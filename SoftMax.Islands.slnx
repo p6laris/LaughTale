@@ -1,5 +1,0 @@
-<Solution>
-  <Project Path="SoftMax.Islands.Core/SoftMax.Islands.Core.csproj" />
-  <Project Path="SoftMax.Islands.Generators/SoftMax.Islands.Generators.csproj" />
-  <Project Path="SoftMax.Islands.Showcase/SoftMax.Islands.Showcase.csproj" />
-</Solution>

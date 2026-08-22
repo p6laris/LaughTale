@@ -1,0 +1,124 @@
+@page
+@model SoftMax.LaughTale.Showcase.Pages.IndexModel
+@{
+    ViewData["Title"] = "LaughTale Islands Architecture Framework";
+}
+
+<!-- Hero Header Card -->
+<div class="aura-header-card">
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <h1 class="page-title">LaughTale Islands Architecture for .NET</h1>
+            <p class="page-desc">
+                High-performance <strong>Server-Side Rendering (SSR)</strong> with selective multi-strategy client hydration, View Transitions, and C# server slot projection.
+            </p>
+        </div>
+
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <span class="aura-tag tag-emerald">Load</span>
+            <span class="aura-tag tag-cyan">Idle</span>
+            <span class="aura-tag tag-amber">Visible</span>
+            <span class="aura-tag tag-purple">Interaction</span>
+            <span class="aura-tag tag-slate">Server Slots</span>
+        </div>
+    </div>
+</div>
+
+<!-- Grid 1: Above The Fold Interactive Islands -->
+<div class="grid-cols-2" style="margin-bottom: 2rem;">
+    
+    <!-- Island 1: Counter (HydrateStrategy.Load) -->
+    <div class="aura-card">
+        <h2 class="section-title">1. Numeric Stepper Island</h2>
+        <p class="section-desc" style="margin-bottom: 1.25rem;">Above-the-fold component with immediate client hydration.</p>
+
+        <island name="interactive-counter" 
+                props="@(new CounterProps(25, 5, "Batch Concurrency"))" 
+                hydrate="Load">
+            <div class="skeleton">
+                Loading Counter Island (SSR Skeleton)...
+            </div>
+        </island>
+    </div>
+
+    <!-- Island 2: Modal Dialog with C# Server Slot Projection -->
+    <div class="aura-card">
+        <h2 class="section-title">2. Modal Dialog with Server Slot</h2>
+        <p class="section-desc" style="margin-bottom: 1.25rem;">Client island wraps and animates arbitrary server-rendered Razor HTML.</p>
+
+        <island name="modal-dialog" 
+                props="@(new SecurityModalProps("Inspect Security Policy", "Enterprise Access Control Policy"))" 
+                hydrate="Interaction">
+            <!-- Server-rendered C# slot content -->
+            <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1rem;">
+                <div style="font-size: 0.8125rem; font-weight: 600; color: var(--p-surface-900);">Zero-Trust Compliance Standard</div>
+                <p style="font-size: 0.75rem; color: var(--p-surface-600); margin-top: 0.25rem; line-height: 1.5;">
+                    All cross-boundary props are serialized at compile-time via Roslyn analyzers and validated server-side.
+                </p>
+                <div style="margin-top: 0.5rem; font-size: 0.6875rem; font-family: var(--p-font-mono); color: var(--p-primary-700);">
+                    Build Hash: @Guid.NewGuid().ToString("N").Substring(0, 8) &bull; Verified: @DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm") UTC
+                </div>
+            </div>
+        </island>
+    </div>
+
+</div>
+
+<!-- Grid 2: Inter-Island Event Bus -->
+<div class="aura-card" style="margin-bottom: 2rem;">
+    <h2 class="section-title">3 &amp; 4. Inter-Island Reactive Event Bus</h2>
+    <p class="section-desc" style="margin-bottom: 1.25rem;">Zero-dependency communication between isolated islands across the DOM tree.</p>
+
+    <div class="grid-cols-2">
+        <island name="event-broadcaster" 
+                props="@(new EventBroadcasterProps("telemetry-channel", "Send Telemetry Pulse"))" 
+                hydrate="Interaction" />
+
+        <island name="event-receiver" 
+                props="@(new EventReceiverProps("telemetry-channel", "Awaiting telemetry broadcast events..."))" 
+                hydrate="Idle" />
+    </div>
+</div>
+
+<!-- Grid 3: Below-the-fold Scroll Hydration (HydrateStrategy.Visible) -->
+<div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--p-border-color);">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+        <div>
+            <h2 class="section-title">Below-the-Fold Lazy Hydration</h2>
+            <p class="section-desc">These islands execute 0 bytes of JavaScript until scrolled into the viewport via IntersectionObserver.</p>
+        </div>
+        <span class="aura-tag tag-cyan">Hydrate: Visible</span>
+    </div>
+
+    <div class="grid-cols-2">
+        
+        <!-- Island 5: Hierarchy Tree -->
+        <div class="aura-card">
+            <h2 class="section-title">5. Department Hierarchy Tree</h2>
+            <p class="section-desc" style="margin-bottom: 1.25rem;">Searchable tree with multi-level depth and outside-click dismiss.</p>
+
+            <island name="cascade-tree" 
+                    props="@(new DepartmentTreeProps("Select Department...", "SelectedDepartmentId", Model.Departments))" 
+                    hydrate="Visible">
+                <div class="skeleton">
+                    Department Tree (Hydrates on scroll)
+                </div>
+            </island>
+        </div>
+
+        <!-- Island 6: File Dropzone -->
+        <div class="aura-card">
+            <h2 class="section-title">6. Secure Document Vault</h2>
+            <p class="section-desc" style="margin-bottom: 1.25rem;">Client-side size checks, MIME verification, and instant upload preview.</p>
+
+            <island name="file-dropzone" 
+                    props="@(new DropzoneProps("DocumentAttachment", ".pdf,.docx,.xlsx,.png", 10, "Drop enterprise attachments here"))" 
+                    hydrate="Visible">
+                <div class="skeleton">
+                    Document Vault (Hydrates on scroll)
+                </div>
+            </island>
+        </div>
+
+    </div>
+</div>

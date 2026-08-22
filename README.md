@@ -1,6 +1,6 @@
-# 🏝️ SoftMax.Islands 2.0
+# 🏝️ SoftMax.LaughTale 2.0
 
-A high-performance, Astro-grade **Islands Architecture framework for ASP.NET Core & Blazor SSR (.NET 9/10 + TypeScript)**.
+A high-performance, Astro-grade **LaughTale Islands Architecture framework for ASP.NET Core & Blazor SSR (.NET 9/10 + TypeScript)**.
 
 ---
 
@@ -21,10 +21,10 @@ A high-performance, Astro-grade **Islands Architecture framework for ASP.NET Cor
 
 | Project | Purpose | Target |
 |---|---|---|
-| **`SoftMax.Islands.Core`** | Core runtime: `HydrateStrategy`, `<Island />` component, TagHelpers, Slots, and JSON serializer. | `net10.0` |
-| **`SoftMax.Islands.Generators`** | Roslyn Source Generator & Diagnostic Analyzer (`SMI001`, `SMI002`). | `netstandard2.0` |
-| **`SoftMax.Islands.Client`** | Sub-2 KB TypeScript hydration engine, View Transitions router & event bus. | `@softmax/islands` |
-| **`SoftMax.Islands.Showcase`** | Live demo application showcasing all 6 hydration modes, slots, and persistent islands. | `net10.0` Web App |
+| **`SoftMax.LaughTale.Core`** | Core runtime: `HydrateStrategy`, `<Island />` component, TagHelpers, Slots, and JSON serializer. | `net10.0` |
+| **`SoftMax.LaughTale.Generators`** | Roslyn Source Generator & Diagnostic Analyzer (`SMI001`, `SMI002`). | `netstandard2.0` |
+| **`SoftMax.LaughTale.Client`** | Sub-2 KB TypeScript hydration engine, View Transitions router & event bus. | `@softmax/islands` |
+| **`SoftMax.LaughTale.Showcase`** | Live demo application showcasing all 6 hydration modes, slots, and persistent islands. | `net10.0` Web App |
 
 ---
 
@@ -96,6 +96,6 @@ public record TaskRunnerProps(CancellationToken Token);
 ## 🏃 Running the Showcase App
 
 ```powershell
-dotnet run --project SoftMax.Islands/SoftMax.Islands.Showcase/SoftMax.Islands.Showcase.csproj
+dotnet run --project SoftMax.LaughTale/SoftMax.LaughTale.Showcase/SoftMax.LaughTale.Showcase.csproj
 ```
 Open **`https://localhost:5001`** and navigate between the **Showcase Hub** and **Architecture Docs** to see View Transitions and persistent islands in action!

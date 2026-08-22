@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="SoftMax.LaughTale.Core/SoftMax.LaughTale.Core.csproj" />
+  <Project Path="SoftMax.LaughTale.Generators/SoftMax.LaughTale.Generators.csproj" />
+  <Project Path="SoftMax.LaughTale.Showcase/SoftMax.LaughTale.Showcase.csproj" />
+</Solution>

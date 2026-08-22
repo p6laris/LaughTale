@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>SoftMax.LaughTale.Showcase</AssemblyName>
+    <RootNamespace>SoftMax.LaughTale.Showcase</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SoftMax.LaughTale.Core\SoftMax.LaughTale.Core.csproj" />
+    <ProjectReference Include="..\SoftMax.LaughTale.Generators\SoftMax.LaughTale.Generators.csproj" 
+                      OutputItemType="Analyzer" 
+                      ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <!-- Auto-bundle TypeScript islands before build -->
+  <Target Name="BuildIslandsJs" BeforeTargets="BeforeBuild" Condition="'$(DesignTimeBuild)' != 'true'">
+    <Exec Command="npm run build" WorkingDirectory="$(ProjectDir)" Condition="Exists('$(ProjectDir)package.json')" />
+  </Target>
+
+</Project>
