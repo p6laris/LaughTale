@@ -32,6 +32,113 @@
 <island-scroll-top />
 
 <!-- ========================================== -->
+<!-- 0. Compound Components & Atomic Blocks Showcase -->
+<!-- ========================================== -->
+<div style="margin-bottom: 2.5rem;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
+        <div>
+            <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--p-surface-900);">Compound Components &amp; Atomic UI Blocks</h2>
+            <p style="font-size: 0.875rem; color: var(--p-surface-500); margin-top: 0.25rem;">Radix / shadcn-style atomic composition: cards, fields, input groups, dialogs, and accordions built with clean customizable CSS tokens.</p>
+        </div>
+        <span class="aura-tag tag-emerald">Compound Blocks</span>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.5rem;">
+        
+        <!-- Block 1: Compound Card with Fields -->
+        <island-card>
+            <island-card-header>
+                <island-card-title>Telemetry Ingress Gateway</island-card-title>
+                <island-card-description>Configure zero-trust ingress credentials.</island-card-description>
+            </island-card-header>
+
+            <island-card-content class="space-y-4">
+                <island-field>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <island-label for="secKey" required="true">Security Key</island-label>
+                        <span class="aura-tag tag-emerald" style="font-size: 0.6875rem;">HSM Active</span>
+                    </div>
+                    <island-input-group>
+                        <island-input-icon icon="key" />
+                        <island-input-text id="secKey" placeholder="sk-live-0921..." />
+                        <island-button variant="Secondary" size="Small">Verify</island-button>
+                    </island-input-group>
+                    <island-helper-text>Cryptographically hashed with SHA-384.</island-helper-text>
+                </island-field>
+
+                <island-field>
+                    <island-label for="operatorEmail">Operator Notification Email</island-label>
+                    <island-input-group>
+                        <island-input-icon icon="mail" />
+                        <island-input-text id="operatorEmail" type="email" placeholder="devops@softmax.dev" />
+                    </island-input-group>
+                </island-field>
+            </island-card-content>
+
+            <island-card-footer class="flex justify-between">
+                <island-button variant="Ghost">Cancel</island-button>
+                <island-button variant="Solid" icon="check">Save Settings</island-button>
+            </island-card-footer>
+        </island-card>
+
+        <!-- Block 2: Compound Accordion & Dialog Trigger -->
+        <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+            
+            <!-- Compound Accordion -->
+            <island-accordion-root>
+                <island-accordion-item>
+                    <island-accordion-trigger>
+                        Zero-Trust Security Policies
+                    </island-accordion-trigger>
+                    <island-accordion-content>
+                        Enforces mTLS mutual authentication and hardware-backed JWT signatures on all endpoints.
+                    </island-accordion-content>
+                </island-accordion-item>
+
+                <island-accordion-item>
+                    <island-accordion-trigger>
+                        Real-time Telemetry Quotas
+                    </island-accordion-trigger>
+                    <island-accordion-content>
+                        Peak bandwidth capped at 10 Gbps with automatic multi-region failover.
+                    </island-accordion-content>
+                </island-accordion-item>
+            </island-accordion-root>
+
+            <!-- Compound Dialog Trigger -->
+            <island-dialog>
+                <island-dialog-trigger>
+                    <island-button variant="Outline" class="w-full">
+                        Open Security Policy Modal (Compound Dialog)
+                    </island-button>
+                </island-dialog-trigger>
+
+                <island-dialog-content>
+                    <island-dialog-header>
+                        <island-dialog-title>Confirm Key Rotation</island-dialog-title>
+                    </island-dialog-header>
+
+                    <p style="font-size: 0.875rem; color: var(--p-surface-600); margin-bottom: 1.25rem;">
+                        Are you sure you want to rotate the active HMAC root signing key? All active sessions will be re-negotiated within 60 seconds.
+                    </p>
+
+                    <island-dialog-footer>
+                        <island-dialog-close>
+                            <island-button variant="Ghost">Cancel</island-button>
+                        </island-dialog-close>
+                        <island-dialog-close>
+                            <island-button variant="Destructive">Rotate Key</island-button>
+                        </island-dialog-close>
+                    </island-dialog-footer>
+                </island-dialog-content>
+            </island-dialog>
+
+        </div>
+
+    </div>
+</div>
+
+<!-- ========================================== -->
 <!-- 1. Form & Input Controls Suite -->
 <!-- ========================================== -->
 <div class="p-card" style="margin-bottom: 2rem;">
