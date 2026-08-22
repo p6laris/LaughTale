@@ -2,7 +2,7 @@
  * SoftMax.LaughTale: Enterprise Chips / Tag Input Component (Aura InputTags inspired)
  */
 
-import { getSolarIcon } from '../icons/solar';
+import { LucideIcons } from '../icons/lucide';
 
 export interface ChipsProps {
     targetInputName?: string;
@@ -21,7 +21,7 @@ export default function ChipsIsland(container: HTMLElement, props: ChipsProps) {
                 <span>${c}</span>
                 ${!props.disabled ? `
                     <button type="button" class="remove-chip-btn" data-index="${idx}" style="border: none; background: transparent; color: var(--p-surface-400); cursor: pointer; display: flex; align-items: center; padding: 0;">
-                        ${getSolarIcon('close')}
+                        ${LucideIcons.x}
                     </button>
                 ` : ''}
             </span>

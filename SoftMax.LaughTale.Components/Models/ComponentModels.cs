@@ -55,3 +55,32 @@ public record SpeedDialAction(
     string? Icon = null,
     string? Action = null
 );
+
+public record AccordionTab(
+    string Id,
+    string Header,
+    string? Content = null,
+    string? Icon = null,
+    bool Disabled = false
+);
+
+public record TabItem(
+    string Id,
+    string Header,
+    string? Content = null,
+    string? Icon = null,
+    bool Disabled = false
+);
+
+public record AutoCompleteItem(
+    string Label,
+    string Value,
+    string? Category = null,
+    string? Icon = null
+);
+
+public record BreadcrumbItem(
+    string Label,
+    string? Url = null,
+    string? Icon = null
+);

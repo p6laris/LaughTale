@@ -97,4 +97,5 @@ export default function SliderIsland(container: HTMLElement, props: SliderProps)
     }
 
     render();
+    syncValue();
 }

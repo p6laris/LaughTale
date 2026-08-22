@@ -87,6 +87,36 @@ public class EnterpriseModel : PageModel
         new("Trigger Backup", null, "backup")
     };
 
+    public List<AccordionTab> AccordionTabs { get; set; } = new()
+    {
+        new("tab-1", "Zero-Trust Architecture", "Every network request and internal IPC transaction is authenticated and encrypted via mutual TLS 1.3 with ephemeral cryptographic tokens.", "🔒"),
+        new("tab-2", "Islands Hydration Lifecycle", "LaughTale detects interactive islands at compile-time and only ships sub-1KB micro-bundles for the exact components on the page.", "⚡"),
+        new("tab-3", "Hardware Security Module (HSM)", "FIPS 140-3 Level 4 physical tamper-resistant hardware key generation with automated annual key rotations.", "🛡️")
+    };
+
+    public List<TabItem> TabSections { get; set; } = new()
+    {
+        new("t-1", "Cluster Health", "All 18 core services running at nominal latency (< 5ms). Zero anomalous egress detected across all cloud regions.", "⚡"),
+        new("t-2", "Threat Monitoring", "Real-time AI behavioral anomaly detection active. 0 critical vulnerabilities identified across the runtime layer.", "🛡️"),
+        new("t-3", "Backup & Snapshots", "Geo-redundant automated continuous volume backups synchronized with RPO < 15s and RTO < 60s.", "💾")
+    };
+
+    public List<AutoCompleteItem> CityOptions { get; set; } = new()
+    {
+        new("Erbil, Kurdistan Region", "EBL", "Kurdistan"),
+        new("Sulaymaniyah, Kurdistan Region", "SUL", "Kurdistan"),
+        new("Duhok, Kurdistan Region", "DHK", "Kurdistan"),
+        new("Baghdad, Iraq", "BGW", "Iraq"),
+        new("Basra, Iraq", "BSR", "Iraq")
+    };
+
+    public List<BreadcrumbItem> Breadcrumbs { get; set; } = new()
+    {
+        new("Enterprise Hub", "/enterprise"),
+        new("Security Clusters", "/enterprise#security"),
+        new("Node Zero-Trust #01")
+    };
+
     public void OnGet()
     {
     }

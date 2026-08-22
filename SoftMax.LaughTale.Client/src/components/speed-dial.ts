@@ -2,7 +2,7 @@
  * SoftMax.LaughTale: Enterprise SpeedDial FAB Component (Aura SpeedDial inspired)
  */
 
-import { getSolarIcon } from '../icons/solar';
+import { LucideIcons } from '../icons/lucide';
 
 export interface SpeedDialAction {
     label: string;
@@ -26,7 +26,7 @@ export default function SpeedDialIsland(container: HTMLElement, props: SpeedDial
                     title="${act.label}" 
                     data-action="${act.action || ''}" 
                     style="width: 2.5rem; height: 2.5rem; border-radius: 50%; border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-surface-800); box-shadow: var(--p-shadow-md); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);">
-                ${act.icon || getSolarIcon('bolt')}
+                ${act.icon || LucideIcons.zap}
             </button>
         `).join('');
 
@@ -34,7 +34,7 @@ export default function SpeedDialIsland(container: HTMLElement, props: SpeedDial
             <div class="laughtale-speed-dial" style="position: relative; display: inline-flex; flex-direction: column-reverse; align-items: center; gap: 0.75rem;">
                 <!-- Main FAB Button -->
                 <button type="button" class="speed-dial-main-btn" style="width: 3.25rem; height: 3.25rem; border-radius: 50%; border: none; background: var(--p-primary-600); color: #ffffff; box-shadow: var(--p-shadow-lg); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1); transform: rotate(${isOpen ? '45deg' : '0deg'});">
-                    ${isOpen ? getSolarIcon('plus') : getSolarIcon('plus')}
+                    ${LucideIcons.plus}
                 </button>
 
                 <!-- Action Items -->

@@ -2,7 +2,7 @@
  * SoftMax.LaughTale: Enterprise Slide-out Drawer / Sidebar Component (Aura Drawer inspired)
  */
 
-import { getSolarIcon } from '../icons/solar';
+import { LucideIcons } from '../icons/lucide';
 
 export interface DrawerProps {
     position?: 'left' | 'right' | 'top' | 'bottom';
@@ -37,7 +37,7 @@ export default function DrawerIsland(container: HTMLElement, props: DrawerProps)
                             ${props.title || 'Panel'}
                         </div>
                         <button type="button" class="drawer-close-btn" style="border: none; background: transparent; color: var(--p-surface-400); cursor: pointer; display: flex; align-items: center; padding: 0.25rem;">
-                            ${getSolarIcon('close')}
+                            ${LucideIcons.x}
                         </button>
                     </div>
 

@@ -2,7 +2,7 @@
  * SoftMax.LaughTale: Enterprise Rating Component (Aura Rating inspired)
  */
 
-import { getSolarIcon } from '../icons/solar';
+import { LucideIcons } from '../icons/lucide';
 
 export interface RatingProps {
     targetInputName?: string;
@@ -25,7 +25,7 @@ export default function RatingIsland(container: HTMLElement, props: RatingProps)
 
             return `
                 <span class="rating-star" data-star="${starNum}" style="cursor: ${props.disabled ? 'default' : 'pointer'}; color: ${color}; transition: transform 0.15s ease, color 0.15s ease; display: inline-flex;">
-                    ${getSolarIcon('star')}
+                    ${isFilled ? LucideIcons.star : LucideIcons.starEmpty}
                 </span>
             `;
         }).join('');
@@ -34,7 +34,7 @@ export default function RatingIsland(container: HTMLElement, props: RatingProps)
             <div class="laughtale-rating" style="display: inline-flex; align-items: center; gap: 0.35rem; user-select: none;">
                 ${props.allowCancel !== false ? `
                     <button type="button" class="rating-cancel-btn" style="border: none; background: transparent; color: var(--p-surface-400); cursor: pointer; display: flex; align-items: center; padding: 0 0.25rem;">
-                        ${getSolarIcon('close')}
+                        ${LucideIcons.x}
                     </button>
                 ` : ''}
                 ${starElements}
@@ -89,4 +89,5 @@ export default function RatingIsland(container: HTMLElement, props: RatingProps)
     }
 
     render();
+    syncValue();
 }

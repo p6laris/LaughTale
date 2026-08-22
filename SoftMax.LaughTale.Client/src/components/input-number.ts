@@ -2,7 +2,7 @@
  * SoftMax.LaughTale: Enterprise Number & Currency Input Component (Aura InputNumber inspired)
  */
 
-import { getSolarIcon } from '../icons/solar';
+import { LucideIcons } from '../icons/lucide';
 
 export interface InputNumberProps {
     targetInputName?: string;
@@ -47,11 +47,11 @@ export default function InputNumberIsland(container: HTMLElement, props: InputNu
                 
                 ${props.showButtons !== false ? `
                     <div style="display: flex; flex-direction: column; border-left: 1px solid var(--p-border-color); width: 2rem;">
-                        <button type="button" class="btn-step-up" style="flex: 1; border: none; background: var(--p-surface-50); color: var(--p-surface-600); cursor: pointer; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid var(--p-border-color); font-size: 0.625rem; transition: background 0.15s ease;">
-                            ▲
+                        <button type="button" class="btn-step-up" style="flex: 1; border: none; background: var(--p-surface-50); color: var(--p-surface-600); cursor: pointer; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid var(--p-border-color); transition: background 0.15s ease;">
+                            ${LucideIcons.chevronUp}
                         </button>
-                        <button type="button" class="btn-step-down" style="flex: 1; border: none; background: var(--p-surface-50); color: var(--p-surface-600); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.625rem; transition: background 0.15s ease;">
-                            ▼
+                        <button type="button" class="btn-step-down" style="flex: 1; border: none; background: var(--p-surface-50); color: var(--p-surface-600); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s ease;">
+                            ${LucideIcons.chevronDown}
                         </button>
                     </div>
                 ` : ''}

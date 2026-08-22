@@ -16,7 +16,7 @@ export default function InputOtpIsland(container: HTMLElement, props: InputOtpPr
     function render() {
         const boxes = Array.from({ length }, (_, i) => `
             <input type="${props.mask ? 'password' : 'text'}" 
-                   class="otp-box" 
+                   class="otp-box otp-digit-input" 
                    data-index="${i}" 
                    maxlength="1" 
                    inputmode="numeric" 
@@ -107,4 +107,5 @@ export default function InputOtpIsland(container: HTMLElement, props: InputOtpPr
     }
 
     render();
+    syncOtp();
 }

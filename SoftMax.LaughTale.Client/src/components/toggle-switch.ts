@@ -51,4 +51,5 @@ export default function ToggleSwitchIsland(container: HTMLElement, props: Toggle
     }
 
     render();
+    syncValue();
 }

@@ -2,7 +2,7 @@
  * SoftMax.LaughTale: Enterprise DatePicker Component (Aura DatePicker inspired)
  */
 
-import { getSolarIcon } from '../icons/solar';
+import { LucideIcons } from '../icons/lucide';
 
 export interface DatePickerProps {
     targetInputName?: string;
@@ -59,7 +59,7 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
                     <span style="font-size: 0.875rem; color: ${selectedDate ? 'var(--p-text-color)' : 'var(--p-surface-400)'};">
                         ${selectedDate ? formatDate(selectedDate) : (props.placeholder || 'Select date...')}
                     </span>
-                    <span style="color: var(--p-surface-500); display: flex; align-items: center;">${getSolarIcon('calendar')}</span>
+                    <span style="color: var(--p-surface-500); display: flex; align-items: center;">${LucideIcons.calendar}</span>
                 </div>
 
                 <!-- Calendar Popup Overlay -->
@@ -67,13 +67,13 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
                     <!-- Calendar Header -->
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
                         <button type="button" class="btn-prev-month" style="border: none; background: transparent; color: var(--p-surface-600); cursor: pointer; display: flex; align-items: center; padding: 0.25rem;">
-                            ${getSolarIcon('chevronLeft')}
+                            ${LucideIcons.chevronLeft}
                         </button>
                         <div style="font-size: 0.875rem; font-weight: 700; color: var(--p-surface-900);">
                             ${monthNames[viewMonth]} ${viewYear}
                         </div>
                         <button type="button" class="btn-next-month" style="border: none; background: transparent; color: var(--p-surface-600); cursor: pointer; display: flex; align-items: center; padding: 0.25rem;">
-                            ${getSolarIcon('chevronRight')}
+                            ${LucideIcons.chevronRight}
                         </button>
                     </div>
 

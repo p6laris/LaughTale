@@ -2,7 +2,7 @@
  * SoftMax.LaughTale: Enterprise ConfirmPopup Component (Aura ConfirmPopup inspired)
  */
 
-import { getSolarIcon } from '../icons/solar';
+import { LucideIcons } from '../icons/lucide';
 
 export interface ConfirmPopupProps {
     targetSelector: string; // CSS selector of trigger button
@@ -19,7 +19,7 @@ export default function ConfirmPopupIsland(container: HTMLElement, props: Confir
         container.innerHTML = `
             <div class="laughtale-confirm-popup" style="display: ${isOpen ? 'block' : 'none'}; position: absolute; z-index: 1000; background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); box-shadow: var(--p-shadow-lg); padding: 1rem; width: 260px; animation: scaleIn 0.15s ease;">
                 <div style="display: flex; align-items: flex-start; gap: 0.5rem; margin-bottom: 0.75rem;">
-                    <span style="color: #f59e0b; font-size: 1.25rem;">⚠️</span>
+                    <span style="color: #f59e0b; display: flex; align-items: center; margin-top: 2px;">${LucideIcons.alertTriangle}</span>
                     <span style="font-size: 0.875rem; font-weight: 500; color: var(--p-surface-900); line-height: 1.4;">${props.message}</span>
                 </div>
                 <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">

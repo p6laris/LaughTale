@@ -18,7 +18,7 @@ export { awaitStreamingReady } from './runtime/streaming';
 export { createVanillaIsland } from './adapters/vanilla';
 export { createPreactIsland } from './adapters/preact';
 export { initDirectives } from './directives/index';
-export { SolarIcons, getSolarIcon } from './icons/solar';
+export { LucideIcons, getLucideIcon } from './icons/lucide';
 
 // Auto-register built-in enterprise components
 defineIsland('stepper', () => import('./components/stepper'));
@@ -30,7 +30,7 @@ defineIsland('datagrid', () => import('./components/datagrid'));
 defineIsland('modal', () => import('./components/modal'));
 defineIsland('toast', () => import('./components/toast'));
 
-// Aura Expanded Components
+// Aura Expanded Suite
 defineIsland('input-number', () => import('./components/input-number'));
 defineIsland('input-otp', () => import('./components/input-otp'));
 defineIsland('input-password', () => import('./components/input-password'));
@@ -48,3 +48,14 @@ defineIsland('drawer', () => import('./components/drawer'));
 defineIsland('speed-dial', () => import('./components/speed-dial'));
 defineIsland('image-compare', () => import('./components/image-compare'));
 defineIsland('confirm-popup', () => import('./components/confirm-popup'));
+
+// Aura Additional Enterprise Components
+defineIsland('accordion', () => import('./components/accordion'));
+defineIsland('tabs', () => import('./components/tabs'));
+defineIsland('autocomplete', () => import('./components/autocomplete'));
+defineIsland('color-picker', () => import('./components/color-picker'));
+defineIsland('knob', () => import('./components/knob'));
+defineIsland('tag', () => import('./components/tag'));
+defineIsland('breadcrumb', () => import('./components/breadcrumb'));
+defineIsland('scroll-top', () => import('./components/scroll-top'));
+defineIsland('inplace', () => import('./components/inplace'));

@@ -1400,29 +1400,65 @@ var init_preact = __esm({
   }
 });
 
-// src/icons/solar.ts
-function getSolarIcon(name) {
-  return SolarIcons[name] || "";
+// src/icons/lucide.ts
+function getLucideIcon(name) {
+  return LucideIcons[name] || "";
 }
-var SolarIcons;
-var init_solar = __esm({
-  "src/icons/solar.ts"() {
+var LucideIcons;
+var init_lucide = __esm({
+  "src/icons/lucide.ts"() {
     "use strict";
-    SolarIcons = {
-      check: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2S2 6.477 2 12s4.477 10 10 10" opacity=".5"/><path fill="currentColor" d="m10.5 15.5l7-7l-1.4-1.4l-5.6 5.6l-2.6-2.6l-1.4 1.4z"/></svg>`,
-      close: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2S2 6.477 2 12s4.477 10 10 10" opacity=".5"/><path fill="currentColor" d="m13.41 12l3.3-3.29a1 1 0 1 0-1.42-1.42L12 10.59l-3.29-3.3a1 1 0 0 0-1.42 1.42l3.3 3.29l-3.3 3.29a1 1 0 0 0 1.42 1.42l3.29-3.3l3.29 3.3a1 1 0 0 0 1.42-1.42z"/></svg>`,
-      eye: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12S6.477 2 12 2" opacity=".5"/><path fill="currentColor" d="M12 9a3 3 0 1 0 0 6a3 3 0 0 0 0-6m-7 3c1.73-3.04 4.19-5 7-5s5.27 1.96 7 5c-1.73 3.04-4.19 5-7 5s-5.27-1.96-7-5"/></svg>`,
-      eyeClosed: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2S2 6.477 2 12s4.477 10 10 10" opacity=".5"/><path fill="currentColor" d="M2.71 3.71a1 1 0 0 0 0 1.42l2.36 2.36C3.76 8.76 2.66 10.27 2 12c1.73 3.04 4.19 5 7 5c1.76 0 3.37-.77 4.7-1.94l3.59 3.59a1 1 0 0 0 1.42-1.42l-16-16zM12 15a3 3 0 0 1-2.91-2.27l3.18 3.18c-.09.06-.18.09-.27.09"/></svg>`,
-      star: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2l3.09 6.26L22 9.27l-5 4.87l1.18 6.88L12 17.77l-6.18 3.25L7 14.14L2 9.27l6.91-1.01z"/></svg>`,
-      starEmpty: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" d="M12 2l3.09 6.26L22 9.27l-5 4.87l1.18 6.88L12 17.77l-6.18 3.25L7 14.14L2 9.27l6.91-1.01z"/></svg>`,
-      calendar: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M8 2a1 1 0 0 1 1 1v1h6V3a1 1 0 1 1 2 0v1h1a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h1V3a1 1 0 0 1 1-1m11 7H5v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1z"/></svg>`,
-      chevronLeft: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 19l-7-7l7-7"/></svg>`,
-      chevronRight: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 5l7 7l-7 7"/></svg>`,
-      plus: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v14m-7-7h14"/></svg>`,
-      minus: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14"/></svg>`,
-      dollar: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a1 1 0 0 1 1 1v1.06c2.58.33 4 2.05 4 4.19a1 1 0 1 1-2 0c0-1.12-.76-2.19-2-2.25V11c2.67.67 4 1.83 4 4.25c0 2.2-1.46 3.96-4 4.25V21a1 1 0 1 1-2 0v-1.06c-2.58-.33-4-2.05-4-4.19a1 1 0 1 1 2 0c0 1.12.76 2.19 2 2.25v-5c-2.67-.67-4-1.83-4-4.25c0-2.2 1.46-3.96 4-4.25V3a1 1 0 0 1 1-1"/></svg>`,
-      bolt: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M11 21h-1l1-7H7.5c-.58 0-.57-.32-.38-.66c.19-.34.05-.08.08-.14C8.58 10.61 10.74 6.8 13.7 2h1l-1 7h3.5c.49 0 .56.33.47.51l-.07.13z"/></svg>`,
-      home: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2L2 12h3v8h6v-6h2v6h6v-8h3z"/></svg>`
+    LucideIcons = {
+      // Navigation & Arrows
+      chevronDown: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`,
+      chevronUp: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>`,
+      chevronLeft: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>`,
+      chevronRight: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`,
+      arrowUp: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>`,
+      arrowDown: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>`,
+      arrowLeft: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>`,
+      arrowRight: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>`,
+      // Common Actions
+      check: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>`,
+      checkCircle: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>`,
+      x: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`,
+      xCircle: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>`,
+      plus: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>`,
+      minus: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>`,
+      search: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>`,
+      refreshCw: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>`,
+      trash2: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>`,
+      copy: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>`,
+      externalLink: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>`,
+      // Forms & Controls
+      eye: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>`,
+      eyeOff: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>`,
+      calendar: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>`,
+      clock: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
+      star: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`,
+      starEmpty: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`,
+      camera: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>`,
+      uploadCloud: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M12 12v9"/><path d="m16 16-4-4-4 4"/></svg>`,
+      sliders: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="4" y1="21" y2="14"/><line x1="4" x2="4" y1="10" y2="3"/><line x1="12" x2="12" y1="21" y2="12"/><line x1="12" x2="12" y1="8" y2="3"/><line x1="20" x2="20" y1="21" y2="16"/><line x1="20" x2="20" y1="12" y2="3"/><line x1="1" x2="7" y1="14" y2="14"/><line x1="9" x2="15" y1="8" y2="8"/><line x1="17" x2="23" y1="16" y2="16"/></svg>`,
+      palette: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>`,
+      // Security & Status
+      lock: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`,
+      shield: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>`,
+      alertTriangle: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>`,
+      info: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
+      bell: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>`,
+      zap: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
+      activity: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>`,
+      // Media & UI
+      layers: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.9a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg>`,
+      folder: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>`,
+      fileText: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>`,
+      terminal: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/></svg>`,
+      moreHorizontal: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>`,
+      sun: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`,
+      moon: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>`,
+      home: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`,
+      edit: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>`
     };
   }
 });
@@ -2193,11 +2229,11 @@ function InputNumberIsland(container, props) {
                 
                 ${props.showButtons !== false ? `
                     <div style="display: flex; flex-direction: column; border-left: 1px solid var(--p-border-color); width: 2rem;">
-                        <button type="button" class="btn-step-up" style="flex: 1; border: none; background: var(--p-surface-50); color: var(--p-surface-600); cursor: pointer; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid var(--p-border-color); font-size: 0.625rem; transition: background 0.15s ease;">
-                            \u25B2
+                        <button type="button" class="btn-step-up" style="flex: 1; border: none; background: var(--p-surface-50); color: var(--p-surface-600); cursor: pointer; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid var(--p-border-color); transition: background 0.15s ease;">
+                            ${LucideIcons.chevronUp}
                         </button>
-                        <button type="button" class="btn-step-down" style="flex: 1; border: none; background: var(--p-surface-50); color: var(--p-surface-600); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.625rem; transition: background 0.15s ease;">
-                            \u25BC
+                        <button type="button" class="btn-step-down" style="flex: 1; border: none; background: var(--p-surface-50); color: var(--p-surface-600); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s ease;">
+                            ${LucideIcons.chevronDown}
                         </button>
                     </div>
                 ` : ""}
@@ -2258,6 +2294,7 @@ function InputNumberIsland(container, props) {
 var init_input_number = __esm({
   "src/components/input-number.ts"() {
     "use strict";
+    init_lucide();
   }
 });
 
@@ -2391,7 +2428,7 @@ function InputPasswordIsland(container, props) {
                     
                     ${props.toggleMask !== false ? `
                         <button type="button" class="toggle-mask-btn" style="border: none; background: transparent; color: var(--p-surface-400); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0.25rem;">
-                            ${isMasked ? getSolarIcon("eye") : getSolarIcon("eyeClosed")}
+                            ${isMasked ? LucideIcons.eye : LucideIcons.eyeOff}
                         </button>
                     ` : ""}
                 </div>
@@ -2444,7 +2481,7 @@ function InputPasswordIsland(container, props) {
 var init_input_password = __esm({
   "src/components/input-password.ts"() {
     "use strict";
-    init_solar();
+    init_lucide();
   }
 });
 
@@ -2597,7 +2634,7 @@ function RatingIsland(container, props) {
       const color = isFilled ? "#f59e0b" : "var(--p-surface-300)";
       return `
                 <span class="rating-star" data-star="${starNum}" style="cursor: ${props.disabled ? "default" : "pointer"}; color: ${color}; transition: transform 0.15s ease, color 0.15s ease; display: inline-flex;">
-                    ${getSolarIcon("star")}
+                    ${isFilled ? LucideIcons.star : LucideIcons.starEmpty}
                 </span>
             `;
     }).join("");
@@ -2605,7 +2642,7 @@ function RatingIsland(container, props) {
             <div class="laughtale-rating" style="display: inline-flex; align-items: center; gap: 0.35rem; user-select: none;">
                 ${props.allowCancel !== false ? `
                     <button type="button" class="rating-cancel-btn" style="border: none; background: transparent; color: var(--p-surface-400); cursor: pointer; display: flex; align-items: center; padding: 0 0.25rem;">
-                        ${getSolarIcon("close")}
+                        ${LucideIcons.x}
                     </button>
                 ` : ""}
                 ${starElements}
@@ -2656,7 +2693,7 @@ function RatingIsland(container, props) {
 var init_rating = __esm({
   "src/components/rating.ts"() {
     "use strict";
-    init_solar();
+    init_lucide();
   }
 });
 
@@ -2732,7 +2769,7 @@ function ChipsIsland(container, props) {
                 <span>${c}</span>
                 ${!props.disabled ? `
                     <button type="button" class="remove-chip-btn" data-index="${idx}" style="border: none; background: transparent; color: var(--p-surface-400); cursor: pointer; display: flex; align-items: center; padding: 0;">
-                        ${getSolarIcon("close")}
+                        ${LucideIcons.x}
                     </button>
                 ` : ""}
             </span>
@@ -2798,7 +2835,7 @@ function ChipsIsland(container, props) {
 var init_chips = __esm({
   "src/components/chips.ts"() {
     "use strict";
-    init_solar();
+    init_lucide();
   }
 });
 
@@ -2846,7 +2883,7 @@ function DatePickerIsland(container, props) {
                     <span style="font-size: 0.875rem; color: ${selectedDate ? "var(--p-text-color)" : "var(--p-surface-400)"};">
                         ${selectedDate ? formatDate(selectedDate) : props.placeholder || "Select date..."}
                     </span>
-                    <span style="color: var(--p-surface-500); display: flex; align-items: center;">${getSolarIcon("calendar")}</span>
+                    <span style="color: var(--p-surface-500); display: flex; align-items: center;">${LucideIcons.calendar}</span>
                 </div>
 
                 <!-- Calendar Popup Overlay -->
@@ -2854,13 +2891,13 @@ function DatePickerIsland(container, props) {
                     <!-- Calendar Header -->
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
                         <button type="button" class="btn-prev-month" style="border: none; background: transparent; color: var(--p-surface-600); cursor: pointer; display: flex; align-items: center; padding: 0.25rem;">
-                            ${getSolarIcon("chevronLeft")}
+                            ${LucideIcons.chevronLeft}
                         </button>
                         <div style="font-size: 0.875rem; font-weight: 700; color: var(--p-surface-900);">
                             ${monthNames[viewMonth]} ${viewYear}
                         </div>
                         <button type="button" class="btn-next-month" style="border: none; background: transparent; color: var(--p-surface-600); cursor: pointer; display: flex; align-items: center; padding: 0.25rem;">
-                            ${getSolarIcon("chevronRight")}
+                            ${LucideIcons.chevronRight}
                         </button>
                     </div>
 
@@ -2941,7 +2978,7 @@ function DatePickerIsland(container, props) {
 var init_datepicker = __esm({
   "src/components/datepicker.ts"() {
     "use strict";
-    init_solar();
+    init_lucide();
   }
 });
 
@@ -3123,7 +3160,7 @@ function DrawerIsland(container, props) {
                             ${props.title || "Panel"}
                         </div>
                         <button type="button" class="drawer-close-btn" style="border: none; background: transparent; color: var(--p-surface-400); cursor: pointer; display: flex; align-items: center; padding: 0.25rem;">
-                            ${getSolarIcon("close")}
+                            ${LucideIcons.x}
                         </button>
                     </div>
 
@@ -3155,7 +3192,7 @@ function DrawerIsland(container, props) {
 var init_drawer = __esm({
   "src/components/drawer.ts"() {
     "use strict";
-    init_solar();
+    init_lucide();
   }
 });
 
@@ -3173,14 +3210,14 @@ function SpeedDialIsland(container, props) {
                     title="${act.label}" 
                     data-action="${act.action || ""}" 
                     style="width: 2.5rem; height: 2.5rem; border-radius: 50%; border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-surface-800); box-shadow: var(--p-shadow-md); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);">
-                ${act.icon || getSolarIcon("bolt")}
+                ${act.icon || LucideIcons.zap}
             </button>
         `).join("");
     container.innerHTML = `
             <div class="laughtale-speed-dial" style="position: relative; display: inline-flex; flex-direction: column-reverse; align-items: center; gap: 0.75rem;">
                 <!-- Main FAB Button -->
                 <button type="button" class="speed-dial-main-btn" style="width: 3.25rem; height: 3.25rem; border-radius: 50%; border: none; background: var(--p-primary-600); color: #ffffff; box-shadow: var(--p-shadow-lg); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1); transform: rotate(${isOpen ? "45deg" : "0deg"});">
-                    ${isOpen ? getSolarIcon("plus") : getSolarIcon("plus")}
+                    ${LucideIcons.plus}
                 </button>
 
                 <!-- Action Items -->
@@ -3210,7 +3247,7 @@ function SpeedDialIsland(container, props) {
 var init_speed_dial = __esm({
   "src/components/speed-dial.ts"() {
     "use strict";
-    init_solar();
+    init_lucide();
   }
 });
 
@@ -3284,7 +3321,7 @@ function ConfirmPopupIsland(container, props) {
     container.innerHTML = `
             <div class="laughtale-confirm-popup" style="display: ${isOpen ? "block" : "none"}; position: absolute; z-index: 1000; background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); box-shadow: var(--p-shadow-lg); padding: 1rem; width: 260px; animation: scaleIn 0.15s ease;">
                 <div style="display: flex; align-items: flex-start; gap: 0.5rem; margin-bottom: 0.75rem;">
-                    <span style="color: #f59e0b; font-size: 1.25rem;">\u26A0\uFE0F</span>
+                    <span style="color: #f59e0b; display: flex; align-items: center; margin-top: 2px;">${LucideIcons.alertTriangle}</span>
                     <span style="font-size: 0.875rem; font-weight: 500; color: var(--p-surface-900); line-height: 1.4;">${props.message}</span>
                 </div>
                 <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
@@ -3331,6 +3368,689 @@ function ConfirmPopupIsland(container, props) {
 var init_confirm_popup = __esm({
   "src/components/confirm-popup.ts"() {
     "use strict";
+    init_lucide();
+  }
+});
+
+// src/components/accordion.ts
+var accordion_exports = {};
+__export(accordion_exports, {
+  default: () => AccordionIsland
+});
+function AccordionIsland(container, props) {
+  const tabs = props.tabs || [];
+  let activeIndices = /* @__PURE__ */ new Set();
+  if (Array.isArray(props.activeIndex)) {
+    props.activeIndex.forEach((i) => activeIndices.add(i));
+  } else if (typeof props.activeIndex === "number") {
+    activeIndices.add(props.activeIndex);
+  } else {
+    activeIndices.add(0);
+  }
+  function render() {
+    const tabHtml = tabs.map((tab, idx) => {
+      const isOpen = activeIndices.has(idx);
+      return `
+                <div class="accordion-tab ${isOpen ? "tab-open" : ""}" data-idx="${idx}" style="border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); margin-bottom: 0.5rem; background: var(--p-surface-0); overflow: hidden;">
+                    <button type="button" 
+                            class="accordion-header-btn" 
+                            data-idx="${idx}" 
+                            ${tab.disabled ? "disabled" : ""} 
+                            style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0.875rem 1.25rem; border: none; background: ${isOpen ? "var(--p-surface-50)" : "var(--p-surface-0)"}; color: var(--p-surface-900); font-weight: 600; font-size: 0.875rem; cursor: ${tab.disabled ? "not-allowed" : "pointer"}; text-align: left; transition: background 0.15s ease;">
+                        <span style="display: flex; align-items: center; gap: 0.5rem;">
+                            ${tab.icon ? `<span>${tab.icon}</span>` : ""}
+                            <span>${tab.header}</span>
+                        </span>
+                        <span class="chevron-icon" style="color: var(--p-surface-500); display: flex; align-items: center; transition: transform 0.2s ease; transform: rotate(${isOpen ? "180deg" : "0deg"});">
+                            ${LucideIcons.chevronDown}
+                        </span>
+                    </button>
+                    <div class="accordion-content" style="display: ${isOpen ? "block" : "none"}; padding: 1.25rem; border-top: 1px solid var(--p-border-color); font-size: 0.875rem; color: var(--p-surface-600); line-height: 1.6; animation: fadeIn 0.2s ease;">
+                        <div class="tab-slot" data-slot-index="${idx}">${tab.content || ""}</div>
+                    </div>
+                </div>
+            `;
+    }).join("");
+    container.innerHTML = `
+            <div class="laughtale-accordion" style="width: 100%;">
+                ${tabHtml}
+            </div>
+        `;
+    tabs.forEach((_, idx) => {
+      const externalSlot = container.querySelector(`[data-slot="tab-${idx}"]`);
+      const targetContainer = container.querySelector(`[data-slot-index="${idx}"]`);
+      if (externalSlot && targetContainer) {
+        targetContainer.innerHTML = "";
+        targetContainer.appendChild(externalSlot);
+      }
+    });
+    container.querySelectorAll(".accordion-header-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const idx = parseInt(btn.getAttribute("data-idx"), 10);
+        if (activeIndices.has(idx)) {
+          activeIndices.delete(idx);
+        } else {
+          if (!props.multiple) activeIndices.clear();
+          activeIndices.add(idx);
+        }
+        render();
+        container.dispatchEvent(new CustomEvent("accordion:change", {
+          bubbles: true,
+          detail: { activeIndex: Array.from(activeIndices) }
+        }));
+      });
+    });
+  }
+  render();
+}
+var init_accordion = __esm({
+  "src/components/accordion.ts"() {
+    "use strict";
+    init_lucide();
+  }
+});
+
+// src/components/tabs.ts
+var tabs_exports = {};
+__export(tabs_exports, {
+  default: () => TabsIsland
+});
+function TabsIsland(container, props) {
+  const tabs = props.tabs || [];
+  let activeIndex = props.activeIndex || 0;
+  function render() {
+    const headerButtons = tabs.map((tab, idx) => {
+      const isActive = idx === activeIndex;
+      return `
+                <button type="button" 
+                        class="tab-header-btn ${isActive ? "tab-active" : ""}" 
+                        data-idx="${idx}" 
+                        ${tab.disabled ? "disabled" : ""} 
+                        style="padding: 0.75rem 1.25rem; border: none; background: transparent; color: ${isActive ? "var(--p-primary-600)" : "var(--p-surface-600)"}; font-weight: ${isActive ? "700" : "500"}; font-size: 0.875rem; cursor: ${tab.disabled ? "not-allowed" : "pointer"}; border-bottom: 2px solid ${isActive ? "var(--p-primary-600)" : "transparent"}; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 0.5rem;">
+                    ${tab.icon ? `<span>${tab.icon}</span>` : ""}
+                    <span>${tab.header}</span>
+                </button>
+            `;
+    }).join("");
+    container.innerHTML = `
+            <div class="laughtale-tabs" style="width: 100%;">
+                <!-- Tab Headers Bar -->
+                <div class="tabs-header-bar" style="display: flex; border-bottom: 1px solid var(--p-border-color); gap: 0.25rem; overflow-x: auto;">
+                    ${headerButtons}
+                </div>
+
+                <!-- Active Tab Content Panel -->
+                <div class="tab-panel-body" style="padding: 1.25rem 0; font-size: 0.875rem; color: var(--p-surface-700); line-height: 1.6; animation: fadeIn 0.2s ease;">
+                    <div class="tab-slot-content">${tabs[activeIndex]?.content || ""}</div>
+                </div>
+            </div>
+        `;
+    const externalSlot = container.querySelector(`[data-slot="tab-${activeIndex}"]`);
+    const targetContainer = container.querySelector(".tab-slot-content");
+    if (externalSlot && targetContainer) {
+      targetContainer.innerHTML = "";
+      targetContainer.appendChild(externalSlot);
+    }
+    container.querySelectorAll(".tab-header-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        activeIndex = parseInt(btn.getAttribute("data-idx"), 10);
+        render();
+        syncValue();
+      });
+    });
+  }
+  function syncValue() {
+    if (props.targetInputName) {
+      let hidden = document.querySelector(`input[name="${props.targetInputName}"]`);
+      if (!hidden) {
+        hidden = document.createElement("input");
+        hidden.type = "hidden";
+        hidden.name = props.targetInputName;
+        container.appendChild(hidden);
+      }
+      hidden.value = activeIndex.toString();
+    }
+    container.dispatchEvent(new CustomEvent("tabs:change", {
+      bubbles: true,
+      detail: { index: activeIndex, tab: tabs[activeIndex] }
+    }));
+  }
+  render();
+  syncValue();
+}
+var init_tabs = __esm({
+  "src/components/tabs.ts"() {
+    "use strict";
+  }
+});
+
+// src/components/autocomplete.ts
+var autocomplete_exports = {};
+__export(autocomplete_exports, {
+  default: () => AutoCompleteIsland
+});
+function AutoCompleteIsland(container, props) {
+  const allItems = props.items || [];
+  let selectedValue = props.value || "";
+  let searchQuery = "";
+  let isOpen = false;
+  function getFilteredItems() {
+    if (!searchQuery) return allItems;
+    const q = searchQuery.toLowerCase();
+    return allItems.filter((item) => item.label.toLowerCase().includes(q) || item.value.toLowerCase().includes(q));
+  }
+  function render() {
+    const filtered = getFilteredItems();
+    const selectedItem = allItems.find((i) => i.value === selectedValue);
+    const displayLabel = selectedItem ? selectedItem.label : searchQuery;
+    const listItemsHtml = filtered.length > 0 ? filtered.map((item) => `
+            <div class="autocomplete-item" data-value="${item.value}" style="padding: 0.5rem 0.75rem; font-size: 0.875rem; color: var(--p-surface-800); cursor: pointer; display: flex; align-items: center; justify-content: space-between; border-radius: var(--p-border-radius); transition: background 0.15s ease;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    ${item.icon ? `<span>${item.icon}</span>` : ""}
+                    <span>${item.label}</span>
+                </div>
+                ${item.value === selectedValue ? `<span style="color: var(--p-primary-600);">${LucideIcons.check}</span>` : ""}
+            </div>
+        `).join("") : `
+            <div style="padding: 0.75rem; font-size: 0.8125rem; color: var(--p-surface-400); text-align: center;">No results found</div>
+        `;
+    container.innerHTML = `
+            <div class="laughtale-autocomplete" style="position: relative; width: 100%; max-width: 320px;">
+                <div class="autocomplete-input-wrap" style="display: flex; align-items: center; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); background: var(--p-surface-0); padding: 0 0.5rem; transition: border-color 0.2s ease;">
+                    <span style="color: var(--p-surface-400); display: flex; align-items: center; margin-right: 0.25rem;">
+                        ${LucideIcons.search}
+                    </span>
+                    <input type="text" 
+                           class="autocomplete-input" 
+                           value="${displayLabel}" 
+                           placeholder="${props.placeholder || "Search or select..."}" 
+                           ${props.disabled ? "disabled" : ""} 
+                           style="flex: 1; padding: 0.5rem 0.25rem; border: none; outline: none; background: transparent; font-size: 0.875rem; color: var(--p-text-color);" />
+                    ${selectedValue ? `
+                        <button type="button" class="btn-clear-autocomplete" style="border: none; background: transparent; color: var(--p-surface-400); cursor: pointer; padding: 0.25rem; display: flex; align-items: center;">
+                            ${LucideIcons.x}
+                        </button>
+                    ` : ""}
+                </div>
+
+                <!-- Dropdown Popup -->
+                <div class="autocomplete-overlay" style="display: ${isOpen ? "block" : "none"}; position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 500; background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); box-shadow: var(--p-shadow-lg); max-height: 220px; overflow-y: auto; padding: 0.25rem;">
+                    ${listItemsHtml}
+                </div>
+            </div>
+        `;
+    const input = container.querySelector(".autocomplete-input");
+    input.addEventListener("focus", () => {
+      isOpen = true;
+      render();
+      container.querySelector(".autocomplete-input").focus();
+    });
+    input.addEventListener("input", (e) => {
+      searchQuery = e.target.value;
+      isOpen = true;
+      render();
+      const nextInput = container.querySelector(".autocomplete-input");
+      nextInput.focus();
+      nextInput.setSelectionRange(searchQuery.length, searchQuery.length);
+    });
+    container.querySelectorAll(".autocomplete-item").forEach((itemEl) => {
+      itemEl.addEventListener("click", () => {
+        selectedValue = itemEl.getAttribute("data-value") || "";
+        searchQuery = "";
+        isOpen = false;
+        render();
+        syncValue();
+      });
+    });
+    container.querySelector(".btn-clear-autocomplete")?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      selectedValue = "";
+      searchQuery = "";
+      isOpen = false;
+      render();
+      syncValue();
+    });
+  }
+  function syncValue() {
+    if (props.targetInputName) {
+      let hidden = document.querySelector(`input[name="${props.targetInputName}"]`);
+      if (!hidden) {
+        hidden = document.createElement("input");
+        hidden.type = "hidden";
+        hidden.name = props.targetInputName;
+        container.appendChild(hidden);
+      }
+      hidden.value = selectedValue;
+    }
+    container.dispatchEvent(new CustomEvent("autocomplete:change", {
+      bubbles: true,
+      detail: { value: selectedValue }
+    }));
+  }
+  render();
+  syncValue();
+}
+var init_autocomplete = __esm({
+  "src/components/autocomplete.ts"() {
+    "use strict";
+    init_lucide();
+  }
+});
+
+// src/components/color-picker.ts
+var color_picker_exports = {};
+__export(color_picker_exports, {
+  default: () => ColorPickerIsland
+});
+function ColorPickerIsland(container, props) {
+  let currentColor = props.value || "#10b981";
+  let isOpen = false;
+  function render() {
+    const swatches = DEFAULT_PRESETS.map((c) => `
+            <button type="button" 
+                    class="color-swatch-btn" 
+                    data-color="${c}" 
+                    style="width: 1.5rem; height: 1.5rem; border-radius: 4px; border: ${c === currentColor ? "2px solid #ffffff" : "1px solid rgba(0,0,0,0.1)"}; background: ${c}; cursor: pointer; box-shadow: ${c === currentColor ? "0 0 0 2px var(--p-primary-600)" : "none"}; transition: transform 0.15s ease;">
+            </button>
+        `).join("");
+    container.innerHTML = `
+            <div class="laughtale-colorpicker" style="position: relative; display: inline-flex; align-items: center; gap: 0.5rem;">
+                <!-- Color Swatch Trigger -->
+                <button type="button" 
+                        class="colorpicker-trigger-btn" 
+                        ${props.disabled ? "disabled" : ""} 
+                        style="width: 2.25rem; height: 2.25rem; border-radius: var(--p-border-radius); border: 2px solid var(--p-surface-200); background: ${currentColor}; cursor: ${props.disabled ? "not-allowed" : "pointer"}; box-shadow: var(--p-shadow-sm); transition: transform 0.15s ease, border-color 0.15s ease;">
+                </button>
+                <span style="font-family: monospace; font-size: 0.8125rem; font-weight: 600; color: var(--p-surface-700);">${currentColor.toUpperCase()}</span>
+
+                <!-- Palette Popover -->
+                <div class="colorpicker-palette-overlay" style="display: ${isOpen ? "block" : "none"}; position: absolute; top: calc(100% + 6px); left: 0; z-index: 500; background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); box-shadow: var(--p-shadow-lg); padding: 0.875rem; width: 180px;">
+                    <div style="font-size: 0.6875rem; font-weight: 700; color: var(--p-surface-500); text-transform: uppercase; margin-bottom: 0.5rem;">Palette Swatches</div>
+                    <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 0.75rem;">
+                        ${swatches}
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.35rem;">
+                        <input type="color" class="color-native-input" value="${currentColor}" style="width: 2rem; height: 1.75rem; border: none; padding: 0; background: transparent; cursor: pointer;" />
+                        <input type="text" class="color-hex-input" value="${currentColor}" maxlength="7" style="flex: 1; padding: 0.25rem 0.5rem; font-family: monospace; font-size: 0.75rem; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius);" />
+                    </div>
+                </div>
+            </div>
+        `;
+    container.querySelector(".colorpicker-trigger-btn")?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      isOpen = !isOpen;
+      render();
+    });
+    container.querySelectorAll(".color-swatch-btn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        currentColor = btn.getAttribute("data-color");
+        isOpen = false;
+        render();
+        syncValue();
+      });
+    });
+    const nativeInput = container.querySelector(".color-native-input");
+    nativeInput?.addEventListener("input", (e) => {
+      currentColor = e.target.value;
+      render();
+      syncValue();
+    });
+    const hexInput = container.querySelector(".color-hex-input");
+    hexInput?.addEventListener("change", (e) => {
+      const val = e.target.value;
+      if (/^#[0-9A-Fa-f]{6}$/.test(val)) {
+        currentColor = val;
+        render();
+        syncValue();
+      }
+    });
+  }
+  function syncValue() {
+    if (props.targetInputName) {
+      let hidden = document.querySelector(`input[name="${props.targetInputName}"]`);
+      if (!hidden) {
+        hidden = document.createElement("input");
+        hidden.type = "hidden";
+        hidden.name = props.targetInputName;
+        container.appendChild(hidden);
+      }
+      hidden.value = currentColor;
+    }
+    container.dispatchEvent(new CustomEvent("color:change", {
+      bubbles: true,
+      detail: { value: currentColor }
+    }));
+  }
+  render();
+  syncValue();
+}
+var DEFAULT_PRESETS;
+var init_color_picker = __esm({
+  "src/components/color-picker.ts"() {
+    "use strict";
+    DEFAULT_PRESETS = [
+      "#10b981",
+      "#059669",
+      "#3b82f6",
+      "#2563eb",
+      "#6366f1",
+      "#8b5cf6",
+      "#ec4899",
+      "#f43f5e",
+      "#ef4444",
+      "#f59e0b",
+      "#14b8a6",
+      "#06b6d4",
+      "#64748b",
+      "#1e293b",
+      "#000000"
+    ];
+  }
+});
+
+// src/components/knob.ts
+var knob_exports = {};
+__export(knob_exports, {
+  default: () => KnobIsland
+});
+function KnobIsland(container, props) {
+  const min = props.min !== void 0 ? props.min : 0;
+  const max = props.max !== void 0 ? props.max : 100;
+  const step = props.step || 1;
+  const size = props.size || 96;
+  const strokeWidth = 8;
+  const radius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+  let currentValue = props.value !== void 0 ? props.value : min;
+  function render() {
+    const pct = Math.max(0, Math.min(1, (currentValue - min) / (max - min)));
+    const strokeDashoffset = circumference * (1 - pct);
+    const template = props.valueTemplate || "{value}%";
+    const displayValue = template.replace("{value}", currentValue.toString());
+    container.innerHTML = `
+            <div class="laughtale-knob" style="position: relative; display: inline-flex; align-items: center; justify-content: center; width: ${size}px; height: ${size}px; user-select: none; cursor: ${props.disabled ? "not-allowed" : "pointer"};">
+                <svg width="${size}" height="${size}" style="transform: rotate(-90deg);">
+                    <!-- Background Circle -->
+                    <circle cx="${size / 2}" cy="${size / 2}" r="${radius}" fill="transparent" stroke="var(--p-surface-200)" stroke-width="${strokeWidth}" />
+                    <!-- Progress Arc -->
+                    <circle class="knob-progress-circle" cx="${size / 2}" cy="${size / 2}" r="${radius}" fill="transparent" stroke="${props.color || "var(--p-primary-600)"}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-dasharray="${circumference}" stroke-dashoffset="${strokeDashoffset}" style="transition: stroke-dashoffset 0.15s ease;" />
+                </svg>
+                <span style="position: absolute; font-size: ${size * 0.2}px; font-weight: 700; color: var(--p-surface-900);">
+                    ${displayValue}
+                </span>
+            </div>
+        `;
+    if (props.disabled) return;
+    let isDragging = false;
+    const updateFromPointer = (e) => {
+      const rect = container.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * (180 / Math.PI) + 90;
+      const normalizedAngle = angle < 0 ? angle + 360 : angle;
+      const ratio = Math.min(1, Math.max(0, normalizedAngle / 360));
+      const rawVal = min + ratio * (max - min);
+      currentValue = Math.round(rawVal / step) * step;
+      render();
+      syncValue();
+    };
+    const knobEl = container.querySelector(".laughtale-knob");
+    knobEl.addEventListener("mousedown", (e) => {
+      isDragging = true;
+      updateFromPointer(e);
+    });
+    window.addEventListener("mousemove", (e) => {
+      if (isDragging) updateFromPointer(e);
+    });
+    window.addEventListener("mouseup", () => {
+      isDragging = false;
+    });
+  }
+  function syncValue() {
+    if (props.targetInputName) {
+      let hidden = document.querySelector(`input[name="${props.targetInputName}"]`);
+      if (!hidden) {
+        hidden = document.createElement("input");
+        hidden.type = "hidden";
+        hidden.name = props.targetInputName;
+        container.appendChild(hidden);
+      }
+      hidden.value = currentValue.toString();
+    }
+    container.dispatchEvent(new CustomEvent("knob:change", {
+      bubbles: true,
+      detail: { value: currentValue }
+    }));
+  }
+  render();
+  syncValue();
+}
+var init_knob = __esm({
+  "src/components/knob.ts"() {
+    "use strict";
+  }
+});
+
+// src/components/tag.ts
+var tag_exports = {};
+__export(tag_exports, {
+  default: () => TagIsland
+});
+function TagIsland(container, props) {
+  const severity = props.severity || "info";
+  const isRounded = props.rounded || false;
+  let bg = "var(--p-blue-50, #eff6ff)";
+  let color = "var(--p-blue-700, #1d4ed8)";
+  let border = "var(--p-blue-200, #bfdbfe)";
+  if (severity === "success") {
+    bg = "var(--p-emerald-50, #ecfdf5)";
+    color = "var(--p-emerald-700, #047857)";
+    border = "var(--p-emerald-200, #a7f3d0)";
+  } else if (severity === "warning") {
+    bg = "var(--p-amber-50, #fffbeb)";
+    color = "var(--p-amber-700, #b45309)";
+    border = "var(--p-amber-200, #fde68a)";
+  } else if (severity === "danger") {
+    bg = "var(--p-red-50, #fef2f2)";
+    color = "var(--p-red-700, #b91c1c)";
+    border = "var(--p-red-200, #fecaca)";
+  } else if (severity === "secondary") {
+    bg = "var(--p-surface-100, #f1f5f9)";
+    color = "var(--p-surface-700, #334155)";
+    border = "var(--p-surface-200, #e2e8f0)";
+  } else if (severity === "contrast") {
+    bg = "var(--p-surface-900, #0f172a)";
+    color = "var(--p-surface-0, #ffffff)";
+    border = "var(--p-surface-950, #020617)";
+  }
+  container.innerHTML = `
+        <span class="laughtale-tag tag-${severity}" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.25rem 0.6rem; font-size: 0.75rem; font-weight: 700; background: ${bg}; color: ${color}; border: 1px solid ${border}; border-radius: ${isRounded ? "9999px" : "var(--p-border-radius)"};">
+            ${props.icon ? `<span>${props.icon}</span>` : ""}
+            <span>${props.value}</span>
+        </span>
+    `;
+}
+var init_tag = __esm({
+  "src/components/tag.ts"() {
+    "use strict";
+  }
+});
+
+// src/components/breadcrumb.ts
+var breadcrumb_exports = {};
+__export(breadcrumb_exports, {
+  default: () => BreadcrumbIsland
+});
+function BreadcrumbIsland(container, props) {
+  const items = props.items || [];
+  const homeUrl = props.homeUrl || "/";
+  const itemsHtml = items.map((item, idx) => {
+    const isLast = idx === items.length - 1;
+    return `
+            <li style="display: flex; align-items: center; gap: 0.5rem;">
+                <span style="color: var(--p-surface-400); display: flex; align-items: center;">${LucideIcons.chevronRight}</span>
+                ${item.url && !isLast ? `
+                    <a href="${item.url}" style="color: var(--p-surface-600); text-decoration: none; font-size: 0.8125rem; font-weight: 500; display: flex; align-items: center; gap: 0.35rem; transition: color 0.15s ease;">
+                        ${item.icon ? `<span>${item.icon}</span>` : ""}
+                        <span>${item.label}</span>
+                    </a>
+                ` : `
+                    <span style="color: var(--p-surface-900); font-size: 0.8125rem; font-weight: 600; display: flex; align-items: center; gap: 0.35rem;">
+                        ${item.icon ? `<span>${item.icon}</span>` : ""}
+                        <span>${item.label}</span>
+                    </span>
+                `}
+            </li>
+        `;
+  }).join("");
+  container.innerHTML = `
+        <nav class="laughtale-breadcrumb" style="display: block;">
+            <ul style="list-style: none; display: flex; align-items: center; gap: 0.5rem; padding: 0; margin: 0;">
+                <li>
+                    <a href="${homeUrl}" style="color: var(--p-surface-600); display: flex; align-items: center; transition: color 0.15s ease;" title="Home">
+                        ${LucideIcons.home}
+                    </a>
+                </li>
+                ${itemsHtml}
+            </ul>
+        </nav>
+    `;
+}
+var init_breadcrumb = __esm({
+  "src/components/breadcrumb.ts"() {
+    "use strict";
+    init_lucide();
+  }
+});
+
+// src/components/scroll-top.ts
+var scroll_top_exports = {};
+__export(scroll_top_exports, {
+  default: () => ScrollTopIsland
+});
+function ScrollTopIsland(container, props) {
+  const threshold = props.threshold || 200;
+  let isVisible = false;
+  function render() {
+    container.innerHTML = `
+            <button type="button" 
+                    class="laughtale-scroll-top-btn" 
+                    style="display: ${isVisible ? "flex" : "none"}; position: fixed; bottom: 2rem; right: 2rem; z-index: 999; width: 2.75rem; height: 2.75rem; border-radius: 50%; border: none; background: var(--p-primary-600); color: #ffffff; box-shadow: var(--p-shadow-lg); cursor: pointer; align-items: center; justify-content: center; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); animation: fadeIn 0.2s ease;" 
+                    title="Scroll to Top">
+                ${LucideIcons.arrowUp}
+            </button>
+        `;
+    container.querySelector(".laughtale-scroll-top-btn")?.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: props.behavior || "smooth" });
+    });
+  }
+  const checkScroll = () => {
+    const scrolled = window.scrollY > threshold;
+    if (scrolled !== isVisible) {
+      isVisible = scrolled;
+      render();
+    }
+  };
+  window.addEventListener("scroll", checkScroll, { passive: true });
+  render();
+}
+var init_scroll_top = __esm({
+  "src/components/scroll-top.ts"() {
+    "use strict";
+    init_lucide();
+  }
+});
+
+// src/components/inplace.ts
+var inplace_exports = {};
+__export(inplace_exports, {
+  default: () => InplaceIsland
+});
+function InplaceIsland(container, props) {
+  let isEditing = false;
+  let currentValue = props.value || "";
+  function render() {
+    if (!isEditing) {
+      container.innerHTML = `
+                <div class="laughtale-inplace-display" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.35rem 0.6rem; border-radius: var(--p-border-radius); border: 1px dashed var(--p-border-color); background: var(--p-surface-50); cursor: ${props.disabled ? "default" : "pointer"}; transition: background 0.15s ease;">
+                    <span style="font-size: 0.875rem; color: ${currentValue ? "var(--p-surface-900)" : "var(--p-surface-400)"}; font-weight: 500;">
+                        ${currentValue || props.placeholder || "Click to edit..."}
+                    </span>
+                    ${!props.disabled ? `<span style="color: var(--p-surface-400); display: flex; align-items: center;">${LucideIcons.edit}</span>` : ""}
+                </div>
+            `;
+      if (!props.disabled) {
+        container.querySelector(".laughtale-inplace-display")?.addEventListener("click", () => {
+          isEditing = true;
+          render();
+        });
+      }
+    } else {
+      container.innerHTML = `
+                <div class="laughtale-inplace-editor" style="display: inline-flex; align-items: center; gap: 0.35rem;">
+                    <input type="text" 
+                           class="inplace-input" 
+                           value="${currentValue}" 
+                           placeholder="${props.placeholder || ""}" 
+                           style="padding: 0.35rem 0.6rem; border: 1px solid var(--p-primary-600); border-radius: var(--p-border-radius); font-size: 0.875rem; outline: none;" />
+                    <button type="button" class="btn-inplace-save p-button p-button-primary" style="padding: 0.35rem 0.5rem; display: flex; align-items: center;">
+                        ${LucideIcons.check}
+                    </button>
+                    <button type="button" class="btn-inplace-cancel p-button p-button-secondary" style="padding: 0.35rem 0.5rem; display: flex; align-items: center;">
+                        ${LucideIcons.x}
+                    </button>
+                </div>
+            `;
+      const input = container.querySelector(".inplace-input");
+      input.focus();
+      input.setSelectionRange(currentValue.length, currentValue.length);
+      container.querySelector(".btn-inplace-save")?.addEventListener("click", () => {
+        currentValue = input.value.trim();
+        isEditing = false;
+        render();
+        syncValue();
+      });
+      container.querySelector(".btn-inplace-cancel")?.addEventListener("click", () => {
+        isEditing = false;
+        render();
+      });
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          currentValue = input.value.trim();
+          isEditing = false;
+          render();
+          syncValue();
+        } else if (e.key === "Escape") {
+          isEditing = false;
+          render();
+        }
+      });
+    }
+  }
+  function syncValue() {
+    if (props.targetInputName) {
+      let hidden = document.querySelector(`input[name="${props.targetInputName}"]`);
+      if (!hidden) {
+        hidden = document.createElement("input");
+        hidden.type = "hidden";
+        hidden.name = props.targetInputName;
+        container.appendChild(hidden);
+      }
+      hidden.value = currentValue;
+    }
+    container.dispatchEvent(new CustomEvent("inplace:change", {
+      bubbles: true,
+      detail: { value: currentValue }
+    }));
+  }
+  render();
+  syncValue();
+}
+var init_inplace = __esm({
+  "src/components/inplace.ts"() {
+    "use strict";
+    init_lucide();
   }
 });
 
@@ -3351,7 +4071,7 @@ var init_index = __esm({
     init_vanilla();
     init_preact();
     init_directives();
-    init_solar();
+    init_lucide();
     defineIsland("stepper", () => Promise.resolve().then(() => (init_stepper(), stepper_exports)));
     defineIsland("timeline", () => Promise.resolve().then(() => (init_timeline(), timeline_exports)));
     defineIsland("camera", () => Promise.resolve().then(() => (init_camera(), camera_exports)));
@@ -3377,11 +4097,20 @@ var init_index = __esm({
     defineIsland("speed-dial", () => Promise.resolve().then(() => (init_speed_dial(), speed_dial_exports)));
     defineIsland("image-compare", () => Promise.resolve().then(() => (init_image_compare(), image_compare_exports)));
     defineIsland("confirm-popup", () => Promise.resolve().then(() => (init_confirm_popup(), confirm_popup_exports)));
+    defineIsland("accordion", () => Promise.resolve().then(() => (init_accordion(), accordion_exports)));
+    defineIsland("tabs", () => Promise.resolve().then(() => (init_tabs(), tabs_exports)));
+    defineIsland("autocomplete", () => Promise.resolve().then(() => (init_autocomplete(), autocomplete_exports)));
+    defineIsland("color-picker", () => Promise.resolve().then(() => (init_color_picker(), color_picker_exports)));
+    defineIsland("knob", () => Promise.resolve().then(() => (init_knob(), knob_exports)));
+    defineIsland("tag", () => Promise.resolve().then(() => (init_tag(), tag_exports)));
+    defineIsland("breadcrumb", () => Promise.resolve().then(() => (init_breadcrumb(), breadcrumb_exports)));
+    defineIsland("scroll-top", () => Promise.resolve().then(() => (init_scroll_top(), scroll_top_exports)));
+    defineIsland("inplace", () => Promise.resolve().then(() => (init_inplace(), inplace_exports)));
   }
 });
 init_index();
 export {
-  SolarIcons,
+  LucideIcons,
   awaitStreamingReady,
   createPreactIsland,
   createVanillaIsland,
@@ -3389,8 +4118,8 @@ export {
   enableViewTransitions,
   extractSlotContent,
   getIslandDefinition,
+  getLucideIcon,
   getSlot,
-  getSolarIcon,
   hasIsland,
   hydrateIsland,
   importWithRetry,

@@ -2,7 +2,7 @@
  * SoftMax.LaughTale: Password Input with Strength Meter & Eye Toggle (Aura InputPassword inspired)
  */
 
-import { getSolarIcon } from '../icons/solar';
+import { LucideIcons } from '../icons/lucide';
 
 export interface InputPasswordProps {
     targetInputName?: string;
@@ -44,7 +44,7 @@ export default function InputPasswordIsland(container: HTMLElement, props: Input
                     
                     ${props.toggleMask !== false ? `
                         <button type="button" class="toggle-mask-btn" style="border: none; background: transparent; color: var(--p-surface-400); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0.25rem;">
-                            ${isMasked ? getSolarIcon('eye') : getSolarIcon('eyeClosed')}
+                            ${isMasked ? LucideIcons.eye : LucideIcons.eyeOff}
                         </button>
                     ` : ''}
                 </div>
