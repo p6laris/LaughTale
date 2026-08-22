@@ -10,6 +10,7 @@ namespace SoftMax.LaughTale.Components.TagHelpers;
 /// </summary>
 [HtmlTargetElement("island-number")]
 [HtmlTargetElement("island-currency")]
+[HtmlTargetElement("island-input-number")]
 public class IslandNumberTagHelper : TagHelper
 {
     public string? TargetInput { get; set; }
@@ -28,9 +29,10 @@ public class IslandNumberTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "input-number");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "input-number");
+        output.Attributes.SetAttribute("data-hydrate", "load");
 
         var props = new
         {
@@ -49,14 +51,15 @@ public class IslandNumberTagHelper : TagHelper
             disabled = Disabled
         };
 
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
 /// <summary>
-/// TagHelper for <island-otp />
+/// TagHelper for <island-otp /> / <island-input-otp />
 /// </summary>
 [HtmlTargetElement("island-otp")]
+[HtmlTargetElement("island-input-otp")]
 public class IslandOtpTagHelper : TagHelper
 {
     public string? TargetInput { get; set; }
@@ -66,9 +69,10 @@ public class IslandOtpTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "input-otp");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "input-otp");
+        output.Attributes.SetAttribute("data-hydrate", "load");
 
         var props = new
         {
@@ -78,14 +82,15 @@ public class IslandOtpTagHelper : TagHelper
             disabled = Disabled
         };
 
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
 /// <summary>
-/// TagHelper for <island-password />
+/// TagHelper for <island-password /> / <island-input-password />
 /// </summary>
 [HtmlTargetElement("island-password")]
+[HtmlTargetElement("island-input-password")]
 public class IslandPasswordTagHelper : TagHelper
 {
     public string? TargetInput { get; set; }
@@ -96,9 +101,10 @@ public class IslandPasswordTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "input-password");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "input-password");
+        output.Attributes.SetAttribute("data-hydrate", "load");
 
         var props = new
         {
@@ -109,14 +115,15 @@ public class IslandPasswordTagHelper : TagHelper
             disabled = Disabled
         };
 
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
 /// <summary>
-/// TagHelper for <island-switch />
+/// TagHelper for <island-switch /> / <island-toggle-switch />
 /// </summary>
 [HtmlTargetElement("island-switch")]
+[HtmlTargetElement("island-toggle-switch")]
 public class IslandSwitchTagHelper : TagHelper
 {
     public string? TargetInput { get; set; }
@@ -126,9 +133,10 @@ public class IslandSwitchTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "toggle-switch");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "toggle-switch");
+        output.Attributes.SetAttribute("data-hydrate", "load");
 
         var props = new
         {
@@ -138,7 +146,7 @@ public class IslandSwitchTagHelper : TagHelper
             disabled = Disabled
         };
 
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -157,9 +165,10 @@ public class IslandSliderTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "slider");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "slider");
+        output.Attributes.SetAttribute("data-hydrate", "load");
 
         var props = new
         {
@@ -171,7 +180,7 @@ public class IslandSliderTagHelper : TagHelper
             disabled = Disabled
         };
 
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -189,9 +198,10 @@ public class IslandRatingTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "rating");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "rating");
+        output.Attributes.SetAttribute("data-hydrate", "load");
 
         var props = new
         {
@@ -202,7 +212,7 @@ public class IslandRatingTagHelper : TagHelper
             disabled = Disabled
         };
 
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -219,9 +229,10 @@ public class IslandSelectButtonTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "select-button");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "select-button");
+        output.Attributes.SetAttribute("data-hydrate", "load");
 
         var props = new
         {
@@ -231,7 +242,7 @@ public class IslandSelectButtonTagHelper : TagHelper
             disabled = Disabled
         };
 
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -249,9 +260,10 @@ public class IslandChipsTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "chips");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "chips");
+        output.Attributes.SetAttribute("data-hydrate", "load");
 
         var props = new
         {
@@ -262,7 +274,7 @@ public class IslandChipsTagHelper : TagHelper
             disabled = Disabled
         };
 
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -279,9 +291,10 @@ public class IslandDatePickerTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "datepicker");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "datepicker");
+        output.Attributes.SetAttribute("data-hydrate", "load");
 
         var props = new
         {
@@ -291,7 +304,7 @@ public class IslandDatePickerTagHelper : TagHelper
             disabled = Disabled
         };
 
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -307,9 +320,10 @@ public class IslandMeterGroupTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "meter-group");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "meter-group");
+        output.Attributes.SetAttribute("data-hydrate", "load");
 
         var props = new
         {
@@ -318,7 +332,7 @@ public class IslandMeterGroupTagHelper : TagHelper
             showLabels = ShowLabels
         };
 
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -334,9 +348,10 @@ public class IslandAvatarGroupTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "avatar-group");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "avatar-group");
+        output.Attributes.SetAttribute("data-hydrate", "load");
 
         var props = new
         {
@@ -345,7 +360,7 @@ public class IslandAvatarGroupTagHelper : TagHelper
             size = Size
         };
 
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -363,9 +378,10 @@ public class IslandProgressBarTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "progress-bar");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "progress-bar");
+        output.Attributes.SetAttribute("data-hydrate", "load");
 
         var props = new
         {
@@ -376,7 +392,7 @@ public class IslandProgressBarTagHelper : TagHelper
             color = Color
         };
 
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -393,9 +409,10 @@ public class IslandSkeletonTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "skeleton");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "skeleton");
+        output.Attributes.SetAttribute("data-hydrate", "load");
 
         var props = new
         {
@@ -405,7 +422,7 @@ public class IslandSkeletonTagHelper : TagHelper
             borderRadius = BorderRadius
         };
 
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -422,9 +439,10 @@ public class IslandDrawerTagHelper : TagHelper
 
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "drawer");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "drawer");
+        output.Attributes.SetAttribute("data-hydrate", "load");
 
         var props = new
         {
@@ -434,7 +452,7 @@ public class IslandDrawerTagHelper : TagHelper
             width = Width
         };
 
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
 
         var childContent = await output.GetChildContentAsync();
         output.Content.SetHtmlContent($"<div data-slot=\"default\">{childContent.GetContent()}</div>");
@@ -452,9 +470,10 @@ public class IslandSpeedDialTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "speed-dial");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "speed-dial");
+        output.Attributes.SetAttribute("data-hydrate", "load");
 
         var props = new
         {
@@ -462,7 +481,7 @@ public class IslandSpeedDialTagHelper : TagHelper
             direction = Direction
         };
 
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -479,9 +498,10 @@ public class IslandImageCompareTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "image-compare");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "image-compare");
+        output.Attributes.SetAttribute("data-hydrate", "load");
 
         var props = new
         {
@@ -491,7 +511,7 @@ public class IslandImageCompareTagHelper : TagHelper
             afterLabel = AfterLabel
         };
 
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -509,9 +529,10 @@ public class IslandConfirmPopupTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "confirm-popup");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "confirm-popup");
+        output.Attributes.SetAttribute("data-hydrate", "load");
 
         var props = new
         {
@@ -522,7 +543,7 @@ public class IslandConfirmPopupTagHelper : TagHelper
             actionName = ActionName
         };
 
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -538,9 +559,10 @@ public class IslandAccordionTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "accordion");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "accordion");
+        output.Attributes.SetAttribute("data-hydrate", "load");
 
         var props = new
         {
@@ -549,7 +571,7 @@ public class IslandAccordionTagHelper : TagHelper
             activeIndex = ActiveIndex
         };
 
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -565,9 +587,10 @@ public class IslandTabsTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "tabs");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "tabs");
+        output.Attributes.SetAttribute("data-hydrate", "load");
 
         var props = new
         {
@@ -576,7 +599,7 @@ public class IslandTabsTagHelper : TagHelper
             targetInputName = TargetInput
         };
 
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -594,9 +617,10 @@ public class IslandAutoCompleteTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "autocomplete");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "autocomplete");
+        output.Attributes.SetAttribute("data-hydrate", "load");
 
         var props = new
         {
@@ -607,7 +631,7 @@ public class IslandAutoCompleteTagHelper : TagHelper
             disabled = Disabled
         };
 
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -623,9 +647,10 @@ public class IslandColorPickerTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "color-picker");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "color-picker");
+        output.Attributes.SetAttribute("data-hydrate", "load");
 
         var props = new
         {
@@ -634,7 +659,7 @@ public class IslandColorPickerTagHelper : TagHelper
             disabled = Disabled
         };
 
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -656,9 +681,10 @@ public class IslandKnobTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "knob");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "knob");
+        output.Attributes.SetAttribute("data-hydrate", "load");
 
         var props = new
         {
@@ -673,7 +699,7 @@ public class IslandKnobTagHelper : TagHelper
             disabled = Disabled
         };
 
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -690,9 +716,10 @@ public class IslandTagTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "tag");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "tag");
+        output.Attributes.SetAttribute("data-hydrate", "load");
 
         var props = new
         {
@@ -702,7 +729,7 @@ public class IslandTagTagHelper : TagHelper
             icon = Icon
         };
 
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -717,9 +744,10 @@ public class IslandBreadcrumbTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "breadcrumb");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "breadcrumb");
+        output.Attributes.SetAttribute("data-hydrate", "load");
 
         var props = new
         {
@@ -727,7 +755,7 @@ public class IslandBreadcrumbTagHelper : TagHelper
             homeUrl = HomeUrl
         };
 
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -742,9 +770,10 @@ public class IslandScrollTopTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "scroll-top");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "scroll-top");
+        output.Attributes.SetAttribute("data-hydrate", "load");
 
         var props = new
         {
@@ -752,7 +781,7 @@ public class IslandScrollTopTagHelper : TagHelper
             behavior = Behavior
         };
 
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -769,9 +798,10 @@ public class IslandInplaceTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "inplace");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "inplace");
+        output.Attributes.SetAttribute("data-hydrate", "load");
 
         var props = new
         {
@@ -781,7 +811,7 @@ public class IslandInplaceTagHelper : TagHelper
             disabled = Disabled
         };
 
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -796,9 +826,10 @@ public class IslandCommandTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "command");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "command");
+        output.Attributes.SetAttribute("data-hydrate", "load");
 
         var props = new
         {
@@ -806,7 +837,7 @@ public class IslandCommandTagHelper : TagHelper
             items = Items ?? new()
         };
 
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -820,16 +851,17 @@ public class IslandThemeStudioTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "theme-studio");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "theme-studio");
+        output.Attributes.SetAttribute("data-hydrate", "load");
 
         var props = new
         {
             defaultOpen = DefaultOpen
         };
 
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -847,9 +879,10 @@ public class IslandDynamicFormTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "dynamic-form");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "dynamic-form");
+        output.Attributes.SetAttribute("data-hydrate", "load");
 
         if (For != null)
         {
@@ -858,7 +891,7 @@ public class IslandDynamicFormTagHelper : TagHelper
             {
                 schema = schema
             };
-            output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+            output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
         }
     }
 }
@@ -874,9 +907,10 @@ public class IslandSplitterTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "splitter");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "splitter");
+        output.Attributes.SetAttribute("data-hydrate", "load");
 
         var props = new
         {
@@ -884,7 +918,7 @@ public class IslandSplitterTagHelper : TagHelper
             panels = Panels ?? new()
         };
 
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -903,9 +937,10 @@ public class IslandMultiSelectTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "multiselect");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "multiselect");
+        output.Attributes.SetAttribute("data-hydrate", "load");
 
         var props = new
         {
@@ -917,7 +952,7 @@ public class IslandMultiSelectTagHelper : TagHelper
             disabled = Disabled
         };
 
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -934,9 +969,10 @@ public class IslandCascadeSelectTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "cascadeselect");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "cascadeselect");
+        output.Attributes.SetAttribute("data-hydrate", "load");
 
         var props = new
         {
@@ -946,7 +982,7 @@ public class IslandCascadeSelectTagHelper : TagHelper
             disabled = Disabled
         };
 
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -965,9 +1001,10 @@ public class IslandListboxTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "listbox");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "listbox");
+        output.Attributes.SetAttribute("data-hydrate", "load");
 
         var props = new
         {
@@ -979,7 +1016,7 @@ public class IslandListboxTagHelper : TagHelper
             disabled = Disabled
         };
 
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -997,9 +1034,10 @@ public class IslandPickListTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "picklist");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "picklist");
+        output.Attributes.SetAttribute("data-hydrate", "load");
 
         var props = new
         {
@@ -1010,7 +1048,7 @@ public class IslandPickListTagHelper : TagHelper
             targetInputName = TargetInput
         };
 
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -1026,9 +1064,10 @@ public class IslandOrderListTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "orderlist");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "orderlist");
+        output.Attributes.SetAttribute("data-hydrate", "load");
 
         var props = new
         {
@@ -1037,7 +1076,7 @@ public class IslandOrderListTagHelper : TagHelper
             targetInputName = TargetInput
         };
 
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -1051,14 +1090,15 @@ public class IslandOrgChartTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "orgchart");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "orgchart");
+        output.Attributes.SetAttribute("data-hydrate", "load");
 
         if (Value != null)
         {
             var props = new { value = Value };
-            output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+            output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
         }
     }
 }
@@ -1075,9 +1115,10 @@ public class IslandTerminalTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "terminal");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "terminal");
+        output.Attributes.SetAttribute("data-hydrate", "load");
 
         var props = new
         {
@@ -1086,7 +1127,7 @@ public class IslandTerminalTagHelper : TagHelper
             commands = Commands ?? new()
         };
 
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -1101,9 +1142,10 @@ public class IslandDockTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "dock");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "dock");
+        output.Attributes.SetAttribute("data-hydrate", "load");
 
         var props = new
         {
@@ -1111,7 +1153,7 @@ public class IslandDockTagHelper : TagHelper
             position = Position
         };
 
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -1126,9 +1168,10 @@ public class IslandGalleriaTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "galleria");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "galleria");
+        output.Attributes.SetAttribute("data-hydrate", "load");
 
         var props = new
         {
@@ -1136,7 +1179,7 @@ public class IslandGalleriaTagHelper : TagHelper
             autoPlay = AutoPlay
         };
 
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -1151,9 +1194,10 @@ public class IslandBlockUITagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "blockui");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "blockui");
+        output.Attributes.SetAttribute("data-hydrate", "load");
 
         var props = new
         {
@@ -1161,7 +1205,7 @@ public class IslandBlockUITagHelper : TagHelper
             message = Message
         };
 
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -1178,9 +1222,10 @@ public class IslandSplitButtonTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "split-button");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "split-button");
+        output.Attributes.SetAttribute("data-hydrate", "load");
 
         var props = new
         {
@@ -1190,7 +1235,7 @@ public class IslandSplitButtonTagHelper : TagHelper
             disabled = Disabled
         };
 
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -1212,9 +1257,10 @@ public class IslandSelectTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "select");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "select");
+        output.Attributes.SetAttribute("data-hydrate", "load");
         var props = new
         {
             options = Options ?? new(),
@@ -1225,7 +1271,7 @@ public class IslandSelectTagHelper : TagHelper
             disabled = Disabled,
             targetInputName = TargetInput
         };
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -1244,18 +1290,19 @@ public class IslandCheckboxTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "checkbox");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "checkbox");
         var props = new { @checked = Checked, indeterminate = Indeterminate, label = Label, value = Value, disabled = Disabled, targetInputName = TargetInput };
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
 /// <summary>
-/// TagHelper for <island-radio /> — Styled radio button
+/// TagHelper for <island-radio /> / <island-radio-button /> — Styled radio button
 /// </summary>
 [HtmlTargetElement("island-radio")]
+[HtmlTargetElement("island-radio-button")]
 public class IslandRadioTagHelper : TagHelper
 {
     public bool Checked { get; set; } = false;
@@ -1267,11 +1314,12 @@ public class IslandRadioTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "radio-button");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "radio-button");
+        output.Attributes.SetAttribute("data-hydrate", "load");
         var props = new { @checked = Checked, label = Label, name = Name, value = Value, disabled = Disabled, targetInputName = TargetInput };
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -1291,11 +1339,12 @@ public class IslandTextareaTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "textarea");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "textarea");
+        output.Attributes.SetAttribute("data-hydrate", "load");
         var props = new { value = Value, placeholder = Placeholder, rows = Rows, maxLength = MaxLength, autoResize = AutoResize, disabled = Disabled, targetInputName = TargetInput };
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -1314,11 +1363,12 @@ public class IslandInputMaskTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "input-mask");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "input-mask");
+        output.Attributes.SetAttribute("data-hydrate", "load");
         var props = new { mask = Mask, value = Value, placeholder = Placeholder, slotChar = SlotChar, disabled = Disabled, targetInputName = TargetInput };
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -1333,18 +1383,20 @@ public class IslandFloatLabelTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "float-label");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "float-label");
+        output.Attributes.SetAttribute("data-hydrate", "load");
         var props = new { label = Label, variant = Variant };
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
 /// <summary>
-/// TagHelper for <island-enhanced-input /> — Enhanced text input with icons, clear, sizes
+/// TagHelper for <island-enhanced-input /> / <island-input-text /> — Enhanced text input with icons, clear, sizes
 /// </summary>
 [HtmlTargetElement("island-enhanced-input")]
+[HtmlTargetElement("island-input-text")]
 public class IslandEnhancedInputTextTagHelper : TagHelper
 {
     public string? Value { get; set; }
@@ -1360,11 +1412,12 @@ public class IslandEnhancedInputTextTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "input-text");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "input-text");
+        output.Attributes.SetAttribute("data-hydrate", "load");
         var props = new { value = Value, placeholder = Placeholder, type = Type, iconLeft = IconLeft, iconRight = IconRight, showClear = ShowClear, invalid = Invalid, disabled = Disabled, size = Size.ToString().ToLowerInvariant(), targetInputName = TargetInput };
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -1385,11 +1438,12 @@ public class IslandCarouselTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "carousel");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "carousel");
         output.Attributes.SetAttribute("hydrate", "Visible");
         var props = new { items = Items ?? new(), numVisible = NumVisible, numScroll = NumScroll, autoplay = Autoplay, autoplayInterval = AutoplayInterval, circular = Circular, showIndicators = ShowIndicators, showNavigators = ShowNavigators };
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -1407,11 +1461,12 @@ public class IslandPaginatorTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "paginator");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "paginator");
+        output.Attributes.SetAttribute("data-hydrate", "load");
         var props = new { totalRecords = TotalRecords, rows = Rows, first = First, rowsPerPageOptions = RowsPerPageOptions ?? new List<int> { 5, 10, 25, 50 }, compact = Compact };
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -1429,11 +1484,12 @@ public class IslandDataViewTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "dataview");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "dataview");
+        output.Attributes.SetAttribute("data-hydrate", "load");
         var props = new { layout = Layout, paginator = ShowPaginator, rows = Rows, sortField = SortField, sortOrder = SortOrder };
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -1449,11 +1505,12 @@ public class IslandMenuTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "menu");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "menu");
+        output.Attributes.SetAttribute("data-hydrate", "load");
         var props = new { items = Items ?? new(), popup = Popup, triggerId = TriggerId };
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -1469,11 +1526,12 @@ public class IslandContextMenuTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "context-menu");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "context-menu");
+        output.Attributes.SetAttribute("data-hydrate", "load");
         var props = new { items = Items ?? new(), targetSelector = TargetSelector, global = Global };
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -1489,11 +1547,12 @@ public class IslandPopoverTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "popover");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "popover");
         output.Attributes.SetAttribute("hydrate", "Interaction");
         var props = new { triggerId = TriggerId, placement = Placement, showArrow = ShowArrow };
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -1510,11 +1569,12 @@ public class IslandTooltipTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "tooltip-component");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "tooltip-component");
         output.Attributes.SetAttribute("hydrate", "Interaction");
         var props = new { target = Target, position = Position, showDelay = ShowDelay, hideDelay = HideDelay };
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }
 
@@ -1530,10 +1590,11 @@ public class IslandSidebarTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "island";
-        output.Attributes.SetAttribute("name", "sidebar");
-        output.Attributes.SetAttribute("hydrate", "Load");
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "sidebar");
+        output.Attributes.SetAttribute("data-hydrate", "load");
         var props = new { items = Items ?? new(), collapsed = Collapsed, position = Position };
-        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
     }
 }

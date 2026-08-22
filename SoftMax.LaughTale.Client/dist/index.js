@@ -2628,6 +2628,436 @@ var SoftMaxIslands = (() => {
     }
   });
 
+  // src/styles/animations.ts
+  function initAnimationStyles() {
+    if (typeof document === "undefined") return;
+    if (document.getElementById("aura-animations")) return;
+    const styleEl = document.createElement("style");
+    styleEl.id = "aura-animations";
+    styleEl.textContent = `
+/* Base Component */
+.p-component {
+    font-family: var(--p-font-family, inherit);
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+/* 1. Anchored Overlays */
+.p-anchored-overlay-enter-active {
+    animation: p-anchored-overlay-enter 200ms ease-out forwards;
+}
+.p-anchored-overlay-leave-active {
+    animation: p-anchored-overlay-leave 150ms ease-in forwards;
+}
+@keyframes p-anchored-overlay-enter {
+    from { opacity: 0; transform: translateY(5%); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes p-anchored-overlay-leave {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(5%); }
+}
+
+/* 2. Collapsibles */
+.p-collapsible-enter-active {
+    animation: p-collapsible-enter 300ms cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+.p-collapsible-leave-active {
+    animation: p-collapsible-leave 300ms cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+@keyframes p-collapsible-enter {
+    from { grid-template-rows: 0fr; opacity: 0; transform: scale(0.97); }
+    to { grid-template-rows: 1fr; opacity: 1; transform: scale(1); }
+}
+@keyframes p-collapsible-leave {
+    from { grid-template-rows: 1fr; opacity: 1; transform: scale(1); }
+    to { grid-template-rows: 0fr; opacity: 0; transform: scale(0.97); }
+}
+
+/* 3. Dialog */
+.p-dialog-enter-active {
+    animation: p-dialog-enter 300ms ease-out forwards;
+}
+.p-dialog-leave-active {
+    animation: p-dialog-leave 200ms ease-in forwards;
+}
+@keyframes p-dialog-enter {
+    from { opacity: 0; transform: scale(0.95); filter: blur(8px); }
+    to { opacity: 1; transform: scale(1); filter: blur(0); }
+}
+@keyframes p-dialog-leave {
+    from { opacity: 1; transform: scale(1); filter: blur(0); }
+    to { opacity: 0; transform: scale(0.95); filter: blur(4px); }
+}
+
+/* 4. Drawer */
+.p-drawer-enter-active {
+    animation: p-drawer-enter 300ms cubic-bezier(0.32, 0.72, 0, 1) forwards;
+}
+.p-drawer-leave-active {
+    animation: p-drawer-leave 200ms cubic-bezier(0.32, 0.72, 0, 1) forwards;
+}
+@keyframes p-drawer-enter {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(0); }
+}
+@keyframes p-drawer-leave {
+    from { transform: translateX(0); }
+    to { transform: translateX(-100%); }
+}
+
+.p-drawer-right-enter-active { animation: p-drawer-right-enter 300ms cubic-bezier(0.32, 0.72, 0, 1) forwards; }
+.p-drawer-right-leave-active { animation: p-drawer-right-leave 200ms cubic-bezier(0.32, 0.72, 0, 1) forwards; }
+@keyframes p-drawer-right-enter { from { transform: translateX(100%); } to { transform: translateX(0); } }
+@keyframes p-drawer-right-leave { from { transform: translateX(0); } to { transform: translateX(100%); } }
+
+.p-drawer-top-enter-active { animation: p-drawer-top-enter 300ms cubic-bezier(0.32, 0.72, 0, 1) forwards; }
+.p-drawer-top-leave-active { animation: p-drawer-top-leave 200ms cubic-bezier(0.32, 0.72, 0, 1) forwards; }
+@keyframes p-drawer-top-enter { from { transform: translateY(-100%); } to { transform: translateY(0); } }
+@keyframes p-drawer-top-leave { from { transform: translateY(0); } to { transform: translateY(-100%); } }
+
+.p-drawer-bottom-enter-active { animation: p-drawer-bottom-enter 300ms cubic-bezier(0.32, 0.72, 0, 1) forwards; }
+.p-drawer-bottom-leave-active { animation: p-drawer-bottom-leave 200ms cubic-bezier(0.32, 0.72, 0, 1) forwards; }
+@keyframes p-drawer-bottom-enter { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes p-drawer-bottom-leave { from { transform: translateY(0); } to { transform: translateY(100%); } }
+
+/* 5. Message/Toast */
+.p-message-enter-active {
+    animation: p-message-enter 300ms ease-out forwards;
+}
+.p-message-leave-active {
+    animation: p-message-leave 200ms ease-in forwards;
+}
+@keyframes p-message-enter {
+    from { opacity: 0; transform: translateY(-100%); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes p-message-leave {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateX(100%); }
+}
+
+/* 6. Overlay Mask */
+.p-overlay-mask-enter-active {
+    animation: p-overlay-mask-enter 200ms ease forwards;
+}
+.p-overlay-mask-leave-active {
+    animation: p-overlay-mask-leave 150ms ease forwards;
+}
+@keyframes p-overlay-mask-enter {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+@keyframes p-overlay-mask-leave {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+/* 7. Ripple */
+.p-ripple-effect {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.4);
+    transform: scale(0);
+    animation: p-ripple-animation 600ms linear;
+    pointer-events: none;
+}
+@keyframes p-ripple-animation {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* 8. Skeleton Shimmer */
+.p-skeleton-animation {
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0, rgba(255, 255, 255, 0.2) 20%, rgba(255, 255, 255, 0.5) 60%, rgba(255, 255, 255, 0));
+    background-size: 200% 100%;
+    animation: p-skeleton-shimmer 1.5s infinite linear;
+}
+@keyframes p-skeleton-shimmer {
+    from { background-position: -200% 0; }
+    to { background-position: 200% 0; }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+        animation-duration: 0s !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0s !important;
+        scroll-behavior: auto !important;
+    }
+}
+    `;
+    document.head.appendChild(styleEl);
+  }
+  function injectRipple(el, event) {
+    const rect = el.getBoundingClientRect();
+    const ripple = document.createElement("span");
+    const size = Math.max(rect.width, rect.height);
+    const x = event.clientX - rect.left - size / 2;
+    const y = event.clientY - rect.top - size / 2;
+    ripple.className = "p-ripple-effect";
+    ripple.style.width = `${size}px`;
+    ripple.style.height = `${size}px`;
+    ripple.style.left = `${x}px`;
+    ripple.style.top = `${y}px`;
+    el.appendChild(ripple);
+    setTimeout(() => {
+      ripple.remove();
+    }, 600);
+  }
+  var init_animations = __esm({
+    "src/styles/animations.ts"() {
+      "use strict";
+    }
+  });
+
+  // src/styles/design-tokens.ts
+  function initDesignTokens() {
+    if (typeof document === "undefined") return;
+    if (document.getElementById("aura-design-tokens")) return;
+    const styleEl = document.createElement("style");
+    styleEl.id = "aura-design-tokens";
+    styleEl.textContent = `
+:root {
+  /* Primary palette (emerald by default) */
+  --p-primary-50: #ecfdf5;
+  --p-primary-100: #d1fae5;
+  --p-primary-200: #a7f3d0;
+  --p-primary-300: #6ee7b7;
+  --p-primary-400: #34d399;
+  --p-primary-500: #10b981;
+  --p-primary-600: #059669;
+  --p-primary-700: #047857;
+  --p-primary-800: #065f46;
+  --p-primary-900: #064e3b;
+  --p-primary-color: var(--p-primary-500);
+  --p-primary-color-text: #ffffff;
+
+  /* Surface palette */
+  --p-surface-0: #ffffff;
+  --p-surface-50: #f8fafc;
+  --p-surface-100: #f1f5f9;
+  --p-surface-200: #e2e8f0;
+  --p-surface-300: #cbd5e1;
+  --p-surface-400: #94a3b8;
+  --p-surface-500: #64748b;
+  --p-surface-600: #475569;
+  --p-surface-700: #334155;
+  --p-surface-800: #1e293b;
+  --p-surface-900: #0f172a;
+  --p-surface-950: #020617;
+  --p-text-color: var(--p-surface-900);
+  --p-text-muted-color: var(--p-surface-500);
+
+  /* Component tokens */
+  --p-content-bg: var(--p-surface-0);
+  --p-content-border: var(--p-surface-200);
+  --p-content-hover-bg: var(--p-surface-50);
+  --p-content-padding: 1rem;
+
+  /* Border radius */
+  --p-border-radius: 0.5rem;
+  --p-border-radius-sm: 0.375rem;
+  --p-border-radius-lg: 0.75rem;
+  --p-border-radius-xl: 1rem;
+  --p-border-radius-full: 9999px;
+
+  /* Shadows */
+  --p-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --p-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --p-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --p-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+
+  /* Focus ring */
+  --p-focus-ring-color: var(--p-primary-500);
+  --p-focus-ring-width: 2px;
+  --p-focus-ring-offset: 2px;
+  --p-focus-ring: 0 0 0 var(--p-focus-ring-offset) var(--p-content-bg), 0 0 0 calc(var(--p-focus-ring-offset) + var(--p-focus-ring-width)) var(--p-focus-ring-color);
+
+  /* Transitions */
+  --p-transition-duration: 150ms;
+  --p-transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Form field tokens */
+  --p-field-border: var(--p-surface-300);
+  --p-field-hover-border: var(--p-surface-400);
+  --p-field-focus-border: var(--p-primary-500);
+  --p-field-bg: var(--p-surface-0);
+  --p-field-padding-x: 0.75rem;
+  --p-field-padding-y: 0.5rem;
+
+  /* Overlay tokens */
+  --p-overlay-bg: var(--p-surface-0);
+  --p-overlay-border: var(--p-surface-200);
+  --p-overlay-shadow: var(--p-shadow-lg);
+}
+
+/* Dark mode overrides */
+[data-theme="dark"], .dark {
+  --p-surface-0: #09090b;
+  --p-surface-50: #18181b;
+  --p-surface-100: #27272a;
+  --p-surface-200: #3f3f46;
+  --p-surface-300: #52525b;
+  --p-surface-400: #71717a;
+  --p-surface-500: #a1a1aa;
+  --p-surface-600: #d4d4d8;
+  --p-surface-700: #e4e4e7;
+  --p-surface-800: #f4f4f5;
+  --p-surface-900: #fafafa;
+  --p-surface-950: #ffffff;
+  
+  --p-text-color: var(--p-surface-50);
+  --p-text-muted-color: var(--p-surface-400);
+  --p-content-bg: var(--p-surface-900);
+  --p-content-border: var(--p-surface-700);
+  --p-content-hover-bg: var(--p-surface-800);
+  --p-field-bg: var(--p-surface-800);
+  --p-field-border: var(--p-surface-600);
+  --p-field-hover-border: var(--p-surface-500);
+  --p-overlay-bg: var(--p-surface-800);
+  --p-overlay-border: var(--p-surface-700);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]):not(.light) {
+    --p-surface-0: #09090b;
+    --p-surface-50: #18181b;
+    --p-surface-100: #27272a;
+    --p-surface-200: #3f3f46;
+    --p-surface-300: #52525b;
+    --p-surface-400: #71717a;
+    --p-surface-500: #a1a1aa;
+    --p-surface-600: #d4d4d8;
+    --p-surface-700: #e4e4e7;
+    --p-surface-800: #f4f4f5;
+    --p-surface-900: #fafafa;
+    --p-surface-950: #ffffff;
+    
+    --p-text-color: var(--p-surface-50);
+    --p-text-muted-color: var(--p-surface-400);
+    --p-content-bg: var(--p-surface-900);
+    --p-content-border: var(--p-surface-700);
+    --p-content-hover-bg: var(--p-surface-800);
+    --p-field-bg: var(--p-surface-800);
+    --p-field-border: var(--p-surface-600);
+    --p-field-hover-border: var(--p-surface-500);
+    --p-overlay-bg: var(--p-surface-800);
+    --p-overlay-border: var(--p-surface-700);
+  }
+}
+    `;
+    document.head.appendChild(styleEl);
+  }
+  function updateToken(name, value) {
+    if (typeof document !== "undefined") {
+      document.documentElement.style.setProperty(name, value);
+    }
+  }
+  function getToken(name) {
+    if (typeof document !== "undefined") {
+      return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    }
+    return "";
+  }
+  var AURA_PALETTES;
+  var init_design_tokens = __esm({
+    "src/styles/design-tokens.ts"() {
+      "use strict";
+      AURA_PALETTES = {
+        emerald: {
+          "50": "#ecfdf5",
+          "100": "#d1fae5",
+          "200": "#a7f3d0",
+          "300": "#6ee7b7",
+          "400": "#34d399",
+          "500": "#10b981",
+          "600": "#059669",
+          "700": "#047857",
+          "800": "#065f46",
+          "900": "#064e3b"
+        },
+        blue: {
+          "50": "#eff6ff",
+          "100": "#dbeafe",
+          "200": "#bfdbfe",
+          "300": "#93c5fd",
+          "400": "#60a5fa",
+          "500": "#3b82f6",
+          "600": "#2563eb",
+          "700": "#1d4ed8",
+          "800": "#1e40af",
+          "900": "#1e3a8a"
+        },
+        violet: {
+          "50": "#f5f3ff",
+          "100": "#ede9fe",
+          "200": "#ddd6fe",
+          "300": "#c4b5fd",
+          "400": "#a78bfa",
+          "500": "#8b5cf6",
+          "600": "#7c3aed",
+          "700": "#6d28d9",
+          "800": "#5b21b6",
+          "900": "#4c1d95"
+        },
+        amber: {
+          "50": "#fffbeb",
+          "100": "#fef3c7",
+          "200": "#fde68a",
+          "300": "#fcd34d",
+          "400": "#fbbf24",
+          "500": "#f59e0b",
+          "600": "#d97706",
+          "700": "#b45309",
+          "800": "#92400e",
+          "900": "#78350f"
+        },
+        rose: {
+          "50": "#fff1f2",
+          "100": "#ffe4e6",
+          "200": "#fecdd3",
+          "300": "#fda4af",
+          "400": "#fb7185",
+          "500": "#f43f5e",
+          "600": "#e11d48",
+          "700": "#be123c",
+          "800": "#9f1239",
+          "900": "#881337"
+        },
+        cyan: {
+          "50": "#ecfeff",
+          "100": "#cffafe",
+          "200": "#a5f3fc",
+          "300": "#67e8f9",
+          "400": "#22d3ee",
+          "500": "#06b6d4",
+          "600": "#0891b2",
+          "700": "#0e7490",
+          "800": "#155e75",
+          "900": "#164e63"
+        },
+        slate: {
+          "50": "#f8fafc",
+          "100": "#f1f5f9",
+          "200": "#e2e8f0",
+          "300": "#cbd5e1",
+          "400": "#94a3b8",
+          "500": "#64748b",
+          "600": "#475569",
+          "700": "#334155",
+          "800": "#1e293b",
+          "900": "#0f172a"
+        }
+      };
+    }
+  });
+
   // src/components/stepper.ts
   var stepper_exports = {};
   __export(stepper_exports, {
@@ -5269,21 +5699,48 @@ var SoftMaxIslands = (() => {
         }));
       });
     }
-    const trigger = document.querySelector(props.targetSelector);
-    if (trigger) {
-      trigger.addEventListener("click", (e) => {
-        e.preventDefault();
+    if (props.targetSelector && props.targetSelector.trim()) {
+      try {
+        const trigger = document.querySelector(props.targetSelector);
+        if (trigger) {
+          trigger.addEventListener("click", (e) => {
+            e.preventDefault();
+            isOpen = !isOpen;
+            render();
+            if (isOpen) {
+              const rect = trigger.getBoundingClientRect();
+              const popup = container.querySelector(".laughtale-confirm-popup");
+              if (popup) {
+                popup.style.top = `${rect.bottom + window.scrollY + 6}px`;
+                popup.style.left = `${rect.left + window.scrollX}px`;
+              }
+            }
+          });
+        }
+      } catch (e) {
+        console.warn("[SoftMax.LaughTale] Invalid targetSelector for confirm-popup:", props.targetSelector);
+      }
+    } else {
+      const fallbackBtn = document.createElement("button");
+      fallbackBtn.type = "button";
+      fallbackBtn.className = "p-button p-button-danger";
+      fallbackBtn.textContent = "Delete Record";
+      fallbackBtn.style.padding = "0.4rem 0.75rem";
+      fallbackBtn.style.fontSize = "0.8125rem";
+      fallbackBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
         isOpen = !isOpen;
         render();
         if (isOpen) {
-          const rect = trigger.getBoundingClientRect();
           const popup = container.querySelector(".laughtale-confirm-popup");
           if (popup) {
-            popup.style.top = `${rect.bottom + window.scrollY + 6}px`;
-            popup.style.left = `${rect.left + window.scrollX}px`;
+            popup.style.position = "relative";
+            popup.style.marginTop = "0.5rem";
+            popup.style.display = "block";
           }
         }
       });
+      container.prepend(fallbackBtn);
     }
     render();
   }
@@ -6561,70 +7018,117 @@ var SoftMaxIslands = (() => {
   });
   function ThemeStudioIsland(container, props = {}) {
     let currentPrimary = "emerald";
-    let currentRadius = "0.5rem";
+    let currentCustomHex = "";
     let currentNeutral = "slate";
+    let currentRadius = "0.5rem";
+    let currentDensity = "normal";
     let currentShadow = "layered";
+    let currentFont = "sans";
+    let currentThemeMode = "system";
     const disclosure = useDisclosure({ defaultIsOpen: props.defaultOpen });
     const scrollLock = useScrollLock();
     const clipboard = useClipboard();
     container.innerHTML = `
         <div class="laughtale-theme-studio-root">
-            <!-- Floating Launch Bubble -->
             <button type="button" 
                     class="theme-studio-toggle-btn" 
-                    title="Open TweakAura Theme Studio"
-                    style="position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 5000; width: 3rem; height: 3rem; border-radius: 9999px; background: var(--p-surface-900, #0f172a); color: var(--p-surface-0, #ffffff); border: 2px solid var(--p-primary-500, #10b981); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; outline: none;">
+                    title="Open Aura Live Theme Studio"
+                    style="position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 5000; width: 3.25rem; height: 3.25rem; border-radius: 9999px; background: var(--p-surface-900, #0f172a); color: var(--p-surface-0, #ffffff); border: 2px solid var(--p-primary-500, #10b981); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; outline: none;">
                 ${LucideIcons.palette}
             </button>
-
-            <!-- Backdrop -->
             <div class="theme-studio-backdrop" style="display: none; position: fixed; inset: 0; z-index: 5001; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(2px);"></div>
-
-            <!-- Slide-in Drawer Panel -->
-            <div class="theme-studio-drawer" style="position: fixed; top: 0; right: 0; bottom: 0; width: 100%; max-width: 380px; z-index: 5002; background: var(--p-surface-0, #ffffff); border-left: 1px solid var(--p-border-color, #e2e8f0); box-shadow: -10px 0 25px -5px rgba(0,0,0,0.1); transform: translateX(100%); transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column;">
-                
-                <!-- Header -->
+            <div class="theme-studio-drawer" style="position: fixed; top: 0; right: 0; bottom: 0; width: 100%; max-width: 440px; z-index: 5002; background: var(--p-surface-0, #ffffff); border-left: 1px solid var(--p-border-color, #e2e8f0); box-shadow: -10px 0 35px -5px rgba(0,0,0,0.15); transform: translateX(100%); transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column;">
                 <div style="display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--p-border-color, #e2e8f0);">
                     <div style="display: flex; align-items: center; gap: 0.625rem;">
                         <span style="color: var(--p-primary-600); display: flex;">${LucideIcons.sliders || "\u{1F3A8}"}</span>
                         <div>
-                            <div style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900);">TweakAura Studio</div>
-                            <div style="font-size: 0.75rem; color: var(--p-surface-500);">Live shadcn-Style Theme Editor</div>
+                            <div style="font-size: 1.05rem; font-weight: 800; color: var(--p-surface-900);">Aura Theme Studio</div>
+                            <div style="font-size: 0.75rem; color: var(--p-surface-500);">Live Reactive Design System Editor</div>
                         </div>
                     </div>
-                    <button type="button" class="theme-studio-close-btn" style="border: none; background: transparent; color: var(--p-surface-400); cursor: pointer; padding: 0.25rem; display: flex; border-radius: 4px;">
-                        ${LucideIcons.x}
-                    </button>
-                </div>
-
-                <!-- Body Controls -->
-                <div style="flex: 1; overflow-y: auto; padding: 1.5rem; display: flex; flex-direction: column; gap: 1.5rem;">
-                    
-                    <!-- 1. Primary Palette -->
-                    <div>
-                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-surface-500); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem;">Primary Color Palette</div>
-                        <div class="studio-color-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(2rem, 1fr)); gap: 0.4rem;"></div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <button type="button" class="studio-reset-btn" title="Reset to Defaults" style="border: none; background: transparent; color: var(--p-surface-400); cursor: pointer; padding: 0.25rem; font-size: 0.75rem; border-radius: 4px;">
+                            Reset
+                        </button>
+                        <button type="button" class="theme-studio-close-btn" style="border: none; background: transparent; color: var(--p-surface-400); cursor: pointer; padding: 0.25rem; display: flex; border-radius: 4px;">
+                            ${LucideIcons.x}
+                        </button>
                     </div>
-
-                    <!-- 2. Corner Radius Slider -->
+                </div>
+                <div style="flex: 1; overflow-y: auto; padding: 1.5rem; display: flex; flex-direction: column; gap: 1.5rem;">
+                    <div>
+                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-surface-500); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.6rem;">Appearance Mode</div>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem;">
+                            <button type="button" class="mode-btn active" data-mode="light" style="padding: 0.45rem 0.5rem; font-size: 0.8125rem; font-weight: 600; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); background: var(--p-surface-50); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.35rem;">
+                                ${LucideIcons.sun || "\u2600\uFE0F"} Light
+                            </button>
+                            <button type="button" class="mode-btn" data-mode="dark" style="padding: 0.45rem 0.5rem; font-size: 0.8125rem; font-weight: 600; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); background: var(--p-surface-50); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.35rem;">
+                                ${LucideIcons.moon || "\u{1F319}"} Dark
+                            </button>
+                            <button type="button" class="mode-btn" data-mode="system" style="padding: 0.45rem 0.5rem; font-size: 0.8125rem; font-weight: 600; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); background: var(--p-surface-50); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.35rem;">
+                                System
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
+                            <span style="font-size: 0.75rem; font-weight: 700; color: var(--p-surface-500); text-transform: uppercase; letter-spacing: 0.05em;">Primary Palette</span>
+                            <span class="studio-primary-label" style="font-size: 0.75rem; color: var(--p-primary-600); font-weight: 700;">Emerald</span>
+                        </div>
+                        <div class="studio-color-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(2.1rem, 1fr)); gap: 0.4rem; margin-bottom: 0.75rem;"></div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 0.35rem 0.6rem;">
+                            <input type="color" class="studio-custom-color-input" value="#10b981" style="width: 1.75rem; height: 1.75rem; border: none; border-radius: 4px; cursor: pointer; background: transparent;" />
+                            <span style="font-size: 0.75rem; font-family: monospace; color: var(--p-surface-600);">Custom Hex Accent</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-surface-500); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.6rem;">Neutral Surface Base</div>
+                        <div class="studio-neutral-grid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.35rem;"></div>
+                    </div>
                     <div>
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                             <span style="font-size: 0.75rem; font-weight: 700; color: var(--p-surface-500); text-transform: uppercase; letter-spacing: 0.05em;">Corner Radius</span>
                             <span class="studio-radius-label" style="font-family: monospace; font-size: 0.75rem; color: var(--p-primary-600); font-weight: 600;">0.5rem</span>
                         </div>
-                        <div class="studio-radius-presets" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.35rem;">
-                            <button type="button" class="radius-btn" data-radius="0rem" style="padding: 0.35rem 0; font-size: 0.75rem; font-family: monospace; border: 1px solid var(--p-border-color); background: var(--p-surface-50); border-radius: 2px; cursor: pointer;">0</button>
-                            <button type="button" class="radius-btn" data-radius="0.25rem" style="padding: 0.35rem 0; font-size: 0.75rem; font-family: monospace; border: 1px solid var(--p-border-color); background: var(--p-surface-50); border-radius: 4px; cursor: pointer;">0.25</button>
-                            <button type="button" class="radius-btn active" data-radius="0.5rem" style="padding: 0.35rem 0; font-size: 0.75rem; font-family: monospace; border: 1px solid var(--p-primary-600); background: var(--p-primary-50); color: var(--p-primary-700); font-weight: 700; border-radius: 6px; cursor: pointer;">0.5</button>
-                            <button type="button" class="radius-btn" data-radius="0.75rem" style="padding: 0.35rem 0; font-size: 0.75rem; font-family: monospace; border: 1px solid var(--p-border-color); background: var(--p-surface-50); border-radius: 8px; cursor: pointer;">0.75</button>
-                            <button type="button" class="radius-btn" data-radius="1.0rem" style="padding: 0.35rem 0; font-size: 0.75rem; font-family: monospace; border: 1px solid var(--p-border-color); background: var(--p-surface-50); border-radius: 12px; cursor: pointer;">1.0</button>
+                        <div class="studio-radius-presets" style="display: grid; grid-template-columns: repeat(8, 1fr); gap: 0.25rem;">
+                            <button type="button" class="radius-btn" data-radius="0rem" style="padding: 0.35rem 0; font-size: 0.6875rem; font-family: monospace; border: 1px solid var(--p-border-color); background: var(--p-surface-50); border-radius: 2px; cursor: pointer;">0</button>
+                            <button type="button" class="radius-btn" data-radius="0.25rem" style="padding: 0.35rem 0; font-size: 0.6875rem; font-family: monospace; border: 1px solid var(--p-border-color); background: var(--p-surface-50); border-radius: 2px; cursor: pointer;">.25</button>
+                            <button type="button" class="radius-btn" data-radius="0.375rem" style="padding: 0.35rem 0; font-size: 0.6875rem; font-family: monospace; border: 1px solid var(--p-border-color); background: var(--p-surface-50); border-radius: 2px; cursor: pointer;">.37</button>
+                            <button type="button" class="radius-btn active" data-radius="0.5rem" style="padding: 0.35rem 0; font-size: 0.6875rem; font-family: monospace; border: 2px solid var(--p-primary-500); background: var(--p-primary-50); color: var(--p-primary-700); font-weight: bold; border-radius: 2px; cursor: pointer;">.5</button>
+                            <button type="button" class="radius-btn" data-radius="0.75rem" style="padding: 0.35rem 0; font-size: 0.6875rem; font-family: monospace; border: 1px solid var(--p-border-color); background: var(--p-surface-50); border-radius: 2px; cursor: pointer;">.75</button>
+                            <button type="button" class="radius-btn" data-radius="1.0rem" style="padding: 0.35rem 0; font-size: 0.6875rem; font-family: monospace; border: 1px solid var(--p-border-color); background: var(--p-surface-50); border-radius: 2px; cursor: pointer;">1.0</button>
+                            <button type="button" class="radius-btn" data-radius="1.5rem" style="padding: 0.35rem 0; font-size: 0.6875rem; font-family: monospace; border: 1px solid var(--p-border-color); background: var(--p-surface-50); border-radius: 2px; cursor: pointer;">1.5</button>
+                            <button type="button" class="radius-btn" data-radius="9999px" style="padding: 0.35rem 0; font-size: 0.6875rem; font-family: monospace; border: 1px solid var(--p-border-color); background: var(--p-surface-50); border-radius: 2px; cursor: pointer;">Pill</button>
                         </div>
                     </div>
-
-                    <!-- 3. Pre-Packaged Themes -->
+                    <div>
+                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-surface-500); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Component Density</div>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem;">
+                            <button type="button" class="density-btn" data-density="compact" style="padding: 0.4rem 0.5rem; font-size: 0.75rem; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); background: var(--p-surface-50); cursor: pointer;">Compact</button>
+                            <button type="button" class="density-btn active" data-density="normal" style="padding: 0.4rem 0.5rem; font-size: 0.75rem; border: 2px solid var(--p-primary-500); border-radius: var(--p-border-radius); background: var(--p-primary-50); color: var(--p-primary-700); font-weight: 600; cursor: pointer;">Normal</button>
+                            <button type="button" class="density-btn" data-density="spacious" style="padding: 0.4rem 0.5rem; font-size: 0.75rem; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); background: var(--p-surface-50); cursor: pointer;">Spacious</button>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-surface-500); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Shadow Elevation</div>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.35rem;">
+                            <button type="button" class="shadow-btn" data-shadow="none" style="padding: 0.4rem 0.25rem; font-size: 0.6875rem; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); background: var(--p-surface-50); cursor: pointer;">Flat</button>
+                            <button type="button" class="shadow-btn" data-shadow="subtle" style="padding: 0.4rem 0.25rem; font-size: 0.6875rem; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); background: var(--p-surface-50); cursor: pointer;">Subtle</button>
+                            <button type="button" class="shadow-btn active" data-shadow="layered" style="padding: 0.4rem 0.25rem; font-size: 0.6875rem; border: 2px solid var(--p-primary-500); border-radius: var(--p-border-radius); background: var(--p-primary-50); color: var(--p-primary-700); font-weight: 600; cursor: pointer;">Layered</button>
+                            <button type="button" class="shadow-btn" data-shadow="bold" style="padding: 0.4rem 0.25rem; font-size: 0.6875rem; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); background: var(--p-surface-50); cursor: pointer;">3D Bold</button>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-surface-500); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Font Family</div>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.35rem;">
+                            <button type="button" class="font-btn active" data-font="sans" style="padding: 0.4rem 0.25rem; font-size: 0.75rem; border: 2px solid var(--p-primary-500); border-radius: var(--p-border-radius); background: var(--p-primary-50); color: var(--p-primary-700); font-weight: 600; cursor: pointer;">Jakarta</button>
+                            <button type="button" class="font-btn" data-font="inter" style="padding: 0.4rem 0.25rem; font-size: 0.75rem; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); background: var(--p-surface-50); cursor: pointer;">Inter</button>
+                            <button type="button" class="font-btn" data-font="mono" style="padding: 0.4rem 0.25rem; font-size: 0.75rem; font-family: monospace; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); background: var(--p-surface-50); cursor: pointer;">Mono</button>
+                        </div>
+                    </div>
                     <div>
                         <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-surface-500); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem;">Preset Curated Themes</div>
-                        <div style="display: flex; flex-direction: column; gap: 0.5rem; max-height: 300px; overflow-y: auto;">
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem; max-height: 240px; overflow-y: auto;">
                             <button type="button" class="preset-theme-btn" data-theme="emerald-zero-trust" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); background: var(--p-surface-50); cursor: pointer; text-align: left;">
                                 <div style="display: flex; align-items: center; gap: 0.5rem;">
                                     <span style="width: 1rem; height: 1rem; border-radius: 3px; background: #10b981;"></span>
@@ -6690,31 +7194,29 @@ var SoftMaxIslands = (() => {
                             </button>
                         </div>
                     </div>
-
-                    <!-- 4. Live Mini Component Preview -->
                     <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1rem;">
-                        <div style="font-size: 0.6875rem; font-weight: 700; color: var(--p-surface-400); text-transform: uppercase; margin-bottom: 0.75rem;">Live Preview</div>
+                        <div style="font-size: 0.6875rem; font-weight: 700; color: var(--p-surface-400); text-transform: uppercase; margin-bottom: 0.75rem;">Interactive Live Preview</div>
                         <div style="display: flex; flex-direction: column; gap: 0.75rem;">
                             <div style="display: flex; gap: 0.5rem;">
-                                <button type="button" class="p-button p-button-primary" style="flex: 1; padding: 0.35rem 0.5rem; font-size: 0.75rem;">Primary</button>
-                                <button type="button" class="p-button p-button-secondary" style="flex: 1; padding: 0.35rem 0.5rem; font-size: 0.75rem;">Secondary</button>
+                                <button type="button" class="p-button p-button-primary" style="flex: 1; padding: 0.4rem 0.5rem; font-size: 0.75rem;">Primary</button>
+                                <button type="button" class="p-button p-button-secondary" style="flex: 1; padding: 0.4rem 0.5rem; font-size: 0.75rem;">Secondary</button>
                             </div>
-                            <input type="text" value="Interactive Input" class="p-input" style="padding: 0.35rem 0.5rem; font-size: 0.75rem;" />
+                            <input type="text" value="Interactive Input" class="p-input" style="width: 100%; padding: 0.4rem 0.6rem; font-size: 0.75rem; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); background: var(--p-surface-0); color: var(--p-text-color);" />
+                            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.75rem;">
+                                <span class="aura-tag tag-emerald">Active Badge</span>
+                                <span style="color: var(--p-primary-600); font-weight: bold;">75% Telemetry</span>
+                            </div>
                         </div>
                     </div>
-
                 </div>
-
-                <!-- Footer Export Actions -->
                 <div style="padding: 1rem 1.5rem; border-top: 1px solid var(--p-border-color, #e2e8f0); background: var(--p-surface-50, #f8fafc); display: flex; flex-direction: column; gap: 0.5rem;">
                     <button type="button" class="studio-copy-css-btn p-button p-button-primary" style="width: 100%; justify-content: center; font-size: 0.8125rem;">
-                        ${LucideIcons.copy} Copy CSS Tokens
+                        ${LucideIcons.copy} Copy CSS Custom Properties
                     </button>
                     <button type="button" class="studio-copy-csharp-btn p-button p-button-secondary" style="width: 100%; justify-content: center; font-size: 0.8125rem;">
                         ${LucideIcons.code} Copy C# Theme Tokens
                     </button>
                 </div>
-
             </div>
         </div>
     `;
@@ -6722,8 +7224,12 @@ var SoftMaxIslands = (() => {
     const backdrop = container.querySelector(".theme-studio-backdrop");
     const drawer = container.querySelector(".theme-studio-drawer");
     const closeBtn = container.querySelector(".theme-studio-close-btn");
+    const resetBtn = container.querySelector(".studio-reset-btn");
     const colorGrid = container.querySelector(".studio-color-grid");
+    const neutralGrid = container.querySelector(".studio-neutral-grid");
     const radiusLabel = container.querySelector(".studio-radius-label");
+    const primaryLabel = container.querySelector(".studio-primary-label");
+    const customColorInput = container.querySelector(".studio-custom-color-input");
     const copyCssBtn = container.querySelector(".studio-copy-css-btn");
     const copyCSharpBtn = container.querySelector(".studio-copy-csharp-btn");
     colorGrid.innerHTML = Object.entries(PRIMARY_PRESETS).map(([key, p]) => `
@@ -6734,20 +7240,97 @@ var SoftMaxIslands = (() => {
                 style="width: 100%; aspect-ratio: 1; border-radius: var(--p-border-radius, 6px); background: ${p.hex}; border: ${key === currentPrimary ? "2px solid #ffffff" : "1px solid rgba(0,0,0,0.1)"}; box-shadow: ${key === currentPrimary ? "0 0 0 2px var(--p-surface-900)" : "none"}; cursor: pointer; transition: transform 0.15s ease;">
         </button>
     `).join("");
+    neutralGrid.innerHTML = Object.entries(NEUTRAL_PRESETS).map(([key, n]) => `
+        <button type="button" 
+                class="studio-neutral-swatch ${key === currentNeutral ? "active" : ""}" 
+                data-neutral="${key}" 
+                style="padding: 0.35rem 0.25rem; font-size: 0.6875rem; font-weight: 600; border: ${key === currentNeutral ? "2px solid var(--p-primary-500)" : "1px solid var(--p-border-color)"}; border-radius: var(--p-border-radius); background: ${n.s100}; color: ${n.s900}; cursor: pointer; text-align: center;">
+            ${n.name}
+        </button>
+    `).join("");
     function applyTheme() {
-      const p = PRIMARY_PRESETS[currentPrimary] || PRIMARY_PRESETS.emerald;
       const root = document.documentElement;
-      root.style.setProperty("--p-primary-50", p.lightP50);
-      root.style.setProperty("--p-primary-100", p.lightP100);
-      root.style.setProperty("--p-primary-200", p.lightP200);
-      root.style.setProperty("--p-primary-500", p.lightP500);
-      root.style.setProperty("--p-primary-600", p.lightP600);
-      root.style.setProperty("--p-primary-700", p.lightP700);
+      const p = PRIMARY_PRESETS[currentPrimary] || PRIMARY_PRESETS.emerald;
+      const n = NEUTRAL_PRESETS[currentNeutral] || NEUTRAL_PRESETS.slate;
+      if (currentCustomHex) {
+        root.style.setProperty("--p-primary-500", currentCustomHex);
+        root.style.setProperty("--p-primary-600", currentCustomHex);
+        root.style.setProperty("--p-primary-700", currentCustomHex);
+        if (primaryLabel) primaryLabel.textContent = `Custom (${currentCustomHex})`;
+      } else {
+        root.style.setProperty("--p-primary-50", p.lightP50);
+        root.style.setProperty("--p-primary-100", p.lightP100);
+        root.style.setProperty("--p-primary-200", p.lightP200);
+        root.style.setProperty("--p-primary-500", p.lightP500);
+        root.style.setProperty("--p-primary-600", p.lightP600);
+        root.style.setProperty("--p-primary-700", p.lightP700);
+        if (primaryLabel) primaryLabel.textContent = p.name;
+      }
+      root.style.setProperty("--p-surface-0", n.s0);
+      root.style.setProperty("--p-surface-50", n.s50);
+      root.style.setProperty("--p-surface-100", n.s100);
+      root.style.setProperty("--p-surface-200", n.s200);
+      root.style.setProperty("--p-surface-300", n.s300);
+      root.style.setProperty("--p-surface-400", n.s400);
+      root.style.setProperty("--p-surface-500", n.s500);
+      root.style.setProperty("--p-surface-600", n.s600);
+      root.style.setProperty("--p-surface-700", n.s700);
+      root.style.setProperty("--p-surface-800", n.s800);
+      root.style.setProperty("--p-surface-900", n.s900);
+      root.style.setProperty("--p-surface-950", n.s950);
       root.style.setProperty("--p-border-radius", currentRadius);
-      const radNum = parseFloat(currentRadius);
-      root.style.setProperty("--p-border-radius-lg", `${radNum * 1.5}rem`);
-      root.style.setProperty("--p-border-radius-xl", `${radNum * 2}rem`);
-      radiusLabel.textContent = currentRadius;
+      const radNum = parseFloat(currentRadius) || 0;
+      root.style.setProperty("--p-border-radius-lg", currentRadius === "9999px" ? "9999px" : `${radNum * 1.5}rem`);
+      root.style.setProperty("--p-border-radius-xl", currentRadius === "9999px" ? "9999px" : `${radNum * 2}rem`);
+      if (radiusLabel) radiusLabel.textContent = currentRadius;
+      if (currentDensity === "compact") {
+        root.style.setProperty("--p-content-padding", "0.625rem");
+        root.style.setProperty("--p-field-padding-y", "0.35rem");
+        root.style.setProperty("--p-field-padding-x", "0.5rem");
+      } else if (currentDensity === "spacious") {
+        root.style.setProperty("--p-content-padding", "1.5rem");
+        root.style.setProperty("--p-field-padding-y", "0.65rem");
+        root.style.setProperty("--p-field-padding-x", "1rem");
+      } else {
+        root.style.setProperty("--p-content-padding", "1rem");
+        root.style.setProperty("--p-field-padding-y", "0.5rem");
+        root.style.setProperty("--p-field-padding-x", "0.75rem");
+      }
+      if (currentShadow === "none") {
+        root.style.setProperty("--p-shadow-sm", "none");
+        root.style.setProperty("--p-shadow-md", "none");
+        root.style.setProperty("--p-shadow-lg", "none");
+      } else if (currentShadow === "subtle") {
+        root.style.setProperty("--p-shadow-sm", "0 1px 2px rgba(0,0,0,0.03)");
+        root.style.setProperty("--p-shadow-md", "0 2px 4px rgba(0,0,0,0.05)");
+        root.style.setProperty("--p-shadow-lg", "0 4px 8px rgba(0,0,0,0.06)");
+      } else if (currentShadow === "bold") {
+        root.style.setProperty("--p-shadow-sm", "0 2px 4px rgba(0,0,0,0.1)");
+        root.style.setProperty("--p-shadow-md", "0 8px 16px rgba(0,0,0,0.15)");
+        root.style.setProperty("--p-shadow-lg", "0 16px 32px rgba(0,0,0,0.2)");
+      } else {
+        root.style.setProperty("--p-shadow-sm", "0 1px 2px 0 rgba(0, 0, 0, 0.05)");
+        root.style.setProperty("--p-shadow-md", "0 4px 6px -1px rgba(0, 0, 0, 0.07)");
+        root.style.setProperty("--p-shadow-lg", "0 10px 15px -3px rgba(0, 0, 0, 0.08)");
+      }
+      if (currentFont === "inter") {
+        root.style.setProperty("--p-font-family", "Inter, -apple-system, sans-serif");
+      } else if (currentFont === "mono") {
+        root.style.setProperty("--p-font-family", "JetBrains Mono, monospace");
+      } else {
+        root.style.setProperty("--p-font-family", "Plus Jakarta Sans, sans-serif");
+      }
+      if (currentThemeMode === "dark") {
+        root.classList.add("dark");
+        root.setAttribute("data-theme", "dark");
+      } else if (currentThemeMode === "light") {
+        root.classList.remove("dark");
+        root.setAttribute("data-theme", "light");
+      } else {
+        const isSysDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        root.classList.toggle("dark", isSysDark);
+        root.setAttribute("data-theme", isSysDark ? "dark" : "light");
+      }
     }
     function open() {
       disclosure.open();
@@ -6769,12 +7352,43 @@ var SoftMaxIslands = (() => {
     });
     closeBtn.addEventListener("click", close);
     backdrop.addEventListener("click", close);
+    container.querySelectorAll(".mode-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        currentThemeMode = btn.getAttribute("data-mode") || "system";
+        container.querySelectorAll(".mode-btn").forEach((b) => {
+          b.classList.remove("active");
+          b.style.borderColor = "var(--p-border-color)";
+          b.style.background = "var(--p-surface-50)";
+        });
+        btn.classList.add("active");
+        btn.style.borderColor = "var(--p-primary-500)";
+        btn.style.background = "var(--p-primary-50)";
+        applyTheme();
+      });
+    });
     colorGrid.querySelectorAll(".studio-color-swatch").forEach((btn) => {
       btn.addEventListener("click", () => {
+        currentCustomHex = "";
         currentPrimary = btn.getAttribute("data-color");
         colorGrid.querySelectorAll(".studio-color-swatch").forEach((b) => {
           const k = b.getAttribute("data-color");
           b.style.boxShadow = k === currentPrimary ? "0 0 0 2px var(--p-surface-900)" : "none";
+        });
+        applyTheme();
+      });
+    });
+    if (customColorInput) {
+      customColorInput.addEventListener("input", () => {
+        currentCustomHex = customColorInput.value;
+        applyTheme();
+      });
+    }
+    neutralGrid.querySelectorAll(".studio-neutral-swatch").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        currentNeutral = btn.getAttribute("data-neutral");
+        neutralGrid.querySelectorAll(".studio-neutral-swatch").forEach((b) => {
+          const k = b.getAttribute("data-neutral");
+          b.style.border = k === currentNeutral ? "2px solid var(--p-primary-500)" : "1px solid var(--p-border-color)";
         });
         applyTheme();
       });
@@ -6787,80 +7401,166 @@ var SoftMaxIslands = (() => {
           b.style.borderColor = "var(--p-border-color)";
           b.style.background = "var(--p-surface-50)";
           b.style.color = "inherit";
+          b.style.fontWeight = "normal";
         });
         btn.classList.add("active");
-        btn.style.borderColor = "var(--p-primary-600)";
+        btn.style.borderColor = "var(--p-primary-500)";
         btn.style.background = "var(--p-primary-50)";
         btn.style.color = "var(--p-primary-700)";
+        btn.style.fontWeight = "bold";
+        applyTheme();
+      });
+    });
+    container.querySelectorAll(".density-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        currentDensity = btn.getAttribute("data-density") || "normal";
+        container.querySelectorAll(".density-btn").forEach((b) => {
+          b.classList.remove("active");
+          b.style.borderColor = "var(--p-border-color)";
+          b.style.background = "var(--p-surface-50)";
+        });
+        btn.classList.add("active");
+        btn.style.borderColor = "var(--p-primary-500)";
+        btn.style.background = "var(--p-primary-50)";
+        applyTheme();
+      });
+    });
+    container.querySelectorAll(".shadow-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        currentShadow = btn.getAttribute("data-shadow") || "layered";
+        container.querySelectorAll(".shadow-btn").forEach((b) => {
+          b.classList.remove("active");
+          b.style.borderColor = "var(--p-border-color)";
+          b.style.background = "var(--p-surface-50)";
+        });
+        btn.classList.add("active");
+        btn.style.borderColor = "var(--p-primary-500)";
+        btn.style.background = "var(--p-primary-50)";
+        applyTheme();
+      });
+    });
+    container.querySelectorAll(".font-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        currentFont = btn.getAttribute("data-font") || "sans";
+        container.querySelectorAll(".font-btn").forEach((b) => {
+          b.classList.remove("active");
+          b.style.borderColor = "var(--p-border-color)";
+          b.style.background = "var(--p-surface-50)";
+        });
+        btn.classList.add("active");
+        btn.style.borderColor = "var(--p-primary-500)";
+        btn.style.background = "var(--p-primary-50)";
         applyTheme();
       });
     });
     container.querySelectorAll(".preset-theme-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
+        currentCustomHex = "";
         const theme = btn.getAttribute("data-theme");
         if (theme === "emerald-zero-trust") {
           currentPrimary = "emerald";
+          currentNeutral = "slate";
           currentRadius = "0.5rem";
+          currentDensity = "normal";
         } else if (theme === "krd-golden") {
           currentPrimary = "yellow";
+          currentNeutral = "zinc";
           currentRadius = "0.5rem";
+          currentDensity = "normal";
         } else if (theme === "supabase-violet") {
           currentPrimary = "violet";
+          currentNeutral = "zinc";
           currentRadius = "0.375rem";
+          currentDensity = "compact";
         } else if (theme === "sunset-ember") {
           currentPrimary = "rose";
+          currentNeutral = "stone";
           currentRadius = "0.75rem";
+          currentDensity = "normal";
         } else if (theme === "ocean-blue") {
           currentPrimary = "blue";
+          currentNeutral = "slate";
           currentRadius = "0.5rem";
+          currentDensity = "normal";
         } else if (theme === "cyber-cyan") {
           currentPrimary = "cyan";
+          currentNeutral = "zinc";
           currentRadius = "0rem";
+          currentDensity = "compact";
         } else if (theme === "lime-minimal") {
           currentPrimary = "lime";
+          currentNeutral = "neutral";
           currentRadius = "0.25rem";
+          currentDensity = "compact";
         } else if (theme === "sunset-orange") {
           currentPrimary = "orange";
+          currentNeutral = "stone";
           currentRadius = "0.5rem";
+          currentDensity = "normal";
         } else if (theme === "sakura-pink") {
           currentPrimary = "pink";
-          currentRadius = "1rem";
+          currentNeutral = "zinc";
+          currentRadius = "1.0rem";
+          currentDensity = "spacious";
         }
         applyTheme();
       });
     });
+    if (resetBtn) {
+      resetBtn.addEventListener("click", () => {
+        currentPrimary = "emerald";
+        currentCustomHex = "";
+        currentNeutral = "slate";
+        currentRadius = "0.5rem";
+        currentDensity = "normal";
+        currentShadow = "layered";
+        currentFont = "sans";
+        currentThemeMode = "system";
+        applyTheme();
+      });
+    }
     copyCssBtn.addEventListener("click", () => {
-      const p = PRIMARY_PRESETS[currentPrimary];
+      const p = PRIMARY_PRESETS[currentPrimary] || PRIMARY_PRESETS.emerald;
+      const n = NEUTRAL_PRESETS[currentNeutral] || NEUTRAL_PRESETS.slate;
+      const primaryVal = currentCustomHex || p.hex;
       const cssSnippet = `
 :root {
+    --p-primary-color: ${primaryVal};
     --p-primary-50: ${p.lightP50};
-    --p-primary-100: ${p.lightP100};
-    --p-primary-200: ${p.lightP200};
     --p-primary-500: ${p.lightP500};
     --p-primary-600: ${p.lightP600};
     --p-primary-700: ${p.lightP700};
+    --p-surface-0: ${n.s0};
+    --p-surface-50: ${n.s50};
+    --p-surface-900: ${n.s900};
     --p-border-radius: ${currentRadius};
+    --p-content-padding: ${currentDensity === "compact" ? "0.625rem" : currentDensity === "spacious" ? "1.5rem" : "1rem"};
 }
 
-html.dark {
+[data-theme="dark"], .dark {
     --p-primary-50: ${p.darkP50};
-    --p-primary-100: ${p.darkP100};
-    --p-primary-200: ${p.darkP200};
+    --p-surface-0: ${n.s900};
+    --p-surface-50: ${n.s950};
+    --p-surface-900: ${n.s50};
 }`.trim();
       clipboard.copy(cssSnippet);
       copyCssBtn.innerHTML = `${LucideIcons.check} Copied to Clipboard!`;
       setTimeout(() => {
-        copyCssBtn.innerHTML = `${LucideIcons.copy} Copy CSS Tokens`;
+        copyCssBtn.innerHTML = `${LucideIcons.copy} Copy CSS Custom Properties`;
       }, 2e3);
     });
     copyCSharpBtn.addEventListener("click", () => {
-      const p = PRIMARY_PRESETS[currentPrimary];
+      const p = PRIMARY_PRESETS[currentPrimary] || PRIMARY_PRESETS.emerald;
+      const primaryHex = currentCustomHex || p.hex;
+      const primaryName = currentCustomHex ? "Custom" : p.name;
       const csharpSnippet = `
 public static class AppTheme
 {
-    public const string PrimaryHex = "${p.hex}";
-    public const string PrimaryName = "${p.name}";
+    public const string PrimaryHex = "${primaryHex}";
+    public const string PrimaryName = "${primaryName}";
+    public const string NeutralBase = "${currentNeutral}";
     public const string BorderRadius = "${currentRadius}";
+    public const string Density = "${currentDensity}";
 }`.trim();
       clipboard.copy(csharpSnippet);
       copyCSharpBtn.innerHTML = `${LucideIcons.check} Copied C# Code!`;
@@ -6875,7 +7575,7 @@ public static class AppTheme
     });
     applyTheme();
   }
-  var PRIMARY_PRESETS;
+  var PRIMARY_PRESETS, NEUTRAL_PRESETS;
   var init_theme_studio = __esm({
     "src/components/theme-studio.ts"() {
       "use strict";
@@ -7052,6 +7752,83 @@ public static class AppTheme
           darkP50: "#0c4a6e",
           darkP100: "#075985",
           darkP200: "#0369a1"
+        }
+      };
+      NEUTRAL_PRESETS = {
+        slate: {
+          name: "Slate",
+          s0: "#ffffff",
+          s50: "#f8fafc",
+          s100: "#f1f5f9",
+          s200: "#e2e8f0",
+          s300: "#cbd5e1",
+          s400: "#94a3b8",
+          s500: "#64748b",
+          s600: "#475569",
+          s700: "#334155",
+          s800: "#1e293b",
+          s900: "#0f172a",
+          s950: "#020617"
+        },
+        zinc: {
+          name: "Zinc",
+          s0: "#ffffff",
+          s50: "#fafafa",
+          s100: "#f4f4f5",
+          s200: "#e4e4e7",
+          s300: "#d4d4d8",
+          s400: "#a1a1aa",
+          s500: "#71717a",
+          s600: "#52525b",
+          s700: "#3f3f46",
+          s800: "#27272a",
+          s900: "#18181b",
+          s950: "#09090b"
+        },
+        stone: {
+          name: "Stone",
+          s0: "#ffffff",
+          s50: "#fafaf9",
+          s100: "#f5f5f4",
+          s200: "#e7e5e4",
+          s300: "#d6d3d1",
+          s400: "#a8a29e",
+          s500: "#78716c",
+          s600: "#57534e",
+          s700: "#44403c",
+          s800: "#292524",
+          s900: "#1c1917",
+          s950: "#0c0a09"
+        },
+        neutral: {
+          name: "Neutral",
+          s0: "#ffffff",
+          s50: "#fafafa",
+          s100: "#f5f5f5",
+          s200: "#e5e5e5",
+          s300: "#d4d4d4",
+          s400: "#a3a3a3",
+          s500: "#737373",
+          s600: "#525252",
+          s700: "#404040",
+          s800: "#262626",
+          s900: "#171717",
+          s950: "#0a0a0a"
+        },
+        gray: {
+          name: "Gray",
+          s0: "#ffffff",
+          s50: "#f9fafb",
+          s100: "#f3f4f6",
+          s200: "#e5e7eb",
+          s300: "#d1d5db",
+          s400: "#9ca3af",
+          s500: "#6b7280",
+          s600: "#4b5563",
+          s700: "#374151",
+          s800: "#1f2937",
+          s900: "#111827",
+          s950: "#030712"
         }
       };
     }
@@ -8793,9 +9570,2254 @@ ${h.response}`).join("\n");
     }
   });
 
+  // src/components/select.ts
+  var select_exports = {};
+  __export(select_exports, {
+    default: () => SelectIsland
+  });
+  function SelectIsland(container, props) {
+    injectIslandStyle("laughtale-select", CSS48);
+    let isOpen = false;
+    let selectedValue = props.selectedValue || "";
+    let searchTerm = "";
+    function render() {
+      const selectedOption = props.options.find((o) => o.value === selectedValue);
+      const displayLabel = selectedOption ? selectedOption.label : props.placeholder || "Select...";
+      let filteredOptions = props.options;
+      if (props.filter && searchTerm) {
+        const lowerTerm = searchTerm.toLowerCase();
+        filteredOptions = props.options.filter((o) => o.label.toLowerCase().includes(lowerTerm));
+      }
+      const optionsHtml = filteredOptions.map((opt) => `
+            <li class="laughtale-select-item ${opt.value === selectedValue ? "is-selected" : ""} ${opt.disabled ? "is-disabled" : ""}" data-value="${opt.value}">
+                <span>${opt.label}</span>
+                ${opt.value === selectedValue ? LucideIcons.check : ""}
+            </li>
+        `).join("");
+      container.innerHTML = `
+            <div class="laughtale-select ${isOpen ? "is-open" : ""}" aria-expanded="${isOpen}">
+                <button type="button" class="laughtale-select-trigger" ${props.disabled ? "disabled" : ""}>
+                    <span style="flex:1; text-align:left; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                        ${displayLabel}
+                    </span>
+                    <div style="display:flex; align-items:center; gap:0.25rem;">
+                        ${props.showClear && selectedValue ? '<span class="laughtale-select-clear">' + LucideIcons.x + "</span>" : ""}
+                        <span style="color: var(--p-surface-500); display:flex;">${LucideIcons.chevronDown}</span>
+                    </div>
+                </button>
+                <div class="laughtale-select-dropdown">
+                    ${props.filter ? `
+                    <div class="laughtale-select-filter">
+                        <input type="text" placeholder="Search..." value="${searchTerm}" />
+                    </div>
+                    ` : ""}
+                    <ul class="laughtale-select-list">
+                        ${optionsHtml.length ? optionsHtml : '<li class="laughtale-select-item is-disabled">No results found</li>'}
+                    </ul>
+                </div>
+            </div>
+        `;
+      bindEvents();
+      syncValue();
+    }
+    function bindEvents() {
+      const selectEl = container.querySelector(".laughtale-select");
+      const trigger = container.querySelector(".laughtale-select-trigger");
+      const clearBtn = container.querySelector(".laughtale-select-clear");
+      const listItems = container.querySelectorAll(".laughtale-select-item:not(.is-disabled)");
+      const filterInput = container.querySelector(".laughtale-select-filter input");
+      trigger.addEventListener("click", (e) => {
+        if (e.target === clearBtn || clearBtn?.contains(e.target)) return;
+        isOpen = !isOpen;
+        render();
+        if (isOpen && filterInput) filterInput.focus();
+      });
+      if (clearBtn) {
+        clearBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          selectedValue = "";
+          render();
+        });
+      }
+      listItems.forEach((item) => {
+        item.addEventListener("click", () => {
+          selectedValue = item.dataset.value;
+          isOpen = false;
+          searchTerm = "";
+          render();
+        });
+      });
+      if (filterInput) {
+        filterInput.addEventListener("input", (e) => {
+          searchTerm = e.target.value;
+          render();
+          const newInput = container.querySelector(".laughtale-select-filter input");
+          if (newInput) {
+            newInput.focus();
+            newInput.setSelectionRange(searchTerm.length, searchTerm.length);
+          }
+        });
+      }
+      const outsideClickListener = (e) => {
+        if (isOpen && !container.contains(e.target)) {
+          isOpen = false;
+          render();
+        }
+      };
+      document.addEventListener("click", outsideClickListener);
+    }
+    function syncValue() {
+      if (props.targetInputName) {
+        let hidden = container.querySelector('input[name="' + props.targetInputName + '"]');
+        if (!hidden) {
+          hidden = document.createElement("input");
+          hidden.type = "hidden";
+          hidden.name = props.targetInputName;
+          container.appendChild(hidden);
+        }
+        hidden.value = selectedValue;
+      }
+      container.dispatchEvent(new CustomEvent("select:change", {
+        bubbles: true,
+        detail: { value: selectedValue }
+      }));
+    }
+    render();
+  }
+  var CSS48;
+  var init_select = __esm({
+    "src/components/select.ts"() {
+      "use strict";
+      init_styles();
+      init_lucide();
+      CSS48 = `
+.laughtale-select {
+    position: relative;
+    display: inline-flex;
+    width: 100%;
+    font-family: inherit;
+    user-select: none;
+}
+.laughtale-select-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    background: var(--p-surface-0);
+    border: 1px solid var(--p-field-border, var(--p-surface-300));
+    border-radius: var(--p-border-radius, 0.5rem);
+    color: var(--p-text-color);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    outline: none;
+    gap: 0.5rem;
+}
+.laughtale-select-trigger:hover:not(:disabled) {
+    border-color: var(--p-primary-400);
+}
+.laughtale-select-trigger:focus-visible:not(:disabled) {
+    box-shadow: 0 0 0 2px var(--p-content-bg), 0 0 0 4px var(--p-primary-500);
+    border-color: var(--p-primary-500);
+}
+.laughtale-select-trigger:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: var(--p-surface-100);
+}
+.laughtale-select-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    margin-top: 0.25rem;
+    background: var(--p-surface-0);
+    border: 1px solid var(--p-surface-200);
+    border-radius: var(--p-border-radius, 0.5rem);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    max-height: 20rem;
+    opacity: 0;
+    transform: translateY(-5px);
+    pointer-events: none;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.laughtale-select.is-open .laughtale-select-dropdown {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+.laughtale-select-list {
+    list-style: none;
+    padding: 0.25rem;
+    margin: 0;
+    overflow-y: auto;
+    flex: 1;
+}
+.laughtale-select-item {
+    padding: 0.5rem 0.75rem;
+    border-radius: calc(var(--p-border-radius, 0.5rem) - 0.25rem);
+    cursor: pointer;
+    font-size: 0.875rem;
+    color: var(--p-text-color);
+    transition: background 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.laughtale-select-item:hover {
+    background: var(--p-surface-100);
+}
+.laughtale-select-item.is-selected {
+    background: var(--p-primary-50);
+    color: var(--p-primary-700);
+    font-weight: 500;
+}
+.laughtale-select-item.is-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+.laughtale-select-filter {
+    padding: 0.5rem;
+    border-bottom: 1px solid var(--p-surface-200);
+}
+.laughtale-select-filter input {
+    width: 100%;
+    padding: 0.375rem 0.5rem;
+    border: 1px solid var(--p-surface-300);
+    border-radius: calc(var(--p-border-radius, 0.5rem) - 0.25rem);
+    font-size: 0.875rem;
+    outline: none;
+    background: transparent;
+    color: var(--p-text-color);
+}
+.laughtale-select-filter input:focus {
+    border-color: var(--p-primary-400);
+}
+.laughtale-select-clear {
+    color: var(--p-surface-400);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 0.125rem;
+    border-radius: 50%;
+}
+.laughtale-select-clear:hover {
+    color: var(--p-surface-600);
+    background: var(--p-surface-100);
+}
+[data-theme="dark"] .laughtale-select-item.is-selected {
+    background: var(--p-primary-900);
+    color: var(--p-primary-100);
+}
+[data-theme="dark"] .laughtale-select-dropdown {
+    background: var(--p-surface-900);
+    border-color: var(--p-surface-700);
+}
+[data-theme="dark"] .laughtale-select-trigger {
+    background: var(--p-surface-900);
+}
+[data-theme="dark"] .laughtale-select-item:hover {
+    background: var(--p-surface-800);
+}
+`;
+    }
+  });
+
+  // src/components/checkbox.ts
+  var checkbox_exports = {};
+  __export(checkbox_exports, {
+    default: () => CheckboxIsland
+  });
+  function CheckboxIsland(container, props) {
+    injectIslandStyle("laughtale-checkbox", CSS49);
+    let isChecked = Boolean(props.checked);
+    let isIndeterminate = Boolean(props.indeterminate);
+    function render() {
+      const icon = isIndeterminate ? LucideIcons.minus : LucideIcons.check;
+      const stateClass = isIndeterminate ? "is-indeterminate" : isChecked ? "is-checked" : "";
+      container.innerHTML = `
+            <label class="laughtale-checkbox-wrap ${stateClass} ${props.disabled ? "is-disabled" : ""}">
+                <input type="checkbox" class="laughtale-checkbox-hidden" 
+                    ${isChecked ? "checked" : ""} 
+                    ${props.disabled ? "disabled" : ""} />
+                <div class="laughtale-checkbox-box">
+                    <span class="laughtale-checkbox-icon" style="display:flex; width:14px; height:14px;">
+                        ${icon}
+                    </span>
+                </div>
+                ${props.label ? '<span class="laughtale-checkbox-label">' + props.label + "</span>" : ""}
+            </label>
+        `;
+      bindEvents();
+      syncValue();
+    }
+    function bindEvents() {
+      const input = container.querySelector(".laughtale-checkbox-hidden");
+      if (!props.disabled) {
+        input.addEventListener("change", (e) => {
+          isChecked = input.checked;
+          isIndeterminate = false;
+          render();
+        });
+      }
+    }
+    function syncValue() {
+      if (props.targetInputName) {
+        let hidden = container.querySelector('input[name="' + props.targetInputName + '"]');
+        if (!hidden) {
+          hidden = document.createElement("input");
+          hidden.type = "hidden";
+          hidden.name = props.targetInputName;
+          container.appendChild(hidden);
+        }
+        hidden.value = isChecked ? props.value || "true" : "false";
+      }
+    }
+    render();
+  }
+  var CSS49;
+  var init_checkbox = __esm({
+    "src/components/checkbox.ts"() {
+      "use strict";
+      init_styles();
+      init_lucide();
+      CSS49 = `
+.laughtale-checkbox-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    user-select: none;
+}
+.laughtale-checkbox-wrap.is-disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+.laughtale-checkbox-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 1px solid var(--p-field-border, var(--p-surface-300));
+    border-radius: calc(var(--p-border-radius, 0.5rem) - 0.25rem);
+    background: var(--p-surface-0);
+    transition: all 0.15s ease;
+    color: white;
+}
+.laughtale-checkbox-wrap:hover:not(.is-disabled) .laughtale-checkbox-box {
+    border-color: var(--p-primary-400);
+}
+.laughtale-checkbox-wrap:focus-within:not(.is-disabled) .laughtale-checkbox-box {
+    box-shadow: 0 0 0 2px var(--p-content-bg), 0 0 0 4px var(--p-primary-500);
+    border-color: var(--p-primary-500);
+}
+.laughtale-checkbox-wrap.is-checked .laughtale-checkbox-box,
+.laughtale-checkbox-wrap.is-indeterminate .laughtale-checkbox-box {
+    background: var(--p-primary-500);
+    border-color: var(--p-primary-500);
+}
+.laughtale-checkbox-icon {
+    transform: scale(0);
+    transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.laughtale-checkbox-wrap.is-checked .laughtale-checkbox-icon,
+.laughtale-checkbox-wrap.is-indeterminate .laughtale-checkbox-icon {
+    transform: scale(1);
+}
+.laughtale-checkbox-label {
+    font-size: 0.875rem;
+    color: var(--p-text-color);
+}
+.laughtale-checkbox-hidden {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    margin: 0;
+}
+[data-theme="dark"] .laughtale-checkbox-box {
+    background: var(--p-surface-900);
+    border-color: var(--p-surface-600);
+}
+[data-theme="dark"] .laughtale-checkbox-label {
+    color: var(--p-surface-200);
+}
+[data-theme="dark"] .laughtale-checkbox-wrap:hover:not(.is-disabled) .laughtale-checkbox-box {
+    border-color: var(--p-primary-400);
+}
+`;
+    }
+  });
+
+  // src/components/radio-button.ts
+  var radio_button_exports = {};
+  __export(radio_button_exports, {
+    default: () => RadioButtonIsland
+  });
+  function RadioButtonIsland(container, props) {
+    injectIslandStyle("laughtale-radio", CSS50);
+    let isChecked = Boolean(props.checked);
+    function render() {
+      container.innerHTML = `
+            <label class="laughtale-radio-wrap ${isChecked ? "is-checked" : ""} ${props.disabled ? "is-disabled" : ""}">
+                <input type="radio" class="laughtale-radio-hidden" 
+                    name="${props.name}"
+                    value="${props.value}"
+                    ${isChecked ? "checked" : ""} 
+                    ${props.disabled ? "disabled" : ""} />
+                <div class="laughtale-radio-circle">
+                    <div class="laughtale-radio-dot"></div>
+                </div>
+                ${props.label ? '<span class="laughtale-radio-label">' + props.label + "</span>" : ""}
+            </label>
+        `;
+      bindEvents();
+      syncValue();
+    }
+    function bindEvents() {
+      const input = container.querySelector(".laughtale-radio-hidden");
+      if (!props.disabled) {
+        input.addEventListener("change", (e) => {
+          isChecked = input.checked;
+          render();
+          document.querySelectorAll('input[type="radio"][name="' + props.name + '"]').forEach((el) => {
+            if (el !== input) {
+              el.dispatchEvent(new Event("change", { bubbles: true }));
+            }
+          });
+        });
+        container.addEventListener("change", (e) => {
+          if (e.target !== input) {
+            isChecked = input.checked;
+            render();
+          }
+        });
+      }
+    }
+    function syncValue() {
+      if (props.targetInputName && isChecked) {
+        let hidden = document.querySelector('input[name="' + props.targetInputName + '"]');
+        if (!hidden) {
+          hidden = document.createElement("input");
+          hidden.type = "hidden";
+          hidden.name = props.targetInputName;
+          document.body.appendChild(hidden);
+        }
+        hidden.value = props.value;
+      }
+    }
+    render();
+  }
+  var CSS50;
+  var init_radio_button = __esm({
+    "src/components/radio-button.ts"() {
+      "use strict";
+      init_styles();
+      CSS50 = `
+.laughtale-radio-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    user-select: none;
+}
+.laughtale-radio-wrap.is-disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+.laughtale-radio-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 1px solid var(--p-field-border, var(--p-surface-300));
+    border-radius: 50%;
+    background: var(--p-surface-0);
+    transition: all 0.15s ease;
+}
+.laughtale-radio-wrap:hover:not(.is-disabled) .laughtale-radio-circle {
+    border-color: var(--p-primary-400);
+}
+.laughtale-radio-wrap:focus-within:not(.is-disabled) .laughtale-radio-circle {
+    box-shadow: 0 0 0 2px var(--p-content-bg), 0 0 0 4px var(--p-primary-500);
+    border-color: var(--p-primary-500);
+}
+.laughtale-radio-wrap.is-checked .laughtale-radio-circle {
+    border-color: var(--p-primary-500);
+}
+.laughtale-radio-dot {
+    width: 0.625rem;
+    height: 0.625rem;
+    border-radius: 50%;
+    background: var(--p-primary-500);
+    transform: scale(0);
+    transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.laughtale-radio-wrap.is-checked .laughtale-radio-dot {
+    transform: scale(1);
+}
+.laughtale-radio-label {
+    font-size: 0.875rem;
+    color: var(--p-text-color);
+}
+.laughtale-radio-hidden {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    margin: 0;
+}
+[data-theme="dark"] .laughtale-radio-circle {
+    background: var(--p-surface-900);
+    border-color: var(--p-surface-600);
+}
+[data-theme="dark"] .laughtale-radio-label {
+    color: var(--p-surface-200);
+}
+`;
+    }
+  });
+
+  // src/components/textarea.ts
+  var textarea_exports = {};
+  __export(textarea_exports, {
+    default: () => TextareaIsland
+  });
+  function TextareaIsland(container, props) {
+    injectIslandStyle("laughtale-textarea", CSS51);
+    let currentValue = props.value || "";
+    function render() {
+      container.innerHTML = `
+            <div class="laughtale-textarea-wrap">
+                <textarea 
+                    class="laughtale-textarea"
+                    rows="${props.rows || 3}"
+                    ${props.maxLength ? 'maxlength="' + props.maxLength + '"' : ""}
+                    placeholder="${props.placeholder || ""}"
+                    ${props.disabled ? "disabled" : ""}
+                    ${props.autoResize ? 'style="overflow:hidden; resize:none;"' : ""}
+                >${currentValue}</textarea>
+                ${props.maxLength ? `
+                    <div class="laughtale-textarea-counter">
+                        <span class="laughtale-char-count">${currentValue.length}</span> / ${props.maxLength}
+                    </div>
+                ` : ""}
+            </div>
+        `;
+      bindEvents();
+      syncValue();
+      if (props.autoResize) autoResize();
+    }
+    function bindEvents() {
+      const textarea = container.querySelector(".laughtale-textarea");
+      const counter = container.querySelector(".laughtale-char-count");
+      textarea.addEventListener("input", () => {
+        currentValue = textarea.value;
+        if (counter) counter.textContent = currentValue.length.toString();
+        if (props.autoResize) autoResize();
+        syncValue();
+      });
+    }
+    function autoResize() {
+      const textarea = container.querySelector(".laughtale-textarea");
+      if (textarea && props.autoResize) {
+        textarea.style.height = "auto";
+        textarea.style.height = textarea.scrollHeight + "px";
+      }
+    }
+    function syncValue() {
+      if (props.targetInputName) {
+        let hidden = container.querySelector('input[name="' + props.targetInputName + '"]');
+        if (!hidden) {
+          hidden = document.createElement("input");
+          hidden.type = "hidden";
+          hidden.name = props.targetInputName;
+          container.appendChild(hidden);
+        }
+        hidden.value = currentValue;
+      }
+    }
+    render();
+  }
+  var CSS51;
+  var init_textarea = __esm({
+    "src/components/textarea.ts"() {
+      "use strict";
+      init_styles();
+      CSS51 = `
+.laughtale-textarea-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    width: 100%;
+}
+.laughtale-textarea {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    background: var(--p-surface-0);
+    border: 1px solid var(--p-field-border, var(--p-surface-300));
+    border-radius: var(--p-border-radius, 0.5rem);
+    color: var(--p-text-color);
+    font-size: 0.875rem;
+    font-family: inherit;
+    resize: vertical;
+    transition: all 0.15s ease;
+    outline: none;
+    line-height: 1.5;
+}
+.laughtale-textarea:hover:not(:disabled) {
+    border-color: var(--p-primary-400);
+}
+.laughtale-textarea:focus-visible:not(:disabled) {
+    box-shadow: 0 0 0 2px var(--p-content-bg), 0 0 0 4px var(--p-primary-500);
+    border-color: var(--p-primary-500);
+}
+.laughtale-textarea:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: var(--p-surface-100);
+}
+.laughtale-textarea-counter {
+    font-size: 0.75rem;
+    color: var(--p-surface-500);
+    text-align: right;
+}
+[data-theme="dark"] .laughtale-textarea {
+    background: var(--p-surface-900);
+    color: var(--p-surface-100);
+    border-color: var(--p-surface-600);
+}
+[data-theme="dark"] .laughtale-textarea:disabled {
+    background: var(--p-surface-800);
+}
+`;
+    }
+  });
+
+  // src/components/input-mask.ts
+  var input_mask_exports = {};
+  __export(input_mask_exports, {
+    default: () => InputMaskIsland
+  });
+  function InputMaskIsland(container, props) {
+    injectIslandStyle("laughtale-input-mask", CSS52);
+    const mask = props.mask;
+    const slotChar = props.slotChar || "_";
+    let rawValue = props.value || "";
+    const defs = {
+      "9": /[0-9]/,
+      "a": /[A-Za-z]/,
+      "*": /[A-Za-z0-9]/
+    };
+    function format(val) {
+      let result = "";
+      let valIndex = 0;
+      for (let i = 0; i < mask.length; i++) {
+        const m = mask[i];
+        if (defs[m]) {
+          if (valIndex < val.length) {
+            if (defs[m].test(val[valIndex])) {
+              result += val[valIndex];
+              valIndex++;
+            } else {
+              valIndex++;
+              i--;
+            }
+          } else {
+            result += slotChar;
+          }
+        } else {
+          result += m;
+          if (valIndex < val.length && val[valIndex] === m) {
+            valIndex++;
+          }
+        }
+      }
+      return result;
+    }
+    let currentValue = format(rawValue);
+    function render() {
+      container.innerHTML = `
+            <input 
+                type="text"
+                class="laughtale-input-mask"
+                value="${currentValue}"
+                placeholder="${props.placeholder || format("")}"
+                ${props.disabled ? "disabled" : ""}
+            />
+        `;
+      bindEvents();
+      syncValue();
+    }
+    function bindEvents() {
+      const input = container.querySelector("input");
+      input.addEventListener("input", (e) => {
+        const val = input.value.replace(new RegExp("[\\\\" + slotChar + "]", "g"), "");
+        const unmasked = Array.from(val).join("");
+        currentValue = format(unmasked);
+        if (input.value !== currentValue) {
+          input.value = currentValue;
+        }
+        const firstSlot = currentValue.indexOf(slotChar);
+        const cursorPos = firstSlot !== -1 ? firstSlot : currentValue.length;
+        input.setSelectionRange(cursorPos, cursorPos);
+        syncValue();
+      });
+      input.addEventListener("focus", () => {
+        if (input.value === format("")) {
+          const firstSlot = input.value.indexOf(slotChar);
+          const cursorPos = firstSlot !== -1 ? firstSlot : 0;
+          setTimeout(() => input.setSelectionRange(cursorPos, cursorPos), 0);
+        }
+      });
+    }
+    function syncValue() {
+      if (props.targetInputName) {
+        let hidden = container.querySelector('input[name="' + props.targetInputName + '"]');
+        if (!hidden) {
+          hidden = document.createElement("input");
+          hidden.type = "hidden";
+          hidden.name = props.targetInputName;
+          container.appendChild(hidden);
+        }
+        hidden.value = currentValue.replace(new RegExp("[\\\\" + slotChar + "]", "g"), "");
+      }
+    }
+    render();
+  }
+  var CSS52;
+  var init_input_mask = __esm({
+    "src/components/input-mask.ts"() {
+      "use strict";
+      init_styles();
+      CSS52 = `
+.laughtale-input-mask {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    background: var(--p-surface-0);
+    border: 1px solid var(--p-field-border, var(--p-surface-300));
+    border-radius: var(--p-border-radius, 0.5rem);
+    color: var(--p-text-color);
+    font-size: 0.875rem;
+    font-family: inherit;
+    transition: all 0.15s ease;
+    outline: none;
+}
+.laughtale-input-mask:hover:not(:disabled) {
+    border-color: var(--p-primary-400);
+}
+.laughtale-input-mask:focus-visible:not(:disabled) {
+    box-shadow: 0 0 0 2px var(--p-content-bg), 0 0 0 4px var(--p-primary-500);
+    border-color: var(--p-primary-500);
+}
+.laughtale-input-mask:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: var(--p-surface-100);
+}
+[data-theme="dark"] .laughtale-input-mask {
+    background: var(--p-surface-900);
+    color: var(--p-surface-100);
+    border-color: var(--p-surface-600);
+}
+[data-theme="dark"] .laughtale-input-mask:disabled {
+    background: var(--p-surface-800);
+}
+`;
+    }
+  });
+
+  // src/components/float-label.ts
+  var float_label_exports = {};
+  __export(float_label_exports, {
+    default: () => FloatLabelIsland
+  });
+  function FloatLabelIsland(container, props) {
+    injectIslandStyle("laughtale-float-label", CSS53);
+    const variant = props.variant || "over";
+    const innerHtml = container.innerHTML;
+    container.innerHTML = `
+        <div class="laughtale-float-label laughtale-float-label-${variant}">
+            ${innerHtml}
+            <label>${props.label}</label>
+        </div>
+    `;
+    const wrap = container.querySelector(".laughtale-float-label");
+    const input = wrap.querySelector("input, textarea, select");
+    if (input) {
+      const updateState = () => {
+        if (input.value && input.value.length > 0) {
+          wrap.classList.add("has-value");
+        } else {
+          wrap.classList.remove("has-value");
+        }
+      };
+      input.addEventListener("input", updateState);
+      input.addEventListener("change", updateState);
+      setTimeout(updateState, 0);
+    }
+  }
+  var CSS53;
+  var init_float_label = __esm({
+    "src/components/float-label.ts"() {
+      "use strict";
+      init_styles();
+      CSS53 = `
+.laughtale-float-label {
+    position: relative;
+    display: block;
+}
+.laughtale-float-label label {
+    position: absolute;
+    left: 0.75rem;
+    color: var(--p-surface-500);
+    font-size: 0.875rem;
+    pointer-events: none;
+    transition: all 0.2s ease;
+    z-index: 1;
+}
+
+/* Variant: over */
+.laughtale-float-label-over label {
+    top: 50%;
+    transform: translateY(-50%);
+}
+.laughtale-float-label-over:focus-within label,
+.laughtale-float-label-over.has-value label {
+    top: -0.5rem;
+    transform: translateY(-100%);
+    font-size: 0.75rem;
+    color: var(--p-primary-500);
+}
+
+/* Variant: on */
+.laughtale-float-label-on label {
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--p-surface-0);
+    padding: 0 0.25rem;
+    margin-left: -0.25rem;
+}
+.laughtale-float-label-on:focus-within label,
+.laughtale-float-label-on.has-value label {
+    top: 0;
+    transform: translateY(-50%);
+    font-size: 0.75rem;
+    color: var(--p-primary-500);
+}
+
+/* Variant: in */
+.laughtale-float-label-in label {
+    top: 50%;
+    transform: translateY(-50%);
+}
+.laughtale-float-label-in:focus-within label,
+.laughtale-float-label-in.has-value label {
+    top: 0.25rem;
+    transform: translateY(0);
+    font-size: 0.65rem;
+    color: var(--p-primary-500);
+}
+.laughtale-float-label-in input {
+    padding-top: 1.25rem !important;
+    padding-bottom: 0.25rem !important;
+}
+
+[data-theme="dark"] .laughtale-float-label-on label {
+    background: var(--p-surface-900);
+}
+`;
+    }
+  });
+
+  // src/components/input-text.ts
+  var input_text_exports = {};
+  __export(input_text_exports, {
+    default: () => InputTextIsland
+  });
+  function InputTextIsland(container, props) {
+    injectIslandStyle("laughtale-input-text", CSS54);
+    let currentValue = props.value || "";
+    function render() {
+      const sizeClass = "laughtale-input-" + props.size || "md";
+      const wrapClasses = [
+        "laughtale-input-wrap",
+        props.iconLeft ? "has-icon-left" : "",
+        props.iconRight ? "has-icon-right" : "",
+        props.showClear && currentValue ? "has-clear" : ""
+      ].filter(Boolean).join(" ");
+      container.innerHTML = `
+            <div class="${wrapClasses}">
+                ${props.iconLeft ? '<span class="laughtale-input-icon laughtale-input-icon-left">' + LucideIcons[props.iconLeft] || "</span>" : ""}
+                <input 
+                    type="${props.type || "text"}"
+                    class="laughtale-input ${sizeClass} ${props.invalid ? "is-invalid" : ""}"
+                    value="${currentValue}"
+                    placeholder="${props.placeholder || ""}"
+                    ${props.disabled ? "disabled" : ""}
+                />
+                ${props.showClear && currentValue ? '<button type="button" class="laughtale-input-clear">' + LucideIcons.x + "</button>" : ""}
+                ${props.iconRight ? '<span class="laughtale-input-icon laughtale-input-icon-right">' + LucideIcons[props.iconRight] || "</span>" : ""}
+            </div>
+        `;
+      bindEvents();
+      syncValue();
+    }
+    function bindEvents() {
+      const input = container.querySelector("input");
+      const clearBtn = container.querySelector(".laughtale-input-clear");
+      input.addEventListener("input", () => {
+        const oldHasValue = !!currentValue;
+        currentValue = input.value;
+        const newHasValue = !!currentValue;
+        syncValue();
+        if (props.showClear && oldHasValue !== newHasValue) {
+          render();
+          const newInput = container.querySelector("input");
+          newInput.focus();
+          newInput.setSelectionRange(currentValue.length, currentValue.length);
+        }
+      });
+      if (clearBtn) {
+        clearBtn.addEventListener("click", () => {
+          currentValue = "";
+          render();
+          container.querySelector("input")?.focus();
+        });
+      }
+    }
+    function syncValue() {
+      if (props.targetInputName) {
+        let hidden = container.querySelector('input[name="' + props.targetInputName + '"]');
+        if (!hidden) {
+          hidden = document.createElement("input");
+          hidden.type = "hidden";
+          hidden.name = props.targetInputName;
+          container.appendChild(hidden);
+        }
+        hidden.value = currentValue;
+      }
+    }
+    render();
+  }
+  var CSS54;
+  var init_input_text = __esm({
+    "src/components/input-text.ts"() {
+      "use strict";
+      init_styles();
+      init_lucide();
+      CSS54 = `
+.laughtale-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+.laughtale-input {
+    width: 100%;
+    background: var(--p-surface-0);
+    border: 1px solid var(--p-field-border, var(--p-surface-300));
+    border-radius: var(--p-border-radius, 0.5rem);
+    color: var(--p-text-color);
+    font-family: inherit;
+    transition: all 0.15s ease;
+    outline: none;
+}
+.laughtale-input-sm { padding: 0.375rem 0.5rem; font-size: 0.75rem; }
+.laughtale-input-md { padding: 0.5rem 0.75rem; font-size: 0.875rem; }
+.laughtale-input-lg { padding: 0.75rem 1rem; font-size: 1rem; }
+
+.laughtale-input:hover:not(:disabled):not(.is-invalid) {
+    border-color: var(--p-primary-400);
+}
+.laughtale-input:focus-visible:not(:disabled):not(.is-invalid) {
+    box-shadow: 0 0 0 2px var(--p-content-bg), 0 0 0 4px var(--p-primary-500);
+    border-color: var(--p-primary-500);
+}
+.laughtale-input:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: var(--p-surface-100);
+}
+.laughtale-input.is-invalid {
+    border-color: #ef4444;
+}
+.laughtale-input.is-invalid:focus-visible {
+    box-shadow: 0 0 0 2px var(--p-content-bg), 0 0 0 4px rgba(239, 68, 68, 0.5);
+}
+.laughtale-input-icon {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--p-surface-400);
+    display: flex;
+    pointer-events: none;
+}
+.laughtale-input-icon-left { left: 0.75rem; }
+.laughtale-input-icon-right { right: 0.75rem; }
+
+.has-icon-left .laughtale-input { padding-left: 2.25rem; }
+.has-icon-right .laughtale-input { padding-right: 2.25rem; }
+
+.laughtale-input-clear {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: var(--p-surface-400);
+    cursor: pointer;
+    display: flex;
+    padding: 0.125rem;
+    border-radius: 50%;
+}
+.laughtale-input-clear:hover {
+    background: var(--p-surface-100);
+    color: var(--p-surface-600);
+}
+.has-clear .laughtale-input { padding-right: 2.25rem; }
+.has-icon-right.has-clear .laughtale-input { padding-right: 3.5rem; }
+.has-icon-right.has-clear .laughtale-input-clear { right: 2.25rem; }
+[data-theme="dark"] .laughtale-input {
+    background: var(--p-surface-900);
+    color: var(--p-surface-100);
+    border-color: var(--p-surface-600);
+}
+[data-theme="dark"] .laughtale-input-wrap.is-invalid .laughtale-input {
+    border-color: var(--p-red-400);
+}
+[data-theme="dark"] .laughtale-input-clear:hover {
+    background: var(--p-surface-700);
+    color: var(--p-surface-200);
+}
+`;
+    }
+  });
+
+  // src/components/carousel.ts
+  var carousel_exports = {};
+  __export(carousel_exports, {
+    default: () => CarouselIsland
+  });
+  function CarouselIsland(container, props) {
+    const items = props.items || [];
+    const numVisible = props.numVisible || 1;
+    const numScroll = props.numScroll || 1;
+    const autoplay = props.autoplay || false;
+    const autoplayInterval = props.autoplayInterval || 5e3;
+    const circular = props.circular || false;
+    const showIndicators = props.showIndicators !== false;
+    const showNavigators = props.showNavigators !== false;
+    let currentIndex = 0;
+    let autoplayTimer = null;
+    let isDragging = false;
+    let startX = 0;
+    let currentTranslate = 0;
+    let prevTranslate = 0;
+    injectIslandStyle("carousel", `
+        .laughtale-carousel {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 100%;
+        }
+        .carousel-content {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+        }
+        .carousel-viewport {
+            overflow: hidden;
+            width: 100%;
+            border-radius: var(--p-border-radius);
+            touch-action: pan-y;
+        }
+        .carousel-track {
+            display: flex;
+            transition: transform 0.3s ease;
+            cursor: grab;
+        }
+        .carousel-track:active {
+            cursor: grabbing;
+        }
+        .carousel-item {
+            flex: 0 0 auto;
+            padding: 0.5rem;
+            box-sizing: border-box;
+        }
+        .carousel-item-content {
+            background: var(--p-surface-0);
+            border: 1px solid var(--p-border-color);
+            border-radius: var(--p-border-radius);
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: box-shadow 150ms ease, transform 150ms ease;
+            height: 100%;
+        }
+        [data-theme="dark"] .carousel-item-content {
+            box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+        }
+        .carousel-item-content:hover {
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .carousel-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            display: block;
+        }
+        .carousel-body {
+            padding: 1rem;
+        }
+        .carousel-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--p-text-color);
+            margin-bottom: 0.5rem;
+        }
+        .carousel-desc {
+            font-size: 0.875rem;
+            color: var(--p-text-muted-color);
+        }
+        .carousel-btn {
+            background: var(--p-surface-0);
+            border: 1px solid var(--p-border-color);
+            color: var(--p-text-color);
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 150ms ease, color 150ms ease, box-shadow 150ms ease;
+            flex-shrink: 0;
+            z-index: 2;
+        }
+        .carousel-btn:hover:not(:disabled) {
+            background: var(--p-surface-100);
+        }
+        .carousel-btn:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--p-primary-color);
+        }
+        .carousel-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .carousel-indicators {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .carousel-indicator {
+            width: 0.75rem;
+            height: 0.75rem;
+            border-radius: 50%;
+            background: var(--p-surface-300);
+            border: none;
+            cursor: pointer;
+            transition: background 150ms ease, transform 150ms ease;
+        }
+        .carousel-indicator.active {
+            background: var(--p-primary-color);
+            transform: scale(1.2);
+        }
+    `);
+    function getPositionByIndex(index) {
+      return -(index * (100 / numVisible));
+    }
+    function setPositionByIndex() {
+      const track = container.querySelector(".carousel-track");
+      if (!track) return;
+      currentTranslate = getPositionByIndex(currentIndex);
+      prevTranslate = currentTranslate;
+      track.style.transform = "translateX(" + currentTranslate + "%)";
+      updateIndicators();
+      updateButtons();
+    }
+    function render() {
+      const itemWidth = 100 / numVisible;
+      const totalPages = Math.ceil((items.length - numVisible) / numScroll) + 1;
+      container.innerHTML = `
+            <div class="laughtale-carousel">
+                <div class="carousel-content">
+                    ${showNavigators ? `
+                        <button type="button" class="carousel-btn prev-btn" aria-label="Previous">
+                            ${LucideIcons.chevronLeft}
+                        </button>
+                    ` : ""}
+                    
+                    <div class="carousel-viewport">
+                        <div class="carousel-track">
+                            ${items.map((item) => `
+                                <div class="carousel-item" style="width: ${itemWidth}%">
+                                    <div class="carousel-item-content">
+                                        ${item.image ? `<img src="${item.image}" alt="${item.title || ""}" class="carousel-img" />` : ""}
+                                        <div class="carousel-body">
+                                            ${item.title ? `<div class="carousel-title">${item.title}</div>` : ""}
+                                            ${item.description ? `<div class="carousel-desc">${item.description}</div>` : ""}
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join("")}
+                        </div>
+                    </div>
+
+                    ${showNavigators ? `
+                        <button type="button" class="carousel-btn next-btn" aria-label="Next">
+                            ${LucideIcons.chevronRight}
+                        </button>
+                    ` : ""}
+                </div>
+
+                ${showIndicators && totalPages > 1 ? `
+                    <div class="carousel-indicators">
+                        ${Array.from({ length: totalPages }).map((_, i) => `
+                            <button type="button" class="carousel-indicator ${i === 0 ? "active" : ""}" data-index="${i}" aria-label="Page ${i + 1}"></button>
+                        `).join("")}
+                    </div>
+                ` : ""}
+            </div>
+        `;
+      bindEvents();
+      setPositionByIndex();
+      if (autoplay) startAutoplay();
+    }
+    function updateIndicators() {
+      if (!showIndicators) return;
+      const page = Math.floor(currentIndex / numScroll);
+      container.querySelectorAll(".carousel-indicator").forEach((ind, i) => {
+        ind.classList.toggle("active", i === page);
+      });
+    }
+    function updateButtons() {
+      if (!showNavigators || circular) return;
+      const prevBtn = container.querySelector(".prev-btn");
+      const nextBtn = container.querySelector(".next-btn");
+      if (prevBtn) prevBtn.disabled = currentIndex === 0;
+      if (nextBtn) nextBtn.disabled = currentIndex >= items.length - numVisible;
+    }
+    function navPrev() {
+      if (currentIndex === 0) {
+        if (circular) currentIndex = Math.max(0, items.length - numVisible);
+      } else {
+        currentIndex = Math.max(0, currentIndex - numScroll);
+      }
+      setPositionByIndex();
+    }
+    function navNext() {
+      if (currentIndex >= items.length - numVisible) {
+        if (circular) currentIndex = 0;
+      } else {
+        currentIndex = Math.min(items.length - numVisible, currentIndex + numScroll);
+      }
+      setPositionByIndex();
+    }
+    function startAutoplay() {
+      if (autoplayTimer) clearInterval(autoplayTimer);
+      autoplayTimer = window.setInterval(navNext, autoplayInterval);
+    }
+    function stopAutoplay() {
+      if (autoplayTimer) {
+        clearInterval(autoplayTimer);
+        autoplayTimer = null;
+      }
+    }
+    function bindEvents() {
+      const prevBtn = container.querySelector(".prev-btn");
+      const nextBtn = container.querySelector(".next-btn");
+      const track = container.querySelector(".carousel-track");
+      const indicators = container.querySelectorAll(".carousel-indicator");
+      prevBtn?.addEventListener("click", navPrev);
+      nextBtn?.addEventListener("click", navNext);
+      indicators.forEach((ind) => {
+        ind.addEventListener("click", (e) => {
+          const idx = Number(e.target.dataset.index);
+          currentIndex = Math.min(idx * numScroll, items.length - numVisible);
+          setPositionByIndex();
+        });
+      });
+      if (autoplay) {
+        container.addEventListener("mouseenter", stopAutoplay);
+        container.addEventListener("mouseleave", startAutoplay);
+      }
+      if (track) {
+        track.addEventListener("pointerdown", (e) => {
+          isDragging = true;
+          startX = e.clientX;
+          track.style.transition = "none";
+          if (autoplay) stopAutoplay();
+        });
+        window.addEventListener("pointermove", (e) => {
+          if (!isDragging) return;
+          const currentX = e.clientX;
+          const diff = (currentX - startX) / container.offsetWidth * 100;
+          track.style.transform = `translateX(${prevTranslate + diff}%)`;
+        });
+        window.addEventListener("pointerup", (e) => {
+          if (!isDragging) return;
+          isDragging = false;
+          track.style.transition = "transform 0.3s ease";
+          const diff = (e.clientX - startX) / container.offsetWidth * 100;
+          if (Math.abs(diff) > 10) {
+            if (diff > 0) navPrev();
+            else navNext();
+          } else {
+            setPositionByIndex();
+          }
+          if (autoplay) startAutoplay();
+        });
+      }
+    }
+    render();
+  }
+  var init_carousel = __esm({
+    "src/components/carousel.ts"() {
+      "use strict";
+      init_lucide();
+      init_styles();
+    }
+  });
+
+  // src/components/paginator.ts
+  var paginator_exports = {};
+  __export(paginator_exports, {
+    default: () => PaginatorIsland
+  });
+  function PaginatorIsland(container, props) {
+    injectIslandStyle("paginator", CSS55);
+    let first = props.first || 0;
+    let rows = props.rows || 10;
+    const totalRecords = props.totalRecords || 0;
+    const options = props.rowsPerPageOptions || [10, 20, 50];
+    const compact = props.compact || false;
+    function changePage(newFirst) {
+      first = Math.max(0, Math.min(newFirst, totalRecords - 1));
+      const page = Math.floor(first / rows);
+      container.dispatchEvent(new CustomEvent("page-change", {
+        detail: { first, rows, page },
+        bubbles: true
+      }));
+      render();
+    }
+    function render() {
+      const pageCount = Math.ceil(totalRecords / rows) || 1;
+      const currentPage = Math.floor(first / rows);
+      let startPage = Math.max(0, currentPage - 2);
+      let endPage = Math.min(pageCount - 1, startPage + 4);
+      if (endPage - startPage < 4) {
+        startPage = Math.max(0, endPage - 4);
+      }
+      const pages = [];
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+      }
+      const isFirst = currentPage === 0;
+      const isLast = currentPage >= pageCount - 1;
+      const showFrom = totalRecords > 0 ? first + 1 : 0;
+      const showTo = Math.min(first + rows, totalRecords);
+      const infoText = "Showing " + showFrom + "-" + showTo + " of " + totalRecords;
+      const pagesHtml = pages.map(
+        (p) => '<button class="paginator-btn btn-page ' + (p === currentPage ? "active" : "") + '" data-page="' + p + '">' + (p + 1) + "</button>"
+      ).join("");
+      const optionsHtml = options.length > 0 ? '<select class="paginator-select">' + options.map((opt) => '<option value="' + opt + '"' + (opt === rows ? " selected" : "") + ">" + opt + "</option>").join("") + "</select>" : "";
+      container.innerHTML = '<div class="laughtale-paginator' + (compact ? " compact" : "") + '"><div class="paginator-left"><button class="paginator-btn btn-first"' + (isFirst ? " disabled" : "") + ' aria-label="First Page"><span style="display:flex;">' + LucideIcons.chevronsLeft + '</span></button><button class="paginator-btn btn-prev"' + (isFirst ? " disabled" : "") + ' aria-label="Previous Page"><span style="display:flex;">' + LucideIcons.chevronLeft + '</span></button><div class="paginator-pages">' + pagesHtml + '</div><button class="paginator-btn btn-next"' + (isLast ? " disabled" : "") + ' aria-label="Next Page"><span style="display:flex;">' + LucideIcons.chevronRight + '</span></button><button class="paginator-btn btn-last"' + (isLast ? " disabled" : "") + ' aria-label="Last Page"><span style="display:flex;">' + LucideIcons.chevronsRight + '</span></button></div><div class="paginator-right">' + optionsHtml + '<span class="paginator-info">' + infoText + "</span></div></div>";
+      bindEvents();
+    }
+    function bindEvents() {
+      container.querySelector(".btn-first")?.addEventListener("click", () => changePage(0));
+      container.querySelector(".btn-prev")?.addEventListener("click", () => changePage(first - rows));
+      container.querySelector(".btn-next")?.addEventListener("click", () => changePage(first + rows));
+      container.querySelector(".btn-last")?.addEventListener("click", () => changePage(Math.floor((totalRecords - 1) / rows) * rows));
+      container.querySelectorAll(".btn-page").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          const page = Number(e.currentTarget.dataset.page);
+          changePage(page * rows);
+        });
+      });
+      const select = container.querySelector(".paginator-select");
+      if (select) {
+        select.addEventListener("change", (e) => {
+          rows = Number(e.target.value);
+          changePage(0);
+        });
+      }
+    }
+    render();
+  }
+  var CSS55;
+  var init_paginator = __esm({
+    "src/components/paginator.ts"() {
+      "use strict";
+      init_lucide();
+      init_styles();
+      CSS55 = `
+.laughtale-paginator {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    background: var(--p-surface-0);
+    border: 1px solid var(--p-border-color, var(--p-surface-200));
+    border-radius: var(--p-border-radius, 0.5rem);
+    font-family: inherit;
+    color: var(--p-text-color);
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+.paginator-left, .paginator-right {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.paginator-pages {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+.paginator-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2rem;
+    height: 2rem;
+    padding: 0 0.25rem;
+    border-radius: var(--p-border-radius, 0.5rem);
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--p-text-color);
+    cursor: pointer;
+    transition: all 150ms ease;
+    font-size: 0.875rem;
+}
+.paginator-btn:hover:not(:disabled) {
+    background: var(--p-surface-100);
+}
+.paginator-btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--p-primary-500);
+}
+.paginator-btn.active {
+    background: var(--p-primary-500);
+    color: white;
+    font-weight: 600;
+}
+.paginator-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+.paginator-select {
+    padding: 0.25rem 2rem 0.25rem 0.75rem;
+    border-radius: var(--p-border-radius, 0.5rem);
+    border: 1px solid var(--p-border-color, var(--p-surface-200));
+    background: var(--p-surface-0);
+    color: var(--p-text-color);
+    appearance: none;
+    cursor: pointer;
+    outline: none;
+    font-size: 0.875rem;
+}
+.paginator-info {
+    font-size: 0.875rem;
+    color: var(--p-surface-500);
+}
+[data-theme="dark"] .laughtale-paginator {
+    background: var(--p-surface-900);
+    border-color: var(--p-surface-700);
+    color: var(--p-surface-100);
+}
+[data-theme="dark"] .paginator-btn {
+    color: var(--p-surface-200);
+}
+[data-theme="dark"] .paginator-btn:hover:not(:disabled) {
+    background: var(--p-surface-800);
+}
+[data-theme="dark"] .paginator-btn.active {
+    background: var(--p-primary-500);
+    color: white;
+}
+[data-theme="dark"] .paginator-select {
+    background: var(--p-surface-800);
+    border-color: var(--p-surface-600);
+    color: var(--p-surface-100);
+}
+`;
+    }
+  });
+
+  // src/components/dataview.ts
+  var dataview_exports = {};
+  __export(dataview_exports, {
+    default: () => DataViewIsland
+  });
+  function DataViewIsland(container, props) {
+    let layout = props.layout || "list";
+    const items = props.items || [];
+    injectIslandStyle("dataview", `
+        .laughtale-dataview {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            font-family: var(--p-font-family, inherit);
+        }
+        .dataview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: var(--p-surface-50);
+            border: 1px solid var(--p-border-color);
+            border-radius: var(--p-border-radius);
+        }
+        .dataview-layout-options {
+            display: flex;
+            background: var(--p-surface-0);
+            border: 1px solid var(--p-border-color);
+            border-radius: var(--p-border-radius);
+            overflow: hidden;
+        }
+        .dataview-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            background: transparent;
+            border: none;
+            color: var(--p-text-muted-color);
+            cursor: pointer;
+            transition: all 150ms ease;
+        }
+        .dataview-btn:hover {
+            background: var(--p-surface-100);
+            color: var(--p-text-color);
+        }
+        .dataview-btn.active {
+            background: var(--p-primary-50);
+            color: var(--p-primary-color);
+        }
+        [data-theme="dark"] .dataview-btn.active {
+            background: var(--p-primary-900);
+        }
+        
+        .dataview-content {
+            display: grid;
+            gap: 1rem;
+        }
+        .dataview-content.list {
+            grid-template-columns: 1fr;
+        }
+        .dataview-content.grid {
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        }
+
+        .dataview-item-list {
+            display: flex;
+            padding: 1rem;
+            background: var(--p-surface-0);
+            border: 1px solid var(--p-border-color);
+            border-radius: var(--p-border-radius);
+            gap: 1rem;
+            align-items: center;
+            transition: box-shadow 150ms ease;
+        }
+        .dataview-item-grid {
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+            background: var(--p-surface-0);
+            border: 1px solid var(--p-border-color);
+            border-radius: var(--p-border-radius);
+            gap: 1rem;
+            transition: box-shadow 150ms ease;
+        }
+        .dataview-item-list:hover, .dataview-item-grid:hover {
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+        }
+    `);
+    function renderContent() {
+      return items.map((item) => {
+        if (layout === "list") {
+          return `
+                    <div class="dataview-item-list">
+                        <div style="flex: 1;">${item.name || item.title || JSON.stringify(item)}</div>
+                    </div>
+                `;
+        } else {
+          return `
+                    <div class="dataview-item-grid">
+                        <div style="font-weight: 600;">${item.name || item.title || JSON.stringify(item)}</div>
+                    </div>
+                `;
+        }
+      }).join("");
+    }
+    function render() {
+      container.innerHTML = `
+<div class="laughtale-dataview">
+                <div class="dataview-header">
+                    <div class="dataview-start">
+                        <!-- Custom content like sorting could go here -->
+                    </div>
+                    <div class="dataview-end">
+                        <div class="dataview-layout-options">
+                            <button class="dataview-btn ' + layout === 'list' ? 'active' : '' + '" data-layout="list" aria-label="List View">
+                                ${LucideIcons.moreHorizontal}
+                            </button>
+                            <button class="dataview-btn ${layout === "grid" ? "active" : ""}" data-layout="grid" aria-label="Grid View">
+                                ${LucideIcons.layers}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dataview-content ${layout}">
+                    ${renderContent()}
+                </div>
+            </div>
+`;
+      bindEvents();
+    }
+    function bindEvents() {
+      container.querySelectorAll(".dataview-btn").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          layout = e.currentTarget.dataset.layout;
+          render();
+        });
+      });
+    }
+    render();
+  }
+  var init_dataview = __esm({
+    "src/components/dataview.ts"() {
+      "use strict";
+      init_lucide();
+      init_styles();
+    }
+  });
+
+  // src/components/menu.ts
+  var menu_exports = {};
+  __export(menu_exports, {
+    default: () => MenuIsland
+  });
+  function MenuIsland(container, props) {
+    const items = props.items || [];
+    const popup = props.popup || false;
+    let isOpen = !popup;
+    injectIslandStyle("menu", `
+        .laughtale-menu {
+            background: var(--p-surface-0);
+            border: 1px solid var(--p-border-color);
+            border-radius: var(--p-border-radius);
+            min-width: 12.5rem;
+            padding: 0.5rem 0;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            font-family: var(--p-font-family, inherit);
+        }
+        [data-theme="dark"] .laughtale-menu {
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.5);
+        }
+        .menu-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            color: var(--p-text-color);
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 150ms ease, color 150ms ease;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+        .menu-item:hover {
+            background: var(--p-surface-100);
+        }
+        .menu-item.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        .menu-separator {
+            height: 1px;
+            background: var(--p-border-color);
+            margin: 0.5rem 0;
+        }
+        
+        .p-anchored-overlay-enter {
+            opacity: 0;
+            transform: scaleY(0.8);
+        }
+        .p-anchored-overlay-enter-active {
+            opacity: 1;
+            transform: scaleY(1);
+            transition: opacity 150ms ease, transform 150ms ease;
+            transform-origin: top;
+        }
+        .p-anchored-overlay-leave-active {
+            opacity: 0;
+            transition: opacity 150ms ease;
+        }
+    `);
+    function renderMenu(menuItems) {
+      return `
+            <ul class="menu-list">
+                ${menuItems.map((item) => {
+        if (item.separator) return `<li class="menu-separator"></li>`;
+        const iconSvg = item.icon && LucideIcons[item.icon] ? LucideIcons[item.icon] : "";
+        return `
+                        <li>
+                            <a class="menu-item ${item.disabled ? "disabled" : ""}" href="${item.url || "#"}" tabindex="0">
+                                ${iconSvg ? `<span style="width: 16px; height: 16px; display: flex;">${iconSvg}</span>` : ""}
+                                <span>${item.label}</span>
+                            </a>
+                        </li>
+                    `;
+      }).join("")}
+            </ul>
+        `;
+    }
+    function render() {
+      if (!isOpen && popup) {
+        container.innerHTML = `
+
+`;
+        return;
+      }
+      const menuHtml = `
+            <div class="laughtale-menu ${popup ? "p-anchored-overlay-enter-active" : ""}" style="${popup ? "position: absolute; z-index: 1000;" : ""}">
+                ${renderMenu(items)}
+            </div>
+        `;
+      container.innerHTML = menuHtml;
+      if (popup) {
+        const menuEl = container.querySelector(".laughtale-menu");
+        const trigger = document.getElementById(props.triggerId || "");
+        if (trigger && menuEl) {
+          const rect = trigger.getBoundingClientRect();
+          menuEl.style.top = `${rect.bottom + window.scrollY + 4}px`;
+          menuEl.style.left = `${rect.left + window.scrollX}px`;
+          const closeHandler = (e) => {
+            if (!container.contains(e.target) && !trigger.contains(e.target)) {
+              isOpen = false;
+              render();
+              document.removeEventListener("click", closeHandler);
+            }
+          };
+          setTimeout(() => document.addEventListener("click", closeHandler), 0);
+        }
+      }
+    }
+    if (popup && props.triggerId) {
+      const trigger = document.getElementById(props.triggerId);
+      trigger?.addEventListener("click", (e) => {
+        e.preventDefault();
+        isOpen = !isOpen;
+        render();
+      });
+    }
+    render();
+  }
+  var init_menu = __esm({
+    "src/components/menu.ts"() {
+      "use strict";
+      init_lucide();
+      init_styles();
+    }
+  });
+
+  // src/components/context-menu.ts
+  var context_menu_exports = {};
+  __export(context_menu_exports, {
+    default: () => ContextMenuIsland
+  });
+  function ContextMenuIsland(container, props) {
+    const items = props.items || [];
+    const targetSelector = props.targetSelector || "body";
+    const global = props.global || false;
+    let isOpen = false;
+    let x = 0;
+    let y = 0;
+    injectIslandStyle("context-menu", `
+        .laughtale-context-menu {
+            position: fixed;
+            background: var(--p-surface-0);
+            border: 1px solid var(--p-border-color);
+            border-radius: var(--p-border-radius);
+            min-width: 12.5rem;
+            padding: 0.5rem 0;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            font-family: var(--p-font-family, inherit);
+            z-index: 1000;
+        }
+        [data-theme="dark"] .laughtale-context-menu {
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.5);
+        }
+        .context-menu-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        .context-menu-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            color: var(--p-text-color);
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 150ms ease, color 150ms ease;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+        .context-menu-item:hover {
+            background: var(--p-surface-100);
+        }
+        .context-menu-item.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        .context-menu-separator {
+            height: 1px;
+            background: var(--p-border-color);
+            margin: 0.5rem 0;
+        }
+        .p-anchored-overlay-enter-active {
+            opacity: 1;
+            transition: opacity 150ms ease;
+        }
+    `);
+    function renderMenu(menuItems) {
+      return `
+            <ul class="context-menu-list">
+                ${menuItems.map((item) => {
+        if (item.separator) return '<li class="context-menu-separator"></li>';
+        const iconSvg = item.icon && LucideIcons[item.icon] ? LucideIcons[item.icon] : "";
+        return `
+                        <li>
+                            <a class="context-menu-item ${item.disabled ? "disabled" : ""}" href="${item.url || "#"}" tabindex="0">
+                                ${iconSvg ? `<span style="width: 16px; height: 16px; display: flex;">${iconSvg}</span>` : ""}
+                                <span>${item.label}</span>
+                            </a>
+                        </li>
+                    `;
+      }).join("")}
+            </ul>
+        `;
+    }
+    function render() {
+      if (!isOpen) {
+        container.innerHTML = `
+
+`;
+        return;
+      }
+      container.innerHTML = `
+            <div class="laughtale-context-menu p-anchored-overlay-enter-active" style="top: ${y}px; left: ${x}px;">
+                ${renderMenu(items)}
+            </div>
+        `;
+      const closeHandler = (e) => {
+        isOpen = false;
+        render();
+        document.removeEventListener("click", closeHandler);
+      };
+      setTimeout(() => document.addEventListener("click", closeHandler), 0);
+    }
+    const targetNodes = global ? [document.body] : document.querySelectorAll(targetSelector);
+    targetNodes.forEach((node) => {
+      node.addEventListener("contextmenu", (e) => {
+        e.preventDefault();
+        const mouseEvent = e;
+        x = mouseEvent.clientX;
+        y = mouseEvent.clientY;
+        isOpen = true;
+        render();
+      });
+    });
+  }
+  var init_context_menu = __esm({
+    "src/components/context-menu.ts"() {
+      "use strict";
+      init_lucide();
+      init_styles();
+    }
+  });
+
+  // src/components/popover.ts
+  var popover_exports = {};
+  __export(popover_exports, {
+    default: () => PopoverIsland
+  });
+  function PopoverIsland(container, props) {
+    let isOpen = false;
+    const placement = props.placement || "bottom";
+    const showArrow = props.showArrow !== false;
+    const contentHtml = container.innerHTML;
+    injectIslandStyle("popover", `
+        .laughtale-popover {
+            position: absolute;
+            background: var(--p-surface-0);
+            border: 1px solid var(--p-border-color);
+            border-radius: var(--p-border-radius);
+            padding: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+            font-family: var(--p-font-family, inherit);
+            color: var(--p-text-color);
+            z-index: 1000;
+            opacity: 0;
+            transform: scaleY(0.9);
+            transition: opacity 150ms ease, transform 150ms ease;
+            transform-origin: top center;
+        }
+        [data-theme="dark"] .laughtale-popover {
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5);
+        }
+        .laughtale-popover.open {
+            opacity: 1;
+            transform: scaleY(1);
+        }
+        .popover-arrow {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: var(--p-surface-0);
+            border: 1px solid var(--p-border-color);
+            transform: rotate(45deg);
+        }
+        .popover-arrow.bottom { top: -5px; left: calc(50% - 4px); border-bottom: none; border-right: none; }
+        .popover-arrow.top { bottom: -5px; left: calc(50% - 4px); border-top: none; border-left: none; }
+    `);
+    function render() {
+      if (!isOpen) {
+        container.innerHTML = `
+
+`;
+        return;
+      }
+      container.innerHTML = `
+<div class="laughtale-popover open">
+                ' + showArrow ? \`<div class="popover-arrow \${placement + '"></div>' : ''}
+                <div class="popover-content">
+                    \${contentHtml}
+                </div>
+            </div>
+`;
+      const popover = container.querySelector(".laughtale-popover");
+      const trigger = document.getElementById(props.triggerId);
+      if (trigger && popover) {
+        const rect = trigger.getBoundingClientRect();
+        if (placement === "bottom") {
+          popover.style.top = `${rect.bottom + window.scrollY + 8}px`;
+          popover.style.left = `${rect.left + window.scrollX}px`;
+        } else if (placement === "top") {
+          popover.style.bottom = `${window.innerHeight - rect.top + 8}px`;
+          popover.style.left = `${rect.left + window.scrollX}px`;
+        }
+        const closeHandler = (e) => {
+          if (!container.contains(e.target) && !trigger.contains(e.target)) {
+            isOpen = false;
+            render();
+            document.removeEventListener("click", closeHandler);
+          }
+        };
+        setTimeout(() => document.addEventListener("click", closeHandler), 0);
+      }
+    }
+    if (props.triggerId) {
+      const trigger = document.getElementById(props.triggerId);
+      trigger?.addEventListener("click", () => {
+        isOpen = !isOpen;
+        render();
+      });
+    }
+    container.innerHTML = `
+
+`;
+  }
+  var init_popover = __esm({
+    "src/components/popover.ts"() {
+      "use strict";
+      init_styles();
+    }
+  });
+
+  // src/components/tooltip-component.ts
+  var tooltip_component_exports = {};
+  __export(tooltip_component_exports, {
+    default: () => TooltipIsland
+  });
+  function TooltipIsland(container, props) {
+    const targetSelector = props.target;
+    const position = props.position || "top";
+    const showDelay = props.showDelay || 300;
+    const hideDelay = props.hideDelay || 100;
+    let showTimer = null;
+    let hideTimer = null;
+    let activeTarget = null;
+    const contentHtml = container.innerHTML;
+    container.innerHTML = `
+
+`;
+    injectIslandStyle("tooltip", `
+        .laughtale-tooltip {
+            position: absolute;
+            background: var(--p-surface-900);
+            color: var(--p-surface-0);
+            padding: 0.5rem 0.75rem;
+            border-radius: var(--p-border-radius);
+            font-size: 0.75rem;
+            font-family: var(--p-font-family, inherit);
+            pointer-events: none;
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity 150ms ease;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+        [data-theme="dark"] .laughtale-tooltip {
+            background: var(--p-surface-100);
+            color: var(--p-text-color);
+        }
+        .laughtale-tooltip.visible {
+            opacity: 1;
+        }
+        .tooltip-arrow {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-style: solid;
+        }
+        .tooltip-arrow.top {
+            bottom: -4px;
+            left: calc(50% - 4px);
+            border-width: 4px 4px 0 4px;
+            border-color: var(--p-surface-900) transparent transparent transparent;
+        }
+        [data-theme="dark"] .tooltip-arrow.top {
+            border-color: var(--p-surface-100) transparent transparent transparent;
+        }
+    `);
+    let tooltipEl = null;
+    function createTooltip() {
+      if (!tooltipEl) {
+        tooltipEl = document.createElement("div");
+        tooltipEl.className = "laughtale-tooltip";
+        tooltipEl.innerHTML = `
+<div class="tooltip-arrow ' + position + '"></div>
+                <div class="tooltip-content">${contentHtml}</div>
+`;
+        document.body.appendChild(tooltipEl);
+      }
+    }
+    function show(target) {
+      if (hideTimer) clearTimeout(hideTimer);
+      activeTarget = target;
+      showTimer = window.setTimeout(() => {
+        createTooltip();
+        if (tooltipEl && activeTarget) {
+          const rect = activeTarget.getBoundingClientRect();
+          if (position === "top") {
+            tooltipEl.style.top = rect.top + window.scrollY - tooltipEl.offsetHeight - 8 + "px";
+            tooltipEl.style.left = rect.left + window.scrollX + rect.width / 2 - tooltipEl.offsetWidth / 2 + "px";
+          }
+          tooltipEl.classList.add("visible");
+        }
+      }, showDelay);
+    }
+    function hide() {
+      if (showTimer) clearTimeout(showTimer);
+      hideTimer = window.setTimeout(() => {
+        if (tooltipEl) {
+          tooltipEl.classList.remove("visible");
+          setTimeout(() => {
+            if (tooltipEl && tooltipEl.parentNode) {
+              tooltipEl.parentNode.removeChild(tooltipEl);
+              tooltipEl = null;
+            }
+          }, 150);
+        }
+      }, hideDelay);
+    }
+    const targets = document.querySelectorAll(targetSelector);
+    targets.forEach((target) => {
+      target.addEventListener("mouseenter", () => show(target));
+      target.addEventListener("mouseleave", hide);
+      target.addEventListener("focus", () => show(target));
+      target.addEventListener("blur", hide);
+    });
+  }
+  var init_tooltip_component = __esm({
+    "src/components/tooltip-component.ts"() {
+      "use strict";
+      init_styles();
+    }
+  });
+
+  // src/components/sidebar.ts
+  var sidebar_exports = {};
+  __export(sidebar_exports, {
+    default: () => SidebarIsland
+  });
+  function SidebarIsland(container, props) {
+    let collapsed = props.collapsed || false;
+    const items = props.items || [];
+    const position = props.position || "left";
+    injectIslandStyle("sidebar", `
+        .laughtale-sidebar {
+            display: flex;
+            flex-direction: column;
+            background: var(--p-surface-0);
+            border-right: 1px solid var(--p-border-color);
+            height: 100vh;
+            width: 260px;
+            transition: width 150ms ease;
+            font-family: var(--p-font-family, inherit);
+            overflow-y: auto;
+        }
+        .laughtale-sidebar.collapsed {
+            width: 64px;
+        }
+        .laughtale-sidebar.right {
+            border-right: none;
+            border-left: 1px solid var(--p-border-color);
+        }
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            border-bottom: 1px solid var(--p-border-color);
+        }
+        .sidebar-toggle {
+            background: transparent;
+            border: none;
+            color: var(--p-text-muted-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--p-border-radius);
+            width: 2rem;
+            height: 2rem;
+            transition: background 150ms ease;
+        }
+        .sidebar-toggle:hover {
+            background: var(--p-surface-100);
+            color: var(--p-text-color);
+        }
+        .sidebar-menu {
+            list-style: none;
+            padding: 0.5rem;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            color: var(--p-text-color);
+            text-decoration: none;
+            border-radius: var(--p-border-radius);
+            transition: background 150ms ease, color 150ms ease;
+            gap: 0.75rem;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        .sidebar-item:hover {
+            background: var(--p-surface-100);
+        }
+        .sidebar-item.active {
+            background: var(--p-primary-50);
+            color: var(--p-primary-color);
+            font-weight: 600;
+        }
+        [data-theme="dark"] .sidebar-item.active {
+            background: var(--p-primary-900);
+        }
+        .sidebar-item-icon {
+            display: flex;
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+            color: var(--p-text-muted-color);
+        }
+        .sidebar-item.active .sidebar-item-icon {
+            color: var(--p-primary-color);
+        }
+        .sidebar-item-label {
+            opacity: 1;
+            transition: opacity 150ms ease;
+        }
+        .collapsed .sidebar-item-label, .collapsed .sidebar-header-title {
+            opacity: 0;
+            width: 0;
+            display: none;
+        }
+    `);
+    function renderMenu(menuItems) {
+      return menuItems.map((item) => {
+        const iconSvg = item.icon && LucideIcons[item.icon] ? LucideIcons[item.icon] : "";
+        return `
+                <li>
+                    <a href="${item.url || "#"}" class="sidebar-item ${item.active ? "active" : ""}">
+                        ${iconSvg ? `<span class="sidebar-item-icon">${iconSvg}</span>` : ""}
+                        <span class="sidebar-item-label">${item.label}</span>
+                    </a>
+                </li>
+            `;
+      }).join("");
+    }
+    function render() {
+      container.innerHTML = `
+<div class="laughtale-sidebar ' + collapsed ? 'collapsed' : '' + ' ${position}">
+                <div class="sidebar-header">
+                    <span class="sidebar-header-title" style="font-weight: 700; color: var(--p-text-color);">Menu</span>
+                    <button class="sidebar-toggle" aria-label="Toggle Sidebar">
+                        ${collapsed ? LucideIcons.chevronRight : LucideIcons.chevronLeft}
+                    </button>
+                </div>
+                <ul class="sidebar-menu">
+                    ${renderMenu(items)}
+                </ul>
+            </div>
+`;
+      container.querySelector(".sidebar-toggle")?.addEventListener("click", () => {
+        collapsed = !collapsed;
+        render();
+      });
+    }
+    render();
+  }
+  var init_sidebar = __esm({
+    "src/components/sidebar.ts"() {
+      "use strict";
+      init_lucide();
+      init_styles();
+    }
+  });
+
   // src/index.ts
   var index_exports = {};
   __export(index_exports, {
+    AURA_PALETTES: () => AURA_PALETTES,
     LucideIcons: () => LucideIcons,
     awaitStreamingReady: () => awaitStreamingReady,
     createPreactIsland: () => createPreactIsland,
@@ -8806,16 +11828,21 @@ ${h.response}`).join("\n");
     getIslandDefinition: () => getIslandDefinition,
     getLucideIcon: () => getLucideIcon,
     getSlot: () => getSlot,
+    getToken: () => getToken,
     hasIsland: () => hasIsland,
     hydrateIsland: () => hydrateIsland,
     importWithRetry: () => importWithRetry,
+    initAnimationStyles: () => initAnimationStyles,
+    initDesignTokens: () => initDesignTokens,
     initDirectives: () => initDirectives,
     initIslands: () => initIslands,
     injectIslandStyle: () => injectIslandStyle,
+    injectRipple: () => injectRipple,
     navigateTo: () => navigateTo,
     parseAndReviveProps: () => parseAndReviveProps,
     removeIslandStyle: () => removeIslandStyle,
     reviveTuple: () => reviveTuple,
+    updateToken: () => updateToken,
     useAutoAnimate: () => useAutoAnimate,
     useClickOutside: () => useClickOutside,
     useClipboard: () => useClipboard,
@@ -8855,6 +11882,8 @@ ${h.response}`).join("\n");
       init_lucide();
       init_composables();
       init_models();
+      init_animations();
+      init_design_tokens();
       defineIsland("stepper", () => Promise.resolve().then(() => (init_stepper(), stepper_exports)));
       defineIsland("timeline", () => Promise.resolve().then(() => (init_timeline(), timeline_exports)));
       defineIsland("camera", () => Promise.resolve().then(() => (init_camera(), camera_exports)));
@@ -8904,6 +11933,24 @@ ${h.response}`).join("\n");
       defineIsland("galleria", () => Promise.resolve().then(() => (init_galleria(), galleria_exports)));
       defineIsland("blockui", () => Promise.resolve().then(() => (init_blockui(), blockui_exports)));
       defineIsland("split-button", () => Promise.resolve().then(() => (init_split_button(), split_button_exports)));
+      defineIsland("select", () => Promise.resolve().then(() => (init_select(), select_exports)));
+      defineIsland("checkbox", () => Promise.resolve().then(() => (init_checkbox(), checkbox_exports)));
+      defineIsland("radio-button", () => Promise.resolve().then(() => (init_radio_button(), radio_button_exports)));
+      defineIsland("radio", () => Promise.resolve().then(() => (init_radio_button(), radio_button_exports)));
+      defineIsland("textarea", () => Promise.resolve().then(() => (init_textarea(), textarea_exports)));
+      defineIsland("input-mask", () => Promise.resolve().then(() => (init_input_mask(), input_mask_exports)));
+      defineIsland("float-label", () => Promise.resolve().then(() => (init_float_label(), float_label_exports)));
+      defineIsland("input-text", () => Promise.resolve().then(() => (init_input_text(), input_text_exports)));
+      defineIsland("enhanced-input", () => Promise.resolve().then(() => (init_input_text(), input_text_exports)));
+      defineIsland("carousel", () => Promise.resolve().then(() => (init_carousel(), carousel_exports)));
+      defineIsland("paginator", () => Promise.resolve().then(() => (init_paginator(), paginator_exports)));
+      defineIsland("dataview", () => Promise.resolve().then(() => (init_dataview(), dataview_exports)));
+      defineIsland("menu", () => Promise.resolve().then(() => (init_menu(), menu_exports)));
+      defineIsland("context-menu", () => Promise.resolve().then(() => (init_context_menu(), context_menu_exports)));
+      defineIsland("popover", () => Promise.resolve().then(() => (init_popover(), popover_exports)));
+      defineIsland("tooltip", () => Promise.resolve().then(() => (init_tooltip_component(), tooltip_component_exports)));
+      defineIsland("tooltip-component", () => Promise.resolve().then(() => (init_tooltip_component(), tooltip_component_exports)));
+      defineIsland("sidebar", () => Promise.resolve().then(() => (init_sidebar(), sidebar_exports)));
     }
   });
   init_index();

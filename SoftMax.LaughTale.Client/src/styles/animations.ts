@@ -174,10 +174,10 @@ export function injectRipple(el: HTMLElement, event: PointerEvent): void {
     const y = event.clientY - rect.top - size / 2;
     
     ripple.className = 'p-ripple-effect';
-    ripple.style.width = \`\${size}px\`;
-    ripple.style.height = \`\${size}px\`;
-    ripple.style.left = \`\${x}px\`;
-    ripple.style.top = \`\${y}px\`;
+    ripple.style.width = `${size}px`;
+    ripple.style.height = `${size}px`;
+    ripple.style.left = `${x}px`;
+    ripple.style.top = `${y}px`;
     
     el.appendChild(ripple);
     

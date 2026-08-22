@@ -69,21 +69,49 @@ export default function ConfirmPopupIsland(container: HTMLElement, props: Confir
         });
     }
 
-    const trigger = document.querySelector(props.targetSelector);
-    if (trigger) {
-        trigger.addEventListener('click', (e) => {
-            e.preventDefault();
+    if (props.targetSelector && props.targetSelector.trim()) {
+        try {
+            const trigger = document.querySelector(props.targetSelector);
+            if (trigger) {
+                trigger.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    isOpen = !isOpen;
+                    render();
+                    if (isOpen) {
+                        const rect = trigger.getBoundingClientRect();
+                        const popup = container.querySelector<HTMLElement>('.laughtale-confirm-popup');
+                        if (popup) {
+                            popup.style.top = `${rect.bottom + window.scrollY + 6}px`;
+                            popup.style.left = `${rect.left + window.scrollX}px`;
+                        }
+                    }
+                });
+            }
+        } catch (e) {
+            console.warn('[SoftMax.LaughTale] Invalid targetSelector for confirm-popup:', props.targetSelector);
+        }
+    } else {
+        // Fallback: provide internal trigger button inside container if none targeted
+        const fallbackBtn = document.createElement('button');
+        fallbackBtn.type = 'button';
+        fallbackBtn.className = 'p-button p-button-danger';
+        fallbackBtn.textContent = 'Delete Record';
+        fallbackBtn.style.padding = '0.4rem 0.75rem';
+        fallbackBtn.style.fontSize = '0.8125rem';
+        fallbackBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
             isOpen = !isOpen;
             render();
             if (isOpen) {
-                const rect = trigger.getBoundingClientRect();
                 const popup = container.querySelector<HTMLElement>('.laughtale-confirm-popup');
                 if (popup) {
-                    popup.style.top = `${rect.bottom + window.scrollY + 6}px`;
-                    popup.style.left = `${rect.left + window.scrollX}px`;
+                    popup.style.position = 'relative';
+                    popup.style.marginTop = '0.5rem';
+                    popup.style.display = 'block';
                 }
             }
         });
+        container.prepend(fallbackBtn);
     }
 
     render();

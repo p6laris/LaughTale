@@ -42,11 +42,11 @@ public class TagHelpersTests
         var (context, output) = CreateTagHelperContext("island-accordion");
         helper.Process(context, output);
 
-        Assert.Equal("island", output.TagName);
-        Assert.Equal("accordion", output.Attributes["name"].Value);
-        Assert.Equal("Load", output.Attributes["hydrate"].Value);
+        Assert.Equal("div", output.TagName);
+        Assert.Equal("accordion", output.Attributes["data-island"].Value);
+        Assert.Equal("load", output.Attributes["data-hydrate"].Value);
 
-        var propsJson = output.Attributes["props-json"].Value.ToString();
+        var propsJson = output.Attributes["data-props"].Value.ToString();
         using var doc = JsonDocument.Parse(propsJson!);
         var root = doc.RootElement;
 
@@ -69,10 +69,10 @@ public class TagHelpersTests
         var (context, output) = CreateTagHelperContext("island-number");
         helper.Process(context, output);
 
-        Assert.Equal("island", output.TagName);
-        Assert.Equal("input-number", output.Attributes["name"].Value);
+        Assert.Equal("div", output.TagName);
+        Assert.Equal("input-number", output.Attributes["data-island"].Value);
 
-        var propsJson = output.Attributes["props-json"].Value.ToString();
+        var propsJson = output.Attributes["data-props"].Value.ToString();
         using var doc = JsonDocument.Parse(propsJson!);
         var root = doc.RootElement;
 
@@ -97,10 +97,10 @@ public class TagHelpersTests
         var (context, output) = CreateTagHelperContext("island-knob");
         helper.Process(context, output);
 
-        Assert.Equal("island", output.TagName);
-        Assert.Equal("knob", output.Attributes["name"].Value);
+        Assert.Equal("div", output.TagName);
+        Assert.Equal("knob", output.Attributes["data-island"].Value);
 
-        var propsJson = output.Attributes["props-json"].Value.ToString();
+        var propsJson = output.Attributes["data-props"].Value.ToString();
         using var doc = JsonDocument.Parse(propsJson!);
         var root = doc.RootElement;
 
@@ -121,10 +121,10 @@ public class TagHelpersTests
         var (context, output) = CreateTagHelperContext("island-color-picker");
         helper.Process(context, output);
 
-        Assert.Equal("island", output.TagName);
-        Assert.Equal("color-picker", output.Attributes["name"].Value);
+        Assert.Equal("div", output.TagName);
+        Assert.Equal("color-picker", output.Attributes["data-island"].Value);
 
-        var propsJson = output.Attributes["props-json"].Value.ToString();
+        var propsJson = output.Attributes["data-props"].Value.ToString();
         using var doc = JsonDocument.Parse(propsJson!);
         var root = doc.RootElement;
 
@@ -148,10 +148,10 @@ public class TagHelpersTests
         var (context, output) = CreateTagHelperContext("island-breadcrumb");
         helper.Process(context, output);
 
-        Assert.Equal("island", output.TagName);
-        Assert.Equal("breadcrumb", output.Attributes["name"].Value);
+        Assert.Equal("div", output.TagName);
+        Assert.Equal("breadcrumb", output.Attributes["data-island"].Value);
 
-        var propsJson = output.Attributes["props-json"].Value.ToString();
+        var propsJson = output.Attributes["data-props"].Value.ToString();
         using var doc = JsonDocument.Parse(propsJson!);
         var root = doc.RootElement;
 
