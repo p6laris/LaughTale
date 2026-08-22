@@ -29,3 +29,29 @@ public record TreeNode(
     string? Code = null,
     List<TreeNode>? Children = null
 );
+
+public record SelectButtonItem(
+    string Label,
+    string Value,
+    string? Icon = null
+);
+
+public record MeterValue(
+    string Label,
+    double Value,
+    string Color,
+    string? Icon = null
+);
+
+public record AvatarItem(
+    string? Label = null,
+    string? Image = null,
+    string? Name = null,
+    string? Bg = null
+);
+
+public record SpeedDialAction(
+    string Label,
+    string? Icon = null,
+    string? Action = null
+);

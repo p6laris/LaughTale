@@ -7,7 +7,7 @@ section: "Zero-JS Architecture"
 
 # Batteries-Included Enterprise Components
 
-The `SoftMax.LaughTale.Components` package provides **pre-built, production-ready enterprise UI TagHelpers** styled in PrimeVue Aura.
+The `SoftMax.LaughTale.Components` package provides **pre-built, production-ready enterprise UI TagHelpers** styled in Aura.
 
 You write pure C# Razor markup without creating any client script files!
 

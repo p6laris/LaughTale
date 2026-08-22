@@ -54,6 +54,39 @@ public class EnterpriseModel : PageModel
         })
     };
 
+    public List<SelectButtonItem> Periods { get; set; } = new()
+    {
+        new("Daily", "daily"),
+        new("Weekly", "weekly"),
+        new("Monthly", "monthly"),
+        new("Annual", "annual")
+    };
+
+    public List<MeterValue> StorageMetrics { get; set; } = new()
+    {
+        new("OS Kernel", 35, "#10b981"),
+        new("Database", 30, "#3b82f6"),
+        new("Encrypted Logs", 20, "#f59e0b"),
+        new("Available", 15, "#94a3b8")
+    };
+
+    public List<AvatarItem> TeamAvatars { get; set; } = new()
+    {
+        new("AM", null, "Alice Montgomery", "#059669"),
+        new("DV", null, "David Vance", "#2563eb"),
+        new("ER", null, "Elena Rostova", "#7c3aed"),
+        new("MT", null, "Marcus Thorne", "#d97706"),
+        new("SJ", null, "Sarah Jenkins", "#dc2626"),
+        new("TW", null, "Thomas Wright", "#475569")
+    };
+
+    public List<SpeedDialAction> QuickActions { get; set; } = new()
+    {
+        new("Sync Cluster", null, "sync"),
+        new("Export Audit Logs", null, "export"),
+        new("Trigger Backup", null, "backup")
+    };
+
     public void OnGet()
     {
     }

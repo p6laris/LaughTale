@@ -955,6 +955,33 @@ var SoftMaxIslands = (() => {
     }
   });
 
+  // src/icons/solar.ts
+  function getSolarIcon(name) {
+    return SolarIcons[name] || "";
+  }
+  var SolarIcons;
+  var init_solar = __esm({
+    "src/icons/solar.ts"() {
+      "use strict";
+      SolarIcons = {
+        check: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2S2 6.477 2 12s4.477 10 10 10" opacity=".5"/><path fill="currentColor" d="m10.5 15.5l7-7l-1.4-1.4l-5.6 5.6l-2.6-2.6l-1.4 1.4z"/></svg>`,
+        close: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2S2 6.477 2 12s4.477 10 10 10" opacity=".5"/><path fill="currentColor" d="m13.41 12l3.3-3.29a1 1 0 1 0-1.42-1.42L12 10.59l-3.29-3.3a1 1 0 0 0-1.42 1.42l3.3 3.29l-3.3 3.29a1 1 0 0 0 1.42 1.42l3.29-3.3l3.29 3.3a1 1 0 0 0 1.42-1.42z"/></svg>`,
+        eye: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12S6.477 2 12 2" opacity=".5"/><path fill="currentColor" d="M12 9a3 3 0 1 0 0 6a3 3 0 0 0 0-6m-7 3c1.73-3.04 4.19-5 7-5s5.27 1.96 7 5c-1.73 3.04-4.19 5-7 5s-5.27-1.96-7-5"/></svg>`,
+        eyeClosed: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2S2 6.477 2 12s4.477 10 10 10" opacity=".5"/><path fill="currentColor" d="M2.71 3.71a1 1 0 0 0 0 1.42l2.36 2.36C3.76 8.76 2.66 10.27 2 12c1.73 3.04 4.19 5 7 5c1.76 0 3.37-.77 4.7-1.94l3.59 3.59a1 1 0 0 0 1.42-1.42l-16-16zM12 15a3 3 0 0 1-2.91-2.27l3.18 3.18c-.09.06-.18.09-.27.09"/></svg>`,
+        star: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2l3.09 6.26L22 9.27l-5 4.87l1.18 6.88L12 17.77l-6.18 3.25L7 14.14L2 9.27l6.91-1.01z"/></svg>`,
+        starEmpty: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" d="M12 2l3.09 6.26L22 9.27l-5 4.87l1.18 6.88L12 17.77l-6.18 3.25L7 14.14L2 9.27l6.91-1.01z"/></svg>`,
+        calendar: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M8 2a1 1 0 0 1 1 1v1h6V3a1 1 0 1 1 2 0v1h1a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h1V3a1 1 0 0 1 1-1m11 7H5v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1z"/></svg>`,
+        chevronLeft: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 19l-7-7l7-7"/></svg>`,
+        chevronRight: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 5l7 7l-7 7"/></svg>`,
+        plus: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v14m-7-7h14"/></svg>`,
+        minus: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14"/></svg>`,
+        dollar: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a1 1 0 0 1 1 1v1.06c2.58.33 4 2.05 4 4.19a1 1 0 1 1-2 0c0-1.12-.76-2.19-2-2.25V11c2.67.67 4 1.83 4 4.25c0 2.2-1.46 3.96-4 4.25V21a1 1 0 1 1-2 0v-1.06c-2.58-.33-4-2.05-4-4.19a1 1 0 1 1 2 0c0 1.12.76 2.19 2 2.25v-5c-2.67-.67-4-1.83-4-4.25c0-2.2 1.46-3.96 4-4.25V3a1 1 0 0 1 1-1"/></svg>`,
+        bolt: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M11 21h-1l1-7H7.5c-.58 0-.57-.32-.38-.66c.19-.34.05-.08.08-.14C8.58 10.61 10.74 6.8 13.7 2h1l-1 7h3.5c.49 0 .56.33.47.51l-.07.13z"/></svg>`,
+        home: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2L2 12h3v8h6v-6h2v6h6v-8h3z"/></svg>`
+      };
+    }
+  });
+
   // src/components/stepper.ts
   var stepper_exports = {};
   __export(stepper_exports, {
@@ -1692,9 +1719,1180 @@ var SoftMaxIslands = (() => {
     }
   });
 
+  // src/components/input-number.ts
+  var input_number_exports = {};
+  __export(input_number_exports, {
+    default: () => InputNumberIsland
+  });
+  function InputNumberIsland(container, props) {
+    let rawValue = props.value !== void 0 ? Number(props.value) : null;
+    const step = props.step || 1;
+    const decimals = props.decimals !== void 0 ? props.decimals : props.mode === "currency" ? 2 : 0;
+    const prefix = props.prefix || (props.mode === "currency" ? props.currency === "EUR" ? "\u20AC " : props.currency === "IQD" ? "IQD " : "$ " : "");
+    const suffix = props.suffix || (props.mode === "percent" ? " %" : "");
+    function formatNumber(val) {
+      if (val === null || isNaN(val)) return "";
+      const parts = val.toFixed(decimals).split(".");
+      parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      return `${prefix}${parts.join(".")}${suffix}`;
+    }
+    function parseRaw(str) {
+      let cleaned = str.replace(new RegExp(`[${prefix}${suffix},]`, "g"), "").trim();
+      const parsed = parseFloat(cleaned);
+      return isNaN(parsed) ? null : parsed;
+    }
+    function render() {
+      container.innerHTML = `
+            <div class="laughtale-input-number" style="display: inline-flex; align-items: stretch; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); background: var(--p-surface-0); overflow: hidden; transition: border-color 0.2s ease, box-shadow 0.2s ease; width: 100%; max-width: 320px;">
+                <input type="text" class="number-display-input" value="${formatNumber(rawValue)}" placeholder="${props.placeholder || ""}" ${props.disabled ? "disabled" : ""} style="flex: 1; padding: 0.5rem 0.75rem; border: none; outline: none; background: transparent; font-family: var(--p-font-family); font-size: 0.875rem; color: var(--p-text-color); font-variant-numeric: tabular-nums;" />
+                
+                ${props.showButtons !== false ? `
+                    <div style="display: flex; flex-direction: column; border-left: 1px solid var(--p-border-color); width: 2rem;">
+                        <button type="button" class="btn-step-up" style="flex: 1; border: none; background: var(--p-surface-50); color: var(--p-surface-600); cursor: pointer; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid var(--p-border-color); font-size: 0.625rem; transition: background 0.15s ease;">
+                            \u25B2
+                        </button>
+                        <button type="button" class="btn-step-down" style="flex: 1; border: none; background: var(--p-surface-50); color: var(--p-surface-600); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.625rem; transition: background 0.15s ease;">
+                            \u25BC
+                        </button>
+                    </div>
+                ` : ""}
+            </div>
+        `;
+      const displayInput = container.querySelector(".number-display-input");
+      displayInput.addEventListener("focus", () => {
+        const wrap = container.querySelector(".laughtale-input-number");
+        if (wrap) {
+          wrap.style.borderColor = "var(--p-primary-600)";
+          wrap.style.boxShadow = "0 0 0 1px var(--p-primary-600)";
+        }
+      });
+      displayInput.addEventListener("blur", () => {
+        const wrap = container.querySelector(".laughtale-input-number");
+        if (wrap) {
+          wrap.style.borderColor = "var(--p-border-color)";
+          wrap.style.boxShadow = "none";
+        }
+        displayInput.value = formatNumber(rawValue);
+      });
+      displayInput.addEventListener("input", () => {
+        rawValue = parseRaw(displayInput.value);
+        syncValue();
+      });
+      container.querySelector(".btn-step-up")?.addEventListener("click", () => {
+        rawValue = (rawValue ?? 0) + step;
+        if (props.max !== void 0 && rawValue > props.max) rawValue = props.max;
+        displayInput.value = formatNumber(rawValue);
+        syncValue();
+      });
+      container.querySelector(".btn-step-down")?.addEventListener("click", () => {
+        rawValue = (rawValue ?? 0) - step;
+        if (props.min !== void 0 && rawValue < props.min) rawValue = props.min;
+        displayInput.value = formatNumber(rawValue);
+        syncValue();
+      });
+    }
+    function syncValue() {
+      if (props.targetInputName) {
+        let hidden = document.querySelector(`input[name="${props.targetInputName}"]`);
+        if (!hidden) {
+          hidden = document.createElement("input");
+          hidden.type = "hidden";
+          hidden.name = props.targetInputName;
+          container.appendChild(hidden);
+        }
+        hidden.value = rawValue !== null ? rawValue.toString() : "";
+      }
+      container.dispatchEvent(new CustomEvent("number:change", {
+        bubbles: true,
+        detail: { value: rawValue }
+      }));
+    }
+    render();
+    syncValue();
+  }
+  var init_input_number = __esm({
+    "src/components/input-number.ts"() {
+      "use strict";
+    }
+  });
+
+  // src/components/input-otp.ts
+  var input_otp_exports = {};
+  __export(input_otp_exports, {
+    default: () => InputOtpIsland
+  });
+  function InputOtpIsland(container, props) {
+    const length = props.length || 6;
+    let values = new Array(length).fill("");
+    function render() {
+      const boxes = Array.from({ length }, (_, i) => `
+            <input type="${props.mask ? "password" : "text"}" 
+                   class="otp-box" 
+                   data-index="${i}" 
+                   maxlength="1" 
+                   inputmode="numeric" 
+                   pattern="[0-9]*" 
+                   value="${values[i] || ""}" 
+                   ${props.disabled ? "disabled" : ""} 
+                   style="width: 2.75rem; height: 3.25rem; text-align: center; font-size: 1.25rem; font-weight: 700; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); background: var(--p-surface-0); color: var(--p-text-color); outline: none; transition: all 0.15s ease;" />
+        `).join("");
+      container.innerHTML = `
+            <div class="laughtale-input-otp" style="display: inline-flex; gap: 0.5rem; align-items: center;">
+                ${boxes}
+            </div>
+        `;
+      const inputs = container.querySelectorAll(".otp-box");
+      inputs.forEach((input, idx) => {
+        input.addEventListener("focus", () => {
+          input.style.borderColor = "var(--p-primary-600)";
+          input.style.boxShadow = "0 0 0 2px rgba(16, 185, 129, 0.2)";
+          input.select();
+        });
+        input.addEventListener("blur", () => {
+          input.style.borderColor = "var(--p-border-color)";
+          input.style.boxShadow = "none";
+        });
+        input.addEventListener("input", (e) => {
+          const val = e.target.value;
+          if (/^\d$/.test(val)) {
+            values[idx] = val;
+            if (idx < length - 1) inputs[idx + 1].focus();
+          } else if (val === "") {
+            values[idx] = "";
+          } else {
+            input.value = values[idx] || "";
+          }
+          syncOtp();
+        });
+        input.addEventListener("keydown", (e) => {
+          if (e.key === "Backspace" && !input.value && idx > 0) {
+            inputs[idx - 1].focus();
+          } else if (e.key === "ArrowLeft" && idx > 0) {
+            inputs[idx - 1].focus();
+          } else if (e.key === "ArrowRight" && idx < length - 1) {
+            inputs[idx + 1].focus();
+          }
+        });
+        input.addEventListener("paste", (e) => {
+          e.preventDefault();
+          const paste = (e.clipboardData || window.clipboardData)?.getData("text") || "";
+          const digits = paste.replace(/\D/g, "").slice(0, length);
+          digits.split("").forEach((d, i) => {
+            values[i] = d;
+            if (inputs[i]) inputs[i].value = d;
+          });
+          syncOtp();
+          if (digits.length === length) {
+            inputs[length - 1].focus();
+          }
+        });
+      });
+    }
+    function syncOtp() {
+      const fullCode = values.join("");
+      if (props.targetInputName) {
+        let hidden = document.querySelector(`input[name="${props.targetInputName}"]`);
+        if (!hidden) {
+          hidden = document.createElement("input");
+          hidden.type = "hidden";
+          hidden.name = props.targetInputName;
+          container.appendChild(hidden);
+        }
+        hidden.value = fullCode;
+      }
+      container.dispatchEvent(new CustomEvent("otp:change", {
+        bubbles: true,
+        detail: { value: fullCode, isComplete: fullCode.length === length }
+      }));
+    }
+    render();
+  }
+  var init_input_otp = __esm({
+    "src/components/input-otp.ts"() {
+      "use strict";
+    }
+  });
+
+  // src/components/input-password.ts
+  var input_password_exports = {};
+  __export(input_password_exports, {
+    default: () => InputPasswordIsland
+  });
+  function InputPasswordIsland(container, props) {
+    let isMasked = true;
+    let currentPassword = "";
+    function calculateStrength(pwd) {
+      if (!pwd) return { score: 0, label: "", color: "transparent", width: "0%" };
+      let score = 0;
+      if (pwd.length >= 8) score++;
+      if (/[A-Z]/.test(pwd)) score++;
+      if (/[0-9]/.test(pwd)) score++;
+      if (/[^A-Za-z0-9]/.test(pwd)) score++;
+      if (score <= 1) return { score: 1, label: "Weak", color: "#ef4444", width: "33%" };
+      if (score <= 3) return { score: 2, label: "Medium", color: "#f59e0b", width: "66%" };
+      return { score: 3, label: "Strong", color: "#10b981", width: "100%" };
+    }
+    function render() {
+      const meter = calculateStrength(currentPassword);
+      container.innerHTML = `
+            <div class="laughtale-password" style="display: flex; flex-direction: column; gap: 0.5rem; width: 100%; max-width: 340px;">
+                <div style="display: flex; align-items: center; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); background: var(--p-surface-0); overflow: hidden; padding-right: 0.5rem;">
+                    <input type="${isMasked ? "password" : "text"}" 
+                           class="password-input" 
+                           value="${currentPassword}" 
+                           placeholder="${props.placeholder || "Enter password..."}" 
+                           ${props.disabled ? "disabled" : ""} 
+                           style="flex: 1; padding: 0.5rem 0.75rem; border: none; outline: none; background: transparent; font-size: 0.875rem; color: var(--p-text-color);" />
+                    
+                    ${props.toggleMask !== false ? `
+                        <button type="button" class="toggle-mask-btn" style="border: none; background: transparent; color: var(--p-surface-400); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0.25rem;">
+                            ${isMasked ? getSolarIcon("eye") : getSolarIcon("eyeClosed")}
+                        </button>
+                    ` : ""}
+                </div>
+
+                ${props.showMeter !== false && currentPassword ? `
+                    <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                        <div style="height: 4px; border-radius: 2px; background: var(--p-surface-200); overflow: hidden;">
+                            <div style="height: 100%; width: ${meter.width}; background: ${meter.color}; transition: all 0.3s ease;"></div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.6875rem; color: ${meter.color}; font-weight: 600;">
+                            <span>Strength</span>
+                            <span>${meter.label}</span>
+                        </div>
+                    </div>
+                ` : ""}
+            </div>
+        `;
+      const input = container.querySelector(".password-input");
+      input.addEventListener("input", (e) => {
+        currentPassword = e.target.value;
+        syncValue();
+        if (props.showMeter !== false) render();
+      });
+      container.querySelector(".toggle-mask-btn")?.addEventListener("click", () => {
+        isMasked = !isMasked;
+        render();
+        const inp = container.querySelector(".password-input");
+        inp.focus();
+        inp.setSelectionRange(currentPassword.length, currentPassword.length);
+      });
+    }
+    function syncValue() {
+      if (props.targetInputName) {
+        let hidden = document.querySelector(`input[name="${props.targetInputName}"]`);
+        if (!hidden) {
+          hidden = document.createElement("input");
+          hidden.type = "hidden";
+          hidden.name = props.targetInputName;
+          container.appendChild(hidden);
+        }
+        hidden.value = currentPassword;
+      }
+      container.dispatchEvent(new CustomEvent("password:change", {
+        bubbles: true,
+        detail: { value: currentPassword, strength: calculateStrength(currentPassword).label }
+      }));
+    }
+    render();
+  }
+  var init_input_password = __esm({
+    "src/components/input-password.ts"() {
+      "use strict";
+      init_solar();
+    }
+  });
+
+  // src/components/toggle-switch.ts
+  var toggle_switch_exports = {};
+  __export(toggle_switch_exports, {
+    default: () => ToggleSwitchIsland
+  });
+  function ToggleSwitchIsland(container, props) {
+    let isChecked = Boolean(props.checked);
+    function render() {
+      container.innerHTML = `
+            <label class="laughtale-switch" style="display: inline-flex; align-items: center; gap: 0.75rem; cursor: ${props.disabled ? "not-allowed" : "pointer"}; user-select: none; opacity: ${props.disabled ? "0.6" : "1"};">
+                <div class="switch-track" style="position: relative; width: 2.75rem; height: 1.5rem; border-radius: 9999px; background: ${isChecked ? "var(--p-primary-600)" : "var(--p-surface-300)"}; transition: background-color 0.2s ease;">
+                    <div class="switch-thumb" style="position: absolute; top: 2px; left: ${isChecked ? "1.35rem" : "2px"}; width: 1.25rem; height: 1.25rem; border-radius: 50%; background: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.25); transition: left 0.2s cubic-bezier(0.16, 1, 0.3, 1);"></div>
+                </div>
+                ${props.label ? `<span style="font-size: 0.875rem; font-weight: 500; color: var(--p-text-color);">${props.label}</span>` : ""}
+            </label>
+        `;
+      if (!props.disabled) {
+        container.querySelector(".laughtale-switch")?.addEventListener("click", (e) => {
+          e.preventDefault();
+          isChecked = !isChecked;
+          render();
+          syncValue();
+        });
+      }
+    }
+    function syncValue() {
+      if (props.targetInputName) {
+        let hidden = document.querySelector(`input[name="${props.targetInputName}"]`);
+        if (!hidden) {
+          hidden = document.createElement("input");
+          hidden.type = "hidden";
+          hidden.name = props.targetInputName;
+          container.appendChild(hidden);
+        }
+        hidden.value = isChecked ? "true" : "false";
+      }
+      container.dispatchEvent(new CustomEvent("switch:change", {
+        bubbles: true,
+        detail: { checked: isChecked }
+      }));
+    }
+    render();
+  }
+  var init_toggle_switch = __esm({
+    "src/components/toggle-switch.ts"() {
+      "use strict";
+    }
+  });
+
+  // src/components/slider.ts
+  var slider_exports = {};
+  __export(slider_exports, {
+    default: () => SliderIsland
+  });
+  function SliderIsland(container, props) {
+    const min = props.min !== void 0 ? props.min : 0;
+    const max = props.max !== void 0 ? props.max : 100;
+    const step = props.step !== void 0 ? props.step : 1;
+    let currentValue = props.value !== void 0 ? props.value : min;
+    function render() {
+      const percent = (currentValue - min) / (max - min) * 100;
+      container.innerHTML = `
+            <div class="laughtale-slider" style="position: relative; width: 100%; max-width: 320px; padding: 1rem 0; user-select: none;">
+                <!-- Track -->
+                <div class="slider-track" style="position: relative; height: 6px; border-radius: 3px; background: var(--p-surface-200); cursor: ${props.disabled ? "not-allowed" : "pointer"};">
+                    <!-- Active Fill Bar -->
+                    <div class="slider-fill" style="position: absolute; top: 0; left: 0; height: 100%; width: ${percent}%; border-radius: 3px; background: var(--p-primary-600);"></div>
+                    <!-- Drag Handle -->
+                    <div class="slider-handle" style="position: absolute; top: 50%; left: ${percent}%; transform: translate(-50%, -50%); width: 1.125rem; height: 1.125rem; border-radius: 50%; background: #ffffff; border: 2px solid var(--p-primary-600); box-shadow: 0 1px 4px rgba(0,0,0,0.2); cursor: ${props.disabled ? "not-allowed" : "grab"}; transition: transform 0.1s ease;"></div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; margin-top: 0.5rem; font-size: 0.75rem; color: var(--p-surface-500); font-family: var(--p-font-mono);">
+                    <span>${min}</span>
+                    <span style="font-weight: 700; color: var(--p-primary-600);">${currentValue}</span>
+                    <span>${max}</span>
+                </div>
+            </div>
+        `;
+      if (props.disabled) return;
+      const track = container.querySelector(".slider-track");
+      const updateFromPointer = (e) => {
+        const rect = track.getBoundingClientRect();
+        const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
+        let ratio = (clientX - rect.left) / rect.width;
+        ratio = Math.max(0, Math.min(1, ratio));
+        let val = min + ratio * (max - min);
+        val = Math.round(val / step) * step;
+        currentValue = Math.max(min, Math.min(max, val));
+        render();
+        syncValue();
+      };
+      track.addEventListener("click", updateFromPointer);
+      const handle = container.querySelector(".slider-handle");
+      const onDrag = (e) => updateFromPointer(e);
+      const onStop = () => {
+        window.removeEventListener("mousemove", onDrag);
+        window.removeEventListener("mouseup", onStop);
+        window.removeEventListener("touchmove", onDrag);
+        window.removeEventListener("touchend", onStop);
+      };
+      handle.addEventListener("mousedown", () => {
+        window.addEventListener("mousemove", onDrag);
+        window.addEventListener("mouseup", onStop);
+      });
+      handle.addEventListener("touchstart", () => {
+        window.addEventListener("touchmove", onDrag);
+        window.addEventListener("touchend", onStop);
+      });
+    }
+    function syncValue() {
+      if (props.targetInputName) {
+        let hidden = document.querySelector(`input[name="${props.targetInputName}"]`);
+        if (!hidden) {
+          hidden = document.createElement("input");
+          hidden.type = "hidden";
+          hidden.name = props.targetInputName;
+          container.appendChild(hidden);
+        }
+        hidden.value = currentValue.toString();
+      }
+      container.dispatchEvent(new CustomEvent("slider:change", {
+        bubbles: true,
+        detail: { value: currentValue }
+      }));
+    }
+    render();
+  }
+  var init_slider = __esm({
+    "src/components/slider.ts"() {
+      "use strict";
+    }
+  });
+
+  // src/components/rating.ts
+  var rating_exports = {};
+  __export(rating_exports, {
+    default: () => RatingIsland
+  });
+  function RatingIsland(container, props) {
+    const totalStars = props.stars || 5;
+    let currentRating = props.value || 0;
+    let hoverRating = 0;
+    function render() {
+      const starElements = Array.from({ length: totalStars }, (_, i) => {
+        const starNum = i + 1;
+        const isFilled = (hoverRating || currentRating) >= starNum;
+        const color = isFilled ? "#f59e0b" : "var(--p-surface-300)";
+        return `
+                <span class="rating-star" data-star="${starNum}" style="cursor: ${props.disabled ? "default" : "pointer"}; color: ${color}; transition: transform 0.15s ease, color 0.15s ease; display: inline-flex;">
+                    ${getSolarIcon("star")}
+                </span>
+            `;
+      }).join("");
+      container.innerHTML = `
+            <div class="laughtale-rating" style="display: inline-flex; align-items: center; gap: 0.35rem; user-select: none;">
+                ${props.allowCancel !== false ? `
+                    <button type="button" class="rating-cancel-btn" style="border: none; background: transparent; color: var(--p-surface-400); cursor: pointer; display: flex; align-items: center; padding: 0 0.25rem;">
+                        ${getSolarIcon("close")}
+                    </button>
+                ` : ""}
+                ${starElements}
+            </div>
+        `;
+      if (props.disabled) return;
+      container.querySelectorAll(".rating-star").forEach((el) => {
+        el.addEventListener("mouseenter", () => {
+          hoverRating = parseInt(el.getAttribute("data-star"), 10);
+          render();
+        });
+        el.addEventListener("click", () => {
+          currentRating = parseInt(el.getAttribute("data-star"), 10);
+          hoverRating = 0;
+          render();
+          syncValue();
+        });
+      });
+      container.querySelector(".laughtale-rating")?.addEventListener("mouseleave", () => {
+        hoverRating = 0;
+        render();
+      });
+      container.querySelector(".rating-cancel-btn")?.addEventListener("click", () => {
+        currentRating = 0;
+        hoverRating = 0;
+        render();
+        syncValue();
+      });
+    }
+    function syncValue() {
+      if (props.targetInputName) {
+        let hidden = document.querySelector(`input[name="${props.targetInputName}"]`);
+        if (!hidden) {
+          hidden = document.createElement("input");
+          hidden.type = "hidden";
+          hidden.name = props.targetInputName;
+          container.appendChild(hidden);
+        }
+        hidden.value = currentRating.toString();
+      }
+      container.dispatchEvent(new CustomEvent("rating:change", {
+        bubbles: true,
+        detail: { value: currentRating }
+      }));
+    }
+    render();
+  }
+  var init_rating = __esm({
+    "src/components/rating.ts"() {
+      "use strict";
+      init_solar();
+    }
+  });
+
+  // src/components/select-button.ts
+  var select_button_exports = {};
+  __export(select_button_exports, {
+    default: () => SelectButtonIsland
+  });
+  function SelectButtonIsland(container, props) {
+    let selectedValue = props.value || props.items[0]?.value || "";
+    function render() {
+      const buttons = props.items.map((item) => {
+        const isSelected = selectedValue === item.value;
+        return `
+                <button type="button" 
+                        class="select-btn-item" 
+                        data-value="${item.value}" 
+                        ${props.disabled ? "disabled" : ""} 
+                        style="padding: 0.45rem 1rem; border: none; background: ${isSelected ? "var(--p-surface-950)" : "transparent"}; color: ${isSelected ? "#ffffff" : "var(--p-surface-700)"}; font-size: 0.8125rem; font-weight: ${isSelected ? "600" : "500"}; border-radius: var(--p-border-radius); cursor: ${props.disabled ? "not-allowed" : "pointer"}; transition: all 0.15s ease; display: inline-flex; align-items: center; gap: 0.35rem;">
+                    ${item.icon ? `<span>${item.icon}</span>` : ""}
+                    <span>${item.label}</span>
+                </button>
+            `;
+      }).join("");
+      container.innerHTML = `
+            <div class="laughtale-select-button" style="display: inline-flex; background: var(--p-surface-100); padding: 0.25rem; border-radius: var(--p-border-radius-lg); border: 1px solid var(--p-border-color); gap: 0.25rem;">
+                ${buttons}
+            </div>
+        `;
+      if (props.disabled) return;
+      container.querySelectorAll(".select-btn-item").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          selectedValue = btn.getAttribute("data-value");
+          render();
+          syncValue();
+        });
+      });
+    }
+    function syncValue() {
+      if (props.targetInputName) {
+        let hidden = document.querySelector(`input[name="${props.targetInputName}"]`);
+        if (!hidden) {
+          hidden = document.createElement("input");
+          hidden.type = "hidden";
+          hidden.name = props.targetInputName;
+          container.appendChild(hidden);
+        }
+        hidden.value = selectedValue;
+      }
+      container.dispatchEvent(new CustomEvent("selectbutton:change", {
+        bubbles: true,
+        detail: { value: selectedValue }
+      }));
+    }
+    render();
+  }
+  var init_select_button = __esm({
+    "src/components/select-button.ts"() {
+      "use strict";
+    }
+  });
+
+  // src/components/chips.ts
+  var chips_exports = {};
+  __export(chips_exports, {
+    default: () => ChipsIsland
+  });
+  function ChipsIsland(container, props) {
+    let chips = props.values ? [...props.values] : [];
+    function render() {
+      const chipTags = chips.map((c, idx) => `
+            <span class="chip-item" style="display: inline-flex; align-items: center; gap: 0.35rem; background: var(--p-surface-100); color: var(--p-surface-800); border: 1px solid var(--p-surface-200); padding: 0.2rem 0.5rem; border-radius: var(--p-border-radius); font-size: 0.8125rem; font-weight: 500;">
+                <span>${c}</span>
+                ${!props.disabled ? `
+                    <button type="button" class="remove-chip-btn" data-index="${idx}" style="border: none; background: transparent; color: var(--p-surface-400); cursor: pointer; display: flex; align-items: center; padding: 0;">
+                        ${getSolarIcon("close")}
+                    </button>
+                ` : ""}
+            </span>
+        `).join("");
+      container.innerHTML = `
+            <div class="laughtale-chips" style="display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; padding: 0.35rem 0.5rem; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); background: var(--p-surface-0); min-height: 2.5rem; max-width: 400px; cursor: text;">
+                ${chipTags}
+                <input type="text" class="chip-text-input" placeholder="${chips.length === 0 ? props.placeholder || "Add tag..." : ""}" ${props.disabled ? "disabled" : ""} style="flex: 1; min-width: 80px; border: none; outline: none; background: transparent; font-size: 0.8125rem; color: var(--p-text-color); padding: 0.25rem 0;" />
+            </div>
+        `;
+      if (props.disabled) return;
+      const input = container.querySelector(".chip-text-input");
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === ",") {
+          e.preventDefault();
+          const val = input.value.trim().replace(/,$/, "");
+          if (val && !chips.includes(val) && (!props.max || chips.length < props.max)) {
+            chips.push(val);
+            render();
+            syncValue();
+            const nextInput = container.querySelector(".chip-text-input");
+            nextInput.focus();
+          }
+        } else if (e.key === "Backspace" && !input.value && chips.length > 0) {
+          chips.pop();
+          render();
+          syncValue();
+          const nextInput = container.querySelector(".chip-text-input");
+          nextInput.focus();
+        }
+      });
+      container.querySelectorAll(".remove-chip-btn").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const idx = parseInt(btn.getAttribute("data-index"), 10);
+          chips.splice(idx, 1);
+          render();
+          syncValue();
+        });
+      });
+      container.querySelector(".laughtale-chips")?.addEventListener("click", () => {
+        input.focus();
+      });
+    }
+    function syncValue() {
+      if (props.targetInputName) {
+        let hidden = document.querySelector(`input[name="${props.targetInputName}"]`);
+        if (!hidden) {
+          hidden = document.createElement("input");
+          hidden.type = "hidden";
+          hidden.name = props.targetInputName;
+          container.appendChild(hidden);
+        }
+        hidden.value = JSON.stringify(chips);
+      }
+      container.dispatchEvent(new CustomEvent("chips:change", {
+        bubbles: true,
+        detail: { values: chips }
+      }));
+    }
+    render();
+  }
+  var init_chips = __esm({
+    "src/components/chips.ts"() {
+      "use strict";
+      init_solar();
+    }
+  });
+
+  // src/components/datepicker.ts
+  var datepicker_exports = {};
+  __export(datepicker_exports, {
+    default: () => DatePickerIsland
+  });
+  function DatePickerIsland(container, props) {
+    let selectedDate = props.value ? new Date(props.value) : null;
+    let viewYear = selectedDate ? selectedDate.getFullYear() : (/* @__PURE__ */ new Date()).getFullYear();
+    let viewMonth = selectedDate ? selectedDate.getMonth() : (/* @__PURE__ */ new Date()).getMonth();
+    let isOpen = false;
+    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const dayNames = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+    function formatDate(d) {
+      if (!d) return "";
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${y}-${m}-${day}`;
+    }
+    function render() {
+      const firstDay = new Date(viewYear, viewMonth, 1).getDay();
+      const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+      const dayCells = [];
+      for (let i = 0; i < firstDay; i++) {
+        dayCells.push("<div></div>");
+      }
+      for (let day = 1; day <= daysInMonth; day++) {
+        const isSelected = selectedDate && selectedDate.getFullYear() === viewYear && selectedDate.getMonth() === viewMonth && selectedDate.getDate() === day;
+        dayCells.push(`
+                <button type="button" 
+                        class="calendar-day-btn" 
+                        data-day="${day}" 
+                        style="width: 2rem; height: 2rem; border-radius: 50%; border: none; background: ${isSelected ? "var(--p-primary-600)" : "transparent"}; color: ${isSelected ? "#ffffff" : "var(--p-surface-800)"}; font-weight: ${isSelected ? "700" : "500"}; font-size: 0.8125rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s ease;">
+                    ${day}
+                </button>
+            `);
+      }
+      container.innerHTML = `
+            <div class="laughtale-datepicker" style="position: relative; width: 100%; max-width: 260px; user-select: none;">
+                <!-- Input trigger -->
+                <div class="dp-trigger" style="display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); background: var(--p-surface-0); padding: 0.5rem 0.75rem; cursor: ${props.disabled ? "not-allowed" : "pointer"};">
+                    <span style="font-size: 0.875rem; color: ${selectedDate ? "var(--p-text-color)" : "var(--p-surface-400)"};">
+                        ${selectedDate ? formatDate(selectedDate) : props.placeholder || "Select date..."}
+                    </span>
+                    <span style="color: var(--p-surface-500); display: flex; align-items: center;">${getSolarIcon("calendar")}</span>
+                </div>
+
+                <!-- Calendar Popup Overlay -->
+                <div class="dp-overlay" style="display: ${isOpen ? "block" : "none"}; position: absolute; top: calc(100% + 4px); left: 0; z-index: 500; background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); box-shadow: var(--p-shadow-lg); padding: 1rem; width: 280px;">
+                    <!-- Calendar Header -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+                        <button type="button" class="btn-prev-month" style="border: none; background: transparent; color: var(--p-surface-600); cursor: pointer; display: flex; align-items: center; padding: 0.25rem;">
+                            ${getSolarIcon("chevronLeft")}
+                        </button>
+                        <div style="font-size: 0.875rem; font-weight: 700; color: var(--p-surface-900);">
+                            ${monthNames[viewMonth]} ${viewYear}
+                        </div>
+                        <button type="button" class="btn-next-month" style="border: none; background: transparent; color: var(--p-surface-600); cursor: pointer; display: flex; align-items: center; padding: 0.25rem;">
+                            ${getSolarIcon("chevronRight")}
+                        </button>
+                    </div>
+
+                    <!-- Day Names -->
+                    <div style="display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 0.6875rem; font-weight: 700; color: var(--p-surface-400); margin-bottom: 0.35rem;">
+                        ${dayNames.map((d) => `<div>${d}</div>`).join("")}
+                    </div>
+
+                    <!-- Day Grid -->
+                    <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; justify-items: center;">
+                        ${dayCells.join("")}
+                    </div>
+                </div>
+            </div>
+        `;
+      if (props.disabled) return;
+      container.querySelector(".dp-trigger")?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        isOpen = !isOpen;
+        render();
+      });
+      container.querySelector(".btn-prev-month")?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (viewMonth === 0) {
+          viewMonth = 11;
+          viewYear--;
+        } else {
+          viewMonth--;
+        }
+        render();
+      });
+      container.querySelector(".btn-next-month")?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (viewMonth === 11) {
+          viewMonth = 0;
+          viewYear++;
+        } else {
+          viewMonth++;
+        }
+        render();
+      });
+      container.querySelectorAll(".calendar-day-btn").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const day = parseInt(btn.getAttribute("data-day"), 10);
+          selectedDate = new Date(viewYear, viewMonth, day);
+          isOpen = false;
+          render();
+          syncValue();
+        });
+      });
+    }
+    function syncValue() {
+      const valStr = formatDate(selectedDate);
+      if (props.targetInputName) {
+        let hidden = document.querySelector(`input[name="${props.targetInputName}"]`);
+        if (!hidden) {
+          hidden = document.createElement("input");
+          hidden.type = "hidden";
+          hidden.name = props.targetInputName;
+          container.appendChild(hidden);
+        }
+        hidden.value = valStr;
+      }
+      container.dispatchEvent(new CustomEvent("date:change", {
+        bubbles: true,
+        detail: { date: valStr }
+      }));
+    }
+    document.addEventListener("click", () => {
+      if (isOpen) {
+        isOpen = false;
+        render();
+      }
+    });
+    render();
+  }
+  var init_datepicker = __esm({
+    "src/components/datepicker.ts"() {
+      "use strict";
+      init_solar();
+    }
+  });
+
+  // src/components/meter-group.ts
+  var meter_group_exports = {};
+  __export(meter_group_exports, {
+    default: () => MeterGroupIsland
+  });
+  function MeterGroupIsland(container, props) {
+    const total = props.values.reduce((acc, curr) => acc + curr.value, 0);
+    const barSegments = props.values.map((v) => {
+      const pct = total > 0 ? v.value / total * 100 : 0;
+      return `
+            <div style="height: 100%; width: ${pct}%; background: ${v.color}; transition: width 0.4s ease;" title="${v.label}: ${v.value}%"></div>
+        `;
+    }).join("");
+    const legendItems = props.values.map((v) => `
+        <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem;">
+            <div style="width: 0.625rem; height: 0.625rem; border-radius: 50%; background: ${v.color}; flex-shrink: 0;"></div>
+            <span style="color: var(--p-surface-600);">${v.label}</span>
+            <span style="font-weight: 700; color: var(--p-surface-900); font-family: var(--p-font-mono);">${v.value}%</span>
+        </div>
+    `).join("");
+    container.innerHTML = `
+        <div class="laughtale-metergroup" style="display: flex; flex-direction: column; gap: 0.75rem; width: 100%;">
+            ${props.title ? `<div style="font-size: 0.875rem; font-weight: 700; color: var(--p-surface-900);">${props.title}</div>` : ""}
+            
+            <!-- Meter Track -->
+            <div style="display: flex; height: 0.75rem; border-radius: 9999px; overflow: hidden; background: var(--p-surface-100); border: 1px solid var(--p-border-color); gap: 2px;">
+                ${barSegments}
+            </div>
+
+            <!-- Legend List -->
+            ${props.showLabels !== false ? `
+                <div style="display: flex; flex-wrap: wrap; gap: 1.25rem; margin-top: 0.25rem;">
+                    ${legendItems}
+                </div>
+            ` : ""}
+        </div>
+    `;
+  }
+  var init_meter_group = __esm({
+    "src/components/meter-group.ts"() {
+      "use strict";
+    }
+  });
+
+  // src/components/avatar-group.ts
+  var avatar_group_exports = {};
+  __export(avatar_group_exports, {
+    default: () => AvatarGroupIsland
+  });
+  function AvatarGroupIsland(container, props) {
+    const max = props.max || 4;
+    const visible = props.avatars.slice(0, max);
+    const overflowCount = props.avatars.length - max;
+    const sizePx = props.size === "sm" ? "1.75rem" : props.size === "lg" ? "2.75rem" : "2.25rem";
+    const fontSize = props.size === "sm" ? "0.6875rem" : props.size === "lg" ? "0.9375rem" : "0.75rem";
+    const avatarElements = visible.map((av) => {
+      const bg = av.bg || "var(--p-surface-800)";
+      return `
+            <div class="avatar-circle" title="${av.name || av.label || ""}" style="width: ${sizePx}; height: ${sizePx}; border-radius: 50%; border: 2px solid #ffffff; background: ${bg}; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: ${fontSize}; margin-left: -0.5rem; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.1); flex-shrink: 0;">
+                ${av.image ? `<img src="${av.image}" alt="${av.name || ""}" style="width: 100%; height: 100%; object-fit: cover;" />` : av.label || "U"}
+            </div>
+        `;
+    }).join("");
+    container.innerHTML = `
+        <div class="laughtale-avatar-group" style="display: inline-flex; align-items: center; padding-left: 0.5rem;">
+            ${avatarElements}
+            ${overflowCount > 0 ? `
+                <div class="avatar-overflow" style="width: ${sizePx}; height: ${sizePx}; border-radius: 50%; border: 2px solid #ffffff; background: var(--p-surface-200); color: var(--p-surface-700); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: ${fontSize}; margin-left: -0.5rem; box-shadow: 0 1px 2px rgba(0,0,0,0.1); flex-shrink: 0;">
+                    +${overflowCount}
+                </div>
+            ` : ""}
+        </div>
+    `;
+  }
+  var init_avatar_group = __esm({
+    "src/components/avatar-group.ts"() {
+      "use strict";
+    }
+  });
+
+  // src/components/progress-bar.ts
+  var progress_bar_exports = {};
+  __export(progress_bar_exports, {
+    default: () => ProgressBarIsland
+  });
+  function ProgressBarIsland(container, props) {
+    const isIndeterminate = props.mode === "indeterminate" || props.value === void 0;
+    const value = Math.max(0, Math.min(100, props.value || 0));
+    const height = props.height || "0.75rem";
+    const color = props.color || "var(--p-primary-600)";
+    if (isIndeterminate) {
+      container.innerHTML = `
+            <div class="laughtale-progress-bar" style="position: relative; height: ${height}; width: 100%; border-radius: 9999px; overflow: hidden; background: var(--p-surface-100);">
+                <div style="position: absolute; height: 100%; width: 40%; background: ${color}; border-radius: 9999px; animation: indeterminateProgress 1.5s infinite linear;"></div>
+            </div>
+            <style>
+                @@keyframes indeterminateProgress {
+                    0% { left: -40%; width: 40%; }
+                    50% { left: 40%; width: 60%; }
+                    100% { left: 100%; width: 40%; }
+                }
+            </style>
+        `;
+    } else {
+      container.innerHTML = `
+            <div class="laughtale-progress-bar" style="position: relative; height: ${height}; width: 100%; border-radius: 9999px; overflow: hidden; background: var(--p-surface-100); display: flex; align-items: center;">
+                <div style="height: 100%; width: ${value}%; background: ${color}; border-radius: 9999px; transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);"></div>
+                ${props.showValue !== false && height >= "1rem" ? `
+                    <span style="position: absolute; width: 100%; text-align: center; font-size: 0.6875rem; font-weight: 700; color: #ffffff; text-shadow: 0 1px 2px rgba(0,0,0,0.5); font-family: var(--p-font-mono);">
+                        ${value}%
+                    </span>
+                ` : ""}
+            </div>
+        `;
+    }
+  }
+  var init_progress_bar = __esm({
+    "src/components/progress-bar.ts"() {
+      "use strict";
+    }
+  });
+
+  // src/components/skeleton.ts
+  var skeleton_exports = {};
+  __export(skeleton_exports, {
+    default: () => SkeletonIsland
+  });
+  function SkeletonIsland(container, props) {
+    const shape = props.shape || "rectangle";
+    const width = props.width || "100%";
+    const height = props.height || "1.25rem";
+    const radius = props.borderRadius || (shape === "circle" ? "50%" : "var(--p-border-radius)");
+    container.innerHTML = `
+        <div class="laughtale-skeleton" style="width: ${width}; height: ${height}; border-radius: ${radius}; background: linear-gradient(90deg, var(--p-surface-100) 25%, var(--p-surface-200) 50%, var(--p-surface-100) 75%); background-size: 200% 100%; animation: skeletonShimmer 1.5s infinite ease-in-out;"></div>
+        <style>
+            @@keyframes skeletonShimmer {
+                0% { background-position: 200% 0; }
+                100% { background-position: -200% 0; }
+            }
+        </style>
+    `;
+  }
+  var init_skeleton = __esm({
+    "src/components/skeleton.ts"() {
+      "use strict";
+    }
+  });
+
+  // src/components/drawer.ts
+  var drawer_exports = {};
+  __export(drawer_exports, {
+    default: () => DrawerIsland
+  });
+  function DrawerIsland(container, props) {
+    const position = props.position || "right";
+    const width = props.width || "380px";
+    let isOpen = false;
+    function render() {
+      container.innerHTML = `
+            <div class="laughtale-drawer-wrapper">
+                ${props.triggerText ? `
+                    <button type="button" class="p-button p-button-secondary drawer-open-btn">
+                        ${props.triggerText}
+                    </button>
+                ` : ""}
+
+                <!-- Backdrop -->
+                <div class="drawer-backdrop" style="display: ${isOpen ? "block" : "none"}; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); z-index: 1000; animation: fadeIn 0.2s ease;"></div>
+
+                <!-- Drawer Panel -->
+                <div class="drawer-panel" style="display: ${isOpen ? "flex" : "none"}; flex-direction: column; position: fixed; ${position}: 0; top: 0; bottom: 0; width: ${width}; max-width: 90vw; background: var(--p-surface-0); border-${position === "right" ? "left" : "right"}: 1px solid var(--p-border-color); box-shadow: var(--p-shadow-lg); z-index: 1001; animation: slideInDrawer 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
+                    
+                    <!-- Header -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 1.25rem; border-bottom: 1px solid var(--p-border-color);">
+                        <div style="font-size: 1.125rem; font-weight: 700; color: var(--p-surface-900);">
+                            ${props.title || "Panel"}
+                        </div>
+                        <button type="button" class="drawer-close-btn" style="border: none; background: transparent; color: var(--p-surface-400); cursor: pointer; display: flex; align-items: center; padding: 0.25rem;">
+                            ${getSolarIcon("close")}
+                        </button>
+                    </div>
+
+                    <!-- Projected Body Slot -->
+                    <div class="drawer-body" style="flex: 1; overflow-y: auto; padding: 1.25rem;">
+                        <div class="drawer-slot-container"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+      const slotEl = container.querySelector('[data-slot="default"]') || container.querySelector(".island-slot");
+      const slotContainer = container.querySelector(".drawer-slot-container");
+      if (slotEl && slotContainer) slotContainer.appendChild(slotEl);
+      container.querySelector(".drawer-open-btn")?.addEventListener("click", () => {
+        isOpen = true;
+        render();
+      });
+      container.querySelector(".drawer-close-btn")?.addEventListener("click", () => {
+        isOpen = false;
+        render();
+      });
+      container.querySelector(".drawer-backdrop")?.addEventListener("click", () => {
+        isOpen = false;
+        render();
+      });
+    }
+    render();
+  }
+  var init_drawer = __esm({
+    "src/components/drawer.ts"() {
+      "use strict";
+      init_solar();
+    }
+  });
+
+  // src/components/speed-dial.ts
+  var speed_dial_exports = {};
+  __export(speed_dial_exports, {
+    default: () => SpeedDialIsland
+  });
+  function SpeedDialIsland(container, props) {
+    let isOpen = false;
+    function render() {
+      const actionItems = props.actions.map((act) => `
+            <button type="button" 
+                    class="speed-dial-action-btn" 
+                    title="${act.label}" 
+                    data-action="${act.action || ""}" 
+                    style="width: 2.5rem; height: 2.5rem; border-radius: 50%; border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-surface-800); box-shadow: var(--p-shadow-md); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);">
+                ${act.icon || getSolarIcon("bolt")}
+            </button>
+        `).join("");
+      container.innerHTML = `
+            <div class="laughtale-speed-dial" style="position: relative; display: inline-flex; flex-direction: column-reverse; align-items: center; gap: 0.75rem;">
+                <!-- Main FAB Button -->
+                <button type="button" class="speed-dial-main-btn" style="width: 3.25rem; height: 3.25rem; border-radius: 50%; border: none; background: var(--p-primary-600); color: #ffffff; box-shadow: var(--p-shadow-lg); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1); transform: rotate(${isOpen ? "45deg" : "0deg"});">
+                    ${isOpen ? getSolarIcon("plus") : getSolarIcon("plus")}
+                </button>
+
+                <!-- Action Items -->
+                <div class="speed-dial-list" style="display: ${isOpen ? "flex" : "none"}; flex-direction: column-reverse; gap: 0.5rem; animation: fadeInUp 0.2s ease;">
+                    ${actionItems}
+                </div>
+            </div>
+        `;
+      container.querySelector(".speed-dial-main-btn")?.addEventListener("click", () => {
+        isOpen = !isOpen;
+        render();
+      });
+      container.querySelectorAll(".speed-dial-action-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const act = btn.getAttribute("data-action");
+          container.dispatchEvent(new CustomEvent("speeddial:action", {
+            bubbles: true,
+            detail: { action: act }
+          }));
+          isOpen = false;
+          render();
+        });
+      });
+    }
+    render();
+  }
+  var init_speed_dial = __esm({
+    "src/components/speed-dial.ts"() {
+      "use strict";
+      init_solar();
+    }
+  });
+
+  // src/components/image-compare.ts
+  var image_compare_exports = {};
+  __export(image_compare_exports, {
+    default: () => ImageCompareIsland
+  });
+  function ImageCompareIsland(container, props) {
+    let splitPercent = 50;
+    function render() {
+      container.innerHTML = `
+            <div class="laughtale-image-compare" style="position: relative; width: 100%; max-width: 600px; height: 340px; border-radius: var(--p-border-radius-lg); overflow: hidden; user-select: none; border: 1px solid var(--p-border-color); box-shadow: var(--p-shadow-md);">
+                <!-- After Image (Bottom) -->
+                <img src="${props.afterImage}" alt="After" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;" />
+                ${props.afterLabel ? `<span style="position: absolute; bottom: 0.75rem; right: 0.75rem; background: rgba(0,0,0,0.6); color: #ffffff; padding: 0.25rem 0.5rem; border-radius: var(--p-border-radius); font-size: 0.75rem; font-weight: 600;">${props.afterLabel}</span>` : ""}
+
+                <!-- Before Image (Top Clipped) -->
+                <div class="compare-clip" style="position: absolute; inset: 0; width: ${splitPercent}%; height: 100%; overflow: hidden;">
+                    <img src="${props.beforeImage}" alt="Before" style="position: absolute; top: 0; left: 0; width: 600px; max-width: 600px; height: 340px; object-fit: cover;" />
+                    ${props.beforeLabel ? `<span style="position: absolute; bottom: 0.75rem; left: 0.75rem; background: rgba(0,0,0,0.6); color: #ffffff; padding: 0.25rem 0.5rem; border-radius: var(--p-border-radius); font-size: 0.75rem; font-weight: 600;">${props.beforeLabel}</span>` : ""}
+                </div>
+
+                <!-- Divider Line & Handle -->
+                <div class="compare-handle-line" style="position: absolute; top: 0; bottom: 0; left: ${splitPercent}%; width: 2px; background: #ffffff; box-shadow: 0 0 4px rgba(0,0,0,0.5); cursor: ew-resize;">
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 2rem; height: 2rem; border-radius: 50%; background: #ffffff; border: 2px solid var(--p-primary-600); box-shadow: 0 2px 6px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; font-size: 0.6875rem; font-weight: 700; color: var(--p-primary-600);">
+                        \u25C0\u25B6
+                    </div>
+                </div>
+            </div>
+        `;
+      const compareBox = container.querySelector(".laughtale-image-compare");
+      const onMove = (e) => {
+        const rect = compareBox.getBoundingClientRect();
+        const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
+        let p = (clientX - rect.left) / rect.width * 100;
+        splitPercent = Math.max(0, Math.min(100, p));
+        render();
+      };
+      const onUp = () => {
+        window.removeEventListener("mousemove", onMove);
+        window.removeEventListener("mouseup", onUp);
+        window.removeEventListener("touchmove", onMove);
+        window.removeEventListener("touchend", onUp);
+      };
+      compareBox.querySelector(".compare-handle-line")?.addEventListener("mousedown", () => {
+        window.addEventListener("mousemove", onMove);
+        window.addEventListener("mouseup", onUp);
+      });
+      compareBox.querySelector(".compare-handle-line")?.addEventListener("touchstart", () => {
+        window.addEventListener("touchmove", onMove);
+        window.addEventListener("touchend", onUp);
+      });
+    }
+    render();
+  }
+  var init_image_compare = __esm({
+    "src/components/image-compare.ts"() {
+      "use strict";
+    }
+  });
+
+  // src/components/confirm-popup.ts
+  var confirm_popup_exports = {};
+  __export(confirm_popup_exports, {
+    default: () => ConfirmPopupIsland
+  });
+  function ConfirmPopupIsland(container, props) {
+    let isOpen = false;
+    function render() {
+      container.innerHTML = `
+            <div class="laughtale-confirm-popup" style="display: ${isOpen ? "block" : "none"}; position: absolute; z-index: 1000; background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); box-shadow: var(--p-shadow-lg); padding: 1rem; width: 260px; animation: scaleIn 0.15s ease;">
+                <div style="display: flex; align-items: flex-start; gap: 0.5rem; margin-bottom: 0.75rem;">
+                    <span style="color: #f59e0b; font-size: 1.25rem;">\u26A0\uFE0F</span>
+                    <span style="font-size: 0.875rem; font-weight: 500; color: var(--p-surface-900); line-height: 1.4;">${props.message}</span>
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+                    <button type="button" class="btn-reject p-button p-button-secondary" style="padding: 0.35rem 0.65rem; font-size: 0.75rem;">
+                        ${props.rejectText || "Cancel"}
+                    </button>
+                    <button type="button" class="btn-accept p-button p-button-primary" style="padding: 0.35rem 0.65rem; font-size: 0.75rem; background: #ef4444; border-color: #ef4444;">
+                        ${props.acceptText || "Confirm"}
+                    </button>
+                </div>
+            </div>
+        `;
+      container.querySelector(".btn-reject")?.addEventListener("click", () => {
+        isOpen = false;
+        render();
+      });
+      container.querySelector(".btn-accept")?.addEventListener("click", () => {
+        isOpen = false;
+        render();
+        container.dispatchEvent(new CustomEvent("confirm:accept", {
+          bubbles: true,
+          detail: { action: props.actionName }
+        }));
+      });
+    }
+    const trigger = document.querySelector(props.targetSelector);
+    if (trigger) {
+      trigger.addEventListener("click", (e) => {
+        e.preventDefault();
+        isOpen = !isOpen;
+        render();
+        if (isOpen) {
+          const rect = trigger.getBoundingClientRect();
+          const popup = container.querySelector(".laughtale-confirm-popup");
+          if (popup) {
+            popup.style.top = `${rect.bottom + window.scrollY + 6}px`;
+            popup.style.left = `${rect.left + window.scrollX}px`;
+          }
+        }
+      });
+    }
+    render();
+  }
+  var init_confirm_popup = __esm({
+    "src/components/confirm-popup.ts"() {
+      "use strict";
+    }
+  });
+
   // src/index.ts
   var index_exports = {};
   __export(index_exports, {
+    SolarIcons: () => SolarIcons,
     awaitStreamingReady: () => awaitStreamingReady,
     createPreactIsland: () => createPreactIsland,
     createVanillaIsland: () => createVanillaIsland,
@@ -1703,12 +2901,14 @@ var SoftMaxIslands = (() => {
     extractSlotContent: () => extractSlotContent,
     getIslandDefinition: () => getIslandDefinition,
     getSlot: () => getSlot,
+    getSolarIcon: () => getSolarIcon,
     hasIsland: () => hasIsland,
     hydrateIsland: () => hydrateIsland,
     importWithRetry: () => importWithRetry,
     initDirectives: () => initDirectives,
     initIslands: () => initIslands,
     injectIslandStyle: () => injectIslandStyle,
+    navigateTo: () => navigateTo,
     parseAndReviveProps: () => parseAndReviveProps,
     reviveTuple: () => reviveTuple
   });
@@ -1728,6 +2928,7 @@ var SoftMaxIslands = (() => {
       init_vanilla();
       init_preact();
       init_directives();
+      init_solar();
       defineIsland("stepper", () => Promise.resolve().then(() => (init_stepper(), stepper_exports)));
       defineIsland("timeline", () => Promise.resolve().then(() => (init_timeline(), timeline_exports)));
       defineIsland("camera", () => Promise.resolve().then(() => (init_camera(), camera_exports)));
@@ -1736,6 +2937,23 @@ var SoftMaxIslands = (() => {
       defineIsland("datagrid", () => Promise.resolve().then(() => (init_datagrid(), datagrid_exports)));
       defineIsland("modal", () => Promise.resolve().then(() => (init_modal(), modal_exports)));
       defineIsland("toast", () => Promise.resolve().then(() => (init_toast(), toast_exports)));
+      defineIsland("input-number", () => Promise.resolve().then(() => (init_input_number(), input_number_exports)));
+      defineIsland("input-otp", () => Promise.resolve().then(() => (init_input_otp(), input_otp_exports)));
+      defineIsland("input-password", () => Promise.resolve().then(() => (init_input_password(), input_password_exports)));
+      defineIsland("toggle-switch", () => Promise.resolve().then(() => (init_toggle_switch(), toggle_switch_exports)));
+      defineIsland("slider", () => Promise.resolve().then(() => (init_slider(), slider_exports)));
+      defineIsland("rating", () => Promise.resolve().then(() => (init_rating(), rating_exports)));
+      defineIsland("select-button", () => Promise.resolve().then(() => (init_select_button(), select_button_exports)));
+      defineIsland("chips", () => Promise.resolve().then(() => (init_chips(), chips_exports)));
+      defineIsland("datepicker", () => Promise.resolve().then(() => (init_datepicker(), datepicker_exports)));
+      defineIsland("meter-group", () => Promise.resolve().then(() => (init_meter_group(), meter_group_exports)));
+      defineIsland("avatar-group", () => Promise.resolve().then(() => (init_avatar_group(), avatar_group_exports)));
+      defineIsland("progress-bar", () => Promise.resolve().then(() => (init_progress_bar(), progress_bar_exports)));
+      defineIsland("skeleton", () => Promise.resolve().then(() => (init_skeleton(), skeleton_exports)));
+      defineIsland("drawer", () => Promise.resolve().then(() => (init_drawer(), drawer_exports)));
+      defineIsland("speed-dial", () => Promise.resolve().then(() => (init_speed_dial(), speed_dial_exports)));
+      defineIsland("image-compare", () => Promise.resolve().then(() => (init_image_compare(), image_compare_exports)));
+      defineIsland("confirm-popup", () => Promise.resolve().then(() => (init_confirm_popup(), confirm_popup_exports)));
     }
   });
   init_index();
