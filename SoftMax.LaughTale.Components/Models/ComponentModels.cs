@@ -1,20 +1,32 @@
+using SoftMax.LaughTale.Components.Enums;
+
 namespace SoftMax.LaughTale.Components.Models;
 
 public record StepperStep(
     string Id,
     string Title,
     string? Description = null,
-    string? Icon = null
+    string? Icon = null,
+    bool Disabled = false
 );
 
 public record TimelineItem(
     string Id,
     string Title,
     string Description,
-    string Timestamp,
-    string Status = "completed",
+    DateTimeOffset Timestamp,
+    TimelineStatus Status = TimelineStatus.Completed,
     string? Actor = null,
     string? Icon = null
+);
+
+public record DataGridCol<TItem>(
+    string Field,
+    string Header,
+    bool Sortable = true,
+    bool Filterable = true,
+    string? Width = null,
+    string Align = "left"
 );
 
 public record DataGridCol(
@@ -23,11 +35,29 @@ public record DataGridCol(
     bool Sortable = true
 );
 
+public record TreeNode<TData>(
+    string Id,
+    string Name,
+    string? Code = null,
+    TData? Data = default,
+    List<TreeNode<TData>>? Children = null,
+    string? Icon = null,
+    bool Expanded = false,
+    bool Selected = false
+);
+
 public record TreeNode(
     string Id,
     string Name,
     string? Code = null,
     List<TreeNode>? Children = null
+);
+
+public record SelectButtonItem<TValue>(
+    string Label,
+    TValue Value,
+    string? Icon = null,
+    bool Disabled = false
 );
 
 public record SelectButtonItem(
@@ -47,13 +77,15 @@ public record AvatarItem(
     string? Label = null,
     string? Image = null,
     string? Name = null,
-    string? Bg = null
+    string? Bg = null,
+    ComponentSize Size = ComponentSize.Medium
 );
 
 public record SpeedDialAction(
     string Label,
     string? Icon = null,
-    string? Action = null
+    string? Action = null,
+    ButtonSeverity Severity = ButtonSeverity.Primary
 );
 
 public record AccordionTab(
@@ -72,6 +104,14 @@ public record TabItem(
     bool Disabled = false
 );
 
+public record AutoCompleteItem<TValue>(
+    string Label,
+    TValue Value,
+    string? Category = null,
+    string? Icon = null,
+    bool Disabled = false
+);
+
 public record AutoCompleteItem(
     string Label,
     string Value,
@@ -82,7 +122,8 @@ public record AutoCompleteItem(
 public record BreadcrumbItem(
     string Label,
     string? Url = null,
-    string? Icon = null
+    string? Icon = null,
+    bool IsCurrent = false
 );
 
 public record CommandPaletteItem(
@@ -92,12 +133,111 @@ public record CommandPaletteItem(
     string? Icon = null,
     string? Shortcut = null,
     string? Url = null,
-    string? Action = null
+    string? Action = null,
+    bool Disabled = false
 );
 
 public record ThemeStudioPreset(
     string Id,
     string Name,
     string PrimaryHex,
-    string BorderRadius
+    string BorderRadius,
+    string NeutralFamily = "slate"
+);
+
+public record SplitterPanel(
+    string Id,
+    double Size = 50,
+    double MinSize = 10,
+    string? Content = null
+);
+
+public record CascadeSelectNode<TValue>(
+    string Name,
+    TValue Value,
+    string? Code = null,
+    List<CascadeSelectNode<TValue>>? Children = null
+);
+
+public record CascadeSelectNode(
+    string Name,
+    string Code,
+    List<CascadeSelectNode>? Children = null
+);
+
+public record PickListItem<TData>(
+    string Id,
+    string Name,
+    string? Category = null,
+    string? Code = null,
+    TData? Data = default
+);
+
+public record PickListItem(
+    string Id,
+    string Name,
+    string? Category = null,
+    string? Code = null
+);
+
+public record OrderListItem<TData>(
+    string Id,
+    string Name,
+    int Order,
+    string? Category = null,
+    TData? Data = default
+);
+
+public record OrderListItem(
+    string Id,
+    string Name,
+    string? Category = null,
+    int Order = 0
+);
+
+public record OrgChartNode<TData>(
+    string Key,
+    string Label,
+    string? Title = null,
+    string? Avatar = null,
+    TData? Data = default,
+    List<OrgChartNode<TData>>? Children = null,
+    bool Expanded = true
+);
+
+public record OrgChartNode(
+    string Key,
+    string Label,
+    string? Title = null,
+    string? Avatar = null,
+    List<OrgChartNode>? Children = null
+);
+
+public record TerminalCommand(
+    string Command,
+    string Response
+);
+
+public record DockItem(
+    string Label,
+    string Icon,
+    string? Url = null,
+    string? Action = null,
+    DockPosition Position = DockPosition.Bottom
+);
+
+public record GalleriaItem(
+    string ItemImageSrc,
+    string ThumbnailImageSrc,
+    string Alt,
+    string? Title = null
+);
+
+public record SplitButtonItem(
+    string Label,
+    string? Icon = null,
+    string? Action = null,
+    string? Url = null,
+    ButtonSeverity Severity = ButtonSeverity.Primary,
+    bool Disabled = false
 );

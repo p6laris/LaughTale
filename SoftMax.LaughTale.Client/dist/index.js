@@ -2397,6 +2397,13 @@ var SoftMaxIslands = (() => {
     }
   });
 
+  // src/types/models.ts
+  var init_models = __esm({
+    "src/types/models.ts"() {
+      "use strict";
+    }
+  });
+
   // src/components/stepper.ts
   var stepper_exports = {};
   __export(stepper_exports, {
@@ -5693,6 +5700,1270 @@ public static class AppTheme
     }
   });
 
+  // src/components/dynamic-form.ts
+  var dynamic_form_exports = {};
+  __export(dynamic_form_exports, {
+    default: () => DynamicFormIsland
+  });
+  function DynamicFormIsland(container, props) {
+    let schema = props.schema || null;
+    if (!schema && props.schemaJson) {
+      try {
+        schema = JSON.parse(props.schemaJson);
+      } catch (err) {
+        console.error("[SoftMax.LaughTale DynamicForm] Failed to parse schemaJson:", err);
+      }
+    }
+    if (!schema) {
+      container.innerHTML = `<div style="color: var(--p-surface-400); font-size: 0.875rem;">No Form Schema provided.</div>`;
+      return;
+    }
+    const formData = {};
+    const errors = {};
+    schema.fields.forEach((f) => {
+      formData[f.name] = f.defaultValue !== void 0 && f.defaultValue !== null ? f.defaultValue : "";
+    });
+    function renderField(f) {
+      const val = formData[f.name] ?? "";
+      const error = errors[f.name];
+      let controlHtml = "";
+      switch (f.fieldType) {
+        case "Password":
+          controlHtml = `
+                    <div style="position: relative;">
+                        <input type="password" name="${f.name}" class="p-input form-field-input" data-field="${f.name}" value="${val}" placeholder="${f.placeholder || ""}" ${f.isRequired ? "required" : ""} style="width: 100%;" />
+                    </div>
+                `;
+          break;
+        case "Multiline":
+          controlHtml = `
+                    <textarea name="${f.name}" class="p-input form-field-input" data-field="${f.name}" rows="3" placeholder="${f.placeholder || ""}" ${f.isRequired ? "required" : ""} style="width: 100%; resize: vertical;">${val}</textarea>
+                `;
+          break;
+        case "Number":
+        case "Currency":
+          controlHtml = `
+                    <input type="number" name="${f.name}" class="p-input form-field-input" data-field="${f.name}" value="${val}" min="${f.min ?? ""}" max="${f.max ?? ""}" placeholder="${f.placeholder || ""}" ${f.isRequired ? "required" : ""} style="width: 100%;" />
+                `;
+          break;
+        case "Switch":
+          const checked = Boolean(val);
+          controlHtml = `
+                    <label style="display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" name="${f.name}" class="form-field-checkbox" data-field="${f.name}" ${checked ? "checked" : ""} style="width: 1.25rem; height: 1.25rem; accent-color: var(--p-primary-600);" />
+                        <span style="font-size: 0.875rem; color: var(--p-surface-700);">${f.label}</span>
+                    </label>
+                `;
+          break;
+        case "Select":
+          const options = (f.options || []).map((opt) => `<option value="${opt.value}" ${opt.value === val ? "selected" : ""}>${opt.label}</option>`).join("");
+          controlHtml = `
+                    <select name="${f.name}" class="p-input form-field-select" data-field="${f.name}" style="width: 100%;">
+                        ${options}
+                    </select>
+                `;
+          break;
+        case "DatePicker":
+          controlHtml = `
+                    <input type="date" name="${f.name}" class="p-input form-field-input" data-field="${f.name}" value="${val}" style="width: 100%;" />
+                `;
+          break;
+        default:
+          controlHtml = `
+                    <input type="${f.fieldType === "Email" ? "email" : "text"}" name="${f.name}" class="p-input form-field-input" data-field="${f.name}" value="${val}" placeholder="${f.placeholder || ""}" ${f.isRequired ? "required" : ""} style="width: 100%;" />
+                `;
+          break;
+      }
+      return `
+            <div class="form-group" style="display: flex; flex-direction: column; gap: 0.35rem;">
+                ${f.fieldType !== "Switch" ? `
+                    <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-surface-800); display: flex; align-items: center; gap: 0.25rem;">
+                        ${f.label}
+                        ${f.isRequired ? '<span style="color: #ef4444;">*</span>' : ""}
+                    </label>
+                ` : ""}
+                ${controlHtml}
+                ${f.helpText ? `<span style="font-size: 0.75rem; color: var(--p-surface-400);">${f.helpText}</span>` : ""}
+                ${error ? `<span style="font-size: 0.75rem; color: #ef4444; font-weight: 500;">${error}</span>` : ""}
+            </div>
+        `;
+    }
+    function render() {
+      const fieldsHtml = schema.fields.map(renderField).join("");
+      container.innerHTML = `
+            <form class="laughtale-dynamic-form" style="background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); padding: 1.75rem; display: flex; flex-direction: column; gap: 1.25rem;">
+                <!-- Form Header -->
+                <div style="border-bottom: 1px solid var(--p-border-color); padding-bottom: 0.875rem;">
+                    <h3 style="font-size: 1.125rem; font-weight: 700; color: var(--p-surface-900); margin-bottom: 0.25rem;">${schema.title}</h3>
+                    ${schema.description ? `<p style="font-size: 0.8125rem; color: var(--p-surface-500);">${schema.description}</p>` : ""}
+                </div>
+
+                <!-- Form Fields Grid -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem;">
+                    ${fieldsHtml}
+                </div>
+
+                <!-- Submit Button -->
+                <div style="display: flex; justify-content: flex-end; border-top: 1px solid var(--p-border-color); padding-top: 1rem; margin-top: 0.5rem;">
+                    <button type="submit" class="p-button p-button-primary" style="padding: 0.5rem 1.25rem; font-size: 0.875rem;">
+                        ${schema.submitLabel || "Submit"}
+                    </button>
+                </div>
+            </form>
+        `;
+      bindEvents();
+    }
+    function validate() {
+      let valid = true;
+      Object.keys(errors).forEach((k) => delete errors[k]);
+      schema.fields.forEach((f) => {
+        const val = formData[f.name];
+        if (f.isRequired && (val === void 0 || val === null || val === "")) {
+          errors[f.name] = `${f.label} is required.`;
+          valid = false;
+        } else if (f.fieldType === "Email" && val && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(val))) {
+          errors[f.name] = `Invalid email address.`;
+          valid = false;
+        }
+      });
+      return valid;
+    }
+    function bindEvents() {
+      const form = container.querySelector(".laughtale-dynamic-form");
+      form.querySelectorAll(".form-field-input, .form-field-select").forEach((input) => {
+        input.addEventListener("input", (e) => {
+          const target = e.target;
+          const fieldName = target.getAttribute("data-field");
+          formData[fieldName] = target.value;
+        });
+      });
+      form.querySelectorAll(".form-field-checkbox").forEach((chk) => {
+        chk.addEventListener("change", (e) => {
+          const target = e.target;
+          const fieldName = target.getAttribute("data-field");
+          formData[fieldName] = target.checked;
+        });
+      });
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        if (validate()) {
+          container.dispatchEvent(new CustomEvent("form:submit", {
+            bubbles: true,
+            detail: { data: formData }
+          }));
+          const submitBtn = form.querySelector('button[type="submit"]');
+          const originalText = submitBtn.innerHTML;
+          submitBtn.innerHTML = `${LucideIcons.check} Submitted Successfully!`;
+          submitBtn.style.backgroundColor = "#059669";
+          setTimeout(() => {
+            submitBtn.innerHTML = originalText;
+            submitBtn.style.backgroundColor = "";
+          }, 2500);
+        } else {
+          render();
+        }
+      });
+    }
+    render();
+  }
+  var init_dynamic_form = __esm({
+    "src/components/dynamic-form.ts"() {
+      "use strict";
+      init_lucide();
+    }
+  });
+
+  // src/components/splitter.ts
+  var splitter_exports = {};
+  __export(splitter_exports, {
+    default: () => SplitterIsland
+  });
+  function SplitterIsland(container, props) {
+    const layout = props.layout || "horizontal";
+    const isHorizontal = layout === "horizontal";
+    const panels = props.panels && props.panels.length >= 2 ? props.panels : [
+      { id: "p1", size: 50, content: "Panel 1 (Left)" },
+      { id: "p2", size: 50, content: "Panel 2 (Right)" }
+    ];
+    let leftPercent = panels[0].size ?? 50;
+    container.innerHTML = `
+        <div class="laughtale-splitter" style="display: flex; flex-direction: ${isHorizontal ? "row" : "column"}; width: 100%; height: 320px; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); overflow: hidden; background: var(--p-surface-0);">
+            <!-- Panel 1 -->
+            <div class="splitter-panel-1" style="flex: 0 0 ${leftPercent}%; overflow: auto; padding: 1.25rem; background: var(--p-surface-50);">
+                ${panels[0].content || ""}
+            </div>
+
+            <!-- Gutter Divider Handle -->
+            <div class="splitter-gutter" style="flex: 0 0 8px; background: var(--p-surface-200); cursor: ${isHorizontal ? "col-resize" : "row-resize"}; display: flex; align-items: center; justify-content: center; user-select: none; transition: background 0.15s ease;">
+                <div style="width: ${isHorizontal ? "2px" : "16px"}; height: ${isHorizontal ? "16px" : "2px"}; background: var(--p-surface-400); border-radius: 1px;"></div>
+            </div>
+
+            <!-- Panel 2 -->
+            <div class="splitter-panel-2" style="flex: 1; overflow: auto; padding: 1.25rem; background: var(--p-surface-0);">
+                ${panels[1].content || ""}
+            </div>
+        </div>
+    `;
+    const panel1 = container.querySelector(".splitter-panel-1");
+    const gutter = container.querySelector(".splitter-gutter");
+    useDragGesture(gutter, {
+      axis: isHorizontal ? "x" : "y",
+      onDrag: (state) => {
+        const containerRect = container.querySelector(".laughtale-splitter").getBoundingClientRect();
+        let newPercent = isHorizontal ? (state.clientX - containerRect.left) / containerRect.width * 100 : (state.clientY - containerRect.top) / containerRect.height * 100;
+        newPercent = Math.max(10, Math.min(90, newPercent));
+        leftPercent = newPercent;
+        panel1.style.flex = `0 0 ${newPercent}%`;
+        container.dispatchEvent(new CustomEvent("splitter:resize", {
+          bubbles: true,
+          detail: { leftPercent: newPercent, rightPercent: 100 - newPercent }
+        }));
+      }
+    });
+  }
+  var init_splitter = __esm({
+    "src/components/splitter.ts"() {
+      "use strict";
+      init_useDragGesture();
+    }
+  });
+
+  // src/components/multiselect.ts
+  var multiselect_exports = {};
+  __export(multiselect_exports, {
+    default: () => MultiSelectIsland
+  });
+  function MultiSelectIsland(container, props) {
+    const options = props.options || [];
+    let selected = new Set(props.selectedValues || []);
+    let filterQuery = "";
+    const disclosure = useDisclosure({ defaultIsOpen: false });
+    container.innerHTML = `
+        <div class="laughtale-multiselect" style="position: relative; width: 100%; max-width: 320px; font-family: var(--p-font-family, inherit);">
+            <!-- Trigger Button Container -->
+            <div class="multiselect-trigger p-input" style="display: flex; align-items: center; justify-content: space-between; min-height: 2.5rem; padding: 0.35rem 0.75rem; cursor: ${props.disabled ? "not-allowed" : "pointer"}; background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); user-select: none;">
+                <div class="multiselect-label-container" style="display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap; flex: 1; min-width: 0;"></div>
+                <div style="display: flex; align-items: center; gap: 0.35rem; color: var(--p-surface-400);">
+                    <span class="multiselect-clear-btn" style="display: none; cursor: pointer; padding: 2px;">${LucideIcons.x}</span>
+                    <span class="multiselect-chevron" style="display: flex; transition: transform 0.2s ease;">${LucideIcons.chevronDown}</span>
+                </div>
+            </div>
+
+            <!-- Popover Overlay -->
+            <div class="multiselect-overlay" style="display: none; position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 500; background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); box-shadow: var(--p-shadow-lg); overflow: hidden;">
+                <!-- Filter Search Box -->
+                <div style="padding: 0.5rem; border-bottom: 1px solid var(--p-border-color); display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="color: var(--p-surface-400); display: flex;">${LucideIcons.search}</span>
+                    <input type="text" class="multiselect-filter-input" placeholder="Search..." style="flex: 1; border: none; outline: none; background: transparent; font-size: 0.8125rem; color: var(--p-text-color);" />
+                </div>
+
+                <!-- Select All Bar -->
+                <div class="multiselect-select-all" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--p-surface-100); background: var(--p-surface-50); cursor: pointer; font-size: 0.75rem; font-weight: 600; color: var(--p-surface-600);">
+                    <input type="checkbox" class="select-all-chk" style="accent-color: var(--p-primary-600); cursor: pointer;" />
+                    <span>Select All</span>
+                </div>
+
+                <!-- Items List -->
+                <div class="multiselect-items-list" style="max-height: 200px; overflow-y: auto; padding: 0.25rem 0;"></div>
+            </div>
+        </div>
+    `;
+    const trigger = container.querySelector(".multiselect-trigger");
+    const labelContainer = container.querySelector(".multiselect-label-container");
+    const overlay = container.querySelector(".multiselect-overlay");
+    const filterInput = container.querySelector(".multiselect-filter-input");
+    const selectAllChk = container.querySelector(".select-all-chk");
+    const itemsList = container.querySelector(".multiselect-items-list");
+    const clearBtn = container.querySelector(".multiselect-clear-btn");
+    const chevron = container.querySelector(".multiselect-chevron");
+    useClickOutside(container, () => close());
+    function getFilteredOptions() {
+      if (!filterQuery.trim()) return options;
+      const q = filterQuery.toLowerCase();
+      return options.filter((o) => o.label.toLowerCase().includes(q));
+    }
+    function renderDisplay() {
+      if (selected.size === 0) {
+        labelContainer.innerHTML = `<span style="color: var(--p-surface-400); font-size: 0.875rem;">${props.placeholder || "Select items..."}</span>`;
+        clearBtn.style.display = "none";
+        return;
+      }
+      clearBtn.style.display = "flex";
+      if (props.display === "comma") {
+        const labels = options.filter((o) => selected.has(o.value)).map((o) => o.label).join(", ");
+        labelContainer.innerHTML = `<span style="font-size: 0.875rem; color: var(--p-text-color);">${labels}</span>`;
+      } else {
+        const chipsHtml = options.filter((o) => selected.has(o.value)).map((o) => `
+                <span class="aura-tag tag-emerald" style="padding: 0.15rem 0.45rem; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 0.25rem;">
+                    ${o.label}
+                    <span class="chip-remove-btn" data-val="${o.value}" style="cursor: pointer; display: flex; opacity: 0.7;">${LucideIcons.x}</span>
+                </span>
+            `).join("");
+        labelContainer.innerHTML = chipsHtml;
+        labelContainer.querySelectorAll(".chip-remove-btn").forEach((btn) => {
+          btn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const val = btn.getAttribute("data-val");
+            selected.delete(val);
+            renderDisplay();
+            renderList();
+            syncValue();
+          });
+        });
+      }
+    }
+    function renderList() {
+      const filtered = getFilteredOptions();
+      selectAllChk.checked = filtered.length > 0 && filtered.every((o) => selected.has(o.value));
+      if (filtered.length === 0) {
+        itemsList.innerHTML = `<div style="padding: 1rem; text-align: center; font-size: 0.75rem; color: var(--p-surface-400);">No options found</div>`;
+        return;
+      }
+      itemsList.innerHTML = filtered.map((o) => {
+        const isChecked = selected.has(o.value);
+        return `
+                <div class="multiselect-item" data-val="${o.value}" style="display: flex; align-items: center; gap: 0.625rem; padding: 0.45rem 0.75rem; cursor: pointer; font-size: 0.8125rem; background: ${isChecked ? "var(--p-surface-50)" : "transparent"}; color: var(--p-text-color);">
+                    <input type="checkbox" ${isChecked ? "checked" : ""} style="accent-color: var(--p-primary-600); pointer-events: none;" />
+                    <span style="flex: 1;">${o.label}</span>
+                </div>
+            `;
+      }).join("");
+      itemsList.querySelectorAll(".multiselect-item").forEach((el) => {
+        el.addEventListener("click", () => {
+          const val = el.getAttribute("data-val");
+          if (selected.has(val)) selected.delete(val);
+          else selected.add(val);
+          renderDisplay();
+          renderList();
+          syncValue();
+        });
+      });
+    }
+    function open() {
+      disclosure.open();
+      overlay.style.display = "block";
+      chevron.style.transform = "rotate(180deg)";
+      filterInput.value = "";
+      filterQuery = "";
+      renderList();
+      filterInput.focus();
+    }
+    function close() {
+      disclosure.close();
+      overlay.style.display = "none";
+      chevron.style.transform = "none";
+    }
+    trigger.addEventListener("click", () => {
+      if (props.disabled) return;
+      if (disclosure.isOpen) close();
+      else open();
+    });
+    clearBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      selected.clear();
+      renderDisplay();
+      renderList();
+      syncValue();
+    });
+    selectAllChk.parentElement?.addEventListener("click", () => {
+      const filtered = getFilteredOptions();
+      const allChecked = filtered.every((o) => selected.has(o.value));
+      if (allChecked) {
+        filtered.forEach((o) => selected.delete(o.value));
+      } else {
+        filtered.forEach((o) => selected.add(o.value));
+      }
+      renderDisplay();
+      renderList();
+      syncValue();
+    });
+    filterInput.addEventListener("input", () => {
+      filterQuery = filterInput.value;
+      renderList();
+    });
+    function syncValue() {
+      if (props.targetInputName) {
+        let hidden = container.querySelector(`input[name="${props.targetInputName}"]`);
+        if (!hidden) {
+          hidden = document.createElement("input");
+          hidden.type = "hidden";
+          hidden.name = props.targetInputName;
+          container.appendChild(hidden);
+        }
+        hidden.value = JSON.stringify(Array.from(selected));
+      }
+      container.dispatchEvent(new CustomEvent("multiselect:change", {
+        bubbles: true,
+        detail: { value: Array.from(selected) }
+      }));
+    }
+    renderDisplay();
+    syncValue();
+  }
+  var init_multiselect = __esm({
+    "src/components/multiselect.ts"() {
+      "use strict";
+      init_lucide();
+      init_useDisclosure();
+      init_useClickOutside();
+    }
+  });
+
+  // src/components/cascadeselect.ts
+  var cascadeselect_exports = {};
+  __export(cascadeselect_exports, {
+    default: () => CascadeSelectIsland
+  });
+  function CascadeSelectIsland(container, props) {
+    const options = props.options || [];
+    let selectedText = "";
+    let selectedValue = null;
+    const disclosure = useDisclosure({ defaultIsOpen: false });
+    container.innerHTML = `
+        <div class="laughtale-cascadeselect" style="position: relative; width: 100%; max-width: 280px; font-family: var(--p-font-family, inherit);">
+            <!-- Trigger -->
+            <div class="cascadeselect-trigger p-input" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; cursor: ${props.disabled ? "not-allowed" : "pointer"}; background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); user-select: none;">
+                <span class="cascadeselect-label" style="font-size: 0.875rem; color: var(--p-text-color);">${props.placeholder || "Select category..."}</span>
+                <span class="cascadeselect-chevron" style="color: var(--p-surface-400); display: flex;">${LucideIcons.chevronDown(16)}</span>
+            </div>
+
+            <!-- Cascade Overlay Panes Container -->
+            <div class="cascadeselect-overlay" style="display: none; position: absolute; top: calc(100% + 4px); left: 0; z-index: 500; background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); box-shadow: var(--p-shadow-lg); min-width: 180px; display: none;">
+                <div class="cascade-level-0" style="padding: 0.25rem 0; min-width: 180px;"></div>
+            </div>
+        </div>
+    `;
+    const trigger = container.querySelector(".cascadeselect-trigger");
+    const label = container.querySelector(".cascadeselect-label");
+    const overlay = container.querySelector(".cascadeselect-overlay");
+    const level0 = container.querySelector(".cascade-level-0");
+    useClickOutside(container, () => close());
+    function renderLevel(nodes, parentContainer, path = []) {
+      parentContainer.innerHTML = nodes.map((n) => {
+        const hasChildren = n.children && n.children.length > 0;
+        return `
+                <div class="cascade-item" data-code="${n.code || n.name}" style="position: relative; display: flex; align-items: center; justify-content: space-between; padding: 0.45rem 0.75rem; cursor: pointer; font-size: 0.8125rem; color: var(--p-text-color); transition: background 0.1s ease;">
+                    <span>${n.name}</span>
+                    ${hasChildren ? `<span style="color: var(--p-surface-400); display: flex;">${LucideIcons.chevronDown(14)}</span>` : ""}
+                    ${hasChildren ? `<div class="sub-pane" style="display: none; position: absolute; top: 0; left: 100%; min-width: 180px; background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); box-shadow: var(--p-shadow-lg); padding: 0.25rem 0;"></div>` : ""}
+                </div>
+            `;
+      }).join("");
+      parentContainer.querySelectorAll(".cascade-item").forEach((itemEl, idx) => {
+        const node = nodes[idx];
+        const hasChildren = node.children && node.children.length > 0;
+        const subPane = itemEl.querySelector(".sub-pane");
+        if (hasChildren && subPane) {
+          renderLevel(node.children, subPane, [...path, node.name]);
+          itemEl.addEventListener("mouseenter", () => {
+            subPane.style.display = "block";
+          });
+          itemEl.addEventListener("mouseleave", () => {
+            subPane.style.display = "none";
+          });
+        } else {
+          itemEl.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const fullPath = [...path, node.name].join(" > ");
+            selectedText = fullPath;
+            selectedValue = node.value ?? node.code ?? node.name;
+            label.textContent = selectedText;
+            syncValue();
+            close();
+          });
+        }
+      });
+    }
+    function open() {
+      disclosure.open();
+      overlay.style.display = "flex";
+      renderLevel(options, level0);
+    }
+    function close() {
+      disclosure.close();
+      overlay.style.display = "none";
+    }
+    trigger.addEventListener("click", () => {
+      if (props.disabled) return;
+      if (disclosure.isOpen) close();
+      else open();
+    });
+    function syncValue() {
+      if (props.targetInputName && selectedValue !== null) {
+        let hidden = container.querySelector(`input[name="${props.targetInputName}"]`);
+        if (!hidden) {
+          hidden = document.createElement("input");
+          hidden.type = "hidden";
+          hidden.name = props.targetInputName;
+          container.appendChild(hidden);
+        }
+        hidden.value = String(selectedValue);
+      }
+      container.dispatchEvent(new CustomEvent("cascadeselect:change", {
+        bubbles: true,
+        detail: { value: selectedValue, label: selectedText }
+      }));
+    }
+  }
+  var init_cascadeselect = __esm({
+    "src/components/cascadeselect.ts"() {
+      "use strict";
+      init_lucide();
+      init_useDisclosure();
+      init_useClickOutside();
+    }
+  });
+
+  // src/components/listbox.ts
+  var listbox_exports = {};
+  __export(listbox_exports, {
+    default: () => ListboxIsland
+  });
+  function ListboxIsland(container, props) {
+    const options = props.options || [];
+    let selected = new Set(props.selectedValue !== void 0 ? [props.selectedValue] : []);
+    let filterQuery = "";
+    container.innerHTML = `
+        <div class="laughtale-listbox" style="width: 100%; max-width: 280px; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); background: var(--p-surface-0); overflow: hidden; font-family: var(--p-font-family, inherit);">
+            ${props.filter ? `
+                <div style="padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--p-border-color); display: flex; align-items: center; gap: 0.5rem; background: var(--p-surface-50);">
+                    <span style="color: var(--p-surface-400); display: flex;">${LucideIcons.search(14)}</span>
+                    <input type="text" class="listbox-filter-input" placeholder="Filter..." style="flex: 1; border: none; outline: none; background: transparent; font-size: 0.8125rem; color: var(--p-text-color);" />
+                </div>
+            ` : ""}
+            <div class="listbox-items-container" style="max-height: 220px; overflow-y: auto; padding: 0.25rem 0;"></div>
+        </div>
+    `;
+    const itemsContainer = container.querySelector(".listbox-items-container");
+    const filterInput = container.querySelector(".listbox-filter-input");
+    function getFiltered() {
+      if (!filterQuery.trim()) return options;
+      const q = filterQuery.toLowerCase();
+      return options.filter((o) => o.label.toLowerCase().includes(q));
+    }
+    function renderList() {
+      const filtered = getFiltered();
+      if (filtered.length === 0) {
+        itemsContainer.innerHTML = `<div style="padding: 1rem; text-align: center; font-size: 0.75rem; color: var(--p-surface-400);">No options</div>`;
+        return;
+      }
+      itemsContainer.innerHTML = filtered.map((o) => {
+        const isSelected = selected.has(o.value);
+        return `
+                <div class="listbox-item" data-val="${o.value}" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.875rem; cursor: pointer; font-size: 0.8125rem; background: ${isSelected ? "var(--p-primary-50)" : "transparent"}; color: ${isSelected ? "var(--p-primary-700)" : "var(--p-text-color)"}; font-weight: ${isSelected ? "600" : "normal"}; transition: background 0.1s ease;">
+                    <span>${o.label}</span>
+                    ${isSelected ? `<span style="color: var(--p-primary-600); display: flex;">${LucideIcons.check}</span>` : ""}
+                </div>
+            `;
+      }).join("");
+      itemsContainer.querySelectorAll(".listbox-item").forEach((el) => {
+        el.addEventListener("click", () => {
+          if (props.disabled) return;
+          const val = el.getAttribute("data-val");
+          if (props.multiple) {
+            if (selected.has(val)) selected.delete(val);
+            else selected.add(val);
+          } else {
+            selected.clear();
+            selected.add(val);
+          }
+          renderList();
+          syncValue();
+        });
+      });
+    }
+    filterInput?.addEventListener("input", () => {
+      filterQuery = filterInput.value;
+      renderList();
+    });
+    function syncValue() {
+      const arr = Array.from(selected);
+      if (props.targetInputName) {
+        let hidden = container.querySelector(`input[name="${props.targetInputName}"]`);
+        if (!hidden) {
+          hidden = document.createElement("input");
+          hidden.type = "hidden";
+          hidden.name = props.targetInputName;
+          container.appendChild(hidden);
+        }
+        hidden.value = props.multiple ? JSON.stringify(arr) : arr[0] ? String(arr[0]) : "";
+      }
+      container.dispatchEvent(new CustomEvent("listbox:change", {
+        bubbles: true,
+        detail: { value: props.multiple ? arr : arr[0] }
+      }));
+    }
+    renderList();
+    syncValue();
+  }
+  var init_listbox = __esm({
+    "src/components/listbox.ts"() {
+      "use strict";
+      init_lucide();
+    }
+  });
+
+  // src/components/picklist.ts
+  var picklist_exports = {};
+  __export(picklist_exports, {
+    default: () => PickListIsland
+  });
+  function PickListIsland(container, props) {
+    let sourceList = props.source ? [...props.source] : [
+      { id: "1", name: "Identity & Access Manager" },
+      { id: "2", name: "Audit Compliance Engine" },
+      { id: "3", name: "Rate Limiter Gateway" }
+    ];
+    let targetList = props.target ? [...props.target] : [
+      { id: "4", name: "Zero-Trust HSM Validator" }
+    ];
+    let selectedSource = /* @__PURE__ */ new Set();
+    let selectedTarget = /* @__PURE__ */ new Set();
+    function render() {
+      container.innerHTML = `
+            <div class="laughtale-picklist" style="display: flex; align-items: center; gap: 1rem; width: 100%; max-width: 680px; font-family: var(--p-font-family, inherit);">
+                <!-- Source Box -->
+                <div style="flex: 1; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); background: var(--p-surface-0); overflow: hidden; display: flex; flex-direction: column;">
+                    <div style="padding: 0.625rem 0.875rem; background: var(--p-surface-50); border-bottom: 1px solid var(--p-border-color); font-size: 0.75rem; font-weight: 700; color: var(--p-surface-600); text-transform: uppercase;">
+                        ${props.sourceHeader || "Available"} (${sourceList.length})
+                    </div>
+                    <div class="picklist-source-list" style="height: 180px; overflow-y: auto; padding: 0.25rem 0;">
+                        ${sourceList.map((it) => `
+                            <div class="picklist-item source-item ${selectedSource.has(it.id) ? "active" : ""}" data-id="${it.id}" style="padding: 0.45rem 0.75rem; cursor: pointer; font-size: 0.8125rem; background: ${selectedSource.has(it.id) ? "var(--p-primary-50)" : "transparent"}; color: ${selectedSource.has(it.id) ? "var(--p-primary-700)" : "var(--p-text-color)"}; font-weight: ${selectedSource.has(it.id) ? "600" : "normal"};">
+                                ${it.name}
+                            </div>
+                        `).join("")}
+                    </div>
+                </div>
+
+                <!-- Transfer Action Buttons -->
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <button type="button" class="btn-move-to-target p-button p-button-secondary" style="padding: 0.45rem; justify-content: center;" title="Move to Selected">
+                        ${LucideIcons.chevronRight}
+                    </button>
+                    <button type="button" class="btn-move-all-to-target p-button p-button-secondary" style="padding: 0.45rem; justify-content: center;" title="Move All to Selected">
+                        \xBB
+                    </button>
+                    <button type="button" class="btn-move-to-source p-button p-button-secondary" style="padding: 0.45rem; justify-content: center;" title="Move to Available">
+                        ${LucideIcons.chevronLeft}
+                    </button>
+                    <button type="button" class="btn-move-all-to-source p-button p-button-secondary" style="padding: 0.45rem; justify-content: center;" title="Move All to Available">
+                        \xAB
+                    </button>
+                </div>
+
+                <!-- Target Box -->
+                <div style="flex: 1; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); background: var(--p-surface-0); overflow: hidden; display: flex; flex-direction: column;">
+                    <div style="padding: 0.625rem 0.875rem; background: var(--p-surface-50); border-bottom: 1px solid var(--p-border-color); font-size: 0.75rem; font-weight: 700; color: var(--p-surface-600); text-transform: uppercase;">
+                        ${props.targetHeader || "Selected"} (${targetList.length})
+                    </div>
+                    <div class="picklist-target-list" style="height: 180px; overflow-y: auto; padding: 0.25rem 0;">
+                        ${targetList.map((it) => `
+                            <div class="picklist-item target-item ${selectedTarget.has(it.id) ? "active" : ""}" data-id="${it.id}" style="padding: 0.45rem 0.75rem; cursor: pointer; font-size: 0.8125rem; background: ${selectedTarget.has(it.id) ? "var(--p-primary-50)" : "transparent"}; color: ${selectedTarget.has(it.id) ? "var(--p-primary-700)" : "var(--p-text-color)"}; font-weight: ${selectedTarget.has(it.id) ? "600" : "normal"};">
+                                ${it.name}
+                            </div>
+                        `).join("")}
+                    </div>
+                </div>
+            </div>
+        `;
+      bindEvents();
+    }
+    function bindEvents() {
+      container.querySelectorAll(".source-item").forEach((el) => {
+        el.addEventListener("click", () => {
+          const id = el.getAttribute("data-id");
+          if (selectedSource.has(id)) selectedSource.delete(id);
+          else selectedSource.add(id);
+          render();
+        });
+      });
+      container.querySelectorAll(".target-item").forEach((el) => {
+        el.addEventListener("click", () => {
+          const id = el.getAttribute("data-id");
+          if (selectedTarget.has(id)) selectedTarget.delete(id);
+          else selectedTarget.add(id);
+          render();
+        });
+      });
+      container.querySelector(".btn-move-to-target")?.addEventListener("click", () => {
+        const moving = sourceList.filter((it) => selectedSource.has(it.id));
+        targetList.push(...moving);
+        sourceList = sourceList.filter((it) => !selectedSource.has(it.id));
+        selectedSource.clear();
+        render();
+        syncValue();
+      });
+      container.querySelector(".btn-move-all-to-target")?.addEventListener("click", () => {
+        targetList.push(...sourceList);
+        sourceList = [];
+        selectedSource.clear();
+        render();
+        syncValue();
+      });
+      container.querySelector(".btn-move-to-source")?.addEventListener("click", () => {
+        const moving = targetList.filter((it) => selectedTarget.has(it.id));
+        sourceList.push(...moving);
+        targetList = targetList.filter((it) => !selectedTarget.has(it.id));
+        selectedTarget.clear();
+        render();
+        syncValue();
+      });
+      container.querySelector(".btn-move-all-to-source")?.addEventListener("click", () => {
+        sourceList.push(...targetList);
+        targetList = [];
+        selectedTarget.clear();
+        render();
+        syncValue();
+      });
+    }
+    function syncValue() {
+      if (props.targetInputName) {
+        let hidden = container.querySelector(`input[name="${props.targetInputName}"]`);
+        if (!hidden) {
+          hidden = document.createElement("input");
+          hidden.type = "hidden";
+          hidden.name = props.targetInputName;
+          container.appendChild(hidden);
+        }
+        hidden.value = JSON.stringify(targetList);
+      }
+      container.dispatchEvent(new CustomEvent("picklist:change", {
+        bubbles: true,
+        detail: { source: sourceList, target: targetList }
+      }));
+    }
+    render();
+    syncValue();
+  }
+  var init_picklist = __esm({
+    "src/components/picklist.ts"() {
+      "use strict";
+      init_lucide();
+    }
+  });
+
+  // src/components/orderlist.ts
+  var orderlist_exports = {};
+  __export(orderlist_exports, {
+    default: () => OrderListIsland
+  });
+  function OrderListIsland(container, props) {
+    let items = props.items ? [...props.items] : [
+      { id: "1", name: "Phase 1: Zero-Trust Gateway Init", order: 0 },
+      { id: "2", name: "Phase 2: Hydrate Islands Engine", order: 1 },
+      { id: "3", name: "Phase 3: Verify Cryptographic Signatures", order: 2 },
+      { id: "4", name: "Phase 4: Telemetry Stream Pipeline", order: 3 }
+    ];
+    let selectedIndex = 0;
+    function render() {
+      container.innerHTML = `
+            <div class="laughtale-orderlist" style="display: flex; align-items: center; gap: 1rem; width: 100%; max-width: 480px; font-family: var(--p-font-family, inherit);">
+                <!-- Reorder Controls -->
+                <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                    <button type="button" class="btn-order-top p-button p-button-secondary" style="padding: 0.45rem; justify-content: center;" title="Move to Top">\u21C8</button>
+                    <button type="button" class="btn-order-up p-button p-button-secondary" style="padding: 0.45rem; justify-content: center;" title="Move Up">\u2191</button>
+                    <button type="button" class="btn-order-down p-button p-button-secondary" style="padding: 0.45rem; justify-content: center;" title="Move Down">\u2193</button>
+                    <button type="button" class="btn-order-bottom p-button p-button-secondary" style="padding: 0.45rem; justify-content: center;" title="Move to Bottom">\u21CA</button>
+                </div>
+
+                <!-- Items List Box -->
+                <div style="flex: 1; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); background: var(--p-surface-0); overflow: hidden; display: flex; flex-direction: column;">
+                    ${props.header ? `<div style="padding: 0.625rem 0.875rem; background: var(--p-surface-50); border-bottom: 1px solid var(--p-border-color); font-size: 0.75rem; font-weight: 700; color: var(--p-surface-600); text-transform: uppercase;">${props.header}</div>` : ""}
+                    <div class="orderlist-items-container" style="max-height: 220px; overflow-y: auto; padding: 0.25rem 0;">
+                        ${items.map((it, idx) => `
+                            <div class="orderlist-item ${selectedIndex === idx ? "active" : ""}" data-index="${idx}" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.875rem; cursor: pointer; font-size: 0.8125rem; background: ${selectedIndex === idx ? "var(--p-primary-50)" : "transparent"}; color: ${selectedIndex === idx ? "var(--p-primary-700)" : "var(--p-text-color)"}; font-weight: ${selectedIndex === idx ? "600" : "normal"};">
+                                <span>${it.name}</span>
+                                <span style="font-family: monospace; font-size: 0.6875rem; color: var(--p-surface-400);">#${idx + 1}</span>
+                            </div>
+                        `).join("")}
+                    </div>
+                </div>
+            </div>
+        `;
+      bindEvents();
+    }
+    function bindEvents() {
+      container.querySelectorAll(".orderlist-item").forEach((el) => {
+        el.addEventListener("click", () => {
+          selectedIndex = Number(el.getAttribute("data-index"));
+          render();
+        });
+      });
+      container.querySelector(".btn-order-top")?.addEventListener("click", () => {
+        if (selectedIndex === null || selectedIndex <= 0) return;
+        const item = items.splice(selectedIndex, 1)[0];
+        items.unshift(item);
+        selectedIndex = 0;
+        render();
+        syncValue();
+      });
+      container.querySelector(".btn-order-up")?.addEventListener("click", () => {
+        if (selectedIndex === null || selectedIndex <= 0) return;
+        const temp = items[selectedIndex];
+        items[selectedIndex] = items[selectedIndex - 1];
+        items[selectedIndex - 1] = temp;
+        selectedIndex--;
+        render();
+        syncValue();
+      });
+      container.querySelector(".btn-order-down")?.addEventListener("click", () => {
+        if (selectedIndex === null || selectedIndex >= items.length - 1) return;
+        const temp = items[selectedIndex];
+        items[selectedIndex] = items[selectedIndex + 1];
+        items[selectedIndex + 1] = temp;
+        selectedIndex++;
+        render();
+        syncValue();
+      });
+      container.querySelector(".btn-order-bottom")?.addEventListener("click", () => {
+        if (selectedIndex === null || selectedIndex >= items.length - 1) return;
+        const item = items.splice(selectedIndex, 1)[0];
+        items.push(item);
+        selectedIndex = items.length - 1;
+        render();
+        syncValue();
+      });
+    }
+    function syncValue() {
+      if (props.targetInputName) {
+        let hidden = container.querySelector(`input[name="${props.targetInputName}"]`);
+        if (!hidden) {
+          hidden = document.createElement("input");
+          hidden.type = "hidden";
+          hidden.name = props.targetInputName;
+          container.appendChild(hidden);
+        }
+        hidden.value = JSON.stringify(items);
+      }
+      container.dispatchEvent(new CustomEvent("orderlist:change", {
+        bubbles: true,
+        detail: { items }
+      }));
+    }
+    render();
+    syncValue();
+  }
+  var init_orderlist = __esm({
+    "src/components/orderlist.ts"() {
+      "use strict";
+    }
+  });
+
+  // src/components/orgchart.ts
+  var orgchart_exports = {};
+  __export(orgchart_exports, {
+    default: () => OrgChartIsland
+  });
+  function OrgChartIsland(container, props) {
+    const rootNode = props.value || {
+      key: "0",
+      label: "Chief Technology Officer",
+      title: "Executive Leadership",
+      children: [
+        {
+          key: "0_0",
+          label: "Engineering Director",
+          title: "Core Infrastructure",
+          children: [
+            { key: "0_0_0", label: "Kernel Lead", title: "Compiler & Runtime" },
+            { key: "0_0_1", label: "Security Lead", title: "Zero-Trust Protocol" }
+          ]
+        },
+        {
+          key: "0_1",
+          label: "Product Director",
+          title: "Developer Experience",
+          children: [
+            { key: "0_1_0", label: "Design System Lead", title: "Aura Theme Engine" }
+          ]
+        }
+      ]
+    };
+    function renderNode(node) {
+      const hasChildren = node.children && node.children.length > 0;
+      return `
+            <table class="orgchart-node-table" style="border-collapse: separate; border-spacing: 0; margin: 0 auto;">
+                <tr>
+                    <td colspan="${hasChildren ? node.children.length * 2 : 2}" align="center" style="padding-bottom: 1rem;">
+                        <div class="orgchart-node-card" data-key="${node.key}" style="background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 0.75rem 1rem; box-shadow: var(--p-shadow-sm); cursor: pointer; min-width: 140px; text-align: center; transition: all 0.15s ease;">
+                            <div style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-900);">${node.label}</div>
+                            ${node.title ? `<div style="font-size: 0.6875rem; color: var(--p-primary-600); font-weight: 600; margin-top: 0.15rem;">${node.title}</div>` : ""}
+                        </div>
+                    </td>
+                </tr>
+                ${hasChildren ? `
+                    <tr>
+                        <td colspan="${node.children.length * 2}" align="center">
+                            <div style="width: 1px; height: 16px; background: var(--p-border-color); margin: 0 auto;"></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        ${node.children.map((child, idx) => {
+        const isFirst = idx === 0;
+        const isLast = idx === node.children.length - 1;
+        const isOnly = node.children.length === 1;
+        return `
+                                <td align="center" style="border-top: ${isOnly ? "none" : isFirst ? "none" : "1px solid var(--p-border-color)"}; border-right: ${isOnly || isLast ? "none" : "1px solid var(--p-border-color)"}; padding: 0 0.5rem;">
+                                    <div style="width: 1px; height: 16px; background: var(--p-border-color); margin: 0 auto;"></div>
+                                    ${renderNode(child)}
+                                </td>
+                            `;
+      }).join("")}
+                    </tr>
+                ` : ""}
+            </table>
+        `;
+    }
+    container.innerHTML = `
+        <div class="laughtale-orgchart" style="width: 100%; overflow-x: auto; padding: 1.5rem; background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); font-family: var(--p-font-family, inherit);">
+            ${renderNode(rootNode)}
+        </div>
+    `;
+    container.querySelectorAll(".orgchart-node-card").forEach((el) => {
+      el.addEventListener("click", () => {
+        const key = el.getAttribute("data-key");
+        container.dispatchEvent(new CustomEvent("orgchart:select", {
+          bubbles: true,
+          detail: { key }
+        }));
+      });
+    });
+  }
+  var init_orgchart = __esm({
+    "src/components/orgchart.ts"() {
+      "use strict";
+    }
+  });
+
+  // src/components/terminal.ts
+  var terminal_exports = {};
+  __export(terminal_exports, {
+    default: () => TerminalIsland
+  });
+  function TerminalIsland(container, props) {
+    const promptPrefix = props.prompt || "admin@softmax:~$";
+    const welcome = props.welcomeMessage || 'Welcome to SoftMax.LaughTale CLI v3.0\nType "help" for available commands.';
+    const commands = {
+      "help": "Available commands: help, clear, status, date, version, info",
+      "status": "All Islands hydrated: 100% OK. System latency: 0.8ms.",
+      "version": "SoftMax.LaughTale Framework v3.0 (.NET 10 & TS)",
+      "info": "Architecture: SSR + Micro-Directives + Islands + Tailwind CSS v4",
+      "date": (/* @__PURE__ */ new Date()).toISOString(),
+      ...props.commands || {}
+    };
+    const history = [];
+    function render() {
+      container.innerHTML = `
+            <div class="laughtale-terminal" style="background: #030712; color: #38bdf8; font-family: var(--p-font-mono, monospace); font-size: 0.8125rem; border-radius: var(--p-border-radius-lg); border: 1px solid #1f2937; box-shadow: var(--p-shadow-lg); padding: 1.25rem; width: 100%; max-width: 640px; min-height: 240px; display: flex; flex-direction: column; overflow: hidden;">
+                <!-- Header Controls -->
+                <div style="display: flex; align-items: center; gap: 0.45rem; margin-bottom: 0.875rem; border-bottom: 1px solid #1f2937; padding-bottom: 0.625rem;">
+                    <span style="width: 10px; height: 10px; border-radius: 50%; background: #ef4444; display: inline-block;"></span>
+                    <span style="width: 10px; height: 10px; border-radius: 50%; background: #f59e0b; display: inline-block;"></span>
+                    <span style="width: 10px; height: 10px; border-radius: 50%; background: #10b981; display: inline-block;"></span>
+                    <span style="color: #64748b; font-size: 0.6875rem; margin-left: 0.5rem;">bash \u2014 80x24</span>
+                </div>
+
+                <!-- History Log -->
+                <div class="terminal-log" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 0.35rem;">
+                    <div style="color: #94a3b8; white-space: pre-wrap; margin-bottom: 0.5rem;">${welcome}</div>
+                    ${history.map((h) => `
+                        <div>
+                            <div style="color: #4ade80;"><span style="color: #64748b;">${promptPrefix}</span> ${h.command}</div>
+                            ${h.response ? `<div style="color: #e2e8f0; white-space: pre-wrap; margin-left: 0.5rem;">${h.response}</div>` : ""}
+                        </div>
+                    `).join("")}
+                </div>
+
+                <!-- Active Prompt Line -->
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
+                    <span style="color: #4ade80; user-select: none;">${promptPrefix}</span>
+                    <input type="text" class="terminal-input" style="flex: 1; background: transparent; border: none; outline: none; color: #f8fafc; font-family: inherit; font-size: inherit;" autofocus />
+                </div>
+            </div>
+        `;
+      const input = container.querySelector(".terminal-input");
+      const log = container.querySelector(".terminal-log");
+      log.scrollTop = log.scrollHeight;
+      input.focus();
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          const cmd = input.value.trim();
+          if (!cmd) return;
+          if (cmd === "clear") {
+            history.length = 0;
+          } else {
+            const resp = commands[cmd.toLowerCase()] || `Command not found: "${cmd}". Type "help" for a list of commands.`;
+            history.push({ command: cmd, response: resp });
+          }
+          render();
+        }
+      });
+    }
+    render();
+  }
+  var init_terminal = __esm({
+    "src/components/terminal.ts"() {
+      "use strict";
+    }
+  });
+
+  // src/components/dock.ts
+  var dock_exports = {};
+  __export(dock_exports, {
+    default: () => DockIsland
+  });
+  function DockIsland(container, props) {
+    const items = props.items || [
+      { label: "Overview", icon: "compass", url: "/" },
+      { label: "Dashboard", icon: "bar-chart", url: "/dashboard" },
+      { label: "Directives", icon: "sliders", url: "/enterprise" },
+      { label: "Docs", icon: "file-text", url: "/doc/01-getting-started" },
+      { label: "Theme Studio", icon: "palette", action: "open-studio" }
+    ];
+    container.innerHTML = `
+        <div class="laughtale-dock" style="display: inline-flex; align-items: center; gap: 0.75rem; background: rgba(255, 255, 255, 0.85); dark:bg-slate-900; backdrop-filter: blur(12px); border: 1px solid var(--p-border-color); border-radius: 9999px; padding: 0.5rem 1rem; box-shadow: var(--p-shadow-lg);">
+            ${items.map((it) => {
+      const iconSvg = LucideIcons[it.icon] || LucideIcons.terminal;
+      return `
+                    <button type="button" 
+                            class="dock-item-btn" 
+                            data-action="${it.action || ""}" 
+                            data-url="${it.url || ""}"
+                            title="${it.label}"
+                            style="width: 2.75rem; height: 2.75rem; border-radius: 9999px; border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-surface-700); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.2s ease;">
+                        ${iconSvg}
+                    </button>
+                `;
+    }).join("")}
+        </div>
+    `;
+    container.querySelectorAll(".dock-item-btn").forEach((btn) => {
+      btn.addEventListener("mouseenter", () => {
+        btn.style.transform = "scale(1.3) translateY(-4px)";
+        btn.style.boxShadow = "0 10px 15px -3px rgba(0,0,0,0.15)";
+      });
+      btn.addEventListener("mouseleave", () => {
+        btn.style.transform = "none";
+        btn.style.boxShadow = "none";
+      });
+      btn.addEventListener("click", () => {
+        const url = btn.getAttribute("data-url");
+        const action = btn.getAttribute("data-action");
+        if (url) window.location.href = url;
+        else if (action === "open-studio") document.dispatchEvent(new CustomEvent("studio:open"));
+      });
+    });
+  }
+  var init_dock = __esm({
+    "src/components/dock.ts"() {
+      "use strict";
+      init_lucide();
+    }
+  });
+
+  // src/components/galleria.ts
+  var galleria_exports = {};
+  __export(galleria_exports, {
+    default: () => GalleriaIsland
+  });
+  function GalleriaIsland(container, props) {
+    const images = props.value && props.value.length > 0 ? props.value : [
+      {
+        itemImageSrc: "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800&auto=format&fit=crop&q=80",
+        thumbnailImageSrc: "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=120&auto=format&fit=crop&q=80",
+        alt: "Aurora Spectrum Wave",
+        title: "Telemetry Cluster Spectrum"
+      },
+      {
+        itemImageSrc: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&auto=format&fit=crop&q=80",
+        thumbnailImageSrc: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=120&auto=format&fit=crop&q=80",
+        alt: "Zero-Trust Shield Gateway",
+        title: "HSM Cryptographic Core"
+      },
+      {
+        itemImageSrc: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop&q=80",
+        thumbnailImageSrc: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=120&auto=format&fit=crop&q=80",
+        alt: "Kernel Micro-Architecture",
+        title: "High-Performance Engine"
+      }
+    ];
+    let activeIndex = 0;
+    function render() {
+      const current = images[activeIndex];
+      container.innerHTML = `
+            <div class="laughtale-galleria" style="width: 100%; max-width: 640px; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); overflow: hidden; background: var(--p-surface-0); font-family: var(--p-font-family, inherit);">
+                <!-- Main Image Stage -->
+                <div style="position: relative; width: 100%; height: 320px; background: #020617; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                    <img src="${current.itemImageSrc}" alt="${current.alt}" style="width: 100%; height: 100%; object-fit: cover; transition: opacity 0.25s ease;" />
+                    
+                    <!-- Prev / Next Nav Buttons -->
+                    <button type="button" class="galleria-prev-btn" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); width: 2.25rem; height: 2.25rem; border-radius: 9999px; background: rgba(0,0,0,0.5); color: #ffffff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                        ${LucideIcons.chevronDown ? '<span style="transform: rotate(90deg); display: flex;">' + LucideIcons.chevronDown(18) + "</span>" : "\u2039"}
+                    </button>
+                    <button type="button" class="galleria-next-btn" style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); width: 2.25rem; height: 2.25rem; border-radius: 9999px; background: rgba(0,0,0,0.5); color: #ffffff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                        ${LucideIcons.chevronDown ? '<span style="transform: rotate(-90deg); display: flex;">' + LucideIcons.chevronDown(18) + "</span>" : "\u203A"}
+                    </button>
+
+                    <!-- Caption Bar -->
+                    <div style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.8)); padding: 1rem; color: #ffffff;">
+                        <div style="font-size: 0.875rem; font-weight: 700;">${current.title || current.alt}</div>
+                    </div>
+                </div>
+
+                <!-- Thumbnail Strip -->
+                <div style="display: flex; gap: 0.5rem; padding: 0.75rem; background: var(--p-surface-50); overflow-x: auto;">
+                    ${images.map((img, idx) => `
+                        <div class="galleria-thumb ${idx === activeIndex ? "active" : ""}" data-index="${idx}" style="flex: 0 0 72px; height: 48px; border-radius: 4px; overflow: hidden; border: ${idx === activeIndex ? "2px solid var(--p-primary-600)" : "2px solid transparent"}; cursor: pointer; opacity: ${idx === activeIndex ? "1" : "0.6"}; transition: all 0.15s ease;">
+                            <img src="${img.thumbnailImageSrc}" alt="${img.alt}" style="width: 100%; height: 100%; object-fit: cover;" />
+                        </div>
+                    `).join("")}
+                </div>
+            </div>
+        `;
+      bindEvents();
+    }
+    function bindEvents() {
+      container.querySelector(".galleria-prev-btn")?.addEventListener("click", () => {
+        activeIndex = (activeIndex - 1 + images.length) % images.length;
+        render();
+      });
+      container.querySelector(".galleria-next-btn")?.addEventListener("click", () => {
+        activeIndex = (activeIndex + 1) % images.length;
+        render();
+      });
+      container.querySelectorAll(".galleria-thumb").forEach((thumb) => {
+        thumb.addEventListener("click", () => {
+          activeIndex = Number(thumb.getAttribute("data-index"));
+          render();
+        });
+      });
+    }
+    render();
+  }
+  var init_galleria = __esm({
+    "src/components/galleria.ts"() {
+      "use strict";
+      init_lucide();
+    }
+  });
+
+  // src/components/blockui.ts
+  var blockui_exports = {};
+  __export(blockui_exports, {
+    default: () => BlockUIIsland
+  });
+  function BlockUIIsland(container, props) {
+    let isBlocked = props.blocked ?? true;
+    function render() {
+      container.innerHTML = `
+            <div class="laughtale-blockui-root" style="position: relative; width: 100%;">
+                <!-- Blocked Glass Overlay -->
+                <div class="blockui-mask" style="display: ${isBlocked ? "flex" : "none"}; position: absolute; inset: 0; z-index: 100; background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(3px); align-items: center; justify-content: center; border-radius: inherit;">
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.75rem; background: var(--p-surface-0); border: 1px solid var(--p-border-color); padding: 1rem 1.5rem; border-radius: var(--p-border-radius-lg); box-shadow: var(--p-shadow-md);">
+                        <svg class="animate-spin" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--p-primary-600); animation: spin 0.8s linear infinite;">
+                            <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                        </svg>
+                        <span style="font-size: 0.8125rem; font-weight: 600; color: var(--p-surface-700);">${props.message || "Processing transaction..."}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    render();
+    container.addEventListener("blockui:toggle", () => {
+      isBlocked = !isBlocked;
+      render();
+    });
+  }
+  var init_blockui = __esm({
+    "src/components/blockui.ts"() {
+      "use strict";
+    }
+  });
+
+  // src/components/split-button.ts
+  var split_button_exports = {};
+  __export(split_button_exports, {
+    default: () => SplitButtonIsland
+  });
+  function SplitButtonIsland(container, props) {
+    const label = props.label || "Save";
+    const items = props.model || [
+      { label: "Update & Sync", icon: "refresh-cw", action: "update" },
+      { label: "Export as Encrypted JSON", icon: "download", action: "export" },
+      { label: "Delete Record", icon: "trash", action: "delete" }
+    ];
+    const disclosure = useDisclosure({ defaultIsOpen: false });
+    container.innerHTML = `
+        <div class="laughtale-splitbutton" style="position: relative; display: inline-flex; border-radius: var(--p-border-radius); overflow: visible; font-family: var(--p-font-family, inherit);">
+            <!-- Primary Action Button -->
+            <button type="button" class="splitbutton-main-btn p-button p-button-primary" style="border-top-right-radius: 0; border-bottom-right-radius: 0; border-right: 1px solid rgba(255,255,255,0.2);">
+                ${label}
+            </button>
+
+            <!-- Dropdown Menu Trigger Button -->
+            <button type="button" class="splitbutton-menu-btn p-button p-button-primary" style="border-top-left-radius: 0; border-bottom-left-radius: 0; padding: 0.5rem 0.5rem; justify-content: center;">
+                <span class="splitbutton-chevron" style="display: flex;">${LucideIcons.chevronDown}</span>
+            </button>
+
+            <!-- Popover Menu -->
+            <div class="splitbutton-menu-overlay" style="display: none; position: absolute; top: calc(100% + 4px); right: 0; z-index: 500; background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); box-shadow: var(--p-shadow-lg); min-width: 180px; padding: 0.25rem 0;">
+                ${items.map((it) => `
+                    <div class="splitbutton-menu-item" data-action="${it.action || ""}" data-url="${it.url || ""}" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.875rem; cursor: pointer; font-size: 0.8125rem; color: var(--p-text-color); transition: background 0.1s ease;">
+                        <span>${it.label}</span>
+                    </div>
+                `).join("")}
+            </div>
+        </div>
+    `;
+    const mainBtn = container.querySelector(".splitbutton-main-btn");
+    const menuBtn = container.querySelector(".splitbutton-menu-btn");
+    const overlay = container.querySelector(".splitbutton-menu-overlay");
+    useClickOutside(container, () => close());
+    function open() {
+      disclosure.open();
+      overlay.style.display = "block";
+    }
+    function close() {
+      disclosure.close();
+      overlay.style.display = "none";
+    }
+    mainBtn.addEventListener("click", () => {
+      container.dispatchEvent(new CustomEvent("splitbutton:click", {
+        bubbles: true,
+        detail: { action: "main" }
+      }));
+    });
+    menuBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (disclosure.isOpen) close();
+      else open();
+    });
+    overlay.querySelectorAll(".splitbutton-menu-item").forEach((item) => {
+      item.addEventListener("click", () => {
+        const action = item.getAttribute("data-action");
+        const url = item.getAttribute("data-url");
+        if (url) window.location.href = url;
+        else {
+          container.dispatchEvent(new CustomEvent("splitbutton:item-click", {
+            bubbles: true,
+            detail: { action }
+          }));
+        }
+        close();
+      });
+    });
+  }
+  var init_split_button = __esm({
+    "src/components/split-button.ts"() {
+      "use strict";
+      init_lucide();
+      init_useDisclosure();
+      init_useClickOutside();
+    }
+  });
+
   // src/index.ts
   var index_exports = {};
   __export(index_exports, {
@@ -5748,6 +7019,7 @@ public static class AppTheme
       init_directives();
       init_lucide();
       init_composables();
+      init_models();
       defineIsland("stepper", () => Promise.resolve().then(() => (init_stepper(), stepper_exports)));
       defineIsland("timeline", () => Promise.resolve().then(() => (init_timeline(), timeline_exports)));
       defineIsland("camera", () => Promise.resolve().then(() => (init_camera(), camera_exports)));
@@ -5784,6 +7056,19 @@ public static class AppTheme
       defineIsland("inplace", () => Promise.resolve().then(() => (init_inplace(), inplace_exports)));
       defineIsland("command", () => Promise.resolve().then(() => (init_command(), command_exports)));
       defineIsland("theme-studio", () => Promise.resolve().then(() => (init_theme_studio(), theme_studio_exports)));
+      defineIsland("dynamic-form", () => Promise.resolve().then(() => (init_dynamic_form(), dynamic_form_exports)));
+      defineIsland("splitter", () => Promise.resolve().then(() => (init_splitter(), splitter_exports)));
+      defineIsland("multiselect", () => Promise.resolve().then(() => (init_multiselect(), multiselect_exports)));
+      defineIsland("cascadeselect", () => Promise.resolve().then(() => (init_cascadeselect(), cascadeselect_exports)));
+      defineIsland("listbox", () => Promise.resolve().then(() => (init_listbox(), listbox_exports)));
+      defineIsland("picklist", () => Promise.resolve().then(() => (init_picklist(), picklist_exports)));
+      defineIsland("orderlist", () => Promise.resolve().then(() => (init_orderlist(), orderlist_exports)));
+      defineIsland("orgchart", () => Promise.resolve().then(() => (init_orgchart(), orgchart_exports)));
+      defineIsland("terminal", () => Promise.resolve().then(() => (init_terminal(), terminal_exports)));
+      defineIsland("dock", () => Promise.resolve().then(() => (init_dock(), dock_exports)));
+      defineIsland("galleria", () => Promise.resolve().then(() => (init_galleria(), galleria_exports)));
+      defineIsland("blockui", () => Promise.resolve().then(() => (init_blockui(), blockui_exports)));
+      defineIsland("split-button", () => Promise.resolve().then(() => (init_split_button(), split_button_exports)));
     }
   });
   init_index();

@@ -831,3 +831,364 @@ public class IslandThemeStudioTagHelper : TagHelper
         output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
     }
 }
+
+/// <summary>
+/// TagHelper for <island-form /> / <island-dynamic-form /> (Auto-Generated Dynamic Forms from C# Objects)
+/// </summary>
+[HtmlTargetElement("island-form")]
+[HtmlTargetElement("island-dynamic-form")]
+public class IslandDynamicFormTagHelper : TagHelper
+{
+    public object? For { get; set; }
+    public string? Title { get; set; }
+    public string? SubmitUrl { get; set; }
+    public string SubmitLabel { get; set; } = "Submit";
+
+    public override void Process(TagHelperContext context, TagHelperOutput output)
+    {
+        output.TagName = "island";
+        output.Attributes.SetAttribute("name", "dynamic-form");
+        output.Attributes.SetAttribute("hydrate", "Load");
+
+        if (For != null)
+        {
+            var schema = Forms.DynamicFormSchemaGenerator.FromType(For.GetType(), For, Title, SubmitUrl);
+            var props = new
+            {
+                schema = schema
+            };
+            output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        }
+    }
+}
+
+/// <summary>
+/// TagHelper for <island-splitter />
+/// </summary>
+[HtmlTargetElement("island-splitter")]
+public class IslandSplitterTagHelper : TagHelper
+{
+    public string Layout { get; set; } = "horizontal";
+    public List<SplitterPanel>? Panels { get; set; }
+
+    public override void Process(TagHelperContext context, TagHelperOutput output)
+    {
+        output.TagName = "island";
+        output.Attributes.SetAttribute("name", "splitter");
+        output.Attributes.SetAttribute("hydrate", "Load");
+
+        var props = new
+        {
+            layout = Layout,
+            panels = Panels ?? new()
+        };
+
+        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+    }
+}
+
+/// <summary>
+/// TagHelper for <island-multiselect />
+/// </summary>
+[HtmlTargetElement("island-multiselect")]
+public class IslandMultiSelectTagHelper : TagHelper
+{
+    public List<SelectButtonItem>? Options { get; set; }
+    public List<string>? SelectedValues { get; set; }
+    public string? Placeholder { get; set; } = "Select items...";
+    public string? TargetInput { get; set; }
+    public string Display { get; set; } = "chip";
+    public bool Disabled { get; set; } = false;
+
+    public override void Process(TagHelperContext context, TagHelperOutput output)
+    {
+        output.TagName = "island";
+        output.Attributes.SetAttribute("name", "multiselect");
+        output.Attributes.SetAttribute("hydrate", "Load");
+
+        var props = new
+        {
+            options = Options ?? new(),
+            selectedValues = SelectedValues ?? new(),
+            placeholder = Placeholder,
+            targetInputName = TargetInput,
+            display = Display,
+            disabled = Disabled
+        };
+
+        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+    }
+}
+
+/// <summary>
+/// TagHelper for <island-cascadeselect />
+/// </summary>
+[HtmlTargetElement("island-cascadeselect")]
+public class IslandCascadeSelectTagHelper : TagHelper
+{
+    public List<CascadeSelectNode>? Options { get; set; }
+    public string? Placeholder { get; set; } = "Select category...";
+    public string? TargetInput { get; set; }
+    public bool Disabled { get; set; } = false;
+
+    public override void Process(TagHelperContext context, TagHelperOutput output)
+    {
+        output.TagName = "island";
+        output.Attributes.SetAttribute("name", "cascadeselect");
+        output.Attributes.SetAttribute("hydrate", "Load");
+
+        var props = new
+        {
+            options = Options ?? new(),
+            placeholder = Placeholder,
+            targetInputName = TargetInput,
+            disabled = Disabled
+        };
+
+        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+    }
+}
+
+/// <summary>
+/// TagHelper for <island-listbox />
+/// </summary>
+[HtmlTargetElement("island-listbox")]
+public class IslandListboxTagHelper : TagHelper
+{
+    public List<SelectButtonItem>? Options { get; set; }
+    public string? SelectedValue { get; set; }
+    public bool Multiple { get; set; } = false;
+    public bool Filter { get; set; } = true;
+    public string? TargetInput { get; set; }
+    public bool Disabled { get; set; } = false;
+
+    public override void Process(TagHelperContext context, TagHelperOutput output)
+    {
+        output.TagName = "island";
+        output.Attributes.SetAttribute("name", "listbox");
+        output.Attributes.SetAttribute("hydrate", "Load");
+
+        var props = new
+        {
+            options = Options ?? new(),
+            selectedValue = SelectedValue,
+            multiple = Multiple,
+            filter = Filter,
+            targetInputName = TargetInput,
+            disabled = Disabled
+        };
+
+        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+    }
+}
+
+/// <summary>
+/// TagHelper for <island-picklist />
+/// </summary>
+[HtmlTargetElement("island-picklist")]
+public class IslandPickListTagHelper : TagHelper
+{
+    public List<PickListItem>? Source { get; set; }
+    public List<PickListItem>? Target { get; set; }
+    public string SourceHeader { get; set; } = "Available";
+    public string TargetHeader { get; set; } = "Selected";
+    public string? TargetInput { get; set; }
+
+    public override void Process(TagHelperContext context, TagHelperOutput output)
+    {
+        output.TagName = "island";
+        output.Attributes.SetAttribute("name", "picklist");
+        output.Attributes.SetAttribute("hydrate", "Load");
+
+        var props = new
+        {
+            source = Source ?? new(),
+            target = Target ?? new(),
+            sourceHeader = SourceHeader,
+            targetHeader = TargetHeader,
+            targetInputName = TargetInput
+        };
+
+        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+    }
+}
+
+/// <summary>
+/// TagHelper for <island-orderlist />
+/// </summary>
+[HtmlTargetElement("island-orderlist")]
+public class IslandOrderListTagHelper : TagHelper
+{
+    public List<OrderListItem>? Items { get; set; }
+    public string? Header { get; set; }
+    public string? TargetInput { get; set; }
+
+    public override void Process(TagHelperContext context, TagHelperOutput output)
+    {
+        output.TagName = "island";
+        output.Attributes.SetAttribute("name", "orderlist");
+        output.Attributes.SetAttribute("hydrate", "Load");
+
+        var props = new
+        {
+            items = Items ?? new(),
+            header = Header,
+            targetInputName = TargetInput
+        };
+
+        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+    }
+}
+
+/// <summary>
+/// TagHelper for <island-orgchart />
+/// </summary>
+[HtmlTargetElement("island-orgchart")]
+public class IslandOrgChartTagHelper : TagHelper
+{
+    public OrgChartNode? Value { get; set; }
+
+    public override void Process(TagHelperContext context, TagHelperOutput output)
+    {
+        output.TagName = "island";
+        output.Attributes.SetAttribute("name", "orgchart");
+        output.Attributes.SetAttribute("hydrate", "Load");
+
+        if (Value != null)
+        {
+            var props = new { value = Value };
+            output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+        }
+    }
+}
+
+/// <summary>
+/// TagHelper for <island-terminal />
+/// </summary>
+[HtmlTargetElement("island-terminal")]
+public class IslandTerminalTagHelper : TagHelper
+{
+    public string? WelcomeMessage { get; set; }
+    public string Prompt { get; set; } = "admin@softmax:~$";
+    public Dictionary<string, string>? Commands { get; set; }
+
+    public override void Process(TagHelperContext context, TagHelperOutput output)
+    {
+        output.TagName = "island";
+        output.Attributes.SetAttribute("name", "terminal");
+        output.Attributes.SetAttribute("hydrate", "Load");
+
+        var props = new
+        {
+            welcomeMessage = WelcomeMessage,
+            prompt = Prompt,
+            commands = Commands ?? new()
+        };
+
+        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+    }
+}
+
+/// <summary>
+/// TagHelper for <island-dock />
+/// </summary>
+[HtmlTargetElement("island-dock")]
+public class IslandDockTagHelper : TagHelper
+{
+    public List<DockItem>? Items { get; set; }
+    public string Position { get; set; } = "bottom";
+
+    public override void Process(TagHelperContext context, TagHelperOutput output)
+    {
+        output.TagName = "island";
+        output.Attributes.SetAttribute("name", "dock");
+        output.Attributes.SetAttribute("hydrate", "Load");
+
+        var props = new
+        {
+            items = Items ?? new(),
+            position = Position
+        };
+
+        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+    }
+}
+
+/// <summary>
+/// TagHelper for <island-galleria />
+/// </summary>
+[HtmlTargetElement("island-galleria")]
+public class IslandGalleriaTagHelper : TagHelper
+{
+    public List<GalleriaItem>? Value { get; set; }
+    public bool AutoPlay { get; set; } = false;
+
+    public override void Process(TagHelperContext context, TagHelperOutput output)
+    {
+        output.TagName = "island";
+        output.Attributes.SetAttribute("name", "galleria");
+        output.Attributes.SetAttribute("hydrate", "Load");
+
+        var props = new
+        {
+            value = Value ?? new(),
+            autoPlay = AutoPlay
+        };
+
+        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+    }
+}
+
+/// <summary>
+/// TagHelper for <island-blockui />
+/// </summary>
+[HtmlTargetElement("island-blockui")]
+public class IslandBlockUITagHelper : TagHelper
+{
+    public bool Blocked { get; set; } = true;
+    public string? Message { get; set; } = "Processing...";
+
+    public override void Process(TagHelperContext context, TagHelperOutput output)
+    {
+        output.TagName = "island";
+        output.Attributes.SetAttribute("name", "blockui");
+        output.Attributes.SetAttribute("hydrate", "Load");
+
+        var props = new
+        {
+            blocked = Blocked,
+            message = Message
+        };
+
+        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+    }
+}
+
+/// <summary>
+/// TagHelper for <island-split-button />
+/// </summary>
+[HtmlTargetElement("island-split-button")]
+public class IslandSplitButtonTagHelper : TagHelper
+{
+    public string Label { get; set; } = "Save";
+    public string? Icon { get; set; }
+    public List<SplitButtonItem>? Model { get; set; }
+    public bool Disabled { get; set; } = false;
+
+    public override void Process(TagHelperContext context, TagHelperOutput output)
+    {
+        output.TagName = "island";
+        output.Attributes.SetAttribute("name", "split-button");
+        output.Attributes.SetAttribute("hydrate", "Load");
+
+        var props = new
+        {
+            label = Label,
+            icon = Icon,
+            model = Model ?? new(),
+            disabled = Disabled
+        };
+
+        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+    }
+}

@@ -8,7 +8,8 @@ esbuild.buildSync({
         'tests/directives.test.ts',
         'tests/components.test.ts',
         'tests/composables.test.ts',
-        'tests/security.test.ts'
+        'tests/security.test.ts',
+        'tests/new-components.test.ts'
     ],
     bundle: true,
     outdir: 'dist/tests',
@@ -24,7 +25,8 @@ const result = spawnSync('node', [
     'dist/tests/directives.test.js',
     'dist/tests/components.test.js',
     'dist/tests/composables.test.js',
-    'dist/tests/security.test.js'
+    'dist/tests/security.test.js',
+    'dist/tests/new-components.test.js'
 ], {
     stdio: 'inherit',
     shell: true

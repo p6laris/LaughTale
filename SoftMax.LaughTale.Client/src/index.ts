@@ -61,6 +61,20 @@ defineIsland('scroll-top', () => import('./components/scroll-top'));
 defineIsland('inplace', () => import('./components/inplace'));
 defineIsland('command', () => import('./components/command'));
 defineIsland('theme-studio', () => import('./components/theme-studio'));
+defineIsland('dynamic-form', () => import('./components/dynamic-form'));
+defineIsland('splitter', () => import('./components/splitter'));
+defineIsland('multiselect', () => import('./components/multiselect'));
+defineIsland('cascadeselect', () => import('./components/cascadeselect'));
+defineIsland('listbox', () => import('./components/listbox'));
+defineIsland('picklist', () => import('./components/picklist'));
+defineIsland('orderlist', () => import('./components/orderlist'));
+defineIsland('orgchart', () => import('./components/orgchart'));
+defineIsland('terminal', () => import('./components/terminal'));
+defineIsland('dock', () => import('./components/dock'));
+defineIsland('galleria', () => import('./components/galleria'));
+defineIsland('blockui', () => import('./components/blockui'));
+defineIsland('split-button', () => import('./components/split-button'));
 
-// Export Headless Composables & Animation Primitives
+// Export Headless Composables, Animations & Strongly-Typed Models
 export * from './composables/index';
+export * from './types/models';
