@@ -11,6 +11,17 @@ The `<island-speed-dial />` TagHelper provides a Floating Action Button (FAB) th
 
 ---
 
+## 🎮 Interactive Live Demo
+
+<div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); padding: 1.5rem; margin: 1.5rem 0; min-height: 180px; display: flex; align-items: flex-end;">
+    <div>
+        <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-primary-600); text-transform: uppercase; margin-bottom: 0.5rem;">Live SpeedDial (Click + to open actions)</div>
+        <island name="speed-dial" props-json='{"direction": "up", "actions": [{"label": "Sync Cluster", "action": "sync"}, {"label": "Export Logs", "action": "export"}, {"label": "Backup", "action": "backup"}]}' hydrate="Load"></island>
+    </div>
+</div>
+
+---
+
 ## 🚀 Basic Usage
 
 ```razor

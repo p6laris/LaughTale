@@ -11,6 +11,15 @@ The `<island-chips />` TagHelper provides a tag management input that turns ente
 
 ---
 
+## 🎮 Interactive Live Demo
+
+<div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); padding: 1.5rem; margin: 1.5rem 0;">
+    <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-primary-600); text-transform: uppercase; margin-bottom: 0.5rem;">Live Tag Manager (Type and press Enter)</div>
+    <island name="chips" props-json='{"values": ["OAuth2", "mTLS", "FIDO2"], "placeholder": "Add tag and press Enter..."}' hydrate="Load"></island>
+</div>
+
+---
+
 ## 🚀 Basic Usage
 
 ```razor

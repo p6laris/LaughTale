@@ -11,6 +11,15 @@ The `<island-datepicker />` TagHelper renders a calendar picker with an animated
 
 ---
 
+## 🎮 Interactive Live Demo
+
+<div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); padding: 1.5rem; margin: 1.5rem 0;">
+    <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-primary-600); text-transform: uppercase; margin-bottom: 0.5rem;">Live Calendar Dropdown (Click to Pick Date)</div>
+    <island name="datepicker" props-json='{"placeholder": "Select deployment date..."}' hydrate="Load"></island>
+</div>
+
+---
+
 ## 🚀 Basic Usage
 
 ```razor

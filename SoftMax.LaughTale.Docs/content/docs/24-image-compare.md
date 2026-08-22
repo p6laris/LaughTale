@@ -11,6 +11,15 @@ The `<island-image-compare />` TagHelper provides a before/after split slider al
 
 ---
 
+## 🎮 Interactive Live Demo
+
+<div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); padding: 1.5rem; margin: 1.5rem 0;">
+    <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-primary-600); text-transform: uppercase; margin-bottom: 0.75rem;">Live Image Compare (Drag handle left/right)</div>
+    <island name="image-compare" props-json='{"beforeImage": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=340&fit=crop", "afterImage": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&h=340&fit=crop", "beforeLabel": "Raw Snapshot", "afterLabel": "Enhanced HD"}' hydrate="Load"></island>
+</div>
+
+---
+
 ## 🚀 Basic Usage
 
 ```razor

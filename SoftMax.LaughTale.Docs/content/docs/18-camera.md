@@ -11,6 +11,15 @@ The `<island-camera />` TagHelper provides a camera interface with live video pr
 
 ---
 
+## 🎮 Interactive Live Demo
+
+<div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); padding: 1.5rem; margin: 1.5rem 0;">
+    <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-primary-600); text-transform: uppercase; margin-bottom: 0.75rem;">Live Hardware Camera (Click Start Camera to test webcam)</div>
+    <island name="camera" props-json='{"title": "Facial Identity Verification", "showFaceGuide": true, "width": 480, "height": 360}' hydrate="Load"></island>
+</div>
+
+---
+
 ## 🚀 Basic Usage
 
 ```razor

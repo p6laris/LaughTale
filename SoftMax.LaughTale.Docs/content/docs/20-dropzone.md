@@ -11,6 +11,15 @@ The `<island-dropzone />` TagHelper provides a drag-and-drop file upload contain
 
 ---
 
+## 🎮 Interactive Live Demo
+
+<div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); padding: 1.5rem; margin: 1.5rem 0;">
+    <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-primary-600); text-transform: uppercase; margin-bottom: 0.75rem;">Live File Vault Dropzone (Drag files or click to browse)</div>
+    <island name="dropzone" props-json='{"name": "SecurityDocs", "maxSizeMb": 15, "allowedExtensions": [".pdf", ".png", ".jpg"]}' hydrate="Load"></island>
+</div>
+
+---
+
 ## 🚀 Basic Usage
 
 ```razor

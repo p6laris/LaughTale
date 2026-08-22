@@ -11,6 +11,19 @@ The `<island-switch />` TagHelper provides a toggle switch with spring physics, 
 
 ---
 
+## 🎮 Interactive Live Demo
+
+<div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); padding: 1.5rem; margin: 1.5rem 0; display: flex; flex-direction: column; gap: 1rem;">
+    <div>
+        <island name="toggle-switch" props-json='{"label": "Enable Two-Factor Authentication", "checked": true}' hydrate="Load"></island>
+    </div>
+    <div>
+        <island name="toggle-switch" props-json='{"label": "Enforce mTLS Gateway Proxy", "checked": false}' hydrate="Load"></island>
+    </div>
+</div>
+
+---
+
 ## 🚀 Basic Usage
 
 ```razor

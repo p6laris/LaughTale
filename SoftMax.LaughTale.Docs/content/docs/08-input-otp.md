@@ -11,6 +11,21 @@ The `<island-otp />` TagHelper provides a PIN/OTP code input consisting of indiv
 
 ---
 
+## 🎮 Interactive Live Demo
+
+<div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); padding: 1.5rem; margin: 1.5rem 0; display: flex; flex-direction: column; gap: 1.25rem;">
+    <div>
+        <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-primary-600); text-transform: uppercase; margin-bottom: 0.5rem;">6-Digit Verification Code (Type or Paste digits)</div>
+        <island name="input-otp" props-json='{"length": 6}' hydrate="Load"></island>
+    </div>
+    <div>
+        <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-primary-600); text-transform: uppercase; margin-bottom: 0.5rem;">4-Digit Masked Security PIN</div>
+        <island name="input-otp" props-json='{"length": 4, "mask": true}' hydrate="Load"></island>
+    </div>
+</div>
+
+---
+
 ## 🚀 Basic Usage
 
 ```razor
@@ -31,15 +46,3 @@ The `<island-otp />` TagHelper provides a PIN/OTP code input consisting of indiv
 | `mask` | `bool` | `false` | When true, renders boxes as masked password inputs. |
 | `target-input` | `string?` | `null` | Name of the hidden input receiving the full concatenated string. |
 | `disabled` | `bool` | `false` | Disables user interaction. |
-
----
-
-## ⚡ Client Events
-
-Listen to OTP completion events in JavaScript or with `l-on`:
-
-```html
-<div l-on:otp:change="if ($event.detail.isComplete) console.log('Code entered:', $event.detail.value)">
-    <island-otp length="6" target-input="Code" hydrate="Load" />
-</div>
-```

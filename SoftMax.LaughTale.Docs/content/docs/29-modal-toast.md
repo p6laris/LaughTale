@@ -11,6 +11,23 @@ The `<island-modal />` and `<island-toast />` TagHelpers provide animated dialog
 
 ---
 
+## 🎮 Interactive Live Demo
+
+<island-toast />
+
+<div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); padding: 1.5rem; margin: 1.5rem 0; display: flex; flex-direction: column; gap: 1rem;">
+    <div>
+        <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-primary-600); text-transform: uppercase; margin-bottom: 0.5rem;">Live Toast Dispatcher (Click to trigger notification)</div>
+        <button type="button" 
+                l-on:click="$emit('toast', { title: 'HSM Signature Created', description: 'Transaction cryptographically sealed.', severity: 'success' })" 
+                class="p-button p-button-primary">
+            Trigger Live Toast Notification 🔔
+        </button>
+    </div>
+</div>
+
+---
+
 ## 🪟 1. Modal Dialog (`<island-modal />`)
 
 ```razor

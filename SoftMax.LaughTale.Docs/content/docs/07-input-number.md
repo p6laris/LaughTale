@@ -11,6 +11,21 @@ The `<island-number />` and `<island-currency />` TagHelpers render formatted nu
 
 ---
 
+## 🎮 Interactive Live Demo
+
+<div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); padding: 1.5rem; margin: 1.5rem 0; display: flex; flex-direction: column; gap: 1.25rem;">
+    <div>
+        <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-primary-600); text-transform: uppercase; margin-bottom: 0.5rem;">Live Currency Input ($ USD)</div>
+        <island name="input-number" props-json='{"value": 2450.50, "currency": "USD", "mode": "currency", "showButtons": true}' hydrate="Load"></island>
+    </div>
+    <div>
+        <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-primary-600); text-transform: uppercase; margin-bottom: 0.5rem;">Live Percentage Input (%)</div>
+        <island name="input-number" props-json='{"value": 45, "mode": "percent", "min": 0, "max": 100, "step": 5, "showButtons": true}' hydrate="Load"></island>
+    </div>
+</div>
+
+---
+
 ## 💵 Currency Formatting
 
 ```razor

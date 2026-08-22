@@ -11,6 +11,14 @@ The `<island-meter-group />` TagHelper renders a multi-segment progress bar with
 
 ---
 
+## 🎮 Interactive Live Demo
+
+<div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); padding: 1.5rem; margin: 1.5rem 0;">
+    <island name="meter-group" props-json='{"title": "Cluster NVMe Pool Allocation (2.4 TB)", "showLabels": true, "values": [{"label": "OS Kernel", "value": 35, "color": "#10b981"}, {"label": "Database", "value": 30, "color": "#3b82f6"}, {"label": "Encrypted Logs", "value": 20, "color": "#f59e0b"}, {"label": "Available Free", "value": 15, "color": "#94a3b8"}]}' hydrate="Load"></island>
+</div>
+
+---
+
 ## 🚀 Basic Usage
 
 ```razor
