@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SoftMax.LaughTale Docs</title>
+    <link rel="stylesheet" href="~/css/docs.css" />
+</head>
+<body>
+    
+    <!-- Top Docs Navbar -->
+    <header class="docs-navbar">
+        <div class="docs-navbar-inner">
+            <div style="display: flex; align-items: center; gap: 2rem;">
+                <a href="/" class="brand-group">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" style="color: var(--p-primary-600); flex-shrink: 0;">
+                        <path fill="currentColor" d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2S2 6.477 2 12s4.477 10 10 10" opacity=".5"/>
+                        <path fill="currentColor" d="M10.93 7.565a.75.75 0 1 0-.986-1.13l-3.437 3A.75.75 0 0 0 7 10.75h10a.75.75 0 0 0 0-1.5H9zM7 14.75h8l-1.93 1.685a.75.75 0 0 0 .986 1.13l3.437-3A.75.75 0 0 0 17 13.25H7a.75.75 0 0 0 0 1.5"/>
+                    </svg>
+                    <div>
+                        <span class="brand-title">SoftMax.LaughTale</span>
+                        <span class="aura-tag tag-slate" style="margin-left: 0.5rem; font-size: 0.6875rem;">Docs v3.0</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Persistent Telemetry Island across View Transitions -->
+            <div>
+                <island name="persistent-telemetry" 
+                        props="@(new SystemTelemetryProps("Docs Gateway", 3))" 
+                        persist="docs-telemetry" 
+                        hydrate="Load" />
+            </div>
+        </div>
+    </header>
+
+    <!-- Main 3-Column Docs Layout -->
+    <div class="docs-layout">
+        
+        <!-- Left Sidebar Navigation -->
+        <aside class="docs-sidebar">
+            <div class="nav-section-title">Getting Started</div>
+            <a href="/doc/01-getting-started" class="sidebar-link">Quickstart &amp; Setup</a>
+            <a href="/doc/02-hydration-strategies" class="sidebar-link">Hydration Strategies</a>
+
+            <div class="nav-section-title">Architecture</div>
+            <a href="/doc/03-view-transitions" class="sidebar-link">View Transitions</a>
+            <a href="/doc/04-slots-and-projection" class="sidebar-link">Server Slot Projection</a>
+
+            <div class="nav-section-title">Content &amp; Markdown</div>
+            <a href="/doc/05-content-collections" class="sidebar-link">Content Collections</a>
+        </aside>
+
+        <!-- Center Markdown Content Body -->
+        <main class="docs-main">
+            @RenderBody()
+        </main>
+
+        <!-- Right Sticky Table of Contents (TOC) -->
+        <aside class="docs-toc">
+            @await RenderSectionAsync("Toc", required: false)
+        </aside>
+
+    </div>
+
+    <!-- Client Islands Engine Bundle -->
+    <script type="module" src="~/js/main.js"></script>
+</body>
+</html>
