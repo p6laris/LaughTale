@@ -15,9 +15,9 @@ This document serves as the master tracking board for the step-driven evolution 
 | **Phase 5** | **Preact / React Multi-Framework Adapter** | 🟢 Completed | [Spec 5](#spec-5-multi-framework-adapters) |
 | **Phase 6** | **Markdig Markdown & Content Collections** | 🟢 Completed | [Spec 6](#spec-6-markdig-markdown--content-collections) |
 | **Phase 7** | **Dedicated Documentation Portal (`SoftMax.LaughTale.Docs`)** | 🟢 Completed | [Spec 7](#spec-7-dedicated-docs-portal) |
-| **Phase 8** | **Rich Declarative Directives Engine (`l-*`)** | 🟡 In Progress | [Spec 8](#spec-8-rich-declarative-directives-engine) |
-| **Phase 9** | **Real Enterprise Components Library (`SoftMax.LaughTale.Components`)** | ⚪ Pending | [Spec 9](#spec-9-real-enterprise-components-library) |
-| **Phase 10**| **Interactive Docs & Showcase for Enterprise Components** | ⚪ Pending | [Spec 10](#spec-10-docs--showcase-integration) |
+| **Phase 8** | **Rich Declarative Directives Engine (`l-*`)** | 🟢 Completed | [Spec 8](#spec-8-rich-declarative-directives-engine) |
+| **Phase 9** | **Real Enterprise Components Library (`SoftMax.LaughTale.Components`)** | 🟢 Completed | [Spec 9](#spec-9-real-enterprise-components-library) |
+| **Phase 10**| **Interactive Docs & Showcase for Enterprise Components** | 🟢 Completed | [Spec 10](#spec-10-docs--showcase-integration) |
 
 ---
 
@@ -25,11 +25,11 @@ This document serves as the master tracking board for the step-driven evolution 
 
 ### Spec 8: Rich Declarative Directives Engine (`l-*`)
 * **Goal**: Enable full client-side reactivity and server fragment swapping directly inside C# Razor HTML without creating separate `.ts` or `.js` files.
-* **Directives to Implement**:
+* **Directives Implemented**:
   - `l-state`: Initializes local reactive state scope using JavaScript `Proxy`.
   - `l-bind`: Binds inner text or attributes to dynamic expressions.
   - `l-model`: Two-way data binding for `<input>`, `<select>`, `<textarea>`.
-  - `l-on:event`: Event listeners (`click`, `input`, `change`, `keydown`, `submit`).
+  - `l-on:event`: Event listeners (`click`, `input`, `change`, `keydown.enter`, `submit.prevent`).
   - `l-show` / `l-hide`: Toggles display visibility based on boolean expressions.
   - `l-class`: Dynamic class toggling based on object conditions `l-class='{"active": isActive}'`.
   - `l-style`: Dynamic inline style bindings.
@@ -41,6 +41,7 @@ This document serves as the master tracking board for the step-driven evolution 
   - `l-copy` / `l-feedback`: Clipboard copy utility with temporary feedback text.
   - `l-emit` / `l-listen`: Inter-directive event bus.
   - `LaughTaleDirectiveTagHelper.cs`: C# Razor TagHelper providing IDE Intellisense and validation in Visual Studio / Rider.
+* **Status**: ✅ Verified (`SoftMax.LaughTale.Client/src/directives/`, `LaughTaleDirectiveTagHelper.cs`)
 
 ---
 
@@ -54,9 +55,12 @@ This document serves as the master tracking board for the step-driven evolution 
   - `<island-datagrid ... />`: Filterable data table with multi-column sorting and pagination.
   - `<island-modal ... />`: Animated server-slot dialog with backdrop blur and ESC dismiss.
   - `<island-toast ... />`: Toast notifications container and dispatcher.
-  - `<island-tabs />` & `<island-accordion />`: Accessible tab and accordion components.
+* **Status**: ✅ Verified (`SoftMax.LaughTale.Components`)
 
 ---
 
 ### Spec 10: Docs & Showcase Integration
-* **Goal**: Update `SoftMax.LaughTale.Docs` (`http://localhost:5001`) and `SoftMax.LaughTale.Showcase` (`http://localhost:5000`) with live demos of all enterprise components (Camera, Stepper, Timeline, Dropzone, TreeSelect, DataGrid).
+* **Goal**: Live testing and interactive documentation across both web portals:
+  - `SoftMax.LaughTale.Docs` (`http://localhost:5001`): New guides in `06-declarative-directives.md` and `07-enterprise-components.md`.
+  - `SoftMax.LaughTale.Showcase` (`http://localhost:5000`): Live interactive `/enterprise` page.
+* **Status**: ✅ Verified & Running live
