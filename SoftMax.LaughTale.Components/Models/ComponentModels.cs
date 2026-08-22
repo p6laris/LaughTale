@@ -241,3 +241,31 @@ public record SplitButtonItem(
     ButtonSeverity Severity = ButtonSeverity.Primary,
     bool Disabled = false
 );
+
+// ─── Aura v2: New Component Models ─────────────────────────────────────
+
+public record MenuItem(
+    string Label,
+    string? Icon = null,
+    bool Separator = false,
+    bool Disabled = false,
+    string? Url = null,
+    string? Action = null,
+    List<MenuItem>? Items = null
+);
+
+public record CarouselItem(
+    string? Image = null,
+    string? Title = null,
+    string? Description = null,
+    string? Url = null
+);
+
+public record SidebarItem(
+    string Label,
+    string? Icon = null,
+    string? Url = null,
+    bool Active = false,
+    List<SidebarItem>? Items = null,
+    string? Badge = null
+);
