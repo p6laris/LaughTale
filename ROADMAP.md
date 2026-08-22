@@ -4,7 +4,7 @@ This document serves as the master tracking board for the step-driven evolution 
 
 ---
 
-## 📊 Milestone Tracker
+## 📊 Milestone Tracker (Branch: `comp`)
 
 | Phase | Feature / Component | Status | Spec Reference |
 |---|---|---|---|
@@ -15,63 +15,49 @@ This document serves as the master tracking board for the step-driven evolution 
 | **Phase 5** | **Preact / React Multi-Framework Adapter** | 🟢 Completed | [Spec 5](#spec-5-multi-framework-adapters) |
 | **Phase 6** | **Markdig Markdown & Content Collections** | 🟢 Completed | [Spec 6](#spec-6-markdig-markdown--content-collections) |
 | **Phase 7** | **Dedicated Documentation Portal (`SoftMax.LaughTale.Docs`)** | 🟢 Completed | [Spec 7](#spec-7-dedicated-docs-portal) |
+| **Phase 8** | **Rich Declarative Directives Engine (`l-*`)** | 🟡 In Progress | [Spec 8](#spec-8-rich-declarative-directives-engine) |
+| **Phase 9** | **Batteries-Included Headless Components (`SoftMax.LaughTale.Components`)** | ⚪ Pending | [Spec 9](#spec-9-batteries-included-headless-components) |
+| **Phase 10**| **Docs & Showcase Integration for Zero-JS Directives** | ⚪ Pending | [Spec 10](#spec-10-docs--showcase-integration) |
 
 ---
 
 ## 📝 Detailed Specifications
 
-### Spec 1: Multi-Type Prop Revival Engine
-* **Goal**: Seamlessly pass rich C# types (`DateTime`, `DateOnly`, `Guid`, `byte[]`, `Dictionary`, `HashSet`, `BigInteger`) to TypeScript islands without type loss or manual JSON serialization hacks.
-* **Server**: `IslandJson.cs` encodes properties with numeric discriminators (`0: Object, 1: Array, 2: RegExp, 3: Date, 4: Map, 5: Set, 6: BigInt, 7: URL, 8: Uint8Array`).
-* **Client**: `reviver.ts` parses and reconstructs native JavaScript objects (`Date`, `Uint8Array`, `Map`, `Set`).
-* **Status**: ✅ Verified (`reviver.ts`, `IslandJson.cs`)
+### Spec 8: Rich Declarative Directives Engine (`l-*`)
+* **Goal**: Enable full client-side reactivity and server fragment swapping directly inside C# Razor HTML without creating separate `.ts` or `.js` files.
+* **Directives to Implement**:
+  - `l-state`: Initializes local reactive state scope using JavaScript `Proxy`.
+  - `l-bind`: Binds inner text or attributes to dynamic expressions.
+  - `l-model`: Two-way data binding for `<input>`, `<select>`, `<textarea>`.
+  - `l-on:event`: Event listeners (`click`, `input`, `change`, `keydown`, `submit`).
+  - `l-show` / `l-hide`: Toggles display visibility based on boolean expressions.
+  - `l-class`: Dynamic class toggling based on object conditions `l-class='{"active": isActive}'`.
+  - `l-style`: Dynamic inline style bindings.
+  - `l-get` / `l-post` / `l-put` / `l-delete`: HTMX-style server fragment fetcher.
+  - `l-target` / `l-swap`: Targets DOM element and specifies swap mode (`innerHTML`, `outerHTML`, `beforeend`, etc.).
+  - `l-trigger`: Custom event triggers with modifiers (`delay:300ms`, `throttle:500ms`, `changed`).
+  - `l-indicator`: Shows/hides loading spinner elements during background HTTP fetches.
+  - `l-mask`: Pattern-based input masking (`(999) 999-9999`, `9999-99-99`).
+  - `l-copy` / `l-feedback`: Clipboard copy utility with temporary feedback text.
+  - `l-emit` / `l-listen`: Inter-directive event bus.
+  - `LaughTaleDirectiveTagHelper.cs`: C# Razor TagHelper providing IDE Intellisense and validation in Visual Studio / Rider.
 
 ---
 
-### Spec 2: Network Resilience with Query Retry
-* **Goal**: Prevent permanent island mount failures on mobile devices caused by transient network drops during dynamic script imports.
-* **Client**: `retry.ts` exports `importWithRetry(url, maxRetries = 3)` with exponential backoff and query timestamp cache-busters (`?island-retry=${timestamp}`).
-* **Status**: ✅ Verified (`retry.ts`, `hydrator.ts`)
+### Spec 9: Batteries-Included Headless & Enterprise Components
+* **Goal**: A dedicated library `SoftMax.LaughTale.Components` providing pre-built, production-ready Razor TagHelpers so developers never write client scripts for common enterprise UI.
+* **Components**:
+  - `<IslandCounter />`: Numeric stepper with min/max/step controls.
+  - `<IslandModal />` / `<IslandDialog />`: Headless dialog with backdrop and C# server slot projection.
+  - `<IslandDropdown />`: Headless dropdown with outside-click dismissal.
+  - `<IslandTree />`: Hierarchical department/location tree with search and selection.
+  - `<IslandDropzone />`: File drag & drop with MIME verification, size limits, and instant preview.
+  - `<IslandTabs />` / `<IslandTabPanel />`: Tab switching container.
+  - `<IslandAccordion />` / `<IslandAccordionItem />`: Expandable accordion container.
+  - `<IslandToast />`: Toast notification dispatcher and floating container.
+  - `<IslandDataGrid />`: High-performance data table with sorting and pagination.
 
 ---
 
-### Spec 3: Child-Targeted Viewport Observer
-* **Goal**: Support `display: contents` on island root elements without breaking `IntersectionObserver` viewport detection.
-* **Client**: `visible.ts` attaches observer to all `container.children` rather than only the container wrapper.
-* **Status**: ✅ Verified (`hydrator.ts:hydrateVisible`)
-
----
-
-### Spec 4: HTML Streaming SSR Support
-* **Goal**: Ensure islands with projected server slots never attempt client hydration while ASP.NET Core is still streaming HTML chunks over HTTP.
-* **Server**: Emits trailing comment marker `<!--island:end:id-->`.
-* **Client**: Uses `MutationObserver` to delay hydration until the end marker is encountered in the DOM.
-* **Status**: ✅ Verified (`streaming.ts`, `Island.razor`, `IslandTagHelper.cs`)
-
----
-
-### Spec 5: Multi-Framework Adapters (Preact / React & Vue)
-* **Goal**: Enable developers to write islands in Preact/React JSX or Vue alongside Vanilla TypeScript.
-* **Client**: `src/adapters/preact.ts` (3 KB Preact adapter supporting JSX and hooks) and `src/adapters/vanilla.ts`.
-* **Roslyn Generator & Tags**: Supported `Framework="Preact"` in TagHelpers and Razor components.
-* **Status**: ✅ Verified (`preact.ts`, `vanilla.ts`, `IslandFramework.cs`)
-
----
-
-### Spec 6: Markdig Markdown & Content Collections (`SoftMax.LaughTale.Markdown`)
-* **Goal**: Astro-style content collections and Markdown processing with embedded live islands in .NET.
-* **Architecture**:
-  - `IslandMarkdownPipeline`: Markdig pipeline with YAML frontmatter, auto-heading slugs, code highlighting, and island tag preservation.
-  - `ContentCollection<TMetadata>`: Type-safe repository reading `.md` files into strongly-typed C# records.
-  - `TableOfContents`: Extracted heading tree `{ Level, Slug, Text }`.
-* **Status**: ✅ Verified (`SoftMax.LaughTale.Markdown`)
-
----
-
-### Spec 7: Dedicated Docs Portal (`SoftMax.LaughTale.Docs`)
-* **Goal**: An official enterprise documentation portal web app for SoftMax.LaughTale built entirely on `SoftMax.LaughTale.Markdown`.
-* **Architecture**:
-  - New ASP.NET Core project in solution: `SoftMax.LaughTale.Docs/`.
-  - Documentation pages (`content/docs/*.md`): Getting Started, Hydration Strategies, View Transitions, Server Slots, Content Collections.
-  - PrimeVue Aura theme with sticky TOC sidebar, dark mode support, and live embedded islands in the docs.
-* **Status**: ✅ Verified & Running live on `http://localhost:5001`
+### Spec 10: Docs & Showcase Integration
+* **Goal**: Update `SoftMax.LaughTale.Docs` and `SoftMax.LaughTale.Showcase` with live interactive examples of all Declarative Directives and Headless Components.
