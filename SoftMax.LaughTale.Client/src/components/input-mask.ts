@@ -106,7 +106,9 @@ export default function InputMaskIsland(container: HTMLElement, props: InputMask
             const unmasked = Array.from(val).join('');
             
             currentValue = format(unmasked);
-            input.value = currentValue;
+            if (input.value !== currentValue) {
+                input.value = currentValue;
+            }
             
             // Advance cursor to first slot char
             const firstSlot = currentValue.indexOf(slotChar);

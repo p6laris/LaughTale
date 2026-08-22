@@ -1483,6 +1483,24 @@ var SoftMaxIslands = (() => {
     }
   });
 
+  // src/directives/csp.ts
+  function getCspNonce() {
+    if (typeof document === "undefined") return null;
+    const meta = document.querySelector('meta[name="csp-nonce"]');
+    return meta ? meta.content : null;
+  }
+  function applyNonceToStyle(style) {
+    const nonce = getCspNonce();
+    if (nonce) {
+      style.setAttribute("nonce", nonce);
+    }
+  }
+  var init_csp = __esm({
+    "src/directives/csp.ts"() {
+      "use strict";
+    }
+  });
+
   // src/runtime/styles.ts
   function injectIslandStyle(islandName, css) {
     if (injectedStyles.has(islandName) || typeof document === "undefined") {
@@ -1492,12 +1510,22 @@ var SoftMaxIslands = (() => {
     const styleEl = document.createElement("style");
     styleEl.setAttribute("data-island-style", islandName);
     styleEl.textContent = css;
+    applyNonceToStyle(styleEl);
     document.head.appendChild(styleEl);
+  }
+  function removeIslandStyle(islandName) {
+    if (typeof document === "undefined") return;
+    const existing = document.querySelector(`style[data-island-style="${islandName}"]`);
+    if (existing) {
+      existing.remove();
+      injectedStyles.delete(islandName);
+    }
   }
   var injectedStyles;
   var init_styles = __esm({
     "src/runtime/styles.ts"() {
       "use strict";
+      init_csp();
       injectedStyles = /* @__PURE__ */ new Set();
     }
   });
@@ -7498,6 +7526,7 @@ ${h.response}`).join("\n");
     injectIslandStyle: () => injectIslandStyle,
     navigateTo: () => navigateTo,
     parseAndReviveProps: () => parseAndReviveProps,
+    removeIslandStyle: () => removeIslandStyle,
     reviveTuple: () => reviveTuple,
     useAutoAnimate: () => useAutoAnimate,
     useClickOutside: () => useClickOutside,
