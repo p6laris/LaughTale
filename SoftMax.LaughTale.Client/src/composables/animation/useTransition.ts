@@ -70,7 +70,7 @@ export function useTransition(element: HTMLElement | null, options: UseTransitio
 
         const hidden = getPresetStyles('hidden');
         Object.assign(element.style, hidden);
-        element.style.display = '';
+        element.style.display = 'block';
 
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {

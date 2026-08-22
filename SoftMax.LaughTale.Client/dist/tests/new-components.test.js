@@ -432,12 +432,93 @@ function useClickOutside(target, handler, options = {}) {
   };
 }
 
+// src/composables/animation/useTransition.ts
+function useTransition(element, options = {}) {
+  const duration = options.duration ?? 200;
+  const easing = options.easing ?? "cubic-bezier(0.16, 1, 0.3, 1)";
+  const preset = options.preset ?? "fade";
+  function getPresetStyles(state) {
+    switch (preset) {
+      case "fade":
+        return {
+          opacity: state === "visible" ? "1" : "0",
+          transform: "none"
+        };
+      case "scale":
+        return {
+          opacity: state === "visible" ? "1" : "0",
+          transform: state === "visible" ? "scale(1)" : "scale(0.95)"
+        };
+      case "slide-up":
+        return {
+          opacity: state === "visible" ? "1" : "0",
+          transform: state === "visible" ? "translateY(0)" : "translateY(12px)"
+        };
+      case "slide-down":
+        return {
+          opacity: state === "visible" ? "1" : "0",
+          transform: state === "visible" ? "translateY(0)" : "translateY(-12px)"
+        };
+      case "slide-left":
+        return {
+          transform: state === "visible" ? "translateX(0)" : "translateX(100%)"
+        };
+      case "slide-right":
+        return {
+          transform: state === "visible" ? "translateX(0)" : "translateX(-100%)"
+        };
+      case "collapse":
+        return {
+          height: state === "visible" ? "auto" : "0px",
+          opacity: state === "visible" ? "1" : "0",
+          overflow: "hidden"
+        };
+      default:
+        return { opacity: state === "visible" ? "1" : "0" };
+    }
+  }
+  function enter(cb) {
+    if (!element) return;
+    options.onEnterStart?.();
+    element.style.transition = `all ${duration}ms ${easing}`;
+    element.style.willChange = "transform, opacity";
+    const hidden = getPresetStyles("hidden");
+    Object.assign(element.style, hidden);
+    element.style.display = "block";
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const visible = getPresetStyles("visible");
+        Object.assign(element.style, visible);
+        setTimeout(() => {
+          element.style.willChange = "auto";
+          options.onEnterEnd?.();
+          cb?.();
+        }, duration);
+      });
+    });
+  }
+  function exit(cb) {
+    if (!element) return;
+    options.onExitStart?.();
+    element.style.transition = `all ${duration}ms ${easing}`;
+    element.style.willChange = "transform, opacity";
+    const hidden = getPresetStyles("hidden");
+    Object.assign(element.style, hidden);
+    setTimeout(() => {
+      element.style.display = "none";
+      element.style.willChange = "auto";
+      options.onExitEnd?.();
+      cb?.();
+    }, duration);
+  }
+  return { enter, exit };
+}
+
 // src/components/multiselect.ts
 function MultiSelectIsland(container, props) {
   const options = props.options || [];
   let selected = new Set(props.selectedValues || []);
   let filterQuery = "";
-  const disclosure = useDisclosure({ defaultIsOpen: false });
   container.innerHTML = `
         <div class="laughtale-multiselect" style="position: relative; width: 100%; max-width: 320px; font-family: var(--p-font-family, inherit);">
             <!-- Trigger Button Container -->
@@ -476,7 +557,22 @@ function MultiSelectIsland(container, props) {
   const itemsList = container.querySelector(".multiselect-items-list");
   const clearBtn = container.querySelector(".multiselect-clear-btn");
   const chevron = container.querySelector(".multiselect-chevron");
-  useClickOutside(container, () => close());
+  const disclosure = useDisclosure({
+    defaultIsOpen: false,
+    onOpen: () => {
+      chevron.style.transform = "rotate(180deg)";
+      filterInput.value = "";
+      filterQuery = "";
+      renderList();
+      useTransition(overlay, { type: "fade", isMounted: true });
+      filterInput.focus();
+    },
+    onClose: () => {
+      chevron.style.transform = "none";
+      useTransition(overlay, { type: "fade", isMounted: false });
+    }
+  });
+  useClickOutside(container, () => disclosure.close());
   function getFilteredOptions() {
     if (!filterQuery.trim()) return options;
     const q = filterQuery.toLowerCase();
@@ -539,24 +635,9 @@ function MultiSelectIsland(container, props) {
       });
     });
   }
-  function open() {
-    disclosure.open();
-    overlay.style.display = "block";
-    chevron.style.transform = "rotate(180deg)";
-    filterInput.value = "";
-    filterQuery = "";
-    renderList();
-    filterInput.focus();
-  }
-  function close() {
-    disclosure.close();
-    overlay.style.display = "none";
-    chevron.style.transform = "none";
-  }
   trigger.addEventListener("click", () => {
     if (props.disabled) return;
-    if (disclosure.isOpen) close();
-    else open();
+    disclosure.toggle();
   });
   clearBtn.addEventListener("click", (e) => {
     e.stopPropagation();
@@ -680,6 +761,63 @@ function ListboxIsland(container, props) {
   syncValue();
 }
 
+// src/composables/animation/useAutoAnimate.ts
+function useAutoAnimate(parent, options = {}) {
+  if (!parent || typeof window === "undefined" || typeof MutationObserver === "undefined") {
+    return { destroy: () => {
+    } };
+  }
+  const duration = options.duration ?? 250;
+  const easing = options.easing ?? "cubic-bezier(0.2, 0, 0, 1)";
+  const prevRects = /* @__PURE__ */ new Map();
+  function recordRects() {
+    prevRects.clear();
+    Array.from(parent.children).forEach((child) => {
+      prevRects.set(child, child.getBoundingClientRect());
+    });
+  }
+  function animate() {
+    const currentChildren = Array.from(parent.children);
+    currentChildren.forEach((child) => {
+      const first = prevRects.get(child);
+      const last = child.getBoundingClientRect();
+      if (first) {
+        const deltaX = first.left - last.left;
+        const deltaY = first.top - last.top;
+        if (deltaX !== 0 || deltaY !== 0) {
+          child.animate([
+            { transform: `translate(${deltaX}px, ${deltaY}px)` },
+            { transform: "none" }
+          ], {
+            duration,
+            easing
+          });
+        }
+      } else {
+        child.animate([
+          { opacity: 0, transform: "scale(0.95)" },
+          { opacity: 1, transform: "none" }
+        ], {
+          duration,
+          easing
+        });
+      }
+    });
+  }
+  recordRects();
+  const observer = new MutationObserver(() => {
+    animate();
+    recordRects();
+  });
+  observer.observe(parent, { childList: true });
+  return {
+    destroy: () => {
+      observer.disconnect();
+      prevRects.clear();
+    }
+  };
+}
+
 // src/components/picklist.ts
 function PickListIsland(container, props) {
   let sourceList = props.source ? [...props.source] : [
@@ -702,7 +840,7 @@ function PickListIsland(container, props) {
                     </div>
                     <div class="picklist-source-list" style="height: 180px; overflow-y: auto; padding: 0.25rem 0;">
                         ${sourceList.map((it2) => `
-                            <div class="picklist-item source-item ${selectedSource.has(it2.id) ? "active" : ""}" data-id="${it2.id}" style="padding: 0.45rem 0.75rem; cursor: pointer; font-size: 0.8125rem; background: ${selectedSource.has(it2.id) ? "var(--p-primary-50)" : "transparent"}; color: ${selectedSource.has(it2.id) ? "var(--p-primary-700)" : "var(--p-text-color)"}; font-weight: ${selectedSource.has(it2.id) ? "600" : "normal"};">
+                            <div class="picklist-item source-item ${selectedSource.has(it2.id) ? "active" : ""}" data-id="${it2.id}" style="padding: 0.45rem 0.75rem; cursor: pointer; font-size: 0.8125rem; background: ${selectedSource.has(it2.id) ? "var(--p-primary-50)" : "transparent"}; color: ${selectedSource.has(it2.id) ? "var(--p-primary-700)" : "var(--p-text-color)"}; font-weight: ${selectedSource.has(it2.id) ? "600" : "normal"}; transition: all 0.15s ease;">
                                 ${it2.name}
                             </div>
                         `).join("")}
@@ -732,7 +870,7 @@ function PickListIsland(container, props) {
                     </div>
                     <div class="picklist-target-list" style="height: 180px; overflow-y: auto; padding: 0.25rem 0;">
                         ${targetList.map((it2) => `
-                            <div class="picklist-item target-item ${selectedTarget.has(it2.id) ? "active" : ""}" data-id="${it2.id}" style="padding: 0.45rem 0.75rem; cursor: pointer; font-size: 0.8125rem; background: ${selectedTarget.has(it2.id) ? "var(--p-primary-50)" : "transparent"}; color: ${selectedTarget.has(it2.id) ? "var(--p-primary-700)" : "var(--p-text-color)"}; font-weight: ${selectedTarget.has(it2.id) ? "600" : "normal"};">
+                            <div class="picklist-item target-item ${selectedTarget.has(it2.id) ? "active" : ""}" data-id="${it2.id}" style="padding: 0.45rem 0.75rem; cursor: pointer; font-size: 0.8125rem; background: ${selectedTarget.has(it2.id) ? "var(--p-primary-50)" : "transparent"}; color: ${selectedTarget.has(it2.id) ? "var(--p-primary-700)" : "var(--p-text-color)"}; font-weight: ${selectedTarget.has(it2.id) ? "600" : "normal"}; transition: all 0.15s ease;">
                                 ${it2.name}
                             </div>
                         `).join("")}
@@ -740,6 +878,10 @@ function PickListIsland(container, props) {
                 </div>
             </div>
         `;
+    const srcEl = container.querySelector(".picklist-source-list");
+    const tgtEl = container.querySelector(".picklist-target-list");
+    useAutoAnimate(srcEl, { duration: 200 });
+    useAutoAnimate(tgtEl, { duration: 200 });
     bindEvents();
   }
   function bindEvents() {
@@ -761,36 +903,36 @@ function PickListIsland(container, props) {
     });
     container.querySelector(".btn-move-to-target")?.addEventListener("click", () => {
       const moving = sourceList.filter((it2) => selectedSource.has(it2.id));
-      targetList.push(...moving);
+      targetList = [...targetList, ...moving];
       sourceList = sourceList.filter((it2) => !selectedSource.has(it2.id));
       selectedSource.clear();
       render();
-      syncValue();
+      syncValues();
     });
     container.querySelector(".btn-move-all-to-target")?.addEventListener("click", () => {
-      targetList.push(...sourceList);
+      targetList = [...targetList, ...sourceList];
       sourceList = [];
       selectedSource.clear();
       render();
-      syncValue();
+      syncValues();
     });
     container.querySelector(".btn-move-to-source")?.addEventListener("click", () => {
       const moving = targetList.filter((it2) => selectedTarget.has(it2.id));
-      sourceList.push(...moving);
+      sourceList = [...sourceList, ...moving];
       targetList = targetList.filter((it2) => !selectedTarget.has(it2.id));
       selectedTarget.clear();
       render();
-      syncValue();
+      syncValues();
     });
     container.querySelector(".btn-move-all-to-source")?.addEventListener("click", () => {
-      sourceList.push(...targetList);
+      sourceList = [...sourceList, ...targetList];
       targetList = [];
       selectedTarget.clear();
       render();
-      syncValue();
+      syncValues();
     });
   }
-  function syncValue() {
+  function syncValues() {
     if (props.targetInputName) {
       let hidden = container.querySelector(`input[name="${props.targetInputName}"]`);
       if (!hidden) {
@@ -799,7 +941,7 @@ function PickListIsland(container, props) {
         hidden.name = props.targetInputName;
         container.appendChild(hidden);
       }
-      hidden.value = JSON.stringify(targetList);
+      hidden.value = JSON.stringify(targetList.map((it2) => it2.id));
     }
     container.dispatchEvent(new CustomEvent("picklist:change", {
       bubbles: true,
@@ -807,7 +949,7 @@ function PickListIsland(container, props) {
     }));
   }
   render();
-  syncValue();
+  syncValues();
 }
 
 // src/components/orderlist.ts
@@ -835,7 +977,7 @@ function OrderListIsland(container, props) {
                     ${props.header ? `<div style="padding: 0.625rem 0.875rem; background: var(--p-surface-50); border-bottom: 1px solid var(--p-border-color); font-size: 0.75rem; font-weight: 700; color: var(--p-surface-600); text-transform: uppercase;">${props.header}</div>` : ""}
                     <div class="orderlist-items-container" style="max-height: 220px; overflow-y: auto; padding: 0.25rem 0;">
                         ${items.map((it2, idx) => `
-                            <div class="orderlist-item ${selectedIndex === idx ? "active" : ""}" data-index="${idx}" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.875rem; cursor: pointer; font-size: 0.8125rem; background: ${selectedIndex === idx ? "var(--p-primary-50)" : "transparent"}; color: ${selectedIndex === idx ? "var(--p-primary-700)" : "var(--p-text-color)"}; font-weight: ${selectedIndex === idx ? "600" : "normal"};">
+                            <div class="orderlist-item ${selectedIndex === idx ? "active" : ""}" data-index="${idx}" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.875rem; cursor: pointer; font-size: 0.8125rem; background: ${selectedIndex === idx ? "var(--p-primary-50)" : "transparent"}; color: ${selectedIndex === idx ? "var(--p-primary-700)" : "var(--p-text-color)"}; font-weight: ${selectedIndex === idx ? "600" : "normal"}; transition: all 0.15s ease;">
                                 <span>${it2.name}</span>
                                 <span style="font-family: monospace; font-size: 0.6875rem; color: var(--p-surface-400);">#${idx + 1}</span>
                             </div>
@@ -844,6 +986,8 @@ function OrderListIsland(container, props) {
                 </div>
             </div>
         `;
+    const itemsEl = container.querySelector(".orderlist-items-container");
+    useAutoAnimate(itemsEl, { duration: 200 });
     bindEvents();
   }
   function bindEvents() {
@@ -855,40 +999,42 @@ function OrderListIsland(container, props) {
     });
     container.querySelector(".btn-order-top")?.addEventListener("click", () => {
       if (selectedIndex === null || selectedIndex <= 0) return;
-      const item = items.splice(selectedIndex, 1)[0];
-      items.unshift(item);
+      const it2 = items.splice(selectedIndex, 1)[0];
+      items.unshift(it2);
       selectedIndex = 0;
       render();
-      syncValue();
+      syncValues();
     });
     container.querySelector(".btn-order-up")?.addEventListener("click", () => {
       if (selectedIndex === null || selectedIndex <= 0) return;
-      const temp = items[selectedIndex];
-      items[selectedIndex] = items[selectedIndex - 1];
-      items[selectedIndex - 1] = temp;
-      selectedIndex--;
+      const target = selectedIndex - 1;
+      const temp = items[target];
+      items[target] = items[selectedIndex];
+      items[selectedIndex] = temp;
+      selectedIndex = target;
       render();
-      syncValue();
+      syncValues();
     });
     container.querySelector(".btn-order-down")?.addEventListener("click", () => {
       if (selectedIndex === null || selectedIndex >= items.length - 1) return;
-      const temp = items[selectedIndex];
-      items[selectedIndex] = items[selectedIndex + 1];
-      items[selectedIndex + 1] = temp;
-      selectedIndex++;
+      const target = selectedIndex + 1;
+      const temp = items[target];
+      items[target] = items[selectedIndex];
+      items[selectedIndex] = temp;
+      selectedIndex = target;
       render();
-      syncValue();
+      syncValues();
     });
     container.querySelector(".btn-order-bottom")?.addEventListener("click", () => {
       if (selectedIndex === null || selectedIndex >= items.length - 1) return;
-      const item = items.splice(selectedIndex, 1)[0];
-      items.push(item);
+      const it2 = items.splice(selectedIndex, 1)[0];
+      items.push(it2);
       selectedIndex = items.length - 1;
       render();
-      syncValue();
+      syncValues();
     });
   }
-  function syncValue() {
+  function syncValues() {
     if (props.targetInputName) {
       let hidden = container.querySelector(`input[name="${props.targetInputName}"]`);
       if (!hidden) {
@@ -897,7 +1043,7 @@ function OrderListIsland(container, props) {
         hidden.name = props.targetInputName;
         container.appendChild(hidden);
       }
-      hidden.value = JSON.stringify(items);
+      hidden.value = JSON.stringify(items.map((it2) => it2.id));
     }
     container.dispatchEvent(new CustomEvent("orderlist:change", {
       bubbles: true,
@@ -905,7 +1051,7 @@ function OrderListIsland(container, props) {
     }));
   }
   render();
-  syncValue();
+  syncValues();
 }
 
 // src/components/terminal.ts
@@ -1004,7 +1150,6 @@ function SplitButtonIsland(container, props) {
     { label: "Export as Encrypted JSON", icon: "download", action: "export" },
     { label: "Delete Record", icon: "trash", action: "delete" }
   ];
-  const disclosure = useDisclosure({ defaultIsOpen: false });
   container.innerHTML = `
         <div class="laughtale-splitbutton" style="position: relative; display: inline-flex; border-radius: var(--p-border-radius); overflow: visible; font-family: var(--p-font-family, inherit);">
             <!-- Primary Action Button -->
@@ -1030,38 +1175,35 @@ function SplitButtonIsland(container, props) {
   const mainBtn = container.querySelector(".splitbutton-main-btn");
   const menuBtn = container.querySelector(".splitbutton-menu-btn");
   const overlay = container.querySelector(".splitbutton-menu-overlay");
-  useClickOutside(container, () => close());
-  function open() {
-    disclosure.open();
-    overlay.style.display = "block";
-  }
-  function close() {
-    disclosure.close();
-    overlay.style.display = "none";
-  }
+  const disclosure = useDisclosure({
+    defaultIsOpen: false,
+    onOpen: () => {
+      useTransition(overlay, { type: "fade", isMounted: true });
+    },
+    onClose: () => {
+      useTransition(overlay, { type: "fade", isMounted: false });
+    }
+  });
+  useClickOutside(container, () => disclosure.close());
   mainBtn.addEventListener("click", () => {
     container.dispatchEvent(new CustomEvent("splitbutton:click", {
       bubbles: true,
       detail: { action: "main" }
     }));
   });
-  menuBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    if (disclosure.isOpen) close();
-    else open();
+  menuBtn.addEventListener("click", () => {
+    disclosure.toggle();
   });
-  overlay.querySelectorAll(".splitbutton-menu-item").forEach((item) => {
-    item.addEventListener("click", () => {
-      const action = item.getAttribute("data-action");
-      const url = item.getAttribute("data-url");
+  container.querySelectorAll(".splitbutton-menu-item").forEach((itemEl) => {
+    itemEl.addEventListener("click", () => {
+      const action = itemEl.getAttribute("data-action");
+      const url = itemEl.getAttribute("data-url");
       if (url) window.location.href = url;
-      else {
-        container.dispatchEvent(new CustomEvent("splitbutton:item-click", {
-          bubbles: true,
-          detail: { action }
-        }));
-      }
-      close();
+      container.dispatchEvent(new CustomEvent("splitbutton:item-click", {
+        bubbles: true,
+        detail: { action }
+      }));
+      disclosure.close();
     });
   });
 }

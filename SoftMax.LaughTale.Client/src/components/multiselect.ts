@@ -1,13 +1,13 @@
 /**
  * SoftMax.LaughTale: Enterprise MultiSelect Component (Aura MultiSelect inspired)
- * Multi-option selector with search filter, chip display, select-all toggle, and keyboard navigation.
+ * Integrated with useDisclosure, useClickOutside, and useTransition for smooth popover fade transitions.
  */
 
 import { SelectButtonItem } from '../types/models';
 import { LucideIcons } from '../icons/lucide';
 import { useDisclosure } from '../composables/useDisclosure';
 import { useClickOutside } from '../composables/useClickOutside';
-import { useFloatingPosition } from '../composables/useFloatingPosition';
+import { useTransition } from '../composables/animation/useTransition';
 
 export interface MultiSelectProps<T = string> {
     options?: SelectButtonItem<T>[];
@@ -23,8 +23,6 @@ export default function MultiSelectIsland<T = string>(container: HTMLElement, pr
     const options: SelectButtonItem<T>[] = props.options || [];
     let selected: Set<T> = new Set(props.selectedValues || []);
     let filterQuery = '';
-
-    const disclosure = useDisclosure({ defaultIsOpen: false });
 
     container.innerHTML = `
         <div class="laughtale-multiselect" style="position: relative; width: 100%; max-width: 320px; font-family: var(--p-font-family, inherit);">
@@ -66,7 +64,23 @@ export default function MultiSelectIsland<T = string>(container: HTMLElement, pr
     const clearBtn = container.querySelector<HTMLElement>('.multiselect-clear-btn')!;
     const chevron = container.querySelector<HTMLElement>('.multiselect-chevron')!;
 
-    useClickOutside(container, () => close());
+    const disclosure = useDisclosure({
+        defaultIsOpen: false,
+        onOpen: () => {
+            chevron.style.transform = 'rotate(180deg)';
+            filterInput.value = '';
+            filterQuery = '';
+            renderList();
+            useTransition(overlay, { type: 'fade', isMounted: true });
+            filterInput.focus();
+        },
+        onClose: () => {
+            chevron.style.transform = 'none';
+            useTransition(overlay, { type: 'fade', isMounted: false });
+        }
+    });
+
+    useClickOutside(container, () => disclosure.close());
 
     function getFilteredOptions() {
         if (!filterQuery.trim()) return options;
@@ -141,26 +155,9 @@ export default function MultiSelectIsland<T = string>(container: HTMLElement, pr
         });
     }
 
-    function open() {
-        disclosure.open();
-        overlay.style.display = 'block';
-        chevron.style.transform = 'rotate(180deg)';
-        filterInput.value = '';
-        filterQuery = '';
-        renderList();
-        filterInput.focus();
-    }
-
-    function close() {
-        disclosure.close();
-        overlay.style.display = 'none';
-        chevron.style.transform = 'none';
-    }
-
     trigger.addEventListener('click', () => {
         if (props.disabled) return;
-        if (disclosure.isOpen) close();
-        else open();
+        disclosure.toggle();
     });
 
     clearBtn.addEventListener('click', (e) => {

@@ -2198,7 +2198,7 @@ function useTransition(element, options = {}) {
     element.style.willChange = "transform, opacity";
     const hidden = getPresetStyles("hidden");
     Object.assign(element.style, hidden);
-    element.style.display = "";
+    element.style.display = "block";
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         const visible = getPresetStyles("visible");
@@ -2235,7 +2235,7 @@ var init_useTransition = __esm({
 
 // src/composables/animation/useAutoAnimate.ts
 function useAutoAnimate(parent, options = {}) {
-  if (!parent || typeof window === "undefined" || !("MutationObserver" in window)) {
+  if (!parent || typeof window === "undefined" || typeof MutationObserver === "undefined") {
     return { destroy: () => {
     } };
   }
@@ -2969,12 +2969,19 @@ function ModalDialogIsland(container, props) {
             position: fixed;
             inset: 0;
             background: rgba(15, 23, 42, 0.45);
-            backdrop-filter: blur(4px);
+            backdrop-filter: blur(6px);
             z-index: 1100;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 1.5rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .aura-dialog-mask.modal-open {
+            opacity: 1;
+            pointer-events: auto;
         }
         .aura-dialog {
             background: var(--p-surface-0);
@@ -2984,6 +2991,11 @@ function ModalDialogIsland(container, props) {
             max-width: 32rem;
             width: 100%;
             overflow: hidden;
+            transform: scale(0.95) translateY(8px);
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .aura-dialog-mask.modal-open .aura-dialog {
+            transform: scale(1) translateY(0);
         }
     `);
   const slotEl = getSlot(container);
@@ -3002,7 +3014,7 @@ function ModalDialogIsland(container, props) {
                 </button>
             </div>
 
-            <div class="aura-dialog-mask modal-overlay" style="display: none;">
+            <div class="aura-dialog-mask modal-overlay">
                 <div class="aura-dialog">
                     <div style="display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--p-border-color);">
                         <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-950);">${props.dialogTitle}</h3>
@@ -3014,9 +3026,9 @@ function ModalDialogIsland(container, props) {
                         ${slotHtml}
                     </div>
 
-                    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 0.75rem; padding: 1rem 1.5rem; background: var(--p-surface-50); border-top: 1px solid var(--p-border-color);">
-                        <button type="button" class="p-button p-button-secondary p-button-sm modal-cancel-btn">Dismiss</button>
-                        <button type="button" class="p-button p-button-primary p-button-sm modal-confirm-btn">Acknowledge</button>
+                    <div style="display: flex; justify-content: flex-end; gap: 0.5rem; padding: 1rem 1.5rem; border-top: 1px solid var(--p-border-color); background: var(--p-surface-50);">
+                        <button type="button" class="p-button p-button-secondary modal-cancel-btn">Cancel</button>
+                        <button type="button" class="p-button p-button-primary modal-confirm-btn">Confirm Operation</button>
                     </div>
                 </div>
             </div>
@@ -3024,26 +3036,39 @@ function ModalDialogIsland(container, props) {
     `;
   const openBtn = container.querySelector(".modal-open-btn");
   const overlay = container.querySelector(".modal-overlay");
-  const closeBtns = container.querySelectorAll(".modal-close-btn, .modal-cancel-btn, .modal-confirm-btn");
-  const open = () => {
-    overlay.style.display = "flex";
-  };
-  const close = () => {
-    overlay.style.display = "none";
-  };
-  openBtn.addEventListener("click", open);
-  closeBtns.forEach((btn) => btn.addEventListener("click", close));
-  overlay.addEventListener("click", (e) => {
-    if (e.target === overlay) close();
+  const dialog = container.querySelector(".aura-dialog");
+  const closeBtn = container.querySelector(".modal-close-btn");
+  const cancelBtn = container.querySelector(".modal-cancel-btn");
+  const confirmBtn = container.querySelector(".modal-confirm-btn");
+  const focusTrap = useFocusTrap(dialog);
+  const disclosure = useDisclosure({
+    defaultIsOpen: false,
+    onOpen: () => {
+      overlay.classList.add("modal-open");
+      focusTrap.activate();
+    },
+    onClose: () => {
+      overlay.classList.remove("modal-open");
+      focusTrap.deactivate();
+    }
   });
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && overlay.style.display === "flex") close();
+  openBtn.addEventListener("click", () => disclosure.open());
+  closeBtn.addEventListener("click", () => disclosure.close());
+  cancelBtn.addEventListener("click", () => disclosure.close());
+  confirmBtn.addEventListener("click", () => {
+    container.dispatchEvent(new CustomEvent("modal:confirmed", { bubbles: true }));
+    disclosure.close();
+  });
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) disclosure.close();
   });
 }
 var init_modal = __esm({
   "src/components/modal.ts"() {
     "use strict";
     init_index();
+    init_useDisclosure();
+    init_useFocusTrap();
   }
 });
 
@@ -3720,10 +3745,16 @@ __export(chips_exports, {
   default: () => ChipsIsland
 });
 function ChipsIsland(container, props) {
-  let chips = props.values ? [...props.values] : [];
+  const [getChips, setChips] = useControllableState({
+    defaultValue: props.values ? [...props.values] : [],
+    onChange: (val) => {
+      syncValue(val);
+    }
+  });
   function render() {
+    const chips = getChips();
     const chipTags = chips.map((c, idx) => `
-            <span class="chip-item" style="display: inline-flex; align-items: center; gap: 0.35rem; background: var(--p-surface-100); color: var(--p-surface-800); border: 1px solid var(--p-surface-200); padding: 0.2rem 0.5rem; border-radius: var(--p-border-radius); font-size: 0.8125rem; font-weight: 500;">
+            <span class="chip-item" data-val="${c}" style="display: inline-flex; align-items: center; gap: 0.35rem; background: var(--p-surface-100); color: var(--p-surface-800); border: 1px solid var(--p-surface-200); padding: 0.2rem 0.5rem; border-radius: var(--p-border-radius); font-size: 0.8125rem; font-weight: 500; transition: all 0.15s ease;">
                 <span>${c}</span>
                 ${!props.disabled ? `
                     <button type="button" class="remove-chip-btn" data-index="${idx}" style="border: none; background: transparent; color: var(--p-surface-400); cursor: pointer; display: flex; align-items: center; padding: 0;">
@@ -3738,23 +3769,24 @@ function ChipsIsland(container, props) {
                 <input type="text" class="chip-text-input" placeholder="${chips.length === 0 ? props.placeholder || "Add tag..." : ""}" ${props.disabled ? "disabled" : ""} style="flex: 1; min-width: 80px; border: none; outline: none; background: transparent; font-size: 0.8125rem; color: var(--p-text-color); padding: 0.25rem 0;" />
             </div>
         `;
+    const wrapper = container.querySelector(".laughtale-chips");
+    useAutoAnimate(wrapper, { duration: 200 });
     if (props.disabled) return;
     const input = container.querySelector(".chip-text-input");
     input.addEventListener("keydown", (e) => {
+      const current = getChips();
       if (e.key === "Enter" || e.key === ",") {
         e.preventDefault();
         const val = input.value.trim().replace(/,$/, "");
-        if (val && !chips.includes(val) && (!props.max || chips.length < props.max)) {
-          chips.push(val);
+        if (val && !current.includes(val) && (!props.max || current.length < props.max)) {
+          setChips([...current, val]);
           render();
-          syncValue();
           const nextInput = container.querySelector(".chip-text-input");
           nextInput.focus();
         }
-      } else if (e.key === "Backspace" && !input.value && chips.length > 0) {
-        chips.pop();
+      } else if (e.key === "Backspace" && !input.value && current.length > 0) {
+        setChips(current.slice(0, -1));
         render();
-        syncValue();
         const nextInput = container.querySelector(".chip-text-input");
         nextInput.focus();
       }
@@ -3762,38 +3794,39 @@ function ChipsIsland(container, props) {
     container.querySelectorAll(".remove-chip-btn").forEach((btn) => {
       btn.addEventListener("click", (e) => {
         e.stopPropagation();
-        const idx = parseInt(btn.getAttribute("data-index"), 10);
-        chips.splice(idx, 1);
+        const idx = Number(btn.getAttribute("data-index"));
+        const current = getChips();
+        setChips(current.filter((_, i) => i !== idx));
         render();
-        syncValue();
       });
     });
-    container.querySelector(".laughtale-chips")?.addEventListener("click", () => {
-      input.focus();
-    });
+    wrapper.addEventListener("click", () => input.focus());
   }
-  function syncValue() {
+  function syncValue(current) {
     if (props.targetInputName) {
-      let hidden = document.querySelector(`input[name="${props.targetInputName}"]`);
+      let hidden = container.querySelector(`input[name="${props.targetInputName}"]`);
       if (!hidden) {
         hidden = document.createElement("input");
         hidden.type = "hidden";
         hidden.name = props.targetInputName;
         container.appendChild(hidden);
       }
-      hidden.value = JSON.stringify(chips);
+      hidden.value = JSON.stringify(current);
     }
     container.dispatchEvent(new CustomEvent("chips:change", {
       bubbles: true,
-      detail: { values: chips }
+      detail: { values: current }
     }));
   }
   render();
+  syncValue(getChips());
 }
 var init_chips = __esm({
   "src/components/chips.ts"() {
     "use strict";
     init_lucide();
+    init_useAutoAnimate();
+    init_useControllableState();
   }
 });
 
@@ -4096,7 +4129,6 @@ __export(drawer_exports, {
 function DrawerIsland(container, props) {
   const position = props.position || "right";
   const width = props.width || "380px";
-  let isOpen = false;
   function render() {
     container.innerHTML = `
             <div class="laughtale-drawer-wrapper">
@@ -4107,10 +4139,10 @@ function DrawerIsland(container, props) {
                 ` : ""}
 
                 <!-- Backdrop -->
-                <div class="drawer-backdrop" style="display: ${isOpen ? "block" : "none"}; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); z-index: 1000; animation: fadeIn 0.2s ease;"></div>
+                <div class="drawer-backdrop" style="display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.45); backdrop-filter: blur(4px); z-index: 1000; opacity: 0; transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1);"></div>
 
                 <!-- Drawer Panel -->
-                <div class="drawer-panel" style="display: ${isOpen ? "flex" : "none"}; flex-direction: column; position: fixed; ${position}: 0; top: 0; bottom: 0; width: ${width}; max-width: 90vw; background: var(--p-surface-0); border-${position === "right" ? "left" : "right"}: 1px solid var(--p-border-color); box-shadow: var(--p-shadow-lg); z-index: 1001; animation: slideInDrawer 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
+                <div class="drawer-panel" style="display: flex; flex-direction: column; position: fixed; ${position}: 0; top: 0; bottom: 0; width: ${width}; max-width: 90vw; background: var(--p-surface-0); border-${position === "right" ? "left" : "right"}: 1px solid var(--p-border-color); box-shadow: var(--p-shadow-lg); z-index: 1001; transform: translateX(${position === "right" ? "100%" : "-100%"}); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); pointer-events: none;">
                     
                     <!-- Header -->
                     <div style="display: flex; align-items: center; justify-content: space-between; padding: 1.25rem; border-bottom: 1px solid var(--p-border-color);">
@@ -4129,21 +4161,35 @@ function DrawerIsland(container, props) {
                 </div>
             </div>
         `;
-    const slotEl = container.querySelector('[data-slot="default"]') || container.querySelector(".island-slot");
-    const slotContainer = container.querySelector(".drawer-slot-container");
-    if (slotEl && slotContainer) slotContainer.appendChild(slotEl);
-    container.querySelector(".drawer-open-btn")?.addEventListener("click", () => {
-      isOpen = true;
-      render();
+    const backdrop = container.querySelector(".drawer-backdrop");
+    const panel = container.querySelector(".drawer-panel");
+    const openBtn = container.querySelector(".drawer-open-btn");
+    const closeBtn = container.querySelector(".drawer-close-btn");
+    const focusTrap = useFocusTrap(panel);
+    const disclosure = useDisclosure({
+      defaultIsOpen: false,
+      onOpen: () => {
+        backdrop.style.display = "block";
+        setTimeout(() => {
+          backdrop.style.opacity = "1";
+          panel.style.transform = "translateX(0)";
+          panel.style.pointerEvents = "auto";
+        }, 10);
+        focusTrap.activate();
+      },
+      onClose: () => {
+        backdrop.style.opacity = "0";
+        panel.style.transform = `translateX(${position === "right" ? "100%" : "-100%"})`;
+        panel.style.pointerEvents = "none";
+        setTimeout(() => {
+          backdrop.style.display = "none";
+        }, 300);
+        focusTrap.deactivate();
+      }
     });
-    container.querySelector(".drawer-close-btn")?.addEventListener("click", () => {
-      isOpen = false;
-      render();
-    });
-    container.querySelector(".drawer-backdrop")?.addEventListener("click", () => {
-      isOpen = false;
-      render();
-    });
+    openBtn?.addEventListener("click", () => disclosure.open());
+    closeBtn?.addEventListener("click", () => disclosure.close());
+    backdrop?.addEventListener("click", () => disclosure.close());
   }
   render();
 }
@@ -4151,6 +4197,8 @@ var init_drawer = __esm({
   "src/components/drawer.ts"() {
     "use strict";
     init_lucide();
+    init_useDisclosure();
+    init_useFocusTrap();
   }
 });
 
@@ -4174,16 +4222,20 @@ function SpeedDialIsland(container, props) {
     container.innerHTML = `
             <div class="laughtale-speed-dial" style="position: relative; display: inline-flex; flex-direction: column-reverse; align-items: center; gap: 0.75rem;">
                 <!-- Main FAB Button -->
-                <button type="button" class="speed-dial-main-btn" style="width: 3.25rem; height: 3.25rem; border-radius: 50%; border: none; background: var(--p-primary-600); color: #ffffff; box-shadow: var(--p-shadow-lg); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1); transform: rotate(${isOpen ? "45deg" : "0deg"});">
+                <button type="button" class="speed-dial-main-btn" style="width: 3.25rem; height: 3.25rem; border-radius: 50%; border: none; background: var(--p-primary-600); color: #ffffff; box-shadow: var(--p-shadow-lg); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); transform: rotate(${isOpen ? "45deg" : "0deg"});">
                     ${LucideIcons.plus}
                 </button>
 
                 <!-- Action Items -->
-                <div class="speed-dial-list" style="display: ${isOpen ? "flex" : "none"}; flex-direction: column-reverse; gap: 0.5rem; animation: fadeInUp 0.2s ease;">
+                <div class="speed-dial-list" style="display: ${isOpen ? "flex" : "none"}; flex-direction: column-reverse; gap: 0.5rem;">
                     ${actionItems}
                 </div>
             </div>
         `;
+    if (isOpen) {
+      const actionBtns = Array.from(container.querySelectorAll(".speed-dial-action-btn"));
+      useStagger(actionBtns, { staggerMs: 40, initialDelay: 10 });
+    }
     container.querySelector(".speed-dial-main-btn")?.addEventListener("click", () => {
       isOpen = !isOpen;
       render();
@@ -4206,6 +4258,7 @@ var init_speed_dial = __esm({
   "src/components/speed-dial.ts"() {
     "use strict";
     init_lucide();
+    init_useStagger();
   }
 });
 
@@ -4373,9 +4426,15 @@ function AccordionIsland(container, props) {
   } else {
     activeIndices.add(0);
   }
+  const disclosures = {};
+  tabs.forEach((_, idx) => {
+    disclosures[idx] = useDisclosure({
+      defaultIsOpen: activeIndices.has(idx)
+    });
+  });
   function render() {
     const tabHtml = tabs.map((tab, idx) => {
-      const isOpen = activeIndices.has(idx);
+      const isOpen = disclosures[idx]?.isOpen ?? false;
       return `
                 <div class="accordion-tab ${isOpen ? "tab-open" : ""}" data-idx="${idx}" style="border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); margin-bottom: 0.5rem; background: var(--p-surface-0); overflow: hidden;">
                     <button type="button" 
@@ -4387,11 +4446,11 @@ function AccordionIsland(container, props) {
                             ${tab.icon ? `<span>${tab.icon}</span>` : ""}
                             <span>${tab.header}</span>
                         </span>
-                        <span class="chevron-icon" style="color: var(--p-surface-500); display: flex; align-items: center; transition: transform 0.2s ease; transform: rotate(${isOpen ? "180deg" : "0deg"});">
+                        <span class="chevron-icon" style="color: var(--p-surface-500); display: flex; align-items: center; transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1); transform: rotate(${isOpen ? "180deg" : "0deg"});">
                             ${LucideIcons.chevronDown}
                         </span>
                     </button>
-                    <div class="accordion-content" style="display: ${isOpen ? "block" : "none"}; padding: 1.25rem; border-top: 1px solid var(--p-border-color); font-size: 0.875rem; color: var(--p-surface-600); line-height: 1.6; animation: fadeIn 0.2s ease;">
+                    <div class="accordion-content" style="display: ${isOpen ? "block" : "none"}; padding: 1.25rem; border-top: 1px solid var(--p-border-color); font-size: 0.875rem; color: var(--p-surface-600); line-height: 1.6;">
                         <div class="tab-slot" data-slot-index="${idx}">${tab.content || ""}</div>
                     </div>
                 </div>
@@ -4402,28 +4461,46 @@ function AccordionIsland(container, props) {
                 ${tabHtml}
             </div>
         `;
-    tabs.forEach((_, idx) => {
-      const externalSlot = container.querySelector(`[data-slot="tab-${idx}"]`);
-      const targetContainer = container.querySelector(`[data-slot-index="${idx}"]`);
-      if (externalSlot && targetContainer) {
-        targetContainer.innerHTML = "";
-        targetContainer.appendChild(externalSlot);
+    bindEvents();
+  }
+  function toggleTab(idx) {
+    if (!props.multiple) {
+      tabs.forEach((_, otherIdx) => {
+        if (otherIdx !== idx) disclosures[otherIdx]?.close();
+      });
+    }
+    disclosures[idx]?.toggle();
+    updateDOM();
+  }
+  function updateDOM() {
+    container.querySelectorAll(".accordion-tab").forEach((tabEl) => {
+      const idx = Number(tabEl.getAttribute("data-idx"));
+      const isOpen = disclosures[idx]?.isOpen ?? false;
+      const contentEl = tabEl.querySelector(".accordion-content");
+      const chevronEl = tabEl.querySelector(".chevron-icon");
+      const headerBtn = tabEl.querySelector(".accordion-header-btn");
+      tabEl.classList.toggle("tab-open", isOpen);
+      headerBtn.style.background = isOpen ? "var(--p-surface-50)" : "var(--p-surface-0)";
+      chevronEl.style.transform = `rotate(${isOpen ? "180deg" : "0deg"})`;
+      const transition = useTransition(contentEl, { preset: "collapse" });
+      if (isOpen) {
+        transition.enter();
+      } else {
+        contentEl.style.display = "none";
+        transition.exit();
       }
     });
+    const activeList = tabs.map((_, idx) => idx).filter((idx) => disclosures[idx]?.isOpen);
+    container.dispatchEvent(new CustomEvent("accordion:change", {
+      bubbles: true,
+      detail: { activeIndex: activeList }
+    }));
+  }
+  function bindEvents() {
     container.querySelectorAll(".accordion-header-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
-        const idx = parseInt(btn.getAttribute("data-idx"), 10);
-        if (activeIndices.has(idx)) {
-          activeIndices.delete(idx);
-        } else {
-          if (!props.multiple) activeIndices.clear();
-          activeIndices.add(idx);
-        }
-        render();
-        container.dispatchEvent(new CustomEvent("accordion:change", {
-          bubbles: true,
-          detail: { activeIndex: Array.from(activeIndices) }
-        }));
+        const idx = Number(btn.getAttribute("data-idx"));
+        toggleTab(idx);
       });
     });
   }
@@ -4433,6 +4510,8 @@ var init_accordion = __esm({
   "src/components/accordion.ts"() {
     "use strict";
     init_lucide();
+    init_useDisclosure();
+    init_useTransition();
   }
 });
 
@@ -4452,7 +4531,7 @@ function TabsIsland(container, props) {
                         class="tab-header-btn ${isActive ? "tab-active" : ""}" 
                         data-idx="${idx}" 
                         ${tab.disabled ? "disabled" : ""} 
-                        style="padding: 0.75rem 1.25rem; border: none; background: transparent; color: ${isActive ? "var(--p-primary-600)" : "var(--p-surface-600)"}; font-weight: ${isActive ? "700" : "500"}; font-size: 0.875rem; cursor: ${tab.disabled ? "not-allowed" : "pointer"}; border-bottom: 2px solid ${isActive ? "var(--p-primary-600)" : "transparent"}; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 0.5rem;">
+                        style="position: relative; padding: 0.75rem 1.25rem; border: none; background: transparent; color: ${isActive ? "var(--p-primary-600)" : "var(--p-surface-600)"}; font-weight: ${isActive ? "700" : "500"}; font-size: 0.875rem; cursor: ${tab.disabled ? "not-allowed" : "pointer"}; transition: color 0.15s ease; display: inline-flex; align-items: center; gap: 0.5rem; border-bottom: 2px solid ${isActive ? "var(--p-primary-600)" : "transparent"};">
                     ${tab.icon ? `<span>${tab.icon}</span>` : ""}
                     <span>${tab.header}</span>
                 </button>
@@ -4461,12 +4540,12 @@ function TabsIsland(container, props) {
     container.innerHTML = `
             <div class="laughtale-tabs" style="width: 100%;">
                 <!-- Tab Headers Bar -->
-                <div class="tabs-header-bar" style="display: flex; border-bottom: 1px solid var(--p-border-color); gap: 0.25rem; overflow-x: auto;">
+                <div class="tabs-header-bar" style="display: flex; border-bottom: 1px solid var(--p-border-color); gap: 0.25rem; overflow-x: auto; position: relative;">
                     ${headerButtons}
                 </div>
 
                 <!-- Active Tab Content Panel -->
-                <div class="tab-panel-body" style="padding: 1.25rem 0; font-size: 0.875rem; color: var(--p-surface-700); line-height: 1.6; animation: fadeIn 0.2s ease;">
+                <div class="tab-panel-body" style="padding: 1.25rem 0; font-size: 0.875rem; color: var(--p-surface-700); line-height: 1.6; transition: opacity 0.2s ease;">
                     <div class="tab-slot-content">${tabs[activeIndex]?.content || ""}</div>
                 </div>
             </div>
@@ -4479,30 +4558,27 @@ function TabsIsland(container, props) {
     }
     container.querySelectorAll(".tab-header-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
-        activeIndex = parseInt(btn.getAttribute("data-idx"), 10);
+        const idx = Number(btn.getAttribute("data-idx"));
+        activeIndex = idx;
         render();
-        syncValue();
+        if (props.targetInputName) {
+          let hidden = container.querySelector(`input[name="${props.targetInputName}"]`);
+          if (!hidden) {
+            hidden = document.createElement("input");
+            hidden.type = "hidden";
+            hidden.name = props.targetInputName;
+            container.appendChild(hidden);
+          }
+          hidden.value = String(activeIndex);
+        }
+        container.dispatchEvent(new CustomEvent("tabs:change", {
+          bubbles: true,
+          detail: { activeIndex }
+        }));
       });
     });
   }
-  function syncValue() {
-    if (props.targetInputName) {
-      let hidden = document.querySelector(`input[name="${props.targetInputName}"]`);
-      if (!hidden) {
-        hidden = document.createElement("input");
-        hidden.type = "hidden";
-        hidden.name = props.targetInputName;
-        container.appendChild(hidden);
-      }
-      hidden.value = activeIndex.toString();
-    }
-    container.dispatchEvent(new CustomEvent("tabs:change", {
-      bubbles: true,
-      detail: { index: activeIndex, tab: tabs[activeIndex] }
-    }));
-  }
   render();
-  syncValue();
 }
 var init_tabs = __esm({
   "src/components/tabs.ts"() {
@@ -5908,7 +5984,6 @@ function MultiSelectIsland(container, props) {
   const options = props.options || [];
   let selected = new Set(props.selectedValues || []);
   let filterQuery = "";
-  const disclosure = useDisclosure({ defaultIsOpen: false });
   container.innerHTML = `
         <div class="laughtale-multiselect" style="position: relative; width: 100%; max-width: 320px; font-family: var(--p-font-family, inherit);">
             <!-- Trigger Button Container -->
@@ -5947,7 +6022,22 @@ function MultiSelectIsland(container, props) {
   const itemsList = container.querySelector(".multiselect-items-list");
   const clearBtn = container.querySelector(".multiselect-clear-btn");
   const chevron = container.querySelector(".multiselect-chevron");
-  useClickOutside(container, () => close());
+  const disclosure = useDisclosure({
+    defaultIsOpen: false,
+    onOpen: () => {
+      chevron.style.transform = "rotate(180deg)";
+      filterInput.value = "";
+      filterQuery = "";
+      renderList();
+      useTransition(overlay, { type: "fade", isMounted: true });
+      filterInput.focus();
+    },
+    onClose: () => {
+      chevron.style.transform = "none";
+      useTransition(overlay, { type: "fade", isMounted: false });
+    }
+  });
+  useClickOutside(container, () => disclosure.close());
   function getFilteredOptions() {
     if (!filterQuery.trim()) return options;
     const q = filterQuery.toLowerCase();
@@ -6010,24 +6100,9 @@ function MultiSelectIsland(container, props) {
       });
     });
   }
-  function open() {
-    disclosure.open();
-    overlay.style.display = "block";
-    chevron.style.transform = "rotate(180deg)";
-    filterInput.value = "";
-    filterQuery = "";
-    renderList();
-    filterInput.focus();
-  }
-  function close() {
-    disclosure.close();
-    overlay.style.display = "none";
-    chevron.style.transform = "none";
-  }
   trigger.addEventListener("click", () => {
     if (props.disabled) return;
-    if (disclosure.isOpen) close();
-    else open();
+    disclosure.toggle();
   });
   clearBtn.addEventListener("click", (e) => {
     e.stopPropagation();
@@ -6077,6 +6152,7 @@ var init_multiselect = __esm({
     init_lucide();
     init_useDisclosure();
     init_useClickOutside();
+    init_useTransition();
   }
 });
 
@@ -6089,17 +6165,16 @@ function CascadeSelectIsland(container, props) {
   const options = props.options || [];
   let selectedText = "";
   let selectedValue = null;
-  const disclosure = useDisclosure({ defaultIsOpen: false });
   container.innerHTML = `
         <div class="laughtale-cascadeselect" style="position: relative; width: 100%; max-width: 280px; font-family: var(--p-font-family, inherit);">
             <!-- Trigger -->
             <div class="cascadeselect-trigger p-input" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; cursor: ${props.disabled ? "not-allowed" : "pointer"}; background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); user-select: none;">
                 <span class="cascadeselect-label" style="font-size: 0.875rem; color: var(--p-text-color);">${props.placeholder || "Select category..."}</span>
-                <span class="cascadeselect-chevron" style="color: var(--p-surface-400); display: flex;">${LucideIcons.chevronDown(16)}</span>
+                <span class="cascadeselect-chevron" style="color: var(--p-surface-400); display: flex;">${LucideIcons.chevronDown}</span>
             </div>
 
             <!-- Cascade Overlay Panes Container -->
-            <div class="cascadeselect-overlay" style="display: none; position: absolute; top: calc(100% + 4px); left: 0; z-index: 500; background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); box-shadow: var(--p-shadow-lg); min-width: 180px; display: none;">
+            <div class="cascadeselect-overlay" style="display: none; position: absolute; top: calc(100% + 4px); left: 0; z-index: 500; background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); box-shadow: var(--p-shadow-lg); min-width: 180px;">
                 <div class="cascade-level-0" style="padding: 0.25rem 0; min-width: 180px;"></div>
             </div>
         </div>
@@ -6108,25 +6183,35 @@ function CascadeSelectIsland(container, props) {
   const label = container.querySelector(".cascadeselect-label");
   const overlay = container.querySelector(".cascadeselect-overlay");
   const level0 = container.querySelector(".cascade-level-0");
-  useClickOutside(container, () => close());
+  const disclosure = useDisclosure({
+    defaultIsOpen: false,
+    onOpen: () => {
+      renderLevel(options, level0, []);
+      useTransition(overlay, { type: "fade", isMounted: true });
+    },
+    onClose: () => {
+      useTransition(overlay, { type: "fade", isMounted: false });
+    }
+  });
+  useClickOutside(container, () => disclosure.close());
   function renderLevel(nodes, parentContainer, path = []) {
     parentContainer.innerHTML = nodes.map((n) => {
       const hasChildren = n.children && n.children.length > 0;
       return `
                 <div class="cascade-item" data-code="${n.code || n.name}" style="position: relative; display: flex; align-items: center; justify-content: space-between; padding: 0.45rem 0.75rem; cursor: pointer; font-size: 0.8125rem; color: var(--p-text-color); transition: background 0.1s ease;">
                     <span>${n.name}</span>
-                    ${hasChildren ? `<span style="color: var(--p-surface-400); display: flex;">${LucideIcons.chevronDown(14)}</span>` : ""}
+                    ${hasChildren ? `<span style="color: var(--p-surface-400); display: flex;">${LucideIcons.chevronRight}</span>` : ""}
                     ${hasChildren ? `<div class="sub-pane" style="display: none; position: absolute; top: 0; left: 100%; min-width: 180px; background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); box-shadow: var(--p-shadow-lg); padding: 0.25rem 0;"></div>` : ""}
                 </div>
             `;
     }).join("");
     parentContainer.querySelectorAll(".cascade-item").forEach((itemEl, idx) => {
       const node = nodes[idx];
-      const hasChildren = node.children && node.children.length > 0;
-      const subPane = itemEl.querySelector(".sub-pane");
-      if (hasChildren && subPane) {
-        renderLevel(node.children, subPane, [...path, node.name]);
+      const currentPath = [...path, node.name];
+      if (node.children && node.children.length > 0) {
+        const subPane = itemEl.querySelector(".sub-pane");
         itemEl.addEventListener("mouseenter", () => {
+          renderLevel(node.children, subPane, currentPath);
           subPane.style.display = "block";
         });
         itemEl.addEventListener("mouseleave", () => {
@@ -6135,29 +6220,18 @@ function CascadeSelectIsland(container, props) {
       } else {
         itemEl.addEventListener("click", (e) => {
           e.stopPropagation();
-          const fullPath = [...path, node.name].join(" > ");
-          selectedText = fullPath;
-          selectedValue = node.value ?? node.code ?? node.name;
+          selectedText = currentPath.join(" / ");
+          selectedValue = node.code || node.name;
           label.textContent = selectedText;
+          disclosure.close();
           syncValue();
-          close();
         });
       }
     });
   }
-  function open() {
-    disclosure.open();
-    overlay.style.display = "flex";
-    renderLevel(options, level0);
-  }
-  function close() {
-    disclosure.close();
-    overlay.style.display = "none";
-  }
   trigger.addEventListener("click", () => {
     if (props.disabled) return;
-    if (disclosure.isOpen) close();
-    else open();
+    disclosure.toggle();
   });
   function syncValue() {
     if (props.targetInputName && selectedValue !== null) {
@@ -6172,7 +6246,7 @@ function CascadeSelectIsland(container, props) {
     }
     container.dispatchEvent(new CustomEvent("cascadeselect:change", {
       bubbles: true,
-      detail: { value: selectedValue, label: selectedText }
+      detail: { value: selectedValue, text: selectedText }
     }));
   }
 }
@@ -6182,6 +6256,7 @@ var init_cascadeselect = __esm({
     init_lucide();
     init_useDisclosure();
     init_useClickOutside();
+    init_useTransition();
   }
 });
 
@@ -6300,7 +6375,7 @@ function PickListIsland(container, props) {
                     </div>
                     <div class="picklist-source-list" style="height: 180px; overflow-y: auto; padding: 0.25rem 0;">
                         ${sourceList.map((it) => `
-                            <div class="picklist-item source-item ${selectedSource.has(it.id) ? "active" : ""}" data-id="${it.id}" style="padding: 0.45rem 0.75rem; cursor: pointer; font-size: 0.8125rem; background: ${selectedSource.has(it.id) ? "var(--p-primary-50)" : "transparent"}; color: ${selectedSource.has(it.id) ? "var(--p-primary-700)" : "var(--p-text-color)"}; font-weight: ${selectedSource.has(it.id) ? "600" : "normal"};">
+                            <div class="picklist-item source-item ${selectedSource.has(it.id) ? "active" : ""}" data-id="${it.id}" style="padding: 0.45rem 0.75rem; cursor: pointer; font-size: 0.8125rem; background: ${selectedSource.has(it.id) ? "var(--p-primary-50)" : "transparent"}; color: ${selectedSource.has(it.id) ? "var(--p-primary-700)" : "var(--p-text-color)"}; font-weight: ${selectedSource.has(it.id) ? "600" : "normal"}; transition: all 0.15s ease;">
                                 ${it.name}
                             </div>
                         `).join("")}
@@ -6330,7 +6405,7 @@ function PickListIsland(container, props) {
                     </div>
                     <div class="picklist-target-list" style="height: 180px; overflow-y: auto; padding: 0.25rem 0;">
                         ${targetList.map((it) => `
-                            <div class="picklist-item target-item ${selectedTarget.has(it.id) ? "active" : ""}" data-id="${it.id}" style="padding: 0.45rem 0.75rem; cursor: pointer; font-size: 0.8125rem; background: ${selectedTarget.has(it.id) ? "var(--p-primary-50)" : "transparent"}; color: ${selectedTarget.has(it.id) ? "var(--p-primary-700)" : "var(--p-text-color)"}; font-weight: ${selectedTarget.has(it.id) ? "600" : "normal"};">
+                            <div class="picklist-item target-item ${selectedTarget.has(it.id) ? "active" : ""}" data-id="${it.id}" style="padding: 0.45rem 0.75rem; cursor: pointer; font-size: 0.8125rem; background: ${selectedTarget.has(it.id) ? "var(--p-primary-50)" : "transparent"}; color: ${selectedTarget.has(it.id) ? "var(--p-primary-700)" : "var(--p-text-color)"}; font-weight: ${selectedTarget.has(it.id) ? "600" : "normal"}; transition: all 0.15s ease;">
                                 ${it.name}
                             </div>
                         `).join("")}
@@ -6338,6 +6413,10 @@ function PickListIsland(container, props) {
                 </div>
             </div>
         `;
+    const srcEl = container.querySelector(".picklist-source-list");
+    const tgtEl = container.querySelector(".picklist-target-list");
+    useAutoAnimate(srcEl, { duration: 200 });
+    useAutoAnimate(tgtEl, { duration: 200 });
     bindEvents();
   }
   function bindEvents() {
@@ -6359,36 +6438,36 @@ function PickListIsland(container, props) {
     });
     container.querySelector(".btn-move-to-target")?.addEventListener("click", () => {
       const moving = sourceList.filter((it) => selectedSource.has(it.id));
-      targetList.push(...moving);
+      targetList = [...targetList, ...moving];
       sourceList = sourceList.filter((it) => !selectedSource.has(it.id));
       selectedSource.clear();
       render();
-      syncValue();
+      syncValues();
     });
     container.querySelector(".btn-move-all-to-target")?.addEventListener("click", () => {
-      targetList.push(...sourceList);
+      targetList = [...targetList, ...sourceList];
       sourceList = [];
       selectedSource.clear();
       render();
-      syncValue();
+      syncValues();
     });
     container.querySelector(".btn-move-to-source")?.addEventListener("click", () => {
       const moving = targetList.filter((it) => selectedTarget.has(it.id));
-      sourceList.push(...moving);
+      sourceList = [...sourceList, ...moving];
       targetList = targetList.filter((it) => !selectedTarget.has(it.id));
       selectedTarget.clear();
       render();
-      syncValue();
+      syncValues();
     });
     container.querySelector(".btn-move-all-to-source")?.addEventListener("click", () => {
-      sourceList.push(...targetList);
+      sourceList = [...sourceList, ...targetList];
       targetList = [];
       selectedTarget.clear();
       render();
-      syncValue();
+      syncValues();
     });
   }
-  function syncValue() {
+  function syncValues() {
     if (props.targetInputName) {
       let hidden = container.querySelector(`input[name="${props.targetInputName}"]`);
       if (!hidden) {
@@ -6397,7 +6476,7 @@ function PickListIsland(container, props) {
         hidden.name = props.targetInputName;
         container.appendChild(hidden);
       }
-      hidden.value = JSON.stringify(targetList);
+      hidden.value = JSON.stringify(targetList.map((it) => it.id));
     }
     container.dispatchEvent(new CustomEvent("picklist:change", {
       bubbles: true,
@@ -6405,12 +6484,13 @@ function PickListIsland(container, props) {
     }));
   }
   render();
-  syncValue();
+  syncValues();
 }
 var init_picklist = __esm({
   "src/components/picklist.ts"() {
     "use strict";
     init_lucide();
+    init_useAutoAnimate();
   }
 });
 
@@ -6443,7 +6523,7 @@ function OrderListIsland(container, props) {
                     ${props.header ? `<div style="padding: 0.625rem 0.875rem; background: var(--p-surface-50); border-bottom: 1px solid var(--p-border-color); font-size: 0.75rem; font-weight: 700; color: var(--p-surface-600); text-transform: uppercase;">${props.header}</div>` : ""}
                     <div class="orderlist-items-container" style="max-height: 220px; overflow-y: auto; padding: 0.25rem 0;">
                         ${items.map((it, idx) => `
-                            <div class="orderlist-item ${selectedIndex === idx ? "active" : ""}" data-index="${idx}" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.875rem; cursor: pointer; font-size: 0.8125rem; background: ${selectedIndex === idx ? "var(--p-primary-50)" : "transparent"}; color: ${selectedIndex === idx ? "var(--p-primary-700)" : "var(--p-text-color)"}; font-weight: ${selectedIndex === idx ? "600" : "normal"};">
+                            <div class="orderlist-item ${selectedIndex === idx ? "active" : ""}" data-index="${idx}" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.875rem; cursor: pointer; font-size: 0.8125rem; background: ${selectedIndex === idx ? "var(--p-primary-50)" : "transparent"}; color: ${selectedIndex === idx ? "var(--p-primary-700)" : "var(--p-text-color)"}; font-weight: ${selectedIndex === idx ? "600" : "normal"}; transition: all 0.15s ease;">
                                 <span>${it.name}</span>
                                 <span style="font-family: monospace; font-size: 0.6875rem; color: var(--p-surface-400);">#${idx + 1}</span>
                             </div>
@@ -6452,6 +6532,8 @@ function OrderListIsland(container, props) {
                 </div>
             </div>
         `;
+    const itemsEl = container.querySelector(".orderlist-items-container");
+    useAutoAnimate(itemsEl, { duration: 200 });
     bindEvents();
   }
   function bindEvents() {
@@ -6463,40 +6545,42 @@ function OrderListIsland(container, props) {
     });
     container.querySelector(".btn-order-top")?.addEventListener("click", () => {
       if (selectedIndex === null || selectedIndex <= 0) return;
-      const item = items.splice(selectedIndex, 1)[0];
-      items.unshift(item);
+      const it = items.splice(selectedIndex, 1)[0];
+      items.unshift(it);
       selectedIndex = 0;
       render();
-      syncValue();
+      syncValues();
     });
     container.querySelector(".btn-order-up")?.addEventListener("click", () => {
       if (selectedIndex === null || selectedIndex <= 0) return;
-      const temp = items[selectedIndex];
-      items[selectedIndex] = items[selectedIndex - 1];
-      items[selectedIndex - 1] = temp;
-      selectedIndex--;
+      const target = selectedIndex - 1;
+      const temp = items[target];
+      items[target] = items[selectedIndex];
+      items[selectedIndex] = temp;
+      selectedIndex = target;
       render();
-      syncValue();
+      syncValues();
     });
     container.querySelector(".btn-order-down")?.addEventListener("click", () => {
       if (selectedIndex === null || selectedIndex >= items.length - 1) return;
-      const temp = items[selectedIndex];
-      items[selectedIndex] = items[selectedIndex + 1];
-      items[selectedIndex + 1] = temp;
-      selectedIndex++;
+      const target = selectedIndex + 1;
+      const temp = items[target];
+      items[target] = items[selectedIndex];
+      items[selectedIndex] = temp;
+      selectedIndex = target;
       render();
-      syncValue();
+      syncValues();
     });
     container.querySelector(".btn-order-bottom")?.addEventListener("click", () => {
       if (selectedIndex === null || selectedIndex >= items.length - 1) return;
-      const item = items.splice(selectedIndex, 1)[0];
-      items.push(item);
+      const it = items.splice(selectedIndex, 1)[0];
+      items.push(it);
       selectedIndex = items.length - 1;
       render();
-      syncValue();
+      syncValues();
     });
   }
-  function syncValue() {
+  function syncValues() {
     if (props.targetInputName) {
       let hidden = container.querySelector(`input[name="${props.targetInputName}"]`);
       if (!hidden) {
@@ -6505,7 +6589,7 @@ function OrderListIsland(container, props) {
         hidden.name = props.targetInputName;
         container.appendChild(hidden);
       }
-      hidden.value = JSON.stringify(items);
+      hidden.value = JSON.stringify(items.map((it) => it.id));
     }
     container.dispatchEvent(new CustomEvent("orderlist:change", {
       bubbles: true,
@@ -6513,11 +6597,12 @@ function OrderListIsland(container, props) {
     }));
   }
   render();
-  syncValue();
+  syncValues();
 }
 var init_orderlist = __esm({
   "src/components/orderlist.ts"() {
     "use strict";
+    init_useAutoAnimate();
   }
 });
 
@@ -6865,7 +6950,6 @@ function SplitButtonIsland(container, props) {
     { label: "Export as Encrypted JSON", icon: "download", action: "export" },
     { label: "Delete Record", icon: "trash", action: "delete" }
   ];
-  const disclosure = useDisclosure({ defaultIsOpen: false });
   container.innerHTML = `
         <div class="laughtale-splitbutton" style="position: relative; display: inline-flex; border-radius: var(--p-border-radius); overflow: visible; font-family: var(--p-font-family, inherit);">
             <!-- Primary Action Button -->
@@ -6891,38 +6975,35 @@ function SplitButtonIsland(container, props) {
   const mainBtn = container.querySelector(".splitbutton-main-btn");
   const menuBtn = container.querySelector(".splitbutton-menu-btn");
   const overlay = container.querySelector(".splitbutton-menu-overlay");
-  useClickOutside(container, () => close());
-  function open() {
-    disclosure.open();
-    overlay.style.display = "block";
-  }
-  function close() {
-    disclosure.close();
-    overlay.style.display = "none";
-  }
+  const disclosure = useDisclosure({
+    defaultIsOpen: false,
+    onOpen: () => {
+      useTransition(overlay, { type: "fade", isMounted: true });
+    },
+    onClose: () => {
+      useTransition(overlay, { type: "fade", isMounted: false });
+    }
+  });
+  useClickOutside(container, () => disclosure.close());
   mainBtn.addEventListener("click", () => {
     container.dispatchEvent(new CustomEvent("splitbutton:click", {
       bubbles: true,
       detail: { action: "main" }
     }));
   });
-  menuBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    if (disclosure.isOpen) close();
-    else open();
+  menuBtn.addEventListener("click", () => {
+    disclosure.toggle();
   });
-  overlay.querySelectorAll(".splitbutton-menu-item").forEach((item) => {
-    item.addEventListener("click", () => {
-      const action = item.getAttribute("data-action");
-      const url = item.getAttribute("data-url");
+  container.querySelectorAll(".splitbutton-menu-item").forEach((itemEl) => {
+    itemEl.addEventListener("click", () => {
+      const action = itemEl.getAttribute("data-action");
+      const url = itemEl.getAttribute("data-url");
       if (url) window.location.href = url;
-      else {
-        container.dispatchEvent(new CustomEvent("splitbutton:item-click", {
-          bubbles: true,
-          detail: { action }
-        }));
-      }
-      close();
+      container.dispatchEvent(new CustomEvent("splitbutton:item-click", {
+        bubbles: true,
+        detail: { action }
+      }));
+      disclosure.close();
     });
   });
 }
@@ -6932,6 +7013,7 @@ var init_split_button = __esm({
     init_lucide();
     init_useDisclosure();
     init_useClickOutside();
+    init_useTransition();
   }
 });
 

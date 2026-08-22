@@ -574,6 +574,134 @@ function RatingIsland(container, props) {
   syncValue();
 }
 
+// src/composables/useDisclosure.ts
+function useDisclosure(options = {}) {
+  let isOpen = Boolean(options.defaultIsOpen);
+  const listeners = /* @__PURE__ */ new Set();
+  function notify() {
+    options.onToggle?.(isOpen);
+    listeners.forEach((fn) => fn(isOpen));
+  }
+  function open() {
+    if (!isOpen) {
+      isOpen = true;
+      options.onOpen?.();
+      notify();
+    }
+  }
+  function close() {
+    if (isOpen) {
+      isOpen = false;
+      options.onClose?.();
+      notify();
+    }
+  }
+  function toggle() {
+    if (isOpen) close();
+    else open();
+  }
+  function setOpen(value) {
+    if (value) open();
+    else close();
+  }
+  function onChange(listener) {
+    listeners.add(listener);
+    return () => listeners.delete(listener);
+  }
+  return {
+    get isOpen() {
+      return isOpen;
+    },
+    open,
+    close,
+    toggle,
+    setOpen,
+    onChange
+  };
+}
+
+// src/composables/animation/useTransition.ts
+function useTransition(element, options = {}) {
+  const duration = options.duration ?? 200;
+  const easing = options.easing ?? "cubic-bezier(0.16, 1, 0.3, 1)";
+  const preset = options.preset ?? "fade";
+  function getPresetStyles(state) {
+    switch (preset) {
+      case "fade":
+        return {
+          opacity: state === "visible" ? "1" : "0",
+          transform: "none"
+        };
+      case "scale":
+        return {
+          opacity: state === "visible" ? "1" : "0",
+          transform: state === "visible" ? "scale(1)" : "scale(0.95)"
+        };
+      case "slide-up":
+        return {
+          opacity: state === "visible" ? "1" : "0",
+          transform: state === "visible" ? "translateY(0)" : "translateY(12px)"
+        };
+      case "slide-down":
+        return {
+          opacity: state === "visible" ? "1" : "0",
+          transform: state === "visible" ? "translateY(0)" : "translateY(-12px)"
+        };
+      case "slide-left":
+        return {
+          transform: state === "visible" ? "translateX(0)" : "translateX(100%)"
+        };
+      case "slide-right":
+        return {
+          transform: state === "visible" ? "translateX(0)" : "translateX(-100%)"
+        };
+      case "collapse":
+        return {
+          height: state === "visible" ? "auto" : "0px",
+          opacity: state === "visible" ? "1" : "0",
+          overflow: "hidden"
+        };
+      default:
+        return { opacity: state === "visible" ? "1" : "0" };
+    }
+  }
+  function enter(cb) {
+    if (!element) return;
+    options.onEnterStart?.();
+    element.style.transition = `all ${duration}ms ${easing}`;
+    element.style.willChange = "transform, opacity";
+    const hidden = getPresetStyles("hidden");
+    Object.assign(element.style, hidden);
+    element.style.display = "block";
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const visible = getPresetStyles("visible");
+        Object.assign(element.style, visible);
+        setTimeout(() => {
+          element.style.willChange = "auto";
+          options.onEnterEnd?.();
+          cb?.();
+        }, duration);
+      });
+    });
+  }
+  function exit(cb) {
+    if (!element) return;
+    options.onExitStart?.();
+    element.style.transition = `all ${duration}ms ${easing}`;
+    element.style.willChange = "transform, opacity";
+    const hidden = getPresetStyles("hidden");
+    Object.assign(element.style, hidden);
+    setTimeout(() => {
+      element.style.display = "none";
+      element.style.willChange = "auto";
+      options.onExitEnd?.();
+      cb?.();
+    }, duration);
+  }
+  return { enter, exit };
+}
+
 // src/components/accordion.ts
 function AccordionIsland(container, props) {
   const tabs = props.tabs || [];
@@ -585,9 +713,15 @@ function AccordionIsland(container, props) {
   } else {
     activeIndices.add(0);
   }
+  const disclosures = {};
+  tabs.forEach((_, idx) => {
+    disclosures[idx] = useDisclosure({
+      defaultIsOpen: activeIndices.has(idx)
+    });
+  });
   function render() {
     const tabHtml = tabs.map((tab, idx) => {
-      const isOpen = activeIndices.has(idx);
+      const isOpen = disclosures[idx]?.isOpen ?? false;
       return `
                 <div class="accordion-tab ${isOpen ? "tab-open" : ""}" data-idx="${idx}" style="border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); margin-bottom: 0.5rem; background: var(--p-surface-0); overflow: hidden;">
                     <button type="button" 
@@ -599,11 +733,11 @@ function AccordionIsland(container, props) {
                             ${tab.icon ? `<span>${tab.icon}</span>` : ""}
                             <span>${tab.header}</span>
                         </span>
-                        <span class="chevron-icon" style="color: var(--p-surface-500); display: flex; align-items: center; transition: transform 0.2s ease; transform: rotate(${isOpen ? "180deg" : "0deg"});">
+                        <span class="chevron-icon" style="color: var(--p-surface-500); display: flex; align-items: center; transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1); transform: rotate(${isOpen ? "180deg" : "0deg"});">
                             ${LucideIcons.chevronDown}
                         </span>
                     </button>
-                    <div class="accordion-content" style="display: ${isOpen ? "block" : "none"}; padding: 1.25rem; border-top: 1px solid var(--p-border-color); font-size: 0.875rem; color: var(--p-surface-600); line-height: 1.6; animation: fadeIn 0.2s ease;">
+                    <div class="accordion-content" style="display: ${isOpen ? "block" : "none"}; padding: 1.25rem; border-top: 1px solid var(--p-border-color); font-size: 0.875rem; color: var(--p-surface-600); line-height: 1.6;">
                         <div class="tab-slot" data-slot-index="${idx}">${tab.content || ""}</div>
                     </div>
                 </div>
@@ -614,28 +748,46 @@ function AccordionIsland(container, props) {
                 ${tabHtml}
             </div>
         `;
-    tabs.forEach((_, idx) => {
-      const externalSlot = container.querySelector(`[data-slot="tab-${idx}"]`);
-      const targetContainer = container.querySelector(`[data-slot-index="${idx}"]`);
-      if (externalSlot && targetContainer) {
-        targetContainer.innerHTML = "";
-        targetContainer.appendChild(externalSlot);
+    bindEvents();
+  }
+  function toggleTab(idx) {
+    if (!props.multiple) {
+      tabs.forEach((_, otherIdx) => {
+        if (otherIdx !== idx) disclosures[otherIdx]?.close();
+      });
+    }
+    disclosures[idx]?.toggle();
+    updateDOM();
+  }
+  function updateDOM() {
+    container.querySelectorAll(".accordion-tab").forEach((tabEl) => {
+      const idx = Number(tabEl.getAttribute("data-idx"));
+      const isOpen = disclosures[idx]?.isOpen ?? false;
+      const contentEl = tabEl.querySelector(".accordion-content");
+      const chevronEl = tabEl.querySelector(".chevron-icon");
+      const headerBtn = tabEl.querySelector(".accordion-header-btn");
+      tabEl.classList.toggle("tab-open", isOpen);
+      headerBtn.style.background = isOpen ? "var(--p-surface-50)" : "var(--p-surface-0)";
+      chevronEl.style.transform = `rotate(${isOpen ? "180deg" : "0deg"})`;
+      const transition = useTransition(contentEl, { preset: "collapse" });
+      if (isOpen) {
+        transition.enter();
+      } else {
+        contentEl.style.display = "none";
+        transition.exit();
       }
     });
+    const activeList = tabs.map((_, idx) => idx).filter((idx) => disclosures[idx]?.isOpen);
+    container.dispatchEvent(new CustomEvent("accordion:change", {
+      bubbles: true,
+      detail: { activeIndex: activeList }
+    }));
+  }
+  function bindEvents() {
     container.querySelectorAll(".accordion-header-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
-        const idx = parseInt(btn.getAttribute("data-idx"), 10);
-        if (activeIndices.has(idx)) {
-          activeIndices.delete(idx);
-        } else {
-          if (!props.multiple) activeIndices.clear();
-          activeIndices.add(idx);
-        }
-        render();
-        container.dispatchEvent(new CustomEvent("accordion:change", {
-          bubbles: true,
-          detail: { activeIndex: Array.from(activeIndices) }
-        }));
+        const idx = Number(btn.getAttribute("data-idx"));
+        toggleTab(idx);
       });
     });
   }
@@ -654,7 +806,7 @@ function TabsIsland(container, props) {
                         class="tab-header-btn ${isActive ? "tab-active" : ""}" 
                         data-idx="${idx}" 
                         ${tab.disabled ? "disabled" : ""} 
-                        style="padding: 0.75rem 1.25rem; border: none; background: transparent; color: ${isActive ? "var(--p-primary-600)" : "var(--p-surface-600)"}; font-weight: ${isActive ? "700" : "500"}; font-size: 0.875rem; cursor: ${tab.disabled ? "not-allowed" : "pointer"}; border-bottom: 2px solid ${isActive ? "var(--p-primary-600)" : "transparent"}; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 0.5rem;">
+                        style="position: relative; padding: 0.75rem 1.25rem; border: none; background: transparent; color: ${isActive ? "var(--p-primary-600)" : "var(--p-surface-600)"}; font-weight: ${isActive ? "700" : "500"}; font-size: 0.875rem; cursor: ${tab.disabled ? "not-allowed" : "pointer"}; transition: color 0.15s ease; display: inline-flex; align-items: center; gap: 0.5rem; border-bottom: 2px solid ${isActive ? "var(--p-primary-600)" : "transparent"};">
                     ${tab.icon ? `<span>${tab.icon}</span>` : ""}
                     <span>${tab.header}</span>
                 </button>
@@ -663,12 +815,12 @@ function TabsIsland(container, props) {
     container.innerHTML = `
             <div class="laughtale-tabs" style="width: 100%;">
                 <!-- Tab Headers Bar -->
-                <div class="tabs-header-bar" style="display: flex; border-bottom: 1px solid var(--p-border-color); gap: 0.25rem; overflow-x: auto;">
+                <div class="tabs-header-bar" style="display: flex; border-bottom: 1px solid var(--p-border-color); gap: 0.25rem; overflow-x: auto; position: relative;">
                     ${headerButtons}
                 </div>
 
                 <!-- Active Tab Content Panel -->
-                <div class="tab-panel-body" style="padding: 1.25rem 0; font-size: 0.875rem; color: var(--p-surface-700); line-height: 1.6; animation: fadeIn 0.2s ease;">
+                <div class="tab-panel-body" style="padding: 1.25rem 0; font-size: 0.875rem; color: var(--p-surface-700); line-height: 1.6; transition: opacity 0.2s ease;">
                     <div class="tab-slot-content">${tabs[activeIndex]?.content || ""}</div>
                 </div>
             </div>
@@ -681,30 +833,27 @@ function TabsIsland(container, props) {
     }
     container.querySelectorAll(".tab-header-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
-        activeIndex = parseInt(btn.getAttribute("data-idx"), 10);
+        const idx = Number(btn.getAttribute("data-idx"));
+        activeIndex = idx;
         render();
-        syncValue();
+        if (props.targetInputName) {
+          let hidden = container.querySelector(`input[name="${props.targetInputName}"]`);
+          if (!hidden) {
+            hidden = document.createElement("input");
+            hidden.type = "hidden";
+            hidden.name = props.targetInputName;
+            container.appendChild(hidden);
+          }
+          hidden.value = String(activeIndex);
+        }
+        container.dispatchEvent(new CustomEvent("tabs:change", {
+          bubbles: true,
+          detail: { activeIndex }
+        }));
       });
     });
   }
-  function syncValue() {
-    if (props.targetInputName) {
-      let hidden = document.querySelector(`input[name="${props.targetInputName}"]`);
-      if (!hidden) {
-        hidden = document.createElement("input");
-        hidden.type = "hidden";
-        hidden.name = props.targetInputName;
-        container.appendChild(hidden);
-      }
-      hidden.value = activeIndex.toString();
-    }
-    container.dispatchEvent(new CustomEvent("tabs:change", {
-      bubbles: true,
-      detail: { index: activeIndex, tab: tabs[activeIndex] }
-    }));
-  }
   render();
-  syncValue();
 }
 
 // src/components/autocomplete.ts

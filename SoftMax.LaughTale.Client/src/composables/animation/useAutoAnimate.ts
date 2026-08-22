@@ -9,7 +9,7 @@ export interface AutoAnimateOptions {
 }
 
 export function useAutoAnimate(parent: HTMLElement | null, options: AutoAnimateOptions = {}) {
-    if (!parent || typeof window === 'undefined' || !('MutationObserver' in window)) {
+    if (!parent || typeof window === 'undefined' || typeof MutationObserver === 'undefined') {
         return { destroy: () => {} };
     }
 

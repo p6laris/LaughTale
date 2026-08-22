@@ -1,8 +1,10 @@
 /**
  * SoftMax.LaughTale: Enterprise SpeedDial FAB Component (Aura SpeedDial inspired)
+ * Integrated with useStagger for cascading staggered button entrances.
  */
 
 import { LucideIcons } from '../icons/lucide';
+import { useStagger } from '../composables/animation/useStagger';
 
 export interface SpeedDialAction {
     label: string;
@@ -33,16 +35,21 @@ export default function SpeedDialIsland(container: HTMLElement, props: SpeedDial
         container.innerHTML = `
             <div class="laughtale-speed-dial" style="position: relative; display: inline-flex; flex-direction: column-reverse; align-items: center; gap: 0.75rem;">
                 <!-- Main FAB Button -->
-                <button type="button" class="speed-dial-main-btn" style="width: 3.25rem; height: 3.25rem; border-radius: 50%; border: none; background: var(--p-primary-600); color: #ffffff; box-shadow: var(--p-shadow-lg); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1); transform: rotate(${isOpen ? '45deg' : '0deg'});">
+                <button type="button" class="speed-dial-main-btn" style="width: 3.25rem; height: 3.25rem; border-radius: 50%; border: none; background: var(--p-primary-600); color: #ffffff; box-shadow: var(--p-shadow-lg); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); transform: rotate(${isOpen ? '45deg' : '0deg'});">
                     ${LucideIcons.plus}
                 </button>
 
                 <!-- Action Items -->
-                <div class="speed-dial-list" style="display: ${isOpen ? 'flex' : 'none'}; flex-direction: column-reverse; gap: 0.5rem; animation: fadeInUp 0.2s ease;">
+                <div class="speed-dial-list" style="display: ${isOpen ? 'flex' : 'none'}; flex-direction: column-reverse; gap: 0.5rem;">
                     ${actionItems}
                 </div>
             </div>
         `;
+
+        if (isOpen) {
+            const actionBtns = Array.from(container.querySelectorAll<HTMLElement>('.speed-dial-action-btn'));
+            useStagger(actionBtns, { staggerMs: 40, initialDelay: 10 });
+        }
 
         container.querySelector('.speed-dial-main-btn')?.addEventListener('click', () => {
             isOpen = !isOpen;

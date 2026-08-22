@@ -1,8 +1,11 @@
 /**
  * SoftMax.LaughTale: Enterprise Slide-out Drawer / Sidebar Component (Aura Drawer inspired)
+ * Integrated with useDisclosure, useFocusTrap, and smooth spring physics slide transitions.
  */
 
 import { LucideIcons } from '../icons/lucide';
+import { useDisclosure } from '../composables/useDisclosure';
+import { useFocusTrap } from '../composables/useFocusTrap';
 
 export interface DrawerProps {
     position?: 'left' | 'right' | 'top' | 'bottom';
@@ -14,7 +17,6 @@ export interface DrawerProps {
 export default function DrawerIsland(container: HTMLElement, props: DrawerProps) {
     const position = props.position || 'right';
     const width = props.width || '380px';
-    let isOpen = false;
 
     function render() {
         container.innerHTML = `
@@ -26,10 +28,10 @@ export default function DrawerIsland(container: HTMLElement, props: DrawerProps)
                 ` : ''}
 
                 <!-- Backdrop -->
-                <div class="drawer-backdrop" style="display: ${isOpen ? 'block' : 'none'}; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); z-index: 1000; animation: fadeIn 0.2s ease;"></div>
+                <div class="drawer-backdrop" style="display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.45); backdrop-filter: blur(4px); z-index: 1000; opacity: 0; transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1);"></div>
 
                 <!-- Drawer Panel -->
-                <div class="drawer-panel" style="display: ${isOpen ? 'flex' : 'none'}; flex-direction: column; position: fixed; ${position}: 0; top: 0; bottom: 0; width: ${width}; max-width: 90vw; background: var(--p-surface-0); border-${position === 'right' ? 'left' : 'right'}: 1px solid var(--p-border-color); box-shadow: var(--p-shadow-lg); z-index: 1001; animation: slideInDrawer 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
+                <div class="drawer-panel" style="display: flex; flex-direction: column; position: fixed; ${position}: 0; top: 0; bottom: 0; width: ${width}; max-width: 90vw; background: var(--p-surface-0); border-${position === 'right' ? 'left' : 'right'}: 1px solid var(--p-border-color); box-shadow: var(--p-shadow-lg); z-index: 1001; transform: translateX(${position === 'right' ? '100%' : '-100%'}); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); pointer-events: none;">
                     
                     <!-- Header -->
                     <div style="display: flex; align-items: center; justify-content: space-between; padding: 1.25rem; border-bottom: 1px solid var(--p-border-color);">
@@ -49,25 +51,35 @@ export default function DrawerIsland(container: HTMLElement, props: DrawerProps)
             </div>
         `;
 
-        // Slot projection
-        const slotEl = container.querySelector('[data-slot="default"]') || container.querySelector('.island-slot');
-        const slotContainer = container.querySelector('.drawer-slot-container');
-        if (slotEl && slotContainer) slotContainer.appendChild(slotEl);
+        const backdrop = container.querySelector<HTMLElement>('.drawer-backdrop')!;
+        const panel = container.querySelector<HTMLElement>('.drawer-panel')!;
+        const openBtn = container.querySelector<HTMLButtonElement>('.drawer-open-btn');
+        const closeBtn = container.querySelector<HTMLButtonElement>('.drawer-close-btn')!;
 
-        container.querySelector('.drawer-open-btn')?.addEventListener('click', () => {
-            isOpen = true;
-            render();
+        const focusTrap = useFocusTrap(panel);
+        const disclosure = useDisclosure({
+            defaultIsOpen: false,
+            onOpen: () => {
+                backdrop.style.display = 'block';
+                setTimeout(() => {
+                    backdrop.style.opacity = '1';
+                    panel.style.transform = 'translateX(0)';
+                    panel.style.pointerEvents = 'auto';
+                }, 10);
+                focusTrap.activate();
+            },
+            onClose: () => {
+                backdrop.style.opacity = '0';
+                panel.style.transform = `translateX(${position === 'right' ? '100%' : '-100%'})`;
+                panel.style.pointerEvents = 'none';
+                setTimeout(() => { backdrop.style.display = 'none'; }, 300);
+                focusTrap.deactivate();
+            }
         });
 
-        container.querySelector('.drawer-close-btn')?.addEventListener('click', () => {
-            isOpen = false;
-            render();
-        });
-
-        container.querySelector('.drawer-backdrop')?.addEventListener('click', () => {
-            isOpen = false;
-            render();
-        });
+        openBtn?.addEventListener('click', () => disclosure.open());
+        closeBtn?.addEventListener('click', () => disclosure.close());
+        backdrop?.addEventListener('click', () => disclosure.close());
     }
 
     render();

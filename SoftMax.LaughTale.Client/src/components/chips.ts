@@ -1,8 +1,11 @@
 /**
- * SoftMax.LaughTale: Enterprise Chips / Tag Input Component (Aura InputTags inspired)
+ * SoftMax.LaughTale: Enterprise Chips / Tag Input Component
+ * Integrated with useAutoAnimate for FLIP-based smooth tag insertions and removals.
  */
 
 import { LucideIcons } from '../icons/lucide';
+import { useAutoAnimate } from '../composables/animation/useAutoAnimate';
+import { useControllableState } from '../composables/useControllableState';
 
 export interface ChipsProps {
     targetInputName?: string;
@@ -13,11 +16,17 @@ export interface ChipsProps {
 }
 
 export default function ChipsIsland(container: HTMLElement, props: ChipsProps) {
-    let chips: string[] = props.values ? [...props.values] : [];
+    const [getChips, setChips] = useControllableState<string[]>({
+        defaultValue: props.values ? [...props.values] : [],
+        onChange: (val) => {
+            syncValue(val);
+        }
+    });
 
     function render() {
+        const chips = getChips();
         const chipTags = chips.map((c, idx) => `
-            <span class="chip-item" style="display: inline-flex; align-items: center; gap: 0.35rem; background: var(--p-surface-100); color: var(--p-surface-800); border: 1px solid var(--p-surface-200); padding: 0.2rem 0.5rem; border-radius: var(--p-border-radius); font-size: 0.8125rem; font-weight: 500;">
+            <span class="chip-item" data-val="${c}" style="display: inline-flex; align-items: center; gap: 0.35rem; background: var(--p-surface-100); color: var(--p-surface-800); border: 1px solid var(--p-surface-200); padding: 0.2rem 0.5rem; border-radius: var(--p-border-radius); font-size: 0.8125rem; font-weight: 500; transition: all 0.15s ease;">
                 <span>${c}</span>
                 ${!props.disabled ? `
                     <button type="button" class="remove-chip-btn" data-index="${idx}" style="border: none; background: transparent; color: var(--p-surface-400); cursor: pointer; display: flex; align-items: center; padding: 0;">
@@ -34,62 +43,63 @@ export default function ChipsIsland(container: HTMLElement, props: ChipsProps) {
             </div>
         `;
 
+        const wrapper = container.querySelector<HTMLElement>('.laughtale-chips')!;
+        useAutoAnimate(wrapper, { duration: 200 });
+
         if (props.disabled) return;
 
         const input = container.querySelector<HTMLInputElement>('.chip-text-input')!;
 
         input.addEventListener('keydown', (e) => {
+            const current = getChips();
             if (e.key === 'Enter' || e.key === ',') {
                 e.preventDefault();
                 const val = input.value.trim().replace(/,$/, '');
-                if (val && !chips.includes(val) && (!props.max || chips.length < props.max)) {
-                    chips.push(val);
+                if (val && !current.includes(val) && (!props.max || current.length < props.max)) {
+                    setChips([...current, val]);
                     render();
-                    syncValue();
                     const nextInput = container.querySelector<HTMLInputElement>('.chip-text-input')!;
                     nextInput.focus();
                 }
-            } else if (e.key === 'Backspace' && !input.value && chips.length > 0) {
-                chips.pop();
+            } else if (e.key === 'Backspace' && !input.value && current.length > 0) {
+                setChips(current.slice(0, -1));
                 render();
-                syncValue();
                 const nextInput = container.querySelector<HTMLInputElement>('.chip-text-input')!;
                 nextInput.focus();
             }
         });
 
-        container.querySelectorAll('.remove-chip-btn').forEach((btn) => {
+        container.querySelectorAll('.remove-chip-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const idx = parseInt(btn.getAttribute('data-index')!, 10);
-                chips.splice(idx, 1);
+                const idx = Number(btn.getAttribute('data-index'));
+                const current = getChips();
+                setChips(current.filter((_, i) => i !== idx));
                 render();
-                syncValue();
             });
         });
 
-        container.querySelector('.laughtale-chips')?.addEventListener('click', () => {
-            input.focus();
-        });
+        wrapper.addEventListener('click', () => input.focus());
     }
 
-    function syncValue() {
+    function syncValue(current: string[]) {
         if (props.targetInputName) {
-            let hidden = document.querySelector<HTMLInputElement>(`input[name="${props.targetInputName}"]`);
+            let hidden = container.querySelector<HTMLInputElement>(`input[name="${props.targetInputName}"]`);
             if (!hidden) {
                 hidden = document.createElement('input');
                 hidden.type = 'hidden';
                 hidden.name = props.targetInputName;
                 container.appendChild(hidden);
             }
-            hidden.value = JSON.stringify(chips);
+            hidden.value = JSON.stringify(current);
         }
 
         container.dispatchEvent(new CustomEvent('chips:change', {
             bubbles: true,
-            detail: { values: chips }
+            detail: { values: current }
         }));
     }
 
     render();
+    syncValue(getChips());
 }

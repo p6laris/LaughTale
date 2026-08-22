@@ -1,12 +1,14 @@
 /**
  * SoftMax.LaughTale: Enterprise SplitButton Component (Aura SplitButton inspired)
  * Main action button paired with a dropdown trigger menu.
+ * Integrated with useDisclosure, useClickOutside, and useTransition.
  */
 
 import { SplitButtonItem, ButtonSeverity } from '../types/models';
 import { LucideIcons } from '../icons/lucide';
 import { useDisclosure } from '../composables/useDisclosure';
 import { useClickOutside } from '../composables/useClickOutside';
+import { useTransition } from '../composables/animation/useTransition';
 
 export interface SplitButtonProps {
     label?: string;
@@ -23,8 +25,6 @@ export default function SplitButtonIsland(container: HTMLElement, props: SplitBu
         { label: 'Export as Encrypted JSON', icon: 'download', action: 'export' },
         { label: 'Delete Record', icon: 'trash', action: 'delete' }
     ];
-
-    const disclosure = useDisclosure({ defaultIsOpen: false });
 
     container.innerHTML = `
         <div class="laughtale-splitbutton" style="position: relative; display: inline-flex; border-radius: var(--p-border-radius); overflow: visible; font-family: var(--p-font-family, inherit);">
@@ -53,17 +53,17 @@ export default function SplitButtonIsland(container: HTMLElement, props: SplitBu
     const menuBtn = container.querySelector<HTMLButtonElement>('.splitbutton-menu-btn')!;
     const overlay = container.querySelector<HTMLElement>('.splitbutton-menu-overlay')!;
 
-    useClickOutside(container, () => close());
+    const disclosure = useDisclosure({
+        defaultIsOpen: false,
+        onOpen: () => {
+            useTransition(overlay, { type: 'fade', isMounted: true });
+        },
+        onClose: () => {
+            useTransition(overlay, { type: 'fade', isMounted: false });
+        }
+    });
 
-    function open() {
-        disclosure.open();
-        overlay.style.display = 'block';
-    }
-
-    function close() {
-        disclosure.close();
-        overlay.style.display = 'none';
-    }
+    useClickOutside(container, () => disclosure.close());
 
     mainBtn.addEventListener('click', () => {
         container.dispatchEvent(new CustomEvent('splitbutton:click', {
@@ -72,24 +72,20 @@ export default function SplitButtonIsland(container: HTMLElement, props: SplitBu
         }));
     });
 
-    menuBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (disclosure.isOpen) close();
-        else open();
+    menuBtn.addEventListener('click', () => {
+        disclosure.toggle();
     });
 
-    overlay.querySelectorAll('.splitbutton-menu-item').forEach(item => {
-        item.addEventListener('click', () => {
-            const action = item.getAttribute('data-action');
-            const url = item.getAttribute('data-url');
+    container.querySelectorAll('.splitbutton-menu-item').forEach(itemEl => {
+        itemEl.addEventListener('click', () => {
+            const action = itemEl.getAttribute('data-action');
+            const url = itemEl.getAttribute('data-url');
             if (url) window.location.href = url;
-            else {
-                container.dispatchEvent(new CustomEvent('splitbutton:item-click', {
-                    bubbles: true,
-                    detail: { action }
-                }));
-            }
-            close();
+            container.dispatchEvent(new CustomEvent('splitbutton:item-click', {
+                bubbles: true,
+                detail: { action }
+            }));
+            disclosure.close();
         });
     });
 }

@@ -1,12 +1,14 @@
 /**
  * SoftMax.LaughTale: Enterprise CascadeSelect Component (Aura CascadeSelect inspired)
  * Hierarchical cascading multi-level dropdown menu for selecting nested categories.
+ * Integrated with useDisclosure, useClickOutside, and useTransition.
  */
 
 import { CascadeSelectNode } from '../types/models';
 import { LucideIcons } from '../icons/lucide';
 import { useDisclosure } from '../composables/useDisclosure';
 import { useClickOutside } from '../composables/useClickOutside';
+import { useTransition } from '../composables/animation/useTransition';
 
 export interface CascadeSelectProps<T = string> {
     options?: CascadeSelectNode<T>[];
@@ -20,18 +22,16 @@ export default function CascadeSelectIsland<T = string>(container: HTMLElement, 
     let selectedText = '';
     let selectedValue: T | null = null;
 
-    const disclosure = useDisclosure({ defaultIsOpen: false });
-
     container.innerHTML = `
         <div class="laughtale-cascadeselect" style="position: relative; width: 100%; max-width: 280px; font-family: var(--p-font-family, inherit);">
             <!-- Trigger -->
             <div class="cascadeselect-trigger p-input" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; cursor: ${props.disabled ? 'not-allowed' : 'pointer'}; background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); user-select: none;">
                 <span class="cascadeselect-label" style="font-size: 0.875rem; color: var(--p-text-color);">${props.placeholder || 'Select category...'}</span>
-                <span class="cascadeselect-chevron" style="color: var(--p-surface-400); display: flex;">${LucideIcons.chevronDown(16)}</span>
+                <span class="cascadeselect-chevron" style="color: var(--p-surface-400); display: flex;">${LucideIcons.chevronDown}</span>
             </div>
 
             <!-- Cascade Overlay Panes Container -->
-            <div class="cascadeselect-overlay" style="display: none; position: absolute; top: calc(100% + 4px); left: 0; z-index: 500; background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); box-shadow: var(--p-shadow-lg); min-width: 180px; display: none;">
+            <div class="cascadeselect-overlay" style="display: none; position: absolute; top: calc(100% + 4px); left: 0; z-index: 500; background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); box-shadow: var(--p-shadow-lg); min-width: 180px;">
                 <div class="cascade-level-0" style="padding: 0.25rem 0; min-width: 180px;"></div>
             </div>
         </div>
@@ -42,7 +42,18 @@ export default function CascadeSelectIsland<T = string>(container: HTMLElement, 
     const overlay = container.querySelector<HTMLElement>('.cascadeselect-overlay')!;
     const level0 = container.querySelector<HTMLElement>('.cascade-level-0')!;
 
-    useClickOutside(container, () => close());
+    const disclosure = useDisclosure({
+        defaultIsOpen: false,
+        onOpen: () => {
+            renderLevel(options, level0, []);
+            useTransition(overlay, { type: 'fade', isMounted: true });
+        },
+        onClose: () => {
+            useTransition(overlay, { type: 'fade', isMounted: false });
+        }
+    });
+
+    useClickOutside(container, () => disclosure.close());
 
     function renderLevel(nodes: CascadeSelectNode<T>[], parentContainer: HTMLElement, path: string[] = []) {
         parentContainer.innerHTML = nodes.map(n => {
@@ -50,7 +61,7 @@ export default function CascadeSelectIsland<T = string>(container: HTMLElement, 
             return `
                 <div class="cascade-item" data-code="${n.code || n.name}" style="position: relative; display: flex; align-items: center; justify-content: space-between; padding: 0.45rem 0.75rem; cursor: pointer; font-size: 0.8125rem; color: var(--p-text-color); transition: background 0.1s ease;">
                     <span>${n.name}</span>
-                    ${hasChildren ? `<span style="color: var(--p-surface-400); display: flex;">${LucideIcons.chevronDown(14)}</span>` : ''}
+                    ${hasChildren ? `<span style="color: var(--p-surface-400); display: flex;">${LucideIcons.chevronRight}</span>` : ''}
                     ${hasChildren ? `<div class="sub-pane" style="display: none; position: absolute; top: 0; left: 100%; min-width: 180px; background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); box-shadow: var(--p-shadow-lg); padding: 0.25rem 0;"></div>` : ''}
                 </div>
             `;
@@ -58,13 +69,12 @@ export default function CascadeSelectIsland<T = string>(container: HTMLElement, 
 
         parentContainer.querySelectorAll('.cascade-item').forEach((itemEl, idx) => {
             const node = nodes[idx];
-            const hasChildren = node.children && node.children.length > 0;
-            const subPane = itemEl.querySelector<HTMLElement>('.sub-pane');
+            const currentPath = [...path, node.name];
 
-            if (hasChildren && subPane) {
-                renderLevel(node.children!, subPane, [...path, node.name]);
-
+            if (node.children && node.children.length > 0) {
+                const subPane = itemEl.querySelector<HTMLElement>('.sub-pane')!;
                 itemEl.addEventListener('mouseenter', () => {
+                    renderLevel(node.children!, subPane, currentPath);
                     subPane.style.display = 'block';
                 });
                 itemEl.addEventListener('mouseleave', () => {
@@ -73,32 +83,19 @@ export default function CascadeSelectIsland<T = string>(container: HTMLElement, 
             } else {
                 itemEl.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    const fullPath = [...path, node.name].join(' > ');
-                    selectedText = fullPath;
-                    selectedValue = (node.value ?? node.code ?? node.name) as unknown as T;
+                    selectedText = currentPath.join(' / ');
+                    selectedValue = (node.code || node.name) as unknown as T;
                     label.textContent = selectedText;
+                    disclosure.close();
                     syncValue();
-                    close();
                 });
             }
         });
     }
 
-    function open() {
-        disclosure.open();
-        overlay.style.display = 'flex';
-        renderLevel(options, level0);
-    }
-
-    function close() {
-        disclosure.close();
-        overlay.style.display = 'none';
-    }
-
     trigger.addEventListener('click', () => {
         if (props.disabled) return;
-        if (disclosure.isOpen) close();
-        else open();
+        disclosure.toggle();
     });
 
     function syncValue() {
@@ -115,7 +112,7 @@ export default function CascadeSelectIsland<T = string>(container: HTMLElement, 
 
         container.dispatchEvent(new CustomEvent('cascadeselect:change', {
             bubbles: true,
-            detail: { value: selectedValue, label: selectedText }
+            detail: { value: selectedValue, text: selectedText }
         }));
     }
 }

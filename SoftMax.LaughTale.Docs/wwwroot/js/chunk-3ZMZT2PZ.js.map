@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../SoftMax.LaughTale.Client/src/composables/useControllableState.ts"],
+  "sourcesContent": ["/**\n * SoftMax.LaughTale: Headless useControllableState Composable\n * Supports both controlled and uncontrolled component state with change notifications.\n */\n\nexport interface UseControllableStateOptions<T> {\n    value?: T;\n    defaultValue?: T;\n    onChange?: (value: T) => void;\n}\n\nexport function useControllableState<T>(options: UseControllableStateOptions<T>) {\n    const isControlled = options.value !== undefined;\n    let internalValue = options.defaultValue !== undefined ? options.defaultValue : options.value;\n\n    function getValue(): T {\n        return (isControlled ? options.value : internalValue) as T;\n    }\n\n    function setValue(nextValue: T | ((prev: T) => T)): void {\n        const resolved = typeof nextValue === 'function' ? (nextValue as (prev: T) => T)(getValue()) : nextValue;\n\n        if (!isControlled) {\n            internalValue = resolved;\n        }\n\n        options.onChange?.(resolved);\n    }\n\n    return [getValue, setValue] as const;\n}\n"],
+  "mappings": ";AAWO,SAAS,qBAAwB,SAAyC;AAC7E,QAAM,eAAe,QAAQ,UAAU;AACvC,MAAI,gBAAgB,QAAQ,iBAAiB,SAAY,QAAQ,eAAe,QAAQ;AAExF,WAAS,WAAc;AACnB,WAAQ,eAAe,QAAQ,QAAQ;AAAA,EAC3C;AAEA,WAAS,SAAS,WAAuC;AACrD,UAAM,WAAW,OAAO,cAAc,aAAc,UAA6B,SAAS,CAAC,IAAI;AAE/F,QAAI,CAAC,cAAc;AACf,sBAAgB;AAAA,IACpB;AAEA,YAAQ,WAAW,QAAQ;AAAA,EAC/B;AAEA,SAAO,CAAC,UAAU,QAAQ;AAC9B;",
+  "names": []
+}

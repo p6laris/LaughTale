@@ -1,10 +1,11 @@
 /**
  * SoftMax.LaughTale: Enterprise PickList Component (Aura PickList inspired)
- * Dual list transfer component for moving items between Source (Available) and Target (Selected).
+ * Integrated with useAutoAnimate for FLIP-based smooth transfers between lists.
  */
 
 import { PickListItem } from '../types/models';
 import { LucideIcons } from '../icons/lucide';
+import { useAutoAnimate } from '../composables/animation/useAutoAnimate';
 
 export interface PickListProps<T = any> {
     source?: PickListItem<T>[];
@@ -38,7 +39,7 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
                     </div>
                     <div class="picklist-source-list" style="height: 180px; overflow-y: auto; padding: 0.25rem 0;">
                         ${sourceList.map(it => `
-                            <div class="picklist-item source-item ${selectedSource.has(it.id) ? 'active' : ''}" data-id="${it.id}" style="padding: 0.45rem 0.75rem; cursor: pointer; font-size: 0.8125rem; background: ${selectedSource.has(it.id) ? 'var(--p-primary-50)' : 'transparent'}; color: ${selectedSource.has(it.id) ? 'var(--p-primary-700)' : 'var(--p-text-color)'}; font-weight: ${selectedSource.has(it.id) ? '600' : 'normal'};">
+                            <div class="picklist-item source-item ${selectedSource.has(it.id) ? 'active' : ''}" data-id="${it.id}" style="padding: 0.45rem 0.75rem; cursor: pointer; font-size: 0.8125rem; background: ${selectedSource.has(it.id) ? 'var(--p-primary-50)' : 'transparent'}; color: ${selectedSource.has(it.id) ? 'var(--p-primary-700)' : 'var(--p-text-color)'}; font-weight: ${selectedSource.has(it.id) ? '600' : 'normal'}; transition: all 0.15s ease;">
                                 ${it.name}
                             </div>
                         `).join('')}
@@ -68,7 +69,7 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
                     </div>
                     <div class="picklist-target-list" style="height: 180px; overflow-y: auto; padding: 0.25rem 0;">
                         ${targetList.map(it => `
-                            <div class="picklist-item target-item ${selectedTarget.has(it.id) ? 'active' : ''}" data-id="${it.id}" style="padding: 0.45rem 0.75rem; cursor: pointer; font-size: 0.8125rem; background: ${selectedTarget.has(it.id) ? 'var(--p-primary-50)' : 'transparent'}; color: ${selectedTarget.has(it.id) ? 'var(--p-primary-700)' : 'var(--p-text-color)'}; font-weight: ${selectedTarget.has(it.id) ? '600' : 'normal'};">
+                            <div class="picklist-item target-item ${selectedTarget.has(it.id) ? 'active' : ''}" data-id="${it.id}" style="padding: 0.45rem 0.75rem; cursor: pointer; font-size: 0.8125rem; background: ${selectedTarget.has(it.id) ? 'var(--p-primary-50)' : 'transparent'}; color: ${selectedTarget.has(it.id) ? 'var(--p-primary-700)' : 'var(--p-text-color)'}; font-weight: ${selectedTarget.has(it.id) ? '600' : 'normal'}; transition: all 0.15s ease;">
                                 ${it.name}
                             </div>
                         `).join('')}
@@ -76,6 +77,11 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
                 </div>
             </div>
         `;
+
+        const srcEl = container.querySelector<HTMLElement>('.picklist-source-list')!;
+        const tgtEl = container.querySelector<HTMLElement>('.picklist-target-list')!;
+        useAutoAnimate(srcEl, { duration: 200 });
+        useAutoAnimate(tgtEl, { duration: 200 });
 
         bindEvents();
     }
@@ -99,46 +105,42 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
             });
         });
 
-        // Move to target
         container.querySelector('.btn-move-to-target')?.addEventListener('click', () => {
             const moving = sourceList.filter(it => selectedSource.has(it.id));
-            targetList.push(...moving);
+            targetList = [...targetList, ...moving];
             sourceList = sourceList.filter(it => !selectedSource.has(it.id));
             selectedSource.clear();
             render();
-            syncValue();
+            syncValues();
         });
 
-        // Move all to target
         container.querySelector('.btn-move-all-to-target')?.addEventListener('click', () => {
-            targetList.push(...sourceList);
+            targetList = [...targetList, ...sourceList];
             sourceList = [];
             selectedSource.clear();
             render();
-            syncValue();
+            syncValues();
         });
 
-        // Move to source
         container.querySelector('.btn-move-to-source')?.addEventListener('click', () => {
             const moving = targetList.filter(it => selectedTarget.has(it.id));
-            sourceList.push(...moving);
+            sourceList = [...sourceList, ...moving];
             targetList = targetList.filter(it => !selectedTarget.has(it.id));
             selectedTarget.clear();
             render();
-            syncValue();
+            syncValues();
         });
 
-        // Move all to source
         container.querySelector('.btn-move-all-to-source')?.addEventListener('click', () => {
-            sourceList.push(...targetList);
+            sourceList = [...sourceList, ...targetList];
             targetList = [];
             selectedTarget.clear();
             render();
-            syncValue();
+            syncValues();
         });
     }
 
-    function syncValue() {
+    function syncValues() {
         if (props.targetInputName) {
             let hidden = container.querySelector<HTMLInputElement>(`input[name="${props.targetInputName}"]`);
             if (!hidden) {
@@ -147,7 +149,7 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
                 hidden.name = props.targetInputName;
                 container.appendChild(hidden);
             }
-            hidden.value = JSON.stringify(targetList);
+            hidden.value = JSON.stringify(targetList.map(it => it.id));
         }
 
         container.dispatchEvent(new CustomEvent('picklist:change', {
@@ -157,5 +159,5 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
     }
 
     render();
-    syncValue();
+    syncValues();
 }
