@@ -15,9 +15,9 @@ LaughTale enables you to combine the blistering speed and SEO of pure **Server-S
 
 ## ⚡ Live Interactive Stepper
 
-Below is an interactive island running directly inside this documentation markdown file:
-
-<island name="interactive-counter" props='{"initialCount": 42, "step": 1, "label": "Batch Concurrency"}' hydrate="Load" />
+<div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); padding: 1.5rem; margin: 1.5rem 0;">
+    <island name="interactive-counter" props-json='{"initialCount": 42, "step": 1, "label": "Batch Concurrency"}' hydrate="Load"></island>
+</div>
 
 ---
 

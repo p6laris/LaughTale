@@ -30,9 +30,10 @@ By deferring non-critical scripts, your pages achieve near-instant First Content
 
 Below is a live interactive demonstration using **Interaction** and **Idle** hydration communicating over the LaughTale Event Bus:
 
-<island name="event-broadcaster" props='{"channelName": "docs-channel", "buttonLabel": "Dispatch Event"}' hydrate="Interaction" />
-
-<island name="event-receiver" props='{"channelName": "docs-channel", "initialMessage": "Awaiting events..."}' hydrate="Idle" />
+<div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); padding: 1.5rem; margin: 1.5rem 0; display: flex; flex-direction: column; gap: 1rem;">
+    <island name="event-broadcaster" props-json='{"channelName": "docs-channel", "buttonLabel": "Dispatch Event"}' hydrate="Interaction"></island>
+    <island name="event-receiver" props-json='{"channelName": "docs-channel", "initialMessage": "Awaiting events..."}' hydrate="Idle"></island>
+</div>
 
 ---
 
