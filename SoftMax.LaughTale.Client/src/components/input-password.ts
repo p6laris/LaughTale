@@ -1,5 +1,6 @@
 /**
  * SoftMax.LaughTale: Password Input with Strength Meter & Eye Toggle (Aura InputPassword inspired)
+ * Zero DOM destruction on typing - retains focus and cursor position smoothly.
  */
 
 import { LucideIcons } from '../icons/lucide';
@@ -29,60 +30,61 @@ export default function InputPasswordIsland(container: HTMLElement, props: Input
         return { score: 3, label: 'Strong', color: '#10b981', width: '100%' };
     }
 
-    function render() {
-        const meter = calculateStrength(currentPassword);
-
-        container.innerHTML = `
-            <div class="laughtale-password" style="display: flex; flex-direction: column; gap: 0.5rem; width: 100%; max-width: 340px;">
-                <div style="display: flex; align-items: center; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); background: var(--p-surface-0); overflow: hidden; padding-right: 0.5rem;">
-                    <input type="${isMasked ? 'password' : 'text'}" 
-                           class="password-input" 
-                           value="${currentPassword}" 
-                           placeholder="${props.placeholder || 'Enter password...'}" 
-                           ${props.disabled ? 'disabled' : ''} 
-                           style="flex: 1; padding: 0.5rem 0.75rem; border: none; outline: none; background: transparent; font-size: 0.875rem; color: var(--p-text-color);" />
-                    
-                    ${props.toggleMask !== false ? `
-                        <button type="button" class="toggle-mask-btn" style="border: none; background: transparent; color: var(--p-surface-400); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0.25rem;">
-                            ${isMasked ? LucideIcons.eye : LucideIcons.eyeOff}
-                        </button>
-                    ` : ''}
-                </div>
-
-                ${props.showMeter !== false && currentPassword ? `
-                    <div style="display: flex; flex-direction: column; gap: 0.25rem;">
-                        <div style="height: 4px; border-radius: 2px; background: var(--p-surface-200); overflow: hidden;">
-                            <div style="height: 100%; width: ${meter.width}; background: ${meter.color}; transition: all 0.3s ease;"></div>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; font-size: 0.6875rem; color: ${meter.color}; font-weight: 600;">
-                            <span>Strength</span>
-                            <span>${meter.label}</span>
-                        </div>
-                    </div>
+    container.innerHTML = `
+        <div class="laughtale-password" style="display: flex; flex-direction: column; gap: 0.5rem; width: 100%; max-width: 340px;">
+            <div style="display: flex; align-items: center; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); background: var(--p-surface-0); overflow: hidden; padding-right: 0.5rem;">
+                <input type="password" 
+                       class="password-input" 
+                       value="" 
+                       placeholder="${props.placeholder || 'Enter password...'}" 
+                       ${props.disabled ? 'disabled' : ''} 
+                       style="flex: 1; padding: 0.5rem 0.75rem; border: none; outline: none; background: transparent; font-size: 0.875rem; color: var(--p-text-color);" />
+                
+                ${props.toggleMask !== false ? `
+                    <button type="button" class="toggle-mask-btn" style="border: none; background: transparent; color: var(--p-surface-400); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0.25rem;">
+                        ${LucideIcons.eye}
+                    </button>
                 ` : ''}
             </div>
-        `;
 
-        const input = container.querySelector<HTMLInputElement>('.password-input')!;
-        input.addEventListener('input', (e) => {
-            currentPassword = (e.target as HTMLInputElement).value;
-            syncValue();
-            if (props.showMeter !== false) render();
-        });
+            ${props.showMeter !== false ? `
+                <div class="password-meter-wrap" style="display: none; flex-direction: column; gap: 0.25rem;">
+                    <div style="height: 4px; border-radius: 2px; background: var(--p-surface-200); overflow: hidden;">
+                        <div class="password-meter-bar" style="height: 100%; width: 0%; background: transparent; transition: all 0.3s ease;"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.6875rem; font-weight: 600;">
+                        <span style="color: var(--p-surface-500);">Strength</span>
+                        <span class="password-meter-label" style="color: var(--p-surface-500);"></span>
+                    </div>
+                </div>
+            ` : ''}
+        </div>
+    `;
 
-        container.querySelector('.toggle-mask-btn')?.addEventListener('click', () => {
-            isMasked = !isMasked;
-            render();
-            // Restore focus
-            const inp = container.querySelector<HTMLInputElement>('.password-input')!;
-            inp.focus();
-            inp.setSelectionRange(currentPassword.length, currentPassword.length);
-        });
+    const input = container.querySelector<HTMLInputElement>('.password-input')!;
+    const toggleBtn = container.querySelector<HTMLButtonElement>('.toggle-mask-btn');
+    const meterWrap = container.querySelector<HTMLElement>('.password-meter-wrap');
+    const meterBar = container.querySelector<HTMLElement>('.password-meter-bar');
+    const meterLabel = container.querySelector<HTMLElement>('.password-meter-label');
+
+    function updateMeterVisuals() {
+        if (!meterWrap || !meterBar || !meterLabel) return;
+        if (!currentPassword) {
+            meterWrap.style.display = 'none';
+            return;
+        }
+
+        meterWrap.style.display = 'flex';
+        const meter = calculateStrength(currentPassword);
+        meterBar.style.width = meter.width;
+        meterBar.style.background = meter.color;
+        meterLabel.textContent = meter.label;
+        meterLabel.style.color = meter.color;
     }
 
     function syncValue() {
         if (props.targetInputName) {
-            let hidden = document.querySelector<HTMLInputElement>(`input[name="${props.targetInputName}"]`);
+            let hidden = container.querySelector<HTMLInputElement>(`input[name="${props.targetInputName}"]`);
             if (!hidden) {
                 hidden = document.createElement('input');
                 hidden.type = 'hidden';
@@ -98,5 +100,18 @@ export default function InputPasswordIsland(container: HTMLElement, props: Input
         }));
     }
 
-    render();
+    input.addEventListener('input', () => {
+        currentPassword = input.value;
+        updateMeterVisuals();
+        syncValue();
+    });
+
+    toggleBtn?.addEventListener('click', () => {
+        isMasked = !isMasked;
+        input.type = isMasked ? 'password' : 'text';
+        toggleBtn.innerHTML = isMasked ? LucideIcons.eye : LucideIcons.eyeOff;
+        input.focus();
+    });
+
+    syncValue();
 }
