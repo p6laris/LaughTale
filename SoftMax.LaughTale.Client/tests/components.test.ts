@@ -15,6 +15,7 @@ import ColorPickerIsland from '../src/components/color-picker.ts';
 import KnobIsland from '../src/components/knob.ts';
 import TagIsland from '../src/components/tag.ts';
 import InplaceIsland from '../src/components/inplace.ts';
+import ImageCompareIsland from '../src/components/image-compare.ts';
 
 describe('SoftMax.LaughTale Aura Enterprise Components Suite', () => {
     let container: HTMLElement;
@@ -90,14 +91,12 @@ describe('SoftMax.LaughTale Aura Enterprise Components Suite', () => {
         });
 
         const switchBtn = container.querySelector('.laughtale-switch') as HTMLElement;
-        const hidden = container.querySelector('input[name="notifications"]') as HTMLInputElement;
-
         switchBtn.click();
         const hiddenAfter = container.querySelector('input[name="notifications"]') as HTMLInputElement;
         assert.strictEqual(hiddenAfter.value, 'true');
     });
 
-    it('Slider: respects min, max, step boundaries', () => {
+    it('Slider: respects min, max, step boundaries and handles drag interactions', () => {
         SliderIsland(container, {
             min: 0,
             max: 100,
@@ -105,8 +104,69 @@ describe('SoftMax.LaughTale Aura Enterprise Components Suite', () => {
             targetInputName: 'volume'
         });
 
+        const track = container.querySelector('.slider-track') as HTMLElement;
         const hidden = container.querySelector('input[name="volume"]') as HTMLInputElement;
         assert.strictEqual(hidden.value, '25');
+
+        // Mock bounding rect for dragging calculation
+        track.getBoundingClientRect = () => ({
+            left: 0,
+            top: 0,
+            right: 200,
+            bottom: 20,
+            width: 200,
+            height: 20,
+            x: 0,
+            y: 0,
+            toJSON: () => {}
+        });
+
+        // Simulate pointerdown at 75% (clientX = 150 of 200px width)
+        track.dispatchEvent(new MouseEvent('pointerdown', { clientX: 150, bubbles: true }));
+        assert.strictEqual(hidden.value, '75');
+
+        // Simulate drag to 10% (clientX = 20)
+        track.dispatchEvent(new MouseEvent('pointermove', { clientX: 20, bubbles: true }));
+        assert.strictEqual(hidden.value, '10');
+
+        // End drag
+        track.dispatchEvent(new MouseEvent('pointerup', { clientX: 20, bubbles: true }));
+        assert.strictEqual(hidden.value, '10');
+    });
+
+    it('ImageCompare: handles split divider pointer dragging', () => {
+        ImageCompareIsland(container, {
+            beforeImage: 'before.jpg',
+            afterImage: 'after.jpg',
+            beforeLabel: 'Before',
+            afterLabel: 'After'
+        });
+
+        const compareBox = container.querySelector('.laughtale-image-compare') as HTMLElement;
+        const clip = container.querySelector('.compare-clip') as HTMLElement;
+        const handleLine = container.querySelector('.compare-handle-line') as HTMLElement;
+
+        compareBox.getBoundingClientRect = () => ({
+            left: 0,
+            top: 0,
+            right: 400,
+            bottom: 200,
+            width: 400,
+            height: 200,
+            x: 0,
+            y: 0,
+            toJSON: () => {}
+        });
+
+        // Pointer down at 25% (clientX = 100 of 400px width)
+        compareBox.dispatchEvent(new MouseEvent('pointerdown', { clientX: 100, bubbles: true }));
+        assert.strictEqual(clip.style.width, '25%');
+        assert.strictEqual(handleLine.style.left, '25%');
+
+        // Pointer move to 80% (clientX = 320 of 400px width)
+        compareBox.dispatchEvent(new MouseEvent('pointermove', { clientX: 320, bubbles: true }));
+        assert.strictEqual(clip.style.width, '80%');
+        assert.strictEqual(handleLine.style.left, '80%');
     });
 
     it('Rating: highlights stars on selection and allows cancel', () => {
@@ -200,17 +260,38 @@ describe('SoftMax.LaughTale Aura Enterprise Components Suite', () => {
         assert.strictEqual(hidden.value, '#10b981');
     });
 
-    it('Knob: calculates value and renders svg circle', () => {
+    it('Knob: calculates value, renders svg circle and responds to pointer events', () => {
         KnobIsland(container, {
             value: 75,
             min: 0,
             max: 100,
+            size: 100,
             targetInputName: 'percentage'
         });
 
+        const knobEl = container.querySelector('.laughtale-knob') as HTMLElement;
         const hidden = container.querySelector('input[name="percentage"]') as HTMLInputElement;
+        const valueDisplay = container.querySelector('.knob-value-display') as HTMLElement;
+
         assert.strictEqual(hidden.value, '75');
-        assert.ok(container.innerHTML.includes('75%'));
+        assert.strictEqual(valueDisplay.textContent?.trim(), '75%');
+
+        knobEl.getBoundingClientRect = () => ({
+            left: 0,
+            top: 0,
+            right: 100,
+            bottom: 100,
+            width: 100,
+            height: 100,
+            x: 0,
+            y: 0,
+            toJSON: () => {}
+        });
+
+        // Pointer event at bottom center (x = 50, y = 100 -> angle 180 deg -> 50%)
+        knobEl.dispatchEvent(new MouseEvent('pointerdown', { clientX: 50, clientY: 100, bubbles: true }));
+        assert.strictEqual(hidden.value, '50');
+        assert.strictEqual(valueDisplay.textContent?.trim(), '50%');
     });
 
     it('Inplace: toggles between display and edit modes', () => {

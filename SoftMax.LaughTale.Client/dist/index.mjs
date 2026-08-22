@@ -2309,7 +2309,7 @@ function InputOtpIsland(container, props) {
   function render() {
     const boxes = Array.from({ length }, (_, i) => `
             <input type="${props.mask ? "password" : "text"}" 
-                   class="otp-box" 
+                   class="otp-box otp-digit-input" 
                    data-index="${i}" 
                    maxlength="1" 
                    inputmode="numeric" 
@@ -2388,6 +2388,7 @@ function InputOtpIsland(container, props) {
     }));
   }
   render();
+  syncOtp();
 }
 var init_input_otp = __esm({
   "src/components/input-otp.ts"() {
@@ -2527,6 +2528,7 @@ function ToggleSwitchIsland(container, props) {
     }));
   }
   render();
+  syncValue();
 }
 var init_toggle_switch = __esm({
   "src/components/toggle-switch.ts"() {
@@ -2544,59 +2546,40 @@ function SliderIsland(container, props) {
   const max = props.max !== void 0 ? props.max : 100;
   const step = props.step !== void 0 ? props.step : 1;
   let currentValue = props.value !== void 0 ? props.value : min;
-  function render() {
-    const percent = (currentValue - min) / (max - min) * 100;
-    container.innerHTML = `
-            <div class="laughtale-slider" style="position: relative; width: 100%; max-width: 320px; padding: 1rem 0; user-select: none;">
-                <!-- Track -->
-                <div class="slider-track" style="position: relative; height: 6px; border-radius: 3px; background: var(--p-surface-200); cursor: ${props.disabled ? "not-allowed" : "pointer"};">
-                    <!-- Active Fill Bar -->
-                    <div class="slider-fill" style="position: absolute; top: 0; left: 0; height: 100%; width: ${percent}%; border-radius: 3px; background: var(--p-primary-600);"></div>
-                    <!-- Drag Handle -->
-                    <div class="slider-handle" style="position: absolute; top: 50%; left: ${percent}%; transform: translate(-50%, -50%); width: 1.125rem; height: 1.125rem; border-radius: 50%; background: #ffffff; border: 2px solid var(--p-primary-600); box-shadow: 0 1px 4px rgba(0,0,0,0.2); cursor: ${props.disabled ? "not-allowed" : "grab"}; transition: transform 0.1s ease;"></div>
-                </div>
-
-                <div style="display: flex; justify-content: space-between; margin-top: 0.5rem; font-size: 0.75rem; color: var(--p-surface-500); font-family: var(--p-font-mono);">
-                    <span>${min}</span>
-                    <span style="font-weight: 700; color: var(--p-primary-600);">${currentValue}</span>
-                    <span>${max}</span>
-                </div>
+  function getPercent(val) {
+    return Math.max(0, Math.min(100, (val - min) / (max - min) * 100));
+  }
+  const initialPercent = getPercent(currentValue);
+  container.innerHTML = `
+        <div class="laughtale-slider" style="position: relative; width: 100%; max-width: 320px; padding: 1rem 0; user-select: none; touch-action: none;">
+            <!-- Track -->
+            <div class="slider-track" style="position: relative; height: 6px; border-radius: 3px; background: var(--p-surface-200); cursor: ${props.disabled ? "not-allowed" : "pointer"};">
+                <!-- Active Fill Bar -->
+                <div class="slider-fill" style="position: absolute; top: 0; left: 0; height: 100%; width: ${initialPercent}%; border-radius: 3px; background: var(--p-primary-600); pointer-events: none;"></div>
+                <!-- Drag Handle -->
+                <div class="slider-handle" style="position: absolute; top: 50%; left: ${initialPercent}%; transform: translate(-50%, -50%); width: 1.125rem; height: 1.125rem; border-radius: 50%; background: #ffffff; border: 2px solid var(--p-primary-600); box-shadow: 0 1px 4px rgba(0,0,0,0.2); cursor: ${props.disabled ? "not-allowed" : "grab"};"></div>
             </div>
-        `;
-    if (props.disabled) return;
-    const track = container.querySelector(".slider-track");
-    const updateFromPointer = (e) => {
-      const rect = track.getBoundingClientRect();
-      const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
-      let ratio = (clientX - rect.left) / rect.width;
-      ratio = Math.max(0, Math.min(1, ratio));
-      let val = min + ratio * (max - min);
-      val = Math.round(val / step) * step;
-      currentValue = Math.max(min, Math.min(max, val));
-      render();
-      syncValue();
-    };
-    track.addEventListener("click", updateFromPointer);
-    const handle = container.querySelector(".slider-handle");
-    const onDrag = (e) => updateFromPointer(e);
-    const onStop = () => {
-      window.removeEventListener("mousemove", onDrag);
-      window.removeEventListener("mouseup", onStop);
-      window.removeEventListener("touchmove", onDrag);
-      window.removeEventListener("touchend", onStop);
-    };
-    handle.addEventListener("mousedown", () => {
-      window.addEventListener("mousemove", onDrag);
-      window.addEventListener("mouseup", onStop);
-    });
-    handle.addEventListener("touchstart", () => {
-      window.addEventListener("touchmove", onDrag);
-      window.addEventListener("touchend", onStop);
-    });
+
+            <div style="display: flex; justify-content: space-between; margin-top: 0.5rem; font-size: 0.75rem; color: var(--p-surface-500); font-family: var(--p-font-mono);">
+                <span>${min}</span>
+                <span class="slider-value-display" style="font-weight: 700; color: var(--p-primary-600);">${currentValue}</span>
+                <span>${max}</span>
+            </div>
+        </div>
+    `;
+  const track = container.querySelector(".slider-track");
+  const fill = container.querySelector(".slider-fill");
+  const handle = container.querySelector(".slider-handle");
+  const valueDisplay = container.querySelector(".slider-value-display");
+  function updateVisuals() {
+    const pct = getPercent(currentValue);
+    fill.style.width = `${pct}%`;
+    handle.style.left = `${pct}%`;
+    valueDisplay.textContent = currentValue.toString();
   }
   function syncValue() {
     if (props.targetInputName) {
-      let hidden = document.querySelector(`input[name="${props.targetInputName}"]`);
+      let hidden = container.querySelector(`input[name="${props.targetInputName}"]`);
       if (!hidden) {
         hidden = document.createElement("input");
         hidden.type = "hidden";
@@ -2610,7 +2593,56 @@ function SliderIsland(container, props) {
       detail: { value: currentValue }
     }));
   }
-  render();
+  if (!props.disabled) {
+    let isDragging = false;
+    const updateFromClientX = (clientX) => {
+      const rect = track.getBoundingClientRect();
+      if (rect.width <= 0) return;
+      let ratio = (clientX - rect.left) / rect.width;
+      ratio = Math.max(0, Math.min(1, ratio));
+      let rawVal = min + ratio * (max - min);
+      rawVal = Math.round(rawVal / step) * step;
+      currentValue = Math.max(min, Math.min(max, rawVal));
+      updateVisuals();
+      syncValue();
+    };
+    const onPointerDown = (e) => {
+      isDragging = true;
+      handle.style.cursor = "grabbing";
+      handle.style.transform = "translate(-50%, -50%) scale(1.2)";
+      if ("setPointerCapture" in track && e.pointerId !== void 0) {
+        try {
+          track.setPointerCapture(e.pointerId);
+        } catch (_) {
+        }
+      }
+      updateFromClientX(e.clientX);
+    };
+    const onPointerMove = (e) => {
+      if (!isDragging) return;
+      updateFromClientX(e.clientX);
+    };
+    const onPointerUp = (e) => {
+      if (!isDragging) return;
+      isDragging = false;
+      handle.style.cursor = "grab";
+      handle.style.transform = "translate(-50%, -50%) scale(1)";
+      if ("releasePointerCapture" in track && e.pointerId !== void 0) {
+        try {
+          track.releasePointerCapture(e.pointerId);
+        } catch (_) {
+        }
+      }
+    };
+    track.addEventListener("pointerdown", onPointerDown);
+    track.addEventListener("pointermove", onPointerMove);
+    track.addEventListener("pointerup", onPointerUp);
+    track.addEventListener("pointercancel", onPointerUp);
+    track.addEventListener("mousedown", onPointerDown);
+    window.addEventListener("mousemove", onPointerMove);
+    window.addEventListener("mouseup", onPointerUp);
+  }
+  syncValue();
 }
 var init_slider = __esm({
   "src/components/slider.ts"() {
@@ -2689,6 +2721,7 @@ function RatingIsland(container, props) {
     }));
   }
   render();
+  syncValue();
 }
 var init_rating = __esm({
   "src/components/rating.ts"() {
@@ -3258,51 +3291,79 @@ __export(image_compare_exports, {
 });
 function ImageCompareIsland(container, props) {
   let splitPercent = 50;
-  function render() {
-    container.innerHTML = `
-            <div class="laughtale-image-compare" style="position: relative; width: 100%; max-width: 600px; height: 340px; border-radius: var(--p-border-radius-lg); overflow: hidden; user-select: none; border: 1px solid var(--p-border-color); box-shadow: var(--p-shadow-md);">
-                <!-- After Image (Bottom) -->
-                <img src="${props.afterImage}" alt="After" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;" />
-                ${props.afterLabel ? `<span style="position: absolute; bottom: 0.75rem; right: 0.75rem; background: rgba(0,0,0,0.6); color: #ffffff; padding: 0.25rem 0.5rem; border-radius: var(--p-border-radius); font-size: 0.75rem; font-weight: 600;">${props.afterLabel}</span>` : ""}
+  container.innerHTML = `
+        <div class="laughtale-image-compare" style="position: relative; width: 100%; max-width: 600px; height: 340px; border-radius: var(--p-border-radius-lg); overflow: hidden; user-select: none; border: 1px solid var(--p-border-color); box-shadow: var(--p-shadow-md); touch-action: none; cursor: ew-resize;">
+            <!-- After Image (Bottom) -->
+            <img src="${props.afterImage}" alt="After" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none;" />
+            ${props.afterLabel ? `<span style="position: absolute; bottom: 0.75rem; right: 0.75rem; background: rgba(0,0,0,0.6); color: #ffffff; padding: 0.25rem 0.5rem; border-radius: var(--p-border-radius); font-size: 0.75rem; font-weight: 600; pointer-events: none;">${props.afterLabel}</span>` : ""}
 
-                <!-- Before Image (Top Clipped) -->
-                <div class="compare-clip" style="position: absolute; inset: 0; width: ${splitPercent}%; height: 100%; overflow: hidden;">
-                    <img src="${props.beforeImage}" alt="Before" style="position: absolute; top: 0; left: 0; width: 600px; max-width: 600px; height: 340px; object-fit: cover;" />
-                    ${props.beforeLabel ? `<span style="position: absolute; bottom: 0.75rem; left: 0.75rem; background: rgba(0,0,0,0.6); color: #ffffff; padding: 0.25rem 0.5rem; border-radius: var(--p-border-radius); font-size: 0.75rem; font-weight: 600;">${props.beforeLabel}</span>` : ""}
-                </div>
+            <!-- Before Image (Top Clipped) -->
+            <div class="compare-clip" style="position: absolute; inset: 0; width: ${splitPercent}%; height: 100%; overflow: hidden; pointer-events: none;">
+                <img src="${props.beforeImage}" alt="Before" style="position: absolute; top: 0; left: 0; width: 600px; max-width: 600px; height: 340px; object-fit: cover;" />
+                ${props.beforeLabel ? `<span style="position: absolute; bottom: 0.75rem; left: 0.75rem; background: rgba(0,0,0,0.6); color: #ffffff; padding: 0.25rem 0.5rem; border-radius: var(--p-border-radius); font-size: 0.75rem; font-weight: 600;">${props.beforeLabel}</span>` : ""}
+            </div>
 
-                <!-- Divider Line & Handle -->
-                <div class="compare-handle-line" style="position: absolute; top: 0; bottom: 0; left: ${splitPercent}%; width: 2px; background: #ffffff; box-shadow: 0 0 4px rgba(0,0,0,0.5); cursor: ew-resize;">
-                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 2rem; height: 2rem; border-radius: 50%; background: #ffffff; border: 2px solid var(--p-primary-600); box-shadow: 0 2px 6px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; font-size: 0.6875rem; font-weight: 700; color: var(--p-primary-600);">
-                        \u25C0\u25B6
-                    </div>
+            <!-- Divider Line & Handle -->
+            <div class="compare-handle-line" style="position: absolute; top: 0; bottom: 0; left: ${splitPercent}%; width: 2px; background: #ffffff; box-shadow: 0 0 6px rgba(0,0,0,0.6); pointer-events: none;">
+                <div class="compare-handle-knob" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 2.25rem; height: 2.25rem; border-radius: 50%; background: #ffffff; border: 2px solid var(--p-primary-600); box-shadow: 0 2px 8px rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center; font-size: 0.6875rem; font-weight: 700; color: var(--p-primary-600); transition: transform 0.15s ease;">
+                    \u25C0\u25B6
                 </div>
             </div>
-        `;
-    const compareBox = container.querySelector(".laughtale-image-compare");
-    const onMove = (e) => {
-      const rect = compareBox.getBoundingClientRect();
-      const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
-      let p = (clientX - rect.left) / rect.width * 100;
-      splitPercent = Math.max(0, Math.min(100, p));
-      render();
-    };
-    const onUp = () => {
-      window.removeEventListener("mousemove", onMove);
-      window.removeEventListener("mouseup", onUp);
-      window.removeEventListener("touchmove", onMove);
-      window.removeEventListener("touchend", onUp);
-    };
-    compareBox.querySelector(".compare-handle-line")?.addEventListener("mousedown", () => {
-      window.addEventListener("mousemove", onMove);
-      window.addEventListener("mouseup", onUp);
-    });
-    compareBox.querySelector(".compare-handle-line")?.addEventListener("touchstart", () => {
-      window.addEventListener("touchmove", onMove);
-      window.addEventListener("touchend", onUp);
-    });
+        </div>
+    `;
+  const compareBox = container.querySelector(".laughtale-image-compare");
+  const clip = container.querySelector(".compare-clip");
+  const handleLine = container.querySelector(".compare-handle-line");
+  const knob = container.querySelector(".compare-handle-knob");
+  function updateSplit(p) {
+    splitPercent = Math.max(0, Math.min(100, p));
+    clip.style.width = `${splitPercent}%`;
+    handleLine.style.left = `${splitPercent}%`;
+    container.dispatchEvent(new CustomEvent("imagecompare:change", {
+      bubbles: true,
+      detail: { split: splitPercent }
+    }));
   }
-  render();
+  let isDragging = false;
+  const updateFromPointer = (clientX) => {
+    const rect = compareBox.getBoundingClientRect();
+    if (rect.width <= 0) return;
+    const p = (clientX - rect.left) / rect.width * 100;
+    updateSplit(p);
+  };
+  const onPointerDown = (e) => {
+    isDragging = true;
+    knob.style.transform = "translate(-50%, -50%) scale(1.15)";
+    if ("setPointerCapture" in compareBox && e.pointerId !== void 0) {
+      try {
+        compareBox.setPointerCapture(e.pointerId);
+      } catch (_) {
+      }
+    }
+    updateFromPointer(e.clientX);
+  };
+  const onPointerMove = (e) => {
+    if (!isDragging) return;
+    updateFromPointer(e.clientX);
+  };
+  const onPointerUp = (e) => {
+    if (!isDragging) return;
+    isDragging = false;
+    knob.style.transform = "translate(-50%, -50%) scale(1)";
+    if ("releasePointerCapture" in compareBox && e.pointerId !== void 0) {
+      try {
+        compareBox.releasePointerCapture(e.pointerId);
+      } catch (_) {
+      }
+    }
+  };
+  compareBox.addEventListener("pointerdown", onPointerDown);
+  compareBox.addEventListener("pointermove", onPointerMove);
+  compareBox.addEventListener("pointerup", onPointerUp);
+  compareBox.addEventListener("pointercancel", onPointerUp);
+  compareBox.addEventListener("mousedown", onPointerDown);
+  window.addEventListener("mousemove", onPointerMove);
+  window.addEventListener("mouseup", onPointerUp);
 }
 var init_image_compare = __esm({
   "src/components/image-compare.ts"() {
@@ -3539,11 +3600,39 @@ function AutoCompleteIsland(container, props) {
     const q = searchQuery.toLowerCase();
     return allItems.filter((item) => item.label.toLowerCase().includes(q) || item.value.toLowerCase().includes(q));
   }
-  function render() {
+  container.innerHTML = `
+        <div class="laughtale-autocomplete" style="position: relative; width: 100%; max-width: 320px;">
+            <div class="autocomplete-input-wrap" style="display: flex; align-items: center; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); background: var(--p-surface-0); padding: 0 0.5rem; transition: border-color 0.2s ease;">
+                <span style="color: var(--p-surface-400); display: flex; align-items: center; margin-right: 0.25rem;">
+                    ${LucideIcons.search}
+                </span>
+                <input type="text" 
+                       class="autocomplete-input" 
+                       value="${selectedValue ? allItems.find((i) => i.value === selectedValue)?.label || "" : ""}" 
+                       placeholder="${props.placeholder || "Search or select..."}" 
+                       ${props.disabled ? "disabled" : ""} 
+                       style="flex: 1; padding: 0.5rem 0.25rem; border: none; outline: none; background: transparent; font-size: 0.875rem; color: var(--p-text-color);" />
+                <button type="button" class="btn-clear-autocomplete" style="display: ${selectedValue ? "flex" : "none"}; border: none; background: transparent; color: var(--p-surface-400); cursor: pointer; padding: 0.25rem; align-items: center;">
+                    ${LucideIcons.x}
+                </button>
+            </div>
+
+            <!-- Dropdown Popup -->
+            <div class="autocomplete-overlay" style="display: none; position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 500; background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); box-shadow: var(--p-shadow-lg); max-height: 220px; overflow-y: auto; padding: 0.25rem;">
+            </div>
+        </div>
+    `;
+  const input = container.querySelector(".autocomplete-input");
+  const clearBtn = container.querySelector(".btn-clear-autocomplete");
+  const overlay = container.querySelector(".autocomplete-overlay");
+  function updateList() {
     const filtered = getFilteredItems();
-    const selectedItem = allItems.find((i) => i.value === selectedValue);
-    const displayLabel = selectedItem ? selectedItem.label : searchQuery;
-    const listItemsHtml = filtered.length > 0 ? filtered.map((item) => `
+    overlay.style.display = isOpen ? "block" : "none";
+    if (filtered.length === 0) {
+      overlay.innerHTML = `<div style="padding: 0.75rem; font-size: 0.8125rem; color: var(--p-surface-400); text-align: center;">No results found</div>`;
+      return;
+    }
+    overlay.innerHTML = filtered.map((item) => `
             <div class="autocomplete-item" data-value="${item.value}" style="padding: 0.5rem 0.75rem; font-size: 0.875rem; color: var(--p-surface-800); cursor: pointer; display: flex; align-items: center; justify-content: space-between; border-radius: var(--p-border-radius); transition: background 0.15s ease;">
                 <div style="display: flex; align-items: center; gap: 0.5rem;">
                     ${item.icon ? `<span>${item.icon}</span>` : ""}
@@ -3551,64 +3640,46 @@ function AutoCompleteIsland(container, props) {
                 </div>
                 ${item.value === selectedValue ? `<span style="color: var(--p-primary-600);">${LucideIcons.check}</span>` : ""}
             </div>
-        `).join("") : `
-            <div style="padding: 0.75rem; font-size: 0.8125rem; color: var(--p-surface-400); text-align: center;">No results found</div>
-        `;
-    container.innerHTML = `
-            <div class="laughtale-autocomplete" style="position: relative; width: 100%; max-width: 320px;">
-                <div class="autocomplete-input-wrap" style="display: flex; align-items: center; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); background: var(--p-surface-0); padding: 0 0.5rem; transition: border-color 0.2s ease;">
-                    <span style="color: var(--p-surface-400); display: flex; align-items: center; margin-right: 0.25rem;">
-                        ${LucideIcons.search}
-                    </span>
-                    <input type="text" 
-                           class="autocomplete-input" 
-                           value="${displayLabel}" 
-                           placeholder="${props.placeholder || "Search or select..."}" 
-                           ${props.disabled ? "disabled" : ""} 
-                           style="flex: 1; padding: 0.5rem 0.25rem; border: none; outline: none; background: transparent; font-size: 0.875rem; color: var(--p-text-color);" />
-                    ${selectedValue ? `
-                        <button type="button" class="btn-clear-autocomplete" style="border: none; background: transparent; color: var(--p-surface-400); cursor: pointer; padding: 0.25rem; display: flex; align-items: center;">
-                            ${LucideIcons.x}
-                        </button>
-                    ` : ""}
-                </div>
-
-                <!-- Dropdown Popup -->
-                <div class="autocomplete-overlay" style="display: ${isOpen ? "block" : "none"}; position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 500; background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); box-shadow: var(--p-shadow-lg); max-height: 220px; overflow-y: auto; padding: 0.25rem;">
-                    ${listItemsHtml}
-                </div>
-            </div>
-        `;
-    const input = container.querySelector(".autocomplete-input");
-    input.addEventListener("focus", () => {
-      isOpen = true;
-      render();
-      container.querySelector(".autocomplete-input").focus();
-    });
-    input.addEventListener("input", (e) => {
-      searchQuery = e.target.value;
-      isOpen = true;
-      render();
-      const nextInput = container.querySelector(".autocomplete-input");
-      nextInput.focus();
-      nextInput.setSelectionRange(searchQuery.length, searchQuery.length);
-    });
-    container.querySelectorAll(".autocomplete-item").forEach((itemEl) => {
+        `).join("");
+    overlay.querySelectorAll(".autocomplete-item").forEach((itemEl) => {
       itemEl.addEventListener("click", () => {
         selectedValue = itemEl.getAttribute("data-value") || "";
+        const item = allItems.find((i) => i.value === selectedValue);
+        input.value = item ? item.label : "";
         searchQuery = "";
         isOpen = false;
-        render();
+        clearBtn.style.display = "flex";
+        updateList();
         syncValue();
       });
     });
-    container.querySelector(".btn-clear-autocomplete")?.addEventListener("click", (e) => {
+  }
+  if (!props.disabled) {
+    input.addEventListener("focus", () => {
+      isOpen = true;
+      updateList();
+    });
+    input.addEventListener("input", () => {
+      searchQuery = input.value;
+      isOpen = true;
+      clearBtn.style.display = input.value ? "flex" : "none";
+      updateList();
+    });
+    clearBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       selectedValue = "";
       searchQuery = "";
+      input.value = "";
       isOpen = false;
-      render();
+      clearBtn.style.display = "none";
+      updateList();
       syncValue();
+    });
+    document.addEventListener("click", (e) => {
+      if (!container.contains(e.target)) {
+        isOpen = false;
+        overlay.style.display = "none";
+      }
     });
   }
   function syncValue() {
@@ -3627,7 +3698,7 @@ function AutoCompleteIsland(container, props) {
       detail: { value: selectedValue }
     }));
   }
-  render();
+  updateList();
   syncValue();
 }
 var init_autocomplete = __esm({
@@ -3762,54 +3833,37 @@ function KnobIsland(container, props) {
   const strokeWidth = 8;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
+  const template = props.valueTemplate || "{value}%";
   let currentValue = props.value !== void 0 ? props.value : min;
-  function render() {
-    const pct = Math.max(0, Math.min(1, (currentValue - min) / (max - min)));
-    const strokeDashoffset = circumference * (1 - pct);
-    const template = props.valueTemplate || "{value}%";
-    const displayValue = template.replace("{value}", currentValue.toString());
-    container.innerHTML = `
-            <div class="laughtale-knob" style="position: relative; display: inline-flex; align-items: center; justify-content: center; width: ${size}px; height: ${size}px; user-select: none; cursor: ${props.disabled ? "not-allowed" : "pointer"};">
-                <svg width="${size}" height="${size}" style="transform: rotate(-90deg);">
-                    <!-- Background Circle -->
-                    <circle cx="${size / 2}" cy="${size / 2}" r="${radius}" fill="transparent" stroke="var(--p-surface-200)" stroke-width="${strokeWidth}" />
-                    <!-- Progress Arc -->
-                    <circle class="knob-progress-circle" cx="${size / 2}" cy="${size / 2}" r="${radius}" fill="transparent" stroke="${props.color || "var(--p-primary-600)"}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-dasharray="${circumference}" stroke-dashoffset="${strokeDashoffset}" style="transition: stroke-dashoffset 0.15s ease;" />
-                </svg>
-                <span style="position: absolute; font-size: ${size * 0.2}px; font-weight: 700; color: var(--p-surface-900);">
-                    ${displayValue}
-                </span>
-            </div>
-        `;
-    if (props.disabled) return;
-    let isDragging = false;
-    const updateFromPointer = (e) => {
-      const rect = container.getBoundingClientRect();
-      const centerX = rect.left + rect.width / 2;
-      const centerY = rect.top + rect.height / 2;
-      const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * (180 / Math.PI) + 90;
-      const normalizedAngle = angle < 0 ? angle + 360 : angle;
-      const ratio = Math.min(1, Math.max(0, normalizedAngle / 360));
-      const rawVal = min + ratio * (max - min);
-      currentValue = Math.round(rawVal / step) * step;
-      render();
-      syncValue();
-    };
-    const knobEl = container.querySelector(".laughtale-knob");
-    knobEl.addEventListener("mousedown", (e) => {
-      isDragging = true;
-      updateFromPointer(e);
-    });
-    window.addEventListener("mousemove", (e) => {
-      if (isDragging) updateFromPointer(e);
-    });
-    window.addEventListener("mouseup", () => {
-      isDragging = false;
-    });
+  function getOffset(val) {
+    const pct = Math.max(0, Math.min(1, (val - min) / (max - min)));
+    return circumference * (1 - pct);
+  }
+  const initialOffset = getOffset(currentValue);
+  const initialText = template.replace("{value}", currentValue.toString());
+  container.innerHTML = `
+        <div class="laughtale-knob" style="position: relative; display: inline-flex; align-items: center; justify-content: center; width: ${size}px; height: ${size}px; user-select: none; cursor: ${props.disabled ? "not-allowed" : "pointer"}; touch-action: none;">
+            <svg width="${size}" height="${size}" style="transform: rotate(-90deg); pointer-events: none;">
+                <!-- Background Circle -->
+                <circle cx="${size / 2}" cy="${size / 2}" r="${radius}" fill="transparent" stroke="var(--p-surface-200)" stroke-width="${strokeWidth}" />
+                <!-- Progress Arc -->
+                <circle class="knob-progress-circle" cx="${size / 2}" cy="${size / 2}" r="${radius}" fill="transparent" stroke="${props.color || "var(--p-primary-600)"}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-dasharray="${circumference}" stroke-dashoffset="${initialOffset}" style="transition: stroke-dashoffset 0.05s ease;" />
+            </svg>
+            <span class="knob-value-display" style="position: absolute; font-size: ${size * 0.2}px; font-weight: 700; color: var(--p-surface-900); pointer-events: none;">
+                ${initialText}
+            </span>
+        </div>
+    `;
+  const knobEl = container.querySelector(".laughtale-knob");
+  const progressCircle = container.querySelector(".knob-progress-circle");
+  const valueDisplay = container.querySelector(".knob-value-display");
+  function updateVisuals() {
+    progressCircle.style.strokeDashoffset = `${getOffset(currentValue)}`;
+    valueDisplay.textContent = template.replace("{value}", currentValue.toString());
   }
   function syncValue() {
     if (props.targetInputName) {
-      let hidden = document.querySelector(`input[name="${props.targetInputName}"]`);
+      let hidden = container.querySelector(`input[name="${props.targetInputName}"]`);
       if (!hidden) {
         hidden = document.createElement("input");
         hidden.type = "hidden";
@@ -3823,7 +3877,54 @@ function KnobIsland(container, props) {
       detail: { value: currentValue }
     }));
   }
-  render();
+  if (!props.disabled) {
+    let isDragging = false;
+    const updateFromPointer = (clientX, clientY) => {
+      const rect = knobEl.getBoundingClientRect();
+      if (rect.width <= 0) return;
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      const angle = Math.atan2(clientY - centerY, clientX - centerX) * (180 / Math.PI) + 90;
+      const normalizedAngle = angle < 0 ? angle + 360 : angle;
+      const ratio = Math.min(1, Math.max(0, normalizedAngle / 360));
+      const rawVal = min + ratio * (max - min);
+      currentValue = Math.round(rawVal / step) * step;
+      currentValue = Math.max(min, Math.min(max, currentValue));
+      updateVisuals();
+      syncValue();
+    };
+    const onPointerDown = (e) => {
+      isDragging = true;
+      if ("setPointerCapture" in knobEl && e.pointerId !== void 0) {
+        try {
+          knobEl.setPointerCapture(e.pointerId);
+        } catch (_) {
+        }
+      }
+      updateFromPointer(e.clientX, e.clientY);
+    };
+    const onPointerMove = (e) => {
+      if (!isDragging) return;
+      updateFromPointer(e.clientX, e.clientY);
+    };
+    const onPointerUp = (e) => {
+      if (!isDragging) return;
+      isDragging = false;
+      if ("releasePointerCapture" in knobEl && e.pointerId !== void 0) {
+        try {
+          knobEl.releasePointerCapture(e.pointerId);
+        } catch (_) {
+        }
+      }
+    };
+    knobEl.addEventListener("pointerdown", onPointerDown);
+    knobEl.addEventListener("pointermove", onPointerMove);
+    knobEl.addEventListener("pointerup", onPointerUp);
+    knobEl.addEventListener("pointercancel", onPointerUp);
+    knobEl.addEventListener("mousedown", onPointerDown);
+    window.addEventListener("mousemove", onPointerMove);
+    window.addEventListener("mouseup", onPointerUp);
+  }
   syncValue();
 }
 var init_knob = __esm({
