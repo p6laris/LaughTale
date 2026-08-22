@@ -17,54 +17,54 @@ You **never create, configure, or compile TypeScript/JavaScript files**. You wri
 
 <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); padding: 1.5rem; margin: 1.5rem 0; display: flex; flex-direction: column; gap: 1.5rem;">
 
-    <!-- 1. Live Reactivity & Storage Persistence (l-state, l-model, l-persist) -->
-    <div l-state='{ "licenses": 5, "pricePerSeat": 120 }' l-persist="demo_pricing_calc" style="background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem;">
-        <div style="font-size: 0.875rem; font-weight: 700; color: var(--p-surface-900); margin-bottom: 0.5rem;">1. Reactive State &amp; LocalStorage Sync (<code style="font-size: 0.75rem;">l-state</code>, <code style="font-size: 0.75rem;">l-persist</code>)</div>
-        <p style="font-size: 0.75rem; color: var(--p-surface-500); margin-bottom: 0.75rem;">Changes save to localStorage and survive page reloads:</p>
-        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
-            <label style="font-size: 0.8125rem; color: var(--p-surface-600);">Seats:</label>
-            <input type="number" l-model="licenses" min="1" max="100" style="padding: 0.35rem 0.5rem; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); width: 80px;" />
-            <span style="font-size: 0.8125rem; color: var(--p-surface-500);">&times; $120/seat</span>
-        </div>
-        <div style="font-size: 1.125rem; font-weight: 800; color: var(--p-primary-600);">
-            Total: $<span l-bind="(licenses * pricePerSeat).toLocaleString()">600</span> /mo
-        </div>
+<!-- 1. Live Reactivity & Storage Persistence (l-state, l-model, l-persist) -->
+<div l-state='{ "licenses": 5, "pricePerSeat": 120 }' l-persist="demo_pricing_calc" style="background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem;">
+    <div style="font-size: 0.875rem; font-weight: 700; color: var(--p-surface-900); margin-bottom: 0.5rem;">1. Reactive State &amp; LocalStorage Sync (<code style="font-size: 0.75rem;">l-state</code>, <code style="font-size: 0.75rem;">l-persist</code>)</div>
+    <p style="font-size: 0.75rem; color: var(--p-surface-500); margin-bottom: 0.75rem;">Changes save to localStorage and survive page reloads:</p>
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+        <label style="font-size: 0.8125rem; color: var(--p-surface-600);">Seats:</label>
+        <input type="number" l-model="licenses" min="1" max="100" style="padding: 0.35rem 0.5rem; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); width: 80px;" />
+        <span style="font-size: 0.8125rem; color: var(--p-surface-500);">&times; $120/seat</span>
     </div>
+    <div style="font-size: 1.125rem; font-weight: 800; color: var(--p-primary-600);">
+        Total: $<span l-bind="(licenses * pricePerSeat).toLocaleString()">600</span> /mo
+    </div>
+</div>
 
-    <!-- 2. Tooltips & Badges (l-tooltip, l-badge) -->
-    <div style="background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem;">
-        <div style="font-size: 0.875rem; font-weight: 700; color: var(--p-surface-900); margin-bottom: 0.5rem;">2. Aura Floating Tooltips &amp; Badges (<code style="font-size: 0.75rem;">l-tooltip</code>, <code style="font-size: 0.75rem;">l-badge</code>)</div>
-        <p style="font-size: 0.75rem; color: var(--p-surface-500); margin-bottom: 0.75rem;">Hover over buttons to see animated Aura tooltips and status badges:</p>
-        <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
-            <button type="button" l-tooltip="Export Audit Log as Encrypted PDF" l-badge="PDF" l-badge.info class="p-button p-button-secondary">
-                Export Audit Logs 📄
-            </button>
-            <button type="button" l-tooltip.bottom="Zero-Trust HSM Level 4 Key" l-badge.dot l-badge.success class="p-button p-button-primary">
-                Hardware Token 🔒
-            </button>
-            <button type="button" l-tooltip.right="3 critical security alerts" l-badge="3" l-badge.danger class="p-button p-button-secondary">
-                Security Alerts 🔔
-            </button>
-        </div>
+<!-- 2. Tooltips & Badges (l-tooltip, l-badge) -->
+<div style="background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem;">
+    <div style="font-size: 0.875rem; font-weight: 700; color: var(--p-surface-900); margin-bottom: 0.5rem;">2. Aura Floating Tooltips &amp; Badges (<code style="font-size: 0.75rem;">l-tooltip</code>, <code style="font-size: 0.75rem;">l-badge</code>)</div>
+    <p style="font-size: 0.75rem; color: var(--p-surface-500); margin-bottom: 0.75rem;">Hover over buttons to see animated Aura tooltips and status badges:</p>
+    <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+        <button type="button" l-tooltip="Export Audit Log as Encrypted PDF" l-badge="PDF" l-badge.info class="p-button p-button-secondary">
+            Export Audit Logs 📄
+        </button>
+        <button type="button" l-tooltip.bottom="Zero-Trust HSM Level 4 Key" l-badge.dot l-badge.success class="p-button p-button-primary">
+            Hardware Token 🔒
+        </button>
+        <button type="button" l-tooltip.right="3 critical security alerts" l-badge="3" l-badge.danger class="p-button p-button-secondary">
+            Security Alerts 🔔
+        </button>
     </div>
+</div>
 
-    <!-- 3. Pattern Masking & Clipboard Copy (l-mask, l-copy) -->
-    <div style="background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem;">
-        <div style="font-size: 0.875rem; font-weight: 700; color: var(--p-surface-900); margin-bottom: 0.5rem;">3. Pattern Input Masking &amp; Clipboard Copy (<code style="font-size: 0.75rem;">l-mask</code>, <code style="font-size: 0.75rem;">l-copy</code>)</div>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
-            <div>
-                <label style="font-size: 0.75rem; color: var(--p-surface-500); display: block; margin-bottom: 0.25rem;">Type numbers; auto-formats into telephone format:</label>
-                <input type="text" l-mask="(999) 999-9999" placeholder="(555) 123-4567" style="width: 100%; padding: 0.45rem 0.75rem; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); font-size: 0.875rem;" />
-            </div>
-            <div>
-                <label style="font-size: 0.75rem; color: var(--p-surface-500); display: block; margin-bottom: 0.25rem;">Copy cryptographic token with instant feedback:</label>
-                <div style="display: flex; gap: 0.5rem;">
-                    <code id="api-key-demo" style="background: var(--p-surface-100); padding: 0.45rem 0.65rem; border-radius: 4px; border: 1px solid var(--p-border-color); font-size: 0.75rem; flex: 1; overflow: hidden; text-overflow: ellipsis;">sec_live_894819204</code>
-                    <button type="button" l-copy="#api-key-demo" l-feedback="✓ Copied!" class="p-button p-button-secondary" style="padding: 0.35rem 0.65rem; font-size: 0.75rem;">Copy</button>
-                </div>
+<!-- 3. Pattern Masking & Clipboard Copy (l-mask, l-copy) -->
+<div style="background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem;">
+    <div style="font-size: 0.875rem; font-weight: 700; color: var(--p-surface-900); margin-bottom: 0.5rem;">3. Pattern Input Masking &amp; Clipboard Copy (<code style="font-size: 0.75rem;">l-mask</code>, <code style="font-size: 0.75rem;">l-copy</code>)</div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
+        <div>
+            <label style="font-size: 0.75rem; color: var(--p-surface-500); display: block; margin-bottom: 0.25rem;">Type numbers; auto-formats into telephone format:</label>
+            <input type="text" l-mask="(999) 999-9999" placeholder="(555) 123-4567" style="width: 100%; padding: 0.45rem 0.75rem; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); font-size: 0.875rem;" />
+        </div>
+        <div>
+            <label style="font-size: 0.75rem; color: var(--p-surface-500); display: block; margin-bottom: 0.25rem;">Copy cryptographic token with instant feedback:</label>
+            <div style="display: flex; gap: 0.5rem;">
+                <code id="api-key-demo" style="background: var(--p-surface-100); padding: 0.45rem 0.65rem; border-radius: 4px; border: 1px solid var(--p-border-color); font-size: 0.75rem; flex: 1; overflow: hidden; text-overflow: ellipsis;">sec_live_894819204</code>
+                <button type="button" l-copy="#api-key-demo" l-feedback="✓ Copied!" class="p-button p-button-secondary" style="padding: 0.35rem 0.65rem; font-size: 0.75rem;">Copy</button>
             </div>
         </div>
     </div>
+</div>
 
 </div>
 
