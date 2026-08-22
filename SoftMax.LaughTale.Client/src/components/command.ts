@@ -52,7 +52,7 @@ export default function CommandPaletteIsland(container: HTMLElement, props: Comm
                     
                     <!-- Search Header -->
                     <div style="display: flex; align-items: center; padding: 0.875rem 1.125rem; border-bottom: 1px solid var(--p-border-color, #e2e8f0); gap: 0.75rem;">
-                        <span style="color: var(--p-surface-400, #94a3b8); display: flex;">${LucideIcons.search(18)}</span>
+                        <span style="color: var(--p-surface-400, #94a3b8); display: flex;">${LucideIcons.search}</span>
                         <input type="text" 
                                class="command-search-input" 
                                placeholder="${placeholder}" 
@@ -93,7 +93,7 @@ export default function CommandPaletteIsland(container: HTMLElement, props: Comm
         if (filtered.length === 0) {
             listContainer.innerHTML = `
                 <div style="padding: 2.5rem 1rem; text-align: center; color: var(--p-surface-400);">
-                    <div style="margin-bottom: 0.5rem; display: flex; justify-content: center;">${LucideIcons.alertCircle(24)}</div>
+                    <div style="margin-bottom: 0.5rem; display: flex; justify-content: center;">${LucideIcons.alertCircle || 'ℹ'}</div>
                     <div style="font-size: 0.875rem; font-weight: 500;">No matching commands found</div>
                 </div>
             `;
@@ -115,7 +115,7 @@ export default function CommandPaletteIsland(container: HTMLElement, props: Comm
             html += `<div style="font-size: 0.6875rem; font-weight: 700; color: var(--p-surface-400); text-transform: uppercase; letter-spacing: 0.05em; padding: 0.5rem 0.75rem 0.25rem;">${groupName}</div>`;
             groupItems.forEach(it => {
                 const isSelected = flatIndex === selectedIndex;
-                const iconSvg = it.icon && LucideIcons[it.icon] ? LucideIcons[it.icon](16) : LucideIcons.terminal(16);
+                const iconSvg = it.icon && (LucideIcons as any)[it.icon] ? (LucideIcons as any)[it.icon] : (LucideIcons.terminal || '⚡');
 
                 html += `
                     <div class="command-item ${isSelected ? 'active' : ''}" 

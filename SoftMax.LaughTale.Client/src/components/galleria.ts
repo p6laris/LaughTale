@@ -46,10 +46,10 @@ export default function GalleriaIsland(container: HTMLElement, props: GalleriaPr
                     
                     <!-- Prev / Next Nav Buttons -->
                     <button type="button" class="galleria-prev-btn" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); width: 2.25rem; height: 2.25rem; border-radius: 9999px; background: rgba(0,0,0,0.5); color: #ffffff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;">
-                        ${LucideIcons.chevronDown ? '<span style="transform: rotate(90deg); display: flex;">' + LucideIcons.chevronDown(18) + '</span>' : '‹'}
+                        <span style="transform: rotate(90deg); display: flex;">${LucideIcons.chevronDown}</span>
                     </button>
                     <button type="button" class="galleria-next-btn" style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); width: 2.25rem; height: 2.25rem; border-radius: 9999px; background: rgba(0,0,0,0.5); color: #ffffff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;">
-                        ${LucideIcons.chevronDown ? '<span style="transform: rotate(-90deg); display: flex;">' + LucideIcons.chevronDown(18) + '</span>' : '›'}
+                        <span style="transform: rotate(-90deg); display: flex;">${LucideIcons.chevronDown}</span>
                     </button>
 
                     <!-- Caption Bar -->

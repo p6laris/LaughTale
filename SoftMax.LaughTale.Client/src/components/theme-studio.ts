@@ -100,14 +100,14 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
                 <!-- Header -->
                 <div style="display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--p-border-color, #e2e8f0);">
                     <div style="display: flex; align-items: center; gap: 0.625rem;">
-                        <span style="color: var(--p-primary-600); display: flex;">${LucideIcons.sliders(20)}</span>
+                        <span style="color: var(--p-primary-600); display: flex;">${LucideIcons.sliders || '🎨'}</span>
                         <div>
                             <div style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900);">TweakAura Studio</div>
                             <div style="font-size: 0.75rem; color: var(--p-surface-500);">Live shadcn-Style Theme Editor</div>
                         </div>
                     </div>
                     <button type="button" class="theme-studio-close-btn" style="border: none; background: transparent; color: var(--p-surface-400); cursor: pointer; padding: 0.25rem; display: flex; border-radius: 4px;">
-                        ${LucideIcons.x(20)}
+                        ${LucideIcons.x}
                     </button>
                 </div>
 
@@ -187,10 +187,10 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
                 <!-- Footer Export Actions -->
                 <div style="padding: 1rem 1.5rem; border-top: 1px solid var(--p-border-color, #e2e8f0); background: var(--p-surface-50, #f8fafc); display: flex; flex-direction: column; gap: 0.5rem;">
                     <button type="button" class="studio-copy-css-btn p-button p-button-primary" style="width: 100%; justify-content: center; font-size: 0.8125rem;">
-                        ${LucideIcons.copy(16)} Copy CSS Tokens
+                        ${LucideIcons.copy} Copy CSS Tokens
                     </button>
                     <button type="button" class="studio-copy-csharp-btn p-button p-button-secondary" style="width: 100%; justify-content: center; font-size: 0.8125rem;">
-                        ${LucideIcons.code(16)} Copy C# Theme Tokens
+                        ${LucideIcons.code} Copy C# Theme Tokens
                     </button>
                 </div>
 

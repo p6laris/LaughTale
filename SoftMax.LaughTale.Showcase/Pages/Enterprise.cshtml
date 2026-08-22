@@ -11,17 +11,18 @@
 
 <!-- Hero Banner -->
 <div class="hero-section" style="margin-bottom: 2rem;">
-    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
-        <span class="aura-tag tag-emerald">100% C# Razor</span>
-        <span class="aura-tag tag-slate">Zero TypeScript / Zero JS</span>
+    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; flex-wrap: wrap;">
+        <span class="aura-tag tag-emerald">100% C# Strongly Typed</span>
+        <span class="aura-tag tag-slate">Tailwind CSS v4 Tokens</span>
         <span class="aura-tag tag-emerald">Aura Theme</span>
         <span class="aura-tag tag-slate">Lucide Icons</span>
+        <span class="aura-tag tag-amber">49 Active Components</span>
     </div>
     <h1 style="font-size: 2.25rem; font-weight: 800; letter-spacing: -0.03em; color: var(--p-surface-950); margin-bottom: 0.75rem;">
-        Enterprise UI Components &amp; Declarative Directives
+        Enterprise UI Components &amp; Dynamic Form Generator
     </h1>
     <p style="font-size: 1.05rem; color: var(--p-surface-600); max-width: 800px; line-height: 1.6;">
-        Production-grade enterprise components written in 100% C# Razor with Lucide vector icons. Zero npm build steps, zero client JavaScript maintenance.
+        Production-grade enterprise components written in 100% C# Razor with Lucide vector icons, headless physics animations, and DataAnnotations-driven dynamic form generation.
     </p>
 </div>
 
@@ -32,7 +33,170 @@
 <island-scroll-top />
 
 <!-- ========================================== -->
-<!-- 0. Compound Components & Atomic Blocks Showcase -->
+<!-- 0. Dynamic Form Generator Showcase -->
+<!-- ========================================== -->
+<div style="margin-bottom: 2.5rem;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
+        <div>
+            <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--p-surface-900);">Dynamic Form Generator (C# DataAnnotations Reflection)</h2>
+            <p style="font-size: 0.875rem; color: var(--p-surface-500); margin-top: 0.25rem;">Generated automatically from <code>OperatorRegistrationDto</code> with <code>[Required]</code>, <code>[EmailAddress]</code>, <code>[DataType]</code>, and <code>[Range]</code> validation.</p>
+        </div>
+        <span class="aura-tag tag-emerald">Dynamic Forms</span>
+    </div>
+
+    <div style="max-width: 640px; background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-xl); box-shadow: var(--p-shadow-sm); padding: 1.5rem;">
+        <island-dynamic-form schema="@Model.RegistrationFormSchema" />
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- 1. Interactive Splitter & Multi-Panel Workspace -->
+<!-- ========================================== -->
+<div style="margin-bottom: 2.5rem;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
+        <div>
+            <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--p-surface-900);">Splitter (Resizable Multi-Panel Layouts)</h2>
+            <p style="font-size: 0.875rem; color: var(--p-surface-500); margin-top: 0.25rem;">Drag the divider gutter with smooth physics-assisted split resizing.</p>
+        </div>
+        <span class="aura-tag tag-slate">Splitter</span>
+    </div>
+
+    <island-splitter orientation="Horizontal" initial-ratio="35" style="background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-xl); box-shadow: var(--p-shadow-sm);">
+        <left-panel>
+            <div style="padding: 1.5rem;">
+                <div style="font-weight: 700; font-size: 0.9375rem; color: var(--p-surface-900); margin-bottom: 0.5rem;">Left Sidebar Panel</div>
+                <p style="font-size: 0.8125rem; color: var(--p-surface-600); line-height: 1.5;">Navigation tree, project directory structure, or telemetry filters.</p>
+                <div style="margin-top: 1rem;">
+                    <island-tree-select placeholder="Select Dept..." target-input-name="splitter_dept" departments="@Model.DepartmentTree" />
+                </div>
+            </div>
+        </left-panel>
+        <right-panel>
+            <div style="padding: 1.5rem;">
+                <div style="font-weight: 700; font-size: 0.9375rem; color: var(--p-surface-900); margin-bottom: 0.5rem;">Main Workspace Area</div>
+                <p style="font-size: 0.8125rem; color: var(--p-surface-600); line-height: 1.5;">Primary workspace canvas with rich data viewports.</p>
+                <div style="margin-top: 1rem; display: flex; gap: 0.75rem;">
+                    <island-split-button label="Trigger Deploy" icon="⚡" menu="@Model.SplitButtonActions" />
+                    <island-button variant="Outline">Refresh Node</island-button>
+                </div>
+            </div>
+        </right-panel>
+    </island-splitter>
+</div>
+
+<!-- ========================================== -->
+<!-- 2. MultiSelect, CascadeSelect, & Listbox -->
+<!-- ========================================== -->
+<div style="margin-bottom: 2.5rem;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
+        <div>
+            <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--p-surface-900);">Advanced Selectors: MultiSelect, CascadeSelect &amp; Listbox</h2>
+            <p style="font-size: 0.875rem; color: var(--p-surface-500); margin-top: 0.25rem;">Chip tags, hierarchical multi-tier cascade popovers, and searchable listboxes.</p>
+        </div>
+        <span class="aura-tag tag-emerald">Selectors</span>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+        
+        <!-- MultiSelect -->
+        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 0.5rem; color: var(--p-surface-900);">MultiSelect with Chips</div>
+            <p style="font-size: 0.75rem; color: var(--p-surface-500); margin-bottom: 1rem;">Select multiple technologies with removable tags.</p>
+            <island-multiselect options="@Model.MultiSelectSkills" placeholder="Select technologies..." target-input-name="selected_tech" />
+        </div>
+
+        <!-- CascadeSelect -->
+        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 0.5rem; color: var(--p-surface-900);">CascadeSelect Multi-Level</div>
+            <p style="font-size: 0.75rem; color: var(--p-surface-500); margin-bottom: 1rem;">Cascading flyout menus for regional hierarchical datacenters.</p>
+            <island-cascadeselect options="@Model.CascadeRegions" placeholder="Select Datacenter..." target-input-name="selected_region" />
+        </div>
+
+        <!-- Listbox -->
+        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 0.5rem; color: var(--p-surface-900);">Searchable Listbox</div>
+            <p style="font-size: 0.75rem; color: var(--p-surface-500); margin-bottom: 1rem;">Scrollable list with real-time debounced query filter.</p>
+            <island-listbox options="@Model.ListboxDatabases" filter="true" target-input-name="selected_db" />
+        </div>
+
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- 3. PickList & OrderList (Dual-List Transfer & Reordering) -->
+<!-- ========================================== -->
+<div style="margin-bottom: 2.5rem;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
+        <div>
+            <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--p-surface-900);">PickList &amp; OrderList (Dual-List Transfer &amp; Reordering)</h2>
+            <p style="font-size: 0.875rem; color: var(--p-surface-500); margin-top: 0.25rem;">FLIP layout physics transfers and keyboard-accessible item reordering.</p>
+        </div>
+        <span class="aura-tag tag-slate">Transfer Lists</span>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 1.5rem;">
+        
+        <!-- PickList -->
+        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">PickList Security Token Assigner</div>
+            <island-picklist source="@Model.PickListSource" target="@Model.PickListTarget" source-header="Available Tokens" target-header="Assigned to Node" />
+        </div>
+
+        <!-- OrderList -->
+        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">OrderList Pipeline Execution Sequence</div>
+            <island-orderlist items="@Model.OrderListTasks" header="Pipeline Order" />
+        </div>
+
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- 4. OrgChart Hierarchy Visualization -->
+<!-- ========================================== -->
+<div style="margin-bottom: 2.5rem;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
+        <div>
+            <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--p-surface-900);">Organizational Tree Chart (OrgChart)</h2>
+            <p style="font-size: 0.875rem; color: var(--p-surface-500); margin-top: 0.25rem;">Collapsible node branches, role badges, and interactive drill-down cards.</p>
+        </div>
+        <span class="aura-tag tag-emerald">OrgChart</span>
+    </div>
+
+    <div style="background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-xl); box-shadow: var(--p-shadow-sm); padding: 1.5rem; overflow-x: auto;">
+        <island-orgchart root="@Model.OrgChartRoot" />
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- 5. Terminal CLI & Galleria Media Stage -->
+<!-- ========================================== -->
+<div style="margin-bottom: 2.5rem;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
+        <div>
+            <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--p-surface-900);">Interactive CLI Terminal &amp; Responsive Galleria</h2>
+            <p style="font-size: 0.875rem; color: var(--p-surface-500); margin-top: 0.25rem;">Type commands (e.g. <code>help</code>, <code>status</code>, <code>version</code>) or inspect server media.</p>
+        </div>
+        <span class="aura-tag tag-slate">Interactive</span>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 1.5rem;">
+        
+        <!-- Terminal -->
+        <div>
+            <island-terminal prompt="operator@zero-trust:~$" />
+        </div>
+
+        <!-- Galleria -->
+        <div>
+            <island-galleria images="@Model.GalleriaImages" />
+        </div>
+
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- 6. Compound Components & Atomic Blocks Showcase -->
 <!-- ========================================== -->
 <div style="margin-bottom: 2.5rem;">
     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
@@ -59,326 +223,156 @@
                         <span class="aura-tag tag-emerald" style="font-size: 0.6875rem;">HSM Active</span>
                     </div>
                     <island-input-group>
-                        <island-input-icon icon="key" />
-                        <island-input-text id="secKey" placeholder="sk-live-0921..." />
-                        <island-button variant="Secondary" size="Small">Verify</island-button>
+                        <island-input-icon icon="🔒" />
+                        <island-input-text id="secKey" name="secKey" placeholder="HSM-KEY-9948-X" />
+                        <island-input-icon icon="⚡" position="Right" />
                     </island-input-group>
-                    <island-helper-text>Cryptographically hashed with SHA-384.</island-helper-text>
+                    <island-helper-text>Keys are ephemeral and rotate every 3600 seconds.</island-helper-text>
                 </island-field>
 
                 <island-field>
-                    <island-label for="operatorEmail">Operator Notification Email</island-label>
-                    <island-input-group>
-                        <island-input-icon icon="mail" />
-                        <island-input-text id="operatorEmail" type="email" placeholder="devops@softmax.dev" />
-                    </island-input-group>
+                    <island-label for="opEmail">Operator Email</island-label>
+                    <island-input-text id="opEmail" name="opEmail" value="alice@zero-trust.io" />
                 </island-field>
             </island-card-content>
 
-            <island-card-footer class="flex justify-between">
-                <island-button variant="Ghost">Cancel</island-button>
-                <island-button variant="Solid" icon="check">Save Settings</island-button>
+            <island-card-footer style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+                <island-button variant="Outline" size="Small">Revoke</island-button>
+                <island-button variant="Solid" size="Small">Deploy Ingress</island-button>
             </island-card-footer>
         </island-card>
 
-        <!-- Block 2: Compound Accordion & Dialog Trigger -->
-        <div style="display: flex; flex-direction: column; gap: 1.25rem;">
-            
-            <!-- Compound Accordion -->
-            <island-accordion-root>
-                <island-accordion-item>
-                    <island-accordion-trigger>
-                        Zero-Trust Security Policies
-                    </island-accordion-trigger>
-                    <island-accordion-content>
-                        Enforces mTLS mutual authentication and hardware-backed JWT signatures on all endpoints.
-                    </island-accordion-content>
-                </island-accordion-item>
+        <!-- Block 2: Compound Dialog Modal -->
+        <island-card>
+            <island-card-header>
+                <island-card-title>Compound Dialog System</island-card-title>
+                <island-card-description>Accessible, spring-animated focus-trapped modal.</island-card-description>
+            </island-card-header>
 
-                <island-accordion-item>
-                    <island-accordion-trigger>
-                        Real-time Telemetry Quotas
-                    </island-accordion-trigger>
-                    <island-accordion-content>
-                        Peak bandwidth capped at 10 Gbps with automatic multi-region failover.
-                    </island-accordion-content>
-                </island-accordion-item>
-            </island-accordion-root>
-
-            <!-- Compound Dialog Trigger -->
-            <island-dialog>
-                <island-dialog-trigger>
-                    <island-button variant="Outline" class="w-full">
-                        Open Security Policy Modal (Compound Dialog)
-                    </island-button>
-                </island-dialog-trigger>
-
-                <island-dialog-content>
-                    <island-dialog-header>
-                        <island-dialog-title>Confirm Key Rotation</island-dialog-title>
-                    </island-dialog-header>
-
-                    <p style="font-size: 0.875rem; color: var(--p-surface-600); margin-bottom: 1.25rem;">
-                        Are you sure you want to rotate the active HMAC root signing key? All active sessions will be re-negotiated within 60 seconds.
-                    </p>
-
-                    <island-dialog-footer>
-                        <island-dialog-close>
-                            <island-button variant="Ghost">Cancel</island-button>
-                        </island-dialog-close>
-                        <island-dialog-close>
-                            <island-button variant="Destructive">Rotate Key</island-button>
-                        </island-dialog-close>
-                    </island-dialog-footer>
-                </island-dialog-content>
-            </island-dialog>
-
-        </div>
+            <island-card-content style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem 1rem;">
+                <div style="font-size: 2.5rem; margin-bottom: 1rem;">🛡️</div>
+                <island-dialog id="auditModal">
+                    <island-dialog-trigger>
+                        <island-button variant="Solid" size="Medium">Launch Audit Review Dialog</island-button>
+                    </island-dialog-trigger>
+                    <island-dialog-content title="Cluster Security Audit" description="Review automated cryptographic sign-off parameters.">
+                        <p style="font-size: 0.875rem; color: var(--p-surface-600); line-height: 1.6; margin-bottom: 1rem;">
+                            All nodes are currently verified against the FIPS 140-3 HSM Root Key ledger. Zero anomalous egress detected in the last 24 hours.
+                        </p>
+                        <island-dialog-footer>
+                            <island-dialog-close>
+                                <island-button variant="Outline" size="Small">Dismiss</island-button>
+                            </island-dialog-close>
+                            <island-button variant="Solid" size="Small">Approve Ledger</island-button>
+                        </island-dialog-footer>
+                    </island-dialog-content>
+                </island-dialog>
+            </island-card-content>
+        </island-card>
 
     </div>
 </div>
 
 <!-- ========================================== -->
-<!-- 1. Form & Input Controls Suite -->
+<!-- 7. Aura Form Controls Suite -->
 <!-- ========================================== -->
-<div class="p-card" style="margin-bottom: 2rem;">
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+<div style="margin-bottom: 2.5rem;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
         <div>
-            <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--p-surface-900);">1. Form &amp; Input Controls (Aura Suite)</h2>
-            <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin-top: 0.25rem;">Formatted numeric &amp; currency inputs, OTP boxes, password strength meters, segmented buttons, sliders, color pickers, and auto-complete comboboxes.</p>
+            <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--p-surface-900);">Aura Form &amp; Input Controls</h2>
+            <p style="font-size: 0.875rem; color: var(--p-surface-500); margin-top: 0.25rem;">InputNumber, OTP, Password strength metering, ToggleSwitch, and Sliders.</p>
         </div>
-        <span class="aura-tag tag-slate">Inputs &amp; Controls</span>
-    </div>
-
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
-        
-        <!-- Currency & Money Input -->
-        <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem;">
-            <div style="font-size: 0.875rem; font-weight: 700; color: var(--p-surface-900); margin-bottom: 0.5rem;">Currency &amp; Money Input</div>
-            <p style="font-size: 0.75rem; color: var(--p-surface-500); margin-bottom: 0.75rem;">Formatted currency with thousands separator &amp; step buttons:</p>
-            <island-currency value="2450.50" currency="USD" target-input="InvoiceAmount" hydrate="Load" />
-        </div>
-
-        <!-- 6-Digit OTP Verification Input -->
-        <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem;">
-            <div style="font-size: 0.875rem; font-weight: 700; color: var(--p-surface-900); margin-bottom: 0.5rem;">6-Digit OTP Verification</div>
-            <p style="font-size: 0.75rem; color: var(--p-surface-500); margin-bottom: 0.75rem;">Auto-advancing verification boxes with backspace &amp; paste support:</p>
-            <island-otp length="6" target-input="AuthCode" hydrate="Load" />
-        </div>
-
-        <!-- AutoComplete / Combobox -->
-        <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem;">
-            <div style="font-size: 0.875rem; font-weight: 700; color: var(--p-surface-900); margin-bottom: 0.5rem;">AutoComplete / Search Dropdown</div>
-            <p style="font-size: 0.75rem; color: var(--p-surface-500); margin-bottom: 0.75rem;">Filterable dropdown with live item search:</p>
-            <island-autocomplete items="@Model.CityOptions" placeholder="Search city..." target-input="SelectedCity" hydrate="Load" />
-        </div>
-
-        <!-- Password with Strength Meter -->
-        <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem;">
-            <div style="font-size: 0.875rem; font-weight: 700; color: var(--p-surface-900); margin-bottom: 0.5rem;">Password &amp; Live Strength Meter</div>
-            <p style="font-size: 0.75rem; color: var(--p-surface-500); margin-bottom: 0.75rem;">Eye visibility toggle with 3-stage color strength bar:</p>
-            <island-password placeholder="Create secure password..." target-input="MasterPassword" hydrate="Load" />
-        </div>
-
-        <!-- ColorPicker -->
-        <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem;">
-            <div style="font-size: 0.875rem; font-weight: 700; color: var(--p-surface-900); margin-bottom: 0.5rem;">Interactive Color Picker</div>
-            <p style="font-size: 0.75rem; color: var(--p-surface-500); margin-bottom: 0.75rem;">Palette swatches with native color input:</p>
-            <island-color-picker value="#10b981" target-input="BrandColor" hydrate="Load" />
-        </div>
-
-        <!-- Inplace Click-to-Edit -->
-        <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem;">
-            <div style="font-size: 0.875rem; font-weight: 700; color: var(--p-surface-900); margin-bottom: 0.5rem;">Inplace Click-to-Edit</div>
-            <p style="font-size: 0.75rem; color: var(--p-surface-500); margin-bottom: 0.75rem;">Inline text editor with save and cancel:</p>
-            <island-inplace value="Cluster-US-East-Primary" target-input="ClusterName" hydrate="Load" />
-        </div>
-
-        <!-- Segmented SelectButton -->
-        <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem;">
-            <div style="font-size: 0.875rem; font-weight: 700; color: var(--p-surface-900); margin-bottom: 0.5rem;">Segmented Button Select</div>
-            <p style="font-size: 0.75rem; color: var(--p-surface-500); margin-bottom: 0.75rem;">Aura pill toggle selector:</p>
-            <island-select-button items="@Model.Periods" value="monthly" target-input="SelectedPeriod" hydrate="Load" />
-        </div>
-
-        <!-- Range Slider -->
-        <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem;">
-            <div style="font-size: 0.875rem; font-weight: 700; color: var(--p-surface-900); margin-bottom: 0.5rem;">Volume / Range Slider</div>
-            <p style="font-size: 0.75rem; color: var(--p-surface-500); margin-bottom: 0.75rem;">Step-based slider with numeric indicators:</p>
-            <island-slider min="0" max="100" value="65" step="5" target-input="ClusterCapacity" hydrate="Load" />
-        </div>
-
-        <!-- Star Rating -->
-        <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem;">
-            <div style="font-size: 0.875rem; font-weight: 700; color: var(--p-surface-900); margin-bottom: 0.5rem;">Interactive Star Rating</div>
-            <p style="font-size: 0.75rem; color: var(--p-surface-500); margin-bottom: 0.75rem;">Hover preview &amp; cancellation:</p>
-            <island-rating stars="5" value="4" allow-cancel="true" target-input="UserRating" hydrate="Load" />
-        </div>
-
-        <!-- Toggle Switch -->
-        <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem;">
-            <div style="font-size: 0.875rem; font-weight: 700; color: var(--p-surface-900); margin-bottom: 0.5rem;">Toggle Switch</div>
-            <p style="font-size: 0.75rem; color: var(--p-surface-500); margin-bottom: 0.75rem;">Smooth animated boolean toggle:</p>
-            <island-switch checked="true" label="Auto-Sync Enabled" target-input="AutoSync" hydrate="Load" />
-        </div>
-
-        <!-- Tag / Chip Input -->
-        <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem;">
-            <div style="font-size: 0.875rem; font-weight: 700; color: var(--p-surface-900); margin-bottom: 0.5rem;">Tag / Chip Input</div>
-            <p style="font-size: 0.75rem; color: var(--p-surface-500); margin-bottom: 0.75rem;">Add/remove tags on enter or comma:</p>
-            <island-chips values='@new[] { "Zero-Trust", "mTLS", "Production" }' target-input="ClusterTags" hydrate="Load" />
-        </div>
-
-        <!-- DatePicker Calendar -->
-        <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem;">
-            <div style="font-size: 0.875rem; font-weight: 700; color: var(--p-surface-900); margin-bottom: 0.5rem;">Calendar DatePicker</div>
-            <p style="font-size: 0.75rem; color: var(--p-surface-500); margin-bottom: 0.75rem;">Full interactive month/year popup calendar:</p>
-            <island-datepicker placeholder="Choose expiration date..." target-input="CertExpiration" hydrate="Load" />
-        </div>
-
-    </div>
-</div>
-
-<!-- ========================================== -->
-<!-- 2. Accordions & Tab Navigation Panels -->
-<!-- ========================================== -->
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
-    
-    <!-- Accordion Section -->
-    <div class="p-card">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
-            <h2 style="font-size: 1.125rem; font-weight: 700; color: var(--p-surface-900);">2. Collapsible Accordion</h2>
-            <span class="aura-tag tag-slate">&lt;island-accordion /&gt;</span>
-        </div>
-        <island-accordion tabs="@Model.AccordionTabs" active-index="0" hydrate="Load" />
-    </div>
-
-    <!-- Tabs Section -->
-    <div class="p-card">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
-            <h2 style="font-size: 1.125rem; font-weight: 700; color: var(--p-surface-900);">3. Underlined Tabs</h2>
-            <span class="aura-tag tag-slate">&lt;island-tabs /&gt;</span>
-        </div>
-        <island-tabs tabs="@Model.TabSections" active-index="0" hydrate="Load" />
-    </div>
-
-</div>
-
-<!-- ========================================== -->
-<!-- 3. Metrics, Gauges & Radial Knob -->
-<!-- ========================================== -->
-<div class="p-card" style="margin-bottom: 2rem;">
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
-        <div>
-            <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--p-surface-900);">4. Gauges, Metrics &amp; Radial Knob</h2>
-            <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin-top: 0.25rem;">Meter bars, circular dial knobs, avatar stacks, and progress indicators.</p>
-        </div>
-        <span class="aura-tag tag-slate">Visual Metrics</span>
-    </div>
-
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; align-items: center;">
-        
-        <!-- Radial Knob -->
-        <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem; text-align: center;">
-            <div style="font-size: 0.875rem; font-weight: 700; color: var(--p-surface-900); margin-bottom: 0.5rem;">Radial Dial Knob</div>
-            <p style="font-size: 0.75rem; color: var(--p-surface-500); margin-bottom: 1rem;">Click &amp; drag circular dial:</p>
-            <div style="display: flex; justify-content: center;">
-                <island-knob value="85" size="110" color="var(--p-primary-600)" target-input="ClusterLoad" hydrate="Load" />
-            </div>
-        </div>
-
-        <!-- MeterGroup -->
-        <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem;">
-            <div style="font-size: 0.875rem; font-weight: 700; color: var(--p-surface-900); margin-bottom: 0.5rem;">Storage Breakdown Meter</div>
-            <island-meter-group values="@Model.StorageMetrics" max="100" hydrate="Load" />
-        </div>
-
-        <!-- Avatar Group -->
-        <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem;">
-            <div style="font-size: 0.875rem; font-weight: 700; color: var(--p-surface-900); margin-bottom: 0.5rem;">Operator Avatar Stack</div>
-            <p style="font-size: 0.75rem; color: var(--p-surface-500); margin-bottom: 1rem;">Overlapping avatar pills with count overflow:</p>
-            <island-avatar-group avatars="@Model.TeamAvatars" max="4" hydrate="Load" />
-        </div>
-
-    </div>
-</div>
-
-<!-- ========================================== -->
-<!-- 4. Real-Time Audit Log & DataGrid -->
-<!-- ========================================== -->
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
-    
-    <!-- Audit Log Timeline -->
-    <div class="p-card">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
-            <h2 style="font-size: 1.125rem; font-weight: 700; color: var(--p-surface-900);">5. Real-Time Audit Log Timeline</h2>
-            <span class="aura-tag tag-slate">&lt;island-timeline /&gt;</span>
-        </div>
-        <island-timeline events="@Model.AuditEvents" hydrate="Visible" />
-    </div>
-
-    <!-- Enterprise DataGrid -->
-    <div class="p-card">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
-            <h2 style="font-size: 1.125rem; font-weight: 700; color: var(--p-surface-900);">6. Filterable &amp; Sortable DataGrid</h2>
-            <span class="aura-tag tag-slate">&lt;island-datagrid /&gt;</span>
-        </div>
-        <island-datagrid columns="@Model.GridColumns" data="@Model.GridRecords" page-size="4" title="Cluster Operators" hydrate="Visible" />
-    </div>
-
-</div>
-
-<!-- ========================================== -->
-<!-- 5. Declarative Directives (Zero-JS) -->
-<!-- ========================================== -->
-<div class="p-card">
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
-        <div>
-            <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--p-surface-900);">7. Declarative Razor Directives (Zero Scripts)</h2>
-            <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin-top: 0.25rem;">Live state, tooltips, hotkeys, input formatting, clipboard copying, and event dispatching written directly in HTML attributes.</p>
-        </div>
-        <span class="aura-tag tag-emerald">l-hotkey &bull; l-tooltip &bull; l-persist</span>
+        <span class="aura-tag tag-emerald">Form Controls</span>
     </div>
 
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
         
-        <!-- Live Pricing Calculator with LocalStorage Persistence -->
-        <div l-state='{ "licenses": 5, "pricePerSeat": 120 }' l-persist="enterprise_calc" style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem;">
-            <div style="font-size: 0.875rem; font-weight: 700; color: var(--p-surface-900); margin-bottom: 0.5rem;">Reactive Calc &amp; Storage Persistence</div>
-            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
-                <label style="font-size: 0.8125rem; color: var(--p-surface-600);">Seats:</label>
-                <input type="number" l-model="licenses" min="1" max="100" style="padding: 0.35rem 0.5rem; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); width: 80px;" />
-            </div>
-            <div style="font-size: 1.125rem; font-weight: 800; color: var(--p-primary-600);">
-                Total: $<span l-bind="(licenses * pricePerSeat).toLocaleString()">600</span> /mo
-            </div>
+        <!-- InputNumber -->
+        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 0.5rem; color: var(--p-surface-900);">InputNumber (Currency &amp; Steppers)</div>
+            <p style="font-size: 0.75rem; color: var(--p-surface-500); margin-bottom: 1rem;">Formatted currency mode with bounds check.</p>
+            <island-input-number mode="Currency" currency="USD" value="2499.50" min="0" max="100000" step="50" target-input-name="cluster_budget" />
         </div>
 
-        <!-- Aura Tooltips & Badges -->
-        <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem;">
-            <div style="font-size: 0.875rem; font-weight: 700; color: var(--p-surface-900); margin-bottom: 0.5rem;">Tooltips &amp; Notification Badges</div>
-            <p style="font-size: 0.75rem; color: var(--p-surface-500); margin-bottom: 0.75rem;">Hover buttons to view animated Aura tooltips:</p>
-            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-                <button type="button" l-tooltip="Export Audit Log as PDF" l-badge="PDF" l-badge.info class="p-button p-button-secondary" style="font-size: 0.8125rem;">
-                    Export 📄
-                </button>
-                <button type="button" l-tooltip.bottom="Clearance Level 4 Active" l-badge.dot l-badge.success class="p-button p-button-primary" style="font-size: 0.8125rem;">
-                    Secure Token 🔒
-                </button>
-            </div>
+        <!-- InputOtp -->
+        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 0.5rem; color: var(--p-surface-900);">InputOtp (6-Digit Security Code)</div>
+            <p style="font-size: 0.75rem; color: var(--p-surface-500); margin-bottom: 1rem;">Auto-focus jump, backspace handling &amp; clipboard paste.</p>
+            <island-input-otp length="6" target-input-name="mfa_otp" />
         </div>
 
-        <!-- Clipboard Copy & Toast Dispatch (l-copy, l-on:click) -->
-        <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem;">
-            <div style="font-size: 0.875rem; font-weight: 700; color: var(--p-surface-900); margin-bottom: 0.5rem;">Clipboard &amp; Toast Dispatch</div>
-            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
-                <code id="vault-key" style="background: white; padding: 0.35rem 0.5rem; border-radius: 4px; border: 1px solid var(--p-border-color); font-size: 0.75rem;">sec_live_994827104</code>
-                <button type="button" l-copy="#vault-key" l-feedback="✓ Copied!" class="p-button p-button-secondary" style="padding: 0.35rem 0.6rem; font-size: 0.75rem;">Copy</button>
+        <!-- InputPassword -->
+        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 0.5rem; color: var(--p-surface-900);">InputPassword (Real-Time Strength Meter)</div>
+            <p style="font-size: 0.75rem; color: var(--p-surface-500); margin-bottom: 1rem;">Eye toggle, entropy score &amp; color-coded meter.</p>
+            <island-input-password feedback="true" toggle-mask="true" target-input-name="operator_pwd" />
+        </div>
+
+        <!-- ToggleSwitch & Slider -->
+        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl); display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 0.5rem; color: var(--p-surface-900);">ToggleSwitch &amp; Physics Slider</div>
+                <p style="font-size: 0.75rem; color: var(--p-surface-500); margin-bottom: 1rem;">Custom spring thumb transitions and range slider.</p>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+                    <span style="font-size: 0.8125rem; font-weight: 600; color: var(--p-surface-700);">Enforce Zero-Trust</span>
+                    <island-toggle-switch checked="true" target-input-name="zero_trust_active" />
+                </div>
             </div>
-            <button type="button" l-on:click="$emit('toast', { title: 'Security Clearance Verified', description: 'Zero-Trust session renewed for 8 hours.', severity: 'success' })" class="p-button p-button-primary" style="width: 100%; font-size: 0.8125rem;">
-                Trigger Toast Notification 🔔
-            </button>
+            <div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--p-surface-500); margin-bottom: 0.5rem;">
+                    <span>Replication Factor</span>
+                    <span style="font-weight: 700; color: var(--p-primary-600);">3 Nodes</span>
+                </div>
+                <island-slider value="3" min="1" max="10" step="1" target-input-name="replica_count" />
+            </div>
         </div>
 
     </div>
 </div>
+
+<!-- ========================================== -->
+<!-- 8. Interactive Accordion, Tabs, & DataGrid -->
+<!-- ========================================== -->
+<div style="margin-bottom: 2.5rem;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
+        <div>
+            <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--p-surface-900);">Enterprise Data &amp; Navigation Panels</h2>
+            <p style="font-size: 0.875rem; color: var(--p-surface-500); margin-top: 0.25rem;">Accordion tabs, sliding indicator tabs, and virtualized DataGrid.</p>
+        </div>
+        <span class="aura-tag tag-emerald">Data &amp; Layout</span>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.5rem;">
+        
+        <!-- Accordion -->
+        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Security Architecture Accordion</div>
+            <island-accordion tabs="@Model.AccordionTabs" />
+        </div>
+
+        <!-- Sliding Tabs -->
+        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Sliding Tab Indicator</div>
+            <island-tabs tabs="@Model.TabSections" />
+        </div>
+
+    </div>
+
+    <!-- DataGrid -->
+    <div style="margin-top: 1.5rem;">
+        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Enterprise Operator Security Grid</div>
+            <island-datagrid columns="@Model.GridColumns" data="@Model.GridRecords" paginate="true" page-size="4" search="true" />
+        </div>
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- 9. Dock Navigation Bar (macOS Style) -->
+<!-- ========================================== -->
+<div style="margin-bottom: 3rem; display: flex; justify-content: center;">
+    <island-dock items="@Model.DockItems" position="Bottom" />
+</div>
+
+<!-- SpeedDial Floating Action Trigger -->
+<island-speed-dial actions="@Model.QuickActions" direction="Up" />

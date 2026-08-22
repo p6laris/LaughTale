@@ -1,10 +1,140 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using SoftMax.LaughTale.Components.Enums;
+using SoftMax.LaughTale.Components.Forms;
 using SoftMax.LaughTale.Components.Models;
 
 namespace SoftMax.LaughTale.Showcase.Pages;
 
+public class OperatorRegistrationDto
+{
+    [Required]
+    [Display(Name = "Full Name", Prompt = "e.g. Alice Montgomery")]
+    public string FullName { get; set; } = "Alice Montgomery";
+
+    [Required]
+    [EmailAddress]
+    [Display(Name = "Corporate Email", Prompt = "operator@zero-trust.io")]
+    public string Email { get; set; } = "alice@zero-trust.io";
+
+    [Required]
+    [DataType(DataType.Password)]
+    [StringLength(100, MinimumLength = 8)]
+    [Display(Name = "HSM Master Key", Description = "Minimum 8 characters with cryptographic complexity")]
+    public string MasterKey { get; set; } = "";
+
+    [Range(1, 10)]
+    [Display(Name = "Clearance Tier (1-10)", Description = "Level 4 required for kernel write access")]
+    public int ClearanceTier { get; set; } = 4;
+
+    [Display(Name = "Zero-Trust Enforcement", Description = "Enforce continuous mutual TLS 1.3 re-authentication")]
+    public bool EnforceMtls { get; set; } = true;
+}
+
 public class EnterpriseModel : PageModel
 {
+    public DynamicFormSchema RegistrationFormSchema { get; set; } = 
+        DynamicFormSchemaGenerator.FromModel<OperatorRegistrationDto>(new OperatorRegistrationDto(), "Zero-Trust Operator Registration");
+
+    public List<SelectButtonItem> MultiSelectSkills { get; set; } = new()
+    {
+        new("C# / .NET 10", "dotnet"),
+        new("TypeScript", "ts"),
+        new("Tailwind CSS v4", "tailwind"),
+        new("Zero-Trust Security", "security"),
+        new("Docker & K8s", "containers")
+    };
+
+    public List<CascadeSelectNode> CascadeRegions { get; set; } = new()
+    {
+        new("Kurdistan Region", "kurdistan", new()
+        {
+            new("Erbil HQ", "erbil", new()
+            {
+                new("Datacenter Alpha", "ebl-dc-1"),
+                new("Datacenter Beta", "ebl-dc-2")
+            }),
+            new("Sulaymaniyah Branch", "sul", new()
+            {
+                new("Primary Node", "sul-dc-1")
+            })
+        }),
+        new("Global Regions", "international", new()
+        {
+            new("Europe West (Frankfurt)", "eu-west", new()
+            {
+                new("Edge Point 1", "fra-01"),
+                new("Edge Point 2", "fra-02")
+            })
+        })
+    };
+
+    public List<SelectButtonItem> ListboxDatabases { get; set; } = new()
+    {
+        new("PostgreSQL Cluster", "postgres"),
+        new("Redis Sentinel", "redis"),
+        new("SQL Server Enterprise", "mssql"),
+        new("ClickHouse Analytics", "clickhouse"),
+        new("CockroachDB Distributed", "cockroach")
+    };
+
+    public List<PickListItem> PickListSource { get; set; } = new()
+    {
+        new("sec-1", "mTLS Encryption", "Active session certificate"),
+        new("sec-2", "YubiKey 5 FIDO2", "Hardware token active"),
+        new("sec-3", "Biometric Retina Scan", "Passkey identity matched"),
+        new("sec-4", "IP Geofencing", "Within corporate subnet")
+    };
+
+    public List<PickListItem> PickListTarget { get; set; } = new()
+    {
+        new("sec-5", "HSM Root Key", "FIPS 140-3 L4 Hardware Key")
+    };
+
+    public List<OrderListItem> OrderListTasks { get; set; } = new()
+    {
+        new("t-1", "Step 1: TLS 1.3 Handshake", "Security", 1),
+        new("t-2", "Step 2: OAuth 2.1 Grant", "Auth", 2),
+        new("t-3", "Step 3: RBAC Evaluation", "Policy", 3),
+        new("t-4", "Step 4: Audit Log Append", "Ledger", 4)
+    };
+
+    public OrgChartNode OrgChartRoot { get; set; } = new("root", "CEO Office", "Elena Rostova (Command Lead)", null, new()
+    {
+        new("eng", "Core Infrastructure", "David Vance (VP)", null, new()
+        {
+            new("kernel", "Kernel & Islands", "Alice Montgomery (Lead)"),
+            new("secops", "Zero-Trust & HSM", "Thomas Wright (Lead)")
+        }),
+        new("ops", "SecOps Operations", "Marcus Thorne (VP)", null, new()
+        {
+            new("cloud", "Cluster Reliability", "Sarah Jenkins (Lead)")
+        })
+    });
+
+    public List<SplitButtonItem> SplitButtonActions { get; set; } = new()
+    {
+        new("Export PDF Report", "📄", "export_pdf"),
+        new("Trigger Cloud Backup", "💾", "backup"),
+        new("Revoke Access Tokens", "🔒", "revoke")
+    };
+
+    public List<GalleriaItem> GalleriaImages { get; set; } = new()
+    {
+        new("https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&auto=format&fit=crop&q=60", "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=160&auto=format&fit=crop&q=60", "Data Center Server Rack", "Cluster Primary Region"),
+        new("https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=60", "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=160&auto=format&fit=crop&q=60", "Matrix Cryptographic Terminal", "Zero-Trust Mesh"),
+        new("https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=60", "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=160&auto=format&fit=crop&q=60", "Real-time Telemetry Dashboard", "Observability Engine")
+    };
+
+    public List<DockItem> DockItems { get; set; } = new()
+    {
+        new("CLI Terminal", "⚡", "/enterprise"),
+        new("HSM Security", "🔒", "/enterprise"),
+        new("Telemetry", "📊", "/enterprise"),
+        new("Theme Studio", "🎨", "/enterprise"),
+        new("Configuration", "⚙️", "/enterprise")
+    };
+
     public List<StepperStep> StepperSteps { get; set; } = new()
     {
         new("step-1", "Personal Identity", "Biometric verification", "1"),
@@ -14,10 +144,10 @@ public class EnterpriseModel : PageModel
 
     public List<TimelineItem> AuditEvents { get; set; } = new()
     {
-        new("1", "TLS 1.3 Handshake Established", "Zero-Trust session authenticated via OAuth2 Bearer token.", DateTimeOffset.UtcNow.AddMinutes(-15), SoftMax.LaughTale.Components.Enums.TimelineStatus.Completed, "Gateway-Proxy-01", "🔒"),
-        new("2", "Biometric Facial Recognition", "Face geometry match 99.4% confidence score.", DateTimeOffset.UtcNow.AddMinutes(-10), SoftMax.LaughTale.Components.Enums.TimelineStatus.Completed, "Camera-Engine", "📸"),
-        new("3", "Department Role Allocation", "Security clearance escalated to Level 4 Tier.", DateTimeOffset.UtcNow.AddMinutes(-5), SoftMax.LaughTale.Components.Enums.TimelineStatus.InProgress, "Auth-Worker-03", "⚡"),
-        new("4", "Cryptographic Sign-Off", "Awaiting HSM hardware certificate validation.", DateTimeOffset.UtcNow, SoftMax.LaughTale.Components.Enums.TimelineStatus.Warning, "HSM-Cluster", "⏳")
+        new("1", "TLS 1.3 Handshake Established", "Zero-Trust session authenticated via OAuth2 Bearer token.", DateTimeOffset.UtcNow.AddMinutes(-15), TimelineStatus.Completed, "Gateway-Proxy-01", "🔒"),
+        new("2", "Biometric Facial Recognition", "Face geometry match 99.4% confidence score.", DateTimeOffset.UtcNow.AddMinutes(-10), TimelineStatus.Completed, "Camera-Engine", "📸"),
+        new("3", "Department Role Allocation", "Security clearance escalated to Level 4 Tier.", DateTimeOffset.UtcNow.AddMinutes(-5), TimelineStatus.InProgress, "Auth-Worker-03", "⚡"),
+        new("4", "Cryptographic Sign-Off", "Awaiting HSM hardware certificate validation.", DateTimeOffset.UtcNow, TimelineStatus.Warning, "HSM-Cluster", "⏳")
     };
 
     public List<DataGridCol> GridColumns { get; set; } = new()

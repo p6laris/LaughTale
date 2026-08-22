@@ -1579,8 +1579,9 @@ var init_lucide = __esm({
       moreHorizontal: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>`,
       sun: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`,
       moon: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>`,
-      home: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`,
-      edit: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>`
+      edit: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>`,
+      gitBranch: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" x2="6" y1="3" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>`,
+      alertCircle: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>`
     };
   }
 });
@@ -2926,112 +2927,250 @@ __export(tree_select_exports, {
   default: () => CascadeTreeIsland
 });
 function CascadeTreeIsland(container, props) {
-  let selectedText = props.placeholder;
+  const allDepartments = props.departments || [];
+  let selectedId = props.selectedValue || "";
+  let selectedName = "";
+  let searchQuery = "";
+  const expandedIds = /* @__PURE__ */ new Set();
+  allDepartments.forEach((dept) => {
+    if (dept.children && dept.children.length > 0) {
+      expandedIds.add(dept.id);
+    }
+  });
+  function findNodeById(nodes, id) {
+    for (const n of nodes) {
+      if (n.id === id) return n;
+      if (n.children) {
+        const found = findNodeById(n.children, id);
+        if (found) return found;
+      }
+    }
+    return null;
+  }
+  if (selectedId) {
+    const found = findNodeById(allDepartments, selectedId);
+    if (found) selectedName = found.name;
+  }
   container.innerHTML = `
-        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-            <div style="display: flex; align-items: center; justify-content: space-between;">
-                <span style="font-size: 0.8125rem; font-weight: 600; color: var(--p-surface-600);">Organizational Hierarchy</span>
-                <span class="aura-tag tag-amber">Hydrate: Visible</span>
-            </div>
+        <div class="laughtale-tree-select" style="position: relative; width: 100%; max-width: 380px; font-family: var(--p-font-family, inherit);">
+            <input type="hidden" name="${props.targetInputName || "tree_selected"}" id="${props.targetInputName || "tree_selected"}" value="${selectedId}" />
+            
+            <!-- Trigger Button -->
+            <button type="button" 
+                    class="tree-trigger-btn" 
+                    ${props.disabled ? "disabled" : ""}
+                    style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.875rem; background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); color: var(--p-text-color); cursor: ${props.disabled ? "not-allowed" : "pointer"}; font-size: 0.875rem; box-shadow: var(--p-shadow-sm); transition: all 0.2s ease;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    <span style="color: var(--p-primary-600); display: flex;">${LucideIcons.gitBranch || "\u{1F333}"}</span>
+                    <span class="tree-trigger-label" style="color: ${selectedName ? "var(--p-surface-900)" : "var(--p-surface-400)"}; font-weight: ${selectedName ? "600" : "normal"};">
+                        ${selectedName || props.placeholder || "Select department or node..."}
+                    </span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.35rem;">
+                    <button type="button" class="tree-clear-btn" style="display: ${selectedId ? "flex" : "none"}; border: none; background: transparent; color: var(--p-surface-400); cursor: pointer; padding: 2px;">
+                        ${LucideIcons.x}
+                    </button>
+                    <span class="tree-chevron" style="color: var(--p-surface-400); display: flex; transition: transform 0.2s ease;">
+                        ${LucideIcons.chevronDown}
+                    </span>
+                </div>
+            </button>
 
-            <div style="position: relative; width: 100%;">
-                <input type="hidden" name="${props.targetInputName}" id="${props.targetInputName}" value="" />
+            <!-- Dropdown Menu -->
+            <div class="tree-dropdown-menu" style="display: none; position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 1000; background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); box-shadow: var(--p-shadow-lg); overflow: hidden;">
                 
-                <button type="button" class="tree-toggle-btn p-input" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; text-align: left;">
-                    <span class="selected-label" style="color: var(--p-surface-600); font-size: 0.875rem;">${selectedText}</span>
-                    <span style="font-size: 0.6875rem; color: var(--p-surface-400);">\u25BC</span>
-                </button>
+                <!-- Search Box -->
+                <div style="padding: 0.625rem 0.75rem; border-bottom: 1px solid var(--p-border-color); display: flex; align-items: center; gap: 0.5rem; background: var(--p-surface-50);">
+                    <span style="color: var(--p-surface-400); display: flex;">${LucideIcons.search}</span>
+                    <input type="text" 
+                           class="tree-search-input" 
+                           placeholder="Search tree nodes..." 
+                           style="flex: 1; border: none; outline: none; background: transparent; font-size: 0.8125rem; color: var(--p-text-color);" />
+                </div>
 
-                <div class="tree-dropdown-menu" style="display: none; position: absolute; top: calc(100% + 4px); left: 0; width: 100%; padding: 0.75rem; background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); box-shadow: var(--p-shadow-lg); z-index: 50; max-height: 16rem; overflow-y: auto;">
-                    <input type="text" placeholder="Search departments..." class="p-input tree-search" style="margin-bottom: 0.5rem; font-size: 0.8125rem; padding: 0.4rem 0.65rem;" />
-                    <div class="tree-list" style="display: flex; flex-direction: column; gap: 0.25rem;"></div>
+                <!-- Tree Hierarchy List -->
+                <div class="tree-nodes-container" style="max-height: 260px; overflow-y: auto; padding: 0.5rem 0.25rem;">
+                </div>
+
+                <!-- Footer Summary -->
+                <div style="padding: 0.4rem 0.75rem; background: var(--p-surface-50); border-top: 1px solid var(--p-border-color); font-size: 0.6875rem; color: var(--p-surface-500); display: flex; justify-content: space-between; align-items: center;">
+                    <span>Hierarchy Explorer</span>
+                    <span class="tree-count-label"></span>
                 </div>
             </div>
         </div>
     `;
-  const btn = container.querySelector(".tree-toggle-btn");
-  const menu = container.querySelector(".tree-dropdown-menu");
-  const searchInput = container.querySelector(".tree-search");
-  const treeList = container.querySelector(".tree-list");
-  const labelSpan = container.querySelector(".selected-label");
-  const hiddenInput = container.querySelector(`#${props.targetInputName}`);
+  const triggerBtn = container.querySelector(".tree-trigger-btn");
+  const triggerLabel = container.querySelector(".tree-trigger-label");
+  const clearBtn = container.querySelector(".tree-clear-btn");
+  const chevron = container.querySelector(".tree-chevron");
+  const dropdown = container.querySelector(".tree-dropdown-menu");
+  const searchInput = container.querySelector(".tree-search-input");
+  const nodesContainer = container.querySelector(".tree-nodes-container");
+  const countLabel = container.querySelector(".tree-count-label");
+  const hiddenInput = container.querySelector(`#${props.targetInputName || "tree_selected"}`);
   const disclosure = useDisclosure({
     defaultIsOpen: false,
     onOpen: () => {
-      renderList(props.departments || []);
-      useTransition(menu, { type: "fade", isMounted: true });
+      renderTree();
+      useTransition(dropdown, { type: "fade", isMounted: true });
+      chevron.style.transform = "rotate(180deg)";
+      triggerBtn.style.borderColor = "var(--p-primary-500)";
       searchInput.focus();
     },
     onClose: () => {
-      useTransition(menu, { type: "fade", isMounted: false });
+      useTransition(dropdown, { type: "fade", isMounted: false });
+      chevron.style.transform = "rotate(0deg)";
+      triggerBtn.style.borderColor = "var(--p-border-color)";
     }
   });
   useClickOutside(container, () => disclosure.close());
-  btn.addEventListener("click", () => disclosure.toggle());
-  searchInput.addEventListener("input", () => {
-    const query = searchInput.value.toLowerCase();
-    const filtered = filterTree(props.departments || [], query);
-    renderList(filtered);
+  triggerBtn.addEventListener("click", (e) => {
+    if (e.target.closest(".tree-clear-btn")) return;
+    disclosure.toggle();
   });
+  clearBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    selectedId = "";
+    selectedName = "";
+    triggerLabel.textContent = props.placeholder || "Select department or node...";
+    triggerLabel.style.color = "var(--p-surface-400)";
+    triggerLabel.style.fontWeight = "normal";
+    clearBtn.style.display = "none";
+    hiddenInput.value = "";
+    renderTree();
+    syncValue();
+  });
+  const debouncedFilter = useDebounce(() => {
+    searchQuery = searchInput.value.trim().toLowerCase();
+    renderTree();
+  }, 150);
+  searchInput.addEventListener("input", () => debouncedFilter());
   function filterTree(nodes, query) {
     if (!query) return nodes;
     return nodes.reduce((acc, node) => {
-      const matchesSelf = node.name.toLowerCase().includes(query);
-      const matchingChildren = node.children ? filterTree(node.children, query) : [];
-      if (matchesSelf || matchingChildren.length > 0) {
+      const matches = node.name.toLowerCase().includes(query) || node.id.toLowerCase().includes(query);
+      const filteredChildren = node.children ? filterTree(node.children, query) : [];
+      if (matches || filteredChildren.length > 0) {
         acc.push({
           ...node,
-          children: matchingChildren.length > 0 ? matchingChildren : node.children
+          children: filteredChildren.length > 0 ? filteredChildren : node.children
         });
       }
       return acc;
     }, []);
   }
-  function renderList(nodes, depth = 0) {
-    if (depth === 0) treeList.innerHTML = "";
-    if (nodes.length === 0 && depth === 0) {
-      treeList.innerHTML = '<div style="padding: 0.5rem; color: var(--p-surface-400); font-size: 0.75rem; text-align: center;">No matches</div>';
+  function renderTree() {
+    const filtered = filterTree(allDepartments, searchQuery);
+    nodesContainer.innerHTML = "";
+    if (filtered.length === 0) {
+      nodesContainer.innerHTML = `<div style="padding: 1.5rem; text-align: center; color: var(--p-surface-400); font-size: 0.8125rem;">No matching departments</div>`;
+      countLabel.textContent = "0 items";
       return;
     }
-    nodes.forEach((node) => {
-      const hasChildren = node.children && node.children.length > 0;
-      const item = document.createElement("div");
-      item.style.paddingLeft = `${depth * 1.25}rem`;
-      item.className = "tree-item";
-      item.innerHTML = `
-                <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.35rem 0.5rem; border-radius: var(--p-border-radius); cursor: pointer; font-size: 0.8125rem; color: var(--p-surface-800); transition: background 0.1s ease;">
-                    <span>${hasChildren ? "\u{1F4C1}" : "\u{1F4C4}"} ${node.name}</span>
-                    <span style="font-size: 0.6875rem; color: var(--p-surface-400); font-family: monospace;">${node.id}</span>
-                </div>
-            `;
-      item.addEventListener("mouseenter", () => {
-        item.firstElementChild.style.background = "var(--p-surface-100)";
+    let totalNodes = 0;
+    function countAll(nodes) {
+      nodes.forEach((n) => {
+        totalNodes++;
+        if (n.children) countAll(n.children);
       });
-      item.addEventListener("mouseleave", () => {
-        item.firstElementChild.style.background = "transparent";
+    }
+    countAll(filtered);
+    countLabel.textContent = `${totalNodes} items`;
+    function renderNodes(nodes, depth, parentEl) {
+      nodes.forEach((node) => {
+        const hasChildren = node.children && node.children.length > 0;
+        const isExpanded = searchQuery ? true : expandedIds.has(node.id);
+        const isSelected = selectedId === node.id;
+        const nodeEl = document.createElement("div");
+        nodeEl.className = "tree-node-item";
+        nodeEl.style.display = "flex";
+        nodeEl.style.flexDirection = "column";
+        const rowEl = document.createElement("div");
+        rowEl.style.display = "flex";
+        rowEl.style.alignItems = "center";
+        rowEl.style.justifyContent = "space-between";
+        rowEl.style.padding = "0.4rem 0.5rem";
+        rowEl.style.paddingLeft = `${depth * 1.25 + 0.5}rem`;
+        rowEl.style.borderRadius = "var(--p-border-radius)";
+        rowEl.style.cursor = "pointer";
+        rowEl.style.background = isSelected ? "var(--p-primary-50)" : "transparent";
+        rowEl.style.color = isSelected ? "var(--p-primary-700)" : "var(--p-text-color)";
+        rowEl.style.fontWeight = isSelected ? "600" : "normal";
+        rowEl.style.fontSize = "0.8125rem";
+        rowEl.style.transition = "all 0.1s ease";
+        rowEl.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 0.4rem; flex: 1; overflow: hidden;">
+                        ${hasChildren ? `
+                            <span class="tree-node-toggle" style="color: var(--p-surface-400); display: flex; align-items: center; transition: transform 0.15s ease; transform: rotate(${isExpanded ? "90deg" : "0deg"});">
+                                ${LucideIcons.chevronRight}
+                            </span>
+                        ` : `
+                            <span style="width: 14px; display: inline-block;"></span>
+                        `}
+                        <span style="display: flex; align-items: center; color: ${hasChildren ? "var(--p-primary-600)" : "var(--p-surface-500)"};">
+                            ${hasChildren ? LucideIcons.folder || "\u{1F4C1}" : LucideIcons.fileText || "\u{1F4C4}"}
+                        </span>
+                        <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${node.name}</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.35rem;">
+                        ${node.badge ? `<span class="aura-tag tag-slate" style="font-size: 0.625rem; padding: 0.1rem 0.35rem;">${node.badge}</span>` : ""}
+                        ${isSelected ? `<span style="color: var(--p-primary-600); display: flex;">${LucideIcons.check}</span>` : ""}
+                    </div>
+                `;
+        rowEl.addEventListener("mouseenter", () => {
+          if (!isSelected) rowEl.style.background = "var(--p-surface-100)";
+        });
+        rowEl.addEventListener("mouseleave", () => {
+          if (!isSelected) rowEl.style.background = "transparent";
+        });
+        const toggleSpan = rowEl.querySelector(".tree-node-toggle");
+        if (toggleSpan) {
+          toggleSpan.addEventListener("click", (e) => {
+            e.stopPropagation();
+            if (expandedIds.has(node.id)) expandedIds.delete(node.id);
+            else expandedIds.add(node.id);
+            renderTree();
+          });
+        }
+        rowEl.addEventListener("click", () => {
+          selectedId = node.id;
+          selectedName = node.name;
+          triggerLabel.textContent = selectedName;
+          triggerLabel.style.color = "var(--p-surface-900)";
+          triggerLabel.style.fontWeight = "600";
+          clearBtn.style.display = "flex";
+          hiddenInput.value = selectedId;
+          disclosure.close();
+          syncValue();
+        });
+        nodeEl.appendChild(rowEl);
+        if (hasChildren && isExpanded) {
+          const childrenContainer = document.createElement("div");
+          childrenContainer.className = "tree-children-container";
+          renderNodes(node.children, depth + 1, childrenContainer);
+          nodeEl.appendChild(childrenContainer);
+        }
+        parentEl.appendChild(nodeEl);
       });
-      item.addEventListener("click", (e) => {
-        e.stopPropagation();
-        selectedText = node.name;
-        labelSpan.textContent = selectedText;
-        labelSpan.style.color = "var(--p-surface-900)";
-        hiddenInput.value = node.id;
-        disclosure.close();
-        container.dispatchEvent(new CustomEvent("dept:selected", { detail: { id: node.id, name: node.name } }));
-      });
-      treeList.appendChild(item);
-      if (hasChildren) {
-        renderList(node.children, depth + 1);
-      }
-    });
+    }
+    renderNodes(filtered, 0, nodesContainer);
+  }
+  function syncValue() {
+    container.dispatchEvent(new CustomEvent("tree:selected", {
+      bubbles: true,
+      detail: { id: selectedId, name: selectedName }
+    }));
   }
 }
 var init_tree_select = __esm({
   "src/components/tree-select.ts"() {
     "use strict";
+    init_lucide();
     init_useDisclosure();
     init_useClickOutside();
     init_useTransition();
+    init_useDebounce();
   }
 });
 
@@ -5451,7 +5590,7 @@ function CommandPaletteIsland(container, props) {
                     
                     <!-- Search Header -->
                     <div style="display: flex; align-items: center; padding: 0.875rem 1.125rem; border-bottom: 1px solid var(--p-border-color, #e2e8f0); gap: 0.75rem;">
-                        <span style="color: var(--p-surface-400, #94a3b8); display: flex;">${LucideIcons.search(18)}</span>
+                        <span style="color: var(--p-surface-400, #94a3b8); display: flex;">${LucideIcons.search}</span>
                         <input type="text" 
                                class="command-search-input" 
                                placeholder="${placeholder}" 
@@ -5489,7 +5628,7 @@ function CommandPaletteIsland(container, props) {
     if (filtered.length === 0) {
       listContainer.innerHTML = `
                 <div style="padding: 2.5rem 1rem; text-align: center; color: var(--p-surface-400);">
-                    <div style="margin-bottom: 0.5rem; display: flex; justify-content: center;">${LucideIcons.alertCircle(24)}</div>
+                    <div style="margin-bottom: 0.5rem; display: flex; justify-content: center;">${LucideIcons.alertCircle || "\u2139"}</div>
                     <div style="font-size: 0.875rem; font-weight: 500;">No matching commands found</div>
                 </div>
             `;
@@ -5507,7 +5646,7 @@ function CommandPaletteIsland(container, props) {
       html += `<div style="font-size: 0.6875rem; font-weight: 700; color: var(--p-surface-400); text-transform: uppercase; letter-spacing: 0.05em; padding: 0.5rem 0.75rem 0.25rem;">${groupName}</div>`;
       groupItems.forEach((it) => {
         const isSelected = flatIndex === selectedIndex;
-        const iconSvg = it.icon && LucideIcons[it.icon] ? LucideIcons[it.icon](16) : LucideIcons.terminal(16);
+        const iconSvg = it.icon && LucideIcons[it.icon] ? LucideIcons[it.icon] : LucideIcons.terminal || "\u26A1";
         html += `
                     <div class="command-item ${isSelected ? "active" : ""}" 
                          data-index="${flatIndex}" 
@@ -5643,14 +5782,14 @@ function ThemeStudioIsland(container, props = {}) {
                 <!-- Header -->
                 <div style="display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--p-border-color, #e2e8f0);">
                     <div style="display: flex; align-items: center; gap: 0.625rem;">
-                        <span style="color: var(--p-primary-600); display: flex;">${LucideIcons.sliders(20)}</span>
+                        <span style="color: var(--p-primary-600); display: flex;">${LucideIcons.sliders || "\u{1F3A8}"}</span>
                         <div>
                             <div style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900);">TweakAura Studio</div>
                             <div style="font-size: 0.75rem; color: var(--p-surface-500);">Live shadcn-Style Theme Editor</div>
                         </div>
                     </div>
                     <button type="button" class="theme-studio-close-btn" style="border: none; background: transparent; color: var(--p-surface-400); cursor: pointer; padding: 0.25rem; display: flex; border-radius: 4px;">
-                        ${LucideIcons.x(20)}
+                        ${LucideIcons.x}
                     </button>
                 </div>
 
@@ -5730,10 +5869,10 @@ function ThemeStudioIsland(container, props = {}) {
                 <!-- Footer Export Actions -->
                 <div style="padding: 1rem 1.5rem; border-top: 1px solid var(--p-border-color, #e2e8f0); background: var(--p-surface-50, #f8fafc); display: flex; flex-direction: column; gap: 0.5rem;">
                     <button type="button" class="studio-copy-css-btn p-button p-button-primary" style="width: 100%; justify-content: center; font-size: 0.8125rem;">
-                        ${LucideIcons.copy(16)} Copy CSS Tokens
+                        ${LucideIcons.copy} Copy CSS Tokens
                     </button>
                     <button type="button" class="studio-copy-csharp-btn p-button p-button-secondary" style="width: 100%; justify-content: center; font-size: 0.8125rem;">
-                        ${LucideIcons.code(16)} Copy C# Theme Tokens
+                        ${LucideIcons.code} Copy C# Theme Tokens
                     </button>
                 </div>
 
@@ -7147,10 +7286,10 @@ function GalleriaIsland(container, props) {
                     
                     <!-- Prev / Next Nav Buttons -->
                     <button type="button" class="galleria-prev-btn" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); width: 2.25rem; height: 2.25rem; border-radius: 9999px; background: rgba(0,0,0,0.5); color: #ffffff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;">
-                        ${LucideIcons.chevronDown ? '<span style="transform: rotate(90deg); display: flex;">' + LucideIcons.chevronDown(18) + "</span>" : "\u2039"}
+                        <span style="transform: rotate(90deg); display: flex;">${LucideIcons.chevronDown}</span>
                     </button>
                     <button type="button" class="galleria-next-btn" style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); width: 2.25rem; height: 2.25rem; border-radius: 9999px; background: rgba(0,0,0,0.5); color: #ffffff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;">
-                        ${LucideIcons.chevronDown ? '<span style="transform: rotate(-90deg); display: flex;">' + LucideIcons.chevronDown(18) + "</span>" : "\u203A"}
+                        <span style="transform: rotate(-90deg); display: flex;">${LucideIcons.chevronDown}</span>
                     </button>
 
                     <!-- Caption Bar -->
