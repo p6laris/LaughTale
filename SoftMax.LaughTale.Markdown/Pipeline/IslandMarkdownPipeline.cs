@@ -79,7 +79,7 @@ public static class IslandMarkdownPipeline
         }
 
         // 3. Render HTML content (preserves <island> tags for client hydration)
-        var htmlContent = document.ToHtml(Pipeline);
+        var htmlContent = Markdig.Markdown.ToHtml(markdownText, Pipeline);
 
         // 4. Calculate reading time (avg 200 words/min)
         var wordCount = Regex.Matches(markdownText, @"\b\w+\b").Count;
