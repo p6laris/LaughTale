@@ -6,6 +6,7 @@
 import { LucideIcons } from '../icons/lucide';
 import { useDisclosure } from '../composables/useDisclosure';
 import { useScrollLock } from '../composables/useScrollLock';
+import { useClipboard } from '../composables/useClipboard';
 
 export interface ThemeStudioProps {
     defaultOpen?: boolean;
@@ -78,6 +79,7 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
 
     const disclosure = useDisclosure({ defaultIsOpen: props.defaultOpen });
     const scrollLock = useScrollLock();
+    const clipboard = useClipboard();
 
     container.innerHTML = `
         <div class="laughtale-theme-studio-root">
@@ -86,7 +88,7 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
                     class="theme-studio-toggle-btn" 
                     title="Open TweakAura Theme Studio"
                     style="position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 5000; width: 3rem; height: 3rem; border-radius: 9999px; background: var(--p-surface-900, #0f172a); color: var(--p-surface-0, #ffffff); border: 2px solid var(--p-primary-500, #10b981); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; outline: none;">
-                ${LucideIcons.palette(20)}
+                ${LucideIcons.palette}
             </button>
 
             <!-- Backdrop -->
@@ -331,10 +333,10 @@ html.dark {
     --p-primary-200: ${p.darkP200};
 }`.trim();
 
-        navigator.clipboard.writeText(cssSnippet);
-        copyCssBtn.innerHTML = `${LucideIcons.check(16)} Copied to Clipboard!`;
+        clipboard.copy(cssSnippet);
+        copyCssBtn.innerHTML = `${LucideIcons.check} Copied to Clipboard!`;
         setTimeout(() => {
-            copyCssBtn.innerHTML = `${LucideIcons.copy(16)} Copy CSS Tokens`;
+            copyCssBtn.innerHTML = `${LucideIcons.copy} Copy CSS Tokens`;
         }, 2000);
     });
 
@@ -349,10 +351,10 @@ public static class AppTheme
     public const string BorderRadius = "${currentRadius}";
 }`.trim();
 
-        navigator.clipboard.writeText(csharpSnippet);
-        copyCSharpBtn.innerHTML = `${LucideIcons.check(16)} Copied C# Code!`;
+        clipboard.copy(csharpSnippet);
+        copyCSharpBtn.innerHTML = `${LucideIcons.check} Copied C# Code!`;
         setTimeout(() => {
-            copyCSharpBtn.innerHTML = `${LucideIcons.code(16)} Copy C# Theme Tokens`;
+            copyCSharpBtn.innerHTML = `${LucideIcons.code} Copy C# Theme Tokens`;
         }, 2000);
     });
 

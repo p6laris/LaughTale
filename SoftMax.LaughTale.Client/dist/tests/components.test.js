@@ -18,6 +18,21 @@ globalThis.Node = win.Node;
 globalThis.localStorage = win.localStorage;
 globalThis.sessionStorage = win.sessionStorage;
 globalThis.requestAnimationFrame = (cb) => setTimeout(cb, 16);
+try {
+  Object.defineProperty(globalThis.navigator, "clipboard", {
+    value: {
+      writeText: async (_text) => Promise.resolve()
+    },
+    configurable: true
+  });
+} catch {
+}
+globalThis.MutationObserver = win.MutationObserver || class {
+  observe() {
+  }
+  disconnect() {
+  }
+};
 globalThis.IntersectionObserver = class {
   callback;
   constructor(cb) {
@@ -856,12 +871,133 @@ function TabsIsland(container, props) {
   render();
 }
 
+// src/composables/useClickOutside.ts
+function useClickOutside(target, handler, options = {}) {
+  if (!target || typeof document === "undefined") return { destroy: () => {
+  } };
+  function listener(e) {
+    const path = e.composedPath ? e.composedPath() : [];
+    const clickedNode = e.target;
+    if (target && (target === clickedNode || target.contains(clickedNode) || path.includes(target))) {
+      return;
+    }
+    if (options.ignoreElements) {
+      for (const el of options.ignoreElements) {
+        if (el && (el === clickedNode || el.contains(clickedNode) || path.includes(el))) {
+          return;
+        }
+      }
+    }
+    handler(e);
+  }
+  const capture = options.capture ?? false;
+  document.addEventListener("pointerdown", listener, { capture });
+  document.addEventListener("touchstart", listener, { capture });
+  return {
+    destroy: () => {
+      document.removeEventListener("pointerdown", listener, { capture });
+      document.removeEventListener("touchstart", listener, { capture });
+    }
+  };
+}
+
+// src/composables/useDebounce.ts
+function useDebounce(fn, delayMs = 250) {
+  let timer = null;
+  const debounced = (...args) => {
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(() => {
+      fn(...args);
+      timer = null;
+    }, delayMs);
+  };
+  debounced.cancel = () => {
+    if (timer) {
+      clearTimeout(timer);
+      timer = null;
+    }
+  };
+  debounced.flush = (...args) => {
+    debounced.cancel();
+    fn(...args);
+  };
+  return debounced;
+}
+
+// src/composables/useKeyboardNav.ts
+function useKeyboardNav(options) {
+  let activeIndex = options.initialIndex ?? -1;
+  const loop = options.loop ?? true;
+  function handleKeyDown(e) {
+    const count = options.itemCount();
+    if (count === 0) return false;
+    const isVertical = options.orientation !== "horizontal";
+    const isHorizontal = options.orientation !== "vertical";
+    if (isVertical && e.key === "ArrowDown" || isHorizontal && e.key === "ArrowRight") {
+      e.preventDefault();
+      if (activeIndex < count - 1) {
+        activeIndex++;
+      } else if (loop) {
+        activeIndex = 0;
+      }
+      options.onHighlight?.(activeIndex);
+      return true;
+    }
+    if (isVertical && e.key === "ArrowUp" || isHorizontal && e.key === "ArrowLeft") {
+      e.preventDefault();
+      if (activeIndex > 0) {
+        activeIndex--;
+      } else if (loop) {
+        activeIndex = count - 1;
+      }
+      options.onHighlight?.(activeIndex);
+      return true;
+    }
+    if (e.key === "Home") {
+      e.preventDefault();
+      activeIndex = 0;
+      options.onHighlight?.(activeIndex);
+      return true;
+    }
+    if (e.key === "End") {
+      e.preventDefault();
+      activeIndex = count - 1;
+      options.onHighlight?.(activeIndex);
+      return true;
+    }
+    if (e.key === "Enter" || e.key === " ") {
+      if (activeIndex >= 0 && activeIndex < count) {
+        e.preventDefault();
+        options.onSelect?.(activeIndex);
+        return true;
+      }
+    }
+    if (e.key === "Escape") {
+      options.onEscape?.();
+      return true;
+    }
+    return false;
+  }
+  return {
+    handleKeyDown,
+    get activeIndex() {
+      return activeIndex;
+    },
+    setActiveIndex: (idx) => {
+      activeIndex = idx;
+      options.onHighlight?.(activeIndex);
+    },
+    reset: () => {
+      activeIndex = -1;
+    }
+  };
+}
+
 // src/components/autocomplete.ts
 function AutoCompleteIsland(container, props) {
   const allItems = props.items || [];
   let selectedValue = props.value || "";
   let searchQuery = "";
-  let isOpen = false;
   function getFilteredItems() {
     if (!searchQuery) return allItems;
     const q = searchQuery.toLowerCase();
@@ -892,66 +1028,90 @@ function AutoCompleteIsland(container, props) {
   const input = container.querySelector(".autocomplete-input");
   const clearBtn = container.querySelector(".btn-clear-autocomplete");
   const overlay = container.querySelector(".autocomplete-overlay");
-  function updateList() {
+  const disclosure = useDisclosure({
+    defaultIsOpen: false,
+    onOpen: () => {
+      renderDropdown();
+      useTransition(overlay, { type: "fade", isMounted: true });
+    },
+    onClose: () => {
+      useTransition(overlay, { type: "fade", isMounted: false });
+    }
+  });
+  useClickOutside(container, () => disclosure.close());
+  const keyboardNav = useKeyboardNav({
+    itemCount: () => getFilteredItems().length,
+    onHighlight: (idx) => {
+      const items = overlay.querySelectorAll(".autocomplete-item");
+      items.forEach((it2, i) => {
+        it2.style.background = i === idx ? "var(--p-surface-100)" : "transparent";
+        if (i === idx) it2.scrollIntoView({ block: "nearest" });
+      });
+    },
+    onSelect: (idx) => {
+      const filtered = getFilteredItems();
+      if (filtered[idx]) selectItem(filtered[idx]);
+    },
+    onEscape: () => disclosure.close()
+  });
+  function selectItem(item) {
+    selectedValue = item.value;
+    searchQuery = "";
+    input.value = item.label;
+    clearBtn.style.display = "flex";
+    disclosure.close();
+    syncValue();
+  }
+  function renderDropdown() {
     const filtered = getFilteredItems();
-    overlay.style.display = isOpen ? "block" : "none";
     if (filtered.length === 0) {
-      overlay.innerHTML = `<div style="padding: 0.75rem; font-size: 0.8125rem; color: var(--p-surface-400); text-align: center;">No results found</div>`;
+      overlay.innerHTML = `<div style="padding: 0.75rem; text-align: center; color: var(--p-surface-400); font-size: 0.8125rem;">No results found</div>`;
       return;
     }
-    overlay.innerHTML = filtered.map((item) => `
-            <div class="autocomplete-item" data-value="${item.value}" style="padding: 0.5rem 0.75rem; font-size: 0.875rem; color: var(--p-surface-800); cursor: pointer; display: flex; align-items: center; justify-content: space-between; border-radius: var(--p-border-radius); transition: background 0.15s ease;">
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
+    overlay.innerHTML = filtered.map((item, idx) => `
+            <div class="autocomplete-item" data-value="${item.value}" data-idx="${idx}" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border-radius: var(--p-border-radius); cursor: pointer; font-size: 0.8125rem; color: var(--p-text-color); transition: background 0.15s ease;">
+                <span style="display: flex; align-items: center; gap: 0.5rem;">
                     ${item.icon ? `<span>${item.icon}</span>` : ""}
                     <span>${item.label}</span>
-                </div>
-                ${item.value === selectedValue ? `<span style="color: var(--p-primary-600);">${LucideIcons.check}</span>` : ""}
+                </span>
+                ${item.category ? `<span class="aura-tag tag-slate" style="font-size: 0.6875rem;">${item.category}</span>` : ""}
             </div>
         `).join("");
     overlay.querySelectorAll(".autocomplete-item").forEach((itemEl) => {
       itemEl.addEventListener("click", () => {
-        selectedValue = itemEl.getAttribute("data-value") || "";
-        const item = allItems.find((i) => i.value === selectedValue);
-        input.value = item ? item.label : "";
-        searchQuery = "";
-        isOpen = false;
-        clearBtn.style.display = "flex";
-        updateList();
-        syncValue();
+        const val = itemEl.getAttribute("data-value");
+        const matched = allItems.find((i) => i.value === val);
+        if (matched) selectItem(matched);
       });
     });
   }
-  if (!props.disabled) {
-    input.addEventListener("focus", () => {
-      isOpen = true;
-      updateList();
-    });
-    input.addEventListener("input", () => {
-      searchQuery = input.value;
-      isOpen = true;
-      clearBtn.style.display = input.value ? "flex" : "none";
-      updateList();
-    });
-    clearBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      selectedValue = "";
-      searchQuery = "";
-      input.value = "";
-      isOpen = false;
-      clearBtn.style.display = "none";
-      updateList();
-      syncValue();
-    });
-    document.addEventListener("click", (e) => {
-      if (!container.contains(e.target)) {
-        isOpen = false;
-        overlay.style.display = "none";
-      }
-    });
-  }
+  const debouncedFilter = useDebounce(() => {
+    searchQuery = input.value;
+    renderDropdown();
+  }, 150);
+  input.addEventListener("input", () => {
+    if (!disclosure.isOpen) disclosure.open();
+    debouncedFilter();
+  });
+  input.addEventListener("focus", () => {
+    if (!disclosure.isOpen) disclosure.open();
+  });
+  input.addEventListener("keydown", (e) => {
+    if (disclosure.isOpen) {
+      keyboardNav.handleKeyDown(e);
+    }
+  });
+  clearBtn.addEventListener("click", () => {
+    selectedValue = "";
+    searchQuery = "";
+    input.value = "";
+    clearBtn.style.display = "none";
+    syncValue();
+    disclosure.close();
+  });
   function syncValue() {
     if (props.targetInputName) {
-      let hidden = document.querySelector(`input[name="${props.targetInputName}"]`);
+      let hidden = container.querySelector(`input[name="${props.targetInputName}"]`);
       if (!hidden) {
         hidden = document.createElement("input");
         hidden.type = "hidden";
@@ -965,8 +1125,6 @@ function AutoCompleteIsland(container, props) {
       detail: { value: selectedValue }
     }));
   }
-  updateList();
-  syncValue();
 }
 
 // src/components/color-picker.ts
@@ -1546,7 +1704,7 @@ describe("SoftMax.LaughTale Aura Enterprise Components Suite", () => {
     assert.strictEqual(hidden.value, "1");
     assert.ok(container.innerHTML.includes("Security Content"));
   });
-  it("AutoComplete: filters list on typing", () => {
+  it("AutoComplete: filters list on typing", async () => {
     AutoCompleteIsland(container, {
       items: [
         { label: "Erbil", value: "EBL" },
@@ -1558,6 +1716,7 @@ describe("SoftMax.LaughTale Aura Enterprise Components Suite", () => {
     const input = container.querySelector(".autocomplete-input");
     input.value = "Erb";
     input.dispatchEvent(new Event("input", { bubbles: true }));
+    await new Promise((r) => setTimeout(r, 180));
     const items = container.querySelectorAll(".autocomplete-item");
     assert.strictEqual(items.length, 1);
     assert.strictEqual(items[0].getAttribute("data-value"), "EBL");

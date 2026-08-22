@@ -287,6 +287,21 @@ globalThis.Node = win.Node;
 globalThis.localStorage = win.localStorage;
 globalThis.sessionStorage = win.sessionStorage;
 globalThis.requestAnimationFrame = (cb) => setTimeout(cb, 16);
+try {
+  Object.defineProperty(globalThis.navigator, "clipboard", {
+    value: {
+      writeText: async (_text) => Promise.resolve()
+    },
+    configurable: true
+  });
+} catch {
+}
+globalThis.MutationObserver = win.MutationObserver || class {
+  observe() {
+  }
+  disconnect() {
+  }
+};
 globalThis.IntersectionObserver = class {
   callback;
   constructor(cb) {

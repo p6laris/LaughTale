@@ -1,3 +1,13 @@
+/**
+ * SoftMax.LaughTale: Enterprise TreeSelect Component
+ * Hierarchical organizational tree dropdown with search filtering.
+ * Integrated with useDisclosure, useClickOutside, and useTransition.
+ */
+
+import { useDisclosure } from '../composables/useDisclosure';
+import { useClickOutside } from '../composables/useClickOutside';
+import { useTransition } from '../composables/animation/useTransition';
+
 export interface DepartmentNode {
     id: string;
     name: string;
@@ -12,7 +22,6 @@ export interface DepartmentTreeProps {
 
 export default function CascadeTreeIsland(container: HTMLElement, props: DepartmentTreeProps) {
     let selectedText = props.placeholder;
-    let isOpen = false;
 
     container.innerHTML = `
         <div style="display: flex; flex-direction: column; gap: 0.75rem;">
@@ -44,14 +53,21 @@ export default function CascadeTreeIsland(container: HTMLElement, props: Departm
     const labelSpan = container.querySelector('.selected-label') as HTMLElement;
     const hiddenInput = container.querySelector<HTMLInputElement>(`#${props.targetInputName}`)!;
 
-    btn.addEventListener('click', () => {
-        isOpen = !isOpen;
-        menu.style.display = isOpen ? 'block' : 'none';
-        if (isOpen) {
+    const disclosure = useDisclosure({
+        defaultIsOpen: false,
+        onOpen: () => {
             renderList(props.departments || []);
+            useTransition(menu, { type: 'fade', isMounted: true });
             searchInput.focus();
+        },
+        onClose: () => {
+            useTransition(menu, { type: 'fade', isMounted: false });
         }
     });
+
+    useClickOutside(container, () => disclosure.close());
+
+    btn.addEventListener('click', () => disclosure.toggle());
 
     searchInput.addEventListener('input', () => {
         const query = searchInput.value.toLowerCase();
@@ -62,10 +78,13 @@ export default function CascadeTreeIsland(container: HTMLElement, props: Departm
     function filterTree(nodes: DepartmentNode[], query: string): DepartmentNode[] {
         if (!query) return nodes;
         return nodes.reduce<DepartmentNode[]>((acc, node) => {
-            const matches = node.name.toLowerCase().includes(query);
-            const filteredChildren = node.children ? filterTree(node.children, query) : [];
-            if (matches || filteredChildren.length > 0) {
-                acc.push({ ...node, children: filteredChildren });
+            const matchesSelf = node.name.toLowerCase().includes(query);
+            const matchingChildren = node.children ? filterTree(node.children, query) : [];
+            if (matchesSelf || matchingChildren.length > 0) {
+                acc.push({
+                    ...node,
+                    children: matchingChildren.length > 0 ? matchingChildren : node.children
+                });
             }
             return acc;
         }, []);
@@ -73,48 +92,44 @@ export default function CascadeTreeIsland(container: HTMLElement, props: Departm
 
     function renderList(nodes: DepartmentNode[], depth = 0) {
         if (depth === 0) treeList.innerHTML = '';
-        nodes.forEach(node => {
-            const item = document.createElement('div');
-            item.style.padding = '0.4rem 0.6rem';
-            item.style.paddingLeft = `${depth * 1 + 0.6}rem`;
-            item.style.fontSize = '0.8125rem';
-            item.style.borderRadius = 'var(--p-border-radius)';
-            item.style.cursor = 'pointer';
-            item.style.display = 'flex';
-            item.style.alignItems = 'center';
-            item.style.justifyContent = 'space-between';
-            item.style.color = 'var(--p-surface-700)';
+        if (nodes.length === 0 && depth === 0) {
+            treeList.innerHTML = '<div style="padding: 0.5rem; color: var(--p-surface-400); font-size: 0.75rem; text-align: center;">No matches</div>';
+            return;
+        }
 
+        nodes.forEach(node => {
+            const hasChildren = node.children && node.children.length > 0;
+            const item = document.createElement('div');
+            item.style.paddingLeft = `${depth * 1.25}rem`;
+            item.className = 'tree-item';
             item.innerHTML = `
-                <span>${node.name}</span>
-                <span style="font-size: 0.6875rem; color: var(--p-surface-400); font-family: var(--p-font-mono);">${node.children?.length ? `${node.children.length} sub` : ''}</span>
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.35rem 0.5rem; border-radius: var(--p-border-radius); cursor: pointer; font-size: 0.8125rem; color: var(--p-surface-800); transition: background 0.1s ease;">
+                    <span>${hasChildren ? '📁' : '📄'} ${node.name}</span>
+                    <span style="font-size: 0.6875rem; color: var(--p-surface-400); font-family: monospace;">${node.id}</span>
+                </div>
             `;
 
-            item.addEventListener('mouseenter', () => { item.style.backgroundColor = 'var(--p-surface-100)'; });
-            item.addEventListener('mouseleave', () => { item.style.backgroundColor = 'transparent'; });
+            item.addEventListener('mouseenter', () => {
+                (item.firstElementChild as HTMLElement).style.background = 'var(--p-surface-100)';
+            });
+            item.addEventListener('mouseleave', () => {
+                (item.firstElementChild as HTMLElement).style.background = 'transparent';
+            });
 
             item.addEventListener('click', (e) => {
                 e.stopPropagation();
+                selectedText = node.name;
+                labelSpan.textContent = selectedText;
+                labelSpan.style.color = 'var(--p-surface-900)';
                 hiddenInput.value = node.id;
-                labelSpan.textContent = node.name;
-                labelSpan.style.color = 'var(--p-surface-950)';
-                labelSpan.style.fontWeight = '600';
-                isOpen = false;
-                menu.style.display = 'none';
+                disclosure.close();
+                container.dispatchEvent(new CustomEvent('dept:selected', { detail: { id: node.id, name: node.name } }));
             });
 
             treeList.appendChild(item);
-
-            if (node.children?.length) {
-                renderList(node.children, depth + 1);
+            if (hasChildren) {
+                renderList(node.children!, depth + 1);
             }
         });
     }
-
-    document.addEventListener('click', (e) => {
-        if (!container.contains(e.target as Node)) {
-            isOpen = false;
-            menu.style.display = 'none';
-        }
-    });
 }

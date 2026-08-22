@@ -231,7 +231,7 @@ describe('SoftMax.LaughTale Aura Enterprise Components Suite', () => {
         assert.ok(container.innerHTML.includes('Security Content'));
     });
 
-    it('AutoComplete: filters list on typing', () => {
+    it('AutoComplete: filters list on typing', async () => {
         AutoCompleteIsland(container, {
             items: [
                 { label: 'Erbil', value: 'EBL' },
@@ -244,6 +244,8 @@ describe('SoftMax.LaughTale Aura Enterprise Components Suite', () => {
         const input = container.querySelector<HTMLInputElement>('.autocomplete-input')!;
         input.value = 'Erb';
         input.dispatchEvent(new Event('input', { bubbles: true }));
+
+        await new Promise(r => setTimeout(r, 180));
 
         const items = container.querySelectorAll('.autocomplete-item');
         assert.strictEqual(items.length, 1);

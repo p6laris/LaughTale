@@ -18,6 +18,21 @@ globalThis.Node = win.Node;
 globalThis.localStorage = win.localStorage;
 globalThis.sessionStorage = win.sessionStorage;
 globalThis.requestAnimationFrame = (cb) => setTimeout(cb, 16);
+try {
+  Object.defineProperty(globalThis.navigator, "clipboard", {
+    value: {
+      writeText: async (_text) => Promise.resolve()
+    },
+    configurable: true
+  });
+} catch {
+}
+globalThis.MutationObserver = win.MutationObserver || class {
+  observe() {
+  }
+  disconnect() {
+  }
+};
 globalThis.IntersectionObserver = class {
   callback;
   constructor(cb) {
@@ -682,28 +697,148 @@ function MultiSelectIsland(container, props) {
   syncValue();
 }
 
+// src/composables/useKeyboardNav.ts
+function useKeyboardNav(options) {
+  let activeIndex = options.initialIndex ?? -1;
+  const loop = options.loop ?? true;
+  function handleKeyDown(e) {
+    const count = options.itemCount();
+    if (count === 0) return false;
+    const isVertical = options.orientation !== "horizontal";
+    const isHorizontal = options.orientation !== "vertical";
+    if (isVertical && e.key === "ArrowDown" || isHorizontal && e.key === "ArrowRight") {
+      e.preventDefault();
+      if (activeIndex < count - 1) {
+        activeIndex++;
+      } else if (loop) {
+        activeIndex = 0;
+      }
+      options.onHighlight?.(activeIndex);
+      return true;
+    }
+    if (isVertical && e.key === "ArrowUp" || isHorizontal && e.key === "ArrowLeft") {
+      e.preventDefault();
+      if (activeIndex > 0) {
+        activeIndex--;
+      } else if (loop) {
+        activeIndex = count - 1;
+      }
+      options.onHighlight?.(activeIndex);
+      return true;
+    }
+    if (e.key === "Home") {
+      e.preventDefault();
+      activeIndex = 0;
+      options.onHighlight?.(activeIndex);
+      return true;
+    }
+    if (e.key === "End") {
+      e.preventDefault();
+      activeIndex = count - 1;
+      options.onHighlight?.(activeIndex);
+      return true;
+    }
+    if (e.key === "Enter" || e.key === " ") {
+      if (activeIndex >= 0 && activeIndex < count) {
+        e.preventDefault();
+        options.onSelect?.(activeIndex);
+        return true;
+      }
+    }
+    if (e.key === "Escape") {
+      options.onEscape?.();
+      return true;
+    }
+    return false;
+  }
+  return {
+    handleKeyDown,
+    get activeIndex() {
+      return activeIndex;
+    },
+    setActiveIndex: (idx) => {
+      activeIndex = idx;
+      options.onHighlight?.(activeIndex);
+    },
+    reset: () => {
+      activeIndex = -1;
+    }
+  };
+}
+
+// src/composables/useDebounce.ts
+function useDebounce(fn, delayMs = 250) {
+  let timer = null;
+  const debounced = (...args) => {
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(() => {
+      fn(...args);
+      timer = null;
+    }, delayMs);
+  };
+  debounced.cancel = () => {
+    if (timer) {
+      clearTimeout(timer);
+      timer = null;
+    }
+  };
+  debounced.flush = (...args) => {
+    debounced.cancel();
+    fn(...args);
+  };
+  return debounced;
+}
+
 // src/components/listbox.ts
 function ListboxIsland(container, props) {
   const options = props.options || [];
   let selected = new Set(props.selectedValue !== void 0 ? [props.selectedValue] : []);
   let filterQuery = "";
   container.innerHTML = `
-        <div class="laughtale-listbox" style="width: 100%; max-width: 280px; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); background: var(--p-surface-0); overflow: hidden; font-family: var(--p-font-family, inherit);">
+        <div class="laughtale-listbox" tabindex="0" style="width: 100%; max-width: 280px; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); background: var(--p-surface-0); overflow: hidden; font-family: var(--p-font-family, inherit); outline: none;">
             ${props.filter ? `
                 <div style="padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--p-border-color); display: flex; align-items: center; gap: 0.5rem; background: var(--p-surface-50);">
-                    <span style="color: var(--p-surface-400); display: flex;">${LucideIcons.search(14)}</span>
+                    <span style="color: var(--p-surface-400); display: flex;">${LucideIcons.search}</span>
                     <input type="text" class="listbox-filter-input" placeholder="Filter..." style="flex: 1; border: none; outline: none; background: transparent; font-size: 0.8125rem; color: var(--p-text-color);" />
                 </div>
             ` : ""}
             <div class="listbox-items-container" style="max-height: 220px; overflow-y: auto; padding: 0.25rem 0;"></div>
         </div>
     `;
+  const root = container.querySelector(".laughtale-listbox");
   const itemsContainer = container.querySelector(".listbox-items-container");
   const filterInput = container.querySelector(".listbox-filter-input");
   function getFiltered() {
     if (!filterQuery.trim()) return options;
     const q = filterQuery.toLowerCase();
     return options.filter((o) => o.label.toLowerCase().includes(q));
+  }
+  const keyboardNav = useKeyboardNav({
+    itemCount: () => getFiltered().length,
+    onHighlight: (idx) => {
+      const items = itemsContainer.querySelectorAll(".listbox-item");
+      items.forEach((it2, i) => {
+        it2.style.outline = i === idx ? "2px solid var(--p-primary-500)" : "none";
+        if (i === idx) it2.scrollIntoView({ block: "nearest" });
+      });
+    },
+    onSelect: (idx) => {
+      const filtered = getFiltered();
+      if (filtered[idx]) {
+        handleItemSelect(filtered[idx].value);
+      }
+    }
+  });
+  function handleItemSelect(val) {
+    if (props.multiple) {
+      if (selected.has(val)) selected.delete(val);
+      else selected.add(val);
+    } else {
+      selected.clear();
+      selected.add(val);
+    }
+    renderList();
+    syncValue();
   }
   function renderList() {
     const filtered = getFiltered();
@@ -722,26 +857,23 @@ function ListboxIsland(container, props) {
     }).join("");
     itemsContainer.querySelectorAll(".listbox-item").forEach((el) => {
       el.addEventListener("click", () => {
-        if (props.disabled) return;
         const val = el.getAttribute("data-val");
-        if (props.multiple) {
-          if (selected.has(val)) selected.delete(val);
-          else selected.add(val);
-        } else {
-          selected.clear();
-          selected.add(val);
-        }
-        renderList();
-        syncValue();
+        handleItemSelect(val);
       });
     });
   }
-  filterInput?.addEventListener("input", () => {
-    filterQuery = filterInput.value;
+  const debouncedFilter = useDebounce(() => {
+    filterQuery = filterInput ? filterInput.value : "";
     renderList();
+  }, 150);
+  if (filterInput) {
+    filterInput.addEventListener("input", () => debouncedFilter());
+  }
+  root.addEventListener("keydown", (e) => {
+    keyboardNav.handleKeyDown(e);
   });
   function syncValue() {
-    const arr = Array.from(selected);
+    const valArray = Array.from(selected);
     if (props.targetInputName) {
       let hidden = container.querySelector(`input[name="${props.targetInputName}"]`);
       if (!hidden) {
@@ -750,11 +882,11 @@ function ListboxIsland(container, props) {
         hidden.name = props.targetInputName;
         container.appendChild(hidden);
       }
-      hidden.value = props.multiple ? JSON.stringify(arr) : arr[0] ? String(arr[0]) : "";
+      hidden.value = props.multiple ? JSON.stringify(valArray) : valArray[0] !== void 0 ? String(valArray[0]) : "";
     }
     container.dispatchEvent(new CustomEvent("listbox:change", {
       bubbles: true,
-      detail: { value: props.multiple ? arr : arr[0] }
+      detail: { value: props.multiple ? valArray : valArray[0] }
     }));
   }
   renderList();
@@ -1054,6 +1186,48 @@ function OrderListIsland(container, props) {
   syncValues();
 }
 
+// src/composables/useClipboard.ts
+function useClipboard(options = {}) {
+  const timeout = options.timeout ?? 2e3;
+  let isCopied = false;
+  let timer = null;
+  async function copy(text) {
+    try {
+      if (typeof navigator !== "undefined" && navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else if (typeof document !== "undefined") {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textArea);
+      }
+      isCopied = true;
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        isCopied = false;
+      }, timeout);
+      return true;
+    } catch {
+      isCopied = false;
+      return false;
+    }
+  }
+  return {
+    copy,
+    get isCopied() {
+      return isCopied;
+    },
+    destroy: () => {
+      if (timer) clearTimeout(timer);
+    }
+  };
+}
+
 // src/components/terminal.ts
 function TerminalIsland(container, props) {
   const promptPrefix = props.prompt || "admin@softmax:~$";
@@ -1067,15 +1241,23 @@ function TerminalIsland(container, props) {
     ...props.commands || {}
   };
   const history = [];
+  const commandHistory = [];
+  let historyIndex = -1;
+  const clipboard = useClipboard();
   function render() {
     container.innerHTML = `
             <div class="laughtale-terminal" style="background: #030712; color: #38bdf8; font-family: var(--p-font-mono, monospace); font-size: 0.8125rem; border-radius: var(--p-border-radius-lg); border: 1px solid #1f2937; box-shadow: var(--p-shadow-lg); padding: 1.25rem; width: 100%; max-width: 640px; min-height: 240px; display: flex; flex-direction: column; overflow: hidden;">
                 <!-- Header Controls -->
-                <div style="display: flex; align-items: center; gap: 0.45rem; margin-bottom: 0.875rem; border-bottom: 1px solid #1f2937; padding-bottom: 0.625rem;">
-                    <span style="width: 10px; height: 10px; border-radius: 50%; background: #ef4444; display: inline-block;"></span>
-                    <span style="width: 10px; height: 10px; border-radius: 50%; background: #f59e0b; display: inline-block;"></span>
-                    <span style="width: 10px; height: 10px; border-radius: 50%; background: #10b981; display: inline-block;"></span>
-                    <span style="color: #64748b; font-size: 0.6875rem; margin-left: 0.5rem;">bash \u2014 80x24</span>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.875rem; border-bottom: 1px solid #1f2937; padding-bottom: 0.625rem;">
+                    <div style="display: flex; align-items: center; gap: 0.45rem;">
+                        <span style="width: 10px; height: 10px; border-radius: 50%; background: #ef4444; display: inline-block;"></span>
+                        <span style="width: 10px; height: 10px; border-radius: 50%; background: #f59e0b; display: inline-block;"></span>
+                        <span style="width: 10px; height: 10px; border-radius: 50%; background: #10b981; display: inline-block;"></span>
+                        <span style="color: #64748b; font-size: 0.6875rem; margin-left: 0.5rem;">bash \u2014 80x24</span>
+                    </div>
+                    <button type="button" class="btn-copy-terminal" style="background: transparent; border: none; color: #64748b; font-size: 0.75rem; cursor: pointer; padding: 0.15rem 0.35rem; border-radius: 4px;">
+                        Copy Log
+                    </button>
                 </div>
 
                 <!-- History Log -->
@@ -1098,19 +1280,49 @@ function TerminalIsland(container, props) {
         `;
     const input = container.querySelector(".terminal-input");
     const log = container.querySelector(".terminal-log");
+    const copyBtn = container.querySelector(".btn-copy-terminal");
     log.scrollTop = log.scrollHeight;
-    input.focus();
+    copyBtn.addEventListener("click", () => {
+      const allText = history.map((h) => `${promptPrefix} ${h.command}
+${h.response}`).join("\n");
+      clipboard.copy(allText);
+      copyBtn.textContent = "Copied!";
+      setTimeout(() => {
+        copyBtn.textContent = "Copy Log";
+      }, 2e3);
+    });
     input.addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
         const cmd = input.value.trim();
         if (!cmd) return;
+        commandHistory.push(cmd);
+        historyIndex = commandHistory.length;
         if (cmd === "clear") {
           history.length = 0;
         } else {
-          const resp = commands[cmd.toLowerCase()] || `Command not found: "${cmd}". Type "help" for a list of commands.`;
+          const resp = commands[cmd] || `command not found: ${cmd}`;
           history.push({ command: cmd, response: resp });
         }
+        container.dispatchEvent(new CustomEvent("terminal:command", {
+          bubbles: true,
+          detail: { command: cmd }
+        }));
         render();
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        if (historyIndex > 0) {
+          historyIndex--;
+          input.value = commandHistory[historyIndex] || "";
+        }
+      } else if (e.key === "ArrowDown") {
+        e.preventDefault();
+        if (historyIndex < commandHistory.length - 1) {
+          historyIndex++;
+          input.value = commandHistory[historyIndex] || "";
+        } else {
+          historyIndex = commandHistory.length;
+          input.value = "";
+        }
       }
     });
   }

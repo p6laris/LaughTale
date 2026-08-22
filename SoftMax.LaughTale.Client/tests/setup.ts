@@ -24,6 +24,24 @@ const win = new Window({
 (globalThis as any).sessionStorage = win.sessionStorage;
 (globalThis as any).requestAnimationFrame = (cb: () => void) => setTimeout(cb, 16);
 
+// Mock navigator.clipboard
+try {
+    Object.defineProperty(globalThis.navigator, 'clipboard', {
+        value: {
+            writeText: async (_text: string) => Promise.resolve()
+        },
+        configurable: true
+    });
+} catch {
+    // ignore
+}
+
+// Mock MutationObserver
+(globalThis as any).MutationObserver = win.MutationObserver || class {
+    observe() {}
+    disconnect() {}
+};
+
 // Mock IntersectionObserver
 (globalThis as any).IntersectionObserver = class {
     callback: any;

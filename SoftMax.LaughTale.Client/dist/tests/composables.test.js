@@ -18,6 +18,21 @@ globalThis.Node = win.Node;
 globalThis.localStorage = win.localStorage;
 globalThis.sessionStorage = win.sessionStorage;
 globalThis.requestAnimationFrame = (cb) => setTimeout(cb, 16);
+try {
+  Object.defineProperty(globalThis.navigator, "clipboard", {
+    value: {
+      writeText: async (_text) => Promise.resolve()
+    },
+    configurable: true
+  });
+} catch {
+}
+globalThis.MutationObserver = win.MutationObserver || class {
+  observe() {
+  }
+  disconnect() {
+  }
+};
 globalThis.IntersectionObserver = class {
   callback;
   constructor(cb) {
@@ -179,6 +194,152 @@ function useStagger(elements, options = {}) {
   });
 }
 
+// src/composables/useDebounce.ts
+function useDebounce(fn, delayMs = 250) {
+  let timer = null;
+  const debounced = (...args) => {
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(() => {
+      fn(...args);
+      timer = null;
+    }, delayMs);
+  };
+  debounced.cancel = () => {
+    if (timer) {
+      clearTimeout(timer);
+      timer = null;
+    }
+  };
+  debounced.flush = (...args) => {
+    debounced.cancel();
+    fn(...args);
+  };
+  return debounced;
+}
+
+// src/composables/useClipboard.ts
+function useClipboard(options = {}) {
+  const timeout = options.timeout ?? 2e3;
+  let isCopied = false;
+  let timer = null;
+  async function copy(text) {
+    try {
+      if (typeof navigator !== "undefined" && navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else if (typeof document !== "undefined") {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textArea);
+      }
+      isCopied = true;
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        isCopied = false;
+      }, timeout);
+      return true;
+    } catch {
+      isCopied = false;
+      return false;
+    }
+  }
+  return {
+    copy,
+    get isCopied() {
+      return isCopied;
+    },
+    destroy: () => {
+      if (timer) clearTimeout(timer);
+    }
+  };
+}
+
+// src/composables/useKeyboardNav.ts
+function useKeyboardNav(options) {
+  let activeIndex = options.initialIndex ?? -1;
+  const loop = options.loop ?? true;
+  function handleKeyDown(e) {
+    const count = options.itemCount();
+    if (count === 0) return false;
+    const isVertical = options.orientation !== "horizontal";
+    const isHorizontal = options.orientation !== "vertical";
+    if (isVertical && e.key === "ArrowDown" || isHorizontal && e.key === "ArrowRight") {
+      e.preventDefault();
+      if (activeIndex < count - 1) {
+        activeIndex++;
+      } else if (loop) {
+        activeIndex = 0;
+      }
+      options.onHighlight?.(activeIndex);
+      return true;
+    }
+    if (isVertical && e.key === "ArrowUp" || isHorizontal && e.key === "ArrowLeft") {
+      e.preventDefault();
+      if (activeIndex > 0) {
+        activeIndex--;
+      } else if (loop) {
+        activeIndex = count - 1;
+      }
+      options.onHighlight?.(activeIndex);
+      return true;
+    }
+    if (e.key === "Home") {
+      e.preventDefault();
+      activeIndex = 0;
+      options.onHighlight?.(activeIndex);
+      return true;
+    }
+    if (e.key === "End") {
+      e.preventDefault();
+      activeIndex = count - 1;
+      options.onHighlight?.(activeIndex);
+      return true;
+    }
+    if (e.key === "Enter" || e.key === " ") {
+      if (activeIndex >= 0 && activeIndex < count) {
+        e.preventDefault();
+        options.onSelect?.(activeIndex);
+        return true;
+      }
+    }
+    if (e.key === "Escape") {
+      options.onEscape?.();
+      return true;
+    }
+    return false;
+  }
+  return {
+    handleKeyDown,
+    get activeIndex() {
+      return activeIndex;
+    },
+    setActiveIndex: (idx) => {
+      activeIndex = idx;
+      options.onHighlight?.(activeIndex);
+    },
+    reset: () => {
+      activeIndex = -1;
+    }
+  };
+}
+
+// src/composables/useEventListener.ts
+function useEventListener(target, type, listener, options) {
+  if (!target || typeof target.addEventListener !== "function") {
+    return () => {
+    };
+  }
+  target.addEventListener(type, listener, options);
+  return () => {
+    target.removeEventListener(type, listener, options);
+  };
+}
+
 // tests/composables.test.ts
 describe("SoftMax.LaughTale Headless Composables Suite", () => {
   it("useDisclosure: manages open/close lifecycle and callbacks", () => {
@@ -235,5 +396,57 @@ describe("SoftMax.LaughTale Headless Composables Suite", () => {
     assert.ok(elements[0].style.transition.includes("10ms"));
     assert.ok(elements[1].style.transition.includes("40ms"));
     assert.ok(elements[2].style.transition.includes("70ms"));
+  });
+  it("useDebounce: executes callback after delay interval", async () => {
+    let count = 0;
+    const debounced = useDebounce(() => {
+      count++;
+    }, 30);
+    debounced();
+    debounced();
+    debounced();
+    assert.equal(count, 0);
+    await new Promise((r) => setTimeout(r, 60));
+    assert.equal(count, 1);
+  });
+  it("useClipboard: copies text and exposes state", async () => {
+    const clipboard = useClipboard({ timeout: 50 });
+    const success = await clipboard.copy("Test Secret Key");
+    assert.equal(success, true);
+    assert.equal(clipboard.isCopied, true);
+    await new Promise((r) => setTimeout(r, 70));
+    assert.equal(clipboard.isCopied, false);
+  });
+  it("useKeyboardNav: manages active item index and arrows", () => {
+    let selected = -1;
+    let highlighted = -1;
+    const nav = useKeyboardNav({
+      itemCount: () => 5,
+      onHighlight: (idx) => {
+        highlighted = idx;
+      },
+      onSelect: (idx) => {
+        selected = idx;
+      }
+    });
+    nav.handleKeyDown(new KeyboardEvent("keydown", { key: "ArrowDown" }));
+    assert.equal(highlighted, 0);
+    nav.handleKeyDown(new KeyboardEvent("keydown", { key: "ArrowDown" }));
+    assert.equal(highlighted, 1);
+    nav.handleKeyDown(new KeyboardEvent("keydown", { key: "Enter" }));
+    assert.equal(selected, 1);
+  });
+  it("useEventListener: attaches and cleans up event listener", () => {
+    const btn = document.createElement("button");
+    let clicked = false;
+    const cleanup = useEventListener(btn, "click", () => {
+      clicked = true;
+    });
+    btn.click();
+    assert.equal(clicked, true);
+    clicked = false;
+    cleanup();
+    btn.click();
+    assert.equal(clicked, false);
   });
 });

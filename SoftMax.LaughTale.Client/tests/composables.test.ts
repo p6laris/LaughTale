@@ -10,6 +10,10 @@ import { useDisclosure } from '../src/composables/useDisclosure.ts';
 import { useControllableState } from '../src/composables/useControllableState.ts';
 import { useSpring } from '../src/composables/animation/useSpring.ts';
 import { useStagger } from '../src/composables/animation/useStagger.ts';
+import { useDebounce } from '../src/composables/useDebounce.ts';
+import { useClipboard } from '../src/composables/useClipboard.ts';
+import { useKeyboardNav } from '../src/composables/useKeyboardNav.ts';
+import { useEventListener } from '../src/composables/useEventListener.ts';
 
 describe('SoftMax.LaughTale Headless Composables Suite', () => {
 
@@ -75,6 +79,66 @@ describe('SoftMax.LaughTale Headless Composables Suite', () => {
         assert.ok(elements[0].style.transition.includes('10ms'));
         assert.ok(elements[1].style.transition.includes('40ms'));
         assert.ok(elements[2].style.transition.includes('70ms'));
+    });
+
+    it('useDebounce: executes callback after delay interval', async () => {
+        let count = 0;
+        const debounced = useDebounce(() => { count++; }, 30);
+
+        debounced();
+        debounced();
+        debounced();
+        assert.equal(count, 0);
+
+        await new Promise(r => setTimeout(r, 60));
+        assert.equal(count, 1);
+    });
+
+    it('useClipboard: copies text and exposes state', async () => {
+        const clipboard = useClipboard({ timeout: 50 });
+        const success = await clipboard.copy('Test Secret Key');
+        assert.equal(success, true);
+        assert.equal(clipboard.isCopied, true);
+
+        await new Promise(r => setTimeout(r, 70));
+        assert.equal(clipboard.isCopied, false);
+    });
+
+    it('useKeyboardNav: manages active item index and arrows', () => {
+        let selected = -1;
+        let highlighted = -1;
+
+        const nav = useKeyboardNav({
+            itemCount: () => 5,
+            onHighlight: (idx) => { highlighted = idx; },
+            onSelect: (idx) => { selected = idx; }
+        });
+
+        nav.handleKeyDown(new KeyboardEvent('keydown', { key: 'ArrowDown' }));
+        assert.equal(highlighted, 0);
+
+        nav.handleKeyDown(new KeyboardEvent('keydown', { key: 'ArrowDown' }));
+        assert.equal(highlighted, 1);
+
+        nav.handleKeyDown(new KeyboardEvent('keydown', { key: 'Enter' }));
+        assert.equal(selected, 1);
+    });
+
+    it('useEventListener: attaches and cleans up event listener', () => {
+        const btn = document.createElement('button');
+        let clicked = false;
+
+        const cleanup = useEventListener(btn, 'click', () => {
+            clicked = true;
+        });
+
+        btn.click();
+        assert.equal(clicked, true);
+
+        clicked = false;
+        cleanup();
+        btn.click();
+        assert.equal(clicked, false);
     });
 
 });

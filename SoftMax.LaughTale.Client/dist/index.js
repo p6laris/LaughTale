@@ -2109,6 +2109,196 @@ var SoftMaxIslands = (() => {
     }
   });
 
+  // src/composables/useDebounce.ts
+  function useDebounce(fn, delayMs = 250) {
+    let timer = null;
+    const debounced = (...args) => {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        fn(...args);
+        timer = null;
+      }, delayMs);
+    };
+    debounced.cancel = () => {
+      if (timer) {
+        clearTimeout(timer);
+        timer = null;
+      }
+    };
+    debounced.flush = (...args) => {
+      debounced.cancel();
+      fn(...args);
+    };
+    return debounced;
+  }
+  function useThrottle(fn, intervalMs = 100) {
+    let lastTime = 0;
+    let timer = null;
+    const throttled = (...args) => {
+      const now = Date.now();
+      if (now - lastTime >= intervalMs) {
+        lastTime = now;
+        fn(...args);
+      } else if (!timer) {
+        timer = setTimeout(() => {
+          lastTime = Date.now();
+          fn(...args);
+          timer = null;
+        }, intervalMs - (now - lastTime));
+      }
+    };
+    throttled.cancel = () => {
+      if (timer) {
+        clearTimeout(timer);
+        timer = null;
+      }
+    };
+    return throttled;
+  }
+  var init_useDebounce = __esm({
+    "src/composables/useDebounce.ts"() {
+      "use strict";
+    }
+  });
+
+  // src/composables/useClipboard.ts
+  function useClipboard(options = {}) {
+    const timeout = options.timeout ?? 2e3;
+    let isCopied = false;
+    let timer = null;
+    async function copy(text) {
+      try {
+        if (typeof navigator !== "undefined" && navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(text);
+        } else if (typeof document !== "undefined") {
+          const textArea = document.createElement("textarea");
+          textArea.value = text;
+          textArea.style.position = "fixed";
+          textArea.style.opacity = "0";
+          document.body.appendChild(textArea);
+          textArea.focus();
+          textArea.select();
+          document.execCommand("copy");
+          document.body.removeChild(textArea);
+        }
+        isCopied = true;
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(() => {
+          isCopied = false;
+        }, timeout);
+        return true;
+      } catch {
+        isCopied = false;
+        return false;
+      }
+    }
+    return {
+      copy,
+      get isCopied() {
+        return isCopied;
+      },
+      destroy: () => {
+        if (timer) clearTimeout(timer);
+      }
+    };
+  }
+  var init_useClipboard = __esm({
+    "src/composables/useClipboard.ts"() {
+      "use strict";
+    }
+  });
+
+  // src/composables/useKeyboardNav.ts
+  function useKeyboardNav(options) {
+    let activeIndex = options.initialIndex ?? -1;
+    const loop = options.loop ?? true;
+    function handleKeyDown(e) {
+      const count = options.itemCount();
+      if (count === 0) return false;
+      const isVertical = options.orientation !== "horizontal";
+      const isHorizontal = options.orientation !== "vertical";
+      if (isVertical && e.key === "ArrowDown" || isHorizontal && e.key === "ArrowRight") {
+        e.preventDefault();
+        if (activeIndex < count - 1) {
+          activeIndex++;
+        } else if (loop) {
+          activeIndex = 0;
+        }
+        options.onHighlight?.(activeIndex);
+        return true;
+      }
+      if (isVertical && e.key === "ArrowUp" || isHorizontal && e.key === "ArrowLeft") {
+        e.preventDefault();
+        if (activeIndex > 0) {
+          activeIndex--;
+        } else if (loop) {
+          activeIndex = count - 1;
+        }
+        options.onHighlight?.(activeIndex);
+        return true;
+      }
+      if (e.key === "Home") {
+        e.preventDefault();
+        activeIndex = 0;
+        options.onHighlight?.(activeIndex);
+        return true;
+      }
+      if (e.key === "End") {
+        e.preventDefault();
+        activeIndex = count - 1;
+        options.onHighlight?.(activeIndex);
+        return true;
+      }
+      if (e.key === "Enter" || e.key === " ") {
+        if (activeIndex >= 0 && activeIndex < count) {
+          e.preventDefault();
+          options.onSelect?.(activeIndex);
+          return true;
+        }
+      }
+      if (e.key === "Escape") {
+        options.onEscape?.();
+        return true;
+      }
+      return false;
+    }
+    return {
+      handleKeyDown,
+      get activeIndex() {
+        return activeIndex;
+      },
+      setActiveIndex: (idx) => {
+        activeIndex = idx;
+        options.onHighlight?.(activeIndex);
+      },
+      reset: () => {
+        activeIndex = -1;
+      }
+    };
+  }
+  var init_useKeyboardNav = __esm({
+    "src/composables/useKeyboardNav.ts"() {
+      "use strict";
+    }
+  });
+
+  // src/composables/useEventListener.ts
+  function useEventListener(target, type, listener, options) {
+    if (!target || typeof target.addEventListener !== "function") {
+      return () => {
+      };
+    }
+    target.addEventListener(type, listener, options);
+    return () => {
+      target.removeEventListener(type, listener, options);
+    };
+  }
+  var init_useEventListener = __esm({
+    "src/composables/useEventListener.ts"() {
+      "use strict";
+    }
+  });
+
   // src/composables/animation/useSpring.ts
   function useSpring(initialValue, config = {}) {
     const stiffness = config.stiffness ?? 170;
@@ -2389,6 +2579,10 @@ var SoftMaxIslands = (() => {
       init_useClickOutside();
       init_useScrollLock();
       init_useControllableState();
+      init_useDebounce();
+      init_useClipboard();
+      init_useKeyboardNav();
+      init_useEventListener();
       init_useSpring();
       init_useTransition();
       init_useAutoAnimate();
@@ -2762,7 +2956,6 @@ var SoftMaxIslands = (() => {
   });
   function CascadeTreeIsland(container, props) {
     let selectedText = props.placeholder;
-    let isOpen = false;
     container.innerHTML = `
         <div style="display: flex; flex-direction: column; gap: 0.75rem;">
             <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -2791,14 +2984,19 @@ var SoftMaxIslands = (() => {
     const treeList = container.querySelector(".tree-list");
     const labelSpan = container.querySelector(".selected-label");
     const hiddenInput = container.querySelector(`#${props.targetInputName}`);
-    btn.addEventListener("click", () => {
-      isOpen = !isOpen;
-      menu.style.display = isOpen ? "block" : "none";
-      if (isOpen) {
+    const disclosure = useDisclosure({
+      defaultIsOpen: false,
+      onOpen: () => {
         renderList(props.departments || []);
+        useTransition(menu, { type: "fade", isMounted: true });
         searchInput.focus();
+      },
+      onClose: () => {
+        useTransition(menu, { type: "fade", isMounted: false });
       }
     });
+    useClickOutside(container, () => disclosure.close());
+    btn.addEventListener("click", () => disclosure.toggle());
     searchInput.addEventListener("input", () => {
       const query = searchInput.value.toLowerCase();
       const filtered = filterTree(props.departments || [], query);
@@ -2807,62 +3005,62 @@ var SoftMaxIslands = (() => {
     function filterTree(nodes, query) {
       if (!query) return nodes;
       return nodes.reduce((acc, node) => {
-        const matches = node.name.toLowerCase().includes(query);
-        const filteredChildren = node.children ? filterTree(node.children, query) : [];
-        if (matches || filteredChildren.length > 0) {
-          acc.push({ ...node, children: filteredChildren });
+        const matchesSelf = node.name.toLowerCase().includes(query);
+        const matchingChildren = node.children ? filterTree(node.children, query) : [];
+        if (matchesSelf || matchingChildren.length > 0) {
+          acc.push({
+            ...node,
+            children: matchingChildren.length > 0 ? matchingChildren : node.children
+          });
         }
         return acc;
       }, []);
     }
     function renderList(nodes, depth = 0) {
       if (depth === 0) treeList.innerHTML = "";
+      if (nodes.length === 0 && depth === 0) {
+        treeList.innerHTML = '<div style="padding: 0.5rem; color: var(--p-surface-400); font-size: 0.75rem; text-align: center;">No matches</div>';
+        return;
+      }
       nodes.forEach((node) => {
+        const hasChildren = node.children && node.children.length > 0;
         const item = document.createElement("div");
-        item.style.padding = "0.4rem 0.6rem";
-        item.style.paddingLeft = `${depth * 1 + 0.6}rem`;
-        item.style.fontSize = "0.8125rem";
-        item.style.borderRadius = "var(--p-border-radius)";
-        item.style.cursor = "pointer";
-        item.style.display = "flex";
-        item.style.alignItems = "center";
-        item.style.justifyContent = "space-between";
-        item.style.color = "var(--p-surface-700)";
+        item.style.paddingLeft = `${depth * 1.25}rem`;
+        item.className = "tree-item";
         item.innerHTML = `
-                <span>${node.name}</span>
-                <span style="font-size: 0.6875rem; color: var(--p-surface-400); font-family: var(--p-font-mono);">${node.children?.length ? `${node.children.length} sub` : ""}</span>
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.35rem 0.5rem; border-radius: var(--p-border-radius); cursor: pointer; font-size: 0.8125rem; color: var(--p-surface-800); transition: background 0.1s ease;">
+                    <span>${hasChildren ? "\u{1F4C1}" : "\u{1F4C4}"} ${node.name}</span>
+                    <span style="font-size: 0.6875rem; color: var(--p-surface-400); font-family: monospace;">${node.id}</span>
+                </div>
             `;
         item.addEventListener("mouseenter", () => {
-          item.style.backgroundColor = "var(--p-surface-100)";
+          item.firstElementChild.style.background = "var(--p-surface-100)";
         });
         item.addEventListener("mouseleave", () => {
-          item.style.backgroundColor = "transparent";
+          item.firstElementChild.style.background = "transparent";
         });
         item.addEventListener("click", (e) => {
           e.stopPropagation();
+          selectedText = node.name;
+          labelSpan.textContent = selectedText;
+          labelSpan.style.color = "var(--p-surface-900)";
           hiddenInput.value = node.id;
-          labelSpan.textContent = node.name;
-          labelSpan.style.color = "var(--p-surface-950)";
-          labelSpan.style.fontWeight = "600";
-          isOpen = false;
-          menu.style.display = "none";
+          disclosure.close();
+          container.dispatchEvent(new CustomEvent("dept:selected", { detail: { id: node.id, name: node.name } }));
         });
         treeList.appendChild(item);
-        if (node.children?.length) {
+        if (hasChildren) {
           renderList(node.children, depth + 1);
         }
       });
     }
-    document.addEventListener("click", (e) => {
-      if (!container.contains(e.target)) {
-        isOpen = false;
-        menu.style.display = "none";
-      }
-    });
   }
   var init_tree_select = __esm({
     "src/components/tree-select.ts"() {
       "use strict";
+      init_useDisclosure();
+      init_useClickOutside();
+      init_useTransition();
     }
   });
 
@@ -4624,7 +4822,6 @@ var SoftMaxIslands = (() => {
     const allItems = props.items || [];
     let selectedValue = props.value || "";
     let searchQuery = "";
-    let isOpen = false;
     function getFilteredItems() {
       if (!searchQuery) return allItems;
       const q = searchQuery.toLowerCase();
@@ -4655,66 +4852,90 @@ var SoftMaxIslands = (() => {
     const input = container.querySelector(".autocomplete-input");
     const clearBtn = container.querySelector(".btn-clear-autocomplete");
     const overlay = container.querySelector(".autocomplete-overlay");
-    function updateList() {
+    const disclosure = useDisclosure({
+      defaultIsOpen: false,
+      onOpen: () => {
+        renderDropdown();
+        useTransition(overlay, { type: "fade", isMounted: true });
+      },
+      onClose: () => {
+        useTransition(overlay, { type: "fade", isMounted: false });
+      }
+    });
+    useClickOutside(container, () => disclosure.close());
+    const keyboardNav = useKeyboardNav({
+      itemCount: () => getFilteredItems().length,
+      onHighlight: (idx) => {
+        const items = overlay.querySelectorAll(".autocomplete-item");
+        items.forEach((it, i) => {
+          it.style.background = i === idx ? "var(--p-surface-100)" : "transparent";
+          if (i === idx) it.scrollIntoView({ block: "nearest" });
+        });
+      },
+      onSelect: (idx) => {
+        const filtered = getFilteredItems();
+        if (filtered[idx]) selectItem(filtered[idx]);
+      },
+      onEscape: () => disclosure.close()
+    });
+    function selectItem(item) {
+      selectedValue = item.value;
+      searchQuery = "";
+      input.value = item.label;
+      clearBtn.style.display = "flex";
+      disclosure.close();
+      syncValue();
+    }
+    function renderDropdown() {
       const filtered = getFilteredItems();
-      overlay.style.display = isOpen ? "block" : "none";
       if (filtered.length === 0) {
-        overlay.innerHTML = `<div style="padding: 0.75rem; font-size: 0.8125rem; color: var(--p-surface-400); text-align: center;">No results found</div>`;
+        overlay.innerHTML = `<div style="padding: 0.75rem; text-align: center; color: var(--p-surface-400); font-size: 0.8125rem;">No results found</div>`;
         return;
       }
-      overlay.innerHTML = filtered.map((item) => `
-            <div class="autocomplete-item" data-value="${item.value}" style="padding: 0.5rem 0.75rem; font-size: 0.875rem; color: var(--p-surface-800); cursor: pointer; display: flex; align-items: center; justify-content: space-between; border-radius: var(--p-border-radius); transition: background 0.15s ease;">
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
+      overlay.innerHTML = filtered.map((item, idx) => `
+            <div class="autocomplete-item" data-value="${item.value}" data-idx="${idx}" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border-radius: var(--p-border-radius); cursor: pointer; font-size: 0.8125rem; color: var(--p-text-color); transition: background 0.15s ease;">
+                <span style="display: flex; align-items: center; gap: 0.5rem;">
                     ${item.icon ? `<span>${item.icon}</span>` : ""}
                     <span>${item.label}</span>
-                </div>
-                ${item.value === selectedValue ? `<span style="color: var(--p-primary-600);">${LucideIcons.check}</span>` : ""}
+                </span>
+                ${item.category ? `<span class="aura-tag tag-slate" style="font-size: 0.6875rem;">${item.category}</span>` : ""}
             </div>
         `).join("");
       overlay.querySelectorAll(".autocomplete-item").forEach((itemEl) => {
         itemEl.addEventListener("click", () => {
-          selectedValue = itemEl.getAttribute("data-value") || "";
-          const item = allItems.find((i) => i.value === selectedValue);
-          input.value = item ? item.label : "";
-          searchQuery = "";
-          isOpen = false;
-          clearBtn.style.display = "flex";
-          updateList();
-          syncValue();
+          const val = itemEl.getAttribute("data-value");
+          const matched = allItems.find((i) => i.value === val);
+          if (matched) selectItem(matched);
         });
       });
     }
-    if (!props.disabled) {
-      input.addEventListener("focus", () => {
-        isOpen = true;
-        updateList();
-      });
-      input.addEventListener("input", () => {
-        searchQuery = input.value;
-        isOpen = true;
-        clearBtn.style.display = input.value ? "flex" : "none";
-        updateList();
-      });
-      clearBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        selectedValue = "";
-        searchQuery = "";
-        input.value = "";
-        isOpen = false;
-        clearBtn.style.display = "none";
-        updateList();
-        syncValue();
-      });
-      document.addEventListener("click", (e) => {
-        if (!container.contains(e.target)) {
-          isOpen = false;
-          overlay.style.display = "none";
-        }
-      });
-    }
+    const debouncedFilter = useDebounce(() => {
+      searchQuery = input.value;
+      renderDropdown();
+    }, 150);
+    input.addEventListener("input", () => {
+      if (!disclosure.isOpen) disclosure.open();
+      debouncedFilter();
+    });
+    input.addEventListener("focus", () => {
+      if (!disclosure.isOpen) disclosure.open();
+    });
+    input.addEventListener("keydown", (e) => {
+      if (disclosure.isOpen) {
+        keyboardNav.handleKeyDown(e);
+      }
+    });
+    clearBtn.addEventListener("click", () => {
+      selectedValue = "";
+      searchQuery = "";
+      input.value = "";
+      clearBtn.style.display = "none";
+      syncValue();
+      disclosure.close();
+    });
     function syncValue() {
       if (props.targetInputName) {
-        let hidden = document.querySelector(`input[name="${props.targetInputName}"]`);
+        let hidden = container.querySelector(`input[name="${props.targetInputName}"]`);
         if (!hidden) {
           hidden = document.createElement("input");
           hidden.type = "hidden";
@@ -4728,13 +4949,16 @@ var SoftMaxIslands = (() => {
         detail: { value: selectedValue }
       }));
     }
-    updateList();
-    syncValue();
   }
   var init_autocomplete = __esm({
     "src/components/autocomplete.ts"() {
       "use strict";
       init_lucide();
+      init_useDisclosure();
+      init_useClickOutside();
+      init_useDebounce();
+      init_useKeyboardNav();
+      init_useTransition();
     }
   });
 
@@ -5428,6 +5652,7 @@ var SoftMaxIslands = (() => {
     let currentShadow = "layered";
     const disclosure = useDisclosure({ defaultIsOpen: props.defaultOpen });
     const scrollLock = useScrollLock();
+    const clipboard = useClipboard();
     container.innerHTML = `
         <div class="laughtale-theme-studio-root">
             <!-- Floating Launch Bubble -->
@@ -5435,7 +5660,7 @@ var SoftMaxIslands = (() => {
                     class="theme-studio-toggle-btn" 
                     title="Open TweakAura Theme Studio"
                     style="position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 5000; width: 3rem; height: 3rem; border-radius: 9999px; background: var(--p-surface-900, #0f172a); color: var(--p-surface-0, #ffffff); border: 2px solid var(--p-primary-500, #10b981); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; outline: none;">
-                ${LucideIcons.palette(20)}
+                ${LucideIcons.palette}
             </button>
 
             <!-- Backdrop -->
@@ -5658,10 +5883,10 @@ html.dark {
     --p-primary-100: ${p.darkP100};
     --p-primary-200: ${p.darkP200};
 }`.trim();
-      navigator.clipboard.writeText(cssSnippet);
-      copyCssBtn.innerHTML = `${LucideIcons.check(16)} Copied to Clipboard!`;
+      clipboard.copy(cssSnippet);
+      copyCssBtn.innerHTML = `${LucideIcons.check} Copied to Clipboard!`;
       setTimeout(() => {
-        copyCssBtn.innerHTML = `${LucideIcons.copy(16)} Copy CSS Tokens`;
+        copyCssBtn.innerHTML = `${LucideIcons.copy} Copy CSS Tokens`;
       }, 2e3);
     });
     copyCSharpBtn.addEventListener("click", () => {
@@ -5673,10 +5898,10 @@ public static class AppTheme
     public const string PrimaryName = "${p.name}";
     public const string BorderRadius = "${currentRadius}";
 }`.trim();
-      navigator.clipboard.writeText(csharpSnippet);
-      copyCSharpBtn.innerHTML = `${LucideIcons.check(16)} Copied C# Code!`;
+      clipboard.copy(csharpSnippet);
+      copyCSharpBtn.innerHTML = `${LucideIcons.check} Copied C# Code!`;
       setTimeout(() => {
-        copyCSharpBtn.innerHTML = `${LucideIcons.code(16)} Copy C# Theme Tokens`;
+        copyCSharpBtn.innerHTML = `${LucideIcons.code} Copy C# Theme Tokens`;
       }, 2e3);
     });
     document.addEventListener("studio:open", open);
@@ -5693,6 +5918,7 @@ public static class AppTheme
       init_lucide();
       init_useDisclosure();
       init_useScrollLock();
+      init_useClipboard();
       PRIMARY_PRESETS = {
         emerald: {
           name: "Emerald",
@@ -6299,22 +6525,50 @@ public static class AppTheme
     let selected = new Set(props.selectedValue !== void 0 ? [props.selectedValue] : []);
     let filterQuery = "";
     container.innerHTML = `
-        <div class="laughtale-listbox" style="width: 100%; max-width: 280px; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); background: var(--p-surface-0); overflow: hidden; font-family: var(--p-font-family, inherit);">
+        <div class="laughtale-listbox" tabindex="0" style="width: 100%; max-width: 280px; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); background: var(--p-surface-0); overflow: hidden; font-family: var(--p-font-family, inherit); outline: none;">
             ${props.filter ? `
                 <div style="padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--p-border-color); display: flex; align-items: center; gap: 0.5rem; background: var(--p-surface-50);">
-                    <span style="color: var(--p-surface-400); display: flex;">${LucideIcons.search(14)}</span>
+                    <span style="color: var(--p-surface-400); display: flex;">${LucideIcons.search}</span>
                     <input type="text" class="listbox-filter-input" placeholder="Filter..." style="flex: 1; border: none; outline: none; background: transparent; font-size: 0.8125rem; color: var(--p-text-color);" />
                 </div>
             ` : ""}
             <div class="listbox-items-container" style="max-height: 220px; overflow-y: auto; padding: 0.25rem 0;"></div>
         </div>
     `;
+    const root = container.querySelector(".laughtale-listbox");
     const itemsContainer = container.querySelector(".listbox-items-container");
     const filterInput = container.querySelector(".listbox-filter-input");
     function getFiltered() {
       if (!filterQuery.trim()) return options;
       const q = filterQuery.toLowerCase();
       return options.filter((o) => o.label.toLowerCase().includes(q));
+    }
+    const keyboardNav = useKeyboardNav({
+      itemCount: () => getFiltered().length,
+      onHighlight: (idx) => {
+        const items = itemsContainer.querySelectorAll(".listbox-item");
+        items.forEach((it, i) => {
+          it.style.outline = i === idx ? "2px solid var(--p-primary-500)" : "none";
+          if (i === idx) it.scrollIntoView({ block: "nearest" });
+        });
+      },
+      onSelect: (idx) => {
+        const filtered = getFiltered();
+        if (filtered[idx]) {
+          handleItemSelect(filtered[idx].value);
+        }
+      }
+    });
+    function handleItemSelect(val) {
+      if (props.multiple) {
+        if (selected.has(val)) selected.delete(val);
+        else selected.add(val);
+      } else {
+        selected.clear();
+        selected.add(val);
+      }
+      renderList();
+      syncValue();
     }
     function renderList() {
       const filtered = getFiltered();
@@ -6333,26 +6587,23 @@ public static class AppTheme
       }).join("");
       itemsContainer.querySelectorAll(".listbox-item").forEach((el) => {
         el.addEventListener("click", () => {
-          if (props.disabled) return;
           const val = el.getAttribute("data-val");
-          if (props.multiple) {
-            if (selected.has(val)) selected.delete(val);
-            else selected.add(val);
-          } else {
-            selected.clear();
-            selected.add(val);
-          }
-          renderList();
-          syncValue();
+          handleItemSelect(val);
         });
       });
     }
-    filterInput?.addEventListener("input", () => {
-      filterQuery = filterInput.value;
+    const debouncedFilter = useDebounce(() => {
+      filterQuery = filterInput ? filterInput.value : "";
       renderList();
+    }, 150);
+    if (filterInput) {
+      filterInput.addEventListener("input", () => debouncedFilter());
+    }
+    root.addEventListener("keydown", (e) => {
+      keyboardNav.handleKeyDown(e);
     });
     function syncValue() {
-      const arr = Array.from(selected);
+      const valArray = Array.from(selected);
       if (props.targetInputName) {
         let hidden = container.querySelector(`input[name="${props.targetInputName}"]`);
         if (!hidden) {
@@ -6361,11 +6612,11 @@ public static class AppTheme
           hidden.name = props.targetInputName;
           container.appendChild(hidden);
         }
-        hidden.value = props.multiple ? JSON.stringify(arr) : arr[0] ? String(arr[0]) : "";
+        hidden.value = props.multiple ? JSON.stringify(valArray) : valArray[0] !== void 0 ? String(valArray[0]) : "";
       }
       container.dispatchEvent(new CustomEvent("listbox:change", {
         bubbles: true,
-        detail: { value: props.multiple ? arr : arr[0] }
+        detail: { value: props.multiple ? valArray : valArray[0] }
       }));
     }
     renderList();
@@ -6375,6 +6626,8 @@ public static class AppTheme
     "src/components/listbox.ts"() {
       "use strict";
       init_lucide();
+      init_useKeyboardNav();
+      init_useDebounce();
     }
   });
 
@@ -6738,15 +6991,23 @@ public static class AppTheme
       ...props.commands || {}
     };
     const history = [];
+    const commandHistory = [];
+    let historyIndex = -1;
+    const clipboard = useClipboard();
     function render() {
       container.innerHTML = `
             <div class="laughtale-terminal" style="background: #030712; color: #38bdf8; font-family: var(--p-font-mono, monospace); font-size: 0.8125rem; border-radius: var(--p-border-radius-lg); border: 1px solid #1f2937; box-shadow: var(--p-shadow-lg); padding: 1.25rem; width: 100%; max-width: 640px; min-height: 240px; display: flex; flex-direction: column; overflow: hidden;">
                 <!-- Header Controls -->
-                <div style="display: flex; align-items: center; gap: 0.45rem; margin-bottom: 0.875rem; border-bottom: 1px solid #1f2937; padding-bottom: 0.625rem;">
-                    <span style="width: 10px; height: 10px; border-radius: 50%; background: #ef4444; display: inline-block;"></span>
-                    <span style="width: 10px; height: 10px; border-radius: 50%; background: #f59e0b; display: inline-block;"></span>
-                    <span style="width: 10px; height: 10px; border-radius: 50%; background: #10b981; display: inline-block;"></span>
-                    <span style="color: #64748b; font-size: 0.6875rem; margin-left: 0.5rem;">bash \u2014 80x24</span>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.875rem; border-bottom: 1px solid #1f2937; padding-bottom: 0.625rem;">
+                    <div style="display: flex; align-items: center; gap: 0.45rem;">
+                        <span style="width: 10px; height: 10px; border-radius: 50%; background: #ef4444; display: inline-block;"></span>
+                        <span style="width: 10px; height: 10px; border-radius: 50%; background: #f59e0b; display: inline-block;"></span>
+                        <span style="width: 10px; height: 10px; border-radius: 50%; background: #10b981; display: inline-block;"></span>
+                        <span style="color: #64748b; font-size: 0.6875rem; margin-left: 0.5rem;">bash \u2014 80x24</span>
+                    </div>
+                    <button type="button" class="btn-copy-terminal" style="background: transparent; border: none; color: #64748b; font-size: 0.75rem; cursor: pointer; padding: 0.15rem 0.35rem; border-radius: 4px;">
+                        Copy Log
+                    </button>
                 </div>
 
                 <!-- History Log -->
@@ -6769,19 +7030,49 @@ public static class AppTheme
         `;
       const input = container.querySelector(".terminal-input");
       const log = container.querySelector(".terminal-log");
+      const copyBtn = container.querySelector(".btn-copy-terminal");
       log.scrollTop = log.scrollHeight;
-      input.focus();
+      copyBtn.addEventListener("click", () => {
+        const allText = history.map((h) => `${promptPrefix} ${h.command}
+${h.response}`).join("\n");
+        clipboard.copy(allText);
+        copyBtn.textContent = "Copied!";
+        setTimeout(() => {
+          copyBtn.textContent = "Copy Log";
+        }, 2e3);
+      });
       input.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
           const cmd = input.value.trim();
           if (!cmd) return;
+          commandHistory.push(cmd);
+          historyIndex = commandHistory.length;
           if (cmd === "clear") {
             history.length = 0;
           } else {
-            const resp = commands[cmd.toLowerCase()] || `Command not found: "${cmd}". Type "help" for a list of commands.`;
+            const resp = commands[cmd] || `command not found: ${cmd}`;
             history.push({ command: cmd, response: resp });
           }
+          container.dispatchEvent(new CustomEvent("terminal:command", {
+            bubbles: true,
+            detail: { command: cmd }
+          }));
           render();
+        } else if (e.key === "ArrowUp") {
+          e.preventDefault();
+          if (historyIndex > 0) {
+            historyIndex--;
+            input.value = commandHistory[historyIndex] || "";
+          }
+        } else if (e.key === "ArrowDown") {
+          e.preventDefault();
+          if (historyIndex < commandHistory.length - 1) {
+            historyIndex++;
+            input.value = commandHistory[historyIndex] || "";
+          } else {
+            historyIndex = commandHistory.length;
+            input.value = "";
+          }
         }
       });
     }
@@ -6790,6 +7081,7 @@ public static class AppTheme
   var init_terminal = __esm({
     "src/components/terminal.ts"() {
       "use strict";
+      init_useClipboard();
     }
   });
 
@@ -7070,16 +7362,21 @@ public static class AppTheme
     reviveTuple: () => reviveTuple,
     useAutoAnimate: () => useAutoAnimate,
     useClickOutside: () => useClickOutside,
+    useClipboard: () => useClipboard,
     useControllableState: () => useControllableState,
+    useDebounce: () => useDebounce,
     useDisclosure: () => useDisclosure,
     useDragGesture: () => useDragGesture,
+    useEventListener: () => useEventListener,
     useFloatingPosition: () => useFloatingPosition,
     useFocusTrap: () => useFocusTrap,
     useHotkeys: () => useHotkeys,
+    useKeyboardNav: () => useKeyboardNav,
     useMorphLayout: () => useMorphLayout,
     useScrollLock: () => useScrollLock,
     useSpring: () => useSpring,
     useStagger: () => useStagger,
+    useThrottle: () => useThrottle,
     useTransition: () => useTransition,
     useVirtualizer: () => useVirtualizer
   });

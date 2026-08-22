@@ -1,9 +1,11 @@
 /**
  * SoftMax.LaughTale: Enterprise Terminal Component (Aura Terminal inspired)
- * Interactive CLI prompt for running commands and displaying output responses.
+ * Interactive CLI prompt for running commands, command history arrow navigation, and output copy.
+ * Integrated with useClipboard and useEventListener.
  */
 
 import { TerminalCommand } from '../types/models';
+import { useClipboard } from '../composables/useClipboard';
 
 export interface TerminalProps {
     welcomeMessage?: string;
@@ -24,16 +26,25 @@ export default function TerminalIsland(container: HTMLElement, props: TerminalPr
     };
 
     const history: Array<{ command: string; response: string }> = [];
+    const commandHistory: string[] = [];
+    let historyIndex = -1;
+
+    const clipboard = useClipboard();
 
     function render() {
         container.innerHTML = `
             <div class="laughtale-terminal" style="background: #030712; color: #38bdf8; font-family: var(--p-font-mono, monospace); font-size: 0.8125rem; border-radius: var(--p-border-radius-lg); border: 1px solid #1f2937; box-shadow: var(--p-shadow-lg); padding: 1.25rem; width: 100%; max-width: 640px; min-height: 240px; display: flex; flex-direction: column; overflow: hidden;">
                 <!-- Header Controls -->
-                <div style="display: flex; align-items: center; gap: 0.45rem; margin-bottom: 0.875rem; border-bottom: 1px solid #1f2937; padding-bottom: 0.625rem;">
-                    <span style="width: 10px; height: 10px; border-radius: 50%; background: #ef4444; display: inline-block;"></span>
-                    <span style="width: 10px; height: 10px; border-radius: 50%; background: #f59e0b; display: inline-block;"></span>
-                    <span style="width: 10px; height: 10px; border-radius: 50%; background: #10b981; display: inline-block;"></span>
-                    <span style="color: #64748b; font-size: 0.6875rem; margin-left: 0.5rem;">bash — 80x24</span>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.875rem; border-bottom: 1px solid #1f2937; padding-bottom: 0.625rem;">
+                    <div style="display: flex; align-items: center; gap: 0.45rem;">
+                        <span style="width: 10px; height: 10px; border-radius: 50%; background: #ef4444; display: inline-block;"></span>
+                        <span style="width: 10px; height: 10px; border-radius: 50%; background: #f59e0b; display: inline-block;"></span>
+                        <span style="width: 10px; height: 10px; border-radius: 50%; background: #10b981; display: inline-block;"></span>
+                        <span style="color: #64748b; font-size: 0.6875rem; margin-left: 0.5rem;">bash — 80x24</span>
+                    </div>
+                    <button type="button" class="btn-copy-terminal" style="background: transparent; border: none; color: #64748b; font-size: 0.75rem; cursor: pointer; padding: 0.15rem 0.35rem; border-radius: 4px;">
+                        Copy Log
+                    </button>
                 </div>
 
                 <!-- History Log -->
@@ -57,23 +68,52 @@ export default function TerminalIsland(container: HTMLElement, props: TerminalPr
 
         const input = container.querySelector<HTMLInputElement>('.terminal-input')!;
         const log = container.querySelector<HTMLElement>('.terminal-log')!;
+        const copyBtn = container.querySelector<HTMLButtonElement>('.btn-copy-terminal')!;
         log.scrollTop = log.scrollHeight;
 
-        input.focus();
+        copyBtn.addEventListener('click', () => {
+            const allText = history.map(h => `${promptPrefix} ${h.command}\n${h.response}`).join('\n');
+            clipboard.copy(allText);
+            copyBtn.textContent = 'Copied!';
+            setTimeout(() => { copyBtn.textContent = 'Copy Log'; }, 2000);
+        });
 
         input.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 const cmd = input.value.trim();
                 if (!cmd) return;
 
+                commandHistory.push(cmd);
+                historyIndex = commandHistory.length;
+
                 if (cmd === 'clear') {
                     history.length = 0;
                 } else {
-                    const resp = commands[cmd.toLowerCase()] || `Command not found: "${cmd}". Type "help" for a list of commands.`;
+                    const resp = commands[cmd] || `command not found: ${cmd}`;
                     history.push({ command: cmd, response: resp });
                 }
 
+                container.dispatchEvent(new CustomEvent('terminal:command', {
+                    bubbles: true,
+                    detail: { command: cmd }
+                }));
+
                 render();
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (historyIndex > 0) {
+                    historyIndex--;
+                    input.value = commandHistory[historyIndex] || '';
+                }
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (historyIndex < commandHistory.length - 1) {
+                    historyIndex++;
+                    input.value = commandHistory[historyIndex] || '';
+                } else {
+                    historyIndex = commandHistory.length;
+                    input.value = '';
+                }
             }
         });
     }
