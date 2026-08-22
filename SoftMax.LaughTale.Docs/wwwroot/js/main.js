@@ -1,8 +1,9 @@
 import {
   defineIsland,
   enableViewTransitions,
+  initDirectives,
   initIslands
-} from "./chunk-2Q46XD3U.js";
+} from "./chunk-J5UHDJTQ.js";
 import "./chunk-63S5ICA2.js";
 import "./chunk-RIDSUAJN.js";
 
@@ -12,16 +13,17 @@ defineIsland("file-dropzone", () => import("./dropzone-OIJK5IJ7.js"));
 defineIsland("cascade-tree", () => import("./cascade-tree-K6NUHXUW.js"));
 defineIsland("event-broadcaster", () => import("./broadcaster-RCRIXWRP.js"));
 defineIsland("event-receiver", () => import("./receiver-CDILBIW3.js"));
-defineIsland("modal-dialog", () => import("./modal-dialog-IBODGHAT.js"));
+defineIsland("modal-dialog", () => import("./modal-dialog-QRVXX23P.js"));
 defineIsland("persistent-telemetry", () => import("./persistent-player-NCRVWT4M.js"));
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", () => {
-    initIslands();
-    enableViewTransitions();
-  });
-} else {
+function initialize() {
   initIslands();
+  initDirectives();
   enableViewTransitions();
 }
-console.log("[SoftMax.LaughTale] Showcase initialized.");
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initialize);
+} else {
+  initialize();
+}
+console.log("[SoftMax.LaughTale] Docs client runtime initialized.");
 //# sourceMappingURL=main.js.map

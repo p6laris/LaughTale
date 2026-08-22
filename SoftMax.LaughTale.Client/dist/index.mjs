@@ -180,10 +180,10 @@ var init_streaming = __esm({
 // src/runtime/hydrator.ts
 function hydrateIsland(container) {
   if (container[HYDRATED_FLAG]) return;
-  const name = container.getAttribute("data-island");
+  const name = container.getAttribute("data-island") || container.getAttribute("name");
   if (!name) return;
-  const strategy = (container.getAttribute("data-hydrate") || "load").toLowerCase();
-  const mediaQuery = container.getAttribute("data-media");
+  const strategy = (container.getAttribute("data-hydrate") || container.getAttribute("hydrate") || "load").toLowerCase();
+  const mediaQuery = container.getAttribute("data-media") || container.getAttribute("media");
   switch (strategy) {
     case "load":
       executeHydration(container, name);
@@ -216,7 +216,7 @@ async function executeHydration(container, name) {
   }
   try {
     await awaitStreamingReady(container);
-    const rawProps = container.getAttribute("data-props");
+    const rawProps = container.getAttribute("data-props") || container.getAttribute("props-json") || container.getAttribute("props");
     const props = parseAndReviveProps(rawProps);
     const module = await importWithRetry(definition.loader);
     const mount = module.default || module;
@@ -292,7 +292,7 @@ function hydrateMedia(container, name, query) {
   }
 }
 function initIslands(root = document) {
-  const islands = root.querySelectorAll("[data-island]");
+  const islands = root.querySelectorAll("[data-island], island, [hydrate], [data-hydrate]");
   islands.forEach(hydrateIsland);
 }
 var HYDRATED_FLAG;

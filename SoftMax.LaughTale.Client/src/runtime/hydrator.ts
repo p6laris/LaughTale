@@ -15,11 +15,11 @@ const HYDRATED_FLAG = '__laughtale_hydrated';
 export function hydrateIsland(container: HTMLElement): void {
     if ((container as any)[HYDRATED_FLAG]) return;
 
-    const name = container.getAttribute('data-island');
+    const name = container.getAttribute('data-island') || container.getAttribute('name');
     if (!name) return;
 
-    const strategy = (container.getAttribute('data-hydrate') || 'load').toLowerCase() as HydrateStrategy;
-    const mediaQuery = container.getAttribute('data-media');
+    const strategy = (container.getAttribute('data-hydrate') || container.getAttribute('hydrate') || 'load').toLowerCase() as HydrateStrategy;
+    const mediaQuery = container.getAttribute('data-media') || container.getAttribute('media');
 
     switch (strategy) {
         case 'load':
@@ -60,7 +60,7 @@ async function executeHydration(container: HTMLElement, name: string): Promise<v
         await awaitStreamingReady(container);
 
         // 2. Parse & revive props (Date, Uint8Array, Map, Set, BigInt, URL)
-        const rawProps = container.getAttribute('data-props');
+        const rawProps = container.getAttribute('data-props') || container.getAttribute('props-json') || container.getAttribute('props');
         const props = parseAndReviveProps(rawProps);
 
         // 3. Load component module with retry resilience
@@ -157,6 +157,6 @@ function hydrateMedia(container: HTMLElement, name: string, query: string | null
 }
 
 export function initIslands(root: ParentNode = document): void {
-    const islands = root.querySelectorAll<HTMLElement>('[data-island]');
+    const islands = root.querySelectorAll<HTMLElement>('[data-island], island, [hydrate], [data-hydrate]');
     islands.forEach(hydrateIsland);
 }
