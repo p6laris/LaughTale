@@ -16,7 +16,7 @@
         <span class="aura-tag tag-slate">Tailwind CSS v4 Tokens</span>
         <span class="aura-tag tag-emerald">Aura Theme</span>
         <span class="aura-tag tag-slate">Lucide Icons</span>
-        <span class="aura-tag tag-amber">49 Active Components</span>
+        <span class="aura-tag tag-amber">64 Active Components</span>
     </div>
     <h1 style="font-size: 2.25rem; font-weight: 800; letter-spacing: -0.03em; color: var(--p-surface-950); margin-bottom: 0.75rem;">
         Enterprise UI Components &amp; Dynamic Form Generator
@@ -368,7 +368,248 @@
 </div>
 
 <!-- ========================================== -->
-<!-- 9. Dock Navigation Bar (macOS Style) -->
+<!-- 9. Missing Components Showcase -->
+<!-- ========================================== -->
+<div style="margin-bottom: 2.5rem;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
+        <div>
+            <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--p-surface-900);">Form Components</h2>
+            <p style="font-size: 0.875rem; color: var(--p-surface-500); margin-top: 0.25rem;">AutoComplete, Select, Checkbox, RadioButton, Textarea, DatePicker, ColorPicker &amp; more.</p>
+        </div>
+        <span class="aura-tag tag-emerald">Forms</span>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+        
+        <!-- AutoComplete -->
+        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">AutoComplete (Combobox)</div>
+            <island-autocomplete items="@Model.CityOptions" placeholder="Search cities..." target-input-name="city_auto" />
+        </div>
+
+        <!-- Select -->
+        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Select Dropdown</div>
+            <island-select options="@Model.Periods" placeholder="Choose period..." target-input-name="period_select" filter="true" show-clear="true" />
+        </div>
+
+        <!-- Checkbox -->
+        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Checkbox</div>
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <island-checkbox label="Enable mTLS Enforcement" checked="true" target-input-name="mtls_check" value="mtls" />
+                <island-checkbox label="Require 2FA for Admin" target-input-name="tfa_check" value="2fa" />
+                <island-checkbox label="Audit all API calls" target-input-name="audit_check" value="audit" />
+            </div>
+        </div>
+
+        <!-- RadioButton -->
+        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Radio Button</div>
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <island-radio name="env" value="production" label="Production" checked="true" target-input-name="env_radio" />
+                <island-radio name="env" value="staging" label="Staging" target-input-name="env_radio" />
+                <island-radio name="env" value="development" label="Development" target-input-name="env_radio" />
+            </div>
+        </div>
+
+        <!-- Textarea -->
+        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Textarea (Auto-Resize)</div>
+            <island-textarea value="Enter your security incident description here..." max-length="500" auto-resize="true" target-input-name="incident_text" />
+        </div>
+
+        <!-- InputMask -->
+        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Input Mask</div>
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <island-input-mask mask="(999) 999-9999" placeholder="Phone number" target-input-name="phone_mask" />
+                <island-input-mask mask="99/99/9999" placeholder="Date (DD/MM/YYYY)" target-input-name="date_mask" />
+            </div>
+        </div>
+
+        <!-- FloatLabel -->
+        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Float Label</div>
+            <island-float-label label="Email Address" target-input-name="email_float" />
+        </div>
+
+        <!-- EnhancedInputText -->
+        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Enhanced Input</div>
+            <island-enhanced-input value="" placeholder="Search operators..." icon-left="search" show-clear="true" target-input-name="enhanced_input" />
+        </div>
+
+        <!-- Chips -->
+        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Chips (Tag Input)</div>
+            <island-chips target-input-name="skill_chips" />
+        </div>
+
+        <!-- ColorPicker -->
+        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Color Picker</div>
+            <island-color-picker value="#10b981" target-input-name="theme_color" />
+        </div>
+
+        <!-- Rating -->
+        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Star Rating</div>
+            <island-rating value="3" count="5" target-input-name="security_rating" />
+        </div>
+
+        <!-- Knob -->
+        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Knob Dial</div>
+            <island-knob value="72" min="0" max="100" />
+        </div>
+
+        <!-- DatePicker -->
+        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Date Picker</div>
+            <island-datepicker target-input-name="audit_date" />
+        </div>
+
+        <!-- SelectButton -->
+        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Select Button</div>
+            <island-select-button items="@Model.Periods" target-input-name="period_btn" />
+        </div>
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- 10. Navigation & Overlay Components -->
+<!-- ========================================== -->
+<div style="margin-bottom: 2.5rem;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
+        <div>
+            <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--p-surface-900);">Navigation &amp; Overlay Components</h2>
+            <p style="font-size: 0.875rem; color: var(--p-surface-500); margin-top: 0.25rem;">Menu, Sidebar, Stepper, Timeline, Drawer &amp; Modal components.</p>
+        </div>
+        <span class="aura-tag tag-slate">Navigation</span>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.5rem;">
+
+        <!-- Stepper -->
+        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Stepper Wizard</div>
+            <island-stepper steps="@Model.StepperSteps" />
+        </div>
+
+        <!-- Timeline -->
+        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Event Timeline</div>
+            <island-timeline events="@Model.AuditEvents" />
+        </div>
+
+        <!-- ProgressBar -->
+        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Progress Bar</div>
+            <island-progress-bar value="68" show-value="true" />
+        </div>
+
+        <!-- MeterGroup -->
+        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Meter Group (Storage)</div>
+            <island-meter-group meters="@Model.StorageMetrics" />
+        </div>
+
+        <!-- AvatarGroup -->
+        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Avatar Group</div>
+            <island-avatar-group avatars="@Model.TeamAvatars" max="4" />
+        </div>
+
+        <!-- Tags -->
+        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Tags / Badges</div>
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <island-tag value="Active" severity="success" />
+                <island-tag value="Pending" severity="warn" />
+                <island-tag value="Critical" severity="error" />
+                <island-tag value="Archived" severity="info" />
+            </div>
+        </div>
+
+        <!-- Skeleton -->
+        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Skeleton Loading</div>
+            <island-skeleton width="100%" height="1rem" />
+            <div style="margin-top: 0.75rem;"><island-skeleton width="80%" height="1rem" /></div>
+            <div style="margin-top: 0.75rem;"><island-skeleton width="60%" height="1rem" /></div>
+            <div style="margin-top: 0.75rem;"><island-skeleton shape="circle" width="3rem" height="3rem" /></div>
+        </div>
+
+        <!-- Inplace -->
+        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Inplace (Click to Edit)</div>
+            <island-inplace display-text="Click to edit this text" target-input-name="inplace_val" />
+        </div>
+
+        <!-- BlockUI -->
+        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Block UI Overlay</div>
+            <island-blockui blocked="false" message="Processing request..." />
+        </div>
+
+        <!-- Drawer -->
+        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Drawer (Slide Panel)</div>
+            <island-drawer position="right" title="Settings Drawer" trigger-label="Open Drawer" />
+        </div>
+
+        <!-- Modal Dialog -->
+        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Modal Dialog</div>
+            <island-modal title="Confirm Action" trigger-label="Open Modal" />
+        </div>
+
+        <!-- ConfirmPopup -->
+        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Confirm Popup</div>
+            <island-confirm-popup message="Are you sure you want to delete this record?" />
+        </div>
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- 11. Data Display & Media -->
+<!-- ========================================== -->
+<div style="margin-bottom: 2.5rem;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
+        <div>
+            <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--p-surface-900);">Data Display &amp; Media Components</h2>
+            <p style="font-size: 0.875rem; color: var(--p-surface-500); margin-top: 0.25rem;">Paginator, DataView, Carousel, ImageCompare &amp; Dropzone.</p>
+        </div>
+        <span class="aura-tag tag-amber">Data Display</span>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.5rem;">
+
+        <!-- Paginator -->
+        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Paginator</div>
+            <island-paginator total-records="150" rows="10" />
+        </div>
+
+        <!-- Dropzone -->
+        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">File Dropzone</div>
+            <island-dropzone accept="image/*,.pdf" max-size="5242880" />
+        </div>
+
+        <!-- ImageCompare -->
+        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Image Compare Slider</div>
+            <island-image-compare />
+        </div>
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- 12. Dock Navigation Bar (macOS Style) -->
 <!-- ========================================== -->
 <div style="margin-bottom: 3rem; display: flex; justify-content: center;">
     <island-dock items="@Model.DockItems" position="Bottom" />

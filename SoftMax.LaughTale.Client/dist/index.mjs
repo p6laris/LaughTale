@@ -1604,6 +1604,7 @@ var init_lucide = __esm({
       folder: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>`,
       fileText: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>`,
       terminal: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/></svg>`,
+      code: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>`,
       moreHorizontal: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>`,
       sun: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`,
       moon: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>`,
@@ -3600,33 +3601,15 @@ function ToastIsland(container) {
     const theme = toastThemes[severity] || toastThemes.success;
     const duration = msg.durationMs || 4e3;
     const toastEl = document.createElement("div");
-    toastEl.style.pointerEvents = "auto";
-    toastEl.style.display = "flex";
-    toastEl.style.alignItems = "flex-start";
-    toastEl.style.gap = "0.75rem";
-    toastEl.style.padding = "0.875rem 1.125rem";
-    toastEl.style.borderRadius = "var(--p-border-radius-lg)";
-    toastEl.style.background = "white";
-    toastEl.style.border = `1px solid ${theme.border}`;
-    toastEl.style.boxShadow = "var(--p-shadow-lg)";
-    toastEl.style.width = "340px";
-    toastEl.style.animation = "slideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1)";
-    toastEl.innerHTML = `
-            <div style="width: 1.5rem; height: 1.5rem; border-radius: 50%; background: ${theme.bg}; color: ${theme.color}; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.75rem; flex-shrink: 0;">
-                ${theme.icon}
-            </div>
-            <div style="flex: 1;">
-                <div style="font-size: 0.875rem; font-weight: 600; color: var(--p-surface-900);">${msg.title}</div>
-                ${msg.description ? `<div style="font-size: 0.75rem; color: var(--p-surface-600); margin-top: 0.15rem;">${msg.description}</div>` : ""}
-            </div>
-            <button type="button" style="background: none; border: none; font-size: 1rem; color: var(--p-surface-400); cursor: pointer; padding: 0 0.25rem;">\u2715</button>
-        `;
-    toastEl.querySelector("button")?.addEventListener("click", () => toastEl.remove());
+    toastEl.className = "laughtale-toast";
+    toastEl.innerHTML = '<div class="toast-icon" style="background: ' + theme.bg + "; color: " + theme.color + ';">' + theme.icon + '</div><div style="flex: 1;"><div class="toast-title">' + msg.title + "</div>" + (msg.description ? '<div class="toast-desc">' + msg.description + "</div>" : "") + '</div><button type="button" class="toast-close">\u2715</button>';
+    toastEl.querySelector(".toast-close")?.addEventListener("click", () => {
+      toastEl.classList.add("leaving");
+      setTimeout(() => toastEl.remove(), 300);
+    });
     container.appendChild(toastEl);
     setTimeout(() => {
-      toastEl.style.opacity = "0";
-      toastEl.style.transform = "translateX(100%)";
-      toastEl.style.transition = "all 0.3s ease";
+      toastEl.classList.add("leaving");
       setTimeout(() => toastEl.remove(), 300);
     }, duration);
   }
@@ -3640,11 +3623,59 @@ var init_toast = __esm({
     "use strict";
     init_styles();
     CSS7 = `
-[data-theme="dark"] .laughtale-toast {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+@keyframes toast-slideIn {
+    from { opacity: 0; transform: translateX(100%); }
+    to { opacity: 1; transform: translateX(0); }
 }
+@keyframes toast-slideOut {
+    from { opacity: 1; transform: translateX(0); }
+    to { opacity: 0; transform: translateX(100%); }
+}
+.laughtale-toast {
+    pointer-events: auto;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.875rem 1.125rem;
+    border-radius: var(--p-border-radius-lg, 0.75rem);
+    background: var(--p-surface-0, #ffffff);
+    border: 1px solid var(--p-surface-200);
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+    width: 340px;
+    animation: toast-slideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.laughtale-toast.leaving {
+    animation: toast-slideOut 0.3s ease forwards;
+}
+.toast-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.75rem;
+    flex-shrink: 0;
+}
+.toast-title { font-size: 0.875rem; font-weight: 600; color: var(--p-surface-900); }
+.toast-desc { font-size: 0.75rem; color: var(--p-surface-500); margin-top: 0.15rem; }
+.toast-close {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    color: var(--p-surface-400);
+    cursor: pointer;
+    padding: 0 0.25rem;
+}
+.toast-close:hover { color: var(--p-surface-600); }
+[data-theme="dark"] .laughtale-toast {
+    background: var(--p-surface-800);
+    border-color: var(--p-surface-700);
+}
+[data-theme="dark"] .toast-title { color: var(--p-surface-100); }
+[data-theme="dark"] .toast-desc { color: var(--p-surface-400); }
+[data-theme="dark"] .toast-close { color: var(--p-surface-400); }
 `;
   }
 });
@@ -6543,7 +6574,7 @@ function ThemeStudioIsland(container, props = {}) {
                     <!-- 1. Primary Palette -->
                     <div>
                         <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-surface-500); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem;">Primary Color Palette</div>
-                        <div class="studio-color-grid" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.5rem;"></div>
+                        <div class="studio-color-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(2rem, 1fr)); gap: 0.4rem;"></div>
                     </div>
 
                     <!-- 2. Corner Radius Slider -->
@@ -6564,13 +6595,20 @@ function ThemeStudioIsland(container, props = {}) {
                     <!-- 3. Pre-Packaged Themes -->
                     <div>
                         <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-surface-500); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem;">Preset Curated Themes</div>
-                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem; max-height: 300px; overflow-y: auto;">
                             <button type="button" class="preset-theme-btn" data-theme="emerald-zero-trust" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); background: var(--p-surface-50); cursor: pointer; text-align: left;">
                                 <div style="display: flex; align-items: center; gap: 0.5rem;">
                                     <span style="width: 1rem; height: 1rem; border-radius: 3px; background: #10b981;"></span>
                                     <span style="font-size: 0.8125rem; font-weight: 600; color: var(--p-surface-800);">Emerald Zero-Trust</span>
                                 </div>
                                 <span style="font-size: 0.6875rem; color: var(--p-surface-400);">Default</span>
+                            </button>
+                            <button type="button" class="preset-theme-btn" data-theme="krd-golden" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); background: var(--p-surface-50); cursor: pointer; text-align: left;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <span style="width: 1rem; height: 1rem; border-radius: 3px; background: #eab308;"></span>
+                                    <span style="font-size: 0.8125rem; font-weight: 600; color: var(--p-surface-800);">KRD Golden</span>
+                                </div>
+                                <span style="font-size: 0.6875rem; color: var(--p-surface-400);">Radius 0.5</span>
                             </button>
                             <button type="button" class="preset-theme-btn" data-theme="supabase-violet" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); background: var(--p-surface-50); cursor: pointer; text-align: left;">
                                 <div style="display: flex; align-items: center; gap: 0.5rem;">
@@ -6586,12 +6624,40 @@ function ThemeStudioIsland(container, props = {}) {
                                 </div>
                                 <span style="font-size: 0.6875rem; color: var(--p-surface-400);">Radius 0.75</span>
                             </button>
+                            <button type="button" class="preset-theme-btn" data-theme="ocean-blue" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); background: var(--p-surface-50); cursor: pointer; text-align: left;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <span style="width: 1rem; height: 1rem; border-radius: 3px; background: #3b82f6;"></span>
+                                    <span style="font-size: 0.8125rem; font-weight: 600; color: var(--p-surface-800);">Ocean Blue</span>
+                                </div>
+                                <span style="font-size: 0.6875rem; color: var(--p-surface-400);">Radius 0.5</span>
+                            </button>
                             <button type="button" class="preset-theme-btn" data-theme="cyber-cyan" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); background: var(--p-surface-50); cursor: pointer; text-align: left;">
                                 <div style="display: flex; align-items: center; gap: 0.5rem;">
                                     <span style="width: 1rem; height: 1rem; border-radius: 3px; background: #06b6d4;"></span>
                                     <span style="font-size: 0.8125rem; font-weight: 600; color: var(--p-surface-800);">Cyberpunk Cyan</span>
                                 </div>
                                 <span style="font-size: 0.6875rem; color: var(--p-surface-400);">Radius 0.0</span>
+                            </button>
+                            <button type="button" class="preset-theme-btn" data-theme="lime-minimal" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); background: var(--p-surface-50); cursor: pointer; text-align: left;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <span style="width: 1rem; height: 1rem; border-radius: 3px; background: #84cc16;"></span>
+                                    <span style="font-size: 0.8125rem; font-weight: 600; color: var(--p-surface-800);">Lime Minimal</span>
+                                </div>
+                                <span style="font-size: 0.6875rem; color: var(--p-surface-400);">Radius 0.25</span>
+                            </button>
+                            <button type="button" class="preset-theme-btn" data-theme="sunset-orange" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); background: var(--p-surface-50); cursor: pointer; text-align: left;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <span style="width: 1rem; height: 1rem; border-radius: 3px; background: #f97316;"></span>
+                                    <span style="font-size: 0.8125rem; font-weight: 600; color: var(--p-surface-800);">Sunset Orange</span>
+                                </div>
+                                <span style="font-size: 0.6875rem; color: var(--p-surface-400);">Radius 0.5</span>
+                            </button>
+                            <button type="button" class="preset-theme-btn" data-theme="sakura-pink" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); background: var(--p-surface-50); cursor: pointer; text-align: left;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <span style="width: 1rem; height: 1rem; border-radius: 3px; background: #ec4899;"></span>
+                                    <span style="font-size: 0.8125rem; font-weight: 600; color: var(--p-surface-800);">Sakura Pink</span>
+                                </div>
+                                <span style="font-size: 0.6875rem; color: var(--p-surface-400);">Radius 1.0</span>
                             </button>
                         </div>
                     </div>
@@ -6706,15 +6772,30 @@ function ThemeStudioIsland(container, props = {}) {
       if (theme === "emerald-zero-trust") {
         currentPrimary = "emerald";
         currentRadius = "0.5rem";
+      } else if (theme === "krd-golden") {
+        currentPrimary = "yellow";
+        currentRadius = "0.5rem";
       } else if (theme === "supabase-violet") {
         currentPrimary = "violet";
         currentRadius = "0.375rem";
       } else if (theme === "sunset-ember") {
         currentPrimary = "rose";
         currentRadius = "0.75rem";
+      } else if (theme === "ocean-blue") {
+        currentPrimary = "blue";
+        currentRadius = "0.5rem";
       } else if (theme === "cyber-cyan") {
         currentPrimary = "cyan";
         currentRadius = "0rem";
+      } else if (theme === "lime-minimal") {
+        currentPrimary = "lime";
+        currentRadius = "0.25rem";
+      } else if (theme === "sunset-orange") {
+        currentPrimary = "orange";
+        currentRadius = "0.5rem";
+      } else if (theme === "sakura-pink") {
+        currentPrimary = "pink";
+        currentRadius = "1rem";
       }
       applyTheme();
     });
@@ -6851,6 +6932,97 @@ var init_theme_studio = __esm({
         darkP50: "#164e63",
         darkP100: "#155e75",
         darkP200: "#0e7490"
+      },
+      yellow: {
+        name: "KRD Yellow",
+        hex: "#eab308",
+        lightP50: "#fefce8",
+        lightP100: "#fef9c3",
+        lightP200: "#fef08a",
+        lightP500: "#eab308",
+        lightP600: "#ca8a04",
+        lightP700: "#a16207",
+        darkP50: "#713f12",
+        darkP100: "#854d0e",
+        darkP200: "#a16207"
+      },
+      blue: {
+        name: "Blue",
+        hex: "#3b82f6",
+        lightP50: "#eff6ff",
+        lightP100: "#dbeafe",
+        lightP200: "#bfdbfe",
+        lightP500: "#3b82f6",
+        lightP600: "#2563eb",
+        lightP700: "#1d4ed8",
+        darkP50: "#1e3a5f",
+        darkP100: "#1e40af",
+        darkP200: "#1d4ed8"
+      },
+      lime: {
+        name: "Lime",
+        hex: "#84cc16",
+        lightP50: "#f7fee7",
+        lightP100: "#ecfccb",
+        lightP200: "#d9f99d",
+        lightP500: "#84cc16",
+        lightP600: "#65a30d",
+        lightP700: "#4d7c0f",
+        darkP50: "#365314",
+        darkP100: "#3f6212",
+        darkP200: "#4d7c0f"
+      },
+      teal: {
+        name: "Teal",
+        hex: "#14b8a6",
+        lightP50: "#f0fdfa",
+        lightP100: "#ccfbf1",
+        lightP200: "#99f6e4",
+        lightP500: "#14b8a6",
+        lightP600: "#0d9488",
+        lightP700: "#0f766e",
+        darkP50: "#134e4a",
+        darkP100: "#115e59",
+        darkP200: "#0f766e"
+      },
+      orange: {
+        name: "Orange",
+        hex: "#f97316",
+        lightP50: "#fff7ed",
+        lightP100: "#ffedd5",
+        lightP200: "#fed7aa",
+        lightP500: "#f97316",
+        lightP600: "#ea580c",
+        lightP700: "#c2410c",
+        darkP50: "#7c2d12",
+        darkP100: "#9a3412",
+        darkP200: "#c2410c"
+      },
+      pink: {
+        name: "Pink",
+        hex: "#ec4899",
+        lightP50: "#fdf2f8",
+        lightP100: "#fce7f3",
+        lightP200: "#fbcfe8",
+        lightP500: "#ec4899",
+        lightP600: "#db2777",
+        lightP700: "#be185d",
+        darkP50: "#831843",
+        darkP100: "#9d174d",
+        darkP200: "#be185d"
+      },
+      sky: {
+        name: "Sky",
+        hex: "#0ea5e9",
+        lightP50: "#f0f9ff",
+        lightP100: "#e0f2fe",
+        lightP200: "#bae6fd",
+        lightP500: "#0ea5e9",
+        lightP600: "#0284c7",
+        lightP700: "#0369a1",
+        darkP50: "#0c4a6e",
+        darkP100: "#075985",
+        darkP200: "#0369a1"
       }
     };
   }
