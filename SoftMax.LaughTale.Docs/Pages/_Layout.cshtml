@@ -27,7 +27,15 @@
                 </a>
             </div>
 
-            <div style="display: flex; align-items: center; gap: 1rem;">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <!-- Launch Theme Studio Button -->
+                <button type="button" 
+                        onclick="document.dispatchEvent(new CustomEvent('studio:open'))" 
+                        class="p-button p-button-primary" 
+                        style="padding: 0.35rem 0.75rem; font-size: 0.8125rem;">
+                    🎨 Studio
+                </button>
+
                 <!-- Dark Mode Toggle Button -->
                 <button type="button" 
                         onclick="document.documentElement.classList.toggle('dark'); localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light')" 
@@ -45,6 +53,9 @@
             </div>
         </div>
     </header>
+
+    <!-- Global Theme Studio Island Drawer -->
+    <island-theme-studio />
 
     <!-- Main 3-Column Docs Layout -->
     <div class="docs-layout">

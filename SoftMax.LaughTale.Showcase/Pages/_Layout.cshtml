@@ -23,9 +23,17 @@
 
                 <nav class="nav-menu">
                     <a href="/" class="nav-link">Showcase</a>
-                    <a href="/dashboard" class="nav-link">Dashboard &amp; Theme Studio</a>
-                    <a href="/enterprise" class="nav-link">Enterprise UI &amp; Directives</a>
+                    <a href="/dashboard" class="nav-link">Dashboard</a>
+                    <a href="/enterprise" class="nav-link">Enterprise UI</a>
                     <a href="/About" class="nav-link">Architecture</a>
+                    
+                    <!-- Global Theme Studio Trigger Button -->
+                    <button type="button" 
+                            onclick="document.dispatchEvent(new CustomEvent('studio:open'))" 
+                            class="p-button p-button-primary" 
+                            style="padding: 0.35rem 0.75rem; font-size: 0.8125rem; margin-left: 0.5rem;">
+                        🎨 Studio
+                    </button>
                 </nav>
             </div>
 
@@ -38,6 +46,9 @@
             </div>
         </div>
     </header>
+
+    <!-- Global Theme Studio Island Drawer -->
+    <island-theme-studio />
 
     <!-- Main Content Container -->
     <main class="app-container">
