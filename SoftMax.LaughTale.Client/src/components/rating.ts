@@ -3,6 +3,7 @@
  */
 
 import { LucideIcons } from '../icons/lucide';
+import { injectIslandStyle } from '../runtime/styles';
 
 export interface RatingProps {
     targetInputName?: string;
@@ -12,7 +13,27 @@ export interface RatingProps {
     disabled?: boolean;
 }
 
+
+const CSS = `
+[data-theme="dark"] .rating-star {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .laughtale-rating {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .rating-cancel-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
+
 export default function RatingIsland(container: HTMLElement, props: RatingProps) {
+    injectIslandStyle('rating', CSS);
     const totalStars = props.stars || 5;
     let currentRating = props.value || 0;
     let hoverRating = 0;

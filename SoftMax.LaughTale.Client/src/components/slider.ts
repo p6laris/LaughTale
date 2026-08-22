@@ -1,3 +1,4 @@
+import { injectIslandStyle } from '../runtime/styles';
 /**
  * SoftMax.LaughTale: Enterprise Range Slider Component (Aura Slider inspired)
  * High-performance Pointer Capture dragging engine (0 DOM rebuilding during drag).
@@ -12,7 +13,37 @@ export interface SliderProps {
     disabled?: boolean;
 }
 
+
+const CSS = `
+[data-theme="dark"] .laughtale-slider {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .slider-track {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .slider-fill {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .slider-handle {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .slider-value-display {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
+
 export default function SliderIsland(container: HTMLElement, props: SliderProps) {
+    injectIslandStyle('slider', CSS);
     const min = props.min !== undefined ? props.min : 0;
     const max = props.max !== undefined ? props.max : 100;
     const step = props.step !== undefined ? props.step : 1;

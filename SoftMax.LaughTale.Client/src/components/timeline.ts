@@ -1,3 +1,4 @@
+import { injectIslandStyle } from '../runtime/styles';
 /**
  * SoftMax.LaughTale: Enterprise Event & Audit Log Timeline Component
  */
@@ -17,7 +18,22 @@ export interface TimelineProps {
     title?: string;
 }
 
+
+const CSS = `
+[data-theme="dark"] .timeline-item {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .laughtale-timeline {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
+
 export default function TimelineIsland(container: HTMLElement, props: TimelineProps) {
+    injectIslandStyle('timeline', CSS);
     const statusBadges = {
         completed: { bg: '#ecfdf5', color: '#047857', border: '#a7f3d0', label: 'Completed', dot: '#10b981' },
         in_progress: { bg: '#eff6ff', color: '#1d4ed8', border: '#bfdbfe', label: 'In Progress', dot: '#3b82f6' },

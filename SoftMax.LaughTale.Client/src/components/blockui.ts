@@ -1,3 +1,4 @@
+import { injectIslandStyle } from '../runtime/styles';
 /**
  * SoftMax.LaughTale: Enterprise BlockUI Component (Aura BlockUI inspired)
  * Blocks user interaction on a target container with an animated spinner and glassy overlay.
@@ -8,7 +9,22 @@ export interface BlockUIProps {
     message?: string;
 }
 
+
+const CSS = `
+[data-theme="dark"] .laughtale-blockui-root {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .blockui-mask {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
+
 export default function BlockUIIsland(container: HTMLElement, props: BlockUIProps) {
+    injectIslandStyle('blockui', CSS);
     let isBlocked = props.blocked ?? true;
 
     function render() {

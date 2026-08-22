@@ -4,6 +4,7 @@
  */
 
 import { GalleriaItem } from '../types/models';
+import { injectIslandStyle } from '../runtime/styles';
 import { LucideIcons } from '../icons/lucide';
 
 export interface GalleriaProps {
@@ -11,7 +12,32 @@ export interface GalleriaProps {
     autoPlay?: boolean;
 }
 
+
+const CSS = `
+[data-theme="dark"] .laughtale-galleria {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .galleria-prev-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .galleria-next-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .galleria-thumb {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
+
 export default function GalleriaIsland(container: HTMLElement, props: GalleriaProps) {
+    injectIslandStyle('galleria', CSS);
     const images: GalleriaItem[] = props.value && props.value.length > 0 ? props.value : [
         {
             itemImageSrc: 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800&auto=format&fit=crop&q=80',

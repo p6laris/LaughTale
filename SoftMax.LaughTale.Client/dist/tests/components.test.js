@@ -104,8 +104,58 @@ var LucideIcons = {
   alertCircle: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>`
 };
 
+// src/directives/csp.ts
+function getCspNonce() {
+  if (typeof document === "undefined") return null;
+  const meta = document.querySelector('meta[name="csp-nonce"]');
+  return meta ? meta.content : null;
+}
+function applyNonceToStyle(style) {
+  const nonce = getCspNonce();
+  if (nonce) {
+    style.setAttribute("nonce", nonce);
+  }
+}
+
+// src/runtime/styles.ts
+var injectedStyles = /* @__PURE__ */ new Set();
+function injectIslandStyle(islandName, css) {
+  if (injectedStyles.has(islandName) || typeof document === "undefined") {
+    return;
+  }
+  injectedStyles.add(islandName);
+  const styleEl = document.createElement("style");
+  styleEl.setAttribute("data-island-style", islandName);
+  styleEl.textContent = css;
+  applyNonceToStyle(styleEl);
+  document.head.appendChild(styleEl);
+}
+
 // src/components/input-number.ts
+var CSS = `
+[data-theme="dark"] .laughtale-input-number {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .number-display-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-step-up {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-step-down {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
 function InputNumberIsland(container, props) {
+  injectIslandStyle("input-number", CSS);
   let rawValue = props.value !== void 0 ? Number(props.value) : null;
   const step = props.step || 1;
   const decimals = props.decimals !== void 0 ? props.decimals : props.mode === "currency" ? 2 : 0;
@@ -193,7 +243,25 @@ function InputNumberIsland(container, props) {
 }
 
 // src/components/input-otp.ts
+var CSS2 = `
+[data-theme="dark"] .otp-box {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .otp-digit-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .laughtale-input-otp {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
 function InputOtpIsland(container, props) {
+  injectIslandStyle("input-otp", CSS2);
   const length = props.length || 6;
   let values = new Array(length).fill("");
   function render() {
@@ -282,7 +350,25 @@ function InputOtpIsland(container, props) {
 }
 
 // src/components/input-password.ts
+var CSS3 = `
+[data-theme="dark"] .password-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .toggle-mask-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .password-meter-wrap {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
 function InputPasswordIsland(container, props) {
+  injectIslandStyle("input-password", CSS3);
   let isMasked = true;
   let currentPassword = "";
   function calculateStrength(pwd) {
@@ -375,7 +461,15 @@ function InputPasswordIsland(container, props) {
 }
 
 // src/components/toggle-switch.ts
+var CSS4 = `
+[data-theme="dark"] .laughtale-toggle-switch {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
 function ToggleSwitchIsland(container, props) {
+  injectIslandStyle("toggle-switch", CSS4);
   let isChecked = Boolean(props.checked);
   function render() {
     container.innerHTML = `
@@ -416,7 +510,35 @@ function ToggleSwitchIsland(container, props) {
 }
 
 // src/components/slider.ts
+var CSS5 = `
+[data-theme="dark"] .laughtale-slider {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .slider-track {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .slider-fill {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .slider-handle {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .slider-value-display {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
 function SliderIsland(container, props) {
+  injectIslandStyle("slider", CSS5);
   const min = props.min !== void 0 ? props.min : 0;
   const max = props.max !== void 0 ? props.max : 100;
   const step = props.step !== void 0 ? props.step : 1;
@@ -521,7 +643,25 @@ function SliderIsland(container, props) {
 }
 
 // src/components/rating.ts
+var CSS6 = `
+[data-theme="dark"] .rating-star {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .laughtale-rating {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .rating-cancel-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
 function RatingIsland(container, props) {
+  injectIslandStyle("rating", CSS6);
   const totalStars = props.stars || 5;
   let currentRating = props.value || 0;
   let hoverRating = 0;
@@ -719,7 +859,35 @@ function useTransition(element, options = {}) {
 }
 
 // src/components/accordion.ts
+var CSS7 = `
+[data-theme="dark"] .accordion-tab {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .accordion-header-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .accordion-content {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .tab-slot {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .laughtale-accordion {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
 function AccordionIsland(container, props) {
+  injectIslandStyle("accordion", CSS7);
   const tabs = props.tabs || [];
   let activeIndices = /* @__PURE__ */ new Set();
   if (Array.isArray(props.activeIndex)) {
@@ -811,7 +979,35 @@ function AccordionIsland(container, props) {
 }
 
 // src/components/tabs.ts
+var CSS8 = `
+[data-theme="dark"] .tab-header-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .laughtale-tabs {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .tabs-header-bar {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .tab-panel-body {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .tab-slot-content {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
 function TabsIsland(container, props) {
+  injectIslandStyle("tabs", CSS8);
   const tabs = props.tabs || [];
   let activeIndex = props.activeIndex || 0;
   function render() {
@@ -995,7 +1191,40 @@ function useKeyboardNav(options) {
 }
 
 // src/components/autocomplete.ts
+var CSS9 = `
+[data-theme="dark"] .laughtale-autocomplete {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .autocomplete-input-wrap {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .autocomplete-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-clear-autocomplete {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .autocomplete-overlay {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .autocomplete-item {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
 function AutoCompleteIsland(container, props) {
+  injectIslandStyle("autocomplete", CSS9);
   const allItems = props.items || [];
   let selectedValue = props.value || "";
   let searchQuery = "";
@@ -1146,7 +1375,35 @@ var DEFAULT_PRESETS = [
   "#1e293b",
   "#000000"
 ];
+var CSS10 = `
+[data-theme="dark"] .color-swatch-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .colorpicker-trigger-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .colorpicker-palette-overlay {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .color-native-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .color-hex-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
 function ColorPickerIsland(container, props) {
+  injectIslandStyle("color-picker", CSS10);
   let currentColor = props.value || "#10b981";
   let isOpen = false;
   const swatchesHtml = DEFAULT_PRESETS.map((c) => `
@@ -1272,7 +1529,25 @@ function ColorPickerIsland(container, props) {
 }
 
 // src/components/knob.ts
+var CSS11 = `
+[data-theme="dark"] .laughtale-knob {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .knob-progress-circle {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .knob-value-display {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
 function KnobIsland(container, props) {
+  injectIslandStyle("knob", CSS11);
   const min = props.min !== void 0 ? props.min : 0;
   const max = props.max !== void 0 ? props.max : 100;
   const step = props.step || 1;
@@ -1376,7 +1651,35 @@ function KnobIsland(container, props) {
 }
 
 // src/components/inplace.ts
+var CSS12 = `
+[data-theme="dark"] .laughtale-inplace-display {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .laughtale-inplace-editor {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .inplace-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-inplace-save {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-inplace-cancel {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
 function InplaceIsland(container, props) {
+  injectIslandStyle("inplace", CSS12);
   let isEditing = false;
   let currentValue = props.value || "";
   function render() {
@@ -1458,7 +1761,15 @@ function InplaceIsland(container, props) {
 }
 
 // src/components/image-compare.ts
+var CSS13 = `
+[data-theme="dark"] .laughtale-image-compare {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
 function ImageCompareIsland(container, props) {
+  injectIslandStyle("image-compare", CSS13);
   let splitPercent = 50;
   container.innerHTML = `
         <div class="laughtale-image-compare" style="position: relative; width: 100%; max-width: 600px; height: 340px; border-radius: var(--p-border-radius-lg); overflow: hidden; user-select: none; border: 1px solid var(--p-border-color); box-shadow: var(--p-shadow-md); touch-action: none; cursor: ew-resize;">

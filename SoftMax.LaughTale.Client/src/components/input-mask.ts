@@ -34,6 +34,14 @@ const CSS = `
     cursor: not-allowed;
     background: var(--p-surface-100);
 }
+[data-theme="dark"] .laughtale-input-mask {
+    background: var(--p-surface-900);
+    color: var(--p-surface-100);
+    border-color: var(--p-surface-600);
+}
+[data-theme="dark"] .laughtale-input-mask:disabled {
+    background: var(--p-surface-800);
+}
 `;
 
 export default function InputMaskIsland(container: HTMLElement, props: InputMaskProps) {
@@ -86,7 +94,7 @@ export default function InputMaskIsland(container: HTMLElement, props: InputMask
             <input 
                 type="text"
                 class="laughtale-input-mask"
-                value="\${currentValue}"
+                value="${currentValue}"
                 placeholder="${props.placeholder || format('')}"
                 ${props.disabled ? 'disabled' : ''}
             />

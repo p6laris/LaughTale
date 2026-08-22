@@ -1,3 +1,4 @@
+import { injectIslandStyle } from '../runtime/styles';
 /**
  * SoftMax.LaughTale: Enterprise Multi-Step Stepper Wizard Component
  */
@@ -15,7 +16,42 @@ export interface StepperProps {
     linear?: boolean;
 }
 
+
+const CSS = `
+[data-theme="dark"] .stepper-item {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .laughtale-stepper {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .stepper-body {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .stepper-slot-container {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .step-prev-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .step-next-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
+
 export default function StepperIsland(container: HTMLElement, props: StepperProps) {
+    injectIslandStyle('stepper', CSS);
     let currentStep = props.initialStep || 0;
     const totalSteps = props.steps.length;
 

@@ -1,3 +1,4 @@
+import { injectIslandStyle } from '../runtime/styles';
 /**
  * SoftMax.LaughTale: Enterprise ProgressBar & ProgressSpinner Component (Aura ProgressBar inspired)
  */
@@ -10,7 +11,17 @@ export interface ProgressBarProps {
     color?: string;
 }
 
+
+const CSS = `
+[data-theme="dark"] .laughtale-progress-bar {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
+
 export default function ProgressBarIsland(container: HTMLElement, props: ProgressBarProps) {
+    injectIslandStyle('progress-bar', CSS);
     const isIndeterminate = props.mode === 'indeterminate' || props.value === undefined;
     const value = Math.max(0, Math.min(100, props.value || 0));
     const height = props.height || '0.75rem';

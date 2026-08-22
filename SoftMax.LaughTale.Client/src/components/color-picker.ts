@@ -4,6 +4,7 @@
  */
 
 import { LucideIcons } from '../icons/lucide';
+import { injectIslandStyle } from '../runtime/styles';
 
 export interface ColorPickerProps {
     value?: string; // Hex color e.g. '#10b981'
@@ -17,7 +18,37 @@ const DEFAULT_PRESETS = [
     '#14b8a6', '#06b6d4', '#64748b', '#1e293b', '#000000'
 ];
 
+
+const CSS = `
+[data-theme="dark"] .color-swatch-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .colorpicker-trigger-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .colorpicker-palette-overlay {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .color-native-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .color-hex-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
+
 export default function ColorPickerIsland(container: HTMLElement, props: ColorPickerProps) {
+    injectIslandStyle('color-picker', CSS);
     let currentColor = props.value || '#10b981';
     let isOpen = false;
 

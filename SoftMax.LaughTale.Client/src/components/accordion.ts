@@ -4,11 +4,42 @@
  */
 
 import { LucideIcons } from '../icons/lucide';
+import { injectIslandStyle } from '../runtime/styles';
 import { AccordionProps } from '../types/models';
 import { useDisclosure } from '../composables/useDisclosure';
 import { useTransition } from '../composables/animation/useTransition';
 
+
+const CSS = `
+[data-theme="dark"] .accordion-tab {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .accordion-header-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .accordion-content {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .tab-slot {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .laughtale-accordion {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
+
 export default function AccordionIsland(container: HTMLElement, props: AccordionProps) {
+    injectIslandStyle('accordion', CSS);
     const tabs = props.tabs || [];
     let activeIndices: Set<number> = new Set();
 

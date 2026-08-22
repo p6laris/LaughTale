@@ -4,6 +4,7 @@
  */
 
 import { OrderListItem } from '../types/models';
+import { injectIslandStyle } from '../runtime/styles';
 import { LucideIcons } from '../icons/lucide';
 import { useAutoAnimate } from '../composables/animation/useAutoAnimate';
 
@@ -13,7 +14,47 @@ export interface OrderListProps<T = any> {
     targetInputName?: string;
 }
 
+
+const CSS = `
+[data-theme="dark"] .laughtale-orderlist {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-order-top {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-order-up {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-order-down {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-order-bottom {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .orderlist-items-container {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .orderlist-item {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
+
 export default function OrderListIsland<T = any>(container: HTMLElement, props: OrderListProps<T>) {
+    injectIslandStyle('orderlist', CSS);
     let items: OrderListItem<T>[] = props.items ? [...props.items] : [
         { id: '1', name: 'Phase 1: Zero-Trust Gateway Init', order: 0 },
         { id: '2', name: 'Phase 2: Hydrate Islands Engine', order: 1 },

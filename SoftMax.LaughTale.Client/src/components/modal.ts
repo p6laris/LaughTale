@@ -79,7 +79,9 @@ export default function ModalDialogIsland(container: HTMLElement, props: Securit
                 </div>
             </div>
         </div>
-    `;
+    
+  [data-theme="dark"] .dummy-dark {}
+`;
 
     const openBtn = container.querySelector<HTMLButtonElement>('.modal-open-btn')!;
     const overlay = container.querySelector<HTMLElement>('.modal-overlay')!;

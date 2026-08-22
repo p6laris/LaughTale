@@ -4,6 +4,7 @@
  */
 
 import { TabItem } from '../types/models';
+import { injectIslandStyle } from '../runtime/styles';
 import { useMorphLayout } from '../composables/animation/useMorphLayout';
 
 export interface TabsProps {
@@ -12,7 +13,37 @@ export interface TabsProps {
     targetInputName?: string;
 }
 
+
+const CSS = `
+[data-theme="dark"] .tab-header-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .laughtale-tabs {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .tabs-header-bar {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .tab-panel-body {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .tab-slot-content {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
+
 export default function TabsIsland(container: HTMLElement, props: TabsProps) {
+    injectIslandStyle('tabs', CSS);
     const tabs = props.tabs || [];
     let activeIndex = props.activeIndex || 0;
 

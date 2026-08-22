@@ -5,6 +5,7 @@
  */
 
 import { CascadeSelectNode } from '../types/models';
+import { injectIslandStyle } from '../runtime/styles';
 import { LucideIcons } from '../icons/lucide';
 import { useDisclosure } from '../composables/useDisclosure';
 import { useClickOutside } from '../composables/useClickOutside';
@@ -17,7 +18,47 @@ export interface CascadeSelectProps<T = string> {
     disabled?: boolean;
 }
 
+
+const CSS = `
+[data-theme="dark"] .laughtale-cascadeselect {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .cascadeselect-trigger {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .p-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .cascadeselect-label {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .cascadeselect-chevron {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .cascadeselect-overlay {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .cascade-item {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
+
 export default function CascadeSelectIsland<T = string>(container: HTMLElement, props: CascadeSelectProps<T>) {
+    injectIslandStyle('cascadeselect', CSS);
     const options: CascadeSelectNode<T>[] = props.options || [];
     let selectedText = '';
     let selectedValue: T | null = null;

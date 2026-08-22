@@ -1,3 +1,4 @@
+import { injectIslandStyle } from '../runtime/styles';
 /**
  * SoftMax.LaughTale: Enterprise ImageCompare Split Slider Component (Aura ImageCompare inspired)
  * High-performance pointer capture dragging engine without full DOM rebuilds.
@@ -10,7 +11,17 @@ export interface ImageCompareProps {
     afterLabel?: string;
 }
 
+
+const CSS = `
+[data-theme="dark"] .laughtale-image-compare {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
+
 export default function ImageCompareIsland(container: HTMLElement, props: ImageCompareProps) {
+    injectIslandStyle('image-compare', CSS);
     let splitPercent = 50;
 
     // Render static DOM skeleton once

@@ -3,6 +3,7 @@
  */
 
 import { LucideIcons } from '../icons/lucide';
+import { injectIslandStyle } from '../runtime/styles';
 
 export interface InputNumberProps {
     targetInputName?: string;
@@ -20,7 +21,32 @@ export interface InputNumberProps {
     disabled?: boolean;
 }
 
+
+const CSS = `
+[data-theme="dark"] .laughtale-input-number {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .number-display-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-step-up {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-step-down {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
+
 export default function InputNumberIsland(container: HTMLElement, props: InputNumberProps) {
+    injectIslandStyle('input-number', CSS);
     let rawValue: number | null = props.value !== undefined ? Number(props.value) : null;
     const step = props.step || 1;
     const decimals = props.decimals !== undefined ? props.decimals : props.mode === 'currency' ? 2 : 0;

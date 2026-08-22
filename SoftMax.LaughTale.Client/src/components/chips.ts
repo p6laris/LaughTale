@@ -4,6 +4,7 @@
  */
 
 import { LucideIcons } from '../icons/lucide';
+import { injectIslandStyle } from '../runtime/styles';
 import { useAutoAnimate } from '../composables/animation/useAutoAnimate';
 import { useControllableState } from '../composables/useControllableState';
 
@@ -15,7 +16,32 @@ export interface ChipsProps {
     disabled?: boolean;
 }
 
+
+const CSS = `
+[data-theme="dark"] .chip-item {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .remove-chip-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .laughtale-chips {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .chip-text-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
+
 export default function ChipsIsland(container: HTMLElement, props: ChipsProps) {
+    injectIslandStyle('chips', CSS);
     const [getChips, setChips] = useControllableState<string[]>({
         defaultValue: props.values ? [...props.values] : [],
         onChange: (val) => {

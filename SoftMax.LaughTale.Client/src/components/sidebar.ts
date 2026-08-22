@@ -124,15 +124,15 @@ export default function SidebarIsland(container: HTMLElement, props: SidebarProp
 
     function render() {
         container.innerHTML = `
-<div class="laughtale-sidebar ' + collapsed ? 'collapsed' : '' + ' \${position}">
+<div class="laughtale-sidebar ' + collapsed ? 'collapsed' : '' + ' ${position}">
                 <div class="sidebar-header">
                     <span class="sidebar-header-title" style="font-weight: 700; color: var(--p-text-color);">Menu</span>
                     <button class="sidebar-toggle" aria-label="Toggle Sidebar">
-                        \${collapsed ? LucideIcons.chevronRight : LucideIcons.chevronLeft}
+                        ${collapsed ? LucideIcons.chevronRight : LucideIcons.chevronLeft}
                     </button>
                 </div>
                 <ul class="sidebar-menu">
-                    \${renderMenu(items)}
+                    ${renderMenu(items)}
                 </ul>
             </div>
 `;

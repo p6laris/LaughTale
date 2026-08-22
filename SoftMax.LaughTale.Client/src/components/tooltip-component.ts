@@ -69,7 +69,7 @@ export default function TooltipIsland(container: HTMLElement, props: TooltipProp
             tooltipEl.className = 'laughtale-tooltip';
             tooltipEl.innerHTML = `
 <div class="tooltip-arrow ' + position + '"></div>
-                <div class="tooltip-content">\${contentHtml}</div>
+                <div class="tooltip-content">${contentHtml}</div>
 `;
             document.body.appendChild(tooltipEl);
         }

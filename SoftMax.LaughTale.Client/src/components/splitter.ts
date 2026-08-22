@@ -4,6 +4,7 @@
  */
 
 import { SplitterPanel, Orientation } from '../types/models';
+import { injectIslandStyle } from '../runtime/styles';
 import { useDragGesture } from '../composables/useDragGesture';
 
 export interface SplitterProps {
@@ -12,7 +13,32 @@ export interface SplitterProps {
     gutterSize?: number;
 }
 
+
+const CSS = `
+[data-theme="dark"] .laughtale-splitter {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .splitter-panel-1 {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .splitter-gutter {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .splitter-panel-2 {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
+
 export default function SplitterIsland(container: HTMLElement, props: SplitterProps) {
+    injectIslandStyle('splitter', CSS);
     const layout = props.layout || 'horizontal';
     const isHorizontal = layout === 'horizontal';
     const panels = props.panels && props.panels.length >= 2 ? props.panels : [

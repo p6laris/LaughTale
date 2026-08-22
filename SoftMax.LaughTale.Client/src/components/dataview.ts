@@ -127,17 +127,17 @@ export default function DataViewIsland(container: HTMLElement, props: DataViewPr
                     <div class="dataview-end">
                         <div class="dataview-layout-options">
                             <button class="dataview-btn ' + layout === 'list' ? 'active' : '' + '" data-layout="list" aria-label="List View">
-                                \${LucideIcons.moreHorizontal}
+                                ${LucideIcons.moreHorizontal}
                             </button>
-                            <button class="dataview-btn \${layout === 'grid' ? 'active' : ''}" data-layout="grid" aria-label="Grid View">
-                                \${LucideIcons.layers}
+                            <button class="dataview-btn ${layout === 'grid' ? 'active' : ''}" data-layout="grid" aria-label="Grid View">
+                                ${LucideIcons.layers}
                             </button>
                         </div>
                     </div>
                 </div>
                 
-                <div class="dataview-content \${layout}">
-                    \${renderContent()}
+                <div class="dataview-content ${layout}">
+                    ${renderContent()}
                 </div>
             </div>
 `;

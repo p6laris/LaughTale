@@ -4,6 +4,7 @@
  */
 
 import { LucideIcons } from '../icons/lucide';
+import { injectIslandStyle } from '../runtime/styles';
 import { useDisclosure } from '../composables/useDisclosure';
 import { useFocusTrap } from '../composables/useFocusTrap';
 import { useHotkeys } from '../composables/useHotkeys';
@@ -25,7 +26,42 @@ export interface CommandPaletteProps {
     hotkey?: string; // default 'ctrl+k, meta+k'
 }
 
+
+const CSS = `
+[data-theme="dark"] .laughtale-command-root {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .command-backdrop {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .command-dialog {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .command-search-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .command-items-container {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .command-item {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
+
 export default function CommandPaletteIsland(container: HTMLElement, props: CommandPaletteProps) {
+    injectIslandStyle('command', CSS);
     const placeholder = props.placeholder || 'Type a command or search...';
     const items: CommandItem[] = props.items || [
         { id: 'home', label: 'Go to Overview', group: 'Navigation', icon: 'compass', url: '/', shortcut: 'G H' },

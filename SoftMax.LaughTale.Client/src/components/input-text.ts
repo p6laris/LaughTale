@@ -87,6 +87,18 @@ const CSS = `
 .has-clear .laughtale-input { padding-right: 2.25rem; }
 .has-icon-right.has-clear .laughtale-input { padding-right: 3.5rem; }
 .has-icon-right.has-clear .laughtale-input-clear { right: 2.25rem; }
+[data-theme="dark"] .laughtale-input {
+    background: var(--p-surface-900);
+    color: var(--p-surface-100);
+    border-color: var(--p-surface-600);
+}
+[data-theme="dark"] .laughtale-input-wrap.is-invalid .laughtale-input {
+    border-color: var(--p-red-400);
+}
+[data-theme="dark"] .laughtale-input-clear:hover {
+    background: var(--p-surface-700);
+    color: var(--p-surface-200);
+}
 `;
 
 export default function InputTextIsland(container: HTMLElement, props: InputTextProps) {

@@ -3,6 +3,7 @@
  */
 
 import { LucideIcons } from '../icons/lucide';
+import { injectIslandStyle } from '../runtime/styles';
 
 export interface BreadcrumbItem {
     label: string;
@@ -15,7 +16,17 @@ export interface BreadcrumbProps {
     homeUrl?: string;
 }
 
+
+const CSS = `
+[data-theme="dark"] .laughtale-breadcrumb {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
+
 export default function BreadcrumbIsland(container: HTMLElement, props: BreadcrumbProps) {
+    injectIslandStyle('breadcrumb', CSS);
     const items = props.items || [];
     const homeUrl = props.homeUrl || '/';
 

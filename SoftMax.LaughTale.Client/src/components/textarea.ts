@@ -48,6 +48,14 @@ const CSS = `
     color: var(--p-surface-500);
     text-align: right;
 }
+[data-theme="dark"] .laughtale-textarea {
+    background: var(--p-surface-900);
+    color: var(--p-surface-100);
+    border-color: var(--p-surface-600);
+}
+[data-theme="dark"] .laughtale-textarea:disabled {
+    background: var(--p-surface-800);
+}
 `;
 
 export default function TextareaIsland(container: HTMLElement, props: TextareaProps) {

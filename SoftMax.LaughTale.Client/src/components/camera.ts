@@ -1,3 +1,4 @@
+import { injectIslandStyle } from '../runtime/styles';
 /**
  * SoftMax.LaughTale: Enterprise Live Hardware Camera & Photo Capture Component
  */
@@ -10,7 +11,32 @@ export interface CameraProps {
     title?: string;
 }
 
+
+const CSS = `
+[data-theme="dark"] .laughtale-camera-preview {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .retake-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .laughtale-camera {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .capture-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
+
 export default function CameraIsland(container: HTMLElement, props: CameraProps) {
+    injectIslandStyle('camera', CSS);
     let stream: MediaStream | null = null;
     let capturedPhotoData: string | null = null;
 

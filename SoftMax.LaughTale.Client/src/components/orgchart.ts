@@ -4,12 +4,33 @@
  */
 
 import { OrgChartNode } from '../types/models';
+import { injectIslandStyle } from '../runtime/styles';
 
 export interface OrgChartProps<T = any> {
     value?: OrgChartNode<T>;
 }
 
+
+const CSS = `
+[data-theme="dark"] .orgchart-node-table {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .orgchart-node-card {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .laughtale-orgchart {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
+
 export default function OrgChartIsland<T = any>(container: HTMLElement, props: OrgChartProps<T>) {
+    injectIslandStyle('orgchart', CSS);
     const rootNode: OrgChartNode<T> = props.value || {
         key: '0',
         label: 'Chief Technology Officer',

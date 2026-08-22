@@ -3,6 +3,7 @@
  */
 
 import { LucideIcons } from '../icons/lucide';
+import { injectIslandStyle } from '../runtime/styles';
 
 export interface InplaceProps {
     value?: string;
@@ -11,7 +12,37 @@ export interface InplaceProps {
     disabled?: boolean;
 }
 
+
+const CSS = `
+[data-theme="dark"] .laughtale-inplace-display {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .laughtale-inplace-editor {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .inplace-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-inplace-save {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-inplace-cancel {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
+
 export default function InplaceIsland(container: HTMLElement, props: InplaceProps) {
+    injectIslandStyle('inplace', CSS);
     let isEditing = false;
     let currentValue = props.value || '';
 

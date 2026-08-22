@@ -5,6 +5,7 @@
  */
 
 import { SelectButtonItem } from '../types/models';
+import { injectIslandStyle } from '../runtime/styles';
 import { LucideIcons } from '../icons/lucide';
 import { useKeyboardNav } from '../composables/useKeyboardNav';
 import { useDebounce } from '../composables/useDebounce';
@@ -18,7 +19,32 @@ export interface ListboxProps<T = string> {
     disabled?: boolean;
 }
 
+
+const CSS = `
+[data-theme="dark"] .laughtale-listbox {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .listbox-filter-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .listbox-items-container {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .listbox-item {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
+
 export default function ListboxIsland<T = string>(container: HTMLElement, props: ListboxProps<T>) {
+    injectIslandStyle('listbox', CSS);
     const options = props.options || [];
     let selected: Set<T> = new Set(props.selectedValue !== undefined ? [props.selectedValue] : []);
     let filterQuery = '';

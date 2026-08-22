@@ -1,3 +1,4 @@
+import { injectIslandStyle } from '../runtime/styles';
 /**
  * SoftMax.LaughTale: Enterprise OTP Verification Input Component (Aura InputOtp inspired)
  */
@@ -9,7 +10,27 @@ export interface InputOtpProps {
     disabled?: boolean;
 }
 
+
+const CSS = `
+[data-theme="dark"] .otp-box {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .otp-digit-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .laughtale-input-otp {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
+
 export default function InputOtpIsland(container: HTMLElement, props: InputOtpProps) {
+    injectIslandStyle('input-otp', CSS);
     const length = props.length || 6;
     let values: string[] = new Array(length).fill('');
 

@@ -1,3 +1,4 @@
+import { injectIslandStyle } from '../runtime/styles';
 export interface DropzoneProps {
     targetInputName: string;
     allowedExtensions: string;
@@ -5,7 +6,22 @@ export interface DropzoneProps {
     dropPrompt: string;
 }
 
+
+const CSS = `
+[data-theme="dark"] .dropzone-box {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .file-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
+
 export default function DropzoneIsland(container: HTMLElement, props: DropzoneProps) {
+    injectIslandStyle('dropzone', CSS);
     container.innerHTML = `
         <div style="display: flex; flex-direction: column; gap: 0.75rem;">
             <div style="display: flex; align-items: center; justify-content: space-between;">

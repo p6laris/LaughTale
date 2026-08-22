@@ -4,6 +4,7 @@
  */
 
 import { LucideIcons } from '../icons/lucide';
+import { injectIslandStyle } from '../runtime/styles';
 
 export interface InputPasswordProps {
     targetInputName?: string;
@@ -13,7 +14,27 @@ export interface InputPasswordProps {
     disabled?: boolean;
 }
 
+
+const CSS = `
+[data-theme="dark"] .password-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .toggle-mask-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .password-meter-wrap {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
+
 export default function InputPasswordIsland(container: HTMLElement, props: InputPasswordProps) {
+    injectIslandStyle('input-password', CSS);
     let isMasked = true;
     let currentPassword = '';
 

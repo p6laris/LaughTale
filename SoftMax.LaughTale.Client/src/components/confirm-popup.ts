@@ -3,6 +3,7 @@
  */
 
 import { LucideIcons } from '../icons/lucide';
+import { injectIslandStyle } from '../runtime/styles';
 
 export interface ConfirmPopupProps {
     targetSelector: string; // CSS selector of trigger button
@@ -12,7 +13,27 @@ export interface ConfirmPopupProps {
     actionName?: string;
 }
 
+
+const CSS = `
+[data-theme="dark"] .laughtale-confirm-popup {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-reject {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-accept {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
+
 export default function ConfirmPopupIsland(container: HTMLElement, props: ConfirmPopupProps) {
+    injectIslandStyle('confirm-popup', CSS);
     let isOpen = false;
 
     function render() {

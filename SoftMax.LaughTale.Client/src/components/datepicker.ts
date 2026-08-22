@@ -3,6 +3,7 @@
  */
 
 import { LucideIcons } from '../icons/lucide';
+import { injectIslandStyle } from '../runtime/styles';
 
 export interface DatePickerProps {
     targetInputName?: string;
@@ -12,7 +13,37 @@ export interface DatePickerProps {
     disabled?: boolean;
 }
 
+
+const CSS = `
+[data-theme="dark"] .calendar-day-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .laughtale-datepicker {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .dp-overlay {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-prev-month {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-next-month {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
+
 export default function DatePickerIsland(container: HTMLElement, props: DatePickerProps) {
+    injectIslandStyle('datepicker', CSS);
     let selectedDate = props.value ? new Date(props.value) : null;
     let viewYear = selectedDate ? selectedDate.getFullYear() : new Date().getFullYear();
     let viewMonth = selectedDate ? selectedDate.getMonth() : new Date().getMonth();

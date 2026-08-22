@@ -64,6 +64,13 @@ const CSS = `
     height: 0;
     margin: 0;
 }
+[data-theme="dark"] .laughtale-radio-circle {
+    background: var(--p-surface-900);
+    border-color: var(--p-surface-600);
+}
+[data-theme="dark"] .laughtale-radio-label {
+    color: var(--p-surface-200);
+}
 `;
 
 export default function RadioButtonIsland(container: HTMLElement, props: RadioButtonProps) {

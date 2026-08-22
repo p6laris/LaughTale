@@ -3,13 +3,24 @@
  */
 
 import { LucideIcons } from '../icons/lucide';
+import { injectIslandStyle } from '../runtime/styles';
 
 export interface ScrollTopProps {
     threshold?: number; // scroll threshold in px, default 200
     behavior?: 'smooth' | 'auto';
 }
 
+
+const CSS = `
+[data-theme="dark"] .laughtale-scroll-top-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
+
 export default function ScrollTopIsland(container: HTMLElement, props: ScrollTopProps) {
+    injectIslandStyle('scroll-top', CSS);
     const threshold = props.threshold || 200;
     let isVisible = false;
 

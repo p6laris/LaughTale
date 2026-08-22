@@ -1,3 +1,4 @@
+import { injectIslandStyle } from '../runtime/styles';
 /**
  * SoftMax.LaughTale: Enterprise Toast Notification Dispatcher Component
  */
@@ -10,7 +11,17 @@ export interface ToastMessage {
     durationMs?: number;
 }
 
+
+const CSS = `
+[data-theme="dark"] .laughtale-toast {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
+
 export default function ToastIsland(container: HTMLElement) {
+    injectIslandStyle('toast', CSS);
     const toastThemes = {
         success: { bg: '#ecfdf5', border: '#a7f3d0', color: '#047857', icon: '✓' },
         info: { bg: '#eff6ff', border: '#bfdbfe', color: '#1d4ed8', icon: 'ℹ' },

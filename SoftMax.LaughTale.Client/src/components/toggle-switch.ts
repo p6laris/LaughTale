@@ -1,3 +1,4 @@
+import { injectIslandStyle } from '../runtime/styles';
 /**
  * SoftMax.LaughTale: Enterprise ToggleSwitch Component (Aura ToggleSwitch inspired)
  */
@@ -9,7 +10,17 @@ export interface ToggleSwitchProps {
     disabled?: boolean;
 }
 
+
+const CSS = `
+[data-theme="dark"] .laughtale-toggle-switch {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
+
 export default function ToggleSwitchIsland(container: HTMLElement, props: ToggleSwitchProps) {
+    injectIslandStyle('toggle-switch', CSS);
     let isChecked = Boolean(props.checked);
 
     function render() {

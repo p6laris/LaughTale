@@ -5,6 +5,7 @@
  */
 
 import { SplitButtonItem, ButtonSeverity } from '../types/models';
+import { injectIslandStyle } from '../runtime/styles';
 import { LucideIcons } from '../icons/lucide';
 import { useDisclosure } from '../composables/useDisclosure';
 import { useClickOutside } from '../composables/useClickOutside';
@@ -18,7 +19,32 @@ export interface SplitButtonProps {
     disabled?: boolean;
 }
 
+
+const CSS = `
+[data-theme="dark"] .splitbutton-main-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .splitbutton-menu-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .splitbutton-menu-overlay {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .splitbutton-menu-item {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
+
 export default function SplitButtonIsland(container: HTMLElement, props: SplitButtonProps) {
+    injectIslandStyle('split-button', CSS);
     const label = props.label || 'Save';
     const items: SplitButtonItem[] = props.model || [
         { label: 'Update & Sync', icon: 'refresh-cw', action: 'update' },

@@ -4,6 +4,7 @@
  */
 
 import { LucideIcons } from '../icons/lucide';
+import { injectIslandStyle } from '../runtime/styles';
 import { useDisclosure } from '../composables/useDisclosure';
 import { useClickOutside } from '../composables/useClickOutside';
 import { useDebounce } from '../composables/useDebounce';
@@ -25,7 +26,42 @@ export interface AutoCompleteProps {
     disabled?: boolean;
 }
 
+
+const CSS = `
+[data-theme="dark"] .laughtale-autocomplete {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .autocomplete-input-wrap {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .autocomplete-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-clear-autocomplete {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .autocomplete-overlay {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .autocomplete-item {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
+
 export default function AutoCompleteIsland(container: HTMLElement, props: AutoCompleteProps) {
+    injectIslandStyle('autocomplete', CSS);
     const allItems = props.items || [];
     let selectedValue = props.value || '';
     let searchQuery = '';

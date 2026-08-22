@@ -1,3 +1,4 @@
+import { injectIslandStyle } from '../runtime/styles';
 /**
  * SoftMax.LaughTale: Enterprise Status Tag & Badge Component (Aura Tag inspired)
  */
@@ -9,7 +10,17 @@ export interface TagProps {
     icon?: string;
 }
 
+
+const CSS = `
+[data-theme="dark"] .laughtale-tag {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
+
 export default function TagIsland(container: HTMLElement, props: TagProps) {
+    injectIslandStyle('tag', CSS);
     const severity = props.severity || 'info';
     const isRounded = props.rounded || false;
 

@@ -5,6 +5,7 @@
  */
 
 import { TerminalCommand } from '../types/models';
+import { injectIslandStyle } from '../runtime/styles';
 import { useClipboard } from '../composables/useClipboard';
 
 export interface TerminalProps {
@@ -13,7 +14,32 @@ export interface TerminalProps {
     commands?: Record<string, string>;
 }
 
+
+const CSS = `
+[data-theme="dark"] .laughtale-terminal {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-copy-terminal {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .terminal-log {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .terminal-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
+
 export default function TerminalIsland(container: HTMLElement, props: TerminalProps) {
+    injectIslandStyle('terminal', CSS);
     const promptPrefix = props.prompt || 'admin@softmax:~$';
     const welcome = props.welcomeMessage || 'Welcome to SoftMax.LaughTale CLI v3.0\nType "help" for available commands.';
     const commands: Record<string, string> = {

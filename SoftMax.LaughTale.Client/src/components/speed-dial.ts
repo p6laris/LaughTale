@@ -4,6 +4,7 @@
  */
 
 import { LucideIcons } from '../icons/lucide';
+import { injectIslandStyle } from '../runtime/styles';
 import { useStagger } from '../composables/animation/useStagger';
 
 export interface SpeedDialAction {
@@ -18,7 +19,32 @@ export interface SpeedDialProps {
     icon?: string;
 }
 
+
+const CSS = `
+[data-theme="dark"] .speed-dial-action-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .laughtale-speed-dial {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .speed-dial-main-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .speed-dial-list {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
+
 export default function SpeedDialIsland(container: HTMLElement, props: SpeedDialProps) {
+    injectIslandStyle('speed-dial', CSS);
     let isOpen = false;
 
     function render() {

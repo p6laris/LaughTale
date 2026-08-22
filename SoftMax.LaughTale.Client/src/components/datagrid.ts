@@ -1,3 +1,4 @@
+import { injectIslandStyle } from '../runtime/styles';
 /**
  * SoftMax.LaughTale: Enterprise Filterable DataGrid Component
  */
@@ -15,7 +16,22 @@ export interface DataGridProps {
     title?: string;
 }
 
+
+const CSS = `
+[data-theme="dark"] .laughtale-datagrid {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .datagrid-search {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
+
 export default function DataGridIsland(container: HTMLElement, props: DataGridProps) {
+    injectIslandStyle('datagrid', CSS);
     let searchQuery = '';
     let sortField = props.columns[0]?.field || '';
     let sortAsc = true;

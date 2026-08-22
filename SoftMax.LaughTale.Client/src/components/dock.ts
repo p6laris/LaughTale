@@ -4,6 +4,7 @@
  */
 
 import { DockItem } from '../types/models';
+import { injectIslandStyle } from '../runtime/styles';
 import { LucideIcons } from '../icons/lucide';
 
 export interface DockProps {
@@ -11,7 +12,22 @@ export interface DockProps {
     position?: 'bottom' | 'top' | 'left' | 'right';
 }
 
+
+const CSS = `
+[data-theme="dark"] .laughtale-dock {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .dock-item-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
+
 export default function DockIsland(container: HTMLElement, props: DockProps) {
+    injectIslandStyle('dock', CSS);
     const items = props.items || [
         { label: 'Overview', icon: 'compass', url: '/' },
         { label: 'Dashboard', icon: 'bar-chart', url: '/dashboard' },

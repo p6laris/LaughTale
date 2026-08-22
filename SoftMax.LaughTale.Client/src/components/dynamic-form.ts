@@ -4,6 +4,7 @@
  */
 
 import { DynamicFormSchema, FormFieldMetadata } from '../types/models';
+import { injectIslandStyle } from '../runtime/styles';
 import { LucideIcons } from '../icons/lucide';
 
 export interface DynamicFormProps<T = Record<string, any>> {
@@ -12,7 +13,32 @@ export interface DynamicFormProps<T = Record<string, any>> {
     targetAction?: string;
 }
 
+
+const CSS = `
+[data-theme="dark"] .p-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .form-field-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .form-field-checkbox {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .laughtale-dynamic-form {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
+
 export default function DynamicFormIsland<T = Record<string, any>>(container: HTMLElement, props: DynamicFormProps<T>) {
+    injectIslandStyle('dynamic-form', CSS);
     let schema: DynamicFormSchema<T> | null = props.schema || null;
 
     if (!schema && props.schemaJson) {

@@ -1,3 +1,4 @@
+import { injectIslandStyle } from '../runtime/styles';
 /**
  * SoftMax.LaughTale: Enterprise MeterGroup Gauge Component (Aura MeterGroup inspired)
  */
@@ -15,7 +16,17 @@ export interface MeterGroupProps {
     showLabels?: boolean;
 }
 
+
+const CSS = `
+[data-theme="dark"] .laughtale-meter-group {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
+
 export default function MeterGroupIsland(container: HTMLElement, props: MeterGroupProps) {
+    injectIslandStyle('meter-group', CSS);
     const total = props.values.reduce((acc, curr) => acc + curr.value, 0);
 
     const barSegments = props.values.map((v) => {

@@ -1,3 +1,4 @@
+import { injectIslandStyle } from '../runtime/styles';
 /**
  * SoftMax.LaughTale: Enterprise Avatar & AvatarGroup Component (Aura AvatarGroup inspired)
  */
@@ -15,7 +16,17 @@ export interface AvatarGroupProps {
     size?: 'sm' | 'md' | 'lg';
 }
 
+
+const CSS = `
+[data-theme="dark"] .laughtale-avatar-group {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
+
 export default function AvatarGroupIsland(container: HTMLElement, props: AvatarGroupProps) {
+    injectIslandStyle('avatar-group', CSS);
     const max = props.max || 4;
     const visible = props.avatars.slice(0, max);
     const overflowCount = props.avatars.length - max;

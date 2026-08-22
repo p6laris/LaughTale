@@ -49,6 +49,33 @@ globalThis.IntersectionObserver = class {
 import { describe, it, beforeEach } from "node:test";
 import assert from "node:assert/strict";
 
+// src/directives/csp.ts
+function getCspNonce() {
+  if (typeof document === "undefined") return null;
+  const meta = document.querySelector('meta[name="csp-nonce"]');
+  return meta ? meta.content : null;
+}
+function applyNonceToStyle(style) {
+  const nonce = getCspNonce();
+  if (nonce) {
+    style.setAttribute("nonce", nonce);
+  }
+}
+
+// src/runtime/styles.ts
+var injectedStyles = /* @__PURE__ */ new Set();
+function injectIslandStyle(islandName, css) {
+  if (injectedStyles.has(islandName) || typeof document === "undefined") {
+    return;
+  }
+  injectedStyles.add(islandName);
+  const styleEl = document.createElement("style");
+  styleEl.setAttribute("data-island-style", islandName);
+  styleEl.textContent = css;
+  applyNonceToStyle(styleEl);
+  document.head.appendChild(styleEl);
+}
+
 // src/icons/lucide.ts
 var LucideIcons = {
   // Navigation & Arrows
@@ -105,7 +132,30 @@ var LucideIcons = {
 };
 
 // src/components/dynamic-form.ts
+var CSS = `
+[data-theme="dark"] .p-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .form-field-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .form-field-checkbox {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .laughtale-dynamic-form {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
 function DynamicFormIsland(container, props) {
+  injectIslandStyle("dynamic-form", CSS);
   let schema = props.schema || null;
   if (!schema && props.schemaJson) {
     try {
@@ -328,7 +378,30 @@ function useDragGesture(targetElement, options = {}) {
 }
 
 // src/components/splitter.ts
+var CSS2 = `
+[data-theme="dark"] .laughtale-splitter {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .splitter-panel-1 {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .splitter-gutter {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .splitter-panel-2 {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
 function SplitterIsland(container, props) {
+  injectIslandStyle("splitter", CSS2);
   const layout = props.layout || "horizontal";
   const isHorizontal = layout === "horizontal";
   const panels = props.panels && props.panels.length >= 2 ? props.panels : [
@@ -531,7 +604,70 @@ function useTransition(element, options = {}) {
 }
 
 // src/components/multiselect.ts
+var CSS3 = `
+[data-theme="dark"] .laughtale-multiselect {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .multiselect-trigger {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .p-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .multiselect-label-container {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .multiselect-clear-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .multiselect-chevron {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .multiselect-overlay {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .multiselect-filter-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .multiselect-select-all {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .multiselect-items-list {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .chip-remove-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .multiselect-item {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
 function MultiSelectIsland(container, props) {
+  injectIslandStyle("multiselect", CSS3);
   const options = props.options || [];
   let selected = new Set(props.selectedValues || []);
   let filterQuery = "";
@@ -791,7 +927,30 @@ function useDebounce(fn, delayMs = 250) {
 }
 
 // src/components/listbox.ts
+var CSS4 = `
+[data-theme="dark"] .laughtale-listbox {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .listbox-filter-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .listbox-items-container {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .listbox-item {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
 function ListboxIsland(container, props) {
+  injectIslandStyle("listbox", CSS4);
   const options = props.options || [];
   let selected = new Set(props.selectedValue !== void 0 ? [props.selectedValue] : []);
   let filterQuery = "";
@@ -952,7 +1111,60 @@ function useAutoAnimate(parent, options = {}) {
 }
 
 // src/components/picklist.ts
+var CSS5 = `
+[data-theme="dark"] .laughtale-picklist {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .picklist-source-list {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .picklist-item {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .source-item {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-move-to-target {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-move-all-to-target {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-move-to-source {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-move-all-to-source {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .picklist-target-list {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .target-item {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
 function PickListIsland(container, props) {
+  injectIslandStyle("picklist", CSS5);
   let sourceList = props.source ? [...props.source] : [
     { id: "1", name: "Identity & Access Manager" },
     { id: "2", name: "Audit Compliance Engine" },
@@ -1086,7 +1298,45 @@ function PickListIsland(container, props) {
 }
 
 // src/components/orderlist.ts
+var CSS6 = `
+[data-theme="dark"] .laughtale-orderlist {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-order-top {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-order-up {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-order-down {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-order-bottom {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .orderlist-items-container {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .orderlist-item {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
 function OrderListIsland(container, props) {
+  injectIslandStyle("orderlist", CSS6);
   let items = props.items ? [...props.items] : [
     { id: "1", name: "Phase 1: Zero-Trust Gateway Init", order: 0 },
     { id: "2", name: "Phase 2: Hydrate Islands Engine", order: 1 },
@@ -1230,7 +1480,30 @@ function useClipboard(options = {}) {
 }
 
 // src/components/terminal.ts
+var CSS7 = `
+[data-theme="dark"] .laughtale-terminal {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-copy-terminal {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .terminal-log {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .terminal-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
 function TerminalIsland(container, props) {
+  injectIslandStyle("terminal", CSS7);
   const promptPrefix = props.prompt || "admin@softmax:~$";
   const welcome = props.welcomeMessage || 'Welcome to SoftMax.LaughTale CLI v3.0\nType "help" for available commands.';
   const commands = {
@@ -1331,7 +1604,20 @@ ${h.response}`).join("\n");
 }
 
 // src/components/blockui.ts
+var CSS8 = `
+[data-theme="dark"] .laughtale-blockui-root {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .blockui-mask {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
 function BlockUIIsland(container, props) {
+  injectIslandStyle("blockui", CSS8);
   let isBlocked = props.blocked ?? true;
   function render() {
     container.innerHTML = `
@@ -1356,7 +1642,30 @@ function BlockUIIsland(container, props) {
 }
 
 // src/components/split-button.ts
+var CSS9 = `
+[data-theme="dark"] .splitbutton-main-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .splitbutton-menu-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .splitbutton-menu-overlay {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .splitbutton-menu-item {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
 function SplitButtonIsland(container, props) {
+  injectIslandStyle("split-button", CSS9);
   const label = props.label || "Save";
   const items = props.model || [
     { label: "Update & Sync", icon: "refresh-cw", action: "update" },

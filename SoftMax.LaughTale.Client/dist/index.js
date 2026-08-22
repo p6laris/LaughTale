@@ -2633,6 +2633,7 @@ var SoftMaxIslands = (() => {
     default: () => StepperIsland
   });
   function StepperIsland(container, props) {
+    injectIslandStyle("stepper", CSS);
     let currentStep = props.initialStep || 0;
     const totalSteps = props.steps.length;
     function render() {
@@ -2708,9 +2709,43 @@ var SoftMaxIslands = (() => {
     }
     render();
   }
+  var CSS;
   var init_stepper = __esm({
     "src/components/stepper.ts"() {
       "use strict";
+      init_styles();
+      CSS = `
+[data-theme="dark"] .stepper-item {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .laughtale-stepper {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .stepper-body {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .stepper-slot-container {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .step-prev-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .step-next-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -2720,6 +2755,7 @@ var SoftMaxIslands = (() => {
     default: () => TimelineIsland
   });
   function TimelineIsland(container, props) {
+    injectIslandStyle("timeline", CSS2);
     const statusBadges = {
       completed: { bg: "#ecfdf5", color: "#047857", border: "#a7f3d0", label: "Completed", dot: "#10b981" },
       in_progress: { bg: "#eff6ff", color: "#1d4ed8", border: "#bfdbfe", label: "In Progress", dot: "#3b82f6" },
@@ -2767,9 +2803,23 @@ var SoftMaxIslands = (() => {
         </div>
     `;
   }
+  var CSS2;
   var init_timeline = __esm({
     "src/components/timeline.ts"() {
       "use strict";
+      init_styles();
+      CSS2 = `
+[data-theme="dark"] .timeline-item {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .laughtale-timeline {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -2779,6 +2829,7 @@ var SoftMaxIslands = (() => {
     default: () => CameraIsland
   });
   function CameraIsland(container, props) {
+    injectIslandStyle("camera", CSS3);
     let stream = null;
     let capturedPhotoData = null;
     function render() {
@@ -2890,9 +2941,33 @@ var SoftMaxIslands = (() => {
       }
     };
   }
+  var CSS3;
   var init_camera = __esm({
     "src/components/camera.ts"() {
       "use strict";
+      init_styles();
+      CSS3 = `
+[data-theme="dark"] .laughtale-camera-preview {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .retake-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .laughtale-camera {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .capture-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -2902,6 +2977,7 @@ var SoftMaxIslands = (() => {
     default: () => DropzoneIsland
   });
   function DropzoneIsland(container, props) {
+    injectIslandStyle("dropzone", CSS4);
     container.innerHTML = `
         <div style="display: flex; flex-direction: column; gap: 0.75rem;">
             <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -2972,9 +3048,23 @@ var SoftMaxIslands = (() => {
         `;
     }
   }
+  var CSS4;
   var init_dropzone = __esm({
     "src/components/dropzone.ts"() {
       "use strict";
+      init_styles();
+      CSS4 = `
+[data-theme="dark"] .dropzone-box {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .file-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -2984,6 +3074,7 @@ var SoftMaxIslands = (() => {
     default: () => CascadeTreeIsland
   });
   function CascadeTreeIsland(container, props) {
+    injectIslandStyle("tree-select", CSS5);
     const allDepartments = props.departments || [];
     let selectedId = props.selectedValue || "";
     let selectedName = "";
@@ -3220,14 +3311,43 @@ var SoftMaxIslands = (() => {
       }));
     }
   }
+  var CSS5;
   var init_tree_select = __esm({
     "src/components/tree-select.ts"() {
       "use strict";
       init_lucide();
+      init_styles();
       init_useDisclosure();
       init_useClickOutside();
       init_useTransition();
       init_useDebounce();
+      CSS5 = `
+[data-theme="dark"] .laughtale-tree-select {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .tree-trigger-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .tree-clear-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .tree-dropdown-menu {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .tree-search-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -3237,6 +3357,7 @@ var SoftMaxIslands = (() => {
     default: () => DataGridIsland
   });
   function DataGridIsland(container, props) {
+    injectIslandStyle("datagrid", CSS6);
     let searchQuery = "";
     let sortField = props.columns[0]?.field || "";
     let sortAsc = true;
@@ -3346,9 +3467,23 @@ var SoftMaxIslands = (() => {
     }
     render();
   }
+  var CSS6;
   var init_datagrid = __esm({
     "src/components/datagrid.ts"() {
       "use strict";
+      init_styles();
+      CSS6 = `
+[data-theme="dark"] .laughtale-datagrid {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .datagrid-search {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -3427,7 +3562,9 @@ var SoftMaxIslands = (() => {
                 </div>
             </div>
         </div>
-    `;
+    
+  [data-theme="dark"] .dummy-dark {}
+`;
     const openBtn = container.querySelector(".modal-open-btn");
     const overlay = container.querySelector(".modal-overlay");
     const dialog = container.querySelector(".aura-dialog");
@@ -3472,6 +3609,7 @@ var SoftMaxIslands = (() => {
     default: () => ToastIsland
   });
   function ToastIsland(container) {
+    injectIslandStyle("toast", CSS7);
     const toastThemes = {
       success: { bg: "#ecfdf5", border: "#a7f3d0", color: "#047857", icon: "\u2713" },
       info: { bg: "#eff6ff", border: "#bfdbfe", color: "#1d4ed8", icon: "\u2139" },
@@ -3525,9 +3663,18 @@ var SoftMaxIslands = (() => {
       if (e.detail) addToast(e.detail);
     });
   }
+  var CSS7;
   var init_toast = __esm({
     "src/components/toast.ts"() {
       "use strict";
+      init_styles();
+      CSS7 = `
+[data-theme="dark"] .laughtale-toast {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -3537,6 +3684,7 @@ var SoftMaxIslands = (() => {
     default: () => InputNumberIsland
   });
   function InputNumberIsland(container, props) {
+    injectIslandStyle("input-number", CSS8);
     let rawValue = props.value !== void 0 ? Number(props.value) : null;
     const step = props.step || 1;
     const decimals = props.decimals !== void 0 ? props.decimals : props.mode === "currency" ? 2 : 0;
@@ -3622,10 +3770,34 @@ var SoftMaxIslands = (() => {
     render();
     syncValue();
   }
+  var CSS8;
   var init_input_number = __esm({
     "src/components/input-number.ts"() {
       "use strict";
       init_lucide();
+      init_styles();
+      CSS8 = `
+[data-theme="dark"] .laughtale-input-number {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .number-display-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-step-up {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-step-down {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -3635,6 +3807,7 @@ var SoftMaxIslands = (() => {
     default: () => InputOtpIsland
   });
   function InputOtpIsland(container, props) {
+    injectIslandStyle("input-otp", CSS9);
     const length = props.length || 6;
     let values = new Array(length).fill("");
     function render() {
@@ -3721,9 +3894,28 @@ var SoftMaxIslands = (() => {
     render();
     syncOtp();
   }
+  var CSS9;
   var init_input_otp = __esm({
     "src/components/input-otp.ts"() {
       "use strict";
+      init_styles();
+      CSS9 = `
+[data-theme="dark"] .otp-box {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .otp-digit-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .laughtale-input-otp {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -3733,6 +3925,7 @@ var SoftMaxIslands = (() => {
     default: () => InputPasswordIsland
   });
   function InputPasswordIsland(container, props) {
+    injectIslandStyle("input-password", CSS10);
     let isMasked = true;
     let currentPassword = "";
     function calculateStrength(pwd) {
@@ -3823,10 +4016,29 @@ var SoftMaxIslands = (() => {
     });
     syncValue();
   }
+  var CSS10;
   var init_input_password = __esm({
     "src/components/input-password.ts"() {
       "use strict";
       init_lucide();
+      init_styles();
+      CSS10 = `
+[data-theme="dark"] .password-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .toggle-mask-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .password-meter-wrap {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -3836,6 +4048,7 @@ var SoftMaxIslands = (() => {
     default: () => ToggleSwitchIsland
   });
   function ToggleSwitchIsland(container, props) {
+    injectIslandStyle("toggle-switch", CSS11);
     let isChecked = Boolean(props.checked);
     function render() {
       container.innerHTML = `
@@ -3874,9 +4087,18 @@ var SoftMaxIslands = (() => {
     render();
     syncValue();
   }
+  var CSS11;
   var init_toggle_switch = __esm({
     "src/components/toggle-switch.ts"() {
       "use strict";
+      init_styles();
+      CSS11 = `
+[data-theme="dark"] .laughtale-toggle-switch {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -3886,6 +4108,7 @@ var SoftMaxIslands = (() => {
     default: () => SliderIsland
   });
   function SliderIsland(container, props) {
+    injectIslandStyle("slider", CSS12);
     const min = props.min !== void 0 ? props.min : 0;
     const max = props.max !== void 0 ? props.max : 100;
     const step = props.step !== void 0 ? props.step : 1;
@@ -3988,9 +4211,38 @@ var SoftMaxIslands = (() => {
     }
     syncValue();
   }
+  var CSS12;
   var init_slider = __esm({
     "src/components/slider.ts"() {
       "use strict";
+      init_styles();
+      CSS12 = `
+[data-theme="dark"] .laughtale-slider {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .slider-track {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .slider-fill {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .slider-handle {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .slider-value-display {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -4000,6 +4252,7 @@ var SoftMaxIslands = (() => {
     default: () => RatingIsland
   });
   function RatingIsland(container, props) {
+    injectIslandStyle("rating", CSS13);
     const totalStars = props.stars || 5;
     let currentRating = props.value || 0;
     let hoverRating = 0;
@@ -4067,10 +4320,29 @@ var SoftMaxIslands = (() => {
     render();
     syncValue();
   }
+  var CSS13;
   var init_rating = __esm({
     "src/components/rating.ts"() {
       "use strict";
       init_lucide();
+      init_styles();
+      CSS13 = `
+[data-theme="dark"] .rating-star {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .laughtale-rating {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .rating-cancel-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -4080,6 +4352,7 @@ var SoftMaxIslands = (() => {
     default: () => SelectButtonIsland
   });
   function SelectButtonIsland(container, props) {
+    injectIslandStyle("select-button", CSS14);
     let selectedValue = props.value || props.items[0]?.value || "";
     function render() {
       const buttons = props.items.map((item) => {
@@ -4127,9 +4400,23 @@ var SoftMaxIslands = (() => {
     }
     render();
   }
+  var CSS14;
   var init_select_button = __esm({
     "src/components/select-button.ts"() {
       "use strict";
+      init_styles();
+      CSS14 = `
+[data-theme="dark"] .select-btn-item {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .laughtale-select-button {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -4139,6 +4426,7 @@ var SoftMaxIslands = (() => {
     default: () => ChipsIsland
   });
   function ChipsIsland(container, props) {
+    injectIslandStyle("chips", CSS15);
     const [getChips, setChips] = useControllableState({
       defaultValue: props.values ? [...props.values] : [],
       onChange: (val) => {
@@ -4215,12 +4503,36 @@ var SoftMaxIslands = (() => {
     render();
     syncValue(getChips());
   }
+  var CSS15;
   var init_chips = __esm({
     "src/components/chips.ts"() {
       "use strict";
       init_lucide();
+      init_styles();
       init_useAutoAnimate();
       init_useControllableState();
+      CSS15 = `
+[data-theme="dark"] .chip-item {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .remove-chip-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .laughtale-chips {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .chip-text-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -4230,6 +4542,7 @@ var SoftMaxIslands = (() => {
     default: () => DatePickerIsland
   });
   function DatePickerIsland(container, props) {
+    injectIslandStyle("datepicker", CSS16);
     let selectedDate = props.value ? new Date(props.value) : null;
     let viewYear = selectedDate ? selectedDate.getFullYear() : (/* @__PURE__ */ new Date()).getFullYear();
     let viewMonth = selectedDate ? selectedDate.getMonth() : (/* @__PURE__ */ new Date()).getMonth();
@@ -4360,10 +4673,39 @@ var SoftMaxIslands = (() => {
     });
     render();
   }
+  var CSS16;
   var init_datepicker = __esm({
     "src/components/datepicker.ts"() {
       "use strict";
       init_lucide();
+      init_styles();
+      CSS16 = `
+[data-theme="dark"] .calendar-day-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .laughtale-datepicker {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .dp-overlay {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-prev-month {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-next-month {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -4373,6 +4715,7 @@ var SoftMaxIslands = (() => {
     default: () => MeterGroupIsland
   });
   function MeterGroupIsland(container, props) {
+    injectIslandStyle("meter-group", CSS17);
     const total = props.values.reduce((acc, curr) => acc + curr.value, 0);
     const barSegments = props.values.map((v) => {
       const pct = total > 0 ? v.value / total * 100 : 0;
@@ -4405,9 +4748,18 @@ var SoftMaxIslands = (() => {
         </div>
     `;
   }
+  var CSS17;
   var init_meter_group = __esm({
     "src/components/meter-group.ts"() {
       "use strict";
+      init_styles();
+      CSS17 = `
+[data-theme="dark"] .laughtale-meter-group {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -4417,6 +4769,7 @@ var SoftMaxIslands = (() => {
     default: () => AvatarGroupIsland
   });
   function AvatarGroupIsland(container, props) {
+    injectIslandStyle("avatar-group", CSS18);
     const max = props.max || 4;
     const visible = props.avatars.slice(0, max);
     const overflowCount = props.avatars.length - max;
@@ -4441,9 +4794,18 @@ var SoftMaxIslands = (() => {
         </div>
     `;
   }
+  var CSS18;
   var init_avatar_group = __esm({
     "src/components/avatar-group.ts"() {
       "use strict";
+      init_styles();
+      CSS18 = `
+[data-theme="dark"] .laughtale-avatar-group {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -4453,6 +4815,7 @@ var SoftMaxIslands = (() => {
     default: () => ProgressBarIsland
   });
   function ProgressBarIsland(container, props) {
+    injectIslandStyle("progress-bar", CSS19);
     const isIndeterminate = props.mode === "indeterminate" || props.value === void 0;
     const value = Math.max(0, Math.min(100, props.value || 0));
     const height = props.height || "0.75rem";
@@ -4483,9 +4846,18 @@ var SoftMaxIslands = (() => {
         `;
     }
   }
+  var CSS19;
   var init_progress_bar = __esm({
     "src/components/progress-bar.ts"() {
       "use strict";
+      init_styles();
+      CSS19 = `
+[data-theme="dark"] .laughtale-progress-bar {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -4495,6 +4867,7 @@ var SoftMaxIslands = (() => {
     default: () => SkeletonIsland
   });
   function SkeletonIsland(container, props) {
+    injectIslandStyle("skeleton", CSS20);
     const shape = props.shape || "rectangle";
     const width = props.width || "100%";
     const height = props.height || "1.25rem";
@@ -4509,9 +4882,18 @@ var SoftMaxIslands = (() => {
         </style>
     `;
   }
+  var CSS20;
   var init_skeleton = __esm({
     "src/components/skeleton.ts"() {
       "use strict";
+      init_styles();
+      CSS20 = `
+[data-theme="dark"] .laughtale-skeleton {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -4521,6 +4903,7 @@ var SoftMaxIslands = (() => {
     default: () => DrawerIsland
   });
   function DrawerIsland(container, props) {
+    injectIslandStyle("drawer", CSS21);
     const position = props.position || "right";
     const width = props.width || "380px";
     function render() {
@@ -4587,12 +4970,51 @@ var SoftMaxIslands = (() => {
     }
     render();
   }
+  var CSS21;
   var init_drawer = __esm({
     "src/components/drawer.ts"() {
       "use strict";
       init_lucide();
+      init_styles();
       init_useDisclosure();
       init_useFocusTrap();
+      CSS21 = `
+[data-theme="dark"] .laughtale-drawer-wrapper {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .drawer-open-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .drawer-backdrop {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .drawer-panel {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .drawer-close-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .drawer-body {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .drawer-slot-container {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -4602,6 +5024,7 @@ var SoftMaxIslands = (() => {
     default: () => SpeedDialIsland
   });
   function SpeedDialIsland(container, props) {
+    injectIslandStyle("speed-dial", CSS22);
     let isOpen = false;
     function render() {
       const actionItems = props.actions.map((act) => `
@@ -4648,11 +5071,35 @@ var SoftMaxIslands = (() => {
     }
     render();
   }
+  var CSS22;
   var init_speed_dial = __esm({
     "src/components/speed-dial.ts"() {
       "use strict";
       init_lucide();
+      init_styles();
       init_useStagger();
+      CSS22 = `
+[data-theme="dark"] .speed-dial-action-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .laughtale-speed-dial {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .speed-dial-main-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .speed-dial-list {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -4662,6 +5109,7 @@ var SoftMaxIslands = (() => {
     default: () => ImageCompareIsland
   });
   function ImageCompareIsland(container, props) {
+    injectIslandStyle("image-compare", CSS23);
     let splitPercent = 50;
     container.innerHTML = `
         <div class="laughtale-image-compare" style="position: relative; width: 100%; max-width: 600px; height: 340px; border-radius: var(--p-border-radius-lg); overflow: hidden; user-select: none; border: 1px solid var(--p-border-color); box-shadow: var(--p-shadow-md); touch-action: none; cursor: ew-resize;">
@@ -4737,9 +5185,18 @@ var SoftMaxIslands = (() => {
     window.addEventListener("mousemove", onPointerMove);
     window.addEventListener("mouseup", onPointerUp);
   }
+  var CSS23;
   var init_image_compare = __esm({
     "src/components/image-compare.ts"() {
       "use strict";
+      init_styles();
+      CSS23 = `
+[data-theme="dark"] .laughtale-image-compare {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -4749,6 +5206,7 @@ var SoftMaxIslands = (() => {
     default: () => ConfirmPopupIsland
   });
   function ConfirmPopupIsland(container, props) {
+    injectIslandStyle("confirm-popup", CSS24);
     let isOpen = false;
     function render() {
       container.innerHTML = `
@@ -4798,10 +5256,29 @@ var SoftMaxIslands = (() => {
     }
     render();
   }
+  var CSS24;
   var init_confirm_popup = __esm({
     "src/components/confirm-popup.ts"() {
       "use strict";
       init_lucide();
+      init_styles();
+      CSS24 = `
+[data-theme="dark"] .laughtale-confirm-popup {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-reject {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-accept {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -4811,6 +5288,7 @@ var SoftMaxIslands = (() => {
     default: () => AccordionIsland
   });
   function AccordionIsland(container, props) {
+    injectIslandStyle("accordion", CSS25);
     const tabs = props.tabs || [];
     let activeIndices = /* @__PURE__ */ new Set();
     if (Array.isArray(props.activeIndex)) {
@@ -4900,12 +5378,41 @@ var SoftMaxIslands = (() => {
     }
     render();
   }
+  var CSS25;
   var init_accordion = __esm({
     "src/components/accordion.ts"() {
       "use strict";
       init_lucide();
+      init_styles();
       init_useDisclosure();
       init_useTransition();
+      CSS25 = `
+[data-theme="dark"] .accordion-tab {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .accordion-header-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .accordion-content {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .tab-slot {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .laughtale-accordion {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -4915,6 +5422,7 @@ var SoftMaxIslands = (() => {
     default: () => TabsIsland
   });
   function TabsIsland(container, props) {
+    injectIslandStyle("tabs", CSS26);
     const tabs = props.tabs || [];
     let activeIndex = props.activeIndex || 0;
     function render() {
@@ -4974,9 +5482,38 @@ var SoftMaxIslands = (() => {
     }
     render();
   }
+  var CSS26;
   var init_tabs = __esm({
     "src/components/tabs.ts"() {
       "use strict";
+      init_styles();
+      CSS26 = `
+[data-theme="dark"] .tab-header-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .laughtale-tabs {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .tabs-header-bar {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .tab-panel-body {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .tab-slot-content {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -4986,6 +5523,7 @@ var SoftMaxIslands = (() => {
     default: () => AutoCompleteIsland
   });
   function AutoCompleteIsland(container, props) {
+    injectIslandStyle("autocomplete", CSS27);
     const allItems = props.items || [];
     let selectedValue = props.value || "";
     let searchQuery = "";
@@ -5117,15 +5655,49 @@ var SoftMaxIslands = (() => {
       }));
     }
   }
+  var CSS27;
   var init_autocomplete = __esm({
     "src/components/autocomplete.ts"() {
       "use strict";
       init_lucide();
+      init_styles();
       init_useDisclosure();
       init_useClickOutside();
       init_useDebounce();
       init_useKeyboardNav();
       init_useTransition();
+      CSS27 = `
+[data-theme="dark"] .laughtale-autocomplete {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .autocomplete-input-wrap {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .autocomplete-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-clear-autocomplete {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .autocomplete-overlay {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .autocomplete-item {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -5135,6 +5707,7 @@ var SoftMaxIslands = (() => {
     default: () => ColorPickerIsland
   });
   function ColorPickerIsland(container, props) {
+    injectIslandStyle("color-picker", CSS28);
     let currentColor = props.value || "#10b981";
     let isOpen = false;
     const swatchesHtml = DEFAULT_PRESETS.map((c) => `
@@ -5258,10 +5831,11 @@ var SoftMaxIslands = (() => {
     }
     syncValue();
   }
-  var DEFAULT_PRESETS;
+  var DEFAULT_PRESETS, CSS28;
   var init_color_picker = __esm({
     "src/components/color-picker.ts"() {
       "use strict";
+      init_styles();
       DEFAULT_PRESETS = [
         "#10b981",
         "#059669",
@@ -5279,6 +5853,33 @@ var SoftMaxIslands = (() => {
         "#1e293b",
         "#000000"
       ];
+      CSS28 = `
+[data-theme="dark"] .color-swatch-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .colorpicker-trigger-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .colorpicker-palette-overlay {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .color-native-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .color-hex-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -5288,6 +5889,7 @@ var SoftMaxIslands = (() => {
     default: () => KnobIsland
   });
   function KnobIsland(container, props) {
+    injectIslandStyle("knob", CSS29);
     const min = props.min !== void 0 ? props.min : 0;
     const max = props.max !== void 0 ? props.max : 100;
     const step = props.step || 1;
@@ -5389,9 +5991,28 @@ var SoftMaxIslands = (() => {
     }
     syncValue();
   }
+  var CSS29;
   var init_knob = __esm({
     "src/components/knob.ts"() {
       "use strict";
+      init_styles();
+      CSS29 = `
+[data-theme="dark"] .laughtale-knob {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .knob-progress-circle {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .knob-value-display {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -5401,6 +6022,7 @@ var SoftMaxIslands = (() => {
     default: () => TagIsland
   });
   function TagIsland(container, props) {
+    injectIslandStyle("tag", CSS30);
     const severity = props.severity || "info";
     const isRounded = props.rounded || false;
     let bg = "var(--p-blue-50, #eff6ff)";
@@ -5434,9 +6056,18 @@ var SoftMaxIslands = (() => {
         </span>
     `;
   }
+  var CSS30;
   var init_tag = __esm({
     "src/components/tag.ts"() {
       "use strict";
+      init_styles();
+      CSS30 = `
+[data-theme="dark"] .laughtale-tag {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -5446,6 +6077,7 @@ var SoftMaxIslands = (() => {
     default: () => BreadcrumbIsland
   });
   function BreadcrumbIsland(container, props) {
+    injectIslandStyle("breadcrumb", CSS31);
     const items = props.items || [];
     const homeUrl = props.homeUrl || "/";
     const itemsHtml = items.map((item, idx) => {
@@ -5480,10 +6112,19 @@ var SoftMaxIslands = (() => {
         </nav>
     `;
   }
+  var CSS31;
   var init_breadcrumb = __esm({
     "src/components/breadcrumb.ts"() {
       "use strict";
       init_lucide();
+      init_styles();
+      CSS31 = `
+[data-theme="dark"] .laughtale-breadcrumb {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -5493,6 +6134,7 @@ var SoftMaxIslands = (() => {
     default: () => ScrollTopIsland
   });
   function ScrollTopIsland(container, props) {
+    injectIslandStyle("scroll-top", CSS32);
     const threshold = props.threshold || 200;
     let isVisible = false;
     function render() {
@@ -5518,10 +6160,19 @@ var SoftMaxIslands = (() => {
     window.addEventListener("scroll", checkScroll, { passive: true });
     render();
   }
+  var CSS32;
   var init_scroll_top = __esm({
     "src/components/scroll-top.ts"() {
       "use strict";
       init_lucide();
+      init_styles();
+      CSS32 = `
+[data-theme="dark"] .laughtale-scroll-top-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -5531,6 +6182,7 @@ var SoftMaxIslands = (() => {
     default: () => InplaceIsland
   });
   function InplaceIsland(container, props) {
+    injectIslandStyle("inplace", CSS33);
     let isEditing = false;
     let currentValue = props.value || "";
     function render() {
@@ -5610,10 +6262,39 @@ var SoftMaxIslands = (() => {
     render();
     syncValue();
   }
+  var CSS33;
   var init_inplace = __esm({
     "src/components/inplace.ts"() {
       "use strict";
       init_lucide();
+      init_styles();
+      CSS33 = `
+[data-theme="dark"] .laughtale-inplace-display {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .laughtale-inplace-editor {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .inplace-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-inplace-save {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-inplace-cancel {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -5623,6 +6304,7 @@ var SoftMaxIslands = (() => {
     default: () => CommandPaletteIsland
   });
   function CommandPaletteIsland(container, props) {
+    injectIslandStyle("command", CSS34);
     const placeholder = props.placeholder || "Type a command or search...";
     const items = props.items || [
       { id: "home", label: "Go to Overview", group: "Navigation", icon: "compass", url: "/", shortcut: "G H" },
@@ -5796,14 +6478,48 @@ var SoftMaxIslands = (() => {
     ]);
     document.addEventListener("command:open", () => open());
   }
+  var CSS34;
   var init_command = __esm({
     "src/components/command.ts"() {
       "use strict";
       init_lucide();
+      init_styles();
       init_useDisclosure();
       init_useFocusTrap();
       init_useHotkeys();
       init_useScrollLock();
+      CSS34 = `
+[data-theme="dark"] .laughtale-command-root {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .command-backdrop {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .command-dialog {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .command-search-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .command-items-container {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .command-item {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -6175,6 +6891,7 @@ public static class AppTheme
     default: () => DynamicFormIsland
   });
   function DynamicFormIsland(container, props) {
+    injectIslandStyle("dynamic-form", CSS35);
     let schema = props.schema || null;
     if (!schema && props.schemaJson) {
       try {
@@ -6335,10 +7052,34 @@ public static class AppTheme
     }
     render();
   }
+  var CSS35;
   var init_dynamic_form = __esm({
     "src/components/dynamic-form.ts"() {
       "use strict";
+      init_styles();
       init_lucide();
+      CSS35 = `
+[data-theme="dark"] .p-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .form-field-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .form-field-checkbox {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .laughtale-dynamic-form {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -6348,6 +7089,7 @@ public static class AppTheme
     default: () => SplitterIsland
   });
   function SplitterIsland(container, props) {
+    injectIslandStyle("splitter", CSS36);
     const layout = props.layout || "horizontal";
     const isHorizontal = layout === "horizontal";
     const panels = props.panels && props.panels.length >= 2 ? props.panels : [
@@ -6390,10 +7132,34 @@ public static class AppTheme
       }
     });
   }
+  var CSS36;
   var init_splitter = __esm({
     "src/components/splitter.ts"() {
       "use strict";
+      init_styles();
       init_useDragGesture();
+      CSS36 = `
+[data-theme="dark"] .laughtale-splitter {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .splitter-panel-1 {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .splitter-gutter {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .splitter-panel-2 {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -6403,6 +7169,7 @@ public static class AppTheme
     default: () => MultiSelectIsland
   });
   function MultiSelectIsland(container, props) {
+    injectIslandStyle("multiselect", CSS37);
     const options = props.options || [];
     let selected = new Set(props.selectedValues || []);
     let filterQuery = "";
@@ -6568,13 +7335,77 @@ public static class AppTheme
     renderDisplay();
     syncValue();
   }
+  var CSS37;
   var init_multiselect = __esm({
     "src/components/multiselect.ts"() {
       "use strict";
+      init_styles();
       init_lucide();
       init_useDisclosure();
       init_useClickOutside();
       init_useTransition();
+      CSS37 = `
+[data-theme="dark"] .laughtale-multiselect {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .multiselect-trigger {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .p-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .multiselect-label-container {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .multiselect-clear-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .multiselect-chevron {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .multiselect-overlay {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .multiselect-filter-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .multiselect-select-all {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .multiselect-items-list {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .chip-remove-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .multiselect-item {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -6584,6 +7415,7 @@ public static class AppTheme
     default: () => CascadeSelectIsland
   });
   function CascadeSelectIsland(container, props) {
+    injectIslandStyle("cascadeselect", CSS38);
     const options = props.options || [];
     let selectedText = "";
     let selectedValue = null;
@@ -6672,13 +7504,52 @@ public static class AppTheme
       }));
     }
   }
+  var CSS38;
   var init_cascadeselect = __esm({
     "src/components/cascadeselect.ts"() {
       "use strict";
+      init_styles();
       init_lucide();
       init_useDisclosure();
       init_useClickOutside();
       init_useTransition();
+      CSS38 = `
+[data-theme="dark"] .laughtale-cascadeselect {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .cascadeselect-trigger {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .p-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .cascadeselect-label {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .cascadeselect-chevron {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .cascadeselect-overlay {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .cascade-item {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -6688,6 +7559,7 @@ public static class AppTheme
     default: () => ListboxIsland
   });
   function ListboxIsland(container, props) {
+    injectIslandStyle("listbox", CSS39);
     const options = props.options || [];
     let selected = new Set(props.selectedValue !== void 0 ? [props.selectedValue] : []);
     let filterQuery = "";
@@ -6789,12 +7661,36 @@ public static class AppTheme
     renderList();
     syncValue();
   }
+  var CSS39;
   var init_listbox = __esm({
     "src/components/listbox.ts"() {
       "use strict";
+      init_styles();
       init_lucide();
       init_useKeyboardNav();
       init_useDebounce();
+      CSS39 = `
+[data-theme="dark"] .laughtale-listbox {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .listbox-filter-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .listbox-items-container {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .listbox-item {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -6804,6 +7700,7 @@ public static class AppTheme
     default: () => PickListIsland
   });
   function PickListIsland(container, props) {
+    injectIslandStyle("picklist", CSS40);
     let sourceList = props.source ? [...props.source] : [
       { id: "1", name: "Identity & Access Manager" },
       { id: "2", name: "Audit Compliance Engine" },
@@ -6935,11 +7832,65 @@ public static class AppTheme
     render();
     syncValues();
   }
+  var CSS40;
   var init_picklist = __esm({
     "src/components/picklist.ts"() {
       "use strict";
+      init_styles();
       init_lucide();
       init_useAutoAnimate();
+      CSS40 = `
+[data-theme="dark"] .laughtale-picklist {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .picklist-source-list {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .picklist-item {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .source-item {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-move-to-target {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-move-all-to-target {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-move-to-source {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-move-all-to-source {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .picklist-target-list {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .target-item {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -6949,6 +7900,7 @@ public static class AppTheme
     default: () => OrderListIsland
   });
   function OrderListIsland(container, props) {
+    injectIslandStyle("orderlist", CSS41);
     let items = props.items ? [...props.items] : [
       { id: "1", name: "Phase 1: Zero-Trust Gateway Init", order: 0 },
       { id: "2", name: "Phase 2: Hydrate Islands Engine", order: 1 },
@@ -7048,10 +8000,49 @@ public static class AppTheme
     render();
     syncValues();
   }
+  var CSS41;
   var init_orderlist = __esm({
     "src/components/orderlist.ts"() {
       "use strict";
+      init_styles();
       init_useAutoAnimate();
+      CSS41 = `
+[data-theme="dark"] .laughtale-orderlist {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-order-top {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-order-up {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-order-down {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-order-bottom {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .orderlist-items-container {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .orderlist-item {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -7061,6 +8052,7 @@ public static class AppTheme
     default: () => OrgChartIsland
   });
   function OrgChartIsland(container, props) {
+    injectIslandStyle("orgchart", CSS42);
     const rootNode = props.value || {
       key: "0",
       label: "Chief Technology Officer",
@@ -7135,9 +8127,28 @@ public static class AppTheme
       });
     });
   }
+  var CSS42;
   var init_orgchart = __esm({
     "src/components/orgchart.ts"() {
       "use strict";
+      init_styles();
+      CSS42 = `
+[data-theme="dark"] .orgchart-node-table {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .orgchart-node-card {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .laughtale-orgchart {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -7147,6 +8158,7 @@ public static class AppTheme
     default: () => TerminalIsland
   });
   function TerminalIsland(container, props) {
+    injectIslandStyle("terminal", CSS43);
     const promptPrefix = props.prompt || "admin@softmax:~$";
     const welcome = props.welcomeMessage || 'Welcome to SoftMax.LaughTale CLI v3.0\nType "help" for available commands.';
     const commands = {
@@ -7245,10 +8257,34 @@ ${h.response}`).join("\n");
     }
     render();
   }
+  var CSS43;
   var init_terminal = __esm({
     "src/components/terminal.ts"() {
       "use strict";
+      init_styles();
       init_useClipboard();
+      CSS43 = `
+[data-theme="dark"] .laughtale-terminal {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .btn-copy-terminal {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .terminal-log {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .terminal-input {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -7258,6 +8294,7 @@ ${h.response}`).join("\n");
     default: () => DockIsland
   });
   function DockIsland(container, props) {
+    injectIslandStyle("dock", CSS44);
     const items = props.items || [
       { label: "Overview", icon: "compass", url: "/" },
       { label: "Dashboard", icon: "bar-chart", url: "/dashboard" },
@@ -7299,10 +8336,24 @@ ${h.response}`).join("\n");
       });
     });
   }
+  var CSS44;
   var init_dock = __esm({
     "src/components/dock.ts"() {
       "use strict";
+      init_styles();
       init_lucide();
+      CSS44 = `
+[data-theme="dark"] .laughtale-dock {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .dock-item-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -7312,6 +8363,7 @@ ${h.response}`).join("\n");
     default: () => GalleriaIsland
   });
   function GalleriaIsland(container, props) {
+    injectIslandStyle("galleria", CSS45);
     const images = props.value && props.value.length > 0 ? props.value : [
       {
         itemImageSrc: "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800&auto=format&fit=crop&q=80",
@@ -7385,10 +8437,34 @@ ${h.response}`).join("\n");
     }
     render();
   }
+  var CSS45;
   var init_galleria = __esm({
     "src/components/galleria.ts"() {
       "use strict";
+      init_styles();
       init_lucide();
+      CSS45 = `
+[data-theme="dark"] .laughtale-galleria {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .galleria-prev-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .galleria-next-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .galleria-thumb {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -7398,6 +8474,7 @@ ${h.response}`).join("\n");
     default: () => BlockUIIsland
   });
   function BlockUIIsland(container, props) {
+    injectIslandStyle("blockui", CSS46);
     let isBlocked = props.blocked ?? true;
     function render() {
       container.innerHTML = `
@@ -7420,9 +8497,23 @@ ${h.response}`).join("\n");
       render();
     });
   }
+  var CSS46;
   var init_blockui = __esm({
     "src/components/blockui.ts"() {
       "use strict";
+      init_styles();
+      CSS46 = `
+[data-theme="dark"] .laughtale-blockui-root {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .blockui-mask {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 
@@ -7432,6 +8523,7 @@ ${h.response}`).join("\n");
     default: () => SplitButtonIsland
   });
   function SplitButtonIsland(container, props) {
+    injectIslandStyle("split-button", CSS47);
     const label = props.label || "Save";
     const items = props.model || [
       { label: "Update & Sync", icon: "refresh-cw", action: "update" },
@@ -7495,13 +8587,37 @@ ${h.response}`).join("\n");
       });
     });
   }
+  var CSS47;
   var init_split_button = __esm({
     "src/components/split-button.ts"() {
       "use strict";
+      init_styles();
       init_lucide();
       init_useDisclosure();
       init_useClickOutside();
       init_useTransition();
+      CSS47 = `
+[data-theme="dark"] .splitbutton-main-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .splitbutton-menu-btn {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .splitbutton-menu-overlay {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .splitbutton-menu-item {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
     }
   });
 

@@ -1,3 +1,4 @@
+import { injectIslandStyle } from '../runtime/styles';
 /**
  * SoftMax.LaughTale: Enterprise SelectButton Component (Aura SelectButton inspired)
  */
@@ -16,7 +17,22 @@ export interface SelectButtonProps {
     disabled?: boolean;
 }
 
+
+const CSS = `
+[data-theme="dark"] .select-btn-item {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .laughtale-select-button {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
+
 export default function SelectButtonIsland(container: HTMLElement, props: SelectButtonProps) {
+    injectIslandStyle('select-button', CSS);
     let selectedValue = props.value || props.items[0]?.value || '';
 
     function render() {

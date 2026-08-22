@@ -1,3 +1,4 @@
+import { injectIslandStyle } from '../runtime/styles';
 /**
  * SoftMax.LaughTale: Enterprise Radial Knob / Dial Component (Aura Knob inspired)
  * High-performance pointer capture dragging engine without full DOM rebuilds.
@@ -15,7 +16,27 @@ export interface KnobProps {
     disabled?: boolean;
 }
 
+
+const CSS = `
+[data-theme="dark"] .laughtale-knob {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .knob-progress-circle {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+[data-theme="dark"] .knob-value-display {
+    background: var(--p-surface-900) !important;
+    color: var(--p-surface-100) !important;
+    border-color: var(--p-surface-700) !important;
+}
+`;
+
 export default function KnobIsland(container: HTMLElement, props: KnobProps) {
+    injectIslandStyle('knob', CSS);
     const min = props.min !== undefined ? props.min : 0;
     const max = props.max !== undefined ? props.max : 100;
     const step = props.step || 1;
