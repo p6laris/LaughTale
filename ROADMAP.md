@@ -1,4 +1,4 @@
-# 🏴‍☠️ SoftMax.LaughTale: Spec-Driven Development Roadmap
+# 🏴‍☠️ SoftMax.LaughTale: Spec-Driven Development Roadmap (Branch: `comp`)
 
 This document serves as the master tracking board for the step-driven evolution of **SoftMax.LaughTale** into a production-grade Islands Architecture framework for .NET 10 & TypeScript.
 
@@ -16,8 +16,8 @@ This document serves as the master tracking board for the step-driven evolution 
 | **Phase 6** | **Markdig Markdown & Content Collections** | 🟢 Completed | [Spec 6](#spec-6-markdig-markdown--content-collections) |
 | **Phase 7** | **Dedicated Documentation Portal (`SoftMax.LaughTale.Docs`)** | 🟢 Completed | [Spec 7](#spec-7-dedicated-docs-portal) |
 | **Phase 8** | **Rich Declarative Directives Engine (`l-*`)** | 🟡 In Progress | [Spec 8](#spec-8-rich-declarative-directives-engine) |
-| **Phase 9** | **Batteries-Included Headless Components (`SoftMax.LaughTale.Components`)** | ⚪ Pending | [Spec 9](#spec-9-batteries-included-headless-components) |
-| **Phase 10**| **Docs & Showcase Integration for Zero-JS Directives** | ⚪ Pending | [Spec 10](#spec-10-docs--showcase-integration) |
+| **Phase 9** | **Real Enterprise Components Library (`SoftMax.LaughTale.Components`)** | ⚪ Pending | [Spec 9](#spec-9-real-enterprise-components-library) |
+| **Phase 10**| **Interactive Docs & Showcase for Enterprise Components** | ⚪ Pending | [Spec 10](#spec-10-docs--showcase-integration) |
 
 ---
 
@@ -44,20 +44,19 @@ This document serves as the master tracking board for the step-driven evolution 
 
 ---
 
-### Spec 9: Batteries-Included Headless & Enterprise Components
-* **Goal**: A dedicated library `SoftMax.LaughTale.Components` providing pre-built, production-ready Razor TagHelpers so developers never write client scripts for common enterprise UI.
-* **Components**:
-  - `<IslandCounter />`: Numeric stepper with min/max/step controls.
-  - `<IslandModal />` / `<IslandDialog />`: Headless dialog with backdrop and C# server slot projection.
-  - `<IslandDropdown />`: Headless dropdown with outside-click dismissal.
-  - `<IslandTree />`: Hierarchical department/location tree with search and selection.
-  - `<IslandDropzone />`: File drag & drop with MIME verification, size limits, and instant preview.
-  - `<IslandTabs />` / `<IslandTabPanel />`: Tab switching container.
-  - `<IslandAccordion />` / `<IslandAccordionItem />`: Expandable accordion container.
-  - `<IslandToast />`: Toast notification dispatcher and floating container.
-  - `<IslandDataGrid />`: High-performance data table with sorting and pagination.
+### Spec 9: Real Enterprise Components Library (`SoftMax.LaughTale.Components`)
+* **Goal**: A dedicated library `SoftMax.LaughTale.Components` providing pre-built, production-ready enterprise UI TagHelpers for C# Razor:
+  - `<island-stepper ... />`: Multi-step form wizard with validation, linear/non-linear mode, and C# step slots.
+  - `<island-timeline ... />`: Interactive event and audit log timeline with expandable detail cards.
+  - `<island-camera ... />`: Live WebRTC webcam/mobile camera stream with face framing and snapshot capture.
+  - `<island-dropzone ... />`: Enterprise file vault with drag & drop, MIME/extension verification, and image preview.
+  - `<island-tree-select ... />`: Searchable hierarchical department and location tree.
+  - `<island-datagrid ... />`: Filterable data table with multi-column sorting and pagination.
+  - `<island-modal ... />`: Animated server-slot dialog with backdrop blur and ESC dismiss.
+  - `<island-toast ... />`: Toast notifications container and dispatcher.
+  - `<island-tabs />` & `<island-accordion />`: Accessible tab and accordion components.
 
 ---
 
 ### Spec 10: Docs & Showcase Integration
-* **Goal**: Update `SoftMax.LaughTale.Docs` and `SoftMax.LaughTale.Showcase` with live interactive examples of all Declarative Directives and Headless Components.
+* **Goal**: Update `SoftMax.LaughTale.Docs` (`http://localhost:5001`) and `SoftMax.LaughTale.Showcase` (`http://localhost:5000`) with live demos of all enterprise components (Camera, Stepper, Timeline, Dropzone, TreeSelect, DataGrid).

@@ -1,0 +1,131 @@
+@page "/enterprise"
+@model SoftMax.LaughTale.Showcase.Pages.EnterpriseModel
+@{
+    ViewData["Title"] = "Zero-JS Enterprise Components & Directives";
+}
+
+<!-- Hero Banner -->
+<div class="hero-section" style="margin-bottom: 2rem;">
+    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+        <span class="aura-tag tag-emerald">100% C# Razor</span>
+        <span class="aura-tag tag-slate">Zero TypeScript / Zero JS</span>
+    </div>
+    <h1 style="font-size: 2.25rem; font-weight: 800; letter-spacing: -0.03em; color: var(--p-surface-950); margin-bottom: 0.75rem;">
+        Enterprise UI Components &amp; Declarative Directives
+    </h1>
+    <p style="font-size: 1.05rem; color: var(--p-surface-600); max-width: 800px; line-height: 1.6;">
+        Real, production-grade enterprise components written in 100% C# Razor. No npm builds, no tsconfig, no manual DOM manipulation.
+    </p>
+</div>
+
+<!-- Floating Toast Container -->
+<island-toast />
+
+<!-- 1. Multi-Step Stepper Wizard -->
+<div class="p-card" style="margin-bottom: 2rem;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+        <div>
+            <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--p-surface-900);">1. Multi-Step Form Wizard</h2>
+            <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin-top: 0.25rem;">Multi-step identity onboarding wizard projecting server-rendered C# Razor slots.</p>
+        </div>
+        <span class="aura-tag tag-slate">&lt;island-stepper /&gt;</span>
+    </div>
+
+    <island-stepper steps="@Model.StepperSteps" hydrate="Load">
+        <!-- Step 1 C# Slot -->
+        <div data-step="0">
+            <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem;">
+                <h4 style="font-size: 0.9375rem; font-weight: 700; color: var(--p-surface-900); margin-bottom: 0.5rem;">Step 1: Facial Biometrics</h4>
+                <p style="font-size: 0.8125rem; color: var(--p-surface-600); margin-bottom: 1rem;">Position yourself in front of the camera and verify your visual identity.</p>
+                <island-camera target-input="BiometricPhoto" hydrate="Interaction" />
+            </div>
+        </div>
+
+        <!-- Step 2 C# Slot -->
+        <div data-step="1" style="display: none;">
+            <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem;">
+                <h4 style="font-size: 0.9375rem; font-weight: 700; color: var(--p-surface-900); margin-bottom: 0.5rem;">Step 2: Department Allocation</h4>
+                <p style="font-size: 0.8125rem; color: var(--p-surface-600); margin-bottom: 1rem;">Select your organizational division from the hierarchy.</p>
+                <island-tree-select nodes="@Model.DepartmentTree" target-input="SelectedDept" placeholder="Search departments..." hydrate="Load" />
+            </div>
+        </div>
+
+        <!-- Step 3 C# Slot -->
+        <div data-step="2" style="display: none;">
+            <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem;">
+                <h4 style="font-size: 0.9375rem; font-weight: 700; color: var(--p-surface-900); margin-bottom: 0.5rem;">Step 3: Document Vault Upload</h4>
+                <p style="font-size: 0.8125rem; color: var(--p-surface-600); margin-bottom: 1rem;">Upload security credentials or clearance agreements.</p>
+                <island-dropzone name="SecurityDocs" max-size-mb="15" hydrate="Load" />
+            </div>
+        </div>
+    </island-stepper>
+</div>
+
+<!-- 2-Column Grid: Timeline & DataGrid -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
+    
+    <!-- 2. Interactive Event Timeline -->
+    <div class="p-card">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
+            <h2 style="font-size: 1.125rem; font-weight: 700; color: var(--p-surface-900);">2. Real-Time Audit Log Timeline</h2>
+            <span class="aura-tag tag-slate">&lt;island-timeline /&gt;</span>
+        </div>
+        <island-timeline events="@Model.AuditEvents" hydrate="Visible" />
+    </div>
+
+    <!-- 3. Enterprise DataGrid -->
+    <div class="p-card">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
+            <h2 style="font-size: 1.125rem; font-weight: 700; color: var(--p-surface-900);">3. Filterable &amp; Sortable DataGrid</h2>
+            <span class="aura-tag tag-slate">&lt;island-datagrid /&gt;</span>
+        </div>
+        <island-datagrid columns="@Model.GridColumns" data="@Model.GridRecords" page-size="4" title="Cluster Operators" hydrate="Visible" />
+    </div>
+
+</div>
+
+<!-- 4. Declarative Directives (Alpine / HTMX Style) -->
+<div class="p-card">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+        <div>
+            <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--p-surface-900);">4. Declarative Razor Directives (Zero Scripts)</h2>
+            <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin-top: 0.25rem;">Live state, input formatting, clipboard copying, and event dispatching written directly in HTML attributes.</p>
+        </div>
+        <span class="aura-tag tag-emerald">l-state &bull; l-mask &bull; l-copy</span>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+        
+        <!-- Live Pricing Calculator (l-state, l-bind, l-model) -->
+        <div l-state='{ "licenses": 5, "pricePerSeat": 120 }' style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem;">
+            <div style="font-size: 0.875rem; font-weight: 700; color: var(--p-surface-900); margin-bottom: 0.5rem;">Reactive License Calculator</div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+                <label style="font-size: 0.8125rem; color: var(--p-surface-600);">Seats:</label>
+                <input type="number" l-model="licenses" min="1" max="100" style="padding: 0.35rem 0.5rem; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); width: 80px;" />
+            </div>
+            <div style="font-size: 1.125rem; font-weight: 800; color: var(--p-primary-600);">
+                Total: $<span l-bind="(licenses * pricePerSeat).toLocaleString()">600</span> /mo
+            </div>
+        </div>
+
+        <!-- Pattern Masking (l-mask) -->
+        <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem;">
+            <div style="font-size: 0.875rem; font-weight: 700; color: var(--p-surface-900); margin-bottom: 0.5rem;">Pattern Input Masking</div>
+            <p style="font-size: 0.75rem; color: var(--p-surface-500); margin-bottom: 0.5rem;">Type numbers; auto-formats into telephone format:</p>
+            <input type="text" l-mask="(999) 999-9999" placeholder="(555) 123-4567" style="width: 100%; padding: 0.45rem 0.75rem; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); font-size: 0.875rem;" />
+        </div>
+
+        <!-- Clipboard Copy & Toast Dispatch (l-copy, l-on:click) -->
+        <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem;">
+            <div style="font-size: 0.875rem; font-weight: 700; color: var(--p-surface-900); margin-bottom: 0.5rem;">Clipboard &amp; Toast Dispatch</div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+                <code id="vault-key" style="background: white; padding: 0.35rem 0.5rem; border-radius: 4px; border: 1px solid var(--p-border-color); font-size: 0.75rem;">sec_live_994827104</code>
+                <button type="button" l-copy="#vault-key" l-feedback="✓ Copied!" class="p-button p-button-secondary" style="padding: 0.35rem 0.6rem; font-size: 0.75rem;">Copy</button>
+            </div>
+            <button type="button" l-on:click="$emit('toast', { title: 'Security Clearance Verified', description: 'Zero-Trust session renewed for 8 hours.', severity: 'success' })" class="p-button p-button-primary" style="width: 100%; font-size: 0.8125rem;">
+                Trigger Toast Notification 🔔
+            </button>
+        </div>
+
+    </div>
+</div>

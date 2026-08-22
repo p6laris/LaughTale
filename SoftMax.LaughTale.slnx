@@ -1,6 +1,7 @@
 <Solution>
   <Project Path="SoftMax.LaughTale.Core/SoftMax.LaughTale.Core.csproj" />
   <Project Path="SoftMax.LaughTale.Generators/SoftMax.LaughTale.Generators.csproj" />
+  <Project Path="SoftMax.LaughTale.Components/SoftMax.LaughTale.Components.csproj" />
   <Project Path="SoftMax.LaughTale.Markdown/SoftMax.LaughTale.Markdown.csproj" />
   <Project Path="SoftMax.LaughTale.Showcase/SoftMax.LaughTale.Showcase.csproj" />
   <Project Path="SoftMax.LaughTale.Docs/SoftMax.LaughTale.Docs.csproj" />

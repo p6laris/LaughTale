@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SoftMax.LaughTale.Core\SoftMax.LaughTale.Core.csproj" />
+    <ProjectReference Include="..\SoftMax.LaughTale.Components\SoftMax.LaughTale.Components.csproj" />
     <ProjectReference Include="..\SoftMax.LaughTale.Generators\SoftMax.LaughTale.Generators.csproj" 
                       OutputItemType="Analyzer" 
                       ReferenceOutputAssembly="false" />
