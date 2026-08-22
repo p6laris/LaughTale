@@ -2,10 +2,11 @@
  * SoftMax.LaughTale: View Transitions & Persistent Islands Router
  * 
  * Intercepts link navigation, performs animated page morphing via View Transitions API,
- * and preserves persistent island state ([data-persist]) across page navigations.
+ * preserves persistent island state ([data-persist]), and re-initializes Islands & Directives.
  */
 
 import { initIslands } from './hydrator';
+import { initDirectives } from '../directives/index';
 
 let isRouterActive = false;
 
@@ -89,8 +90,18 @@ export async function navigateTo(urlStr: string, pushState = true): Promise<void
                 }
             });
 
-            // Hydrate any new islands on the newly rendered page
+            // Hydrate any new islands & directives on the newly rendered page
             initIslands(document.body);
+            initDirectives(document.body);
+
+            // Handle scroll position or hash anchor
+            const targetUrl = new URL(urlStr, window.location.origin);
+            if (targetUrl.hash) {
+                const targetEl = document.querySelector(targetUrl.hash);
+                if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                window.scrollTo({ top: 0, behavior: 'instant' as any });
+            }
 
             if (pushState) {
                 window.history.pushState({}, '', urlStr);

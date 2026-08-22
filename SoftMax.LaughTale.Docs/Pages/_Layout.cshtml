@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - SoftMax.LaughTale Docs</title>
     <link rel="stylesheet" href="~/css/docs.css" />
+    <script>
+        // Synchronous theme initialization (prevents dark mode flash)
+        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
 </head>
 <body>
     
@@ -24,8 +30,17 @@
                 </a>
             </div>
 
-            <!-- Persistent Telemetry Island across View Transitions -->
-            <div>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <!-- Dark Mode Toggle Button -->
+                <button type="button" 
+                        onclick="document.documentElement.classList.toggle('dark'); localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light')" 
+                        class="p-button p-button-secondary" 
+                        style="padding: 0.35rem 0.65rem; font-size: 0.8125rem;"
+                        title="Toggle Dark Mode">
+                    🌓
+                </button>
+
+                <!-- Persistent Telemetry Island across View Transitions -->
                 <island name="persistent-telemetry" 
                         props="@(new SystemTelemetryProps("Docs Gateway", 3))" 
                         persist="docs-telemetry" 
@@ -69,5 +84,39 @@
 
     <!-- Client Islands Engine Bundle -->
     <script type="module" src="~/js/main.js"></script>
+
+    <!-- Active Navigation & ScrollSpy Script -->
+    <script>
+        function updateActiveState() {
+            // 1. Highlight Active Sidebar Link
+            const currentPath = window.location.pathname.toLowerCase();
+            document.querySelectorAll('.sidebar-link').forEach(link => {
+                const href = link.getAttribute('href')?.toLowerCase();
+                link.classList.toggle('active', href === currentPath || (currentPath === '/' && href?.includes('01-getting-started')));
+            });
+
+            // 2. TOC ScrollSpy Observer
+            const headings = document.querySelectorAll('.laughtale-markdown-content h2, .laughtale-markdown-content h3');
+            const tocLinks = document.querySelectorAll('.toc-link');
+            
+            if (headings.length > 0 && tocLinks.length > 0) {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const id = entry.target.getAttribute('id');
+                            tocLinks.forEach(l => {
+                                l.classList.toggle('active', l.getAttribute('href') === `#${id}`);
+                            });
+                        }
+                    });
+                }, { rootMargin: '0px 0px -70% 0px' });
+
+                headings.forEach(h => observer.observe(h));
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', updateActiveState);
+        window.addEventListener('island:page-loaded', updateActiveState);
+    </script>
 </body>
 </html>

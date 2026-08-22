@@ -41,6 +41,32 @@
     --p-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
 }
 
+/* Dark Mode Tokens */
+:root.dark, html.dark body {
+    --p-surface-0: #090d16;
+    --p-surface-50: #0f172a;
+    --p-surface-100: #1e293b;
+    --p-surface-200: #334155;
+    --p-surface-300: #475569;
+    --p-surface-400: #64748b;
+    --p-surface-500: #94a3b8;
+    --p-surface-600: #cbd5e1;
+    --p-surface-700: #e2e8f0;
+    --p-surface-800: #f1f5f9;
+    --p-surface-900: #f8fafc;
+    --p-surface-950: #ffffff;
+
+    --p-primary-50: #064e3b;
+    --p-primary-100: #065f46;
+    --p-primary-200: #047857;
+
+    --p-border-color: #1e293b;
+    --p-text-color: #f8fafc;
+    --p-text-muted: #94a3b8;
+    background-color: var(--p-surface-0);
+    color: var(--p-text-color);
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -53,6 +79,7 @@ body {
     color: var(--p-text-color);
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 /* Navbar */
@@ -163,6 +190,11 @@ body {
     font-weight: 600;
 }
 
+html.dark .sidebar-link.active {
+    background-color: #064e3b;
+    color: #6ee7b7;
+}
+
 /* Center Markdown Content */
 .docs-main {
     padding: 2.5rem 0 5rem;
@@ -232,10 +264,11 @@ body {
 }
 
 .laughtale-markdown-content pre {
-    background-color: var(--p-surface-900);
+    background-color: var(--p-surface-950);
     color: #f8fafc;
     padding: 1.25rem;
     border-radius: var(--p-border-radius-lg);
+    border: 1px solid var(--p-border-color);
     overflow-x: auto;
     margin: 1.25rem 0 1.5rem;
 }
@@ -297,11 +330,18 @@ body {
     color: var(--p-surface-500);
     text-decoration: none;
     padding: 0.25rem 0;
-    transition: color 0.15s ease;
+    transition: all 0.15s ease;
 }
 
 .toc-link:hover {
     color: var(--p-primary-600);
+}
+
+.toc-link.active {
+    color: var(--p-primary-600);
+    font-weight: 600;
+    padding-left: 0.5rem;
+    border-left: 2px solid var(--p-primary-600);
 }
 
 .toc-link.depth-3 {
@@ -324,6 +364,9 @@ body {
 
 .tag-emerald { background-color: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
 .tag-slate { background-color: var(--p-surface-100); color: var(--p-surface-700); border: 1px solid var(--p-surface-200); }
+
+html.dark .tag-emerald { background-color: #064e3b; color: #6ee7b7; border-color: #047857; }
+html.dark .tag-slate { background-color: var(--p-surface-100); color: var(--p-surface-700); border-color: var(--p-surface-200); }
 
 /* Buttons */
 .p-button {

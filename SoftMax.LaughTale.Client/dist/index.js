@@ -336,168 +336,6 @@ var SoftMaxIslands = (() => {
     }
   });
 
-  // src/runtime/router.ts
-  function enableViewTransitions() {
-    if (isRouterActive || typeof window === "undefined") return;
-    isRouterActive = true;
-    document.addEventListener("click", handleLinkClick);
-    window.addEventListener("popstate", handlePopState);
-  }
-  async function handleLinkClick(e) {
-    if (e.button !== 0 || e.ctrlKey || e.metaKey || e.altKey || e.shiftKey || e.defaultPrevented) {
-      return;
-    }
-    const anchor = e.target.closest("a");
-    if (!anchor || !anchor.href) return;
-    const url = new URL(anchor.href, window.location.href);
-    if (url.origin !== window.location.origin) return;
-    if (anchor.target && anchor.target !== "_self") return;
-    if (anchor.hasAttribute("download") || anchor.getAttribute("data-no-transition") !== null) return;
-    if (url.pathname === window.location.pathname && url.search === window.location.search && url.hash) {
-      return;
-    }
-    e.preventDefault();
-    await navigateTo(url.href, true);
-  }
-  async function handlePopState() {
-    await navigateTo(window.location.href, false);
-  }
-  async function navigateTo(urlStr, pushState = true) {
-    try {
-      const response = await fetch(urlStr, {
-        headers: {
-          "X-Requested-With": "SoftMaxIslands-ViewTransition"
-        }
-      });
-      if (!response.ok) {
-        window.location.href = urlStr;
-        return;
-      }
-      const htmlText = await response.text();
-      const parser = new DOMParser();
-      const newDoc = parser.parseFromString(htmlText, "text/html");
-      const persistentElements = /* @__PURE__ */ new Map();
-      document.querySelectorAll("[data-persist]").forEach((el) => {
-        const id = el.dataset.persist;
-        if (id) persistentElements.set(id, el);
-      });
-      const updateDom = () => {
-        document.title = newDoc.title;
-        document.body.innerHTML = newDoc.body.innerHTML;
-        persistentElements.forEach((liveEl, id) => {
-          const targetSlot = document.querySelector(`[data-persist="${id}"]`);
-          if (targetSlot && targetSlot.parentNode) {
-            targetSlot.parentNode.replaceChild(liveEl, targetSlot);
-          }
-        });
-        initIslands(document.body);
-        if (pushState) {
-          window.history.pushState({}, "", urlStr);
-        }
-        window.dispatchEvent(new CustomEvent("island:page-loaded", { detail: { url: urlStr } }));
-      };
-      if ("startViewTransition" in document) {
-        document.startViewTransition(updateDom);
-      } else {
-        updateDom();
-      }
-    } catch (err) {
-      console.error("[SoftMax.LaughTale] View transition failed, falling back to full navigation:", err);
-      window.location.href = urlStr;
-    }
-  }
-  var isRouterActive;
-  var init_router = __esm({
-    "src/runtime/router.ts"() {
-      "use strict";
-      init_hydrator();
-      isRouterActive = false;
-    }
-  });
-
-  // src/runtime/slots.ts
-  function getSlot(container, name = "default") {
-    return container.querySelector(`[data-slot="${name}"]`);
-  }
-  function extractSlotContent(container, name = "default") {
-    const slotEl = getSlot(container, name);
-    if (!slotEl) return "";
-    return slotEl.innerHTML;
-  }
-  var init_slots = __esm({
-    "src/runtime/slots.ts"() {
-      "use strict";
-    }
-  });
-
-  // src/runtime/styles.ts
-  function injectIslandStyle(islandName, css) {
-    if (injectedStyles.has(islandName) || typeof document === "undefined") {
-      return;
-    }
-    injectedStyles.add(islandName);
-    const styleEl = document.createElement("style");
-    styleEl.setAttribute("data-island-style", islandName);
-    styleEl.textContent = css;
-    document.head.appendChild(styleEl);
-  }
-  var injectedStyles;
-  var init_styles = __esm({
-    "src/runtime/styles.ts"() {
-      "use strict";
-      injectedStyles = /* @__PURE__ */ new Set();
-    }
-  });
-
-  // src/runtime/events.ts
-  var init_events = __esm({
-    "src/runtime/events.ts"() {
-      "use strict";
-    }
-  });
-
-  // src/runtime/state.ts
-  var init_state = __esm({
-    "src/runtime/state.ts"() {
-      "use strict";
-    }
-  });
-
-  // src/adapters/vanilla.ts
-  function createVanillaIsland(mount) {
-    return mount;
-  }
-  var init_vanilla = __esm({
-    "src/adapters/vanilla.ts"() {
-      "use strict";
-    }
-  });
-
-  // src/adapters/preact.ts
-  function createPreactIsland(Component, options = {}) {
-    return async (container, props) => {
-      try {
-        const preact = await import("preact");
-        const h = preact.h || preact.default?.h;
-        const render = preact.render || preact.default?.render;
-        if (render && h) {
-          render(h(Component, props), container);
-          return () => render(null, container);
-        }
-      } catch {
-        console.warn("[SoftMax.LaughTale] Preact package not found in bundle. Rendering component directly.");
-        if (typeof Component === "function") {
-          return Component(container, props);
-        }
-      }
-    };
-  }
-  var init_preact = __esm({
-    "src/adapters/preact.ts"() {
-      "use strict";
-    }
-  });
-
   // src/directives/reactivity.ts
   var reactivity_exports = {};
   __export(reactivity_exports, {
@@ -682,7 +520,7 @@ var SoftMaxIslands = (() => {
       }
     }
   }
-  var init_events2 = __esm({
+  var init_events = __esm({
     "src/directives/events.ts"() {
       "use strict";
       init_reactivity();
@@ -932,7 +770,7 @@ var SoftMaxIslands = (() => {
     "src/directives/index.ts"() {
       "use strict";
       init_reactivity();
-      init_events2();
+      init_events();
       init_htmx();
       init_masking();
       init_utils();
@@ -943,6 +781,177 @@ var SoftMaxIslands = (() => {
           initDirectives();
         }
       }
+    }
+  });
+
+  // src/runtime/router.ts
+  function enableViewTransitions() {
+    if (isRouterActive || typeof window === "undefined") return;
+    isRouterActive = true;
+    document.addEventListener("click", handleLinkClick);
+    window.addEventListener("popstate", handlePopState);
+  }
+  async function handleLinkClick(e) {
+    if (e.button !== 0 || e.ctrlKey || e.metaKey || e.altKey || e.shiftKey || e.defaultPrevented) {
+      return;
+    }
+    const anchor = e.target.closest("a");
+    if (!anchor || !anchor.href) return;
+    const url = new URL(anchor.href, window.location.href);
+    if (url.origin !== window.location.origin) return;
+    if (anchor.target && anchor.target !== "_self") return;
+    if (anchor.hasAttribute("download") || anchor.getAttribute("data-no-transition") !== null) return;
+    if (url.pathname === window.location.pathname && url.search === window.location.search && url.hash) {
+      return;
+    }
+    e.preventDefault();
+    await navigateTo(url.href, true);
+  }
+  async function handlePopState() {
+    await navigateTo(window.location.href, false);
+  }
+  async function navigateTo(urlStr, pushState = true) {
+    try {
+      const response = await fetch(urlStr, {
+        headers: {
+          "X-Requested-With": "SoftMaxIslands-ViewTransition"
+        }
+      });
+      if (!response.ok) {
+        window.location.href = urlStr;
+        return;
+      }
+      const htmlText = await response.text();
+      const parser = new DOMParser();
+      const newDoc = parser.parseFromString(htmlText, "text/html");
+      const persistentElements = /* @__PURE__ */ new Map();
+      document.querySelectorAll("[data-persist]").forEach((el) => {
+        const id = el.dataset.persist;
+        if (id) persistentElements.set(id, el);
+      });
+      const updateDom = () => {
+        document.title = newDoc.title;
+        document.body.innerHTML = newDoc.body.innerHTML;
+        persistentElements.forEach((liveEl, id) => {
+          const targetSlot = document.querySelector(`[data-persist="${id}"]`);
+          if (targetSlot && targetSlot.parentNode) {
+            targetSlot.parentNode.replaceChild(liveEl, targetSlot);
+          }
+        });
+        initIslands(document.body);
+        initDirectives(document.body);
+        const targetUrl = new URL(urlStr, window.location.origin);
+        if (targetUrl.hash) {
+          const targetEl = document.querySelector(targetUrl.hash);
+          if (targetEl) targetEl.scrollIntoView({ behavior: "smooth" });
+        } else {
+          window.scrollTo({ top: 0, behavior: "instant" });
+        }
+        if (pushState) {
+          window.history.pushState({}, "", urlStr);
+        }
+        window.dispatchEvent(new CustomEvent("island:page-loaded", { detail: { url: urlStr } }));
+      };
+      if ("startViewTransition" in document) {
+        document.startViewTransition(updateDom);
+      } else {
+        updateDom();
+      }
+    } catch (err) {
+      console.error("[SoftMax.LaughTale] View transition failed, falling back to full navigation:", err);
+      window.location.href = urlStr;
+    }
+  }
+  var isRouterActive;
+  var init_router = __esm({
+    "src/runtime/router.ts"() {
+      "use strict";
+      init_hydrator();
+      init_directives();
+      isRouterActive = false;
+    }
+  });
+
+  // src/runtime/slots.ts
+  function getSlot(container, name = "default") {
+    return container.querySelector(`[data-slot="${name}"]`);
+  }
+  function extractSlotContent(container, name = "default") {
+    const slotEl = getSlot(container, name);
+    if (!slotEl) return "";
+    return slotEl.innerHTML;
+  }
+  var init_slots = __esm({
+    "src/runtime/slots.ts"() {
+      "use strict";
+    }
+  });
+
+  // src/runtime/styles.ts
+  function injectIslandStyle(islandName, css) {
+    if (injectedStyles.has(islandName) || typeof document === "undefined") {
+      return;
+    }
+    injectedStyles.add(islandName);
+    const styleEl = document.createElement("style");
+    styleEl.setAttribute("data-island-style", islandName);
+    styleEl.textContent = css;
+    document.head.appendChild(styleEl);
+  }
+  var injectedStyles;
+  var init_styles = __esm({
+    "src/runtime/styles.ts"() {
+      "use strict";
+      injectedStyles = /* @__PURE__ */ new Set();
+    }
+  });
+
+  // src/runtime/events.ts
+  var init_events2 = __esm({
+    "src/runtime/events.ts"() {
+      "use strict";
+    }
+  });
+
+  // src/runtime/state.ts
+  var init_state = __esm({
+    "src/runtime/state.ts"() {
+      "use strict";
+    }
+  });
+
+  // src/adapters/vanilla.ts
+  function createVanillaIsland(mount) {
+    return mount;
+  }
+  var init_vanilla = __esm({
+    "src/adapters/vanilla.ts"() {
+      "use strict";
+    }
+  });
+
+  // src/adapters/preact.ts
+  function createPreactIsland(Component, options = {}) {
+    return async (container, props) => {
+      try {
+        const preact = await import("preact");
+        const h = preact.h || preact.default?.h;
+        const render = preact.render || preact.default?.render;
+        if (render && h) {
+          render(h(Component, props), container);
+          return () => render(null, container);
+        }
+      } catch {
+        console.warn("[SoftMax.LaughTale] Preact package not found in bundle. Rendering component directly.");
+        if (typeof Component === "function") {
+          return Component(container, props);
+        }
+      }
+    };
+  }
+  var init_preact = __esm({
+    "src/adapters/preact.ts"() {
+      "use strict";
     }
   });
 
@@ -1711,7 +1720,7 @@ var SoftMaxIslands = (() => {
       init_router();
       init_slots();
       init_styles();
-      init_events();
+      init_events2();
       init_state();
       init_reviver();
       init_retry();
