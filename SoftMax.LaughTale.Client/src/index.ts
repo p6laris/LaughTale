@@ -59,3 +59,8 @@ defineIsland('tag', () => import('./components/tag'));
 defineIsland('breadcrumb', () => import('./components/breadcrumb'));
 defineIsland('scroll-top', () => import('./components/scroll-top'));
 defineIsland('inplace', () => import('./components/inplace'));
+defineIsland('command', () => import('./components/command'));
+defineIsland('theme-studio', () => import('./components/theme-studio'));
+
+// Export Headless Composables & Animation Primitives
+export * from './composables/index';

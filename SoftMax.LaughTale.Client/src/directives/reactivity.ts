@@ -1,7 +1,9 @@
 /**
- * SoftMax.LaughTale: Declarative Reactivity Engine
- * Lightweight JavaScript Proxy state management, expression evaluation, and two-way data binding.
+ * SoftMax.LaughTale: Declarative Reactivity Engine (Hardened Security Edition)
+ * Lightweight JavaScript Proxy state management, expression evaluation, XSS prevention, and two-way data binding.
  */
+
+import { createSandboxState, isSafeAttribute, isSafeProperty, sanitizeUrl } from './security';
 
 export interface ReactiveScope {
     state: Record<string, any>;
@@ -26,11 +28,19 @@ export function createReactiveScope(container: HTMLElement, initialData: Record<
 
     const state = new Proxy(initialData, {
         set(target, prop, value) {
+            if (!isSafeProperty(prop)) {
+                console.warn(`[SoftMax.LaughTale Security] Blocked assignment to restricted property: "${String(prop)}"`);
+                return true;
+            }
             target[prop as string] = value;
             listeners.forEach((fn) => fn());
             return true;
         },
         get(target, prop) {
+            if (!isSafeProperty(prop)) {
+                console.warn(`[SoftMax.LaughTale Security] Blocked access to restricted property: "${String(prop)}"`);
+                return undefined;
+            }
             return target[prop as string];
         }
     });
@@ -42,10 +52,22 @@ export function createReactiveScope(container: HTMLElement, initialData: Record<
 
 export function evaluateExpression(expr: string, state: Record<string, any>, extraContext: Record<string, any> = {}): any {
     try {
-        const contextKeys = Object.keys(extraContext);
-        const contextValues = Object.values(extraContext);
-        const fn = new Function('state', ...contextKeys, `with(state) { return (${expr}); }`);
-        return fn(state, ...contextValues);
+        const sandboxState = createSandboxState(state);
+        const contextKeys = Object.keys(extraContext).filter(isSafeProperty);
+        const contextValues = contextKeys.map(k => extraContext[k]);
+
+        // Sandboxed execution with masked globals
+        const fn = new Function(
+            'state',
+            'window',
+            'document',
+            'location',
+            'cookie',
+            ...contextKeys,
+            `with(state) { return (${expr}); }`
+        );
+
+        return fn(sandboxState, undefined, undefined, undefined, undefined, ...contextValues);
     } catch (err) {
         console.error(`[SoftMax.LaughTale] Error evaluating expression "${expr}":`, err);
         return undefined;
@@ -54,10 +76,21 @@ export function evaluateExpression(expr: string, state: Record<string, any>, ext
 
 export function executeStatement(stmt: string, state: Record<string, any>, extraContext: Record<string, any> = {}): void {
     try {
-        const contextKeys = Object.keys(extraContext);
-        const contextValues = Object.values(extraContext);
-        const fn = new Function('state', ...contextKeys, `with(state) { ${stmt}; }`);
-        fn(state, ...contextValues);
+        const sandboxState = createSandboxState(state);
+        const contextKeys = Object.keys(extraContext).filter(isSafeProperty);
+        const contextValues = contextKeys.map(k => extraContext[k]);
+
+        const fn = new Function(
+            'state',
+            'window',
+            'document',
+            'location',
+            'cookie',
+            ...contextKeys,
+            `with(state) { ${stmt}; }`
+        );
+
+        fn(sandboxState, undefined, undefined, undefined, undefined, ...contextValues);
     } catch (err) {
         console.error(`[SoftMax.LaughTale] Error executing statement "${stmt}":`, err);
     }
@@ -70,15 +103,26 @@ export function bindElementReactivity(element: HTMLElement, scope: ReactiveScope
             const expr = attr.value;
             const update = () => {
                 const val = evaluateExpression(expr, scope.state);
+                // Safe textContent assignment immune to XSS
                 element.textContent = String(val ?? '');
             };
             scope.listeners.add(update);
             update();
         } else if (attr.name.startsWith('l-bind:')) {
             const targetAttr = attr.name.slice(7);
+            if (!isSafeAttribute(targetAttr)) {
+                continue;
+            }
+
             const expr = attr.value;
             const update = () => {
-                const val = evaluateExpression(expr, scope.state);
+                let val = evaluateExpression(expr, scope.state);
+
+                // Protocol sanitization for URLs
+                if (['href', 'src', 'action'].includes(targetAttr.toLowerCase())) {
+                    val = sanitizeUrl(val);
+                }
+
                 if (val === false || val === null || val === undefined) {
                     element.removeAttribute(targetAttr);
                 } else if (val === true) {
@@ -119,6 +163,11 @@ export function bindElementReactivity(element: HTMLElement, scope: ReactiveScope
     // 2. Two-Way Model Binding: l-model="property"
     if (element.hasAttribute('l-model')) {
         const propName = element.getAttribute('l-model')!;
+        if (!isSafeProperty(propName)) {
+            console.warn(`[SoftMax.LaughTale Security] Blocked l-model binding on restricted property: "${propName}"`);
+            return;
+        }
+
         const input = element as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
 
         // Model to View

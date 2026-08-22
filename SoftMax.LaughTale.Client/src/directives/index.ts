@@ -19,6 +19,9 @@ import { bindScrollToDirectives } from './scroll';
 import { bindBadgeDirectives } from './badge';
 import { bindTeleportDirectives } from './teleport';
 
+export * from './security';
+export * from './reactivity';
+
 export function initDirectives(root: ParentNode = document): void {
     // 1. Initialize Reactive Scopes: [l-state]
     const stateElements = root.querySelectorAll<HTMLElement>('[l-state]');

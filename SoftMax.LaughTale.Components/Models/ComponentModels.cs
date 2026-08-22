@@ -84,3 +84,20 @@ public record BreadcrumbItem(
     string? Url = null,
     string? Icon = null
 );
+
+public record CommandPaletteItem(
+    string Id,
+    string Label,
+    string? Group = null,
+    string? Icon = null,
+    string? Shortcut = null,
+    string? Url = null,
+    string? Action = null
+);
+
+public record ThemeStudioPreset(
+    string Id,
+    string Name,
+    string PrimaryHex,
+    string BorderRadius
+);

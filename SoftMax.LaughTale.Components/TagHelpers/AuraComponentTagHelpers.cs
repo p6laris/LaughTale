@@ -783,3 +783,51 @@ public class IslandInplaceTagHelper : TagHelper
         output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
     }
 }
+
+/// <summary>
+/// TagHelper for <island-command /> (Spotlight Ctrl+K Command Palette)
+/// </summary>
+[HtmlTargetElement("island-command")]
+public class IslandCommandTagHelper : TagHelper
+{
+    public string? Placeholder { get; set; } = "Type a command or search...";
+    public List<CommandPaletteItem>? Items { get; set; }
+
+    public override void Process(TagHelperContext context, TagHelperOutput output)
+    {
+        output.TagName = "island";
+        output.Attributes.SetAttribute("name", "command");
+        output.Attributes.SetAttribute("hydrate", "Load");
+
+        var props = new
+        {
+            placeholder = Placeholder,
+            items = Items ?? new()
+        };
+
+        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+    }
+}
+
+/// <summary>
+/// TagHelper for <island-theme-studio /> (TweakAura Live Theme Editor)
+/// </summary>
+[HtmlTargetElement("island-theme-studio")]
+public class IslandThemeStudioTagHelper : TagHelper
+{
+    public bool DefaultOpen { get; set; } = false;
+
+    public override void Process(TagHelperContext context, TagHelperOutput output)
+    {
+        output.TagName = "island";
+        output.Attributes.SetAttribute("name", "theme-studio");
+        output.Attributes.SetAttribute("hydrate", "Load");
+
+        var props = new
+        {
+            defaultOpen = DefaultOpen
+        };
+
+        output.Attributes.SetAttribute("props-json", JsonSerializer.Serialize(props));
+    }
+}

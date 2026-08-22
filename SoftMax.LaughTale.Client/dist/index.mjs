@@ -307,6 +307,89 @@ var init_hydrator = __esm({
   }
 });
 
+// src/directives/security.ts
+function isSafeProperty(prop) {
+  if (typeof prop !== "string") return true;
+  return !BLOCKED_PROPERTIES.has(prop);
+}
+function sanitizeUrl(url) {
+  if (typeof url !== "string") return "";
+  const trimmed = url.trim();
+  if (DANGEROUS_PROTOCOLS.test(trimmed)) {
+    console.warn(`[SoftMax.LaughTale Security] Blocked dangerous URL protocol: "${trimmed}"`);
+    return "about:blank";
+  }
+  return trimmed;
+}
+function isSafeAttribute(attrName) {
+  const lower = attrName.toLowerCase();
+  if (lower.startsWith("on") || DANGEROUS_ATTRIBUTES.has(lower)) {
+    console.warn(`[SoftMax.LaughTale Security] Blocked dangerous dynamic attribute binding: "${attrName}"`);
+    return false;
+  }
+  return true;
+}
+function createSandboxState(state) {
+  return new Proxy(state, {
+    get(target, prop) {
+      if (!isSafeProperty(prop)) {
+        console.warn(`[SoftMax.LaughTale Security] Blocked restricted property access: "${String(prop)}"`);
+        return void 0;
+      }
+      return target[prop];
+    },
+    set(target, prop, value) {
+      if (!isSafeProperty(prop)) {
+        console.warn(`[SoftMax.LaughTale Security] Blocked assignment to restricted property: "${String(prop)}"`);
+        return true;
+      }
+      target[prop] = value;
+      return true;
+    },
+    has(target, prop) {
+      if (!isSafeProperty(prop)) {
+        return false;
+      }
+      return prop in target;
+    }
+  });
+}
+var BLOCKED_PROPERTIES, DANGEROUS_ATTRIBUTES, DANGEROUS_PROTOCOLS;
+var init_security = __esm({
+  "src/directives/security.ts"() {
+    "use strict";
+    BLOCKED_PROPERTIES = /* @__PURE__ */ new Set([
+      "__proto__",
+      "prototype",
+      "constructor",
+      "window",
+      "document",
+      "globalThis",
+      "location",
+      "localStorage",
+      "sessionStorage",
+      "indexedDB",
+      "cookie",
+      "eval",
+      "Function",
+      "XMLHttpRequest",
+      "fetch"
+    ]);
+    DANGEROUS_ATTRIBUTES = /* @__PURE__ */ new Set([
+      "onerror",
+      "onload",
+      "onclick",
+      "onmouseover",
+      "onfocus",
+      "onblur",
+      "onchange",
+      "onsubmit",
+      "formaction"
+    ]);
+    DANGEROUS_PROTOCOLS = /^\s*(javascript|data|vbscript):/i;
+  }
+});
+
 // src/directives/reactivity.ts
 var reactivity_exports = {};
 __export(reactivity_exports, {
@@ -329,11 +412,19 @@ function createReactiveScope(container, initialData) {
   const listeners = /* @__PURE__ */ new Set();
   const state = new Proxy(initialData, {
     set(target, prop, value) {
+      if (!isSafeProperty(prop)) {
+        console.warn(`[SoftMax.LaughTale Security] Blocked assignment to restricted property: "${String(prop)}"`);
+        return true;
+      }
       target[prop] = value;
       listeners.forEach((fn) => fn());
       return true;
     },
     get(target, prop) {
+      if (!isSafeProperty(prop)) {
+        console.warn(`[SoftMax.LaughTale Security] Blocked access to restricted property: "${String(prop)}"`);
+        return void 0;
+      }
       return target[prop];
     }
   });
@@ -343,10 +434,19 @@ function createReactiveScope(container, initialData) {
 }
 function evaluateExpression(expr, state, extraContext = {}) {
   try {
-    const contextKeys = Object.keys(extraContext);
-    const contextValues = Object.values(extraContext);
-    const fn = new Function("state", ...contextKeys, `with(state) { return (${expr}); }`);
-    return fn(state, ...contextValues);
+    const sandboxState = createSandboxState(state);
+    const contextKeys = Object.keys(extraContext).filter(isSafeProperty);
+    const contextValues = contextKeys.map((k) => extraContext[k]);
+    const fn = new Function(
+      "state",
+      "window",
+      "document",
+      "location",
+      "cookie",
+      ...contextKeys,
+      `with(state) { return (${expr}); }`
+    );
+    return fn(sandboxState, void 0, void 0, void 0, void 0, ...contextValues);
   } catch (err) {
     console.error(`[SoftMax.LaughTale] Error evaluating expression "${expr}":`, err);
     return void 0;
@@ -354,10 +454,19 @@ function evaluateExpression(expr, state, extraContext = {}) {
 }
 function executeStatement(stmt, state, extraContext = {}) {
   try {
-    const contextKeys = Object.keys(extraContext);
-    const contextValues = Object.values(extraContext);
-    const fn = new Function("state", ...contextKeys, `with(state) { ${stmt}; }`);
-    fn(state, ...contextValues);
+    const sandboxState = createSandboxState(state);
+    const contextKeys = Object.keys(extraContext).filter(isSafeProperty);
+    const contextValues = contextKeys.map((k) => extraContext[k]);
+    const fn = new Function(
+      "state",
+      "window",
+      "document",
+      "location",
+      "cookie",
+      ...contextKeys,
+      `with(state) { ${stmt}; }`
+    );
+    fn(sandboxState, void 0, void 0, void 0, void 0, ...contextValues);
   } catch (err) {
     console.error(`[SoftMax.LaughTale] Error executing statement "${stmt}":`, err);
   }
@@ -374,9 +483,15 @@ function bindElementReactivity(element, scope) {
       update();
     } else if (attr.name.startsWith("l-bind:")) {
       const targetAttr = attr.name.slice(7);
+      if (!isSafeAttribute(targetAttr)) {
+        continue;
+      }
       const expr = attr.value;
       const update = () => {
-        const val = evaluateExpression(expr, scope.state);
+        let val = evaluateExpression(expr, scope.state);
+        if (["href", "src", "action"].includes(targetAttr.toLowerCase())) {
+          val = sanitizeUrl(val);
+        }
         if (val === false || val === null || val === void 0) {
           element.removeAttribute(targetAttr);
         } else if (val === true) {
@@ -415,6 +530,10 @@ function bindElementReactivity(element, scope) {
   }
   if (element.hasAttribute("l-model")) {
     const propName = element.getAttribute("l-model");
+    if (!isSafeProperty(propName)) {
+      console.warn(`[SoftMax.LaughTale Security] Blocked l-model binding on restricted property: "${propName}"`);
+      return;
+    }
     const input = element;
     const update = () => {
       const val = scope.state[propName];
@@ -442,6 +561,7 @@ var elementScopeMap;
 var init_reactivity = __esm({
   "src/directives/reactivity.ts"() {
     "use strict";
+    init_security();
     elementScopeMap = /* @__PURE__ */ new WeakMap();
   }
 });
@@ -1219,6 +1339,8 @@ var init_directives = __esm({
     init_scroll();
     init_badge();
     init_teleport();
+    init_security();
+    init_reactivity();
     if (typeof document !== "undefined") {
       if (document.readyState === "loading") {
         document.addEventListener("DOMContentLoaded", () => initDirectives());
@@ -1460,6 +1582,789 @@ var init_lucide = __esm({
       home: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`,
       edit: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>`
     };
+  }
+});
+
+// src/composables/useDisclosure.ts
+function useDisclosure(options = {}) {
+  let isOpen = Boolean(options.defaultIsOpen);
+  const listeners = /* @__PURE__ */ new Set();
+  function notify() {
+    options.onToggle?.(isOpen);
+    listeners.forEach((fn) => fn(isOpen));
+  }
+  function open() {
+    if (!isOpen) {
+      isOpen = true;
+      options.onOpen?.();
+      notify();
+    }
+  }
+  function close() {
+    if (isOpen) {
+      isOpen = false;
+      options.onClose?.();
+      notify();
+    }
+  }
+  function toggle() {
+    if (isOpen) close();
+    else open();
+  }
+  function setOpen(value) {
+    if (value) open();
+    else close();
+  }
+  function onChange(listener) {
+    listeners.add(listener);
+    return () => listeners.delete(listener);
+  }
+  return {
+    get isOpen() {
+      return isOpen;
+    },
+    open,
+    close,
+    toggle,
+    setOpen,
+    onChange
+  };
+}
+var init_useDisclosure = __esm({
+  "src/composables/useDisclosure.ts"() {
+    "use strict";
+  }
+});
+
+// src/composables/useFocusTrap.ts
+function useFocusTrap(container, options = {}) {
+  let previouslyFocusedElement = null;
+  let isActive = false;
+  function getFocusableElements() {
+    return Array.from(container.querySelectorAll(FOCUSABLE_SELECTOR)).filter((el) => el.offsetParent !== null || el.offsetWidth > 0 || el.offsetHeight > 0);
+  }
+  function handleKeyDown(e) {
+    if (!isActive || e.key !== "Tab") return;
+    const focusable = getFocusableElements();
+    if (focusable.length === 0) {
+      e.preventDefault();
+      return;
+    }
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (e.shiftKey) {
+      if (document.activeElement === first || !container.contains(document.activeElement)) {
+        e.preventDefault();
+        last.focus();
+      }
+    } else {
+      if (document.activeElement === last || !container.contains(document.activeElement)) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+  }
+  function activate() {
+    if (isActive) return;
+    isActive = true;
+    previouslyFocusedElement = document.activeElement;
+    document.addEventListener("keydown", handleKeyDown);
+    if (options.autoFocus !== false) {
+      setTimeout(() => {
+        if (options.initialFocusElement) {
+          options.initialFocusElement.focus();
+        } else {
+          const focusable = getFocusableElements();
+          if (focusable.length > 0) focusable[0].focus();
+          else container.focus();
+        }
+      }, 10);
+    }
+  }
+  function deactivate() {
+    if (!isActive) return;
+    isActive = false;
+    document.removeEventListener("keydown", handleKeyDown);
+    if (options.restoreFocus !== false && previouslyFocusedElement && typeof previouslyFocusedElement.focus === "function") {
+      previouslyFocusedElement.focus();
+    }
+  }
+  return { activate, deactivate };
+}
+var FOCUSABLE_SELECTOR;
+var init_useFocusTrap = __esm({
+  "src/composables/useFocusTrap.ts"() {
+    "use strict";
+    FOCUSABLE_SELECTOR = [
+      "a[href]",
+      "button:not([disabled])",
+      "input:not([disabled])",
+      "select:not([disabled])",
+      "textarea:not([disabled])",
+      '[tabindex]:not([tabindex="-1"])',
+      '[contenteditable="true"]'
+    ].join(",");
+  }
+});
+
+// src/composables/useFloatingPosition.ts
+function useFloatingPosition(reference, floating, options = {}) {
+  const offset = options.offset ?? 6;
+  const autoFlip = options.autoFlip !== false;
+  const viewportPadding = options.viewportPadding ?? 8;
+  let initialPlacement = options.placement ?? "bottom-start";
+  function computePosition() {
+    const refRect = reference.getBoundingClientRect();
+    const floatRect = floating.getBoundingClientRect();
+    const vpWidth = window.innerWidth;
+    const vpHeight = window.innerHeight;
+    let placement = initialPlacement;
+    if (autoFlip) {
+      const spaceTop = refRect.top;
+      const spaceBottom = vpHeight - refRect.bottom;
+      const spaceLeft = refRect.left;
+      const spaceRight = vpWidth - refRect.right;
+      if (placement.startsWith("bottom") && spaceBottom < floatRect.height + offset && spaceTop > spaceBottom) {
+        placement = placement.replace("bottom", "top");
+      } else if (placement.startsWith("top") && spaceTop < floatRect.height + offset && spaceBottom > spaceTop) {
+        placement = placement.replace("top", "bottom");
+      } else if (placement.startsWith("right") && spaceRight < floatRect.width + offset && spaceLeft > spaceRight) {
+        placement = placement.replace("right", "left");
+      } else if (placement.startsWith("left") && spaceLeft < floatRect.width + offset && spaceRight > spaceLeft) {
+        placement = placement.replace("left", "right");
+      }
+    }
+    let x = 0;
+    let y = 0;
+    switch (placement) {
+      case "bottom":
+        x = refRect.left + (refRect.width - floatRect.width) / 2;
+        y = refRect.bottom + offset;
+        break;
+      case "bottom-start":
+        x = refRect.left;
+        y = refRect.bottom + offset;
+        break;
+      case "bottom-end":
+        x = refRect.right - floatRect.width;
+        y = refRect.bottom + offset;
+        break;
+      case "top":
+        x = refRect.left + (refRect.width - floatRect.width) / 2;
+        y = refRect.top - floatRect.height - offset;
+        break;
+      case "top-start":
+        x = refRect.left;
+        y = refRect.top - floatRect.height - offset;
+        break;
+      case "top-end":
+        x = refRect.right - floatRect.width;
+        y = refRect.top - floatRect.height - offset;
+        break;
+      case "left":
+        x = refRect.left - floatRect.width - offset;
+        y = refRect.top + (refRect.height - floatRect.height) / 2;
+        break;
+      case "left-start":
+        x = refRect.left - floatRect.width - offset;
+        y = refRect.top;
+        break;
+      case "left-end":
+        x = refRect.left - floatRect.width - offset;
+        y = refRect.bottom - floatRect.height;
+        break;
+      case "right":
+        x = refRect.right + offset;
+        y = refRect.top + (refRect.height - floatRect.height) / 2;
+        break;
+      case "right-start":
+        x = refRect.right + offset;
+        y = refRect.top;
+        break;
+      case "right-end":
+        x = refRect.right + offset;
+        y = refRect.bottom - floatRect.height;
+        break;
+    }
+    x = Math.max(viewportPadding, Math.min(vpWidth - floatRect.width - viewportPadding, x));
+    y = Math.max(viewportPadding, Math.min(vpHeight - floatRect.height - viewportPadding, y));
+    return { x, y, actualPlacement: placement };
+  }
+  function update() {
+    const { x, y } = computePosition();
+    floating.style.position = "fixed";
+    floating.style.left = `${Math.round(x)}px`;
+    floating.style.top = `${Math.round(y)}px`;
+  }
+  return { update, computePosition };
+}
+var init_useFloatingPosition = __esm({
+  "src/composables/useFloatingPosition.ts"() {
+    "use strict";
+  }
+});
+
+// src/composables/useVirtualizer.ts
+function useVirtualizer(options) {
+  const overscan = options.overscan ?? 3;
+  let scrollTop = 0;
+  function getItemOffset(index) {
+    let offset = 0;
+    for (let i = 0; i < index; i++) {
+      offset += options.estimateSize(i);
+    }
+    return offset;
+  }
+  function getTotalSize() {
+    let total = 0;
+    for (let i = 0; i < options.count; i++) {
+      total += options.estimateSize(i);
+    }
+    return total;
+  }
+  function getVirtualItems() {
+    const scrollEl = options.getScrollElement();
+    const viewportHeight = scrollEl ? scrollEl.clientHeight : 400;
+    scrollTop = scrollEl ? scrollEl.scrollTop : 0;
+    const total = options.count;
+    if (total === 0) return [];
+    let startIndex = 0;
+    let runningOffset = 0;
+    while (startIndex < total && runningOffset + options.estimateSize(startIndex) < scrollTop) {
+      runningOffset += options.estimateSize(startIndex);
+      startIndex++;
+    }
+    let endIndex = startIndex;
+    let currentBottom = runningOffset;
+    while (endIndex < total && currentBottom < scrollTop + viewportHeight) {
+      currentBottom += options.estimateSize(endIndex);
+      endIndex++;
+    }
+    startIndex = Math.max(0, startIndex - overscan);
+    endIndex = Math.min(total - 1, endIndex + overscan);
+    const items = [];
+    let itemStart = getItemOffset(startIndex);
+    for (let i = startIndex; i <= endIndex; i++) {
+      const size = options.estimateSize(i);
+      items.push({
+        index: i,
+        start: itemStart,
+        size,
+        end: itemStart + size
+      });
+      itemStart += size;
+    }
+    return items;
+  }
+  return {
+    getTotalSize,
+    getVirtualItems
+  };
+}
+var init_useVirtualizer = __esm({
+  "src/composables/useVirtualizer.ts"() {
+    "use strict";
+  }
+});
+
+// src/composables/useDragGesture.ts
+function useDragGesture(targetElement, options = {}) {
+  const axis = options.axis ?? "both";
+  let isDragging = false;
+  let startX = 0;
+  let startY = 0;
+  function getDragState(e) {
+    const rect = targetElement.getBoundingClientRect();
+    const clientX = e.clientX;
+    const clientY = e.clientY;
+    const dx = axis === "y" ? 0 : clientX - startX;
+    const dy = axis === "x" ? 0 : clientY - startY;
+    const ratioX = rect.width > 0 ? Math.max(0, Math.min(1, (clientX - rect.left) / rect.width)) : 0;
+    const ratioY = rect.height > 0 ? Math.max(0, Math.min(1, (clientY - rect.top) / rect.height)) : 0;
+    return { clientX, clientY, dx, dy, ratioX, ratioY, isDragging };
+  }
+  const onPointerDown = (e) => {
+    isDragging = true;
+    startX = e.clientX;
+    startY = e.clientY;
+    if ("setPointerCapture" in targetElement && e.pointerId !== void 0) {
+      try {
+        targetElement.setPointerCapture(e.pointerId);
+      } catch (_) {
+      }
+    }
+    const state = getDragState(e);
+    options.onDragStart?.(state);
+    options.onDrag?.(state);
+  };
+  const onPointerMove = (e) => {
+    if (!isDragging) return;
+    const state = getDragState(e);
+    options.onDrag?.(state);
+  };
+  const onPointerUp = (e) => {
+    if (!isDragging) return;
+    isDragging = false;
+    if ("releasePointerCapture" in targetElement && e.pointerId !== void 0) {
+      try {
+        targetElement.releasePointerCapture(e.pointerId);
+      } catch (_) {
+      }
+    }
+    const state = getDragState(e);
+    options.onDragEnd?.(state);
+  };
+  targetElement.addEventListener("pointerdown", onPointerDown);
+  targetElement.addEventListener("pointermove", onPointerMove);
+  targetElement.addEventListener("pointerup", onPointerUp);
+  targetElement.addEventListener("pointercancel", onPointerUp);
+  function destroy() {
+    targetElement.removeEventListener("pointerdown", onPointerDown);
+    targetElement.removeEventListener("pointermove", onPointerMove);
+    targetElement.removeEventListener("pointerup", onPointerUp);
+    targetElement.removeEventListener("pointercancel", onPointerUp);
+  }
+  return { destroy };
+}
+var init_useDragGesture = __esm({
+  "src/composables/useDragGesture.ts"() {
+    "use strict";
+  }
+});
+
+// src/composables/useHotkeys.ts
+function useHotkeys(hotkeys, targetNode = typeof document !== "undefined" ? document : null) {
+  if (!targetNode) return { destroy: () => {
+  } };
+  function matchesCombo(e, comboStr) {
+    const parts = comboStr.toLowerCase().split("+").map((p) => p.trim());
+    const hasCtrl = parts.includes("ctrl") || parts.includes("control");
+    const hasMeta = parts.includes("meta") || parts.includes("cmd") || parts.includes("command");
+    const hasShift = parts.includes("shift");
+    const hasAlt = parts.includes("alt");
+    if (hasCtrl && !e.ctrlKey) return false;
+    if (hasMeta && !e.metaKey) return false;
+    if (hasShift && !e.shiftKey) return false;
+    if (hasAlt && !e.altKey) return false;
+    const mainKey = parts.find((p) => !["ctrl", "control", "meta", "cmd", "command", "shift", "alt"].includes(p));
+    if (!mainKey) return true;
+    const key = e.key.toLowerCase();
+    if (mainKey === "esc" || mainKey === "escape") return key === "escape";
+    if (mainKey === "enter") return key === "enter";
+    if (mainKey === "space") return key === " " || key === "space";
+    if (mainKey === "slash") return key === "/";
+    return key === mainKey;
+  }
+  function isInputElement(el) {
+    if (!el) return false;
+    const tag = el.tagName.toLowerCase();
+    return tag === "input" || tag === "textarea" || tag === "select" || el.hasAttribute("contenteditable");
+  }
+  function handleKeyDown(e) {
+    const keyEvent = e;
+    const target = keyEvent.target;
+    const isInput = isInputElement(target);
+    for (const item of hotkeys) {
+      if (isInput && !item.allowInInputs && item.combo !== "escape") {
+        continue;
+      }
+      if (matchesCombo(keyEvent, item.combo)) {
+        keyEvent.preventDefault();
+        item.handler(keyEvent);
+        break;
+      }
+    }
+  }
+  targetNode.addEventListener("keydown", handleKeyDown);
+  return {
+    destroy: () => {
+      targetNode.removeEventListener("keydown", handleKeyDown);
+    }
+  };
+}
+var init_useHotkeys = __esm({
+  "src/composables/useHotkeys.ts"() {
+    "use strict";
+  }
+});
+
+// src/composables/useClickOutside.ts
+function useClickOutside(target, handler, options = {}) {
+  if (!target || typeof document === "undefined") return { destroy: () => {
+  } };
+  function listener(e) {
+    const path = e.composedPath ? e.composedPath() : [];
+    const clickedNode = e.target;
+    if (target && (target === clickedNode || target.contains(clickedNode) || path.includes(target))) {
+      return;
+    }
+    if (options.ignoreElements) {
+      for (const el of options.ignoreElements) {
+        if (el && (el === clickedNode || el.contains(clickedNode) || path.includes(el))) {
+          return;
+        }
+      }
+    }
+    handler(e);
+  }
+  const capture = options.capture ?? false;
+  document.addEventListener("pointerdown", listener, { capture });
+  document.addEventListener("touchstart", listener, { capture });
+  return {
+    destroy: () => {
+      document.removeEventListener("pointerdown", listener, { capture });
+      document.removeEventListener("touchstart", listener, { capture });
+    }
+  };
+}
+var init_useClickOutside = __esm({
+  "src/composables/useClickOutside.ts"() {
+    "use strict";
+  }
+});
+
+// src/composables/useScrollLock.ts
+function useScrollLock() {
+  function lock() {
+    if (typeof document === "undefined") return;
+    if (lockCount === 0) {
+      originalOverflow = document.body.style.overflow;
+      originalPaddingRight = document.body.style.paddingRight;
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+      document.body.style.overflow = "hidden";
+      if (scrollbarWidth > 0) {
+        document.body.style.paddingRight = `${scrollbarWidth}px`;
+      }
+    }
+    lockCount++;
+  }
+  function unlock() {
+    if (typeof document === "undefined") return;
+    lockCount = Math.max(0, lockCount - 1);
+    if (lockCount === 0) {
+      document.body.style.overflow = originalOverflow;
+      document.body.style.paddingRight = originalPaddingRight;
+    }
+  }
+  return { lock, unlock };
+}
+var lockCount, originalOverflow, originalPaddingRight;
+var init_useScrollLock = __esm({
+  "src/composables/useScrollLock.ts"() {
+    "use strict";
+    lockCount = 0;
+    originalOverflow = "";
+    originalPaddingRight = "";
+  }
+});
+
+// src/composables/useControllableState.ts
+function useControllableState(options) {
+  const isControlled = options.value !== void 0;
+  let internalValue = options.defaultValue !== void 0 ? options.defaultValue : options.value;
+  function getValue() {
+    return isControlled ? options.value : internalValue;
+  }
+  function setValue(nextValue) {
+    const resolved = typeof nextValue === "function" ? nextValue(getValue()) : nextValue;
+    if (!isControlled) {
+      internalValue = resolved;
+    }
+    options.onChange?.(resolved);
+  }
+  return [getValue, setValue];
+}
+var init_useControllableState = __esm({
+  "src/composables/useControllableState.ts"() {
+    "use strict";
+  }
+});
+
+// src/composables/animation/useSpring.ts
+function useSpring(initialValue, config = {}) {
+  const stiffness = config.stiffness ?? 170;
+  const damping = config.damping ?? 26;
+  const mass = config.mass ?? 1;
+  const precision = config.precision ?? 1e-3;
+  let current = initialValue;
+  let target = initialValue;
+  let velocity = 0;
+  let animFrame = null;
+  const updateListeners = /* @__PURE__ */ new Set();
+  function step() {
+    const displacement = current - target;
+    const springForce = -stiffness * displacement;
+    const dampingForce = -damping * velocity;
+    const acceleration = (springForce + dampingForce) / mass;
+    const dt = 1 / 60;
+    velocity += acceleration * dt;
+    current += velocity * dt;
+    updateListeners.forEach((fn) => fn(current));
+    if (Math.abs(displacement) < precision && Math.abs(velocity) < precision) {
+      current = target;
+      velocity = 0;
+      updateListeners.forEach((fn) => fn(current));
+      animFrame = null;
+    } else {
+      if (typeof requestAnimationFrame !== "undefined") {
+        animFrame = requestAnimationFrame(step);
+      }
+    }
+  }
+  function set(nextTarget) {
+    target = nextTarget;
+    if (animFrame === null && typeof requestAnimationFrame !== "undefined") {
+      animFrame = requestAnimationFrame(step);
+    } else if (typeof requestAnimationFrame === "undefined") {
+      current = nextTarget;
+      updateListeners.forEach((fn) => fn(current));
+    }
+  }
+  function stop() {
+    if (animFrame !== null && typeof cancelAnimationFrame !== "undefined") {
+      cancelAnimationFrame(animFrame);
+      animFrame = null;
+    }
+    velocity = 0;
+  }
+  function onUpdate(listener) {
+    updateListeners.add(listener);
+    return () => updateListeners.delete(listener);
+  }
+  return {
+    get value() {
+      return current;
+    },
+    set,
+    onUpdate,
+    stop
+  };
+}
+var init_useSpring = __esm({
+  "src/composables/animation/useSpring.ts"() {
+    "use strict";
+  }
+});
+
+// src/composables/animation/useTransition.ts
+function useTransition(element, options = {}) {
+  const duration = options.duration ?? 200;
+  const easing = options.easing ?? "cubic-bezier(0.16, 1, 0.3, 1)";
+  const preset = options.preset ?? "fade";
+  function getPresetStyles(state) {
+    switch (preset) {
+      case "fade":
+        return {
+          opacity: state === "visible" ? "1" : "0",
+          transform: "none"
+        };
+      case "scale":
+        return {
+          opacity: state === "visible" ? "1" : "0",
+          transform: state === "visible" ? "scale(1)" : "scale(0.95)"
+        };
+      case "slide-up":
+        return {
+          opacity: state === "visible" ? "1" : "0",
+          transform: state === "visible" ? "translateY(0)" : "translateY(12px)"
+        };
+      case "slide-down":
+        return {
+          opacity: state === "visible" ? "1" : "0",
+          transform: state === "visible" ? "translateY(0)" : "translateY(-12px)"
+        };
+      case "slide-left":
+        return {
+          transform: state === "visible" ? "translateX(0)" : "translateX(100%)"
+        };
+      case "slide-right":
+        return {
+          transform: state === "visible" ? "translateX(0)" : "translateX(-100%)"
+        };
+      case "collapse":
+        return {
+          height: state === "visible" ? "auto" : "0px",
+          opacity: state === "visible" ? "1" : "0",
+          overflow: "hidden"
+        };
+      default:
+        return { opacity: state === "visible" ? "1" : "0" };
+    }
+  }
+  function enter(cb) {
+    if (!element) return;
+    options.onEnterStart?.();
+    element.style.transition = `all ${duration}ms ${easing}`;
+    element.style.willChange = "transform, opacity";
+    const hidden = getPresetStyles("hidden");
+    Object.assign(element.style, hidden);
+    element.style.display = "";
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const visible = getPresetStyles("visible");
+        Object.assign(element.style, visible);
+        setTimeout(() => {
+          element.style.willChange = "auto";
+          options.onEnterEnd?.();
+          cb?.();
+        }, duration);
+      });
+    });
+  }
+  function exit(cb) {
+    if (!element) return;
+    options.onExitStart?.();
+    element.style.transition = `all ${duration}ms ${easing}`;
+    element.style.willChange = "transform, opacity";
+    const hidden = getPresetStyles("hidden");
+    Object.assign(element.style, hidden);
+    setTimeout(() => {
+      element.style.display = "none";
+      element.style.willChange = "auto";
+      options.onExitEnd?.();
+      cb?.();
+    }, duration);
+  }
+  return { enter, exit };
+}
+var init_useTransition = __esm({
+  "src/composables/animation/useTransition.ts"() {
+    "use strict";
+  }
+});
+
+// src/composables/animation/useAutoAnimate.ts
+function useAutoAnimate(parent, options = {}) {
+  if (!parent || typeof window === "undefined" || !("MutationObserver" in window)) {
+    return { destroy: () => {
+    } };
+  }
+  const duration = options.duration ?? 250;
+  const easing = options.easing ?? "cubic-bezier(0.2, 0, 0, 1)";
+  const prevRects = /* @__PURE__ */ new Map();
+  function recordRects() {
+    prevRects.clear();
+    Array.from(parent.children).forEach((child) => {
+      prevRects.set(child, child.getBoundingClientRect());
+    });
+  }
+  function animate() {
+    const currentChildren = Array.from(parent.children);
+    currentChildren.forEach((child) => {
+      const first = prevRects.get(child);
+      const last = child.getBoundingClientRect();
+      if (first) {
+        const deltaX = first.left - last.left;
+        const deltaY = first.top - last.top;
+        if (deltaX !== 0 || deltaY !== 0) {
+          child.animate([
+            { transform: `translate(${deltaX}px, ${deltaY}px)` },
+            { transform: "none" }
+          ], {
+            duration,
+            easing
+          });
+        }
+      } else {
+        child.animate([
+          { opacity: 0, transform: "scale(0.95)" },
+          { opacity: 1, transform: "none" }
+        ], {
+          duration,
+          easing
+        });
+      }
+    });
+  }
+  recordRects();
+  const observer = new MutationObserver(() => {
+    animate();
+    recordRects();
+  });
+  observer.observe(parent, { childList: true });
+  return {
+    destroy: () => {
+      observer.disconnect();
+      prevRects.clear();
+    }
+  };
+}
+var init_useAutoAnimate = __esm({
+  "src/composables/animation/useAutoAnimate.ts"() {
+    "use strict";
+  }
+});
+
+// src/composables/animation/useStagger.ts
+function useStagger(elements, options = {}) {
+  const staggerMs = options.staggerMs ?? 40;
+  const initialDelay = options.initialDelay ?? 0;
+  const duration = options.duration ?? 250;
+  const easing = options.easing ?? "cubic-bezier(0.16, 1, 0.3, 1)";
+  const list = Array.from(elements);
+  list.forEach((el, index) => {
+    const delay = initialDelay + index * staggerMs;
+    el.style.opacity = "0";
+    el.style.transform = "translateY(8px)";
+    el.style.transition = `opacity ${duration}ms ${easing} ${delay}ms, transform ${duration}ms ${easing} ${delay}ms`;
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        el.style.opacity = "1";
+        el.style.transform = "none";
+      });
+    });
+  });
+}
+var init_useStagger = __esm({
+  "src/composables/animation/useStagger.ts"() {
+    "use strict";
+  }
+});
+
+// src/composables/animation/useMorphLayout.ts
+function useMorphLayout(indicator, options = {}) {
+  const duration = options.duration ?? 200;
+  const easing = options.easing ?? "cubic-bezier(0.2, 0, 0, 1)";
+  indicator.style.position = "absolute";
+  indicator.style.transition = `left ${duration}ms ${easing}, top ${duration}ms ${easing}, width ${duration}ms ${easing}, height ${duration}ms ${easing}, opacity ${duration}ms ${easing}`;
+  indicator.style.pointerEvents = "none";
+  function moveTo(target) {
+    if (!target || !target.offsetParent) {
+      indicator.style.opacity = "0";
+      return;
+    }
+    indicator.style.opacity = "1";
+    indicator.style.left = `${target.offsetLeft}px`;
+    indicator.style.top = `${target.offsetTop}px`;
+    indicator.style.width = `${target.offsetWidth}px`;
+    indicator.style.height = `${target.offsetHeight}px`;
+  }
+  return { moveTo };
+}
+var init_useMorphLayout = __esm({
+  "src/composables/animation/useMorphLayout.ts"() {
+    "use strict";
+  }
+});
+
+// src/composables/index.ts
+var init_composables = __esm({
+  "src/composables/index.ts"() {
+    "use strict";
+    init_useDisclosure();
+    init_useFocusTrap();
+    init_useFloatingPosition();
+    init_useVirtualizer();
+    init_useDragGesture();
+    init_useHotkeys();
+    init_useClickOutside();
+    init_useScrollLock();
+    init_useControllableState();
+    init_useSpring();
+    init_useTransition();
+    init_useAutoAnimate();
+    init_useStagger();
+    init_useMorphLayout();
   }
 });
 
@@ -4209,6 +5114,556 @@ var init_inplace = __esm({
   }
 });
 
+// src/components/command.ts
+var command_exports = {};
+__export(command_exports, {
+  default: () => CommandPaletteIsland
+});
+function CommandPaletteIsland(container, props) {
+  const placeholder = props.placeholder || "Type a command or search...";
+  const items = props.items || [
+    { id: "home", label: "Go to Overview", group: "Navigation", icon: "compass", url: "/", shortcut: "G H" },
+    { id: "docs", label: "Documentation Index", group: "Navigation", icon: "file-text", url: "/doc/01-getting-started", shortcut: "G D" },
+    { id: "showcase", label: "Showcase Components", group: "Navigation", icon: "layers", url: "/enterprise", shortcut: "G S" },
+    { id: "dash", label: "Enterprise Dashboard", group: "Navigation", icon: "bar-chart", url: "/dashboard", shortcut: "G B" },
+    { id: "theme-dark", label: "Toggle Dark Mode", group: "Theme & Preferences", icon: "moon", action: "toggle-dark", shortcut: "T D" },
+    { id: "studio", label: "Open TweakAura Studio", group: "Theme & Preferences", icon: "palette", action: "open-studio", shortcut: "T S" },
+    { id: "export-css", label: "Export Current CSS Theme", group: "Actions", icon: "share-2", action: "export-css" },
+    { id: "help", label: "Help & Shortcuts Guide", group: "Actions", icon: "help-circle", action: "help", shortcut: "?" }
+  ];
+  let search = "";
+  let selectedIndex = 0;
+  const disclosure = useDisclosure({ defaultIsOpen: false });
+  const scrollLock = useScrollLock();
+  container.innerHTML = `
+        <div class="laughtale-command-root">
+            <!-- Command Overlay Backdrop -->
+            <div class="command-backdrop" style="display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); align-items: flex-start; justify-content: center; padding-top: 12vh;">
+                <!-- Command Dialog Card -->
+                <div class="command-dialog" style="width: 100%; max-width: 580px; background: var(--p-surface-0, #ffffff); border: 1px solid var(--p-border-color, #e2e8f0); border-radius: var(--p-border-radius-xl, 0.75rem); box-shadow: var(--p-shadow-lg, 0 20px 25px -5px rgba(0,0,0,0.1)); overflow: hidden; display: flex; flex-direction: column;">
+                    
+                    <!-- Search Header -->
+                    <div style="display: flex; align-items: center; padding: 0.875rem 1.125rem; border-bottom: 1px solid var(--p-border-color, #e2e8f0); gap: 0.75rem;">
+                        <span style="color: var(--p-surface-400, #94a3b8); display: flex;">${LucideIcons.search(18)}</span>
+                        <input type="text" 
+                               class="command-search-input" 
+                               placeholder="${placeholder}" 
+                               style="flex: 1; border: none; outline: none; background: transparent; font-size: 0.9375rem; color: var(--p-text-color, #0f172a); font-family: var(--p-font-family, inherit);" />
+                        <span class="aura-tag tag-slate" style="font-size: 0.6875rem; padding: 0.2rem 0.45rem; font-family: monospace;">ESC</span>
+                    </div>
+
+                    <!-- Command Items List -->
+                    <div class="command-items-container" style="max-height: 340px; overflow-y: auto; padding: 0.5rem;"></div>
+
+                    <!-- Footer Bar -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 1rem; border-top: 1px solid var(--p-border-color, #e2e8f0); background: var(--p-surface-50, #f8fafc); font-size: 0.75rem; color: var(--p-surface-500, #64748b);">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <span>Navigate <kbd style="font-family: monospace; background: var(--p-surface-200); padding: 1px 4px; border-radius: 3px;">\u2191\u2193</kbd></span>
+                            <span>Select <kbd style="font-family: monospace; background: var(--p-surface-200); padding: 1px 4px; border-radius: 3px;">\u21B5</kbd></span>
+                        </div>
+                        <div>SoftMax.LaughTale Spotlight</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+  const backdrop = container.querySelector(".command-backdrop");
+  const dialog = container.querySelector(".command-dialog");
+  const input = container.querySelector(".command-search-input");
+  const listContainer = container.querySelector(".command-items-container");
+  const focusTrap = useFocusTrap(dialog, { initialFocusElement: input });
+  function getFilteredItems() {
+    if (!search.trim()) return items;
+    const q = search.toLowerCase();
+    return items.filter((it) => it.label.toLowerCase().includes(q) || it.group && it.group.toLowerCase().includes(q));
+  }
+  function renderList() {
+    const filtered = getFilteredItems();
+    if (filtered.length === 0) {
+      listContainer.innerHTML = `
+                <div style="padding: 2.5rem 1rem; text-align: center; color: var(--p-surface-400);">
+                    <div style="margin-bottom: 0.5rem; display: flex; justify-content: center;">${LucideIcons.alertCircle(24)}</div>
+                    <div style="font-size: 0.875rem; font-weight: 500;">No matching commands found</div>
+                </div>
+            `;
+      return;
+    }
+    const groups = {};
+    filtered.forEach((it) => {
+      const g = it.group || "General";
+      if (!groups[g]) groups[g] = [];
+      groups[g].push(it);
+    });
+    let flatIndex = 0;
+    let html = "";
+    for (const [groupName, groupItems] of Object.entries(groups)) {
+      html += `<div style="font-size: 0.6875rem; font-weight: 700; color: var(--p-surface-400); text-transform: uppercase; letter-spacing: 0.05em; padding: 0.5rem 0.75rem 0.25rem;">${groupName}</div>`;
+      groupItems.forEach((it) => {
+        const isSelected = flatIndex === selectedIndex;
+        const iconSvg = it.icon && LucideIcons[it.icon] ? LucideIcons[it.icon](16) : LucideIcons.terminal(16);
+        html += `
+                    <div class="command-item ${isSelected ? "active" : ""}" 
+                         data-index="${flatIndex}" 
+                         data-id="${it.id}" 
+                         style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border-radius: var(--p-border-radius, 6px); cursor: pointer; background: ${isSelected ? "var(--p-surface-100, #f1f5f9)" : "transparent"}; color: var(--p-text-color, #0f172a); font-size: 0.875rem; transition: background 0.1s ease;">
+                        <div style="display: flex; align-items: center; gap: 0.625rem;">
+                            <span style="color: ${isSelected ? "var(--p-primary-600)" : "var(--p-surface-400)"}; display: flex;">${iconSvg}</span>
+                            <span>${it.label}</span>
+                        </div>
+                        ${it.shortcut ? `<span class="aura-tag tag-slate" style="font-size: 0.6875rem; padding: 0.15rem 0.4rem; font-family: monospace;">${it.shortcut}</span>` : ""}
+                    </div>
+                `;
+        flatIndex++;
+      });
+    }
+    listContainer.innerHTML = html;
+    listContainer.querySelectorAll(".command-item").forEach((el) => {
+      el.addEventListener("mouseenter", () => {
+        selectedIndex = Number(el.getAttribute("data-index"));
+        renderList();
+      });
+      el.addEventListener("click", () => {
+        executeItem(filtered[Number(el.getAttribute("data-index"))]);
+      });
+    });
+  }
+  function executeItem(item) {
+    if (!item) return;
+    close();
+    if (item.url) {
+      window.location.href = item.url;
+    } else if (item.action === "toggle-dark") {
+      document.documentElement.classList.toggle("dark");
+      localStorage.setItem("theme", document.documentElement.classList.contains("dark") ? "dark" : "light");
+    } else if (item.action === "open-studio") {
+      document.dispatchEvent(new CustomEvent("studio:open"));
+    } else if (item.action === "export-css") {
+      document.dispatchEvent(new CustomEvent("studio:export"));
+    }
+  }
+  function open() {
+    disclosure.open();
+    backdrop.style.display = "flex";
+    scrollLock.lock();
+    focusTrap.activate();
+    search = "";
+    input.value = "";
+    selectedIndex = 0;
+    renderList();
+    input.focus();
+  }
+  function close() {
+    disclosure.close();
+    backdrop.style.display = "none";
+    scrollLock.unlock();
+    focusTrap.deactivate();
+  }
+  backdrop.addEventListener("click", (e) => {
+    if (e.target === backdrop) close();
+  });
+  input.addEventListener("input", () => {
+    search = input.value;
+    selectedIndex = 0;
+    renderList();
+  });
+  input.addEventListener("keydown", (e) => {
+    const filtered = getFilteredItems();
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      selectedIndex = (selectedIndex + 1) % Math.max(1, filtered.length);
+      renderList();
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      selectedIndex = (selectedIndex - 1 + filtered.length) % Math.max(1, filtered.length);
+      renderList();
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      executeItem(filtered[selectedIndex]);
+    } else if (e.key === "Escape") {
+      e.preventDefault();
+      close();
+    }
+  });
+  useHotkeys([
+    { combo: "ctrl+k", handler: () => disclosure.isOpen ? close() : open(), allowInInputs: true },
+    { combo: "meta+k", handler: () => disclosure.isOpen ? close() : open(), allowInInputs: true },
+    { combo: "escape", handler: () => {
+      if (disclosure.isOpen) close();
+    }, allowInInputs: true }
+  ]);
+  document.addEventListener("command:open", () => open());
+}
+var init_command = __esm({
+  "src/components/command.ts"() {
+    "use strict";
+    init_lucide();
+    init_useDisclosure();
+    init_useFocusTrap();
+    init_useHotkeys();
+    init_useScrollLock();
+  }
+});
+
+// src/components/theme-studio.ts
+var theme_studio_exports = {};
+__export(theme_studio_exports, {
+  default: () => ThemeStudioIsland
+});
+function ThemeStudioIsland(container, props = {}) {
+  let currentPrimary = "emerald";
+  let currentRadius = "0.5rem";
+  let currentNeutral = "slate";
+  let currentShadow = "layered";
+  const disclosure = useDisclosure({ defaultIsOpen: props.defaultOpen });
+  const scrollLock = useScrollLock();
+  container.innerHTML = `
+        <div class="laughtale-theme-studio-root">
+            <!-- Floating Launch Bubble -->
+            <button type="button" 
+                    class="theme-studio-toggle-btn" 
+                    title="Open TweakAura Theme Studio"
+                    style="position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 5000; width: 3rem; height: 3rem; border-radius: 9999px; background: var(--p-surface-900, #0f172a); color: var(--p-surface-0, #ffffff); border: 2px solid var(--p-primary-500, #10b981); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; outline: none;">
+                ${LucideIcons.palette(20)}
+            </button>
+
+            <!-- Backdrop -->
+            <div class="theme-studio-backdrop" style="display: none; position: fixed; inset: 0; z-index: 5001; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(2px);"></div>
+
+            <!-- Slide-in Drawer Panel -->
+            <div class="theme-studio-drawer" style="position: fixed; top: 0; right: 0; bottom: 0; width: 100%; max-width: 380px; z-index: 5002; background: var(--p-surface-0, #ffffff); border-left: 1px solid var(--p-border-color, #e2e8f0); box-shadow: -10px 0 25px -5px rgba(0,0,0,0.1); transform: translateX(100%); transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column;">
+                
+                <!-- Header -->
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--p-border-color, #e2e8f0);">
+                    <div style="display: flex; align-items: center; gap: 0.625rem;">
+                        <span style="color: var(--p-primary-600); display: flex;">${LucideIcons.sliders(20)}</span>
+                        <div>
+                            <div style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900);">TweakAura Studio</div>
+                            <div style="font-size: 0.75rem; color: var(--p-surface-500);">Live shadcn-Style Theme Editor</div>
+                        </div>
+                    </div>
+                    <button type="button" class="theme-studio-close-btn" style="border: none; background: transparent; color: var(--p-surface-400); cursor: pointer; padding: 0.25rem; display: flex; border-radius: 4px;">
+                        ${LucideIcons.x(20)}
+                    </button>
+                </div>
+
+                <!-- Body Controls -->
+                <div style="flex: 1; overflow-y: auto; padding: 1.5rem; display: flex; flex-direction: column; gap: 1.5rem;">
+                    
+                    <!-- 1. Primary Palette -->
+                    <div>
+                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-surface-500); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem;">Primary Color Palette</div>
+                        <div class="studio-color-grid" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.5rem;"></div>
+                    </div>
+
+                    <!-- 2. Corner Radius Slider -->
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <span style="font-size: 0.75rem; font-weight: 700; color: var(--p-surface-500); text-transform: uppercase; letter-spacing: 0.05em;">Corner Radius</span>
+                            <span class="studio-radius-label" style="font-family: monospace; font-size: 0.75rem; color: var(--p-primary-600); font-weight: 600;">0.5rem</span>
+                        </div>
+                        <div class="studio-radius-presets" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.35rem;">
+                            <button type="button" class="radius-btn" data-radius="0rem" style="padding: 0.35rem 0; font-size: 0.75rem; font-family: monospace; border: 1px solid var(--p-border-color); background: var(--p-surface-50); border-radius: 2px; cursor: pointer;">0</button>
+                            <button type="button" class="radius-btn" data-radius="0.25rem" style="padding: 0.35rem 0; font-size: 0.75rem; font-family: monospace; border: 1px solid var(--p-border-color); background: var(--p-surface-50); border-radius: 4px; cursor: pointer;">0.25</button>
+                            <button type="button" class="radius-btn active" data-radius="0.5rem" style="padding: 0.35rem 0; font-size: 0.75rem; font-family: monospace; border: 1px solid var(--p-primary-600); background: var(--p-primary-50); color: var(--p-primary-700); font-weight: 700; border-radius: 6px; cursor: pointer;">0.5</button>
+                            <button type="button" class="radius-btn" data-radius="0.75rem" style="padding: 0.35rem 0; font-size: 0.75rem; font-family: monospace; border: 1px solid var(--p-border-color); background: var(--p-surface-50); border-radius: 8px; cursor: pointer;">0.75</button>
+                            <button type="button" class="radius-btn" data-radius="1.0rem" style="padding: 0.35rem 0; font-size: 0.75rem; font-family: monospace; border: 1px solid var(--p-border-color); background: var(--p-surface-50); border-radius: 12px; cursor: pointer;">1.0</button>
+                        </div>
+                    </div>
+
+                    <!-- 3. Pre-Packaged Themes -->
+                    <div>
+                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-surface-500); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem;">Preset Curated Themes</div>
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            <button type="button" class="preset-theme-btn" data-theme="emerald-zero-trust" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); background: var(--p-surface-50); cursor: pointer; text-align: left;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <span style="width: 1rem; height: 1rem; border-radius: 3px; background: #10b981;"></span>
+                                    <span style="font-size: 0.8125rem; font-weight: 600; color: var(--p-surface-800);">Emerald Zero-Trust</span>
+                                </div>
+                                <span style="font-size: 0.6875rem; color: var(--p-surface-400);">Default</span>
+                            </button>
+                            <button type="button" class="preset-theme-btn" data-theme="supabase-violet" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); background: var(--p-surface-50); cursor: pointer; text-align: left;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <span style="width: 1rem; height: 1rem; border-radius: 3px; background: #8b5cf6;"></span>
+                                    <span style="font-size: 0.8125rem; font-weight: 600; color: var(--p-surface-800);">Supabase Violet</span>
+                                </div>
+                                <span style="font-size: 0.6875rem; color: var(--p-surface-400);">Radius 0.375</span>
+                            </button>
+                            <button type="button" class="preset-theme-btn" data-theme="sunset-ember" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); background: var(--p-surface-50); cursor: pointer; text-align: left;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <span style="width: 1rem; height: 1rem; border-radius: 3px; background: #f43f5e;"></span>
+                                    <span style="font-size: 0.8125rem; font-weight: 600; color: var(--p-surface-800);">Sunset Ember</span>
+                                </div>
+                                <span style="font-size: 0.6875rem; color: var(--p-surface-400);">Radius 0.75</span>
+                            </button>
+                            <button type="button" class="preset-theme-btn" data-theme="cyber-cyan" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); background: var(--p-surface-50); cursor: pointer; text-align: left;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <span style="width: 1rem; height: 1rem; border-radius: 3px; background: #06b6d4;"></span>
+                                    <span style="font-size: 0.8125rem; font-weight: 600; color: var(--p-surface-800);">Cyberpunk Cyan</span>
+                                </div>
+                                <span style="font-size: 0.6875rem; color: var(--p-surface-400);">Radius 0.0</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 4. Live Mini Component Preview -->
+                    <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1rem;">
+                        <div style="font-size: 0.6875rem; font-weight: 700; color: var(--p-surface-400); text-transform: uppercase; margin-bottom: 0.75rem;">Live Preview</div>
+                        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button type="button" class="p-button p-button-primary" style="flex: 1; padding: 0.35rem 0.5rem; font-size: 0.75rem;">Primary</button>
+                                <button type="button" class="p-button p-button-secondary" style="flex: 1; padding: 0.35rem 0.5rem; font-size: 0.75rem;">Secondary</button>
+                            </div>
+                            <input type="text" value="Interactive Input" class="p-input" style="padding: 0.35rem 0.5rem; font-size: 0.75rem;" />
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Footer Export Actions -->
+                <div style="padding: 1rem 1.5rem; border-top: 1px solid var(--p-border-color, #e2e8f0); background: var(--p-surface-50, #f8fafc); display: flex; flex-direction: column; gap: 0.5rem;">
+                    <button type="button" class="studio-copy-css-btn p-button p-button-primary" style="width: 100%; justify-content: center; font-size: 0.8125rem;">
+                        ${LucideIcons.copy(16)} Copy CSS Tokens
+                    </button>
+                    <button type="button" class="studio-copy-csharp-btn p-button p-button-secondary" style="width: 100%; justify-content: center; font-size: 0.8125rem;">
+                        ${LucideIcons.code(16)} Copy C# Theme Tokens
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    `;
+  const toggleBtn = container.querySelector(".theme-studio-toggle-btn");
+  const backdrop = container.querySelector(".theme-studio-backdrop");
+  const drawer = container.querySelector(".theme-studio-drawer");
+  const closeBtn = container.querySelector(".theme-studio-close-btn");
+  const colorGrid = container.querySelector(".studio-color-grid");
+  const radiusLabel = container.querySelector(".studio-radius-label");
+  const copyCssBtn = container.querySelector(".studio-copy-css-btn");
+  const copyCSharpBtn = container.querySelector(".studio-copy-csharp-btn");
+  colorGrid.innerHTML = Object.entries(PRIMARY_PRESETS).map(([key, p]) => `
+        <button type="button" 
+                class="studio-color-swatch ${key === currentPrimary ? "active" : ""}" 
+                data-color="${key}" 
+                title="${p.name}" 
+                style="width: 100%; aspect-ratio: 1; border-radius: var(--p-border-radius, 6px); background: ${p.hex}; border: ${key === currentPrimary ? "2px solid #ffffff" : "1px solid rgba(0,0,0,0.1)"}; box-shadow: ${key === currentPrimary ? "0 0 0 2px var(--p-surface-900)" : "none"}; cursor: pointer; transition: transform 0.15s ease;">
+        </button>
+    `).join("");
+  function applyTheme() {
+    const p = PRIMARY_PRESETS[currentPrimary] || PRIMARY_PRESETS.emerald;
+    const root = document.documentElement;
+    root.style.setProperty("--p-primary-50", p.lightP50);
+    root.style.setProperty("--p-primary-100", p.lightP100);
+    root.style.setProperty("--p-primary-200", p.lightP200);
+    root.style.setProperty("--p-primary-500", p.lightP500);
+    root.style.setProperty("--p-primary-600", p.lightP600);
+    root.style.setProperty("--p-primary-700", p.lightP700);
+    root.style.setProperty("--p-border-radius", currentRadius);
+    const radNum = parseFloat(currentRadius);
+    root.style.setProperty("--p-border-radius-lg", `${radNum * 1.5}rem`);
+    root.style.setProperty("--p-border-radius-xl", `${radNum * 2}rem`);
+    radiusLabel.textContent = currentRadius;
+  }
+  function open() {
+    disclosure.open();
+    backdrop.style.display = "block";
+    drawer.style.transform = "translateX(0)";
+    scrollLock.lock();
+  }
+  function close() {
+    disclosure.close();
+    drawer.style.transform = "translateX(100%)";
+    setTimeout(() => {
+      backdrop.style.display = "none";
+    }, 250);
+    scrollLock.unlock();
+  }
+  toggleBtn.addEventListener("click", () => {
+    if (disclosure.isOpen) close();
+    else open();
+  });
+  closeBtn.addEventListener("click", close);
+  backdrop.addEventListener("click", close);
+  colorGrid.querySelectorAll(".studio-color-swatch").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      currentPrimary = btn.getAttribute("data-color");
+      colorGrid.querySelectorAll(".studio-color-swatch").forEach((b) => {
+        const k = b.getAttribute("data-color");
+        b.style.boxShadow = k === currentPrimary ? "0 0 0 2px var(--p-surface-900)" : "none";
+      });
+      applyTheme();
+    });
+  });
+  container.querySelectorAll(".radius-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      currentRadius = btn.getAttribute("data-radius");
+      container.querySelectorAll(".radius-btn").forEach((b) => {
+        b.classList.remove("active");
+        b.style.borderColor = "var(--p-border-color)";
+        b.style.background = "var(--p-surface-50)";
+        b.style.color = "inherit";
+      });
+      btn.classList.add("active");
+      btn.style.borderColor = "var(--p-primary-600)";
+      btn.style.background = "var(--p-primary-50)";
+      btn.style.color = "var(--p-primary-700)";
+      applyTheme();
+    });
+  });
+  container.querySelectorAll(".preset-theme-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const theme = btn.getAttribute("data-theme");
+      if (theme === "emerald-zero-trust") {
+        currentPrimary = "emerald";
+        currentRadius = "0.5rem";
+      } else if (theme === "supabase-violet") {
+        currentPrimary = "violet";
+        currentRadius = "0.375rem";
+      } else if (theme === "sunset-ember") {
+        currentPrimary = "rose";
+        currentRadius = "0.75rem";
+      } else if (theme === "cyber-cyan") {
+        currentPrimary = "cyan";
+        currentRadius = "0rem";
+      }
+      applyTheme();
+    });
+  });
+  copyCssBtn.addEventListener("click", () => {
+    const p = PRIMARY_PRESETS[currentPrimary];
+    const cssSnippet = `
+:root {
+    --p-primary-50: ${p.lightP50};
+    --p-primary-100: ${p.lightP100};
+    --p-primary-200: ${p.lightP200};
+    --p-primary-500: ${p.lightP500};
+    --p-primary-600: ${p.lightP600};
+    --p-primary-700: ${p.lightP700};
+    --p-border-radius: ${currentRadius};
+}
+
+html.dark {
+    --p-primary-50: ${p.darkP50};
+    --p-primary-100: ${p.darkP100};
+    --p-primary-200: ${p.darkP200};
+}`.trim();
+    navigator.clipboard.writeText(cssSnippet);
+    copyCssBtn.innerHTML = `${LucideIcons.check(16)} Copied to Clipboard!`;
+    setTimeout(() => {
+      copyCssBtn.innerHTML = `${LucideIcons.copy(16)} Copy CSS Tokens`;
+    }, 2e3);
+  });
+  copyCSharpBtn.addEventListener("click", () => {
+    const p = PRIMARY_PRESETS[currentPrimary];
+    const csharpSnippet = `
+public static class AppTheme
+{
+    public const string PrimaryHex = "${p.hex}";
+    public const string PrimaryName = "${p.name}";
+    public const string BorderRadius = "${currentRadius}";
+}`.trim();
+    navigator.clipboard.writeText(csharpSnippet);
+    copyCSharpBtn.innerHTML = `${LucideIcons.check(16)} Copied C# Code!`;
+    setTimeout(() => {
+      copyCSharpBtn.innerHTML = `${LucideIcons.code(16)} Copy C# Theme Tokens`;
+    }, 2e3);
+  });
+  document.addEventListener("studio:open", open);
+  document.addEventListener("studio:export", () => {
+    open();
+    copyCssBtn.click();
+  });
+  applyTheme();
+}
+var PRIMARY_PRESETS;
+var init_theme_studio = __esm({
+  "src/components/theme-studio.ts"() {
+    "use strict";
+    init_lucide();
+    init_useDisclosure();
+    init_useScrollLock();
+    PRIMARY_PRESETS = {
+      emerald: {
+        name: "Emerald",
+        hex: "#10b981",
+        lightP50: "#ecfdf5",
+        lightP100: "#d1fae5",
+        lightP200: "#a7f3d0",
+        lightP500: "#10b981",
+        lightP600: "#059669",
+        lightP700: "#047857",
+        darkP50: "#064e3b",
+        darkP100: "#065f46",
+        darkP200: "#047857"
+      },
+      indigo: {
+        name: "Indigo",
+        hex: "#6366f1",
+        lightP50: "#eef2ff",
+        lightP100: "#e0e7ff",
+        lightP200: "#c7d2fe",
+        lightP500: "#6366f1",
+        lightP600: "#4f46e5",
+        lightP700: "#4338ca",
+        darkP50: "#312e81",
+        darkP100: "#3730a3",
+        darkP200: "#4338ca"
+      },
+      violet: {
+        name: "Violet",
+        hex: "#8b5cf6",
+        lightP50: "#f5f3ff",
+        lightP100: "#ede9fe",
+        lightP200: "#ddd6fe",
+        lightP500: "#8b5cf6",
+        lightP600: "#7c3aed",
+        lightP700: "#6d28d9",
+        darkP50: "#4c1d95",
+        darkP100: "#5b21b6",
+        darkP200: "#6d28d9"
+      },
+      rose: {
+        name: "Rose",
+        hex: "#f43f5e",
+        lightP50: "#fff1f2",
+        lightP100: "#ffe4e6",
+        lightP200: "#fecdd3",
+        lightP500: "#f43f5e",
+        lightP600: "#e11d48",
+        lightP700: "#be123c",
+        darkP50: "#881337",
+        darkP100: "#9f1239",
+        darkP200: "#be123c"
+      },
+      amber: {
+        name: "Amber",
+        hex: "#f59e0b",
+        lightP50: "#fffbeb",
+        lightP100: "#fef3c7",
+        lightP200: "#fde68a",
+        lightP500: "#f59e0b",
+        lightP600: "#d97706",
+        lightP700: "#b45309",
+        darkP50: "#78350f",
+        darkP100: "#92400e",
+        darkP200: "#b45309"
+      },
+      cyan: {
+        name: "Cyan",
+        hex: "#06b6d4",
+        lightP50: "#ecfeff",
+        lightP100: "#cffafe",
+        lightP200: "#a5f3fc",
+        lightP500: "#06b6d4",
+        lightP600: "#0891b2",
+        lightP700: "#0e7490",
+        darkP50: "#164e63",
+        darkP100: "#155e75",
+        darkP200: "#0e7490"
+      }
+    };
+  }
+});
+
 // src/index.ts
 var init_index = __esm({
   "src/index.ts"() {
@@ -4227,6 +5682,7 @@ var init_index = __esm({
     init_preact();
     init_directives();
     init_lucide();
+    init_composables();
     defineIsland("stepper", () => Promise.resolve().then(() => (init_stepper(), stepper_exports)));
     defineIsland("timeline", () => Promise.resolve().then(() => (init_timeline(), timeline_exports)));
     defineIsland("camera", () => Promise.resolve().then(() => (init_camera(), camera_exports)));
@@ -4261,6 +5717,8 @@ var init_index = __esm({
     defineIsland("breadcrumb", () => Promise.resolve().then(() => (init_breadcrumb(), breadcrumb_exports)));
     defineIsland("scroll-top", () => Promise.resolve().then(() => (init_scroll_top(), scroll_top_exports)));
     defineIsland("inplace", () => Promise.resolve().then(() => (init_inplace(), inplace_exports)));
+    defineIsland("command", () => Promise.resolve().then(() => (init_command(), command_exports)));
+    defineIsland("theme-studio", () => Promise.resolve().then(() => (init_theme_studio(), theme_studio_exports)));
   }
 });
 init_index();
@@ -4283,6 +5741,20 @@ export {
   injectIslandStyle,
   navigateTo,
   parseAndReviveProps,
-  reviveTuple
+  reviveTuple,
+  useAutoAnimate,
+  useClickOutside,
+  useControllableState,
+  useDisclosure,
+  useDragGesture,
+  useFloatingPosition,
+  useFocusTrap,
+  useHotkeys,
+  useMorphLayout,
+  useScrollLock,
+  useSpring,
+  useStagger,
+  useTransition,
+  useVirtualizer
 };
 //# sourceMappingURL=index.mjs.map

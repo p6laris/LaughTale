@@ -8,6 +8,89 @@ var __export = (target, all) => {
     __defProp(target, name, { get: all[name], enumerable: true });
 };
 
+// src/directives/security.ts
+function isSafeProperty(prop) {
+  if (typeof prop !== "string") return true;
+  return !BLOCKED_PROPERTIES.has(prop);
+}
+function sanitizeUrl(url) {
+  if (typeof url !== "string") return "";
+  const trimmed = url.trim();
+  if (DANGEROUS_PROTOCOLS.test(trimmed)) {
+    console.warn(`[SoftMax.LaughTale Security] Blocked dangerous URL protocol: "${trimmed}"`);
+    return "about:blank";
+  }
+  return trimmed;
+}
+function isSafeAttribute(attrName) {
+  const lower = attrName.toLowerCase();
+  if (lower.startsWith("on") || DANGEROUS_ATTRIBUTES.has(lower)) {
+    console.warn(`[SoftMax.LaughTale Security] Blocked dangerous dynamic attribute binding: "${attrName}"`);
+    return false;
+  }
+  return true;
+}
+function createSandboxState(state) {
+  return new Proxy(state, {
+    get(target, prop) {
+      if (!isSafeProperty(prop)) {
+        console.warn(`[SoftMax.LaughTale Security] Blocked restricted property access: "${String(prop)}"`);
+        return void 0;
+      }
+      return target[prop];
+    },
+    set(target, prop, value) {
+      if (!isSafeProperty(prop)) {
+        console.warn(`[SoftMax.LaughTale Security] Blocked assignment to restricted property: "${String(prop)}"`);
+        return true;
+      }
+      target[prop] = value;
+      return true;
+    },
+    has(target, prop) {
+      if (!isSafeProperty(prop)) {
+        return false;
+      }
+      return prop in target;
+    }
+  });
+}
+var BLOCKED_PROPERTIES, DANGEROUS_ATTRIBUTES, DANGEROUS_PROTOCOLS;
+var init_security = __esm({
+  "src/directives/security.ts"() {
+    "use strict";
+    BLOCKED_PROPERTIES = /* @__PURE__ */ new Set([
+      "__proto__",
+      "prototype",
+      "constructor",
+      "window",
+      "document",
+      "globalThis",
+      "location",
+      "localStorage",
+      "sessionStorage",
+      "indexedDB",
+      "cookie",
+      "eval",
+      "Function",
+      "XMLHttpRequest",
+      "fetch"
+    ]);
+    DANGEROUS_ATTRIBUTES = /* @__PURE__ */ new Set([
+      "onerror",
+      "onload",
+      "onclick",
+      "onmouseover",
+      "onfocus",
+      "onblur",
+      "onchange",
+      "onsubmit",
+      "formaction"
+    ]);
+    DANGEROUS_PROTOCOLS = /^\s*(javascript|data|vbscript):/i;
+  }
+});
+
 // src/directives/reactivity.ts
 var reactivity_exports = {};
 __export(reactivity_exports, {
@@ -30,11 +113,19 @@ function createReactiveScope(container, initialData) {
   const listeners = /* @__PURE__ */ new Set();
   const state = new Proxy(initialData, {
     set(target, prop, value) {
+      if (!isSafeProperty(prop)) {
+        console.warn(`[SoftMax.LaughTale Security] Blocked assignment to restricted property: "${String(prop)}"`);
+        return true;
+      }
       target[prop] = value;
       listeners.forEach((fn) => fn());
       return true;
     },
     get(target, prop) {
+      if (!isSafeProperty(prop)) {
+        console.warn(`[SoftMax.LaughTale Security] Blocked access to restricted property: "${String(prop)}"`);
+        return void 0;
+      }
       return target[prop];
     }
   });
@@ -44,10 +135,19 @@ function createReactiveScope(container, initialData) {
 }
 function evaluateExpression(expr, state, extraContext = {}) {
   try {
-    const contextKeys = Object.keys(extraContext);
-    const contextValues = Object.values(extraContext);
-    const fn = new Function("state", ...contextKeys, `with(state) { return (${expr}); }`);
-    return fn(state, ...contextValues);
+    const sandboxState = createSandboxState(state);
+    const contextKeys = Object.keys(extraContext).filter(isSafeProperty);
+    const contextValues = contextKeys.map((k) => extraContext[k]);
+    const fn = new Function(
+      "state",
+      "window",
+      "document",
+      "location",
+      "cookie",
+      ...contextKeys,
+      `with(state) { return (${expr}); }`
+    );
+    return fn(sandboxState, void 0, void 0, void 0, void 0, ...contextValues);
   } catch (err) {
     console.error(`[SoftMax.LaughTale] Error evaluating expression "${expr}":`, err);
     return void 0;
@@ -55,10 +155,19 @@ function evaluateExpression(expr, state, extraContext = {}) {
 }
 function executeStatement(stmt, state, extraContext = {}) {
   try {
-    const contextKeys = Object.keys(extraContext);
-    const contextValues = Object.values(extraContext);
-    const fn = new Function("state", ...contextKeys, `with(state) { ${stmt}; }`);
-    fn(state, ...contextValues);
+    const sandboxState = createSandboxState(state);
+    const contextKeys = Object.keys(extraContext).filter(isSafeProperty);
+    const contextValues = contextKeys.map((k) => extraContext[k]);
+    const fn = new Function(
+      "state",
+      "window",
+      "document",
+      "location",
+      "cookie",
+      ...contextKeys,
+      `with(state) { ${stmt}; }`
+    );
+    fn(sandboxState, void 0, void 0, void 0, void 0, ...contextValues);
   } catch (err) {
     console.error(`[SoftMax.LaughTale] Error executing statement "${stmt}":`, err);
   }
@@ -75,9 +184,15 @@ function bindElementReactivity(element, scope) {
       update();
     } else if (attr.name.startsWith("l-bind:")) {
       const targetAttr = attr.name.slice(7);
+      if (!isSafeAttribute(targetAttr)) {
+        continue;
+      }
       const expr = attr.value;
       const update = () => {
-        const val = evaluateExpression(expr, scope.state);
+        let val = evaluateExpression(expr, scope.state);
+        if (["href", "src", "action"].includes(targetAttr.toLowerCase())) {
+          val = sanitizeUrl(val);
+        }
         if (val === false || val === null || val === void 0) {
           element.removeAttribute(targetAttr);
         } else if (val === true) {
@@ -116,6 +231,10 @@ function bindElementReactivity(element, scope) {
   }
   if (element.hasAttribute("l-model")) {
     const propName = element.getAttribute("l-model");
+    if (!isSafeProperty(propName)) {
+      console.warn(`[SoftMax.LaughTale Security] Blocked l-model binding on restricted property: "${propName}"`);
+      return;
+    }
     const input = element;
     const update = () => {
       const val = scope.state[propName];
@@ -143,6 +262,7 @@ var elementScopeMap;
 var init_reactivity = __esm({
   "src/directives/reactivity.ts"() {
     "use strict";
+    init_security();
     elementScopeMap = /* @__PURE__ */ new WeakMap();
   }
 });
@@ -1095,6 +1215,8 @@ function bindTeleportDirectives(element) {
 }
 
 // src/directives/index.ts
+init_security();
+init_reactivity();
 function initDirectives(root = document) {
   const stateElements = root.querySelectorAll("[l-state]");
   stateElements.forEach((el) => {

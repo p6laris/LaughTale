@@ -1,0 +1,104 @@
+@page "/dashboard"
+@model SoftMax.LaughTale.Showcase.Pages.DashboardModel
+@{
+    ViewData["Title"] = "Enterprise Dashboard & Theme Studio";
+}
+
+<div class="app-container" style="max-width: 1320px;">
+    
+    <!-- Spotlight Command Palette & Theme Studio -->
+    <island-command items="@Model.CommandItems" />
+    <island-theme-studio />
+
+    <!-- Top Action Bar -->
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                <h1 style="font-size: 1.875rem; font-weight: 800; letter-spacing: -0.03em; color: var(--p-surface-900);">Enterprise Telemetry Dashboard</h1>
+                <span class="aura-tag tag-emerald">Live Node 10</span>
+            </div>
+            <p style="color: var(--p-surface-500); font-size: 0.875rem;">Full-stack .NET 10 Islands + Declarative Directives + shadcn-grade TweakAura Customizer.</p>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <!-- Command Palette Trigger Button -->
+            <button type="button" 
+                    onclick="document.dispatchEvent(new CustomEvent('command:open'))" 
+                    class="p-button p-button-secondary" 
+                    style="padding: 0.5rem 0.875rem; font-size: 0.8125rem;">
+                🔍 Search Commands <kbd style="font-family: monospace; background: var(--p-surface-200); padding: 1px 5px; border-radius: 4px; font-size: 0.6875rem; margin-left: 0.35rem;">Ctrl+K</kbd>
+            </button>
+
+            <!-- TweakAura Studio Trigger -->
+            <button type="button" 
+                    onclick="document.dispatchEvent(new CustomEvent('studio:open'))" 
+                    class="p-button p-button-primary" 
+                    style="padding: 0.5rem 1rem; font-size: 0.8125rem;">
+                🎨 TweakAura Studio
+            </button>
+        </div>
+    </div>
+
+    <!-- 4-Column KPI Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
+        
+        <!-- KPI 1: Active Concurrency -->
+        <div style="background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); padding: 1.5rem; display: flex; align-items: center; justify-content: space-between;">
+            <div>
+                <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-surface-400); text-transform: uppercase;">Active Concurrency</div>
+                <div style="font-size: 1.75rem; font-weight: 800; color: var(--p-surface-900); margin: 0.35rem 0;">4,892 <span style="font-size: 0.75rem; color: var(--p-primary-600); font-weight: 600;">+14%</span></div>
+                <div style="font-size: 0.75rem; color: var(--p-surface-500);">SSR WebSocket sessions</div>
+            </div>
+            <island-knob value="78" min="0" max="100" size="64" value-color="var(--p-primary-600)" hydrate="Load" />
+        </div>
+
+        <!-- KPI 2: Gateway Latency -->
+        <div style="background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); padding: 1.5rem; display: flex; align-items: center; justify-content: space-between;">
+            <div>
+                <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-surface-400); text-transform: uppercase;">p99 Gateway Latency</div>
+                <div style="font-size: 1.75rem; font-weight: 800; color: var(--p-surface-900); margin: 0.35rem 0;">1.42 <span style="font-size: 0.875rem; font-weight: 500;">ms</span></div>
+                <div style="font-size: 0.75rem; color: var(--p-primary-600); font-weight: 600;">Sub-millisecond peak</div>
+            </div>
+            <island-knob value="94" min="0" max="100" size="64" value-color="#3b82f6" hydrate="Load" />
+        </div>
+
+        <!-- KPI 3: Inplace Live Title -->
+        <div style="background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); padding: 1.5rem;">
+            <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-surface-400); text-transform: uppercase; margin-bottom: 0.5rem;">Cluster Node Label</div>
+            <island-inplace value="us-east-cluster-primary" placeholder="Click to rename cluster" hydrate="Load" />
+            <div style="font-size: 0.75rem; color: var(--p-surface-500); margin-top: 0.75rem;">Instant inline editing</div>
+        </div>
+
+        <!-- KPI 4: Security Shield -->
+        <div style="background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 0.75rem; font-weight: 700; color: var(--p-surface-400); text-transform: uppercase;">Zero-Trust Engine</span>
+                <span class="aura-tag tag-emerald">Active</span>
+            </div>
+            <div style="font-size: 1.125rem; font-weight: 700; color: var(--p-surface-800); margin: 0.5rem 0;">HSM Token Guard</div>
+            <div style="font-size: 0.75rem; color: var(--p-surface-500);">XSS &amp; Prototype Pollution blocked</div>
+        </div>
+
+    </div>
+
+    <!-- Cluster Resource Allocation Meters -->
+    <div style="background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); padding: 1.5rem; margin-bottom: 2rem;">
+        <div style="font-size: 0.875rem; font-weight: 700; color: var(--p-surface-900); margin-bottom: 1rem;">System Resource Allocation (Multi-Core Pools)</div>
+        <island-meter-group values="@Model.SystemHealthMeters" max="100" hydrate="Load" />
+    </div>
+
+    <!-- Security Audit DataGrid -->
+    <div style="background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); padding: 1.5rem; margin-bottom: 2rem;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
+            <div>
+                <h3 style="font-size: 1.125rem; font-weight: 700; color: var(--p-surface-900);">Real-Time Audit Trail</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-surface-500);">Cryptographically verified security transactions.</p>
+            </div>
+            <button type="button" class="p-button p-button-secondary" style="font-size: 0.75rem; padding: 0.35rem 0.65rem;">
+                Export CSV
+            </button>
+        </div>
+        <island-datagrid columns="@Model.AuditCols" rows="@Model.AuditRows" page-size="5" paginator="true" hydrate="Load" />
+    </div>
+
+</div>
