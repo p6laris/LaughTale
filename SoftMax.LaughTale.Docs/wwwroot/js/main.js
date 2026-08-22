@@ -3,7 +3,7 @@ import {
   enableViewTransitions,
   initDirectives,
   initIslands
-} from "./chunk-J5UHDJTQ.js";
+} from "./chunk-BGYQ2BIA.js";
 import "./chunk-63S5ICA2.js";
 import "./chunk-RIDSUAJN.js";
 
@@ -13,7 +13,7 @@ defineIsland("file-dropzone", () => import("./dropzone-OIJK5IJ7.js"));
 defineIsland("cascade-tree", () => import("./cascade-tree-K6NUHXUW.js"));
 defineIsland("event-broadcaster", () => import("./broadcaster-RCRIXWRP.js"));
 defineIsland("event-receiver", () => import("./receiver-CDILBIW3.js"));
-defineIsland("modal-dialog", () => import("./modal-dialog-QRVXX23P.js"));
+defineIsland("modal-dialog", () => import("./modal-dialog-ONN47GA3.js"));
 defineIsland("persistent-telemetry", () => import("./persistent-player-NCRVWT4M.js"));
 function initialize() {
   initIslands();

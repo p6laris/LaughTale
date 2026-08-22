@@ -454,7 +454,20 @@ function bindElementEvents(element) {
       const rawEvent = attr.name.slice(5);
       const [eventName, ...modifiers] = rawEvent.split(".");
       const stmt = attr.value;
-      element.addEventListener(eventName, (e) => {
+      let debounceMs = 0;
+      let throttleMs = 0;
+      for (let i = 0; i < modifiers.length; i++) {
+        if (modifiers[i] === "debounce") {
+          const next = modifiers[i + 1];
+          debounceMs = next ? parseDurationMs(next) : 250;
+        } else if (modifiers[i] === "throttle") {
+          const next = modifiers[i + 1];
+          throttleMs = next ? parseDurationMs(next) : 250;
+        }
+      }
+      let timer = null;
+      let lastExecution = 0;
+      const executeHandler = (e) => {
         if (modifiers.includes("prevent")) e.preventDefault();
         if (modifiers.includes("stop")) e.stopPropagation();
         if (modifiers.includes("enter") && e.key !== "Enter") return;
@@ -469,7 +482,26 @@ function bindElementEvents(element) {
         };
         const activeState = scope ? scope.state : {};
         executeStatement(stmt, activeState, context);
-      });
+      };
+      const handler = (e) => {
+        if (debounceMs > 0) {
+          clearTimeout(timer);
+          timer = setTimeout(() => executeHandler(e), debounceMs);
+        } else if (throttleMs > 0) {
+          const now = Date.now();
+          if (now - lastExecution >= throttleMs) {
+            lastExecution = now;
+            executeHandler(e);
+          }
+        } else {
+          executeHandler(e);
+        }
+      };
+      const isWindow = modifiers.includes("window");
+      const isDocument = modifiers.includes("document");
+      const isOnce = modifiers.includes("once");
+      const target = isWindow ? window : isDocument ? document : element;
+      target.addEventListener(eventName, handler, { once: isOnce });
     }
     if (attr.name.startsWith("l-listen:")) {
       const channel = attr.name.slice(9);
@@ -477,7 +509,10 @@ function bindElementEvents(element) {
       window.addEventListener(`laughtale:${channel}`, (e) => {
         const context = {
           $event: e.detail,
-          $el: element
+          $el: element,
+          $emit: (c, p) => {
+            window.dispatchEvent(new CustomEvent(`laughtale:${c}`, { detail: p, bubbles: true }));
+          }
         };
         const activeState = scope ? scope.state : {};
         executeStatement(stmt, activeState, context);
@@ -490,6 +525,11 @@ function bindElementEvents(element) {
       });
     }
   }
+}
+function parseDurationMs(spec) {
+  if (spec.endsWith("ms")) return parseFloat(spec) || 250;
+  if (spec.endsWith("s")) return (parseFloat(spec) || 0.25) * 1e3;
+  return parseFloat(spec) || 250;
 }
 var init_events = __esm({
   "src/directives/events.ts"() {
@@ -703,6 +743,423 @@ var init_utils = __esm({
   }
 });
 
+// src/directives/hotkey.ts
+function bindHotkeyDirectives(element) {
+  const scope = getNearestScope(element);
+  for (const attr of Array.from(element.attributes)) {
+    if (attr.name === "l-hotkey" || attr.name === "l-shortcut" || attr.name.startsWith("l-hotkey.") || attr.name.startsWith("l-shortcut.")) {
+      const isGlobal = attr.name.includes(".global") || !attr.name.includes(".local");
+      const prevent = !attr.name.includes(".noprevent");
+      const shortcutSpec = attr.value.trim().toLowerCase();
+      const stmt = element.getAttribute("l-on:hotkey") || element.getAttribute("l-action");
+      const handler = (e) => {
+        if (matchesShortcut(e, shortcutSpec)) {
+          if (prevent) e.preventDefault();
+          if (stmt) {
+            const activeState = scope ? scope.state : {};
+            const context = {
+              $event: e,
+              $el: element,
+              $emit: (channel, payload) => {
+                window.dispatchEvent(new CustomEvent(`laughtale:${channel}`, { detail: payload, bubbles: true }));
+              }
+            };
+            executeStatement(stmt, activeState, context);
+          } else {
+            if (element.tagName === "INPUT" || element.tagName === "TEXTAREA") {
+              element.focus();
+            } else {
+              element.click();
+            }
+          }
+        }
+      };
+      const target = isGlobal ? window : element;
+      target.addEventListener("keydown", handler);
+    }
+  }
+}
+function matchesShortcut(e, spec) {
+  const parts = spec.split("+").map((s) => s.trim());
+  const needsCtrl = parts.includes("ctrl") || parts.includes("control") || parts.includes("cmd") || parts.includes("meta");
+  const needsAlt = parts.includes("alt") || parts.includes("option");
+  const needsShift = parts.includes("shift");
+  const keyPart = parts.find((p) => !["ctrl", "control", "cmd", "meta", "alt", "option", "shift"].includes(p));
+  const ctrlPressed = e.ctrlKey || e.metaKey;
+  if (needsCtrl !== ctrlPressed) return false;
+  if (needsAlt !== e.altKey) return false;
+  if (needsShift !== e.shiftKey) return false;
+  if (!keyPart) return true;
+  const actualKey = e.key.toLowerCase();
+  if (keyPart === "escape" || keyPart === "esc") return actualKey === "escape";
+  if (keyPart === "enter" || keyPart === "return") return actualKey === "enter";
+  if (keyPart === "space") return actualKey === " " || actualKey === "spacebar";
+  return actualKey === keyPart;
+}
+var init_hotkey = __esm({
+  "src/directives/hotkey.ts"() {
+    "use strict";
+    init_reactivity();
+  }
+});
+
+// src/directives/tooltip.ts
+function bindTooltipDirectives(element) {
+  for (const attr of Array.from(element.attributes)) {
+    if (attr.name === "l-tooltip" || attr.name.startsWith("l-tooltip.")) {
+      const text = attr.value;
+      if (!text) return;
+      let position = "top";
+      if (attr.name.includes(".bottom")) position = "bottom";
+      else if (attr.name.includes(".left")) position = "left";
+      else if (attr.name.includes(".right")) position = "right";
+      let tooltipEl = null;
+      const showTooltip = () => {
+        if (tooltipEl) return;
+        tooltipEl = document.createElement("div");
+        tooltipEl.className = "aura-directive-tooltip";
+        tooltipEl.textContent = text;
+        tooltipEl.style.cssText = `
+                    position: fixed;
+                    z-index: 99999;
+                    background: var(--p-surface-900, #1e293b);
+                    color: var(--p-surface-0, #ffffff);
+                    font-size: 0.75rem;
+                    font-weight: 500;
+                    padding: 0.35rem 0.65rem;
+                    border-radius: 6px;
+                    pointer-events: none;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                    opacity: 0;
+                    transform: scale(0.95);
+                    transition: opacity 150ms ease, transform 150ms ease;
+                    white-space: nowrap;
+                `;
+        document.body.appendChild(tooltipEl);
+        const rect = element.getBoundingClientRect();
+        const tooltipRect = tooltipEl.getBoundingClientRect();
+        let top = 0;
+        let left = 0;
+        switch (position) {
+          case "top":
+            top = rect.top - tooltipRect.height - 8;
+            left = rect.left + (rect.width - tooltipRect.width) / 2;
+            break;
+          case "bottom":
+            top = rect.bottom + 8;
+            left = rect.left + (rect.width - tooltipRect.width) / 2;
+            break;
+          case "left":
+            top = rect.top + (rect.height - tooltipRect.height) / 2;
+            left = rect.left - tooltipRect.width - 8;
+            break;
+          case "right":
+            top = rect.top + (rect.height - tooltipRect.height) / 2;
+            left = rect.right + 8;
+            break;
+        }
+        tooltipEl.style.top = `${Math.max(4, top)}px`;
+        tooltipEl.style.left = `${Math.max(4, left)}px`;
+        requestAnimationFrame(() => {
+          if (tooltipEl) {
+            tooltipEl.style.opacity = "1";
+            tooltipEl.style.transform = "scale(1)";
+          }
+        });
+      };
+      const hideTooltip = () => {
+        if (!tooltipEl) return;
+        const el = tooltipEl;
+        tooltipEl = null;
+        el.style.opacity = "0";
+        el.style.transform = "scale(0.95)";
+        setTimeout(() => {
+          if (el.parentNode) el.parentNode.removeChild(el);
+        }, 150);
+      };
+      element.addEventListener("mouseenter", showTooltip);
+      element.addEventListener("mouseleave", hideTooltip);
+      element.addEventListener("focus", showTooltip);
+      element.addEventListener("blur", hideTooltip);
+    }
+  }
+}
+var init_tooltip = __esm({
+  "src/directives/tooltip.ts"() {
+    "use strict";
+  }
+});
+
+// src/directives/outside.ts
+function bindOutsideClickDirectives(element) {
+  const scope = getNearestScope(element);
+  for (const attr of Array.from(element.attributes)) {
+    if (attr.name === "l-outside" || attr.name === "l-click-outside") {
+      const stmt = attr.value;
+      document.addEventListener("click", (e) => {
+        const target = e.target;
+        if (!element.contains(target)) {
+          const activeState = scope ? scope.state : {};
+          const context = {
+            $event: e,
+            $el: element,
+            $emit: (channel, payload) => {
+              window.dispatchEvent(new CustomEvent(`laughtale:${channel}`, { detail: payload, bubbles: true }));
+            }
+          };
+          executeStatement(stmt, activeState, context);
+        }
+      });
+    }
+  }
+}
+var init_outside = __esm({
+  "src/directives/outside.ts"() {
+    "use strict";
+    init_reactivity();
+  }
+});
+
+// src/directives/storage.ts
+function bindStoragePersistence(element, scope) {
+  for (const attr of Array.from(element.attributes)) {
+    if (attr.name === "l-persist" || attr.name.startsWith("l-persist.") || attr.name === "l-sync-storage") {
+      const key = attr.value || "laughtale_persisted_state";
+      const useSession = attr.name.includes(".session");
+      const storage = useSession ? sessionStorage : localStorage;
+      try {
+        const saved = storage.getItem(key);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (typeof parsed === "object" && parsed !== null) {
+            Object.assign(scope.state, parsed);
+          }
+        }
+      } catch (err) {
+        console.warn(`[SoftMax.LaughTale] Failed to read persisted state for key "${key}":`, err);
+      }
+      let timer = null;
+      const save = () => {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+          try {
+            storage.setItem(key, JSON.stringify(scope.state));
+          } catch (err) {
+            console.warn(`[SoftMax.LaughTale] Failed to save persisted state for key "${key}":`, err);
+          }
+        }, 150);
+      };
+      scope.listeners.add(save);
+    }
+  }
+}
+var init_storage = __esm({
+  "src/directives/storage.ts"() {
+    "use strict";
+  }
+});
+
+// src/directives/poll.ts
+function bindPollingDirectives(element) {
+  const scope = getNearestScope(element);
+  for (const attr of Array.from(element.attributes)) {
+    if (attr.name.startsWith("l-poll")) {
+      let intervalMs = 3e3;
+      const parts = attr.name.split(".");
+      for (const part of parts) {
+        if (part.endsWith("s") && !part.endsWith("ms")) {
+          const sec = parseFloat(part);
+          if (!isNaN(sec)) intervalMs = sec * 1e3;
+        } else if (part.endsWith("ms")) {
+          const ms = parseFloat(part);
+          if (!isNaN(ms)) intervalMs = ms;
+        }
+      }
+      const stmt = attr.value;
+      const runPoll = () => {
+        if (!document.body.contains(element)) {
+          clearInterval(intervalId);
+          return;
+        }
+        if (stmt) {
+          const activeState = scope ? scope.state : {};
+          const context = {
+            $el: element,
+            $emit: (channel, payload) => {
+              window.dispatchEvent(new CustomEvent(`laughtale:${channel}`, { detail: payload, bubbles: true }));
+            }
+          };
+          executeStatement(stmt, activeState, context);
+        } else {
+          element.dispatchEvent(new CustomEvent("laughtale:poll-trigger", { bubbles: true }));
+        }
+      };
+      const intervalId = setInterval(runPoll, intervalMs);
+    }
+  }
+}
+var init_poll = __esm({
+  "src/directives/poll.ts"() {
+    "use strict";
+    init_reactivity();
+  }
+});
+
+// src/directives/intersect.ts
+function bindIntersectionDirectives(element) {
+  const scope = getNearestScope(element);
+  for (const attr of Array.from(element.attributes)) {
+    if (attr.name === "l-intersect" || attr.name.startsWith("l-intersect.") || attr.name === "l-viewport") {
+      const isOnce = attr.name.includes(".once");
+      const isHalf = attr.name.includes(".half");
+      const stmt = attr.value;
+      const threshold = isHalf ? 0.5 : 0.1;
+      const observer = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            if (stmt) {
+              const activeState = scope ? scope.state : {};
+              const context = {
+                $event: entry,
+                $el: element,
+                $emit: (channel, payload) => {
+                  window.dispatchEvent(new CustomEvent(`laughtale:${channel}`, { detail: payload, bubbles: true }));
+                }
+              };
+              executeStatement(stmt, activeState, context);
+            }
+            element.dispatchEvent(new CustomEvent("laughtale:intersect", { bubbles: true, detail: entry }));
+            if (isOnce) {
+              observer.disconnect();
+            }
+          }
+        }
+      }, { threshold });
+      observer.observe(element);
+    }
+  }
+}
+var init_intersect = __esm({
+  "src/directives/intersect.ts"() {
+    "use strict";
+    init_reactivity();
+  }
+});
+
+// src/directives/scroll.ts
+function bindScrollToDirectives(element) {
+  for (const attr of Array.from(element.attributes)) {
+    if (attr.name === "l-scroll-to" || attr.name.startsWith("l-scroll-to.")) {
+      const target = attr.value.trim();
+      element.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (target === "top") {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        } else if (target === "bottom") {
+          window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+        } else if (target) {
+          const targetEl = document.querySelector(target);
+          if (targetEl) {
+            targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        }
+      });
+    }
+  }
+}
+var init_scroll = __esm({
+  "src/directives/scroll.ts"() {
+    "use strict";
+  }
+});
+
+// src/directives/badge.ts
+function bindBadgeDirectives(element) {
+  for (const attr of Array.from(element.attributes)) {
+    if (attr.name === "l-badge" || attr.name.startsWith("l-badge.")) {
+      const isDot = attr.name.includes(".dot");
+      const value = attr.value;
+      let severity = "danger";
+      if (attr.name.includes(".success")) severity = "success";
+      else if (attr.name.includes(".warning")) severity = "warning";
+      else if (attr.name.includes(".info")) severity = "info";
+      else if (attr.name.includes(".slate") || attr.name.includes(".secondary")) severity = "slate";
+      const compStyle = window.getComputedStyle(element);
+      if (compStyle.position === "static") {
+        element.style.position = "relative";
+      }
+      const badge = document.createElement("span");
+      badge.className = `aura-directive-badge badge-${severity}`;
+      let bg = "var(--p-red-500, #ef4444)";
+      let color = "#ffffff";
+      if (severity === "success") bg = "var(--p-emerald-500, #10b981)";
+      else if (severity === "warning") bg = "var(--p-amber-500, #f59e0b)";
+      else if (severity === "info") bg = "var(--p-blue-500, #3b82f6)";
+      else if (severity === "slate") {
+        bg = "var(--p-surface-600, #475569)";
+        color = "#ffffff";
+      }
+      if (isDot) {
+        badge.style.cssText = `
+                    position: absolute;
+                    top: -2px;
+                    right: -2px;
+                    width: 8px;
+                    height: 8px;
+                    background: ${bg};
+                    border-radius: 50%;
+                    border: 2px solid var(--p-surface-0, #ffffff);
+                    pointer-events: none;
+                `;
+      } else {
+        badge.textContent = value || "";
+        badge.style.cssText = `
+                    position: absolute;
+                    top: -6px;
+                    right: -6px;
+                    min-width: 18px;
+                    height: 18px;
+                    line-height: 18px;
+                    padding: 0 5px;
+                    font-size: 0.6875rem;
+                    font-weight: 700;
+                    text-align: center;
+                    background: ${bg};
+                    color: ${color};
+                    border-radius: 9999px;
+                    border: 2px solid var(--p-surface-0, #ffffff);
+                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+                    pointer-events: none;
+                `;
+      }
+      element.appendChild(badge);
+    }
+  }
+}
+var init_badge = __esm({
+  "src/directives/badge.ts"() {
+    "use strict";
+  }
+});
+
+// src/directives/teleport.ts
+function bindTeleportDirectives(element) {
+  for (const attr of Array.from(element.attributes)) {
+    if (attr.name === "l-teleport") {
+      const targetSelector = attr.value || "body";
+      const targetContainer = document.querySelector(targetSelector);
+      if (targetContainer && targetContainer !== element.parentElement) {
+        targetContainer.appendChild(element);
+      }
+    }
+  }
+}
+var init_teleport = __esm({
+  "src/directives/teleport.ts"() {
+    "use strict";
+  }
+});
+
 // src/directives/index.ts
 function initDirectives(root = document) {
   const stateElements = root.querySelectorAll("[l-state]");
@@ -710,7 +1167,8 @@ function initDirectives(root = document) {
     const rawJson = el.getAttribute("l-state");
     try {
       const initialData = rawJson ? JSON.parse(rawJson) : {};
-      createReactiveScope(el, initialData);
+      const scope = createReactiveScope(el, initialData);
+      bindStoragePersistence(el, scope);
     } catch (err) {
       console.error("[SoftMax.LaughTale] Invalid JSON in l-state:", rawJson, err);
     }
@@ -719,7 +1177,6 @@ function initDirectives(root = document) {
   allElements.forEach((el) => {
     for (const attr of Array.from(el.attributes)) {
       if (attr.name === "l-bind" || attr.name.startsWith("l-bind:") || attr.name === "l-model" || attr.name === "l-class" || attr.name === "l-style") {
-        const scope = el.__laughtale_scope || el.closest("[l-state]");
         Promise.resolve().then(() => (init_reactivity(), reactivity_exports)).then(({ getNearestScope: getNearestScope2 }) => {
           const nearest = getNearestScope2(el);
           if (nearest) bindElementReactivity(el, nearest);
@@ -735,6 +1192,14 @@ function initDirectives(root = document) {
       bindInputMask(el);
     }
     bindUtilityDirectives(el);
+    bindHotkeyDirectives(el);
+    bindTooltipDirectives(el);
+    bindOutsideClickDirectives(el);
+    bindPollingDirectives(el);
+    bindIntersectionDirectives(el);
+    bindScrollToDirectives(el);
+    bindBadgeDirectives(el);
+    bindTeleportDirectives(el);
   });
 }
 var init_directives = __esm({
@@ -745,6 +1210,15 @@ var init_directives = __esm({
     init_htmx();
     init_masking();
     init_utils();
+    init_hotkey();
+    init_tooltip();
+    init_outside();
+    init_storage();
+    init_poll();
+    init_intersect();
+    init_scroll();
+    init_badge();
+    init_teleport();
     if (typeof document !== "undefined") {
       if (document.readyState === "loading") {
         document.addEventListener("DOMContentLoaded", () => initDirectives());
