@@ -11,6 +11,11 @@ export type IslandLoader<TProps = any> = () => Promise<
     { default: IslandFactory<TProps> } | IslandFactory<TProps>
 >;
 
+export interface IslandDefinition<TProps = any> {
+    name: string;
+    loader: IslandLoader<TProps>;
+}
+
 const registry = new Map<string, IslandLoader>();
 
 /**
@@ -34,4 +39,12 @@ export function hasIsland(name: string): boolean {
  */
 export function getIslandLoader(name: string): IslandLoader | undefined {
     return registry.get(name);
+}
+
+/**
+ * Retrieves the registered island definition.
+ */
+export function getIslandDefinition(name: string): IslandDefinition | undefined {
+    const loader = registry.get(name);
+    return loader ? { name, loader } : undefined;
 }

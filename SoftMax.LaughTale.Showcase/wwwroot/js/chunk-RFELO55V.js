@@ -1,17 +1,14 @@
-// src/runtime/registry.ts
+// ../SoftMax.LaughTale.Client/src/runtime/registry.ts
 var registry = /* @__PURE__ */ new Map();
 function defineIsland(name, loader) {
   registry.set(name, loader);
-}
-function hasIsland(name) {
-  return registry.has(name);
 }
 function getIslandDefinition(name) {
   const loader = registry.get(name);
   return loader ? { name, loader } : void 0;
 }
 
-// src/runtime/reviver.ts
+// ../SoftMax.LaughTale.Client/src/runtime/reviver.ts
 var ISO_DATE_REGEX = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})?)?$/;
 var propTypes = {
   0: (val) => reviveObject(val),
@@ -74,7 +71,7 @@ function parseAndReviveProps(rawJson) {
   }
 }
 
-// src/runtime/retry.ts
+// ../SoftMax.LaughTale.Client/src/runtime/retry.ts
 async function importWithRetry(importFnOrUrl, retries = 3, baseDelayMs = 1e3) {
   if (typeof importFnOrUrl === "function") {
     for (let attempt = 0; attempt < retries; attempt++) {
@@ -108,7 +105,7 @@ async function importWithRetry(importFnOrUrl, retries = 3, baseDelayMs = 1e3) {
   throw new Error(`[SoftMax.LaughTale] Permanent failure loading island module after ${retries} attempts.`);
 }
 
-// src/runtime/streaming.ts
+// ../SoftMax.LaughTale.Client/src/runtime/streaming.ts
 function awaitStreamingReady(container) {
   const islandId = container.getAttribute("data-island-id") || container.getAttribute("data-island");
   const markerValue = `island:end:${islandId}`;
@@ -145,7 +142,7 @@ function awaitStreamingReady(container) {
   });
 }
 
-// src/runtime/hydrator.ts
+// ../SoftMax.LaughTale.Client/src/runtime/hydrator.ts
 var HYDRATED_FLAG = "__laughtale_hydrated";
 function hydrateIsland(container) {
   if (container[HYDRATED_FLAG]) return;
@@ -265,7 +262,7 @@ function initIslands(root = document) {
   islands.forEach(hydrateIsland);
 }
 
-// src/runtime/router.ts
+// ../SoftMax.LaughTale.Client/src/runtime/router.ts
 var isRouterActive = false;
 function enableViewTransitions() {
   if (isRouterActive || typeof window === "undefined") return;
@@ -337,17 +334,12 @@ async function navigateTo(urlStr, pushState = true) {
   }
 }
 
-// src/runtime/slots.ts
+// ../SoftMax.LaughTale.Client/src/runtime/slots.ts
 function getSlot(container, name = "default") {
   return container.querySelector(`[data-slot="${name}"]`);
 }
-function extractSlotContent(container, name = "default") {
-  const slotEl = getSlot(container, name);
-  if (!slotEl) return "";
-  return slotEl.innerHTML;
-}
 
-// src/runtime/styles.ts
+// ../SoftMax.LaughTale.Client/src/runtime/styles.ts
 var injectedStyles = /* @__PURE__ */ new Set();
 function injectIslandStyle(islandName, css) {
   if (injectedStyles.has(islandName) || typeof document === "undefined") {
@@ -360,45 +352,11 @@ function injectIslandStyle(islandName, css) {
   document.head.appendChild(styleEl);
 }
 
-// src/adapters/vanilla.ts
-function createVanillaIsland(mount) {
-  return mount;
-}
-
-// src/adapters/preact.ts
-function createPreactIsland(Component, options = {}) {
-  return async (container, props) => {
-    try {
-      const preact = await import("preact");
-      const h = preact.h || preact.default?.h;
-      const render = preact.render || preact.default?.render;
-      if (render && h) {
-        render(h(Component, props), container);
-        return () => render(null, container);
-      }
-    } catch {
-      console.warn("[SoftMax.LaughTale] Preact package not found in bundle. Rendering component directly.");
-      if (typeof Component === "function") {
-        return Component(container, props);
-      }
-    }
-  };
-}
 export {
-  awaitStreamingReady,
-  createPreactIsland,
-  createVanillaIsland,
   defineIsland,
-  enableViewTransitions,
-  extractSlotContent,
-  getIslandDefinition,
-  getSlot,
-  hasIsland,
-  hydrateIsland,
-  importWithRetry,
   initIslands,
-  injectIslandStyle,
-  parseAndReviveProps,
-  reviveTuple
+  enableViewTransitions,
+  getSlot,
+  injectIslandStyle
 };
-//# sourceMappingURL=index.mjs.map
+//# sourceMappingURL=chunk-RFELO55V.js.map

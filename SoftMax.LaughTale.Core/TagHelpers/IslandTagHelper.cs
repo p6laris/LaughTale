@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace SoftMax.LaughTale.Core.TagHelpers;
 
 /// <summary>
-/// ASP.NET Core MVC &amp; Razor Pages TagHelper for rendering Islands with slots and persistence support.
+/// ASP.NET Core MVC &amp; Razor Pages TagHelper for rendering Islands with multi-framework, slots, and streaming SSR support.
 /// </summary>
 [HtmlTargetElement("island", TagStructure = TagStructure.NormalOrSelfClosing)]
 public class IslandTagHelper : TagHelper
@@ -19,6 +19,9 @@ public class IslandTagHelper : TagHelper
 
     [HtmlAttributeName("hydrate")]
     public HydrateStrategy Hydrate { get; set; } = HydrateStrategy.Load;
+
+    [HtmlAttributeName("framework")]
+    public IslandFramework Framework { get; set; } = IslandFramework.Vanilla;
 
     [HtmlAttributeName("media")]
     public string? Media { get; set; }
@@ -43,6 +46,11 @@ public class IslandTagHelper : TagHelper
         output.Attributes.SetAttribute("data-island", Name);
         output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(Props));
         output.Attributes.SetAttribute("data-hydrate", Hydrate.ToString().ToLowerInvariant());
+
+        if (Framework != IslandFramework.Vanilla)
+        {
+            output.Attributes.SetAttribute("data-framework", Framework.ToString().ToLowerInvariant());
+        }
 
         if (!string.IsNullOrWhiteSpace(Persist))
         {
@@ -72,7 +80,7 @@ public class IslandTagHelper : TagHelper
         var childContent = await output.GetChildContentAsync();
         if (!childContent.IsEmptyOrWhiteSpace)
         {
-            output.Content.SetHtmlContent($"<div data-slot=\"default\" class=\"island-slot\">{childContent.GetContent()}</div>");
+            output.Content.SetHtmlContent($"<div data-slot=\"default\" class=\"island-slot\">{childContent.GetContent()}</div><!--island:end:{Name}-->");
         }
     }
 }

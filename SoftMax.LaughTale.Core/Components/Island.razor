@@ -8,6 +8,7 @@
      data-island="@Name"
      data-props="@SerializedProps"
      data-hydrate="@Hydrate.ToString().ToLowerInvariant()"
+     data-framework="@(Framework == IslandFramework.Vanilla ? null : Framework.ToString().ToLowerInvariant())"
      data-media="@Media"
      data-island-id="@ElementId"
      data-persist="@PersistId">
@@ -16,6 +17,7 @@
         <div data-slot="default" class="island-slot">
             @ChildContent
         </div>
+        <!--island:end:@Name-->
     }
 </div>
 
@@ -34,6 +36,11 @@
     /// The client-side hydration strategy (Load, Idle, Visible, Media, Interaction, Never).
     /// </summary>
     [Parameter] public HydrateStrategy Hydrate { get; set; } = HydrateStrategy.Load;
+
+    /// <summary>
+    /// The target UI framework adapter (Vanilla, Preact, React, Vue, Alpine, Svelte).
+    /// </summary>
+    [Parameter] public IslandFramework Framework { get; set; } = IslandFramework.Vanilla;
 
     /// <summary>
     /// Optional CSS Media query when using HydrateStrategy.Media (e.g. "(max-width: 768px)").

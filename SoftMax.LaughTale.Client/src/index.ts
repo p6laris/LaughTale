@@ -1,27 +1,17 @@
 /**
- * SoftMax.LaughTale Client Runtime 2.0
+ * SoftMax.LaughTale Client Runtime API
+ * High-performance Islands Architecture hydration & multi-framework engine.
  */
 
-export * from './runtime/hydrator';
-export * from './runtime/registry';
-export * from './runtime/events';
-export * from './runtime/state';
-export * from './runtime/slots';
-export * from './runtime/styles';
-export * from './runtime/router';
-
-import { initIslands } from './runtime/hydrator';
-import { enableViewTransitions } from './runtime/router';
-
-// Auto-initialize hydration & view transitions in browser
-if (typeof window !== 'undefined') {
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => {
-            initIslands();
-            enableViewTransitions();
-        });
-    } else {
-        initIslands();
-        enableViewTransitions();
-    }
-}
+export { defineIsland, getIslandDefinition, hasIsland } from './runtime/registry';
+export { hydrateIsland, initIslands, type HydrateStrategy } from './runtime/hydrator';
+export { enableViewTransitions, navigate } from './runtime/router';
+export { getSlot, extractSlotContent, hasSlot } from './runtime/slots';
+export { injectIslandStyle, removeIslandStyle } from './runtime/styles';
+export { islandEvents } from './runtime/events';
+export { islandStore } from './runtime/state';
+export { parseAndReviveProps, reviveTuple } from './runtime/reviver';
+export { importWithRetry } from './runtime/retry';
+export { awaitStreamingReady } from './runtime/streaming';
+export { createVanillaIsland } from './adapters/vanilla';
+export { createPreactIsland } from './adapters/preact';

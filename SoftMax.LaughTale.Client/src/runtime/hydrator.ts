@@ -1,158 +1,162 @@
 /**
- * SoftMax.LaughTale: Core Multi-Strategy Hydration Engine
- * 
- * Supports 6 hydration modes:
- * - load: Hydrates immediately on page load
- * - idle: Hydrates when browser is idle (requestIdleCallback)
- * - visible: Hydrates when scrolled into viewport (IntersectionObserver)
- * - media: Hydrates when media query matches (e.g. mobile)
- * - interaction: Hydrates on first hover/focus/click
- * - never: Pure SSR, no client JS executed
+ * SoftMax.LaughTale: Multi-Strategy Client Hydration Engine
+ * Supercharged with Astro-grade prop revival, query retry, child viewport observation & streaming SSR.
  */
 
-import { getIslandLoader, IslandFactory } from './registry';
+import { getIslandDefinition } from './registry';
+import { parseAndReviveProps } from './reviver';
+import { importWithRetry } from './retry';
+import { awaitStreamingReady } from './streaming';
 
-const activeCleanups = new WeakMap<HTMLElement, () => void>();
+export type HydrateStrategy = 'load' | 'idle' | 'visible' | 'media' | 'interaction' | 'never';
 
-/**
- * Hydrates a single island DOM element.
- */
-export async function hydrateIsland(container: HTMLElement): Promise<void> {
-    if (container.dataset.hydrated === 'true') {
+const HYDRATED_FLAG = '__laughtale_hydrated';
+
+export function hydrateIsland(container: HTMLElement): void {
+    if ((container as any)[HYDRATED_FLAG]) return;
+
+    const name = container.getAttribute('data-island');
+    if (!name) return;
+
+    const strategy = (container.getAttribute('data-hydrate') || 'load').toLowerCase() as HydrateStrategy;
+    const mediaQuery = container.getAttribute('data-media');
+
+    switch (strategy) {
+        case 'load':
+            executeHydration(container, name);
+            break;
+        case 'idle':
+            hydrateIdle(container, name);
+            break;
+        case 'visible':
+            hydrateVisible(container, name);
+            break;
+        case 'interaction':
+            hydrateInteraction(container, name);
+            break;
+        case 'media':
+            hydrateMedia(container, name, mediaQuery);
+            break;
+        case 'never':
+            // Server-only island (zero JS execution)
+            break;
+        default:
+            executeHydration(container, name);
+    }
+}
+
+async function executeHydration(container: HTMLElement, name: string): Promise<void> {
+    if ((container as any)[HYDRATED_FLAG]) return;
+    (container as any)[HYDRATED_FLAG] = true;
+
+    const definition = getIslandDefinition(name);
+    if (!definition) {
+        console.warn(`[SoftMax.LaughTale] Island '${name}' is not registered in the client registry.`);
         return;
     }
-
-    const islandName = container.dataset.island;
-    if (!islandName) {
-        return;
-    }
-
-    const loader = getIslandLoader(islandName);
-    if (!loader) {
-        console.warn(`[SoftMax.LaughTale] No factory registered for island: "${islandName}"`);
-        return;
-    }
-
-    container.dataset.hydrated = 'true';
-    container.classList.add('island-hydrating');
 
     try {
-        const rawProps = container.dataset.props;
-        const props = rawProps ? JSON.parse(rawProps) : {};
+        // 1. Await streaming SSR completion if applicable
+        await awaitStreamingReady(container);
 
-        const moduleResult = await loader();
-        const factory: IslandFactory = typeof moduleResult === 'function'
-            ? moduleResult
-            : moduleResult.default;
+        // 2. Parse & revive props (Date, Uint8Array, Map, Set, BigInt, URL)
+        const rawProps = container.getAttribute('data-props');
+        const props = parseAndReviveProps(rawProps);
 
-        if (typeof factory === 'function') {
-            const cleanup = await factory(container, props);
-            if (typeof cleanup === 'function') {
-                activeCleanups.set(container, cleanup);
-            }
+        // 3. Load component module with retry resilience
+        const module = await importWithRetry(definition.loader);
+        const mount = module.default || module;
+
+        if (typeof mount !== 'function') {
+            console.error(`[SoftMax.LaughTale] Island '${name}' module does not export a mount function.`);
+            return;
         }
 
-        container.classList.remove('island-hydrating');
-        container.classList.add('island-hydrated');
-        container.dispatchEvent(new CustomEvent('island:hydrated', { detail: { name: islandName, props }, bubbles: true }));
+        // 4. Mount island and register unmount hook
+        const unmount = mount(container, props);
+        if (typeof unmount === 'function') {
+            container.addEventListener('laughtale:unmount', unmount, { once: true });
+        }
+
+        // 5. Dispatch success lifecycle event
+        container.dispatchEvent(new CustomEvent('laughtale:hydrated', {
+            bubbles: true,
+            composed: true,
+            detail: { name, strategy: container.getAttribute('data-hydrate') }
+        }));
     } catch (error) {
-        container.classList.remove('island-hydrating');
-        container.classList.add('island-error');
-        console.error(`[SoftMax.LaughTale] Failed to hydrate island "${islandName}":`, error);
+        (container as any)[HYDRATED_FLAG] = false;
+        console.error(`[SoftMax.LaughTale] Error hydrating island '${name}':`, error);
+        container.dispatchEvent(new CustomEvent('laughtale:hydration-error', {
+            bubbles: true,
+            composed: true,
+            detail: { name, error }
+        }));
+    }
+}
+
+function hydrateIdle(container: HTMLElement, name: string): void {
+    if ('requestIdleCallback' in window) {
+        (window as any).requestIdleCallback(() => executeHydration(container, name), { timeout: 2000 });
+    } else {
+        setTimeout(() => executeHydration(container, name), 200);
     }
 }
 
 /**
- * Destroys and cleans up an active island element.
+ * Child-Targeted Viewport Observer
+ * Observes container and all its child nodes so `display: contents` layouts never miss scroll events.
  */
-export function destroyIsland(container: HTMLElement): void {
-    const cleanup = activeCleanups.get(container);
-    if (cleanup) {
-        try {
-            cleanup();
-        } catch (e) {
-            console.error('[SoftMax.LaughTale] Error during island cleanup:', e);
+function hydrateVisible(container: HTMLElement, name: string): void {
+    const observer = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+            if (entry.isIntersecting) {
+                observer.disconnect();
+                executeHydration(container, name);
+                break;
+            }
         }
-        activeCleanups.delete(container);
+    }, { rootMargin: '120px' });
+
+    observer.observe(container);
+
+    // Also observe children to support `display: contents` styling
+    for (let i = 0; i < container.children.length; i++) {
+        observer.observe(container.children[i]);
     }
-    container.dataset.hydrated = 'false';
-    container.classList.remove('island-hydrated');
 }
 
-/**
- * Scans the DOM and attaches the appropriate hydration strategy to each island.
- */
+function hydrateInteraction(container: HTMLElement, name: string): void {
+    const events = ['mouseenter', 'focusin', 'touchstart', 'click'];
+    const onInteract = () => {
+        events.forEach(e => container.removeEventListener(e, onInteract));
+        executeHydration(container, name);
+    };
+
+    events.forEach(e => container.addEventListener(e, onInteract, { once: true, passive: true }));
+}
+
+function hydrateMedia(container: HTMLElement, name: string, query: string | null): void {
+    if (!query) {
+        executeHydration(container, name);
+        return;
+    }
+
+    const mql = window.matchMedia(query);
+    if (mql.matches) {
+        executeHydration(container, name);
+    } else {
+        const handler = (e: MediaQueryListEvent) => {
+            if (e.matches) {
+                mql.removeEventListener('change', handler);
+                executeHydration(container, name);
+            }
+        };
+        mql.addEventListener('change', handler);
+    }
+}
+
 export function initIslands(root: ParentNode = document): void {
-    const containers = root.querySelectorAll<HTMLElement>('[data-island]');
-
-    containers.forEach(container => {
-        if (container.dataset.hydrated === 'true') return;
-
-        const strategy = container.dataset.hydrate?.toLowerCase() || 'load';
-
-        switch (strategy) {
-            case 'load':
-                hydrateIsland(container);
-                break;
-
-            case 'idle':
-                if ('requestIdleCallback' in window) {
-                    (window as any).requestIdleCallback(() => hydrateIsland(container), { timeout: 2000 });
-                } else {
-                    setTimeout(() => hydrateIsland(container), 150);
-                }
-                break;
-
-            case 'visible': {
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            observer.disconnect();
-                            hydrateIsland(container);
-                        }
-                    });
-                }, { rootMargin: '120px 0px' });
-
-                observer.observe(container);
-                break;
-            }
-
-            case 'media': {
-                const mediaQuery = container.dataset.media;
-                if (mediaQuery) {
-                    const mql = window.matchMedia(mediaQuery);
-                    if (mql.matches) {
-                        hydrateIsland(container);
-                    } else {
-                        const handler = (e: MediaQueryListEvent) => {
-                            if (e.matches) {
-                                mql.removeEventListener('change', handler);
-                                hydrateIsland(container);
-                            }
-                        };
-                        mql.addEventListener('change', handler);
-                    }
-                }
-                break;
-            }
-
-            case 'interaction': {
-                const triggerEvents = ['mouseenter', 'focusin', 'touchstart', 'click'];
-                const onInteract = () => {
-                    triggerEvents.forEach(evt => container.removeEventListener(evt, onInteract));
-                    hydrateIsland(container);
-                };
-                triggerEvents.forEach(evt => container.addEventListener(evt, onInteract, { once: true, passive: true }));
-                break;
-            }
-
-            case 'never':
-                // Pure SSR - do nothing
-                break;
-
-            default:
-                hydrateIsland(container);
-                break;
-        }
-    });
+    const islands = root.querySelectorAll<HTMLElement>('[data-island]');
+    islands.forEach(hydrateIsland);
 }

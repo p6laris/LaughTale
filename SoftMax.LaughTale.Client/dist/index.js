@@ -1,9 +1,17 @@
 "use strict";
 var SoftMaxIslands = (() => {
+  var __create = Object.create;
   var __defProp = Object.defineProperty;
   var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
   var __getOwnPropNames = Object.getOwnPropertyNames;
+  var __getProtoOf = Object.getPrototypeOf;
   var __hasOwnProp = Object.prototype.hasOwnProperty;
+  var __require = /* @__PURE__ */ ((x) => typeof require !== "undefined" ? require : typeof Proxy !== "undefined" ? new Proxy(x, {
+    get: (a, b) => (typeof require !== "undefined" ? require : a)[b]
+  }) : x)(function(x) {
+    if (typeof require !== "undefined") return require.apply(this, arguments);
+    throw Error('Dynamic require of "' + x + '" is not supported');
+  });
   var __export = (target, all) => {
     for (var name in all)
       __defProp(target, name, { get: all[name], enumerable: true });
@@ -16,26 +24,34 @@ var SoftMaxIslands = (() => {
     }
     return to;
   };
+  var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+    // If the importer is in node compatibility mode or this is not an ESM
+    // file that has been converted to a CommonJS file using a Babel-
+    // compatible transform (i.e. "__esModule" has not been set), then set
+    // "default" to the CommonJS "module.exports" for node compatibility.
+    isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+    mod
+  ));
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
   // src/index.ts
   var index_exports = {};
   __export(index_exports, {
-    IslandStore: () => IslandStore,
+    awaitStreamingReady: () => awaitStreamingReady,
+    createPreactIsland: () => createPreactIsland,
+    createVanillaIsland: () => createVanillaIsland,
     defineIsland: () => defineIsland,
-    destroyIsland: () => destroyIsland,
-    emitIslandEvent: () => emitIslandEvent,
     enableViewTransitions: () => enableViewTransitions,
     extractSlotContent: () => extractSlotContent,
-    getIslandLoader: () => getIslandLoader,
+    getIslandDefinition: () => getIslandDefinition,
     getSlot: () => getSlot,
     hasIsland: () => hasIsland,
     hydrateIsland: () => hydrateIsland,
+    importWithRetry: () => importWithRetry,
     initIslands: () => initIslands,
     injectIslandStyle: () => injectIslandStyle,
-    navigateTo: () => navigateTo,
-    onIslandEvent: () => onIslandEvent,
-    useSharedState: () => useSharedState
+    parseAndReviveProps: () => parseAndReviveProps,
+    reviveTuple: () => reviveTuple
   });
 
   // src/runtime/registry.ts
@@ -46,204 +62,263 @@ var SoftMaxIslands = (() => {
   function hasIsland(name) {
     return registry.has(name);
   }
-  function getIslandLoader(name) {
-    return registry.get(name);
+  function getIslandDefinition(name) {
+    const loader = registry.get(name);
+    return loader ? { name, loader } : void 0;
   }
 
-  // src/runtime/hydrator.ts
-  var activeCleanups = /* @__PURE__ */ new WeakMap();
-  async function hydrateIsland(container) {
-    if (container.dataset.hydrated === "true") {
-      return;
+  // src/runtime/reviver.ts
+  var ISO_DATE_REGEX = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})?)?$/;
+  var propTypes = {
+    0: (val) => reviveObject(val),
+    1: (val) => reviveArray(val),
+    2: (val) => new RegExp(val),
+    3: (val) => new Date(val),
+    4: (val) => new Map(reviveArray(val)),
+    5: (val) => new Set(reviveArray(val)),
+    6: (val) => BigInt(val),
+    7: (val) => new URL(val, window.location.origin),
+    8: (val) => {
+      if (typeof val === "string") {
+        const binaryString = atob(val);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+        return bytes;
+      }
+      return new Uint8Array(val);
     }
-    const islandName = container.dataset.island;
-    if (!islandName) {
-      return;
+  };
+  function reviveTuple(raw) {
+    if (Array.isArray(raw) && raw.length === 2 && typeof raw[0] === "number" && raw[0] in propTypes) {
+      return propTypes[raw[0]](raw[1]);
     }
-    const loader = getIslandLoader(islandName);
-    if (!loader) {
-      console.warn(`[SoftMax.Islands] No factory registered for island: "${islandName}"`);
-      return;
+    if (typeof raw === "string" && ISO_DATE_REGEX.test(raw)) {
+      const d = new Date(raw);
+      if (!isNaN(d.getTime())) return d;
     }
-    container.dataset.hydrated = "true";
-    container.classList.add("island-hydrating");
+    if (Array.isArray(raw)) {
+      return reviveArray(raw);
+    }
+    if (typeof raw === "object" && raw !== null) {
+      return reviveObject(raw);
+    }
+    return raw;
+  }
+  function reviveArray(raw) {
+    return raw.map(reviveTuple);
+  }
+  function reviveObject(raw) {
+    if (!raw || typeof raw !== "object") return raw;
+    const result = {};
+    for (const [key, value] of Object.entries(raw)) {
+      result[key] = reviveTuple(value);
+    }
+    return result;
+  }
+  function parseAndReviveProps(rawJson) {
+    if (!rawJson || rawJson.trim() === "" || rawJson === "{}") {
+      return {};
+    }
     try {
-      const rawProps = container.dataset.props;
-      const props = rawProps ? JSON.parse(rawProps) : {};
-      const moduleResult = await loader();
-      const factory = typeof moduleResult === "function" ? moduleResult : moduleResult.default;
-      if (typeof factory === "function") {
-        const cleanup = await factory(container, props);
-        if (typeof cleanup === "function") {
-          activeCleanups.set(container, cleanup);
-        }
-      }
-      container.classList.remove("island-hydrating");
-      container.classList.add("island-hydrated");
-      container.dispatchEvent(new CustomEvent("island:hydrated", { detail: { name: islandName, props }, bubbles: true }));
-    } catch (error) {
-      container.classList.remove("island-hydrating");
-      container.classList.add("island-error");
-      console.error(`[SoftMax.Islands] Failed to hydrate island "${islandName}":`, error);
+      const parsed = JSON.parse(rawJson);
+      return reviveTuple(parsed);
+    } catch (err) {
+      console.error("[SoftMax.LaughTale] Failed to parse and revive island props:", err, rawJson);
+      return {};
     }
   }
-  function destroyIsland(container) {
-    const cleanup = activeCleanups.get(container);
-    if (cleanup) {
+
+  // src/runtime/retry.ts
+  async function importWithRetry(importFnOrUrl, retries = 3, baseDelayMs = 1e3) {
+    if (typeof importFnOrUrl === "function") {
+      for (let attempt = 0; attempt < retries; attempt++) {
+        try {
+          return await importFnOrUrl();
+        } catch (err) {
+          if (attempt === retries - 1) throw err;
+          const delay = baseDelayMs * Math.pow(2, attempt);
+          console.warn(`[SoftMax.LaughTale] Island dynamic import failed. Retrying in ${delay}ms (Attempt ${attempt + 1}/${retries})...`, err);
+          await new Promise((resolve) => setTimeout(resolve, delay));
+        }
+      }
+    }
+    let url = importFnOrUrl;
+    for (let attempt = 0; attempt < retries; attempt++) {
       try {
-        cleanup();
-      } catch (e) {
-        console.error("[SoftMax.Islands] Error during island cleanup:", e);
+        return await import(
+          /* @vite-ignore */
+          url
+        );
+      } catch (err) {
+        if (attempt === retries - 1) throw err;
+        const delay = baseDelayMs * Math.pow(2, attempt);
+        console.warn(`[SoftMax.LaughTale] Failed to fetch island script at ${url}. Retrying with cache-buster in ${delay}ms...`, err);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        const parsed = new URL(url, document.baseURI);
+        parsed.searchParams.set("island-retry", Date.now().toString());
+        url = parsed.toString();
       }
-      activeCleanups.delete(container);
     }
-    container.dataset.hydrated = "false";
-    container.classList.remove("island-hydrated");
+    throw new Error(`[SoftMax.LaughTale] Permanent failure loading island module after ${retries} attempts.`);
   }
-  function initIslands(root = document) {
-    const containers = root.querySelectorAll("[data-island]");
-    containers.forEach((container) => {
-      if (container.dataset.hydrated === "true") return;
-      const strategy = container.dataset.hydrate?.toLowerCase() || "load";
-      switch (strategy) {
-        case "load":
-          hydrateIsland(container);
-          break;
-        case "idle":
-          if ("requestIdleCallback" in window) {
-            window.requestIdleCallback(() => hydrateIsland(container), { timeout: 2e3 });
-          } else {
-            setTimeout(() => hydrateIsland(container), 150);
-          }
-          break;
-        case "visible": {
-          const observer = new IntersectionObserver((entries) => {
-            entries.forEach((entry) => {
-              if (entry.isIntersecting) {
-                observer.disconnect();
-                hydrateIsland(container);
-              }
-            });
-          }, { rootMargin: "120px 0px" });
-          observer.observe(container);
-          break;
-        }
-        case "media": {
-          const mediaQuery = container.dataset.media;
-          if (mediaQuery) {
-            const mql = window.matchMedia(mediaQuery);
-            if (mql.matches) {
-              hydrateIsland(container);
-            } else {
-              const handler = (e) => {
-                if (e.matches) {
-                  mql.removeEventListener("change", handler);
-                  hydrateIsland(container);
-                }
-              };
-              mql.addEventListener("change", handler);
-            }
-          }
-          break;
-        }
-        case "interaction": {
-          const triggerEvents = ["mouseenter", "focusin", "touchstart", "click"];
-          const onInteract = () => {
-            triggerEvents.forEach((evt) => container.removeEventListener(evt, onInteract));
-            hydrateIsland(container);
-          };
-          triggerEvents.forEach((evt) => container.addEventListener(evt, onInteract, { once: true, passive: true }));
-          break;
-        }
-        case "never":
-          break;
-        default:
-          hydrateIsland(container);
-          break;
+
+  // src/runtime/streaming.ts
+  function awaitStreamingReady(container) {
+    const islandId = container.getAttribute("data-island-id") || container.getAttribute("data-island");
+    const markerValue = `island:end:${islandId}`;
+    if (document.readyState === "complete" || !container.hasAttribute("data-streaming")) {
+      return Promise.resolve();
+    }
+    for (let node = container.lastChild; node; node = node.previousSibling) {
+      if (node.nodeType === Node.COMMENT_NODE && (node.nodeValue?.trim() === markerValue || node.nodeValue?.trim() === "island:end")) {
+        node.remove();
+        return Promise.resolve();
       }
+    }
+    return new Promise((resolve) => {
+      let isResolved = false;
+      const onDone = () => {
+        if (!isResolved) {
+          isResolved = true;
+          observer.disconnect();
+          document.removeEventListener("DOMContentLoaded", onDone);
+          resolve();
+        }
+      };
+      const observer = new MutationObserver(() => {
+        for (let node = container.lastChild; node; node = node.previousSibling) {
+          if (node.nodeType === Node.COMMENT_NODE && (node.nodeValue?.trim() === markerValue || node.nodeValue?.trim() === "island:end")) {
+            node.remove();
+            onDone();
+            break;
+          }
+        }
+      });
+      observer.observe(container, { childList: true });
+      document.addEventListener("DOMContentLoaded", onDone);
     });
   }
 
-  // src/runtime/events.ts
-  var bus = /* @__PURE__ */ new Map();
-  function emitIslandEvent(event, detail) {
-    const handlers = bus.get(event);
-    if (handlers) {
-      handlers.forEach((fn) => {
-        try {
-          fn(detail);
-        } catch (err) {
-          console.error(`[SoftMax.Islands] Error in event listener for "${event}":`, err);
-        }
-      });
+  // src/runtime/hydrator.ts
+  var HYDRATED_FLAG = "__laughtale_hydrated";
+  function hydrateIsland(container) {
+    if (container[HYDRATED_FLAG]) return;
+    const name = container.getAttribute("data-island");
+    if (!name) return;
+    const strategy = (container.getAttribute("data-hydrate") || "load").toLowerCase();
+    const mediaQuery = container.getAttribute("data-media");
+    switch (strategy) {
+      case "load":
+        executeHydration(container, name);
+        break;
+      case "idle":
+        hydrateIdle(container, name);
+        break;
+      case "visible":
+        hydrateVisible(container, name);
+        break;
+      case "interaction":
+        hydrateInteraction(container, name);
+        break;
+      case "media":
+        hydrateMedia(container, name, mediaQuery);
+        break;
+      case "never":
+        break;
+      default:
+        executeHydration(container, name);
     }
-    window.dispatchEvent(new CustomEvent(`island:${event}`, { detail }));
   }
-  function onIslandEvent(event, handler) {
-    if (!bus.has(event)) {
-      bus.set(event, /* @__PURE__ */ new Set());
-    }
-    bus.get(event).add(handler);
-    return () => {
-      const set = bus.get(event);
-      if (set) {
-        set.delete(handler);
-        if (set.size === 0) bus.delete(event);
-      }
-    };
-  }
-
-  // src/runtime/state.ts
-  var IslandStore = class {
-    value;
-    listeners = /* @__PURE__ */ new Set();
-    constructor(initialValue) {
-      this.value = initialValue;
-    }
-    get() {
-      return this.value;
-    }
-    set(next) {
-      const prev = this.value;
-      this.value = typeof next === "function" ? next(prev) : next;
-      if (this.value !== prev) {
-        this.listeners.forEach((fn) => fn(this.value, prev));
-      }
-    }
-    subscribe(listener) {
-      this.listeners.add(listener);
-      return () => this.listeners.delete(listener);
-    }
-  };
-  var stores = /* @__PURE__ */ new Map();
-  function useSharedState(key, initialValue) {
-    if (!stores.has(key)) {
-      stores.set(key, new IslandStore(initialValue));
-    }
-    return stores.get(key);
-  }
-
-  // src/runtime/slots.ts
-  function getSlot(container, name = "default") {
-    return container.querySelector(`[data-slot="${name}"]`);
-  }
-  function extractSlotContent(container, name = "default") {
-    const slotEl = getSlot(container, name);
-    if (!slotEl) return "";
-    return slotEl.innerHTML;
-  }
-
-  // src/runtime/styles.ts
-  var injectedStyles = /* @__PURE__ */ new Set();
-  function injectIslandStyle(islandName, css) {
-    if (injectedStyles.has(islandName) || typeof document === "undefined") {
+  async function executeHydration(container, name) {
+    if (container[HYDRATED_FLAG]) return;
+    container[HYDRATED_FLAG] = true;
+    const definition = getIslandDefinition(name);
+    if (!definition) {
+      console.warn(`[SoftMax.LaughTale] Island '${name}' is not registered in the client registry.`);
       return;
     }
-    injectedStyles.add(islandName);
-    const styleEl = document.createElement("style");
-    styleEl.setAttribute("data-island-style", islandName);
-    styleEl.textContent = css;
-    document.head.appendChild(styleEl);
+    try {
+      await awaitStreamingReady(container);
+      const rawProps = container.getAttribute("data-props");
+      const props = parseAndReviveProps(rawProps);
+      const module = await importWithRetry(definition.loader);
+      const mount = module.default || module;
+      if (typeof mount !== "function") {
+        console.error(`[SoftMax.LaughTale] Island '${name}' module does not export a mount function.`);
+        return;
+      }
+      const unmount = mount(container, props);
+      if (typeof unmount === "function") {
+        container.addEventListener("laughtale:unmount", unmount, { once: true });
+      }
+      container.dispatchEvent(new CustomEvent("laughtale:hydrated", {
+        bubbles: true,
+        composed: true,
+        detail: { name, strategy: container.getAttribute("data-hydrate") }
+      }));
+    } catch (error) {
+      container[HYDRATED_FLAG] = false;
+      console.error(`[SoftMax.LaughTale] Error hydrating island '${name}':`, error);
+      container.dispatchEvent(new CustomEvent("laughtale:hydration-error", {
+        bubbles: true,
+        composed: true,
+        detail: { name, error }
+      }));
+    }
+  }
+  function hydrateIdle(container, name) {
+    if ("requestIdleCallback" in window) {
+      window.requestIdleCallback(() => executeHydration(container, name), { timeout: 2e3 });
+    } else {
+      setTimeout(() => executeHydration(container, name), 200);
+    }
+  }
+  function hydrateVisible(container, name) {
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          observer.disconnect();
+          executeHydration(container, name);
+          break;
+        }
+      }
+    }, { rootMargin: "120px" });
+    observer.observe(container);
+    for (let i = 0; i < container.children.length; i++) {
+      observer.observe(container.children[i]);
+    }
+  }
+  function hydrateInteraction(container, name) {
+    const events = ["mouseenter", "focusin", "touchstart", "click"];
+    const onInteract = () => {
+      events.forEach((e) => container.removeEventListener(e, onInteract));
+      executeHydration(container, name);
+    };
+    events.forEach((e) => container.addEventListener(e, onInteract, { once: true, passive: true }));
+  }
+  function hydrateMedia(container, name, query) {
+    if (!query) {
+      executeHydration(container, name);
+      return;
+    }
+    const mql = window.matchMedia(query);
+    if (mql.matches) {
+      executeHydration(container, name);
+    } else {
+      const handler = (e) => {
+        if (e.matches) {
+          mql.removeEventListener("change", handler);
+          executeHydration(container, name);
+        }
+      };
+      mql.addEventListener("change", handler);
+    }
+  }
+  function initIslands(root = document) {
+    const islands = root.querySelectorAll("[data-island]");
+    islands.forEach(hydrateIsland);
   }
 
   // src/runtime/router.ts
@@ -313,22 +388,57 @@ var SoftMaxIslands = (() => {
         updateDom();
       }
     } catch (err) {
-      console.error("[SoftMax.Islands] View transition failed, falling back to full navigation:", err);
+      console.error("[SoftMax.LaughTale] View transition failed, falling back to full navigation:", err);
       window.location.href = urlStr;
     }
   }
 
-  // src/index.ts
-  if (typeof window !== "undefined") {
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", () => {
-        initIslands();
-        enableViewTransitions();
-      });
-    } else {
-      initIslands();
-      enableViewTransitions();
+  // src/runtime/slots.ts
+  function getSlot(container, name = "default") {
+    return container.querySelector(`[data-slot="${name}"]`);
+  }
+  function extractSlotContent(container, name = "default") {
+    const slotEl = getSlot(container, name);
+    if (!slotEl) return "";
+    return slotEl.innerHTML;
+  }
+
+  // src/runtime/styles.ts
+  var injectedStyles = /* @__PURE__ */ new Set();
+  function injectIslandStyle(islandName, css) {
+    if (injectedStyles.has(islandName) || typeof document === "undefined") {
+      return;
     }
+    injectedStyles.add(islandName);
+    const styleEl = document.createElement("style");
+    styleEl.setAttribute("data-island-style", islandName);
+    styleEl.textContent = css;
+    document.head.appendChild(styleEl);
+  }
+
+  // src/adapters/vanilla.ts
+  function createVanillaIsland(mount) {
+    return mount;
+  }
+
+  // src/adapters/preact.ts
+  function createPreactIsland(Component, options = {}) {
+    return async (container, props) => {
+      try {
+        const preact = await import("preact");
+        const h = preact.h || preact.default?.h;
+        const render = preact.render || preact.default?.render;
+        if (render && h) {
+          render(h(Component, props), container);
+          return () => render(null, container);
+        }
+      } catch {
+        console.warn("[SoftMax.LaughTale] Preact package not found in bundle. Rendering component directly.");
+        if (typeof Component === "function") {
+          return Component(container, props);
+        }
+      }
+    };
   }
   return __toCommonJS(index_exports);
 })();
