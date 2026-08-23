@@ -11792,6 +11792,18 @@ function SidebarIsland(container, props) {
             display: flex;
             flex-direction: column;
             gap: 0.2rem;
+            scrollbar-width: thin;
+            scrollbar-color: var(--p-surface-300) transparent;
+        }
+        .sidebar-body::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar-body::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .sidebar-body::-webkit-scrollbar-thumb {
+            background: var(--p-surface-300);
+            border-radius: 4px;
         }
         .sidebar-tree-menu {
             list-style: none;
@@ -11800,6 +11812,7 @@ function SidebarIsland(container, props) {
             display: flex;
             flex-direction: column;
             gap: 0.2rem;
+            width: 100%;
         }
         .sidebar-item {
             display: flex;
@@ -11817,6 +11830,7 @@ function SidebarIsland(container, props) {
             cursor: pointer;
             user-select: none;
             border: 1px solid transparent;
+            box-sizing: border-box;
         }
         .sidebar-item:hover {
             background: var(--p-surface-100);
@@ -11832,6 +11846,10 @@ function SidebarIsland(container, props) {
             color: #6ee7b7;
             border-color: rgba(16, 185, 129, 0.3);
         }
+        .sidebar-group-container {
+            width: 100%;
+            list-style: none;
+        }
         .sidebar-group-header {
             display: flex;
             align-items: center;
@@ -11845,6 +11863,7 @@ function SidebarIsland(container, props) {
             cursor: pointer;
             border-radius: var(--p-border-radius);
             transition: background 150ms ease, color 150ms ease;
+            box-sizing: border-box;
         }
         .sidebar-group-header:hover {
             background: var(--p-surface-100);
@@ -11877,6 +11896,22 @@ function SidebarIsland(container, props) {
             background: var(--p-surface-200);
             color: var(--p-text-color);
         }
+        .collapsed .sidebar-body {
+            padding: 0.5rem 0 !important;
+            align-items: center;
+        }
+        .collapsed .sidebar-tree-menu {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .collapsed .sidebar-group-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
         .collapsed .sidebar-item-label, 
         .collapsed .sidebar-header-title,
         .collapsed .sidebar-search-box,
@@ -11896,33 +11931,63 @@ function SidebarIsland(container, props) {
         }
         .collapsed .sidebar-group-header {
             display: flex !important;
-            justify-content: center;
-            padding: 0.6rem 0 0.3rem;
-            margin-top: 0.5rem;
+            justify-content: center !important;
+            align-items: center !important;
+            width: 44px;
+            height: 38px;
+            margin: 0.5rem auto 0.25rem;
+            padding: 0.5rem 0 0 !important;
             border-top: 1px solid var(--p-border-color);
             cursor: pointer;
+            box-sizing: border-box;
         }
-        .collapsed .sidebar-group-header .sidebar-item-label,
-        .collapsed .sidebar-group-header .sidebar-group-chevron {
-            display: none !important;
+        .collapsed .sidebar-group-header > div {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 0 !important;
+            width: 100% !important;
+        }
+        .collapsed .sidebar-group-header span {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 20px !important;
+            height: 20px !important;
         }
         .collapsed .sidebar-sub-tree {
             display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            width: 100% !important;
             padding: 0 !important;
             margin: 0 !important;
             border-left: none !important;
-            list-style: none;
-            flex-direction: column;
+            list-style: none !important;
             gap: 0.2rem;
         }
+        .collapsed .sidebar-sub-tree > li {
+            display: flex !important;
+            justify-content: center !important;
+            width: 100% !important;
+        }
         .collapsed .sidebar-item {
-            justify-content: center;
-            padding: 0;
-            width: 44px;
-            height: 44px;
-            margin: 0 auto;
-            box-sizing: border-box;
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+            padding: 0 !important;
+            width: 44px !important;
+            height: 44px !important;
+            margin: 0 auto !important;
+            box-sizing: border-box !important;
             border-radius: var(--p-border-radius);
+        }
+        .collapsed .sidebar-item span {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 20px !important;
+            height: 20px !important;
         }
         .collapsed .sidebar-item:hover {
             background: var(--p-surface-100);

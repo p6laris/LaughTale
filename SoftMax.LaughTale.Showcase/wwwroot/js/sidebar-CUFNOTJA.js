@@ -1,42 +1,34 @@
-import { SidebarItem } from '../types/models';
-import { LucideIcons } from '../icons/lucide';
-import { injectIslandStyle } from '../runtime/styles';
+import {
+  LucideIcons
+} from "./chunk-PRHJLIKH.js";
+import {
+  injectIslandStyle
+} from "./chunk-3TFPN5JM.js";
 
-export interface SidebarProps {
-    items: SidebarItem[];
-    collapsed?: boolean;
-    position?: 'left' | 'right';
-    title?: string;
-    searchable?: boolean;
-}
-
-export default function SidebarIsland(container: HTMLElement, props: SidebarProps) {
-    let collapsed = props.collapsed || false;
-    let searchQuery = '';
-    const items = props.items || [];
-    const position = props.position || 'left';
-    const title = props.title || 'Navigation';
-    const searchable = props.searchable !== false;
-
-    // Track expanded state for parent categories by label
-    const expandedMap: Record<string, boolean> = {};
-
-    function initExpanded(itemList: SidebarItem[]) {
-        itemList.forEach(item => {
-            const label = (item as any).label || (item as any).Label || '';
-            const isExpanded = (item as any).expanded !== false && (item as any).Expanded !== false;
-            if (label && expandedMap[label] === undefined) {
-                expandedMap[label] = isExpanded;
-            }
-            const children = (item as any).items || (item as any).Items;
-            if (Array.isArray(children)) {
-                initExpanded(children);
-            }
-        });
-    }
-    initExpanded(items);
-
-    injectIslandStyle('sidebar', `
+// ../SoftMax.LaughTale.Client/src/components/sidebar.ts
+function SidebarIsland(container, props) {
+  let collapsed = props.collapsed || false;
+  let searchQuery = "";
+  const items = props.items || [];
+  const position = props.position || "left";
+  const title = props.title || "Navigation";
+  const searchable = props.searchable !== false;
+  const expandedMap = {};
+  function initExpanded(itemList) {
+    itemList.forEach((item) => {
+      const label = item.label || item.Label || "";
+      const isExpanded = item.expanded !== false && item.Expanded !== false;
+      if (label && expandedMap[label] === void 0) {
+        expandedMap[label] = isExpanded;
+      }
+      const children = item.items || item.Items;
+      if (Array.isArray(children)) {
+        initExpanded(children);
+      }
+    });
+  }
+  initExpanded(items);
+  injectIslandStyle("sidebar", `
         .laughtale-sidebar {
             display: flex;
             flex-direction: column;
@@ -321,59 +313,53 @@ export default function SidebarIsland(container: HTMLElement, props: SidebarProp
             background: var(--p-surface-100);
         }
     `);
-
-    function renderNode(item: SidebarItem, level: number = 0): string {
-        const label = (item as any).label || (item as any).Label || (item as any).title || (item as any).Title || '';
-        const url = (item as any).url || (item as any).Url || '#';
-        const icon = (item as any).icon || (item as any).Icon || '';
-        const active = (item as any).active || (item as any).Active || false;
-        const badge = (item as any).badge || (item as any).Badge || '';
-        const children = (item as any).items || (item as any).Items;
-        const hasChildren = Array.isArray(children) && children.length > 0;
-        const isExpanded = expandedMap[label] ?? true;
-        const iconSvg = icon && (LucideIcons as any)[icon] ? (LucideIcons as any)[icon] : (icon.startsWith('<svg') ? icon : '');
-
-        // Search query filter matching
-        if (searchQuery) {
-            const q = searchQuery.toLowerCase();
-            const matchesSelf = label.toLowerCase().includes(q);
-            const matchesChild = hasChildren && children.some((c: any) => ((c.label || c.Label || '').toLowerCase().includes(q)));
-            if (!matchesSelf && !matchesChild) return '';
-        }
-
-        if (hasChildren) {
-            return `
+  function renderNode(item, level = 0) {
+    const label = item.label || item.Label || item.title || item.Title || "";
+    const url = item.url || item.Url || "#";
+    const icon = item.icon || item.Icon || "";
+    const active = item.active || item.Active || false;
+    const badge = item.badge || item.Badge || "";
+    const children = item.items || item.Items;
+    const hasChildren = Array.isArray(children) && children.length > 0;
+    const isExpanded = expandedMap[label] ?? true;
+    const iconSvg = icon && LucideIcons[icon] ? LucideIcons[icon] : icon.startsWith("<svg") ? icon : "";
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      const matchesSelf = label.toLowerCase().includes(q);
+      const matchesChild = hasChildren && children.some((c) => (c.label || c.Label || "").toLowerCase().includes(q));
+      if (!matchesSelf && !matchesChild) return "";
+    }
+    if (hasChildren) {
+      return `
                 <li class="sidebar-group-container" data-label="${label}">
                     <div class="sidebar-group-header" data-group-toggle="${label}" title="${label}">
                         <div style="display: flex; align-items: center; gap: 0.45rem;">
-                            ${iconSvg ? `<span style="display: flex; width: 16px; height: 16px; color: var(--p-primary-600);">${iconSvg}</span>` : ''}
+                            ${iconSvg ? `<span style="display: flex; width: 16px; height: 16px; color: var(--p-primary-600);">${iconSvg}</span>` : ""}
                             <span class="sidebar-item-label">${label}</span>
                         </div>
-                        <span class="sidebar-group-chevron ${isExpanded ? 'expanded' : ''}">
+                        <span class="sidebar-group-chevron ${isExpanded ? "expanded" : ""}">
                             ${LucideIcons.chevronRight}
                         </span>
                     </div>
-                    <ul class="sidebar-sub-tree" style="display: ${isExpanded ? 'flex' : 'none'};">
-                        ${children.map((child: SidebarItem) => renderNode(child, level + 1)).join('')}
+                    <ul class="sidebar-sub-tree" style="display: ${isExpanded ? "flex" : "none"};">
+                        ${children.map((child) => renderNode(child, level + 1)).join("")}
                     </ul>
                 </li>
             `;
-        }
-
-        return `
+    }
+    return `
             <li>
-                <a href="${url}" class="sidebar-item ${active ? 'active' : ''}" data-sidebar-link="${url}" title="${label}">
-                    ${iconSvg ? `<span style="display: flex; width: 18px; height: 18px; color: ${active ? 'var(--p-primary-600)' : 'var(--p-text-muted)'}; flex-shrink: 0;">${iconSvg}</span>` : ''}
+                <a href="${url}" class="sidebar-item ${active ? "active" : ""}" data-sidebar-link="${url}" title="${label}">
+                    ${iconSvg ? `<span style="display: flex; width: 18px; height: 18px; color: ${active ? "var(--p-primary-600)" : "var(--p-text-muted)"}; flex-shrink: 0;">${iconSvg}</span>` : ""}
                     <span class="sidebar-item-label">${label}</span>
-                    ${badge ? `<span class="sidebar-badge">${badge}</span>` : ''}
+                    ${badge ? `<span class="sidebar-badge">${badge}</span>` : ""}
                 </a>
             </li>
         `;
-    }
-
-    function render() {
-        container.innerHTML = `
-            <div class="laughtale-sidebar ${collapsed ? 'collapsed' : ''} ${position}">
+  }
+  function render() {
+    container.innerHTML = `
+            <div class="laughtale-sidebar ${collapsed ? "collapsed" : ""} ${position}">
                 <div class="sidebar-header">
                     <div class="sidebar-brand-group" style="display: flex; align-items: center; gap: 0.6rem; overflow: hidden;">
                         <span style="color: var(--p-primary-600); display: flex; flex-shrink: 0;">${LucideIcons.layers}</span>
@@ -388,50 +374,46 @@ export default function SidebarIsland(container: HTMLElement, props: SidebarProp
                     <div class="sidebar-search-box">
                         <input type="text" class="sidebar-search-input" placeholder="Filter components..." value="${searchQuery}" />
                     </div>
-                ` : ''}
+                ` : ""}
 
                 <div class="sidebar-body">
                     <ul class="sidebar-tree-menu">
-                        ${items.map(item => renderNode(item)).join('')}
+                        ${items.map((item) => renderNode(item)).join("")}
                     </ul>
                 </div>
             </div>
         `;
-
-        // Toggle sidebar collapse
-        container.querySelector('.sidebar-toggle')?.addEventListener('click', () => {
-            collapsed = !collapsed;
-            render();
-        });
-
-        // Search input handling
-        const searchInput = container.querySelector<HTMLInputElement>('.sidebar-search-input');
-        if (searchInput) {
-            searchInput.addEventListener('input', (e) => {
-                searchQuery = (e.target as HTMLInputElement).value;
-                const menuEl = container.querySelector('.sidebar-tree-menu');
-                if (menuEl) {
-                    menuEl.innerHTML = items.map(item => renderNode(item)).join('');
-                    bindGroupToggles();
-                }
-            });
+    container.querySelector(".sidebar-toggle")?.addEventListener("click", () => {
+      collapsed = !collapsed;
+      render();
+    });
+    const searchInput = container.querySelector(".sidebar-search-input");
+    if (searchInput) {
+      searchInput.addEventListener("input", (e) => {
+        searchQuery = e.target.value;
+        const menuEl = container.querySelector(".sidebar-tree-menu");
+        if (menuEl) {
+          menuEl.innerHTML = items.map((item) => renderNode(item)).join("");
+          bindGroupToggles();
         }
-
-        bindGroupToggles();
+      });
     }
-
-    function bindGroupToggles() {
-        container.querySelectorAll('[data-group-toggle]').forEach(header => {
-            header.addEventListener('click', () => {
-                const groupLabel = header.getAttribute('data-group-toggle');
-                if (groupLabel) {
-                    expandedMap[groupLabel] = !expandedMap[groupLabel];
-                    render();
-                }
-            });
-        });
-    }
-
-    render();
+    bindGroupToggles();
+  }
+  function bindGroupToggles() {
+    container.querySelectorAll("[data-group-toggle]").forEach((header) => {
+      header.addEventListener("click", () => {
+        const groupLabel = header.getAttribute("data-group-toggle");
+        if (groupLabel) {
+          expandedMap[groupLabel] = !expandedMap[groupLabel];
+          render();
+        }
+      });
+    });
+  }
+  render();
 }
-
+export {
+  SidebarIsland as default
+};
+//# sourceMappingURL=sidebar-CUFNOTJA.js.map
