@@ -199,30 +199,134 @@ public class IslandNumberTagHelper : TagHelper
 }
 
 /// <summary>
-/// TagHelper for <island-otp /> / <island-input-otp />
+/// TagHelper for <island-otp /> / <island-input-otp /> / <island-inputotp /> — Aura InputOtp
 /// </summary>
 [HtmlTargetElement("island-otp")]
 [HtmlTargetElement("island-input-otp")]
+[HtmlTargetElement("island-inputotp")]
 public class IslandOtpTagHelper : TagHelper
 {
     public string? TargetInput { get; set; }
-    public int Length { get; set; } = 6;
+    public string? InputId { get; set; }
+    public string? Value { get; set; }
+    public int Length { get; set; } = 4;
     public bool Mask { get; set; } = false;
+    public bool IntegerOnly { get; set; } = true;
+    public bool Grouped { get; set; } = false;
+    public string? Separator { get; set; }
+    public InputVariant Variant { get; set; } = InputVariant.Outlined;
+    public ComponentSize Size { get; set; } = ComponentSize.Normal;
     public bool Disabled { get; set; } = false;
+    public bool ReadOnly { get; set; } = false;
+    public bool Invalid { get; set; } = false;
+    public bool Autofocus { get; set; } = false;
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
+        // Fallback attribute resolution for camelCase & kebab-case
+        if (context.AllAttributes.TryGetAttribute("integerOnly", out var ioAttr) || context.AllAttributes.TryGetAttribute("integer-only", out ioAttr))
+        {
+            if (bool.TryParse(ioAttr.Value?.ToString(), out var io)) IntegerOnly = io;
+            else if (ioAttr.Value != null) IntegerOnly = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("grouped", out var grpAttr))
+        {
+            if (bool.TryParse(grpAttr.Value?.ToString(), out var grp)) Grouped = grp;
+            else if (grpAttr.Value != null) Grouped = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("mask", out var mskAttr))
+        {
+            if (bool.TryParse(mskAttr.Value?.ToString(), out var msk)) Mask = msk;
+            else if (mskAttr.Value != null) Mask = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("invalid", out var invAttr))
+        {
+            if (bool.TryParse(invAttr.Value?.ToString(), out var inv)) Invalid = inv;
+            else if (invAttr.Value != null) Invalid = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("disabled", out var disAttr))
+        {
+            if (bool.TryParse(disAttr.Value?.ToString(), out var dis)) Disabled = dis;
+            else if (disAttr.Value != null) Disabled = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("readonly", out var roAttr))
+        {
+            if (bool.TryParse(roAttr.Value?.ToString(), out var ro)) ReadOnly = ro;
+            else if (roAttr.Value != null) ReadOnly = true;
+        }
+
         output.TagName = "div";
         output.TagMode = TagMode.StartTagAndEndTag;
+
+        var cssClass = "laughtale-input-otp p-inputotp";
+        if (Variant == InputVariant.Filled) cssClass += " variant-filled";
+        if (Size != ComponentSize.Normal) cssClass += $" size-{Size.ToString().ToLowerInvariant()}";
+        if (Invalid) cssClass += " is-invalid";
+        if (Disabled) cssClass += " is-disabled";
+        if (Grouped) cssClass += " p-inputotp-grouped";
+
+        output.Attributes.SetAttribute("class", cssClass);
         output.Attributes.SetAttribute("data-island", "input-otp");
         output.Attributes.SetAttribute("data-hydrate", "load");
+
+        // SSR Render initial boxes
+        var valChars = (Value ?? "").PadRight(Length).ToCharArray();
+        var disabledAttr = Disabled ? "disabled" : "";
+        var roAttrStr = ReadOnly ? "readonly" : "";
+        var inputType = Mask ? "password" : "text";
+        var inputMode = IntegerOnly ? "numeric" : "text";
+        var pattern = IntegerOnly ? "[0-9]*" : null;
+
+        var sb = new System.Text.StringBuilder();
+
+        if (Grouped && Length % 2 == 0)
+        {
+            int mid = Length / 2;
+            sb.Append("<div class=\"p-inputotp-group\">");
+            for (int i = 0; i < mid; i++)
+            {
+                var c = valChars[i] != ' ' ? valChars[i].ToString() : "";
+                sb.Append($"<input type=\"{inputType}\" class=\"p-inputotp-input\" data-index=\"{i}\" maxlength=\"1\" inputmode=\"{inputMode}\" {(pattern != null ? $"pattern=\"{pattern}\"" : "")} {disabledAttr} {roAttrStr} value=\"{c}\" autocomplete=\"off\" aria-label=\"Character {i+1}\" />");
+            }
+            sb.Append("</div>");
+
+            sb.Append($"<span class=\"p-inputotp-separator\">{(string.IsNullOrEmpty(Separator) ? "-" : Separator)}</span>");
+
+            sb.Append("<div class=\"p-inputotp-group\">");
+            for (int i = mid; i < Length; i++)
+            {
+                var c = valChars[i] != ' ' ? valChars[i].ToString() : "";
+                sb.Append($"<input type=\"{inputType}\" class=\"p-inputotp-input\" data-index=\"{i}\" maxlength=\"1\" inputmode=\"{inputMode}\" {(pattern != null ? $"pattern=\"{pattern}\"" : "")} {disabledAttr} {roAttrStr} value=\"{c}\" autocomplete=\"off\" aria-label=\"Character {i+1}\" />");
+            }
+            sb.Append("</div>");
+        }
+        else
+        {
+            for (int i = 0; i < Length; i++)
+            {
+                var c = valChars[i] != ' ' ? valChars[i].ToString() : "";
+                sb.Append($"<input type=\"{inputType}\" class=\"p-inputotp-input\" data-index=\"{i}\" maxlength=\"1\" inputmode=\"{inputMode}\" {(pattern != null ? $"pattern=\"{pattern}\"" : "")} {disabledAttr} {roAttrStr} value=\"{c}\" autocomplete=\"off\" aria-label=\"Character {i+1}\" />");
+            }
+        }
+
+        output.Content.SetHtmlContent(sb.ToString());
 
         var props = new
         {
             targetInputName = TargetInput,
+            inputId = InputId,
+            value = Value,
             length = Length,
             mask = Mask,
-            disabled = Disabled
+            integerOnly = IntegerOnly,
+            grouped = Grouped,
+            separator = Separator,
+            variant = Variant.ToString().ToLowerInvariant(),
+            size = Size.ToString().ToLowerInvariant(),
+            disabled = Disabled,
+            readonlyMode = ReadOnly,
+            invalid = Invalid,
+            autofocus = Autofocus
         };
 
         output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
