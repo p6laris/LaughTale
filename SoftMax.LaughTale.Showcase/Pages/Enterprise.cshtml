@@ -634,3 +634,63 @@
 <!-- SpeedDial Floating Action Trigger -->
 <island-speed-dial actions="@Model.QuickActions" direction="Up" />
 
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const sections = Array.from(document.querySelectorAll('.enterprise-content > section'));
+    
+    function activateSection(targetId) {
+        if (!targetId || targetId === '#') {
+            targetId = sections[0]?.id ? `#${sections[0].id}` : '';
+        }
+        if (!targetId) return;
+
+        const cleanId = targetId.startsWith('#') ? targetId.substring(1) : targetId;
+        const targetSection = document.getElementById(cleanId);
+        
+        if (targetSection) {
+            sections.forEach(sec => {
+                if (sec === targetSection) {
+                    sec.style.display = 'block';
+                    sec.style.opacity = '1';
+                } else {
+                    sec.style.display = 'none';
+                }
+            });
+
+            // Highlight matching sidebar link
+            document.querySelectorAll('.enterprise-sidebar a').forEach(link => {
+                const href = link.getAttribute('href');
+                if (href === `#${cleanId}`) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            window.dispatchEvent(new Event('resize'));
+        }
+    }
+
+    // Intercept clicks on sidebar items
+    document.querySelector('.enterprise-sidebar')?.addEventListener('click', (e) => {
+        const link = e.target.closest('a');
+        if (link && link.getAttribute('href')?.startsWith('#sec-')) {
+            e.preventDefault();
+            const href = link.getAttribute('href');
+            history.pushState(null, '', href);
+            activateSection(href);
+        }
+    });
+
+    // Handle initial hash or default to first section
+    const initialHash = window.location.hash || (sections[0] ? `#${sections[0].id}` : '');
+    activateSection(initialHash);
+
+    window.addEventListener('hashchange', () => {
+        activateSection(window.location.hash);
+    });
+});
+</script>
+
+

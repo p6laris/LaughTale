@@ -874,6 +874,7 @@ public class IslandThemeStudioTagHelper : TagHelper
 public class IslandDynamicFormTagHelper : TagHelper
 {
     public object? For { get; set; }
+    public object? Schema { get; set; }
     public string? Title { get; set; }
     public string? SubmitUrl { get; set; }
     public string SubmitLabel { get; set; } = "Submit";
@@ -885,15 +886,18 @@ public class IslandDynamicFormTagHelper : TagHelper
         output.Attributes.SetAttribute("data-island", "dynamic-form");
         output.Attributes.SetAttribute("data-hydrate", "load");
 
-        if (For != null)
+        object? resolvedSchema = Schema;
+        if (resolvedSchema == null && For != null)
         {
-            var schema = Forms.DynamicFormSchemaGenerator.FromType(For.GetType(), For, Title, SubmitUrl);
-            var props = new
-            {
-                schema = schema
-            };
-            output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
+            resolvedSchema = Forms.DynamicFormSchemaGenerator.FromType(For.GetType(), For, Title, SubmitUrl);
         }
+
+        var props = new
+        {
+            schema = resolvedSchema,
+            targetAction = SubmitUrl
+        };
+        output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
     }
 }
 
