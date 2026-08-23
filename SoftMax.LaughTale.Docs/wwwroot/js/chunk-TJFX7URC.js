@@ -1053,9 +1053,9 @@ defineIsland("stepper", () => import("./stepper-JGXFKGGY.js"));
 defineIsland("timeline", () => import("./timeline-AQZ4AYXL.js"));
 defineIsland("camera", () => import("./camera-KAAHJRTE.js"));
 defineIsland("dropzone", () => import("./dropzone-E76UIQBF.js"));
-defineIsland("tree-select", () => import("./tree-select-TAD7XUXF.js"));
+defineIsland("tree-select", () => import("./tree-select-FZOTTQ6I.js"));
 defineIsland("datagrid", () => import("./datagrid-OWH5VQKO.js"));
-defineIsland("modal", () => import("./modal-YR27SB7N.js"));
+defineIsland("modal", () => import("./modal-A563WVP6.js"));
 defineIsland("toast", () => import("./toast-WLFO7J5G.js"));
 defineIsland("input-number", () => import("./input-number-KQ2J2WMH.js"));
 defineIsland("input-otp", () => import("./input-otp-RUPMATZ7.js"));
@@ -1132,4 +1132,4 @@ export {
   enableViewTransitions,
   getSlot
 };
-//# sourceMappingURL=chunk-NSXWS4FG.js.map
+//# sourceMappingURL=chunk-TJFX7URC.js.map
