@@ -2216,7 +2216,6 @@ public class IslandEnhancedInputTextTagHelper : TagHelper
         if (Size != ComponentSize.Normal) inputClasses.Add($"size-{Size.ToString().ToLowerInvariant()}");
         if (Invalid) inputClasses.Add("is-invalid");
         if (Fluid) inputClasses.Add("p-inputtext-fluid");
-
         var idAttr = !string.IsNullOrEmpty(InputId) ? $" id=\"{System.Net.WebUtility.HtmlEncode(InputId)}\"" : "";
         var nameAttr = !string.IsNullOrEmpty(Name) ? $" name=\"{System.Net.WebUtility.HtmlEncode(Name)}\"" : (!string.IsNullOrEmpty(TargetInput) ? $" name=\"{System.Net.WebUtility.HtmlEncode(TargetInput)}\"" : "");
         var placeholderAttr = !string.IsNullOrEmpty(Placeholder) ? $" placeholder=\"{System.Net.WebUtility.HtmlEncode(Placeholder)}\"" : "";
@@ -2224,14 +2223,38 @@ public class IslandEnhancedInputTextTagHelper : TagHelper
         var disabledAttr = Disabled ? " disabled" : "";
         var readonlyAttr = Readonly ? " readonly" : "";
 
-        var ssrHtml = $"<input type=\"{Type}\" class=\"{string.Join(" ", inputClasses)}\"{idAttr}{nameAttr}{placeholderAttr}{valueAttr}{disabledAttr}{readonlyAttr} autocomplete=\"off\" />";
+        var sb = new System.Text.StringBuilder();
+
+        if (!string.IsNullOrEmpty(effectiveLeftIcon))
+        {
+            sb.Append("<span class=\"p-inputtext-icon p-inputtext-icon-left\">");
+            sb.Append(SoftMax.LaughTale.Components.Icons.LucideIcons.Get(effectiveLeftIcon, 16));
+            sb.Append("</span>");
+        }
+
+        sb.Append($"<input type=\"{Type}\" class=\"{string.Join(" ", inputClasses)}\"{idAttr}{nameAttr}{placeholderAttr}{valueAttr}{disabledAttr}{readonlyAttr} autocomplete=\"off\" />");
+
+        if ((ShowClear || Clearable) && !string.IsNullOrEmpty(Value) && !Disabled)
+        {
+            sb.Append("<button type=\"button\" class=\"p-inputtext-clear\" aria-label=\"Clear text\" tabindex=\"-1\">");
+            sb.Append(SoftMax.LaughTale.Components.Icons.LucideIcons.Get("x", 14));
+            sb.Append("</button>");
+        }
+
+        if (!string.IsNullOrEmpty(IconRight))
+        {
+            sb.Append("<span class=\"p-inputtext-icon p-inputtext-icon-right\">");
+            sb.Append(SoftMax.LaughTale.Components.Icons.LucideIcons.Get(IconRight, 16));
+            sb.Append("</span>");
+        }
+
         if (!string.IsNullOrEmpty(HelpText))
         {
             var helpIdAttr = !string.IsNullOrEmpty(AriaDescribedBy) ? $" id=\"{System.Net.WebUtility.HtmlEncode(AriaDescribedBy)}\"" : "";
-            ssrHtml += $"<small class=\"p-inputtext-help\"{helpIdAttr}>{System.Net.WebUtility.HtmlEncode(HelpText)}</small>";
+            sb.Append($"<small class=\"p-inputtext-help\"{helpIdAttr}>{System.Net.WebUtility.HtmlEncode(HelpText)}</small>");
         }
 
-        output.Content.SetHtmlContent(ssrHtml);
+        output.Content.SetHtmlContent(sb.ToString());
     }
 }
 
