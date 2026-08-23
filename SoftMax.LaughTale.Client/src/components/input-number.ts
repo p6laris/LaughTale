@@ -1,12 +1,11 @@
 /**
  * SoftMax.LaughTale: Enterprise InputNumber Component (Aura InputNumber)
- * Comprehensive numerical input with currency, locale, min/max fractions,
- * prefixes, suffixes, button layouts (stacked, horizontal, vertical),
- * fluid sizing, clearable trigger, and dark mode awareness.
+ * Seamless unified container design matching PrimeVue Aura pixel-for-pixel:
+ * Single outer focus ring enclosing buttons and inputs, zero blue selection on click,
+ * precision internationalization, and complete dark mode themer tokens.
  */
 
 import { injectIslandStyle } from '../runtime/styles';
-import { getLucideIcon } from '../icons/lucide';
 
 export interface InputNumberProps {
     targetInputName?: string;
@@ -16,7 +15,7 @@ export interface InputNumberProps {
     currency?: string; // ISO 4217 e.g. 'USD', 'EUR', 'JPY', 'INR'
     currencyDisplay?: 'symbol' | 'code' | 'name';
     locale?: string;
-    useGrouping?: boolean;
+    useGrouping?: boolean | string;
     minFractionDigits?: number;
     maxFractionDigits?: number;
     prefix?: string;
@@ -41,11 +40,17 @@ const CSS = `
 .laughtale-inputnumber,
 .p-inputnumber {
     display: inline-flex;
+    align-items: stretch;
     position: relative;
     font-family: var(--p-font-family, inherit);
+    background: var(--p-surface-0);
+    border: 1px solid var(--p-border-color);
+    border-radius: var(--p-border-radius);
+    transition: border-color 150ms ease, box-shadow 150ms ease, background 150ms ease;
     box-sizing: border-box;
+    min-height: 2.5rem;
+    overflow: hidden;
     vertical-align: middle;
-    width: auto;
 }
 
 .p-inputnumber.p-inputnumber-fluid {
@@ -53,7 +58,56 @@ const CSS = `
     width: 100%;
 }
 
-/* Base Input Element */
+.p-inputnumber:hover:not(.is-disabled) {
+    border-color: var(--p-surface-400);
+}
+
+.p-inputnumber:focus-within:not(.is-disabled) {
+    border-color: var(--p-primary-500) !important;
+    box-shadow: 0 0 0 1px var(--p-primary-500) !important;
+}
+
+.p-inputnumber.is-disabled {
+    background: var(--p-surface-100);
+    opacity: 0.75;
+    cursor: not-allowed;
+}
+
+/* Variant: Filled */
+.p-inputnumber.variant-filled {
+    background: var(--p-surface-100);
+    border-color: transparent;
+}
+.p-inputnumber.variant-filled:focus-within {
+    background: var(--p-surface-0);
+    border-color: var(--p-primary-500) !important;
+}
+
+/* Invalid State */
+.p-inputnumber.is-invalid {
+    border-color: var(--p-red-500, #ef4444) !important;
+}
+.p-inputnumber.is-invalid:focus-within {
+    box-shadow: 0 0 0 1px var(--p-red-500, #ef4444) !important;
+}
+
+/* Sizes */
+.p-inputnumber.size-small {
+    min-height: 2rem;
+}
+.p-inputnumber.size-small .p-inputnumber-input {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+}
+.p-inputnumber.size-large {
+    min-height: 3rem;
+}
+.p-inputnumber.size-large .p-inputnumber-input {
+    font-size: 1rem;
+    padding: 0.75rem 1rem;
+}
+
+/* Inner Input */
 .p-inputnumber-input {
     flex: 1 1 auto;
     width: 100%;
@@ -61,91 +115,40 @@ const CSS = `
     font-family: inherit;
     font-size: 0.875rem;
     color: var(--p-text-color);
-    background: var(--p-surface-0);
-    border: 1px solid var(--p-border-color);
-    border-radius: var(--p-border-radius);
-    padding: 0.5rem 0.75rem;
-    transition: background 150ms ease, color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
-    appearance: none;
+    background: transparent;
+    border: none;
     outline: none;
+    padding: 0.5rem 0.75rem;
     box-sizing: border-box;
     font-variant-numeric: tabular-nums;
-    min-height: 2.5rem;
+    height: 100%;
 }
-
-.p-inputnumber-input:hover:not(:disabled) {
-    border-color: var(--p-surface-400);
-}
-
-.p-inputnumber-input:focus {
-    border-color: var(--p-primary-500);
-    box-shadow: 0 0 0 1px var(--p-primary-500);
-}
-
 .p-inputnumber-input:disabled {
-    background: var(--p-surface-100);
     color: var(--p-text-muted);
     cursor: not-allowed;
-    opacity: 0.75;
 }
 
-/* Variant: Filled */
-.p-inputnumber.variant-filled .p-inputnumber-input {
-    background: var(--p-surface-100);
-    border-color: transparent;
-}
-.p-inputnumber.variant-filled .p-inputnumber-input:focus {
-    background: var(--p-surface-0);
-    border-color: var(--p-primary-500);
-}
-
-/* Sizes */
-.p-inputnumber.size-small .p-inputnumber-input {
-    font-size: 0.75rem;
-    padding: 0.25rem 0.5rem;
-    min-height: 2rem;
-}
-.p-inputnumber.size-large .p-inputnumber-input {
-    font-size: 1rem;
-    padding: 0.75rem 1rem;
-    min-height: 3rem;
-}
-
-/* Invalid state */
-.p-inputnumber.is-invalid .p-inputnumber-input {
-    border-color: var(--p-red-500, #ef4444) !important;
-}
-.p-inputnumber.is-invalid .p-inputnumber-input:focus {
-    box-shadow: 0 0 0 1px var(--p-red-500, #ef4444) !important;
-}
-
-/* Clear icon */
+/* Clear Icon */
 .p-inputnumber-clear-icon {
-    position: absolute;
-    right: 0.75rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--p-text-muted);
-    cursor: pointer;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 1rem;
-    height: 1rem;
-    padding: 0;
+    color: var(--p-text-muted);
+    cursor: pointer;
     border: none;
     background: transparent;
+    padding: 0 0.5rem;
     transition: color 150ms ease;
-    z-index: 2;
 }
 .p-inputnumber-clear-icon:hover {
     color: var(--p-text-color);
 }
-.p-inputnumber:has(.p-inputnumber-clear-icon) .p-inputnumber-input {
-    padding-right: 2.25rem;
+.p-inputnumber-clear-icon svg {
+    width: 14px;
+    height: 14px;
 }
 
-/* ==================== BUTTON LAYOUTS ==================== */
+/* ==================== BUTTONS ==================== */
 
 /* Shared Button Styles */
 .p-inputnumber-button {
@@ -154,12 +157,13 @@ const CSS = `
     justify-content: center;
     background: var(--p-surface-100);
     color: var(--p-surface-600);
-    border: 1px solid var(--p-border-color);
+    border: none;
     cursor: pointer;
     user-select: none;
-    transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
-    box-sizing: border-box;
+    -webkit-user-select: none;
+    transition: background 150ms ease, color 150ms ease;
     padding: 0;
+    box-sizing: border-box;
 }
 .p-inputnumber-button:hover:not(:disabled) {
     background: var(--p-surface-200);
@@ -179,73 +183,47 @@ const CSS = `
 }
 
 /* Layout 1: Stacked (Default) */
-.p-inputnumber-stacked {
-    display: inline-flex;
-    align-items: stretch;
-}
-.p-inputnumber-stacked.p-inputnumber-fluid {
-    display: flex;
-    width: 100%;
-}
-.p-inputnumber-stacked .p-inputnumber-input {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-    padding-right: 0.5rem;
-}
 .p-inputnumber-button-group {
     display: flex;
     flex-direction: column;
     width: 2.25rem;
-    margin-left: -1px;
+    border-left: 1px solid var(--p-border-color);
+    background: var(--p-surface-100);
     flex-shrink: 0;
+}
+.p-inputnumber:focus-within .p-inputnumber-button-group {
+    border-left-color: var(--p-primary-500);
 }
 .p-inputnumber-stacked .p-inputnumber-button-up {
     flex: 1;
-    border-top-right-radius: var(--p-border-radius);
-    border-bottom-right-radius: 0;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
     border-bottom: 1px solid var(--p-border-color);
+}
+.p-inputnumber-stacked:focus-within .p-inputnumber-button-up {
+    border-bottom-color: var(--p-primary-500);
 }
 .p-inputnumber-stacked .p-inputnumber-button-down {
     flex: 1;
-    border-bottom-right-radius: var(--p-border-radius);
-    border-top-right-radius: 0;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-    border-top: none;
 }
 
 /* Layout 2: Horizontal */
-.p-inputnumber-horizontal {
-    display: inline-flex;
-    align-items: stretch;
-}
-.p-inputnumber-horizontal.p-inputnumber-fluid {
-    display: flex;
-    width: 100%;
-}
 .p-inputnumber-horizontal .p-inputnumber-button-down {
     width: 2.5rem;
-    border-top-left-radius: var(--p-border-radius);
-    border-bottom-left-radius: var(--p-border-radius);
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
+    border-right: 1px solid var(--p-border-color);
     flex-shrink: 0;
 }
+.p-inputnumber-horizontal:focus-within .p-inputnumber-button-down {
+    border-right-color: var(--p-primary-500);
+}
 .p-inputnumber-horizontal .p-inputnumber-input {
-    border-radius: 0;
-    margin-left: -1px;
-    margin-right: -1px;
     text-align: center;
 }
 .p-inputnumber-horizontal .p-inputnumber-button-up {
     width: 2.5rem;
-    border-top-right-radius: var(--p-border-radius);
-    border-bottom-right-radius: var(--p-border-radius);
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
+    border-left: 1px solid var(--p-border-color);
     flex-shrink: 0;
+}
+.p-inputnumber-horizontal:focus-within .p-inputnumber-button-up {
+    border-left-color: var(--p-primary-500);
 }
 
 /* Layout 3: Vertical */
@@ -254,60 +232,57 @@ const CSS = `
     flex-direction: column;
     align-items: center;
     width: auto;
+    min-height: auto;
 }
 .p-inputnumber-vertical .p-inputnumber-button-up {
     width: 100%;
     height: 2rem;
-    border-top-left-radius: var(--p-border-radius);
-    border-top-right-radius: var(--p-border-radius);
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
+    border-bottom: 1px solid var(--p-border-color);
+}
+.p-inputnumber-vertical:focus-within .p-inputnumber-button-up {
+    border-bottom-color: var(--p-primary-500);
 }
 .p-inputnumber-vertical .p-inputnumber-input {
-    border-radius: 0;
-    margin-top: -1px;
-    margin-bottom: -1px;
     text-align: center;
     width: 3.5rem;
+    height: 2.5rem;
 }
 .p-inputnumber-vertical .p-inputnumber-button-down {
     width: 100%;
     height: 2rem;
-    border-bottom-left-radius: var(--p-border-radius);
-    border-bottom-right-radius: var(--p-border-radius);
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
+    border-top: 1px solid var(--p-border-color);
 }
-
-/* Focus elevations on buttons & inputs */
-.p-inputnumber > *:focus,
-.p-inputnumber-input:focus {
-    z-index: 1;
+.p-inputnumber-vertical:focus-within .p-inputnumber-button-down {
+    border-top-color: var(--p-primary-500);
 }
 
 /* ==================== DARK MODE ==================== */
-.dark .p-inputnumber-input {
+.dark .laughtale-inputnumber,
+.dark .p-inputnumber {
     background: var(--p-surface-900);
     border-color: var(--p-surface-700);
-    color: var(--p-surface-0);
 }
-.dark .p-inputnumber-input:hover:not(:disabled) {
+.dark .p-inputnumber:hover:not(.is-disabled) {
     border-color: var(--p-surface-600);
 }
-.dark .p-inputnumber-input:focus {
-    border-color: var(--p-primary-500);
-    box-shadow: 0 0 0 1px var(--p-primary-500);
-}
-.dark .p-inputnumber.variant-filled .p-inputnumber-input {
+.dark .p-inputnumber.variant-filled {
     background: var(--p-surface-800);
 }
-.dark .p-inputnumber.variant-filled .p-inputnumber-input:focus {
+.dark .p-inputnumber.variant-filled:focus-within {
     background: var(--p-surface-900);
 }
+.dark .p-inputnumber-input {
+    color: var(--p-surface-0);
+}
+.dark .p-inputnumber-button-group,
 .dark .p-inputnumber-button {
     background: var(--p-surface-800);
-    border-color: var(--p-surface-700);
     color: var(--p-surface-400);
+}
+.dark .p-inputnumber:focus-within .p-inputnumber-button-group,
+.dark .p-inputnumber:focus-within .p-inputnumber-button-up,
+.dark .p-inputnumber:focus-within .p-inputnumber-button-down {
+    border-color: var(--p-primary-500);
 }
 .dark .p-inputnumber-button:hover:not(:disabled) {
     background: var(--p-surface-700);
@@ -429,6 +404,7 @@ export default function InputNumberIsland(container: HTMLElement, props: InputNu
         if (isFilled) container.classList.add('variant-filled');
         if (props.size) container.classList.add(`size-${props.size}`);
         if (isInvalid) container.classList.add('is-invalid');
+        if (isDisabled) container.classList.add('is-disabled');
         if (showButtons) container.classList.add(`p-inputnumber-${buttonLayout}`);
 
         const inputIdAttr = props.inputId ? `id="${props.inputId}"` : '';
@@ -519,18 +495,14 @@ export default function InputNumberIsland(container: HTMLElement, props: InputNu
         const upBtn = container.querySelector<HTMLButtonElement>('.p-inputnumber-button-up');
         const downBtn = container.querySelector<HTMLButtonElement>('.p-inputnumber-button-down');
 
-        // Focus & Blur
-        inputEl.addEventListener('focus', () => {
-            inputEl.select();
-        });
-
+        // Blur formatting
         inputEl.addEventListener('blur', () => {
             const parsed = parseRaw(inputEl.value);
             setValue(parsed);
             inputEl.value = formatNumber(rawValue);
         });
 
-        // Input change
+        // Live input change
         inputEl.addEventListener('input', () => {
             const parsed = parseRaw(inputEl.value);
             rawValue = parsed;
@@ -562,20 +534,27 @@ export default function InputNumberIsland(container: HTMLElement, props: InputNu
             }
         });
 
-        // Step Buttons
+        // Step Buttons (Prevent focus event from highlighting text)
+        upBtn?.addEventListener('mousedown', (e) => {
+            e.preventDefault(); // Prevents loss of focus or unwanted text selection
+        });
         upBtn?.addEventListener('click', (e) => {
             e.preventDefault();
             stepUp();
-            inputEl.focus();
         });
 
+        downBtn?.addEventListener('mousedown', (e) => {
+            e.preventDefault(); // Prevents loss of focus or unwanted text selection
+        });
         downBtn?.addEventListener('click', (e) => {
             e.preventDefault();
             stepDown();
-            inputEl.focus();
         });
 
         // Clear button
+        clearBtn?.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+        });
         clearBtn?.addEventListener('click', (e) => {
             e.preventDefault();
             setValue(null);
