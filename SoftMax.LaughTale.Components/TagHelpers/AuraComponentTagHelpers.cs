@@ -1667,33 +1667,212 @@ public class IslandCascadeSelectTagHelper : TagHelper
 }
 
 /// <summary>
-/// TagHelper for <island-listbox />
+/// TagHelper for <island-listbox /> — Aura Listbox Component
 /// </summary>
 [HtmlTargetElement("island-listbox")]
 public class IslandListboxTagHelper : TagHelper
 {
-    public List<SelectButtonItem>? Options { get; set; }
+    [HtmlAttributeName("options")]
+    public object? Options { get; set; }
+
+    [HtmlAttributeName("value")]
+    public string? Value { get; set; }
+
+    [HtmlAttributeName("selected-value")]
     public string? SelectedValue { get; set; }
+
+    [HtmlAttributeName("values")]
+    public List<string>? Values { get; set; }
+
+    [HtmlAttributeName("selected-values")]
+    public List<string>? SelectedValues { get; set; }
+
+    [HtmlAttributeName("multiple")]
     public bool Multiple { get; set; } = false;
-    public bool Filter { get; set; } = true;
-    public string? TargetInput { get; set; }
+
+    [HtmlAttributeName("meta-key-selection")]
+    public bool MetaKeySelection { get; set; } = true;
+
+    [HtmlAttributeName("checkbox")]
+    public bool Checkbox { get; set; } = false;
+
+    [HtmlAttributeName("checkmark")]
+    public bool Checkmark { get; set; } = false;
+
+    [HtmlAttributeName("highlight-on-select")]
+    public bool HighlightOnSelect { get; set; } = true;
+
+    [HtmlAttributeName("filter")]
+    public bool Filter { get; set; } = false;
+
+    [HtmlAttributeName("filter-placeholder")]
+    public string? FilterPlaceholder { get; set; }
+
+    [HtmlAttributeName("filter-match-mode")]
+    public string? FilterMatchMode { get; set; }
+
+    [HtmlAttributeName("scroll-height")]
+    public string? ScrollHeight { get; set; }
+
+    [HtmlAttributeName("striped")]
+    public bool Striped { get; set; } = false;
+
+    [HtmlAttributeName("variant")]
+    public InputVariant Variant { get; set; } = InputVariant.Outlined;
+
+    [HtmlAttributeName("size")]
+    public ComponentSize Size { get; set; } = ComponentSize.Normal;
+
+    [HtmlAttributeName("fluid")]
+    public bool Fluid { get; set; } = false;
+
+    [HtmlAttributeName("invalid")]
+    public bool Invalid { get; set; } = false;
+
+    [HtmlAttributeName("disabled")]
     public bool Disabled { get; set; } = false;
+
+    [HtmlAttributeName("input-id")]
+    public string? InputId { get; set; }
+
+    [HtmlAttributeName("name")]
+    public string? Name { get; set; }
+
+    [HtmlAttributeName("target-input")]
+    public string? TargetInput { get; set; }
+
+    [HtmlAttributeName("header")]
+    public string? Header { get; set; }
+
+    [HtmlAttributeName("header-count")]
+    public string? HeaderCount { get; set; }
+
+    [HtmlAttributeName("footer")]
+    public string? Footer { get; set; }
+
+    [HtmlAttributeName("auto-option-focus")]
+    public bool AutoOptionFocus { get; set; } = true;
+
+    [HtmlAttributeName("select-on-focus")]
+    public bool SelectOnFocus { get; set; } = false;
+
+    [HtmlAttributeName("focus-on-hover")]
+    public bool FocusOnHover { get; set; } = false;
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
+        if (context.AllAttributes.TryGetAttribute("multiple", out var mulAttr))
+        {
+            if (bool.TryParse(mulAttr.Value?.ToString(), out var m)) Multiple = m;
+            else if (mulAttr.Value != null) Multiple = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("metaKeySelection", out var metaAttr) || context.AllAttributes.TryGetAttribute("meta-key-selection", out metaAttr))
+        {
+            if (bool.TryParse(metaAttr.Value?.ToString(), out var mk)) MetaKeySelection = mk;
+        }
+        if (context.AllAttributes.TryGetAttribute("checkbox", out var cbAttr))
+        {
+            if (bool.TryParse(cbAttr.Value?.ToString(), out var cb)) Checkbox = cb;
+            else if (cbAttr.Value != null) Checkbox = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("checkmark", out var cmAttr))
+        {
+            if (bool.TryParse(cmAttr.Value?.ToString(), out var cm)) Checkmark = cm;
+            else if (cmAttr.Value != null) Checkmark = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("highlightOnSelect", out var hosAttr) || context.AllAttributes.TryGetAttribute("highlight-on-select", out hosAttr))
+        {
+            if (bool.TryParse(hosAttr.Value?.ToString(), out var hos)) HighlightOnSelect = hos;
+        }
+        if (context.AllAttributes.TryGetAttribute("filter", out var fAttr))
+        {
+            if (bool.TryParse(fAttr.Value?.ToString(), out var f)) Filter = f;
+            else if (fAttr.Value != null) Filter = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("striped", out var strAttr))
+        {
+            if (bool.TryParse(strAttr.Value?.ToString(), out var st)) Striped = st;
+            else if (strAttr.Value != null) Striped = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("fluid", out var flAttr))
+        {
+            if (bool.TryParse(flAttr.Value?.ToString(), out var fl)) Fluid = fl;
+            else if (flAttr.Value != null) Fluid = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("invalid", out var invAttr))
+        {
+            if (bool.TryParse(invAttr.Value?.ToString(), out var inv)) Invalid = inv;
+            else if (invAttr.Value != null) Invalid = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("disabled", out var disAttr))
+        {
+            if (bool.TryParse(disAttr.Value?.ToString(), out var dis)) Disabled = dis;
+            else if (disAttr.Value != null) Disabled = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("variant", out var varAttr))
+        {
+            if (System.Enum.TryParse<InputVariant>(varAttr.Value?.ToString(), true, out var vr)) Variant = vr;
+        }
+        if (context.AllAttributes.TryGetAttribute("size", out var szAttr))
+        {
+            if (System.Enum.TryParse<ComponentSize>(szAttr.Value?.ToString(), true, out var sz)) Size = sz;
+        }
+        if (context.AllAttributes.TryGetAttribute("target-input-name", out var tinAttr) || context.AllAttributes.TryGetAttribute("targetInputName", out tinAttr))
+        {
+            TargetInput = tinAttr.Value?.ToString();
+        }
+
         output.TagName = "div";
         output.TagMode = TagMode.StartTagAndEndTag;
+
+        var rootClasses = new List<string> { "laughtale-listbox", "p-listbox" };
+        if (Fluid) rootClasses.Add("p-listbox-fluid");
+        if (Variant == InputVariant.Filled) rootClasses.Add("variant-filled");
+        if (Striped) rootClasses.Add("p-listbox-striped");
+        if (Size != ComponentSize.Normal) rootClasses.Add($"size-{Size.ToString().ToLowerInvariant()}");
+        if (Invalid) rootClasses.Add("is-invalid");
+        if (Disabled) rootClasses.Add("is-disabled");
+
+        output.Attributes.SetAttribute("class", string.Join(" ", rootClasses));
         output.Attributes.SetAttribute("data-island", "listbox");
         output.Attributes.SetAttribute("data-hydrate", "load");
+        output.Attributes.SetAttribute("tabindex", Disabled ? "-1" : "0");
+        output.Attributes.SetAttribute("role", "listbox");
+        output.Attributes.SetAttribute("aria-multiselectable", Multiple ? "true" : "false");
+
+        if (!string.IsNullOrEmpty(InputId)) output.Attributes.SetAttribute("id", InputId);
+
+        var effectiveValue = (object?)Values ?? (object?)SelectedValues ?? (object?)Value ?? SelectedValue;
 
         var props = new
         {
-            options = Options ?? new(),
-            selectedValue = SelectedValue,
+            options = Options ?? new List<object>(),
+            value = effectiveValue,
+            selectedValue = effectiveValue,
             multiple = Multiple,
+            metaKeySelection = MetaKeySelection,
+            checkbox = Checkbox,
+            checkmark = Checkmark,
+            highlightOnSelect = HighlightOnSelect,
             filter = Filter,
+            filterPlaceholder = FilterPlaceholder ?? "Filter...",
+            filterMatchMode = FilterMatchMode ?? "contains",
+            scrollHeight = ScrollHeight ?? "220px",
+            striped = Striped,
+            variant = Variant == InputVariant.Filled ? "filled" : "outlined",
+            size = Size.ToString().ToLowerInvariant(),
+            fluid = Fluid,
+            disabled = Disabled,
+            invalid = Invalid,
+            inputId = InputId,
+            name = Name,
             targetInputName = TargetInput,
-            disabled = Disabled
+            header = Header,
+            headerCount = HeaderCount,
+            footer = Footer,
+            autoOptionFocus = AutoOptionFocus,
+            selectOnFocus = SelectOnFocus,
+            focusOnHover = FocusOnHover
         };
 
         output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));

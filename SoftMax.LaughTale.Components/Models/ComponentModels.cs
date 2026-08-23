@@ -66,6 +66,19 @@ public record SelectButtonItem(
     string? Icon = null
 );
 
+public record ListboxOptionItem(
+    string Label,
+    object Value,
+    string? Code = null,
+    string? Name = null,
+    string? Icon = null,
+    string? Flag = null,
+    string? Badge = null,
+    string? Description = null,
+    bool Disabled = false,
+    List<ListboxOptionItem>? Items = null
+);
+
 public record MeterValue(
     string Label,
     double Value,

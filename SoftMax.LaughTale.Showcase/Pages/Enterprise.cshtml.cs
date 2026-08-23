@@ -131,6 +131,76 @@ public class EnterpriseModel : PageModel
         new("CockroachDB Distributed", "cockroach")
     };
 
+    public List<ListboxOptionItem> ListboxCities { get; set; } = new()
+    {
+        new("New York", "NY", Code: "NY"),
+        new("Rome", "RM", Code: "RM"),
+        new("London", "LDN", Code: "LDN"),
+        new("Istanbul", "IST", Code: "IST"),
+        new("Paris", "PRS", Code: "PRS")
+    };
+
+    public List<ListboxOptionItem> ListboxAirports { get; set; } = new()
+    {
+        new("John F. Kennedy", "JFK", Code: "JFK", Flag: "🇺🇸"),
+        new("Heathrow", "LHR", Code: "LHR", Flag: "🇬🇧"),
+        new("Charles de Gaulle", "CDG", Code: "CDG", Flag: "🇫🇷"),
+        new("Frankfurt", "FRA", Code: "FRA", Flag: "🇩🇪"),
+        new("Schiphol", "AMS", Code: "AMS", Flag: "🇳🇱"),
+        new("Istanbul", "IST", Code: "IST", Flag: "🇹🇷"),
+        new("Dubai", "DXB", Code: "DXB", Flag: "🇦🇪"),
+        new("Changi", "SIN", Code: "SIN", Flag: "🇸🇬"),
+        new("Haneda", "HND", Code: "HND", Flag: "🇯🇵")
+    };
+
+    public List<ListboxOptionItem> ListboxCountries { get; set; } = new()
+    {
+        new("Australia", "AU", Code: "AU", Flag: "🇦🇺"),
+        new("Brazil", "BR", Code: "BR", Flag: "🇧🇷"),
+        new("China", "CN", Code: "CN", Flag: "🇨🇳"),
+        new("Egypt", "EG", Code: "EG", Flag: "🇪🇬"),
+        new("France", "FR", Code: "FR", Flag: "🇫🇷"),
+        new("Germany", "DE", Code: "DE", Flag: "🇩🇪"),
+        new("India", "IN", Code: "IN", Flag: "🇮🇳"),
+        new("Japan", "JP", Code: "JP", Flag: "🇯🇵"),
+        new("Spain", "ES", Code: "ES", Flag: "🇪🇸"),
+        new("United States", "US", Code: "US", Flag: "🇺🇸")
+    };
+
+    public List<ListboxOptionItem> ListboxGroupedCities { get; set; } = new()
+    {
+        new("Germany", "de", Flag: "🇩🇪", Items: new()
+        {
+            new("Berlin", "Berlin"),
+            new("Frankfurt", "Frankfurt"),
+            new("Hamburg", "Hamburg"),
+            new("Munich", "Munich")
+        }),
+        new("USA", "us", Flag: "🇺🇸", Items: new()
+        {
+            new("Chicago", "Chicago"),
+            new("Los Angeles", "Los Angeles"),
+            new("New York", "New York"),
+            new("San Francisco", "San Francisco")
+        }),
+        new("Japan", "jp", Flag: "🇯🇵", Items: new()
+        {
+            new("Kyoto", "Kyoto"),
+            new("Osaka", "Osaka"),
+            new("Tokyo", "Tokyo"),
+            new("Yokohama", "Yokohama")
+        })
+    };
+
+    public List<ListboxOptionItem> ListboxDisabledCities { get; set; } = new()
+    {
+        new("New York", "NY"),
+        new("Rome", "RM"),
+        new("London", "LDN", Disabled: true),
+        new("Istanbul", "IST"),
+        new("Paris", "PRS", Disabled: true)
+    };
+
     public List<PickListItem> PickListSource { get; set; } = new()
     {
         new("sec-1", "mTLS Encryption", "Active session certificate"),

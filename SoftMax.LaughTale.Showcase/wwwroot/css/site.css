@@ -1343,6 +1343,311 @@ html {
     color: var(--p-surface-200);
 }
 
+/* ==================== AURA LISTBOX ==================== */
+.laughtale-listbox,
+.p-listbox {
+    display: inline-flex;
+    flex-direction: column;
+    background: var(--p-surface-0);
+    color: var(--p-text-color);
+    border: 1px solid var(--p-border-color);
+    border-radius: var(--p-border-radius);
+    font-family: var(--p-font-family, inherit);
+    box-sizing: border-box;
+    overflow: hidden;
+    outline: none;
+    transition: background 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.02);
+    width: 100%;
+    max-width: 280px;
+}
+
+.p-listbox.p-listbox-fluid {
+    width: 100%;
+    max-width: 100%;
+}
+
+.p-listbox.is-focused,
+.p-listbox:focus-within {
+    border-color: var(--p-primary-500) !important;
+}
+
+.p-listbox.variant-filled {
+    background-color: var(--p-surface-100);
+    border-color: transparent;
+}
+.p-listbox.variant-filled.is-focused {
+    background-color: var(--p-surface-0);
+    border-color: var(--p-primary-500) !important;
+}
+
+.p-listbox.size-small,
+.p-listbox.p-listbox-sm {
+    font-size: 0.75rem;
+}
+.p-listbox.size-small .p-listbox-option {
+    padding: 0.3125rem 0.5rem;
+}
+.p-listbox.size-large,
+.p-listbox.p-listbox-lg {
+    font-size: 1rem;
+}
+.p-listbox.size-large .p-listbox-option {
+    padding: 0.625rem 1rem;
+}
+
+.p-listbox.is-invalid {
+    border-color: var(--p-red-500, #ef4444) !important;
+}
+
+.p-listbox.is-disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    background-color: var(--p-surface-100);
+}
+.p-listbox.is-disabled .p-listbox-option {
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.p-listbox-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.625rem 0.875rem;
+    background: var(--p-surface-50);
+    border-bottom: 1px solid var(--p-border-color);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: var(--p-text-color);
+}
+.p-listbox-header-count {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--p-text-muted);
+}
+.p-listbox-footer {
+    padding: 0.5rem 0.875rem;
+    background: var(--p-surface-50);
+    border-top: 1px solid var(--p-border-color);
+    font-size: 0.75rem;
+    color: var(--p-text-muted);
+}
+
+.p-listbox-filter-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: var(--p-surface-50);
+    border-bottom: 1px solid var(--p-border-color);
+}
+.p-listbox-filter-input {
+    flex: 1;
+    width: 100%;
+    font-family: inherit;
+    font-size: 0.8125rem;
+    padding: 0.3125rem 0.5rem;
+    background: var(--p-surface-0);
+    border: 1px solid var(--p-border-color);
+    border-radius: calc(var(--p-border-radius) - 2px);
+    color: var(--p-text-color);
+    outline: none;
+    box-sizing: border-box;
+}
+.p-listbox-filter-input:focus {
+    border-color: var(--p-primary-500);
+}
+
+.p-listbox-list-wrapper {
+    overflow-y: auto;
+    outline: none;
+}
+.p-listbox-list {
+    margin: 0;
+    padding: 0.25rem 0;
+    list-style: none;
+}
+
+.p-listbox-option-group {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.p-listbox-option-group-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.875rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--p-text-muted);
+    background: var(--p-surface-50);
+}
+
+.p-listbox-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0.875rem;
+    cursor: pointer;
+    font-size: 0.8125rem;
+    color: var(--p-text-color);
+    background: transparent;
+    transition: background 150ms ease, color 150ms ease;
+    user-select: none;
+    outline: none;
+}
+
+.p-listbox-option:hover:not(.p-disabled) {
+    background: var(--p-surface-100);
+    color: var(--p-text-color);
+}
+
+.p-listbox-option.p-highlight {
+    background: var(--p-primary-50, #ecfdf5);
+    color: var(--p-primary-700, #047857);
+    font-weight: 600;
+}
+.p-listbox-option.p-highlight:hover:not(.p-disabled) {
+    background: var(--p-primary-100, #d1fae5);
+    color: var(--p-primary-800, #065f46);
+}
+
+.p-listbox-option.p-highlight-none {
+    background: transparent !important;
+    color: var(--p-text-color) !important;
+    font-weight: normal !important;
+}
+.p-listbox-option.p-highlight-none:hover:not(.p-disabled) {
+    background: var(--p-surface-100) !important;
+}
+
+.p-listbox-option.p-focus {
+    box-shadow: inset 0 0 0 1px var(--p-primary-500);
+}
+
+.p-listbox-option.p-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.p-listbox-striped .p-listbox-option:nth-child(even):not(.p-highlight) {
+    background: var(--p-surface-50);
+}
+
+.p-listbox-option-content {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.p-listbox-option-badge {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    padding: 0.125rem 0.375rem;
+    border-radius: calc(var(--p-border-radius) - 2px);
+    background: var(--p-surface-100);
+    color: var(--p-surface-700);
+}
+.p-listbox-option.p-highlight .p-listbox-option-badge {
+    background: var(--p-primary-100);
+    color: var(--p-primary-800);
+}
+
+.p-listbox-option-checkbox {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.125rem;
+    height: 1.125rem;
+    border: 1px solid var(--p-border-color);
+    border-radius: 4px;
+    background: var(--p-surface-0);
+    margin-right: 0.5rem;
+    transition: all 150ms ease;
+    flex-shrink: 0;
+}
+.p-listbox-option.p-highlight .p-listbox-option-checkbox {
+    background: var(--p-primary-500);
+    border-color: var(--p-primary-500);
+    color: #ffffff;
+}
+
+.p-listbox-option-checkmark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--p-primary-600);
+    margin-left: 0.5rem;
+    flex-shrink: 0;
+}
+
+/* Dark mode overrides */
+.dark .p-listbox {
+    background: var(--p-surface-900);
+    color: var(--p-surface-0);
+    border-color: var(--p-surface-700);
+}
+.dark .p-listbox.variant-filled {
+    background-color: var(--p-surface-800);
+}
+.dark .p-listbox.variant-filled.is-focused {
+    background-color: var(--p-surface-900);
+}
+.dark .p-listbox-header,
+.dark .p-listbox-footer,
+.dark .p-listbox-filter-container,
+.dark .p-listbox-option-group-label {
+    background: var(--p-surface-850, #141b26);
+    border-color: var(--p-surface-700);
+}
+.dark .p-listbox-filter-input {
+    background: var(--p-surface-900);
+    border-color: var(--p-surface-700);
+    color: var(--p-surface-0);
+}
+.dark .p-listbox-option {
+    color: var(--p-surface-100);
+}
+.dark .p-listbox-option:hover:not(.p-disabled) {
+    background: var(--p-surface-800);
+    color: var(--p-surface-0);
+}
+.dark .p-listbox-option.p-highlight {
+    background: rgba(16, 185, 129, 0.16);
+    color: var(--p-primary-300, #6ee7b7);
+}
+.dark .p-listbox-option.p-highlight:hover:not(.p-disabled) {
+    background: rgba(16, 185, 129, 0.24);
+    color: var(--p-primary-200, #a7f3d0);
+}
+.dark .p-listbox-option-badge {
+    background: var(--p-surface-800);
+    color: var(--p-surface-200);
+}
+.dark .p-listbox-option.p-highlight .p-listbox-option-badge {
+    background: rgba(16, 185, 129, 0.25);
+    color: var(--p-primary-200);
+}
+.dark .p-listbox-option-checkbox {
+    background: var(--p-surface-900);
+    border-color: var(--p-surface-600);
+}
+.dark .p-listbox-option-checkmark {
+    color: var(--p-primary-400);
+}
+.dark .p-listbox-striped .p-listbox-option:nth-child(even):not(.p-highlight) {
+    background: var(--p-surface-850, #141b26);
+}
+
+
 
 
 

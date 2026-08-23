@@ -1605,17 +1605,95 @@
         </div>
     </section>
 
-    <!-- Listbox -->
+        <!-- Listbox -->
     <section id="sec-listbox" class="component-card">
         <div class="card-header">
             <div>
-                <h2>Searchable Listbox</h2>
-                <p>Scrollable selection box with instant client-side filtering.</p>
+                <h2>Listbox</h2>
+                <p>Form component to choose one or more values from a list of items with single, multiple, metaKey, checkbox, checkmark-only, grouping, and templated options.</p>
             </div>
-            <span class="aura-tag tag-slate">List</span>
+            <span class="aura-tag tag-indigo">Form Control</span>
         </div>
-        <div class="card-body" style="max-width: 450px;">
-            <island-listbox options="@Model.ListboxDatabases" filter="true" target-input-name="selected_db" />
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Demo 1: Basic & Custom Templated Options -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic &amp; Custom Option Templating</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Simple primitive string options, custom airport badges with headers, and country flags.</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; align-items: start;">
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--p-text-color);">Basic Cities</label>
+                        <island-listbox options="@Model.ListboxCities" selected-value="RM" fluid="true" />
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--p-text-color);">Airport Selector (Header Slot)</label>
+                        <island-listbox options="@Model.ListboxAirports" header="Choose Airport" header-count="9 airports" scroll-height="240px" fluid="true" />
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--p-text-color);">Country Options</label>
+                        <island-listbox options="@Model.ListboxCountries" selected-value="EG" scroll-height="240px" fluid="true" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 2: Checkmark & Multiple Selection Modes -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Selection Modes (Checkmark, Multiple, MetaKey &amp; Checkbox)</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Checkmark-only selection indicators, additive meta-key navigation (Hold Ctrl/Cmd), and checkbox toggles.</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; align-items: start;">
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--p-text-color);">Checkmark Mode (No Highlight)</label>
+                        <island-listbox options="@Model.ListboxCities" checkmark="true" highlight-on-select="false" selected-value="IST" fluid="true" />
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--p-text-color);">Multiple (MetaKey / Ctrl+Click)</label>
+                        <island-listbox options="@Model.ListboxCities" multiple="true" meta-key-selection="true" selected-value="@(new List<string> { "RM", "LDN" })" fluid="true" />
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--p-text-color);">Multiple with Checkboxes</label>
+                        <island-listbox options="@Model.ListboxCities" multiple="true" checkbox="true" selected-value="@(new List<string> { "NY", "PRS" })" fluid="true" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 3: Option Groups & Filter -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Option Groups &amp; Live Search Filtering</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Categorized nested groups with flag headers and instant client-side search filtering.</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; align-items: start;">
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--p-text-color);">Grouped Regional Hubs</label>
+                        <island-listbox options="@Model.ListboxGroupedCities" scroll-height="240px" fluid="true" />
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--p-text-color);">Searchable Listbox with Striped Rows</label>
+                        <island-listbox options="@Model.ListboxAirports" filter="true" filter-placeholder="Search airport or code..." striped="true" scroll-height="240px" fluid="true" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 4: Sizes, Filled Variant & Validation -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Sizes, Filled Variant &amp; Disabled States</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Small and large size metrics, filled variant, disabled items, and invalid validation ring.</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; align-items: start;">
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--p-text-color);">Small Size</label>
+                        <island-listbox options="@Model.ListboxCities" size="@ComponentSize.Small" fluid="true" />
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--p-text-color);">Filled Variant</label>
+                        <island-listbox options="@Model.ListboxCities" variant="@InputVariant.Filled" fluid="true" />
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--p-text-color);">Disabled Options (London/Paris)</label>
+                        <island-listbox options="@Model.ListboxDisabledCities" fluid="true" />
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--p-red-500);">Invalid State</label>
+                        <island-listbox options="@Model.ListboxCities" invalid="true" fluid="true" />
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
