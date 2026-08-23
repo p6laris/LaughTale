@@ -50,6 +50,62 @@
         </div>
     </section>
 
+    <!-- FloatLabel & IftaLabel -->
+    <section id="sec-floatlabel" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>FloatLabel &amp; IftaLabel</h2>
+                <p>Smooth floating labels with Over, On, and In (Ifta) positioning variants and automatic value/focus detection.</p>
+            </div>
+            <span class="aura-tag tag-emerald">Form Control</span>
+        </div>
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Demo 1: Variants (Over, On, In) -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 1.25rem; color: var(--p-text-color);">Floating Position Variants</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem;">
+                    <div>
+                        <island-float-label label="Username (Over)" variant="@FloatLabelVariant.Over">
+                            <input type="text" class="p-input" style="width: 100%;" />
+                        </island-float-label>
+                    </div>
+                    <div>
+                        <island-float-label label="Email (On Border)" variant="@FloatLabelVariant.On">
+                            <input type="text" class="p-input" style="width: 100%;" />
+                        </island-float-label>
+                    </div>
+                    <div>
+                        <island-ifta-label label="City (Infield / Ifta)">
+                            <input type="text" class="p-input" style="width: 100%;" />
+                        </island-ifta-label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 2: Invalid State -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 1.25rem; color: var(--p-text-color);">Validation Error Highlight</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem;">
+                    <div>
+                        <island-float-label label="Required Field (Over)" variant="@FloatLabelVariant.Over" invalid="true">
+                            <input type="text" class="p-input invalid" style="width: 100%;" />
+                        </island-float-label>
+                    </div>
+                    <div>
+                        <island-float-label label="Required Field (On)" variant="@FloatLabelVariant.On" invalid="true">
+                            <input type="text" class="p-input invalid" style="width: 100%;" />
+                        </island-float-label>
+                    </div>
+                    <div>
+                        <island-ifta-label label="Required Field (Ifta)" invalid="true">
+                            <input type="text" class="p-input invalid" style="width: 100%;" />
+                        </island-ifta-label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Textarea -->
     <section id="sec-textarea" class="component-card">
         <div class="card-header">

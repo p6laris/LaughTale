@@ -1493,13 +1493,15 @@ public class IslandInputMaskTagHelper : TagHelper
 }
 
 /// <summary>
-/// TagHelper for <island-float-label /> — Animated floating label wrapper
+/// TagHelper for <island-float-label /> — Aura Floating Label Wrapper
 /// </summary>
 [HtmlTargetElement("island-float-label")]
 public class IslandFloatLabelTagHelper : TagHelper
 {
     public string? Label { get; set; }
-    public string Variant { get; set; } = "over";
+    public string? For { get; set; }
+    public FloatLabelVariant Variant { get; set; } = FloatLabelVariant.Over;
+    public bool Invalid { get; set; } = false;
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
@@ -1507,7 +1509,40 @@ public class IslandFloatLabelTagHelper : TagHelper
         output.TagMode = TagMode.StartTagAndEndTag;
         output.Attributes.SetAttribute("data-island", "float-label");
         output.Attributes.SetAttribute("data-hydrate", "load");
-        var props = new { label = Label, variant = Variant };
+        var props = new
+        {
+            label = Label,
+            @for = For,
+            variant = Variant.ToString().ToLowerInvariant(),
+            invalid = Invalid
+        };
+        output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
+    }
+}
+
+/// <summary>
+/// TagHelper for <island-ifta-label /> — Aura Infield Top Aligned Label
+/// </summary>
+[HtmlTargetElement("island-ifta-label")]
+public class IslandIftaLabelTagHelper : TagHelper
+{
+    public string? Label { get; set; }
+    public string? For { get; set; }
+    public bool Invalid { get; set; } = false;
+
+    public override void Process(TagHelperContext context, TagHelperOutput output)
+    {
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "float-label");
+        output.Attributes.SetAttribute("data-hydrate", "load");
+        var props = new
+        {
+            label = Label,
+            @for = For,
+            variant = "in",
+            invalid = Invalid
+        };
         output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
     }
 }
