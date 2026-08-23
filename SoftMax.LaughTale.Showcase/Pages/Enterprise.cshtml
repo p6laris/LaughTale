@@ -832,17 +832,123 @@
         </div>
     </section>
 
-    <!-- InputMask -->
+        <!-- InputMask -->
     <section id="sec-input-mask" class="component-card">
         <div class="card-header">
             <div>
                 <h2>InputMask</h2>
-                <p>Strict input formatting masks for phone numbers, SSNs, and license tokens.</p>
+                <p>Form directive &amp; component used to enter input in strict predefined formats (phone numbers, dates, SSNs, credit cards, and serial tokens) with optional parameters and auto-clearing.</p>
             </div>
-            <span class="aura-tag tag-slate">Mask</span>
+            <span class="aura-tag tag-indigo">Form Control</span>
         </div>
-        <div class="card-body" style="max-width: 400px;">
-            <island-input-mask mask="+1 (999) 999-9999" placeholder="+1 (555) 019-2834" />
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Demo 1: Format Patterns (SSN, Phone, Serial) -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Predefined Format Patterns</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Combinations of numeric (<code>9</code>), alphabetic (<code>a</code>), and alphanumeric (<code>*</code>) definitions.</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem;">
+                    <div>
+                        <island-label for="mask-ssn" text="Social Security Number (SSN)" style="margin-bottom: 0.35rem;" />
+                        <island-input-mask input-id="mask-ssn" mask="999-99-9999" placeholder="999-99-9999" fluid="true" />
+                    </div>
+                    <div>
+                        <island-label for="mask-phone" text="US Phone Number" style="margin-bottom: 0.35rem;" />
+                        <island-input-mask input-id="mask-phone" mask="(999) 999-9999" placeholder="(999) 999-9999" fluid="true" />
+                    </div>
+                    <div>
+                        <island-label for="mask-serial" text="Hardware Serial Token" style="margin-bottom: 0.35rem;" />
+                        <island-input-mask input-id="mask-serial" mask="a*-999-a999" placeholder="a*-999-a999" fluid="true" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 2: Custom SlotChar & Optional Characters -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Custom Slot Characters &amp; Optional Extensions</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Multi-character template placeholders (<code>mm/dd/yyyy</code>) and optional values marked with <code>?</code>.</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+                    <div>
+                        <island-label for="mask-date" text="Date of Birth" style="margin-bottom: 0.35rem;" />
+                        <island-input-mask input-id="mask-date" mask="99/99/9999" slot-char="mm/dd/yyyy" placeholder="99/99/9999" fluid="true" />
+                    </div>
+                    <div>
+                        <island-label for="mask-opt" text="Phone with Optional Extension" style="margin-bottom: 0.35rem;" />
+                        <island-input-mask input-id="mask-opt" mask="(999) 999-9999? x99999" placeholder="(999) 999-9999? x99999" fluid="true" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 3: Unmask & AutoClear Control -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Unmask &amp; AutoClear Control</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Unmask raw value extraction without formatting characters and preserved incomplete inputs on blur.</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+                    <div>
+                        <island-label for="mask-unmask" text="Credit Card (Unmask Raw Digits)" style="margin-bottom: 0.35rem;" />
+                        <island-input-mask input-id="mask-unmask" mask="9999-9999-9999-9999" unmask="true" placeholder="9999-9999-9999-9999" fluid="true" />
+                    </div>
+                    <div>
+                        <island-label for="mask-noautoclear" text="Serial Number (autoClear: false)" style="margin-bottom: 0.35rem;" />
+                        <island-input-mask input-id="mask-noautoclear" mask="99-999999" auto-clear="false" placeholder="99-999999" fluid="true" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 4: FloatLabel & IftaLabel Integration -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">FloatLabel &amp; IftaLabel Integration</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Flawless floating and infield label integration with exact Aura input geometry.</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; align-items: end;">
+                    <div>
+                        <island-float-label variant="@FloatLabelVariant.Over">
+                            <island-input-mask input-id="fl-mask-over" mask="(999) 999-9999" fluid="true" />
+                            <label for="fl-mask-over">Phone (Over)</label>
+                        </island-float-label>
+                    </div>
+                    <div>
+                        <island-float-label variant="@FloatLabelVariant.In">
+                            <island-input-mask input-id="fl-mask-in" mask="999-99-9999" fluid="true" />
+                            <label for="fl-mask-in">SSN (In)</label>
+                        </island-float-label>
+                    </div>
+                    <div>
+                        <island-float-label variant="@FloatLabelVariant.On">
+                            <island-input-mask input-id="fl-mask-on" mask="99/99/9999" fluid="true" />
+                            <label for="fl-mask-on">Date (On)</label>
+                        </island-float-label>
+                    </div>
+                    <div>
+                        <island-ifta-label>
+                            <island-input-mask input-id="ifta-mask" mask="a*-999-a999" fluid="true" />
+                            <label for="ifta-mask">License Token</label>
+                        </island-ifta-label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 5: Sizes, Filled Variant & Validation States -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Sizes, Filled Variant &amp; Validation</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Small and large size metrics alongside high-contrast filled variant and invalid state.</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; align-items: end;">
+                    <div>
+                        <island-label for="mask-sm" text="Small Size" size="@ComponentSize.Small" style="margin-bottom: 0.35rem;" />
+                        <island-input-mask input-id="mask-sm" mask="(999) 999-9999" size="@ComponentSize.Small" placeholder="(999) 999-9999" fluid="true" />
+                    </div>
+                    <div>
+                        <island-label for="mask-lg" text="Large Size" size="@ComponentSize.Large" style="margin-bottom: 0.35rem;" />
+                        <island-input-mask input-id="mask-lg" mask="(999) 999-9999" size="@ComponentSize.Large" placeholder="(999) 999-9999" fluid="true" />
+                    </div>
+                    <div>
+                        <island-label for="mask-filled" text="Filled Variant" style="margin-bottom: 0.35rem;" />
+                        <island-input-mask input-id="mask-filled" mask="999-99-9999" variant="@InputVariant.Filled" placeholder="999-99-9999" fluid="true" />
+                    </div>
+                    <div>
+                        <island-label for="mask-invalid" text="Invalid State" style="margin-bottom: 0.35rem; color: var(--p-red-500);" />
+                        <island-input-mask input-id="mask-invalid" mask="9999-9999" invalid="true" placeholder="Required" fluid="true" />
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 

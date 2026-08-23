@@ -2254,26 +2254,146 @@ public class IslandTextareaTagHelper : TagHelper
 }
 
 /// <summary>
-/// TagHelper for <island-input-mask /> — Pattern-masked input
+/// TagHelper for <island-input-mask /> / <island-mask /> — Aura Pattern-Masked Input
 /// </summary>
 [HtmlTargetElement("island-input-mask")]
+[HtmlTargetElement("island-mask")]
 public class IslandInputMaskTagHelper : TagHelper
 {
+    [HtmlAttributeName("mask")]
     public string Mask { get; set; } = "(999) 999-9999";
+
+    [HtmlAttributeName("value")]
     public string? Value { get; set; }
+
+    [HtmlAttributeName("placeholder")]
     public string? Placeholder { get; set; }
+
+    [HtmlAttributeName("slot-char")]
     public string SlotChar { get; set; } = "_";
+
+    [HtmlAttributeName("auto-clear")]
+    public bool AutoClear { get; set; } = true;
+
+    [HtmlAttributeName("unmask")]
+    public bool Unmask { get; set; } = false;
+
+    [HtmlAttributeName("variant")]
+    public InputVariant Variant { get; set; } = InputVariant.Outlined;
+
+    [HtmlAttributeName("size")]
+    public ComponentSize Size { get; set; } = ComponentSize.Normal;
+
+    [HtmlAttributeName("fluid")]
+    public bool Fluid { get; set; } = false;
+
+    [HtmlAttributeName("invalid")]
+    public bool Invalid { get; set; } = false;
+
+    [HtmlAttributeName("disabled")]
     public bool Disabled { get; set; } = false;
+
+    [HtmlAttributeName("readonly")]
+    public bool Readonly { get; set; } = false;
+
+    [HtmlAttributeName("input-id")]
+    public string? InputId { get; set; }
+
+    [HtmlAttributeName("name")]
+    public string? Name { get; set; }
+
+    [HtmlAttributeName("target-input")]
     public string? TargetInput { get; set; }
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
+        if (context.AllAttributes.TryGetAttribute("slotChar", out var scAttr) || context.AllAttributes.TryGetAttribute("slot-char", out scAttr))
+        {
+            SlotChar = scAttr.Value?.ToString() ?? "_";
+        }
+        if (context.AllAttributes.TryGetAttribute("autoClear", out var acAttr) || context.AllAttributes.TryGetAttribute("auto-clear", out acAttr))
+        {
+            if (bool.TryParse(acAttr.Value?.ToString(), out var ac)) AutoClear = ac;
+        }
+        if (context.AllAttributes.TryGetAttribute("unmask", out var umAttr))
+        {
+            if (bool.TryParse(umAttr.Value?.ToString(), out var um)) Unmask = um;
+            else if (umAttr.Value != null) Unmask = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("fluid", out var flAttr))
+        {
+            if (bool.TryParse(flAttr.Value?.ToString(), out var fl)) Fluid = fl;
+            else if (flAttr.Value != null) Fluid = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("invalid", out var invAttr))
+        {
+            if (bool.TryParse(invAttr.Value?.ToString(), out var inv)) Invalid = inv;
+            else if (invAttr.Value != null) Invalid = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("disabled", out var disAttr))
+        {
+            if (bool.TryParse(disAttr.Value?.ToString(), out var dis)) Disabled = dis;
+            else if (disAttr.Value != null) Disabled = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("readonly", out var roAttr))
+        {
+            if (bool.TryParse(roAttr.Value?.ToString(), out var ro)) Readonly = ro;
+            else if (roAttr.Value != null) Readonly = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("variant", out var varAttr))
+        {
+            if (System.Enum.TryParse<InputVariant>(varAttr.Value?.ToString(), true, out var vr)) Variant = vr;
+        }
+        if (context.AllAttributes.TryGetAttribute("size", out var szAttr))
+        {
+            if (System.Enum.TryParse<ComponentSize>(szAttr.Value?.ToString(), true, out var sz)) Size = sz;
+        }
+        if (context.AllAttributes.TryGetAttribute("target-input-name", out var tinAttr) || context.AllAttributes.TryGetAttribute("targetInputName", out tinAttr))
+        {
+            TargetInput = tinAttr.Value?.ToString();
+        }
+
         output.TagName = "div";
         output.TagMode = TagMode.StartTagAndEndTag;
         output.Attributes.SetAttribute("data-island", "input-mask");
         output.Attributes.SetAttribute("data-hydrate", "load");
-        var props = new { mask = Mask, value = Value, placeholder = Placeholder, slotChar = SlotChar, disabled = Disabled, targetInputName = TargetInput };
+
+        var props = new
+        {
+            mask = Mask,
+            value = Value,
+            placeholder = Placeholder,
+            slotChar = SlotChar,
+            autoClear = AutoClear,
+            unmask = Unmask,
+            variant = Variant == InputVariant.Filled ? "filled" : "outlined",
+            size = Size.ToString().ToLowerInvariant(),
+            fluid = Fluid,
+            disabled = Disabled,
+            @readonly = Readonly,
+            invalid = Invalid,
+            inputId = InputId,
+            name = Name,
+            targetInputName = TargetInput
+        };
+
         output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
+
+        // SSR Pre-rendered input markup
+        var rootClasses = new List<string> { "laughtale-input-mask", "p-inputmask", "p-inputtext" };
+        if (Fluid) rootClasses.Add("p-inputmask-fluid");
+        if (Variant == InputVariant.Filled) rootClasses.Add("variant-filled");
+        if (Size != ComponentSize.Normal) rootClasses.Add($"size-{Size.ToString().ToLowerInvariant()}");
+        if (Invalid) rootClasses.Add("is-invalid");
+        if (Disabled) rootClasses.Add("is-disabled");
+
+        var idAttr = !string.IsNullOrEmpty(InputId) ? $" id=\"{System.Net.WebUtility.HtmlEncode(InputId)}\"" : "";
+        var disAttrStr = Disabled ? " disabled" : "";
+        var roAttrStr = Readonly ? " readonly" : "";
+        var plAttrStr = !string.IsNullOrEmpty(Placeholder) ? $" placeholder=\"{System.Net.WebUtility.HtmlEncode(Placeholder)}\"" : "";
+        var valAttrStr = !string.IsNullOrEmpty(Value) ? $" value=\"{System.Net.WebUtility.HtmlEncode(Value)}\"" : "";
+
+        output.Content.SetHtmlContent($"<input type=\"text\" class=\"{string.Join(" ", rootClasses)}\"{idAttr}{valAttrStr}{plAttrStr}{disAttrStr}{roAttrStr} />");
     }
 }
 
