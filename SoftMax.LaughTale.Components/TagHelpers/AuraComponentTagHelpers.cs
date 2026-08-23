@@ -1320,16 +1320,22 @@ public class IslandSelectTagHelper : TagHelper
 }
 
 /// <summary>
-/// TagHelper for <island-checkbox /> — Styled checkbox
+/// TagHelper for <island-checkbox /> — Aura Styled Checkbox
 /// </summary>
 [HtmlTargetElement("island-checkbox")]
 public class IslandCheckboxTagHelper : TagHelper
 {
     public bool Checked { get; set; } = false;
     public bool Indeterminate { get; set; } = false;
+    public bool Binary { get; set; } = true;
     public string? Label { get; set; }
     public string? Value { get; set; }
+    public string? Name { get; set; }
+    public string? InputId { get; set; }
     public bool Disabled { get; set; } = false;
+    public bool Invalid { get; set; } = false;
+    public ComponentSize Size { get; set; } = ComponentSize.Normal;
+    public InputVariant Variant { get; set; } = InputVariant.Outlined;
     public string? TargetInput { get; set; }
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
@@ -1337,8 +1343,48 @@ public class IslandCheckboxTagHelper : TagHelper
         output.TagName = "div";
         output.TagMode = TagMode.StartTagAndEndTag;
         output.Attributes.SetAttribute("data-island", "checkbox");
-        var props = new { @checked = Checked, indeterminate = Indeterminate, label = Label, value = Value, disabled = Disabled, targetInputName = TargetInput };
+        output.Attributes.SetAttribute("data-hydrate", "load");
+
+        var props = new
+        {
+            @checked = Checked,
+            indeterminate = Indeterminate,
+            binary = Binary,
+            label = Label,
+            value = Value,
+            name = Name,
+            inputId = InputId,
+            disabled = Disabled,
+            invalid = Invalid,
+            size = Size.ToString().ToLowerInvariant(),
+            variant = Variant.ToString().ToLowerInvariant(),
+            targetInputName = TargetInput ?? Name
+        };
+
         output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
+    }
+}
+
+/// <summary>
+/// TagHelper for <island-checkbox-group /> — Aura Checkbox Group Wrapper
+/// </summary>
+[HtmlTargetElement("island-checkbox-group")]
+public class IslandCheckboxGroupTagHelper : TagHelper
+{
+    public string? Name { get; set; }
+    public List<string>? Values { get; set; }
+    public bool Disabled { get; set; } = false;
+    public Orientation Orientation { get; set; } = Orientation.Horizontal;
+
+    public override void Process(TagHelperContext context, TagHelperOutput output)
+    {
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("class", $"aura-checkbox-group flex gap-4 {(Orientation == Orientation.Vertical ? "flex-col" : "flex-wrap")}");
+        if (Disabled)
+        {
+            output.Attributes.SetAttribute("data-disabled", "true");
+        }
     }
 }
 

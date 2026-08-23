@@ -1,28 +1,12 @@
-/**
- * SoftMax.LaughTale: Enterprise Checkbox Component (Aura Checkbox)
- * Accessible, theme-aware tri-state checkbox with Radix UI spring micro-interactions.
- * Integrates with Theme Studio tokens and full dark mode support.
- */
+import {
+  LucideIcons
+} from "./chunk-PRHJLIKH.js";
+import {
+  injectIslandStyle
+} from "./chunk-3TFPN5JM.js";
 
-import { injectIslandStyle } from '../runtime/styles';
-import { LucideIcons } from '../icons/lucide';
-
-export interface CheckboxProps {
-    checked?: boolean;
-    indeterminate?: boolean;
-    binary?: boolean;
-    label?: string;
-    value?: string;
-    name?: string;
-    inputId?: string;
-    disabled?: boolean;
-    invalid?: boolean;
-    size?: 'small' | 'normal' | 'large';
-    variant?: 'outlined' | 'filled';
-    targetInputName?: string;
-}
-
-const CSS = `
+// ../SoftMax.LaughTale.Client/src/components/checkbox.ts
+var CSS = `
 .laughtale-checkbox-wrap {
     display: inline-flex;
     align-items: center;
@@ -190,87 +174,80 @@ const CSS = `
     color: var(--p-surface-100);
 }
 `;
-
-export default function CheckboxIsland(container: HTMLElement, props: CheckboxProps) {
-    injectIslandStyle('laughtale-checkbox', CSS);
-    
-    let isChecked = Boolean(props.checked);
-    let isIndeterminate = Boolean(props.indeterminate);
-    const size = props.size || 'normal';
-    const variant = props.variant || 'outlined';
-    const inputId = props.inputId || `chk_${Math.random().toString(36).substring(2, 9)}`;
-
-    function render() {
-        const stateClass = isIndeterminate ? 'indeterminate' : (isChecked ? 'checked' : '');
-        const iconSvg = isIndeterminate ? LucideIcons.minus : LucideIcons.check;
-
-        container.innerHTML = `
-            <label class="laughtale-checkbox-wrap size-${size} variant-${variant} ${stateClass} ${props.disabled ? 'disabled' : ''} ${props.invalid ? 'invalid' : ''}" 
+function CheckboxIsland(container, props) {
+  injectIslandStyle("laughtale-checkbox", CSS);
+  let isChecked = Boolean(props.checked);
+  let isIndeterminate = Boolean(props.indeterminate);
+  const size = props.size || "normal";
+  const variant = props.variant || "outlined";
+  const inputId = props.inputId || `chk_${Math.random().toString(36).substring(2, 9)}`;
+  function render() {
+    const stateClass = isIndeterminate ? "indeterminate" : isChecked ? "checked" : "";
+    const iconSvg = isIndeterminate ? LucideIcons.minus : LucideIcons.check;
+    container.innerHTML = `
+            <label class="laughtale-checkbox-wrap size-${size} variant-${variant} ${stateClass} ${props.disabled ? "disabled" : ""} ${props.invalid ? "invalid" : ""}" 
                    for="${inputId}">
                 <input type="checkbox" 
                        id="${inputId}" 
                        class="laughtale-checkbox-hidden" 
-                       ${isChecked ? 'checked' : ''} 
-                       ${props.disabled ? 'disabled' : ''} 
-                       aria-checked="${isIndeterminate ? 'mixed' : (isChecked ? 'true' : 'false')}" 
+                       ${isChecked ? "checked" : ""} 
+                       ${props.disabled ? "disabled" : ""} 
+                       aria-checked="${isIndeterminate ? "mixed" : isChecked ? "true" : "false"}" 
                        role="checkbox" />
                 <div class="laughtale-checkbox-box" tabindex="${props.disabled ? -1 : 0}">
                     <span class="laughtale-checkbox-icon">
                         ${iconSvg}
                     </span>
                 </div>
-                ${props.label ? `<span class="laughtale-checkbox-label">${props.label}</span>` : ''}
+                ${props.label ? `<span class="laughtale-checkbox-label">${props.label}</span>` : ""}
             </label>
         `;
-
-        bindEvents();
-        syncValue();
+    bindEvents();
+    syncValue();
+  }
+  function bindEvents() {
+    const input = container.querySelector(`#${inputId}`);
+    const box = container.querySelector(".laughtale-checkbox-box");
+    if (!input || props.disabled) return;
+    input.addEventListener("change", () => {
+      isChecked = input.checked;
+      isIndeterminate = false;
+      render();
+      dispatchChangeEvent();
+    });
+    box?.addEventListener("keydown", (e) => {
+      if (e.key === " ") {
+        e.preventDefault();
+        input.click();
+      }
+    });
+  }
+  function dispatchChangeEvent() {
+    container.dispatchEvent(new CustomEvent("checkbox:change", {
+      bubbles: true,
+      detail: {
+        checked: isChecked,
+        indeterminate: isIndeterminate,
+        value: props.value || isChecked
+      }
+    }));
+  }
+  function syncValue() {
+    const targetName = props.targetInputName || props.name;
+    if (targetName) {
+      let hidden = container.querySelector(`input[type="hidden"][name="${targetName}"]`);
+      if (!hidden) {
+        hidden = document.createElement("input");
+        hidden.type = "hidden";
+        hidden.name = targetName;
+        container.appendChild(hidden);
+      }
+      hidden.value = isChecked ? props.value || "true" : "false";
     }
-
-    function bindEvents() {
-        const input = container.querySelector<HTMLInputElement>(`#${inputId}`);
-        const box = container.querySelector<HTMLElement>('.laughtale-checkbox-box');
-        if (!input || props.disabled) return;
-
-        input.addEventListener('change', () => {
-            isChecked = input.checked;
-            isIndeterminate = false;
-            render();
-            dispatchChangeEvent();
-        });
-
-        box?.addEventListener('keydown', (e) => {
-            if (e.key === ' ') {
-                e.preventDefault();
-                input.click();
-            }
-        });
-    }
-
-    function dispatchChangeEvent() {
-        container.dispatchEvent(new CustomEvent('checkbox:change', {
-            bubbles: true,
-            detail: {
-                checked: isChecked,
-                indeterminate: isIndeterminate,
-                value: props.value || isChecked
-            }
-        }));
-    }
-
-    function syncValue() {
-        const targetName = props.targetInputName || props.name;
-        if (targetName) {
-            let hidden = container.querySelector<HTMLInputElement>(`input[type="hidden"][name="${targetName}"]`);
-            if (!hidden) {
-                hidden = document.createElement('input');
-                hidden.type = 'hidden';
-                hidden.name = targetName;
-                container.appendChild(hidden);
-            }
-            hidden.value = isChecked ? (props.value || 'true') : 'false';
-        }
-    }
-
-    render();
+  }
+  render();
 }
+export {
+  CheckboxIsland as default
+};
+//# sourceMappingURL=checkbox-LO5TETIZ.js.map

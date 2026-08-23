@@ -287,18 +287,50 @@
     </section>
 
     <!-- Checkbox -->
+    <!-- Checkbox -->
     <section id="sec-checkbox" class="component-card">
         <div class="card-header">
             <div>
                 <h2>Checkbox</h2>
-                <p>Animated Boolean and tristate checkboxes with accessible focus rings.</p>
+                <p>Enterprise theme-aware binary and tristate checkboxes with Radix UI spring micro-interactions.</p>
             </div>
-            <span class="aura-tag tag-slate">Toggle</span>
+            <span class="aura-tag tag-emerald">Form Control</span>
         </div>
-        <div class="card-body" style="display: flex; flex-direction: column; gap: 0.75rem;">
-            <island-checkbox label="Enable Zero-Trust Telemetry" checked="true" />
-            <island-checkbox label="Enforce End-to-End Cryptographic Encryption" checked="true" />
-            <island-checkbox label="Allow Anonymous Guest Tunneling" checked="false" />
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Demo 1: Basic & Indeterminate -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+                <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); display: flex; flex-direction: column; gap: 0.75rem;">
+                    <h3 style="font-size: 0.95rem; font-weight: 700; color: var(--p-text-color);">Binary & Indeterminate</h3>
+                    <island-checkbox label="I accept the Terms of Service" checked="true" />
+                    <island-checkbox label="Select all notifications" indeterminate="true" />
+                    <island-checkbox label="Allow Anonymous Guest Tunneling" checked="false" />
+                </div>
+
+                <!-- Demo 2: Checkbox Group -->
+                <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); display: flex; flex-direction: column; gap: 0.75rem;">
+                    <h3 style="font-size: 0.95rem; font-weight: 700; color: var(--p-text-color);">Category Group (Dynamic)</h3>
+                    <island-checkbox-group name="categories" orientation="@Orientation.Vertical">
+                        <island-checkbox name="categories" value="A" label="Accounting" />
+                        <island-checkbox name="categories" value="M" label="Marketing" checked="true" />
+                        <island-checkbox name="categories" value="P" label="Production" checked="true" />
+                        <island-checkbox name="categories" value="R" label="Research" />
+                    </island-checkbox-group>
+                </div>
+            </div>
+
+            <!-- Demo 3: Sizes, Variants & States -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 1rem; color: var(--p-text-color);">Sizes, Variants & States</h3>
+                <div style="display: flex; flex-wrap: wrap; gap: 2rem; align-items: center;">
+                    <island-checkbox label="Small" size="@ComponentSize.Small" checked="true" />
+                    <island-checkbox label="Normal" size="@ComponentSize.Normal" checked="true" />
+                    <island-checkbox label="Large" size="@ComponentSize.Large" checked="true" />
+                    <island-checkbox label="Filled Variant" variant="@InputVariant.Filled" checked="true" />
+                    <island-checkbox label="Invalid State" invalid="true" checked="false" />
+                    <island-checkbox label="Disabled Checked" disabled="true" checked="true" />
+                    <island-checkbox label="Disabled Unchecked" disabled="true" checked="false" />
+                </div>
+            </div>
         </div>
     </section>
 
