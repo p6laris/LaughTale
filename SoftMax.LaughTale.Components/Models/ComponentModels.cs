@@ -267,5 +267,7 @@ public record SidebarItem(
     string? Url = null,
     bool Active = false,
     List<SidebarItem>? Items = null,
-    string? Badge = null
+    string? Badge = null,
+    bool Expanded = true
 );
+

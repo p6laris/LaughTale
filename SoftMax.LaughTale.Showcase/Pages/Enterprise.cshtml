@@ -37,15 +37,8 @@
 <!-- Scroll to Top Floating Button -->
 <island-scroll-top />
 
-<!-- Two-Column Showcase Layout with Sticky Sidebar -->
-<div class="enterprise-layout" style="display: flex; gap: 2rem; align-items: flex-start; position: relative;">
-    <!-- Left Navigation Sidebar -->
-    <aside class="enterprise-sidebar" style="position: sticky; top: 5rem; width: 260px; flex-shrink: 0; max-height: calc(100vh - 6rem); overflow-y: auto; background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-xl); box-shadow: var(--p-shadow-sm); padding: 0.5rem; z-index: 10;">
-        <island-sidebar items="@Model.ComponentSidebarItems" />
-    </aside>
-
-    <!-- Main Component Showcases Content -->
-    <div class="enterprise-content" style="flex: 1; min-width: 0;">
+<!-- Main Component Section Container (Driven by Left Global Sidebar) -->
+<div class="enterprise-sections" style="width: 100%;">
 
         <!-- ========================================== -->
         <!-- 0. Dynamic Form Generator Showcase -->
@@ -621,7 +614,6 @@
             </div>
         </section>
 
-    </div>
 </div>
 
 <!-- ========================================== -->
@@ -636,15 +628,15 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    const sections = Array.from(document.querySelectorAll('.enterprise-content > section'));
+    const sections = Array.from(document.querySelectorAll('.enterprise-sections > section'));
     
     function activateSection(targetId) {
-        if (!targetId || targetId === '#') {
+        if (!targetId || targetId === '#' || targetId === '/enterprise') {
             targetId = sections[0]?.id ? `#${sections[0].id}` : '';
         }
         if (!targetId) return;
 
-        const cleanId = targetId.startsWith('#') ? targetId.substring(1) : targetId;
+        const cleanId = targetId.includes('#') ? targetId.split('#')[1] : targetId;
         const targetSection = document.getElementById(cleanId);
         
         if (targetSection) {
@@ -657,10 +649,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            // Highlight matching sidebar link
-            document.querySelectorAll('.enterprise-sidebar a').forEach(link => {
-                const href = link.getAttribute('href');
-                if (href === `#${cleanId}`) {
+            // Highlight matching link across the global sidebar
+            document.querySelectorAll('aside a, [data-sidebar-link]').forEach(link => {
+                const href = link.getAttribute('href') || '';
+                if (href.includes(`#${cleanId}`)) {
                     link.classList.add('active');
                 } else {
                     link.classList.remove('active');
@@ -673,13 +665,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Intercept clicks on sidebar items
-    document.querySelector('.enterprise-sidebar')?.addEventListener('click', (e) => {
+    document.addEventListener('click', (e) => {
         const link = e.target.closest('a');
-        if (link && link.getAttribute('href')?.startsWith('#sec-')) {
-            e.preventDefault();
-            const href = link.getAttribute('href');
-            history.pushState(null, '', href);
-            activateSection(href);
+        if (link) {
+            const href = link.getAttribute('href') || '';
+            if (href.includes('#sec-')) {
+                const secId = href.split('#')[1];
+                if (document.getElementById(secId)) {
+                    e.preventDefault();
+                    history.pushState(null, '', '#' + secId);
+                    activateSection('#' + secId);
+                }
+            }
         }
     });
 
@@ -692,5 +689,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 </script>
+
 
 

@@ -11709,22 +11709,44 @@ ${h.response}`).join("\n");
   });
   function SidebarIsland(container, props) {
     let collapsed = props.collapsed || false;
+    let searchQuery = "";
     const items = props.items || [];
     const position = props.position || "left";
+    const title = props.title || "Navigation";
+    const searchable = props.searchable !== false;
+    const expandedMap = {};
+    function initExpanded(itemList) {
+      itemList.forEach((item) => {
+        const label = item.label || item.Label || "";
+        const isExpanded = item.expanded !== false && item.Expanded !== false;
+        if (label && expandedMap[label] === void 0) {
+          expandedMap[label] = isExpanded;
+        }
+        const children = item.items || item.Items;
+        if (Array.isArray(children)) {
+          initExpanded(children);
+        }
+      });
+    }
+    initExpanded(items);
     injectIslandStyle("sidebar", `
         .laughtale-sidebar {
             display: flex;
             flex-direction: column;
             background: var(--p-surface-0);
             border-right: 1px solid var(--p-border-color);
-            height: 100vh;
             width: 260px;
-            transition: width 150ms ease;
+            min-width: 260px;
+            max-height: calc(100vh - 5rem);
+            transition: width 180ms cubic-bezier(0.4, 0, 0.2, 1);
             font-family: var(--p-font-family, inherit);
             overflow-y: auto;
+            border-radius: var(--p-border-radius-xl);
+            box-shadow: var(--p-shadow-sm);
         }
         .laughtale-sidebar.collapsed {
             width: 64px;
+            min-width: 64px;
         }
         .laughtale-sidebar.right {
             border-right: none;
@@ -11734,111 +11756,232 @@ ${h.response}`).join("\n");
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 1rem;
+            padding: 0.875rem 1rem;
             border-bottom: 1px solid var(--p-border-color);
+            gap: 0.5rem;
+        }
+        .sidebar-search-box {
+            padding: 0.5rem 0.75rem 0.25rem;
+        }
+        .sidebar-search-input {
+            width: 100%;
+            background: var(--p-surface-50);
+            border: 1px solid var(--p-border-color);
+            border-radius: var(--p-border-radius);
+            padding: 0.35rem 0.65rem;
+            font-size: 0.75rem;
+            color: var(--p-text-color);
+            outline: none;
+            transition: border-color 0.15s ease;
+        }
+        .sidebar-search-input:focus {
+            border-color: var(--p-primary-500);
         }
         .sidebar-toggle {
             background: transparent;
             border: none;
-            color: var(--p-text-muted-color);
+            color: var(--p-text-muted);
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: var(--p-border-radius);
-            width: 2rem;
-            height: 2rem;
-            transition: background 150ms ease;
+            width: 1.75rem;
+            height: 1.75rem;
+            transition: background 150ms ease, color 150ms ease;
+            flex-shrink: 0;
         }
         .sidebar-toggle:hover {
             background: var(--p-surface-100);
             color: var(--p-text-color);
         }
-        .sidebar-menu {
+        .sidebar-tree-menu {
             list-style: none;
-            padding: 0.5rem;
+            padding: 0.35rem 0.5rem;
             margin: 0;
             display: flex;
             flex-direction: column;
-            gap: 0.25rem;
+            gap: 0.2rem;
         }
         .sidebar-item {
             display: flex;
             align-items: center;
-            padding: 0.75rem;
+            padding: 0.45rem 0.65rem;
             color: var(--p-text-color);
             text-decoration: none;
             border-radius: var(--p-border-radius);
             transition: background 150ms ease, color 150ms ease;
-            gap: 0.75rem;
+            gap: 0.5rem;
+            font-size: 0.8125rem;
+            font-weight: 500;
             white-space: nowrap;
             overflow: hidden;
+            cursor: pointer;
+            user-select: none;
+            border: 1px solid transparent;
         }
         .sidebar-item:hover {
             background: var(--p-surface-100);
         }
         .sidebar-item.active {
             background: var(--p-primary-50);
-            color: var(--p-primary-color);
-            font-weight: 600;
+            color: var(--p-primary-700);
+            font-weight: 700;
+            border-color: var(--p-primary-200);
         }
-        [data-theme="dark"] .sidebar-item.active {
-            background: var(--p-primary-900);
+        .dark .sidebar-item.active {
+            background: rgba(16, 185, 129, 0.15);
+            color: #6ee7b7;
+            border-color: rgba(16, 185, 129, 0.3);
         }
-        .sidebar-item-icon {
+        .sidebar-group-header {
             display: flex;
-            width: 20px;
-            height: 20px;
-            flex-shrink: 0;
-            color: var(--p-text-muted-color);
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem 0.65rem;
+            color: var(--p-text-muted);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+            border-radius: var(--p-border-radius);
+            transition: background 150ms ease, color 150ms ease;
         }
-        .sidebar-item.active .sidebar-item-icon {
-            color: var(--p-primary-color);
+        .sidebar-group-header:hover {
+            background: var(--p-surface-100);
+            color: var(--p-text-color);
         }
-        .sidebar-item-label {
-            opacity: 1;
-            transition: opacity 150ms ease;
+        .sidebar-group-chevron {
+            display: flex;
+            align-items: center;
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            color: var(--p-text-muted);
         }
-        .collapsed .sidebar-item-label, .collapsed .sidebar-header-title {
-            opacity: 0;
-            width: 0;
-            display: none;
+        .sidebar-group-chevron.expanded {
+            transform: rotate(90deg);
+        }
+        .sidebar-sub-tree {
+            list-style: none;
+            padding: 0 0 0 0.75rem;
+            margin: 0.15rem 0 0.35rem 0.35rem;
+            border-left: 1px solid var(--p-border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+        }
+        .sidebar-badge {
+            margin-left: auto;
+            font-size: 0.6875rem;
+            font-weight: 700;
+            padding: 0.1rem 0.4rem;
+            border-radius: 9999px;
+            background: var(--p-surface-200);
+            color: var(--p-text-color);
+        }
+        .collapsed .sidebar-item-label, 
+        .collapsed .sidebar-header-title,
+        .collapsed .sidebar-search-box,
+        .collapsed .sidebar-badge,
+        .collapsed .sidebar-group-chevron,
+        .collapsed .sidebar-sub-tree {
+            display: none !important;
         }
     `);
-    function renderMenu(menuItems) {
-      return menuItems.map((item) => {
-        const label = item.label || item.Label || item.title || item.Title || "";
-        const url = item.url || item.Url || "#";
-        const icon = item.icon || item.Icon || "";
-        const active = item.active || item.Active || false;
-        const iconSvg = icon && LucideIcons[icon] ? LucideIcons[icon] : icon.startsWith("<svg") ? icon : "";
+    function renderNode(item, level = 0) {
+      const label = item.label || item.Label || item.title || item.Title || "";
+      const url = item.url || item.Url || "#";
+      const icon = item.icon || item.Icon || "";
+      const active = item.active || item.Active || false;
+      const badge = item.badge || item.Badge || "";
+      const children = item.items || item.Items;
+      const hasChildren = Array.isArray(children) && children.length > 0;
+      const isExpanded = expandedMap[label] ?? true;
+      const iconSvg = icon && LucideIcons[icon] ? LucideIcons[icon] : icon.startsWith("<svg") ? icon : "";
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        const matchesSelf = label.toLowerCase().includes(q);
+        const matchesChild = hasChildren && children.some((c) => (c.label || c.Label || "").toLowerCase().includes(q));
+        if (!matchesSelf && !matchesChild) return "";
+      }
+      if (hasChildren) {
         return `
-                <li>
-                    <a href="${url}" class="sidebar-item ${active ? "active" : ""}">
-                        ${iconSvg ? `<span class="sidebar-item-icon">${iconSvg}</span>` : ""}
-                        <span class="sidebar-item-label">${label}</span>
-                    </a>
+                <li class="sidebar-group-container" data-label="${label}">
+                    <div class="sidebar-group-header" data-group-toggle="${label}">
+                        <div style="display: flex; align-items: center; gap: 0.45rem;">
+                            ${iconSvg ? `<span style="display: flex; width: 16px; height: 16px; color: var(--p-primary-600);">${iconSvg}</span>` : ""}
+                            <span class="sidebar-item-label">${label}</span>
+                        </div>
+                        <span class="sidebar-group-chevron ${isExpanded ? "expanded" : ""}">
+                            ${LucideIcons.chevronRight}
+                        </span>
+                    </div>
+                    <ul class="sidebar-sub-tree" style="display: ${isExpanded ? "flex" : "none"};">
+                        ${children.map((child) => renderNode(child, level + 1)).join("")}
+                    </ul>
                 </li>
             `;
-      }).join("");
+      }
+      return `
+            <li>
+                <a href="${url}" class="sidebar-item ${active ? "active" : ""}" data-sidebar-link="${url}">
+                    ${iconSvg ? `<span style="display: flex; width: 16px; height: 16px; color: ${active ? "var(--p-primary-600)" : "var(--p-text-muted)"};">${iconSvg}</span>` : ""}
+                    <span class="sidebar-item-label">${label}</span>
+                    ${badge ? `<span class="sidebar-badge">${badge}</span>` : ""}
+                </a>
+            </li>
+        `;
     }
     function render() {
       container.innerHTML = `
             <div class="laughtale-sidebar ${collapsed ? "collapsed" : ""} ${position}">
                 <div class="sidebar-header">
-                    <span class="sidebar-header-title" style="font-weight: 700; color: var(--p-text-color);">Component Navigation</span>
-                    <button class="sidebar-toggle" aria-label="Toggle Sidebar">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; overflow: hidden;">
+                        <span style="color: var(--p-primary-600); display: flex;">${LucideIcons.folderTree}</span>
+                        <span class="sidebar-header-title" style="font-weight: 800; font-size: 0.875rem; color: var(--p-text-color);">${title}</span>
+                    </div>
+                    <button class="sidebar-toggle" aria-label="Toggle Sidebar" title="Collapse / Expand Sidebar">
                         ${collapsed ? LucideIcons.chevronRight : LucideIcons.chevronLeft}
                     </button>
                 </div>
-                <ul class="sidebar-menu">
-                    ${renderMenu(items)}
+
+                ${searchable && !collapsed ? `
+                    <div class="sidebar-search-box">
+                        <input type="text" class="sidebar-search-input" placeholder="Filter components..." value="${searchQuery}" />
+                    </div>
+                ` : ""}
+
+                <ul class="sidebar-tree-menu">
+                    ${items.map((item) => renderNode(item)).join("")}
                 </ul>
             </div>
         `;
       container.querySelector(".sidebar-toggle")?.addEventListener("click", () => {
         collapsed = !collapsed;
         render();
+      });
+      const searchInput = container.querySelector(".sidebar-search-input");
+      if (searchInput) {
+        searchInput.addEventListener("input", (e) => {
+          searchQuery = e.target.value;
+          const menuEl = container.querySelector(".sidebar-tree-menu");
+          if (menuEl) {
+            menuEl.innerHTML = items.map((item) => renderNode(item)).join("");
+            bindGroupToggles();
+          }
+        });
+      }
+      bindGroupToggles();
+    }
+    function bindGroupToggles() {
+      container.querySelectorAll("[data-group-toggle]").forEach((header) => {
+        header.addEventListener("click", () => {
+          const groupLabel = header.getAttribute("data-group-toggle");
+          if (groupLabel) {
+            expandedMap[groupLabel] = !expandedMap[groupLabel];
+            render();
+          }
+        });
       });
     }
     render();
