@@ -2111,6 +2111,11 @@ public class IslandFloatLabelTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
+        if (context.AllAttributes.TryGetAttribute("variant", out var varAttr))
+        {
+            if (System.Enum.TryParse<FloatLabelVariant>(varAttr.Value?.ToString(), true, out var vr)) Variant = vr;
+        }
+
         output.TagName = "div";
         output.TagMode = TagMode.StartTagAndEndTag;
         output.Attributes.SetAttribute("data-island", "float-label");

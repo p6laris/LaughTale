@@ -1179,19 +1179,19 @@
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Seamless integration with floating label variants (Over, In, On) and top-aligned Ifta labels.</p>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; align-items: end;">
                     <div>
-                        <island-float-label variant="over">
+                        <island-float-label variant="@FloatLabelVariant.Over">
                             <island-tree-select input-id="fl-ts-over" nodes="@Model.DocumentsTree" fluid="true" />
                             <label for="fl-ts-over">Over Label</label>
                         </island-float-label>
                     </div>
                     <div>
-                        <island-float-label variant="in">
+                        <island-float-label variant="@FloatLabelVariant.In">
                             <island-tree-select input-id="fl-ts-in" nodes="@Model.DocumentsTree" fluid="true" />
                             <label for="fl-ts-in">In Label</label>
                         </island-float-label>
                     </div>
                     <div>
-                        <island-float-label variant="on">
+                        <island-float-label variant="@FloatLabelVariant.On">
                             <island-tree-select input-id="fl-ts-on" nodes="@Model.DocumentsTree" fluid="true" />
                             <label for="fl-ts-on">On Label</label>
                         </island-float-label>
