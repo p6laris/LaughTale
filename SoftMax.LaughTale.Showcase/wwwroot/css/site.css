@@ -2441,3 +2441,11 @@ html {
 
 
 
+
+/* FloatLabel & IftaLabel Select Integration */
+.laughtale-float-label-in .p-select,
+.laughtale-ifta-label .p-select {
+    padding-top: 1.35rem !important;
+    padding-bottom: 0.35rem !important;
+    min-height: 3rem !important;
+}

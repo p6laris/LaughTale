@@ -35,7 +35,10 @@ var CSS = `
 .laughtale-ifta-label .p-inputtags,
 .laughtale-ifta-label .cs-trigger,
 .laughtale-ifta-label .dp-trigger,
-.laughtale-ifta-label .ac-input-container {
+.laughtale-ifta-label .ac-input-container,
+.laughtale-ifta-label .p-select,
+.laughtale-ifta-label .p-treeselect,
+.laughtale-ifta-label .p-multiselect {
     padding-top: 1.35rem !important;
     padding-bottom: 0.35rem !important;
     min-height: 3rem !important;
@@ -105,4 +108,4 @@ function IftaLabelIsland(container, props) {
 export {
   IftaLabelIsland as default
 };
-//# sourceMappingURL=ifta-label-RK23F4KA.js.map
+//# sourceMappingURL=ifta-label-7XAPRVSY.js.map

@@ -90,7 +90,10 @@ const CSS = `
 .laughtale-float-label-in .p-inputtags,
 .laughtale-float-label-in .cs-trigger,
 .laughtale-float-label-in .dp-trigger,
-.laughtale-float-label-in .ac-input-container {
+.laughtale-float-label-in .ac-input-container,
+.laughtale-float-label-in .p-select,
+.laughtale-float-label-in .p-treeselect,
+.laughtale-float-label-in .p-multiselect {
     padding-top: 1.25rem !important;
     padding-bottom: 0.25rem !important;
 }
@@ -158,15 +161,18 @@ export default function FloatLabelIsland(container: HTMLElement, props: FloatLab
 
     function updateFloatingState() {
         const input = wrap.querySelector<HTMLInputElement | HTMLTextAreaElement>('input:not([type="hidden"]), textarea, select');
-        const customText = wrap.querySelector<HTMLElement>('.cs-label:not(.placeholder), .dp-label:not(.placeholder), .ac-input');
-        const tags = wrap.querySelectorAll<HTMLElement>('.p-inputtags-tag, .chip-item, .p-chip');
+        const customText = wrap.querySelector<HTMLElement>('.cs-label:not(.placeholder), .dp-label:not(.placeholder), .ac-input, .p-select-label:not(.p-placeholder), .p-treeselect-label:not(.p-placeholder), .p-multiselect-label:not(.p-placeholder)');
+        const tags = wrap.querySelectorAll<HTMLElement>('.p-inputtags-tag, .chip-item, .p-chip, .p-select-chip');
+        const hiddenInp = wrap.querySelector<HTMLInputElement>('input[type="hidden"]');
 
         let hasVal = false;
         if (input && input.value && input.value.trim().length > 0) {
             hasVal = true;
-        } else if (customText && customText.textContent && customText.textContent.trim().length > 0 && !customText.classList.contains('placeholder')) {
+        } else if (customText && customText.textContent && customText.textContent.trim().length > 0 && !customText.classList.contains('placeholder') && !customText.classList.contains('p-placeholder') && customText.textContent.trim() !== ' ') {
             hasVal = true;
         } else if (tags.length > 0) {
+            hasVal = true;
+        } else if (hiddenInp && hiddenInp.value && hiddenInp.value.trim().length > 0) {
             hasVal = true;
         }
 

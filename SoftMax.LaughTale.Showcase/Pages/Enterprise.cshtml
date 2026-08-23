@@ -1266,26 +1266,26 @@
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; align-items: end;">
                     <div>
                         <island-float-label variant="@FloatLabelVariant.Over">
-                            <island-select input-id="fl-sel-over" options="@Model.ListboxCities" selected-value="NY" fluid="true" />
-                            <label for="fl-sel-over">City (Over)</label>
+                            <island-select input-id="fl-sel-over" options="@Model.ListboxCities" selected-value="NY" fluid="true" placeholder="" />
+                            <label for="fl-sel-over">Over Label</label>
                         </island-float-label>
                     </div>
                     <div>
                         <island-float-label variant="@FloatLabelVariant.In">
-                            <island-select input-id="fl-sel-in" options="@Model.ListboxCities" selected-value="RM" variant="@InputVariant.Filled" fluid="true" />
-                            <label for="fl-sel-in">City (In)</label>
+                            <island-select input-id="fl-sel-in" options="@Model.ListboxCities" selected-value="RM" variant="@InputVariant.Filled" fluid="true" placeholder="" />
+                            <label for="fl-sel-in">In Label</label>
                         </island-float-label>
                     </div>
                     <div>
                         <island-float-label variant="@FloatLabelVariant.On">
-                            <island-select input-id="fl-sel-on" options="@Model.ListboxCities" selected-value="LDN" fluid="true" />
-                            <label for="fl-sel-on">City (On)</label>
+                            <island-select input-id="fl-sel-on" options="@Model.ListboxCities" fluid="true" placeholder="" />
+                            <label for="fl-sel-on">On Label</label>
                         </island-float-label>
                     </div>
                     <div>
                         <island-ifta-label>
-                            <island-select input-id="ifta-sel" options="@Model.ListboxCities" selected-value="IST" fluid="true" />
-                            <label for="ifta-sel">Selected City</label>
+                            <island-select input-id="ifta-sel" options="@Model.ListboxCities" selected-value="IST" fluid="true" placeholder="" />
+                            <label for="ifta-sel">City</label>
                         </island-ifta-label>
                     </div>
                 </div>
