@@ -1,6 +1,6 @@
 /**
  * SoftMax.LaughTale: Enterprise AutoComplete & Combobox Component (Aura AutoComplete)
- * Features: Typeahead suggestions, Dropdown button trigger, Clear button, Multi-chip tokens,
+ * Features: Typeahead suggestions on typing, Dropdown button trigger, Clear button, Multi-chip tokens,
  * Group headers, Rich option templating (Avatar, Status, Shortcut, Tag), Keyboard Navigation (W3C ARIA),
  * Size variants (small, normal, large), Filled/Outlined variants, Invalid/Disabled states, Fluid mode.
  */
@@ -50,6 +50,7 @@ const CSS = `
 .laughtale-autocomplete {
     position: relative;
     display: inline-flex;
+    align-items: stretch;
     font-family: var(--p-font-family, inherit);
     box-sizing: border-box;
 }
@@ -64,14 +65,19 @@ const CSS = `
 .ac-input-container {
     display: flex;
     align-items: center;
-    width: 100%;
+    flex: 1;
+    min-width: 0;
     background: var(--p-surface-0);
     border: 1px solid var(--p-border-color);
     border-radius: var(--p-border-radius);
     transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
     box-sizing: border-box;
     cursor: text;
-    overflow: hidden;
+    position: relative;
+}
+.laughtale-autocomplete.has-dropdown .ac-input-container {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
 }
 .ac-input-container.variant-filled {
     background: var(--p-surface-50);
@@ -79,6 +85,7 @@ const CSS = `
 .ac-input-container.focused {
     border-color: var(--p-primary-500);
     box-shadow: 0 0 0 1px var(--p-primary-500);
+    z-index: 2;
 }
 .ac-input-container.invalid {
     border-color: #ef4444 !important;
@@ -113,6 +120,7 @@ const CSS = `
     align-items: center;
     gap: 0.35rem;
     flex: 1;
+    min-width: 0;
     padding: 0.25rem 0;
 }
 .ac-chip {
@@ -170,27 +178,46 @@ const CSS = `
     border-radius: 50%;
     transition: color 0.15s ease, background 0.15s ease;
     flex-shrink: 0;
+    margin-left: 0.25rem;
 }
 .ac-btn-icon:hover {
     color: var(--p-text-color);
     background: var(--p-surface-100);
 }
+
 .ac-dropdown-btn {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-left: 1px solid var(--p-border-color);
-    background: var(--p-surface-50);
+    border: 1px solid var(--p-border-color);
+    border-left: none;
+    background: var(--p-surface-100);
     color: var(--p-text-muted);
+    border-top-right-radius: var(--p-border-radius);
+    border-bottom-right-radius: var(--p-border-radius);
     cursor: pointer;
-    padding: 0 0.65rem;
-    height: 100%;
-    align-self: stretch;
-    transition: background 0.15s ease, color 0.15s ease;
+    padding: 0 0.85rem;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    flex-shrink: 0;
+    box-sizing: border-box;
 }
 .ac-dropdown-btn:hover {
-    background: var(--p-surface-100);
+    background: var(--p-surface-200);
     color: var(--p-text-color);
+}
+.ac-dropdown-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
+/* Sizes for dropdown button */
+.size-small + .ac-dropdown-btn,
+.laughtale-autocomplete .ac-dropdown-btn.size-small {
+    padding: 0 0.6rem;
+}
+.size-large + .ac-dropdown-btn,
+.laughtale-autocomplete .ac-dropdown-btn.size-large {
+    padding: 0 1.1rem;
 }
 
 /* Floating Overlay Panel */
@@ -260,6 +287,11 @@ const CSS = `
 .dark .ac-dropdown-btn {
     background: var(--p-surface-800);
     border-color: var(--p-surface-700);
+    color: var(--p-surface-300);
+}
+.dark .ac-dropdown-btn:hover {
+    background: var(--p-surface-700);
+    color: var(--p-surface-0);
 }
 .dark .ac-overlay {
     background: var(--p-surface-900);
@@ -308,7 +340,7 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
     }
 
     container.innerHTML = `
-        <div class="laughtale-autocomplete ${props.fluid ? 'fluid' : ''}">
+        <div class="laughtale-autocomplete ${props.fluid ? 'fluid' : ''} ${hasDropdown ? 'has-dropdown' : ''}">
             <div class="ac-input-container size-${size} variant-${variant} ${props.invalid ? 'invalid' : ''} ${props.disabled ? 'disabled' : ''}">
                 <div class="ac-chips-wrapper">
                     <input type="text" 
@@ -331,13 +363,13 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
                         ${LucideIcons.x}
                     </button>
                 ` : ''}
-
-                ${hasDropdown ? `
-                    <button type="button" class="ac-dropdown-btn" title="Show all suggestions">
-                        ${LucideIcons.chevronDown}
-                    </button>
-                ` : ''}
             </div>
+
+            ${hasDropdown ? `
+                <button type="button" class="ac-dropdown-btn size-${size}" ${props.disabled ? 'disabled' : ''} title="Show all suggestions">
+                    <span style="display: flex; width: 16px; height: 16px;">${LucideIcons.chevronDown}</span>
+                </button>
+            ` : ''}
 
             <!-- Suggestions Overlay -->
             <div class="ac-overlay" style="max-height: ${scrollHeight};"></div>
@@ -556,8 +588,12 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
 
     const debouncedFilter = useDebounce(() => {
         searchQuery = input.value;
-        if (!disclosure.isOpen) disclosure.open();
-        else renderDropdown();
+        if (searchQuery.trim().length > 0) {
+            if (!disclosure.isOpen) disclosure.open();
+            else renderDropdown();
+        } else {
+            if (disclosure.isOpen) disclosure.close();
+        }
         updateClearButton();
     }, 150);
 
@@ -567,9 +603,11 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
 
     input.addEventListener('focus', () => {
         inputWrap.classList.add('focused');
-        if (!disclosure.isOpen && (allItems.length > 0 || searchQuery)) {
-            disclosure.open();
-        }
+        // Do not open dropdown immediately on focus - only when user types or clicks dropdown button
+    });
+
+    input.addEventListener('blur', () => {
+        inputWrap.classList.remove('focused');
     });
 
     input.addEventListener('keydown', (e) => {
