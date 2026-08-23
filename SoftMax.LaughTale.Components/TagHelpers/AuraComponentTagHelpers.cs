@@ -1547,6 +1547,56 @@ public class IslandIftaLabelTagHelper : TagHelper
 }
 
 /// <summary>
+/// TagHelper for <island-input-group /> / <island-inputgroup /> — Aura InputGroup
+/// </summary>
+[HtmlTargetElement("island-input-group")]
+[HtmlTargetElement("island-inputgroup")]
+public class IslandInputGroupTagHelper : TagHelper
+{
+    public ComponentSize Size { get; set; } = ComponentSize.Normal;
+    public bool Fluid { get; set; } = false;
+
+    public override void Process(TagHelperContext context, TagHelperOutput output)
+    {
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "input-group");
+        output.Attributes.SetAttribute("data-hydrate", "load");
+        var props = new
+        {
+            size = Size.ToString().ToLowerInvariant(),
+            fluid = Fluid
+        };
+        output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
+    }
+}
+
+/// <summary>
+/// TagHelper for <island-input-group-addon /> / <island-inputgroup-addon /> — Aura InputGroupAddon
+/// </summary>
+[HtmlTargetElement("island-input-group-addon")]
+[HtmlTargetElement("island-inputgroup-addon")]
+public class IslandInputGroupAddonTagHelper : TagHelper
+{
+    public string? Icon { get; set; }
+    public string? Text { get; set; }
+
+    public override void Process(TagHelperContext context, TagHelperOutput output)
+    {
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "input-group-addon");
+        output.Attributes.SetAttribute("data-hydrate", "load");
+        var props = new
+        {
+            icon = Icon,
+            text = Text
+        };
+        output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
+    }
+}
+
+/// <summary>
 /// TagHelper for <island-enhanced-input /> / <island-input-text /> — Enhanced text input with icons, clear, sizes
 /// </summary>
 [HtmlTargetElement("island-enhanced-input")]

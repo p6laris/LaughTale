@@ -39,7 +39,8 @@ public static class NavigationData
                 new("Knob", "gauge", "/enterprise#sec-knob"),
                 new("DatePicker", "calendar", "/enterprise#sec-datepicker"),
                 new("FloatLabel", "edit", "/enterprise#sec-floatlabel"),
-                new("IftaLabel", "edit", "/enterprise#sec-iftalabel")
+                new("IftaLabel", "edit", "/enterprise#sec-iftalabel"),
+                new("InputGroup", "layers", "/enterprise#sec-inputgroup")
             }),
             new("Data & Tables (11)", "database", null, false, new List<SidebarItem>
             {

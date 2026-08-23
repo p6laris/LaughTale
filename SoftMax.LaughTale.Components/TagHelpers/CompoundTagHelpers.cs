@@ -75,26 +75,6 @@ public class IslandLabelTagHelper : TagHelper
 }
 
 /// <summary>
-/// Group container for attaching leading/trailing icons, buttons, or addons next to an input.
-/// </summary>
-[HtmlTargetElement("island-input-group")]
-public class IslandInputGroupTagHelper : TagHelper
-{
-    [HtmlAttributeName("class")]
-    public string? Class { get; set; }
-
-    public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
-    {
-        output.TagName = "div";
-        var baseClass = "laughtale-input-group relative flex items-center w-full rounded-md shadow-sm border border-surface-200 dark:border-surface-700 bg-surface-0 dark:bg-surface-900 focus-within:ring-2 focus-within:ring-primary-500/20 focus-within:border-primary-600 transition-all overflow-hidden";
-        output.Attributes.SetAttribute("class", string.IsNullOrWhiteSpace(Class) ? baseClass : $"{baseClass} {Class}");
-
-        var childContent = await output.GetChildContentAsync();
-        output.Content.SetHtmlContent(childContent);
-    }
-}
-
-/// <summary>
 /// Icon addon inside an input group.
 /// </summary>
 [HtmlTargetElement("island-input-icon")]

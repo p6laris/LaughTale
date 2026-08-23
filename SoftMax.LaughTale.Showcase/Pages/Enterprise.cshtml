@@ -140,6 +140,105 @@
         </div>
     </section>
 
+    <!-- InputGroup -->
+    <section id="sec-inputgroup" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>InputGroup &amp; Addons</h2>
+                <p>Enterprise layout container grouping text inputs, icons, buttons, dropdowns, checkboxes, FloatLabels, and IftaLabels with seamless corner rounding.</p>
+            </div>
+            <span class="aura-tag tag-emerald">Form Control</span>
+        </div>
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Demo 1: Basic & Multiple Addons -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic &amp; Multiple Addons</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Group text, leading/trailing icons, and domain suffixes.</p>
+                <div style="display: flex; flex-direction: column; gap: 1rem; max-width: 440px;">
+                    <!-- User Addon -->
+                    <island-input-group>
+                        <island-input-group-addon icon="user" />
+                        <input type="text" class="p-input" placeholder="Username" style="flex: 1;" />
+                    </island-input-group>
+
+                    <!-- Website URL (Prefix + Suffix) -->
+                    <island-input-group>
+                        <island-input-group-addon text="https://" />
+                        <input type="text" class="p-input" placeholder="website" style="flex: 1;" />
+                        <island-input-group-addon text=".com" />
+                    </island-input-group>
+
+                    <!-- Select + Phone Number -->
+                    <island-input-group>
+                        <div style="width: 110px;">
+                            <island-select placeholder="🇹🇷 +90" />
+                        </div>
+                        <input type="text" class="p-input" placeholder="Phone number" style="flex: 1;" />
+                    </island-input-group>
+                </div>
+            </div>
+
+            <!-- Demo 2: Button & Checkbox Addons -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Buttons &amp; Actions</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Seamlessly integrated action buttons and telemetry badges.</p>
+                <div style="display: flex; flex-direction: column; gap: 1rem; max-width: 440px;">
+                    <!-- Search button + Input + Badge -->
+                    <island-input-group>
+                        <button type="button" class="p-button p-button-primary">Search</button>
+                        <input type="text" class="p-input" placeholder="Keyword" style="flex: 1;" />
+                        <island-input-group-addon text="8 results" />
+                    </island-input-group>
+
+                    <!-- Input + Search icon button -->
+                    <island-input-group>
+                        <input type="text" class="p-input" placeholder="Keyword" style="flex: 1;" />
+                        <button type="button" class="p-button p-button-secondary">🔍</button>
+                    </island-input-group>
+
+                    <!-- Check addon + Vote input + Clear button -->
+                    <island-input-group>
+                        <island-input-group-addon icon="check" />
+                        <input type="text" class="p-input" placeholder="Vote" style="flex: 1;" />
+                        <button type="button" class="p-button p-button-secondary">✕</button>
+                    </island-input-group>
+                </div>
+            </div>
+
+            <!-- Demo 3: FloatLabel & IftaLabel inside InputGroup -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">FloatLabel &amp; IftaLabel Integration</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Group addons alongside animated floating labels.</p>
+                <div style="display: flex; flex-direction: column; gap: 1.25rem; max-width: 440px;">
+                    <!-- Over Label -->
+                    <island-input-group>
+                        <island-input-group-addon icon="user" />
+                        <island-float-label label="Over Label" variant="@FloatLabelVariant.Over">
+                            <input type="text" class="p-input" style="width: 100%;" />
+                        </island-float-label>
+                    </island-input-group>
+
+                    <!-- In Label (Ifta) -->
+                    <island-input-group>
+                        <island-input-group-addon text="$" />
+                        <island-ifta-label label="In Label">
+                            <input type="text" class="p-input" style="width: 100%;" />
+                        </island-ifta-label>
+                        <island-input-group-addon text=".00" />
+                    </island-input-group>
+
+                    <!-- On Label -->
+                    <island-input-group>
+                        <island-input-group-addon text="www" />
+                        <island-float-label label="On Label" variant="@FloatLabelVariant.On">
+                            <input type="text" class="p-input" style="width: 100%;" />
+                        </island-float-label>
+                    </island-input-group>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Textarea -->
     <section id="sec-textarea" class="component-card">
         <div class="card-header">

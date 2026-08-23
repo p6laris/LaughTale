@@ -12094,13 +12094,172 @@ ${h.response}`).join("\n");
     }
   });
 
+  // src/components/input-group.ts
+  var input_group_exports = {};
+  __export(input_group_exports, {
+    InputGroupAddonIsland: () => InputGroupAddonIsland,
+    default: () => InputGroupIsland
+  });
+  function InputGroupIsland(container, props) {
+    injectIslandStyle("laughtale-inputgroup", CSS55);
+    container.classList.add("laughtale-inputgroup", "p-inputgroup");
+    if (props.size) {
+      container.classList.add(`size-${props.size}`);
+    }
+  }
+  function InputGroupAddonIsland(container, props) {
+    injectIslandStyle("laughtale-inputgroup", CSS55);
+    container.classList.add("laughtale-inputgroup-addon", "p-inputgroup-addon");
+    if (props.icon || props.text) {
+      const iconSvg = props.icon ? getLucideIcon(props.icon) : "";
+      const textSpan = props.text ? `<span>${props.text}</span>` : "";
+      container.innerHTML = `${iconSvg}${textSpan}${container.innerHTML}`;
+    }
+  }
+  var CSS55;
+  var init_input_group = __esm({
+    "src/components/input-group.ts"() {
+      "use strict";
+      init_styles();
+      init_lucide();
+      CSS55 = `
+.laughtale-inputgroup,
+.p-inputgroup {
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+    font-family: var(--p-font-family, inherit);
+    box-sizing: border-box;
+}
+
+.laughtale-inputgroup > *,
+.p-inputgroup > * {
+    border-radius: 0 !important;
+    margin-left: -1px;
+    box-sizing: border-box;
+}
+
+.laughtale-inputgroup > *:first-child,
+.p-inputgroup > *:first-child {
+    margin-left: 0;
+    border-top-left-radius: var(--p-border-radius) !important;
+    border-bottom-left-radius: var(--p-border-radius) !important;
+}
+
+.laughtale-inputgroup > *:last-child,
+.p-inputgroup > *:last-child {
+    border-top-right-radius: var(--p-border-radius) !important;
+    border-bottom-right-radius: var(--p-border-radius) !important;
+}
+
+/* Propagate border-radius into nested form elements / islands */
+.laughtale-inputgroup > *:first-child input,
+.laughtale-inputgroup > *:first-child textarea,
+.laughtale-inputgroup > *:first-child .p-input,
+.laughtale-inputgroup > *:first-child .cs-trigger,
+.laughtale-inputgroup > *:first-child .dp-trigger,
+.laughtale-inputgroup > *:first-child .laughtale-select-trigger,
+.laughtale-inputgroup > *:first-child .p-button,
+.p-inputgroup > *:first-child input,
+.p-inputgroup > *:first-child textarea,
+.p-inputgroup > *:first-child .p-input,
+.p-inputgroup > *:first-child .cs-trigger,
+.p-inputgroup > *:first-child .dp-trigger,
+.p-inputgroup > *:first-child .laughtale-select-trigger,
+.p-inputgroup > *:first-child .p-button {
+    border-top-left-radius: var(--p-border-radius) !important;
+    border-bottom-left-radius: var(--p-border-radius) !important;
+}
+
+.laughtale-inputgroup > *:last-child input,
+.laughtale-inputgroup > *:last-child textarea,
+.laughtale-inputgroup > *:last-child .p-input,
+.laughtale-inputgroup > *:last-child .cs-trigger,
+.laughtale-inputgroup > *:last-child .dp-trigger,
+.laughtale-inputgroup > *:last-child .laughtale-select-trigger,
+.laughtale-inputgroup > *:last-child .p-button,
+.p-inputgroup > *:last-child input,
+.p-inputgroup > *:last-child textarea,
+.p-inputgroup > *:last-child .p-input,
+.p-inputgroup > *:last-child .cs-trigger,
+.p-inputgroup > *:last-child .dp-trigger,
+.p-inputgroup > *:last-child .laughtale-select-trigger,
+.p-inputgroup > *:last-child .p-button {
+    border-top-right-radius: var(--p-border-radius) !important;
+    border-bottom-right-radius: var(--p-border-radius) !important;
+}
+
+.laughtale-inputgroup > *:not(:first-child):not(:last-child) input,
+.laughtale-inputgroup > *:not(:first-child):not(:last-child) textarea,
+.laughtale-inputgroup > *:not(:first-child):not(:last-child) .p-input,
+.laughtale-inputgroup > *:not(:first-child):not(:last-child) .cs-trigger,
+.laughtale-inputgroup > *:not(:first-child):not(:last-child) .dp-trigger,
+.laughtale-inputgroup > *:not(:first-child):not(:last-child) .laughtale-select-trigger,
+.laughtale-inputgroup > *:not(:first-child):not(:last-child) .p-button,
+.p-inputgroup > *:not(:first-child):not(:last-child) input,
+.p-inputgroup > *:not(:first-child):not(:last-child) textarea,
+.p-inputgroup > *:not(:first-child):not(:last-child) .p-input,
+.p-inputgroup > *:not(:first-child):not(:last-child) .cs-trigger,
+.p-inputgroup > *:not(:first-child):not(:last-child) .dp-trigger,
+.p-inputgroup > *:not(:first-child):not(:last-child) .laughtale-select-trigger,
+.p-inputgroup > *:not(:first-child):not(:last-child) .p-button {
+    border-radius: 0 !important;
+}
+
+/* Addon Styling */
+.laughtale-inputgroup-addon,
+.p-inputgroup-addon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 0.75rem;
+    background: var(--p-surface-100);
+    color: var(--p-text-muted);
+    border: 1px solid var(--p-border-color);
+    font-size: 0.875rem;
+    font-weight: 500;
+    min-width: 2.5rem;
+    user-select: none;
+    white-space: nowrap;
+    box-sizing: border-box;
+    gap: 0.35rem;
+}
+
+/* FloatLabel & IftaLabel inside InputGroup adjustments */
+.laughtale-inputgroup .laughtale-float-label,
+.p-inputgroup .laughtale-float-label {
+    flex: 1;
+    margin-top: 0;
+}
+.laughtale-inputgroup .laughtale-ifta-label,
+.p-inputgroup .laughtale-ifta-label {
+    flex: 1;
+}
+
+/* Elevation on focus */
+.laughtale-inputgroup > *:focus-within,
+.p-inputgroup > *:focus-within {
+    z-index: 2;
+}
+
+/* Dark Mode Tokens */
+.dark .laughtale-inputgroup-addon,
+.dark .p-inputgroup-addon {
+    background: var(--p-surface-800);
+    border-color: var(--p-surface-700);
+    color: var(--p-surface-300);
+}
+`;
+    }
+  });
+
   // src/components/input-text.ts
   var input_text_exports = {};
   __export(input_text_exports, {
     default: () => InputTextIsland
   });
   function InputTextIsland(container, props) {
-    injectIslandStyle("laughtale-input-text", CSS55);
+    injectIslandStyle("laughtale-input-text", CSS56);
     let currentValue = props.value || "";
     function render() {
       const sizeClass = "laughtale-input-" + props.size || "md";
@@ -12164,13 +12323,13 @@ ${h.response}`).join("\n");
     }
     render();
   }
-  var CSS55;
+  var CSS56;
   var init_input_text = __esm({
     "src/components/input-text.ts"() {
       "use strict";
       init_styles();
       init_lucide();
-      CSS55 = `
+      CSS56 = `
 .laughtale-input-wrap {
     position: relative;
     display: flex;
@@ -12552,7 +12711,7 @@ ${h.response}`).join("\n");
     default: () => PaginatorIsland
   });
   function PaginatorIsland(container, props) {
-    injectIslandStyle("paginator", CSS56);
+    injectIslandStyle("paginator", CSS57);
     let first = props.first || 0;
     let rows = props.rows || 10;
     const totalRecords = props.totalRecords || 0;
@@ -12612,13 +12771,13 @@ ${h.response}`).join("\n");
     }
     render();
   }
-  var CSS56;
+  var CSS57;
   var init_paginator = __esm({
     "src/components/paginator.ts"() {
       "use strict";
       init_lucide();
       init_styles();
-      CSS56 = `
+      CSS57 = `
 .laughtale-paginator {
     display: flex;
     align-items: center;
@@ -13876,6 +14035,10 @@ ${h.response}`).join("\n");
       defineIsland("input-mask", () => Promise.resolve().then(() => (init_input_mask(), input_mask_exports)));
       defineIsland("float-label", () => Promise.resolve().then(() => (init_float_label(), float_label_exports)));
       defineIsland("ifta-label", () => Promise.resolve().then(() => (init_ifta_label(), ifta_label_exports)));
+      defineIsland("input-group", () => Promise.resolve().then(() => (init_input_group(), input_group_exports)));
+      defineIsland("input-group-addon", () => Promise.resolve().then(() => (init_input_group(), input_group_exports)).then((m) => ({ default: m.InputGroupAddonIsland })));
+      defineIsland("inputgroup", () => Promise.resolve().then(() => (init_input_group(), input_group_exports)));
+      defineIsland("inputgroup-addon", () => Promise.resolve().then(() => (init_input_group(), input_group_exports)).then((m) => ({ default: m.InputGroupAddonIsland })));
       defineIsland("input-text", () => Promise.resolve().then(() => (init_input_text(), input_text_exports)));
       defineIsland("enhanced-input", () => Promise.resolve().then(() => (init_input_text(), input_text_exports)));
       defineIsland("carousel", () => Promise.resolve().then(() => (init_carousel(), carousel_exports)));
