@@ -304,6 +304,39 @@ public class EnterpriseModel : PageModel
         })
     };
 
+    public List<ListboxOptionItem> SelectButtonStateOptions { get; set; } = new()
+    {
+        new("One-Way", "one-way"),
+        new("Return", "return")
+    };
+
+    public List<ListboxOptionItem> SelectButtonPaymentOptions { get; set; } = new()
+    {
+        new("Option 1", "1"),
+        new("Option 2", "2"),
+        new("Option 3", "3")
+    };
+
+    public List<ListboxOptionItem> SelectButtonJustifyOptions { get; set; } = new()
+    {
+        new("Left", "left", Icon: "align-left"),
+        new("Center", "center", Icon: "align-center"),
+        new("Right", "right", Icon: "align-right"),
+        new("Justify", "justify", Icon: "align-justify")
+    };
+
+    public List<string> SelectButtonSkillLevels { get; set; } = new()
+    {
+        "Beginner", "Expert"
+    };
+
+    public List<ListboxOptionItem> SelectButtonDisabledOptions { get; set; } = new()
+    {
+        new("Option 1", "1"),
+        new("Option 2 (Disabled)", "2", Disabled: true),
+        new("Option 3", "3")
+    };
+
     public List<PickListItem> PickListSource { get; set; } = new()
     {
         new("sec-1", "mTLS Encryption", "Active session certificate"),

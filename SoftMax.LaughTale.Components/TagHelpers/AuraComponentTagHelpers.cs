@@ -708,32 +708,129 @@ public class IslandRatingTagHelper : TagHelper
 }
 
 /// <summary>
-/// TagHelper for <island-select-button />
+/// TagHelper for <island-select-button /> / <island-selectbutton /> — Aura Segmented SelectButton
 /// </summary>
 [HtmlTargetElement("island-select-button")]
+[HtmlTargetElement("island-selectbutton")]
 public class IslandSelectButtonTagHelper : TagHelper
 {
-    public string? TargetInput { get; set; }
-    public List<SelectButtonItem> Items { get; set; } = new();
+    [HtmlAttributeName("options")]
+    public object? Options { get; set; }
+
+    [HtmlAttributeName("items")]
+    public object? Items { get; set; }
+
+    [HtmlAttributeName("value")]
     public string? Value { get; set; }
+
+    [HtmlAttributeName("selected-value")]
+    public string? SelectedValue { get; set; }
+
+    [HtmlAttributeName("values")]
+    public List<string>? Values { get; set; }
+
+    [HtmlAttributeName("selected-values")]
+    public List<string>? SelectedValues { get; set; }
+
+    [HtmlAttributeName("multiple")]
+    public bool Multiple { get; set; } = false;
+
+    [HtmlAttributeName("unselectable")]
+    public bool Unselectable { get; set; } = true;
+
+    [HtmlAttributeName("size")]
+    public ComponentSize Size { get; set; } = ComponentSize.Normal;
+
+    [HtmlAttributeName("fluid")]
+    public bool Fluid { get; set; } = false;
+
+    [HtmlAttributeName("invalid")]
+    public bool Invalid { get; set; } = false;
+
+    [HtmlAttributeName("disabled")]
     public bool Disabled { get; set; } = false;
+
+    [HtmlAttributeName("input-id")]
+    public string? InputId { get; set; }
+
+    [HtmlAttributeName("name")]
+    public string? Name { get; set; }
+
+    [HtmlAttributeName("target-input")]
+    public string? TargetInput { get; set; }
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
+        if (context.AllAttributes.TryGetAttribute("multiple", out var mulAttr))
+        {
+            if (bool.TryParse(mulAttr.Value?.ToString(), out var m)) Multiple = m;
+            else if (mulAttr.Value != null) Multiple = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("unselectable", out var unAttr))
+        {
+            if (bool.TryParse(unAttr.Value?.ToString(), out var u)) Unselectable = u;
+        }
+        if (context.AllAttributes.TryGetAttribute("fluid", out var flAttr))
+        {
+            if (bool.TryParse(flAttr.Value?.ToString(), out var fl)) Fluid = fl;
+            else if (flAttr.Value != null) Fluid = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("invalid", out var invAttr))
+        {
+            if (bool.TryParse(invAttr.Value?.ToString(), out var inv)) Invalid = inv;
+            else if (invAttr.Value != null) Invalid = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("disabled", out var disAttr))
+        {
+            if (bool.TryParse(disAttr.Value?.ToString(), out var dis)) Disabled = dis;
+            else if (disAttr.Value != null) Disabled = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("size", out var szAttr))
+        {
+            if (System.Enum.TryParse<ComponentSize>(szAttr.Value?.ToString(), true, out var sz)) Size = sz;
+        }
+        if (context.AllAttributes.TryGetAttribute("target-input-name", out var tinAttr) || context.AllAttributes.TryGetAttribute("targetInputName", out tinAttr))
+        {
+            TargetInput = tinAttr.Value?.ToString();
+        }
+
         output.TagName = "div";
         output.TagMode = TagMode.StartTagAndEndTag;
         output.Attributes.SetAttribute("data-island", "select-button");
         output.Attributes.SetAttribute("data-hydrate", "load");
+        output.Attributes.SetAttribute("role", Multiple ? "group" : "radiogroup");
+
+        if (!string.IsNullOrEmpty(InputId)) output.Attributes.SetAttribute("id", InputId);
+
+        var effectiveOptions = Options ?? Items ?? new List<object>();
+        var effectiveValue = (object?)Values ?? (object?)SelectedValues ?? (object?)Value ?? SelectedValue;
 
         var props = new
         {
+            options = effectiveOptions,
+            value = effectiveValue,
+            selectedValue = effectiveValue,
+            multiple = Multiple,
+            unselectable = Unselectable,
+            size = Size.ToString().ToLowerInvariant(),
+            fluid = Fluid,
+            disabled = Disabled,
+            invalid = Invalid,
+            name = Name,
             targetInputName = TargetInput,
-            items = Items,
-            value = Value,
-            disabled = Disabled
+            inputId = InputId
         };
 
         output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
+
+        // SSR Pre-rendered markup
+        var rootClasses = new List<string> { "laughtale-selectbutton", "p-selectbutton" };
+        if (Fluid) rootClasses.Add("p-selectbutton-fluid");
+        if (Size != ComponentSize.Normal) rootClasses.Add($"size-{Size.ToString().ToLowerInvariant()}");
+        if (Invalid) rootClasses.Add("is-invalid");
+        if (Disabled) rootClasses.Add("is-disabled");
+
+        output.Attributes.SetAttribute("class", string.Join(" ", rootClasses));
     }
 }
 

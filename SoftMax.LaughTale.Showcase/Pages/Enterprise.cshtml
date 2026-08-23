@@ -1771,17 +1771,75 @@
         </div>
     </section>
 
-    <!-- SelectButton -->
+        <!-- SelectButton -->
     <section id="sec-select-button" class="component-card">
         <div class="card-header">
             <div>
                 <h2>SelectButton</h2>
-                <p>Segmented button group for exclusive or multi-selection modes.</p>
+                <p>Segmented button group used to choose single or multiple items from a list using interactive button segments, custom icon templates, sizes, and validation states.</p>
             </div>
-            <span class="aura-tag tag-slate">Segmented</span>
+            <span class="aura-tag tag-indigo">Form Control</span>
         </div>
-        <div class="card-body" style="max-width: 450px;">
-            <island-select-button options="@Model.Periods" value="Daily" />
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Demo 1: Basic Single Selection -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic Single Selection</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Mutually exclusive segmented button options.</p>
+                <div style="display: flex; justify-content: center;">
+                    <island-select-button options="@Model.SelectButtonStateOptions" value="one-way" />
+                </div>
+            </div>
+
+            <!-- Demo 2: Multiple Selection -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Multiple Selection</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Multi-selection mode allowing multiple concurrent active button segments.</p>
+                <div style="display: flex; justify-content: center;">
+                    <island-select-button options="@Model.SelectButtonPaymentOptions" multiple="true" selected-value="1,3" />
+                </div>
+            </div>
+
+            <!-- Demo 3: Icon Template (Text Alignment) -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Template with Icons</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Custom icon templated options for rich toolbar controls.</p>
+                <div style="display: flex; justify-content: center;">
+                    <island-select-button options="@Model.SelectButtonJustifyOptions" value="center" />
+                </div>
+            </div>
+
+            <!-- Demo 4: Sizes & Fluid Layout -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Sizes &amp; Fluid Width</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Small and large size metrics alongside full-width fluid responsive layout.</p>
+                <div style="display: flex; flex-direction: column; gap: 1.25rem; align-items: center; max-width: 480px; margin: 0 auto;">
+                    <island-select-button options="@Model.SelectButtonSkillLevels" size="@ComponentSize.Small" value="Beginner" />
+                    <island-select-button options="@Model.SelectButtonSkillLevels" size="@ComponentSize.Normal" value="Expert" />
+                    <island-select-button options="@Model.SelectButtonSkillLevels" size="@ComponentSize.Large" value="Expert" />
+                    <div style="width: 100%; margin-top: 0.5rem;">
+                        <island-select-button options="@Model.SelectButtonStateOptions" fluid="true" value="return" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 5: Disabled States -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Disabled States</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Entire disabled component and individual disabled options.</p>
+                <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 1.5rem;">
+                    <island-select-button options="@Model.SelectButtonStateOptions" disabled="true" value="one-way" />
+                    <island-select-button options="@Model.SelectButtonDisabledOptions" value="1" />
+                </div>
+            </div>
+
+            <!-- Demo 6: Invalid Validation State -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Invalid Validation State</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Highlight border and ring indicating required form validation failure.</p>
+                <div style="display: flex; justify-content: center;">
+                    <island-select-button options="@Model.SelectButtonStateOptions" invalid="true" />
+                </div>
+            </div>
         </div>
     </section>
 
