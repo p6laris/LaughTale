@@ -35,8 +35,10 @@ async function handleLinkClick(e: MouseEvent) {
     if (url.origin !== window.location.origin) return;
     if (anchor.target && anchor.target !== '_self') return;
     if (anchor.hasAttribute('download') || anchor.getAttribute('data-no-transition') !== null) return;
-    if (url.pathname === window.location.pathname && url.search === window.location.search && url.hash) {
-        return; // Normal anchor jump
+    const currentPath = window.location.pathname.toLowerCase().replace(/\/$/, '');
+    const targetPath = url.pathname.toLowerCase().replace(/\/$/, '');
+    if ((currentPath === targetPath || !targetPath) && url.hash) {
+        return; // Normal anchor jump / local hash navigation
     }
 
     e.preventDefault();
