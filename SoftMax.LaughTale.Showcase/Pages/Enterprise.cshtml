@@ -579,12 +579,98 @@
         <div class="card-header">
             <div>
                 <h2>InputPassword</h2>
-                <p>Password field with toggle visibility and interactive strength meter indicator.</p>
+                <p>Enhanced password field with visibility toggle, live strength metering, requirements checklist, and floating popover overlay.</p>
             </div>
             <span class="aura-tag tag-emerald">Auth</span>
         </div>
-        <div class="card-body" style="max-width: 400px;">
-            <island-input-password feedback="true" toggle-mask="true" placeholder="Enter secure key..." />
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Hero Demo 1: Create a password (Chips Requirements & Left Lock Icon) -->
+            <div style="background: var(--p-surface-50); padding: 1.75rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); max-width: 440px; display: flex; flex-direction: column; gap: 0.5rem;">
+                <label style="font-weight: 700; font-size: 1.05rem; color: var(--p-text-color); margin-bottom: 0.25rem; display: block;">Create a password</label>
+                <island-input-password icon="lock" toggle-mask="true" show-requirements="true" requirements-mode="chips" min-length="8" fluid="true" value="pass123" />
+            </div>
+
+            <!-- Hero Demo 2: Popover Overlay Panel (Feedback) -->
+            <div style="background: var(--p-surface-50); padding: 1.75rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); max-width: 440px; display: flex; flex-direction: column; gap: 0.5rem;">
+                <div>
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-text-color); margin-bottom: 0.25rem;">Popover Strength &amp; Requirements</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 0.75rem;">Click the field to trigger the floating popover with animated strength meter and rules.</p>
+                </div>
+                <island-input-password feedback="true" toggle-mask="true" show-clear="true" min-length="12" placeholder="Focus to see password popover..." fluid="true" />
+            </div>
+
+            <!-- Demo 3: Direct Strength Meter -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Strength Meter (Direct Progress Bar)</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Real-time animated progress bar with color-coded severity badge (Weak, Medium, Strong).</p>
+                <div style="max-width: 380px;">
+                    <island-input-password show-meter="true" toggle-mask="true" value="Secret123!" fluid="true" />
+                </div>
+            </div>
+
+            <!-- Demo 4: Requirements Checklist (Vertical List) -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Requirements Checklist</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Live validation checklist with color transitions for uppercase, lowercase, numbers, and special chars.</p>
+                <div style="max-width: 380px;">
+                    <island-input-password show-requirements="true" requirements-mode="list" min-length="12" placeholder="Enter password..." fluid="true" />
+                </div>
+            </div>
+
+            <!-- Demo 5: Toggle Mask & Clear Action -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Toggle Mask &amp; Clear Action</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Clean eye toggle action with instantaneous clear button trigger.</p>
+                <div style="max-width: 380px;">
+                    <island-input-password toggle-mask="true" show-clear="true" value="MyPassword2026!" fluid="true" />
+                </div>
+            </div>
+
+            <!-- Demo 6: FloatLabel & IftaLabel Integrations -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">FloatLabel &amp; IftaLabel Integration</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Floating labels and infield top labels supporting password masks.</p>
+                <div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 1.5rem;">
+                    <div style="flex: 1; min-width: 200px;">
+                        <island-float-label label="Password" variant="@FloatLabelVariant.Over">
+                            <island-input-password input-id="pwd_fl_over" toggle-mask="true" fluid="true" />
+                        </island-float-label>
+                    </div>
+                    <div style="flex: 1; min-width: 200px;">
+                        <island-ifta-label label="Security Passcode">
+                            <island-input-password input-id="pwd_ifta" toggle-mask="true" variant="@InputVariant.Filled" fluid="true" />
+                        </island-ifta-label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 7: Sizes, Variants & States -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Sizes, Variants &amp; States</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Small and large sizes, filled variant, disabled, and invalid error boundaries.</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    <div>
+                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Small Size</label>
+                        <island-input-password size="@ComponentSize.Small" placeholder="Small Password" toggle-mask="true" fluid="true" />
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Large Size</label>
+                        <island-input-password size="@ComponentSize.Large" placeholder="Large Password" toggle-mask="true" fluid="true" />
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Filled Variant</label>
+                        <island-input-password variant="@InputVariant.Filled" placeholder="Filled style" toggle-mask="true" fluid="true" />
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Invalid State</label>
+                        <island-input-password invalid="true" placeholder="Password required" fluid="true" />
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Disabled State</label>
+                        <island-input-password disabled="true" value="DisabledValue123" toggle-mask="true" fluid="true" />
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 

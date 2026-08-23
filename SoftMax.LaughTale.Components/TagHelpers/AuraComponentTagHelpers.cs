@@ -334,32 +334,158 @@ public class IslandOtpTagHelper : TagHelper
 }
 
 /// <summary>
-/// TagHelper for <island-password /> / <island-input-password />
+/// TagHelper for <island-password /> / <island-input-password /> — Aura InputPassword
 /// </summary>
 [HtmlTargetElement("island-password")]
 [HtmlTargetElement("island-input-password")]
 public class IslandPasswordTagHelper : TagHelper
 {
     public string? TargetInput { get; set; }
+    public string? InputId { get; set; }
+    public string? Value { get; set; }
     public string? Placeholder { get; set; }
     public bool ToggleMask { get; set; } = true;
-    public bool ShowMeter { get; set; } = true;
+    public bool ShowMeter { get; set; } = false;
+    public bool ShowRequirements { get; set; } = false;
+    public string RequirementsMode { get; set; } = "chips"; // chips, list, popover
+    public bool Feedback { get; set; } = false; // Popover mode
+    public int MinLength { get; set; } = 8;
+    public string? Icon { get; set; }
+    public bool ShowClear { get; set; } = false;
+    public InputVariant Variant { get; set; } = InputVariant.Outlined;
+    public ComponentSize Size { get; set; } = ComponentSize.Normal;
+    public bool Fluid { get; set; } = false;
     public bool Disabled { get; set; } = false;
+    public bool ReadOnly { get; set; } = false;
+    public bool Invalid { get; set; } = false;
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
+        // Fallback attribute resolution for camelCase & kebab-case
+        if (context.AllAttributes.TryGetAttribute("toggleMask", out var tmAttr) || context.AllAttributes.TryGetAttribute("toggle-mask", out tmAttr))
+        {
+            if (bool.TryParse(tmAttr.Value?.ToString(), out var tm)) ToggleMask = tm;
+            else if (tmAttr.Value != null) ToggleMask = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("showMeter", out var smAttr) || context.AllAttributes.TryGetAttribute("show-meter", out smAttr))
+        {
+            if (bool.TryParse(smAttr.Value?.ToString(), out var sm)) ShowMeter = sm;
+            else if (smAttr.Value != null) ShowMeter = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("showRequirements", out var srAttr) || context.AllAttributes.TryGetAttribute("show-requirements", out srAttr))
+        {
+            if (bool.TryParse(srAttr.Value?.ToString(), out var sr)) ShowRequirements = sr;
+            else if (srAttr.Value != null) ShowRequirements = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("requirementsMode", out var rmAttr) || context.AllAttributes.TryGetAttribute("requirements-mode", out rmAttr))
+        {
+            RequirementsMode = rmAttr.Value?.ToString() ?? "chips";
+        }
+        if (context.AllAttributes.TryGetAttribute("feedback", out var fbAttr))
+        {
+            if (bool.TryParse(fbAttr.Value?.ToString(), out var fb)) Feedback = fb;
+            else if (fbAttr.Value != null) Feedback = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("minLength", out var mlAttr) || context.AllAttributes.TryGetAttribute("min-length", out mlAttr))
+        {
+            if (int.TryParse(mlAttr.Value?.ToString(), out var ml)) MinLength = ml;
+        }
+        if (context.AllAttributes.TryGetAttribute("showClear", out var scAttr) || context.AllAttributes.TryGetAttribute("show-clear", out scAttr))
+        {
+            if (bool.TryParse(scAttr.Value?.ToString(), out var sc)) ShowClear = sc;
+            else if (scAttr.Value != null) ShowClear = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("fluid", out var flAttr))
+        {
+            if (bool.TryParse(flAttr.Value?.ToString(), out var fl)) Fluid = fl;
+            else if (flAttr.Value != null) Fluid = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("disabled", out var disAttr))
+        {
+            if (bool.TryParse(disAttr.Value?.ToString(), out var dis)) Disabled = dis;
+            else if (disAttr.Value != null) Disabled = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("readonly", out var roAttr))
+        {
+            if (bool.TryParse(roAttr.Value?.ToString(), out var ro)) ReadOnly = ro;
+            else if (roAttr.Value != null) ReadOnly = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("invalid", out var invAttr))
+        {
+            if (bool.TryParse(invAttr.Value?.ToString(), out var inv)) Invalid = inv;
+            else if (invAttr.Value != null) Invalid = true;
+        }
+
         output.TagName = "div";
         output.TagMode = TagMode.StartTagAndEndTag;
+
+        var cssClass = "laughtale-password p-password";
+        if (Fluid) cssClass += " p-password-fluid";
+        if (Variant == InputVariant.Filled) cssClass += " variant-filled";
+        if (Size != ComponentSize.Normal) cssClass += $" size-{Size.ToString().ToLowerInvariant()}";
+        if (Invalid) cssClass += " is-invalid";
+        if (Disabled) cssClass += " is-disabled";
+
+        output.Attributes.SetAttribute("class", cssClass);
         output.Attributes.SetAttribute("data-island", "input-password");
         output.Attributes.SetAttribute("data-hydrate", "load");
+
+        // SSR Render initial DOM
+        var inputIdAttr = !string.IsNullOrEmpty(InputId) ? $"id=\"{InputId}\"" : "";
+        var placeholderAttr = !string.IsNullOrEmpty(Placeholder) ? $"placeholder=\"{Placeholder}\"" : "";
+        var disabledAttr = Disabled ? "disabled" : "";
+        var roAttrStr = ReadOnly ? "readonly" : "";
+
+        var sb = new System.Text.StringBuilder();
+        sb.Append("<div class=\"p-password-container\">");
+
+        if (!string.IsNullOrEmpty(Icon))
+        {
+            sb.Append("<span class=\"p-password-left-icon\">");
+            sb.Append(SoftMax.LaughTale.Components.Icons.LucideIcons.Get(Icon, 16));
+            sb.Append("</span>");
+        }
+
+        sb.Append($"<input type=\"password\" class=\"p-password-input\" {inputIdAttr} {placeholderAttr} {disabledAttr} {roAttrStr} value=\"{Value ?? ""}\" autocomplete=\"off\" />");
+
+        if (ShowClear && !string.IsNullOrEmpty(Value) && !Disabled)
+        {
+            sb.Append("<button type=\"button\" class=\"p-password-action-btn p-password-clear-btn\" aria-label=\"Clear password\" tabindex=\"-1\">");
+            sb.Append(SoftMax.LaughTale.Components.Icons.LucideIcons.Get("x", 14));
+            sb.Append("</button>");
+        }
+
+        if (ToggleMask)
+        {
+            sb.Append("<button type=\"button\" class=\"p-password-action-btn p-password-toggle-btn\" aria-label=\"Toggle password visibility\" tabindex=\"-1\">");
+            sb.Append(SoftMax.LaughTale.Components.Icons.LucideIcons.Get("eye", 16));
+            sb.Append("</button>");
+        }
+
+        sb.Append("</div>");
+
+        output.Content.SetHtmlContent(sb.ToString());
 
         var props = new
         {
             targetInputName = TargetInput,
+            inputId = InputId,
+            value = Value,
             placeholder = Placeholder,
             toggleMask = ToggleMask,
             showMeter = ShowMeter,
-            disabled = Disabled
+            showRequirements = ShowRequirements,
+            requirementsMode = RequirementsMode,
+            feedback = Feedback,
+            minLength = MinLength,
+            icon = Icon,
+            showClear = ShowClear,
+            variant = Variant.ToString().ToLowerInvariant(),
+            size = Size.ToString().ToLowerInvariant(),
+            fluid = Fluid,
+            disabled = Disabled,
+            readonlyMode = ReadOnly,
+            invalid = Invalid
         };
 
         output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
