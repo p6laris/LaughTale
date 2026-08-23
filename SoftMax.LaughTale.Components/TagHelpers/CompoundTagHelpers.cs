@@ -98,8 +98,9 @@ public class IslandInputIconTagHelper : TagHelper
 /// <summary>
 /// Standalone input text element with clean styles and Tailwind v4 support.
 /// </summary>
-[HtmlTargetElement("island-input-text")]
-public class IslandInputTextTagHelper : TagHelper
+[HtmlTargetElement("island-field-input")]
+[HtmlTargetElement("island-primitive-input")]
+public class IslandPrimitiveInputTagHelper : TagHelper
 {
     [HtmlAttributeName("id")]
     public string? Id { get; set; }
