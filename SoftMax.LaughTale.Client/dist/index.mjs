@@ -9745,6 +9745,8 @@ var init_cascadeselect = __esm({
     position: absolute;
     top: calc(100% + 4px);
     left: 0;
+    width: 100%;
+    min-width: 100%;
     z-index: 1000;
     display: none;
     box-sizing: border-box;
@@ -9755,7 +9757,8 @@ var init_cascadeselect = __esm({
     border: 1px solid var(--p-border-color);
     border-radius: var(--p-border-radius);
     box-shadow: var(--p-shadow-lg);
-    min-width: 14rem;
+    width: 100%;
+    min-width: 100%;
     padding: 0.35rem;
     box-sizing: border-box;
 }
@@ -9797,7 +9800,8 @@ var init_cascadeselect = __esm({
     border: 1px solid var(--p-border-color);
     border-radius: var(--p-border-radius);
     box-shadow: var(--p-shadow-lg);
-    min-width: 14rem;
+    width: 100%;
+    min-width: 100%;
     padding: 0.35rem;
     box-sizing: border-box;
 }
