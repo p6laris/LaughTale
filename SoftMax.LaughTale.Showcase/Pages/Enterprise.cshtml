@@ -1210,17 +1210,111 @@
         </div>
     </section>
 
-    <!-- Rating -->
+        <!-- Rating -->
     <section id="sec-rating" class="component-card">
         <div class="card-header">
             <div>
                 <h2>Rating</h2>
-                <p>Interactive vector star rating with configurable count and reset button.</p>
+                <p>Star-based selection input with half-star precision, vertical orientation, custom emoji templates, keyboard navigation, and zero-flicker state transitions.</p>
             </div>
-            <span class="aura-tag tag-amber">Feedback</span>
+            <span class="aura-tag tag-amber">Form Control</span>
         </div>
-        <div class="card-body" style="max-width: 300px;">
-            <island-rating value="4" stars="5" />
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Demo 1: Basic & Cancel -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic &amp; Clear Action</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Standard two-way value binding with zero-flicker hover transitions and optional cancel button.</p>
+                <div style="display: flex; flex-wrap: wrap; gap: 3rem; align-items: center;">
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--p-text-color);">Basic Rating (3 of 5 Stars)</label>
+                        <island-rating value="3" stars="5" />
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--p-text-color);">Without Cancel Icon (cancel="false")</label>
+                        <island-rating value="4" stars="5" cancel="false" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 2: Half Stars -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Half Stars (0.5 Precision)</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Enable <code>allowHalf</code> to support half-star selection with split-filling visual feedback.</p>
+                <div style="display: flex; flex-wrap: wrap; gap: 3rem; align-items: center;">
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--p-text-color);">Full Star Mode</label>
+                        <island-rating value="3" stars="5" />
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--p-text-color);">Half Star Mode (3.5 Stars)</label>
+                        <island-rating value="3.5" allowHalf="true" stars="5" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 3: Controlled & Number of Stars -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Controlled Programmatically &amp; Number of Stars</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Rating value can be updated programmatically, with configurable star totals (e.g. 10 stars).</p>
+                <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--p-text-color);">10-Star Scale (7 of 10)</label>
+                        <island-rating value="7" stars="10" />
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--p-text-color);">Interactive Controlled Demo</label>
+                        <div style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;">
+                            <island-rating id="controlled-rating" value="2.5" allowHalf="true" stars="5" />
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button type="button" class="aura-btn aura-btn-secondary" style="font-size: 0.75rem; padding: 0.35rem 0.75rem;" onclick="const r = document.getElementById('controlled-rating'); if(r){ const items = r.querySelectorAll('.p-rating-item'); items[1].click(); }">2.5 Star</button>
+                                <button type="button" class="aura-btn aura-btn-secondary" style="font-size: 0.75rem; padding: 0.35rem 0.75rem;" onclick="const r = document.getElementById('controlled-rating'); if(r){ const items = r.querySelectorAll('.p-rating-item'); items[2].click(); }">3 Star</button>
+                                <button type="button" class="aura-btn aura-btn-secondary" style="font-size: 0.75rem; padding: 0.35rem 0.75rem;" onclick="const r = document.getElementById('controlled-rating'); if(r){ const items = r.querySelectorAll('.p-rating-item'); items[3].click(); }">4 Star</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 4: Vertical Orientation -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Vertical Orientation</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Rating displayed vertically with column layout and matching keyboard navigation.</p>
+                <div style="display: inline-block;">
+                    <island-rating value="3" stars="5" orientation="@Orientation.Vertical" />
+                </div>
+            </div>
+
+            <!-- Demo 5: Templates & Emoji Mode -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Templates &amp; Emoji Customization</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Custom characters and 5-stage Emotion Emojis with smooth grayscale-to-color hover transitions.</p>
+                <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--p-text-color);">Letter Rating (A A A A A)</label>
+                        <island-rating value="3" stars="5" mode="template" />
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--p-text-color);">Emotion Emojis (😡 🙁 😐 😊 🤩)</label>
+                        <island-rating value="4" stars="5" mode="emoji" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 6: Readonly & Disabled -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">ReadOnly &amp; Disabled States</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Readonly mode for non-editable score displays and disabled state for inactive forms.</p>
+                <div style="display: flex; flex-wrap: wrap; gap: 3rem; align-items: center;">
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--p-text-color);">ReadOnly (4 of 5)</label>
+                        <island-rating value="4" stars="5" readonly="true" />
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--p-text-color);">Disabled State</label>
+                        <island-rating value="2" stars="5" disabled="true" />
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 

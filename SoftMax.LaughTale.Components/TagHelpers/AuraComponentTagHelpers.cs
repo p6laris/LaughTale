@@ -558,34 +558,152 @@ public class IslandSliderTagHelper : TagHelper
 }
 
 /// <summary>
-/// TagHelper for <island-rating />
+/// TagHelper for <island-rating /> — Aura Star & Emoji Rating
 /// </summary>
 [HtmlTargetElement("island-rating")]
 public class IslandRatingTagHelper : TagHelper
 {
     public string? TargetInput { get; set; }
-    public int Value { get; set; } = 0;
+    public double Value { get; set; } = 0;
     public int Stars { get; set; } = 5;
+    public bool AllowHalf { get; set; } = false;
+    public bool Cancel { get; set; } = true;
     public bool AllowCancel { get; set; } = true;
+    public Orientation Orientation { get; set; } = Orientation.Horizontal;
+    public bool Readonly { get; set; } = false;
     public bool Disabled { get; set; } = false;
+    public ComponentSize Size { get; set; } = ComponentSize.Normal;
+    public string Mode { get; set; } = "stars";
+    public string? Emojis { get; set; }
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
+        // Fallback attribute resolution
+        if (context.AllAttributes.TryGetAttribute("allowHalf", out var ahAttr) || context.AllAttributes.TryGetAttribute("allow-half", out ahAttr))
+        {
+            if (bool.TryParse(ahAttr.Value?.ToString(), out var ah)) AllowHalf = ah;
+            else if (ahAttr.Value != null) AllowHalf = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("allowCancel", out var acAttr) || context.AllAttributes.TryGetAttribute("allow-cancel", out acAttr))
+        {
+            if (bool.TryParse(acAttr.Value?.ToString(), out var ac)) AllowCancel = ac;
+            else if (acAttr.Value != null) AllowCancel = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("cancel", out var cAttr))
+        {
+            if (bool.TryParse(cAttr.Value?.ToString(), out var c)) Cancel = c;
+            else if (cAttr.Value != null) Cancel = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("orientation", out var orAttr))
+        {
+            if (Enum.TryParse<Orientation>(orAttr.Value?.ToString(), true, out var orVal)) Orientation = orVal;
+        }
+        if (context.AllAttributes.TryGetAttribute("readonly", out var roAttr) || context.AllAttributes.TryGetAttribute("readOnly", out roAttr))
+        {
+            if (bool.TryParse(roAttr.Value?.ToString(), out var ro)) Readonly = ro;
+            else if (roAttr.Value != null) Readonly = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("disabled", out var disAttr))
+        {
+            if (bool.TryParse(disAttr.Value?.ToString(), out var dis)) Disabled = dis;
+            else if (disAttr.Value != null) Disabled = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("size", out var szAttr))
+        {
+            if (Enum.TryParse<ComponentSize>(szAttr.Value?.ToString(), true, out var sz)) Size = sz;
+        }
+
         output.TagName = "div";
         output.TagMode = TagMode.StartTagAndEndTag;
+
+        var isVertical = Orientation == Orientation.Vertical;
+        var isCancelAllowed = Cancel && AllowCancel && !Readonly && !Disabled;
+
+        var rootClasses = new List<string> { "laughtale-rating", "p-rating" };
+        if (isVertical) rootClasses.Add("p-rating-vertical");
+        if (Size != ComponentSize.Normal) rootClasses.Add($"size-{Size.ToString().ToLowerInvariant()}");
+        if (Readonly) rootClasses.Add("p-readonly");
+        if (Disabled) rootClasses.Add("p-disabled");
+
+        output.Attributes.SetAttribute("class", string.Join(" ", rootClasses));
         output.Attributes.SetAttribute("data-island", "rating");
         output.Attributes.SetAttribute("data-hydrate", "load");
+        output.Attributes.SetAttribute("role", "radiogroup");
+        output.Attributes.SetAttribute("aria-label", $"{Value} of {Stars} stars");
 
         var props = new
         {
             targetInputName = TargetInput,
             value = Value,
             stars = Stars,
-            allowCancel = AllowCancel,
-            disabled = Disabled
+            allowHalf = AllowHalf,
+            cancel = isCancelAllowed,
+            allowCancel = isCancelAllowed,
+            orientation = isVertical ? "vertical" : "horizontal",
+            readonlyMode = Readonly,
+            disabled = Disabled,
+            size = Size.ToString().ToLowerInvariant(),
+            mode = Mode,
+            emojis = Emojis
         };
-
         output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
+
+        // SSR Pre-render
+        var sb = new System.Text.StringBuilder();
+
+        if (isCancelAllowed)
+        {
+            sb.Append("<button type=\"button\" class=\"p-rating-cancel-item\" aria-label=\"Clear rating\" tabindex=\"0\">");
+            sb.Append("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><line x1=\"4.93\" y1=\"4.93\" x2=\"19.07\" y2=\"19.07\"/></svg>");
+            sb.Append("</button>");
+        }
+
+        sb.Append($"<div class=\"p-rating-items\" style=\"display: flex; {(isVertical ? "flex-direction: column;" : "align-items: center;")} gap: 0.375rem;\">");
+
+        var starFilledSvg = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"currentColor\" stroke=\"none\"><polygon points=\"12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2\"/></svg>";
+        var starEmptySvg = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polygon points=\"12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2\"/></svg>";
+
+        var emojisList = new string[] { "😡", "🙁", "😐", "😊", "🤩" };
+        if (!string.IsNullOrEmpty(Emojis))
+        {
+            emojisList = Emojis.Split(',').Select(e => e.Trim()).ToArray();
+        }
+
+        for (int i = 1; i <= Stars; i++)
+        {
+            var isFull = Value >= i;
+            var isHalf = AllowHalf && Value >= (i - 0.5) && Value < i;
+
+            if (Mode == "emoji")
+            {
+                var emoji = emojisList[(i - 1) % emojisList.Length];
+                var activeClass = isFull ? " p-rating-item-active" : "";
+                sb.Append($"<span class=\"p-rating-item p-rating-emoji-item{activeClass}\" data-value=\"{i}\" role=\"radio\" aria-checked=\"{(isFull ? "true" : "false")}\" aria-label=\"{i} Star\" tabindex=\"{(Readonly || Disabled ? "-1" : "0")}\">{emoji}</span>");
+            }
+            else if (Mode == "template")
+            {
+                var activeClass = isFull ? " p-rating-item-active" : "";
+                sb.Append($"<span class=\"p-rating-item p-rating-text-item{activeClass}\" data-value=\"{i}\" role=\"radio\" aria-checked=\"{(isFull ? "true" : "false")}\" aria-label=\"{i} Star\" tabindex=\"{(Readonly || Disabled ? "-1" : "0")}\">A</span>");
+            }
+            else
+            {
+                var activeClass = isFull ? " p-rating-item-active" : "";
+                var iconSvg = isFull ? starFilledSvg : starEmptySvg;
+                var halfDisplay = isHalf ? "display: block;" : "display: none;";
+
+                sb.Append($"<span class=\"p-rating-item p-rating-star-item{activeClass}\" data-value=\"{i}\" role=\"radio\" aria-checked=\"{(isFull || isHalf ? "true" : "false")}\" aria-label=\"{i} Stars\" tabindex=\"{(Readonly || Disabled ? "-1" : "0")}\">");
+                sb.Append("<div class=\"p-rating-half-wrapper\">");
+                sb.Append($"<span class=\"p-rating-icon p-rating-icon-off\">{iconSvg}</span>");
+                sb.Append($"<span class=\"p-rating-half-overlay\" style=\"{halfDisplay}\">");
+                sb.Append($"<span class=\"p-rating-icon p-rating-icon-half\">{starFilledSvg}</span>");
+                sb.Append("</span>");
+                sb.Append("</div>");
+                sb.Append("</span>");
+            }
+        }
+
+        sb.Append("</div>");
+        output.Content.SetHtmlContent(sb.ToString());
     }
 }
 
