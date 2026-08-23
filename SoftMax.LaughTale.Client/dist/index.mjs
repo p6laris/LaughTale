@@ -11706,18 +11706,22 @@ function SidebarIsland(container, props) {
             flex-direction: column;
             background: var(--p-surface-0);
             border-right: 1px solid var(--p-border-color);
-            width: 260px;
-            min-width: 260px;
-            max-height: calc(100vh - 5rem);
-            transition: width 180ms cubic-bezier(0.4, 0, 0.2, 1);
+            width: 270px;
+            min-width: 270px;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            left: 0;
+            transition: width 200ms cubic-bezier(0.4, 0, 0.2, 1), min-width 200ms cubic-bezier(0.4, 0, 0.2, 1);
             font-family: var(--p-font-family, inherit);
-            overflow-y: auto;
-            border-radius: var(--p-border-radius-xl);
-            box-shadow: var(--p-shadow-sm);
+            overflow: hidden;
+            border-radius: 0;
+            box-shadow: none;
+            z-index: 40;
         }
         .laughtale-sidebar.collapsed {
-            width: 64px;
-            min-width: 64px;
+            width: 68px;
+            min-width: 68px;
         }
         .laughtale-sidebar.right {
             border-right: none;
@@ -11727,26 +11731,32 @@ function SidebarIsland(container, props) {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0.875rem 1rem;
+            padding: 1rem 1.125rem;
             border-bottom: 1px solid var(--p-border-color);
             gap: 0.5rem;
+            height: 60px;
+            box-sizing: border-box;
+            flex-shrink: 0;
         }
         .sidebar-search-box {
-            padding: 0.5rem 0.75rem 0.25rem;
+            padding: 0.625rem 0.875rem 0.25rem;
+            flex-shrink: 0;
         }
         .sidebar-search-input {
             width: 100%;
             background: var(--p-surface-50);
             border: 1px solid var(--p-border-color);
             border-radius: var(--p-border-radius);
-            padding: 0.35rem 0.65rem;
-            font-size: 0.75rem;
+            padding: 0.4rem 0.65rem;
+            font-size: 0.775rem;
             color: var(--p-text-color);
             outline: none;
-            transition: border-color 0.15s ease;
+            transition: border-color 0.15s ease, background 0.15s ease;
+            box-sizing: border-box;
         }
         .sidebar-search-input:focus {
             border-color: var(--p-primary-500);
+            background: var(--p-surface-0);
         }
         .sidebar-toggle {
             background: transparent;
@@ -11757,8 +11767,8 @@ function SidebarIsland(container, props) {
             align-items: center;
             justify-content: center;
             border-radius: var(--p-border-radius);
-            width: 1.75rem;
-            height: 1.75rem;
+            width: 1.85rem;
+            height: 1.85rem;
             transition: background 150ms ease, color 150ms ease;
             flex-shrink: 0;
         }
@@ -11766,9 +11776,18 @@ function SidebarIsland(container, props) {
             background: var(--p-surface-100);
             color: var(--p-text-color);
         }
+        .sidebar-body {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 0.5rem 0.6rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
         .sidebar-tree-menu {
             list-style: none;
-            padding: 0.35rem 0.5rem;
+            padding: 0;
             margin: 0;
             display: flex;
             flex-direction: column;
@@ -11782,7 +11801,7 @@ function SidebarIsland(container, props) {
             text-decoration: none;
             border-radius: var(--p-border-radius);
             transition: background 150ms ease, color 150ms ease;
-            gap: 0.5rem;
+            gap: 0.6rem;
             font-size: 0.8125rem;
             font-weight: 500;
             white-space: nowrap;
@@ -11811,7 +11830,7 @@ function SidebarIsland(container, props) {
             justify-content: space-between;
             padding: 0.5rem 0.65rem;
             color: var(--p-text-muted);
-            font-size: 0.75rem;
+            font-size: 0.725rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.04em;
@@ -11858,6 +11877,22 @@ function SidebarIsland(container, props) {
         .collapsed .sidebar-sub-tree {
             display: none !important;
         }
+        .collapsed .sidebar-header {
+            justify-content: center;
+            padding: 0.75rem 0.5rem;
+        }
+        .collapsed .sidebar-item {
+            justify-content: center;
+            padding: 0.65rem 0;
+            width: 44px;
+            height: 44px;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+        .collapsed .sidebar-group-header {
+            justify-content: center;
+            padding: 0.5rem 0;
+        }
     `);
   function renderNode(item, level = 0) {
     const label = item.label || item.Label || item.title || item.Title || "";
@@ -11895,8 +11930,8 @@ function SidebarIsland(container, props) {
     }
     return `
             <li>
-                <a href="${url}" class="sidebar-item ${active ? "active" : ""}" data-sidebar-link="${url}">
-                    ${iconSvg ? `<span style="display: flex; width: 16px; height: 16px; color: ${active ? "var(--p-primary-600)" : "var(--p-text-muted)"};">${iconSvg}</span>` : ""}
+                <a href="${url}" class="sidebar-item ${active ? "active" : ""}" data-sidebar-link="${url}" title="${label}">
+                    ${iconSvg ? `<span style="display: flex; width: 18px; height: 18px; color: ${active ? "var(--p-primary-600)" : "var(--p-text-muted)"}; flex-shrink: 0;">${iconSvg}</span>` : ""}
                     <span class="sidebar-item-label">${label}</span>
                     ${badge ? `<span class="sidebar-badge">${badge}</span>` : ""}
                 </a>
@@ -11907,9 +11942,9 @@ function SidebarIsland(container, props) {
     container.innerHTML = `
             <div class="laughtale-sidebar ${collapsed ? "collapsed" : ""} ${position}">
                 <div class="sidebar-header">
-                    <div style="display: flex; align-items: center; gap: 0.5rem; overflow: hidden;">
-                        <span style="color: var(--p-primary-600); display: flex;">${LucideIcons.folderTree}</span>
-                        <span class="sidebar-header-title" style="font-weight: 800; font-size: 0.875rem; color: var(--p-text-color);">${title}</span>
+                    <div style="display: flex; align-items: center; gap: 0.6rem; overflow: hidden;">
+                        <span style="color: var(--p-primary-600); display: flex; flex-shrink: 0;">${LucideIcons.layers}</span>
+                        <span class="sidebar-header-title" style="font-weight: 800; font-size: 0.9rem; color: var(--p-text-color); white-space: nowrap;">${title}</span>
                     </div>
                     <button class="sidebar-toggle" aria-label="Toggle Sidebar" title="Collapse / Expand Sidebar">
                         ${collapsed ? LucideIcons.chevronRight : LucideIcons.chevronLeft}
@@ -11922,9 +11957,11 @@ function SidebarIsland(container, props) {
                     </div>
                 ` : ""}
 
-                <ul class="sidebar-tree-menu">
-                    ${items.map((item) => renderNode(item)).join("")}
-                </ul>
+                <div class="sidebar-body">
+                    <ul class="sidebar-tree-menu">
+                        ${items.map((item) => renderNode(item)).join("")}
+                    </ul>
+                </div>
             </div>
         `;
     container.querySelector(".sidebar-toggle")?.addEventListener("click", () => {
