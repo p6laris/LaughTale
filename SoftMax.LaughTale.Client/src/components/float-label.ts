@@ -1,7 +1,8 @@
 /**
- * SoftMax.LaughTale: Enterprise FloatLabel & IftaLabel Component (Aura FloatLabel)
+ * SoftMax.LaughTale: Enterprise FloatLabel Component (Aura FloatLabel)
  * Smooth floating label wrapper with 'over', 'in', and 'on' variants,
- * automatic child value/focus detection, and full Theme Studio & dark mode token support.
+ * automatic child value/focus/tags detection, MutationObserver tracking,
+ * and full Theme Studio & dark mode token support.
  */
 
 import { injectIslandStyle } from '../runtime/styles';
@@ -32,7 +33,7 @@ const CSS = `
     font-weight: 500;
     pointer-events: none;
     transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 1;
+    z-index: 10;
     line-height: 1;
     user-select: none;
 }
@@ -67,7 +68,7 @@ const CSS = `
     font-size: 0.75rem;
     font-weight: 600;
     color: var(--p-primary-500);
-    z-index: 2;
+    z-index: 15;
 }
 
 /* Variant: in (Infield top-aligned label) */
@@ -85,6 +86,8 @@ const CSS = `
 }
 .laughtale-float-label-in input,
 .laughtale-float-label-in .p-input,
+.laughtale-float-label-in .p-password-container,
+.laughtale-float-label-in .p-inputtags,
 .laughtale-float-label-in .cs-trigger,
 .laughtale-float-label-in .dp-trigger,
 .laughtale-float-label-in .ac-input-container {
@@ -95,8 +98,9 @@ const CSS = `
 /* Invalid State */
 .laughtale-float-label.invalid > label,
 .laughtale-float-label:has(.invalid) > label,
+.laughtale-float-label:has(.is-invalid) > label,
 .laughtale-float-label:has(:invalid) > label {
-    color: #ef4444 !important;
+    color: var(--p-red-500, #ef4444) !important;
 }
 
 /* Dark Mode Tokens */
@@ -112,6 +116,7 @@ const CSS = `
 }
 .dark .laughtale-float-label.invalid > label,
 .dark .laughtale-float-label:has(.invalid) > label,
+.dark .laughtale-float-label:has(.is-invalid) > label,
 .dark .laughtale-float-label:has(:invalid) > label {
     color: #f87171 !important;
 }
@@ -140,17 +145,20 @@ export default function FloatLabelIsland(container: HTMLElement, props: FloatLab
 
     // Find interactive child input / textarea / custom island
     const findTarget = (): HTMLElement | null => {
-        return wrap.querySelector('input, textarea, select, .cs-trigger, .dp-trigger, .ac-input');
+        return wrap.querySelector('input, textarea, select, .cs-trigger, .dp-trigger, .ac-input, .p-inputtags-input, .p-password-input');
     };
 
     function updateFloatingState() {
         const input = wrap.querySelector<HTMLInputElement | HTMLTextAreaElement>('input:not([type="hidden"]), textarea, select');
         const customText = wrap.querySelector<HTMLElement>('.cs-label:not(.placeholder), .dp-label:not(.placeholder), .ac-input');
+        const tags = wrap.querySelectorAll<HTMLElement>('.p-inputtags-tag, .chip-item, .p-chip');
 
         let hasVal = false;
         if (input && input.value && input.value.trim().length > 0) {
             hasVal = true;
         } else if (customText && customText.textContent && customText.textContent.trim().length > 0 && !customText.classList.contains('placeholder')) {
+            hasVal = true;
+        } else if (tags.length > 0) {
             hasVal = true;
         }
 
@@ -175,18 +183,35 @@ export default function FloatLabelIsland(container: HTMLElement, props: FloatLab
     // Event listeners
     wrap.addEventListener('input', updateFloatingState);
     wrap.addEventListener('change', updateFloatingState);
-    wrap.addEventListener('focusin', () => wrap.classList.add('is-focused'));
+    wrap.addEventListener('focusin', () => {
+        wrap.classList.add('is-focused');
+        updateFloatingState();
+    });
     wrap.addEventListener('focusout', () => {
         wrap.classList.remove('is-focused');
         updateFloatingState();
     });
 
     // Custom island change events
+    wrap.addEventListener('inputtags:change', updateFloatingState);
+    wrap.addEventListener('chips:change', updateFloatingState);
+    wrap.addEventListener('tags:add', updateFloatingState);
+    wrap.addEventListener('tags:remove', updateFloatingState);
+    wrap.addEventListener('password:change', updateFloatingState);
+    wrap.addEventListener('otp:change', updateFloatingState);
     wrap.addEventListener('cascadeselect:change', updateFloatingState);
     wrap.addEventListener('datepicker:change', updateFloatingState);
     wrap.addEventListener('autocomplete:change', updateFloatingState);
     wrap.addEventListener('select:change', updateFloatingState);
 
-    // Initial pass
+    // MutationObserver to detect async island rendering or DOM tag additions
+    const observer = new MutationObserver(() => {
+        updateFloatingState();
+    });
+    observer.observe(wrap, { childList: true, subtree: true, attributes: true });
+
+    // Initial passes
+    updateFloatingState();
     setTimeout(updateFloatingState, 50);
+    setTimeout(updateFloatingState, 200);
 }

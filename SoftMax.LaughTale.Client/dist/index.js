@@ -13478,15 +13478,18 @@ ${h.response}`).join("\n");
     const wrap = container.querySelector(".laughtale-float-label");
     const labelEl = wrap.querySelector("label");
     const findTarget = () => {
-      return wrap.querySelector("input, textarea, select, .cs-trigger, .dp-trigger, .ac-input");
+      return wrap.querySelector("input, textarea, select, .cs-trigger, .dp-trigger, .ac-input, .p-inputtags-input, .p-password-input");
     };
     function updateFloatingState() {
       const input = wrap.querySelector('input:not([type="hidden"]), textarea, select');
       const customText = wrap.querySelector(".cs-label:not(.placeholder), .dp-label:not(.placeholder), .ac-input");
+      const tags = wrap.querySelectorAll(".p-inputtags-tag, .chip-item, .p-chip");
       let hasVal = false;
       if (input && input.value && input.value.trim().length > 0) {
         hasVal = true;
       } else if (customText && customText.textContent && customText.textContent.trim().length > 0 && !customText.classList.contains("placeholder")) {
+        hasVal = true;
+      } else if (tags.length > 0) {
         hasVal = true;
       }
       if (hasVal) {
@@ -13506,16 +13509,31 @@ ${h.response}`).join("\n");
     });
     wrap.addEventListener("input", updateFloatingState);
     wrap.addEventListener("change", updateFloatingState);
-    wrap.addEventListener("focusin", () => wrap.classList.add("is-focused"));
+    wrap.addEventListener("focusin", () => {
+      wrap.classList.add("is-focused");
+      updateFloatingState();
+    });
     wrap.addEventListener("focusout", () => {
       wrap.classList.remove("is-focused");
       updateFloatingState();
     });
+    wrap.addEventListener("inputtags:change", updateFloatingState);
+    wrap.addEventListener("chips:change", updateFloatingState);
+    wrap.addEventListener("tags:add", updateFloatingState);
+    wrap.addEventListener("tags:remove", updateFloatingState);
+    wrap.addEventListener("password:change", updateFloatingState);
+    wrap.addEventListener("otp:change", updateFloatingState);
     wrap.addEventListener("cascadeselect:change", updateFloatingState);
     wrap.addEventListener("datepicker:change", updateFloatingState);
     wrap.addEventListener("autocomplete:change", updateFloatingState);
     wrap.addEventListener("select:change", updateFloatingState);
+    const observer = new MutationObserver(() => {
+      updateFloatingState();
+    });
+    observer.observe(wrap, { childList: true, subtree: true, attributes: true });
+    updateFloatingState();
     setTimeout(updateFloatingState, 50);
+    setTimeout(updateFloatingState, 200);
   }
   var CSS53;
   var init_float_label = __esm({
@@ -13541,7 +13559,7 @@ ${h.response}`).join("\n");
     font-weight: 500;
     pointer-events: none;
     transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 1;
+    z-index: 10;
     line-height: 1;
     user-select: none;
 }
@@ -13576,7 +13594,7 @@ ${h.response}`).join("\n");
     font-size: 0.75rem;
     font-weight: 600;
     color: var(--p-primary-500);
-    z-index: 2;
+    z-index: 15;
 }
 
 /* Variant: in (Infield top-aligned label) */
@@ -13594,6 +13612,8 @@ ${h.response}`).join("\n");
 }
 .laughtale-float-label-in input,
 .laughtale-float-label-in .p-input,
+.laughtale-float-label-in .p-password-container,
+.laughtale-float-label-in .p-inputtags,
 .laughtale-float-label-in .cs-trigger,
 .laughtale-float-label-in .dp-trigger,
 .laughtale-float-label-in .ac-input-container {
@@ -13604,8 +13624,9 @@ ${h.response}`).join("\n");
 /* Invalid State */
 .laughtale-float-label.invalid > label,
 .laughtale-float-label:has(.invalid) > label,
+.laughtale-float-label:has(.is-invalid) > label,
 .laughtale-float-label:has(:invalid) > label {
-    color: #ef4444 !important;
+    color: var(--p-red-500, #ef4444) !important;
 }
 
 /* Dark Mode Tokens */
@@ -13621,6 +13642,7 @@ ${h.response}`).join("\n");
 }
 .dark .laughtale-float-label.invalid > label,
 .dark .laughtale-float-label:has(.invalid) > label,
+.dark .laughtale-float-label:has(.is-invalid) > label,
 .dark .laughtale-float-label:has(:invalid) > label {
     color: #f87171 !important;
 }
@@ -13648,7 +13670,7 @@ ${h.response}`).join("\n");
     const wrap = container.querySelector(".laughtale-ifta-label");
     const labelEl = wrap.querySelector("label");
     labelEl?.addEventListener("click", () => {
-      const input = wrap.querySelector("input, textarea, select, .cs-trigger, .dp-trigger, .ac-input");
+      const input = wrap.querySelector("input, textarea, select, .cs-trigger, .dp-trigger, .ac-input, .p-inputtags-input, .p-password-input");
       if (input) {
         input.focus();
         if (typeof input.click === "function" && !input.matches("input, textarea")) {
@@ -13681,7 +13703,7 @@ ${h.response}`).join("\n");
     font-weight: 600;
     pointer-events: none;
     transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 1;
+    z-index: 10;
     line-height: 1;
     user-select: none;
 }
@@ -13690,6 +13712,8 @@ ${h.response}`).join("\n");
 .laughtale-ifta-label textarea,
 .laughtale-ifta-label select,
 .laughtale-ifta-label .p-input,
+.laughtale-ifta-label .p-password-container,
+.laughtale-ifta-label .p-inputtags,
 .laughtale-ifta-label .cs-trigger,
 .laughtale-ifta-label .dp-trigger,
 .laughtale-ifta-label .ac-input-container {
@@ -13708,8 +13732,9 @@ ${h.response}`).join("\n");
 /* Invalid State */
 .laughtale-ifta-label.invalid > label,
 .laughtale-ifta-label:has(.invalid) > label,
+.laughtale-ifta-label:has(.is-invalid) > label,
 .laughtale-ifta-label:has(:invalid) > label {
-    color: #ef4444 !important;
+    color: var(--p-red-500, #ef4444) !important;
 }
 
 /* Dark Mode Tokens */
@@ -13721,6 +13746,7 @@ ${h.response}`).join("\n");
 }
 .dark .laughtale-ifta-label.invalid > label,
 .dark .laughtale-ifta-label:has(.invalid) > label,
+.dark .laughtale-ifta-label:has(.is-invalid) > label,
 .dark .laughtale-ifta-label:has(:invalid) > label {
     color: #f87171 !important;
 }

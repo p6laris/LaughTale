@@ -1,18 +1,9 @@
-/**
- * SoftMax.LaughTale: Enterprise IftaLabel Component (Aura IftaLabel)
- * Infield top-aligned label container with seamless field padding,
- * focus/invalid states, and full Theme Studio & dark mode token adherence.
- */
+import {
+  injectIslandStyle
+} from "./chunk-3TFPN5JM.js";
 
-import { injectIslandStyle } from '../runtime/styles';
-
-export interface IftaLabelProps {
-    label?: string;
-    for?: string;
-    invalid?: boolean;
-}
-
-const CSS = `
+// ../SoftMax.LaughTale.Client/src/components/ifta-label.ts
+var CSS = `
 .laughtale-ifta-label {
     position: relative;
     display: inline-flex;
@@ -79,35 +70,31 @@ const CSS = `
     color: #f87171 !important;
 }
 `;
-
-export default function IftaLabelIsland(container: HTMLElement, props: IftaLabelProps) {
-    injectIslandStyle('laughtale-ifta-label', CSS);
-
-    const initialHtml = container.innerHTML;
-    const forAttr = props.for ? `for="${props.for}"` : '';
-
-    // Check if label element already exists in slotted markup
-    const existingLabel = container.querySelector('label');
-    const labelText = props.label || (existingLabel ? existingLabel.textContent : 'Label');
-
-    container.innerHTML = `
-        <div class="laughtale-ifta-label ${props.invalid ? 'invalid' : ''}">
+function IftaLabelIsland(container, props) {
+  injectIslandStyle("laughtale-ifta-label", CSS);
+  const initialHtml = container.innerHTML;
+  const forAttr = props.for ? `for="${props.for}"` : "";
+  const existingLabel = container.querySelector("label");
+  const labelText = props.label || (existingLabel ? existingLabel.textContent : "Label");
+  container.innerHTML = `
+        <div class="laughtale-ifta-label ${props.invalid ? "invalid" : ""}">
             ${initialHtml}
-            ${!existingLabel && labelText ? `<label ${forAttr}>${labelText}</label>` : ''}
+            ${!existingLabel && labelText ? `<label ${forAttr}>${labelText}</label>` : ""}
         </div>
     `;
-
-    const wrap = container.querySelector<HTMLElement>('.laughtale-ifta-label')!;
-    const labelEl = wrap.querySelector('label');
-
-    // Label click focus delegation
-    labelEl?.addEventListener('click', () => {
-        const input = wrap.querySelector<HTMLElement>('input, textarea, select, .cs-trigger, .dp-trigger, .ac-input, .p-inputtags-input, .p-password-input');
-        if (input) {
-            input.focus();
-            if (typeof (input as any).click === 'function' && !input.matches('input, textarea')) {
-                (input as any).click();
-            }
-        }
-    });
+  const wrap = container.querySelector(".laughtale-ifta-label");
+  const labelEl = wrap.querySelector("label");
+  labelEl?.addEventListener("click", () => {
+    const input = wrap.querySelector("input, textarea, select, .cs-trigger, .dp-trigger, .ac-input, .p-inputtags-input, .p-password-input");
+    if (input) {
+      input.focus();
+      if (typeof input.click === "function" && !input.matches("input, textarea")) {
+        input.click();
+      }
+    }
+  });
 }
+export {
+  IftaLabelIsland as default
+};
+//# sourceMappingURL=ifta-label-SJ3GAHKP.js.map
