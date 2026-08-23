@@ -40,6 +40,7 @@ public static class NavigationData
                 new("DatePicker", "calendar", "/enterprise#sec-datepicker"),
                 new("FloatLabel", "edit", "/enterprise#sec-floatlabel"),
                 new("IftaLabel", "edit", "/enterprise#sec-iftalabel"),
+                new("Label", "tag", "/enterprise#sec-label"),
                 new("InputGroup", "layers", "/enterprise#sec-inputgroup")
             }),
             new("Data & Tables (11)", "database", null, false, new List<SidebarItem>

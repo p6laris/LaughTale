@@ -30,9 +30,10 @@ public class IslandFieldTagHelper : TagHelper
 }
 
 /// <summary>
-/// Accessible, customizable label element. Can be placed standalone anywhere.
+/// Accessible, customizable label element supporting required indicators, wrappers, and Aura tokens.
 /// </summary>
 [HtmlTargetElement("island-label")]
+[HtmlTargetElement("island-form-label")]
 public class IslandLabelTagHelper : TagHelper
 {
     [HtmlAttributeName("for")]
@@ -41,36 +42,127 @@ public class IslandLabelTagHelper : TagHelper
     [HtmlAttributeName("asp-for")]
     public ModelExpression? AspFor { get; set; }
 
+    [HtmlAttributeName("text")]
+    public string? Text { get; set; }
+
+    [HtmlAttributeName("required")]
     public bool Required { get; set; } = false;
+
+    [HtmlAttributeName("required-indicator")]
+    public string RequiredIndicator { get; set; } = "*";
+
+    [HtmlAttributeName("disabled")]
+    public bool Disabled { get; set; } = false;
+
+    [HtmlAttributeName("size")]
+    public ComponentSize Size { get; set; } = ComponentSize.Normal;
+
+    [HtmlAttributeName("description")]
+    public string? Description { get; set; }
+
+    [HtmlAttributeName("badge")]
+    public string? Badge { get; set; }
+
+    [HtmlAttributeName("badge-severity")]
+    public string? BadgeSeverity { get; set; }
+
+    [HtmlAttributeName("wrapper")]
+    public bool Wrapper { get; set; } = false;
 
     [HtmlAttributeName("class")]
     public string? Class { get; set; }
 
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
+        if (context.AllAttributes.TryGetAttribute("required", out var reqAttr))
+        {
+            if (bool.TryParse(reqAttr.Value?.ToString(), out var rq)) Required = rq;
+            else if (reqAttr.Value != null) Required = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("disabled", out var disAttr))
+        {
+            if (bool.TryParse(disAttr.Value?.ToString(), out var ds)) Disabled = ds;
+            else if (disAttr.Value != null) Disabled = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("size", out var szAttr))
+        {
+            if (Enum.TryParse<ComponentSize>(szAttr.Value?.ToString(), true, out var sz)) Size = sz;
+        }
+        if (context.AllAttributes.TryGetAttribute("wrapper", out var wrAttr))
+        {
+            if (bool.TryParse(wrAttr.Value?.ToString(), out var wr)) Wrapper = wr;
+            else if (wrAttr.Value != null) Wrapper = true;
+        }
+
         output.TagName = "label";
+
         var targetId = For ?? AspFor?.Name;
         if (!string.IsNullOrWhiteSpace(targetId))
         {
             output.Attributes.SetAttribute("for", targetId);
         }
 
-        var baseClass = "text-xs font-semibold tracking-wide text-surface-700 dark:text-surface-300 flex items-center gap-1 select-none";
-        output.Attributes.SetAttribute("class", string.IsNullOrWhiteSpace(Class) ? baseClass : $"{baseClass} {Class}");
+        var classes = new List<string> { "laughtale-label", "p-label" };
+        if (Wrapper) classes.Add("p-label-wrapper");
+        if (Size != ComponentSize.Normal) classes.Add($"size-{Size.ToString().ToLowerInvariant()}");
+        if (Disabled) classes.Add("p-disabled is-disabled");
+        if (!string.IsNullOrWhiteSpace(Class)) classes.Add(Class);
+
+        output.Attributes.SetAttribute("class", string.Join(" ", classes));
 
         var childContent = await output.GetChildContentAsync();
-        var labelText = childContent.IsEmptyOrWhiteSpace && AspFor?.Metadata.DisplayName != null 
-            ? AspFor.Metadata.DisplayName 
-            : childContent.GetContent();
+        var labelText = !string.IsNullOrEmpty(Text) 
+            ? Text 
+            : (!childContent.IsEmptyOrWhiteSpace 
+                ? childContent.GetContent() 
+                : (AspFor?.Metadata.DisplayName ?? AspFor?.Name ?? ""));
 
-        if (Required)
+        var sb = new System.Text.StringBuilder();
+
+        if (Wrapper)
         {
-            output.Content.SetHtmlContent($"{labelText} <span class=\"text-red-500 font-bold ml-0.5\" aria-hidden=\"true\">*</span>");
+            // If wrapping a child control like a checkbox or radio
+            sb.Append(childContent.GetContent());
+            if (!string.IsNullOrEmpty(Text) || !string.IsNullOrEmpty(Description))
+            {
+                sb.Append("<div>");
+                if (!string.IsNullOrEmpty(labelText))
+                {
+                    sb.Append($"<span class=\"p-label-text\">{labelText}</span>");
+                }
+                if (Required)
+                {
+                    sb.Append($" <span class=\"p-label-required\" aria-hidden=\"true\">{System.Net.WebUtility.HtmlEncode(RequiredIndicator)}</span>");
+                }
+                if (!string.IsNullOrEmpty(Badge))
+                {
+                    sb.Append($" <span class=\"p-label-badge\">{System.Net.WebUtility.HtmlEncode(Badge)}</span>");
+                }
+                if (!string.IsNullOrEmpty(Description))
+                {
+                    sb.Append($"<span class=\"p-label-description\">{System.Net.WebUtility.HtmlEncode(Description)}</span>");
+                }
+                sb.Append("</div>");
+            }
         }
         else
         {
-            output.Content.SetHtmlContent(labelText);
+            sb.Append($"<span class=\"p-label-text\">{labelText}</span>");
+            if (Required)
+            {
+                sb.Append($" <span class=\"p-label-required\" aria-hidden=\"true\">{System.Net.WebUtility.HtmlEncode(RequiredIndicator)}</span>");
+            }
+            if (!string.IsNullOrEmpty(Badge))
+            {
+                sb.Append($" <span class=\"p-label-badge\">{System.Net.WebUtility.HtmlEncode(Badge)}</span>");
+            }
+            if (!string.IsNullOrEmpty(Description))
+            {
+                sb.Append($"<span class=\"p-label-description\">{System.Net.WebUtility.HtmlEncode(Description)}</span>");
+            }
         }
+
+        output.Content.SetHtmlContent(sb.ToString());
     }
 }
 
