@@ -59,7 +59,7 @@ export default function SpeedDialIsland(container: HTMLElement, props: SpeedDial
         `).join('');
 
         container.innerHTML = `
-            <div class="laughtale-speed-dial" style="position: relative; display: inline-flex; flex-direction: column-reverse; align-items: center; gap: 0.75rem;">
+            <div class="laughtale-speed-dial" style="position: fixed; bottom: 2rem; right: 2rem; z-index: 50; display: flex; flex-direction: column-reverse; align-items: center; gap: 0.75rem;">
                 <!-- Main FAB Button -->
                 <button type="button" class="speed-dial-main-btn" style="width: 3.25rem; height: 3.25rem; border-radius: 50%; border: none; background: var(--p-primary-600); color: #ffffff; box-shadow: var(--p-shadow-lg); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); transform: rotate(${isOpen ? '45deg' : '0deg'});">
                     ${LucideIcons.plus}

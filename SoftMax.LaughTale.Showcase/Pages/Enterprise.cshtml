@@ -4,10 +4,8 @@
     ViewData["Title"] = "Enterprise Component Explorer (64 Components)";
 }
 
-<!-- Floating Global Helpers -->
+<!-- Floating Toast Notification Container -->
 <island-toast />
-<island-scroll-top />
-<island-speed-dial actions="@Model.QuickActions" direction="Up" />
 
 <!-- Top Breadcrumb & Quick Actions Bar -->
 <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 2rem; background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-xl); padding: 0.75rem 1.25rem; box-shadow: var(--p-shadow-sm); flex-wrap: wrap;">
@@ -24,7 +22,7 @@
 <div class="enterprise-sections" style="width: 100%;">
 
     <!-- Dynamic Form -->
-    <section id="sec-dynamic-form" class="component-card">
+    <section id="sec-dynamic-form" class="component-card active-card" style="display: block;">
         <div class="card-header">
             <div>
                 <h2>Dynamic Form Generator</h2>
@@ -613,7 +611,7 @@
         </div>
     </section>
 
-    <!-- SpeedDial FAB -->
+    <!-- SpeedDial FAB Sandbox -->
     <section id="sec-speed-dial" class="component-card">
         <div class="card-header">
             <div>
@@ -623,11 +621,11 @@
             <span class="aura-tag tag-emerald">FAB</span>
         </div>
         <div class="card-body">
-            <p style="font-size: 0.875rem; color: var(--p-text-muted);">See the live floating action button in the bottom right corner of the window.</p>
+            <island-speed-dial actions="@Model.QuickActions" direction="Up" />
         </div>
     </section>
 
-    <!-- ScrollTop -->
+    <!-- ScrollTop Sandbox -->
     <section id="sec-scroll-top" class="component-card">
         <div class="card-header">
             <div>
@@ -637,7 +635,8 @@
             <span class="aura-tag tag-slate">Scroll</span>
         </div>
         <div class="card-body">
-            <p style="font-size: 0.875rem; color: var(--p-text-muted);">Scroll down any page to see the smooth float-in ScrollTop button.</p>
+            <island-scroll-top />
+            <p style="font-size: 0.875rem; color: var(--p-text-muted);">Scroll down this page to see the smooth float-in ScrollTop button.</p>
         </div>
     </section>
 
@@ -983,6 +982,9 @@
     margin-bottom: 2rem;
     display: none;
 }
+.component-card.active-card {
+    display: block !important;
+}
 .component-card .card-header {
     display: flex;
     align-items: flex-start;
@@ -1006,65 +1008,69 @@
 </style>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    const sections = Array.from(document.querySelectorAll('.enterprise-sections > section'));
-    
-    function activateSection(targetId) {
+(function() {
+    function showTabSection(targetId) {
         if (!targetId || targetId === '#' || targetId === '/enterprise') {
-            targetId = sections[0]?.id ? `#${sections[0].id}` : '';
+            targetId = 'sec-dynamic-form';
         }
-        if (!targetId) return;
+        const id = targetId.replace(/^.*#/, '').trim() || 'sec-dynamic-form';
+        const allCards = document.querySelectorAll('.enterprise-sections > section');
+        if (!allCards || !allCards.length) return;
 
-        const cleanId = targetId.includes('#') ? targetId.split('#')[1] : targetId;
-        const targetSection = document.getElementById(cleanId);
-        
-        if (targetSection) {
-            sections.forEach(sec => {
-                if (sec === targetSection) {
-                    sec.style.display = 'block';
-                    sec.style.opacity = '1';
-                } else {
-                    sec.style.display = 'none';
-                }
-            });
+        let matched = false;
+        allCards.forEach(card => {
+            if (card.id === id) {
+                card.style.display = 'block';
+                card.classList.add('active-card');
+                matched = true;
+            } else {
+                card.style.display = 'none';
+                card.classList.remove('active-card');
+            }
+        });
 
-            // Highlight matching link across the global sidebar
-            document.querySelectorAll('aside a, [data-sidebar-link]').forEach(link => {
-                const href = link.getAttribute('href') || '';
-                if (href.includes(`#${cleanId}`)) {
-                    link.classList.add('active');
-                } else {
-                    link.classList.remove('active');
-                }
-            });
-
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            window.dispatchEvent(new Event('resize'));
+        if (!matched && allCards[0]) {
+            allCards[0].style.display = 'block';
+            allCards[0].classList.add('active-card');
         }
+
+        // Highlight active link in sidebar
+        document.querySelectorAll('aside a, [data-sidebar-link]').forEach(link => {
+            const href = link.getAttribute('href') || '';
+            if (href.endsWith('#' + id)) {
+                link.classList.add('active');
+            } else {
+                link.classList.remove('active');
+            }
+        });
+
+        window.dispatchEvent(new Event('resize'));
     }
 
-    // Intercept clicks on sidebar items
-    document.addEventListener('click', (e) => {
+    // Intercept clicks on links
+    document.addEventListener('click', function(e) {
         const link = e.target.closest('a');
-        if (link) {
-            const href = link.getAttribute('href') || '';
-            if (href.includes('#sec-')) {
-                const secId = href.split('#')[1];
-                if (document.getElementById(secId)) {
-                    e.preventDefault();
-                    history.pushState(null, '', '#' + secId);
-                    activateSection('#' + secId);
-                }
-            }
+        if (!link) return;
+        const href = link.getAttribute('href') || '';
+        if (href.includes('#sec-')) {
+            const hash = href.substring(href.indexOf('#'));
+            e.preventDefault();
+            history.pushState(null, '', hash);
+            showTabSection(hash);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     });
 
-    // Handle initial hash or default to first section
-    const initialHash = window.location.hash || (sections[0] ? `#${sections[0].id}` : '');
-    activateSection(initialHash);
-
-    window.addEventListener('hashchange', () => {
-        activateSection(window.location.hash);
+    window.addEventListener('hashchange', function() {
+        showTabSection(window.location.hash);
     });
-});
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            showTabSection(window.location.hash);
+        });
+    } else {
+        showTabSection(window.location.hash);
+    }
+})();
 </script>

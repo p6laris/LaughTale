@@ -46,6 +46,13 @@ export default function TabsIsland(container: HTMLElement, props: TabsProps) {
     injectIslandStyle('tabs', CSS);
     const tabs = props.tabs || [];
     let activeIndex = props.activeIndex || 0;
+    const initialSlots: Record<string, HTMLElement> = {};
+    container.querySelectorAll<HTMLElement>('[data-slot]').forEach((el) => {
+        const slotKey = el.getAttribute('data-slot') || '';
+        if (slotKey) {
+            initialSlots[slotKey] = el.cloneNode(true) as HTMLElement;
+        }
+    });
 
     function render() {
         const headerButtons = tabs.map((tab, idx) => {
@@ -81,15 +88,16 @@ export default function TabsIsland(container: HTMLElement, props: TabsProps) {
         `;
 
         // Slot projection support for Razor slot templates
-        const externalSlot = container.querySelector(`[data-slot="tab-${activeIndex}"]`);
+        const slotEl = initialSlots[`tab-${activeIndex}`];
         const targetContainer = container.querySelector('.tab-slot-content');
-        if (externalSlot && targetContainer) {
+        if (slotEl && targetContainer) {
             targetContainer.innerHTML = '';
-            targetContainer.appendChild(externalSlot);
+            targetContainer.appendChild(slotEl.cloneNode(true));
         }
 
         container.querySelectorAll('.tab-header-btn').forEach((btn) => {
-            btn.addEventListener('click', () => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
                 const idx = Number(btn.getAttribute('data-idx'));
                 activeIndex = idx;
                 render();

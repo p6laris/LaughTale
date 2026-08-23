@@ -5488,7 +5488,7 @@ function SpeedDialIsland(container, props) {
             </button>
         `).join("");
     container.innerHTML = `
-            <div class="laughtale-speed-dial" style="position: relative; display: inline-flex; flex-direction: column-reverse; align-items: center; gap: 0.75rem;">
+            <div class="laughtale-speed-dial" style="position: fixed; bottom: 2rem; right: 2rem; z-index: 50; display: flex; flex-direction: column-reverse; align-items: center; gap: 0.75rem;">
                 <!-- Main FAB Button -->
                 <button type="button" class="speed-dial-main-btn" style="width: 3.25rem; height: 3.25rem; border-radius: 50%; border: none; background: var(--p-primary-600); color: #ffffff; box-shadow: var(--p-shadow-lg); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); transform: rotate(${isOpen ? "45deg" : "0deg"});">
                     ${LucideIcons.plus}
@@ -5906,6 +5906,13 @@ function TabsIsland(container, props) {
   injectIslandStyle("tabs", CSS26);
   const tabs = props.tabs || [];
   let activeIndex = props.activeIndex || 0;
+  const initialSlots = {};
+  container.querySelectorAll("[data-slot]").forEach((el) => {
+    const slotKey = el.getAttribute("data-slot") || "";
+    if (slotKey) {
+      initialSlots[slotKey] = el.cloneNode(true);
+    }
+  });
   function render() {
     const headerButtons = tabs.map((tab, idx) => {
       const isActive = idx === activeIndex;
@@ -5936,14 +5943,15 @@ function TabsIsland(container, props) {
                 </div>
             </div>
         `;
-    const externalSlot = container.querySelector(`[data-slot="tab-${activeIndex}"]`);
+    const slotEl = initialSlots[`tab-${activeIndex}`];
     const targetContainer = container.querySelector(".tab-slot-content");
-    if (externalSlot && targetContainer) {
+    if (slotEl && targetContainer) {
       targetContainer.innerHTML = "";
-      targetContainer.appendChild(externalSlot);
+      targetContainer.appendChild(slotEl.cloneNode(true));
     }
     container.querySelectorAll(".tab-header-btn").forEach((btn) => {
-      btn.addEventListener("click", () => {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
         const idx = Number(btn.getAttribute("data-idx"));
         activeIndex = idx;
         render();
@@ -11879,7 +11887,13 @@ function SidebarIsland(container, props) {
         }
         .collapsed .sidebar-header {
             justify-content: center;
-            padding: 0.75rem 0.5rem;
+            padding: 0;
+        }
+        .collapsed .sidebar-header .sidebar-brand-group {
+            display: none !important;
+        }
+        .collapsed .sidebar-header .sidebar-toggle {
+            margin: 0 auto;
         }
         .collapsed .sidebar-item {
             justify-content: center;
@@ -11890,8 +11904,7 @@ function SidebarIsland(container, props) {
             box-sizing: border-box;
         }
         .collapsed .sidebar-group-header {
-            justify-content: center;
-            padding: 0.5rem 0;
+            display: none !important;
         }
     `);
   function renderNode(item, level = 0) {
@@ -11942,7 +11955,7 @@ function SidebarIsland(container, props) {
     container.innerHTML = `
             <div class="laughtale-sidebar ${collapsed ? "collapsed" : ""} ${position}">
                 <div class="sidebar-header">
-                    <div style="display: flex; align-items: center; gap: 0.6rem; overflow: hidden;">
+                    <div class="sidebar-brand-group" style="display: flex; align-items: center; gap: 0.6rem; overflow: hidden;">
                         <span style="color: var(--p-primary-600); display: flex; flex-shrink: 0;">${LucideIcons.layers}</span>
                         <span class="sidebar-header-title" style="font-weight: 800; font-size: 0.9rem; color: var(--p-text-color); white-space: nowrap;">${title}</span>
                     </div>
