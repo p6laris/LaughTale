@@ -1,8 +1,8 @@
 /**
  * SoftMax.LaughTale: Enterprise InputGroup & InputGroupAddon (Aura InputGroup)
  * High-precision grouping container matching PrimeVue Aura pixel-for-pixel:
- * single unified rounded pill, border-collapse, unclipped focus rings,
- * native inputs, selects, buttons, checkboxes, and floating labels.
+ * single unified rounded pill, border-collapse, exact identical height across all parts,
+ * unclipped focus rings, native inputs, selects, buttons, checkboxes, and floating labels.
  */
 
 import { injectIslandStyle } from '../runtime/styles';
@@ -24,24 +24,57 @@ const CSS = `
     display: flex;
     align-items: stretch;
     width: 100%;
+    height: 2.5rem;
+    min-height: 2.5rem;
     font-family: var(--p-font-family, inherit);
     box-sizing: border-box;
     position: relative;
+}
+
+/* FloatLabel over spacing on inputgroup */
+.laughtale-inputgroup:has(.laughtale-float-label-over),
+.p-inputgroup:has(.laughtale-float-label-over) {
+    margin-top: 1rem;
 }
 
 /* All direct children and island root elements inside inputgroup */
 .laughtale-inputgroup > *,
 .p-inputgroup > * {
     border-radius: 0 !important;
-    margin-left: -1px;
+    margin: 0 0 0 -1px !important;
     box-sizing: border-box;
-    min-height: 2.5rem;
+    height: 100% !important;
+    min-height: 100% !important;
+    display: flex;
+    align-items: stretch;
+    flex-shrink: 0;
+}
+
+/* Flexible inputs / float labels fill remaining width */
+.laughtale-inputgroup > input,
+.laughtale-inputgroup > .p-input,
+.laughtale-inputgroup > [data-island="float-label"],
+.laughtale-inputgroup > [data-island="ifta-label"],
+.laughtale-inputgroup > [data-island="select"],
+.laughtale-inputgroup > [data-island="datepicker"],
+.laughtale-inputgroup > [data-island="autocomplete"],
+.laughtale-inputgroup > [data-island="cascadeselect"],
+.p-inputgroup > input,
+.p-inputgroup > .p-input,
+.p-inputgroup > [data-island="float-label"],
+.p-inputgroup > [data-island="ifta-label"],
+.p-inputgroup > [data-island="select"],
+.p-inputgroup > [data-island="datepicker"],
+.p-inputgroup > [data-island="autocomplete"],
+.p-inputgroup > [data-island="cascadeselect"] {
+    flex: 1 1 auto;
+    width: 1%;
 }
 
 /* First child outer corners */
 .laughtale-inputgroup > *:first-child,
 .p-inputgroup > *:first-child {
-    margin-left: 0;
+    margin-left: 0 !important;
     border-top-left-radius: var(--p-border-radius) !important;
     border-bottom-left-radius: var(--p-border-radius) !important;
 }
@@ -59,12 +92,13 @@ const CSS = `
     border-radius: var(--p-border-radius) !important;
 }
 
-/* Inner inputs, triggers, select boxes, and buttons corner overrides */
+/* Inner inputs, triggers, select boxes, and buttons corner & height overrides */
 .laughtale-inputgroup input,
 .laughtale-inputgroup textarea,
 .laughtale-inputgroup .p-input,
 .laughtale-inputgroup .cs-trigger,
 .laughtale-inputgroup .dp-trigger,
+.laughtale-inputgroup .laughtale-select,
 .laughtale-inputgroup .laughtale-select-trigger,
 .laughtale-inputgroup .p-button,
 .p-inputgroup input,
@@ -72,11 +106,14 @@ const CSS = `
 .p-inputgroup .p-input,
 .p-inputgroup .cs-trigger,
 .p-inputgroup .dp-trigger,
+.p-inputgroup .laughtale-select,
 .p-inputgroup .laughtale-select-trigger,
 .p-inputgroup .p-button {
     border-radius: 0 !important;
-    height: 100%;
+    height: 100% !important;
+    min-height: 100% !important;
     box-sizing: border-box;
+    margin: 0 !important;
 }
 
 .laughtale-inputgroup > *:first-child input,
@@ -128,6 +165,8 @@ const CSS = `
     font-size: 0.875rem;
     font-weight: 500;
     min-width: 2.75rem;
+    height: 100% !important;
+    min-height: 100% !important;
     user-select: none;
     white-space: nowrap;
     box-sizing: border-box;
@@ -156,9 +195,11 @@ const CSS = `
     cursor: pointer;
     transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
     flex-shrink: 0;
+    height: 100% !important;
+    min-height: 100% !important;
 }
 
-/* Primary Dark / Contrast button (matches PrimeVue Aura 'Search' button) */
+/* Primary Contrast button */
 .laughtale-inputgroup .p-button-primary,
 .p-inputgroup .p-button-primary {
     background: var(--p-surface-950);
@@ -184,32 +225,27 @@ const CSS = `
     color: var(--p-text-color);
 }
 
-/* Select inside InputGroup */
-.laughtale-inputgroup .laughtale-select,
-.p-inputgroup .laughtale-select {
-    height: 100%;
-}
-.laughtale-inputgroup .laughtale-select-trigger,
-.p-inputgroup .laughtale-select-trigger {
-    height: 100%;
-    min-height: 2.5rem;
-    border-color: var(--p-border-color);
-}
-
 /* FloatLabel & IftaLabel inside InputGroup */
 .laughtale-inputgroup .laughtale-float-label,
 .p-inputgroup .laughtale-float-label {
-    flex: 1;
-    margin-top: 0;
-    min-height: 2.5rem;
+    flex: 1 1 auto;
+    width: 100%;
+    margin: 0 !important;
+    height: 100% !important;
+    min-height: 100% !important;
     display: flex;
+    flex-direction: column;
     justify-content: center;
 }
 .laughtale-inputgroup .laughtale-ifta-label,
 .p-inputgroup .laughtale-ifta-label {
-    flex: 1;
-    min-height: 3rem;
+    flex: 1 1 auto;
+    width: 100%;
+    margin: 0 !important;
+    height: 100% !important;
+    min-height: 100% !important;
     display: flex;
+    flex-direction: column;
     justify-content: center;
 }
 
