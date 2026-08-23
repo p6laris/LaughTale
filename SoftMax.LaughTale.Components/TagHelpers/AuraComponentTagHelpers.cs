@@ -620,8 +620,8 @@ public class IslandAutoCompleteTagHelper : TagHelper
     public bool ShowClear { get; set; } = true;
     public bool ForceSelection { get; set; } = false;
     public bool Multiple { get; set; } = false;
-    public string Size { get; set; } = "normal";
-    public string Variant { get; set; } = "outlined";
+    public ComponentSize Size { get; set; } = ComponentSize.Normal;
+    public InputVariant Variant { get; set; } = InputVariant.Outlined;
     public bool Invalid { get; set; } = false;
     public bool Fluid { get; set; } = false;
     public bool Loading { get; set; } = false;
@@ -647,8 +647,8 @@ public class IslandAutoCompleteTagHelper : TagHelper
             showClear = ShowClear,
             forceSelection = ForceSelection,
             multiple = Multiple,
-            size = Size,
-            variant = Variant,
+            size = Size.ToString().ToLowerInvariant(),
+            variant = Variant.ToString().ToLowerInvariant(),
             invalid = Invalid,
             fluid = Fluid,
             loading = Loading,
@@ -987,15 +987,22 @@ public class IslandMultiSelectTagHelper : TagHelper
 }
 
 /// <summary>
-/// TagHelper for <island-cascadeselect />
+/// TagHelper for <island-cascadeselect /> (Aura CascadeSelect)
 /// </summary>
 [HtmlTargetElement("island-cascadeselect")]
 public class IslandCascadeSelectTagHelper : TagHelper
 {
     public List<CascadeSelectNode>? Options { get; set; }
-    public string? Placeholder { get; set; } = "Select category...";
+    public string? Placeholder { get; set; } = "Select a City";
     public string? TargetInput { get; set; }
+    public string? Value { get; set; }
     public bool Disabled { get; set; } = false;
+    public bool ShowClear { get; set; } = false;
+    public ComponentSize Size { get; set; } = ComponentSize.Normal;
+    public InputVariant Variant { get; set; } = InputVariant.Outlined;
+    public bool Invalid { get; set; } = false;
+    public bool Fluid { get; set; } = false;
+    public bool Loading { get; set; } = false;
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
@@ -1009,7 +1016,14 @@ public class IslandCascadeSelectTagHelper : TagHelper
             options = Options ?? new(),
             placeholder = Placeholder,
             targetInputName = TargetInput,
-            disabled = Disabled
+            value = Value,
+            disabled = Disabled,
+            showClear = ShowClear,
+            size = Size.ToString().ToLowerInvariant(),
+            variant = Variant.ToString().ToLowerInvariant(),
+            invalid = Invalid,
+            fluid = Fluid,
+            loading = Loading
         };
 
         output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));

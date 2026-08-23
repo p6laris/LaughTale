@@ -169,12 +169,18 @@ public record CascadeSelectNode<TValue>(
     string Name,
     TValue Value,
     string? Code = null,
+    string? Icon = null,
+    string? Image = null,
+    bool Disabled = false,
     List<CascadeSelectNode<TValue>>? Children = null
 );
 
 public record CascadeSelectNode(
     string Name,
     string Code,
+    string? Icon = null,
+    string? Image = null,
+    bool Disabled = false,
     List<CascadeSelectNode>? Children = null
 );
 

@@ -47,24 +47,77 @@ public class EnterpriseModel : PageModel
 
     public List<CascadeSelectNode> CascadeRegions { get; set; } = new()
     {
-        new("Kurdistan Region", "kurdistan", new()
+        new("Kurdistan Region", "kurdistan", "shield", null, false, new()
         {
-            new("Erbil HQ", "erbil", new()
+            new("Erbil HQ", "erbil", "server", null, false, new()
             {
-                new("Datacenter Alpha", "ebl-dc-1"),
-                new("Datacenter Beta", "ebl-dc-2")
+                new("Datacenter Alpha", "ebl-dc-1", "hardDrive"),
+                new("Datacenter Beta", "ebl-dc-2", "hardDrive")
             }),
-            new("Sulaymaniyah Branch", "sul", new()
+            new("Sulaymaniyah Branch", "sul", "server", null, false, new()
             {
-                new("Primary Node", "sul-dc-1")
+                new("Primary Node", "sul-dc-1", "hardDrive")
             })
         }),
-        new("Global Regions", "international", new()
+        new("Global Regions", "international", "globe", null, false, new()
         {
-            new("Europe West (Frankfurt)", "eu-west", new()
+            new("Europe West (Frankfurt)", "eu-west", "server", null, false, new()
             {
-                new("Edge Point 1", "fra-01"),
-                new("Edge Point 2", "fra-02")
+                new("Edge Point 1", "fra-01", "cpu"),
+                new("Edge Point 2", "fra-02", "cpu")
+            })
+        })
+    };
+
+    public List<CascadeSelectNode> CascadeCountries { get; set; } = new()
+    {
+        new("Australia", "AU", "globe", null, false, new()
+        {
+            new("New South Wales", "NSW", "mapPin", null, false, new()
+            {
+                new("Sydney", "A-SY", "mapPin"),
+                new("Newcastle", "A-NE", "mapPin"),
+                new("Wollongong", "A-WO", "mapPin")
+            }),
+            new("Queensland", "QLD", "mapPin", null, false, new()
+            {
+                new("Brisbane", "A-BR", "mapPin"),
+                new("Townsville", "A-TO", "mapPin")
+            })
+        }),
+        new("Canada", "CA", "globe", null, false, new()
+        {
+            new("Quebec", "QC", "mapPin", null, false, new()
+            {
+                new("Montreal", "C-MO", "mapPin"),
+                new("Quebec City", "C-QU", "mapPin")
+            }),
+            new("Ontario", "ON", "mapPin", null, false, new()
+            {
+                new("Ottawa", "C-OT", "mapPin"),
+                new("Toronto", "C-TO", "mapPin")
+            })
+        }),
+        new("United States", "US", "globe", null, false, new()
+        {
+            new("California", "CA_US", "mapPin", null, false, new()
+            {
+                new("Los Angeles", "US-LA", "mapPin"),
+                new("San Diego", "US-SD", "mapPin"),
+                new("San Francisco", "US-SF", "mapPin")
+            }),
+            new("Florida", "FL_US", "mapPin", null, false, new()
+            {
+                new("Jacksonville", "US-JA", "mapPin"),
+                new("Miami", "US-MI", "mapPin"),
+                new("Tampa", "US-TA", "mapPin"),
+                new("Orlando", "US-OR", "mapPin")
+            }),
+            new("Texas", "TX_US", "mapPin", null, false, new()
+            {
+                new("Austin", "US-AU", "mapPin"),
+                new("Dallas", "US-DA", "mapPin"),
+                new("Houston", "US-HO", "mapPin")
             })
         })
     };

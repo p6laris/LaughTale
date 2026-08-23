@@ -175,11 +175,11 @@
                 <div style="display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: center;">
                     <div style="flex: 1; min-width: 200px;">
                         <label style="font-size: 0.75rem; font-weight: 600; color: var(--p-text-muted); display: block; margin-bottom: 0.25rem;">Small</label>
-                        <island-autocomplete placeholder="Small size..." suggestions="@Model.CityOptions" size="small" />
+                        <island-autocomplete placeholder="Small size..." suggestions="@Model.CityOptions" size="@ComponentSize.Small" />
                     </div>
                     <div style="flex: 1; min-width: 200px;">
                         <label style="font-size: 0.75rem; font-weight: 600; color: var(--p-text-muted); display: block; margin-bottom: 0.25rem;">Filled Variant</label>
-                        <island-autocomplete placeholder="Filled variant..." suggestions="@Model.CityOptions" variant="filled" />
+                        <island-autocomplete placeholder="Filled variant..." suggestions="@Model.CityOptions" variant="@InputVariant.Filled" />
                     </div>
                     <div style="flex: 1; min-width: 200px;">
                         <label style="font-size: 0.75rem; font-weight: 600; color: var(--p-text-muted); display: block; margin-bottom: 0.25rem;">Invalid State</label>
@@ -227,12 +227,48 @@
         <div class="card-header">
             <div>
                 <h2>CascadeSelect Multi-Level</h2>
-                <p>Hierarchical multi-tier flyout menu for datacenters and regions.</p>
+                <p>Enterprise hierarchical cascading multi-tier flyout menu for deeply nested locations, categories, and datacenters.</p>
             </div>
-            <span class="aura-tag tag-slate">Hierarchy</span>
+            <span class="aura-tag tag-emerald">Form Control</span>
         </div>
-        <div class="card-body" style="max-width: 450px;">
-            <island-cascadeselect options="@Model.CascadeRegions" placeholder="Select Datacenter..." target-input-name="selected_region" />
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Demo 1: Countries & Cities (3 Levels) -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+                <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                    <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Global City Selection (3-Tier)</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1rem;">Browse Country -> State -> City with smooth flyout panels.</p>
+                    <island-cascadeselect options="@Model.CascadeCountries" placeholder="Select a City" show-clear="true" target-input="selected_city" />
+                </div>
+
+                <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                    <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Datacenter Clusters with Icons</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1rem;">Region -> Branch -> Edge Nodes with custom Lucide icons.</p>
+                    <island-cascadeselect options="@Model.CascadeRegions" placeholder="Select Cluster Node..." show-clear="true" target-input="selected_region" />
+                </div>
+            </div>
+
+            <!-- Demo 2: Sizes & Variants -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 1rem; color: var(--p-text-color);">Sizes & Variants</h3>
+                <div style="display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: center;">
+                    <div style="flex: 1; min-width: 200px;">
+                        <label style="font-size: 0.75rem; font-weight: 600; color: var(--p-text-muted); display: block; margin-bottom: 0.25rem;">Small</label>
+                        <island-cascadeselect options="@Model.CascadeCountries" placeholder="Small size..." size="@ComponentSize.Small" />
+                    </div>
+                    <div style="flex: 1; min-width: 200px;">
+                        <label style="font-size: 0.75rem; font-weight: 600; color: var(--p-text-muted); display: block; margin-bottom: 0.25rem;">Filled Variant</label>
+                        <island-cascadeselect options="@Model.CascadeCountries" placeholder="Filled variant..." variant="@InputVariant.Filled" />
+                    </div>
+                    <div style="flex: 1; min-width: 200px;">
+                        <label style="font-size: 0.75rem; font-weight: 600; color: var(--p-text-muted); display: block; margin-bottom: 0.25rem;">Invalid State</label>
+                        <island-cascadeselect options="@Model.CascadeCountries" placeholder="Invalid state..." invalid="true" />
+                    </div>
+                    <div style="flex: 1; min-width: 200px;">
+                        <label style="font-size: 0.75rem; font-weight: 600; color: var(--p-text-muted); display: block; margin-bottom: 0.25rem;">Disabled</label>
+                        <island-cascadeselect options="@Model.CascadeCountries" placeholder="Disabled state..." disabled="true" />
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 

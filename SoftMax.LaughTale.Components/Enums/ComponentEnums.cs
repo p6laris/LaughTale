@@ -1,5 +1,18 @@
 namespace SoftMax.LaughTale.Components.Enums;
 
+public enum InputVariant
+{
+    Outlined,
+    Filled
+}
+
+public enum FloatLabelVariant
+{
+    Over,
+    In,
+    On
+}
+
 public enum ComponentVariant
 {
     Solid,
@@ -13,6 +26,7 @@ public enum ComponentVariant
 public enum ComponentSize
 {
     Small,
+    Normal,
     Medium,
     Large,
     ExtraLarge
