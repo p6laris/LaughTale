@@ -1,8 +1,8 @@
 import { MenuItem } from '../types/models';
 import { LucideIcons, getLucideIcon } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
-import { useFloatingPosition } from '../../composables/useFloatingPosition'; // Assuming path
-import { useClickOutside } from '../../composables/useClickOutside';
+import { useFloatingPosition } from '../composables/useFloatingPosition';
+import { useClickOutside } from '../composables/useClickOutside';
 
 export interface MenuProps {
     items: MenuItem[];
@@ -78,13 +78,18 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps) {
         return `
             <ul class="menu-list">
                 ${menuItems.map(item => {
-                    if (item.separator) return `<li class="menu-separator"></li>`;
-                    const iconSvg = item.icon && (LucideIcons as any)[item.icon] ? (LucideIcons as any)[item.icon] : '';
+                    const isSeparator = (item as any).separator || (item as any).Separator;
+                    if (isSeparator) return `<li class="menu-separator"></li>`;
+                    const label = (item as any).label || (item as any).Label || (item as any).title || (item as any).Title || '';
+                    const url = (item as any).url || (item as any).Url || '#';
+                    const icon = (item as any).icon || (item as any).Icon || '';
+                    const disabled = (item as any).disabled || (item as any).Disabled;
+                    const iconSvg = icon && (LucideIcons as any)[icon] ? (LucideIcons as any)[icon] : (icon.startsWith('<svg') ? icon : '');
                     return `
                         <li>
-                            <a class="menu-item ${item.disabled ? 'disabled' : ''}" href="${item.url || '#'}" tabindex="0">
+                            <a class="menu-item ${disabled ? 'disabled' : ''}" href="${url}" tabindex="0">
                                 ${iconSvg ? `<span style="width: 16px; height: 16px; display: flex;">${iconSvg}</span>` : ''}
-                                <span>${item.label}</span>
+                                <span>${label}</span>
                             </a>
                         </li>
                     `;

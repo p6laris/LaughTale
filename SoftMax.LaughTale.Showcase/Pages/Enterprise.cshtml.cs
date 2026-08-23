@@ -247,6 +247,36 @@ public class EnterpriseModel : PageModel
         new("Node Zero-Trust #01")
     };
 
+    public List<MenuItem> HeaderMenuItems { get; set; } = new()
+    {
+        new("Overview", "home", false, false, "#overview"),
+        new("Form Controls", "fileText", false, false, "#sec-inputs-otp"),
+        new("Data & Tables", "database", false, false, "#sec-datagrid"),
+        new("Navigation", "compass", false, false, "#sec-menus-nav"),
+        new("Overlays", "layers", false, false, "#sec-overlays-popovers"),
+        new("Media", "image", false, false, "#sec-carousel-dropzone")
+    };
+
+    public List<SidebarItem> ComponentSidebarItems { get; set; } = new()
+    {
+        new("Dynamic Forms", "fileSpreadsheet", "#sec-dynamic-form", true, null, "Reflect"),
+        new("Splitter Panels", "columns3", "#sec-splitter"),
+        new("Advanced Selects", "listFilter", "#sec-advanced-selects"),
+        new("PickList & Transfer", "arrowLeftRight", "#sec-transfer-lists"),
+        new("Hierarchy & Terminal", "terminal", "#sec-hierarchy-terminal"),
+        new("Galleria & Dock", "layoutGrid", "#sec-galleria-dock"),
+        new("Form Inputs & OTP", "shieldAlert", "#sec-inputs-otp"),
+        new("Enhanced Inputs & Masks", "edit3", "#sec-enhanced-inputs"),
+        new("Panels, Tabs & Accordion", "folderTree", "#sec-panels-tabs"),
+        new("Security DataGrid", "table2", "#sec-datagrid"),
+        new("DataView & Paginator", "grid", "#sec-dataview-paginator"),
+        new("Carousel & Dropzone", "galleryThumbnails", "#sec-carousel-dropzone"),
+        new("TreeSelect & Meters", "gauge", "#sec-treeselect-meters"),
+        new("Progress & Skeleton", "loader2", "#sec-progress-skeleton"),
+        new("Overlays, Popovers & Dialogs", "messageSquare", "#sec-overlays-popovers"),
+        new("Navigation, Menus & Dock", "menu", "#sec-menus-nav")
+    };
+
     public void OnGet()
     {
     }

@@ -62,23 +62,26 @@ export default function AccordionIsland(container: HTMLElement, props: Accordion
     function render() {
         const tabHtml = tabs.map((tab, idx) => {
             const isOpen = disclosures[idx]?.isOpen ?? false;
+            const headerText = (tab as any).header || (tab as any).Header || (tab as any).title || (tab as any).Title || (tab as any).label || (tab as any).Label || `Tab ${idx + 1}`;
+            const contentText = (tab as any).content || (tab as any).Content || '';
+            const iconText = (tab as any).icon || (tab as any).Icon || '';
             return `
                 <div class="accordion-tab ${isOpen ? 'tab-open' : ''}" data-idx="${idx}" style="border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); margin-bottom: 0.5rem; background: var(--p-surface-0); overflow: hidden;">
                     <button type="button" 
                             class="accordion-header-btn" 
                             data-idx="${idx}" 
                             ${tab.disabled ? 'disabled' : ''} 
-                            style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0.875rem 1.25rem; border: none; background: ${isOpen ? 'var(--p-surface-50)' : 'var(--p-surface-0)'}; color: var(--p-surface-900); font-weight: 600; font-size: 0.875rem; cursor: ${tab.disabled ? 'not-allowed' : 'pointer'}; text-align: left; transition: background 0.15s ease;">
+                            style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0.875rem 1.25rem; border: none; background: ${isOpen ? 'var(--p-surface-50)' : 'var(--p-surface-0)'}; color: var(--p-text-color); font-weight: 600; font-size: 0.875rem; cursor: ${tab.disabled ? 'not-allowed' : 'pointer'}; text-align: left; transition: background 0.15s ease;">
                         <span style="display: flex; align-items: center; gap: 0.5rem;">
-                            ${tab.icon ? `<span>${tab.icon}</span>` : ''}
-                            <span>${tab.header}</span>
+                            ${iconText ? `<span>${iconText}</span>` : ''}
+                            <span>${headerText}</span>
                         </span>
-                        <span class="chevron-icon" style="color: var(--p-surface-500); display: flex; align-items: center; transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1); transform: rotate(${isOpen ? '180deg' : '0deg'});">
+                        <span class="chevron-icon" style="color: var(--p-text-muted); display: flex; align-items: center; transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1); transform: rotate(${isOpen ? '180deg' : '0deg'});">
                             ${LucideIcons.chevronDown}
                         </span>
                     </button>
-                    <div class="accordion-content" style="display: ${isOpen ? 'block' : 'none'}; padding: 1.25rem; border-top: 1px solid var(--p-border-color); font-size: 0.875rem; color: var(--p-surface-600); line-height: 1.6;">
-                        <div class="tab-slot" data-slot-index="${idx}">${tab.content || ''}</div>
+                    <div class="accordion-content" style="display: ${isOpen ? 'block' : 'none'}; padding: 1.25rem; border-top: 1px solid var(--p-border-color); font-size: 0.875rem; color: var(--p-text-muted); line-height: 1.6; background: var(--p-surface-0);">
+                        <div class="tab-slot" data-slot-index="${idx}">${contentText}</div>
                     </div>
                 </div>
             `;

@@ -786,13 +786,18 @@ function MenuIsland(container, props) {
     return `
             <ul class="menu-list">
                 ${menuItems.map((item) => {
-      if (item.separator) return `<li class="menu-separator"></li>`;
-      const iconSvg = item.icon && LucideIcons[item.icon] ? LucideIcons[item.icon] : "";
+      const isSeparator = item.separator || item.Separator;
+      if (isSeparator) return `<li class="menu-separator"></li>`;
+      const label = item.label || item.Label || item.title || item.Title || "";
+      const url = item.url || item.Url || "#";
+      const icon = item.icon || item.Icon || "";
+      const disabled = item.disabled || item.Disabled;
+      const iconSvg = icon && LucideIcons[icon] ? LucideIcons[icon] : icon.startsWith("<svg") ? icon : "";
       return `
                         <li>
-                            <a class="menu-item ${item.disabled ? "disabled" : ""}" href="${item.url || "#"}" tabindex="0">
+                            <a class="menu-item ${disabled ? "disabled" : ""}" href="${url}" tabindex="0">
                                 ${iconSvg ? `<span style="width: 16px; height: 16px; display: flex;">${iconSvg}</span>` : ""}
-                                <span>${item.label}</span>
+                                <span>${label}</span>
                             </a>
                         </li>
                     `;

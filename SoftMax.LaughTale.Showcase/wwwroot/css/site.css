@@ -294,3 +294,18 @@ body {
     box-shadow: var(--p-shadow-md);
     border-color: var(--p-surface-300);
 }
+
+.p-card {
+    background: var(--p-surface-0);
+    border: 1px solid var(--p-border-color);
+    border-radius: var(--p-border-radius-xl);
+    box-shadow: var(--p-shadow-sm);
+    color: var(--p-text-color);
+    transition: all 0.2s ease;
+}
+
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5.5rem;
+}
+

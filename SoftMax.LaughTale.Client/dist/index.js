@@ -5795,23 +5795,26 @@ var SoftMaxIslands = (() => {
     function render() {
       const tabHtml = tabs.map((tab, idx) => {
         const isOpen = disclosures[idx]?.isOpen ?? false;
+        const headerText = tab.header || tab.Header || tab.title || tab.Title || tab.label || tab.Label || `Tab ${idx + 1}`;
+        const contentText = tab.content || tab.Content || "";
+        const iconText = tab.icon || tab.Icon || "";
         return `
                 <div class="accordion-tab ${isOpen ? "tab-open" : ""}" data-idx="${idx}" style="border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); margin-bottom: 0.5rem; background: var(--p-surface-0); overflow: hidden;">
                     <button type="button" 
                             class="accordion-header-btn" 
                             data-idx="${idx}" 
                             ${tab.disabled ? "disabled" : ""} 
-                            style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0.875rem 1.25rem; border: none; background: ${isOpen ? "var(--p-surface-50)" : "var(--p-surface-0)"}; color: var(--p-surface-900); font-weight: 600; font-size: 0.875rem; cursor: ${tab.disabled ? "not-allowed" : "pointer"}; text-align: left; transition: background 0.15s ease;">
+                            style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0.875rem 1.25rem; border: none; background: ${isOpen ? "var(--p-surface-50)" : "var(--p-surface-0)"}; color: var(--p-text-color); font-weight: 600; font-size: 0.875rem; cursor: ${tab.disabled ? "not-allowed" : "pointer"}; text-align: left; transition: background 0.15s ease;">
                         <span style="display: flex; align-items: center; gap: 0.5rem;">
-                            ${tab.icon ? `<span>${tab.icon}</span>` : ""}
-                            <span>${tab.header}</span>
+                            ${iconText ? `<span>${iconText}</span>` : ""}
+                            <span>${headerText}</span>
                         </span>
-                        <span class="chevron-icon" style="color: var(--p-surface-500); display: flex; align-items: center; transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1); transform: rotate(${isOpen ? "180deg" : "0deg"});">
+                        <span class="chevron-icon" style="color: var(--p-text-muted); display: flex; align-items: center; transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1); transform: rotate(${isOpen ? "180deg" : "0deg"});">
                             ${LucideIcons.chevronDown}
                         </span>
                     </button>
-                    <div class="accordion-content" style="display: ${isOpen ? "block" : "none"}; padding: 1.25rem; border-top: 1px solid var(--p-border-color); font-size: 0.875rem; color: var(--p-surface-600); line-height: 1.6;">
-                        <div class="tab-slot" data-slot-index="${idx}">${tab.content || ""}</div>
+                    <div class="accordion-content" style="display: ${isOpen ? "block" : "none"}; padding: 1.25rem; border-top: 1px solid var(--p-border-color); font-size: 0.875rem; color: var(--p-text-muted); line-height: 1.6; background: var(--p-surface-0);">
+                        <div class="tab-slot" data-slot-index="${idx}">${contentText}</div>
                     </div>
                 </div>
             `;
@@ -5916,17 +5919,20 @@ var SoftMaxIslands = (() => {
     function render() {
       const headerButtons = tabs.map((tab, idx) => {
         const isActive = idx === activeIndex;
+        const headerText = tab.header || tab.Header || tab.title || tab.Title || tab.label || tab.Label || `Tab ${idx + 1}`;
+        const iconText = tab.icon || tab.Icon || "";
         return `
                 <button type="button" 
                         class="tab-header-btn ${isActive ? "tab-active" : ""}" 
                         data-idx="${idx}" 
                         ${tab.disabled ? "disabled" : ""} 
-                        style="position: relative; padding: 0.75rem 1.25rem; border: none; background: transparent; color: ${isActive ? "var(--p-primary-600)" : "var(--p-surface-600)"}; font-weight: ${isActive ? "700" : "500"}; font-size: 0.875rem; cursor: ${tab.disabled ? "not-allowed" : "pointer"}; transition: color 0.15s ease; display: inline-flex; align-items: center; gap: 0.5rem; border-bottom: 2px solid ${isActive ? "var(--p-primary-600)" : "transparent"};">
-                    ${tab.icon ? `<span>${tab.icon}</span>` : ""}
-                    <span>${tab.header}</span>
+                        style="position: relative; padding: 0.75rem 1.25rem; border: none; background: transparent; color: ${isActive ? "var(--p-primary-600)" : "var(--p-text-muted)"}; font-weight: ${isActive ? "700" : "500"}; font-size: 0.875rem; cursor: ${tab.disabled ? "not-allowed" : "pointer"}; transition: color 0.15s ease; display: inline-flex; align-items: center; gap: 0.5rem; border-bottom: 2px solid ${isActive ? "var(--p-primary-600)" : "transparent"};">
+                    ${iconText ? `<span>${iconText}</span>` : ""}
+                    <span>${headerText}</span>
                 </button>
             `;
       }).join("");
+      const activeContent = tabs[activeIndex]?.content || tabs[activeIndex]?.Content || "";
       container.innerHTML = `
             <div class="laughtale-tabs" style="width: 100%;">
                 <!-- Tab Headers Bar -->
@@ -5935,8 +5941,8 @@ var SoftMaxIslands = (() => {
                 </div>
 
                 <!-- Active Tab Content Panel -->
-                <div class="tab-panel-body" style="padding: 1.25rem 0; font-size: 0.875rem; color: var(--p-surface-700); line-height: 1.6; transition: opacity 0.2s ease;">
-                    <div class="tab-slot-content">${tabs[activeIndex]?.content || ""}</div>
+                <div class="tab-panel-body" style="padding: 1.25rem 0; font-size: 0.875rem; color: var(--p-text-color); line-height: 1.6; transition: opacity 0.2s ease;">
+                    <div class="tab-slot-content">${activeContent}</div>
                 </div>
             </div>
         `;
@@ -6570,18 +6576,21 @@ var SoftMaxIslands = (() => {
     const homeUrl = props.homeUrl || "/";
     const itemsHtml = items.map((item, idx) => {
       const isLast = idx === items.length - 1;
+      const label = item.label || item.Label || "";
+      const url = item.url || item.Url || "";
+      const icon = item.icon || item.Icon || "";
       return `
             <li style="display: flex; align-items: center; gap: 0.5rem;">
-                <span style="color: var(--p-surface-400); display: flex; align-items: center;">${LucideIcons.chevronRight}</span>
-                ${item.url && !isLast ? `
-                    <a href="${item.url}" style="color: var(--p-surface-600); text-decoration: none; font-size: 0.8125rem; font-weight: 500; display: flex; align-items: center; gap: 0.35rem; transition: color 0.15s ease;">
-                        ${item.icon ? `<span>${item.icon}</span>` : ""}
-                        <span>${item.label}</span>
+                <span style="color: var(--p-text-muted); display: flex; align-items: center;">${LucideIcons.chevronRight}</span>
+                ${url && !isLast ? `
+                    <a href="${url}" style="color: var(--p-text-muted); text-decoration: none; font-size: 0.8125rem; font-weight: 500; display: flex; align-items: center; gap: 0.35rem; transition: color 0.15s ease;">
+                        ${icon ? `<span>${icon}</span>` : ""}
+                        <span>${label}</span>
                     </a>
                 ` : `
-                    <span style="color: var(--p-surface-900); font-size: 0.8125rem; font-weight: 600; display: flex; align-items: center; gap: 0.35rem;">
-                        ${item.icon ? `<span>${item.icon}</span>` : ""}
-                        <span>${item.label}</span>
+                    <span style="color: var(--p-text-color); font-size: 0.8125rem; font-weight: 600; display: flex; align-items: center; gap: 0.35rem;">
+                        ${icon ? `<span>${icon}</span>` : ""}
+                        <span>${label}</span>
                     </span>
                 `}
             </li>
@@ -11279,13 +11288,18 @@ ${h.response}`).join("\n");
       return `
             <ul class="menu-list">
                 ${menuItems.map((item) => {
-        if (item.separator) return `<li class="menu-separator"></li>`;
-        const iconSvg = item.icon && LucideIcons[item.icon] ? LucideIcons[item.icon] : "";
+        const isSeparator = item.separator || item.Separator;
+        if (isSeparator) return `<li class="menu-separator"></li>`;
+        const label = item.label || item.Label || item.title || item.Title || "";
+        const url = item.url || item.Url || "#";
+        const icon = item.icon || item.Icon || "";
+        const disabled = item.disabled || item.Disabled;
+        const iconSvg = icon && LucideIcons[icon] ? LucideIcons[icon] : icon.startsWith("<svg") ? icon : "";
         return `
                         <li>
-                            <a class="menu-item ${item.disabled ? "disabled" : ""}" href="${item.url || "#"}" tabindex="0">
+                            <a class="menu-item ${disabled ? "disabled" : ""}" href="${url}" tabindex="0">
                                 ${iconSvg ? `<span style="width: 16px; height: 16px; display: flex;">${iconSvg}</span>` : ""}
-                                <span>${item.label}</span>
+                                <span>${label}</span>
                             </a>
                         </li>
                     `;
@@ -11774,12 +11788,16 @@ ${h.response}`).join("\n");
     `);
     function renderMenu(menuItems) {
       return menuItems.map((item) => {
-        const iconSvg = item.icon && LucideIcons[item.icon] ? LucideIcons[item.icon] : "";
+        const label = item.label || item.Label || item.title || item.Title || "";
+        const url = item.url || item.Url || "#";
+        const icon = item.icon || item.Icon || "";
+        const active = item.active || item.Active || false;
+        const iconSvg = icon && LucideIcons[icon] ? LucideIcons[icon] : icon.startsWith("<svg") ? icon : "";
         return `
                 <li>
-                    <a href="${item.url || "#"}" class="sidebar-item ${item.active ? "active" : ""}">
+                    <a href="${url}" class="sidebar-item ${active ? "active" : ""}">
                         ${iconSvg ? `<span class="sidebar-item-icon">${iconSvg}</span>` : ""}
-                        <span class="sidebar-item-label">${item.label}</span>
+                        <span class="sidebar-item-label">${label}</span>
                     </a>
                 </li>
             `;
@@ -11787,9 +11805,9 @@ ${h.response}`).join("\n");
     }
     function render() {
       container.innerHTML = `
-<div class="laughtale-sidebar ' + collapsed ? 'collapsed' : '' + ' ${position}">
+            <div class="laughtale-sidebar ${collapsed ? "collapsed" : ""} ${position}">
                 <div class="sidebar-header">
-                    <span class="sidebar-header-title" style="font-weight: 700; color: var(--p-text-color);">Menu</span>
+                    <span class="sidebar-header-title" style="font-weight: 700; color: var(--p-text-color);">Component Navigation</span>
                     <button class="sidebar-toggle" aria-label="Toggle Sidebar">
                         ${collapsed ? LucideIcons.chevronRight : LucideIcons.chevronLeft}
                     </button>
@@ -11798,7 +11816,7 @@ ${h.response}`).join("\n");
                     ${renderMenu(items)}
                 </ul>
             </div>
-`;
+        `;
       container.querySelector(".sidebar-toggle")?.addEventListener("click", () => {
         collapsed = !collapsed;
         render();

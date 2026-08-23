@@ -907,23 +907,26 @@ function AccordionIsland(container, props) {
   function render() {
     const tabHtml = tabs.map((tab, idx) => {
       const isOpen = disclosures[idx]?.isOpen ?? false;
+      const headerText = tab.header || tab.Header || tab.title || tab.Title || tab.label || tab.Label || `Tab ${idx + 1}`;
+      const contentText = tab.content || tab.Content || "";
+      const iconText = tab.icon || tab.Icon || "";
       return `
                 <div class="accordion-tab ${isOpen ? "tab-open" : ""}" data-idx="${idx}" style="border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); margin-bottom: 0.5rem; background: var(--p-surface-0); overflow: hidden;">
                     <button type="button" 
                             class="accordion-header-btn" 
                             data-idx="${idx}" 
                             ${tab.disabled ? "disabled" : ""} 
-                            style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0.875rem 1.25rem; border: none; background: ${isOpen ? "var(--p-surface-50)" : "var(--p-surface-0)"}; color: var(--p-surface-900); font-weight: 600; font-size: 0.875rem; cursor: ${tab.disabled ? "not-allowed" : "pointer"}; text-align: left; transition: background 0.15s ease;">
+                            style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0.875rem 1.25rem; border: none; background: ${isOpen ? "var(--p-surface-50)" : "var(--p-surface-0)"}; color: var(--p-text-color); font-weight: 600; font-size: 0.875rem; cursor: ${tab.disabled ? "not-allowed" : "pointer"}; text-align: left; transition: background 0.15s ease;">
                         <span style="display: flex; align-items: center; gap: 0.5rem;">
-                            ${tab.icon ? `<span>${tab.icon}</span>` : ""}
-                            <span>${tab.header}</span>
+                            ${iconText ? `<span>${iconText}</span>` : ""}
+                            <span>${headerText}</span>
                         </span>
-                        <span class="chevron-icon" style="color: var(--p-surface-500); display: flex; align-items: center; transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1); transform: rotate(${isOpen ? "180deg" : "0deg"});">
+                        <span class="chevron-icon" style="color: var(--p-text-muted); display: flex; align-items: center; transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1); transform: rotate(${isOpen ? "180deg" : "0deg"});">
                             ${LucideIcons.chevronDown}
                         </span>
                     </button>
-                    <div class="accordion-content" style="display: ${isOpen ? "block" : "none"}; padding: 1.25rem; border-top: 1px solid var(--p-border-color); font-size: 0.875rem; color: var(--p-surface-600); line-height: 1.6;">
-                        <div class="tab-slot" data-slot-index="${idx}">${tab.content || ""}</div>
+                    <div class="accordion-content" style="display: ${isOpen ? "block" : "none"}; padding: 1.25rem; border-top: 1px solid var(--p-border-color); font-size: 0.875rem; color: var(--p-text-muted); line-height: 1.6; background: var(--p-surface-0);">
+                        <div class="tab-slot" data-slot-index="${idx}">${contentText}</div>
                     </div>
                 </div>
             `;
@@ -1014,17 +1017,20 @@ function TabsIsland(container, props) {
   function render() {
     const headerButtons = tabs.map((tab, idx) => {
       const isActive = idx === activeIndex;
+      const headerText = tab.header || tab.Header || tab.title || tab.Title || tab.label || tab.Label || `Tab ${idx + 1}`;
+      const iconText = tab.icon || tab.Icon || "";
       return `
                 <button type="button" 
                         class="tab-header-btn ${isActive ? "tab-active" : ""}" 
                         data-idx="${idx}" 
                         ${tab.disabled ? "disabled" : ""} 
-                        style="position: relative; padding: 0.75rem 1.25rem; border: none; background: transparent; color: ${isActive ? "var(--p-primary-600)" : "var(--p-surface-600)"}; font-weight: ${isActive ? "700" : "500"}; font-size: 0.875rem; cursor: ${tab.disabled ? "not-allowed" : "pointer"}; transition: color 0.15s ease; display: inline-flex; align-items: center; gap: 0.5rem; border-bottom: 2px solid ${isActive ? "var(--p-primary-600)" : "transparent"};">
-                    ${tab.icon ? `<span>${tab.icon}</span>` : ""}
-                    <span>${tab.header}</span>
+                        style="position: relative; padding: 0.75rem 1.25rem; border: none; background: transparent; color: ${isActive ? "var(--p-primary-600)" : "var(--p-text-muted)"}; font-weight: ${isActive ? "700" : "500"}; font-size: 0.875rem; cursor: ${tab.disabled ? "not-allowed" : "pointer"}; transition: color 0.15s ease; display: inline-flex; align-items: center; gap: 0.5rem; border-bottom: 2px solid ${isActive ? "var(--p-primary-600)" : "transparent"};">
+                    ${iconText ? `<span>${iconText}</span>` : ""}
+                    <span>${headerText}</span>
                 </button>
             `;
     }).join("");
+    const activeContent = tabs[activeIndex]?.content || tabs[activeIndex]?.Content || "";
     container.innerHTML = `
             <div class="laughtale-tabs" style="width: 100%;">
                 <!-- Tab Headers Bar -->
@@ -1033,8 +1039,8 @@ function TabsIsland(container, props) {
                 </div>
 
                 <!-- Active Tab Content Panel -->
-                <div class="tab-panel-body" style="padding: 1.25rem 0; font-size: 0.875rem; color: var(--p-surface-700); line-height: 1.6; transition: opacity 0.2s ease;">
-                    <div class="tab-slot-content">${tabs[activeIndex]?.content || ""}</div>
+                <div class="tab-panel-body" style="padding: 1.25rem 0; font-size: 0.875rem; color: var(--p-text-color); line-height: 1.6; transition: opacity 0.2s ease;">
+                    <div class="tab-slot-content">${activeContent}</div>
                 </div>
             </div>
         `;

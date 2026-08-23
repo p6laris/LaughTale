@@ -4,13 +4,18 @@
     ViewData["Title"] = "Aura Enterprise Components & Declarative Directives";
 }
 
-<!-- Breadcrumbs -->
-<div style="margin-bottom: 1.5rem;">
-    <island-breadcrumb items="@Model.Breadcrumbs" hydrate="Load" />
+<!-- Top Header Navigation Bar -->
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 2rem; background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-xl); padding: 0.75rem 1.25rem; box-shadow: var(--p-shadow-sm); flex-wrap: wrap;">
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <island-breadcrumb items="@Model.Breadcrumbs" hydrate="Load" />
+    </div>
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <island-menu items="@Model.HeaderMenuItems" />
+    </div>
 </div>
 
 <!-- Hero Banner -->
-<div class="hero-section" style="margin-bottom: 2rem;">
+<div class="hero-section" style="margin-bottom: 2.5rem;">
     <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; flex-wrap: wrap;">
         <span class="aura-tag tag-emerald">100% C# Strongly Typed</span>
         <span class="aura-tag tag-slate">Tailwind CSS v4 Tokens</span>
@@ -32,22 +37,32 @@
 <!-- Scroll to Top Floating Button -->
 <island-scroll-top />
 
-<!-- ========================================== -->
-<!-- 0. Dynamic Form Generator Showcase -->
-<!-- ========================================== -->
-<div style="margin-bottom: 2.5rem;">
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
-        <div>
-            <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--p-surface-900);">Dynamic Form Generator (C# DataAnnotations Reflection)</h2>
-            <p style="font-size: 0.875rem; color: var(--p-surface-500); margin-top: 0.25rem;">Generated automatically from <code>OperatorRegistrationDto</code> with <code>[Required]</code>, <code>[EmailAddress]</code>, <code>[DataType]</code>, and <code>[Range]</code> validation.</p>
-        </div>
-        <span class="aura-tag tag-emerald">Dynamic Forms</span>
-    </div>
+<!-- Two-Column Showcase Layout with Sticky Sidebar -->
+<div class="enterprise-layout" style="display: flex; gap: 2rem; align-items: flex-start; position: relative;">
+    <!-- Left Navigation Sidebar -->
+    <aside class="enterprise-sidebar" style="position: sticky; top: 5rem; width: 260px; flex-shrink: 0; max-height: calc(100vh - 6rem); overflow-y: auto; background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-xl); box-shadow: var(--p-shadow-sm); padding: 0.5rem; z-index: 10;">
+        <island-sidebar items="@Model.ComponentSidebarItems" />
+    </aside>
 
-    <div style="max-width: 640px; background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-xl); box-shadow: var(--p-shadow-sm); padding: 1.5rem;">
-        <island-dynamic-form schema="@Model.RegistrationFormSchema" />
-    </div>
-</div>
+    <!-- Main Component Showcases Content -->
+    <div class="enterprise-content" style="flex: 1; min-width: 0;">
+
+        <!-- ========================================== -->
+        <!-- 0. Dynamic Form Generator Showcase -->
+        <!-- ========================================== -->
+        <section id="sec-dynamic-form" style="margin-bottom: 2.5rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
+                <div>
+                    <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--p-surface-900);">Dynamic Form Generator (C# DataAnnotations Reflection)</h2>
+                    <p style="font-size: 0.875rem; color: var(--p-surface-500); margin-top: 0.25rem;">Generated automatically from <code>OperatorRegistrationDto</code> with <code>[Required]</code>, <code>[EmailAddress]</code>, <code>[DataType]</code>, and <code>[Range]</code> validation.</p>
+                </div>
+                <span class="aura-tag tag-emerald">Dynamic Forms</span>
+            </div>
+
+            <div style="max-width: 640px; background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-xl); box-shadow: var(--p-shadow-sm); padding: 1.5rem;">
+                <island-dynamic-form schema="@Model.RegistrationFormSchema" />
+            </div>
+        </section>
 
 <!-- ========================================== -->
 <!-- 1. Interactive Splitter & Multi-Panel Workspace -->
@@ -572,48 +587,50 @@
             <island-confirm-popup message="Are you sure you want to delete this record?" />
         </div>
     </div>
-</div>
+        <!-- ========================================== -->
+        <!-- 11. Data Display & Media -->
+        <!-- ========================================== -->
+        <section id="sec-dataview-paginator" style="margin-bottom: 2.5rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
+                <div>
+                    <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--p-surface-900);">Data Display &amp; Media Components</h2>
+                    <p style="font-size: 0.875rem; color: var(--p-surface-500); margin-top: 0.25rem;">Paginator, DataView, Carousel, ImageCompare &amp; Dropzone.</p>
+                </div>
+                <span class="aura-tag tag-amber">Data Display</span>
+            </div>
 
-<!-- ========================================== -->
-<!-- 11. Data Display & Media -->
-<!-- ========================================== -->
-<div style="margin-bottom: 2.5rem;">
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
-        <div>
-            <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--p-surface-900);">Data Display &amp; Media Components</h2>
-            <p style="font-size: 0.875rem; color: var(--p-surface-500); margin-top: 0.25rem;">Paginator, DataView, Carousel, ImageCompare &amp; Dropzone.</p>
-        </div>
-        <span class="aura-tag tag-amber">Data Display</span>
-    </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.5rem;">
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.5rem;">
+                <!-- Paginator -->
+                <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+                    <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Paginator</div>
+                    <island-paginator total-records="150" rows="10" />
+                </div>
 
-        <!-- Paginator -->
-        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Paginator</div>
-            <island-paginator total-records="150" rows="10" />
-        </div>
+                <!-- Dropzone -->
+                <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+                    <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">File Dropzone</div>
+                    <island-dropzone accept="image/*,.pdf" max-size="5242880" />
+                </div>
 
-        <!-- Dropzone -->
-        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">File Dropzone</div>
-            <island-dropzone accept="image/*,.pdf" max-size="5242880" />
-        </div>
+                <!-- ImageCompare -->
+                <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
+                    <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Image Compare Slider</div>
+                    <island-image-compare />
+                </div>
+            </div>
+        </section>
 
-        <!-- ImageCompare -->
-        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Image Compare Slider</div>
-            <island-image-compare />
-        </div>
     </div>
 </div>
 
 <!-- ========================================== -->
 <!-- 12. Dock Navigation Bar (macOS Style) -->
 <!-- ========================================== -->
-<div style="margin-bottom: 3rem; display: flex; justify-content: center;">
+<div style="margin-top: 3rem; margin-bottom: 3rem; display: flex; justify-content: center;">
     <island-dock items="@Model.DockItems" position="Bottom" />
 </div>
 
 <!-- SpeedDial Floating Action Trigger -->
 <island-speed-dial actions="@Model.QuickActions" direction="Up" />
+

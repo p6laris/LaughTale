@@ -1,19 +1,16 @@
-import { SidebarItem } from '../types/models';
-import { LucideIcons } from '../icons/lucide';
-import { injectIslandStyle } from '../runtime/styles';
+import {
+  LucideIcons
+} from "./chunk-BWRILNJC.js";
+import {
+  injectIslandStyle
+} from "./chunk-3TFPN5JM.js";
 
-export interface SidebarProps {
-    items: SidebarItem[];
-    collapsed?: boolean;
-    position?: 'left' | 'right';
-}
-
-export default function SidebarIsland(container: HTMLElement, props: SidebarProps) {
-    let collapsed = props.collapsed || false;
-    const items = props.items || [];
-    const position = props.position || 'left';
-
-    injectIslandStyle('sidebar', `
+// ../SoftMax.LaughTale.Client/src/components/sidebar.ts
+function SidebarIsland(container, props) {
+  let collapsed = props.collapsed || false;
+  const items = props.items || [];
+  const position = props.position || "left";
+  injectIslandStyle("sidebar", `
         .laughtale-sidebar {
             display: flex;
             flex-direction: column;
@@ -107,28 +104,26 @@ export default function SidebarIsland(container: HTMLElement, props: SidebarProp
             display: none;
         }
     `);
-
-    function renderMenu(menuItems: SidebarItem[]) {
-        return menuItems.map(item => {
-            const label = (item as any).label || (item as any).Label || (item as any).title || (item as any).Title || '';
-            const url = (item as any).url || (item as any).Url || '#';
-            const icon = (item as any).icon || (item as any).Icon || '';
-            const active = (item as any).active || (item as any).Active || false;
-            const iconSvg = icon && (LucideIcons as any)[icon] ? (LucideIcons as any)[icon] : (icon.startsWith('<svg') ? icon : '');
-            return `
+  function renderMenu(menuItems) {
+    return menuItems.map((item) => {
+      const label = item.label || item.Label || item.title || item.Title || "";
+      const url = item.url || item.Url || "#";
+      const icon = item.icon || item.Icon || "";
+      const active = item.active || item.Active || false;
+      const iconSvg = icon && LucideIcons[icon] ? LucideIcons[icon] : icon.startsWith("<svg") ? icon : "";
+      return `
                 <li>
-                    <a href="${url}" class="sidebar-item ${active ? 'active' : ''}">
-                        ${iconSvg ? `<span class="sidebar-item-icon">${iconSvg}</span>` : ''}
+                    <a href="${url}" class="sidebar-item ${active ? "active" : ""}">
+                        ${iconSvg ? `<span class="sidebar-item-icon">${iconSvg}</span>` : ""}
                         <span class="sidebar-item-label">${label}</span>
                     </a>
                 </li>
             `;
-        }).join('');
-    }
-
-    function render() {
-        container.innerHTML = `
-            <div class="laughtale-sidebar ${collapsed ? 'collapsed' : ''} ${position}">
+    }).join("");
+  }
+  function render() {
+    container.innerHTML = `
+            <div class="laughtale-sidebar ${collapsed ? "collapsed" : ""} ${position}">
                 <div class="sidebar-header">
                     <span class="sidebar-header-title" style="font-weight: 700; color: var(--p-text-color);">Component Navigation</span>
                     <button class="sidebar-toggle" aria-label="Toggle Sidebar">
@@ -140,12 +135,14 @@ export default function SidebarIsland(container: HTMLElement, props: SidebarProp
                 </ul>
             </div>
         `;
-
-        container.querySelector('.sidebar-toggle')?.addEventListener('click', () => {
-            collapsed = !collapsed;
-            render();
-        });
-    }
-
-    render();
+    container.querySelector(".sidebar-toggle")?.addEventListener("click", () => {
+      collapsed = !collapsed;
+      render();
+    });
+  }
+  render();
 }
+export {
+  SidebarIsland as default
+};
+//# sourceMappingURL=sidebar-3K4CHXLG.js.map

@@ -1,59 +1,45 @@
-/**
- * SoftMax.LaughTale: Enterprise Breadcrumb Component (Aura Breadcrumb inspired)
- */
+import {
+  LucideIcons
+} from "./chunk-BWRILNJC.js";
+import {
+  injectIslandStyle
+} from "./chunk-3TFPN5JM.js";
 
-import { LucideIcons } from '../icons/lucide';
-import { injectIslandStyle } from '../runtime/styles';
-
-export interface BreadcrumbItem {
-    label: string;
-    url?: string;
-    icon?: string;
-}
-
-export interface BreadcrumbProps {
-    items: BreadcrumbItem[];
-    homeUrl?: string;
-}
-
-
-const CSS = `
+// ../SoftMax.LaughTale.Client/src/components/breadcrumb.ts
+var CSS = `
 [data-theme="dark"] .laughtale-breadcrumb {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
     border-color: var(--p-surface-700) !important;
 }
 `;
-
-export default function BreadcrumbIsland(container: HTMLElement, props: BreadcrumbProps) {
-    injectIslandStyle('breadcrumb', CSS);
-    const items = props.items || [];
-    const homeUrl = props.homeUrl || '/';
-
-    const itemsHtml = items.map((item, idx) => {
-        const isLast = idx === items.length - 1;
-        const label = (item as any).label || (item as any).Label || '';
-        const url = (item as any).url || (item as any).Url || '';
-        const icon = (item as any).icon || (item as any).Icon || '';
-        return `
+function BreadcrumbIsland(container, props) {
+  injectIslandStyle("breadcrumb", CSS);
+  const items = props.items || [];
+  const homeUrl = props.homeUrl || "/";
+  const itemsHtml = items.map((item, idx) => {
+    const isLast = idx === items.length - 1;
+    const label = item.label || item.Label || "";
+    const url = item.url || item.Url || "";
+    const icon = item.icon || item.Icon || "";
+    return `
             <li style="display: flex; align-items: center; gap: 0.5rem;">
                 <span style="color: var(--p-text-muted); display: flex; align-items: center;">${LucideIcons.chevronRight}</span>
                 ${url && !isLast ? `
                     <a href="${url}" style="color: var(--p-text-muted); text-decoration: none; font-size: 0.8125rem; font-weight: 500; display: flex; align-items: center; gap: 0.35rem; transition: color 0.15s ease;">
-                        ${icon ? `<span>${icon}</span>` : ''}
+                        ${icon ? `<span>${icon}</span>` : ""}
                         <span>${label}</span>
                     </a>
                 ` : `
                     <span style="color: var(--p-text-color); font-size: 0.8125rem; font-weight: 600; display: flex; align-items: center; gap: 0.35rem;">
-                        ${icon ? `<span>${icon}</span>` : ''}
+                        ${icon ? `<span>${icon}</span>` : ""}
                         <span>${label}</span>
                     </span>
                 `}
             </li>
         `;
-    }).join('');
-
-    container.innerHTML = `
+  }).join("");
+  container.innerHTML = `
         <nav class="laughtale-breadcrumb" style="display: block;">
             <ul style="list-style: none; display: flex; align-items: center; gap: 0.5rem; padding: 0; margin: 0;">
                 <li>
@@ -66,3 +52,7 @@ export default function BreadcrumbIsland(container: HTMLElement, props: Breadcru
         </nav>
     `;
 }
+export {
+  BreadcrumbIsland as default
+};
+//# sourceMappingURL=breadcrumb-5VEYMK6Q.js.map
