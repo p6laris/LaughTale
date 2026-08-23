@@ -126,6 +126,13 @@ public class EnterpriseModel : PageModel
         new("https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=60", "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=160&auto=format&fit=crop&q=60", "Real-time Telemetry Dashboard", "Observability Engine")
     };
 
+    public List<CarouselItem> CarouselSlides { get; set; } = new()
+    {
+        new("1", "Cluster Alpha Overview", "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&auto=format&fit=crop&q=60", "Active datacenter deployment"),
+        new("2", "Security Mesh Matrix", "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=60", "Cryptographic key distribution"),
+        new("3", "Telemetry Metrics", "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=60", "Observability pipeline stream")
+    };
+
     public List<DockItem> DockItems { get; set; } = new()
     {
         new("CLI Terminal", "⚡", "/enterprise"),

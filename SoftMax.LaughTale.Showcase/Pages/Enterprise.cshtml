@@ -1,630 +1,1009 @@
 @page "/enterprise"
 @model SoftMax.LaughTale.Showcase.Pages.EnterpriseModel
 @{
-    ViewData["Title"] = "Aura Enterprise Components & Declarative Directives";
+    ViewData["Title"] = "Enterprise Component Explorer (64 Components)";
 }
 
-<!-- Top Header Navigation Bar -->
+<!-- Floating Global Helpers -->
+<island-toast />
+<island-scroll-top />
+<island-speed-dial actions="@Model.QuickActions" direction="Up" />
+
+<!-- Top Breadcrumb & Quick Actions Bar -->
 <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 2rem; background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-xl); padding: 0.75rem 1.25rem; box-shadow: var(--p-shadow-sm); flex-wrap: wrap;">
     <div style="display: flex; align-items: center; gap: 0.75rem;">
         <island-breadcrumb items="@Model.Breadcrumbs" hydrate="Load" />
     </div>
     <div style="display: flex; align-items: center; gap: 0.75rem;">
-        <island-menu items="@Model.HeaderMenuItems" />
-    </div>
-</div>
-
-<!-- Hero Banner -->
-<div class="hero-section" style="margin-bottom: 2.5rem;">
-    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; flex-wrap: wrap;">
-        <span class="aura-tag tag-emerald">100% C# Strongly Typed</span>
+        <span class="aura-tag tag-emerald">64 Active Components</span>
         <span class="aura-tag tag-slate">Tailwind CSS v4 Tokens</span>
-        <span class="aura-tag tag-emerald">Aura Theme</span>
-        <span class="aura-tag tag-slate">Lucide Icons</span>
-        <span class="aura-tag tag-amber">64 Active Components</span>
     </div>
-    <h1 style="font-size: 2.25rem; font-weight: 800; letter-spacing: -0.03em; color: var(--p-surface-950); margin-bottom: 0.75rem;">
-        Enterprise UI Components &amp; Dynamic Form Generator
-    </h1>
-    <p style="font-size: 1.05rem; color: var(--p-surface-600); max-width: 800px; line-height: 1.6;">
-        Production-grade enterprise components written in 100% C# Razor with Lucide vector icons, headless physics animations, and DataAnnotations-driven dynamic form generation.
-    </p>
 </div>
 
-<!-- Floating Toast Container -->
-<island-toast />
-
-<!-- Scroll to Top Floating Button -->
-<island-scroll-top />
-
-<!-- Main Component Section Container (Driven by Left Global Sidebar) -->
+<!-- Main Component Section Container (Each Component Has Its Own Dedicated Tab View) -->
 <div class="enterprise-sections" style="width: 100%;">
 
-        <!-- ========================================== -->
-        <!-- 0. Dynamic Form Generator Showcase -->
-        <!-- ========================================== -->
-        <section id="sec-dynamic-form" style="margin-bottom: 2.5rem;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
-                <div>
-                    <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--p-surface-900);">Dynamic Form Generator (C# DataAnnotations Reflection)</h2>
-                    <p style="font-size: 0.875rem; color: var(--p-surface-500); margin-top: 0.25rem;">Generated automatically from <code>OperatorRegistrationDto</code> with <code>[Required]</code>, <code>[EmailAddress]</code>, <code>[DataType]</code>, and <code>[Range]</code> validation.</p>
-                </div>
-                <span class="aura-tag tag-emerald">Dynamic Forms</span>
+    <!-- Dynamic Form -->
+    <section id="sec-dynamic-form" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>Dynamic Form Generator</h2>
+                <p>Generated automatically from C# <code>OperatorRegistrationDto</code> with DataAnnotations reflection.</p>
             </div>
-
-            <div style="max-width: 640px; background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-xl); box-shadow: var(--p-shadow-sm); padding: 1.5rem;">
-                <island-dynamic-form schema="@Model.RegistrationFormSchema" />
-            </div>
-        </section>
-
-<!-- ========================================== -->
-<!-- 1. Interactive Splitter & Multi-Panel Workspace -->
-<!-- ========================================== -->
-<div style="margin-bottom: 2.5rem;">
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
-        <div>
-            <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--p-surface-900);">Splitter (Resizable Multi-Panel Layouts)</h2>
-            <p style="font-size: 0.875rem; color: var(--p-surface-500); margin-top: 0.25rem;">Drag the divider gutter with smooth physics-assisted split resizing.</p>
+            <span class="aura-tag tag-emerald">Reflect</span>
         </div>
-        <span class="aura-tag tag-slate">Splitter</span>
-    </div>
-
-    <island-splitter orientation="Horizontal" initial-ratio="35" style="background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-xl); box-shadow: var(--p-shadow-sm);">
-        <left-panel>
-            <div style="padding: 1.5rem;">
-                <div style="font-weight: 700; font-size: 0.9375rem; color: var(--p-surface-900); margin-bottom: 0.5rem;">Left Sidebar Panel</div>
-                <p style="font-size: 0.8125rem; color: var(--p-surface-600); line-height: 1.5;">Navigation tree, project directory structure, or telemetry filters.</p>
-                <div style="margin-top: 1rem;">
-                    <island-tree-select placeholder="Select Dept..." target-input-name="splitter_dept" departments="@Model.DepartmentTree" />
-                </div>
-            </div>
-        </left-panel>
-        <right-panel>
-            <div style="padding: 1.5rem;">
-                <div style="font-weight: 700; font-size: 0.9375rem; color: var(--p-surface-900); margin-bottom: 0.5rem;">Main Workspace Area</div>
-                <p style="font-size: 0.8125rem; color: var(--p-surface-600); line-height: 1.5;">Primary workspace canvas with rich data viewports.</p>
-                <div style="margin-top: 1rem; display: flex; gap: 0.75rem;">
-                    <island-split-button label="Trigger Deploy" icon="⚡" menu="@Model.SplitButtonActions" />
-                    <island-button variant="Outline">Refresh Node</island-button>
-                </div>
-            </div>
-        </right-panel>
-    </island-splitter>
-</div>
-
-<!-- ========================================== -->
-<!-- 2. MultiSelect, CascadeSelect, & Listbox -->
-<!-- ========================================== -->
-<div style="margin-bottom: 2.5rem;">
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
-        <div>
-            <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--p-surface-900);">Advanced Selectors: MultiSelect, CascadeSelect &amp; Listbox</h2>
-            <p style="font-size: 0.875rem; color: var(--p-surface-500); margin-top: 0.25rem;">Chip tags, hierarchical multi-tier cascade popovers, and searchable listboxes.</p>
+        <div class="card-body" style="max-width: 640px;">
+            <island-dynamic-form schema="@Model.RegistrationFormSchema" />
         </div>
-        <span class="aura-tag tag-emerald">Selectors</span>
-    </div>
+    </section>
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
-        
-        <!-- MultiSelect -->
-        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 0.5rem; color: var(--p-surface-900);">MultiSelect with Chips</div>
-            <p style="font-size: 0.75rem; color: var(--p-surface-500); margin-bottom: 1rem;">Select multiple technologies with removable tags.</p>
+    <!-- InputText -->
+    <section id="sec-input-text" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>InputText &amp; EnhancedInput</h2>
+                <p>Standard and enhanced text inputs with leading icons, clear buttons, and fluid states.</p>
+            </div>
+            <span class="aura-tag tag-slate">Input</span>
+        </div>
+        <div class="card-body" style="max-width: 500px; display: flex; flex-direction: column; gap: 1rem;">
+            <island-input-text placeholder="Standard text input..." />
+            <island-enhanced-input placeholder="Enhanced input with leading icon..." icon="search" clearable="true" />
+        </div>
+    </section>
+
+    <!-- Textarea -->
+    <section id="sec-textarea" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>Textarea</h2>
+                <p>Multi-line textarea with auto-resize and character count telemetry.</p>
+            </div>
+            <span class="aura-tag tag-slate">Form</span>
+        </div>
+        <div class="card-body" style="max-width: 600px;">
+            <island-textarea placeholder="Enter incident report logs or operational payload notes..." rows="5" />
+        </div>
+    </section>
+
+    <!-- InputNumber -->
+    <section id="sec-input-number" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>InputNumber</h2>
+                <p>Numeric stepper with currency formatting, min/max clamps, and increment triggers.</p>
+            </div>
+            <span class="aura-tag tag-slate">Numeric</span>
+        </div>
+        <div class="card-body" style="max-width: 400px;">
+            <island-input-number value="1250" min="0" max="100000" step="50" prefix="$" />
+        </div>
+    </section>
+
+    <!-- InputOtp -->
+    <section id="sec-input-otp" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>InputOtp (One-Time Password)</h2>
+                <p>Secure multi-cell OTP PIN input with auto-advance and clipboard paste parsing.</p>
+            </div>
+            <span class="aura-tag tag-amber">Security</span>
+        </div>
+        <div class="card-body" style="max-width: 400px;">
+            <island-input-otp length="6" integer-only="true" />
+        </div>
+    </section>
+
+    <!-- InputPassword -->
+    <section id="sec-input-password" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>InputPassword</h2>
+                <p>Password field with toggle visibility and interactive strength meter indicator.</p>
+            </div>
+            <span class="aura-tag tag-emerald">Auth</span>
+        </div>
+        <div class="card-body" style="max-width: 400px;">
+            <island-input-password feedback="true" toggle-mask="true" placeholder="Enter secure key..." />
+        </div>
+    </section>
+
+    <!-- InputMask -->
+    <section id="sec-input-mask" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>InputMask</h2>
+                <p>Strict input formatting masks for phone numbers, SSNs, and license tokens.</p>
+            </div>
+            <span class="aura-tag tag-slate">Mask</span>
+        </div>
+        <div class="card-body" style="max-width: 400px;">
+            <island-input-mask mask="+1 (999) 999-9999" placeholder="+1 (555) 019-2834" />
+        </div>
+    </section>
+
+    <!-- AutoComplete -->
+    <section id="sec-autocomplete" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>AutoComplete</h2>
+                <p>Debounced typeahead search suggestions with keyboard navigation.</p>
+            </div>
+            <span class="aura-tag tag-emerald">Search</span>
+        </div>
+        <div class="card-body" style="max-width: 450px;">
+            <island-autocomplete placeholder="Search server regions..." suggestions="@Model.CityOptions" />
+        </div>
+    </section>
+
+    <!-- Select -->
+    <section id="sec-select" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>Select (Single Select)</h2>
+                <p>Custom dropdown selector with searchable filter and clear option.</p>
+            </div>
+            <span class="aura-tag tag-slate">Select</span>
+        </div>
+        <div class="card-body" style="max-width: 400px;">
+            <island-select options="@Model.ListboxDatabases" placeholder="Select Database..." />
+        </div>
+    </section>
+
+    <!-- MultiSelect -->
+    <section id="sec-multiselect" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>MultiSelect with Chips</h2>
+                <p>Select multiple technologies with removable tag badges and search filter.</p>
+            </div>
+            <span class="aura-tag tag-emerald">Chips</span>
+        </div>
+        <div class="card-body" style="max-width: 500px;">
             <island-multiselect options="@Model.MultiSelectSkills" placeholder="Select technologies..." target-input-name="selected_tech" />
         </div>
+    </section>
 
-        <!-- CascadeSelect -->
-        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 0.5rem; color: var(--p-surface-900);">CascadeSelect Multi-Level</div>
-            <p style="font-size: 0.75rem; color: var(--p-surface-500); margin-bottom: 1rem;">Cascading flyout menus for regional hierarchical datacenters.</p>
+    <!-- CascadeSelect -->
+    <section id="sec-cascadeselect" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>CascadeSelect Multi-Level</h2>
+                <p>Hierarchical multi-tier flyout menu for datacenters and regions.</p>
+            </div>
+            <span class="aura-tag tag-slate">Hierarchy</span>
+        </div>
+        <div class="card-body" style="max-width: 450px;">
             <island-cascadeselect options="@Model.CascadeRegions" placeholder="Select Datacenter..." target-input-name="selected_region" />
         </div>
+    </section>
 
-        <!-- Listbox -->
-        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 0.5rem; color: var(--p-surface-900);">Searchable Listbox</div>
-            <p style="font-size: 0.75rem; color: var(--p-surface-500); margin-bottom: 1rem;">Scrollable list with real-time debounced query filter.</p>
+    <!-- TreeSelect -->
+    <section id="sec-treeselect" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>TreeSelect</h2>
+                <p>Dropdown with expandable tree hierarchy for department selection.</p>
+            </div>
+            <span class="aura-tag tag-slate">Tree</span>
+        </div>
+        <div class="card-body" style="max-width: 450px;">
+            <island-tree-select placeholder="Select Department..." target-input-name="ts_dept" departments="@Model.DepartmentTree" />
+        </div>
+    </section>
+
+    <!-- Checkbox -->
+    <section id="sec-checkbox" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>Checkbox</h2>
+                <p>Animated Boolean and tristate checkboxes with accessible focus rings.</p>
+            </div>
+            <span class="aura-tag tag-slate">Toggle</span>
+        </div>
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <island-checkbox label="Enable Zero-Trust Telemetry" checked="true" />
+            <island-checkbox label="Enforce End-to-End Cryptographic Encryption" checked="true" />
+            <island-checkbox label="Allow Anonymous Guest Tunneling" checked="false" />
+        </div>
+    </section>
+
+    <!-- RadioButton -->
+    <section id="sec-radio" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>RadioButton</h2>
+                <p>Mutual exclusion selection radio group with custom spring animations.</p>
+            </div>
+            <span class="aura-tag tag-slate">Form</span>
+        </div>
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <island-radio-button name="env" value="prod" label="Production Multi-Region" checked="true" />
+            <island-radio-button name="env" value="stage" label="Staging Isolated Sandbox" />
+            <island-radio-button name="env" value="dev" label="Local Dev Docker Container" />
+        </div>
+    </section>
+
+    <!-- ToggleSwitch -->
+    <section id="sec-toggle-switch" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>ToggleSwitch</h2>
+                <p>Smooth iOS/macOS style switch for toggling features and services.</p>
+            </div>
+            <span class="aura-tag tag-emerald">Active</span>
+        </div>
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 1rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; max-width: 400px;">
+                <span style="font-weight: 600; color: var(--p-text-color);">High-Availability Clustering</span>
+                <island-toggle-switch checked="true" />
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; max-width: 400px;">
+                <span style="font-weight: 600; color: var(--p-text-color);">Automated SSL Rotation</span>
+                <island-toggle-switch checked="true" />
+            </div>
+        </div>
+    </section>
+
+    <!-- Slider -->
+    <section id="sec-slider" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>Slider</h2>
+                <p>Continuous and stepped range slider with live value readout.</p>
+            </div>
+            <span class="aura-tag tag-slate">Control</span>
+        </div>
+        <div class="card-body" style="max-width: 500px;">
+            <island-slider value="65" min="0" max="100" />
+        </div>
+    </section>
+
+    <!-- Rating -->
+    <section id="sec-rating" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>Rating</h2>
+                <p>Interactive vector star rating with configurable count and reset button.</p>
+            </div>
+            <span class="aura-tag tag-amber">Feedback</span>
+        </div>
+        <div class="card-body" style="max-width: 300px;">
+            <island-rating value="4" stars="5" />
+        </div>
+    </section>
+
+    <!-- SelectButton -->
+    <section id="sec-select-button" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>SelectButton</h2>
+                <p>Segmented button group for exclusive or multi-selection modes.</p>
+            </div>
+            <span class="aura-tag tag-slate">Segmented</span>
+        </div>
+        <div class="card-body" style="max-width: 450px;">
+            <island-select-button options="@Model.Periods" value="Daily" />
+        </div>
+    </section>
+
+    <!-- Chips -->
+    <section id="sec-chips" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>Chips Input</h2>
+                <p>Enter-delimited chip tag creator with delete and duplicate prevention.</p>
+            </div>
+            <span class="aura-tag tag-emerald">Tags</span>
+        </div>
+        <div class="card-body" style="max-width: 500px;">
+            <island-chips placeholder="Add IP or domain tag..." />
+        </div>
+    </section>
+
+    <!-- ColorPicker -->
+    <section id="sec-color-picker" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>ColorPicker</h2>
+                <p>Hex and RGB color selection with interactive palette canvas.</p>
+            </div>
+            <span class="aura-tag tag-amber">Design</span>
+        </div>
+        <div class="card-body" style="max-width: 300px;">
+            <island-color-picker value="#10b981" />
+        </div>
+    </section>
+
+    <!-- Knob -->
+    <section id="sec-knob" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>Knob (Rotary Gauge)</h2>
+                <p>Circular rotary dial with SVG arc calculation and drag controls.</p>
+            </div>
+            <span class="aura-tag tag-emerald">Telemetry</span>
+        </div>
+        <div class="card-body" style="max-width: 300px; display: flex; justify-content: center;">
+            <island-knob value="72" min="0" max="100" value-template="{value}%" size="140" />
+        </div>
+    </section>
+
+    <!-- DatePicker -->
+    <section id="sec-datepicker" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>DatePicker Calendar</h2>
+                <p>Interactive date selection popover with month navigation and time picker.</p>
+            </div>
+            <span class="aura-tag tag-slate">Date</span>
+        </div>
+        <div class="card-body" style="max-width: 400px;">
+            <island-datepicker placeholder="Select deployment deadline..." show-icon="true" />
+        </div>
+    </section>
+
+    <!-- FloatLabel -->
+    <section id="sec-float-label" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>FloatLabel Material Input</h2>
+                <p>Floating animated label container that transitions smoothly on focus.</p>
+            </div>
+            <span class="aura-tag tag-slate">Material</span>
+        </div>
+        <div class="card-body" style="max-width: 400px;">
+            <island-float-label label="Tenant Identifier">
+                <island-input-text />
+            </island-float-label>
+        </div>
+    </section>
+
+    <!-- Security DataGrid -->
+    <section id="sec-datagrid" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>Security Clusters DataGrid</h2>
+                <p>Enterprise table with real-time multi-column sorting, debounced search, and pagination.</p>
+            </div>
+            <span class="aura-tag tag-emerald">Live</span>
+        </div>
+        <div class="card-body">
+            <island-datagrid items="@Model.GridRecords" columns="@Model.GridColumns" page-size="5" />
+        </div>
+    </section>
+
+    <!-- DataView -->
+    <section id="sec-dataview" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>DataView (Grid &amp; List Layouts)</h2>
+                <p>Switchable data presentation view with custom layout cards.</p>
+            </div>
+            <span class="aura-tag tag-slate">View</span>
+        </div>
+        <div class="card-body">
+            <island-dataview items="@Model.GridRecords" layout="grid" />
+        </div>
+    </section>
+
+    <!-- Paginator -->
+    <section id="sec-paginator" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>Paginator</h2>
+                <p>Standalone pagination bar with page jumps and configurable page sizes.</p>
+            </div>
+            <span class="aura-tag tag-slate">Pagination</span>
+        </div>
+        <div class="card-body" style="max-width: 600px;">
+            <island-paginator total-records="240" rows="10" />
+        </div>
+    </section>
+
+    <!-- Splitter -->
+    <section id="sec-splitter" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>Splitter Panels</h2>
+                <p>Draggable split divider gutter with smooth physics-assisted resizing.</p>
+            </div>
+            <span class="aura-tag tag-slate">Layout</span>
+        </div>
+        <div class="card-body">
+            <island-splitter orientation="Horizontal" initial-ratio="40">
+                <left-panel>
+                    <div style="padding: 1.5rem;">
+                        <h4 style="font-weight: 700; color: var(--p-text-color); margin-bottom: 0.5rem;">Left Explorer</h4>
+                        <p style="font-size: 0.8125rem; color: var(--p-text-muted);">Directory tree and filter facets.</p>
+                    </div>
+                </left-panel>
+                <right-panel>
+                    <div style="padding: 1.5rem;">
+                        <h4 style="font-weight: 700; color: var(--p-text-color); margin-bottom: 0.5rem;">Main Canvas</h4>
+                        <p style="font-size: 0.8125rem; color: var(--p-text-muted);">Workspace viewport with live data stream.</p>
+                    </div>
+                </right-panel>
+            </island-splitter>
+        </div>
+    </section>
+
+    <!-- Listbox -->
+    <section id="sec-listbox" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>Searchable Listbox</h2>
+                <p>Scrollable selection box with instant client-side filtering.</p>
+            </div>
+            <span class="aura-tag tag-slate">List</span>
+        </div>
+        <div class="card-body" style="max-width: 450px;">
             <island-listbox options="@Model.ListboxDatabases" filter="true" target-input-name="selected_db" />
         </div>
+    </section>
 
-    </div>
-</div>
-
-<!-- ========================================== -->
-<!-- 3. PickList & OrderList (Dual-List Transfer & Reordering) -->
-<!-- ========================================== -->
-<div style="margin-bottom: 2.5rem;">
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
-        <div>
-            <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--p-surface-900);">PickList &amp; OrderList (Dual-List Transfer &amp; Reordering)</h2>
-            <p style="font-size: 0.875rem; color: var(--p-surface-500); margin-top: 0.25rem;">FLIP layout physics transfers and keyboard-accessible item reordering.</p>
+    <!-- PickList -->
+    <section id="sec-picklist" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>PickList Dual-List Transfer</h2>
+                <p>Transfer items between two lists with smooth FLIP physics layout transitions.</p>
+            </div>
+            <span class="aura-tag tag-emerald">Transfer</span>
         </div>
-        <span class="aura-tag tag-slate">Transfer Lists</span>
-    </div>
-
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 1.5rem;">
-        
-        <!-- PickList -->
-        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">PickList Security Token Assigner</div>
+        <div class="card-body">
             <island-picklist source="@Model.PickListSource" target="@Model.PickListTarget" source-header="Available Tokens" target-header="Assigned to Node" />
         </div>
+    </section>
 
-        <!-- OrderList -->
-        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">OrderList Pipeline Execution Sequence</div>
+    <!-- OrderList -->
+    <section id="sec-orderlist" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>OrderList Pipeline Sequence</h2>
+                <p>Reorder items within a list using action buttons or keyboard accessibility.</p>
+            </div>
+            <span class="aura-tag tag-slate">Reorder</span>
+        </div>
+        <div class="card-body" style="max-width: 500px;">
             <island-orderlist items="@Model.OrderListTasks" header="Pipeline Order" />
         </div>
+    </section>
 
-    </div>
-</div>
-
-<!-- ========================================== -->
-<!-- 4. OrgChart Hierarchy Visualization -->
-<!-- ========================================== -->
-<div style="margin-bottom: 2.5rem;">
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
-        <div>
-            <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--p-surface-900);">Organizational Tree Chart (OrgChart)</h2>
-            <p style="font-size: 0.875rem; color: var(--p-surface-500); margin-top: 0.25rem;">Collapsible node branches, role badges, and interactive drill-down cards.</p>
-        </div>
-        <span class="aura-tag tag-emerald">OrgChart</span>
-    </div>
-
-    <div style="background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-xl); box-shadow: var(--p-shadow-sm); padding: 1.5rem; overflow-x: auto;">
-        <island-orgchart root="@Model.OrgChartRoot" />
-    </div>
-</div>
-
-<!-- ========================================== -->
-<!-- 5. Terminal CLI & Galleria Media Stage -->
-<!-- ========================================== -->
-<div style="margin-bottom: 2.5rem;">
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
-        <div>
-            <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--p-surface-900);">Interactive CLI Terminal &amp; Responsive Galleria</h2>
-            <p style="font-size: 0.875rem; color: var(--p-surface-500); margin-top: 0.25rem;">Type commands (e.g. <code>help</code>, <code>status</code>, <code>version</code>) or inspect server media.</p>
-        </div>
-        <span class="aura-tag tag-slate">Interactive</span>
-    </div>
-
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 1.5rem;">
-        
-        <!-- Terminal -->
-        <div>
-            <island-terminal prompt="operator@zero-trust:~$" />
-        </div>
-
-        <!-- Galleria -->
-        <div>
-            <island-galleria images="@Model.GalleriaImages" />
-        </div>
-
-    </div>
-</div>
-
-<!-- ========================================== -->
-<!-- 6. Compound Components & Atomic Blocks Showcase -->
-<!-- ========================================== -->
-<div style="margin-bottom: 2.5rem;">
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
-        <div>
-            <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--p-surface-900);">Compound Components &amp; Atomic UI Blocks</h2>
-            <p style="font-size: 0.875rem; color: var(--p-surface-500); margin-top: 0.25rem;">Radix / shadcn-style atomic composition: cards, fields, input groups, dialogs, and accordions built with clean customizable CSS tokens.</p>
-        </div>
-        <span class="aura-tag tag-emerald">Compound Blocks</span>
-    </div>
-
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.5rem;">
-        
-        <!-- Block 1: Compound Card with Fields -->
-        <island-card>
-            <island-card-header>
-                <island-card-title>Telemetry Ingress Gateway</island-card-title>
-                <island-card-description>Configure zero-trust ingress credentials.</island-card-description>
-            </island-card-header>
-
-            <island-card-content class="space-y-4">
-                <island-field>
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <island-label for="secKey" required="true">Security Key</island-label>
-                        <span class="aura-tag tag-emerald" style="font-size: 0.6875rem;">HSM Active</span>
-                    </div>
-                    <island-input-group>
-                        <island-input-icon icon="🔒" />
-                        <island-input-text id="secKey" name="secKey" placeholder="HSM-KEY-9948-X" />
-                        <island-input-icon icon="⚡" position="Right" />
-                    </island-input-group>
-                    <island-helper-text>Keys are ephemeral and rotate every 3600 seconds.</island-helper-text>
-                </island-field>
-
-                <island-field>
-                    <island-label for="opEmail">Operator Email</island-label>
-                    <island-input-text id="opEmail" name="opEmail" value="alice@zero-trust.io" />
-                </island-field>
-            </island-card-content>
-
-            <island-card-footer style="display: flex; justify-content: flex-end; gap: 0.75rem;">
-                <island-button variant="Outline" size="Small">Revoke</island-button>
-                <island-button variant="Solid" size="Small">Deploy Ingress</island-button>
-            </island-card-footer>
-        </island-card>
-
-        <!-- Block 2: Compound Dialog Modal -->
-        <island-card>
-            <island-card-header>
-                <island-card-title>Compound Dialog System</island-card-title>
-                <island-card-description>Accessible, spring-animated focus-trapped modal.</island-card-description>
-            </island-card-header>
-
-            <island-card-content style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem 1rem;">
-                <div style="font-size: 2.5rem; margin-bottom: 1rem;">🛡️</div>
-                <island-dialog id="auditModal">
-                    <island-dialog-trigger>
-                        <island-button variant="Solid" size="Medium">Launch Audit Review Dialog</island-button>
-                    </island-dialog-trigger>
-                    <island-dialog-content title="Cluster Security Audit" description="Review automated cryptographic sign-off parameters.">
-                        <p style="font-size: 0.875rem; color: var(--p-surface-600); line-height: 1.6; margin-bottom: 1rem;">
-                            All nodes are currently verified against the FIPS 140-3 HSM Root Key ledger. Zero anomalous egress detected in the last 24 hours.
-                        </p>
-                        <island-dialog-footer>
-                            <island-dialog-close>
-                                <island-button variant="Outline" size="Small">Dismiss</island-button>
-                            </island-dialog-close>
-                            <island-button variant="Solid" size="Small">Approve Ledger</island-button>
-                        </island-dialog-footer>
-                    </island-dialog-content>
-                </island-dialog>
-            </island-card-content>
-        </island-card>
-
-    </div>
-</div>
-
-<!-- ========================================== -->
-<!-- 7. Aura Form Controls Suite -->
-<!-- ========================================== -->
-<div style="margin-bottom: 2.5rem;">
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
-        <div>
-            <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--p-surface-900);">Aura Form &amp; Input Controls</h2>
-            <p style="font-size: 0.875rem; color: var(--p-surface-500); margin-top: 0.25rem;">InputNumber, OTP, Password strength metering, ToggleSwitch, and Sliders.</p>
-        </div>
-        <span class="aura-tag tag-emerald">Form Controls</span>
-    </div>
-
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
-        
-        <!-- InputNumber -->
-        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 0.5rem; color: var(--p-surface-900);">InputNumber (Currency &amp; Steppers)</div>
-            <p style="font-size: 0.75rem; color: var(--p-surface-500); margin-bottom: 1rem;">Formatted currency mode with bounds check.</p>
-            <island-input-number mode="Currency" currency="USD" value="2499.50" min="0" max="100000" step="50" target-input-name="cluster_budget" />
-        </div>
-
-        <!-- InputOtp -->
-        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 0.5rem; color: var(--p-surface-900);">InputOtp (6-Digit Security Code)</div>
-            <p style="font-size: 0.75rem; color: var(--p-surface-500); margin-bottom: 1rem;">Auto-focus jump, backspace handling &amp; clipboard paste.</p>
-            <island-input-otp length="6" target-input-name="mfa_otp" />
-        </div>
-
-        <!-- InputPassword -->
-        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 0.5rem; color: var(--p-surface-900);">InputPassword (Real-Time Strength Meter)</div>
-            <p style="font-size: 0.75rem; color: var(--p-surface-500); margin-bottom: 1rem;">Eye toggle, entropy score &amp; color-coded meter.</p>
-            <island-input-password feedback="true" toggle-mask="true" target-input-name="operator_pwd" />
-        </div>
-
-        <!-- ToggleSwitch & Slider -->
-        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl); display: flex; flex-direction: column; justify-content: space-between;">
+    <!-- OrgChart -->
+    <section id="sec-orgchart" class="component-card">
+        <div class="card-header">
             <div>
-                <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 0.5rem; color: var(--p-surface-900);">ToggleSwitch &amp; Physics Slider</div>
-                <p style="font-size: 0.75rem; color: var(--p-surface-500); margin-bottom: 1rem;">Custom spring thumb transitions and range slider.</p>
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
-                    <span style="font-size: 0.8125rem; font-weight: 600; color: var(--p-surface-700);">Enforce Zero-Trust</span>
-                    <island-toggle-switch checked="true" target-input-name="zero_trust_active" />
-                </div>
+                <h2>OrgChart Hierarchy</h2>
+                <p>Interactive tree graph with expandable subordinate branches and role cards.</p>
             </div>
+            <span class="aura-tag tag-emerald">Hierarchy</span>
+        </div>
+        <div class="card-body">
+            <island-orgchart root="@Model.OrgChartRoot" />
+        </div>
+    </section>
+
+    <!-- Accordion -->
+    <section id="sec-accordion" class="component-card">
+        <div class="card-header">
             <div>
-                <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--p-surface-500); margin-bottom: 0.5rem;">
-                    <span>Replication Factor</span>
-                    <span style="font-weight: 700; color: var(--p-primary-600);">3 Nodes</span>
-                </div>
-                <island-slider value="3" min="1" max="10" step="1" target-input-name="replica_count" />
+                <h2>Accordion</h2>
+                <p>Stacked expandable accordion panels with multiple or single expansion modes.</p>
             </div>
+            <span class="aura-tag tag-slate">Panels</span>
         </div>
-
-    </div>
-</div>
-
-<!-- ========================================== -->
-<!-- 8. Interactive Accordion, Tabs, & DataGrid -->
-<!-- ========================================== -->
-<div style="margin-bottom: 2.5rem;">
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
-        <div>
-            <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--p-surface-900);">Enterprise Data &amp; Navigation Panels</h2>
-            <p style="font-size: 0.875rem; color: var(--p-surface-500); margin-top: 0.25rem;">Accordion tabs, sliding indicator tabs, and virtualized DataGrid.</p>
+        <div class="card-body" style="max-width: 700px;">
+            <island-accordion tabs="@Model.AccordionTabs" multiple="true" />
         </div>
-        <span class="aura-tag tag-emerald">Data &amp; Layout</span>
-    </div>
+    </section>
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.5rem;">
-        
-        <!-- Accordion -->
-        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Security Architecture Accordion</div>
-            <island-accordion tabs="@Model.AccordionTabs" />
+    <!-- Sliding Tabs -->
+    <section id="sec-tabs" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>Sliding Tabs</h2>
+                <p>Underline animated sliding tabs with lazy content panel switching.</p>
+            </div>
+            <span class="aura-tag tag-emerald">Tabs</span>
         </div>
-
-        <!-- Sliding Tabs -->
-        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Sliding Tab Indicator</div>
+        <div class="card-body" style="max-width: 700px;">
             <island-tabs tabs="@Model.TabSections" />
         </div>
+    </section>
 
-    </div>
-
-    <!-- DataGrid -->
-    <div style="margin-top: 1.5rem;">
-        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Enterprise Operator Security Grid</div>
-            <island-datagrid columns="@Model.GridColumns" data="@Model.GridRecords" paginate="true" page-size="4" search="true" />
-        </div>
-    </div>
-</div>
-
-<!-- ========================================== -->
-<!-- 9. Missing Components Showcase -->
-<!-- ========================================== -->
-<div style="margin-bottom: 2.5rem;">
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
-        <div>
-            <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--p-surface-900);">Form Components</h2>
-            <p style="font-size: 0.875rem; color: var(--p-surface-500); margin-top: 0.25rem;">AutoComplete, Select, Checkbox, RadioButton, Textarea, DatePicker, ColorPicker &amp; more.</p>
-        </div>
-        <span class="aura-tag tag-emerald">Forms</span>
-    </div>
-
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
-        
-        <!-- AutoComplete -->
-        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">AutoComplete (Combobox)</div>
-            <island-autocomplete items="@Model.CityOptions" placeholder="Search cities..." target-input-name="city_auto" />
-        </div>
-
-        <!-- Select -->
-        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Select Dropdown</div>
-            <island-select options="@Model.Periods" placeholder="Choose period..." target-input-name="period_select" filter="true" show-clear="true" />
-        </div>
-
-        <!-- Checkbox -->
-        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Checkbox</div>
-            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                <island-checkbox label="Enable mTLS Enforcement" checked="true" target-input-name="mtls_check" value="mtls" />
-                <island-checkbox label="Require 2FA for Admin" target-input-name="tfa_check" value="2fa" />
-                <island-checkbox label="Audit all API calls" target-input-name="audit_check" value="audit" />
+    <!-- Timeline -->
+    <section id="sec-timeline" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>Timeline</h2>
+                <p>Chronological sequence visualizer with status badges and milestone markers.</p>
             </div>
+            <span class="aura-tag tag-slate">History</span>
         </div>
-
-        <!-- RadioButton -->
-        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Radio Button</div>
-            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                <island-radio name="env" value="production" label="Production" checked="true" target-input-name="env_radio" />
-                <island-radio name="env" value="staging" label="Staging" target-input-name="env_radio" />
-                <island-radio name="env" value="development" label="Development" target-input-name="env_radio" />
-            </div>
-        </div>
-
-        <!-- Textarea -->
-        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Textarea (Auto-Resize)</div>
-            <island-textarea value="Enter your security incident description here..." max-length="500" auto-resize="true" target-input-name="incident_text" />
-        </div>
-
-        <!-- InputMask -->
-        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Input Mask</div>
-            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                <island-input-mask mask="(999) 999-9999" placeholder="Phone number" target-input-name="phone_mask" />
-                <island-input-mask mask="99/99/9999" placeholder="Date (DD/MM/YYYY)" target-input-name="date_mask" />
-            </div>
-        </div>
-
-        <!-- FloatLabel -->
-        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Float Label</div>
-            <island-float-label label="Email Address" target-input-name="email_float" />
-        </div>
-
-        <!-- EnhancedInputText -->
-        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Enhanced Input</div>
-            <island-enhanced-input value="" placeholder="Search operators..." icon-left="search" show-clear="true" target-input-name="enhanced_input" />
-        </div>
-
-        <!-- Chips -->
-        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Chips (Tag Input)</div>
-            <island-chips target-input-name="skill_chips" />
-        </div>
-
-        <!-- ColorPicker -->
-        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Color Picker</div>
-            <island-color-picker value="#10b981" target-input-name="theme_color" />
-        </div>
-
-        <!-- Rating -->
-        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Star Rating</div>
-            <island-rating value="3" count="5" target-input-name="security_rating" />
-        </div>
-
-        <!-- Knob -->
-        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Knob Dial</div>
-            <island-knob value="72" min="0" max="100" />
-        </div>
-
-        <!-- DatePicker -->
-        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Date Picker</div>
-            <island-datepicker target-input-name="audit_date" />
-        </div>
-
-        <!-- SelectButton -->
-        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Select Button</div>
-            <island-select-button items="@Model.Periods" target-input-name="period_btn" />
-        </div>
-    </div>
-</div>
-
-<!-- ========================================== -->
-<!-- 10. Navigation & Overlay Components -->
-<!-- ========================================== -->
-<div style="margin-bottom: 2.5rem;">
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
-        <div>
-            <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--p-surface-900);">Navigation &amp; Overlay Components</h2>
-            <p style="font-size: 0.875rem; color: var(--p-surface-500); margin-top: 0.25rem;">Menu, Sidebar, Stepper, Timeline, Drawer &amp; Modal components.</p>
-        </div>
-        <span class="aura-tag tag-slate">Navigation</span>
-    </div>
-
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.5rem;">
-
-        <!-- Stepper -->
-        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Stepper Wizard</div>
-            <island-stepper steps="@Model.StepperSteps" />
-        </div>
-
-        <!-- Timeline -->
-        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Event Timeline</div>
+        <div class="card-body" style="max-width: 650px;">
             <island-timeline events="@Model.AuditEvents" />
         </div>
+    </section>
 
-        <!-- ProgressBar -->
-        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Progress Bar</div>
+    <!-- Header Menu -->
+    <section id="sec-menu" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>Header &amp; Navigation Menu</h2>
+                <p>Horizontal and dropdown navigation bar with active path detection.</p>
+            </div>
+            <span class="aura-tag tag-slate">Menu</span>
+        </div>
+        <div class="card-body">
+            <island-menu items="@Model.HeaderMenuItems" />
+        </div>
+    </section>
+
+    <!-- ContextMenu -->
+    <section id="sec-context-menu" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>ContextMenu</h2>
+                <p>Right-click context menu overlay with nested submenus and command actions.</p>
+            </div>
+            <span class="aura-tag tag-slate">Context</span>
+        </div>
+        <div class="card-body">
+            <div style="padding: 2.5rem; border: 2px dashed var(--p-border-color); border-radius: var(--p-border-radius); text-align: center; color: var(--p-text-muted);">
+                Right click inside this area to trigger the ContextMenu island.
+            </div>
+            <island-context-menu items="@Model.HeaderMenuItems" />
+        </div>
+    </section>
+
+    <!-- Breadcrumb -->
+    <section id="sec-breadcrumb" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>Breadcrumb</h2>
+                <p>Navigational trail showing current hierarchy path with home icon.</p>
+            </div>
+            <span class="aura-tag tag-slate">Nav</span>
+        </div>
+        <div class="card-body">
+            <island-breadcrumb items="@Model.Breadcrumbs" />
+        </div>
+    </section>
+
+    <!-- macOS Dock -->
+    <section id="sec-dock" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>macOS Dock</h2>
+                <p>Fisheye magnification dock navigation bar with smooth physics scaling.</p>
+            </div>
+            <span class="aura-tag tag-emerald">macOS</span>
+        </div>
+        <div class="card-body" style="display: flex; justify-content: center; padding: 2rem 0;">
+            <island-dock items="@Model.DockItems" position="Bottom" />
+        </div>
+    </section>
+
+    <!-- Sidebar Tree -->
+    <section id="sec-sidebar" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>Sidebar Tree Navigation</h2>
+                <p>Collapsible nested hierarchy tree sidebar with search and status badges.</p>
+            </div>
+            <span class="aura-tag tag-slate">Sidebar</span>
+        </div>
+        <div class="card-body" style="max-width: 320px;">
+            <p style="font-size: 0.875rem; color: var(--p-text-muted); margin-bottom: 1rem;">The live sidebar is running persistently on the left navigation bar.</p>
+        </div>
+    </section>
+
+    <!-- Stepper Flow -->
+    <section id="sec-stepper" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>Stepper Flow</h2>
+                <p>Multi-step wizard workflow with validation checkpoints and progress connectors.</p>
+            </div>
+            <span class="aura-tag tag-emerald">Wizard</span>
+        </div>
+        <div class="card-body" style="max-width: 700px;">
+            <island-stepper steps="@Model.StepperSteps" active-step="1" />
+        </div>
+    </section>
+
+    <!-- SpeedDial FAB -->
+    <section id="sec-speed-dial" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>SpeedDial Floating FAB</h2>
+                <p>Radial floating action button that fans out quick actions on trigger.</p>
+            </div>
+            <span class="aura-tag tag-emerald">FAB</span>
+        </div>
+        <div class="card-body">
+            <p style="font-size: 0.875rem; color: var(--p-text-muted);">See the live floating action button in the bottom right corner of the window.</p>
+        </div>
+    </section>
+
+    <!-- ScrollTop -->
+    <section id="sec-scroll-top" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>ScrollTop Button</h2>
+                <p>Smooth animated scroll to top trigger appearing upon page scroll offset.</p>
+            </div>
+            <span class="aura-tag tag-slate">Scroll</span>
+        </div>
+        <div class="card-body">
+            <p style="font-size: 0.875rem; color: var(--p-text-muted);">Scroll down any page to see the smooth float-in ScrollTop button.</p>
+        </div>
+    </section>
+
+    <!-- Command Palette -->
+    <section id="sec-command-palette" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>Command Palette (Ctrl+K)</h2>
+                <p>Spotlight modal search for rapid command execution and keyboard navigation.</p>
+            </div>
+            <span class="aura-tag tag-amber">Ctrl+K</span>
+        </div>
+        <div class="card-body" style="max-width: 500px;">
+            <island-command-palette />
+        </div>
+    </section>
+
+    <!-- Modal Dialog -->
+    <section id="sec-modal" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>Modal Dialog</h2>
+                <p>Accessible modal dialog window with backdrop blur and keyboard trap.</p>
+            </div>
+            <span class="aura-tag tag-slate">Modal</span>
+        </div>
+        <div class="card-body" style="max-width: 500px;">
+            <button type="button" class="p-button p-button-primary" onclick="document.dispatchEvent(new CustomEvent('modal:open', { detail: { id: 'demo-modal' } }))">
+                Open Modal Dialog
+            </button>
+            <island-modal id="demo-modal" title="Security Confirmation">
+                <p style="color: var(--p-text-color); margin-bottom: 1rem;">Confirm zero-trust node deployment to the production cluster?</p>
+                <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+                    <button type="button" class="p-button p-button-secondary" onclick="document.dispatchEvent(new CustomEvent('modal:close', { detail: { id: 'demo-modal' } }))">Cancel</button>
+                    <button type="button" class="p-button p-button-primary" onclick="document.dispatchEvent(new CustomEvent('modal:close', { detail: { id: 'demo-modal' } }))">Confirm</button>
+                </div>
+            </island-modal>
+        </div>
+    </section>
+
+    <!-- Drawer Offcanvas -->
+    <section id="sec-drawer" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>Drawer Offcanvas</h2>
+                <p>Slide-in side drawer panel from right, left, top, or bottom edges.</p>
+            </div>
+            <span class="aura-tag tag-slate">Drawer</span>
+        </div>
+        <div class="card-body">
+            <button type="button" class="p-button p-button-secondary" onclick="document.dispatchEvent(new CustomEvent('drawer:open', { detail: { id: 'demo-drawer' } }))">
+                Open Side Drawer
+            </button>
+            <island-drawer id="demo-drawer" title="Cluster Configuration" position="Right">
+                <p style="color: var(--p-text-color);">Configure environment runtime arguments and network firewall policies.</p>
+            </island-drawer>
+        </div>
+    </section>
+
+    <!-- Popover -->
+    <section id="sec-popover" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>Popover</h2>
+                <p>Contextual overlay popup anchored to a target trigger element.</p>
+            </div>
+            <span class="aura-tag tag-slate">Popover</span>
+        </div>
+        <div class="card-body">
+            <island-popover target="#popover-btn">
+                <div style="padding: 0.75rem; font-size: 0.875rem;">
+                    <strong>Cluster Telemetry</strong>
+                    <p style="color: var(--p-text-muted); margin-top: 0.25rem;">Latency: 14ms | Health: 99.98%</p>
+                </div>
+            </island-popover>
+            <button id="popover-btn" type="button" class="p-button p-button-secondary">Hover or Click for Popover</button>
+        </div>
+    </section>
+
+    <!-- Tooltip -->
+    <section id="sec-tooltip" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>Tooltip</h2>
+                <p>Lightweight informative floating tooltip with arrow anchoring.</p>
+            </div>
+            <span class="aura-tag tag-slate">Tooltip</span>
+        </div>
+        <div class="card-body">
+            <island-tooltip text="Encrypted using SHA-256 HSM keys">
+                <button type="button" class="p-button p-button-secondary">Hover for Security Details</button>
+            </island-tooltip>
+        </div>
+    </section>
+
+    <!-- ConfirmPopup -->
+    <section id="sec-confirm-popup" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>ConfirmPopup</h2>
+                <p>Inline anchor confirmation popover before destructive operations.</p>
+            </div>
+            <span class="aura-tag tag-amber">Confirm</span>
+        </div>
+        <div class="card-body">
+            <island-confirm-popup message="Are you sure you want to flush all cluster caches?" icon="alertTriangle" />
+        </div>
+    </section>
+
+    <!-- Toast Container -->
+    <section id="sec-toast" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>Toast Notification Dispatcher</h2>
+                <p>Non-blocking growl toast alerts with auto-dismiss timers and sound hooks.</p>
+            </div>
+            <span class="aura-tag tag-emerald">Notifications</span>
+        </div>
+        <div class="card-body" style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <button type="button" class="p-button p-button-success" onclick="document.dispatchEvent(new CustomEvent('toast:show', { detail: { severity: 'success', summary: 'Success', detail: 'Cluster node deployed successfully.' } }))">
+                Success Toast
+            </button>
+            <button type="button" class="p-button p-button-danger" onclick="document.dispatchEvent(new CustomEvent('toast:show', { detail: { severity: 'error', summary: 'Error', detail: 'Connection timeout to vault #04.' } }))">
+                Error Toast
+            </button>
+            <button type="button" class="p-button p-button-info" onclick="document.dispatchEvent(new CustomEvent('toast:show', { detail: { severity: 'info', summary: 'Info', detail: 'Backup snapshot initiated.' } }))">
+                Info Toast
+            </button>
+        </div>
+    </section>
+
+    <!-- BlockUI -->
+    <section id="sec-blockui" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>BlockUI Screen Locker</h2>
+                <p>Block interaction on specific components or the full page during long async operations.</p>
+            </div>
+            <span class="aura-tag tag-slate">Lock</span>
+        </div>
+        <div class="card-body" style="max-width: 500px;">
+            <island-block-ui blocked="false" />
+        </div>
+    </section>
+
+    <!-- ProgressBar -->
+    <section id="sec-progress-bar" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>ProgressBar</h2>
+                <p>Determinate and indeterminate progress indicator bars.</p>
+            </div>
+            <span class="aura-tag tag-emerald">Progress</span>
+        </div>
+        <div class="card-body" style="max-width: 500px; display: flex; flex-direction: column; gap: 1rem;">
             <island-progress-bar value="68" show-value="true" />
+            <island-progress-bar mode="indeterminate" />
         </div>
+    </section>
 
-        <!-- MeterGroup -->
-        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Meter Group (Storage)</div>
-            <island-meter-group meters="@Model.StorageMetrics" />
+    <!-- Skeleton -->
+    <section id="sec-skeleton" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>Skeleton Placeholder</h2>
+                <p>Shimmer loading placeholders mimicking cards, text, and circular avatars.</p>
+            </div>
+            <span class="aura-tag tag-slate">Loading</span>
         </div>
+        <div class="card-body" style="max-width: 400px; display: flex; flex-direction: column; gap: 0.75rem;">
+            <island-skeleton width="100%" height="2rem" />
+            <island-skeleton width="75%" height="1.25rem" />
+            <island-skeleton width="50%" height="1.25rem" />
+        </div>
+    </section>
 
-        <!-- AvatarGroup -->
-        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Avatar Group</div>
+    <!-- MeterGroup -->
+    <section id="sec-meter-group" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>MeterGroup Capacity Gauge</h2>
+                <p>Multi-segmented capacity distribution meter for RAM, CPU, and disk pools.</p>
+            </div>
+            <span class="aura-tag tag-emerald">Telemetry</span>
+        </div>
+        <div class="card-body" style="max-width: 600px;">
+            <island-meter-group meters="@Model.StorageMetrics" max="100" />
+        </div>
+    </section>
+
+    <!-- AvatarGroup -->
+    <section id="sec-avatar-group" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>AvatarGroup Stack</h2>
+                <p>Overlapping user profile avatars with status badges and excess overflow indicator.</p>
+            </div>
+            <span class="aura-tag tag-slate">Users</span>
+        </div>
+        <div class="card-body">
             <island-avatar-group avatars="@Model.TeamAvatars" max="4" />
         </div>
+    </section>
 
-        <!-- Tags -->
-        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Tags / Badges</div>
-            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                <island-tag value="Active" severity="success" />
-                <island-tag value="Pending" severity="warn" />
-                <island-tag value="Critical" severity="error" />
-                <island-tag value="Archived" severity="info" />
+    <!-- Tag & Badges -->
+    <section id="sec-tag" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>Tag &amp; Status Badges</h2>
+                <p>Pill and status badge tags in emerald, amber, rose, and slate tones.</p>
             </div>
+            <span class="aura-tag tag-slate">Badges</span>
         </div>
+        <div class="card-body" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <island-tag value="Active" severity="Success" />
+            <island-tag value="Degraded" severity="Warning" />
+            <island-tag value="Offline" severity="Danger" />
+            <island-tag value="Standby" severity="Info" />
+        </div>
+    </section>
 
-        <!-- Skeleton -->
-        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Skeleton Loading</div>
-            <island-skeleton width="100%" height="1rem" />
-            <div style="margin-top: 0.75rem;"><island-skeleton width="80%" height="1rem" /></div>
-            <div style="margin-top: 0.75rem;"><island-skeleton width="60%" height="1rem" /></div>
-            <div style="margin-top: 0.75rem;"><island-skeleton shape="circle" width="3rem" height="3rem" /></div>
-        </div>
-
-        <!-- Inplace -->
-        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Inplace (Click to Edit)</div>
-            <island-inplace display-text="Click to edit this text" target-input-name="inplace_val" />
-        </div>
-
-        <!-- BlockUI -->
-        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Block UI Overlay</div>
-            <island-blockui blocked="false" message="Processing request..." />
-        </div>
-
-        <!-- Drawer -->
-        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Drawer (Slide Panel)</div>
-            <island-drawer position="right" title="Settings Drawer" trigger-label="Open Drawer" />
-        </div>
-
-        <!-- Modal Dialog -->
-        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Modal Dialog</div>
-            <island-modal title="Confirm Action" trigger-label="Open Modal" />
-        </div>
-
-        <!-- ConfirmPopup -->
-        <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-            <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Confirm Popup</div>
-            <island-confirm-popup message="Are you sure you want to delete this record?" />
-        </div>
-    </div>
-        <!-- ========================================== -->
-        <!-- 11. Data Display & Media -->
-        <!-- ========================================== -->
-        <section id="sec-dataview-paginator" style="margin-bottom: 2.5rem;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
-                <div>
-                    <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--p-surface-900);">Data Display &amp; Media Components</h2>
-                    <p style="font-size: 0.875rem; color: var(--p-surface-500); margin-top: 0.25rem;">Paginator, DataView, Carousel, ImageCompare &amp; Dropzone.</p>
-                </div>
-                <span class="aura-tag tag-amber">Data Display</span>
+    <!-- Inplace Editor -->
+    <section id="sec-inplace" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>Inplace Inline Editor</h2>
+                <p>Seamless inline text-to-input morphing for instant on-page editing.</p>
             </div>
+            <span class="aura-tag tag-emerald">Inline</span>
+        </div>
+        <div class="card-body" style="max-width: 400px;">
+            <island-inplace value="Cluster-US-East-01" />
+        </div>
+    </section>
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.5rem;">
-
-                <!-- Paginator -->
-                <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-                    <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Paginator</div>
-                    <island-paginator total-records="150" rows="10" />
-                </div>
-
-                <!-- Dropzone -->
-                <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-                    <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">File Dropzone</div>
-                    <island-dropzone accept="image/*,.pdf" max-size="5242880" />
-                </div>
-
-                <!-- ImageCompare -->
-                <div class="p-card" style="padding: 1.5rem; border-radius: var(--p-border-radius-xl);">
-                    <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 1rem; color: var(--p-surface-900);">Image Compare Slider</div>
-                    <island-image-compare />
-                </div>
+    <!-- Terminal CLI -->
+    <section id="sec-terminal" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>Terminal CLI Island</h2>
+                <p>Interactive web CLI with command history, auto-scrolling, and custom response hooks.</p>
             </div>
-        </section>
+            <span class="aura-tag tag-amber">CLI</span>
+        </div>
+        <div class="card-body">
+            <island-terminal welcome-message="SoftMax.LaughTale [Version 3.0.0] - Type 'help' or 'status'" prompt="operator@node-01:~$" />
+        </div>
+    </section>
+
+    <!-- Galleria -->
+    <section id="sec-galleria" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>Galleria Stage</h2>
+                <p>Fullscreen responsive image gallery with thumbnail navigation strip.</p>
+            </div>
+            <span class="aura-tag tag-emerald">Media</span>
+        </div>
+        <div class="card-body">
+            <island-galleria images="@Model.GalleriaImages" auto-play="true" />
+        </div>
+    </section>
+
+    <!-- Carousel -->
+    <section id="sec-carousel" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>Carousel Slider</h2>
+                <p>Smooth slide carousel with touch swipe and custom page indicators.</p>
+            </div>
+            <span class="aura-tag tag-slate">Carousel</span>
+        </div>
+        <div class="card-body">
+            <island-carousel items="@Model.CarouselSlides" />
+        </div>
+    </section>
+
+    <!-- File Dropzone -->
+    <section id="sec-dropzone" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>File Dropzone</h2>
+                <p>Drag-and-drop file upload with file type filters and progress hooks.</p>
+            </div>
+            <span class="aura-tag tag-emerald">Upload</span>
+        </div>
+        <div class="card-body" style="max-width: 500px;">
+            <island-dropzone accept="image/*,.pdf,.json" max-size="10485760" />
+        </div>
+    </section>
+
+    <!-- Image Compare -->
+    <section id="sec-image-compare" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>Image Compare Slider</h2>
+                <p>Split slider comparing before and after imagery with draggable divider.</p>
+            </div>
+            <span class="aura-tag tag-slate">Compare</span>
+        </div>
+        <div class="card-body" style="max-width: 600px;">
+            <island-image-compare />
+        </div>
+    </section>
+
+    <!-- Camera -->
+    <section id="sec-camera" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>Camera Snapshot</h2>
+                <p>Webcam video stream grabber for taking profile snapshots directly in browser.</p>
+            </div>
+            <span class="aura-tag tag-slate">Camera</span>
+        </div>
+        <div class="card-body" style="max-width: 450px;">
+            <island-camera />
+        </div>
+    </section>
+
+    <!-- SplitButton -->
+    <section id="sec-split-button" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>SplitButton Action Menu</h2>
+                <p>Primary action button paired with a dropdown flyout menu for secondary actions.</p>
+            </div>
+            <span class="aura-tag tag-emerald">Actions</span>
+        </div>
+        <div class="card-body">
+            <island-split-button label="Trigger Deploy" icon="⚡" menu="@Model.SplitButtonActions" />
+        </div>
+    </section>
 
 </div>
 
-<!-- ========================================== -->
-<!-- 12. Dock Navigation Bar (macOS Style) -->
-<!-- ========================================== -->
-<div style="margin-top: 3rem; margin-bottom: 3rem; display: flex; justify-content: center;">
-    <island-dock items="@Model.DockItems" position="Bottom" />
-</div>
-
-<!-- SpeedDial Floating Action Trigger -->
-<island-speed-dial actions="@Model.QuickActions" direction="Up" />
+<style>
+.component-card {
+    background: var(--p-surface-0);
+    border: 1px solid var(--p-border-color);
+    border-radius: var(--p-border-radius-xl);
+    box-shadow: var(--p-shadow-sm);
+    padding: 1.75rem;
+    margin-bottom: 2rem;
+    display: none;
+}
+.component-card .card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--p-border-color);
+    padding-bottom: 1rem;
+}
+.component-card .card-header h2 {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: var(--p-text-color);
+    margin: 0;
+}
+.component-card .card-header p {
+    font-size: 0.875rem;
+    color: var(--p-text-muted);
+    margin: 0.35rem 0 0;
+}
+</style>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
@@ -689,6 +1068,3 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 </script>
-
-
-

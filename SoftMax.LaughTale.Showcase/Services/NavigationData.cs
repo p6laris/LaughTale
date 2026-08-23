@@ -11,36 +11,89 @@ public static class NavigationData
             new("Overview", "compass", null, false, new List<SidebarItem>
             {
                 new("Showcase Home", "home", "/", currentPath == "/"),
-                new("Enterprise UI", "grid", "/enterprise", currentPath.StartsWith("/enterprise"), null, "64"),
                 new("Dashboard", "activity", "/dashboard", currentPath.StartsWith("/dashboard")),
                 new("Architecture", "fileText", "/About", currentPath.StartsWith("/About"))
             }),
-            new("Form Controls", "edit3", null, false, new List<SidebarItem>
+            new("Form Controls (22)", "edit3", null, false, new List<SidebarItem>
             {
-                new("Dynamic Forms", "fileSpreadsheet", "/enterprise#sec-dynamic-form", false, null, "Reflect"),
-                new("Form Inputs & OTP", "shieldAlert", "/enterprise#sec-inputs-otp"),
-                new("Enhanced Inputs & Masks", "edit", "/enterprise#sec-enhanced-inputs")
+                new("Dynamic Form", "fileSpreadsheet", "/enterprise#sec-dynamic-form", false, null, "Reflect"),
+                new("InputText", "edit", "/enterprise#sec-input-text"),
+                new("Textarea", "fileText", "/enterprise#sec-textarea"),
+                new("InputNumber", "sliders", "/enterprise#sec-input-number"),
+                new("InputOtp", "shieldAlert", "/enterprise#sec-input-otp"),
+                new("InputPassword", "lock", "/enterprise#sec-input-password"),
+                new("InputMask", "edit", "/enterprise#sec-input-mask"),
+                new("AutoComplete", "search", "/enterprise#sec-autocomplete"),
+                new("Select", "listFilter", "/enterprise#sec-select"),
+                new("MultiSelect", "listFilter", "/enterprise#sec-multiselect"),
+                new("CascadeSelect", "folderTree", "/enterprise#sec-cascadeselect"),
+                new("TreeSelect", "folderTree", "/enterprise#sec-treeselect"),
+                new("Checkbox", "checkCircle", "/enterprise#sec-checkbox"),
+                new("RadioButton", "check", "/enterprise#sec-radio"),
+                new("ToggleSwitch", "sliders", "/enterprise#sec-toggle-switch"),
+                new("Slider", "sliders", "/enterprise#sec-slider"),
+                new("Rating", "star", "/enterprise#sec-rating"),
+                new("SelectButton", "layoutGrid", "/enterprise#sec-select-button"),
+                new("Chips", "tag", "/enterprise#sec-chips"),
+                new("ColorPicker", "palette", "/enterprise#sec-color-picker"),
+                new("Knob", "gauge", "/enterprise#sec-knob"),
+                new("DatePicker", "calendar", "/enterprise#sec-datepicker"),
+                new("FloatLabel", "edit", "/enterprise#sec-float-label")
             }),
-            new("Data & Tables", "database", null, false, new List<SidebarItem>
+            new("Data & Tables (11)", "database", null, false, new List<SidebarItem>
             {
-                new("Splitter Panels", "columns3", "/enterprise#sec-splitter"),
-                new("Advanced Selects", "listFilter", "/enterprise#sec-advanced-selects"),
-                new("PickList & Transfer", "arrowLeftRight", "/enterprise#sec-transfer-lists"),
-                new("Hierarchy & Terminal", "terminal", "/enterprise#sec-hierarchy-terminal"),
                 new("Security DataGrid", "table2", "/enterprise#sec-datagrid", false, null, "Live"),
-                new("DataView & Paginator", "layoutGrid", "/enterprise#sec-dataview-paginator"),
-                new("Panels & Tabs", "folderTree", "/enterprise#sec-panels-tabs")
+                new("DataView", "layoutGrid", "/enterprise#sec-dataview"),
+                new("Paginator", "grid", "/enterprise#sec-paginator"),
+                new("Splitter Panels", "columns3", "/enterprise#sec-splitter"),
+                new("Listbox", "listFilter", "/enterprise#sec-listbox"),
+                new("PickList Transfer", "arrowLeftRight", "/enterprise#sec-picklist"),
+                new("OrderList", "arrowLeftRight", "/enterprise#sec-orderlist"),
+                new("OrgChart Hierarchy", "folderTree", "/enterprise#sec-orgchart"),
+                new("Accordion", "folderTree", "/enterprise#sec-accordion"),
+                new("Sliding Tabs", "columns3", "/enterprise#sec-tabs"),
+                new("Timeline", "activity", "/enterprise#sec-timeline")
             }),
-            new("Overlays & Feedback", "layers", null, false, new List<SidebarItem>
+            new("Navigation & Menus (9)", "compass", null, false, new List<SidebarItem>
             {
-                new("Overlays & Dialogs", "messageSquare", "/enterprise#sec-overlays-popovers"),
-                new("TreeSelect & Meters", "gauge", "/enterprise#sec-treeselect-meters"),
-                new("Progress & Skeleton", "loader2", "/enterprise#sec-progress-skeleton")
+                new("Header Menu", "menu", "/enterprise#sec-menu"),
+                new("ContextMenu", "moreHorizontal", "/enterprise#sec-context-menu"),
+                new("Breadcrumb", "compass", "/enterprise#sec-breadcrumb"),
+                new("macOS Dock", "layoutGrid", "/enterprise#sec-dock"),
+                new("Sidebar Tree", "folderTree", "/enterprise#sec-sidebar"),
+                new("Stepper Flow", "arrowRight", "/enterprise#sec-stepper"),
+                new("SpeedDial FAB", "zap", "/enterprise#sec-speed-dial"),
+                new("ScrollTop", "arrowUp", "/enterprise#sec-scroll-top"),
+                new("Command Palette", "terminal", "/enterprise#sec-command-palette")
             }),
-            new("Media & Files", "image", null, false, new List<SidebarItem>
+            new("Overlays & Dialogs (7)", "layers", null, false, new List<SidebarItem>
             {
-                new("Galleria & Dock", "galleryThumbnails", "/enterprise#sec-galleria-dock"),
-                new("Carousel & Dropzone", "uploadCloud", "/enterprise#sec-carousel-dropzone")
+                new("Modal Dialog", "layers", "/enterprise#sec-modal"),
+                new("Drawer Offcanvas", "sidebar", "/enterprise#sec-drawer"),
+                new("Popover", "messageSquare", "/enterprise#sec-popover"),
+                new("Tooltip", "info", "/enterprise#sec-tooltip"),
+                new("ConfirmPopup", "alertTriangle", "/enterprise#sec-confirm-popup"),
+                new("Toast Container", "bell", "/enterprise#sec-toast"),
+                new("BlockUI Locker", "lock", "/enterprise#sec-blockui")
+            }),
+            new("Feedback & Status (7)", "activity", null, false, new List<SidebarItem>
+            {
+                new("ProgressBar", "loader2", "/enterprise#sec-progress-bar"),
+                new("Skeleton Placeholder", "loader2", "/enterprise#sec-skeleton"),
+                new("MeterGroup Gauge", "gauge", "/enterprise#sec-meter-group"),
+                new("AvatarGroup", "compass", "/enterprise#sec-avatar-group"),
+                new("Tag & Badges", "check", "/enterprise#sec-tag"),
+                new("Inplace Editor", "edit3", "/enterprise#sec-inplace"),
+                new("Terminal CLI", "terminal", "/enterprise#sec-terminal")
+            }),
+            new("Media & Files (6)", "image", null, false, new List<SidebarItem>
+            {
+                new("Galleria Stage", "galleryThumbnails", "/enterprise#sec-galleria"),
+                new("Carousel Slider", "image", "/enterprise#sec-carousel"),
+                new("File Dropzone", "uploadCloud", "/enterprise#sec-dropzone"),
+                new("Image Compare", "columns3", "/enterprise#sec-image-compare"),
+                new("Camera Snapshot", "camera", "/enterprise#sec-camera"),
+                new("SplitButton Trigger", "zap", "/enterprise#sec-split-button")
             })
         };
     }
