@@ -220,8 +220,9 @@ body {
     border-color: var(--p-surface-300);
 }
 
-/* Aura Form Controls */
-.p-input {
+/* Aura Form Controls & InputText */
+.p-input,
+.p-inputtext {
     width: 100%;
     font-family: inherit;
     font-size: 0.875rem;
@@ -230,14 +231,167 @@ body {
     border: 1px solid var(--p-border-color);
     border-radius: var(--p-border-radius);
     padding: 0.5rem 0.875rem;
-    transition: all 0.15s ease;
+    transition: background 150ms ease, border-color 150ms ease, box-shadow 150ms ease, color 150ms ease;
     outline: none;
+    box-sizing: border-box;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.02);
 }
 
-.p-input:focus {
-    border-color: var(--p-primary-600);
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+.p-input:hover:not(:disabled):not(.is-invalid):not(.p-invalid),
+.p-inputtext:hover:not(:disabled):not(.is-invalid):not(.p-invalid) {
+    border-color: var(--p-surface-400);
+}
+
+.p-input:focus,
+.p-inputtext:focus,
+.p-inputtext:focus-visible {
+    border-color: var(--p-primary-500) !important;
+    box-shadow: 0 0 0 1px var(--p-primary-500) !important;
+}
+
+.p-inputtext.variant-filled,
+.p-inputtext.p-variant-filled {
+    background-color: var(--p-surface-100);
+    border-color: transparent;
+}
+.p-inputtext.variant-filled:hover:not(:disabled) {
+    background-color: var(--p-surface-200);
+}
+.p-inputtext.variant-filled:focus {
+    background-color: var(--p-surface-0);
+    border-color: var(--p-primary-500) !important;
+}
+
+.p-inputtext.size-small,
+.p-inputtext.p-inputtext-sm {
+    padding: 0.3125rem 0.625rem;
+    font-size: 0.75rem;
+    border-radius: calc(var(--p-border-radius) - 2px);
+}
+
+.p-inputtext.size-large,
+.p-inputtext.p-inputtext-lg {
+    padding: 0.6875rem 1rem;
+    font-size: 1.0625rem;
+    border-radius: calc(var(--p-border-radius) + 2px);
+}
+
+.p-inputtext.is-invalid,
+.p-inputtext.p-invalid {
+    border-color: var(--p-red-500, #ef4444) !important;
+}
+.p-inputtext.is-invalid:focus,
+.p-inputtext.p-invalid:focus {
+    box-shadow: 0 0 0 1px var(--p-red-500, #ef4444) !important;
+}
+
+.p-inputtext:disabled,
+.p-inputtext.is-disabled {
+    background-color: var(--p-surface-100);
+    color: var(--p-text-muted);
+    opacity: 0.75;
+    cursor: not-allowed;
+}
+
+.p-inputtext.p-inputtext-fluid,
+.p-inputtext.p-fluid {
+    width: 100%;
+}
+
+.laughtale-inputtext-wrap,
+.p-inputtext-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    width: auto;
+    font-family: var(--p-font-family, inherit);
+    box-sizing: border-box;
+}
+.p-inputtext-wrap.p-inputtext-fluid,
+.laughtale-inputtext-wrap.p-inputtext-fluid {
+    display: flex;
+    width: 100%;
+}
+
+.p-inputtext-icon {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--p-surface-400);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 2;
+}
+.p-inputtext-icon svg { width: 16px; height: 16px; }
+.p-inputtext-icon-left { left: 0.75rem; }
+.p-inputtext-icon-right { right: 0.75rem; }
+
+.has-icon-left .p-inputtext { padding-left: 2.25rem !important; }
+.has-icon-right .p-inputtext { padding-right: 2.25rem !important; }
+.has-clear .p-inputtext { padding-right: 2.25rem !important; }
+.has-icon-right.has-clear .p-inputtext { padding-right: 3.625rem !important; }
+
+.p-inputtext-clear {
+    position: absolute;
+    right: 0.625rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: var(--p-surface-400);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem;
+    border-radius: 9999px;
+    z-index: 3;
+}
+.p-inputtext-clear:hover {
+    background: var(--p-surface-200);
+    color: var(--p-surface-700);
+}
+.p-inputtext-clear svg { width: 14px; height: 14px; }
+.has-icon-right.has-clear .p-inputtext-clear { right: 2.25rem; }
+
+.p-inputtext-help {
+    font-size: 0.75rem;
+    color: var(--p-text-muted);
+    margin-top: 0.25rem;
+    line-height: 1.25;
+}
+
+/* Dark mode overrides */
+.dark .p-inputtext,
+[data-theme="dark"] .p-inputtext {
+    background-color: var(--p-surface-900);
+    border-color: var(--p-surface-700);
+    color: var(--p-surface-0);
+}
+.dark .p-inputtext:hover:not(:disabled):not(.is-invalid):not(.p-invalid),
+[data-theme="dark"] .p-inputtext:hover:not(:disabled):not(.is-invalid):not(.p-invalid) {
+    border-color: var(--p-surface-500);
+}
+.dark .p-inputtext.variant-filled,
+[data-theme="dark"] .p-inputtext.variant-filled {
+    background-color: var(--p-surface-800);
+}
+.dark .p-inputtext.variant-filled:focus,
+[data-theme="dark"] .p-inputtext.variant-filled:focus {
+    background-color: var(--p-surface-900);
+}
+.dark .p-inputtext:disabled,
+[data-theme="dark"] .p-inputtext:disabled {
+    background-color: var(--p-surface-800);
+    border-color: var(--p-surface-700);
+    color: var(--p-surface-500);
+}
+.dark .p-inputtext-clear:hover,
+[data-theme="dark"] .p-inputtext-clear:hover {
+    background-color: var(--p-surface-700);
+    color: var(--p-surface-200);
 }
 
 /* Tags & Badges */
