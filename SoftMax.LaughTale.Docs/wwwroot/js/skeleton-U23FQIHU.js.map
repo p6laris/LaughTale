@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../../../SoftMax.LaughTale.Client/src/components/skeleton.ts"],
-  "sourcesContent": ["/**\n * SoftMax.LaughTale: Enterprise Skeleton Shimmer Placeholder (Aura Skeleton inspired)\n */\n\nexport interface SkeletonProps {\n    shape?: 'rectangle' | 'circle';\n    width?: string;\n    height?: string;\n    borderRadius?: string;\n}\n\nexport default function SkeletonIsland(container: HTMLElement, props: SkeletonProps) {\n    const shape = props.shape || 'rectangle';\n    const width = props.width || '100%';\n    const height = props.height || '1.25rem';\n    const radius = props.borderRadius || (shape === 'circle' ? '50%' : 'var(--p-border-radius)');\n\n    container.innerHTML = `\n        <div class=\"laughtale-skeleton\" style=\"width: ${width}; height: ${height}; border-radius: ${radius}; background: linear-gradient(90deg, var(--p-surface-100) 25%, var(--p-surface-200) 50%, var(--p-surface-100) 75%); background-size: 200% 100%; animation: skeletonShimmer 1.5s infinite ease-in-out;\"></div>\n        <style>\n            @@keyframes skeletonShimmer {\n                0% { background-position: 200% 0; }\n                100% { background-position: -200% 0; }\n            }\n        </style>\n    `;\n}\n"],
-  "mappings": ";AAWe,SAAR,eAAgC,WAAwB,OAAsB;AACjF,QAAM,QAAQ,MAAM,SAAS;AAC7B,QAAM,QAAQ,MAAM,SAAS;AAC7B,QAAM,SAAS,MAAM,UAAU;AAC/B,QAAM,SAAS,MAAM,iBAAiB,UAAU,WAAW,QAAQ;AAEnE,YAAU,YAAY;AAAA,wDAC8B,KAAK,aAAa,MAAM,oBAAoB,MAAM;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAQ1G;",
-  "names": []
-}
