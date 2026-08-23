@@ -45,8 +45,92 @@ public class IslandNumberTagHelper : TagHelper
     {
         output.TagName = "div";
         output.TagMode = TagMode.StartTagAndEndTag;
+
+        var cssClass = "laughtale-inputnumber p-inputnumber";
+        if (Fluid) cssClass += " p-inputnumber-fluid";
+        if (Variant == InputVariant.Filled) cssClass += " variant-filled";
+        if (Size != ComponentSize.Normal) cssClass += $" size-{Size.ToString().ToLowerInvariant()}";
+        if (Invalid) cssClass += " is-invalid";
+        if (ShowButtons) cssClass += $" p-inputnumber-{ButtonLayout.ToString().ToLowerInvariant()}";
+
+        output.Attributes.SetAttribute("class", cssClass);
         output.Attributes.SetAttribute("data-island", "input-number");
         output.Attributes.SetAttribute("data-hydrate", "load");
+
+        // Format initial value server-side
+        string displayVal = "";
+        if (Value.HasValue)
+        {
+            if (Mode == InputNumberMode.Currency)
+            {
+                var cult = !string.IsNullOrEmpty(Locale) ? System.Globalization.CultureInfo.GetCultureInfo(Locale) : System.Globalization.CultureInfo.GetCultureInfo("en-US");
+                displayVal = Currency == "JPY" ? Value.Value.ToString("C0", cult) : Value.Value.ToString("C2", cult);
+            }
+            else
+            {
+                var cult = !string.IsNullOrEmpty(Locale) ? System.Globalization.CultureInfo.GetCultureInfo(Locale) : System.Globalization.CultureInfo.InvariantCulture;
+                displayVal = UseGrouping ? Value.Value.ToString("N" + (MinFractionDigits ?? 0), cult) : Value.Value.ToString("F" + (MinFractionDigits ?? 0), cult);
+            }
+            if (!string.IsNullOrEmpty(Prefix) && !displayVal.StartsWith(Prefix)) displayVal = Prefix + displayVal;
+            if (!string.IsNullOrEmpty(Suffix) && !displayVal.EndsWith(Suffix)) displayVal = displayVal + Suffix;
+        }
+
+        var inputIdAttr = !string.IsNullOrEmpty(InputId) ? $"id=\"{InputId}\"" : "";
+        var placeholderAttr = !string.IsNullOrEmpty(Placeholder) ? $"placeholder=\"{Placeholder}\"" : "";
+        var disabledAttr = Disabled ? "disabled" : "";
+
+        var sb = new System.Text.StringBuilder();
+
+        if (ShowButtons && ButtonLayout == ButtonLayout.Horizontal)
+        {
+            sb.Append($"<button type=\"button\" class=\"p-inputnumber-button p-inputnumber-button-down\" tabindex=\"-1\" {disabledAttr} aria-label=\"Decrement\">");
+            sb.Append(SoftMax.LaughTale.Components.Icons.LucideIcons.Get("minus", 14));
+            sb.Append("</button>");
+        }
+        else if (ShowButtons && ButtonLayout == ButtonLayout.Vertical)
+        {
+            sb.Append($"<button type=\"button\" class=\"p-inputnumber-button p-inputnumber-button-up\" tabindex=\"-1\" {disabledAttr} aria-label=\"Increment\">");
+            sb.Append(SoftMax.LaughTale.Components.Icons.LucideIcons.Get("plus", 14));
+            sb.Append("</button>");
+        }
+
+        sb.Append($"<input type=\"text\" class=\"p-inputnumber-input\" {inputIdAttr} {placeholderAttr} {disabledAttr} value=\"{displayVal}\" role=\"spinbutton\" autocomplete=\"off\" />");
+
+        if (ShowClear && Value.HasValue && !Disabled)
+        {
+            sb.Append("<button type=\"button\" class=\"p-inputnumber-clear-icon\" aria-label=\"Clear value\" tabindex=\"-1\">");
+            sb.Append(SoftMax.LaughTale.Components.Icons.LucideIcons.Get("x", 14));
+            sb.Append("</button>");
+        }
+
+        if (ShowButtons)
+        {
+            if (ButtonLayout == ButtonLayout.Stacked)
+            {
+                sb.Append("<div class=\"p-inputnumber-button-group\">");
+                sb.Append($"<button type=\"button\" class=\"p-inputnumber-button p-inputnumber-button-up\" tabindex=\"-1\" {disabledAttr} aria-label=\"Increment\">");
+                sb.Append(SoftMax.LaughTale.Components.Icons.LucideIcons.Get("chevron-up", 14));
+                sb.Append("</button>");
+                sb.Append($"<button type=\"button\" class=\"p-inputnumber-button p-inputnumber-button-down\" tabindex=\"-1\" {disabledAttr} aria-label=\"Decrement\">");
+                sb.Append(SoftMax.LaughTale.Components.Icons.LucideIcons.Get("chevron-down", 14));
+                sb.Append("</button>");
+                sb.Append("</div>");
+            }
+            else if (ButtonLayout == ButtonLayout.Horizontal)
+            {
+                sb.Append($"<button type=\"button\" class=\"p-inputnumber-button p-inputnumber-button-up\" tabindex=\"-1\" {disabledAttr} aria-label=\"Increment\">");
+                sb.Append(SoftMax.LaughTale.Components.Icons.LucideIcons.Get("plus", 14));
+                sb.Append("</button>");
+            }
+            else if (ButtonLayout == ButtonLayout.Vertical)
+            {
+                sb.Append($"<button type=\"button\" class=\"p-inputnumber-button p-inputnumber-button-down\" tabindex=\"-1\" {disabledAttr} aria-label=\"Decrement\">");
+                sb.Append(SoftMax.LaughTale.Components.Icons.LucideIcons.Get("minus", 14));
+                sb.Append("</button>");
+            }
+        }
+
+        output.Content.SetHtmlContent(sb.ToString());
 
         var props = new
         {

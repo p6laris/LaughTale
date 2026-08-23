@@ -24,15 +24,15 @@ export interface InputNumberProps {
     min?: number;
     max?: number;
     step?: number;
-    showButtons?: boolean;
+    showButtons?: boolean | string;
     buttonLayout?: 'stacked' | 'horizontal' | 'vertical';
     variant?: 'outlined' | 'filled';
     size?: 'small' | 'normal' | 'large';
-    fluid?: boolean;
-    invalid?: boolean;
-    showClear?: boolean;
+    fluid?: boolean | string;
+    invalid?: boolean | string;
+    showClear?: boolean | string;
     placeholder?: string;
-    disabled?: boolean;
+    disabled?: boolean | string;
     inputClass?: string;
     inputStyle?: Record<string, string> | string;
 }
@@ -45,6 +45,7 @@ const CSS = `
     font-family: var(--p-font-family, inherit);
     box-sizing: border-box;
     vertical-align: middle;
+    width: auto;
 }
 
 .p-inputnumber.p-inputnumber-fluid {
@@ -55,7 +56,7 @@ const CSS = `
 /* Base Input Element */
 .p-inputnumber-input {
     flex: 1 1 auto;
-    width: 1%;
+    width: 100%;
     min-width: 0;
     font-family: inherit;
     font-size: 0.875rem;
@@ -152,7 +153,7 @@ const CSS = `
     align-items: center;
     justify-content: center;
     background: var(--p-surface-100);
-    color: var(--p-text-muted);
+    color: var(--p-surface-600);
     border: 1px solid var(--p-border-color);
     cursor: pointer;
     user-select: none;
@@ -162,7 +163,7 @@ const CSS = `
 }
 .p-inputnumber-button:hover:not(:disabled) {
     background: var(--p-surface-200);
-    color: var(--p-text-color);
+    color: var(--p-surface-900);
 }
 .p-inputnumber-button:active:not(:disabled) {
     background: var(--p-surface-300);
@@ -172,11 +173,20 @@ const CSS = `
     cursor: not-allowed;
 }
 .p-inputnumber-button svg {
-    width: 14px;
-    height: 14px;
+    width: 12px;
+    height: 12px;
+    display: block;
 }
 
 /* Layout 1: Stacked (Default) */
+.p-inputnumber-stacked {
+    display: inline-flex;
+    align-items: stretch;
+}
+.p-inputnumber-stacked.p-inputnumber-fluid {
+    display: flex;
+    width: 100%;
+}
 .p-inputnumber-stacked .p-inputnumber-input {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
@@ -187,16 +197,23 @@ const CSS = `
     flex-direction: column;
     width: 2.25rem;
     margin-left: -1px;
+    flex-shrink: 0;
 }
 .p-inputnumber-stacked .p-inputnumber-button-up {
     flex: 1;
     border-top-right-radius: var(--p-border-radius);
+    border-bottom-right-radius: 0;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
     border-bottom: 1px solid var(--p-border-color);
 }
 .p-inputnumber-stacked .p-inputnumber-button-down {
     flex: 1;
     border-bottom-right-radius: var(--p-border-radius);
-    margin-top: -1px;
+    border-top-right-radius: 0;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top: none;
 }
 
 /* Layout 2: Horizontal */
@@ -204,12 +221,17 @@ const CSS = `
     display: inline-flex;
     align-items: stretch;
 }
+.p-inputnumber-horizontal.p-inputnumber-fluid {
+    display: flex;
+    width: 100%;
+}
 .p-inputnumber-horizontal .p-inputnumber-button-down {
     width: 2.5rem;
     border-top-left-radius: var(--p-border-radius);
     border-bottom-left-radius: var(--p-border-radius);
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
+    flex-shrink: 0;
 }
 .p-inputnumber-horizontal .p-inputnumber-input {
     border-radius: 0;
@@ -223,6 +245,7 @@ const CSS = `
     border-bottom-right-radius: var(--p-border-radius);
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
+    flex-shrink: 0;
 }
 
 /* Layout 3: Vertical */
@@ -306,13 +329,18 @@ export default function InputNumberIsland(container: HTMLElement, props: InputNu
     const currency = props.currency || 'USD';
     const currencyDisplay = props.currencyDisplay || 'symbol';
     const locale = props.locale || undefined;
-    const useGrouping = props.useGrouping !== false;
+    const useGrouping = props.useGrouping !== false && String(props.useGrouping) !== 'false';
     const buttonLayout = props.buttonLayout || 'stacked';
-    const showButtons = props.showButtons === true;
+    const showButtons = props.showButtons === true || String(props.showButtons) === 'true';
+    const isFluid = props.fluid === true || String(props.fluid) === 'true';
+    const isInvalid = props.invalid === true || String(props.invalid) === 'true';
+    const isFilled = props.variant === 'filled';
+    const isDisabled = props.disabled === true || String(props.disabled) === 'true';
+    const showClear = props.showClear === true || String(props.showClear) === 'true';
 
     // Determine default min/max fraction digits
-    let minFractionDigits = props.minFractionDigits;
-    let maxFractionDigits = props.maxFractionDigits;
+    let minFractionDigits = props.minFractionDigits !== undefined ? Number(props.minFractionDigits) : undefined;
+    let maxFractionDigits = props.maxFractionDigits !== undefined ? Number(props.maxFractionDigits) : undefined;
     if (minFractionDigits === undefined && maxFractionDigits === undefined) {
         if (isCurrency) {
             minFractionDigits = currency === 'JPY' ? 0 : 2;
@@ -374,7 +402,6 @@ export default function InputNumberIsland(container: HTMLElement, props: InputNu
         }
 
         // Strip non-numeric characters except digits, minus, and period/comma
-        // Normalize German/European comma to decimal point if decimal symbol
         clean = clean.replace(/[^\d.,-]/g, '').trim();
 
         // If string contains comma as decimal separator (e.g. de-DE: 1.500,00 or 1500,00)
@@ -398,22 +425,22 @@ export default function InputNumberIsland(container: HTMLElement, props: InputNu
         container.innerHTML = '';
         container.className = 'laughtale-inputnumber p-inputnumber';
 
-        if (props.fluid) container.classList.add('p-inputnumber-fluid');
-        if (props.variant === 'filled') container.classList.add('variant-filled');
+        if (isFluid) container.classList.add('p-inputnumber-fluid');
+        if (isFilled) container.classList.add('variant-filled');
         if (props.size) container.classList.add(`size-${props.size}`);
-        if (props.invalid) container.classList.add('is-invalid');
+        if (isInvalid) container.classList.add('is-invalid');
         if (showButtons) container.classList.add(`p-inputnumber-${buttonLayout}`);
 
         const inputIdAttr = props.inputId ? `id="${props.inputId}"` : '';
         const placeholderAttr = props.placeholder ? `placeholder="${props.placeholder}"` : '';
-        const disabledAttr = props.disabled ? 'disabled' : '';
+        const disabledAttr = isDisabled ? 'disabled' : '';
         const formattedVal = formatNumber(rawValue);
 
-        const upIcon = getLucideIcon('chevronUp') || `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 15-6-6-6 6"/></svg>`;
-        const downIcon = getLucideIcon('chevronDown') || `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>`;
-        const plusIcon = getLucideIcon('plus') || `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>`;
-        const minusIcon = getLucideIcon('minus') || `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/></svg>`;
-        const clearIcon = getLucideIcon('x') || `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
+        const upIcon = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>`;
+        const downIcon = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
+        const plusIcon = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>`;
+        const minusIcon = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>`;
+        const clearIcon = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
 
         let html = '';
 
@@ -442,12 +469,12 @@ export default function InputNumberIsland(container: HTMLElement, props: InputNu
                 aria-valuenow="${rawValue ?? ''}"
                 ${min !== undefined ? `aria-valuemin="${min}"` : ''}
                 ${max !== undefined ? `aria-valuemax="${max}"` : ''}
-                ${props.invalid ? 'aria-invalid="true"' : ''}
+                ${isInvalid ? 'aria-invalid="true"' : ''}
                 autocomplete="off"
             />
         `;
 
-        if (props.showClear && rawValue !== null && !props.disabled) {
+        if (showClear && rawValue !== null && !isDisabled) {
             html += `
                 <button type="button" class="p-inputnumber-clear-icon" aria-label="Clear value" tabindex="-1">
                     ${clearIcon}
@@ -494,7 +521,6 @@ export default function InputNumberIsland(container: HTMLElement, props: InputNu
 
         // Focus & Blur
         inputEl.addEventListener('focus', () => {
-            // Show raw or unformatted number during editing if needed, or select text
             inputEl.select();
         });
 
@@ -513,7 +539,7 @@ export default function InputNumberIsland(container: HTMLElement, props: InputNu
 
         // Keyboard navigation
         inputEl.addEventListener('keydown', (e) => {
-            if (props.disabled) return;
+            if (isDisabled) return;
 
             if (e.key === 'ArrowUp') {
                 e.preventDefault();
