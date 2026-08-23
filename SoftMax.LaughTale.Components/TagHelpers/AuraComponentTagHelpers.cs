@@ -1560,6 +1560,7 @@ public class IslandInputGroupTagHelper : TagHelper
     {
         output.TagName = "div";
         output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("class", "laughtale-inputgroup p-inputgroup");
         output.Attributes.SetAttribute("data-island", "input-group");
         output.Attributes.SetAttribute("data-hydrate", "load");
         var props = new
@@ -1585,8 +1586,20 @@ public class IslandInputGroupAddonTagHelper : TagHelper
     {
         output.TagName = "div";
         output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("class", "laughtale-inputgroup-addon p-inputgroup-addon");
         output.Attributes.SetAttribute("data-island", "input-group-addon");
         output.Attributes.SetAttribute("data-hydrate", "load");
+
+        if (!string.IsNullOrEmpty(Icon))
+        {
+            output.Content.AppendHtml(SoftMax.LaughTale.Components.Icons.LucideIcons.Get(Icon, 16));
+        }
+
+        if (!string.IsNullOrEmpty(Text))
+        {
+            output.Content.AppendHtml($"<span>{Text}</span>");
+        }
+
         var props = new
         {
             icon = Icon,

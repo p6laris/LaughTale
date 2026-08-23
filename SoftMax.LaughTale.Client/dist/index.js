@@ -1581,7 +1581,10 @@ var SoftMaxIslands = (() => {
 
   // src/icons/lucide.ts
   function getLucideIcon(name) {
-    return LucideIcons[name] || "";
+    if (!name) return "";
+    const camel = name.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+    const dict = LucideIcons;
+    return dict[name] || dict[camel] || dict[name.toLowerCase()] || "";
   }
   var LucideIcons;
   var init_lucide = __esm({
@@ -1618,6 +1621,11 @@ var SoftMaxIslands = (() => {
         starEmpty: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`,
         camera: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>`,
         uploadCloud: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M12 12v9"/><path d="m16 16-4-4-4 4"/></svg>`,
+        user: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+        mapPin: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>`,
+        globe: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>`,
+        dollarSign: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`,
+        phone: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>`,
         sliders: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="4" y1="21" y2="14"/><line x1="4" x2="4" y1="10" y2="3"/><line x1="12" x2="12" y1="21" y2="12"/><line x1="12" x2="12" y1="8" y2="3"/><line x1="20" x2="20" y1="21" y2="16"/><line x1="20" x2="20" y1="12" y2="3"/><line x1="1" x2="7" y1="14" y2="14"/><line x1="9" x2="15" y1="8" y2="8"/><line x1="17" x2="23" y1="16" y2="16"/></svg>`,
         palette: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>`,
         // Security & Status
@@ -12110,10 +12118,14 @@ ${h.response}`).join("\n");
   function InputGroupAddonIsland(container, props) {
     injectIslandStyle("laughtale-inputgroup", CSS55);
     container.classList.add("laughtale-inputgroup-addon", "p-inputgroup-addon");
-    if (props.icon || props.text) {
-      const iconSvg = props.icon ? getLucideIcon(props.icon) : "";
-      const textSpan = props.text ? `<span>${props.text}</span>` : "";
-      container.innerHTML = `${iconSvg}${textSpan}${container.innerHTML}`;
+    if (props.icon && !container.querySelector("svg")) {
+      const svg = getLucideIcon(props.icon);
+      if (svg) {
+        container.insertAdjacentHTML("afterbegin", svg);
+      }
+    }
+    if (props.text && !container.querySelector("span") && !container.textContent?.trim()) {
+      container.insertAdjacentHTML("beforeend", `<span>${props.text}</span>`);
     }
   }
   var CSS55;
@@ -12130,15 +12142,19 @@ ${h.response}`).join("\n");
     width: 100%;
     font-family: var(--p-font-family, inherit);
     box-sizing: border-box;
+    position: relative;
 }
 
+/* All direct children and island root elements inside inputgroup */
 .laughtale-inputgroup > *,
 .p-inputgroup > * {
     border-radius: 0 !important;
     margin-left: -1px;
     box-sizing: border-box;
+    min-height: 2.5rem;
 }
 
+/* First child outer corners */
 .laughtale-inputgroup > *:first-child,
 .p-inputgroup > *:first-child {
     margin-left: 0;
@@ -12146,27 +12162,53 @@ ${h.response}`).join("\n");
     border-bottom-left-radius: var(--p-border-radius) !important;
 }
 
+/* Last child outer corners */
 .laughtale-inputgroup > *:last-child,
 .p-inputgroup > *:last-child {
     border-top-right-radius: var(--p-border-radius) !important;
     border-bottom-right-radius: var(--p-border-radius) !important;
 }
 
-/* Propagate border-radius into nested form elements / islands */
+/* Only child */
+.laughtale-inputgroup > *:only-child,
+.p-inputgroup > *:only-child {
+    border-radius: var(--p-border-radius) !important;
+}
+
+/* Inner inputs, triggers, select boxes, and buttons corner overrides */
+.laughtale-inputgroup input,
+.laughtale-inputgroup textarea,
+.laughtale-inputgroup .p-input,
+.laughtale-inputgroup .cs-trigger,
+.laughtale-inputgroup .dp-trigger,
+.laughtale-inputgroup .laughtale-select-trigger,
+.laughtale-inputgroup .p-button,
+.p-inputgroup input,
+.p-inputgroup textarea,
+.p-inputgroup .p-input,
+.p-inputgroup .cs-trigger,
+.p-inputgroup .dp-trigger,
+.p-inputgroup .laughtale-select-trigger,
+.p-inputgroup .p-button {
+    border-radius: 0 !important;
+    height: 100%;
+    box-sizing: border-box;
+}
+
 .laughtale-inputgroup > *:first-child input,
 .laughtale-inputgroup > *:first-child textarea,
 .laughtale-inputgroup > *:first-child .p-input,
 .laughtale-inputgroup > *:first-child .cs-trigger,
 .laughtale-inputgroup > *:first-child .dp-trigger,
 .laughtale-inputgroup > *:first-child .laughtale-select-trigger,
-.laughtale-inputgroup > *:first-child .p-button,
+.laughtale-inputgroup > *:first-child.p-button,
 .p-inputgroup > *:first-child input,
 .p-inputgroup > *:first-child textarea,
 .p-inputgroup > *:first-child .p-input,
 .p-inputgroup > *:first-child .cs-trigger,
 .p-inputgroup > *:first-child .dp-trigger,
 .p-inputgroup > *:first-child .laughtale-select-trigger,
-.p-inputgroup > *:first-child .p-button {
+.p-inputgroup > *:first-child.p-button {
     border-top-left-radius: var(--p-border-radius) !important;
     border-bottom-left-radius: var(--p-border-radius) !important;
 }
@@ -12177,33 +12219,16 @@ ${h.response}`).join("\n");
 .laughtale-inputgroup > *:last-child .cs-trigger,
 .laughtale-inputgroup > *:last-child .dp-trigger,
 .laughtale-inputgroup > *:last-child .laughtale-select-trigger,
-.laughtale-inputgroup > *:last-child .p-button,
+.laughtale-inputgroup > *:last-child.p-button,
 .p-inputgroup > *:last-child input,
 .p-inputgroup > *:last-child textarea,
 .p-inputgroup > *:last-child .p-input,
 .p-inputgroup > *:last-child .cs-trigger,
 .p-inputgroup > *:last-child .dp-trigger,
 .p-inputgroup > *:last-child .laughtale-select-trigger,
-.p-inputgroup > *:last-child .p-button {
+.p-inputgroup > *:last-child.p-button {
     border-top-right-radius: var(--p-border-radius) !important;
     border-bottom-right-radius: var(--p-border-radius) !important;
-}
-
-.laughtale-inputgroup > *:not(:first-child):not(:last-child) input,
-.laughtale-inputgroup > *:not(:first-child):not(:last-child) textarea,
-.laughtale-inputgroup > *:not(:first-child):not(:last-child) .p-input,
-.laughtale-inputgroup > *:not(:first-child):not(:last-child) .cs-trigger,
-.laughtale-inputgroup > *:not(:first-child):not(:last-child) .dp-trigger,
-.laughtale-inputgroup > *:not(:first-child):not(:last-child) .laughtale-select-trigger,
-.laughtale-inputgroup > *:not(:first-child):not(:last-child) .p-button,
-.p-inputgroup > *:not(:first-child):not(:last-child) input,
-.p-inputgroup > *:not(:first-child):not(:last-child) textarea,
-.p-inputgroup > *:not(:first-child):not(:last-child) .p-input,
-.p-inputgroup > *:not(:first-child):not(:last-child) .cs-trigger,
-.p-inputgroup > *:not(:first-child):not(:last-child) .dp-trigger,
-.p-inputgroup > *:not(:first-child):not(:last-child) .laughtale-select-trigger,
-.p-inputgroup > *:not(:first-child):not(:last-child) .p-button {
-    border-radius: 0 !important;
 }
 
 /* Addon Styling */
@@ -12212,33 +12237,103 @@ ${h.response}`).join("\n");
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.5rem 0.75rem;
-    background: var(--p-surface-100);
+    padding: 0 0.85rem;
+    background: var(--p-surface-50);
     color: var(--p-text-muted);
     border: 1px solid var(--p-border-color);
     font-size: 0.875rem;
     font-weight: 500;
-    min-width: 2.5rem;
+    min-width: 2.75rem;
     user-select: none;
     white-space: nowrap;
     box-sizing: border-box;
-    gap: 0.35rem;
+    gap: 0.4rem;
+    flex-shrink: 0;
+}
+.laughtale-inputgroup-addon svg,
+.p-inputgroup-addon svg {
+    display: block;
+    width: 16px;
+    height: 16px;
+    color: var(--p-text-muted);
+    flex-shrink: 0;
 }
 
-/* FloatLabel & IftaLabel inside InputGroup adjustments */
+/* Buttons inside InputGroup */
+.laughtale-inputgroup .p-button,
+.p-inputgroup .p-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border: 1px solid var(--p-border-color);
+    cursor: pointer;
+    transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+    flex-shrink: 0;
+}
+
+/* Primary Dark / Contrast button (matches PrimeVue Aura 'Search' button) */
+.laughtale-inputgroup .p-button-primary,
+.p-inputgroup .p-button-primary {
+    background: var(--p-surface-950);
+    color: var(--p-surface-0);
+    border-color: var(--p-surface-950);
+}
+.laughtale-inputgroup .p-button-primary:hover,
+.p-inputgroup .p-button-primary:hover {
+    background: var(--p-surface-800);
+    border-color: var(--p-surface-800);
+}
+
+/* Secondary Button */
+.laughtale-inputgroup .p-button-secondary,
+.p-inputgroup .p-button-secondary {
+    background: var(--p-surface-0);
+    color: var(--p-text-muted);
+    border-color: var(--p-border-color);
+}
+.laughtale-inputgroup .p-button-secondary:hover,
+.p-inputgroup .p-button-secondary:hover {
+    background: var(--p-surface-100);
+    color: var(--p-text-color);
+}
+
+/* Select inside InputGroup */
+.laughtale-inputgroup .laughtale-select,
+.p-inputgroup .laughtale-select {
+    height: 100%;
+}
+.laughtale-inputgroup .laughtale-select-trigger,
+.p-inputgroup .laughtale-select-trigger {
+    height: 100%;
+    min-height: 2.5rem;
+    border-color: var(--p-border-color);
+}
+
+/* FloatLabel & IftaLabel inside InputGroup */
 .laughtale-inputgroup .laughtale-float-label,
 .p-inputgroup .laughtale-float-label {
     flex: 1;
     margin-top: 0;
+    min-height: 2.5rem;
+    display: flex;
+    justify-content: center;
 }
 .laughtale-inputgroup .laughtale-ifta-label,
 .p-inputgroup .laughtale-ifta-label {
     flex: 1;
+    min-height: 3rem;
+    display: flex;
+    justify-content: center;
 }
 
-/* Elevation on focus */
+/* Elevation on focus so the active border-color sits on top */
 .laughtale-inputgroup > *:focus-within,
-.p-inputgroup > *:focus-within {
+.p-inputgroup > *:focus-within,
+.laughtale-inputgroup > *:hover,
+.p-inputgroup > *:hover {
     z-index: 2;
 }
 
@@ -12246,6 +12341,22 @@ ${h.response}`).join("\n");
 .dark .laughtale-inputgroup-addon,
 .dark .p-inputgroup-addon {
     background: var(--p-surface-800);
+    border-color: var(--p-surface-700);
+    color: var(--p-surface-300);
+}
+.dark .laughtale-inputgroup-addon svg,
+.dark .p-inputgroup-addon svg {
+    color: var(--p-surface-400);
+}
+.dark .laughtale-inputgroup .p-button-primary,
+.dark .p-inputgroup .p-button-primary {
+    background: var(--p-surface-0);
+    color: var(--p-surface-950);
+    border-color: var(--p-surface-0);
+}
+.dark .laughtale-inputgroup .p-button-secondary,
+.dark .p-inputgroup .p-button-secondary {
+    background: var(--p-surface-900);
     border-color: var(--p-surface-700);
     color: var(--p-surface-300);
 }
