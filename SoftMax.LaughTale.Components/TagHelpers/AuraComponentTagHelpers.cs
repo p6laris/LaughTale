@@ -620,31 +620,147 @@ public class IslandSelectButtonTagHelper : TagHelper
 }
 
 /// <summary>
-/// TagHelper for <island-chips />
+/// TagHelper for <island-input-tags /> / <island-inputtags /> / <island-tags /> / <island-chips /> — Aura InputTags
 /// </summary>
+[HtmlTargetElement("island-input-tags")]
+[HtmlTargetElement("island-inputtags")]
+[HtmlTargetElement("island-tags")]
 [HtmlTargetElement("island-chips")]
-public class IslandChipsTagHelper : TagHelper
+public class IslandInputTagsTagHelper : TagHelper
 {
     public string? TargetInput { get; set; }
+    public string? InputId { get; set; }
     public IEnumerable<string>? Values { get; set; }
+    public string? Value { get; set; }
     public string? Placeholder { get; set; }
+    public string? Separator { get; set; }
+    public string? Delimiter { get; set; }
+    public bool AddOnPaste { get; set; } = true;
+    public bool AllowDuplicate { get; set; } = false;
     public int? Max { get; set; }
+    public bool Typeahead { get; set; } = false;
+    public IEnumerable<string>? Suggestions { get; set; }
+    public InputVariant Variant { get; set; } = InputVariant.Outlined;
+    public ComponentSize Size { get; set; } = ComponentSize.Normal;
+    public bool Fluid { get; set; } = false;
     public bool Disabled { get; set; } = false;
+    public bool ReadOnly { get; set; } = false;
+    public bool Invalid { get; set; } = false;
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
+        // Fallback attribute resolution for camelCase & kebab-case
+        if (context.AllAttributes.TryGetAttribute("addOnPaste", out var aopAttr) || context.AllAttributes.TryGetAttribute("add-on-paste", out aopAttr))
+        {
+            if (bool.TryParse(aopAttr.Value?.ToString(), out var aop)) AddOnPaste = aop;
+            else if (aopAttr.Value != null) AddOnPaste = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("allowDuplicate", out var adAttr) || context.AllAttributes.TryGetAttribute("allow-duplicate", out adAttr))
+        {
+            if (bool.TryParse(adAttr.Value?.ToString(), out var ad)) AllowDuplicate = ad;
+            else if (adAttr.Value != null) AllowDuplicate = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("typeahead", out var thAttr))
+        {
+            if (bool.TryParse(thAttr.Value?.ToString(), out var th)) Typeahead = th;
+            else if (thAttr.Value != null) Typeahead = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("fluid", out var flAttr))
+        {
+            if (bool.TryParse(flAttr.Value?.ToString(), out var fl)) Fluid = fl;
+            else if (flAttr.Value != null) Fluid = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("disabled", out var disAttr))
+        {
+            if (bool.TryParse(disAttr.Value?.ToString(), out var dis)) Disabled = dis;
+            else if (disAttr.Value != null) Disabled = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("readonly", out var roAttr))
+        {
+            if (bool.TryParse(roAttr.Value?.ToString(), out var ro)) ReadOnly = ro;
+            else if (roAttr.Value != null) ReadOnly = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("invalid", out var invAttr))
+        {
+            if (bool.TryParse(invAttr.Value?.ToString(), out var inv)) Invalid = inv;
+            else if (invAttr.Value != null) Invalid = true;
+        }
+
         output.TagName = "div";
         output.TagMode = TagMode.StartTagAndEndTag;
-        output.Attributes.SetAttribute("data-island", "chips");
+
+        var cssClass = "laughtale-inputtags p-inputtags";
+        if (Fluid) cssClass += " p-inputtags-fluid";
+        if (Variant == InputVariant.Filled) cssClass += " variant-filled";
+        if (Size != ComponentSize.Normal) cssClass += $" size-{Size.ToString().ToLowerInvariant()}";
+        if (Invalid) cssClass += " is-invalid";
+        if (Disabled) cssClass += " is-disabled";
+
+        output.Attributes.SetAttribute("class", cssClass);
+        output.Attributes.SetAttribute("data-island", "input-tags");
         output.Attributes.SetAttribute("data-hydrate", "load");
+        output.Attributes.SetAttribute("role", "listbox");
+        output.Attributes.SetAttribute("aria-orientation", "horizontal");
+
+        // Parse initial list of tags for SSR
+        var tagList = new List<string>();
+        if (Values != null)
+        {
+            tagList.AddRange(Values);
+        }
+        else if (!string.IsNullOrWhiteSpace(Value))
+        {
+            tagList.AddRange(Value.Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()));
+        }
+
+        var sb = new System.Text.StringBuilder();
+        var xCircleIcon = SoftMax.LaughTale.Components.Icons.LucideIcons.Get("x", 14);
+
+        for (int i = 0; i < tagList.Count; i++)
+        {
+            var tag = System.Net.WebUtility.HtmlEncode(tagList[i]);
+            sb.Append($"<span class=\"p-inputtags-tag\" data-index=\"{i}\" tabindex=\"0\" role=\"option\" aria-selected=\"true\">");
+            sb.Append($"<span class=\"p-inputtags-tag-label\">{tag}</span>");
+            if (!Disabled && !ReadOnly)
+            {
+                sb.Append($"<button type=\"button\" class=\"p-inputtags-tag-remove\" data-index=\"{i}\" aria-label=\"Remove {tag}\" tabindex=\"-1\">");
+                sb.Append(xCircleIcon);
+                sb.Append("</button>");
+            }
+            sb.Append("</span>");
+        }
+
+        var inputIdAttr = !string.IsNullOrEmpty(InputId) ? $"id=\"{InputId}\"" : "";
+        var placeholderAttr = tagList.Count == 0 && !string.IsNullOrEmpty(Placeholder) ? $"placeholder=\"{Placeholder}\"" : "";
+        var disabledAttr = Disabled ? "disabled" : "";
+        var roAttrStr = ReadOnly ? "readonly" : "";
+
+        if (Max == null || tagList.Count < Max)
+        {
+            sb.Append($"<input type=\"text\" class=\"p-inputtags-input\" {inputIdAttr} {placeholderAttr} {disabledAttr} {roAttrStr} autocomplete=\"off\" />");
+        }
+
+        output.Content.SetHtmlContent(sb.ToString());
 
         var props = new
         {
             targetInputName = TargetInput,
-            values = Values,
+            inputId = InputId,
+            values = tagList,
             placeholder = Placeholder,
+            separator = Separator,
+            delimiter = Delimiter ?? Separator,
+            addOnPaste = AddOnPaste,
+            allowDuplicate = AllowDuplicate,
             max = Max,
-            disabled = Disabled
+            typeahead = Typeahead,
+            suggestions = Suggestions,
+            variant = Variant.ToString().ToLowerInvariant(),
+            size = Size.ToString().ToLowerInvariant(),
+            fluid = Fluid,
+            disabled = Disabled,
+            readonlyMode = ReadOnly,
+            invalid = Invalid
         };
 
         output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
