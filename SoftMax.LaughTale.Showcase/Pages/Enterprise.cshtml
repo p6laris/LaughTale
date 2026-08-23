@@ -1439,19 +1439,72 @@
         </div>
     </section>
 
-    <!-- RadioButton -->
+        <!-- RadioButton -->
     <section id="sec-radio" class="component-card">
         <div class="card-header">
             <div>
                 <h2>RadioButton</h2>
-                <p>Mutual exclusion selection radio group with custom spring animations.</p>
+                <p>Single option selector from mutually exclusive choices with individual controls, groups, dynamic generation, selectable cards, sizes, and dark mode.</p>
             </div>
-            <span class="aura-tag tag-slate">Form</span>
+            <span class="aura-tag tag-indigo">Form Control</span>
         </div>
-        <div class="card-body" style="display: flex; flex-direction: column; gap: 0.75rem;">
-            <island-radio-button name="env" value="prod" label="Production Multi-Region" checked="true" />
-            <island-radio-button name="env" value="stage" label="Staging Isolated Sandbox" />
-            <island-radio-button name="env" value="dev" label="Local Dev Docker Container" />
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Demo 1: Basic List & Fruit Emojis -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic Vertical Radio Group</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Vertical mutually exclusive options with icons and emojis.</p>
+                <div style="max-width: 320px;">
+                    <island-radio-group name="fruit" options="@Model.FruitOptions" selected-value="banana" layout="vertical" />
+                </div>
+            </div>
+
+            <!-- Demo 2: Horizontal Group & Ingredients -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Horizontal Radio Group</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Inline horizontal radio group for quick compact choices.</p>
+                <island-radio-group name="pizza" options="@Model.PizzaIngredients" selected-value="Cheese" layout="horizontal" />
+            </div>
+
+            <!-- Demo 3: Dynamic Category List -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Dynamic Category List</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Dynamically bound category collection rendered horizontally.</p>
+                <island-radio-group name="department" options="@Model.CategoryOptions" selected-value="Production" layout="horizontal" />
+            </div>
+
+            <!-- Demo 4: Deployment Environment Selection Cards -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Deployment Region Cards</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Interactive selectable card style with country flags, latency titles, and subtitle descriptions.</p>
+                <div style="display: flex; flex-direction: column; gap: 0.75rem; max-width: 520px;">
+                    <span style="font-size: 0.875rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.25rem;">Select a deployment environment:</span>
+                    <island-radio-group name="deploy_env" options="@Model.DeploymentRegions" selected-value="us-east" card="true" layout="vertical" />
+                </div>
+            </div>
+
+            <!-- Demo 5: Pricing Plan Cards -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Pricing Tier Selection Cards</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Card layout featuring plan titles, highlight badges, descriptions, and price markers.</p>
+                <div style="display: flex; flex-direction: column; gap: 0.75rem; max-width: 520px;">
+                    <span style="font-size: 0.875rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.25rem;">Choose a plan:</span>
+                    <island-radio-group name="billing_plan" options="@Model.PricingPlans" selected-value="pro" card="true" layout="vertical" />
+                </div>
+            </div>
+
+            <!-- Demo 6: Sizes, Filled Variant & Validation States -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Sizes, Filled Variant &amp; Validation</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Small and large size metrics alongside high-contrast filled variant and validation states.</p>
+                <div style="display: flex; flex-wrap: wrap; gap: 2rem; align-items: center;">
+                    <island-radio-button name="sz_demo" value="sm" label="Small (16px)" size="@ComponentSize.Small" checked="true" />
+                    <island-radio-button name="sz_demo" value="nm" label="Normal (20px)" size="@ComponentSize.Normal" />
+                    <island-radio-button name="sz_demo" value="lg" label="Large (24px)" size="@ComponentSize.Large" />
+                    <island-radio-button name="var_demo" value="filled" label="Filled Variant" variant="@InputVariant.Filled" checked="true" />
+                    <island-radio-button name="dis_demo" value="dis" label="Disabled Option" disabled="true" />
+                    <island-radio-button name="inv_demo" value="inv" label="Invalid Validation" invalid="true" />
+                </div>
+            </div>
         </div>
     </section>
 

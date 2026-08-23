@@ -79,6 +79,17 @@ public record ListboxOptionItem(
     List<ListboxOptionItem>? Items = null
 );
 
+public record RadioButtonOption(
+    string Label,
+    string Value,
+    string? Description = null,
+    string? Badge = null,
+    string? Flag = null,
+    string? Icon = null,
+    string? Price = null,
+    bool Disabled = false
+);
+
 public record MeterValue(
     string Label,
     double Value,

@@ -2204,27 +2204,203 @@ public class IslandCheckboxGroupTagHelper : TagHelper
 }
 
 /// <summary>
-/// TagHelper for <island-radio /> / <island-radio-button /> — Styled radio button
+/// TagHelper for <island-radio /> / <island-radio-button /> / <island-radio-group /> — Aura RadioButton Component
 /// </summary>
 [HtmlTargetElement("island-radio")]
 [HtmlTargetElement("island-radio-button")]
+[HtmlTargetElement("island-radio-group")]
 public class IslandRadioTagHelper : TagHelper
 {
+    [HtmlAttributeName("checked")]
     public bool Checked { get; set; } = false;
+
+    [HtmlAttributeName("label")]
     public string? Label { get; set; }
+
+    [HtmlAttributeName("name")]
     public string? Name { get; set; }
+
+    [HtmlAttributeName("value")]
     public string? Value { get; set; }
+
+    [HtmlAttributeName("description")]
+    public string? Description { get; set; }
+
+    [HtmlAttributeName("badge")]
+    public string? Badge { get; set; }
+
+    [HtmlAttributeName("flag")]
+    public string? Flag { get; set; }
+
+    [HtmlAttributeName("icon")]
+    public string? Icon { get; set; }
+
+    [HtmlAttributeName("price")]
+    public string? Price { get; set; }
+
+    [HtmlAttributeName("card")]
+    public bool Card { get; set; } = false;
+
+    [HtmlAttributeName("variant")]
+    public InputVariant Variant { get; set; } = InputVariant.Outlined;
+
+    [HtmlAttributeName("size")]
+    public ComponentSize Size { get; set; } = ComponentSize.Normal;
+
+    [HtmlAttributeName("invalid")]
+    public bool Invalid { get; set; } = false;
+
+    [HtmlAttributeName("disabled")]
     public bool Disabled { get; set; } = false;
+
+    [HtmlAttributeName("readonly")]
+    public bool Readonly { get; set; } = false;
+
+    [HtmlAttributeName("input-id")]
+    public string? InputId { get; set; }
+
+    [HtmlAttributeName("target-input")]
     public string? TargetInput { get; set; }
+
+    [HtmlAttributeName("options")]
+    public object? Options { get; set; }
+
+    [HtmlAttributeName("selected-value")]
+    public string? SelectedValue { get; set; }
+
+    [HtmlAttributeName("layout")]
+    public string Layout { get; set; } = "vertical";
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
+        if (context.AllAttributes.TryGetAttribute("checked", out var chkAttr))
+        {
+            if (bool.TryParse(chkAttr.Value?.ToString(), out var chk)) Checked = chk;
+            else if (chkAttr.Value != null) Checked = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("card", out var cardAttr))
+        {
+            if (bool.TryParse(cardAttr.Value?.ToString(), out var cd)) Card = cd;
+            else if (cardAttr.Value != null) Card = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("invalid", out var invAttr))
+        {
+            if (bool.TryParse(invAttr.Value?.ToString(), out var inv)) Invalid = inv;
+            else if (invAttr.Value != null) Invalid = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("disabled", out var disAttr))
+        {
+            if (bool.TryParse(disAttr.Value?.ToString(), out var dis)) Disabled = dis;
+            else if (disAttr.Value != null) Disabled = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("readonly", out var roAttr))
+        {
+            if (bool.TryParse(roAttr.Value?.ToString(), out var ro)) Readonly = ro;
+            else if (roAttr.Value != null) Readonly = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("variant", out var varAttr))
+        {
+            if (System.Enum.TryParse<InputVariant>(varAttr.Value?.ToString(), true, out var vr)) Variant = vr;
+        }
+        if (context.AllAttributes.TryGetAttribute("size", out var szAttr))
+        {
+            if (System.Enum.TryParse<ComponentSize>(szAttr.Value?.ToString(), true, out var sz)) Size = sz;
+        }
+        if (context.AllAttributes.TryGetAttribute("target-input-name", out var tinAttr) || context.AllAttributes.TryGetAttribute("targetInputName", out tinAttr))
+        {
+            TargetInput = tinAttr.Value?.ToString();
+        }
+
         output.TagName = "div";
         output.TagMode = TagMode.StartTagAndEndTag;
         output.Attributes.SetAttribute("data-island", "radio-button");
         output.Attributes.SetAttribute("data-hydrate", "load");
-        var props = new { @checked = Checked, label = Label, name = Name, value = Value, disabled = Disabled, targetInputName = TargetInput };
+
+        var isEffectiveChecked = Checked || (!string.IsNullOrEmpty(SelectedValue) && SelectedValue == Value);
+
+        var props = new
+        {
+            @checked = isEffectiveChecked,
+            label = Label,
+            name = Name ?? "radio_group",
+            value = Value ?? Label ?? "val",
+            description = Description,
+            badge = Badge,
+            flag = Flag,
+            icon = Icon,
+            price = Price,
+            card = Card,
+            variant = Variant == InputVariant.Filled ? "filled" : "outlined",
+            size = Size.ToString().ToLowerInvariant(),
+            invalid = Invalid,
+            disabled = Disabled,
+            @readonly = Readonly,
+            inputId = InputId,
+            targetInputName = TargetInput,
+            options = Options,
+            selectedValue = SelectedValue,
+            layout = Layout
+        };
+
         output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
+
+        // SSR Pre-rendered markup
+        if (Options == null)
+        {
+            var rootClasses = new List<string> { "laughtale-radio-root", "p-radiobutton-root" };
+            if (Card) rootClasses.Add("p-radiobutton-card");
+            if (isEffectiveChecked) rootClasses.Add("is-checked");
+            if (Variant == InputVariant.Filled) rootClasses.Add("variant-filled");
+            if (Size != ComponentSize.Normal) rootClasses.Add($"size-{Size.ToString().ToLowerInvariant()}");
+            if (Invalid) rootClasses.Add("is-invalid");
+            if (Disabled) rootClasses.Add("is-disabled");
+
+            var chkAttrStr = isEffectiveChecked ? " checked" : "";
+            var disAttrStr = Disabled ? " disabled" : "";
+            var roAttrStr = Readonly ? " readonly" : "";
+            var idAttrStr = !string.IsNullOrEmpty(InputId) ? $" id=\"{System.Net.WebUtility.HtmlEncode(InputId)}\"" : "";
+            var valAttrStr = $" value=\"{System.Net.WebUtility.HtmlEncode(Value ?? Label ?? "val")}\"";
+            var nameAttrStr = !string.IsNullOrEmpty(Name) ? $" name=\"{System.Net.WebUtility.HtmlEncode(Name)}\"" : "";
+
+            if (Card)
+            {
+                var flagHtml = !string.IsNullOrEmpty(Flag) ? $"<span style=\"font-size: 1.25rem; line-height: 1;\">{System.Net.WebUtility.HtmlEncode(Flag)}</span>" : "";
+                var descHtml = !string.IsNullOrEmpty(Description) ? $"<div class=\"p-radiobutton-card-desc\">{System.Net.WebUtility.HtmlEncode(Description)}</div>" : "";
+                var badgeHtml = !string.IsNullOrEmpty(Badge) ? $"<span class=\"p-radiobutton-card-badge\">{System.Net.WebUtility.HtmlEncode(Badge)}</span>" : "";
+                var priceHtml = !string.IsNullOrEmpty(Price) ? $"<span class=\"p-radiobutton-card-price\">{System.Net.WebUtility.HtmlEncode(Price)}</span>" : "";
+
+                output.Content.SetHtmlContent($@"<label class=""{string.Join(" ", rootClasses)}"">
+    <div class=""p-radiobutton-card-content"">
+        {flagHtml}
+        <div>
+            <div class=""p-radiobutton-card-title"">
+                <span>{System.Net.WebUtility.HtmlEncode(Label ?? Value ?? "")}</span>
+                {badgeHtml}
+            </div>
+            {descHtml}
+        </div>
+    </div>
+    <div style=""display: flex; align-items: center;"">
+        {priceHtml}
+        <div class=""p-radiobutton{(isEffectiveChecked ? " p-radiobutton-checked" : "")}"">
+            <input type=""radio"" class=""p-radiobutton-input""{nameAttrStr}{valAttrStr}{idAttrStr}{chkAttrStr}{disAttrStr}{roAttrStr} />
+            <div class=""p-radiobutton-box""><div class=""p-radiobutton-icon""></div></div>
+        </div>
+    </div>
+</label>");
+            }
+            else
+            {
+                var labelHtml = !string.IsNullOrEmpty(Label) ? $"<span class=\"p-radiobutton-label\">{System.Net.WebUtility.HtmlEncode(Label)}</span>" : "";
+                output.Content.SetHtmlContent($@"<label class=""{string.Join(" ", rootClasses)}"">
+    <div class=""p-radiobutton{(isEffectiveChecked ? " p-radiobutton-checked" : "")}"">
+        <input type=""radio"" class=""p-radiobutton-input""{nameAttrStr}{valAttrStr}{idAttrStr}{chkAttrStr}{disAttrStr}{roAttrStr} />
+        <div class=""p-radiobutton-box""><div class=""p-radiobutton-icon""></div></div>
+    </div>
+    {labelHtml}
+</label>");
+            }
+        }
     }
 }
 

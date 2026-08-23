@@ -201,6 +201,37 @@ public class EnterpriseModel : PageModel
         new("Paris", "PRS", Disabled: true)
     };
 
+    public List<RadioButtonOption> DeploymentRegions { get; set; } = new()
+    {
+        new("US East — Virginia", "us-east", Flag: "🇺🇸", Description: "Low latency, auto-scaling enabled."),
+        new("EU West — Frankfurt", "eu-west", Flag: "🇩🇪", Description: "CI/CD pipeline, daily backups."),
+        new("EU East — Poland", "eu-east", Flag: "🇵🇱", Description: "GDPR compliant, secure.")
+    };
+
+    public List<RadioButtonOption> PricingPlans { get; set; } = new()
+    {
+        new("Starter", "starter", Price: "$0/month", Description: "For solo developers exploring the platform."),
+        new("Pro", "pro", Badge: "Popular", Price: "$29/month", Description: "For growing teams shipping in production."),
+        new("Enterprise", "enterprise", Price: "Custom", Description: "For large organizations with custom needs.")
+    };
+
+    public List<string> CategoryOptions { get; set; } = new()
+    {
+        "Accounting", "Marketing", "Production", "Research"
+    };
+
+    public List<string> PizzaIngredients { get; set; } = new()
+    {
+        "Cheese", "Mushroom", "Pepper", "Onion"
+    };
+
+    public List<RadioButtonOption> FruitOptions { get; set; } = new()
+    {
+        new("Strawberry", "strawberry", Flag: "🍓"),
+        new("Banana", "banana", Flag: "🍌"),
+        new("Watermelon", "watermelon", Flag: "🍉")
+    };
+
     public List<PickListItem> PickListSource { get; set; } = new()
     {
         new("sec-1", "mTLS Encryption", "Active session certificate"),
