@@ -280,15 +280,30 @@ public class IslandChipsTagHelper : TagHelper
 }
 
 /// <summary>
-/// TagHelper for <island-datepicker />
+/// TagHelper for <island-datepicker /> (Aura DatePicker)
 /// </summary>
 [HtmlTargetElement("island-datepicker")]
 public class IslandDatePickerTagHelper : TagHelper
 {
     public string? TargetInput { get; set; }
     public string? Value { get; set; }
-    public string? Placeholder { get; set; }
+    public string? Placeholder { get; set; } = "Select Date...";
+    public string DateFormat { get; set; } = "yy-mm-dd";
+    public DatePickerSelectionMode SelectionMode { get; set; } = DatePickerSelectionMode.Single;
+    public DatePickerView View { get; set; } = DatePickerView.Date;
+    public string? MinDate { get; set; }
+    public string? MaxDate { get; set; }
+    public bool ShowButtonBar { get; set; } = false;
+    public bool ShowTime { get; set; } = false;
+    public bool TimeOnly { get; set; } = false;
+    public string HourFormat { get; set; } = "24";
+    public bool Inline { get; set; } = false;
+    public bool ShowIcon { get; set; } = true;
     public bool Disabled { get; set; } = false;
+    public bool Invalid { get; set; } = false;
+    public bool Fluid { get; set; } = false;
+    public ComponentSize Size { get; set; } = ComponentSize.Normal;
+    public InputVariant Variant { get; set; } = InputVariant.Outlined;
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
@@ -302,7 +317,22 @@ public class IslandDatePickerTagHelper : TagHelper
             targetInputName = TargetInput,
             value = Value,
             placeholder = Placeholder,
-            disabled = Disabled
+            dateFormat = DateFormat,
+            selectionMode = SelectionMode.ToString().ToLowerInvariant(),
+            view = View.ToString().ToLowerInvariant(),
+            minDate = MinDate,
+            maxDate = MaxDate,
+            showButtonBar = ShowButtonBar,
+            showTime = ShowTime,
+            timeOnly = TimeOnly,
+            hourFormat = HourFormat,
+            inline = Inline,
+            showIcon = ShowIcon,
+            disabled = Disabled,
+            invalid = Invalid,
+            fluid = Fluid,
+            size = Size.ToString().ToLowerInvariant(),
+            variant = Variant.ToString().ToLowerInvariant()
         };
 
         output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));

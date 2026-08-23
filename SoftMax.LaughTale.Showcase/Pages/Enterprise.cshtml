@@ -120,6 +120,73 @@
         </div>
     </section>
 
+    <!-- DatePicker -->
+    <section id="sec-datepicker" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>DatePicker & TimePicker</h2>
+                <p>Enterprise theme-aware date & time picker with Single, Range, Multiple selection modes, Month/Year views, Button Bar, and Inline calendar.</p>
+            </div>
+            <span class="aura-tag tag-emerald">Form Control</span>
+        </div>
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Demo 1: Basic & Range (Travel Departure & Return) -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+                <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                    <label style="font-size: 0.875rem; font-weight: 700; color: var(--p-text-color); display: block; margin-bottom: 0.5rem;">When are you traveling?</label>
+                    <island-datepicker placeholder="Select departure and return" selection-mode="@DatePickerSelectionMode.Range" show-button-bar="true" />
+                </div>
+
+                <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                    <label style="font-size: 0.875rem; font-weight: 700; color: var(--p-text-color); display: block; margin-bottom: 0.5rem;">Deployment Schedule (Date + Time)</label>
+                    <island-datepicker placeholder="Select release time..." show-time="true" hour-format="12" show-button-bar="true" />
+                </div>
+            </div>
+
+            <!-- Demo 2: Multiple Selection, Month View & Inline Mode -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+                <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); display: flex; flex-direction: column; gap: 1rem;">
+                    <div>
+                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-muted); display: block; margin-bottom: 0.25rem;">Multiple Dates</label>
+                        <island-datepicker placeholder="Select multiple days..." selection-mode="@DatePickerSelectionMode.Multiple" />
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-muted); display: block; margin-bottom: 0.25rem;">Month Picker View</label>
+                        <island-datepicker placeholder="Select target fiscal month..." view="@DatePickerView.Month" />
+                    </div>
+                </div>
+
+                <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); display: flex; flex-direction: column; align-items: center;">
+                    <label style="font-size: 0.875rem; font-weight: 700; color: var(--p-text-color); margin-bottom: 0.5rem; align-self: flex-start;">Inline Calendar</label>
+                    <island-datepicker inline="true" show-button-bar="true" />
+                </div>
+            </div>
+
+            <!-- Demo 3: Sizes & Variants -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 1rem; color: var(--p-text-color);">Sizes & Variants</h3>
+                <div style="display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: center;">
+                    <div style="flex: 1; min-width: 200px;">
+                        <label style="font-size: 0.75rem; font-weight: 600; color: var(--p-text-muted); display: block; margin-bottom: 0.25rem;">Small</label>
+                        <island-datepicker placeholder="Small..." size="@ComponentSize.Small" />
+                    </div>
+                    <div style="flex: 1; min-width: 200px;">
+                        <label style="font-size: 0.75rem; font-weight: 600; color: var(--p-text-muted); display: block; margin-bottom: 0.25rem;">Filled Variant</label>
+                        <island-datepicker placeholder="Filled..." variant="@InputVariant.Filled" />
+                    </div>
+                    <div style="flex: 1; min-width: 200px;">
+                        <label style="font-size: 0.75rem; font-weight: 600; color: var(--p-text-muted); display: block; margin-bottom: 0.25rem;">Invalid</label>
+                        <island-datepicker placeholder="Invalid..." invalid="true" />
+                    </div>
+                    <div style="flex: 1; min-width: 200px;">
+                        <label style="font-size: 0.75rem; font-weight: 600; color: var(--p-text-muted); display: block; margin-bottom: 0.25rem;">Disabled</label>
+                        <island-datepicker placeholder="Disabled..." disabled="true" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- AutoComplete -->
     <section id="sec-autocomplete" class="component-card">
         <div class="card-header">

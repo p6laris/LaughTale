@@ -6,6 +6,20 @@ public enum InputVariant
     Filled
 }
 
+public enum DatePickerSelectionMode
+{
+    Single,
+    Multiple,
+    Range
+}
+
+public enum DatePickerView
+{
+    Date,
+    Month,
+    Year
+}
+
 public enum FloatLabelVariant
 {
     Over,
