@@ -162,10 +162,13 @@ export default function FloatLabelIsland(container: HTMLElement, props: FloatLab
             hasVal = true;
         }
 
-        if (hasVal) {
-            wrap.classList.add('has-value');
-        } else {
-            wrap.classList.remove('has-value');
+        const currentlyHas = wrap.classList.contains('has-value');
+        if (currentlyHas !== hasVal) {
+            if (hasVal) {
+                wrap.classList.add('has-value');
+            } else {
+                wrap.classList.remove('has-value');
+            }
         }
     }
 
@@ -204,11 +207,11 @@ export default function FloatLabelIsland(container: HTMLElement, props: FloatLab
     wrap.addEventListener('autocomplete:change', updateFloatingState);
     wrap.addEventListener('select:change', updateFloatingState);
 
-    // MutationObserver to detect async island rendering or DOM tag additions
+    // MutationObserver to detect child tag additions (childList only, preventing attribute loops)
     const observer = new MutationObserver(() => {
         updateFloatingState();
     });
-    observer.observe(wrap, { childList: true, subtree: true, attributes: true });
+    observer.observe(wrap, { childList: true, subtree: true });
 
     // Initial passes
     updateFloatingState();

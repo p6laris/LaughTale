@@ -13494,10 +13494,13 @@ ${h.response}`).join("\n");
       } else if (tags.length > 0) {
         hasVal = true;
       }
-      if (hasVal) {
-        wrap.classList.add("has-value");
-      } else {
-        wrap.classList.remove("has-value");
+      const currentlyHas = wrap.classList.contains("has-value");
+      if (currentlyHas !== hasVal) {
+        if (hasVal) {
+          wrap.classList.add("has-value");
+        } else {
+          wrap.classList.remove("has-value");
+        }
       }
     }
     labelEl?.addEventListener("click", () => {
@@ -13532,7 +13535,7 @@ ${h.response}`).join("\n");
     const observer = new MutationObserver(() => {
       updateFloatingState();
     });
-    observer.observe(wrap, { childList: true, subtree: true, attributes: true });
+    observer.observe(wrap, { childList: true, subtree: true });
     updateFloatingState();
     setTimeout(updateFloatingState, 50);
     setTimeout(updateFloatingState, 200);
