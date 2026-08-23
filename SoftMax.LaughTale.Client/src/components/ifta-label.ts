@@ -52,6 +52,14 @@ const CSS = `
     box-sizing: border-box;
 }
 
+.laughtale-ifta-label .p-inputtags input,
+.laughtale-ifta-label .p-password-container input,
+.laughtale-ifta-label .p-inputgroup input {
+    padding-top: 0.1875rem !important;
+    padding-bottom: 0.1875rem !important;
+    min-height: auto !important;
+}
+
 /* Focus State */
 .laughtale-ifta-label:focus-within > label {
     color: var(--p-primary-500);

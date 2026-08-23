@@ -95,6 +95,14 @@ const CSS = `
     padding-bottom: 0.25rem !important;
 }
 
+.laughtale-float-label-in .p-inputtags input,
+.laughtale-float-label-in .p-password-container input,
+.laughtale-float-label-in .p-inputgroup input {
+    padding-top: 0.1875rem !important;
+    padding-bottom: 0.1875rem !important;
+    min-height: auto !important;
+}
+
 /* Invalid State */
 .laughtale-float-label.invalid > label,
 .laughtale-float-label:has(.invalid) > label,

@@ -1,34 +1,31 @@
 /**
  * SoftMax.LaughTale: Enterprise InputTags Component (Aura InputTags / Chips)
- * High-performance tag entry with keyboard navigation, custom delimiters, addOnPaste,
- * allowDuplicate control, max items restriction, typeahead suggestion dropdown,
- * FLIP animations, filled/outlined variants, sizes, and dark mode tokens.
+ * Zero-flicker incremental DOM tokenization, custom delimiters, paste splitting,
+ * duplicate handling, max capacity locking, and typeahead suggestions.
  */
 
 import { injectIslandStyle } from '../runtime/styles';
-import { useAutoAnimate } from '../composables/animation/useAutoAnimate';
 import { useControllableState } from '../composables/useControllableState';
-import { LucideIcons } from '../icons/lucide';
 
 export interface InputTagsProps {
-    targetInputName?: string;
-    inputId?: string;
     values?: string[] | string;
     value?: string[] | string;
     placeholder?: string;
     separator?: string;
     delimiter?: string;
-    addOnPaste?: boolean | string;
-    allowDuplicate?: boolean | string;
-    max?: number | string;
-    typeahead?: boolean | string;
+    addOnPaste?: boolean;
+    allowDuplicate?: boolean;
+    max?: number;
+    typeahead?: boolean;
     suggestions?: string[] | string;
     variant?: 'outlined' | 'filled';
     size?: 'small' | 'normal' | 'large';
-    fluid?: boolean | string;
-    disabled?: boolean | string;
-    readonlyMode?: boolean | string;
-    invalid?: boolean | string;
+    fluid?: boolean;
+    disabled?: boolean;
+    readonlyMode?: boolean;
+    invalid?: boolean;
+    targetInputName?: string;
+    inputId?: string;
 }
 
 const CSS = `
@@ -167,14 +164,17 @@ const CSS = `
 .p-inputtags-input {
     flex: 1 1 60px;
     min-width: 60px;
-    border: none;
-    outline: none;
-    background: transparent;
+    border: none !important;
+    outline: none !important;
+    background: transparent !important;
     font-family: inherit;
     font-size: 0.875rem;
     color: var(--p-text-color);
-    padding: 0.1875rem 0.25rem;
+    padding: 0.1875rem 0.25rem !important;
+    margin: 0 !important;
     box-sizing: border-box;
+    line-height: 1.2;
+    box-shadow: none !important;
 }
 .p-inputtags-input:disabled {
     cursor: not-allowed;
@@ -270,6 +270,8 @@ const CSS = `
 }
 `;
 
+const xCircleIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>`;
+
 export default function InputTagsIsland(container: HTMLElement, props: InputTagsProps) {
     injectIslandStyle('laughtale-inputtags', CSS);
 
@@ -323,59 +325,89 @@ export default function InputTagsIsland(container: HTMLElement, props: InputTags
     let activeSuggestionIndex = -1;
     let filteredSuggestions: string[] = [];
 
-    function render() {
-        const tags = getTags();
-        const inputIdAttr = props.inputId ? `id="${props.inputId}"` : '';
-        const isMaxReached = maxItems !== null && tags.length >= maxItems;
-
-        container.className = 'laughtale-inputtags p-inputtags';
-        container.setAttribute('role', 'listbox');
-        container.setAttribute('aria-orientation', 'horizontal');
-        if (isFluid) container.classList.add('p-inputtags-fluid');
-        if (isFilled) container.classList.add('variant-filled');
-        if (props.size) container.classList.add(`size-${props.size}`);
-        if (isInvalid) container.classList.add('is-invalid');
-        if (isDisabled) container.classList.add('is-disabled');
-
-        const xCircleIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>`;
-
-        let tagsHtml = tags.map((tag, idx) => `
-            <span class="p-inputtags-tag" data-index="${idx}" tabindex="0" role="option" aria-selected="true">
-                <span class="p-inputtags-tag-label">${escapeHtml(tag)}</span>
-                ${!isDisabled && !isReadonly ? `
-                    <button type="button" class="p-inputtags-tag-remove" data-index="${idx}" aria-label="Remove ${escapeHtml(tag)}" tabindex="-1">
-                        ${xCircleIcon}
-                    </button>
-                ` : ''}
-            </span>
-        `).join('');
-
-        let inputHtml = '';
-        if (!isMaxReached) {
-            inputHtml = `
-                <input type="text"
-                       class="p-inputtags-input"
-                       ${inputIdAttr}
-                       placeholder="${tags.length === 0 ? (props.placeholder || '') : ''}"
-                       ${isDisabled ? 'disabled' : ''}
-                       ${isReadonly ? 'readonly' : ''}
-                       autocomplete="off"
-                       ${hasTypeahead ? 'role="combobox" aria-autocomplete="list" aria-expanded="false"' : ''} />
-            `;
-        }
-
-        container.innerHTML = `
-            ${tagsHtml}
-            ${inputHtml}
-            ${hasTypeahead ? `<div class="p-inputtags-panel" style="display: none;"></div>` : ''}
-        `;
-
-        useAutoAnimate(container, { duration: 180 });
-        bindEvents();
-    }
-
     function escapeHtml(str: string): string {
         return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function createTagElement(tag: string, index: number): HTMLElement {
+        const el = document.createElement('span');
+        el.className = 'p-inputtags-tag';
+        el.setAttribute('data-index', String(index));
+        el.setAttribute('tabindex', '0');
+        el.setAttribute('role', 'option');
+        el.setAttribute('aria-selected', 'true');
+
+        el.innerHTML = `
+            <span class="p-inputtags-tag-label">${escapeHtml(tag)}</span>
+            ${!isDisabled && !isReadonly ? `
+                <button type="button" class="p-inputtags-tag-remove" data-index="${index}" aria-label="Remove ${escapeHtml(tag)}" tabindex="-1">
+                    ${xCircleIcon}
+                </button>
+            ` : ''}
+        `;
+
+        bindTagEvents(el);
+        return el;
+    }
+
+    function bindTagEvents(tagEl: HTMLElement) {
+        const removeBtn = tagEl.querySelector<HTMLButtonElement>('.p-inputtags-tag-remove');
+        if (removeBtn) {
+            removeBtn.addEventListener('mousedown', (e) => e.preventDefault());
+            removeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const idx = Number(tagEl.getAttribute('data-index'));
+                removeTag(idx);
+            });
+        }
+
+        tagEl.addEventListener('keydown', (e) => {
+            const idx = Number(tagEl.getAttribute('data-index'));
+            if (e.key === 'Backspace' || e.key === 'Delete') {
+                e.preventDefault();
+                removeTag(idx);
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                const prevTag = tagEl.previousElementSibling as HTMLElement;
+                if (prevTag && prevTag.classList.contains('p-inputtags-tag')) {
+                    prevTag.focus();
+                }
+            } else if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                const nextTag = tagEl.nextElementSibling as HTMLElement;
+                if (nextTag && nextTag.classList.contains('p-inputtags-tag')) {
+                    nextTag.focus();
+                } else {
+                    const input = container.querySelector<HTMLInputElement>('.p-inputtags-input');
+                    input?.focus();
+                }
+            }
+        });
+    }
+
+    function updateTagIndices() {
+        const allTags = container.querySelectorAll<HTMLElement>('.p-inputtags-tag');
+        allTags.forEach((el, i) => {
+            el.setAttribute('data-index', String(i));
+            const btn = el.querySelector<HTMLButtonElement>('.p-inputtags-tag-remove');
+            if (btn) btn.setAttribute('data-index', String(i));
+        });
+
+        const input = container.querySelector<HTMLInputElement>('.p-inputtags-input');
+        if (input) {
+            const current = getTags();
+            if (current.length === 0) {
+                input.placeholder = props.placeholder || '';
+            } else {
+                input.placeholder = '';
+            }
+
+            if (maxItems !== null && current.length >= maxItems) {
+                input.style.display = 'none';
+            } else {
+                input.style.display = '';
+            }
+        }
     }
 
     function addTag(val: string) {
@@ -386,7 +418,7 @@ export default function InputTagsIsland(container: HTMLElement, props: InputTags
         if (maxItems !== null && current.length >= maxItems) return;
 
         if (!allowDuplicate && current.includes(val)) {
-            // Flash existing tag
+            // Flash existing tag without re-render
             const existingEl = container.querySelector<HTMLElement>(`.p-inputtags-tag[data-index="${current.indexOf(val)}"]`);
             if (existingEl) {
                 existingEl.classList.add('is-focused');
@@ -397,10 +429,18 @@ export default function InputTagsIsland(container: HTMLElement, props: InputTags
 
         const newTags = [...current, val];
         setTags(newTags);
-        render();
 
+        // Incremental DOM update: Insert tag before input WITHOUT rebuilding container
         const input = container.querySelector<HTMLInputElement>('.p-inputtags-input');
-        input?.focus();
+        const tagEl = createTagElement(val, current.length);
+        if (input) {
+            container.insertBefore(tagEl, input);
+            input.value = '';
+        } else {
+            container.appendChild(tagEl);
+        }
+
+        updateTagIndices();
 
         container.dispatchEvent(new CustomEvent('tags:add', {
             bubbles: true,
@@ -414,7 +454,14 @@ export default function InputTagsIsland(container: HTMLElement, props: InputTags
         const removedVal = current[index];
         const newTags = current.filter((_, i) => i !== index);
         setTags(newTags);
-        render();
+
+        // Incremental DOM update: remove target tag element
+        const tagEl = container.querySelector<HTMLElement>(`.p-inputtags-tag[data-index="${index}"]`);
+        if (tagEl) {
+            tagEl.remove();
+        }
+
+        updateTagIndices();
 
         const input = container.querySelector<HTMLInputElement>('.p-inputtags-input');
         input?.focus();
@@ -425,57 +472,72 @@ export default function InputTagsIsland(container: HTMLElement, props: InputTags
         }));
     }
 
-    function bindEvents() {
-        if (isDisabled || isReadonly) return;
+    function init() {
+        const tags = getTags();
+        const inputIdAttr = props.inputId ? `id="${props.inputId}"` : '';
+        const isMaxReached = maxItems !== null && tags.length >= maxItems;
 
-        const input = container.querySelector<HTMLInputElement>('.p-inputtags-input');
-        const panel = container.querySelector<HTMLElement>('.p-inputtags-panel');
+        container.className = 'laughtale-inputtags p-inputtags';
+        container.setAttribute('role', 'listbox');
+        container.setAttribute('aria-orientation', 'horizontal');
+        if (isFluid) container.classList.add('p-inputtags-fluid');
+        if (isFilled) container.classList.add('variant-filled');
+        if (props.size) container.classList.add(`size-${props.size}`);
+        if (isInvalid) container.classList.add('is-invalid');
+        if (isDisabled) container.classList.add('is-disabled');
+
+        let tagsHtml = tags.map((tag, idx) => `
+            <span class="p-inputtags-tag" data-index="${idx}" tabindex="0" role="option" aria-selected="true">
+                <span class="p-inputtags-tag-label">${escapeHtml(tag)}</span>
+                ${!isDisabled && !isReadonly ? `
+                    <button type="button" class="p-inputtags-tag-remove" data-index="${idx}" aria-label="Remove ${escapeHtml(tag)}" tabindex="-1">
+                        ${xCircleIcon}
+                    </button>
+                ` : ''}
+            </span>
+        `).join('');
+
+        let inputHtml = `
+            <input type="text"
+                   class="p-inputtags-input"
+                   ${inputIdAttr}
+                   placeholder="${tags.length === 0 ? (props.placeholder || '') : ''}"
+                   ${isDisabled ? 'disabled' : ''}
+                   ${isReadonly ? 'readonly' : ''}
+                   autocomplete="off"
+                   spellcheck="false"
+                   ${isMaxReached ? 'style="display: none;"' : ''}
+                   ${hasTypeahead ? 'role="combobox" aria-autocomplete="list" aria-expanded="false"' : ''} />
+        `;
+
+        container.innerHTML = `
+            ${tagsHtml}
+            ${inputHtml}
+            ${hasTypeahead ? `<div class="p-inputtags-panel" style="display: none;"></div>` : ''}
+        `;
+
+        // Bind initial tag events
+        container.querySelectorAll<HTMLElement>('.p-inputtags-tag').forEach(bindTagEvents);
 
         // Container click focuses input
         container.addEventListener('click', (e) => {
             if (e.target === container || (e.target as HTMLElement).classList.contains('p-inputtags')) {
+                const input = container.querySelector<HTMLInputElement>('.p-inputtags-input');
                 input?.focus();
             }
         });
 
-        // Remove tag click
-        container.querySelectorAll<HTMLButtonElement>('.p-inputtags-tag-remove').forEach(btn => {
-            btn.addEventListener('mousedown', (e) => e.preventDefault());
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const idx = Number(btn.getAttribute('data-index'));
-                removeTag(idx);
-            });
-        });
+        bindInputEvents();
+    }
 
-        // Tag keyboard navigation (Left/Right/Backspace/Delete on tag)
-        container.querySelectorAll<HTMLElement>('.p-inputtags-tag').forEach(tagEl => {
-            tagEl.addEventListener('keydown', (e) => {
-                const idx = Number(tagEl.getAttribute('data-index'));
-                if (e.key === 'Backspace' || e.key === 'Delete') {
-                    e.preventDefault();
-                    removeTag(idx);
-                } else if (e.key === 'ArrowLeft') {
-                    e.preventDefault();
-                    const prevTag = tagEl.previousElementSibling as HTMLElement;
-                    if (prevTag && prevTag.classList.contains('p-inputtags-tag')) {
-                        prevTag.focus();
-                    }
-                } else if (e.key === 'ArrowRight') {
-                    e.preventDefault();
-                    const nextTag = tagEl.nextElementSibling as HTMLElement;
-                    if (nextTag && nextTag.classList.contains('p-inputtags-tag')) {
-                        nextTag.focus();
-                    } else if (input) {
-                        input.focus();
-                    }
-                }
-            });
-        });
+    function bindInputEvents() {
+        if (isDisabled || isReadonly) return;
 
+        const input = container.querySelector<HTMLInputElement>('.p-inputtags-input');
+        const panel = container.querySelector<HTMLElement>('.p-inputtags-panel');
         if (!input) return;
 
-        // Input typing and keyboard commands
+        // Keyboard commands on input
         input.addEventListener('keydown', (e) => {
             const val = input.value;
             const current = getTags();
@@ -485,7 +547,6 @@ export default function InputTagsIsland(container: HTMLElement, props: InputTags
                 e.preventDefault();
                 if (val.trim()) {
                     addTag(val);
-                    input.value = '';
                 }
                 closeTypeahead();
                 return;
@@ -495,11 +556,9 @@ export default function InputTagsIsland(container: HTMLElement, props: InputTags
                 e.preventDefault();
                 if (hasTypeahead && activeSuggestionIndex >= 0 && filteredSuggestions[activeSuggestionIndex]) {
                     addTag(filteredSuggestions[activeSuggestionIndex]);
-                    input.value = '';
                     closeTypeahead();
                 } else if (val.trim()) {
                     addTag(val);
-                    input.value = '';
                     closeTypeahead();
                 }
             } else if (e.key === 'Backspace' && !val && current.length > 0) {
@@ -528,7 +587,6 @@ export default function InputTagsIsland(container: HTMLElement, props: InputTags
                     closeTypeahead();
                 } else if (e.key === 'Tab' && activeSuggestionIndex >= 0 && filteredSuggestions[activeSuggestionIndex]) {
                     addTag(filteredSuggestions[activeSuggestionIndex]);
-                    input.value = '';
                     closeTypeahead();
                 }
             }
@@ -543,7 +601,6 @@ export default function InputTagsIsland(container: HTMLElement, props: InputTags
                 const splitRegex = new RegExp(`[\\s,${delimiter}]+`);
                 const items = pasteData.split(splitRegex).map(s => s.trim()).filter(Boolean);
                 items.forEach(item => addTag(item));
-                input.value = '';
             }
         });
 
@@ -598,8 +655,6 @@ export default function InputTagsIsland(container: HTMLElement, props: InputTags
                 const idx = Number(itemEl.getAttribute('data-index'));
                 if (filteredSuggestions[idx]) {
                     addTag(filteredSuggestions[idx]);
-                    const input = container.querySelector<HTMLInputElement>('.p-inputtags-input');
-                    if (input) input.value = '';
                     closeTypeahead();
                 }
             });
@@ -648,6 +703,5 @@ export default function InputTagsIsland(container: HTMLElement, props: InputTags
         }));
     }
 
-    render();
-    syncTargetInput(getTags());
+    init();
 }

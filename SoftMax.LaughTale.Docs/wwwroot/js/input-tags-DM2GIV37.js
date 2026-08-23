@@ -2,9 +2,6 @@ import {
   useControllableState
 } from "./chunk-3ZMZT2PZ.js";
 import {
-  useAutoAnimate
-} from "./chunk-P6OQD35U.js";
-import {
   injectIslandStyle
 } from "./chunk-3TFPN5JM.js";
 
@@ -145,14 +142,17 @@ var CSS = `
 .p-inputtags-input {
     flex: 1 1 60px;
     min-width: 60px;
-    border: none;
-    outline: none;
-    background: transparent;
+    border: none !important;
+    outline: none !important;
+    background: transparent !important;
     font-family: inherit;
     font-size: 0.875rem;
     color: var(--p-text-color);
-    padding: 0.1875rem 0.25rem;
+    padding: 0.1875rem 0.25rem !important;
+    margin: 0 !important;
     box-sizing: border-box;
+    line-height: 1.2;
+    box-shadow: none !important;
 }
 .p-inputtags-input:disabled {
     cursor: not-allowed;
@@ -247,6 +247,7 @@ var CSS = `
     color: var(--p-surface-0);
 }
 `;
+var xCircleIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>`;
 function InputTagsIsland(container, props) {
   injectIslandStyle("laughtale-inputtags", CSS);
   let initialValues = [];
@@ -292,52 +293,81 @@ function InputTagsIsland(container, props) {
   }
   let activeSuggestionIndex = -1;
   let filteredSuggestions = [];
-  function render() {
-    const tags = getTags();
-    const inputIdAttr = props.inputId ? `id="${props.inputId}"` : "";
-    const isMaxReached = maxItems !== null && tags.length >= maxItems;
-    container.className = "laughtale-inputtags p-inputtags";
-    container.setAttribute("role", "listbox");
-    container.setAttribute("aria-orientation", "horizontal");
-    if (isFluid) container.classList.add("p-inputtags-fluid");
-    if (isFilled) container.classList.add("variant-filled");
-    if (props.size) container.classList.add(`size-${props.size}`);
-    if (isInvalid) container.classList.add("is-invalid");
-    if (isDisabled) container.classList.add("is-disabled");
-    const xCircleIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>`;
-    let tagsHtml = tags.map((tag, idx) => `
-            <span class="p-inputtags-tag" data-index="${idx}" tabindex="0" role="option" aria-selected="true">
-                <span class="p-inputtags-tag-label">${escapeHtml(tag)}</span>
-                ${!isDisabled && !isReadonly ? `
-                    <button type="button" class="p-inputtags-tag-remove" data-index="${idx}" aria-label="Remove ${escapeHtml(tag)}" tabindex="-1">
-                        ${xCircleIcon}
-                    </button>
-                ` : ""}
-            </span>
-        `).join("");
-    let inputHtml = "";
-    if (!isMaxReached) {
-      inputHtml = `
-                <input type="text"
-                       class="p-inputtags-input"
-                       ${inputIdAttr}
-                       placeholder="${tags.length === 0 ? props.placeholder || "" : ""}"
-                       ${isDisabled ? "disabled" : ""}
-                       ${isReadonly ? "readonly" : ""}
-                       autocomplete="off"
-                       ${hasTypeahead ? 'role="combobox" aria-autocomplete="list" aria-expanded="false"' : ""} />
-            `;
-    }
-    container.innerHTML = `
-            ${tagsHtml}
-            ${inputHtml}
-            ${hasTypeahead ? `<div class="p-inputtags-panel" style="display: none;"></div>` : ""}
-        `;
-    useAutoAnimate(container, { duration: 180 });
-    bindEvents();
-  }
   function escapeHtml(str) {
     return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+  function createTagElement(tag, index) {
+    const el = document.createElement("span");
+    el.className = "p-inputtags-tag";
+    el.setAttribute("data-index", String(index));
+    el.setAttribute("tabindex", "0");
+    el.setAttribute("role", "option");
+    el.setAttribute("aria-selected", "true");
+    el.innerHTML = `
+            <span class="p-inputtags-tag-label">${escapeHtml(tag)}</span>
+            ${!isDisabled && !isReadonly ? `
+                <button type="button" class="p-inputtags-tag-remove" data-index="${index}" aria-label="Remove ${escapeHtml(tag)}" tabindex="-1">
+                    ${xCircleIcon}
+                </button>
+            ` : ""}
+        `;
+    bindTagEvents(el);
+    return el;
+  }
+  function bindTagEvents(tagEl) {
+    const removeBtn = tagEl.querySelector(".p-inputtags-tag-remove");
+    if (removeBtn) {
+      removeBtn.addEventListener("mousedown", (e) => e.preventDefault());
+      removeBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const idx = Number(tagEl.getAttribute("data-index"));
+        removeTag(idx);
+      });
+    }
+    tagEl.addEventListener("keydown", (e) => {
+      const idx = Number(tagEl.getAttribute("data-index"));
+      if (e.key === "Backspace" || e.key === "Delete") {
+        e.preventDefault();
+        removeTag(idx);
+      } else if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        const prevTag = tagEl.previousElementSibling;
+        if (prevTag && prevTag.classList.contains("p-inputtags-tag")) {
+          prevTag.focus();
+        }
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        const nextTag = tagEl.nextElementSibling;
+        if (nextTag && nextTag.classList.contains("p-inputtags-tag")) {
+          nextTag.focus();
+        } else {
+          const input = container.querySelector(".p-inputtags-input");
+          input?.focus();
+        }
+      }
+    });
+  }
+  function updateTagIndices() {
+    const allTags = container.querySelectorAll(".p-inputtags-tag");
+    allTags.forEach((el, i) => {
+      el.setAttribute("data-index", String(i));
+      const btn = el.querySelector(".p-inputtags-tag-remove");
+      if (btn) btn.setAttribute("data-index", String(i));
+    });
+    const input = container.querySelector(".p-inputtags-input");
+    if (input) {
+      const current = getTags();
+      if (current.length === 0) {
+        input.placeholder = props.placeholder || "";
+      } else {
+        input.placeholder = "";
+      }
+      if (maxItems !== null && current.length >= maxItems) {
+        input.style.display = "none";
+      } else {
+        input.style.display = "";
+      }
+    }
   }
   function addTag(val) {
     val = val.trim();
@@ -354,9 +384,15 @@ function InputTagsIsland(container, props) {
     }
     const newTags = [...current, val];
     setTags(newTags);
-    render();
     const input = container.querySelector(".p-inputtags-input");
-    input?.focus();
+    const tagEl = createTagElement(val, current.length);
+    if (input) {
+      container.insertBefore(tagEl, input);
+      input.value = "";
+    } else {
+      container.appendChild(tagEl);
+    }
+    updateTagIndices();
     container.dispatchEvent(new CustomEvent("tags:add", {
       bubbles: true,
       detail: { value: val, values: newTags }
@@ -368,7 +404,11 @@ function InputTagsIsland(container, props) {
     const removedVal = current[index];
     const newTags = current.filter((_, i) => i !== index);
     setTags(newTags);
-    render();
+    const tagEl = container.querySelector(`.p-inputtags-tag[data-index="${index}"]`);
+    if (tagEl) {
+      tagEl.remove();
+    }
+    updateTagIndices();
     const input = container.querySelector(".p-inputtags-input");
     input?.focus();
     container.dispatchEvent(new CustomEvent("tags:remove", {
@@ -376,46 +416,58 @@ function InputTagsIsland(container, props) {
       detail: { value: removedVal, index, values: newTags }
     }));
   }
-  function bindEvents() {
-    if (isDisabled || isReadonly) return;
-    const input = container.querySelector(".p-inputtags-input");
-    const panel = container.querySelector(".p-inputtags-panel");
+  function init() {
+    const tags = getTags();
+    const inputIdAttr = props.inputId ? `id="${props.inputId}"` : "";
+    const isMaxReached = maxItems !== null && tags.length >= maxItems;
+    container.className = "laughtale-inputtags p-inputtags";
+    container.setAttribute("role", "listbox");
+    container.setAttribute("aria-orientation", "horizontal");
+    if (isFluid) container.classList.add("p-inputtags-fluid");
+    if (isFilled) container.classList.add("variant-filled");
+    if (props.size) container.classList.add(`size-${props.size}`);
+    if (isInvalid) container.classList.add("is-invalid");
+    if (isDisabled) container.classList.add("is-disabled");
+    let tagsHtml = tags.map((tag, idx) => `
+            <span class="p-inputtags-tag" data-index="${idx}" tabindex="0" role="option" aria-selected="true">
+                <span class="p-inputtags-tag-label">${escapeHtml(tag)}</span>
+                ${!isDisabled && !isReadonly ? `
+                    <button type="button" class="p-inputtags-tag-remove" data-index="${idx}" aria-label="Remove ${escapeHtml(tag)}" tabindex="-1">
+                        ${xCircleIcon}
+                    </button>
+                ` : ""}
+            </span>
+        `).join("");
+    let inputHtml = `
+            <input type="text"
+                   class="p-inputtags-input"
+                   ${inputIdAttr}
+                   placeholder="${tags.length === 0 ? props.placeholder || "" : ""}"
+                   ${isDisabled ? "disabled" : ""}
+                   ${isReadonly ? "readonly" : ""}
+                   autocomplete="off"
+                   spellcheck="false"
+                   ${isMaxReached ? 'style="display: none;"' : ""}
+                   ${hasTypeahead ? 'role="combobox" aria-autocomplete="list" aria-expanded="false"' : ""} />
+        `;
+    container.innerHTML = `
+            ${tagsHtml}
+            ${inputHtml}
+            ${hasTypeahead ? `<div class="p-inputtags-panel" style="display: none;"></div>` : ""}
+        `;
+    container.querySelectorAll(".p-inputtags-tag").forEach(bindTagEvents);
     container.addEventListener("click", (e) => {
       if (e.target === container || e.target.classList.contains("p-inputtags")) {
+        const input = container.querySelector(".p-inputtags-input");
         input?.focus();
       }
     });
-    container.querySelectorAll(".p-inputtags-tag-remove").forEach((btn) => {
-      btn.addEventListener("mousedown", (e) => e.preventDefault());
-      btn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const idx = Number(btn.getAttribute("data-index"));
-        removeTag(idx);
-      });
-    });
-    container.querySelectorAll(".p-inputtags-tag").forEach((tagEl) => {
-      tagEl.addEventListener("keydown", (e) => {
-        const idx = Number(tagEl.getAttribute("data-index"));
-        if (e.key === "Backspace" || e.key === "Delete") {
-          e.preventDefault();
-          removeTag(idx);
-        } else if (e.key === "ArrowLeft") {
-          e.preventDefault();
-          const prevTag = tagEl.previousElementSibling;
-          if (prevTag && prevTag.classList.contains("p-inputtags-tag")) {
-            prevTag.focus();
-          }
-        } else if (e.key === "ArrowRight") {
-          e.preventDefault();
-          const nextTag = tagEl.nextElementSibling;
-          if (nextTag && nextTag.classList.contains("p-inputtags-tag")) {
-            nextTag.focus();
-          } else if (input) {
-            input.focus();
-          }
-        }
-      });
-    });
+    bindInputEvents();
+  }
+  function bindInputEvents() {
+    if (isDisabled || isReadonly) return;
+    const input = container.querySelector(".p-inputtags-input");
+    const panel = container.querySelector(".p-inputtags-panel");
     if (!input) return;
     input.addEventListener("keydown", (e) => {
       const val = input.value;
@@ -424,7 +476,6 @@ function InputTagsIsland(container, props) {
         e.preventDefault();
         if (val.trim()) {
           addTag(val);
-          input.value = "";
         }
         closeTypeahead();
         return;
@@ -433,11 +484,9 @@ function InputTagsIsland(container, props) {
         e.preventDefault();
         if (hasTypeahead && activeSuggestionIndex >= 0 && filteredSuggestions[activeSuggestionIndex]) {
           addTag(filteredSuggestions[activeSuggestionIndex]);
-          input.value = "";
           closeTypeahead();
         } else if (val.trim()) {
           addTag(val);
-          input.value = "";
           closeTypeahead();
         }
       } else if (e.key === "Backspace" && !val && current.length > 0) {
@@ -464,7 +513,6 @@ function InputTagsIsland(container, props) {
           closeTypeahead();
         } else if (e.key === "Tab" && activeSuggestionIndex >= 0 && filteredSuggestions[activeSuggestionIndex]) {
           addTag(filteredSuggestions[activeSuggestionIndex]);
-          input.value = "";
           closeTypeahead();
         }
       }
@@ -477,7 +525,6 @@ function InputTagsIsland(container, props) {
         const splitRegex = new RegExp(`[\\s,${delimiter}]+`);
         const items = pasteData.split(splitRegex).map((s) => s.trim()).filter(Boolean);
         items.forEach((item) => addTag(item));
-        input.value = "";
       }
     });
     if (hasTypeahead && panel) {
@@ -523,8 +570,6 @@ function InputTagsIsland(container, props) {
         const idx = Number(itemEl.getAttribute("data-index"));
         if (filteredSuggestions[idx]) {
           addTag(filteredSuggestions[idx]);
-          const input2 = container.querySelector(".p-inputtags-input");
-          if (input2) input2.value = "";
           closeTypeahead();
         }
       });
@@ -568,10 +613,9 @@ function InputTagsIsland(container, props) {
       detail: { values: tags }
     }));
   }
-  render();
-  syncTargetInput(getTags());
+  init();
 }
 export {
   InputTagsIsland as default
 };
-//# sourceMappingURL=input-tags-GU52ORT6.js.map
+//# sourceMappingURL=input-tags-DM2GIV37.js.map

@@ -84,6 +84,14 @@ var CSS = `
     padding-bottom: 0.25rem !important;
 }
 
+.laughtale-float-label-in .p-inputtags input,
+.laughtale-float-label-in .p-password-container input,
+.laughtale-float-label-in .p-inputgroup input {
+    padding-top: 0.1875rem !important;
+    padding-bottom: 0.1875rem !important;
+    min-height: auto !important;
+}
+
 /* Invalid State */
 .laughtale-float-label.invalid > label,
 .laughtale-float-label:has(.invalid) > label,
@@ -140,10 +148,13 @@ function FloatLabelIsland(container, props) {
     } else if (tags.length > 0) {
       hasVal = true;
     }
-    if (hasVal) {
-      wrap.classList.add("has-value");
-    } else {
-      wrap.classList.remove("has-value");
+    const currentlyHas = wrap.classList.contains("has-value");
+    if (currentlyHas !== hasVal) {
+      if (hasVal) {
+        wrap.classList.add("has-value");
+      } else {
+        wrap.classList.remove("has-value");
+      }
     }
   }
   labelEl?.addEventListener("click", () => {
@@ -178,7 +189,7 @@ function FloatLabelIsland(container, props) {
   const observer = new MutationObserver(() => {
     updateFloatingState();
   });
-  observer.observe(wrap, { childList: true, subtree: true, attributes: true });
+  observer.observe(wrap, { childList: true, subtree: true });
   updateFloatingState();
   setTimeout(updateFloatingState, 50);
   setTimeout(updateFloatingState, 200);
@@ -186,4 +197,4 @@ function FloatLabelIsland(container, props) {
 export {
   FloatLabelIsland as default
 };
-//# sourceMappingURL=float-label-MG36XF5S.js.map
+//# sourceMappingURL=float-label-TOXD5G2L.js.map

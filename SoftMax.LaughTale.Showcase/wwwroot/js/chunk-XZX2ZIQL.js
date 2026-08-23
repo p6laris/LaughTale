@@ -979,7 +979,9 @@ async function handleLinkClick(e) {
   if (url.origin !== window.location.origin) return;
   if (anchor.target && anchor.target !== "_self") return;
   if (anchor.hasAttribute("download") || anchor.getAttribute("data-no-transition") !== null) return;
-  if (url.pathname === window.location.pathname && url.search === window.location.search && url.hash) {
+  const currentPath = window.location.pathname.toLowerCase().replace(/\/$/, "");
+  const targetPath = url.pathname.toLowerCase().replace(/\/$/, "");
+  if ((currentPath === targetPath || !targetPath) && url.hash) {
     return;
   }
   e.preventDefault();
@@ -1053,7 +1055,7 @@ defineIsland("camera", () => import("./camera-KAAHJRTE.js"));
 defineIsland("dropzone", () => import("./dropzone-E76UIQBF.js"));
 defineIsland("tree-select", () => import("./tree-select-UVFVMRN7.js"));
 defineIsland("datagrid", () => import("./datagrid-OWH5VQKO.js"));
-defineIsland("modal", () => import("./modal-H6JTW45J.js"));
+defineIsland("modal", () => import("./modal-6YEFZA74.js"));
 defineIsland("toast", () => import("./toast-WLFO7J5G.js"));
 defineIsland("input-number", () => import("./input-number-KQ2J2WMH.js"));
 defineIsland("input-otp", () => import("./input-otp-RUPMATZ7.js"));
@@ -1062,10 +1064,10 @@ defineIsland("toggle-switch", () => import("./toggle-switch-TBWZQR4Y.js"));
 defineIsland("slider", () => import("./slider-47QSQKTF.js"));
 defineIsland("rating", () => import("./rating-D3UI743I.js"));
 defineIsland("select-button", () => import("./select-button-ADKT2S2D.js"));
-defineIsland("chips", () => import("./input-tags-GU52ORT6.js"));
-defineIsland("input-tags", () => import("./input-tags-GU52ORT6.js"));
-defineIsland("inputtags", () => import("./input-tags-GU52ORT6.js"));
-defineIsland("tags", () => import("./input-tags-GU52ORT6.js"));
+defineIsland("chips", () => import("./input-tags-DM2GIV37.js"));
+defineIsland("input-tags", () => import("./input-tags-DM2GIV37.js"));
+defineIsland("inputtags", () => import("./input-tags-DM2GIV37.js"));
+defineIsland("tags", () => import("./input-tags-DM2GIV37.js"));
 defineIsland("datepicker", () => import("./datepicker-P5446DSU.js"));
 defineIsland("meter-group", () => import("./meter-group-LDZQKTKU.js"));
 defineIsland("avatar-group", () => import("./avatar-group-VNSODI34.js"));
@@ -1105,8 +1107,8 @@ defineIsland("radio-button", () => import("./radio-button-ENU2W3XU.js"));
 defineIsland("radio", () => import("./radio-button-ENU2W3XU.js"));
 defineIsland("textarea", () => import("./textarea-HTK2KLXG.js"));
 defineIsland("input-mask", () => import("./input-mask-YTSRFUM4.js"));
-defineIsland("float-label", () => import("./float-label-MG36XF5S.js"));
-defineIsland("ifta-label", () => import("./ifta-label-SJ3GAHKP.js"));
+defineIsland("float-label", () => import("./float-label-TOXD5G2L.js"));
+defineIsland("ifta-label", () => import("./ifta-label-RK23F4KA.js"));
 defineIsland("input-group", () => import("./input-group-P3CFDB3G.js"));
 defineIsland("input-group-addon", () => import("./input-group-P3CFDB3G.js").then((m) => ({ default: m.InputGroupAddonIsland })));
 defineIsland("inputgroup", () => import("./input-group-P3CFDB3G.js"));
@@ -1130,4 +1132,4 @@ export {
   enableViewTransitions,
   getSlot
 };
-//# sourceMappingURL=chunk-XITVD7P6.js.map
+//# sourceMappingURL=chunk-XZX2ZIQL.js.map
