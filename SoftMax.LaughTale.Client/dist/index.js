@@ -11910,8 +11910,7 @@ ${h.response}`).join("\n");
         .collapsed .sidebar-header-title,
         .collapsed .sidebar-search-box,
         .collapsed .sidebar-badge,
-        .collapsed .sidebar-group-chevron,
-        .collapsed .sidebar-sub-tree {
+        .collapsed .sidebar-group-chevron {
             display: none !important;
         }
         .collapsed .sidebar-header {
@@ -11924,16 +11923,38 @@ ${h.response}`).join("\n");
         .collapsed .sidebar-header .sidebar-toggle {
             margin: 0 auto;
         }
+        .collapsed .sidebar-group-header {
+            display: flex !important;
+            justify-content: center;
+            padding: 0.6rem 0 0.3rem;
+            margin-top: 0.5rem;
+            border-top: 1px solid var(--p-border-color);
+            cursor: pointer;
+        }
+        .collapsed .sidebar-group-header .sidebar-item-label,
+        .collapsed .sidebar-group-header .sidebar-group-chevron {
+            display: none !important;
+        }
+        .collapsed .sidebar-sub-tree {
+            display: flex !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            border-left: none !important;
+            list-style: none;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
         .collapsed .sidebar-item {
             justify-content: center;
-            padding: 0.65rem 0;
+            padding: 0;
             width: 44px;
             height: 44px;
             margin: 0 auto;
             box-sizing: border-box;
+            border-radius: var(--p-border-radius);
         }
-        .collapsed .sidebar-group-header {
-            display: none !important;
+        .collapsed .sidebar-item:hover {
+            background: var(--p-surface-100);
         }
     `);
     function renderNode(item, level = 0) {
@@ -11955,7 +11976,7 @@ ${h.response}`).join("\n");
       if (hasChildren) {
         return `
                 <li class="sidebar-group-container" data-label="${label}">
-                    <div class="sidebar-group-header" data-group-toggle="${label}">
+                    <div class="sidebar-group-header" data-group-toggle="${label}" title="${label}">
                         <div style="display: flex; align-items: center; gap: 0.45rem;">
                             ${iconSvg ? `<span style="display: flex; width: 16px; height: 16px; color: var(--p-primary-600);">${iconSvg}</span>` : ""}
                             <span class="sidebar-item-label">${label}</span>
