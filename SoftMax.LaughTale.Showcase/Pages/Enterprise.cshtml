@@ -316,7 +316,7 @@
             <!-- Hero Demo: Monthly Budget -->
             <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); max-width: 440px;">
                 <label style="font-weight: 700; font-size: 0.95rem; color: var(--p-text-color); margin-bottom: 0.5rem; display: block;">Monthly budget</label>
-                <island-input-number value="1500" mode="@InputNumberMode.Currency" currency="USD" locale="en-US" showButtons="true" buttonLayout="@ButtonLayout.Stacked" fluid="true" />
+                <island-input-number value="1500" mode="@InputNumberMode.Currency" currency="USD" locale="en-US" show-buttons="true" button-layout="@ButtonLayout.Stacked" fluid="true" />
                 <span style="font-size: 0.8125rem; color: var(--p-text-muted); margin-top: 0.5rem; display: block;">Set the maximum amount you can spend per month</span>
             </div>
 
@@ -331,11 +331,11 @@
                     </div>
                     <div>
                         <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Without Grouping</label>
-                        <island-input-number value="58151" useGrouping="false" fluid="true" />
+                        <island-input-number value="58151" use-grouping="false" fluid="true" />
                     </div>
                     <div>
                         <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Min-Max Fractions (2 to 5)</label>
-                        <island-input-number value="2351.35" minFractionDigits="2" maxFractionDigits="5" fluid="true" />
+                        <island-input-number value="2351.35" min-fraction-digits="2" max-fraction-digits="5" fluid="true" />
                     </div>
                     <div>
                         <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Min-Max Clamped (0 to 100)</label>
@@ -359,7 +359,7 @@
                     </div>
                     <div>
                         <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">India (INR Code)</label>
-                        <island-input-number value="4250" mode="@InputNumberMode.Currency" currency="INR" currencyDisplay="@CurrencyDisplay.Code" locale="en-IN" fluid="true" />
+                        <island-input-number value="4250" mode="@InputNumberMode.Currency" currency="INR" currency-display="@CurrencyDisplay.Code" locale="en-IN" fluid="true" />
                     </div>
                     <div>
                         <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Japan (JPY 0 Decimals)</label>
@@ -399,19 +399,19 @@
                 <div style="display: flex; flex-wrap: wrap; align-items: flex-start; gap: 2rem;">
                     <div style="flex: 1; min-width: 200px;">
                         <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Stacked Buttons (USD)</label>
-                        <island-input-number value="20" showButtons="true" buttonLayout="@ButtonLayout.Stacked" mode="@InputNumberMode.Currency" currency="USD" fluid="true" />
+                        <island-input-number value="20" show-buttons="true" button-layout="@ButtonLayout.Stacked" mode="@InputNumberMode.Currency" currency="USD" fluid="true" />
                     </div>
                     <div style="flex: 1; min-width: 200px;">
                         <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Min-Max Bound Stepper</label>
-                        <island-input-number value="10.5" showButtons="true" buttonLayout="@ButtonLayout.Stacked" min="0" max="100" step="0.5" fluid="true" />
+                        <island-input-number value="10.5" show-buttons="true" button-layout="@ButtonLayout.Stacked" min="0" max="100" step="0.5" fluid="true" />
                     </div>
                     <div style="flex: 1; min-width: 220px;">
                         <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Horizontal Layout (Step 0.25 €)</label>
-                        <island-input-number value="25" showButtons="true" buttonLayout="@ButtonLayout.Horizontal" step="0.25" mode="@InputNumberMode.Currency" currency="EUR" fluid="true" />
+                        <island-input-number value="25" show-buttons="true" button-layout="@ButtonLayout.Horizontal" step="0.25" mode="@InputNumberMode.Currency" currency="EUR" fluid="true" />
                     </div>
                     <div style="display: flex; flex-direction: column; align-items: center;">
                         <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Vertical Layout</label>
-                        <island-input-number value="50" showButtons="true" buttonLayout="@ButtonLayout.Vertical" />
+                        <island-input-number value="50" show-buttons="true" button-layout="@ButtonLayout.Vertical" />
                     </div>
                 </div>
             </div>
