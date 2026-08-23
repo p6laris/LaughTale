@@ -5184,20 +5184,20 @@ var SoftMaxIslands = (() => {
     function renderRequirementsChips(pwd) {
       const r = checkRules(pwd);
       const checkIcon = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>`;
-      const xIcon = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
+      const xIcon2 = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
       return `
             <div class="p-password-chips-wrap">
                 <span class="p-password-chip ${r.length ? "is-met" : ""}" data-rule="length">
-                    ${r.length ? checkIcon : xIcon} ${minLength}+ characters
+                    ${r.length ? checkIcon : xIcon2} ${minLength}+ characters
                 </span>
                 <span class="p-password-chip ${r.number ? "is-met" : ""}" data-rule="number">
-                    ${r.number ? checkIcon : xIcon} Number
+                    ${r.number ? checkIcon : xIcon2} Number
                 </span>
                 <span class="p-password-chip ${r.uppercase ? "is-met" : ""}" data-rule="uppercase">
-                    ${r.uppercase ? checkIcon : xIcon} Uppercase letter
+                    ${r.uppercase ? checkIcon : xIcon2} Uppercase letter
                 </span>
                 <span class="p-password-chip ${r.special ? "is-met" : ""}" data-rule="special">
-                    ${r.special ? checkIcon : xIcon} Special character
+                    ${r.special ? checkIcon : xIcon2} Special character
                 </span>
             </div>
         `;
@@ -5212,22 +5212,22 @@ var SoftMaxIslands = (() => {
     function renderRequirementsListItems(pwd) {
       const r = checkRules(pwd);
       const checkIcon = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>`;
-      const xIcon = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
+      const xIcon2 = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
       return `
             <div class="p-password-list-item ${r.length ? "is-met" : ""}" data-rule="length">
-                ${r.length ? checkIcon : xIcon} At least ${minLength} characters long
+                ${r.length ? checkIcon : xIcon2} At least ${minLength} characters long
             </div>
             <div class="p-password-list-item ${r.uppercase ? "is-met" : ""}" data-rule="uppercase">
-                ${r.uppercase ? checkIcon : xIcon} Contains uppercase letter
+                ${r.uppercase ? checkIcon : xIcon2} Contains uppercase letter
             </div>
             <div class="p-password-list-item ${r.lowercase ? "is-met" : ""}" data-rule="lowercase">
-                ${r.lowercase ? checkIcon : xIcon} Contains lowercase letter
+                ${r.lowercase ? checkIcon : xIcon2} Contains lowercase letter
             </div>
             <div class="p-password-list-item ${r.number ? "is-met" : ""}" data-rule="number">
-                ${r.number ? checkIcon : xIcon} Contains number
+                ${r.number ? checkIcon : xIcon2} Contains number
             </div>
             <div class="p-password-list-item ${r.special ? "is-met" : ""}" data-rule="special">
-                ${r.special ? checkIcon : xIcon} Contains special character (!@#$...)
+                ${r.special ? checkIcon : xIcon2} Contains special character (!@#$...)
             </div>
         `;
     }
@@ -5250,13 +5250,13 @@ var SoftMaxIslands = (() => {
         meterBadge.style.backgroundColor = str.bgColor;
       }
       const checkIcon = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>`;
-      const xIcon = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
+      const xIcon2 = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
       container.querySelectorAll(".p-password-chip").forEach((chip) => {
         const rule = chip.getAttribute("data-rule");
         const isMet = r[rule];
         chip.classList.toggle("is-met", isMet);
         const text = chip.textContent?.trim().replace(/^[✔✕]\s*/, "") || "";
-        chip.innerHTML = `${isMet ? checkIcon : xIcon} ${text}`;
+        chip.innerHTML = `${isMet ? checkIcon : xIcon2} ${text}`;
       });
       const listCheckIcon = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>`;
       const listXIcon = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
@@ -14125,132 +14125,293 @@ ${h.response}`).join("\n");
     default: () => InputTextIsland
   });
   function InputTextIsland(container, props) {
-    injectIslandStyle("laughtale-input-text", CSS56);
-    let currentValue = props.value || "";
-    function render() {
-      const sizeClass = "laughtale-input-" + props.size || "md";
+    injectIslandStyle("laughtale-inputtext", CSS56);
+    const [getValue, setValue] = useControllableState({
+      defaultValue: props.value ?? "",
+      onChange: (val) => {
+        syncValue(val);
+      }
+    });
+    const isFluid = props.fluid === true || String(props.fluid) === "true";
+    const isFilled = props.variant === "filled";
+    const isDisabled = props.disabled === true || String(props.disabled) === "true";
+    const isReadonly = props.readonlyMode === true || String(props.readonlyMode) === "true";
+    const isInvalid = props.invalid === true || String(props.invalid) === "true";
+    const hasClear = props.showClear === true || props.clearable === true || String(props.showClear) === "true" || String(props.clearable) === "true";
+    const leftIconName = props.iconLeft || (!props.iconRight ? props.icon : "");
+    const rightIconName = props.iconRight;
+    const inputId = props.inputId || props.id || "";
+    const inputName = props.name || props.targetInputName || "";
+    function getIconSvg(name) {
+      if (!name) return "";
+      if (LucideIcons[name]) return LucideIcons[name];
+      if (name.startsWith("<svg")) return name;
+      return "";
+    }
+    const leftIconSvg = getIconSvg(leftIconName);
+    const rightIconSvg = getIconSvg(rightIconName);
+    function init() {
+      const val = getValue();
       const wrapClasses = [
-        "laughtale-input-wrap",
-        props.iconLeft ? "has-icon-left" : "",
-        props.iconRight ? "has-icon-right" : "",
-        props.showClear && currentValue ? "has-clear" : ""
+        "laughtale-inputtext-wrap",
+        "p-inputtext-wrap",
+        isFluid ? "p-inputtext-fluid" : "",
+        leftIconSvg ? "has-icon-left" : "",
+        rightIconSvg ? "has-icon-right" : "",
+        hasClear ? "has-clear" : ""
       ].filter(Boolean).join(" ");
+      const inputClasses = [
+        "p-inputtext",
+        isFilled ? "variant-filled" : "",
+        props.size ? `size-${props.size}` : "",
+        isInvalid ? "is-invalid" : "",
+        isFluid ? "p-inputtext-fluid" : ""
+      ].filter(Boolean).join(" ");
+      container.className = wrapClasses;
+      const leftIconHtml = leftIconSvg ? `<span class="p-inputtext-icon p-inputtext-icon-left">${leftIconSvg}</span>` : "";
+      const rightIconHtml = rightIconSvg ? `<span class="p-inputtext-icon p-inputtext-icon-right">${rightIconSvg}</span>` : "";
+      const clearBtnHtml = hasClear ? `
+            <button type="button" class="p-inputtext-clear" aria-label="Clear text" tabindex="-1" style="display: ${val ? "flex" : "none"};">
+                ${xIcon}
+            </button>
+        ` : "";
+      const idAttr = inputId ? `id="${escapeHtml(inputId)}"` : "";
+      const nameAttr = inputName ? `name="${escapeHtml(inputName)}"` : "";
+      const ariaLabelAttr = props.ariaLabel ? `aria-label="${escapeHtml(props.ariaLabel)}"` : "";
+      const ariaLabelledByAttr = props.ariaLabelledBy ? `aria-labelledby="${escapeHtml(props.ariaLabelledBy)}"` : "";
+      const ariaDescribedByAttr = props.ariaDescribedBy ? `aria-describedby="${escapeHtml(props.ariaDescribedBy)}"` : "";
       container.innerHTML = `
-            <div class="${wrapClasses}">
-                ${props.iconLeft ? '<span class="laughtale-input-icon laughtale-input-icon-left">' + LucideIcons[props.iconLeft] || "</span>" : ""}
-                <input 
-                    type="${props.type || "text"}"
-                    class="laughtale-input ${sizeClass} ${props.invalid ? "is-invalid" : ""}"
-                    value="${currentValue}"
-                    placeholder="${props.placeholder || ""}"
-                    ${props.disabled ? "disabled" : ""}
-                />
-                ${props.showClear && currentValue ? '<button type="button" class="laughtale-input-clear">' + LucideIcons.x + "</button>" : ""}
-                ${props.iconRight ? '<span class="laughtale-input-icon laughtale-input-icon-right">' + LucideIcons[props.iconRight] || "</span>" : ""}
-            </div>
+            ${leftIconHtml}
+            <input
+                type="${props.type || "text"}"
+                class="${inputClasses}"
+                value="${escapeHtml(val)}"
+                placeholder="${escapeHtml(props.placeholder || "")}"
+                ${idAttr}
+                ${nameAttr}
+                ${ariaLabelAttr}
+                ${ariaLabelledByAttr}
+                ${ariaDescribedByAttr}
+                ${isDisabled ? "disabled" : ""}
+                ${isReadonly ? "readonly" : ""}
+                ${isInvalid ? 'aria-invalid="true"' : ""}
+                autocomplete="off"
+            />
+            ${clearBtnHtml}
+            ${rightIconHtml}
         `;
+      if (props.helpText) {
+        const helpEl = document.createElement("small");
+        helpEl.className = "p-inputtext-help";
+        if (props.ariaDescribedBy) helpEl.id = props.ariaDescribedBy;
+        helpEl.textContent = props.helpText;
+        container.parentElement?.insertBefore(helpEl, container.nextSibling);
+      }
       bindEvents();
-      syncValue();
+    }
+    function escapeHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
     }
     function bindEvents() {
-      const input = container.querySelector("input");
-      const clearBtn = container.querySelector(".laughtale-input-clear");
+      const input = container.querySelector("input.p-inputtext");
+      const clearBtn = container.querySelector(".p-inputtext-clear");
+      if (!input) return;
       input.addEventListener("input", () => {
-        const oldHasValue = !!currentValue;
-        currentValue = input.value;
-        const newHasValue = !!currentValue;
-        syncValue();
-        if (props.showClear && oldHasValue !== newHasValue) {
-          render();
-          const newInput = container.querySelector("input");
-          newInput.focus();
-          newInput.setSelectionRange(currentValue.length, currentValue.length);
+        const val = input.value;
+        setValue(val);
+        if (clearBtn) {
+          clearBtn.style.display = val ? "flex" : "none";
         }
+        container.dispatchEvent(new CustomEvent("inputtext:change", {
+          bubbles: true,
+          detail: { value: val }
+        }));
+      });
+      input.addEventListener("change", () => {
+        container.dispatchEvent(new CustomEvent("inputtext:change", {
+          bubbles: true,
+          detail: { value: input.value }
+        }));
       });
       if (clearBtn) {
-        clearBtn.addEventListener("click", () => {
-          currentValue = "";
-          render();
-          container.querySelector("input")?.focus();
+        clearBtn.addEventListener("mousedown", (e) => e.preventDefault());
+        clearBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          input.value = "";
+          setValue("");
+          clearBtn.style.display = "none";
+          input.focus();
+          container.dispatchEvent(new CustomEvent("inputtext:change", {
+            bubbles: true,
+            detail: { value: "" }
+          }));
+          container.dispatchEvent(new CustomEvent("inputtext:clear", {
+            bubbles: true
+          }));
+          input.dispatchEvent(new Event("input", { bubbles: true }));
         });
       }
     }
-    function syncValue() {
+    function syncValue(val) {
       if (props.targetInputName) {
-        let hidden = container.querySelector('input[name="' + props.targetInputName + '"]');
+        let hidden = container.querySelector(`input[name="${props.targetInputName}"]`);
         if (!hidden) {
           hidden = document.createElement("input");
           hidden.type = "hidden";
           hidden.name = props.targetInputName;
           container.appendChild(hidden);
         }
-        hidden.value = currentValue;
+        hidden.value = val;
       }
     }
-    render();
+    init();
   }
-  var CSS56;
+  var CSS56, xIcon;
   var init_input_text = __esm({
     "src/components/input-text.ts"() {
       "use strict";
       init_styles();
       init_lucide();
+      init_useControllableState();
       CSS56 = `
-.laughtale-input-wrap {
+.laughtale-inputtext-wrap,
+.p-inputtext-wrap {
     position: relative;
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    width: 100%;
+    width: auto;
+    font-family: var(--p-font-family, inherit);
+    box-sizing: border-box;
 }
-.laughtale-input {
-    width: 100%;
-    background: var(--p-surface-0);
-    border: 1px solid var(--p-field-border, var(--p-surface-300));
-    border-radius: var(--p-border-radius, 0.5rem);
-    color: var(--p-text-color);
-    font-family: inherit;
-    transition: all 0.15s ease;
-    outline: none;
-}
-.laughtale-input-sm { padding: 0.375rem 0.5rem; font-size: 0.75rem; }
-.laughtale-input-md { padding: 0.5rem 0.75rem; font-size: 0.875rem; }
-.laughtale-input-lg { padding: 0.75rem 1rem; font-size: 1rem; }
 
-.laughtale-input:hover:not(:disabled):not(.is-invalid) {
-    border-color: var(--p-primary-400);
+.p-inputtext-wrap.p-inputtext-fluid,
+.laughtale-inputtext-wrap.p-inputtext-fluid {
+    display: flex;
+    width: 100%;
 }
-.laughtale-input:focus-visible:not(:disabled):not(.is-invalid) {
-    box-shadow: 0 0 0 2px var(--p-content-bg), 0 0 0 4px var(--p-primary-500);
-    border-color: var(--p-primary-500);
+
+/* Native Aura InputText */
+.p-inputtext {
+    width: 100%;
+    font-family: inherit;
+    font-size: 0.875rem;
+    color: var(--p-text-color);
+    background: var(--p-surface-0);
+    border: 1px solid var(--p-border-color);
+    border-radius: var(--p-border-radius);
+    padding: 0.5rem 0.75rem;
+    line-height: 1.25;
+    transition: background 150ms ease, border-color 150ms ease, box-shadow 150ms ease, color 150ms ease;
+    outline: none;
+    box-sizing: border-box;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.02);
 }
-.laughtale-input:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
+
+.p-inputtext:hover:not(:disabled):not(.is-invalid):not(.p-invalid) {
+    border-color: var(--p-surface-400);
+}
+
+.p-inputtext:focus,
+.p-inputtext:focus-visible {
+    border-color: var(--p-primary-500) !important;
+    box-shadow: 0 0 0 1px var(--p-primary-500) !important;
+}
+
+/* Variant: Filled */
+.p-inputtext.variant-filled,
+.p-inputtext.p-variant-filled {
     background: var(--p-surface-100);
+    border-color: transparent;
 }
-.laughtale-input.is-invalid {
-    border-color: #ef4444;
+.p-inputtext.variant-filled:hover:not(:disabled) {
+    background: var(--p-surface-200);
 }
-.laughtale-input.is-invalid:focus-visible {
-    box-shadow: 0 0 0 2px var(--p-content-bg), 0 0 0 4px rgba(239, 68, 68, 0.5);
+.p-inputtext.variant-filled:focus {
+    background: var(--p-surface-0);
+    border-color: var(--p-primary-500) !important;
 }
-.laughtale-input-icon {
+
+/* Sizes */
+.p-inputtext.size-small,
+.p-inputtext.p-inputtext-sm {
+    padding: 0.3125rem 0.625rem;
+    font-size: 0.75rem;
+    border-radius: calc(var(--p-border-radius) - 2px);
+}
+
+.p-inputtext.size-large,
+.p-inputtext.p-inputtext-lg {
+    padding: 0.6875rem 1rem;
+    font-size: 1.0625rem;
+    border-radius: calc(var(--p-border-radius) + 2px);
+}
+
+/* Invalid State */
+.p-inputtext.is-invalid,
+.p-inputtext.p-invalid {
+    border-color: var(--p-red-500, #ef4444) !important;
+}
+.p-inputtext.is-invalid:focus,
+.p-inputtext.p-invalid:focus {
+    box-shadow: 0 0 0 1px var(--p-red-500, #ef4444) !important;
+}
+
+/* Disabled State */
+.p-inputtext:disabled,
+.p-inputtext.is-disabled {
+    background: var(--p-surface-100);
+    color: var(--p-text-muted);
+    opacity: 0.75;
+    cursor: not-allowed;
+}
+
+/* Fluid State */
+.p-inputtext.p-inputtext-fluid,
+.p-inputtext.p-fluid {
+    width: 100%;
+}
+
+/* Icons Integration */
+.p-inputtext-icon {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
     color: var(--p-surface-400);
     display: flex;
+    align-items: center;
+    justify-content: center;
     pointer-events: none;
+    z-index: 2;
+    transition: color 150ms ease;
 }
-.laughtale-input-icon-left { left: 0.75rem; }
-.laughtale-input-icon-right { right: 0.75rem; }
-
-.has-icon-left .laughtale-input { padding-left: 2.25rem; }
-.has-icon-right .laughtale-input { padding-right: 2.25rem; }
-
-.laughtale-input-clear {
-    position: absolute;
+.p-inputtext-icon svg {
+    width: 16px;
+    height: 16px;
+}
+.p-inputtext-icon-left {
+    left: 0.75rem;
+}
+.p-inputtext-icon-right {
     right: 0.75rem;
+}
+
+.has-icon-left .p-inputtext {
+    padding-left: 2.25rem !important;
+}
+.has-icon-right .p-inputtext {
+    padding-right: 2.25rem !important;
+}
+.has-clear .p-inputtext {
+    padding-right: 2.25rem !important;
+}
+.has-icon-right.has-clear .p-inputtext {
+    padding-right: 3.625rem !important;
+}
+
+/* Clear Icon Button (Zero-Flicker) */
+.p-inputtext-clear {
+    position: absolute;
+    right: 0.625rem;
     top: 50%;
     transform: translateY(-50%);
     background: transparent;
@@ -14258,29 +14419,60 @@ ${h.response}`).join("\n");
     color: var(--p-surface-400);
     cursor: pointer;
     display: flex;
-    padding: 0.125rem;
-    border-radius: 50%;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem;
+    border-radius: 9999px;
+    z-index: 3;
+    transition: color 150ms ease, background 150ms ease, opacity 150ms ease;
 }
-.laughtale-input-clear:hover {
-    background: var(--p-surface-100);
-    color: var(--p-surface-600);
+.p-inputtext-clear:hover {
+    background: var(--p-surface-200);
+    color: var(--p-surface-700);
 }
-.has-clear .laughtale-input { padding-right: 2.25rem; }
-.has-icon-right.has-clear .laughtale-input { padding-right: 3.5rem; }
-.has-icon-right.has-clear .laughtale-input-clear { right: 2.25rem; }
-[data-theme="dark"] .laughtale-input {
+.p-inputtext-clear svg {
+    width: 14px;
+    height: 14px;
+}
+.has-icon-right.has-clear .p-inputtext-clear {
+    right: 2.25rem;
+}
+
+/* Help Text */
+.p-inputtext-help {
+    font-size: 0.75rem;
+    color: var(--p-text-muted);
+    margin-top: 0.25rem;
+    line-height: 1.25;
+}
+
+/* ==================== DARK MODE ==================== */
+.dark .p-inputtext {
     background: var(--p-surface-900);
-    color: var(--p-surface-100);
-    border-color: var(--p-surface-600);
+    border-color: var(--p-surface-700);
+    color: var(--p-surface-0);
 }
-[data-theme="dark"] .laughtale-input-wrap.is-invalid .laughtale-input {
-    border-color: var(--p-red-400);
+.dark .p-inputtext:hover:not(:disabled):not(.is-invalid):not(.p-invalid) {
+    border-color: var(--p-surface-500);
 }
-[data-theme="dark"] .laughtale-input-clear:hover {
+.dark .p-inputtext.variant-filled,
+.dark .p-inputtext.p-variant-filled {
+    background: var(--p-surface-800);
+}
+.dark .p-inputtext.variant-filled:focus {
+    background: var(--p-surface-900);
+}
+.dark .p-inputtext:disabled {
+    background: var(--p-surface-800);
+    border-color: var(--p-surface-700);
+    color: var(--p-surface-500);
+}
+.dark .p-inputtext-clear:hover {
     background: var(--p-surface-700);
     color: var(--p-surface-200);
 }
 `;
+      xIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
     }
   });
 

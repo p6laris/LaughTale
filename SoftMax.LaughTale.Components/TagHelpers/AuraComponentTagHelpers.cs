@@ -2098,31 +2098,140 @@ public class IslandInputGroupAddonTagHelper : TagHelper
 }
 
 /// <summary>
-/// TagHelper for <island-enhanced-input /> / <island-input-text /> — Enhanced text input with icons, clear, sizes
+/// TagHelper for <island-input-text /> / <island-inputtext /> / <island-text /> / <island-enhanced-input /> — Aura InputText
 /// </summary>
-[HtmlTargetElement("island-enhanced-input")]
 [HtmlTargetElement("island-input-text")]
+[HtmlTargetElement("island-inputtext")]
+[HtmlTargetElement("island-text")]
+[HtmlTargetElement("island-enhanced-input")]
 public class IslandEnhancedInputTextTagHelper : TagHelper
 {
     public string? Value { get; set; }
     public string? Placeholder { get; set; }
     public string Type { get; set; } = "text";
-    public string? IconLeft { get; set; }
-    public string? IconRight { get; set; }
-    public bool ShowClear { get; set; } = false;
+    public InputVariant Variant { get; set; } = InputVariant.Outlined;
+    public ComponentSize Size { get; set; } = ComponentSize.Normal;
+    public bool Fluid { get; set; } = false;
     public bool Invalid { get; set; } = false;
     public bool Disabled { get; set; } = false;
-    public ComponentSize Size { get; set; } = ComponentSize.Medium;
+    public bool Readonly { get; set; } = false;
+    public bool ShowClear { get; set; } = false;
+    public bool Clearable { get; set; } = false;
+    public string? IconLeft { get; set; }
+    public string? IconRight { get; set; }
+    public string? Icon { get; set; }
+    public string? InputId { get; set; }
+    public string? Name { get; set; }
+    public string? HelpText { get; set; }
+    public string? AriaLabel { get; set; }
+    public string? AriaLabelledBy { get; set; }
+    public string? AriaDescribedBy { get; set; }
     public string? TargetInput { get; set; }
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
+        // Fallback attribute resolution
+        if (context.AllAttributes.TryGetAttribute("fluid", out var flAttr))
+        {
+            if (bool.TryParse(flAttr.Value?.ToString(), out var fl)) Fluid = fl;
+            else if (flAttr.Value != null) Fluid = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("variant", out var varAttr))
+        {
+            if (Enum.TryParse<InputVariant>(varAttr.Value?.ToString(), true, out var vr)) Variant = vr;
+        }
+        if (context.AllAttributes.TryGetAttribute("size", out var szAttr))
+        {
+            if (Enum.TryParse<ComponentSize>(szAttr.Value?.ToString(), true, out var sz)) Size = sz;
+        }
+        if (context.AllAttributes.TryGetAttribute("showClear", out var scAttr) || context.AllAttributes.TryGetAttribute("show-clear", out scAttr) || context.AllAttributes.TryGetAttribute("clearable", out scAttr))
+        {
+            if (bool.TryParse(scAttr.Value?.ToString(), out var sc)) ShowClear = sc;
+            else if (scAttr.Value != null) ShowClear = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("iconLeft", out var ilAttr) || context.AllAttributes.TryGetAttribute("icon-left", out ilAttr))
+        {
+            IconLeft = ilAttr.Value?.ToString();
+        }
+        if (context.AllAttributes.TryGetAttribute("iconRight", out var irAttr) || context.AllAttributes.TryGetAttribute("icon-right", out irAttr))
+        {
+            IconRight = irAttr.Value?.ToString();
+        }
+        if (context.AllAttributes.TryGetAttribute("icon", out var icAttr))
+        {
+            Icon = icAttr.Value?.ToString();
+        }
+        if (context.AllAttributes.TryGetAttribute("helpText", out var htAttr) || context.AllAttributes.TryGetAttribute("help-text", out htAttr))
+        {
+            HelpText = htAttr.Value?.ToString();
+        }
+        if (context.AllAttributes.TryGetAttribute("invalid", out var invAttr))
+        {
+            if (bool.TryParse(invAttr.Value?.ToString(), out var inv)) Invalid = inv;
+            else if (invAttr.Value != null) Invalid = true;
+        }
+
         output.TagName = "div";
         output.TagMode = TagMode.StartTagAndEndTag;
+
+        var wrapClasses = new List<string> { "laughtale-inputtext-wrap", "p-inputtext-wrap" };
+        if (Fluid) wrapClasses.Add("p-inputtext-fluid");
+        if (!string.IsNullOrEmpty(IconLeft) || (!string.IsNullOrEmpty(Icon) && string.IsNullOrEmpty(IconRight))) wrapClasses.Add("has-icon-left");
+        if (!string.IsNullOrEmpty(IconRight)) wrapClasses.Add("has-icon-right");
+        if (ShowClear || Clearable) wrapClasses.Add("has-clear");
+
+        output.Attributes.SetAttribute("class", string.Join(" ", wrapClasses));
         output.Attributes.SetAttribute("data-island", "input-text");
         output.Attributes.SetAttribute("data-hydrate", "load");
-        var props = new { value = Value, placeholder = Placeholder, type = Type, iconLeft = IconLeft, iconRight = IconRight, showClear = ShowClear, invalid = Invalid, disabled = Disabled, size = Size.ToString().ToLowerInvariant(), targetInputName = TargetInput };
+
+        var effectiveLeftIcon = IconLeft ?? (string.IsNullOrEmpty(IconRight) ? Icon : null);
+        var props = new
+        {
+            value = Value,
+            placeholder = Placeholder,
+            type = Type,
+            variant = Variant == InputVariant.Filled ? "filled" : "outlined",
+            size = Size.ToString().ToLowerInvariant(),
+            fluid = Fluid,
+            disabled = Disabled,
+            readonlyMode = Readonly,
+            invalid = Invalid,
+            showClear = ShowClear || Clearable,
+            clearable = ShowClear || Clearable,
+            iconLeft = effectiveLeftIcon,
+            iconRight = IconRight,
+            inputId = InputId,
+            name = Name,
+            helpText = HelpText,
+            ariaLabel = AriaLabel,
+            ariaLabelledBy = AriaLabelledBy,
+            ariaDescribedBy = AriaDescribedBy,
+            targetInputName = TargetInput
+        };
         output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
+
+        // Server-Side Rendering
+        var inputClasses = new List<string> { "p-inputtext" };
+        if (Variant == InputVariant.Filled) inputClasses.Add("variant-filled");
+        if (Size != ComponentSize.Normal) inputClasses.Add($"size-{Size.ToString().ToLowerInvariant()}");
+        if (Invalid) inputClasses.Add("is-invalid");
+        if (Fluid) inputClasses.Add("p-inputtext-fluid");
+
+        var idAttr = !string.IsNullOrEmpty(InputId) ? $" id=\"{System.Net.WebUtility.HtmlEncode(InputId)}\"" : "";
+        var nameAttr = !string.IsNullOrEmpty(Name) ? $" name=\"{System.Net.WebUtility.HtmlEncode(Name)}\"" : (!string.IsNullOrEmpty(TargetInput) ? $" name=\"{System.Net.WebUtility.HtmlEncode(TargetInput)}\"" : "");
+        var placeholderAttr = !string.IsNullOrEmpty(Placeholder) ? $" placeholder=\"{System.Net.WebUtility.HtmlEncode(Placeholder)}\"" : "";
+        var valueAttr = !string.IsNullOrEmpty(Value) ? $" value=\"{System.Net.WebUtility.HtmlEncode(Value)}\"" : "";
+        var disabledAttr = Disabled ? " disabled" : "";
+        var readonlyAttr = Readonly ? " readonly" : "";
+
+        var ssrHtml = $"<input type=\"{Type}\" class=\"{string.Join(" ", inputClasses)}\"{idAttr}{nameAttr}{placeholderAttr}{valueAttr}{disabledAttr}{readonlyAttr} autocomplete=\"off\" />";
+        if (!string.IsNullOrEmpty(HelpText))
+        {
+            var helpIdAttr = !string.IsNullOrEmpty(AriaDescribedBy) ? $" id=\"{System.Net.WebUtility.HtmlEncode(AriaDescribedBy)}\"" : "";
+            ssrHtml += $"<small class=\"p-inputtext-help\"{helpIdAttr}>{System.Net.WebUtility.HtmlEncode(HelpText)}</small>";
+        }
+
+        output.Content.SetHtmlContent(ssrHtml);
     }
 }
 

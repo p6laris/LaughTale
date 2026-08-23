@@ -39,14 +39,110 @@
     <section id="sec-input-text" class="component-card">
         <div class="card-header">
             <div>
-                <h2>InputText &amp; EnhancedInput</h2>
-                <p>Standard and enhanced text inputs with leading icons, clear buttons, and fluid states.</p>
+                <h2>InputText</h2>
+                <p>Aura enterprise text input extension with icon fields, zero-flicker clear actions, size scaling, filled variants, and seamless FloatLabel/IftaLabel integration.</p>
             </div>
-            <span class="aura-tag tag-slate">Input</span>
+            <span class="aura-tag tag-emerald">Form Control</span>
         </div>
-        <div class="card-body" style="max-width: 500px; display: flex; flex-direction: column; gap: 1rem;">
-            <island-input-text placeholder="Standard text input..." />
-            <island-enhanced-input placeholder="Enhanced input with leading icon..." icon="search" clearable="true" />
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Demo 1: Basic & Clear Icon -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic &amp; Clear Icon</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Standard two-way value binding and zero-flicker clear icon button that resets input without losing focus.</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--p-text-color);">Basic Input</label>
+                        <island-input-text placeholder="Enter text..." fluid="true" />
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--p-text-color);">Clearable Input (Type to see Clear Button)</label>
+                        <island-input-text value="Clearable content" showClear="true" placeholder="Type something..." fluid="true" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 2: Sizes & Filled Variant -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Sizes &amp; Filled Variant</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Small and large size alternatives alongside the high-emphasis filled background variant.</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; align-items: end;">
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--p-text-color);">Small Size</label>
+                        <island-input-text size="@ComponentSize.Small" placeholder="Small input..." fluid="true" />
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--p-text-color);">Normal (Default)</label>
+                        <island-input-text placeholder="Normal input..." fluid="true" />
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--p-text-color);">Large Size</label>
+                        <island-input-text size="@ComponentSize.Large" placeholder="Large input..." fluid="true" />
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--p-text-color);">Filled Variant</label>
+                        <island-input-text variant="@InputVariant.Filled" placeholder="Filled input..." fluid="true" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 3: Icons & Help Text -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Leading / Trailing Icons &amp; Help Text</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Icons embedded cleanly within input padding and advisory help texts.</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--p-text-color);">Search Query</label>
+                        <island-input-text iconLeft="search" placeholder="Search components or keywords..." fluid="true" />
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--p-text-color);">Username (With Advisory Help)</label>
+                        <island-input-text id="username-demo" iconLeft="user" placeholder="Enter username..." helpText="Enter your corporate username to verify clearance." fluid="true" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 4: Validation & Disabled -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Invalid &amp; Disabled States</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Form validation error ring and non-interactive states.</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--p-red-500);">Invalid (Outlined)</label>
+                        <island-input-text value="invalid@@cluster" invalid="true" fluid="true" />
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--p-red-500);">Invalid (Filled)</label>
+                        <island-input-text variant="@InputVariant.Filled" value="missing-token" invalid="true" fluid="true" />
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--p-text-color);">Disabled State</label>
+                        <island-input-text value="system-generated-readonly" disabled="true" fluid="true" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 5: FloatLabel & IftaLabel Integration -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">FloatLabel &amp; IftaLabel Integration</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Seamless integration with Over, On, and In (Ifta) floating labels.</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; align-items: end;">
+                    <div>
+                        <island-float-label label="Over Label" variant="@FloatLabelVariant.Over">
+                            <island-input-text fluid="true" />
+                        </island-float-label>
+                    </div>
+                    <div>
+                        <island-float-label label="On Border Label" variant="@FloatLabelVariant.On">
+                            <island-input-text fluid="true" />
+                        </island-float-label>
+                    </div>
+                    <div>
+                        <island-ifta-label label="Infield Top-Aligned">
+                            <island-input-text fluid="true" />
+                        </island-ifta-label>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
