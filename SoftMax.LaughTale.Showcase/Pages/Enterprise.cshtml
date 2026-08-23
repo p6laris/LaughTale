@@ -97,10 +97,44 @@
                         </island-float-label>
                     </div>
                     <div>
-                        <island-ifta-label label="Required Field (Ifta)" invalid="true">
+                        <island-float-label label="Required Field (In)" variant="@FloatLabelVariant.In" invalid="true">
                             <input type="text" class="p-input invalid" style="width: 100%;" />
-                        </island-ifta-label>
+                        </island-float-label>
                     </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- IftaLabel -->
+    <section id="sec-iftalabel" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>IftaLabel (Infield Top-Aligned Label)</h2>
+                <p>Enterprise infield top-aligned labels with focus transition, invalid highlighting, and automatic child integration.</p>
+            </div>
+            <span class="aura-tag tag-emerald">Form Control</span>
+        </div>
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Demo 1: Basic Infield Top-Aligned Label -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic Infield Label</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Wrapping standard input and label with permanent top-aligned position.</p>
+                <div style="max-width: 380px;">
+                    <island-ifta-label label="Username">
+                        <input type="text" class="p-input" style="width: 100%;" />
+                    </island-ifta-label>
+                </div>
+            </div>
+
+            <!-- Demo 2: Invalid State -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Invalid Infield Label</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Label automatically transitions to error theme when the wrapped input is invalid.</p>
+                <div style="max-width: 380px;">
+                    <island-ifta-label label="Username" invalid="true">
+                        <input type="text" class="p-input invalid" style="width: 100%;" />
+                    </island-ifta-label>
                 </div>
             </div>
         </div>

@@ -11965,13 +11965,113 @@ var init_float_label = __esm({
   }
 });
 
+// src/components/ifta-label.ts
+var ifta_label_exports = {};
+__export(ifta_label_exports, {
+  default: () => IftaLabelIsland
+});
+function IftaLabelIsland(container, props) {
+  injectIslandStyle("laughtale-ifta-label", CSS54);
+  const initialHtml = container.innerHTML;
+  const forAttr = props.for ? `for="${props.for}"` : "";
+  const existingLabel = container.querySelector("label");
+  const labelText = props.label || (existingLabel ? existingLabel.textContent : "Label");
+  container.innerHTML = `
+        <div class="laughtale-ifta-label ${props.invalid ? "invalid" : ""}">
+            ${initialHtml}
+            ${!existingLabel && labelText ? `<label ${forAttr}>${labelText}</label>` : ""}
+        </div>
+    `;
+  const wrap = container.querySelector(".laughtale-ifta-label");
+  const labelEl = wrap.querySelector("label");
+  labelEl?.addEventListener("click", () => {
+    const input = wrap.querySelector("input, textarea, select, .cs-trigger, .dp-trigger, .ac-input");
+    if (input) {
+      input.focus();
+      if (typeof input.click === "function" && !input.matches("input, textarea")) {
+        input.click();
+      }
+    }
+  });
+}
+var CSS54;
+var init_ifta_label = __esm({
+  "src/components/ifta-label.ts"() {
+    "use strict";
+    init_styles();
+    CSS54 = `
+.laughtale-ifta-label {
+    position: relative;
+    display: inline-flex;
+    flex-direction: column;
+    width: 100%;
+    font-family: var(--p-font-family, inherit);
+    box-sizing: border-box;
+}
+
+.laughtale-ifta-label > label {
+    position: absolute;
+    top: 0.4rem;
+    left: 0.75rem;
+    color: var(--p-text-muted);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    pointer-events: none;
+    transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1;
+    line-height: 1;
+    user-select: none;
+}
+
+.laughtale-ifta-label input,
+.laughtale-ifta-label textarea,
+.laughtale-ifta-label select,
+.laughtale-ifta-label .p-input,
+.laughtale-ifta-label .cs-trigger,
+.laughtale-ifta-label .dp-trigger,
+.laughtale-ifta-label .ac-input-container {
+    padding-top: 1.35rem !important;
+    padding-bottom: 0.35rem !important;
+    min-height: 3rem !important;
+    font-size: 0.875rem !important;
+    box-sizing: border-box;
+}
+
+/* Focus State */
+.laughtale-ifta-label:focus-within > label {
+    color: var(--p-primary-500);
+}
+
+/* Invalid State */
+.laughtale-ifta-label.invalid > label,
+.laughtale-ifta-label:has(.invalid) > label,
+.laughtale-ifta-label:has(:invalid) > label {
+    color: #ef4444 !important;
+}
+
+/* Dark Mode Tokens */
+.dark .laughtale-ifta-label > label {
+    color: var(--p-surface-400);
+}
+.dark .laughtale-ifta-label:focus-within > label {
+    color: var(--p-primary-400);
+}
+.dark .laughtale-ifta-label.invalid > label,
+.dark .laughtale-ifta-label:has(.invalid) > label,
+.dark .laughtale-ifta-label:has(:invalid) > label {
+    color: #f87171 !important;
+}
+`;
+  }
+});
+
 // src/components/input-text.ts
 var input_text_exports = {};
 __export(input_text_exports, {
   default: () => InputTextIsland
 });
 function InputTextIsland(container, props) {
-  injectIslandStyle("laughtale-input-text", CSS54);
+  injectIslandStyle("laughtale-input-text", CSS55);
   let currentValue = props.value || "";
   function render() {
     const sizeClass = "laughtale-input-" + props.size || "md";
@@ -12035,13 +12135,13 @@ function InputTextIsland(container, props) {
   }
   render();
 }
-var CSS54;
+var CSS55;
 var init_input_text = __esm({
   "src/components/input-text.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS54 = `
+    CSS55 = `
 .laughtale-input-wrap {
     position: relative;
     display: flex;
@@ -12423,7 +12523,7 @@ __export(paginator_exports, {
   default: () => PaginatorIsland
 });
 function PaginatorIsland(container, props) {
-  injectIslandStyle("paginator", CSS55);
+  injectIslandStyle("paginator", CSS56);
   let first = props.first || 0;
   let rows = props.rows || 10;
   const totalRecords = props.totalRecords || 0;
@@ -12483,13 +12583,13 @@ function PaginatorIsland(container, props) {
   }
   render();
 }
-var CSS55;
+var CSS56;
 var init_paginator = __esm({
   "src/components/paginator.ts"() {
     "use strict";
     init_lucide();
     init_styles();
-    CSS55 = `
+    CSS56 = `
 .laughtale-paginator {
     display: flex;
     align-items: center;
@@ -13698,6 +13798,7 @@ var init_index = __esm({
     defineIsland("textarea", () => Promise.resolve().then(() => (init_textarea(), textarea_exports)));
     defineIsland("input-mask", () => Promise.resolve().then(() => (init_input_mask(), input_mask_exports)));
     defineIsland("float-label", () => Promise.resolve().then(() => (init_float_label(), float_label_exports)));
+    defineIsland("ifta-label", () => Promise.resolve().then(() => (init_ifta_label(), ifta_label_exports)));
     defineIsland("input-text", () => Promise.resolve().then(() => (init_input_text(), input_text_exports)));
     defineIsland("enhanced-input", () => Promise.resolve().then(() => (init_input_text(), input_text_exports)));
     defineIsland("carousel", () => Promise.resolve().then(() => (init_carousel(), carousel_exports)));

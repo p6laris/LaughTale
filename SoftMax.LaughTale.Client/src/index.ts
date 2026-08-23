@@ -83,6 +83,7 @@ defineIsland('radio', () => import('./components/radio-button'));
 defineIsland('textarea', () => import('./components/textarea'));
 defineIsland('input-mask', () => import('./components/input-mask'));
 defineIsland('float-label', () => import('./components/float-label'));
+defineIsland('ifta-label', () => import('./components/ifta-label'));
 defineIsland('input-text', () => import('./components/input-text'));
 defineIsland('enhanced-input', () => import('./components/input-text'));
 defineIsland('carousel', () => import('./components/carousel'));

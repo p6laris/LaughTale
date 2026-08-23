@@ -1534,13 +1534,12 @@ public class IslandIftaLabelTagHelper : TagHelper
     {
         output.TagName = "div";
         output.TagMode = TagMode.StartTagAndEndTag;
-        output.Attributes.SetAttribute("data-island", "float-label");
+        output.Attributes.SetAttribute("data-island", "ifta-label");
         output.Attributes.SetAttribute("data-hydrate", "load");
         var props = new
         {
             label = Label,
             @for = For,
-            variant = "in",
             invalid = Invalid
         };
         output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));

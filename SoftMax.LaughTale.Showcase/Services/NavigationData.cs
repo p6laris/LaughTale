@@ -38,7 +38,8 @@ public static class NavigationData
                 new("ColorPicker", "palette", "/enterprise#sec-color-picker"),
                 new("Knob", "gauge", "/enterprise#sec-knob"),
                 new("DatePicker", "calendar", "/enterprise#sec-datepicker"),
-                new("FloatLabel", "edit", "/enterprise#sec-floatlabel")
+                new("FloatLabel", "edit", "/enterprise#sec-floatlabel"),
+                new("IftaLabel", "edit", "/enterprise#sec-iftalabel")
             }),
             new("Data & Tables (11)", "database", null, false, new List<SidebarItem>
             {
