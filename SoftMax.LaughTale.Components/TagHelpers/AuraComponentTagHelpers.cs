@@ -605,16 +605,29 @@ public class IslandTabsTagHelper : TagHelper
 }
 
 /// <summary>
-/// TagHelper for <island-autocomplete />
+/// TagHelper for <island-autocomplete /> (Aura AutoComplete)
 /// </summary>
 [HtmlTargetElement("island-autocomplete")]
 public class IslandAutoCompleteTagHelper : TagHelper
 {
     public List<AutoCompleteItem>? Items { get; set; }
+    public List<AutoCompleteItem>? Suggestions { get; set; }
     public string? Placeholder { get; set; }
     public string? TargetInput { get; set; }
     public string? Value { get; set; }
     public bool Disabled { get; set; } = false;
+    public bool Dropdown { get; set; } = false;
+    public bool ShowClear { get; set; } = true;
+    public bool ForceSelection { get; set; } = false;
+    public bool Multiple { get; set; } = false;
+    public string Size { get; set; } = "normal";
+    public string Variant { get; set; } = "outlined";
+    public bool Invalid { get; set; } = false;
+    public bool Fluid { get; set; } = false;
+    public bool Loading { get; set; } = false;
+    public string ScrollHeight { get; set; } = "14rem";
+    public string? OptionGroupLabel { get; set; }
+    public string? OptionGroupChildren { get; set; }
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
@@ -625,11 +638,23 @@ public class IslandAutoCompleteTagHelper : TagHelper
 
         var props = new
         {
-            items = Items ?? new(),
+            items = Suggestions ?? Items ?? new(),
             placeholder = Placeholder,
             targetInputName = TargetInput,
             value = Value,
-            disabled = Disabled
+            disabled = Disabled,
+            dropdown = Dropdown,
+            showClear = ShowClear,
+            forceSelection = ForceSelection,
+            multiple = Multiple,
+            size = Size,
+            variant = Variant,
+            invalid = Invalid,
+            fluid = Fluid,
+            loading = Loading,
+            scrollHeight = ScrollHeight,
+            optionGroupLabel = OptionGroupLabel,
+            optionGroupChildren = OptionGroupChildren
         };
 
         output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));

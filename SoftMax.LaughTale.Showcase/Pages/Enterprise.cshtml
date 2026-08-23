@@ -124,13 +124,73 @@
     <section id="sec-autocomplete" class="component-card">
         <div class="card-header">
             <div>
-                <h2>AutoComplete</h2>
-                <p>Debounced typeahead search suggestions with keyboard navigation.</p>
+                <h2>AutoComplete & Combobox</h2>
+                <p>Enterprise real-time typeahead suggestions with keyboard navigation, dropdown button, clear icon, multi-chip tokens, and custom templating.</p>
             </div>
-            <span class="aura-tag tag-emerald">Search</span>
+            <span class="aura-tag tag-emerald">Form Control</span>
         </div>
-        <div class="card-body" style="max-width: 450px;">
-            <island-autocomplete placeholder="Search server regions..." suggestions="@Model.CityOptions" />
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Demo 1: Basic & Command Shortcuts -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Command Palette with Shortcuts</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1rem;">Type a command or shortcut key to see instant suggestions.</p>
+                <div style="max-width: 380px;">
+                    <island-autocomplete placeholder="Type a command (e.g. Save)..." suggestions="@Model.CommandsList" show-clear="true" />
+                </div>
+            </div>
+
+            <!-- Demo 2: Dropdown Trigger & Custom Options (Team Members) -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+                <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                    <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Dropdown Button Trigger</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1rem;">Click the chevron button to open the full option list.</p>
+                    <island-autocomplete placeholder="Search server regions..." suggestions="@Model.CityOptions" dropdown="true" show-clear="true" />
+                </div>
+
+                <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                    <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Custom Option Template (Team Members)</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1rem;">Rich avatars, status indicators, and roles.</p>
+                    <island-autocomplete placeholder="Search team members..." suggestions="@Model.TeamMembers" show-clear="true" />
+                </div>
+            </div>
+
+            <!-- Demo 3: Grouped Technologies & Multi-Chip Mode -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+                <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                    <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Grouped Categories</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1rem;">Grouped by Frontend, Backend, and Database tiers.</p>
+                    <island-autocomplete placeholder="Search tech stack..." suggestions="@Model.GroupedTechnologies" dropdown="true" show-clear="true" />
+                </div>
+
+                <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                    <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Multiple Selection with Chips</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1rem;">Select multiple items with removable inline tags.</p>
+                    <island-autocomplete placeholder="Select technologies..." suggestions="@Model.GroupedTechnologies" multiple="true" show-clear="true" />
+                </div>
+            </div>
+
+            <!-- Demo 4: Sizes & Variants -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 1rem; color: var(--p-text-color);">Sizes & Variants</h3>
+                <div style="display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: center;">
+                    <div style="flex: 1; min-width: 200px;">
+                        <label style="font-size: 0.75rem; font-weight: 600; color: var(--p-text-muted); display: block; margin-bottom: 0.25rem;">Small</label>
+                        <island-autocomplete placeholder="Small size..." suggestions="@Model.CityOptions" size="small" />
+                    </div>
+                    <div style="flex: 1; min-width: 200px;">
+                        <label style="font-size: 0.75rem; font-weight: 600; color: var(--p-text-muted); display: block; margin-bottom: 0.25rem;">Filled Variant</label>
+                        <island-autocomplete placeholder="Filled variant..." suggestions="@Model.CityOptions" variant="filled" />
+                    </div>
+                    <div style="flex: 1; min-width: 200px;">
+                        <label style="font-size: 0.75rem; font-weight: 600; color: var(--p-text-muted); display: block; margin-bottom: 0.25rem;">Invalid State</label>
+                        <island-autocomplete placeholder="Invalid state..." suggestions="@Model.CityOptions" invalid="true" />
+                    </div>
+                    <div style="flex: 1; min-width: 200px;">
+                        <label style="font-size: 0.75rem; font-weight: 600; color: var(--p-text-muted); display: block; margin-bottom: 0.25rem;">Disabled</label>
+                        <island-autocomplete placeholder="Disabled state..." suggestions="@Model.CityOptions" disabled="true" />
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 

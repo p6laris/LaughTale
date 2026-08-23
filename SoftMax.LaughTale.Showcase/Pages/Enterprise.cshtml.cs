@@ -247,6 +247,55 @@ public class EnterpriseModel : PageModel
         new("Basra, Iraq", "BSR", "Iraq")
     };
 
+    public List<AutoCompleteItem> CommandsList { get; set; } = new()
+    {
+        new("New File", "new_file", "File", "filePlus", "⌘N"),
+        new("Open File", "open_file", "File", "folderOpen", "⌘O"),
+        new("Save", "save", "File", "save", "⌘S"),
+        new("Save As", "save_as", "File", "save", "⇧⌘S"),
+        new("Find in Files", "find", "Edit", "search", "⌘F"),
+        new("Replace", "replace", "Edit", "refreshCw", "⌘H"),
+        new("Go to Line", "goto", "Navigate", "hash", "⌘G"),
+        new("Toggle Sidebar", "toggle_sb", "View", "layout", "⌘B"),
+        new("Split Editor", "split", "View", "columns", "⌘\\"),
+        new("Close Tab", "close_tab", "Window", "x", "⌘W")
+    };
+
+    public List<AutoCompleteItem> TeamMembers { get; set; } = new()
+    {
+        new("Sarah Chen", "sc", null, null, null, "SC", "online", "Engineering Lead"),
+        new("Alex Rivera", "ar", null, null, null, "AR", "online", "Senior Developer"),
+        new("Jordan Kim", "jk", null, null, null, "JK", "away", "UX Designer"),
+        new("Taylor Morgan", "tm", null, null, null, "TM", "offline", "Product Manager"),
+        new("Morgan Lee", "ml", null, null, null, "ML", "online", "DevOps Engineer"),
+        new("Casey Jones", "cj", null, null, null, "CJ", "away", "QA Engineer")
+    };
+
+    public List<AutoCompleteItem> GroupedTechnologies { get; set; } = new()
+    {
+        new("React", "react", "Frontend", null, null, null, null, "Component Framework", "Frontend"),
+        new("Vue.js", "vue", "Frontend", null, null, null, null, "Progressive Framework", "Frontend"),
+        new("Angular", "angular", "Frontend", null, null, null, null, "Enterprise Framework", "Frontend"),
+        new("Svelte", "svelte", "Frontend", null, null, null, null, "Compiler Framework", "Frontend"),
+        new("ASP.NET Core", "dotnet", "Backend", null, null, null, null, "High-Perf Runtime", "Backend"),
+        new("Node.js", "nodejs", "Backend", null, null, null, null, "V8 JavaScript Engine", "Backend"),
+        new("Go (Golang)", "golang", "Backend", null, null, null, null, "Cloud Microservices", "Backend"),
+        new("Rust", "rust", "Backend", null, null, null, null, "Memory-Safe Systems", "Backend"),
+        new("PostgreSQL", "postgres", "Database", null, null, null, null, "Relational Engine", "Database"),
+        new("Redis", "redis", "Database", null, null, null, null, "In-Memory Cache", "Database"),
+        new("ClickHouse", "clickhouse", "Database", null, null, null, null, "OLAP Analytics", "Database")
+    };
+
+    public List<AutoCompleteItem> ProductCategories { get; set; } = new()
+    {
+        new("Electronics", "electronics", null, null, null, null, null, null, null, 1247),
+        new("Clothing & Apparel", "clothing", null, null, null, null, null, null, null, 856),
+        new("Home & Garden", "home", null, null, null, null, null, null, null, 634),
+        new("Sports & Outdoors", "sports", null, null, null, null, null, null, null, 421),
+        new("Books & Media", "books", null, null, null, null, null, null, null, 2103),
+        new("Toys & Games", "toys", null, null, null, null, null, null, null, 312)
+    };
+
     public List<BreadcrumbItem> Breadcrumbs { get; set; } = new()
     {
         new("Enterprise Hub", "/enterprise"),

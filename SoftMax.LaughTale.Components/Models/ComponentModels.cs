@@ -109,6 +109,12 @@ public record AutoCompleteItem<TValue>(
     TValue Value,
     string? Category = null,
     string? Icon = null,
+    string? Shortcut = null,
+    string? Avatar = null,
+    string? Status = null,
+    string? Subtitle = null,
+    string? Group = null,
+    object? Count = null,
     bool Disabled = false
 );
 
@@ -116,7 +122,14 @@ public record AutoCompleteItem(
     string Label,
     string Value,
     string? Category = null,
-    string? Icon = null
+    string? Icon = null,
+    string? Shortcut = null,
+    string? Avatar = null,
+    string? Status = null,
+    string? Subtitle = null,
+    string? Group = null,
+    object? Count = null,
+    bool Disabled = false
 );
 
 public record BreadcrumbItem(
