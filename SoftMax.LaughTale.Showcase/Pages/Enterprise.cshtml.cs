@@ -244,6 +244,41 @@ public class EnterpriseModel : PageModel
         })
     };
 
+    public List<TreeNode> DocumentsTree { get; set; } = new()
+    {
+        new("0", "Documents", "docs", new()
+        {
+            new("0-0", "Work", "work", new()
+            {
+                new("0-0-0", "Expenses.doc", "exp"),
+                new("0-0-1", "Resume.doc", "res")
+            }),
+            new("0-1", "Home", "home", new()
+            {
+                new("0-1-0", "Invoices.txt", "inv")
+            })
+        }),
+        new("1", "Events", "events", new()
+        {
+            new("1-0", "Meeting", "meet"),
+            new("1-1", "Product Launch", "launch"),
+            new("1-2", "Report Review", "review")
+        }),
+        new("2", "Movies", "movies", new()
+        {
+            new("2-0", "Al Pacino", "pacino", new()
+            {
+                new("2-0-0", "Scarface", "scar"),
+                new("2-0-1", "Serpico", "serp")
+            }),
+            new("2-1", "Robert De Niro", "deniro", new()
+            {
+                new("2-1-0", "Goodfellas", "good"),
+                new("2-1-1", "Taxi Driver", "taxi")
+            })
+        })
+    };
+
     public List<SelectButtonItem> Periods { get; set; } = new()
     {
         new("Daily", "daily"),

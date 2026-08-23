@@ -1097,17 +1097,129 @@
         </div>
     </section>
 
-    <!-- TreeSelect -->
+        <!-- TreeSelect -->
     <section id="sec-treeselect" class="component-card">
         <div class="card-header">
             <div>
                 <h2>TreeSelect</h2>
-                <p>Dropdown with expandable tree hierarchy for department selection.</p>
+                <p>Form component to choose from hierarchical data with single, multiple, and tri-state checkbox selection modes, chip display, instant filtering, and floating label support.</p>
             </div>
-            <span class="aura-tag tag-slate">Tree</span>
+            <span class="aura-tag tag-indigo">Form Control</span>
         </div>
-        <div class="card-body" style="max-width: 450px;">
-            <island-tree-select placeholder="Select Department..." target-input-name="ts_dept" departments="@Model.DepartmentTree" />
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Demo 1: Basic Single & Multiple Selection -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic &amp; Multiple Selection Modes</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Single node selection with immediate closing vs multi-node selection with comma-separated values.</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--p-text-color);">Single Selection (Default)</label>
+                        <island-tree-select nodes="@Model.DocumentsTree" placeholder="Select Item" fluid="true" />
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--p-text-color);">Multiple Selection (Comma Display)</label>
+                        <island-tree-select nodes="@Model.DocumentsTree" selectionMode="multiple" display="comma" placeholder="Select Multiple Items..." fluid="true" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 2: Checkbox Tri-State & Chip Display -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Checkbox Tri-State &amp; Chip Display</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Hierarchical checkbox cascading with automatic parent indeterminate states and removable token chips.</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--p-text-color);">Checkbox Mode with Chips</label>
+                        <island-tree-select nodes="@Model.DocumentsTree" selectionMode="checkbox" display="chip" placeholder="Select Items via Checkboxes..." fluid="true" />
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--p-text-color);">Clearable Action &amp; Search Filter</label>
+                        <island-tree-select nodes="@Model.DocumentsTree" showClear="true" filter="true" placeholder="Search &amp; Select with Clear..." fluid="true" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 3: Sizes & Filled Variant -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Sizes &amp; Filled Variant</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Small and large size metrics alongside high-emphasis filled surface variant.</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; align-items: end;">
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--p-text-color);">Small Size</label>
+                        <island-tree-select nodes="@Model.DocumentsTree" size="@ComponentSize.Small" placeholder="Small" fluid="true" />
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--p-text-color);">Normal (Default)</label>
+                        <island-tree-select nodes="@Model.DocumentsTree" placeholder="Normal" fluid="true" />
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--p-text-color);">Large Size</label>
+                        <island-tree-select nodes="@Model.DocumentsTree" size="@ComponentSize.Large" placeholder="Large" fluid="true" />
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--p-text-color);">Filled Variant</label>
+                        <island-tree-select nodes="@Model.DocumentsTree" variant="@InputVariant.Filled" placeholder="Filled TreeSelect" fluid="true" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 4: Header & Footer Templates -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Header &amp; Footer Slots</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Customized dropdown overlay with contextual header banner and summary footer metadata.</p>
+                <div style="max-width: 420px;">
+                    <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--p-text-color);">Department Organization Tree</label>
+                    <island-tree-select nodes="@Model.DepartmentTree" header="Corporate Hierarchy" footer="Select an active department unit" placeholder="Select Organizational Unit..." fluid="true" />
+                </div>
+            </div>
+
+            <!-- Demo 5: FloatLabel & IftaLabel Integration -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">FloatLabel &amp; IftaLabel Integration</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Seamless integration with floating label variants (Over, In, On) and top-aligned Ifta labels.</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; align-items: end;">
+                    <div>
+                        <island-float-label variant="over">
+                            <island-tree-select input-id="fl-ts-over" nodes="@Model.DocumentsTree" fluid="true" />
+                            <label for="fl-ts-over">Over Label</label>
+                        </island-float-label>
+                    </div>
+                    <div>
+                        <island-float-label variant="in">
+                            <island-tree-select input-id="fl-ts-in" nodes="@Model.DocumentsTree" fluid="true" />
+                            <label for="fl-ts-in">In Label</label>
+                        </island-float-label>
+                    </div>
+                    <div>
+                        <island-float-label variant="on">
+                            <island-tree-select input-id="fl-ts-on" nodes="@Model.DocumentsTree" fluid="true" />
+                            <label for="fl-ts-on">On Label</label>
+                        </island-float-label>
+                    </div>
+                    <div>
+                        <island-ifta-label>
+                            <island-tree-select input-id="ifta-ts" nodes="@Model.DocumentsTree" fluid="true" />
+                            <label for="ifta-ts">File Repository</label>
+                        </island-ifta-label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 6: Validation & Disabled States -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Invalid &amp; Disabled States</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Precision error focus rings and non-interactive state styling.</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--p-red-500);">Invalid State (Required)</label>
+                        <island-tree-select nodes="@Model.DocumentsTree" invalid="true" placeholder="Selection is Required" fluid="true" />
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--p-text-muted);">Disabled State</label>
+                        <island-tree-select nodes="@Model.DocumentsTree" disabled="true" placeholder="Locked Hierarchy" fluid="true" />
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
