@@ -2101,36 +2101,213 @@ public class IslandSplitButtonTagHelper : TagHelper
 // ─── Aura v2: New Components ────────────────────────────────────────────────
 
 /// <summary>
-/// TagHelper for <island-select /> — Single-value dropdown selector
+/// TagHelper for <island-select /> / <island-dropdown /> — Aura Select Component
 /// </summary>
 [HtmlTargetElement("island-select")]
+[HtmlTargetElement("island-dropdown")]
 public class IslandSelectTagHelper : TagHelper
 {
-    public List<SelectButtonItem>? Options { get; set; }
+    [HtmlAttributeName("options")]
+    public object? Options { get; set; }
+
+    [HtmlAttributeName("value")]
+    public string? Value { get; set; }
+
+    [HtmlAttributeName("selected-value")]
     public string? SelectedValue { get; set; }
+
+    [HtmlAttributeName("values")]
+    public List<string>? Values { get; set; }
+
+    [HtmlAttributeName("selected-values")]
+    public List<string>? SelectedValues { get; set; }
+
+    [HtmlAttributeName("placeholder")]
     public string? Placeholder { get; set; } = "Select an option...";
+
+    [HtmlAttributeName("multiple")]
+    public bool Multiple { get; set; } = false;
+
+    [HtmlAttributeName("checkmark")]
+    public bool Checkmark { get; set; } = false;
+
+    [HtmlAttributeName("checkbox")]
+    public bool Checkbox { get; set; } = false;
+
+    [HtmlAttributeName("display")]
+    public string Display { get; set; } = "comma";
+
+    [HtmlAttributeName("filter")]
     public bool Filter { get; set; } = false;
+
+    [HtmlAttributeName("filter-placeholder")]
+    public string? FilterPlaceholder { get; set; } = "Search...";
+
+    [HtmlAttributeName("show-clear")]
     public bool ShowClear { get; set; } = false;
+
+    [HtmlAttributeName("editable")]
+    public bool Editable { get; set; } = false;
+
+    [HtmlAttributeName("loading")]
+    public bool Loading { get; set; } = false;
+
+    [HtmlAttributeName("scroll-height")]
+    public string? ScrollHeight { get; set; } = "220px";
+
+    [HtmlAttributeName("variant")]
+    public InputVariant Variant { get; set; } = InputVariant.Outlined;
+
+    [HtmlAttributeName("size")]
+    public ComponentSize Size { get; set; } = ComponentSize.Normal;
+
+    [HtmlAttributeName("fluid")]
+    public bool Fluid { get; set; } = false;
+
+    [HtmlAttributeName("invalid")]
+    public bool Invalid { get; set; } = false;
+
+    [HtmlAttributeName("disabled")]
     public bool Disabled { get; set; } = false;
+
+    [HtmlAttributeName("readonly")]
+    public bool Readonly { get; set; } = false;
+
+    [HtmlAttributeName("input-id")]
+    public string? InputId { get; set; }
+
+    [HtmlAttributeName("name")]
+    public string? Name { get; set; }
+
+    [HtmlAttributeName("target-input")]
     public string? TargetInput { get; set; }
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
+        if (context.AllAttributes.TryGetAttribute("multiple", out var mulAttr))
+        {
+            if (bool.TryParse(mulAttr.Value?.ToString(), out var m)) Multiple = m;
+            else if (mulAttr.Value != null) Multiple = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("checkmark", out var cmAttr))
+        {
+            if (bool.TryParse(cmAttr.Value?.ToString(), out var cm)) Checkmark = cm;
+            else if (cmAttr.Value != null) Checkmark = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("checkbox", out var cbAttr))
+        {
+            if (bool.TryParse(cbAttr.Value?.ToString(), out var cb)) Checkbox = cb;
+            else if (cbAttr.Value != null) Checkbox = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("showClear", out var scAttr) || context.AllAttributes.TryGetAttribute("show-clear", out scAttr))
+        {
+            if (bool.TryParse(scAttr.Value?.ToString(), out var sc)) ShowClear = sc;
+            else if (scAttr.Value != null) ShowClear = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("editable", out var edAttr))
+        {
+            if (bool.TryParse(edAttr.Value?.ToString(), out var ed)) Editable = ed;
+            else if (edAttr.Value != null) Editable = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("loading", out var ldAttr))
+        {
+            if (bool.TryParse(ldAttr.Value?.ToString(), out var ld)) Loading = ld;
+            else if (ldAttr.Value != null) Loading = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("filter", out var fAttr))
+        {
+            if (bool.TryParse(fAttr.Value?.ToString(), out var f)) Filter = f;
+            else if (fAttr.Value != null) Filter = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("fluid", out var flAttr))
+        {
+            if (bool.TryParse(flAttr.Value?.ToString(), out var fl)) Fluid = fl;
+            else if (flAttr.Value != null) Fluid = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("invalid", out var invAttr))
+        {
+            if (bool.TryParse(invAttr.Value?.ToString(), out var inv)) Invalid = inv;
+            else if (invAttr.Value != null) Invalid = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("disabled", out var disAttr))
+        {
+            if (bool.TryParse(disAttr.Value?.ToString(), out var dis)) Disabled = dis;
+            else if (disAttr.Value != null) Disabled = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("readonly", out var roAttr))
+        {
+            if (bool.TryParse(roAttr.Value?.ToString(), out var ro)) Readonly = ro;
+            else if (roAttr.Value != null) Readonly = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("variant", out var varAttr))
+        {
+            if (System.Enum.TryParse<InputVariant>(varAttr.Value?.ToString(), true, out var vr)) Variant = vr;
+        }
+        if (context.AllAttributes.TryGetAttribute("size", out var szAttr))
+        {
+            if (System.Enum.TryParse<ComponentSize>(szAttr.Value?.ToString(), true, out var sz)) Size = sz;
+        }
+        if (context.AllAttributes.TryGetAttribute("target-input-name", out var tinAttr) || context.AllAttributes.TryGetAttribute("targetInputName", out tinAttr))
+        {
+            TargetInput = tinAttr.Value?.ToString();
+        }
+
         output.TagName = "div";
         output.TagMode = TagMode.StartTagAndEndTag;
         output.Attributes.SetAttribute("data-island", "select");
         output.Attributes.SetAttribute("data-hydrate", "load");
+        output.Attributes.SetAttribute("tabindex", Disabled ? "-1" : "0");
+        output.Attributes.SetAttribute("role", "combobox");
+
+        if (!string.IsNullOrEmpty(InputId)) output.Attributes.SetAttribute("id", InputId);
+
+        var effectiveValue = (object?)Values ?? (object?)SelectedValues ?? (object?)Value ?? SelectedValue;
+
         var props = new
         {
-            options = Options ?? new(),
-            selectedValue = SelectedValue,
+            options = Options ?? new List<object>(),
+            value = effectiveValue,
+            selectedValue = effectiveValue,
             placeholder = Placeholder,
+            multiple = Multiple,
+            checkmark = Checkmark,
+            checkbox = Checkbox,
+            display = Display,
             filter = Filter,
+            filterPlaceholder = FilterPlaceholder,
             showClear = ShowClear,
+            editable = Editable,
+            loading = Loading,
+            scrollHeight = ScrollHeight,
+            variant = Variant == InputVariant.Filled ? "filled" : "outlined",
+            size = Size.ToString().ToLowerInvariant(),
+            fluid = Fluid,
             disabled = Disabled,
+            @readonly = Readonly,
+            invalid = Invalid,
+            inputId = InputId,
+            name = Name,
             targetInputName = TargetInput
         };
+
         output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
+
+        // SSR Pre-rendered markup
+        var rootClasses = new List<string> { "laughtale-select", "p-select" };
+        if (Fluid) rootClasses.Add("p-select-fluid");
+        if (Variant == InputVariant.Filled) rootClasses.Add("variant-filled");
+        if (Size != ComponentSize.Normal) rootClasses.Add($"size-{Size.ToString().ToLowerInvariant()}");
+        if (Invalid) rootClasses.Add("is-invalid");
+        if (Disabled) rootClasses.Add("is-disabled");
+
+        output.Attributes.SetAttribute("class", string.Join(" ", rootClasses));
+        var labelText = !string.IsNullOrEmpty(Value ?? SelectedValue) ? (Value ?? SelectedValue) : Placeholder;
+        var isPlaceholder = string.IsNullOrEmpty(Value ?? SelectedValue);
+
+        output.Content.SetHtmlContent($@"<span class=""p-select-label{(isPlaceholder ? " p-placeholder" : "")}"">{System.Net.WebUtility.HtmlEncode(labelText)}</span>
+<div class=""p-select-actions"">
+    <span class=""p-select-dropdown""><svg xmlns=""http://www.w3.org/2000/svg"" width=""16"" height=""16"" viewBox=""0 0 24 24"" fill=""none"" stroke=""currentColor"" stroke-width=""2"" stroke-linecap=""round"" stroke-linejoin=""round""><path d=""m6 9 6 6 6-6""/></svg></span>
+</div>");
     }
 }
 

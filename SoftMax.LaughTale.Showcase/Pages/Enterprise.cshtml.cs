@@ -232,6 +232,78 @@ public class EnterpriseModel : PageModel
         new("Watermelon", "watermelon", Flag: "🍉")
     };
 
+    public List<ListboxOptionItem> SelectLanguages { get; set; } = new()
+    {
+        new("English", "en", Flag: "🇺🇸"),
+        new("Deutsch", "de", Flag: "🇩🇪"),
+        new("Español", "es", Flag: "🇪🇸"),
+        new("Français", "fr", Flag: "🇫🇷"),
+        new("Italiano", "it", Flag: "🇮🇹"),
+        new("Português", "pt", Flag: "🇵🇹"),
+        new("Polski", "pl", Flag: "🇵🇱"),
+        new("Türkçe", "tr", Flag: "🇹🇷"),
+        new("日本語", "ja", Flag: "🇯🇵"),
+        new("中文", "zh", Flag: "🇨🇳")
+    };
+
+    public List<string> SelectToppings { get; set; } = new()
+    {
+        "Pepperoni", "Mushrooms", "Onions", "Black Olives", "Green Peppers", "Mozzarella", "Basil", "Tomatoes"
+    };
+
+    public List<ListboxOptionItem> SelectThemes { get; set; } = new()
+    {
+        new("Light", "light", Icon: "☀️", Description: "Clean and bright interface"),
+        new("Dark", "dark", Icon: "🌙", Description: "Easy on the eyes"),
+        new("System", "system", Icon: "💻", Description: "Match your device settings"),
+        new("High Contrast", "high-contrast", Icon: "◐", Description: "Maximum readability")
+    };
+
+    public List<ListboxOptionItem> SelectTeamMembers { get; set; } = new()
+    {
+        new("Sarah Chen", "sc", Description: "Engineering Lead", Badge: "SC", StatusClass: "bg-amber-400"),
+        new("Alex Rivera", "ar", Description: "Senior Developer", Badge: "AR", StatusClass: "bg-green-400"),
+        new("Jordan Kim", "jk", Description: "UX Designer", Badge: "JK", StatusClass: "bg-amber-400"),
+        new("Taylor Morgan", "tm", Description: "Product Manager", Badge: "TM", StatusClass: "bg-zinc-400"),
+        new("Morgan Lee", "ml", Description: "DevOps Engineer", Badge: "ML", StatusClass: "bg-green-400"),
+        new("Casey Jones", "cj", Description: "QA Engineer", Badge: "CJ", StatusClass: "bg-red-400")
+    };
+
+    public List<ListboxOptionItem> SelectCategories { get; set; } = new()
+    {
+        new("Electronics", "electronics", Badge: "1247"),
+        new("Clothing", "clothing", Badge: "856"),
+        new("Garden", "home", Badge: "634"),
+        new("Sports", "sports", Badge: "421"),
+        new("Books", "books", Badge: "2103"),
+        new("Toys", "toys", Badge: "312")
+    };
+
+    public List<ListboxOptionItem> SelectJobGroups { get; set; } = new()
+    {
+        new("Engineering", "eng", Items: new()
+        {
+            new("Frontend Developer", "frontend"),
+            new("Backend Developer", "backend"),
+            new("Full Stack Developer", "fullstack"),
+            new("DevOps Engineer", "devops"),
+            new("QA Engineer", "qa")
+        }),
+        new("Design", "design", Items: new()
+        {
+            new("UI Designer", "ui"),
+            new("UX Designer", "ux"),
+            new("Product Designer", "product-design"),
+            new("Brand Designer", "brand")
+        }),
+        new("Product", "product", Items: new()
+        {
+            new("Product Manager", "pm"),
+            new("Product Owner", "po"),
+            new("Business Analyst", "ba")
+        })
+    };
+
     public List<PickListItem> PickListSource { get; set; } = new()
     {
         new("sec-1", "mTLS Encryption", "Active session certificate"),

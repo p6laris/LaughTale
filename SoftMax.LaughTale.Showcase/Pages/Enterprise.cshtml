@@ -1187,17 +1187,137 @@
         </div>
     </section>
 
-    <!-- Select -->
+        <!-- Select -->
     <section id="sec-select" class="component-card">
         <div class="card-header">
             <div>
-                <h2>Select (Single Select)</h2>
-                <p>Custom dropdown selector with searchable filter and clear option.</p>
+                <h2>Select (Dropdown)</h2>
+                <p>Select is used to choose one or more items from a collection with search filtering, checkmark/checkbox indicators, chips display, option grouping, templating, and floating labels.</p>
             </div>
-            <span class="aura-tag tag-slate">Select</span>
+            <span class="aura-tag tag-indigo">Form Control</span>
         </div>
-        <div class="card-body" style="max-width: 400px;">
-            <island-select options="@Model.ListboxDatabases" placeholder="Select Database..." />
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Demo 1: Basic & Search Filter with Flags -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic &amp; Search Filter</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Single item selection with instant debounced search filter, country flags, and clear button.</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem;">
+                    <div>
+                        <island-label for="sel-lang" text="Select a Language (Filter + Clear)" style="margin-bottom: 0.35rem;" />
+                        <island-select input-id="sel-lang" options="@Model.SelectLanguages" filter="true" filter-placeholder="Search language..." show-clear="true" placeholder="Select a language" fluid="true" />
+                    </div>
+                    <div>
+                        <island-label for="sel-theme" text="Theme Mode Selector" style="margin-bottom: 0.35rem;" />
+                        <island-select input-id="sel-theme" options="@Model.SelectThemes" selected-value="system" checkmark="true" placeholder="Select a Theme" fluid="true" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 2: Multiple Selection & Checkmark Indicator -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Multiple Selection (Checkmark Indicator)</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Multi-item selection displaying "Item (+N more)" and checkmark highlights.</p>
+                <div style="max-width: 360px;">
+                    <island-label for="sel-toppings" text="Select Toppings (Multiple)" style="margin-bottom: 0.35rem;" />
+                    <island-select input-id="sel-toppings" options="@Model.SelectToppings" multiple="true" checkmark="true" show-clear="true" selected-value="Green Peppers,Black Olives" placeholder="Select Toppings" fluid="true" />
+                </div>
+            </div>
+
+            <!-- Demo 3: Checkbox Selection with Select-All Header -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Checkbox Multi-Selection</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Select multiple cities with checkbox controls and select-all/indeterminate header toggle.</p>
+                <div style="max-width: 360px;">
+                    <island-label for="sel-cities-cb" text="Select Cities (Checkboxes)" style="margin-bottom: 0.35rem;" />
+                    <island-select input-id="sel-cities-cb" options="@Model.ListboxCities" multiple="true" checkbox="true" show-clear="true" selected-value="NY,LDN" placeholder="Select Cities" fluid="true" />
+                </div>
+            </div>
+
+            <!-- Demo 4: Chips Display Mode & Custom Team Avatars -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Chips Mode &amp; Custom Team Member Templates</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Selected items displayed as removable chips alongside avatar badges and live presence indicators.</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+                    <div>
+                        <island-label for="sel-members" text="Assign Team Members (Avatars + Chips)" style="margin-bottom: 0.35rem;" />
+                        <island-select input-id="sel-members" options="@Model.SelectTeamMembers" multiple="true" display="chip" show-clear="true" selected-value="sc,ar" placeholder="Select team members..." fluid="true" />
+                    </div>
+                    <div>
+                        <island-label for="sel-cats" text="Inventory Categories (Count Badges)" style="margin-bottom: 0.35rem;" />
+                        <island-select input-id="sel-cats" options="@Model.SelectCategories" show-clear="true" placeholder="Category" fluid="true" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 5: Grouped Options -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Option Grouping</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Categorized nested hierarchical positions with group headers.</p>
+                <div style="max-width: 360px;">
+                    <island-label for="sel-jobs" text="Job Position" style="margin-bottom: 0.35rem;" />
+                    <island-select input-id="sel-jobs" options="@Model.SelectJobGroups" filter="true" placeholder="Select a position..." fluid="true" />
+                </div>
+            </div>
+
+            <!-- Demo 6: FloatLabel & IftaLabel Integration -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">FloatLabel &amp; IftaLabel Integration</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Flawless integration with animated floating and infield top labels.</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; align-items: end;">
+                    <div>
+                        <island-float-label variant="@FloatLabelVariant.Over">
+                            <island-select input-id="fl-sel-over" options="@Model.ListboxCities" selected-value="NY" fluid="true" />
+                            <label for="fl-sel-over">City (Over)</label>
+                        </island-float-label>
+                    </div>
+                    <div>
+                        <island-float-label variant="@FloatLabelVariant.In">
+                            <island-select input-id="fl-sel-in" options="@Model.ListboxCities" selected-value="RM" variant="@InputVariant.Filled" fluid="true" />
+                            <label for="fl-sel-in">City (In)</label>
+                        </island-float-label>
+                    </div>
+                    <div>
+                        <island-float-label variant="@FloatLabelVariant.On">
+                            <island-select input-id="fl-sel-on" options="@Model.ListboxCities" selected-value="LDN" fluid="true" />
+                            <label for="fl-sel-on">City (On)</label>
+                        </island-float-label>
+                    </div>
+                    <div>
+                        <island-ifta-label>
+                            <island-select input-id="ifta-sel" options="@Model.ListboxCities" selected-value="IST" fluid="true" />
+                            <label for="ifta-sel">Selected City</label>
+                        </island-ifta-label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 7: Sizes, Filled Variant & Validation States -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Sizes, Filled Variant, Editable, Loading &amp; Validation</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Small and large size metrics alongside high-contrast filled variant, loading spinner, and invalid validation ring.</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; align-items: end;">
+                    <div>
+                        <island-label for="sel-sz-sm" text="Small Size" size="@ComponentSize.Small" style="margin-bottom: 0.35rem;" />
+                        <island-select input-id="sel-sz-sm" options="@Model.ListboxCities" size="@ComponentSize.Small" placeholder="Small" fluid="true" />
+                    </div>
+                    <div>
+                        <island-label for="sel-sz-lg" text="Large Size" size="@ComponentSize.Large" style="margin-bottom: 0.35rem;" />
+                        <island-select input-id="sel-sz-lg" options="@Model.ListboxCities" size="@ComponentSize.Large" placeholder="Large" fluid="true" />
+                    </div>
+                    <div>
+                        <island-label for="sel-filled" text="Filled Variant" style="margin-bottom: 0.35rem;" />
+                        <island-select input-id="sel-filled" options="@Model.ListboxCities" variant="@InputVariant.Filled" placeholder="Filled" fluid="true" />
+                    </div>
+                    <div>
+                        <island-label for="sel-loading" text="Loading State" style="margin-bottom: 0.35rem;" />
+                        <island-select input-id="sel-loading" options="@Model.ListboxCities" loading="true" placeholder="Loading..." fluid="true" />
+                    </div>
+                    <div>
+                        <island-label for="sel-invalid" text="Invalid State" style="margin-bottom: 0.35rem; color: var(--p-red-500);" />
+                        <island-select input-id="sel-invalid" options="@Model.ListboxCities" invalid="true" placeholder="Required" fluid="true" />
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 

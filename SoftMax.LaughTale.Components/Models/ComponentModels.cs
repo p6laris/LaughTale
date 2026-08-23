@@ -75,6 +75,8 @@ public record ListboxOptionItem(
     string? Flag = null,
     string? Badge = null,
     string? Description = null,
+    string? Avatar = null,
+    string? StatusClass = null,
     bool Disabled = false,
     List<ListboxOptionItem>? Items = null
 );
