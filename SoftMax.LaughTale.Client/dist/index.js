@@ -11894,6 +11894,7 @@ ${h.response}`).join("\n");
     display: inline-flex;
     flex-direction: column;
     width: 100%;
+    margin-top: 1rem;
     font-family: var(--p-font-family, inherit);
     box-sizing: border-box;
 }
@@ -11911,27 +11912,27 @@ ${h.response}`).join("\n");
     user-select: none;
 }
 
-/* Variant: over (Floats above the input) */
+/* Variant: over (Floats completely above the input) */
 .laughtale-float-label-over > label {
     top: 50%;
     transform: translateY(-50%);
 }
 .laughtale-float-label-over.has-value > label,
 .laughtale-float-label-over:focus-within > label {
-    top: -0.65rem;
+    top: -1.25rem;
+    left: 0.15rem;
     transform: translateY(0);
     font-size: 0.75rem;
     font-weight: 600;
     color: var(--p-primary-500);
 }
 
-/* Variant: on (Floats on the top border line) */
+/* Variant: on (Floats on the top border line with surface pill masking) */
 .laughtale-float-label-on > label {
     top: 50%;
     transform: translateY(-50%);
     background: var(--p-surface-0);
-    padding: 0 0.3rem;
-    margin-left: -0.3rem;
+    padding: 0 0.35rem;
     border-radius: 2px;
 }
 .laughtale-float-label-on.has-value > label,
@@ -11941,6 +11942,7 @@ ${h.response}`).join("\n");
     font-size: 0.75rem;
     font-weight: 600;
     color: var(--p-primary-500);
+    z-index: 2;
 }
 
 /* Variant: in (Infield top-aligned label) */
