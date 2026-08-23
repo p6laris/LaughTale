@@ -11977,7 +11977,7 @@ ${h.response}`).join("\n");
             gap: 0 !important;
             width: 100% !important;
         }
-        .collapsed .sidebar-group-header span {
+        .collapsed .sidebar-group-header span.sidebar-group-icon {
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
@@ -12011,7 +12011,7 @@ ${h.response}`).join("\n");
             box-sizing: border-box !important;
             border-radius: var(--p-border-radius);
         }
-        .collapsed .sidebar-item span {
+        .collapsed .sidebar-item span.sidebar-icon {
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
@@ -12043,7 +12043,7 @@ ${h.response}`).join("\n");
                 <li class="sidebar-group-container" data-label="${label}">
                     <div class="sidebar-group-header" data-group-toggle="${label}" title="${label}">
                         <div style="display: flex; align-items: center; gap: 0.45rem;">
-                            ${iconSvg ? `<span style="display: flex; width: 16px; height: 16px; color: var(--p-primary-600);">${iconSvg}</span>` : ""}
+                            ${iconSvg ? `<span class="sidebar-group-icon" style="display: flex; width: 16px; height: 16px; color: var(--p-primary-600);">${iconSvg}</span>` : ""}
                             <span class="sidebar-item-label">${label}</span>
                         </div>
                         <span class="sidebar-group-chevron ${isExpanded ? "expanded" : ""}">
@@ -12059,7 +12059,7 @@ ${h.response}`).join("\n");
       return `
             <li>
                 <a href="${url}" class="sidebar-item ${active ? "active" : ""}" data-sidebar-link="${url}" title="${label}">
-                    ${iconSvg ? `<span style="display: flex; width: 18px; height: 18px; color: ${active ? "var(--p-primary-600)" : "var(--p-text-muted)"}; flex-shrink: 0;">${iconSvg}</span>` : ""}
+                    ${iconSvg ? `<span class="sidebar-icon" style="display: flex; width: 18px; height: 18px; color: ${active ? "var(--p-primary-600)" : "var(--p-text-muted)"}; flex-shrink: 0;">${iconSvg}</span>` : ""}
                     <span class="sidebar-item-label">${label}</span>
                     ${badge ? `<span class="sidebar-badge">${badge}</span>` : ""}
                 </a>
