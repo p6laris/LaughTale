@@ -308,12 +308,173 @@
         <div class="card-header">
             <div>
                 <h2>InputNumber</h2>
-                <p>Numeric stepper with currency formatting, min/max clamps, and increment triggers.</p>
+                <p>Enterprise numerical input with currency formats (ISO 4217), locale aware grouping, fraction limits, prefix/suffix units, and spinner button layouts.</p>
             </div>
-            <span class="aura-tag tag-slate">Numeric</span>
+            <span class="aura-tag tag-emerald">Form Control</span>
         </div>
-        <div class="card-body" style="max-width: 400px;">
-            <island-input-number value="1250" min="0" max="100000" step="50" prefix="$" />
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Hero Demo: Monthly Budget -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); max-width: 440px;">
+                <label style="font-weight: 700; font-size: 0.95rem; color: var(--p-text-color); margin-bottom: 0.5rem; display: block;">Monthly budget</label>
+                <island-input-number value="1500" mode="@InputNumberMode.Currency" currency="USD" locale="en-US" showButtons="true" buttonLayout="@ButtonLayout.Stacked" fluid="true" />
+                <span style="font-size: 0.8125rem; color: var(--p-text-muted); margin-top: 0.5rem; display: block;">Set the maximum amount you can spend per month</span>
+            </div>
+
+            <!-- Demo 1: Numerals & Precision -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Numerals &amp; Precision</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Integer only, disabled grouping separators, min/max fraction digits, and boundary clamping.</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+                    <div>
+                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Integer Only</label>
+                        <island-input-number value="42723" fluid="true" />
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Without Grouping</label>
+                        <island-input-number value="58151" useGrouping="false" fluid="true" />
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Min-Max Fractions (2 to 5)</label>
+                        <island-input-number value="2351.35" minFractionDigits="2" maxFractionDigits="5" fluid="true" />
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Min-Max Clamped (0 to 100)</label>
+                        <island-input-number value="50" min="0" max="100" fluid="true" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 2: Currency & Locale Localization -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Currency &amp; Locales (ISO 4217)</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Standard international financial formatting across United States, Germany, India, and Japan.</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+                    <div>
+                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">United States (USD)</label>
+                        <island-input-number value="1500" mode="@InputNumberMode.Currency" currency="USD" locale="en-US" fluid="true" />
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Germany (EUR)</label>
+                        <island-input-number value="2500" mode="@InputNumberMode.Currency" currency="EUR" locale="de-DE" fluid="true" />
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">India (INR Code)</label>
+                        <island-input-number value="4250" mode="@InputNumberMode.Currency" currency="INR" currencyDisplay="@CurrencyDisplay.Code" locale="en-IN" fluid="true" />
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Japan (JPY 0 Decimals)</label>
+                        <island-input-number value="5002" mode="@InputNumberMode.Currency" currency="JPY" locale="ja-JP" fluid="true" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 3: Prefix & Suffix Units -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Prefix &amp; Suffix Units</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Custom contextual indicators, distance units, percentages, and temperature scales.</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+                    <div>
+                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Mile (Suffix)</label>
+                        <island-input-number value="20" suffix=" mi" fluid="true" />
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Percent (Prefix)</label>
+                        <island-input-number value="50" prefix="%" fluid="true" />
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Expiry (Prefix + Suffix)</label>
+                        <island-input-number value="10" prefix="Expires in " suffix=" days" fluid="true" />
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Temperature (0 to 40℃)</label>
+                        <island-input-number value="20" prefix="↑ " suffix="℃" min="0" max="40" fluid="true" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 4: Stepper Buttons & Layouts -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Stepper Button Layouts</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Stacked spinner controls, horizontal plus/minus pill buttons, and vertical layouts.</p>
+                <div style="display: flex; flex-wrap: wrap; align-items: flex-start; gap: 2rem;">
+                    <div style="flex: 1; min-width: 200px;">
+                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Stacked Buttons (USD)</label>
+                        <island-input-number value="20" showButtons="true" buttonLayout="@ButtonLayout.Stacked" mode="@InputNumberMode.Currency" currency="USD" fluid="true" />
+                    </div>
+                    <div style="flex: 1; min-width: 200px;">
+                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Min-Max Bound Stepper</label>
+                        <island-input-number value="10.5" showButtons="true" buttonLayout="@ButtonLayout.Stacked" min="0" max="100" step="0.5" fluid="true" />
+                    </div>
+                    <div style="flex: 1; min-width: 220px;">
+                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Horizontal Layout (Step 0.25 €)</label>
+                        <island-input-number value="25" showButtons="true" buttonLayout="@ButtonLayout.Horizontal" step="0.25" mode="@InputNumberMode.Currency" currency="EUR" fluid="true" />
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: center;">
+                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Vertical Layout</label>
+                        <island-input-number value="50" showButtons="true" buttonLayout="@ButtonLayout.Vertical" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 5: FloatLabel & IftaLabel Integrations -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">FloatLabel &amp; IftaLabel Integration</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Harmonious integration with dynamic floating labels and infield top labels.</p>
+                <div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 1.5rem;">
+                    <div style="flex: 1; min-width: 200px;">
+                        <island-float-label label="Over Label" variant="@FloatLabelVariant.Over">
+                            <island-input-number inputId="num_fl_over" mode="@InputNumberMode.Currency" currency="USD" locale="en-US" fluid="true" />
+                        </island-float-label>
+                    </div>
+                    <div style="flex: 1; min-width: 200px;">
+                        <island-float-label label="In Label" variant="@FloatLabelVariant.In">
+                            <island-input-number inputId="num_fl_in" mode="@InputNumberMode.Currency" currency="USD" locale="en-US" variant="@InputVariant.Filled" fluid="true" />
+                        </island-float-label>
+                    </div>
+                    <div style="flex: 1; min-width: 200px;">
+                        <island-float-label label="On Label" variant="@FloatLabelVariant.On">
+                            <island-input-number inputId="num_fl_on" mode="@InputNumberMode.Currency" currency="USD" locale="en-US" fluid="true" />
+                        </island-float-label>
+                    </div>
+                    <div style="flex: 1; min-width: 200px;">
+                        <island-ifta-label label="Price">
+                            <island-input-number inputId="num_ifta_price" value="1" mode="@InputNumberMode.Currency" currency="USD" locale="en-US" variant="@InputVariant.Filled" fluid="true" />
+                        </island-ifta-label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 6: Sizes, Clear Icon, Filled & Validation States -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Sizes &amp; States</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Small/Large sizes, clear icon trigger, filled variant, disabled, and invalid validation states.</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    <div>
+                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Small Size</label>
+                        <island-input-number size="@ComponentSize.Small" placeholder="Small" mode="@InputNumberMode.Currency" currency="USD" fluid="true" />
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Large Size</label>
+                        <island-input-number size="@ComponentSize.Large" placeholder="Large" mode="@InputNumberMode.Currency" currency="USD" fluid="true" />
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Clear Icon Trigger</label>
+                        <island-input-number value="1250" showClear="true" mode="@InputNumberMode.Currency" currency="USD" fluid="true" />
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Filled Variant</label>
+                        <island-input-number value="350" variant="@InputVariant.Filled" fluid="true" />
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Invalid State</label>
+                        <island-input-number invalid="true" placeholder="Amount Required" fluid="true" />
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Disabled State</label>
+                        <island-input-number value="50" prefix="%" disabled="true" fluid="true" />
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 

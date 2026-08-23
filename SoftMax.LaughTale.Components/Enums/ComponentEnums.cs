@@ -94,6 +94,20 @@ public enum InputNumberMode
     Currency
 }
 
+public enum ButtonLayout
+{
+    Stacked,
+    Horizontal,
+    Vertical
+}
+
+public enum CurrencyDisplay
+{
+    Symbol,
+    Code,
+    Name
+}
+
 public enum ToastSeverity
 {
     Success,
@@ -101,3 +115,4 @@ public enum ToastSeverity
     Warn,
     Error
 }
+

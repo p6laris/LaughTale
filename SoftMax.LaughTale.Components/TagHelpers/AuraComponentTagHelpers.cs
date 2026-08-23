@@ -7,24 +7,37 @@ using System.Text.Json;
 namespace SoftMax.LaughTale.Components.TagHelpers;
 
 /// <summary>
-/// TagHelper for <island-number /> / <island-currency />
+/// <summary>
+/// TagHelper for <island-input-number /> / <island-inputnumber /> / <island-number /> / <island-currency /> — Aura InputNumber
 /// </summary>
+[HtmlTargetElement("island-input-number")]
+[HtmlTargetElement("island-inputnumber")]
 [HtmlTargetElement("island-number")]
 [HtmlTargetElement("island-currency")]
-[HtmlTargetElement("island-input-number")]
 public class IslandNumberTagHelper : TagHelper
 {
     public string? TargetInput { get; set; }
+    public string? InputId { get; set; }
     public double? Value { get; set; }
-    public string Mode { get; set; } = "decimal";
+    public InputNumberMode Mode { get; set; } = InputNumberMode.Decimal;
     public string? Currency { get; set; } = "USD";
+    public CurrencyDisplay CurrencyDisplay { get; set; } = CurrencyDisplay.Symbol;
+    public string? Locale { get; set; }
+    public bool UseGrouping { get; set; } = true;
+    public int? MinFractionDigits { get; set; }
+    public int? MaxFractionDigits { get; set; }
     public string? Prefix { get; set; }
     public string? Suffix { get; set; }
     public double? Min { get; set; }
     public double? Max { get; set; }
     public double Step { get; set; } = 1;
-    public int? Decimals { get; set; }
-    public bool ShowButtons { get; set; } = true;
+    public bool ShowButtons { get; set; } = false;
+    public ButtonLayout ButtonLayout { get; set; } = ButtonLayout.Stacked;
+    public InputVariant Variant { get; set; } = InputVariant.Outlined;
+    public ComponentSize Size { get; set; } = ComponentSize.Normal;
+    public bool Fluid { get; set; } = false;
+    public bool Invalid { get; set; } = false;
+    public bool ShowClear { get; set; } = false;
     public string? Placeholder { get; set; }
     public bool Disabled { get; set; } = false;
 
@@ -38,16 +51,27 @@ public class IslandNumberTagHelper : TagHelper
         var props = new
         {
             targetInputName = TargetInput,
+            inputId = InputId,
             value = Value,
-            mode = Mode,
+            mode = Mode.ToString().ToLowerInvariant(),
             currency = Currency,
+            currencyDisplay = CurrencyDisplay.ToString().ToLowerInvariant(),
+            locale = Locale,
+            useGrouping = UseGrouping,
+            minFractionDigits = MinFractionDigits,
+            maxFractionDigits = MaxFractionDigits,
             prefix = Prefix,
             suffix = Suffix,
             min = Min,
             max = Max,
             step = Step,
-            decimals = Decimals,
             showButtons = ShowButtons,
+            buttonLayout = ButtonLayout.ToString().ToLowerInvariant(),
+            variant = Variant.ToString().ToLowerInvariant(),
+            size = Size.ToString().ToLowerInvariant(),
+            fluid = Fluid,
+            invalid = Invalid,
+            showClear = ShowClear,
             placeholder = Placeholder,
             disabled = Disabled
         };
