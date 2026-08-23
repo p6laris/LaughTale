@@ -326,13 +326,13 @@ export default function RadioButtonIsland(container: HTMLElement, props: RadioBu
     const isDisabled = props.disabled === true || String(props.disabled) === 'true';
     const isReadonly = props.readonly === true || String(props.readonly) === 'true';
 
-    // Check if rendering a full group of options
+    // Group mode
     if (props.options && props.options.length > 0) {
         renderGroup();
         return;
     }
 
-    // Single standalone radio button
+    // Single standalone radio button mode
     let isChecked = Boolean(props.checked) || (props.selectedValue !== undefined && String(props.selectedValue) === String(props.value));
 
     function renderSingle() {
@@ -413,7 +413,7 @@ export default function RadioButtonIsland(container: HTMLElement, props: RadioBu
         isChecked = checked;
         const labelWrap = container.querySelector<HTMLElement>('.p-radiobutton-root');
         const rbBox = container.querySelector<HTMLElement>('.p-radiobutton');
-        const hiddenInp = container.querySelector<HTMLInputElement>(`input[type="hidden"]`);
+        const hiddenInp = container.querySelector<HTMLInputElement>('input[type="hidden"]');
 
         if (labelWrap) {
             if (isChecked) labelWrap.classList.add('is-checked');
@@ -435,7 +435,7 @@ export default function RadioButtonIsland(container: HTMLElement, props: RadioBu
         input.addEventListener('change', () => {
             if (isDisabled || isReadonly) return;
             updateVisuals(input.checked);
-            notifyGroup(input);
+            syncOthers();
             syncValue();
         });
 
@@ -445,20 +445,24 @@ export default function RadioButtonIsland(container: HTMLElement, props: RadioBu
         input.addEventListener('blur', () => {
             container.querySelector('.p-radiobutton-root')?.classList.remove('is-focused');
         });
-
-        // Listen for group coordination
-        document.addEventListener('laughtale:radio:change', (e: any) => {
-            if (e.detail?.name === props.name && e.detail?.input !== input) {
-                updateVisuals(input.checked);
-            }
-        });
     }
 
-    function notifyGroup(currentInput: HTMLInputElement) {
-        document.dispatchEvent(new CustomEvent('laughtale:radio:change', {
-            bubbles: true,
-            detail: { name: props.name, input: currentInput, value: props.value }
-        }));
+    function syncOthers() {
+        // Find all other standalone radio buttons with the same name in the document
+        document.querySelectorAll<HTMLInputElement>(`input[type="radio"][name="${props.name}"]`).forEach(other => {
+            if (other !== container.querySelector('.p-radiobutton-input')) {
+                const parentRoot = other.closest('.p-radiobutton-root');
+                const parentBox = other.closest('.p-radiobutton');
+                if (parentRoot) {
+                    if (other.checked) parentRoot.classList.add('is-checked');
+                    else parentRoot.classList.remove('is-checked');
+                }
+                if (parentBox) {
+                    if (other.checked) parentBox.classList.add('p-radiobutton-checked');
+                    else parentBox.classList.remove('p-radiobutton-checked');
+                }
+            }
+        });
     }
 
     function syncValue() {
@@ -466,10 +470,6 @@ export default function RadioButtonIsland(container: HTMLElement, props: RadioBu
         container.dispatchEvent(new CustomEvent('radio:change', {
             bubbles: true,
             detail: { value: props.value, checked: isChecked }
-        }));
-        container.dispatchEvent(new CustomEvent('change', {
-            bubbles: true,
-            detail: { value: props.value }
         }));
     }
 
@@ -564,10 +564,6 @@ export default function RadioButtonIsland(container: HTMLElement, props: RadioBu
 
                 if (hiddenInp) hiddenInp.value = inp.value;
                 container.dispatchEvent(new CustomEvent('radiogroup:change', {
-                    bubbles: true,
-                    detail: { value: inp.value }
-                }));
-                container.dispatchEvent(new CustomEvent('change', {
                     bubbles: true,
                     detail: { value: inp.value }
                 }));

@@ -14565,7 +14565,7 @@ function RadioButtonIsland(container, props) {
     isChecked = checked;
     const labelWrap = container.querySelector(".p-radiobutton-root");
     const rbBox = container.querySelector(".p-radiobutton");
-    const hiddenInp = container.querySelector(`input[type="hidden"]`);
+    const hiddenInp = container.querySelector('input[type="hidden"]');
     if (labelWrap) {
       if (isChecked) labelWrap.classList.add("is-checked");
       else labelWrap.classList.remove("is-checked");
@@ -14584,7 +14584,7 @@ function RadioButtonIsland(container, props) {
     input.addEventListener("change", () => {
       if (isDisabled || isReadonly) return;
       updateVisuals(input.checked);
-      notifyGroup(input);
+      syncOthers();
       syncValue();
     });
     input.addEventListener("focus", () => {
@@ -14593,27 +14593,28 @@ function RadioButtonIsland(container, props) {
     input.addEventListener("blur", () => {
       container.querySelector(".p-radiobutton-root")?.classList.remove("is-focused");
     });
-    document.addEventListener("laughtale:radio:change", (e) => {
-      if (e.detail?.name === props.name && e.detail?.input !== input) {
-        updateVisuals(input.checked);
+  }
+  function syncOthers() {
+    document.querySelectorAll(`input[type="radio"][name="${props.name}"]`).forEach((other) => {
+      if (other !== container.querySelector(".p-radiobutton-input")) {
+        const parentRoot = other.closest(".p-radiobutton-root");
+        const parentBox = other.closest(".p-radiobutton");
+        if (parentRoot) {
+          if (other.checked) parentRoot.classList.add("is-checked");
+          else parentRoot.classList.remove("is-checked");
+        }
+        if (parentBox) {
+          if (other.checked) parentBox.classList.add("p-radiobutton-checked");
+          else parentBox.classList.remove("p-radiobutton-checked");
+        }
       }
     });
-  }
-  function notifyGroup(currentInput) {
-    document.dispatchEvent(new CustomEvent("laughtale:radio:change", {
-      bubbles: true,
-      detail: { name: props.name, input: currentInput, value: props.value }
-    }));
   }
   function syncValue() {
     if (!isChecked) return;
     container.dispatchEvent(new CustomEvent("radio:change", {
       bubbles: true,
       detail: { value: props.value, checked: isChecked }
-    }));
-    container.dispatchEvent(new CustomEvent("change", {
-      bubbles: true,
-      detail: { value: props.value }
     }));
   }
   function renderGroup() {
@@ -14701,10 +14702,6 @@ function RadioButtonIsland(container, props) {
         });
         if (hiddenInp) hiddenInp.value = inp.value;
         container.dispatchEvent(new CustomEvent("radiogroup:change", {
-          bubbles: true,
-          detail: { value: inp.value }
-        }));
-        container.dispatchEvent(new CustomEvent("change", {
           bubbles: true,
           detail: { value: inp.value }
         }));
