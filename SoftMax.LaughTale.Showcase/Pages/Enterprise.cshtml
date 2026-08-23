@@ -688,6 +688,100 @@
         </div>
     </section>
 
+    <!-- InputTags / Chips -->
+    <section id="sec-inputtags" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>InputTags (Chips)</h2>
+                <p>Multiple tag entry component supporting custom delimiters, paste splitting, duplicate allowance, max limits, typeahead suggestions, and dark mode.</p>
+            </div>
+            <span class="aura-tag tag-emerald">Tags</span>
+        </div>
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Demo 1: Basic (Enter / Backspace Navigation) -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); max-width: 560px;">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1rem;">Press <kbd style="background: var(--p-surface-200); padding: 0.1rem 0.35rem; border-radius: 4px; font-size: 0.75rem;">Enter</kbd> to add a tag and <kbd style="background: var(--p-surface-200); padding: 0.1rem 0.35rem; border-radius: 4px; font-size: 0.75rem;">Backspace</kbd> to remove the last one.</p>
+                <island-input-tags values='@new[] { "Vue", "fdsa" }' placeholder="Add tag..." fluid="true" />
+            </div>
+
+            <!-- Demo 2: Delimiter & AddOnPaste -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); max-width: 560px;">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Delimiter &amp; AddOnPaste</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1rem;">Use a comma <kbd style="background: var(--p-surface-200); padding: 0.1rem 0.35rem; border-radius: 4px; font-size: 0.75rem;">,</kbd> delimiter or paste comma-separated text to automatically tokenize into tags.</p>
+                <island-input-tags values='@new[] { "sdasf" }' separator="," add-on-paste="true" placeholder="Type comma or paste..." fluid="true" />
+            </div>
+
+            <!-- Demo 3: Allow Duplicate -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); max-width: 560px;">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Allow Duplicate</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1rem;">Enable duplicate values to allow adding the same token multiple times.</p>
+                <island-input-tags values='@new[] { "a", "A", "a" }' allow-duplicate="true" placeholder="Add duplicate tags..." fluid="true" />
+            </div>
+
+            <!-- Demo 4: Typeahead Suggestions & Max Items -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+                <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                    <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Typeahead Suggestions</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1rem;">Interactive dropdown suggestions with arrow key selection.</p>
+                    <island-input-tags typeahead="true" suggestions='@new[] { "JavaScript", "TypeScript", "C#", "Python", "Rust", "Go", "Vue", "React", "Angular", "TailwindCSS" }' values='@new[] { "TypeScript", "C#" }' placeholder="Type tech name..." fluid="true" />
+                </div>
+
+                <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                    <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Max Items Limit</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1rem;">Limits the maximum capacity to 4 tokens.</p>
+                    <island-input-tags values='@new[] { "Cluster-Alpha", "Node-01" }' max="4" placeholder="Max 4 items..." fluid="true" />
+                </div>
+            </div>
+
+            <!-- Demo 5: FloatLabel & IftaLabel Integrations -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">FloatLabel &amp; IftaLabel Integration</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Labels integrated seamlessly with InputTags containers.</p>
+                <div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 1.5rem;">
+                    <div style="flex: 1; min-width: 220px;">
+                        <island-float-label label="Security Tags" variant="@FloatLabelVariant.Over">
+                            <island-input-tags input-id="tags_fl" values='@new[] { "Zero-Trust", "mTLS" }' fluid="true" />
+                        </island-float-label>
+                    </div>
+                    <div style="flex: 1; min-width: 220px;">
+                        <island-ifta-label label="Topic Labels">
+                            <island-input-tags input-id="tags_ifta" values='@new[] { "AI", "Cloud" }' variant="@InputVariant.Filled" fluid="true" />
+                        </island-ifta-label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 6: Sizes, Variants & States -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Sizes, Variants &amp; States</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Small and large sizes, filled style, disabled, and validation error states.</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    <div>
+                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Small Size</label>
+                        <island-input-tags size="@ComponentSize.Small" values='@new[] { "Sm1", "Sm2" }' fluid="true" />
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Large Size</label>
+                        <island-input-tags size="@ComponentSize.Large" values='@new[] { "Lg1", "Lg2" }' fluid="true" />
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Filled Variant</label>
+                        <island-input-tags variant="@InputVariant.Filled" values='@new[] { "Filled" }' fluid="true" />
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Invalid State</label>
+                        <island-input-tags invalid="true" values='@new[] { "Error" }' fluid="true" />
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Disabled State</label>
+                        <island-input-tags disabled="true" values='@new[] { "Locked1", "Locked2" }' fluid="true" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- DatePicker -->
     <section id="sec-datepicker" class="component-card">
         <div class="card-header">
@@ -1048,99 +1142,7 @@
         </div>
     </section>
 
-    <!-- InputTags / Chips -->
-    <section id="sec-chips" class="component-card">
-        <div class="card-header">
-            <div>
-                <h2>InputTags (Chips)</h2>
-                <p>Multiple tag entry component supporting custom delimiters, paste splitting, duplicate allowance, max limits, typeahead suggestions, and dark mode.</p>
-            </div>
-            <span class="aura-tag tag-emerald">Tags</span>
-        </div>
-        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
-            <!-- Demo 1: Basic (Enter / Backspace Navigation) -->
-            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); max-width: 560px;">
-                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic</h3>
-                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1rem;">Press <kbd style="background: var(--p-surface-200); padding: 0.1rem 0.35rem; border-radius: 4px; font-size: 0.75rem;">Enter</kbd> to add a tag and <kbd style="background: var(--p-surface-200); padding: 0.1rem 0.35rem; border-radius: 4px; font-size: 0.75rem;">Backspace</kbd> to remove the last one.</p>
-                <island-input-tags values='@new[] { "Vue", "fdsa" }' placeholder="Add tag..." fluid="true" />
-            </div>
 
-            <!-- Demo 2: Delimiter & AddOnPaste -->
-            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); max-width: 560px;">
-                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Delimiter &amp; AddOnPaste</h3>
-                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1rem;">Use a comma <kbd style="background: var(--p-surface-200); padding: 0.1rem 0.35rem; border-radius: 4px; font-size: 0.75rem;">,</kbd> delimiter or paste comma-separated text to automatically tokenize into tags.</p>
-                <island-input-tags values='@new[] { "sdasf" }' separator="," add-on-paste="true" placeholder="Type comma or paste..." fluid="true" />
-            </div>
-
-            <!-- Demo 3: Allow Duplicate -->
-            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); max-width: 560px;">
-                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Allow Duplicate</h3>
-                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1rem;">Enable duplicate values to allow adding the same token multiple times.</p>
-                <island-input-tags values='@new[] { "a", "A", "a" }' allow-duplicate="true" placeholder="Add duplicate tags..." fluid="true" />
-            </div>
-
-            <!-- Demo 4: Typeahead Suggestions & Max Items -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
-                <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
-                    <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Typeahead Suggestions</h3>
-                    <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1rem;">Interactive dropdown suggestions with arrow key selection.</p>
-                    <island-input-tags typeahead="true" suggestions='@new[] { "JavaScript", "TypeScript", "C#", "Python", "Rust", "Go", "Vue", "React", "Angular", "TailwindCSS" }' values='@new[] { "TypeScript", "C#" }' placeholder="Type tech name..." fluid="true" />
-                </div>
-
-                <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
-                    <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Max Items Limit</h3>
-                    <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1rem;">Limits the maximum capacity to 4 tokens.</p>
-                    <island-input-tags values='@new[] { "Cluster-Alpha", "Node-01" }' max="4" placeholder="Max 4 items..." fluid="true" />
-                </div>
-            </div>
-
-            <!-- Demo 5: FloatLabel & IftaLabel Integrations -->
-            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
-                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">FloatLabel &amp; IftaLabel Integration</h3>
-                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Labels integrated seamlessly with InputTags containers.</p>
-                <div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 1.5rem;">
-                    <div style="flex: 1; min-width: 220px;">
-                        <island-float-label label="Security Tags" variant="@FloatLabelVariant.Over">
-                            <island-input-tags input-id="tags_fl" values='@new[] { "Zero-Trust", "mTLS" }' fluid="true" />
-                        </island-float-label>
-                    </div>
-                    <div style="flex: 1; min-width: 220px;">
-                        <island-ifta-label label="Topic Labels">
-                            <island-input-tags input-id="tags_ifta" values='@new[] { "AI", "Cloud" }' variant="@InputVariant.Filled" fluid="true" />
-                        </island-ifta-label>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Demo 6: Sizes, Variants & States -->
-            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
-                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Sizes, Variants &amp; States</h3>
-                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Small and large sizes, filled style, disabled, and validation error states.</p>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-                    <div>
-                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Small Size</label>
-                        <island-input-tags size="@ComponentSize.Small" values='@new[] { "Sm1", "Sm2" }' fluid="true" />
-                    </div>
-                    <div>
-                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Large Size</label>
-                        <island-input-tags size="@ComponentSize.Large" values='@new[] { "Lg1", "Lg2" }' fluid="true" />
-                    </div>
-                    <div>
-                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Filled Variant</label>
-                        <island-input-tags variant="@InputVariant.Filled" values='@new[] { "Filled" }' fluid="true" />
-                    </div>
-                    <div>
-                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Invalid State</label>
-                        <island-input-tags invalid="true" values='@new[] { "Error" }' fluid="true" />
-                    </div>
-                    <div>
-                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Disabled State</label>
-                        <island-input-tags disabled="true" values='@new[] { "Locked1", "Locked2" }' fluid="true" />
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 
     <!-- ColorPicker -->
     <section id="sec-color-picker" class="component-card">
@@ -1826,7 +1828,8 @@
         if (!targetId || targetId === '#' || targetId === '/enterprise') {
             targetId = 'sec-dynamic-form';
         }
-        const id = targetId.replace(/^.*#/, '').trim() || 'sec-dynamic-form';
+        let id = targetId.replace(/^.*#/, '').trim() || 'sec-dynamic-form';
+        if (id === 'sec-chips') id = 'sec-inputtags';
         const allCards = document.querySelectorAll('.enterprise-sections > section');
         if (!allCards || !allCards.length) return;
 
