@@ -43,6 +43,40 @@ public class IslandNumberTagHelper : TagHelper
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
+        // Fallback attribute resolution for camelCase & kebab-case
+        if (context.AllAttributes.TryGetAttribute("showButtons", out var sbAttr) || context.AllAttributes.TryGetAttribute("show-buttons", out sbAttr))
+        {
+            if (bool.TryParse(sbAttr.Value?.ToString(), out var b)) ShowButtons = b;
+            else if (sbAttr.Value != null) ShowButtons = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("buttonLayout", out var blAttr) || context.AllAttributes.TryGetAttribute("button-layout", out blAttr))
+        {
+            if (Enum.TryParse<ButtonLayout>(blAttr.Value?.ToString(), true, out var bl)) ButtonLayout = bl;
+        }
+        if (context.AllAttributes.TryGetAttribute("currencyDisplay", out var cdAttr) || context.AllAttributes.TryGetAttribute("currency-display", out cdAttr))
+        {
+            if (Enum.TryParse<CurrencyDisplay>(cdAttr.Value?.ToString(), true, out var cd)) CurrencyDisplay = cd;
+        }
+        if (context.AllAttributes.TryGetAttribute("fluid", out var flAttr))
+        {
+            if (bool.TryParse(flAttr.Value?.ToString(), out var fl)) Fluid = fl;
+            else if (flAttr.Value != null) Fluid = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("useGrouping", out var ugAttr) || context.AllAttributes.TryGetAttribute("use-grouping", out ugAttr))
+        {
+            if (bool.TryParse(ugAttr.Value?.ToString(), out var ug)) UseGrouping = ug;
+        }
+        if (context.AllAttributes.TryGetAttribute("showClear", out var scAttr) || context.AllAttributes.TryGetAttribute("show-clear", out scAttr))
+        {
+            if (bool.TryParse(scAttr.Value?.ToString(), out var sc)) ShowClear = sc;
+            else if (scAttr.Value != null) ShowClear = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("invalid", out var invAttr))
+        {
+            if (bool.TryParse(invAttr.Value?.ToString(), out var inv)) Invalid = inv;
+            else if (invAttr.Value != null) Invalid = true;
+        }
+
         output.TagName = "div";
         output.TagMode = TagMode.StartTagAndEndTag;
 
