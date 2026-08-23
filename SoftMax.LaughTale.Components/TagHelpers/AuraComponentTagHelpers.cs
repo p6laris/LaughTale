@@ -723,7 +723,7 @@ public class IslandInputTagsTagHelper : TagHelper
             sb.Append($"<span class=\"p-inputtags-tag-label\">{tag}</span>");
             if (!Disabled && !ReadOnly)
             {
-                sb.Append($"<button type=\"button\" class=\"p-inputtags-tag-remove\" data-index=\"{i}\" aria-label=\"Remove {tag}\" tabindex=\"-1\">");
+                sb.Append($"<button type=\"button\" class=\"p-inputtags-tag-remove\" data-index=\"{i}\" aria-label=\"Remove {tag}\" tabindex=\"-1\" style=\"border: none; background: transparent; padding: 0; display: inline-flex; align-items: center; cursor: pointer;\">");
                 sb.Append(xCircleIcon);
                 sb.Append("</button>");
             }
@@ -737,7 +737,7 @@ public class IslandInputTagsTagHelper : TagHelper
 
         if (Max == null || tagList.Count < Max)
         {
-            sb.Append($"<input type=\"text\" class=\"p-inputtags-input\" {inputIdAttr} {placeholderAttr} {disabledAttr} {roAttrStr} autocomplete=\"off\" />");
+            sb.Append($"<input type=\"text\" class=\"p-inputtags-input\" {inputIdAttr} {placeholderAttr} {disabledAttr} {roAttrStr} autocomplete=\"off\" style=\"border: none !important; outline: none !important; background: transparent !important; box-shadow: none !important; flex: 1 1 60px; min-width: 60px; font-family: inherit; font-size: 0.875rem; color: var(--p-text-color);\" />");
         }
 
         output.Content.SetHtmlContent(sb.ToString());
