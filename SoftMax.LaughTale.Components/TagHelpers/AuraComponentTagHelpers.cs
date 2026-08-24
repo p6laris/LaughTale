@@ -2,6 +2,7 @@ using SoftMax.LaughTale.Core.Serialization;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using SoftMax.LaughTale.Components.Enums;
 using SoftMax.LaughTale.Components.Models;
+using SoftMax.LaughTale.Components.Icons;
 using System.Text.Json;
 
 namespace SoftMax.LaughTale.Components.TagHelpers;
@@ -686,7 +687,9 @@ public class IslandToggleButtonTagHelper : TagHelper
 
         var currentLabel = Checked ? OnLabel : OffLabel;
         var currentIcon = Checked ? (OnIcon ?? Icon) : (OffIcon ?? Icon);
-        var iconHtml = !string.IsNullOrEmpty(currentIcon) ? $@"<span class=""p-togglebutton-icon""></span>" : "";
+        var iconSize = Size == ComponentSize.Small ? 14 : (Size == ComponentSize.Large ? 18 : 16);
+        var iconSvg = !string.IsNullOrEmpty(currentIcon) ? LucideIcons.Get(currentIcon, iconSize) : "";
+        var iconHtml = !string.IsNullOrEmpty(iconSvg) ? $@"<span class=""p-togglebutton-icon"">{iconSvg}</span>" : "";
         var labelHtml = !string.IsNullOrEmpty(currentLabel) ? $@"<span class=""p-togglebutton-label"">{currentLabel}</span>" : "";
         var hiddenName = Name ?? TargetInput ?? "togglebutton_value";
 
