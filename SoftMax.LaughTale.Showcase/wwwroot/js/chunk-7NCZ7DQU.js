@@ -1055,7 +1055,7 @@ defineIsland("camera", () => import("./camera-KAAHJRTE.js"));
 defineIsland("dropzone", () => import("./dropzone-E76UIQBF.js"));
 defineIsland("tree-select", () => import("./tree-select-JWHDAGUG.js"));
 defineIsland("datagrid", () => import("./datagrid-OWH5VQKO.js"));
-defineIsland("modal", () => import("./modal-JJHJIXEB.js"));
+defineIsland("modal", () => import("./modal-QQLDIYDS.js"));
 defineIsland("toast", () => import("./toast-WLFO7J5G.js"));
 defineIsland("input-number", () => import("./input-number-KQ2J2WMH.js"));
 defineIsland("input-otp", () => import("./input-otp-RUPMATZ7.js"));
@@ -1077,7 +1077,7 @@ defineIsland("avatar-group", () => import("./avatar-group-VNSODI34.js"));
 defineIsland("progress-bar", () => import("./progress-bar-FCJC5G3P.js"));
 defineIsland("skeleton", () => import("./skeleton-4CLSEMFH.js"));
 defineIsland("drawer", () => import("./drawer-YB3KUNTQ.js"));
-defineIsland("speed-dial", () => import("./speed-dial-XI4YLCZA.js"));
+defineIsland("speed-dial", () => import("./speed-dial-TRUSZBLO.js"));
 defineIsland("image-compare", () => import("./image-compare-6BR2BVQR.js"));
 defineIsland("confirm-popup", () => import("./confirm-popup-W2QOSTFU.js"));
 defineIsland("accordion", () => import("./accordion-V67NLQBG.js"));
@@ -1135,4 +1135,4 @@ export {
   enableViewTransitions,
   getSlot
 };
-//# sourceMappingURL=chunk-Z2WM2VDG.js.map
+//# sourceMappingURL=chunk-7NCZ7DQU.js.map

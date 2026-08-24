@@ -67,7 +67,7 @@ const SPEEDDIAL_CSS = `
     width: 3rem;
     height: 3rem;
     border-radius: 50%;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.15), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
     transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s, transform 0.2s;
     outline: none;
 }
@@ -128,51 +128,64 @@ const SPEEDDIAL_CSS = `
     pointer-events: auto;
 }
 
+/* Action Button: Authentic Aura Slate / Surface Styling */
 .p-speeddial-action {
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 50%;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
-    border: 1px solid var(--p-surface-200, #e2e8f0);
-    background: var(--p-surface-0, #ffffff);
-    color: var(--p-surface-700, #334155);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
-    cursor: pointer;
-    position: relative;
-    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
-    outline: none;
+    width: 2.5rem !important;
+    height: 2.5rem !important;
+    border-radius: 50% !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-decoration: none !important;
+    border: 1px solid var(--p-surface-200, #e2e8f0) !important;
+    background: var(--p-surface-0, #ffffff) !important;
+    color: var(--p-surface-600, #475569) !important;
+    box-shadow: 0 3px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+    cursor: pointer !important;
+    position: relative !important;
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease !important;
+    outline: none !important;
+}
+
+.p-speeddial-action svg {
+    width: 18px !important;
+    height: 18px !important;
+    stroke: currentColor !important;
+    stroke-width: 2 !important;
 }
 
 .p-speeddial-action:hover:not(:disabled) {
-    background: var(--p-surface-100, #f1f5f9);
-    color: var(--p-surface-900, #0f172a);
-    border-color: var(--p-surface-300, #cbd5e1);
-    transform: scale(1.08);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+    background: var(--p-surface-100, #f1f5f9) !important;
+    color: var(--p-surface-900, #0f172a) !important;
+    border-color: var(--p-surface-300, #cbd5e1) !important;
+    transform: scale(1.1) !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
 }
 
 .p-speeddial-action:focus-visible {
-    outline: 2px solid var(--p-primary-500, #10b981);
-    outline-offset: 2px;
+    outline: 2px solid var(--p-primary-500, #10b981) !important;
+    outline-offset: 2px !important;
 }
 
 .p-speeddial-action:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    pointer-events: none;
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
+    pointer-events: none !important;
 }
 
 /* Custom Template Layout */
 .p-speeddial-custom-item {
     display: flex;
     align-items: center;
+    justify-content: flex-end;
     gap: 0.75rem;
     cursor: pointer;
     text-decoration: none;
     white-space: nowrap;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
 .p-speeddial-custom-label {
@@ -184,17 +197,17 @@ const SPEEDDIAL_CSS = `
     border-radius: var(--p-border-radius, 6px);
     background: var(--p-surface-0, #ffffff);
     border: 1px solid var(--p-surface-200, #e2e8f0);
-    color: var(--p-surface-600, #475569);
+    color: var(--p-surface-700, #334155);
     font-weight: 500;
     font-size: 0.875rem;
-    box-shadow: var(--p-shadow-sm, 0 1px 2px rgba(0,0,0,0.05));
+    box-shadow: 0 2px 4px rgba(0,0,0,0.06);
     transition: background-color 0.15s, color 0.15s, border-color 0.15s;
     user-select: none;
 }
 
 .p-speeddial-custom-icon {
-    width: 2.75rem;
-    height: 2.75rem;
+    width: 3rem;
+    height: 3rem;
     border-radius: 50%;
     background: var(--p-surface-0, #ffffff);
     border: 1px solid var(--p-surface-200, #e2e8f0);
@@ -202,10 +215,17 @@ const SPEEDDIAL_CSS = `
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: var(--p-shadow-sm, 0 1px 2px rgba(0,0,0,0.05));
+    box-shadow: 0 2px 4px rgba(0,0,0,0.06);
     transition: background-color 0.15s, color 0.15s, border-color 0.15s, transform 0.15s;
     cursor: pointer;
     outline: none;
+}
+
+.p-speeddial-custom-icon svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+    stroke-width: 2;
 }
 
 .p-speeddial-custom-item:hover .p-speeddial-custom-label,
@@ -234,12 +254,15 @@ const SPEEDDIAL_CSS = `
     z-index: 100;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
     opacity: 0;
-    transform: scale(0.9);
     transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
-.p-speeddial-tooltip.p-tooltip-visible {
-    opacity: 1;
+.p-speeddial-tooltip::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-style: solid;
 }
 
 .p-speeddial-tooltip.tooltip-left {
@@ -247,7 +270,15 @@ const SPEEDDIAL_CSS = `
     top: 50%;
     transform: translateY(-50%) scale(0.9);
 }
+.p-speeddial-tooltip.tooltip-left::after {
+    right: -4px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-width: 4px 0 4px 4px;
+    border-color: transparent transparent transparent var(--p-surface-900, #0f172a);
+}
 .p-speeddial-tooltip.tooltip-left.p-tooltip-visible {
+    opacity: 1;
     transform: translateY(-50%) scale(1);
 }
 
@@ -256,7 +287,15 @@ const SPEEDDIAL_CSS = `
     top: 50%;
     transform: translateY(-50%) scale(0.9);
 }
+.p-speeddial-tooltip.tooltip-right::after {
+    left: -4px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-width: 4px 4px 4px 0;
+    border-color: transparent var(--p-surface-900, #0f172a) transparent transparent;
+}
 .p-speeddial-tooltip.tooltip-right.p-tooltip-visible {
+    opacity: 1;
     transform: translateY(-50%) scale(1);
 }
 
@@ -265,7 +304,15 @@ const SPEEDDIAL_CSS = `
     left: 50%;
     transform: translateX(-50%) scale(0.9);
 }
+.p-speeddial-tooltip.tooltip-top::after {
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 4px 4px 0 4px;
+    border-color: var(--p-surface-900, #0f172a) transparent transparent transparent;
+}
 .p-speeddial-tooltip.tooltip-top.p-tooltip-visible {
+    opacity: 1;
     transform: translateX(-50%) scale(1);
 }
 
@@ -274,7 +321,15 @@ const SPEEDDIAL_CSS = `
     left: 50%;
     transform: translateX(-50%) scale(0.9);
 }
+.p-speeddial-tooltip.tooltip-bottom::after {
+    top: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 0 4px 4px 4px;
+    border-color: transparent transparent var(--p-surface-900, #0f172a) transparent;
+}
 .p-speeddial-tooltip.tooltip-bottom.p-tooltip-visible {
+    opacity: 1;
     transform: translateX(-50%) scale(1);
 }
 
@@ -295,19 +350,24 @@ const SPEEDDIAL_CSS = `
     pointer-events: auto;
 }
 
-/* Dark Mode Support */
+/* Dark Mode */
+.dark .p-speeddial-action,
 [data-theme="dark"] .p-speeddial-action {
-    background: var(--p-surface-900, #0f172a);
-    border-color: var(--p-surface-700, #334155);
-    color: var(--p-surface-300, #cbd5e1);
+    background: var(--p-surface-900, #0f172a) !important;
+    border-color: var(--p-surface-700, #334155) !important;
+    color: var(--p-surface-300, #cbd5e1) !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4) !important;
 }
 
+.dark .p-speeddial-action:hover:not(:disabled),
 [data-theme="dark"] .p-speeddial-action:hover:not(:disabled) {
-    background: var(--p-surface-800, #1e293b);
-    color: #ffffff;
-    border-color: var(--p-surface-600, #475569);
+    background: var(--p-surface-800, #1e293b) !important;
+    color: #ffffff !important;
+    border-color: var(--p-surface-600, #475569) !important;
 }
 
+.dark .p-speeddial-custom-label,
+.dark .p-speeddial-custom-icon,
 [data-theme="dark"] .p-speeddial-custom-label,
 [data-theme="dark"] .p-speeddial-custom-icon {
     background: var(--p-surface-900, #0f172a);
@@ -315,6 +375,8 @@ const SPEEDDIAL_CSS = `
     color: var(--p-surface-400, #94a3b8);
 }
 
+.dark .p-speeddial-custom-item:hover .p-speeddial-custom-label,
+.dark .p-speeddial-custom-item:hover .p-speeddial-custom-icon,
 [data-theme="dark"] .p-speeddial-custom-item:hover .p-speeddial-custom-label,
 [data-theme="dark"] .p-speeddial-custom-item:hover .p-speeddial-custom-icon {
     background: var(--p-surface-800, #1e293b);
@@ -322,12 +384,29 @@ const SPEEDDIAL_CSS = `
     border-color: var(--p-surface-600, #475569);
 }
 
+.dark .p-speeddial-tooltip,
 [data-theme="dark"] .p-speeddial-tooltip {
     background: var(--p-surface-800, #1e293b);
     color: #ffffff;
     border: 1px solid var(--p-surface-700, #334155);
 }
-`
+.dark .p-speeddial-tooltip.tooltip-left::after,
+[data-theme="dark"] .p-speeddial-tooltip.tooltip-left::after {
+    border-color: transparent transparent transparent var(--p-surface-800, #1e293b);
+}
+.dark .p-speeddial-tooltip.tooltip-right::after,
+[data-theme="dark"] .p-speeddial-tooltip.tooltip-right::after {
+    border-color: transparent var(--p-surface-800, #1e293b) transparent transparent;
+}
+.dark .p-speeddial-tooltip.tooltip-top::after,
+[data-theme="dark"] .p-speeddial-tooltip.tooltip-top::after {
+    border-color: var(--p-surface-800, #1e293b) transparent transparent transparent;
+}
+.dark .p-speeddial-tooltip.tooltip-bottom::after,
+[data-theme="dark"] .p-speeddial-tooltip.tooltip-bottom::after {
+    border-color: transparent transparent var(--p-surface-800, #1e293b) transparent;
+}
+`;
 
 export default function SpeedDialIsland(container: HTMLElement, props: SpeedDialProps) {
     injectIslandStyle('speed-dial', SPEEDDIAL_CSS);
@@ -344,10 +423,10 @@ export default function SpeedDialIsland(container: HTMLElement, props: SpeedDial
 
     let isOpen = false;
 
-    // Severity mapping for main button
-    const btnSev = props.buttonProps?.severity || 'primary';
-    let btnSevClass = 'p-button-primary';
-    if (btnSev !== 'primary') {
+    // Default severity in Aura is contrast unless specified
+    const btnSev = props.buttonProps?.severity || 'contrast';
+    let btnSevClass = 'p-button-contrast';
+    if (btnSev !== 'contrast') {
         btnSevClass = `p-button-${btnSev.toLowerCase()}`;
     }
     const btnRounded = props.buttonProps?.rounded !== false ? 'p-button-rounded' : '';
@@ -476,10 +555,9 @@ export default function SpeedDialIsland(container: HTMLElement, props: SpeedDial
             
             let transformStyle = '';
             if (isCustomTemplate) {
-                const customOffset = -40; // shift slightly left so icon aligns with button
                 transformStyle = isOpen 
-                    ? `transform: translate3d(${pos.x + customOffset}px, ${pos.y}px, 0) scale(1);` 
-                    : `transform: translate3d(${customOffset}px, 0, 0) scale(0);`;
+                    ? `transform: translate3d(0, ${pos.y}px, 0) scale(1);` 
+                    : `transform: translate3d(0, 0, 0) scale(0);`;
             } else {
                 transformStyle = isOpen 
                     ? `transform: translate3d(${pos.x}px, ${pos.y}px, 0) scale(1);` 
@@ -508,14 +586,13 @@ export default function SpeedDialIsland(container: HTMLElement, props: SpeedDial
                 `;
             }
 
-            const itemSevClass = item.severity ? `p-button-${item.severity.toLowerCase()}` : '';
             const tag = item.url ? 'a' : 'button';
             const hrefAttr = item.url ? `href="${item.url}" target="${item.target || '_self'}" rel="noopener"` : `type="button"`;
 
             return `
                 <li class="p-speeddial-item" style="${style}" role="none" data-index="${index}">
                     <${tag} ${hrefAttr} 
-                       class="p-speeddial-action p-button ${itemSevClass} ${item.styleClass || ''}" 
+                       class="p-speeddial-action ${item.styleClass || ''}" 
                        role="menuitem"
                        data-index="${index}"
                        tabindex="${isOpen ? '0' : '-1'}"
