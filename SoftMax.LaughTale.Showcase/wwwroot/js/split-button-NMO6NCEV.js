@@ -240,20 +240,23 @@ var SPLITBUTTON_CSS = `
 /* Menu Overlay */
 .p-splitbutton-menu {
     position: absolute;
+    right: 0 !important;
+    left: auto !important;
     z-index: 1050;
-    min-width: 12.5rem;
+    min-width: 100%;
+    width: max-content;
     background: var(--p-surface-0, #ffffff);
     border: 1px solid var(--p-surface-200, #e2e8f0);
     border-radius: var(--p-border-radius, 8px);
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     padding: 0.35rem;
     outline: none;
-    transform-origin: top;
+    transform-origin: top right;
     transition: opacity 0.15s cubic-bezier(0.16, 1, 0.3, 1), transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .p-splitbutton-menu.p-menu-flipped {
-    transform-origin: bottom;
+    transform-origin: bottom right;
 }
 
 .p-splitbutton-menu .p-menu-list {
@@ -703,4 +706,4 @@ function SplitButtonIsland(container, props) {
 export {
   SplitButtonIsland as default
 };
-//# sourceMappingURL=split-button-A3DNX6HD.js.map
+//# sourceMappingURL=split-button-NMO6NCEV.js.map
