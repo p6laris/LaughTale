@@ -6287,108 +6287,323 @@ var SoftMaxIslands = (() => {
     default: () => SliderIsland
   });
   function SliderIsland(container, props) {
-    injectIslandStyle("slider", CSS12);
-    const min = props.min !== void 0 ? props.min : 0;
-    const max = props.max !== void 0 ? props.max : 100;
-    const step = props.step !== void 0 ? props.step : 1;
-    let currentValue = props.value !== void 0 ? props.value : min;
+    injectIslandStyle("laughtale-slider", CSS12);
+    const min = props.min !== void 0 ? Number(props.min) : 0;
+    const max = props.max !== void 0 ? Number(props.max) : 100;
+    const step = props.step !== void 0 ? Number(props.step) : 1;
+    const isRange = props.range === true || String(props.range) === "true";
+    const isVertical = props.orientation === "vertical";
+    const isDisabled = props.disabled === true || String(props.disabled) === "true";
+    const disabledMin = props.disabledMinHandle === true || String(props.disabledMinHandle) === "true";
+    const disabledMax = props.disabledMaxHandle === true || String(props.disabledMaxHandle) === "true";
+    const minDistance = props.minStepsBetweenHandles !== void 0 ? Number(props.minStepsBetweenHandles) : 0;
+    let currentValues = [];
+    if (isRange) {
+      if (Array.isArray(props.values) && props.values.length >= 2) {
+        currentValues = [Number(props.values[0]), Number(props.values[1])];
+      } else if (Array.isArray(props.value) && props.value.length >= 2) {
+        currentValues = [Number(props.value[0]), Number(props.value[1])];
+      } else if (typeof props.value === "string" && props.value.includes(",")) {
+        const parts = props.value.split(",").map((s) => Number(s.trim()));
+        currentValues = [parts[0] || min, parts[1] || max];
+      } else {
+        currentValues = [min + (max - min) * 0.2, min + (max - min) * 0.8];
+      }
+    } else {
+      const singleVal = props.value !== void 0 ? Number(props.value) : min;
+      currentValues = [singleVal];
+    }
+    function clampValue(val) {
+      return Math.max(min, Math.min(max, val));
+    }
+    function snapToStep(val) {
+      if (step <= 0) return val;
+      const count = Math.round((val - min) / step);
+      const snapped = min + count * step;
+      return Number(clampValue(snapped).toFixed(4));
+    }
+    currentValues = currentValues.map((v) => snapToStep(v));
     function getPercent(val) {
+      if (max === min) return 0;
       return Math.max(0, Math.min(100, (val - min) / (max - min) * 100));
     }
-    const initialPercent = getPercent(currentValue);
-    container.innerHTML = `
-        <div class="laughtale-slider" style="position: relative; width: 100%; max-width: 320px; padding: 1rem 0; user-select: none; touch-action: none;">
-            <!-- Track -->
-            <div class="slider-track" style="position: relative; height: 6px; border-radius: 3px; background: var(--p-surface-200); cursor: ${props.disabled ? "not-allowed" : "pointer"};">
-                <!-- Active Fill Bar -->
-                <div class="slider-fill" style="position: absolute; top: 0; left: 0; height: 100%; width: ${initialPercent}%; border-radius: 3px; background: var(--p-primary-600); pointer-events: none;"></div>
-                <!-- Drag Handle -->
-                <div class="slider-handle" style="position: absolute; top: 50%; left: ${initialPercent}%; transform: translate(-50%, -50%); width: 1.125rem; height: 1.125rem; border-radius: 50%; background: #ffffff; border: 2px solid var(--p-primary-600); box-shadow: 0 1px 4px rgba(0,0,0,0.2); cursor: ${props.disabled ? "not-allowed" : "grab"};"></div>
-            </div>
-
-            <div style="display: flex; justify-content: space-between; margin-top: 0.5rem; font-size: 0.75rem; color: var(--p-surface-500); font-family: var(--p-font-mono);">
-                <span>${min}</span>
-                <span class="slider-value-display" style="font-weight: 700; color: var(--p-primary-600);">${currentValue}</span>
-                <span>${max}</span>
-            </div>
-        </div>
-    `;
-    const track = container.querySelector(".slider-track");
-    const fill = container.querySelector(".slider-fill");
-    const handle = container.querySelector(".slider-handle");
-    const valueDisplay = container.querySelector(".slider-value-display");
-    function updateVisuals() {
-      const pct = getPercent(currentValue);
-      fill.style.width = `${pct}%`;
-      handle.style.left = `${pct}%`;
-      valueDisplay.textContent = currentValue.toString();
-    }
-    function syncValue() {
-      if (props.targetInputName) {
-        let hidden = container.querySelector(`input[name="${props.targetInputName}"]`);
-        if (!hidden) {
-          hidden = document.createElement("input");
-          hidden.type = "hidden";
-          hidden.name = props.targetInputName;
-          container.appendChild(hidden);
-        }
-        hidden.value = currentValue.toString();
+    function render() {
+      const rootClasses = [
+        "laughtale-slider",
+        "p-slider",
+        isVertical ? "p-slider-vertical" : "p-slider-horizontal",
+        isDisabled ? "is-disabled" : ""
+      ].filter(Boolean).join(" ");
+      container.className = rootClasses;
+      if (props.inputId) container.setAttribute("id", props.inputId);
+      if (isRange) {
+        const p1 = getPercent(currentValues[0]);
+        const p2 = getPercent(currentValues[1]);
+        const leftPct = Math.min(p1, p2);
+        const sizePct = Math.abs(p2 - p1);
+        const rangeStyle = isVertical ? `bottom: ${leftPct}%; height: ${sizePct}%;` : `left: ${leftPct}%; width: ${sizePct}%;`;
+        const h1Style = isVertical ? `bottom: ${p1}%; left: 50%; transform: translate(-50%, 50%);` : `left: ${p1}%; top: 50%; transform: translate(-50%, -50%);`;
+        const h2Style = isVertical ? `bottom: ${p2}%; left: 50%; transform: translate(-50%, 50%);` : `left: ${p2}%; top: 50%; transform: translate(-50%, -50%);`;
+        container.innerHTML = `
+                <span class="p-slider-range" style="${rangeStyle}"></span>
+                <span 
+                    class="p-slider-handle ${disabledMin || isDisabled ? "is-disabled" : ""}" 
+                    data-handle="0" 
+                    tabindex="${isDisabled || disabledMin ? "-1" : "0"}" 
+                    role="slider" 
+                    aria-orientation="${isVertical ? "vertical" : "horizontal"}" 
+                    aria-valuemin="${min}" 
+                    aria-valuemax="${max}" 
+                    aria-valuenow="${currentValues[0]}"
+                    style="${h1Style}"
+                ></span>
+                <span 
+                    class="p-slider-handle ${disabledMax || isDisabled ? "is-disabled" : ""}" 
+                    data-handle="1" 
+                    tabindex="${isDisabled || disabledMax ? "-1" : "0"}" 
+                    role="slider" 
+                    aria-orientation="${isVertical ? "vertical" : "horizontal"}" 
+                    aria-valuemin="${min}" 
+                    aria-valuemax="${max}" 
+                    aria-valuenow="${currentValues[1]}"
+                    style="${h2Style}"
+                ></span>
+                <input type="hidden" name="${props.name || props.targetInputName || "slider_value"}" value="${currentValues.join(",")}" />
+            `;
+      } else {
+        const p = getPercent(currentValues[0]);
+        const rangeStyle = isVertical ? `bottom: 0; height: ${p}%;` : `left: 0; width: ${p}%;`;
+        const hStyle = isVertical ? `bottom: ${p}%; left: 50%; transform: translate(-50%, 50%);` : `left: ${p}%; top: 50%; transform: translate(-50%, -50%);`;
+        container.innerHTML = `
+                <span class="p-slider-range" style="${rangeStyle}"></span>
+                <span 
+                    class="p-slider-handle ${isDisabled ? "is-disabled" : ""}" 
+                    data-handle="0" 
+                    tabindex="${isDisabled ? "-1" : "0"}" 
+                    role="slider" 
+                    aria-orientation="${isVertical ? "vertical" : "horizontal"}" 
+                    aria-valuemin="${min}" 
+                    aria-valuemax="${max}" 
+                    aria-valuenow="${currentValues[0]}"
+                    style="${hStyle}"
+                ></span>
+                <input type="hidden" name="${props.name || props.targetInputName || "slider_value"}" value="${currentValues[0]}" />
+            `;
       }
+      bindEvents();
+    }
+    function updateVisuals() {
+      const rangeEl = container.querySelector(".p-slider-range");
+      const handles = container.querySelectorAll(".p-slider-handle");
+      const hiddenInp = container.querySelector('input[type="hidden"]');
+      if (isRange) {
+        const p1 = getPercent(currentValues[0]);
+        const p2 = getPercent(currentValues[1]);
+        const leftPct = Math.min(p1, p2);
+        const sizePct = Math.abs(p2 - p1);
+        if (rangeEl) {
+          if (isVertical) {
+            rangeEl.style.bottom = `${leftPct}%`;
+            rangeEl.style.height = `${sizePct}%`;
+          } else {
+            rangeEl.style.left = `${leftPct}%`;
+            rangeEl.style.width = `${sizePct}%`;
+          }
+        }
+        if (handles[0]) {
+          if (isVertical) handles[0].style.bottom = `${p1}%`;
+          else handles[0].style.left = `${p1}%`;
+          handles[0].setAttribute("aria-valuenow", currentValues[0].toString());
+        }
+        if (handles[1]) {
+          if (isVertical) handles[1].style.bottom = `${p2}%`;
+          else handles[1].style.left = `${p2}%`;
+          handles[1].setAttribute("aria-valuenow", currentValues[1].toString());
+        }
+        if (hiddenInp) hiddenInp.value = currentValues.join(",");
+      } else {
+        const p = getPercent(currentValues[0]);
+        if (rangeEl) {
+          if (isVertical) rangeEl.style.height = `${p}%`;
+          else rangeEl.style.width = `${p}%`;
+        }
+        if (handles[0]) {
+          if (isVertical) handles[0].style.bottom = `${p}%`;
+          else handles[0].style.left = `${p}%`;
+          handles[0].setAttribute("aria-valuenow", currentValues[0].toString());
+        }
+        if (hiddenInp) hiddenInp.value = currentValues[0].toString();
+      }
+    }
+    function syncValue(isEnd = false) {
+      const valPayload = isRange ? [...currentValues] : currentValues[0];
       container.dispatchEvent(new CustomEvent("slider:change", {
         bubbles: true,
-        detail: { value: currentValue }
+        detail: { value: valPayload }
       }));
+      container.dispatchEvent(new CustomEvent("change", {
+        bubbles: true,
+        detail: { value: valPayload }
+      }));
+      if (isEnd) {
+        container.dispatchEvent(new CustomEvent("slider:slideend", {
+          bubbles: true,
+          detail: { value: valPayload }
+        }));
+        container.dispatchEvent(new CustomEvent("slideend", {
+          bubbles: true,
+          detail: { value: valPayload }
+        }));
+      }
     }
-    if (!props.disabled) {
+    function bindEvents() {
+      if (isDisabled) return;
+      let activeHandleIdx = null;
       let isDragging = false;
-      const updateFromClientX = (clientX) => {
-        const rect = track.getBoundingClientRect();
-        if (rect.width <= 0) return;
-        let ratio = (clientX - rect.left) / rect.width;
-        ratio = Math.max(0, Math.min(1, ratio));
-        let rawVal = min + ratio * (max - min);
-        rawVal = Math.round(rawVal / step) * step;
-        currentValue = Math.max(min, Math.min(max, rawVal));
-        updateVisuals();
-        syncValue();
+      const getRatioFromEvent = (e) => {
+        const rect = container.getBoundingClientRect();
+        if (isVertical) {
+          if (rect.height <= 0) return 0;
+          const ratio = (rect.bottom - e.clientY) / rect.height;
+          return Math.max(0, Math.min(1, ratio));
+        } else {
+          if (rect.width <= 0) return 0;
+          const ratio = (e.clientX - rect.left) / rect.width;
+          return Math.max(0, Math.min(1, ratio));
+        }
       };
-      const onPointerDown = (e) => {
-        isDragging = true;
-        handle.style.cursor = "grabbing";
-        handle.style.transform = "translate(-50%, -50%) scale(1.2)";
-        if ("setPointerCapture" in track && e.pointerId !== void 0) {
-          try {
-            track.setPointerCapture(e.pointerId);
-          } catch (_) {
+      const updateFromRatio = (ratio, handleIdx) => {
+        let rawVal = min + ratio * (max - min);
+        let snapped = snapToStep(rawVal);
+        if (isRange) {
+          if (handleIdx === 0) {
+            if (disabledMin) return;
+            const maxAllowed = currentValues[1] - minDistance;
+            snapped = Math.min(snapped, maxAllowed);
+            snapped = Math.max(min, snapped);
+            currentValues[0] = snapped;
+          } else {
+            if (disabledMax) return;
+            const minAllowed = currentValues[0] + minDistance;
+            snapped = Math.max(snapped, minAllowed);
+            snapped = Math.min(max, snapped);
+            currentValues[1] = snapped;
+          }
+        } else {
+          currentValues[0] = snapped;
+        }
+        updateVisuals();
+        syncValue(false);
+      };
+      container.onpointerdown = (e) => {
+        if (isDisabled) return;
+        const target = e.target;
+        const handleEl = target.closest(".p-slider-handle");
+        if (handleEl) {
+          const idx = Number(handleEl.getAttribute("data-handle") || 0);
+          if (idx === 0 && disabledMin) return;
+          if (idx === 1 && disabledMax) return;
+          activeHandleIdx = idx;
+        } else {
+          const ratio = getRatioFromEvent(e);
+          const clickVal = min + ratio * (max - min);
+          if (isRange) {
+            const dist0 = Math.abs(currentValues[0] - clickVal);
+            const dist1 = Math.abs(currentValues[1] - clickVal);
+            if (dist0 <= dist1 && !disabledMin) {
+              activeHandleIdx = 0;
+            } else if (!disabledMax) {
+              activeHandleIdx = 1;
+            } else {
+              activeHandleIdx = 0;
+            }
+          } else {
+            activeHandleIdx = 0;
           }
         }
-        updateFromClientX(e.clientX);
+        if (activeHandleIdx === null) return;
+        isDragging = true;
+        const activeEl = container.querySelector(`.p-slider-handle[data-handle="${activeHandleIdx}"]`);
+        activeEl?.classList.add("is-dragging");
+        activeEl?.focus();
+        try {
+          container.setPointerCapture(e.pointerId);
+        } catch (_) {
+        }
+        updateFromRatio(getRatioFromEvent(e), activeHandleIdx);
       };
-      const onPointerMove = (e) => {
-        if (!isDragging) return;
-        updateFromClientX(e.clientX);
+      container.onpointermove = (e) => {
+        if (!isDragging || activeHandleIdx === null) return;
+        updateFromRatio(getRatioFromEvent(e), activeHandleIdx);
       };
-      const onPointerUp = (e) => {
+      const onEnd = (e) => {
         if (!isDragging) return;
         isDragging = false;
-        handle.style.cursor = "grab";
-        handle.style.transform = "translate(-50%, -50%) scale(1)";
-        if ("releasePointerCapture" in track && e.pointerId !== void 0) {
-          try {
-            track.releasePointerCapture(e.pointerId);
-          } catch (_) {
-          }
+        if (activeHandleIdx !== null) {
+          const activeEl = container.querySelector(`.p-slider-handle[data-handle="${activeHandleIdx}"]`);
+          activeEl?.classList.remove("is-dragging");
         }
+        try {
+          container.releasePointerCapture(e.pointerId);
+        } catch (_) {
+        }
+        syncValue(true);
+        activeHandleIdx = null;
       };
-      track.addEventListener("pointerdown", onPointerDown);
-      track.addEventListener("pointermove", onPointerMove);
-      track.addEventListener("pointerup", onPointerUp);
-      track.addEventListener("pointercancel", onPointerUp);
-      track.addEventListener("mousedown", onPointerDown);
-      window.addEventListener("mousemove", onPointerMove);
-      window.addEventListener("mouseup", onPointerUp);
+      container.onpointerup = onEnd;
+      container.onpointercancel = onEnd;
+      const handles = container.querySelectorAll(".p-slider-handle");
+      handles.forEach((h) => {
+        h.onkeydown = (e) => {
+          const idx = Number(h.getAttribute("data-handle") || 0);
+          if (idx === 0 && disabledMin) return;
+          if (idx === 1 && disabledMax) return;
+          let cur = currentValues[idx];
+          let changed = false;
+          if (e.key === "ArrowRight" || e.key === "ArrowUp") {
+            cur = snapToStep(cur + step);
+            changed = true;
+          } else if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
+            cur = snapToStep(cur - step);
+            changed = true;
+          } else if (e.key === "PageUp") {
+            cur = snapToStep(cur + step * 10);
+            changed = true;
+          } else if (e.key === "PageDown") {
+            cur = snapToStep(cur - step * 10);
+            changed = true;
+          } else if (e.key === "Home") {
+            cur = min;
+            changed = true;
+          } else if (e.key === "End") {
+            cur = max;
+            changed = true;
+          }
+          if (changed) {
+            e.preventDefault();
+            if (isRange) {
+              if (idx === 0) {
+                const maxAllowed = currentValues[1] - minDistance;
+                currentValues[0] = Math.min(cur, maxAllowed);
+              } else {
+                const minAllowed = currentValues[0] + minDistance;
+                currentValues[1] = Math.max(cur, minAllowed);
+              }
+            } else {
+              currentValues[0] = cur;
+            }
+            updateVisuals();
+            syncValue(false);
+          }
+        };
+        h.onkeyup = (e) => {
+          if (["ArrowRight", "ArrowUp", "ArrowLeft", "ArrowDown", "PageUp", "PageDown", "Home", "End"].includes(e.key)) {
+            syncValue(true);
+          }
+        };
+      });
     }
-    syncValue();
+    render();
   }
   var CSS12;
   var init_slider = __esm({
@@ -6396,30 +6611,124 @@ var SoftMaxIslands = (() => {
       "use strict";
       init_styles();
       CSS12 = `
-[data-theme="dark"] .laughtale-slider {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+/* ==================== AURA SLIDER ==================== */
+.laughtale-slider,
+.p-slider {
+    position: relative;
+    user-select: none;
+    touch-action: none;
+    box-sizing: border-box;
+    font-family: var(--p-font-family, inherit);
 }
-[data-theme="dark"] .slider-track {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-slider-horizontal {
+    height: 0.375rem;
+    width: 100%;
+    background: var(--p-surface-200);
+    border-radius: 9999px;
+    cursor: pointer;
 }
-[data-theme="dark"] .slider-fill {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-slider-vertical {
+    width: 0.375rem;
+    height: 12rem;
+    background: var(--p-surface-200);
+    border-radius: 9999px;
+    cursor: pointer;
+    display: inline-block;
 }
-[data-theme="dark"] .slider-handle {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-slider.is-disabled {
+    opacity: 0.6;
+    cursor: not-allowed !important;
+    pointer-events: none;
 }
-[data-theme="dark"] .slider-value-display {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+/* Range Fill Bar */
+.p-slider-range {
+    position: absolute;
+    background: var(--p-primary-500, #10b981);
+    border-radius: 9999px;
+    pointer-events: none;
+    transition: background 150ms ease;
+}
+
+.p-slider-horizontal .p-slider-range {
+    top: 0;
+    height: 100%;
+}
+
+.p-slider-vertical .p-slider-range {
+    left: 0;
+    width: 100%;
+    bottom: 0;
+}
+
+/* Handle */
+.p-slider-handle {
+    position: absolute;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 50%;
+    background: var(--p-surface-0);
+    border: 2px solid var(--p-primary-500);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.15), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    cursor: grab;
+    outline: none;
+    box-sizing: border-box;
+    transform: translate(-50%, -50%);
+    transition: border-color 150ms ease, box-shadow 150ms ease, transform 120ms ease;
+    z-index: 10;
+}
+
+.p-slider-handle:hover:not(.is-disabled) {
+    border-color: var(--p-primary-600);
+    transform: translate(-50%, -50%) scale(1.1);
+}
+
+.p-slider-handle:focus-visible:not(.is-disabled) {
+    border-color: var(--p-primary-600);
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
+}
+
+.p-slider-handle.is-dragging {
+    cursor: grabbing !important;
+    transform: translate(-50%, -50%) scale(1.18) !important;
+    box-shadow: 0 0 0 5px rgba(16, 185, 129, 0.25) !important;
+}
+
+.p-slider-handle.is-disabled {
+    cursor: not-allowed;
+    background: var(--p-surface-200);
+    border-color: var(--p-surface-400);
+    box-shadow: none;
+}
+
+/* ==================== DARK MODE ==================== */
+.dark .p-slider-horizontal,
+.dark .p-slider-vertical {
+    background: var(--p-surface-700);
+}
+.dark .p-slider-range {
+    background: var(--p-primary-400);
+}
+.dark .p-slider-handle {
+    background: var(--p-surface-900);
+    border-color: var(--p-primary-400);
+}
+.dark .p-slider-handle:hover:not(.is-disabled) {
+    border-color: var(--p-primary-300);
+}
+.dark .p-slider-handle:focus-visible:not(.is-disabled) {
+    border-color: var(--p-primary-300);
+    box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.2);
+}
+.dark .p-slider-handle.is-dragging {
+    box-shadow: 0 0 0 5px rgba(52, 211, 153, 0.25) !important;
+}
+.dark .p-slider-handle.is-disabled {
+    background: var(--p-surface-800);
+    border-color: var(--p-surface-600);
 }
 `;
     }

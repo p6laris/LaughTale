@@ -1649,17 +1649,126 @@
         </div>
     </section>
 
-    <!-- Slider -->
+        <!-- Slider -->
     <section id="sec-slider" class="component-card">
         <div class="card-header">
             <div>
                 <h2>Slider</h2>
-                <p>Continuous and stepped range slider with live value readout.</p>
+                <p>Slider provides numerical input by dragging smooth handles along continuous or discrete stepped tracks in horizontal or vertical layouts.</p>
             </div>
-            <span class="aura-tag tag-slate">Control</span>
+            <span class="aura-tag tag-indigo">Form Control</span>
         </div>
-        <div class="card-body" style="max-width: 500px;">
-            <island-slider value="65" min="0" max="100" />
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Demo 1: Basic & Step Sliders -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic &amp; Step Sliders</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Continuous drag tracking and discrete stepped increments (step=20).</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 2rem;">
+                    <div>
+                        <island-label text="Continuous (Value: 50)" style="margin-bottom: 0.75rem;" />
+                        <div style="padding: 0.5rem 0;">
+                            <island-slider value="50" min="0" max="100" />
+                        </div>
+                    </div>
+                    <div>
+                        <island-label text="Stepped Snapping (Step: 20, Value: 20)" style="margin-bottom: 0.75rem;" />
+                        <div style="padding: 0.5rem 0;">
+                            <island-slider value="20" min="0" max="100" step="20" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 2: Dual-Handle Range Slider & Min Handle Distance -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Range &amp; Handle Distance</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Two draggable handles defining lower and upper bounds with optional minimum step gap constraint.</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 2rem;">
+                    <div>
+                        <island-label text="Range Slider [20, 80]" style="margin-bottom: 0.75rem;" />
+                        <div style="padding: 0.5rem 0;">
+                            <island-slider range="true" value="20" max-value="80" min="0" max="100" />
+                        </div>
+                    </div>
+                    <div>
+                        <island-label text="Handles Distance Constraint (Min Gap: 20)" style="margin-bottom: 0.75rem;" />
+                        <div style="padding: 0.5rem 0;">
+                            <island-slider range="true" value="20" max-value="80" min="0" max="100" min-steps-between-handles="20" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 3: Vertical Equalizer Sliders -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Vertical Orientation (Audio Equalizer)</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Vertical sliders arranged in an interactive audio channel mixer.</p>
+                <div style="display: flex; justify-content: center; gap: 3rem; align-items: flex-end; padding: 1rem 0;">
+                    @foreach (var channel in Model.VerticalEqualizerSliders)
+                    {
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 0.75rem;">
+                            <island-slider orientation="vertical" value="@channel.Value" min="0" max="100" />
+                            <span style="font-family: var(--p-font-mono); font-size: 0.75rem; text-transform: uppercase; color: var(--p-text-muted); font-weight: 600;">@channel.Label</span>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Demo 4: Disabled States -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Disabled States</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Entire disabled slider, disabled range, and single-handle lock.</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 2rem;">
+                    <div>
+                        <island-label text="Disabled Slider" style="margin-bottom: 0.75rem;" />
+                        <div style="padding: 0.5rem 0;">
+                            <island-slider value="50" disabled="true" />
+                        </div>
+                    </div>
+                    <div>
+                        <island-label text="Disabled Range" style="margin-bottom: 0.75rem;" />
+                        <div style="padding: 0.5rem 0;">
+                            <island-slider range="true" value="20" max-value="80" disabled="true" />
+                        </div>
+                    </div>
+                    <div>
+                        <island-label text="Disabled Single (Min) Handle" style="margin-bottom: 0.75rem;" />
+                        <div style="padding: 0.5rem 0;">
+                            <island-slider range="true" value="20" max-value="80" disabled-min-handle="true" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 5: Controlled Sync & Events -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Controlled Input &amp; Event Monitoring</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Real-time event firing during drag (<code style="font-family: var(--p-font-mono);">change</code>) and upon release (<code style="font-family: var(--p-font-mono);">slideend</code>).</p>
+                <div style="max-width: 380px; margin: 0 auto; display: flex; flex-direction: column; gap: 1rem;">
+                    <div style="display: flex; justify-content: space-between; font-family: var(--p-font-mono); font-size: 0.8125rem; color: var(--p-text-muted);">
+                        <span>Drag Value: <strong id="slider-val-readout" style="color: var(--p-primary-600);">50</strong></span>
+                        <span>Release Value: <strong id="slider-end-readout" style="color: var(--p-text-color);">50</strong></span>
+                    </div>
+                    <div style="padding: 0.5rem 0;">
+                        <island-slider input-id="slider-event-demo" value="50" min="0" max="100" />
+                    </div>
+                    <script>
+                        document.addEventListener('DOMContentLoaded', () => {
+                            const slEl = document.getElementById('slider-event-demo');
+                            const valEl = document.getElementById('slider-val-readout');
+                            const endEl = document.getElementById('slider-end-readout');
+                            if (slEl) {
+                                slEl.addEventListener('slider:change', (e) => {
+                                    if (valEl) valEl.textContent = e.detail.value;
+                                });
+                                slEl.addEventListener('slider:slideend', (e) => {
+                                    if (endEl) endEl.textContent = e.detail.value;
+                                });
+                            }
+                        });
+                    </script>
+                </div>
+            </div>
         </div>
     </section>
 

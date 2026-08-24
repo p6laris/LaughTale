@@ -524,36 +524,141 @@ public class IslandSwitchTagHelper : TagHelper
 }
 
 /// <summary>
-/// TagHelper for <island-slider />
+/// TagHelper for <island-slider /> — Aura Range & Discrete Slider
 /// </summary>
 [HtmlTargetElement("island-slider")]
 public class IslandSliderTagHelper : TagHelper
 {
-    public string? TargetInput { get; set; }
-    public double Value { get; set; } = 0;
+    [HtmlAttributeName("value")]
+    public double? Value { get; set; }
+
+    [HtmlAttributeName("max-value")]
+    public double? MaxValue { get; set; }
+
+    [HtmlAttributeName("values")]
+    public List<double>? Values { get; set; }
+
+    [HtmlAttributeName("min")]
     public double Min { get; set; } = 0;
+
+    [HtmlAttributeName("max")]
     public double Max { get; set; } = 100;
+
+    [HtmlAttributeName("step")]
     public double Step { get; set; } = 1;
+
+    [HtmlAttributeName("range")]
+    public bool Range { get; set; } = false;
+
+    [HtmlAttributeName("min-steps-between-handles")]
+    public double? MinStepsBetweenHandles { get; set; }
+
+    [HtmlAttributeName("orientation")]
+    public string Orientation { get; set; } = "horizontal";
+
+    [HtmlAttributeName("disabled")]
     public bool Disabled { get; set; } = false;
+
+    [HtmlAttributeName("disabled-min-handle")]
+    public bool DisabledMinHandle { get; set; } = false;
+
+    [HtmlAttributeName("disabled-max-handle")]
+    public bool DisabledMaxHandle { get; set; } = false;
+
+    [HtmlAttributeName("input-id")]
+    public string? InputId { get; set; }
+
+    [HtmlAttributeName("name")]
+    public string? Name { get; set; }
+
+    [HtmlAttributeName("target-input")]
+    public string? TargetInput { get; set; }
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
+        if (context.AllAttributes.TryGetAttribute("range", out var rngAttr))
+        {
+            if (bool.TryParse(rngAttr.Value?.ToString(), out var r)) Range = r;
+            else if (rngAttr.Value != null) Range = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("disabled", out var disAttr))
+        {
+            if (bool.TryParse(disAttr.Value?.ToString(), out var d)) Disabled = d;
+            else if (disAttr.Value != null) Disabled = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("disabledMinHandle", out var dmAttr) || context.AllAttributes.TryGetAttribute("disabled-min-handle", out dmAttr))
+        {
+            if (bool.TryParse(dmAttr.Value?.ToString(), out var dm)) DisabledMinHandle = dm;
+            else if (dmAttr.Value != null) DisabledMinHandle = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("disabledMaxHandle", out var dxAttr) || context.AllAttributes.TryGetAttribute("disabled-max-handle", out dxAttr))
+        {
+            if (bool.TryParse(dxAttr.Value?.ToString(), out var dx)) DisabledMaxHandle = dx;
+            else if (dxAttr.Value != null) DisabledMaxHandle = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("minStepsBetweenHandles", out var msbAttr) || context.AllAttributes.TryGetAttribute("min-steps-between-handles", out msbAttr))
+        {
+            if (double.TryParse(msbAttr.Value?.ToString(), out var msb)) MinStepsBetweenHandles = msb;
+        }
+        if (context.AllAttributes.TryGetAttribute("target-input-name", out var tinAttr) || context.AllAttributes.TryGetAttribute("targetInputName", out tinAttr))
+        {
+            TargetInput = tinAttr.Value?.ToString();
+        }
+
         output.TagName = "div";
         output.TagMode = TagMode.StartTagAndEndTag;
         output.Attributes.SetAttribute("data-island", "slider");
         output.Attributes.SetAttribute("data-hydrate", "load");
 
+        if (!string.IsNullOrEmpty(InputId)) output.Attributes.SetAttribute("id", InputId);
+
+        object effectiveValue = Value ?? 0;
+        if (Range)
+        {
+            if (Values != null && Values.Count >= 2)
+            {
+                effectiveValue = Values;
+            }
+            else if (Value.HasValue && MaxValue.HasValue)
+            {
+                effectiveValue = new List<double> { Value.Value, MaxValue.Value };
+            }
+            else if (Value.HasValue)
+            {
+                effectiveValue = new List<double> { Min, Value.Value };
+            }
+            else
+            {
+                effectiveValue = new List<double> { Min + (Max - Min) * 0.2, Min + (Max - Min) * 0.8 };
+            }
+        }
+
         var props = new
         {
-            targetInputName = TargetInput,
-            value = Value,
+            value = effectiveValue,
+            values = Values,
             min = Min,
             max = Max,
             step = Step,
-            disabled = Disabled
+            range = Range,
+            minStepsBetweenHandles = MinStepsBetweenHandles,
+            orientation = Orientation.ToLowerInvariant(),
+            disabled = Disabled,
+            disabledMinHandle = DisabledMinHandle,
+            disabledMaxHandle = DisabledMaxHandle,
+            name = Name,
+            targetInputName = TargetInput,
+            inputId = InputId
         };
 
         output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
+
+        // SSR Pre-rendered markup
+        var isVertical = Orientation.Equals("vertical", System.StringComparison.OrdinalIgnoreCase);
+        var rootClasses = new List<string> { "laughtale-slider", "p-slider", isVertical ? "p-slider-vertical" : "p-slider-horizontal" };
+        if (Disabled) rootClasses.Add("is-disabled");
+
+        output.Attributes.SetAttribute("class", string.Join(" ", rootClasses));
     }
 }
 

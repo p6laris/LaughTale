@@ -337,6 +337,13 @@ public class EnterpriseModel : PageModel
         new("Option 3", "3")
     };
 
+    public List<ListboxOptionItem> VerticalEqualizerSliders { get; set; } = new()
+    {
+        new("Bass", 40),
+        new("Mid", 70),
+        new("Treble", 55)
+    };
+
     public List<PickListItem> PickListSource { get; set; } = new()
     {
         new("sec-1", "mTLS Encryption", "Active session certificate"),
