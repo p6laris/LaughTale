@@ -16091,59 +16091,80 @@ ${h.response}`).join("\n");
   });
   function TextareaIsland(container, props) {
     injectIslandStyle("laughtale-textarea", CSS51);
-    let currentValue = props.value || "";
-    function render() {
-      container.innerHTML = `
-            <div class="laughtale-textarea-wrap">
+    const isAutoResize = props.autoResize === true || String(props.autoResize) === "true";
+    const isFluid = props.fluid === true || String(props.fluid) === "true";
+    const isInvalid = props.invalid === true || String(props.invalid) === "true";
+    const isDisabled = props.disabled === true || String(props.disabled) === "true";
+    const size = props.size || "normal";
+    const variant = props.variant || "outlined";
+    let textareaEl;
+    if (container.tagName.toLowerCase() === "textarea") {
+      textareaEl = container;
+    } else {
+      const existing = container.querySelector("textarea");
+      if (existing) {
+        textareaEl = existing;
+      } else {
+        const classList = [
+          "p-textarea",
+          isFluid ? "p-textarea-fluid" : "",
+          size !== "normal" ? `p-textarea-${size === "small" ? "sm" : "lg"}` : "",
+          variant === "filled" ? "p-textarea-filled" : "",
+          isInvalid ? "p-invalid" : "",
+          isDisabled ? "p-disabled" : ""
+        ].filter(Boolean).join(" ");
+        container.innerHTML = `
                 <textarea 
-                    class="laughtale-textarea"
-                    rows="${props.rows || 3}"
-                    ${props.maxLength ? 'maxlength="' + props.maxLength + '"' : ""}
+                    class="${classList}"
+                    rows="${props.rows || 5}"
+                    cols="${props.cols || 30}"
                     placeholder="${props.placeholder || ""}"
-                    ${props.disabled ? "disabled" : ""}
-                    ${props.autoResize ? 'style="overflow:hidden; resize:none;"' : ""}
-                >${currentValue}</textarea>
+                    ${props.maxLength ? `maxlength="${props.maxLength}"` : ""}
+                    ${isDisabled ? "disabled" : ""}
+                    ${props.name || props.targetInputName ? `name="${props.name || props.targetInputName}"` : ""}
+                    ${props.inputId ? `id="${props.inputId}"` : ""}
+                >${props.value || ""}</textarea>
                 ${props.maxLength ? `
-                    <div class="laughtale-textarea-counter">
-                        <span class="laughtale-char-count">${currentValue.length}</span> / ${props.maxLength}
+                    <div class="p-textarea-counter">
+                        <span class="p-textarea-count">${(props.value || "").length}</span> / ${props.maxLength}
                     </div>
                 ` : ""}
-            </div>
-        `;
-      bindEvents();
-      syncValue();
-      if (props.autoResize) autoResize();
-    }
-    function bindEvents() {
-      const textarea = container.querySelector(".laughtale-textarea");
-      const counter = container.querySelector(".laughtale-char-count");
-      textarea.addEventListener("input", () => {
-        currentValue = textarea.value;
-        if (counter) counter.textContent = currentValue.length.toString();
-        if (props.autoResize) autoResize();
-        syncValue();
-      });
-    }
-    function autoResize() {
-      const textarea = container.querySelector(".laughtale-textarea");
-      if (textarea && props.autoResize) {
-        textarea.style.height = "auto";
-        textarea.style.height = textarea.scrollHeight + "px";
+            `;
+        textareaEl = container.querySelector("textarea");
       }
     }
-    function syncValue() {
-      if (props.targetInputName) {
-        let hidden = container.querySelector('input[name="' + props.targetInputName + '"]');
-        if (!hidden) {
-          hidden = document.createElement("input");
-          hidden.type = "hidden";
-          hidden.name = props.targetInputName;
-          container.appendChild(hidden);
-        }
-        hidden.value = currentValue;
+    function adjustHeight() {
+      if (!isAutoResize || !textareaEl) return;
+      textareaEl.style.height = "auto";
+      textareaEl.style.overflow = "hidden";
+      textareaEl.style.resize = "none";
+      textareaEl.style.height = `${textareaEl.scrollHeight}px`;
+    }
+    function updateCounter() {
+      if (!props.maxLength) return;
+      const countEl = container.querySelector(".p-textarea-count");
+      if (countEl && textareaEl) {
+        countEl.textContent = textareaEl.value.length.toString();
       }
     }
-    render();
+    textareaEl.addEventListener("input", () => {
+      adjustHeight();
+      updateCounter();
+      container.dispatchEvent(new CustomEvent("textarea:input", {
+        bubbles: true,
+        detail: { value: textareaEl.value }
+      }));
+    });
+    textareaEl.addEventListener("change", () => {
+      container.dispatchEvent(new CustomEvent("textarea:change", {
+        bubbles: true,
+        detail: { value: textareaEl.value }
+      }));
+    });
+    if (isAutoResize) {
+      window.addEventListener("resize", adjustHeight);
+      setTimeout(adjustHeight, 0);
+    }
   }
   var CSS51;
   var init_textarea = __esm({
@@ -16151,50 +16172,119 @@ ${h.response}`).join("\n");
       "use strict";
       init_styles();
       CSS51 = `
-.laughtale-textarea-wrap {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    width: 100%;
-}
-.laughtale-textarea {
-    width: 100%;
-    padding: 0.5rem 0.75rem;
-    background: var(--p-surface-0);
-    border: 1px solid var(--p-field-border, var(--p-surface-300));
-    border-radius: var(--p-border-radius, 0.5rem);
-    color: var(--p-text-color);
+/* ==================== AURA TEXTAREA ==================== */
+.p-textarea {
+    font-family: var(--p-font-family, inherit);
     font-size: 0.875rem;
-    font-family: inherit;
-    resize: vertical;
-    transition: all 0.15s ease;
+    color: var(--p-text-color, #0f172a);
+    background: var(--p-surface-0, #ffffff);
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--p-border-color, #cbd5e1);
+    border-radius: var(--p-border-radius, 6px);
     outline: none;
     line-height: 1.5;
+    box-sizing: border-box;
+    transition: background 150ms ease, border-color 150ms ease, box-shadow 150ms ease, color 150ms ease;
+    resize: vertical;
+    vertical-align: middle;
 }
-.laughtale-textarea:hover:not(:disabled) {
-    border-color: var(--p-primary-400);
+
+.p-textarea:hover:not(:disabled):not(.p-disabled):not(.p-invalid) {
+    border-color: var(--p-surface-400, #94a3b8);
 }
-.laughtale-textarea:focus-visible:not(:disabled) {
-    box-shadow: 0 0 0 2px var(--p-content-bg), 0 0 0 4px var(--p-primary-500);
-    border-color: var(--p-primary-500);
+
+.p-textarea:focus:not(:disabled):not(.p-disabled):not(.p-invalid),
+.p-textarea:focus-visible:not(:disabled):not(.p-disabled):not(.p-invalid) {
+    border-color: var(--p-primary-500, #10b981) !important;
+    box-shadow: 0 0 0 1px var(--p-primary-500, #10b981) !important;
 }
-.laughtale-textarea:disabled {
+
+/* Fluid */
+.p-textarea.p-textarea-fluid,
+.p-textarea-fluid {
+    width: 100%;
+    display: block;
+}
+
+/* Sizes */
+.p-textarea.size-small,
+.p-textarea.p-textarea-sm {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+}
+
+.p-textarea.size-large,
+.p-textarea.p-textarea-lg {
+    font-size: 1.0625rem;
+    padding: 0.75rem 1rem;
+}
+
+/* Variant: Filled */
+.p-textarea.p-textarea-filled,
+.p-textarea.variant-filled {
+    background: var(--p-surface-100, #f1f5f9);
+}
+.p-textarea.p-textarea-filled:focus,
+.p-textarea.variant-filled:focus {
+    background: var(--p-surface-0, #ffffff);
+}
+
+/* Disabled */
+.p-textarea:disabled,
+.p-textarea.p-disabled {
     opacity: 0.6;
     cursor: not-allowed;
-    background: var(--p-surface-100);
+    background: var(--p-surface-200, #e2e8f0);
+    color: var(--p-text-muted, #64748b);
+    pointer-events: none;
 }
-.laughtale-textarea-counter {
+
+/* Invalid */
+.p-textarea.p-invalid,
+.p-textarea.is-invalid {
+    border-color: var(--p-red-500, #ef4444) !important;
+}
+.p-textarea.p-invalid:focus,
+.p-textarea.is-invalid:focus {
+    box-shadow: 0 0 0 1px var(--p-red-500, #ef4444) !important;
+}
+
+/* Counter */
+.p-textarea-counter {
     font-size: 0.75rem;
-    color: var(--p-surface-500);
+    color: var(--p-text-muted, #64748b);
     text-align: right;
+    margin-top: 0.25rem;
+    font-family: var(--p-font-mono, monospace);
 }
-[data-theme="dark"] .laughtale-textarea {
-    background: var(--p-surface-900);
-    color: var(--p-surface-100);
-    border-color: var(--p-surface-600);
+
+/* ==================== DARK MODE ==================== */
+.dark .p-textarea {
+    background: var(--p-surface-950, #090d14);
+    border-color: var(--p-surface-700, #334155);
+    color: var(--p-surface-0, #f8fafc);
 }
-[data-theme="dark"] .laughtale-textarea:disabled {
-    background: var(--p-surface-800);
+.dark .p-textarea:hover:not(:disabled):not(.p-disabled):not(.p-invalid) {
+    border-color: var(--p-surface-500, #64748b);
+}
+.dark .p-textarea:focus:not(:disabled):not(.p-disabled):not(.p-invalid),
+.dark .p-textarea:focus-visible:not(:disabled):not(.p-disabled):not(.p-invalid) {
+    border-color: var(--p-primary-400, #34d399) !important;
+    box-shadow: 0 0 0 1px var(--p-primary-400, #34d399) !important;
+}
+.dark .p-textarea.p-textarea-filled,
+.dark .p-textarea.variant-filled {
+    background: var(--p-surface-850, #141b26);
+}
+.dark .p-textarea.p-textarea-filled:focus,
+.dark .p-textarea.variant-filled:focus {
+    background: var(--p-surface-950, #090d14);
+}
+.dark .p-textarea:disabled,
+.dark .p-textarea.p-disabled {
+    background: var(--p-surface-800, #1e293b);
+    border-color: var(--p-surface-700, #334155);
+    color: var(--p-surface-500, #64748b);
 }
 `;
     }

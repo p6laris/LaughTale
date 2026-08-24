@@ -447,17 +447,106 @@
         </div>
     </section>
 
-    <!-- Textarea -->
+        <!-- Textarea -->
     <section id="sec-textarea" class="component-card">
         <div class="card-header">
             <div>
                 <h2>Textarea</h2>
-                <p>Multi-line textarea with auto-resize and character count telemetry.</p>
+                <p>Textarea adds styling, auto-resizing, float labels, ifta labels, size metrics, and filled variants to the standard textarea element.</p>
             </div>
-            <span class="aura-tag tag-slate">Form</span>
+            <span class="aura-tag tag-indigo">Form Control</span>
         </div>
-        <div class="card-body" style="max-width: 600px;">
-            <island-textarea placeholder="Enter incident report logs or operational payload notes..." rows="5" />
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Demo 1: Basic -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Textarea is used with standard rows and columns for multi-line text input.</p>
+                <div style="display: flex; justify-content: center;">
+                    <island-textarea rows="5" cols="30" />
+                </div>
+            </div>
+
+            <!-- Demo 2: AutoResize -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">AutoResize</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">When autoResize is enabled, textarea dynamically expands height to fit text content instead of displaying a scrollbar.</p>
+                <div style="display: flex; justify-content: center;">
+                    <island-textarea autoresize="true" rows="5" cols="30" placeholder="Type multiple lines to see textarea automatically expand..." />
+                </div>
+            </div>
+
+            <!-- Demo 3: Float Label -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Float Label</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Floating labels in standard Over, Infield (in), and On-border (on) variants.</p>
+                <div style="display: flex; flex-wrap: wrap; justify-content: center; align-items: stretch; gap: 1.5rem;">
+                    <island-float-label>
+                        <island-textarea input-id="txt_over_label" rows="5" cols="30" style="resize: none;" />
+                        <label for="txt_over_label">Over Label</label>
+                    </island-float-label>
+
+                    <island-float-label variant="@FloatLabelVariant.In">
+                        <island-textarea input-id="txt_in_label" rows="5" cols="30" style="resize: none;" />
+                        <label for="txt_in_label">In Label</label>
+                    </island-float-label>
+
+                    <island-float-label variant="@FloatLabelVariant.On">
+                        <island-textarea input-id="txt_on_label" rows="5" cols="30" style="resize: none;" />
+                        <label for="txt_on_label">On Label</label>
+                    </island-float-label>
+                </div>
+            </div>
+
+            <!-- Demo 4: Ifta Label -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Ifta Label</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Infield top-aligned persistent label styling.</p>
+                <div style="display: flex; justify-content: center;">
+                    <island-ifta-label>
+                        <island-textarea input-id="txt_description" rows="5" cols="30" style="resize: none;" />
+                        <label for="txt_description">Description</label>
+                    </island-ifta-label>
+                </div>
+            </div>
+
+            <!-- Demo 5: Sizes -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Sizes</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Small and large size metrics as alternatives to base.</p>
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+                    <island-textarea size="@ComponentSize.Small" placeholder="Small" rows="3" cols="30" />
+                    <island-textarea size="@ComponentSize.Normal" placeholder="Normal" rows="3" cols="30" />
+                    <island-textarea size="@ComponentSize.Large" placeholder="Large" rows="3" cols="30" />
+                </div>
+            </div>
+
+            <!-- Demo 6: Fluid Layout -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Fluid Width</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Full 100% width responsive container scaling.</p>
+                <div style="width: 100%;">
+                    <island-textarea fluid="true" rows="5" cols="30" placeholder="Fluid full-width textarea..." />
+                </div>
+            </div>
+
+            <!-- Demo 7: Filled Variant -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Filled Variant</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Higher visual emphasis filled surface style.</p>
+                <div style="display: flex; justify-content: center;">
+                    <island-textarea variant="@InputVariant.Filled" rows="5" cols="30" placeholder="Filled surface variant..." />
+                </div>
+            </div>
+
+            <!-- Demo 8: Disabled & Invalid States -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Disabled &amp; Invalid States</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Non-editable disabled state and validation failure ring highlight.</p>
+                <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 1.5rem;">
+                    <island-textarea disabled="true" rows="5" cols="30" value="Disabled content cannot be edited" />
+                    <island-textarea invalid="true" rows="5" cols="30" placeholder="Required Address (Invalid)" />
+                </div>
+            </div>
         </div>
     </section>
 

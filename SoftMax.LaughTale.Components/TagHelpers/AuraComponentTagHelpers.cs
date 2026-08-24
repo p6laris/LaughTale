@@ -2834,27 +2834,146 @@ public class IslandRadioTagHelper : TagHelper
 }
 
 /// <summary>
-/// TagHelper for <island-textarea /> — Auto-resizing textarea
+/// TagHelper for <island-textarea /> / <textarea island-textarea /> — Aura Multi-line Textarea
 /// </summary>
 [HtmlTargetElement("island-textarea")]
+[HtmlTargetElement("textarea", Attributes = "island-textarea")]
 public class IslandTextareaTagHelper : TagHelper
 {
+    [HtmlAttributeName("value")]
     public string? Value { get; set; }
+
+    [HtmlAttributeName("placeholder")]
     public string? Placeholder { get; set; }
-    public int Rows { get; set; } = 3;
+
+    [HtmlAttributeName("rows")]
+    public int Rows { get; set; } = 5;
+
+    [HtmlAttributeName("cols")]
+    public int Cols { get; set; } = 30;
+
+    [HtmlAttributeName("max-length")]
     public int? MaxLength { get; set; }
-    public bool AutoResize { get; set; } = true;
+
+    [HtmlAttributeName("autoresize")]
+    public bool AutoResize { get; set; } = false;
+
+    [HtmlAttributeName("variant")]
+    public InputVariant Variant { get; set; } = InputVariant.Outlined;
+
+    [HtmlAttributeName("size")]
+    public ComponentSize Size { get; set; } = ComponentSize.Normal;
+
+    [HtmlAttributeName("fluid")]
+    public bool Fluid { get; set; } = false;
+
+    [HtmlAttributeName("invalid")]
+    public bool Invalid { get; set; } = false;
+
+    [HtmlAttributeName("disabled")]
     public bool Disabled { get; set; } = false;
+
+    [HtmlAttributeName("input-id")]
+    public string? InputId { get; set; }
+
+    [HtmlAttributeName("id")]
+    public string? Id { get; set; }
+
+    [HtmlAttributeName("name")]
+    public string? Name { get; set; }
+
+    [HtmlAttributeName("target-input")]
     public string? TargetInput { get; set; }
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "div";
+        if (context.AllAttributes.TryGetAttribute("autoResize", out var arAttr) || context.AllAttributes.TryGetAttribute("autoresize", out arAttr))
+        {
+            if (bool.TryParse(arAttr.Value?.ToString(), out var ar)) AutoResize = ar;
+            else if (arAttr.Value != null) AutoResize = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("fluid", out var flAttr))
+        {
+            if (bool.TryParse(flAttr.Value?.ToString(), out var fl)) Fluid = fl;
+            else if (flAttr.Value != null) Fluid = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("invalid", out var invAttr))
+        {
+            if (bool.TryParse(invAttr.Value?.ToString(), out var inv)) Invalid = inv;
+            else if (invAttr.Value != null) Invalid = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("disabled", out var disAttr))
+        {
+            if (bool.TryParse(disAttr.Value?.ToString(), out var dis)) Disabled = dis;
+            else if (disAttr.Value != null) Disabled = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("variant", out var varAttr))
+        {
+            if (System.Enum.TryParse<InputVariant>(varAttr.Value?.ToString(), true, out var v)) Variant = v;
+        }
+        if (context.AllAttributes.TryGetAttribute("size", out var szAttr))
+        {
+            if (System.Enum.TryParse<ComponentSize>(szAttr.Value?.ToString(), true, out var sz)) Size = sz;
+        }
+        if (context.AllAttributes.TryGetAttribute("target-input-name", out var tinAttr) || context.AllAttributes.TryGetAttribute("targetInputName", out tinAttr))
+        {
+            TargetInput = tinAttr.Value?.ToString();
+        }
+
+        output.TagName = "textarea";
         output.TagMode = TagMode.StartTagAndEndTag;
-        output.Attributes.SetAttribute("data-island", "textarea");
-        output.Attributes.SetAttribute("data-hydrate", "load");
-        var props = new { value = Value, placeholder = Placeholder, rows = Rows, maxLength = MaxLength, autoResize = AutoResize, disabled = Disabled, targetInputName = TargetInput };
-        output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
+
+        var effectiveId = InputId ?? Id;
+        if (!string.IsNullOrEmpty(effectiveId)) output.Attributes.SetAttribute("id", effectiveId);
+        if (!string.IsNullOrEmpty(Name) || !string.IsNullOrEmpty(TargetInput)) output.Attributes.SetAttribute("name", Name ?? TargetInput);
+        if (!string.IsNullOrEmpty(Placeholder)) output.Attributes.SetAttribute("placeholder", Placeholder);
+        if (Rows > 0) output.Attributes.SetAttribute("rows", Rows);
+        if (Cols > 0) output.Attributes.SetAttribute("cols", Cols);
+        if (MaxLength.HasValue) output.Attributes.SetAttribute("maxlength", MaxLength.Value);
+        if (Disabled) output.Attributes.SetAttribute("disabled", "disabled");
+
+        var classList = new List<string> { "p-textarea" };
+        if (Fluid) classList.Add("p-textarea-fluid");
+        if (Size == ComponentSize.Small) classList.Add("p-textarea-sm");
+        else if (Size == ComponentSize.Large) classList.Add("p-textarea-lg");
+        if (Variant == InputVariant.Filled) classList.Add("p-textarea-filled");
+        if (Invalid) classList.Add("p-invalid");
+        if (Disabled) classList.Add("p-disabled");
+
+        if (output.Attributes.TryGetAttribute("class", out var existingClass))
+        {
+            classList.Add(existingClass.Value.ToString()!);
+        }
+        output.Attributes.SetAttribute("class", string.Join(" ", classList.Distinct()));
+
+        if (AutoResize)
+        {
+            output.Attributes.SetAttribute("data-island", "textarea");
+            output.Attributes.SetAttribute("data-hydrate", "load");
+            var props = new
+            {
+                value = Value,
+                placeholder = Placeholder,
+                rows = Rows,
+                cols = Cols,
+                maxLength = MaxLength,
+                autoResize = true,
+                disabled = Disabled,
+                invalid = Invalid,
+                fluid = Fluid,
+                size = Size.ToString().ToLowerInvariant(),
+                variant = Variant.ToString().ToLowerInvariant(),
+                name = Name,
+                targetInputName = TargetInput,
+                inputId = effectiveId
+            };
+            output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
+        }
+
+        if (!string.IsNullOrEmpty(Value))
+        {
+            output.Content.SetContent(Value);
+        }
     }
 }
 

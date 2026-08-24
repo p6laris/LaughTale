@@ -1055,7 +1055,7 @@ defineIsland("camera", () => import("./camera-KAAHJRTE.js"));
 defineIsland("dropzone", () => import("./dropzone-E76UIQBF.js"));
 defineIsland("tree-select", () => import("./tree-select-FZOTTQ6I.js"));
 defineIsland("datagrid", () => import("./datagrid-OWH5VQKO.js"));
-defineIsland("modal", () => import("./modal-QMTIZNH5.js"));
+defineIsland("modal", () => import("./modal-B5JFXHEB.js"));
 defineIsland("toast", () => import("./toast-WLFO7J5G.js"));
 defineIsland("input-number", () => import("./input-number-KQ2J2WMH.js"));
 defineIsland("input-otp", () => import("./input-otp-RUPMATZ7.js"));
@@ -1105,7 +1105,7 @@ defineIsland("select", () => import("./select-B4PHV7IP.js"));
 defineIsland("checkbox", () => import("./checkbox-IRZB2CQJ.js"));
 defineIsland("radio-button", () => import("./radio-button-XUVRCZN3.js"));
 defineIsland("radio", () => import("./radio-button-XUVRCZN3.js"));
-defineIsland("textarea", () => import("./textarea-HTK2KLXG.js"));
+defineIsland("textarea", () => import("./textarea-BBEDGOBT.js"));
 defineIsland("input-mask", () => import("./input-mask-2NYG3JKC.js"));
 defineIsland("float-label", () => import("./float-label-T62JBL5G.js"));
 defineIsland("ifta-label", () => import("./ifta-label-7XAPRVSY.js"));
@@ -1132,4 +1132,4 @@ export {
   enableViewTransitions,
   getSlot
 };
-//# sourceMappingURL=chunk-JOAHR3WG.js.map
+//# sourceMappingURL=chunk-FIPA57JS.js.map
