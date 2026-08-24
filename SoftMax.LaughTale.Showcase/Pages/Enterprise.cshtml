@@ -1780,23 +1780,94 @@
         </div>
     </section>
 
-    <!-- ToggleSwitch -->
+        <!-- ToggleSwitch -->
     <section id="sec-toggle-switch" class="component-card">
         <div class="card-header">
             <div>
                 <h2>ToggleSwitch</h2>
-                <p>Smooth iOS/macOS style switch for toggling features and services.</p>
+                <p>ToggleSwitch is used to select a boolean value with smooth micro-animations, handle icon templating, and form validation states.</p>
             </div>
-            <span class="aura-tag tag-emerald">Active</span>
+            <span class="aura-tag tag-indigo">Form Control</span>
         </div>
-        <div class="card-body" style="display: flex; flex-direction: column; gap: 1rem;">
-            <div style="display: flex; align-items: center; justify-content: space-between; max-width: 400px;">
-                <span style="font-weight: 600; color: var(--p-text-color);">High-Availability Clustering</span>
-                <island-toggle-switch checked="true" />
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Hero Demo: Account Settings -->
+            <div style="background: var(--p-surface-0); padding: 1.5rem; border-radius: var(--p-border-radius-lg); border: 1px solid var(--p-border-color); max-width: 540px; margin: 0 auto; width: 100%; box-sizing: border-box; box-shadow: var(--p-shadow-sm);">
+                <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 1.25rem; border-bottom: 1px solid var(--p-border-color);">
+                    <div>
+                        <div style="font-weight: 600; font-size: 0.9375rem; color: var(--p-text-color);">Email address</div>
+                        <div style="font-size: 0.8125rem; color: var(--p-text-muted);">Users can add email addresses to their account</div>
+                    </div>
+                    <island-toggle-switch />
+                </div>
+                <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 1.25rem;">
+                    <div>
+                        <div style="font-weight: 600; font-size: 0.9375rem; color: var(--p-text-color);">Two-factor authentication</div>
+                        <div style="font-size: 0.8125rem; color: var(--p-text-muted);">Require a verification code when signing in</div>
+                    </div>
+                    <island-toggle-switch checked="true" />
+                </div>
             </div>
-            <div style="display: flex; align-items: center; justify-content: space-between; max-width: 400px;">
-                <span style="font-weight: 600; color: var(--p-text-color);">Automated SSL Rotation</span>
-                <island-toggle-switch checked="true" />
+
+            <!-- Demo 1: Basic -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Toggles a boolean setting between enabled and disabled states.</p>
+                <div style="display: flex; justify-content: center; align-items: center; gap: 0.75rem;">
+                    <label for="switch_basic" style="font-size: 0.875rem; font-weight: 500; color: var(--p-text-color); cursor: pointer;">Off</label>
+                    <island-toggle-switch input-id="switch_basic" />
+                    <label for="switch_basic" style="font-size: 0.875rem; font-weight: 500; color: var(--p-text-color); cursor: pointer;">On</label>
+                </div>
+            </div>
+
+            <!-- Demo 2: Controlled -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Controlled</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">A controlled ToggleSwitch manages the checked state for two-way value binding.</p>
+                <div style="display: flex; justify-content: center; align-items: center; gap: 0.75rem;">
+                    <island-toggle-switch checked="true" input-id="mode_airplane" />
+                    <label for="mode_airplane" style="font-size: 0.875rem; font-weight: 500; color: var(--p-text-color); cursor: pointer;">Airplane Mode</label>
+                </div>
+            </div>
+
+            <!-- Demo 3: Template (Handle Icons) -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Template (Handle Icons)</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">The handle slot is available to display custom vector icons based on state.</p>
+                <div style="display: flex; justify-content: center; align-items: center; gap: 1.5rem;">
+                    <island-toggle-switch checked-icon="check" unchecked-icon="x" checked="true" />
+                    <island-toggle-switch checked-icon="check" unchecked-icon="x" checked="false" />
+                </div>
+            </div>
+
+            <!-- Demo 4: Customization -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Customization</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">ToggleSwitch supports appearance customization including custom track and handle styling.</p>
+                <div style="display: flex; justify-content: center;">
+                    <div style="max-width: 360px; width: 100%; display: flex; align-items: flex-start; gap: 1rem; background: var(--p-surface-0); padding: 1rem 1.25rem; border-radius: var(--p-border-radius-md); border: 1px solid var(--p-border-color); box-shadow: var(--p-shadow-sm);">
+                        <div style="display: flex; flex-direction: column; gap: 0.25rem; flex: 1;">
+                            <span style="font-size: 0.9375rem; font-weight: 600; color: var(--p-text-color);">Try Beta Features</span>
+                            <span style="font-size: 0.8125rem; color: var(--p-text-muted);">Experience upcoming features before they're officially released.</span>
+                        </div>
+                        <island-toggle-switch checked="true" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 5: Disabled & Invalid States -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Disabled &amp; Invalid States</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Non-interactive disabled state and validation failure highlight border.</p>
+                <div style="display: flex; justify-content: center; align-items: center; gap: 2rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <island-toggle-switch disabled="true" checked="false" />
+                        <span style="font-size: 0.8125rem; color: var(--p-text-muted);">Disabled</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <island-toggle-switch invalid="true" checked="false" />
+                        <span style="font-size: 0.8125rem; color: var(--p-red-500); font-weight: 600;">Invalid</span>
+                    </div>
+                </div>
             </div>
         </div>
     </section>

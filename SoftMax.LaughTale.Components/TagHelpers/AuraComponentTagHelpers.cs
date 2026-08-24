@@ -494,33 +494,164 @@ public class IslandPasswordTagHelper : TagHelper
 }
 
 /// <summary>
-/// TagHelper for <island-switch /> / <island-toggle-switch />
+/// TagHelper for <island-toggle-switch /> / <island-toggleswitch /> / <island-switch /> — Aura ToggleSwitch
 /// </summary>
-[HtmlTargetElement("island-switch")]
 [HtmlTargetElement("island-toggle-switch")]
+[HtmlTargetElement("island-toggleswitch")]
+[HtmlTargetElement("island-switch")]
 public class IslandSwitchTagHelper : TagHelper
 {
-    public string? TargetInput { get; set; }
+    [HtmlAttributeName("checked")]
     public bool Checked { get; set; } = false;
+
+    [HtmlAttributeName("value")]
+    public string? Value { get; set; }
+
+    [HtmlAttributeName("label")]
     public string? Label { get; set; }
+
+    [HtmlAttributeName("disabled")]
     public bool Disabled { get; set; } = false;
+
+    [HtmlAttributeName("invalid")]
+    public bool Invalid { get; set; } = false;
+
+    [HtmlAttributeName("checked-icon")]
+    public string? CheckedIcon { get; set; }
+
+    [HtmlAttributeName("unchecked-icon")]
+    public string? UncheckedIcon { get; set; }
+
+    [HtmlAttributeName("icon")]
+    public string? Icon { get; set; }
+
+    [HtmlAttributeName("input-id")]
+    public string? InputId { get; set; }
+
+    [HtmlAttributeName("id")]
+    public string? Id { get; set; }
+
+    [HtmlAttributeName("name")]
+    public string? Name { get; set; }
+
+    [HtmlAttributeName("target-input")]
+    public string? TargetInput { get; set; }
+
+    [HtmlAttributeName("aria-label")]
+    public string? AriaLabel { get; set; }
+
+    [HtmlAttributeName("aria-labelledby")]
+    public string? AriaLabelledBy { get; set; }
+
+    [HtmlAttributeName("slider-class")]
+    public string? SliderClass { get; set; }
+
+    [HtmlAttributeName("handle-class")]
+    public string? HandleClass { get; set; }
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
+        if (context.AllAttributes.TryGetAttribute("checked", out var chkAttr))
+        {
+            if (bool.TryParse(chkAttr.Value?.ToString(), out var chk)) Checked = chk;
+            else if (chkAttr.Value != null) Checked = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("value", out var valAttr))
+        {
+            if (bool.TryParse(valAttr.Value?.ToString(), out var chkVal)) Checked = chkVal;
+        }
+        if (context.AllAttributes.TryGetAttribute("disabled", out var disAttr))
+        {
+            if (bool.TryParse(disAttr.Value?.ToString(), out var dis)) Disabled = dis;
+            else if (disAttr.Value != null) Disabled = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("invalid", out var invAttr))
+        {
+            if (bool.TryParse(invAttr.Value?.ToString(), out var inv)) Invalid = inv;
+            else if (invAttr.Value != null) Invalid = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("checkedIcon", out var ciAttr) || context.AllAttributes.TryGetAttribute("checked-icon", out ciAttr))
+        {
+            CheckedIcon = ciAttr.Value?.ToString();
+        }
+        if (context.AllAttributes.TryGetAttribute("uncheckedIcon", out var uiAttr) || context.AllAttributes.TryGetAttribute("unchecked-icon", out uiAttr))
+        {
+            UncheckedIcon = uiAttr.Value?.ToString();
+        }
+        if (context.AllAttributes.TryGetAttribute("inputId", out var iiAttr) || context.AllAttributes.TryGetAttribute("input-id", out iiAttr))
+        {
+            InputId = iiAttr.Value?.ToString();
+        }
+        if (context.AllAttributes.TryGetAttribute("target-input-name", out var tinAttr) || context.AllAttributes.TryGetAttribute("targetInputName", out tinAttr))
+        {
+            TargetInput = tinAttr.Value?.ToString();
+        }
+        if (context.AllAttributes.TryGetAttribute("sliderClass", out var scAttr) || context.AllAttributes.TryGetAttribute("slider-class", out scAttr))
+        {
+            SliderClass = scAttr.Value?.ToString();
+        }
+        if (context.AllAttributes.TryGetAttribute("handleClass", out var hcAttr) || context.AllAttributes.TryGetAttribute("handle-class", out hcAttr))
+        {
+            HandleClass = hcAttr.Value?.ToString();
+        }
+
         output.TagName = "div";
         output.TagMode = TagMode.StartTagAndEndTag;
         output.Attributes.SetAttribute("data-island", "toggle-switch");
         output.Attributes.SetAttribute("data-hydrate", "load");
 
+        var effectiveId = InputId ?? Id;
+        var inputName = Name ?? TargetInput ?? "switch_value";
+
         var props = new
         {
-            targetInputName = TargetInput,
             @checked = Checked,
+            value = Checked,
             label = Label,
-            disabled = Disabled
+            disabled = Disabled,
+            invalid = Invalid,
+            checkedIcon = CheckedIcon ?? Icon,
+            uncheckedIcon = UncheckedIcon,
+            icon = Icon,
+            inputId = effectiveId,
+            name = Name,
+            targetInputName = TargetInput,
+            ariaLabel = AriaLabel,
+            ariaLabelledBy = AriaLabelledBy,
+            sliderClass = SliderClass,
+            handleClass = HandleClass
         };
 
         output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
+
+        // SSR Pre-rendered markup
+        var rootClasses = new List<string> { "laughtale-toggleswitch", "p-toggleswitch", "p-component" };
+        if (Checked) rootClasses.Add("p-toggleswitch-checked");
+        if (Invalid) rootClasses.Add("p-invalid is-invalid");
+        if (Disabled) rootClasses.Add("p-disabled");
+
+        if (output.Attributes.TryGetAttribute("class", out var existingClass))
+        {
+            rootClasses.Add(existingClass.Value.ToString()!);
+        }
+        output.Attributes.SetAttribute("class", string.Join(" ", rootClasses.Distinct()));
+
+        var activeIcon = Checked ? (CheckedIcon ?? Icon) : UncheckedIcon;
+        var iconSvg = !string.IsNullOrEmpty(activeIcon) ? $@"<span class=""p-toggleswitch-handle-icon"">{LucideIcons.Get(activeIcon, 10)}</span>" : "";
+        var idAttr = !string.IsNullOrEmpty(effectiveId) ? $@"id=""{effectiveId}""" : "";
+        var checkedAttr = Checked ? "checked" : "";
+        var disabledAttr = Disabled ? "disabled" : "";
+        var labelHtml = !string.IsNullOrEmpty(Label) ? $@"<span class=""p-toggleswitch-label"">{Label}</span>" : "";
+
+        output.Content.SetHtmlContent($@"
+            <input type=""checkbox"" role=""switch"" class=""p-toggleswitch-input"" {idAttr} name=""{inputName}"" {checkedAttr} {disabledAttr} aria-checked=""{(Checked ? "true" : "false")}"" tabindex=""{(Disabled ? "-1" : "0")}"" />
+            <div class=""p-toggleswitch-slider {SliderClass ?? ""}"">
+                <div class=""p-toggleswitch-handle {HandleClass ?? ""}"">
+                    {iconSvg}
+                </div>
+            </div>
+            {labelHtml}
+        ");
     }
 }
 
