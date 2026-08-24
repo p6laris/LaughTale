@@ -1659,12 +1659,58 @@ public class IslandDrawerTagHelper : TagHelper
 
 /// <summary>
 /// TagHelper for <island-speed-dial />
+/// Floating action button with popup action items, compliant with Aura Design System.
 /// </summary>
 [HtmlTargetElement("island-speed-dial")]
 public class IslandSpeedDialTagHelper : TagHelper
 {
+    [HtmlAttributeName("model")]
+    public List<SpeedDialAction> Model { get; set; } = new();
+
+    [HtmlAttributeName("actions")]
     public List<SpeedDialAction> Actions { get; set; } = new();
+
+    [HtmlAttributeName("direction")]
     public string Direction { get; set; } = "up";
+
+    [HtmlAttributeName("type")]
+    public string Type { get; set; } = "linear";
+
+    [HtmlAttributeName("radius")]
+    public int? Radius { get; set; }
+
+    [HtmlAttributeName("transition-delay")]
+    public int TransitionDelay { get; set; } = 30;
+
+    [HtmlAttributeName("mask")]
+    public bool Mask { get; set; } = false;
+
+    [HtmlAttributeName("show-icon")]
+    public string ShowIcon { get; set; } = "plus";
+
+    [HtmlAttributeName("hide-icon")]
+    public string HideIcon { get; set; } = "times";
+
+    [HtmlAttributeName("rotate-animation")]
+    public bool RotateAnimation { get; set; } = true;
+
+    [HtmlAttributeName("button-props")]
+    public SpeedDialButtonProps? ButtonProps { get; set; }
+
+    [HtmlAttributeName("button-severity")]
+    public string? ButtonSeverity { get; set; }
+
+    [HtmlAttributeName("tooltip-options")]
+    public SpeedDialTooltipOptions? TooltipOptions { get; set; }
+
+    [HtmlAttributeName("aria-label")]
+    public string? AriaLabel { get; set; } = "Speed Dial Options";
+
+    [HtmlAttributeName("template")]
+    public string? Template { get; set; }
+
+    [HtmlAttributeName("class")]
+    public string? Class { get; set; }
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
@@ -1673,13 +1719,58 @@ public class IslandSpeedDialTagHelper : TagHelper
         output.Attributes.SetAttribute("data-island", "speed-dial");
         output.Attributes.SetAttribute("data-hydrate", "load");
 
+        if (context.AllAttributes.TryGetAttribute("mask", out var mAttr))
+        {
+            if (bool.TryParse(mAttr.Value?.ToString(), out var m)) Mask = m;
+            else if (mAttr.Value != null) Mask = true;
+        }
+
+        var items = (Model != null && Model.Count > 0) ? Model : Actions;
+        var btnProps = ButtonProps ?? new SpeedDialButtonProps(
+            Severity: ButtonSeverity ?? "primary",
+            Rounded: true,
+            IconOnly: true
+        );
+
+        if (!string.IsNullOrEmpty(ButtonSeverity) && btnProps.Severity != ButtonSeverity)
+        {
+            btnProps = btnProps with { Severity = ButtonSeverity };
+        }
+
         var props = new
         {
-            actions = Actions,
-            direction = Direction
+            model = items,
+            direction = Direction,
+            type = Type,
+            radius = Radius,
+            transitionDelay = TransitionDelay,
+            mask = Mask,
+            showIcon = ShowIcon,
+            hideIcon = HideIcon,
+            rotateAnimation = RotateAnimation,
+            buttonProps = btnProps,
+            tooltipOptions = TooltipOptions,
+            ariaLabel = AriaLabel,
+            template = Template
         };
 
         output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
+
+        // SSR Pre-render
+        var sev = (btnProps.Severity ?? "primary").ToLowerInvariant();
+        var sevClass = sev != "primary" ? $"p-button-{sev}" : "p-button-primary";
+        var roundedClass = btnProps.Rounded ? "p-button-rounded" : "";
+        var iconOnlyClass = btnProps.IconOnly ? "p-button-icon-only" : "";
+        var customClass = btnProps.StyleClass ?? "";
+
+        var preRenderHtml = $@"
+            <div class=""p-speeddial p-component p-speeddial-direction-{Direction} p-speeddial-{Type}"" style=""position: absolute;"">
+                <button type=""button"" class=""p-speeddial-button p-button {sevClass} {roundedClass} {iconOnlyClass} {customClass}"" aria-haspopup=""true"" aria-expanded=""false"" aria-label=""{AriaLabel}"">
+                    <span class=""p-speeddial-icon"">{LucideIcons.Get(ShowIcon ?? "plus", 20)}</span>
+                </button>
+            </div>";
+
+        output.Content.SetHtmlContent(preRenderHtml);
     }
 }
 

@@ -73,10 +73,28 @@ export interface AvatarItem {
 }
 
 export interface SpeedDialAction {
-    label: string;
+    label?: string;
     icon?: string;
     action?: string;
-    severity?: ButtonSeverity;
+    url?: string;
+    target?: string;
+    disabled?: boolean;
+    tooltip?: string;
+    severity?: string;
+    styleClass?: string;
+    command?: string;
+}
+
+export interface SpeedDialButtonProps {
+    severity?: string;
+    rounded?: boolean;
+    iconOnly?: boolean;
+    styleClass?: string;
+}
+
+export interface SpeedDialTooltipOptions {
+    position?: 'top' | 'bottom' | 'left' | 'right';
+    event?: 'hover' | 'focus';
 }
 
 export interface AccordionTab {

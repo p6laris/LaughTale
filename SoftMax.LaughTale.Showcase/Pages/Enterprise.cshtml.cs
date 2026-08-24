@@ -520,9 +520,48 @@ public class EnterpriseModel : PageModel
 
     public List<SpeedDialAction> QuickActions { get; set; } = new()
     {
-        new("Sync Cluster", null, "sync"),
-        new("Export Audit Logs", null, "export"),
-        new("Trigger Backup", null, "backup")
+        new("Sync Cluster", "refresh", "sync"),
+        new("Export Audit Logs", "upload", "export"),
+        new("Trigger Backup", "save", "backup")
+    };
+
+    public List<SpeedDialAction> SpeedDialBasicItems { get; set; } = new()
+    {
+        new("Add", "pencil", "add"),
+        new("Update", "refresh", "update"),
+        new("Delete", "trash", "delete"),
+        new("Upload", "upload", "upload"),
+        new("VueJS", "externallink", "external", Url: "https://vuejs.org", Target: "_blank")
+    };
+
+    public List<SpeedDialAction> SpeedDialCircleItems { get; set; } = new()
+    {
+        new("Add", "pencil", "add"),
+        new("Update", "refresh", "update"),
+        new("Delete", "trash", "delete"),
+        new("Upload", "upload", "upload"),
+        new("VueJS", "externallink", "external", Url: "https://vuejs.org", Target: "_blank"),
+        new("Settings", "cog", "settings"),
+        new("Profile", "user", "profile"),
+        new("Favorite", "heart", "favorite")
+    };
+
+    public List<SpeedDialAction> SpeedDialTemplateItems { get; set; } = new()
+    {
+        new("Like", "heart", "like"),
+        new("Share", "sharealt", "share"),
+        new("Print", "print", "print"),
+        new("Save", "save", "save"),
+        new("Copy", "copy", "copy")
+    };
+
+    public List<SpeedDialAction> SpeedDialTooltipItems { get; set; } = new()
+    {
+        new("Add", "pencil", "add", Tooltip: "Add"),
+        new("Update", "refresh", "update", Tooltip: "Update"),
+        new("Delete", "trash", "delete", Tooltip: "Delete"),
+        new("Upload", "upload", "upload", Tooltip: "Upload"),
+        new("External", "externallink", "external", Tooltip: "External", Url: "https://vuejs.org", Target: "_blank")
     };
 
     public List<AccordionTab> AccordionTabs { get; set; } = new()

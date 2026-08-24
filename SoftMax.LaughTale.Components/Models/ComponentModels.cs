@@ -108,10 +108,27 @@ public record AvatarItem(
 );
 
 public record SpeedDialAction(
-    string Label,
+    string? Label = null,
     string? Icon = null,
     string? Action = null,
-    ButtonSeverity Severity = ButtonSeverity.Primary
+    string? Url = null,
+    string? Target = null,
+    bool Disabled = false,
+    string? Tooltip = null,
+    string? Severity = null,
+    string? StyleClass = null
+);
+
+public record SpeedDialButtonProps(
+    string? Severity = "primary",
+    bool Rounded = true,
+    bool IconOnly = true,
+    string? StyleClass = null
+);
+
+public record SpeedDialTooltipOptions(
+    string? Position = "left",
+    string? Event = "hover"
 );
 
 public record AccordionTab(

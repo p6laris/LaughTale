@@ -3,21 +3,20 @@ import {
   enableViewTransitions,
   initDirectives,
   initIslands
-} from "./chunk-QKOVLUTT.js";
+} from "./chunk-Z2WM2VDG.js";
 import "./chunk-J7IJRT66.js";
 import "./chunk-P6OQD35U.js";
 import "./chunk-ZFSVXRXK.js";
 import "./chunk-Y4YSQNFD.js";
 import "./chunk-I7ZAYNYP.js";
 import "./chunk-RBI7CHCL.js";
-import "./chunk-VDYWG2PC.js";
 import "./chunk-IOCYPXM4.js";
 import "./chunk-5EJRX4PB.js";
 import "./chunk-3ZMZT2PZ.js";
 import "./chunk-RQ5UXIGU.js";
 import "./chunk-T4EPW24S.js";
 import "./chunk-KEONGXN5.js";
-import "./chunk-YLRV6FTK.js";
+import "./chunk-C4P5FSS5.js";
 import "./chunk-3TFPN5JM.js";
 
 // Scripts/main.ts
@@ -26,7 +25,7 @@ defineIsland("file-dropzone", () => import("./dropzone-OIJK5IJ7.js"));
 defineIsland("cascade-tree", () => import("./cascade-tree-K6NUHXUW.js"));
 defineIsland("event-broadcaster", () => import("./broadcaster-RCRIXWRP.js"));
 defineIsland("event-receiver", () => import("./receiver-CDILBIW3.js"));
-defineIsland("modal-dialog", () => import("./modal-dialog-OKA5ODSF.js"));
+defineIsland("modal-dialog", () => import("./modal-dialog-XBVYSSWY.js"));
 defineIsland("persistent-telemetry", () => import("./persistent-player-NCRVWT4M.js"));
 function initialize() {
   initIslands();

@@ -1671,7 +1671,14 @@ var init_lucide = __esm({
       youtube: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/><path d="m10 15 5-3-5-3v6Z"/></svg>`,
       spinner: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="animate-spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>`,
       times: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`,
-      trash: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>`
+      trash: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>`,
+      pencil: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg>`,
+      cog: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>`,
+      settings: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>`,
+      print: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6"/><rect x="6" y="14" width="12" height="8" rx="1"/></svg>`,
+      save: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"/><path d="M7 3v4a1 1 0 0 0 1 1h7"/></svg>`,
+      shareAlt: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>`,
+      share2: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>`
     };
   }
 });
@@ -9658,80 +9665,608 @@ __export(speed_dial_exports, {
   default: () => SpeedDialIsland
 });
 function SpeedDialIsland(container, props) {
-  injectIslandStyle("speed-dial", CSS24);
+  injectIslandStyle("speed-dial", SPEEDDIAL_CSS);
+  const items = props.model || props.actions || [];
+  const direction = props.direction || "up";
+  const type = props.type || "linear";
+  const radius = props.radius || (type === "quarter-circle" ? 120 : 80);
+  const transitionDelay = props.transitionDelay !== void 0 ? props.transitionDelay : 30;
+  const rotateAnimation = props.rotateAnimation !== false;
+  const mask = !!props.mask;
+  const isCustomTemplate = props.template === "custom";
+  const tooltipPosition = props.tooltipOptions?.position || (direction === "left" ? "top" : direction === "right" ? "top" : "left");
   let isOpen = false;
+  const btnSev = props.buttonProps?.severity || "primary";
+  let btnSevClass = "p-button-primary";
+  if (btnSev !== "primary") {
+    btnSevClass = `p-button-${btnSev.toLowerCase()}`;
+  }
+  const btnRounded = props.buttonProps?.rounded !== false ? "p-button-rounded" : "";
+  const btnIconOnly = props.buttonProps?.iconOnly !== false ? "p-button-icon-only" : "";
+  const customBtnClass = props.buttonProps?.styleClass || "";
+  function calculatePosition(index, count) {
+    if (type === "linear") {
+      const spacing = 52;
+      const distance = (index + 1) * spacing;
+      switch (direction) {
+        case "up":
+          return { x: 0, y: -distance };
+        case "down":
+          return { x: 0, y: distance };
+        case "left":
+          return { x: -distance, y: 0 };
+        case "right":
+          return { x: distance, y: 0 };
+        default:
+          return { x: 0, y: -distance };
+      }
+    }
+    if (type === "circle") {
+      const step = 2 * Math.PI / count;
+      const angle = index * step - Math.PI / 2;
+      return {
+        x: Math.round(radius * Math.cos(angle)),
+        y: Math.round(radius * Math.sin(angle))
+      };
+    }
+    if (type === "semi-circle") {
+      const step = count > 1 ? Math.PI / (count - 1) : 0;
+      switch (direction) {
+        case "up": {
+          const angle = Math.PI - index * step;
+          return {
+            x: Math.round(radius * Math.cos(angle)),
+            y: Math.round(-radius * Math.sin(angle))
+          };
+        }
+        case "down": {
+          const angle = Math.PI - index * step;
+          return {
+            x: Math.round(radius * Math.cos(angle)),
+            y: Math.round(radius * Math.sin(angle))
+          };
+        }
+        case "left": {
+          const angle = Math.PI / 2 + index * step;
+          return {
+            x: Math.round(-radius * Math.sin(angle)),
+            y: Math.round(radius * Math.cos(angle))
+          };
+        }
+        case "right": {
+          const angle = -Math.PI / 2 + index * step;
+          return {
+            x: Math.round(radius * Math.sin(angle)),
+            y: Math.round(radius * Math.cos(angle))
+          };
+        }
+        default: {
+          const angle = Math.PI - index * step;
+          return {
+            x: Math.round(radius * Math.cos(angle)),
+            y: Math.round(-radius * Math.sin(angle))
+          };
+        }
+      }
+    }
+    if (type === "quarter-circle") {
+      const step = count > 1 ? Math.PI / 2 / (count - 1) : 0;
+      switch (direction) {
+        case "up-left": {
+          const angle = index * step;
+          return {
+            x: Math.round(-radius * Math.cos(angle)),
+            y: Math.round(-radius * Math.sin(angle))
+          };
+        }
+        case "up-right": {
+          const angle = index * step;
+          return {
+            x: Math.round(radius * Math.cos(angle)),
+            y: Math.round(-radius * Math.sin(angle))
+          };
+        }
+        case "down-left": {
+          const angle = index * step;
+          return {
+            x: Math.round(-radius * Math.cos(angle)),
+            y: Math.round(radius * Math.sin(angle))
+          };
+        }
+        case "down-right": {
+          const angle = index * step;
+          return {
+            x: Math.round(radius * Math.sin(angle)),
+            y: Math.round(radius * Math.cos(angle))
+          };
+        }
+        default: {
+          const angle = index * step;
+          return {
+            x: Math.round(-radius * Math.cos(angle)),
+            y: Math.round(-radius * Math.sin(angle))
+          };
+        }
+      }
+    }
+    return { x: 0, y: 0 };
+  }
+  const uniqueId = "speeddial_" + Math.random().toString(36).substring(2, 9);
   function render() {
-    const actionItems = props.actions.map((act) => `
-            <button type="button" 
-                    class="speed-dial-action-btn" 
-                    title="${act.label}" 
-                    data-action="${act.action || ""}" 
-                    style="width: 2.5rem; height: 2.5rem; border-radius: 50%; border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-surface-800); box-shadow: var(--p-shadow-md); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);">
-                ${act.icon || LucideIcons.zap}
-            </button>
-        `).join("");
+    let maskHtml = "";
+    if (mask) {
+      maskHtml = `<div class="p-speeddial-mask ${isOpen ? "p-speeddial-mask-visible" : ""}"></div>`;
+    }
+    const itemsHtml = items.map((item, index) => {
+      const pos = calculatePosition(index, items.length);
+      const delay = isOpen ? transitionDelay * index : transitionDelay * (items.length - 1 - index);
+      let transformStyle = "";
+      if (isCustomTemplate) {
+        const customOffset = -40;
+        transformStyle = isOpen ? `transform: translate3d(${pos.x + customOffset}px, ${pos.y}px, 0) scale(1);` : `transform: translate3d(${customOffset}px, 0, 0) scale(0);`;
+      } else {
+        transformStyle = isOpen ? `transform: translate3d(${pos.x}px, ${pos.y}px, 0) scale(1);` : `transform: translate3d(0, 0, 0) scale(0);`;
+      }
+      const style = `${transformStyle} transition-delay: ${delay}ms;`;
+      const iconHtml = item.icon ? getLucideIcon(item.icon, 18) : LucideIcons.zap;
+      const tooltipText = item.tooltip || item.label || "";
+      const tooltipHtml = tooltipText ? `
+                <span class="p-speeddial-tooltip tooltip-${tooltipPosition}" data-index="${index}">
+                    ${tooltipText}
+                </span>
+            ` : "";
+      if (isCustomTemplate) {
+        return `
+                    <li class="p-speeddial-item" style="${style}" role="none" data-index="${index}">
+                        <div class="p-speeddial-custom-item" data-index="${index}">
+                            <span class="p-speeddial-custom-label">${item.label || ""}</span>
+                            <button type="button" class="p-speeddial-custom-icon" aria-label="${item.label || ""}" tabindex="${isOpen ? "0" : "-1"}">
+                                ${iconHtml}
+                            </button>
+                        </div>
+                    </li>
+                `;
+      }
+      const itemSevClass = item.severity ? `p-button-${item.severity.toLowerCase()}` : "";
+      const tag = item.url ? "a" : "button";
+      const hrefAttr = item.url ? `href="${item.url}" target="${item.target || "_self"}" rel="noopener"` : `type="button"`;
+      return `
+                <li class="p-speeddial-item" style="${style}" role="none" data-index="${index}">
+                    <${tag} ${hrefAttr} 
+                       class="p-speeddial-action p-button ${itemSevClass} ${item.styleClass || ""}" 
+                       role="menuitem"
+                       data-index="${index}"
+                       tabindex="${isOpen ? "0" : "-1"}"
+                       aria-label="${tooltipText || "Action"}"
+                       ${item.disabled ? 'disabled aria-disabled="true"' : ""}>
+                        ${iconHtml}
+                        ${tooltipHtml}
+                    </${tag}>
+                </li>
+            `;
+    }).join("");
+    const openClass = isOpen ? "p-speeddial-opened" : "";
+    const rotateClass = rotateAnimation ? "p-speeddial-rotate" : "";
+    const ariaLabel = props.ariaLabel || "Speed Dial Options";
     container.innerHTML = `
-            <div class="laughtale-speed-dial" style="position: fixed; bottom: 2rem; right: 2rem; z-index: 50; display: flex; flex-direction: column-reverse; align-items: center; gap: 0.75rem;">
-                <!-- Main FAB Button -->
-                <button type="button" class="speed-dial-main-btn" style="width: 3.25rem; height: 3.25rem; border-radius: 50%; border: none; background: var(--p-primary-600); color: #ffffff; box-shadow: var(--p-shadow-lg); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); transform: rotate(${isOpen ? "45deg" : "0deg"});">
-                    ${LucideIcons.plus}
+            ${maskHtml}
+            <div class="p-speeddial p-component p-speeddial-direction-${direction} p-speeddial-${type} ${openClass}">
+                <button type="button" 
+                        class="p-speeddial-button p-button ${btnSevClass} ${btnRounded} ${btnIconOnly} ${customBtnClass}"
+                        aria-haspopup="true"
+                        aria-expanded="${isOpen}"
+                        aria-controls="${uniqueId}_list"
+                        aria-label="${ariaLabel}">
+                    <span class="p-speeddial-icon ${rotateClass}">
+                        ${LucideIcons.plus}
+                    </span>
                 </button>
-
-                <!-- Action Items -->
-                <div class="speed-dial-list" style="display: ${isOpen ? "flex" : "none"}; flex-direction: column-reverse; gap: 0.5rem;">
-                    ${actionItems}
-                </div>
+                <ul id="${uniqueId}_list" class="p-speeddial-list" role="menu" aria-label="${ariaLabel}">
+                    ${itemsHtml}
+                </ul>
             </div>
         `;
-    if (isOpen) {
-      const actionBtns = Array.from(container.querySelectorAll(".speed-dial-action-btn"));
-      useStagger(actionBtns, { staggerMs: 40, initialDelay: 10 });
-    }
-    container.querySelector(".speed-dial-main-btn")?.addEventListener("click", () => {
+    bindEvents();
+  }
+  function bindEvents() {
+    const mainBtn = container.querySelector(".p-speeddial-button");
+    const maskEl = container.querySelector(".p-speeddial-mask");
+    function toggle() {
       isOpen = !isOpen;
       render();
-    });
-    container.querySelectorAll(".speed-dial-action-btn").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const act = btn.getAttribute("data-action");
-        container.dispatchEvent(new CustomEvent("speeddial:action", {
-          bubbles: true,
-          detail: { action: act }
-        }));
+      if (isOpen) {
+        const firstAction = container.querySelector(".p-speeddial-action, .p-speeddial-custom-item button");
+        firstAction?.focus();
+      } else {
+        mainBtn?.focus();
+      }
+    }
+    function close() {
+      if (isOpen) {
         isOpen = false;
         render();
+        mainBtn?.focus();
+      }
+    }
+    mainBtn?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      toggle();
+    });
+    maskEl?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      close();
+    });
+    document.addEventListener("click", (e) => {
+      if (isOpen && !container.contains(e.target)) {
+        close();
+      }
+    });
+    mainBtn?.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        toggle();
+      } else if (e.key === "ArrowDown" || e.key === "ArrowRight") {
+        if (!isOpen) {
+          e.preventDefault();
+          isOpen = true;
+          render();
+          const firstAction = container.querySelector(".p-speeddial-action, .p-speeddial-custom-item button");
+          firstAction?.focus();
+        }
+      } else if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
+        if (!isOpen) {
+          e.preventDefault();
+          isOpen = true;
+          render();
+          const actions = container.querySelectorAll(".p-speeddial-action, .p-speeddial-custom-item button");
+          if (actions.length) actions[actions.length - 1].focus();
+        }
+      }
+    });
+    const actionElements = container.querySelectorAll(".p-speeddial-action, .p-speeddial-custom-item");
+    actionElements.forEach((el) => {
+      const index = parseInt(el.getAttribute("data-index") || "-1", 10);
+      const item = items[index];
+      el.addEventListener("click", (e) => {
+        if (item?.disabled) return;
+        container.dispatchEvent(new CustomEvent("speeddial:action", {
+          bubbles: true,
+          detail: { item, index }
+        }));
+        if (item?.command) {
+          try {
+            const fn = new Function("item", item.command);
+            fn(item);
+          } catch (err) {
+            console.error("SpeedDial command execution error:", err);
+          }
+        }
+        close();
+      });
+      const tooltip = el.querySelector(".p-speeddial-tooltip");
+      if (tooltip) {
+        el.addEventListener("mouseenter", () => {
+          tooltip.classList.add("p-tooltip-visible");
+        });
+        el.addEventListener("mouseleave", () => {
+          tooltip.classList.remove("p-tooltip-visible");
+        });
+        el.addEventListener("focus", () => {
+          tooltip.classList.add("p-tooltip-visible");
+        });
+        el.addEventListener("blur", () => {
+          tooltip.classList.remove("p-tooltip-visible");
+        });
+      }
+      el.addEventListener("keydown", (e) => {
+        const allActions = Array.from(container.querySelectorAll(".p-speeddial-action, .p-speeddial-custom-item button, .p-speeddial-custom-item"));
+        const currentIndex = allActions.indexOf(el);
+        if (e.key === "Escape") {
+          e.preventDefault();
+          close();
+        } else if (e.key === "ArrowDown" || e.key === "ArrowRight") {
+          e.preventDefault();
+          const next = (currentIndex + 1) % allActions.length;
+          allActions[next]?.focus();
+        } else if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
+          e.preventDefault();
+          const prev = (currentIndex - 1 + allActions.length) % allActions.length;
+          allActions[prev]?.focus();
+        } else if (e.key === "Home") {
+          e.preventDefault();
+          allActions[0]?.focus();
+        } else if (e.key === "End") {
+          e.preventDefault();
+          allActions[allActions.length - 1]?.focus();
+        }
       });
     });
   }
   render();
 }
-var CSS24;
+var SPEEDDIAL_CSS;
 var init_speed_dial = __esm({
   "src/components/speed-dial.ts"() {
     "use strict";
     init_lucide();
     init_styles();
-    init_useStagger();
-    CSS24 = `
-[data-theme="dark"] .speed-dial-action-btn {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+    SPEEDDIAL_CSS = `
+.p-speeddial {
+    position: relative;
+    display: inline-flex;
+    z-index: 10;
 }
-[data-theme="dark"] .laughtale-speed-dial {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-speeddial-button {
+    position: relative;
+    z-index: 2;
+    cursor: pointer;
+    user-select: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.08);
+    transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+    outline: none;
 }
-[data-theme="dark"] .speed-dial-main-btn {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-speeddial-button:focus-visible {
+    outline: 2px solid var(--p-primary-500, #10b981);
+    outline-offset: 2px;
 }
-[data-theme="dark"] .speed-dial-list {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-speeddial-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.p-speeddial-opened .p-speeddial-icon.p-speeddial-rotate {
+    transform: rotate(45deg);
+}
+
+.p-speeddial-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3rem;
+    height: 3rem;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.p-speeddial-opened .p-speeddial-list {
+    pointer-events: auto;
+}
+
+.p-speeddial-item {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -1.25rem;
+    margin-left: -1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: scale(0);
+    transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1), opacity 250ms ease;
+    pointer-events: none;
+}
+
+.p-speeddial-opened .p-speeddial-item {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.p-speeddial-action {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    border: 1px solid var(--p-surface-200, #e2e8f0);
+    background: var(--p-surface-0, #ffffff);
+    color: var(--p-surface-700, #334155);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+    cursor: pointer;
+    position: relative;
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+    outline: none;
+}
+
+.p-speeddial-action:hover:not(:disabled) {
+    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-surface-900, #0f172a);
+    border-color: var(--p-surface-300, #cbd5e1);
+    transform: scale(1.08);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+}
+
+.p-speeddial-action:focus-visible {
+    outline: 2px solid var(--p-primary-500, #10b981);
+    outline-offset: 2px;
+}
+
+.p-speeddial-action:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Custom Template Layout */
+.p-speeddial-custom-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.p-speeddial-custom-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 5.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: var(--p-border-radius, 6px);
+    background: var(--p-surface-0, #ffffff);
+    border: 1px solid var(--p-surface-200, #e2e8f0);
+    color: var(--p-surface-600, #475569);
+    font-weight: 500;
+    font-size: 0.875rem;
+    box-shadow: var(--p-shadow-sm, 0 1px 2px rgba(0,0,0,0.05));
+    transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+    user-select: none;
+}
+
+.p-speeddial-custom-icon {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    background: var(--p-surface-0, #ffffff);
+    border: 1px solid var(--p-surface-200, #e2e8f0);
+    color: var(--p-surface-600, #475569);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--p-shadow-sm, 0 1px 2px rgba(0,0,0,0.05));
+    transition: background-color 0.15s, color 0.15s, border-color 0.15s, transform 0.15s;
+    cursor: pointer;
+    outline: none;
+}
+
+.p-speeddial-custom-item:hover .p-speeddial-custom-label,
+.p-speeddial-custom-item:hover .p-speeddial-custom-icon {
+    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-surface-900, #0f172a);
+    border-color: var(--p-surface-300, #cbd5e1);
+}
+
+.p-speeddial-custom-item:hover .p-speeddial-custom-icon {
+    transform: scale(1.05);
+}
+
+/* Tooltips */
+.p-speeddial-tooltip {
+    position: absolute;
+    background: var(--p-surface-900, #0f172a);
+    color: #ffffff;
+    padding: 0.35rem 0.65rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1;
+    border-radius: var(--p-border-radius-sm, 4px);
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 100;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.p-speeddial-tooltip.p-tooltip-visible {
+    opacity: 1;
+}
+
+.p-speeddial-tooltip.tooltip-left {
+    right: calc(100% + 8px);
+    top: 50%;
+    transform: translateY(-50%) scale(0.9);
+}
+.p-speeddial-tooltip.tooltip-left.p-tooltip-visible {
+    transform: translateY(-50%) scale(1);
+}
+
+.p-speeddial-tooltip.tooltip-right {
+    left: calc(100% + 8px);
+    top: 50%;
+    transform: translateY(-50%) scale(0.9);
+}
+.p-speeddial-tooltip.tooltip-right.p-tooltip-visible {
+    transform: translateY(-50%) scale(1);
+}
+
+.p-speeddial-tooltip.tooltip-top {
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) scale(0.9);
+}
+.p-speeddial-tooltip.tooltip-top.p-tooltip-visible {
+    transform: translateX(-50%) scale(1);
+}
+
+.p-speeddial-tooltip.tooltip-bottom {
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) scale(0.9);
+}
+.p-speeddial-tooltip.tooltip-bottom.p-tooltip-visible {
+    transform: translateX(-50%) scale(1);
+}
+
+/* Mask */
+.p-speeddial-mask {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: inherit;
+    z-index: 5;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+}
+
+.p-speeddial-mask.p-speeddial-mask-visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Dark Mode Support */
+[data-theme="dark"] .p-speeddial-action {
+    background: var(--p-surface-900, #0f172a);
+    border-color: var(--p-surface-700, #334155);
+    color: var(--p-surface-300, #cbd5e1);
+}
+
+[data-theme="dark"] .p-speeddial-action:hover:not(:disabled) {
+    background: var(--p-surface-800, #1e293b);
+    color: #ffffff;
+    border-color: var(--p-surface-600, #475569);
+}
+
+[data-theme="dark"] .p-speeddial-custom-label,
+[data-theme="dark"] .p-speeddial-custom-icon {
+    background: var(--p-surface-900, #0f172a);
+    border-color: var(--p-surface-700, #334155);
+    color: var(--p-surface-400, #94a3b8);
+}
+
+[data-theme="dark"] .p-speeddial-custom-item:hover .p-speeddial-custom-label,
+[data-theme="dark"] .p-speeddial-custom-item:hover .p-speeddial-custom-icon {
+    background: var(--p-surface-800, #1e293b);
+    color: #ffffff;
+    border-color: var(--p-surface-600, #475569);
+}
+
+[data-theme="dark"] .p-speeddial-tooltip {
+    background: var(--p-surface-800, #1e293b);
+    color: #ffffff;
+    border: 1px solid var(--p-surface-700, #334155);
 }
 `;
   }
@@ -9743,7 +10278,7 @@ __export(image_compare_exports, {
   default: () => ImageCompareIsland
 });
 function ImageCompareIsland(container, props) {
-  injectIslandStyle("image-compare", CSS25);
+  injectIslandStyle("image-compare", CSS24);
   let splitPercent = 50;
   container.innerHTML = `
         <div class="laughtale-image-compare" style="position: relative; width: 100%; max-width: 600px; height: 340px; border-radius: var(--p-border-radius-lg); overflow: hidden; user-select: none; border: 1px solid var(--p-border-color); box-shadow: var(--p-shadow-md); touch-action: none; cursor: ew-resize;">
@@ -9819,12 +10354,12 @@ function ImageCompareIsland(container, props) {
   window.addEventListener("mousemove", onPointerMove);
   window.addEventListener("mouseup", onPointerUp);
 }
-var CSS25;
+var CSS24;
 var init_image_compare = __esm({
   "src/components/image-compare.ts"() {
     "use strict";
     init_styles();
-    CSS25 = `
+    CSS24 = `
 [data-theme="dark"] .laughtale-image-compare {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -9840,7 +10375,7 @@ __export(confirm_popup_exports, {
   default: () => ConfirmPopupIsland
 });
 function ConfirmPopupIsland(container, props) {
-  injectIslandStyle("confirm-popup", CSS26);
+  injectIslandStyle("confirm-popup", CSS25);
   let isOpen = false;
   function render() {
     container.innerHTML = `
@@ -9917,13 +10452,13 @@ function ConfirmPopupIsland(container, props) {
   }
   render();
 }
-var CSS26;
+var CSS25;
 var init_confirm_popup = __esm({
   "src/components/confirm-popup.ts"() {
     "use strict";
     init_lucide();
     init_styles();
-    CSS26 = `
+    CSS25 = `
 [data-theme="dark"] .laughtale-confirm-popup {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -9949,7 +10484,7 @@ __export(accordion_exports, {
   default: () => AccordionIsland
 });
 function AccordionIsland(container, props) {
-  injectIslandStyle("accordion", CSS27);
+  injectIslandStyle("accordion", CSS26);
   const tabs = props.tabs || [];
   let activeIndices = /* @__PURE__ */ new Set();
   if (Array.isArray(props.activeIndex)) {
@@ -10042,7 +10577,7 @@ function AccordionIsland(container, props) {
   }
   render();
 }
-var CSS27;
+var CSS26;
 var init_accordion = __esm({
   "src/components/accordion.ts"() {
     "use strict";
@@ -10050,7 +10585,7 @@ var init_accordion = __esm({
     init_styles();
     init_useDisclosure();
     init_useTransition();
-    CSS27 = `
+    CSS26 = `
 [data-theme="dark"] .accordion-tab {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -10086,7 +10621,7 @@ __export(tabs_exports, {
   default: () => TabsIsland
 });
 function TabsIsland(container, props) {
-  injectIslandStyle("tabs", CSS28);
+  injectIslandStyle("tabs", CSS27);
   const tabs = props.tabs || [];
   let activeIndex = props.activeIndex || 0;
   const initialSlots = {};
@@ -10157,12 +10692,12 @@ function TabsIsland(container, props) {
   }
   render();
 }
-var CSS28;
+var CSS27;
 var init_tabs = __esm({
   "src/components/tabs.ts"() {
     "use strict";
     init_styles();
-    CSS28 = `
+    CSS27 = `
 [data-theme="dark"] .tab-header-btn {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -10198,7 +10733,7 @@ __export(autocomplete_exports, {
   default: () => AutoCompleteIsland
 });
 function AutoCompleteIsland(container, props) {
-  injectIslandStyle("autocomplete", CSS29);
+  injectIslandStyle("autocomplete", CSS28);
   const allItems = props.suggestions || props.items || [];
   const multiple = props.multiple === true;
   const showClear = props.showClear !== false;
@@ -10531,7 +11066,7 @@ function AutoCompleteIsland(container, props) {
   }
   renderChips();
 }
-var CSS29;
+var CSS28;
 var init_autocomplete = __esm({
   "src/components/autocomplete.ts"() {
     "use strict";
@@ -10540,7 +11075,7 @@ var init_autocomplete = __esm({
     init_useDisclosure();
     init_useClickOutside();
     init_useDebounce();
-    CSS29 = `
+    CSS28 = `
 .laughtale-autocomplete {
     position: relative;
     display: inline-flex;
@@ -10810,7 +11345,7 @@ __export(color_picker_exports, {
   default: () => ColorPickerIsland
 });
 function ColorPickerIsland(container, props) {
-  injectIslandStyle("color-picker", CSS30);
+  injectIslandStyle("color-picker", CSS29);
   let currentColor = props.value || "#10b981";
   let isOpen = false;
   const swatchesHtml = DEFAULT_PRESETS.map((c) => `
@@ -10934,7 +11469,7 @@ function ColorPickerIsland(container, props) {
   }
   syncValue();
 }
-var DEFAULT_PRESETS, CSS30;
+var DEFAULT_PRESETS, CSS29;
 var init_color_picker = __esm({
   "src/components/color-picker.ts"() {
     "use strict";
@@ -10956,7 +11491,7 @@ var init_color_picker = __esm({
       "#1e293b",
       "#000000"
     ];
-    CSS30 = `
+    CSS29 = `
 [data-theme="dark"] .color-swatch-btn {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -10992,7 +11527,7 @@ __export(knob_exports, {
   default: () => KnobIsland
 });
 function KnobIsland(container, props) {
-  injectIslandStyle("knob", CSS31);
+  injectIslandStyle("knob", CSS30);
   const min = props.min !== void 0 ? props.min : 0;
   const max = props.max !== void 0 ? props.max : 100;
   const step = props.step || 1;
@@ -11094,12 +11629,12 @@ function KnobIsland(container, props) {
   }
   syncValue();
 }
-var CSS31;
+var CSS30;
 var init_knob = __esm({
   "src/components/knob.ts"() {
     "use strict";
     init_styles();
-    CSS31 = `
+    CSS30 = `
 [data-theme="dark"] .laughtale-knob {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -11125,7 +11660,7 @@ __export(tag_exports, {
   default: () => TagIsland
 });
 function TagIsland(container, props) {
-  injectIslandStyle("tag", CSS32);
+  injectIslandStyle("tag", CSS31);
   const severity = props.severity || "info";
   const isRounded = props.rounded || false;
   let bg = "var(--p-blue-50, #eff6ff)";
@@ -11159,12 +11694,12 @@ function TagIsland(container, props) {
         </span>
     `;
 }
-var CSS32;
+var CSS31;
 var init_tag = __esm({
   "src/components/tag.ts"() {
     "use strict";
     init_styles();
-    CSS32 = `
+    CSS31 = `
 [data-theme="dark"] .laughtale-tag {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -11180,7 +11715,7 @@ __export(breadcrumb_exports, {
   default: () => BreadcrumbIsland
 });
 function BreadcrumbIsland(container, props) {
-  injectIslandStyle("breadcrumb", CSS33);
+  injectIslandStyle("breadcrumb", CSS32);
   const items = props.items || [];
   const homeUrl = props.homeUrl || "/";
   const itemsHtml = items.map((item, idx) => {
@@ -11218,13 +11753,13 @@ function BreadcrumbIsland(container, props) {
         </nav>
     `;
 }
-var CSS33;
+var CSS32;
 var init_breadcrumb = __esm({
   "src/components/breadcrumb.ts"() {
     "use strict";
     init_lucide();
     init_styles();
-    CSS33 = `
+    CSS32 = `
 [data-theme="dark"] .laughtale-breadcrumb {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -11240,7 +11775,7 @@ __export(scroll_top_exports, {
   default: () => ScrollTopIsland
 });
 function ScrollTopIsland(container, props) {
-  injectIslandStyle("scroll-top", CSS34);
+  injectIslandStyle("scroll-top", CSS33);
   const threshold = props.threshold || 200;
   let isVisible = false;
   function render() {
@@ -11266,13 +11801,13 @@ function ScrollTopIsland(container, props) {
   window.addEventListener("scroll", checkScroll, { passive: true });
   render();
 }
-var CSS34;
+var CSS33;
 var init_scroll_top = __esm({
   "src/components/scroll-top.ts"() {
     "use strict";
     init_lucide();
     init_styles();
-    CSS34 = `
+    CSS33 = `
 [data-theme="dark"] .laughtale-scroll-top-btn {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -11288,7 +11823,7 @@ __export(inplace_exports, {
   default: () => InplaceIsland
 });
 function InplaceIsland(container, props) {
-  injectIslandStyle("inplace", CSS35);
+  injectIslandStyle("inplace", CSS34);
   let isEditing = false;
   let currentValue = props.value || "";
   function render() {
@@ -11368,13 +11903,13 @@ function InplaceIsland(container, props) {
   render();
   syncValue();
 }
-var CSS35;
+var CSS34;
 var init_inplace = __esm({
   "src/components/inplace.ts"() {
     "use strict";
     init_lucide();
     init_styles();
-    CSS35 = `
+    CSS34 = `
 [data-theme="dark"] .laughtale-inplace-display {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -11410,7 +11945,7 @@ __export(command_exports, {
   default: () => CommandPaletteIsland
 });
 function CommandPaletteIsland(container, props) {
-  injectIslandStyle("command", CSS36);
+  injectIslandStyle("command", CSS35);
   const placeholder = props.placeholder || "Type a command or search...";
   const items = props.items || [
     { id: "home", label: "Go to Overview", group: "Navigation", icon: "compass", url: "/", shortcut: "G H" },
@@ -11584,7 +12119,7 @@ function CommandPaletteIsland(container, props) {
   ]);
   document.addEventListener("command:open", () => open());
 }
-var CSS36;
+var CSS35;
 var init_command = __esm({
   "src/components/command.ts"() {
     "use strict";
@@ -11594,7 +12129,7 @@ var init_command = __esm({
     init_useFocusTrap();
     init_useHotkeys();
     init_useScrollLock();
-    CSS36 = `
+    CSS35 = `
 [data-theme="dark"] .laughtale-command-root {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -12458,7 +12993,7 @@ __export(dynamic_form_exports, {
   default: () => DynamicFormIsland
 });
 function DynamicFormIsland(container, props) {
-  injectIslandStyle("dynamic-form", CSS37);
+  injectIslandStyle("dynamic-form", CSS36);
   let schema = props.schema || null;
   if (!schema && props.schemaJson) {
     try {
@@ -12619,13 +13154,13 @@ function DynamicFormIsland(container, props) {
   }
   render();
 }
-var CSS37;
+var CSS36;
 var init_dynamic_form = __esm({
   "src/components/dynamic-form.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS37 = `
+    CSS36 = `
 [data-theme="dark"] .p-input {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -12656,7 +13191,7 @@ __export(splitter_exports, {
   default: () => SplitterIsland
 });
 function SplitterIsland(container, props) {
-  injectIslandStyle("splitter", CSS38);
+  injectIslandStyle("splitter", CSS37);
   const layout = props.layout || "horizontal";
   const isHorizontal = layout === "horizontal";
   const panels = props.panels && props.panels.length >= 2 ? props.panels : [
@@ -12699,13 +13234,13 @@ function SplitterIsland(container, props) {
     }
   });
 }
-var CSS38;
+var CSS37;
 var init_splitter = __esm({
   "src/components/splitter.ts"() {
     "use strict";
     init_styles();
     init_useDragGesture();
-    CSS38 = `
+    CSS37 = `
 [data-theme="dark"] .laughtale-splitter {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -12736,7 +13271,7 @@ __export(multiselect_exports, {
   default: () => MultiSelectIsland
 });
 function MultiSelectIsland(container, props) {
-  injectIslandStyle("multiselect", CSS39);
+  injectIslandStyle("multiselect", CSS38);
   const options = props.options || [];
   let selected = new Set(props.selectedValues || []);
   let filterQuery = "";
@@ -12902,7 +13437,7 @@ function MultiSelectIsland(container, props) {
   renderDisplay();
   syncValue();
 }
-var CSS39;
+var CSS38;
 var init_multiselect = __esm({
   "src/components/multiselect.ts"() {
     "use strict";
@@ -12911,7 +13446,7 @@ var init_multiselect = __esm({
     init_useDisclosure();
     init_useClickOutside();
     init_useTransition();
-    CSS39 = `
+    CSS38 = `
 [data-theme="dark"] .laughtale-multiselect {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -12982,7 +13517,7 @@ __export(cascadeselect_exports, {
   default: () => CascadeSelectIsland
 });
 function CascadeSelectIsland(container, props) {
-  injectIslandStyle("cascadeselect", CSS40);
+  injectIslandStyle("cascadeselect", CSS39);
   const options = props.options || [];
   const size = props.size || "normal";
   const variant = props.variant || "outlined";
@@ -13195,7 +13730,7 @@ function CascadeSelectIsland(container, props) {
     }));
   }
 }
-var CSS40;
+var CSS39;
 var init_cascadeselect = __esm({
   "src/components/cascadeselect.ts"() {
     "use strict";
@@ -13203,7 +13738,7 @@ var init_cascadeselect = __esm({
     init_styles();
     init_useDisclosure();
     init_useClickOutside();
-    CSS40 = `
+    CSS39 = `
 .laughtale-cascadeselect {
     position: relative;
     display: inline-flex;
@@ -13408,7 +13943,7 @@ __export(listbox_exports, {
   default: () => ListboxIsland
 });
 function ListboxIsland(container, props) {
-  injectIslandStyle("laughtale-listbox", CSS41);
+  injectIslandStyle("laughtale-listbox", CSS40);
   const isMultiple = props.multiple === true || String(props.multiple) === "true";
   const isMetaKey = props.metaKeySelection !== false && String(props.metaKeySelection) !== "false";
   const isCheckbox = props.checkbox === true || String(props.checkbox) === "true";
@@ -13744,14 +14279,14 @@ function ListboxIsland(container, props) {
   }
   init();
 }
-var CSS41, checkSvg2, searchSvg2;
+var CSS40, checkSvg2, searchSvg2;
 var init_listbox = __esm({
   "src/components/listbox.ts"() {
     "use strict";
     init_lucide();
     init_styles();
     init_useDebounce();
-    CSS41 = `
+    CSS40 = `
 /* ==================== AURA LISTBOX ==================== */
 .laughtale-listbox,
 .p-listbox {
@@ -14080,7 +14615,7 @@ __export(picklist_exports, {
   default: () => PickListIsland
 });
 function PickListIsland(container, props) {
-  injectIslandStyle("picklist", CSS42);
+  injectIslandStyle("picklist", CSS41);
   let sourceList = props.source ? [...props.source] : [
     { id: "1", name: "Identity & Access Manager" },
     { id: "2", name: "Audit Compliance Engine" },
@@ -14212,14 +14747,14 @@ function PickListIsland(container, props) {
   render();
   syncValues();
 }
-var CSS42;
+var CSS41;
 var init_picklist = __esm({
   "src/components/picklist.ts"() {
     "use strict";
     init_styles();
     init_lucide();
     init_useAutoAnimate();
-    CSS42 = `
+    CSS41 = `
 [data-theme="dark"] .laughtale-picklist {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -14280,7 +14815,7 @@ __export(orderlist_exports, {
   default: () => OrderListIsland
 });
 function OrderListIsland(container, props) {
-  injectIslandStyle("orderlist", CSS43);
+  injectIslandStyle("orderlist", CSS42);
   let items = props.items ? [...props.items] : [
     { id: "1", name: "Phase 1: Zero-Trust Gateway Init", order: 0 },
     { id: "2", name: "Phase 2: Hydrate Islands Engine", order: 1 },
@@ -14380,13 +14915,13 @@ function OrderListIsland(container, props) {
   render();
   syncValues();
 }
-var CSS43;
+var CSS42;
 var init_orderlist = __esm({
   "src/components/orderlist.ts"() {
     "use strict";
     init_styles();
     init_useAutoAnimate();
-    CSS43 = `
+    CSS42 = `
 [data-theme="dark"] .laughtale-orderlist {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -14432,7 +14967,7 @@ __export(orgchart_exports, {
   default: () => OrgChartIsland
 });
 function OrgChartIsland(container, props) {
-  injectIslandStyle("orgchart", CSS44);
+  injectIslandStyle("orgchart", CSS43);
   const rootNode = props.value || {
     key: "0",
     label: "Chief Technology Officer",
@@ -14507,12 +15042,12 @@ function OrgChartIsland(container, props) {
     });
   });
 }
-var CSS44;
+var CSS43;
 var init_orgchart = __esm({
   "src/components/orgchart.ts"() {
     "use strict";
     init_styles();
-    CSS44 = `
+    CSS43 = `
 [data-theme="dark"] .orgchart-node-table {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -14538,7 +15073,7 @@ __export(terminal_exports, {
   default: () => TerminalIsland
 });
 function TerminalIsland(container, props) {
-  injectIslandStyle("terminal", CSS45);
+  injectIslandStyle("terminal", CSS44);
   const promptPrefix = props.prompt || "admin@softmax:~$";
   const welcome = props.welcomeMessage || 'Welcome to SoftMax.LaughTale CLI v3.0\nType "help" for available commands.';
   const commands = {
@@ -14637,13 +15172,13 @@ ${h.response}`).join("\n");
   }
   render();
 }
-var CSS45;
+var CSS44;
 var init_terminal = __esm({
   "src/components/terminal.ts"() {
     "use strict";
     init_styles();
     init_useClipboard();
-    CSS45 = `
+    CSS44 = `
 [data-theme="dark"] .laughtale-terminal {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -14674,7 +15209,7 @@ __export(dock_exports, {
   default: () => DockIsland
 });
 function DockIsland(container, props) {
-  injectIslandStyle("dock", CSS46);
+  injectIslandStyle("dock", CSS45);
   const items = props.items || [
     { label: "Overview", icon: "compass", url: "/" },
     { label: "Dashboard", icon: "bar-chart", url: "/dashboard" },
@@ -14716,13 +15251,13 @@ function DockIsland(container, props) {
     });
   });
 }
-var CSS46;
+var CSS45;
 var init_dock = __esm({
   "src/components/dock.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS46 = `
+    CSS45 = `
 [data-theme="dark"] .laughtale-dock {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -14743,7 +15278,7 @@ __export(galleria_exports, {
   default: () => GalleriaIsland
 });
 function GalleriaIsland(container, props) {
-  injectIslandStyle("galleria", CSS47);
+  injectIslandStyle("galleria", CSS46);
   const images = props.value && props.value.length > 0 ? props.value : [
     {
       itemImageSrc: "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800&auto=format&fit=crop&q=80",
@@ -14817,13 +15352,13 @@ function GalleriaIsland(container, props) {
   }
   render();
 }
-var CSS47;
+var CSS46;
 var init_galleria = __esm({
   "src/components/galleria.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS47 = `
+    CSS46 = `
 [data-theme="dark"] .laughtale-galleria {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -14854,7 +15389,7 @@ __export(blockui_exports, {
   default: () => BlockUIIsland
 });
 function BlockUIIsland(container, props) {
-  injectIslandStyle("blockui", CSS48);
+  injectIslandStyle("blockui", CSS47);
   let isBlocked = props.blocked ?? true;
   function render() {
     container.innerHTML = `
@@ -14877,12 +15412,12 @@ function BlockUIIsland(container, props) {
     render();
   });
 }
-var CSS48;
+var CSS47;
 var init_blockui = __esm({
   "src/components/blockui.ts"() {
     "use strict";
     init_styles();
-    CSS48 = `
+    CSS47 = `
 [data-theme="dark"] .laughtale-blockui-root {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -14903,7 +15438,7 @@ __export(split_button_exports, {
   default: () => SplitButtonIsland
 });
 function SplitButtonIsland(container, props) {
-  injectIslandStyle("split-button", CSS49);
+  injectIslandStyle("split-button", CSS48);
   const label = props.label || "Save";
   const items = props.model || [
     { label: "Update & Sync", icon: "refresh-cw", action: "update" },
@@ -14967,7 +15502,7 @@ function SplitButtonIsland(container, props) {
     });
   });
 }
-var CSS49;
+var CSS48;
 var init_split_button = __esm({
   "src/components/split-button.ts"() {
     "use strict";
@@ -14976,7 +15511,7 @@ var init_split_button = __esm({
     init_useDisclosure();
     init_useClickOutside();
     init_useTransition();
-    CSS49 = `
+    CSS48 = `
 [data-theme="dark"] .splitbutton-main-btn {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -15007,7 +15542,7 @@ __export(select_exports, {
   default: () => SelectIsland
 });
 function SelectIsland(container, props) {
-  injectIslandStyle("laughtale-select", CSS50);
+  injectIslandStyle("laughtale-select", CSS49);
   const isMultiple = props.multiple === true || String(props.multiple) === "true";
   const isCheckmark = props.checkmark === true || String(props.checkmark) === "true";
   const isCheckbox = props.checkbox === true || String(props.checkbox) === "true";
@@ -15347,13 +15882,13 @@ function SelectIsland(container, props) {
   }
   render();
 }
-var CSS50;
+var CSS49;
 var init_select = __esm({
   "src/components/select.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS50 = `
+    CSS49 = `
 /* ==================== AURA SELECT ==================== */
 .laughtale-select,
 .p-select {
@@ -15780,7 +16315,7 @@ __export(checkbox_exports, {
   default: () => CheckboxIsland
 });
 function CheckboxIsland(container, props) {
-  injectIslandStyle("laughtale-checkbox", CSS51);
+  injectIslandStyle("laughtale-checkbox", CSS50);
   let isChecked = Boolean(props.checked);
   let isIndeterminate = Boolean(props.indeterminate);
   const size = props.size || "normal";
@@ -15852,13 +16387,13 @@ function CheckboxIsland(container, props) {
   }
   render();
 }
-var CSS51;
+var CSS50;
 var init_checkbox = __esm({
   "src/components/checkbox.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS51 = `
+    CSS50 = `
 .laughtale-checkbox-wrap {
     display: inline-flex;
     align-items: center;
@@ -16035,7 +16570,7 @@ __export(radio_button_exports, {
   default: () => RadioButtonIsland
 });
 function RadioButtonIsland(container, props) {
-  injectIslandStyle("laughtale-radio", CSS52);
+  injectIslandStyle("laughtale-radio", CSS51);
   const isCard = props.card === true || String(props.card) === "true";
   const isFilled = props.variant === "filled";
   const size = props.size || "normal";
@@ -16267,13 +16802,13 @@ function RadioButtonIsland(container, props) {
   }
   renderSingle();
 }
-var CSS52;
+var CSS51;
 var init_radio_button = __esm({
   "src/components/radio-button.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS52 = `
+    CSS51 = `
 /* ==================== AURA RADIOBUTTON ==================== */
 .laughtale-radio-root,
 .p-radiobutton-root {
@@ -16556,7 +17091,7 @@ __export(textarea_exports, {
   default: () => TextareaIsland
 });
 function TextareaIsland(container, props) {
-  injectIslandStyle("laughtale-textarea", CSS53);
+  injectIslandStyle("laughtale-textarea", CSS52);
   const isAutoResize = props.autoResize === true || String(props.autoResize) === "true";
   const isFluid = props.fluid === true || String(props.fluid) === "true";
   const isInvalid = props.invalid === true || String(props.invalid) === "true";
@@ -16632,12 +17167,12 @@ function TextareaIsland(container, props) {
     setTimeout(adjustHeight, 0);
   }
 }
-var CSS53;
+var CSS52;
 var init_textarea = __esm({
   "src/components/textarea.ts"() {
     "use strict";
     init_styles();
-    CSS53 = `
+    CSS52 = `
 /* ==================== AURA TEXTAREA ==================== */
 .p-textarea {
     font-family: var(--p-font-family, inherit);
@@ -16762,7 +17297,7 @@ __export(input_mask_exports, {
   default: () => InputMaskIsland
 });
 function InputMaskIsland(container, props) {
-  injectIslandStyle("laughtale-input-mask", CSS54);
+  injectIslandStyle("laughtale-input-mask", CSS53);
   const mask = props.mask || "(999) 999-9999";
   const slotChar = props.slotChar || "_";
   const autoClear = props.autoClear !== false && String(props.autoClear) !== "false";
@@ -16949,12 +17484,12 @@ function InputMaskIsland(container, props) {
   });
   syncValue();
 }
-var CSS54;
+var CSS53;
 var init_input_mask = __esm({
   "src/components/input-mask.ts"() {
     "use strict";
     init_styles();
-    CSS54 = `
+    CSS53 = `
 /* ==================== AURA INPUTMASK ==================== */
 .laughtale-input-mask,
 .p-inputmask {
@@ -17064,7 +17599,7 @@ __export(float_label_exports, {
   default: () => FloatLabelIsland
 });
 function FloatLabelIsland(container, props) {
-  injectIslandStyle("laughtale-float-label", CSS55);
+  injectIslandStyle("laughtale-float-label", CSS54);
   const variant = props.variant || "over";
   const initialHtml = container.innerHTML;
   const forAttr = props.for ? `for="${props.for}"` : "";
@@ -17142,12 +17677,12 @@ function FloatLabelIsland(container, props) {
   setTimeout(updateFloatingState, 50);
   setTimeout(updateFloatingState, 200);
 }
-var CSS55;
+var CSS54;
 var init_float_label = __esm({
   "src/components/float-label.ts"() {
     "use strict";
     init_styles();
-    CSS55 = `
+    CSS54 = `
 .laughtale-float-label {
     position: relative;
     display: inline-flex;
@@ -17274,7 +17809,7 @@ __export(ifta_label_exports, {
   default: () => IftaLabelIsland
 });
 function IftaLabelIsland(container, props) {
-  injectIslandStyle("laughtale-ifta-label", CSS56);
+  injectIslandStyle("laughtale-ifta-label", CSS55);
   const initialHtml = container.innerHTML;
   const forAttr = props.for ? `for="${props.for}"` : "";
   const existingLabel = container.querySelector("label");
@@ -17297,12 +17832,12 @@ function IftaLabelIsland(container, props) {
     }
   });
 }
-var CSS56;
+var CSS55;
 var init_ifta_label = __esm({
   "src/components/ifta-label.ts"() {
     "use strict";
     init_styles();
-    CSS56 = `
+    CSS55 = `
 .laughtale-ifta-label {
     position: relative;
     display: inline-flex;
@@ -17390,14 +17925,14 @@ __export(input_group_exports, {
   default: () => InputGroupIsland
 });
 function InputGroupIsland(container, props) {
-  injectIslandStyle("laughtale-inputgroup", CSS57);
+  injectIslandStyle("laughtale-inputgroup", CSS56);
   container.classList.add("laughtale-inputgroup", "p-inputgroup");
   if (props.size) {
     container.classList.add(`size-${props.size}`);
   }
 }
 function InputGroupAddonIsland(container, props) {
-  injectIslandStyle("laughtale-inputgroup", CSS57);
+  injectIslandStyle("laughtale-inputgroup", CSS56);
   container.classList.add("laughtale-inputgroup-addon", "p-inputgroup-addon");
   if (props.icon && !container.querySelector("svg")) {
     const svg = getLucideIcon(props.icon);
@@ -17409,13 +17944,13 @@ function InputGroupAddonIsland(container, props) {
     container.insertAdjacentHTML("beforeend", `<span>${props.text}</span>`);
   }
 }
-var CSS57;
+var CSS56;
 var init_input_group = __esm({
   "src/components/input-group.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS57 = `
+    CSS56 = `
 .laughtale-inputgroup,
 .p-inputgroup {
     display: flex;
@@ -17687,7 +18222,7 @@ __export(input_text_exports, {
   default: () => InputTextIsland
 });
 function InputTextIsland(container, props) {
-  injectIslandStyle("laughtale-inputtext", CSS58);
+  injectIslandStyle("laughtale-inputtext", CSS57);
   const [getValue, setValue] = useControllableState({
     defaultValue: props.value ?? "",
     onChange: (val) => {
@@ -17828,14 +18363,14 @@ function InputTextIsland(container, props) {
   }
   init();
 }
-var CSS58, xIcon;
+var CSS57, xIcon;
 var init_input_text = __esm({
   "src/components/input-text.ts"() {
     "use strict";
     init_styles();
     init_lucide();
     init_useControllableState();
-    CSS58 = `
+    CSS57 = `
 .laughtale-inputtext-wrap,
 .p-inputtext-wrap {
     position: relative;
@@ -18331,7 +18866,7 @@ __export(paginator_exports, {
   default: () => PaginatorIsland
 });
 function PaginatorIsland(container, props) {
-  injectIslandStyle("paginator", CSS59);
+  injectIslandStyle("paginator", CSS58);
   let first = props.first || 0;
   let rows = props.rows || 10;
   const totalRecords = props.totalRecords || 0;
@@ -18391,13 +18926,13 @@ function PaginatorIsland(container, props) {
   }
   render();
 }
-var CSS59;
+var CSS58;
 var init_paginator = __esm({
   "src/components/paginator.ts"() {
     "use strict";
     init_lucide();
     init_styles();
-    CSS59 = `
+    CSS58 = `
 .laughtale-paginator {
     display: flex;
     align-items: center;
