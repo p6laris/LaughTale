@@ -17417,39 +17417,19 @@ public static class AppTheme
       }
     }
     buildNodeMap(rootNode);
-    function getNodeIcon(iconName) {
+    function getNodeIconSvg(iconName) {
       if (!iconName) return "";
-      switch (iconName.toLowerCase()) {
-        case "cloud":
-          return LucideIcons.cloud || LucideIcons.globe;
-        case "server":
-          return LucideIcons.server || LucideIcons.cpu;
-        case "database":
-          return LucideIcons.database || LucideIcons.layers;
-        case "globe":
-          return LucideIcons.globe;
-        case "shield":
-          return LucideIcons.shield || LucideIcons.lock;
-        case "box":
-          return LucideIcons.package;
-        case "bolt":
-          return LucideIcons.zap || LucideIcons.activity;
-        case "user":
-          return LucideIcons.user;
-        case "users":
-          return LucideIcons.users;
-        default:
-          return LucideIcons.circle || "";
-      }
+      const key = iconName.toLowerCase();
+      return ICONS[key] || ICONS.bolt;
     }
     function renderNodeCardContent(node, isSelected, isIndet) {
       const checkboxHtml = selectionMode === "checkbox" ? `
             <div class="p-checkbox-box ${isSelected ? "p-checked" : isIndet ? "p-indeterminate" : ""}" role="checkbox" aria-checked="${isSelected}">
-                ${isSelected ? LucideIcons.check : isIndet ? '<span style="width: 8px; height: 2px; background: white; border-radius: 1px;"></span>' : ""}
+                ${isSelected ? ICONS.check : isIndet ? '<span style="width: 8px; height: 2px; background: white; border-radius: 1px;"></span>' : ""}
             </div>
         ` : "";
       if (node.icon || node.accent || node.description) {
-        const iconSvg = getNodeIcon(node.icon);
+        const iconSvg = getNodeIconSvg(node.icon);
         const accentClass = node.accent || "bg-emerald-500/10 text-emerald-500";
         return `
                 ${checkboxHtml}
@@ -17482,9 +17462,9 @@ public static class AppTheme
     }
     function getToggleIconSvg(isCollapsed) {
       if (toggleIconType === "plusMinus") {
-        return isCollapsed ? LucideIcons.plus : LucideIcons.minus;
+        return isCollapsed ? ICONS.plus : ICONS.minus;
       }
-      return isCollapsed ? LucideIcons.chevronDown : LucideIcons.chevronUp;
+      return isCollapsed ? ICONS.chevronDown : ICONS.chevronUp;
     }
     function renderBranch(node) {
       const key = String(node.key);
@@ -17533,11 +17513,11 @@ public static class AppTheme
           node.children.forEach((child, idx) => {
             const isFirst = idx === 0;
             const isLast = idx === childCount - 1;
-            const leftClass = isFirst ? "" : "p-organizationchart-line-top";
-            const rightClass = isLast ? "" : "p-organizationchart-line-top";
+            const leftTop = !isFirst ? "p-organizationchart-line-top" : "";
+            const rightTop = !isLast ? "p-organizationchart-line-top" : "";
             connectorTds.push(`
-                        <td class="p-organizationchart-line-left ${leftClass}">&nbsp;</td>
-                        <td class="p-organizationchart-line-right ${rightClass}">&nbsp;</td>
+                        <td class="p-organizationchart-line-left ${leftTop}">&nbsp;</td>
+                        <td class="p-organizationchart-line-right ${rightTop}">&nbsp;</td>
                     `);
             childTds.push(`
                         <td colspan="2" class="p-organizationchart-node-cell">
@@ -17642,14 +17622,17 @@ public static class AppTheme
           if (chk) {
             chk.className = `p-checkbox-box ${isSelected ? "p-checked" : isIndet ? "p-indeterminate" : ""}`;
             chk.setAttribute("aria-checked", String(isSelected));
-            chk.innerHTML = isSelected ? LucideIcons.check : isIndet ? '<span style="width: 8px; height: 2px; background: white; border-radius: 1px;"></span>' : "";
+            chk.innerHTML = isSelected ? ICONS.check : isIndet ? '<span style="width: 8px; height: 2px; background: white; border-radius: 1px;"></span>' : "";
           }
         }
       });
-      const statusEl = container.parentElement?.querySelector(".p-orgchart-selection-status") || document.querySelector(".p-orgchart-selection-status");
-      if (statusEl) {
-        const arr = Array.from(selectedKeys);
-        statusEl.textContent = arr.length > 0 ? arr.join(", ") : "-";
+      const parentCard = container.closest(".demo-subcard") || container.parentElement;
+      if (parentCard) {
+        const statusEl = parentCard.querySelector(".p-orgchart-selected-text");
+        if (statusEl) {
+          const arr = Array.from(selectedKeys);
+          statusEl.textContent = arr.length > 0 ? arr.join(", ") : "-";
+        }
       }
       dispatchSelectionEvent();
       syncValues();
@@ -17718,9 +17701,9 @@ public static class AppTheme
         });
       });
     }
-    const parentSection = container.closest("section") || container.parentElement;
-    if (parentSection) {
-      parentSection.querySelectorAll("[data-orgchart-action]").forEach((btn) => {
+    const parentContainer = container.closest(".demo-subcard") || container.closest("section") || container.parentElement;
+    if (parentContainer) {
+      parentContainer.querySelectorAll("[data-orgchart-action]").forEach((btn) => {
         btn.addEventListener("click", () => {
           const action = btn.getAttribute("data-orgchart-action");
           if (action === "expand-all") {
@@ -17757,15 +17740,14 @@ public static class AppTheme
     renderTree();
     syncValues();
   }
-  var ORGCHART_CSS;
+  var ORGCHART_CSS, ICONS;
   var init_orgchart = __esm({
     "src/components/orgchart.ts"() {
       "use strict";
       init_styles();
-      init_lucide();
       ORGCHART_CSS = `
 .p-organizationchart {
-    display: flex;
+    display: inline-flex;
     flex-direction: column;
     align-items: center;
     width: 100%;
@@ -17797,18 +17779,19 @@ public static class AppTheme
     border-radius: var(--p-border-radius-lg, 8px);
     padding: 0.75rem 1.25rem;
     min-width: 9.5rem;
-    box-shadow: var(--p-shadow-xs, 0 1px 2px 0 rgba(0, 0, 0, 0.05));
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease, box-shadow 0.12s ease;
     user-select: none;
+    overflow: visible !important;
 }
 
 .p-organizationchart-node.p-organizationchart-selectable {
     cursor: pointer;
 }
 .p-organizationchart-node.p-organizationchart-selectable:hover:not(.p-highlight) {
-    background: var(--p-surface-100, #f1f5f9);
+    background: var(--p-surface-50, #f8fafc);
     border-color: var(--p-surface-300, #cbd5e1);
-    box-shadow: var(--p-shadow-sm, 0 1px 3px 0 rgba(0, 0, 0, 0.1));
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
 }
 
 .p-organizationchart-node.p-highlight {
@@ -17819,22 +17802,33 @@ public static class AppTheme
 }
 
 /* Connector Lines */
-.p-organizationchart-line-down-container {
+.p-organizationchart-lines {
     height: 20px;
 }
+.p-organizationchart-lines td {
+    height: 20px;
+    padding: 0 !important;
+    margin: 0 !important;
+    font-size: 0 !important;
+    line-height: 0 !important;
+    box-sizing: border-box;
+}
+
 .p-organizationchart-line-down {
     width: 1px;
     height: 20px;
-    background: var(--p-surface-300, #cbd5e1);
+    background-color: var(--p-surface-300, #cbd5e1);
     margin: 0 auto;
 }
 
 .p-organizationchart-line-left {
     border-right: 1px solid var(--p-surface-300, #cbd5e1);
 }
+
 .p-organizationchart-line-right {
-    border-left: 1px solid var(--p-surface-300, #cbd5e1);
+    /* Transparent vertical seam */
 }
+
 .p-organizationchart-line-top {
     border-top: 1px solid var(--p-surface-300, #cbd5e1);
 }
@@ -17842,11 +17836,11 @@ public static class AppTheme
 /* Toggle / Collapse Button */
 .p-organizationchart-node-toggle-button {
     position: absolute;
-    bottom: -0.625rem;
+    bottom: -0.6875rem;
     left: 50%;
     transform: translateX(-50%);
-    width: 1.25rem;
-    height: 1.25rem;
+    width: 1.375rem;
+    height: 1.375rem;
     border-radius: 9999px;
     background: var(--p-surface-0, #ffffff);
     border: 1px solid var(--p-surface-300, #cbd5e1);
@@ -17855,9 +17849,10 @@ public static class AppTheme
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    z-index: 3;
+    z-index: 10;
     padding: 0;
     outline: none;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.08);
     transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
 }
 .p-organizationchart-node-toggle-button:hover {
@@ -17879,7 +17874,7 @@ public static class AppTheme
     cursor: pointer;
     transition: background-color 0.12s ease, border-color 0.12s ease;
     flex-shrink: 0;
-    margin-right: 0.5rem;
+    margin-right: 0.625rem;
 }
 .p-checkbox-box.p-checked {
     background: var(--p-primary-500, #10b981);
@@ -17892,7 +17887,7 @@ public static class AppTheme
     color: #ffffff;
 }
 
-/* Custom Card Templates */
+/* Custom Card Content */
 .p-orgchart-card-content {
     display: flex;
     align-items: center;
@@ -17913,8 +17908,8 @@ public static class AppTheme
     flex-shrink: 0;
 }
 .p-orgchart-icon-box {
-    width: 2rem;
-    height: 2rem;
+    width: 2.25rem;
+    height: 2.25rem;
     border-radius: 6px;
     display: flex;
     align-items: center;
@@ -17924,10 +17919,10 @@ public static class AppTheme
 .p-orgchart-details {
     display: flex;
     flex-direction: column;
-    gap: 0.1rem;
+    gap: 0.15rem;
 }
 .p-orgchart-label {
-    font-weight: 700;
+    font-weight: 600;
     font-size: 0.875rem;
     color: var(--p-surface-900, #0f172a);
     line-height: 1.25;
@@ -17962,13 +17957,11 @@ public static class AppTheme
 }
 .dark .p-organizationchart-line-down,
 .dark .p-organizationchart-line-left,
-.dark .p-organizationchart-line-right,
 .dark .p-organizationchart-line-top,
 [data-theme="dark"] .p-organizationchart-line-down,
 [data-theme="dark"] .p-organizationchart-line-left,
-[data-theme="dark"] .p-organizationchart-line-right,
 [data-theme="dark"] .p-organizationchart-line-top {
-    background: var(--p-surface-700, #334155) !important;
+    background-color: var(--p-surface-700, #334155) !important;
     border-color: var(--p-surface-700, #334155) !important;
 }
 .dark .p-organizationchart-node-toggle-button,
@@ -17986,6 +17979,20 @@ public static class AppTheme
     color: var(--p-surface-400, #94a3b8) !important;
 }
 `;
+      ICONS = {
+        chevronDown: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>',
+        chevronUp: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>',
+        plus: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>',
+        minus: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>',
+        check: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+        cloud: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>',
+        server: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="8" x="2" y="2" rx="2" ry="2"/><rect width="20" height="8" x="2" y="14" rx="2" ry="2"/><line x1="6" x2="6.01" y1="6" y2="6"/><line x1="6" x2="6.01" y1="18" y2="18"/></svg>',
+        database: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>',
+        globe: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>',
+        shield: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>',
+        box: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>',
+        bolt: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>'
+      };
     }
   });
 
