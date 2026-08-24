@@ -9,11 +9,12 @@ import {
 var DATATABLE_CSS = `
 .p-datatable {
     position: relative;
-    border-radius: var(--p-border-radius-lg, 8px);
+    border-radius: var(--p-border-radius-lg, 10px);
     background: var(--p-surface-0, #ffffff);
     color: var(--p-surface-800, #1e293b);
     font-family: var(--p-font-family, inherit);
     border: 1px solid var(--p-surface-200, #e2e8f0);
+    box-shadow: var(--p-shadow-xs, 0 1px 2px 0 rgba(0, 0, 0, 0.05));
     overflow: hidden;
 }
 
@@ -26,11 +27,12 @@ var DATATABLE_CSS = `
 
 /* Header Cells */
 .p-datatable-thead > tr > th {
-    padding: 0.75rem 1rem;
+    padding: 0.875rem 1rem;
     background: var(--p-surface-50, #f8fafc);
     color: var(--p-surface-700, #334155);
-    font-weight: 600;
+    font-weight: 700;
     font-size: 0.8125rem;
+    letter-spacing: 0.01em;
     border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
     text-align: left;
     user-select: none;
@@ -56,7 +58,7 @@ var DATATABLE_CSS = `
     display: inline-flex;
     align-items: center;
     color: var(--p-surface-400, #94a3b8);
-    transition: color 0.15s ease;
+    transition: color 0.15s ease, transform 0.15s ease;
 }
 .p-sortable-column.p-sorted .p-datatable-sort-icon {
     color: var(--p-primary-500, #10b981);
@@ -77,13 +79,13 @@ var DATATABLE_CSS = `
 
 /* Filter Row */
 .p-datatable-filter-row > th {
-    padding: 0.35rem 0.75rem;
+    padding: 0.4rem 0.75rem;
     background: var(--p-surface-50, #f8fafc);
     border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
 }
 .p-datatable-filter-input {
     width: 100%;
-    padding: 0.35rem 0.6rem;
+    padding: 0.4rem 0.65rem;
     font-size: 0.8125rem;
     border: 1px solid var(--p-surface-300, #cbd5e1);
     border-radius: var(--p-border-radius, 6px);
@@ -103,9 +105,10 @@ var DATATABLE_CSS = `
 }
 
 .p-datatable-tbody > tr > td {
-    padding: 0.75rem 1rem;
+    padding: 0.875rem 1rem;
     border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
     color: var(--p-surface-700, #334155);
+    vertical-align: middle;
 }
 
 .p-datatable-tbody > tr:hover {
@@ -124,14 +127,14 @@ var DATATABLE_CSS = `
 /* Size Variants */
 .p-datatable-sm .p-datatable-thead > tr > th,
 .p-datatable-sm .p-datatable-tbody > tr > td {
-    padding: 0.375rem 0.625rem;
-    font-size: 0.75rem;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8125rem;
 }
 
 .p-datatable-lg .p-datatable-thead > tr > th,
 .p-datatable-lg .p-datatable-tbody > tr > td {
-    padding: 1rem 1.25rem;
-    font-size: 0.9375rem;
+    padding: 1.15rem 1.35rem;
+    font-size: 1rem;
 }
 
 /* Striped Rows */
@@ -185,14 +188,15 @@ var DATATABLE_CSS = `
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.25rem;
+    width: 1.75rem;
+    height: 1.75rem;
     border-radius: 9999px;
     color: var(--p-surface-500, #64748b);
-    transition: background-color 0.15s ease, color 0.15s ease;
+    transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
 }
 .p-row-toggler:hover {
     background: var(--p-surface-200, #e2e8f0);
-    color: var(--p-surface-800, #1e293b);
+    color: var(--p-surface-900, #0f172a);
 }
 
 /* Custom Checkbox & Radio */
@@ -200,13 +204,14 @@ var DATATABLE_CSS = `
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 1.125rem;
-    height: 1.125rem;
-    border-radius: var(--p-border-radius-xs, 4px);
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: var(--p-border-radius-xs, 5px);
     border: 2px solid var(--p-surface-300, #cbd5e1);
     background: var(--p-surface-0, #ffffff);
     cursor: pointer;
     transition: all 0.15s ease;
+    user-select: none;
 }
 .p-radio-box {
     border-radius: 9999px;
@@ -217,18 +222,92 @@ var DATATABLE_CSS = `
     color: #ffffff;
 }
 
+/* Aura Tags & Badges */
+.p-tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem 0.55rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    text-transform: capitalize;
+    white-space: nowrap;
+}
+.p-tag-success { background: #dcfce7; color: #15803d; }
+.p-tag-warn { background: #fef3c7; color: #b45309; }
+.p-tag-danger { background: #fee2e2; color: #b91c1c; }
+.p-tag-info { background: #e0f2fe; color: #0369a1; }
+.p-tag-secondary { background: var(--p-surface-100, #f1f5f9); color: var(--p-surface-700, #334155); }
+
+/* Product, Rep & Country Flex Formats */
+.p-product-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.p-product-avatar {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 6px;
+    background: var(--p-surface-100, #f1f5f9);
+    border: 1px solid var(--p-surface-200, #e2e8f0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--p-primary-600, #059669);
+    flex-shrink: 0;
+}
+.p-product-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+.p-product-name {
+    font-weight: 600;
+    color: var(--p-surface-900, #0f172a);
+}
+.p-product-code {
+    font-size: 0.75rem;
+    color: var(--p-surface-400, #94a3b8);
+    font-family: monospace;
+}
+
+.p-country-cell, .p-rep-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.p-rep-avatar {
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 9999px;
+    background: var(--p-primary-100, #d1fae5);
+    color: var(--p-primary-700, #047857);
+    font-weight: 700;
+    font-size: 0.6875rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
 /* In-place Editable Cell */
 .p-editable-cell {
     cursor: pointer;
     position: relative;
     border-radius: var(--p-border-radius-xs, 4px);
+    transition: background-color 0.15s ease;
 }
 .p-editable-cell:hover {
     outline: 1px dashed var(--p-primary-400, #34d399);
+    background: rgba(16, 185, 129, 0.04);
 }
 .p-cell-editor-input {
     width: 100%;
-    padding: 0.25rem 0.5rem;
+    padding: 0.35rem 0.5rem;
     font-size: inherit;
     border: 1px solid var(--p-primary-500, #10b981);
     border-radius: var(--p-border-radius-xs, 4px);
@@ -238,7 +317,7 @@ var DATATABLE_CSS = `
     box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
 }
 
-/* Toolbar & Global Filter */
+/* Toolbar, Selection Bar & Controls */
 .p-datatable-header-toolbar {
     display: flex;
     align-items: center;
@@ -253,6 +332,43 @@ var DATATABLE_CSS = `
     font-weight: 700;
     font-size: 1rem;
     color: var(--p-surface-900, #0f172a);
+}
+
+.p-datatable-selection-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.625rem 1.25rem;
+    background: var(--p-surface-50, #f8fafc);
+    border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
+    font-size: 0.8125rem;
+    font-weight: 500;
+}
+
+.p-size-switcher {
+    display: inline-flex;
+    border-radius: 6px;
+    border: 1px solid var(--p-surface-300, #cbd5e1);
+    overflow: hidden;
+    background: var(--p-surface-0, #ffffff);
+}
+.p-size-btn {
+    padding: 0.35rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: var(--p-surface-600, #475569);
+    transition: all 0.15s ease;
+}
+.p-size-btn:hover {
+    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-surface-900, #0f172a);
+}
+.p-size-btn.p-active {
+    background: var(--p-primary-500, #10b981);
+    color: #ffffff;
 }
 
 /* Paginator Integration */
@@ -307,7 +423,7 @@ var DATATABLE_CSS = `
     position: absolute;
     inset: 0;
     z-index: 50;
-    background: rgba(255, 255, 255, 0.75);
+    background: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(1px);
     display: flex;
     flex-direction: column;
@@ -318,7 +434,7 @@ var DATATABLE_CSS = `
 
 /* Skeleton Placeholders */
 .p-datatable-skeleton-cell {
-    height: 1rem;
+    height: 1.25rem;
     border-radius: 4px;
     background: linear-gradient(90deg, var(--p-surface-200, #e2e8f0) 25%, var(--p-surface-100, #f1f5f9) 50%, var(--p-surface-200, #e2e8f0) 75%);
     background-size: 200% 100%;
@@ -328,6 +444,11 @@ var DATATABLE_CSS = `
 @keyframes p-skeleton-shimmer {
     0% { background-position: 200% 0; }
     100% { background-position: -200% 0; }
+}
+
+@keyframes p-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 /* Dark Mode Tokens */
@@ -358,8 +479,10 @@ var DATATABLE_CSS = `
 }
 .dark .p-datatable-header-toolbar,
 .dark .p-datatable-paginator,
+.dark .p-datatable-selection-bar,
 [data-theme="dark"] .p-datatable-header-toolbar,
-[data-theme="dark"] .p-datatable-paginator {
+[data-theme="dark"] .p-datatable-paginator,
+[data-theme="dark"] .p-datatable-selection-bar {
     background: var(--p-surface-900, #0f172a) !important;
     border-color: var(--p-surface-700, #334155) !important;
     color: var(--p-surface-300, #cbd5e1) !important;
@@ -379,14 +502,22 @@ var DATATABLE_CSS = `
 }
 .dark .p-datatable-loading-overlay,
 [data-theme="dark"] .p-datatable-loading-overlay {
-    background: rgba(15, 23, 42, 0.75) !important;
+    background: rgba(15, 23, 42, 0.8) !important;
+}
+.dark .p-tag-secondary, [data-theme="dark"] .p-tag-secondary {
+    background: var(--p-surface-800, #1e293b);
+    color: var(--p-surface-200, #e2e8f0);
+}
+.dark .p-product-avatar, [data-theme="dark"] .p-product-avatar {
+    background: var(--p-surface-800, #1e293b);
+    border-color: var(--p-surface-700, #334155);
 }
 `;
 function DataTableIsland(container, props) {
   injectIslandStyle("datatable", DATATABLE_CSS);
   const rawData = [...props.value || props.data || []];
   const columns = props.columns || [];
-  const size = props.size || "normal";
+  let currentSize = props.size || "normal";
   const showGridlines = !!props.showGridlines;
   const stripedRows = !!props.stripedRows;
   const selectionMode = props.selectionMode;
@@ -406,6 +537,7 @@ function DataTableIsland(container, props) {
   const loadingMode = props.loadingMode || "overlay";
   const exportFilename = props.exportFilename || "datatable_export";
   const emptyMessage = props.emptyMessage || "No records found.";
+  const showInteractiveSize = !!props.interactiveSize;
   let globalFilter = "";
   const columnFilters = {};
   let sortMeta = [];
@@ -421,6 +553,64 @@ function DataTableIsland(container, props) {
       return field.split(".").reduce((acc, part) => acc?.[part], obj);
     }
     return obj[field];
+  }
+  function renderCellContent(row, col, rawVal) {
+    const fieldName = (col.field || "").toLowerCase();
+    const headerName = (col.header || "").toLowerCase();
+    if (fieldName.includes("status") || headerName.includes("status")) {
+      const strVal = String(rawVal || "").toUpperCase();
+      if (strVal === "INSTOCK" || strVal === "QUALIFIED") {
+        return `<span class="p-tag p-tag-success">${strVal === "INSTOCK" ? "In Stock" : "Qualified"}</span>`;
+      }
+      if (strVal === "LOWSTOCK" || strVal === "NEGOTIATION") {
+        return `<span class="p-tag p-tag-warn">${strVal === "LOWSTOCK" ? "Low Stock" : "Negotiation"}</span>`;
+      }
+      if (strVal === "OUTOFSTOCK" || strVal === "UNQUALIFIED") {
+        return `<span class="p-tag p-tag-danger">${strVal === "OUTOFSTOCK" ? "Out of Stock" : "Unqualified"}</span>`;
+      }
+      if (strVal === "NEW" || strVal === "PROPOSAL") {
+        return `<span class="p-tag p-tag-info">${strVal}</span>`;
+      }
+      return `<span class="p-tag p-tag-secondary">${rawVal ?? ""}</span>`;
+    }
+    if (fieldName === "category") {
+      return `<span class="p-tag p-tag-secondary">${rawVal ?? ""}</span>`;
+    }
+    if ((fieldName === "name" || headerName === "product") && row.code) {
+      return `
+                <div class="p-product-cell">
+                    <div class="p-product-avatar">${LucideIcons.package}</div>
+                    <div class="p-product-info">
+                        <span class="p-product-name">${row.name ?? ""}</span>
+                        <span class="p-product-code">${row.code ?? ""}</span>
+                    </div>
+                </div>
+            `;
+    }
+    if (fieldName === "country") {
+      return `
+                <div class="p-country-cell">
+                    <span style="font-size: 1rem; line-height: 1;">\u{1F310}</span>
+                    <span>${rawVal ?? ""}</span>
+                </div>
+            `;
+    }
+    if (fieldName.includes("rep") || headerName.includes("representative")) {
+      const initials = String(rawVal || "U").split(" ").map((n) => n[0]).join("").substring(0, 2);
+      return `
+                <div class="p-rep-cell">
+                    <div class="p-rep-avatar">${initials}</div>
+                    <span>${rawVal ?? ""}</span>
+                </div>
+            `;
+    }
+    if (typeof rawVal === "number" && (fieldName.includes("price") || fieldName.includes("balance"))) {
+      return `<span style="font-weight: 700; color: var(--p-surface-900);">$${rawVal.toLocaleString()}</span>`;
+    }
+    if (fieldName === "verified") {
+      return rawVal ? `<span class="p-tag p-tag-success">Verified</span>` : `<span class="p-tag p-tag-secondary">\u2014</span>`;
+    }
+    return rawVal != null ? String(rawVal) : "";
   }
   function exportCSV() {
     if (rawData.length === 0) return;
@@ -487,13 +677,13 @@ function DataTableIsland(container, props) {
     const firstIdx = (currentPage - 1) * rowsPerPage;
     const displayRows = paginator ? filtered.slice(firstIdx, firstIdx + rowsPerPage) : filtered;
     const rootClasses = ["p-datatable", "p-component"];
-    if (size === "small") rootClasses.push("p-datatable-sm");
-    if (size === "large") rootClasses.push("p-datatable-lg");
+    if (currentSize === "small") rootClasses.push("p-datatable-sm");
+    if (currentSize === "large") rootClasses.push("p-datatable-lg");
     if (showGridlines) rootClasses.push("p-datatable-gridlines");
     if (stripedRows) rootClasses.push("p-datatable-striped");
     if (scrollable) rootClasses.push("p-datatable-scrollable");
     const allPageSelected = displayRows.length > 0 && displayRows.every((r) => selectedKeys.has(r[dataKey]));
-    const headerCells = columns.map((col, cIdx) => {
+    const headerCells = columns.map((col) => {
       const isSortable = !!col.sortable;
       const sortItem = sortMeta.find((m) => m.field === col.field);
       const isSorted = !!sortItem;
@@ -501,9 +691,9 @@ function DataTableIsland(container, props) {
       const sortBadge = sortMode === "multiple" && sortMeta.length > 1 && isSorted ? `<span class="p-datatable-sort-badge">${sortMeta.indexOf(sortItem) + 1}</span>` : "";
       let sortIconSvg = "";
       if (isSortable) {
-        if (sortOrder === 1) sortIconSvg = LucideIcons.arrowUp || "\u25B2";
-        else if (sortOrder === -1) sortIconSvg = LucideIcons.arrowDown || "\u25BC";
-        else sortIconSvg = LucideIcons.arrowUpDown || "\u2195";
+        if (sortOrder === 1) sortIconSvg = LucideIcons.arrowUp;
+        else if (sortOrder === -1) sortIconSvg = LucideIcons.arrowDown;
+        else sortIconSvg = LucideIcons.arrowUpDown;
       }
       let frozenClass = "";
       if (col.frozen) {
@@ -518,7 +708,7 @@ function DataTableIsland(container, props) {
         return `
                     <th class="${frozenClass}" style="width: 3.5rem; text-align: center;">
                         <div class="p-checkbox-box p-select-all ${allPageSelected ? "p-checked" : ""}" role="checkbox" aria-checked="${allPageSelected}">
-                            ${allPageSelected ? LucideIcons.check || "\u2713" : ""}
+                            ${allPageSelected ? LucideIcons.check : ""}
                         </div>
                     </th>
                 `;
@@ -576,7 +766,7 @@ function DataTableIsland(container, props) {
                 <tr>
                     <td colspan="${columns.length}" style="text-align: center; padding: 3rem 1rem; color: var(--p-surface-400);">
                         <div style="display: flex; flex-direction: column; align-items: center; gap: 0.75rem;">
-                            <span style="font-size: 1.75rem; color: var(--p-surface-400);">${LucideIcons.inbox || "\u{1F4ED}"}</span>
+                            <span style="font-size: 1.75rem; color: var(--p-surface-400);">${LucideIcons.inbox}</span>
                             <span style="font-weight: 600; font-size: 0.9375rem; color: var(--p-surface-700);">${emptyMessage}</span>
                         </div>
                     </td>
@@ -598,7 +788,7 @@ function DataTableIsland(container, props) {
             return `
                             <td class="${frozenClass}" style="width: 3.5rem; text-align: center;">
                                 <div class="p-checkbox-box p-row-checkbox ${isSelected ? "p-checked" : ""}" data-row-key="${rowKey}">
-                                    ${isSelected ? LucideIcons.check || "\u2713" : ""}
+                                    ${isSelected ? LucideIcons.check : ""}
                                 </div>
                             </td>
                         `;
@@ -616,7 +806,7 @@ function DataTableIsland(container, props) {
             return `
                             <td class="${frozenClass}" style="width: 3.5rem; text-align: center;">
                                 <button type="button" class="p-row-toggler" data-row-key="${rowKey}" aria-label="Toggle Row">
-                                    ${isExpanded ? LucideIcons.chevronDown || "\u25BC" : LucideIcons.chevronRight || "\u25B6"}
+                                    ${isExpanded ? LucideIcons.chevronDown : LucideIcons.chevronRight}
                                 </button>
                             </td>
                         `;
@@ -635,17 +825,14 @@ function DataTableIsland(container, props) {
                             </td>
                         `;
           }
-          let cellDisplay = rawVal ?? "";
-          if (typeof rawVal === "number" && col.field.toLowerCase().includes("price")) {
-            cellDisplay = `$${rawVal.toLocaleString()}`;
-          }
+          const formattedContent = renderCellContent(row, col, rawVal);
           const editableClass = editMode === "cell" && col.field ? "p-editable-cell" : "";
           return `
                         <td class="${frozenClass} ${editableClass} ${col.bodyClass || ""}" 
                             data-row-key="${rowKey}" 
                             data-field="${col.field || ""}" 
                             style="${styleAttr}">
-                            ${cellDisplay}
+                            ${formattedContent}
                         </td>
                     `;
         }).join("");
@@ -659,18 +846,22 @@ function DataTableIsland(container, props) {
           expansionHtml = `
                         <tr class="p-row-expansion">
                             <td colspan="${columns.length}" style="padding: 1.25rem;">
-                                <div style="display: flex; gap: 1.25rem; align-items: center;">
-                                    <div style="width: 50px; height: 50px; border-radius: 8px; background: var(--p-surface-200); display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
-                                        ${LucideIcons.package || "\u{1F4E6}"}
+                                <div style="display: flex; gap: 1.25rem; align-items: center; background: var(--p-surface-0); padding: 1rem; border-radius: 8px; border: 1px solid var(--p-surface-200);">
+                                    <div style="width: 56px; height: 56px; border-radius: 8px; background: var(--p-primary-50, #ecfdf5); border: 1px solid var(--p-primary-200, #a7f3d0); display: flex; align-items: center; justify-content: center; color: var(--p-primary-600); font-size: 1.5rem; flex-shrink: 0;">
+                                        ${LucideIcons.package}
                                     </div>
-                                    <div style="display: flex; flex-direction: column; gap: 0.25rem;">
-                                        <div style="font-weight: 700; color: var(--p-surface-900); font-size: 0.9375rem;">
-                                            ${row.name || row.title || `Record #${rowKey}`}
+                                    <div style="display: flex; flex-direction: column; gap: 0.35rem; flex: 1;">
+                                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                                            <span style="font-weight: 700; color: var(--p-surface-900); font-size: 1rem;">
+                                                ${row.name || row.title || `Record #${rowKey}`}
+                                            </span>
+                                            <span class="p-tag p-tag-success">${row.inventoryStatus || "Active"}</span>
                                         </div>
-                                        <div style="font-size: 0.8125rem; color: var(--p-surface-500);">
-                                            ${row.category ? `Category: ${row.category} \u2022 ` : ""}
-                                            ${row.code ? `SKU: ${row.code} \u2022 ` : ""}
-                                            ${row.quantity != null ? `In Stock: ${row.quantity} units` : ""}
+                                        <div style="font-size: 0.8125rem; color: var(--p-surface-500); display: flex; gap: 1.5rem;">
+                                            <span>SKU: <strong>${row.code || "N/A"}</strong></span>
+                                            <span>Category: <strong>${row.category || "General"}</strong></span>
+                                            <span>Stock: <strong>${row.quantity ?? 0} units</strong></span>
+                                            <span>Price: <strong>$${row.price ?? 0}</strong></span>
                                         </div>
                                     </div>
                                 </div>
@@ -680,6 +871,24 @@ function DataTableIsland(container, props) {
         }
         return rowHtml + expansionHtml;
       }).join("");
+    }
+    let selectionBarHtml = "";
+    if (selectedKeys.size > 0) {
+      const selectedRows = rawData.filter((r) => selectedKeys.has(r[dataKey]));
+      const totalVal = selectedRows.reduce((sum, r) => sum + (Number(r.price) || Number(r.balance) || 0), 0);
+      selectionBarHtml = `
+                <div class="p-datatable-selection-bar">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span class="p-tag p-tag-info" style="font-weight: 700;">Selected: ${selectedKeys.size}</span>
+                        ${totalVal > 0 ? `<span>Total: <strong>$${totalVal.toLocaleString()}</strong></span>` : ""}
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <button type="button" class="p-datatable-clear-selection" style="padding: 0.3rem 0.6rem; font-size: 0.75rem; border-radius: 4px; border: 1px solid var(--p-surface-300); background: transparent; cursor: pointer; color: var(--p-surface-600);">
+                            Clear Selection
+                        </button>
+                    </div>
+                </div>
+            `;
     }
     let paginatorHtml = "";
     if (paginator) {
@@ -717,18 +926,33 @@ function DataTableIsland(container, props) {
             `;
     }
     let toolbarHtml = "";
-    if (props.title || props.globalFilterFields || props.exportFilename) {
+    const hasToolbar = props.title || props.globalFilterFields || props.exportFilename || showInteractiveSize || loading;
+    if (hasToolbar) {
       toolbarHtml = `
                 <div class="p-datatable-header-toolbar">
                     <div class="p-datatable-title">${props.title || ""}</div>
-                    <div style="display: flex; align-items: center; gap: 0.75rem;">
-                        ${props.globalFilterFields ? `
-                            <div style="position: relative; display: flex; align-items: center;">
-                                <input type="text" class="p-datatable-global-filter p-datatable-filter-input" placeholder="Search keywords..." value="${globalFilter}" style="width: 200px;" />
+                    <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                        ${showInteractiveSize ? `
+                            <div class="p-size-switcher">
+                                <button type="button" class="p-size-btn ${currentSize === "small" ? "p-active" : ""}" data-size="small">Small</button>
+                                <button type="button" class="p-size-btn ${currentSize === "normal" ? "p-active" : ""}" data-size="normal">Normal</button>
+                                <button type="button" class="p-size-btn ${currentSize === "large" ? "p-active" : ""}" data-size="large">Large</button>
                             </div>
                         ` : ""}
+
+                        ${props.globalFilterFields ? `
+                            <div style="position: relative; display: flex; align-items: center;">
+                                <input type="text" class="p-datatable-global-filter p-datatable-filter-input" placeholder="Search keyword..." value="${globalFilter}" style="width: 180px;" />
+                            </div>
+                        ` : ""}
+
+                        <button type="button" class="p-datatable-refresh-btn" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.4rem 0.75rem; border-radius: 6px; border: 1px solid var(--p-surface-300); background: var(--p-surface-0); color: inherit; font-size: 0.8125rem; font-weight: 600; cursor: pointer;">
+                            <span>${LucideIcons.refreshCw}</span>
+                            <span>Refresh</span>
+                        </button>
+
                         <button type="button" class="p-datatable-export-btn" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.4rem 0.75rem; border-radius: 6px; border: 1px solid var(--p-surface-300); background: var(--p-surface-0); color: inherit; font-size: 0.8125rem; font-weight: 600; cursor: pointer;">
-                            <span>${LucideIcons.fileSpreadsheet || "\u{1F4CA}"}</span>
+                            <span>${LucideIcons.fileSpreadsheet}</span>
                             <span>Export CSV</span>
                         </button>
                     </div>
@@ -749,6 +973,7 @@ function DataTableIsland(container, props) {
             <div class="${rootClasses.join(" ")}">
                 ${loadingOverlayHtml}
                 ${toolbarHtml}
+                ${selectionBarHtml}
                 <div class="p-datatable-scrollable-wrapper" style="${scrollWrapperStyle}">
                     <table class="p-datatable-table" style="${props.tableStyle || ""}">
                         <thead class="p-datatable-thead">
@@ -820,11 +1045,31 @@ function DataTableIsland(container, props) {
     if (exportBtn) {
       exportBtn.addEventListener("click", () => exportCSV());
     }
+    const refreshBtn = rootEl.querySelector(".p-datatable-refresh-btn");
+    if (refreshBtn) {
+      refreshBtn.addEventListener("click", () => {
+        loading = true;
+        render();
+        setTimeout(() => {
+          loading = false;
+          render();
+        }, 1e3);
+      });
+    }
+    rootEl.querySelectorAll(".p-size-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const s = btn.getAttribute("data-size");
+        if (s) {
+          currentSize = s;
+          render();
+        }
+      });
+    });
     const selectAllBox = rootEl.querySelector(".p-select-all");
     if (selectAllBox) {
       selectAllBox.addEventListener("click", () => {
         const allSelected = selectAllBox.classList.contains("p-checked");
-        const displayRows = getFilteredRows();
+        const displayRows = rawData;
         if (allSelected) {
           displayRows.forEach((r) => selectedKeys.delete(r[dataKey]));
         } else {
@@ -834,13 +1079,23 @@ function DataTableIsland(container, props) {
         render();
       });
     }
+    const clearSelBtn = rootEl.querySelector(".p-datatable-clear-selection");
+    if (clearSelBtn) {
+      clearSelBtn.addEventListener("click", () => {
+        selectedKeys.clear();
+        dispatchSelectionEvent();
+        render();
+      });
+    }
     rootEl.querySelectorAll(".p-row-checkbox").forEach((box) => {
       box.addEventListener("click", (e) => {
         e.stopPropagation();
         const key = box.getAttribute("data-row-key");
         if (!key) return;
-        if (selectedKeys.has(key)) selectedKeys.delete(key);
-        else selectedKeys.add(key);
+        const matchedRow = rawData.find((r) => String(r[dataKey]) === String(key));
+        const realKey = matchedRow ? matchedRow[dataKey] : key;
+        if (selectedKeys.has(realKey)) selectedKeys.delete(realKey);
+        else selectedKeys.add(realKey);
         dispatchSelectionEvent();
         render();
       });
@@ -850,8 +1105,10 @@ function DataTableIsland(container, props) {
         e.stopPropagation();
         const key = radio.getAttribute("data-row-key");
         if (!key) return;
+        const matchedRow = rawData.find((r) => String(r[dataKey]) === String(key));
+        const realKey = matchedRow ? matchedRow[dataKey] : key;
         selectedKeys.clear();
-        selectedKeys.add(key);
+        selectedKeys.add(realKey);
         dispatchSelectionEvent();
         render();
       });
@@ -861,20 +1118,22 @@ function DataTableIsland(container, props) {
         tr.addEventListener("click", (e) => {
           const key = tr.getAttribute("data-row-key");
           if (!key) return;
+          const matchedRow = rawData.find((r) => String(r[dataKey]) === String(key));
+          const realKey = matchedRow ? matchedRow[dataKey] : key;
           if (selectionMode === "single") {
-            if (selectedKeys.has(key)) selectedKeys.delete(key);
+            if (selectedKeys.has(realKey)) selectedKeys.delete(realKey);
             else {
               selectedKeys.clear();
-              selectedKeys.add(key);
+              selectedKeys.add(realKey);
             }
           } else if (selectionMode === "multiple") {
             const mouseEvent = e;
             if (metaKeySelection && (mouseEvent.ctrlKey || mouseEvent.metaKey)) {
-              if (selectedKeys.has(key)) selectedKeys.delete(key);
-              else selectedKeys.add(key);
+              if (selectedKeys.has(realKey)) selectedKeys.delete(realKey);
+              else selectedKeys.add(realKey);
             } else {
               selectedKeys.clear();
-              selectedKeys.add(key);
+              selectedKeys.add(realKey);
             }
           }
           dispatchSelectionEvent();
@@ -887,8 +1146,10 @@ function DataTableIsland(container, props) {
         e.stopPropagation();
         const key = btn.getAttribute("data-row-key");
         if (!key) return;
-        if (expandedKeys.has(key)) expandedKeys.delete(key);
-        else expandedKeys.add(key);
+        const matchedRow = rawData.find((r) => String(r[dataKey]) === String(key));
+        const realKey = matchedRow ? matchedRow[dataKey] : key;
+        if (expandedKeys.has(realKey)) expandedKeys.delete(realKey);
+        else expandedKeys.add(realKey);
         render();
       });
     });
@@ -899,7 +1160,9 @@ function DataTableIsland(container, props) {
           const rowKey = td.getAttribute("data-row-key");
           const field = td.getAttribute("data-field");
           if (!rowKey || !field) return;
-          editingCell = { rowKey, field };
+          const matchedRow = rawData.find((r) => String(r[dataKey]) === String(rowKey));
+          const realKey = matchedRow ? matchedRow[dataKey] : rowKey;
+          editingCell = { rowKey: realKey, field };
           render();
         });
       });
@@ -951,9 +1214,6 @@ function DataTableIsland(container, props) {
       });
     }
   }
-  function getFilteredRows() {
-    return rawData;
-  }
   function dispatchSelectionEvent() {
     const selectedRows = rawData.filter((r) => selectedKeys.has(r[dataKey]));
     container.dispatchEvent(new CustomEvent("datatable:selection-change", {
@@ -966,4 +1226,4 @@ function DataTableIsland(container, props) {
 export {
   DataTableIsland as default
 };
-//# sourceMappingURL=datatable-RAO2HVD6.js.map
+//# sourceMappingURL=datatable-KINB2FFM.js.map
