@@ -2590,13 +2590,89 @@
     <section id="sec-orgchart" class="component-card">
         <div class="card-header">
             <div>
-                <h2>OrgChart Hierarchy</h2>
-                <p>Interactive tree graph with expandable subordinate branches and role cards.</p>
+                <h2>OrganizationChart</h2>
+                <p>Hierarchical tree diagram for organizational structures, cloud topology, and multi-tier dependencies.</p>
             </div>
-            <span class="aura-tag tag-emerald">Hierarchy</span>
+            <span class="aura-tag tag-emerald">Data</span>
         </div>
-        <div class="card-body">
-            <island-orgchart root="@Model.OrgChartRoot" />
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Demo 1: Basic Hierarchy -->
+            <div class="demo-subcard">
+                <div class="demo-subcard-header">
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Basic</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Displays a hierarchy from the value collection with centered node cards.</p>
+                </div>
+                <div style="display: flex; justify-content: center; overflow-x: auto; padding: 1.5rem; background: var(--p-surface-50); border: 1px solid var(--p-surface-200); border-radius: 8px;">
+                    <island-orgchart value="@Model.OrgChartBasic" />
+                </div>
+            </div>
+
+            <!-- Demo 2: Collapsible -->
+            <div class="demo-subcard">
+                <div class="demo-subcard-header">
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Collapsible</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Use the collapsible prop to make subordinate branches collapsible with smooth toggler buttons.</p>
+                </div>
+                <div style="display: flex; justify-content: center; overflow-x: auto; padding: 1.5rem; background: var(--p-surface-50); border: 1px solid var(--p-surface-200); border-radius: 8px;">
+                    <island-orgchart value="@Model.OrgChartBasic" collapsible="true" />
+                </div>
+            </div>
+
+            <!-- Demo 3: Controlled & Custom Toggle Icons -->
+            <div class="demo-subcard">
+                <div class="demo-subcard-header">
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Controlled Actions</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Control collapsed states with external buttons and custom Plus/Minus toggle icons.</p>
+                </div>
+                <div style="padding: 1.5rem; background: var(--p-surface-50); border: 1px solid var(--p-surface-200); border-radius: 8px;">
+                    <div style="display: flex; gap: 0.5rem; justify-content: center; margin-bottom: 1.5rem;">
+                        <button type="button" class="p-button p-component p-button-outlined" style="padding: 0.4rem 0.85rem; font-size: 0.8125rem; border-radius: 6px; border: 1px solid var(--p-surface-300); background: var(--p-surface-0); cursor: pointer;" data-orgchart-action="expand-all">
+                            Expand all
+                        </button>
+                        <button type="button" class="p-button p-component p-button-outlined" style="padding: 0.4rem 0.85rem; font-size: 0.8125rem; border-radius: 6px; border: 1px solid var(--p-surface-300); background: var(--p-surface-0); cursor: pointer;" data-orgchart-action="collapse-all">
+                            Collapse all
+                        </button>
+                    </div>
+                    <div style="display: flex; justify-content: center; overflow-x: auto;">
+                        <island-orgchart value="@Model.OrgChartBasic" collapsible="true" toggle-icon="plusMinus" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 4: Custom Node Content (Cloud Architecture & Leadership) -->
+            <div class="demo-subcard">
+                <div class="demo-subcard-header">
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Custom Content Template</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Rich node templates supporting service icons, accent badges, and cloud architecture topology.</p>
+                </div>
+                <div style="display: flex; justify-content: center; overflow-x: auto; padding: 1.5rem; background: var(--p-surface-50); border: 1px solid var(--p-surface-200); border-radius: 8px;">
+                    <island-orgchart value="@Model.OrgChartCloud" collapsible="true" />
+                </div>
+            </div>
+
+            <!-- Demo 5: Single & Checkbox Selection Modes -->
+            <div class="demo-subcard">
+                <div class="demo-subcard-header">
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Selection (Single & Checkbox)</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Interactive single selection and cascading checkbox selection across the hierarchy.</p>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.5rem;">
+                    <!-- Single Selection -->
+                    <div style="padding: 1.25rem; background: var(--p-surface-50); border: 1px solid var(--p-surface-200); border-radius: 8px; overflow-x: auto;">
+                        <h4 style="font-size: 0.875rem; font-weight: 700; margin: 0 0 1rem 0; color: var(--p-surface-700);">Single Selection</h4>
+                        <div style="display: flex; justify-content: center;">
+                            <island-orgchart value="@Model.OrgChartBasic" selection-mode="single" />
+                        </div>
+                    </div>
+                    <!-- Checkbox Cascading Selection -->
+                    <div style="padding: 1.25rem; background: var(--p-surface-50); border: 1px solid var(--p-surface-200); border-radius: 8px; overflow-x: auto;">
+                        <h4 style="font-size: 0.875rem; font-weight: 700; margin: 0 0 1rem 0; color: var(--p-surface-700);">Checkbox Cascading Selection</h4>
+                        <div style="display: flex; justify-content: center;">
+                            <island-orgchart value="@Model.OrgChartBasic" selection-mode="checkbox" />
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 

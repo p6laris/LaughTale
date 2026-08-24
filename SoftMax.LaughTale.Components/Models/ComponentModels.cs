@@ -297,17 +297,28 @@ public record OrgChartNode<TData>(
     string Key,
     string Label,
     string? Title = null,
+    string? Description = null,
+    string? Icon = null,
+    string? Accent = null,
     string? Avatar = null,
+    string? Type = null,
+    bool Selectable = true,
+    bool Collapsed = false,
     TData? Data = default,
-    List<OrgChartNode<TData>>? Children = null,
-    bool Expanded = true
+    List<OrgChartNode<TData>>? Children = null
 );
 
 public record OrgChartNode(
     string Key,
     string Label,
     string? Title = null,
+    string? Description = null,
+    string? Icon = null,
+    string? Accent = null,
     string? Avatar = null,
+    string? Type = null,
+    bool Selectable = true,
+    bool Collapsed = false,
     List<OrgChartNode>? Children = null
 );
 

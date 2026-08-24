@@ -425,16 +425,63 @@ public class EnterpriseModel : PageModel
         new("t-4", "Step 4: Audit Log Append", "Ledger", 4)
     };
 
-    public OrgChartNode OrgChartRoot { get; set; } = new("root", "CEO Office", "Elena Rostova (Command Lead)", null, new()
+        public OrgChartNode OrgChartBasic { get; set; } = new("0", "Founder", Children: new()
     {
-        new("eng", "Core Infrastructure", "David Vance (VP)", null, new()
+        new("0-0", "Product Lead", Children: new()
         {
-            new("kernel", "Kernel & Islands", "Alice Montgomery (Lead)"),
-            new("secops", "Zero-Trust & HSM", "Thomas Wright (Lead)")
+            new("0-0-0", "UX/UI Designer"),
+            new("0-0-1", "Product Manager")
         }),
-        new("ops", "SecOps Operations", "Marcus Thorne (VP)", null, new()
+        new("0-1", "Engineering Lead", Children: new()
         {
-            new("cloud", "Cluster Reliability", "Sarah Jenkins (Lead)")
+            new("0-1-0", "Frontend Developer"),
+            new("0-1-1", "Backend Developer")
+        })
+    });
+
+    public OrgChartNode OrgChartCloud { get; set; } = new("0", "AWS Cloud", Description: "us-east-1", Icon: "cloud", Accent: "bg-orange-500/10 text-orange-500", Children: new()
+    {
+        new("0_0", "Compute", Description: "Workloads & runtime", Icon: "server", Accent: "bg-sky-500/10 text-sky-500", Children: new()
+        {
+            new("0_0_0", "EC2", Description: "Virtual servers", Icon: "server", Accent: "bg-sky-500/10 text-sky-500"),
+            new("0_0_1", "Lambda", Description: "Serverless functions", Icon: "bolt", Accent: "bg-sky-500/10 text-sky-500")
+        }),
+        new("0_1", "Storage", Description: "Data persistence", Icon: "database", Accent: "bg-emerald-500/10 text-emerald-500", Children: new()
+        {
+            new("0_1_0", "S3", Description: "Object storage", Icon: "box", Accent: "bg-emerald-500/10 text-emerald-500"),
+            new("0_1_1", "RDS", Description: "Managed databases", Icon: "database", Accent: "bg-emerald-500/10 text-emerald-500")
+        }),
+        new("0_2", "Networking", Description: "Edge & access", Icon: "globe", Accent: "bg-violet-500/10 text-violet-500", Children: new()
+        {
+            new("0_2_0", "CloudFront", Description: "Global CDN", Icon: "globe", Accent: "bg-violet-500/10 text-violet-500"),
+            new("0_2_1", "IAM", Description: "Access policies", Icon: "shield", Accent: "bg-violet-500/10 text-violet-500")
+        })
+    });
+
+    public OrgChartNode OrgChartAvatar { get; set; } = new("0", "Amy Elsner", Title: "Chief Executive Officer", Avatar: "AE", Children: new()
+    {
+        new("0-0", "Anna Fali", Title: "Chief Operating Officer", Avatar: "AF", Children: new()
+        {
+            new("0-0-0", "Stephen Shaw", Title: "Head of Marketing", Avatar: "SS"),
+            new("0-0-1", "Ioni Bowcher", Title: "Customer Relations", Avatar: "IB")
+        }),
+        new("0-1", "Asiya Javayant", Title: "Chief Technology Officer", Avatar: "AJ", Children: new()
+        {
+            new("0-1-0", "Bernardo Dominic", Title: "VP of Engineering", Avatar: "BD"),
+            new("0-1-1", "Elwin Sharvill", Title: "Principal Architect", Avatar: "ES")
+        })
+    });
+
+    public OrgChartNode OrgChartRoot { get; set; } = new("root", "CEO Office", Title: "Elena Rostova (Command Lead)", Children: new()
+    {
+        new("eng", "Core Infrastructure", Title: "David Vance (VP)", Children: new()
+        {
+            new("kernel", "Kernel & Islands", Title: "Alice Montgomery (Lead)"),
+            new("secops", "Zero-Trust & HSM", Title: "Thomas Wright (Lead)")
+        }),
+        new("ops", "SecOps Operations", Title: "Marcus Thorne (VP)", Children: new()
+        {
+            new("cloud", "Cluster Reliability", Title: "Sarah Jenkins (Lead)")
         })
     });
 

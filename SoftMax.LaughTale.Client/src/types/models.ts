@@ -186,14 +186,19 @@ export interface OrderListItem<TData = any> {
     [key: string]: any;
 }
 
-export interface OrgChartNode<TData = any> {
+export interface OrgChartNode<T = any> {
     key: string;
     label: string;
     title?: string;
+    description?: string;
+    icon?: string;
+    accent?: string;
     avatar?: string;
-    data?: TData;
-    children?: OrgChartNode<TData>[];
-    expanded?: boolean;
+    type?: string;
+    selectable?: boolean;
+    collapsed?: boolean;
+    data?: T;
+    children?: OrgChartNode<T>[];
 }
 
 export interface TerminalCommand {

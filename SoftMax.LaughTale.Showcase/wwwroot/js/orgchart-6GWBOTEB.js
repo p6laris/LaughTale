@@ -1,0 +1,632 @@
+import {
+  LucideIcons
+} from "./chunk-XHF3KYSF.js";
+import {
+  injectIslandStyle
+} from "./chunk-3TFPN5JM.js";
+
+// ../SoftMax.LaughTale.Client/src/components/orgchart.ts
+var ORGCHART_CSS = `
+.p-organizationchart {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    overflow-x: auto;
+    font-family: var(--p-font-family, inherit);
+    padding: 1.5rem 0.5rem;
+    color: var(--p-surface-800, #1e293b);
+}
+
+.p-organizationchart-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 0 auto;
+}
+
+.p-organizationchart-node-cell {
+    text-align: center;
+    vertical-align: top;
+    padding: 0 0.5rem;
+}
+
+.p-organizationchart-node {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: var(--p-surface-0, #ffffff);
+    border: 1px solid var(--p-surface-200, #e2e8f0);
+    border-radius: var(--p-border-radius-lg, 8px);
+    padding: 0.75rem 1.25rem;
+    min-width: 9.5rem;
+    box-shadow: var(--p-shadow-xs, 0 1px 2px 0 rgba(0, 0, 0, 0.05));
+    transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease, box-shadow 0.12s ease;
+    user-select: none;
+}
+
+.p-organizationchart-node.p-organizationchart-selectable {
+    cursor: pointer;
+}
+.p-organizationchart-node.p-organizationchart-selectable:hover:not(.p-highlight) {
+    background: var(--p-surface-100, #f1f5f9);
+    border-color: var(--p-surface-300, #cbd5e1);
+    box-shadow: var(--p-shadow-sm, 0 1px 3px 0 rgba(0, 0, 0, 0.1));
+}
+
+.p-organizationchart-node.p-highlight {
+    background: rgba(16, 185, 129, 0.08) !important;
+    border-color: var(--p-primary-500, #10b981) !important;
+    color: var(--p-primary-700, #047857) !important;
+    font-weight: 600;
+}
+
+/* Connector Lines */
+.p-organizationchart-line-down-container {
+    height: 20px;
+}
+.p-organizationchart-line-down {
+    width: 1px;
+    height: 20px;
+    background: var(--p-surface-300, #cbd5e1);
+    margin: 0 auto;
+}
+
+.p-organizationchart-line-left {
+    border-right: 1px solid var(--p-surface-300, #cbd5e1);
+}
+.p-organizationchart-line-right {
+    border-left: 1px solid var(--p-surface-300, #cbd5e1);
+}
+.p-organizationchart-line-top {
+    border-top: 1px solid var(--p-surface-300, #cbd5e1);
+}
+
+/* Toggle / Collapse Button */
+.p-organizationchart-node-toggle-button {
+    position: absolute;
+    bottom: -0.625rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 9999px;
+    background: var(--p-surface-0, #ffffff);
+    border: 1px solid var(--p-surface-300, #cbd5e1);
+    color: var(--p-surface-600, #475569);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 3;
+    padding: 0;
+    outline: none;
+    transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+.p-organizationchart-node-toggle-button:hover {
+    background: var(--p-surface-100, #f1f5f9);
+    border-color: var(--p-primary-500, #10b981);
+    color: var(--p-primary-600, #059669);
+}
+
+/* Checkbox */
+.p-checkbox-box {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.125rem;
+    height: 1.125rem;
+    border-radius: var(--p-border-radius-xs, 4px);
+    border: 2px solid var(--p-surface-300, #cbd5e1);
+    background: var(--p-surface-0, #ffffff);
+    cursor: pointer;
+    transition: background-color 0.12s ease, border-color 0.12s ease;
+    flex-shrink: 0;
+    margin-right: 0.5rem;
+}
+.p-checkbox-box.p-checked {
+    background: var(--p-primary-500, #10b981);
+    border-color: var(--p-primary-500, #10b981);
+    color: #ffffff;
+}
+.p-checkbox-box.p-indeterminate {
+    background: var(--p-primary-500, #10b981);
+    border-color: var(--p-primary-500, #10b981);
+    color: #ffffff;
+}
+
+/* Custom Card Templates */
+.p-orgchart-card-content {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    text-align: left;
+}
+.p-orgchart-avatar {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 9999px;
+    background: var(--p-primary-100, #d1fae5);
+    color: var(--p-primary-700, #047857);
+    font-weight: 700;
+    font-size: 0.8125rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.p-orgchart-icon-box {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.p-orgchart-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+.p-orgchart-label {
+    font-weight: 700;
+    font-size: 0.875rem;
+    color: var(--p-surface-900, #0f172a);
+    line-height: 1.25;
+}
+.p-orgchart-desc {
+    font-size: 0.75rem;
+    color: var(--p-surface-500, #64748b);
+    line-height: 1.2;
+}
+
+/* Dark Mode Tokens */
+.dark .p-organizationchart,
+[data-theme="dark"] .p-organizationchart {
+    color: var(--p-surface-100, #f1f5f9) !important;
+}
+.dark .p-organizationchart-node,
+[data-theme="dark"] .p-organizationchart-node {
+    background: var(--p-surface-900, #0f172a) !important;
+    border-color: var(--p-surface-700, #334155) !important;
+    color: var(--p-surface-100, #f1f5f9) !important;
+}
+.dark .p-organizationchart-node.p-organizationchart-selectable:hover:not(.p-highlight),
+[data-theme="dark"] .p-organizationchart-node.p-organizationchart-selectable:hover:not(.p-highlight) {
+    background: var(--p-surface-800, #1e293b) !important;
+    border-color: var(--p-surface-600, #475569) !important;
+}
+.dark .p-organizationchart-node.p-highlight,
+[data-theme="dark"] .p-organizationchart-node.p-highlight {
+    background: rgba(16, 185, 129, 0.15) !important;
+    border-color: var(--p-primary-500, #10b981) !important;
+    color: var(--p-primary-400, #34d399) !important;
+}
+.dark .p-organizationchart-line-down,
+.dark .p-organizationchart-line-left,
+.dark .p-organizationchart-line-right,
+.dark .p-organizationchart-line-top,
+[data-theme="dark"] .p-organizationchart-line-down,
+[data-theme="dark"] .p-organizationchart-line-left,
+[data-theme="dark"] .p-organizationchart-line-right,
+[data-theme="dark"] .p-organizationchart-line-top {
+    background: var(--p-surface-700, #334155) !important;
+    border-color: var(--p-surface-700, #334155) !important;
+}
+.dark .p-organizationchart-node-toggle-button,
+[data-theme="dark"] .p-organizationchart-node-toggle-button {
+    background: var(--p-surface-800, #1e293b) !important;
+    border-color: var(--p-surface-600, #475569) !important;
+    color: var(--p-surface-300, #cbd5e1) !important;
+}
+.dark .p-orgchart-label,
+[data-theme="dark"] .p-orgchart-label {
+    color: var(--p-surface-100, #f1f5f9) !important;
+}
+.dark .p-orgchart-desc,
+[data-theme="dark"] .p-orgchart-desc {
+    color: var(--p-surface-400, #94a3b8) !important;
+}
+`;
+function OrgChartIsland(container, props) {
+  injectIslandStyle("orgchart", ORGCHART_CSS);
+  const rootNode = props.value || props.root || {
+    key: "0",
+    label: "Founder",
+    children: [
+      {
+        key: "0-0",
+        label: "Product Lead",
+        children: [
+          { key: "0-0-0", label: "UX/UI Designer" },
+          { key: "0-0-1", label: "Product Manager" }
+        ]
+      },
+      {
+        key: "0-1",
+        label: "Engineering Lead",
+        children: [
+          { key: "0-1-0", label: "Frontend Developer" },
+          { key: "0-1-1", label: "Backend Developer" }
+        ]
+      }
+    ]
+  };
+  const isCollapsible = !!props.collapsible;
+  const selectionMode = props.selectionMode || "none";
+  const isSelectable = selectionMode !== "none";
+  const toggleIconType = props.toggleIcon || "chevron";
+  const collapsedKeys = /* @__PURE__ */ new Set();
+  if (props.collapsedKeys) {
+    if (Array.isArray(props.collapsedKeys)) {
+      props.collapsedKeys.forEach((k) => collapsedKeys.add(String(k)));
+    } else if (typeof props.collapsedKeys === "object") {
+      Object.entries(props.collapsedKeys).forEach(([k, v]) => {
+        if (v) collapsedKeys.add(k);
+      });
+    }
+  }
+  const selectedKeys = /* @__PURE__ */ new Set();
+  const indeterminateKeys = /* @__PURE__ */ new Set();
+  if (props.selectionKeys) {
+    if (Array.isArray(props.selectionKeys)) {
+      props.selectionKeys.forEach((k) => selectedKeys.add(String(k)));
+    } else if (typeof props.selectionKeys === "object") {
+      Object.entries(props.selectionKeys).forEach(([k, v]) => {
+        if (v) selectedKeys.add(k);
+      });
+    }
+  }
+  const nodeMap = /* @__PURE__ */ new Map();
+  function buildNodeMap(cur, parentKey = null) {
+    nodeMap.set(String(cur.key), { node: cur, parentKey });
+    if (cur.children) {
+      cur.children.forEach((c) => buildNodeMap(c, String(cur.key)));
+    }
+  }
+  buildNodeMap(rootNode);
+  function getNodeIcon(iconName) {
+    if (!iconName) return "";
+    switch (iconName.toLowerCase()) {
+      case "cloud":
+        return LucideIcons.cloud || LucideIcons.globe;
+      case "server":
+        return LucideIcons.server || LucideIcons.cpu;
+      case "database":
+        return LucideIcons.database || LucideIcons.layers;
+      case "globe":
+        return LucideIcons.globe;
+      case "shield":
+        return LucideIcons.shield || LucideIcons.lock;
+      case "box":
+        return LucideIcons.package;
+      case "bolt":
+        return LucideIcons.zap || LucideIcons.activity;
+      case "user":
+        return LucideIcons.user;
+      case "users":
+        return LucideIcons.users;
+      default:
+        return LucideIcons.circle || "";
+    }
+  }
+  function renderNodeCardContent(node, isSelected, isIndet) {
+    const checkboxHtml = selectionMode === "checkbox" ? `
+            <div class="p-checkbox-box ${isSelected ? "p-checked" : isIndet ? "p-indeterminate" : ""}" role="checkbox" aria-checked="${isSelected}">
+                ${isSelected ? LucideIcons.check : isIndet ? '<span style="width: 8px; height: 2px; background: white; border-radius: 1px;"></span>' : ""}
+            </div>
+        ` : "";
+    if (node.icon || node.accent || node.description) {
+      const iconSvg = getNodeIcon(node.icon);
+      const accentClass = node.accent || "bg-emerald-500/10 text-emerald-500";
+      return `
+                ${checkboxHtml}
+                <div class="p-orgchart-card-content">
+                    ${iconSvg ? `<div class="p-orgchart-icon-box ${accentClass}">${iconSvg}</div>` : ""}
+                    <div class="p-orgchart-details">
+                        <span class="p-orgchart-label">${node.label}</span>
+                        ${node.description ? `<span class="p-orgchart-desc">${node.description}</span>` : ""}
+                    </div>
+                </div>
+            `;
+    }
+    if (node.avatar || node.title) {
+      const initials = node.label.split(" ").map((w) => w[0]).join("").substring(0, 2).toUpperCase();
+      return `
+                ${checkboxHtml}
+                <div class="p-orgchart-card-content">
+                    <div class="p-orgchart-avatar">${initials}</div>
+                    <div class="p-orgchart-details">
+                        <span class="p-orgchart-label">${node.label}</span>
+                        ${node.title ? `<span class="p-orgchart-desc" style="color: var(--p-primary-600); font-weight: 600;">${node.title}</span>` : ""}
+                    </div>
+                </div>
+            `;
+    }
+    return `
+            ${checkboxHtml}
+            <span class="p-orgchart-label">${node.label}</span>
+        `;
+  }
+  function getToggleIconSvg(isCollapsed) {
+    if (toggleIconType === "plusMinus") {
+      return isCollapsed ? LucideIcons.plus : LucideIcons.minus;
+    }
+    return isCollapsed ? LucideIcons.chevronDown : LucideIcons.chevronUp;
+  }
+  function renderBranch(node) {
+    const key = String(node.key);
+    const hasChildren = node.children && node.children.length > 0;
+    const isCollapsed = isCollapsible && collapsedKeys.has(key);
+    const isSelected = selectedKeys.has(key);
+    const isIndet = indeterminateKeys.has(key);
+    const childCount = hasChildren ? node.children.length : 0;
+    const colspan = childCount * 2;
+    let toggleBtnHtml = "";
+    if (isCollapsible && hasChildren) {
+      toggleBtnHtml = `
+                <button type="button" class="p-organizationchart-node-toggle-button" data-toggle-key="${key}" title="${isCollapsed ? "Expand" : "Collapse"}" aria-label="${isCollapsed ? "Expand" : "Collapse"}">
+                    ${getToggleIconSvg(isCollapsed)}
+                </button>
+            `;
+    }
+    const linesDownHtml = hasChildren && !isCollapsed ? `
+            <tr class="p-organizationchart-lines">
+                <td colspan="${colspan}">
+                    <div class="p-organizationchart-line-down"></div>
+                </td>
+            </tr>
+        ` : "";
+    let connectorRowHtml = "";
+    let childrenCellsHtml = "";
+    if (hasChildren && !isCollapsed) {
+      if (childCount === 1) {
+        connectorRowHtml = `
+                    <tr class="p-organizationchart-lines">
+                        <td colspan="2">
+                            <div class="p-organizationchart-line-down"></div>
+                        </td>
+                    </tr>
+                `;
+        childrenCellsHtml = `
+                    <tr class="p-organizationchart-nodes">
+                        <td colspan="2" class="p-organizationchart-node-cell">
+                            ${renderBranch(node.children[0])}
+                        </td>
+                    </tr>
+                `;
+      } else {
+        const connectorTds = [];
+        const childTds = [];
+        node.children.forEach((child, idx) => {
+          const isFirst = idx === 0;
+          const isLast = idx === childCount - 1;
+          const leftClass = isFirst ? "" : "p-organizationchart-line-top";
+          const rightClass = isLast ? "" : "p-organizationchart-line-top";
+          connectorTds.push(`
+                        <td class="p-organizationchart-line-left ${leftClass}">&nbsp;</td>
+                        <td class="p-organizationchart-line-right ${rightClass}">&nbsp;</td>
+                    `);
+          childTds.push(`
+                        <td colspan="2" class="p-organizationchart-node-cell">
+                            ${renderBranch(child)}
+                        </td>
+                    `);
+        });
+        connectorRowHtml = `
+                    <tr class="p-organizationchart-lines">
+                        ${connectorTds.join("")}
+                    </tr>
+                `;
+        childrenCellsHtml = `
+                    <tr class="p-organizationchart-nodes">
+                        ${childTds.join("")}
+                    </tr>
+                `;
+      }
+    }
+    return `
+            <table class="p-organizationchart-table" role="presentation">
+                <tbody>
+                    <tr>
+                        <td colspan="${hasChildren ? colspan : 2}" class="p-organizationchart-node-cell">
+                            <div class="p-organizationchart-node ${isSelectable ? "p-organizationchart-selectable" : ""} ${isSelected ? "p-highlight" : ""}" 
+                                 data-node-key="${key}" 
+                                 role="treeitem" 
+                                 aria-selected="${isSelected}" 
+                                 aria-expanded="${hasChildren ? !isCollapsed : void 0}"
+                                 tabindex="0">
+                                ${renderNodeCardContent(node, isSelected, isIndet)}
+                                ${toggleBtnHtml}
+                            </div>
+                        </td>
+                    </tr>
+                    ${linesDownHtml}
+                    ${connectorRowHtml}
+                    ${childrenCellsHtml}
+                </tbody>
+            </table>
+        `;
+  }
+  function renderTree() {
+    if (selectionMode === "checkbox") {
+      recalculateCheckboxHierarchy();
+    }
+    container.innerHTML = `
+            <div class="p-organizationchart p-component" role="tree">
+                ${renderBranch(rootNode)}
+            </div>
+        `;
+    bindEvents();
+  }
+  function recalculateCheckboxHierarchy() {
+    indeterminateKeys.clear();
+    function checkNode(n) {
+      const k = String(n.key);
+      if (!n.children || n.children.length === 0) {
+        return selectedKeys.has(k);
+      }
+      const childResults = n.children.map((c) => checkNode(c));
+      const allChecked = childResults.every((r) => r === true);
+      const someChecked = childResults.some((r) => r === true) || n.children.some((c) => indeterminateKeys.has(String(c.key)));
+      if (allChecked) {
+        selectedKeys.add(k);
+        indeterminateKeys.delete(k);
+        return true;
+      } else if (someChecked) {
+        selectedKeys.delete(k);
+        indeterminateKeys.add(k);
+        return false;
+      } else {
+        selectedKeys.delete(k);
+        indeterminateKeys.delete(k);
+        return false;
+      }
+    }
+    checkNode(rootNode);
+  }
+  function selectDescendants(n, check) {
+    const k = String(n.key);
+    if (check) selectedKeys.add(k);
+    else selectedKeys.delete(k);
+    indeterminateKeys.delete(k);
+    if (n.children) {
+      n.children.forEach((c) => selectDescendants(c, check));
+    }
+  }
+  function updateSelectionUI() {
+    if (selectionMode === "checkbox") {
+      recalculateCheckboxHierarchy();
+    }
+    container.querySelectorAll(".p-organizationchart-node").forEach((el) => {
+      const key = el.getAttribute("data-node-key");
+      if (!key) return;
+      const isSelected = selectedKeys.has(key);
+      const isIndet = indeterminateKeys.has(key);
+      el.classList.toggle("p-highlight", isSelected);
+      el.setAttribute("aria-selected", String(isSelected));
+      if (selectionMode === "checkbox") {
+        const chk = el.querySelector(".p-checkbox-box");
+        if (chk) {
+          chk.className = `p-checkbox-box ${isSelected ? "p-checked" : isIndet ? "p-indeterminate" : ""}`;
+          chk.setAttribute("aria-checked", String(isSelected));
+          chk.innerHTML = isSelected ? LucideIcons.check : isIndet ? '<span style="width: 8px; height: 2px; background: white; border-radius: 1px;"></span>' : "";
+        }
+      }
+    });
+    const statusEl = container.parentElement?.querySelector(".p-orgchart-selection-status") || document.querySelector(".p-orgchart-selection-status");
+    if (statusEl) {
+      const arr = Array.from(selectedKeys);
+      statusEl.textContent = arr.length > 0 ? arr.join(", ") : "-";
+    }
+    dispatchSelectionEvent();
+    syncValues();
+  }
+  function toggleNodeCollapse(key) {
+    if (collapsedKeys.has(key)) {
+      collapsedKeys.delete(key);
+    } else {
+      collapsedKeys.add(key);
+    }
+    renderTree();
+    container.dispatchEvent(new CustomEvent("orgchart:toggle", {
+      bubbles: true,
+      detail: { key, collapsed: collapsedKeys.has(key), collapsedKeys: Array.from(collapsedKeys) }
+    }));
+  }
+  function handleNodeClick(key) {
+    if (!isSelectable) return;
+    if (selectionMode === "single") {
+      if (selectedKeys.has(key)) {
+        selectedKeys.clear();
+      } else {
+        selectedKeys.clear();
+        selectedKeys.add(key);
+      }
+      updateSelectionUI();
+    } else if (selectionMode === "multiple") {
+      if (selectedKeys.has(key)) {
+        selectedKeys.delete(key);
+      } else {
+        selectedKeys.add(key);
+      }
+      updateSelectionUI();
+    } else if (selectionMode === "checkbox") {
+      const entry = nodeMap.get(key);
+      if (!entry) return;
+      const willCheck = !selectedKeys.has(key);
+      selectDescendants(entry.node, willCheck);
+      updateSelectionUI();
+    }
+  }
+  function bindEvents() {
+    container.querySelectorAll(".p-organizationchart-node-toggle-button").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const key = btn.getAttribute("data-toggle-key");
+        if (key) toggleNodeCollapse(key);
+      });
+    });
+    if (isSelectable) {
+      container.querySelectorAll(".p-organizationchart-node").forEach((nodeEl) => {
+        nodeEl.addEventListener("click", () => {
+          const key = nodeEl.getAttribute("data-node-key");
+          if (key) handleNodeClick(key);
+        });
+      });
+    }
+    container.querySelectorAll(".p-organizationchart-node").forEach((nodeEl) => {
+      nodeEl.addEventListener("keydown", (e) => {
+        const key = nodeEl.getAttribute("data-node-key");
+        if (!key) return;
+        if (e.key === " " || e.key === "Enter") {
+          e.preventDefault();
+          handleNodeClick(key);
+        }
+      });
+    });
+  }
+  const parentSection = container.closest("section") || container.parentElement;
+  if (parentSection) {
+    parentSection.querySelectorAll("[data-orgchart-action]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const action = btn.getAttribute("data-orgchart-action");
+        if (action === "expand-all") {
+          collapsedKeys.clear();
+          renderTree();
+        } else if (action === "collapse-all") {
+          collapsedKeys.add(String(rootNode.key));
+          renderTree();
+        }
+      });
+    });
+  }
+  function dispatchSelectionEvent() {
+    container.dispatchEvent(new CustomEvent("orgchart:selection-change", {
+      bubbles: true,
+      detail: {
+        selectionKeys: Array.from(selectedKeys),
+        indeterminateKeys: Array.from(indeterminateKeys)
+      }
+    }));
+  }
+  function syncValues() {
+    if (props.targetInputName) {
+      let hidden = container.querySelector(`input[name="${props.targetInputName}"]`);
+      if (!hidden) {
+        hidden = document.createElement("input");
+        hidden.type = "hidden";
+        hidden.name = props.targetInputName;
+        container.appendChild(hidden);
+      }
+      hidden.value = JSON.stringify(Array.from(selectedKeys));
+    }
+  }
+  renderTree();
+  syncValues();
+}
+export {
+  OrgChartIsland as default
+};
+//# sourceMappingURL=orgchart-6GWBOTEB.js.map
