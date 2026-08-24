@@ -659,6 +659,56 @@ public class IslandSliderTagHelper : TagHelper
         if (Disabled) rootClasses.Add("is-disabled");
 
         output.Attributes.SetAttribute("class", string.Join(" ", rootClasses));
+
+        double minD = Min, maxD = Max;
+        if (maxD <= minD) maxD = minD + 100;
+
+        if (Range)
+        {
+            double v1 = minD + (maxD - minD) * 0.2;
+            double v2 = minD + (maxD - minD) * 0.8;
+            if (effectiveValue is System.Collections.IEnumerable listObj && !(effectiveValue is string))
+            {
+                var nums = new List<double>();
+                foreach (var item in listObj)
+                {
+                    if (item != null && double.TryParse(item.ToString(), out var parsedN)) nums.Add(parsedN);
+                }
+                if (nums.Count >= 2) { v1 = nums[0]; v2 = nums[1]; }
+            }
+            else if (effectiveValue != null && double.TryParse(effectiveValue.ToString(), out var singleN))
+            {
+                v1 = singleN;
+            }
+
+            double p1 = Math.Max(0, Math.Min(100, ((v1 - minD) / (maxD - minD)) * 100));
+            double p2 = Math.Max(0, Math.Min(100, ((v2 - minD) / (maxD - minD)) * 100));
+            double leftPct = Math.Min(p1, p2);
+            double sizePct = Math.Abs(p2 - p1);
+
+            string rangeStyle = isVertical ? $"bottom:{leftPct}%;height:{sizePct}%;" : $"left:{leftPct}%;width:{sizePct}%;";
+            string h1Style = isVertical ? $"bottom:{p1}%;" : $"left:{p1}%;";
+            string h2Style = isVertical ? $"bottom:{p2}%;" : $"left:{p2}%;";
+
+            output.Content.SetHtmlContent($@"
+                <span class=""p-slider-range"" style=""{rangeStyle}""></span>
+                <span class=""p-slider-handle {(Disabled || DisabledMinHandle ? "is-disabled" : "")}"" data-handle=""0"" tabindex=""{(Disabled || DisabledMinHandle ? "-1" : "0")}"" role=""slider"" aria-orientation=""{(isVertical ? "vertical" : "horizontal")}"" aria-valuemin=""{Min}"" aria-valuemax=""{Max}"" aria-valuenow=""{v1}"" style=""{h1Style}""></span>
+                <span class=""p-slider-handle {(Disabled || DisabledMaxHandle ? "is-disabled" : "")}"" data-handle=""1"" tabindex=""{(Disabled || DisabledMaxHandle ? "-1" : "0")}"" role=""slider"" aria-orientation=""{(isVertical ? "vertical" : "horizontal")}"" aria-valuemin=""{Min}"" aria-valuemax=""{Max}"" aria-valuenow=""{v2}"" style=""{h2Style}""></span>
+            ");
+        }
+        else
+        {
+            double v = 0;
+            if (effectiveValue != null) double.TryParse(effectiveValue.ToString(), out v);
+            double p1 = Math.Max(0, Math.Min(100, ((v - minD) / (maxD - minD)) * 100));
+            string rangeStyle = isVertical ? $"bottom:0;height:{p1}%;" : $"left:0;width:{p1}%;";
+            string hStyle = isVertical ? $"bottom:{p1}%;" : $"left:{p1}%;";
+
+            output.Content.SetHtmlContent($@"
+                <span class=""p-slider-range"" style=""{rangeStyle}""></span>
+                <span class=""p-slider-handle {(Disabled ? "is-disabled" : "")}"" data-handle=""0"" tabindex=""{(Disabled ? "-1" : "0")}"" role=""slider"" aria-orientation=""{(isVertical ? "vertical" : "horizontal")}"" aria-valuemin=""{Min}"" aria-valuemax=""{Max}"" aria-valuenow=""{v}"" style=""{hStyle}""></span>
+            ");
+        }
     }
 }
 

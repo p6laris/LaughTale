@@ -17,15 +17,16 @@ var CSS = `
 .p-slider-horizontal {
     height: 0.375rem;
     width: 100%;
-    background: var(--p-surface-200);
+    background: var(--p-surface-200, #e2e8f0);
     border-radius: 9999px;
     cursor: pointer;
+    display: block;
 }
 
 .p-slider-vertical {
     width: 0.375rem;
     height: 12rem;
-    background: var(--p-surface-200);
+    background: var(--p-surface-200, #e2e8f0);
     border-radius: 9999px;
     cursor: pointer;
     display: inline-block;
@@ -44,6 +45,7 @@ var CSS = `
     border-radius: 9999px;
     pointer-events: none;
     transition: background 150ms ease;
+    display: block;
 }
 
 .p-slider-horizontal .p-slider-range {
@@ -63,24 +65,38 @@ var CSS = `
     width: 1.25rem;
     height: 1.25rem;
     border-radius: 50%;
-    background: var(--p-surface-0);
-    border: 2px solid var(--p-primary-500);
+    background: var(--p-surface-0, #ffffff);
+    border: 2px solid var(--p-primary-500, #10b981);
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.15), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
     cursor: grab;
     outline: none;
     box-sizing: border-box;
-    transform: translate(-50%, -50%);
     transition: border-color 150ms ease, box-shadow 150ms ease, transform 120ms ease;
     z-index: 10;
+    display: block;
+}
+
+.p-slider-horizontal .p-slider-handle {
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.p-slider-vertical .p-slider-handle {
+    left: 50%;
+    transform: translate(-50%, 50%);
 }
 
 .p-slider-handle:hover:not(.is-disabled) {
-    border-color: var(--p-primary-600);
+    border-color: var(--p-primary-600, #059669);
     transform: translate(-50%, -50%) scale(1.1);
 }
 
+.p-slider-vertical .p-slider-handle:hover:not(.is-disabled) {
+    transform: translate(-50%, 50%) scale(1.1);
+}
+
 .p-slider-handle:focus-visible:not(.is-disabled) {
-    border-color: var(--p-primary-600);
+    border-color: var(--p-primary-600, #059669);
     box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
 }
 
@@ -90,38 +106,42 @@ var CSS = `
     box-shadow: 0 0 0 5px rgba(16, 185, 129, 0.25) !important;
 }
 
+.p-slider-vertical .p-slider-handle.is-dragging {
+    transform: translate(-50%, 50%) scale(1.18) !important;
+}
+
 .p-slider-handle.is-disabled {
     cursor: not-allowed;
-    background: var(--p-surface-200);
-    border-color: var(--p-surface-400);
+    background: var(--p-surface-200, #e2e8f0);
+    border-color: var(--p-surface-400, #94a3b8);
     box-shadow: none;
 }
 
 /* ==================== DARK MODE ==================== */
 .dark .p-slider-horizontal,
 .dark .p-slider-vertical {
-    background: var(--p-surface-700);
+    background: var(--p-surface-700, #334155);
 }
 .dark .p-slider-range {
-    background: var(--p-primary-400);
+    background: var(--p-primary-400, #34d399);
 }
 .dark .p-slider-handle {
-    background: var(--p-surface-900);
-    border-color: var(--p-primary-400);
+    background: var(--p-surface-900, #0f172a);
+    border-color: var(--p-primary-400, #34d399);
 }
 .dark .p-slider-handle:hover:not(.is-disabled) {
-    border-color: var(--p-primary-300);
+    border-color: var(--p-primary-300, #6ee7b7);
 }
 .dark .p-slider-handle:focus-visible:not(.is-disabled) {
-    border-color: var(--p-primary-300);
+    border-color: var(--p-primary-300, #6ee7b7);
     box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.2);
 }
 .dark .p-slider-handle.is-dragging {
     box-shadow: 0 0 0 5px rgba(52, 211, 153, 0.25) !important;
 }
 .dark .p-slider-handle.is-disabled {
-    background: var(--p-surface-800);
-    border-color: var(--p-surface-600);
+    background: var(--p-surface-800, #1e293b);
+    border-color: var(--p-surface-600, #475569);
 }
 `;
 function SliderIsland(container, props) {
@@ -143,7 +163,7 @@ function SliderIsland(container, props) {
       currentValues = [Number(props.value[0]), Number(props.value[1])];
     } else if (typeof props.value === "string" && props.value.includes(",")) {
       const parts = props.value.split(",").map((s) => Number(s.trim()));
-      currentValues = [parts[0] || min, parts[1] || max];
+      currentValues = [parts[0] ?? min, parts[1] ?? max];
     } else {
       currentValues = [min + (max - min) * 0.2, min + (max - min) * 0.8];
     }
@@ -180,8 +200,8 @@ function SliderIsland(container, props) {
       const leftPct = Math.min(p1, p2);
       const sizePct = Math.abs(p2 - p1);
       const rangeStyle = isVertical ? `bottom: ${leftPct}%; height: ${sizePct}%;` : `left: ${leftPct}%; width: ${sizePct}%;`;
-      const h1Style = isVertical ? `bottom: ${p1}%; left: 50%; transform: translate(-50%, 50%);` : `left: ${p1}%; top: 50%; transform: translate(-50%, -50%);`;
-      const h2Style = isVertical ? `bottom: ${p2}%; left: 50%; transform: translate(-50%, 50%);` : `left: ${p2}%; top: 50%; transform: translate(-50%, -50%);`;
+      const h1Style = isVertical ? `bottom: ${p1}%;` : `left: ${p1}%;`;
+      const h2Style = isVertical ? `bottom: ${p2}%;` : `left: ${p2}%;`;
       container.innerHTML = `
                 <span class="p-slider-range" style="${rangeStyle}"></span>
                 <span 
@@ -211,7 +231,7 @@ function SliderIsland(container, props) {
     } else {
       const p = getPercent(currentValues[0]);
       const rangeStyle = isVertical ? `bottom: 0; height: ${p}%;` : `left: 0; width: ${p}%;`;
-      const hStyle = isVertical ? `bottom: ${p}%; left: 50%; transform: translate(-50%, 50%);` : `left: ${p}%; top: 50%; transform: translate(-50%, -50%);`;
+      const hStyle = isVertical ? `bottom: ${p}%;` : `left: ${p}%;`;
       container.innerHTML = `
                 <span class="p-slider-range" style="${rangeStyle}"></span>
                 <span 
@@ -446,4 +466,4 @@ function SliderIsland(container, props) {
 export {
   SliderIsland as default
 };
-//# sourceMappingURL=slider-CQNJBFMR.js.map
+//# sourceMappingURL=slider-UV27YNGE.js.map
