@@ -107,6 +107,21 @@ body {
     transition: background-color 0.2s ease, color 0.2s ease;
 }
 
+/* Global SVG Sprite & Vector Icon Engine */
+.p-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    flex-shrink: 0;
+    pointer-events: none;
+}
+
 /* Layout */
 .app-container {
     max-width: 1240px;
