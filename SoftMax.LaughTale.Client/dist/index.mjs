@@ -9664,17 +9664,17 @@ function SpeedDialIsland(container, props) {
           };
         }
         case "left": {
-          const angle = Math.PI / 2 + index * step;
+          const angle = -Math.PI / 2 - index * step;
           return {
-            x: Math.round(-radius * Math.sin(angle)),
-            y: Math.round(radius * Math.cos(angle))
+            x: Math.round(radius * Math.cos(angle)),
+            y: Math.round(radius * Math.sin(angle))
           };
         }
         case "right": {
           const angle = -Math.PI / 2 + index * step;
           return {
-            x: Math.round(radius * Math.sin(angle)),
-            y: Math.round(radius * Math.cos(angle))
+            x: Math.round(radius * Math.cos(angle)),
+            y: Math.round(radius * Math.sin(angle))
           };
         }
         default: {
