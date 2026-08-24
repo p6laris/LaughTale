@@ -16625,88 +16625,273 @@ public static class AppTheme
     default: () => OrderListIsland
   });
   function OrderListIsland(container, props) {
-    injectIslandStyle("orderlist", CSS39);
-    let items = props.items ? [...props.items] : [
-      { id: "1", name: "Phase 1: Zero-Trust Gateway Init", order: 0 },
-      { id: "2", name: "Phase 2: Hydrate Islands Engine", order: 1 },
-      { id: "3", name: "Phase 3: Verify Cryptographic Signatures", order: 2 },
-      { id: "4", name: "Phase 4: Telemetry Stream Pipeline", order: 3 }
-    ];
-    let selectedIndex = 0;
-    function render() {
+    injectIslandStyle("orderlist", ORDERLIST_CSS);
+    const initialItems = props.value ? [...props.value] : props.items ? [...props.items] : [];
+    let itemsList = [...initialItems];
+    const dataKey = props.dataKey || "id";
+    const isCheckbox = !!props.checkbox;
+    const isFilter = !!props.filter;
+    const filterBy = props.filterBy || props.filterFields && props.filterFields[0] || "name";
+    const filterPlaceholder = props.filterPlaceholder || "Filter by name";
+    const scrollHeight = props.scrollHeight || "20rem";
+    const emptyMessage = props.emptyMessage || "No available options";
+    let selectedIds = /* @__PURE__ */ new Set();
+    let filterQuery = "";
+    function getItemId(item, fallbackIndex) {
+      const keyVal = item[dataKey] || item.id || item.title || item.name;
+      return keyVal != null ? String(keyVal) : String(fallbackIndex);
+    }
+    function getItemTitle(item) {
+      return item.title || item.name || "";
+    }
+    function renderCellContent(item, index, isSelected) {
+      const checkboxHtml = isCheckbox ? `
+            <div class="p-checkbox-box ${isSelected ? "p-checked" : ""}" role="checkbox" aria-checked="${isSelected}">
+                ${isSelected ? LucideIcons.check : ""}
+            </div>
+        ` : "";
+      if (item.price != null || item.category != null || item.image != null) {
+        return `
+                ${checkboxHtml}
+                <div class="p-orderlist-product-item">
+                    <div class="p-orderlist-product-img">
+                        ${LucideIcons.package}
+                    </div>
+                    <div class="p-orderlist-product-details">
+                        <span class="p-orderlist-product-name">${getItemTitle(item)}</span>
+                        <span class="p-orderlist-product-category">${item.category || ""}</span>
+                    </div>
+                    ${item.price != null ? `<span class="p-orderlist-product-price">$${item.price}</span>` : ""}
+                </div>
+            `;
+      }
+      return `
+            ${checkboxHtml}
+            <span class="p-orderlist-index">${index + 1}</span>
+            <span style="flex: 1; font-weight: ${isSelected ? "600" : "normal"}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                ${getItemTitle(item)}
+            </span>
+        `;
+    }
+    function buildShell() {
+      const headerHtml = props.header ? `
+            <div class="p-orderlist-header">
+                <span>${props.header}</span>
+            </div>
+        ` : "";
+      const filterHtml = isFilter ? `
+            <div class="p-orderlist-filter-container">
+                <input type="text" class="p-orderlist-filter-input" placeholder="${filterPlaceholder}" />
+                <span class="p-orderlist-filter-icon">${LucideIcons.search}</span>
+            </div>
+        ` : "";
       container.innerHTML = `
-            <div class="laughtale-orderlist" style="display: flex; align-items: center; gap: 1rem; width: 100%; max-width: 480px; font-family: var(--p-font-family, inherit);">
-                <!-- Reorder Controls -->
-                <div style="display: flex; flex-direction: column; gap: 0.35rem;">
-                    <button type="button" class="btn-order-top p-button p-button-secondary" style="padding: 0.45rem; justify-content: center;" title="Move to Top">\u21C8</button>
-                    <button type="button" class="btn-order-up p-button p-button-secondary" style="padding: 0.45rem; justify-content: center;" title="Move Up">\u2191</button>
-                    <button type="button" class="btn-order-down p-button p-button-secondary" style="padding: 0.45rem; justify-content: center;" title="Move Down">\u2193</button>
-                    <button type="button" class="btn-order-bottom p-button p-button-secondary" style="padding: 0.45rem; justify-content: center;" title="Move to Bottom">\u21CA</button>
+            <div class="p-orderlist p-component">
+                <!-- Reorder Action Buttons (Left) -->
+                <div class="p-orderlist-controls">
+                    <button type="button" class="p-orderlist-control-btn btn-order-top" title="Move to Top" aria-label="Move to Top" disabled>
+                        ${LucideIcons.chevronsUp}
+                    </button>
+                    <button type="button" class="p-orderlist-control-btn btn-order-up" title="Move Up" aria-label="Move Up" disabled>
+                        ${LucideIcons.chevronUp}
+                    </button>
+                    <button type="button" class="p-orderlist-control-btn btn-order-down" title="Move Down" aria-label="Move Down" disabled>
+                        ${LucideIcons.chevronDown}
+                    </button>
+                    <button type="button" class="p-orderlist-control-btn btn-order-bottom" title="Move to Bottom" aria-label="Move to Bottom" disabled>
+                        ${LucideIcons.chevronsDown}
+                    </button>
                 </div>
 
-                <!-- Items List Box -->
-                <div style="flex: 1; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); background: var(--p-surface-0); overflow: hidden; display: flex; flex-direction: column;">
-                    ${props.header ? `<div style="padding: 0.625rem 0.875rem; background: var(--p-surface-50); border-bottom: 1px solid var(--p-border-color); font-size: 0.75rem; font-weight: 700; color: var(--p-surface-600); text-transform: uppercase;">${props.header}</div>` : ""}
-                    <div class="orderlist-items-container" style="max-height: 220px; overflow-y: auto; padding: 0.25rem 0;">
-                        ${items.map((it, idx) => `
-                            <div class="orderlist-item ${selectedIndex === idx ? "active" : ""}" data-index="${idx}" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.875rem; cursor: pointer; font-size: 0.8125rem; background: ${selectedIndex === idx ? "var(--p-primary-50)" : "transparent"}; color: ${selectedIndex === idx ? "var(--p-primary-700)" : "var(--p-text-color)"}; font-weight: ${selectedIndex === idx ? "600" : "normal"}; transition: all 0.15s ease;">
-                                <span>${it.name}</span>
-                                <span style="font-family: monospace; font-size: 0.6875rem; color: var(--p-surface-400);">#${idx + 1}</span>
-                            </div>
-                        `).join("")}
+                <!-- List Box (Right) -->
+                <div class="p-orderlist-list-container">
+                    ${headerHtml}
+                    ${filterHtml}
+                    <ul class="p-orderlist-list" style="height: ${scrollHeight};" role="listbox" aria-multiselectable="true" tabindex="0">
+                    </ul>
+                    <div class="p-orderlist-footer">
+                        <span class="p-orderlist-selection-status">No selected item</span>
+                        ${isFilter ? `<span class="p-orderlist-results-status" style="font-size: 0.6875rem; color: var(--p-surface-400);">0 results available</span>` : ""}
                     </div>
                 </div>
             </div>
         `;
-      const itemsEl = container.querySelector(".orderlist-items-container");
-      useAutoAnimate(itemsEl, { duration: 200 });
-      bindEvents();
+      const listEl = container.querySelector(".p-orderlist-list");
+      if (listEl) useAutoAnimate(listEl, { duration: 180 });
+      bindPermanentEvents();
+      updateList();
+      updateButtons();
     }
-    function bindEvents() {
-      container.querySelectorAll(".orderlist-item").forEach((el) => {
-        el.addEventListener("click", () => {
-          selectedIndex = Number(el.getAttribute("data-index"));
-          render();
+    function updateList() {
+      const rootEl = container.firstElementChild;
+      if (!rootEl) return;
+      const filteredItems = itemsList.filter((item, idx) => {
+        if (!isFilter || !filterQuery.trim()) return true;
+        const targetVal = String(item[filterBy] || item.title || item.name || "").toLowerCase();
+        return targetVal.includes(filterQuery.toLowerCase());
+      });
+      const resultsEl = rootEl.querySelector(".p-orderlist-results-status");
+      if (resultsEl) {
+        resultsEl.textContent = `${filteredItems.length} results are available`;
+      }
+      const statusEl = rootEl.querySelector(".p-orderlist-selection-status");
+      if (statusEl) {
+        statusEl.textContent = selectedIds.size > 0 ? `${selectedIds.size} items selected` : "No selected item";
+      }
+      const listUl = rootEl.querySelector(".p-orderlist-list");
+      if (listUl) {
+        if (filteredItems.length === 0) {
+          listUl.innerHTML = `<li class="p-orderlist-empty">${filterQuery ? "No results found" : emptyMessage}</li>`;
+        } else {
+          listUl.innerHTML = filteredItems.map((item, idx) => {
+            const id = getItemId(item, idx);
+            const isSelected = selectedIds.has(id);
+            return `
+                        <li class="p-orderlist-item ${isSelected ? "p-highlight" : ""}" 
+                            data-id="${id}" 
+                            data-index="${idx}"
+                            role="option" 
+                            aria-selected="${isSelected}">
+                            ${renderCellContent(item, idx, isSelected)}
+                        </li>
+                    `;
+          }).join("");
+          listUl.querySelectorAll(".p-orderlist-item").forEach((el) => {
+            el.addEventListener("click", (e) => {
+              const id = el.getAttribute("data-id");
+              if (!id) return;
+              const mouseEvent = e;
+              if (isCheckbox || mouseEvent.ctrlKey || mouseEvent.metaKey) {
+                if (selectedIds.has(id)) selectedIds.delete(id);
+                else selectedIds.add(id);
+              } else {
+                if (selectedIds.has(id) && selectedIds.size === 1) {
+                  selectedIds.clear();
+                } else {
+                  selectedIds.clear();
+                  selectedIds.add(id);
+                }
+              }
+              updateList();
+              updateButtons();
+              dispatchSelectionEvent();
+            });
+          });
+        }
+      }
+    }
+    function updateButtons() {
+      const rootEl = container.firstElementChild;
+      if (!rootEl) return;
+      const btnTop = rootEl.querySelector(".btn-order-top");
+      const btnUp = rootEl.querySelector(".btn-order-up");
+      const btnDown = rootEl.querySelector(".btn-order-down");
+      const btnBottom = rootEl.querySelector(".btn-order-bottom");
+      const hasSelection = selectedIds.size > 0 && itemsList.length > 1;
+      if (btnTop) btnTop.disabled = !hasSelection;
+      if (btnUp) btnUp.disabled = !hasSelection;
+      if (btnDown) btnDown.disabled = !hasSelection;
+      if (btnBottom) btnBottom.disabled = !hasSelection;
+    }
+    function bindPermanentEvents() {
+      const rootEl = container.firstElementChild;
+      if (!rootEl) return;
+      const filterInput = rootEl.querySelector(".p-orderlist-filter-input");
+      if (filterInput) {
+        filterInput.addEventListener("input", (e) => {
+          filterQuery = e.target.value;
+          updateList();
+          updateButtons();
         });
+      }
+      rootEl.querySelector(".btn-order-top")?.addEventListener("click", () => {
+        reorder("top");
       });
-      container.querySelector(".btn-order-top")?.addEventListener("click", () => {
-        if (selectedIndex === null || selectedIndex <= 0) return;
-        const it = items.splice(selectedIndex, 1)[0];
-        items.unshift(it);
-        selectedIndex = 0;
-        render();
-        syncValues();
+      rootEl.querySelector(".btn-order-up")?.addEventListener("click", () => {
+        reorder("up");
       });
-      container.querySelector(".btn-order-up")?.addEventListener("click", () => {
-        if (selectedIndex === null || selectedIndex <= 0) return;
-        const target = selectedIndex - 1;
-        const temp = items[target];
-        items[target] = items[selectedIndex];
-        items[selectedIndex] = temp;
-        selectedIndex = target;
-        render();
-        syncValues();
+      rootEl.querySelector(".btn-order-down")?.addEventListener("click", () => {
+        reorder("down");
       });
-      container.querySelector(".btn-order-down")?.addEventListener("click", () => {
-        if (selectedIndex === null || selectedIndex >= items.length - 1) return;
-        const target = selectedIndex + 1;
-        const temp = items[target];
-        items[target] = items[selectedIndex];
-        items[selectedIndex] = temp;
-        selectedIndex = target;
-        render();
-        syncValues();
+      rootEl.querySelector(".btn-order-bottom")?.addEventListener("click", () => {
+        reorder("bottom");
       });
-      container.querySelector(".btn-order-bottom")?.addEventListener("click", () => {
-        if (selectedIndex === null || selectedIndex >= items.length - 1) return;
-        const it = items.splice(selectedIndex, 1)[0];
-        items.push(it);
-        selectedIndex = items.length - 1;
-        render();
-        syncValues();
-      });
+      const listUl = rootEl.querySelector(".p-orderlist-list");
+      if (listUl) {
+        listUl.addEventListener("keydown", (e) => {
+          if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+            e.preventDefault();
+            navigateItems(e.key === "ArrowDown" ? 1 : -1, e.shiftKey);
+          } else if (e.key === " " || e.key === "Enter") {
+            e.preventDefault();
+          } else if (e.key === "a" && (e.ctrlKey || e.metaKey)) {
+            e.preventDefault();
+            itemsList.forEach((it, idx) => selectedIds.add(getItemId(it, idx)));
+            updateList();
+            updateButtons();
+            dispatchSelectionEvent();
+          }
+        });
+      }
     }
-    function syncValues() {
+    function navigateItems(delta, isShift) {
+      if (itemsList.length === 0) return;
+      let lastSelectedIdx = itemsList.findIndex((it, idx) => selectedIds.has(getItemId(it, idx)));
+      if (lastSelectedIdx === -1) lastSelectedIdx = delta > 0 ? -1 : itemsList.length;
+      const targetIdx = Math.max(0, Math.min(itemsList.length - 1, lastSelectedIdx + delta));
+      const targetId = getItemId(itemsList[targetIdx], targetIdx);
+      if (!isShift) selectedIds.clear();
+      selectedIds.add(targetId);
+      updateList();
+      updateButtons();
+      dispatchSelectionEvent();
+    }
+    function reorder(direction) {
+      if (selectedIds.size === 0 || itemsList.length < 2) return;
+      if (direction === "top") {
+        const selected = itemsList.filter((it, idx) => selectedIds.has(getItemId(it, idx)));
+        const remaining = itemsList.filter((it, idx) => !selectedIds.has(getItemId(it, idx)));
+        itemsList.length = 0;
+        itemsList.push(...selected, ...remaining);
+      } else if (direction === "bottom") {
+        const selected = itemsList.filter((it, idx) => selectedIds.has(getItemId(it, idx)));
+        const remaining = itemsList.filter((it, idx) => !selectedIds.has(getItemId(it, idx)));
+        itemsList.length = 0;
+        itemsList.push(...remaining, ...selected);
+      } else if (direction === "up") {
+        for (let i = 1; i < itemsList.length; i++) {
+          const curId = getItemId(itemsList[i], i);
+          const prevId = getItemId(itemsList[i - 1], i - 1);
+          if (selectedIds.has(curId) && !selectedIds.has(prevId)) {
+            const temp = itemsList[i];
+            itemsList[i] = itemsList[i - 1];
+            itemsList[i - 1] = temp;
+          }
+        }
+      } else if (direction === "down") {
+        for (let i = itemsList.length - 2; i >= 0; i--) {
+          const curId = getItemId(itemsList[i], i);
+          const nextId = getItemId(itemsList[i + 1], i + 1);
+          if (selectedIds.has(curId) && !selectedIds.has(nextId)) {
+            const temp = itemsList[i];
+            itemsList[i] = itemsList[i + 1];
+            itemsList[i + 1] = temp;
+          }
+        }
+      }
+      updateList();
+      updateButtons();
+      syncValues("reorder");
+    }
+    function dispatchSelectionEvent() {
+      container.dispatchEvent(new CustomEvent("orderlist:selection-change", {
+        bubbles: true,
+        detail: {
+          selection: Array.from(selectedIds)
+        }
+      }));
+    }
+    function syncValues(action = "change") {
       if (props.targetInputName) {
         let hidden = container.querySelector(`input[name="${props.targetInputName}"]`);
         if (!hidden) {
@@ -16715,57 +16900,304 @@ public static class AppTheme
           hidden.name = props.targetInputName;
           container.appendChild(hidden);
         }
-        hidden.value = JSON.stringify(items.map((it) => it.id));
+        hidden.value = JSON.stringify(itemsList.map((it, idx) => getItemId(it, idx)));
       }
       container.dispatchEvent(new CustomEvent("orderlist:change", {
         bubbles: true,
-        detail: { items }
+        detail: { value: itemsList, action }
       }));
     }
-    render();
+    buildShell();
     syncValues();
   }
-  var CSS39;
+  var ORDERLIST_CSS;
   var init_orderlist = __esm({
     "src/components/orderlist.ts"() {
       "use strict";
       init_styles();
+      init_lucide();
       init_useAutoAnimate();
-      CSS39 = `
-[data-theme="dark"] .laughtale-orderlist {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+      ORDERLIST_CSS = `
+.p-orderlist {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.25rem;
+    width: 100%;
+    font-family: var(--p-font-family, inherit);
+    color: var(--p-surface-800, #1e293b);
 }
-[data-theme="dark"] .btn-order-top {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-orderlist-controls {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 0.5rem;
+    flex-shrink: 0;
+    padding-top: 0.5rem;
 }
-[data-theme="dark"] .btn-order-up {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-orderlist-control-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    border-radius: var(--p-border-radius, 6px);
+    border: 1px solid var(--p-surface-300, #cbd5e1);
+    background: var(--p-surface-0, #ffffff);
+    color: var(--p-surface-700, #334155);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    outline: none;
 }
-[data-theme="dark"] .btn-order-down {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+.p-orderlist-control-btn:hover:not(:disabled) {
+    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-surface-900, #0f172a);
+    border-color: var(--p-surface-400, #94a3b8);
 }
-[data-theme="dark"] .btn-order-bottom {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+.p-orderlist-control-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
 }
-[data-theme="dark"] .orderlist-items-container {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-orderlist-list-container {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--p-surface-200, #e2e8f0);
+    border-radius: var(--p-border-radius-lg, 8px);
+    background: var(--p-surface-0, #ffffff);
+    overflow: hidden;
+    min-width: 0;
+    box-shadow: var(--p-shadow-xs, 0 1px 2px 0 rgba(0, 0, 0, 0.05));
 }
-[data-theme="dark"] .orderlist-item {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-orderlist-header {
+    padding: 0.75rem 1rem;
+    background: var(--p-surface-50, #f8fafc);
+    border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--p-surface-800, #1e293b);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.p-orderlist-filter-container {
+    padding: 0.5rem 0.75rem;
+    background: var(--p-surface-50, #f8fafc);
+    border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.p-orderlist-filter-input {
+    width: 100%;
+    padding: 0.4rem 2rem 0.4rem 0.65rem;
+    font-size: 0.8125rem;
+    border: 1px solid var(--p-surface-300, #cbd5e1);
+    border-radius: var(--p-border-radius, 6px);
+    background: var(--p-surface-0, #ffffff);
+    color: inherit;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.p-orderlist-filter-input:focus {
+    border-color: var(--p-primary-500, #10b981);
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+}
+.p-orderlist-filter-icon {
+    position: absolute;
+    right: 1.25rem;
+    color: var(--p-surface-400, #94a3b8);
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+}
+
+.p-orderlist-list {
+    list-style: none;
+    margin: 0;
+    padding: 0.25rem 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.p-orderlist-item {
+    padding: 0.625rem 1rem;
+    margin: 0.125rem 0.25rem;
+    border-radius: var(--p-border-radius-xs, 5px);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.875rem;
+    color: var(--p-surface-700, #334155);
+    user-select: none;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+.p-orderlist-item:hover:not(.p-highlight) {
+    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-surface-900, #0f172a);
+}
+.p-orderlist-item.p-highlight {
+    background: rgba(16, 185, 129, 0.1) !important;
+    color: var(--p-primary-700, #047857) !important;
+    font-weight: 600;
+}
+
+/* Checkbox */
+.p-checkbox-box {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.125rem;
+    height: 1.125rem;
+    border-radius: var(--p-border-radius-xs, 4px);
+    border: 2px solid var(--p-surface-300, #cbd5e1);
+    background: var(--p-surface-0, #ffffff);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+}
+.p-checkbox-box.p-checked {
+    background: var(--p-primary-500, #10b981);
+    border-color: var(--p-primary-500, #10b981);
+    color: #ffffff;
+}
+
+/* Product Item Content */
+.p-orderlist-product-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+}
+.p-orderlist-product-img {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 6px;
+    background: var(--p-surface-100, #f1f5f9);
+    border: 1px solid var(--p-surface-200, #e2e8f0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--p-primary-600, #059669);
+    flex-shrink: 0;
+}
+.p-orderlist-product-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+}
+.p-orderlist-product-name {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--p-surface-900, #0f172a);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.p-orderlist-product-category {
+    font-size: 0.75rem;
+    color: var(--p-surface-500, #64748b);
+}
+.p-orderlist-product-price {
+    font-weight: 700;
+    font-size: 0.875rem;
+    color: var(--p-surface-900, #0f172a);
+}
+
+/* Numbered Digits */
+.p-orderlist-index {
+    font-variant-numeric: tabular-nums;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--p-surface-400, #94a3b8);
+    width: 1.5rem;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+/* Footer / Status Bar */
+.p-orderlist-footer {
+    padding: 0.5rem 1rem;
+    background: var(--p-surface-50, #f8fafc);
+    border-top: 1px solid var(--p-surface-200, #e2e8f0);
+    font-size: 0.75rem;
+    color: var(--p-surface-500, #64748b);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Empty State */
+.p-orderlist-empty {
+    padding: 2.5rem 1rem;
+    text-align: center;
+    color: var(--p-surface-400, #94a3b8);
+    font-size: 0.8125rem;
+    font-style: italic;
+}
+
+/* Dark Mode Tokens */
+.dark .p-orderlist,
+[data-theme="dark"] .p-orderlist {
+    color: var(--p-surface-100, #f1f5f9) !important;
+}
+.dark .p-orderlist-list-container,
+[data-theme="dark"] .p-orderlist-list-container {
+    background: var(--p-surface-900, #0f172a) !important;
+    border-color: var(--p-surface-700, #334155) !important;
+}
+.dark .p-orderlist-header,
+.dark .p-orderlist-filter-container,
+.dark .p-orderlist-footer,
+[data-theme="dark"] .p-orderlist-header,
+[data-theme="dark"] .p-orderlist-filter-container,
+[data-theme="dark"] .p-orderlist-footer {
+    background: var(--p-surface-800, #1e293b) !important;
+    border-color: var(--p-surface-700, #334155) !important;
+    color: var(--p-surface-100, #f1f5f9) !important;
+}
+.dark .p-orderlist-filter-input,
+[data-theme="dark"] .p-orderlist-filter-input {
+    background: var(--p-surface-900, #0f172a) !important;
+    border-color: var(--p-surface-600, #475569) !important;
+    color: #ffffff !important;
+}
+.dark .p-orderlist-control-btn,
+[data-theme="dark"] .p-orderlist-control-btn {
+    background: var(--p-surface-800, #1e293b) !important;
+    border-color: var(--p-surface-600, #475569) !important;
+    color: var(--p-surface-200, #e2e8f0) !important;
+}
+.dark .p-orderlist-control-btn:hover:not(:disabled),
+[data-theme="dark"] .p-orderlist-control-btn:hover:not(:disabled) {
+    background: var(--p-surface-700, #334155) !important;
+    color: #ffffff !important;
+}
+.dark .p-orderlist-item:hover:not(.p-highlight),
+[data-theme="dark"] .p-orderlist-item:hover:not(.p-highlight) {
+    background: var(--p-surface-800, #1e293b) !important;
+    color: #ffffff !important;
+}
+.dark .p-orderlist-product-name,
+.dark .p-orderlist-product-price,
+[data-theme="dark"] .p-orderlist-product-name,
+[data-theme="dark"] .p-orderlist-product-price {
+    color: var(--p-surface-100, #f1f5f9) !important;
+}
+.dark .p-orderlist-product-img,
+[data-theme="dark"] .p-orderlist-product-img {
+    background: var(--p-surface-800, #1e293b) !important;
+    border-color: var(--p-surface-700, #334155) !important;
 }
 `;
     }
@@ -16777,7 +17209,7 @@ public static class AppTheme
     default: () => OrgChartIsland
   });
   function OrgChartIsland(container, props) {
-    injectIslandStyle("orgchart", CSS40);
+    injectIslandStyle("orgchart", CSS39);
     const rootNode = props.value || {
       key: "0",
       label: "Chief Technology Officer",
@@ -16852,12 +17284,12 @@ public static class AppTheme
       });
     });
   }
-  var CSS40;
+  var CSS39;
   var init_orgchart = __esm({
     "src/components/orgchart.ts"() {
       "use strict";
       init_styles();
-      CSS40 = `
+      CSS39 = `
 [data-theme="dark"] .orgchart-node-table {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -16883,7 +17315,7 @@ public static class AppTheme
     default: () => TerminalIsland
   });
   function TerminalIsland(container, props) {
-    injectIslandStyle("terminal", CSS41);
+    injectIslandStyle("terminal", CSS40);
     const promptPrefix = props.prompt || "admin@softmax:~$";
     const welcome = props.welcomeMessage || 'Welcome to SoftMax.LaughTale CLI v3.0\nType "help" for available commands.';
     const commands = {
@@ -16982,13 +17414,13 @@ ${h.response}`).join("\n");
     }
     render();
   }
-  var CSS41;
+  var CSS40;
   var init_terminal = __esm({
     "src/components/terminal.ts"() {
       "use strict";
       init_styles();
       init_useClipboard();
-      CSS41 = `
+      CSS40 = `
 [data-theme="dark"] .laughtale-terminal {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -17019,7 +17451,7 @@ ${h.response}`).join("\n");
     default: () => DockIsland
   });
   function DockIsland(container, props) {
-    injectIslandStyle("dock", CSS42);
+    injectIslandStyle("dock", CSS41);
     const items = props.items || [
       { label: "Overview", icon: "compass", url: "/" },
       { label: "Dashboard", icon: "bar-chart", url: "/dashboard" },
@@ -17061,13 +17493,13 @@ ${h.response}`).join("\n");
       });
     });
   }
-  var CSS42;
+  var CSS41;
   var init_dock = __esm({
     "src/components/dock.ts"() {
       "use strict";
       init_styles();
       init_lucide();
-      CSS42 = `
+      CSS41 = `
 [data-theme="dark"] .laughtale-dock {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -17088,7 +17520,7 @@ ${h.response}`).join("\n");
     default: () => GalleriaIsland
   });
   function GalleriaIsland(container, props) {
-    injectIslandStyle("galleria", CSS43);
+    injectIslandStyle("galleria", CSS42);
     const images = props.value && props.value.length > 0 ? props.value : [
       {
         itemImageSrc: "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800&auto=format&fit=crop&q=80",
@@ -17162,13 +17594,13 @@ ${h.response}`).join("\n");
     }
     render();
   }
-  var CSS43;
+  var CSS42;
   var init_galleria = __esm({
     "src/components/galleria.ts"() {
       "use strict";
       init_styles();
       init_lucide();
-      CSS43 = `
+      CSS42 = `
 [data-theme="dark"] .laughtale-galleria {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -17199,7 +17631,7 @@ ${h.response}`).join("\n");
     default: () => BlockUIIsland
   });
   function BlockUIIsland(container, props) {
-    injectIslandStyle("blockui", CSS44);
+    injectIslandStyle("blockui", CSS43);
     let isBlocked = props.blocked ?? true;
     function render() {
       container.innerHTML = `
@@ -17222,12 +17654,12 @@ ${h.response}`).join("\n");
       render();
     });
   }
-  var CSS44;
+  var CSS43;
   var init_blockui = __esm({
     "src/components/blockui.ts"() {
       "use strict";
       init_styles();
-      CSS44 = `
+      CSS43 = `
 [data-theme="dark"] .laughtale-blockui-root {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -17959,7 +18391,7 @@ ${h.response}`).join("\n");
     default: () => SelectIsland
   });
   function SelectIsland(container, props) {
-    injectIslandStyle("laughtale-select", CSS45);
+    injectIslandStyle("laughtale-select", CSS44);
     const isMultiple = props.multiple === true || String(props.multiple) === "true";
     const isCheckmark = props.checkmark === true || String(props.checkmark) === "true";
     const isCheckbox = props.checkbox === true || String(props.checkbox) === "true";
@@ -18299,13 +18731,13 @@ ${h.response}`).join("\n");
     }
     render();
   }
-  var CSS45;
+  var CSS44;
   var init_select = __esm({
     "src/components/select.ts"() {
       "use strict";
       init_styles();
       init_lucide();
-      CSS45 = `
+      CSS44 = `
 /* ==================== AURA SELECT ==================== */
 .laughtale-select,
 .p-select {
@@ -18732,7 +19164,7 @@ ${h.response}`).join("\n");
     default: () => CheckboxIsland
   });
   function CheckboxIsland(container, props) {
-    injectIslandStyle("laughtale-checkbox", CSS46);
+    injectIslandStyle("laughtale-checkbox", CSS45);
     let isChecked = Boolean(props.checked);
     let isIndeterminate = Boolean(props.indeterminate);
     const size = props.size || "normal";
@@ -18804,13 +19236,13 @@ ${h.response}`).join("\n");
     }
     render();
   }
-  var CSS46;
+  var CSS45;
   var init_checkbox = __esm({
     "src/components/checkbox.ts"() {
       "use strict";
       init_styles();
       init_lucide();
-      CSS46 = `
+      CSS45 = `
 .laughtale-checkbox-wrap {
     display: inline-flex;
     align-items: center;
@@ -18987,7 +19419,7 @@ ${h.response}`).join("\n");
     default: () => RadioButtonIsland
   });
   function RadioButtonIsland(container, props) {
-    injectIslandStyle("laughtale-radio", CSS47);
+    injectIslandStyle("laughtale-radio", CSS46);
     const isCard = props.card === true || String(props.card) === "true";
     const isFilled = props.variant === "filled";
     const size = props.size || "normal";
@@ -19219,13 +19651,13 @@ ${h.response}`).join("\n");
     }
     renderSingle();
   }
-  var CSS47;
+  var CSS46;
   var init_radio_button = __esm({
     "src/components/radio-button.ts"() {
       "use strict";
       init_styles();
       init_lucide();
-      CSS47 = `
+      CSS46 = `
 /* ==================== AURA RADIOBUTTON ==================== */
 .laughtale-radio-root,
 .p-radiobutton-root {
@@ -19508,7 +19940,7 @@ ${h.response}`).join("\n");
     default: () => TextareaIsland
   });
   function TextareaIsland(container, props) {
-    injectIslandStyle("laughtale-textarea", CSS48);
+    injectIslandStyle("laughtale-textarea", CSS47);
     const isAutoResize = props.autoResize === true || String(props.autoResize) === "true";
     const isFluid = props.fluid === true || String(props.fluid) === "true";
     const isInvalid = props.invalid === true || String(props.invalid) === "true";
@@ -19584,12 +20016,12 @@ ${h.response}`).join("\n");
       setTimeout(adjustHeight, 0);
     }
   }
-  var CSS48;
+  var CSS47;
   var init_textarea = __esm({
     "src/components/textarea.ts"() {
       "use strict";
       init_styles();
-      CSS48 = `
+      CSS47 = `
 /* ==================== AURA TEXTAREA ==================== */
 .p-textarea {
     font-family: var(--p-font-family, inherit);
@@ -19714,7 +20146,7 @@ ${h.response}`).join("\n");
     default: () => InputMaskIsland
   });
   function InputMaskIsland(container, props) {
-    injectIslandStyle("laughtale-input-mask", CSS49);
+    injectIslandStyle("laughtale-input-mask", CSS48);
     const mask = props.mask || "(999) 999-9999";
     const slotChar = props.slotChar || "_";
     const autoClear = props.autoClear !== false && String(props.autoClear) !== "false";
@@ -19901,12 +20333,12 @@ ${h.response}`).join("\n");
     });
     syncValue();
   }
-  var CSS49;
+  var CSS48;
   var init_input_mask = __esm({
     "src/components/input-mask.ts"() {
       "use strict";
       init_styles();
-      CSS49 = `
+      CSS48 = `
 /* ==================== AURA INPUTMASK ==================== */
 .laughtale-input-mask,
 .p-inputmask {
@@ -20016,7 +20448,7 @@ ${h.response}`).join("\n");
     default: () => FloatLabelIsland
   });
   function FloatLabelIsland(container, props) {
-    injectIslandStyle("laughtale-float-label", CSS50);
+    injectIslandStyle("laughtale-float-label", CSS49);
     const variant = props.variant || "over";
     const initialHtml = container.innerHTML;
     const forAttr = props.for ? `for="${props.for}"` : "";
@@ -20094,12 +20526,12 @@ ${h.response}`).join("\n");
     setTimeout(updateFloatingState, 50);
     setTimeout(updateFloatingState, 200);
   }
-  var CSS50;
+  var CSS49;
   var init_float_label = __esm({
     "src/components/float-label.ts"() {
       "use strict";
       init_styles();
-      CSS50 = `
+      CSS49 = `
 .laughtale-float-label {
     position: relative;
     display: inline-flex;
@@ -20226,7 +20658,7 @@ ${h.response}`).join("\n");
     default: () => IftaLabelIsland
   });
   function IftaLabelIsland(container, props) {
-    injectIslandStyle("laughtale-ifta-label", CSS51);
+    injectIslandStyle("laughtale-ifta-label", CSS50);
     const initialHtml = container.innerHTML;
     const forAttr = props.for ? `for="${props.for}"` : "";
     const existingLabel = container.querySelector("label");
@@ -20249,12 +20681,12 @@ ${h.response}`).join("\n");
       }
     });
   }
-  var CSS51;
+  var CSS50;
   var init_ifta_label = __esm({
     "src/components/ifta-label.ts"() {
       "use strict";
       init_styles();
-      CSS51 = `
+      CSS50 = `
 .laughtale-ifta-label {
     position: relative;
     display: inline-flex;
@@ -20342,14 +20774,14 @@ ${h.response}`).join("\n");
     default: () => InputGroupIsland
   });
   function InputGroupIsland(container, props) {
-    injectIslandStyle("laughtale-inputgroup", CSS52);
+    injectIslandStyle("laughtale-inputgroup", CSS51);
     container.classList.add("laughtale-inputgroup", "p-inputgroup");
     if (props.size) {
       container.classList.add(`size-${props.size}`);
     }
   }
   function InputGroupAddonIsland(container, props) {
-    injectIslandStyle("laughtale-inputgroup", CSS52);
+    injectIslandStyle("laughtale-inputgroup", CSS51);
     container.classList.add("laughtale-inputgroup-addon", "p-inputgroup-addon");
     if (props.icon && !container.querySelector("svg")) {
       const svg = getLucideIcon(props.icon);
@@ -20361,13 +20793,13 @@ ${h.response}`).join("\n");
       container.insertAdjacentHTML("beforeend", `<span>${props.text}</span>`);
     }
   }
-  var CSS52;
+  var CSS51;
   var init_input_group = __esm({
     "src/components/input-group.ts"() {
       "use strict";
       init_styles();
       init_lucide();
-      CSS52 = `
+      CSS51 = `
 .laughtale-inputgroup,
 .p-inputgroup {
     display: flex;
@@ -20639,7 +21071,7 @@ ${h.response}`).join("\n");
     default: () => InputTextIsland
   });
   function InputTextIsland(container, props) {
-    injectIslandStyle("laughtale-inputtext", CSS53);
+    injectIslandStyle("laughtale-inputtext", CSS52);
     const [getValue, setValue] = useControllableState({
       defaultValue: props.value ?? "",
       onChange: (val) => {
@@ -20780,14 +21212,14 @@ ${h.response}`).join("\n");
     }
     init();
   }
-  var CSS53, xIcon;
+  var CSS52, xIcon;
   var init_input_text = __esm({
     "src/components/input-text.ts"() {
       "use strict";
       init_styles();
       init_lucide();
       init_useControllableState();
-      CSS53 = `
+      CSS52 = `
 .laughtale-inputtext-wrap,
 .p-inputtext-wrap {
     position: relative;
@@ -21283,7 +21715,7 @@ ${h.response}`).join("\n");
     default: () => PaginatorIsland
   });
   function PaginatorIsland(container, props) {
-    injectIslandStyle("paginator", CSS54);
+    injectIslandStyle("paginator", CSS53);
     let first = props.first || 0;
     let rows = props.rows || 10;
     const totalRecords = props.totalRecords || 0;
@@ -21343,13 +21775,13 @@ ${h.response}`).join("\n");
     }
     render();
   }
-  var CSS54;
+  var CSS53;
   var init_paginator = __esm({
     "src/components/paginator.ts"() {
       "use strict";
       init_lucide();
       init_styles();
-      CSS54 = `
+      CSS53 = `
 .laughtale-paginator {
     display: flex;
     align-items: center;

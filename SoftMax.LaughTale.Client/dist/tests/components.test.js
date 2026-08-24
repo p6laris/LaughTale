@@ -49,62 +49,6 @@ globalThis.IntersectionObserver = class {
 import { describe, it, beforeEach } from "node:test";
 import assert from "node:assert";
 
-// src/icons/lucide.ts
-var LucideIcons = {
-  // Navigation & Arrows
-  chevronDown: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`,
-  chevronUp: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>`,
-  chevronLeft: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>`,
-  chevronRight: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`,
-  arrowUp: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>`,
-  arrowDown: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>`,
-  arrowLeft: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>`,
-  arrowRight: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>`,
-  // Common Actions
-  check: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>`,
-  checkCircle: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>`,
-  x: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`,
-  xCircle: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>`,
-  plus: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>`,
-  minus: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>`,
-  search: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>`,
-  refreshCw: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>`,
-  trash2: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>`,
-  copy: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>`,
-  externalLink: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>`,
-  // Forms & Controls
-  eye: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>`,
-  eyeOff: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>`,
-  calendar: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>`,
-  clock: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
-  star: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`,
-  starEmpty: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`,
-  camera: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>`,
-  uploadCloud: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M12 12v9"/><path d="m16 16-4-4-4 4"/></svg>`,
-  sliders: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="4" y1="21" y2="14"/><line x1="4" x2="4" y1="10" y2="3"/><line x1="12" x2="12" y1="21" y2="12"/><line x1="12" x2="12" y1="8" y2="3"/><line x1="20" x2="20" y1="21" y2="16"/><line x1="20" x2="20" y1="12" y2="3"/><line x1="1" x2="7" y1="14" y2="14"/><line x1="9" x2="15" y1="8" y2="8"/><line x1="17" x2="23" y1="16" y2="16"/></svg>`,
-  palette: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>`,
-  // Security & Status
-  lock: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`,
-  shield: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>`,
-  alertTriangle: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>`,
-  info: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-  bell: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>`,
-  zap: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
-  activity: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>`,
-  // Media & UI
-  layers: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.9a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg>`,
-  folder: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>`,
-  fileText: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>`,
-  terminal: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/></svg>`,
-  code: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>`,
-  moreHorizontal: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>`,
-  sun: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`,
-  moon: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>`,
-  edit: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>`,
-  gitBranch: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" x2="6" y1="3" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>`,
-  alertCircle: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>`
-};
-
 // src/directives/csp.ts
 function getCspNonce() {
   if (typeof document === "undefined") return null;
@@ -134,98 +78,521 @@ function injectIslandStyle(islandName, css) {
 
 // src/components/input-number.ts
 var CSS = `
-[data-theme="dark"] .laughtale-input-number {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+.laughtale-inputnumber,
+.p-inputnumber {
+    display: inline-flex;
+    align-items: stretch;
+    position: relative;
+    font-family: var(--p-font-family, inherit);
+    background: var(--p-surface-0);
+    border: 1px solid var(--p-border-color);
+    border-radius: var(--p-border-radius);
+    transition: border-color 150ms ease, box-shadow 150ms ease, background 150ms ease;
+    box-sizing: border-box;
+    min-height: 2.5rem;
+    overflow: hidden;
+    vertical-align: middle;
 }
-[data-theme="dark"] .number-display-input {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-inputnumber.p-inputnumber-fluid {
+    display: flex;
+    width: 100%;
 }
-[data-theme="dark"] .btn-step-up {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-inputnumber:hover:not(.is-disabled) {
+    border-color: var(--p-surface-400);
 }
-[data-theme="dark"] .btn-step-down {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-inputnumber:focus-within:not(.is-disabled) {
+    border-color: var(--p-primary-500) !important;
+    box-shadow: 0 0 0 1px var(--p-primary-500) !important;
+}
+
+.p-inputnumber.is-disabled {
+    background: var(--p-surface-100);
+    opacity: 0.75;
+    cursor: not-allowed;
+}
+
+/* Variant: Filled */
+.p-inputnumber.variant-filled {
+    background: var(--p-surface-100);
+    border-color: transparent;
+}
+.p-inputnumber.variant-filled:focus-within {
+    background: var(--p-surface-0);
+    border-color: var(--p-primary-500) !important;
+}
+
+/* Invalid State */
+.p-inputnumber.is-invalid {
+    border-color: var(--p-red-500, #ef4444) !important;
+}
+.p-inputnumber.is-invalid:focus-within {
+    box-shadow: 0 0 0 1px var(--p-red-500, #ef4444) !important;
+}
+
+/* Sizes */
+.p-inputnumber.size-small {
+    min-height: 2rem;
+}
+.p-inputnumber.size-small .p-inputnumber-input {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+}
+.p-inputnumber.size-large {
+    min-height: 3rem;
+}
+.p-inputnumber.size-large .p-inputnumber-input {
+    font-size: 1rem;
+    padding: 0.75rem 1rem;
+}
+
+/* Inner Input */
+.p-inputnumber-input {
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
+    font-family: inherit;
+    font-size: 0.875rem;
+    color: var(--p-text-color);
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 0.5rem 0.75rem;
+    box-sizing: border-box;
+    font-variant-numeric: tabular-nums;
+    height: 100%;
+}
+.p-inputnumber-input:disabled {
+    color: var(--p-text-muted);
+    cursor: not-allowed;
+}
+
+/* Clear Icon */
+.p-inputnumber-clear-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--p-text-muted);
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    padding: 0 0.5rem;
+    transition: color 150ms ease;
+}
+.p-inputnumber-clear-icon:hover {
+    color: var(--p-text-color);
+}
+.p-inputnumber-clear-icon svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* ==================== BUTTONS ==================== */
+
+/* Shared Button Styles */
+.p-inputnumber-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--p-surface-100);
+    color: var(--p-surface-600);
+    border: none;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: background 150ms ease, color 150ms ease;
+    padding: 0;
+    box-sizing: border-box;
+}
+.p-inputnumber-button:hover:not(:disabled) {
+    background: var(--p-surface-200);
+    color: var(--p-surface-900);
+}
+.p-inputnumber-button:active:not(:disabled) {
+    background: var(--p-surface-300);
+}
+.p-inputnumber-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+.p-inputnumber-button svg {
+    width: 12px;
+    height: 12px;
+    display: block;
+}
+
+/* Layout 1: Stacked (Default) */
+.p-inputnumber-button-group {
+    display: flex;
+    flex-direction: column;
+    width: 2.25rem;
+    border-left: 1px solid var(--p-border-color);
+    background: var(--p-surface-100);
+    flex-shrink: 0;
+}
+.p-inputnumber:focus-within .p-inputnumber-button-group {
+    border-left-color: var(--p-primary-500);
+}
+.p-inputnumber-stacked .p-inputnumber-button-up {
+    flex: 1;
+    border-bottom: 1px solid var(--p-border-color);
+}
+.p-inputnumber-stacked:focus-within .p-inputnumber-button-up {
+    border-bottom-color: var(--p-primary-500);
+}
+.p-inputnumber-stacked .p-inputnumber-button-down {
+    flex: 1;
+}
+
+/* Layout 2: Horizontal */
+.p-inputnumber-horizontal .p-inputnumber-button-down {
+    width: 2.5rem;
+    border-right: 1px solid var(--p-border-color);
+    flex-shrink: 0;
+}
+.p-inputnumber-horizontal:focus-within .p-inputnumber-button-down {
+    border-right-color: var(--p-primary-500);
+}
+.p-inputnumber-horizontal .p-inputnumber-input {
+    text-align: center;
+}
+.p-inputnumber-horizontal .p-inputnumber-button-up {
+    width: 2.5rem;
+    border-left: 1px solid var(--p-border-color);
+    flex-shrink: 0;
+}
+.p-inputnumber-horizontal:focus-within .p-inputnumber-button-up {
+    border-left-color: var(--p-primary-500);
+}
+
+/* Layout 3: Vertical */
+.p-inputnumber-vertical {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    width: auto;
+    min-height: auto;
+}
+.p-inputnumber-vertical .p-inputnumber-button-up {
+    width: 100%;
+    height: 2rem;
+    border-bottom: 1px solid var(--p-border-color);
+}
+.p-inputnumber-vertical:focus-within .p-inputnumber-button-up {
+    border-bottom-color: var(--p-primary-500);
+}
+.p-inputnumber-vertical .p-inputnumber-input {
+    text-align: center;
+    width: 3.5rem;
+    height: 2.5rem;
+}
+.p-inputnumber-vertical .p-inputnumber-button-down {
+    width: 100%;
+    height: 2rem;
+    border-top: 1px solid var(--p-border-color);
+}
+.p-inputnumber-vertical:focus-within .p-inputnumber-button-down {
+    border-top-color: var(--p-primary-500);
+}
+
+/* ==================== DARK MODE ==================== */
+.dark .laughtale-inputnumber,
+.dark .p-inputnumber {
+    background: var(--p-surface-900);
+    border-color: var(--p-surface-700);
+}
+.dark .p-inputnumber:hover:not(.is-disabled) {
+    border-color: var(--p-surface-600);
+}
+.dark .p-inputnumber.variant-filled {
+    background: var(--p-surface-800);
+}
+.dark .p-inputnumber.variant-filled:focus-within {
+    background: var(--p-surface-900);
+}
+.dark .p-inputnumber-input {
+    color: var(--p-surface-0);
+}
+.dark .p-inputnumber-button-group,
+.dark .p-inputnumber-button {
+    background: var(--p-surface-800);
+    color: var(--p-surface-400);
+}
+.dark .p-inputnumber:focus-within .p-inputnumber-button-group,
+.dark .p-inputnumber:focus-within .p-inputnumber-button-up,
+.dark .p-inputnumber:focus-within .p-inputnumber-button-down {
+    border-color: var(--p-primary-500);
+}
+.dark .p-inputnumber-button:hover:not(:disabled) {
+    background: var(--p-surface-700);
+    color: var(--p-surface-100);
+}
+.dark .p-inputnumber-button:active:not(:disabled) {
+    background: var(--p-surface-600);
 }
 `;
 function InputNumberIsland(container, props) {
-  injectIslandStyle("input-number", CSS);
-  let rawValue = props.value !== void 0 ? Number(props.value) : null;
-  const step = props.step || 1;
-  const decimals = props.decimals !== void 0 ? props.decimals : props.mode === "currency" ? 2 : 0;
-  const prefix = props.prefix || (props.mode === "currency" ? props.currency === "EUR" ? "\u20AC " : props.currency === "IQD" ? "IQD " : "$ " : "");
-  const suffix = props.suffix || (props.mode === "percent" ? " %" : "");
+  injectIslandStyle("laughtale-inputnumber", CSS);
+  let rawValue = props.value !== void 0 && props.value !== null ? Number(props.value) : null;
+  const step = props.step !== void 0 ? Number(props.step) : 1;
+  const min = props.min !== void 0 ? Number(props.min) : void 0;
+  const max = props.max !== void 0 ? Number(props.max) : void 0;
+  const isCurrency = props.mode === "currency";
+  const currency = props.currency || "USD";
+  const currencyDisplay = props.currencyDisplay || "symbol";
+  const locale = props.locale || void 0;
+  const useGrouping = props.useGrouping !== false && String(props.useGrouping) !== "false";
+  const buttonLayout = props.buttonLayout || "stacked";
+  const showButtons = props.showButtons === true || String(props.showButtons) === "true";
+  const isFluid = props.fluid === true || String(props.fluid) === "true";
+  const isInvalid = props.invalid === true || String(props.invalid) === "true";
+  const isFilled = props.variant === "filled";
+  const isDisabled = props.disabled === true || String(props.disabled) === "true";
+  const showClear = props.showClear === true || String(props.showClear) === "true";
+  let minFractionDigits = props.minFractionDigits !== void 0 ? Number(props.minFractionDigits) : void 0;
+  let maxFractionDigits = props.maxFractionDigits !== void 0 ? Number(props.maxFractionDigits) : void 0;
+  if (minFractionDigits === void 0 && maxFractionDigits === void 0) {
+    if (isCurrency) {
+      minFractionDigits = currency === "JPY" ? 0 : 2;
+      maxFractionDigits = currency === "JPY" ? 0 : 2;
+    } else {
+      minFractionDigits = 0;
+      maxFractionDigits = 20;
+    }
+  }
   function formatNumber(val) {
     if (val === null || isNaN(val)) return "";
-    const parts = val.toFixed(decimals).split(".");
-    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    return `${prefix}${parts.join(".")}${suffix}`;
+    let formatted = "";
+    try {
+      if (isCurrency) {
+        const formatter = new Intl.NumberFormat(locale, {
+          style: "currency",
+          currency,
+          currencyDisplay,
+          useGrouping,
+          minimumFractionDigits: minFractionDigits,
+          maximumFractionDigits: maxFractionDigits
+        });
+        formatted = formatter.format(val);
+      } else {
+        const formatter = new Intl.NumberFormat(locale, {
+          style: "decimal",
+          useGrouping,
+          minimumFractionDigits: minFractionDigits,
+          maximumFractionDigits: maxFractionDigits
+        });
+        formatted = formatter.format(val);
+      }
+    } catch {
+      formatted = val.toString();
+    }
+    if (props.prefix && !formatted.startsWith(props.prefix)) {
+      formatted = `${props.prefix}${formatted}`;
+    }
+    if (props.suffix && !formatted.endsWith(props.suffix)) {
+      formatted = `${formatted}${props.suffix}`;
+    }
+    return formatted;
   }
   function parseRaw(str) {
-    let cleaned = str.replace(new RegExp(`[${prefix}${suffix},]`, "g"), "").trim();
-    const parsed = parseFloat(cleaned);
+    if (!str || !str.trim()) return null;
+    let clean = str;
+    if (props.prefix) {
+      clean = clean.replace(props.prefix, "");
+    }
+    if (props.suffix) {
+      clean = clean.replace(props.suffix, "");
+    }
+    clean = clean.replace(/[^\d.,-]/g, "").trim();
+    if (clean.indexOf(",") > -1 && clean.indexOf(".") === -1) {
+      clean = clean.replace(",", ".");
+    } else if (clean.indexOf(",") > -1 && clean.indexOf(".") > -1) {
+      if (clean.lastIndexOf(",") > clean.lastIndexOf(".")) {
+        clean = clean.replace(/\./g, "").replace(",", ".");
+      } else {
+        clean = clean.replace(/,/g, "");
+      }
+    }
+    const parsed = parseFloat(clean);
     return isNaN(parsed) ? null : parsed;
   }
   function render() {
-    container.innerHTML = `
-            <div class="laughtale-input-number" style="display: inline-flex; align-items: stretch; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); background: var(--p-surface-0); overflow: hidden; transition: border-color 0.2s ease, box-shadow 0.2s ease; width: 100%; max-width: 320px;">
-                <input type="text" class="number-display-input" value="${formatNumber(rawValue)}" placeholder="${props.placeholder || ""}" ${props.disabled ? "disabled" : ""} style="flex: 1; padding: 0.5rem 0.75rem; border: none; outline: none; background: transparent; font-family: var(--p-font-family); font-size: 0.875rem; color: var(--p-text-color); font-variant-numeric: tabular-nums;" />
-                
-                ${props.showButtons !== false ? `
-                    <div style="display: flex; flex-direction: column; border-left: 1px solid var(--p-border-color); width: 2rem;">
-                        <button type="button" class="btn-step-up" style="flex: 1; border: none; background: var(--p-surface-50); color: var(--p-surface-600); cursor: pointer; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid var(--p-border-color); transition: background 0.15s ease;">
-                            ${LucideIcons.chevronUp}
+    container.innerHTML = "";
+    container.className = "laughtale-inputnumber p-inputnumber";
+    if (isFluid) container.classList.add("p-inputnumber-fluid");
+    if (isFilled) container.classList.add("variant-filled");
+    if (props.size) container.classList.add(`size-${props.size}`);
+    if (isInvalid) container.classList.add("is-invalid");
+    if (isDisabled) container.classList.add("is-disabled");
+    if (showButtons) container.classList.add(`p-inputnumber-${buttonLayout}`);
+    const inputIdAttr = props.inputId ? `id="${props.inputId}"` : "";
+    const placeholderAttr = props.placeholder ? `placeholder="${props.placeholder}"` : "";
+    const disabledAttr = isDisabled ? "disabled" : "";
+    const formattedVal = formatNumber(rawValue);
+    const upIcon = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>`;
+    const downIcon = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
+    const plusIcon = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>`;
+    const minusIcon = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>`;
+    const clearIcon = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
+    let html = "";
+    if (showButtons && buttonLayout === "horizontal") {
+      html += `
+                <button type="button" class="p-inputnumber-button p-inputnumber-button-down" tabindex="-1" ${disabledAttr} aria-label="Decrement">
+                    ${minusIcon}
+                </button>
+            `;
+    } else if (showButtons && buttonLayout === "vertical") {
+      html += `
+                <button type="button" class="p-inputnumber-button p-inputnumber-button-up" tabindex="-1" ${disabledAttr} aria-label="Increment">
+                    ${plusIcon}
+                </button>
+            `;
+    }
+    html += `
+            <input type="text"
+                class="p-inputnumber-input ${props.inputClass || ""}"
+                ${inputIdAttr}
+                ${placeholderAttr}
+                ${disabledAttr}
+                value="${formattedVal}"
+                role="spinbutton"
+                aria-valuenow="${rawValue ?? ""}"
+                ${min !== void 0 ? `aria-valuemin="${min}"` : ""}
+                ${max !== void 0 ? `aria-valuemax="${max}"` : ""}
+                ${isInvalid ? 'aria-invalid="true"' : ""}
+                autocomplete="off"
+            />
+        `;
+    if (showClear && rawValue !== null && !isDisabled) {
+      html += `
+                <button type="button" class="p-inputnumber-clear-icon" aria-label="Clear value" tabindex="-1">
+                    ${clearIcon}
+                </button>
+            `;
+    }
+    if (showButtons) {
+      if (buttonLayout === "stacked") {
+        html += `
+                    <div class="p-inputnumber-button-group">
+                        <button type="button" class="p-inputnumber-button p-inputnumber-button-up" tabindex="-1" ${disabledAttr} aria-label="Increment">
+                            ${upIcon}
                         </button>
-                        <button type="button" class="btn-step-down" style="flex: 1; border: none; background: var(--p-surface-50); color: var(--p-surface-600); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s ease;">
-                            ${LucideIcons.chevronDown}
+                        <button type="button" class="p-inputnumber-button p-inputnumber-button-down" tabindex="-1" ${disabledAttr} aria-label="Decrement">
+                            ${downIcon}
                         </button>
                     </div>
-                ` : ""}
-            </div>
-        `;
-    const displayInput = container.querySelector(".number-display-input");
-    displayInput.addEventListener("focus", () => {
-      const wrap = container.querySelector(".laughtale-input-number");
-      if (wrap) {
-        wrap.style.borderColor = "var(--p-primary-600)";
-        wrap.style.boxShadow = "0 0 0 1px var(--p-primary-600)";
+                `;
+      } else if (buttonLayout === "horizontal") {
+        html += `
+                    <button type="button" class="p-inputnumber-button p-inputnumber-button-up" tabindex="-1" ${disabledAttr} aria-label="Increment">
+                        ${plusIcon}
+                    </button>
+                `;
+      } else if (buttonLayout === "vertical") {
+        html += `
+                    <button type="button" class="p-inputnumber-button p-inputnumber-button-down" tabindex="-1" ${disabledAttr} aria-label="Decrement">
+                        ${minusIcon}
+                    </button>
+                `;
+      }
+    }
+    container.innerHTML = html;
+    bindEvents();
+  }
+  function bindEvents() {
+    const inputEl = container.querySelector(".p-inputnumber-input");
+    const clearBtn = container.querySelector(".p-inputnumber-clear-icon");
+    const upBtn = container.querySelector(".p-inputnumber-button-up");
+    const downBtn = container.querySelector(".p-inputnumber-button-down");
+    inputEl.addEventListener("blur", () => {
+      const parsed = parseRaw(inputEl.value);
+      setValue(parsed);
+      inputEl.value = formatNumber(rawValue);
+    });
+    inputEl.addEventListener("input", () => {
+      const parsed = parseRaw(inputEl.value);
+      rawValue = parsed;
+      syncTargetInput();
+    });
+    inputEl.addEventListener("keydown", (e) => {
+      if (isDisabled) return;
+      if (e.key === "ArrowUp") {
+        e.preventDefault();
+        stepUp();
+      } else if (e.key === "ArrowDown") {
+        e.preventDefault();
+        stepDown();
+      } else if (e.key === "Home" && min !== void 0) {
+        e.preventDefault();
+        setValue(min);
+        inputEl.value = formatNumber(rawValue);
+      } else if (e.key === "End" && max !== void 0) {
+        e.preventDefault();
+        setValue(max);
+        inputEl.value = formatNumber(rawValue);
+      } else if (e.key === "Enter") {
+        const parsed = parseRaw(inputEl.value);
+        setValue(parsed);
+        inputEl.value = formatNumber(rawValue);
       }
     });
-    displayInput.addEventListener("blur", () => {
-      const wrap = container.querySelector(".laughtale-input-number");
-      if (wrap) {
-        wrap.style.borderColor = "var(--p-border-color)";
-        wrap.style.boxShadow = "none";
-      }
-      displayInput.value = formatNumber(rawValue);
+    upBtn?.addEventListener("mousedown", (e) => {
+      e.preventDefault();
     });
-    displayInput.addEventListener("input", () => {
-      rawValue = parseRaw(displayInput.value);
-      syncValue();
+    upBtn?.addEventListener("click", (e) => {
+      e.preventDefault();
+      stepUp();
     });
-    container.querySelector(".btn-step-up")?.addEventListener("click", () => {
-      rawValue = (rawValue ?? 0) + step;
-      if (props.max !== void 0 && rawValue > props.max) rawValue = props.max;
-      displayInput.value = formatNumber(rawValue);
-      syncValue();
+    downBtn?.addEventListener("mousedown", (e) => {
+      e.preventDefault();
     });
-    container.querySelector(".btn-step-down")?.addEventListener("click", () => {
-      rawValue = (rawValue ?? 0) - step;
-      if (props.min !== void 0 && rawValue < props.min) rawValue = props.min;
-      displayInput.value = formatNumber(rawValue);
-      syncValue();
+    downBtn?.addEventListener("click", (e) => {
+      e.preventDefault();
+      stepDown();
+    });
+    clearBtn?.addEventListener("mousedown", (e) => {
+      e.preventDefault();
+    });
+    clearBtn?.addEventListener("click", (e) => {
+      e.preventDefault();
+      setValue(null);
+      inputEl.value = "";
+      inputEl.focus();
     });
   }
-  function syncValue() {
+  function stepUp() {
+    let current = rawValue ?? 0;
+    let next = current + step;
+    if (max !== void 0 && next > max) next = max;
+    setValue(next);
+    const inputEl = container.querySelector(".p-inputnumber-input");
+    if (inputEl) inputEl.value = formatNumber(rawValue);
+  }
+  function stepDown() {
+    let current = rawValue ?? 0;
+    let next = current - step;
+    if (min !== void 0 && next < min) next = min;
+    setValue(next);
+    const inputEl = container.querySelector(".p-inputnumber-input");
+    if (inputEl) inputEl.value = formatNumber(rawValue);
+  }
+  function setValue(val) {
+    if (val !== null) {
+      if (min !== void 0 && val < min) val = min;
+      if (max !== void 0 && val > max) val = max;
+    }
+    rawValue = val;
+    syncTargetInput();
+    container.dispatchEvent(new CustomEvent("inputnumber:change", {
+      bubbles: true,
+      detail: { value: rawValue }
+    }));
+  }
+  function syncTargetInput() {
     if (props.targetInputName) {
-      let hidden = document.querySelector(`input[name="${props.targetInputName}"]`);
+      let hidden = container.querySelector(`input[name="${props.targetInputName}"]`);
       if (!hidden) {
         hidden = document.createElement("input");
         hidden.type = "hidden";
@@ -234,97 +601,314 @@ function InputNumberIsland(container, props) {
       }
       hidden.value = rawValue !== null ? rawValue.toString() : "";
     }
-    container.dispatchEvent(new CustomEvent("number:change", {
-      bubbles: true,
-      detail: { value: rawValue }
-    }));
   }
   render();
-  syncValue();
+  syncTargetInput();
 }
 
 // src/components/input-otp.ts
 var CSS2 = `
-[data-theme="dark"] .otp-box {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+.laughtale-input-otp,
+.p-inputotp {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--p-font-family, inherit);
+    box-sizing: border-box;
 }
-[data-theme="dark"] .otp-digit-input {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-inputotp.p-inputotp-grouped {
+    gap: 0;
 }
-[data-theme="dark"] .laughtale-input-otp {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+/* Individual Digit Cell */
+.p-inputotp-input {
+    width: 2.75rem;
+    height: 3.25rem;
+    font-family: inherit;
+    font-size: 1.25rem;
+    font-weight: 700;
+    text-align: center;
+    color: var(--p-text-color);
+    background: var(--p-surface-0);
+    border: 1px solid var(--p-border-color);
+    border-radius: var(--p-border-radius);
+    outline: none;
+    transition: border-color 150ms ease, box-shadow 150ms ease, background 150ms ease;
+    box-sizing: border-box;
+    font-variant-numeric: tabular-nums;
+    padding: 0;
+}
+
+.p-inputotp-input:hover:not(:disabled) {
+    border-color: var(--p-surface-400);
+}
+
+.p-inputotp-input:focus {
+    border-color: var(--p-primary-500) !important;
+    box-shadow: 0 0 0 1px var(--p-primary-500) !important;
+    z-index: 2;
+    position: relative;
+}
+
+.p-inputotp-input:disabled {
+    background: var(--p-surface-100);
+    color: var(--p-text-muted);
+    cursor: not-allowed;
+    opacity: 0.75;
+}
+
+/* Variant: Filled */
+.p-inputotp.variant-filled .p-inputotp-input {
+    background: var(--p-surface-100);
+    border-color: transparent;
+}
+.p-inputotp.variant-filled .p-inputotp-input:focus {
+    background: var(--p-surface-0);
+    border-color: var(--p-primary-500) !important;
+}
+
+/* Sizes */
+.p-inputotp.size-small .p-inputotp-input {
+    width: 2rem;
+    height: 2.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+}
+.p-inputotp.size-large .p-inputotp-input {
+    width: 3.25rem;
+    height: 3.75rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+/* Invalid State */
+.p-inputotp.is-invalid .p-inputotp-input {
+    border-color: var(--p-red-500, #ef4444) !important;
+}
+.p-inputotp.is-invalid .p-inputotp-input:focus {
+    box-shadow: 0 0 0 1px var(--p-red-500, #ef4444) !important;
+}
+
+/* Grouped Layout with Joined Borders */
+.p-inputotp-group {
+    display: inline-flex;
+    align-items: center;
+}
+.p-inputotp-group .p-inputotp-input:first-child {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.p-inputotp-group .p-inputotp-input:not(:first-child):not(:last-child) {
+    border-radius: 0;
+    margin-left: -1px;
+}
+.p-inputotp-group .p-inputotp-input:last-child {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    margin-left: -1px;
+}
+
+/* Separator between Groups */
+.p-inputotp-separator {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 0.75rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--p-text-muted);
+    user-select: none;
+}
+
+/* ==================== DARK MODE ==================== */
+.dark .p-inputotp-input {
+    background: var(--p-surface-900);
+    border-color: var(--p-surface-700);
+    color: var(--p-surface-0);
+}
+.dark .p-inputotp-input:hover:not(:disabled) {
+    border-color: var(--p-surface-600);
+}
+.dark .p-inputotp.variant-filled .p-inputotp-input {
+    background: var(--p-surface-800);
+}
+.dark .p-inputotp.variant-filled .p-inputotp-input:focus {
+    background: var(--p-surface-900);
+}
+.dark .p-inputotp-input:disabled {
+    background: var(--p-surface-800);
+    border-color: var(--p-surface-700);
+    color: var(--p-surface-500);
+}
+.dark .p-inputotp-separator {
+    color: var(--p-surface-400);
 }
 `;
 function InputOtpIsland(container, props) {
-  injectIslandStyle("input-otp", CSS2);
-  const length = props.length || 6;
-  let values = new Array(length).fill("");
+  injectIslandStyle("laughtale-inputotp", CSS2);
+  const length = Number(props.length) || 4;
+  const isMask = props.mask === true || String(props.mask) === "true";
+  const isIntegerOnly = props.integerOnly !== false && String(props.integerOnly) !== "false";
+  const isGrouped = props.grouped === true || String(props.grouped) === "true";
+  const isFilled = props.variant === "filled";
+  const isDisabled = props.disabled === true || String(props.disabled) === "true";
+  const isReadonly = props.readonlyMode === true || String(props.readonlyMode) === "true";
+  const isInvalid = props.invalid === true || String(props.invalid) === "true";
+  const separator = props.separator || "-";
+  const initialVal = props.value || "";
+  let values = Array.from({ length }, (_, i) => initialVal[i] || "");
   function render() {
-    const boxes = Array.from({ length }, (_, i) => `
-            <input type="${props.mask ? "password" : "text"}" 
-                   class="otp-box otp-digit-input" 
-                   data-index="${i}" 
-                   maxlength="1" 
-                   inputmode="numeric" 
-                   pattern="[0-9]*" 
-                   value="${values[i] || ""}" 
-                   ${props.disabled ? "disabled" : ""} 
-                   style="width: 2.75rem; height: 3.25rem; text-align: center; font-size: 1.25rem; font-weight: 700; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); background: var(--p-surface-0); color: var(--p-text-color); outline: none; transition: all 0.15s ease;" />
-        `).join("");
-    container.innerHTML = `
-            <div class="laughtale-input-otp" style="display: inline-flex; gap: 0.5rem; align-items: center;">
-                ${boxes}
-            </div>
-        `;
-    const inputs = container.querySelectorAll(".otp-box");
+    container.className = "laughtale-input-otp p-inputotp";
+    if (isFilled) container.classList.add("variant-filled");
+    if (props.size) container.classList.add(`size-${props.size}`);
+    if (isInvalid) container.classList.add("is-invalid");
+    if (isDisabled) container.classList.add("is-disabled");
+    if (isGrouped) container.classList.add("p-inputotp-grouped");
+    const inputType = isMask ? "password" : "text";
+    const inputMode = isIntegerOnly ? "numeric" : "text";
+    const patternAttr = isIntegerOnly ? 'pattern="[0-9]*"' : "";
+    const disabledAttr = isDisabled ? "disabled" : "";
+    const roAttr = isReadonly ? "readonly" : "";
+    let html = "";
+    if (isGrouped && length % 2 === 0) {
+      const mid = length / 2;
+      html += '<div class="p-inputotp-group">';
+      for (let i = 0; i < mid; i++) {
+        html += `
+                    <input type="${inputType}"
+                           class="p-inputotp-input"
+                           data-index="${i}"
+                           maxlength="1"
+                           inputmode="${inputMode}"
+                           ${patternAttr}
+                           ${disabledAttr}
+                           ${roAttr}
+                           value="${values[i] || ""}"
+                           autocomplete="off"
+                           aria-label="Character ${i + 1}" />
+                `;
+      }
+      html += "</div>";
+      html += `<span class="p-inputotp-separator">${separator}</span>`;
+      html += '<div class="p-inputotp-group">';
+      for (let i = mid; i < length; i++) {
+        html += `
+                    <input type="${inputType}"
+                           class="p-inputotp-input"
+                           data-index="${i}"
+                           maxlength="1"
+                           inputmode="${inputMode}"
+                           ${patternAttr}
+                           ${disabledAttr}
+                           ${roAttr}
+                           value="${values[i] || ""}"
+                           autocomplete="off"
+                           aria-label="Character ${i + 1}" />
+                `;
+      }
+      html += "</div>";
+    } else {
+      for (let i = 0; i < length; i++) {
+        html += `
+                    <input type="${inputType}"
+                           class="p-inputotp-input"
+                           data-index="${i}"
+                           maxlength="1"
+                           inputmode="${inputMode}"
+                           ${patternAttr}
+                           ${disabledAttr}
+                           ${roAttr}
+                           value="${values[i] || ""}"
+                           autocomplete="off"
+                           aria-label="Character ${i + 1}" />
+                `;
+      }
+    }
+    container.innerHTML = html;
+    bindEvents();
+  }
+  function bindEvents() {
+    const inputs = Array.from(container.querySelectorAll(".p-inputotp-input"));
     inputs.forEach((input, idx) => {
       input.addEventListener("focus", () => {
-        input.style.borderColor = "var(--p-primary-600)";
-        input.style.boxShadow = "0 0 0 2px rgba(16, 185, 129, 0.2)";
         input.select();
       });
-      input.addEventListener("blur", () => {
-        input.style.borderColor = "var(--p-border-color)";
-        input.style.boxShadow = "none";
-      });
       input.addEventListener("input", (e) => {
-        const val = e.target.value;
-        if (/^\d$/.test(val)) {
-          values[idx] = val;
-          if (idx < length - 1) inputs[idx + 1].focus();
-        } else if (val === "") {
-          values[idx] = "";
+        const target = e.target;
+        let val = target.value;
+        if (isIntegerOnly) {
+          val = val.replace(/\D/g, "");
+        }
+        if (val.length > 0) {
+          const char = val[val.length - 1];
+          values[idx] = char;
+          target.value = char;
+          if (idx < length - 1) {
+            inputs[idx + 1].focus();
+            inputs[idx + 1].select();
+          }
         } else {
-          input.value = values[idx] || "";
+          values[idx] = "";
+          target.value = "";
         }
         syncOtp();
       });
       input.addEventListener("keydown", (e) => {
-        if (e.key === "Backspace" && !input.value && idx > 0) {
-          inputs[idx - 1].focus();
+        if (isDisabled || isReadonly) return;
+        if (e.key === "Backspace") {
+          if (input.value) {
+            values[idx] = "";
+            input.value = "";
+            syncOtp();
+          } else if (idx > 0) {
+            inputs[idx - 1].focus();
+            inputs[idx - 1].value = "";
+            values[idx - 1] = "";
+            syncOtp();
+          }
+          e.preventDefault();
+        } else if (e.key === "Delete") {
+          values[idx] = "";
+          input.value = "";
+          syncOtp();
+          e.preventDefault();
         } else if (e.key === "ArrowLeft" && idx > 0) {
           inputs[idx - 1].focus();
+          inputs[idx - 1].select();
+          e.preventDefault();
         } else if (e.key === "ArrowRight" && idx < length - 1) {
           inputs[idx + 1].focus();
+          inputs[idx + 1].select();
+          e.preventDefault();
+        } else if (e.key === "Home") {
+          inputs[0].focus();
+          inputs[0].select();
+          e.preventDefault();
+        } else if (e.key === "End") {
+          inputs[length - 1].focus();
+          inputs[length - 1].select();
+          e.preventDefault();
         }
       });
       input.addEventListener("paste", (e) => {
         e.preventDefault();
-        const paste = (e.clipboardData || window.clipboardData)?.getData("text") || "";
-        const digits = paste.replace(/\D/g, "").slice(0, length);
-        digits.split("").forEach((d, i) => {
-          values[i] = d;
-          if (inputs[i]) inputs[i].value = d;
+        const pasteData = (e.clipboardData || window.clipboardData)?.getData("text") || "";
+        let clean = isIntegerOnly ? pasteData.replace(/\D/g, "") : pasteData.trim();
+        clean = clean.slice(0, length - idx);
+        if (!clean) return;
+        clean.split("").forEach((char, i) => {
+          const targetIdx = idx + i;
+          if (targetIdx < length) {
+            values[targetIdx] = char;
+            if (inputs[targetIdx]) inputs[targetIdx].value = char;
+          }
         });
         syncOtp();
-        if (digits.length === length) {
-          inputs[length - 1].focus();
+        const nextFocus = Math.min(idx + clean.length, length - 1);
+        if (inputs[nextFocus]) {
+          inputs[nextFocus].focus();
+          inputs[nextFocus].select();
         }
       });
     });
@@ -332,7 +916,7 @@ function InputOtpIsland(container, props) {
   function syncOtp() {
     const fullCode = values.join("");
     if (props.targetInputName) {
-      let hidden = document.querySelector(`input[name="${props.targetInputName}"]`);
+      let hidden = container.querySelector(`input[name="${props.targetInputName}"]`);
       if (!hidden) {
         hidden = document.createElement("input");
         hidden.type = "hidden";
@@ -343,95 +927,716 @@ function InputOtpIsland(container, props) {
     }
     container.dispatchEvent(new CustomEvent("otp:change", {
       bubbles: true,
-      detail: { value: fullCode, isComplete: fullCode.length === length }
+      detail: {
+        value: fullCode,
+        isComplete: fullCode.length === length && !values.includes("")
+      }
     }));
   }
   render();
   syncOtp();
+  if (props.autofocus === true || String(props.autofocus) === "true") {
+    const first = container.querySelector(".p-inputotp-input");
+    first?.focus();
+  }
 }
+
+// src/icons/lucide.ts
+var ALIASES = {
+  "refresh": "refresh-cw",
+  "refreshcw": "refresh-cw",
+  "refreshccw": "refresh-ccw",
+  "times": "x",
+  "close": "x",
+  "sharealt": "share-2",
+  "share2": "share-2",
+  "externallink": "external-link",
+  "spinner": "loader-circle",
+  "loader2": "loader-circle",
+  "loader": "loader-circle",
+  "pencil": "pencil",
+  "edit": "pencil",
+  "edit3": "pencil",
+  "trash": "trash-2",
+  "trash2": "trash-2",
+  "arrowup": "arrow-up",
+  "arrowdown": "arrow-down",
+  "arrowleft": "arrow-left",
+  "arrowright": "arrow-right",
+  "chevrondown": "chevron-down",
+  "chevronup": "chevron-up",
+  "chevronleft": "chevron-left",
+  "chevronright": "chevron-right",
+  "chevronsleft": "chevrons-left",
+  "chevronsright": "chevrons-right",
+  "chevronsup": "chevrons-up",
+  "chevronsdown": "chevrons-down",
+  "plus": "plus",
+  "minus": "minus",
+  "layers": "layers",
+  "check": "check",
+  "search": "search",
+  "settings": "settings",
+  "cog": "settings",
+  "eye": "eye",
+  "eyeoff": "eye-off",
+  "alertcircle": "circle-alert",
+  "alerttriangle": "triangle-alert",
+  "terminal": "terminal",
+  "palette": "palette",
+  "sliders": "sliders-horizontal",
+  "sun": "sun",
+  "moon": "moon",
+  "code": "code",
+  "heart": "heart",
+  "save": "save",
+  "print": "print",
+  "copy": "copy",
+  "upload": "upload",
+  "download": "download",
+  "user": "user",
+  "users": "users",
+  "bell": "bell",
+  "home": "home",
+  "lock": "lock",
+  "unlock": "unlock",
+  "calendar": "calendar",
+  "clock": "clock",
+  "star": "star",
+  "zap": "zap"
+};
+function normalizeLucideId(name) {
+  if (!name) return "zap";
+  const kebab = name.trim().replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase().replace(/_/g, "-");
+  const cleanKey = kebab.replace(/-/g, "");
+  if (ALIASES[cleanKey]) {
+    return ALIASES[cleanKey];
+  }
+  if (ALIASES[kebab]) {
+    return ALIASES[kebab];
+  }
+  return kebab;
+}
+function getLucideIcon(name, size = 16, strokeWidth = 2) {
+  if (!name) return "";
+  const iconId = normalizeLucideId(name);
+  return `<svg class="p-icon p-icon-${iconId}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round"><use href="/icons/lucide-sprites.svg#${iconId}"></use></svg>`;
+}
+var LucideIcons = new Proxy({}, {
+  get: (_, prop) => {
+    if (typeof prop === "string") {
+      return getLucideIcon(prop);
+    }
+    return "";
+  }
+});
 
 // src/components/input-password.ts
 var CSS3 = `
-[data-theme="dark"] .password-input {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+.laughtale-password,
+.p-password {
+    display: inline-flex;
+    flex-direction: column;
+    position: relative;
+    font-family: var(--p-font-family, inherit);
+    box-sizing: border-box;
+    width: auto;
+    vertical-align: middle;
 }
-[data-theme="dark"] .toggle-mask-btn {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-password.p-password-fluid {
+    display: flex;
+    width: 100%;
 }
-[data-theme="dark"] .password-meter-wrap {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+/* Main Input Container Box */
+.p-password-container {
+    display: flex;
+    align-items: center;
+    position: relative;
+    background: var(--p-surface-0);
+    border: 1px solid var(--p-border-color);
+    border-radius: var(--p-border-radius);
+    transition: border-color 150ms ease, box-shadow 150ms ease, background 150ms ease;
+    box-sizing: border-box;
+    min-height: 2.5rem;
+    overflow: hidden;
+    width: 100%;
+}
+
+.p-password-container:hover:not(.is-disabled) {
+    border-color: var(--p-surface-400);
+}
+
+.p-password-container:focus-within:not(.is-disabled) {
+    border-color: var(--p-primary-500) !important;
+    box-shadow: 0 0 0 1px var(--p-primary-500) !important;
+}
+
+.p-password.is-disabled .p-password-container {
+    background: var(--p-surface-100);
+    opacity: 0.75;
+    cursor: not-allowed;
+}
+
+/* Variant: Filled */
+.p-password.variant-filled .p-password-container {
+    background: var(--p-surface-100);
+    border-color: transparent;
+}
+.p-password.variant-filled .p-password-container:focus-within {
+    background: var(--p-surface-0);
+    border-color: var(--p-primary-500) !important;
+}
+
+/* Invalid State */
+.p-password.is-invalid .p-password-container {
+    border-color: var(--p-red-500, #ef4444) !important;
+}
+.p-password.is-invalid .p-password-container:focus-within {
+    box-shadow: 0 0 0 1px var(--p-red-500, #ef4444) !important;
+}
+
+/* Sizes */
+.p-password.size-small .p-password-container {
+    min-height: 2rem;
+}
+.p-password.size-small .p-password-input {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+}
+.p-password.size-large .p-password-container {
+    min-height: 3rem;
+}
+.p-password.size-large .p-password-input {
+    font-size: 1rem;
+    padding: 0.75rem 1rem;
+}
+
+/* Left Icon */
+.p-password-left-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding-left: 0.75rem;
+    color: var(--p-surface-400);
+    pointer-events: none;
+    flex-shrink: 0;
+}
+.p-password-left-icon svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Native Input */
+.p-password-input {
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
+    font-family: inherit;
+    font-size: 0.875rem;
+    color: var(--p-text-color);
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 0.5rem 0.75rem;
+    box-sizing: border-box;
+    height: 100%;
+}
+.p-password-input:disabled {
+    color: var(--p-text-muted);
+    cursor: not-allowed;
+}
+
+/* Action Buttons (Clear / Toggle Mask) */
+.p-password-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: var(--p-surface-400);
+    cursor: pointer;
+    padding: 0 0.625rem;
+    height: 100%;
+    transition: color 150ms ease;
+    user-select: none;
+}
+.p-password-action-btn:hover:not(:disabled) {
+    color: var(--p-surface-700);
+}
+.p-password-action-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* ==================== DIRECT STRENGTH METER ==================== */
+.p-password-meter-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin-top: 0.5rem;
+    width: 100%;
+}
+.p-password-meter-track {
+    height: 6px;
+    background: var(--p-surface-200);
+    border-radius: 9999px;
+    overflow: hidden;
+    width: 100%;
+}
+.p-password-meter-bar {
+    height: 100%;
+    width: 0%;
+    border-radius: 9999px;
+    transition: width 300ms ease, background-color 300ms ease;
+}
+.p-password-meter-badge-row {
+    display: flex;
+    justify-content: flex-end;
+}
+.p-password-meter-badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.15rem 0.5rem;
+    border-radius: 9999px;
+    display: inline-flex;
+    align-items: center;
+}
+
+/* ==================== REQUIREMENTS: CHIPS MODE ==================== */
+.p-password-chips-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+.p-password-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    padding: 0.25rem 0.625rem;
+    border-radius: 9999px;
+    border: 1px solid var(--p-border-color);
+    background: var(--p-surface-0);
+    color: var(--p-surface-600);
+    transition: all 200ms ease;
+}
+.p-password-chip.is-met {
+    background: var(--p-emerald-500, #10b981);
+    border-color: var(--p-emerald-500, #10b981);
+    color: #ffffff;
+}
+.p-password-chip svg {
+    width: 12px;
+    height: 12px;
+}
+
+/* ==================== REQUIREMENTS: LIST MODE ==================== */
+.p-password-list-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-top: 0.75rem;
+}
+.p-password-list-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--p-surface-500);
+    transition: color 200ms ease;
+}
+.p-password-list-item.is-met {
+    color: var(--p-emerald-600, #059669);
+    font-weight: 600;
+}
+.p-password-list-item svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+}
+
+/* ==================== POPOVER OVERLAY PANEL ==================== */
+.p-password-popover {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    width: 320px;
+    background: var(--p-surface-0);
+    border: 1px solid var(--p-border-color);
+    border-radius: var(--p-border-radius);
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+    padding: 1rem;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    animation: pPasswordFadeIn 150ms ease;
+}
+.p-password-popover::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: 1.5rem;
+    width: 8px;
+    height: 8px;
+    background: var(--p-surface-0);
+    border-left: 1px solid var(--p-border-color);
+    border-top: 1px solid var(--p-border-color);
+    transform: rotate(45deg);
+}
+@keyframes pPasswordFadeIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.p-password-popover-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--p-text-color);
+}
+.p-password-popover-header-title {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+.p-password-popover-header-title svg {
+    width: 16px;
+    height: 16px;
+    color: var(--p-surface-600);
+}
+
+/* ==================== DARK MODE ==================== */
+.dark .p-password-container {
+    background: var(--p-surface-900);
+    border-color: var(--p-surface-700);
+}
+.dark .p-password-container:hover:not(.is-disabled) {
+    border-color: var(--p-surface-600);
+}
+.dark .p-password.variant-filled .p-password-container {
+    background: var(--p-surface-800);
+}
+.dark .p-password.variant-filled .p-password-container:focus-within {
+    background: var(--p-surface-900);
+}
+.dark .p-password-input {
+    color: var(--p-surface-0);
+}
+.dark .p-password-action-btn {
+    color: var(--p-surface-400);
+}
+.dark .p-password-action-btn:hover:not(:disabled) {
+    color: var(--p-surface-100);
+}
+.dark .p-password-meter-track {
+    background: var(--p-surface-800);
+}
+.dark .p-password-chip {
+    background: var(--p-surface-800);
+    border-color: var(--p-surface-700);
+    color: var(--p-surface-300);
+}
+.dark .p-password-chip.is-met {
+    background: var(--p-emerald-600, #059669);
+    border-color: var(--p-emerald-600, #059669);
+    color: #ffffff;
+}
+.dark .p-password-list-item {
+    color: var(--p-surface-400);
+}
+.dark .p-password-list-item.is-met {
+    color: var(--p-emerald-400, #34d399);
+}
+.dark .p-password-popover {
+    background: var(--p-surface-900);
+    border-color: var(--p-surface-700);
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5);
+}
+.dark .p-password-popover::before {
+    background: var(--p-surface-900);
+    border-left-color: var(--p-surface-700);
+    border-top-color: var(--p-surface-700);
+}
+.dark .p-password-popover-header-title svg {
+    color: var(--p-surface-300);
 }
 `;
 function InputPasswordIsland(container, props) {
-  injectIslandStyle("input-password", CSS3);
+  injectIslandStyle("laughtale-password", CSS3);
   let isMasked = true;
-  let currentPassword = "";
-  function calculateStrength(pwd) {
-    if (!pwd) return { score: 0, label: "", color: "transparent", width: "0%" };
-    let score = 0;
-    if (pwd.length >= 8) score++;
-    if (/[A-Z]/.test(pwd)) score++;
-    if (/[0-9]/.test(pwd)) score++;
-    if (/[^A-Za-z0-9]/.test(pwd)) score++;
-    if (score <= 1) return { score: 1, label: "Weak", color: "#ef4444", width: "33%" };
-    if (score <= 3) return { score: 2, label: "Medium", color: "#f59e0b", width: "66%" };
-    return { score: 3, label: "Strong", color: "#10b981", width: "100%" };
+  let currentVal = props.value || "";
+  const minLength = Number(props.minLength) || 8;
+  const isFilled = props.variant === "filled";
+  const isFluid = props.fluid === true || String(props.fluid) === "true";
+  const isDisabled = props.disabled === true || String(props.disabled) === "true";
+  const isReadonly = props.readonlyMode === true || String(props.readonlyMode) === "true";
+  const isInvalid = props.invalid === true || String(props.invalid) === "true";
+  const hasToggleMask = props.toggleMask !== false && String(props.toggleMask) !== "false";
+  const showClear = props.showClear === true || String(props.showClear) === "true";
+  const showMeter = props.showMeter === true || String(props.showMeter) === "true";
+  const showRequirements = props.showRequirements === true || String(props.showRequirements) === "true";
+  const isPopover = props.feedback === true || String(props.feedback) === "true" || props.requirementsMode === "popover";
+  const requirementsMode = props.requirementsMode || (isPopover ? "popover" : "chips");
+  function checkRules(pwd) {
+    return {
+      length: pwd.length >= minLength,
+      uppercase: /[A-Z]/.test(pwd),
+      lowercase: /[a-z]/.test(pwd),
+      number: /[0-9]/.test(pwd),
+      special: /[^A-Za-z0-9]/.test(pwd)
+    };
   }
-  container.innerHTML = `
-        <div class="laughtale-password" style="display: flex; flex-direction: column; gap: 0.5rem; width: 100%; max-width: 340px;">
-            <div style="display: flex; align-items: center; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); background: var(--p-surface-0); overflow: hidden; padding-right: 0.5rem;">
-                <input type="password" 
-                       class="password-input" 
-                       value="" 
-                       placeholder="${props.placeholder || "Enter password..."}" 
-                       ${props.disabled ? "disabled" : ""} 
-                       style="flex: 1; padding: 0.5rem 0.75rem; border: none; outline: none; background: transparent; font-size: 0.875rem; color: var(--p-text-color);" />
-                
-                ${props.toggleMask !== false ? `
-                    <button type="button" class="toggle-mask-btn" style="border: none; background: transparent; color: var(--p-surface-400); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0.25rem;">
-                        ${LucideIcons.eye}
+  function calculateStrength(pwd) {
+    if (!pwd) return { score: 0, label: "Empty", color: "#94a3b8", bgColor: "#f1f5f9", width: "0%" };
+    const rules = checkRules(pwd);
+    const passed = Object.values(rules).filter(Boolean).length;
+    if (passed <= 1) {
+      return { score: 1, label: "Too Weak", color: "#ef4444", bgColor: "rgba(239, 68, 68, 0.15)", width: "25%" };
+    } else if (passed <= 3) {
+      return { score: 2, label: "Medium", color: "#f59e0b", bgColor: "rgba(245, 158, 11, 0.15)", width: "60%" };
+    } else {
+      return { score: 3, label: "Strong", color: "#10b981", bgColor: "rgba(16, 185, 129, 0.15)", width: "100%" };
+    }
+  }
+  function render() {
+    container.className = "laughtale-password p-password";
+    if (isFluid) container.classList.add("p-password-fluid");
+    if (isFilled) container.classList.add("variant-filled");
+    if (props.size) container.classList.add(`size-${props.size}`);
+    if (isInvalid) container.classList.add("is-invalid");
+    if (isDisabled) container.classList.add("is-disabled");
+    const inputIdAttr = props.inputId ? `id="${props.inputId}"` : "";
+    const placeholderAttr = props.placeholder ? `placeholder="${props.placeholder}"` : "";
+    const disabledAttr = isDisabled ? "disabled" : "";
+    const roAttr = isReadonly ? "readonly" : "";
+    const inputType = isMasked ? "password" : "text";
+    const eyeIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>`;
+    const eyeOffIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>`;
+    const clearIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
+    let leftIconHtml = "";
+    if (props.icon) {
+      const iconSvg = getLucideIcon(props.icon) || `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`;
+      leftIconHtml = `<span class="p-password-left-icon">${iconSvg}</span>`;
+    }
+    let html = `
+            <div class="p-password-container">
+                ${leftIconHtml}
+                <input type="${inputType}"
+                       class="p-password-input ${props.inputClass || ""}"
+                       ${inputIdAttr}
+                       ${placeholderAttr}
+                       ${disabledAttr}
+                       ${roAttr}
+                       value="${currentVal}"
+                       autocomplete="off" />
+                ${showClear ? `
+                    <button type="button" class="p-password-action-btn p-password-clear-btn" aria-label="Clear password" style="${!currentVal ? "display: none;" : ""}">
+                        ${clearIcon}
+                    </button>
+                ` : ""}
+                ${hasToggleMask ? `
+                    <button type="button" class="p-password-action-btn p-password-toggle-btn" aria-label="Toggle password visibility" tabindex="-1">
+                        ${isMasked ? eyeIcon : eyeOffIcon}
                     </button>
                 ` : ""}
             </div>
-
-            ${props.showMeter !== false ? `
-                <div class="password-meter-wrap" style="display: none; flex-direction: column; gap: 0.25rem;">
-                    <div style="height: 4px; border-radius: 2px; background: var(--p-surface-200); overflow: hidden;">
-                        <div class="password-meter-bar" style="height: 100%; width: 0%; background: transparent; transition: all 0.3s ease;"></div>
+        `;
+    if (showMeter && !isPopover) {
+      const str = calculateStrength(currentVal);
+      html += `
+                <div class="p-password-meter-wrap" style="${!currentVal ? "display: none;" : ""}">
+                    <div class="p-password-meter-track">
+                        <div class="p-password-meter-bar" style="width: ${str.width}; background-color: ${str.color};"></div>
                     </div>
-                    <div style="display: flex; justify-content: space-between; font-size: 0.6875rem; font-weight: 600;">
-                        <span style="color: var(--p-surface-500);">Strength</span>
-                        <span class="password-meter-label" style="color: var(--p-surface-500);"></span>
+                    <div class="p-password-meter-badge-row">
+                        <span class="p-password-meter-badge" style="color: ${str.color}; background-color: ${str.bgColor};">${str.label}</span>
                     </div>
                 </div>
-            ` : ""}
-        </div>
-    `;
-  const input = container.querySelector(".password-input");
-  const toggleBtn = container.querySelector(".toggle-mask-btn");
-  const meterWrap = container.querySelector(".password-meter-wrap");
-  const meterBar = container.querySelector(".password-meter-bar");
-  const meterLabel = container.querySelector(".password-meter-label");
-  function updateMeterVisuals() {
-    if (!meterWrap || !meterBar || !meterLabel) return;
-    if (!currentPassword) {
-      meterWrap.style.display = "none";
-      return;
+            `;
     }
-    meterWrap.style.display = "flex";
-    const meter = calculateStrength(currentPassword);
-    meterBar.style.width = meter.width;
-    meterBar.style.background = meter.color;
-    meterLabel.textContent = meter.label;
-    meterLabel.style.color = meter.color;
+    if (showRequirements && requirementsMode === "chips" && !isPopover) {
+      html += renderRequirementsChips(currentVal);
+    }
+    if (showRequirements && requirementsMode === "list" && !isPopover) {
+      html += renderRequirementsList(currentVal);
+    }
+    if (isPopover) {
+      html += `
+                <div class="p-password-popover" style="display: none;">
+                    <div class="p-password-popover-header">
+                        <span class="p-password-popover-header-title">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
+                            Password Strength
+                        </span>
+                        <span class="p-password-popover-badge p-password-meter-badge"></span>
+                    </div>
+                    <div class="p-password-meter-track">
+                        <div class="p-password-popover-bar p-password-meter-bar"></div>
+                    </div>
+                    <div class="p-password-popover-list p-password-list-wrap">
+                        ${renderRequirementsListItems(currentVal)}
+                    </div>
+                </div>
+            `;
+    }
+    container.innerHTML = html;
+    bindEvents();
   }
-  function syncValue() {
+  function renderRequirementsChips(pwd) {
+    const r = checkRules(pwd);
+    const checkIcon = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>`;
+    const xIcon = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
+    return `
+            <div class="p-password-chips-wrap">
+                <span class="p-password-chip ${r.length ? "is-met" : ""}" data-rule="length">
+                    ${r.length ? checkIcon : xIcon} ${minLength}+ characters
+                </span>
+                <span class="p-password-chip ${r.number ? "is-met" : ""}" data-rule="number">
+                    ${r.number ? checkIcon : xIcon} Number
+                </span>
+                <span class="p-password-chip ${r.uppercase ? "is-met" : ""}" data-rule="uppercase">
+                    ${r.uppercase ? checkIcon : xIcon} Uppercase letter
+                </span>
+                <span class="p-password-chip ${r.special ? "is-met" : ""}" data-rule="special">
+                    ${r.special ? checkIcon : xIcon} Special character
+                </span>
+            </div>
+        `;
+  }
+  function renderRequirementsList(pwd) {
+    return `
+            <div class="p-password-list-wrap">
+                ${renderRequirementsListItems(pwd)}
+            </div>
+        `;
+  }
+  function renderRequirementsListItems(pwd) {
+    const r = checkRules(pwd);
+    const checkIcon = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>`;
+    const xIcon = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
+    return `
+            <div class="p-password-list-item ${r.length ? "is-met" : ""}" data-rule="length">
+                ${r.length ? checkIcon : xIcon} At least ${minLength} characters long
+            </div>
+            <div class="p-password-list-item ${r.uppercase ? "is-met" : ""}" data-rule="uppercase">
+                ${r.uppercase ? checkIcon : xIcon} Contains uppercase letter
+            </div>
+            <div class="p-password-list-item ${r.lowercase ? "is-met" : ""}" data-rule="lowercase">
+                ${r.lowercase ? checkIcon : xIcon} Contains lowercase letter
+            </div>
+            <div class="p-password-list-item ${r.number ? "is-met" : ""}" data-rule="number">
+                ${r.number ? checkIcon : xIcon} Contains number
+            </div>
+            <div class="p-password-list-item ${r.special ? "is-met" : ""}" data-rule="special">
+                ${r.special ? checkIcon : xIcon} Contains special character (!@#$...)
+            </div>
+        `;
+  }
+  function updateVisuals() {
+    const r = checkRules(currentVal);
+    const str = calculateStrength(currentVal);
+    const clearBtn = container.querySelector(".p-password-clear-btn");
+    if (clearBtn) {
+      clearBtn.style.display = currentVal ? "inline-flex" : "none";
+    }
+    const meterWrap = container.querySelector(".p-password-meter-wrap");
+    const meterBar = container.querySelector(".p-password-meter-bar");
+    const meterBadge = container.querySelector(".p-password-meter-badge");
+    if (meterWrap && meterBar && meterBadge) {
+      meterWrap.style.display = currentVal ? "flex" : "none";
+      meterBar.style.width = str.width;
+      meterBar.style.backgroundColor = str.color;
+      meterBadge.textContent = str.label;
+      meterBadge.style.color = str.color;
+      meterBadge.style.backgroundColor = str.bgColor;
+    }
+    const checkIcon = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>`;
+    const xIcon = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
+    container.querySelectorAll(".p-password-chip").forEach((chip) => {
+      const rule = chip.getAttribute("data-rule");
+      const isMet = r[rule];
+      chip.classList.toggle("is-met", isMet);
+      const text = chip.textContent?.trim().replace(/^[✔✕]\s*/, "") || "";
+      chip.innerHTML = `${isMet ? checkIcon : xIcon} ${text}`;
+    });
+    const listCheckIcon = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>`;
+    const listXIcon = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
+    container.querySelectorAll(".p-password-list-item").forEach((item) => {
+      const rule = item.getAttribute("data-rule");
+      const isMet = r[rule];
+      item.classList.toggle("is-met", isMet);
+      const text = item.textContent?.trim().replace(/^[✔✕]\s*/, "") || "";
+      item.innerHTML = `${isMet ? listCheckIcon : listXIcon} ${text}`;
+    });
+    const popoverBar = container.querySelector(".p-password-popover-bar");
+    const popoverBadge = container.querySelector(".p-password-popover-badge");
+    if (popoverBar && popoverBadge) {
+      popoverBar.style.width = str.width;
+      popoverBar.style.backgroundColor = str.color;
+      popoverBadge.textContent = str.label;
+      popoverBadge.style.color = str.color;
+      popoverBadge.style.backgroundColor = str.bgColor;
+    }
+  }
+  function bindEvents() {
+    const inputEl = container.querySelector(".p-password-input");
+    const toggleBtn = container.querySelector(".p-password-toggle-btn");
+    const clearBtn = container.querySelector(".p-password-clear-btn");
+    const popoverEl = container.querySelector(".p-password-popover");
+    const eyeIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>`;
+    const eyeOffIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>`;
+    inputEl.addEventListener("input", () => {
+      currentVal = inputEl.value;
+      updateVisuals();
+      syncTargetInput();
+    });
+    if (popoverEl) {
+      inputEl.addEventListener("focus", () => {
+        popoverEl.style.display = "flex";
+        updateVisuals();
+      });
+      document.addEventListener("click", (e) => {
+        if (!container.contains(e.target)) {
+          popoverEl.style.display = "none";
+        }
+      });
+      inputEl.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          popoverEl.style.display = "none";
+        }
+      });
+    }
+    toggleBtn?.addEventListener("mousedown", (e) => {
+      e.preventDefault();
+    });
+    toggleBtn?.addEventListener("click", (e) => {
+      e.preventDefault();
+      isMasked = !isMasked;
+      inputEl.type = isMasked ? "password" : "text";
+      toggleBtn.innerHTML = isMasked ? eyeIcon : eyeOffIcon;
+      inputEl.focus();
+    });
+    clearBtn?.addEventListener("mousedown", (e) => {
+      e.preventDefault();
+    });
+    clearBtn?.addEventListener("click", (e) => {
+      e.preventDefault();
+      currentVal = "";
+      inputEl.value = "";
+      updateVisuals();
+      syncTargetInput();
+      inputEl.focus();
+    });
+  }
+  function syncTargetInput() {
     if (props.targetInputName) {
       let hidden = container.querySelector(`input[name="${props.targetInputName}"]`);
       if (!hidden) {
@@ -440,142 +1645,1125 @@ function InputPasswordIsland(container, props) {
         hidden.name = props.targetInputName;
         container.appendChild(hidden);
       }
-      hidden.value = currentPassword;
+      hidden.value = currentVal;
     }
     container.dispatchEvent(new CustomEvent("password:change", {
       bubbles: true,
-      detail: { value: currentPassword, strength: calculateStrength(currentPassword).label }
+      detail: {
+        value: currentVal,
+        strength: calculateStrength(currentVal).label,
+        rules: checkRules(currentVal)
+      }
     }));
   }
-  input.addEventListener("input", () => {
-    currentPassword = input.value;
-    updateMeterVisuals();
-    syncValue();
-  });
-  toggleBtn?.addEventListener("click", () => {
-    isMasked = !isMasked;
-    input.type = isMasked ? "password" : "text";
-    toggleBtn.innerHTML = isMasked ? LucideIcons.eye : LucideIcons.eyeOff;
-    input.focus();
-  });
-  syncValue();
+  render();
+  updateVisuals();
+  syncTargetInput();
 }
 
 // src/components/toggle-switch.ts
 var CSS4 = `
-[data-theme="dark"] .laughtale-toggle-switch {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+/* ==================== AURA TOGGLESWITCH ==================== */
+.laughtale-toggleswitch,
+.p-toggleswitch {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+    user-select: none;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+.p-toggleswitch.p-disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.p-toggleswitch-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    opacity: 0;
+    z-index: 1;
+    cursor: pointer;
+    border: 0;
+    appearance: none;
+}
+
+.p-toggleswitch.p-disabled .p-toggleswitch-input {
+    cursor: not-allowed;
+}
+
+/* Slider Track */
+.p-toggleswitch-slider {
+    position: relative;
+    display: block;
+    width: 2.5rem; /* 40px */
+    height: 1.5rem; /* 24px */
+    background: var(--p-surface-300, #cbd5e1);
+    border-radius: 9999px;
+    transition: background 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+    box-sizing: border-box;
+}
+
+.p-toggleswitch:hover:not(.p-disabled):not(.p-toggleswitch-checked) .p-toggleswitch-slider {
+    background: var(--p-surface-400, #94a3b8);
+}
+
+.p-toggleswitch:focus-within:not(.p-disabled) .p-toggleswitch-slider,
+.p-toggleswitch-input:focus-visible ~ .p-toggleswitch-slider {
+    box-shadow: 0 0 0 1px var(--p-primary-500, #10b981) !important;
+}
+
+/* Checked State */
+.p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-slider {
+    background: var(--p-primary-500, #10b981);
+}
+
+.p-toggleswitch.p-toggleswitch-checked:hover:not(.p-disabled) .p-toggleswitch-slider {
+    background: var(--p-primary-600, #059669);
+}
+
+/* Handle Thumb */
+.p-toggleswitch-handle {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 1.125rem; /* 18px */
+    height: 1.125rem; /* 18px */
+    background: var(--p-surface-0, #ffffff);
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.06);
+    transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1), background 150ms ease, color 150ms ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    color: var(--p-surface-600, #475569);
+}
+
+.p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-handle {
+    transform: translateX(16px);
+    color: var(--p-primary-600, #059669);
+}
+
+/* Handle Icon */
+.p-toggleswitch-handle-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.p-toggleswitch-handle-icon svg {
+    width: 10px;
+    height: 10px;
+}
+
+/* Invalid State */
+.p-toggleswitch.p-invalid .p-toggleswitch-slider,
+.p-toggleswitch.is-invalid .p-toggleswitch-slider {
+    border: 1px solid var(--p-red-500, #ef4444) !important;
+}
+.p-toggleswitch.p-invalid:focus-within .p-toggleswitch-slider,
+.p-toggleswitch.is-invalid:focus-within .p-toggleswitch-slider {
+    box-shadow: 0 0 0 1px var(--p-red-500, #ef4444) !important;
+}
+
+/* Label */
+.p-toggleswitch-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--p-text-color, #0f172a);
+    cursor: pointer;
+}
+
+/* ==================== DARK MODE ==================== */
+.dark .p-toggleswitch-slider {
+    background: var(--p-surface-700, #334155);
+}
+.dark .p-toggleswitch:hover:not(.p-disabled):not(.p-toggleswitch-checked) .p-toggleswitch-slider {
+    background: var(--p-surface-600, #475569);
+}
+.dark .p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-slider {
+    background: var(--p-primary-500, #10b981);
+}
+.dark .p-toggleswitch.p-toggleswitch-checked:hover:not(.p-disabled) .p-toggleswitch-slider {
+    background: var(--p-primary-400, #34d399);
+}
+.dark .p-toggleswitch-handle {
+    background: var(--p-surface-0, #ffffff);
+    color: var(--p-surface-600, #475569);
+}
+.dark .p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-handle {
+    background: var(--p-surface-0, #ffffff);
+    color: var(--p-primary-600, #059669);
+}
+.dark .p-toggleswitch.p-disabled .p-toggleswitch-slider {
+    background: var(--p-surface-800, #1e293b);
+}
+.dark .p-toggleswitch.p-disabled .p-toggleswitch-handle {
+    background: var(--p-surface-500, #64748b);
 }
 `;
 function ToggleSwitchIsland(container, props) {
-  injectIslandStyle("toggle-switch", CSS4);
-  let isChecked = Boolean(props.checked);
+  injectIslandStyle("laughtale-toggleswitch", CSS4);
+  let isChecked = props.checked === true || String(props.checked) === "true" || props.value === true || String(props.value) === "true";
+  const isInvalid = props.invalid === true || String(props.invalid) === "true";
+  const isDisabled = props.disabled === true || String(props.disabled) === "true";
+  const checkedIcon = props.checkedIcon || props.icon;
+  const uncheckedIcon = props.uncheckedIcon;
+  const inputId = props.inputId || "";
+  const inputName = props.name || props.targetInputName || "switch_value";
   function render() {
+    const rootClasses = [
+      "laughtale-toggleswitch",
+      "p-toggleswitch",
+      "p-component",
+      isChecked ? "p-toggleswitch-checked" : "",
+      isInvalid ? "p-invalid is-invalid" : "",
+      isDisabled ? "p-disabled" : ""
+    ].filter(Boolean).join(" ");
+    container.className = rootClasses;
+    const activeIcon = isChecked ? checkedIcon : uncheckedIcon;
+    const iconHtml = activeIcon ? `<span class="p-toggleswitch-handle-icon">${getLucideIcon(activeIcon, 10)}</span>` : "";
     container.innerHTML = `
-            <label class="laughtale-switch" style="display: inline-flex; align-items: center; gap: 0.75rem; cursor: ${props.disabled ? "not-allowed" : "pointer"}; user-select: none; opacity: ${props.disabled ? "0.6" : "1"};">
-                <div class="switch-track" style="position: relative; width: 2.75rem; height: 1.5rem; border-radius: 9999px; background: ${isChecked ? "var(--p-primary-600)" : "var(--p-surface-300)"}; transition: background-color 0.2s ease;">
-                    <div class="switch-thumb" style="position: absolute; top: 2px; left: ${isChecked ? "1.35rem" : "2px"}; width: 1.25rem; height: 1.25rem; border-radius: 50%; background: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.25); transition: left 0.2s cubic-bezier(0.16, 1, 0.3, 1);"></div>
+            <input 
+                type="checkbox" 
+                role="switch"
+                class="p-toggleswitch-input"
+                ${inputId ? `id="${inputId}"` : ""}
+                name="${inputName}"
+                ${isChecked ? "checked" : ""}
+                ${isDisabled ? "disabled" : ""}
+                aria-checked="${isChecked ? "true" : "false"}"
+                ${props.ariaLabel ? `aria-label="${props.ariaLabel}"` : ""}
+                ${props.ariaLabelledBy ? `aria-labelledby="${props.ariaLabelledBy}"` : ""}
+                tabindex="${isDisabled ? "-1" : "0"}"
+            />
+            <div class="p-toggleswitch-slider ${props.sliderClass || ""}">
+                <div class="p-toggleswitch-handle ${props.handleClass || ""}">
+                    ${iconHtml}
                 </div>
-                ${props.label ? `<span style="font-size: 0.875rem; font-weight: 500; color: var(--p-text-color);">${props.label}</span>` : ""}
-            </label>
+            </div>
+            ${props.label ? `<span class="p-toggleswitch-label">${props.label}</span>` : ""}
         `;
-    if (!props.disabled) {
-      container.querySelector(".laughtale-switch")?.addEventListener("click", (e) => {
-        e.preventDefault();
-        isChecked = !isChecked;
-        render();
-        syncValue();
-      });
-    }
+    bindEvents();
+  }
+  function toggle() {
+    if (isDisabled) return;
+    isChecked = !isChecked;
+    render();
+    syncValue();
   }
   function syncValue() {
-    if (props.targetInputName) {
-      let hidden = document.querySelector(`input[name="${props.targetInputName}"]`);
-      if (!hidden) {
-        hidden = document.createElement("input");
-        hidden.type = "hidden";
-        hidden.name = props.targetInputName;
-        container.appendChild(hidden);
-      }
-      hidden.value = isChecked ? "true" : "false";
-    }
     container.dispatchEvent(new CustomEvent("switch:change", {
       bubbles: true,
-      detail: { checked: isChecked }
+      detail: { checked: isChecked, value: isChecked }
+    }));
+    container.dispatchEvent(new CustomEvent("toggleswitch:change", {
+      bubbles: true,
+      detail: { checked: isChecked, value: isChecked }
+    }));
+    container.dispatchEvent(new CustomEvent("change", {
+      bubbles: true,
+      detail: { checked: isChecked, value: isChecked }
     }));
   }
+  function bindEvents() {
+    const inp = container.querySelector(".p-toggleswitch-input");
+    if (inp) {
+      inp.onchange = (e) => {
+        e.stopPropagation();
+        toggle();
+      };
+    }
+    container.onclick = (e) => {
+      if (e.target.closest(".p-toggleswitch-input")) return;
+      e.preventDefault();
+      toggle();
+    };
+    container.onkeydown = (e) => {
+      if (e.key === " " || e.key === "Enter") {
+        e.preventDefault();
+        toggle();
+      }
+    };
+  }
   render();
-  syncValue();
 }
 
 // src/components/slider.ts
 var CSS5 = `
-[data-theme="dark"] .laughtale-slider {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+/* ==================== AURA SLIDER ==================== */
+.laughtale-slider,
+.p-slider {
+    position: relative;
+    user-select: none;
+    touch-action: none;
+    box-sizing: border-box;
+    font-family: var(--p-font-family, inherit);
 }
-[data-theme="dark"] .slider-track {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-slider-horizontal {
+    height: 0.375rem;
+    width: 100%;
+    background: var(--p-surface-200, #e2e8f0);
+    border-radius: 9999px;
+    cursor: pointer;
+    display: block;
 }
-[data-theme="dark"] .slider-fill {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-slider-vertical {
+    width: 0.375rem;
+    height: 12rem;
+    background: var(--p-surface-200, #e2e8f0);
+    border-radius: 9999px;
+    cursor: pointer;
+    display: inline-block;
 }
-[data-theme="dark"] .slider-handle {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-slider.is-disabled {
+    opacity: 0.6;
+    cursor: not-allowed !important;
+    pointer-events: none;
 }
-[data-theme="dark"] .slider-value-display {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+/* Range Fill Bar */
+.p-slider-range {
+    position: absolute;
+    background: var(--p-primary-500, #10b981);
+    border-radius: 9999px;
+    pointer-events: none;
+    transition: background 150ms ease;
+    display: block;
+}
+
+.p-slider-horizontal .p-slider-range {
+    top: 0;
+    height: 100%;
+}
+
+.p-slider-vertical .p-slider-range {
+    left: 0;
+    width: 100%;
+    bottom: 0;
+}
+
+/* Handle */
+.p-slider-handle {
+    position: absolute;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 50%;
+    background: var(--p-surface-0, #ffffff);
+    border: 2px solid var(--p-primary-500, #10b981);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.15), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    cursor: grab;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 150ms ease, box-shadow 150ms ease, transform 120ms ease;
+    z-index: 10;
+    display: block;
+}
+
+.p-slider-horizontal .p-slider-handle {
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.p-slider-vertical .p-slider-handle {
+    left: 50%;
+    transform: translate(-50%, 50%);
+}
+
+.p-slider-handle:hover:not(.is-disabled) {
+    border-color: var(--p-primary-600, #059669);
+    transform: translate(-50%, -50%) scale(1.1);
+}
+
+.p-slider-vertical .p-slider-handle:hover:not(.is-disabled) {
+    transform: translate(-50%, 50%) scale(1.1);
+}
+
+.p-slider-handle:focus-visible:not(.is-disabled) {
+    border-color: var(--p-primary-600, #059669);
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
+}
+
+.p-slider-handle.is-dragging {
+    cursor: grabbing !important;
+    transform: translate(-50%, -50%) scale(1.18) !important;
+    box-shadow: 0 0 0 5px rgba(16, 185, 129, 0.25) !important;
+}
+
+.p-slider-vertical .p-slider-handle.is-dragging {
+    transform: translate(-50%, 50%) scale(1.18) !important;
+}
+
+.p-slider-handle.is-disabled {
+    cursor: not-allowed;
+    background: var(--p-surface-200, #e2e8f0);
+    border-color: var(--p-surface-400, #94a3b8);
+    box-shadow: none;
+}
+
+/* ==================== DARK MODE ==================== */
+.dark .p-slider-horizontal,
+.dark .p-slider-vertical {
+    background: var(--p-surface-700, #334155);
+}
+.dark .p-slider-range {
+    background: var(--p-primary-400, #34d399);
+}
+.dark .p-slider-handle {
+    background: var(--p-surface-900, #0f172a);
+    border-color: var(--p-primary-400, #34d399);
+}
+.dark .p-slider-handle:hover:not(.is-disabled) {
+    border-color: var(--p-primary-300, #6ee7b7);
+}
+.dark .p-slider-handle:focus-visible:not(.is-disabled) {
+    border-color: var(--p-primary-300, #6ee7b7);
+    box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.2);
+}
+.dark .p-slider-handle.is-dragging {
+    box-shadow: 0 0 0 5px rgba(52, 211, 153, 0.25) !important;
+}
+.dark .p-slider-handle.is-disabled {
+    background: var(--p-surface-800, #1e293b);
+    border-color: var(--p-surface-600, #475569);
 }
 `;
 function SliderIsland(container, props) {
-  injectIslandStyle("slider", CSS5);
-  const min = props.min !== void 0 ? props.min : 0;
-  const max = props.max !== void 0 ? props.max : 100;
-  const step = props.step !== void 0 ? props.step : 1;
-  let currentValue = props.value !== void 0 ? props.value : min;
+  injectIslandStyle("laughtale-slider", CSS5);
+  const min = props.min !== void 0 ? Number(props.min) : 0;
+  const max = props.max !== void 0 ? Number(props.max) : 100;
+  const step = props.step !== void 0 ? Number(props.step) : 1;
+  const isRange = props.range === true || String(props.range) === "true";
+  const isVertical = props.orientation === "vertical";
+  const isDisabled = props.disabled === true || String(props.disabled) === "true";
+  const disabledMin = props.disabledMinHandle === true || String(props.disabledMinHandle) === "true";
+  const disabledMax = props.disabledMaxHandle === true || String(props.disabledMaxHandle) === "true";
+  const minDistance = props.minStepsBetweenHandles !== void 0 ? Number(props.minStepsBetweenHandles) : 0;
+  let currentValues = [];
+  if (isRange) {
+    if (Array.isArray(props.values) && props.values.length >= 2) {
+      currentValues = [Number(props.values[0]), Number(props.values[1])];
+    } else if (Array.isArray(props.value) && props.value.length >= 2) {
+      currentValues = [Number(props.value[0]), Number(props.value[1])];
+    } else if (typeof props.value === "string" && props.value.includes(",")) {
+      const parts = props.value.split(",").map((s) => Number(s.trim()));
+      currentValues = [parts[0] ?? min, parts[1] ?? max];
+    } else {
+      currentValues = [min + (max - min) * 0.2, min + (max - min) * 0.8];
+    }
+  } else {
+    const singleVal = props.value !== void 0 ? Number(props.value) : min;
+    currentValues = [singleVal];
+  }
+  function clampValue(val) {
+    return Math.max(min, Math.min(max, val));
+  }
+  function snapToStep(val) {
+    if (step <= 0) return val;
+    const count = Math.round((val - min) / step);
+    const snapped = min + count * step;
+    return Number(clampValue(snapped).toFixed(4));
+  }
+  currentValues = currentValues.map((v) => snapToStep(v));
   function getPercent(val) {
+    if (max === min) return 0;
     return Math.max(0, Math.min(100, (val - min) / (max - min) * 100));
   }
-  const initialPercent = getPercent(currentValue);
-  container.innerHTML = `
-        <div class="laughtale-slider" style="position: relative; width: 100%; max-width: 320px; padding: 1rem 0; user-select: none; touch-action: none;">
-            <!-- Track -->
-            <div class="slider-track" style="position: relative; height: 6px; border-radius: 3px; background: var(--p-surface-200); cursor: ${props.disabled ? "not-allowed" : "pointer"};">
-                <!-- Active Fill Bar -->
-                <div class="slider-fill" style="position: absolute; top: 0; left: 0; height: 100%; width: ${initialPercent}%; border-radius: 3px; background: var(--p-primary-600); pointer-events: none;"></div>
-                <!-- Drag Handle -->
-                <div class="slider-handle" style="position: absolute; top: 50%; left: ${initialPercent}%; transform: translate(-50%, -50%); width: 1.125rem; height: 1.125rem; border-radius: 50%; background: #ffffff; border: 2px solid var(--p-primary-600); box-shadow: 0 1px 4px rgba(0,0,0,0.2); cursor: ${props.disabled ? "not-allowed" : "grab"};"></div>
-            </div>
-
-            <div style="display: flex; justify-content: space-between; margin-top: 0.5rem; font-size: 0.75rem; color: var(--p-surface-500); font-family: var(--p-font-mono);">
-                <span>${min}</span>
-                <span class="slider-value-display" style="font-weight: 700; color: var(--p-primary-600);">${currentValue}</span>
-                <span>${max}</span>
-            </div>
-        </div>
-    `;
-  const track = container.querySelector(".slider-track");
-  const fill = container.querySelector(".slider-fill");
-  const handle = container.querySelector(".slider-handle");
-  const valueDisplay = container.querySelector(".slider-value-display");
-  function updateVisuals() {
-    const pct = getPercent(currentValue);
-    fill.style.width = `${pct}%`;
-    handle.style.left = `${pct}%`;
-    valueDisplay.textContent = currentValue.toString();
+  function render() {
+    const rootClasses = [
+      "laughtale-slider",
+      "p-slider",
+      isVertical ? "p-slider-vertical" : "p-slider-horizontal",
+      isDisabled ? "is-disabled" : ""
+    ].filter(Boolean).join(" ");
+    container.className = rootClasses;
+    if (props.inputId) container.setAttribute("id", props.inputId);
+    if (isRange) {
+      const p1 = getPercent(currentValues[0]);
+      const p2 = getPercent(currentValues[1]);
+      const leftPct = Math.min(p1, p2);
+      const sizePct = Math.abs(p2 - p1);
+      const rangeStyle = isVertical ? `bottom: ${leftPct}%; height: ${sizePct}%;` : `left: ${leftPct}%; width: ${sizePct}%;`;
+      const h1Style = isVertical ? `bottom: ${p1}%;` : `left: ${p1}%;`;
+      const h2Style = isVertical ? `bottom: ${p2}%;` : `left: ${p2}%;`;
+      container.innerHTML = `
+                <span class="p-slider-range" style="${rangeStyle}"></span>
+                <span 
+                    class="p-slider-handle ${disabledMin || isDisabled ? "is-disabled" : ""}" 
+                    data-handle="0" 
+                    tabindex="${isDisabled || disabledMin ? "-1" : "0"}" 
+                    role="slider" 
+                    aria-orientation="${isVertical ? "vertical" : "horizontal"}" 
+                    aria-valuemin="${min}" 
+                    aria-valuemax="${max}" 
+                    aria-valuenow="${currentValues[0]}"
+                    style="${h1Style}"
+                ></span>
+                <span 
+                    class="p-slider-handle ${disabledMax || isDisabled ? "is-disabled" : ""}" 
+                    data-handle="1" 
+                    tabindex="${isDisabled || disabledMax ? "-1" : "0"}" 
+                    role="slider" 
+                    aria-orientation="${isVertical ? "vertical" : "horizontal"}" 
+                    aria-valuemin="${min}" 
+                    aria-valuemax="${max}" 
+                    aria-valuenow="${currentValues[1]}"
+                    style="${h2Style}"
+                ></span>
+                <input type="hidden" name="${props.name || props.targetInputName || "slider_value"}" value="${currentValues.join(",")}" />
+            `;
+    } else {
+      const p = getPercent(currentValues[0]);
+      const rangeStyle = isVertical ? `bottom: 0; height: ${p}%;` : `left: 0; width: ${p}%;`;
+      const hStyle = isVertical ? `bottom: ${p}%;` : `left: ${p}%;`;
+      container.innerHTML = `
+                <span class="p-slider-range" style="${rangeStyle}"></span>
+                <span 
+                    class="p-slider-handle ${isDisabled ? "is-disabled" : ""}" 
+                    data-handle="0" 
+                    tabindex="${isDisabled ? "-1" : "0"}" 
+                    role="slider" 
+                    aria-orientation="${isVertical ? "vertical" : "horizontal"}" 
+                    aria-valuemin="${min}" 
+                    aria-valuemax="${max}" 
+                    aria-valuenow="${currentValues[0]}"
+                    style="${hStyle}"
+                ></span>
+                <input type="hidden" name="${props.name || props.targetInputName || "slider_value"}" value="${currentValues[0]}" />
+            `;
+    }
+    bindEvents();
   }
-  function syncValue() {
+  function updateVisuals() {
+    const rangeEl = container.querySelector(".p-slider-range");
+    const handles = container.querySelectorAll(".p-slider-handle");
+    const hiddenInp = container.querySelector('input[type="hidden"]');
+    if (isRange) {
+      const p1 = getPercent(currentValues[0]);
+      const p2 = getPercent(currentValues[1]);
+      const leftPct = Math.min(p1, p2);
+      const sizePct = Math.abs(p2 - p1);
+      if (rangeEl) {
+        if (isVertical) {
+          rangeEl.style.bottom = `${leftPct}%`;
+          rangeEl.style.height = `${sizePct}%`;
+        } else {
+          rangeEl.style.left = `${leftPct}%`;
+          rangeEl.style.width = `${sizePct}%`;
+        }
+      }
+      if (handles[0]) {
+        if (isVertical) handles[0].style.bottom = `${p1}%`;
+        else handles[0].style.left = `${p1}%`;
+        handles[0].setAttribute("aria-valuenow", currentValues[0].toString());
+      }
+      if (handles[1]) {
+        if (isVertical) handles[1].style.bottom = `${p2}%`;
+        else handles[1].style.left = `${p2}%`;
+        handles[1].setAttribute("aria-valuenow", currentValues[1].toString());
+      }
+      if (hiddenInp) hiddenInp.value = currentValues.join(",");
+    } else {
+      const p = getPercent(currentValues[0]);
+      if (rangeEl) {
+        if (isVertical) rangeEl.style.height = `${p}%`;
+        else rangeEl.style.width = `${p}%`;
+      }
+      if (handles[0]) {
+        if (isVertical) handles[0].style.bottom = `${p}%`;
+        else handles[0].style.left = `${p}%`;
+        handles[0].setAttribute("aria-valuenow", currentValues[0].toString());
+      }
+      if (hiddenInp) hiddenInp.value = currentValues[0].toString();
+    }
+  }
+  function syncValue(isEnd = false) {
+    const valPayload = isRange ? [...currentValues] : currentValues[0];
+    container.dispatchEvent(new CustomEvent("slider:change", {
+      bubbles: true,
+      detail: { value: valPayload }
+    }));
+    container.dispatchEvent(new CustomEvent("change", {
+      bubbles: true,
+      detail: { value: valPayload }
+    }));
+    if (isEnd) {
+      container.dispatchEvent(new CustomEvent("slider:slideend", {
+        bubbles: true,
+        detail: { value: valPayload }
+      }));
+      container.dispatchEvent(new CustomEvent("slideend", {
+        bubbles: true,
+        detail: { value: valPayload }
+      }));
+    }
+  }
+  function bindEvents() {
+    if (isDisabled) return;
+    let activeHandleIdx = null;
+    let isDragging = false;
+    const getRatioFromEvent = (e) => {
+      const rect = container.getBoundingClientRect();
+      if (isVertical) {
+        if (rect.height <= 0) return 0;
+        const ratio = (rect.bottom - e.clientY) / rect.height;
+        return Math.max(0, Math.min(1, ratio));
+      } else {
+        if (rect.width <= 0) return 0;
+        const ratio = (e.clientX - rect.left) / rect.width;
+        return Math.max(0, Math.min(1, ratio));
+      }
+    };
+    const updateFromRatio = (ratio, handleIdx) => {
+      let rawVal = min + ratio * (max - min);
+      let snapped = snapToStep(rawVal);
+      if (isRange) {
+        if (handleIdx === 0) {
+          if (disabledMin) return;
+          const maxAllowed = currentValues[1] - minDistance;
+          snapped = Math.min(snapped, maxAllowed);
+          snapped = Math.max(min, snapped);
+          currentValues[0] = snapped;
+        } else {
+          if (disabledMax) return;
+          const minAllowed = currentValues[0] + minDistance;
+          snapped = Math.max(snapped, minAllowed);
+          snapped = Math.min(max, snapped);
+          currentValues[1] = snapped;
+        }
+      } else {
+        currentValues[0] = snapped;
+      }
+      updateVisuals();
+      syncValue(false);
+    };
+    container.onpointerdown = (e) => {
+      if (isDisabled) return;
+      const target = e.target;
+      const handleEl = target.closest(".p-slider-handle");
+      if (handleEl) {
+        const idx = Number(handleEl.getAttribute("data-handle") || 0);
+        if (idx === 0 && disabledMin) return;
+        if (idx === 1 && disabledMax) return;
+        activeHandleIdx = idx;
+      } else {
+        const ratio = getRatioFromEvent(e);
+        const clickVal = min + ratio * (max - min);
+        if (isRange) {
+          const dist0 = Math.abs(currentValues[0] - clickVal);
+          const dist1 = Math.abs(currentValues[1] - clickVal);
+          if (dist0 <= dist1 && !disabledMin) {
+            activeHandleIdx = 0;
+          } else if (!disabledMax) {
+            activeHandleIdx = 1;
+          } else {
+            activeHandleIdx = 0;
+          }
+        } else {
+          activeHandleIdx = 0;
+        }
+      }
+      if (activeHandleIdx === null) return;
+      isDragging = true;
+      const activeEl = container.querySelector(`.p-slider-handle[data-handle="${activeHandleIdx}"]`);
+      activeEl?.classList.add("is-dragging");
+      activeEl?.focus();
+      try {
+        container.setPointerCapture(e.pointerId);
+      } catch (_) {
+      }
+      updateFromRatio(getRatioFromEvent(e), activeHandleIdx);
+    };
+    container.onpointermove = (e) => {
+      if (!isDragging || activeHandleIdx === null) return;
+      updateFromRatio(getRatioFromEvent(e), activeHandleIdx);
+    };
+    const onEnd = (e) => {
+      if (!isDragging) return;
+      isDragging = false;
+      if (activeHandleIdx !== null) {
+        const activeEl = container.querySelector(`.p-slider-handle[data-handle="${activeHandleIdx}"]`);
+        activeEl?.classList.remove("is-dragging");
+      }
+      try {
+        container.releasePointerCapture(e.pointerId);
+      } catch (_) {
+      }
+      syncValue(true);
+      activeHandleIdx = null;
+    };
+    container.onpointerup = onEnd;
+    container.onpointercancel = onEnd;
+    const handles = container.querySelectorAll(".p-slider-handle");
+    handles.forEach((h) => {
+      h.onkeydown = (e) => {
+        const idx = Number(h.getAttribute("data-handle") || 0);
+        if (idx === 0 && disabledMin) return;
+        if (idx === 1 && disabledMax) return;
+        let cur = currentValues[idx];
+        let changed = false;
+        if (e.key === "ArrowRight" || e.key === "ArrowUp") {
+          cur = snapToStep(cur + step);
+          changed = true;
+        } else if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
+          cur = snapToStep(cur - step);
+          changed = true;
+        } else if (e.key === "PageUp") {
+          cur = snapToStep(cur + step * 10);
+          changed = true;
+        } else if (e.key === "PageDown") {
+          cur = snapToStep(cur - step * 10);
+          changed = true;
+        } else if (e.key === "Home") {
+          cur = min;
+          changed = true;
+        } else if (e.key === "End") {
+          cur = max;
+          changed = true;
+        }
+        if (changed) {
+          e.preventDefault();
+          if (isRange) {
+            if (idx === 0) {
+              const maxAllowed = currentValues[1] - minDistance;
+              currentValues[0] = Math.min(cur, maxAllowed);
+            } else {
+              const minAllowed = currentValues[0] + minDistance;
+              currentValues[1] = Math.max(cur, minAllowed);
+            }
+          } else {
+            currentValues[0] = cur;
+          }
+          updateVisuals();
+          syncValue(false);
+        }
+      };
+      h.onkeyup = (e) => {
+        if (["ArrowRight", "ArrowUp", "ArrowLeft", "ArrowDown", "PageUp", "PageDown", "Home", "End"].includes(e.key)) {
+          syncValue(true);
+        }
+      };
+    });
+  }
+  render();
+}
+
+// src/composables/useControllableState.ts
+function useControllableState(options) {
+  const isControlled = options.value !== void 0;
+  let internalValue = options.defaultValue !== void 0 ? options.defaultValue : options.value;
+  function getValue() {
+    return isControlled ? options.value : internalValue;
+  }
+  function setValue(nextValue) {
+    const resolved = typeof nextValue === "function" ? nextValue(getValue()) : nextValue;
+    if (!isControlled) {
+      internalValue = resolved;
+    }
+    options.onChange?.(resolved);
+  }
+  return [getValue, setValue];
+}
+
+// src/components/rating.ts
+var CSS6 = `
+.laughtale-rating,
+.p-rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-family: var(--p-font-family, inherit);
+    user-select: none;
+    box-sizing: border-box;
+}
+
+.p-rating.p-rating-vertical {
+    flex-direction: column;
+}
+
+/* Rating Items (Stars / Icons) */
+.p-rating-item {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 9999px;
+    padding: 0.125rem;
+    transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1), color 150ms ease, opacity 150ms ease;
+    color: var(--p-surface-300);
+    outline: none;
+}
+
+.p-rating:not(.p-readonly):not(.p-disabled) .p-rating-item:hover {
+    transform: scale(1.15);
+}
+
+.p-rating:not(.p-readonly):not(.p-disabled) .p-rating-item:focus-visible {
+    box-shadow: 0 0 0 2px var(--p-primary-500);
+}
+
+.p-rating-item.p-rating-item-active {
+    color: var(--p-primary-500, #f59e0b);
+}
+
+.p-rating-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    transition: color 150ms ease, fill 150ms ease;
+}
+
+.p-rating-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* Sizes */
+.p-rating.size-small .p-rating-icon {
+    width: 16px;
+    height: 16px;
+}
+.p-rating.size-large .p-rating-icon {
+    width: 26px;
+    height: 26px;
+}
+
+/* Half Stars Overlay */
+.p-rating-half-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.p-rating-half-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    overflow: hidden;
+    color: var(--p-primary-500, #f59e0b);
+    pointer-events: none;
+}
+.p-rating-half-overlay .p-rating-icon {
+    width: 20px;
+    height: 20px;
+}
+.p-rating.size-small .p-rating-half-overlay .p-rating-icon {
+    width: 16px;
+    height: 16px;
+}
+.p-rating.size-large .p-rating-half-overlay .p-rating-icon {
+    width: 26px;
+    height: 26px;
+}
+
+/* Cancel Button */
+.p-rating-cancel-item {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0.125rem;
+    margin-right: 0.25rem;
+    color: var(--p-surface-400);
+    border-radius: 9999px;
+    transition: color 150ms ease, background 150ms ease, transform 150ms ease;
+    outline: none;
+}
+.p-rating-vertical .p-rating-cancel-item {
+    margin-right: 0;
+    margin-bottom: 0.25rem;
+}
+.p-rating-cancel-item:hover {
+    color: var(--p-red-500, #ef4444);
+    transform: scale(1.1);
+}
+.p-rating-cancel-item:focus-visible {
+    box-shadow: 0 0 0 2px var(--p-red-500);
+}
+.p-rating-cancel-item svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Emoji / Template Mode */
+.p-rating-emoji-item {
+    font-size: 1.5rem;
+    line-height: 1;
+    filter: grayscale(100%);
+    opacity: 0.5;
+    transition: transform 150ms ease, filter 150ms ease, opacity 150ms ease;
+}
+.p-rating-emoji-item.p-rating-item-active,
+.p-rating:not(.p-readonly):not(.p-disabled) .p-rating-emoji-item:hover {
+    filter: grayscale(0%);
+    opacity: 1;
+    transform: scale(1.25);
+}
+
+/* Text Template Mode (e.g. A A A A A) */
+.p-rating-text-item {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--p-surface-300);
+    transition: color 150ms ease, transform 150ms ease;
+}
+.p-rating-text-item.p-rating-item-active {
+    color: var(--p-primary-500);
+}
+
+/* States */
+.p-rating.p-readonly .p-rating-item,
+.p-rating.p-readonly .p-rating-cancel-item {
+    cursor: default;
+}
+.p-rating.p-disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+.p-rating.p-disabled .p-rating-item,
+.p-rating.p-disabled .p-rating-cancel-item {
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* ==================== DARK MODE ==================== */
+.dark .p-rating-item {
+    color: var(--p-surface-600);
+}
+.dark .p-rating-item.p-rating-item-active,
+.dark .p-rating-half-overlay {
+    color: var(--p-primary-400, #fbbf24);
+}
+.dark .p-rating-cancel-item {
+    color: var(--p-surface-500);
+}
+.dark .p-rating-cancel-item:hover {
+    color: var(--p-red-400);
+}
+.dark .p-rating-text-item {
+    color: var(--p-surface-700);
+}
+.dark .p-rating-text-item.p-rating-item-active {
+    color: var(--p-primary-400);
+}
+`;
+var starFilledSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+var starEmptySvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+var cancelSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>`;
+function RatingIsland(container, props) {
+  injectIslandStyle("laughtale-rating", CSS6);
+  const totalStars = props.stars ? Number(props.stars) : 5;
+  const isAllowHalf = props.allowHalf === true || String(props.allowHalf) === "true";
+  const isCancelAllowed = props.cancel !== false && props.allowCancel !== false && String(props.cancel) !== "false" && String(props.allowCancel) !== "false";
+  const isVertical = props.orientation === "vertical";
+  const isReadonly = props.readonlyMode === true || props.readonly === true || String(props.readonlyMode) === "true" || String(props.readonly) === "true";
+  const isDisabled = props.disabled === true || String(props.disabled) === "true";
+  const mode = props.mode || "stars";
+  let emojiList = ["\u{1F621}", "\u{1F641}", "\u{1F610}", "\u{1F60A}", "\u{1F929}"];
+  if (props.emojis) {
+    if (Array.isArray(props.emojis)) emojiList = props.emojis;
+    else if (typeof props.emojis === "string") {
+      try {
+        const parsed = JSON.parse(props.emojis);
+        if (Array.isArray(parsed)) emojiList = parsed;
+        else emojiList = props.emojis.split(",").map((s) => s.trim()).filter(Boolean);
+      } catch {
+        emojiList = props.emojis.split(",").map((s) => s.trim()).filter(Boolean);
+      }
+    }
+  }
+  const [getRating, setRating] = useControllableState({
+    defaultValue: props.value ? Number(props.value) : 0,
+    onChange: (val) => {
+      syncValue(val);
+    }
+  });
+  let hoverValue = null;
+  function init() {
+    const rating = getRating();
+    const rootClasses = [
+      "laughtale-rating",
+      "p-rating",
+      isVertical ? "p-rating-vertical" : "",
+      props.size ? `size-${props.size}` : "",
+      isReadonly ? "p-readonly" : "",
+      isDisabled ? "p-disabled" : ""
+    ].filter(Boolean).join(" ");
+    container.className = rootClasses;
+    container.setAttribute("role", "radiogroup");
+    container.setAttribute("aria-label", `${rating} of ${totalStars} stars`);
+    let cancelBtnHtml = "";
+    if (isCancelAllowed && !isReadonly && !isDisabled) {
+      cancelBtnHtml = `
+                <button type="button" class="p-rating-cancel-item" aria-label="Clear rating" tabindex="0">
+                    ${cancelSvg}
+                </button>
+            `;
+    }
+    let itemsHtml = "";
+    for (let i = 1; i <= totalStars; i++) {
+      if (mode === "emoji") {
+        const emoji = emojiList[(i - 1) % emojiList.length] || "\u2B50";
+        itemsHtml += `
+                    <span class="p-rating-item p-rating-emoji-item" data-value="${i}" role="radio" aria-checked="${rating >= i ? "true" : "false"}" aria-label="${i} Star" tabindex="${isReadonly || isDisabled ? "-1" : "0"}">
+                        ${emoji}
+                    </span>
+                `;
+      } else if (mode === "template") {
+        itemsHtml += `
+                    <span class="p-rating-item p-rating-text-item" data-value="${i}" role="radio" aria-checked="${rating >= i ? "true" : "false"}" aria-label="${i} Star" tabindex="${isReadonly || isDisabled ? "-1" : "0"}">
+                        A
+                    </span>
+                `;
+      } else {
+        itemsHtml += `
+                    <span class="p-rating-item p-rating-star-item" data-value="${i}" role="radio" aria-checked="${rating >= i ? "true" : "false"}" aria-label="${i} Stars" tabindex="${isReadonly || isDisabled ? "-1" : "0"}">
+                        <div class="p-rating-half-wrapper">
+                            <span class="p-rating-icon p-rating-icon-off">${starEmptySvg}</span>
+                            <span class="p-rating-half-overlay" style="display: none;">
+                                <span class="p-rating-icon p-rating-icon-half">${starFilledSvg}</span>
+                            </span>
+                        </div>
+                    </span>
+                `;
+      }
+    }
+    container.innerHTML = `
+            ${cancelBtnHtml}
+            <div class="p-rating-items" style="display: flex; ${isVertical ? "flex-direction: column;" : "align-items: center;"} gap: 0.375rem;">
+                ${itemsHtml}
+            </div>
+        `;
+    updateVisuals(rating);
+    bindEvents();
+  }
+  function updateVisuals(activeVal) {
+    const items = container.querySelectorAll(".p-rating-item");
+    items.forEach((item) => {
+      const starVal = Number(item.getAttribute("data-value"));
+      const isFull = activeVal >= starVal;
+      const isHalf = isAllowHalf && activeVal >= starVal - 0.5 && activeVal < starVal;
+      if (mode === "stars") {
+        const offIcon = item.querySelector(".p-rating-icon-off");
+        const halfOverlay = item.querySelector(".p-rating-half-overlay");
+        if (isFull) {
+          item.classList.add("p-rating-item-active");
+          if (offIcon) offIcon.innerHTML = starFilledSvg;
+          if (halfOverlay) halfOverlay.style.display = "none";
+        } else if (isHalf) {
+          item.classList.remove("p-rating-item-active");
+          if (offIcon) offIcon.innerHTML = starEmptySvg;
+          if (halfOverlay) halfOverlay.style.display = "block";
+        } else {
+          item.classList.remove("p-rating-item-active");
+          if (offIcon) offIcon.innerHTML = starEmptySvg;
+          if (halfOverlay) halfOverlay.style.display = "none";
+        }
+      } else {
+        item.classList.toggle("p-rating-item-active", isFull);
+      }
+      item.setAttribute("aria-checked", isFull || isHalf ? "true" : "false");
+    });
+    container.setAttribute("aria-label", `${activeVal} of ${totalStars} stars`);
+  }
+  function bindEvents() {
+    if (isReadonly || isDisabled) return;
+    const cancelBtn = container.querySelector(".p-rating-cancel-item");
+    if (cancelBtn) {
+      cancelBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        setRating(0);
+        updateVisuals(0);
+      });
+      cancelBtn.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          setRating(0);
+          updateVisuals(0);
+        }
+      });
+    }
+    const items = container.querySelectorAll(".p-rating-item");
+    items.forEach((item) => {
+      const starVal = Number(item.getAttribute("data-value"));
+      item.addEventListener("mousemove", (e) => {
+        if (isAllowHalf && mode === "stars") {
+          const rect = item.getBoundingClientRect();
+          const isLeftHalf = e.clientX - rect.left < rect.width / 2;
+          hoverValue = isLeftHalf ? starVal - 0.5 : starVal;
+        } else {
+          hoverValue = starVal;
+        }
+        updateVisuals(hoverValue);
+      });
+      item.addEventListener("click", (e) => {
+        let targetVal = starVal;
+        if (isAllowHalf && mode === "stars") {
+          const rect = item.getBoundingClientRect();
+          const isLeftHalf = e.clientX - rect.left < rect.width / 2;
+          targetVal = isLeftHalf ? starVal - 0.5 : starVal;
+        }
+        const current = getRating();
+        const finalVal = current === targetVal && isCancelAllowed ? 0 : targetVal;
+        setRating(finalVal);
+        updateVisuals(finalVal);
+      });
+      item.addEventListener("keydown", (e) => {
+        const current = getRating();
+        const step = isAllowHalf ? 0.5 : 1;
+        if (e.key === "ArrowRight" || e.key === "ArrowUp") {
+          e.preventDefault();
+          const nextVal = Math.min(totalStars, current + step);
+          setRating(nextVal);
+          updateVisuals(nextVal);
+          focusStar(Math.ceil(nextVal));
+        } else if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
+          e.preventDefault();
+          const prevVal = Math.max(0, current - step);
+          setRating(prevVal);
+          updateVisuals(prevVal);
+          focusStar(Math.ceil(prevVal));
+        } else if (e.key === " " || e.key === "Enter") {
+          e.preventDefault();
+          setRating(starVal);
+          updateVisuals(starVal);
+        } else if (e.key === "Backspace" || e.key === "Delete") {
+          e.preventDefault();
+          setRating(0);
+          updateVisuals(0);
+        }
+      });
+    });
+    container.addEventListener("mouseleave", () => {
+      hoverValue = null;
+      updateVisuals(getRating());
+    });
+  }
+  function focusStar(starNum) {
+    const target = container.querySelector(`.p-rating-item[data-value="${Math.max(1, starNum)}"]`);
+    target?.focus();
+  }
+  function syncValue(val) {
     if (props.targetInputName) {
       let hidden = container.querySelector(`input[name="${props.targetInputName}"]`);
       if (!hidden) {
@@ -584,151 +2772,18 @@ function SliderIsland(container, props) {
         hidden.name = props.targetInputName;
         container.appendChild(hidden);
       }
-      hidden.value = currentValue.toString();
-    }
-    container.dispatchEvent(new CustomEvent("slider:change", {
-      bubbles: true,
-      detail: { value: currentValue }
-    }));
-  }
-  if (!props.disabled) {
-    let isDragging = false;
-    const updateFromClientX = (clientX) => {
-      const rect = track.getBoundingClientRect();
-      if (rect.width <= 0) return;
-      let ratio = (clientX - rect.left) / rect.width;
-      ratio = Math.max(0, Math.min(1, ratio));
-      let rawVal = min + ratio * (max - min);
-      rawVal = Math.round(rawVal / step) * step;
-      currentValue = Math.max(min, Math.min(max, rawVal));
-      updateVisuals();
-      syncValue();
-    };
-    const onPointerDown = (e) => {
-      isDragging = true;
-      handle.style.cursor = "grabbing";
-      handle.style.transform = "translate(-50%, -50%) scale(1.2)";
-      if ("setPointerCapture" in track && e.pointerId !== void 0) {
-        try {
-          track.setPointerCapture(e.pointerId);
-        } catch (_) {
-        }
-      }
-      updateFromClientX(e.clientX);
-    };
-    const onPointerMove = (e) => {
-      if (!isDragging) return;
-      updateFromClientX(e.clientX);
-    };
-    const onPointerUp = (e) => {
-      if (!isDragging) return;
-      isDragging = false;
-      handle.style.cursor = "grab";
-      handle.style.transform = "translate(-50%, -50%) scale(1)";
-      if ("releasePointerCapture" in track && e.pointerId !== void 0) {
-        try {
-          track.releasePointerCapture(e.pointerId);
-        } catch (_) {
-        }
-      }
-    };
-    track.addEventListener("pointerdown", onPointerDown);
-    track.addEventListener("pointermove", onPointerMove);
-    track.addEventListener("pointerup", onPointerUp);
-    track.addEventListener("pointercancel", onPointerUp);
-    track.addEventListener("mousedown", onPointerDown);
-    window.addEventListener("mousemove", onPointerMove);
-    window.addEventListener("mouseup", onPointerUp);
-  }
-  syncValue();
-}
-
-// src/components/rating.ts
-var CSS6 = `
-[data-theme="dark"] .rating-star {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
-}
-[data-theme="dark"] .laughtale-rating {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
-}
-[data-theme="dark"] .rating-cancel-btn {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
-}
-`;
-function RatingIsland(container, props) {
-  injectIslandStyle("rating", CSS6);
-  const totalStars = props.stars || 5;
-  let currentRating = props.value || 0;
-  let hoverRating = 0;
-  function render() {
-    const starElements = Array.from({ length: totalStars }, (_, i) => {
-      const starNum = i + 1;
-      const isFilled = (hoverRating || currentRating) >= starNum;
-      const color = isFilled ? "#f59e0b" : "var(--p-surface-300)";
-      return `
-                <span class="rating-star" data-star="${starNum}" style="cursor: ${props.disabled ? "default" : "pointer"}; color: ${color}; transition: transform 0.15s ease, color 0.15s ease; display: inline-flex;">
-                    ${isFilled ? LucideIcons.star : LucideIcons.starEmpty}
-                </span>
-            `;
-    }).join("");
-    container.innerHTML = `
-            <div class="laughtale-rating" style="display: inline-flex; align-items: center; gap: 0.35rem; user-select: none;">
-                ${props.allowCancel !== false ? `
-                    <button type="button" class="rating-cancel-btn" style="border: none; background: transparent; color: var(--p-surface-400); cursor: pointer; display: flex; align-items: center; padding: 0 0.25rem;">
-                        ${LucideIcons.x}
-                    </button>
-                ` : ""}
-                ${starElements}
-            </div>
-        `;
-    if (props.disabled) return;
-    container.querySelectorAll(".rating-star").forEach((el) => {
-      el.addEventListener("mouseenter", () => {
-        hoverRating = parseInt(el.getAttribute("data-star"), 10);
-        render();
-      });
-      el.addEventListener("click", () => {
-        currentRating = parseInt(el.getAttribute("data-star"), 10);
-        hoverRating = 0;
-        render();
-        syncValue();
-      });
-    });
-    container.querySelector(".laughtale-rating")?.addEventListener("mouseleave", () => {
-      hoverRating = 0;
-      render();
-    });
-    container.querySelector(".rating-cancel-btn")?.addEventListener("click", () => {
-      currentRating = 0;
-      hoverRating = 0;
-      render();
-      syncValue();
-    });
-  }
-  function syncValue() {
-    if (props.targetInputName) {
-      let hidden = document.querySelector(`input[name="${props.targetInputName}"]`);
-      if (!hidden) {
-        hidden = document.createElement("input");
-        hidden.type = "hidden";
-        hidden.name = props.targetInputName;
-        container.appendChild(hidden);
-      }
-      hidden.value = currentRating.toString();
+      hidden.value = String(val);
     }
     container.dispatchEvent(new CustomEvent("rating:change", {
       bubbles: true,
-      detail: { value: currentRating }
+      detail: { value: val }
+    }));
+    container.dispatchEvent(new CustomEvent("change", {
+      bubbles: true,
+      detail: { value: val }
     }));
   }
-  render();
-  syncValue();
+  init();
 }
 
 // src/composables/useDisclosure.ts
@@ -983,37 +3038,76 @@ function AccordionIsland(container, props) {
 }
 
 // src/components/tabs.ts
-var CSS8 = `
-[data-theme="dark"] .tab-header-btn {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+var TABS_CSS = `
+.laughtale-tabs {
+    width: 100%;
 }
-[data-theme="dark"] .laughtale-tabs {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.tabs-header-bar {
+    display: flex;
+    border-bottom: 1px solid var(--p-border-color);
+    gap: 0.5rem;
+    overflow-x: auto;
+    position: relative;
 }
-[data-theme="dark"] .tabs-header-bar {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.tab-header-btn {
+    position: relative;
+    padding: 0.75rem 1.25rem;
+    border: none;
+    background: transparent;
+    color: var(--p-text-muted);
+    font-weight: 500;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-bottom: 2px solid transparent;
+    outline: none;
+    user-select: none;
 }
-[data-theme="dark"] .tab-panel-body {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.tab-header-btn:hover:not(:disabled) {
+    color: var(--p-text-color);
 }
-[data-theme="dark"] .tab-slot-content {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.tab-header-btn.tab-active {
+    color: var(--p-primary-600);
+    font-weight: 700;
+    border-bottom-color: var(--p-primary-600);
+}
+
+.tab-header-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.tab-panel-body {
+    padding: 1.25rem 0;
+    font-size: 0.875rem;
+    color: var(--p-text-color);
+    line-height: 1.6;
+}
+
+.dark .tab-header-btn.tab-active,
+[data-theme="dark"] .tab-header-btn.tab-active {
+    color: var(--p-primary-500);
+    border-bottom-color: var(--p-primary-500);
 }
 `;
 function TabsIsland(container, props) {
-  injectIslandStyle("tabs", CSS8);
+  injectIslandStyle("tabs", TABS_CSS);
   const tabs = props.tabs || [];
   let activeIndex = props.activeIndex || 0;
+  const initialSlots = {};
+  container.querySelectorAll("[data-slot]").forEach((el) => {
+    const slotKey = el.getAttribute("data-slot") || "";
+    if (slotKey) {
+      initialSlots[slotKey] = el.cloneNode(true);
+    }
+  });
   function render() {
     const headerButtons = tabs.map((tab, idx) => {
       const isActive = idx === activeIndex;
@@ -1023,8 +3117,9 @@ function TabsIsland(container, props) {
                 <button type="button" 
                         class="tab-header-btn ${isActive ? "tab-active" : ""}" 
                         data-idx="${idx}" 
-                        ${tab.disabled ? "disabled" : ""} 
-                        style="position: relative; padding: 0.75rem 1.25rem; border: none; background: transparent; color: ${isActive ? "var(--p-primary-600)" : "var(--p-text-muted)"}; font-weight: ${isActive ? "700" : "500"}; font-size: 0.875rem; cursor: ${tab.disabled ? "not-allowed" : "pointer"}; transition: color 0.15s ease; display: inline-flex; align-items: center; gap: 0.5rem; border-bottom: 2px solid ${isActive ? "var(--p-primary-600)" : "transparent"};">
+                        ${tab.disabled ? 'disabled aria-disabled="true"' : ""}
+                        role="tab"
+                        aria-selected="${isActive}">
                     ${iconText ? `<span>${iconText}</span>` : ""}
                     <span>${headerText}</span>
                 </button>
@@ -1032,27 +3127,26 @@ function TabsIsland(container, props) {
     }).join("");
     const activeContent = tabs[activeIndex]?.content || tabs[activeIndex]?.Content || "";
     container.innerHTML = `
-            <div class="laughtale-tabs" style="width: 100%;">
-                <!-- Tab Headers Bar -->
-                <div class="tabs-header-bar" style="display: flex; border-bottom: 1px solid var(--p-border-color); gap: 0.25rem; overflow-x: auto; position: relative;">
+            <div class="laughtale-tabs">
+                <div class="tabs-header-bar" role="tablist">
                     ${headerButtons}
                 </div>
-
-                <!-- Active Tab Content Panel -->
-                <div class="tab-panel-body" style="padding: 1.25rem 0; font-size: 0.875rem; color: var(--p-text-color); line-height: 1.6; transition: opacity 0.2s ease;">
+                <div class="tab-panel-body" role="tabpanel">
                     <div class="tab-slot-content">${activeContent}</div>
                 </div>
             </div>
         `;
-    const externalSlot = container.querySelector(`[data-slot="tab-${activeIndex}"]`);
+    const slotEl = initialSlots[`tab-${activeIndex}`];
     const targetContainer = container.querySelector(".tab-slot-content");
-    if (externalSlot && targetContainer) {
+    if (slotEl && targetContainer) {
       targetContainer.innerHTML = "";
-      targetContainer.appendChild(externalSlot);
+      targetContainer.appendChild(slotEl.cloneNode(true));
     }
     container.querySelectorAll(".tab-header-btn").forEach((btn) => {
-      btn.addEventListener("click", () => {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
         const idx = Number(btn.getAttribute("data-idx"));
+        if (tabs[idx]?.disabled) return;
         activeIndex = idx;
         render();
         if (props.targetInputName) {
@@ -1067,7 +3161,7 @@ function TabsIsland(container, props) {
         }
         container.dispatchEvent(new CustomEvent("tabs:change", {
           bubbles: true,
-          detail: { activeIndex }
+          detail: { activeIndex, tab: tabs[activeIndex] }
         }));
       });
     });
@@ -1128,223 +3222,583 @@ function useDebounce(fn, delayMs = 250) {
   return debounced;
 }
 
-// src/composables/useKeyboardNav.ts
-function useKeyboardNav(options) {
-  let activeIndex = options.initialIndex ?? -1;
-  const loop = options.loop ?? true;
-  function handleKeyDown(e) {
-    const count = options.itemCount();
-    if (count === 0) return false;
-    const isVertical = options.orientation !== "horizontal";
-    const isHorizontal = options.orientation !== "vertical";
-    if (isVertical && e.key === "ArrowDown" || isHorizontal && e.key === "ArrowRight") {
-      e.preventDefault();
-      if (activeIndex < count - 1) {
-        activeIndex++;
-      } else if (loop) {
-        activeIndex = 0;
-      }
-      options.onHighlight?.(activeIndex);
-      return true;
-    }
-    if (isVertical && e.key === "ArrowUp" || isHorizontal && e.key === "ArrowLeft") {
-      e.preventDefault();
-      if (activeIndex > 0) {
-        activeIndex--;
-      } else if (loop) {
-        activeIndex = count - 1;
-      }
-      options.onHighlight?.(activeIndex);
-      return true;
-    }
-    if (e.key === "Home") {
-      e.preventDefault();
-      activeIndex = 0;
-      options.onHighlight?.(activeIndex);
-      return true;
-    }
-    if (e.key === "End") {
-      e.preventDefault();
-      activeIndex = count - 1;
-      options.onHighlight?.(activeIndex);
-      return true;
-    }
-    if (e.key === "Enter" || e.key === " ") {
-      if (activeIndex >= 0 && activeIndex < count) {
-        e.preventDefault();
-        options.onSelect?.(activeIndex);
-        return true;
-      }
-    }
-    if (e.key === "Escape") {
-      options.onEscape?.();
-      return true;
-    }
-    return false;
-  }
-  return {
-    handleKeyDown,
-    get activeIndex() {
-      return activeIndex;
-    },
-    setActiveIndex: (idx) => {
-      activeIndex = idx;
-      options.onHighlight?.(activeIndex);
-    },
-    reset: () => {
-      activeIndex = -1;
-    }
-  };
+// src/components/autocomplete.ts
+var CSS8 = `
+.laughtale-autocomplete {
+    position: relative;
+    display: inline-flex;
+    align-items: stretch;
+    font-family: var(--p-font-family, inherit);
+    box-sizing: border-box;
+}
+.laughtale-autocomplete.fluid {
+    width: 100%;
+}
+.laughtale-autocomplete:not(.fluid) {
+    width: 100%;
+    max-width: 320px;
 }
 
-// src/components/autocomplete.ts
-var CSS9 = `
-[data-theme="dark"] .laughtale-autocomplete {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+.ac-input-container {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    min-width: 0;
+    background: var(--p-surface-0);
+    border: 1px solid var(--p-border-color);
+    border-radius: var(--p-border-radius);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    box-sizing: border-box;
+    cursor: text;
+    position: relative;
 }
-[data-theme="dark"] .autocomplete-input-wrap {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+.laughtale-autocomplete.has-dropdown .ac-input-container {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
 }
-[data-theme="dark"] .autocomplete-input {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+.ac-input-container.variant-filled {
+    background: var(--p-surface-50);
 }
-[data-theme="dark"] .btn-clear-autocomplete {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+.ac-input-container.focused {
+    border-color: var(--p-primary-500);
+    box-shadow: 0 0 0 1px var(--p-primary-500);
+    z-index: 2;
 }
-[data-theme="dark"] .autocomplete-overlay {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+.ac-input-container.invalid {
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 0 1px #ef4444 !important;
 }
-[data-theme="dark"] .autocomplete-item {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+.ac-input-container.disabled {
+    background: var(--p-surface-100);
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+/* Sizes */
+.ac-input-container.size-small {
+    min-height: 2rem;
+    padding: 0 0.5rem;
+    font-size: 0.75rem;
+}
+.ac-input-container.size-normal {
+    min-height: 2.5rem;
+    padding: 0 0.75rem;
+    font-size: 0.875rem;
+}
+.ac-input-container.size-large {
+    min-height: 3rem;
+    padding: 0 1rem;
+    font-size: 1rem;
+}
+
+.ac-chips-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+    flex: 1;
+    min-width: 0;
+    padding: 0.25rem 0;
+}
+.ac-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: var(--p-surface-100);
+    color: var(--p-text-color);
+    border-radius: calc(var(--p-border-radius) - 2px);
+    padding: 0.15rem 0.45rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+.ac-chip-remove {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    color: var(--p-text-muted);
+    border: none;
+    background: transparent;
+    padding: 0;
+    font-size: 0.75rem;
+}
+.ac-chip-remove:hover {
+    color: #ef4444;
+}
+
+.ac-input {
+    flex: 1;
+    min-width: 60px;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--p-text-color);
+    font-family: inherit;
+    font-size: inherit;
+    padding: 0.35rem 0;
+}
+.ac-input::placeholder {
+    color: var(--p-text-muted);
+}
+.ac-input:disabled {
+    cursor: not-allowed;
+}
+
+.ac-btn-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    color: var(--p-text-muted);
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 50%;
+    transition: color 0.15s ease, background 0.15s ease;
+    flex-shrink: 0;
+    margin-left: 0.25rem;
+}
+.ac-btn-icon:hover {
+    color: var(--p-text-color);
+    background: var(--p-surface-100);
+}
+
+.ac-dropdown-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--p-border-color);
+    border-left: none;
+    background: var(--p-surface-100);
+    color: var(--p-text-muted);
+    border-top-right-radius: var(--p-border-radius);
+    border-bottom-right-radius: var(--p-border-radius);
+    cursor: pointer;
+    padding: 0 0.85rem;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    flex-shrink: 0;
+    box-sizing: border-box;
+}
+.ac-dropdown-btn:hover {
+    background: var(--p-surface-200);
+    color: var(--p-text-color);
+}
+.ac-dropdown-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
+/* Sizes for dropdown button */
+.size-small + .ac-dropdown-btn,
+.laughtale-autocomplete .ac-dropdown-btn.size-small {
+    padding: 0 0.6rem;
+}
+.size-large + .ac-dropdown-btn,
+.laughtale-autocomplete .ac-dropdown-btn.size-large {
+    padding: 0 1.1rem;
+}
+
+/* Floating Overlay Panel */
+.ac-overlay {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: var(--p-surface-0);
+    border: 1px solid var(--p-border-color);
+    border-radius: var(--p-border-radius);
+    box-shadow: var(--p-shadow-lg);
+    overflow-y: auto;
+    padding: 0.35rem;
+    display: none;
+    box-sizing: border-box;
+}
+.ac-group-header {
+    font-size: 0.725rem;
+    font-weight: 700;
+    color: var(--p-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.5rem 0.65rem 0.25rem;
+    user-select: none;
+}
+.ac-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0.75rem;
+    border-radius: calc(var(--p-border-radius) - 2px);
+    color: var(--p-text-color);
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+    font-size: 0.875rem;
+    user-select: none;
+    gap: 0.5rem;
+}
+.ac-item:hover, .ac-item.highlighted {
+    background: var(--p-surface-100);
+}
+.ac-item.selected {
+    background: var(--p-primary-50);
+    color: var(--p-primary-700);
+    font-weight: 600;
+}
+.ac-item.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Dark Mode Aware Tokens */
+.dark .ac-input-container {
+    background: var(--p-surface-900);
+    border-color: var(--p-surface-700);
+    color: var(--p-surface-0);
+}
+.dark .ac-input-container.variant-filled {
+    background: var(--p-surface-800);
+}
+.dark .ac-chip {
+    background: var(--p-surface-800);
+    color: var(--p-surface-100);
+}
+.dark .ac-dropdown-btn {
+    background: var(--p-surface-800);
+    border-color: var(--p-surface-700);
+    color: var(--p-surface-300);
+}
+.dark .ac-dropdown-btn:hover {
+    background: var(--p-surface-700);
+    color: var(--p-surface-0);
+}
+.dark .ac-overlay {
+    background: var(--p-surface-900);
+    border-color: var(--p-surface-700);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+}
+.dark .ac-item:hover, .dark .ac-item.highlighted {
+    background: var(--p-surface-800);
+    color: var(--p-surface-0);
+}
+.dark .ac-item.selected {
+    background: rgba(16, 185, 129, 0.15);
+    color: #6ee7b7;
 }
 `;
 function AutoCompleteIsland(container, props) {
-  injectIslandStyle("autocomplete", CSS9);
-  const allItems = props.items || [];
-  let selectedValue = props.value || "";
+  injectIslandStyle("autocomplete", CSS8);
+  const allItems = props.suggestions || props.items || [];
+  const multiple = props.multiple === true;
+  const showClear = props.showClear !== false;
+  const hasDropdown = props.dropdown === true;
+  const forceSelection = props.forceSelection === true;
+  const size = props.size || "normal";
+  const variant = props.variant || "outlined";
+  const scrollHeight = props.scrollHeight || "14rem";
+  let selectedValues = multiple ? Array.isArray(props.value) ? props.value : props.value ? [props.value] : [] : props.value ? [props.value] : [];
   let searchQuery = "";
+  let highlightedIndex = -1;
   function getFilteredItems() {
     if (!searchQuery) return allItems;
     const q = searchQuery.toLowerCase();
-    return allItems.filter((item) => item.label.toLowerCase().includes(q) || item.value.toLowerCase().includes(q));
+    return allItems.filter(
+      (item) => item.label.toLowerCase().includes(q) || item.value.toLowerCase().includes(q) || item.subtitle && item.subtitle.toLowerCase().includes(q) || item.group && item.group.toLowerCase().includes(q) || item.category && item.category.toLowerCase().includes(q)
+    );
   }
   container.innerHTML = `
-        <div class="laughtale-autocomplete" style="position: relative; width: 100%; max-width: 320px;">
-            <div class="autocomplete-input-wrap" style="display: flex; align-items: center; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); background: var(--p-surface-0); padding: 0 0.5rem; transition: border-color 0.2s ease;">
-                <span style="color: var(--p-surface-400); display: flex; align-items: center; margin-right: 0.25rem;">
-                    ${LucideIcons.search}
-                </span>
-                <input type="text" 
-                       class="autocomplete-input" 
-                       value="${selectedValue ? allItems.find((i) => i.value === selectedValue)?.label || "" : ""}" 
-                       placeholder="${props.placeholder || "Search or select..."}" 
-                       ${props.disabled ? "disabled" : ""} 
-                       style="flex: 1; padding: 0.5rem 0.25rem; border: none; outline: none; background: transparent; font-size: 0.875rem; color: var(--p-text-color);" />
-                <button type="button" class="btn-clear-autocomplete" style="display: ${selectedValue ? "flex" : "none"}; border: none; background: transparent; color: var(--p-surface-400); cursor: pointer; padding: 0.25rem; align-items: center;">
-                    ${LucideIcons.x}
-                </button>
+        <div class="laughtale-autocomplete ${props.fluid ? "fluid" : ""} ${hasDropdown ? "has-dropdown" : ""}">
+            <div class="ac-input-container size-${size} variant-${variant} ${props.invalid ? "invalid" : ""} ${props.disabled ? "disabled" : ""}">
+                <div class="ac-chips-wrapper">
+                    <input type="text" 
+                           class="ac-input" 
+                           role="combobox"
+                           aria-autocomplete="list"
+                           aria-expanded="false"
+                           placeholder="${selectedValues.length === 0 ? props.placeholder || "Search..." : ""}" 
+                           ${props.disabled ? "disabled" : ""} />
+                </div>
+                
+                ${props.loading ? `
+                    <span class="ac-btn-icon" style="animation: spin 1s linear infinite;">
+                        ${LucideIcons.loader2 || "\u23F3"}
+                    </span>
+                ` : ""}
+
+                ${showClear ? `
+                    <button type="button" class="ac-btn-icon ac-btn-clear" style="display: none;" title="Clear value">
+                        ${LucideIcons.x}
+                    </button>
+                ` : ""}
             </div>
 
-            <!-- Dropdown Popup -->
-            <div class="autocomplete-overlay" style="display: none; position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 500; background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); box-shadow: var(--p-shadow-lg); max-height: 220px; overflow-y: auto; padding: 0.25rem;">
-            </div>
+            ${hasDropdown ? `
+                <button type="button" class="ac-dropdown-btn size-${size}" ${props.disabled ? "disabled" : ""} title="Show all suggestions">
+                    <span style="display: flex; width: 16px; height: 16px;">${LucideIcons.chevronDown}</span>
+                </button>
+            ` : ""}
+
+            <!-- Suggestions Overlay -->
+            <div class="ac-overlay" style="max-height: ${scrollHeight};"></div>
         </div>
     `;
-  const input = container.querySelector(".autocomplete-input");
-  const clearBtn = container.querySelector(".btn-clear-autocomplete");
-  const overlay = container.querySelector(".autocomplete-overlay");
+  const inputWrap = container.querySelector(".ac-input-container");
+  const chipsWrap = container.querySelector(".ac-chips-wrapper");
+  const input = container.querySelector(".ac-input");
+  const clearBtn = container.querySelector(".ac-btn-clear");
+  const dropdownBtn = container.querySelector(".ac-dropdown-btn");
+  const overlay = container.querySelector(".ac-overlay");
   const disclosure = useDisclosure({
     defaultIsOpen: false,
     onOpen: () => {
+      overlay.style.display = "block";
+      input.setAttribute("aria-expanded", "true");
       renderDropdown();
-      useTransition(overlay, { type: "fade", isMounted: true });
     },
     onClose: () => {
-      useTransition(overlay, { type: "fade", isMounted: false });
+      overlay.style.display = "none";
+      input.setAttribute("aria-expanded", "false");
+      highlightedIndex = -1;
+      if (forceSelection && !multiple && searchQuery) {
+        const exact = allItems.find((i) => i.label.toLowerCase() === searchQuery.toLowerCase());
+        if (!exact) {
+          input.value = selectedValues[0] ? allItems.find((i) => i.value === selectedValues[0])?.label || "" : "";
+          searchQuery = "";
+        }
+      }
     }
   });
-  useClickOutside(container, () => disclosure.close());
-  const keyboardNav = useKeyboardNav({
-    itemCount: () => getFilteredItems().length,
-    onHighlight: (idx) => {
-      const items = overlay.querySelectorAll(".autocomplete-item");
-      items.forEach((it2, i) => {
-        it2.style.background = i === idx ? "var(--p-surface-100)" : "transparent";
-        if (i === idx) it2.scrollIntoView({ block: "nearest" });
-      });
-    },
-    onSelect: (idx) => {
-      const filtered = getFilteredItems();
-      if (filtered[idx]) selectItem(filtered[idx]);
-    },
-    onEscape: () => disclosure.close()
-  });
-  function selectItem(item) {
-    selectedValue = item.value;
-    searchQuery = "";
-    input.value = item.label;
-    clearBtn.style.display = "flex";
+  useClickOutside(container, () => {
     disclosure.close();
-    syncValue();
+    inputWrap.classList.remove("focused");
+  });
+  function renderChips() {
+    if (!multiple) {
+      if (selectedValues[0]) {
+        const found = allItems.find((i) => i.value === selectedValues[0]);
+        input.value = found ? found.label : selectedValues[0];
+      } else {
+        input.value = "";
+      }
+      updateClearButton();
+      return;
+    }
+    chipsWrap.querySelectorAll(".ac-chip").forEach((el) => el.remove());
+    selectedValues.forEach((val) => {
+      const item = allItems.find((i) => i.value === val) || { label: val, value: val };
+      const chip = document.createElement("span");
+      chip.className = "ac-chip";
+      chip.innerHTML = `
+                <span>${item.label}</span>
+                <button type="button" class="ac-chip-remove" data-remove="${item.value}">&times;</button>
+            `;
+      chip.querySelector(".ac-chip-remove")?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        removeValue(item.value);
+      });
+      chipsWrap.insertBefore(chip, input);
+    });
+    input.placeholder = selectedValues.length === 0 ? props.placeholder || "Search..." : "";
+    updateClearButton();
+  }
+  function updateClearButton() {
+    if (!clearBtn) return;
+    const hasContent = multiple ? selectedValues.length > 0 : selectedValues.length > 0 || input.value.length > 0;
+    clearBtn.style.display = hasContent && !props.disabled ? "flex" : "none";
   }
   function renderDropdown() {
     const filtered = getFilteredItems();
     if (filtered.length === 0) {
-      overlay.innerHTML = `<div style="padding: 0.75rem; text-align: center; color: var(--p-surface-400); font-size: 0.8125rem;">No results found</div>`;
+      overlay.innerHTML = `<div style="padding: 0.75rem; text-align: center; color: var(--p-text-muted); font-size: 0.8125rem;">No results found</div>`;
       return;
     }
-    overlay.innerHTML = filtered.map((item, idx) => `
-            <div class="autocomplete-item" data-value="${item.value}" data-idx="${idx}" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border-radius: var(--p-border-radius); cursor: pointer; font-size: 0.8125rem; color: var(--p-text-color); transition: background 0.15s ease;">
-                <span style="display: flex; align-items: center; gap: 0.5rem;">
-                    ${item.icon ? `<span>${item.icon}</span>` : ""}
-                    <span>${item.label}</span>
-                </span>
-                ${item.category ? `<span class="aura-tag tag-slate" style="font-size: 0.6875rem;">${item.category}</span>` : ""}
-            </div>
-        `).join("");
-    overlay.querySelectorAll(".autocomplete-item").forEach((itemEl) => {
+    const groups = {};
+    let isGrouped = false;
+    filtered.forEach((item) => {
+      const grp = item.group || item.category || "";
+      if (grp) isGrouped = true;
+      if (!groups[grp]) groups[grp] = [];
+      groups[grp].push(item);
+    });
+    let html = "";
+    let itemIndex = 0;
+    if (isGrouped) {
+      Object.entries(groups).forEach(([grpName, groupItems]) => {
+        if (grpName) {
+          html += `<div class="ac-group-header">${grpName}</div>`;
+        }
+        groupItems.forEach((item) => {
+          html += renderOptionHtml(item, itemIndex++);
+        });
+      });
+    } else {
+      filtered.forEach((item) => {
+        html += renderOptionHtml(item, itemIndex++);
+      });
+    }
+    overlay.innerHTML = html;
+    overlay.querySelectorAll(".ac-item").forEach((itemEl) => {
       itemEl.addEventListener("click", () => {
         const val = itemEl.getAttribute("data-value");
         const matched = allItems.find((i) => i.value === val);
-        if (matched) selectItem(matched);
+        if (matched && !matched.disabled) {
+          selectItem(matched);
+        }
+      });
+      itemEl.addEventListener("mouseenter", () => {
+        const idx = Number(itemEl.getAttribute("data-idx"));
+        highlightItem(idx);
       });
     });
   }
+  function renderOptionHtml(item, idx) {
+    const isSelected = selectedValues.includes(item.value);
+    const isHighlighted = idx === highlightedIndex;
+    let leadingHtml = "";
+    if (item.avatar) {
+      leadingHtml = `<span style="width: 26px; height: 26px; border-radius: 50%; background: var(--p-primary-600); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; flex-shrink: 0;">${item.avatar}</span>`;
+    } else if (item.icon && LucideIcons[item.icon]) {
+      leadingHtml = `<span style="display: flex; width: 16px; height: 16px; color: var(--p-primary-600); flex-shrink: 0;">${LucideIcons[item.icon]}</span>`;
+    }
+    let statusHtml = "";
+    if (item.status) {
+      const statusColor = item.status === "online" ? "#10b981" : item.status === "away" ? "#f59e0b" : "#94a3b8";
+      statusHtml = `<span style="width: 8px; height: 8px; border-radius: 50%; background: ${statusColor}; margin-right: 0.35rem; display: inline-block;"></span>`;
+    }
+    let trailingHtml = "";
+    if (item.shortcut) {
+      trailingHtml = `<span style="font-size: 0.725rem; background: var(--p-surface-200); padding: 0.1rem 0.35rem; border-radius: 4px; color: var(--p-text-muted); font-family: monospace;">${item.shortcut}</span>`;
+    } else if (item.count !== void 0) {
+      trailingHtml = `<span class="aura-tag tag-slate" style="font-size: 0.6875rem;">${item.count}</span>`;
+    }
+    return `
+            <div class="ac-item ${isSelected ? "selected" : ""} ${isHighlighted ? "highlighted" : ""} ${item.disabled ? "disabled" : ""}" 
+                 data-value="${item.value}" 
+                 data-idx="${idx}" 
+                 role="option" 
+                 aria-selected="${isSelected}">
+                <div style="display: flex; align-items: center; gap: 0.5rem; overflow: hidden;">
+                    ${leadingHtml}
+                    <div style="display: flex; flex-direction: column; overflow: hidden;">
+                        <span style="font-weight: ${isSelected ? "700" : "500"}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            ${statusHtml}${item.label}
+                        </span>
+                        ${item.subtitle ? `<span style="font-size: 0.75rem; color: var(--p-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.subtitle}</span>` : ""}
+                    </div>
+                </div>
+                ${trailingHtml}
+            </div>
+        `;
+  }
+  function highlightItem(idx) {
+    highlightedIndex = idx;
+    const items = overlay.querySelectorAll(".ac-item");
+    items.forEach((it2, i) => {
+      if (i === idx) {
+        it2.classList.add("highlighted");
+        it2.scrollIntoView({ block: "nearest" });
+      } else {
+        it2.classList.remove("highlighted");
+      }
+    });
+  }
+  function selectItem(item) {
+    if (multiple) {
+      if (!selectedValues.includes(item.value)) {
+        selectedValues.push(item.value);
+      }
+      searchQuery = "";
+      input.value = "";
+      renderChips();
+      disclosure.close();
+      syncValue();
+      input.focus();
+    } else {
+      selectedValues = [item.value];
+      searchQuery = "";
+      input.value = item.label;
+      disclosure.close();
+      renderChips();
+      syncValue();
+    }
+  }
+  function removeValue(val) {
+    selectedValues = selectedValues.filter((v) => v !== val);
+    renderChips();
+    syncValue();
+  }
   const debouncedFilter = useDebounce(() => {
     searchQuery = input.value;
-    renderDropdown();
+    if (searchQuery.trim().length > 0) {
+      if (!disclosure.isOpen) disclosure.open();
+      else renderDropdown();
+    } else {
+      if (disclosure.isOpen) disclosure.close();
+    }
+    updateClearButton();
   }, 150);
   input.addEventListener("input", () => {
-    if (!disclosure.isOpen) disclosure.open();
     debouncedFilter();
   });
   input.addEventListener("focus", () => {
-    if (!disclosure.isOpen) disclosure.open();
+    inputWrap.classList.add("focused");
+  });
+  input.addEventListener("blur", () => {
+    inputWrap.classList.remove("focused");
   });
   input.addEventListener("keydown", (e) => {
-    if (disclosure.isOpen) {
-      keyboardNav.handleKeyDown(e);
+    const filtered = getFilteredItems();
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      if (!disclosure.isOpen) {
+        disclosure.open();
+      } else {
+        const nextIdx = highlightedIndex < filtered.length - 1 ? highlightedIndex + 1 : 0;
+        highlightItem(nextIdx);
+      }
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      if (disclosure.isOpen) {
+        const prevIdx = highlightedIndex > 0 ? highlightedIndex - 1 : filtered.length - 1;
+        highlightItem(prevIdx);
+      }
+    } else if (e.key === "Enter") {
+      if (disclosure.isOpen && highlightedIndex >= 0 && filtered[highlightedIndex]) {
+        e.preventDefault();
+        selectItem(filtered[highlightedIndex]);
+      }
+    } else if (e.key === "Escape") {
+      disclosure.close();
+    } else if (e.key === "Backspace" && multiple && input.value === "" && selectedValues.length > 0) {
+      removeValue(selectedValues[selectedValues.length - 1]);
+    } else if (e.key === "Home" && disclosure.isOpen) {
+      e.preventDefault();
+      highlightItem(0);
+    } else if (e.key === "End" && disclosure.isOpen) {
+      e.preventDefault();
+      highlightItem(filtered.length - 1);
     }
   });
-  clearBtn.addEventListener("click", () => {
-    selectedValue = "";
+  clearBtn?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    selectedValues = [];
     searchQuery = "";
     input.value = "";
-    clearBtn.style.display = "none";
+    renderChips();
     syncValue();
     disclosure.close();
+    input.focus();
+  });
+  dropdownBtn?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (disclosure.isOpen) {
+      disclosure.close();
+    } else {
+      searchQuery = "";
+      disclosure.open();
+      input.focus();
+    }
+  });
+  inputWrap.addEventListener("click", () => {
+    input.focus();
   });
   function syncValue() {
     if (props.targetInputName) {
@@ -1355,13 +3809,14 @@ function AutoCompleteIsland(container, props) {
         hidden.name = props.targetInputName;
         container.appendChild(hidden);
       }
-      hidden.value = selectedValue;
+      hidden.value = multiple ? JSON.stringify(selectedValues) : selectedValues[0] || "";
     }
     container.dispatchEvent(new CustomEvent("autocomplete:change", {
       bubbles: true,
-      detail: { value: selectedValue }
+      detail: { value: multiple ? selectedValues : selectedValues[0] || "" }
     }));
   }
+  renderChips();
 }
 
 // src/components/color-picker.ts
@@ -1382,7 +3837,7 @@ var DEFAULT_PRESETS = [
   "#1e293b",
   "#000000"
 ];
-var CSS10 = `
+var CSS9 = `
 [data-theme="dark"] .color-swatch-btn {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -1410,7 +3865,7 @@ var CSS10 = `
 }
 `;
 function ColorPickerIsland(container, props) {
-  injectIslandStyle("color-picker", CSS10);
+  injectIslandStyle("color-picker", CSS9);
   let currentColor = props.value || "#10b981";
   let isOpen = false;
   const swatchesHtml = DEFAULT_PRESETS.map((c) => `
@@ -1536,7 +3991,7 @@ function ColorPickerIsland(container, props) {
 }
 
 // src/components/knob.ts
-var CSS11 = `
+var CSS10 = `
 [data-theme="dark"] .laughtale-knob {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -1554,7 +4009,7 @@ var CSS11 = `
 }
 `;
 function KnobIsland(container, props) {
-  injectIslandStyle("knob", CSS11);
+  injectIslandStyle("knob", CSS10);
   const min = props.min !== void 0 ? props.min : 0;
   const max = props.max !== void 0 ? props.max : 100;
   const step = props.step || 1;
@@ -1658,7 +4113,7 @@ function KnobIsland(container, props) {
 }
 
 // src/components/inplace.ts
-var CSS12 = `
+var CSS11 = `
 [data-theme="dark"] .laughtale-inplace-display {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -1686,7 +4141,7 @@ var CSS12 = `
 }
 `;
 function InplaceIsland(container, props) {
-  injectIslandStyle("inplace", CSS12);
+  injectIslandStyle("inplace", CSS11);
   let isEditing = false;
   let currentValue = props.value || "";
   function render() {
@@ -1768,7 +4223,7 @@ function InplaceIsland(container, props) {
 }
 
 // src/components/image-compare.ts
-var CSS13 = `
+var CSS12 = `
 [data-theme="dark"] .laughtale-image-compare {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -1776,7 +4231,7 @@ var CSS13 = `
 }
 `;
 function ImageCompareIsland(container, props) {
-  injectIslandStyle("image-compare", CSS13);
+  injectIslandStyle("image-compare", CSS12);
   let splitPercent = 50;
   container.innerHTML = `
         <div class="laughtale-image-compare" style="position: relative; width: 100%; max-width: 600px; height: 340px; border-radius: var(--p-border-radius-lg); overflow: hidden; user-select: none; border: 1px solid var(--p-border-color); box-shadow: var(--p-shadow-md); touch-action: none; cursor: ew-resize;">

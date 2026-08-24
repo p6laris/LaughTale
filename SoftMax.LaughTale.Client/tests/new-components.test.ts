@@ -120,10 +120,13 @@ describe('SoftMax.LaughTale Dynamic Form & New Aura Components Suite', () => {
             ]
         });
 
+        const firstItem = container.querySelector<HTMLElement>('.p-orderlist-item')!;
+        firstItem.click();
+
         const downBtn = container.querySelector<HTMLButtonElement>('.btn-order-down')!;
         downBtn.click();
 
-        const firstItemText = container.querySelector('.orderlist-item')!.textContent;
+        const firstItemText = container.querySelector('.p-orderlist-item')!.textContent;
         assert.ok(firstItemText!.includes('Second'));
     });
 

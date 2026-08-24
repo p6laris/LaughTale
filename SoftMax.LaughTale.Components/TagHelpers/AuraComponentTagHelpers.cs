@@ -2597,13 +2597,22 @@ public class IslandPickListTagHelper : TagHelper
 }
 
 /// <summary>
-/// TagHelper for <island-orderlist />
+/// TagHelper for <island-orderlist /> (Aura OrderList Component)
 /// </summary>
 [HtmlTargetElement("island-orderlist")]
 public class IslandOrderListTagHelper : TagHelper
 {
-    public List<OrderListItem>? Items { get; set; }
+    public object? Value { get; set; }
+    public object? Items { get; set; }
     public string? Header { get; set; }
+    public bool Checkbox { get; set; } = false;
+    public bool Filter { get; set; } = false;
+    public string? FilterPlaceholder { get; set; } = "Filter by name";
+    public string? FilterBy { get; set; } = "name";
+    public string ScrollHeight { get; set; } = "20rem";
+    public bool Responsive { get; set; } = true;
+    public string Breakpoint { get; set; } = "575px";
+    public string? KeyField { get; set; }
     public string? TargetInput { get; set; }
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
@@ -2613,10 +2622,21 @@ public class IslandOrderListTagHelper : TagHelper
         output.Attributes.SetAttribute("data-island", "orderlist");
         output.Attributes.SetAttribute("data-hydrate", "load");
 
+        var data = Value ?? Items ?? new object[0];
+
         var props = new
         {
-            items = Items ?? new(),
+            value = data,
+            items = data,
             header = Header,
+            checkbox = Checkbox,
+            filter = Filter,
+            filterPlaceholder = FilterPlaceholder,
+            filterBy = FilterBy,
+            scrollHeight = ScrollHeight,
+            responsive = Responsive,
+            breakpoint = Breakpoint,
+            dataKey = KeyField,
             targetInputName = TargetInput
         };
 

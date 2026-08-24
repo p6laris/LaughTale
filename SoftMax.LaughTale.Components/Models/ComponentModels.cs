@@ -273,18 +273,24 @@ public record PickListItem(
 );
 
 public record OrderListItem<TData>(
-    string Id,
-    string Name,
-    int Order,
+    string? Id = null,
+    string? Title = null,
+    string? Name = null,
+    int Order = 0,
     string? Category = null,
+    decimal? Price = null,
+    string? Image = null,
     TData? Data = default
 );
 
 public record OrderListItem(
-    string Id,
-    string Name,
+    string? Id = null,
+    string? Title = null,
+    string? Name = null,
+    int Order = 0,
     string? Category = null,
-    int Order = 0
+    decimal? Price = null,
+    string? Image = null
 );
 
 public record OrgChartNode<TData>(

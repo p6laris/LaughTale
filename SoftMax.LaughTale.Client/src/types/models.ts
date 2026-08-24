@@ -175,11 +175,15 @@ export interface PickListItem<TData = any> {
 }
 
 export interface OrderListItem<TData = any> {
-    id: string;
-    name: string;
-    order: number;
+    id?: string | number;
+    title?: string;
+    name?: string;
+    order?: number;
     category?: string;
+    price?: number;
+    image?: string;
     data?: TData;
+    [key: string]: any;
 }
 
 export interface OrgChartNode<TData = any> {

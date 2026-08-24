@@ -2542,13 +2542,47 @@
     <section id="sec-orderlist" class="component-card">
         <div class="card-header">
             <div>
-                <h2>OrderList Pipeline Sequence</h2>
-                <p>Reorder items within a list using action buttons or keyboard accessibility.</p>
+                <h2>OrderList</h2>
+                <p>OrderList is used to sort a collection of items using vertical action controls, multi-selection, checkboxes, live filtering, and rich item templates.</p>
             </div>
-            <span class="aura-tag tag-slate">Reorder</span>
+            <span class="aura-tag tag-emerald">Data Ordering</span>
         </div>
-        <div class="card-body" style="max-width: 500px;">
-            <island-orderlist items="@Model.OrderListTasks" header="Pipeline Order" />
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Demo 1: Basic -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Selection-based reordering with move buttons. Click to select items, then use the buttons to move them up, down, to top, or to bottom.</p>
+                <div style="max-width: 480px; margin: 0 auto;">
+                    <island-orderlist value="@Model.OrderListMovies" breakpoint="575px" />
+                </div>
+            </div>
+
+            <!-- Demo 2: Checkbox -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Checkbox Selection</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Combine with Checkbox for a visual multi-select experience alongside drag-and-drop and action button reordering.</p>
+                <div style="max-width: 480px; margin: 0 auto;">
+                    <island-orderlist value="@Model.OrderListMovies" checkbox="true" breakpoint="575px" scroll-height="20rem" />
+                </div>
+            </div>
+
+            <!-- Demo 3: Filter -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Filter</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Enable the filter property and search against properties such as product name with live result counters.</p>
+                <div style="max-width: 520px; margin: 0 auto;">
+                    <island-orderlist value="@Model.OrderListProducts" filter="true" filter-placeholder="Filter by name" breakpoint="575px" scroll-height="20rem" />
+                </div>
+            </div>
+
+            <!-- Demo 4: Template -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Template</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Custom item representation with product thumbnail icon, title, category, and formatted price.</p>
+                <div style="max-width: 520px; margin: 0 auto;">
+                    <island-orderlist value="@Model.OrderListProducts" breakpoint="575px" scroll-height="20rem" />
+                </div>
+            </div>
         </div>
     </section>
 

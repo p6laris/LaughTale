@@ -389,6 +389,34 @@ public class EnterpriseModel : PageModel
 
     public List<PickListItem> PickListProductsTarget { get; set; } = new();
 
+    public List<OrderListItem> OrderListMovies { get; set; } = new()
+    {
+        new("1", Title: "The Shawshank Redemption", Order: 1),
+        new("2", Title: "Inception", Order: 2),
+        new("3", Title: "Interstellar", Order: 3),
+        new("4", Title: "The Dark Knight", Order: 4),
+        new("5", Title: "Pulp Fiction", Order: 5),
+        new("6", Title: "Baby Driver", Order: 6),
+        new("7", Title: "Whiplash", Order: 7),
+        new("8", Title: "Eternal Sunshine of the Spotless Mind", Order: 8),
+        new("9", Title: "La La Land", Order: 9),
+        new("10", Title: "Parasite", Order: 10)
+    };
+
+    public List<OrderListItem> OrderListProducts { get; set; } = new()
+    {
+        new("1000", Name: "Bamboo Watch", Category: "Accessories", Price: 65, Image: "bamboo-watch.jpg", Order: 1),
+        new("1001", Name: "Black Watch", Category: "Accessories", Price: 72, Image: "black-watch.jpg", Order: 2),
+        new("1002", Name: "Blue Band", Category: "Fitness", Price: 79, Image: "blue-band.jpg", Order: 3),
+        new("1003", Name: "Blue T-Shirt", Category: "Clothing", Price: 29, Image: "blue-t-shirt.jpg", Order: 4),
+        new("1004", Name: "Bracelet", Category: "Accessories", Price: 15, Image: "bracelet.jpg", Order: 5),
+        new("1005", Name: "Brown Purse", Category: "Accessories", Price: 120, Image: "brown-purse.jpg", Order: 6),
+        new("1006", Name: "Chakra Bracelet", Category: "Accessories", Price: 32, Image: "chakra-bracelet.jpg", Order: 7),
+        new("1007", Name: "Galaxy Earrings", Category: "Accessories", Price: 34, Image: "galaxy-earrings.jpg", Order: 8),
+        new("1008", Name: "Game Controller", Category: "Electronics", Price: 99, Image: "game-controller.jpg", Order: 9),
+        new("1009", Name: "Gaming Set", Category: "Electronics", Price: 299, Image: "gaming-set.jpg", Order: 10)
+    };
+
     public List<OrderListItem> OrderListTasks { get; set; } = new()
     {
         new("t-1", "Step 1: TLS 1.3 Handshake", "Security", 1),

@@ -77,60 +77,94 @@ function injectIslandStyle(islandName, css) {
 }
 
 // src/icons/lucide.ts
-var LucideIcons = {
-  // Navigation & Arrows
-  chevronDown: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`,
-  chevronUp: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>`,
-  chevronLeft: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>`,
-  chevronRight: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`,
-  arrowUp: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>`,
-  arrowDown: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>`,
-  arrowLeft: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>`,
-  arrowRight: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>`,
-  // Common Actions
-  check: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>`,
-  checkCircle: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>`,
-  x: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`,
-  xCircle: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>`,
-  plus: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>`,
-  minus: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>`,
-  search: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>`,
-  refreshCw: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>`,
-  trash2: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>`,
-  copy: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>`,
-  externalLink: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>`,
-  // Forms & Controls
-  eye: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>`,
-  eyeOff: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>`,
-  calendar: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>`,
-  clock: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
-  star: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`,
-  starEmpty: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`,
-  camera: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>`,
-  uploadCloud: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M12 12v9"/><path d="m16 16-4-4-4 4"/></svg>`,
-  sliders: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="4" y1="21" y2="14"/><line x1="4" x2="4" y1="10" y2="3"/><line x1="12" x2="12" y1="21" y2="12"/><line x1="12" x2="12" y1="8" y2="3"/><line x1="20" x2="20" y1="21" y2="16"/><line x1="20" x2="20" y1="12" y2="3"/><line x1="1" x2="7" y1="14" y2="14"/><line x1="9" x2="15" y1="8" y2="8"/><line x1="17" x2="23" y1="16" y2="16"/></svg>`,
-  palette: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>`,
-  // Security & Status
-  lock: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`,
-  shield: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>`,
-  alertTriangle: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>`,
-  info: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-  bell: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>`,
-  zap: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
-  activity: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>`,
-  // Media & UI
-  layers: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.9a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg>`,
-  folder: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>`,
-  fileText: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>`,
-  terminal: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/></svg>`,
-  code: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>`,
-  moreHorizontal: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>`,
-  sun: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`,
-  moon: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>`,
-  edit: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>`,
-  gitBranch: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" x2="6" y1="3" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>`,
-  alertCircle: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>`
+var ALIASES = {
+  "refresh": "refresh-cw",
+  "refreshcw": "refresh-cw",
+  "refreshccw": "refresh-ccw",
+  "times": "x",
+  "close": "x",
+  "sharealt": "share-2",
+  "share2": "share-2",
+  "externallink": "external-link",
+  "spinner": "loader-circle",
+  "loader2": "loader-circle",
+  "loader": "loader-circle",
+  "pencil": "pencil",
+  "edit": "pencil",
+  "edit3": "pencil",
+  "trash": "trash-2",
+  "trash2": "trash-2",
+  "arrowup": "arrow-up",
+  "arrowdown": "arrow-down",
+  "arrowleft": "arrow-left",
+  "arrowright": "arrow-right",
+  "chevrondown": "chevron-down",
+  "chevronup": "chevron-up",
+  "chevronleft": "chevron-left",
+  "chevronright": "chevron-right",
+  "chevronsleft": "chevrons-left",
+  "chevronsright": "chevrons-right",
+  "chevronsup": "chevrons-up",
+  "chevronsdown": "chevrons-down",
+  "plus": "plus",
+  "minus": "minus",
+  "layers": "layers",
+  "check": "check",
+  "search": "search",
+  "settings": "settings",
+  "cog": "settings",
+  "eye": "eye",
+  "eyeoff": "eye-off",
+  "alertcircle": "circle-alert",
+  "alerttriangle": "triangle-alert",
+  "terminal": "terminal",
+  "palette": "palette",
+  "sliders": "sliders-horizontal",
+  "sun": "sun",
+  "moon": "moon",
+  "code": "code",
+  "heart": "heart",
+  "save": "save",
+  "print": "print",
+  "copy": "copy",
+  "upload": "upload",
+  "download": "download",
+  "user": "user",
+  "users": "users",
+  "bell": "bell",
+  "home": "home",
+  "lock": "lock",
+  "unlock": "unlock",
+  "calendar": "calendar",
+  "clock": "clock",
+  "star": "star",
+  "zap": "zap"
 };
+function normalizeLucideId(name) {
+  if (!name) return "zap";
+  const kebab = name.trim().replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase().replace(/_/g, "-");
+  const cleanKey = kebab.replace(/-/g, "");
+  if (ALIASES[cleanKey]) {
+    return ALIASES[cleanKey];
+  }
+  if (ALIASES[kebab]) {
+    return ALIASES[kebab];
+  }
+  return kebab;
+}
+function getLucideIcon(name, size = 16, strokeWidth = 2) {
+  if (!name) return "";
+  const iconId = normalizeLucideId(name);
+  return `<svg class="p-icon p-icon-${iconId}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round"><use href="/icons/lucide-sprites.svg#${iconId}"></use></svg>`;
+}
+var LucideIcons = new Proxy({}, {
+  get: (_, prop) => {
+    if (typeof prop === "string") {
+      return getLucideIcon(prop);
+    }
+    return "";
+  }
+});
 
 // src/components/dynamic-form.ts
 var CSS = `
@@ -835,75 +869,6 @@ function MultiSelectIsland(container, props) {
   syncValue();
 }
 
-// src/composables/useKeyboardNav.ts
-function useKeyboardNav(options) {
-  let activeIndex = options.initialIndex ?? -1;
-  const loop = options.loop ?? true;
-  function handleKeyDown(e) {
-    const count = options.itemCount();
-    if (count === 0) return false;
-    const isVertical = options.orientation !== "horizontal";
-    const isHorizontal = options.orientation !== "vertical";
-    if (isVertical && e.key === "ArrowDown" || isHorizontal && e.key === "ArrowRight") {
-      e.preventDefault();
-      if (activeIndex < count - 1) {
-        activeIndex++;
-      } else if (loop) {
-        activeIndex = 0;
-      }
-      options.onHighlight?.(activeIndex);
-      return true;
-    }
-    if (isVertical && e.key === "ArrowUp" || isHorizontal && e.key === "ArrowLeft") {
-      e.preventDefault();
-      if (activeIndex > 0) {
-        activeIndex--;
-      } else if (loop) {
-        activeIndex = count - 1;
-      }
-      options.onHighlight?.(activeIndex);
-      return true;
-    }
-    if (e.key === "Home") {
-      e.preventDefault();
-      activeIndex = 0;
-      options.onHighlight?.(activeIndex);
-      return true;
-    }
-    if (e.key === "End") {
-      e.preventDefault();
-      activeIndex = count - 1;
-      options.onHighlight?.(activeIndex);
-      return true;
-    }
-    if (e.key === "Enter" || e.key === " ") {
-      if (activeIndex >= 0 && activeIndex < count) {
-        e.preventDefault();
-        options.onSelect?.(activeIndex);
-        return true;
-      }
-    }
-    if (e.key === "Escape") {
-      options.onEscape?.();
-      return true;
-    }
-    return false;
-  }
-  return {
-    handleKeyDown,
-    get activeIndex() {
-      return activeIndex;
-    },
-    setActiveIndex: (idx) => {
-      activeIndex = idx;
-      options.onHighlight?.(activeIndex);
-    },
-    reset: () => {
-      activeIndex = -1;
-    }
-  };
-}
-
 // src/composables/useDebounce.ts
 function useDebounce(fn, delayMs = 250) {
   let timer = null;
@@ -929,129 +894,661 @@ function useDebounce(fn, delayMs = 250) {
 
 // src/components/listbox.ts
 var CSS4 = `
-[data-theme="dark"] .laughtale-listbox {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+/* ==================== AURA LISTBOX ==================== */
+.laughtale-listbox,
+.p-listbox {
+    display: inline-flex;
+    flex-direction: column;
+    background: var(--p-surface-0);
+    color: var(--p-text-color);
+    border: 1px solid var(--p-border-color);
+    border-radius: var(--p-border-radius);
+    font-family: var(--p-font-family, inherit);
+    box-sizing: border-box;
+    overflow: hidden;
+    outline: none;
+    transition: background 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.02);
+    width: 100%;
+    max-width: 280px;
 }
-[data-theme="dark"] .listbox-filter-input {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-listbox.p-listbox-fluid {
+    width: 100%;
+    max-width: 100%;
 }
-[data-theme="dark"] .listbox-items-container {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-listbox.is-focused,
+.p-listbox:focus-within {
+    border-color: var(--p-primary-500) !important;
 }
-[data-theme="dark"] .listbox-item {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+/* Filled Variant */
+.p-listbox.variant-filled {
+    background-color: var(--p-surface-100);
+    border-color: transparent;
+}
+.p-listbox.variant-filled.is-focused {
+    background-color: var(--p-surface-0);
+    border-color: var(--p-primary-500) !important;
+}
+
+/* Sizes */
+.p-listbox.size-small,
+.p-listbox.p-listbox-sm {
+    font-size: 0.75rem;
+}
+.p-listbox.size-small .p-listbox-option {
+    padding: 0.3125rem 0.5rem;
+}
+.p-listbox.size-large,
+.p-listbox.p-listbox-lg {
+    font-size: 1rem;
+}
+.p-listbox.size-large .p-listbox-option {
+    padding: 0.625rem 1rem;
+}
+
+/* Invalid State */
+.p-listbox.is-invalid {
+    border-color: var(--p-red-500, #ef4444) !important;
+}
+
+/* Disabled State */
+.p-listbox.is-disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    background-color: var(--p-surface-100);
+}
+.p-listbox.is-disabled .p-listbox-option {
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Header & Footer */
+.p-listbox-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.625rem 0.875rem;
+    background: var(--p-surface-50);
+    border-bottom: 1px solid var(--p-border-color);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: var(--p-text-color);
+}
+.p-listbox-header-count {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--p-text-muted);
+}
+.p-listbox-footer {
+    padding: 0.5rem 0.875rem;
+    background: var(--p-surface-50);
+    border-top: 1px solid var(--p-border-color);
+    font-size: 0.75rem;
+    color: var(--p-text-muted);
+}
+
+/* Filter */
+.p-listbox-filter-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: var(--p-surface-50);
+    border-bottom: 1px solid var(--p-border-color);
+}
+.p-listbox-filter-input {
+    flex: 1;
+    width: 100%;
+    font-family: inherit;
+    font-size: 0.8125rem;
+    padding: 0.3125rem 0.5rem;
+    background: var(--p-surface-0);
+    border: 1px solid var(--p-border-color);
+    border-radius: calc(var(--p-border-radius) - 2px);
+    color: var(--p-text-color);
+    outline: none;
+    box-sizing: border-box;
+}
+.p-listbox-filter-input:focus {
+    border-color: var(--p-primary-500);
+}
+
+/* Options List Container */
+.p-listbox-list-wrapper {
+    overflow-y: auto;
+    outline: none;
+}
+.p-listbox-list {
+    margin: 0;
+    padding: 0.25rem 0;
+    list-style: none;
+}
+
+/* Option Groups */
+.p-listbox-option-group {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.p-listbox-option-group-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.875rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--p-text-muted);
+    background: var(--p-surface-50);
+}
+
+/* Option Items */
+.p-listbox-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0.875rem;
+    cursor: pointer;
+    font-size: 0.8125rem;
+    color: var(--p-text-color);
+    background: transparent;
+    transition: background 150ms ease, color 150ms ease;
+    user-select: none;
+    outline: none;
+}
+
+.p-listbox-option:hover:not(.p-disabled) {
+    background: var(--p-surface-100);
+    color: var(--p-text-color);
+}
+
+.p-listbox-option.p-highlight {
+    background: var(--p-primary-50, #ecfdf5);
+    color: var(--p-primary-700, #047857);
+    font-weight: 600;
+}
+.p-listbox-option.p-highlight:hover:not(.p-disabled) {
+    background: var(--p-primary-100, #d1fae5);
+    color: var(--p-primary-800, #065f46);
+}
+
+.p-listbox-option.p-highlight-none {
+    background: transparent !important;
+    color: var(--p-text-color) !important;
+    font-weight: normal !important;
+}
+.p-listbox-option.p-highlight-none:hover:not(.p-disabled) {
+    background: var(--p-surface-100) !important;
+}
+
+.p-listbox-option.p-focus {
+    box-shadow: inset 0 0 0 1px var(--p-primary-500);
+}
+
+.p-listbox-option.p-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Striped Listbox */
+.p-listbox-striped .p-listbox-option:nth-child(even):not(.p-highlight) {
+    background: var(--p-surface-50);
+}
+
+/* Option Content */
+.p-listbox-option-content {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.p-listbox-option-badge {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    padding: 0.125rem 0.375rem;
+    border-radius: calc(var(--p-border-radius) - 2px);
+    background: var(--p-surface-100);
+    color: var(--p-surface-700);
+}
+.p-listbox-option.p-highlight .p-listbox-option-badge {
+    background: var(--p-primary-100);
+    color: var(--p-primary-800);
+}
+
+/* Option Checkbox */
+.p-listbox-option-checkbox {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.125rem;
+    height: 1.125rem;
+    border: 1px solid var(--p-border-color);
+    border-radius: 4px;
+    background: var(--p-surface-0);
+    margin-right: 0.5rem;
+    transition: all 150ms ease;
+    flex-shrink: 0;
+}
+.p-listbox-option.p-highlight .p-listbox-option-checkbox {
+    background: var(--p-primary-500);
+    border-color: var(--p-primary-500);
+    color: #ffffff;
+}
+
+/* Option Checkmark Icon */
+.p-listbox-option-checkmark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--p-primary-600);
+    margin-left: 0.5rem;
+    flex-shrink: 0;
+}
+
+/* ==================== DARK MODE ==================== */
+.dark .p-listbox {
+    background: var(--p-surface-900);
+    color: var(--p-surface-0);
+    border-color: var(--p-surface-700);
+}
+.dark .p-listbox.variant-filled {
+    background-color: var(--p-surface-800);
+}
+.dark .p-listbox.variant-filled.is-focused {
+    background-color: var(--p-surface-900);
+}
+.dark .p-listbox-header,
+.dark .p-listbox-footer,
+.dark .p-listbox-filter-container,
+.dark .p-listbox-option-group-label {
+    background: var(--p-surface-850, #141b26);
+    border-color: var(--p-surface-700);
+}
+.dark .p-listbox-filter-input {
+    background: var(--p-surface-900);
+    border-color: var(--p-surface-700);
+    color: var(--p-surface-0);
+}
+.dark .p-listbox-option {
+    color: var(--p-surface-100);
+}
+.dark .p-listbox-option:hover:not(.p-disabled) {
+    background: var(--p-surface-800);
+    color: var(--p-surface-0);
+}
+.dark .p-listbox-option.p-highlight {
+    background: rgba(16, 185, 129, 0.16);
+    color: var(--p-primary-300, #6ee7b7);
+}
+.dark .p-listbox-option.p-highlight:hover:not(.p-disabled) {
+    background: rgba(16, 185, 129, 0.24);
+    color: var(--p-primary-200, #a7f3d0);
+}
+.dark .p-listbox-option-badge {
+    background: var(--p-surface-800);
+    color: var(--p-surface-200);
+}
+.dark .p-listbox-option.p-highlight .p-listbox-option-badge {
+    background: rgba(16, 185, 129, 0.25);
+    color: var(--p-primary-200);
+}
+.dark .p-listbox-option-checkbox {
+    background: var(--p-surface-900);
+    border-color: var(--p-surface-600);
+}
+.dark .p-listbox-option-checkmark {
+    color: var(--p-primary-400);
+}
+.dark .p-listbox-striped .p-listbox-option:nth-child(even):not(.p-highlight) {
+    background: var(--p-surface-850, #141b26);
 }
 `;
+var checkSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+var searchSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>`;
 function ListboxIsland(container, props) {
-  injectIslandStyle("listbox", CSS4);
-  const options = props.options || [];
-  let selected = new Set(props.selectedValue !== void 0 ? [props.selectedValue] : []);
-  let filterQuery = "";
-  container.innerHTML = `
-        <div class="laughtale-listbox" tabindex="0" style="width: 100%; max-width: 280px; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); background: var(--p-surface-0); overflow: hidden; font-family: var(--p-font-family, inherit); outline: none;">
-            ${props.filter ? `
-                <div style="padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--p-border-color); display: flex; align-items: center; gap: 0.5rem; background: var(--p-surface-50);">
-                    <span style="color: var(--p-surface-400); display: flex;">${LucideIcons.search}</span>
-                    <input type="text" class="listbox-filter-input" placeholder="Filter..." style="flex: 1; border: none; outline: none; background: transparent; font-size: 0.8125rem; color: var(--p-text-color);" />
-                </div>
-            ` : ""}
-            <div class="listbox-items-container" style="max-height: 220px; overflow-y: auto; padding: 0.25rem 0;"></div>
-        </div>
-    `;
-  const root = container.querySelector(".laughtale-listbox");
-  const itemsContainer = container.querySelector(".listbox-items-container");
-  const filterInput = container.querySelector(".listbox-filter-input");
-  function getFiltered() {
-    if (!filterQuery.trim()) return options;
-    const q = filterQuery.toLowerCase();
-    return options.filter((o) => o.label.toLowerCase().includes(q));
-  }
-  const keyboardNav = useKeyboardNav({
-    itemCount: () => getFiltered().length,
-    onHighlight: (idx) => {
-      const items = itemsContainer.querySelectorAll(".listbox-item");
-      items.forEach((it2, i) => {
-        it2.style.outline = i === idx ? "2px solid var(--p-primary-500)" : "none";
-        if (i === idx) it2.scrollIntoView({ block: "nearest" });
-      });
-    },
-    onSelect: (idx) => {
-      const filtered = getFiltered();
-      if (filtered[idx]) {
-        handleItemSelect(filtered[idx].value);
+  injectIslandStyle("laughtale-listbox", CSS4);
+  const isMultiple = props.multiple === true || String(props.multiple) === "true";
+  const isMetaKey = props.metaKeySelection !== false && String(props.metaKeySelection) !== "false";
+  const isCheckbox = props.checkbox === true || String(props.checkbox) === "true";
+  const isCheckmark = props.checkmark === true || String(props.checkmark) === "true";
+  const isHighlightOnSelect = props.highlightOnSelect !== false && String(props.highlightOnSelect) !== "false";
+  const isFilter = props.filter === true || String(props.filter) === "true";
+  const isFluid = props.fluid === true || String(props.fluid) === "true";
+  const isInvalid = props.invalid === true || String(props.invalid) === "true";
+  const isDisabled = props.disabled === true || String(props.disabled) === "true";
+  const isStriped = props.striped === true || String(props.striped) === "true";
+  const isFilled = props.variant === "filled";
+  const size = props.size || "normal";
+  const scrollHeight = props.scrollHeight || "220px";
+  function normalizeOptions(opts) {
+    return (opts || []).map((opt) => {
+      if (typeof opt === "string") {
+        return { label: opt, value: opt };
       }
-    }
-  });
-  function handleItemSelect(val) {
-    if (props.multiple) {
-      if (selected.has(val)) selected.delete(val);
-      else selected.add(val);
-    } else {
-      selected.clear();
-      selected.add(val);
-    }
-    renderList();
-    syncValue();
-  }
-  function renderList() {
-    const filtered = getFiltered();
-    if (filtered.length === 0) {
-      itemsContainer.innerHTML = `<div style="padding: 1rem; text-align: center; font-size: 0.75rem; color: var(--p-surface-400);">No options</div>`;
-      return;
-    }
-    itemsContainer.innerHTML = filtered.map((o) => {
-      const isSelected = selected.has(o.value);
-      return `
-                <div class="listbox-item" data-val="${o.value}" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.875rem; cursor: pointer; font-size: 0.8125rem; background: ${isSelected ? "var(--p-primary-50)" : "transparent"}; color: ${isSelected ? "var(--p-primary-700)" : "var(--p-text-color)"}; font-weight: ${isSelected ? "600" : "normal"}; transition: background 0.1s ease;">
-                    <span>${o.label}</span>
-                    ${isSelected ? `<span style="color: var(--p-primary-600); display: flex;">${LucideIcons.check}</span>` : ""}
-                </div>
-            `;
-    }).join("");
-    itemsContainer.querySelectorAll(".listbox-item").forEach((el) => {
-      el.addEventListener("click", () => {
-        const val = el.getAttribute("data-val");
-        handleItemSelect(val);
-      });
+      return {
+        label: opt.label || opt.name || String(opt.value || ""),
+        value: opt.value !== void 0 ? opt.value : opt.code || opt.name || opt.label,
+        code: opt.code,
+        name: opt.name,
+        icon: opt.icon,
+        flag: opt.flag,
+        badge: opt.badge,
+        description: opt.description,
+        disabled: opt.disabled,
+        items: opt.items ? normalizeOptions(opt.items) : void 0
+      };
     });
   }
-  const debouncedFilter = useDebounce(() => {
-    filterQuery = filterInput ? filterInput.value : "";
-    renderList();
-  }, 150);
-  if (filterInput) {
-    filterInput.addEventListener("input", () => debouncedFilter());
-  }
-  root.addEventListener("keydown", (e) => {
-    keyboardNav.handleKeyDown(e);
-  });
-  function syncValue() {
-    const valArray = Array.from(selected);
-    if (props.targetInputName) {
-      let hidden = container.querySelector(`input[name="${props.targetInputName}"]`);
-      if (!hidden) {
-        hidden = document.createElement("input");
-        hidden.type = "hidden";
-        hidden.name = props.targetInputName;
-        container.appendChild(hidden);
+  const rawOptions = normalizeOptions(props.options || []);
+  const selectedValues = /* @__PURE__ */ new Set();
+  const initialVal = props.value ?? props.selectedValue;
+  if (initialVal !== void 0 && initialVal !== null) {
+    if (Array.isArray(initialVal)) {
+      initialVal.forEach((v) => selectedValues.add(typeof v === "object" && v !== null ? String(v.value || v.code || v.name) : String(v)));
+    } else if (typeof initialVal === "string") {
+      try {
+        const parsed = JSON.parse(initialVal);
+        if (Array.isArray(parsed)) parsed.forEach((v) => selectedValues.add(String(v)));
+        else selectedValues.add(initialVal);
+      } catch {
+        selectedValues.add(initialVal);
       }
-      hidden.value = props.multiple ? JSON.stringify(valArray) : valArray[0] !== void 0 ? String(valArray[0]) : "";
+    } else {
+      selectedValues.add(String(initialVal));
+    }
+  }
+  let searchQuery = "";
+  let focusedIndex = -1;
+  function getFlatVisibleOptions() {
+    const flat = [];
+    const q = searchQuery.toLowerCase().trim();
+    function matches(item) {
+      if (!q) return true;
+      if (props.filterMatchMode === "startsWith") {
+        return item.label.toLowerCase().startsWith(q) || item.code && item.code.toLowerCase().startsWith(q);
+      }
+      return item.label.toLowerCase().includes(q) || item.code && item.code.toLowerCase().includes(q);
+    }
+    for (const opt of rawOptions) {
+      if (opt.items && opt.items.length > 0) {
+        const filteredChildren = opt.items.filter(matches);
+        if (filteredChildren.length > 0) {
+          flat.push(...filteredChildren);
+        }
+      } else if (matches(opt)) {
+        flat.push(opt);
+      }
+    }
+    return flat;
+  }
+  function init() {
+    const rootClasses = [
+      "laughtale-listbox",
+      "p-listbox",
+      isFluid ? "p-listbox-fluid" : "",
+      isFilled ? "variant-filled" : "",
+      isStriped ? "p-listbox-striped" : "",
+      size !== "normal" ? `size-${size}` : "",
+      isInvalid ? "is-invalid" : "",
+      isDisabled ? "is-disabled" : ""
+    ].filter(Boolean).join(" ");
+    container.className = rootClasses;
+    container.setAttribute("tabindex", isDisabled ? "-1" : "0");
+    container.setAttribute("role", "listbox");
+    container.setAttribute("aria-multiselectable", isMultiple ? "true" : "false");
+    if (props.inputId) container.id = props.inputId;
+    container.innerHTML = `
+            ${props.header ? `
+                <div class="p-listbox-header">
+                    <span>${props.header}</span>
+                    ${props.headerCount ? `<span class="p-listbox-header-count">${props.headerCount}</span>` : ""}
+                </div>
+            ` : ""}
+            ${isFilter ? `
+                <div class="p-listbox-filter-container">
+                    <span style="color: var(--p-surface-400); display: flex;">${searchSvg}</span>
+                    <input type="text" class="p-listbox-filter-input" placeholder="${props.filterPlaceholder || "Filter..."}" ${isDisabled ? "disabled" : ""} />
+                </div>
+            ` : ""}
+            <div class="p-listbox-list-wrapper" style="max-height: ${scrollHeight};">
+                <ul class="p-listbox-list" role="presentation"></ul>
+            </div>
+            ${props.footer ? `
+                <div class="p-listbox-footer">${props.footer}</div>
+            ` : ""}
+            <input type="hidden" name="${props.name || props.targetInputName || "listbox_value"}" value="" />
+        `;
+    renderOptions();
+    bindEvents();
+    syncValue();
+  }
+  function renderOptions() {
+    const listEl = container.querySelector(".p-listbox-list");
+    const q = searchQuery.toLowerCase().trim();
+    function matches(item) {
+      if (!q) return true;
+      if (props.filterMatchMode === "startsWith") {
+        return item.label.toLowerCase().startsWith(q) || item.code && item.code.toLowerCase().startsWith(q);
+      }
+      return item.label.toLowerCase().includes(q) || item.code && item.code.toLowerCase().includes(q);
+    }
+    const isGrouped = rawOptions.some((o) => o.items && o.items.length > 0);
+    if (isGrouped) {
+      let html = "";
+      let totalRendered = 0;
+      for (const group of rawOptions) {
+        const groupItems = group.items ? group.items.filter(matches) : [];
+        if (groupItems.length === 0 && !matches(group)) continue;
+        html += `
+                    <li class="p-listbox-option-group" role="group">
+                        <div class="p-listbox-option-group-label">
+                            ${group.flag ? `<span style="font-size: 1.1rem; line-height: 1;">${group.flag}</span>` : ""}
+                            ${group.icon ? `<span style="display: flex;">${getLucideIcon(group.icon, 14)}</span>` : ""}
+                            <span>${group.label}</span>
+                        </div>
+                        <ul style="margin: 0; padding: 0; list-style: none;">
+                            ${groupItems.map((item) => renderSingleOptionHtml(item)).join("")}
+                        </ul>
+                    </li>
+                `;
+        totalRendered += groupItems.length;
+      }
+      if (totalRendered === 0) {
+        listEl.innerHTML = `<li style="padding: 1rem; text-align: center; color: var(--p-text-muted); font-size: 0.8125rem;">No results found</li>`;
+      } else {
+        listEl.innerHTML = html;
+      }
+    } else {
+      const visible = rawOptions.filter(matches);
+      if (visible.length === 0) {
+        listEl.innerHTML = `<li style="padding: 1rem; text-align: center; color: var(--p-text-muted); font-size: 0.8125rem;">No results found</li>`;
+      } else {
+        listEl.innerHTML = visible.map((item) => renderSingleOptionHtml(item)).join("");
+      }
+    }
+    bindItemEvents();
+  }
+  function renderSingleOptionHtml(item) {
+    const valStr = String(item.value);
+    const isSelected = selectedValues.has(valStr);
+    const highlightClass = isSelected ? isHighlightOnSelect ? "p-highlight" : "p-highlight-none" : "";
+    const disabledClass = item.disabled ? "p-disabled" : "";
+    let checkboxHtml = "";
+    if (isCheckbox && isMultiple) {
+      checkboxHtml = `
+                <span class="p-listbox-option-checkbox" aria-hidden="true">
+                    ${isSelected ? checkSvg : ""}
+                </span>
+            `;
+    }
+    let checkmarkHtml = "";
+    if (isCheckmark && isSelected) {
+      checkmarkHtml = `
+                <span class="p-listbox-option-checkmark" aria-hidden="true">
+                    ${checkSvg}
+                </span>
+            `;
+    }
+    let leadingHtml = "";
+    if (item.flag) {
+      leadingHtml = `<span style="font-size: 1.1rem; line-height: 1; flex-shrink: 0;">${item.flag}</span>`;
+    } else if (item.icon) {
+      leadingHtml = `<span style="display: flex; flex-shrink: 0; color: var(--p-primary-600);">${getLucideIcon(item.icon, 16)}</span>`;
+    }
+    let trailingHtml = "";
+    if (item.code) {
+      trailingHtml = `<span class="p-listbox-option-badge">${item.code}</span>`;
+    } else if (item.badge) {
+      trailingHtml = `<span class="p-listbox-option-badge">${item.badge}</span>`;
+    }
+    return `
+            <li class="p-listbox-option ${highlightClass} ${disabledClass}" role="option" aria-selected="${isSelected}" aria-disabled="${item.disabled ? "true" : "false"}" data-val="${valStr}" tabindex="-1">
+                <div class="p-listbox-option-content">
+                    ${checkboxHtml}
+                    ${leadingHtml}
+                    <span>${item.label}</span>
+                </div>
+                ${trailingHtml}
+                ${checkmarkHtml}
+            </li>
+        `;
+  }
+  function bindItemEvents() {
+    const items = container.querySelectorAll(".p-listbox-option");
+    items.forEach((itemEl, idx) => {
+      itemEl.addEventListener("click", (e) => {
+        if (isDisabled || itemEl.classList.contains("p-disabled")) return;
+        const val = itemEl.getAttribute("data-val");
+        handleSelect(val, e);
+      });
+      if (props.focusOnHover) {
+        itemEl.addEventListener("mouseenter", () => {
+          if (!isDisabled && !itemEl.classList.contains("p-disabled")) {
+            updateFocus(idx);
+          }
+        });
+      }
+    });
+  }
+  function handleSelect(valStr, e) {
+    const isCtrlOrCmd = e && (e.ctrlKey || e.metaKey);
+    if (isMultiple) {
+      if (isMetaKey && !isCtrlOrCmd && !isCheckbox) {
+        selectedValues.clear();
+        selectedValues.add(valStr);
+      } else {
+        if (selectedValues.has(valStr)) selectedValues.delete(valStr);
+        else selectedValues.add(valStr);
+      }
+    } else {
+      selectedValues.clear();
+      selectedValues.add(valStr);
+    }
+    renderOptions();
+    syncValue();
+  }
+  function updateFocus(idx) {
+    const visible = container.querySelectorAll(".p-listbox-option");
+    visible.forEach((el, i) => {
+      if (i === idx) el.classList.add("p-focus");
+      else el.classList.remove("p-focus");
+    });
+    focusedIndex = idx;
+  }
+  function bindEvents() {
+    const filterInp = container.querySelector(".p-listbox-filter-input");
+    if (filterInp) {
+      const debouncedSearch = useDebounce(() => {
+        searchQuery = filterInp.value;
+        renderOptions();
+      }, 150);
+      filterInp.addEventListener("input", () => debouncedSearch());
+    }
+    container.addEventListener("focus", () => {
+      container.classList.add("is-focused");
+      if (props.autoOptionFocus !== false && focusedIndex === -1) {
+        updateFocus(0);
+      }
+    });
+    container.addEventListener("blur", (e) => {
+      if (!container.contains(e.relatedTarget)) {
+        container.classList.remove("is-focused");
+        const visible = container.querySelectorAll(".p-listbox-option");
+        visible.forEach((el) => el.classList.remove("p-focus"));
+      }
+    });
+    container.addEventListener("keydown", (e) => {
+      if (isDisabled) return;
+      const visible = container.querySelectorAll(".p-listbox-option");
+      if (visible.length === 0) return;
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        const next = Math.min(focusedIndex + 1, visible.length - 1);
+        updateFocus(next);
+        visible[next]?.scrollIntoView({ block: "nearest" });
+        if (props.selectOnFocus && !isMultiple) {
+          const val = visible[next]?.getAttribute("data-val");
+          handleSelect(val, e);
+        }
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        const prev = Math.max(focusedIndex - 1, 0);
+        updateFocus(prev);
+        visible[prev]?.scrollIntoView({ block: "nearest" });
+        if (props.selectOnFocus && !isMultiple) {
+          const val = visible[prev]?.getAttribute("data-val");
+          handleSelect(val, e);
+        }
+      } else if (e.key === "Home") {
+        e.preventDefault();
+        updateFocus(0);
+        visible[0]?.scrollIntoView({ block: "nearest" });
+      } else if (e.key === "End") {
+        e.preventDefault();
+        updateFocus(visible.length - 1);
+        visible[visible.length - 1]?.scrollIntoView({ block: "nearest" });
+      } else if (e.key === " " || e.key === "Enter") {
+        if (focusedIndex >= 0 && focusedIndex < visible.length) {
+          e.preventDefault();
+          const val = visible[focusedIndex]?.getAttribute("data-val");
+          handleSelect(val, e);
+        }
+      } else if (e.key === "a" && (e.ctrlKey || e.metaKey) && isMultiple) {
+        e.preventDefault();
+        visible.forEach((el) => {
+          const v = el.getAttribute("data-val");
+          selectedValues.add(v);
+        });
+        renderOptions();
+        syncValue();
+      }
+    });
+  }
+  function syncValue() {
+    const hiddenInp = container.querySelector(`input[name="${props.name || props.targetInputName || "listbox_value"}"]`);
+    const valArray = Array.from(selectedValues);
+    const payload = isMultiple ? valArray : valArray[0] || null;
+    if (hiddenInp) {
+      hiddenInp.value = isMultiple ? JSON.stringify(valArray) : valArray[0] || "";
     }
     container.dispatchEvent(new CustomEvent("listbox:change", {
       bubbles: true,
-      detail: { value: props.multiple ? valArray : valArray[0] }
+      detail: { value: payload, selectedValues: valArray }
+    }));
+    container.dispatchEvent(new CustomEvent("change", {
+      bubbles: true,
+      detail: { value: payload }
     }));
   }
-  renderList();
-  syncValue();
+  init();
 }
 
 // src/composables/animation/useAutoAnimate.ts
@@ -1112,173 +1609,741 @@ function useAutoAnimate(parent, options = {}) {
 }
 
 // src/components/picklist.ts
-var CSS5 = `
-[data-theme="dark"] .laughtale-picklist {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+var PICKLIST_CSS = `
+.p-picklist {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    width: 100%;
+    font-family: var(--p-font-family, inherit);
+    color: var(--p-surface-800, #1e293b);
 }
-[data-theme="dark"] .picklist-source-list {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-picklist-controls {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
 }
-[data-theme="dark"] .picklist-item {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-picklist-control-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    border-radius: var(--p-border-radius, 6px);
+    border: 1px solid var(--p-surface-300, #cbd5e1);
+    background: var(--p-surface-0, #ffffff);
+    color: var(--p-surface-700, #334155);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    outline: none;
 }
-[data-theme="dark"] .source-item {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+.p-picklist-control-btn:hover:not(:disabled) {
+    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-surface-900, #0f172a);
+    border-color: var(--p-surface-400, #94a3b8);
 }
-[data-theme="dark"] .btn-move-to-target {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+.p-picklist-control-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
 }
-[data-theme="dark"] .btn-move-all-to-target {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-picklist-list-container {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--p-surface-200, #e2e8f0);
+    border-radius: var(--p-border-radius-lg, 8px);
+    background: var(--p-surface-0, #ffffff);
+    overflow: hidden;
+    min-width: 0;
+    box-shadow: var(--p-shadow-xs, 0 1px 2px 0 rgba(0, 0, 0, 0.05));
 }
-[data-theme="dark"] .btn-move-to-source {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-picklist-header {
+    padding: 0.75rem 1rem;
+    background: var(--p-surface-50, #f8fafc);
+    border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--p-surface-800, #1e293b);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
 }
-[data-theme="dark"] .btn-move-all-to-source {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-picklist-filter-container {
+    padding: 0.5rem 0.75rem;
+    background: var(--p-surface-50, #f8fafc);
+    border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
+    position: relative;
+    display: flex;
+    align-items: center;
 }
-[data-theme="dark"] .picklist-target-list {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+.p-picklist-filter-input {
+    width: 100%;
+    padding: 0.4rem 2rem 0.4rem 0.65rem;
+    font-size: 0.8125rem;
+    border: 1px solid var(--p-surface-300, #cbd5e1);
+    border-radius: var(--p-border-radius, 6px);
+    background: var(--p-surface-0, #ffffff);
+    color: inherit;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
-[data-theme="dark"] .target-item {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+.p-picklist-filter-input:focus {
+    border-color: var(--p-primary-500, #10b981);
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+}
+.p-picklist-filter-icon {
+    position: absolute;
+    right: 1.25rem;
+    color: var(--p-surface-400, #94a3b8);
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+}
+
+.p-picklist-list {
+    list-style: none;
+    margin: 0;
+    padding: 0.25rem 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.p-picklist-item {
+    padding: 0.625rem 1rem;
+    margin: 0.125rem 0.25rem;
+    border-radius: var(--p-border-radius-xs, 5px);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.875rem;
+    color: var(--p-surface-700, #334155);
+    user-select: none;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+.p-picklist-item:hover:not(.p-highlight) {
+    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-surface-900, #0f172a);
+}
+.p-picklist-item.p-highlight {
+    background: rgba(16, 185, 129, 0.1) !important;
+    color: var(--p-primary-700, #047857) !important;
+    font-weight: 600;
+}
+
+/* Custom Checkbox */
+.p-checkbox-box {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.125rem;
+    height: 1.125rem;
+    border-radius: var(--p-border-radius-xs, 4px);
+    border: 2px solid var(--p-surface-300, #cbd5e1);
+    background: var(--p-surface-0, #ffffff);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+}
+.p-checkbox-box.p-checked {
+    background: var(--p-primary-500, #10b981);
+    border-color: var(--p-primary-500, #10b981);
+    color: #ffffff;
+}
+.p-checkbox-box.p-indeterminate {
+    background: var(--p-primary-500, #10b981);
+    border-color: var(--p-primary-500, #10b981);
+    color: #ffffff;
+}
+
+/* Custom Item Content */
+.p-picklist-product-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+}
+.p-picklist-product-img {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 6px;
+    background: var(--p-surface-100, #f1f5f9);
+    border: 1px solid var(--p-surface-200, #e2e8f0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--p-primary-600, #059669);
+    flex-shrink: 0;
+}
+.p-picklist-product-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+}
+.p-picklist-product-name {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--p-surface-900, #0f172a);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.p-picklist-product-category {
+    font-size: 0.75rem;
+    color: var(--p-surface-500, #64748b);
+}
+.p-picklist-product-price {
+    font-weight: 700;
+    font-size: 0.875rem;
+    color: var(--p-surface-900, #0f172a);
+}
+
+.p-picklist-member-item {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    width: 100%;
+}
+.p-picklist-member-avatar {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 9999px;
+    background: var(--p-primary-100, #d1fae5);
+    color: var(--p-primary-700, #047857);
+    font-weight: 700;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* Empty State */
+.p-picklist-empty {
+    padding: 2.5rem 1rem;
+    text-align: center;
+    color: var(--p-surface-400, #94a3b8);
+    font-size: 0.8125rem;
+    font-style: italic;
+}
+
+/* Striped Rows */
+.p-picklist-striped .p-picklist-item:nth-child(even):not(.p-highlight) {
+    background: var(--p-surface-50, #f8fafc);
+}
+
+/* Dark Mode Tokens */
+.dark .p-picklist,
+[data-theme="dark"] .p-picklist {
+    color: var(--p-surface-100, #f1f5f9) !important;
+}
+.dark .p-picklist-list-container,
+[data-theme="dark"] .p-picklist-list-container {
+    background: var(--p-surface-900, #0f172a) !important;
+    border-color: var(--p-surface-700, #334155) !important;
+}
+.dark .p-picklist-header,
+.dark .p-picklist-filter-container,
+[data-theme="dark"] .p-picklist-header,
+[data-theme="dark"] .p-picklist-filter-container {
+    background: var(--p-surface-800, #1e293b) !important;
+    border-color: var(--p-surface-700, #334155) !important;
+    color: var(--p-surface-100, #f1f5f9) !important;
+}
+.dark .p-picklist-filter-input,
+[data-theme="dark"] .p-picklist-filter-input {
+    background: var(--p-surface-900, #0f172a) !important;
+    border-color: var(--p-surface-600, #475569) !important;
+    color: #ffffff !important;
+}
+.dark .p-picklist-control-btn,
+[data-theme="dark"] .p-picklist-control-btn {
+    background: var(--p-surface-800, #1e293b) !important;
+    border-color: var(--p-surface-600, #475569) !important;
+    color: var(--p-surface-200, #e2e8f0) !important;
+}
+.dark .p-picklist-control-btn:hover:not(:disabled),
+[data-theme="dark"] .p-picklist-control-btn:hover:not(:disabled) {
+    background: var(--p-surface-700, #334155) !important;
+    color: #ffffff !important;
+}
+.dark .p-picklist-item:hover:not(.p-highlight),
+[data-theme="dark"] .p-picklist-item:hover:not(.p-highlight) {
+    background: var(--p-surface-800, #1e293b) !important;
+    color: #ffffff !important;
+}
+.dark .p-picklist-product-name,
+[data-theme="dark"] .p-picklist-product-name,
+.dark .p-picklist-product-price,
+[data-theme="dark"] .p-picklist-product-price {
+    color: var(--p-surface-100, #f1f5f9) !important;
+}
+.dark .p-picklist-product-img,
+[data-theme="dark"] .p-picklist-product-img {
+    background: var(--p-surface-800, #1e293b) !important;
+    border-color: var(--p-surface-700, #334155) !important;
 }
 `;
 function PickListIsland(container, props) {
-  injectIslandStyle("picklist", CSS5);
-  let sourceList = props.source ? [...props.source] : [
-    { id: "1", name: "Identity & Access Manager" },
-    { id: "2", name: "Audit Compliance Engine" },
-    { id: "3", name: "Rate Limiter Gateway" }
-  ];
-  let targetList = props.target ? [...props.target] : [
-    { id: "4", name: "Zero-Trust HSM Validator" }
-  ];
+  injectIslandStyle("picklist", PICKLIST_CSS);
+  const initialSource = props.value ? props.value[0] : props.source || [];
+  const initialTarget = props.value ? props.value[1] : props.target || [];
+  let sourceList = [...initialSource];
+  let targetList = [...initialTarget];
+  const dataKey = props.dataKey || "id";
+  const isCheckbox = !!props.checkbox;
+  const isFilter = !!props.filter;
+  const filterBy = props.filterBy || "name";
+  const sourceHeader = props.sourceHeader || "Available";
+  const targetHeader = props.targetHeader || "Selected";
+  const showSourceControls = !!props.showSourceControls;
+  const showTargetControls = !!props.showTargetControls;
+  const scrollHeight = props.scrollHeight || "18rem";
+  const emptyMessageSource = props.emptyMessageSource || "No available options";
+  const emptyMessageTarget = props.emptyMessageTarget || "No available options";
   let selectedSource = /* @__PURE__ */ new Set();
   let selectedTarget = /* @__PURE__ */ new Set();
-  function render() {
-    container.innerHTML = `
-            <div class="laughtale-picklist" style="display: flex; align-items: center; gap: 1rem; width: 100%; max-width: 680px; font-family: var(--p-font-family, inherit);">
-                <!-- Source Box -->
-                <div style="flex: 1; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); background: var(--p-surface-0); overflow: hidden; display: flex; flex-direction: column;">
-                    <div style="padding: 0.625rem 0.875rem; background: var(--p-surface-50); border-bottom: 1px solid var(--p-border-color); font-size: 0.75rem; font-weight: 700; color: var(--p-surface-600); text-transform: uppercase;">
-                        ${props.sourceHeader || "Available"} (${sourceList.length})
+  let sourceFilterQuery = "";
+  let targetFilterQuery = "";
+  function getItemId(item) {
+    return String(item[dataKey] || item.id || item.name);
+  }
+  function renderCellContent(item, isSelected) {
+    const checkboxHtml = isCheckbox ? `
+            <div class="p-checkbox-box ${isSelected ? "p-checked" : ""}" role="checkbox" aria-checked="${isSelected}">
+                ${isSelected ? LucideIcons.check : ""}
+            </div>
+        ` : "";
+    if (item.price != null || item.category != null || item.image != null) {
+      return `
+                ${checkboxHtml}
+                <div class="p-picklist-product-item">
+                    <div class="p-picklist-product-img">
+                        ${LucideIcons.package}
                     </div>
-                    <div class="picklist-source-list" style="height: 180px; overflow-y: auto; padding: 0.25rem 0;">
-                        ${sourceList.map((it2) => `
-                            <div class="picklist-item source-item ${selectedSource.has(it2.id) ? "active" : ""}" data-id="${it2.id}" style="padding: 0.45rem 0.75rem; cursor: pointer; font-size: 0.8125rem; background: ${selectedSource.has(it2.id) ? "var(--p-primary-50)" : "transparent"}; color: ${selectedSource.has(it2.id) ? "var(--p-primary-700)" : "var(--p-text-color)"}; font-weight: ${selectedSource.has(it2.id) ? "600" : "normal"}; transition: all 0.15s ease;">
-                                ${it2.name}
-                            </div>
-                        `).join("")}
+                    <div class="p-picklist-product-details">
+                        <span class="p-picklist-product-name">${item.name}</span>
+                        <span class="p-picklist-product-category">${item.category || ""}</span>
+                    </div>
+                    ${item.price != null ? `<span class="p-picklist-product-price">$${item.price}</span>` : ""}
+                </div>
+            `;
+    }
+    if (item.avatar != null || item.role != null) {
+      const initials = item.name.split(" ").map((w) => w[0]).join("").substring(0, 2);
+      return `
+                ${checkboxHtml}
+                <div class="p-picklist-member-item">
+                    <div class="p-picklist-member-avatar">${initials}</div>
+                    <div style="display: flex; flex-direction: column;">
+                        <span style="font-weight: 600; color: var(--p-surface-900);">${item.name}</span>
+                        ${item.role ? `<span style="font-size: 0.75rem; color: var(--p-surface-500);">${item.role}</span>` : ""}
                     </div>
                 </div>
+            `;
+    }
+    return `
+            ${checkboxHtml}
+            <span style="flex: 1; font-weight: ${isSelected ? "600" : "normal"};">${item.name}</span>
+        `;
+  }
+  function buildShell() {
+    const sourceControlsHtml = showSourceControls ? `
+            <div class="p-picklist-controls p-picklist-source-controls">
+                <button type="button" class="p-picklist-control-btn btn-source-top" title="Move Top" aria-label="Move Top">${LucideIcons.chevronsUp}</button>
+                <button type="button" class="p-picklist-control-btn btn-source-up" title="Move Up" aria-label="Move Up">${LucideIcons.chevronUp}</button>
+                <button type="button" class="p-picklist-control-btn btn-source-down" title="Move Down" aria-label="Move Down">${LucideIcons.chevronDown}</button>
+                <button type="button" class="p-picklist-control-btn btn-source-bottom" title="Move Bottom" aria-label="Move Bottom">${LucideIcons.chevronsDown}</button>
+            </div>
+        ` : "";
+    const targetControlsHtml = showTargetControls ? `
+            <div class="p-picklist-controls p-picklist-target-controls">
+                <button type="button" class="p-picklist-control-btn btn-target-top" title="Move Top" aria-label="Move Top">${LucideIcons.chevronsUp}</button>
+                <button type="button" class="p-picklist-control-btn btn-target-up" title="Move Up" aria-label="Move Up">${LucideIcons.chevronUp}</button>
+                <button type="button" class="p-picklist-control-btn btn-target-down" title="Move Down" aria-label="Move Down">${LucideIcons.chevronDown}</button>
+                <button type="button" class="p-picklist-control-btn btn-target-bottom" title="Move Bottom" aria-label="Move Bottom">${LucideIcons.chevronsDown}</button>
+            </div>
+        ` : "";
+    const sourceHeaderCheckboxHtml = isCheckbox ? `
+            <div class="p-checkbox-box p-source-select-all" role="checkbox" aria-checked="false"></div>
+        ` : "";
+    const targetHeaderCheckboxHtml = isCheckbox ? `
+            <div class="p-checkbox-box p-target-select-all" role="checkbox" aria-checked="false"></div>
+        ` : "";
+    const sourceFilterHtml = isFilter ? `
+            <div class="p-picklist-filter-container">
+                <input type="text" class="p-picklist-filter-input p-source-filter" placeholder="${props.sourceFilterPlaceholder || "Search by name"}" />
+                <span class="p-picklist-filter-icon">${LucideIcons.search}</span>
+            </div>
+        ` : "";
+    const targetFilterHtml = isFilter ? `
+            <div class="p-picklist-filter-container">
+                <input type="text" class="p-picklist-filter-input p-target-filter" placeholder="${props.targetFilterPlaceholder || "Search by name"}" />
+                <span class="p-picklist-filter-icon">${LucideIcons.search}</span>
+            </div>
+        ` : "";
+    container.innerHTML = `
+            <div class="p-picklist p-component">
+                ${sourceControlsHtml}
 
-                <!-- Transfer Action Buttons -->
-                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-                    <button type="button" class="btn-move-to-target p-button p-button-secondary" style="padding: 0.45rem; justify-content: center;" title="Move to Selected">
+                <!-- Source List Box -->
+                <div class="p-picklist-list-container">
+                    <div class="p-picklist-header">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            ${sourceHeaderCheckboxHtml}
+                            <span>${sourceHeader}</span>
+                        </div>
+                        <span class="p-source-count" style="font-size: 0.75rem; font-weight: 600; color: var(--p-surface-500);">0 items</span>
+                    </div>
+                    ${sourceFilterHtml}
+                    <ul class="p-picklist-list picklist-source-list" style="height: ${scrollHeight};" role="listbox" aria-multiselectable="true" tabindex="0">
+                    </ul>
+                </div>
+
+                <!-- Transfer Buttons (Center) -->
+                <div class="p-picklist-controls p-picklist-transfer-controls">
+                    <button type="button" class="p-picklist-control-btn btn-move-to-target" title="Move to Target" aria-label="Move to Target" disabled>
                         ${LucideIcons.chevronRight}
                     </button>
-                    <button type="button" class="btn-move-all-to-target p-button p-button-secondary" style="padding: 0.45rem; justify-content: center;" title="Move All to Selected">
-                        \xBB
+                    <button type="button" class="p-picklist-control-btn btn-move-all-to-target" title="Move All to Target" aria-label="Move All to Target">
+                        ${LucideIcons.chevronsRight}
                     </button>
-                    <button type="button" class="btn-move-to-source p-button p-button-secondary" style="padding: 0.45rem; justify-content: center;" title="Move to Available">
+                    <button type="button" class="p-picklist-control-btn btn-move-to-source" title="Move to Source" aria-label="Move to Source" disabled>
                         ${LucideIcons.chevronLeft}
                     </button>
-                    <button type="button" class="btn-move-all-to-source p-button p-button-secondary" style="padding: 0.45rem; justify-content: center;" title="Move All to Available">
-                        \xAB
+                    <button type="button" class="p-picklist-control-btn btn-move-all-to-source" title="Move All to Source" aria-label="Move All to Source">
+                        ${LucideIcons.chevronsLeft}
                     </button>
                 </div>
 
-                <!-- Target Box -->
-                <div style="flex: 1; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); background: var(--p-surface-0); overflow: hidden; display: flex; flex-direction: column;">
-                    <div style="padding: 0.625rem 0.875rem; background: var(--p-surface-50); border-bottom: 1px solid var(--p-border-color); font-size: 0.75rem; font-weight: 700; color: var(--p-surface-600); text-transform: uppercase;">
-                        ${props.targetHeader || "Selected"} (${targetList.length})
+                <!-- Target List Box -->
+                <div class="p-picklist-list-container">
+                    <div class="p-picklist-header">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            ${targetHeaderCheckboxHtml}
+                            <span>${targetHeader}</span>
+                        </div>
+                        <span class="p-target-count" style="font-size: 0.75rem; font-weight: 600; color: var(--p-surface-500);">0 items</span>
                     </div>
-                    <div class="picklist-target-list" style="height: 180px; overflow-y: auto; padding: 0.25rem 0;">
-                        ${targetList.map((it2) => `
-                            <div class="picklist-item target-item ${selectedTarget.has(it2.id) ? "active" : ""}" data-id="${it2.id}" style="padding: 0.45rem 0.75rem; cursor: pointer; font-size: 0.8125rem; background: ${selectedTarget.has(it2.id) ? "var(--p-primary-50)" : "transparent"}; color: ${selectedTarget.has(it2.id) ? "var(--p-primary-700)" : "var(--p-text-color)"}; font-weight: ${selectedTarget.has(it2.id) ? "600" : "normal"}; transition: all 0.15s ease;">
-                                ${it2.name}
-                            </div>
-                        `).join("")}
-                    </div>
+                    ${targetFilterHtml}
+                    <ul class="p-picklist-list picklist-target-list" style="height: ${scrollHeight};" role="listbox" aria-multiselectable="true" tabindex="0">
+                    </ul>
                 </div>
+
+                ${targetControlsHtml}
             </div>
         `;
     const srcEl = container.querySelector(".picklist-source-list");
     const tgtEl = container.querySelector(".picklist-target-list");
-    useAutoAnimate(srcEl, { duration: 200 });
-    useAutoAnimate(tgtEl, { duration: 200 });
-    bindEvents();
+    if (srcEl) useAutoAnimate(srcEl, { duration: 180 });
+    if (tgtEl) useAutoAnimate(tgtEl, { duration: 180 });
+    bindPermanentEvents();
+    updateSourceList();
+    updateTargetList();
+    updateTransferButtons();
   }
-  function bindEvents() {
-    container.querySelectorAll(".source-item").forEach((el) => {
-      el.addEventListener("click", () => {
-        const id = el.getAttribute("data-id");
-        if (selectedSource.has(id)) selectedSource.delete(id);
-        else selectedSource.add(id);
-        render();
-      });
+  function updateSourceList() {
+    const rootEl = container.firstElementChild;
+    if (!rootEl) return;
+    const filteredSource = sourceList.filter((item) => {
+      if (!isFilter || !sourceFilterQuery.trim()) return true;
+      const val = String(item[filterBy] || item.name || "").toLowerCase();
+      return val.includes(sourceFilterQuery.toLowerCase());
     });
-    container.querySelectorAll(".target-item").forEach((el) => {
-      el.addEventListener("click", () => {
-        const id = el.getAttribute("data-id");
-        if (selectedTarget.has(id)) selectedTarget.delete(id);
-        else selectedTarget.add(id);
-        render();
-      });
+    const countEl = rootEl.querySelector(".p-source-count");
+    if (countEl) countEl.textContent = `${filteredSource.length} items`;
+    const sourceSelectAll = rootEl.querySelector(".p-source-select-all");
+    if (sourceSelectAll) {
+      const isAll = filteredSource.length > 0 && filteredSource.every((it2) => selectedSource.has(getItemId(it2)));
+      const isIndet = filteredSource.some((it2) => selectedSource.has(getItemId(it2))) && !isAll;
+      sourceSelectAll.className = `p-checkbox-box p-source-select-all ${isAll ? "p-checked" : isIndet ? "p-indeterminate" : ""}`;
+      sourceSelectAll.setAttribute("aria-checked", String(isAll));
+      sourceSelectAll.innerHTML = isAll ? LucideIcons.check : isIndet ? '<span style="width: 8px; height: 2px; background: white;"></span>' : "";
+    }
+    const srcUl = rootEl.querySelector(".picklist-source-list");
+    if (srcUl) {
+      if (filteredSource.length === 0) {
+        srcUl.innerHTML = `<li class="p-picklist-empty">${sourceFilterQuery ? "No results found" : emptyMessageSource}</li>`;
+      } else {
+        srcUl.innerHTML = filteredSource.map((it2) => {
+          const id = getItemId(it2);
+          const isSelected = selectedSource.has(id);
+          return `
+                        <li class="p-picklist-item source-item ${isSelected ? "p-highlight" : ""}" 
+                            data-id="${id}" 
+                            role="option" 
+                            aria-selected="${isSelected}">
+                            ${renderCellContent(it2, isSelected)}
+                        </li>
+                    `;
+        }).join("");
+        srcUl.querySelectorAll(".source-item").forEach((el) => {
+          el.addEventListener("click", (e) => {
+            const id = el.getAttribute("data-id");
+            if (!id) return;
+            const mouseEvent = e;
+            if (isCheckbox || mouseEvent.ctrlKey || mouseEvent.metaKey) {
+              if (selectedSource.has(id)) selectedSource.delete(id);
+              else selectedSource.add(id);
+            } else {
+              if (selectedSource.has(id) && selectedSource.size === 1) {
+                selectedSource.clear();
+              } else {
+                selectedSource.clear();
+                selectedSource.add(id);
+              }
+            }
+            updateSourceList();
+            updateTransferButtons();
+            dispatchSelectionEvent();
+          });
+        });
+      }
+    }
+  }
+  function updateTargetList() {
+    const rootEl = container.firstElementChild;
+    if (!rootEl) return;
+    const filteredTarget = targetList.filter((item) => {
+      if (!isFilter || !targetFilterQuery.trim()) return true;
+      const val = String(item[filterBy] || item.name || "").toLowerCase();
+      return val.includes(targetFilterQuery.toLowerCase());
     });
-    container.querySelector(".btn-move-to-target")?.addEventListener("click", () => {
-      const moving = sourceList.filter((it2) => selectedSource.has(it2.id));
+    const countEl = rootEl.querySelector(".p-target-count");
+    if (countEl) countEl.textContent = `${filteredTarget.length} items`;
+    const targetSelectAll = rootEl.querySelector(".p-target-select-all");
+    if (targetSelectAll) {
+      const isAll = filteredTarget.length > 0 && filteredTarget.every((it2) => selectedTarget.has(getItemId(it2)));
+      const isIndet = filteredTarget.some((it2) => selectedTarget.has(getItemId(it2))) && !isAll;
+      targetSelectAll.className = `p-checkbox-box p-target-select-all ${isAll ? "p-checked" : isIndet ? "p-indeterminate" : ""}`;
+      targetSelectAll.setAttribute("aria-checked", String(isAll));
+      targetSelectAll.innerHTML = isAll ? LucideIcons.check : isIndet ? '<span style="width: 8px; height: 2px; background: white;"></span>' : "";
+    }
+    const tgtUl = rootEl.querySelector(".picklist-target-list");
+    if (tgtUl) {
+      if (filteredTarget.length === 0) {
+        tgtUl.innerHTML = `<li class="p-picklist-empty">${targetFilterQuery ? "No results found" : emptyMessageTarget}</li>`;
+      } else {
+        tgtUl.innerHTML = filteredTarget.map((it2) => {
+          const id = getItemId(it2);
+          const isSelected = selectedTarget.has(id);
+          return `
+                        <li class="p-picklist-item target-item ${isSelected ? "p-highlight" : ""}" 
+                            data-id="${id}" 
+                            role="option" 
+                            aria-selected="${isSelected}">
+                            ${renderCellContent(it2, isSelected)}
+                        </li>
+                    `;
+        }).join("");
+        tgtUl.querySelectorAll(".target-item").forEach((el) => {
+          el.addEventListener("click", (e) => {
+            const id = el.getAttribute("data-id");
+            if (!id) return;
+            const mouseEvent = e;
+            if (isCheckbox || mouseEvent.ctrlKey || mouseEvent.metaKey) {
+              if (selectedTarget.has(id)) selectedTarget.delete(id);
+              else selectedTarget.add(id);
+            } else {
+              if (selectedTarget.has(id) && selectedTarget.size === 1) {
+                selectedTarget.clear();
+              } else {
+                selectedTarget.clear();
+                selectedTarget.add(id);
+              }
+            }
+            updateTargetList();
+            updateTransferButtons();
+            dispatchSelectionEvent();
+          });
+        });
+      }
+    }
+  }
+  function updateTransferButtons() {
+    const rootEl = container.firstElementChild;
+    if (!rootEl) return;
+    const btnMoveTarget = rootEl.querySelector(".btn-move-to-target");
+    if (btnMoveTarget) btnMoveTarget.disabled = selectedSource.size === 0;
+    const btnMoveAllTarget = rootEl.querySelector(".btn-move-all-to-target");
+    if (btnMoveAllTarget) btnMoveAllTarget.disabled = sourceList.length === 0;
+    const btnMoveSource = rootEl.querySelector(".btn-move-to-source");
+    if (btnMoveSource) btnMoveSource.disabled = selectedTarget.size === 0;
+    const btnMoveAllSource = rootEl.querySelector(".btn-move-all-to-source");
+    if (btnMoveAllSource) btnMoveAllSource.disabled = targetList.length === 0;
+  }
+  function bindPermanentEvents() {
+    const rootEl = container.firstElementChild;
+    if (!rootEl) return;
+    const srcFilterInput = rootEl.querySelector(".p-source-filter");
+    if (srcFilterInput) {
+      srcFilterInput.addEventListener("input", (e) => {
+        sourceFilterQuery = e.target.value;
+        updateSourceList();
+        updateTransferButtons();
+      });
+    }
+    const tgtFilterInput = rootEl.querySelector(".p-target-filter");
+    if (tgtFilterInput) {
+      tgtFilterInput.addEventListener("input", (e) => {
+        targetFilterQuery = e.target.value;
+        updateTargetList();
+        updateTransferButtons();
+      });
+    }
+    const sourceSelectAll = rootEl.querySelector(".p-source-select-all");
+    if (sourceSelectAll) {
+      sourceSelectAll.addEventListener("click", () => {
+        const isAll = sourceSelectAll.classList.contains("p-checked");
+        if (isAll) {
+          selectedSource.clear();
+        } else {
+          sourceList.forEach((it2) => selectedSource.add(getItemId(it2)));
+        }
+        updateSourceList();
+        updateTransferButtons();
+        dispatchSelectionEvent();
+      });
+    }
+    const targetSelectAll = rootEl.querySelector(".p-target-select-all");
+    if (targetSelectAll) {
+      targetSelectAll.addEventListener("click", () => {
+        const isAll = targetSelectAll.classList.contains("p-checked");
+        if (isAll) {
+          selectedTarget.clear();
+        } else {
+          targetList.forEach((it2) => selectedTarget.add(getItemId(it2)));
+        }
+        updateTargetList();
+        updateTransferButtons();
+        dispatchSelectionEvent();
+      });
+    }
+    rootEl.querySelector(".btn-move-to-target")?.addEventListener("click", () => {
+      if (selectedSource.size === 0) return;
+      const moving = sourceList.filter((it2) => selectedSource.has(getItemId(it2)));
       targetList = [...targetList, ...moving];
-      sourceList = sourceList.filter((it2) => !selectedSource.has(it2.id));
+      sourceList = sourceList.filter((it2) => !selectedSource.has(getItemId(it2)));
       selectedSource.clear();
-      render();
-      syncValues();
+      updateSourceList();
+      updateTargetList();
+      updateTransferButtons();
+      syncValues("move-to-target", moving);
     });
-    container.querySelector(".btn-move-all-to-target")?.addEventListener("click", () => {
+    rootEl.querySelector(".btn-move-all-to-target")?.addEventListener("click", () => {
+      if (sourceList.length === 0) return;
+      const moving = [...sourceList];
       targetList = [...targetList, ...sourceList];
       sourceList = [];
       selectedSource.clear();
-      render();
-      syncValues();
+      updateSourceList();
+      updateTargetList();
+      updateTransferButtons();
+      syncValues("move-all-to-target", moving);
     });
-    container.querySelector(".btn-move-to-source")?.addEventListener("click", () => {
-      const moving = targetList.filter((it2) => selectedTarget.has(it2.id));
+    rootEl.querySelector(".btn-move-to-source")?.addEventListener("click", () => {
+      if (selectedTarget.size === 0) return;
+      const moving = targetList.filter((it2) => selectedTarget.has(getItemId(it2)));
       sourceList = [...sourceList, ...moving];
-      targetList = targetList.filter((it2) => !selectedTarget.has(it2.id));
+      targetList = targetList.filter((it2) => !selectedTarget.has(getItemId(it2)));
       selectedTarget.clear();
-      render();
-      syncValues();
+      updateSourceList();
+      updateTargetList();
+      updateTransferButtons();
+      syncValues("move-to-source", moving);
     });
-    container.querySelector(".btn-move-all-to-source")?.addEventListener("click", () => {
+    rootEl.querySelector(".btn-move-all-to-source")?.addEventListener("click", () => {
+      if (targetList.length === 0) return;
+      const moving = [...targetList];
       sourceList = [...sourceList, ...targetList];
       targetList = [];
       selectedTarget.clear();
-      render();
-      syncValues();
+      updateSourceList();
+      updateTargetList();
+      updateTransferButtons();
+      syncValues("move-all-to-source", moving);
+    });
+    rootEl.querySelector(".btn-source-top")?.addEventListener("click", () => {
+      reorderList(sourceList, selectedSource, "top", "source");
+    });
+    rootEl.querySelector(".btn-source-up")?.addEventListener("click", () => {
+      reorderList(sourceList, selectedSource, "up", "source");
+    });
+    rootEl.querySelector(".btn-source-down")?.addEventListener("click", () => {
+      reorderList(sourceList, selectedSource, "down", "source");
+    });
+    rootEl.querySelector(".btn-source-bottom")?.addEventListener("click", () => {
+      reorderList(sourceList, selectedSource, "bottom", "source");
+    });
+    rootEl.querySelector(".btn-target-top")?.addEventListener("click", () => {
+      reorderList(targetList, selectedTarget, "top", "target");
+    });
+    rootEl.querySelector(".btn-target-up")?.addEventListener("click", () => {
+      reorderList(targetList, selectedTarget, "up", "target");
+    });
+    rootEl.querySelector(".btn-target-down")?.addEventListener("click", () => {
+      reorderList(targetList, selectedTarget, "down", "target");
+    });
+    rootEl.querySelector(".btn-target-bottom")?.addEventListener("click", () => {
+      reorderList(targetList, selectedTarget, "bottom", "target");
     });
   }
-  function syncValues() {
+  function reorderList(list, selectedSet, direction, whichList) {
+    if (selectedSet.size === 0 || list.length < 2) return;
+    if (direction === "top") {
+      const selected = list.filter((it2) => selectedSet.has(getItemId(it2)));
+      const remaining = list.filter((it2) => !selectedSet.has(getItemId(it2)));
+      list.length = 0;
+      list.push(...selected, ...remaining);
+    } else if (direction === "bottom") {
+      const selected = list.filter((it2) => selectedSet.has(getItemId(it2)));
+      const remaining = list.filter((it2) => !selectedSet.has(getItemId(it2)));
+      list.length = 0;
+      list.push(...remaining, ...selected);
+    } else if (direction === "up") {
+      for (let i = 1; i < list.length; i++) {
+        if (selectedSet.has(getItemId(list[i])) && !selectedSet.has(getItemId(list[i - 1]))) {
+          const temp = list[i];
+          list[i] = list[i - 1];
+          list[i - 1] = temp;
+        }
+      }
+    } else if (direction === "down") {
+      for (let i = list.length - 2; i >= 0; i--) {
+        if (selectedSet.has(getItemId(list[i])) && !selectedSet.has(getItemId(list[i + 1]))) {
+          const temp = list[i];
+          list[i] = list[i + 1];
+          list[i + 1] = temp;
+        }
+      }
+    }
+    if (whichList === "source") updateSourceList();
+    else updateTargetList();
+    updateTransferButtons();
+    syncValues("reorder");
+  }
+  function dispatchSelectionEvent() {
+    container.dispatchEvent(new CustomEvent("picklist:selection-change", {
+      bubbles: true,
+      detail: {
+        sourceSelection: Array.from(selectedSource),
+        targetSelection: Array.from(selectedTarget)
+      }
+    }));
+  }
+  function syncValues(action = "change", affectedItems = []) {
     if (props.targetInputName) {
       let hidden = container.querySelector(`input[name="${props.targetInputName}"]`);
       if (!hidden) {
@@ -1287,138 +2352,569 @@ function PickListIsland(container, props) {
         hidden.name = props.targetInputName;
         container.appendChild(hidden);
       }
-      hidden.value = JSON.stringify(targetList.map((it2) => it2.id));
+      hidden.value = JSON.stringify(targetList.map((it2) => getItemId(it2)));
     }
     container.dispatchEvent(new CustomEvent("picklist:change", {
       bubbles: true,
-      detail: { source: sourceList, target: targetList }
+      detail: { source: sourceList, target: targetList, action, affectedItems }
     }));
   }
-  render();
+  buildShell();
   syncValues();
 }
 
 // src/components/orderlist.ts
-var CSS6 = `
-[data-theme="dark"] .laughtale-orderlist {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+var ORDERLIST_CSS = `
+.p-orderlist {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.25rem;
+    width: 100%;
+    font-family: var(--p-font-family, inherit);
+    color: var(--p-surface-800, #1e293b);
 }
-[data-theme="dark"] .btn-order-top {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-orderlist-controls {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 0.5rem;
+    flex-shrink: 0;
+    padding-top: 0.5rem;
 }
-[data-theme="dark"] .btn-order-up {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-orderlist-control-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    border-radius: var(--p-border-radius, 6px);
+    border: 1px solid var(--p-surface-300, #cbd5e1);
+    background: var(--p-surface-0, #ffffff);
+    color: var(--p-surface-700, #334155);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    outline: none;
 }
-[data-theme="dark"] .btn-order-down {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+.p-orderlist-control-btn:hover:not(:disabled) {
+    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-surface-900, #0f172a);
+    border-color: var(--p-surface-400, #94a3b8);
 }
-[data-theme="dark"] .btn-order-bottom {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+.p-orderlist-control-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
 }
-[data-theme="dark"] .orderlist-items-container {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-orderlist-list-container {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--p-surface-200, #e2e8f0);
+    border-radius: var(--p-border-radius-lg, 8px);
+    background: var(--p-surface-0, #ffffff);
+    overflow: hidden;
+    min-width: 0;
+    box-shadow: var(--p-shadow-xs, 0 1px 2px 0 rgba(0, 0, 0, 0.05));
 }
-[data-theme="dark"] .orderlist-item {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-orderlist-header {
+    padding: 0.75rem 1rem;
+    background: var(--p-surface-50, #f8fafc);
+    border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--p-surface-800, #1e293b);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.p-orderlist-filter-container {
+    padding: 0.5rem 0.75rem;
+    background: var(--p-surface-50, #f8fafc);
+    border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.p-orderlist-filter-input {
+    width: 100%;
+    padding: 0.4rem 2rem 0.4rem 0.65rem;
+    font-size: 0.8125rem;
+    border: 1px solid var(--p-surface-300, #cbd5e1);
+    border-radius: var(--p-border-radius, 6px);
+    background: var(--p-surface-0, #ffffff);
+    color: inherit;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.p-orderlist-filter-input:focus {
+    border-color: var(--p-primary-500, #10b981);
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+}
+.p-orderlist-filter-icon {
+    position: absolute;
+    right: 1.25rem;
+    color: var(--p-surface-400, #94a3b8);
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+}
+
+.p-orderlist-list {
+    list-style: none;
+    margin: 0;
+    padding: 0.25rem 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.p-orderlist-item {
+    padding: 0.625rem 1rem;
+    margin: 0.125rem 0.25rem;
+    border-radius: var(--p-border-radius-xs, 5px);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.875rem;
+    color: var(--p-surface-700, #334155);
+    user-select: none;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+.p-orderlist-item:hover:not(.p-highlight) {
+    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-surface-900, #0f172a);
+}
+.p-orderlist-item.p-highlight {
+    background: rgba(16, 185, 129, 0.1) !important;
+    color: var(--p-primary-700, #047857) !important;
+    font-weight: 600;
+}
+
+/* Checkbox */
+.p-checkbox-box {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.125rem;
+    height: 1.125rem;
+    border-radius: var(--p-border-radius-xs, 4px);
+    border: 2px solid var(--p-surface-300, #cbd5e1);
+    background: var(--p-surface-0, #ffffff);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+}
+.p-checkbox-box.p-checked {
+    background: var(--p-primary-500, #10b981);
+    border-color: var(--p-primary-500, #10b981);
+    color: #ffffff;
+}
+
+/* Product Item Content */
+.p-orderlist-product-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+}
+.p-orderlist-product-img {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 6px;
+    background: var(--p-surface-100, #f1f5f9);
+    border: 1px solid var(--p-surface-200, #e2e8f0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--p-primary-600, #059669);
+    flex-shrink: 0;
+}
+.p-orderlist-product-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+}
+.p-orderlist-product-name {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--p-surface-900, #0f172a);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.p-orderlist-product-category {
+    font-size: 0.75rem;
+    color: var(--p-surface-500, #64748b);
+}
+.p-orderlist-product-price {
+    font-weight: 700;
+    font-size: 0.875rem;
+    color: var(--p-surface-900, #0f172a);
+}
+
+/* Numbered Digits */
+.p-orderlist-index {
+    font-variant-numeric: tabular-nums;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--p-surface-400, #94a3b8);
+    width: 1.5rem;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+/* Footer / Status Bar */
+.p-orderlist-footer {
+    padding: 0.5rem 1rem;
+    background: var(--p-surface-50, #f8fafc);
+    border-top: 1px solid var(--p-surface-200, #e2e8f0);
+    font-size: 0.75rem;
+    color: var(--p-surface-500, #64748b);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Empty State */
+.p-orderlist-empty {
+    padding: 2.5rem 1rem;
+    text-align: center;
+    color: var(--p-surface-400, #94a3b8);
+    font-size: 0.8125rem;
+    font-style: italic;
+}
+
+/* Dark Mode Tokens */
+.dark .p-orderlist,
+[data-theme="dark"] .p-orderlist {
+    color: var(--p-surface-100, #f1f5f9) !important;
+}
+.dark .p-orderlist-list-container,
+[data-theme="dark"] .p-orderlist-list-container {
+    background: var(--p-surface-900, #0f172a) !important;
+    border-color: var(--p-surface-700, #334155) !important;
+}
+.dark .p-orderlist-header,
+.dark .p-orderlist-filter-container,
+.dark .p-orderlist-footer,
+[data-theme="dark"] .p-orderlist-header,
+[data-theme="dark"] .p-orderlist-filter-container,
+[data-theme="dark"] .p-orderlist-footer {
+    background: var(--p-surface-800, #1e293b) !important;
+    border-color: var(--p-surface-700, #334155) !important;
+    color: var(--p-surface-100, #f1f5f9) !important;
+}
+.dark .p-orderlist-filter-input,
+[data-theme="dark"] .p-orderlist-filter-input {
+    background: var(--p-surface-900, #0f172a) !important;
+    border-color: var(--p-surface-600, #475569) !important;
+    color: #ffffff !important;
+}
+.dark .p-orderlist-control-btn,
+[data-theme="dark"] .p-orderlist-control-btn {
+    background: var(--p-surface-800, #1e293b) !important;
+    border-color: var(--p-surface-600, #475569) !important;
+    color: var(--p-surface-200, #e2e8f0) !important;
+}
+.dark .p-orderlist-control-btn:hover:not(:disabled),
+[data-theme="dark"] .p-orderlist-control-btn:hover:not(:disabled) {
+    background: var(--p-surface-700, #334155) !important;
+    color: #ffffff !important;
+}
+.dark .p-orderlist-item:hover:not(.p-highlight),
+[data-theme="dark"] .p-orderlist-item:hover:not(.p-highlight) {
+    background: var(--p-surface-800, #1e293b) !important;
+    color: #ffffff !important;
+}
+.dark .p-orderlist-product-name,
+.dark .p-orderlist-product-price,
+[data-theme="dark"] .p-orderlist-product-name,
+[data-theme="dark"] .p-orderlist-product-price {
+    color: var(--p-surface-100, #f1f5f9) !important;
+}
+.dark .p-orderlist-product-img,
+[data-theme="dark"] .p-orderlist-product-img {
+    background: var(--p-surface-800, #1e293b) !important;
+    border-color: var(--p-surface-700, #334155) !important;
 }
 `;
 function OrderListIsland(container, props) {
-  injectIslandStyle("orderlist", CSS6);
-  let items = props.items ? [...props.items] : [
-    { id: "1", name: "Phase 1: Zero-Trust Gateway Init", order: 0 },
-    { id: "2", name: "Phase 2: Hydrate Islands Engine", order: 1 },
-    { id: "3", name: "Phase 3: Verify Cryptographic Signatures", order: 2 },
-    { id: "4", name: "Phase 4: Telemetry Stream Pipeline", order: 3 }
-  ];
-  let selectedIndex = 0;
-  function render() {
+  injectIslandStyle("orderlist", ORDERLIST_CSS);
+  const initialItems = props.value ? [...props.value] : props.items ? [...props.items] : [];
+  let itemsList = [...initialItems];
+  const dataKey = props.dataKey || "id";
+  const isCheckbox = !!props.checkbox;
+  const isFilter = !!props.filter;
+  const filterBy = props.filterBy || props.filterFields && props.filterFields[0] || "name";
+  const filterPlaceholder = props.filterPlaceholder || "Filter by name";
+  const scrollHeight = props.scrollHeight || "20rem";
+  const emptyMessage = props.emptyMessage || "No available options";
+  let selectedIds = /* @__PURE__ */ new Set();
+  let filterQuery = "";
+  function getItemId(item, fallbackIndex) {
+    const keyVal = item[dataKey] || item.id || item.title || item.name;
+    return keyVal != null ? String(keyVal) : String(fallbackIndex);
+  }
+  function getItemTitle(item) {
+    return item.title || item.name || "";
+  }
+  function renderCellContent(item, index, isSelected) {
+    const checkboxHtml = isCheckbox ? `
+            <div class="p-checkbox-box ${isSelected ? "p-checked" : ""}" role="checkbox" aria-checked="${isSelected}">
+                ${isSelected ? LucideIcons.check : ""}
+            </div>
+        ` : "";
+    if (item.price != null || item.category != null || item.image != null) {
+      return `
+                ${checkboxHtml}
+                <div class="p-orderlist-product-item">
+                    <div class="p-orderlist-product-img">
+                        ${LucideIcons.package}
+                    </div>
+                    <div class="p-orderlist-product-details">
+                        <span class="p-orderlist-product-name">${getItemTitle(item)}</span>
+                        <span class="p-orderlist-product-category">${item.category || ""}</span>
+                    </div>
+                    ${item.price != null ? `<span class="p-orderlist-product-price">$${item.price}</span>` : ""}
+                </div>
+            `;
+    }
+    return `
+            ${checkboxHtml}
+            <span class="p-orderlist-index">${index + 1}</span>
+            <span style="flex: 1; font-weight: ${isSelected ? "600" : "normal"}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                ${getItemTitle(item)}
+            </span>
+        `;
+  }
+  function buildShell() {
+    const headerHtml = props.header ? `
+            <div class="p-orderlist-header">
+                <span>${props.header}</span>
+            </div>
+        ` : "";
+    const filterHtml = isFilter ? `
+            <div class="p-orderlist-filter-container">
+                <input type="text" class="p-orderlist-filter-input" placeholder="${filterPlaceholder}" />
+                <span class="p-orderlist-filter-icon">${LucideIcons.search}</span>
+            </div>
+        ` : "";
     container.innerHTML = `
-            <div class="laughtale-orderlist" style="display: flex; align-items: center; gap: 1rem; width: 100%; max-width: 480px; font-family: var(--p-font-family, inherit);">
-                <!-- Reorder Controls -->
-                <div style="display: flex; flex-direction: column; gap: 0.35rem;">
-                    <button type="button" class="btn-order-top p-button p-button-secondary" style="padding: 0.45rem; justify-content: center;" title="Move to Top">\u21C8</button>
-                    <button type="button" class="btn-order-up p-button p-button-secondary" style="padding: 0.45rem; justify-content: center;" title="Move Up">\u2191</button>
-                    <button type="button" class="btn-order-down p-button p-button-secondary" style="padding: 0.45rem; justify-content: center;" title="Move Down">\u2193</button>
-                    <button type="button" class="btn-order-bottom p-button p-button-secondary" style="padding: 0.45rem; justify-content: center;" title="Move to Bottom">\u21CA</button>
+            <div class="p-orderlist p-component">
+                <!-- Reorder Action Buttons (Left) -->
+                <div class="p-orderlist-controls">
+                    <button type="button" class="p-orderlist-control-btn btn-order-top" title="Move to Top" aria-label="Move to Top" disabled>
+                        ${LucideIcons.chevronsUp}
+                    </button>
+                    <button type="button" class="p-orderlist-control-btn btn-order-up" title="Move Up" aria-label="Move Up" disabled>
+                        ${LucideIcons.chevronUp}
+                    </button>
+                    <button type="button" class="p-orderlist-control-btn btn-order-down" title="Move Down" aria-label="Move Down" disabled>
+                        ${LucideIcons.chevronDown}
+                    </button>
+                    <button type="button" class="p-orderlist-control-btn btn-order-bottom" title="Move to Bottom" aria-label="Move to Bottom" disabled>
+                        ${LucideIcons.chevronsDown}
+                    </button>
                 </div>
 
-                <!-- Items List Box -->
-                <div style="flex: 1; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); background: var(--p-surface-0); overflow: hidden; display: flex; flex-direction: column;">
-                    ${props.header ? `<div style="padding: 0.625rem 0.875rem; background: var(--p-surface-50); border-bottom: 1px solid var(--p-border-color); font-size: 0.75rem; font-weight: 700; color: var(--p-surface-600); text-transform: uppercase;">${props.header}</div>` : ""}
-                    <div class="orderlist-items-container" style="max-height: 220px; overflow-y: auto; padding: 0.25rem 0;">
-                        ${items.map((it2, idx) => `
-                            <div class="orderlist-item ${selectedIndex === idx ? "active" : ""}" data-index="${idx}" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.875rem; cursor: pointer; font-size: 0.8125rem; background: ${selectedIndex === idx ? "var(--p-primary-50)" : "transparent"}; color: ${selectedIndex === idx ? "var(--p-primary-700)" : "var(--p-text-color)"}; font-weight: ${selectedIndex === idx ? "600" : "normal"}; transition: all 0.15s ease;">
-                                <span>${it2.name}</span>
-                                <span style="font-family: monospace; font-size: 0.6875rem; color: var(--p-surface-400);">#${idx + 1}</span>
-                            </div>
-                        `).join("")}
+                <!-- List Box (Right) -->
+                <div class="p-orderlist-list-container">
+                    ${headerHtml}
+                    ${filterHtml}
+                    <ul class="p-orderlist-list" style="height: ${scrollHeight};" role="listbox" aria-multiselectable="true" tabindex="0">
+                    </ul>
+                    <div class="p-orderlist-footer">
+                        <span class="p-orderlist-selection-status">No selected item</span>
+                        ${isFilter ? `<span class="p-orderlist-results-status" style="font-size: 0.6875rem; color: var(--p-surface-400);">0 results available</span>` : ""}
                     </div>
                 </div>
             </div>
         `;
-    const itemsEl = container.querySelector(".orderlist-items-container");
-    useAutoAnimate(itemsEl, { duration: 200 });
-    bindEvents();
+    const listEl = container.querySelector(".p-orderlist-list");
+    if (listEl) useAutoAnimate(listEl, { duration: 180 });
+    bindPermanentEvents();
+    updateList();
+    updateButtons();
   }
-  function bindEvents() {
-    container.querySelectorAll(".orderlist-item").forEach((el) => {
-      el.addEventListener("click", () => {
-        selectedIndex = Number(el.getAttribute("data-index"));
-        render();
+  function updateList() {
+    const rootEl = container.firstElementChild;
+    if (!rootEl) return;
+    const filteredItems = itemsList.filter((item, idx) => {
+      if (!isFilter || !filterQuery.trim()) return true;
+      const targetVal = String(item[filterBy] || item.title || item.name || "").toLowerCase();
+      return targetVal.includes(filterQuery.toLowerCase());
+    });
+    const resultsEl = rootEl.querySelector(".p-orderlist-results-status");
+    if (resultsEl) {
+      resultsEl.textContent = `${filteredItems.length} results are available`;
+    }
+    const statusEl = rootEl.querySelector(".p-orderlist-selection-status");
+    if (statusEl) {
+      statusEl.textContent = selectedIds.size > 0 ? `${selectedIds.size} items selected` : "No selected item";
+    }
+    const listUl = rootEl.querySelector(".p-orderlist-list");
+    if (listUl) {
+      if (filteredItems.length === 0) {
+        listUl.innerHTML = `<li class="p-orderlist-empty">${filterQuery ? "No results found" : emptyMessage}</li>`;
+      } else {
+        listUl.innerHTML = filteredItems.map((item, idx) => {
+          const id = getItemId(item, idx);
+          const isSelected = selectedIds.has(id);
+          return `
+                        <li class="p-orderlist-item ${isSelected ? "p-highlight" : ""}" 
+                            data-id="${id}" 
+                            data-index="${idx}"
+                            role="option" 
+                            aria-selected="${isSelected}">
+                            ${renderCellContent(item, idx, isSelected)}
+                        </li>
+                    `;
+        }).join("");
+        listUl.querySelectorAll(".p-orderlist-item").forEach((el) => {
+          el.addEventListener("click", (e) => {
+            const id = el.getAttribute("data-id");
+            if (!id) return;
+            const mouseEvent = e;
+            if (isCheckbox || mouseEvent.ctrlKey || mouseEvent.metaKey) {
+              if (selectedIds.has(id)) selectedIds.delete(id);
+              else selectedIds.add(id);
+            } else {
+              if (selectedIds.has(id) && selectedIds.size === 1) {
+                selectedIds.clear();
+              } else {
+                selectedIds.clear();
+                selectedIds.add(id);
+              }
+            }
+            updateList();
+            updateButtons();
+            dispatchSelectionEvent();
+          });
+        });
+      }
+    }
+  }
+  function updateButtons() {
+    const rootEl = container.firstElementChild;
+    if (!rootEl) return;
+    const btnTop = rootEl.querySelector(".btn-order-top");
+    const btnUp = rootEl.querySelector(".btn-order-up");
+    const btnDown = rootEl.querySelector(".btn-order-down");
+    const btnBottom = rootEl.querySelector(".btn-order-bottom");
+    const hasSelection = selectedIds.size > 0 && itemsList.length > 1;
+    if (btnTop) btnTop.disabled = !hasSelection;
+    if (btnUp) btnUp.disabled = !hasSelection;
+    if (btnDown) btnDown.disabled = !hasSelection;
+    if (btnBottom) btnBottom.disabled = !hasSelection;
+  }
+  function bindPermanentEvents() {
+    const rootEl = container.firstElementChild;
+    if (!rootEl) return;
+    const filterInput = rootEl.querySelector(".p-orderlist-filter-input");
+    if (filterInput) {
+      filterInput.addEventListener("input", (e) => {
+        filterQuery = e.target.value;
+        updateList();
+        updateButtons();
       });
+    }
+    rootEl.querySelector(".btn-order-top")?.addEventListener("click", () => {
+      reorder("top");
     });
-    container.querySelector(".btn-order-top")?.addEventListener("click", () => {
-      if (selectedIndex === null || selectedIndex <= 0) return;
-      const it2 = items.splice(selectedIndex, 1)[0];
-      items.unshift(it2);
-      selectedIndex = 0;
-      render();
-      syncValues();
+    rootEl.querySelector(".btn-order-up")?.addEventListener("click", () => {
+      reorder("up");
     });
-    container.querySelector(".btn-order-up")?.addEventListener("click", () => {
-      if (selectedIndex === null || selectedIndex <= 0) return;
-      const target = selectedIndex - 1;
-      const temp = items[target];
-      items[target] = items[selectedIndex];
-      items[selectedIndex] = temp;
-      selectedIndex = target;
-      render();
-      syncValues();
+    rootEl.querySelector(".btn-order-down")?.addEventListener("click", () => {
+      reorder("down");
     });
-    container.querySelector(".btn-order-down")?.addEventListener("click", () => {
-      if (selectedIndex === null || selectedIndex >= items.length - 1) return;
-      const target = selectedIndex + 1;
-      const temp = items[target];
-      items[target] = items[selectedIndex];
-      items[selectedIndex] = temp;
-      selectedIndex = target;
-      render();
-      syncValues();
+    rootEl.querySelector(".btn-order-bottom")?.addEventListener("click", () => {
+      reorder("bottom");
     });
-    container.querySelector(".btn-order-bottom")?.addEventListener("click", () => {
-      if (selectedIndex === null || selectedIndex >= items.length - 1) return;
-      const it2 = items.splice(selectedIndex, 1)[0];
-      items.push(it2);
-      selectedIndex = items.length - 1;
-      render();
-      syncValues();
-    });
+    const listUl = rootEl.querySelector(".p-orderlist-list");
+    if (listUl) {
+      listUl.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+          e.preventDefault();
+          navigateItems(e.key === "ArrowDown" ? 1 : -1, e.shiftKey);
+        } else if (e.key === " " || e.key === "Enter") {
+          e.preventDefault();
+        } else if (e.key === "a" && (e.ctrlKey || e.metaKey)) {
+          e.preventDefault();
+          itemsList.forEach((it2, idx) => selectedIds.add(getItemId(it2, idx)));
+          updateList();
+          updateButtons();
+          dispatchSelectionEvent();
+        }
+      });
+    }
   }
-  function syncValues() {
+  function navigateItems(delta, isShift) {
+    if (itemsList.length === 0) return;
+    let lastSelectedIdx = itemsList.findIndex((it2, idx) => selectedIds.has(getItemId(it2, idx)));
+    if (lastSelectedIdx === -1) lastSelectedIdx = delta > 0 ? -1 : itemsList.length;
+    const targetIdx = Math.max(0, Math.min(itemsList.length - 1, lastSelectedIdx + delta));
+    const targetId = getItemId(itemsList[targetIdx], targetIdx);
+    if (!isShift) selectedIds.clear();
+    selectedIds.add(targetId);
+    updateList();
+    updateButtons();
+    dispatchSelectionEvent();
+  }
+  function reorder(direction) {
+    if (selectedIds.size === 0 || itemsList.length < 2) return;
+    if (direction === "top") {
+      const selected = itemsList.filter((it2, idx) => selectedIds.has(getItemId(it2, idx)));
+      const remaining = itemsList.filter((it2, idx) => !selectedIds.has(getItemId(it2, idx)));
+      itemsList.length = 0;
+      itemsList.push(...selected, ...remaining);
+    } else if (direction === "bottom") {
+      const selected = itemsList.filter((it2, idx) => selectedIds.has(getItemId(it2, idx)));
+      const remaining = itemsList.filter((it2, idx) => !selectedIds.has(getItemId(it2, idx)));
+      itemsList.length = 0;
+      itemsList.push(...remaining, ...selected);
+    } else if (direction === "up") {
+      for (let i = 1; i < itemsList.length; i++) {
+        const curId = getItemId(itemsList[i], i);
+        const prevId = getItemId(itemsList[i - 1], i - 1);
+        if (selectedIds.has(curId) && !selectedIds.has(prevId)) {
+          const temp = itemsList[i];
+          itemsList[i] = itemsList[i - 1];
+          itemsList[i - 1] = temp;
+        }
+      }
+    } else if (direction === "down") {
+      for (let i = itemsList.length - 2; i >= 0; i--) {
+        const curId = getItemId(itemsList[i], i);
+        const nextId = getItemId(itemsList[i + 1], i + 1);
+        if (selectedIds.has(curId) && !selectedIds.has(nextId)) {
+          const temp = itemsList[i];
+          itemsList[i] = itemsList[i + 1];
+          itemsList[i + 1] = temp;
+        }
+      }
+    }
+    updateList();
+    updateButtons();
+    syncValues("reorder");
+  }
+  function dispatchSelectionEvent() {
+    container.dispatchEvent(new CustomEvent("orderlist:selection-change", {
+      bubbles: true,
+      detail: {
+        selection: Array.from(selectedIds)
+      }
+    }));
+  }
+  function syncValues(action = "change") {
     if (props.targetInputName) {
       let hidden = container.querySelector(`input[name="${props.targetInputName}"]`);
       if (!hidden) {
@@ -1427,14 +2923,14 @@ function OrderListIsland(container, props) {
         hidden.name = props.targetInputName;
         container.appendChild(hidden);
       }
-      hidden.value = JSON.stringify(items.map((it2) => it2.id));
+      hidden.value = JSON.stringify(itemsList.map((it2, idx) => getItemId(it2, idx)));
     }
     container.dispatchEvent(new CustomEvent("orderlist:change", {
       bubbles: true,
-      detail: { items }
+      detail: { value: itemsList, action }
     }));
   }
-  render();
+  buildShell();
   syncValues();
 }
 
@@ -1481,7 +2977,7 @@ function useClipboard(options = {}) {
 }
 
 // src/components/terminal.ts
-var CSS7 = `
+var CSS5 = `
 [data-theme="dark"] .laughtale-terminal {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -1504,7 +3000,7 @@ var CSS7 = `
 }
 `;
 function TerminalIsland(container, props) {
-  injectIslandStyle("terminal", CSS7);
+  injectIslandStyle("terminal", CSS5);
   const promptPrefix = props.prompt || "admin@softmax:~$";
   const welcome = props.welcomeMessage || 'Welcome to SoftMax.LaughTale CLI v3.0\nType "help" for available commands.';
   const commands = {
@@ -1605,7 +3101,7 @@ ${h.response}`).join("\n");
 }
 
 // src/components/blockui.ts
-var CSS8 = `
+var CSS6 = `
 [data-theme="dark"] .laughtale-blockui-root {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -1618,7 +3114,7 @@ var CSS8 = `
 }
 `;
 function BlockUIIsland(container, props) {
-  injectIslandStyle("blockui", CSS8);
+  injectIslandStyle("blockui", CSS6);
   let isBlocked = props.blocked ?? true;
   function render() {
     container.innerHTML = `
@@ -1643,91 +3139,701 @@ function BlockUIIsland(container, props) {
 }
 
 // src/components/split-button.ts
-var CSS9 = `
-[data-theme="dark"] .splitbutton-main-btn {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+var activeSplitButtonClose = null;
+var SPLITBUTTON_CSS = `
+.p-splitbutton {
+    display: inline-flex;
+    position: relative;
+    vertical-align: middle;
+    border-radius: var(--p-border-radius, 6px);
+    font-family: var(--p-font-family, inherit);
 }
-[data-theme="dark"] .splitbutton-menu-btn {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-splitbutton-fluid {
+    width: 100%;
+    display: flex;
 }
-[data-theme="dark"] .splitbutton-menu-overlay {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-splitbutton .p-splitbutton-button {
+    flex: 1 1 auto;
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
 }
-[data-theme="dark"] .splitbutton-menu-item {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-splitbutton .p-splitbutton-dropdown {
+    flex: 0 0 auto;
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+}
+
+/* Button Base & Severities */
+.p-splitbutton .p-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-family: inherit;
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1;
+    padding: 0.5rem 1rem;
+    border: 1px solid transparent;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
+    outline: none;
+    text-decoration: none;
+}
+
+.p-splitbutton-sm .p-button {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+}
+
+.p-splitbutton-lg .p-button {
+    padding: 0.75rem 1.25rem;
+    font-size: 1rem;
+}
+
+.p-splitbutton-rounded {
+    border-radius: 9999px !important;
+}
+.p-splitbutton-rounded .p-splitbutton-button {
+    border-top-left-radius: 9999px !important;
+    border-bottom-left-radius: 9999px !important;
+}
+.p-splitbutton-rounded .p-splitbutton-dropdown {
+    border-top-right-radius: 9999px !important;
+    border-bottom-right-radius: 9999px !important;
+}
+
+.p-splitbutton-raised {
+    box-shadow: 0 3px 4px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Solid Severities */
+.p-splitbutton .p-button-primary {
+    background: var(--p-primary-500, #10b981);
+    color: #ffffff;
+    border-color: var(--p-primary-500, #10b981);
+}
+.p-splitbutton .p-button-primary:hover:not(:disabled) {
+    background: var(--p-primary-600, #059669);
+    border-color: var(--p-primary-600, #059669);
+}
+
+.p-splitbutton .p-button-secondary {
+    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-surface-700, #334155);
+    border-color: var(--p-surface-200, #e2e8f0);
+}
+.p-splitbutton .p-button-secondary:hover:not(:disabled) {
+    background: var(--p-surface-200, #e2e8f0);
+    color: var(--p-surface-800, #1e293b);
+}
+
+.p-splitbutton .p-button-success {
+    background: #22c55e;
+    color: #ffffff;
+    border-color: #22c55e;
+}
+.p-splitbutton .p-button-success:hover:not(:disabled) {
+    background: #16a34a;
+    border-color: #16a34a;
+}
+
+.p-splitbutton .p-button-info {
+    background: #0ea5e9;
+    color: #ffffff;
+    border-color: #0ea5e9;
+}
+.p-splitbutton .p-button-info:hover:not(:disabled) {
+    background: #0284c7;
+    border-color: #0284c7;
+}
+
+.p-splitbutton .p-button-warn {
+    background: #f59e0b;
+    color: #ffffff;
+    border-color: #f59e0b;
+}
+.p-splitbutton .p-button-warn:hover:not(:disabled) {
+    background: #d97706;
+    border-color: #d97706;
+}
+
+.p-splitbutton .p-button-help {
+    background: #a855f7;
+    color: #ffffff;
+    border-color: #a855f7;
+}
+.p-splitbutton .p-button-help:hover:not(:disabled) {
+    background: #9333ea;
+    border-color: #9333ea;
+}
+
+.p-splitbutton .p-button-danger {
+    background: #ef4444;
+    color: #ffffff;
+    border-color: #ef4444;
+}
+.p-splitbutton .p-button-danger:hover:not(:disabled) {
+    background: #dc2626;
+    border-color: #dc2626;
+}
+
+.p-splitbutton .p-button-contrast {
+    background: #0f172a;
+    color: #ffffff;
+    border-color: #0f172a;
+}
+.p-splitbutton .p-button-contrast:hover:not(:disabled) {
+    background: #1e293b;
+    border-color: #1e293b;
+}
+
+/* Outlined Variant */
+.p-splitbutton-outlined .p-button-primary { background: transparent; color: var(--p-primary-500, #10b981); border-color: var(--p-primary-500, #10b981); }
+.p-splitbutton-outlined .p-button-primary:hover:not(:disabled) { background: rgba(16, 185, 129, 0.08); }
+.p-splitbutton-outlined .p-button-secondary { background: transparent; color: var(--p-surface-700, #334155); border-color: var(--p-surface-300, #cbd5e1); }
+.p-splitbutton-outlined .p-button-secondary:hover:not(:disabled) { background: var(--p-surface-100, #f1f5f9); }
+.p-splitbutton-outlined .p-button-success { background: transparent; color: #22c55e; border-color: #22c55e; }
+.p-splitbutton-outlined .p-button-success:hover:not(:disabled) { background: rgba(34, 197, 94, 0.08); }
+.p-splitbutton-outlined .p-button-info { background: transparent; color: #0ea5e9; border-color: #0ea5e9; }
+.p-splitbutton-outlined .p-button-info:hover:not(:disabled) { background: rgba(14, 165, 233, 0.08); }
+.p-splitbutton-outlined .p-button-warn { background: transparent; color: #f59e0b; border-color: #f59e0b; }
+.p-splitbutton-outlined .p-button-warn:hover:not(:disabled) { background: rgba(245, 158, 11, 0.08); }
+.p-splitbutton-outlined .p-button-help { background: transparent; color: #a855f7; border-color: #a855f7; }
+.p-splitbutton-outlined .p-button-help:hover:not(:disabled) { background: rgba(168, 85, 247, 0.08); }
+.p-splitbutton-outlined .p-button-danger { background: transparent; color: #ef4444; border-color: #ef4444; }
+.p-splitbutton-outlined .p-button-danger:hover:not(:disabled) { background: rgba(239, 68, 68, 0.08); }
+.p-splitbutton-outlined .p-button-contrast { background: transparent; color: #0f172a; border-color: #0f172a; }
+.p-splitbutton-outlined .p-button-contrast:hover:not(:disabled) { background: rgba(15, 23, 42, 0.08); }
+
+.p-splitbutton-outlined .p-splitbutton-button {
+    border-right: none !important;
+}
+
+/* Text Variant */
+.p-splitbutton-text .p-button { 
+    background: transparent !important; 
+    border-color: transparent !important; 
+    box-shadow: none !important;
+}
+.p-splitbutton-text .p-button-primary { color: var(--p-primary-500, #10b981) !important; }
+.p-splitbutton-text .p-button-primary:hover:not(:disabled),
+.p-splitbutton-text .p-button-primary[aria-expanded="true"] { background: rgba(16, 185, 129, 0.1) !important; }
+
+.p-splitbutton-text .p-button-secondary { color: var(--p-surface-700, #334155) !important; }
+.p-splitbutton-text .p-button-secondary:hover:not(:disabled),
+.p-splitbutton-text .p-button-secondary[aria-expanded="true"] { background: var(--p-surface-200, #e2e8f0) !important; }
+
+.p-splitbutton-text .p-button-success { color: #22c55e !important; }
+.p-splitbutton-text .p-button-success:hover:not(:disabled),
+.p-splitbutton-text .p-button-success[aria-expanded="true"] { background: rgba(34, 197, 94, 0.1) !important; }
+
+.p-splitbutton-text .p-button-info { color: #0ea5e9 !important; }
+.p-splitbutton-text .p-button-info:hover:not(:disabled),
+.p-splitbutton-text .p-button-info[aria-expanded="true"] { background: rgba(14, 165, 233, 0.1) !important; }
+
+.p-splitbutton-text .p-button-warn { color: #f59e0b !important; }
+.p-splitbutton-text .p-button-warn:hover:not(:disabled),
+.p-splitbutton-text .p-button-warn[aria-expanded="true"] { background: rgba(245, 158, 11, 0.1) !important; }
+
+.p-splitbutton-text .p-button-help { color: #a855f7 !important; }
+.p-splitbutton-text .p-button-help:hover:not(:disabled),
+.p-splitbutton-text .p-button-help[aria-expanded="true"] { background: rgba(168, 85, 247, 0.1) !important; }
+
+.p-splitbutton-text .p-button-danger { color: #ef4444 !important; }
+.p-splitbutton-text .p-button-danger:hover:not(:disabled),
+.p-splitbutton-text .p-button-danger[aria-expanded="true"] { background: rgba(239, 68, 68, 0.1) !important; }
+
+.p-splitbutton-text .p-button-contrast { color: #0f172a !important; }
+.p-splitbutton-text .p-button-contrast:hover:not(:disabled),
+.p-splitbutton-text .p-button-contrast[aria-expanded="true"] { background: rgba(15, 23, 42, 0.1) !important; }
+
+/* Divider separator in solid buttons */
+.p-splitbutton:not(.p-splitbutton-outlined):not(.p-splitbutton-text) .p-splitbutton-dropdown {
+    border-left: 1px solid rgba(255, 255, 255, 0.25) !important;
+}
+.p-splitbutton:not(.p-splitbutton-outlined):not(.p-splitbutton-text) .p-button-secondary.p-splitbutton-dropdown {
+    border-left: 1px solid var(--p-surface-300, #cbd5e1) !important;
+}
+
+/* Disabled */
+.p-splitbutton-disabled,
+.p-splitbutton .p-button:disabled {
+    opacity: 0.6 !important;
+    cursor: not-allowed !important;
+    pointer-events: none !important;
+}
+
+/* Menu Overlay */
+.p-splitbutton-menu {
+    position: absolute;
+    right: 0 !important;
+    left: auto !important;
+    z-index: 1050;
+    min-width: 100%;
+    width: max-content;
+    background: var(--p-surface-0, #ffffff);
+    border: 1px solid var(--p-surface-200, #e2e8f0);
+    border-radius: var(--p-border-radius, 8px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    padding: 0.35rem;
+    outline: none;
+    transform-origin: top right;
+    transition: opacity 0.15s cubic-bezier(0.16, 1, 0.3, 1), transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.p-splitbutton-menu.p-menu-flipped {
+    transform-origin: bottom right;
+}
+
+.p-splitbutton-menu .p-menu-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.p-splitbutton-menu .p-menu-item {
+    position: relative;
+    border-radius: calc(var(--p-border-radius, 6px) - 2px);
+}
+
+.p-splitbutton-menu .p-menu-item-link {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.5rem 0.75rem;
+    color: var(--p-surface-700, #334155);
+    border-radius: inherit;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    user-select: none;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    outline: none;
+}
+
+.p-splitbutton-menu .p-menu-item-link:hover,
+.p-splitbutton-menu .p-menu-item.p-menu-active > .p-menu-item-link,
+.p-splitbutton-menu .p-menu-item.p-focus > .p-menu-item-link {
+    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-surface-900, #0f172a);
+}
+
+.p-splitbutton-menu .p-menu-item-link[aria-disabled="true"] {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.p-splitbutton-menu .p-menu-item-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--p-surface-500, #64748b);
+}
+
+.p-splitbutton-menu .p-menu-item-link:hover .p-menu-item-icon,
+.p-splitbutton-menu .p-menu-item.p-menu-active > .p-menu-item-link .p-menu-item-icon {
+    color: var(--p-surface-700, #334155);
+}
+
+.p-splitbutton-menu .p-submenu-icon {
+    margin-left: auto;
+    display: inline-flex;
+    color: var(--p-surface-400, #94a3b8);
+}
+
+.p-splitbutton-menu .p-menu-separator {
+    height: 1px;
+    background: var(--p-surface-200, #e2e8f0);
+    margin: 0.25rem 0;
+}
+
+/* Submenu Flyout Overlay */
+.p-splitbutton-submenu-overlay {
+    position: absolute;
+    top: 0;
+    left: calc(100% + 2px);
+    z-index: 1060;
+    min-width: 11.5rem;
+    background: var(--p-surface-0, #ffffff);
+    border: 1px solid var(--p-surface-200, #e2e8f0);
+    border-radius: var(--p-border-radius, 8px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    padding: 0.35rem;
+    list-style: none;
+    margin: 0;
+    display: none;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.p-splitbutton-submenu-overlay.p-submenu-flipped {
+    left: auto;
+    right: calc(100% + 2px);
+}
+
+.p-menu-item.p-submenu-open > .p-splitbutton-submenu-overlay {
+    display: flex !important;
+}
+
+/* Dark Mode Overrides */
+.dark .p-splitbutton-menu,
+.dark .p-splitbutton-submenu-overlay,
+[data-theme="dark"] .p-splitbutton-menu,
+[data-theme="dark"] .p-splitbutton-submenu-overlay {
+    background: var(--p-surface-900, #0f172a) !important;
+    border-color: var(--p-surface-700, #334155) !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4) !important;
+}
+
+.dark .p-splitbutton-menu .p-menu-item-link,
+[data-theme="dark"] .p-splitbutton-menu .p-menu-item-link {
+    color: var(--p-surface-200, #e2e8f0) !important;
+}
+
+.dark .p-splitbutton-menu .p-menu-item-link:hover,
+.dark .p-splitbutton-menu .p-menu-item.p-menu-active > .p-menu-item-link,
+.dark .p-splitbutton-menu .p-menu-item.p-focus > .p-menu-item-link,
+[data-theme="dark"] .p-splitbutton-menu .p-menu-item-link:hover,
+[data-theme="dark"] .p-splitbutton-menu .p-menu-item.p-menu-active > .p-menu-item-link,
+[data-theme="dark"] .p-splitbutton-menu .p-menu-item.p-focus > .p-menu-item-link {
+    background: var(--p-surface-800, #1e293b) !important;
+    color: #ffffff !important;
+}
+
+.dark .p-splitbutton-menu .p-menu-separator,
+[data-theme="dark"] .p-splitbutton-menu .p-menu-separator {
+    background: var(--p-surface-700, #334155) !important;
+}
+
+.dark .p-splitbutton-text .p-button-contrast,
+[data-theme="dark"] .p-splitbutton-text .p-button-contrast {
+    color: var(--p-surface-0, #ffffff) !important;
+}
+.dark .p-splitbutton-text .p-button-contrast:hover:not(:disabled),
+.dark .p-splitbutton-text .p-button-contrast[aria-expanded="true"],
+[data-theme="dark"] .p-splitbutton-text .p-button-contrast:hover:not(:disabled),
+[data-theme="dark"] .p-splitbutton-text .p-button-contrast[aria-expanded="true"] {
+    background: rgba(255, 255, 255, 0.1) !important;
 }
 `;
 function SplitButtonIsland(container, props) {
-  injectIslandStyle("split-button", CSS9);
-  const label = props.label || "Save";
-  const items = props.model || [
-    { label: "Update & Sync", icon: "refresh-cw", action: "update" },
-    { label: "Export as Encrypted JSON", icon: "download", action: "export" },
-    { label: "Delete Record", icon: "trash", action: "delete" }
-  ];
+  injectIslandStyle("split-button", SPLITBUTTON_CSS);
+  const label = props.label || "";
+  const icon = props.icon || "";
+  const dropdownIcon = props.dropdownIcon || "chevronDown";
+  const items = props.model || [];
+  const severity = (props.severity || "primary").toLowerCase();
+  const raised = !!props.raised;
+  const rounded = !!props.rounded;
+  const text = !!props.text;
+  const outlined = !!props.outlined;
+  const size = props.size || "normal";
+  const disabled = !!props.disabled;
+  const fluid = !!props.fluid;
+  let isOpen = false;
+  const menuId = `sb_menu_${Math.random().toString(36).substring(2, 9)}`;
+  const rootClasses = ["p-splitbutton", "p-component"];
+  if (rounded) rootClasses.push("p-splitbutton-rounded");
+  if (raised) rootClasses.push("p-splitbutton-raised");
+  if (text) rootClasses.push("p-splitbutton-text");
+  if (outlined) rootClasses.push("p-splitbutton-outlined");
+  if (size === "small") rootClasses.push("p-splitbutton-sm");
+  if (size === "large") rootClasses.push("p-splitbutton-lg");
+  if (fluid) rootClasses.push("p-splitbutton-fluid");
+  if (disabled) rootClasses.push("p-splitbutton-disabled");
+  const btnSevClass = `p-button-${severity}`;
+  const initialSlotContent = container.innerHTML.trim();
+  const hasCustomSlot = initialSlotContent && !initialSlotContent.startsWith('<div class="p-splitbutton');
+  function renderSubmenuTree(subItems) {
+    return `
+            <ul class="p-splitbutton-submenu-overlay p-menu-list" role="menu">
+                ${subItems.map((item, idx) => renderMenuItem(item, idx, true)).join("")}
+            </ul>
+        `;
+  }
+  function renderMenuItem(item, index, isSub = false) {
+    if (item.separator) {
+      return `<li class="p-menu-separator" role="separator"></li>`;
+    }
+    const hasSub = Array.isArray(item.items) && item.items.length > 0;
+    const iconSvg = item.icon ? `<span class="p-menu-item-icon">${LucideIcons[item.icon]}</span>` : "";
+    const subChevron = hasSub ? `<span class="p-submenu-icon">${LucideIcons.chevronRight}</span>` : "";
+    const itemLabel = item.label || "";
+    const itemDisabled = item.disabled ? 'aria-disabled="true"' : "";
+    const itemUrl = item.url || (item.route ? item.route : "");
+    return `
+            <li class="p-menu-item ${hasSub ? "p-menu-item-has-submenu" : ""}" role="none" data-index="${index}">
+                <a class="p-menu-item-link" 
+                   role="menuitem" 
+                   tabindex="${item.disabled ? "-1" : "0"}" 
+                   ${itemDisabled}
+                   ${itemUrl ? `href="${itemUrl}"` : ""}
+                   ${item.target ? `target="${item.target}"` : ""}>
+                    ${iconSvg}
+                    <span class="p-menu-item-label">${itemLabel}</span>
+                    ${subChevron}
+                </a>
+                ${hasSub ? renderSubmenuTree(item.items) : ""}
+            </li>
+        `;
+  }
+  const mainButtonContent = hasCustomSlot ? initialSlotContent : `${icon ? `<span class="p-button-icon">${LucideIcons[icon]}</span>` : ""}${label ? `<span class="p-button-label">${label}</span>` : ""}`;
   container.innerHTML = `
-        <div class="laughtale-splitbutton" style="position: relative; display: inline-flex; border-radius: var(--p-border-radius); overflow: visible; font-family: var(--p-font-family, inherit);">
-            <!-- Primary Action Button -->
-            <button type="button" class="splitbutton-main-btn p-button p-button-primary" style="border-top-right-radius: 0; border-bottom-right-radius: 0; border-right: 1px solid rgba(255,255,255,0.2);">
-                ${label}
+        <div class="${rootClasses.join(" ")}">
+            <!-- Main Default Action Button -->
+            <button type="button" 
+                    class="p-splitbutton-button p-button ${btnSevClass}" 
+                    ${disabled ? "disabled" : ""} 
+                    aria-label="${label || "SplitButton Action"}">
+                ${mainButtonContent}
             </button>
 
             <!-- Dropdown Menu Trigger Button -->
-            <button type="button" class="splitbutton-menu-btn p-button p-button-primary" style="border-top-left-radius: 0; border-bottom-left-radius: 0; padding: 0.5rem 0.5rem; justify-content: center;">
-                <span class="splitbutton-chevron" style="display: flex;">${LucideIcons.chevronDown}</span>
+            <button type="button" 
+                    class="p-splitbutton-dropdown p-button p-button-icon-only ${btnSevClass}" 
+                    ${disabled ? "disabled" : ""} 
+                    aria-haspopup="menu" 
+                    aria-expanded="false" 
+                    aria-controls="${menuId}" 
+                    aria-label="More Options">
+                <span class="p-button-icon">${LucideIcons[dropdownIcon]}</span>
             </button>
 
-            <!-- Popover Menu -->
-            <div class="splitbutton-menu-overlay" style="display: none; position: absolute; top: calc(100% + 4px); right: 0; z-index: 500; background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); box-shadow: var(--p-shadow-lg); min-width: 180px; padding: 0.25rem 0;">
-                ${items.map((it2) => `
-                    <div class="splitbutton-menu-item" data-action="${it2.action || ""}" data-url="${it2.url || ""}" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.875rem; cursor: pointer; font-size: 0.8125rem; color: var(--p-text-color); transition: background 0.1s ease;">
-                        <span>${it2.label}</span>
-                    </div>
-                `).join("")}
+            <!-- Dropdown Menu Overlay -->
+            <div id="${menuId}" class="p-splitbutton-menu p-menu p-component" role="menu" style="display: none; opacity: 0; transform: scaleY(0.8);">
+                <ul class="p-menu-list" role="menu">
+                    ${items.map((it2, idx) => renderMenuItem(it2, idx)).join("")}
+                </ul>
             </div>
         </div>
     `;
-  const mainBtn = container.querySelector(".splitbutton-main-btn");
-  const menuBtn = container.querySelector(".splitbutton-menu-btn");
-  const overlay = container.querySelector(".splitbutton-menu-overlay");
-  const disclosure = useDisclosure({
-    defaultIsOpen: false,
-    onOpen: () => {
-      useTransition(overlay, { type: "fade", isMounted: true });
-    },
-    onClose: () => {
-      useTransition(overlay, { type: "fade", isMounted: false });
+  const rootEl = container.firstElementChild;
+  const mainBtn = rootEl.querySelector(".p-splitbutton-button");
+  const dropdownBtn = rootEl.querySelector(".p-splitbutton-dropdown");
+  const menuEl = rootEl.querySelector(".p-splitbutton-menu");
+  function closeAllSubmenus(scopeList) {
+    const target = scopeList || menuEl;
+    target.querySelectorAll(".p-menu-item.p-submenu-open").forEach((openLi) => {
+      openLi.classList.remove("p-submenu-open", "p-menu-active");
+    });
+  }
+  function closeMenu() {
+    if (!isOpen) return;
+    isOpen = false;
+    if (activeSplitButtonClose === closeMenu) {
+      activeSplitButtonClose = null;
     }
-  });
-  useClickOutside(container, () => disclosure.close());
+    dropdownBtn.setAttribute("aria-expanded", "false");
+    menuEl.style.opacity = "0";
+    menuEl.style.transform = "scaleY(0.8)";
+    closeAllSubmenus();
+    setTimeout(() => {
+      if (!isOpen) {
+        menuEl.style.display = "none";
+      }
+    }, 150);
+  }
+  function openMenu() {
+    if (disabled || items.length === 0 || isOpen) return;
+    if (activeSplitButtonClose && activeSplitButtonClose !== closeMenu) {
+      activeSplitButtonClose();
+    }
+    activeSplitButtonClose = closeMenu;
+    isOpen = true;
+    dropdownBtn.setAttribute("aria-expanded", "true");
+    menuEl.style.display = "block";
+    const rect = rootEl.getBoundingClientRect();
+    const menuHeight = menuEl.offsetHeight || 200;
+    const fitsBelow = rect.bottom + menuHeight + 10 <= window.innerHeight;
+    if (fitsBelow) {
+      menuEl.classList.remove("p-menu-flipped");
+      menuEl.style.top = "calc(100% + 4px)";
+      menuEl.style.bottom = "auto";
+      menuEl.style.right = "0";
+    } else {
+      menuEl.classList.add("p-menu-flipped");
+      menuEl.style.top = "auto";
+      menuEl.style.bottom = "calc(100% + 4px)";
+      menuEl.style.right = "0";
+    }
+    requestAnimationFrame(() => {
+      menuEl.style.opacity = "1";
+      menuEl.style.transform = "scaleY(1)";
+    });
+    const firstLink = menuEl.querySelector('.p-menu-item-link:not([aria-disabled="true"])');
+    firstLink?.focus();
+  }
+  function toggleMenu() {
+    if (isOpen) closeMenu();
+    else openMenu();
+  }
   mainBtn.addEventListener("click", () => {
+    if (disabled) return;
     container.dispatchEvent(new CustomEvent("splitbutton:click", {
       bubbles: true,
-      detail: { action: "main" }
+      detail: { action: props.action || "main", label }
     }));
   });
-  menuBtn.addEventListener("click", () => {
-    disclosure.toggle();
+  dropdownBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    toggleMenu();
   });
-  container.querySelectorAll(".splitbutton-menu-item").forEach((itemEl) => {
-    itemEl.addEventListener("click", () => {
-      const action = itemEl.getAttribute("data-action");
-      const url = itemEl.getAttribute("data-url");
-      if (url) window.location.href = url;
-      container.dispatchEvent(new CustomEvent("splitbutton:item-click", {
-        bubbles: true,
-        detail: { action }
-      }));
-      disclosure.close();
+  document.addEventListener("click", (e) => {
+    if (isOpen && !rootEl.contains(e.target)) {
+      closeMenu();
+    }
+  });
+  function handleItemClick(itemData, e) {
+    if (itemData.disabled) return;
+    if (itemData.command) {
+      try {
+        const fn = new Function("item", itemData.command);
+        fn(itemData);
+      } catch (err) {
+        console.error("SplitButton command execution error:", err);
+      }
+    }
+    if (itemData.url) {
+      if (itemData.target === "_blank") {
+        window.open(itemData.url, "_blank", "noopener,noreferrer");
+      } else {
+        window.location.href = itemData.url;
+      }
+    }
+    container.dispatchEvent(new CustomEvent("splitbutton:action", {
+      bubbles: true,
+      detail: { item: itemData, action: itemData.action || itemData.label }
+    }));
+    closeMenu();
+    dropdownBtn.focus();
+  }
+  function setupSubmenuHover(parentUl, itemsList) {
+    const directLis = Array.from(parentUl.children).filter((el) => el.classList.contains("p-menu-item"));
+    directLis.forEach((li, idx) => {
+      const itemData = itemsList[idx];
+      if (!itemData || itemData.separator) return;
+      const hasSub = Array.isArray(itemData.items) && itemData.items.length > 0;
+      const link = li.querySelector(":scope > .p-menu-item-link");
+      const subOverlay = li.querySelector(":scope > .p-splitbutton-submenu-overlay");
+      li.addEventListener("mouseenter", () => {
+        directLis.forEach((sibling) => {
+          if (sibling !== li) {
+            sibling.classList.remove("p-submenu-open", "p-menu-active");
+          }
+        });
+        if (hasSub && subOverlay) {
+          li.classList.add("p-submenu-open", "p-menu-active");
+          const liRect = li.getBoundingClientRect();
+          const subWidth = subOverlay.offsetWidth || 180;
+          if (liRect.right + subWidth > window.innerWidth) {
+            subOverlay.classList.add("p-submenu-flipped");
+          } else {
+            subOverlay.classList.remove("p-submenu-flipped");
+          }
+        } else {
+          li.classList.add("p-menu-active");
+        }
+      });
+      link?.addEventListener("click", (e) => {
+        if (hasSub) {
+          e.preventDefault();
+          e.stopPropagation();
+          return;
+        }
+        handleItemClick(itemData, e);
+      });
+      if (hasSub && subOverlay) {
+        setupSubmenuHover(subOverlay, itemData.items);
+      }
     });
+  }
+  const rootList = menuEl.querySelector(":scope > .p-menu-list");
+  if (rootList) {
+    setupSubmenuHover(rootList, items);
+  }
+  dropdownBtn.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === " " || e.key === "Enter") {
+      e.preventDefault();
+      openMenu();
+    }
+  });
+  menuEl.addEventListener("keydown", (e) => {
+    const activeEl = document.activeElement;
+    const currentLink = activeEl?.closest(".p-menu-item-link");
+    const currentLi = currentLink?.closest(".p-menu-item");
+    const activeList = currentLi?.closest("ul");
+    if (e.key === "Escape") {
+      e.preventDefault();
+      const parentSubmenu = currentLi?.closest(".p-splitbutton-submenu-overlay");
+      if (parentSubmenu) {
+        const parentLi = parentSubmenu.closest(".p-menu-item");
+        parentLi?.classList.remove("p-submenu-open");
+        parentLi?.querySelector(":scope > .p-menu-item-link")?.focus();
+      } else {
+        closeMenu();
+        dropdownBtn.focus();
+      }
+      return;
+    }
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      const links = Array.from(activeList?.querySelectorAll(':scope > .p-menu-item > .p-menu-item-link:not([aria-disabled="true"])') || []);
+      const currentIndex = links.indexOf(currentLink);
+      const nextIndex = (currentIndex + 1) % links.length;
+      links[nextIndex]?.focus();
+      return;
+    }
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      const links = Array.from(activeList?.querySelectorAll(':scope > .p-menu-item > .p-menu-item-link:not([aria-disabled="true"])') || []);
+      const currentIndex = links.indexOf(currentLink);
+      const prevIndex = (currentIndex - 1 + links.length) % links.length;
+      links[prevIndex]?.focus();
+      return;
+    }
+    if (e.key === "ArrowRight") {
+      if (currentLi?.classList.contains("p-menu-item-has-submenu")) {
+        e.preventDefault();
+        currentLi.classList.add("p-submenu-open");
+        const firstSubLink = currentLi.querySelector('.p-splitbutton-submenu-overlay .p-menu-item-link:not([aria-disabled="true"])');
+        firstSubLink?.focus();
+      }
+      return;
+    }
+    if (e.key === "ArrowLeft") {
+      const parentSubmenu = currentLi?.closest(".p-splitbutton-submenu-overlay");
+      if (parentSubmenu) {
+        e.preventDefault();
+        const parentLi = parentSubmenu.closest(".p-menu-item");
+        parentLi?.classList.remove("p-submenu-open");
+        parentLi?.querySelector(":scope > .p-menu-item-link")?.focus();
+      }
+      return;
+    }
+    if (e.key === "Home") {
+      e.preventDefault();
+      const links = Array.from(activeList?.querySelectorAll(':scope > .p-menu-item > .p-menu-item-link:not([aria-disabled="true"])') || []);
+      links[0]?.focus();
+      return;
+    }
+    if (e.key === "End") {
+      e.preventDefault();
+      const links = Array.from(activeList?.querySelectorAll(':scope > .p-menu-item > .p-menu-item-link:not([aria-disabled="true"])') || []);
+      links[links.length - 1]?.focus();
+      return;
+    }
   });
 }
 
@@ -1814,9 +3920,11 @@ describe("SoftMax.LaughTale Dynamic Form & New Aura Components Suite", () => {
         { id: "2", name: "Second", order: 1 }
       ]
     });
+    const firstItem = container.querySelector(".p-orderlist-item");
+    firstItem.click();
     const downBtn = container.querySelector(".btn-order-down");
     downBtn.click();
-    const firstItemText = container.querySelector(".orderlist-item").textContent;
+    const firstItemText = container.querySelector(".p-orderlist-item").textContent;
     assert.ok(firstItemText.includes("Second"));
   });
   it("Terminal: executes command and outputs response", () => {

@@ -3,7 +3,7 @@ import {
   enableViewTransitions,
   initDirectives,
   initIslands
-} from "./chunk-4BU2DYWU.js";
+} from "./chunk-YAHXPFQ2.js";
 import "./chunk-J7IJRT66.js";
 import "./chunk-P6OQD35U.js";
 import "./chunk-ZFSVXRXK.js";
@@ -25,7 +25,7 @@ defineIsland("file-dropzone", () => import("./dropzone-OIJK5IJ7.js"));
 defineIsland("cascade-tree", () => import("./cascade-tree-K6NUHXUW.js"));
 defineIsland("event-broadcaster", () => import("./broadcaster-RCRIXWRP.js"));
 defineIsland("event-receiver", () => import("./receiver-CDILBIW3.js"));
-defineIsland("modal-dialog", () => import("./modal-dialog-VR3KQXWW.js"));
+defineIsland("modal-dialog", () => import("./modal-dialog-RO6FZ57E.js"));
 defineIsland("persistent-telemetry", () => import("./persistent-player-NCRVWT4M.js"));
 function initialize() {
   initIslands();
@@ -37,5 +37,5 @@ if (document.readyState === "loading") {
 } else {
   initialize();
 }
-console.log("[SoftMax.LaughTale] Docs client runtime initialized.");
+console.log("[SoftMax.LaughTale] Showcase initialized.");
 //# sourceMappingURL=main.js.map
