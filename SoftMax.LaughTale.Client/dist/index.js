@@ -3266,35 +3266,42 @@ var SoftMaxIslands = (() => {
       if (key === "check") return ICONS.check;
       return ICONS.checkCircle;
     }
+    function getColorHex(colorStr) {
+      if (!colorStr) return "#10b981";
+      const clean = colorStr.replace("!", "").trim();
+      if (COLOR_MAP[clean]) return COLOR_MAP[clean];
+      if (clean.startsWith("#") || clean.startsWith("rgb")) return clean;
+      return "#10b981";
+    }
     function renderMarker(item, isLast) {
       if (isInteractive) {
         const status = getStepStatus(item.id);
-        let btnClass = "width: 2.5rem; height: 2.5rem; border-radius: 9999px; display: inline-flex; align-items: center; justify-content: center; border: none; transition: all 0.2s ease;";
+        let btnStyle = "width: 2.5rem; height: 2.5rem; border-radius: 9999px; display: inline-flex; align-items: center; justify-content: center; border: none; transition: all 0.2s ease;";
         let iconHtml = "";
         if (status === "completed") {
-          btnClass += " background: #22c55e; color: #ffffff; cursor: default;";
+          btnStyle += " background: #22c55e; color: #ffffff; cursor: default;";
           iconHtml = ICONS.check;
         } else if (status === "current") {
-          btnClass += " background: var(--p-primary-500, #10b981); color: #ffffff; cursor: pointer; transform: scale(1.05);";
+          btnStyle += " background: var(--p-primary-500, #10b981); color: #ffffff; cursor: pointer; transform: scale(1.05);";
           iconHtml = getIconSvg(item.icon) || ICONS.userPlus;
         } else {
-          btnClass += " background: var(--p-surface-200, #e2e8f0); color: var(--p-surface-400, #94a3b8); cursor: not-allowed;";
+          btnStyle += " background: var(--p-surface-200, #e2e8f0); color: var(--p-surface-400, #94a3b8); cursor: not-allowed;";
           iconHtml = getIconSvg(item.icon) || ICONS.userPlus;
         }
         return `
                 <div class="p-timeline-event-marker ${status === "current" ? "p-timeline-pulse" : ""}">
-                    <button type="button" class="p-interactive-step-btn" data-step-id="${item.id}" style="${btnClass}" ${status !== "current" ? "disabled" : ""}>
+                    <button type="button" class="p-interactive-step-btn" data-step-id="${item.id}" style="${btnStyle}" ${status !== "current" ? "disabled" : ""}>
                         ${iconHtml}
                     </button>
                 </div>
             `;
       }
       if (isActivityFeed && item.user) {
-        const avatar = typeof item.user === "object" ? item.user.avatar : item.user;
-        const colorClass = typeof item.user === "object" && item.user.color ? item.user.color : "bg-primary/10 text-primary";
+        const avatar = typeof item.user === "object" ? item.user.avatar : item.id === "1" ? "SC" : item.id === "2" ? "AK" : item.id === "3" ? "MJ" : item.id === "4" ? "DP" : "EW";
+        const color = item.id === "1" ? "#8b5cf6" : item.id === "2" ? "#3b82f6" : item.id === "3" ? "#10b981" : item.id === "4" ? "#f59e0b" : "#f43f5e";
         return `
                 <div class="p-timeline-event-marker">
-                    <span class="p-timeline-avatar ${colorClass}">
+                    <span class="p-timeline-avatar" style="background: ${color};">
                         ${avatar}
                     </span>
                 </div>
@@ -3302,10 +3309,10 @@ var SoftMaxIslands = (() => {
       }
       if (item.color || item.icon) {
         const iconSvg = getIconSvg(item.icon);
-        const colorClass = item.color || "bg-emerald-500";
+        const colorHex = getColorHex(item.color);
         return `
                 <div class="p-timeline-event-marker">
-                    <span class="inline-flex items-center justify-center w-10 h-10 rounded-full text-white shadow-md ${colorClass}">
+                    <span style="display: inline-flex; align-items: center; justify-content: center; width: 2.75rem; height: 2.75rem; border-radius: 9999px; color: #ffffff; background: ${colorHex}; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
                         ${iconSvg}
                     </span>
                 </div>
@@ -3326,24 +3333,24 @@ var SoftMaxIslands = (() => {
             `;
       }
       if (item.date) {
-        return `<span>${item.date}</span>`;
+        return `<span style="font-size: 0.8125rem; color: var(--p-surface-500);">${item.date}</span>`;
       }
       if (item.time) {
-        return `<span style="white-space: nowrap;">${item.time}</span>`;
+        return `<span style="white-space: nowrap; font-size: 0.8125rem; color: var(--p-surface-500);">${item.time}</span>`;
       }
       return `&nbsp;`;
     }
     function renderContent(item) {
       if (typeof item === "string") {
-        return `<span style="font-size: 0.875rem; font-weight: 500;">${item}</span>`;
+        return `<span style="font-size: 0.875rem; font-weight: 600; color: var(--p-surface-800);">${item}</span>`;
       }
       if (isInteractive) {
         const status = getStepStatus(item.id);
         const isDone = status === "completed";
         const isCurr = status === "current";
         return `
-                <div style="padding: 0.75rem 1rem; border-radius: 8px; transition: all 0.2s ease; ${isDone ? "background: rgba(34, 197, 94, 0.08);" : isCurr ? "background: rgba(16, 185, 129, 0.08);" : "opacity: 0.5;"}">
-                    <p style="margin: 0; font-weight: 600; font-size: 0.875rem; ${isDone ? "color: #15803d; text-decoration: line-through;" : isCurr ? "color: var(--p-primary-600, #059669);" : "color: var(--p-surface-500);"}">
+                <div style="padding: 0.75rem 1rem; border-radius: 8px; transition: all 0.2s ease; ${isDone ? "background: rgba(34, 197, 94, 0.08);" : isCurr ? "background: rgba(16, 185, 129, 0.08);" : "opacity: 0.6;"}">
+                    <p style="margin: 0; font-weight: 600; font-size: 0.875rem; ${isDone ? "color: #15803d; text-decoration: line-through;" : isCurr ? "color: var(--p-primary-600, #059669);" : "color: var(--p-surface-600);"}">
                         ${item.label || item.status || item.title}
                     </p>
                     ${isCurr ? `<p style="font-size: 0.75rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Click the marker to complete</p>` : ""}
@@ -3397,7 +3404,7 @@ var SoftMaxIslands = (() => {
         return `
                 <div class="p-timeline-card">
                     <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
-                        ${item.user ? `<span class="p-timeline-avatar">${item.user}</span>` : ""}
+                        ${item.user ? `<span class="p-timeline-avatar" style="background: rgba(16, 185, 129, 0.12); color: var(--p-primary-600);">${item.user}</span>` : ""}
                         <span style="font-weight: 700; font-size: 0.9375rem; color: var(--p-surface-900);">${item.status || item.title}</span>
                     </div>
                     ${item.description ? `<p style="margin: 0; font-size: 0.875rem; color: var(--p-surface-600); line-height: 1.5;">${item.description}</p>` : ""}
@@ -3500,7 +3507,7 @@ var SoftMaxIslands = (() => {
     }
     render();
   }
-  var TIMELINE_CSS, ICONS;
+  var TIMELINE_CSS, ICONS, COLOR_MAP;
   var init_timeline = __esm({
     "src/components/timeline.ts"() {
       "use strict";
@@ -3519,8 +3526,9 @@ var SoftMaxIslands = (() => {
 
 .p-timeline-horizontal {
     flex-direction: row;
+    width: 100%;
     overflow-x: auto;
-    padding: 1rem 0;
+    padding: 1.5rem 0.5rem;
 }
 
 .p-timeline-event {
@@ -3603,46 +3611,56 @@ var SoftMaxIslands = (() => {
     margin-top: 0.25rem;
 }
 
-.p-timeline-event-connector {
+.p-timeline-vertical .p-timeline-event-connector {
     flex-grow: 1;
     width: 2px;
     background-color: var(--p-surface-200, #e2e8f0);
     margin: 0.25rem 0;
 }
 
-/* Horizontal layout styling */
+/* Horizontal layout styling with continuous locked axis */
 .p-timeline-horizontal .p-timeline-event {
     flex-direction: column;
     flex: 1;
     min-height: auto;
-    min-width: 9rem;
-    align-items: center;
+    min-width: 8rem;
+    align-items: stretch;
 }
 
 .p-timeline-horizontal .p-timeline-event-separator {
+    display: flex;
     flex-direction: row;
-    width: 100%;
     align-items: center;
-    justify-content: center;
+    width: 100%;
+    order: 2;
+    position: relative;
+    min-height: 1.5rem;
+}
+
+.p-timeline-horizontal .p-timeline-event-marker {
+    margin: 0 auto;
 }
 
 .p-timeline-horizontal .p-timeline-event-connector {
-    height: 2px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
     width: 100%;
-    margin: 0 0.25rem;
+    height: 2px;
+    background-color: var(--p-surface-300, #cbd5e1);
+    transform: translateY(-50%);
+    z-index: 1;
 }
 
 .p-timeline-horizontal .p-timeline-event-opposite,
 .p-timeline-horizontal .p-timeline-event-content {
     padding: 0.5rem 0.25rem;
     text-align: center !important;
+    min-height: 2rem;
 }
 
 .p-timeline-horizontal.p-timeline-top .p-timeline-event-opposite {
     order: 1;
-}
-.p-timeline-horizontal.p-timeline-top .p-timeline-event-separator {
-    order: 2;
 }
 .p-timeline-horizontal.p-timeline-top .p-timeline-event-content {
     order: 3;
@@ -3651,9 +3669,6 @@ var SoftMaxIslands = (() => {
 .p-timeline-horizontal.p-timeline-bottom .p-timeline-event-content {
     order: 1;
 }
-.p-timeline-horizontal.p-timeline-bottom .p-timeline-event-separator {
-    order: 2;
-}
 .p-timeline-horizontal.p-timeline-bottom .p-timeline-event-opposite {
     order: 3;
 }
@@ -3661,17 +3676,11 @@ var SoftMaxIslands = (() => {
 .p-timeline-horizontal.p-timeline-alternate .p-timeline-event:nth-child(even) .p-timeline-event-content {
     order: 1;
 }
-.p-timeline-horizontal.p-timeline-alternate .p-timeline-event:nth-child(even) .p-timeline-event-separator {
-    order: 2;
-}
 .p-timeline-horizontal.p-timeline-alternate .p-timeline-event:nth-child(even) .p-timeline-event-opposite {
     order: 3;
 }
 .p-timeline-horizontal.p-timeline-alternate .p-timeline-event:nth-child(odd) .p-timeline-event-opposite {
     order: 1;
-}
-.p-timeline-horizontal.p-timeline-alternate .p-timeline-event:nth-child(odd) .p-timeline-event-separator {
-    order: 2;
 }
 .p-timeline-horizontal.p-timeline-alternate .p-timeline-event:nth-child(odd) .p-timeline-event-content {
     order: 3;
@@ -3689,17 +3698,16 @@ var SoftMaxIslands = (() => {
 }
 
 .p-timeline-avatar {
-    width: 2rem;
-    height: 2rem;
+    width: 2.25rem;
+    height: 2.25rem;
     border-radius: 9999px;
-    background: rgba(16, 185, 129, 0.12);
-    color: var(--p-primary-600, #059669);
     font-weight: 700;
     font-size: 0.8125rem;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    color: #ffffff;
 }
 
 .p-timeline-pulse {
@@ -3708,7 +3716,7 @@ var SoftMaxIslands = (() => {
 
 @keyframes timelinePulse {
     0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: .75; transform: scale(1.08); }
+    50% { opacity: .85; transform: scale(1.08); }
 }
 
 /* Dark Mode Tokens */
@@ -3751,6 +3759,15 @@ var SoftMaxIslands = (() => {
         history: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>',
         refresh: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>',
         minus: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" x2="19" y1="12" y2="12"/></svg>'
+      };
+      COLOR_MAP = {
+        "bg-blue-500": "#3b82f6",
+        "bg-green-500": "#10b981",
+        "bg-orange-500": "#f97316",
+        "bg-lime-500": "#84cc16",
+        "bg-violet-500": "#8b5cf6",
+        "bg-amber-500": "#f59e0b",
+        "bg-rose-500": "#f43f5e"
       };
     }
   });
