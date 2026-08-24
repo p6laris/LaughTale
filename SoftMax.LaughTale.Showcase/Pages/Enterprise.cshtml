@@ -2752,17 +2752,114 @@
         </div>
     </section>
 
-    <!-- Timeline -->
+        <!-- Timeline -->
     <section id="sec-timeline" class="component-card">
         <div class="card-header">
             <div>
                 <h2>Timeline</h2>
-                <p>Chronological sequence visualizer with status badges and milestone markers.</p>
+                <p>Timeline displays a series of events in chronological sequence with customizable layouts, markers, and content cards.</p>
             </div>
             <span class="aura-tag tag-slate">History</span>
         </div>
-        <div class="card-body" style="max-width: 650px;">
-            <island-timeline events="@Model.AuditEvents" />
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Demo 1: Basic -->
+            <div class="demo-subcard">
+                <div class="demo-subcard-header">
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Basic</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Timeline receives the events with the value property as a collection of arbitrary objects.</p>
+                </div>
+                <div style="padding: 1.5rem; background: var(--p-surface-50); border: 1px solid var(--p-surface-200); border-radius: 8px; max-width: 400px;">
+                    <island-timeline value="@Model.TimelineBasicEvents" />
+                </div>
+            </div>
+
+            <!-- Demo 2: Alignment -->
+            <div class="demo-subcard">
+                <div class="demo-subcard-header">
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Alignment</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Content location relative to the line is defined with the align property (Left, Right, Alternate).</p>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; padding: 1.5rem; background: var(--p-surface-50); border: 1px solid var(--p-surface-200); border-radius: 8px;">
+                    <div style="background: var(--p-surface-0); padding: 1rem; border-radius: 8px; border: 1px solid var(--p-surface-200);">
+                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 1rem 0;">Left Align</h4>
+                        <island-timeline value="@Model.TimelineBasicEvents" align="left" />
+                    </div>
+                    <div style="background: var(--p-surface-0); padding: 1rem; border-radius: 8px; border: 1px solid var(--p-surface-200);">
+                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 1rem 0;">Right Align</h4>
+                        <island-timeline value="@Model.TimelineBasicEvents" align="right" />
+                    </div>
+                    <div style="background: var(--p-surface-0); padding: 1rem; border-radius: 8px; border: 1px solid var(--p-surface-200);">
+                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 1rem 0;">Alternate Align</h4>
+                        <island-timeline value="@Model.TimelineBasicEvents" align="alternate" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 3: Opposite -->
+            <div class="demo-subcard">
+                <div class="demo-subcard-header">
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Opposite</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Additional content at the other side of the line can be provided with the opposite slot / property.</p>
+                </div>
+                <div style="padding: 1.5rem; background: var(--p-surface-50); border: 1px solid var(--p-surface-200); border-radius: 8px; max-width: 500px;">
+                    <island-timeline value="@Model.TimelineOppositeEvents" />
+                </div>
+            </div>
+
+            <!-- Demo 4: Horizontal -->
+            <div class="demo-subcard">
+                <div class="demo-subcard-header">
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Horizontal</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Timeline orientation is controlled with the layout property, with top, bottom, and alternate alignment.</p>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 1.5rem; padding: 1.5rem; background: var(--p-surface-50); border: 1px solid var(--p-surface-200); border-radius: 8px;">
+                    <div style="background: var(--p-surface-0); padding: 1rem; border-radius: 8px; border: 1px solid var(--p-surface-200);">
+                        <span style="font-size: 0.75rem; font-weight: 700; color: var(--p-surface-500); text-transform: uppercase;">Top Align</span>
+                        <island-timeline value="@Model.TimelineHorizontalYears" layout="horizontal" align="top" />
+                    </div>
+                    <div style="background: var(--p-surface-0); padding: 1rem; border-radius: 8px; border: 1px solid var(--p-surface-200);">
+                        <span style="font-size: 0.75rem; font-weight: 700; color: var(--p-surface-500); text-transform: uppercase;">Bottom Align</span>
+                        <island-timeline value="@Model.TimelineHorizontalYears" layout="horizontal" align="bottom" />
+                    </div>
+                    <div style="background: var(--p-surface-0); padding: 1rem; border-radius: 8px; border: 1px solid var(--p-surface-200);">
+                        <span style="font-size: 0.75rem; font-weight: 700; color: var(--p-surface-500); text-transform: uppercase;">Alternate Align</span>
+                        <island-timeline value="@Model.TimelineHorizontalYears" layout="horizontal" align="alternate" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 5: Custom Order Tracking Cards -->
+            <div class="demo-subcard">
+                <div class="demo-subcard-header">
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Custom Content &amp; Markers</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Sample e-commerce order tracking implementation with custom styled markers, item breakdowns, and tracking tags.</p>
+                </div>
+                <div style="padding: 2rem 1rem; background: var(--p-surface-50); border: 1px solid var(--p-surface-200); border-radius: 8px;">
+                    <island-timeline value="@Model.TimelineCustomEvents" align="alternate" />
+                </div>
+            </div>
+
+            <!-- Demo 6: Interactive Step Workflow -->
+            <div class="demo-subcard">
+                <div class="demo-subcard-header">
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Interactive Workflow</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Build interactive step-based workflows with progress tracking, clickable pulsating markers, and state management.</p>
+                </div>
+                <div style="padding: 1.5rem; background: var(--p-surface-50); border: 1px solid var(--p-surface-200); border-radius: 8px; max-width: 600px;">
+                    <island-timeline value="@Model.TimelineInteractiveSteps" interactive="true" />
+                </div>
+            </div>
+
+            <!-- Demo 7: Activity Feed -->
+            <div class="demo-subcard">
+                <div class="demo-subcard-header">
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Activity Feed</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Display real-time activity streams with user avatars, branch pills, and commit details.</p>
+                </div>
+                <div style="padding: 1.5rem; background: var(--p-surface-50); border: 1px solid var(--p-surface-200); border-radius: 8px; max-width: 650px;">
+                    <island-timeline value="@Model.TimelineActivities" activity-feed="true" />
+                </div>
+            </div>
         </div>
     </section>
 

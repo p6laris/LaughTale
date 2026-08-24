@@ -1050,13 +1050,13 @@ function getSlot(container, name = "default") {
 
 // ../SoftMax.LaughTale.Client/src/index.ts
 defineIsland("stepper", () => import("./stepper-JGXFKGGY.js"));
-defineIsland("timeline", () => import("./timeline-AQZ4AYXL.js"));
+defineIsland("timeline", () => import("./timeline-ZRKCIBJ6.js"));
 defineIsland("camera", () => import("./camera-KAAHJRTE.js"));
 defineIsland("dropzone", () => import("./dropzone-E76UIQBF.js"));
 defineIsland("tree-select", () => import("./tree-select-3WADBRSW.js"));
 defineIsland("datatable", () => import("./datatable-FJYSSBES.js"));
 defineIsland("datagrid", () => import("./datatable-FJYSSBES.js"));
-defineIsland("modal", () => import("./modal-ZWQGHZ27.js"));
+defineIsland("modal", () => import("./modal-BLY3TOU7.js"));
 defineIsland("toast", () => import("./toast-WLFO7J5G.js"));
 defineIsland("input-number", () => import("./input-number-KQ2J2WMH.js"));
 defineIsland("input-otp", () => import("./input-otp-RUPMATZ7.js"));
@@ -1136,4 +1136,4 @@ export {
   enableViewTransitions,
   getSlot
 };
-//# sourceMappingURL=chunk-7FNQA5VG.js.map
+//# sourceMappingURL=chunk-IQ72I7L6.js.map

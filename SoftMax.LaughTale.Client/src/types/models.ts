@@ -21,13 +21,24 @@ export interface StepperStep {
 }
 
 export interface TimelineItem {
-    id: string;
-    title: string;
-    description: string;
-    timestamp: string | Date;
-    status?: TimelineStatus | string;
-    actor?: string;
+    id?: string | number;
+    status?: string;
+    label?: string;
+    title?: string;
+    description?: string;
+    date?: string;
+    time?: string;
+    timestamp?: string | Date;
+    opposite?: string;
     icon?: string;
+    color?: string;
+    user?: string | { name: string; avatar: string; color?: string };
+    details?: string[];
+    tracking?: string;
+    action?: string;
+    target?: string;
+    repo?: string;
+    actor?: string;
 }
 
 export interface DataGridCol<TItem = any> {

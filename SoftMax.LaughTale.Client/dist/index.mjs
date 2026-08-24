@@ -3196,71 +3196,533 @@ __export(timeline_exports, {
   default: () => TimelineIsland
 });
 function TimelineIsland(container, props) {
-  injectIslandStyle("timeline", CSS2);
-  const statusBadges = {
-    completed: { bg: "#ecfdf5", color: "#047857", border: "#a7f3d0", label: "Completed", dot: "#10b981" },
-    in_progress: { bg: "#eff6ff", color: "#1d4ed8", border: "#bfdbfe", label: "In Progress", dot: "#3b82f6" },
-    warning: { bg: "#fffbeb", color: "#b45309", border: "#fde68a", label: "Warning", dot: "#f59e0b" },
-    failed: { bg: "#fef2f2", color: "#b91c1c", border: "#fecaca", label: "Failed", dot: "#ef4444" }
-  };
-  const items = props.events.map((evt, idx) => {
-    const badge = statusBadges[evt.status] || statusBadges.completed;
-    const isLast = idx === props.events.length - 1;
+  injectIslandStyle("timeline", TIMELINE_CSS);
+  const rawEvents = props.value || props.events || [];
+  const align = props.align || "left";
+  const layout = props.layout || "vertical";
+  const isInteractive = !!props.interactive;
+  const isActivityFeed = !!props.activityFeed;
+  let completedSteps = [1];
+  let currentStep = 2;
+  function getStepStatus(stepId) {
+    if (completedSteps.includes(stepId)) return "completed";
+    if (stepId === currentStep) return "current";
+    return "pending";
+  }
+  function handleStepComplete(stepId) {
+    if (stepId === currentStep) {
+      completedSteps.push(stepId);
+      currentStep++;
+      render();
+    }
+  }
+  function handleReset() {
+    completedSteps = [1];
+    currentStep = 2;
+    render();
+  }
+  function getIconSvg(iconName) {
+    if (!iconName) return "";
+    const key = iconName.toLowerCase().replace(/[-_]/g, "");
+    if (key === "shoppingcart") return ICONS.shoppingCart;
+    if (key === "creditcard") return ICONS.creditCard;
+    if (key === "truck") return ICONS.truck;
+    if (key === "checkcircle") return ICONS.checkCircle;
+    if (key === "userplus") return ICONS.userPlus;
+    if (key === "envelope") return ICONS.envelope;
+    if (key === "idcard") return ICONS.idCard;
+    if (key === "shoppingbag") return ICONS.shoppingBag;
+    if (key === "star") return ICONS.star;
+    if (key === "box") return ICONS.box;
+    if (key === "check") return ICONS.check;
+    return ICONS.checkCircle;
+  }
+  function renderMarker(item, isLast) {
+    if (isInteractive) {
+      const status = getStepStatus(item.id);
+      let btnClass = "width: 2.5rem; height: 2.5rem; border-radius: 9999px; display: inline-flex; align-items: center; justify-content: center; border: none; transition: all 0.2s ease;";
+      let iconHtml = "";
+      if (status === "completed") {
+        btnClass += " background: #22c55e; color: #ffffff; cursor: default;";
+        iconHtml = ICONS.check;
+      } else if (status === "current") {
+        btnClass += " background: var(--p-primary-500, #10b981); color: #ffffff; cursor: pointer; transform: scale(1.05);";
+        iconHtml = getIconSvg(item.icon) || ICONS.userPlus;
+      } else {
+        btnClass += " background: var(--p-surface-200, #e2e8f0); color: var(--p-surface-400, #94a3b8); cursor: not-allowed;";
+        iconHtml = getIconSvg(item.icon) || ICONS.userPlus;
+      }
+      return `
+                <div class="p-timeline-event-marker ${status === "current" ? "p-timeline-pulse" : ""}">
+                    <button type="button" class="p-interactive-step-btn" data-step-id="${item.id}" style="${btnClass}" ${status !== "current" ? "disabled" : ""}>
+                        ${iconHtml}
+                    </button>
+                </div>
+            `;
+    }
+    if (isActivityFeed && item.user) {
+      const avatar = typeof item.user === "object" ? item.user.avatar : item.user;
+      const colorClass = typeof item.user === "object" && item.user.color ? item.user.color : "bg-primary/10 text-primary";
+      return `
+                <div class="p-timeline-event-marker">
+                    <span class="p-timeline-avatar ${colorClass}">
+                        ${avatar}
+                    </span>
+                </div>
+            `;
+    }
+    if (item.color || item.icon) {
+      const iconSvg = getIconSvg(item.icon);
+      const colorClass = item.color || "bg-emerald-500";
+      return `
+                <div class="p-timeline-event-marker">
+                    <span class="inline-flex items-center justify-center w-10 h-10 rounded-full text-white shadow-md ${colorClass}">
+                        ${iconSvg}
+                    </span>
+                </div>
+            `;
+    }
     return `
-            <div class="timeline-item" style="display: flex; gap: 1.25rem; position: relative;">
-                <!-- Vertical Line & Indicator Dot -->
-                <div style="display: flex; flex-direction: column; align-items: center;">
-                    <div style="width: 1.5rem; height: 1.5rem; border-radius: 50%; background: ${badge.bg}; border: 2px solid ${badge.dot}; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; z-index: 1;">
-                        ${evt.icon || "\u2022"}
-                    </div>
-                    ${!isLast ? `<div style="width: 2px; flex: 1; background: var(--p-surface-200); margin: 0.25rem 0;"></div>` : ""}
+            <div class="p-timeline-event-marker p-marker-default"></div>
+        `;
+  }
+  function renderOpposite(item) {
+    if (item.opposite) {
+      return `<span>${item.opposite}</span>`;
+    }
+    if (item.date && item.time) {
+      return `
+                <div style="font-weight: 600; color: var(--p-surface-800, #1e293b);">${item.date}</div>
+                <div style="font-size: 0.75rem; color: var(--p-surface-500, #64748b);">${item.time}</div>
+            `;
+    }
+    if (item.date) {
+      return `<span>${item.date}</span>`;
+    }
+    if (item.time) {
+      return `<span style="white-space: nowrap;">${item.time}</span>`;
+    }
+    return `&nbsp;`;
+  }
+  function renderContent(item) {
+    if (typeof item === "string") {
+      return `<span style="font-size: 0.875rem; font-weight: 500;">${item}</span>`;
+    }
+    if (isInteractive) {
+      const status = getStepStatus(item.id);
+      const isDone = status === "completed";
+      const isCurr = status === "current";
+      return `
+                <div style="padding: 0.75rem 1rem; border-radius: 8px; transition: all 0.2s ease; ${isDone ? "background: rgba(34, 197, 94, 0.08);" : isCurr ? "background: rgba(16, 185, 129, 0.08);" : "opacity: 0.5;"}">
+                    <p style="margin: 0; font-weight: 600; font-size: 0.875rem; ${isDone ? "color: #15803d; text-decoration: line-through;" : isCurr ? "color: var(--p-primary-600, #059669);" : "color: var(--p-surface-500);"}">
+                        ${item.label || item.status || item.title}
+                    </p>
+                    ${isCurr ? `<p style="font-size: 0.75rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Click the marker to complete</p>` : ""}
                 </div>
-
-                <!-- Event Details Card -->
-                <div style="flex: 1; padding-bottom: ${isLast ? "0" : "1.5rem"};">
-                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap;">
-                        <div style="font-size: 0.875rem; font-weight: 600; color: var(--p-surface-950);">${evt.title}</div>
-                        <span style="font-size: 0.6875rem; padding: 0.15rem 0.5rem; border-radius: var(--p-border-radius); background: ${badge.bg}; color: ${badge.color}; border: 1px solid ${badge.border}; font-weight: 600;">
-                            ${badge.label}
-                        </span>
+            `;
+    }
+    if (isActivityFeed) {
+      const userName = typeof item.user === "object" ? item.user.name : item.user;
+      const detailsHtml = item.details && item.details.length > 0 ? `
+                <div style="margin-top: 0.75rem; padding: 0.75rem; border-radius: 8px; background: var(--p-surface-50); border: 1px solid var(--p-surface-200);">
+                    <ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 0.35rem;">
+                        ${item.details.map((d) => `
+                            <li style="font-size: 0.8125rem; font-family: var(--p-font-mono, monospace); color: var(--p-surface-700); display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="color: var(--p-surface-400);">${ICONS.minus}</span> ${d}
+                            </li>
+                        `).join("")}
+                    </ul>
+                </div>
+            ` : "";
+      return `
+                <div style="padding-bottom: 1.5rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                        <span style="font-weight: 600; color: var(--p-surface-900);">${userName}</span>
+                        <span style="color: var(--p-surface-500);">${item.action || ""}</span>
+                        <span style="font-weight: 600; color: var(--p-primary-600);">${item.target || ""}</span>
+                        ${item.repo ? `<span style="color: var(--p-surface-500);">to</span> <code style="padding: 0.15rem 0.45rem; border-radius: 4px; background: var(--p-surface-100); font-size: 0.8125rem; font-family: monospace; color: var(--p-surface-700);">${item.repo}</code>` : ""}
                     </div>
-
-                    <p style="font-size: 0.8125rem; color: var(--p-surface-600); margin-top: 0.35rem; line-height: 1.5;">${evt.description}</p>
-
-                    <div style="display: flex; align-items: center; gap: 1rem; margin-top: 0.5rem; font-size: 0.75rem; color: var(--p-surface-400); font-family: var(--p-font-mono);">
-                        <span>\u{1F552} ${evt.timestamp}</span>
-                        ${evt.actor ? `<span>\u{1F464} ${evt.actor}</span>` : ""}
+                    ${item.description ? `<p style="margin: 0.35rem 0 0 0; font-size: 0.875rem; color: var(--p-surface-600);">${item.description}</p>` : ""}
+                    ${detailsHtml}
+                </div>
+            `;
+    }
+    if (item.details || item.tracking || item.user) {
+      const detailsHtml = item.details && item.details.length > 0 ? `
+                <ul style="margin: 0.75rem 0 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 0.35rem;">
+                    ${item.details.map((d) => `
+                        <li style="font-size: 0.8125rem; color: var(--p-surface-500); display: flex; align-items: center; gap: 0.5rem;">
+                            <span style="color: var(--p-primary-500);">${ICONS.box}</span> ${d}
+                        </li>
+                    `).join("")}
+                </ul>
+            ` : "";
+      const trackingHtml = item.tracking ? `
+                <div style="margin-top: 1rem; padding: 0.65rem 0.85rem; border-radius: 8px; background: var(--p-surface-100); display: flex; align-items: center; justify-content: space-between;">
+                    <span style="font-size: 0.8125rem; color: var(--p-surface-700); display: flex; align-items: center; gap: 0.5rem;">
+                        ${ICONS.mapPin} Tracking: <strong>${item.tracking}</strong>
+                    </span>
+                    <button type="button" class="p-button p-component p-button-text" style="font-size: 0.75rem; font-weight: 600; color: var(--p-primary-600); background: transparent; border: none; cursor: pointer; padding: 0.25rem 0.5rem;">Track</button>
+                </div>
+            ` : "";
+      return `
+                <div class="p-timeline-card">
+                    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                        ${item.user ? `<span class="p-timeline-avatar">${item.user}</span>` : ""}
+                        <span style="font-weight: 700; font-size: 0.9375rem; color: var(--p-surface-900);">${item.status || item.title}</span>
+                    </div>
+                    ${item.description ? `<p style="margin: 0; font-size: 0.875rem; color: var(--p-surface-600); line-height: 1.5;">${item.description}</p>` : ""}
+                    ${detailsHtml}
+                    ${trackingHtml}
+                </div>
+            `;
+    }
+    return `
+            <div style="font-size: 0.875rem; font-weight: 500; color: var(--p-surface-800, #1e293b);">${item.status || item.title || item.label || JSON.stringify(item)}</div>
+        `;
+  }
+  function render() {
+    const isHorizontal = layout === "horizontal";
+    const alignClass = `p-timeline-${align}`;
+    const layoutClass = isHorizontal ? "p-timeline-horizontal" : "p-timeline-vertical";
+    let interactiveHeaderHtml = "";
+    let interactiveCelebrationHtml = "";
+    if (isInteractive) {
+      const allCount = rawEvents.length;
+      const doneCount = completedSteps.length;
+      const percent = Math.round(doneCount / allCount * 100);
+      const isAllDone = doneCount === allCount;
+      interactiveHeaderHtml = `
+                <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem;">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <div>
+                            <h3 style="margin: 0; font-size: 1.125rem; font-weight: 700; color: var(--p-surface-900);">Onboarding Progress</h3>
+                            <p style="margin: 0.25rem 0 0 0; font-size: 0.8125rem; color: var(--p-surface-500);">${doneCount} of ${allCount} steps completed</p>
+                        </div>
+                        <button type="button" class="p-interactive-reset-btn p-button p-component p-button-outlined" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: 6px; border: 1px solid var(--p-surface-300); background: var(--p-surface-0); cursor: pointer; color: var(--p-surface-700);">
+                            ${ICONS.refresh} Reset
+                        </button>
+                    </div>
+                    <div style="width: 100%; height: 0.5rem; border-radius: 9999px; background: var(--p-surface-200); overflow: hidden;">
+                        <div style="width: ${percent}%; height: 100%; border-radius: 9999px; background: var(--p-primary-500, #10b981); transition: width 0.4s ease;"></div>
                     </div>
                 </div>
+            `;
+      if (isAllDone) {
+        interactiveCelebrationHtml = `
+                    <div style="margin-top: 1.5rem; padding: 1rem; border-radius: 8px; background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.3); display: flex; flex-direction: column; align-items: center; gap: 0.25rem; text-align: center;">
+                        <span style="color: #22c55e;">${ICONS.checkCircle}</span>
+                        <div style="font-weight: 700; color: #15803d; font-size: 0.9375rem;">Onboarding Complete!</div>
+                        <span style="font-size: 0.8125rem; color: #16a34a;">You've completed all the steps.</span>
+                    </div>
+                `;
+      }
+    }
+    let activityHeaderHtml = "";
+    if (isActivityFeed) {
+      activityHeaderHtml = `
+                <div style="display: flex; align-items: center; gap: 0.625rem; margin-bottom: 1.25rem;">
+                    <span style="color: var(--p-surface-500);">${ICONS.history}</span>
+                    <span style="font-size: 1.125rem; font-weight: 700; color: var(--p-surface-900);">Recent Activity</span>
+                </div>
+            `;
+    }
+    const eventsHtml = rawEvents.map((item, idx) => {
+      const isLast = idx === rawEvents.length - 1;
+      return `
+                <div class="p-timeline-event" role="listitem">
+                    <div class="p-timeline-event-opposite">
+                        ${renderOpposite(item)}
+                    </div>
+                    <div class="p-timeline-event-separator">
+                        ${renderMarker(item, isLast)}
+                        ${!isLast ? '<div class="p-timeline-event-connector"></div>' : ""}
+                    </div>
+                    <div class="p-timeline-event-content">
+                        ${renderContent(item)}
+                    </div>
+                </div>
+            `;
+    }).join("");
+    container.innerHTML = `
+            <div class="p-timeline-wrapper" style="width: 100%;">
+                ${interactiveHeaderHtml}
+                ${activityHeaderHtml}
+                <div class="p-timeline p-component ${layoutClass} ${alignClass}" role="list">
+                    ${eventsHtml}
+                </div>
+                ${interactiveCelebrationHtml}
             </div>
         `;
-  }).join("");
-  container.innerHTML = `
-        <div class="laughtale-timeline" style="display: flex; flex-direction: column; gap: 1rem;">
-            ${props.title ? `<div style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); padding-bottom: 0.75rem; border-bottom: 1px solid var(--p-border-color);">${props.title}</div>` : ""}
-            <div style="display: flex; flex-direction: column;">
-                ${items}
-            </div>
-        </div>
-    `;
+    bindEvents();
+  }
+  function bindEvents() {
+    if (isInteractive) {
+      container.querySelectorAll(".p-interactive-step-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const stepId = parseInt(btn.getAttribute("data-step-id") || "0", 10);
+          if (stepId) handleStepComplete(stepId);
+        });
+      });
+      container.querySelector(".p-interactive-reset-btn")?.addEventListener("click", () => {
+        handleReset();
+      });
+    }
+  }
+  render();
 }
-var CSS2;
+var TIMELINE_CSS, ICONS;
 var init_timeline = __esm({
   "src/components/timeline.ts"() {
     "use strict";
     init_styles();
-    CSS2 = `
-[data-theme="dark"] .timeline-item {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+    TIMELINE_CSS = `
+.p-timeline {
+    display: flex;
+    flex-grow: 1;
+    font-family: var(--p-font-family, inherit);
+    color: var(--p-surface-700, #334155);
 }
-[data-theme="dark"] .laughtale-timeline {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-timeline-vertical {
+    flex-direction: column;
+}
+
+.p-timeline-horizontal {
+    flex-direction: row;
+    overflow-x: auto;
+    padding: 1rem 0;
+}
+
+.p-timeline-event {
+    display: flex;
+    position: relative;
+    min-height: 4.5rem;
+}
+
+.p-timeline-vertical.p-timeline-left .p-timeline-event {
+    flex-direction: row;
+}
+
+.p-timeline-vertical.p-timeline-right .p-timeline-event {
+    flex-direction: row-reverse;
+}
+
+.p-timeline-vertical.p-timeline-alternate .p-timeline-event:nth-child(even) {
+    flex-direction: row-reverse;
+}
+
+.p-timeline-event-opposite {
+    flex: 1;
+    padding: 0.125rem 1rem 1rem 1rem;
+    font-size: 0.8125rem;
+    color: var(--p-surface-500, #64748b);
+}
+
+.p-timeline-vertical.p-timeline-left .p-timeline-event-opposite {
+    text-align: right;
+}
+
+.p-timeline-vertical.p-timeline-right .p-timeline-event-opposite {
+    text-align: left;
+}
+
+.p-timeline-vertical.p-timeline-alternate .p-timeline-event:nth-child(odd) .p-timeline-event-opposite {
+    text-align: right;
+}
+.p-timeline-vertical.p-timeline-alternate .p-timeline-event:nth-child(even) .p-timeline-event-opposite {
+    text-align: left;
+}
+
+.p-timeline-event-content {
+    flex: 1;
+    padding: 0.125rem 1rem 1.5rem 1rem;
+    text-align: left;
+}
+
+.p-timeline-vertical.p-timeline-right .p-timeline-event-content {
+    text-align: right;
+}
+
+.p-timeline-vertical.p-timeline-alternate .p-timeline-event:nth-child(even) .p-timeline-event-content {
+    text-align: right;
+}
+
+.p-timeline-event-separator {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.p-timeline-event-marker {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    border-radius: 9999px;
+    z-index: 2;
+}
+
+/* Default marker dot */
+.p-timeline-event-marker.p-marker-default {
+    width: 0.875rem;
+    height: 0.875rem;
+    border: 2px solid var(--p-primary-500, #10b981);
+    background: var(--p-surface-0, #ffffff);
+    margin-top: 0.25rem;
+}
+
+.p-timeline-event-connector {
+    flex-grow: 1;
+    width: 2px;
+    background-color: var(--p-surface-200, #e2e8f0);
+    margin: 0.25rem 0;
+}
+
+/* Horizontal layout styling */
+.p-timeline-horizontal .p-timeline-event {
+    flex-direction: column;
+    flex: 1;
+    min-height: auto;
+    min-width: 9rem;
+    align-items: center;
+}
+
+.p-timeline-horizontal .p-timeline-event-separator {
+    flex-direction: row;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+.p-timeline-horizontal .p-timeline-event-connector {
+    height: 2px;
+    width: 100%;
+    margin: 0 0.25rem;
+}
+
+.p-timeline-horizontal .p-timeline-event-opposite,
+.p-timeline-horizontal .p-timeline-event-content {
+    padding: 0.5rem 0.25rem;
+    text-align: center !important;
+}
+
+.p-timeline-horizontal.p-timeline-top .p-timeline-event-opposite {
+    order: 1;
+}
+.p-timeline-horizontal.p-timeline-top .p-timeline-event-separator {
+    order: 2;
+}
+.p-timeline-horizontal.p-timeline-top .p-timeline-event-content {
+    order: 3;
+}
+
+.p-timeline-horizontal.p-timeline-bottom .p-timeline-event-content {
+    order: 1;
+}
+.p-timeline-horizontal.p-timeline-bottom .p-timeline-event-separator {
+    order: 2;
+}
+.p-timeline-horizontal.p-timeline-bottom .p-timeline-event-opposite {
+    order: 3;
+}
+
+.p-timeline-horizontal.p-timeline-alternate .p-timeline-event:nth-child(even) .p-timeline-event-content {
+    order: 1;
+}
+.p-timeline-horizontal.p-timeline-alternate .p-timeline-event:nth-child(even) .p-timeline-event-separator {
+    order: 2;
+}
+.p-timeline-horizontal.p-timeline-alternate .p-timeline-event:nth-child(even) .p-timeline-event-opposite {
+    order: 3;
+}
+.p-timeline-horizontal.p-timeline-alternate .p-timeline-event:nth-child(odd) .p-timeline-event-opposite {
+    order: 1;
+}
+.p-timeline-horizontal.p-timeline-alternate .p-timeline-event:nth-child(odd) .p-timeline-event-separator {
+    order: 2;
+}
+.p-timeline-horizontal.p-timeline-alternate .p-timeline-event:nth-child(odd) .p-timeline-event-content {
+    order: 3;
+}
+
+/* Rich custom event card */
+.p-timeline-card {
+    padding: 1.25rem;
+    border-radius: var(--p-border-radius-xl, 12px);
+    background: var(--p-surface-0, #ffffff);
+    border: 1px solid var(--p-surface-200, #e2e8f0);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+    margin-bottom: 1rem;
+    text-align: left;
+}
+
+.p-timeline-avatar {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 9999px;
+    background: rgba(16, 185, 129, 0.12);
+    color: var(--p-primary-600, #059669);
+    font-weight: 700;
+    font-size: 0.8125rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.p-timeline-pulse {
+    animation: timelinePulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes timelinePulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: .75; transform: scale(1.08); }
+}
+
+/* Dark Mode Tokens */
+.dark .p-timeline,
+[data-theme="dark"] .p-timeline {
+    color: var(--p-surface-200, #e2e8f0) !important;
+}
+.dark .p-timeline-event-marker.p-marker-default,
+[data-theme="dark"] .p-timeline-event-marker.p-marker-default {
+    background: var(--p-surface-900, #0f172a) !important;
+    border-color: var(--p-primary-500, #10b981) !important;
+}
+.dark .p-timeline-event-connector,
+[data-theme="dark"] .p-timeline-event-connector {
+    background-color: var(--p-surface-700, #334155) !important;
+}
+.dark .p-timeline-card,
+[data-theme="dark"] .p-timeline-card {
+    background: var(--p-surface-900, #0f172a) !important;
+    border-color: var(--p-surface-700, #334155) !important;
+}
+.dark .p-timeline-event-opposite,
+[data-theme="dark"] .p-timeline-event-opposite {
+    color: var(--p-surface-400, #94a3b8) !important;
 }
 `;
+    ICONS = {
+      shoppingCart: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>',
+      creditCard: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>',
+      truck: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14v10Z"/><circle cx="17" cy="18.5" r="2.5"/><circle cx="7" cy="18.5" r="2.5"/></svg>',
+      checkCircle: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>',
+      check: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+      userPlus: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>',
+      envelope: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>',
+      idCard: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><circle cx="8" cy="12" r="2"/><path d="M14 10h4"/><path d="M14 14h4"/></svg>',
+      shoppingBag: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>',
+      star: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+      box: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>',
+      mapPin: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>',
+      history: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>',
+      refresh: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>',
+      minus: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" x2="19" y1="12" y2="12"/></svg>'
+    };
   }
 });
 
@@ -3270,7 +3732,7 @@ __export(camera_exports, {
   default: () => CameraIsland
 });
 function CameraIsland(container, props) {
-  injectIslandStyle("camera", CSS3);
+  injectIslandStyle("camera", CSS2);
   let stream = null;
   let capturedPhotoData = null;
   function render() {
@@ -3382,12 +3844,12 @@ function CameraIsland(container, props) {
     }
   };
 }
-var CSS3;
+var CSS2;
 var init_camera = __esm({
   "src/components/camera.ts"() {
     "use strict";
     init_styles();
-    CSS3 = `
+    CSS2 = `
 [data-theme="dark"] .laughtale-camera-preview {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -3418,7 +3880,7 @@ __export(dropzone_exports, {
   default: () => DropzoneIsland
 });
 function DropzoneIsland(container, props) {
-  injectIslandStyle("dropzone", CSS4);
+  injectIslandStyle("dropzone", CSS3);
   container.innerHTML = `
         <div style="display: flex; flex-direction: column; gap: 0.75rem;">
             <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -3489,12 +3951,12 @@ function DropzoneIsland(container, props) {
         `;
   }
 }
-var CSS4;
+var CSS3;
 var init_dropzone = __esm({
   "src/components/dropzone.ts"() {
     "use strict";
     init_styles();
-    CSS4 = `
+    CSS3 = `
 [data-theme="dark"] .dropzone-box {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -3515,7 +3977,7 @@ __export(tree_select_exports, {
   default: () => TreeSelectIsland
 });
 function TreeSelectIsland(container, props) {
-  injectIslandStyle("laughtale-treeselect", CSS5);
+  injectIslandStyle("laughtale-treeselect", CSS4);
   const rawNodes = props.nodes || props.options || props.departments || [];
   const selectionMode = props.selectionMode || "single";
   const displayMode = props.display || "comma";
@@ -3870,7 +4332,7 @@ function TreeSelectIsland(container, props) {
   }
   init();
 }
-var CSS5, checkSvg, minusSvg, chevronRightSvg, chevronDownSvg, searchSvg, xSvg;
+var CSS4, checkSvg, minusSvg, chevronRightSvg, chevronDownSvg, searchSvg, xSvg;
 var init_tree_select = __esm({
   "src/components/tree-select.ts"() {
     "use strict";
@@ -3878,7 +4340,7 @@ var init_tree_select = __esm({
     init_styles();
     init_useDisclosure();
     init_useClickOutside();
-    CSS5 = `
+    CSS4 = `
 /* ==================== AURA TREESELECT ==================== */
 .laughtale-treeselect,
 .p-treeselect {
@@ -5683,7 +6145,7 @@ __export(toast_exports, {
   default: () => ToastIsland
 });
 function ToastIsland(container) {
-  injectIslandStyle("toast", CSS6);
+  injectIslandStyle("toast", CSS5);
   const toastThemes = {
     success: { bg: "#ecfdf5", border: "#a7f3d0", color: "#047857", icon: "\u2713" },
     info: { bg: "#eff6ff", border: "#bfdbfe", color: "#1d4ed8", icon: "\u2139" },
@@ -5719,12 +6181,12 @@ function ToastIsland(container) {
     if (e.detail) addToast(e.detail);
   });
 }
-var CSS6;
+var CSS5;
 var init_toast = __esm({
   "src/components/toast.ts"() {
     "use strict";
     init_styles();
-    CSS6 = `
+    CSS5 = `
 @keyframes toast-slideIn {
     from { opacity: 0; transform: translateX(100%); }
     to { opacity: 1; transform: translateX(0); }
@@ -5788,7 +6250,7 @@ __export(input_number_exports, {
   default: () => InputNumberIsland
 });
 function InputNumberIsland(container, props) {
-  injectIslandStyle("laughtale-inputnumber", CSS7);
+  injectIslandStyle("laughtale-inputnumber", CSS6);
   let rawValue = props.value !== void 0 && props.value !== null ? Number(props.value) : null;
   const step = props.step !== void 0 ? Number(props.step) : 1;
   const min = props.min !== void 0 ? Number(props.min) : void 0;
@@ -6059,12 +6521,12 @@ function InputNumberIsland(container, props) {
   render();
   syncTargetInput();
 }
-var CSS7;
+var CSS6;
 var init_input_number = __esm({
   "src/components/input-number.ts"() {
     "use strict";
     init_styles();
-    CSS7 = `
+    CSS6 = `
 .laughtale-inputnumber,
 .p-inputnumber {
     display: inline-flex;
@@ -6329,7 +6791,7 @@ __export(input_otp_exports, {
   default: () => InputOtpIsland
 });
 function InputOtpIsland(container, props) {
-  injectIslandStyle("laughtale-inputotp", CSS8);
+  injectIslandStyle("laughtale-inputotp", CSS7);
   const length = Number(props.length) || 4;
   const isMask = props.mask === true || String(props.mask) === "true";
   const isIntegerOnly = props.integerOnly !== false && String(props.integerOnly) !== "false";
@@ -6523,12 +6985,12 @@ function InputOtpIsland(container, props) {
     first?.focus();
   }
 }
-var CSS8;
+var CSS7;
 var init_input_otp = __esm({
   "src/components/input-otp.ts"() {
     "use strict";
     init_styles();
-    CSS8 = `
+    CSS7 = `
 .laughtale-input-otp,
 .p-inputotp {
     display: inline-flex;
@@ -6675,7 +7137,7 @@ __export(input_password_exports, {
   default: () => InputPasswordIsland
 });
 function InputPasswordIsland(container, props) {
-  injectIslandStyle("laughtale-password", CSS9);
+  injectIslandStyle("laughtale-password", CSS8);
   let isMasked = true;
   let currentVal = props.value || "";
   const minLength = Number(props.minLength) || 8;
@@ -6965,13 +7427,13 @@ function InputPasswordIsland(container, props) {
   updateVisuals();
   syncTargetInput();
 }
-var CSS9;
+var CSS8;
 var init_input_password = __esm({
   "src/components/input-password.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS9 = `
+    CSS8 = `
 .laughtale-password,
 .p-password {
     display: inline-flex;
@@ -7317,7 +7779,7 @@ __export(toggle_switch_exports, {
   default: () => ToggleSwitchIsland
 });
 function ToggleSwitchIsland(container, props) {
-  injectIslandStyle("laughtale-toggleswitch", CSS10);
+  injectIslandStyle("laughtale-toggleswitch", CSS9);
   let isChecked = props.checked === true || String(props.checked) === "true" || props.value === true || String(props.value) === "true";
   const isInvalid = props.invalid === true || String(props.invalid) === "true";
   const isDisabled = props.disabled === true || String(props.disabled) === "true";
@@ -7402,13 +7864,13 @@ function ToggleSwitchIsland(container, props) {
   }
   render();
 }
-var CSS10;
+var CSS9;
 var init_toggle_switch = __esm({
   "src/components/toggle-switch.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS10 = `
+    CSS9 = `
 /* ==================== AURA TOGGLESWITCH ==================== */
 .laughtale-toggleswitch,
 .p-toggleswitch {
@@ -7567,7 +8029,7 @@ __export(toggle_button_exports, {
   default: () => ToggleButtonIsland
 });
 function ToggleButtonIsland(container, props) {
-  injectIslandStyle("laughtale-togglebutton", CSS11);
+  injectIslandStyle("laughtale-togglebutton", CSS10);
   let isChecked = props.checked === true || String(props.checked) === "true" || props.value === true || String(props.value) === "true";
   const isFluid = props.fluid === true || String(props.fluid) === "true";
   const isInvalid = props.invalid === true || String(props.invalid) === "true";
@@ -7639,13 +8101,13 @@ function ToggleButtonIsland(container, props) {
   }
   render();
 }
-var CSS11;
+var CSS10;
 var init_toggle_button = __esm({
   "src/components/toggle-button.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS11 = `
+    CSS10 = `
 /* ==================== AURA TOGGLEBUTTON ==================== */
 .laughtale-togglebutton,
 .p-togglebutton {
@@ -7785,7 +8247,7 @@ __export(button_exports, {
   default: () => ButtonIsland
 });
 function ButtonIsland(container, props) {
-  injectIslandStyle("laughtale-button", CSS12);
+  injectIslandStyle("laughtale-button", CSS11);
   let isLoading = props.loading === true || String(props.loading) === "true";
   let isDisabled = props.disabled === true || String(props.disabled) === "true";
   const btnEl = container.tagName.toLowerCase() === "button" || container.tagName.toLowerCase() === "a" ? container : container.querySelector("button, a") || container;
@@ -7822,13 +8284,13 @@ function ButtonIsland(container, props) {
   });
   renderLoading();
 }
-var CSS12;
+var CSS11;
 var init_button = __esm({
   "src/components/button.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS12 = `
+    CSS11 = `
 /* CSS is provided globally in site.css / theme */
 `;
   }
@@ -7840,7 +8302,7 @@ __export(slider_exports, {
   default: () => SliderIsland
 });
 function SliderIsland(container, props) {
-  injectIslandStyle("laughtale-slider", CSS13);
+  injectIslandStyle("laughtale-slider", CSS12);
   const min = props.min !== void 0 ? Number(props.min) : 0;
   const max = props.max !== void 0 ? Number(props.max) : 100;
   const step = props.step !== void 0 ? Number(props.step) : 1;
@@ -8158,12 +8620,12 @@ function SliderIsland(container, props) {
   }
   render();
 }
-var CSS13;
+var CSS12;
 var init_slider = __esm({
   "src/components/slider.ts"() {
     "use strict";
     init_styles();
-    CSS13 = `
+    CSS12 = `
 /* ==================== AURA SLIDER ==================== */
 .laughtale-slider,
 .p-slider {
@@ -8313,7 +8775,7 @@ __export(rating_exports, {
   default: () => RatingIsland
 });
 function RatingIsland(container, props) {
-  injectIslandStyle("laughtale-rating", CSS14);
+  injectIslandStyle("laughtale-rating", CSS13);
   const totalStars = props.stars ? Number(props.stars) : 5;
   const isAllowHalf = props.allowHalf === true || String(props.allowHalf) === "true";
   const isCancelAllowed = props.cancel !== false && props.allowCancel !== false && String(props.cancel) !== "false" && String(props.allowCancel) !== "false";
@@ -8527,13 +8989,13 @@ function RatingIsland(container, props) {
   }
   init();
 }
-var CSS14, starFilledSvg, starEmptySvg, cancelSvg;
+var CSS13, starFilledSvg, starEmptySvg, cancelSvg;
 var init_rating = __esm({
   "src/components/rating.ts"() {
     "use strict";
     init_styles();
     init_useControllableState();
-    CSS14 = `
+    CSS13 = `
 .laughtale-rating,
 .p-rating {
     display: inline-flex;
@@ -8733,7 +9195,7 @@ __export(select_button_exports, {
   default: () => SelectButtonIsland
 });
 function SelectButtonIsland(container, props) {
-  injectIslandStyle("laughtale-selectbutton", CSS15);
+  injectIslandStyle("laughtale-selectbutton", CSS14);
   const isMultiple = props.multiple === true || String(props.multiple) === "true";
   const isUnselectable = props.unselectable !== false && String(props.unselectable) !== "false";
   const isFluid = props.fluid === true || String(props.fluid) === "true";
@@ -8853,13 +9315,13 @@ function SelectButtonIsland(container, props) {
   }
   render();
 }
-var CSS15;
+var CSS14;
 var init_select_button = __esm({
   "src/components/select-button.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS15 = `
+    CSS14 = `
 /* ==================== AURA SELECTBUTTON ==================== */
 .laughtale-selectbutton,
 .p-selectbutton {
@@ -9027,7 +9489,7 @@ __export(input_tags_exports, {
   default: () => InputTagsIsland
 });
 function InputTagsIsland(container, props) {
-  injectIslandStyle("laughtale-inputtags", CSS16);
+  injectIslandStyle("laughtale-inputtags", CSS15);
   let initialValues = [];
   const rawVal = props.values ?? props.value;
   if (Array.isArray(rawVal)) {
@@ -9393,13 +9855,13 @@ function InputTagsIsland(container, props) {
   }
   init();
 }
-var CSS16, xCircleIcon;
+var CSS15, xCircleIcon;
 var init_input_tags = __esm({
   "src/components/input-tags.ts"() {
     "use strict";
     init_styles();
     init_useControllableState();
-    CSS16 = `
+    CSS15 = `
 .laughtale-inputtags,
 .p-inputtags {
     display: inline-flex;
@@ -9650,7 +10112,7 @@ __export(datepicker_exports, {
   default: () => DatePickerIsland
 });
 function DatePickerIsland(container, props) {
-  injectIslandStyle("datepicker", CSS17);
+  injectIslandStyle("datepicker", CSS16);
   const selectionMode = props.selectionMode || "single";
   let currentView = props.view || "date";
   const isInline = props.inline === true;
@@ -10063,7 +10525,7 @@ function DatePickerIsland(container, props) {
   }
   renderComponent();
 }
-var CSS17, MONTH_NAMES, SHORT_MONTHS, WEEKDAYS;
+var CSS16, MONTH_NAMES, SHORT_MONTHS, WEEKDAYS;
 var init_datepicker = __esm({
   "src/components/datepicker.ts"() {
     "use strict";
@@ -10071,7 +10533,7 @@ var init_datepicker = __esm({
     init_styles();
     init_useDisclosure();
     init_useClickOutside();
-    CSS17 = `
+    CSS16 = `
 .laughtale-datepicker {
     position: relative;
     display: inline-flex;
@@ -10436,7 +10898,7 @@ __export(meter_group_exports, {
   default: () => MeterGroupIsland
 });
 function MeterGroupIsland(container, props) {
-  injectIslandStyle("meter-group", CSS18);
+  injectIslandStyle("meter-group", CSS17);
   const total = props.values.reduce((acc, curr) => acc + curr.value, 0);
   const barSegments = props.values.map((v) => {
     const pct = total > 0 ? v.value / total * 100 : 0;
@@ -10469,12 +10931,12 @@ function MeterGroupIsland(container, props) {
         </div>
     `;
 }
-var CSS18;
+var CSS17;
 var init_meter_group = __esm({
   "src/components/meter-group.ts"() {
     "use strict";
     init_styles();
-    CSS18 = `
+    CSS17 = `
 [data-theme="dark"] .laughtale-meter-group {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -10490,7 +10952,7 @@ __export(avatar_group_exports, {
   default: () => AvatarGroupIsland
 });
 function AvatarGroupIsland(container, props) {
-  injectIslandStyle("avatar-group", CSS19);
+  injectIslandStyle("avatar-group", CSS18);
   const max = props.max || 4;
   const visible = props.avatars.slice(0, max);
   const overflowCount = props.avatars.length - max;
@@ -10515,12 +10977,12 @@ function AvatarGroupIsland(container, props) {
         </div>
     `;
 }
-var CSS19;
+var CSS18;
 var init_avatar_group = __esm({
   "src/components/avatar-group.ts"() {
     "use strict";
     init_styles();
-    CSS19 = `
+    CSS18 = `
 [data-theme="dark"] .laughtale-avatar-group {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -10536,7 +10998,7 @@ __export(progress_bar_exports, {
   default: () => ProgressBarIsland
 });
 function ProgressBarIsland(container, props) {
-  injectIslandStyle("progress-bar", CSS20);
+  injectIslandStyle("progress-bar", CSS19);
   const isIndeterminate = props.mode === "indeterminate" || props.value === void 0;
   const value = Math.max(0, Math.min(100, props.value || 0));
   const height = props.height || "0.75rem";
@@ -10567,12 +11029,12 @@ function ProgressBarIsland(container, props) {
         `;
   }
 }
-var CSS20;
+var CSS19;
 var init_progress_bar = __esm({
   "src/components/progress-bar.ts"() {
     "use strict";
     init_styles();
-    CSS20 = `
+    CSS19 = `
 [data-theme="dark"] .laughtale-progress-bar {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -10588,7 +11050,7 @@ __export(skeleton_exports, {
   default: () => SkeletonIsland
 });
 function SkeletonIsland(container, props) {
-  injectIslandStyle("skeleton", CSS21);
+  injectIslandStyle("skeleton", CSS20);
   const shape = props.shape || "rectangle";
   const width = props.width || "100%";
   const height = props.height || "1.25rem";
@@ -10603,12 +11065,12 @@ function SkeletonIsland(container, props) {
         </style>
     `;
 }
-var CSS21;
+var CSS20;
 var init_skeleton = __esm({
   "src/components/skeleton.ts"() {
     "use strict";
     init_styles();
-    CSS21 = `
+    CSS20 = `
 [data-theme="dark"] .laughtale-skeleton {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -10624,7 +11086,7 @@ __export(drawer_exports, {
   default: () => DrawerIsland
 });
 function DrawerIsland(container, props) {
-  injectIslandStyle("drawer", CSS22);
+  injectIslandStyle("drawer", CSS21);
   const position = props.position || "right";
   const width = props.width || "380px";
   function render() {
@@ -10691,7 +11153,7 @@ function DrawerIsland(container, props) {
   }
   render();
 }
-var CSS22;
+var CSS21;
 var init_drawer = __esm({
   "src/components/drawer.ts"() {
     "use strict";
@@ -10699,7 +11161,7 @@ var init_drawer = __esm({
     init_styles();
     init_useDisclosure();
     init_useFocusTrap();
-    CSS22 = `
+    CSS21 = `
 [data-theme="dark"] .laughtale-drawer-wrapper {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -11466,7 +11928,7 @@ __export(image_compare_exports, {
   default: () => ImageCompareIsland
 });
 function ImageCompareIsland(container, props) {
-  injectIslandStyle("image-compare", CSS23);
+  injectIslandStyle("image-compare", CSS22);
   let splitPercent = 50;
   container.innerHTML = `
         <div class="laughtale-image-compare" style="position: relative; width: 100%; max-width: 600px; height: 340px; border-radius: var(--p-border-radius-lg); overflow: hidden; user-select: none; border: 1px solid var(--p-border-color); box-shadow: var(--p-shadow-md); touch-action: none; cursor: ew-resize;">
@@ -11542,12 +12004,12 @@ function ImageCompareIsland(container, props) {
   window.addEventListener("mousemove", onPointerMove);
   window.addEventListener("mouseup", onPointerUp);
 }
-var CSS23;
+var CSS22;
 var init_image_compare = __esm({
   "src/components/image-compare.ts"() {
     "use strict";
     init_styles();
-    CSS23 = `
+    CSS22 = `
 [data-theme="dark"] .laughtale-image-compare {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -11563,7 +12025,7 @@ __export(confirm_popup_exports, {
   default: () => ConfirmPopupIsland
 });
 function ConfirmPopupIsland(container, props) {
-  injectIslandStyle("confirm-popup", CSS24);
+  injectIslandStyle("confirm-popup", CSS23);
   let isOpen = false;
   function render() {
     container.innerHTML = `
@@ -11640,13 +12102,13 @@ function ConfirmPopupIsland(container, props) {
   }
   render();
 }
-var CSS24;
+var CSS23;
 var init_confirm_popup = __esm({
   "src/components/confirm-popup.ts"() {
     "use strict";
     init_lucide();
     init_styles();
-    CSS24 = `
+    CSS23 = `
 [data-theme="dark"] .laughtale-confirm-popup {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -11672,7 +12134,7 @@ __export(accordion_exports, {
   default: () => AccordionIsland
 });
 function AccordionIsland(container, props) {
-  injectIslandStyle("accordion", CSS25);
+  injectIslandStyle("accordion", CSS24);
   const tabs = props.tabs || [];
   let activeIndices = /* @__PURE__ */ new Set();
   if (Array.isArray(props.activeIndex)) {
@@ -11765,7 +12227,7 @@ function AccordionIsland(container, props) {
   }
   render();
 }
-var CSS25;
+var CSS24;
 var init_accordion = __esm({
   "src/components/accordion.ts"() {
     "use strict";
@@ -11773,7 +12235,7 @@ var init_accordion = __esm({
     init_styles();
     init_useDisclosure();
     init_useTransition();
-    CSS25 = `
+    CSS24 = `
 [data-theme="dark"] .accordion-tab {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -11952,7 +12414,7 @@ __export(autocomplete_exports, {
   default: () => AutoCompleteIsland
 });
 function AutoCompleteIsland(container, props) {
-  injectIslandStyle("autocomplete", CSS26);
+  injectIslandStyle("autocomplete", CSS25);
   const allItems = props.suggestions || props.items || [];
   const multiple = props.multiple === true;
   const showClear = props.showClear !== false;
@@ -12285,7 +12747,7 @@ function AutoCompleteIsland(container, props) {
   }
   renderChips();
 }
-var CSS26;
+var CSS25;
 var init_autocomplete = __esm({
   "src/components/autocomplete.ts"() {
     "use strict";
@@ -12294,7 +12756,7 @@ var init_autocomplete = __esm({
     init_useDisclosure();
     init_useClickOutside();
     init_useDebounce();
-    CSS26 = `
+    CSS25 = `
 .laughtale-autocomplete {
     position: relative;
     display: inline-flex;
@@ -12564,7 +13026,7 @@ __export(color_picker_exports, {
   default: () => ColorPickerIsland
 });
 function ColorPickerIsland(container, props) {
-  injectIslandStyle("color-picker", CSS27);
+  injectIslandStyle("color-picker", CSS26);
   let currentColor = props.value || "#10b981";
   let isOpen = false;
   const swatchesHtml = DEFAULT_PRESETS.map((c) => `
@@ -12688,7 +13150,7 @@ function ColorPickerIsland(container, props) {
   }
   syncValue();
 }
-var DEFAULT_PRESETS, CSS27;
+var DEFAULT_PRESETS, CSS26;
 var init_color_picker = __esm({
   "src/components/color-picker.ts"() {
     "use strict";
@@ -12710,7 +13172,7 @@ var init_color_picker = __esm({
       "#1e293b",
       "#000000"
     ];
-    CSS27 = `
+    CSS26 = `
 [data-theme="dark"] .color-swatch-btn {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -12746,7 +13208,7 @@ __export(knob_exports, {
   default: () => KnobIsland
 });
 function KnobIsland(container, props) {
-  injectIslandStyle("knob", CSS28);
+  injectIslandStyle("knob", CSS27);
   const min = props.min !== void 0 ? props.min : 0;
   const max = props.max !== void 0 ? props.max : 100;
   const step = props.step || 1;
@@ -12848,12 +13310,12 @@ function KnobIsland(container, props) {
   }
   syncValue();
 }
-var CSS28;
+var CSS27;
 var init_knob = __esm({
   "src/components/knob.ts"() {
     "use strict";
     init_styles();
-    CSS28 = `
+    CSS27 = `
 [data-theme="dark"] .laughtale-knob {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -12879,7 +13341,7 @@ __export(tag_exports, {
   default: () => TagIsland
 });
 function TagIsland(container, props) {
-  injectIslandStyle("tag", CSS29);
+  injectIslandStyle("tag", CSS28);
   const severity = props.severity || "info";
   const isRounded = props.rounded || false;
   let bg = "var(--p-blue-50, #eff6ff)";
@@ -12913,12 +13375,12 @@ function TagIsland(container, props) {
         </span>
     `;
 }
-var CSS29;
+var CSS28;
 var init_tag = __esm({
   "src/components/tag.ts"() {
     "use strict";
     init_styles();
-    CSS29 = `
+    CSS28 = `
 [data-theme="dark"] .laughtale-tag {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -12934,7 +13396,7 @@ __export(breadcrumb_exports, {
   default: () => BreadcrumbIsland
 });
 function BreadcrumbIsland(container, props) {
-  injectIslandStyle("breadcrumb", CSS30);
+  injectIslandStyle("breadcrumb", CSS29);
   const items = props.items || [];
   const homeUrl = props.homeUrl || "/";
   const itemsHtml = items.map((item, idx) => {
@@ -12972,13 +13434,13 @@ function BreadcrumbIsland(container, props) {
         </nav>
     `;
 }
-var CSS30;
+var CSS29;
 var init_breadcrumb = __esm({
   "src/components/breadcrumb.ts"() {
     "use strict";
     init_lucide();
     init_styles();
-    CSS30 = `
+    CSS29 = `
 [data-theme="dark"] .laughtale-breadcrumb {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -12994,7 +13456,7 @@ __export(scroll_top_exports, {
   default: () => ScrollTopIsland
 });
 function ScrollTopIsland(container, props) {
-  injectIslandStyle("scroll-top", CSS31);
+  injectIslandStyle("scroll-top", CSS30);
   const threshold = props.threshold || 200;
   let isVisible = false;
   function render() {
@@ -13020,13 +13482,13 @@ function ScrollTopIsland(container, props) {
   window.addEventListener("scroll", checkScroll, { passive: true });
   render();
 }
-var CSS31;
+var CSS30;
 var init_scroll_top = __esm({
   "src/components/scroll-top.ts"() {
     "use strict";
     init_lucide();
     init_styles();
-    CSS31 = `
+    CSS30 = `
 [data-theme="dark"] .laughtale-scroll-top-btn {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -13042,7 +13504,7 @@ __export(inplace_exports, {
   default: () => InplaceIsland
 });
 function InplaceIsland(container, props) {
-  injectIslandStyle("inplace", CSS32);
+  injectIslandStyle("inplace", CSS31);
   let isEditing = false;
   let currentValue = props.value || "";
   function render() {
@@ -13122,13 +13584,13 @@ function InplaceIsland(container, props) {
   render();
   syncValue();
 }
-var CSS32;
+var CSS31;
 var init_inplace = __esm({
   "src/components/inplace.ts"() {
     "use strict";
     init_lucide();
     init_styles();
-    CSS32 = `
+    CSS31 = `
 [data-theme="dark"] .laughtale-inplace-display {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -13164,7 +13626,7 @@ __export(command_exports, {
   default: () => CommandPaletteIsland
 });
 function CommandPaletteIsland(container, props) {
-  injectIslandStyle("command", CSS33);
+  injectIslandStyle("command", CSS32);
   const placeholder = props.placeholder || "Type a command or search...";
   const items = props.items || [
     { id: "home", label: "Go to Overview", group: "Navigation", icon: "compass", url: "/", shortcut: "G H" },
@@ -13338,7 +13800,7 @@ function CommandPaletteIsland(container, props) {
   ]);
   document.addEventListener("command:open", () => open());
 }
-var CSS33;
+var CSS32;
 var init_command = __esm({
   "src/components/command.ts"() {
     "use strict";
@@ -13348,7 +13810,7 @@ var init_command = __esm({
     init_useFocusTrap();
     init_useHotkeys();
     init_useScrollLock();
-    CSS33 = `
+    CSS32 = `
 [data-theme="dark"] .laughtale-command-root {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -14212,7 +14674,7 @@ __export(dynamic_form_exports, {
   default: () => DynamicFormIsland
 });
 function DynamicFormIsland(container, props) {
-  injectIslandStyle("dynamic-form", CSS34);
+  injectIslandStyle("dynamic-form", CSS33);
   let schema = props.schema || null;
   if (!schema && props.schemaJson) {
     try {
@@ -14373,13 +14835,13 @@ function DynamicFormIsland(container, props) {
   }
   render();
 }
-var CSS34;
+var CSS33;
 var init_dynamic_form = __esm({
   "src/components/dynamic-form.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS34 = `
+    CSS33 = `
 [data-theme="dark"] .p-input {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -14410,7 +14872,7 @@ __export(splitter_exports, {
   default: () => SplitterIsland
 });
 function SplitterIsland(container, props) {
-  injectIslandStyle("splitter", CSS35);
+  injectIslandStyle("splitter", CSS34);
   const layout = props.layout || "horizontal";
   const isHorizontal = layout === "horizontal";
   const panels = props.panels && props.panels.length >= 2 ? props.panels : [
@@ -14453,13 +14915,13 @@ function SplitterIsland(container, props) {
     }
   });
 }
-var CSS35;
+var CSS34;
 var init_splitter = __esm({
   "src/components/splitter.ts"() {
     "use strict";
     init_styles();
     init_useDragGesture();
-    CSS35 = `
+    CSS34 = `
 [data-theme="dark"] .laughtale-splitter {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -14490,7 +14952,7 @@ __export(multiselect_exports, {
   default: () => MultiSelectIsland
 });
 function MultiSelectIsland(container, props) {
-  injectIslandStyle("multiselect", CSS36);
+  injectIslandStyle("multiselect", CSS35);
   const options = props.options || [];
   let selected = new Set(props.selectedValues || []);
   let filterQuery = "";
@@ -14656,7 +15118,7 @@ function MultiSelectIsland(container, props) {
   renderDisplay();
   syncValue();
 }
-var CSS36;
+var CSS35;
 var init_multiselect = __esm({
   "src/components/multiselect.ts"() {
     "use strict";
@@ -14665,7 +15127,7 @@ var init_multiselect = __esm({
     init_useDisclosure();
     init_useClickOutside();
     init_useTransition();
-    CSS36 = `
+    CSS35 = `
 [data-theme="dark"] .laughtale-multiselect {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -14736,7 +15198,7 @@ __export(cascadeselect_exports, {
   default: () => CascadeSelectIsland
 });
 function CascadeSelectIsland(container, props) {
-  injectIslandStyle("cascadeselect", CSS37);
+  injectIslandStyle("cascadeselect", CSS36);
   const options = props.options || [];
   const size = props.size || "normal";
   const variant = props.variant || "outlined";
@@ -14949,7 +15411,7 @@ function CascadeSelectIsland(container, props) {
     }));
   }
 }
-var CSS37;
+var CSS36;
 var init_cascadeselect = __esm({
   "src/components/cascadeselect.ts"() {
     "use strict";
@@ -14957,7 +15419,7 @@ var init_cascadeselect = __esm({
     init_styles();
     init_useDisclosure();
     init_useClickOutside();
-    CSS37 = `
+    CSS36 = `
 .laughtale-cascadeselect {
     position: relative;
     display: inline-flex;
@@ -15162,7 +15624,7 @@ __export(listbox_exports, {
   default: () => ListboxIsland
 });
 function ListboxIsland(container, props) {
-  injectIslandStyle("laughtale-listbox", CSS38);
+  injectIslandStyle("laughtale-listbox", CSS37);
   const isMultiple = props.multiple === true || String(props.multiple) === "true";
   const isMetaKey = props.metaKeySelection !== false && String(props.metaKeySelection) !== "false";
   const isCheckbox = props.checkbox === true || String(props.checkbox) === "true";
@@ -15498,14 +15960,14 @@ function ListboxIsland(container, props) {
   }
   init();
 }
-var CSS38, checkSvg2, searchSvg2;
+var CSS37, checkSvg2, searchSvg2;
 var init_listbox = __esm({
   "src/components/listbox.ts"() {
     "use strict";
     init_lucide();
     init_styles();
     init_useDebounce();
-    CSS38 = `
+    CSS37 = `
 /* ==================== AURA LISTBOX ==================== */
 .laughtale-listbox,
 .p-listbox {
@@ -17391,12 +17853,12 @@ function OrgChartIsland(container, props) {
   function getNodeIconSvg(iconName) {
     if (!iconName) return "";
     const key = iconName.toLowerCase();
-    return ICONS[key] || ICONS.bolt;
+    return ICONS2[key] || ICONS2.bolt;
   }
   function renderNodeCardContent(node, isSelected, isIndet) {
     const checkboxHtml = selectionMode === "checkbox" ? `
             <div class="p-checkbox-box ${isSelected ? "p-checked" : isIndet ? "p-indeterminate" : ""}" role="checkbox" aria-checked="${isSelected}">
-                ${isSelected ? ICONS.check : isIndet ? '<span style="width: 8px; height: 2px; background: white; border-radius: 1px;"></span>' : ""}
+                ${isSelected ? ICONS2.check : isIndet ? '<span style="width: 8px; height: 2px; background: white; border-radius: 1px;"></span>' : ""}
             </div>
         ` : "";
     if (node.icon || node.accent || node.description) {
@@ -17433,9 +17895,9 @@ function OrgChartIsland(container, props) {
   }
   function getToggleIconSvg(isCollapsed) {
     if (toggleIconType === "plusMinus") {
-      return isCollapsed ? ICONS.plus : ICONS.minus;
+      return isCollapsed ? ICONS2.plus : ICONS2.minus;
     }
-    return isCollapsed ? ICONS.chevronDown : ICONS.chevronUp;
+    return isCollapsed ? ICONS2.chevronDown : ICONS2.chevronUp;
   }
   function renderBranch(node) {
     const key = String(node.key);
@@ -17595,7 +18057,7 @@ function OrgChartIsland(container, props) {
         if (chk) {
           chk.className = `p-checkbox-box ${isSelected ? "p-checked" : isIndet ? "p-indeterminate" : ""}`;
           chk.setAttribute("aria-checked", String(isSelected));
-          chk.innerHTML = isSelected ? ICONS.check : isIndet ? '<span style="width: 8px; height: 2px; background: white; border-radius: 1px;"></span>' : "";
+          chk.innerHTML = isSelected ? ICONS2.check : isIndet ? '<span style="width: 8px; height: 2px; background: white; border-radius: 1px;"></span>' : "";
         }
       }
     });
@@ -17713,7 +18175,7 @@ function OrgChartIsland(container, props) {
   renderTree();
   syncValues();
 }
-var ORGCHART_CSS, ICONS;
+var ORGCHART_CSS, ICONS2;
 var init_orgchart = __esm({
   "src/components/orgchart.ts"() {
     "use strict";
@@ -17954,7 +18416,7 @@ var init_orgchart = __esm({
     color: var(--p-surface-400, #94a3b8) !important;
 }
 `;
-    ICONS = {
+    ICONS2 = {
       chevronDown: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>',
       chevronUp: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>',
       plus: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>',
@@ -17977,7 +18439,7 @@ __export(terminal_exports, {
   default: () => TerminalIsland
 });
 function TerminalIsland(container, props) {
-  injectIslandStyle("terminal", CSS39);
+  injectIslandStyle("terminal", CSS38);
   const promptPrefix = props.prompt || "admin@softmax:~$";
   const welcome = props.welcomeMessage || 'Welcome to SoftMax.LaughTale CLI v3.0\nType "help" for available commands.';
   const commands = {
@@ -18076,13 +18538,13 @@ ${h.response}`).join("\n");
   }
   render();
 }
-var CSS39;
+var CSS38;
 var init_terminal = __esm({
   "src/components/terminal.ts"() {
     "use strict";
     init_styles();
     init_useClipboard();
-    CSS39 = `
+    CSS38 = `
 [data-theme="dark"] .laughtale-terminal {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -18113,7 +18575,7 @@ __export(dock_exports, {
   default: () => DockIsland
 });
 function DockIsland(container, props) {
-  injectIslandStyle("dock", CSS40);
+  injectIslandStyle("dock", CSS39);
   const items = props.items || [
     { label: "Overview", icon: "compass", url: "/" },
     { label: "Dashboard", icon: "bar-chart", url: "/dashboard" },
@@ -18155,13 +18617,13 @@ function DockIsland(container, props) {
     });
   });
 }
-var CSS40;
+var CSS39;
 var init_dock = __esm({
   "src/components/dock.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS40 = `
+    CSS39 = `
 [data-theme="dark"] .laughtale-dock {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -18182,7 +18644,7 @@ __export(galleria_exports, {
   default: () => GalleriaIsland
 });
 function GalleriaIsland(container, props) {
-  injectIslandStyle("galleria", CSS41);
+  injectIslandStyle("galleria", CSS40);
   const images = props.value && props.value.length > 0 ? props.value : [
     {
       itemImageSrc: "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800&auto=format&fit=crop&q=80",
@@ -18256,13 +18718,13 @@ function GalleriaIsland(container, props) {
   }
   render();
 }
-var CSS41;
+var CSS40;
 var init_galleria = __esm({
   "src/components/galleria.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS41 = `
+    CSS40 = `
 [data-theme="dark"] .laughtale-galleria {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -18293,7 +18755,7 @@ __export(blockui_exports, {
   default: () => BlockUIIsland
 });
 function BlockUIIsland(container, props) {
-  injectIslandStyle("blockui", CSS42);
+  injectIslandStyle("blockui", CSS41);
   let isBlocked = props.blocked ?? true;
   function render() {
     container.innerHTML = `
@@ -18316,12 +18778,12 @@ function BlockUIIsland(container, props) {
     render();
   });
 }
-var CSS42;
+var CSS41;
 var init_blockui = __esm({
   "src/components/blockui.ts"() {
     "use strict";
     init_styles();
-    CSS42 = `
+    CSS41 = `
 [data-theme="dark"] .laughtale-blockui-root {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -19053,7 +19515,7 @@ __export(select_exports, {
   default: () => SelectIsland
 });
 function SelectIsland(container, props) {
-  injectIslandStyle("laughtale-select", CSS43);
+  injectIslandStyle("laughtale-select", CSS42);
   const isMultiple = props.multiple === true || String(props.multiple) === "true";
   const isCheckmark = props.checkmark === true || String(props.checkmark) === "true";
   const isCheckbox = props.checkbox === true || String(props.checkbox) === "true";
@@ -19393,13 +19855,13 @@ function SelectIsland(container, props) {
   }
   render();
 }
-var CSS43;
+var CSS42;
 var init_select = __esm({
   "src/components/select.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS43 = `
+    CSS42 = `
 /* ==================== AURA SELECT ==================== */
 .laughtale-select,
 .p-select {
@@ -19826,7 +20288,7 @@ __export(checkbox_exports, {
   default: () => CheckboxIsland
 });
 function CheckboxIsland(container, props) {
-  injectIslandStyle("laughtale-checkbox", CSS44);
+  injectIslandStyle("laughtale-checkbox", CSS43);
   let isChecked = Boolean(props.checked);
   let isIndeterminate = Boolean(props.indeterminate);
   const size = props.size || "normal";
@@ -19898,13 +20360,13 @@ function CheckboxIsland(container, props) {
   }
   render();
 }
-var CSS44;
+var CSS43;
 var init_checkbox = __esm({
   "src/components/checkbox.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS44 = `
+    CSS43 = `
 .laughtale-checkbox-wrap {
     display: inline-flex;
     align-items: center;
@@ -20081,7 +20543,7 @@ __export(radio_button_exports, {
   default: () => RadioButtonIsland
 });
 function RadioButtonIsland(container, props) {
-  injectIslandStyle("laughtale-radio", CSS45);
+  injectIslandStyle("laughtale-radio", CSS44);
   const isCard = props.card === true || String(props.card) === "true";
   const isFilled = props.variant === "filled";
   const size = props.size || "normal";
@@ -20313,13 +20775,13 @@ function RadioButtonIsland(container, props) {
   }
   renderSingle();
 }
-var CSS45;
+var CSS44;
 var init_radio_button = __esm({
   "src/components/radio-button.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS45 = `
+    CSS44 = `
 /* ==================== AURA RADIOBUTTON ==================== */
 .laughtale-radio-root,
 .p-radiobutton-root {
@@ -20602,7 +21064,7 @@ __export(textarea_exports, {
   default: () => TextareaIsland
 });
 function TextareaIsland(container, props) {
-  injectIslandStyle("laughtale-textarea", CSS46);
+  injectIslandStyle("laughtale-textarea", CSS45);
   const isAutoResize = props.autoResize === true || String(props.autoResize) === "true";
   const isFluid = props.fluid === true || String(props.fluid) === "true";
   const isInvalid = props.invalid === true || String(props.invalid) === "true";
@@ -20678,12 +21140,12 @@ function TextareaIsland(container, props) {
     setTimeout(adjustHeight, 0);
   }
 }
-var CSS46;
+var CSS45;
 var init_textarea = __esm({
   "src/components/textarea.ts"() {
     "use strict";
     init_styles();
-    CSS46 = `
+    CSS45 = `
 /* ==================== AURA TEXTAREA ==================== */
 .p-textarea {
     font-family: var(--p-font-family, inherit);
@@ -20808,7 +21270,7 @@ __export(input_mask_exports, {
   default: () => InputMaskIsland
 });
 function InputMaskIsland(container, props) {
-  injectIslandStyle("laughtale-input-mask", CSS47);
+  injectIslandStyle("laughtale-input-mask", CSS46);
   const mask = props.mask || "(999) 999-9999";
   const slotChar = props.slotChar || "_";
   const autoClear = props.autoClear !== false && String(props.autoClear) !== "false";
@@ -20995,12 +21457,12 @@ function InputMaskIsland(container, props) {
   });
   syncValue();
 }
-var CSS47;
+var CSS46;
 var init_input_mask = __esm({
   "src/components/input-mask.ts"() {
     "use strict";
     init_styles();
-    CSS47 = `
+    CSS46 = `
 /* ==================== AURA INPUTMASK ==================== */
 .laughtale-input-mask,
 .p-inputmask {
@@ -21110,7 +21572,7 @@ __export(float_label_exports, {
   default: () => FloatLabelIsland
 });
 function FloatLabelIsland(container, props) {
-  injectIslandStyle("laughtale-float-label", CSS48);
+  injectIslandStyle("laughtale-float-label", CSS47);
   const variant = props.variant || "over";
   const initialHtml = container.innerHTML;
   const forAttr = props.for ? `for="${props.for}"` : "";
@@ -21188,12 +21650,12 @@ function FloatLabelIsland(container, props) {
   setTimeout(updateFloatingState, 50);
   setTimeout(updateFloatingState, 200);
 }
-var CSS48;
+var CSS47;
 var init_float_label = __esm({
   "src/components/float-label.ts"() {
     "use strict";
     init_styles();
-    CSS48 = `
+    CSS47 = `
 .laughtale-float-label {
     position: relative;
     display: inline-flex;
@@ -21320,7 +21782,7 @@ __export(ifta_label_exports, {
   default: () => IftaLabelIsland
 });
 function IftaLabelIsland(container, props) {
-  injectIslandStyle("laughtale-ifta-label", CSS49);
+  injectIslandStyle("laughtale-ifta-label", CSS48);
   const initialHtml = container.innerHTML;
   const forAttr = props.for ? `for="${props.for}"` : "";
   const existingLabel = container.querySelector("label");
@@ -21343,12 +21805,12 @@ function IftaLabelIsland(container, props) {
     }
   });
 }
-var CSS49;
+var CSS48;
 var init_ifta_label = __esm({
   "src/components/ifta-label.ts"() {
     "use strict";
     init_styles();
-    CSS49 = `
+    CSS48 = `
 .laughtale-ifta-label {
     position: relative;
     display: inline-flex;
@@ -21436,14 +21898,14 @@ __export(input_group_exports, {
   default: () => InputGroupIsland
 });
 function InputGroupIsland(container, props) {
-  injectIslandStyle("laughtale-inputgroup", CSS50);
+  injectIslandStyle("laughtale-inputgroup", CSS49);
   container.classList.add("laughtale-inputgroup", "p-inputgroup");
   if (props.size) {
     container.classList.add(`size-${props.size}`);
   }
 }
 function InputGroupAddonIsland(container, props) {
-  injectIslandStyle("laughtale-inputgroup", CSS50);
+  injectIslandStyle("laughtale-inputgroup", CSS49);
   container.classList.add("laughtale-inputgroup-addon", "p-inputgroup-addon");
   if (props.icon && !container.querySelector("svg")) {
     const svg = getLucideIcon(props.icon);
@@ -21455,13 +21917,13 @@ function InputGroupAddonIsland(container, props) {
     container.insertAdjacentHTML("beforeend", `<span>${props.text}</span>`);
   }
 }
-var CSS50;
+var CSS49;
 var init_input_group = __esm({
   "src/components/input-group.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS50 = `
+    CSS49 = `
 .laughtale-inputgroup,
 .p-inputgroup {
     display: flex;
@@ -21733,7 +22195,7 @@ __export(input_text_exports, {
   default: () => InputTextIsland
 });
 function InputTextIsland(container, props) {
-  injectIslandStyle("laughtale-inputtext", CSS51);
+  injectIslandStyle("laughtale-inputtext", CSS50);
   const [getValue, setValue] = useControllableState({
     defaultValue: props.value ?? "",
     onChange: (val) => {
@@ -21874,14 +22336,14 @@ function InputTextIsland(container, props) {
   }
   init();
 }
-var CSS51, xIcon;
+var CSS50, xIcon;
 var init_input_text = __esm({
   "src/components/input-text.ts"() {
     "use strict";
     init_styles();
     init_lucide();
     init_useControllableState();
-    CSS51 = `
+    CSS50 = `
 .laughtale-inputtext-wrap,
 .p-inputtext-wrap {
     position: relative;
@@ -22444,22 +22906,22 @@ function PaginatorIsland(container, props) {
     }
     const firstBtnHtml = showFirstLast ? `
             <button type="button" class="p-paginator-first" data-action="first" title="First Page" aria-label="First Page" ${isFirstPage ? "disabled" : ""}>
-                ${ICONS2.first}
+                ${ICONS3.first}
             </button>
         ` : "";
     const prevBtnHtml = `
             <button type="button" class="p-paginator-prev" data-action="prev" title="Previous Page" aria-label="Previous Page" ${isFirstPage ? "disabled" : ""}>
-                ${ICONS2.prev}
+                ${ICONS3.prev}
             </button>
         `;
     const nextBtnHtml = `
             <button type="button" class="p-paginator-next" data-action="next" title="Next Page" aria-label="Next Page" ${isLastPage ? "disabled" : ""}>
-                ${ICONS2.next}
+                ${ICONS3.next}
             </button>
         `;
     const lastBtnHtml = showFirstLast ? `
             <button type="button" class="p-paginator-last" data-action="last" title="Last Page" aria-label="Last Page" ${isLastPage ? "disabled" : ""}>
-                ${ICONS2.last}
+                ${ICONS3.last}
             </button>
         ` : "";
     let rppHtml = "";
@@ -22639,7 +23101,7 @@ function PaginatorIsland(container, props) {
   render();
   dispatchEvents();
 }
-var PAGINATOR_CSS, ICONS2, DEFAULT_IMAGES;
+var PAGINATOR_CSS, ICONS3, DEFAULT_IMAGES;
 var init_paginator = __esm({
   "src/components/paginator.ts"() {
     "use strict";
@@ -22872,7 +23334,7 @@ var init_paginator = __esm({
     border-color: var(--p-surface-700, #334155) !important;
 }
 `;
-    ICONS2 = {
+    ICONS3 = {
       first: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m11 17-5-5 5-5"/><path d="m18 17-5-5 5-5"/></svg>',
       prev: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>',
       next: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>',

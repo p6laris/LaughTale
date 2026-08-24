@@ -11,13 +11,24 @@ public record StepperStep(
 );
 
 public record TimelineItem(
-    string Id,
-    string Title,
-    string Description,
-    DateTimeOffset Timestamp,
-    TimelineStatus Status = TimelineStatus.Completed,
-    string? Actor = null,
-    string? Icon = null
+    string? Id = null,
+    string? Title = null,
+    string? Label = null,
+    string? Status = null,
+    string? Description = null,
+    string? Date = null,
+    string? Time = null,
+    DateTimeOffset? Timestamp = null,
+    string? Opposite = null,
+    string? Icon = null,
+    string? Color = null,
+    string? User = null,
+    List<string>? Details = null,
+    string? Tracking = null,
+    string? Action = null,
+    string? Target = null,
+    string? Repo = null,
+    string? Actor = null
 );
 
 public record DataGridCol<TItem>(

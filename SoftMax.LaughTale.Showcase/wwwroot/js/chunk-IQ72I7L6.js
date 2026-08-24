@@ -1050,13 +1050,13 @@ function getSlot(container, name = "default") {
 
 // ../SoftMax.LaughTale.Client/src/index.ts
 defineIsland("stepper", () => import("./stepper-JGXFKGGY.js"));
-defineIsland("timeline", () => import("./timeline-AQZ4AYXL.js"));
+defineIsland("timeline", () => import("./timeline-ZRKCIBJ6.js"));
 defineIsland("camera", () => import("./camera-KAAHJRTE.js"));
 defineIsland("dropzone", () => import("./dropzone-E76UIQBF.js"));
 defineIsland("tree-select", () => import("./tree-select-3WADBRSW.js"));
 defineIsland("datatable", () => import("./datatable-FJYSSBES.js"));
 defineIsland("datagrid", () => import("./datatable-FJYSSBES.js"));
-defineIsland("modal", () => import("./modal-JQXUSIMP.js"));
+defineIsland("modal", () => import("./modal-BLY3TOU7.js"));
 defineIsland("toast", () => import("./toast-WLFO7J5G.js"));
 defineIsland("input-number", () => import("./input-number-KQ2J2WMH.js"));
 defineIsland("input-otp", () => import("./input-otp-RUPMATZ7.js"));
@@ -1120,7 +1120,7 @@ defineIsland("inputgroup-addon", () => import("./input-group-SYXCWTLZ.js").then(
 defineIsland("input-text", () => import("./input-text-N5PAAEU3.js"));
 defineIsland("enhanced-input", () => import("./input-text-N5PAAEU3.js"));
 defineIsland("carousel", () => import("./carousel-YCWS2HUB.js"));
-defineIsland("paginator", () => import("./paginator-Z2G6GW6K.js"));
+defineIsland("paginator", () => import("./paginator-NY74SK5Q.js"));
 defineIsland("dataview", () => import("./dataview-7JZHVNBV.js"));
 defineIsland("menu", () => import("./menu-3E34L5JL.js"));
 defineIsland("context-menu", () => import("./context-menu-LU6WIMC7.js"));
@@ -1136,4 +1136,4 @@ export {
   enableViewTransitions,
   getSlot
 };
-//# sourceMappingURL=chunk-I25B42IT.js.map
+//# sourceMappingURL=chunk-IQ72I7L6.js.map

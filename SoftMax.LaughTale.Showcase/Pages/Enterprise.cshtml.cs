@@ -532,12 +532,56 @@ public class EnterpriseModel : PageModel
         new("step-3", "Security Clearance", "Audit review & sign-off", "3")
     };
 
+    public List<TimelineItem> TimelineBasicEvents { get; set; } = new()
+    {
+        new(Status: "Ordered"),
+        new(Status: "Processing"),
+        new(Status: "Shipped"),
+        new(Status: "Delivered")
+    };
+
+    public List<TimelineItem> TimelineOppositeEvents { get; set; } = new()
+    {
+        new(Status: "Ordered", Date: "15/10/2026 10:30"),
+        new(Status: "Processing", Date: "15/10/2026 14:00"),
+        new(Status: "Shipped", Date: "15/10/2026 16:15"),
+        new(Status: "Delivered", Date: "16/10/2026 10:00")
+    };
+
+    public List<string> TimelineHorizontalYears { get; set; } = new() { "2026", "2027", "2028", "2029" };
+
+    public List<TimelineItem> TimelineCustomEvents { get; set; } = new()
+    {
+        new(Status: "Order Placed", Date: "Oct 15, 2026", Time: "10:30 AM", Icon: "shoppingCart", Color: "bg-blue-500", User: "JD", Description: "Your order #12345 has been confirmed and is being prepared for processing.", Details: new() { "2x Wireless Headphones", "1x Phone Case", "1x USB-C Cable" }),
+        new(Status: "Payment Confirmed", Date: "Oct 15, 2026", Time: "10:32 AM", Icon: "creditCard", Color: "bg-green-500", User: "SY", Description: "Payment of $149.99 was successfully processed via Credit Card ending in 4242."),
+        new(Status: "Shipped", Date: "Oct 16, 2026", Time: "02:15 PM", Icon: "truck", Color: "bg-orange-500", User: "MK", Description: "Package has been handed to the carrier and is on its way.", Tracking: "TRK-892374651"),
+        new(Status: "Delivered", Date: "Oct 18, 2026", Time: "11:20 AM", Icon: "checkCircle", Color: "bg-lime-500", User: "JD", Description: "Package was delivered and signed for at the front door.")
+    };
+
+    public List<TimelineItem> TimelineInteractiveSteps { get; set; } = new()
+    {
+        new(Id: "1", Label: "Account Created", Icon: "userPlus"),
+        new(Id: "2", Label: "Email Verified", Icon: "envelope"),
+        new(Id: "3", Label: "Profile Completed", Icon: "idCard"),
+        new(Id: "4", Label: "First Purchase", Icon: "shoppingBag"),
+        new(Id: "5", Label: "Review Posted", Icon: "star")
+    };
+
+    public List<TimelineItem> TimelineActivities { get; set; } = new()
+    {
+        new(Id: "1", User: "Sarah Chen", Action: "pushed", Target: "3 commits", Repo: "main", Time: "2 minutes ago", Details: new() { "fix: resolve memory leak in useEffect", "feat: add dark mode toggle", "chore: update dependencies" }),
+        new(Id: "2", User: "Alex Kumar", Action: "opened", Target: "pull request #142", Repo: "feature/auth", Time: "15 minutes ago", Description: "Implement OAuth2 authentication flow"),
+        new(Id: "3", User: "Maya Johnson", Action: "commented on", Target: "issue #89", Time: "1 hour ago", Description: "I've investigated this bug and found the root cause. Working on a fix now."),
+        new(Id: "4", User: "David Park", Action: "merged", Target: "pull request #138", Repo: "main", Time: "3 hours ago"),
+        new(Id: "5", User: "Emma Wilson", Action: "created", Target: "release v2.4.0", Time: "5 hours ago", Description: "Performance improvements and bug fixes")
+    };
+
     public List<TimelineItem> AuditEvents { get; set; } = new()
     {
-        new("1", "TLS 1.3 Handshake Established", "Zero-Trust session authenticated via OAuth2 Bearer token.", DateTimeOffset.UtcNow.AddMinutes(-15), TimelineStatus.Completed, "Gateway-Proxy-01", "🔒"),
-        new("2", "Biometric Facial Recognition", "Face geometry match 99.4% confidence score.", DateTimeOffset.UtcNow.AddMinutes(-10), TimelineStatus.Completed, "Camera-Engine", "📸"),
-        new("3", "Department Role Allocation", "Security clearance escalated to Level 4 Tier.", DateTimeOffset.UtcNow.AddMinutes(-5), TimelineStatus.InProgress, "Auth-Worker-03", "⚡"),
-        new("4", "Cryptographic Sign-Off", "Awaiting HSM hardware certificate validation.", DateTimeOffset.UtcNow, TimelineStatus.Warning, "HSM-Cluster", "⏳")
+        new("1", Title: "TLS 1.3 Handshake Established", Description: "Zero-Trust session authenticated via OAuth2 Bearer token.", Timestamp: DateTimeOffset.UtcNow.AddMinutes(-15), Status: "completed", Actor: "Gateway-Proxy-01", Icon: "🔒"),
+        new("2", Title: "Biometric Facial Recognition", Description: "Face geometry match 99.4% confidence score.", Timestamp: DateTimeOffset.UtcNow.AddMinutes(-10), Status: "completed", Actor: "Camera-Engine", Icon: "📸"),
+        new("3", Title: "Department Role Allocation", Description: "Security clearance escalated to Level 4 Tier.", Timestamp: DateTimeOffset.UtcNow.AddMinutes(-5), Status: "in_progress", Actor: "Auth-Worker-03", Icon: "⚡"),
+        new("4", Title: "Cryptographic Sign-Off", Description: "Awaiting HSM hardware certificate validation.", Timestamp: DateTimeOffset.UtcNow, Status: "warning", Actor: "HSM-Cluster", Icon: "⏳")
     };
 
     public List<DataGridCol> GridColumns { get; set; } = new()
