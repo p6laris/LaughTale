@@ -2315,13 +2315,46 @@
     <section id="sec-dataview" class="component-card">
         <div class="card-header">
             <div>
-                <h2>DataView (Grid &amp; List Layouts)</h2>
-                <p>Switchable data presentation view with custom layout cards.</p>
+                <h2>DataView</h2>
+                <p>DataView displays data in grid or list layout with rich product presentation, interactive pagination, sorting controls, and skeleton loading.</p>
             </div>
-            <span class="aura-tag tag-slate">View</span>
+            <span class="aura-tag tag-emerald">Data Presentation</span>
         </div>
-        <div class="card-body">
-            <island-dataview items="@Model.GridRecords" layout="grid" />
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Demo 1: Basic -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">DataView requires a collection of items to display in standard list presentation.</p>
+                <island-dataview value="@Model.DataViewProducts" layout="list" rows="5" />
+            </div>
+
+            <!-- Demo 2: Pagination -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Pagination</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Pagination is enabled with the paginator and rows properties to browse large collections.</p>
+                <island-dataview value="@Model.DataViewProducts" layout="list" paginator="true" rows="5" />
+            </div>
+
+            <!-- Demo 3: Sorting -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Sorting</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Built-in sorting is controlled via sort dropdown options (Price High to Low / Low to High).</p>
+                <island-dataview value="@Model.DataViewProducts" layout="list" show-sort="true" title="Product Inventory" rows="5" />
+            </div>
+
+            <!-- Demo 4: Layout (Grid & List) -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Layout (Grid &amp; List)</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">DataView supports list and grid display modes switchable on the fly with the header layout toggle.</p>
+                <island-dataview value="@Model.DataViewProducts" layout="grid" show-layout-switcher="true" paginator="true" rows="6" title="Catalog" />
+            </div>
+
+            <!-- Demo 5: Loading State -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Loading (Skeleton Placeholders)</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">While data is being loaded, animated Skeleton placeholders indicate the busy state.</p>
+                <island-dataview value="@Model.DataViewProducts" layout="grid" show-layout-switcher="true" loading="true" title="Loading Catalog..." />
+            </div>
         </div>
     </section>
 

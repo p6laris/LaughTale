@@ -1,42 +1,15 @@
-/**
- * SoftMax.LaughTale: Enterprise DataView Component (Aura Design System compliant)
- * Displays data in List or Grid layouts with pagination, real-time sorting,
- * layout toggling, skeleton loading, and interactive action controls.
- */
+import {
+  useAutoAnimate
+} from "./chunk-P6OQD35U.js";
+import {
+  LucideIcons
+} from "./chunk-XHF3KYSF.js";
+import {
+  injectIslandStyle
+} from "./chunk-3TFPN5JM.js";
 
-import { injectIslandStyle } from '../runtime/styles';
-import { LucideIcons } from '../icons/lucide';
-import { useAutoAnimate } from '../composables/animation/useAutoAnimate';
-
-export interface DataViewItem {
-    id?: string | number;
-    name: string;
-    category?: string;
-    price?: number;
-    rating?: number;
-    inventoryStatus?: string;
-    image?: string;
-    code?: string;
-    [key: string]: any;
-}
-
-export interface DataViewProps {
-    value?: DataViewItem[];
-    items?: DataViewItem[];
-    layout?: 'list' | 'grid';
-    paginator?: boolean;
-    rows?: number;
-    first?: number;
-    rowsPerPageOptions?: number[];
-    sortField?: string;
-    sortOrder?: number; // 1 = asc, -1 = desc
-    showLayoutSwitcher?: boolean;
-    showSort?: boolean;
-    loading?: boolean;
-    title?: string;
-}
-
-const DATAVIEW_CSS = `
+// ../SoftMax.LaughTale.Client/src/components/dataview.ts
+var DATAVIEW_CSS = `
 .p-dataview {
     display: flex;
     flex-direction: column;
@@ -483,94 +456,79 @@ const DATAVIEW_CSS = `
     color: var(--p-surface-100, #f1f5f9) !important;
 }
 `;
-
-export default function DataViewIsland(container: HTMLElement, props: DataViewProps) {
-    injectIslandStyle('dataview', DATAVIEW_CSS);
-
-    const rawItems: DataViewItem[] = [...(props.value || props.items || [])];
-    let currentLayout: 'list' | 'grid' = props.layout || 'list';
-    const paginator = !!props.paginator;
-    let rowsPerPage = props.rows || 5;
-    let currentPage = Math.floor((props.first || 0) / rowsPerPage) + 1;
-    const rowsPerPageOptions = props.rowsPerPageOptions || [5, 10, 20];
-    let sortField = props.sortField;
-    let sortOrder = props.sortOrder ?? 1;
-    const showLayoutSwitcher = !!props.showLayoutSwitcher;
-    const showSort = !!props.showSort;
-    const loading = !!props.loading;
-
-    const wishlistedIds = new Set<any>();
-
-    function getSeverityTag(status?: string): string {
-        const s = (status || '').toUpperCase();
-        if (s === 'INSTOCK' || s === 'QUALIFIED') return '<span class="p-tag p-tag-success">In Stock</span>';
-        if (s === 'LOWSTOCK' || s === 'NEGOTIATION') return '<span class="p-tag p-tag-warn">Low Stock</span>';
-        if (s === 'OUTOFSTOCK' || s === 'UNQUALIFIED') return '<span class="p-tag p-tag-danger">Out of Stock</span>';
-        return s ? `<span class="p-tag p-tag-success">${s}</span>` : '';
+function DataViewIsland(container, props) {
+  injectIslandStyle("dataview", DATAVIEW_CSS);
+  const rawItems = [...props.value || props.items || []];
+  let currentLayout = props.layout || "list";
+  const paginator = !!props.paginator;
+  let rowsPerPage = props.rows || 5;
+  let currentPage = Math.floor((props.first || 0) / rowsPerPage) + 1;
+  const rowsPerPageOptions = props.rowsPerPageOptions || [5, 10, 20];
+  let sortField = props.sortField;
+  let sortOrder = props.sortOrder ?? 1;
+  const showLayoutSwitcher = !!props.showLayoutSwitcher;
+  const showSort = !!props.showSort;
+  const loading = !!props.loading;
+  const wishlistedIds = /* @__PURE__ */ new Set();
+  function getSeverityTag(status) {
+    const s = (status || "").toUpperCase();
+    if (s === "INSTOCK" || s === "QUALIFIED") return '<span class="p-tag p-tag-success">In Stock</span>';
+    if (s === "LOWSTOCK" || s === "NEGOTIATION") return '<span class="p-tag p-tag-warn">Low Stock</span>';
+    if (s === "OUTOFSTOCK" || s === "UNQUALIFIED") return '<span class="p-tag p-tag-danger">Out of Stock</span>';
+    return s ? `<span class="p-tag p-tag-success">${s}</span>` : "";
+  }
+  function render() {
+    const sortedItems = [...rawItems];
+    if (sortField) {
+      sortedItems.sort((a, b) => {
+        const valA = a[sortField];
+        const valB = b[sortField];
+        if (valA === valB) return 0;
+        if (valA == null) return 1;
+        if (valB == null) return -1;
+        const res = typeof valA === "number" && typeof valB === "number" ? valA - valB : String(valA).localeCompare(String(valB));
+        return res * sortOrder;
+      });
     }
-
-    function render() {
-        // 1. Sort Items
-        const sortedItems = [...rawItems];
-        if (sortField) {
-            sortedItems.sort((a, b) => {
-                const valA = a[sortField!];
-                const valB = b[sortField!];
-                if (valA === valB) return 0;
-                if (valA == null) return 1;
-                if (valB == null) return -1;
-                const res = typeof valA === 'number' && typeof valB === 'number'
-                    ? valA - valB
-                    : String(valA).localeCompare(String(valB));
-                return res * sortOrder;
-            });
-        }
-
-        // 2. Paginate Items
-        const totalRecords = sortedItems.length;
-        const totalPages = Math.ceil(totalRecords / rowsPerPage) || 1;
-        if (currentPage > totalPages) currentPage = totalPages;
-        if (currentPage < 1) currentPage = 1;
-        const firstIdx = (currentPage - 1) * rowsPerPage;
-        const displayItems = paginator ? sortedItems.slice(firstIdx, firstIdx + rowsPerPage) : sortedItems;
-
-        // Header HTML
-        let headerHtml = '';
-        const hasHeader = props.title || showLayoutSwitcher || showSort;
-        if (hasHeader) {
-            headerHtml = `
+    const totalRecords = sortedItems.length;
+    const totalPages = Math.ceil(totalRecords / rowsPerPage) || 1;
+    if (currentPage > totalPages) currentPage = totalPages;
+    if (currentPage < 1) currentPage = 1;
+    const firstIdx = (currentPage - 1) * rowsPerPage;
+    const displayItems = paginator ? sortedItems.slice(firstIdx, firstIdx + rowsPerPage) : sortedItems;
+    let headerHtml = "";
+    const hasHeader = props.title || showLayoutSwitcher || showSort;
+    if (hasHeader) {
+      headerHtml = `
                 <div class="p-dataview-header">
-                    <div class="p-dataview-title">${props.title || ''}</div>
+                    <div class="p-dataview-title">${props.title || ""}</div>
                     <div class="p-dataview-controls">
                         ${showSort ? `
                             <select class="p-dataview-sort-select">
-                                <option value="" ${!sortField ? 'selected' : ''}>Sort by Price...</option>
-                                <option value="lowtohigh" ${sortField === 'price' && sortOrder === 1 ? 'selected' : ''}>Price Low to High</option>
-                                <option value="hightolow" ${sortField === 'price' && sortOrder === -1 ? 'selected' : ''}>Price High to Low</option>
+                                <option value="" ${!sortField ? "selected" : ""}>Sort by Price...</option>
+                                <option value="lowtohigh" ${sortField === "price" && sortOrder === 1 ? "selected" : ""}>Price Low to High</option>
+                                <option value="hightolow" ${sortField === "price" && sortOrder === -1 ? "selected" : ""}>Price High to Low</option>
                             </select>
-                        ` : ''}
+                        ` : ""}
 
                         ${showLayoutSwitcher ? `
                             <div class="p-layout-switcher">
-                                <button type="button" class="p-layout-btn btn-layout-list ${currentLayout === 'list' ? 'p-active' : ''}" title="List View" aria-label="List View">
+                                <button type="button" class="p-layout-btn btn-layout-list ${currentLayout === "list" ? "p-active" : ""}" title="List View" aria-label="List View">
                                     ${LucideIcons.list}
                                 </button>
-                                <button type="button" class="p-layout-btn btn-layout-grid ${currentLayout === 'grid' ? 'p-active' : ''}" title="Grid View" aria-label="Grid View">
+                                <button type="button" class="p-layout-btn btn-layout-grid ${currentLayout === "grid" ? "p-active" : ""}" title="Grid View" aria-label="Grid View">
                                     ${LucideIcons.layoutGrid}
                                 </button>
                             </div>
-                        ` : ''}
+                        ` : ""}
                     </div>
                 </div>
             `;
-        }
-
-        // Content HTML
-        let contentHtml = '';
-        if (loading) {
-            // Skeleton Shimmer Loading
-            if (currentLayout === 'list') {
-                contentHtml = `
+    }
+    let contentHtml = "";
+    if (loading) {
+      if (currentLayout === "list") {
+        contentHtml = `
                     <div class="p-dataview-list">
                         ${Array.from({ length: rowsPerPage }).map(() => `
                             <div class="p-dataview-list-item">
@@ -590,11 +548,11 @@ export default function DataViewIsland(container: HTMLElement, props: DataViewPr
                                     </div>
                                 </div>
                             </div>
-                        `).join('')}
+                        `).join("")}
                     </div>
                 `;
-            } else {
-                contentHtml = `
+      } else {
+        contentHtml = `
                     <div class="p-dataview-grid">
                         ${Array.from({ length: 6 }).map(() => `
                             <div class="p-dataview-grid-card">
@@ -612,18 +570,17 @@ export default function DataViewIsland(container: HTMLElement, props: DataViewPr
                                     </div>
                                 </div>
                             </div>
-                        `).join('')}
+                        `).join("")}
                     </div>
                 `;
-            }
-        } else if (currentLayout === 'list') {
-            // List Items
-            contentHtml = `
+      }
+    } else if (currentLayout === "list") {
+      contentHtml = `
                 <div class="p-dataview-list dataview-animated-container">
-                    ${displayItems.map(item => {
-                        const isWishlisted = wishlistedIds.has(item.id || item.name);
-                        const isOutOfStock = (item.inventoryStatus || '').toUpperCase() === 'OUTOFSTOCK';
-                        return `
+                    ${displayItems.map((item) => {
+        const isWishlisted = wishlistedIds.has(item.id || item.name);
+        const isOutOfStock = (item.inventoryStatus || "").toUpperCase() === "OUTOFSTOCK";
+        return `
                             <div class="p-dataview-list-item" data-id="${item.id || item.name}">
                                 <div class="p-dataview-list-image-box">
                                     ${getSeverityTag(item.inventoryStatus)}
@@ -631,39 +588,38 @@ export default function DataViewIsland(container: HTMLElement, props: DataViewPr
                                 </div>
                                 <div class="p-dataview-list-body">
                                     <div class="p-dataview-item-info">
-                                        <span class="p-dataview-item-category">${item.category || 'General'}</span>
+                                        <span class="p-dataview-item-category">${item.category || "General"}</span>
                                         <div class="p-dataview-item-name">${item.name}</div>
                                         <div class="p-dataview-rating-pill">
                                             <span>${item.rating ?? 5}</span>
-                                            <span class="p-rating-star">★</span>
+                                            <span class="p-rating-star">\u2605</span>
                                         </div>
                                     </div>
                                     <div class="p-dataview-list-actions">
                                         <span class="p-dataview-price">$${item.price ?? 0}</span>
                                         <div class="p-dataview-btn-group">
-                                            <button type="button" class="p-dataview-btn-wishlist ${isWishlisted ? 'p-wishlisted' : ''}" data-id="${item.id || item.name}" title="Wishlist" aria-label="Wishlist">
+                                            <button type="button" class="p-dataview-btn-wishlist ${isWishlisted ? "p-wishlisted" : ""}" data-id="${item.id || item.name}" title="Wishlist" aria-label="Wishlist">
                                                 ${LucideIcons.heart}
                                             </button>
-                                            <button type="button" class="p-dataview-btn-buy" data-id="${item.id || item.name}" ${isOutOfStock ? 'disabled' : ''}>
+                                            <button type="button" class="p-dataview-btn-buy" data-id="${item.id || item.name}" ${isOutOfStock ? "disabled" : ""}>
                                                 <span>${LucideIcons.shoppingCart}</span>
-                                                <span>${isOutOfStock ? 'Out of Stock' : 'Buy Now'}</span>
+                                                <span>${isOutOfStock ? "Out of Stock" : "Buy Now"}</span>
                                             </button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         `;
-                    }).join('')}
+      }).join("")}
                 </div>
             `;
-        } else {
-            // Grid Cards
-            contentHtml = `
+    } else {
+      contentHtml = `
                 <div class="p-dataview-grid dataview-animated-container">
-                    ${displayItems.map(item => {
-                        const isWishlisted = wishlistedIds.has(item.id || item.name);
-                        const isOutOfStock = (item.inventoryStatus || '').toUpperCase() === 'OUTOFSTOCK';
-                        return `
+                    ${displayItems.map((item) => {
+        const isWishlisted = wishlistedIds.has(item.id || item.name);
+        const isOutOfStock = (item.inventoryStatus || "").toUpperCase() === "OUTOFSTOCK";
+        return `
                             <div class="p-dataview-grid-card" data-id="${item.id || item.name}">
                                 <div class="p-dataview-grid-image-box">
                                     ${getSeverityTag(item.inventoryStatus)}
@@ -671,72 +627,66 @@ export default function DataViewIsland(container: HTMLElement, props: DataViewPr
                                 </div>
                                 <div class="p-dataview-grid-body">
                                     <div style="display: flex; align-items: center; justify-content: space-between;">
-                                        <span class="p-dataview-item-category">${item.category || 'General'}</span>
+                                        <span class="p-dataview-item-category">${item.category || "General"}</span>
                                         <div class="p-dataview-rating-pill">
                                             <span>${item.rating ?? 5}</span>
-                                            <span class="p-rating-star">★</span>
+                                            <span class="p-rating-star">\u2605</span>
                                         </div>
                                     </div>
                                     <div class="p-dataview-item-name" style="font-size: 1rem;">${item.name}</div>
                                     <div class="p-dataview-price" style="font-size: 1.5rem;">$${item.price ?? 0}</div>
                                     <div style="display: flex; gap: 0.5rem; align-items: center;">
-                                        <button type="button" class="p-dataview-btn-buy" style="flex: 1; justify-content: center;" data-id="${item.id || item.name}" ${isOutOfStock ? 'disabled' : ''}>
+                                        <button type="button" class="p-dataview-btn-buy" style="flex: 1; justify-content: center;" data-id="${item.id || item.name}" ${isOutOfStock ? "disabled" : ""}>
                                             <span>${LucideIcons.shoppingCart}</span>
-                                            <span>${isOutOfStock ? 'Out of Stock' : 'Buy Now'}</span>
+                                            <span>${isOutOfStock ? "Out of Stock" : "Buy Now"}</span>
                                         </button>
-                                        <button type="button" class="p-dataview-btn-wishlist ${isWishlisted ? 'p-wishlisted' : ''}" data-id="${item.id || item.name}" title="Wishlist" aria-label="Wishlist">
+                                        <button type="button" class="p-dataview-btn-wishlist ${isWishlisted ? "p-wishlisted" : ""}" data-id="${item.id || item.name}" title="Wishlist" aria-label="Wishlist">
                                             ${LucideIcons.heart}
                                         </button>
                                     </div>
                                 </div>
                             </div>
                         `;
-                    }).join('')}
+      }).join("")}
                 </div>
             `;
-        }
-
-        // Paginator HTML
-        let paginatorHtml = '';
-        if (paginator) {
-            const startRecord = totalRecords > 0 ? firstIdx + 1 : 0;
-            const endRecord = Math.min(firstIdx + rowsPerPage, totalRecords);
-            const reportStr = `Showing ${startRecord} to ${endRecord} of ${totalRecords} entries`;
-
-            const pageButtons = [];
-            let startPage = Math.max(1, currentPage - 2);
-            let endPage = Math.min(totalPages, startPage + 4);
-            if (endPage - startPage < 4) startPage = Math.max(1, endPage - 4);
-
-            for (let p = startPage; p <= endPage; p++) {
-                pageButtons.push(`
-                    <button type="button" class="p-paginator-page ${p === currentPage ? 'p-paginator-page-active' : ''}" data-page="${p}">
+    }
+    let paginatorHtml = "";
+    if (paginator) {
+      const startRecord = totalRecords > 0 ? firstIdx + 1 : 0;
+      const endRecord = Math.min(firstIdx + rowsPerPage, totalRecords);
+      const reportStr = `Showing ${startRecord} to ${endRecord} of ${totalRecords} entries`;
+      const pageButtons = [];
+      let startPage = Math.max(1, currentPage - 2);
+      let endPage = Math.min(totalPages, startPage + 4);
+      if (endPage - startPage < 4) startPage = Math.max(1, endPage - 4);
+      for (let p = startPage; p <= endPage; p++) {
+        pageButtons.push(`
+                    <button type="button" class="p-paginator-page ${p === currentPage ? "p-paginator-page-active" : ""}" data-page="${p}">
                         ${p}
                     </button>
                 `);
-            }
-
-            paginatorHtml = `
+      }
+      paginatorHtml = `
                 <div class="p-dataview-paginator">
                     <span>${reportStr}</span>
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <button type="button" class="p-paginator-nav p-first" data-page="1" ${currentPage === 1 ? 'disabled' : ''} aria-label="First Page">«</button>
-                        <button type="button" class="p-paginator-nav p-prev" data-page="${currentPage - 1}" ${currentPage === 1 ? 'disabled' : ''} aria-label="Previous Page">‹</button>
-                        <div class="p-paginator-pages">${pageButtons.join('')}</div>
-                        <button type="button" class="p-paginator-nav p-next" data-page="${currentPage + 1}" ${currentPage === totalPages ? 'disabled' : ''} aria-label="Next Page">›</button>
-                        <button type="button" class="p-paginator-nav p-last" data-page="${totalPages}" ${currentPage === totalPages ? 'disabled' : ''} aria-label="Last Page">»</button>
+                        <button type="button" class="p-paginator-nav p-first" data-page="1" ${currentPage === 1 ? "disabled" : ""} aria-label="First Page">\xAB</button>
+                        <button type="button" class="p-paginator-nav p-prev" data-page="${currentPage - 1}" ${currentPage === 1 ? "disabled" : ""} aria-label="Previous Page">\u2039</button>
+                        <div class="p-paginator-pages">${pageButtons.join("")}</div>
+                        <button type="button" class="p-paginator-nav p-next" data-page="${currentPage + 1}" ${currentPage === totalPages ? "disabled" : ""} aria-label="Next Page">\u203A</button>
+                        <button type="button" class="p-paginator-nav p-last" data-page="${totalPages}" ${currentPage === totalPages ? "disabled" : ""} aria-label="Last Page">\xBB</button>
                     </div>
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                         <span>Rows per page:</span>
                         <select class="p-dataview-rows-select" style="padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px solid var(--p-surface-300); background: var(--p-surface-0); color: inherit; font-size: 0.8125rem;">
-                            ${rowsPerPageOptions.map(opt => `<option value="${opt}" ${opt === rowsPerPage ? 'selected' : ''}>${opt}</option>`).join('')}
+                            ${rowsPerPageOptions.map((opt) => `<option value="${opt}" ${opt === rowsPerPage ? "selected" : ""}>${opt}</option>`).join("")}
                         </select>
                     </div>
                 </div>
             `;
-        }
-
-        container.innerHTML = `
+    }
+    container.innerHTML = `
             <div class="p-dataview p-component">
                 ${headerHtml}
                 <div class="p-dataview-content">
@@ -745,94 +695,83 @@ export default function DataViewIsland(container: HTMLElement, props: DataViewPr
                 ${paginatorHtml}
             </div>
         `;
-
-        const animEl = container.querySelector<HTMLElement>('.dataview-animated-container');
-        if (animEl) useAutoAnimate(animEl, { duration: 200 });
-
-        bindEvents();
-    }
-
-    function bindEvents() {
-        const rootEl = container.firstElementChild as HTMLElement;
-        if (!rootEl) return;
-
-        // 1. Layout Buttons
-        rootEl.querySelector('.btn-layout-list')?.addEventListener('click', () => {
-            currentLayout = 'list';
-            render();
-        });
-        rootEl.querySelector('.btn-layout-grid')?.addEventListener('click', () => {
-            currentLayout = 'grid';
-            render();
-        });
-
-        // 2. Sort Dropdown
-        const sortSelect = rootEl.querySelector<HTMLSelectElement>('.p-dataview-sort-select');
-        if (sortSelect) {
-            sortSelect.addEventListener('change', () => {
-                const val = sortSelect.value;
-                if (val === 'lowtohigh') {
-                    sortField = 'price';
-                    sortOrder = 1;
-                } else if (val === 'hightolow') {
-                    sortField = 'price';
-                    sortOrder = -1;
-                } else {
-                    sortField = undefined;
-                }
-                render();
-            });
+    const animEl = container.querySelector(".dataview-animated-container");
+    if (animEl) useAutoAnimate(animEl, { duration: 200 });
+    bindEvents();
+  }
+  function bindEvents() {
+    const rootEl = container.firstElementChild;
+    if (!rootEl) return;
+    rootEl.querySelector(".btn-layout-list")?.addEventListener("click", () => {
+      currentLayout = "list";
+      render();
+    });
+    rootEl.querySelector(".btn-layout-grid")?.addEventListener("click", () => {
+      currentLayout = "grid";
+      render();
+    });
+    const sortSelect = rootEl.querySelector(".p-dataview-sort-select");
+    if (sortSelect) {
+      sortSelect.addEventListener("change", () => {
+        const val = sortSelect.value;
+        if (val === "lowtohigh") {
+          sortField = "price";
+          sortOrder = 1;
+        } else if (val === "hightolow") {
+          sortField = "price";
+          sortOrder = -1;
+        } else {
+          sortField = void 0;
         }
-
-        // 3. Wishlist Heart Buttons
-        rootEl.querySelectorAll<HTMLButtonElement>('.p-dataview-btn-wishlist').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const id = btn.getAttribute('data-id');
-                if (!id) return;
-                if (wishlistedIds.has(id)) wishlistedIds.delete(id);
-                else wishlistedIds.add(id);
-                btn.classList.toggle('p-wishlisted');
-                container.dispatchEvent(new CustomEvent('dataview:wishlist-toggle', {
-                    bubbles: true,
-                    detail: { id, isWishlisted: wishlistedIds.has(id) }
-                }));
-            });
-        });
-
-        // 4. Buy Now Buttons
-        rootEl.querySelectorAll<HTMLButtonElement>('.p-dataview-btn-buy').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const id = btn.getAttribute('data-id');
-                const matched = rawItems.find(it => String(it.id || it.name) === String(id));
-                container.dispatchEvent(new CustomEvent('dataview:buy-now', {
-                    bubbles: true,
-                    detail: { item: matched }
-                }));
-            });
-        });
-
-        // 5. Pagination Buttons
-        rootEl.querySelectorAll<HTMLButtonElement>('.p-paginator-page, .p-paginator-nav').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const targetPage = Number(btn.getAttribute('data-page'));
-                if (!isNaN(targetPage) && targetPage > 0) {
-                    currentPage = targetPage;
-                    render();
-                }
-            });
-        });
-
-        const rowsSelect = rootEl.querySelector<HTMLSelectElement>('.p-dataview-rows-select');
-        if (rowsSelect) {
-            rowsSelect.addEventListener('change', () => {
-                rowsPerPage = Number(rowsSelect.value);
-                currentPage = 1;
-                render();
-            });
-        }
+        render();
+      });
     }
-
-    render();
+    rootEl.querySelectorAll(".p-dataview-btn-wishlist").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const id = btn.getAttribute("data-id");
+        if (!id) return;
+        if (wishlistedIds.has(id)) wishlistedIds.delete(id);
+        else wishlistedIds.add(id);
+        btn.classList.toggle("p-wishlisted");
+        container.dispatchEvent(new CustomEvent("dataview:wishlist-toggle", {
+          bubbles: true,
+          detail: { id, isWishlisted: wishlistedIds.has(id) }
+        }));
+      });
+    });
+    rootEl.querySelectorAll(".p-dataview-btn-buy").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const id = btn.getAttribute("data-id");
+        const matched = rawItems.find((it) => String(it.id || it.name) === String(id));
+        container.dispatchEvent(new CustomEvent("dataview:buy-now", {
+          bubbles: true,
+          detail: { item: matched }
+        }));
+      });
+    });
+    rootEl.querySelectorAll(".p-paginator-page, .p-paginator-nav").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const targetPage = Number(btn.getAttribute("data-page"));
+        if (!isNaN(targetPage) && targetPage > 0) {
+          currentPage = targetPage;
+          render();
+        }
+      });
+    });
+    const rowsSelect = rootEl.querySelector(".p-dataview-rows-select");
+    if (rowsSelect) {
+      rowsSelect.addEventListener("change", () => {
+        rowsPerPage = Number(rowsSelect.value);
+        currentPage = 1;
+        render();
+      });
+    }
+  }
+  render();
 }
+export {
+  DataViewIsland as default
+};
+//# sourceMappingURL=dataview-2HAWXOAK.js.map

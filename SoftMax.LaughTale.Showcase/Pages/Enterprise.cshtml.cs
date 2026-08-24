@@ -743,6 +743,22 @@ public class EnterpriseModel : PageModel
         new("inventoryStatus", "Status")
     };
 
+    public List<object> DataViewProducts { get; set; } = new()
+    {
+        new { id = "1000", code = "f230fh0g3", name = "Bamboo Watch", category = "Accessories", price = 65, rating = 5, inventoryStatus = "INSTOCK", image = "bamboo-watch.jpg" },
+        new { id = "1001", code = "nvklal433", name = "Black Watch", category = "Accessories", price = 72, rating = 4, inventoryStatus = "INSTOCK", image = "black-watch.jpg" },
+        new { id = "1002", code = "zz21cz3c1", name = "Blue Band", category = "Fitness", price = 79, rating = 3, inventoryStatus = "LOWSTOCK", image = "blue-band.jpg" },
+        new { id = "1003", code = "244wgerg2", name = "Blue T-Shirt", category = "Clothing", price = 29, rating = 5, inventoryStatus = "INSTOCK", image = "blue-t-shirt.jpg" },
+        new { id = "1004", code = "h456wer53", name = "Bracelet", category = "Accessories", price = 15, rating = 4, inventoryStatus = "INSTOCK", image = "bracelet.jpg" },
+        new { id = "1005", code = "av2231fwg", name = "Brown Purse", category = "Accessories", price = 120, rating = 4, inventoryStatus = "OUTOFSTOCK", image = "brown-purse.jpg" },
+        new { id = "1006", code = "bib36pfvm", name = "Chakra Bracelet", category = "Accessories", price = 32, rating = 3, inventoryStatus = "LOWSTOCK", image = "chakra-bracelet.jpg" },
+        new { id = "1007", code = "mb89353st", name = "Galaxy Earrings", category = "Accessories", price = 34, rating = 5, inventoryStatus = "INSTOCK", image = "galaxy-earrings.jpg" },
+        new { id = "1008", code = "vbb124btr", name = "Game Controller", category = "Electronics", price = 99, rating = 4, inventoryStatus = "LOWSTOCK", image = "game-controller.jpg" },
+        new { id = "1009", code = "cm230f032", name = "Gaming Set", category = "Electronics", price = 299, rating = 3, inventoryStatus = "INSTOCK", image = "gaming-set.jpg" },
+        new { id = "1010", code = "pl1432f91", name = "Gold Phone Case", category = "Accessories", price = 24, rating = 4, inventoryStatus = "OUTOFSTOCK", image = "gold-phone-case.jpg" },
+        new { id = "1011", code = "rt23019aa", name = "Green Earbuds", category = "Electronics", price = 89, rating = 4, inventoryStatus = "INSTOCK", image = "green-earbuds.jpg" }
+    };
+
     public List<object> DataTableProducts { get; set; } = new()
     {
         new { id = 1000, code = "f230fh0g3", name = "Bamboo Watch", category = "Accessories", price = 65, quantity = 24, inventoryStatus = "INSTOCK", rating = 5 },

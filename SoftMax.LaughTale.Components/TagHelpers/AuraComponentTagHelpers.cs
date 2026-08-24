@@ -3912,16 +3912,22 @@ public class IslandPaginatorTagHelper : TagHelper
 }
 
 /// <summary>
-/// TagHelper for <island-dataview /> — Grid/list layout toggle
+/// TagHelper for <island-dataview /> (Aura DataView Component)
 /// </summary>
 [HtmlTargetElement("island-dataview")]
 public class IslandDataViewTagHelper : TagHelper
 {
-    public string Layout { get; set; } = "grid";
-    public bool ShowPaginator { get; set; } = false;
-    public int Rows { get; set; } = 12;
+    public object? Value { get; set; }
+    public object? Items { get; set; }
+    public string Layout { get; set; } = "list";
+    public bool Paginator { get; set; } = false;
+    public int Rows { get; set; } = 5;
     public string? SortField { get; set; }
-    public string SortOrder { get; set; } = "asc";
+    public int SortOrder { get; set; } = 1;
+    public bool ShowLayoutSwitcher { get; set; } = false;
+    public bool ShowSort { get; set; } = false;
+    public bool Loading { get; set; } = false;
+    public string? Title { get; set; }
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
@@ -3929,7 +3935,24 @@ public class IslandDataViewTagHelper : TagHelper
         output.TagMode = TagMode.StartTagAndEndTag;
         output.Attributes.SetAttribute("data-island", "dataview");
         output.Attributes.SetAttribute("data-hydrate", "load");
-        var props = new { layout = Layout, paginator = ShowPaginator, rows = Rows, sortField = SortField, sortOrder = SortOrder };
+
+        var data = Value ?? Items ?? new object[0];
+
+        var props = new
+        {
+            value = data,
+            items = data,
+            layout = Layout.ToLowerInvariant(),
+            paginator = Paginator,
+            rows = Rows,
+            sortField = SortField,
+            sortOrder = SortOrder,
+            showLayoutSwitcher = ShowLayoutSwitcher,
+            showSort = ShowSort,
+            loading = Loading,
+            title = Title
+        };
+
         output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
     }
 }
