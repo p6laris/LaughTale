@@ -450,17 +450,17 @@ function SpeedDialIsland(container, props) {
           };
         }
         case "left": {
-          const angle = Math.PI / 2 + index * step;
+          const angle = -Math.PI / 2 - index * step;
           return {
-            x: Math.round(-radius * Math.sin(angle)),
-            y: Math.round(radius * Math.cos(angle))
+            x: Math.round(radius * Math.cos(angle)),
+            y: Math.round(radius * Math.sin(angle))
           };
         }
         case "right": {
           const angle = -Math.PI / 2 + index * step;
           return {
-            x: Math.round(radius * Math.sin(angle)),
-            y: Math.round(radius * Math.cos(angle))
+            x: Math.round(radius * Math.cos(angle)),
+            y: Math.round(radius * Math.sin(angle))
           };
         }
         default: {
@@ -676,6 +676,13 @@ function SpeedDialIsland(container, props) {
           console.error("SpeedDial command error:", err);
         }
       }
+      if (item?.url) {
+        if (item.target === "_blank") {
+          window.open(item.url, "_blank", "noopener,noreferrer");
+        } else {
+          window.location.href = item.url;
+        }
+      }
       close();
     });
     const tooltip = el.querySelector(".p-speeddial-tooltip");
@@ -710,4 +717,4 @@ function SpeedDialIsland(container, props) {
 export {
   SpeedDialIsland as default
 };
-//# sourceMappingURL=speed-dial-BPMVMRZ3.js.map
+//# sourceMappingURL=speed-dial-WRJKIB6L.js.map

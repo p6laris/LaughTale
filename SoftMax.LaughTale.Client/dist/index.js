@@ -9919,6 +9919,13 @@ var SoftMaxIslands = (() => {
             console.error("SpeedDial command error:", err);
           }
         }
+        if (item?.url) {
+          if (item.target === "_blank") {
+            window.open(item.url, "_blank", "noopener,noreferrer");
+          } else {
+            window.location.href = item.url;
+          }
+        }
         close();
       });
       const tooltip = el.querySelector(".p-speeddial-tooltip");
@@ -10687,7 +10694,7 @@ var SoftMaxIslands = (() => {
     default: () => TabsIsland
   });
   function TabsIsland(container, props) {
-    injectIslandStyle("tabs", CSS27);
+    injectIslandStyle("tabs", TABS_CSS);
     const tabs = props.tabs || [];
     let activeIndex = props.activeIndex || 0;
     const initialSlots = {};
@@ -10706,8 +10713,9 @@ var SoftMaxIslands = (() => {
                 <button type="button" 
                         class="tab-header-btn ${isActive ? "tab-active" : ""}" 
                         data-idx="${idx}" 
-                        ${tab.disabled ? "disabled" : ""} 
-                        style="position: relative; padding: 0.75rem 1.25rem; border: none; background: transparent; color: ${isActive ? "var(--p-primary-600)" : "var(--p-text-muted)"}; font-weight: ${isActive ? "700" : "500"}; font-size: 0.875rem; cursor: ${tab.disabled ? "not-allowed" : "pointer"}; transition: color 0.15s ease; display: inline-flex; align-items: center; gap: 0.5rem; border-bottom: 2px solid ${isActive ? "var(--p-primary-600)" : "transparent"};">
+                        ${tab.disabled ? 'disabled aria-disabled="true"' : ""}
+                        role="tab"
+                        aria-selected="${isActive}">
                     ${iconText ? `<span>${iconText}</span>` : ""}
                     <span>${headerText}</span>
                 </button>
@@ -10715,14 +10723,11 @@ var SoftMaxIslands = (() => {
       }).join("");
       const activeContent = tabs[activeIndex]?.content || tabs[activeIndex]?.Content || "";
       container.innerHTML = `
-            <div class="laughtale-tabs" style="width: 100%;">
-                <!-- Tab Headers Bar -->
-                <div class="tabs-header-bar" style="display: flex; border-bottom: 1px solid var(--p-border-color); gap: 0.25rem; overflow-x: auto; position: relative;">
+            <div class="laughtale-tabs">
+                <div class="tabs-header-bar" role="tablist">
                     ${headerButtons}
                 </div>
-
-                <!-- Active Tab Content Panel -->
-                <div class="tab-panel-body" style="padding: 1.25rem 0; font-size: 0.875rem; color: var(--p-text-color); line-height: 1.6; transition: opacity 0.2s ease;">
+                <div class="tab-panel-body" role="tabpanel">
                     <div class="tab-slot-content">${activeContent}</div>
                 </div>
             </div>
@@ -10737,6 +10742,7 @@ var SoftMaxIslands = (() => {
         btn.addEventListener("click", (e) => {
           e.preventDefault();
           const idx = Number(btn.getAttribute("data-idx"));
+          if (tabs[idx]?.disabled) return;
           activeIndex = idx;
           render();
           if (props.targetInputName) {
@@ -10751,43 +10757,75 @@ var SoftMaxIslands = (() => {
           }
           container.dispatchEvent(new CustomEvent("tabs:change", {
             bubbles: true,
-            detail: { activeIndex }
+            detail: { activeIndex, tab: tabs[activeIndex] }
           }));
         });
       });
     }
     render();
   }
-  var CSS27;
+  var TABS_CSS;
   var init_tabs = __esm({
     "src/components/tabs.ts"() {
       "use strict";
       init_styles();
-      CSS27 = `
-[data-theme="dark"] .tab-header-btn {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+      TABS_CSS = `
+.laughtale-tabs {
+    width: 100%;
 }
-[data-theme="dark"] .laughtale-tabs {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.tabs-header-bar {
+    display: flex;
+    border-bottom: 1px solid var(--p-border-color);
+    gap: 0.5rem;
+    overflow-x: auto;
+    position: relative;
 }
-[data-theme="dark"] .tabs-header-bar {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.tab-header-btn {
+    position: relative;
+    padding: 0.75rem 1.25rem;
+    border: none;
+    background: transparent;
+    color: var(--p-text-muted);
+    font-weight: 500;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-bottom: 2px solid transparent;
+    outline: none;
+    user-select: none;
 }
-[data-theme="dark"] .tab-panel-body {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.tab-header-btn:hover:not(:disabled) {
+    color: var(--p-text-color);
 }
-[data-theme="dark"] .tab-slot-content {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.tab-header-btn.tab-active {
+    color: var(--p-primary-600);
+    font-weight: 700;
+    border-bottom-color: var(--p-primary-600);
+}
+
+.tab-header-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.tab-panel-body {
+    padding: 1.25rem 0;
+    font-size: 0.875rem;
+    color: var(--p-text-color);
+    line-height: 1.6;
+}
+
+.dark .tab-header-btn.tab-active,
+[data-theme="dark"] .tab-header-btn.tab-active {
+    color: var(--p-primary-500);
+    border-bottom-color: var(--p-primary-500);
 }
 `;
     }
@@ -10799,7 +10837,7 @@ var SoftMaxIslands = (() => {
     default: () => AutoCompleteIsland
   });
   function AutoCompleteIsland(container, props) {
-    injectIslandStyle("autocomplete", CSS28);
+    injectIslandStyle("autocomplete", CSS27);
     const allItems = props.suggestions || props.items || [];
     const multiple = props.multiple === true;
     const showClear = props.showClear !== false;
@@ -11132,7 +11170,7 @@ var SoftMaxIslands = (() => {
     }
     renderChips();
   }
-  var CSS28;
+  var CSS27;
   var init_autocomplete = __esm({
     "src/components/autocomplete.ts"() {
       "use strict";
@@ -11141,7 +11179,7 @@ var SoftMaxIslands = (() => {
       init_useDisclosure();
       init_useClickOutside();
       init_useDebounce();
-      CSS28 = `
+      CSS27 = `
 .laughtale-autocomplete {
     position: relative;
     display: inline-flex;
@@ -11411,7 +11449,7 @@ var SoftMaxIslands = (() => {
     default: () => ColorPickerIsland
   });
   function ColorPickerIsland(container, props) {
-    injectIslandStyle("color-picker", CSS29);
+    injectIslandStyle("color-picker", CSS28);
     let currentColor = props.value || "#10b981";
     let isOpen = false;
     const swatchesHtml = DEFAULT_PRESETS.map((c) => `
@@ -11535,7 +11573,7 @@ var SoftMaxIslands = (() => {
     }
     syncValue();
   }
-  var DEFAULT_PRESETS, CSS29;
+  var DEFAULT_PRESETS, CSS28;
   var init_color_picker = __esm({
     "src/components/color-picker.ts"() {
       "use strict";
@@ -11557,7 +11595,7 @@ var SoftMaxIslands = (() => {
         "#1e293b",
         "#000000"
       ];
-      CSS29 = `
+      CSS28 = `
 [data-theme="dark"] .color-swatch-btn {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -11593,7 +11631,7 @@ var SoftMaxIslands = (() => {
     default: () => KnobIsland
   });
   function KnobIsland(container, props) {
-    injectIslandStyle("knob", CSS30);
+    injectIslandStyle("knob", CSS29);
     const min = props.min !== void 0 ? props.min : 0;
     const max = props.max !== void 0 ? props.max : 100;
     const step = props.step || 1;
@@ -11695,12 +11733,12 @@ var SoftMaxIslands = (() => {
     }
     syncValue();
   }
-  var CSS30;
+  var CSS29;
   var init_knob = __esm({
     "src/components/knob.ts"() {
       "use strict";
       init_styles();
-      CSS30 = `
+      CSS29 = `
 [data-theme="dark"] .laughtale-knob {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -11726,7 +11764,7 @@ var SoftMaxIslands = (() => {
     default: () => TagIsland
   });
   function TagIsland(container, props) {
-    injectIslandStyle("tag", CSS31);
+    injectIslandStyle("tag", CSS30);
     const severity = props.severity || "info";
     const isRounded = props.rounded || false;
     let bg = "var(--p-blue-50, #eff6ff)";
@@ -11760,12 +11798,12 @@ var SoftMaxIslands = (() => {
         </span>
     `;
   }
-  var CSS31;
+  var CSS30;
   var init_tag = __esm({
     "src/components/tag.ts"() {
       "use strict";
       init_styles();
-      CSS31 = `
+      CSS30 = `
 [data-theme="dark"] .laughtale-tag {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -11781,7 +11819,7 @@ var SoftMaxIslands = (() => {
     default: () => BreadcrumbIsland
   });
   function BreadcrumbIsland(container, props) {
-    injectIslandStyle("breadcrumb", CSS32);
+    injectIslandStyle("breadcrumb", CSS31);
     const items = props.items || [];
     const homeUrl = props.homeUrl || "/";
     const itemsHtml = items.map((item, idx) => {
@@ -11819,13 +11857,13 @@ var SoftMaxIslands = (() => {
         </nav>
     `;
   }
-  var CSS32;
+  var CSS31;
   var init_breadcrumb = __esm({
     "src/components/breadcrumb.ts"() {
       "use strict";
       init_lucide();
       init_styles();
-      CSS32 = `
+      CSS31 = `
 [data-theme="dark"] .laughtale-breadcrumb {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -11841,7 +11879,7 @@ var SoftMaxIslands = (() => {
     default: () => ScrollTopIsland
   });
   function ScrollTopIsland(container, props) {
-    injectIslandStyle("scroll-top", CSS33);
+    injectIslandStyle("scroll-top", CSS32);
     const threshold = props.threshold || 200;
     let isVisible = false;
     function render() {
@@ -11867,13 +11905,13 @@ var SoftMaxIslands = (() => {
     window.addEventListener("scroll", checkScroll, { passive: true });
     render();
   }
-  var CSS33;
+  var CSS32;
   var init_scroll_top = __esm({
     "src/components/scroll-top.ts"() {
       "use strict";
       init_lucide();
       init_styles();
-      CSS33 = `
+      CSS32 = `
 [data-theme="dark"] .laughtale-scroll-top-btn {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -11889,7 +11927,7 @@ var SoftMaxIslands = (() => {
     default: () => InplaceIsland
   });
   function InplaceIsland(container, props) {
-    injectIslandStyle("inplace", CSS34);
+    injectIslandStyle("inplace", CSS33);
     let isEditing = false;
     let currentValue = props.value || "";
     function render() {
@@ -11969,13 +12007,13 @@ var SoftMaxIslands = (() => {
     render();
     syncValue();
   }
-  var CSS34;
+  var CSS33;
   var init_inplace = __esm({
     "src/components/inplace.ts"() {
       "use strict";
       init_lucide();
       init_styles();
-      CSS34 = `
+      CSS33 = `
 [data-theme="dark"] .laughtale-inplace-display {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -12011,7 +12049,7 @@ var SoftMaxIslands = (() => {
     default: () => CommandPaletteIsland
   });
   function CommandPaletteIsland(container, props) {
-    injectIslandStyle("command", CSS35);
+    injectIslandStyle("command", CSS34);
     const placeholder = props.placeholder || "Type a command or search...";
     const items = props.items || [
       { id: "home", label: "Go to Overview", group: "Navigation", icon: "compass", url: "/", shortcut: "G H" },
@@ -12185,7 +12223,7 @@ var SoftMaxIslands = (() => {
     ]);
     document.addEventListener("command:open", () => open());
   }
-  var CSS35;
+  var CSS34;
   var init_command = __esm({
     "src/components/command.ts"() {
       "use strict";
@@ -12195,7 +12233,7 @@ var SoftMaxIslands = (() => {
       init_useFocusTrap();
       init_useHotkeys();
       init_useScrollLock();
-      CSS35 = `
+      CSS34 = `
 [data-theme="dark"] .laughtale-command-root {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -13059,7 +13097,7 @@ public static class AppTheme
     default: () => DynamicFormIsland
   });
   function DynamicFormIsland(container, props) {
-    injectIslandStyle("dynamic-form", CSS36);
+    injectIslandStyle("dynamic-form", CSS35);
     let schema = props.schema || null;
     if (!schema && props.schemaJson) {
       try {
@@ -13220,13 +13258,13 @@ public static class AppTheme
     }
     render();
   }
-  var CSS36;
+  var CSS35;
   var init_dynamic_form = __esm({
     "src/components/dynamic-form.ts"() {
       "use strict";
       init_styles();
       init_lucide();
-      CSS36 = `
+      CSS35 = `
 [data-theme="dark"] .p-input {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -13257,7 +13295,7 @@ public static class AppTheme
     default: () => SplitterIsland
   });
   function SplitterIsland(container, props) {
-    injectIslandStyle("splitter", CSS37);
+    injectIslandStyle("splitter", CSS36);
     const layout = props.layout || "horizontal";
     const isHorizontal = layout === "horizontal";
     const panels = props.panels && props.panels.length >= 2 ? props.panels : [
@@ -13300,13 +13338,13 @@ public static class AppTheme
       }
     });
   }
-  var CSS37;
+  var CSS36;
   var init_splitter = __esm({
     "src/components/splitter.ts"() {
       "use strict";
       init_styles();
       init_useDragGesture();
-      CSS37 = `
+      CSS36 = `
 [data-theme="dark"] .laughtale-splitter {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -13337,7 +13375,7 @@ public static class AppTheme
     default: () => MultiSelectIsland
   });
   function MultiSelectIsland(container, props) {
-    injectIslandStyle("multiselect", CSS38);
+    injectIslandStyle("multiselect", CSS37);
     const options = props.options || [];
     let selected = new Set(props.selectedValues || []);
     let filterQuery = "";
@@ -13503,7 +13541,7 @@ public static class AppTheme
     renderDisplay();
     syncValue();
   }
-  var CSS38;
+  var CSS37;
   var init_multiselect = __esm({
     "src/components/multiselect.ts"() {
       "use strict";
@@ -13512,7 +13550,7 @@ public static class AppTheme
       init_useDisclosure();
       init_useClickOutside();
       init_useTransition();
-      CSS38 = `
+      CSS37 = `
 [data-theme="dark"] .laughtale-multiselect {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -13583,7 +13621,7 @@ public static class AppTheme
     default: () => CascadeSelectIsland
   });
   function CascadeSelectIsland(container, props) {
-    injectIslandStyle("cascadeselect", CSS39);
+    injectIslandStyle("cascadeselect", CSS38);
     const options = props.options || [];
     const size = props.size || "normal";
     const variant = props.variant || "outlined";
@@ -13796,7 +13834,7 @@ public static class AppTheme
       }));
     }
   }
-  var CSS39;
+  var CSS38;
   var init_cascadeselect = __esm({
     "src/components/cascadeselect.ts"() {
       "use strict";
@@ -13804,7 +13842,7 @@ public static class AppTheme
       init_styles();
       init_useDisclosure();
       init_useClickOutside();
-      CSS39 = `
+      CSS38 = `
 .laughtale-cascadeselect {
     position: relative;
     display: inline-flex;
@@ -14009,7 +14047,7 @@ public static class AppTheme
     default: () => ListboxIsland
   });
   function ListboxIsland(container, props) {
-    injectIslandStyle("laughtale-listbox", CSS40);
+    injectIslandStyle("laughtale-listbox", CSS39);
     const isMultiple = props.multiple === true || String(props.multiple) === "true";
     const isMetaKey = props.metaKeySelection !== false && String(props.metaKeySelection) !== "false";
     const isCheckbox = props.checkbox === true || String(props.checkbox) === "true";
@@ -14345,14 +14383,14 @@ public static class AppTheme
     }
     init();
   }
-  var CSS40, checkSvg2, searchSvg2;
+  var CSS39, checkSvg2, searchSvg2;
   var init_listbox = __esm({
     "src/components/listbox.ts"() {
       "use strict";
       init_lucide();
       init_styles();
       init_useDebounce();
-      CSS40 = `
+      CSS39 = `
 /* ==================== AURA LISTBOX ==================== */
 .laughtale-listbox,
 .p-listbox {
@@ -14681,7 +14719,7 @@ public static class AppTheme
     default: () => PickListIsland
   });
   function PickListIsland(container, props) {
-    injectIslandStyle("picklist", CSS41);
+    injectIslandStyle("picklist", CSS40);
     let sourceList = props.source ? [...props.source] : [
       { id: "1", name: "Identity & Access Manager" },
       { id: "2", name: "Audit Compliance Engine" },
@@ -14813,14 +14851,14 @@ public static class AppTheme
     render();
     syncValues();
   }
-  var CSS41;
+  var CSS40;
   var init_picklist = __esm({
     "src/components/picklist.ts"() {
       "use strict";
       init_styles();
       init_lucide();
       init_useAutoAnimate();
-      CSS41 = `
+      CSS40 = `
 [data-theme="dark"] .laughtale-picklist {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -14881,7 +14919,7 @@ public static class AppTheme
     default: () => OrderListIsland
   });
   function OrderListIsland(container, props) {
-    injectIslandStyle("orderlist", CSS42);
+    injectIslandStyle("orderlist", CSS41);
     let items = props.items ? [...props.items] : [
       { id: "1", name: "Phase 1: Zero-Trust Gateway Init", order: 0 },
       { id: "2", name: "Phase 2: Hydrate Islands Engine", order: 1 },
@@ -14981,13 +15019,13 @@ public static class AppTheme
     render();
     syncValues();
   }
-  var CSS42;
+  var CSS41;
   var init_orderlist = __esm({
     "src/components/orderlist.ts"() {
       "use strict";
       init_styles();
       init_useAutoAnimate();
-      CSS42 = `
+      CSS41 = `
 [data-theme="dark"] .laughtale-orderlist {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -15033,7 +15071,7 @@ public static class AppTheme
     default: () => OrgChartIsland
   });
   function OrgChartIsland(container, props) {
-    injectIslandStyle("orgchart", CSS43);
+    injectIslandStyle("orgchart", CSS42);
     const rootNode = props.value || {
       key: "0",
       label: "Chief Technology Officer",
@@ -15108,12 +15146,12 @@ public static class AppTheme
       });
     });
   }
-  var CSS43;
+  var CSS42;
   var init_orgchart = __esm({
     "src/components/orgchart.ts"() {
       "use strict";
       init_styles();
-      CSS43 = `
+      CSS42 = `
 [data-theme="dark"] .orgchart-node-table {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -15139,7 +15177,7 @@ public static class AppTheme
     default: () => TerminalIsland
   });
   function TerminalIsland(container, props) {
-    injectIslandStyle("terminal", CSS44);
+    injectIslandStyle("terminal", CSS43);
     const promptPrefix = props.prompt || "admin@softmax:~$";
     const welcome = props.welcomeMessage || 'Welcome to SoftMax.LaughTale CLI v3.0\nType "help" for available commands.';
     const commands = {
@@ -15238,13 +15276,13 @@ ${h.response}`).join("\n");
     }
     render();
   }
-  var CSS44;
+  var CSS43;
   var init_terminal = __esm({
     "src/components/terminal.ts"() {
       "use strict";
       init_styles();
       init_useClipboard();
-      CSS44 = `
+      CSS43 = `
 [data-theme="dark"] .laughtale-terminal {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -15275,7 +15313,7 @@ ${h.response}`).join("\n");
     default: () => DockIsland
   });
   function DockIsland(container, props) {
-    injectIslandStyle("dock", CSS45);
+    injectIslandStyle("dock", CSS44);
     const items = props.items || [
       { label: "Overview", icon: "compass", url: "/" },
       { label: "Dashboard", icon: "bar-chart", url: "/dashboard" },
@@ -15317,13 +15355,13 @@ ${h.response}`).join("\n");
       });
     });
   }
-  var CSS45;
+  var CSS44;
   var init_dock = __esm({
     "src/components/dock.ts"() {
       "use strict";
       init_styles();
       init_lucide();
-      CSS45 = `
+      CSS44 = `
 [data-theme="dark"] .laughtale-dock {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -15344,7 +15382,7 @@ ${h.response}`).join("\n");
     default: () => GalleriaIsland
   });
   function GalleriaIsland(container, props) {
-    injectIslandStyle("galleria", CSS46);
+    injectIslandStyle("galleria", CSS45);
     const images = props.value && props.value.length > 0 ? props.value : [
       {
         itemImageSrc: "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800&auto=format&fit=crop&q=80",
@@ -15418,13 +15456,13 @@ ${h.response}`).join("\n");
     }
     render();
   }
-  var CSS46;
+  var CSS45;
   var init_galleria = __esm({
     "src/components/galleria.ts"() {
       "use strict";
       init_styles();
       init_lucide();
-      CSS46 = `
+      CSS45 = `
 [data-theme="dark"] .laughtale-galleria {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -15455,7 +15493,7 @@ ${h.response}`).join("\n");
     default: () => BlockUIIsland
   });
   function BlockUIIsland(container, props) {
-    injectIslandStyle("blockui", CSS47);
+    injectIslandStyle("blockui", CSS46);
     let isBlocked = props.blocked ?? true;
     function render() {
       container.innerHTML = `
@@ -15478,12 +15516,12 @@ ${h.response}`).join("\n");
       render();
     });
   }
-  var CSS47;
+  var CSS46;
   var init_blockui = __esm({
     "src/components/blockui.ts"() {
       "use strict";
       init_styles();
-      CSS47 = `
+      CSS46 = `
 [data-theme="dark"] .laughtale-blockui-root {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -15504,7 +15542,7 @@ ${h.response}`).join("\n");
     default: () => SplitButtonIsland
   });
   function SplitButtonIsland(container, props) {
-    injectIslandStyle("split-button", CSS48);
+    injectIslandStyle("split-button", CSS47);
     const label = props.label || "Save";
     const items = props.model || [
       { label: "Update & Sync", icon: "refresh-cw", action: "update" },
@@ -15568,7 +15606,7 @@ ${h.response}`).join("\n");
       });
     });
   }
-  var CSS48;
+  var CSS47;
   var init_split_button = __esm({
     "src/components/split-button.ts"() {
       "use strict";
@@ -15577,7 +15615,7 @@ ${h.response}`).join("\n");
       init_useDisclosure();
       init_useClickOutside();
       init_useTransition();
-      CSS48 = `
+      CSS47 = `
 [data-theme="dark"] .splitbutton-main-btn {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -15608,7 +15646,7 @@ ${h.response}`).join("\n");
     default: () => SelectIsland
   });
   function SelectIsland(container, props) {
-    injectIslandStyle("laughtale-select", CSS49);
+    injectIslandStyle("laughtale-select", CSS48);
     const isMultiple = props.multiple === true || String(props.multiple) === "true";
     const isCheckmark = props.checkmark === true || String(props.checkmark) === "true";
     const isCheckbox = props.checkbox === true || String(props.checkbox) === "true";
@@ -15948,13 +15986,13 @@ ${h.response}`).join("\n");
     }
     render();
   }
-  var CSS49;
+  var CSS48;
   var init_select = __esm({
     "src/components/select.ts"() {
       "use strict";
       init_styles();
       init_lucide();
-      CSS49 = `
+      CSS48 = `
 /* ==================== AURA SELECT ==================== */
 .laughtale-select,
 .p-select {
@@ -16381,7 +16419,7 @@ ${h.response}`).join("\n");
     default: () => CheckboxIsland
   });
   function CheckboxIsland(container, props) {
-    injectIslandStyle("laughtale-checkbox", CSS50);
+    injectIslandStyle("laughtale-checkbox", CSS49);
     let isChecked = Boolean(props.checked);
     let isIndeterminate = Boolean(props.indeterminate);
     const size = props.size || "normal";
@@ -16453,13 +16491,13 @@ ${h.response}`).join("\n");
     }
     render();
   }
-  var CSS50;
+  var CSS49;
   var init_checkbox = __esm({
     "src/components/checkbox.ts"() {
       "use strict";
       init_styles();
       init_lucide();
-      CSS50 = `
+      CSS49 = `
 .laughtale-checkbox-wrap {
     display: inline-flex;
     align-items: center;
@@ -16636,7 +16674,7 @@ ${h.response}`).join("\n");
     default: () => RadioButtonIsland
   });
   function RadioButtonIsland(container, props) {
-    injectIslandStyle("laughtale-radio", CSS51);
+    injectIslandStyle("laughtale-radio", CSS50);
     const isCard = props.card === true || String(props.card) === "true";
     const isFilled = props.variant === "filled";
     const size = props.size || "normal";
@@ -16868,13 +16906,13 @@ ${h.response}`).join("\n");
     }
     renderSingle();
   }
-  var CSS51;
+  var CSS50;
   var init_radio_button = __esm({
     "src/components/radio-button.ts"() {
       "use strict";
       init_styles();
       init_lucide();
-      CSS51 = `
+      CSS50 = `
 /* ==================== AURA RADIOBUTTON ==================== */
 .laughtale-radio-root,
 .p-radiobutton-root {
@@ -17157,7 +17195,7 @@ ${h.response}`).join("\n");
     default: () => TextareaIsland
   });
   function TextareaIsland(container, props) {
-    injectIslandStyle("laughtale-textarea", CSS52);
+    injectIslandStyle("laughtale-textarea", CSS51);
     const isAutoResize = props.autoResize === true || String(props.autoResize) === "true";
     const isFluid = props.fluid === true || String(props.fluid) === "true";
     const isInvalid = props.invalid === true || String(props.invalid) === "true";
@@ -17233,12 +17271,12 @@ ${h.response}`).join("\n");
       setTimeout(adjustHeight, 0);
     }
   }
-  var CSS52;
+  var CSS51;
   var init_textarea = __esm({
     "src/components/textarea.ts"() {
       "use strict";
       init_styles();
-      CSS52 = `
+      CSS51 = `
 /* ==================== AURA TEXTAREA ==================== */
 .p-textarea {
     font-family: var(--p-font-family, inherit);
@@ -17363,7 +17401,7 @@ ${h.response}`).join("\n");
     default: () => InputMaskIsland
   });
   function InputMaskIsland(container, props) {
-    injectIslandStyle("laughtale-input-mask", CSS53);
+    injectIslandStyle("laughtale-input-mask", CSS52);
     const mask = props.mask || "(999) 999-9999";
     const slotChar = props.slotChar || "_";
     const autoClear = props.autoClear !== false && String(props.autoClear) !== "false";
@@ -17550,12 +17588,12 @@ ${h.response}`).join("\n");
     });
     syncValue();
   }
-  var CSS53;
+  var CSS52;
   var init_input_mask = __esm({
     "src/components/input-mask.ts"() {
       "use strict";
       init_styles();
-      CSS53 = `
+      CSS52 = `
 /* ==================== AURA INPUTMASK ==================== */
 .laughtale-input-mask,
 .p-inputmask {
@@ -17665,7 +17703,7 @@ ${h.response}`).join("\n");
     default: () => FloatLabelIsland
   });
   function FloatLabelIsland(container, props) {
-    injectIslandStyle("laughtale-float-label", CSS54);
+    injectIslandStyle("laughtale-float-label", CSS53);
     const variant = props.variant || "over";
     const initialHtml = container.innerHTML;
     const forAttr = props.for ? `for="${props.for}"` : "";
@@ -17743,12 +17781,12 @@ ${h.response}`).join("\n");
     setTimeout(updateFloatingState, 50);
     setTimeout(updateFloatingState, 200);
   }
-  var CSS54;
+  var CSS53;
   var init_float_label = __esm({
     "src/components/float-label.ts"() {
       "use strict";
       init_styles();
-      CSS54 = `
+      CSS53 = `
 .laughtale-float-label {
     position: relative;
     display: inline-flex;
@@ -17875,7 +17913,7 @@ ${h.response}`).join("\n");
     default: () => IftaLabelIsland
   });
   function IftaLabelIsland(container, props) {
-    injectIslandStyle("laughtale-ifta-label", CSS55);
+    injectIslandStyle("laughtale-ifta-label", CSS54);
     const initialHtml = container.innerHTML;
     const forAttr = props.for ? `for="${props.for}"` : "";
     const existingLabel = container.querySelector("label");
@@ -17898,12 +17936,12 @@ ${h.response}`).join("\n");
       }
     });
   }
-  var CSS55;
+  var CSS54;
   var init_ifta_label = __esm({
     "src/components/ifta-label.ts"() {
       "use strict";
       init_styles();
-      CSS55 = `
+      CSS54 = `
 .laughtale-ifta-label {
     position: relative;
     display: inline-flex;
@@ -17991,14 +18029,14 @@ ${h.response}`).join("\n");
     default: () => InputGroupIsland
   });
   function InputGroupIsland(container, props) {
-    injectIslandStyle("laughtale-inputgroup", CSS56);
+    injectIslandStyle("laughtale-inputgroup", CSS55);
     container.classList.add("laughtale-inputgroup", "p-inputgroup");
     if (props.size) {
       container.classList.add(`size-${props.size}`);
     }
   }
   function InputGroupAddonIsland(container, props) {
-    injectIslandStyle("laughtale-inputgroup", CSS56);
+    injectIslandStyle("laughtale-inputgroup", CSS55);
     container.classList.add("laughtale-inputgroup-addon", "p-inputgroup-addon");
     if (props.icon && !container.querySelector("svg")) {
       const svg = getLucideIcon(props.icon);
@@ -18010,13 +18048,13 @@ ${h.response}`).join("\n");
       container.insertAdjacentHTML("beforeend", `<span>${props.text}</span>`);
     }
   }
-  var CSS56;
+  var CSS55;
   var init_input_group = __esm({
     "src/components/input-group.ts"() {
       "use strict";
       init_styles();
       init_lucide();
-      CSS56 = `
+      CSS55 = `
 .laughtale-inputgroup,
 .p-inputgroup {
     display: flex;
@@ -18288,7 +18326,7 @@ ${h.response}`).join("\n");
     default: () => InputTextIsland
   });
   function InputTextIsland(container, props) {
-    injectIslandStyle("laughtale-inputtext", CSS57);
+    injectIslandStyle("laughtale-inputtext", CSS56);
     const [getValue, setValue] = useControllableState({
       defaultValue: props.value ?? "",
       onChange: (val) => {
@@ -18429,14 +18467,14 @@ ${h.response}`).join("\n");
     }
     init();
   }
-  var CSS57, xIcon;
+  var CSS56, xIcon;
   var init_input_text = __esm({
     "src/components/input-text.ts"() {
       "use strict";
       init_styles();
       init_lucide();
       init_useControllableState();
-      CSS57 = `
+      CSS56 = `
 .laughtale-inputtext-wrap,
 .p-inputtext-wrap {
     position: relative;
@@ -18932,7 +18970,7 @@ ${h.response}`).join("\n");
     default: () => PaginatorIsland
   });
   function PaginatorIsland(container, props) {
-    injectIslandStyle("paginator", CSS58);
+    injectIslandStyle("paginator", CSS57);
     let first = props.first || 0;
     let rows = props.rows || 10;
     const totalRecords = props.totalRecords || 0;
@@ -18992,13 +19030,13 @@ ${h.response}`).join("\n");
     }
     render();
   }
-  var CSS58;
+  var CSS57;
   var init_paginator = __esm({
     "src/components/paginator.ts"() {
       "use strict";
       init_lucide();
       init_styles();
-      CSS58 = `
+      CSS57 = `
 .laughtale-paginator {
     display: flex;
     align-items: center;

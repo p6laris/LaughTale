@@ -753,6 +753,14 @@ export default function SpeedDialIsland(container: HTMLElement, props: SpeedDial
                 }
             }
 
+            if (item?.url) {
+                if (item.target === '_blank') {
+                    window.open(item.url, '_blank', 'noopener,noreferrer');
+                } else {
+                    window.location.href = item.url;
+                }
+            }
+
             close();
         });
 

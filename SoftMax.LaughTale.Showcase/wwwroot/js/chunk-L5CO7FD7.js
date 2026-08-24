@@ -1055,7 +1055,7 @@ defineIsland("camera", () => import("./camera-KAAHJRTE.js"));
 defineIsland("dropzone", () => import("./dropzone-E76UIQBF.js"));
 defineIsland("tree-select", () => import("./tree-select-JBGQ75LI.js"));
 defineIsland("datagrid", () => import("./datagrid-OWH5VQKO.js"));
-defineIsland("modal", () => import("./modal-APL4BWZZ.js"));
+defineIsland("modal", () => import("./modal-OUNJEWK2.js"));
 defineIsland("toast", () => import("./toast-WLFO7J5G.js"));
 defineIsland("input-number", () => import("./input-number-KQ2J2WMH.js"));
 defineIsland("input-otp", () => import("./input-otp-RUPMATZ7.js"));
@@ -1077,11 +1077,11 @@ defineIsland("avatar-group", () => import("./avatar-group-VNSODI34.js"));
 defineIsland("progress-bar", () => import("./progress-bar-FCJC5G3P.js"));
 defineIsland("skeleton", () => import("./skeleton-4CLSEMFH.js"));
 defineIsland("drawer", () => import("./drawer-3TR6Z4LL.js"));
-defineIsland("speed-dial", () => import("./speed-dial-BPMVMRZ3.js"));
+defineIsland("speed-dial", () => import("./speed-dial-WRJKIB6L.js"));
 defineIsland("image-compare", () => import("./image-compare-6BR2BVQR.js"));
 defineIsland("confirm-popup", () => import("./confirm-popup-RHTBBEPC.js"));
 defineIsland("accordion", () => import("./accordion-HG5TYRA4.js"));
-defineIsland("tabs", () => import("./tabs-VR75X7VK.js"));
+defineIsland("tabs", () => import("./tabs-KTJMUQFY.js"));
 defineIsland("autocomplete", () => import("./autocomplete-57J3MCBX.js"));
 defineIsland("color-picker", () => import("./color-picker-VDAKHERO.js"));
 defineIsland("knob", () => import("./knob-QRIVX7GP.js"));
@@ -1135,4 +1135,4 @@ export {
   enableViewTransitions,
   getSlot
 };
-//# sourceMappingURL=chunk-MT42HJ57.js.map
+//# sourceMappingURL=chunk-L5CO7FD7.js.map

@@ -1,11 +1,9 @@
 /**
- * SoftMax.LaughTale: Enterprise Tabs & TabView Component (Aura Tabs inspired)
- * Integrated with useMorphLayout for fluid active indicator pill animations.
+ * SoftMax.LaughTale: Enterprise Tabs & TabView Component (Aura Tabs compliant)
  */
 
 import { TabItem } from '../types/models';
 import { injectIslandStyle } from '../runtime/styles';
-import { useMorphLayout } from '../composables/animation/useMorphLayout';
 
 export interface TabsProps {
     tabs?: TabItem[];
@@ -13,39 +11,71 @@ export interface TabsProps {
     targetInputName?: string;
 }
 
+const TABS_CSS = `
+.laughtale-tabs {
+    width: 100%;
+}
 
-const CSS = `
-[data-theme="dark"] .tab-header-btn {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+.tabs-header-bar {
+    display: flex;
+    border-bottom: 1px solid var(--p-border-color);
+    gap: 0.5rem;
+    overflow-x: auto;
+    position: relative;
 }
-[data-theme="dark"] .laughtale-tabs {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.tab-header-btn {
+    position: relative;
+    padding: 0.75rem 1.25rem;
+    border: none;
+    background: transparent;
+    color: var(--p-text-muted);
+    font-weight: 500;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-bottom: 2px solid transparent;
+    outline: none;
+    user-select: none;
 }
-[data-theme="dark"] .tabs-header-bar {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.tab-header-btn:hover:not(:disabled) {
+    color: var(--p-text-color);
 }
-[data-theme="dark"] .tab-panel-body {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.tab-header-btn.tab-active {
+    color: var(--p-primary-600);
+    font-weight: 700;
+    border-bottom-color: var(--p-primary-600);
 }
-[data-theme="dark"] .tab-slot-content {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.tab-header-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.tab-panel-body {
+    padding: 1.25rem 0;
+    font-size: 0.875rem;
+    color: var(--p-text-color);
+    line-height: 1.6;
+}
+
+.dark .tab-header-btn.tab-active,
+[data-theme="dark"] .tab-header-btn.tab-active {
+    color: var(--p-primary-500);
+    border-bottom-color: var(--p-primary-500);
 }
 `;
 
 export default function TabsIsland(container: HTMLElement, props: TabsProps) {
-    injectIslandStyle('tabs', CSS);
+    injectIslandStyle('tabs', TABS_CSS);
     const tabs = props.tabs || [];
     let activeIndex = props.activeIndex || 0;
+
     const initialSlots: Record<string, HTMLElement> = {};
     container.querySelectorAll<HTMLElement>('[data-slot]').forEach((el) => {
         const slotKey = el.getAttribute('data-slot') || '';
@@ -63,8 +93,9 @@ export default function TabsIsland(container: HTMLElement, props: TabsProps) {
                 <button type="button" 
                         class="tab-header-btn ${isActive ? 'tab-active' : ''}" 
                         data-idx="${idx}" 
-                        ${tab.disabled ? 'disabled' : ''} 
-                        style="position: relative; padding: 0.75rem 1.25rem; border: none; background: transparent; color: ${isActive ? 'var(--p-primary-600)' : 'var(--p-text-muted)'}; font-weight: ${isActive ? '700' : '500'}; font-size: 0.875rem; cursor: ${tab.disabled ? 'not-allowed' : 'pointer'}; transition: color 0.15s ease; display: inline-flex; align-items: center; gap: 0.5rem; border-bottom: 2px solid ${isActive ? 'var(--p-primary-600)' : 'transparent'};">
+                        ${tab.disabled ? 'disabled aria-disabled="true"' : ''}
+                        role="tab"
+                        aria-selected="${isActive}">
                     ${iconText ? `<span>${iconText}</span>` : ''}
                     <span>${headerText}</span>
                 </button>
@@ -74,20 +105,16 @@ export default function TabsIsland(container: HTMLElement, props: TabsProps) {
         const activeContent = (tabs[activeIndex] as any)?.content || (tabs[activeIndex] as any)?.Content || '';
 
         container.innerHTML = `
-            <div class="laughtale-tabs" style="width: 100%;">
-                <!-- Tab Headers Bar -->
-                <div class="tabs-header-bar" style="display: flex; border-bottom: 1px solid var(--p-border-color); gap: 0.25rem; overflow-x: auto; position: relative;">
+            <div class="laughtale-tabs">
+                <div class="tabs-header-bar" role="tablist">
                     ${headerButtons}
                 </div>
-
-                <!-- Active Tab Content Panel -->
-                <div class="tab-panel-body" style="padding: 1.25rem 0; font-size: 0.875rem; color: var(--p-text-color); line-height: 1.6; transition: opacity 0.2s ease;">
+                <div class="tab-panel-body" role="tabpanel">
                     <div class="tab-slot-content">${activeContent}</div>
                 </div>
             </div>
         `;
 
-        // Slot projection support for Razor slot templates
         const slotEl = initialSlots[`tab-${activeIndex}`];
         const targetContainer = container.querySelector('.tab-slot-content');
         if (slotEl && targetContainer) {
@@ -99,6 +126,7 @@ export default function TabsIsland(container: HTMLElement, props: TabsProps) {
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
                 const idx = Number(btn.getAttribute('data-idx'));
+                if (tabs[idx]?.disabled) return;
                 activeIndex = idx;
                 render();
 
@@ -115,7 +143,7 @@ export default function TabsIsland(container: HTMLElement, props: TabsProps) {
 
                 container.dispatchEvent(new CustomEvent('tabs:change', {
                     bubbles: true,
-                    detail: { activeIndex }
+                    detail: { activeIndex, tab: tabs[activeIndex] }
                 }));
             });
         });
