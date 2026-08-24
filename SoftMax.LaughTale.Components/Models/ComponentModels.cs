@@ -252,6 +252,11 @@ public record PickListItem<TData>(
     string Name,
     string? Category = null,
     string? Code = null,
+    string? Image = null,
+    decimal? Price = null,
+    string? Subtitle = null,
+    string? Avatar = null,
+    string? Role = null,
     TData? Data = default
 );
 
@@ -259,7 +264,12 @@ public record PickListItem(
     string Id,
     string Name,
     string? Category = null,
-    string? Code = null
+    string? Code = null,
+    string? Image = null,
+    decimal? Price = null,
+    string? Subtitle = null,
+    string? Avatar = null,
+    string? Role = null
 );
 
 public record OrderListItem<TData>(

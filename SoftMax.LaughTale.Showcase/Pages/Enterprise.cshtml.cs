@@ -357,6 +357,38 @@ public class EnterpriseModel : PageModel
         new("sec-5", "HSM Root Key", "FIPS 140-3 L4 Hardware Key")
     };
 
+    public List<PickListItem> PickListMembersSource { get; set; } = new()
+    {
+        new("1", "Amy Elsner", Role: "Product Manager", Avatar: "AE"),
+        new("2", "Asiya Javayant", Role: "DevOps Engineer", Avatar: "AJ"),
+        new("3", "Onyama Limba", Role: "Lead Architect", Avatar: "OL"),
+        new("4", "Anna Fali", Role: "Frontend Developer", Avatar: "AF"),
+        new("5", "Bernardo Dominic", Role: "Backend Developer", Avatar: "BD"),
+        new("6", "Elwin Sharvill", Role: "QA Engineer", Avatar: "ES"),
+        new("7", "Ioni Bowcher", Role: "Security Specialist", Avatar: "IB"),
+        new("8", "Stephen Shaw", Role: "UI/UX Designer", Avatar: "SS"),
+        new("9", "Ivan Magalhaes", Role: "Cloud Architect", Avatar: "IM"),
+        new("10", "Xuxue Feng", Role: "Database Administrator", Avatar: "XF")
+    };
+
+    public List<PickListItem> PickListMembersTarget { get; set; } = new();
+
+    public List<PickListItem> PickListProductsSource { get; set; } = new()
+    {
+        new("1000", "Bamboo Watch", Category: "Accessories", Price: 65, Image: "bamboo-watch.jpg"),
+        new("1001", "Black Watch", Category: "Accessories", Price: 72, Image: "black-watch.jpg"),
+        new("1002", "Blue Band", Category: "Fitness", Price: 79, Image: "blue-band.jpg"),
+        new("1003", "Blue T-Shirt", Category: "Clothing", Price: 29, Image: "blue-t-shirt.jpg"),
+        new("1004", "Bracelet", Category: "Accessories", Price: 15, Image: "bracelet.jpg"),
+        new("1005", "Brown Purse", Category: "Accessories", Price: 120, Image: "brown-purse.jpg"),
+        new("1006", "Chakra Bracelet", Category: "Accessories", Price: 32, Image: "chakra-bracelet.jpg"),
+        new("1007", "Galaxy Earrings", Category: "Accessories", Price: 34, Image: "galaxy-earrings.jpg"),
+        new("1008", "Game Controller", Category: "Electronics", Price: 99, Image: "game-controller.jpg"),
+        new("1009", "Gaming Set", Category: "Electronics", Price: 299, Image: "gaming-set.jpg")
+    };
+
+    public List<PickListItem> PickListProductsTarget { get; set; } = new();
+
     public List<OrderListItem> OrderListTasks { get; set; } = new()
     {
         new("t-1", "Step 1: TLS 1.3 Handshake", "Security", 1),

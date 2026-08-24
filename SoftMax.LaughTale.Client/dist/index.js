@@ -15843,120 +15843,439 @@ public static class AppTheme
     default: () => PickListIsland
   });
   function PickListIsland(container, props) {
-    injectIslandStyle("picklist", CSS39);
-    let sourceList = props.source ? [...props.source] : [
-      { id: "1", name: "Identity & Access Manager" },
-      { id: "2", name: "Audit Compliance Engine" },
-      { id: "3", name: "Rate Limiter Gateway" }
-    ];
-    let targetList = props.target ? [...props.target] : [
-      { id: "4", name: "Zero-Trust HSM Validator" }
-    ];
+    injectIslandStyle("picklist", PICKLIST_CSS);
+    const initialSource = props.value ? props.value[0] : props.source || [];
+    const initialTarget = props.value ? props.value[1] : props.target || [];
+    let sourceList = [...initialSource];
+    let targetList = [...initialTarget];
+    const dataKey = props.dataKey || "id";
+    const isCheckbox = !!props.checkbox;
+    const isFilter = !!props.filter;
+    const filterBy = props.filterBy || "name";
+    const sourceHeader = props.sourceHeader || "Available";
+    const targetHeader = props.targetHeader || "Selected";
+    const showSourceControls = !!props.showSourceControls;
+    const showTargetControls = !!props.showTargetControls;
+    const scrollHeight = props.scrollHeight || "18rem";
+    const emptyMessageSource = props.emptyMessageSource || "No available options";
+    const emptyMessageTarget = props.emptyMessageTarget || "No available options";
     let selectedSource = /* @__PURE__ */ new Set();
     let selectedTarget = /* @__PURE__ */ new Set();
-    function render() {
-      container.innerHTML = `
-            <div class="laughtale-picklist" style="display: flex; align-items: center; gap: 1rem; width: 100%; max-width: 680px; font-family: var(--p-font-family, inherit);">
-                <!-- Source Box -->
-                <div style="flex: 1; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); background: var(--p-surface-0); overflow: hidden; display: flex; flex-direction: column;">
-                    <div style="padding: 0.625rem 0.875rem; background: var(--p-surface-50); border-bottom: 1px solid var(--p-border-color); font-size: 0.75rem; font-weight: 700; color: var(--p-surface-600); text-transform: uppercase;">
-                        ${props.sourceHeader || "Available"} (${sourceList.length})
+    let sourceFilterQuery = "";
+    let targetFilterQuery = "";
+    function getItemId(item) {
+      return String(item[dataKey] || item.id || item.name);
+    }
+    function renderItemContent(item, isSelected) {
+      const checkboxHtml = isCheckbox ? `
+            <div class="p-checkbox-box ${isSelected ? "p-checked" : ""}" role="checkbox" aria-checked="${isSelected}">
+                ${isSelected ? LucideIcons.check : ""}
+            </div>
+        ` : "";
+      if (item.price != null || item.category != null || item.image != null) {
+        return `
+                ${checkboxHtml}
+                <div class="p-picklist-product-item">
+                    <div class="p-picklist-product-img">
+                        ${LucideIcons.package}
                     </div>
-                    <div class="picklist-source-list" style="height: 180px; overflow-y: auto; padding: 0.25rem 0;">
-                        ${sourceList.map((it) => `
-                            <div class="picklist-item source-item ${selectedSource.has(it.id) ? "active" : ""}" data-id="${it.id}" style="padding: 0.45rem 0.75rem; cursor: pointer; font-size: 0.8125rem; background: ${selectedSource.has(it.id) ? "var(--p-primary-50)" : "transparent"}; color: ${selectedSource.has(it.id) ? "var(--p-primary-700)" : "var(--p-text-color)"}; font-weight: ${selectedSource.has(it.id) ? "600" : "normal"}; transition: all 0.15s ease;">
-                                ${it.name}
-                            </div>
-                        `).join("")}
+                    <div class="p-picklist-product-details">
+                        <span class="p-picklist-product-name">${item.name}</span>
+                        <span class="p-picklist-product-category">${item.category || ""}</span>
+                    </div>
+                    ${item.price != null ? `<span class="p-picklist-product-price">$${item.price}</span>` : ""}
+                </div>
+            `;
+      }
+      if (item.avatar != null || item.role != null) {
+        const initials = item.name.split(" ").map((w) => w[0]).join("").substring(0, 2);
+        return `
+                ${checkboxHtml}
+                <div class="p-picklist-member-item">
+                    <div class="p-picklist-member-avatar">${initials}</div>
+                    <div style="display: flex; flex-direction: column;">
+                        <span style="font-weight: 600; color: var(--p-surface-900);">${item.name}</span>
+                        ${item.role ? `<span style="font-size: 0.75rem; color: var(--p-surface-500);">${item.role}</span>` : ""}
                     </div>
                 </div>
+            `;
+      }
+      return `
+            ${checkboxHtml}
+            <span style="flex: 1; font-weight: ${isSelected ? "600" : "normal"};">${item.name}</span>
+        `;
+    }
+    function render() {
+      const filteredSource = sourceList.filter((item) => {
+        if (!isFilter || !sourceFilterQuery.trim()) return true;
+        const val = String(item[filterBy] || item.name || "").toLowerCase();
+        return val.includes(sourceFilterQuery.toLowerCase());
+      });
+      const filteredTarget = targetList.filter((item) => {
+        if (!isFilter || !targetFilterQuery.trim()) return true;
+        const val = String(item[filterBy] || item.name || "").toLowerCase();
+        return val.includes(targetFilterQuery.toLowerCase());
+      });
+      const isAllSourceSelected = filteredSource.length > 0 && filteredSource.every((it) => selectedSource.has(getItemId(it)));
+      const isSourceIndeterminate = filteredSource.some((it) => selectedSource.has(getItemId(it))) && !isAllSourceSelected;
+      const isAllTargetSelected = filteredTarget.length > 0 && filteredTarget.every((it) => selectedTarget.has(getItemId(it)));
+      const isTargetIndeterminate = filteredTarget.some((it) => selectedTarget.has(getItemId(it))) && !isAllTargetSelected;
+      const sourceControlsHtml = showSourceControls ? `
+            <div class="p-picklist-controls p-picklist-source-controls">
+                <button type="button" class="p-picklist-control-btn btn-source-top" title="Move Top" aria-label="Move Top">${LucideIcons.chevronsUp}</button>
+                <button type="button" class="p-picklist-control-btn btn-source-up" title="Move Up" aria-label="Move Up">${LucideIcons.chevronUp}</button>
+                <button type="button" class="p-picklist-control-btn btn-source-down" title="Move Down" aria-label="Move Down">${LucideIcons.chevronDown}</button>
+                <button type="button" class="p-picklist-control-btn btn-source-bottom" title="Move Bottom" aria-label="Move Bottom">${LucideIcons.chevronsDown}</button>
+            </div>
+        ` : "";
+      const targetControlsHtml = showTargetControls ? `
+            <div class="p-picklist-controls p-picklist-target-controls">
+                <button type="button" class="p-picklist-control-btn btn-target-top" title="Move Top" aria-label="Move Top">${LucideIcons.chevronsUp}</button>
+                <button type="button" class="p-picklist-control-btn btn-target-up" title="Move Up" aria-label="Move Up">${LucideIcons.chevronUp}</button>
+                <button type="button" class="p-picklist-control-btn btn-target-down" title="Move Down" aria-label="Move Down">${LucideIcons.chevronDown}</button>
+                <button type="button" class="p-picklist-control-btn btn-target-bottom" title="Move Bottom" aria-label="Move Bottom">${LucideIcons.chevronsDown}</button>
+            </div>
+        ` : "";
+      const sourceHeaderCheckboxHtml = isCheckbox ? `
+            <div class="p-checkbox-box p-source-select-all ${isAllSourceSelected ? "p-checked" : isSourceIndeterminate ? "p-indeterminate" : ""}" role="checkbox" aria-checked="${isAllSourceSelected}">
+                ${isAllSourceSelected ? LucideIcons.check : isSourceIndeterminate ? '<span style="width: 8px; height: 2px; background: white;"></span>' : ""}
+            </div>
+        ` : "";
+      const targetHeaderCheckboxHtml = isCheckbox ? `
+            <div class="p-checkbox-box p-target-select-all ${isAllTargetSelected ? "p-checked" : isTargetIndeterminate ? "p-indeterminate" : ""}" role="checkbox" aria-checked="${isAllTargetSelected}">
+                ${isAllTargetSelected ? LucideIcons.check : isTargetIndeterminate ? '<span style="width: 8px; height: 2px; background: white;"></span>' : ""}
+            </div>
+        ` : "";
+      const sourceFilterHtml = isFilter ? `
+            <div class="p-picklist-filter-container">
+                <input type="text" class="p-picklist-filter-input p-source-filter" placeholder="${props.sourceFilterPlaceholder || "Search by name"}" value="${sourceFilterQuery}" />
+                <span class="p-picklist-filter-icon">${LucideIcons.search}</span>
+            </div>
+        ` : "";
+      const targetFilterHtml = isFilter ? `
+            <div class="p-picklist-filter-container">
+                <input type="text" class="p-picklist-filter-input p-target-filter" placeholder="${props.targetFilterPlaceholder || "Search by name"}" value="${targetFilterQuery}" />
+                <span class="p-picklist-filter-icon">${LucideIcons.search}</span>
+            </div>
+        ` : "";
+      let sourceItemsHtml = "";
+      if (filteredSource.length === 0) {
+        sourceItemsHtml = `<li class="p-picklist-empty">${sourceFilterQuery ? "No results found" : emptyMessageSource}</li>`;
+      } else {
+        sourceItemsHtml = filteredSource.map((it) => {
+          const id = getItemId(it);
+          const isSelected = selectedSource.has(id);
+          return `
+                    <li class="p-picklist-item source-item ${isSelected ? "p-highlight" : ""}" 
+                        data-id="${id}" 
+                        role="option" 
+                        aria-selected="${isSelected}">
+                        ${renderCellContent(it, isSelected)}
+                    </li>
+                `;
+        }).join("");
+      }
+      let targetItemsHtml = "";
+      if (filteredTarget.length === 0) {
+        targetItemsHtml = `<li class="p-picklist-empty">${targetFilterQuery ? "No results found" : emptyMessageTarget}</li>`;
+      } else {
+        targetItemsHtml = filteredTarget.map((it) => {
+          const id = getItemId(it);
+          const isSelected = selectedTarget.has(id);
+          return `
+                    <li class="p-picklist-item target-item ${isSelected ? "p-highlight" : ""}" 
+                        data-id="${id}" 
+                        role="option" 
+                        aria-selected="${isSelected}">
+                        ${renderCellContent(it, isSelected)}
+                    </li>
+                `;
+        }).join("");
+      }
+      container.innerHTML = `
+            <div class="p-picklist p-component">
+                ${sourceControlsHtml}
 
-                <!-- Transfer Action Buttons -->
-                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-                    <button type="button" class="btn-move-to-target p-button p-button-secondary" style="padding: 0.45rem; justify-content: center;" title="Move to Selected">
+                <!-- Source List Box -->
+                <div class="p-picklist-list-container">
+                    <div class="p-picklist-header">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            ${sourceHeaderCheckboxHtml}
+                            <span>${sourceHeader}</span>
+                        </div>
+                        <span style="font-size: 0.75rem; font-weight: 600; color: var(--p-surface-500);">${filteredSource.length} items</span>
+                    </div>
+                    ${sourceFilterHtml}
+                    <ul class="p-picklist-list picklist-source-list" style="height: ${scrollHeight};" role="listbox" aria-multiselectable="true" tabindex="0">
+                        ${sourceItemsHtml}
+                    </ul>
+                </div>
+
+                <!-- Transfer Buttons (Center) -->
+                <div class="p-picklist-controls p-picklist-transfer-controls">
+                    <button type="button" class="p-picklist-control-btn btn-move-to-target" title="Move to Target" aria-label="Move to Target" ${selectedSource.size === 0 ? "disabled" : ""}>
                         ${LucideIcons.chevronRight}
                     </button>
-                    <button type="button" class="btn-move-all-to-target p-button p-button-secondary" style="padding: 0.45rem; justify-content: center;" title="Move All to Selected">
-                        \xBB
+                    <button type="button" class="p-picklist-control-btn btn-move-all-to-target" title="Move All to Target" aria-label="Move All to Target" ${sourceList.length === 0 ? "disabled" : ""}>
+                        ${LucideIcons.chevronsRight}
                     </button>
-                    <button type="button" class="btn-move-to-source p-button p-button-secondary" style="padding: 0.45rem; justify-content: center;" title="Move to Available">
+                    <button type="button" class="p-picklist-control-btn btn-move-to-source" title="Move to Source" aria-label="Move to Source" ${selectedTarget.size === 0 ? "disabled" : ""}>
                         ${LucideIcons.chevronLeft}
                     </button>
-                    <button type="button" class="btn-move-all-to-source p-button p-button-secondary" style="padding: 0.45rem; justify-content: center;" title="Move All to Available">
-                        \xAB
+                    <button type="button" class="p-picklist-control-btn btn-move-all-to-source" title="Move All to Source" aria-label="Move All to Source" ${targetList.length === 0 ? "disabled" : ""}>
+                        ${LucideIcons.chevronsLeft}
                     </button>
                 </div>
 
-                <!-- Target Box -->
-                <div style="flex: 1; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); background: var(--p-surface-0); overflow: hidden; display: flex; flex-direction: column;">
-                    <div style="padding: 0.625rem 0.875rem; background: var(--p-surface-50); border-bottom: 1px solid var(--p-border-color); font-size: 0.75rem; font-weight: 700; color: var(--p-surface-600); text-transform: uppercase;">
-                        ${props.targetHeader || "Selected"} (${targetList.length})
+                <!-- Target List Box -->
+                <div class="p-picklist-list-container">
+                    <div class="p-picklist-header">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            ${targetHeaderCheckboxHtml}
+                            <span>${targetHeader}</span>
+                        </div>
+                        <span style="font-size: 0.75rem; font-weight: 600; color: var(--p-surface-500);">${filteredTarget.length} items</span>
                     </div>
-                    <div class="picklist-target-list" style="height: 180px; overflow-y: auto; padding: 0.25rem 0;">
-                        ${targetList.map((it) => `
-                            <div class="picklist-item target-item ${selectedTarget.has(it.id) ? "active" : ""}" data-id="${it.id}" style="padding: 0.45rem 0.75rem; cursor: pointer; font-size: 0.8125rem; background: ${selectedTarget.has(it.id) ? "var(--p-primary-50)" : "transparent"}; color: ${selectedTarget.has(it.id) ? "var(--p-primary-700)" : "var(--p-text-color)"}; font-weight: ${selectedTarget.has(it.id) ? "600" : "normal"}; transition: all 0.15s ease;">
-                                ${it.name}
-                            </div>
-                        `).join("")}
-                    </div>
+                    ${targetFilterHtml}
+                    <ul class="p-picklist-list picklist-target-list" style="height: ${scrollHeight};" role="listbox" aria-multiselectable="true" tabindex="0">
+                        ${targetItemsHtml}
+                    </ul>
                 </div>
+
+                ${targetControlsHtml}
             </div>
         `;
       const srcEl = container.querySelector(".picklist-source-list");
       const tgtEl = container.querySelector(".picklist-target-list");
-      useAutoAnimate(srcEl, { duration: 200 });
-      useAutoAnimate(tgtEl, { duration: 200 });
+      if (srcEl) useAutoAnimate(srcEl, { duration: 180 });
+      if (tgtEl) useAutoAnimate(tgtEl, { duration: 180 });
       bindEvents();
     }
+    function renderCellContent(item, isSelected) {
+      const checkboxHtml = isCheckbox ? `
+            <div class="p-checkbox-box ${isSelected ? "p-checked" : ""}" role="checkbox" aria-checked="${isSelected}">
+                ${isSelected ? LucideIcons.check : ""}
+            </div>
+        ` : "";
+      if (item.price != null || item.category != null || item.image != null) {
+        return `
+                ${checkboxHtml}
+                <div class="p-picklist-product-item">
+                    <div class="p-picklist-product-img">
+                        ${LucideIcons.package}
+                    </div>
+                    <div class="p-picklist-product-details">
+                        <span class="p-picklist-product-name">${item.name}</span>
+                        <span class="p-picklist-product-category">${item.category || ""}</span>
+                    </div>
+                    ${item.price != null ? `<span class="p-picklist-product-price">$${item.price}</span>` : ""}
+                </div>
+            `;
+      }
+      if (item.avatar != null || item.role != null) {
+        const initials = item.name.split(" ").map((w) => w[0]).join("").substring(0, 2);
+        return `
+                ${checkboxHtml}
+                <div class="p-picklist-member-item">
+                    <div class="p-picklist-member-avatar">${initials}</div>
+                    <div style="display: flex; flex-direction: column;">
+                        <span style="font-weight: 600; color: var(--p-surface-900);">${item.name}</span>
+                        ${item.role ? `<span style="font-size: 0.75rem; color: var(--p-surface-500);">${item.role}</span>` : ""}
+                    </div>
+                </div>
+            `;
+      }
+      return `
+            ${checkboxHtml}
+            <span style="flex: 1; font-weight: ${isSelected ? "600" : "normal"};">${item.name}</span>
+        `;
+    }
     function bindEvents() {
-      container.querySelectorAll(".source-item").forEach((el) => {
-        el.addEventListener("click", () => {
+      const rootEl = container.firstElementChild;
+      if (!rootEl) return;
+      rootEl.querySelectorAll(".source-item").forEach((el) => {
+        el.addEventListener("click", (e) => {
           const id = el.getAttribute("data-id");
-          if (selectedSource.has(id)) selectedSource.delete(id);
-          else selectedSource.add(id);
+          if (!id) return;
+          const mouseEvent = e;
+          if (isCheckbox || mouseEvent.ctrlKey || mouseEvent.metaKey) {
+            if (selectedSource.has(id)) selectedSource.delete(id);
+            else selectedSource.add(id);
+          } else {
+            if (selectedSource.has(id) && selectedSource.size === 1) {
+              selectedSource.clear();
+            } else {
+              selectedSource.clear();
+              selectedSource.add(id);
+            }
+          }
           render();
+          dispatchSelectionEvent();
         });
       });
-      container.querySelectorAll(".target-item").forEach((el) => {
-        el.addEventListener("click", () => {
+      rootEl.querySelectorAll(".target-item").forEach((el) => {
+        el.addEventListener("click", (e) => {
           const id = el.getAttribute("data-id");
-          if (selectedTarget.has(id)) selectedTarget.delete(id);
-          else selectedTarget.add(id);
+          if (!id) return;
+          const mouseEvent = e;
+          if (isCheckbox || mouseEvent.ctrlKey || mouseEvent.metaKey) {
+            if (selectedTarget.has(id)) selectedTarget.delete(id);
+            else selectedTarget.add(id);
+          } else {
+            if (selectedTarget.has(id) && selectedTarget.size === 1) {
+              selectedTarget.clear();
+            } else {
+              selectedTarget.clear();
+              selectedTarget.add(id);
+            }
+          }
           render();
+          dispatchSelectionEvent();
         });
       });
-      container.querySelector(".btn-move-to-target")?.addEventListener("click", () => {
-        const moving = sourceList.filter((it) => selectedSource.has(it.id));
+      const sourceSelectAll = rootEl.querySelector(".p-source-select-all");
+      if (sourceSelectAll) {
+        sourceSelectAll.addEventListener("click", () => {
+          const isAll = sourceSelectAll.classList.contains("p-checked");
+          if (isAll) {
+            selectedSource.clear();
+          } else {
+            sourceList.forEach((it) => selectedSource.add(getItemId(it)));
+          }
+          render();
+          dispatchSelectionEvent();
+        });
+      }
+      const targetSelectAll = rootEl.querySelector(".p-target-select-all");
+      if (targetSelectAll) {
+        targetSelectAll.addEventListener("click", () => {
+          const isAll = targetSelectAll.classList.contains("p-checked");
+          if (isAll) {
+            selectedTarget.clear();
+          } else {
+            targetList.forEach((it) => selectedTarget.add(getItemId(it)));
+          }
+          render();
+          dispatchSelectionEvent();
+        });
+      }
+      const srcFilterInput = rootEl.querySelector(".p-source-filter");
+      if (srcFilterInput) {
+        srcFilterInput.addEventListener("input", (e) => {
+          sourceFilterQuery = e.target.value;
+          render();
+        });
+      }
+      const tgtFilterInput = rootEl.querySelector(".p-target-filter");
+      if (tgtFilterInput) {
+        tgtFilterInput.addEventListener("input", (e) => {
+          targetFilterQuery = e.target.value;
+          render();
+        });
+      }
+      rootEl.querySelector(".btn-move-to-target")?.addEventListener("click", () => {
+        if (selectedSource.size === 0) return;
+        const moving = sourceList.filter((it) => selectedSource.has(getItemId(it)));
         targetList = [...targetList, ...moving];
-        sourceList = sourceList.filter((it) => !selectedSource.has(it.id));
+        sourceList = sourceList.filter((it) => !selectedSource.has(getItemId(it)));
         selectedSource.clear();
         render();
-        syncValues();
+        syncValues("move-to-target", moving);
       });
-      container.querySelector(".btn-move-all-to-target")?.addEventListener("click", () => {
+      rootEl.querySelector(".btn-move-all-to-target")?.addEventListener("click", () => {
+        if (sourceList.length === 0) return;
+        const moving = [...sourceList];
         targetList = [...targetList, ...sourceList];
         sourceList = [];
         selectedSource.clear();
         render();
-        syncValues();
+        syncValues("move-all-to-target", moving);
       });
-      container.querySelector(".btn-move-to-source")?.addEventListener("click", () => {
-        const moving = targetList.filter((it) => selectedTarget.has(it.id));
+      rootEl.querySelector(".btn-move-to-source")?.addEventListener("click", () => {
+        if (selectedTarget.size === 0) return;
+        const moving = targetList.filter((it) => selectedTarget.has(getItemId(it)));
         sourceList = [...sourceList, ...moving];
-        targetList = targetList.filter((it) => !selectedTarget.has(it.id));
+        targetList = targetList.filter((it) => !selectedTarget.has(getItemId(it)));
         selectedTarget.clear();
         render();
-        syncValues();
+        syncValues("move-to-source", moving);
       });
-      container.querySelector(".btn-move-all-to-source")?.addEventListener("click", () => {
+      rootEl.querySelector(".btn-move-all-to-source")?.addEventListener("click", () => {
+        if (targetList.length === 0) return;
+        const moving = [...targetList];
         sourceList = [...sourceList, ...targetList];
         targetList = [];
         selectedTarget.clear();
         render();
-        syncValues();
+        syncValues("move-all-to-source", moving);
+      });
+      rootEl.querySelector(".btn-source-top")?.addEventListener("click", () => {
+        reorderList(sourceList, selectedSource, "top");
+      });
+      rootEl.querySelector(".btn-source-up")?.addEventListener("click", () => {
+        reorderList(sourceList, selectedSource, "up");
+      });
+      rootEl.querySelector(".btn-source-down")?.addEventListener("click", () => {
+        reorderList(sourceList, selectedSource, "down");
+      });
+      rootEl.querySelector(".btn-source-bottom")?.addEventListener("click", () => {
+        reorderList(sourceList, selectedSource, "bottom");
+      });
+      rootEl.querySelector(".btn-target-top")?.addEventListener("click", () => {
+        reorderList(targetList, selectedTarget, "top");
+      });
+      rootEl.querySelector(".btn-target-up")?.addEventListener("click", () => {
+        reorderList(targetList, selectedTarget, "up");
+      });
+      rootEl.querySelector(".btn-target-down")?.addEventListener("click", () => {
+        reorderList(targetList, selectedTarget, "down");
+      });
+      rootEl.querySelector(".btn-target-bottom")?.addEventListener("click", () => {
+        reorderList(targetList, selectedTarget, "bottom");
       });
     }
-    function syncValues() {
+    function reorderList(list, selectedSet, direction) {
+      if (selectedSet.size === 0 || list.length < 2) return;
+      if (direction === "top") {
+        const selected = list.filter((it) => selectedSet.has(getItemId(it)));
+        const remaining = list.filter((it) => !selectedSet.has(getItemId(it)));
+        list.length = 0;
+        list.push(...selected, ...remaining);
+      } else if (direction === "bottom") {
+        const selected = list.filter((it) => selectedSet.has(getItemId(it)));
+        const remaining = list.filter((it) => !selectedSet.has(getItemId(it)));
+        list.length = 0;
+        list.push(...remaining, ...selected);
+      } else if (direction === "up") {
+        for (let i = 1; i < list.length; i++) {
+          if (selectedSet.has(getItemId(list[i])) && !selectedSet.has(getItemId(list[i - 1]))) {
+            const temp = list[i];
+            list[i] = list[i - 1];
+            list[i - 1] = temp;
+          }
+        }
+      } else if (direction === "down") {
+        for (let i = list.length - 2; i >= 0; i--) {
+          if (selectedSet.has(getItemId(list[i])) && !selectedSet.has(getItemId(list[i + 1]))) {
+            const temp = list[i];
+            list[i] = list[i + 1];
+            list[i + 1] = temp;
+          }
+        }
+      }
+      render();
+      syncValues("reorder");
+    }
+    function dispatchSelectionEvent() {
+      container.dispatchEvent(new CustomEvent("picklist:selection-change", {
+        bubbles: true,
+        detail: {
+          sourceSelection: Array.from(selectedSource),
+          targetSelection: Array.from(selectedTarget)
+        }
+      }));
+    }
+    function syncValues(action = "change", affectedItems = []) {
       if (props.targetInputName) {
         let hidden = container.querySelector(`input[name="${props.targetInputName}"]`);
         if (!hidden) {
@@ -15965,73 +16284,308 @@ public static class AppTheme
           hidden.name = props.targetInputName;
           container.appendChild(hidden);
         }
-        hidden.value = JSON.stringify(targetList.map((it) => it.id));
+        hidden.value = JSON.stringify(targetList.map((it) => getItemId(it)));
       }
       container.dispatchEvent(new CustomEvent("picklist:change", {
         bubbles: true,
-        detail: { source: sourceList, target: targetList }
+        detail: { source: sourceList, target: targetList, action, affectedItems }
       }));
     }
     render();
     syncValues();
   }
-  var CSS39;
+  var PICKLIST_CSS;
   var init_picklist = __esm({
     "src/components/picklist.ts"() {
       "use strict";
       init_styles();
       init_lucide();
       init_useAutoAnimate();
-      CSS39 = `
-[data-theme="dark"] .laughtale-picklist {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+      PICKLIST_CSS = `
+.p-picklist {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    width: 100%;
+    font-family: var(--p-font-family, inherit);
+    color: var(--p-surface-800, #1e293b);
 }
-[data-theme="dark"] .picklist-source-list {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-picklist-controls {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
 }
-[data-theme="dark"] .picklist-item {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-picklist-control-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    border-radius: var(--p-border-radius, 6px);
+    border: 1px solid var(--p-surface-300, #cbd5e1);
+    background: var(--p-surface-0, #ffffff);
+    color: var(--p-surface-700, #334155);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    outline: none;
 }
-[data-theme="dark"] .source-item {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+.p-picklist-control-btn:hover:not(:disabled) {
+    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-surface-900, #0f172a);
+    border-color: var(--p-surface-400, #94a3b8);
 }
-[data-theme="dark"] .btn-move-to-target {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+.p-picklist-control-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
 }
-[data-theme="dark"] .btn-move-all-to-target {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-picklist-list-container {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--p-surface-200, #e2e8f0);
+    border-radius: var(--p-border-radius-lg, 8px);
+    background: var(--p-surface-0, #ffffff);
+    overflow: hidden;
+    min-width: 0;
+    box-shadow: var(--p-shadow-xs, 0 1px 2px 0 rgba(0, 0, 0, 0.05));
 }
-[data-theme="dark"] .btn-move-to-source {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-picklist-header {
+    padding: 0.75rem 1rem;
+    background: var(--p-surface-50, #f8fafc);
+    border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--p-surface-800, #1e293b);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
 }
-[data-theme="dark"] .btn-move-all-to-source {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-picklist-filter-container {
+    padding: 0.5rem 0.75rem;
+    background: var(--p-surface-50, #f8fafc);
+    border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
+    position: relative;
+    display: flex;
+    align-items: center;
 }
-[data-theme="dark"] .picklist-target-list {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+.p-picklist-filter-input {
+    width: 100%;
+    padding: 0.4rem 2rem 0.4rem 0.65rem;
+    font-size: 0.8125rem;
+    border: 1px solid var(--p-surface-300, #cbd5e1);
+    border-radius: var(--p-border-radius, 6px);
+    background: var(--p-surface-0, #ffffff);
+    color: inherit;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
-[data-theme="dark"] .target-item {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+.p-picklist-filter-input:focus {
+    border-color: var(--p-primary-500, #10b981);
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+}
+.p-picklist-filter-icon {
+    position: absolute;
+    right: 1.25rem;
+    color: var(--p-surface-400, #94a3b8);
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+}
+
+.p-picklist-list {
+    list-style: none;
+    margin: 0;
+    padding: 0.25rem 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.p-picklist-item {
+    padding: 0.625rem 1rem;
+    margin: 0.125rem 0.25rem;
+    border-radius: var(--p-border-radius-xs, 5px);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.875rem;
+    color: var(--p-surface-700, #334155);
+    user-select: none;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+.p-picklist-item:hover:not(.p-highlight) {
+    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-surface-900, #0f172a);
+}
+.p-picklist-item.p-highlight {
+    background: rgba(16, 185, 129, 0.1) !important;
+    color: var(--p-primary-700, #047857) !important;
+    font-weight: 600;
+}
+
+/* Custom Checkbox */
+.p-checkbox-box {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.125rem;
+    height: 1.125rem;
+    border-radius: var(--p-border-radius-xs, 4px);
+    border: 2px solid var(--p-surface-300, #cbd5e1);
+    background: var(--p-surface-0, #ffffff);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+}
+.p-checkbox-box.p-checked {
+    background: var(--p-primary-500, #10b981);
+    border-color: var(--p-primary-500, #10b981);
+    color: #ffffff;
+}
+.p-checkbox-box.p-indeterminate {
+    background: var(--p-primary-500, #10b981);
+    border-color: var(--p-primary-500, #10b981);
+    color: #ffffff;
+}
+
+/* Custom Item Content */
+.p-picklist-product-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+}
+.p-picklist-product-img {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 6px;
+    background: var(--p-surface-100, #f1f5f9);
+    border: 1px solid var(--p-surface-200, #e2e8f0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--p-primary-600, #059669);
+    flex-shrink: 0;
+}
+.p-picklist-product-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+}
+.p-picklist-product-name {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--p-surface-900, #0f172a);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.p-picklist-product-category {
+    font-size: 0.75rem;
+    color: var(--p-surface-500, #64748b);
+}
+.p-picklist-product-price {
+    font-weight: 700;
+    font-size: 0.875rem;
+    color: var(--p-surface-900, #0f172a);
+}
+
+.p-picklist-member-item {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    width: 100%;
+}
+.p-picklist-member-avatar {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 9999px;
+    background: var(--p-primary-100, #d1fae5);
+    color: var(--p-primary-700, #047857);
+    font-weight: 700;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* Empty State */
+.p-picklist-empty {
+    padding: 2.5rem 1rem;
+    text-align: center;
+    color: var(--p-surface-400, #94a3b8);
+    font-size: 0.8125rem;
+    font-style: italic;
+}
+
+/* Striped Rows */
+.p-picklist-striped .p-picklist-item:nth-child(even):not(.p-highlight) {
+    background: var(--p-surface-50, #f8fafc);
+}
+
+/* Dark Mode Tokens */
+.dark .p-picklist,
+[data-theme="dark"] .p-picklist {
+    color: var(--p-surface-100, #f1f5f9) !important;
+}
+.dark .p-picklist-list-container,
+[data-theme="dark"] .p-picklist-list-container {
+    background: var(--p-surface-900, #0f172a) !important;
+    border-color: var(--p-surface-700, #334155) !important;
+}
+.dark .p-picklist-header,
+.dark .p-picklist-filter-container,
+[data-theme="dark"] .p-picklist-header,
+[data-theme="dark"] .p-picklist-filter-container {
+    background: var(--p-surface-800, #1e293b) !important;
+    border-color: var(--p-surface-700, #334155) !important;
+    color: var(--p-surface-100, #f1f5f9) !important;
+}
+.dark .p-picklist-filter-input,
+[data-theme="dark"] .p-picklist-filter-input {
+    background: var(--p-surface-900, #0f172a) !important;
+    border-color: var(--p-surface-600, #475569) !important;
+    color: #ffffff !important;
+}
+.dark .p-picklist-control-btn,
+[data-theme="dark"] .p-picklist-control-btn {
+    background: var(--p-surface-800, #1e293b) !important;
+    border-color: var(--p-surface-600, #475569) !important;
+    color: var(--p-surface-200, #e2e8f0) !important;
+}
+.dark .p-picklist-control-btn:hover:not(:disabled),
+[data-theme="dark"] .p-picklist-control-btn:hover:not(:disabled) {
+    background: var(--p-surface-700, #334155) !important;
+    color: #ffffff !important;
+}
+.dark .p-picklist-item:hover:not(.p-highlight),
+[data-theme="dark"] .p-picklist-item:hover:not(.p-highlight) {
+    background: var(--p-surface-800, #1e293b) !important;
+    color: #ffffff !important;
+}
+.dark .p-picklist-product-name,
+[data-theme="dark"] .p-picklist-product-name,
+.dark .p-picklist-product-price,
+[data-theme="dark"] .p-picklist-product-price {
+    color: var(--p-surface-100, #f1f5f9) !important;
+}
+.dark .p-picklist-product-img,
+[data-theme="dark"] .p-picklist-product-img {
+    background: var(--p-surface-800, #1e293b) !important;
+    border-color: var(--p-surface-700, #334155) !important;
 }
 `;
     }
@@ -16043,7 +16597,7 @@ public static class AppTheme
     default: () => OrderListIsland
   });
   function OrderListIsland(container, props) {
-    injectIslandStyle("orderlist", CSS40);
+    injectIslandStyle("orderlist", CSS39);
     let items = props.items ? [...props.items] : [
       { id: "1", name: "Phase 1: Zero-Trust Gateway Init", order: 0 },
       { id: "2", name: "Phase 2: Hydrate Islands Engine", order: 1 },
@@ -16143,13 +16697,13 @@ public static class AppTheme
     render();
     syncValues();
   }
-  var CSS40;
+  var CSS39;
   var init_orderlist = __esm({
     "src/components/orderlist.ts"() {
       "use strict";
       init_styles();
       init_useAutoAnimate();
-      CSS40 = `
+      CSS39 = `
 [data-theme="dark"] .laughtale-orderlist {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -16195,7 +16749,7 @@ public static class AppTheme
     default: () => OrgChartIsland
   });
   function OrgChartIsland(container, props) {
-    injectIslandStyle("orgchart", CSS41);
+    injectIslandStyle("orgchart", CSS40);
     const rootNode = props.value || {
       key: "0",
       label: "Chief Technology Officer",
@@ -16270,12 +16824,12 @@ public static class AppTheme
       });
     });
   }
-  var CSS41;
+  var CSS40;
   var init_orgchart = __esm({
     "src/components/orgchart.ts"() {
       "use strict";
       init_styles();
-      CSS41 = `
+      CSS40 = `
 [data-theme="dark"] .orgchart-node-table {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -16301,7 +16855,7 @@ public static class AppTheme
     default: () => TerminalIsland
   });
   function TerminalIsland(container, props) {
-    injectIslandStyle("terminal", CSS42);
+    injectIslandStyle("terminal", CSS41);
     const promptPrefix = props.prompt || "admin@softmax:~$";
     const welcome = props.welcomeMessage || 'Welcome to SoftMax.LaughTale CLI v3.0\nType "help" for available commands.';
     const commands = {
@@ -16400,13 +16954,13 @@ ${h.response}`).join("\n");
     }
     render();
   }
-  var CSS42;
+  var CSS41;
   var init_terminal = __esm({
     "src/components/terminal.ts"() {
       "use strict";
       init_styles();
       init_useClipboard();
-      CSS42 = `
+      CSS41 = `
 [data-theme="dark"] .laughtale-terminal {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -16437,7 +16991,7 @@ ${h.response}`).join("\n");
     default: () => DockIsland
   });
   function DockIsland(container, props) {
-    injectIslandStyle("dock", CSS43);
+    injectIslandStyle("dock", CSS42);
     const items = props.items || [
       { label: "Overview", icon: "compass", url: "/" },
       { label: "Dashboard", icon: "bar-chart", url: "/dashboard" },
@@ -16479,13 +17033,13 @@ ${h.response}`).join("\n");
       });
     });
   }
-  var CSS43;
+  var CSS42;
   var init_dock = __esm({
     "src/components/dock.ts"() {
       "use strict";
       init_styles();
       init_lucide();
-      CSS43 = `
+      CSS42 = `
 [data-theme="dark"] .laughtale-dock {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -16506,7 +17060,7 @@ ${h.response}`).join("\n");
     default: () => GalleriaIsland
   });
   function GalleriaIsland(container, props) {
-    injectIslandStyle("galleria", CSS44);
+    injectIslandStyle("galleria", CSS43);
     const images = props.value && props.value.length > 0 ? props.value : [
       {
         itemImageSrc: "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800&auto=format&fit=crop&q=80",
@@ -16580,13 +17134,13 @@ ${h.response}`).join("\n");
     }
     render();
   }
-  var CSS44;
+  var CSS43;
   var init_galleria = __esm({
     "src/components/galleria.ts"() {
       "use strict";
       init_styles();
       init_lucide();
-      CSS44 = `
+      CSS43 = `
 [data-theme="dark"] .laughtale-galleria {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -16617,7 +17171,7 @@ ${h.response}`).join("\n");
     default: () => BlockUIIsland
   });
   function BlockUIIsland(container, props) {
-    injectIslandStyle("blockui", CSS45);
+    injectIslandStyle("blockui", CSS44);
     let isBlocked = props.blocked ?? true;
     function render() {
       container.innerHTML = `
@@ -16640,12 +17194,12 @@ ${h.response}`).join("\n");
       render();
     });
   }
-  var CSS45;
+  var CSS44;
   var init_blockui = __esm({
     "src/components/blockui.ts"() {
       "use strict";
       init_styles();
-      CSS45 = `
+      CSS44 = `
 [data-theme="dark"] .laughtale-blockui-root {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -17377,7 +17931,7 @@ ${h.response}`).join("\n");
     default: () => SelectIsland
   });
   function SelectIsland(container, props) {
-    injectIslandStyle("laughtale-select", CSS46);
+    injectIslandStyle("laughtale-select", CSS45);
     const isMultiple = props.multiple === true || String(props.multiple) === "true";
     const isCheckmark = props.checkmark === true || String(props.checkmark) === "true";
     const isCheckbox = props.checkbox === true || String(props.checkbox) === "true";
@@ -17717,13 +18271,13 @@ ${h.response}`).join("\n");
     }
     render();
   }
-  var CSS46;
+  var CSS45;
   var init_select = __esm({
     "src/components/select.ts"() {
       "use strict";
       init_styles();
       init_lucide();
-      CSS46 = `
+      CSS45 = `
 /* ==================== AURA SELECT ==================== */
 .laughtale-select,
 .p-select {
@@ -18150,7 +18704,7 @@ ${h.response}`).join("\n");
     default: () => CheckboxIsland
   });
   function CheckboxIsland(container, props) {
-    injectIslandStyle("laughtale-checkbox", CSS47);
+    injectIslandStyle("laughtale-checkbox", CSS46);
     let isChecked = Boolean(props.checked);
     let isIndeterminate = Boolean(props.indeterminate);
     const size = props.size || "normal";
@@ -18222,13 +18776,13 @@ ${h.response}`).join("\n");
     }
     render();
   }
-  var CSS47;
+  var CSS46;
   var init_checkbox = __esm({
     "src/components/checkbox.ts"() {
       "use strict";
       init_styles();
       init_lucide();
-      CSS47 = `
+      CSS46 = `
 .laughtale-checkbox-wrap {
     display: inline-flex;
     align-items: center;
@@ -18405,7 +18959,7 @@ ${h.response}`).join("\n");
     default: () => RadioButtonIsland
   });
   function RadioButtonIsland(container, props) {
-    injectIslandStyle("laughtale-radio", CSS48);
+    injectIslandStyle("laughtale-radio", CSS47);
     const isCard = props.card === true || String(props.card) === "true";
     const isFilled = props.variant === "filled";
     const size = props.size || "normal";
@@ -18637,13 +19191,13 @@ ${h.response}`).join("\n");
     }
     renderSingle();
   }
-  var CSS48;
+  var CSS47;
   var init_radio_button = __esm({
     "src/components/radio-button.ts"() {
       "use strict";
       init_styles();
       init_lucide();
-      CSS48 = `
+      CSS47 = `
 /* ==================== AURA RADIOBUTTON ==================== */
 .laughtale-radio-root,
 .p-radiobutton-root {
@@ -18926,7 +19480,7 @@ ${h.response}`).join("\n");
     default: () => TextareaIsland
   });
   function TextareaIsland(container, props) {
-    injectIslandStyle("laughtale-textarea", CSS49);
+    injectIslandStyle("laughtale-textarea", CSS48);
     const isAutoResize = props.autoResize === true || String(props.autoResize) === "true";
     const isFluid = props.fluid === true || String(props.fluid) === "true";
     const isInvalid = props.invalid === true || String(props.invalid) === "true";
@@ -19002,12 +19556,12 @@ ${h.response}`).join("\n");
       setTimeout(adjustHeight, 0);
     }
   }
-  var CSS49;
+  var CSS48;
   var init_textarea = __esm({
     "src/components/textarea.ts"() {
       "use strict";
       init_styles();
-      CSS49 = `
+      CSS48 = `
 /* ==================== AURA TEXTAREA ==================== */
 .p-textarea {
     font-family: var(--p-font-family, inherit);
@@ -19132,7 +19686,7 @@ ${h.response}`).join("\n");
     default: () => InputMaskIsland
   });
   function InputMaskIsland(container, props) {
-    injectIslandStyle("laughtale-input-mask", CSS50);
+    injectIslandStyle("laughtale-input-mask", CSS49);
     const mask = props.mask || "(999) 999-9999";
     const slotChar = props.slotChar || "_";
     const autoClear = props.autoClear !== false && String(props.autoClear) !== "false";
@@ -19319,12 +19873,12 @@ ${h.response}`).join("\n");
     });
     syncValue();
   }
-  var CSS50;
+  var CSS49;
   var init_input_mask = __esm({
     "src/components/input-mask.ts"() {
       "use strict";
       init_styles();
-      CSS50 = `
+      CSS49 = `
 /* ==================== AURA INPUTMASK ==================== */
 .laughtale-input-mask,
 .p-inputmask {
@@ -19434,7 +19988,7 @@ ${h.response}`).join("\n");
     default: () => FloatLabelIsland
   });
   function FloatLabelIsland(container, props) {
-    injectIslandStyle("laughtale-float-label", CSS51);
+    injectIslandStyle("laughtale-float-label", CSS50);
     const variant = props.variant || "over";
     const initialHtml = container.innerHTML;
     const forAttr = props.for ? `for="${props.for}"` : "";
@@ -19512,12 +20066,12 @@ ${h.response}`).join("\n");
     setTimeout(updateFloatingState, 50);
     setTimeout(updateFloatingState, 200);
   }
-  var CSS51;
+  var CSS50;
   var init_float_label = __esm({
     "src/components/float-label.ts"() {
       "use strict";
       init_styles();
-      CSS51 = `
+      CSS50 = `
 .laughtale-float-label {
     position: relative;
     display: inline-flex;
@@ -19644,7 +20198,7 @@ ${h.response}`).join("\n");
     default: () => IftaLabelIsland
   });
   function IftaLabelIsland(container, props) {
-    injectIslandStyle("laughtale-ifta-label", CSS52);
+    injectIslandStyle("laughtale-ifta-label", CSS51);
     const initialHtml = container.innerHTML;
     const forAttr = props.for ? `for="${props.for}"` : "";
     const existingLabel = container.querySelector("label");
@@ -19667,12 +20221,12 @@ ${h.response}`).join("\n");
       }
     });
   }
-  var CSS52;
+  var CSS51;
   var init_ifta_label = __esm({
     "src/components/ifta-label.ts"() {
       "use strict";
       init_styles();
-      CSS52 = `
+      CSS51 = `
 .laughtale-ifta-label {
     position: relative;
     display: inline-flex;
@@ -19760,14 +20314,14 @@ ${h.response}`).join("\n");
     default: () => InputGroupIsland
   });
   function InputGroupIsland(container, props) {
-    injectIslandStyle("laughtale-inputgroup", CSS53);
+    injectIslandStyle("laughtale-inputgroup", CSS52);
     container.classList.add("laughtale-inputgroup", "p-inputgroup");
     if (props.size) {
       container.classList.add(`size-${props.size}`);
     }
   }
   function InputGroupAddonIsland(container, props) {
-    injectIslandStyle("laughtale-inputgroup", CSS53);
+    injectIslandStyle("laughtale-inputgroup", CSS52);
     container.classList.add("laughtale-inputgroup-addon", "p-inputgroup-addon");
     if (props.icon && !container.querySelector("svg")) {
       const svg = getLucideIcon(props.icon);
@@ -19779,13 +20333,13 @@ ${h.response}`).join("\n");
       container.insertAdjacentHTML("beforeend", `<span>${props.text}</span>`);
     }
   }
-  var CSS53;
+  var CSS52;
   var init_input_group = __esm({
     "src/components/input-group.ts"() {
       "use strict";
       init_styles();
       init_lucide();
-      CSS53 = `
+      CSS52 = `
 .laughtale-inputgroup,
 .p-inputgroup {
     display: flex;
@@ -20057,7 +20611,7 @@ ${h.response}`).join("\n");
     default: () => InputTextIsland
   });
   function InputTextIsland(container, props) {
-    injectIslandStyle("laughtale-inputtext", CSS54);
+    injectIslandStyle("laughtale-inputtext", CSS53);
     const [getValue, setValue] = useControllableState({
       defaultValue: props.value ?? "",
       onChange: (val) => {
@@ -20198,14 +20752,14 @@ ${h.response}`).join("\n");
     }
     init();
   }
-  var CSS54, xIcon;
+  var CSS53, xIcon;
   var init_input_text = __esm({
     "src/components/input-text.ts"() {
       "use strict";
       init_styles();
       init_lucide();
       init_useControllableState();
-      CSS54 = `
+      CSS53 = `
 .laughtale-inputtext-wrap,
 .p-inputtext-wrap {
     position: relative;
@@ -20701,7 +21255,7 @@ ${h.response}`).join("\n");
     default: () => PaginatorIsland
   });
   function PaginatorIsland(container, props) {
-    injectIslandStyle("paginator", CSS55);
+    injectIslandStyle("paginator", CSS54);
     let first = props.first || 0;
     let rows = props.rows || 10;
     const totalRecords = props.totalRecords || 0;
@@ -20761,13 +21315,13 @@ ${h.response}`).join("\n");
     }
     render();
   }
-  var CSS55;
+  var CSS54;
   var init_paginator = __esm({
     "src/components/paginator.ts"() {
       "use strict";
       init_lucide();
       init_styles();
-      CSS55 = `
+      CSS54 = `
 .laughtale-paginator {
     display: flex;
     align-items: center;

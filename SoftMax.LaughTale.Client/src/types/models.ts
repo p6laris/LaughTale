@@ -166,6 +166,11 @@ export interface PickListItem<TData = any> {
     name: string;
     category?: string;
     code?: string;
+    image?: string;
+    price?: number;
+    subtitle?: string;
+    avatar?: string;
+    role?: string;
     data?: TData;
 }
 

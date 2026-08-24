@@ -2537,15 +2537,29 @@ public class IslandListboxTagHelper : TagHelper
 }
 
 /// <summary>
-/// TagHelper for <island-picklist />
+/// TagHelper for <island-picklist /> (Aura PickList Component)
 /// </summary>
 [HtmlTargetElement("island-picklist")]
 public class IslandPickListTagHelper : TagHelper
 {
     public List<PickListItem>? Source { get; set; }
     public List<PickListItem>? Target { get; set; }
+    public object? Value { get; set; }
     public string SourceHeader { get; set; } = "Available";
     public string TargetHeader { get; set; } = "Selected";
+    public string KeyField { get; set; } = "id";
+    public bool Filter { get; set; } = false;
+    public string FilterBy { get; set; } = "name";
+    public string SourceFilterPlaceholder { get; set; } = "Search...";
+    public string TargetFilterPlaceholder { get; set; } = "Search...";
+    public bool Checkbox { get; set; } = false;
+    public bool ShowSourceControls { get; set; } = false;
+    public bool ShowTargetControls { get; set; } = false;
+    public string ScrollHeight { get; set; } = "18rem";
+    public bool Responsive { get; set; } = true;
+    public string Breakpoint { get; set; } = "1400px";
+    public bool StripedRows { get; set; } = false;
+    public bool Disabled { get; set; } = false;
     public string? TargetInput { get; set; }
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
@@ -2559,8 +2573,22 @@ public class IslandPickListTagHelper : TagHelper
         {
             source = Source ?? new(),
             target = Target ?? new(),
+            value = Value,
             sourceHeader = SourceHeader,
             targetHeader = TargetHeader,
+            dataKey = KeyField,
+            filter = Filter,
+            filterBy = FilterBy,
+            sourceFilterPlaceholder = SourceFilterPlaceholder,
+            targetFilterPlaceholder = TargetFilterPlaceholder,
+            checkbox = Checkbox,
+            showSourceControls = ShowSourceControls,
+            showTargetControls = ShowTargetControls,
+            scrollHeight = ScrollHeight,
+            responsive = Responsive,
+            breakpoint = Breakpoint,
+            stripedRows = StripedRows,
+            disabled = Disabled,
             targetInputName = TargetInput
         };
 

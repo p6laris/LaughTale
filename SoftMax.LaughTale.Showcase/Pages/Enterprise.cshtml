@@ -2462,13 +2462,46 @@
     <section id="sec-picklist" class="component-card">
         <div class="card-header">
             <div>
-                <h2>PickList Dual-List Transfer</h2>
-                <p>Transfer items between two lists with smooth FLIP physics layout transitions.</p>
+                <h2>PickList</h2>
+                <p>PickList is used to reorder and transfer items between different lists with rich selection modes, checkboxes, live filtering, and reordering controls.</p>
             </div>
-            <span class="aura-tag tag-emerald">Transfer</span>
+            <span class="aura-tag tag-emerald">Data Transfer</span>
         </div>
-        <div class="card-body">
-            <island-picklist source="@Model.PickListSource" target="@Model.PickListTarget" source-header="Available Tokens" target-header="Assigned to Node" />
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Demo 1: Basic -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">PickList transfers items between a source list and target list with standard action buttons and multi-selection.</p>
+                <island-picklist source="@Model.PickListMembersSource" target="@Model.PickListMembersTarget" source-header="Available Members" target-header="Team Members" />
+            </div>
+
+            <!-- Demo 2: Checkbox -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Checkbox Selection</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Combine with Checkbox and a select-all header for batch selection alongside drag-and-drop.</p>
+                <island-picklist source="@Model.PickListMembersSource" target="@Model.PickListMembersTarget" checkbox="true" source-header="Available Members" target-header="Team Members" />
+            </div>
+
+            <!-- Demo 3: Filter -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Filter</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Filter value is checked against the configured property with real-time search inputs.</p>
+                <island-picklist source="@Model.PickListProductsSource" target="@Model.PickListProductsTarget" filter="true" filter-by="name" source-filter-placeholder="Search by name" target-filter-placeholder="Search by name" source-header="Available Products" target-header="Selected Products" />
+            </div>
+
+            <!-- Demo 4: Template -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Template</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Rich item representation with product thumbnail icons, SKU categories, and formatted pricing.</p>
+                <island-picklist source="@Model.PickListProductsSource" target="@Model.PickListProductsTarget" source-header="Catalog" target-header="Selected Items" />
+            </div>
+
+            <!-- Demo 5: Reorder Controls -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Reorder Controls (Source &amp; Target)</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Dedicated vertical reorder controls to move items to top, up, down, or bottom within either list.</p>
+                <island-picklist source="@Model.PickListMembersSource" target="@Model.PickListMembersTarget" show-source-controls="true" show-target-controls="true" source-header="Candidate Pool" target-header="Assigned Squad" />
+            </div>
         </div>
     </section>
 
