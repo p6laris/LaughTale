@@ -68,7 +68,7 @@ const SPEEDDIAL_CSS = `
     height: 3rem;
     border-radius: 50%;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.15), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+    transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s;
     outline: none;
 }
 
@@ -81,10 +81,17 @@ const SPEEDDIAL_CSS = `
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.p-speeddial-opened .p-speeddial-icon.p-speeddial-rotate {
+.p-speeddial-icon svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+    stroke-width: 2.2;
+}
+
+.p-speeddial.p-speeddial-opened .p-speeddial-icon.p-speeddial-rotate {
     transform: rotate(45deg);
 }
 
@@ -104,7 +111,7 @@ const SPEEDDIAL_CSS = `
     z-index: 1;
 }
 
-.p-speeddial-opened .p-speeddial-list {
+.p-speeddial.p-speeddial-opened .p-speeddial-list {
     pointer-events: auto;
 }
 
@@ -118,13 +125,13 @@ const SPEEDDIAL_CSS = `
     align-items: center;
     justify-content: center;
     opacity: 0;
-    transform: scale(0);
-    transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1), opacity 250ms ease;
+    transform: translate3d(0, 0, 0) scale(0);
+    transition: transform 350ms cubic-bezier(0.16, 1, 0.3, 1), opacity 250ms cubic-bezier(0.16, 1, 0.3, 1);
     pointer-events: none;
+    will-change: transform, opacity;
 }
 
-.p-speeddial-opened .p-speeddial-item {
-    opacity: 1;
+.p-speeddial.p-speeddial-opened .p-speeddial-item {
     pointer-events: auto;
 }
 
@@ -423,7 +430,7 @@ export default function SpeedDialIsland(container: HTMLElement, props: SpeedDial
 
     let isOpen = false;
 
-    // Default severity in Aura is contrast unless specified
+    // Severity mapping
     const btnSev = props.buttonProps?.severity || 'contrast';
     let btnSevClass = 'p-button-contrast';
     if (btnSev !== 'contrast') {
@@ -543,228 +550,231 @@ export default function SpeedDialIsland(container: HTMLElement, props: SpeedDial
 
     const uniqueId = 'speeddial_' + Math.random().toString(36).substring(2, 9);
 
-    function render() {
-        let maskHtml = '';
-        if (mask) {
-            maskHtml = `<div class="p-speeddial-mask ${isOpen ? 'p-speeddial-mask-visible' : ''}"></div>`;
-        }
-
-        const itemsHtml = items.map((item, index) => {
-            const pos = calculatePosition(index, items.length);
-            const delay = isOpen ? transitionDelay * index : transitionDelay * (items.length - 1 - index);
-            
-            let transformStyle = '';
-            if (isCustomTemplate) {
-                transformStyle = isOpen 
-                    ? `transform: translate3d(0, ${pos.y}px, 0) scale(1);` 
-                    : `transform: translate3d(0, 0, 0) scale(0);`;
-            } else {
-                transformStyle = isOpen 
-                    ? `transform: translate3d(${pos.x}px, ${pos.y}px, 0) scale(1);` 
-                    : `transform: translate3d(0, 0, 0) scale(0);`;
-            }
-
-            const style = `${transformStyle} transition-delay: ${delay}ms;`;
-            const iconHtml = item.icon ? getLucideIcon(item.icon, 18) : LucideIcons.zap;
-            const tooltipText = item.tooltip || item.label || '';
-            const tooltipHtml = tooltipText ? `
-                <span class="p-speeddial-tooltip tooltip-${tooltipPosition}" data-index="${index}">
-                    ${tooltipText}
-                </span>
-            ` : '';
-
-            if (isCustomTemplate) {
-                return `
-                    <li class="p-speeddial-item" style="${style}" role="none" data-index="${index}">
-                        <div class="p-speeddial-custom-item" data-index="${index}">
-                            <span class="p-speeddial-custom-label">${item.label || ''}</span>
-                            <button type="button" class="p-speeddial-custom-icon" aria-label="${item.label || ''}" tabindex="${isOpen ? '0' : '-1'}">
-                                ${iconHtml}
-                            </button>
-                        </div>
-                    </li>
-                `;
-            }
-
-            const tag = item.url ? 'a' : 'button';
-            const hrefAttr = item.url ? `href="${item.url}" target="${item.target || '_self'}" rel="noopener"` : `type="button"`;
-
-            return `
-                <li class="p-speeddial-item" style="${style}" role="none" data-index="${index}">
-                    <${tag} ${hrefAttr} 
-                       class="p-speeddial-action ${item.styleClass || ''}" 
-                       role="menuitem"
-                       data-index="${index}"
-                       tabindex="${isOpen ? '0' : '-1'}"
-                       aria-label="${tooltipText || 'Action'}"
-                       ${item.disabled ? 'disabled aria-disabled="true"' : ''}>
-                        ${iconHtml}
-                        ${tooltipHtml}
-                    </${tag}>
-                </li>
-            `;
-        }).join('');
-
-        const openClass = isOpen ? 'p-speeddial-opened' : '';
-        const rotateClass = rotateAnimation ? 'p-speeddial-rotate' : '';
-        const ariaLabel = props.ariaLabel || 'Speed Dial Options';
-
-        container.innerHTML = `
-            ${maskHtml}
-            <div class="p-speeddial p-component p-speeddial-direction-${direction} p-speeddial-${type} ${openClass}">
-                <button type="button" 
-                        class="p-speeddial-button p-button ${btnSevClass} ${btnRounded} ${btnIconOnly} ${customBtnClass}"
-                        aria-haspopup="true"
-                        aria-expanded="${isOpen}"
-                        aria-controls="${uniqueId}_list"
-                        aria-label="${ariaLabel}">
-                    <span class="p-speeddial-icon ${rotateClass}">
-                        ${LucideIcons.plus}
-                    </span>
-                </button>
-                <ul id="${uniqueId}_list" class="p-speeddial-list" role="menu" aria-label="${ariaLabel}">
-                    ${itemsHtml}
-                </ul>
-            </div>
-        `;
-
-        bindEvents();
+    // Initial DOM creation (Only once!)
+    let maskHtml = '';
+    if (mask) {
+        maskHtml = `<div class="p-speeddial-mask"></div>`;
     }
 
-    function bindEvents() {
-        const mainBtn = container.querySelector<HTMLButtonElement>('.p-speeddial-button');
-        const maskEl = container.querySelector<HTMLDivElement>('.p-speeddial-mask');
+    const itemsHtml = items.map((item, index) => {
+        const iconHtml = item.icon ? getLucideIcon(item.icon, 18) : LucideIcons.zap;
+        const tooltipText = item.tooltip || item.label || '';
+        const tooltipHtml = tooltipText ? `
+            <span class="p-speeddial-tooltip tooltip-${tooltipPosition}" data-index="${index}">
+                ${tooltipText}
+            </span>
+        ` : '';
 
-        function toggle() {
-            isOpen = !isOpen;
-            render();
-            if (isOpen) {
-                const firstAction = container.querySelector<HTMLElement>('.p-speeddial-action, .p-speeddial-custom-item button');
-                firstAction?.focus();
+        if (isCustomTemplate) {
+            return `
+                <li class="p-speeddial-item" role="none" data-index="${index}">
+                    <div class="p-speeddial-custom-item" data-index="${index}">
+                        <span class="p-speeddial-custom-label">${item.label || ''}</span>
+                        <button type="button" class="p-speeddial-custom-icon" aria-label="${item.label || ''}" tabindex="-1">
+                            ${iconHtml}
+                        </button>
+                    </div>
+                </li>
+            `;
+        }
+
+        const tag = item.url ? 'a' : 'button';
+        const hrefAttr = item.url ? `href="${item.url}" target="${item.target || '_self'}" rel="noopener"` : `type="button"`;
+
+        return `
+            <li class="p-speeddial-item" role="none" data-index="${index}">
+                <${tag} ${hrefAttr} 
+                   class="p-speeddial-action ${item.styleClass || ''}" 
+                   role="menuitem"
+                   data-index="${index}"
+                   tabindex="-1"
+                   aria-label="${tooltipText || 'Action'}"
+                   ${item.disabled ? 'disabled aria-disabled="true"' : ''}>
+                    ${iconHtml}
+                    ${tooltipHtml}
+                </${tag}>
+            </li>
+        `;
+    }).join('');
+
+    const rotateClass = rotateAnimation ? 'p-speeddial-rotate' : '';
+    const ariaLabel = props.ariaLabel || 'Speed Dial Options';
+
+    container.innerHTML = `
+        ${maskHtml}
+        <div class="p-speeddial p-component p-speeddial-direction-${direction} p-speeddial-${type}">
+            <button type="button" 
+                    class="p-speeddial-button p-button ${btnSevClass} ${btnRounded} ${btnIconOnly} ${customBtnClass}"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                    aria-controls="${uniqueId}_list"
+                    aria-label="${ariaLabel}">
+                <span class="p-speeddial-icon ${rotateClass}">
+                    ${LucideIcons.plus}
+                </span>
+            </button>
+            <ul id="${uniqueId}_list" class="p-speeddial-list" role="menu" aria-label="${ariaLabel}">
+                ${itemsHtml}
+            </ul>
+        </div>
+    `;
+
+    const rootEl = container.querySelector<HTMLElement>('.p-speeddial')!;
+    const mainBtn = container.querySelector<HTMLButtonElement>('.p-speeddial-button')!;
+    const maskEl = container.querySelector<HTMLDivElement>('.p-speeddial-mask');
+    const itemElements = Array.from(container.querySelectorAll<HTMLLIElement>('.p-speeddial-item'));
+
+    function applyAnimation(opening: boolean) {
+        isOpen = opening;
+        rootEl.classList.toggle('p-speeddial-opened', opening);
+        mainBtn.setAttribute('aria-expanded', String(opening));
+
+        if (maskEl) {
+            maskEl.classList.toggle('p-speeddial-mask-visible', opening);
+        }
+
+        itemElements.forEach((li, index) => {
+            const pos = calculatePosition(index, items.length);
+            const delay = opening 
+                ? transitionDelay * index 
+                : transitionDelay * (items.length - 1 - index);
+
+            li.style.transitionDelay = `${delay}ms`;
+
+            if (isCustomTemplate) {
+                if (opening) {
+                    li.style.transform = `translate3d(0, ${pos.y}px, 0) scale(1)`;
+                    li.style.opacity = '1';
+                } else {
+                    li.style.transform = `translate3d(0, 0, 0) scale(0)`;
+                    li.style.opacity = '0';
+                }
             } else {
-                mainBtn?.focus();
+                if (opening) {
+                    li.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0) scale(1)`;
+                    li.style.opacity = '1';
+                } else {
+                    li.style.transform = `translate3d(0, 0, 0) scale(0)`;
+                    li.style.opacity = '0';
+                }
             }
-        }
 
-        function close() {
-            if (isOpen) {
-                isOpen = false;
-                render();
-                mainBtn?.focus();
+            const interactive = li.querySelector<HTMLElement>('.p-speeddial-action, .p-speeddial-custom-icon');
+            if (interactive) {
+                interactive.setAttribute('tabindex', opening ? '0' : '-1');
             }
-        }
-
-        mainBtn?.addEventListener('click', (e) => {
-            e.stopPropagation();
-            toggle();
         });
+    }
 
-        maskEl?.addEventListener('click', (e) => {
-            e.stopPropagation();
+    function toggle() {
+        applyAnimation(!isOpen);
+        if (isOpen) {
+            const first = container.querySelector<HTMLElement>('.p-speeddial-action, .p-speeddial-custom-icon');
+            first?.focus();
+        } else {
+            mainBtn.focus();
+        }
+    }
+
+    function close() {
+        if (isOpen) {
+            applyAnimation(false);
+            mainBtn.focus();
+        }
+    }
+
+    mainBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggle();
+    });
+
+    maskEl?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        close();
+    });
+
+    document.addEventListener('click', (e) => {
+        if (isOpen && !container.contains(e.target as Node)) {
+            close();
+        }
+    });
+
+    mainBtn.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggle();
+        } else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+            if (!isOpen) {
+                e.preventDefault();
+                applyAnimation(true);
+                const first = container.querySelector<HTMLElement>('.p-speeddial-action, .p-speeddial-custom-icon');
+                first?.focus();
+            }
+        } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+            if (!isOpen) {
+                e.preventDefault();
+                applyAnimation(true);
+                const actions = container.querySelectorAll<HTMLElement>('.p-speeddial-action, .p-speeddial-custom-icon');
+                if (actions.length) actions[actions.length - 1].focus();
+            }
+        }
+    });
+
+    const actionElements = container.querySelectorAll<HTMLElement>('.p-speeddial-action, .p-speeddial-custom-item');
+    actionElements.forEach((el) => {
+        const index = parseInt(el.getAttribute('data-index') || '-1', 10);
+        const item = items[index];
+
+        el.addEventListener('click', (e) => {
+            if (item?.disabled) return;
+
+            container.dispatchEvent(new CustomEvent('speeddial:action', {
+                bubbles: true,
+                detail: { item, index }
+            }));
+
+            if (item?.command) {
+                try {
+                    const fn = new Function('item', item.command);
+                    fn(item);
+                } catch (err) {
+                    console.error('SpeedDial command error:', err);
+                }
+            }
+
             close();
         });
 
-        // Close on outside click
-        document.addEventListener('click', (e) => {
-            if (isOpen && !container.contains(e.target as Node)) {
-                close();
-            }
-        });
+        const tooltip = el.querySelector<HTMLElement>('.p-speeddial-tooltip');
+        if (tooltip) {
+            el.addEventListener('mouseenter', () => tooltip.classList.add('p-tooltip-visible'));
+            el.addEventListener('mouseleave', () => tooltip.classList.remove('p-tooltip-visible'));
+            el.addEventListener('focus', () => tooltip.classList.add('p-tooltip-visible'));
+            el.addEventListener('blur', () => tooltip.classList.remove('p-tooltip-visible'));
+        }
 
-        // Main button keyboard navigation
-        mainBtn?.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
+        el.addEventListener('keydown', (e) => {
+            const allActions = Array.from(container.querySelectorAll<HTMLElement>('.p-speeddial-action, .p-speeddial-custom-icon'));
+            const currentIndex = allActions.indexOf(el as HTMLElement);
+
+            if (e.key === 'Escape') {
                 e.preventDefault();
-                toggle();
-            } else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
-                if (!isOpen) {
-                    e.preventDefault();
-                    isOpen = true;
-                    render();
-                    const firstAction = container.querySelector<HTMLElement>('.p-speeddial-action, .p-speeddial-custom-item button');
-                    firstAction?.focus();
-                }
-            } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
-                if (!isOpen) {
-                    e.preventDefault();
-                    isOpen = true;
-                    render();
-                    const actions = container.querySelectorAll<HTMLElement>('.p-speeddial-action, .p-speeddial-custom-item button');
-                    if (actions.length) actions[actions.length - 1].focus();
-                }
-            }
-        });
-
-        // Action items event binding
-        const actionElements = container.querySelectorAll<HTMLElement>('.p-speeddial-action, .p-speeddial-custom-item');
-        actionElements.forEach((el) => {
-            const index = parseInt(el.getAttribute('data-index') || '-1', 10);
-            const item = items[index];
-
-            el.addEventListener('click', (e) => {
-                if (item?.disabled) return;
-                
-                // Dispatch custom event
-                container.dispatchEvent(new CustomEvent('speeddial:action', {
-                    bubbles: true,
-                    detail: { item, index }
-                }));
-
-                if (item?.command) {
-                    try {
-                        const fn = new Function('item', item.command);
-                        fn(item);
-                    } catch (err) {
-                        console.error('SpeedDial command execution error:', err);
-                    }
-                }
-
                 close();
-            });
-
-            // Tooltip hover
-            const tooltip = el.querySelector<HTMLElement>('.p-speeddial-tooltip');
-            if (tooltip) {
-                el.addEventListener('mouseenter', () => {
-                    tooltip.classList.add('p-tooltip-visible');
-                });
-                el.addEventListener('mouseleave', () => {
-                    tooltip.classList.remove('p-tooltip-visible');
-                });
-                el.addEventListener('focus', () => {
-                    tooltip.classList.add('p-tooltip-visible');
-                });
-                el.addEventListener('blur', () => {
-                    tooltip.classList.remove('p-tooltip-visible');
-                });
+            } else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+                e.preventDefault();
+                const next = (currentIndex + 1) % allActions.length;
+                allActions[next]?.focus();
+            } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                e.preventDefault();
+                const prev = (currentIndex - 1 + allActions.length) % allActions.length;
+                allActions[prev]?.focus();
+            } else if (e.key === 'Home') {
+                e.preventDefault();
+                allActions[0]?.focus();
+            } else if (e.key === 'End') {
+                e.preventDefault();
+                allActions[allActions.length - 1]?.focus();
             }
-
-            // Keyboard navigation among actions
-            el.addEventListener('keydown', (e) => {
-                const allActions = Array.from(container.querySelectorAll<HTMLElement>('.p-speeddial-action, .p-speeddial-custom-item button, .p-speeddial-custom-item'));
-                const currentIndex = allActions.indexOf(el);
-
-                if (e.key === 'Escape') {
-                    e.preventDefault();
-                    close();
-                } else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
-                    e.preventDefault();
-                    const next = (currentIndex + 1) % allActions.length;
-                    allActions[next]?.focus();
-                } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
-                    e.preventDefault();
-                    const prev = (currentIndex - 1 + allActions.length) % allActions.length;
-                    allActions[prev]?.focus();
-                } else if (e.key === 'Home') {
-                    e.preventDefault();
-                    allActions[0]?.focus();
-                } else if (e.key === 'End') {
-                    e.preventDefault();
-                    allActions[allActions.length - 1]?.focus();
-                }
-            });
         });
-    }
-
-    render();
+    });
 }
