@@ -530,10 +530,10 @@ public class IslandSwitchTagHelper : TagHelper
 public class IslandSliderTagHelper : TagHelper
 {
     [HtmlAttributeName("value")]
-    public double? Value { get; set; }
+    public object? Value { get; set; }
 
     [HtmlAttributeName("max-value")]
-    public double? MaxValue { get; set; }
+    public object? MaxValue { get; set; }
 
     [HtmlAttributeName("values")]
     public List<double>? Values { get; set; }
@@ -619,13 +619,13 @@ public class IslandSliderTagHelper : TagHelper
             {
                 effectiveValue = Values;
             }
-            else if (Value.HasValue && MaxValue.HasValue)
+            else if (Value != null && MaxValue != null)
             {
-                effectiveValue = new List<double> { Value.Value, MaxValue.Value };
+                effectiveValue = new List<object> { Value, MaxValue };
             }
-            else if (Value.HasValue)
+            else if (Value != null)
             {
-                effectiveValue = new List<double> { Min, Value.Value };
+                effectiveValue = new List<object> { Min, Value };
             }
             else
             {
