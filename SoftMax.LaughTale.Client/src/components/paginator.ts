@@ -31,9 +31,10 @@ const PAGINATOR_CSS = `
     justify-content: center;
     flex-wrap: wrap;
     gap: 0.35rem;
-    padding: 0.625rem 1rem;
+    padding: 0.5rem 1rem;
     background: var(--p-surface-0, #ffffff);
     border-radius: var(--p-border-radius-lg, 8px);
+    border: 1px solid var(--p-surface-200, #e2e8f0);
     color: var(--p-surface-700, #334155);
     font-family: var(--p-font-family, inherit);
     user-select: none;
@@ -56,19 +57,20 @@ const PAGINATOR_CSS = `
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 2.25rem;
+    width: 2.25rem;
     height: 2.25rem;
-    padding: 0 0.4rem;
-    border-radius: var(--p-border-radius, 6px);
+    min-width: 2.25rem;
+    border-radius: 9999px;
     border: 1px solid transparent;
     background: transparent;
-    color: var(--p-surface-700, #334155);
+    color: var(--p-surface-600, #475569);
     font-size: 0.875rem;
     font-weight: 500;
     cursor: pointer;
     transition: background-color 0.12s ease, color 0.12s ease, border-color 0.12s ease;
     outline: none;
     box-sizing: border-box;
+    padding: 0;
 }
 
 .p-paginator-page:hover:not(:disabled):not(.p-highlight),
@@ -94,8 +96,8 @@ const PAGINATOR_CSS = `
 .p-paginator-last:disabled,
 .p-paginator-page:disabled,
 .p-paginator-action-btn:disabled {
-    opacity: 0.35;
-    cursor: not-allowed;
+    opacity: 0.3;
+    cursor: default;
 }
 
 .p-paginator-pages {
@@ -105,20 +107,22 @@ const PAGINATOR_CSS = `
 }
 
 .p-paginator-current {
-    font-size: 0.8125rem;
+    font-size: 0.875rem;
     color: var(--p-surface-500, #64748b);
-    padding: 0 0.5rem;
+    padding: 0 0.75rem;
     white-space: nowrap;
 }
 
 .p-paginator-rpp-select,
 .p-paginator-jtp-select {
-    padding: 0.35rem 0.65rem;
+    appearance: none;
+    padding: 0.35rem 2rem 0.35rem 0.75rem;
     border-radius: var(--p-border-radius, 6px);
     border: 1px solid var(--p-surface-300, #cbd5e1);
-    background: var(--p-surface-0, #ffffff);
-    color: inherit;
-    font-size: 0.8125rem;
+    background: var(--p-surface-0, #ffffff) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 0.6rem center;
+    color: var(--p-surface-800, #1e293b);
+    font-size: 0.875rem;
+    font-weight: 500;
     outline: none;
     cursor: pointer;
     transition: border-color 0.15s ease;
@@ -132,25 +136,26 @@ const PAGINATOR_CSS = `
 .p-paginator-jtp-container {
     display: inline-flex;
     align-items: center;
-    gap: 0.35rem;
-    font-size: 0.8125rem;
+    gap: 0.5rem;
+    font-size: 0.875rem;
     color: var(--p-surface-600, #475569);
+    padding: 0 0.5rem;
 }
 
 .p-paginator-jtp-input {
-    width: 3.25rem;
-    padding: 0.35rem 0.4rem;
+    width: 3.5rem;
+    padding: 0.35rem 0.5rem;
     text-align: center;
     border-radius: var(--p-border-radius, 6px);
     border: 1px solid var(--p-surface-300, #cbd5e1);
     background: var(--p-surface-0, #ffffff);
     color: inherit;
-    font-size: 0.8125rem;
+    font-size: 0.875rem;
     outline: none;
 }
 
 .p-paginator-slider {
-    width: 7.5rem;
+    width: 8rem;
     accent-color: var(--p-primary-500, #10b981);
     cursor: pointer;
 }
@@ -158,7 +163,7 @@ const PAGINATOR_CSS = `
 /* Image gallery container */
 .p-paginator-image-display {
     width: 100%;
-    margin-top: 1rem;
+    margin-top: 1.25rem;
     display: flex;
     justify-content: center;
 }
@@ -168,9 +173,13 @@ const PAGINATOR_CSS = `
     height: 20rem;
     border-radius: var(--p-border-radius-lg, 8px);
     overflow: hidden;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
     background: var(--p-surface-100, #f1f5f9);
     border: 1px solid var(--p-surface-200, #e2e8f0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
 }
 .p-paginator-image-card img {
     width: 100%;
@@ -184,6 +193,7 @@ const PAGINATOR_CSS = `
 .dark .p-paginator,
 [data-theme="dark"] .p-paginator {
     background: var(--p-surface-900, #0f172a) !important;
+    border-color: var(--p-surface-700, #334155) !important;
     color: var(--p-surface-200, #e2e8f0) !important;
 }
 .dark .p-paginator-page,
@@ -226,7 +236,7 @@ const PAGINATOR_CSS = `
 [data-theme="dark"] .p-paginator-rpp-select,
 [data-theme="dark"] .p-paginator-jtp-select,
 [data-theme="dark"] .p-paginator-jtp-input {
-    background: var(--p-surface-800, #1e293b) !important;
+    background-color: var(--p-surface-800, #1e293b) !important;
     border-color: var(--p-surface-600, #475569) !important;
     color: #ffffff !important;
 }
@@ -252,6 +262,16 @@ const ICONS = {
     settings: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>'
 };
 
+// Scenic nature images with reliable fallback
+const DEFAULT_IMAGES = [
+    'https://primefaces.org/cdn/primevue/images/nature/nature1.jpg',
+    'https://primefaces.org/cdn/primevue/images/nature/nature2.jpg',
+    'https://primefaces.org/cdn/primevue/images/nature/nature3.jpg',
+    'https://primefaces.org/cdn/primevue/images/nature/nature4.jpg',
+    'https://primefaces.org/cdn/primevue/images/nature/nature5.jpg',
+    'https://primefaces.org/cdn/primevue/images/nature/nature6.jpg'
+];
+
 export default function PaginatorIsland(container: HTMLElement, props: PaginatorProps) {
     injectIslandStyle('paginator', PAGINATOR_CSS);
 
@@ -266,7 +286,7 @@ export default function PaginatorIsland(container: HTMLElement, props: Paginator
     const showJumpToPageDropdown = !!props.showJumpToPageDropdown;
     const showJumpToPageInput = !!props.showJumpToPageInput;
     const showSlider = !!props.showSlider;
-    const images = props.images || [];
+    const images = (props.images && props.images.length > 0) ? props.images : (props.totalRecords === 6 && rows === 1 ? DEFAULT_IMAGES : []);
 
     function getTotalPages(): number {
         return Math.ceil(totalRecords / rows) || 1;
@@ -417,7 +437,6 @@ export default function PaginatorIsland(container: HTMLElement, props: Paginator
         let elementsHtml = '';
 
         if (template) {
-            // Parse custom template string
             const tokens = template.split(/\s+/);
             const renderedTokens = tokens.map(token => {
                 switch (token) {
@@ -436,7 +455,6 @@ export default function PaginatorIsland(container: HTMLElement, props: Paginator
             });
             elementsHtml = renderedTokens.join('');
         } else {
-            // Default layout
             elementsHtml = `
                 ${firstBtnHtml}
                 ${prevBtnHtml}
@@ -458,7 +476,7 @@ export default function PaginatorIsland(container: HTMLElement, props: Paginator
             imageDisplayHtml = `
                 <div class="p-paginator-image-display">
                     <div class="p-paginator-image-card">
-                        <img src="${currentImg}" alt="Gallery image ${currentPage + 1}" />
+                        <img src="${currentImg}" alt="Nature ${currentPage + 1}" loading="eager" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop&q=80';" />
                     </div>
                 </div>
             `;

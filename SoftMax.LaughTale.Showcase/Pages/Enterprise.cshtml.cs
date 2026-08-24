@@ -427,12 +427,12 @@ public class EnterpriseModel : PageModel
 
         public List<string> PaginatorImages { get; set; } = new()
     {
-        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop&q=80",
-        "https://images.unsplash.com/photo-1519046904884-53103b34b206?w=800&auto=format&fit=crop&q=80",
-        "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=800&auto=format&fit=crop&q=80",
-        "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&auto=format&fit=crop&q=80",
-        "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&auto=format&fit=crop&q=80",
-        "https://images.unsplash.com/photo-1511497584788-87676104235f?w=800&auto=format&fit=crop&q=80"
+        "https://primefaces.org/cdn/primevue/images/nature/nature1.jpg",
+        "https://primefaces.org/cdn/primevue/images/nature/nature2.jpg",
+        "https://primefaces.org/cdn/primevue/images/nature/nature3.jpg",
+        "https://primefaces.org/cdn/primevue/images/nature/nature4.jpg",
+        "https://primefaces.org/cdn/primevue/images/nature/nature5.jpg",
+        "https://primefaces.org/cdn/primevue/images/nature/nature6.jpg"
     };
 
     public OrgChartNode OrgChartBasic { get; set; } = new("0", "Founder", Children: new()
