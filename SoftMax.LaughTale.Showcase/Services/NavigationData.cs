@@ -14,7 +14,7 @@ public static class NavigationData
                 new("Dashboard", "activity", "/dashboard", currentPath.StartsWith("/dashboard")),
                 new("Architecture", "fileText", "/About", currentPath.StartsWith("/About"))
             }),
-            new("Form Controls (22)", "edit3", null, false, new List<SidebarItem>
+            new("Form Controls (27)", "edit3", null, false, new List<SidebarItem>
             {
                 new("Dynamic Form", "fileSpreadsheet", "/enterprise#sec-dynamic-form", false, null, "Reflect"),
                 new("InputText", "edit", "/enterprise#sec-input-text"),
@@ -31,6 +31,7 @@ public static class NavigationData
                 new("TreeSelect", "folderTree", "/enterprise#sec-treeselect"),
                 new("Checkbox", "checkCircle", "/enterprise#sec-checkbox"),
                 new("RadioButton", "check", "/enterprise#sec-radio"),
+                new("ToggleButton", "zap", "/enterprise#sec-toggle-button"),
                 new("ToggleSwitch", "sliders", "/enterprise#sec-toggle-switch"),
                 new("Slider", "sliders", "/enterprise#sec-slider"),
                 new("Rating", "star", "/enterprise#sec-rating"),
