@@ -425,7 +425,17 @@ public class EnterpriseModel : PageModel
         new("t-4", "Step 4: Audit Log Append", "Ledger", 4)
     };
 
-        public OrgChartNode OrgChartBasic { get; set; } = new("0", "Founder", Children: new()
+        public List<string> PaginatorImages { get; set; } = new()
+    {
+        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1519046904884-53103b34b206?w=800&auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=800&auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1511497584788-87676104235f?w=800&auto=format&fit=crop&q=80"
+    };
+
+    public OrgChartNode OrgChartBasic { get; set; } = new("0", "Founder", Children: new()
     {
         new("0-0", "Product Lead", Children: new()
         {

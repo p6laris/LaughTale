@@ -2358,17 +2358,59 @@
         </div>
     </section>
 
-    <!-- Paginator -->
+        <!-- Paginator -->
     <section id="sec-paginator" class="component-card">
         <div class="card-header">
             <div>
                 <h2>Paginator</h2>
-                <p>Standalone pagination bar with page jumps and configurable page sizes.</p>
+                <p>Paginator displays data in paged format and provides navigation between pages.</p>
             </div>
             <span class="aura-tag tag-slate">Pagination</span>
         </div>
-        <div class="card-body" style="max-width: 600px;">
-            <island-paginator total-records="240" rows="10" />
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Demo 1: Basic -->
+            <div class="demo-subcard">
+                <div class="demo-subcard-header">
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Basic</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Paginator tracks rows, total records, and page navigation with customizable rows per page options.</p>
+                </div>
+                <div style="padding: 1.5rem; background: var(--p-surface-50); border: 1px solid var(--p-surface-200); border-radius: 8px;">
+                    <island-paginator rows="10" total-records="120" rows-per-page-options="new List<int> { 10, 20, 30 }" />
+                </div>
+            </div>
+
+            <!-- Demo 2: Template (Custom Controls, Jump To Page, Slider) -->
+            <div class="demo-subcard">
+                <div class="demo-subcard-header">
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Template</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">The default layout can be customized with template tokens, jump to page dropdown, and scrubber slider.</p>
+                </div>
+                <div style="padding: 1.5rem; background: var(--p-surface-50); border: 1px solid var(--p-surface-200); border-radius: 8px;">
+                    <island-paginator rows="10" total-records="120" show-jump-to-page-dropdown="true" show-slider="true" template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport JumpToPageDropdown Slider" />
+                </div>
+            </div>
+
+            <!-- Demo 3: CurrentPageReport -->
+            <div class="demo-subcard">
+                <div class="demo-subcard-header">
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Current Page Report</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Current page report element displays information about the paginator state with tokens.</p>
+                </div>
+                <div style="padding: 1.5rem; background: var(--p-surface-50); border: 1px solid var(--p-surface-200); border-radius: 8px;">
+                    <island-paginator rows="10" total-records="120" current-page-report-template="Showing {first} to {last} of {totalRecords}" />
+                </div>
+            </div>
+
+            <!-- Demo 4: Images / Collection Paging -->
+            <div class="demo-subcard">
+                <div class="demo-subcard-header">
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Images</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Sample image gallery implementation using a standalone paginator.</p>
+                </div>
+                <div style="padding: 1.5rem; background: var(--p-surface-50); border: 1px solid var(--p-surface-200); border-radius: 8px;">
+                    <island-paginator rows="1" total-records="6" images="@Model.PaginatorImages" show-first-last="false" />
+                </div>
+            </div>
         </div>
     </section>
 

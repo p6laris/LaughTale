@@ -3938,7 +3938,7 @@ public class IslandCarouselTagHelper : TagHelper
 }
 
 /// <summary>
-/// TagHelper for <island-paginator /> — Page navigation
+/// TagHelper for <island-paginator /> — Aura Paginator Component
 /// </summary>
 [HtmlTargetElement("island-paginator")]
 public class IslandPaginatorTagHelper : TagHelper
@@ -3946,16 +3946,73 @@ public class IslandPaginatorTagHelper : TagHelper
     public int TotalRecords { get; set; } = 0;
     public int Rows { get; set; } = 10;
     public int First { get; set; } = 0;
+    public int PageLinkSize { get; set; } = 5;
     public List<int>? RowsPerPageOptions { get; set; }
+    public string? Template { get; set; }
+    public string? CurrentPageReportTemplate { get; set; }
+    public bool ShowFirstLast { get; set; } = true;
+    public bool ShowJumpToPageDropdown { get; set; } = false;
+    public bool ShowJumpToPageInput { get; set; } = false;
+    public bool ShowSlider { get; set; } = false;
     public bool Compact { get; set; } = false;
+    public string? TargetInput { get; set; }
+    public string? TargetSelector { get; set; }
+    public List<string>? Images { get; set; }
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
+        // Attribute fallbacks
+        if (context.AllAttributes.TryGetAttribute("totalRecords", out var trAttr) || context.AllAttributes.TryGetAttribute("total-records", out trAttr))
+        {
+            if (int.TryParse(trAttr.Value?.ToString(), out var tr)) TotalRecords = tr;
+        }
+        if (context.AllAttributes.TryGetAttribute("pageLinkSize", out var plsAttr) || context.AllAttributes.TryGetAttribute("page-link-size", out plsAttr))
+        {
+            if (int.TryParse(plsAttr.Value?.ToString(), out var pls)) PageLinkSize = pls;
+        }
+        if (context.AllAttributes.TryGetAttribute("currentPageReportTemplate", out var cprtAttr) || context.AllAttributes.TryGetAttribute("current-page-report-template", out cprtAttr))
+        {
+            CurrentPageReportTemplate = cprtAttr.Value?.ToString();
+        }
+        if (context.AllAttributes.TryGetAttribute("showJumpToPageDropdown", out var sjdAttr) || context.AllAttributes.TryGetAttribute("show-jump-to-page-dropdown", out sjdAttr))
+        {
+            if (bool.TryParse(sjdAttr.Value?.ToString(), out var b)) ShowJumpToPageDropdown = b;
+            else if (sjdAttr.Value != null) ShowJumpToPageDropdown = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("showJumpToPageInput", out var sjiAttr) || context.AllAttributes.TryGetAttribute("show-jump-to-page-input", out sjiAttr))
+        {
+            if (bool.TryParse(sjiAttr.Value?.ToString(), out var b)) ShowJumpToPageInput = b;
+            else if (sjiAttr.Value != null) ShowJumpToPageInput = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("showSlider", out var ssAttr) || context.AllAttributes.TryGetAttribute("show-slider", out ssAttr))
+        {
+            if (bool.TryParse(ssAttr.Value?.ToString(), out var b)) ShowSlider = b;
+            else if (ssAttr.Value != null) ShowSlider = true;
+        }
+
         output.TagName = "div";
         output.TagMode = TagMode.StartTagAndEndTag;
         output.Attributes.SetAttribute("data-island", "paginator");
         output.Attributes.SetAttribute("data-hydrate", "load");
-        var props = new { totalRecords = TotalRecords, rows = Rows, first = First, rowsPerPageOptions = RowsPerPageOptions ?? new List<int> { 5, 10, 25, 50 }, compact = Compact };
+
+        var props = new
+        {
+            totalRecords = TotalRecords,
+            rows = Rows,
+            first = First,
+            pageLinkSize = PageLinkSize,
+            rowsPerPageOptions = RowsPerPageOptions,
+            template = Template,
+            currentPageReportTemplate = CurrentPageReportTemplate,
+            showFirstLast = ShowFirstLast,
+            showJumpToPageDropdown = ShowJumpToPageDropdown,
+            showJumpToPageInput = ShowJumpToPageInput,
+            showSlider = ShowSlider,
+            compact = Compact,
+            targetInputName = TargetInput,
+            targetSelector = TargetSelector,
+            images = Images
+        };
         output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
     }
 }
