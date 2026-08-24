@@ -15568,7 +15568,7 @@ function SplitButtonIsland(container, props) {
   if (disabled) rootClasses.push("p-splitbutton-disabled");
   const btnSevClass = `p-button-${severity}`;
   const initialSlotContent = container.innerHTML.trim();
-  const hasCustomSlot = initialSlotContent && !initialSlotContent.startsWith('<div class="laughtale-splitbutton');
+  const hasCustomSlot = initialSlotContent && !initialSlotContent.startsWith('<div class="p-splitbutton');
   function renderSubmenuTree(subItems) {
     return `
             <ul class="p-splitbutton-submenu-overlay p-menu-list" role="menu">
@@ -15636,8 +15636,34 @@ function SplitButtonIsland(container, props) {
   const mainBtn = rootEl.querySelector(".p-splitbutton-button");
   const dropdownBtn = rootEl.querySelector(".p-splitbutton-dropdown");
   const menuEl = rootEl.querySelector(".p-splitbutton-menu");
+  function closeAllSubmenus(scopeList) {
+    const target = scopeList || menuEl;
+    target.querySelectorAll(".p-menu-item.p-submenu-open").forEach((openLi) => {
+      openLi.classList.remove("p-submenu-open", "p-menu-active");
+    });
+  }
+  function closeMenu() {
+    if (!isOpen) return;
+    isOpen = false;
+    if (activeSplitButtonClose === closeMenu) {
+      activeSplitButtonClose = null;
+    }
+    dropdownBtn.setAttribute("aria-expanded", "false");
+    menuEl.style.opacity = "0";
+    menuEl.style.transform = "scaleY(0.8)";
+    closeAllSubmenus();
+    setTimeout(() => {
+      if (!isOpen) {
+        menuEl.style.display = "none";
+      }
+    }, 150);
+  }
   function openMenu() {
     if (disabled || items.length === 0 || isOpen) return;
+    if (activeSplitButtonClose && activeSplitButtonClose !== closeMenu) {
+      activeSplitButtonClose();
+    }
+    activeSplitButtonClose = closeMenu;
     isOpen = true;
     dropdownBtn.setAttribute("aria-expanded", "true");
     menuEl.style.display = "block";
@@ -15662,23 +15688,11 @@ function SplitButtonIsland(container, props) {
     const firstLink = menuEl.querySelector('.p-menu-item-link:not([aria-disabled="true"])');
     firstLink?.focus();
   }
-  function closeMenu() {
-    if (!isOpen) return;
-    isOpen = false;
-    dropdownBtn.setAttribute("aria-expanded", "false");
-    menuEl.style.opacity = "0";
-    menuEl.style.transform = "scaleY(0.8)";
-    setTimeout(() => {
-      if (!isOpen) {
-        menuEl.style.display = "none";
-      }
-    }, 150);
-  }
   function toggleMenu() {
     if (isOpen) closeMenu();
     else openMenu();
   }
-  mainBtn.addEventListener("click", (e) => {
+  mainBtn.addEventListener("click", () => {
     if (disabled) return;
     container.dispatchEvent(new CustomEvent("splitbutton:click", {
       bubbles: true,
@@ -15718,37 +15732,50 @@ function SplitButtonIsland(container, props) {
     closeMenu();
     dropdownBtn.focus();
   }
-  function findItemByPath(itemsList, path) {
-    let current = { items: itemsList };
-    for (const idx of path) {
-      if (!current || !current.items || !current.items[idx]) return void 0;
-      current = current.items[idx];
-    }
-    return current;
-  }
-  menuEl.querySelectorAll(".p-menu-item").forEach((li) => {
-    const link = li.querySelector(":scope > .p-menu-item-link");
-    const hasSub = li.classList.contains("p-menu-item-has-submenu");
-    link?.addEventListener("click", (e) => {
-      if (hasSub) {
-        e.preventDefault();
-        e.stopPropagation();
-        li.classList.toggle("p-submenu-open");
-        return;
-      }
-      const itemIndex = Number(li.getAttribute("data-index") || "0");
-      const parentSubmenu = li.closest(".p-splitbutton-submenu-overlay");
-      if (parentSubmenu) {
-        const parentLi = parentSubmenu.closest(".p-menu-item");
-        const parentIdx = Number(parentLi?.getAttribute("data-index") || "0");
-        const matchedItem = items[parentIdx]?.items?.[itemIndex];
-        if (matchedItem) handleItemClick(matchedItem, e);
-      } else {
-        const matchedItem = items[itemIndex];
-        if (matchedItem) handleItemClick(matchedItem, e);
+  function setupSubmenuHover(parentUl, itemsList) {
+    const directLis = Array.from(parentUl.children).filter((el) => el.classList.contains("p-menu-item"));
+    directLis.forEach((li, idx) => {
+      const itemData = itemsList[idx];
+      if (!itemData || itemData.separator) return;
+      const hasSub = Array.isArray(itemData.items) && itemData.items.length > 0;
+      const link = li.querySelector(":scope > .p-menu-item-link");
+      const subOverlay = li.querySelector(":scope > .p-splitbutton-submenu-overlay");
+      li.addEventListener("mouseenter", () => {
+        directLis.forEach((sibling) => {
+          if (sibling !== li) {
+            sibling.classList.remove("p-submenu-open", "p-menu-active");
+          }
+        });
+        if (hasSub && subOverlay) {
+          li.classList.add("p-submenu-open", "p-menu-active");
+          const liRect = li.getBoundingClientRect();
+          const subWidth = subOverlay.offsetWidth || 180;
+          if (liRect.right + subWidth > window.innerWidth) {
+            subOverlay.classList.add("p-submenu-flipped");
+          } else {
+            subOverlay.classList.remove("p-submenu-flipped");
+          }
+        } else {
+          li.classList.add("p-menu-active");
+        }
+      });
+      link?.addEventListener("click", (e) => {
+        if (hasSub) {
+          e.preventDefault();
+          e.stopPropagation();
+          return;
+        }
+        handleItemClick(itemData, e);
+      });
+      if (hasSub && subOverlay) {
+        setupSubmenuHover(subOverlay, itemData.items);
       }
     });
-  });
+  }
+  const rootList = menuEl.querySelector(":scope > .p-menu-list");
+  if (rootList) {
+    setupSubmenuHover(rootList, items);
+  }
   dropdownBtn.addEventListener("keydown", (e) => {
     if (e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === " " || e.key === "Enter") {
       e.preventDefault();
@@ -15822,12 +15849,13 @@ function SplitButtonIsland(container, props) {
     }
   });
 }
-var SPLITBUTTON_CSS;
+var activeSplitButtonClose, SPLITBUTTON_CSS;
 var init_split_button = __esm({
   "src/components/split-button.ts"() {
     "use strict";
     init_styles();
     init_lucide();
+    activeSplitButtonClose = null;
     SPLITBUTTON_CSS = `
 .p-splitbutton {
     display: inline-flex;
@@ -15846,7 +15874,6 @@ var init_split_button = __esm({
     flex: 1 1 auto;
     border-top-right-radius: 0 !important;
     border-bottom-right-radius: 0 !important;
-    border-right: none !important;
 }
 
 .p-splitbutton .p-splitbutton-dropdown {
@@ -15871,7 +15898,7 @@ var init_split_button = __esm({
     border: 1px solid transparent;
     cursor: pointer;
     user-select: none;
-    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+    transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
     outline: none;
     text-decoration: none;
 }
@@ -16001,24 +16028,47 @@ var init_split_button = __esm({
 .p-splitbutton-outlined .p-button-contrast { background: transparent; color: #0f172a; border-color: #0f172a; }
 .p-splitbutton-outlined .p-button-contrast:hover:not(:disabled) { background: rgba(15, 23, 42, 0.08); }
 
+.p-splitbutton-outlined .p-splitbutton-button {
+    border-right: none !important;
+}
+
 /* Text Variant */
-.p-splitbutton-text .p-button { background: transparent; border-color: transparent !important; }
-.p-splitbutton-text .p-button-primary { color: var(--p-primary-500, #10b981); }
-.p-splitbutton-text .p-button-primary:hover:not(:disabled) { background: rgba(16, 185, 129, 0.08); }
-.p-splitbutton-text .p-button-secondary { color: var(--p-surface-700, #334155); }
-.p-splitbutton-text .p-button-secondary:hover:not(:disabled) { background: var(--p-surface-100, #f1f5f9); }
-.p-splitbutton-text .p-button-success { color: #22c55e; }
-.p-splitbutton-text .p-button-success:hover:not(:disabled) { background: rgba(34, 197, 94, 0.08); }
-.p-splitbutton-text .p-button-info { color: #0ea5e9; }
-.p-splitbutton-text .p-button-info:hover:not(:disabled) { background: rgba(14, 165, 233, 0.08); }
-.p-splitbutton-text .p-button-warn { color: #f59e0b; }
-.p-splitbutton-text .p-button-warn:hover:not(:disabled) { background: rgba(245, 158, 11, 0.08); }
-.p-splitbutton-text .p-button-help { color: #a855f7; }
-.p-splitbutton-text .p-button-help:hover:not(:disabled) { background: rgba(168, 85, 247, 0.08); }
-.p-splitbutton-text .p-button-danger { color: #ef4444; }
-.p-splitbutton-text .p-button-danger:hover:not(:disabled) { background: rgba(239, 68, 68, 0.08); }
-.p-splitbutton-text .p-button-contrast { color: #0f172a; }
-.p-splitbutton-text .p-button-contrast:hover:not(:disabled) { background: rgba(15, 23, 42, 0.08); }
+.p-splitbutton-text .p-button { 
+    background: transparent !important; 
+    border-color: transparent !important; 
+    box-shadow: none !important;
+}
+.p-splitbutton-text .p-button-primary { color: var(--p-primary-500, #10b981) !important; }
+.p-splitbutton-text .p-button-primary:hover:not(:disabled),
+.p-splitbutton-text .p-button-primary[aria-expanded="true"] { background: rgba(16, 185, 129, 0.1) !important; }
+
+.p-splitbutton-text .p-button-secondary { color: var(--p-surface-700, #334155) !important; }
+.p-splitbutton-text .p-button-secondary:hover:not(:disabled),
+.p-splitbutton-text .p-button-secondary[aria-expanded="true"] { background: var(--p-surface-200, #e2e8f0) !important; }
+
+.p-splitbutton-text .p-button-success { color: #22c55e !important; }
+.p-splitbutton-text .p-button-success:hover:not(:disabled),
+.p-splitbutton-text .p-button-success[aria-expanded="true"] { background: rgba(34, 197, 94, 0.1) !important; }
+
+.p-splitbutton-text .p-button-info { color: #0ea5e9 !important; }
+.p-splitbutton-text .p-button-info:hover:not(:disabled),
+.p-splitbutton-text .p-button-info[aria-expanded="true"] { background: rgba(14, 165, 233, 0.1) !important; }
+
+.p-splitbutton-text .p-button-warn { color: #f59e0b !important; }
+.p-splitbutton-text .p-button-warn:hover:not(:disabled),
+.p-splitbutton-text .p-button-warn[aria-expanded="true"] { background: rgba(245, 158, 11, 0.1) !important; }
+
+.p-splitbutton-text .p-button-help { color: #a855f7 !important; }
+.p-splitbutton-text .p-button-help:hover:not(:disabled),
+.p-splitbutton-text .p-button-help[aria-expanded="true"] { background: rgba(168, 85, 247, 0.1) !important; }
+
+.p-splitbutton-text .p-button-danger { color: #ef4444 !important; }
+.p-splitbutton-text .p-button-danger:hover:not(:disabled),
+.p-splitbutton-text .p-button-danger[aria-expanded="true"] { background: rgba(239, 68, 68, 0.1) !important; }
+
+.p-splitbutton-text .p-button-contrast { color: #0f172a !important; }
+.p-splitbutton-text .p-button-contrast:hover:not(:disabled),
+.p-splitbutton-text .p-button-contrast[aria-expanded="true"] { background: rgba(15, 23, 42, 0.1) !important; }
 
 /* Divider separator in solid buttons */
 .p-splitbutton:not(.p-splitbutton-outlined):not(.p-splitbutton-text) .p-splitbutton-dropdown {
@@ -16086,8 +16136,8 @@ var init_split_button = __esm({
 }
 
 .p-splitbutton-menu .p-menu-item-link:hover,
-.p-splitbutton-menu .p-menu-item.p-focus > .p-menu-item-link,
-.p-splitbutton-menu .p-menu-item:hover > .p-menu-item-link {
+.p-splitbutton-menu .p-menu-item.p-menu-active > .p-menu-item-link,
+.p-splitbutton-menu .p-menu-item.p-focus > .p-menu-item-link {
     background: var(--p-surface-100, #f1f5f9);
     color: var(--p-surface-900, #0f172a);
 }
@@ -16105,7 +16155,8 @@ var init_split_button = __esm({
     color: var(--p-surface-500, #64748b);
 }
 
-.p-splitbutton-menu .p-menu-item-link:hover .p-menu-item-icon {
+.p-splitbutton-menu .p-menu-item-link:hover .p-menu-item-icon,
+.p-splitbutton-menu .p-menu-item.p-menu-active > .p-menu-item-link .p-menu-item-icon {
     color: var(--p-surface-700, #334155);
 }
 
@@ -16124,8 +16175,8 @@ var init_split_button = __esm({
 /* Submenu Flyout Overlay */
 .p-splitbutton-submenu-overlay {
     position: absolute;
-    top: -0.35rem;
-    left: calc(100% + 4px);
+    top: 0;
+    left: calc(100% + 2px);
     z-index: 1060;
     min-width: 11.5rem;
     background: var(--p-surface-0, #ffffff);
@@ -16142,12 +16193,11 @@ var init_split_button = __esm({
 
 .p-splitbutton-submenu-overlay.p-submenu-flipped {
     left: auto;
-    right: calc(100% + 4px);
+    right: calc(100% + 2px);
 }
 
-.p-menu-item-has-submenu:hover > .p-splitbutton-submenu-overlay,
-.p-menu-item-has-submenu.p-submenu-open > .p-splitbutton-submenu-overlay {
-    display: flex;
+.p-menu-item.p-submenu-open > .p-splitbutton-submenu-overlay {
+    display: flex !important;
 }
 
 /* Dark Mode Overrides */
@@ -16166,11 +16216,11 @@ var init_split_button = __esm({
 }
 
 .dark .p-splitbutton-menu .p-menu-item-link:hover,
+.dark .p-splitbutton-menu .p-menu-item.p-menu-active > .p-menu-item-link,
 .dark .p-splitbutton-menu .p-menu-item.p-focus > .p-menu-item-link,
-.dark .p-splitbutton-menu .p-menu-item:hover > .p-menu-item-link,
 [data-theme="dark"] .p-splitbutton-menu .p-menu-item-link:hover,
-[data-theme="dark"] .p-splitbutton-menu .p-menu-item.p-focus > .p-menu-item-link,
-[data-theme="dark"] .p-splitbutton-menu .p-menu-item:hover > .p-menu-item-link {
+[data-theme="dark"] .p-splitbutton-menu .p-menu-item.p-menu-active > .p-menu-item-link,
+[data-theme="dark"] .p-splitbutton-menu .p-menu-item.p-focus > .p-menu-item-link {
     background: var(--p-surface-800, #1e293b) !important;
     color: #ffffff !important;
 }
@@ -16180,14 +16230,15 @@ var init_split_button = __esm({
     background: var(--p-surface-700, #334155) !important;
 }
 
-.dark .p-splitbutton-outlined .p-button-contrast,
-[data-theme="dark"] .p-splitbutton-outlined .p-button-contrast {
-    color: var(--p-surface-0, #ffffff) !important;
-    border-color: var(--p-surface-700, #334155) !important;
-}
 .dark .p-splitbutton-text .p-button-contrast,
 [data-theme="dark"] .p-splitbutton-text .p-button-contrast {
     color: var(--p-surface-0, #ffffff) !important;
+}
+.dark .p-splitbutton-text .p-button-contrast:hover:not(:disabled),
+.dark .p-splitbutton-text .p-button-contrast[aria-expanded="true"],
+[data-theme="dark"] .p-splitbutton-text .p-button-contrast:hover:not(:disabled),
+[data-theme="dark"] .p-splitbutton-text .p-button-contrast[aria-expanded="true"] {
+    background: rgba(255, 255, 255, 0.1) !important;
 }
 `;
   }

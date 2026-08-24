@@ -1,35 +1,13 @@
-/**
- * SoftMax.LaughTale: Enterprise SplitButton Component (Aura Design System compliant)
- * Main action button paired with a dropdown trigger menu with nested submenu support.
- */
+import {
+  LucideIcons
+} from "./chunk-XHF3KYSF.js";
+import {
+  injectIslandStyle
+} from "./chunk-3TFPN5JM.js";
 
-import { SplitButtonItem, ButtonSeverity } from '../types/models';
-import { injectIslandStyle } from '../runtime/styles';
-import { LucideIcons } from '../icons/lucide';
-
-export interface SplitButtonProps {
-    label?: string;
-    icon?: string;
-    dropdownIcon?: string;
-    model?: SplitButtonItem[];
-    severity?: ButtonSeverity;
-    raised?: boolean;
-    rounded?: boolean;
-    text?: boolean;
-    outlined?: boolean;
-    size?: 'small' | 'normal' | 'large';
-    disabled?: boolean;
-    fluid?: boolean;
-    buttonProps?: Record<string, any>;
-    menuButtonProps?: Record<string, any>;
-    appendTo?: string;
-    action?: string;
-}
-
-// Global active coordinator: guarantees only ONE SplitButton menu is open at any time
-let activeSplitButtonClose: (() => void) | null = null;
-
-const SPLITBUTTON_CSS = `
+// ../SoftMax.LaughTale.Client/src/components/split-button.ts
+var activeSplitButtonClose = null;
+var SPLITBUTTON_CSS = `
 .p-splitbutton {
     display: inline-flex;
     position: relative;
@@ -414,99 +392,82 @@ const SPLITBUTTON_CSS = `
     background: rgba(255, 255, 255, 0.1) !important;
 }
 `;
-
-export default function SplitButtonIsland(container: HTMLElement, props: SplitButtonProps) {
-    injectIslandStyle('split-button', SPLITBUTTON_CSS);
-
-    const label = props.label || '';
-    const icon = props.icon || '';
-    const dropdownIcon = props.dropdownIcon || 'chevronDown';
-    const items: SplitButtonItem[] = props.model || [];
-    const severity = (props.severity || 'primary').toLowerCase();
-    const raised = !!props.raised;
-    const rounded = !!props.rounded;
-    const text = !!props.text;
-    const outlined = !!props.outlined;
-    const size = props.size || 'normal';
-    const disabled = !!props.disabled;
-    const fluid = !!props.fluid;
-
-    let isOpen = false;
-    const menuId = `sb_menu_${Math.random().toString(36).substring(2, 9)}`;
-
-    // Build Modifier Classes
-    const rootClasses = ['p-splitbutton', 'p-component'];
-    if (rounded) rootClasses.push('p-splitbutton-rounded');
-    if (raised) rootClasses.push('p-splitbutton-raised');
-    if (text) rootClasses.push('p-splitbutton-text');
-    if (outlined) rootClasses.push('p-splitbutton-outlined');
-    if (size === 'small') rootClasses.push('p-splitbutton-sm');
-    if (size === 'large') rootClasses.push('p-splitbutton-lg');
-    if (fluid) rootClasses.push('p-splitbutton-fluid');
-    if (disabled) rootClasses.push('p-splitbutton-disabled');
-
-    const btnSevClass = `p-button-${severity}`;
-
-    // Preserve custom inner template if passed from Razor
-    const initialSlotContent = container.innerHTML.trim();
-    const hasCustomSlot = initialSlotContent && !initialSlotContent.startsWith('<div class="p-splitbutton');
-
-    function renderSubmenuTree(subItems: SplitButtonItem[]): string {
-        return `
+function SplitButtonIsland(container, props) {
+  injectIslandStyle("split-button", SPLITBUTTON_CSS);
+  const label = props.label || "";
+  const icon = props.icon || "";
+  const dropdownIcon = props.dropdownIcon || "chevronDown";
+  const items = props.model || [];
+  const severity = (props.severity || "primary").toLowerCase();
+  const raised = !!props.raised;
+  const rounded = !!props.rounded;
+  const text = !!props.text;
+  const outlined = !!props.outlined;
+  const size = props.size || "normal";
+  const disabled = !!props.disabled;
+  const fluid = !!props.fluid;
+  let isOpen = false;
+  const menuId = `sb_menu_${Math.random().toString(36).substring(2, 9)}`;
+  const rootClasses = ["p-splitbutton", "p-component"];
+  if (rounded) rootClasses.push("p-splitbutton-rounded");
+  if (raised) rootClasses.push("p-splitbutton-raised");
+  if (text) rootClasses.push("p-splitbutton-text");
+  if (outlined) rootClasses.push("p-splitbutton-outlined");
+  if (size === "small") rootClasses.push("p-splitbutton-sm");
+  if (size === "large") rootClasses.push("p-splitbutton-lg");
+  if (fluid) rootClasses.push("p-splitbutton-fluid");
+  if (disabled) rootClasses.push("p-splitbutton-disabled");
+  const btnSevClass = `p-button-${severity}`;
+  const initialSlotContent = container.innerHTML.trim();
+  const hasCustomSlot = initialSlotContent && !initialSlotContent.startsWith('<div class="p-splitbutton');
+  function renderSubmenuTree(subItems) {
+    return `
             <ul class="p-splitbutton-submenu-overlay p-menu-list" role="menu">
-                ${subItems.map((item, idx) => renderMenuItem(item, idx, true)).join('')}
+                ${subItems.map((item, idx) => renderMenuItem(item, idx, true)).join("")}
             </ul>
         `;
+  }
+  function renderMenuItem(item, index, isSub = false) {
+    if (item.separator) {
+      return `<li class="p-menu-separator" role="separator"></li>`;
     }
-
-    function renderMenuItem(item: SplitButtonItem, index: number, isSub: boolean = false): string {
-        if (item.separator) {
-            return `<li class="p-menu-separator" role="separator"></li>`;
-        }
-
-        const hasSub = Array.isArray(item.items) && item.items.length > 0;
-        const iconSvg = item.icon ? `<span class="p-menu-item-icon">${LucideIcons[item.icon]}</span>` : '';
-        const subChevron = hasSub ? `<span class="p-submenu-icon">${LucideIcons.chevronRight}</span>` : '';
-        const itemLabel = item.label || '';
-        const itemDisabled = item.disabled ? 'aria-disabled="true"' : '';
-        const itemUrl = item.url || (item.route ? item.route : '');
-
-        return `
-            <li class="p-menu-item ${hasSub ? 'p-menu-item-has-submenu' : ''}" role="none" data-index="${index}">
+    const hasSub = Array.isArray(item.items) && item.items.length > 0;
+    const iconSvg = item.icon ? `<span class="p-menu-item-icon">${LucideIcons[item.icon]}</span>` : "";
+    const subChevron = hasSub ? `<span class="p-submenu-icon">${LucideIcons.chevronRight}</span>` : "";
+    const itemLabel = item.label || "";
+    const itemDisabled = item.disabled ? 'aria-disabled="true"' : "";
+    const itemUrl = item.url || (item.route ? item.route : "");
+    return `
+            <li class="p-menu-item ${hasSub ? "p-menu-item-has-submenu" : ""}" role="none" data-index="${index}">
                 <a class="p-menu-item-link" 
                    role="menuitem" 
-                   tabindex="${item.disabled ? '-1' : '0'}" 
+                   tabindex="${item.disabled ? "-1" : "0"}" 
                    ${itemDisabled}
-                   ${itemUrl ? `href="${itemUrl}"` : ''}
-                   ${item.target ? `target="${item.target}"` : ''}>
+                   ${itemUrl ? `href="${itemUrl}"` : ""}
+                   ${item.target ? `target="${item.target}"` : ""}>
                     ${iconSvg}
                     <span class="p-menu-item-label">${itemLabel}</span>
                     ${subChevron}
                 </a>
-                ${hasSub ? renderSubmenuTree(item.items!) : ''}
+                ${hasSub ? renderSubmenuTree(item.items) : ""}
             </li>
         `;
-    }
-
-    // Main markup
-    const mainButtonContent = hasCustomSlot 
-        ? initialSlotContent 
-        : `${icon ? `<span class="p-button-icon">${LucideIcons[icon]}</span>` : ''}${label ? `<span class="p-button-label">${label}</span>` : ''}`;
-
-    container.innerHTML = `
-        <div class="${rootClasses.join(' ')}">
+  }
+  const mainButtonContent = hasCustomSlot ? initialSlotContent : `${icon ? `<span class="p-button-icon">${LucideIcons[icon]}</span>` : ""}${label ? `<span class="p-button-label">${label}</span>` : ""}`;
+  container.innerHTML = `
+        <div class="${rootClasses.join(" ")}">
             <!-- Main Default Action Button -->
             <button type="button" 
                     class="p-splitbutton-button p-button ${btnSevClass}" 
-                    ${disabled ? 'disabled' : ''} 
-                    aria-label="${label || 'SplitButton Action'}">
+                    ${disabled ? "disabled" : ""} 
+                    aria-label="${label || "SplitButton Action"}">
                 ${mainButtonContent}
             </button>
 
             <!-- Dropdown Menu Trigger Button -->
             <button type="button" 
                     class="p-splitbutton-dropdown p-button p-button-icon-only ${btnSevClass}" 
-                    ${disabled ? 'disabled' : ''} 
+                    ${disabled ? "disabled" : ""} 
                     aria-haspopup="menu" 
                     aria-expanded="false" 
                     aria-controls="${menuId}" 
@@ -517,276 +478,229 @@ export default function SplitButtonIsland(container: HTMLElement, props: SplitBu
             <!-- Dropdown Menu Overlay -->
             <div id="${menuId}" class="p-splitbutton-menu p-menu p-component" role="menu" style="display: none; opacity: 0; transform: scaleY(0.8);">
                 <ul class="p-menu-list" role="menu">
-                    ${items.map((it, idx) => renderMenuItem(it, idx)).join('')}
+                    ${items.map((it, idx) => renderMenuItem(it, idx)).join("")}
                 </ul>
             </div>
         </div>
     `;
-
-    const rootEl = container.firstElementChild as HTMLElement;
-    const mainBtn = rootEl.querySelector<HTMLButtonElement>('.p-splitbutton-button')!;
-    const dropdownBtn = rootEl.querySelector<HTMLButtonElement>('.p-splitbutton-dropdown')!;
-    const menuEl = rootEl.querySelector<HTMLElement>('.p-splitbutton-menu')!;
-
-    function closeAllSubmenus(scopeList?: HTMLElement) {
-        const target = scopeList || menuEl;
-        target.querySelectorAll('.p-menu-item.p-submenu-open').forEach((openLi) => {
-            openLi.classList.remove('p-submenu-open', 'p-menu-active');
+  const rootEl = container.firstElementChild;
+  const mainBtn = rootEl.querySelector(".p-splitbutton-button");
+  const dropdownBtn = rootEl.querySelector(".p-splitbutton-dropdown");
+  const menuEl = rootEl.querySelector(".p-splitbutton-menu");
+  function closeAllSubmenus(scopeList) {
+    const target = scopeList || menuEl;
+    target.querySelectorAll(".p-menu-item.p-submenu-open").forEach((openLi) => {
+      openLi.classList.remove("p-submenu-open", "p-menu-active");
+    });
+  }
+  function closeMenu() {
+    if (!isOpen) return;
+    isOpen = false;
+    if (activeSplitButtonClose === closeMenu) {
+      activeSplitButtonClose = null;
+    }
+    dropdownBtn.setAttribute("aria-expanded", "false");
+    menuEl.style.opacity = "0";
+    menuEl.style.transform = "scaleY(0.8)";
+    closeAllSubmenus();
+    setTimeout(() => {
+      if (!isOpen) {
+        menuEl.style.display = "none";
+      }
+    }, 150);
+  }
+  function openMenu() {
+    if (disabled || items.length === 0 || isOpen) return;
+    if (activeSplitButtonClose && activeSplitButtonClose !== closeMenu) {
+      activeSplitButtonClose();
+    }
+    activeSplitButtonClose = closeMenu;
+    isOpen = true;
+    dropdownBtn.setAttribute("aria-expanded", "true");
+    menuEl.style.display = "block";
+    const rect = rootEl.getBoundingClientRect();
+    const menuHeight = menuEl.offsetHeight || 200;
+    const fitsBelow = rect.bottom + menuHeight + 10 <= window.innerHeight;
+    if (fitsBelow) {
+      menuEl.classList.remove("p-menu-flipped");
+      menuEl.style.top = "calc(100% + 4px)";
+      menuEl.style.bottom = "auto";
+      menuEl.style.right = "0";
+    } else {
+      menuEl.classList.add("p-menu-flipped");
+      menuEl.style.top = "auto";
+      menuEl.style.bottom = "calc(100% + 4px)";
+      menuEl.style.right = "0";
+    }
+    requestAnimationFrame(() => {
+      menuEl.style.opacity = "1";
+      menuEl.style.transform = "scaleY(1)";
+    });
+    const firstLink = menuEl.querySelector('.p-menu-item-link:not([aria-disabled="true"])');
+    firstLink?.focus();
+  }
+  function toggleMenu() {
+    if (isOpen) closeMenu();
+    else openMenu();
+  }
+  mainBtn.addEventListener("click", () => {
+    if (disabled) return;
+    container.dispatchEvent(new CustomEvent("splitbutton:click", {
+      bubbles: true,
+      detail: { action: props.action || "main", label }
+    }));
+  });
+  dropdownBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    toggleMenu();
+  });
+  document.addEventListener("click", (e) => {
+    if (isOpen && !rootEl.contains(e.target)) {
+      closeMenu();
+    }
+  });
+  function handleItemClick(itemData, e) {
+    if (itemData.disabled) return;
+    if (itemData.command) {
+      try {
+        const fn = new Function("item", itemData.command);
+        fn(itemData);
+      } catch (err) {
+        console.error("SplitButton command execution error:", err);
+      }
+    }
+    if (itemData.url) {
+      if (itemData.target === "_blank") {
+        window.open(itemData.url, "_blank", "noopener,noreferrer");
+      } else {
+        window.location.href = itemData.url;
+      }
+    }
+    container.dispatchEvent(new CustomEvent("splitbutton:action", {
+      bubbles: true,
+      detail: { item: itemData, action: itemData.action || itemData.label }
+    }));
+    closeMenu();
+    dropdownBtn.focus();
+  }
+  function setupSubmenuHover(parentUl, itemsList) {
+    const directLis = Array.from(parentUl.children).filter((el) => el.classList.contains("p-menu-item"));
+    directLis.forEach((li, idx) => {
+      const itemData = itemsList[idx];
+      if (!itemData || itemData.separator) return;
+      const hasSub = Array.isArray(itemData.items) && itemData.items.length > 0;
+      const link = li.querySelector(":scope > .p-menu-item-link");
+      const subOverlay = li.querySelector(":scope > .p-splitbutton-submenu-overlay");
+      li.addEventListener("mouseenter", () => {
+        directLis.forEach((sibling) => {
+          if (sibling !== li) {
+            sibling.classList.remove("p-submenu-open", "p-menu-active");
+          }
         });
-    }
-
-    function closeMenu() {
-        if (!isOpen) return;
-        isOpen = false;
-        if (activeSplitButtonClose === closeMenu) {
-            activeSplitButtonClose = null;
-        }
-        dropdownBtn.setAttribute('aria-expanded', 'false');
-        menuEl.style.opacity = '0';
-        menuEl.style.transform = 'scaleY(0.8)';
-        closeAllSubmenus();
-        setTimeout(() => {
-            if (!isOpen) {
-                menuEl.style.display = 'none';
-            }
-        }, 150);
-    }
-
-    function openMenu() {
-        if (disabled || items.length === 0 || isOpen) return;
-
-        // Close any other open SplitButton menu across the entire page!
-        if (activeSplitButtonClose && activeSplitButtonClose !== closeMenu) {
-            activeSplitButtonClose();
-        }
-        activeSplitButtonClose = closeMenu;
-
-        isOpen = true;
-        dropdownBtn.setAttribute('aria-expanded', 'true');
-        menuEl.style.display = 'block';
-
-        // Dynamic Collision & Viewport Positioning
-        const rect = rootEl.getBoundingClientRect();
-        const menuHeight = menuEl.offsetHeight || 200;
-        const fitsBelow = (rect.bottom + menuHeight + 10) <= window.innerHeight;
-
-        if (fitsBelow) {
-            menuEl.classList.remove('p-menu-flipped');
-            menuEl.style.top = 'calc(100% + 4px)';
-            menuEl.style.bottom = 'auto';
-            menuEl.style.right = '0';
+        if (hasSub && subOverlay) {
+          li.classList.add("p-submenu-open", "p-menu-active");
+          const liRect = li.getBoundingClientRect();
+          const subWidth = subOverlay.offsetWidth || 180;
+          if (liRect.right + subWidth > window.innerWidth) {
+            subOverlay.classList.add("p-submenu-flipped");
+          } else {
+            subOverlay.classList.remove("p-submenu-flipped");
+          }
         } else {
-            menuEl.classList.add('p-menu-flipped');
-            menuEl.style.top = 'auto';
-            menuEl.style.bottom = 'calc(100% + 4px)';
-            menuEl.style.right = '0';
+          li.classList.add("p-menu-active");
         }
-
-        requestAnimationFrame(() => {
-            menuEl.style.opacity = '1';
-            menuEl.style.transform = 'scaleY(1)';
-        });
-
-        // Focus first active menu item
-        const firstLink = menuEl.querySelector<HTMLAnchorElement>('.p-menu-item-link:not([aria-disabled="true"])');
-        firstLink?.focus();
+      });
+      link?.addEventListener("click", (e) => {
+        if (hasSub) {
+          e.preventDefault();
+          e.stopPropagation();
+          return;
+        }
+        handleItemClick(itemData, e);
+      });
+      if (hasSub && subOverlay) {
+        setupSubmenuHover(subOverlay, itemData.items);
+      }
+    });
+  }
+  const rootList = menuEl.querySelector(":scope > .p-menu-list");
+  if (rootList) {
+    setupSubmenuHover(rootList, items);
+  }
+  dropdownBtn.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === " " || e.key === "Enter") {
+      e.preventDefault();
+      openMenu();
     }
-
-    function toggleMenu() {
-        if (isOpen) closeMenu();
-        else openMenu();
-    }
-
-    // Main Button Click
-    mainBtn.addEventListener('click', () => {
-        if (disabled) return;
-        container.dispatchEvent(new CustomEvent('splitbutton:click', {
-            bubbles: true,
-            detail: { action: props.action || 'main', label }
-        }));
-    });
-
-    // Dropdown Trigger Click
-    dropdownBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        toggleMenu();
-    });
-
-    // Global Click Outside
-    document.addEventListener('click', (e) => {
-        if (isOpen && !rootEl.contains(e.target as Node)) {
-            closeMenu();
-        }
-    });
-
-    // Item Selection & Execution Handler
-    function handleItemClick(itemData: SplitButtonItem, e: MouseEvent | KeyboardEvent) {
-        if (itemData.disabled) return;
-
-        if (itemData.command) {
-            try {
-                const fn = new Function('item', itemData.command);
-                fn(itemData);
-            } catch (err) {
-                console.error('SplitButton command execution error:', err);
-            }
-        }
-
-        if (itemData.url) {
-            if (itemData.target === '_blank') {
-                window.open(itemData.url, '_blank', 'noopener,noreferrer');
-            } else {
-                window.location.href = itemData.url;
-            }
-        }
-
-        container.dispatchEvent(new CustomEvent('splitbutton:action', {
-            bubbles: true,
-            detail: { item: itemData, action: itemData.action || itemData.label }
-        }));
-
+  });
+  menuEl.addEventListener("keydown", (e) => {
+    const activeEl = document.activeElement;
+    const currentLink = activeEl?.closest(".p-menu-item-link");
+    const currentLi = currentLink?.closest(".p-menu-item");
+    const activeList = currentLi?.closest("ul");
+    if (e.key === "Escape") {
+      e.preventDefault();
+      const parentSubmenu = currentLi?.closest(".p-splitbutton-submenu-overlay");
+      if (parentSubmenu) {
+        const parentLi = parentSubmenu.closest(".p-menu-item");
+        parentLi?.classList.remove("p-submenu-open");
+        parentLi?.querySelector(":scope > .p-menu-item-link")?.focus();
+      } else {
         closeMenu();
         dropdownBtn.focus();
+      }
+      return;
     }
-
-    // Tiered Hover & Click Engine for Nested Submenus
-    function setupSubmenuHover(parentUl: HTMLElement, itemsList: SplitButtonItem[]) {
-        const directLis = Array.from(parentUl.children).filter(el => el.classList.contains('p-menu-item')) as HTMLElement[];
-
-        directLis.forEach((li, idx) => {
-            const itemData = itemsList[idx];
-            if (!itemData || itemData.separator) return;
-
-            const hasSub = Array.isArray(itemData.items) && itemData.items.length > 0;
-            const link = li.querySelector(':scope > .p-menu-item-link') as HTMLAnchorElement;
-            const subOverlay = li.querySelector(':scope > .p-splitbutton-submenu-overlay') as HTMLElement;
-
-            // When mouse enters this item:
-            li.addEventListener('mouseenter', () => {
-                // Close all sibling submenus in this same UL
-                directLis.forEach(sibling => {
-                    if (sibling !== li) {
-                        sibling.classList.remove('p-submenu-open', 'p-menu-active');
-                    }
-                });
-
-                if (hasSub && subOverlay) {
-                    li.classList.add('p-submenu-open', 'p-menu-active');
-
-                    // Check horizontal viewport collision for flyout
-                    const liRect = li.getBoundingClientRect();
-                    const subWidth = subOverlay.offsetWidth || 180;
-                    if (liRect.right + subWidth > window.innerWidth) {
-                        subOverlay.classList.add('p-submenu-flipped');
-                    } else {
-                        subOverlay.classList.remove('p-submenu-flipped');
-                    }
-                } else {
-                    li.classList.add('p-menu-active');
-                }
-            });
-
-            // When click on link
-            link?.addEventListener('click', (e) => {
-                if (hasSub) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    return;
-                }
-                handleItemClick(itemData, e);
-            });
-
-            // If it has a submenu, recursively set up the child UL
-            if (hasSub && subOverlay) {
-                setupSubmenuHover(subOverlay, itemData.items!);
-            }
-        });
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      const links = Array.from(activeList?.querySelectorAll(':scope > .p-menu-item > .p-menu-item-link:not([aria-disabled="true"])') || []);
+      const currentIndex = links.indexOf(currentLink);
+      const nextIndex = (currentIndex + 1) % links.length;
+      links[nextIndex]?.focus();
+      return;
     }
-
-    const rootList = menuEl.querySelector(':scope > .p-menu-list') as HTMLElement;
-    if (rootList) {
-        setupSubmenuHover(rootList, items);
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      const links = Array.from(activeList?.querySelectorAll(':scope > .p-menu-item > .p-menu-item-link:not([aria-disabled="true"])') || []);
+      const currentIndex = links.indexOf(currentLink);
+      const prevIndex = (currentIndex - 1 + links.length) % links.length;
+      links[prevIndex]?.focus();
+      return;
     }
-
-    // Keyboard Navigation
-    dropdownBtn.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === ' ' || e.key === 'Enter') {
-            e.preventDefault();
-            openMenu();
-        }
-    });
-
-    menuEl.addEventListener('keydown', (e) => {
-        const activeEl = document.activeElement as HTMLElement;
-        const currentLink = activeEl?.closest('.p-menu-item-link') as HTMLAnchorElement;
-        const currentLi = currentLink?.closest('.p-menu-item') as HTMLElement;
-        const activeList = currentLi?.closest('ul') as HTMLUListElement;
-
-        if (e.key === 'Escape') {
-            e.preventDefault();
-            const parentSubmenu = currentLi?.closest('.p-splitbutton-submenu-overlay');
-            if (parentSubmenu) {
-                const parentLi = parentSubmenu.closest('.p-menu-item') as HTMLElement;
-                parentLi?.classList.remove('p-submenu-open');
-                parentLi?.querySelector<HTMLAnchorElement>(':scope > .p-menu-item-link')?.focus();
-            } else {
-                closeMenu();
-                dropdownBtn.focus();
-            }
-            return;
-        }
-
-        if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            const links = Array.from(activeList?.querySelectorAll<HTMLAnchorElement>(':scope > .p-menu-item > .p-menu-item-link:not([aria-disabled="true"])') || []);
-            const currentIndex = links.indexOf(currentLink);
-            const nextIndex = (currentIndex + 1) % links.length;
-            links[nextIndex]?.focus();
-            return;
-        }
-
-        if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            const links = Array.from(activeList?.querySelectorAll<HTMLAnchorElement>(':scope > .p-menu-item > .p-menu-item-link:not([aria-disabled="true"])') || []);
-            const currentIndex = links.indexOf(currentLink);
-            const prevIndex = (currentIndex - 1 + links.length) % links.length;
-            links[prevIndex]?.focus();
-            return;
-        }
-
-        if (e.key === 'ArrowRight') {
-            if (currentLi?.classList.contains('p-menu-item-has-submenu')) {
-                e.preventDefault();
-                currentLi.classList.add('p-submenu-open');
-                const firstSubLink = currentLi.querySelector<HTMLAnchorElement>('.p-splitbutton-submenu-overlay .p-menu-item-link:not([aria-disabled="true"])');
-                firstSubLink?.focus();
-            }
-            return;
-        }
-
-        if (e.key === 'ArrowLeft') {
-            const parentSubmenu = currentLi?.closest('.p-splitbutton-submenu-overlay');
-            if (parentSubmenu) {
-                e.preventDefault();
-                const parentLi = parentSubmenu.closest('.p-menu-item') as HTMLElement;
-                parentLi?.classList.remove('p-submenu-open');
-                parentLi?.querySelector<HTMLAnchorElement>(':scope > .p-menu-item-link')?.focus();
-            }
-            return;
-        }
-
-        if (e.key === 'Home') {
-            e.preventDefault();
-            const links = Array.from(activeList?.querySelectorAll<HTMLAnchorElement>(':scope > .p-menu-item > .p-menu-item-link:not([aria-disabled="true"])') || []);
-            links[0]?.focus();
-            return;
-        }
-
-        if (e.key === 'End') {
-            e.preventDefault();
-            const links = Array.from(activeList?.querySelectorAll<HTMLAnchorElement>(':scope > .p-menu-item > .p-menu-item-link:not([aria-disabled="true"])') || []);
-            links[links.length - 1]?.focus();
-            return;
-        }
-    });
+    if (e.key === "ArrowRight") {
+      if (currentLi?.classList.contains("p-menu-item-has-submenu")) {
+        e.preventDefault();
+        currentLi.classList.add("p-submenu-open");
+        const firstSubLink = currentLi.querySelector('.p-splitbutton-submenu-overlay .p-menu-item-link:not([aria-disabled="true"])');
+        firstSubLink?.focus();
+      }
+      return;
+    }
+    if (e.key === "ArrowLeft") {
+      const parentSubmenu = currentLi?.closest(".p-splitbutton-submenu-overlay");
+      if (parentSubmenu) {
+        e.preventDefault();
+        const parentLi = parentSubmenu.closest(".p-menu-item");
+        parentLi?.classList.remove("p-submenu-open");
+        parentLi?.querySelector(":scope > .p-menu-item-link")?.focus();
+      }
+      return;
+    }
+    if (e.key === "Home") {
+      e.preventDefault();
+      const links = Array.from(activeList?.querySelectorAll(':scope > .p-menu-item > .p-menu-item-link:not([aria-disabled="true"])') || []);
+      links[0]?.focus();
+      return;
+    }
+    if (e.key === "End") {
+      e.preventDefault();
+      const links = Array.from(activeList?.querySelectorAll(':scope > .p-menu-item > .p-menu-item-link:not([aria-disabled="true"])') || []);
+      links[links.length - 1]?.focus();
+      return;
+    }
+  });
 }
+export {
+  SplitButtonIsland as default
+};
+//# sourceMappingURL=split-button-A3DNX6HD.js.map
