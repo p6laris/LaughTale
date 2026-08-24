@@ -636,6 +636,72 @@ public class EnterpriseModel : PageModel
         new("Toys & Games", "toys", null, null, null, null, null, null, null, 312)
     };
 
+    public List<SplitButtonItem> SplitButtonBasicItems { get; set; } = new()
+    {
+        new("Update", "refresh-cw", "update", Command: "console.log('Updated');"),
+        new("Delete", "trash-2", "delete", Command: "console.log('Deleted');"),
+        new("Vue.js", "external-link", Url: "https://vuejs.org/"),
+        new(Separator: true),
+        new("Upload", "upload", Route: "/fileupload")
+    };
+
+    public List<SplitButtonItem> SplitButtonIconItems { get; set; } = new()
+    {
+        new("Update", "refresh-cw", "update"),
+        new("Delete", "x", "delete"),
+        new(Separator: true),
+        new("Quit", "power", Url: "https://vuejs.org/")
+    };
+
+    public List<SplitButtonItem> SplitButtonNestedItems { get; set; } = new()
+    {
+        new("File", "folder", Items: new()
+        {
+            new("New", "plus", Items: new()
+            {
+                new("Bookmark", "bookmark"),
+                new("Video", "video")
+            }),
+            new("Delete", "trash-2"),
+            new(Separator: true),
+            new("Export", "external-link")
+        }),
+        new("Edit", "pencil", Items: new()
+        {
+            new("Left", "align-left"),
+            new("Right", "align-right"),
+            new("Center", "align-center"),
+            new("Justify", "align-justify")
+        }),
+        new("Users", "user", Items: new()
+        {
+            new("New", "user-plus"),
+            new("Delete", "user-minus"),
+            new("Search", "users", Items: new()
+            {
+                new("Filter", "filter", Items: new()
+                {
+                    new("Print", "print")
+                }),
+                new("List", "list")
+            })
+        }),
+        new("Events", "calendar", Items: new()
+        {
+            new("Edit", "pencil", Items: new()
+            {
+                new("Save", "calendar-plus"),
+                new("Delete", "calendar-minus")
+            }),
+            new("Archive", "archive", Items: new()
+            {
+                new("Remove", "calendar-minus")
+            })
+        }),
+        new(Separator: true),
+        new("Quit", "power")
+    };
+
     public List<BreadcrumbItem> Breadcrumbs { get; set; } = new()
     {
         new("Enterprise Hub", "/enterprise"),

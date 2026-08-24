@@ -15542,99 +15542,652 @@ __export(split_button_exports, {
   default: () => SplitButtonIsland
 });
 function SplitButtonIsland(container, props) {
-  injectIslandStyle("split-button", CSS47);
-  const label = props.label || "Save";
-  const items = props.model || [
-    { label: "Update & Sync", icon: "refresh-cw", action: "update" },
-    { label: "Export as Encrypted JSON", icon: "download", action: "export" },
-    { label: "Delete Record", icon: "trash", action: "delete" }
-  ];
+  injectIslandStyle("split-button", SPLITBUTTON_CSS);
+  const label = props.label || "";
+  const icon = props.icon || "";
+  const dropdownIcon = props.dropdownIcon || "chevronDown";
+  const items = props.model || [];
+  const severity = (props.severity || "primary").toLowerCase();
+  const raised = !!props.raised;
+  const rounded = !!props.rounded;
+  const text = !!props.text;
+  const outlined = !!props.outlined;
+  const size = props.size || "normal";
+  const disabled = !!props.disabled;
+  const fluid = !!props.fluid;
+  let isOpen = false;
+  const menuId = `sb_menu_${Math.random().toString(36).substring(2, 9)}`;
+  const rootClasses = ["p-splitbutton", "p-component"];
+  if (rounded) rootClasses.push("p-splitbutton-rounded");
+  if (raised) rootClasses.push("p-splitbutton-raised");
+  if (text) rootClasses.push("p-splitbutton-text");
+  if (outlined) rootClasses.push("p-splitbutton-outlined");
+  if (size === "small") rootClasses.push("p-splitbutton-sm");
+  if (size === "large") rootClasses.push("p-splitbutton-lg");
+  if (fluid) rootClasses.push("p-splitbutton-fluid");
+  if (disabled) rootClasses.push("p-splitbutton-disabled");
+  const btnSevClass = `p-button-${severity}`;
+  const initialSlotContent = container.innerHTML.trim();
+  const hasCustomSlot = initialSlotContent && !initialSlotContent.startsWith('<div class="laughtale-splitbutton');
+  function renderSubmenuTree(subItems) {
+    return `
+            <ul class="p-splitbutton-submenu-overlay p-menu-list" role="menu">
+                ${subItems.map((item, idx) => renderMenuItem(item, idx, true)).join("")}
+            </ul>
+        `;
+  }
+  function renderMenuItem(item, index, isSub = false) {
+    if (item.separator) {
+      return `<li class="p-menu-separator" role="separator"></li>`;
+    }
+    const hasSub = Array.isArray(item.items) && item.items.length > 0;
+    const iconSvg = item.icon ? `<span class="p-menu-item-icon">${LucideIcons[item.icon]}</span>` : "";
+    const subChevron = hasSub ? `<span class="p-submenu-icon">${LucideIcons.chevronRight}</span>` : "";
+    const itemLabel = item.label || "";
+    const itemDisabled = item.disabled ? 'aria-disabled="true"' : "";
+    const itemUrl = item.url || (item.route ? item.route : "");
+    return `
+            <li class="p-menu-item ${hasSub ? "p-menu-item-has-submenu" : ""}" role="none" data-index="${index}">
+                <a class="p-menu-item-link" 
+                   role="menuitem" 
+                   tabindex="${item.disabled ? "-1" : "0"}" 
+                   ${itemDisabled}
+                   ${itemUrl ? `href="${itemUrl}"` : ""}
+                   ${item.target ? `target="${item.target}"` : ""}>
+                    ${iconSvg}
+                    <span class="p-menu-item-label">${itemLabel}</span>
+                    ${subChevron}
+                </a>
+                ${hasSub ? renderSubmenuTree(item.items) : ""}
+            </li>
+        `;
+  }
+  const mainButtonContent = hasCustomSlot ? initialSlotContent : `${icon ? `<span class="p-button-icon">${LucideIcons[icon]}</span>` : ""}${label ? `<span class="p-button-label">${label}</span>` : ""}`;
   container.innerHTML = `
-        <div class="laughtale-splitbutton" style="position: relative; display: inline-flex; border-radius: var(--p-border-radius); overflow: visible; font-family: var(--p-font-family, inherit);">
-            <!-- Primary Action Button -->
-            <button type="button" class="splitbutton-main-btn p-button p-button-primary" style="border-top-right-radius: 0; border-bottom-right-radius: 0; border-right: 1px solid rgba(255,255,255,0.2);">
-                ${label}
+        <div class="${rootClasses.join(" ")}">
+            <!-- Main Default Action Button -->
+            <button type="button" 
+                    class="p-splitbutton-button p-button ${btnSevClass}" 
+                    ${disabled ? "disabled" : ""} 
+                    aria-label="${label || "SplitButton Action"}">
+                ${mainButtonContent}
             </button>
 
             <!-- Dropdown Menu Trigger Button -->
-            <button type="button" class="splitbutton-menu-btn p-button p-button-primary" style="border-top-left-radius: 0; border-bottom-left-radius: 0; padding: 0.5rem 0.5rem; justify-content: center;">
-                <span class="splitbutton-chevron" style="display: flex;">${LucideIcons.chevronDown}</span>
+            <button type="button" 
+                    class="p-splitbutton-dropdown p-button p-button-icon-only ${btnSevClass}" 
+                    ${disabled ? "disabled" : ""} 
+                    aria-haspopup="menu" 
+                    aria-expanded="false" 
+                    aria-controls="${menuId}" 
+                    aria-label="More Options">
+                <span class="p-button-icon">${LucideIcons[dropdownIcon]}</span>
             </button>
 
-            <!-- Popover Menu -->
-            <div class="splitbutton-menu-overlay" style="display: none; position: absolute; top: calc(100% + 4px); right: 0; z-index: 500; background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); box-shadow: var(--p-shadow-lg); min-width: 180px; padding: 0.25rem 0;">
-                ${items.map((it) => `
-                    <div class="splitbutton-menu-item" data-action="${it.action || ""}" data-url="${it.url || ""}" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.875rem; cursor: pointer; font-size: 0.8125rem; color: var(--p-text-color); transition: background 0.1s ease;">
-                        <span>${it.label}</span>
-                    </div>
-                `).join("")}
+            <!-- Dropdown Menu Overlay -->
+            <div id="${menuId}" class="p-splitbutton-menu p-menu p-component" role="menu" style="display: none; opacity: 0; transform: scaleY(0.8);">
+                <ul class="p-menu-list" role="menu">
+                    ${items.map((it, idx) => renderMenuItem(it, idx)).join("")}
+                </ul>
             </div>
         </div>
     `;
-  const mainBtn = container.querySelector(".splitbutton-main-btn");
-  const menuBtn = container.querySelector(".splitbutton-menu-btn");
-  const overlay = container.querySelector(".splitbutton-menu-overlay");
-  const disclosure = useDisclosure({
-    defaultIsOpen: false,
-    onOpen: () => {
-      useTransition(overlay, { type: "fade", isMounted: true });
-    },
-    onClose: () => {
-      useTransition(overlay, { type: "fade", isMounted: false });
+  const rootEl = container.firstElementChild;
+  const mainBtn = rootEl.querySelector(".p-splitbutton-button");
+  const dropdownBtn = rootEl.querySelector(".p-splitbutton-dropdown");
+  const menuEl = rootEl.querySelector(".p-splitbutton-menu");
+  function openMenu() {
+    if (disabled || items.length === 0 || isOpen) return;
+    isOpen = true;
+    dropdownBtn.setAttribute("aria-expanded", "true");
+    menuEl.style.display = "block";
+    const rect = rootEl.getBoundingClientRect();
+    const menuHeight = menuEl.offsetHeight || 200;
+    const fitsBelow = rect.bottom + menuHeight + 10 <= window.innerHeight;
+    if (fitsBelow) {
+      menuEl.classList.remove("p-menu-flipped");
+      menuEl.style.top = "calc(100% + 4px)";
+      menuEl.style.bottom = "auto";
+      menuEl.style.right = "0";
+    } else {
+      menuEl.classList.add("p-menu-flipped");
+      menuEl.style.top = "auto";
+      menuEl.style.bottom = "calc(100% + 4px)";
+      menuEl.style.right = "0";
     }
-  });
-  useClickOutside(container, () => disclosure.close());
-  mainBtn.addEventListener("click", () => {
+    requestAnimationFrame(() => {
+      menuEl.style.opacity = "1";
+      menuEl.style.transform = "scaleY(1)";
+    });
+    const firstLink = menuEl.querySelector('.p-menu-item-link:not([aria-disabled="true"])');
+    firstLink?.focus();
+  }
+  function closeMenu() {
+    if (!isOpen) return;
+    isOpen = false;
+    dropdownBtn.setAttribute("aria-expanded", "false");
+    menuEl.style.opacity = "0";
+    menuEl.style.transform = "scaleY(0.8)";
+    setTimeout(() => {
+      if (!isOpen) {
+        menuEl.style.display = "none";
+      }
+    }, 150);
+  }
+  function toggleMenu() {
+    if (isOpen) closeMenu();
+    else openMenu();
+  }
+  mainBtn.addEventListener("click", (e) => {
+    if (disabled) return;
     container.dispatchEvent(new CustomEvent("splitbutton:click", {
       bubbles: true,
-      detail: { action: "main" }
+      detail: { action: props.action || "main", label }
     }));
   });
-  menuBtn.addEventListener("click", () => {
-    disclosure.toggle();
+  dropdownBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    toggleMenu();
   });
-  container.querySelectorAll(".splitbutton-menu-item").forEach((itemEl) => {
-    itemEl.addEventListener("click", () => {
-      const action = itemEl.getAttribute("data-action");
-      const url = itemEl.getAttribute("data-url");
-      if (url) window.location.href = url;
-      container.dispatchEvent(new CustomEvent("splitbutton:item-click", {
-        bubbles: true,
-        detail: { action }
-      }));
-      disclosure.close();
+  document.addEventListener("click", (e) => {
+    if (isOpen && !rootEl.contains(e.target)) {
+      closeMenu();
+    }
+  });
+  function handleItemClick(itemData, e) {
+    if (itemData.disabled) return;
+    if (itemData.command) {
+      try {
+        const fn = new Function("item", itemData.command);
+        fn(itemData);
+      } catch (err) {
+        console.error("SplitButton command execution error:", err);
+      }
+    }
+    if (itemData.url) {
+      if (itemData.target === "_blank") {
+        window.open(itemData.url, "_blank", "noopener,noreferrer");
+      } else {
+        window.location.href = itemData.url;
+      }
+    }
+    container.dispatchEvent(new CustomEvent("splitbutton:action", {
+      bubbles: true,
+      detail: { item: itemData, action: itemData.action || itemData.label }
+    }));
+    closeMenu();
+    dropdownBtn.focus();
+  }
+  function findItemByPath(itemsList, path) {
+    let current = { items: itemsList };
+    for (const idx of path) {
+      if (!current || !current.items || !current.items[idx]) return void 0;
+      current = current.items[idx];
+    }
+    return current;
+  }
+  menuEl.querySelectorAll(".p-menu-item").forEach((li) => {
+    const link = li.querySelector(":scope > .p-menu-item-link");
+    const hasSub = li.classList.contains("p-menu-item-has-submenu");
+    link?.addEventListener("click", (e) => {
+      if (hasSub) {
+        e.preventDefault();
+        e.stopPropagation();
+        li.classList.toggle("p-submenu-open");
+        return;
+      }
+      const itemIndex = Number(li.getAttribute("data-index") || "0");
+      const parentSubmenu = li.closest(".p-splitbutton-submenu-overlay");
+      if (parentSubmenu) {
+        const parentLi = parentSubmenu.closest(".p-menu-item");
+        const parentIdx = Number(parentLi?.getAttribute("data-index") || "0");
+        const matchedItem = items[parentIdx]?.items?.[itemIndex];
+        if (matchedItem) handleItemClick(matchedItem, e);
+      } else {
+        const matchedItem = items[itemIndex];
+        if (matchedItem) handleItemClick(matchedItem, e);
+      }
     });
   });
+  dropdownBtn.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === " " || e.key === "Enter") {
+      e.preventDefault();
+      openMenu();
+    }
+  });
+  menuEl.addEventListener("keydown", (e) => {
+    const activeEl = document.activeElement;
+    const currentLink = activeEl?.closest(".p-menu-item-link");
+    const currentLi = currentLink?.closest(".p-menu-item");
+    const activeList = currentLi?.closest("ul");
+    if (e.key === "Escape") {
+      e.preventDefault();
+      const parentSubmenu = currentLi?.closest(".p-splitbutton-submenu-overlay");
+      if (parentSubmenu) {
+        const parentLi = parentSubmenu.closest(".p-menu-item");
+        parentLi?.classList.remove("p-submenu-open");
+        parentLi?.querySelector(":scope > .p-menu-item-link")?.focus();
+      } else {
+        closeMenu();
+        dropdownBtn.focus();
+      }
+      return;
+    }
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      const links = Array.from(activeList?.querySelectorAll(':scope > .p-menu-item > .p-menu-item-link:not([aria-disabled="true"])') || []);
+      const currentIndex = links.indexOf(currentLink);
+      const nextIndex = (currentIndex + 1) % links.length;
+      links[nextIndex]?.focus();
+      return;
+    }
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      const links = Array.from(activeList?.querySelectorAll(':scope > .p-menu-item > .p-menu-item-link:not([aria-disabled="true"])') || []);
+      const currentIndex = links.indexOf(currentLink);
+      const prevIndex = (currentIndex - 1 + links.length) % links.length;
+      links[prevIndex]?.focus();
+      return;
+    }
+    if (e.key === "ArrowRight") {
+      if (currentLi?.classList.contains("p-menu-item-has-submenu")) {
+        e.preventDefault();
+        currentLi.classList.add("p-submenu-open");
+        const firstSubLink = currentLi.querySelector('.p-splitbutton-submenu-overlay .p-menu-item-link:not([aria-disabled="true"])');
+        firstSubLink?.focus();
+      }
+      return;
+    }
+    if (e.key === "ArrowLeft") {
+      const parentSubmenu = currentLi?.closest(".p-splitbutton-submenu-overlay");
+      if (parentSubmenu) {
+        e.preventDefault();
+        const parentLi = parentSubmenu.closest(".p-menu-item");
+        parentLi?.classList.remove("p-submenu-open");
+        parentLi?.querySelector(":scope > .p-menu-item-link")?.focus();
+      }
+      return;
+    }
+    if (e.key === "Home") {
+      e.preventDefault();
+      const links = Array.from(activeList?.querySelectorAll(':scope > .p-menu-item > .p-menu-item-link:not([aria-disabled="true"])') || []);
+      links[0]?.focus();
+      return;
+    }
+    if (e.key === "End") {
+      e.preventDefault();
+      const links = Array.from(activeList?.querySelectorAll(':scope > .p-menu-item > .p-menu-item-link:not([aria-disabled="true"])') || []);
+      links[links.length - 1]?.focus();
+      return;
+    }
+  });
 }
-var CSS47;
+var SPLITBUTTON_CSS;
 var init_split_button = __esm({
   "src/components/split-button.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    init_useDisclosure();
-    init_useClickOutside();
-    init_useTransition();
-    CSS47 = `
-[data-theme="dark"] .splitbutton-main-btn {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+    SPLITBUTTON_CSS = `
+.p-splitbutton {
+    display: inline-flex;
+    position: relative;
+    vertical-align: middle;
+    border-radius: var(--p-border-radius, 6px);
+    font-family: var(--p-font-family, inherit);
 }
-[data-theme="dark"] .splitbutton-menu-btn {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-splitbutton-fluid {
+    width: 100%;
+    display: flex;
 }
-[data-theme="dark"] .splitbutton-menu-overlay {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-splitbutton .p-splitbutton-button {
+    flex: 1 1 auto;
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    border-right: none !important;
 }
-[data-theme="dark"] .splitbutton-menu-item {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-splitbutton .p-splitbutton-dropdown {
+    flex: 0 0 auto;
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+}
+
+/* Button Base & Severities */
+.p-splitbutton .p-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-family: inherit;
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1;
+    padding: 0.5rem 1rem;
+    border: 1px solid transparent;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+    outline: none;
+    text-decoration: none;
+}
+
+.p-splitbutton-sm .p-button {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+}
+
+.p-splitbutton-lg .p-button {
+    padding: 0.75rem 1.25rem;
+    font-size: 1rem;
+}
+
+.p-splitbutton-rounded {
+    border-radius: 9999px !important;
+}
+.p-splitbutton-rounded .p-splitbutton-button {
+    border-top-left-radius: 9999px !important;
+    border-bottom-left-radius: 9999px !important;
+}
+.p-splitbutton-rounded .p-splitbutton-dropdown {
+    border-top-right-radius: 9999px !important;
+    border-bottom-right-radius: 9999px !important;
+}
+
+.p-splitbutton-raised {
+    box-shadow: 0 3px 4px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Solid Severities */
+.p-splitbutton .p-button-primary {
+    background: var(--p-primary-500, #10b981);
+    color: #ffffff;
+    border-color: var(--p-primary-500, #10b981);
+}
+.p-splitbutton .p-button-primary:hover:not(:disabled) {
+    background: var(--p-primary-600, #059669);
+    border-color: var(--p-primary-600, #059669);
+}
+
+.p-splitbutton .p-button-secondary {
+    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-surface-700, #334155);
+    border-color: var(--p-surface-200, #e2e8f0);
+}
+.p-splitbutton .p-button-secondary:hover:not(:disabled) {
+    background: var(--p-surface-200, #e2e8f0);
+    color: var(--p-surface-800, #1e293b);
+}
+
+.p-splitbutton .p-button-success {
+    background: #22c55e;
+    color: #ffffff;
+    border-color: #22c55e;
+}
+.p-splitbutton .p-button-success:hover:not(:disabled) {
+    background: #16a34a;
+    border-color: #16a34a;
+}
+
+.p-splitbutton .p-button-info {
+    background: #0ea5e9;
+    color: #ffffff;
+    border-color: #0ea5e9;
+}
+.p-splitbutton .p-button-info:hover:not(:disabled) {
+    background: #0284c7;
+    border-color: #0284c7;
+}
+
+.p-splitbutton .p-button-warn {
+    background: #f59e0b;
+    color: #ffffff;
+    border-color: #f59e0b;
+}
+.p-splitbutton .p-button-warn:hover:not(:disabled) {
+    background: #d97706;
+    border-color: #d97706;
+}
+
+.p-splitbutton .p-button-help {
+    background: #a855f7;
+    color: #ffffff;
+    border-color: #a855f7;
+}
+.p-splitbutton .p-button-help:hover:not(:disabled) {
+    background: #9333ea;
+    border-color: #9333ea;
+}
+
+.p-splitbutton .p-button-danger {
+    background: #ef4444;
+    color: #ffffff;
+    border-color: #ef4444;
+}
+.p-splitbutton .p-button-danger:hover:not(:disabled) {
+    background: #dc2626;
+    border-color: #dc2626;
+}
+
+.p-splitbutton .p-button-contrast {
+    background: #0f172a;
+    color: #ffffff;
+    border-color: #0f172a;
+}
+.p-splitbutton .p-button-contrast:hover:not(:disabled) {
+    background: #1e293b;
+    border-color: #1e293b;
+}
+
+/* Outlined Variant */
+.p-splitbutton-outlined .p-button-primary { background: transparent; color: var(--p-primary-500, #10b981); border-color: var(--p-primary-500, #10b981); }
+.p-splitbutton-outlined .p-button-primary:hover:not(:disabled) { background: rgba(16, 185, 129, 0.08); }
+.p-splitbutton-outlined .p-button-secondary { background: transparent; color: var(--p-surface-700, #334155); border-color: var(--p-surface-300, #cbd5e1); }
+.p-splitbutton-outlined .p-button-secondary:hover:not(:disabled) { background: var(--p-surface-100, #f1f5f9); }
+.p-splitbutton-outlined .p-button-success { background: transparent; color: #22c55e; border-color: #22c55e; }
+.p-splitbutton-outlined .p-button-success:hover:not(:disabled) { background: rgba(34, 197, 94, 0.08); }
+.p-splitbutton-outlined .p-button-info { background: transparent; color: #0ea5e9; border-color: #0ea5e9; }
+.p-splitbutton-outlined .p-button-info:hover:not(:disabled) { background: rgba(14, 165, 233, 0.08); }
+.p-splitbutton-outlined .p-button-warn { background: transparent; color: #f59e0b; border-color: #f59e0b; }
+.p-splitbutton-outlined .p-button-warn:hover:not(:disabled) { background: rgba(245, 158, 11, 0.08); }
+.p-splitbutton-outlined .p-button-help { background: transparent; color: #a855f7; border-color: #a855f7; }
+.p-splitbutton-outlined .p-button-help:hover:not(:disabled) { background: rgba(168, 85, 247, 0.08); }
+.p-splitbutton-outlined .p-button-danger { background: transparent; color: #ef4444; border-color: #ef4444; }
+.p-splitbutton-outlined .p-button-danger:hover:not(:disabled) { background: rgba(239, 68, 68, 0.08); }
+.p-splitbutton-outlined .p-button-contrast { background: transparent; color: #0f172a; border-color: #0f172a; }
+.p-splitbutton-outlined .p-button-contrast:hover:not(:disabled) { background: rgba(15, 23, 42, 0.08); }
+
+/* Text Variant */
+.p-splitbutton-text .p-button { background: transparent; border-color: transparent !important; }
+.p-splitbutton-text .p-button-primary { color: var(--p-primary-500, #10b981); }
+.p-splitbutton-text .p-button-primary:hover:not(:disabled) { background: rgba(16, 185, 129, 0.08); }
+.p-splitbutton-text .p-button-secondary { color: var(--p-surface-700, #334155); }
+.p-splitbutton-text .p-button-secondary:hover:not(:disabled) { background: var(--p-surface-100, #f1f5f9); }
+.p-splitbutton-text .p-button-success { color: #22c55e; }
+.p-splitbutton-text .p-button-success:hover:not(:disabled) { background: rgba(34, 197, 94, 0.08); }
+.p-splitbutton-text .p-button-info { color: #0ea5e9; }
+.p-splitbutton-text .p-button-info:hover:not(:disabled) { background: rgba(14, 165, 233, 0.08); }
+.p-splitbutton-text .p-button-warn { color: #f59e0b; }
+.p-splitbutton-text .p-button-warn:hover:not(:disabled) { background: rgba(245, 158, 11, 0.08); }
+.p-splitbutton-text .p-button-help { color: #a855f7; }
+.p-splitbutton-text .p-button-help:hover:not(:disabled) { background: rgba(168, 85, 247, 0.08); }
+.p-splitbutton-text .p-button-danger { color: #ef4444; }
+.p-splitbutton-text .p-button-danger:hover:not(:disabled) { background: rgba(239, 68, 68, 0.08); }
+.p-splitbutton-text .p-button-contrast { color: #0f172a; }
+.p-splitbutton-text .p-button-contrast:hover:not(:disabled) { background: rgba(15, 23, 42, 0.08); }
+
+/* Divider separator in solid buttons */
+.p-splitbutton:not(.p-splitbutton-outlined):not(.p-splitbutton-text) .p-splitbutton-dropdown {
+    border-left: 1px solid rgba(255, 255, 255, 0.25) !important;
+}
+.p-splitbutton:not(.p-splitbutton-outlined):not(.p-splitbutton-text) .p-button-secondary.p-splitbutton-dropdown {
+    border-left: 1px solid var(--p-surface-300, #cbd5e1) !important;
+}
+
+/* Disabled */
+.p-splitbutton-disabled,
+.p-splitbutton .p-button:disabled {
+    opacity: 0.6 !important;
+    cursor: not-allowed !important;
+    pointer-events: none !important;
+}
+
+/* Menu Overlay */
+.p-splitbutton-menu {
+    position: absolute;
+    z-index: 1050;
+    min-width: 12.5rem;
+    background: var(--p-surface-0, #ffffff);
+    border: 1px solid var(--p-surface-200, #e2e8f0);
+    border-radius: var(--p-border-radius, 8px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    padding: 0.35rem;
+    outline: none;
+    transform-origin: top;
+    transition: opacity 0.15s cubic-bezier(0.16, 1, 0.3, 1), transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.p-splitbutton-menu.p-menu-flipped {
+    transform-origin: bottom;
+}
+
+.p-splitbutton-menu .p-menu-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.p-splitbutton-menu .p-menu-item {
+    position: relative;
+    border-radius: calc(var(--p-border-radius, 6px) - 2px);
+}
+
+.p-splitbutton-menu .p-menu-item-link {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.5rem 0.75rem;
+    color: var(--p-surface-700, #334155);
+    border-radius: inherit;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    user-select: none;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    outline: none;
+}
+
+.p-splitbutton-menu .p-menu-item-link:hover,
+.p-splitbutton-menu .p-menu-item.p-focus > .p-menu-item-link,
+.p-splitbutton-menu .p-menu-item:hover > .p-menu-item-link {
+    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-surface-900, #0f172a);
+}
+
+.p-splitbutton-menu .p-menu-item-link[aria-disabled="true"] {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.p-splitbutton-menu .p-menu-item-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--p-surface-500, #64748b);
+}
+
+.p-splitbutton-menu .p-menu-item-link:hover .p-menu-item-icon {
+    color: var(--p-surface-700, #334155);
+}
+
+.p-splitbutton-menu .p-submenu-icon {
+    margin-left: auto;
+    display: inline-flex;
+    color: var(--p-surface-400, #94a3b8);
+}
+
+.p-splitbutton-menu .p-menu-separator {
+    height: 1px;
+    background: var(--p-surface-200, #e2e8f0);
+    margin: 0.25rem 0;
+}
+
+/* Submenu Flyout Overlay */
+.p-splitbutton-submenu-overlay {
+    position: absolute;
+    top: -0.35rem;
+    left: calc(100% + 4px);
+    z-index: 1060;
+    min-width: 11.5rem;
+    background: var(--p-surface-0, #ffffff);
+    border: 1px solid var(--p-surface-200, #e2e8f0);
+    border-radius: var(--p-border-radius, 8px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    padding: 0.35rem;
+    list-style: none;
+    margin: 0;
+    display: none;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.p-splitbutton-submenu-overlay.p-submenu-flipped {
+    left: auto;
+    right: calc(100% + 4px);
+}
+
+.p-menu-item-has-submenu:hover > .p-splitbutton-submenu-overlay,
+.p-menu-item-has-submenu.p-submenu-open > .p-splitbutton-submenu-overlay {
+    display: flex;
+}
+
+/* Dark Mode Overrides */
+.dark .p-splitbutton-menu,
+.dark .p-splitbutton-submenu-overlay,
+[data-theme="dark"] .p-splitbutton-menu,
+[data-theme="dark"] .p-splitbutton-submenu-overlay {
+    background: var(--p-surface-900, #0f172a) !important;
+    border-color: var(--p-surface-700, #334155) !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4) !important;
+}
+
+.dark .p-splitbutton-menu .p-menu-item-link,
+[data-theme="dark"] .p-splitbutton-menu .p-menu-item-link {
+    color: var(--p-surface-200, #e2e8f0) !important;
+}
+
+.dark .p-splitbutton-menu .p-menu-item-link:hover,
+.dark .p-splitbutton-menu .p-menu-item.p-focus > .p-menu-item-link,
+.dark .p-splitbutton-menu .p-menu-item:hover > .p-menu-item-link,
+[data-theme="dark"] .p-splitbutton-menu .p-menu-item-link:hover,
+[data-theme="dark"] .p-splitbutton-menu .p-menu-item.p-focus > .p-menu-item-link,
+[data-theme="dark"] .p-splitbutton-menu .p-menu-item:hover > .p-menu-item-link {
+    background: var(--p-surface-800, #1e293b) !important;
+    color: #ffffff !important;
+}
+
+.dark .p-splitbutton-menu .p-menu-separator,
+[data-theme="dark"] .p-splitbutton-menu .p-menu-separator {
+    background: var(--p-surface-700, #334155) !important;
+}
+
+.dark .p-splitbutton-outlined .p-button-contrast,
+[data-theme="dark"] .p-splitbutton-outlined .p-button-contrast {
+    color: var(--p-surface-0, #ffffff) !important;
+    border-color: var(--p-surface-700, #334155) !important;
+}
+.dark .p-splitbutton-text .p-button-contrast,
+[data-theme="dark"] .p-splitbutton-text .p-button-contrast {
+    color: var(--p-surface-0, #ffffff) !important;
 }
 `;
   }
@@ -15646,7 +16199,7 @@ __export(select_exports, {
   default: () => SelectIsland
 });
 function SelectIsland(container, props) {
-  injectIslandStyle("laughtale-select", CSS48);
+  injectIslandStyle("laughtale-select", CSS47);
   const isMultiple = props.multiple === true || String(props.multiple) === "true";
   const isCheckmark = props.checkmark === true || String(props.checkmark) === "true";
   const isCheckbox = props.checkbox === true || String(props.checkbox) === "true";
@@ -15986,13 +16539,13 @@ function SelectIsland(container, props) {
   }
   render();
 }
-var CSS48;
+var CSS47;
 var init_select = __esm({
   "src/components/select.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS48 = `
+    CSS47 = `
 /* ==================== AURA SELECT ==================== */
 .laughtale-select,
 .p-select {
@@ -16419,7 +16972,7 @@ __export(checkbox_exports, {
   default: () => CheckboxIsland
 });
 function CheckboxIsland(container, props) {
-  injectIslandStyle("laughtale-checkbox", CSS49);
+  injectIslandStyle("laughtale-checkbox", CSS48);
   let isChecked = Boolean(props.checked);
   let isIndeterminate = Boolean(props.indeterminate);
   const size = props.size || "normal";
@@ -16491,13 +17044,13 @@ function CheckboxIsland(container, props) {
   }
   render();
 }
-var CSS49;
+var CSS48;
 var init_checkbox = __esm({
   "src/components/checkbox.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS49 = `
+    CSS48 = `
 .laughtale-checkbox-wrap {
     display: inline-flex;
     align-items: center;
@@ -16674,7 +17227,7 @@ __export(radio_button_exports, {
   default: () => RadioButtonIsland
 });
 function RadioButtonIsland(container, props) {
-  injectIslandStyle("laughtale-radio", CSS50);
+  injectIslandStyle("laughtale-radio", CSS49);
   const isCard = props.card === true || String(props.card) === "true";
   const isFilled = props.variant === "filled";
   const size = props.size || "normal";
@@ -16906,13 +17459,13 @@ function RadioButtonIsland(container, props) {
   }
   renderSingle();
 }
-var CSS50;
+var CSS49;
 var init_radio_button = __esm({
   "src/components/radio-button.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS50 = `
+    CSS49 = `
 /* ==================== AURA RADIOBUTTON ==================== */
 .laughtale-radio-root,
 .p-radiobutton-root {
@@ -17195,7 +17748,7 @@ __export(textarea_exports, {
   default: () => TextareaIsland
 });
 function TextareaIsland(container, props) {
-  injectIslandStyle("laughtale-textarea", CSS51);
+  injectIslandStyle("laughtale-textarea", CSS50);
   const isAutoResize = props.autoResize === true || String(props.autoResize) === "true";
   const isFluid = props.fluid === true || String(props.fluid) === "true";
   const isInvalid = props.invalid === true || String(props.invalid) === "true";
@@ -17271,12 +17824,12 @@ function TextareaIsland(container, props) {
     setTimeout(adjustHeight, 0);
   }
 }
-var CSS51;
+var CSS50;
 var init_textarea = __esm({
   "src/components/textarea.ts"() {
     "use strict";
     init_styles();
-    CSS51 = `
+    CSS50 = `
 /* ==================== AURA TEXTAREA ==================== */
 .p-textarea {
     font-family: var(--p-font-family, inherit);
@@ -17401,7 +17954,7 @@ __export(input_mask_exports, {
   default: () => InputMaskIsland
 });
 function InputMaskIsland(container, props) {
-  injectIslandStyle("laughtale-input-mask", CSS52);
+  injectIslandStyle("laughtale-input-mask", CSS51);
   const mask = props.mask || "(999) 999-9999";
   const slotChar = props.slotChar || "_";
   const autoClear = props.autoClear !== false && String(props.autoClear) !== "false";
@@ -17588,12 +18141,12 @@ function InputMaskIsland(container, props) {
   });
   syncValue();
 }
-var CSS52;
+var CSS51;
 var init_input_mask = __esm({
   "src/components/input-mask.ts"() {
     "use strict";
     init_styles();
-    CSS52 = `
+    CSS51 = `
 /* ==================== AURA INPUTMASK ==================== */
 .laughtale-input-mask,
 .p-inputmask {
@@ -17703,7 +18256,7 @@ __export(float_label_exports, {
   default: () => FloatLabelIsland
 });
 function FloatLabelIsland(container, props) {
-  injectIslandStyle("laughtale-float-label", CSS53);
+  injectIslandStyle("laughtale-float-label", CSS52);
   const variant = props.variant || "over";
   const initialHtml = container.innerHTML;
   const forAttr = props.for ? `for="${props.for}"` : "";
@@ -17781,12 +18334,12 @@ function FloatLabelIsland(container, props) {
   setTimeout(updateFloatingState, 50);
   setTimeout(updateFloatingState, 200);
 }
-var CSS53;
+var CSS52;
 var init_float_label = __esm({
   "src/components/float-label.ts"() {
     "use strict";
     init_styles();
-    CSS53 = `
+    CSS52 = `
 .laughtale-float-label {
     position: relative;
     display: inline-flex;
@@ -17913,7 +18466,7 @@ __export(ifta_label_exports, {
   default: () => IftaLabelIsland
 });
 function IftaLabelIsland(container, props) {
-  injectIslandStyle("laughtale-ifta-label", CSS54);
+  injectIslandStyle("laughtale-ifta-label", CSS53);
   const initialHtml = container.innerHTML;
   const forAttr = props.for ? `for="${props.for}"` : "";
   const existingLabel = container.querySelector("label");
@@ -17936,12 +18489,12 @@ function IftaLabelIsland(container, props) {
     }
   });
 }
-var CSS54;
+var CSS53;
 var init_ifta_label = __esm({
   "src/components/ifta-label.ts"() {
     "use strict";
     init_styles();
-    CSS54 = `
+    CSS53 = `
 .laughtale-ifta-label {
     position: relative;
     display: inline-flex;
@@ -18029,14 +18582,14 @@ __export(input_group_exports, {
   default: () => InputGroupIsland
 });
 function InputGroupIsland(container, props) {
-  injectIslandStyle("laughtale-inputgroup", CSS55);
+  injectIslandStyle("laughtale-inputgroup", CSS54);
   container.classList.add("laughtale-inputgroup", "p-inputgroup");
   if (props.size) {
     container.classList.add(`size-${props.size}`);
   }
 }
 function InputGroupAddonIsland(container, props) {
-  injectIslandStyle("laughtale-inputgroup", CSS55);
+  injectIslandStyle("laughtale-inputgroup", CSS54);
   container.classList.add("laughtale-inputgroup-addon", "p-inputgroup-addon");
   if (props.icon && !container.querySelector("svg")) {
     const svg = getLucideIcon(props.icon);
@@ -18048,13 +18601,13 @@ function InputGroupAddonIsland(container, props) {
     container.insertAdjacentHTML("beforeend", `<span>${props.text}</span>`);
   }
 }
-var CSS55;
+var CSS54;
 var init_input_group = __esm({
   "src/components/input-group.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS55 = `
+    CSS54 = `
 .laughtale-inputgroup,
 .p-inputgroup {
     display: flex;
@@ -18326,7 +18879,7 @@ __export(input_text_exports, {
   default: () => InputTextIsland
 });
 function InputTextIsland(container, props) {
-  injectIslandStyle("laughtale-inputtext", CSS56);
+  injectIslandStyle("laughtale-inputtext", CSS55);
   const [getValue, setValue] = useControllableState({
     defaultValue: props.value ?? "",
     onChange: (val) => {
@@ -18467,14 +19020,14 @@ function InputTextIsland(container, props) {
   }
   init();
 }
-var CSS56, xIcon;
+var CSS55, xIcon;
 var init_input_text = __esm({
   "src/components/input-text.ts"() {
     "use strict";
     init_styles();
     init_lucide();
     init_useControllableState();
-    CSS56 = `
+    CSS55 = `
 .laughtale-inputtext-wrap,
 .p-inputtext-wrap {
     position: relative;
@@ -18970,7 +19523,7 @@ __export(paginator_exports, {
   default: () => PaginatorIsland
 });
 function PaginatorIsland(container, props) {
-  injectIslandStyle("paginator", CSS57);
+  injectIslandStyle("paginator", CSS56);
   let first = props.first || 0;
   let rows = props.rows || 10;
   const totalRecords = props.totalRecords || 0;
@@ -19030,13 +19583,13 @@ function PaginatorIsland(container, props) {
   }
   render();
 }
-var CSS57;
+var CSS56;
 var init_paginator = __esm({
   "src/components/paginator.ts"() {
     "use strict";
     init_lucide();
     init_styles();
-    CSS57 = `
+    CSS56 = `
 .laughtale-paginator {
     display: flex;
     align-items: center;

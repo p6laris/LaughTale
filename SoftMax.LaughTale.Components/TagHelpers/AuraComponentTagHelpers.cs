@@ -2721,15 +2721,28 @@ public class IslandBlockUITagHelper : TagHelper
 }
 
 /// <summary>
-/// TagHelper for <island-split-button />
+/// TagHelper for <island-split-button /> / <island-splitbutton /> (Aura SplitButton)
 /// </summary>
 [HtmlTargetElement("island-split-button")]
+[HtmlTargetElement("island-splitbutton")]
 public class IslandSplitButtonTagHelper : TagHelper
 {
     public string Label { get; set; } = "Save";
     public string? Icon { get; set; }
+    public string? DropdownIcon { get; set; }
     public List<SplitButtonItem>? Model { get; set; }
+    public ButtonSeverity Severity { get; set; } = ButtonSeverity.Primary;
+    public bool Raised { get; set; } = false;
+    public bool Rounded { get; set; } = false;
+    public bool Text { get; set; } = false;
+    public bool Outlined { get; set; } = false;
+    public ComponentSize Size { get; set; } = ComponentSize.Normal;
     public bool Disabled { get; set; } = false;
+    public bool Fluid { get; set; } = false;
+    public object? ButtonProps { get; set; }
+    public object? MenuButtonProps { get; set; }
+    public string? AppendTo { get; set; }
+    public string? Action { get; set; }
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
@@ -2742,8 +2755,20 @@ public class IslandSplitButtonTagHelper : TagHelper
         {
             label = Label,
             icon = Icon,
+            dropdownIcon = DropdownIcon,
             model = Model ?? new(),
-            disabled = Disabled
+            severity = Severity.ToString().ToLowerInvariant(),
+            raised = Raised,
+            rounded = Rounded,
+            text = Text,
+            outlined = Outlined,
+            size = Size.ToString().ToLowerInvariant(),
+            disabled = Disabled,
+            fluid = Fluid,
+            buttonProps = ButtonProps,
+            menuButtonProps = MenuButtonProps,
+            appendTo = AppendTo,
+            action = Action
         };
 
         output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));

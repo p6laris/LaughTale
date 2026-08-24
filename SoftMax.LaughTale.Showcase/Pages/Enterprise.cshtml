@@ -3234,13 +3234,168 @@
     <section id="sec-split-button" class="component-card">
         <div class="card-header">
             <div>
-                <h2>SplitButton Action Menu</h2>
-                <p>Primary action button paired with a dropdown flyout menu for secondary actions.</p>
+                <h2>SplitButton</h2>
+                <p>SplitButton groups a set of commands in an overlay with a default command.</p>
             </div>
-            <span class="aura-tag tag-emerald">Actions</span>
+            <span class="aura-tag tag-emerald">SplitButton Suite</span>
         </div>
-        <div class="card-body">
-            <island-split-button label="Trigger Deploy" icon="⚡" menu="@Model.SplitButtonActions" />
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Demo 1: Basic -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">SplitButton has a default action button and a collection of additional options defined by the model property based on MenuModel API.</p>
+                <div style="display: flex; justify-content: center; padding: 1rem 0;">
+                    <island-splitbutton label="Save" model="@Model.SplitButtonBasicItems" />
+                </div>
+            </div>
+
+            <!-- Demo 2: Icons -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Icons</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">The buttons and menuitems have support to display icons.</p>
+                <div style="display: flex; justify-content: center; padding: 1rem 0;">
+                    <island-splitbutton label="Save" icon="check" dropdown-icon="cog" model="@Model.SplitButtonIconItems" />
+                </div>
+            </div>
+
+            <!-- Demo 3: Nested -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Nested</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">SplitButton has a default action button and a collection of additional hierarchical options defined by the model property.</p>
+                <div style="display: flex; justify-content: center; padding: 1rem 0;">
+                    <island-splitbutton label="Save" model="@Model.SplitButtonNestedItems" />
+                </div>
+            </div>
+
+            <!-- Demo 4: Severity -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Severity</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">The severity property defines the variant of a button.</p>
+                <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 1rem; padding: 0.5rem 0;">
+                    <island-splitbutton label="Primary" severity="Primary" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Secondary" severity="Secondary" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Success" severity="Success" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Info" severity="Info" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Warn" severity="Warn" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Help" severity="Help" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Danger" severity="Danger" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Contrast" severity="Contrast" model="@Model.SplitButtonBasicItems" />
+                </div>
+            </div>
+
+            <!-- Demo 5: Disabled -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Disabled</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">When the disabled attribute is present, the element is uneditable and unfocused.</p>
+                <div style="display: flex; justify-content: center; padding: 1rem 0;">
+                    <island-splitbutton label="Save" icon="plus" disabled="true" model="@Model.SplitButtonBasicItems" />
+                </div>
+            </div>
+
+            <!-- Demo 6: Raised -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Raised</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Raised buttons display a shadow to indicate elevation.</p>
+                <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 1rem; padding: 0.5rem 0;">
+                    <island-splitbutton label="Primary" raised="true" severity="Primary" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Secondary" raised="true" severity="Secondary" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Success" raised="true" severity="Success" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Info" raised="true" severity="Info" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Warn" raised="true" severity="Warn" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Help" raised="true" severity="Help" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Danger" raised="true" severity="Danger" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Contrast" raised="true" severity="Contrast" model="@Model.SplitButtonBasicItems" />
+                </div>
+            </div>
+
+            <!-- Demo 7: Rounded -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Rounded</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Rounded buttons have a circular border radius.</p>
+                <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 1rem; padding: 0.5rem 0;">
+                    <island-splitbutton label="Primary" rounded="true" severity="Primary" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Secondary" rounded="true" severity="Secondary" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Success" rounded="true" severity="Success" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Info" rounded="true" severity="Info" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Warn" rounded="true" severity="Warn" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Help" rounded="true" severity="Help" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Danger" rounded="true" severity="Danger" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Contrast" rounded="true" severity="Contrast" model="@Model.SplitButtonBasicItems" />
+                </div>
+            </div>
+
+            <!-- Demo 8: Text -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Text</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Text buttons are displayed as textual elements.</p>
+                <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 1rem; padding: 0.5rem 0;">
+                    <island-splitbutton label="Primary" text="true" severity="Primary" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Secondary" text="true" severity="Secondary" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Success" text="true" severity="Success" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Info" text="true" severity="Info" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Warn" text="true" severity="Warn" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Help" text="true" severity="Help" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Danger" text="true" severity="Danger" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Contrast" text="true" severity="Contrast" model="@Model.SplitButtonBasicItems" />
+                </div>
+            </div>
+
+            <!-- Demo 9: Raised Text -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Raised Text</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Text buttons can be displayed as raised as well for elevation.</p>
+                <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 1rem; padding: 0.5rem 0;">
+                    <island-splitbutton label="Primary" raised="true" text="true" severity="Primary" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Secondary" raised="true" text="true" severity="Secondary" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Success" raised="true" text="true" severity="Success" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Info" raised="true" text="true" severity="Info" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Warn" raised="true" text="true" severity="Warn" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Help" raised="true" text="true" severity="Help" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Danger" raised="true" text="true" severity="Danger" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Contrast" raised="true" text="true" severity="Contrast" model="@Model.SplitButtonBasicItems" />
+                </div>
+            </div>
+
+            <!-- Demo 10: Outlined -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Outlined</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Outlined buttons display a border without a background initially.</p>
+                <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 1rem; padding: 0.5rem 0;">
+                    <island-splitbutton label="Primary" outlined="true" severity="Primary" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Secondary" outlined="true" severity="Secondary" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Success" outlined="true" severity="Success" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Info" outlined="true" severity="Info" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Warn" outlined="true" severity="Warn" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Help" outlined="true" severity="Help" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Danger" outlined="true" severity="Danger" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Contrast" outlined="true" severity="Contrast" model="@Model.SplitButtonBasicItems" />
+                </div>
+            </div>
+
+            <!-- Demo 11: Sizes -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Sizes</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">SplitButton provides small and large sizes as alternatives to the standard.</p>
+                <div style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 1.5rem; padding: 0.5rem 0;">
+                    <island-splitbutton label="Small" size="Small" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Normal" size="Normal" model="@Model.SplitButtonBasicItems" />
+                    <island-splitbutton label="Large" size="Large" model="@Model.SplitButtonBasicItems" />
+                </div>
+            </div>
+
+            <!-- Demo 12: Template -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Template</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Custom content inside a button is defined as children.</p>
+                <div style="display: flex; justify-content: center; padding: 1rem 0;">
+                    <island-splitbutton severity="Contrast" model="@Model.SplitButtonBasicItems">
+                        <span style="display: flex; align-items: center; gap: 0.5rem; font-weight: 700;">
+                            <span style="color: var(--p-primary-500); display: flex;">⚡</span>
+                            <span>SoftMax Aura</span>
+                        </span>
+                    </island-splitbutton>
+                </div>
+            </div>
         </div>
     </section>
 

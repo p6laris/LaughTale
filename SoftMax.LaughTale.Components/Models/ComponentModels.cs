@@ -296,12 +296,17 @@ public record GalleriaItem(
 );
 
 public record SplitButtonItem(
-    string Label,
+    string? Label = null,
     string? Icon = null,
     string? Action = null,
     string? Url = null,
+    string? Route = null,
+    string? Target = null,
+    string? Command = null,
     ButtonSeverity Severity = ButtonSeverity.Primary,
-    bool Disabled = false
+    bool Disabled = false,
+    bool Separator = false,
+    List<SplitButtonItem>? Items = null
 );
 
 // ─── Aura v2: New Component Models ─────────────────────────────────────
