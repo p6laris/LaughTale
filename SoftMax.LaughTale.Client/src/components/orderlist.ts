@@ -1,13 +1,12 @@
 /**
  * SoftMax.LaughTale: Enterprise OrderList Component (Aura Design System compliant)
- * Sort a collection of items using vertical action controls, multi-selection,
- * checkboxes, live search filtering, rich templates, and FLIP animations via useAutoAnimate.
+ * Clean, instant, and accessible list reordering with selection modes, checkboxes,
+ * live filtering, and rich item templates.
  */
 
 import { OrderListItem } from '../types/models';
 import { injectIslandStyle } from '../runtime/styles';
 import { LucideIcons } from '../icons/lucide';
-import { useAutoAnimate } from '../composables/animation/useAutoAnimate';
 
 export interface OrderListProps<T = any> {
     value?: OrderListItem<T>[];
@@ -59,7 +58,7 @@ const ORDERLIST_CSS = `
     background: var(--p-surface-0, #ffffff);
     color: var(--p-surface-700, #334155);
     cursor: pointer;
-    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
     outline: none;
 }
 .p-orderlist-control-btn:hover:not(:disabled) {
@@ -149,7 +148,7 @@ const ORDERLIST_CSS = `
     font-size: 0.875rem;
     color: var(--p-surface-700, #334155);
     user-select: none;
-    transition: background-color 0.15s ease, color 0.15s ease;
+    transition: background-color 0.12s ease, color 0.12s ease;
 }
 .p-orderlist-item:hover:not(.p-highlight) {
     background: var(--p-surface-100, #f1f5f9);
@@ -172,7 +171,7 @@ const ORDERLIST_CSS = `
     border: 2px solid var(--p-surface-300, #cbd5e1);
     background: var(--p-surface-0, #ffffff);
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: background-color 0.12s ease, border-color 0.12s ease;
     flex-shrink: 0;
 }
 .p-checkbox-box.p-checked {
@@ -418,9 +417,6 @@ export default function OrderListIsland<T = any>(container: HTMLElement, props: 
             </div>
         `;
 
-        const listEl = container.querySelector<HTMLElement>('.p-orderlist-list');
-        if (listEl) useAutoAnimate(listEl, { duration: 180 });
-
         bindPermanentEvents();
         updateListStructure();
     }
@@ -603,14 +599,12 @@ export default function OrderListIsland<T = any>(container: HTMLElement, props: 
         const listUl = rootEl?.querySelector<HTMLUListElement>('.p-orderlist-list');
         if (!listUl || selectedIds.size === 0 || itemsList.length < 2) return;
 
-        // Perform DOM node movement directly for silky smooth FLIP transition without innerHTML reconstruction
         if (direction === 'top') {
             const selected = itemsList.filter((it, idx) => selectedIds.has(getItemId(it, idx)));
             const remaining = itemsList.filter((it, idx) => !selectedIds.has(getItemId(it, idx)));
             itemsList.length = 0;
             itemsList.push(...selected, ...remaining);
 
-            // Re-order DOM children
             const selectedElements: HTMLElement[] = [];
             listUl.querySelectorAll<HTMLElement>('.p-orderlist-item').forEach(el => {
                 const id = el.getAttribute('data-id');
@@ -625,7 +619,6 @@ export default function OrderListIsland<T = any>(container: HTMLElement, props: 
             itemsList.length = 0;
             itemsList.push(...remaining, ...selected);
 
-            // Re-order DOM children
             const selectedElements: HTMLElement[] = [];
             listUl.querySelectorAll<HTMLElement>('.p-orderlist-item').forEach(el => {
                 const id = el.getAttribute('data-id');
@@ -641,7 +634,6 @@ export default function OrderListIsland<T = any>(container: HTMLElement, props: 
                     itemsList[i] = itemsList[i - 1];
                     itemsList[i - 1] = temp;
 
-                    // Move in DOM
                     const curEl = listUl.querySelector<HTMLElement>(`.p-orderlist-item[data-id="${curId}"]`);
                     const prevEl = listUl.querySelector<HTMLElement>(`.p-orderlist-item[data-id="${prevId}"]`);
                     if (curEl && prevEl) {
@@ -658,7 +650,6 @@ export default function OrderListIsland<T = any>(container: HTMLElement, props: 
                     itemsList[i] = itemsList[i + 1];
                     itemsList[i + 1] = temp;
 
-                    // Move in DOM
                     const curEl = listUl.querySelector<HTMLElement>(`.p-orderlist-item[data-id="${curId}"]`);
                     const nextEl = listUl.querySelector<HTMLElement>(`.p-orderlist-item[data-id="${nextId}"]`);
                     if (curEl && nextEl) {

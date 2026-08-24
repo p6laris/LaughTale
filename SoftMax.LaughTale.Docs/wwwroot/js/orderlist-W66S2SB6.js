@@ -1,7 +1,4 @@
 import {
-  useAutoAnimate
-} from "./chunk-P6OQD35U.js";
-import {
   LucideIcons
 } from "./chunk-XHF3KYSF.js";
 import {
@@ -40,7 +37,7 @@ var ORDERLIST_CSS = `
     background: var(--p-surface-0, #ffffff);
     color: var(--p-surface-700, #334155);
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
     outline: none;
 }
 .p-orderlist-control-btn:hover:not(:disabled) {
@@ -130,7 +127,7 @@ var ORDERLIST_CSS = `
     font-size: 0.875rem;
     color: var(--p-surface-700, #334155);
     user-select: none;
-    transition: background-color 0.15s ease, color 0.15s ease;
+    transition: background-color 0.12s ease, color 0.12s ease;
 }
 .p-orderlist-item:hover:not(.p-highlight) {
     background: var(--p-surface-100, #f1f5f9);
@@ -153,7 +150,7 @@ var ORDERLIST_CSS = `
     border: 2px solid var(--p-surface-300, #cbd5e1);
     background: var(--p-surface-0, #ffffff);
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: background-color 0.12s ease, border-color 0.12s ease;
     flex-shrink: 0;
 }
 .p-checkbox-box.p-checked {
@@ -384,8 +381,6 @@ function OrderListIsland(container, props) {
                 </div>
             </div>
         `;
-    const listEl = container.querySelector(".p-orderlist-list");
-    if (listEl) useAutoAnimate(listEl, { duration: 180 });
     bindPermanentEvents();
     updateListStructure();
   }
@@ -532,17 +527,33 @@ function OrderListIsland(container, props) {
     updateSelectionUI();
   }
   function reorder(direction) {
-    if (selectedIds.size === 0 || itemsList.length < 2) return;
+    const rootEl = container.firstElementChild;
+    const listUl = rootEl?.querySelector(".p-orderlist-list");
+    if (!listUl || selectedIds.size === 0 || itemsList.length < 2) return;
     if (direction === "top") {
       const selected = itemsList.filter((it, idx) => selectedIds.has(getItemId(it, idx)));
       const remaining = itemsList.filter((it, idx) => !selectedIds.has(getItemId(it, idx)));
       itemsList.length = 0;
       itemsList.push(...selected, ...remaining);
+      const selectedElements = [];
+      listUl.querySelectorAll(".p-orderlist-item").forEach((el) => {
+        const id = el.getAttribute("data-id");
+        if (id && selectedIds.has(id)) selectedElements.push(el);
+      });
+      for (let i = selectedElements.length - 1; i >= 0; i--) {
+        listUl.insertBefore(selectedElements[i], listUl.firstElementChild);
+      }
     } else if (direction === "bottom") {
       const selected = itemsList.filter((it, idx) => selectedIds.has(getItemId(it, idx)));
       const remaining = itemsList.filter((it, idx) => !selectedIds.has(getItemId(it, idx)));
       itemsList.length = 0;
       itemsList.push(...remaining, ...selected);
+      const selectedElements = [];
+      listUl.querySelectorAll(".p-orderlist-item").forEach((el) => {
+        const id = el.getAttribute("data-id");
+        if (id && selectedIds.has(id)) selectedElements.push(el);
+      });
+      selectedElements.forEach((el) => listUl.appendChild(el));
     } else if (direction === "up") {
       for (let i = 1; i < itemsList.length; i++) {
         const curId = getItemId(itemsList[i], i);
@@ -551,6 +562,11 @@ function OrderListIsland(container, props) {
           const temp = itemsList[i];
           itemsList[i] = itemsList[i - 1];
           itemsList[i - 1] = temp;
+          const curEl = listUl.querySelector(`.p-orderlist-item[data-id="${curId}"]`);
+          const prevEl = listUl.querySelector(`.p-orderlist-item[data-id="${prevId}"]`);
+          if (curEl && prevEl) {
+            listUl.insertBefore(curEl, prevEl);
+          }
         }
       }
     } else if (direction === "down") {
@@ -561,10 +577,19 @@ function OrderListIsland(container, props) {
           const temp = itemsList[i];
           itemsList[i] = itemsList[i + 1];
           itemsList[i + 1] = temp;
+          const curEl = listUl.querySelector(`.p-orderlist-item[data-id="${curId}"]`);
+          const nextEl = listUl.querySelector(`.p-orderlist-item[data-id="${nextId}"]`);
+          if (curEl && nextEl) {
+            listUl.insertBefore(nextEl, curEl);
+          }
         }
       }
     }
-    updateListStructure();
+    listUl.querySelectorAll(".p-orderlist-item").forEach((el, idx) => {
+      const idxSpan = el.querySelector(".p-orderlist-index");
+      if (idxSpan) idxSpan.textContent = String(idx + 1);
+    });
+    updateButtons();
     syncValues("reorder");
   }
   function dispatchSelectionEvent() {
@@ -597,4 +622,4 @@ function OrderListIsland(container, props) {
 export {
   OrderListIsland as default
 };
-//# sourceMappingURL=orderlist-IZXCOQMS.js.map
+//# sourceMappingURL=orderlist-W66S2SB6.js.map

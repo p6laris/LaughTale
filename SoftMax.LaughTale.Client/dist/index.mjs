@@ -16738,8 +16738,6 @@ function OrderListIsland(container, props) {
                 </div>
             </div>
         `;
-    const listEl = container.querySelector(".p-orderlist-list");
-    if (listEl) useAutoAnimate(listEl, { duration: 180 });
     bindPermanentEvents();
     updateListStructure();
   }
@@ -16984,7 +16982,6 @@ var init_orderlist = __esm({
     "use strict";
     init_styles();
     init_lucide();
-    init_useAutoAnimate();
     ORDERLIST_CSS = `
 .p-orderlist {
     display: flex;
@@ -17016,7 +17013,7 @@ var init_orderlist = __esm({
     background: var(--p-surface-0, #ffffff);
     color: var(--p-surface-700, #334155);
     cursor: pointer;
-    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
     outline: none;
 }
 .p-orderlist-control-btn:hover:not(:disabled) {
@@ -17106,7 +17103,7 @@ var init_orderlist = __esm({
     font-size: 0.875rem;
     color: var(--p-surface-700, #334155);
     user-select: none;
-    transition: background-color 0.15s ease, color 0.15s ease;
+    transition: background-color 0.12s ease, color 0.12s ease;
 }
 .p-orderlist-item:hover:not(.p-highlight) {
     background: var(--p-surface-100, #f1f5f9);
@@ -17129,7 +17126,7 @@ var init_orderlist = __esm({
     border: 2px solid var(--p-surface-300, #cbd5e1);
     background: var(--p-surface-0, #ffffff);
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: background-color 0.12s ease, border-color 0.12s ease;
     flex-shrink: 0;
 }
 .p-checkbox-box.p-checked {
