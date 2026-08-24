@@ -529,6 +529,7 @@ public class IslandButtonTagHelper : TagHelper
 
         var isAnchor = As?.Equals("a", StringComparison.OrdinalIgnoreCase) == true || !string.IsNullOrEmpty(Href);
         output.TagName = isAnchor ? "a" : "button";
+        output.TagMode = TagMode.StartTagAndEndTag;
 
         if (isAnchor)
         {
@@ -558,6 +559,10 @@ public class IslandButtonTagHelper : TagHelper
         if (sevLower != "primary")
         {
             classes.Add($"p-button-{sevLower}");
+        }
+        else
+        {
+            classes.Add("p-button-primary");
         }
 
         // Variant
@@ -637,6 +642,7 @@ public class IslandButtonGroupTagHelper : TagHelper
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
         output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
         output.Attributes.SetAttribute("role", "group");
         var baseClass = "p-buttongroup";
         output.Attributes.SetAttribute("class", string.IsNullOrWhiteSpace(Class) ? baseClass : $"{baseClass} {Class}");

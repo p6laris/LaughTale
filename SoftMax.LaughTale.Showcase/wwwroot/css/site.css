@@ -292,13 +292,13 @@ body {
 
 /* ==================== SOLID SEVERITIES ==================== */
 .p-button-primary,
-.p-button:not([class*="p-button-"]):not(.p-button-outlined):not(.p-button-text):not(.p-button-link) {
+.p-button:not([class*="p-button-secondary"]):not([class*="p-button-success"]):not([class*="p-button-info"]):not([class*="p-button-warn"]):not([class*="p-button-help"]):not([class*="p-button-danger"]):not([class*="p-button-contrast"]):not(.p-button-outlined):not(.p-button-text):not(.p-button-link) {
     background: var(--p-primary-500, #10b981);
     color: #ffffff;
     border-color: var(--p-primary-500, #10b981);
 }
 .p-button-primary:hover:not(:disabled),
-.p-button:not([class*="p-button-"]):not(.p-button-outlined):not(.p-button-text):not(.p-button-link):hover:not(:disabled) {
+.p-button:not([class*="p-button-secondary"]):not([class*="p-button-success"]):not([class*="p-button-info"]):not([class*="p-button-warn"]):not([class*="p-button-help"]):not([class*="p-button-danger"]):not([class*="p-button-contrast"]):not(.p-button-outlined):not(.p-button-text):not(.p-button-link):hover:not(:disabled) {
     background: var(--p-primary-600, #059669);
     border-color: var(--p-primary-600, #059669);
 }
