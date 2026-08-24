@@ -2870,6 +2870,266 @@
         </div>
     </section>
 
+    <!-- Button -->
+    <section id="sec-button" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>Button</h2>
+                <p>Button is an extension to standard button element with icons, severities, loading states, badges, and theming.</p>
+            </div>
+            <span class="aura-tag tag-emerald">Button Suite</span>
+        </div>
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Hero Preview -->
+            <div style="background: var(--p-surface-0); padding: 1.5rem; border-radius: var(--p-border-radius-lg); border: 1px solid var(--p-border-color); display: flex; justify-content: center; gap: 1rem; align-items: center; box-shadow: var(--p-shadow-sm);">
+                <island-button severity="secondary" label="Reject" />
+                <island-button label="Accept" />
+            </div>
+
+            <!-- Demo 1: Basic -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Text to display on a button is provided as label or slot content.</p>
+                <div style="display: flex; justify-content: center;">
+                    <island-button label="Submit" />
+                </div>
+            </div>
+
+            <!-- Demo 2: Icons -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Icons</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Icons placed leading, trailing, icon-only, or vertically stacked with text.</p>
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+                    <div style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center;">
+                        <island-button icon="home" icon-only="true" aria-label="Save" />
+                        <island-button icon="user" label="Profile" />
+                        <island-button icon="check" icon-pos="right" label="Save" />
+                    </div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center;">
+                        <island-button icon="search" icon-pos="top" label="Search" />
+                        <island-button icon="refresh" icon-pos="top" label="Update" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 3: Loading -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Loading</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Render an animated spinner while expressing the busy state.</p>
+                <div style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center;">
+                    <island-button loading="true" label="Loading..." />
+                    <island-button loading="true" icon-only="true" />
+                </div>
+            </div>
+
+            <!-- Demo 4: Link -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Link</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">The button element can be rendered as a link visually or as an HTML anchor tag.</p>
+                <div style="display: flex; justify-content: center; gap: 1rem; align-items: center;">
+                    <island-button variant="link" label="Link" />
+                    <island-button as="a" href="https://github.com" target="_blank" rel="noopener" label="External" />
+                    <island-button variant="text" label="Router" />
+                </div>
+            </div>
+
+            <!-- Demo 5: Severity -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Severity</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">The severity property defines the color variant of a button.</p>
+                <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 0.75rem;">
+                    <island-button label="Primary" />
+                    <island-button severity="secondary" label="Secondary" />
+                    <island-button severity="success" label="Success" />
+                    <island-button severity="info" label="Info" />
+                    <island-button severity="warn" label="Warn" />
+                    <island-button severity="help" label="Help" />
+                    <island-button severity="danger" label="Danger" />
+                    <island-button severity="contrast" label="Contrast" />
+                </div>
+            </div>
+
+            <!-- Demo 6: Raised -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Raised</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Raised buttons display elevation shadow.</p>
+                <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 0.75rem;">
+                    <island-button raised="true" label="Primary" />
+                    <island-button severity="secondary" raised="true" label="Secondary" />
+                    <island-button severity="success" raised="true" label="Success" />
+                    <island-button severity="info" raised="true" label="Info" />
+                    <island-button severity="warn" raised="true" label="Warn" />
+                    <island-button severity="help" raised="true" label="Help" />
+                    <island-button severity="danger" raised="true" label="Danger" />
+                    <island-button severity="contrast" raised="true" label="Contrast" />
+                </div>
+            </div>
+
+            <!-- Demo 7: Rounded -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Rounded</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Rounded buttons have a circular pill border radius.</p>
+                <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 0.75rem;">
+                    <island-button rounded="true" label="Primary" />
+                    <island-button severity="secondary" rounded="true" label="Secondary" />
+                    <island-button severity="success" rounded="true" label="Success" />
+                    <island-button severity="info" rounded="true" label="Info" />
+                    <island-button severity="warn" rounded="true" label="Warn" />
+                    <island-button severity="help" rounded="true" label="Help" />
+                    <island-button severity="danger" rounded="true" label="Danger" />
+                    <island-button severity="contrast" rounded="true" label="Contrast" />
+                </div>
+            </div>
+
+            <!-- Demo 8: Text -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Text</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Text buttons are displayed as transparent background elements.</p>
+                <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 0.75rem;">
+                    <island-button variant="text" label="Primary" />
+                    <island-button severity="secondary" variant="text" label="Secondary" />
+                    <island-button severity="success" variant="text" label="Success" />
+                    <island-button severity="info" variant="text" label="Info" />
+                    <island-button severity="warn" variant="text" label="Warn" />
+                    <island-button severity="help" variant="text" label="Help" />
+                    <island-button severity="danger" variant="text" label="Danger" />
+                    <island-button severity="contrast" variant="text" label="Contrast" />
+                </div>
+            </div>
+
+            <!-- Demo 9: Raised Text -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Raised Text</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Text buttons can be elevated with the raised option.</p>
+                <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 0.75rem;">
+                    <island-button variant="text" raised="true" label="Primary" />
+                    <island-button severity="secondary" variant="text" raised="true" label="Secondary" />
+                    <island-button severity="success" variant="text" raised="true" label="Success" />
+                    <island-button severity="info" variant="text" raised="true" label="Info" />
+                    <island-button severity="warn" variant="text" raised="true" label="Warn" />
+                    <island-button severity="help" variant="text" raised="true" label="Help" />
+                    <island-button severity="danger" variant="text" raised="true" label="Danger" />
+                    <island-button severity="contrast" variant="text" raised="true" label="Contrast" />
+                </div>
+            </div>
+
+            <!-- Demo 10: Outlined -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Outlined</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Outlined buttons display a colored border without background initially.</p>
+                <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 0.75rem;">
+                    <island-button variant="outlined" label="Primary" />
+                    <island-button severity="secondary" variant="outlined" label="Secondary" />
+                    <island-button severity="success" variant="outlined" label="Success" />
+                    <island-button severity="info" variant="outlined" label="Info" />
+                    <island-button severity="warn" variant="outlined" label="Warn" />
+                    <island-button severity="help" variant="outlined" label="Help" />
+                    <island-button severity="danger" variant="outlined" label="Danger" />
+                    <island-button severity="contrast" variant="outlined" label="Contrast" />
+                </div>
+            </div>
+
+            <!-- Demo 11: Icon Only -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Icon Only</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Render buttons as 1:1 aspect ratio icon triggers across variants and shapes.</p>
+                <div style="display: flex; flex-direction: column; gap: 1rem; align-items: center;">
+                    <!-- Solid Square -->
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center;">
+                        <island-button icon="check" icon-only="true" aria-label="Filter" />
+                        <island-button icon="bookmark" icon-only="true" severity="secondary" aria-label="Bookmark" />
+                        <island-button icon="search" icon-only="true" severity="success" aria-label="Search" />
+                        <island-button icon="user" icon-only="true" severity="info" aria-label="User" />
+                        <island-button icon="bell" icon-only="true" severity="warn" aria-label="Notification" />
+                        <island-button icon="heart" icon-only="true" severity="help" aria-label="Favorite" />
+                        <island-button icon="times" icon-only="true" severity="danger" aria-label="Cancel" />
+                        <island-button icon="star" icon-only="true" severity="contrast" aria-label="Star" />
+                    </div>
+                    <!-- Solid Rounded -->
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center;">
+                        <island-button icon="check" icon-only="true" rounded="true" aria-label="Filter" />
+                        <island-button icon="bookmark" icon-only="true" rounded="true" severity="secondary" aria-label="Bookmark" />
+                        <island-button icon="search" icon-only="true" rounded="true" severity="success" aria-label="Search" />
+                        <island-button icon="user" icon-only="true" rounded="true" severity="info" aria-label="User" />
+                        <island-button icon="bell" icon-only="true" rounded="true" severity="warn" aria-label="Notification" />
+                        <island-button icon="heart" icon-only="true" rounded="true" severity="help" aria-label="Favorite" />
+                        <island-button icon="times" icon-only="true" rounded="true" severity="danger" aria-label="Cancel" />
+                        <island-button icon="star" icon-only="true" rounded="true" severity="contrast" aria-label="Star" />
+                    </div>
+                    <!-- Outlined Rounded -->
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center;">
+                        <island-button icon="check" icon-only="true" rounded="true" variant="outlined" aria-label="Filter" />
+                        <island-button icon="bookmark" icon-only="true" rounded="true" variant="outlined" severity="secondary" aria-label="Bookmark" />
+                        <island-button icon="search" icon-only="true" rounded="true" variant="outlined" severity="success" aria-label="Search" />
+                        <island-button icon="user" icon-only="true" rounded="true" variant="outlined" severity="info" aria-label="User" />
+                        <island-button icon="bell" icon-only="true" rounded="true" variant="outlined" severity="warn" aria-label="Notification" />
+                        <island-button icon="heart" icon-only="true" rounded="true" variant="outlined" severity="help" aria-label="Favorite" />
+                        <island-button icon="times" icon-only="true" rounded="true" variant="outlined" severity="danger" aria-label="Cancel" />
+                        <island-button icon="star" icon-only="true" rounded="true" variant="outlined" severity="contrast" aria-label="Star" />
+                    </div>
+                    <!-- Raised Rounded -->
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center;">
+                        <island-button icon="check" icon-only="true" rounded="true" raised="true" aria-label="Filter" />
+                        <island-button icon="bookmark" icon-only="true" rounded="true" raised="true" severity="secondary" aria-label="Bookmark" />
+                        <island-button icon="search" icon-only="true" rounded="true" raised="true" severity="success" aria-label="Search" />
+                        <island-button icon="user" icon-only="true" rounded="true" raised="true" severity="info" aria-label="User" />
+                        <island-button icon="bell" icon-only="true" rounded="true" raised="true" severity="warn" aria-label="Notification" />
+                        <island-button icon="heart" icon-only="true" rounded="true" raised="true" severity="help" aria-label="Favorite" />
+                        <island-button icon="times" icon-only="true" rounded="true" raised="true" severity="danger" aria-label="Cancel" />
+                        <island-button icon="star" icon-only="true" rounded="true" raised="true" severity="contrast" aria-label="Star" />
+                    </div>
+                    <!-- Text Rounded -->
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center;">
+                        <island-button icon="check" icon-only="true" rounded="true" variant="text" aria-label="Filter" />
+                        <island-button icon="bookmark" icon-only="true" rounded="true" variant="text" severity="secondary" aria-label="Bookmark" />
+                        <island-button icon="search" icon-only="true" rounded="true" variant="text" severity="success" aria-label="Search" />
+                        <island-button icon="user" icon-only="true" rounded="true" variant="text" severity="info" aria-label="User" />
+                        <island-button icon="bell" icon-only="true" rounded="true" variant="text" severity="warn" aria-label="Notification" />
+                        <island-button icon="heart" icon-only="true" rounded="true" variant="text" severity="help" aria-label="Favorite" />
+                        <island-button icon="times" icon-only="true" rounded="true" variant="text" severity="danger" aria-label="Cancel" />
+                        <island-button icon="star" icon-only="true" rounded="true" variant="text" severity="contrast" aria-label="Star" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 12: Badge -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Badge</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Badge counters embedded seamlessly inside button controls.</p>
+                <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 1rem; align-items: center;">
+                    <island-button label="Emails" badge="2" badge-severity="secondary" />
+                    <island-button variant="outlined" icon="users" label="Messages" badge="2" badge-severity="contrast" />
+                    <island-button variant="outlined" icon="bell" icon-only="true" badge="3" badge-severity="danger" />
+                </div>
+            </div>
+
+            <!-- Demo 13: Button Group -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Button Group</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Multiple buttons connected smoothly inside a ButtonGroup element.</p>
+                <div style="display: flex; justify-content: center;">
+                    <island-button-group>
+                        <island-button icon="check" label="Save" />
+                        <island-button icon="trash" label="Delete" />
+                        <island-button icon="times" label="Cancel" />
+                    </island-button-group>
+                </div>
+            </div>
+
+            <!-- Demo 14: Sizes & Disabled -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Sizes &amp; Disabled</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Button provides small, normal, large sizes, and disabled states.</p>
+                <div style="display: flex; flex-wrap: wrap; items-center; justify-content: center; gap: 1rem;">
+                    <island-button size="small" icon="check" label="Small" />
+                    <island-button icon="check" label="Normal" />
+                    <island-button size="large" icon="check" label="Large" />
+                    <island-button disabled="true" label="Disabled" />
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- SplitButton -->
     <section id="sec-split-button" class="component-card">
         <div class="card-header">

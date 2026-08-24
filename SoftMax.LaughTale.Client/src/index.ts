@@ -37,6 +37,7 @@ defineIsland('input-password', () => import('./components/input-password'));
 defineIsland('toggle-switch', () => import('./components/toggle-switch'));
 defineIsland('toggle-button', () => import('./components/toggle-button'));
 defineIsland('togglebutton', () => import('./components/toggle-button'));
+defineIsland('button', () => import('./components/button'));
 defineIsland('slider', () => import('./components/slider'));
 defineIsland('rating', () => import('./components/rating'));
 defineIsland('select-button', () => import('./components/select-button'));

@@ -6,6 +6,14 @@ public enum InputVariant
     Filled
 }
 
+public enum ButtonVariant
+{
+    Filled,
+    Outlined,
+    Text,
+    Link
+}
+
 public enum DatePickerSelectionMode
 {
     Single,

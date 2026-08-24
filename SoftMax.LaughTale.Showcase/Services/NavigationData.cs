@@ -44,6 +44,12 @@ public static class NavigationData
                 new("Label", "tag", "/enterprise#sec-label"),
                 new("InputGroup", "layers", "/enterprise#sec-inputgroup")
             }),
+            new("Buttons (3)", "zap", null, false, new List<SidebarItem>
+            {
+                new("Button", "zap", "/enterprise#sec-button"),
+                new("SplitButton", "zap", "/enterprise#sec-split-button"),
+                new("SpeedDial FAB", "zap", "/enterprise#sec-speed-dial")
+            }),
             new("Data & Tables (11)", "database", null, false, new List<SidebarItem>
             {
                 new("Security DataGrid", "table2", "/enterprise#sec-datagrid", false, null, "Live"),
@@ -58,7 +64,7 @@ public static class NavigationData
                 new("Sliding Tabs", "columns3", "/enterprise#sec-tabs"),
                 new("Timeline", "activity", "/enterprise#sec-timeline")
             }),
-            new("Navigation & Menus (9)", "compass", null, false, new List<SidebarItem>
+            new("Navigation & Menus (8)", "compass", null, false, new List<SidebarItem>
             {
                 new("Header Menu", "menu", "/enterprise#sec-menu"),
                 new("ContextMenu", "moreHorizontal", "/enterprise#sec-context-menu"),
@@ -66,7 +72,6 @@ public static class NavigationData
                 new("macOS Dock", "layoutGrid", "/enterprise#sec-dock"),
                 new("Sidebar Tree", "folderTree", "/enterprise#sec-sidebar"),
                 new("Stepper Flow", "arrowRight", "/enterprise#sec-stepper"),
-                new("SpeedDial FAB", "zap", "/enterprise#sec-speed-dial"),
                 new("ScrollTop", "arrowUp", "/enterprise#sec-scroll-top"),
                 new("Command Palette", "terminal", "/enterprise#sec-command-palette")
             }),
@@ -90,14 +95,13 @@ public static class NavigationData
                 new("Inplace Editor", "edit3", "/enterprise#sec-inplace"),
                 new("Terminal CLI", "terminal", "/enterprise#sec-terminal")
             }),
-            new("Media & Files (6)", "image", null, false, new List<SidebarItem>
+            new("Media & Files (5)", "image", null, false, new List<SidebarItem>
             {
                 new("Galleria Stage", "galleryThumbnails", "/enterprise#sec-galleria"),
                 new("Carousel Slider", "image", "/enterprise#sec-carousel"),
                 new("File Dropzone", "uploadCloud", "/enterprise#sec-dropzone"),
                 new("Image Compare", "columns3", "/enterprise#sec-image-compare"),
-                new("Camera Snapshot", "camera", "/enterprise#sec-camera"),
-                new("SplitButton Trigger", "zap", "/enterprise#sec-split-button")
+                new("Camera Snapshot", "camera", "/enterprise#sec-camera")
             })
         };
     }

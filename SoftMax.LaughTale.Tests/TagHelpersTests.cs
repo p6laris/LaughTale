@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using SoftMax.LaughTale.Components.Enums;
 using SoftMax.LaughTale.Components.Models;
 using SoftMax.LaughTale.Components.TagHelpers;
 using System.Text.Json;
@@ -61,7 +62,7 @@ public class TagHelpersTests
         var helper = new IslandNumberTagHelper
         {
             Value = 1250.50,
-            Mode = "currency",
+            Mode = InputNumberMode.Currency,
             Currency = "EUR",
             TargetInput = "total_price"
         };

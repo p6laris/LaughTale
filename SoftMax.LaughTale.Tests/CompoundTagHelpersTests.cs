@@ -41,8 +41,8 @@ public class CompoundTagHelpersTests
     {
         var tagHelper = new IslandButtonTagHelper
         {
-            Variant = ComponentVariant.Outline,
-            Size = ComponentSize.Small,
+            Variant = "outlined",
+            Size = "small",
             Icon = "check"
         };
 
@@ -61,8 +61,9 @@ public class CompoundTagHelpersTests
         await tagHelper.ProcessAsync(context, output);
 
         Assert.Equal("button", output.TagName);
-        Assert.Contains("px-2.5 py-1 text-xs", output.Attributes["class"].Value.ToString());
-        Assert.Contains("border border-surface-300", output.Attributes["class"].Value.ToString());
+        Assert.Contains("p-button", output.Attributes["class"].Value.ToString());
+        Assert.Contains("p-button-outlined", output.Attributes["class"].Value.ToString());
+        Assert.Contains("p-button-sm", output.Attributes["class"].Value.ToString());
         Assert.Contains("Confirm", output.Content.GetContent());
     }
 
