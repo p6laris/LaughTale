@@ -320,191 +320,6 @@ function PickListIsland(container, props) {
   function getItemId(item) {
     return String(item[dataKey] || item.id || item.name);
   }
-  function renderItemContent(item, isSelected) {
-    const checkboxHtml = isCheckbox ? `
-            <div class="p-checkbox-box ${isSelected ? "p-checked" : ""}" role="checkbox" aria-checked="${isSelected}">
-                ${isSelected ? LucideIcons.check : ""}
-            </div>
-        ` : "";
-    if (item.price != null || item.category != null || item.image != null) {
-      return `
-                ${checkboxHtml}
-                <div class="p-picklist-product-item">
-                    <div class="p-picklist-product-img">
-                        ${LucideIcons.package}
-                    </div>
-                    <div class="p-picklist-product-details">
-                        <span class="p-picklist-product-name">${item.name}</span>
-                        <span class="p-picklist-product-category">${item.category || ""}</span>
-                    </div>
-                    ${item.price != null ? `<span class="p-picklist-product-price">$${item.price}</span>` : ""}
-                </div>
-            `;
-    }
-    if (item.avatar != null || item.role != null) {
-      const initials = item.name.split(" ").map((w) => w[0]).join("").substring(0, 2);
-      return `
-                ${checkboxHtml}
-                <div class="p-picklist-member-item">
-                    <div class="p-picklist-member-avatar">${initials}</div>
-                    <div style="display: flex; flex-direction: column;">
-                        <span style="font-weight: 600; color: var(--p-surface-900);">${item.name}</span>
-                        ${item.role ? `<span style="font-size: 0.75rem; color: var(--p-surface-500);">${item.role}</span>` : ""}
-                    </div>
-                </div>
-            `;
-    }
-    return `
-            ${checkboxHtml}
-            <span style="flex: 1; font-weight: ${isSelected ? "600" : "normal"};">${item.name}</span>
-        `;
-  }
-  function render() {
-    const filteredSource = sourceList.filter((item) => {
-      if (!isFilter || !sourceFilterQuery.trim()) return true;
-      const val = String(item[filterBy] || item.name || "").toLowerCase();
-      return val.includes(sourceFilterQuery.toLowerCase());
-    });
-    const filteredTarget = targetList.filter((item) => {
-      if (!isFilter || !targetFilterQuery.trim()) return true;
-      const val = String(item[filterBy] || item.name || "").toLowerCase();
-      return val.includes(targetFilterQuery.toLowerCase());
-    });
-    const isAllSourceSelected = filteredSource.length > 0 && filteredSource.every((it) => selectedSource.has(getItemId(it)));
-    const isSourceIndeterminate = filteredSource.some((it) => selectedSource.has(getItemId(it))) && !isAllSourceSelected;
-    const isAllTargetSelected = filteredTarget.length > 0 && filteredTarget.every((it) => selectedTarget.has(getItemId(it)));
-    const isTargetIndeterminate = filteredTarget.some((it) => selectedTarget.has(getItemId(it))) && !isAllTargetSelected;
-    const sourceControlsHtml = showSourceControls ? `
-            <div class="p-picklist-controls p-picklist-source-controls">
-                <button type="button" class="p-picklist-control-btn btn-source-top" title="Move Top" aria-label="Move Top">${LucideIcons.chevronsUp}</button>
-                <button type="button" class="p-picklist-control-btn btn-source-up" title="Move Up" aria-label="Move Up">${LucideIcons.chevronUp}</button>
-                <button type="button" class="p-picklist-control-btn btn-source-down" title="Move Down" aria-label="Move Down">${LucideIcons.chevronDown}</button>
-                <button type="button" class="p-picklist-control-btn btn-source-bottom" title="Move Bottom" aria-label="Move Bottom">${LucideIcons.chevronsDown}</button>
-            </div>
-        ` : "";
-    const targetControlsHtml = showTargetControls ? `
-            <div class="p-picklist-controls p-picklist-target-controls">
-                <button type="button" class="p-picklist-control-btn btn-target-top" title="Move Top" aria-label="Move Top">${LucideIcons.chevronsUp}</button>
-                <button type="button" class="p-picklist-control-btn btn-target-up" title="Move Up" aria-label="Move Up">${LucideIcons.chevronUp}</button>
-                <button type="button" class="p-picklist-control-btn btn-target-down" title="Move Down" aria-label="Move Down">${LucideIcons.chevronDown}</button>
-                <button type="button" class="p-picklist-control-btn btn-target-bottom" title="Move Bottom" aria-label="Move Bottom">${LucideIcons.chevronsDown}</button>
-            </div>
-        ` : "";
-    const sourceHeaderCheckboxHtml = isCheckbox ? `
-            <div class="p-checkbox-box p-source-select-all ${isAllSourceSelected ? "p-checked" : isSourceIndeterminate ? "p-indeterminate" : ""}" role="checkbox" aria-checked="${isAllSourceSelected}">
-                ${isAllSourceSelected ? LucideIcons.check : isSourceIndeterminate ? '<span style="width: 8px; height: 2px; background: white;"></span>' : ""}
-            </div>
-        ` : "";
-    const targetHeaderCheckboxHtml = isCheckbox ? `
-            <div class="p-checkbox-box p-target-select-all ${isAllTargetSelected ? "p-checked" : isTargetIndeterminate ? "p-indeterminate" : ""}" role="checkbox" aria-checked="${isAllTargetSelected}">
-                ${isAllTargetSelected ? LucideIcons.check : isTargetIndeterminate ? '<span style="width: 8px; height: 2px; background: white;"></span>' : ""}
-            </div>
-        ` : "";
-    const sourceFilterHtml = isFilter ? `
-            <div class="p-picklist-filter-container">
-                <input type="text" class="p-picklist-filter-input p-source-filter" placeholder="${props.sourceFilterPlaceholder || "Search by name"}" value="${sourceFilterQuery}" />
-                <span class="p-picklist-filter-icon">${LucideIcons.search}</span>
-            </div>
-        ` : "";
-    const targetFilterHtml = isFilter ? `
-            <div class="p-picklist-filter-container">
-                <input type="text" class="p-picklist-filter-input p-target-filter" placeholder="${props.targetFilterPlaceholder || "Search by name"}" value="${targetFilterQuery}" />
-                <span class="p-picklist-filter-icon">${LucideIcons.search}</span>
-            </div>
-        ` : "";
-    let sourceItemsHtml = "";
-    if (filteredSource.length === 0) {
-      sourceItemsHtml = `<li class="p-picklist-empty">${sourceFilterQuery ? "No results found" : emptyMessageSource}</li>`;
-    } else {
-      sourceItemsHtml = filteredSource.map((it) => {
-        const id = getItemId(it);
-        const isSelected = selectedSource.has(id);
-        return `
-                    <li class="p-picklist-item source-item ${isSelected ? "p-highlight" : ""}" 
-                        data-id="${id}" 
-                        role="option" 
-                        aria-selected="${isSelected}">
-                        ${renderCellContent(it, isSelected)}
-                    </li>
-                `;
-      }).join("");
-    }
-    let targetItemsHtml = "";
-    if (filteredTarget.length === 0) {
-      targetItemsHtml = `<li class="p-picklist-empty">${targetFilterQuery ? "No results found" : emptyMessageTarget}</li>`;
-    } else {
-      targetItemsHtml = filteredTarget.map((it) => {
-        const id = getItemId(it);
-        const isSelected = selectedTarget.has(id);
-        return `
-                    <li class="p-picklist-item target-item ${isSelected ? "p-highlight" : ""}" 
-                        data-id="${id}" 
-                        role="option" 
-                        aria-selected="${isSelected}">
-                        ${renderCellContent(it, isSelected)}
-                    </li>
-                `;
-      }).join("");
-    }
-    container.innerHTML = `
-            <div class="p-picklist p-component">
-                ${sourceControlsHtml}
-
-                <!-- Source List Box -->
-                <div class="p-picklist-list-container">
-                    <div class="p-picklist-header">
-                        <div style="display: flex; align-items: center; gap: 0.5rem;">
-                            ${sourceHeaderCheckboxHtml}
-                            <span>${sourceHeader}</span>
-                        </div>
-                        <span style="font-size: 0.75rem; font-weight: 600; color: var(--p-surface-500);">${filteredSource.length} items</span>
-                    </div>
-                    ${sourceFilterHtml}
-                    <ul class="p-picklist-list picklist-source-list" style="height: ${scrollHeight};" role="listbox" aria-multiselectable="true" tabindex="0">
-                        ${sourceItemsHtml}
-                    </ul>
-                </div>
-
-                <!-- Transfer Buttons (Center) -->
-                <div class="p-picklist-controls p-picklist-transfer-controls">
-                    <button type="button" class="p-picklist-control-btn btn-move-to-target" title="Move to Target" aria-label="Move to Target" ${selectedSource.size === 0 ? "disabled" : ""}>
-                        ${LucideIcons.chevronRight}
-                    </button>
-                    <button type="button" class="p-picklist-control-btn btn-move-all-to-target" title="Move All to Target" aria-label="Move All to Target" ${sourceList.length === 0 ? "disabled" : ""}>
-                        ${LucideIcons.chevronsRight}
-                    </button>
-                    <button type="button" class="p-picklist-control-btn btn-move-to-source" title="Move to Source" aria-label="Move to Source" ${selectedTarget.size === 0 ? "disabled" : ""}>
-                        ${LucideIcons.chevronLeft}
-                    </button>
-                    <button type="button" class="p-picklist-control-btn btn-move-all-to-source" title="Move All to Source" aria-label="Move All to Source" ${targetList.length === 0 ? "disabled" : ""}>
-                        ${LucideIcons.chevronsLeft}
-                    </button>
-                </div>
-
-                <!-- Target List Box -->
-                <div class="p-picklist-list-container">
-                    <div class="p-picklist-header">
-                        <div style="display: flex; align-items: center; gap: 0.5rem;">
-                            ${targetHeaderCheckboxHtml}
-                            <span>${targetHeader}</span>
-                        </div>
-                        <span style="font-size: 0.75rem; font-weight: 600; color: var(--p-surface-500);">${filteredTarget.length} items</span>
-                    </div>
-                    ${targetFilterHtml}
-                    <ul class="p-picklist-list picklist-target-list" style="height: ${scrollHeight};" role="listbox" aria-multiselectable="true" tabindex="0">
-                        ${targetItemsHtml}
-                    </ul>
-                </div>
-
-                ${targetControlsHtml}
-            </div>
-        `;
-    const srcEl = container.querySelector(".picklist-source-list");
-    const tgtEl = container.querySelector(".picklist-target-list");
-    if (srcEl) useAutoAnimate(srcEl, { duration: 180 });
-    if (tgtEl) useAutoAnimate(tgtEl, { duration: 180 });
-    bindEvents();
-  }
   function renderCellContent(item, isSelected) {
     const checkboxHtml = isCheckbox ? `
             <div class="p-checkbox-box ${isSelected ? "p-checked" : ""}" role="checkbox" aria-checked="${isSelected}">
@@ -544,49 +359,250 @@ function PickListIsland(container, props) {
             <span style="flex: 1; font-weight: ${isSelected ? "600" : "normal"};">${item.name}</span>
         `;
   }
-  function bindEvents() {
+  function buildShell() {
+    const sourceControlsHtml = showSourceControls ? `
+            <div class="p-picklist-controls p-picklist-source-controls">
+                <button type="button" class="p-picklist-control-btn btn-source-top" title="Move Top" aria-label="Move Top">${LucideIcons.chevronsUp}</button>
+                <button type="button" class="p-picklist-control-btn btn-source-up" title="Move Up" aria-label="Move Up">${LucideIcons.chevronUp}</button>
+                <button type="button" class="p-picklist-control-btn btn-source-down" title="Move Down" aria-label="Move Down">${LucideIcons.chevronDown}</button>
+                <button type="button" class="p-picklist-control-btn btn-source-bottom" title="Move Bottom" aria-label="Move Bottom">${LucideIcons.chevronsDown}</button>
+            </div>
+        ` : "";
+    const targetControlsHtml = showTargetControls ? `
+            <div class="p-picklist-controls p-picklist-target-controls">
+                <button type="button" class="p-picklist-control-btn btn-target-top" title="Move Top" aria-label="Move Top">${LucideIcons.chevronsUp}</button>
+                <button type="button" class="p-picklist-control-btn btn-target-up" title="Move Up" aria-label="Move Up">${LucideIcons.chevronUp}</button>
+                <button type="button" class="p-picklist-control-btn btn-target-down" title="Move Down" aria-label="Move Down">${LucideIcons.chevronDown}</button>
+                <button type="button" class="p-picklist-control-btn btn-target-bottom" title="Move Bottom" aria-label="Move Bottom">${LucideIcons.chevronsDown}</button>
+            </div>
+        ` : "";
+    const sourceHeaderCheckboxHtml = isCheckbox ? `
+            <div class="p-checkbox-box p-source-select-all" role="checkbox" aria-checked="false"></div>
+        ` : "";
+    const targetHeaderCheckboxHtml = isCheckbox ? `
+            <div class="p-checkbox-box p-target-select-all" role="checkbox" aria-checked="false"></div>
+        ` : "";
+    const sourceFilterHtml = isFilter ? `
+            <div class="p-picklist-filter-container">
+                <input type="text" class="p-picklist-filter-input p-source-filter" placeholder="${props.sourceFilterPlaceholder || "Search by name"}" />
+                <span class="p-picklist-filter-icon">${LucideIcons.search}</span>
+            </div>
+        ` : "";
+    const targetFilterHtml = isFilter ? `
+            <div class="p-picklist-filter-container">
+                <input type="text" class="p-picklist-filter-input p-target-filter" placeholder="${props.targetFilterPlaceholder || "Search by name"}" />
+                <span class="p-picklist-filter-icon">${LucideIcons.search}</span>
+            </div>
+        ` : "";
+    container.innerHTML = `
+            <div class="p-picklist p-component">
+                ${sourceControlsHtml}
+
+                <!-- Source List Box -->
+                <div class="p-picklist-list-container">
+                    <div class="p-picklist-header">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            ${sourceHeaderCheckboxHtml}
+                            <span>${sourceHeader}</span>
+                        </div>
+                        <span class="p-source-count" style="font-size: 0.75rem; font-weight: 600; color: var(--p-surface-500);">0 items</span>
+                    </div>
+                    ${sourceFilterHtml}
+                    <ul class="p-picklist-list picklist-source-list" style="height: ${scrollHeight};" role="listbox" aria-multiselectable="true" tabindex="0">
+                    </ul>
+                </div>
+
+                <!-- Transfer Buttons (Center) -->
+                <div class="p-picklist-controls p-picklist-transfer-controls">
+                    <button type="button" class="p-picklist-control-btn btn-move-to-target" title="Move to Target" aria-label="Move to Target" disabled>
+                        ${LucideIcons.chevronRight}
+                    </button>
+                    <button type="button" class="p-picklist-control-btn btn-move-all-to-target" title="Move All to Target" aria-label="Move All to Target">
+                        ${LucideIcons.chevronsRight}
+                    </button>
+                    <button type="button" class="p-picklist-control-btn btn-move-to-source" title="Move to Source" aria-label="Move to Source" disabled>
+                        ${LucideIcons.chevronLeft}
+                    </button>
+                    <button type="button" class="p-picklist-control-btn btn-move-all-to-source" title="Move All to Source" aria-label="Move All to Source">
+                        ${LucideIcons.chevronsLeft}
+                    </button>
+                </div>
+
+                <!-- Target List Box -->
+                <div class="p-picklist-list-container">
+                    <div class="p-picklist-header">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            ${targetHeaderCheckboxHtml}
+                            <span>${targetHeader}</span>
+                        </div>
+                        <span class="p-target-count" style="font-size: 0.75rem; font-weight: 600; color: var(--p-surface-500);">0 items</span>
+                    </div>
+                    ${targetFilterHtml}
+                    <ul class="p-picklist-list picklist-target-list" style="height: ${scrollHeight};" role="listbox" aria-multiselectable="true" tabindex="0">
+                    </ul>
+                </div>
+
+                ${targetControlsHtml}
+            </div>
+        `;
+    const srcEl = container.querySelector(".picklist-source-list");
+    const tgtEl = container.querySelector(".picklist-target-list");
+    if (srcEl) useAutoAnimate(srcEl, { duration: 180 });
+    if (tgtEl) useAutoAnimate(tgtEl, { duration: 180 });
+    bindPermanentEvents();
+    updateSourceList();
+    updateTargetList();
+    updateTransferButtons();
+  }
+  function updateSourceList() {
     const rootEl = container.firstElementChild;
     if (!rootEl) return;
-    rootEl.querySelectorAll(".source-item").forEach((el) => {
-      el.addEventListener("click", (e) => {
-        const id = el.getAttribute("data-id");
-        if (!id) return;
-        const mouseEvent = e;
-        if (isCheckbox || mouseEvent.ctrlKey || mouseEvent.metaKey) {
-          if (selectedSource.has(id)) selectedSource.delete(id);
-          else selectedSource.add(id);
-        } else {
-          if (selectedSource.has(id) && selectedSource.size === 1) {
-            selectedSource.clear();
-          } else {
-            selectedSource.clear();
-            selectedSource.add(id);
-          }
-        }
-        render();
-        dispatchSelectionEvent();
-      });
+    const filteredSource = sourceList.filter((item) => {
+      if (!isFilter || !sourceFilterQuery.trim()) return true;
+      const val = String(item[filterBy] || item.name || "").toLowerCase();
+      return val.includes(sourceFilterQuery.toLowerCase());
     });
-    rootEl.querySelectorAll(".target-item").forEach((el) => {
-      el.addEventListener("click", (e) => {
-        const id = el.getAttribute("data-id");
-        if (!id) return;
-        const mouseEvent = e;
-        if (isCheckbox || mouseEvent.ctrlKey || mouseEvent.metaKey) {
-          if (selectedTarget.has(id)) selectedTarget.delete(id);
-          else selectedTarget.add(id);
-        } else {
-          if (selectedTarget.has(id) && selectedTarget.size === 1) {
-            selectedTarget.clear();
-          } else {
-            selectedTarget.clear();
-            selectedTarget.add(id);
-          }
-        }
-        render();
-        dispatchSelectionEvent();
-      });
+    const countEl = rootEl.querySelector(".p-source-count");
+    if (countEl) countEl.textContent = `${filteredSource.length} items`;
+    const sourceSelectAll = rootEl.querySelector(".p-source-select-all");
+    if (sourceSelectAll) {
+      const isAll = filteredSource.length > 0 && filteredSource.every((it) => selectedSource.has(getItemId(it)));
+      const isIndet = filteredSource.some((it) => selectedSource.has(getItemId(it))) && !isAll;
+      sourceSelectAll.className = `p-checkbox-box p-source-select-all ${isAll ? "p-checked" : isIndet ? "p-indeterminate" : ""}`;
+      sourceSelectAll.setAttribute("aria-checked", String(isAll));
+      sourceSelectAll.innerHTML = isAll ? LucideIcons.check : isIndet ? '<span style="width: 8px; height: 2px; background: white;"></span>' : "";
+    }
+    const srcUl = rootEl.querySelector(".picklist-source-list");
+    if (srcUl) {
+      if (filteredSource.length === 0) {
+        srcUl.innerHTML = `<li class="p-picklist-empty">${sourceFilterQuery ? "No results found" : emptyMessageSource}</li>`;
+      } else {
+        srcUl.innerHTML = filteredSource.map((it) => {
+          const id = getItemId(it);
+          const isSelected = selectedSource.has(id);
+          return `
+                        <li class="p-picklist-item source-item ${isSelected ? "p-highlight" : ""}" 
+                            data-id="${id}" 
+                            role="option" 
+                            aria-selected="${isSelected}">
+                            ${renderCellContent(it, isSelected)}
+                        </li>
+                    `;
+        }).join("");
+        srcUl.querySelectorAll(".source-item").forEach((el) => {
+          el.addEventListener("click", (e) => {
+            const id = el.getAttribute("data-id");
+            if (!id) return;
+            const mouseEvent = e;
+            if (isCheckbox || mouseEvent.ctrlKey || mouseEvent.metaKey) {
+              if (selectedSource.has(id)) selectedSource.delete(id);
+              else selectedSource.add(id);
+            } else {
+              if (selectedSource.has(id) && selectedSource.size === 1) {
+                selectedSource.clear();
+              } else {
+                selectedSource.clear();
+                selectedSource.add(id);
+              }
+            }
+            updateSourceList();
+            updateTransferButtons();
+            dispatchSelectionEvent();
+          });
+        });
+      }
+    }
+  }
+  function updateTargetList() {
+    const rootEl = container.firstElementChild;
+    if (!rootEl) return;
+    const filteredTarget = targetList.filter((item) => {
+      if (!isFilter || !targetFilterQuery.trim()) return true;
+      const val = String(item[filterBy] || item.name || "").toLowerCase();
+      return val.includes(targetFilterQuery.toLowerCase());
     });
+    const countEl = rootEl.querySelector(".p-target-count");
+    if (countEl) countEl.textContent = `${filteredTarget.length} items`;
+    const targetSelectAll = rootEl.querySelector(".p-target-select-all");
+    if (targetSelectAll) {
+      const isAll = filteredTarget.length > 0 && filteredTarget.every((it) => selectedTarget.has(getItemId(it)));
+      const isIndet = filteredTarget.some((it) => selectedTarget.has(getItemId(it))) && !isAll;
+      targetSelectAll.className = `p-checkbox-box p-target-select-all ${isAll ? "p-checked" : isIndet ? "p-indeterminate" : ""}`;
+      targetSelectAll.setAttribute("aria-checked", String(isAll));
+      targetSelectAll.innerHTML = isAll ? LucideIcons.check : isIndet ? '<span style="width: 8px; height: 2px; background: white;"></span>' : "";
+    }
+    const tgtUl = rootEl.querySelector(".picklist-target-list");
+    if (tgtUl) {
+      if (filteredTarget.length === 0) {
+        tgtUl.innerHTML = `<li class="p-picklist-empty">${targetFilterQuery ? "No results found" : emptyMessageTarget}</li>`;
+      } else {
+        tgtUl.innerHTML = filteredTarget.map((it) => {
+          const id = getItemId(it);
+          const isSelected = selectedTarget.has(id);
+          return `
+                        <li class="p-picklist-item target-item ${isSelected ? "p-highlight" : ""}" 
+                            data-id="${id}" 
+                            role="option" 
+                            aria-selected="${isSelected}">
+                            ${renderCellContent(it, isSelected)}
+                        </li>
+                    `;
+        }).join("");
+        tgtUl.querySelectorAll(".target-item").forEach((el) => {
+          el.addEventListener("click", (e) => {
+            const id = el.getAttribute("data-id");
+            if (!id) return;
+            const mouseEvent = e;
+            if (isCheckbox || mouseEvent.ctrlKey || mouseEvent.metaKey) {
+              if (selectedTarget.has(id)) selectedTarget.delete(id);
+              else selectedTarget.add(id);
+            } else {
+              if (selectedTarget.has(id) && selectedTarget.size === 1) {
+                selectedTarget.clear();
+              } else {
+                selectedTarget.clear();
+                selectedTarget.add(id);
+              }
+            }
+            updateTargetList();
+            updateTransferButtons();
+            dispatchSelectionEvent();
+          });
+        });
+      }
+    }
+  }
+  function updateTransferButtons() {
+    const rootEl = container.firstElementChild;
+    if (!rootEl) return;
+    const btnMoveTarget = rootEl.querySelector(".btn-move-to-target");
+    if (btnMoveTarget) btnMoveTarget.disabled = selectedSource.size === 0;
+    const btnMoveAllTarget = rootEl.querySelector(".btn-move-all-to-target");
+    if (btnMoveAllTarget) btnMoveAllTarget.disabled = sourceList.length === 0;
+    const btnMoveSource = rootEl.querySelector(".btn-move-to-source");
+    if (btnMoveSource) btnMoveSource.disabled = selectedTarget.size === 0;
+    const btnMoveAllSource = rootEl.querySelector(".btn-move-all-to-source");
+    if (btnMoveAllSource) btnMoveAllSource.disabled = targetList.length === 0;
+  }
+  function bindPermanentEvents() {
+    const rootEl = container.firstElementChild;
+    if (!rootEl) return;
+    const srcFilterInput = rootEl.querySelector(".p-source-filter");
+    if (srcFilterInput) {
+      srcFilterInput.addEventListener("input", (e) => {
+        sourceFilterQuery = e.target.value;
+        updateSourceList();
+        updateTransferButtons();
+      });
+    }
+    const tgtFilterInput = rootEl.querySelector(".p-target-filter");
+    if (tgtFilterInput) {
+      tgtFilterInput.addEventListener("input", (e) => {
+        targetFilterQuery = e.target.value;
+        updateTargetList();
+        updateTransferButtons();
+      });
+    }
     const sourceSelectAll = rootEl.querySelector(".p-source-select-all");
     if (sourceSelectAll) {
       sourceSelectAll.addEventListener("click", () => {
@@ -596,7 +612,8 @@ function PickListIsland(container, props) {
         } else {
           sourceList.forEach((it) => selectedSource.add(getItemId(it)));
         }
-        render();
+        updateSourceList();
+        updateTransferButtons();
         dispatchSelectionEvent();
       });
     }
@@ -609,22 +626,9 @@ function PickListIsland(container, props) {
         } else {
           targetList.forEach((it) => selectedTarget.add(getItemId(it)));
         }
-        render();
+        updateTargetList();
+        updateTransferButtons();
         dispatchSelectionEvent();
-      });
-    }
-    const srcFilterInput = rootEl.querySelector(".p-source-filter");
-    if (srcFilterInput) {
-      srcFilterInput.addEventListener("input", (e) => {
-        sourceFilterQuery = e.target.value;
-        render();
-      });
-    }
-    const tgtFilterInput = rootEl.querySelector(".p-target-filter");
-    if (tgtFilterInput) {
-      tgtFilterInput.addEventListener("input", (e) => {
-        targetFilterQuery = e.target.value;
-        render();
       });
     }
     rootEl.querySelector(".btn-move-to-target")?.addEventListener("click", () => {
@@ -633,7 +637,9 @@ function PickListIsland(container, props) {
       targetList = [...targetList, ...moving];
       sourceList = sourceList.filter((it) => !selectedSource.has(getItemId(it)));
       selectedSource.clear();
-      render();
+      updateSourceList();
+      updateTargetList();
+      updateTransferButtons();
       syncValues("move-to-target", moving);
     });
     rootEl.querySelector(".btn-move-all-to-target")?.addEventListener("click", () => {
@@ -642,7 +648,9 @@ function PickListIsland(container, props) {
       targetList = [...targetList, ...sourceList];
       sourceList = [];
       selectedSource.clear();
-      render();
+      updateSourceList();
+      updateTargetList();
+      updateTransferButtons();
       syncValues("move-all-to-target", moving);
     });
     rootEl.querySelector(".btn-move-to-source")?.addEventListener("click", () => {
@@ -651,7 +659,9 @@ function PickListIsland(container, props) {
       sourceList = [...sourceList, ...moving];
       targetList = targetList.filter((it) => !selectedTarget.has(getItemId(it)));
       selectedTarget.clear();
-      render();
+      updateSourceList();
+      updateTargetList();
+      updateTransferButtons();
       syncValues("move-to-source", moving);
     });
     rootEl.querySelector(".btn-move-all-to-source")?.addEventListener("click", () => {
@@ -660,35 +670,37 @@ function PickListIsland(container, props) {
       sourceList = [...sourceList, ...targetList];
       targetList = [];
       selectedTarget.clear();
-      render();
+      updateSourceList();
+      updateTargetList();
+      updateTransferButtons();
       syncValues("move-all-to-source", moving);
     });
     rootEl.querySelector(".btn-source-top")?.addEventListener("click", () => {
-      reorderList(sourceList, selectedSource, "top");
+      reorderList(sourceList, selectedSource, "top", "source");
     });
     rootEl.querySelector(".btn-source-up")?.addEventListener("click", () => {
-      reorderList(sourceList, selectedSource, "up");
+      reorderList(sourceList, selectedSource, "up", "source");
     });
     rootEl.querySelector(".btn-source-down")?.addEventListener("click", () => {
-      reorderList(sourceList, selectedSource, "down");
+      reorderList(sourceList, selectedSource, "down", "source");
     });
     rootEl.querySelector(".btn-source-bottom")?.addEventListener("click", () => {
-      reorderList(sourceList, selectedSource, "bottom");
+      reorderList(sourceList, selectedSource, "bottom", "source");
     });
     rootEl.querySelector(".btn-target-top")?.addEventListener("click", () => {
-      reorderList(targetList, selectedTarget, "top");
+      reorderList(targetList, selectedTarget, "top", "target");
     });
     rootEl.querySelector(".btn-target-up")?.addEventListener("click", () => {
-      reorderList(targetList, selectedTarget, "up");
+      reorderList(targetList, selectedTarget, "up", "target");
     });
     rootEl.querySelector(".btn-target-down")?.addEventListener("click", () => {
-      reorderList(targetList, selectedTarget, "down");
+      reorderList(targetList, selectedTarget, "down", "target");
     });
     rootEl.querySelector(".btn-target-bottom")?.addEventListener("click", () => {
-      reorderList(targetList, selectedTarget, "bottom");
+      reorderList(targetList, selectedTarget, "bottom", "target");
     });
   }
-  function reorderList(list, selectedSet, direction) {
+  function reorderList(list, selectedSet, direction, whichList) {
     if (selectedSet.size === 0 || list.length < 2) return;
     if (direction === "top") {
       const selected = list.filter((it) => selectedSet.has(getItemId(it)));
@@ -717,7 +729,9 @@ function PickListIsland(container, props) {
         }
       }
     }
-    render();
+    if (whichList === "source") updateSourceList();
+    else updateTargetList();
+    updateTransferButtons();
     syncValues("reorder");
   }
   function dispatchSelectionEvent() {
@@ -745,10 +759,10 @@ function PickListIsland(container, props) {
       detail: { source: sourceList, target: targetList, action, affectedItems }
     }));
   }
-  render();
+  buildShell();
   syncValues();
 }
 export {
   PickListIsland as default
 };
-//# sourceMappingURL=picklist-25WCYUMG.js.map
+//# sourceMappingURL=picklist-WLN4YAUC.js.map

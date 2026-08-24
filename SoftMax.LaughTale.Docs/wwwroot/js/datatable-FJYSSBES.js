@@ -1028,17 +1028,31 @@ function DataTableIsland(container, props) {
     const globalInput = rootEl.querySelector(".p-datatable-global-filter");
     if (globalInput) {
       globalInput.addEventListener("input", (e) => {
-        globalFilter = e.target.value;
+        const target = e.target;
+        globalFilter = target.value;
+        const pos = target.selectionStart;
         currentPage = 1;
         render();
+        const reacquired = container.querySelector(".p-datatable-global-filter");
+        if (reacquired) {
+          reacquired.focus();
+          if (pos != null) reacquired.setSelectionRange(pos, pos);
+        }
       });
     }
     rootEl.querySelectorAll(".p-datatable-filter-input[data-filter-field]").forEach((input) => {
       input.addEventListener("input", (e) => {
+        const target = e.target;
         const field = input.getAttribute("data-filter-field");
-        columnFilters[field] = e.target.value;
+        columnFilters[field] = target.value;
+        const pos = target.selectionStart;
         currentPage = 1;
         render();
+        const reacquired = container.querySelector(`.p-datatable-filter-input[data-filter-field="${field}"]`);
+        if (reacquired) {
+          reacquired.focus();
+          if (pos != null) reacquired.setSelectionRange(pos, pos);
+        }
       });
     });
     const exportBtn = rootEl.querySelector(".p-datatable-export-btn");
@@ -1226,4 +1240,4 @@ function DataTableIsland(container, props) {
 export {
   DataTableIsland as default
 };
-//# sourceMappingURL=datatable-KINB2FFM.js.map
+//# sourceMappingURL=datatable-FJYSSBES.js.map

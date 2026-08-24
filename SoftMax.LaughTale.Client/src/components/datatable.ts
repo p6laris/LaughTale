@@ -1190,19 +1190,33 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
         const globalInput = rootEl.querySelector<HTMLInputElement>('.p-datatable-global-filter');
         if (globalInput) {
             globalInput.addEventListener('input', (e) => {
-                globalFilter = (e.target as HTMLInputElement).value;
+                const target = e.target as HTMLInputElement;
+                globalFilter = target.value;
+                const pos = target.selectionStart;
                 currentPage = 1;
                 render();
+                const reacquired = container.querySelector<HTMLInputElement>('.p-datatable-global-filter');
+                if (reacquired) {
+                    reacquired.focus();
+                    if (pos != null) reacquired.setSelectionRange(pos, pos);
+                }
             });
         }
 
         // 3. Column Row Filters
         rootEl.querySelectorAll<HTMLInputElement>('.p-datatable-filter-input[data-filter-field]').forEach(input => {
             input.addEventListener('input', (e) => {
+                const target = e.target as HTMLInputElement;
                 const field = input.getAttribute('data-filter-field')!;
-                columnFilters[field] = (e.target as HTMLInputElement).value;
+                columnFilters[field] = target.value;
+                const pos = target.selectionStart;
                 currentPage = 1;
                 render();
+                const reacquired = container.querySelector<HTMLInputElement>(`.p-datatable-filter-input[data-filter-field="${field}"]`);
+                if (reacquired) {
+                    reacquired.focus();
+                    if (pos != null) reacquired.setSelectionRange(pos, pos);
+                }
             });
         });
 
