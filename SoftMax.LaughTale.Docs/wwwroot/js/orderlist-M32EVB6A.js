@@ -525,6 +525,11 @@ function OrderListIsland(container, props) {
     if (!isShift) selectedIds.clear();
     selectedIds.add(targetId);
     updateSelectionUI();
+    const rootEl = container.firstElementChild;
+    const targetEl = rootEl?.querySelector(`.p-orderlist-item[data-id="${targetId}"]`);
+    if (targetEl) {
+      targetEl.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    }
   }
   function reorder(direction) {
     const rootEl = container.firstElementChild;
@@ -589,6 +594,10 @@ function OrderListIsland(container, props) {
       const idxSpan = el.querySelector(".p-orderlist-index");
       if (idxSpan) idxSpan.textContent = String(idx + 1);
     });
+    const activeSelectedEl = listUl.querySelector(".p-orderlist-item.p-highlight");
+    if (activeSelectedEl) {
+      activeSelectedEl.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    }
     updateButtons();
     syncValues("reorder");
   }
@@ -622,4 +631,4 @@ function OrderListIsland(container, props) {
 export {
   OrderListIsland as default
 };
-//# sourceMappingURL=orderlist-W66S2SB6.js.map
+//# sourceMappingURL=orderlist-M32EVB6A.js.map

@@ -1,13 +1,12 @@
 /**
  * SoftMax.LaughTale: Enterprise PickList Component (Aura Design System compliant)
- * Rich dual-list transfer & reordering with selection modes, checkboxes, live filtering,
- * templates, keyboard navigation, and FLIP layout physics via useAutoAnimate.
+ * Clean, instant dual-list transfer & reordering with selection modes, checkboxes,
+ * live filtering, rich templates, auto-scrolling, and keyboard navigation.
  */
 
 import { PickListItem } from '../types/models';
 import { injectIslandStyle } from '../runtime/styles';
 import { LucideIcons } from '../icons/lucide';
-import { useAutoAnimate } from '../composables/animation/useAutoAnimate';
 
 export interface PickListProps<T = any> {
     source?: PickListItem<T>[];
@@ -63,7 +62,7 @@ const PICKLIST_CSS = `
     background: var(--p-surface-0, #ffffff);
     color: var(--p-surface-700, #334155);
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
     outline: none;
 }
 .p-picklist-control-btn:hover:not(:disabled) {
@@ -140,6 +139,7 @@ const PICKLIST_CSS = `
     overflow-y: auto;
     display: flex;
     flex-direction: column;
+    scroll-behavior: smooth;
 }
 
 .p-picklist-item {
@@ -153,7 +153,7 @@ const PICKLIST_CSS = `
     font-size: 0.875rem;
     color: var(--p-surface-700, #334155);
     user-select: none;
-    transition: background-color 0.15s ease, color 0.15s ease;
+    transition: background-color 0.12s ease, color 0.12s ease;
 }
 .p-picklist-item:hover:not(.p-highlight) {
     background: var(--p-surface-100, #f1f5f9);
@@ -176,7 +176,7 @@ const PICKLIST_CSS = `
     border: 2px solid var(--p-surface-300, #cbd5e1);
     background: var(--p-surface-0, #ffffff);
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: background-color 0.12s ease, border-color 0.12s ease;
     flex-shrink: 0;
 }
 .p-checkbox-box.p-checked {
@@ -490,11 +490,6 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
             </div>
         `;
 
-        const srcEl = container.querySelector<HTMLElement>('.picklist-source-list');
-        const tgtEl = container.querySelector<HTMLElement>('.picklist-target-list');
-        if (srcEl) useAutoAnimate(srcEl, { duration: 180 });
-        if (tgtEl) useAutoAnimate(tgtEl, { duration: 180 });
-
         bindPermanentEvents();
         updateSourceList();
         updateTargetList();
@@ -787,6 +782,14 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
             selectedSource.clear();
             updateSourceList();
             updateTargetList();
+
+            // Auto-scroll newly transferred items in target list
+            if (moving.length > 0) {
+                const firstId = getItemId(moving[0]);
+                const movedEl = rootEl.querySelector<HTMLElement>(`.picklist-target-list .target-item[data-id="${firstId}"]`);
+                if (movedEl) movedEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+            }
+
             syncValues('move-to-target', moving);
         });
 
@@ -799,6 +802,13 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
             selectedSource.clear();
             updateSourceList();
             updateTargetList();
+
+            if (moving.length > 0) {
+                const firstId = getItemId(moving[0]);
+                const movedEl = rootEl.querySelector<HTMLElement>(`.picklist-target-list .target-item[data-id="${firstId}"]`);
+                if (movedEl) movedEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+            }
+
             syncValues('move-all-to-target', moving);
         });
 
@@ -811,6 +821,14 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
             selectedTarget.clear();
             updateSourceList();
             updateTargetList();
+
+            // Auto-scroll newly transferred items in source list
+            if (moving.length > 0) {
+                const firstId = getItemId(moving[0]);
+                const movedEl = rootEl.querySelector<HTMLElement>(`.picklist-source-list .source-item[data-id="${firstId}"]`);
+                if (movedEl) movedEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+            }
+
             syncValues('move-to-source', moving);
         });
 
@@ -823,6 +841,13 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
             selectedTarget.clear();
             updateSourceList();
             updateTargetList();
+
+            if (moving.length > 0) {
+                const firstId = getItemId(moving[0]);
+                const movedEl = rootEl.querySelector<HTMLElement>(`.picklist-source-list .source-item[data-id="${firstId}"]`);
+                if (movedEl) movedEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+            }
+
             syncValues('move-all-to-source', moving);
         });
 
@@ -856,39 +881,77 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
     }
 
     function reorderList(list: PickListItem<T>[], selectedSet: Set<string>, direction: 'top' | 'up' | 'down' | 'bottom', whichList: 'source' | 'target') {
-        if (selectedSet.size === 0 || list.length < 2) return;
+        const rootEl = container.firstElementChild as HTMLElement;
+        const targetUl = rootEl?.querySelector<HTMLUListElement>(whichList === 'source' ? '.picklist-source-list' : '.picklist-target-list');
+        if (!targetUl || selectedSet.size === 0 || list.length < 2) return;
 
         if (direction === 'top') {
             const selected = list.filter(it => selectedSet.has(getItemId(it)));
             const remaining = list.filter(it => !selectedSet.has(getItemId(it)));
             list.length = 0;
             list.push(...selected, ...remaining);
+
+            const selectedElements: HTMLElement[] = [];
+            targetUl.querySelectorAll<HTMLElement>(`.${whichList}-item`).forEach(el => {
+                const id = el.getAttribute('data-id');
+                if (id && selectedSet.has(id)) selectedElements.push(el);
+            });
+            for (let i = selectedElements.length - 1; i >= 0; i--) {
+                targetUl.insertBefore(selectedElements[i], targetUl.firstElementChild);
+            }
         } else if (direction === 'bottom') {
             const selected = list.filter(it => selectedSet.has(getItemId(it)));
             const remaining = list.filter(it => !selectedSet.has(getItemId(it)));
             list.length = 0;
             list.push(...remaining, ...selected);
+
+            const selectedElements: HTMLElement[] = [];
+            targetUl.querySelectorAll<HTMLElement>(`.${whichList}-item`).forEach(el => {
+                const id = el.getAttribute('data-id');
+                if (id && selectedSet.has(id)) selectedElements.push(el);
+            });
+            selectedElements.forEach(el => targetUl.appendChild(el));
         } else if (direction === 'up') {
             for (let i = 1; i < list.length; i++) {
-                if (selectedSet.has(getItemId(list[i])) && !selectedSet.has(getItemId(list[i - 1]))) {
+                const curId = getItemId(list[i]);
+                const prevId = getItemId(list[i - 1]);
+                if (selectedSet.has(curId) && !selectedSet.has(prevId)) {
                     const temp = list[i];
                     list[i] = list[i - 1];
                     list[i - 1] = temp;
+
+                    const curEl = targetUl.querySelector<HTMLElement>(`.${whichList}-item[data-id="${curId}"]`);
+                    const prevEl = targetUl.querySelector<HTMLElement>(`.${whichList}-item[data-id="${prevId}"]`);
+                    if (curEl && prevEl) {
+                        targetUl.insertBefore(curEl, prevEl);
+                    }
                 }
             }
         } else if (direction === 'down') {
             for (let i = list.length - 2; i >= 0; i--) {
-                if (selectedSet.has(getItemId(list[i])) && !selectedSet.has(getItemId(list[i + 1]))) {
+                const curId = getItemId(list[i]);
+                const nextId = getItemId(list[i + 1]);
+                if (selectedSet.has(curId) && !selectedSet.has(nextId)) {
                     const temp = list[i];
                     list[i] = list[i + 1];
                     list[i + 1] = temp;
+
+                    const curEl = targetUl.querySelector<HTMLElement>(`.${whichList}-item[data-id="${curId}"]`);
+                    const nextEl = targetUl.querySelector<HTMLElement>(`.${whichList}-item[data-id="${nextId}"]`);
+                    if (curEl && nextEl) {
+                        targetUl.insertBefore(nextEl, curEl);
+                    }
                 }
             }
         }
 
-        if (whichList === 'source') updateSourceList();
-        else updateTargetList();
+        // Auto-scroll active moved item into view
+        const activeSelectedEl = targetUl.querySelector<HTMLElement>(`.${whichList}-item.p-highlight`);
+        if (activeSelectedEl) {
+            activeSelectedEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }
 
+        updateTransferButtons();
         syncValues('reorder');
     }
 

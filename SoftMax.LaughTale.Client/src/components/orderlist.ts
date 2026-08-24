@@ -592,6 +592,12 @@ export default function OrderListIsland<T = any>(container: HTMLElement, props: 
         selectedIds.add(targetId);
 
         updateSelectionUI();
+
+        const rootEl = container.firstElementChild as HTMLElement;
+        const targetEl = rootEl?.querySelector<HTMLElement>(`.p-orderlist-item[data-id="${targetId}"]`);
+        if (targetEl) {
+            targetEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }
     }
 
     function reorder(direction: 'top' | 'up' | 'down' | 'bottom') {
@@ -664,6 +670,12 @@ export default function OrderListIsland<T = any>(container: HTMLElement, props: 
             const idxSpan = el.querySelector('.p-orderlist-index');
             if (idxSpan) idxSpan.textContent = String(idx + 1);
         });
+
+        // Scroll active item smoothly into view
+        const activeSelectedEl = listUl.querySelector<HTMLElement>('.p-orderlist-item.p-highlight');
+        if (activeSelectedEl) {
+            activeSelectedEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }
 
         updateButtons();
         syncValues('reorder');
