@@ -2214,17 +2214,8 @@
             <!-- Demo 2: Size Variants -->
             <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
                 <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Size</h3>
-                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Use the size property with small or large to adjust cell padding.</p>
-                <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-                    <div>
-                        <span style="font-size: 0.8125rem; font-weight: 600; color: var(--p-surface-600); margin-bottom: 0.5rem; display: inline-block;">Small Size</span>
-                        <island-datatable value="@Model.DataTableCustomers" columns="@Model.DataTableCustomerColumns" size="Small" />
-                    </div>
-                    <div>
-                        <span style="font-size: 0.8125rem; font-weight: 600; color: var(--p-surface-600); margin-bottom: 0.5rem; display: inline-block;">Large Size</span>
-                        <island-datatable value="@Model.DataTableCustomers" columns="@Model.DataTableCustomerColumns" size="Large" />
-                    </div>
-                </div>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Use the size property with small, normal, or large to adjust cell padding.</p>
+                <island-datatable value="@Model.DataTableCustomers" columns="@Model.DataTableCustomerColumns" interactive-size="true" title="Customer Records" />
             </div>
 
             <!-- Demo 3: Grid Lines -->

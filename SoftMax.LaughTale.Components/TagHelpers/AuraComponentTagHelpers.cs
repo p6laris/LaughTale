@@ -1514,6 +1514,7 @@ public class IslandMeterGroupTagHelper : TagHelper
 {
     public List<MeterValue> Values { get; set; } = new();
     public string? Title { get; set; }
+    public bool InteractiveSize { get; set; } = false;
     public bool ShowLabels { get; set; } = true;
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
@@ -1527,6 +1528,7 @@ public class IslandMeterGroupTagHelper : TagHelper
         {
             values = Values,
             title = Title,
+            interactiveSize = InteractiveSize,
             showLabels = ShowLabels
         };
 
@@ -1632,6 +1634,7 @@ public class IslandDrawerTagHelper : TagHelper
 {
     public string Position { get; set; } = "right";
     public string? Title { get; set; }
+    public bool InteractiveSize { get; set; } = false;
     public string? TriggerText { get; set; }
     public string Width { get; set; } = "380px";
 
@@ -1646,6 +1649,7 @@ public class IslandDrawerTagHelper : TagHelper
         {
             position = Position,
             title = Title,
+            interactiveSize = InteractiveSize,
             triggerText = TriggerText,
             width = Width
         };
@@ -2189,6 +2193,7 @@ public class IslandDynamicFormTagHelper : TagHelper
     public object? For { get; set; }
     public object? Schema { get; set; }
     public string? Title { get; set; }
+    public bool InteractiveSize { get; set; } = false;
     public string? SubmitUrl { get; set; }
     public string SubmitLabel { get; set; } = "Submit";
 
@@ -4044,6 +4049,7 @@ public class IslandDataTableTagHelper : TagHelper
     public string EmptyMessage { get; set; } = "No records found.";
     public string? TableStyle { get; set; }
     public string? Title { get; set; }
+    public bool InteractiveSize { get; set; } = false;
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
@@ -4084,7 +4090,8 @@ public class IslandDataTableTagHelper : TagHelper
             exportFilename = ExportFilename,
             emptyMessage = EmptyMessage,
             tableStyle = TableStyle,
-            title = Title
+            title = Title,
+            interactiveSize = InteractiveSize
         };
 
         output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
