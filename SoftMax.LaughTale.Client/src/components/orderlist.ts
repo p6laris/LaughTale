@@ -59,7 +59,7 @@ const ORDERLIST_CSS = `
     background: var(--p-surface-0, #ffffff);
     color: var(--p-surface-700, #334155);
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
     outline: none;
 }
 .p-orderlist-control-btn:hover:not(:disabled) {
@@ -599,18 +599,39 @@ export default function OrderListIsland<T = any>(container: HTMLElement, props: 
     }
 
     function reorder(direction: 'top' | 'up' | 'down' | 'bottom') {
-        if (selectedIds.size === 0 || itemsList.length < 2) return;
+        const rootEl = container.firstElementChild as HTMLElement;
+        const listUl = rootEl?.querySelector<HTMLUListElement>('.p-orderlist-list');
+        if (!listUl || selectedIds.size === 0 || itemsList.length < 2) return;
 
+        // Perform DOM node movement directly for silky smooth FLIP transition without innerHTML reconstruction
         if (direction === 'top') {
             const selected = itemsList.filter((it, idx) => selectedIds.has(getItemId(it, idx)));
             const remaining = itemsList.filter((it, idx) => !selectedIds.has(getItemId(it, idx)));
             itemsList.length = 0;
             itemsList.push(...selected, ...remaining);
+
+            // Re-order DOM children
+            const selectedElements: HTMLElement[] = [];
+            listUl.querySelectorAll<HTMLElement>('.p-orderlist-item').forEach(el => {
+                const id = el.getAttribute('data-id');
+                if (id && selectedIds.has(id)) selectedElements.push(el);
+            });
+            for (let i = selectedElements.length - 1; i >= 0; i--) {
+                listUl.insertBefore(selectedElements[i], listUl.firstElementChild);
+            }
         } else if (direction === 'bottom') {
             const selected = itemsList.filter((it, idx) => selectedIds.has(getItemId(it, idx)));
             const remaining = itemsList.filter((it, idx) => !selectedIds.has(getItemId(it, idx)));
             itemsList.length = 0;
             itemsList.push(...remaining, ...selected);
+
+            // Re-order DOM children
+            const selectedElements: HTMLElement[] = [];
+            listUl.querySelectorAll<HTMLElement>('.p-orderlist-item').forEach(el => {
+                const id = el.getAttribute('data-id');
+                if (id && selectedIds.has(id)) selectedElements.push(el);
+            });
+            selectedElements.forEach(el => listUl.appendChild(el));
         } else if (direction === 'up') {
             for (let i = 1; i < itemsList.length; i++) {
                 const curId = getItemId(itemsList[i], i);
@@ -619,6 +640,13 @@ export default function OrderListIsland<T = any>(container: HTMLElement, props: 
                     const temp = itemsList[i];
                     itemsList[i] = itemsList[i - 1];
                     itemsList[i - 1] = temp;
+
+                    // Move in DOM
+                    const curEl = listUl.querySelector<HTMLElement>(`.p-orderlist-item[data-id="${curId}"]`);
+                    const prevEl = listUl.querySelector<HTMLElement>(`.p-orderlist-item[data-id="${prevId}"]`);
+                    if (curEl && prevEl) {
+                        listUl.insertBefore(curEl, prevEl);
+                    }
                 }
             }
         } else if (direction === 'down') {
@@ -629,11 +657,24 @@ export default function OrderListIsland<T = any>(container: HTMLElement, props: 
                     const temp = itemsList[i];
                     itemsList[i] = itemsList[i + 1];
                     itemsList[i + 1] = temp;
+
+                    // Move in DOM
+                    const curEl = listUl.querySelector<HTMLElement>(`.p-orderlist-item[data-id="${curId}"]`);
+                    const nextEl = listUl.querySelector<HTMLElement>(`.p-orderlist-item[data-id="${nextId}"]`);
+                    if (curEl && nextEl) {
+                        listUl.insertBefore(nextEl, curEl);
+                    }
                 }
             }
         }
 
-        updateListStructure();
+        // Update index numbers in-place
+        listUl.querySelectorAll<HTMLElement>('.p-orderlist-item').forEach((el, idx) => {
+            const idxSpan = el.querySelector('.p-orderlist-index');
+            if (idxSpan) idxSpan.textContent = String(idx + 1);
+        });
+
+        updateButtons();
         syncValues('reorder');
     }
 

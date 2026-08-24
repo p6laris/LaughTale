@@ -1,6 +1,6 @@
 import {
   useAutoAnimate
-} from "./chunk-P6OQD35U.js";
+} from "./chunk-YSGXRJIU.js";
 import {
   LucideIcons
 } from "./chunk-XHF3KYSF.js";
@@ -774,4 +774,4 @@ function DataViewIsland(container, props) {
 export {
   DataViewIsland as default
 };
-//# sourceMappingURL=dataview-2HAWXOAK.js.map
+//# sourceMappingURL=dataview-7JZHVNBV.js.map

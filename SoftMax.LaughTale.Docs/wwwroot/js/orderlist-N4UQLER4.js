@@ -1,6 +1,6 @@
 import {
   useAutoAnimate
-} from "./chunk-P6OQD35U.js";
+} from "./chunk-YSGXRJIU.js";
 import {
   LucideIcons
 } from "./chunk-XHF3KYSF.js";
@@ -40,7 +40,7 @@ var ORDERLIST_CSS = `
     background: var(--p-surface-0, #ffffff);
     color: var(--p-surface-700, #334155);
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
     outline: none;
 }
 .p-orderlist-control-btn:hover:not(:disabled) {
@@ -387,10 +387,37 @@ function OrderListIsland(container, props) {
     const listEl = container.querySelector(".p-orderlist-list");
     if (listEl) useAutoAnimate(listEl, { duration: 180 });
     bindPermanentEvents();
-    updateList();
-    updateButtons();
+    updateListStructure();
   }
-  function updateList() {
+  function updateSelectionUI() {
+    const rootEl = container.firstElementChild;
+    if (!rootEl) return;
+    const statusEl = rootEl.querySelector(".p-orderlist-selection-status");
+    if (statusEl) {
+      statusEl.textContent = selectedIds.size > 0 ? `${selectedIds.size} items selected` : "No selected item";
+    }
+    const listUl = rootEl.querySelector(".p-orderlist-list");
+    if (listUl) {
+      listUl.querySelectorAll(".p-orderlist-item").forEach((el) => {
+        const id = el.getAttribute("data-id");
+        if (!id) return;
+        const isSelected = selectedIds.has(id);
+        el.classList.toggle("p-highlight", isSelected);
+        el.setAttribute("aria-selected", String(isSelected));
+        if (isCheckbox) {
+          const chk = el.querySelector(".p-checkbox-box");
+          if (chk) {
+            chk.className = `p-checkbox-box ${isSelected ? "p-checked" : ""}`;
+            chk.setAttribute("aria-checked", String(isSelected));
+            chk.innerHTML = isSelected ? LucideIcons.check : "";
+          }
+        }
+      });
+    }
+    updateButtons();
+    dispatchSelectionEvent();
+  }
+  function updateListStructure() {
     const rootEl = container.firstElementChild;
     if (!rootEl) return;
     const filteredItems = itemsList.filter((item, idx) => {
@@ -401,10 +428,6 @@ function OrderListIsland(container, props) {
     const resultsEl = rootEl.querySelector(".p-orderlist-results-status");
     if (resultsEl) {
       resultsEl.textContent = `${filteredItems.length} results are available`;
-    }
-    const statusEl = rootEl.querySelector(".p-orderlist-selection-status");
-    if (statusEl) {
-      statusEl.textContent = selectedIds.size > 0 ? `${selectedIds.size} items selected` : "No selected item";
     }
     const listUl = rootEl.querySelector(".p-orderlist-list");
     if (listUl) {
@@ -440,13 +463,12 @@ function OrderListIsland(container, props) {
                 selectedIds.add(id);
               }
             }
-            updateList();
-            updateButtons();
-            dispatchSelectionEvent();
+            updateSelectionUI();
           });
         });
       }
     }
+    updateSelectionUI();
   }
   function updateButtons() {
     const rootEl = container.firstElementChild;
@@ -468,8 +490,7 @@ function OrderListIsland(container, props) {
     if (filterInput) {
       filterInput.addEventListener("input", (e) => {
         filterQuery = e.target.value;
-        updateList();
-        updateButtons();
+        updateListStructure();
       });
     }
     rootEl.querySelector(".btn-order-top")?.addEventListener("click", () => {
@@ -495,9 +516,7 @@ function OrderListIsland(container, props) {
         } else if (e.key === "a" && (e.ctrlKey || e.metaKey)) {
           e.preventDefault();
           itemsList.forEach((it, idx) => selectedIds.add(getItemId(it, idx)));
-          updateList();
-          updateButtons();
-          dispatchSelectionEvent();
+          updateSelectionUI();
         }
       });
     }
@@ -510,22 +529,36 @@ function OrderListIsland(container, props) {
     const targetId = getItemId(itemsList[targetIdx], targetIdx);
     if (!isShift) selectedIds.clear();
     selectedIds.add(targetId);
-    updateList();
-    updateButtons();
-    dispatchSelectionEvent();
+    updateSelectionUI();
   }
   function reorder(direction) {
-    if (selectedIds.size === 0 || itemsList.length < 2) return;
+    const rootEl = container.firstElementChild;
+    const listUl = rootEl?.querySelector(".p-orderlist-list");
+    if (!listUl || selectedIds.size === 0 || itemsList.length < 2) return;
     if (direction === "top") {
       const selected = itemsList.filter((it, idx) => selectedIds.has(getItemId(it, idx)));
       const remaining = itemsList.filter((it, idx) => !selectedIds.has(getItemId(it, idx)));
       itemsList.length = 0;
       itemsList.push(...selected, ...remaining);
+      const selectedElements = [];
+      listUl.querySelectorAll(".p-orderlist-item").forEach((el) => {
+        const id = el.getAttribute("data-id");
+        if (id && selectedIds.has(id)) selectedElements.push(el);
+      });
+      for (let i = selectedElements.length - 1; i >= 0; i--) {
+        listUl.insertBefore(selectedElements[i], listUl.firstElementChild);
+      }
     } else if (direction === "bottom") {
       const selected = itemsList.filter((it, idx) => selectedIds.has(getItemId(it, idx)));
       const remaining = itemsList.filter((it, idx) => !selectedIds.has(getItemId(it, idx)));
       itemsList.length = 0;
       itemsList.push(...remaining, ...selected);
+      const selectedElements = [];
+      listUl.querySelectorAll(".p-orderlist-item").forEach((el) => {
+        const id = el.getAttribute("data-id");
+        if (id && selectedIds.has(id)) selectedElements.push(el);
+      });
+      selectedElements.forEach((el) => listUl.appendChild(el));
     } else if (direction === "up") {
       for (let i = 1; i < itemsList.length; i++) {
         const curId = getItemId(itemsList[i], i);
@@ -534,6 +567,11 @@ function OrderListIsland(container, props) {
           const temp = itemsList[i];
           itemsList[i] = itemsList[i - 1];
           itemsList[i - 1] = temp;
+          const curEl = listUl.querySelector(`.p-orderlist-item[data-id="${curId}"]`);
+          const prevEl = listUl.querySelector(`.p-orderlist-item[data-id="${prevId}"]`);
+          if (curEl && prevEl) {
+            listUl.insertBefore(curEl, prevEl);
+          }
         }
       }
     } else if (direction === "down") {
@@ -544,10 +582,18 @@ function OrderListIsland(container, props) {
           const temp = itemsList[i];
           itemsList[i] = itemsList[i + 1];
           itemsList[i + 1] = temp;
+          const curEl = listUl.querySelector(`.p-orderlist-item[data-id="${curId}"]`);
+          const nextEl = listUl.querySelector(`.p-orderlist-item[data-id="${nextId}"]`);
+          if (curEl && nextEl) {
+            listUl.insertBefore(nextEl, curEl);
+          }
         }
       }
     }
-    updateList();
+    listUl.querySelectorAll(".p-orderlist-item").forEach((el, idx) => {
+      const idxSpan = el.querySelector(".p-orderlist-index");
+      if (idxSpan) idxSpan.textContent = String(idx + 1);
+    });
     updateButtons();
     syncValues("reorder");
   }
@@ -581,4 +627,4 @@ function OrderListIsland(container, props) {
 export {
   OrderListIsland as default
 };
-//# sourceMappingURL=orderlist-AZHLYJZI.js.map
+//# sourceMappingURL=orderlist-N4UQLER4.js.map

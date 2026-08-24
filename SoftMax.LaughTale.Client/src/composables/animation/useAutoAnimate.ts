@@ -1,6 +1,7 @@
 /**
  * SoftMax.LaughTale: Composable useAutoAnimate (FLIP Engine)
  * Zero-config layout transitions when items in a list or grid are added, removed, or reordered.
+ * Keys elements by data-id / data-key to guarantee smooth FLIP physics without opacity blinking.
  */
 
 export interface AutoAnimateOptions {
@@ -13,29 +14,36 @@ export function useAutoAnimate(parent: HTMLElement | null, options: AutoAnimateO
         return { destroy: () => {} };
     }
 
-    const duration = options.duration ?? 250;
+    const duration = options.duration ?? 200;
     const easing = options.easing ?? 'cubic-bezier(0.2, 0, 0, 1)';
-    const prevRects = new Map<Element, DOMRect>();
+    const prevRects = new Map<string, DOMRect>();
+
+    function getKey(el: Element, idx: number): string {
+        return el.getAttribute('data-id') || el.getAttribute('data-key') || el.getAttribute('data-row-key') || el.id || `item-${idx}`;
+    }
 
     function recordRects() {
         prevRects.clear();
-        Array.from(parent!.children).forEach(child => {
-            prevRects.set(child, child.getBoundingClientRect());
+        if (!parent) return;
+        Array.from(parent.children).forEach((child, idx) => {
+            prevRects.set(getKey(child, idx), child.getBoundingClientRect());
         });
     }
 
     function animate() {
-        const currentChildren = Array.from(parent!.children);
+        if (!parent) return;
+        const currentChildren = Array.from(parent.children);
 
-        currentChildren.forEach(child => {
-            const first = prevRects.get(child);
+        currentChildren.forEach((child, idx) => {
+            const key = getKey(child, idx);
+            const first = prevRects.get(key);
             const last = child.getBoundingClientRect();
 
             if (first) {
                 const deltaX = first.left - last.left;
                 const deltaY = first.top - last.top;
 
-                if (deltaX !== 0 || deltaY !== 0) {
+                if (Math.abs(deltaX) > 0.5 || Math.abs(deltaY) > 0.5) {
                     child.animate([
                         { transform: `translate(${deltaX}px, ${deltaY}px)` },
                         { transform: 'none' }
@@ -45,12 +53,12 @@ export function useAutoAnimate(parent: HTMLElement | null, options: AutoAnimateO
                     });
                 }
             } else {
-                // New Element Enter Animation
+                // New item enter
                 child.animate([
-                    { opacity: 0, transform: 'scale(0.95)' },
+                    { opacity: 0.4, transform: 'scale(0.98)' },
                     { opacity: 1, transform: 'none' }
                 ], {
-                    duration,
+                    duration: 150,
                     easing
                 });
             }

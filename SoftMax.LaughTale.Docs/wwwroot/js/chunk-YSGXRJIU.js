@@ -4,24 +4,30 @@ function useAutoAnimate(parent, options = {}) {
     return { destroy: () => {
     } };
   }
-  const duration = options.duration ?? 250;
+  const duration = options.duration ?? 200;
   const easing = options.easing ?? "cubic-bezier(0.2, 0, 0, 1)";
   const prevRects = /* @__PURE__ */ new Map();
+  function getKey(el, idx) {
+    return el.getAttribute("data-id") || el.getAttribute("data-key") || el.getAttribute("data-row-key") || el.id || `item-${idx}`;
+  }
   function recordRects() {
     prevRects.clear();
-    Array.from(parent.children).forEach((child) => {
-      prevRects.set(child, child.getBoundingClientRect());
+    if (!parent) return;
+    Array.from(parent.children).forEach((child, idx) => {
+      prevRects.set(getKey(child, idx), child.getBoundingClientRect());
     });
   }
   function animate() {
+    if (!parent) return;
     const currentChildren = Array.from(parent.children);
-    currentChildren.forEach((child) => {
-      const first = prevRects.get(child);
+    currentChildren.forEach((child, idx) => {
+      const key = getKey(child, idx);
+      const first = prevRects.get(key);
       const last = child.getBoundingClientRect();
       if (first) {
         const deltaX = first.left - last.left;
         const deltaY = first.top - last.top;
-        if (deltaX !== 0 || deltaY !== 0) {
+        if (Math.abs(deltaX) > 0.5 || Math.abs(deltaY) > 0.5) {
           child.animate([
             { transform: `translate(${deltaX}px, ${deltaY}px)` },
             { transform: "none" }
@@ -32,10 +38,10 @@ function useAutoAnimate(parent, options = {}) {
         }
       } else {
         child.animate([
-          { opacity: 0, transform: "scale(0.95)" },
+          { opacity: 0.4, transform: "scale(0.98)" },
           { opacity: 1, transform: "none" }
         ], {
-          duration,
+          duration: 150,
           easing
         });
       }
@@ -58,4 +64,4 @@ function useAutoAnimate(parent, options = {}) {
 export {
   useAutoAnimate
 };
-//# sourceMappingURL=chunk-P6OQD35U.js.map
+//# sourceMappingURL=chunk-YSGXRJIU.js.map

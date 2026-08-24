@@ -2521,24 +2521,30 @@ var SoftMaxIslands = (() => {
       return { destroy: () => {
       } };
     }
-    const duration = options.duration ?? 250;
+    const duration = options.duration ?? 200;
     const easing = options.easing ?? "cubic-bezier(0.2, 0, 0, 1)";
     const prevRects = /* @__PURE__ */ new Map();
+    function getKey(el, idx) {
+      return el.getAttribute("data-id") || el.getAttribute("data-key") || el.getAttribute("data-row-key") || el.id || `item-${idx}`;
+    }
     function recordRects() {
       prevRects.clear();
-      Array.from(parent.children).forEach((child) => {
-        prevRects.set(child, child.getBoundingClientRect());
+      if (!parent) return;
+      Array.from(parent.children).forEach((child, idx) => {
+        prevRects.set(getKey(child, idx), child.getBoundingClientRect());
       });
     }
     function animate() {
+      if (!parent) return;
       const currentChildren = Array.from(parent.children);
-      currentChildren.forEach((child) => {
-        const first = prevRects.get(child);
+      currentChildren.forEach((child, idx) => {
+        const key = getKey(child, idx);
+        const first = prevRects.get(key);
         const last = child.getBoundingClientRect();
         if (first) {
           const deltaX = first.left - last.left;
           const deltaY = first.top - last.top;
-          if (deltaX !== 0 || deltaY !== 0) {
+          if (Math.abs(deltaX) > 0.5 || Math.abs(deltaY) > 0.5) {
             child.animate([
               { transform: `translate(${deltaX}px, ${deltaY}px)` },
               { transform: "none" }
@@ -2549,10 +2555,10 @@ var SoftMaxIslands = (() => {
           }
         } else {
           child.animate([
-            { opacity: 0, transform: "scale(0.95)" },
+            { opacity: 0.4, transform: "scale(0.98)" },
             { opacity: 1, transform: "none" }
           ], {
-            duration,
+            duration: 150,
             easing
           });
         }
@@ -16909,17 +16915,33 @@ public static class AppTheme
       updateSelectionUI();
     }
     function reorder(direction) {
-      if (selectedIds.size === 0 || itemsList.length < 2) return;
+      const rootEl = container.firstElementChild;
+      const listUl = rootEl?.querySelector(".p-orderlist-list");
+      if (!listUl || selectedIds.size === 0 || itemsList.length < 2) return;
       if (direction === "top") {
         const selected = itemsList.filter((it, idx) => selectedIds.has(getItemId(it, idx)));
         const remaining = itemsList.filter((it, idx) => !selectedIds.has(getItemId(it, idx)));
         itemsList.length = 0;
         itemsList.push(...selected, ...remaining);
+        const selectedElements = [];
+        listUl.querySelectorAll(".p-orderlist-item").forEach((el) => {
+          const id = el.getAttribute("data-id");
+          if (id && selectedIds.has(id)) selectedElements.push(el);
+        });
+        for (let i = selectedElements.length - 1; i >= 0; i--) {
+          listUl.insertBefore(selectedElements[i], listUl.firstElementChild);
+        }
       } else if (direction === "bottom") {
         const selected = itemsList.filter((it, idx) => selectedIds.has(getItemId(it, idx)));
         const remaining = itemsList.filter((it, idx) => !selectedIds.has(getItemId(it, idx)));
         itemsList.length = 0;
         itemsList.push(...remaining, ...selected);
+        const selectedElements = [];
+        listUl.querySelectorAll(".p-orderlist-item").forEach((el) => {
+          const id = el.getAttribute("data-id");
+          if (id && selectedIds.has(id)) selectedElements.push(el);
+        });
+        selectedElements.forEach((el) => listUl.appendChild(el));
       } else if (direction === "up") {
         for (let i = 1; i < itemsList.length; i++) {
           const curId = getItemId(itemsList[i], i);
@@ -16928,6 +16950,11 @@ public static class AppTheme
             const temp = itemsList[i];
             itemsList[i] = itemsList[i - 1];
             itemsList[i - 1] = temp;
+            const curEl = listUl.querySelector(`.p-orderlist-item[data-id="${curId}"]`);
+            const prevEl = listUl.querySelector(`.p-orderlist-item[data-id="${prevId}"]`);
+            if (curEl && prevEl) {
+              listUl.insertBefore(curEl, prevEl);
+            }
           }
         }
       } else if (direction === "down") {
@@ -16938,10 +16965,19 @@ public static class AppTheme
             const temp = itemsList[i];
             itemsList[i] = itemsList[i + 1];
             itemsList[i + 1] = temp;
+            const curEl = listUl.querySelector(`.p-orderlist-item[data-id="${curId}"]`);
+            const nextEl = listUl.querySelector(`.p-orderlist-item[data-id="${nextId}"]`);
+            if (curEl && nextEl) {
+              listUl.insertBefore(nextEl, curEl);
+            }
           }
         }
       }
-      updateListStructure();
+      listUl.querySelectorAll(".p-orderlist-item").forEach((el, idx) => {
+        const idxSpan = el.querySelector(".p-orderlist-index");
+        if (idxSpan) idxSpan.textContent = String(idx + 1);
+      });
+      updateButtons();
       syncValues("reorder");
     }
     function dispatchSelectionEvent() {
@@ -17009,7 +17045,7 @@ public static class AppTheme
     background: var(--p-surface-0, #ffffff);
     color: var(--p-surface-700, #334155);
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
     outline: none;
 }
 .p-orderlist-control-btn:hover:not(:disabled) {
