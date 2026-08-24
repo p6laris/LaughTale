@@ -16014,6 +16014,80 @@ public static class AppTheme
       updateTargetList();
       updateTransferButtons();
     }
+    function updateSourceSelectionUI() {
+      const rootEl = container.firstElementChild;
+      if (!rootEl) return;
+      const filteredSource = sourceList.filter((item) => {
+        if (!isFilter || !sourceFilterQuery.trim()) return true;
+        const val = String(item[filterBy] || item.name || "").toLowerCase();
+        return val.includes(sourceFilterQuery.toLowerCase());
+      });
+      const sourceSelectAll = rootEl.querySelector(".p-source-select-all");
+      if (sourceSelectAll) {
+        const isAll = filteredSource.length > 0 && filteredSource.every((it) => selectedSource.has(getItemId(it)));
+        const isIndet = filteredSource.some((it) => selectedSource.has(getItemId(it))) && !isAll;
+        sourceSelectAll.className = `p-checkbox-box p-source-select-all ${isAll ? "p-checked" : isIndet ? "p-indeterminate" : ""}`;
+        sourceSelectAll.setAttribute("aria-checked", String(isAll));
+        sourceSelectAll.innerHTML = isAll ? LucideIcons.check : isIndet ? '<span style="width: 8px; height: 2px; background: white;"></span>' : "";
+      }
+      const srcUl = rootEl.querySelector(".picklist-source-list");
+      if (srcUl) {
+        srcUl.querySelectorAll(".source-item").forEach((el) => {
+          const id = el.getAttribute("data-id");
+          if (!id) return;
+          const isSelected = selectedSource.has(id);
+          el.classList.toggle("p-highlight", isSelected);
+          el.setAttribute("aria-selected", String(isSelected));
+          if (isCheckbox) {
+            const chk = el.querySelector(".p-checkbox-box");
+            if (chk) {
+              chk.className = `p-checkbox-box ${isSelected ? "p-checked" : ""}`;
+              chk.setAttribute("aria-checked", String(isSelected));
+              chk.innerHTML = isSelected ? LucideIcons.check : "";
+            }
+          }
+        });
+      }
+      updateTransferButtons();
+      dispatchSelectionEvent();
+    }
+    function updateTargetSelectionUI() {
+      const rootEl = container.firstElementChild;
+      if (!rootEl) return;
+      const filteredTarget = targetList.filter((item) => {
+        if (!isFilter || !targetFilterQuery.trim()) return true;
+        const val = String(item[filterBy] || item.name || "").toLowerCase();
+        return val.includes(targetFilterQuery.toLowerCase());
+      });
+      const targetSelectAll = rootEl.querySelector(".p-target-select-all");
+      if (targetSelectAll) {
+        const isAll = filteredTarget.length > 0 && filteredTarget.every((it) => selectedTarget.has(getItemId(it)));
+        const isIndet = filteredTarget.some((it) => selectedTarget.has(getItemId(it))) && !isAll;
+        targetSelectAll.className = `p-checkbox-box p-target-select-all ${isAll ? "p-checked" : isIndet ? "p-indeterminate" : ""}`;
+        targetSelectAll.setAttribute("aria-checked", String(isAll));
+        targetSelectAll.innerHTML = isAll ? LucideIcons.check : isIndet ? '<span style="width: 8px; height: 2px; background: white;"></span>' : "";
+      }
+      const tgtUl = rootEl.querySelector(".picklist-target-list");
+      if (tgtUl) {
+        tgtUl.querySelectorAll(".target-item").forEach((el) => {
+          const id = el.getAttribute("data-id");
+          if (!id) return;
+          const isSelected = selectedTarget.has(id);
+          el.classList.toggle("p-highlight", isSelected);
+          el.setAttribute("aria-selected", String(isSelected));
+          if (isCheckbox) {
+            const chk = el.querySelector(".p-checkbox-box");
+            if (chk) {
+              chk.className = `p-checkbox-box ${isSelected ? "p-checked" : ""}`;
+              chk.setAttribute("aria-checked", String(isSelected));
+              chk.innerHTML = isSelected ? LucideIcons.check : "";
+            }
+          }
+        });
+      }
+      updateTransferButtons();
+      dispatchSelectionEvent();
+    }
     function updateSourceList() {
       const rootEl = container.firstElementChild;
       if (!rootEl) return;
@@ -16024,14 +16098,6 @@ public static class AppTheme
       });
       const countEl = rootEl.querySelector(".p-source-count");
       if (countEl) countEl.textContent = `${filteredSource.length} items`;
-      const sourceSelectAll = rootEl.querySelector(".p-source-select-all");
-      if (sourceSelectAll) {
-        const isAll = filteredSource.length > 0 && filteredSource.every((it) => selectedSource.has(getItemId(it)));
-        const isIndet = filteredSource.some((it) => selectedSource.has(getItemId(it))) && !isAll;
-        sourceSelectAll.className = `p-checkbox-box p-source-select-all ${isAll ? "p-checked" : isIndet ? "p-indeterminate" : ""}`;
-        sourceSelectAll.setAttribute("aria-checked", String(isAll));
-        sourceSelectAll.innerHTML = isAll ? LucideIcons.check : isIndet ? '<span style="width: 8px; height: 2px; background: white;"></span>' : "";
-      }
       const srcUl = rootEl.querySelector(".picklist-source-list");
       if (srcUl) {
         if (filteredSource.length === 0) {
@@ -16065,13 +16131,12 @@ public static class AppTheme
                   selectedSource.add(id);
                 }
               }
-              updateSourceList();
-              updateTransferButtons();
-              dispatchSelectionEvent();
+              updateSourceSelectionUI();
             });
           });
         }
       }
+      updateSourceSelectionUI();
     }
     function updateTargetList() {
       const rootEl = container.firstElementChild;
@@ -16083,14 +16148,6 @@ public static class AppTheme
       });
       const countEl = rootEl.querySelector(".p-target-count");
       if (countEl) countEl.textContent = `${filteredTarget.length} items`;
-      const targetSelectAll = rootEl.querySelector(".p-target-select-all");
-      if (targetSelectAll) {
-        const isAll = filteredTarget.length > 0 && filteredTarget.every((it) => selectedTarget.has(getItemId(it)));
-        const isIndet = filteredTarget.some((it) => selectedTarget.has(getItemId(it))) && !isAll;
-        targetSelectAll.className = `p-checkbox-box p-target-select-all ${isAll ? "p-checked" : isIndet ? "p-indeterminate" : ""}`;
-        targetSelectAll.setAttribute("aria-checked", String(isAll));
-        targetSelectAll.innerHTML = isAll ? LucideIcons.check : isIndet ? '<span style="width: 8px; height: 2px; background: white;"></span>' : "";
-      }
       const tgtUl = rootEl.querySelector(".picklist-target-list");
       if (tgtUl) {
         if (filteredTarget.length === 0) {
@@ -16124,13 +16181,12 @@ public static class AppTheme
                   selectedTarget.add(id);
                 }
               }
-              updateTargetList();
-              updateTransferButtons();
-              dispatchSelectionEvent();
+              updateTargetSelectionUI();
             });
           });
         }
       }
+      updateTargetSelectionUI();
     }
     function updateTransferButtons() {
       const rootEl = container.firstElementChild;
@@ -16152,7 +16208,6 @@ public static class AppTheme
         srcFilterInput.addEventListener("input", (e) => {
           sourceFilterQuery = e.target.value;
           updateSourceList();
-          updateTransferButtons();
         });
       }
       const tgtFilterInput = rootEl.querySelector(".p-target-filter");
@@ -16160,7 +16215,6 @@ public static class AppTheme
         tgtFilterInput.addEventListener("input", (e) => {
           targetFilterQuery = e.target.value;
           updateTargetList();
-          updateTransferButtons();
         });
       }
       const sourceSelectAll = rootEl.querySelector(".p-source-select-all");
@@ -16172,9 +16226,7 @@ public static class AppTheme
           } else {
             sourceList.forEach((it) => selectedSource.add(getItemId(it)));
           }
-          updateSourceList();
-          updateTransferButtons();
-          dispatchSelectionEvent();
+          updateSourceSelectionUI();
         });
       }
       const targetSelectAll = rootEl.querySelector(".p-target-select-all");
@@ -16186,9 +16238,7 @@ public static class AppTheme
           } else {
             targetList.forEach((it) => selectedTarget.add(getItemId(it)));
           }
-          updateTargetList();
-          updateTransferButtons();
-          dispatchSelectionEvent();
+          updateTargetSelectionUI();
         });
       }
       rootEl.querySelector(".btn-move-to-target")?.addEventListener("click", () => {
@@ -16199,7 +16249,6 @@ public static class AppTheme
         selectedSource.clear();
         updateSourceList();
         updateTargetList();
-        updateTransferButtons();
         syncValues("move-to-target", moving);
       });
       rootEl.querySelector(".btn-move-all-to-target")?.addEventListener("click", () => {
@@ -16210,7 +16259,6 @@ public static class AppTheme
         selectedSource.clear();
         updateSourceList();
         updateTargetList();
-        updateTransferButtons();
         syncValues("move-all-to-target", moving);
       });
       rootEl.querySelector(".btn-move-to-source")?.addEventListener("click", () => {
@@ -16221,7 +16269,6 @@ public static class AppTheme
         selectedTarget.clear();
         updateSourceList();
         updateTargetList();
-        updateTransferButtons();
         syncValues("move-to-source", moving);
       });
       rootEl.querySelector(".btn-move-all-to-source")?.addEventListener("click", () => {
@@ -16232,7 +16279,6 @@ public static class AppTheme
         selectedTarget.clear();
         updateSourceList();
         updateTargetList();
-        updateTransferButtons();
         syncValues("move-all-to-source", moving);
       });
       rootEl.querySelector(".btn-source-top")?.addEventListener("click", () => {
@@ -16291,7 +16337,6 @@ public static class AppTheme
       }
       if (whichList === "source") updateSourceList();
       else updateTargetList();
-      updateTransferButtons();
       syncValues("reorder");
     }
     function dispatchSelectionEvent() {
@@ -16719,10 +16764,37 @@ public static class AppTheme
       const listEl = container.querySelector(".p-orderlist-list");
       if (listEl) useAutoAnimate(listEl, { duration: 180 });
       bindPermanentEvents();
-      updateList();
-      updateButtons();
+      updateListStructure();
     }
-    function updateList() {
+    function updateSelectionUI() {
+      const rootEl = container.firstElementChild;
+      if (!rootEl) return;
+      const statusEl = rootEl.querySelector(".p-orderlist-selection-status");
+      if (statusEl) {
+        statusEl.textContent = selectedIds.size > 0 ? `${selectedIds.size} items selected` : "No selected item";
+      }
+      const listUl = rootEl.querySelector(".p-orderlist-list");
+      if (listUl) {
+        listUl.querySelectorAll(".p-orderlist-item").forEach((el) => {
+          const id = el.getAttribute("data-id");
+          if (!id) return;
+          const isSelected = selectedIds.has(id);
+          el.classList.toggle("p-highlight", isSelected);
+          el.setAttribute("aria-selected", String(isSelected));
+          if (isCheckbox) {
+            const chk = el.querySelector(".p-checkbox-box");
+            if (chk) {
+              chk.className = `p-checkbox-box ${isSelected ? "p-checked" : ""}`;
+              chk.setAttribute("aria-checked", String(isSelected));
+              chk.innerHTML = isSelected ? LucideIcons.check : "";
+            }
+          }
+        });
+      }
+      updateButtons();
+      dispatchSelectionEvent();
+    }
+    function updateListStructure() {
       const rootEl = container.firstElementChild;
       if (!rootEl) return;
       const filteredItems = itemsList.filter((item, idx) => {
@@ -16733,10 +16805,6 @@ public static class AppTheme
       const resultsEl = rootEl.querySelector(".p-orderlist-results-status");
       if (resultsEl) {
         resultsEl.textContent = `${filteredItems.length} results are available`;
-      }
-      const statusEl = rootEl.querySelector(".p-orderlist-selection-status");
-      if (statusEl) {
-        statusEl.textContent = selectedIds.size > 0 ? `${selectedIds.size} items selected` : "No selected item";
       }
       const listUl = rootEl.querySelector(".p-orderlist-list");
       if (listUl) {
@@ -16772,13 +16840,12 @@ public static class AppTheme
                   selectedIds.add(id);
                 }
               }
-              updateList();
-              updateButtons();
-              dispatchSelectionEvent();
+              updateSelectionUI();
             });
           });
         }
       }
+      updateSelectionUI();
     }
     function updateButtons() {
       const rootEl = container.firstElementChild;
@@ -16800,8 +16867,7 @@ public static class AppTheme
       if (filterInput) {
         filterInput.addEventListener("input", (e) => {
           filterQuery = e.target.value;
-          updateList();
-          updateButtons();
+          updateListStructure();
         });
       }
       rootEl.querySelector(".btn-order-top")?.addEventListener("click", () => {
@@ -16827,9 +16893,7 @@ public static class AppTheme
           } else if (e.key === "a" && (e.ctrlKey || e.metaKey)) {
             e.preventDefault();
             itemsList.forEach((it, idx) => selectedIds.add(getItemId(it, idx)));
-            updateList();
-            updateButtons();
-            dispatchSelectionEvent();
+            updateSelectionUI();
           }
         });
       }
@@ -16842,9 +16906,7 @@ public static class AppTheme
       const targetId = getItemId(itemsList[targetIdx], targetIdx);
       if (!isShift) selectedIds.clear();
       selectedIds.add(targetId);
-      updateList();
-      updateButtons();
-      dispatchSelectionEvent();
+      updateSelectionUI();
     }
     function reorder(direction) {
       if (selectedIds.size === 0 || itemsList.length < 2) return;
@@ -16879,8 +16941,7 @@ public static class AppTheme
           }
         }
       }
-      updateList();
-      updateButtons();
+      updateListStructure();
       syncValues("reorder");
     }
     function dispatchSelectionEvent() {

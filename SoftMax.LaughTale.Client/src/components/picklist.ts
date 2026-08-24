@@ -501,6 +501,96 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
         updateTransferButtons();
     }
 
+    function updateSourceSelectionUI() {
+        const rootEl = container.firstElementChild as HTMLElement;
+        if (!rootEl) return;
+
+        const filteredSource = sourceList.filter(item => {
+            if (!isFilter || !sourceFilterQuery.trim()) return true;
+            const val = String((item as any)[filterBy] || item.name || '').toLowerCase();
+            return val.includes(sourceFilterQuery.toLowerCase());
+        });
+
+        // Update Select All Checkbox
+        const sourceSelectAll = rootEl.querySelector<HTMLElement>('.p-source-select-all');
+        if (sourceSelectAll) {
+            const isAll = filteredSource.length > 0 && filteredSource.every(it => selectedSource.has(getItemId(it)));
+            const isIndet = filteredSource.some(it => selectedSource.has(getItemId(it))) && !isAll;
+            sourceSelectAll.className = `p-checkbox-box p-source-select-all ${isAll ? 'p-checked' : (isIndet ? 'p-indeterminate' : '')}`;
+            sourceSelectAll.setAttribute('aria-checked', String(isAll));
+            sourceSelectAll.innerHTML = isAll ? LucideIcons.check : (isIndet ? '<span style="width: 8px; height: 2px; background: white;"></span>' : '');
+        }
+
+        // Update DOM elements in-place without rebuilding innerHTML
+        const srcUl = rootEl.querySelector<HTMLUListElement>('.picklist-source-list');
+        if (srcUl) {
+            srcUl.querySelectorAll<HTMLElement>('.source-item').forEach(el => {
+                const id = el.getAttribute('data-id');
+                if (!id) return;
+                const isSelected = selectedSource.has(id);
+                el.classList.toggle('p-highlight', isSelected);
+                el.setAttribute('aria-selected', String(isSelected));
+
+                if (isCheckbox) {
+                    const chk = el.querySelector('.p-checkbox-box');
+                    if (chk) {
+                        chk.className = `p-checkbox-box ${isSelected ? 'p-checked' : ''}`;
+                        chk.setAttribute('aria-checked', String(isSelected));
+                        chk.innerHTML = isSelected ? LucideIcons.check : '';
+                    }
+                }
+            });
+        }
+
+        updateTransferButtons();
+        dispatchSelectionEvent();
+    }
+
+    function updateTargetSelectionUI() {
+        const rootEl = container.firstElementChild as HTMLElement;
+        if (!rootEl) return;
+
+        const filteredTarget = targetList.filter(item => {
+            if (!isFilter || !targetFilterQuery.trim()) return true;
+            const val = String((item as any)[filterBy] || item.name || '').toLowerCase();
+            return val.includes(targetFilterQuery.toLowerCase());
+        });
+
+        // Update Select All Checkbox
+        const targetSelectAll = rootEl.querySelector<HTMLElement>('.p-target-select-all');
+        if (targetSelectAll) {
+            const isAll = filteredTarget.length > 0 && filteredTarget.every(it => selectedTarget.has(getItemId(it)));
+            const isIndet = filteredTarget.some(it => selectedTarget.has(getItemId(it))) && !isAll;
+            targetSelectAll.className = `p-checkbox-box p-target-select-all ${isAll ? 'p-checked' : (isIndet ? 'p-indeterminate' : '')}`;
+            targetSelectAll.setAttribute('aria-checked', String(isAll));
+            targetSelectAll.innerHTML = isAll ? LucideIcons.check : (isIndet ? '<span style="width: 8px; height: 2px; background: white;"></span>' : '');
+        }
+
+        // Update DOM elements in-place without rebuilding innerHTML
+        const tgtUl = rootEl.querySelector<HTMLUListElement>('.picklist-target-list');
+        if (tgtUl) {
+            tgtUl.querySelectorAll<HTMLElement>('.target-item').forEach(el => {
+                const id = el.getAttribute('data-id');
+                if (!id) return;
+                const isSelected = selectedTarget.has(id);
+                el.classList.toggle('p-highlight', isSelected);
+                el.setAttribute('aria-selected', String(isSelected));
+
+                if (isCheckbox) {
+                    const chk = el.querySelector('.p-checkbox-box');
+                    if (chk) {
+                        chk.className = `p-checkbox-box ${isSelected ? 'p-checked' : ''}`;
+                        chk.setAttribute('aria-checked', String(isSelected));
+                        chk.innerHTML = isSelected ? LucideIcons.check : '';
+                    }
+                }
+            });
+        }
+
+        updateTransferButtons();
+        dispatchSelectionEvent();
+    }
+
     function updateSourceList() {
         const rootEl = container.firstElementChild as HTMLElement;
         if (!rootEl) return;
@@ -514,16 +604,6 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
         // Update Count
         const countEl = rootEl.querySelector('.p-source-count');
         if (countEl) countEl.textContent = `${filteredSource.length} items`;
-
-        // Update Select All Checkbox
-        const sourceSelectAll = rootEl.querySelector<HTMLElement>('.p-source-select-all');
-        if (sourceSelectAll) {
-            const isAll = filteredSource.length > 0 && filteredSource.every(it => selectedSource.has(getItemId(it)));
-            const isIndet = filteredSource.some(it => selectedSource.has(getItemId(it))) && !isAll;
-            sourceSelectAll.className = `p-checkbox-box p-source-select-all ${isAll ? 'p-checked' : (isIndet ? 'p-indeterminate' : '')}`;
-            sourceSelectAll.setAttribute('aria-checked', String(isAll));
-            sourceSelectAll.innerHTML = isAll ? LucideIcons.check : (isIndet ? '<span style="width: 8px; height: 2px; background: white;"></span>' : '');
-        }
 
         // Render List Items
         const srcUl = rootEl.querySelector<HTMLUListElement>('.picklist-source-list');
@@ -562,13 +642,13 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
                                 selectedSource.add(id);
                             }
                         }
-                        updateSourceList();
-                        updateTransferButtons();
-                        dispatchSelectionEvent();
+                        updateSourceSelectionUI();
                     });
                 });
             }
         }
+
+        updateSourceSelectionUI();
     }
 
     function updateTargetList() {
@@ -584,16 +664,6 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
         // Update Count
         const countEl = rootEl.querySelector('.p-target-count');
         if (countEl) countEl.textContent = `${filteredTarget.length} items`;
-
-        // Update Select All Checkbox
-        const targetSelectAll = rootEl.querySelector<HTMLElement>('.p-target-select-all');
-        if (targetSelectAll) {
-            const isAll = filteredTarget.length > 0 && filteredTarget.every(it => selectedTarget.has(getItemId(it)));
-            const isIndet = filteredTarget.some(it => selectedTarget.has(getItemId(it))) && !isAll;
-            targetSelectAll.className = `p-checkbox-box p-target-select-all ${isAll ? 'p-checked' : (isIndet ? 'p-indeterminate' : '')}`;
-            targetSelectAll.setAttribute('aria-checked', String(isAll));
-            targetSelectAll.innerHTML = isAll ? LucideIcons.check : (isIndet ? '<span style="width: 8px; height: 2px; background: white;"></span>' : '');
-        }
 
         // Render List Items
         const tgtUl = rootEl.querySelector<HTMLUListElement>('.picklist-target-list');
@@ -632,13 +702,13 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
                                 selectedTarget.add(id);
                             }
                         }
-                        updateTargetList();
-                        updateTransferButtons();
-                        dispatchSelectionEvent();
+                        updateTargetSelectionUI();
                     });
                 });
             }
         }
+
+        updateTargetSelectionUI();
     }
 
     function updateTransferButtons() {
@@ -668,7 +738,6 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
             srcFilterInput.addEventListener('input', (e) => {
                 sourceFilterQuery = (e.target as HTMLInputElement).value;
                 updateSourceList();
-                updateTransferButtons();
             });
         }
 
@@ -678,7 +747,6 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
             tgtFilterInput.addEventListener('input', (e) => {
                 targetFilterQuery = (e.target as HTMLInputElement).value;
                 updateTargetList();
-                updateTransferButtons();
             });
         }
 
@@ -692,9 +760,7 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
                 } else {
                     sourceList.forEach(it => selectedSource.add(getItemId(it)));
                 }
-                updateSourceList();
-                updateTransferButtons();
-                dispatchSelectionEvent();
+                updateSourceSelectionUI();
             });
         }
 
@@ -708,9 +774,7 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
                 } else {
                     targetList.forEach(it => selectedTarget.add(getItemId(it)));
                 }
-                updateTargetList();
-                updateTransferButtons();
-                dispatchSelectionEvent();
+                updateTargetSelectionUI();
             });
         }
 
@@ -723,7 +787,6 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
             selectedSource.clear();
             updateSourceList();
             updateTargetList();
-            updateTransferButtons();
             syncValues('move-to-target', moving);
         });
 
@@ -736,7 +799,6 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
             selectedSource.clear();
             updateSourceList();
             updateTargetList();
-            updateTransferButtons();
             syncValues('move-all-to-target', moving);
         });
 
@@ -749,7 +811,6 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
             selectedTarget.clear();
             updateSourceList();
             updateTargetList();
-            updateTransferButtons();
             syncValues('move-to-source', moving);
         });
 
@@ -762,7 +823,6 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
             selectedTarget.clear();
             updateSourceList();
             updateTargetList();
-            updateTransferButtons();
             syncValues('move-all-to-source', moving);
         });
 
@@ -829,7 +889,6 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
         if (whichList === 'source') updateSourceList();
         else updateTargetList();
 
-        updateTransferButtons();
         syncValues('reorder');
     }
 

@@ -1,0 +1,600 @@
+import {
+  useAutoAnimate
+} from "./chunk-P6OQD35U.js";
+import {
+  LucideIcons
+} from "./chunk-XHF3KYSF.js";
+import {
+  injectIslandStyle
+} from "./chunk-3TFPN5JM.js";
+
+// ../SoftMax.LaughTale.Client/src/components/orderlist.ts
+var ORDERLIST_CSS = `
+.p-orderlist {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.25rem;
+    width: 100%;
+    font-family: var(--p-font-family, inherit);
+    color: var(--p-surface-800, #1e293b);
+}
+
+.p-orderlist-controls {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 0.5rem;
+    flex-shrink: 0;
+    padding-top: 0.5rem;
+}
+
+.p-orderlist-control-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    border-radius: var(--p-border-radius, 6px);
+    border: 1px solid var(--p-surface-300, #cbd5e1);
+    background: var(--p-surface-0, #ffffff);
+    color: var(--p-surface-700, #334155);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    outline: none;
+}
+.p-orderlist-control-btn:hover:not(:disabled) {
+    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-surface-900, #0f172a);
+    border-color: var(--p-surface-400, #94a3b8);
+}
+.p-orderlist-control-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.p-orderlist-list-container {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--p-surface-200, #e2e8f0);
+    border-radius: var(--p-border-radius-lg, 8px);
+    background: var(--p-surface-0, #ffffff);
+    overflow: hidden;
+    min-width: 0;
+    box-shadow: var(--p-shadow-xs, 0 1px 2px 0 rgba(0, 0, 0, 0.05));
+}
+
+.p-orderlist-header {
+    padding: 0.75rem 1rem;
+    background: var(--p-surface-50, #f8fafc);
+    border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--p-surface-800, #1e293b);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.p-orderlist-filter-container {
+    padding: 0.5rem 0.75rem;
+    background: var(--p-surface-50, #f8fafc);
+    border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.p-orderlist-filter-input {
+    width: 100%;
+    padding: 0.4rem 2rem 0.4rem 0.65rem;
+    font-size: 0.8125rem;
+    border: 1px solid var(--p-surface-300, #cbd5e1);
+    border-radius: var(--p-border-radius, 6px);
+    background: var(--p-surface-0, #ffffff);
+    color: inherit;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.p-orderlist-filter-input:focus {
+    border-color: var(--p-primary-500, #10b981);
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+}
+.p-orderlist-filter-icon {
+    position: absolute;
+    right: 1.25rem;
+    color: var(--p-surface-400, #94a3b8);
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+}
+
+.p-orderlist-list {
+    list-style: none;
+    margin: 0;
+    padding: 0.25rem 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.p-orderlist-item {
+    padding: 0.625rem 1rem;
+    margin: 0.125rem 0.25rem;
+    border-radius: var(--p-border-radius-xs, 5px);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.875rem;
+    color: var(--p-surface-700, #334155);
+    user-select: none;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+.p-orderlist-item:hover:not(.p-highlight) {
+    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-surface-900, #0f172a);
+}
+.p-orderlist-item.p-highlight {
+    background: rgba(16, 185, 129, 0.1) !important;
+    color: var(--p-primary-700, #047857) !important;
+    font-weight: 600;
+}
+
+/* Checkbox */
+.p-checkbox-box {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.125rem;
+    height: 1.125rem;
+    border-radius: var(--p-border-radius-xs, 4px);
+    border: 2px solid var(--p-surface-300, #cbd5e1);
+    background: var(--p-surface-0, #ffffff);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+}
+.p-checkbox-box.p-checked {
+    background: var(--p-primary-500, #10b981);
+    border-color: var(--p-primary-500, #10b981);
+    color: #ffffff;
+}
+
+/* Product Item Content */
+.p-orderlist-product-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+}
+.p-orderlist-product-img {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 6px;
+    background: var(--p-surface-100, #f1f5f9);
+    border: 1px solid var(--p-surface-200, #e2e8f0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--p-primary-600, #059669);
+    flex-shrink: 0;
+}
+.p-orderlist-product-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+}
+.p-orderlist-product-name {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--p-surface-900, #0f172a);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.p-orderlist-product-category {
+    font-size: 0.75rem;
+    color: var(--p-surface-500, #64748b);
+}
+.p-orderlist-product-price {
+    font-weight: 700;
+    font-size: 0.875rem;
+    color: var(--p-surface-900, #0f172a);
+}
+
+/* Numbered Digits */
+.p-orderlist-index {
+    font-variant-numeric: tabular-nums;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--p-surface-400, #94a3b8);
+    width: 1.5rem;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+/* Footer / Status Bar */
+.p-orderlist-footer {
+    padding: 0.5rem 1rem;
+    background: var(--p-surface-50, #f8fafc);
+    border-top: 1px solid var(--p-surface-200, #e2e8f0);
+    font-size: 0.75rem;
+    color: var(--p-surface-500, #64748b);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Empty State */
+.p-orderlist-empty {
+    padding: 2.5rem 1rem;
+    text-align: center;
+    color: var(--p-surface-400, #94a3b8);
+    font-size: 0.8125rem;
+    font-style: italic;
+}
+
+/* Dark Mode Tokens */
+.dark .p-orderlist,
+[data-theme="dark"] .p-orderlist {
+    color: var(--p-surface-100, #f1f5f9) !important;
+}
+.dark .p-orderlist-list-container,
+[data-theme="dark"] .p-orderlist-list-container {
+    background: var(--p-surface-900, #0f172a) !important;
+    border-color: var(--p-surface-700, #334155) !important;
+}
+.dark .p-orderlist-header,
+.dark .p-orderlist-filter-container,
+.dark .p-orderlist-footer,
+[data-theme="dark"] .p-orderlist-header,
+[data-theme="dark"] .p-orderlist-filter-container,
+[data-theme="dark"] .p-orderlist-footer {
+    background: var(--p-surface-800, #1e293b) !important;
+    border-color: var(--p-surface-700, #334155) !important;
+    color: var(--p-surface-100, #f1f5f9) !important;
+}
+.dark .p-orderlist-filter-input,
+[data-theme="dark"] .p-orderlist-filter-input {
+    background: var(--p-surface-900, #0f172a) !important;
+    border-color: var(--p-surface-600, #475569) !important;
+    color: #ffffff !important;
+}
+.dark .p-orderlist-control-btn,
+[data-theme="dark"] .p-orderlist-control-btn {
+    background: var(--p-surface-800, #1e293b) !important;
+    border-color: var(--p-surface-600, #475569) !important;
+    color: var(--p-surface-200, #e2e8f0) !important;
+}
+.dark .p-orderlist-control-btn:hover:not(:disabled),
+[data-theme="dark"] .p-orderlist-control-btn:hover:not(:disabled) {
+    background: var(--p-surface-700, #334155) !important;
+    color: #ffffff !important;
+}
+.dark .p-orderlist-item:hover:not(.p-highlight),
+[data-theme="dark"] .p-orderlist-item:hover:not(.p-highlight) {
+    background: var(--p-surface-800, #1e293b) !important;
+    color: #ffffff !important;
+}
+.dark .p-orderlist-product-name,
+.dark .p-orderlist-product-price,
+[data-theme="dark"] .p-orderlist-product-name,
+[data-theme="dark"] .p-orderlist-product-price {
+    color: var(--p-surface-100, #f1f5f9) !important;
+}
+.dark .p-orderlist-product-img,
+[data-theme="dark"] .p-orderlist-product-img {
+    background: var(--p-surface-800, #1e293b) !important;
+    border-color: var(--p-surface-700, #334155) !important;
+}
+`;
+function OrderListIsland(container, props) {
+  injectIslandStyle("orderlist", ORDERLIST_CSS);
+  const initialItems = props.value ? [...props.value] : props.items ? [...props.items] : [];
+  let itemsList = [...initialItems];
+  const dataKey = props.dataKey || "id";
+  const isCheckbox = !!props.checkbox;
+  const isFilter = !!props.filter;
+  const filterBy = props.filterBy || props.filterFields && props.filterFields[0] || "name";
+  const filterPlaceholder = props.filterPlaceholder || "Filter by name";
+  const scrollHeight = props.scrollHeight || "20rem";
+  const emptyMessage = props.emptyMessage || "No available options";
+  let selectedIds = /* @__PURE__ */ new Set();
+  let filterQuery = "";
+  function getItemId(item, fallbackIndex) {
+    const keyVal = item[dataKey] || item.id || item.title || item.name;
+    return keyVal != null ? String(keyVal) : String(fallbackIndex);
+  }
+  function getItemTitle(item) {
+    return item.title || item.name || "";
+  }
+  function renderCellContent(item, index, isSelected) {
+    const checkboxHtml = isCheckbox ? `
+            <div class="p-checkbox-box ${isSelected ? "p-checked" : ""}" role="checkbox" aria-checked="${isSelected}">
+                ${isSelected ? LucideIcons.check : ""}
+            </div>
+        ` : "";
+    if (item.price != null || item.category != null || item.image != null) {
+      return `
+                ${checkboxHtml}
+                <div class="p-orderlist-product-item">
+                    <div class="p-orderlist-product-img">
+                        ${LucideIcons.package}
+                    </div>
+                    <div class="p-orderlist-product-details">
+                        <span class="p-orderlist-product-name">${getItemTitle(item)}</span>
+                        <span class="p-orderlist-product-category">${item.category || ""}</span>
+                    </div>
+                    ${item.price != null ? `<span class="p-orderlist-product-price">$${item.price}</span>` : ""}
+                </div>
+            `;
+    }
+    return `
+            ${checkboxHtml}
+            <span class="p-orderlist-index">${index + 1}</span>
+            <span style="flex: 1; font-weight: ${isSelected ? "600" : "normal"}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                ${getItemTitle(item)}
+            </span>
+        `;
+  }
+  function buildShell() {
+    const headerHtml = props.header ? `
+            <div class="p-orderlist-header">
+                <span>${props.header}</span>
+            </div>
+        ` : "";
+    const filterHtml = isFilter ? `
+            <div class="p-orderlist-filter-container">
+                <input type="text" class="p-orderlist-filter-input" placeholder="${filterPlaceholder}" />
+                <span class="p-orderlist-filter-icon">${LucideIcons.search}</span>
+            </div>
+        ` : "";
+    container.innerHTML = `
+            <div class="p-orderlist p-component">
+                <!-- Reorder Action Buttons (Left) -->
+                <div class="p-orderlist-controls">
+                    <button type="button" class="p-orderlist-control-btn btn-order-top" title="Move to Top" aria-label="Move to Top" disabled>
+                        ${LucideIcons.chevronsUp}
+                    </button>
+                    <button type="button" class="p-orderlist-control-btn btn-order-up" title="Move Up" aria-label="Move Up" disabled>
+                        ${LucideIcons.chevronUp}
+                    </button>
+                    <button type="button" class="p-orderlist-control-btn btn-order-down" title="Move Down" aria-label="Move Down" disabled>
+                        ${LucideIcons.chevronDown}
+                    </button>
+                    <button type="button" class="p-orderlist-control-btn btn-order-bottom" title="Move to Bottom" aria-label="Move to Bottom" disabled>
+                        ${LucideIcons.chevronsDown}
+                    </button>
+                </div>
+
+                <!-- List Box (Right) -->
+                <div class="p-orderlist-list-container">
+                    ${headerHtml}
+                    ${filterHtml}
+                    <ul class="p-orderlist-list" style="height: ${scrollHeight};" role="listbox" aria-multiselectable="true" tabindex="0">
+                    </ul>
+                    <div class="p-orderlist-footer">
+                        <span class="p-orderlist-selection-status">No selected item</span>
+                        ${isFilter ? `<span class="p-orderlist-results-status" style="font-size: 0.6875rem; color: var(--p-surface-400);">0 results available</span>` : ""}
+                    </div>
+                </div>
+            </div>
+        `;
+    const listEl = container.querySelector(".p-orderlist-list");
+    if (listEl) useAutoAnimate(listEl, { duration: 180 });
+    bindPermanentEvents();
+    updateListStructure();
+  }
+  function updateSelectionUI() {
+    const rootEl = container.firstElementChild;
+    if (!rootEl) return;
+    const statusEl = rootEl.querySelector(".p-orderlist-selection-status");
+    if (statusEl) {
+      statusEl.textContent = selectedIds.size > 0 ? `${selectedIds.size} items selected` : "No selected item";
+    }
+    const listUl = rootEl.querySelector(".p-orderlist-list");
+    if (listUl) {
+      listUl.querySelectorAll(".p-orderlist-item").forEach((el) => {
+        const id = el.getAttribute("data-id");
+        if (!id) return;
+        const isSelected = selectedIds.has(id);
+        el.classList.toggle("p-highlight", isSelected);
+        el.setAttribute("aria-selected", String(isSelected));
+        if (isCheckbox) {
+          const chk = el.querySelector(".p-checkbox-box");
+          if (chk) {
+            chk.className = `p-checkbox-box ${isSelected ? "p-checked" : ""}`;
+            chk.setAttribute("aria-checked", String(isSelected));
+            chk.innerHTML = isSelected ? LucideIcons.check : "";
+          }
+        }
+      });
+    }
+    updateButtons();
+    dispatchSelectionEvent();
+  }
+  function updateListStructure() {
+    const rootEl = container.firstElementChild;
+    if (!rootEl) return;
+    const filteredItems = itemsList.filter((item, idx) => {
+      if (!isFilter || !filterQuery.trim()) return true;
+      const targetVal = String(item[filterBy] || item.title || item.name || "").toLowerCase();
+      return targetVal.includes(filterQuery.toLowerCase());
+    });
+    const resultsEl = rootEl.querySelector(".p-orderlist-results-status");
+    if (resultsEl) {
+      resultsEl.textContent = `${filteredItems.length} results are available`;
+    }
+    const listUl = rootEl.querySelector(".p-orderlist-list");
+    if (listUl) {
+      if (filteredItems.length === 0) {
+        listUl.innerHTML = `<li class="p-orderlist-empty">${filterQuery ? "No results found" : emptyMessage}</li>`;
+      } else {
+        listUl.innerHTML = filteredItems.map((item, idx) => {
+          const id = getItemId(item, idx);
+          const isSelected = selectedIds.has(id);
+          return `
+                        <li class="p-orderlist-item ${isSelected ? "p-highlight" : ""}" 
+                            data-id="${id}" 
+                            data-index="${idx}"
+                            role="option" 
+                            aria-selected="${isSelected}">
+                            ${renderCellContent(item, idx, isSelected)}
+                        </li>
+                    `;
+        }).join("");
+        listUl.querySelectorAll(".p-orderlist-item").forEach((el) => {
+          el.addEventListener("click", (e) => {
+            const id = el.getAttribute("data-id");
+            if (!id) return;
+            const mouseEvent = e;
+            if (isCheckbox || mouseEvent.ctrlKey || mouseEvent.metaKey) {
+              if (selectedIds.has(id)) selectedIds.delete(id);
+              else selectedIds.add(id);
+            } else {
+              if (selectedIds.has(id) && selectedIds.size === 1) {
+                selectedIds.clear();
+              } else {
+                selectedIds.clear();
+                selectedIds.add(id);
+              }
+            }
+            updateSelectionUI();
+          });
+        });
+      }
+    }
+    updateSelectionUI();
+  }
+  function updateButtons() {
+    const rootEl = container.firstElementChild;
+    if (!rootEl) return;
+    const btnTop = rootEl.querySelector(".btn-order-top");
+    const btnUp = rootEl.querySelector(".btn-order-up");
+    const btnDown = rootEl.querySelector(".btn-order-down");
+    const btnBottom = rootEl.querySelector(".btn-order-bottom");
+    const hasSelection = selectedIds.size > 0 && itemsList.length > 1;
+    if (btnTop) btnTop.disabled = !hasSelection;
+    if (btnUp) btnUp.disabled = !hasSelection;
+    if (btnDown) btnDown.disabled = !hasSelection;
+    if (btnBottom) btnBottom.disabled = !hasSelection;
+  }
+  function bindPermanentEvents() {
+    const rootEl = container.firstElementChild;
+    if (!rootEl) return;
+    const filterInput = rootEl.querySelector(".p-orderlist-filter-input");
+    if (filterInput) {
+      filterInput.addEventListener("input", (e) => {
+        filterQuery = e.target.value;
+        updateListStructure();
+      });
+    }
+    rootEl.querySelector(".btn-order-top")?.addEventListener("click", () => {
+      reorder("top");
+    });
+    rootEl.querySelector(".btn-order-up")?.addEventListener("click", () => {
+      reorder("up");
+    });
+    rootEl.querySelector(".btn-order-down")?.addEventListener("click", () => {
+      reorder("down");
+    });
+    rootEl.querySelector(".btn-order-bottom")?.addEventListener("click", () => {
+      reorder("bottom");
+    });
+    const listUl = rootEl.querySelector(".p-orderlist-list");
+    if (listUl) {
+      listUl.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+          e.preventDefault();
+          navigateItems(e.key === "ArrowDown" ? 1 : -1, e.shiftKey);
+        } else if (e.key === " " || e.key === "Enter") {
+          e.preventDefault();
+        } else if (e.key === "a" && (e.ctrlKey || e.metaKey)) {
+          e.preventDefault();
+          itemsList.forEach((it, idx) => selectedIds.add(getItemId(it, idx)));
+          updateSelectionUI();
+        }
+      });
+    }
+  }
+  function navigateItems(delta, isShift) {
+    if (itemsList.length === 0) return;
+    let lastSelectedIdx = itemsList.findIndex((it, idx) => selectedIds.has(getItemId(it, idx)));
+    if (lastSelectedIdx === -1) lastSelectedIdx = delta > 0 ? -1 : itemsList.length;
+    const targetIdx = Math.max(0, Math.min(itemsList.length - 1, lastSelectedIdx + delta));
+    const targetId = getItemId(itemsList[targetIdx], targetIdx);
+    if (!isShift) selectedIds.clear();
+    selectedIds.add(targetId);
+    updateSelectionUI();
+  }
+  function reorder(direction) {
+    if (selectedIds.size === 0 || itemsList.length < 2) return;
+    if (direction === "top") {
+      const selected = itemsList.filter((it, idx) => selectedIds.has(getItemId(it, idx)));
+      const remaining = itemsList.filter((it, idx) => !selectedIds.has(getItemId(it, idx)));
+      itemsList.length = 0;
+      itemsList.push(...selected, ...remaining);
+    } else if (direction === "bottom") {
+      const selected = itemsList.filter((it, idx) => selectedIds.has(getItemId(it, idx)));
+      const remaining = itemsList.filter((it, idx) => !selectedIds.has(getItemId(it, idx)));
+      itemsList.length = 0;
+      itemsList.push(...remaining, ...selected);
+    } else if (direction === "up") {
+      for (let i = 1; i < itemsList.length; i++) {
+        const curId = getItemId(itemsList[i], i);
+        const prevId = getItemId(itemsList[i - 1], i - 1);
+        if (selectedIds.has(curId) && !selectedIds.has(prevId)) {
+          const temp = itemsList[i];
+          itemsList[i] = itemsList[i - 1];
+          itemsList[i - 1] = temp;
+        }
+      }
+    } else if (direction === "down") {
+      for (let i = itemsList.length - 2; i >= 0; i--) {
+        const curId = getItemId(itemsList[i], i);
+        const nextId = getItemId(itemsList[i + 1], i + 1);
+        if (selectedIds.has(curId) && !selectedIds.has(nextId)) {
+          const temp = itemsList[i];
+          itemsList[i] = itemsList[i + 1];
+          itemsList[i + 1] = temp;
+        }
+      }
+    }
+    updateListStructure();
+    syncValues("reorder");
+  }
+  function dispatchSelectionEvent() {
+    container.dispatchEvent(new CustomEvent("orderlist:selection-change", {
+      bubbles: true,
+      detail: {
+        selection: Array.from(selectedIds)
+      }
+    }));
+  }
+  function syncValues(action = "change") {
+    if (props.targetInputName) {
+      let hidden = container.querySelector(`input[name="${props.targetInputName}"]`);
+      if (!hidden) {
+        hidden = document.createElement("input");
+        hidden.type = "hidden";
+        hidden.name = props.targetInputName;
+        container.appendChild(hidden);
+      }
+      hidden.value = JSON.stringify(itemsList.map((it, idx) => getItemId(it, idx)));
+    }
+    container.dispatchEvent(new CustomEvent("orderlist:change", {
+      bubbles: true,
+      detail: { value: itemsList, action }
+    }));
+  }
+  buildShell();
+  syncValues();
+}
+export {
+  OrderListIsland as default
+};
+//# sourceMappingURL=orderlist-IZXCOQMS.js.map
