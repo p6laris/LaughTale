@@ -35,6 +35,26 @@ public record DataGridCol(
     bool Sortable = true
 );
 
+public record DataTableColumn(
+    string Field,
+    string Header,
+    bool Sortable = false,
+    bool Filterable = false,
+    string? FilterPlaceholder = null,
+    string? Width = null,
+    string? MinWidth = null,
+    string Align = "left",
+    bool Frozen = false,
+    string AlignFrozen = "left",
+    string? SelectionMode = null,
+    bool Expander = false,
+    string? EditorType = null,
+    object? EditorOptions = null,
+    string? BodyTemplate = null,
+    string? HeaderClass = null,
+    string? BodyClass = null
+);
+
 public record TreeNode<TData>(
     string Id,
     string Name,

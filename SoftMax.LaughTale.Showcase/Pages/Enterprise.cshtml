@@ -2194,16 +2194,129 @@
     </section>
 
     <!-- Security DataGrid -->
+    <!-- DataTable Suite -->
     <section id="sec-datagrid" class="component-card">
         <div class="card-header">
             <div>
-                <h2>Security Clusters DataGrid</h2>
-                <p>Enterprise table with real-time multi-column sorting, debounced search, and pagination.</p>
+                <h2>DataTable</h2>
+                <p>DataTable displays data in tabular format with rich interactive capabilities including sorting, filtering, pagination, selection, frozen columns, row expansion, in-place cell editing, and CSV export.</p>
             </div>
-            <span class="aura-tag tag-emerald">Live</span>
+            <span class="aura-tag tag-emerald">DataTable Suite</span>
         </div>
-        <div class="card-body">
-            <island-datagrid items="@Model.GridRecords" columns="@Model.GridColumns" page-size="5" />
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Demo 1: Basic -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">DataTable requires a collection to display along with Column configurations for data representation.</p>
+                <island-datatable value="@Model.DataTableProducts" columns="@Model.DataTableProductColumns" />
+            </div>
+
+            <!-- Demo 2: Size Variants -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Size</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Use the size property with small or large to adjust cell padding.</p>
+                <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                    <div>
+                        <span style="font-size: 0.8125rem; font-weight: 600; color: var(--p-surface-600); margin-bottom: 0.5rem; display: inline-block;">Small Size</span>
+                        <island-datatable value="@Model.DataTableCustomers" columns="@Model.DataTableCustomerColumns" size="Small" />
+                    </div>
+                    <div>
+                        <span style="font-size: 0.8125rem; font-weight: 600; color: var(--p-surface-600); margin-bottom: 0.5rem; display: inline-block;">Large Size</span>
+                        <island-datatable value="@Model.DataTableCustomers" columns="@Model.DataTableCustomerColumns" size="Large" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 3: Grid Lines -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Grid Lines</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Enabling showGridlines displays borders between cells.</p>
+                <island-datatable value="@Model.DataTableCustomers" columns="@Model.DataTableCustomerColumns" showGridlines="true" />
+            </div>
+
+            <!-- Demo 4: Striped Rows -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Striped Rows</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Alternating rows are displayed when stripedRows property is present.</p>
+                <island-datatable value="@Model.DataTableCustomers" columns="@Model.DataTableCustomerColumns" stripedRows="true" />
+            </div>
+
+            <!-- Demo 5: Single & Multiple Selection -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Row Selection (Multiple with MetaKey)</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Click to replace selection. Ctrl/Cmd + Click to toggle multiple rows.</p>
+                <island-datatable value="@Model.DataTableProducts" columns="@Model.DataTableProductColumns" selectionMode="multiple" metaKeySelection="true" />
+            </div>
+
+            <!-- Demo 6: Checkbox Selection -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Checkbox Selection</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Checkbox-based multiple selection with a header select-all toggle.</p>
+                <island-datatable value="@Model.DataTableProducts" columns="@Model.DataTableCheckboxColumns" />
+            </div>
+
+            <!-- Demo 7: Radio Selection -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Radio Selection</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Dedicated radio column for single row selection.</p>
+                <island-datatable value="@Model.DataTableCustomers" columns="@Model.DataTableRadioColumns" />
+            </div>
+
+            <!-- Demo 8: Sorting & Multi-Sort -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Multi-Column Sorting</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Sort by multiple columns simultaneously with sortMode="multiple" and removableSort.</p>
+                <island-datatable value="@Model.DataTableProducts" columns="@Model.DataTableProductColumns" sortMode="multiple" removableSort="true" />
+            </div>
+
+            <!-- Demo 9: Pagination -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Pagination</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Integrated Aura pagination with jump buttons and rows-per-page options.</p>
+                <island-datatable value="@Model.DataTableProducts" columns="@Model.DataTableProductColumns" paginator="true" rows="5" />
+            </div>
+
+            <!-- Demo 10: Scrollable & Frozen Columns -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Scrollable &amp; Frozen Columns</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Fixed scrollHeight with sticky headers and pinned left/right columns.</p>
+                <island-datatable value="@Model.DataTableProducts" columns="@Model.DataTableFrozenColumns" scrollable="true" scrollHeight="260px" />
+            </div>
+
+            <!-- Demo 11: Row Expansion -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Row Expansion</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Click the chevron button to expand nested details and sub-records.</p>
+                <island-datatable value="@Model.DataTableProducts" columns="@Model.DataTableExpanderColumns" />
+            </div>
+
+            <!-- Demo 12: In-Place Cell Editing -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">In-Place Cell Editing</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Click any cell to edit its value directly and press Enter or click away to save.</p>
+                <island-datatable value="@Model.DataTableProducts" columns="@Model.DataTableEditableColumns" editMode="cell" />
+            </div>
+
+            <!-- Demo 13: Filtering (Row Filters & Global Search) -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Filtering (Inline Row &amp; Global Search)</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Search data using global keyword search or individual column filters.</p>
+                <island-datatable value="@Model.DataTableCustomers" columns="@Model.DataTableFilterColumns" filterDisplay="row" title="Customer Directory" />
+            </div>
+
+            <!-- Demo 14: Loading State & Skeletons -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Loading State (Skeleton Placeholders)</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Animated skeleton placeholder rows displayed during asynchronous loading.</p>
+                <island-datatable value="@Model.DataTableProducts" columns="@Model.DataTableProductColumns" loading="true" loadingMode="skeleton" rows="4" />
+            </div>
+
+            <!-- Demo 15: CSV Export & Empty State -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">CSV Export &amp; Custom Empty State</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Export filtered table data to CSV with a single click, or display an empty state.</p>
+                <island-datatable value="@Model.DataTableProducts" columns="@Model.DataTableProductColumns" exportFilename="products_export" title="Exportable Products" />
+            </div>
         </div>
     </section>
 

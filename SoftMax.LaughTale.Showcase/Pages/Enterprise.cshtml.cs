@@ -636,6 +636,109 @@ public class EnterpriseModel : PageModel
         new("Toys & Games", "toys", null, null, null, null, null, null, null, 312)
     };
 
+    // DataTable Showcase Datasets
+    public List<DataTableColumn> DataTableProductColumns { get; set; } = new()
+    {
+        new("code", "Code", Sortable: true),
+        new("name", "Name", Sortable: true),
+        new("category", "Category", Sortable: true),
+        new("price", "Price", Sortable: true),
+        new("quantity", "Quantity", Sortable: true),
+        new("inventoryStatus", "Status", Sortable: true)
+    };
+
+    public List<DataTableColumn> DataTableCustomerColumns { get; set; } = new()
+    {
+        new("name", "Name", Sortable: true),
+        new("country", "Country", Sortable: true),
+        new("company", "Company", Sortable: true),
+        new("status", "Status", Sortable: true),
+        new("balance", "Balance", Sortable: true)
+    };
+
+    public List<DataTableColumn> DataTableCheckboxColumns { get; set; } = new()
+    {
+        new("", "", SelectionMode: "multiple"),
+        new("name", "Product", Sortable: true),
+        new("category", "Category", Sortable: true),
+        new("price", "Price", Sortable: true),
+        new("inventoryStatus", "Status", Sortable: true)
+    };
+
+    public List<DataTableColumn> DataTableRadioColumns { get; set; } = new()
+    {
+        new("", "", SelectionMode: "single"),
+        new("name", "Customer", Sortable: true),
+        new("country", "Country", Sortable: true),
+        new("company", "Company", Sortable: true),
+        new("balance", "Balance", Sortable: true)
+    };
+
+    public List<DataTableColumn> DataTableExpanderColumns { get; set; } = new()
+    {
+        new("", "", Expander: true),
+        new("name", "Product", Sortable: true),
+        new("category", "Category", Sortable: true),
+        new("price", "Price", Sortable: true),
+        new("inventoryStatus", "Status", Sortable: true)
+    };
+
+    public List<DataTableColumn> DataTableFrozenColumns { get; set; } = new()
+    {
+        new("name", "Product", Frozen: true, AlignFrozen: "left", Width: "220px", Sortable: true),
+        new("code", "Code", Width: "150px"),
+        new("category", "Category", Width: "180px"),
+        new("quantity", "Quantity", Width: "120px"),
+        new("inventoryStatus", "Status", Width: "150px"),
+        new("price", "Price", Frozen: true, AlignFrozen: "right", Width: "140px", Sortable: true)
+    };
+
+    public List<DataTableColumn> DataTableFilterColumns { get; set; } = new()
+    {
+        new("name", "Name", Sortable: true, Filterable: true, FilterPlaceholder: "Search name..."),
+        new("country", "Country", Sortable: true, Filterable: true, FilterPlaceholder: "Search country..."),
+        new("company", "Company", Sortable: true, Filterable: true, FilterPlaceholder: "Search company..."),
+        new("status", "Status", Sortable: true, Filterable: true, FilterPlaceholder: "Search status..."),
+        new("balance", "Balance", Sortable: true)
+    };
+
+    public List<DataTableColumn> DataTableEditableColumns { get; set; } = new()
+    {
+        new("name", "Name", EditorType: "text"),
+        new("category", "Category", EditorType: "text"),
+        new("quantity", "Qty", EditorType: "number"),
+        new("price", "Price", EditorType: "number"),
+        new("inventoryStatus", "Status")
+    };
+
+    public List<object> DataTableProducts { get; set; } = new()
+    {
+        new { id = 1000, code = "f230fh0g3", name = "Bamboo Watch", category = "Accessories", price = 65, quantity = 24, inventoryStatus = "INSTOCK", rating = 5 },
+        new { id = 1001, code = "nvklal433", name = "Black Watch", category = "Accessories", price = 72, quantity = 61, inventoryStatus = "INSTOCK", rating = 4 },
+        new { id = 1002, code = "zz21cz3c1", name = "Blue Band", category = "Fitness", price = 79, quantity = 2, inventoryStatus = "LOWSTOCK", rating = 3 },
+        new { id = 1003, code = "244wgerg2", name = "Blue T-Shirt", category = "Clothing", price = 29, quantity = 25, inventoryStatus = "INSTOCK", rating = 5 },
+        new { id = 1004, code = "h456wer53", name = "Bracelet", category = "Accessories", price = 15, quantity = 73, inventoryStatus = "INSTOCK", rating = 4 },
+        new { id = 1005, code = "av2231fwg", name = "Brown Purse", category = "Accessories", price = 120, quantity = 0, inventoryStatus = "OUTOFSTOCK", rating = 4 },
+        new { id = 1006, code = "bib36pfvm", name = "Chakra Bracelet", category = "Accessories", price = 32, quantity = 5, inventoryStatus = "LOWSTOCK", rating = 3 },
+        new { id = 1007, code = "mb89353st", name = "Galaxy Earrings", category = "Accessories", price = 34, quantity = 23, inventoryStatus = "INSTOCK", rating = 5 },
+        new { id = 1008, code = "vbb124btr", name = "Game Controller", category = "Electronics", price = 99, quantity = 2, inventoryStatus = "LOWSTOCK", rating = 4 },
+        new { id = 1009, code = "cm230f032", name = "Gaming Set", category = "Electronics", price = 299, quantity = 63, inventoryStatus = "INSTOCK", rating = 5 }
+    };
+
+    public List<object> DataTableCustomers { get; set; } = new()
+    {
+        new { id = 1, name = "Amy Elsner", country = "Germany", company = "Benton, John B Jr", status = "qualified", balance = 9702, verified = true },
+        new { id = 2, name = "Anna Fali", country = "France", company = "Chanay, Jeffrey A Esq", status = "qualified", balance = 12500, verified = true },
+        new { id = 3, name = "Asiya Javayant", country = "India", company = "Chemel, James L Cpa", status = "new", balance = 8300, verified = false },
+        new { id = 4, name = "Bernardo Dominic", country = "USA", company = "Feltz Printing Service", status = "negotiation", balance = 24100, verified = true },
+        new { id = 5, name = "Elwin Sharvill", country = "United Kingdom", company = "Printing Dimensions", status = "qualified", balance = 16200, verified = true },
+        new { id = 6, name = "Ioni Bowcher", country = "Brazil", company = "Chapman, Ross E Esq", status = "unqualified", balance = 4200, verified = false },
+        new { id = 7, name = "Ivan Magalhaes", country = "Brazil", company = "Art Crafters", status = "new", balance = 18700, verified = true },
+        new { id = 8, name = "Onyama Limba", country = "Nigeria", company = "Commercial Press", status = "qualified", balance = 29300, verified = false },
+        new { id = 9, name = "Stephen Shaw", country = "United Kingdom", company = "In Communications", status = "negotiation", balance = 15800, verified = true },
+        new { id = 10, name = "Xuxue Feng", country = "China", company = "Modern Graphic", status = "renewal", balance = 44500, verified = true }
+    };
+
     public List<SplitButtonItem> SplitButtonBasicItems { get; set; } = new()
     {
         new("Update", "refresh-cw", "update", Command: "console.log('Updated');"),

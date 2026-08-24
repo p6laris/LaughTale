@@ -4006,3 +4006,87 @@ public class IslandSidebarTagHelper : TagHelper
         output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
     }
 }
+
+/// <summary>
+/// TagHelper for <island-datatable /> / <island-table /> (Aura DataTable Component)
+/// </summary>
+[HtmlTargetElement("island-datatable")]
+[HtmlTargetElement("island-table")]
+public class IslandDataTableTagHelper : TagHelper
+{
+    public object? Value { get; set; }
+    public object? Data { get; set; }
+    public List<DataTableColumn>? Columns { get; set; }
+    public ComponentSize Size { get; set; } = ComponentSize.Normal;
+    public bool ShowGridlines { get; set; } = false;
+    public bool StripedRows { get; set; } = false;
+    public string? SelectionMode { get; set; }
+    public bool MetaKeySelection { get; set; } = true;
+    public string KeyField { get; set; } = "id";
+    public string RowKey { get; set; } = "id";
+    public bool Paginator { get; set; } = false;
+    public int Rows { get; set; } = 10;
+    public int First { get; set; } = 0;
+    public List<int>? RowsPerPageOptions { get; set; }
+    public string? CurrentPageReportTemplate { get; set; }
+    public string SortMode { get; set; } = "single";
+    public bool RemovableSort { get; set; } = false;
+    public string? SortField { get; set; }
+    public int SortOrder { get; set; } = 1;
+    public string? FilterDisplay { get; set; }
+    public List<string>? GlobalFilterFields { get; set; }
+    public bool Scrollable { get; set; } = false;
+    public string? ScrollHeight { get; set; }
+    public string? EditMode { get; set; }
+    public bool Loading { get; set; } = false;
+    public string LoadingMode { get; set; } = "overlay";
+    public string ExportFilename { get; set; } = "export";
+    public string EmptyMessage { get; set; } = "No records found.";
+    public string? TableStyle { get; set; }
+    public string? Title { get; set; }
+
+    public override void Process(TagHelperContext context, TagHelperOutput output)
+    {
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "datatable");
+        output.Attributes.SetAttribute("data-hydrate", "load");
+
+        var tableData = Value ?? Data ?? new object[0];
+        var resolvedKey = !string.IsNullOrEmpty(KeyField) && KeyField != "id" ? KeyField : RowKey;
+
+        var props = new
+        {
+            value = tableData,
+            columns = Columns ?? new List<DataTableColumn>(),
+            size = Size.ToString().ToLowerInvariant(),
+            showGridlines = ShowGridlines,
+            stripedRows = StripedRows,
+            selectionMode = SelectionMode,
+            metaKeySelection = MetaKeySelection,
+            dataKey = resolvedKey,
+            paginator = Paginator,
+            rows = Rows,
+            first = First,
+            rowsPerPageOptions = RowsPerPageOptions,
+            currentPageReportTemplate = CurrentPageReportTemplate,
+            sortMode = SortMode,
+            removableSort = RemovableSort,
+            sortField = SortField,
+            sortOrder = SortOrder,
+            filterDisplay = FilterDisplay,
+            globalFilterFields = GlobalFilterFields,
+            scrollable = Scrollable,
+            scrollHeight = ScrollHeight,
+            editMode = EditMode,
+            loading = Loading,
+            loadingMode = LoadingMode,
+            exportFilename = ExportFilename,
+            emptyMessage = EmptyMessage,
+            tableStyle = TableStyle,
+            title = Title
+        };
+
+        output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
+    }
+}

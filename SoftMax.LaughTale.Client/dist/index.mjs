@@ -4310,137 +4310,972 @@ var init_tree_select = __esm({
   }
 });
 
-// src/components/datagrid.ts
-var datagrid_exports = {};
-__export(datagrid_exports, {
-  default: () => DataGridIsland
+// src/components/datatable.ts
+var datatable_exports = {};
+__export(datatable_exports, {
+  default: () => DataTableIsland
 });
-function DataGridIsland(container, props) {
-  injectIslandStyle("datagrid", CSS6);
-  let searchQuery = "";
-  let sortField = props.columns[0]?.field || "";
-  let sortAsc = true;
-  let currentPage = 1;
-  const pageSize = props.pageSize || 5;
-  function render() {
-    let filtered = props.data.filter((row) => {
-      if (!searchQuery.trim()) return true;
-      return Object.values(row).some(
-        (val) => String(val).toLowerCase().includes(searchQuery.toLowerCase())
-      );
+function DataTableIsland(container, props) {
+  injectIslandStyle("datatable", DATATABLE_CSS);
+  const rawData = [...props.value || props.data || []];
+  const columns = props.columns || [];
+  const size = props.size || "normal";
+  const showGridlines = !!props.showGridlines;
+  const stripedRows = !!props.stripedRows;
+  const selectionMode = props.selectionMode;
+  const metaKeySelection = props.metaKeySelection !== false;
+  const dataKey = props.dataKey || "id";
+  const paginator = !!props.paginator;
+  let rowsPerPage = props.rows || 10;
+  let currentPage = Math.floor((props.first || 0) / rowsPerPage) + 1;
+  const rowsPerPageOptions = props.rowsPerPageOptions || [5, 10, 20, 50];
+  const sortMode = props.sortMode || "single";
+  const removableSort = !!props.removableSort;
+  const filterDisplay = props.filterDisplay || "none";
+  const scrollable = !!props.scrollable;
+  const scrollHeight = props.scrollHeight;
+  const editMode = props.editMode;
+  let loading = !!props.loading;
+  const loadingMode = props.loadingMode || "overlay";
+  const exportFilename = props.exportFilename || "datatable_export";
+  const emptyMessage = props.emptyMessage || "No records found.";
+  let globalFilter = "";
+  const columnFilters = {};
+  let sortMeta = [];
+  if (props.sortField) {
+    sortMeta.push({ field: props.sortField, order: props.sortOrder ?? 1 });
+  }
+  const selectedKeys = /* @__PURE__ */ new Set();
+  const expandedKeys = /* @__PURE__ */ new Set();
+  let editingCell = null;
+  function resolveField(obj, field) {
+    if (!obj || !field) return "";
+    if (field.includes(".")) {
+      return field.split(".").reduce((acc, part) => acc?.[part], obj);
+    }
+    return obj[field];
+  }
+  function exportCSV() {
+    if (rawData.length === 0) return;
+    const exportCols = columns.filter((c) => c.field && !c.selectionMode && !c.expander);
+    const headers = exportCols.map((c) => `"${(c.header || c.field).replace(/"/g, '""')}"`).join(",");
+    const rows = rawData.map((row) => {
+      return exportCols.map((c) => {
+        const val = resolveField(row, c.field);
+        const str = val == null ? "" : String(val);
+        return `"${str.replace(/"/g, '""')}"`;
+      }).join(",");
     });
-    if (sortField) {
+    const csvContent = [headers, ...rows].join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `${exportFilename}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+  container.exportCSV = exportCSV;
+  function render() {
+    let filtered = rawData.filter((row) => {
+      if (globalFilter.trim()) {
+        const query = globalFilter.toLowerCase();
+        const fieldsToCheck = props.globalFilterFields && props.globalFilterFields.length > 0 ? props.globalFilterFields : columns.map((c) => c.field).filter(Boolean);
+        const matchesGlobal = fieldsToCheck.some((f) => {
+          const val = resolveField(row, f);
+          return val != null && String(val).toLowerCase().includes(query);
+        });
+        if (!matchesGlobal) return false;
+      }
+      for (const [f, query] of Object.entries(columnFilters)) {
+        if (query.trim()) {
+          const val = resolveField(row, f);
+          if (val == null || !String(val).toLowerCase().includes(query.toLowerCase())) {
+            return false;
+          }
+        }
+      }
+      return true;
+    });
+    if (sortMeta.length > 0) {
       filtered.sort((a, b) => {
-        const valA = a[sortField];
-        const valB = b[sortField];
-        if (valA < valB) return sortAsc ? -1 : 1;
-        if (valA > valB) return sortAsc ? 1 : -1;
+        for (const meta of sortMeta) {
+          const valA = resolveField(a, meta.field);
+          const valB = resolveField(b, meta.field);
+          if (valA === valB) continue;
+          if (valA == null) return 1;
+          if (valB == null) return -1;
+          const res = typeof valA === "number" && typeof valB === "number" ? valA - valB : String(valA).localeCompare(String(valB), void 0, { numeric: true });
+          if (res !== 0) return res * meta.order;
+        }
         return 0;
       });
     }
-    const totalPages = Math.ceil(filtered.length / pageSize) || 1;
+    const totalRecords = filtered.length;
+    const totalPages = Math.ceil(totalRecords / rowsPerPage) || 1;
     if (currentPage > totalPages) currentPage = totalPages;
-    const startIdx = (currentPage - 1) * pageSize;
-    const pageRows = filtered.slice(startIdx, startIdx + pageSize);
-    const headerCells = props.columns.map((col) => `
-            <th data-field="${col.field}" style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--p-border-color); text-align: left; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--p-surface-500); cursor: ${col.sortable !== false ? "pointer" : "default"}; user-select: none;">
-                <div style="display: flex; align-items: center; gap: 0.35rem;">
-                    <span>${col.header}</span>
-                    ${col.sortable !== false ? `<span style="font-size: 0.6875rem; color: ${sortField === col.field ? "var(--p-surface-950)" : "var(--p-surface-300)"};">${sortField === col.field ? sortAsc ? "\u25B2" : "\u25BC" : "\u2195"}</span>` : ""}
-                </div>
-            </th>
-        `).join("");
-    const rowCells = pageRows.map((row) => `
-            <tr style="border-bottom: 1px solid var(--p-surface-100); transition: background 0.15s ease;">
-                ${props.columns.map((col) => `
-                    <td style="padding: 0.75rem 1rem; font-size: 0.8125rem; color: var(--p-surface-700);">
-                        ${row[col.field] ?? ""}
+    if (currentPage < 1) currentPage = 1;
+    const firstIdx = (currentPage - 1) * rowsPerPage;
+    const displayRows = paginator ? filtered.slice(firstIdx, firstIdx + rowsPerPage) : filtered;
+    const rootClasses = ["p-datatable", "p-component"];
+    if (size === "small") rootClasses.push("p-datatable-sm");
+    if (size === "large") rootClasses.push("p-datatable-lg");
+    if (showGridlines) rootClasses.push("p-datatable-gridlines");
+    if (stripedRows) rootClasses.push("p-datatable-striped");
+    if (scrollable) rootClasses.push("p-datatable-scrollable");
+    const allPageSelected = displayRows.length > 0 && displayRows.every((r) => selectedKeys.has(r[dataKey]));
+    const headerCells = columns.map((col, cIdx) => {
+      const isSortable = !!col.sortable;
+      const sortItem = sortMeta.find((m) => m.field === col.field);
+      const isSorted = !!sortItem;
+      const sortOrder = sortItem?.order || 0;
+      const sortBadge = sortMode === "multiple" && sortMeta.length > 1 && isSorted ? `<span class="p-datatable-sort-badge">${sortMeta.indexOf(sortItem) + 1}</span>` : "";
+      let sortIconSvg = "";
+      if (isSortable) {
+        if (sortOrder === 1) sortIconSvg = LucideIcons.arrowUp || "\u25B2";
+        else if (sortOrder === -1) sortIconSvg = LucideIcons.arrowDown || "\u25BC";
+        else sortIconSvg = LucideIcons.arrowUpDown || "\u2195";
+      }
+      let frozenClass = "";
+      if (col.frozen) {
+        frozenClass = col.alignFrozen === "right" ? "p-frozen-column-right" : "p-frozen-column-left";
+      }
+      const styleAttr = [
+        col.width ? `width: ${col.width};` : "",
+        col.minWidth ? `min-width: ${col.minWidth};` : "",
+        col.align ? `text-align: ${col.align};` : ""
+      ].filter(Boolean).join(" ");
+      if (col.selectionMode === "multiple") {
+        return `
+                    <th class="${frozenClass}" style="width: 3.5rem; text-align: center;">
+                        <div class="p-checkbox-box p-select-all ${allPageSelected ? "p-checked" : ""}" role="checkbox" aria-checked="${allPageSelected}">
+                            ${allPageSelected ? LucideIcons.check || "\u2713" : ""}
+                        </div>
+                    </th>
+                `;
+      }
+      if (col.selectionMode === "single") {
+        return `<th class="${frozenClass}" style="width: 3.5rem; text-align: center;"></th>`;
+      }
+      if (col.expander) {
+        return `<th class="${frozenClass}" style="width: 3.5rem; text-align: center;"></th>`;
+      }
+      return `
+                <th class="${isSortable ? "p-sortable-column" : ""} ${isSorted ? "p-sorted" : ""} ${frozenClass} ${col.headerClass || ""}" 
+                    data-field="${col.field || ""}" 
+                    style="${styleAttr}">
+                    <div class="p-datatable-header-content" style="justify-content: ${col.align === "right" ? "flex-end" : col.align === "center" ? "center" : "flex-start"};">
+                        <span>${col.header || ""}</span>
+                        ${isSortable ? `<span class="p-datatable-sort-icon">${sortIconSvg}</span>${sortBadge}` : ""}
+                    </div>
+                </th>
+            `;
+    }).join("");
+    let filterRowHtml = "";
+    if (filterDisplay === "row") {
+      const filterCells = columns.map((col) => {
+        let frozenClass = col.frozen ? col.alignFrozen === "right" ? "p-frozen-column-right" : "p-frozen-column-left" : "";
+        if (!col.field || col.selectionMode || col.expander || col.filterable === false) {
+          return `<th class="${frozenClass}"></th>`;
+        }
+        const curVal = columnFilters[col.field] || "";
+        return `
+                    <th class="${frozenClass}">
+                        <input type="text" 
+                               class="p-datatable-filter-input" 
+                               data-filter-field="${col.field}" 
+                               placeholder="${col.filterPlaceholder || "Filter..."}" 
+                               value="${curVal}" />
+                    </th>
+                `;
+      }).join("");
+      filterRowHtml = `<tr class="p-datatable-filter-row">${filterCells}</tr>`;
+    }
+    let bodyRowsHtml = "";
+    if (loading && loadingMode === "skeleton") {
+      bodyRowsHtml = Array.from({ length: rowsPerPage }).map(() => `
+                <tr>
+                    ${columns.map((col) => `
+                        <td style="${col.width ? `width: ${col.width};` : ""}">
+                            <div class="p-datatable-skeleton-cell"></div>
+                        </td>
+                    `).join("")}
+                </tr>
+            `).join("");
+    } else if (displayRows.length === 0) {
+      bodyRowsHtml = `
+                <tr>
+                    <td colspan="${columns.length}" style="text-align: center; padding: 3rem 1rem; color: var(--p-surface-400);">
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 0.75rem;">
+                            <span style="font-size: 1.75rem; color: var(--p-surface-400);">${LucideIcons.inbox || "\u{1F4ED}"}</span>
+                            <span style="font-weight: 600; font-size: 0.9375rem; color: var(--p-surface-700);">${emptyMessage}</span>
+                        </div>
                     </td>
-                `).join("")}
-            </tr>
-        `).join("");
-    container.innerHTML = `
-            <div class="laughtale-datagrid" style="border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); overflow: hidden; background: var(--p-surface-0);">
-                <!-- Toolbar -->
-                <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.875rem 1.25rem; background: var(--p-surface-50); border-bottom: 1px solid var(--p-border-color); flex-wrap: wrap;">
-                    <div style="font-size: 0.9375rem; font-weight: 700; color: var(--p-surface-900);">
-                        ${props.title || "Enterprise Records"}
+                </tr>
+            `;
+    } else {
+      bodyRowsHtml = displayRows.map((row) => {
+        const rowKey = row[dataKey];
+        const isSelected = selectedKeys.has(rowKey);
+        const isExpanded = expandedKeys.has(rowKey);
+        const cellTds = columns.map((col) => {
+          let frozenClass = col.frozen ? col.alignFrozen === "right" ? "p-frozen-column-right" : "p-frozen-column-left" : "";
+          const styleAttr = [
+            col.width ? `width: ${col.width};` : "",
+            col.minWidth ? `min-width: ${col.minWidth};` : "",
+            col.align ? `text-align: ${col.align};` : ""
+          ].filter(Boolean).join(" ");
+          if (col.selectionMode === "multiple") {
+            return `
+                            <td class="${frozenClass}" style="width: 3.5rem; text-align: center;">
+                                <div class="p-checkbox-box p-row-checkbox ${isSelected ? "p-checked" : ""}" data-row-key="${rowKey}">
+                                    ${isSelected ? LucideIcons.check || "\u2713" : ""}
+                                </div>
+                            </td>
+                        `;
+          }
+          if (col.selectionMode === "single") {
+            return `
+                            <td class="${frozenClass}" style="width: 3.5rem; text-align: center;">
+                                <div class="p-radio-box p-row-radio ${isSelected ? "p-checked" : ""}" data-row-key="${rowKey}">
+                                    ${isSelected ? '<span style="width: 6px; height: 6px; border-radius: 9999px; background: white;"></span>' : ""}
+                                </div>
+                            </td>
+                        `;
+          }
+          if (col.expander) {
+            return `
+                            <td class="${frozenClass}" style="width: 3.5rem; text-align: center;">
+                                <button type="button" class="p-row-toggler" data-row-key="${rowKey}" aria-label="Toggle Row">
+                                    ${isExpanded ? LucideIcons.chevronDown || "\u25BC" : LucideIcons.chevronRight || "\u25B6"}
+                                </button>
+                            </td>
+                        `;
+          }
+          const rawVal = resolveField(row, col.field);
+          const isEditing = editMode === "cell" && editingCell?.rowKey === rowKey && editingCell?.field === col.field;
+          if (isEditing) {
+            return `
+                            <td class="${frozenClass} ${col.bodyClass || ""}" style="${styleAttr}">
+                                <input type="text" 
+                                       class="p-cell-editor-input" 
+                                       data-row-key="${rowKey}" 
+                                       data-field="${col.field}" 
+                                       value="${rawVal ?? ""}" 
+                                       autofocus />
+                            </td>
+                        `;
+          }
+          let cellDisplay = rawVal ?? "";
+          if (typeof rawVal === "number" && col.field.toLowerCase().includes("price")) {
+            cellDisplay = `$${rawVal.toLocaleString()}`;
+          }
+          const editableClass = editMode === "cell" && col.field ? "p-editable-cell" : "";
+          return `
+                        <td class="${frozenClass} ${editableClass} ${col.bodyClass || ""}" 
+                            data-row-key="${rowKey}" 
+                            data-field="${col.field || ""}" 
+                            style="${styleAttr}">
+                            ${cellDisplay}
+                        </td>
+                    `;
+        }).join("");
+        const rowHtml = `
+                    <tr class="${isSelected ? "p-highlight" : ""}" data-row-key="${rowKey}">
+                        ${cellTds}
+                    </tr>
+                `;
+        let expansionHtml = "";
+        if (isExpanded) {
+          expansionHtml = `
+                        <tr class="p-row-expansion">
+                            <td colspan="${columns.length}" style="padding: 1.25rem;">
+                                <div style="display: flex; gap: 1.25rem; align-items: center;">
+                                    <div style="width: 50px; height: 50px; border-radius: 8px; background: var(--p-surface-200); display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+                                        ${LucideIcons.package || "\u{1F4E6}"}
+                                    </div>
+                                    <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                                        <div style="font-weight: 700; color: var(--p-surface-900); font-size: 0.9375rem;">
+                                            ${row.name || row.title || `Record #${rowKey}`}
+                                        </div>
+                                        <div style="font-size: 0.8125rem; color: var(--p-surface-500);">
+                                            ${row.category ? `Category: ${row.category} \u2022 ` : ""}
+                                            ${row.code ? `SKU: ${row.code} \u2022 ` : ""}
+                                            ${row.quantity != null ? `In Stock: ${row.quantity} units` : ""}
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+        }
+        return rowHtml + expansionHtml;
+      }).join("");
+    }
+    let paginatorHtml = "";
+    if (paginator) {
+      const startRecord = totalRecords > 0 ? firstIdx + 1 : 0;
+      const endRecord = Math.min(firstIdx + rowsPerPage, totalRecords);
+      const reportStr = (props.currentPageReportTemplate || "Showing {first} to {last} of {totalRecords} entries").replace("{first}", String(startRecord)).replace("{last}", String(endRecord)).replace("{totalRecords}", String(totalRecords));
+      const pageButtons = [];
+      let startPage = Math.max(1, currentPage - 2);
+      let endPage = Math.min(totalPages, startPage + 4);
+      if (endPage - startPage < 4) startPage = Math.max(1, endPage - 4);
+      for (let p = startPage; p <= endPage; p++) {
+        pageButtons.push(`
+                    <button type="button" class="p-paginator-page ${p === currentPage ? "p-paginator-page-active" : ""}" data-page="${p}">
+                        ${p}
+                    </button>
+                `);
+      }
+      paginatorHtml = `
+                <div class="p-datatable-paginator">
+                    <span>${reportStr}</span>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <button type="button" class="p-paginator-nav p-first" data-page="1" ${currentPage === 1 ? "disabled" : ""} aria-label="First Page">\xAB</button>
+                        <button type="button" class="p-paginator-nav p-prev" data-page="${currentPage - 1}" ${currentPage === 1 ? "disabled" : ""} aria-label="Previous Page">\u2039</button>
+                        <div class="p-paginator-pages">${pageButtons.join("")}</div>
+                        <button type="button" class="p-paginator-nav p-next" data-page="${currentPage + 1}" ${currentPage === totalPages ? "disabled" : ""} aria-label="Next Page">\u203A</button>
+                        <button type="button" class="p-paginator-nav p-last" data-page="${totalPages}" ${currentPage === totalPages ? "disabled" : ""} aria-label="Last Page">\xBB</button>
                     </div>
-                    <div style="position: relative;">
-                        <input type="text" class="datagrid-search" placeholder="Search table..." value="${searchQuery}" style="padding: 0.4rem 0.75rem; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); font-size: 0.8125rem; width: 220px; outline: none; background: white;" />
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span>Rows per page:</span>
+                        <select class="p-datatable-rows-select" style="padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px solid var(--p-surface-300); background: var(--p-surface-0); color: inherit; font-size: 0.8125rem;">
+                            ${rowsPerPageOptions.map((opt) => `<option value="${opt}" ${opt === rowsPerPage ? "selected" : ""}>${opt}</option>`).join("")}
+                        </select>
                     </div>
                 </div>
-
-                <!-- Table -->
-                <div style="overflow-x: auto;">
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <thead><tr style="background: var(--p-surface-50);">${headerCells}</tr></thead>
-                        <tbody>${rowCells.length > 0 ? rowCells : `<tr><td colspan="${props.columns.length}" style="text-align: center; padding: 2rem; color: var(--p-surface-400); font-size: 0.875rem;">No matching records found.</td></tr>`}</tbody>
+            `;
+    }
+    let toolbarHtml = "";
+    if (props.title || props.globalFilterFields || props.exportFilename) {
+      toolbarHtml = `
+                <div class="p-datatable-header-toolbar">
+                    <div class="p-datatable-title">${props.title || ""}</div>
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        ${props.globalFilterFields ? `
+                            <div style="position: relative; display: flex; align-items: center;">
+                                <input type="text" class="p-datatable-global-filter p-datatable-filter-input" placeholder="Search keywords..." value="${globalFilter}" style="width: 200px;" />
+                            </div>
+                        ` : ""}
+                        <button type="button" class="p-datatable-export-btn" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.4rem 0.75rem; border-radius: 6px; border: 1px solid var(--p-surface-300); background: var(--p-surface-0); color: inherit; font-size: 0.8125rem; font-weight: 600; cursor: pointer;">
+                            <span>${LucideIcons.fileSpreadsheet || "\u{1F4CA}"}</span>
+                            <span>Export CSV</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+    }
+    let loadingOverlayHtml = "";
+    if (loading && loadingMode === "overlay") {
+      loadingOverlayHtml = `
+                <div class="p-datatable-loading-overlay">
+                    <div style="width: 2.25rem; height: 2.25rem; border: 3px solid var(--p-primary-500); border-top-color: transparent; border-radius: 9999px; animation: p-spin 0.8s linear infinite;"></div>
+                    <span style="font-size: 0.875rem; font-weight: 600; color: var(--p-surface-700);">Loading records...</span>
+                </div>
+            `;
+    }
+    const scrollWrapperStyle = scrollHeight ? `max-height: ${scrollHeight}; overflow-y: auto;` : "";
+    container.innerHTML = `
+            <div class="${rootClasses.join(" ")}">
+                ${loadingOverlayHtml}
+                ${toolbarHtml}
+                <div class="p-datatable-scrollable-wrapper" style="${scrollWrapperStyle}">
+                    <table class="p-datatable-table" style="${props.tableStyle || ""}">
+                        <thead class="p-datatable-thead">
+                            <tr>${headerCells}</tr>
+                            ${filterRowHtml}
+                        </thead>
+                        <tbody class="p-datatable-tbody">
+                            ${bodyRowsHtml}
+                        </tbody>
                     </table>
                 </div>
-
-                <!-- Pagination Footer -->
-                <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1.25rem; background: var(--p-surface-50); border-top: 1px solid var(--p-border-color); font-size: 0.75rem; color: var(--p-surface-500);">
-                    <div>Showing ${filtered.length > 0 ? startIdx + 1 : 0} to ${Math.min(startIdx + pageSize, filtered.length)} of ${filtered.length} entries</div>
-                    <div style="display: flex; gap: 0.5rem;">
-                        <button type="button" class="p-button p-button-secondary prev-page" ${currentPage === 1 ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ""} style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">Prev</button>
-                        <span style="display: flex; align-items: center; padding: 0 0.5rem; font-weight: 600; color: var(--p-surface-900);">${currentPage} / ${totalPages}</span>
-                        <button type="button" class="p-button p-button-secondary next-page" ${currentPage === totalPages ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ""} style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">Next</button>
-                    </div>
-                </div>
+                ${paginatorHtml}
             </div>
         `;
-    const searchInput = container.querySelector(".datagrid-search");
-    searchInput.addEventListener("input", (e) => {
-      searchQuery = e.target.value;
-      currentPage = 1;
-      render();
-      const updatedInput = container.querySelector(".datagrid-search");
-      updatedInput.focus();
-      updatedInput.setSelectionRange(searchQuery.length, searchQuery.length);
-    });
-    container.querySelectorAll("th[data-field]").forEach((th) => {
+    bindEvents();
+  }
+  function bindEvents() {
+    const rootEl = container.firstElementChild;
+    if (!rootEl) return;
+    rootEl.querySelectorAll(".p-sortable-column").forEach((th) => {
       th.addEventListener("click", () => {
         const field = th.getAttribute("data-field");
-        if (sortField === field) {
-          sortAsc = !sortAsc;
-        } else {
-          sortField = field;
-          sortAsc = true;
+        if (!field) return;
+        const existing = sortMeta.find((m) => m.field === field);
+        let nextOrder = 1;
+        if (existing) {
+          if (existing.order === 1) nextOrder = -1;
+          else if (existing.order === -1) nextOrder = removableSort ? 0 : 1;
         }
+        if (sortMode === "multiple") {
+          if (nextOrder === 0) {
+            sortMeta = sortMeta.filter((m) => m.field !== field);
+          } else if (existing) {
+            existing.order = nextOrder;
+          } else {
+            sortMeta.push({ field, order: nextOrder });
+          }
+        } else {
+          if (nextOrder === 0) {
+            sortMeta = [];
+          } else {
+            sortMeta = [{ field, order: nextOrder }];
+          }
+        }
+        container.dispatchEvent(new CustomEvent("datatable:sort", {
+          bubbles: true,
+          detail: { sortMeta }
+        }));
         render();
       });
     });
-    container.querySelector(".prev-page")?.addEventListener("click", () => {
-      if (currentPage > 1) {
-        currentPage--;
+    const globalInput = rootEl.querySelector(".p-datatable-global-filter");
+    if (globalInput) {
+      globalInput.addEventListener("input", (e) => {
+        globalFilter = e.target.value;
+        currentPage = 1;
         render();
-      }
-    });
-    container.querySelector(".next-page")?.addEventListener("click", () => {
-      if (currentPage < totalPages) {
-        currentPage++;
+      });
+    }
+    rootEl.querySelectorAll(".p-datatable-filter-input[data-filter-field]").forEach((input) => {
+      input.addEventListener("input", (e) => {
+        const field = input.getAttribute("data-filter-field");
+        columnFilters[field] = e.target.value;
+        currentPage = 1;
         render();
-      }
+      });
     });
+    const exportBtn = rootEl.querySelector(".p-datatable-export-btn");
+    if (exportBtn) {
+      exportBtn.addEventListener("click", () => exportCSV());
+    }
+    const selectAllBox = rootEl.querySelector(".p-select-all");
+    if (selectAllBox) {
+      selectAllBox.addEventListener("click", () => {
+        const allSelected = selectAllBox.classList.contains("p-checked");
+        const displayRows = getFilteredRows();
+        if (allSelected) {
+          displayRows.forEach((r) => selectedKeys.delete(r[dataKey]));
+        } else {
+          displayRows.forEach((r) => selectedKeys.add(r[dataKey]));
+        }
+        dispatchSelectionEvent();
+        render();
+      });
+    }
+    rootEl.querySelectorAll(".p-row-checkbox").forEach((box) => {
+      box.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const key = box.getAttribute("data-row-key");
+        if (!key) return;
+        if (selectedKeys.has(key)) selectedKeys.delete(key);
+        else selectedKeys.add(key);
+        dispatchSelectionEvent();
+        render();
+      });
+    });
+    rootEl.querySelectorAll(".p-row-radio").forEach((radio) => {
+      radio.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const key = radio.getAttribute("data-row-key");
+        if (!key) return;
+        selectedKeys.clear();
+        selectedKeys.add(key);
+        dispatchSelectionEvent();
+        render();
+      });
+    });
+    if (selectionMode === "single" || selectionMode === "multiple") {
+      rootEl.querySelectorAll(".p-datatable-tbody > tr[data-row-key]").forEach((tr) => {
+        tr.addEventListener("click", (e) => {
+          const key = tr.getAttribute("data-row-key");
+          if (!key) return;
+          if (selectionMode === "single") {
+            if (selectedKeys.has(key)) selectedKeys.delete(key);
+            else {
+              selectedKeys.clear();
+              selectedKeys.add(key);
+            }
+          } else if (selectionMode === "multiple") {
+            const mouseEvent = e;
+            if (metaKeySelection && (mouseEvent.ctrlKey || mouseEvent.metaKey)) {
+              if (selectedKeys.has(key)) selectedKeys.delete(key);
+              else selectedKeys.add(key);
+            } else {
+              selectedKeys.clear();
+              selectedKeys.add(key);
+            }
+          }
+          dispatchSelectionEvent();
+          render();
+        });
+      });
+    }
+    rootEl.querySelectorAll(".p-row-toggler").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const key = btn.getAttribute("data-row-key");
+        if (!key) return;
+        if (expandedKeys.has(key)) expandedKeys.delete(key);
+        else expandedKeys.add(key);
+        render();
+      });
+    });
+    if (editMode === "cell") {
+      rootEl.querySelectorAll(".p-editable-cell").forEach((td) => {
+        td.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const rowKey = td.getAttribute("data-row-key");
+          const field = td.getAttribute("data-field");
+          if (!rowKey || !field) return;
+          editingCell = { rowKey, field };
+          render();
+        });
+      });
+      const cellInput = rootEl.querySelector(".p-cell-editor-input");
+      if (cellInput) {
+        cellInput.focus();
+        const saveCell = () => {
+          if (!editingCell) return;
+          const rowKey = editingCell.rowKey;
+          const field = editingCell.field;
+          const newVal = cellInput.value;
+          const matchedRow = rawData.find((r) => String(r[dataKey]) === String(rowKey));
+          if (matchedRow) {
+            matchedRow[field] = newVal;
+            container.dispatchEvent(new CustomEvent("datatable:cell-edit-complete", {
+              bubbles: true,
+              detail: { row: matchedRow, field, newValue: newVal }
+            }));
+          }
+          editingCell = null;
+          render();
+        };
+        cellInput.addEventListener("blur", saveCell);
+        cellInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            saveCell();
+          } else if (e.key === "Escape") {
+            editingCell = null;
+            render();
+          }
+        });
+      }
+    }
+    rootEl.querySelectorAll(".p-paginator-page, .p-paginator-nav").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const targetPage = Number(btn.getAttribute("data-page"));
+        if (!isNaN(targetPage) && targetPage > 0) {
+          currentPage = targetPage;
+          render();
+        }
+      });
+    });
+    const rowsSelect = rootEl.querySelector(".p-datatable-rows-select");
+    if (rowsSelect) {
+      rowsSelect.addEventListener("change", () => {
+        rowsPerPage = Number(rowsSelect.value);
+        currentPage = 1;
+        render();
+      });
+    }
+  }
+  function getFilteredRows() {
+    return rawData;
+  }
+  function dispatchSelectionEvent() {
+    const selectedRows = rawData.filter((r) => selectedKeys.has(r[dataKey]));
+    container.dispatchEvent(new CustomEvent("datatable:selection-change", {
+      bubbles: true,
+      detail: { selectedKeys: Array.from(selectedKeys), selectedRows }
+    }));
   }
   render();
 }
-var CSS6;
-var init_datagrid = __esm({
-  "src/components/datagrid.ts"() {
+var DATATABLE_CSS;
+var init_datatable = __esm({
+  "src/components/datatable.ts"() {
     "use strict";
     init_styles();
-    CSS6 = `
-[data-theme="dark"] .laughtale-datagrid {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+    init_lucide();
+    DATATABLE_CSS = `
+.p-datatable {
+    position: relative;
+    border-radius: var(--p-border-radius-lg, 8px);
+    background: var(--p-surface-0, #ffffff);
+    color: var(--p-surface-800, #1e293b);
+    font-family: var(--p-font-family, inherit);
+    border: 1px solid var(--p-surface-200, #e2e8f0);
+    overflow: hidden;
 }
-[data-theme="dark"] .datagrid-search {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-datatable-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    font-size: 0.875rem;
+}
+
+/* Header Cells */
+.p-datatable-thead > tr > th {
+    padding: 0.75rem 1rem;
+    background: var(--p-surface-50, #f8fafc);
+    color: var(--p-surface-700, #334155);
+    font-weight: 600;
+    font-size: 0.8125rem;
+    border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
+    text-align: left;
+    user-select: none;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.p-datatable-thead > tr > th.p-sortable-column {
+    cursor: pointer;
+}
+
+.p-datatable-thead > tr > th.p-sortable-column:hover {
+    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-surface-900, #0f172a);
+}
+
+.p-datatable-header-content {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.p-datatable-sort-icon {
+    display: inline-flex;
+    align-items: center;
+    color: var(--p-surface-400, #94a3b8);
+    transition: color 0.15s ease;
+}
+.p-sortable-column.p-sorted .p-datatable-sort-icon {
+    color: var(--p-primary-500, #10b981);
+}
+
+.p-datatable-sort-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.125rem;
+    height: 1.125rem;
+    border-radius: 9999px;
+    background: var(--p-primary-500, #10b981);
+    color: #ffffff;
+    font-size: 0.6875rem;
+    font-weight: 700;
+}
+
+/* Filter Row */
+.p-datatable-filter-row > th {
+    padding: 0.35rem 0.75rem;
+    background: var(--p-surface-50, #f8fafc);
+    border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
+}
+.p-datatable-filter-input {
+    width: 100%;
+    padding: 0.35rem 0.6rem;
+    font-size: 0.8125rem;
+    border: 1px solid var(--p-surface-300, #cbd5e1);
+    border-radius: var(--p-border-radius, 6px);
+    background: var(--p-surface-0, #ffffff);
+    color: inherit;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.p-datatable-filter-input:focus {
+    border-color: var(--p-primary-500, #10b981);
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+}
+
+/* Body Cells */
+.p-datatable-tbody > tr {
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.p-datatable-tbody > tr > td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
+    color: var(--p-surface-700, #334155);
+}
+
+.p-datatable-tbody > tr:hover {
+    background: var(--p-surface-50, #f8fafc);
+}
+
+.p-datatable-tbody > tr.p-highlight {
+    background: rgba(16, 185, 129, 0.08) !important;
+    color: var(--p-primary-700, #047857) !important;
+}
+
+.p-datatable-tbody > tr.p-highlight > td {
+    color: inherit;
+}
+
+/* Size Variants */
+.p-datatable-sm .p-datatable-thead > tr > th,
+.p-datatable-sm .p-datatable-tbody > tr > td {
+    padding: 0.375rem 0.625rem;
+    font-size: 0.75rem;
+}
+
+.p-datatable-lg .p-datatable-thead > tr > th,
+.p-datatable-lg .p-datatable-tbody > tr > td {
+    padding: 1rem 1.25rem;
+    font-size: 0.9375rem;
+}
+
+/* Striped Rows */
+.p-datatable-striped .p-datatable-tbody > tr:nth-child(even):not(.p-highlight) {
+    background: var(--p-surface-50, #f8fafc);
+}
+
+/* Grid Lines */
+.p-datatable-gridlines .p-datatable-thead > tr > th,
+.p-datatable-gridlines .p-datatable-tbody > tr > td {
+    border: 1px solid var(--p-surface-200, #e2e8f0);
+}
+
+/* Scrollable & Sticky Header */
+.p-datatable-scrollable-wrapper {
+    overflow: auto;
+    position: relative;
+}
+
+.p-datatable-scrollable .p-datatable-thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+/* Frozen Columns */
+.p-frozen-column-left {
+    position: sticky !important;
+    left: 0;
+    z-index: 5;
+    background: inherit;
+    box-shadow: 2px 0 4px -2px rgba(0, 0, 0, 0.1);
+}
+.p-frozen-column-right {
+    position: sticky !important;
+    right: 0;
+    z-index: 5;
+    background: inherit;
+    box-shadow: -2px 0 4px -2px rgba(0, 0, 0, 0.1);
+}
+
+/* Row Expansion */
+.p-row-expansion {
+    background: var(--p-surface-50, #f8fafc);
+    border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
+}
+.p-row-toggler {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem;
+    border-radius: 9999px;
+    color: var(--p-surface-500, #64748b);
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+.p-row-toggler:hover {
+    background: var(--p-surface-200, #e2e8f0);
+    color: var(--p-surface-800, #1e293b);
+}
+
+/* Custom Checkbox & Radio */
+.p-checkbox-box, .p-radio-box {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.125rem;
+    height: 1.125rem;
+    border-radius: var(--p-border-radius-xs, 4px);
+    border: 2px solid var(--p-surface-300, #cbd5e1);
+    background: var(--p-surface-0, #ffffff);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.p-radio-box {
+    border-radius: 9999px;
+}
+.p-checkbox-box.p-checked, .p-radio-box.p-checked {
+    background: var(--p-primary-500, #10b981);
+    border-color: var(--p-primary-500, #10b981);
+    color: #ffffff;
+}
+
+/* In-place Editable Cell */
+.p-editable-cell {
+    cursor: pointer;
+    position: relative;
+    border-radius: var(--p-border-radius-xs, 4px);
+}
+.p-editable-cell:hover {
+    outline: 1px dashed var(--p-primary-400, #34d399);
+}
+.p-cell-editor-input {
+    width: 100%;
+    padding: 0.25rem 0.5rem;
+    font-size: inherit;
+    border: 1px solid var(--p-primary-500, #10b981);
+    border-radius: var(--p-border-radius-xs, 4px);
+    background: var(--p-surface-0, #ffffff);
+    color: inherit;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+}
+
+/* Toolbar & Global Filter */
+.p-datatable-header-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.875rem 1.25rem;
+    border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
+    background: var(--p-surface-0, #ffffff);
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+.p-datatable-title {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--p-surface-900, #0f172a);
+}
+
+/* Paginator Integration */
+.p-datatable-paginator {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1.25rem;
+    background: var(--p-surface-0, #ffffff);
+    border-top: 1px solid var(--p-surface-200, #e2e8f0);
+    font-size: 0.8125rem;
+    color: var(--p-surface-600, #475569);
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+.p-paginator-pages {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+.p-paginator-page, .p-paginator-nav {
+    min-width: 2rem;
+    height: 2rem;
+    padding: 0 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--p-border-radius, 6px);
+    border: 1px solid transparent;
+    background: transparent;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.8125rem;
+    color: var(--p-surface-700, #334155);
+    transition: all 0.15s ease;
+}
+.p-paginator-page:hover:not(:disabled), .p-paginator-nav:hover:not(:disabled) {
+    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-surface-900, #0f172a);
+}
+.p-paginator-page.p-paginator-page-active {
+    background: var(--p-primary-500, #10b981);
+    color: #ffffff;
+}
+.p-paginator-page:disabled, .p-paginator-nav:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* Loading Mask */
+.p-datatable-loading-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 50;
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(1px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+/* Skeleton Placeholders */
+.p-datatable-skeleton-cell {
+    height: 1rem;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--p-surface-200, #e2e8f0) 25%, var(--p-surface-100, #f1f5f9) 50%, var(--p-surface-200, #e2e8f0) 75%);
+    background-size: 200% 100%;
+    animation: p-skeleton-shimmer 1.5s infinite;
+}
+
+@keyframes p-skeleton-shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Dark Mode Tokens */
+.dark .p-datatable,
+[data-theme="dark"] .p-datatable {
+    background: var(--p-surface-900, #0f172a) !important;
+    color: var(--p-surface-100, #f1f5f9) !important;
+    border-color: var(--p-surface-700, #334155) !important;
+}
+.dark .p-datatable-thead > tr > th,
+[data-theme="dark"] .p-datatable-thead > tr > th {
+    background: var(--p-surface-800, #1e293b) !important;
+    color: var(--p-surface-200, #e2e8f0) !important;
+    border-color: var(--p-surface-700, #334155) !important;
+}
+.dark .p-datatable-tbody > tr > td,
+[data-theme="dark"] .p-datatable-tbody > tr > td {
+    border-color: var(--p-surface-800, #1e293b) !important;
+    color: var(--p-surface-200, #e2e8f0) !important;
+}
+.dark .p-datatable-tbody > tr:hover,
+[data-theme="dark"] .p-datatable-tbody > tr:hover {
+    background: var(--p-surface-800, #1e293b) !important;
+}
+.dark .p-datatable-striped .p-datatable-tbody > tr:nth-child(even):not(.p-highlight),
+[data-theme="dark"] .p-datatable-striped .p-datatable-tbody > tr:nth-child(even):not(.p-highlight) {
+    background: rgba(30, 41, 59, 0.5) !important;
+}
+.dark .p-datatable-header-toolbar,
+.dark .p-datatable-paginator,
+[data-theme="dark"] .p-datatable-header-toolbar,
+[data-theme="dark"] .p-datatable-paginator {
+    background: var(--p-surface-900, #0f172a) !important;
+    border-color: var(--p-surface-700, #334155) !important;
+    color: var(--p-surface-300, #cbd5e1) !important;
+}
+.dark .p-datatable-filter-row > th,
+.dark .p-row-expansion,
+[data-theme="dark"] .p-datatable-filter-row > th,
+[data-theme="dark"] .p-row-expansion {
+    background: var(--p-surface-800, #1e293b) !important;
+    border-color: var(--p-surface-700, #334155) !important;
+}
+.dark .p-datatable-filter-input,
+[data-theme="dark"] .p-datatable-filter-input {
+    background: var(--p-surface-900, #0f172a) !important;
+    border-color: var(--p-surface-600, #475569) !important;
+    color: #ffffff !important;
+}
+.dark .p-datatable-loading-overlay,
+[data-theme="dark"] .p-datatable-loading-overlay {
+    background: rgba(15, 23, 42, 0.75) !important;
 }
 `;
   }
@@ -4568,7 +5403,7 @@ __export(toast_exports, {
   default: () => ToastIsland
 });
 function ToastIsland(container) {
-  injectIslandStyle("toast", CSS7);
+  injectIslandStyle("toast", CSS6);
   const toastThemes = {
     success: { bg: "#ecfdf5", border: "#a7f3d0", color: "#047857", icon: "\u2713" },
     info: { bg: "#eff6ff", border: "#bfdbfe", color: "#1d4ed8", icon: "\u2139" },
@@ -4604,12 +5439,12 @@ function ToastIsland(container) {
     if (e.detail) addToast(e.detail);
   });
 }
-var CSS7;
+var CSS6;
 var init_toast = __esm({
   "src/components/toast.ts"() {
     "use strict";
     init_styles();
-    CSS7 = `
+    CSS6 = `
 @keyframes toast-slideIn {
     from { opacity: 0; transform: translateX(100%); }
     to { opacity: 1; transform: translateX(0); }
@@ -4673,7 +5508,7 @@ __export(input_number_exports, {
   default: () => InputNumberIsland
 });
 function InputNumberIsland(container, props) {
-  injectIslandStyle("laughtale-inputnumber", CSS8);
+  injectIslandStyle("laughtale-inputnumber", CSS7);
   let rawValue = props.value !== void 0 && props.value !== null ? Number(props.value) : null;
   const step = props.step !== void 0 ? Number(props.step) : 1;
   const min = props.min !== void 0 ? Number(props.min) : void 0;
@@ -4944,12 +5779,12 @@ function InputNumberIsland(container, props) {
   render();
   syncTargetInput();
 }
-var CSS8;
+var CSS7;
 var init_input_number = __esm({
   "src/components/input-number.ts"() {
     "use strict";
     init_styles();
-    CSS8 = `
+    CSS7 = `
 .laughtale-inputnumber,
 .p-inputnumber {
     display: inline-flex;
@@ -5214,7 +6049,7 @@ __export(input_otp_exports, {
   default: () => InputOtpIsland
 });
 function InputOtpIsland(container, props) {
-  injectIslandStyle("laughtale-inputotp", CSS9);
+  injectIslandStyle("laughtale-inputotp", CSS8);
   const length = Number(props.length) || 4;
   const isMask = props.mask === true || String(props.mask) === "true";
   const isIntegerOnly = props.integerOnly !== false && String(props.integerOnly) !== "false";
@@ -5408,12 +6243,12 @@ function InputOtpIsland(container, props) {
     first?.focus();
   }
 }
-var CSS9;
+var CSS8;
 var init_input_otp = __esm({
   "src/components/input-otp.ts"() {
     "use strict";
     init_styles();
-    CSS9 = `
+    CSS8 = `
 .laughtale-input-otp,
 .p-inputotp {
     display: inline-flex;
@@ -5560,7 +6395,7 @@ __export(input_password_exports, {
   default: () => InputPasswordIsland
 });
 function InputPasswordIsland(container, props) {
-  injectIslandStyle("laughtale-password", CSS10);
+  injectIslandStyle("laughtale-password", CSS9);
   let isMasked = true;
   let currentVal = props.value || "";
   const minLength = Number(props.minLength) || 8;
@@ -5850,13 +6685,13 @@ function InputPasswordIsland(container, props) {
   updateVisuals();
   syncTargetInput();
 }
-var CSS10;
+var CSS9;
 var init_input_password = __esm({
   "src/components/input-password.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS10 = `
+    CSS9 = `
 .laughtale-password,
 .p-password {
     display: inline-flex;
@@ -6202,7 +7037,7 @@ __export(toggle_switch_exports, {
   default: () => ToggleSwitchIsland
 });
 function ToggleSwitchIsland(container, props) {
-  injectIslandStyle("laughtale-toggleswitch", CSS11);
+  injectIslandStyle("laughtale-toggleswitch", CSS10);
   let isChecked = props.checked === true || String(props.checked) === "true" || props.value === true || String(props.value) === "true";
   const isInvalid = props.invalid === true || String(props.invalid) === "true";
   const isDisabled = props.disabled === true || String(props.disabled) === "true";
@@ -6287,13 +7122,13 @@ function ToggleSwitchIsland(container, props) {
   }
   render();
 }
-var CSS11;
+var CSS10;
 var init_toggle_switch = __esm({
   "src/components/toggle-switch.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS11 = `
+    CSS10 = `
 /* ==================== AURA TOGGLESWITCH ==================== */
 .laughtale-toggleswitch,
 .p-toggleswitch {
@@ -6452,7 +7287,7 @@ __export(toggle_button_exports, {
   default: () => ToggleButtonIsland
 });
 function ToggleButtonIsland(container, props) {
-  injectIslandStyle("laughtale-togglebutton", CSS12);
+  injectIslandStyle("laughtale-togglebutton", CSS11);
   let isChecked = props.checked === true || String(props.checked) === "true" || props.value === true || String(props.value) === "true";
   const isFluid = props.fluid === true || String(props.fluid) === "true";
   const isInvalid = props.invalid === true || String(props.invalid) === "true";
@@ -6524,13 +7359,13 @@ function ToggleButtonIsland(container, props) {
   }
   render();
 }
-var CSS12;
+var CSS11;
 var init_toggle_button = __esm({
   "src/components/toggle-button.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS12 = `
+    CSS11 = `
 /* ==================== AURA TOGGLEBUTTON ==================== */
 .laughtale-togglebutton,
 .p-togglebutton {
@@ -6670,7 +7505,7 @@ __export(button_exports, {
   default: () => ButtonIsland
 });
 function ButtonIsland(container, props) {
-  injectIslandStyle("laughtale-button", CSS13);
+  injectIslandStyle("laughtale-button", CSS12);
   let isLoading = props.loading === true || String(props.loading) === "true";
   let isDisabled = props.disabled === true || String(props.disabled) === "true";
   const btnEl = container.tagName.toLowerCase() === "button" || container.tagName.toLowerCase() === "a" ? container : container.querySelector("button, a") || container;
@@ -6707,13 +7542,13 @@ function ButtonIsland(container, props) {
   });
   renderLoading();
 }
-var CSS13;
+var CSS12;
 var init_button = __esm({
   "src/components/button.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS13 = `
+    CSS12 = `
 /* CSS is provided globally in site.css / theme */
 `;
   }
@@ -6725,7 +7560,7 @@ __export(slider_exports, {
   default: () => SliderIsland
 });
 function SliderIsland(container, props) {
-  injectIslandStyle("laughtale-slider", CSS14);
+  injectIslandStyle("laughtale-slider", CSS13);
   const min = props.min !== void 0 ? Number(props.min) : 0;
   const max = props.max !== void 0 ? Number(props.max) : 100;
   const step = props.step !== void 0 ? Number(props.step) : 1;
@@ -7043,12 +7878,12 @@ function SliderIsland(container, props) {
   }
   render();
 }
-var CSS14;
+var CSS13;
 var init_slider = __esm({
   "src/components/slider.ts"() {
     "use strict";
     init_styles();
-    CSS14 = `
+    CSS13 = `
 /* ==================== AURA SLIDER ==================== */
 .laughtale-slider,
 .p-slider {
@@ -7198,7 +8033,7 @@ __export(rating_exports, {
   default: () => RatingIsland
 });
 function RatingIsland(container, props) {
-  injectIslandStyle("laughtale-rating", CSS15);
+  injectIslandStyle("laughtale-rating", CSS14);
   const totalStars = props.stars ? Number(props.stars) : 5;
   const isAllowHalf = props.allowHalf === true || String(props.allowHalf) === "true";
   const isCancelAllowed = props.cancel !== false && props.allowCancel !== false && String(props.cancel) !== "false" && String(props.allowCancel) !== "false";
@@ -7412,13 +8247,13 @@ function RatingIsland(container, props) {
   }
   init();
 }
-var CSS15, starFilledSvg, starEmptySvg, cancelSvg;
+var CSS14, starFilledSvg, starEmptySvg, cancelSvg;
 var init_rating = __esm({
   "src/components/rating.ts"() {
     "use strict";
     init_styles();
     init_useControllableState();
-    CSS15 = `
+    CSS14 = `
 .laughtale-rating,
 .p-rating {
     display: inline-flex;
@@ -7618,7 +8453,7 @@ __export(select_button_exports, {
   default: () => SelectButtonIsland
 });
 function SelectButtonIsland(container, props) {
-  injectIslandStyle("laughtale-selectbutton", CSS16);
+  injectIslandStyle("laughtale-selectbutton", CSS15);
   const isMultiple = props.multiple === true || String(props.multiple) === "true";
   const isUnselectable = props.unselectable !== false && String(props.unselectable) !== "false";
   const isFluid = props.fluid === true || String(props.fluid) === "true";
@@ -7738,13 +8573,13 @@ function SelectButtonIsland(container, props) {
   }
   render();
 }
-var CSS16;
+var CSS15;
 var init_select_button = __esm({
   "src/components/select-button.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS16 = `
+    CSS15 = `
 /* ==================== AURA SELECTBUTTON ==================== */
 .laughtale-selectbutton,
 .p-selectbutton {
@@ -7912,7 +8747,7 @@ __export(input_tags_exports, {
   default: () => InputTagsIsland
 });
 function InputTagsIsland(container, props) {
-  injectIslandStyle("laughtale-inputtags", CSS17);
+  injectIslandStyle("laughtale-inputtags", CSS16);
   let initialValues = [];
   const rawVal = props.values ?? props.value;
   if (Array.isArray(rawVal)) {
@@ -8278,13 +9113,13 @@ function InputTagsIsland(container, props) {
   }
   init();
 }
-var CSS17, xCircleIcon;
+var CSS16, xCircleIcon;
 var init_input_tags = __esm({
   "src/components/input-tags.ts"() {
     "use strict";
     init_styles();
     init_useControllableState();
-    CSS17 = `
+    CSS16 = `
 .laughtale-inputtags,
 .p-inputtags {
     display: inline-flex;
@@ -8535,7 +9370,7 @@ __export(datepicker_exports, {
   default: () => DatePickerIsland
 });
 function DatePickerIsland(container, props) {
-  injectIslandStyle("datepicker", CSS18);
+  injectIslandStyle("datepicker", CSS17);
   const selectionMode = props.selectionMode || "single";
   let currentView = props.view || "date";
   const isInline = props.inline === true;
@@ -8948,7 +9783,7 @@ function DatePickerIsland(container, props) {
   }
   renderComponent();
 }
-var CSS18, MONTH_NAMES, SHORT_MONTHS, WEEKDAYS;
+var CSS17, MONTH_NAMES, SHORT_MONTHS, WEEKDAYS;
 var init_datepicker = __esm({
   "src/components/datepicker.ts"() {
     "use strict";
@@ -8956,7 +9791,7 @@ var init_datepicker = __esm({
     init_styles();
     init_useDisclosure();
     init_useClickOutside();
-    CSS18 = `
+    CSS17 = `
 .laughtale-datepicker {
     position: relative;
     display: inline-flex;
@@ -9321,7 +10156,7 @@ __export(meter_group_exports, {
   default: () => MeterGroupIsland
 });
 function MeterGroupIsland(container, props) {
-  injectIslandStyle("meter-group", CSS19);
+  injectIslandStyle("meter-group", CSS18);
   const total = props.values.reduce((acc, curr) => acc + curr.value, 0);
   const barSegments = props.values.map((v) => {
     const pct = total > 0 ? v.value / total * 100 : 0;
@@ -9354,12 +10189,12 @@ function MeterGroupIsland(container, props) {
         </div>
     `;
 }
-var CSS19;
+var CSS18;
 var init_meter_group = __esm({
   "src/components/meter-group.ts"() {
     "use strict";
     init_styles();
-    CSS19 = `
+    CSS18 = `
 [data-theme="dark"] .laughtale-meter-group {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -9375,7 +10210,7 @@ __export(avatar_group_exports, {
   default: () => AvatarGroupIsland
 });
 function AvatarGroupIsland(container, props) {
-  injectIslandStyle("avatar-group", CSS20);
+  injectIslandStyle("avatar-group", CSS19);
   const max = props.max || 4;
   const visible = props.avatars.slice(0, max);
   const overflowCount = props.avatars.length - max;
@@ -9400,12 +10235,12 @@ function AvatarGroupIsland(container, props) {
         </div>
     `;
 }
-var CSS20;
+var CSS19;
 var init_avatar_group = __esm({
   "src/components/avatar-group.ts"() {
     "use strict";
     init_styles();
-    CSS20 = `
+    CSS19 = `
 [data-theme="dark"] .laughtale-avatar-group {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -9421,7 +10256,7 @@ __export(progress_bar_exports, {
   default: () => ProgressBarIsland
 });
 function ProgressBarIsland(container, props) {
-  injectIslandStyle("progress-bar", CSS21);
+  injectIslandStyle("progress-bar", CSS20);
   const isIndeterminate = props.mode === "indeterminate" || props.value === void 0;
   const value = Math.max(0, Math.min(100, props.value || 0));
   const height = props.height || "0.75rem";
@@ -9452,12 +10287,12 @@ function ProgressBarIsland(container, props) {
         `;
   }
 }
-var CSS21;
+var CSS20;
 var init_progress_bar = __esm({
   "src/components/progress-bar.ts"() {
     "use strict";
     init_styles();
-    CSS21 = `
+    CSS20 = `
 [data-theme="dark"] .laughtale-progress-bar {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -9473,7 +10308,7 @@ __export(skeleton_exports, {
   default: () => SkeletonIsland
 });
 function SkeletonIsland(container, props) {
-  injectIslandStyle("skeleton", CSS22);
+  injectIslandStyle("skeleton", CSS21);
   const shape = props.shape || "rectangle";
   const width = props.width || "100%";
   const height = props.height || "1.25rem";
@@ -9488,12 +10323,12 @@ function SkeletonIsland(container, props) {
         </style>
     `;
 }
-var CSS22;
+var CSS21;
 var init_skeleton = __esm({
   "src/components/skeleton.ts"() {
     "use strict";
     init_styles();
-    CSS22 = `
+    CSS21 = `
 [data-theme="dark"] .laughtale-skeleton {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -9509,7 +10344,7 @@ __export(drawer_exports, {
   default: () => DrawerIsland
 });
 function DrawerIsland(container, props) {
-  injectIslandStyle("drawer", CSS23);
+  injectIslandStyle("drawer", CSS22);
   const position = props.position || "right";
   const width = props.width || "380px";
   function render() {
@@ -9576,7 +10411,7 @@ function DrawerIsland(container, props) {
   }
   render();
 }
-var CSS23;
+var CSS22;
 var init_drawer = __esm({
   "src/components/drawer.ts"() {
     "use strict";
@@ -9584,7 +10419,7 @@ var init_drawer = __esm({
     init_styles();
     init_useDisclosure();
     init_useFocusTrap();
-    CSS23 = `
+    CSS22 = `
 [data-theme="dark"] .laughtale-drawer-wrapper {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -10351,7 +11186,7 @@ __export(image_compare_exports, {
   default: () => ImageCompareIsland
 });
 function ImageCompareIsland(container, props) {
-  injectIslandStyle("image-compare", CSS24);
+  injectIslandStyle("image-compare", CSS23);
   let splitPercent = 50;
   container.innerHTML = `
         <div class="laughtale-image-compare" style="position: relative; width: 100%; max-width: 600px; height: 340px; border-radius: var(--p-border-radius-lg); overflow: hidden; user-select: none; border: 1px solid var(--p-border-color); box-shadow: var(--p-shadow-md); touch-action: none; cursor: ew-resize;">
@@ -10427,12 +11262,12 @@ function ImageCompareIsland(container, props) {
   window.addEventListener("mousemove", onPointerMove);
   window.addEventListener("mouseup", onPointerUp);
 }
-var CSS24;
+var CSS23;
 var init_image_compare = __esm({
   "src/components/image-compare.ts"() {
     "use strict";
     init_styles();
-    CSS24 = `
+    CSS23 = `
 [data-theme="dark"] .laughtale-image-compare {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -10448,7 +11283,7 @@ __export(confirm_popup_exports, {
   default: () => ConfirmPopupIsland
 });
 function ConfirmPopupIsland(container, props) {
-  injectIslandStyle("confirm-popup", CSS25);
+  injectIslandStyle("confirm-popup", CSS24);
   let isOpen = false;
   function render() {
     container.innerHTML = `
@@ -10525,13 +11360,13 @@ function ConfirmPopupIsland(container, props) {
   }
   render();
 }
-var CSS25;
+var CSS24;
 var init_confirm_popup = __esm({
   "src/components/confirm-popup.ts"() {
     "use strict";
     init_lucide();
     init_styles();
-    CSS25 = `
+    CSS24 = `
 [data-theme="dark"] .laughtale-confirm-popup {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -10557,7 +11392,7 @@ __export(accordion_exports, {
   default: () => AccordionIsland
 });
 function AccordionIsland(container, props) {
-  injectIslandStyle("accordion", CSS26);
+  injectIslandStyle("accordion", CSS25);
   const tabs = props.tabs || [];
   let activeIndices = /* @__PURE__ */ new Set();
   if (Array.isArray(props.activeIndex)) {
@@ -10650,7 +11485,7 @@ function AccordionIsland(container, props) {
   }
   render();
 }
-var CSS26;
+var CSS25;
 var init_accordion = __esm({
   "src/components/accordion.ts"() {
     "use strict";
@@ -10658,7 +11493,7 @@ var init_accordion = __esm({
     init_styles();
     init_useDisclosure();
     init_useTransition();
-    CSS26 = `
+    CSS25 = `
 [data-theme="dark"] .accordion-tab {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -10837,7 +11672,7 @@ __export(autocomplete_exports, {
   default: () => AutoCompleteIsland
 });
 function AutoCompleteIsland(container, props) {
-  injectIslandStyle("autocomplete", CSS27);
+  injectIslandStyle("autocomplete", CSS26);
   const allItems = props.suggestions || props.items || [];
   const multiple = props.multiple === true;
   const showClear = props.showClear !== false;
@@ -11170,7 +12005,7 @@ function AutoCompleteIsland(container, props) {
   }
   renderChips();
 }
-var CSS27;
+var CSS26;
 var init_autocomplete = __esm({
   "src/components/autocomplete.ts"() {
     "use strict";
@@ -11179,7 +12014,7 @@ var init_autocomplete = __esm({
     init_useDisclosure();
     init_useClickOutside();
     init_useDebounce();
-    CSS27 = `
+    CSS26 = `
 .laughtale-autocomplete {
     position: relative;
     display: inline-flex;
@@ -11449,7 +12284,7 @@ __export(color_picker_exports, {
   default: () => ColorPickerIsland
 });
 function ColorPickerIsland(container, props) {
-  injectIslandStyle("color-picker", CSS28);
+  injectIslandStyle("color-picker", CSS27);
   let currentColor = props.value || "#10b981";
   let isOpen = false;
   const swatchesHtml = DEFAULT_PRESETS.map((c) => `
@@ -11573,7 +12408,7 @@ function ColorPickerIsland(container, props) {
   }
   syncValue();
 }
-var DEFAULT_PRESETS, CSS28;
+var DEFAULT_PRESETS, CSS27;
 var init_color_picker = __esm({
   "src/components/color-picker.ts"() {
     "use strict";
@@ -11595,7 +12430,7 @@ var init_color_picker = __esm({
       "#1e293b",
       "#000000"
     ];
-    CSS28 = `
+    CSS27 = `
 [data-theme="dark"] .color-swatch-btn {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -11631,7 +12466,7 @@ __export(knob_exports, {
   default: () => KnobIsland
 });
 function KnobIsland(container, props) {
-  injectIslandStyle("knob", CSS29);
+  injectIslandStyle("knob", CSS28);
   const min = props.min !== void 0 ? props.min : 0;
   const max = props.max !== void 0 ? props.max : 100;
   const step = props.step || 1;
@@ -11733,12 +12568,12 @@ function KnobIsland(container, props) {
   }
   syncValue();
 }
-var CSS29;
+var CSS28;
 var init_knob = __esm({
   "src/components/knob.ts"() {
     "use strict";
     init_styles();
-    CSS29 = `
+    CSS28 = `
 [data-theme="dark"] .laughtale-knob {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -11764,7 +12599,7 @@ __export(tag_exports, {
   default: () => TagIsland
 });
 function TagIsland(container, props) {
-  injectIslandStyle("tag", CSS30);
+  injectIslandStyle("tag", CSS29);
   const severity = props.severity || "info";
   const isRounded = props.rounded || false;
   let bg = "var(--p-blue-50, #eff6ff)";
@@ -11798,12 +12633,12 @@ function TagIsland(container, props) {
         </span>
     `;
 }
-var CSS30;
+var CSS29;
 var init_tag = __esm({
   "src/components/tag.ts"() {
     "use strict";
     init_styles();
-    CSS30 = `
+    CSS29 = `
 [data-theme="dark"] .laughtale-tag {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -11819,7 +12654,7 @@ __export(breadcrumb_exports, {
   default: () => BreadcrumbIsland
 });
 function BreadcrumbIsland(container, props) {
-  injectIslandStyle("breadcrumb", CSS31);
+  injectIslandStyle("breadcrumb", CSS30);
   const items = props.items || [];
   const homeUrl = props.homeUrl || "/";
   const itemsHtml = items.map((item, idx) => {
@@ -11857,13 +12692,13 @@ function BreadcrumbIsland(container, props) {
         </nav>
     `;
 }
-var CSS31;
+var CSS30;
 var init_breadcrumb = __esm({
   "src/components/breadcrumb.ts"() {
     "use strict";
     init_lucide();
     init_styles();
-    CSS31 = `
+    CSS30 = `
 [data-theme="dark"] .laughtale-breadcrumb {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -11879,7 +12714,7 @@ __export(scroll_top_exports, {
   default: () => ScrollTopIsland
 });
 function ScrollTopIsland(container, props) {
-  injectIslandStyle("scroll-top", CSS32);
+  injectIslandStyle("scroll-top", CSS31);
   const threshold = props.threshold || 200;
   let isVisible = false;
   function render() {
@@ -11905,13 +12740,13 @@ function ScrollTopIsland(container, props) {
   window.addEventListener("scroll", checkScroll, { passive: true });
   render();
 }
-var CSS32;
+var CSS31;
 var init_scroll_top = __esm({
   "src/components/scroll-top.ts"() {
     "use strict";
     init_lucide();
     init_styles();
-    CSS32 = `
+    CSS31 = `
 [data-theme="dark"] .laughtale-scroll-top-btn {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -11927,7 +12762,7 @@ __export(inplace_exports, {
   default: () => InplaceIsland
 });
 function InplaceIsland(container, props) {
-  injectIslandStyle("inplace", CSS33);
+  injectIslandStyle("inplace", CSS32);
   let isEditing = false;
   let currentValue = props.value || "";
   function render() {
@@ -12007,13 +12842,13 @@ function InplaceIsland(container, props) {
   render();
   syncValue();
 }
-var CSS33;
+var CSS32;
 var init_inplace = __esm({
   "src/components/inplace.ts"() {
     "use strict";
     init_lucide();
     init_styles();
-    CSS33 = `
+    CSS32 = `
 [data-theme="dark"] .laughtale-inplace-display {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -12049,7 +12884,7 @@ __export(command_exports, {
   default: () => CommandPaletteIsland
 });
 function CommandPaletteIsland(container, props) {
-  injectIslandStyle("command", CSS34);
+  injectIslandStyle("command", CSS33);
   const placeholder = props.placeholder || "Type a command or search...";
   const items = props.items || [
     { id: "home", label: "Go to Overview", group: "Navigation", icon: "compass", url: "/", shortcut: "G H" },
@@ -12223,7 +13058,7 @@ function CommandPaletteIsland(container, props) {
   ]);
   document.addEventListener("command:open", () => open());
 }
-var CSS34;
+var CSS33;
 var init_command = __esm({
   "src/components/command.ts"() {
     "use strict";
@@ -12233,7 +13068,7 @@ var init_command = __esm({
     init_useFocusTrap();
     init_useHotkeys();
     init_useScrollLock();
-    CSS34 = `
+    CSS33 = `
 [data-theme="dark"] .laughtale-command-root {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -13097,7 +13932,7 @@ __export(dynamic_form_exports, {
   default: () => DynamicFormIsland
 });
 function DynamicFormIsland(container, props) {
-  injectIslandStyle("dynamic-form", CSS35);
+  injectIslandStyle("dynamic-form", CSS34);
   let schema = props.schema || null;
   if (!schema && props.schemaJson) {
     try {
@@ -13258,13 +14093,13 @@ function DynamicFormIsland(container, props) {
   }
   render();
 }
-var CSS35;
+var CSS34;
 var init_dynamic_form = __esm({
   "src/components/dynamic-form.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS35 = `
+    CSS34 = `
 [data-theme="dark"] .p-input {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -13295,7 +14130,7 @@ __export(splitter_exports, {
   default: () => SplitterIsland
 });
 function SplitterIsland(container, props) {
-  injectIslandStyle("splitter", CSS36);
+  injectIslandStyle("splitter", CSS35);
   const layout = props.layout || "horizontal";
   const isHorizontal = layout === "horizontal";
   const panels = props.panels && props.panels.length >= 2 ? props.panels : [
@@ -13338,13 +14173,13 @@ function SplitterIsland(container, props) {
     }
   });
 }
-var CSS36;
+var CSS35;
 var init_splitter = __esm({
   "src/components/splitter.ts"() {
     "use strict";
     init_styles();
     init_useDragGesture();
-    CSS36 = `
+    CSS35 = `
 [data-theme="dark"] .laughtale-splitter {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -13375,7 +14210,7 @@ __export(multiselect_exports, {
   default: () => MultiSelectIsland
 });
 function MultiSelectIsland(container, props) {
-  injectIslandStyle("multiselect", CSS37);
+  injectIslandStyle("multiselect", CSS36);
   const options = props.options || [];
   let selected = new Set(props.selectedValues || []);
   let filterQuery = "";
@@ -13541,7 +14376,7 @@ function MultiSelectIsland(container, props) {
   renderDisplay();
   syncValue();
 }
-var CSS37;
+var CSS36;
 var init_multiselect = __esm({
   "src/components/multiselect.ts"() {
     "use strict";
@@ -13550,7 +14385,7 @@ var init_multiselect = __esm({
     init_useDisclosure();
     init_useClickOutside();
     init_useTransition();
-    CSS37 = `
+    CSS36 = `
 [data-theme="dark"] .laughtale-multiselect {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -13621,7 +14456,7 @@ __export(cascadeselect_exports, {
   default: () => CascadeSelectIsland
 });
 function CascadeSelectIsland(container, props) {
-  injectIslandStyle("cascadeselect", CSS38);
+  injectIslandStyle("cascadeselect", CSS37);
   const options = props.options || [];
   const size = props.size || "normal";
   const variant = props.variant || "outlined";
@@ -13834,7 +14669,7 @@ function CascadeSelectIsland(container, props) {
     }));
   }
 }
-var CSS38;
+var CSS37;
 var init_cascadeselect = __esm({
   "src/components/cascadeselect.ts"() {
     "use strict";
@@ -13842,7 +14677,7 @@ var init_cascadeselect = __esm({
     init_styles();
     init_useDisclosure();
     init_useClickOutside();
-    CSS38 = `
+    CSS37 = `
 .laughtale-cascadeselect {
     position: relative;
     display: inline-flex;
@@ -14047,7 +14882,7 @@ __export(listbox_exports, {
   default: () => ListboxIsland
 });
 function ListboxIsland(container, props) {
-  injectIslandStyle("laughtale-listbox", CSS39);
+  injectIslandStyle("laughtale-listbox", CSS38);
   const isMultiple = props.multiple === true || String(props.multiple) === "true";
   const isMetaKey = props.metaKeySelection !== false && String(props.metaKeySelection) !== "false";
   const isCheckbox = props.checkbox === true || String(props.checkbox) === "true";
@@ -14383,14 +15218,14 @@ function ListboxIsland(container, props) {
   }
   init();
 }
-var CSS39, checkSvg2, searchSvg2;
+var CSS38, checkSvg2, searchSvg2;
 var init_listbox = __esm({
   "src/components/listbox.ts"() {
     "use strict";
     init_lucide();
     init_styles();
     init_useDebounce();
-    CSS39 = `
+    CSS38 = `
 /* ==================== AURA LISTBOX ==================== */
 .laughtale-listbox,
 .p-listbox {
@@ -14719,7 +15554,7 @@ __export(picklist_exports, {
   default: () => PickListIsland
 });
 function PickListIsland(container, props) {
-  injectIslandStyle("picklist", CSS40);
+  injectIslandStyle("picklist", CSS39);
   let sourceList = props.source ? [...props.source] : [
     { id: "1", name: "Identity & Access Manager" },
     { id: "2", name: "Audit Compliance Engine" },
@@ -14851,14 +15686,14 @@ function PickListIsland(container, props) {
   render();
   syncValues();
 }
-var CSS40;
+var CSS39;
 var init_picklist = __esm({
   "src/components/picklist.ts"() {
     "use strict";
     init_styles();
     init_lucide();
     init_useAutoAnimate();
-    CSS40 = `
+    CSS39 = `
 [data-theme="dark"] .laughtale-picklist {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -14919,7 +15754,7 @@ __export(orderlist_exports, {
   default: () => OrderListIsland
 });
 function OrderListIsland(container, props) {
-  injectIslandStyle("orderlist", CSS41);
+  injectIslandStyle("orderlist", CSS40);
   let items = props.items ? [...props.items] : [
     { id: "1", name: "Phase 1: Zero-Trust Gateway Init", order: 0 },
     { id: "2", name: "Phase 2: Hydrate Islands Engine", order: 1 },
@@ -15019,13 +15854,13 @@ function OrderListIsland(container, props) {
   render();
   syncValues();
 }
-var CSS41;
+var CSS40;
 var init_orderlist = __esm({
   "src/components/orderlist.ts"() {
     "use strict";
     init_styles();
     init_useAutoAnimate();
-    CSS41 = `
+    CSS40 = `
 [data-theme="dark"] .laughtale-orderlist {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -15071,7 +15906,7 @@ __export(orgchart_exports, {
   default: () => OrgChartIsland
 });
 function OrgChartIsland(container, props) {
-  injectIslandStyle("orgchart", CSS42);
+  injectIslandStyle("orgchart", CSS41);
   const rootNode = props.value || {
     key: "0",
     label: "Chief Technology Officer",
@@ -15146,12 +15981,12 @@ function OrgChartIsland(container, props) {
     });
   });
 }
-var CSS42;
+var CSS41;
 var init_orgchart = __esm({
   "src/components/orgchart.ts"() {
     "use strict";
     init_styles();
-    CSS42 = `
+    CSS41 = `
 [data-theme="dark"] .orgchart-node-table {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -15177,7 +16012,7 @@ __export(terminal_exports, {
   default: () => TerminalIsland
 });
 function TerminalIsland(container, props) {
-  injectIslandStyle("terminal", CSS43);
+  injectIslandStyle("terminal", CSS42);
   const promptPrefix = props.prompt || "admin@softmax:~$";
   const welcome = props.welcomeMessage || 'Welcome to SoftMax.LaughTale CLI v3.0\nType "help" for available commands.';
   const commands = {
@@ -15276,13 +16111,13 @@ ${h.response}`).join("\n");
   }
   render();
 }
-var CSS43;
+var CSS42;
 var init_terminal = __esm({
   "src/components/terminal.ts"() {
     "use strict";
     init_styles();
     init_useClipboard();
-    CSS43 = `
+    CSS42 = `
 [data-theme="dark"] .laughtale-terminal {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -15313,7 +16148,7 @@ __export(dock_exports, {
   default: () => DockIsland
 });
 function DockIsland(container, props) {
-  injectIslandStyle("dock", CSS44);
+  injectIslandStyle("dock", CSS43);
   const items = props.items || [
     { label: "Overview", icon: "compass", url: "/" },
     { label: "Dashboard", icon: "bar-chart", url: "/dashboard" },
@@ -15355,13 +16190,13 @@ function DockIsland(container, props) {
     });
   });
 }
-var CSS44;
+var CSS43;
 var init_dock = __esm({
   "src/components/dock.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS44 = `
+    CSS43 = `
 [data-theme="dark"] .laughtale-dock {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -15382,7 +16217,7 @@ __export(galleria_exports, {
   default: () => GalleriaIsland
 });
 function GalleriaIsland(container, props) {
-  injectIslandStyle("galleria", CSS45);
+  injectIslandStyle("galleria", CSS44);
   const images = props.value && props.value.length > 0 ? props.value : [
     {
       itemImageSrc: "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800&auto=format&fit=crop&q=80",
@@ -15456,13 +16291,13 @@ function GalleriaIsland(container, props) {
   }
   render();
 }
-var CSS45;
+var CSS44;
 var init_galleria = __esm({
   "src/components/galleria.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS45 = `
+    CSS44 = `
 [data-theme="dark"] .laughtale-galleria {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -15493,7 +16328,7 @@ __export(blockui_exports, {
   default: () => BlockUIIsland
 });
 function BlockUIIsland(container, props) {
-  injectIslandStyle("blockui", CSS46);
+  injectIslandStyle("blockui", CSS45);
   let isBlocked = props.blocked ?? true;
   function render() {
     container.innerHTML = `
@@ -15516,12 +16351,12 @@ function BlockUIIsland(container, props) {
     render();
   });
 }
-var CSS46;
+var CSS45;
 var init_blockui = __esm({
   "src/components/blockui.ts"() {
     "use strict";
     init_styles();
-    CSS46 = `
+    CSS45 = `
 [data-theme="dark"] .laughtale-blockui-root {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -16253,7 +17088,7 @@ __export(select_exports, {
   default: () => SelectIsland
 });
 function SelectIsland(container, props) {
-  injectIslandStyle("laughtale-select", CSS47);
+  injectIslandStyle("laughtale-select", CSS46);
   const isMultiple = props.multiple === true || String(props.multiple) === "true";
   const isCheckmark = props.checkmark === true || String(props.checkmark) === "true";
   const isCheckbox = props.checkbox === true || String(props.checkbox) === "true";
@@ -16593,13 +17428,13 @@ function SelectIsland(container, props) {
   }
   render();
 }
-var CSS47;
+var CSS46;
 var init_select = __esm({
   "src/components/select.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS47 = `
+    CSS46 = `
 /* ==================== AURA SELECT ==================== */
 .laughtale-select,
 .p-select {
@@ -17026,7 +17861,7 @@ __export(checkbox_exports, {
   default: () => CheckboxIsland
 });
 function CheckboxIsland(container, props) {
-  injectIslandStyle("laughtale-checkbox", CSS48);
+  injectIslandStyle("laughtale-checkbox", CSS47);
   let isChecked = Boolean(props.checked);
   let isIndeterminate = Boolean(props.indeterminate);
   const size = props.size || "normal";
@@ -17098,13 +17933,13 @@ function CheckboxIsland(container, props) {
   }
   render();
 }
-var CSS48;
+var CSS47;
 var init_checkbox = __esm({
   "src/components/checkbox.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS48 = `
+    CSS47 = `
 .laughtale-checkbox-wrap {
     display: inline-flex;
     align-items: center;
@@ -17281,7 +18116,7 @@ __export(radio_button_exports, {
   default: () => RadioButtonIsland
 });
 function RadioButtonIsland(container, props) {
-  injectIslandStyle("laughtale-radio", CSS49);
+  injectIslandStyle("laughtale-radio", CSS48);
   const isCard = props.card === true || String(props.card) === "true";
   const isFilled = props.variant === "filled";
   const size = props.size || "normal";
@@ -17513,13 +18348,13 @@ function RadioButtonIsland(container, props) {
   }
   renderSingle();
 }
-var CSS49;
+var CSS48;
 var init_radio_button = __esm({
   "src/components/radio-button.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS49 = `
+    CSS48 = `
 /* ==================== AURA RADIOBUTTON ==================== */
 .laughtale-radio-root,
 .p-radiobutton-root {
@@ -17802,7 +18637,7 @@ __export(textarea_exports, {
   default: () => TextareaIsland
 });
 function TextareaIsland(container, props) {
-  injectIslandStyle("laughtale-textarea", CSS50);
+  injectIslandStyle("laughtale-textarea", CSS49);
   const isAutoResize = props.autoResize === true || String(props.autoResize) === "true";
   const isFluid = props.fluid === true || String(props.fluid) === "true";
   const isInvalid = props.invalid === true || String(props.invalid) === "true";
@@ -17878,12 +18713,12 @@ function TextareaIsland(container, props) {
     setTimeout(adjustHeight, 0);
   }
 }
-var CSS50;
+var CSS49;
 var init_textarea = __esm({
   "src/components/textarea.ts"() {
     "use strict";
     init_styles();
-    CSS50 = `
+    CSS49 = `
 /* ==================== AURA TEXTAREA ==================== */
 .p-textarea {
     font-family: var(--p-font-family, inherit);
@@ -18008,7 +18843,7 @@ __export(input_mask_exports, {
   default: () => InputMaskIsland
 });
 function InputMaskIsland(container, props) {
-  injectIslandStyle("laughtale-input-mask", CSS51);
+  injectIslandStyle("laughtale-input-mask", CSS50);
   const mask = props.mask || "(999) 999-9999";
   const slotChar = props.slotChar || "_";
   const autoClear = props.autoClear !== false && String(props.autoClear) !== "false";
@@ -18195,12 +19030,12 @@ function InputMaskIsland(container, props) {
   });
   syncValue();
 }
-var CSS51;
+var CSS50;
 var init_input_mask = __esm({
   "src/components/input-mask.ts"() {
     "use strict";
     init_styles();
-    CSS51 = `
+    CSS50 = `
 /* ==================== AURA INPUTMASK ==================== */
 .laughtale-input-mask,
 .p-inputmask {
@@ -18310,7 +19145,7 @@ __export(float_label_exports, {
   default: () => FloatLabelIsland
 });
 function FloatLabelIsland(container, props) {
-  injectIslandStyle("laughtale-float-label", CSS52);
+  injectIslandStyle("laughtale-float-label", CSS51);
   const variant = props.variant || "over";
   const initialHtml = container.innerHTML;
   const forAttr = props.for ? `for="${props.for}"` : "";
@@ -18388,12 +19223,12 @@ function FloatLabelIsland(container, props) {
   setTimeout(updateFloatingState, 50);
   setTimeout(updateFloatingState, 200);
 }
-var CSS52;
+var CSS51;
 var init_float_label = __esm({
   "src/components/float-label.ts"() {
     "use strict";
     init_styles();
-    CSS52 = `
+    CSS51 = `
 .laughtale-float-label {
     position: relative;
     display: inline-flex;
@@ -18520,7 +19355,7 @@ __export(ifta_label_exports, {
   default: () => IftaLabelIsland
 });
 function IftaLabelIsland(container, props) {
-  injectIslandStyle("laughtale-ifta-label", CSS53);
+  injectIslandStyle("laughtale-ifta-label", CSS52);
   const initialHtml = container.innerHTML;
   const forAttr = props.for ? `for="${props.for}"` : "";
   const existingLabel = container.querySelector("label");
@@ -18543,12 +19378,12 @@ function IftaLabelIsland(container, props) {
     }
   });
 }
-var CSS53;
+var CSS52;
 var init_ifta_label = __esm({
   "src/components/ifta-label.ts"() {
     "use strict";
     init_styles();
-    CSS53 = `
+    CSS52 = `
 .laughtale-ifta-label {
     position: relative;
     display: inline-flex;
@@ -18636,14 +19471,14 @@ __export(input_group_exports, {
   default: () => InputGroupIsland
 });
 function InputGroupIsland(container, props) {
-  injectIslandStyle("laughtale-inputgroup", CSS54);
+  injectIslandStyle("laughtale-inputgroup", CSS53);
   container.classList.add("laughtale-inputgroup", "p-inputgroup");
   if (props.size) {
     container.classList.add(`size-${props.size}`);
   }
 }
 function InputGroupAddonIsland(container, props) {
-  injectIslandStyle("laughtale-inputgroup", CSS54);
+  injectIslandStyle("laughtale-inputgroup", CSS53);
   container.classList.add("laughtale-inputgroup-addon", "p-inputgroup-addon");
   if (props.icon && !container.querySelector("svg")) {
     const svg = getLucideIcon(props.icon);
@@ -18655,13 +19490,13 @@ function InputGroupAddonIsland(container, props) {
     container.insertAdjacentHTML("beforeend", `<span>${props.text}</span>`);
   }
 }
-var CSS54;
+var CSS53;
 var init_input_group = __esm({
   "src/components/input-group.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS54 = `
+    CSS53 = `
 .laughtale-inputgroup,
 .p-inputgroup {
     display: flex;
@@ -18933,7 +19768,7 @@ __export(input_text_exports, {
   default: () => InputTextIsland
 });
 function InputTextIsland(container, props) {
-  injectIslandStyle("laughtale-inputtext", CSS55);
+  injectIslandStyle("laughtale-inputtext", CSS54);
   const [getValue, setValue] = useControllableState({
     defaultValue: props.value ?? "",
     onChange: (val) => {
@@ -19074,14 +19909,14 @@ function InputTextIsland(container, props) {
   }
   init();
 }
-var CSS55, xIcon;
+var CSS54, xIcon;
 var init_input_text = __esm({
   "src/components/input-text.ts"() {
     "use strict";
     init_styles();
     init_lucide();
     init_useControllableState();
-    CSS55 = `
+    CSS54 = `
 .laughtale-inputtext-wrap,
 .p-inputtext-wrap {
     position: relative;
@@ -19577,7 +20412,7 @@ __export(paginator_exports, {
   default: () => PaginatorIsland
 });
 function PaginatorIsland(container, props) {
-  injectIslandStyle("paginator", CSS56);
+  injectIslandStyle("paginator", CSS55);
   let first = props.first || 0;
   let rows = props.rows || 10;
   const totalRecords = props.totalRecords || 0;
@@ -19637,13 +20472,13 @@ function PaginatorIsland(container, props) {
   }
   render();
 }
-var CSS56;
+var CSS55;
 var init_paginator = __esm({
   "src/components/paginator.ts"() {
     "use strict";
     init_lucide();
     init_styles();
-    CSS56 = `
+    CSS55 = `
 .laughtale-paginator {
     display: flex;
     align-items: center;
@@ -20801,7 +21636,8 @@ var init_index = __esm({
     defineIsland("camera", () => Promise.resolve().then(() => (init_camera(), camera_exports)));
     defineIsland("dropzone", () => Promise.resolve().then(() => (init_dropzone(), dropzone_exports)));
     defineIsland("tree-select", () => Promise.resolve().then(() => (init_tree_select(), tree_select_exports)));
-    defineIsland("datagrid", () => Promise.resolve().then(() => (init_datagrid(), datagrid_exports)));
+    defineIsland("datatable", () => Promise.resolve().then(() => (init_datatable(), datatable_exports)));
+    defineIsland("datagrid", () => Promise.resolve().then(() => (init_datatable(), datatable_exports)));
     defineIsland("modal", () => Promise.resolve().then(() => (init_modal(), modal_exports)));
     defineIsland("toast", () => Promise.resolve().then(() => (init_toast(), toast_exports)));
     defineIsland("input-number", () => Promise.resolve().then(() => (init_input_number(), input_number_exports)));

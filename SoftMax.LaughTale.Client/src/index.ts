@@ -26,7 +26,8 @@ defineIsland('timeline', () => import('./components/timeline'));
 defineIsland('camera', () => import('./components/camera'));
 defineIsland('dropzone', () => import('./components/dropzone'));
 defineIsland('tree-select', () => import('./components/tree-select'));
-defineIsland('datagrid', () => import('./components/datagrid'));
+defineIsland('datatable', () => import('./components/datatable'));
+defineIsland('datagrid', () => import('./components/datatable'));
 defineIsland('modal', () => import('./components/modal'));
 defineIsland('toast', () => import('./components/toast'));
 
