@@ -9635,10 +9635,11 @@ var SoftMaxIslands = (() => {
     const direction = props.direction || "up";
     const type = props.type || "linear";
     const radius = props.radius || (type === "quarter-circle" ? 120 : 80);
-    const transitionDelay = props.transitionDelay !== void 0 ? props.transitionDelay : 30;
+    const transitionDelay = props.transitionDelay !== void 0 ? Number(props.transitionDelay) : 30;
     const rotateAnimation = props.rotateAnimation !== false;
     const mask = !!props.mask;
     const isCustomTemplate = props.template === "custom";
+    const hasTooltips = !!props.tooltipOptions;
     const tooltipPosition = props.tooltipOptions?.position || (direction === "left" ? "top" : direction === "right" ? "top" : "left");
     let isOpen = false;
     const btnSev = props.buttonProps?.severity || "contrast";
@@ -9763,7 +9764,7 @@ var SoftMaxIslands = (() => {
     }
     const itemsHtml = items.map((item, index) => {
       const iconHtml = item.icon ? getLucideIcon(item.icon, 18) : LucideIcons.zap;
-      const tooltipText = item.tooltip || item.label || "";
+      const tooltipText = hasTooltips || item.tooltip ? item.tooltip || item.label || "" : "";
       const tooltipHtml = tooltipText ? `
             <span class="p-speeddial-tooltip tooltip-${tooltipPosition}" data-index="${index}">
                 ${tooltipText}
@@ -9790,7 +9791,7 @@ var SoftMaxIslands = (() => {
                    role="menuitem"
                    data-index="${index}"
                    tabindex="-1"
-                   aria-label="${tooltipText || "Action"}"
+                   aria-label="${item.label || tooltipText || "Action"}"
                    ${item.disabled ? 'disabled aria-disabled="true"' : ""}>
                     ${iconHtml}
                     ${tooltipHtml}
@@ -9829,41 +9830,37 @@ var SoftMaxIslands = (() => {
       if (maskEl) {
         maskEl.classList.toggle("p-speeddial-mask-visible", opening);
       }
-      itemElements.forEach((li, index) => {
-        const pos = calculatePosition(index, items.length);
-        const delay = opening ? transitionDelay * index : transitionDelay * (items.length - 1 - index);
-        li.style.transitionDelay = `${delay}ms`;
-        if (isCustomTemplate) {
-          if (opening) {
-            li.style.transform = `translate3d(0, ${pos.y}px, 0) scale(1)`;
-            li.style.opacity = "1";
+      requestAnimationFrame(() => {
+        itemElements.forEach((li, index) => {
+          const pos = calculatePosition(index, items.length);
+          const delay = opening ? transitionDelay * index : transitionDelay * (items.length - 1 - index);
+          li.style.transitionDelay = `${delay}ms`;
+          if (isCustomTemplate) {
+            if (opening) {
+              li.style.transform = `translate3d(0, ${pos.y}px, 0) scale(1)`;
+              li.style.opacity = "1";
+            } else {
+              li.style.transform = `translate3d(0, 0, 0) scale(0)`;
+              li.style.opacity = "0";
+            }
           } else {
-            li.style.transform = `translate3d(0, 0, 0) scale(0)`;
-            li.style.opacity = "0";
+            if (opening) {
+              li.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0) scale(1)`;
+              li.style.opacity = "1";
+            } else {
+              li.style.transform = `translate3d(0, 0, 0) scale(0)`;
+              li.style.opacity = "0";
+            }
           }
-        } else {
-          if (opening) {
-            li.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0) scale(1)`;
-            li.style.opacity = "1";
-          } else {
-            li.style.transform = `translate3d(0, 0, 0) scale(0)`;
-            li.style.opacity = "0";
+          const interactive = li.querySelector(".p-speeddial-action, .p-speeddial-custom-icon");
+          if (interactive) {
+            interactive.setAttribute("tabindex", opening ? "0" : "-1");
           }
-        }
-        const interactive = li.querySelector(".p-speeddial-action, .p-speeddial-custom-icon");
-        if (interactive) {
-          interactive.setAttribute("tabindex", opening ? "0" : "-1");
-        }
+        });
       });
     }
     function toggle() {
       applyAnimation(!isOpen);
-      if (isOpen) {
-        const first = container.querySelector(".p-speeddial-action, .p-speeddial-custom-icon");
-        first?.focus();
-      } else {
-        mainBtn.focus();
-      }
     }
     function close() {
       if (isOpen) {
@@ -9928,8 +9925,6 @@ var SoftMaxIslands = (() => {
       if (tooltip) {
         el.addEventListener("mouseenter", () => tooltip.classList.add("p-tooltip-visible"));
         el.addEventListener("mouseleave", () => tooltip.classList.remove("p-tooltip-visible"));
-        el.addEventListener("focus", () => tooltip.classList.add("p-tooltip-visible"));
-        el.addEventListener("blur", () => tooltip.classList.remove("p-tooltip-visible"));
       }
       el.addEventListener("keydown", (e) => {
         const allActions = Array.from(container.querySelectorAll(".p-speeddial-action, .p-speeddial-custom-icon"));
@@ -10021,6 +10016,7 @@ var SoftMaxIslands = (() => {
     height: 3rem;
     pointer-events: none;
     z-index: 1;
+    overflow: visible;
 }
 
 .p-speeddial.p-speeddial-opened .p-speeddial-list {
@@ -10038,13 +10034,21 @@ var SoftMaxIslands = (() => {
     justify-content: center;
     opacity: 0;
     transform: translate3d(0, 0, 0) scale(0);
-    transition: transform 350ms cubic-bezier(0.16, 1, 0.3, 1), opacity 250ms cubic-bezier(0.16, 1, 0.3, 1);
+    transition-property: transform, opacity;
+    transition-duration: 300ms, 200ms;
+    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1), cubic-bezier(0.16, 1, 0.3, 1);
     pointer-events: none;
     will-change: transform, opacity;
+    z-index: 1;
 }
 
 .p-speeddial.p-speeddial-opened .p-speeddial-item {
     pointer-events: auto;
+}
+
+.p-speeddial-item:hover,
+.p-speeddial-item:focus-within {
+    z-index: 100 !important;
 }
 
 /* Action Button: Authentic Aura Slate / Surface Styling */
@@ -10170,10 +10174,11 @@ var SoftMaxIslands = (() => {
     border-radius: var(--p-border-radius-sm, 4px);
     white-space: nowrap;
     pointer-events: none;
-    z-index: 100;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+    z-index: 1000 !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
     opacity: 0;
-    transition: opacity 0.15s ease, transform 0.15s ease;
+    visibility: hidden;
+    transition: opacity 0.15s ease, visibility 0.15s ease, transform 0.15s ease;
 }
 
 .p-speeddial-tooltip::after {
@@ -10198,6 +10203,7 @@ var SoftMaxIslands = (() => {
 }
 .p-speeddial-tooltip.tooltip-left.p-tooltip-visible {
     opacity: 1;
+    visibility: visible;
     transform: translateY(-50%) scale(1);
 }
 
@@ -10215,6 +10221,7 @@ var SoftMaxIslands = (() => {
 }
 .p-speeddial-tooltip.tooltip-right.p-tooltip-visible {
     opacity: 1;
+    visibility: visible;
     transform: translateY(-50%) scale(1);
 }
 
@@ -10232,6 +10239,7 @@ var SoftMaxIslands = (() => {
 }
 .p-speeddial-tooltip.tooltip-top.p-tooltip-visible {
     opacity: 1;
+    visibility: visible;
     transform: translateX(-50%) scale(1);
 }
 
@@ -10249,6 +10257,7 @@ var SoftMaxIslands = (() => {
 }
 .p-speeddial-tooltip.tooltip-bottom.p-tooltip-visible {
     opacity: 1;
+    visibility: visible;
     transform: translateX(-50%) scale(1);
 }
 

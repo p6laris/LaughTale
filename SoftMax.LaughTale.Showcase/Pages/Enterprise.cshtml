@@ -2525,7 +2525,7 @@
         </div>
     </section>
 
-        <!-- SpeedDial -->
+            <!-- SpeedDial -->
     <section id="sec-speed-dial" class="component-card">
         <div class="card-header">
             <div>
@@ -2536,19 +2536,19 @@
         </div>
         <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
             <!-- Hero Preview -->
-            <div style="background: var(--p-surface-0); padding: 1.5rem; border-radius: var(--p-border-radius-lg); border: 1px solid var(--p-border-color); position: relative; height: 320px; box-shadow: var(--p-shadow-sm); overflow: hidden;">
-                <island-speed-dial model="@Model.SpeedDialBasicItems" direction="down-right" type="quarter-circle" radius="100" style="position: absolute; left: 1rem; top: 1rem;" />
-                <island-speed-dial model="@Model.SpeedDialBasicItems" direction="down-left" type="quarter-circle" radius="100" style="position: absolute; right: 1rem; top: 1rem;" />
+            <div style="background: var(--p-surface-0); padding: 1.5rem; border-radius: var(--p-border-radius-lg); border: 1px solid var(--p-border-color); position: relative; height: 360px; box-shadow: var(--p-shadow-sm); overflow: hidden;">
+                <island-speed-dial model="@Model.SpeedDialBasicItems" direction="down-right" type="quarter-circle" radius="100" style="position: absolute; left: 1.5rem; top: 1.5rem;" />
+                <island-speed-dial model="@Model.SpeedDialBasicItems" direction="down-left" type="quarter-circle" radius="100" style="position: absolute; right: 1.5rem; top: 1.5rem;" />
                 <island-speed-dial model="@Model.SpeedDialCircleItems" type="circle" radius="70" style="position: absolute; top: calc(50% - 1.5rem); left: calc(50% - 1.5rem);" />
-                <island-speed-dial model="@Model.SpeedDialBasicItems" direction="up-right" type="quarter-circle" radius="100" style="position: absolute; left: 1rem; bottom: 1rem;" />
-                <island-speed-dial model="@Model.SpeedDialBasicItems" direction="up-left" type="quarter-circle" radius="100" style="position: absolute; right: 1rem; bottom: 1rem;" />
+                <island-speed-dial model="@Model.SpeedDialBasicItems" direction="up-right" type="quarter-circle" radius="100" style="position: absolute; left: 1.5rem; bottom: 1.5rem;" />
+                <island-speed-dial model="@Model.SpeedDialBasicItems" direction="up-left" type="quarter-circle" radius="100" style="position: absolute; right: 1.5rem; bottom: 1.5rem;" />
             </div>
 
             <!-- Demo 1: Basic -->
             <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
                 <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic</h3>
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">SpeedDial displays related actions from a single trigger button.</p>
-                <div style="position: relative; height: 240px; background: var(--p-surface-0); border-radius: var(--p-border-radius); border: 1px dashed var(--p-border-color);">
+                <div style="position: relative; height: 360px; background: var(--p-surface-0); border-radius: var(--p-border-radius); border: 1px dashed var(--p-border-color);">
                     <island-speed-dial model="@Model.SpeedDialBasicItems" direction="up" style="position: absolute; right: 1.5rem; bottom: 1.5rem;" />
                 </div>
             </div>
@@ -2557,11 +2557,11 @@
             <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
                 <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Linear</h3>
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">When type is set to linear (default), items are displayed in a line based on the direction property (up, down, left, right).</p>
-                <div style="position: relative; height: 420px; background: var(--p-surface-0); border-radius: var(--p-border-radius); border: 1px dashed var(--p-border-color);">
-                    <island-speed-dial model="@Model.SpeedDialBasicItems" direction="up" style="position: absolute; left: calc(50% - 1.5rem); bottom: 1rem;" />
-                    <island-speed-dial model="@Model.SpeedDialBasicItems" direction="down" style="position: absolute; left: calc(50% - 1.5rem); top: 1rem;" />
-                    <island-speed-dial model="@Model.SpeedDialBasicItems" direction="left" style="position: absolute; top: calc(50% - 1.5rem); right: 1rem;" />
-                    <island-speed-dial model="@Model.SpeedDialBasicItems" direction="right" style="position: absolute; top: calc(50% - 1.5rem); left: 1rem;" />
+                <div style="position: relative; height: 480px; background: var(--p-surface-0); border-radius: var(--p-border-radius); border: 1px dashed var(--p-border-color);">
+                    <island-speed-dial model="@Model.SpeedDialBasicItems" direction="up" style="position: absolute; left: calc(50% - 1.5rem); bottom: 1.5rem;" />
+                    <island-speed-dial model="@Model.SpeedDialBasicItems" direction="down" style="position: absolute; left: calc(50% - 1.5rem); top: 1.5rem;" />
+                    <island-speed-dial model="@Model.SpeedDialBasicItems" direction="left" style="position: absolute; top: calc(50% - 1.5rem); right: 1.5rem;" />
+                    <island-speed-dial model="@Model.SpeedDialBasicItems" direction="right" style="position: absolute; top: calc(50% - 1.5rem); left: 1.5rem;" />
                 </div>
             </div>
 
@@ -2569,7 +2569,7 @@
             <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
                 <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Circle</h3>
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Items can be displayed around the button when type is set to circle with configurable radius.</p>
-                <div style="position: relative; height: 360px; background: var(--p-surface-0); border-radius: var(--p-border-radius); border: 1px dashed var(--p-border-color);">
+                <div style="position: relative; height: 380px; background: var(--p-surface-0); border-radius: var(--p-border-radius); border: 1px dashed var(--p-border-color);">
                     <island-speed-dial model="@Model.SpeedDialCircleItems" radius="80" type="circle" button-severity="warn" style="position: absolute; top: calc(50% - 1.5rem); left: calc(50% - 1.5rem);" />
                 </div>
             </div>
@@ -2578,11 +2578,11 @@
             <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
                 <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Semi Circle</h3>
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">When type is defined as semi-circle, items are displayed in a half-circle around the button.</p>
-                <div style="position: relative; height: 420px; background: var(--p-surface-0); border-radius: var(--p-border-radius); border: 1px dashed var(--p-border-color);">
-                    <island-speed-dial model="@Model.SpeedDialBasicItems" radius="80" type="semi-circle" direction="up" button-severity="success" style="position: absolute; left: calc(50% - 1.5rem); bottom: 1rem;" />
-                    <island-speed-dial model="@Model.SpeedDialBasicItems" radius="80" type="semi-circle" direction="down" button-severity="success" style="position: absolute; left: calc(50% - 1.5rem); top: 1rem;" />
-                    <island-speed-dial model="@Model.SpeedDialBasicItems" radius="80" type="semi-circle" direction="left" button-severity="success" style="position: absolute; top: calc(50% - 1.5rem); right: 1rem;" />
-                    <island-speed-dial model="@Model.SpeedDialBasicItems" radius="80" type="semi-circle" direction="right" button-severity="success" style="position: absolute; top: calc(50% - 1.5rem); left: 1rem;" />
+                <div style="position: relative; height: 480px; background: var(--p-surface-0); border-radius: var(--p-border-radius); border: 1px dashed var(--p-border-color);">
+                    <island-speed-dial model="@Model.SpeedDialBasicItems" radius="80" type="semi-circle" direction="up" button-severity="success" style="position: absolute; left: calc(50% - 1.5rem); bottom: 1.5rem;" />
+                    <island-speed-dial model="@Model.SpeedDialBasicItems" radius="80" type="semi-circle" direction="down" button-severity="success" style="position: absolute; left: calc(50% - 1.5rem); top: 1.5rem;" />
+                    <island-speed-dial model="@Model.SpeedDialBasicItems" radius="80" type="semi-circle" direction="left" button-severity="success" style="position: absolute; top: calc(50% - 1.5rem); right: 1.5rem;" />
+                    <island-speed-dial model="@Model.SpeedDialBasicItems" radius="80" type="semi-circle" direction="right" button-severity="success" style="position: absolute; top: calc(50% - 1.5rem); left: 1.5rem;" />
                 </div>
             </div>
 
@@ -2590,11 +2590,11 @@
             <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
                 <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Quarter Circle</h3>
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Setting type as quarter-circle displays items at one of four corners based on the direction.</p>
-                <div style="position: relative; height: 380px; background: var(--p-surface-0); border-radius: var(--p-border-radius); border: 1px dashed var(--p-border-color);">
-                    <island-speed-dial model="@Model.SpeedDialBasicItems" radius="120" type="quarter-circle" direction="up-left" style="position: absolute; right: 1.5rem; bottom: 1.5rem;" />
-                    <island-speed-dial model="@Model.SpeedDialBasicItems" radius="120" type="quarter-circle" direction="up-right" style="position: absolute; left: 1.5rem; bottom: 1.5rem;" />
-                    <island-speed-dial model="@Model.SpeedDialBasicItems" radius="120" type="quarter-circle" direction="down-left" style="position: absolute; right: 1.5rem; top: 1.5rem;" />
-                    <island-speed-dial model="@Model.SpeedDialBasicItems" radius="120" type="quarter-circle" direction="down-right" style="position: absolute; left: 1.5rem; top: 1.5rem;" />
+                <div style="position: relative; height: 420px; background: var(--p-surface-0); border-radius: var(--p-border-radius); border: 1px dashed var(--p-border-color);">
+                    <island-speed-dial model="@Model.SpeedDialBasicItems" radius="120" type="quarter-circle" direction="up-left" style="position: absolute; right: 2rem; bottom: 2rem;" />
+                    <island-speed-dial model="@Model.SpeedDialBasicItems" radius="120" type="quarter-circle" direction="up-right" style="position: absolute; left: 2rem; bottom: 2rem;" />
+                    <island-speed-dial model="@Model.SpeedDialBasicItems" radius="120" type="quarter-circle" direction="down-left" style="position: absolute; right: 2rem; top: 2rem;" />
+                    <island-speed-dial model="@Model.SpeedDialBasicItems" radius="120" type="quarter-circle" direction="down-right" style="position: absolute; left: 2rem; top: 2rem;" />
                 </div>
             </div>
 
@@ -2602,10 +2602,10 @@
             <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
                 <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Transition Delay</h3>
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">The transitionDelay property specifies the delay in milliseconds between each action item's appearance animation.</p>
-                <div style="position: relative; height: 260px; background: var(--p-surface-0); border-radius: var(--p-border-radius); border: 1px dashed var(--p-border-color);">
-                    <island-speed-dial model="@Model.SpeedDialBasicItems" direction="up" transition-delay="0" button-severity="secondary" style="position: absolute; left: 1.5rem; bottom: 1.5rem;" />
+                <div style="position: relative; height: 380px; background: var(--p-surface-0); border-radius: var(--p-border-radius); border: 1px dashed var(--p-border-color);">
+                    <island-speed-dial model="@Model.SpeedDialBasicItems" direction="up" transition-delay="0" button-severity="secondary" style="position: absolute; left: 2rem; bottom: 1.5rem;" />
                     <island-speed-dial model="@Model.SpeedDialBasicItems" direction="up" transition-delay="80" button-severity="success" style="position: absolute; left: calc(50% - 1.5rem); bottom: 1.5rem;" />
-                    <island-speed-dial model="@Model.SpeedDialBasicItems" direction="up" transition-delay="150" button-severity="info" style="position: absolute; right: 1.5rem; bottom: 1.5rem;" />
+                    <island-speed-dial model="@Model.SpeedDialBasicItems" direction="up" transition-delay="150" button-severity="info" style="position: absolute; right: 2rem; bottom: 1.5rem;" />
                 </div>
             </div>
 
@@ -2613,7 +2613,7 @@
             <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
                 <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Template</h3>
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">SpeedDial supports full customization of the trigger button and action items using item templates.</p>
-                <div style="position: relative; height: 380px; background: var(--p-surface-0); border-radius: var(--p-border-radius); border: 1px dashed var(--p-border-color);">
+                <div style="position: relative; height: 420px; background: var(--p-surface-0); border-radius: var(--p-border-radius); border: 1px dashed var(--p-border-color);">
                     <island-speed-dial model="@Model.SpeedDialTemplateItems" direction="down" transition-delay="50" template="custom" button-severity="warn" style="position: absolute; top: 1.5rem; left: calc(50% - 1.5rem);" />
                 </div>
             </div>
@@ -2622,9 +2622,9 @@
             <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
                 <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Tooltip</h3>
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">SpeedDial can be combined with Tooltips to display labels on hover for action items.</p>
-                <div style="position: relative; height: 280px; background: var(--p-surface-0); border-radius: var(--p-border-radius); border: 1px dashed var(--p-border-color);">
-                    <island-speed-dial model="@Model.SpeedDialTooltipItems" direction="up" button-severity="help" tooltip-options='new SpeedDialTooltipOptions { Position = "left" }' style="position: absolute; right: 2rem; bottom: 1.5rem;" />
-                    <island-speed-dial model="@Model.SpeedDialTooltipItems" direction="up" button-severity="danger" tooltip-options='new SpeedDialTooltipOptions { Position = "right" }' style="position: absolute; left: 2rem; bottom: 1.5rem;" />
+                <div style="position: relative; height: 380px; background: var(--p-surface-0); border-radius: var(--p-border-radius); border: 1px dashed var(--p-border-color);">
+                    <island-speed-dial model="@Model.SpeedDialTooltipItems" direction="up" button-severity="help" tooltip-options='new SpeedDialTooltipOptions { Position = "left" }' style="position: absolute; right: 3rem; bottom: 1.5rem;" />
+                    <island-speed-dial model="@Model.SpeedDialTooltipItems" direction="up" button-severity="danger" tooltip-options='new SpeedDialTooltipOptions { Position = "right" }' style="position: absolute; left: 3rem; bottom: 1.5rem;" />
                 </div>
             </div>
 
@@ -2632,8 +2632,8 @@
             <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
                 <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Mask</h3>
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Adding mask property displays a modal layer behind the popup items.</p>
-                <div style="position: relative; height: 280px; background: var(--p-surface-0); border-radius: var(--p-border-radius); border: 1px dashed var(--p-border-color); overflow: hidden;">
-                    <island-speed-dial model="@Model.SpeedDialBasicItems" direction="up" mask="true" style="position: absolute; right: 1.5rem; bottom: 1.5rem;" />
+                <div style="position: relative; height: 380px; background: var(--p-surface-0); border-radius: var(--p-border-radius); border: 1px dashed var(--p-border-color); overflow: hidden;">
+                    <island-speed-dial model="@Model.SpeedDialBasicItems" direction="up" mask="true" style="position: absolute; right: 2rem; bottom: 1.5rem;" />
                 </div>
             </div>
         </div>
