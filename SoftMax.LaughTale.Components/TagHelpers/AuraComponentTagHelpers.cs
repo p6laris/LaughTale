@@ -524,6 +524,181 @@ public class IslandSwitchTagHelper : TagHelper
 }
 
 /// <summary>
+/// TagHelper for <island-toggle-button /> / <island-togglebutton /> — Aura ToggleButton
+/// </summary>
+[HtmlTargetElement("island-toggle-button")]
+[HtmlTargetElement("island-togglebutton")]
+public class IslandToggleButtonTagHelper : TagHelper
+{
+    [HtmlAttributeName("checked")]
+    public bool Checked { get; set; } = false;
+
+    [HtmlAttributeName("value")]
+    public string? Value { get; set; }
+
+    [HtmlAttributeName("on-label")]
+    public string OnLabel { get; set; } = "On";
+
+    [HtmlAttributeName("off-label")]
+    public string OffLabel { get; set; } = "Off";
+
+    [HtmlAttributeName("on-icon")]
+    public string? OnIcon { get; set; }
+
+    [HtmlAttributeName("off-icon")]
+    public string? OffIcon { get; set; }
+
+    [HtmlAttributeName("icon")]
+    public string? Icon { get; set; }
+
+    [HtmlAttributeName("size")]
+    public ComponentSize Size { get; set; } = ComponentSize.Normal;
+
+    [HtmlAttributeName("fluid")]
+    public bool Fluid { get; set; } = false;
+
+    [HtmlAttributeName("invalid")]
+    public bool Invalid { get; set; } = false;
+
+    [HtmlAttributeName("disabled")]
+    public bool Disabled { get; set; } = false;
+
+    [HtmlAttributeName("input-id")]
+    public string? InputId { get; set; }
+
+    [HtmlAttributeName("id")]
+    public string? Id { get; set; }
+
+    [HtmlAttributeName("name")]
+    public string? Name { get; set; }
+
+    [HtmlAttributeName("aria-label")]
+    public string? AriaLabel { get; set; }
+
+    [HtmlAttributeName("aria-labelledby")]
+    public string? AriaLabelledBy { get; set; }
+
+    [HtmlAttributeName("target-input")]
+    public string? TargetInput { get; set; }
+
+    public override void Process(TagHelperContext context, TagHelperOutput output)
+    {
+        if (context.AllAttributes.TryGetAttribute("checked", out var chkAttr))
+        {
+            if (bool.TryParse(chkAttr.Value?.ToString(), out var chk)) Checked = chk;
+            else if (chkAttr.Value != null) Checked = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("value", out var valAttr))
+        {
+            if (bool.TryParse(valAttr.Value?.ToString(), out var chkVal)) Checked = chkVal;
+        }
+        if (context.AllAttributes.TryGetAttribute("onLabel", out var onLAttr) || context.AllAttributes.TryGetAttribute("on-label", out onLAttr))
+        {
+            OnLabel = onLAttr.Value?.ToString() ?? "On";
+        }
+        if (context.AllAttributes.TryGetAttribute("offLabel", out var offLAttr) || context.AllAttributes.TryGetAttribute("off-label", out offLAttr))
+        {
+            OffLabel = offLAttr.Value?.ToString() ?? "Off";
+        }
+        if (context.AllAttributes.TryGetAttribute("onIcon", out var onIAttr) || context.AllAttributes.TryGetAttribute("on-icon", out onIAttr))
+        {
+            OnIcon = onIAttr.Value?.ToString();
+        }
+        if (context.AllAttributes.TryGetAttribute("offIcon", out var offIAttr) || context.AllAttributes.TryGetAttribute("off-icon", out offIAttr))
+        {
+            OffIcon = offIAttr.Value?.ToString();
+        }
+        if (context.AllAttributes.TryGetAttribute("fluid", out var flAttr))
+        {
+            if (bool.TryParse(flAttr.Value?.ToString(), out var fl)) Fluid = fl;
+            else if (flAttr.Value != null) Fluid = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("invalid", out var invAttr))
+        {
+            if (bool.TryParse(invAttr.Value?.ToString(), out var inv)) Invalid = inv;
+            else if (invAttr.Value != null) Invalid = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("disabled", out var disAttr))
+        {
+            if (bool.TryParse(disAttr.Value?.ToString(), out var dis)) Disabled = dis;
+            else if (disAttr.Value != null) Disabled = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("size", out var szAttr))
+        {
+            if (System.Enum.TryParse<ComponentSize>(szAttr.Value?.ToString(), true, out var sz)) Size = sz;
+        }
+        if (context.AllAttributes.TryGetAttribute("target-input-name", out var tinAttr) || context.AllAttributes.TryGetAttribute("targetInputName", out tinAttr))
+        {
+            TargetInput = tinAttr.Value?.ToString();
+        }
+
+        output.TagName = "button";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("type", "button");
+        output.Attributes.SetAttribute("role", "button");
+        output.Attributes.SetAttribute("aria-pressed", Checked ? "true" : "false");
+        output.Attributes.SetAttribute("tabindex", Disabled ? "-1" : "0");
+        output.Attributes.SetAttribute("data-island", "toggle-button");
+        output.Attributes.SetAttribute("data-hydrate", "load");
+
+        var effectiveId = InputId ?? Id;
+        if (!string.IsNullOrEmpty(effectiveId)) output.Attributes.SetAttribute("id", effectiveId);
+        if (!string.IsNullOrEmpty(AriaLabel)) output.Attributes.SetAttribute("aria-label", AriaLabel);
+        if (!string.IsNullOrEmpty(AriaLabelledBy)) output.Attributes.SetAttribute("aria-labelledby", AriaLabelledBy);
+        if (Disabled) output.Attributes.SetAttribute("disabled", "disabled");
+
+        var props = new
+        {
+            @checked = Checked,
+            value = Checked,
+            onLabel = OnLabel,
+            offLabel = OffLabel,
+            onIcon = OnIcon ?? Icon,
+            offIcon = OffIcon ?? Icon,
+            icon = Icon,
+            size = Size.ToString().ToLowerInvariant(),
+            fluid = Fluid,
+            disabled = Disabled,
+            invalid = Invalid,
+            name = Name,
+            targetInputName = TargetInput,
+            inputId = effectiveId,
+            ariaLabel = AriaLabel,
+            ariaLabelledBy = AriaLabelledBy
+        };
+
+        output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
+
+        // SSR Pre-rendered markup
+        var rootClasses = new List<string> { "laughtale-togglebutton", "p-togglebutton", "p-component" };
+        if (Checked) rootClasses.Add("p-togglebutton-checked is-checked");
+        if (Fluid) rootClasses.Add("p-togglebutton-fluid");
+        if (Size == ComponentSize.Small) rootClasses.Add("size-small p-togglebutton-sm");
+        else if (Size == ComponentSize.Large) rootClasses.Add("size-large p-togglebutton-lg");
+        if (Invalid) rootClasses.Add("p-invalid is-invalid");
+        if (Disabled) rootClasses.Add("p-disabled");
+
+        if (output.Attributes.TryGetAttribute("class", out var existingClass))
+        {
+            rootClasses.Add(existingClass.Value.ToString()!);
+        }
+        output.Attributes.SetAttribute("class", string.Join(" ", rootClasses.Distinct()));
+
+        var currentLabel = Checked ? OnLabel : OffLabel;
+        var currentIcon = Checked ? (OnIcon ?? Icon) : (OffIcon ?? Icon);
+        var iconHtml = !string.IsNullOrEmpty(currentIcon) ? $@"<span class=""p-togglebutton-icon""></span>" : "";
+        var labelHtml = !string.IsNullOrEmpty(currentLabel) ? $@"<span class=""p-togglebutton-label"">{currentLabel}</span>" : "";
+        var hiddenName = Name ?? TargetInput ?? "togglebutton_value";
+
+        output.Content.SetHtmlContent($@"
+            {iconHtml}
+            {labelHtml}
+            <input type=""hidden"" name=""{hiddenName}"" value=""{(Checked ? "true" : "false")}"" />
+        ");
+    }
+}
+
+/// <summary>
 /// TagHelper for <island-slider /> — Aura Range & Discrete Slider
 /// </summary>
 [HtmlTargetElement("island-slider")]

@@ -1717,6 +1717,69 @@
         </div>
     </section>
 
+
+    <!-- ToggleButton -->
+    <section id="sec-toggle-button" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>ToggleButton</h2>
+                <p>ToggleButton is used to select a boolean value using an interactive button with custom state labels, dynamic Lucide icons, sizes, and validation states.</p>
+            </div>
+            <span class="aura-tag tag-indigo">Form Control</span>
+        </div>
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Demo 1: Basic -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Two-way binding to a boolean property with default On and Off states.</p>
+                <div style="display: flex; justify-content: center;">
+                    <island-toggle-button on-label="On" off-label="Off" checked="true" style="width: 6rem;" />
+                </div>
+            </div>
+
+            <!-- Demo 2: Customized with Icons -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Customized</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Custom Lucide icons and descriptive labels based on the active binary state.</p>
+                <div style="display: flex; flex-wrap: wrap; items-center: center; justify-content: center; gap: 1rem;">
+                    <island-toggle-button on-label="On" off-label="Off" style="min-width: 4rem;" />
+                    <island-toggle-button on-label="Locked" off-label="Unlocked" on-icon="lock" off-icon="lock-open" checked="true" style="min-width: 7.25rem;" />
+                    <island-toggle-button on-label="Mute" off-label="Unmute" on-icon="volume-2" off-icon="volume-x" style="min-width: 6.5rem;" />
+                </div>
+            </div>
+
+            <!-- Demo 3: Sizes -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Sizes</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">ToggleButton provides small and large sizes as alternatives to the base size.</p>
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 0.75rem;">
+                    <island-toggle-button size="@ComponentSize.Small" on-label="Small" off-label="Small" style="min-width: 4rem;" />
+                    <island-toggle-button size="@ComponentSize.Normal" on-label="Normal" off-label="Normal" style="min-width: 5rem;" />
+                    <island-toggle-button size="@ComponentSize.Large" on-label="Large" off-label="Large" style="min-width: 7rem;" />
+                </div>
+            </div>
+
+            <!-- Demo 4: Fluid Width -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Fluid Width</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">The fluid prop makes the component take up the full width of its container.</p>
+                <div style="width: 100%; max-width: 360px; margin: 0 auto;">
+                    <island-toggle-button fluid="true" on-label="On" off-label="Off" checked="true" />
+                </div>
+            </div>
+
+            <!-- Demo 5: Invalid & Disabled States -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Disabled &amp; Invalid States</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Non-interactive disabled mode and form validation failure highlight.</p>
+                <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 1.5rem;">
+                    <island-toggle-button disabled="true" on-label="Disabled" off-label="Disabled" />
+                    <island-toggle-button invalid="true" on-label="Invalid" off-label="Invalid" />
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- ToggleSwitch -->
     <section id="sec-toggle-switch" class="component-card">
         <div class="card-header">

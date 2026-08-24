@@ -1055,12 +1055,14 @@ defineIsland("camera", () => import("./camera-KAAHJRTE.js"));
 defineIsland("dropzone", () => import("./dropzone-E76UIQBF.js"));
 defineIsland("tree-select", () => import("./tree-select-FZOTTQ6I.js"));
 defineIsland("datagrid", () => import("./datagrid-OWH5VQKO.js"));
-defineIsland("modal", () => import("./modal-B5JFXHEB.js"));
+defineIsland("modal", () => import("./modal-F767ZAXY.js"));
 defineIsland("toast", () => import("./toast-WLFO7J5G.js"));
 defineIsland("input-number", () => import("./input-number-KQ2J2WMH.js"));
 defineIsland("input-otp", () => import("./input-otp-RUPMATZ7.js"));
 defineIsland("input-password", () => import("./input-password-FBH7UGJO.js"));
 defineIsland("toggle-switch", () => import("./toggle-switch-TBWZQR4Y.js"));
+defineIsland("toggle-button", () => import("./toggle-button-BN5FX5FZ.js"));
+defineIsland("togglebutton", () => import("./toggle-button-BN5FX5FZ.js"));
 defineIsland("slider", () => import("./slider-UV27YNGE.js"));
 defineIsland("rating", () => import("./rating-RN6FXTFU.js"));
 defineIsland("select-button", () => import("./select-button-QXT57GWM.js"));
@@ -1132,4 +1134,4 @@ export {
   enableViewTransitions,
   getSlot
 };
-//# sourceMappingURL=chunk-FIPA57JS.js.map
+//# sourceMappingURL=chunk-GEULZ7ND.js.map
