@@ -2651,19 +2651,48 @@ public class IslandOrderListTagHelper : TagHelper
 public class IslandOrgChartTagHelper : TagHelper
 {
     public OrgChartNode? Value { get; set; }
+    public OrgChartNode? Root { get; set; }
+    public bool Collapsible { get; set; }
+    public string? SelectionMode { get; set; } = "none";
+    public List<string>? SelectionKeys { get; set; }
+    public List<string>? CollapsedKeys { get; set; }
+    public string? ToggleIcon { get; set; } = "chevron";
+    public string? TargetInput { get; set; }
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
+        // Attribute fallbacks
+        if (context.AllAttributes.TryGetAttribute("collapsible", out var colAttr))
+        {
+            if (bool.TryParse(colAttr.Value?.ToString(), out var b)) Collapsible = b;
+            else if (colAttr.Value != null) Collapsible = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("selectionMode", out var smAttr) || context.AllAttributes.TryGetAttribute("selection-mode", out smAttr))
+        {
+            SelectionMode = smAttr.Value?.ToString();
+        }
+        if (context.AllAttributes.TryGetAttribute("toggleIcon", out var tiAttr) || context.AllAttributes.TryGetAttribute("toggle-icon", out tiAttr))
+        {
+            ToggleIcon = tiAttr.Value?.ToString();
+        }
+
         output.TagName = "div";
         output.TagMode = TagMode.StartTagAndEndTag;
         output.Attributes.SetAttribute("data-island", "orgchart");
         output.Attributes.SetAttribute("data-hydrate", "load");
 
-        if (Value != null)
+        var nodeData = Value ?? Root;
+        var props = new
         {
-            var props = new { value = Value };
-            output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
-        }
+            value = nodeData,
+            collapsible = Collapsible,
+            selectionMode = SelectionMode ?? "none",
+            selectionKeys = SelectionKeys,
+            collapsedKeys = CollapsedKeys,
+            toggleIcon = ToggleIcon ?? "chevron",
+            targetInputName = TargetInput
+        };
+        output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
     }
 }
 

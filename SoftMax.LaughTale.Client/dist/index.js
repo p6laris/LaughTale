@@ -17502,12 +17502,14 @@ public static class AppTheme
                 `;
           childrenCellsHtml = `
                     <tr class="p-organizationchart-nodes">
-                        <td colspan="2" class="p-organizationchart-node-cell">
+                        <td colspan="2" class="p-organizationchart-node-cell" style="width: 100%;">
                             ${renderBranch(node.children[0])}
                         </td>
                     </tr>
                 `;
         } else {
+          const colWidth = (100 / colspan).toFixed(4);
+          const childCellWidth = (100 / childCount).toFixed(4);
           const connectorTds = [];
           const childTds = [];
           node.children.forEach((child, idx) => {
@@ -17516,11 +17518,11 @@ public static class AppTheme
             const leftTop = !isFirst ? "p-organizationchart-line-top" : "";
             const rightTop = !isLast ? "p-organizationchart-line-top" : "";
             connectorTds.push(`
-                        <td class="p-organizationchart-line-left ${leftTop}">&nbsp;</td>
-                        <td class="p-organizationchart-line-right ${rightTop}">&nbsp;</td>
+                        <td class="p-organizationchart-line-left ${leftTop}" style="width: ${colWidth}%;">&nbsp;</td>
+                        <td class="p-organizationchart-line-right ${rightTop}" style="width: ${colWidth}%;">&nbsp;</td>
                     `);
             childTds.push(`
-                        <td colspan="2" class="p-organizationchart-node-cell">
+                        <td colspan="2" class="p-organizationchart-node-cell" style="width: ${childCellWidth}%;">
                             ${renderBranch(child)}
                         </td>
                     `);
@@ -17747,7 +17749,7 @@ public static class AppTheme
       init_styles();
       ORGCHART_CSS = `
 .p-organizationchart {
-    display: inline-flex;
+    display: flex;
     flex-direction: column;
     align-items: center;
     width: 100%;
@@ -17761,6 +17763,8 @@ public static class AppTheme
     border-collapse: separate;
     border-spacing: 0;
     margin: 0 auto;
+    table-layout: fixed;
+    width: 100%;
 }
 
 .p-organizationchart-node-cell {
