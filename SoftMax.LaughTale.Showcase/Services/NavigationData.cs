@@ -50,10 +50,11 @@ public static class NavigationData
                 new("SplitButton", "zap", "/enterprise#sec-split-button"),
                 new("SpeedDial FAB", "zap", "/enterprise#sec-speed-dial")
             }),
-            new("Data & Tables (11)", "database", null, false, new List<SidebarItem>
+            new("Data & Tables (12)", "database", null, false, new List<SidebarItem>
             {
                 new("DataTable", "table2", "/enterprise#sec-datagrid", false, null, "Live"),
                 new("DataView", "layoutGrid", "/enterprise#sec-dataview"),
+                new("Tree", "folderTree", "/enterprise#sec-tree", false, null, "New"),
                 new("Paginator", "grid", "/enterprise#sec-paginator"),
                 new("Splitter Panels", "columns3", "/enterprise#sec-splitter"),
                 new("Listbox", "listFilter", "/enterprise#sec-listbox"),

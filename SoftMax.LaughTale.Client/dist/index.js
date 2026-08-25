@@ -25839,6 +25839,9 @@ ${h.response}`).join("\n");
                 </div>
             </div>
         `;
+      bindEvents();
+    }
+    function bindEvents() {
       container.querySelector(".sidebar-toggle")?.addEventListener("click", () => {
         collapsed = !collapsed;
         render();
@@ -25851,18 +25854,51 @@ ${h.response}`).join("\n");
           if (menuEl) {
             menuEl.innerHTML = items.map((item) => renderNode(item)).join("");
             bindGroupToggles();
+            bindLinkClicks();
           }
         });
       }
       bindGroupToggles();
+      bindLinkClicks();
     }
     function bindGroupToggles() {
       container.querySelectorAll("[data-group-toggle]").forEach((header) => {
-        header.addEventListener("click", () => {
+        header.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
           const groupLabel = header.getAttribute("data-group-toggle");
           if (groupLabel) {
             expandedMap[groupLabel] = !expandedMap[groupLabel];
-            render();
+            const groupContainer = container.querySelector(`[data-label="${groupLabel}"]`);
+            if (groupContainer) {
+              const subTree = groupContainer.querySelector(".sidebar-sub-tree");
+              const chevron = groupContainer.querySelector(".sidebar-group-chevron");
+              if (subTree) {
+                subTree.style.display = expandedMap[groupLabel] ? "flex" : "none";
+              }
+              if (chevron) {
+                chevron.classList.toggle("expanded", expandedMap[groupLabel]);
+              }
+            }
+          }
+        });
+      });
+    }
+    function bindLinkClicks() {
+      container.querySelectorAll("a[data-sidebar-link]").forEach((link) => {
+        link.addEventListener("click", (e) => {
+          const href = link.getAttribute("href") || "";
+          const hashIndex = href.indexOf("#");
+          if (hashIndex >= 0) {
+            const targetId = href.substring(hashIndex + 1);
+            const targetEl = document.getElementById(targetId);
+            if (targetEl) {
+              e.preventDefault();
+              targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
+              container.querySelectorAll(".sidebar-item").forEach((el) => el.classList.remove("active"));
+              link.classList.add("active");
+              window.history.pushState(null, "", href);
+            }
           }
         });
       });
