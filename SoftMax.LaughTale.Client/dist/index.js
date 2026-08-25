@@ -14245,7 +14245,6 @@ var SoftMaxIslands = (() => {
     const isMultiple = !!props.multiple;
     const isControlled = !!props.controlled;
     const withRadio = !!props.withRadio;
-    const customTrigger = !!props.customTrigger;
     const customIndicator = props.customIndicator || "css";
     let activeKeys = /* @__PURE__ */ new Set();
     if (props.value !== void 0 && props.value !== null) {
@@ -14266,27 +14265,63 @@ var SoftMaxIslands = (() => {
     function togglePanel(idxStr) {
       const idx = Number(idxStr);
       if (tabs[idx]?.disabled) return;
-      if (isMultiple) {
-        if (activeKeys.has(idxStr)) {
+      const isOpening = !activeKeys.has(idxStr);
+      if (!isMultiple) {
+        container.querySelectorAll(".p-accordionpanel").forEach((panel) => {
+          const k = panel.getAttribute("data-panel-idx");
+          if (k !== idxStr) {
+            panel.classList.remove("p-accordionpanel-active");
+            const toggleBtn = panel.querySelector(".p-accordionheader-toggle");
+            if (toggleBtn) toggleBtn.setAttribute("aria-expanded", "false");
+            if (customIndicator === "match") {
+              const iconSpan = panel.querySelector(".p-accordionheader-toggle-icon");
+              if (iconSpan) iconSpan.innerHTML = SVG_ICONS3.folder;
+            } else if (tabs[Number(k)]?.toggleIcon === "plusMinus") {
+              const iconSpan = panel.querySelector(".p-accordionheader-toggle-icon");
+              if (iconSpan) iconSpan.innerHTML = SVG_ICONS3.plus;
+            }
+          }
+        });
+        activeKeys.clear();
+      }
+      const targetPanel = container.querySelector(`.p-accordionpanel[data-panel-idx="${idxStr}"]`);
+      if (targetPanel) {
+        if (isOpening) {
+          activeKeys.add(idxStr);
+          targetPanel.classList.add("p-accordionpanel-active");
+          targetPanel.querySelector(".p-accordionheader-toggle")?.setAttribute("aria-expanded", "true");
+          if (customIndicator === "match") {
+            const iconSpan = targetPanel.querySelector(".p-accordionheader-toggle-icon");
+            if (iconSpan) iconSpan.innerHTML = SVG_ICONS3.folderOpen;
+          } else if (tabs[idx]?.toggleIcon === "plusMinus") {
+            const iconSpan = targetPanel.querySelector(".p-accordionheader-toggle-icon");
+            if (iconSpan) iconSpan.innerHTML = SVG_ICONS3.minus;
+          }
+        } else {
           activeKeys.delete(idxStr);
-        } else {
-          activeKeys.add(idxStr);
-        }
-      } else {
-        if (activeKeys.has(idxStr)) {
-          activeKeys.clear();
-        } else {
-          activeKeys.clear();
-          activeKeys.add(idxStr);
+          targetPanel.classList.remove("p-accordionpanel-active");
+          targetPanel.querySelector(".p-accordionheader-toggle")?.setAttribute("aria-expanded", "false");
+          if (customIndicator === "match") {
+            const iconSpan = targetPanel.querySelector(".p-accordionheader-toggle-icon");
+            if (iconSpan) iconSpan.innerHTML = SVG_ICONS3.folder;
+          } else if (tabs[idx]?.toggleIcon === "plusMinus") {
+            const iconSpan = targetPanel.querySelector(".p-accordionheader-toggle-icon");
+            if (iconSpan) iconSpan.innerHTML = SVG_ICONS3.plus;
+          }
         }
       }
-      render();
+      if (isControlled) {
+        container.querySelectorAll(".p-accordion-ctrl-btn").forEach((btn) => {
+          const k = btn.getAttribute("data-ctrl-idx");
+          btn.classList.toggle("p-highlight", k !== null && activeKeys.has(k));
+        });
+      }
       container.dispatchEvent(new CustomEvent("accordion:change", {
         bubbles: true,
         detail: { value: Array.from(activeKeys) }
       }));
     }
-    function render() {
+    function renderInitial() {
       let topControlsHtml = "";
       if (isControlled) {
         topControlsHtml = `
@@ -14359,10 +14394,11 @@ var SoftMaxIslands = (() => {
                     <div class="p-accordioncontent" 
                          id="${contentId}" 
                          role="region" 
-                         aria-labelledby="${headerId}" 
-                         style="display: ${isActive ? "block" : "none"};">
-                        <div class="p-accordioncontent-content">
-                            ${tab.content}
+                         aria-labelledby="${headerId}">
+                        <div class="p-accordioncontent-wrapper">
+                            <div class="p-accordioncontent-content">
+                                ${tab.content}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -14409,7 +14445,7 @@ var SoftMaxIslands = (() => {
         });
       });
     }
-    render();
+    renderInitial();
   }
   var SVG_ICONS3, ACCORDION_CSS;
   var init_accordion = __esm({
@@ -14467,7 +14503,7 @@ var SoftMaxIslands = (() => {
     border: none;
     cursor: pointer;
     text-align: left;
-    transition: background-color 0.15s ease, color 0.15s ease;
+    transition: background-color 0.2s cubic-bezier(0.2, 0, 0, 1), color 0.2s cubic-bezier(0.2, 0, 0, 1);
     box-sizing: border-box;
 }
 .p-accordionheader-toggle:hover:not(:disabled) {
@@ -14484,7 +14520,7 @@ var SoftMaxIslands = (() => {
     align-items: center;
     justify-content: center;
     color: var(--p-surface-400, #94a3b8);
-    transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1), color 0.15s ease;
+    transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1), color 0.2s ease;
     flex-shrink: 0;
 }
 .p-accordionpanel.p-accordionpanel-active > .p-accordionheader > .p-accordionheader-toggle .p-accordionheader-toggle-icon {
@@ -14494,16 +14530,35 @@ var SoftMaxIslands = (() => {
     transform: rotate(180deg);
 }
 
+/* 60fps CSS Grid Smooth Collapse/Expand Transition */
 .p-accordioncontent {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 280ms cubic-bezier(0.2, 0, 0, 1);
     background: var(--p-surface-0, #ffffff);
+    overflow: hidden;
+}
+.p-accordionpanel.p-accordionpanel-active > .p-accordioncontent {
+    grid-template-rows: 1fr;
+}
+
+.p-accordioncontent-wrapper {
+    min-height: 0;
     overflow: hidden;
 }
 
 .p-accordioncontent-content {
-    padding: 0 1.25rem 1.25rem 1.25rem;
+    padding: 0.25rem 1.25rem 1.25rem 1.25rem;
     color: var(--p-surface-600, #475569);
     font-size: 0.875rem;
     line-height: 1.65;
+    transition: opacity 220ms ease, transform 240ms cubic-bezier(0.2, 0, 0, 1);
+    opacity: 0;
+    transform: translateY(-6px);
+}
+.p-accordionpanel.p-accordionpanel-active > .p-accordioncontent .p-accordioncontent-content {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .p-accordionpanel.p-disabled {
@@ -14525,7 +14580,7 @@ var SoftMaxIslands = (() => {
     justify-content: center;
     margin-right: 0.75rem;
     flex-shrink: 0;
-    transition: border-color 0.15s ease;
+    transition: border-color 0.2s ease;
 }
 .p-accordionpanel.p-accordionpanel-active .p-accordion-radio-circle {
     border-color: var(--p-primary-600, #10b981);
@@ -14536,9 +14591,15 @@ var SoftMaxIslands = (() => {
     border-radius: 9999px;
     background: var(--p-primary-600, #10b981);
     display: none;
+    transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1);
 }
 .p-accordionpanel.p-accordionpanel-active .p-accordion-radio-inner {
     display: block;
+    animation: pRadioPop 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+@keyframes pRadioPop {
+    0% { transform: scale(0); }
+    100% { transform: scale(1); }
 }
 
 /* Controlled top buttons */
@@ -14557,7 +14618,7 @@ var SoftMaxIslands = (() => {
     background: var(--p-surface-0, #ffffff);
     color: var(--p-surface-700, #334155);
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
 }
 .p-accordion-ctrl-btn:hover {
     background: var(--p-surface-100, #f1f5f9);
