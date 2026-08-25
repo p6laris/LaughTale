@@ -1479,7 +1479,7 @@
         <div class="card-header">
             <div>
                 <h2>Tree</h2>
-                <p>Tree is used to display hierarchical data with expand/collapse support, custom icons, multi-mode selection, filtering, lazy loading, and drag &amp; drop.</p>
+                <p>Tree displays hierarchical data with expand/collapse support, custom icons, multi-mode selection, filtering, lazy loading, and drag &amp; drop.</p>
             </div>
             <span class="aura-tag tag-emerald">Data</span>
         </div>
@@ -1490,7 +1490,7 @@
                     <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Basic</h3>
                     <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Displays hierarchical data with expand and collapse support.</p>
                 </div>
-                <div style="max-width: 480px;">
+                <div style="padding: 1.5rem; background: var(--p-surface-50); border: 1px solid var(--p-surface-200); border-radius: 8px; max-width: 480px;">
                     <island-tree value="@Model.DocumentsTree" />
                 </div>
             </div>
@@ -1501,25 +1501,25 @@
                     <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Content &amp; Toggle Indicator</h3>
                     <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Custom node icons (Folder / FolderOpen / File) and plus/minus circle toggle indicators.</p>
                 </div>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
-                    <div>
-                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 0.5rem 0;">Dynamic Node Icons</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; padding: 1.5rem; background: var(--p-surface-50); border: 1px solid var(--p-surface-200); border-radius: 8px;">
+                    <div style="background: var(--p-surface-0); padding: 1.25rem; border-radius: 8px; border: 1px solid var(--p-surface-200);">
+                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 1rem 0;">Dynamic Node Icons</h4>
                         <island-tree value="@Model.DocumentsTree" />
                     </div>
-                    <div>
-                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 0.5rem 0;">Plus / Minus Toggle Icons</h4>
+                    <div style="background: var(--p-surface-0); padding: 1.25rem; border-radius: 8px; border: 1px solid var(--p-surface-200);">
+                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 1rem 0;">Plus / Minus Toggle Icons</h4>
                         <island-tree value="@Model.DocumentsTree" toggleIcon="plusMinus" />
                     </div>
                 </div>
             </div>
 
-            <!-- Demo 3: Controlled (Programmatic Expansion) -->
+            <!-- Demo 3: Controlled -->
             <div class="demo-subcard">
                 <div class="demo-subcard-header">
                     <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Controlled</h3>
-                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Tree state controlled programmatically with Expand All and Collapse All buttons.</p>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Programmatic Expand All and Collapse All operations.</p>
                 </div>
-                <div style="max-width: 480px;">
+                <div style="padding: 1.5rem; background: var(--p-surface-50); border: 1px solid var(--p-surface-200); border-radius: 8px; max-width: 520px;">
                     <island-tree value="@Model.DocumentsTree" showControls="true" />
                 </div>
             </div>
@@ -1528,344 +1528,242 @@
             <div class="demo-subcard">
                 <div class="demo-subcard-header">
                     <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Selection Modes</h3>
-                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Single selection, multiple selection with MetaKey, and cascading tri-state checkboxes with Select All.</p>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Single, Multiple, and Checkbox (Cascading Tri-State) selection modes.</p>
                 </div>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
-                    <div>
-                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 0.5rem 0;">Single Selection</h4>
-                        <island-tree value="@Model.DocumentsTree" selectionMode="single" />
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; padding: 1.5rem; background: var(--p-surface-50); border: 1px solid var(--p-surface-200); border-radius: 8px;">
+                    <div style="background: var(--p-surface-0); padding: 1.25rem; border-radius: 8px; border: 1px solid var(--p-surface-200);">
+                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 1rem 0;">Single Selection</h4>
+                        <island-tree value="@Model.DocumentsTree" selectionMode="single" events="true" />
                     </div>
-                    <div>
-                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 0.5rem 0;">Multiple Selection</h4>
-                        <island-tree value="@Model.DocumentsTree" selectionMode="multiple" metaKeySelection="false" />
+                    <div style="background: var(--p-surface-0); padding: 1.25rem; border-radius: 8px; border: 1px solid var(--p-surface-200);">
+                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 1rem 0;">Multiple Selection</h4>
+                        <island-tree value="@Model.DocumentsTree" selectionMode="multiple" metaKeySelection="false" events="true" />
                     </div>
-                    <div>
-                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 0.5rem 0;">Checkbox (Cascading Tri-State)</h4>
-                        <island-tree value="@Model.DocumentsTree" selectionMode="checkbox" />
-                    </div>
-                    <div>
-                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 0.5rem 0;">Select All Header</h4>
-                        <island-tree value="@Model.DocumentsTree" selectionMode="checkbox" showSelectAll="true" />
+                    <div style="background: var(--p-surface-0); padding: 1.25rem; border-radius: 8px; border: 1px solid var(--p-surface-200);">
+                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 1rem 0;">Checkbox (Cascading)</h4>
+                        <island-tree value="@Model.DocumentsTree" selectionMode="checkbox" showSelectAll="true" events="true" />
                     </div>
                 </div>
             </div>
 
-            <!-- Demo 5: Keyboard Accessibility -->
+            <!-- Demo 5: Filter & Lazy Loading -->
             <div class="demo-subcard">
                 <div class="demo-subcard-header">
-                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Keyboard Navigation</h3>
-                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Full keyboard support: Arrow keys navigate/expand/collapse, Space selects with live counter badge.</p>
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Filter &amp; Lazy Loading</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Real-time search filtering with auto-expansion, and on-demand child node loading.</p>
                 </div>
-                <div style="max-width: 480px;">
-                    <island-tree value="@Model.DocumentsTree" selectionMode="multiple" keyboardInfo="true" />
-                </div>
-            </div>
-
-            <!-- Demo 6: Filter -->
-            <div class="demo-subcard">
-                <div class="demo-subcard-header">
-                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Filter</h3>
-                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Search filter input with real-time matching and auto-expanding matched branches.</p>
-                </div>
-                <div style="max-width: 480px;">
-                    <island-tree value="@Model.DocumentsTree" filter="true" filterPlaceholder="Search" />
-                </div>
-            </div>
-
-            <!-- Demo 7: Lazy Loading -->
-            <div class="demo-subcard">
-                <div class="demo-subcard-header">
-                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Lazy Loading</h3>
-                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Nodes loaded on demand when expanded with animated spinner.</p>
-                </div>
-                <div style="max-width: 480px;">
-                    <island-tree value="@Model.LazyTreeNodes" lazy="true" loadingMode="icon" />
-                </div>
-            </div>
-
-            <!-- Demo 8: Loading & Skeleton -->
-            <div class="demo-subcard">
-                <div class="demo-subcard-header">
-                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Loading States (Overlay &amp; Skeleton)</h3>
-                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Loading spinner overlay and skeleton animated placeholders.</p>
-                </div>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
-                    <div>
-                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 0.5rem 0;">Overlay Spinner</h4>
-                        <island-tree value="@Model.DocumentsTree" loading="true" />
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; padding: 1.5rem; background: var(--p-surface-50); border: 1px solid var(--p-surface-200); border-radius: 8px;">
+                    <div style="background: var(--p-surface-0); padding: 1.25rem; border-radius: 8px; border: 1px solid var(--p-surface-200);">
+                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 1rem 0;">Live Search Filter</h4>
+                        <island-tree value="@Model.DocumentsTree" filter="true" filterPlaceholder="Search nodes..." />
                     </div>
-                    <div>
-                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 0.5rem 0;">Skeleton Placeholders</h4>
-                        <island-tree value="@Model.DocumentsTree" skeleton="true" loading="true" />
+                    <div style="background: var(--p-surface-0); padding: 1.25rem; border-radius: 8px; border: 1px solid var(--p-surface-200);">
+                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 1rem 0;">Lazy Loading (Click expand arrow)</h4>
+                        <island-tree value="@Model.LazyTreeNodes" lazy="true" />
                     </div>
                 </div>
             </div>
 
-            <!-- Demo 9: Empty State -->
+            <!-- Demo 6: Drag & Drop (Cross-Tree Transfer) -->
             <div class="demo-subcard">
                 <div class="demo-subcard-header">
-                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Empty State</h3>
-                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Custom placeholder with interactive creator button when there are no nodes to display.</p>
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Drag &amp; Drop Transfer</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Drag and drop nodes between scoped trees with permissions.</p>
                 </div>
-                <div style="max-width: 480px;">
-                    <island-tree value="@Model.EmptyTreeNodes" />
-                </div>
-            </div>
-
-            <!-- Demo 10: Drag & Drop (Single Tree) -->
-            <div class="demo-subcard">
-                <div class="demo-subcard-header">
-                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Drag &amp; Drop (Single Tree)</h3>
-                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Drag and drop based reordering and nesting within the tree structure.</p>
-                </div>
-                <div style="max-width: 480px;">
-                    <island-tree value="@Model.FilesystemTree" draggableNodes="true" droppableNodes="true" />
-                </div>
-            </div>
-
-            <!-- Demo 11: Drag & Drop (Multiple Trees Transfer) -->
-            <div class="demo-subcard">
-                <div class="demo-subcard-header">
-                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Drag &amp; Drop (Multiple Trees Transfer)</h3>
-                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Transfer nodes between multiple scoped trees (Tree 1 → Tree 2 → Tree 3).</p>
-                </div>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
-                    <div>
-                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 0.5rem 0;">Source (Scope: First)</h4>
-                        <island-tree value="@Model.TransferTree1" draggableNodes="true" droppableNodes="true" draggableScope="first" droppableScope="none" />
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; padding: 1.5rem; background: var(--p-surface-50); border: 1px solid var(--p-surface-200); border-radius: 8px;">
+                    <div style="background: var(--p-surface-0); padding: 1.25rem; border-radius: 8px; border: 1px solid var(--p-surface-200);">
+                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 1rem 0;">Source Tree (Files)</h4>
+                        <island-tree value="@Model.TransferTree1" draggableNodes="true" droppableNodes="true" draggableScope="files" droppableScope="files,etc,target" />
                     </div>
-                    <div>
-                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 0.5rem 0;">Intermediate (Accepts: First)</h4>
-                        <island-tree value="@Model.TransferTree2" draggableNodes="true" droppableNodes="true" draggableScope="second" droppableScope="first" />
+                    <div style="background: var(--p-surface-0); padding: 1.25rem; border-radius: 8px; border: 1px solid var(--p-surface-200);">
+                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 1rem 0;">Intermediate Tree (/etc)</h4>
+                        <island-tree value="@Model.TransferTree2" draggableNodes="true" droppableNodes="true" draggableScope="etc" droppableScope="files,etc" />
                     </div>
-                    <div>
-                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 0.5rem 0;">Target (Accepts: First &amp; Second)</h4>
-                        <island-tree value="@Model.TransferTree3" draggableNodes="true" droppableNodes="true" droppableScope='new[] { "first", "second" }' />
+                    <div style="background: var(--p-surface-0); padding: 1.25rem; border-radius: 8px; border: 1px solid var(--p-surface-200);">
+                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 1rem 0;">Target Tree (Drop Here)</h4>
+                        <island-tree value="@Model.TransferTree3" draggableNodes="true" droppableNodes="true" draggableScope="target" droppableScope="files,etc,target" emptyMessage="Drag files here..." />
                     </div>
-                </div>
-            </div>
-
-            <!-- Demo 12: Events -->
-            <div class="demo-subcard">
-                <div class="demo-subcard-header">
-                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Events</h3>
-                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Event toasts triggered on node select, unselect, expand, and collapse.</p>
-                </div>
-                <div style="max-width: 480px;">
-                    <island-tree value="@Model.DocumentsTree" selectionMode="single" events="true" />
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- TreeSelect -->
-        <!-- 29. TREETABLE COMPONENT SUITE -->
+    <!-- TreeTable -->
     <section id="sec-treetable" class="component-card">
-        <div class="component-card-header">
+        <div class="card-header">
             <div>
-                <h2 class="component-card-title">TreeTable</h2>
-                <p class="component-card-desc">Display hierarchical data in tabular format with expandable rows, multi-mode selections, multi-column sorting, pagination, frozen columns, column resizing, filtering, lazy loading, and context menu support.</p>
+                <h2>TreeTable</h2>
+                <p>TreeTable displays hierarchical data in tabular format with expandable rows, multi-mode selection, multi-column sorting, pagination, and frozen columns.</p>
             </div>
-            <span class="badge badge-success">Aura Compliant</span>
+            <span class="aura-tag tag-blue">Tabular</span>
         </div>
-
-        <div class="component-demo-grid">
-            <!-- 1. Basic -->
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Demo 1: Basic -->
             <div class="demo-subcard">
                 <div class="demo-subcard-header">
-                    <span class="demo-subcard-title">1. Basic</span>
-                    <span class="demo-subcard-desc">TreeTable requires a collection of TreeNode instances as a value and Column components as children for representation.</span>
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Basic</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">TreeTable requires a collection of TreeNode instances as a value and Column components as children.</p>
                 </div>
-                <div class="demo-subcard-body">
+                <div style="padding: 1.5rem; background: var(--p-surface-50); border: 1px solid var(--p-surface-200); border-radius: 8px;">
                     <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableBasicColumns" />
                 </div>
             </div>
 
-            <!-- 2. Size -->
+            <!-- Demo 2: Size & Grid Lines -->
             <div class="demo-subcard">
                 <div class="demo-subcard-header">
-                    <span class="demo-subcard-title">2. Size</span>
-                    <span class="demo-subcard-desc">In addition to a regular table, alternatives with alternative sizes are available.</span>
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Size &amp; Grid Lines</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Interactive size switching (Small, Normal, Large) and optional cell gridlines.</p>
                 </div>
-                <div class="demo-subcard-body">
-                    <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableBasicColumns" top-controls="size" use-tags="true" />
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.5rem; padding: 1.5rem; background: var(--p-surface-50); border: 1px solid var(--p-surface-200); border-radius: 8px;">
+                    <div style="background: var(--p-surface-0); padding: 1.25rem; border-radius: 8px; border: 1px solid var(--p-surface-200);">
+                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 1rem 0;">Dynamic Sizing</h4>
+                        <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableBasicColumns" top-controls="size" use-tags="true" />
+                    </div>
+                    <div style="background: var(--p-surface-0); padding: 1.25rem; border-radius: 8px; border: 1px solid var(--p-surface-200);">
+                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 1rem 0;">Grid Lines</h4>
+                        <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableBasicColumns" show-gridlines="true" use-tags="true" />
+                    </div>
                 </div>
             </div>
 
-            <!-- 3. Grid Lines -->
+            <!-- Demo 3: Selection Modes -->
             <div class="demo-subcard">
                 <div class="demo-subcard-header">
-                    <span class="demo-subcard-title">3. Grid Lines</span>
-                    <span class="demo-subcard-desc">Enabling showGridlines displays grid lines.</span>
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Selection Modes</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Single, Multiple, and Tri-State Checkbox row selection.</p>
                 </div>
-                <div class="demo-subcard-body">
-                    <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableBasicColumns" show-gridlines="true" use-tags="true" />
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; padding: 1.5rem; background: var(--p-surface-50); border: 1px solid var(--p-surface-200); border-radius: 8px;">
+                    <div style="background: var(--p-surface-0); padding: 1.25rem; border-radius: 8px; border: 1px solid var(--p-surface-200);">
+                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 1rem 0;">Single Row Selection</h4>
+                        <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableBasicColumns" top-controls="metaKey" selection-mode="single" meta-key-selection="true" use-tags="true" events="true" />
+                    </div>
+                    <div style="background: var(--p-surface-0); padding: 1.25rem; border-radius: 8px; border: 1px solid var(--p-surface-200);">
+                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 1rem 0;">Multiple Rows Selection</h4>
+                        <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableBasicColumns" top-controls="metaKey" selection-mode="multiple" meta-key-selection="true" use-tags="true" events="true" />
+                    </div>
+                    <div style="background: var(--p-surface-0); padding: 1.25rem; border-radius: 8px; border: 1px solid var(--p-surface-200);">
+                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 1rem 0;">Checkbox Row Selection</h4>
+                        <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableBasicColumns" selection-mode="checkbox" use-tags="true" events="true" />
+                    </div>
                 </div>
             </div>
 
-            <!-- 4. Single Row Selection -->
+            <!-- Demo 4: Sorting -->
             <div class="demo-subcard">
                 <div class="demo-subcard-header">
-                    <span class="demo-subcard-title">4. Single Row Selection</span>
-                    <span class="demo-subcard-desc">Single node selection is configured by setting selectionMode as single along with selectionKeys property.</span>
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Sorting</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Single column sorting and multiple column presort with 3-state removable sort.</p>
                 </div>
-                <div class="demo-subcard-body">
-                    <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableBasicColumns" top-controls="metaKey" selection-mode="single" meta-key-selection="true" use-tags="true" events="true" />
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.5rem; padding: 1.5rem; background: var(--p-surface-50); border: 1px solid var(--p-surface-200); border-radius: 8px;">
+                    <div style="background: var(--p-surface-0); padding: 1.25rem; border-radius: 8px; border: 1px solid var(--p-surface-200);">
+                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 1rem 0;">Single Column Sort</h4>
+                        <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableSortableColumns" sort-mode="single" use-tags="true" />
+                    </div>
+                    <div style="background: var(--p-surface-0); padding: 1.25rem; border-radius: 8px; border: 1px solid var(--p-surface-200);">
+                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 1rem 0;">Multiple Column Sort &amp; Removable</h4>
+                        <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableSortableColumns" sort-mode="multiple" removable-sort="true" use-tags="true" />
+                    </div>
                 </div>
             </div>
 
-            <!-- 5. Multiple Rows Selection -->
+            <!-- Demo 5: Pagination -->
             <div class="demo-subcard">
                 <div class="demo-subcard-header">
-                    <span class="demo-subcard-title">5. Multiple Rows Selection</span>
-                    <span class="demo-subcard-desc">More than one node is selectable by setting selectionMode to multiple.</span>
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Pagination</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Standard paginator with rows-per-page dropdown and headless compact pager.</p>
                 </div>
-                <div class="demo-subcard-body">
-                    <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableBasicColumns" top-controls="metaKey" selection-mode="multiple" meta-key-selection="true" use-tags="true" events="true" />
-                </div>
-            </div>
-
-            <!-- 6. Checkbox Row Selection -->
-            <div class="demo-subcard">
-                <div class="demo-subcard-header">
-                    <span class="demo-subcard-title">6. Checkbox Row Selection</span>
-                    <span class="demo-subcard-desc">Selection of multiple nodes via checkboxes with cascading checked and partialChecked states.</span>
-                </div>
-                <div class="demo-subcard-body">
-                    <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableBasicColumns" selection-mode="checkbox" use-tags="true" events="true" />
-                </div>
-            </div>
-
-            <!-- 7. Keyboard Navigation -->
-            <div class="demo-subcard">
-                <div class="demo-subcard-header">
-                    <span class="demo-subcard-title">7. Keyboard Selection</span>
-                    <span class="demo-subcard-desc">TreeTable has full keyboard support: &uarr; &darr; navigate, &rarr; &larr; expand/collapse, Space/Enter selects.</span>
-                </div>
-                <div class="demo-subcard-body">
-                    <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableBasicColumns" selection-mode="multiple" meta-key-selection="true" use-tags="true" events="true" />
-                </div>
-            </div>
-
-            <!-- 8. Single Column Sort -->
-            <div class="demo-subcard">
-                <div class="demo-subcard-header">
-                    <span class="demo-subcard-title">8. Single Column Sort</span>
-                    <span class="demo-subcard-desc">Sorting on a column is enabled by adding the sortable property.</span>
-                </div>
-                <div class="demo-subcard-body">
-                    <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableSortableColumns" sort-mode="single" use-tags="true" />
-                </div>
-            </div>
-
-            <!-- 9. Multiple Column Presort & Removable Sort -->
-            <div class="demo-subcard">
-                <div class="demo-subcard-header">
-                    <span class="demo-subcard-title">9. Multiple Columns Sort & Removable Sort</span>
-                    <span class="demo-subcard-desc">Multiple columns sorted with sort order badges. 3rd click removes sorting.</span>
-                </div>
-                <div class="demo-subcard-body">
-                    <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableSortableColumns" sort-mode="multiple" removable-sort="true" use-tags="true" />
-                </div>
-            </div>
-
-            <!-- 10. Pagination -->
-            <div class="demo-subcard">
-                <div class="demo-subcard-header">
-                    <span class="demo-subcard-title">10. Pagination (Basic & Headless)</span>
-                    <span class="demo-subcard-desc">Pagination is enabled by adding paginator property and defining rows per page.</span>
-                </div>
-                <div class="demo-subcard-body" style="display: flex; flex-direction: column; gap: 1.5rem;">
-                    <div>
-                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-text-muted); margin-bottom: 0.4rem; text-transform: uppercase;">Basic Paginator</div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.5rem; padding: 1.5rem; background: var(--p-surface-50); border: 1px solid var(--p-surface-200); border-radius: 8px;">
+                    <div style="background: var(--p-surface-0); padding: 1.25rem; border-radius: 8px; border: 1px solid var(--p-surface-200);">
+                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 1rem 0;">Standard Paginator</h4>
                         <island-treetable value="@Model.TreeTablePaginatorNodes" columns="@Model.TreeTableBasicColumns" paginator="true" rows="5" use-tags="true" />
                     </div>
-                    <div>
-                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-text-muted); margin-bottom: 0.4rem; text-transform: uppercase;">Headless Compact Paginator</div>
+                    <div style="background: var(--p-surface-0); padding: 1.25rem; border-radius: 8px; border: 1px solid var(--p-surface-200);">
+                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 1rem 0;">Headless Compact Paginator</h4>
                         <island-treetable value="@Model.TreeTablePaginatorNodes" columns="@Model.TreeTableBasicColumns" paginator="true" rows="5" headless-paginator="true" use-tags="true" />
                     </div>
                 </div>
             </div>
 
-            <!-- 11. Scroll & Frozen Columns -->
+            <!-- Demo 6: Scroll & Frozen Columns -->
             <div class="demo-subcard">
                 <div class="demo-subcard-header">
-                    <span class="demo-subcard-title">11. Scroll & Frozen Columns</span>
-                    <span class="demo-subcard-desc">Vertical scrolling with sticky header and left-frozen Name column.</span>
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Scroll &amp; Frozen Columns</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Vertical scrolling with sticky header and left-frozen Name column during horizontal pan.</p>
                 </div>
-                <div class="demo-subcard-body">
-                    <island-treetable value="@Model.TreeTableFrozenNodes" columns="@Model.TreeTableFrozenColumns" scrollable="true" scroll-height="400px" use-node-icons="true" use-tags="true" />
+                <div style="padding: 1.5rem; background: var(--p-surface-50); border: 1px solid var(--p-surface-200); border-radius: 8px;">
+                    <island-treetable value="@Model.TreeTableFrozenNodes" columns="@Model.TreeTableFrozenColumns" scrollable="true" scroll-height="350px" use-node-icons="true" use-tags="true" />
                 </div>
             </div>
 
-            <!-- 12. Column Resize & Toggle -->
+            <!-- Demo 7: Column Resize & Visibility Toggle -->
             <div class="demo-subcard">
                 <div class="demo-subcard-header">
-                    <span class="demo-subcard-title">12. Column Resize & Column Toggle</span>
-                    <span class="demo-subcard-desc">Columns resized with drag and drop, and toggled via popover.</span>
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Column Resize &amp; Toggle</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Drag column dividers to resize widths live, and toggle visible columns via popover.</p>
                 </div>
-                <div class="demo-subcard-body">
+                <div style="padding: 1.5rem; background: var(--p-surface-50); border: 1px solid var(--p-surface-200); border-radius: 8px;">
                     <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableBasicColumns" resizable-columns="true" column-toggle="true" show-gridlines="true" use-tags="true" />
                 </div>
             </div>
 
-            <!-- 13. Filter -->
+            <!-- Demo 8: Instant Search Filter -->
             <div class="demo-subcard">
                 <div class="demo-subcard-header">
-                    <span class="demo-subcard-title">13. Instant Search Filter</span>
-                    <span class="demo-subcard-desc">Global keyword search across all columns with automatic branch preservation.</span>
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Instant Search Filter</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Global keyword search input with branch auto-expansion.</p>
                 </div>
-                <div class="demo-subcard-body">
+                <div style="padding: 1.5rem; background: var(--p-surface-50); border: 1px solid var(--p-surface-200); border-radius: 8px;">
                     <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableBasicColumns" filter="true" use-tags="true" />
                 </div>
             </div>
 
-            <!-- 14. Lazy Loading & Skeleton States -->
+            <!-- Demo 9: Lazy Loading & Skeleton Placeholders -->
             <div class="demo-subcard">
                 <div class="demo-subcard-header">
-                    <span class="demo-subcard-title">14. Lazy Loading & Loading Skeleton</span>
-                    <span class="demo-subcard-desc">Remote-simulation lazy loading on expand, and skeleton placeholder rows during loading.</span>
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Lazy Loading &amp; Skeleton Placeholders</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">On-demand child node expansion with loading spinners, and animated skeleton rows.</p>
                 </div>
-                <div class="demo-subcard-body" style="display: flex; flex-direction: column; gap: 1.5rem;">
-                    <div>
-                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-text-muted); margin-bottom: 0.4rem; text-transform: uppercase;">Lazy Expand (Click expand arrow)</div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.5rem; padding: 1.5rem; background: var(--p-surface-50); border: 1px solid var(--p-surface-200); border-radius: 8px;">
+                    <div style="background: var(--p-surface-0); padding: 1.25rem; border-radius: 8px; border: 1px solid var(--p-surface-200);">
+                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 1rem 0;">Lazy Loading</h4>
                         <island-treetable value="@Model.LazyTreeNodes" columns="@Model.TreeTableBasicColumns" lazy="true" use-tags="true" />
                     </div>
-                    <div>
-                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-text-muted); margin-bottom: 0.4rem; text-transform: uppercase;">Skeleton Placeholders</div>
+                    <div style="background: var(--p-surface-0); padding: 1.25rem; border-radius: 8px; border: 1px solid var(--p-surface-200);">
+                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 1rem 0;">Skeleton Placeholders</h4>
                         <island-treetable columns="@Model.TreeTableBasicColumns" skeleton="true" loading="true" />
                     </div>
                 </div>
             </div>
 
-            <!-- 15. Template (Header & Footer) -->
+            <!-- Demo 10: Template (Header, Actions & Footer) -->
             <div class="demo-subcard">
                 <div class="demo-subcard-header">
-                    <span class="demo-subcard-title">15. Template (Header, Actions & Footer)</span>
-                    <span class="demo-subcard-desc">Custom content at header and footer slots via templating.</span>
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Template (Header, Actions &amp; Footer)</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Custom content at header caption, row action buttons, and footer reload button.</p>
                 </div>
-                <div class="demo-subcard-body">
+                <div style="padding: 1.5rem; background: var(--p-surface-50); border: 1px solid var(--p-surface-200); border-radius: 8px;">
                     <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableBasicColumns" header-title="File Viewer" show-actions="true" footer-text="Reload" use-tags="true" events="true" />
                 </div>
             </div>
 
-            <!-- 16. Controlled & Context Menu -->
+            <!-- Demo 11: Controlled Expansion, ContextMenu & Empty State -->
             <div class="demo-subcard">
                 <div class="demo-subcard-header">
-                    <span class="demo-subcard-title">16. Controlled Expansion & ContextMenu</span>
-                    <span class="demo-subcard-desc">Expansion controlled with expandedKeys property, and right-click ContextMenu.</span>
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Controlled Expansion, ContextMenu &amp; Empty State</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Programmatic expansion toggle, right-click ContextMenu, and custom empty state.</p>
                 </div>
-                <div class="demo-subcard-body" style="display: flex; flex-direction: column; gap: 1.5rem;">
-                    <div>
-                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-text-muted); margin-bottom: 0.4rem; text-transform: uppercase;">Controlled (Toggle Applications Button)</div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; padding: 1.5rem; background: var(--p-surface-50); border: 1px solid var(--p-surface-200); border-radius: 8px;">
+                    <div style="background: var(--p-surface-0); padding: 1.25rem; border-radius: 8px; border: 1px solid var(--p-surface-200);">
+                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 1rem 0;">Controlled (Toggle Applications)</h4>
                         <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableBasicColumns" top-controls="controlled" use-tags="true" />
                     </div>
-                    <div>
-                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-text-muted); margin-bottom: 0.4rem; text-transform: uppercase;">Right-Click Context Menu (Right-click any row)</div>
+                    <div style="background: var(--p-surface-0); padding: 1.25rem; border-radius: 8px; border: 1px solid var(--p-surface-200);">
+                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 1rem 0;">Right-Click Context Menu</h4>
                         <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableBasicColumns" context-menu="true" use-tags="true" events="true" />
                     </div>
-                    <div>
-                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-text-muted); margin-bottom: 0.4rem; text-transform: uppercase;">Empty State</div>
+                    <div style="background: var(--p-surface-0); padding: 1.25rem; border-radius: 8px; border: 1px solid var(--p-surface-200);">
+                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 1rem 0;">Empty State</h4>
                         <island-treetable value="@Model.TreeTableEmptyNodes" columns="@Model.TreeTableBasicColumns" empty-message="No folders yet" />
                     </div>
                 </div>
