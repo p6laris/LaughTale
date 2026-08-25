@@ -2954,12 +2954,66 @@
         <div class="card-header">
             <div>
                 <h2>Accordion</h2>
-                <p>Stacked expandable accordion panels with multiple or single expansion modes.</p>
+                <p>Accordion groups a collection of contents in collapsible panels with single/multiple modes, custom triggers, indicators, radio selection, and full accessibility.</p>
             </div>
             <span class="aura-tag tag-slate">Panels</span>
         </div>
-        <div class="card-body" style="max-width: 700px;">
-            <island-accordion tabs="@Model.AccordionTabs" multiple="true" />
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Demo 1: Basic -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">A simple accordion with expandable panels controlled via the value prop.</p>
+                <island-accordion tabs="@Model.AccordionBasicTabs" value="0" />
+            </div>
+
+            <!-- Demo 2: Multiple -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Multiple</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">By default, a single panel is open at a time. Enable multiple to allow multiple panels to stay open.</p>
+                <island-accordion tabs="@Model.AccordionBasicTabs" multiple="true" value="0" />
+            </div>
+
+            <!-- Demo 3: Controlled -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Controlled</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Control the active panel state programmatically with value buttons.</p>
+                <island-accordion tabs="@Model.AccordionControlledTabs" controlled="true" value="0" />
+            </div>
+
+            <!-- Demo 4: Custom Header & Trigger -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Trigger</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">The trigger can be tailored per panel with custom icons, badges, and contextual headers.</p>
+                <island-accordion tabs="@Model.AccordionCustomTriggerTabs" value="0" />
+            </div>
+
+            <!-- Demo 5: Indicator -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Indicator</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">The toggle icon customizes the indicator, switching between open/closed glyphs or rotating via CSS.</p>
+                <island-accordion tabs="@Model.AccordionIndicatorTabs" custom-indicator="match" value="0" />
+            </div>
+
+            <!-- Demo 6: Disabled -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Disabled</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Set disabled on an AccordionPanel to prevent user interaction with that panel.</p>
+                <island-accordion tabs="@Model.AccordionDisabledTabs" value="0" />
+            </div>
+
+            <!-- Demo 7: With RadioButton -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">With RadioButton</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">RadioButton component can be used to group multiple AccordionPanel components.</p>
+                <island-accordion tabs="@Model.AccordionRadioTabs" with-radio="true" value="1" />
+            </div>
+
+            <!-- Demo 8: Dynamic -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Dynamic</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">AccordionPanel can be generated dynamically using structured datasets.</p>
+                <island-accordion tabs="@Model.AccordionDynamicTabs" value="0" />
+            </div>
         </div>
     </section>
 

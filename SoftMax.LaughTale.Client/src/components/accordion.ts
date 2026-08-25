@@ -1,144 +1,423 @@
 /**
- * SoftMax.LaughTale: Enterprise Accordion Component
- * Powered by useDisclosure and useTransition composables.
+ * SoftMax.LaughTale: Enterprise Accordion Component (Aura Design System compliant)
+ * Expandable collapsible panel groups with single/multiple modes, controlled state,
+ * custom triggers, custom indicators, disabled states, radio-grouped selection,
+ * dynamic datasets, and full W3C APG keyboard accessibility.
  */
 
-import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
-import { AccordionProps } from '../types/models';
-import { useDisclosure } from '../composables/useDisclosure';
+import { AccordionProps, AccordionTab } from '../types/models';
 import { useTransition } from '../composables/animation/useTransition';
 
+const SVG_ICONS = {
+    chevronDown: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>',
+    chevronRight: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>',
+    folder: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>',
+    folderOpen: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 14 1.5-6h13l-2.5 6H6Z"/><path d="M4 18h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2Z"/></svg>',
+    plus: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>',
+    minus: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>',
+    check: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+    user: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>',
+    shield: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>',
+    zap: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>'
+};
 
-const CSS = `
-[data-theme="dark"] .accordion-tab {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+const ACCORDION_CSS = `
+.p-accordion {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    border: 1px solid var(--p-surface-200, #e2e8f0);
+    border-radius: var(--p-border-radius-md, 6px);
+    overflow: hidden;
+    background: var(--p-surface-0, #ffffff);
+    font-family: var(--p-font-family, inherit);
+    box-sizing: border-box;
 }
-[data-theme="dark"] .accordion-header-btn {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-accordionpanel {
+    border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
+    transition: background-color 0.2s ease;
 }
-[data-theme="dark"] .accordion-content {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+.p-accordionpanel:last-child {
+    border-bottom: none;
 }
-[data-theme="dark"] .tab-slot {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-accordionheader {
+    margin: 0;
+    padding: 0;
 }
-[data-theme="dark"] .laughtale-accordion {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-accordionheader-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 1rem 1.25rem;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    color: var(--p-surface-700, #334155);
+    background: var(--p-surface-0, #ffffff);
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    box-sizing: border-box;
+}
+.p-accordionheader-toggle:hover:not(:disabled) {
+    background: var(--p-surface-50, #f8fafc);
+    color: var(--p-surface-900, #0f172a);
+}
+.p-accordionpanel.p-accordionpanel-active > .p-accordionheader > .p-accordionheader-toggle {
+    color: var(--p-primary-600, #10b981);
+    font-weight: 700;
+}
+
+.p-accordionheader-toggle-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--p-surface-400, #94a3b8);
+    transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1), color 0.15s ease;
+    flex-shrink: 0;
+}
+.p-accordionpanel.p-accordionpanel-active > .p-accordionheader > .p-accordionheader-toggle .p-accordionheader-toggle-icon {
+    color: var(--p-primary-600, #10b981);
+}
+.p-accordion-css-indicator .p-accordionpanel.p-accordionpanel-active .p-accordionheader-toggle-icon {
+    transform: rotate(180deg);
+}
+
+.p-accordioncontent {
+    background: var(--p-surface-0, #ffffff);
+    overflow: hidden;
+}
+
+.p-accordioncontent-content {
+    padding: 0 1.25rem 1.25rem 1.25rem;
+    color: var(--p-surface-600, #475569);
+    font-size: 0.875rem;
+    line-height: 1.65;
+}
+
+.p-accordionpanel.p-disabled {
+    opacity: 0.5;
+}
+.p-accordionpanel.p-disabled .p-accordionheader-toggle {
+    cursor: not-allowed;
+}
+
+/* Radio variant */
+.p-accordion-radio-circle {
+    width: 1.125rem;
+    height: 1.125rem;
+    border-radius: 9999px;
+    border: 2px solid var(--p-surface-300, #cbd5e1);
+    background: var(--p-surface-0, #ffffff);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+    transition: border-color 0.15s ease;
+}
+.p-accordionpanel.p-accordionpanel-active .p-accordion-radio-circle {
+    border-color: var(--p-primary-600, #10b981);
+}
+.p-accordion-radio-inner {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+    background: var(--p-primary-600, #10b981);
+    display: none;
+}
+.p-accordionpanel.p-accordionpanel-active .p-accordion-radio-inner {
+    display: block;
+}
+
+/* Controlled top buttons */
+.p-accordion-top-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+.p-accordion-ctrl-btn {
+    padding: 0.45rem 0.9rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    border-radius: 6px;
+    border: 1px solid var(--p-surface-300, #cbd5e1);
+    background: var(--p-surface-0, #ffffff);
+    color: var(--p-surface-700, #334155);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.p-accordion-ctrl-btn:hover {
+    background: var(--p-surface-100, #f1f5f9);
+}
+.p-accordion-ctrl-btn.p-highlight {
+    background: var(--p-primary-500, #10b981);
+    border-color: var(--p-primary-500, #10b981);
+    color: #ffffff;
+}
+
+/* Dark Mode Tokens */
+.dark .p-accordion,
+[data-theme="dark"] .p-accordion {
+    background: var(--p-surface-900, #0f172a) !important;
+    border-color: var(--p-surface-700, #334155) !important;
+    color: var(--p-surface-100, #f8fafc) !important;
+}
+.dark .p-accordionpanel,
+[data-theme="dark"] .p-accordionpanel {
+    border-color: var(--p-surface-700, #334155) !important;
+}
+.dark .p-accordionheader-toggle,
+[data-theme="dark"] .p-accordionheader-toggle {
+    background: var(--p-surface-900, #0f172a) !important;
+    color: var(--p-surface-200, #e2e8f0) !important;
+}
+.dark .p-accordionheader-toggle:hover:not(:disabled),
+[data-theme="dark"] .p-accordionheader-toggle:hover:not(:disabled) {
+    background: var(--p-surface-800, #1e293b) !important;
+    color: var(--p-surface-0, #ffffff) !important;
+}
+.dark .p-accordionpanel.p-accordionpanel-active > .p-accordionheader > .p-accordionheader-toggle,
+[data-theme="dark"] .p-accordionpanel.p-accordionpanel-active > .p-accordionheader > .p-accordionheader-toggle {
+    color: var(--p-primary-400, #34d399) !important;
+}
+.dark .p-accordioncontent,
+[data-theme="dark"] .p-accordioncontent {
+    background: var(--p-surface-900, #0f172a) !important;
+}
+.dark .p-accordioncontent-content,
+[data-theme="dark"] .p-accordioncontent-content {
+    color: var(--p-surface-300, #cbd5e1) !important;
+}
+.dark .p-accordion-ctrl-btn,
+[data-theme="dark"] .p-accordion-ctrl-btn {
+    background: var(--p-surface-900, #0f172a) !important;
+    border-color: var(--p-surface-700, #334155) !important;
+    color: var(--p-surface-200, #e2e8f0) !important;
+}
+.dark .p-accordion-ctrl-btn.p-highlight,
+[data-theme="dark"] .p-accordion-ctrl-btn.p-highlight {
+    background: var(--p-primary-500, #10b981) !important;
+    color: #ffffff !important;
+}
+.dark .p-accordion-radio-circle,
+[data-theme="dark"] .p-accordion-radio-circle {
+    background: var(--p-surface-950, #020617) !important;
+    border-color: var(--p-surface-700, #334155) !important;
 }
 `;
 
 export default function AccordionIsland(container: HTMLElement, props: AccordionProps) {
-    injectIslandStyle('accordion', CSS);
-    const tabs = props.tabs || [];
-    let activeIndices: Set<number> = new Set();
+    injectIslandStyle('accordion', ACCORDION_CSS);
 
-    if (Array.isArray(props.activeIndex)) {
-        props.activeIndex.forEach(i => activeIndices.add(i));
-    } else if (typeof props.activeIndex === 'number') {
-        activeIndices.add(props.activeIndex);
-    } else {
-        activeIndices.add(0);
+    const tabs: AccordionTab[] = (props.tabs || []).map((t, i) => ({
+        id: t.id || String(i),
+        header: t.header || `Header ${i + 1}`,
+        content: t.content || '',
+        icon: t.icon,
+        badge: t.badge,
+        subtitle: t.subtitle,
+        price: t.price,
+        disabled: !!t.disabled,
+        toggleIcon: t.toggleIcon
+    }));
+
+    const isMultiple = !!props.multiple;
+    const isControlled = !!props.controlled;
+    const withRadio = !!props.withRadio;
+    const customTrigger = !!props.customTrigger;
+    const customIndicator = props.customIndicator || 'css'; // 'css' | 'match'
+
+    // Active state tracking
+    let activeKeys: Set<string> = new Set();
+
+    if (props.value !== undefined && props.value !== null) {
+        if (Array.isArray(props.value)) {
+            props.value.forEach(v => activeKeys.add(String(v)));
+        } else {
+            activeKeys.add(String(props.value));
+        }
+    } else if (props.activeIndex !== undefined && props.activeIndex !== null) {
+        if (Array.isArray(props.activeIndex)) {
+            props.activeIndex.forEach(i => activeKeys.add(String(i)));
+        } else {
+            activeKeys.add(String(props.activeIndex));
+        }
+    } else if (tabs.length > 0) {
+        activeKeys.add('0');
     }
 
-    const disclosures: Record<number, ReturnType<typeof useDisclosure>> = {};
+    function togglePanel(idxStr: string) {
+        const idx = Number(idxStr);
+        if (tabs[idx]?.disabled) return;
 
-    tabs.forEach((_, idx) => {
-        disclosures[idx] = useDisclosure({
-            defaultIsOpen: activeIndices.has(idx)
-        });
-    });
+        if (isMultiple) {
+            if (activeKeys.has(idxStr)) {
+                activeKeys.delete(idxStr);
+            } else {
+                activeKeys.add(idxStr);
+            }
+        } else {
+            if (activeKeys.has(idxStr)) {
+                activeKeys.clear();
+            } else {
+                activeKeys.clear();
+                activeKeys.add(idxStr);
+            }
+        }
+
+        render();
+        container.dispatchEvent(new CustomEvent('accordion:change', {
+            bubbles: true,
+            detail: { value: Array.from(activeKeys) }
+        }));
+    }
 
     function render() {
-        const tabHtml = tabs.map((tab, idx) => {
-            const isOpen = disclosures[idx]?.isOpen ?? false;
-            const headerText = (tab as any).header || (tab as any).Header || (tab as any).title || (tab as any).Title || (tab as any).label || (tab as any).Label || `Tab ${idx + 1}`;
-            const contentText = (tab as any).content || (tab as any).Content || '';
-            const iconText = (tab as any).icon || (tab as any).Icon || '';
+        let topControlsHtml = '';
+        if (isControlled) {
+            topControlsHtml = `
+                <div class="p-accordion-top-controls">
+                    ${tabs.map((_, i) => {
+                        const k = String(i);
+                        const isActive = activeKeys.has(k);
+                        return `
+                            <button type="button" class="p-accordion-ctrl-btn ${isActive ? 'p-highlight' : ''}" data-ctrl-idx="${k}">
+                                ${i + 1}
+                            </button>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        const panelsHtml = tabs.map((tab, idx) => {
+            const k = String(idx);
+            const isActive = activeKeys.has(k);
+            const disabledClass = tab.disabled ? 'p-disabled' : '';
+            const activeClass = isActive ? 'p-accordionpanel-active' : '';
+            const headerId = `acc-header-${idx}`;
+            const contentId = `acc-content-${idx}`;
+
+            // Indicator icon
+            let indicatorSvg = SVG_ICONS.chevronDown;
+            if (customIndicator === 'match') {
+                indicatorSvg = isActive ? SVG_ICONS.folderOpen : SVG_ICONS.folder;
+            } else if (tab.toggleIcon === 'plusMinus') {
+                indicatorSvg = isActive ? SVG_ICONS.minus : SVG_ICONS.plus;
+            }
+
+            // Radio Button circle
+            let radioHtml = withRadio ? `
+                <span class="p-accordion-radio-circle">
+                    <span class="p-accordion-radio-inner"></span>
+                </span>
+            ` : '';
+
+            // Custom icon or Avatar in header
+            let customIconHtml = '';
+            if (tab.icon) {
+                if (tab.icon === 'user') customIconHtml = `<span style="display: inline-flex; align-items: center; margin-right: 0.5rem; color: var(--p-surface-400);">${SVG_ICONS.user}</span>`;
+                else if (tab.icon === 'shield') customIconHtml = `<span style="display: inline-flex; align-items: center; margin-right: 0.5rem; color: var(--p-primary-500);">${SVG_ICONS.shield}</span>`;
+                else if (tab.icon === 'zap') customIconHtml = `<span style="display: inline-flex; align-items: center; margin-right: 0.5rem; color: #f59e0b;">${SVG_ICONS.zap}</span>`;
+            }
+
+            // Badge / Subtitle / Price
+            let extraHeaderHtml = '';
+            if (tab.badge) {
+                extraHeaderHtml += `<span style="background: var(--p-primary-100, #dcfce7); color: var(--p-primary-700, #15803d); font-size: 0.75rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 9999px; margin-left: 0.5rem;">${tab.badge}</span>`;
+            }
+            if (tab.price) {
+                extraHeaderHtml += `<span style="font-weight: 700; font-size: 0.875rem; color: var(--p-surface-900); margin-left: auto; margin-right: 1rem;">${tab.price}</span>`;
+            }
+
             return `
-                <div class="accordion-tab ${isOpen ? 'tab-open' : ''}" data-idx="${idx}" style="border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); margin-bottom: 0.5rem; background: var(--p-surface-0); overflow: hidden;">
-                    <button type="button" 
-                            class="accordion-header-btn" 
-                            data-idx="${idx}" 
-                            ${tab.disabled ? 'disabled' : ''} 
-                            style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0.875rem 1.25rem; border: none; background: ${isOpen ? 'var(--p-surface-50)' : 'var(--p-surface-0)'}; color: var(--p-text-color); font-weight: 600; font-size: 0.875rem; cursor: ${tab.disabled ? 'not-allowed' : 'pointer'}; text-align: left; transition: background 0.15s ease;">
-                        <span style="display: flex; align-items: center; gap: 0.5rem;">
-                            ${iconText ? `<span>${iconText}</span>` : ''}
-                            <span>${headerText}</span>
-                        </span>
-                        <span class="chevron-icon" style="color: var(--p-text-muted); display: flex; align-items: center; transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1); transform: rotate(${isOpen ? '180deg' : '0deg'});">
-                            ${LucideIcons.chevronDown}
-                        </span>
-                    </button>
-                    <div class="accordion-content" style="display: ${isOpen ? 'block' : 'none'}; padding: 1.25rem; border-top: 1px solid var(--p-border-color); font-size: 0.875rem; color: var(--p-text-muted); line-height: 1.6; background: var(--p-surface-0);">
-                        <div class="tab-slot" data-slot-index="${idx}">${contentText}</div>
+                <div class="p-accordionpanel ${activeClass} ${disabledClass}" data-panel-idx="${k}">
+                    <div class="p-accordionheader" role="heading" aria-level="2">
+                        <button type="button" 
+                                class="p-accordionheader-toggle" 
+                                id="${headerId}"
+                                aria-controls="${contentId}"
+                                aria-expanded="${isActive ? 'true' : 'false'}"
+                                aria-disabled="${tab.disabled ? 'true' : 'false'}"
+                                ${tab.disabled ? 'disabled' : ''}
+                                data-toggle-idx="${k}">
+                            <div style="display: flex; align-items: center; width: 100%;">
+                                ${radioHtml}
+                                ${customIconHtml}
+                                <span class="p-accordionheader-title">${tab.header}</span>
+                                ${extraHeaderHtml}
+                            </div>
+                            <span class="p-accordionheader-toggle-icon">
+                                ${indicatorSvg}
+                            </span>
+                        </button>
+                    </div>
+                    <div class="p-accordioncontent" 
+                         id="${contentId}" 
+                         role="region" 
+                         aria-labelledby="${headerId}" 
+                         style="display: ${isActive ? 'block' : 'none'};">
+                        <div class="p-accordioncontent-content">
+                            ${tab.content}
+                        </div>
                     </div>
                 </div>
             `;
         }).join('');
 
+        const cssIndicatorClass = customIndicator === 'css' ? 'p-accordion-css-indicator' : '';
+
         container.innerHTML = `
-            <div class="laughtale-accordion" style="width: 100%;">
-                ${tabHtml}
+            ${topControlsHtml}
+            <div class="p-accordion p-component ${cssIndicatorClass}" role="tablist">
+                ${panelsHtml}
             </div>
         `;
 
         bindEvents();
     }
 
-    function toggleTab(idx: number) {
-        if (!props.multiple) {
-            tabs.forEach((_, otherIdx) => {
-                if (otherIdx !== idx) disclosures[otherIdx]?.close();
+    function bindEvents() {
+        // Controlled buttons
+        container.querySelectorAll<HTMLButtonElement>('.p-accordion-ctrl-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const k = btn.getAttribute('data-ctrl-idx');
+                if (k !== null) togglePanel(k);
             });
-        }
-        disclosures[idx]?.toggle();
-        updateDOM();
-    }
-
-    function updateDOM() {
-        container.querySelectorAll<HTMLElement>('.accordion-tab').forEach((tabEl) => {
-            const idx = Number(tabEl.getAttribute('data-idx'));
-            const isOpen = disclosures[idx]?.isOpen ?? false;
-            const contentEl = tabEl.querySelector<HTMLElement>('.accordion-content')!;
-            const chevronEl = tabEl.querySelector<HTMLElement>('.chevron-icon')!;
-            const headerBtn = tabEl.querySelector<HTMLElement>('.accordion-header-btn')!;
-
-            tabEl.classList.toggle('tab-open', isOpen);
-            headerBtn.style.background = isOpen ? 'var(--p-surface-50)' : 'var(--p-surface-0)';
-            chevronEl.style.transform = `rotate(${isOpen ? '180deg' : '0deg'})`;
-
-            const transition = useTransition(contentEl, { preset: 'collapse' });
-            if (isOpen) {
-                transition.enter();
-            } else {
-                contentEl.style.display = 'none';
-                transition.exit();
-            }
         });
 
-        const activeList = tabs.map((_, idx) => idx).filter(idx => disclosures[idx]?.isOpen);
-        container.dispatchEvent(new CustomEvent('accordion:change', {
-            bubbles: true,
-            detail: { activeIndex: activeList }
-        }));
-    }
-
-    function bindEvents() {
-        container.querySelectorAll<HTMLButtonElement>('.accordion-header-btn').forEach(btn => {
+        // Header toggles
+        const headerButtons = container.querySelectorAll<HTMLButtonElement>('.p-accordionheader-toggle');
+        headerButtons.forEach((btn, index) => {
             btn.addEventListener('click', () => {
-                const idx = Number(btn.getAttribute('data-idx'));
-                toggleTab(idx);
+                const k = btn.getAttribute('data-toggle-idx');
+                if (k !== null) togglePanel(k);
+            });
+
+            // Keyboard accessibility (APG W3C standard)
+            btn.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    const next = (index + 1) % headerButtons.length;
+                    headerButtons[next]?.focus();
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    const prev = (index - 1 + headerButtons.length) % headerButtons.length;
+                    headerButtons[prev]?.focus();
+                } else if (e.key === 'Home') {
+                    e.preventDefault();
+                    headerButtons[0]?.focus();
+                } else if (e.key === 'End') {
+                    e.preventDefault();
+                    headerButtons[headerButtons.length - 1]?.focus();
+                }
             });
         });
     }

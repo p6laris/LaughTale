@@ -115,11 +115,29 @@ export interface SpeedDialTooltipOptions {
 }
 
 export interface AccordionTab {
-    id: string;
+    id?: string;
     header: string;
     content?: string;
     icon?: string;
+    badge?: string;
+    subtitle?: string;
+    price?: string;
     disabled?: boolean;
+    toggleIcon?: string;
+}
+
+export interface AccordionProps {
+    tabs?: AccordionTab[];
+    multiple?: boolean;
+    value?: string | number | (string | number)[];
+    activeIndex?: number | number[];
+    expandIcon?: string;
+    collapseIcon?: string;
+    controlled?: boolean;
+    withRadio?: boolean;
+    customTrigger?: boolean;
+    customIndicator?: 'match' | 'css' | null;
+    variant?: 'default' | 'card' | 'bordered';
 }
 
 export interface TabItem {

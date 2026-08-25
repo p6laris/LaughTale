@@ -1,4 +1,5 @@
 using SoftMax.LaughTale.Core.Serialization;
+using SoftMax.LaughTale.Core.Enums;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using SoftMax.LaughTale.Components.Enums;
 using SoftMax.LaughTale.Components.Models;
@@ -1841,30 +1842,92 @@ public class IslandConfirmPopupTagHelper : TagHelper
 }
 
 /// <summary>
-/// TagHelper for <island-accordion />
+/// Enterprise Accordion TagHelper (Aura Design System compliant)
 /// </summary>
 [HtmlTargetElement("island-accordion")]
 public class IslandAccordionTagHelper : TagHelper
 {
-    public List<AccordionTab>? Tabs { get; set; }
+    [HtmlAttributeName("tabs")]
+    public object? Tabs { get; set; }
+
+    [HtmlAttributeName("multiple")]
     public bool Multiple { get; set; } = false;
-    public int ActiveIndex { get; set; } = 0;
+
+    [HtmlAttributeName("value")]
+    public object? Value { get; set; }
+
+    [HtmlAttributeName("active-index")]
+    public object? ActiveIndex { get; set; }
+
+    [HtmlAttributeName("controlled")]
+    public bool Controlled { get; set; } = false;
+
+    [HtmlAttributeName("with-radio")]
+    public bool WithRadio { get; set; } = false;
+
+    [HtmlAttributeName("custom-trigger")]
+    public bool CustomTrigger { get; set; } = false;
+
+    [HtmlAttributeName("custom-indicator")]
+    public string? CustomIndicator { get; set; }
+
+    [HtmlAttributeName("expand-icon")]
+    public string? ExpandIcon { get; set; }
+
+    [HtmlAttributeName("collapse-icon")]
+    public string? CollapseIcon { get; set; }
+
+    [HtmlAttributeName("hydrate")]
+    public HydrateStrategy Hydrate { get; set; } = HydrateStrategy.Load;
+
+    [HtmlAttributeName("class")]
+    public string? Class { get; set; }
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
+        if (context.AllAttributes.TryGetAttribute("activeIndex", out var aiAttr))
+        {
+            ActiveIndex = aiAttr.Value;
+        }
+        if (context.AllAttributes.TryGetAttribute("customIndicator", out var ciAttr))
+        {
+            CustomIndicator = ciAttr.Value?.ToString();
+        }
+        if (context.AllAttributes.TryGetAttribute("withRadio", out var wrAttr))
+        {
+            if (bool.TryParse(wrAttr.Value?.ToString(), out var b)) WithRadio = b;
+            else if (wrAttr.Value != null) WithRadio = true;
+        }
+        if (context.AllAttributes.TryGetAttribute("customTrigger", out var ctAttr))
+        {
+            if (bool.TryParse(ctAttr.Value?.ToString(), out var b)) CustomTrigger = b;
+            else if (ctAttr.Value != null) CustomTrigger = true;
+        }
+
         output.TagName = "div";
         output.TagMode = TagMode.StartTagAndEndTag;
         output.Attributes.SetAttribute("data-island", "accordion");
-        output.Attributes.SetAttribute("data-hydrate", "load");
+        output.Attributes.SetAttribute("data-hydrate", Hydrate.ToString().ToLowerInvariant());
 
         var props = new
         {
-            tabs = Tabs ?? new(),
+            tabs = Tabs ?? new object[0],
             multiple = Multiple,
-            activeIndex = ActiveIndex
+            value = Value ?? ActiveIndex,
+            activeIndex = ActiveIndex ?? Value,
+            controlled = Controlled,
+            withRadio = WithRadio,
+            customTrigger = CustomTrigger,
+            customIndicator = CustomIndicator,
+            expandIcon = ExpandIcon,
+            collapseIcon = CollapseIcon
         };
 
         output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
+        if (!string.IsNullOrWhiteSpace(Class))
+        {
+            output.Attributes.SetAttribute("class", Class);
+        }
     }
 }
 

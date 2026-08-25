@@ -903,7 +903,63 @@ public class EnterpriseModel : PageModel
         new("External", "externallink", "external", Tooltip: "External", Url: "https://vuejs.org", Target: "_blank")
     };
 
+    public List<AccordionTab> AccordionBasicTabs { get; set; } = new()
+    {
+        new("acc-1", "Header I", "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."),
+        new("acc-2", "Header II", "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit."),
+        new("acc-3", "Header III", "At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga.")
+    };
+
+    public List<AccordionTab> AccordionControlledTabs { get; set; } = new()
+    {
+        new("ctrl-1", "Header I", "This service helps you manage your projects more efficiently by offering real-time collaboration, task tracking, and powerful analytics."),
+        new("ctrl-2", "Header II", "Seamlessly integrate with over 50+ popular developer and productivity tools, including GitHub, Jira, and Slack."),
+        new("ctrl-3", "Header III", "Enterprise-grade end-to-end encryption, automated backups, and 99.99% uptime SLA guarantee for mission-critical deployments.")
+    };
+
+    public List<AccordionTab> AccordionCustomTriggerTabs { get; set; } = new()
+    {
+        new("trig-1", "User Profile & Identity", "Manage your personal credentials, contact email, avatar, and linked single-sign-on providers.", Icon: "user", Badge: "Active"),
+        new("trig-2", "Security & Two-Factor Authentication", "Configure hardware security keys (FIDO2), authenticator apps (TOTP), and backup recovery codes.", Icon: "shield", Badge: "Protected"),
+        new("trig-3", "API Webhooks & Realtime Streams", "Configure endpoint URLs, HMAC signing secrets, and subscribed notification topic events.", Icon: "zap", Badge: "Pro")
+    };
+
+    public List<AccordionTab> AccordionIndicatorTabs { get; set; } = new()
+    {
+        new("ind-1", "Dynamic Match Icons (Folder / FolderOpen)", "The toggle icon dynamically switches between closed and open folder representations based on the panel expansion state.", ToggleIcon: "match"),
+        new("ind-2", "Plus / Minus Toggle Icons", "The indicator switches between plus and minus glyphs to represent toggle state.", ToggleIcon: "plusMinus"),
+        new("ind-3", "CSS Animated Chevron", "The chevron indicator animates smoothly with CSS 180-degree rotation.")
+    };
+
+    public List<AccordionTab> AccordionDisabledTabs { get; set; } = new()
+    {
+        new("dis-1", "General Overview", "Welcome to the workspace settings. All basic configurations are enabled and accessible."),
+        new("dis-2", "Billing & Invoices (Locked)", "Access to billing information requires Workspace Administrator authorization. Please contact your administrator.", Disabled: true),
+        new("dis-3", "Team Members & Permissions", "Manage member invitations, role-based access control, and workspace security policies.")
+    };
+
+    public List<AccordionTab> AccordionRadioTabs { get; set; } = new()
+    {
+        new("plan-1", "Basic Plan", "Perfect for individuals getting started. Includes access to core components, community support, and standard SLA.", Price: "$9/mo"),
+        new("plan-2", "Pro Plan", "Tailored for growing teams requiring priority support, unlimited components, advanced analytics, and custom themes.", Price: "$29/mo", Badge: "Popular"),
+        new("plan-3", "Enterprise Plan", "Dedicated infrastructure, custom security compliance audits, 24/7 dedicated engineer support, and 99.99% uptime guarantee.", Price: "Custom")
+    };
+
+    public List<AccordionTab> AccordionDynamicTabs { get; set; } = new()
+    {
+        new("dyn-1", "Getting Started", "Learn the essentials of LaughTale Aura components, TagHelpers, and Island architecture integration."),
+        new("dyn-2", "Theming & Design Tokens", "Customize primary colors, surface scales, typography, and dark mode tokens via Theme Studio."),
+        new("dyn-3", "Performance Optimization", "Island hydration strategies (load, visible, idle, interaction) ensure ultra-light initial payloads.")
+    };
+
     public List<AccordionTab> AccordionTabs { get; set; } = new()
+    {
+        new("acc-1", "Header I", "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."),
+        new("acc-2", "Header II", "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium."),
+        new("acc-3", "Header III", "At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium.")
+    };
+
+    public List<TabItem> SlidingTabs { get; set; } = new()
     {
         new("tab-1", "Zero-Trust Architecture", "Every network request and internal IPC transaction is authenticated and encrypted via mutual TLS 1.3 with ephemeral cryptographic tokens.", "🔒"),
         new("tab-2", "Islands Hydration Lifecycle", "LaughTale detects interactive islands at compile-time and only ships sub-1KB micro-bundles for the exact components on the page.", "⚡"),

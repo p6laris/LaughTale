@@ -14201,132 +14201,392 @@ __export(accordion_exports, {
   default: () => AccordionIsland
 });
 function AccordionIsland(container, props) {
-  injectIslandStyle("accordion", CSS24);
-  const tabs = props.tabs || [];
-  let activeIndices = /* @__PURE__ */ new Set();
-  if (Array.isArray(props.activeIndex)) {
-    props.activeIndex.forEach((i) => activeIndices.add(i));
-  } else if (typeof props.activeIndex === "number") {
-    activeIndices.add(props.activeIndex);
-  } else {
-    activeIndices.add(0);
+  injectIslandStyle("accordion", ACCORDION_CSS);
+  const tabs = (props.tabs || []).map((t, i) => ({
+    id: t.id || String(i),
+    header: t.header || `Header ${i + 1}`,
+    content: t.content || "",
+    icon: t.icon,
+    badge: t.badge,
+    subtitle: t.subtitle,
+    price: t.price,
+    disabled: !!t.disabled,
+    toggleIcon: t.toggleIcon
+  }));
+  const isMultiple = !!props.multiple;
+  const isControlled = !!props.controlled;
+  const withRadio = !!props.withRadio;
+  const customTrigger = !!props.customTrigger;
+  const customIndicator = props.customIndicator || "css";
+  let activeKeys = /* @__PURE__ */ new Set();
+  if (props.value !== void 0 && props.value !== null) {
+    if (Array.isArray(props.value)) {
+      props.value.forEach((v) => activeKeys.add(String(v)));
+    } else {
+      activeKeys.add(String(props.value));
+    }
+  } else if (props.activeIndex !== void 0 && props.activeIndex !== null) {
+    if (Array.isArray(props.activeIndex)) {
+      props.activeIndex.forEach((i) => activeKeys.add(String(i)));
+    } else {
+      activeKeys.add(String(props.activeIndex));
+    }
+  } else if (tabs.length > 0) {
+    activeKeys.add("0");
   }
-  const disclosures = {};
-  tabs.forEach((_, idx) => {
-    disclosures[idx] = useDisclosure({
-      defaultIsOpen: activeIndices.has(idx)
-    });
-  });
+  function togglePanel(idxStr) {
+    const idx = Number(idxStr);
+    if (tabs[idx]?.disabled) return;
+    if (isMultiple) {
+      if (activeKeys.has(idxStr)) {
+        activeKeys.delete(idxStr);
+      } else {
+        activeKeys.add(idxStr);
+      }
+    } else {
+      if (activeKeys.has(idxStr)) {
+        activeKeys.clear();
+      } else {
+        activeKeys.clear();
+        activeKeys.add(idxStr);
+      }
+    }
+    render();
+    container.dispatchEvent(new CustomEvent("accordion:change", {
+      bubbles: true,
+      detail: { value: Array.from(activeKeys) }
+    }));
+  }
   function render() {
-    const tabHtml = tabs.map((tab, idx) => {
-      const isOpen = disclosures[idx]?.isOpen ?? false;
-      const headerText = tab.header || tab.Header || tab.title || tab.Title || tab.label || tab.Label || `Tab ${idx + 1}`;
-      const contentText = tab.content || tab.Content || "";
-      const iconText = tab.icon || tab.Icon || "";
+    let topControlsHtml = "";
+    if (isControlled) {
+      topControlsHtml = `
+                <div class="p-accordion-top-controls">
+                    ${tabs.map((_, i) => {
+        const k = String(i);
+        const isActive = activeKeys.has(k);
+        return `
+                            <button type="button" class="p-accordion-ctrl-btn ${isActive ? "p-highlight" : ""}" data-ctrl-idx="${k}">
+                                ${i + 1}
+                            </button>
+                        `;
+      }).join("")}
+                </div>
+            `;
+    }
+    const panelsHtml = tabs.map((tab, idx) => {
+      const k = String(idx);
+      const isActive = activeKeys.has(k);
+      const disabledClass = tab.disabled ? "p-disabled" : "";
+      const activeClass = isActive ? "p-accordionpanel-active" : "";
+      const headerId = `acc-header-${idx}`;
+      const contentId = `acc-content-${idx}`;
+      let indicatorSvg = SVG_ICONS3.chevronDown;
+      if (customIndicator === "match") {
+        indicatorSvg = isActive ? SVG_ICONS3.folderOpen : SVG_ICONS3.folder;
+      } else if (tab.toggleIcon === "plusMinus") {
+        indicatorSvg = isActive ? SVG_ICONS3.minus : SVG_ICONS3.plus;
+      }
+      let radioHtml = withRadio ? `
+                <span class="p-accordion-radio-circle">
+                    <span class="p-accordion-radio-inner"></span>
+                </span>
+            ` : "";
+      let customIconHtml = "";
+      if (tab.icon) {
+        if (tab.icon === "user") customIconHtml = `<span style="display: inline-flex; align-items: center; margin-right: 0.5rem; color: var(--p-surface-400);">${SVG_ICONS3.user}</span>`;
+        else if (tab.icon === "shield") customIconHtml = `<span style="display: inline-flex; align-items: center; margin-right: 0.5rem; color: var(--p-primary-500);">${SVG_ICONS3.shield}</span>`;
+        else if (tab.icon === "zap") customIconHtml = `<span style="display: inline-flex; align-items: center; margin-right: 0.5rem; color: #f59e0b;">${SVG_ICONS3.zap}</span>`;
+      }
+      let extraHeaderHtml = "";
+      if (tab.badge) {
+        extraHeaderHtml += `<span style="background: var(--p-primary-100, #dcfce7); color: var(--p-primary-700, #15803d); font-size: 0.75rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 9999px; margin-left: 0.5rem;">${tab.badge}</span>`;
+      }
+      if (tab.price) {
+        extraHeaderHtml += `<span style="font-weight: 700; font-size: 0.875rem; color: var(--p-surface-900); margin-left: auto; margin-right: 1rem;">${tab.price}</span>`;
+      }
       return `
-                <div class="accordion-tab ${isOpen ? "tab-open" : ""}" data-idx="${idx}" style="border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); margin-bottom: 0.5rem; background: var(--p-surface-0); overflow: hidden;">
-                    <button type="button" 
-                            class="accordion-header-btn" 
-                            data-idx="${idx}" 
-                            ${tab.disabled ? "disabled" : ""} 
-                            style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0.875rem 1.25rem; border: none; background: ${isOpen ? "var(--p-surface-50)" : "var(--p-surface-0)"}; color: var(--p-text-color); font-weight: 600; font-size: 0.875rem; cursor: ${tab.disabled ? "not-allowed" : "pointer"}; text-align: left; transition: background 0.15s ease;">
-                        <span style="display: flex; align-items: center; gap: 0.5rem;">
-                            ${iconText ? `<span>${iconText}</span>` : ""}
-                            <span>${headerText}</span>
-                        </span>
-                        <span class="chevron-icon" style="color: var(--p-text-muted); display: flex; align-items: center; transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1); transform: rotate(${isOpen ? "180deg" : "0deg"});">
-                            ${LucideIcons.chevronDown}
-                        </span>
-                    </button>
-                    <div class="accordion-content" style="display: ${isOpen ? "block" : "none"}; padding: 1.25rem; border-top: 1px solid var(--p-border-color); font-size: 0.875rem; color: var(--p-text-muted); line-height: 1.6; background: var(--p-surface-0);">
-                        <div class="tab-slot" data-slot-index="${idx}">${contentText}</div>
+                <div class="p-accordionpanel ${activeClass} ${disabledClass}" data-panel-idx="${k}">
+                    <div class="p-accordionheader" role="heading" aria-level="2">
+                        <button type="button" 
+                                class="p-accordionheader-toggle" 
+                                id="${headerId}"
+                                aria-controls="${contentId}"
+                                aria-expanded="${isActive ? "true" : "false"}"
+                                aria-disabled="${tab.disabled ? "true" : "false"}"
+                                ${tab.disabled ? "disabled" : ""}
+                                data-toggle-idx="${k}">
+                            <div style="display: flex; align-items: center; width: 100%;">
+                                ${radioHtml}
+                                ${customIconHtml}
+                                <span class="p-accordionheader-title">${tab.header}</span>
+                                ${extraHeaderHtml}
+                            </div>
+                            <span class="p-accordionheader-toggle-icon">
+                                ${indicatorSvg}
+                            </span>
+                        </button>
+                    </div>
+                    <div class="p-accordioncontent" 
+                         id="${contentId}" 
+                         role="region" 
+                         aria-labelledby="${headerId}" 
+                         style="display: ${isActive ? "block" : "none"};">
+                        <div class="p-accordioncontent-content">
+                            ${tab.content}
+                        </div>
                     </div>
                 </div>
             `;
     }).join("");
+    const cssIndicatorClass = customIndicator === "css" ? "p-accordion-css-indicator" : "";
     container.innerHTML = `
-            <div class="laughtale-accordion" style="width: 100%;">
-                ${tabHtml}
+            ${topControlsHtml}
+            <div class="p-accordion p-component ${cssIndicatorClass}" role="tablist">
+                ${panelsHtml}
             </div>
         `;
     bindEvents();
   }
-  function toggleTab(idx) {
-    if (!props.multiple) {
-      tabs.forEach((_, otherIdx) => {
-        if (otherIdx !== idx) disclosures[otherIdx]?.close();
-      });
-    }
-    disclosures[idx]?.toggle();
-    updateDOM();
-  }
-  function updateDOM() {
-    container.querySelectorAll(".accordion-tab").forEach((tabEl) => {
-      const idx = Number(tabEl.getAttribute("data-idx"));
-      const isOpen = disclosures[idx]?.isOpen ?? false;
-      const contentEl = tabEl.querySelector(".accordion-content");
-      const chevronEl = tabEl.querySelector(".chevron-icon");
-      const headerBtn = tabEl.querySelector(".accordion-header-btn");
-      tabEl.classList.toggle("tab-open", isOpen);
-      headerBtn.style.background = isOpen ? "var(--p-surface-50)" : "var(--p-surface-0)";
-      chevronEl.style.transform = `rotate(${isOpen ? "180deg" : "0deg"})`;
-      const transition = useTransition(contentEl, { preset: "collapse" });
-      if (isOpen) {
-        transition.enter();
-      } else {
-        contentEl.style.display = "none";
-        transition.exit();
-      }
-    });
-    const activeList = tabs.map((_, idx) => idx).filter((idx) => disclosures[idx]?.isOpen);
-    container.dispatchEvent(new CustomEvent("accordion:change", {
-      bubbles: true,
-      detail: { activeIndex: activeList }
-    }));
-  }
   function bindEvents() {
-    container.querySelectorAll(".accordion-header-btn").forEach((btn) => {
+    container.querySelectorAll(".p-accordion-ctrl-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
-        const idx = Number(btn.getAttribute("data-idx"));
-        toggleTab(idx);
+        const k = btn.getAttribute("data-ctrl-idx");
+        if (k !== null) togglePanel(k);
+      });
+    });
+    const headerButtons = container.querySelectorAll(".p-accordionheader-toggle");
+    headerButtons.forEach((btn, index) => {
+      btn.addEventListener("click", () => {
+        const k = btn.getAttribute("data-toggle-idx");
+        if (k !== null) togglePanel(k);
+      });
+      btn.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowDown") {
+          e.preventDefault();
+          const next = (index + 1) % headerButtons.length;
+          headerButtons[next]?.focus();
+        } else if (e.key === "ArrowUp") {
+          e.preventDefault();
+          const prev = (index - 1 + headerButtons.length) % headerButtons.length;
+          headerButtons[prev]?.focus();
+        } else if (e.key === "Home") {
+          e.preventDefault();
+          headerButtons[0]?.focus();
+        } else if (e.key === "End") {
+          e.preventDefault();
+          headerButtons[headerButtons.length - 1]?.focus();
+        }
       });
     });
   }
   render();
 }
-var CSS24;
+var SVG_ICONS3, ACCORDION_CSS;
 var init_accordion = __esm({
   "src/components/accordion.ts"() {
     "use strict";
-    init_lucide();
     init_styles();
-    init_useDisclosure();
-    init_useTransition();
-    CSS24 = `
-[data-theme="dark"] .accordion-tab {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+    SVG_ICONS3 = {
+      chevronDown: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>',
+      chevronRight: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>',
+      folder: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>',
+      folderOpen: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 14 1.5-6h13l-2.5 6H6Z"/><path d="M4 18h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2Z"/></svg>',
+      plus: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>',
+      minus: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>',
+      check: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+      user: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>',
+      shield: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>',
+      zap: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>'
+    };
+    ACCORDION_CSS = `
+.p-accordion {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    border: 1px solid var(--p-surface-200, #e2e8f0);
+    border-radius: var(--p-border-radius-md, 6px);
+    overflow: hidden;
+    background: var(--p-surface-0, #ffffff);
+    font-family: var(--p-font-family, inherit);
+    box-sizing: border-box;
 }
-[data-theme="dark"] .accordion-header-btn {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-accordionpanel {
+    border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
+    transition: background-color 0.2s ease;
 }
-[data-theme="dark"] .accordion-content {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+.p-accordionpanel:last-child {
+    border-bottom: none;
 }
-[data-theme="dark"] .tab-slot {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-accordionheader {
+    margin: 0;
+    padding: 0;
 }
-[data-theme="dark"] .laughtale-accordion {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-accordionheader-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 1rem 1.25rem;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    color: var(--p-surface-700, #334155);
+    background: var(--p-surface-0, #ffffff);
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    box-sizing: border-box;
+}
+.p-accordionheader-toggle:hover:not(:disabled) {
+    background: var(--p-surface-50, #f8fafc);
+    color: var(--p-surface-900, #0f172a);
+}
+.p-accordionpanel.p-accordionpanel-active > .p-accordionheader > .p-accordionheader-toggle {
+    color: var(--p-primary-600, #10b981);
+    font-weight: 700;
+}
+
+.p-accordionheader-toggle-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--p-surface-400, #94a3b8);
+    transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1), color 0.15s ease;
+    flex-shrink: 0;
+}
+.p-accordionpanel.p-accordionpanel-active > .p-accordionheader > .p-accordionheader-toggle .p-accordionheader-toggle-icon {
+    color: var(--p-primary-600, #10b981);
+}
+.p-accordion-css-indicator .p-accordionpanel.p-accordionpanel-active .p-accordionheader-toggle-icon {
+    transform: rotate(180deg);
+}
+
+.p-accordioncontent {
+    background: var(--p-surface-0, #ffffff);
+    overflow: hidden;
+}
+
+.p-accordioncontent-content {
+    padding: 0 1.25rem 1.25rem 1.25rem;
+    color: var(--p-surface-600, #475569);
+    font-size: 0.875rem;
+    line-height: 1.65;
+}
+
+.p-accordionpanel.p-disabled {
+    opacity: 0.5;
+}
+.p-accordionpanel.p-disabled .p-accordionheader-toggle {
+    cursor: not-allowed;
+}
+
+/* Radio variant */
+.p-accordion-radio-circle {
+    width: 1.125rem;
+    height: 1.125rem;
+    border-radius: 9999px;
+    border: 2px solid var(--p-surface-300, #cbd5e1);
+    background: var(--p-surface-0, #ffffff);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+    transition: border-color 0.15s ease;
+}
+.p-accordionpanel.p-accordionpanel-active .p-accordion-radio-circle {
+    border-color: var(--p-primary-600, #10b981);
+}
+.p-accordion-radio-inner {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+    background: var(--p-primary-600, #10b981);
+    display: none;
+}
+.p-accordionpanel.p-accordionpanel-active .p-accordion-radio-inner {
+    display: block;
+}
+
+/* Controlled top buttons */
+.p-accordion-top-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+.p-accordion-ctrl-btn {
+    padding: 0.45rem 0.9rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    border-radius: 6px;
+    border: 1px solid var(--p-surface-300, #cbd5e1);
+    background: var(--p-surface-0, #ffffff);
+    color: var(--p-surface-700, #334155);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.p-accordion-ctrl-btn:hover {
+    background: var(--p-surface-100, #f1f5f9);
+}
+.p-accordion-ctrl-btn.p-highlight {
+    background: var(--p-primary-500, #10b981);
+    border-color: var(--p-primary-500, #10b981);
+    color: #ffffff;
+}
+
+/* Dark Mode Tokens */
+.dark .p-accordion,
+[data-theme="dark"] .p-accordion {
+    background: var(--p-surface-900, #0f172a) !important;
+    border-color: var(--p-surface-700, #334155) !important;
+    color: var(--p-surface-100, #f8fafc) !important;
+}
+.dark .p-accordionpanel,
+[data-theme="dark"] .p-accordionpanel {
+    border-color: var(--p-surface-700, #334155) !important;
+}
+.dark .p-accordionheader-toggle,
+[data-theme="dark"] .p-accordionheader-toggle {
+    background: var(--p-surface-900, #0f172a) !important;
+    color: var(--p-surface-200, #e2e8f0) !important;
+}
+.dark .p-accordionheader-toggle:hover:not(:disabled),
+[data-theme="dark"] .p-accordionheader-toggle:hover:not(:disabled) {
+    background: var(--p-surface-800, #1e293b) !important;
+    color: var(--p-surface-0, #ffffff) !important;
+}
+.dark .p-accordionpanel.p-accordionpanel-active > .p-accordionheader > .p-accordionheader-toggle,
+[data-theme="dark"] .p-accordionpanel.p-accordionpanel-active > .p-accordionheader > .p-accordionheader-toggle {
+    color: var(--p-primary-400, #34d399) !important;
+}
+.dark .p-accordioncontent,
+[data-theme="dark"] .p-accordioncontent {
+    background: var(--p-surface-900, #0f172a) !important;
+}
+.dark .p-accordioncontent-content,
+[data-theme="dark"] .p-accordioncontent-content {
+    color: var(--p-surface-300, #cbd5e1) !important;
+}
+.dark .p-accordion-ctrl-btn,
+[data-theme="dark"] .p-accordion-ctrl-btn {
+    background: var(--p-surface-900, #0f172a) !important;
+    border-color: var(--p-surface-700, #334155) !important;
+    color: var(--p-surface-200, #e2e8f0) !important;
+}
+.dark .p-accordion-ctrl-btn.p-highlight,
+[data-theme="dark"] .p-accordion-ctrl-btn.p-highlight {
+    background: var(--p-primary-500, #10b981) !important;
+    color: #ffffff !important;
+}
+.dark .p-accordion-radio-circle,
+[data-theme="dark"] .p-accordion-radio-circle {
+    background: var(--p-surface-950, #020617) !important;
+    border-color: var(--p-surface-700, #334155) !important;
 }
 `;
   }
@@ -14481,7 +14741,7 @@ __export(autocomplete_exports, {
   default: () => AutoCompleteIsland
 });
 function AutoCompleteIsland(container, props) {
-  injectIslandStyle("autocomplete", CSS25);
+  injectIslandStyle("autocomplete", CSS24);
   const allItems = props.suggestions || props.items || [];
   const multiple = props.multiple === true;
   const showClear = props.showClear !== false;
@@ -14814,7 +15074,7 @@ function AutoCompleteIsland(container, props) {
   }
   renderChips();
 }
-var CSS25;
+var CSS24;
 var init_autocomplete = __esm({
   "src/components/autocomplete.ts"() {
     "use strict";
@@ -14823,7 +15083,7 @@ var init_autocomplete = __esm({
     init_useDisclosure();
     init_useClickOutside();
     init_useDebounce();
-    CSS25 = `
+    CSS24 = `
 .laughtale-autocomplete {
     position: relative;
     display: inline-flex;
@@ -15093,7 +15353,7 @@ __export(color_picker_exports, {
   default: () => ColorPickerIsland
 });
 function ColorPickerIsland(container, props) {
-  injectIslandStyle("color-picker", CSS26);
+  injectIslandStyle("color-picker", CSS25);
   let currentColor = props.value || "#10b981";
   let isOpen = false;
   const swatchesHtml = DEFAULT_PRESETS.map((c) => `
@@ -15217,7 +15477,7 @@ function ColorPickerIsland(container, props) {
   }
   syncValue();
 }
-var DEFAULT_PRESETS, CSS26;
+var DEFAULT_PRESETS, CSS25;
 var init_color_picker = __esm({
   "src/components/color-picker.ts"() {
     "use strict";
@@ -15239,7 +15499,7 @@ var init_color_picker = __esm({
       "#1e293b",
       "#000000"
     ];
-    CSS26 = `
+    CSS25 = `
 [data-theme="dark"] .color-swatch-btn {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -15275,7 +15535,7 @@ __export(knob_exports, {
   default: () => KnobIsland
 });
 function KnobIsland(container, props) {
-  injectIslandStyle("knob", CSS27);
+  injectIslandStyle("knob", CSS26);
   const min = props.min !== void 0 ? props.min : 0;
   const max = props.max !== void 0 ? props.max : 100;
   const step = props.step || 1;
@@ -15377,12 +15637,12 @@ function KnobIsland(container, props) {
   }
   syncValue();
 }
-var CSS27;
+var CSS26;
 var init_knob = __esm({
   "src/components/knob.ts"() {
     "use strict";
     init_styles();
-    CSS27 = `
+    CSS26 = `
 [data-theme="dark"] .laughtale-knob {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -15408,7 +15668,7 @@ __export(tag_exports, {
   default: () => TagIsland
 });
 function TagIsland(container, props) {
-  injectIslandStyle("tag", CSS28);
+  injectIslandStyle("tag", CSS27);
   const severity = props.severity || "info";
   const isRounded = props.rounded || false;
   let bg = "var(--p-blue-50, #eff6ff)";
@@ -15442,12 +15702,12 @@ function TagIsland(container, props) {
         </span>
     `;
 }
-var CSS28;
+var CSS27;
 var init_tag = __esm({
   "src/components/tag.ts"() {
     "use strict";
     init_styles();
-    CSS28 = `
+    CSS27 = `
 [data-theme="dark"] .laughtale-tag {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -15463,7 +15723,7 @@ __export(breadcrumb_exports, {
   default: () => BreadcrumbIsland
 });
 function BreadcrumbIsland(container, props) {
-  injectIslandStyle("breadcrumb", CSS29);
+  injectIslandStyle("breadcrumb", CSS28);
   const items = props.items || [];
   const homeUrl = props.homeUrl || "/";
   const itemsHtml = items.map((item, idx) => {
@@ -15501,13 +15761,13 @@ function BreadcrumbIsland(container, props) {
         </nav>
     `;
 }
-var CSS29;
+var CSS28;
 var init_breadcrumb = __esm({
   "src/components/breadcrumb.ts"() {
     "use strict";
     init_lucide();
     init_styles();
-    CSS29 = `
+    CSS28 = `
 [data-theme="dark"] .laughtale-breadcrumb {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -15523,7 +15783,7 @@ __export(scroll_top_exports, {
   default: () => ScrollTopIsland
 });
 function ScrollTopIsland(container, props) {
-  injectIslandStyle("scroll-top", CSS30);
+  injectIslandStyle("scroll-top", CSS29);
   const threshold = props.threshold || 200;
   let isVisible = false;
   function render() {
@@ -15549,13 +15809,13 @@ function ScrollTopIsland(container, props) {
   window.addEventListener("scroll", checkScroll, { passive: true });
   render();
 }
-var CSS30;
+var CSS29;
 var init_scroll_top = __esm({
   "src/components/scroll-top.ts"() {
     "use strict";
     init_lucide();
     init_styles();
-    CSS30 = `
+    CSS29 = `
 [data-theme="dark"] .laughtale-scroll-top-btn {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -15571,7 +15831,7 @@ __export(inplace_exports, {
   default: () => InplaceIsland
 });
 function InplaceIsland(container, props) {
-  injectIslandStyle("inplace", CSS31);
+  injectIslandStyle("inplace", CSS30);
   let isEditing = false;
   let currentValue = props.value || "";
   function render() {
@@ -15651,13 +15911,13 @@ function InplaceIsland(container, props) {
   render();
   syncValue();
 }
-var CSS31;
+var CSS30;
 var init_inplace = __esm({
   "src/components/inplace.ts"() {
     "use strict";
     init_lucide();
     init_styles();
-    CSS31 = `
+    CSS30 = `
 [data-theme="dark"] .laughtale-inplace-display {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -15693,7 +15953,7 @@ __export(command_exports, {
   default: () => CommandPaletteIsland
 });
 function CommandPaletteIsland(container, props) {
-  injectIslandStyle("command", CSS32);
+  injectIslandStyle("command", CSS31);
   const placeholder = props.placeholder || "Type a command or search...";
   const items = props.items || [
     { id: "home", label: "Go to Overview", group: "Navigation", icon: "compass", url: "/", shortcut: "G H" },
@@ -15867,7 +16127,7 @@ function CommandPaletteIsland(container, props) {
   ]);
   document.addEventListener("command:open", () => open());
 }
-var CSS32;
+var CSS31;
 var init_command = __esm({
   "src/components/command.ts"() {
     "use strict";
@@ -15877,7 +16137,7 @@ var init_command = __esm({
     init_useFocusTrap();
     init_useHotkeys();
     init_useScrollLock();
-    CSS32 = `
+    CSS31 = `
 [data-theme="dark"] .laughtale-command-root {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -16741,7 +17001,7 @@ __export(dynamic_form_exports, {
   default: () => DynamicFormIsland
 });
 function DynamicFormIsland(container, props) {
-  injectIslandStyle("dynamic-form", CSS33);
+  injectIslandStyle("dynamic-form", CSS32);
   let schema = props.schema || null;
   if (!schema && props.schemaJson) {
     try {
@@ -16902,13 +17162,13 @@ function DynamicFormIsland(container, props) {
   }
   render();
 }
-var CSS33;
+var CSS32;
 var init_dynamic_form = __esm({
   "src/components/dynamic-form.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS33 = `
+    CSS32 = `
 [data-theme="dark"] .p-input {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -16939,7 +17199,7 @@ __export(splitter_exports, {
   default: () => SplitterIsland
 });
 function SplitterIsland(container, props) {
-  injectIslandStyle("splitter", CSS34);
+  injectIslandStyle("splitter", CSS33);
   const layout = props.layout || "horizontal";
   const isHorizontal = layout === "horizontal";
   const panels = props.panels && props.panels.length >= 2 ? props.panels : [
@@ -16982,13 +17242,13 @@ function SplitterIsland(container, props) {
     }
   });
 }
-var CSS34;
+var CSS33;
 var init_splitter = __esm({
   "src/components/splitter.ts"() {
     "use strict";
     init_styles();
     init_useDragGesture();
-    CSS34 = `
+    CSS33 = `
 [data-theme="dark"] .laughtale-splitter {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -17019,7 +17279,7 @@ __export(multiselect_exports, {
   default: () => MultiSelectIsland
 });
 function MultiSelectIsland(container, props) {
-  injectIslandStyle("multiselect", CSS35);
+  injectIslandStyle("multiselect", CSS34);
   const options = props.options || [];
   let selected = new Set(props.selectedValues || []);
   let filterQuery = "";
@@ -17185,7 +17445,7 @@ function MultiSelectIsland(container, props) {
   renderDisplay();
   syncValue();
 }
-var CSS35;
+var CSS34;
 var init_multiselect = __esm({
   "src/components/multiselect.ts"() {
     "use strict";
@@ -17194,7 +17454,7 @@ var init_multiselect = __esm({
     init_useDisclosure();
     init_useClickOutside();
     init_useTransition();
-    CSS35 = `
+    CSS34 = `
 [data-theme="dark"] .laughtale-multiselect {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -17265,7 +17525,7 @@ __export(cascadeselect_exports, {
   default: () => CascadeSelectIsland
 });
 function CascadeSelectIsland(container, props) {
-  injectIslandStyle("cascadeselect", CSS36);
+  injectIslandStyle("cascadeselect", CSS35);
   const options = props.options || [];
   const size = props.size || "normal";
   const variant = props.variant || "outlined";
@@ -17478,7 +17738,7 @@ function CascadeSelectIsland(container, props) {
     }));
   }
 }
-var CSS36;
+var CSS35;
 var init_cascadeselect = __esm({
   "src/components/cascadeselect.ts"() {
     "use strict";
@@ -17486,7 +17746,7 @@ var init_cascadeselect = __esm({
     init_styles();
     init_useDisclosure();
     init_useClickOutside();
-    CSS36 = `
+    CSS35 = `
 .laughtale-cascadeselect {
     position: relative;
     display: inline-flex;
@@ -17691,7 +17951,7 @@ __export(listbox_exports, {
   default: () => ListboxIsland
 });
 function ListboxIsland(container, props) {
-  injectIslandStyle("laughtale-listbox", CSS37);
+  injectIslandStyle("laughtale-listbox", CSS36);
   const isMultiple = props.multiple === true || String(props.multiple) === "true";
   const isMetaKey = props.metaKeySelection !== false && String(props.metaKeySelection) !== "false";
   const isCheckbox = props.checkbox === true || String(props.checkbox) === "true";
@@ -18027,14 +18287,14 @@ function ListboxIsland(container, props) {
   }
   init();
 }
-var CSS37, checkSvg2, searchSvg2;
+var CSS36, checkSvg2, searchSvg2;
 var init_listbox = __esm({
   "src/components/listbox.ts"() {
     "use strict";
     init_lucide();
     init_styles();
     init_useDebounce();
-    CSS37 = `
+    CSS36 = `
 /* ==================== AURA LISTBOX ==================== */
 .laughtale-listbox,
 .p-listbox {
@@ -20506,7 +20766,7 @@ __export(terminal_exports, {
   default: () => TerminalIsland
 });
 function TerminalIsland(container, props) {
-  injectIslandStyle("terminal", CSS38);
+  injectIslandStyle("terminal", CSS37);
   const promptPrefix = props.prompt || "admin@softmax:~$";
   const welcome = props.welcomeMessage || 'Welcome to SoftMax.LaughTale CLI v3.0\nType "help" for available commands.';
   const commands = {
@@ -20605,13 +20865,13 @@ ${h.response}`).join("\n");
   }
   render();
 }
-var CSS38;
+var CSS37;
 var init_terminal = __esm({
   "src/components/terminal.ts"() {
     "use strict";
     init_styles();
     init_useClipboard();
-    CSS38 = `
+    CSS37 = `
 [data-theme="dark"] .laughtale-terminal {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -20642,7 +20902,7 @@ __export(dock_exports, {
   default: () => DockIsland
 });
 function DockIsland(container, props) {
-  injectIslandStyle("dock", CSS39);
+  injectIslandStyle("dock", CSS38);
   const items = props.items || [
     { label: "Overview", icon: "compass", url: "/" },
     { label: "Dashboard", icon: "bar-chart", url: "/dashboard" },
@@ -20684,13 +20944,13 @@ function DockIsland(container, props) {
     });
   });
 }
-var CSS39;
+var CSS38;
 var init_dock = __esm({
   "src/components/dock.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS39 = `
+    CSS38 = `
 [data-theme="dark"] .laughtale-dock {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -20711,7 +20971,7 @@ __export(galleria_exports, {
   default: () => GalleriaIsland
 });
 function GalleriaIsland(container, props) {
-  injectIslandStyle("galleria", CSS40);
+  injectIslandStyle("galleria", CSS39);
   const images = props.value && props.value.length > 0 ? props.value : [
     {
       itemImageSrc: "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800&auto=format&fit=crop&q=80",
@@ -20785,13 +21045,13 @@ function GalleriaIsland(container, props) {
   }
   render();
 }
-var CSS40;
+var CSS39;
 var init_galleria = __esm({
   "src/components/galleria.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS40 = `
+    CSS39 = `
 [data-theme="dark"] .laughtale-galleria {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -20822,7 +21082,7 @@ __export(blockui_exports, {
   default: () => BlockUIIsland
 });
 function BlockUIIsland(container, props) {
-  injectIslandStyle("blockui", CSS41);
+  injectIslandStyle("blockui", CSS40);
   let isBlocked = props.blocked ?? true;
   function render() {
     container.innerHTML = `
@@ -20845,12 +21105,12 @@ function BlockUIIsland(container, props) {
     render();
   });
 }
-var CSS41;
+var CSS40;
 var init_blockui = __esm({
   "src/components/blockui.ts"() {
     "use strict";
     init_styles();
-    CSS41 = `
+    CSS40 = `
 [data-theme="dark"] .laughtale-blockui-root {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -21582,7 +21842,7 @@ __export(select_exports, {
   default: () => SelectIsland
 });
 function SelectIsland(container, props) {
-  injectIslandStyle("laughtale-select", CSS42);
+  injectIslandStyle("laughtale-select", CSS41);
   const isMultiple = props.multiple === true || String(props.multiple) === "true";
   const isCheckmark = props.checkmark === true || String(props.checkmark) === "true";
   const isCheckbox = props.checkbox === true || String(props.checkbox) === "true";
@@ -21922,13 +22182,13 @@ function SelectIsland(container, props) {
   }
   render();
 }
-var CSS42;
+var CSS41;
 var init_select = __esm({
   "src/components/select.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS42 = `
+    CSS41 = `
 /* ==================== AURA SELECT ==================== */
 .laughtale-select,
 .p-select {
@@ -22355,7 +22615,7 @@ __export(checkbox_exports, {
   default: () => CheckboxIsland
 });
 function CheckboxIsland(container, props) {
-  injectIslandStyle("laughtale-checkbox", CSS43);
+  injectIslandStyle("laughtale-checkbox", CSS42);
   let isChecked = Boolean(props.checked);
   let isIndeterminate = Boolean(props.indeterminate);
   const size = props.size || "normal";
@@ -22427,13 +22687,13 @@ function CheckboxIsland(container, props) {
   }
   render();
 }
-var CSS43;
+var CSS42;
 var init_checkbox = __esm({
   "src/components/checkbox.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS43 = `
+    CSS42 = `
 .laughtale-checkbox-wrap {
     display: inline-flex;
     align-items: center;
@@ -22610,7 +22870,7 @@ __export(radio_button_exports, {
   default: () => RadioButtonIsland
 });
 function RadioButtonIsland(container, props) {
-  injectIslandStyle("laughtale-radio", CSS44);
+  injectIslandStyle("laughtale-radio", CSS43);
   const isCard = props.card === true || String(props.card) === "true";
   const isFilled = props.variant === "filled";
   const size = props.size || "normal";
@@ -22842,13 +23102,13 @@ function RadioButtonIsland(container, props) {
   }
   renderSingle();
 }
-var CSS44;
+var CSS43;
 var init_radio_button = __esm({
   "src/components/radio-button.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS44 = `
+    CSS43 = `
 /* ==================== AURA RADIOBUTTON ==================== */
 .laughtale-radio-root,
 .p-radiobutton-root {
@@ -23131,7 +23391,7 @@ __export(textarea_exports, {
   default: () => TextareaIsland
 });
 function TextareaIsland(container, props) {
-  injectIslandStyle("laughtale-textarea", CSS45);
+  injectIslandStyle("laughtale-textarea", CSS44);
   const isAutoResize = props.autoResize === true || String(props.autoResize) === "true";
   const isFluid = props.fluid === true || String(props.fluid) === "true";
   const isInvalid = props.invalid === true || String(props.invalid) === "true";
@@ -23207,12 +23467,12 @@ function TextareaIsland(container, props) {
     setTimeout(adjustHeight, 0);
   }
 }
-var CSS45;
+var CSS44;
 var init_textarea = __esm({
   "src/components/textarea.ts"() {
     "use strict";
     init_styles();
-    CSS45 = `
+    CSS44 = `
 /* ==================== AURA TEXTAREA ==================== */
 .p-textarea {
     font-family: var(--p-font-family, inherit);
@@ -23337,7 +23597,7 @@ __export(input_mask_exports, {
   default: () => InputMaskIsland
 });
 function InputMaskIsland(container, props) {
-  injectIslandStyle("laughtale-input-mask", CSS46);
+  injectIslandStyle("laughtale-input-mask", CSS45);
   const mask = props.mask || "(999) 999-9999";
   const slotChar = props.slotChar || "_";
   const autoClear = props.autoClear !== false && String(props.autoClear) !== "false";
@@ -23524,12 +23784,12 @@ function InputMaskIsland(container, props) {
   });
   syncValue();
 }
-var CSS46;
+var CSS45;
 var init_input_mask = __esm({
   "src/components/input-mask.ts"() {
     "use strict";
     init_styles();
-    CSS46 = `
+    CSS45 = `
 /* ==================== AURA INPUTMASK ==================== */
 .laughtale-input-mask,
 .p-inputmask {
@@ -23639,7 +23899,7 @@ __export(float_label_exports, {
   default: () => FloatLabelIsland
 });
 function FloatLabelIsland(container, props) {
-  injectIslandStyle("laughtale-float-label", CSS47);
+  injectIslandStyle("laughtale-float-label", CSS46);
   const variant = props.variant || "over";
   const initialHtml = container.innerHTML;
   const forAttr = props.for ? `for="${props.for}"` : "";
@@ -23717,12 +23977,12 @@ function FloatLabelIsland(container, props) {
   setTimeout(updateFloatingState, 50);
   setTimeout(updateFloatingState, 200);
 }
-var CSS47;
+var CSS46;
 var init_float_label = __esm({
   "src/components/float-label.ts"() {
     "use strict";
     init_styles();
-    CSS47 = `
+    CSS46 = `
 .laughtale-float-label {
     position: relative;
     display: inline-flex;
@@ -23849,7 +24109,7 @@ __export(ifta_label_exports, {
   default: () => IftaLabelIsland
 });
 function IftaLabelIsland(container, props) {
-  injectIslandStyle("laughtale-ifta-label", CSS48);
+  injectIslandStyle("laughtale-ifta-label", CSS47);
   const initialHtml = container.innerHTML;
   const forAttr = props.for ? `for="${props.for}"` : "";
   const existingLabel = container.querySelector("label");
@@ -23872,12 +24132,12 @@ function IftaLabelIsland(container, props) {
     }
   });
 }
-var CSS48;
+var CSS47;
 var init_ifta_label = __esm({
   "src/components/ifta-label.ts"() {
     "use strict";
     init_styles();
-    CSS48 = `
+    CSS47 = `
 .laughtale-ifta-label {
     position: relative;
     display: inline-flex;
@@ -23965,14 +24225,14 @@ __export(input_group_exports, {
   default: () => InputGroupIsland
 });
 function InputGroupIsland(container, props) {
-  injectIslandStyle("laughtale-inputgroup", CSS49);
+  injectIslandStyle("laughtale-inputgroup", CSS48);
   container.classList.add("laughtale-inputgroup", "p-inputgroup");
   if (props.size) {
     container.classList.add(`size-${props.size}`);
   }
 }
 function InputGroupAddonIsland(container, props) {
-  injectIslandStyle("laughtale-inputgroup", CSS49);
+  injectIslandStyle("laughtale-inputgroup", CSS48);
   container.classList.add("laughtale-inputgroup-addon", "p-inputgroup-addon");
   if (props.icon && !container.querySelector("svg")) {
     const svg = getLucideIcon(props.icon);
@@ -23984,13 +24244,13 @@ function InputGroupAddonIsland(container, props) {
     container.insertAdjacentHTML("beforeend", `<span>${props.text}</span>`);
   }
 }
-var CSS49;
+var CSS48;
 var init_input_group = __esm({
   "src/components/input-group.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS49 = `
+    CSS48 = `
 .laughtale-inputgroup,
 .p-inputgroup {
     display: flex;
@@ -24262,7 +24522,7 @@ __export(input_text_exports, {
   default: () => InputTextIsland
 });
 function InputTextIsland(container, props) {
-  injectIslandStyle("laughtale-inputtext", CSS50);
+  injectIslandStyle("laughtale-inputtext", CSS49);
   const [getValue, setValue] = useControllableState({
     defaultValue: props.value ?? "",
     onChange: (val) => {
@@ -24403,14 +24663,14 @@ function InputTextIsland(container, props) {
   }
   init();
 }
-var CSS50, xIcon;
+var CSS49, xIcon;
 var init_input_text = __esm({
   "src/components/input-text.ts"() {
     "use strict";
     init_styles();
     init_lucide();
     init_useControllableState();
-    CSS50 = `
+    CSS49 = `
 .laughtale-inputtext-wrap,
 .p-inputtext-wrap {
     position: relative;

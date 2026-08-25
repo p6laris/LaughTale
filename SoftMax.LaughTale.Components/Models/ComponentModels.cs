@@ -185,7 +185,11 @@ public record AccordionTab(
     string Header,
     string? Content = null,
     string? Icon = null,
-    bool Disabled = false
+    bool Disabled = false,
+    string? Badge = null,
+    string? Subtitle = null,
+    string? Price = null,
+    string? ToggleIcon = null
 );
 
 public record TabItem(
