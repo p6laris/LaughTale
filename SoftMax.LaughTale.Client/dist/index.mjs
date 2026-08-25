@@ -4831,6 +4831,7 @@ function TreeTableIsland(container, props) {
   let isLoading = !!props.loading;
   let isSkeleton = !!props.skeleton;
   let columnToggle = !!props.columnToggle;
+  let showPopover = false;
   let contextMenuEnabled = !!props.contextMenu;
   let sortMode = props.sortMode || "single";
   let sortField = props.sortField || null;
@@ -4878,12 +4879,16 @@ function TreeTableIsland(container, props) {
       case "Folder":
         return "warn";
       case "Document":
+      case "Resume":
+      case "Application":
+      case "PDF":
         return "info";
       case "Picture":
-        return "success";
       case "Video":
         return "success";
       case "Text":
+      case "Zip":
+      case "Link":
         return "secondary";
       default:
         return "secondary";
@@ -5045,25 +5050,39 @@ function TreeTableIsland(container, props) {
     if (currentPage >= totalPages) currentPage = Math.max(0, totalPages - 1);
     const displayedRows = isPaginator ? allVisibleRows.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage) : allVisibleRows;
     const visibleCols = columns.filter((c) => visibleFields.includes(c.field));
-    let toolbarHtml = "";
-    if (props.filter || columnToggle || props.headerTitle) {
-      toolbarHtml = `
-                <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.75rem 1rem; border-bottom: 1px solid var(--p-surface-200); background: var(--p-surface-0); flex-wrap: wrap;">
-                    <div style="font-weight: 700; font-size: 1rem; color: var(--p-surface-900);">
-                        ${props.headerTitle || "TreeTable"}
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+    let headerHtml = "";
+    if (props.headerTitle || props.filter || columnToggle) {
+      headerHtml = `
+                <div class="p-treetable-header">
+                    ${props.headerTitle ? `<span>${props.headerTitle}</span>` : "<div></div>"}
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
                         ${props.filter ? `
-                            <div style="position: relative; min-width: 200px;">
+                            <div style="position: relative; width: 220px;">
                                 <span style="position: absolute; left: 0.65rem; top: 50%; transform: translateY(-50%); color: var(--p-surface-400);">${SVG_ICONS2.search}</span>
-                                <input type="text" class="p-treetable-global-search" placeholder="Search keyword..." value="${globalFilter}" style="width: 100%; padding: 0.35rem 0.65rem 0.35rem 2rem; font-size: 0.8125rem; border-radius: 6px; border: 1px solid var(--p-surface-300); background: var(--p-surface-0); color: var(--p-surface-900); outline: none; box-sizing: border-box;" />
+                                <input type="text" class="p-treetable-global-search" placeholder="Keyword search" value="${globalFilter}" style="width: 100%; padding: 0.4rem 0.65rem 0.4rem 2.2rem; font-size: 0.8125rem; border-radius: 6px; border: 1px solid var(--p-surface-300); background: var(--p-surface-0); color: var(--p-surface-900); outline: none; box-sizing: border-box;" />
                             </div>
                         ` : ""}
                         ${columnToggle ? `
                             <div style="position: relative;">
-                                <button type="button" class="p-treetable-column-toggle-btn p-button p-component p-button-outlined" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.35rem 0.75rem; font-size: 0.8125rem; border-radius: 6px; border: 1px solid var(--p-surface-300); background: var(--p-surface-0); color: var(--p-surface-700); cursor: pointer;">
+                                <button type="button" class="p-treetable-column-toggle-btn" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.75rem; font-size: 0.8125rem; font-weight: 600; border-radius: 6px; border: 1px solid var(--p-surface-300); background: var(--p-surface-0); color: var(--p-surface-700); cursor: pointer;">
                                     ${SVG_ICONS2.cog} Columns
                                 </button>
+                                ${showPopover ? `
+                                    <div class="p-treetable-popover">
+                                        <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 0.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid var(--p-surface-200);">
+                                            <span style="font-weight: 700; font-size: 0.8125rem;">Columns</span>
+                                            <button type="button" class="p-treetable-reset-cols-btn" style="border: none; background: transparent; color: var(--p-primary-600); cursor: pointer; font-size: 0.75rem; font-weight: 600;">Reset</button>
+                                        </div>
+                                        <div style="display: flex; flex-direction: column; gap: 0.35rem; max-height: 200px; overflow-y: auto;">
+                                            ${columns.map((col) => `
+                                                <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; cursor: pointer; padding: 0.25rem 0.4rem; border-radius: 4px;">
+                                                    <input type="checkbox" class="p-treetable-col-cb" data-field="${col.field}" ${visibleFields.includes(col.field) ? "checked" : ""} />
+                                                    <span>${col.header}</span>
+                                                </label>
+                                            `).join("")}
+                                        </div>
+                                    </div>
+                                ` : ""}
                             </div>
                         ` : ""}
                     </div>
@@ -5098,15 +5117,16 @@ function TreeTableIsland(container, props) {
         }
       }
       return `
-                            <th class="${isSort ? "p-sortable-column" : ""} ${frozenClass}" data-col-field="${col.field}" style="${widthStyle}">
-                                <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
+                            <th class="${isSort ? "p-sortable-column" : ""} ${sortField === col.field || multiSortMeta.some((m) => m.field === col.field) ? "p-highlight" : ""} ${frozenClass}" data-col-field="${col.field}" style="${widthStyle}">
+                                <div class="p-treetable-header-content">
                                     <span>${col.header}</span>
-                                    ${isSort ? `<span style="display: inline-flex; align-items: center; color: var(--p-surface-400);">${sortIconHtml}${sortBadgeHtml}</span>` : ""}
+                                    ${isSort ? `<span class="p-treetable-sort-icon">${sortIconHtml}${sortBadgeHtml}</span>` : ""}
                                 </div>
                                 ${props.resizableColumns ? '<span class="p-column-resizer"></span>' : ""}
                             </th>
                         `;
     }).join("")}
+                    ${props.showActions ? '<th style="width: 140px; text-align: center;">Actions</th>' : ""}
                 </tr>
             </thead>
         `;
@@ -5119,6 +5139,7 @@ function TreeTableIsland(container, props) {
                             ${visibleCols.map(() => `
                                 <td><div class="p-treetable-skeleton-line" style="width: ${Math.floor(Math.random() * 40) + 50}%;"></div></td>
                             `).join("")}
+                            ${props.showActions ? '<td><div class="p-treetable-skeleton-line" style="width: 70px; margin: 0 auto;"></div></td>' : ""}
                         </tr>
                     `).join("")}
                 </tbody>
@@ -5127,10 +5148,18 @@ function TreeTableIsland(container, props) {
       tbodyHtml = `
                 <tbody class="p-treetable-tbody">
                     <tr>
-                        <td colspan="${visibleCols.length}" style="text-align: center; padding: 2.5rem 1rem;">
-                            <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; color: var(--p-surface-500);">
-                                <span style="transform: scale(1.4);">${SVG_ICONS2.folder}</span>
-                                <p style="margin: 0; font-weight: 600; color: var(--p-surface-900);">${props.emptyMessage || "No records found"}</p>
+                        <td colspan="${visibleCols.length + (props.showActions ? 1 : 0)}" style="text-align: center; padding: 3rem 1rem;">
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 0.75rem; color: var(--p-surface-500);">
+                                <div style="width: 3.5rem; height: 3.5rem; border-radius: 9999px; background: var(--p-surface-100); display: flex; align-items: center; justify-content: center; color: var(--p-surface-400);">
+                                    <span style="transform: scale(1.6);">${SVG_ICONS2.folder}</span>
+                                </div>
+                                <div>
+                                    <p style="margin: 0; font-weight: 700; font-size: 1rem; color: var(--p-surface-900);">${props.emptyMessage || "No folders yet"}</p>
+                                    <p style="margin: 0.25rem 0 0; font-size: 0.8125rem; color: var(--p-surface-500);">Create your first folder to start building a tree.</p>
+                                </div>
+                                <button type="button" class="p-treetable-empty-add-btn" style="margin-top: 0.25rem; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: 6px; border: none; background: var(--p-primary-500); color: #ffffff; cursor: pointer;">
+                                    ${SVG_ICONS2.plus} New Folder
+                                </button>
                             </div>
                         </td>
                     </tr>
@@ -5188,6 +5217,18 @@ function TreeTableIsland(container, props) {
                                 </td>
                             `;
         }).join("")}
+                        ${props.showActions ? `
+                            <td style="text-align: center;">
+                                <div style="display: inline-flex; align-items: center; gap: 0.4rem;">
+                                    <button type="button" class="p-treetable-action-view" style="width: 2rem; height: 2rem; border-radius: 9999px; border: none; background: var(--p-surface-100); color: var(--p-surface-700); display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                                        ${SVG_ICONS2.search}
+                                    </button>
+                                    <button type="button" class="p-treetable-action-edit" style="width: 2rem; height: 2rem; border-radius: 9999px; border: none; background: #dcfce7; color: #15803d; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                                        ${SVG_ICONS2.pencil}
+                                    </button>
+                                </div>
+                            </td>
+                        ` : ""}
                     </tr>
                 `;
       }).join("");
@@ -5240,8 +5281,10 @@ function TreeTableIsland(container, props) {
       }
     }
     let footerHtml = props.footerText ? `
-            <div style="padding: 0.75rem 1rem; border-top: 1px solid var(--p-surface-200); background: var(--p-surface-50); font-size: 0.8125rem; font-weight: 600; color: var(--p-surface-700);">
-                ${props.footerText}
+            <div class="p-treetable-footer">
+                <button type="button" class="p-treetable-footer-reload-btn" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: 6px; border: none; background: #f59e0b; color: #ffffff; cursor: pointer;">
+                    ${SVG_ICONS2.refresh} ${props.footerText}
+                </button>
             </div>
         ` : "";
     let loadingMaskHtml = isLoading && !isSkeleton ? `
@@ -5257,7 +5300,7 @@ function TreeTableIsland(container, props) {
     const gridlinesClass = showGridlines ? "p-treetable-gridlines" : "";
     container.innerHTML = `
             <div class="p-treetable p-component ${sizeClass} ${gridlinesClass}">
-                ${toolbarHtml}
+                ${headerHtml}
                 ${loadingMaskHtml}
                 <div class="p-treetable-scrollable-wrapper" style="${scrollStyle}">
                     <table class="p-treetable-table">
@@ -5380,6 +5423,40 @@ function TreeTableIsland(container, props) {
         }
       });
     }
+    container.querySelector(".p-treetable-column-toggle-btn")?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      showPopover = !showPopover;
+      render();
+    });
+    container.querySelectorAll(".p-treetable-col-cb").forEach((cb) => {
+      cb.addEventListener("change", (e) => {
+        const field = cb.getAttribute("data-field");
+        if (field) {
+          if (cb.checked) {
+            if (!visibleFields.includes(field)) visibleFields.push(field);
+          } else {
+            visibleFields = visibleFields.filter((f) => f !== field);
+          }
+          render();
+        }
+      });
+    });
+    container.querySelector(".p-treetable-reset-cols-btn")?.addEventListener("click", () => {
+      visibleFields = columns.map((c) => c.field);
+      render();
+    });
+    container.querySelector(".p-treetable-empty-add-btn")?.addEventListener("click", () => {
+      rawNodes.push({
+        key: String(rawNodes.length),
+        data: { name: `New Folder ${rawNodes.length + 1}`, size: "0kb", type: "Folder" },
+        children: []
+      });
+      buildMaps(rawNodes);
+      render();
+    });
+    container.querySelector(".p-treetable-footer-reload-btn")?.addEventListener("click", () => {
+      notifyToast("info", "TreeTable Reloaded", "Refreshed node hierarchy");
+    });
   }
   function showContextMenu(x, y) {
     document.querySelectorAll(".p-treetable-contextmenu").forEach((el) => el.remove());
@@ -5433,6 +5510,31 @@ var init_treetable = __esm({
     font-family: var(--p-font-family, inherit);
     box-sizing: border-box;
     width: 100%;
+    overflow: hidden;
+}
+
+.p-treetable-header {
+    background: var(--p-surface-0, #ffffff);
+    color: var(--p-surface-900, #0f172a);
+    padding: 0.875rem 1.25rem;
+    border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
+    font-weight: 700;
+    font-size: 1.125rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.p-treetable-footer {
+    background: var(--p-surface-50, #f8fafc);
+    color: var(--p-surface-700, #334155);
+    padding: 0.75rem 1.25rem;
+    border-top: 1px solid var(--p-surface-200, #e2e8f0);
+    font-size: 0.875rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
 }
 
 .p-treetable-table {
@@ -5453,6 +5555,13 @@ var init_treetable = __esm({
     user-select: none;
     position: relative;
     font-size: 0.875rem;
+    box-sizing: border-box;
+}
+
+.p-treetable-header-content {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
 }
 
 .p-treetable-thead > tr > th.p-sortable-column {
@@ -5464,8 +5573,17 @@ var init_treetable = __esm({
 }
 
 .p-treetable-thead > tr > th.p-highlight {
-    color: var(--p-primary-600, #059669);
-    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-primary-600, #10b981);
+}
+
+.p-treetable-sort-icon {
+    display: inline-flex;
+    align-items: center;
+    color: var(--p-surface-400, #94a3b8);
+    transition: color 0.15s ease;
+}
+.p-treetable-thead > tr > th.p-highlight .p-treetable-sort-icon {
+    color: var(--p-primary-600, #10b981);
 }
 
 .p-treetable-tbody > tr {
@@ -5489,6 +5607,7 @@ var init_treetable = __esm({
     border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
     font-size: 0.875rem;
     vertical-align: middle;
+    box-sizing: border-box;
 }
 
 /* Gridlines mode */
@@ -5521,7 +5640,7 @@ var init_treetable = __esm({
     justify-content: center;
     cursor: pointer;
     color: var(--p-surface-500, #64748b);
-    transition: background-color 0.15s ease, transform 0.2s ease;
+    transition: background-color 0.15s ease, transform 0.2s ease, color 0.15s ease;
     margin-right: 0.35rem;
     padding: 0;
 }
@@ -5547,6 +5666,7 @@ var init_treetable = __esm({
     margin-right: 0.5rem;
     cursor: pointer;
     transition: background-color 0.15s, border-color 0.15s;
+    flex-shrink: 0;
 }
 .p-treetable-checkbox.p-highlight {
     background: var(--p-primary-500, #10b981);
@@ -5611,11 +5731,10 @@ var init_treetable = __esm({
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.2rem 0.5rem;
+    padding: 0.2rem 0.55rem;
     border-radius: 4px;
     font-size: 0.75rem;
     font-weight: 600;
-    text-transform: uppercase;
     letter-spacing: 0.02em;
 }
 .p-tag-warn { background: #fef3c7; color: #b45309; }
@@ -5628,7 +5747,7 @@ var init_treetable = __esm({
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.75rem 1rem;
+    padding: 0.65rem 1rem;
     border-top: 1px solid var(--p-surface-200, #e2e8f0);
     background: var(--p-surface-0, #ffffff);
     flex-wrap: wrap;
@@ -5657,7 +5776,7 @@ var init_treetable = __esm({
     color: #ffffff;
 }
 .p-treetable-paginator-btn:disabled {
-    opacity: 0.4;
+    opacity: 0.35;
     cursor: not-allowed;
 }
 
@@ -5673,12 +5792,11 @@ var init_treetable = __esm({
     align-items: center;
     justify-content: center;
     z-index: 10;
-    border-radius: var(--p-border-radius-md, 6px);
 }
 
 /* Skeleton Rows */
 .p-treetable-skeleton-line {
-    height: 1rem;
+    height: 1.125rem;
     background: var(--p-surface-200, #e2e8f0);
     border-radius: 4px;
     animation: pTableSkeletonPulse 1.5s infinite;
@@ -5718,11 +5836,38 @@ var init_treetable = __esm({
     color: var(--p-surface-900);
 }
 
+/* Column Toggle Popover */
+.p-treetable-popover {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 0.5rem;
+    background: var(--p-surface-0, #ffffff);
+    border: 1px solid var(--p-surface-200, #e2e8f0);
+    border-radius: 8px;
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+    z-index: 50;
+    min-width: 260px;
+    padding: 0.5rem;
+}
+
 /* Dark Mode Tokens */
 .dark .p-treetable,
 [data-theme="dark"] .p-treetable {
     background: var(--p-surface-900, #0f172a) !important;
     color: var(--p-surface-100, #f8fafc) !important;
+    border-color: var(--p-surface-700, #334155) !important;
+}
+.dark .p-treetable-header,
+[data-theme="dark"] .p-treetable-header {
+    background: var(--p-surface-900, #0f172a) !important;
+    color: var(--p-surface-0, #ffffff) !important;
+    border-color: var(--p-surface-700, #334155) !important;
+}
+.dark .p-treetable-footer,
+[data-theme="dark"] .p-treetable-footer {
+    background: var(--p-surface-950, #020617) !important;
+    color: var(--p-surface-200, #e2e8f0) !important;
     border-color: var(--p-surface-700, #334155) !important;
 }
 .dark .p-treetable-thead > tr > th,
@@ -5770,7 +5915,9 @@ var init_treetable = __esm({
     background: rgba(15, 23, 42, 0.8) !important;
 }
 .dark .p-treetable-contextmenu,
-[data-theme="dark"] .p-treetable-contextmenu {
+[data-theme="dark"] .p-treetable-contextmenu,
+.dark .p-treetable-popover,
+[data-theme="dark"] .p-treetable-popover {
     background: var(--p-surface-900, #0f172a) !important;
     border-color: var(--p-surface-700, #334155) !important;
 }
@@ -5781,9 +5928,9 @@ var init_treetable = __esm({
       chevronLeft: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>',
       firstPage: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m11 17-5-5 5-5"/><path d="m18 17-5-5 5-5"/><path d="M6 19V5"/></svg>',
       lastPage: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 17 5-5-5-5"/><path d="m13 17 5-5-5-5"/><path d="M18 19V5"/></svg>',
-      sortAsc: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>',
-      sortDesc: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>',
-      sortNone: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>',
+      sortAsc: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>',
+      sortDesc: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>',
+      sortNone: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>',
       folder: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>',
       file: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg>',
       image: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>',
@@ -5792,12 +5939,13 @@ var init_treetable = __esm({
       minus: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="5" x2="19" y1="12" y2="12"/></svg>',
       search: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>',
       cog: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/></svg>',
-      spinner: '<svg class="animate-spin" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>',
+      spinner: '<svg class="animate-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>',
       refresh: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>',
       download: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>',
       pencil: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>',
       trash: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>',
-      plus: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>'
+      plus: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>',
+      bars: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>'
     };
   }
 });
