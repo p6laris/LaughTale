@@ -1673,29 +1673,22 @@
             <!-- 1. Basic -->
             <div class="demo-subcard">
                 <div class="demo-subcard-header">
-                    <span class="demo-subcard-title">1. Basic Hierarchy</span>
-                    <span class="demo-subcard-desc">TreeTable requires a collection of TreeNode instances and column definitions.</span>
+                    <span class="demo-subcard-title">1. Basic</span>
+                    <span class="demo-subcard-desc">TreeTable requires a collection of TreeNode instances as a value and Column components as children for representation.</span>
                 </div>
                 <div class="demo-subcard-body">
-                    <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableDefaultColumns" />
+                    <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableBasicColumns" />
                 </div>
             </div>
 
-            <!-- 2. Size Variants -->
+            <!-- 2. Size -->
             <div class="demo-subcard">
                 <div class="demo-subcard-header">
-                    <span class="demo-subcard-title">2. Size Variants</span>
-                    <span class="demo-subcard-desc">Small, Normal, and Large row padding alternatives with severity badge tags.</span>
+                    <span class="demo-subcard-title">2. Size</span>
+                    <span class="demo-subcard-desc">In addition to a regular table, alternatives with alternative sizes are available.</span>
                 </div>
-                <div class="demo-subcard-body" style="display: flex; flex-direction: column; gap: 1.25rem;">
-                    <div>
-                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-text-muted); margin-bottom: 0.4rem; text-transform: uppercase;">Small (Dense)</div>
-                        <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableDefaultColumns" size="small" />
-                    </div>
-                    <div>
-                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-text-muted); margin-bottom: 0.4rem; text-transform: uppercase;">Large (Spacious)</div>
-                        <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableDefaultColumns" size="large" />
-                    </div>
+                <div class="demo-subcard-body">
+                    <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableBasicColumns" top-controls="size" use-tags="true" />
                 </div>
             </div>
 
@@ -1703,10 +1696,10 @@
             <div class="demo-subcard">
                 <div class="demo-subcard-header">
                     <span class="demo-subcard-title">3. Grid Lines</span>
-                    <span class="demo-subcard-desc">Enabling showGridlines displays vertical and horizontal cell borders.</span>
+                    <span class="demo-subcard-desc">Enabling showGridlines displays grid lines.</span>
                 </div>
                 <div class="demo-subcard-body">
-                    <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableDefaultColumns" show-gridlines="true" />
+                    <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableBasicColumns" show-gridlines="true" use-tags="true" />
                 </div>
             </div>
 
@@ -1714,10 +1707,10 @@
             <div class="demo-subcard">
                 <div class="demo-subcard-header">
                     <span class="demo-subcard-title">4. Single Row Selection</span>
-                    <span class="demo-subcard-desc">Single node selection with selectionKeys binding and active row highlighting.</span>
+                    <span class="demo-subcard-desc">Single node selection is configured by setting selectionMode as single along with selectionKeys property.</span>
                 </div>
                 <div class="demo-subcard-body">
-                    <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableDefaultColumns" selection-mode="single" meta-key-selection="false" events="true" />
+                    <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableBasicColumns" top-controls="metaKey" selection-mode="single" meta-key-selection="true" use-tags="true" events="true" />
                 </div>
             </div>
 
@@ -1725,36 +1718,32 @@
             <div class="demo-subcard">
                 <div class="demo-subcard-header">
                     <span class="demo-subcard-title">5. Multiple Rows Selection</span>
-                    <span class="demo-subcard-desc">More than one node selectable simultaneously with optional MetaKey.</span>
+                    <span class="demo-subcard-desc">More than one node is selectable by setting selectionMode to multiple.</span>
                 </div>
                 <div class="demo-subcard-body">
-                    <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableDefaultColumns" selection-mode="multiple" meta-key-selection="false" events="true" />
+                    <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableBasicColumns" top-controls="metaKey" selection-mode="multiple" meta-key-selection="true" use-tags="true" events="true" />
                 </div>
             </div>
 
             <!-- 6. Checkbox Row Selection -->
             <div class="demo-subcard">
                 <div class="demo-subcard-header">
-                    <span class="demo-subcard-title">6. Checkbox Row Selection (Cascading Tri-State)</span>
-                    <span class="demo-subcard-desc">Selection of multiple nodes via checkboxes with cascading checked/partialChecked propagation.</span>
+                    <span class="demo-subcard-title">6. Checkbox Row Selection</span>
+                    <span class="demo-subcard-desc">Selection of multiple nodes via checkboxes with cascading checked and partialChecked states.</span>
                 </div>
                 <div class="demo-subcard-body">
-                    <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableDefaultColumns" selection-mode="checkbox" events="true" />
+                    <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableBasicColumns" selection-mode="checkbox" use-tags="true" events="true" />
                 </div>
             </div>
 
             <!-- 7. Keyboard Navigation -->
             <div class="demo-subcard">
                 <div class="demo-subcard-header">
-                    <span class="demo-subcard-title">7. Keyboard Navigation & Accessibility</span>
-                    <span class="demo-subcard-desc">Arrow Up/Down moves focus, Arrow Right/Left expands/collapses, Space/Enter toggles selection.</span>
+                    <span class="demo-subcard-title">7. Keyboard Selection</span>
+                    <span class="demo-subcard-desc">TreeTable has full keyboard support: &uarr; &darr; navigate, &rarr; &larr; expand/collapse, Space/Enter selects.</span>
                 </div>
                 <div class="demo-subcard-body">
-                    <div style="background: var(--p-surface-100); border: 1px solid var(--p-surface-200); border-radius: 6px; padding: 0.5rem 0.75rem; font-size: 0.75rem; color: var(--p-surface-700); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
-                        <span style="font-weight: 700;">Keyboard Hotkeys:</span>
-                        <code>&uarr;</code> <code>&darr;</code> (Focus) &bull; <code>&rarr;</code> <code>&larr;</code> (Expand / Collapse) &bull; <code>Space</code> (Select)
-                    </div>
-                    <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableDefaultColumns" selection-mode="single" meta-key-selection="false" events="true" />
+                    <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableBasicColumns" selection-mode="multiple" meta-key-selection="true" use-tags="true" events="true" />
                 </div>
             </div>
 
@@ -1762,38 +1751,38 @@
             <div class="demo-subcard">
                 <div class="demo-subcard-header">
                     <span class="demo-subcard-title">8. Single Column Sort</span>
-                    <span class="demo-subcard-desc">Sorting on a column is enabled by clicking the column header.</span>
+                    <span class="demo-subcard-desc">Sorting on a column is enabled by adding the sortable property.</span>
                 </div>
                 <div class="demo-subcard-body">
-                    <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableDefaultColumns" sort-mode="single" />
+                    <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableSortableColumns" sort-mode="single" use-tags="true" />
                 </div>
             </div>
 
             <!-- 9. Multiple Column Presort & Removable Sort -->
             <div class="demo-subcard">
                 <div class="demo-subcard-header">
-                    <span class="demo-subcard-title">9. Multiple Column Presort & Removable Sort</span>
-                    <span class="demo-subcard-desc">Multiple columns sorted simultaneously with sort order badges and 3-state removable sorting.</span>
+                    <span class="demo-subcard-title">9. Multiple Columns Sort & Removable Sort</span>
+                    <span class="demo-subcard-desc">Multiple columns sorted with sort order badges. 3rd click removes sorting.</span>
                 </div>
                 <div class="demo-subcard-body">
-                    <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableDefaultColumns" sort-mode="multiple" removable-sort="true" />
+                    <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableSortableColumns" sort-mode="multiple" removable-sort="true" use-tags="true" />
                 </div>
             </div>
 
-            <!-- 10. Pagination (Standard & Headless) -->
+            <!-- 10. Pagination -->
             <div class="demo-subcard">
                 <div class="demo-subcard-header">
-                    <span class="demo-subcard-title">10. Pagination</span>
-                    <span class="demo-subcard-desc">Standard rows-per-page paginator bar and headless compact pill pager.</span>
+                    <span class="demo-subcard-title">10. Pagination (Basic & Headless)</span>
+                    <span class="demo-subcard-desc">Pagination is enabled by adding paginator property and defining rows per page.</span>
                 </div>
                 <div class="demo-subcard-body" style="display: flex; flex-direction: column; gap: 1.5rem;">
                     <div>
-                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-text-muted); margin-bottom: 0.4rem; text-transform: uppercase;">Standard Paginator</div>
-                        <island-treetable value="@Model.TreeTablePaginatorNodes" columns="@Model.TreeTableDefaultColumns" paginator="true" rows="5" />
+                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-text-muted); margin-bottom: 0.4rem; text-transform: uppercase;">Basic Paginator</div>
+                        <island-treetable value="@Model.TreeTablePaginatorNodes" columns="@Model.TreeTableBasicColumns" paginator="true" rows="5" use-tags="true" />
                     </div>
                     <div>
-                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-text-muted); margin-bottom: 0.4rem; text-transform: uppercase;">Headless Compact Pager</div>
-                        <island-treetable value="@Model.TreeTablePaginatorNodes" columns="@Model.TreeTableDefaultColumns" paginator="true" rows="5" headless-paginator="true" />
+                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-text-muted); margin-bottom: 0.4rem; text-transform: uppercase;">Headless Compact Paginator</div>
+                        <island-treetable value="@Model.TreeTablePaginatorNodes" columns="@Model.TreeTableBasicColumns" paginator="true" rows="5" headless-paginator="true" use-tags="true" />
                     </div>
                 </div>
             </div>
@@ -1805,75 +1794,79 @@
                     <span class="demo-subcard-desc">Vertical scrolling with sticky header and left-frozen Name column.</span>
                 </div>
                 <div class="demo-subcard-body">
-                    <island-treetable value="@Model.TreeTableFrozenNodes" columns="@Model.TreeTableFrozenColumns" scrollable="true" scroll-height="300px" />
+                    <island-treetable value="@Model.TreeTableFrozenNodes" columns="@Model.TreeTableFrozenColumns" scrollable="true" scroll-height="400px" use-node-icons="true" use-tags="true" />
                 </div>
             </div>
 
             <!-- 12. Column Resize & Toggle -->
             <div class="demo-subcard">
                 <div class="demo-subcard-header">
-                    <span class="demo-subcard-title">12. Column Resize & Visibility Toggle</span>
-                    <span class="demo-subcard-desc">Drag column header dividers to resize column widths, and toggle visible columns dynamically.</span>
+                    <span class="demo-subcard-title">12. Column Resize & Column Toggle</span>
+                    <span class="demo-subcard-desc">Columns resized with drag and drop, and toggled via popover.</span>
                 </div>
                 <div class="demo-subcard-body">
-                    <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableDefaultColumns" resizable-columns="true" column-toggle="true" show-gridlines="true" />
+                    <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableBasicColumns" resizable-columns="true" column-toggle="true" show-gridlines="true" use-tags="true" />
                 </div>
             </div>
 
-            <!-- 13. Instant Search Filter -->
+            <!-- 13. Filter -->
             <div class="demo-subcard">
                 <div class="demo-subcard-header">
-                    <span class="demo-subcard-title">13. Instant Search Filtering</span>
-                    <span class="demo-subcard-desc">Keyword search input with live branch matching and auto-expansion.</span>
+                    <span class="demo-subcard-title">13. Instant Search Filter</span>
+                    <span class="demo-subcard-desc">Global keyword search across all columns with automatic branch preservation.</span>
                 </div>
                 <div class="demo-subcard-body">
-                    <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableDefaultColumns" filter="true" />
+                    <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableBasicColumns" filter="true" use-tags="true" />
                 </div>
             </div>
 
             <!-- 14. Lazy Loading & Skeleton States -->
             <div class="demo-subcard">
                 <div class="demo-subcard-header">
-                    <span class="demo-subcard-title">14. Lazy Loading & Skeleton States</span>
-                    <span class="demo-subcard-desc">On-demand child node expansion with loading spinners, and animated skeleton rows.</span>
+                    <span class="demo-subcard-title">14. Lazy Loading & Loading Skeleton</span>
+                    <span class="demo-subcard-desc">Remote-simulation lazy loading on expand, and skeleton placeholder rows during loading.</span>
                 </div>
                 <div class="demo-subcard-body" style="display: flex; flex-direction: column; gap: 1.5rem;">
                     <div>
-                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-text-muted); margin-bottom: 0.4rem; text-transform: uppercase;">Lazy Expand (Click arrow to load)</div>
-                        <island-treetable value="@Model.LazyTreeNodes" columns="@Model.TreeTableDefaultColumns" lazy="true" />
+                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-text-muted); margin-bottom: 0.4rem; text-transform: uppercase;">Lazy Expand (Click expand arrow)</div>
+                        <island-treetable value="@Model.LazyTreeNodes" columns="@Model.TreeTableBasicColumns" lazy="true" use-tags="true" />
                     </div>
                     <div>
-                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-text-muted); margin-bottom: 0.4rem; text-transform: uppercase;">Animated Skeleton Placeholders</div>
-                        <island-treetable columns="@Model.TreeTableDefaultColumns" skeleton="true" loading="true" />
+                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-text-muted); margin-bottom: 0.4rem; text-transform: uppercase;">Skeleton Placeholders</div>
+                        <island-treetable columns="@Model.TreeTableBasicColumns" skeleton="true" loading="true" />
                     </div>
                 </div>
             </div>
 
-            <!-- 15. Template Header & Footer -->
+            <!-- 15. Template (Header & Footer) -->
             <div class="demo-subcard">
                 <div class="demo-subcard-header">
-                    <span class="demo-subcard-title">15. Template Header, Actions & Footer</span>
-                    <span class="demo-subcard-desc">Custom header title caption, row action buttons, and footer reload button.</span>
+                    <span class="demo-subcard-title">15. Template (Header, Actions & Footer)</span>
+                    <span class="demo-subcard-desc">Custom content at header and footer slots via templating.</span>
                 </div>
                 <div class="demo-subcard-body">
-                    <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableDefaultColumns" header-title="File Viewer" show-actions="true" footer-text="Reload" events="true" />
+                    <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableBasicColumns" header-title="File Viewer" show-actions="true" footer-text="Reload" use-tags="true" events="true" />
                 </div>
             </div>
 
-            <!-- 16. Empty State & Context Menu -->
+            <!-- 16. Controlled & Context Menu -->
             <div class="demo-subcard">
                 <div class="demo-subcard-header">
-                    <span class="demo-subcard-title">16. Empty State & Context Menu</span>
-                    <span class="demo-subcard-desc">Custom empty placeholder with "+ New Folder" action button, and right-click ContextMenu.</span>
+                    <span class="demo-subcard-title">16. Controlled Expansion & ContextMenu</span>
+                    <span class="demo-subcard-desc">Expansion controlled with expandedKeys property, and right-click ContextMenu.</span>
                 </div>
                 <div class="demo-subcard-body" style="display: flex; flex-direction: column; gap: 1.5rem;">
                     <div>
+                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-text-muted); margin-bottom: 0.4rem; text-transform: uppercase;">Controlled (Toggle Applications Button)</div>
+                        <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableBasicColumns" top-controls="controlled" use-tags="true" />
+                    </div>
+                    <div>
                         <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-text-muted); margin-bottom: 0.4rem; text-transform: uppercase;">Right-Click Context Menu (Right-click any row)</div>
-                        <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableDefaultColumns" context-menu="true" events="true" />
+                        <island-treetable value="@Model.TreeTableSmallNodes" columns="@Model.TreeTableBasicColumns" context-menu="true" use-tags="true" events="true" />
                     </div>
                     <div>
                         <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-text-muted); margin-bottom: 0.4rem; text-transform: uppercase;">Empty State</div>
-                        <island-treetable value="@Model.TreeTableEmptyNodes" columns="@Model.TreeTableDefaultColumns" empty-message="No folders yet" />
+                        <island-treetable value="@Model.TreeTableEmptyNodes" columns="@Model.TreeTableBasicColumns" empty-message="No folders yet" />
                     </div>
                 </div>
             </div>

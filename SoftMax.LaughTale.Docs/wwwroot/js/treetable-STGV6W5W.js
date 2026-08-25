@@ -15,6 +15,30 @@ var TREETABLE_CSS = `
     width: 100%;
 }
 
+.p-treetable-header {
+    background: var(--p-surface-0, #ffffff);
+    color: var(--p-surface-900, #0f172a);
+    padding: 0.875rem 1.25rem;
+    border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
+    font-weight: 700;
+    font-size: 1.125rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.p-treetable-footer {
+    background: var(--p-surface-50, #f8fafc);
+    color: var(--p-surface-700, #334155);
+    padding: 0.75rem 1.25rem;
+    border-top: 1px solid var(--p-surface-200, #e2e8f0);
+    font-size: 0.875rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
 .p-treetable-table {
     border-spacing: 0;
     width: 100%;
@@ -23,16 +47,26 @@ var TREETABLE_CSS = `
 }
 
 .p-treetable-thead > tr > th {
-    background: var(--p-surface-50, #f8fafc);
+    background: var(--p-surface-0, #ffffff);
     color: var(--p-surface-700, #334155);
     padding: 0.75rem 1rem;
     border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
+    border-top: none;
+    border-left: none;
+    border-right: none;
     font-weight: 600;
     text-align: left;
     transition: background-color 0.15s ease, color 0.15s ease;
     user-select: none;
     position: relative;
     font-size: 0.875rem;
+    box-sizing: border-box;
+}
+
+.p-treetable-header-content {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
 }
 
 .p-treetable-thead > tr > th.p-sortable-column {
@@ -44,8 +78,17 @@ var TREETABLE_CSS = `
 }
 
 .p-treetable-thead > tr > th.p-highlight {
-    color: var(--p-primary-600, #059669);
-    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-primary-600, #10b981);
+}
+
+.p-treetable-sort-icon {
+    display: inline-flex;
+    align-items: center;
+    color: var(--p-surface-400, #94a3b8);
+    transition: color 0.15s ease;
+}
+.p-treetable-thead > tr > th.p-highlight .p-treetable-sort-icon {
+    color: var(--p-primary-600, #10b981);
 }
 
 .p-treetable-tbody > tr {
@@ -67,8 +110,12 @@ var TREETABLE_CSS = `
 .p-treetable-tbody > tr > td {
     padding: 0.75rem 1rem;
     border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
+    border-top: none;
+    border-left: none;
+    border-right: none;
     font-size: 0.875rem;
     vertical-align: middle;
+    box-sizing: border-box;
 }
 
 /* Gridlines mode */
@@ -101,7 +148,7 @@ var TREETABLE_CSS = `
     justify-content: center;
     cursor: pointer;
     color: var(--p-surface-500, #64748b);
-    transition: background-color 0.15s ease, transform 0.2s ease;
+    transition: background-color 0.15s ease, transform 0.2s ease, color 0.15s ease;
     margin-right: 0.35rem;
     padding: 0;
 }
@@ -127,6 +174,7 @@ var TREETABLE_CSS = `
     margin-right: 0.5rem;
     cursor: pointer;
     transition: background-color 0.15s, border-color 0.15s;
+    flex-shrink: 0;
 }
 .p-treetable-checkbox.p-highlight {
     background: var(--p-primary-500, #10b981);
@@ -171,13 +219,13 @@ var TREETABLE_CSS = `
     position: sticky;
     left: 0;
     z-index: 2;
-    background: inherit;
+    background: var(--p-surface-0, #ffffff);
 }
 .p-frozen-right {
     position: sticky;
     right: 0;
     z-index: 2;
-    background: inherit;
+    background: var(--p-surface-0, #ffffff);
 }
 
 /* Scrollable Container */
@@ -191,11 +239,10 @@ var TREETABLE_CSS = `
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.2rem 0.5rem;
+    padding: 0.2rem 0.55rem;
     border-radius: 4px;
     font-size: 0.75rem;
     font-weight: 600;
-    text-transform: uppercase;
     letter-spacing: 0.02em;
 }
 .p-tag-warn { background: #fef3c7; color: #b45309; }
@@ -208,7 +255,7 @@ var TREETABLE_CSS = `
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.75rem 1rem;
+    padding: 0.65rem 1rem;
     border-top: 1px solid var(--p-surface-200, #e2e8f0);
     background: var(--p-surface-0, #ffffff);
     flex-wrap: wrap;
@@ -237,7 +284,7 @@ var TREETABLE_CSS = `
     color: #ffffff;
 }
 .p-treetable-paginator-btn:disabled {
-    opacity: 0.4;
+    opacity: 0.35;
     cursor: not-allowed;
 }
 
@@ -253,12 +300,11 @@ var TREETABLE_CSS = `
     align-items: center;
     justify-content: center;
     z-index: 10;
-    border-radius: var(--p-border-radius-md, 6px);
 }
 
 /* Skeleton Rows */
 .p-treetable-skeleton-line {
-    height: 1rem;
+    height: 1.125rem;
     background: var(--p-surface-200, #e2e8f0);
     border-radius: 4px;
     animation: pTableSkeletonPulse 1.5s infinite;
@@ -298,6 +344,36 @@ var TREETABLE_CSS = `
     color: var(--p-surface-900);
 }
 
+/* Column Toggle Popover */
+.p-treetable-popover {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 0.5rem;
+    background: var(--p-surface-0, #ffffff);
+    border: 1px solid var(--p-surface-200, #e2e8f0);
+    border-radius: 8px;
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+    z-index: 50;
+    min-width: 260px;
+    padding: 0.5rem;
+}
+
+/* Top Controls Area (SelectButton, MetaKey toggle, Refresh button, Filter search) */
+.p-treetable-top-controls {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-bottom: 1rem;
+    gap: 0.75rem;
+}
+.p-treetable-top-controls.justify-end {
+    justify-content: flex-end;
+}
+.p-treetable-top-controls.justify-center {
+    justify-content: center;
+}
+
 /* Dark Mode Tokens */
 .dark .p-treetable,
 [data-theme="dark"] .p-treetable {
@@ -305,9 +381,21 @@ var TREETABLE_CSS = `
     color: var(--p-surface-100, #f8fafc) !important;
     border-color: var(--p-surface-700, #334155) !important;
 }
+.dark .p-treetable-header,
+[data-theme="dark"] .p-treetable-header {
+    background: var(--p-surface-900, #0f172a) !important;
+    color: var(--p-surface-0, #ffffff) !important;
+    border-color: var(--p-surface-700, #334155) !important;
+}
+.dark .p-treetable-footer,
+[data-theme="dark"] .p-treetable-footer {
+    background: var(--p-surface-950, #020617) !important;
+    color: var(--p-surface-200, #e2e8f0) !important;
+    border-color: var(--p-surface-700, #334155) !important;
+}
 .dark .p-treetable-thead > tr > th,
 [data-theme="dark"] .p-treetable-thead > tr > th {
-    background: var(--p-surface-950, #020617) !important;
+    background: var(--p-surface-900, #0f172a) !important;
     color: var(--p-surface-200, #e2e8f0) !important;
     border-color: var(--p-surface-700, #334155) !important;
 }
@@ -330,6 +418,10 @@ var TREETABLE_CSS = `
 [data-theme="dark"] .p-treetable-tbody > tr > td {
     border-color: var(--p-surface-700, #334155) !important;
 }
+.dark .p-frozen-left,
+.dark .p-frozen-right {
+    background: var(--p-surface-900, #0f172a) !important;
+}
 .dark .p-treetable-paginator,
 [data-theme="dark"] .p-treetable-paginator {
     background: var(--p-surface-900, #0f172a) !important;
@@ -350,7 +442,9 @@ var TREETABLE_CSS = `
     background: rgba(15, 23, 42, 0.8) !important;
 }
 .dark .p-treetable-contextmenu,
-[data-theme="dark"] .p-treetable-contextmenu {
+[data-theme="dark"] .p-treetable-contextmenu,
+.dark .p-treetable-popover,
+[data-theme="dark"] .p-treetable-popover {
     background: var(--p-surface-900, #0f172a) !important;
     border-color: var(--p-surface-700, #334155) !important;
 }
@@ -361,9 +455,9 @@ var SVG_ICONS = {
   chevronLeft: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>',
   firstPage: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m11 17-5-5 5-5"/><path d="m18 17-5-5 5-5"/><path d="M6 19V5"/></svg>',
   lastPage: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 17 5-5-5-5"/><path d="m13 17 5-5-5-5"/><path d="M18 19V5"/></svg>',
-  sortAsc: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>',
-  sortDesc: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>',
-  sortNone: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>',
+  sortAsc: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>',
+  sortDesc: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>',
+  sortNone: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>',
   folder: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>',
   file: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg>',
   image: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>',
@@ -372,7 +466,7 @@ var SVG_ICONS = {
   minus: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="5" x2="19" y1="12" y2="12"/></svg>',
   search: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>',
   cog: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/></svg>',
-  spinner: '<svg class="animate-spin" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>',
+  spinner: '<svg class="animate-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>',
   refresh: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>',
   download: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>',
   pencil: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>',
@@ -384,8 +478,8 @@ function TreeTableIsland(container, props) {
   let rawNodes = JSON.parse(JSON.stringify(props.value || props.nodes || []));
   let columns = props.columns ? [...props.columns] : [
     { field: "name", header: "Name", expander: true },
-    { field: "size", header: "Size", sortable: true },
-    { field: "type", header: "Type", sortable: true }
+    { field: "size", header: "Size" },
+    { field: "type", header: "Type" }
   ];
   let visibleFields = columns.map((c) => c.field);
   let size = props.size || "normal";
@@ -402,6 +496,7 @@ function TreeTableIsland(container, props) {
   let isLoading = !!props.loading;
   let isSkeleton = !!props.skeleton;
   let columnToggle = !!props.columnToggle;
+  let showPopover = false;
   let contextMenuEnabled = !!props.contextMenu;
   let sortMode = props.sortMode || "single";
   let sortField = props.sortField || null;
@@ -449,12 +544,16 @@ function TreeTableIsland(container, props) {
       case "Folder":
         return "warn";
       case "Document":
+      case "Resume":
+      case "Application":
+      case "PDF":
         return "info";
       case "Picture":
-        return "success";
       case "Video":
         return "success";
       case "Text":
+      case "Zip":
+      case "Link":
         return "secondary";
       default:
         return "secondary";
@@ -616,31 +715,84 @@ function TreeTableIsland(container, props) {
     if (currentPage >= totalPages) currentPage = Math.max(0, totalPages - 1);
     const displayedRows = isPaginator ? allVisibleRows.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage) : allVisibleRows;
     const visibleCols = columns.filter((c) => visibleFields.includes(c.field));
-    let toolbarHtml = "";
-    if (props.filter || columnToggle || props.headerTitle) {
-      toolbarHtml = `
-                <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.75rem 1rem; border-bottom: 1px solid var(--p-surface-200); background: var(--p-surface-0); flex-wrap: wrap;">
-                    <div style="font-weight: 700; font-size: 1rem; color: var(--p-surface-900);">
-                        ${props.headerTitle || "TreeTable"}
+    let topControlsHtml = "";
+    if (props.topControls === "size") {
+      topControlsHtml = `
+                <div class="p-treetable-top-controls">
+                    <div class="p-selectbutton p-button-group" style="display: inline-flex; border: 1px solid var(--p-surface-300); border-radius: 6px; overflow: hidden;">
+                        <button type="button" class="p-treetable-size-btn ${size === "small" ? "p-highlight" : ""}" data-size="small" style="padding: 0.45rem 1rem; border: none; background: ${size === "small" ? "var(--p-primary-500)" : "var(--p-surface-0)"}; color: ${size === "small" ? "#ffffff" : "var(--p-surface-700)"}; cursor: pointer; font-size: 0.8125rem; font-weight: 600;">Small</button>
+                        <button type="button" class="p-treetable-size-btn ${size === "normal" ? "p-highlight" : ""}" data-size="normal" style="padding: 0.45rem 1rem; border: none; border-left: 1px solid var(--p-surface-200); border-right: 1px solid var(--p-surface-200); background: ${size === "normal" ? "var(--p-primary-500)" : "var(--p-surface-0)"}; color: ${size === "normal" ? "#ffffff" : "var(--p-surface-700)"}; cursor: pointer; font-size: 0.8125rem; font-weight: 600;">Normal</button>
+                        <button type="button" class="p-treetable-size-btn ${size === "large" ? "p-highlight" : ""}" data-size="large" style="padding: 0.45rem 1rem; border: none; background: ${size === "large" ? "var(--p-primary-500)" : "var(--p-surface-0)"}; color: ${size === "large" ? "#ffffff" : "var(--p-surface-700)"}; cursor: pointer; font-size: 0.8125rem; font-weight: 600;">Large</button>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-                        ${props.filter ? `
-                            <div style="position: relative; min-width: 200px;">
-                                <span style="position: absolute; left: 0.65rem; top: 50%; transform: translateY(-50%); color: var(--p-surface-400);">${SVG_ICONS.search}</span>
-                                <input type="text" class="p-treetable-global-search" placeholder="Search keyword..." value="${globalFilter}" style="width: 100%; padding: 0.35rem 0.65rem 0.35rem 2rem; font-size: 0.8125rem; border-radius: 6px; border: 1px solid var(--p-surface-300); background: var(--p-surface-0); color: var(--p-surface-900); outline: none; box-sizing: border-box;" />
-                            </div>
-                        ` : ""}
-                        ${columnToggle ? `
-                            <div style="position: relative;">
-                                <button type="button" class="p-treetable-column-toggle-btn p-button p-component p-button-outlined" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.35rem 0.75rem; font-size: 0.8125rem; border-radius: 6px; border: 1px solid var(--p-surface-300); background: var(--p-surface-0); color: var(--p-surface-700); cursor: pointer;">
-                                    ${SVG_ICONS.cog} Columns
-                                </button>
+                </div>
+            `;
+    } else if (props.topControls === "metaKey") {
+      topControlsHtml = `
+                <div class="p-treetable-top-controls justify-center">
+                    <label style="display: inline-flex; align-items: center; gap: 0.6rem; cursor: pointer; font-size: 0.875rem; font-weight: 600; color: var(--p-surface-800);">
+                        <input type="checkbox" class="p-treetable-metakey-switch" ${metaKeySelection ? "checked" : ""} style="width: 1.25rem; height: 1.25rem; accent-color: var(--p-primary-500);" />
+                        <span>MetaKey</span>
+                    </label>
+                </div>
+            `;
+    } else if (props.topControls === "controlled") {
+      topControlsHtml = `
+                <div class="p-treetable-top-controls">
+                    <button type="button" class="p-treetable-toggle-apps-btn" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 1rem; font-size: 0.8125rem; font-weight: 600; border-radius: 6px; border: none; background: var(--p-primary-500); color: #ffffff; cursor: pointer;">
+                        Toggle Applications
+                    </button>
+                </div>
+            `;
+    } else if (props.topControls === "refresh") {
+      topControlsHtml = `
+                <div class="p-treetable-top-controls" style="justify-content: space-between;">
+                    <span style="font-size: 0.875rem; color: var(--p-surface-500);">Click refresh to simulate a network fetch.</span>
+                    <button type="button" class="p-treetable-refresh-btn" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: 6px; border: 1px solid var(--p-surface-300); background: var(--p-surface-0); color: var(--p-surface-700); cursor: pointer;">
+                        ${SVG_ICONS.refresh} Refresh
+                    </button>
+                </div>
+            `;
+    } else if (props.filter) {
+      topControlsHtml = `
+                <div class="p-treetable-top-controls justify-end">
+                    <div style="position: relative; width: 240px;">
+                        <span style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--p-surface-400);">${SVG_ICONS.search}</span>
+                        <input type="text" class="p-treetable-global-search" placeholder="Keyword search" value="${globalFilter}" style="width: 100%; padding: 0.45rem 0.75rem 0.45rem 2.25rem; font-size: 0.8125rem; border-radius: 6px; border: 1px solid var(--p-surface-300); background: var(--p-surface-0); color: var(--p-surface-900); outline: none; box-sizing: border-box;" />
+                    </div>
+                </div>
+            `;
+    } else if (columnToggle) {
+      topControlsHtml = `
+                <div class="p-treetable-top-controls justify-end">
+                    <div style="position: relative;">
+                        <button type="button" class="p-treetable-column-toggle-btn" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: 6px; border: 1px solid var(--p-surface-300); background: var(--p-surface-0); color: var(--p-surface-700); cursor: pointer;">
+                            ${SVG_ICONS.cog} Columns
+                        </button>
+                        ${showPopover ? `
+                            <div class="p-treetable-popover">
+                                <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 0.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid var(--p-surface-200);">
+                                    <span style="font-weight: 700; font-size: 0.8125rem;">Columns</span>
+                                    <button type="button" class="p-treetable-reset-cols-btn" style="border: none; background: transparent; color: var(--p-primary-600); cursor: pointer; font-size: 0.75rem; font-weight: 600;">Reset</button>
+                                </div>
+                                <div style="display: flex; flex-direction: column; gap: 0.35rem; max-height: 200px; overflow-y: auto;">
+                                    ${columns.map((col) => `
+                                        <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; cursor: pointer; padding: 0.25rem 0.4rem; border-radius: 4px;">
+                                            <input type="checkbox" class="p-treetable-col-cb" data-field="${col.field}" ${visibleFields.includes(col.field) ? "checked" : ""} />
+                                            <span>${col.header}</span>
+                                        </label>
+                                    `).join("")}
+                                </div>
                             </div>
                         ` : ""}
                     </div>
                 </div>
             `;
     }
+    let headerHtml = props.headerTitle ? `
+            <div class="p-treetable-header">
+                <span>${props.headerTitle}</span>
+            </div>
+        ` : "";
     const theadHtml = `
             <thead class="p-treetable-thead">
                 <tr>
@@ -669,15 +821,16 @@ function TreeTableIsland(container, props) {
         }
       }
       return `
-                            <th class="${isSort ? "p-sortable-column" : ""} ${frozenClass}" data-col-field="${col.field}" style="${widthStyle}">
-                                <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
+                            <th class="${isSort ? "p-sortable-column" : ""} ${sortField === col.field || multiSortMeta.some((m) => m.field === col.field) ? "p-highlight" : ""} ${frozenClass}" data-col-field="${col.field}" style="${widthStyle}">
+                                <div class="p-treetable-header-content">
                                     <span>${col.header}</span>
-                                    ${isSort ? `<span style="display: inline-flex; align-items: center; color: var(--p-surface-400);">${sortIconHtml}${sortBadgeHtml}</span>` : ""}
+                                    ${isSort ? `<span class="p-treetable-sort-icon">${sortIconHtml}${sortBadgeHtml}</span>` : ""}
                                 </div>
                                 ${props.resizableColumns ? '<span class="p-column-resizer"></span>' : ""}
                             </th>
                         `;
     }).join("")}
+                    ${props.showActions ? '<th style="width: 140px; text-align: center;">Actions</th>' : ""}
                 </tr>
             </thead>
         `;
@@ -685,11 +838,12 @@ function TreeTableIsland(container, props) {
     if (isSkeleton && isLoading) {
       tbodyHtml = `
                 <tbody class="p-treetable-tbody">
-                    ${Array.from({ length: 5 }).map((_, r) => `
+                    ${Array.from({ length: 10 }).map((_, r) => `
                         <tr>
                             ${visibleCols.map(() => `
                                 <td><div class="p-treetable-skeleton-line" style="width: ${Math.floor(Math.random() * 40) + 50}%;"></div></td>
                             `).join("")}
+                            ${props.showActions ? '<td><div class="p-treetable-skeleton-line" style="width: 70px; margin: 0 auto;"></div></td>' : ""}
                         </tr>
                     `).join("")}
                 </tbody>
@@ -698,10 +852,18 @@ function TreeTableIsland(container, props) {
       tbodyHtml = `
                 <tbody class="p-treetable-tbody">
                     <tr>
-                        <td colspan="${visibleCols.length}" style="text-align: center; padding: 2.5rem 1rem;">
-                            <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; color: var(--p-surface-500);">
-                                <span style="transform: scale(1.4);">${SVG_ICONS.folder}</span>
-                                <p style="margin: 0; font-weight: 600; color: var(--p-surface-900);">${props.emptyMessage || "No records found"}</p>
+                        <td colspan="${visibleCols.length + (props.showActions ? 1 : 0)}" style="text-align: center; padding: 3rem 1rem;">
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 0.75rem; color: var(--p-surface-500);">
+                                <div style="width: 3.5rem; height: 3.5rem; border-radius: 9999px; background: var(--p-surface-100); display: flex; align-items: center; justify-content: center; color: var(--p-surface-400);">
+                                    <span style="transform: scale(1.6);">${SVG_ICONS.folder}</span>
+                                </div>
+                                <div>
+                                    <p style="margin: 0; font-weight: 700; font-size: 1rem; color: var(--p-surface-900);">${props.emptyMessage || "No folders yet"}</p>
+                                    <p style="margin: 0.25rem 0 0; font-size: 0.8125rem; color: var(--p-surface-500);">Create your first folder to start building a tree.</p>
+                                </div>
+                                <button type="button" class="p-treetable-empty-add-btn" style="margin-top: 0.25rem; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: 6px; border: none; background: var(--p-primary-500); color: #ffffff; cursor: pointer;">
+                                    ${SVG_ICONS.plus} New Folder
+                                </button>
                             </div>
                         </td>
                     </tr>
@@ -722,7 +884,7 @@ function TreeTableIsland(container, props) {
           const widthStyle = col.width ? `width: ${col.width};` : col.minWidth ? `min-width: ${col.minWidth};` : "";
           if (isExp) {
             const toggleSvg = hasChildren ? node.loading ? SVG_ICONS.spinner : isExpanded ? SVG_ICONS.chevronDown : SVG_ICONS.chevronRight : "";
-            const iconSvg = getIcon(node.data.type, isExpanded);
+            const iconSvg = props.useNodeIcons ? `<span style="display: inline-flex; align-items: center; margin-right: 0.5rem; color: var(--p-surface-400);">${getIcon(node.data.type, isExpanded)}</span>` : "";
             let checkboxHtml = "";
             if (selectionMode === "checkbox") {
               checkboxHtml = `
@@ -738,13 +900,13 @@ function TreeTableIsland(container, props) {
                                                 ${toggleSvg}
                                             </button>
                                             ${checkboxHtml}
-                                            <span style="display: inline-flex; align-items: center; margin-right: 0.5rem; color: var(--p-surface-400);">${iconSvg}</span>
-                                            <span style="font-weight: ${hasChildren ? "600" : "400"}; color: var(--p-surface-900);">${node.data[col.field] ?? ""}</span>
+                                            ${iconSvg}
+                                            <span style="font-weight: ${hasChildren && props.useNodeIcons ? "600" : "400"}; color: var(--p-surface-900);">${node.data[col.field] ?? ""}</span>
                                         </div>
                                     </td>
                                 `;
           }
-          if (col.field === "type") {
+          if (col.field === "type" && props.useTags) {
             const typeVal = node.data.type || "Folder";
             const sev = getSeverity(typeVal);
             return `
@@ -759,6 +921,18 @@ function TreeTableIsland(container, props) {
                                 </td>
                             `;
         }).join("")}
+                        ${props.showActions ? `
+                            <td style="text-align: center;">
+                                <div style="display: inline-flex; align-items: center; gap: 0.4rem;">
+                                    <button type="button" class="p-treetable-action-view" style="width: 2rem; height: 2rem; border-radius: 9999px; border: none; background: var(--p-surface-100); color: var(--p-surface-700); display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                                        ${SVG_ICONS.search}
+                                    </button>
+                                    <button type="button" class="p-treetable-action-edit" style="width: 2rem; height: 2rem; border-radius: 9999px; border: none; background: #dcfce7; color: #15803d; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                                        ${SVG_ICONS.pencil}
+                                    </button>
+                                </div>
+                            </td>
+                        ` : ""}
                     </tr>
                 `;
       }).join("");
@@ -811,8 +985,10 @@ function TreeTableIsland(container, props) {
       }
     }
     let footerHtml = props.footerText ? `
-            <div style="padding: 0.75rem 1rem; border-top: 1px solid var(--p-surface-200); background: var(--p-surface-50); font-size: 0.8125rem; font-weight: 600; color: var(--p-surface-700);">
-                ${props.footerText}
+            <div class="p-treetable-footer">
+                <button type="button" class="p-treetable-footer-reload-btn" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: 6px; border: none; background: #f59e0b; color: #ffffff; cursor: pointer;">
+                    ${SVG_ICONS.refresh} ${props.footerText}
+                </button>
             </div>
         ` : "";
     let loadingMaskHtml = isLoading && !isSkeleton ? `
@@ -827,8 +1003,9 @@ function TreeTableIsland(container, props) {
     const sizeClass = size === "small" ? "p-treetable-sm" : size === "large" ? "p-treetable-lg" : "";
     const gridlinesClass = showGridlines ? "p-treetable-gridlines" : "";
     container.innerHTML = `
+            ${topControlsHtml}
             <div class="p-treetable p-component ${sizeClass} ${gridlinesClass}">
-                ${toolbarHtml}
+                ${headerHtml}
                 ${loadingMaskHtml}
                 <div class="p-treetable-scrollable-wrapper" style="${scrollStyle}">
                     <table class="p-treetable-table">
@@ -843,6 +1020,31 @@ function TreeTableIsland(container, props) {
     bindEvents();
   }
   function bindEvents() {
+    container.querySelectorAll(".p-treetable-size-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const s = btn.getAttribute("data-size");
+        if (s) {
+          size = s;
+          render();
+        }
+      });
+    });
+    container.querySelector(".p-treetable-metakey-switch")?.addEventListener("change", (e) => {
+      metaKeySelection = e.target.checked;
+    });
+    container.querySelector(".p-treetable-toggle-apps-btn")?.addEventListener("click", () => {
+      if (expandedKeys["0"]) delete expandedKeys["0"];
+      else expandedKeys["0"] = true;
+      render();
+    });
+    container.querySelector(".p-treetable-refresh-btn")?.addEventListener("click", () => {
+      isLoading = true;
+      render();
+      setTimeout(() => {
+        isLoading = false;
+        render();
+      }, 1200);
+    });
     container.querySelectorAll(".p-treetable-toggler").forEach((btn) => {
       btn.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -951,6 +1153,40 @@ function TreeTableIsland(container, props) {
         }
       });
     }
+    container.querySelector(".p-treetable-column-toggle-btn")?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      showPopover = !showPopover;
+      render();
+    });
+    container.querySelectorAll(".p-treetable-col-cb").forEach((cb) => {
+      cb.addEventListener("change", (e) => {
+        const field = cb.getAttribute("data-field");
+        if (field) {
+          if (cb.checked) {
+            if (!visibleFields.includes(field)) visibleFields.push(field);
+          } else {
+            visibleFields = visibleFields.filter((f) => f !== field);
+          }
+          render();
+        }
+      });
+    });
+    container.querySelector(".p-treetable-reset-cols-btn")?.addEventListener("click", () => {
+      visibleFields = columns.map((c) => c.field);
+      render();
+    });
+    container.querySelector(".p-treetable-empty-add-btn")?.addEventListener("click", () => {
+      rawNodes.push({
+        key: String(rawNodes.length),
+        data: { name: `New Folder ${rawNodes.length + 1}`, size: "0kb", type: "Folder" },
+        children: []
+      });
+      buildMaps(rawNodes);
+      render();
+    });
+    container.querySelector(".p-treetable-footer-reload-btn")?.addEventListener("click", () => {
+      notifyToast("info", "TreeTable Reloaded", "Refreshed node hierarchy");
+    });
   }
   function showContextMenu(x, y) {
     document.querySelectorAll(".p-treetable-contextmenu").forEach((el) => el.remove());
@@ -992,4 +1228,4 @@ function TreeTableIsland(container, props) {
 export {
   TreeTableIsland as default
 };
-//# sourceMappingURL=treetable-YODMIPSF.js.map
+//# sourceMappingURL=treetable-STGV6W5W.js.map

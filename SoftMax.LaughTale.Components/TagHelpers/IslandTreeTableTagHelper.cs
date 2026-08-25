@@ -123,6 +123,15 @@ public class IslandTreeTableTagHelper : TagHelper
     [HtmlAttributeName("custom-template")]
     public bool CustomTemplate { get; set; } = false;
 
+    [HtmlAttributeName("use-tags")]
+    public bool UseTags { get; set; } = false;
+
+    [HtmlAttributeName("use-node-icons")]
+    public bool UseNodeIcons { get; set; } = false;
+
+    [HtmlAttributeName("top-controls")]
+    public string? TopControls { get; set; }
+
     [HtmlAttributeName("hydrate")]
     public HydrateStrategy Hydrate { get; set; } = HydrateStrategy.Visible;
 
@@ -230,7 +239,10 @@ public class IslandTreeTableTagHelper : TagHelper
             contextMenu = ContextMenu,
             events = Events,
             showActions = ShowActions,
-            customTemplate = CustomTemplate
+            customTemplate = CustomTemplate,
+            useTags = UseTags,
+            useNodeIcons = UseNodeIcons,
+            topControls = TopControls
         };
 
         output.Attributes.SetAttribute("data-island", "treetable");

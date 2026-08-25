@@ -4813,8 +4813,8 @@ function TreeTableIsland(container, props) {
   let rawNodes = JSON.parse(JSON.stringify(props.value || props.nodes || []));
   let columns = props.columns ? [...props.columns] : [
     { field: "name", header: "Name", expander: true },
-    { field: "size", header: "Size", sortable: true },
-    { field: "type", header: "Type", sortable: true }
+    { field: "size", header: "Size" },
+    { field: "type", header: "Type" }
   ];
   let visibleFields = columns.map((c) => c.field);
   let size = props.size || "normal";
@@ -5050,45 +5050,84 @@ function TreeTableIsland(container, props) {
     if (currentPage >= totalPages) currentPage = Math.max(0, totalPages - 1);
     const displayedRows = isPaginator ? allVisibleRows.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage) : allVisibleRows;
     const visibleCols = columns.filter((c) => visibleFields.includes(c.field));
-    let headerHtml = "";
-    if (props.headerTitle || props.filter || columnToggle) {
-      headerHtml = `
-                <div class="p-treetable-header">
-                    ${props.headerTitle ? `<span>${props.headerTitle}</span>` : "<div></div>"}
-                    <div style="display: flex; align-items: center; gap: 0.75rem;">
-                        ${props.filter ? `
-                            <div style="position: relative; width: 220px;">
-                                <span style="position: absolute; left: 0.65rem; top: 50%; transform: translateY(-50%); color: var(--p-surface-400);">${SVG_ICONS2.search}</span>
-                                <input type="text" class="p-treetable-global-search" placeholder="Keyword search" value="${globalFilter}" style="width: 100%; padding: 0.4rem 0.65rem 0.4rem 2.2rem; font-size: 0.8125rem; border-radius: 6px; border: 1px solid var(--p-surface-300); background: var(--p-surface-0); color: var(--p-surface-900); outline: none; box-sizing: border-box;" />
-                            </div>
-                        ` : ""}
-                        ${columnToggle ? `
-                            <div style="position: relative;">
-                                <button type="button" class="p-treetable-column-toggle-btn" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.75rem; font-size: 0.8125rem; font-weight: 600; border-radius: 6px; border: 1px solid var(--p-surface-300); background: var(--p-surface-0); color: var(--p-surface-700); cursor: pointer;">
-                                    ${SVG_ICONS2.cog} Columns
-                                </button>
-                                ${showPopover ? `
-                                    <div class="p-treetable-popover">
-                                        <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 0.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid var(--p-surface-200);">
-                                            <span style="font-weight: 700; font-size: 0.8125rem;">Columns</span>
-                                            <button type="button" class="p-treetable-reset-cols-btn" style="border: none; background: transparent; color: var(--p-primary-600); cursor: pointer; font-size: 0.75rem; font-weight: 600;">Reset</button>
-                                        </div>
-                                        <div style="display: flex; flex-direction: column; gap: 0.35rem; max-height: 200px; overflow-y: auto;">
-                                            ${columns.map((col) => `
-                                                <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; cursor: pointer; padding: 0.25rem 0.4rem; border-radius: 4px;">
-                                                    <input type="checkbox" class="p-treetable-col-cb" data-field="${col.field}" ${visibleFields.includes(col.field) ? "checked" : ""} />
-                                                    <span>${col.header}</span>
-                                                </label>
-                                            `).join("")}
-                                        </div>
-                                    </div>
-                                ` : ""}
+    let topControlsHtml = "";
+    if (props.topControls === "size") {
+      topControlsHtml = `
+                <div class="p-treetable-top-controls">
+                    <div class="p-selectbutton p-button-group" style="display: inline-flex; border: 1px solid var(--p-surface-300); border-radius: 6px; overflow: hidden;">
+                        <button type="button" class="p-treetable-size-btn ${size === "small" ? "p-highlight" : ""}" data-size="small" style="padding: 0.45rem 1rem; border: none; background: ${size === "small" ? "var(--p-primary-500)" : "var(--p-surface-0)"}; color: ${size === "small" ? "#ffffff" : "var(--p-surface-700)"}; cursor: pointer; font-size: 0.8125rem; font-weight: 600;">Small</button>
+                        <button type="button" class="p-treetable-size-btn ${size === "normal" ? "p-highlight" : ""}" data-size="normal" style="padding: 0.45rem 1rem; border: none; border-left: 1px solid var(--p-surface-200); border-right: 1px solid var(--p-surface-200); background: ${size === "normal" ? "var(--p-primary-500)" : "var(--p-surface-0)"}; color: ${size === "normal" ? "#ffffff" : "var(--p-surface-700)"}; cursor: pointer; font-size: 0.8125rem; font-weight: 600;">Normal</button>
+                        <button type="button" class="p-treetable-size-btn ${size === "large" ? "p-highlight" : ""}" data-size="large" style="padding: 0.45rem 1rem; border: none; background: ${size === "large" ? "var(--p-primary-500)" : "var(--p-surface-0)"}; color: ${size === "large" ? "#ffffff" : "var(--p-surface-700)"}; cursor: pointer; font-size: 0.8125rem; font-weight: 600;">Large</button>
+                    </div>
+                </div>
+            `;
+    } else if (props.topControls === "metaKey") {
+      topControlsHtml = `
+                <div class="p-treetable-top-controls justify-center">
+                    <label style="display: inline-flex; align-items: center; gap: 0.6rem; cursor: pointer; font-size: 0.875rem; font-weight: 600; color: var(--p-surface-800);">
+                        <input type="checkbox" class="p-treetable-metakey-switch" ${metaKeySelection ? "checked" : ""} style="width: 1.25rem; height: 1.25rem; accent-color: var(--p-primary-500);" />
+                        <span>MetaKey</span>
+                    </label>
+                </div>
+            `;
+    } else if (props.topControls === "controlled") {
+      topControlsHtml = `
+                <div class="p-treetable-top-controls">
+                    <button type="button" class="p-treetable-toggle-apps-btn" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 1rem; font-size: 0.8125rem; font-weight: 600; border-radius: 6px; border: none; background: var(--p-primary-500); color: #ffffff; cursor: pointer;">
+                        Toggle Applications
+                    </button>
+                </div>
+            `;
+    } else if (props.topControls === "refresh") {
+      topControlsHtml = `
+                <div class="p-treetable-top-controls" style="justify-content: space-between;">
+                    <span style="font-size: 0.875rem; color: var(--p-surface-500);">Click refresh to simulate a network fetch.</span>
+                    <button type="button" class="p-treetable-refresh-btn" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: 6px; border: 1px solid var(--p-surface-300); background: var(--p-surface-0); color: var(--p-surface-700); cursor: pointer;">
+                        ${SVG_ICONS2.refresh} Refresh
+                    </button>
+                </div>
+            `;
+    } else if (props.filter) {
+      topControlsHtml = `
+                <div class="p-treetable-top-controls justify-end">
+                    <div style="position: relative; width: 240px;">
+                        <span style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--p-surface-400);">${SVG_ICONS2.search}</span>
+                        <input type="text" class="p-treetable-global-search" placeholder="Keyword search" value="${globalFilter}" style="width: 100%; padding: 0.45rem 0.75rem 0.45rem 2.25rem; font-size: 0.8125rem; border-radius: 6px; border: 1px solid var(--p-surface-300); background: var(--p-surface-0); color: var(--p-surface-900); outline: none; box-sizing: border-box;" />
+                    </div>
+                </div>
+            `;
+    } else if (columnToggle) {
+      topControlsHtml = `
+                <div class="p-treetable-top-controls justify-end">
+                    <div style="position: relative;">
+                        <button type="button" class="p-treetable-column-toggle-btn" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: 6px; border: 1px solid var(--p-surface-300); background: var(--p-surface-0); color: var(--p-surface-700); cursor: pointer;">
+                            ${SVG_ICONS2.cog} Columns
+                        </button>
+                        ${showPopover ? `
+                            <div class="p-treetable-popover">
+                                <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 0.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid var(--p-surface-200);">
+                                    <span style="font-weight: 700; font-size: 0.8125rem;">Columns</span>
+                                    <button type="button" class="p-treetable-reset-cols-btn" style="border: none; background: transparent; color: var(--p-primary-600); cursor: pointer; font-size: 0.75rem; font-weight: 600;">Reset</button>
+                                </div>
+                                <div style="display: flex; flex-direction: column; gap: 0.35rem; max-height: 200px; overflow-y: auto;">
+                                    ${columns.map((col) => `
+                                        <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; cursor: pointer; padding: 0.25rem 0.4rem; border-radius: 4px;">
+                                            <input type="checkbox" class="p-treetable-col-cb" data-field="${col.field}" ${visibleFields.includes(col.field) ? "checked" : ""} />
+                                            <span>${col.header}</span>
+                                        </label>
+                                    `).join("")}
+                                </div>
                             </div>
                         ` : ""}
                     </div>
                 </div>
             `;
     }
+    let headerHtml = props.headerTitle ? `
+            <div class="p-treetable-header">
+                <span>${props.headerTitle}</span>
+            </div>
+        ` : "";
     const theadHtml = `
             <thead class="p-treetable-thead">
                 <tr>
@@ -5134,7 +5173,7 @@ function TreeTableIsland(container, props) {
     if (isSkeleton && isLoading) {
       tbodyHtml = `
                 <tbody class="p-treetable-tbody">
-                    ${Array.from({ length: 5 }).map((_, r) => `
+                    ${Array.from({ length: 10 }).map((_, r) => `
                         <tr>
                             ${visibleCols.map(() => `
                                 <td><div class="p-treetable-skeleton-line" style="width: ${Math.floor(Math.random() * 40) + 50}%;"></div></td>
@@ -5180,7 +5219,7 @@ function TreeTableIsland(container, props) {
           const widthStyle = col.width ? `width: ${col.width};` : col.minWidth ? `min-width: ${col.minWidth};` : "";
           if (isExp) {
             const toggleSvg = hasChildren ? node.loading ? SVG_ICONS2.spinner : isExpanded ? SVG_ICONS2.chevronDown : SVG_ICONS2.chevronRight : "";
-            const iconSvg = getIcon(node.data.type, isExpanded);
+            const iconSvg = props.useNodeIcons ? `<span style="display: inline-flex; align-items: center; margin-right: 0.5rem; color: var(--p-surface-400);">${getIcon(node.data.type, isExpanded)}</span>` : "";
             let checkboxHtml = "";
             if (selectionMode === "checkbox") {
               checkboxHtml = `
@@ -5196,13 +5235,13 @@ function TreeTableIsland(container, props) {
                                                 ${toggleSvg}
                                             </button>
                                             ${checkboxHtml}
-                                            <span style="display: inline-flex; align-items: center; margin-right: 0.5rem; color: var(--p-surface-400);">${iconSvg}</span>
-                                            <span style="font-weight: ${hasChildren ? "600" : "400"}; color: var(--p-surface-900);">${node.data[col.field] ?? ""}</span>
+                                            ${iconSvg}
+                                            <span style="font-weight: ${hasChildren && props.useNodeIcons ? "600" : "400"}; color: var(--p-surface-900);">${node.data[col.field] ?? ""}</span>
                                         </div>
                                     </td>
                                 `;
           }
-          if (col.field === "type") {
+          if (col.field === "type" && props.useTags) {
             const typeVal = node.data.type || "Folder";
             const sev = getSeverity(typeVal);
             return `
@@ -5299,6 +5338,7 @@ function TreeTableIsland(container, props) {
     const sizeClass = size === "small" ? "p-treetable-sm" : size === "large" ? "p-treetable-lg" : "";
     const gridlinesClass = showGridlines ? "p-treetable-gridlines" : "";
     container.innerHTML = `
+            ${topControlsHtml}
             <div class="p-treetable p-component ${sizeClass} ${gridlinesClass}">
                 ${headerHtml}
                 ${loadingMaskHtml}
@@ -5315,6 +5355,31 @@ function TreeTableIsland(container, props) {
     bindEvents();
   }
   function bindEvents() {
+    container.querySelectorAll(".p-treetable-size-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const s = btn.getAttribute("data-size");
+        if (s) {
+          size = s;
+          render();
+        }
+      });
+    });
+    container.querySelector(".p-treetable-metakey-switch")?.addEventListener("change", (e) => {
+      metaKeySelection = e.target.checked;
+    });
+    container.querySelector(".p-treetable-toggle-apps-btn")?.addEventListener("click", () => {
+      if (expandedKeys["0"]) delete expandedKeys["0"];
+      else expandedKeys["0"] = true;
+      render();
+    });
+    container.querySelector(".p-treetable-refresh-btn")?.addEventListener("click", () => {
+      isLoading = true;
+      render();
+      setTimeout(() => {
+        isLoading = false;
+        render();
+      }, 1200);
+    });
     container.querySelectorAll(".p-treetable-toggler").forEach((btn) => {
       btn.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -5510,7 +5575,6 @@ var init_treetable = __esm({
     font-family: var(--p-font-family, inherit);
     box-sizing: border-box;
     width: 100%;
-    overflow: hidden;
 }
 
 .p-treetable-header {
@@ -5545,10 +5609,13 @@ var init_treetable = __esm({
 }
 
 .p-treetable-thead > tr > th {
-    background: var(--p-surface-50, #f8fafc);
+    background: var(--p-surface-0, #ffffff);
     color: var(--p-surface-700, #334155);
     padding: 0.75rem 1rem;
     border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
+    border-top: none;
+    border-left: none;
+    border-right: none;
     font-weight: 600;
     text-align: left;
     transition: background-color 0.15s ease, color 0.15s ease;
@@ -5605,6 +5672,9 @@ var init_treetable = __esm({
 .p-treetable-tbody > tr > td {
     padding: 0.75rem 1rem;
     border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
+    border-top: none;
+    border-left: none;
+    border-right: none;
     font-size: 0.875rem;
     vertical-align: middle;
     box-sizing: border-box;
@@ -5711,13 +5781,13 @@ var init_treetable = __esm({
     position: sticky;
     left: 0;
     z-index: 2;
-    background: inherit;
+    background: var(--p-surface-0, #ffffff);
 }
 .p-frozen-right {
     position: sticky;
     right: 0;
     z-index: 2;
-    background: inherit;
+    background: var(--p-surface-0, #ffffff);
 }
 
 /* Scrollable Container */
@@ -5851,6 +5921,21 @@ var init_treetable = __esm({
     padding: 0.5rem;
 }
 
+/* Top Controls Area (SelectButton, MetaKey toggle, Refresh button, Filter search) */
+.p-treetable-top-controls {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-bottom: 1rem;
+    gap: 0.75rem;
+}
+.p-treetable-top-controls.justify-end {
+    justify-content: flex-end;
+}
+.p-treetable-top-controls.justify-center {
+    justify-content: center;
+}
+
 /* Dark Mode Tokens */
 .dark .p-treetable,
 [data-theme="dark"] .p-treetable {
@@ -5872,7 +5957,7 @@ var init_treetable = __esm({
 }
 .dark .p-treetable-thead > tr > th,
 [data-theme="dark"] .p-treetable-thead > tr > th {
-    background: var(--p-surface-950, #020617) !important;
+    background: var(--p-surface-900, #0f172a) !important;
     color: var(--p-surface-200, #e2e8f0) !important;
     border-color: var(--p-surface-700, #334155) !important;
 }
@@ -5894,6 +5979,10 @@ var init_treetable = __esm({
 .dark .p-treetable-tbody > tr > td,
 [data-theme="dark"] .p-treetable-tbody > tr > td {
     border-color: var(--p-surface-700, #334155) !important;
+}
+.dark .p-frozen-left,
+.dark .p-frozen-right {
+    background: var(--p-surface-900, #0f172a) !important;
 }
 .dark .p-treetable-paginator,
 [data-theme="dark"] .p-treetable-paginator {
@@ -5944,8 +6033,7 @@ var init_treetable = __esm({
       download: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>',
       pencil: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>',
       trash: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>',
-      plus: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>',
-      bars: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>'
+      plus: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>'
     };
   }
 });

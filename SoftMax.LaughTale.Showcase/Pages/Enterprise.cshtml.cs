@@ -741,11 +741,25 @@ public class EnterpriseModel : PageModel
 
     public List<TreeNode> TransferTree3 { get; set; } = new();
 
+    public List<TreeTableColumn> TreeTableBasicColumns { get; set; } = new()
+    {
+        new("name", "Name", Expander: true, Width: "34%"),
+        new("size", "Size", Width: "33%"),
+        new("type", "Type", Width: "33%")
+    };
+
+    public List<TreeTableColumn> TreeTableSortableColumns { get; set; } = new()
+    {
+        new("name", "Name", Expander: true, Sortable: true, Width: "34%"),
+        new("size", "Size", Sortable: true, Width: "33%"),
+        new("type", "Type", Sortable: true, Width: "33%")
+    };
+
     public List<TreeTableColumn> TreeTableDefaultColumns { get; set; } = new()
     {
-        new("name", "Name", Expander: true, Sortable: true, Width: "40%"),
-        new("size", "Size", Sortable: true, Width: "30%"),
-        new("type", "Type", Sortable: true, Width: "30%")
+        new("name", "Name", Expander: true, Width: "34%"),
+        new("size", "Size", Width: "33%"),
+        new("type", "Type", Width: "33%")
     };
 
     public List<TreeTableColumn> TreeTableFrozenColumns { get; set; } = new()
