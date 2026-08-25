@@ -290,3 +290,26 @@ export interface DynamicFormSchema<TData = Record<string, any>> {
     submitLabel?: string;
     method?: 'POST' | 'PUT' | 'PATCH' | 'GET';
 }
+
+export interface TreeTableColumn {
+    field: string;
+    header: string;
+    expander?: boolean;
+    sortable?: boolean;
+    frozen?: boolean;
+    alignFrozen?: 'left' | 'right';
+    width?: string;
+    minWidth?: string;
+    filterMatchMode?: string;
+}
+
+export interface TreeTableNode<TData = any> {
+    key: string;
+    data: TData;
+    children?: TreeTableNode<TData>[];
+    leaf?: boolean;
+    expanded?: boolean;
+    selectable?: boolean;
+    loading?: boolean;
+    icon?: string;
+}

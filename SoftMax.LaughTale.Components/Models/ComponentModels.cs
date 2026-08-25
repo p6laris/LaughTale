@@ -414,3 +414,26 @@ public record SidebarItem(
     bool Expanded = true
 );
 
+
+public record TreeTableColumn(
+    string Field,
+    string Header,
+    bool Expander = false,
+    bool Sortable = false,
+    bool Frozen = false,
+    string? AlignFrozen = null,
+    string? Width = null,
+    string? MinWidth = null,
+    string? FilterMatchMode = null
+);
+
+public record TreeTableNode(
+    string Key,
+    object Data,
+    List<TreeTableNode>? Children = null,
+    bool Leaf = false,
+    bool Expanded = false,
+    bool Selectable = true,
+    bool Loading = false,
+    string? Icon = null
+);

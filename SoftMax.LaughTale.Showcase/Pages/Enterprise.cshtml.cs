@@ -741,6 +741,82 @@ public class EnterpriseModel : PageModel
 
     public List<TreeNode> TransferTree3 { get; set; } = new();
 
+    public List<TreeTableColumn> TreeTableDefaultColumns { get; set; } = new()
+    {
+        new("name", "Name", Expander: true, Sortable: true, Width: "40%"),
+        new("size", "Size", Sortable: true, Width: "30%"),
+        new("type", "Type", Sortable: true, Width: "30%")
+    };
+
+    public List<TreeTableColumn> TreeTableFrozenColumns { get; set; } = new()
+    {
+        new("name", "Name", Expander: true, Frozen: true, AlignFrozen: "left", MinWidth: "280px"),
+        new("size", "Size", MinWidth: "120px"),
+        new("type", "Type", MinWidth: "140px"),
+        new("owner", "Owner", MinWidth: "180px"),
+        new("modified", "Modified", MinWidth: "140px")
+    };
+
+    public List<TreeTableNode> TreeTableSmallNodes { get; set; } = new()
+    {
+        new("0", new { name = "Documents", size = "75kb", type = "Folder" }, new()
+        {
+            new("0-0", new { name = "Work", size = "55kb", type = "Folder" }, new()
+            {
+                new("0-0-0", new { name = "Expenses.doc", size = "30kb", type = "Document" }),
+                new("0-0-1", new { name = "Resume.doc", size = "25kb", type = "Resume" })
+            }),
+            new("0-1", new { name = "Home", size = "20kb", type = "Folder" }, new()
+            {
+                new("0-1-0", new { name = "Invoices.txt", size = "20kb", type = "Text" })
+            })
+        }),
+        new("1", new { name = "Pictures", size = "150kb", type = "Folder" }, new()
+        {
+            new("1-0", new { name = "barcelona.jpg", size = "90kb", type = "Picture" }),
+            new("1-1", new { name = "nature.png", size = "60kb", type = "Picture" })
+        }),
+        new("2", new { name = "Movies", size = "1500kb", type = "Folder" }, new()
+        {
+            new("2-0", new { name = "intro.mp4", size = "1000kb", type = "Video" }),
+            new("2-1", new { name = "tutorial.mp4", size = "500kb", type = "Video" })
+        })
+    };
+
+    public List<TreeTableNode> TreeTableFrozenNodes { get; set; } = new()
+    {
+        new("0", new { name = "Folder 1", size = "—", type = "Folder", owner = "Amy Elsner", modified = "2026-01-15" }, new()
+        {
+            new("0-0", new { name = "Document 1.1", size = "50kb", type = "Document", owner = "Amy Elsner", modified = "2026-01-20" }),
+            new("0-1", new { name = "Text 1.2", size = "163kb", type = "Text", owner = "Anna Fali", modified = "2026-02-20" }),
+            new("0-2", new { name = "Picture 1.3", size = "276kb", type = "Picture", owner = "Bernardo Dominic", modified = "2026-03-20" }),
+            new("0-3", new { name = "Video 1.4", size = "389kb", type = "Video", owner = "Ioni Bowcher", modified = "2026-04-20" })
+        }),
+        new("1", new { name = "Folder 2", size = "—", type = "Folder", owner = "Anna Fali", modified = "2026-02-15" }, new()
+        {
+            new("1-0", new { name = "Document 2.1", size = "87kb", type = "Document", owner = "Anna Fali", modified = "2026-02-20" }),
+            new("1-1", new { name = "Text 2.2", size = "200kb", type = "Text", owner = "Bernardo Dominic", modified = "2026-03-20" }),
+            new("1-2", new { name = "Picture 2.3", size = "313kb", type = "Picture", owner = "Ioni Bowcher", modified = "2026-04-20" })
+        }),
+        new("2", new { name = "Folder 3", size = "—", type = "Folder", owner = "Bernardo Dominic", modified = "2026-03-15" }, new()
+        {
+            new("2-0", new { name = "Document 3.1", size = "120kb", type = "Document", owner = "Stephen Shaw", modified = "2026-03-25" })
+        }),
+        new("3", new { name = "Folder 4", size = "—", type = "Folder", owner = "Ioni Bowcher", modified = "2026-04-15" }),
+        new("4", new { name = "Folder 5", size = "—", type = "Folder", owner = "Stephen Shaw", modified = "2026-05-15" })
+    };
+
+    public List<TreeTableNode> TreeTablePaginatorNodes { get; set; } = Enumerable.Range(0, 30).Select(i => new TreeTableNode(
+        Key: i.ToString(),
+        Data: new { name = $"Item {i}", size = $"{(i * 37 % 900) + 50}kb", type = i % 3 == 0 ? "Folder" : (i % 3 == 1 ? "Document" : "Picture") },
+        Children: new List<TreeTableNode>
+        {
+            new($"{i}-0", new { name = $"Item {i} - 0", size = $"{(i * 19 % 400) + 20}kb", type = "Text" })
+        }
+    )).ToList();
+
+    public List<TreeTableNode> TreeTableEmptyNodes { get; set; } = new();
+
     public List<SelectButtonItem> Periods { get; set; } = new()
     {
         new("Daily", "daily"),
