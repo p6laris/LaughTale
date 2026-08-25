@@ -51,14 +51,20 @@ export interface DataGridCol<TItem = any> {
 }
 
 export interface TreeNode<TData = any> {
-    id: string;
-    name: string;
-    code?: string;
+    key: string;
+    label: string;
+    id?: string;
+    name?: string;
     data?: TData;
-    children?: TreeNode<TData>[];
     icon?: string;
+    expandedIcon?: string;
+    collapsedIcon?: string;
+    children?: TreeNode<TData>[];
+    leaf?: boolean;
     expanded?: boolean;
-    selected?: boolean;
+    selectable?: boolean;
+    loading?: boolean;
+    styleClass?: string;
 }
 
 export interface SelectButtonItem<TValue = string | number | boolean> {

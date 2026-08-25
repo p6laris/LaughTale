@@ -1474,7 +1474,191 @@
         </div>
     </section>
 
-        <!-- TreeSelect -->
+        <!-- Tree -->
+    <section id="sec-tree" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>Tree</h2>
+                <p>Tree is used to display hierarchical data with expand/collapse support, custom icons, multi-mode selection, filtering, lazy loading, and drag &amp; drop.</p>
+            </div>
+            <span class="aura-tag tag-emerald">Data</span>
+        </div>
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Demo 1: Basic -->
+            <div class="demo-subcard">
+                <div class="demo-subcard-header">
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Basic</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Displays hierarchical data with expand and collapse support.</p>
+                </div>
+                <div style="max-width: 480px;">
+                    <island-tree value="@Model.DocumentsTree" />
+                </div>
+            </div>
+
+            <!-- Demo 2: Content & Toggle Indicator -->
+            <div class="demo-subcard">
+                <div class="demo-subcard-header">
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Content &amp; Toggle Indicator</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Custom node icons (Folder / FolderOpen / File) and plus/minus circle toggle indicators.</p>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+                    <div>
+                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 0.5rem 0;">Dynamic Node Icons</h4>
+                        <island-tree value="@Model.DocumentsTree" />
+                    </div>
+                    <div>
+                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 0.5rem 0;">Plus / Minus Toggle Icons</h4>
+                        <island-tree value="@Model.DocumentsTree" toggleIcon="plusMinus" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 3: Controlled (Programmatic Expansion) -->
+            <div class="demo-subcard">
+                <div class="demo-subcard-header">
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Controlled</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Tree state controlled programmatically with Expand All and Collapse All buttons.</p>
+                </div>
+                <div style="max-width: 480px;">
+                    <island-tree value="@Model.DocumentsTree" showControls="true" />
+                </div>
+            </div>
+
+            <!-- Demo 4: Selection Modes -->
+            <div class="demo-subcard">
+                <div class="demo-subcard-header">
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Selection Modes</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Single selection, multiple selection with MetaKey, and cascading tri-state checkboxes with Select All.</p>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+                    <div>
+                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 0.5rem 0;">Single Selection</h4>
+                        <island-tree value="@Model.DocumentsTree" selectionMode="single" />
+                    </div>
+                    <div>
+                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 0.5rem 0;">Multiple Selection</h4>
+                        <island-tree value="@Model.DocumentsTree" selectionMode="multiple" metaKeySelection="false" />
+                    </div>
+                    <div>
+                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 0.5rem 0;">Checkbox (Cascading Tri-State)</h4>
+                        <island-tree value="@Model.DocumentsTree" selectionMode="checkbox" />
+                    </div>
+                    <div>
+                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 0.5rem 0;">Select All Header</h4>
+                        <island-tree value="@Model.DocumentsTree" selectionMode="checkbox" showSelectAll="true" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 5: Keyboard Accessibility -->
+            <div class="demo-subcard">
+                <div class="demo-subcard-header">
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Keyboard Navigation</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Full keyboard support: Arrow keys navigate/expand/collapse, Space selects with live counter badge.</p>
+                </div>
+                <div style="max-width: 480px;">
+                    <island-tree value="@Model.DocumentsTree" selectionMode="multiple" keyboardInfo="true" />
+                </div>
+            </div>
+
+            <!-- Demo 6: Filter -->
+            <div class="demo-subcard">
+                <div class="demo-subcard-header">
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Filter</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Search filter input with real-time matching and auto-expanding matched branches.</p>
+                </div>
+                <div style="max-width: 480px;">
+                    <island-tree value="@Model.DocumentsTree" filter="true" filterPlaceholder="Search" />
+                </div>
+            </div>
+
+            <!-- Demo 7: Lazy Loading -->
+            <div class="demo-subcard">
+                <div class="demo-subcard-header">
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Lazy Loading</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Nodes loaded on demand when expanded with animated spinner.</p>
+                </div>
+                <div style="max-width: 480px;">
+                    <island-tree value="@Model.LazyTreeNodes" lazy="true" loadingMode="icon" />
+                </div>
+            </div>
+
+            <!-- Demo 8: Loading & Skeleton -->
+            <div class="demo-subcard">
+                <div class="demo-subcard-header">
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Loading States (Overlay &amp; Skeleton)</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Loading spinner overlay and skeleton animated placeholders.</p>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+                    <div>
+                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 0.5rem 0;">Overlay Spinner</h4>
+                        <island-tree value="@Model.DocumentsTree" loading="true" />
+                    </div>
+                    <div>
+                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 0.5rem 0;">Skeleton Placeholders</h4>
+                        <island-tree value="@Model.DocumentsTree" skeleton="true" loading="true" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 9: Empty State -->
+            <div class="demo-subcard">
+                <div class="demo-subcard-header">
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Empty State</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Custom placeholder with interactive creator button when there are no nodes to display.</p>
+                </div>
+                <div style="max-width: 480px;">
+                    <island-tree value="@Model.EmptyTreeNodes" />
+                </div>
+            </div>
+
+            <!-- Demo 10: Drag & Drop (Single Tree) -->
+            <div class="demo-subcard">
+                <div class="demo-subcard-header">
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Drag &amp; Drop (Single Tree)</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Drag and drop based reordering and nesting within the tree structure.</p>
+                </div>
+                <div style="max-width: 480px;">
+                    <island-tree value="@Model.FilesystemTree" draggableNodes="true" droppableNodes="true" />
+                </div>
+            </div>
+
+            <!-- Demo 11: Drag & Drop (Multiple Trees Transfer) -->
+            <div class="demo-subcard">
+                <div class="demo-subcard-header">
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Drag &amp; Drop (Multiple Trees Transfer)</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Transfer nodes between multiple scoped trees (Tree 1 → Tree 2 → Tree 3).</p>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
+                    <div>
+                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 0.5rem 0;">Source (Scope: First)</h4>
+                        <island-tree value="@Model.TransferTree1" draggableNodes="true" droppableNodes="true" draggableScope="first" droppableScope="none" />
+                    </div>
+                    <div>
+                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 0.5rem 0;">Intermediate (Accepts: First)</h4>
+                        <island-tree value="@Model.TransferTree2" draggableNodes="true" droppableNodes="true" draggableScope="second" droppableScope="first" />
+                    </div>
+                    <div>
+                        <h4 style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-600); margin: 0 0 0.5rem 0;">Target (Accepts: First &amp; Second)</h4>
+                        <island-tree value="@Model.TransferTree3" draggableNodes="true" droppableNodes="true" droppableScope='new[] { "first", "second" }' />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 12: Events -->
+            <div class="demo-subcard">
+                <div class="demo-subcard-header">
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-900); margin: 0;">Events</h3>
+                    <p style="font-size: 0.8125rem; color: var(--p-surface-500); margin: 0.25rem 0 0 0;">Event toasts triggered on node select, unselect, expand, and collapse.</p>
+                </div>
+                <div style="max-width: 480px;">
+                    <island-tree value="@Model.DocumentsTree" selectionMode="single" events="true" />
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TreeSelect -->
     <section id="sec-treeselect" class="component-card">
         <div class="card-header">
             <div>

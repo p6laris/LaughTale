@@ -78,11 +78,29 @@ public record TreeNode<TData>(
 );
 
 public record TreeNode(
-    string Id,
-    string Name,
-    string? Code = null,
-    List<TreeNode>? Children = null
-);
+    string Key,
+    string Label,
+    string? Data = null,
+    string? Icon = null,
+    string? ExpandedIcon = null,
+    string? CollapsedIcon = null,
+    List<TreeNode>? Children = null,
+    bool Leaf = false,
+    bool Expanded = false,
+    bool Selectable = true,
+    bool Loading = false,
+    string? StyleClass = null
+)
+{
+    public string Id => Key;
+    public string Name => Label;
+    public string? Code => Data;
+
+    public TreeNode(string id, string name, string? code, List<TreeNode>? children)
+        : this(Key: id, Label: name, Data: code, Children: children, Leaf: children == null || children.Count == 0)
+    {
+    }
+}
 
 public record SelectButtonItem<TValue>(
     string Label,

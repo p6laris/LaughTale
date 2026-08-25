@@ -25,6 +25,7 @@ defineIsland('stepper', () => import('./components/stepper'));
 defineIsland('timeline', () => import('./components/timeline'));
 defineIsland('camera', () => import('./components/camera'));
 defineIsland('dropzone', () => import('./components/dropzone'));
+defineIsland('tree', () => import('./components/tree'));
 defineIsland('tree-select', () => import('./components/tree-select'));
 defineIsland('datatable', () => import('./components/datatable'));
 defineIsland('datagrid', () => import('./components/datatable'));

@@ -653,6 +653,94 @@ public class EnterpriseModel : PageModel
         })
     };
 
+    public List<TreeNode> FilesystemTree { get; set; } = new()
+    {
+        new("0", ".github", "github folder", "folder", Children: new()
+        {
+            new("0-0", "workflows", "workflows folder", "folder", Children: new()
+            {
+                new("0-0-0", "node.js.yml", "node.js.yml file", "file")
+            })
+        }),
+        new("1", ".vscode", "vscode folder", "folder", Children: new()
+        {
+            new("1-0", "extensions.json", "extensions.json file", "file")
+        }),
+        new("2", "public", "public folder", "folder", Children: new()
+        {
+            new("2-0", "vite.svg", "vite.svg file", "file")
+        }),
+        new("3", "src", "src folder", "folder", Children: new()
+        {
+            new("3-0", "assets", "assets folder", "folder", Children: new()
+            {
+                new("3-0-0", "vue.svg", "vue.svg file", "file")
+            }),
+            new("3-1", "components", "components folder", "folder", Children: new()
+            {
+                new("3-1-0", "HelloWorld.vue", "HelloWorld.vue file", "file")
+            }),
+            new("3-2", "App.vue", "App.vue file", "file"),
+            new("3-3", "main.js", "main.js file", "file"),
+            new("3-4", "style.css", "style.css file", "file")
+        }),
+        new("4", "index.html", "index.html file", "file"),
+        new("5", "package.json", "package.json file", "file"),
+        new("6", "vite.config.js", "vite.config.js file", "file")
+    };
+
+    public List<TreeNode> LazyTreeNodes { get; set; } = new()
+    {
+        new("0", "Node 0", Leaf: false),
+        new("1", "Node 1", Leaf: false),
+        new("2", "Node 2", Leaf: false)
+    };
+
+    public List<TreeNode> EmptyTreeNodes { get; set; } = new();
+
+    public List<TreeNode> TransferTree1 { get; set; } = new()
+    {
+        new("0-0", ".github", "github folder", "folder", Children: new()
+        {
+            new("0-0-0", "workflows", "workflows folder", "folder", Children: new()
+            {
+                new("0-0-0-0", "node.js.yml", "node.js.yml file", "file")
+            })
+        }),
+        new("0-1", ".vscode", "vscode folder", "folder", Children: new()
+        {
+            new("0-1-0", "extensions.json", "extensions.json file", "file")
+        }),
+        new("0-2", "public", "public folder", "folder", Children: new()
+        {
+            new("0-2-0", "vite.svg", "vite.svg file", "file")
+        }),
+        new("0-3", "src", "src folder", "folder", Children: new()
+        {
+            new("0-3-0", "assets", "assets folder", "folder", Children: new()
+            {
+                new("0-3-0-0", "vue.svg", "vue.svg file", "file")
+            }),
+            new("0-3-1", "components", "components folder", "folder", Children: new()
+            {
+                new("0-3-1-0", "HelloWorld.vue", "HelloWorld.vue file", "file")
+            }),
+            new("0-3-2", "App.vue", "App.vue file", "file"),
+            new("0-3-3", "main.js", "main.js file", "file"),
+            new("0-3-4", "style.css", "style.css file", "file")
+        }),
+        new("0-4", "index.html", "index.html file", "file"),
+        new("0-5", "package.json", "package.json file", "file"),
+        new("0-6", "vite.config.js", "vite.config.js file", "file")
+    };
+
+    public List<TreeNode> TransferTree2 { get; set; } = new()
+    {
+        new("1-0", "/etc", Icon: "folder")
+    };
+
+    public List<TreeNode> TransferTree3 { get; set; } = new();
+
     public List<SelectButtonItem> Periods { get; set; } = new()
     {
         new("Daily", "daily"),
