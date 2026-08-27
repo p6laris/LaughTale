@@ -3329,6 +3329,213 @@
         </div>
     </section>
 
+    <!-- Panel -->
+    <section id="sec-panel" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>Panel</h2>
+                <p>Panel is a container component with an optional content toggle feature and customizable header/footer templates.</p>
+            </div>
+            <span class="aura-tag tag-blue">Panels</span>
+        </div>
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Demo 1: Basic -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">A simple Panel is created with a header property along with the content as children.</p>
+                <div style="display: flex; justify-content: center;">
+                    <island-panel header="Order Summary" style="max-width: 22rem; width: 100%;">
+                        <div style="display: flex; flex-direction: column; font-size: 0.875rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="color: var(--p-text-muted);">Wireless Headphones</span>
+                                <span style="color: var(--p-text-color); font-weight: 500;">$79.00</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem;">
+                                <span style="color: var(--p-text-muted);">Phone Case</span>
+                                <span style="color: var(--p-text-color); font-weight: 500;">$15.00</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem;">
+                                <span style="color: var(--p-text-muted);">Shipping</span>
+                                <span style="color: var(--p-text-color); font-weight: 500;">$5.99</span>
+                            </div>
+                            <island-divider></island-divider>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="color: var(--p-text-color); font-weight: 600;">Total</span>
+                                <span style="color: var(--p-text-color); font-weight: 600;">$99.99</span>
+                            </div>
+                        </div>
+                    </island-panel>
+                </div>
+            </div>
+
+            <!-- Demo 2: Toggleable -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Toggleable</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Content of the panel can be expanded and collapsed using the toggleable property.</p>
+                <div style="display: flex; justify-content: center;">
+                    <island-panel header="Order Summary" toggleable="true" style="max-width: 22rem; width: 100%;">
+                        <div style="display: flex; flex-direction: column; font-size: 0.875rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="color: var(--p-text-muted);">Wireless Headphones</span>
+                                <span style="color: var(--p-text-color); font-weight: 500;">$79.00</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem;">
+                                <span style="color: var(--p-text-muted);">Phone Case</span>
+                                <span style="color: var(--p-text-color); font-weight: 500;">$15.00</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem;">
+                                <span style="color: var(--p-text-muted);">Shipping</span>
+                                <span style="color: var(--p-text-color); font-weight: 500;">$5.99</span>
+                            </div>
+                            <island-divider></island-divider>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="color: var(--p-text-color); font-weight: 600;">Total</span>
+                                <span style="color: var(--p-text-color); font-weight: 600;">$99.99</span>
+                            </div>
+                        </div>
+                    </island-panel>
+                </div>
+            </div>
+
+            <!-- Demo 3: Controlled -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Controlled</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">The collapsed property controls the open state programmatically via Open and Close buttons.</p>
+                <div style="display: flex; justify-content: center;">
+                    <div style="max-width: 22rem; width: 100%;">
+                        <island-panel header="Order Summary" toggleable="true" controlled="true">
+                            <div style="display: flex; flex-direction: column; font-size: 0.875rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="color: var(--p-text-muted);">Wireless Headphones</span>
+                                    <span style="color: var(--p-text-color); font-weight: 500;">$79.00</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem;">
+                                    <span style="color: var(--p-text-muted);">Phone Case</span>
+                                    <span style="color: var(--p-text-color); font-weight: 500;">$15.00</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem;">
+                                    <span style="color: var(--p-text-muted);">Shipping</span>
+                                    <span style="color: var(--p-text-color); font-weight: 500;">$5.99</span>
+                                </div>
+                                <island-divider></island-divider>
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="color: var(--p-text-color); font-weight: 600;">Total</span>
+                                    <span style="color: var(--p-text-color); font-weight: 600;">$99.99</span>
+                                </div>
+                            </div>
+                        </island-panel>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 4: Indicator -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Indicator</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">The toggle icon customizes the indicator, switching between open/closed glyphs or rotating via CSS.</p>
+                <div style="display: flex; flex-direction: column; gap: 1.5rem; max-width: 22rem; margin: 0 auto; width: 100%;">
+                    <div>
+                        <h4 style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-muted); margin-bottom: 0.5rem;">Match open / closed</h4>
+                        <island-panel header="Order Summary" toggleable="true" toggle-icon="plusMinus">
+                            <div style="display: flex; flex-direction: column; font-size: 0.875rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="color: var(--p-text-muted);">Wireless Headphones</span>
+                                    <span style="color: var(--p-text-color); font-weight: 500;">$79.00</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem;">
+                                    <span style="color: var(--p-text-muted);">Phone Case</span>
+                                    <span style="color: var(--p-text-color); font-weight: 500;">$15.00</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem;">
+                                    <span style="color: var(--p-text-muted);">Shipping</span>
+                                    <span style="color: var(--p-text-color); font-weight: 500;">$5.99</span>
+                                </div>
+                                <island-divider></island-divider>
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="color: var(--p-text-color); font-weight: 600;">Total</span>
+                                    <span style="color: var(--p-text-color); font-weight: 600;">$99.99</span>
+                                </div>
+                            </div>
+                        </island-panel>
+                    </div>
+                    <div>
+                        <h4 style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-muted); margin-bottom: 0.5rem;">CSS-only with data attributes</h4>
+                        <island-panel header="Order Summary" toggleable="true" toggle-icon="chevron">
+                            <div style="display: flex; flex-direction: column; font-size: 0.875rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="color: var(--p-text-muted);">Wireless Headphones</span>
+                                    <span style="color: var(--p-text-color); font-weight: 500;">$79.00</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem;">
+                                    <span style="color: var(--p-text-muted);">Phone Case</span>
+                                    <span style="color: var(--p-text-color); font-weight: 500;">$15.00</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem;">
+                                    <span style="color: var(--p-text-muted);">Shipping</span>
+                                    <span style="color: var(--p-text-color); font-weight: 500;">$5.99</span>
+                                </div>
+                                <island-divider></island-divider>
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="color: var(--p-text-color); font-weight: 600;">Total</span>
+                                    <span style="color: var(--p-text-color); font-weight: 600;">$99.99</span>
+                                </div>
+                            </div>
+                        </island-panel>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 5: Template -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Template</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Header and footer sections can be customized using header and footer templates.</p>
+                <div style="display: flex; justify-content: center;">
+                    <div style="max-width: 24rem; width: 100%;">
+                        <div class="p-panel p-component p-panel-chevron-indicator" data-island="panel" data-hydrate="load" data-props='{"toggleable":true,"toggleIcon":"chevron"}'>
+                            <div class="p-panel-header" style="padding: 1rem 1.25rem;">
+                                <div style="display: flex; align-items: center; gap: 0.6rem;">
+                                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=120&auto=format&fit=crop" style="width: 2rem; height: 2rem; border-radius: 9999px; object-fit: cover;" alt="Amy Elsner" />
+                                    <span style="font-weight: 700; font-size: 0.9375rem; color: var(--p-text-color);">Amy Elsner</span>
+                                </div>
+                                <div class="p-panel-icons">
+                                    <button type="button" style="border: none; background: transparent; color: var(--p-text-muted); cursor: pointer; padding: 0.35rem; display: inline-flex; align-items: center; border-radius: 9999px;">
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    </button>
+                                    <button type="button" class="p-panel-toggle-button" aria-label="Toggle Panel" aria-expanded="true">
+                                        <span class="p-panel-toggle-icon">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                                        </span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="p-panel-content-container">
+                                <div class="p-panel-content-wrapper">
+                                    <div class="p-panel-content">
+                                        <p style="margin: 0; font-size: 0.875rem; color: var(--p-surface-700); line-height: 1.6;">
+                                            Product designer focused on accessible interfaces, scalable design systems and modern frontend workflows. Passionate about creating intuitive user experiences that balance usability, consistency and performance across platforms. Currently exploring AI-assisted UI tooling, component architecture and developer experience improvements to streamline design-to-development collaboration and build more maintainable products.
+                                        </p>
+                                    </div>
+                                    <div class="p-panel-footer">
+                                        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+                                            <div style="display: flex; align-items: center; gap: 0.25rem;">
+                                                <button type="button" style="border: none; background: transparent; color: var(--p-surface-600); cursor: pointer; padding: 0.35rem; display: inline-flex; align-items: center; border-radius: 9999px;">
+                                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                                </button>
+                                                <button type="button" style="border: none; background: transparent; color: var(--p-surface-600); cursor: pointer; padding: 0.35rem; display: inline-flex; align-items: center; border-radius: 9999px;">
+                                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>
+                                                </button>
+                                            </div>
+                                            <span style="font-size: 0.8125rem; color: var(--p-text-muted);">Updated 2 hours ago</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Accordion -->
     <section id="sec-accordion" class="component-card">
         <div class="card-header">

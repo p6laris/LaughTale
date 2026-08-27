@@ -657,6 +657,141 @@ public class IslandFieldsetTagHelper : TagHelper
 
 #endregion
 
+#region 2d. Panel Primitives
+
+/// <summary>
+/// Enterprise Panel TagHelper (Aura Design System compliant)
+/// </summary>
+[HtmlTargetElement("island-panel", TagStructure = TagStructure.NormalOrSelfClosing)]
+[HtmlTargetElement("p-panel", TagStructure = TagStructure.NormalOrSelfClosing)]
+public class IslandPanelTagHelper : TagHelper
+{
+    [HtmlAttributeName("header")]
+    public string? Header { get; set; }
+
+    [HtmlAttributeName("toggleable")]
+    public bool Toggleable { get; set; } = false;
+
+    [HtmlAttributeName("collapsed")]
+    public bool Collapsed { get; set; } = false;
+
+    [HtmlAttributeName("controlled")]
+    public bool Controlled { get; set; } = false;
+
+    [HtmlAttributeName("toggle-icon")]
+    public string ToggleIcon { get; set; } = "chevron";
+
+    [HtmlAttributeName("class")]
+    public string? Class { get; set; }
+
+    [HtmlAttributeName("style")]
+    public string? Style { get; set; }
+
+    [HtmlAttributeName("hydrate")]
+    public HydrateStrategy Hydrate { get; set; } = HydrateStrategy.Load;
+
+    public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
+    {
+        var childContent = await output.GetChildContentAsync();
+        var contentStr = childContent.GetContent();
+
+        var isCollapsed = Collapsed;
+        var toggleIconType = ToggleIcon ?? "chevron";
+        var uid = Guid.NewGuid().ToString("N")[..8];
+        var headerId = $"panel_header_{uid}";
+        var contentId = $"panel_content_{uid}";
+
+        var initialIconSvg = toggleIconType == "plusMinus"
+            ? (isCollapsed 
+                ? "<svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 5v14\"/><path d=\"M5 12h14\"/></svg>" 
+                : "<svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M5 12h14\"/></svg>")
+            : "<svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m6 9 6 6 6-6\"/></svg>";
+
+        var indicatorClass = toggleIconType == "chevron" ? "p-panel-chevron-indicator" : "";
+        var collapsedClass = isCollapsed ? "p-panel-collapsed" : "";
+
+        var headerHtml = "";
+        if (!string.IsNullOrWhiteSpace(Header))
+        {
+            var toggleBtnHtml = Toggleable ? $@"<div class=""p-panel-icons"">
+                <button type=""button"" class=""p-panel-toggle-button"" aria-label=""{Header}"" aria-controls=""{contentId}"" aria-expanded=""{(isCollapsed ? "false" : "true")}"" tabindex=""0"">
+                    <span class=""p-panel-toggle-icon"">{initialIconSvg}</span>
+                </button>
+            </div>" : "";
+
+            headerHtml = $@"<div class=""p-panel-header"">
+                <span class=""p-panel-title"" id=""{headerId}"">{Header}</span>
+                {toggleBtnHtml}
+            </div>";
+        }
+
+        var topControlsHtml = "";
+        if (Controlled)
+        {
+            topControlsHtml = $@"<div class=""p-panel-top-controls"">
+                <button type=""button"" class=""p-panel-ctrl-btn {(!isCollapsed ? "p-highlight" : "")}"" data-action=""open"">Open</button>
+                <button type=""button"" class=""p-panel-ctrl-btn {(isCollapsed ? "p-highlight" : "")}"" data-action=""close"">Close</button>
+            </div>";
+        }
+
+        var panelHtml = $@"<div class=""p-panel p-component {indicatorClass} {collapsedClass}"">
+            {headerHtml}
+            <div class=""p-panel-content-container"" id=""{contentId}"" role=""region"" aria-labelledby=""{headerId}"">
+                <div class=""p-panel-content-wrapper"">
+                    <div class=""p-panel-content"">
+                        {contentStr}
+                    </div>
+                </div>
+            </div>
+        </div>";
+
+        if (Toggleable || Controlled)
+        {
+            output.TagName = "div";
+            output.TagMode = TagMode.StartTagAndEndTag;
+            output.Attributes.SetAttribute("data-island", "panel");
+            output.Attributes.SetAttribute("data-hydrate", Hydrate.ToString().ToLowerInvariant());
+
+            var props = new
+            {
+                header = Header,
+                toggleable = Toggleable,
+                collapsed = Collapsed,
+                controlled = Controlled,
+                toggleIcon = ToggleIcon
+            };
+            output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
+            
+            var classes = new List<string>();
+            if (!string.IsNullOrWhiteSpace(Class)) classes.Add(Class);
+            if (classes.Count > 0) output.Attributes.SetAttribute("class", string.Join(" ", classes));
+            if (!string.IsNullOrWhiteSpace(Style)) output.Attributes.SetAttribute("style", Style);
+
+            output.Content.SetHtmlContent(topControlsHtml + panelHtml);
+        }
+        else
+        {
+            output.TagName = "div";
+            output.TagMode = TagMode.StartTagAndEndTag;
+            var classes = new List<string> { "p-panel", "p-component" };
+            if (!string.IsNullOrWhiteSpace(Class)) classes.Add(Class);
+            output.Attributes.SetAttribute("class", string.Join(" ", classes));
+            if (!string.IsNullOrWhiteSpace(Style)) output.Attributes.SetAttribute("style", Style);
+
+            output.Content.SetHtmlContent($@"{headerHtml}
+            <div class=""p-panel-content-container"" id=""{contentId}"" role=""region"" aria-labelledby=""{headerId}"">
+                <div class=""p-panel-content-wrapper"">
+                    <div class=""p-panel-content"">
+                        {contentStr}
+                    </div>
+                </div>
+            </div>");
+        }
+    }
+}
+
+#endregion
+
 #region 3. Button Primitive
 
 /// <summary>
