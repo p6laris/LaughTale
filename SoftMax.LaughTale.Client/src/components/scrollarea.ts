@@ -264,19 +264,40 @@ export default function ScrollAreaIsland(container: HTMLElement, props: ScrollAr
     }
 
     // Handle interactive variant selector buttons in demo
-    const searchScope = container.parentElement || container;
-    const variantButtons = searchScope.querySelectorAll<HTMLButtonElement>('[data-scrollarea-variant]');
-    if (variantButtons.length > 0) {
-        variantButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
+    // Search up to the demo card container
+    let cardScope = container.closest('.component-card') || container.parentElement?.parentElement?.parentElement || document;
+    
+    function applyVariant(variant: string, clickedBtn?: HTMLElement) {
+        rootEl.setAttribute('data-p-variant', variant);
+        if (cardScope) {
+            cardScope.querySelectorAll<HTMLButtonElement>('[data-scrollarea-variant]').forEach(b => {
+                const bVar = b.getAttribute('data-scrollarea-variant');
+                b.classList.toggle('p-highlight', bVar === variant);
+            });
+        }
+        updateScrollbars();
+    }
+
+    if (cardScope) {
+        cardScope.querySelectorAll<HTMLButtonElement>('[data-scrollarea-variant]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
                 const selectedVariant = btn.getAttribute('data-scrollarea-variant') || 'auto';
-                rootEl.setAttribute('data-p-variant', selectedVariant);
-                variantButtons.forEach(b => b.classList.remove('p-highlight'));
-                btn.classList.add('p-highlight');
-                updateScrollbars();
+                applyVariant(selectedVariant, btn);
             });
         });
     }
+
+    // Global document click delegator as absolute fallback
+    document.addEventListener('click', (e) => {
+        const btn = (e.target as HTMLElement)?.closest<HTMLButtonElement>('[data-scrollarea-variant]');
+        if (!btn) return;
+        const demoRow = btn.closest('div[style*="padding"]') || btn.closest('.component-card');
+        if (demoRow && demoRow.contains(rootEl)) {
+            const selectedVariant = btn.getAttribute('data-scrollarea-variant') || 'auto';
+            applyVariant(selectedVariant, btn);
+        }
+    });
 
     // Observe size changes
     const resizeObserver = new ResizeObserver(() => {

@@ -14331,19 +14331,35 @@ var SoftMaxIslands = (() => {
       hHandle.addEventListener("pointerup", stopDrag);
       hHandle.addEventListener("pointercancel", stopDrag);
     }
-    const searchScope = container.parentElement || container;
-    const variantButtons = searchScope.querySelectorAll("[data-scrollarea-variant]");
-    if (variantButtons.length > 0) {
-      variantButtons.forEach((btn) => {
-        btn.addEventListener("click", () => {
+    let cardScope = container.closest(".component-card") || container.parentElement?.parentElement?.parentElement || document;
+    function applyVariant(variant, clickedBtn) {
+      rootEl.setAttribute("data-p-variant", variant);
+      if (cardScope) {
+        cardScope.querySelectorAll("[data-scrollarea-variant]").forEach((b) => {
+          const bVar = b.getAttribute("data-scrollarea-variant");
+          b.classList.toggle("p-highlight", bVar === variant);
+        });
+      }
+      updateScrollbars();
+    }
+    if (cardScope) {
+      cardScope.querySelectorAll("[data-scrollarea-variant]").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          e.preventDefault();
           const selectedVariant = btn.getAttribute("data-scrollarea-variant") || "auto";
-          rootEl.setAttribute("data-p-variant", selectedVariant);
-          variantButtons.forEach((b) => b.classList.remove("p-highlight"));
-          btn.classList.add("p-highlight");
-          updateScrollbars();
+          applyVariant(selectedVariant, btn);
         });
       });
     }
+    document.addEventListener("click", (e) => {
+      const btn = e.target?.closest("[data-scrollarea-variant]");
+      if (!btn) return;
+      const demoRow = btn.closest('div[style*="padding"]') || btn.closest(".component-card");
+      if (demoRow && demoRow.contains(rootEl)) {
+        const selectedVariant = btn.getAttribute("data-scrollarea-variant") || "auto";
+        applyVariant(selectedVariant, btn);
+      }
+    });
     const resizeObserver = new ResizeObserver(() => {
       updateScrollbars();
     });
