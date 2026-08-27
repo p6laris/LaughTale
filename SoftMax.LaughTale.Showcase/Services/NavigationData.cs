@@ -64,6 +64,7 @@ public static class NavigationData
                 new("OrgChart Hierarchy", "folderTree", "/enterprise#sec-orgchart"),
                 new("Card", "layers", "/enterprise#sec-card", false, null, "New"),
                 new("Divider", "columns3", "/enterprise#sec-divider", false, null, "New"),
+                new("Fieldset", "layoutGrid", "/enterprise#sec-fieldset", false, null, "New"),
                 new("Accordion", "folderTree", "/enterprise#sec-accordion"),
                 new("Sliding Tabs", "columns3", "/enterprise#sec-tabs"),
                 new("Timeline", "activity", "/enterprise#sec-timeline")

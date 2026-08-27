@@ -3192,6 +3192,143 @@
         </div>
     </section>
 
+    <!-- Fieldset -->
+    <section id="sec-fieldset" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>Fieldset</h2>
+                <p>Fieldset is a grouping container component with a collapsible content toggle feature and smooth animations.</p>
+            </div>
+            <span class="aura-tag tag-emerald">Panels</span>
+        </div>
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Demo 1: Basic -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">A simple Fieldset is created with a legend property along with the content as children.</p>
+                <div style="display: flex; justify-content: center;">
+                    <island-fieldset legend="Invoice #1024" style="max-width: 22rem; width: 100%;">
+                        <div style="display: flex; flex-direction: column; font-size: 0.875rem; padding: 0.25rem 0;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="color: var(--p-text-color);">Design Service</span>
+                                <span style="color: var(--p-text-muted);">$120.00</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem;">
+                                <span style="color: var(--p-text-color);">Hosting</span>
+                                <span style="color: var(--p-text-muted);">$30.00</span>
+                            </div>
+                            <island-divider></island-divider>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="color: var(--p-text-color); font-weight: 600;">Total</span>
+                                <span style="color: var(--p-text-color); font-weight: 600;">$150.00</span>
+                            </div>
+                        </div>
+                    </island-fieldset>
+                </div>
+            </div>
+
+            <!-- Demo 2: Toggleable -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Toggleable</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Content of the fieldset can be expanded and collapsed using the toggleable property.</p>
+                <div style="display: flex; justify-content: center;">
+                    <island-fieldset legend="Invoice #1024" toggleable="true" style="max-width: 22rem; width: 100%;">
+                        <div style="display: flex; flex-direction: column; font-size: 0.875rem; padding: 0.25rem 0;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="color: var(--p-text-color);">Design Service</span>
+                                <span style="color: var(--p-text-muted);">$120.00</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem;">
+                                <span style="color: var(--p-text-color);">Hosting</span>
+                                <span style="color: var(--p-text-muted);">$30.00</span>
+                            </div>
+                            <island-divider></island-divider>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="color: var(--p-text-color); font-weight: 600;">Total</span>
+                                <span style="color: var(--p-text-color); font-weight: 600;">$150.00</span>
+                            </div>
+                        </div>
+                    </island-fieldset>
+                </div>
+            </div>
+
+            <!-- Demo 3: Controlled -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Controlled</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">The collapsed property controls the open state programmatically via Open and Close buttons.</p>
+                <div style="display: flex; justify-content: center;">
+                    <div style="max-width: 22rem; width: 100%;">
+                        <island-fieldset legend="Invoice #1024" toggleable="true" controlled="true">
+                            <div style="display: flex; flex-direction: column; font-size: 0.875rem; padding: 0.25rem 0;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="color: var(--p-text-color);">Design Service</span>
+                                    <span style="color: var(--p-text-muted);">$120.00</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem;">
+                                    <span style="color: var(--p-text-color);">Hosting</span>
+                                    <span style="color: var(--p-text-muted);">$30.00</span>
+                                </div>
+                                <island-divider></island-divider>
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="color: var(--p-text-color); font-weight: 600;">Total</span>
+                                    <span style="color: var(--p-text-color); font-weight: 600;">$150.00</span>
+                                </div>
+                            </div>
+                        </island-fieldset>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 4: Indicator -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Indicator</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">The toggle icon customizes the indicator, switching between open/closed glyphs or rotating via CSS.</p>
+                <div style="display: flex; flex-direction: column; gap: 1.5rem; max-width: 22rem; margin: 0 auto; width: 100%;">
+                    <div>
+                        <h4 style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-muted); margin-bottom: 0.5rem;">Match open / closed</h4>
+                        <island-fieldset legend="Invoice #1024" toggleable="true" toggle-icon="plusMinus">
+                            <div style="display: flex; flex-direction: column; font-size: 0.875rem; padding: 0.25rem 0;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="color: var(--p-text-color);">Design Service</span>
+                                    <span style="color: var(--p-text-muted);">$120.00</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem;">
+                                    <span style="color: var(--p-text-color);">Hosting</span>
+                                    <span style="color: var(--p-text-muted);">$30.00</span>
+                                </div>
+                                <island-divider></island-divider>
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="color: var(--p-text-color); font-weight: 600;">Total</span>
+                                    <span style="color: var(--p-text-color); font-weight: 600;">$150.00</span>
+                                </div>
+                            </div>
+                        </island-fieldset>
+                    </div>
+                    <div>
+                        <h4 style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-muted); margin-bottom: 0.5rem;">CSS-only with data attributes</h4>
+                        <island-fieldset legend="Invoice #1024" toggleable="true" toggle-icon="chevron">
+                            <div style="display: flex; flex-direction: column; font-size: 0.875rem; padding: 0.25rem 0;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="color: var(--p-text-color);">Design Service</span>
+                                    <span style="color: var(--p-text-muted);">$120.00</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem;">
+                                    <span style="color: var(--p-text-color);">Hosting</span>
+                                    <span style="color: var(--p-text-muted);">$30.00</span>
+                                </div>
+                                <island-divider></island-divider>
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="color: var(--p-text-color); font-weight: 600;">Total</span>
+                                    <span style="color: var(--p-text-color); font-weight: 600;">$150.00</span>
+                                </div>
+                            </div>
+                        </island-fieldset>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Accordion -->
     <section id="sec-accordion" class="component-card">
         <div class="card-header">

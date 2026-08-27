@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using SoftMax.LaughTale.Components.Enums;
 using SoftMax.LaughTale.Components.Icons;
+using SoftMax.LaughTale.Core.Enums;
+using SoftMax.LaughTale.Core.Serialization;
 
 namespace SoftMax.LaughTale.Components.TagHelpers;
 
@@ -508,6 +510,147 @@ public class IslandDividerTagHelper : TagHelper
         else
         {
             output.Content.SetHtmlContent(string.Empty);
+        }
+    }
+}
+
+#endregion
+
+#region 2c. Fieldset Primitives
+
+/// <summary>
+/// Enterprise Fieldset TagHelper (Aura Design System compliant)
+/// </summary>
+[HtmlTargetElement("island-fieldset", TagStructure = TagStructure.NormalOrSelfClosing)]
+[HtmlTargetElement("p-fieldset", TagStructure = TagStructure.NormalOrSelfClosing)]
+public class IslandFieldsetTagHelper : TagHelper
+{
+    [HtmlAttributeName("legend")]
+    public string? Legend { get; set; }
+
+    [HtmlAttributeName("toggleable")]
+    public bool Toggleable { get; set; } = false;
+
+    [HtmlAttributeName("collapsed")]
+    public bool Collapsed { get; set; } = false;
+
+    [HtmlAttributeName("controlled")]
+    public bool Controlled { get; set; } = false;
+
+    [HtmlAttributeName("toggle-icon")]
+    public string ToggleIcon { get; set; } = "plusMinus";
+
+    [HtmlAttributeName("class")]
+    public string? Class { get; set; }
+
+    [HtmlAttributeName("style")]
+    public string? Style { get; set; }
+
+    [HtmlAttributeName("hydrate")]
+    public HydrateStrategy Hydrate { get; set; } = HydrateStrategy.Load;
+
+    public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
+    {
+        var childContent = await output.GetChildContentAsync();
+        var contentStr = childContent.GetContent();
+
+        var isCollapsed = Collapsed;
+        var toggleIconType = ToggleIcon ?? "plusMinus";
+        var uid = Guid.NewGuid().ToString("N")[..8];
+        var headerId = $"fieldset_header_{uid}";
+        var contentId = $"fieldset_content_{uid}";
+
+        var initialIconSvg = toggleIconType == "chevron"
+            ? "<svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m6 9 6 6 6-6\"/></svg>"
+            : (isCollapsed 
+                ? "<svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 5v14\"/><path d=\"M5 12h14\"/></svg>" 
+                : "<svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M5 12h14\"/></svg>");
+
+        var indicatorClass = toggleIconType == "chevron" ? "p-fieldset-chevron-indicator" : "";
+        var collapsedClass = isCollapsed ? "p-fieldset-collapsed" : "";
+
+        var legendHtml = "";
+        if (!string.IsNullOrWhiteSpace(Legend))
+        {
+            if (Toggleable)
+            {
+                legendHtml = $@"<legend class=""p-fieldset-legend"">
+                    <a class=""p-fieldset-toggle-button"" id=""{headerId}"" role=""button"" aria-controls=""{contentId}"" aria-expanded=""{(isCollapsed ? "false" : "true")}"" tabindex=""0"">
+                        <span class=""p-fieldset-toggle-icon"">{initialIconSvg}</span>
+                        <span class=""p-fieldset-legend-label"">{Legend}</span>
+                    </a>
+                </legend>";
+            }
+            else
+            {
+                legendHtml = $@"<legend class=""p-fieldset-legend"">
+                    <span class=""p-fieldset-legend-label"">{Legend}</span>
+                </legend>";
+            }
+        }
+
+        var topControlsHtml = "";
+        if (Controlled)
+        {
+            topControlsHtml = $@"<div class=""p-fieldset-top-controls"">
+                <button type=""button"" class=""p-fieldset-ctrl-btn {(!isCollapsed ? "p-highlight" : "")}"" data-action=""open"">Open</button>
+                <button type=""button"" class=""p-fieldset-ctrl-btn {(isCollapsed ? "p-highlight" : "")}"" data-action=""close"">Close</button>
+            </div>";
+        }
+
+        var toggleableAttr = Toggleable ? "data-p-toggleable=\"true\"" : "";
+        var fieldsetHtml = $@"<fieldset class=""p-fieldset p-component {indicatorClass} {collapsedClass}"" {toggleableAttr}>
+            {legendHtml}
+            <div class=""p-fieldset-content-container"" id=""{contentId}"" role=""region"" aria-labelledby=""{headerId}"">
+                <div class=""p-fieldset-content-wrapper"">
+                    <div class=""p-fieldset-content"">
+                        {contentStr}
+                    </div>
+                </div>
+            </div>
+        </fieldset>";
+
+        if (Toggleable || Controlled)
+        {
+            output.TagName = "div";
+            output.TagMode = TagMode.StartTagAndEndTag;
+            output.Attributes.SetAttribute("data-island", "fieldset");
+            output.Attributes.SetAttribute("data-hydrate", Hydrate.ToString().ToLowerInvariant());
+
+            var props = new
+            {
+                legend = Legend,
+                toggleable = Toggleable,
+                collapsed = Collapsed,
+                controlled = Controlled,
+                toggleIcon = ToggleIcon
+            };
+            output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
+            
+            var classes = new List<string>();
+            if (!string.IsNullOrWhiteSpace(Class)) classes.Add(Class);
+            if (classes.Count > 0) output.Attributes.SetAttribute("class", string.Join(" ", classes));
+            if (!string.IsNullOrWhiteSpace(Style)) output.Attributes.SetAttribute("style", Style);
+
+            output.Content.SetHtmlContent(topControlsHtml + fieldsetHtml);
+        }
+        else
+        {
+            output.TagName = "fieldset";
+            output.TagMode = TagMode.StartTagAndEndTag;
+            var classes = new List<string> { "p-fieldset", "p-component" };
+            if (!string.IsNullOrWhiteSpace(Class)) classes.Add(Class);
+            output.Attributes.SetAttribute("class", string.Join(" ", classes));
+            if (!string.IsNullOrWhiteSpace(Style)) output.Attributes.SetAttribute("style", Style);
+
+            output.Content.SetHtmlContent($@"{legendHtml}
+            <div class=""p-fieldset-content-container"" id=""{contentId}"" role=""region"" aria-labelledby=""{headerId}"">
+                <div class=""p-fieldset-content-wrapper"">
+                    <div class=""p-fieldset-content"">
+                        {contentStr}
+                    </div>
+                </div>
+            </div>");
         }
     }
 }
