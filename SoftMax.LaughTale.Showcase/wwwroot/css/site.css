@@ -4663,3 +4663,217 @@ html {
 [data-theme="dark"] .p-splitter-gutter[data-resizing="true"] > .p-splitter-gutter-handle {
     background: var(--p-surface-300, #cbd5e1) !important;
 }
+
+
+/* ==========================================================================
+   Aura PrimeVue 4 Stepper Component Tokens & Transitions
+   ========================================================================== */
+.p-stepper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.p-stepper-horizontal {
+    flex-direction: column;
+}
+
+.p-steplist {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    overflow-x: auto;
+    position: relative;
+}
+
+.p-step {
+    display: flex;
+    align-items: center;
+    flex: 1 1 auto;
+    position: relative;
+}
+.p-step:last-child {
+    flex-grow: 0;
+}
+
+.p-step-header {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    border-radius: var(--p-border-radius-md, 6px);
+    transition: background-color 0.15s ease, color 0.15s ease;
+    outline: none;
+    user-select: none;
+}
+.p-step-header:hover:not(:disabled) {
+    background: var(--p-surface-100, #f1f5f9);
+}
+.p-step-header:focus-visible {
+    outline: 2px solid var(--p-primary-500, #10b981);
+    outline-offset: 2px;
+}
+.p-step-header:disabled {
+    cursor: default;
+    opacity: 0.6;
+}
+
+.p-step-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 9999px;
+    border: 2px solid var(--p-surface-300, #cbd5e1);
+    background: var(--p-surface-0, #ffffff);
+    color: var(--p-surface-700, #334155);
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+}
+
+.p-step-active .p-step-number {
+    border-color: var(--p-primary-500, #10b981);
+    color: var(--p-primary-500, #10b981);
+}
+
+.p-step-completed .p-step-number {
+    background: var(--p-primary-500, #10b981);
+    border-color: var(--p-primary-500, #10b981);
+    color: #ffffff;
+}
+
+.p-step-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--p-surface-500, #64748b);
+    transition: color 0.2s ease;
+    white-space: nowrap;
+}
+.p-step-active .p-step-title {
+    color: var(--p-text-color, #0f172a);
+    font-weight: 700;
+}
+
+.p-stepper-separator {
+    flex: 1 1 0;
+    height: 2px;
+    background: var(--p-surface-200, #e2e8f0);
+    margin: 0 0.75rem;
+    transition: background-color 0.25s ease;
+}
+.p-stepper-separator.p-stepper-separator-active {
+    background: var(--p-primary-500, #10b981);
+}
+
+/* Step Panels (Horizontal) */
+.p-steppanels {
+    margin-top: 1.5rem;
+    width: 100%;
+}
+
+.p-steppanel {
+    display: none;
+    width: 100%;
+}
+.p-steppanel.p-steppanel-active {
+    display: block;
+    animation: p-steppanel-fadein 0.25s cubic-bezier(0.2, 0, 0, 1);
+}
+
+@keyframes p-steppanel-fadein {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Vertical Layout & Smooth Slide Animation */
+.p-stepper-vertical {
+    display: flex;
+    flex-direction: column;
+}
+
+.p-stepitem {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.p-stepitem-content-wrapper {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
+    opacity: 0;
+    margin-left: 1rem;
+    padding-left: 1.25rem;
+    border-left: 2px solid var(--p-surface-200, #e2e8f0);
+}
+.p-stepitem-active > .p-stepitem-content-wrapper {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    border-left-color: var(--p-surface-200, #e2e8f0);
+}
+.p-stepitem:last-child > .p-stepitem-content-wrapper {
+    border-left: 2px solid transparent;
+}
+
+.p-stepitem-content-inner {
+    overflow: hidden;
+    min-height: 0;
+}
+
+.p-stepitem .p-steppanel {
+    display: block;
+    padding: 0.5rem 0 1.5rem 0;
+}
+
+/* Dark Mode Tokens */
+.dark .p-step-header:hover:not(:disabled),
+[data-theme="dark"] .p-step-header:hover:not(:disabled) {
+    background: var(--p-surface-800, #1e293b) !important;
+}
+
+.dark .p-step-number,
+[data-theme="dark"] .p-step-number {
+    background: var(--p-surface-900, #0f172a) !important;
+    border-color: var(--p-surface-700, #334155) !important;
+    color: var(--p-surface-400, #94a3b8) !important;
+}
+
+.dark .p-step-active .p-step-number,
+[data-theme="dark"] .p-step-active .p-step-number {
+    border-color: var(--p-primary-400, #34d399) !important;
+    color: var(--p-primary-400, #34d399) !important;
+}
+
+.dark .p-step-completed .p-step-number,
+[data-theme="dark"] .p-step-completed .p-step-number {
+    background: var(--p-primary-500, #10b981) !important;
+    border-color: var(--p-primary-500, #10b981) !important;
+    color: #ffffff !important;
+}
+
+.dark .p-step-active .p-step-title,
+[data-theme="dark"] .p-step-active .p-step-title {
+    color: var(--p-surface-0, #f8fafc) !important;
+}
+
+.dark .p-stepper-separator,
+.dark .p-stepitem-content-wrapper,
+[data-theme="dark"] .p-stepper-separator,
+[data-theme="dark"] .p-stepitem-content-wrapper {
+    background: var(--p-surface-700, #334155);
+    border-color: var(--p-surface-700, #334155);
+}
+.dark .p-stepper-separator.p-stepper-separator-active,
+[data-theme="dark"] .p-stepper-separator.p-stepper-separator-active {
+    background: var(--p-primary-500, #10b981) !important;
+}

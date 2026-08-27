@@ -78,7 +78,7 @@ public static class NavigationData
                 new("Breadcrumb", "compass", "/enterprise#sec-breadcrumb"),
                 new("macOS Dock", "layoutGrid", "/enterprise#sec-dock"),
                 new("Sidebar Tree", "folderTree", "/enterprise#sec-sidebar"),
-                new("Stepper Flow", "arrowRight", "/enterprise#sec-stepper"),
+                new("Stepper", "listOrdered", "/enterprise#sec-stepper", false, null, "New"),
                 new("ScrollTop", "arrowUp", "/enterprise#sec-scroll-top"),
                 new("Command Palette", "terminal", "/enterprise#sec-command-palette")
             }),

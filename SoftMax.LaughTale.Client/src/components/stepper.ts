@@ -1,140 +1,405 @@
-import { injectIslandStyle } from '../runtime/styles';
 /**
- * SoftMax.LaughTale: Enterprise Multi-Step Stepper Wizard Component
+ * SoftMax.LaughTale: Enterprise Stepper Component (Aura Design System compliant)
+ * Multi-step wizard workflow supporting horizontal, vertical with smooth slide animation,
+ * linear validation enforcement, steps-only progress bar, headless templates, and keyboard accessibility.
  */
 
-export interface StepperStep {
-    id: string;
-    title: string;
-    description?: string;
-    icon?: string;
+import { injectIslandStyle } from '../runtime/styles';
+
+const STEPPER_CSS = `
+.p-stepper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-export interface StepperProps {
-    steps: StepperStep[];
-    initialStep?: number;
-    linear?: boolean;
+.p-stepper-horizontal {
+    flex-direction: column;
 }
 
+.p-steplist {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    overflow-x: auto;
+    position: relative;
+}
 
-const CSS = `
-[data-theme="dark"] .stepper-item {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+.p-step {
+    display: flex;
+    align-items: center;
+    flex: 1 1 auto;
+    position: relative;
 }
-[data-theme="dark"] .laughtale-stepper {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+.p-step:last-child {
+    flex-grow: 0;
 }
-[data-theme="dark"] .stepper-body {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-step-header {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    border-radius: var(--p-border-radius-md, 6px);
+    transition: background-color 0.15s ease, color 0.15s ease;
+    outline: none;
+    user-select: none;
 }
-[data-theme="dark"] .stepper-slot-container {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+.p-step-header:hover:not(:disabled) {
+    background: var(--p-surface-100, #f1f5f9);
 }
-[data-theme="dark"] .step-prev-btn {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+.p-step-header:focus-visible {
+    outline: 2px solid var(--p-primary-500, #10b981);
+    outline-offset: 2px;
 }
-[data-theme="dark"] .step-next-btn {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+.p-step-header:disabled {
+    cursor: default;
+    opacity: 0.6;
+}
+
+.p-step-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 9999px;
+    border: 2px solid var(--p-surface-300, #cbd5e1);
+    background: var(--p-surface-0, #ffffff);
+    color: var(--p-surface-700, #334155);
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+}
+
+.p-step-active .p-step-number {
+    border-color: var(--p-primary-500, #10b981);
+    color: var(--p-primary-500, #10b981);
+}
+
+.p-step-completed .p-step-number {
+    background: var(--p-primary-500, #10b981);
+    border-color: var(--p-primary-500, #10b981);
+    color: #ffffff;
+}
+
+.p-step-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--p-surface-500, #64748b);
+    transition: color 0.2s ease;
+    white-space: nowrap;
+}
+.p-step-active .p-step-title {
+    color: var(--p-text-color, #0f172a);
+    font-weight: 700;
+}
+
+.p-stepper-separator {
+    flex: 1 1 0;
+    height: 2px;
+    background: var(--p-surface-200, #e2e8f0);
+    margin: 0 0.75rem;
+    transition: background-color 0.25s ease;
+}
+.p-stepper-separator.p-stepper-separator-active {
+    background: var(--p-primary-500, #10b981);
+}
+
+/* Step Panels (Horizontal) */
+.p-steppanels {
+    margin-top: 1.5rem;
+    width: 100%;
+}
+
+.p-steppanel {
+    display: none;
+    width: 100%;
+}
+.p-steppanel.p-steppanel-active {
+    display: block;
+    animation: p-steppanel-fadein 0.25s cubic-bezier(0.2, 0, 0, 1);
+}
+
+@keyframes p-steppanel-fadein {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Vertical Layout & Smooth Slide Animation */
+.p-stepper-vertical {
+    display: flex;
+    flex-direction: column;
+}
+
+.p-stepitem {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.p-stepitem-content-wrapper {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
+    opacity: 0;
+    margin-left: 1rem;
+    padding-left: 1.25rem;
+    border-left: 2px solid var(--p-surface-200, #e2e8f0);
+}
+.p-stepitem-active > .p-stepitem-content-wrapper {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    border-left-color: var(--p-surface-200, #e2e8f0);
+}
+.p-stepitem:last-child > .p-stepitem-content-wrapper {
+    border-left: 2px solid transparent;
+}
+
+.p-stepitem-content-inner {
+    overflow: hidden;
+    min-height: 0;
+}
+
+.p-stepitem .p-steppanel {
+    display: block;
+    padding: 0.5rem 0 1.5rem 0;
+}
+
+/* Dark Mode Tokens */
+.dark .p-step-header:hover:not(:disabled),
+[data-theme="dark"] .p-step-header:hover:not(:disabled) {
+    background: var(--p-surface-800, #1e293b) !important;
+}
+
+.dark .p-step-number,
+[data-theme="dark"] .p-step-number {
+    background: var(--p-surface-900, #0f172a) !important;
+    border-color: var(--p-surface-700, #334155) !important;
+    color: var(--p-surface-400, #94a3b8) !important;
+}
+
+.dark .p-step-active .p-step-number,
+[data-theme="dark"] .p-step-active .p-step-number {
+    border-color: var(--p-primary-400, #34d399) !important;
+    color: var(--p-primary-400, #34d399) !important;
+}
+
+.dark .p-step-completed .p-step-number,
+[data-theme="dark"] .p-step-completed .p-step-number {
+    background: var(--p-primary-500, #10b981) !important;
+    border-color: var(--p-primary-500, #10b981) !important;
+    color: #ffffff !important;
+}
+
+.dark .p-step-active .p-step-title,
+[data-theme="dark"] .p-step-active .p-step-title {
+    color: var(--p-surface-0, #f8fafc) !important;
+}
+
+.dark .p-stepper-separator,
+.dark .p-stepitem-content-wrapper,
+[data-theme="dark"] .p-stepper-separator,
+[data-theme="dark"] .p-stepitem-content-wrapper {
+    background: var(--p-surface-700, #334155);
+    border-color: var(--p-surface-700, #334155);
+}
+.dark .p-stepper-separator.p-stepper-separator-active,
+[data-theme="dark"] .p-stepper-separator.p-stepper-separator-active {
+    background: var(--p-primary-500, #10b981) !important;
 }
 `;
 
+export interface StepperProps {
+    value?: string | number;
+    linear?: boolean;
+    layout?: 'horizontal' | 'vertical';
+}
+
 export default function StepperIsland(container: HTMLElement, props: StepperProps) {
-    injectIslandStyle('stepper', CSS);
-    let currentStep = props.initialStep || 0;
-    const totalSteps = props.steps.length;
+    injectIslandStyle('stepper', STEPPER_CSS);
 
-    function render() {
-        const stepItems = props.steps.map((s, idx) => {
-            const isCompleted = idx < currentStep;
-            const isActive = idx === currentStep;
-            const isPending = idx > currentStep;
+    const rootEl = container.querySelector<HTMLElement>('.p-stepper') || container;
+    const isVertical = props.layout === 'vertical' || rootEl.classList.contains('p-stepper-vertical') || rootEl.querySelector('.p-stepitem') !== null;
+    const isLinear = !!props.linear || rootEl.hasAttribute('data-linear');
+    
+    rootEl.classList.add('p-stepper', 'p-component', isVertical ? 'p-stepper-vertical' : 'p-stepper-horizontal');
 
-            const badgeBg = isActive ? 'var(--p-surface-950)' : isCompleted ? 'var(--p-primary-600)' : 'var(--p-surface-200)';
-            const badgeColor = isActive || isCompleted ? '#ffffff' : 'var(--p-surface-600)';
+    let activeValue = String(props.value || rootEl.getAttribute('data-value') || '1');
 
-            return `
-                <div class="stepper-item" data-step-idx="${idx}" style="display: flex; align-items: center; gap: 0.75rem; cursor: ${props.linear ? 'default' : 'pointer'};">
-                    <div style="width: 2.25rem; height: 2.25rem; border-radius: 50%; background: ${badgeBg}; color: ${badgeColor}; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.875rem; transition: all 0.2s ease;">
-                        ${isCompleted ? '✓' : (s.icon || (idx + 1))}
-                    </div>
-                    <div>
-                        <div style="font-size: 0.875rem; font-weight: ${isActive ? '700' : '500'}; color: ${isActive ? 'var(--p-surface-950)' : 'var(--p-surface-600)'};">${s.title}</div>
-                        ${s.description ? `<div style="font-size: 0.75rem; color: var(--p-surface-400);">${s.description}</div>` : ''}
-                    </div>
-                </div>
-            `;
-        }).join('<div style="flex: 1; height: 2px; background: var(--p-surface-200); margin: 0 0.5rem;"></div>');
+    // Horizontal Elements
+    const stepList = rootEl.querySelector<HTMLElement>('.p-steplist');
+    const stepPanels = rootEl.querySelector<HTMLElement>('.p-steppanels');
 
-        container.innerHTML = `
-            <div class="laughtale-stepper" style="display: flex; flex-direction: column; gap: 1.5rem;">
-                <!-- Step Header Progress Bar -->
-                <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 1.25rem; border-bottom: 1px solid var(--p-border-color);">
-                    ${stepItems}
-                </div>
+    // Vertical Elements
+    const stepItems = Array.from(rootEl.querySelectorAll<HTMLElement>(':scope > .p-stepitem, .p-stepitem'));
 
-                <!-- Step Content Container (Shows active slot) -->
-                <div class="stepper-body" style="min-height: 120px;">
-                    <div class="stepper-slot-container"></div>
-                </div>
-
-                <!-- Step Navigation Footer -->
-                <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 1rem; border-top: 1px solid var(--p-border-color);">
-                    <button type="button" class="p-button p-button-secondary step-prev-btn" ${currentStep === 0 ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
-                        &larr; Previous
-                    </button>
-                    <div style="font-size: 0.8125rem; color: var(--p-surface-500); font-family: var(--p-font-mono);">
-                        Step ${currentStep + 1} of ${totalSteps}
-                    </div>
-                    <button type="button" class="p-button p-button-primary step-next-btn">
-                        ${currentStep === totalSteps - 1 ? 'Complete & Submit ✓' : 'Next Step &rarr;'}
-                    </button>
-                </div>
-            </div>
-        `;
-
-        // Update slot projection visibility
-        const slotEl = container.querySelector('[data-slot="default"]') || container.querySelector('.island-slot');
-        const slotContainer = container.querySelector('.stepper-slot-container')!;
-
-        if (slotEl) {
-            slotContainer.appendChild(slotEl);
-            const stepPanels = slotEl.querySelectorAll<HTMLElement>('[data-step]');
-            if (stepPanels.length > 0) {
-                stepPanels.forEach((panel, i) => {
-                    panel.style.display = i === currentStep ? 'block' : 'none';
-                });
-            }
+    function getSteps(): HTMLElement[] {
+        if (isVertical) {
+            return stepItems.map(item => item.querySelector('.p-step') as HTMLElement).filter(Boolean);
         }
+        return Array.from(stepList ? stepList.querySelectorAll<HTMLElement>(':scope > .p-step, .p-step') : []);
+    }
 
-        // Attach buttons
-        container.querySelector('.step-prev-btn')?.addEventListener('click', () => {
-            if (currentStep > 0) {
-                currentStep--;
-                render();
+    function getPanels(): HTMLElement[] {
+        if (isVertical) {
+            return stepItems.map(item => item.querySelector('.p-steppanel') as HTMLElement).filter(Boolean);
+        }
+        return Array.from(stepPanels ? stepPanels.querySelectorAll<HTMLElement>(':scope > .p-steppanel, .p-steppanel') : []);
+    }
+
+    function update() {
+        const steps = getSteps();
+        const panels = getPanels();
+        const activeIdx = steps.findIndex(s => (s.getAttribute('data-value') || s.getAttribute('value')) === activeValue);
+        const resolvedIdx = activeIdx >= 0 ? activeIdx : 0;
+
+        // Update Steps
+        steps.forEach((step, idx) => {
+            const stepVal = step.getAttribute('data-value') || step.getAttribute('value') || String(idx + 1);
+            const isCompleted = idx < resolvedIdx;
+            const isActive = idx === resolvedIdx;
+            const isFuture = idx > resolvedIdx;
+
+            step.classList.toggle('p-step-active', isActive);
+            step.classList.toggle('p-step-completed', isCompleted);
+
+            const btn = step.querySelector<HTMLButtonElement>('.p-step-header');
+            if (btn) {
+                btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+                if (isLinear) {
+                    btn.disabled = isFuture;
+                }
+            }
+
+            // Separators
+            const separator = step.nextElementSibling;
+            if (separator && separator.classList.contains('p-stepper-separator')) {
+                separator.classList.toggle('p-stepper-separator-active', isCompleted);
             }
         });
 
-        container.querySelector('.step-next-btn')?.addEventListener('click', () => {
-            if (currentStep < totalSteps - 1) {
-                currentStep++;
-                render();
-            } else {
-                container.dispatchEvent(new CustomEvent('stepper:completed', { bubbles: true }));
+        // Update Panels & Vertical Items
+        if (isVertical) {
+            stepItems.forEach((item, idx) => {
+                const itemVal = item.getAttribute('data-value') || item.getAttribute('value') || String(idx + 1);
+                const isActive = itemVal === activeValue || idx === resolvedIdx;
+                item.classList.toggle('p-stepitem-active', isActive);
+
+                // Ensure smooth slide wrapper exists
+                let wrapper = item.querySelector<HTMLElement>('.p-stepitem-content-wrapper');
+                const panel = item.querySelector<HTMLElement>('.p-steppanel');
+                if (panel && !wrapper) {
+                    wrapper = document.createElement('div');
+                    wrapper.className = 'p-stepitem-content-wrapper';
+                    const inner = document.createElement('div');
+                    inner.className = 'p-stepitem-content-inner';
+                    panel.parentNode?.insertBefore(wrapper, panel);
+                    inner.appendChild(panel);
+                    wrapper.appendChild(inner);
+                }
+            });
+        } else {
+            panels.forEach((panel, idx) => {
+                const panelVal = panel.getAttribute('data-value') || panel.getAttribute('value') || String(idx + 1);
+                const isActive = panelVal === activeValue || idx === resolvedIdx;
+                panel.classList.toggle('p-steppanel-active', isActive);
+            });
+        }
+
+        rootEl.setAttribute('data-value', activeValue);
+    }
+
+    function setActiveStep(value: string) {
+        activeValue = value;
+        update();
+        container.dispatchEvent(new CustomEvent('stepper:change', {
+            bubbles: true,
+            detail: { value: activeValue }
+        }));
+    }
+
+    // Step Header Click Handlers
+    const steps = getSteps();
+    steps.forEach((step, idx) => {
+        const stepVal = step.getAttribute('data-value') || step.getAttribute('value') || String(idx + 1);
+        const header = step.querySelector<HTMLElement>('.p-step-header') || step;
+        header.addEventListener('click', (e) => {
+            e.preventDefault();
+            const currentIdx = steps.findIndex(s => (s.getAttribute('data-value') || s.getAttribute('value')) === activeValue);
+            if (isLinear && idx > currentIdx) return;
+            setActiveStep(stepVal);
+        });
+    });
+
+    // Action button handlers inside panels (Next / Back / Callback)
+    rootEl.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement;
+        const actionBtn = target.closest<HTMLButtonElement>('[data-stepper-next], [data-stepper-prev], [data-stepper-action]');
+        if (!actionBtn) return;
+
+        e.preventDefault();
+        const nextVal = actionBtn.getAttribute('data-stepper-next');
+        const prevVal = actionBtn.getAttribute('data-stepper-prev');
+        const action = actionBtn.getAttribute('data-stepper-action');
+
+        if (nextVal) {
+            setActiveStep(nextVal);
+        } else if (prevVal) {
+            setActiveStep(prevVal);
+        } else if (action === 'next') {
+            const steps = getSteps();
+            const currentIdx = steps.findIndex(s => (s.getAttribute('data-value') || s.getAttribute('value')) === activeValue);
+            if (currentIdx >= 0 && currentIdx < steps.length - 1) {
+                const nextStepVal = steps[currentIdx + 1].getAttribute('data-value') || steps[currentIdx + 1].getAttribute('value') || String(currentIdx + 2);
+                setActiveStep(nextStepVal);
+            }
+        } else if (action === 'prev') {
+            const steps = getSteps();
+            const currentIdx = steps.findIndex(s => (s.getAttribute('data-value') || s.getAttribute('value')) === activeValue);
+            if (currentIdx > 0) {
+                const prevStepVal = steps[currentIdx - 1].getAttribute('data-value') || steps[currentIdx - 1].getAttribute('value') || String(currentIdx);
+                setActiveStep(prevStepVal);
+            }
+        }
+    });
+
+    // Auto inject separators in Horizontal mode if missing
+    if (!isVertical && stepList) {
+        const renderedSteps = Array.from(stepList.children).filter(c => c.classList.contains('p-step'));
+        for (let i = 0; i < renderedSteps.length - 1; i++) {
+            if (!renderedSteps[i].nextElementSibling?.classList.contains('p-stepper-separator')) {
+                const sep = document.createElement('div');
+                sep.className = 'p-stepper-separator';
+                renderedSteps[i].after(sep);
+            }
+        }
+    }
+
+    // Wrap vertical item panel contents for slide animation
+    if (isVertical) {
+        stepItems.forEach(item => {
+            const panel = item.querySelector<HTMLElement>('.p-steppanel');
+            let wrapper = item.querySelector<HTMLElement>('.p-stepitem-content-wrapper');
+            if (panel && !wrapper) {
+                wrapper = document.createElement('div');
+                wrapper.className = 'p-stepitem-content-wrapper';
+                const inner = document.createElement('div');
+                inner.className = 'p-stepitem-content-inner';
+                panel.parentNode?.insertBefore(wrapper, panel);
+                inner.appendChild(panel);
+                wrapper.appendChild(inner);
             }
         });
     }
 
-    render();
+    update();
 }
