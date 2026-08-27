@@ -37,5 +37,5 @@ if (document.readyState === "loading") {
 } else {
   initialize();
 }
-console.log("[SoftMax.LaughTale] Showcase initialized.");
+console.log("[SoftMax.LaughTale] Docs client runtime initialized.");
 //# sourceMappingURL=main.js.map
