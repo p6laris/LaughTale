@@ -16132,7 +16132,7 @@ var init_tabs = __esm({
     background: transparent;
     border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
     box-sizing: border-box;
-    align-items: center;
+    align-items: stretch;
     width: 100%;
 }
 
@@ -16193,7 +16193,7 @@ var init_tabs = __esm({
 
 .p-tab:disabled,
 .p-tab[aria-disabled="true"] {
-    opacity: 0.4;
+    opacity: 0.35;
     cursor: not-allowed;
 }
 
@@ -16208,39 +16208,39 @@ var init_tabs = __esm({
     bottom: -1px;
     height: 2px;
     background: var(--p-primary-500, #10b981);
-    transition: left 0.25s cubic-bezier(0.2, 0, 0, 1), width 0.25s cubic-bezier(0.2, 0, 0, 1);
+    transition: left 0.2s cubic-bezier(0.2, 0, 0, 1), width 0.2s cubic-bezier(0.2, 0, 0, 1);
     z-index: 3;
     pointer-events: none;
 }
 
-/* Scroll navigation buttons */
+/* Seamless scroll navigation buttons */
 .p-tablist-prev-button,
 .p-tablist-next-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     width: 2.25rem;
-    height: 2.25rem;
     background: var(--p-surface-0, #ffffff);
-    border: 1px solid var(--p-border-color, #e2e8f0);
-    border-radius: var(--p-border-radius-md, 6px);
-    color: var(--p-surface-600, #475569);
+    border: none;
+    color: var(--p-surface-500, #64748b);
     cursor: pointer;
     flex-shrink: 0;
-    transition: all 0.15s ease;
+    transition: opacity 0.2s ease, color 0.15s ease, background-color 0.15s ease;
     z-index: 4;
     outline: none;
-    margin: 0 0.25rem;
+    margin: 0;
+    padding: 0;
+    border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
 }
 .p-tablist-prev-button:hover:not(:disabled),
 .p-tablist-next-button:hover:not(:disabled) {
-    background: var(--p-surface-100, #f1f5f9);
     color: var(--p-text-color, #0f172a);
+    background: var(--p-surface-100, #f1f5f9);
 }
 .p-tablist-prev-button:disabled,
 .p-tablist-next-button:disabled {
-    opacity: 0.25;
-    cursor: not-allowed;
+    opacity: 0;
+    pointer-events: none;
 }
 
 /* Tab Panels */
@@ -16316,7 +16316,7 @@ var init_tabs = __esm({
 [data-theme="dark"] .p-tablist-next-button {
     background: var(--p-surface-900, #0f172a);
     border-color: var(--p-surface-700, #334155);
-    color: var(--p-surface-300, #cbd5e1);
+    color: var(--p-surface-400, #94a3b8);
 }
 .dark .p-tablist-prev-button:hover:not(:disabled),
 .dark .p-tablist-next-button:hover:not(:disabled),

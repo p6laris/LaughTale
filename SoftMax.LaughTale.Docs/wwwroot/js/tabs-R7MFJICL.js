@@ -14,9 +14,11 @@ var TABS_CSS = `
 .p-tablist {
     display: flex;
     position: relative;
-    border-bottom: 1px solid var(--p-border-color, #e2e8f0);
+    background: transparent;
+    border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
     box-sizing: border-box;
-    align-items: center;
+    align-items: stretch;
+    width: 100%;
 }
 
 .p-tablist-content {
@@ -38,7 +40,8 @@ var TABS_CSS = `
     margin: 0;
     padding: 0;
     list-style-type: none;
-    gap: 0.25rem;
+    gap: 0;
+    width: auto;
 }
 
 .p-tab {
@@ -48,13 +51,14 @@ var TABS_CSS = `
     padding: 0.75rem 1.125rem;
     border: none;
     background: transparent;
-    color: var(--p-surface-600, #475569);
+    color: var(--p-surface-500, #64748b);
     font-weight: 600;
     font-size: 0.875rem;
     cursor: pointer;
     text-decoration: none;
-    border-radius: var(--p-border-radius-md, 6px);
-    transition: color 0.15s ease, background-color 0.15s ease;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
     outline: none;
     user-select: none;
     position: relative;
@@ -63,18 +67,18 @@ var TABS_CSS = `
 }
 
 .p-tab:hover:not(.p-tab-active):not(:disabled):not([aria-disabled="true"]) {
-    color: var(--p-text-color, #0f172a);
-    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-surface-800, #1e293b);
 }
 
 .p-tab-active {
     color: var(--p-primary-600, #059669);
+    border-bottom-color: var(--p-primary-500, #10b981);
     font-weight: 700;
 }
 
 .p-tab:disabled,
 .p-tab[aria-disabled="true"] {
-    opacity: 0.45;
+    opacity: 0.35;
     cursor: not-allowed;
 }
 
@@ -89,39 +93,39 @@ var TABS_CSS = `
     bottom: -1px;
     height: 2px;
     background: var(--p-primary-500, #10b981);
-    transition: left 0.25s cubic-bezier(0.2, 0, 0, 1), width 0.25s cubic-bezier(0.2, 0, 0, 1), transform 0.25s cubic-bezier(0.2, 0, 0, 1);
+    transition: left 0.2s cubic-bezier(0.2, 0, 0, 1), width 0.2s cubic-bezier(0.2, 0, 0, 1);
     z-index: 3;
     pointer-events: none;
 }
 
-/* Scroll navigation buttons */
+/* Seamless scroll navigation buttons */
 .p-tablist-prev-button,
 .p-tablist-next-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     width: 2.25rem;
-    height: 2.25rem;
     background: var(--p-surface-0, #ffffff);
-    border: 1px solid var(--p-border-color, #e2e8f0);
-    border-radius: var(--p-border-radius-md, 6px);
-    color: var(--p-surface-600, #475569);
+    border: none;
+    color: var(--p-surface-500, #64748b);
     cursor: pointer;
     flex-shrink: 0;
-    transition: all 0.15s ease;
+    transition: opacity 0.2s ease, color 0.15s ease, background-color 0.15s ease;
     z-index: 4;
     outline: none;
-    margin: 0 0.25rem;
+    margin: 0;
+    padding: 0;
+    border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
 }
 .p-tablist-prev-button:hover:not(:disabled),
 .p-tablist-next-button:hover:not(:disabled) {
-    background: var(--p-surface-100, #f1f5f9);
     color: var(--p-text-color, #0f172a);
+    background: var(--p-surface-100, #f1f5f9);
 }
 .p-tablist-prev-button:disabled,
 .p-tablist-next-button:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
+    opacity: 0;
+    pointer-events: none;
 }
 
 /* Tab Panels */
@@ -141,23 +145,39 @@ var TABS_CSS = `
 }
 
 @keyframes p-tabpanel-fadein {
-    from { opacity: 0; transform: translateY(3px); }
+    from { opacity: 0; transform: translateY(2px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
 /* Custom Capsule Indicator */
-.p-tablist-capsule .p-tablist-active-bar {
-    bottom: 4px;
-    height: calc(100% - 8px);
+.p-tablist-capsule {
+    border-bottom: none;
     background: var(--p-surface-100, #f1f5f9);
+    padding: 0.25rem;
     border-radius: var(--p-border-radius-md, 6px);
-    z-index: 1;
+    width: fit-content;
+}
+.p-tablist-capsule .p-tablist-active-bar {
+    display: none;
+}
+.p-tablist-capsule .p-tab {
+    border-bottom: none;
+    margin-bottom: 0;
+    border-radius: var(--p-border-radius-sm, 4px);
+    padding: 0.5rem 1rem;
+    color: var(--p-surface-600, #475569);
 }
 .p-tablist-capsule .p-tab-active {
+    background: var(--p-surface-0, #ffffff);
     color: var(--p-text-color, #0f172a);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 /* Dark Mode Tokens */
+.dark .p-tablist,
+[data-theme="dark"] .p-tablist {
+    border-bottom-color: var(--p-surface-700, #334155);
+}
 .dark .p-tab,
 [data-theme="dark"] .p-tab {
     color: var(--p-surface-400, #94a3b8);
@@ -165,11 +185,11 @@ var TABS_CSS = `
 .dark .p-tab:hover:not(.p-tab-active):not(:disabled):not([aria-disabled="true"]),
 [data-theme="dark"] .p-tab:hover:not(.p-tab-active):not(:disabled):not([aria-disabled="true"]) {
     color: var(--p-surface-100, #f8fafc);
-    background: var(--p-surface-800, #1e293b);
 }
 .dark .p-tab-active,
 [data-theme="dark"] .p-tab-active {
     color: var(--p-primary-400, #34d399);
+    border-bottom-color: var(--p-primary-400, #34d399);
 }
 .dark .p-tablist-active-bar,
 [data-theme="dark"] .p-tablist-active-bar {
@@ -181,7 +201,7 @@ var TABS_CSS = `
 [data-theme="dark"] .p-tablist-next-button {
     background: var(--p-surface-900, #0f172a);
     border-color: var(--p-surface-700, #334155);
-    color: var(--p-surface-300, #cbd5e1);
+    color: var(--p-surface-400, #94a3b8);
 }
 .dark .p-tablist-prev-button:hover:not(:disabled),
 .dark .p-tablist-next-button:hover:not(:disabled),
@@ -190,13 +210,15 @@ var TABS_CSS = `
     background: var(--p-surface-800, #1e293b);
     color: #ffffff;
 }
-.dark .p-tablist-capsule .p-tablist-active-bar,
-[data-theme="dark"] .p-tablist-capsule .p-tablist-active-bar {
+.dark .p-tablist-capsule,
+[data-theme="dark"] .p-tablist-capsule {
     background: var(--p-surface-800, #1e293b);
 }
 .dark .p-tablist-capsule .p-tab-active,
 [data-theme="dark"] .p-tablist-capsule .p-tab-active {
+    background: var(--p-surface-900, #0f172a);
     color: var(--p-surface-0, #f8fafc);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 `;
 var CHEVRON_LEFT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>`;
@@ -230,7 +252,8 @@ function TabsIsland(container, props) {
   }
   const tabsListWrapper = contentContainer.querySelector(".p-tablist-tab-list, ul") || contentContainer;
   let activeBar = contentContainer.querySelector(".p-tablist-active-bar");
-  if (!activeBar) {
+  const isCapsule = tabList.classList.contains("p-tablist-capsule");
+  if (!activeBar && !isCapsule) {
     activeBar = document.createElement("div");
     activeBar.className = "p-tablist-active-bar";
     contentContainer.appendChild(activeBar);
@@ -246,19 +269,15 @@ function TabsIsland(container, props) {
     activeValue = allTabs[0].getAttribute("data-value") || allTabs[0].getAttribute("value") || "0";
   }
   function updateActiveBar(targetTab) {
-    if (!activeBar) return;
+    if (!activeBar || isCapsule) return;
     if (!targetTab) {
       activeBar.style.width = "0px";
       return;
     }
-    const isCapsule = tabList?.classList.contains("p-tablist-capsule");
     const left = targetTab.offsetLeft;
     const width = targetTab.offsetWidth;
     activeBar.style.left = `${left}px`;
     activeBar.style.width = `${width}px`;
-    if (isCapsule) {
-      activeBar.style.height = `${targetTab.offsetHeight - 8}px`;
-    }
   }
   function update() {
     const tabs = getTabs();
@@ -294,6 +313,10 @@ function TabsIsland(container, props) {
     }
   }
   function setActiveTab(value) {
+    const targetTab = getTabs().find((t) => (t.getAttribute("data-value") || t.getAttribute("value")) === value);
+    if (targetTab && (targetTab.hasAttribute("disabled") || targetTab.getAttribute("aria-disabled") === "true")) {
+      return;
+    }
     activeValue = value;
     update();
     container.dispatchEvent(new CustomEvent("tabs:change", {
@@ -373,9 +396,9 @@ function TabsIsland(container, props) {
     setTimeout(checkScrollButtons2, 50);
     window.addEventListener("resize", checkScrollButtons2);
   }
-  const parentCard = container.closest(".component-card") || container.parentElement;
-  if (parentCard) {
-    parentCard.querySelectorAll("[data-tabs-target]").forEach((btn) => {
+  const demoCard = container.closest("[data-tabs-demo]") || container.parentElement;
+  if (demoCard) {
+    demoCard.querySelectorAll(":scope > * [data-tabs-target], :scope > [data-tabs-target]").forEach((btn) => {
       btn.addEventListener("click", (e) => {
         e.preventDefault();
         const targetTab = btn.getAttribute("data-tabs-target");
@@ -393,4 +416,4 @@ function TabsIsland(container, props) {
 export {
   TabsIsland as default
 };
-//# sourceMappingURL=tabs-LEAPITU3.js.map
+//# sourceMappingURL=tabs-R7MFJICL.js.map
