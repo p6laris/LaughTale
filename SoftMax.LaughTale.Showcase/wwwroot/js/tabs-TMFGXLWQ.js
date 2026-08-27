@@ -19,6 +19,7 @@ var TABS_CSS = `
     box-sizing: border-box;
     align-items: center;
     width: 100%;
+    overflow: hidden;
 }
 
 .p-tablist-content {
@@ -58,7 +59,7 @@ var TABS_CSS = `
     text-decoration: none;
     border-bottom: 2px solid transparent;
     margin-bottom: -1px;
-    transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+    transition: color 0.15s ease, border-color 0.15s ease;
     outline: none;
     user-select: none;
     position: relative;
@@ -78,7 +79,7 @@ var TABS_CSS = `
 
 .p-tab:disabled,
 .p-tab[aria-disabled="true"] {
-    opacity: 0.4;
+    opacity: 0.35;
     cursor: not-allowed;
 }
 
@@ -93,39 +94,53 @@ var TABS_CSS = `
     bottom: -1px;
     height: 2px;
     background: var(--p-primary-500, #10b981);
-    transition: left 0.25s cubic-bezier(0.2, 0, 0, 1), width 0.25s cubic-bezier(0.2, 0, 0, 1);
+    transition: left 0.2s cubic-bezier(0.2, 0, 0, 1), width 0.2s cubic-bezier(0.2, 0, 0, 1);
     z-index: 3;
     pointer-events: none;
 }
 
-/* Scroll navigation buttons */
+/* Smooth Gradient Fade Mask Navigation Buttons */
 .p-tablist-prev-button,
 .p-tablist-next-button {
-    display: inline-flex;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 3.5rem;
+    display: flex;
     align-items: center;
-    justify-content: center;
-    width: 2.25rem;
-    height: 2.25rem;
-    background: var(--p-surface-0, #ffffff);
-    border: 1px solid var(--p-border-color, #e2e8f0);
-    border-radius: var(--p-border-radius-md, 6px);
-    color: var(--p-surface-600, #475569);
+    border: none;
     cursor: pointer;
-    flex-shrink: 0;
-    transition: all 0.15s ease;
-    z-index: 4;
+    z-index: 10;
+    transition: opacity 0.25s ease, color 0.15s ease;
     outline: none;
-    margin: 0 0.25rem;
+    color: var(--p-surface-600, #475569);
+    padding: 0;
+    box-shadow: none;
 }
+
+.p-tablist-prev-button {
+    left: 0;
+    justify-content: flex-start;
+    padding-left: 0.5rem;
+    background: linear-gradient(to right, var(--p-surface-50, #f8fafc) 35%, rgba(248, 250, 252, 0.7) 65%, transparent 100%);
+}
+
+.p-tablist-next-button {
+    right: 0;
+    justify-content: flex-end;
+    padding-right: 0.5rem;
+    background: linear-gradient(to left, var(--p-surface-50, #f8fafc) 35%, rgba(248, 250, 252, 0.7) 65%, transparent 100%);
+}
+
 .p-tablist-prev-button:hover:not(:disabled),
 .p-tablist-next-button:hover:not(:disabled) {
-    background: var(--p-surface-100, #f1f5f9);
     color: var(--p-text-color, #0f172a);
 }
+
 .p-tablist-prev-button:disabled,
 .p-tablist-next-button:disabled {
-    opacity: 0.25;
-    cursor: not-allowed;
+    opacity: 0;
+    pointer-events: none;
 }
 
 /* Tab Panels */
@@ -196,18 +211,19 @@ var TABS_CSS = `
     background: var(--p-primary-400, #34d399);
 }
 .dark .p-tablist-prev-button,
+[data-theme="dark"] .p-tablist-prev-button {
+    background: linear-gradient(to right, var(--p-surface-900, #0f172a) 35%, rgba(15, 23, 42, 0.7) 65%, transparent 100%);
+    color: var(--p-surface-400, #94a3b8);
+}
 .dark .p-tablist-next-button,
-[data-theme="dark"] .p-tablist-prev-button,
 [data-theme="dark"] .p-tablist-next-button {
-    background: var(--p-surface-900, #0f172a);
-    border-color: var(--p-surface-700, #334155);
-    color: var(--p-surface-300, #cbd5e1);
+    background: linear-gradient(to left, var(--p-surface-900, #0f172a) 35%, rgba(15, 23, 42, 0.7) 65%, transparent 100%);
+    color: var(--p-surface-400, #94a3b8);
 }
 .dark .p-tablist-prev-button:hover:not(:disabled),
 .dark .p-tablist-next-button:hover:not(:disabled),
 [data-theme="dark"] .p-tablist-prev-button:hover:not(:disabled),
 [data-theme="dark"] .p-tablist-next-button:hover:not(:disabled) {
-    background: var(--p-surface-800, #1e293b);
     color: #ffffff;
 }
 .dark .p-tablist-capsule,
@@ -221,8 +237,8 @@ var TABS_CSS = `
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 `;
-var CHEVRON_LEFT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>`;
-var CHEVRON_RIGHT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`;
+var CHEVRON_LEFT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>`;
+var CHEVRON_RIGHT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`;
 function TabsIsland(container, props) {
   injectIslandStyle("tabs", TABS_CSS);
   const rootEl = container.querySelector(".p-tabs") || container;
@@ -306,9 +322,9 @@ function TabsIsland(container, props) {
       const tabLeft = activeTabEl.offsetLeft;
       const tabRight = tabLeft + activeTabEl.offsetWidth;
       if (tabLeft < containerLeft) {
-        contentContainer.scrollTo({ left: tabLeft - 20, behavior: "smooth" });
+        contentContainer.scrollTo({ left: tabLeft - 40, behavior: "smooth" });
       } else if (tabRight > containerRight) {
-        contentContainer.scrollTo({ left: tabRight - contentContainer.clientWidth + 20, behavior: "smooth" });
+        contentContainer.scrollTo({ left: tabRight - contentContainer.clientWidth + 40, behavior: "smooth" });
       }
     }
   }
@@ -364,8 +380,8 @@ function TabsIsland(container, props) {
     let checkScrollButtons2 = function() {
       if (!contentContainer || !prevBtn || !nextBtn) return;
       const { scrollLeft, scrollWidth, clientWidth } = contentContainer;
-      prevBtn.disabled = scrollLeft <= 2;
-      nextBtn.disabled = scrollLeft + clientWidth >= scrollWidth - 2;
+      prevBtn.disabled = scrollLeft <= 4;
+      nextBtn.disabled = scrollLeft + clientWidth >= scrollWidth - 4;
     };
     var checkScrollButtons = checkScrollButtons2;
     let prevBtn = tabList.querySelector(".p-tablist-prev-button");
@@ -387,10 +403,10 @@ function TabsIsland(container, props) {
       tabList.appendChild(nextBtn);
     }
     prevBtn.addEventListener("click", () => {
-      contentContainer?.scrollBy({ left: -200, behavior: "smooth" });
+      contentContainer?.scrollBy({ left: -220, behavior: "smooth" });
     });
     nextBtn.addEventListener("click", () => {
-      contentContainer?.scrollBy({ left: 200, behavior: "smooth" });
+      contentContainer?.scrollBy({ left: 220, behavior: "smooth" });
     });
     contentContainer.addEventListener("scroll", checkScrollButtons2);
     setTimeout(checkScrollButtons2, 50);
@@ -416,4 +432,4 @@ function TabsIsland(container, props) {
 export {
   TabsIsland as default
 };
-//# sourceMappingURL=tabs-M3N4IZRX.js.map
+//# sourceMappingURL=tabs-TMFGXLWQ.js.map

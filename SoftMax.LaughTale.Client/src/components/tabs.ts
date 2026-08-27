@@ -1,7 +1,7 @@
 /**
  * SoftMax.LaughTale: Enterprise Tabs Component (Aura Design System compliant)
  * PrimeVue 4 Aura-exact tabs container with animated indicator bar,
- * seamless scrollable navigation buttons, controlled values, lazy loading, custom indicator, and ARIA keyboard support.
+ * gradient fade mask scroll navigation, controlled values, lazy loading, custom indicator, and ARIA keyboard support.
  */
 
 import { injectIslandStyle } from '../runtime/styles';
@@ -20,8 +20,9 @@ const TABS_CSS = `
     background: transparent;
     border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
     box-sizing: border-box;
-    align-items: stretch;
+    align-items: center;
     width: 100%;
+    overflow: hidden;
 }
 
 .p-tablist-content {
@@ -61,7 +62,7 @@ const TABS_CSS = `
     text-decoration: none;
     border-bottom: 2px solid transparent;
     margin-bottom: -1px;
-    transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+    transition: color 0.15s ease, border-color 0.15s ease;
     outline: none;
     user-select: none;
     position: relative;
@@ -101,30 +102,44 @@ const TABS_CSS = `
     pointer-events: none;
 }
 
-/* Seamless scroll navigation buttons */
+/* Smooth Gradient Fade Mask Navigation Buttons */
 .p-tablist-prev-button,
 .p-tablist-next-button {
-    display: inline-flex;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 3.5rem;
+    display: flex;
     align-items: center;
-    justify-content: center;
-    width: 2.25rem;
-    background: var(--p-surface-0, #ffffff);
     border: none;
-    color: var(--p-surface-500, #64748b);
     cursor: pointer;
-    flex-shrink: 0;
-    transition: opacity 0.2s ease, color 0.15s ease, background-color 0.15s ease;
-    z-index: 4;
+    z-index: 10;
+    transition: opacity 0.25s ease, color 0.15s ease;
     outline: none;
-    margin: 0;
+    color: var(--p-surface-600, #475569);
     padding: 0;
-    border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
+    box-shadow: none;
 }
+
+.p-tablist-prev-button {
+    left: 0;
+    justify-content: flex-start;
+    padding-left: 0.5rem;
+    background: linear-gradient(to right, var(--p-surface-50, #f8fafc) 35%, rgba(248, 250, 252, 0.7) 65%, transparent 100%);
+}
+
+.p-tablist-next-button {
+    right: 0;
+    justify-content: flex-end;
+    padding-right: 0.5rem;
+    background: linear-gradient(to left, var(--p-surface-50, #f8fafc) 35%, rgba(248, 250, 252, 0.7) 65%, transparent 100%);
+}
+
 .p-tablist-prev-button:hover:not(:disabled),
 .p-tablist-next-button:hover:not(:disabled) {
     color: var(--p-text-color, #0f172a);
-    background: var(--p-surface-100, #f1f5f9);
 }
+
 .p-tablist-prev-button:disabled,
 .p-tablist-next-button:disabled {
     opacity: 0;
@@ -199,18 +214,19 @@ const TABS_CSS = `
     background: var(--p-primary-400, #34d399);
 }
 .dark .p-tablist-prev-button,
+[data-theme="dark"] .p-tablist-prev-button {
+    background: linear-gradient(to right, var(--p-surface-900, #0f172a) 35%, rgba(15, 23, 42, 0.7) 65%, transparent 100%);
+    color: var(--p-surface-400, #94a3b8);
+}
 .dark .p-tablist-next-button,
-[data-theme="dark"] .p-tablist-prev-button,
 [data-theme="dark"] .p-tablist-next-button {
-    background: var(--p-surface-900, #0f172a);
-    border-color: var(--p-surface-700, #334155);
+    background: linear-gradient(to left, var(--p-surface-900, #0f172a) 35%, rgba(15, 23, 42, 0.7) 65%, transparent 100%);
     color: var(--p-surface-400, #94a3b8);
 }
 .dark .p-tablist-prev-button:hover:not(:disabled),
 .dark .p-tablist-next-button:hover:not(:disabled),
 [data-theme="dark"] .p-tablist-prev-button:hover:not(:disabled),
 [data-theme="dark"] .p-tablist-next-button:hover:not(:disabled) {
-    background: var(--p-surface-800, #1e293b);
     color: #ffffff;
 }
 .dark .p-tablist-capsule,
@@ -232,8 +248,8 @@ export interface TabsProps {
     lazy?: boolean;
 }
 
-const CHEVRON_LEFT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>`;
-const CHEVRON_RIGHT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`;
+const CHEVRON_LEFT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>`;
+const CHEVRON_RIGHT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`;
 
 export default function TabsIsland(container: HTMLElement, props: TabsProps) {
     injectIslandStyle('tabs', TABS_CSS);
@@ -338,9 +354,9 @@ export default function TabsIsland(container: HTMLElement, props: TabsProps) {
             const tabRight = tabLeft + (activeTabEl as HTMLElement).offsetWidth;
 
             if (tabLeft < containerLeft) {
-                contentContainer.scrollTo({ left: tabLeft - 20, behavior: 'smooth' });
+                contentContainer.scrollTo({ left: tabLeft - 40, behavior: 'smooth' });
             } else if (tabRight > containerRight) {
-                contentContainer.scrollTo({ left: tabRight - contentContainer.clientWidth + 20, behavior: 'smooth' });
+                contentContainer.scrollTo({ left: tabRight - contentContainer.clientWidth + 40, behavior: 'smooth' });
             }
         }
     }
@@ -428,16 +444,16 @@ export default function TabsIsland(container: HTMLElement, props: TabsProps) {
         function checkScrollButtons() {
             if (!contentContainer || !prevBtn || !nextBtn) return;
             const { scrollLeft, scrollWidth, clientWidth } = contentContainer;
-            prevBtn.disabled = scrollLeft <= 2;
-            nextBtn.disabled = scrollLeft + clientWidth >= scrollWidth - 2;
+            prevBtn.disabled = scrollLeft <= 4;
+            nextBtn.disabled = scrollLeft + clientWidth >= scrollWidth - 4;
         }
 
         prevBtn.addEventListener('click', () => {
-            contentContainer?.scrollBy({ left: -200, behavior: 'smooth' });
+            contentContainer?.scrollBy({ left: -220, behavior: 'smooth' });
         });
 
         nextBtn.addEventListener('click', () => {
-            contentContainer?.scrollBy({ left: 200, behavior: 'smooth' });
+            contentContainer?.scrollBy({ left: 220, behavior: 'smooth' });
         });
 
         contentContainer.addEventListener('scroll', checkScrollButtons);
