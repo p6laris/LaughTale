@@ -459,8 +459,8 @@ public class IslandCardFooterTagHelper : TagHelper
 /// <summary>
 /// Enterprise Divider TagHelper (Aura Design System compliant)
 /// </summary>
-[HtmlTargetElement("island-divider")]
-[HtmlTargetElement("p-divider")]
+[HtmlTargetElement("island-divider", TagStructure = TagStructure.NormalOrSelfClosing)]
+[HtmlTargetElement("p-divider", TagStructure = TagStructure.NormalOrSelfClosing)]
 public class IslandDividerTagHelper : TagHelper
 {
     [HtmlAttributeName("layout")]
@@ -481,6 +481,7 @@ public class IslandDividerTagHelper : TagHelper
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
         output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
         var isVertical = string.Equals(Layout, "vertical", StringComparison.OrdinalIgnoreCase);
         var layoutClass = isVertical ? "p-divider-vertical" : "p-divider-horizontal";
         var typeClass = string.IsNullOrWhiteSpace(Type) ? "p-divider-solid" : $"p-divider-{Type.ToLowerInvariant()}";

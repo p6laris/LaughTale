@@ -3948,6 +3948,7 @@ html {
 }
 
 
+
 /* ==========================================================================
    Aura PrimeVue 4 Divider Component Tokens & Layouts
    ========================================================================== */
@@ -3960,8 +3961,9 @@ html {
     width: 100%;
     position: relative;
     align-items: center;
-    margin: 1.25rem 0;
+    margin: 1rem 0;
     padding: 0;
+    min-height: 1px;
 }
 .p-divider-horizontal:before {
     position: absolute;
@@ -3970,7 +3972,7 @@ html {
     left: 0;
     width: 100%;
     content: "";
-    border-top: 1px solid var(--p-surface-200, #e2e8f0);
+    border-top: 1px solid var(--p-border-color, #e2e8f0);
 }
 .p-divider-horizontal.p-divider-solid:before {
     border-top-style: solid;
@@ -3987,6 +3989,9 @@ html {
     color: var(--p-surface-700, #334155);
     z-index: 1;
 }
+.p-card .p-divider-horizontal .p-divider-content {
+    background: var(--p-surface-0, #ffffff);
+}
 .p-divider-horizontal.p-divider-left {
     justify-content: flex-start;
 }
@@ -3998,12 +4003,14 @@ html {
 }
 
 .p-divider-vertical {
-    min-height: 100%;
-    margin: 0 1.25rem;
-    display: flex;
+    display: inline-flex;
     position: relative;
     justify-content: center;
+    align-self: stretch;
+    margin: 0 1.25rem;
     padding: 0;
+    min-width: 1px;
+    min-height: 100%;
 }
 .p-divider-vertical:before {
     position: absolute;
@@ -4012,7 +4019,7 @@ html {
     left: 50%;
     height: 100%;
     content: "";
-    border-left: 1px solid var(--p-surface-200, #e2e8f0);
+    border-left: 1px solid var(--p-border-color, #e2e8f0);
 }
 .p-divider-vertical.p-divider-solid:before {
     border-left-style: solid;
@@ -4028,6 +4035,9 @@ html {
     background: var(--p-surface-50, #f8fafc);
     color: var(--p-surface-700, #334155);
     z-index: 1;
+}
+.p-card .p-divider-vertical .p-divider-content {
+    background: var(--p-surface-0, #ffffff);
 }
 .p-divider-vertical.p-divider-top {
     align-items: flex-start;
