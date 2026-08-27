@@ -454,6 +454,65 @@ public class IslandCardFooterTagHelper : TagHelper
 
 #endregion
 
+#region 2b. Divider Primitives
+
+/// <summary>
+/// Enterprise Divider TagHelper (Aura Design System compliant)
+/// </summary>
+[HtmlTargetElement("island-divider")]
+[HtmlTargetElement("p-divider")]
+public class IslandDividerTagHelper : TagHelper
+{
+    [HtmlAttributeName("layout")]
+    public string Layout { get; set; } = "horizontal";
+
+    [HtmlAttributeName("type")]
+    public string Type { get; set; } = "solid";
+
+    [HtmlAttributeName("align")]
+    public string? Align { get; set; }
+
+    [HtmlAttributeName("class")]
+    public string? Class { get; set; }
+
+    [HtmlAttributeName("style")]
+    public string? Style { get; set; }
+
+    public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
+    {
+        output.TagName = "div";
+        var isVertical = string.Equals(Layout, "vertical", StringComparison.OrdinalIgnoreCase);
+        var layoutClass = isVertical ? "p-divider-vertical" : "p-divider-horizontal";
+        var typeClass = string.IsNullOrWhiteSpace(Type) ? "p-divider-solid" : $"p-divider-{Type.ToLowerInvariant()}";
+        var alignClass = !string.IsNullOrWhiteSpace(Align) ? $"p-divider-{Align.ToLowerInvariant()}" : (isVertical ? "p-divider-center" : "p-divider-left");
+
+        var classes = new List<string> { "p-divider", "p-component", layoutClass, typeClass, alignClass };
+        if (!string.IsNullOrWhiteSpace(Class)) classes.Add(Class);
+
+        output.Attributes.SetAttribute("class", string.Join(" ", classes));
+        output.Attributes.SetAttribute("role", "separator");
+        output.Attributes.SetAttribute("aria-orientation", isVertical ? "vertical" : "horizontal");
+
+        if (!string.IsNullOrWhiteSpace(Style))
+        {
+            output.Attributes.SetAttribute("style", Style);
+        }
+
+        var childContent = await output.GetChildContentAsync();
+        var contentStr = childContent.GetContent();
+        if (!string.IsNullOrWhiteSpace(contentStr))
+        {
+            output.Content.SetHtmlContent($"<div class=\"p-divider-content\">{contentStr}</div>");
+        }
+        else
+        {
+            output.Content.SetHtmlContent(string.Empty);
+        }
+    }
+}
+
+#endregion
+
 #region 3. Button Primitive
 
 /// <summary>

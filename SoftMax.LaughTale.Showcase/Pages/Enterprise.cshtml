@@ -3092,6 +3092,106 @@
         </div>
     </section>
 
+    <!-- Divider -->
+    <section id="sec-divider" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>Divider</h2>
+                <p>Divider is used to separate contents horizontally or vertically with custom border styles and content alignments.</p>
+            </div>
+            <span class="aura-tag tag-purple">Panels</span>
+        </div>
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Demo 1: Basic -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Divider is placed between items to separate content.</p>
+                <div style="display: flex; justify-content: center;">
+                    <div style="max-width: 24rem; width: 100%; font-size: 0.875rem;">
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <span style="color: var(--p-text-color); font-weight: 500;">Subtotal</span>
+                            <span style="color: var(--p-text-color);">$89.00</span>
+                        </div>
+                        <island-divider />
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <span style="color: var(--p-text-color); font-weight: 500;">Shipping</span>
+                            <span style="color: var(--p-text-color);">$5.99</span>
+                        </div>
+                        <island-divider />
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <span style="color: var(--p-text-color); font-weight: 700;">Total</span>
+                            <span style="color: var(--p-text-color); font-weight: 700;">$94.99</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 2: Type -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Type</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Style of the border is configured with the type property that can be solid, dotted or dashed.</p>
+                <div style="display: flex; justify-content: center;">
+                    <div style="max-width: 28rem; width: 100%;">
+                        <p style="font-size: 0.875rem; color: var(--p-text-color); margin: 0;">Fast setup, no credit card required</p>
+                        <island-divider type="solid" />
+                        <p style="font-size: 0.875rem; color: var(--p-text-color); margin: 0;">Cancel anytime from your account</p>
+                        <island-divider type="dotted" />
+                        <p style="font-size: 0.875rem; color: var(--p-text-color); margin: 0;">24/7 support included</p>
+                        <island-divider type="dashed" />
+                        <p style="font-size: 0.875rem; color: var(--p-text-color); margin: 0;">No long-term commitments</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 3: Vertical -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Vertical</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Vertical divider is enabled by setting the layout property as vertical.</p>
+                <div style="display: flex; justify-content: center;">
+                    <div style="display: flex; align-items: stretch; width: fit-content; background: var(--p-surface-0); padding: 1rem 1.5rem; border-radius: 8px; border: 1px solid var(--p-border-color);">
+                        <div>
+                            <div style="text-transform: uppercase; font-family: var(--font-mono, monospace); font-size: 0.75rem; color: var(--p-text-muted); font-weight: 600;">Invoice No</div>
+                            <div style="font-weight: 300; font-size: 0.9375rem; color: var(--p-text-color); margin-top: 0.25rem;">0000123</div>
+                        </div>
+                        <island-divider layout="vertical" />
+                        <div>
+                            <div style="text-transform: uppercase; font-family: var(--font-mono, monospace); font-size: 0.75rem; color: var(--p-text-muted); font-weight: 600;">Issued</div>
+                            <div style="font-weight: 300; font-size: 0.9375rem; color: var(--p-text-color); margin-top: 0.25rem;">01/01/2026</div>
+                        </div>
+                        <island-divider layout="vertical" />
+                        <div>
+                            <div style="text-transform: uppercase; font-family: var(--font-mono, monospace); font-size: 0.75rem; color: var(--p-text-muted); font-weight: 600;">Due Date</div>
+                            <div style="font-weight: 300; font-size: 0.9375rem; color: var(--p-text-color); margin-top: 0.25rem;">02/02/2026</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 4: Alignment -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Alignment</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Children are rendered within the boundaries of the divider where location of the content is configured with the align property.</p>
+                <div style="display: flex; justify-content: center;">
+                    <div style="max-width: 28rem; width: 100%;">
+                        <p style="font-size: 0.875rem; color: var(--p-text-color); margin: 0;">Fast setup with a simple onboarding process, no credit card required to get started.</p>
+                        <island-divider align="left" type="solid">
+                            <code style="text-transform: uppercase; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; background: var(--p-surface-100); padding: 0.15rem 0.4rem; border-radius: 4px; color: var(--p-primary-600);">Getting started</code>
+                        </island-divider>
+                        <p style="font-size: 0.875rem; color: var(--p-text-color); margin: 0;">Cancel anytime directly from your account settings, with no questions asked.</p>
+                        <island-divider align="center" type="dotted">
+                            <code style="text-transform: uppercase; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; background: var(--p-surface-100); padding: 0.15rem 0.4rem; border-radius: 4px; color: var(--p-primary-600);">Flexibility</code>
+                        </island-divider>
+                        <p style="font-size: 0.875rem; color: var(--p-text-color); margin: 0;">24/7 support included to help you resolve issues quickly, whenever you need assistance.</p>
+                        <island-divider align="right" type="dashed">
+                            <code style="text-transform: uppercase; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; background: var(--p-surface-100); padding: 0.15rem 0.4rem; border-radius: 4px; color: var(--p-primary-600);">Support</code>
+                        </island-divider>
+                        <p style="font-size: 0.875rem; color: var(--p-text-color); margin: 0;">No long-term commitments or hidden contracts, just transparent and flexible pricing.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Accordion -->
     <section id="sec-accordion" class="component-card">
         <div class="card-header">
