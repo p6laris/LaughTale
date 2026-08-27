@@ -16386,6 +16386,74 @@ var SoftMaxIslands = (() => {
     }
   });
 
+  // src/components/toolbar.ts
+  var toolbar_exports = {};
+  __export(toolbar_exports, {
+    default: () => ToolbarIsland
+  });
+  function ToolbarIsland(container, props) {
+    injectIslandStyle("toolbar", TOOLBAR_CSS);
+    const rootEl = container.querySelector(".p-toolbar") || container;
+    rootEl.classList.add("p-toolbar", "p-component");
+    rootEl.setAttribute("role", "toolbar");
+    rootEl.setAttribute("aria-orientation", "horizontal");
+    if (props.ariaLabel) {
+      rootEl.setAttribute("aria-label", props.ariaLabel);
+    }
+  }
+  var TOOLBAR_CSS;
+  var init_toolbar = __esm({
+    "src/components/toolbar.ts"() {
+      "use strict";
+      init_styles();
+      TOOLBAR_CSS = `
+.p-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    padding: 0.75rem 1rem;
+    background: var(--p-surface-0, #ffffff);
+    border: 1px solid var(--p-border-color, #e2e8f0);
+    border-radius: var(--p-border-radius, 6px);
+    gap: 0.5rem;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.p-toolbar-start,
+.p-toolbar-center,
+.p-toolbar-end,
+.p-toolbar-group-start,
+.p-toolbar-group-center,
+.p-toolbar-group-end {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.p-toolbar-center,
+.p-toolbar-group-center {
+    justify-content: center;
+    flex: 1 1 auto;
+}
+
+.p-toolbar-end,
+.p-toolbar-group-end {
+    margin-left: auto;
+}
+
+/* Dark Mode Tokens */
+.dark .p-toolbar,
+[data-theme="dark"] .p-toolbar {
+    background: var(--p-surface-900, #0f172a);
+    border-color: var(--p-surface-700, #334155);
+}
+`;
+    }
+  });
+
   // src/components/autocomplete.ts
   var autocomplete_exports = {};
   __export(autocomplete_exports, {
@@ -29417,6 +29485,7 @@ ${h.response}`).join("\n");
       defineIsland("card", () => Promise.resolve().then(() => (init_card(), card_exports)));
       defineIsland("accordion", () => Promise.resolve().then(() => (init_accordion(), accordion_exports)));
       defineIsland("tabs", () => Promise.resolve().then(() => (init_tabs(), tabs_exports)));
+      defineIsland("toolbar", () => Promise.resolve().then(() => (init_toolbar(), toolbar_exports)));
       defineIsland("autocomplete", () => Promise.resolve().then(() => (init_autocomplete(), autocomplete_exports)));
       defineIsland("color-picker", () => Promise.resolve().then(() => (init_color_picker(), color_picker_exports)));
       defineIsland("knob", () => Promise.resolve().then(() => (init_knob(), knob_exports)));

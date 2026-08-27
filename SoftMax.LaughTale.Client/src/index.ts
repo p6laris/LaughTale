@@ -67,6 +67,7 @@ defineIsland('divider', () => import('./components/divider'));
 defineIsland('card', () => import('./components/card'));
 defineIsland('accordion', () => import('./components/accordion'));
 defineIsland('tabs', () => import('./components/tabs'));
+defineIsland('toolbar', () => import('./components/toolbar'));
 defineIsland('autocomplete', () => import('./components/autocomplete'));
 defineIsland('color-picker', () => import('./components/color-picker'));
 defineIsland('knob', () => import('./components/knob'));

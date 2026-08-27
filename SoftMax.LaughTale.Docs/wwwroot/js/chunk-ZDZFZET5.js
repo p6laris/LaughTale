@@ -1059,7 +1059,7 @@ defineIsland("tree-table", () => import("./treetable-STGV6W5W.js"));
 defineIsland("tree-select", () => import("./tree-select-3WADBRSW.js"));
 defineIsland("datatable", () => import("./datatable-FJYSSBES.js"));
 defineIsland("datagrid", () => import("./datatable-FJYSSBES.js"));
-defineIsland("modal", () => import("./modal-KOGB32WN.js"));
+defineIsland("modal", () => import("./modal-HO3GZXON.js"));
 defineIsland("toast", () => import("./toast-WLFO7J5G.js"));
 defineIsland("input-number", () => import("./input-number-KQ2J2WMH.js"));
 defineIsland("input-otp", () => import("./input-otp-RUPMATZ7.js"));
@@ -1091,6 +1091,7 @@ defineIsland("divider", () => import("./divider-VDZXMYK7.js"));
 defineIsland("card", () => import("./card-KVZGT5KH.js"));
 defineIsland("accordion", () => import("./accordion-BOH5KS7S.js"));
 defineIsland("tabs", () => import("./tabs-TMFGXLWQ.js"));
+defineIsland("toolbar", () => import("./toolbar-C7I662XJ.js"));
 defineIsland("autocomplete", () => import("./autocomplete-RVYP54K4.js"));
 defineIsland("color-picker", () => import("./color-picker-VDAKHERO.js"));
 defineIsland("knob", () => import("./knob-QRIVX7GP.js"));
@@ -1144,4 +1145,4 @@ export {
   enableViewTransitions,
   getSlot
 };
-//# sourceMappingURL=chunk-O6LYOKXG.js.map
+//# sourceMappingURL=chunk-ZDZFZET5.js.map

@@ -50,7 +50,7 @@ public static class NavigationData
                 new("SplitButton", "zap", "/enterprise#sec-split-button"),
                 new("SpeedDial FAB", "zap", "/enterprise#sec-speed-dial")
             }),
-            new("Data & Tables (13)", "database", null, false, new List<SidebarItem>
+            new("Data & Tables (14)", "database", null, false, new List<SidebarItem>
             {
                 new("DataTable", "table2", "/enterprise#sec-datagrid", false, null, "Live"),
                 new("DataView", "layoutGrid", "/enterprise#sec-dataview"),
@@ -69,6 +69,7 @@ public static class NavigationData
                 new("ScrollArea", "chevronsUpDown", "/enterprise#sec-scrollarea", false, null, "New"),
                 new("Accordion", "folderTree", "/enterprise#sec-accordion"),
                 new("Tabs", "columns3", "/enterprise#sec-tabs", false, null, "New"),
+                new("Toolbar", "columns3", "/enterprise#sec-toolbar", false, null, "New"),
                 new("Timeline", "activity", "/enterprise#sec-timeline")
             }),
             new("Navigation & Menus (8)", "compass", null, false, new List<SidebarItem>
