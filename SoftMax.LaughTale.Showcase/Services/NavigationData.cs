@@ -68,7 +68,7 @@ public static class NavigationData
                 new("Panel", "square", "/enterprise#sec-panel", false, null, "New"),
                 new("ScrollArea", "chevronsUpDown", "/enterprise#sec-scrollarea", false, null, "New"),
                 new("Accordion", "folderTree", "/enterprise#sec-accordion"),
-                new("Sliding Tabs", "columns3", "/enterprise#sec-tabs"),
+                new("Tabs", "columns3", "/enterprise#sec-tabs", false, null, "New"),
                 new("Timeline", "activity", "/enterprise#sec-timeline")
             }),
             new("Navigation & Menus (8)", "compass", null, false, new List<SidebarItem>

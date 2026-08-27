@@ -1931,33 +1931,7 @@ public class IslandAccordionTagHelper : TagHelper
     }
 }
 
-/// <summary>
-/// TagHelper for <island-tabs />
-/// </summary>
-[HtmlTargetElement("island-tabs")]
-public class IslandTabsTagHelper : TagHelper
-{
-    public List<TabItem>? Tabs { get; set; }
-    public int ActiveIndex { get; set; } = 0;
-    public string? TargetInput { get; set; }
-
-    public override void Process(TagHelperContext context, TagHelperOutput output)
-    {
-        output.TagName = "div";
-        output.TagMode = TagMode.StartTagAndEndTag;
-        output.Attributes.SetAttribute("data-island", "tabs");
-        output.Attributes.SetAttribute("data-hydrate", "load");
-
-        var props = new
-        {
-            tabs = Tabs ?? new(),
-            activeIndex = ActiveIndex,
-            targetInputName = TargetInput
-        };
-
-        output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
-    }
-}
+// IslandTabsTagHelper moved to IslandTabsTagHelper.cs
 
 /// <summary>
 /// TagHelper for <island-autocomplete /> (Aura AutoComplete)

@@ -4104,21 +4104,606 @@
         </div>
     </section>
 
-    <!-- Sliding Tabs -->
+    <!-- Tabs -->
     <section id="sec-tabs" class="component-card">
         <div class="card-header">
             <div>
-                <h2>Sliding Tabs</h2>
-                <p>Underline animated sliding tabs with lazy content panel switching.</p>
+                <h2>Tabs</h2>
+                <p>Tabs is a container component to group content with animated active indicator, keyboard navigation, and responsive overflow.</p>
             </div>
-            <span class="aura-tag tag-emerald">Tabs</span>
+            <span class="aura-tag tag-emerald">Panels</span>
         </div>
-        <div class="card-body" style="max-width: 700px;">
-            <island-tabs tabs="@Model.TabSections" />
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Demo 1: Basic -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Organizes content into selectable, horizontally laid out sections.</p>
+                <div style="max-width: 48rem; width: 100%;">
+                    <island-tabs value="tab1">
+                        <island-tablist>
+                            <island-tab value="tab1">Account Info</island-tab>
+                            <island-tab value="tab2">Payment</island-tab>
+                            <island-tab value="tab3">Preferences</island-tab>
+                        </island-tablist>
+                        <island-tabpanels>
+                            <island-tabpanel value="tab1">
+                                <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Account Info</h4>
+                                <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Update your personal information such as name, email address, and profile picture.</p>
+                            </island-tabpanel>
+                            <island-tabpanel value="tab2">
+                                <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Payment</h4>
+                                <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Manage your subscription plan, view invoices, and update your payment method.</p>
+                            </island-tabpanel>
+                            <island-tabpanel value="tab3">
+                                <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Preferences</h4>
+                                <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Customize how the application looks and behaves to match your personal preferences.</p>
+                            </island-tabpanel>
+                        </island-tabpanels>
+                    </island-tabs>
+                </div>
+            </div>
+
+            <!-- Demo 2: Dynamic -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Dynamic</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Create tabs dynamically from structured collections to keep labels and panel content in sync.</p>
+                <div style="max-width: 48rem; width: 100%;">
+                    <island-tabs value="tab1">
+                        <island-tablist>
+                            <island-tab value="tab1">Account Info</island-tab>
+                            <island-tab value="tab2">Payment</island-tab>
+                            <island-tab value="tab3">Preferences</island-tab>
+                        </island-tablist>
+                        <island-tabpanels>
+                            <island-tabpanel value="tab1">
+                                <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Account Info</h4>
+                                <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Update your personal information such as name, email address, and profile picture.</p>
+                            </island-tabpanel>
+                            <island-tabpanel value="tab2">
+                                <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Payment</h4>
+                                <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Manage your subscription plan, view invoices, and update your payment method.</p>
+                            </island-tabpanel>
+                            <island-tabpanel value="tab3">
+                                <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Preferences</h4>
+                                <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Customize how the application looks and behaves to match your personal preferences.</p>
+                            </island-tabpanel>
+                        </island-tabpanels>
+                    </island-tabs>
+                </div>
+            </div>
+
+            <!-- Demo 3: Controlled -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Controlled</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Control the active tab externally with the value property and button actions.</p>
+                <div style="max-width: 48rem; width: 100%;">
+                    <div style="margin-bottom: 1.25rem;">
+                        <button type="button" class="p-button p-button-primary" data-tabs-target="tab2" style="display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.5rem 1.1rem; font-size: 0.875rem; font-weight: 600; border-radius: 6px; background: var(--p-primary-500); border: 1px solid var(--p-primary-500); color: #ffffff; cursor: pointer;">
+                            <span>Go to Payment</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                        </button>
+                    </div>
+                    <island-tabs value="tab1">
+                        <island-tablist>
+                            <island-tab value="tab1">Account Info</island-tab>
+                            <island-tab value="tab2">Payment</island-tab>
+                            <island-tab value="tab3">Preferences</island-tab>
+                        </island-tablist>
+                        <island-tabpanels>
+                            <island-tabpanel value="tab1">
+                                <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Account Info</h4>
+                                <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Update your personal information such as name, email address, and profile picture.</p>
+                            </island-tabpanel>
+                            <island-tabpanel value="tab2">
+                                <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Payment</h4>
+                                <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Manage your subscription plan, view invoices, and update your payment method.</p>
+                            </island-tabpanel>
+                            <island-tabpanel value="tab3">
+                                <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Preferences</h4>
+                                <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Customize how the application looks and behaves to match your personal preferences.</p>
+                            </island-tabpanel>
+                        </island-tabpanels>
+                    </island-tabs>
+                </div>
+            </div>
+
+            <!-- Demo 4: Scrollable -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Scrollable</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Long tab lists are navigable with responsive horizontal scroll and forward/backward chevron buttons.</p>
+                <div style="max-width: 48rem; width: 100%;">
+                    <island-tabs value="0" scrollable="true">
+                        <island-tablist>
+                                <island-tab value="0">Tab 1</island-tab>
+                                <island-tab value="1">Tab 2</island-tab>
+                                <island-tab value="2">Tab 3</island-tab>
+                                <island-tab value="3">Tab 4</island-tab>
+                                <island-tab value="4">Tab 5</island-tab>
+                                <island-tab value="5">Tab 6</island-tab>
+                                <island-tab value="6">Tab 7</island-tab>
+                                <island-tab value="7">Tab 8</island-tab>
+                                <island-tab value="8">Tab 9</island-tab>
+                                <island-tab value="9">Tab 10</island-tab>
+                                <island-tab value="10">Tab 11</island-tab>
+                                <island-tab value="11">Tab 12</island-tab>
+                                <island-tab value="12">Tab 13</island-tab>
+                                <island-tab value="13">Tab 14</island-tab>
+                                <island-tab value="14">Tab 15</island-tab>
+                                <island-tab value="15">Tab 16</island-tab>
+                                <island-tab value="16">Tab 17</island-tab>
+                                <island-tab value="17">Tab 18</island-tab>
+                                <island-tab value="18">Tab 19</island-tab>
+                                <island-tab value="19">Tab 20</island-tab>
+                                <island-tab value="20">Tab 21</island-tab>
+                                <island-tab value="21">Tab 22</island-tab>
+                                <island-tab value="22">Tab 23</island-tab>
+                                <island-tab value="23">Tab 24</island-tab>
+                                <island-tab value="24">Tab 25</island-tab>
+                                <island-tab value="25">Tab 26</island-tab>
+                                <island-tab value="26">Tab 27</island-tab>
+                                <island-tab value="27">Tab 28</island-tab>
+                                <island-tab value="28">Tab 29</island-tab>
+                                <island-tab value="29">Tab 30</island-tab>
+                                <island-tab value="30">Tab 31</island-tab>
+                                <island-tab value="31">Tab 32</island-tab>
+                                <island-tab value="32">Tab 33</island-tab>
+                                <island-tab value="33">Tab 34</island-tab>
+                                <island-tab value="34">Tab 35</island-tab>
+                                <island-tab value="35">Tab 36</island-tab>
+                                <island-tab value="36">Tab 37</island-tab>
+                                <island-tab value="37">Tab 38</island-tab>
+                                <island-tab value="38">Tab 39</island-tab>
+                                <island-tab value="39">Tab 40</island-tab>
+                                <island-tab value="40">Tab 41</island-tab>
+                                <island-tab value="41">Tab 42</island-tab>
+                                <island-tab value="42">Tab 43</island-tab>
+                                <island-tab value="43">Tab 44</island-tab>
+                                <island-tab value="44">Tab 45</island-tab>
+                                <island-tab value="45">Tab 46</island-tab>
+                                <island-tab value="46">Tab 47</island-tab>
+                                <island-tab value="47">Tab 48</island-tab>
+                                <island-tab value="48">Tab 49</island-tab>
+                                <island-tab value="49">Tab 50</island-tab>
+                        </island-tablist>
+                        <island-tabpanels>
+                                <island-tabpanel value="0">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 1</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="1">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 2</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="2">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 3</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="3">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 4</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="4">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 5</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="5">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 6</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="6">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 7</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="7">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 8</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="8">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 9</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="9">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 10</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="10">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 11</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="11">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 12</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="12">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 13</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="13">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 14</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="14">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 15</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="15">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 16</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="16">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 17</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="17">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 18</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="18">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 19</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="19">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 20</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="20">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 21</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="21">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 22</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="22">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 23</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="23">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 24</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="24">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 25</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="25">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 26</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="26">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 27</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="27">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 28</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="28">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 29</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="29">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 30</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="30">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 31</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="31">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 32</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="32">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 33</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="33">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 34</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="34">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 35</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="35">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 36</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="36">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 37</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="37">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 38</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="38">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 39</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="39">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 40</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="40">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 41</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="41">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 42</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="42">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 43</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="43">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 44</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="44">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 45</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="45">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 46</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="46">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 47</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="47">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 48</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="48">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 49</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                                <island-tabpanel value="49">
+                                    <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Tab 50</h4>
+                                    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                </island-tabpanel>
+                        </island-tabpanels>
+                    </island-tabs>
+                </div>
+            </div>
+
+            <!-- Demo 5: Select on Focus -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Select on Focus</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Set select-on-focus to activate tabs immediately on keyboard focus.</p>
+                <div style="max-width: 48rem; width: 100%;">
+                    <island-tabs value="tab1" select-on-focus="true">
+                        <island-tablist>
+                            <island-tab value="tab1">Account Info</island-tab>
+                            <island-tab value="tab2">Payment</island-tab>
+                            <island-tab value="tab3">Preferences</island-tab>
+                        </island-tablist>
+                        <island-tabpanels>
+                            <island-tabpanel value="tab1">
+                                <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Account Info</h4>
+                                <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Update your personal information such as name, email address, and profile picture.</p>
+                            </island-tabpanel>
+                            <island-tabpanel value="tab2">
+                                <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Payment</h4>
+                                <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Manage your subscription plan, view invoices, and update your payment method.</p>
+                            </island-tabpanel>
+                            <island-tabpanel value="tab3">
+                                <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Preferences</h4>
+                                <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Customize how the application looks and behaves to match your personal preferences.</p>
+                            </island-tabpanel>
+                        </island-tabpanels>
+                    </island-tabs>
+                </div>
+            </div>
+
+            <!-- Demo 6: Lazy -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Lazy</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Panel content is only rendered or hydrated when the tab becomes active.</p>
+                <div style="max-width: 48rem; width: 100%;">
+                    <island-tabs value="0" lazy="true">
+                        <island-tablist>
+                            <island-tab value="0">Header I</island-tab>
+                            <island-tab value="1">Header II</island-tab>
+                            <island-tab value="2">Header III</island-tab>
+                        </island-tablist>
+                        <island-tabpanels>
+                            <island-tabpanel value="0">
+                                <p style="margin: 0; font-size: 0.875rem; line-height: 1.6; color: var(--p-text-color);">
+                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+                                </p>
+                            </island-tabpanel>
+                            <island-tabpanel value="1">
+                                <p style="margin: 0; font-size: 0.875rem; line-height: 1.6; color: var(--p-text-color);">
+                                    Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit.
+                                </p>
+                            </island-tabpanel>
+                            <island-tabpanel value="2">
+                                <p style="margin: 0; font-size: 0.875rem; line-height: 1.6; color: var(--p-text-color);">
+                                    Complex components that should only be initialized when the tab becomes active.
+                                </p>
+                            </island-tabpanel>
+                        </island-tabpanels>
+                    </island-tabs>
+                </div>
+            </div>
+
+            <!-- Demo 7: Disabled -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Disabled</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Set disabled on a Tab to prevent selection and interaction.</p>
+                <div style="max-width: 48rem; width: 100%;">
+                    <island-tabs value="tab1">
+                        <island-tablist>
+                            <island-tab value="tab1">Account Info</island-tab>
+                            <island-tab value="tab2" disabled="true">Payment</island-tab>
+                            <island-tab value="tab3">Preferences</island-tab>
+                        </island-tablist>
+                        <island-tabpanels>
+                            <island-tabpanel value="tab1">
+                                <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Account Info</h4>
+                                <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Update your personal information such as name, email address, and profile picture.</p>
+                            </island-tabpanel>
+                            <island-tabpanel value="tab2">
+                                <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Payment</h4>
+                                <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Manage your subscription plan, view invoices, and update your payment method.</p>
+                            </island-tabpanel>
+                            <island-tabpanel value="tab3">
+                                <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Preferences</h4>
+                                <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Customize how the application looks and behaves to match your personal preferences.</p>
+                            </island-tabpanel>
+                        </island-tabpanels>
+                    </island-tabs>
+                </div>
+            </div>
+
+            <!-- Demo 8: Custom Indicator -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Custom Indicator</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Active tab highlight restyled as a smooth floating capsule indicator.</p>
+                <div style="max-width: 48rem; width: 100%;">
+                    <island-tabs value="tab1">
+                        <island-tablist class="p-tablist-capsule">
+                            <island-tab value="tab1">Account Info</island-tab>
+                            <island-tab value="tab2">Payment</island-tab>
+                            <island-tab value="tab3">Preferences</island-tab>
+                        </island-tablist>
+                        <island-tabpanels>
+                            <island-tabpanel value="tab1">
+                                <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Account Info</h4>
+                                <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Update your personal information such as name, email address, and profile picture.</p>
+                            </island-tabpanel>
+                            <island-tabpanel value="tab2">
+                                <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Payment</h4>
+                                <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Manage your subscription plan, view invoices, and update your payment method.</p>
+                            </island-tabpanel>
+                            <island-tabpanel value="tab3">
+                                <h4 style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Preferences</h4>
+                                <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Customize how the application looks and behaves to match your personal preferences.</p>
+                            </island-tabpanel>
+                        </island-tabpanels>
+                    </island-tabs>
+                </div>
+            </div>
+
+            <!-- Demo 9: Template -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Template</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Custom tab headers with vector SVG icons and rich interactive form controls.</p>
+                <div style="max-width: 32rem; margin: 0 auto; width: 100%;">
+                    <island-tabs value="tab1">
+                        <island-tablist>
+                            <island-tab value="tab1" class="flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                <span>Account Info</span>
+                            </island-tab>
+                            <island-tab value="tab2" class="flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+                                <span>Payment</span>
+                                <span class="p-tag p-tag-emerald" style="font-size: 0.7rem; padding: 0.15rem 0.45rem; border-radius: 9999px; background: rgba(16, 185, 129, 0.15); color: var(--p-primary-600); font-weight: 700;">New</span>
+                            </island-tab>
+                            <island-tab value="tab3" class="flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                                <span>Preferences</span>
+                            </island-tab>
+                        </island-tablist>
+                        <island-tabpanels>
+                            <island-tabpanel value="tab1">
+                                <div>
+                                    <p style="margin: 0.5rem 0 1.5rem 0; font-size: 0.875rem; color: var(--p-text-muted);">Update your personal information such as name, email address, and profile picture.</p>
+                                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                        <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                                            <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color);">Username</label>
+                                            <input type="text" class="p-inputtext p-component" placeholder="john.doe" style="padding: 0.5rem 0.75rem; border-radius: 6px; border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color);" />
+                                        </div>
+                                        <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                                            <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color);">Email</label>
+                                            <input type="email" class="p-inputtext p-component" placeholder="john.doe@example.com" style="padding: 0.5rem 0.75rem; border-radius: 6px; border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color);" />
+                                        </div>
+                                    </div>
+                                    <button type="button" class="p-button p-button-primary" style="margin-top: 1.5rem; display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: 6px; background: var(--p-primary-500); border: 1px solid var(--p-primary-500); color: #ffffff; cursor: pointer;">Save Changes</button>
+                                </div>
+                            </island-tabpanel>
+                            <island-tabpanel value="tab2">
+                                <div>
+                                    <p style="margin: 0.5rem 0 1.5rem 0; font-size: 0.875rem; color: var(--p-text-muted);">Manage your subscription plan, view invoices, and update your payment method.</p>
+                                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                        <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                                            <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color);">Cardholder Name</label>
+                                            <input type="text" class="p-inputtext p-component" placeholder="John Doe" style="padding: 0.5rem 0.75rem; border-radius: 6px; border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color);" />
+                                        </div>
+                                        <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                                            <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color);">Card Number</label>
+                                            <input type="text" class="p-inputtext p-component" placeholder="0000 0000 0000 0000" style="padding: 0.5rem 0.75rem; border-radius: 6px; border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color);" />
+                                        </div>
+                                        <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                                            <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color);">Expiry Date</label>
+                                            <input type="text" class="p-inputtext p-component" placeholder="MM/YY" style="padding: 0.5rem 0.75rem; border-radius: 6px; border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color);" />
+                                        </div>
+                                    </div>
+                                    <button type="button" class="p-button p-button-primary" style="margin-top: 1.5rem; display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: 6px; background: var(--p-primary-500); border: 1px solid var(--p-primary-500); color: #ffffff; cursor: pointer;">Update Payment</button>
+                                </div>
+                            </island-tabpanel>
+                            <island-tabpanel value="tab3">
+                                <div>
+                                    <p style="margin: 0.5rem 0 1.5rem 0; font-size: 0.875rem; color: var(--p-text-muted);">Customize how the application looks and behaves to match your personal preferences.</p>
+                                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                                            <label style="font-size: 0.875rem; font-weight: 600; color: var(--p-text-color);">Dark Mode</label>
+                                            <island-toggle-switch />
+                                        </div>
+                                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                                            <label style="font-size: 0.875rem; font-weight: 600; color: var(--p-text-color);">Email Notifications</label>
+                                            <island-toggle-switch checked="true" />
+                                        </div>
+                                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                                            <label style="font-size: 0.875rem; font-weight: 600; color: var(--p-text-color);">Desktop Notifications</label>
+                                            <island-toggle-switch />
+                                        </div>
+                                    </div>
+                                    <button type="button" class="p-button p-button-primary" style="margin-top: 1.5rem; display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: 6px; background: var(--p-primary-500); border: 1px solid var(--p-primary-500); color: #ffffff; cursor: pointer; float: right;">Save Preferences</button>
+                                </div>
+                            </island-tabpanel>
+                        </island-tabpanels>
+                    </island-tabs>
+                </div>
+            </div>
+
+            <!-- Demo 10: Tab Menu (Navigational) -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Tab Menu</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">A navigation menu implemented using tabs without panels where the content is provided by routing.</p>
+                <div style="max-width: 48rem; width: 100%;">
+                    <island-tabs value="dashboard">
+                        <island-tablist>
+                            <island-tab value="dashboard" class="flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                                <span>Dashboard</span>
+                            </island-tab>
+                            <island-tab value="transactions" class="flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+                                <span>Transactions</span>
+                            </island-tab>
+                            <island-tab value="products" class="flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg>
+                                <span>Products</span>
+                            </island-tab>
+                            <island-tab value="messages" class="flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
+                                <span>Messages</span>
+                            </island-tab>
+                        </island-tablist>
+                    </island-tabs>
+                </div>
+            </div>
         </div>
     </section>
 
-        <!-- Timeline -->
+    <!-- Timeline -->
     <section id="sec-timeline" class="component-card">
         <div class="card-header">
             <div>

@@ -4902,3 +4902,201 @@ html {
 [data-theme="dark"] .p-stepitem-completed:not(:last-child)::before {
     background: var(--p-primary-500, #10b981) !important;
 }
+
+/* ==========================================================================
+   Aura PrimeVue 4 Tabs Component Tokens & Transitions
+   ========================================================================== */
+.p-tabs {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.p-tablist {
+    display: flex;
+    position: relative;
+    border-bottom: 1px solid var(--p-border-color, #e2e8f0);
+    box-sizing: border-box;
+    align-items: center;
+}
+
+.p-tablist-content {
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    position: relative;
+    flex: 1 1 auto;
+    scroll-behavior: smooth;
+}
+.p-tablist-content::-webkit-scrollbar {
+    display: none;
+}
+
+.p-tablist-tab-list {
+    display: flex;
+    position: relative;
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    gap: 0.25rem;
+}
+
+.p-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.125rem;
+    border: none;
+    background: transparent;
+    color: var(--p-surface-600, #475569);
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    text-decoration: none;
+    border-radius: var(--p-border-radius-md, 6px);
+    transition: color 0.15s ease, background-color 0.15s ease;
+    outline: none;
+    user-select: none;
+    position: relative;
+    z-index: 2;
+    white-space: nowrap;
+}
+
+.p-tab:hover:not(.p-tab-active):not(:disabled):not([aria-disabled="true"]) {
+    color: var(--p-text-color, #0f172a);
+    background: var(--p-surface-100, #f1f5f9);
+}
+
+.p-tab-active {
+    color: var(--p-primary-600, #059669);
+    font-weight: 700;
+}
+
+.p-tab:disabled,
+.p-tab[aria-disabled="true"] {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.p-tab:focus-visible {
+    outline: 2px solid var(--p-primary-500, #10b981);
+    outline-offset: -2px;
+}
+
+/* Active indicator bar */
+.p-tablist-active-bar {
+    position: absolute;
+    bottom: -1px;
+    height: 2px;
+    background: var(--p-primary-500, #10b981);
+    transition: left 0.25s cubic-bezier(0.2, 0, 0, 1), width 0.25s cubic-bezier(0.2, 0, 0, 1);
+    z-index: 3;
+    pointer-events: none;
+}
+
+/* Scroll navigation buttons */
+.p-tablist-prev-button,
+.p-tablist-next-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    background: var(--p-surface-0, #ffffff);
+    border: 1px solid var(--p-border-color, #e2e8f0);
+    border-radius: var(--p-border-radius-md, 6px);
+    color: var(--p-surface-600, #475569);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.15s ease;
+    z-index: 4;
+    outline: none;
+    margin: 0 0.25rem;
+}
+.p-tablist-prev-button:hover:not(:disabled),
+.p-tablist-next-button:hover:not(:disabled) {
+    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-text-color, #0f172a);
+}
+.p-tablist-prev-button:disabled,
+.p-tablist-next-button:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+/* Tab Panels */
+.p-tabpanels {
+    padding: 1.25rem 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.p-tabpanel {
+    display: none;
+    width: 100%;
+}
+.p-tabpanel.p-tabpanel-active {
+    display: block;
+    animation: p-tabpanel-fadein 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+
+@keyframes p-tabpanel-fadein {
+    from { opacity: 0; transform: translateY(3px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Custom Capsule Indicator */
+.p-tablist-capsule .p-tablist-active-bar {
+    bottom: 4px;
+    height: calc(100% - 8px);
+    background: var(--p-surface-100, #f1f5f9);
+    border-radius: var(--p-border-radius-md, 6px);
+    z-index: 1;
+}
+.p-tablist-capsule .p-tab-active {
+    color: var(--p-text-color, #0f172a);
+}
+
+/* Dark Mode Tokens */
+.dark .p-tab,
+[data-theme="dark"] .p-tab {
+    color: var(--p-surface-400, #94a3b8);
+}
+.dark .p-tab:hover:not(.p-tab-active):not(:disabled):not([aria-disabled="true"]),
+[data-theme="dark"] .p-tab:hover:not(.p-tab-active):not(:disabled):not([aria-disabled="true"]) {
+    color: var(--p-surface-100, #f8fafc);
+    background: var(--p-surface-800, #1e293b);
+}
+.dark .p-tab-active,
+[data-theme="dark"] .p-tab-active {
+    color: var(--p-primary-400, #34d399);
+}
+.dark .p-tablist-active-bar,
+[data-theme="dark"] .p-tablist-active-bar {
+    background: var(--p-primary-400, #34d399);
+}
+.dark .p-tablist-prev-button,
+.dark .p-tablist-next-button,
+[data-theme="dark"] .p-tablist-prev-button,
+[data-theme="dark"] .p-tablist-next-button {
+    background: var(--p-surface-900, #0f172a);
+    border-color: var(--p-surface-700, #334155);
+    color: var(--p-surface-300, #cbd5e1);
+}
+.dark .p-tablist-prev-button:hover:not(:disabled),
+.dark .p-tablist-next-button:hover:not(:disabled),
+[data-theme="dark"] .p-tablist-prev-button:hover:not(:disabled),
+[data-theme="dark"] .p-tablist-next-button:hover:not(:disabled) {
+    background: var(--p-surface-800, #1e293b);
+    color: #ffffff;
+}
+.dark .p-tablist-capsule .p-tablist-active-bar,
+[data-theme="dark"] .p-tablist-capsule .p-tablist-active-bar {
+    background: var(--p-surface-800, #1e293b);
+}
+.dark .p-tablist-capsule .p-tab-active,
+[data-theme="dark"] .p-tablist-capsule .p-tab-active {
+    color: var(--p-surface-0, #f8fafc);
+}
