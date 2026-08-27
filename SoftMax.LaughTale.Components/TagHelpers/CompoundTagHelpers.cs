@@ -792,6 +792,196 @@ public class IslandPanelTagHelper : TagHelper
 
 #endregion
 
+#region 2e. ScrollArea Primitives
+
+/// <summary>
+/// Enterprise ScrollArea TagHelper (Aura Design System compliant)
+/// </summary>
+[HtmlTargetElement("island-scrollarea", TagStructure = TagStructure.NormalOrSelfClosing)]
+[HtmlTargetElement("p-scrollarea", TagStructure = TagStructure.NormalOrSelfClosing)]
+public class IslandScrollAreaTagHelper : TagHelper
+{
+    [HtmlAttributeName("orientation")]
+    public string Orientation { get; set; } = "vertical"; // "vertical" | "horizontal" | "both"
+
+    [HtmlAttributeName("variant")]
+    public string Variant { get; set; } = "auto"; // "auto" | "hover" | "scroll" | "always" | "hidden"
+
+    [HtmlAttributeName("mask")]
+    public bool Mask { get; set; } = false;
+
+    [HtmlAttributeName("class")]
+    public string? Class { get; set; }
+
+    [HtmlAttributeName("style")]
+    public string? Style { get; set; }
+
+    [HtmlAttributeName("hydrate")]
+    public HydrateStrategy Hydrate { get; set; } = HydrateStrategy.Load;
+
+    public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
+    {
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "scrollarea");
+        output.Attributes.SetAttribute("data-hydrate", Hydrate.ToString().ToLowerInvariant());
+        output.Attributes.SetAttribute("data-p-variant", Variant);
+
+        var props = new
+        {
+            orientation = Orientation,
+            variant = Variant,
+            mask = Mask
+        };
+        output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
+
+        var classes = new List<string> { "p-scrollarea", "p-component" };
+        if (Mask) classes.Add("p-scrollarea-mask");
+        if (!string.IsNullOrWhiteSpace(Class)) classes.Add(Class);
+        output.Attributes.SetAttribute("class", string.Join(" ", classes));
+
+        if (!string.IsNullOrWhiteSpace(Style))
+        {
+            output.Attributes.SetAttribute("style", Style);
+        }
+
+        var childContent = await output.GetChildContentAsync();
+        var contentStr = childContent.GetContent();
+
+        // If sub-tags were not used, wrap children automatically
+        if (!contentStr.Contains("p-scrollarea-viewport"))
+        {
+            var isBoth = string.Equals(Orientation, "both", StringComparison.OrdinalIgnoreCase);
+            var isHoriz = isBoth || string.Equals(Orientation, "horizontal", StringComparison.OrdinalIgnoreCase);
+            var isVert = isBoth || string.Equals(Orientation, "vertical", StringComparison.OrdinalIgnoreCase);
+
+            var vBar = isVert ? @"<div class=""p-scrollarea-scrollbar p-scrollarea-scrollbar-vertical"" role=""scrollbar"" aria-orientation=""vertical""><div class=""p-scrollarea-handle""></div></div>" : "";
+            var hBar = isHoriz ? @"<div class=""p-scrollarea-scrollbar p-scrollarea-scrollbar-horizontal"" role=""scrollbar"" aria-orientation=""horizontal""><div class=""p-scrollarea-handle""></div></div>" : "";
+            var corner = isBoth ? @"<div class=""p-scrollarea-corner""></div>" : "";
+
+            output.Content.SetHtmlContent($@"<div class=""p-scrollarea-viewport"" tabindex=""0"">
+                <div class=""p-scrollarea-content"">
+                    {contentStr}
+                </div>
+            </div>
+            {vBar}
+            {hBar}
+            {corner}");
+        }
+        else
+        {
+            output.Content.SetHtmlContent(contentStr);
+        }
+    }
+}
+
+[HtmlTargetElement("island-scrollarea-viewport", TagStructure = TagStructure.NormalOrSelfClosing)]
+[HtmlTargetElement("p-scrollarea-viewport", TagStructure = TagStructure.NormalOrSelfClosing)]
+public class IslandScrollAreaViewportTagHelper : TagHelper
+{
+    [HtmlAttributeName("class")]
+    public string? Class { get; set; }
+
+    public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
+    {
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        var baseClass = "p-scrollarea-viewport";
+        output.Attributes.SetAttribute("class", string.IsNullOrWhiteSpace(Class) ? baseClass : $"{baseClass} {Class}");
+        output.Attributes.SetAttribute("tabindex", "0");
+
+        var childContent = await output.GetChildContentAsync();
+        output.Content.SetHtmlContent(childContent);
+    }
+}
+
+[HtmlTargetElement("island-scrollarea-content", TagStructure = TagStructure.NormalOrSelfClosing)]
+[HtmlTargetElement("p-scrollarea-content", TagStructure = TagStructure.NormalOrSelfClosing)]
+public class IslandScrollAreaContentTagHelper : TagHelper
+{
+    [HtmlAttributeName("class")]
+    public string? Class { get; set; }
+
+    public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
+    {
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        var baseClass = "p-scrollarea-content";
+        output.Attributes.SetAttribute("class", string.IsNullOrWhiteSpace(Class) ? baseClass : $"{baseClass} {Class}");
+
+        var childContent = await output.GetChildContentAsync();
+        output.Content.SetHtmlContent(childContent);
+    }
+}
+
+[HtmlTargetElement("island-scrollarea-scrollbar", TagStructure = TagStructure.NormalOrSelfClosing)]
+[HtmlTargetElement("p-scrollarea-scrollbar", TagStructure = TagStructure.NormalOrSelfClosing)]
+public class IslandScrollAreaScrollbarTagHelper : TagHelper
+{
+    [HtmlAttributeName("orientation")]
+    public string Orientation { get; set; } = "vertical";
+
+    [HtmlAttributeName("class")]
+    public string? Class { get; set; }
+
+    public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
+    {
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        var isHoriz = string.Equals(Orientation, "horizontal", StringComparison.OrdinalIgnoreCase);
+        var orientClass = isHoriz ? "p-scrollarea-scrollbar-horizontal" : "p-scrollarea-scrollbar-vertical";
+        var baseClass = $"p-scrollarea-scrollbar {orientClass}";
+        output.Attributes.SetAttribute("class", string.IsNullOrWhiteSpace(Class) ? baseClass : $"{baseClass} {Class}");
+        output.Attributes.SetAttribute("role", "scrollbar");
+        output.Attributes.SetAttribute("aria-orientation", isHoriz ? "horizontal" : "vertical");
+
+        var childContent = await output.GetChildContentAsync();
+        var contentStr = childContent.GetContent();
+        if (string.IsNullOrWhiteSpace(contentStr))
+        {
+            output.Content.SetHtmlContent(@"<div class=""p-scrollarea-handle""></div>");
+        }
+        else
+        {
+            output.Content.SetHtmlContent(contentStr);
+        }
+    }
+}
+
+[HtmlTargetElement("island-scrollarea-handle", TagStructure = TagStructure.NormalOrSelfClosing)]
+[HtmlTargetElement("island-scrollarea-thumb", TagStructure = TagStructure.NormalOrSelfClosing)]
+[HtmlTargetElement("p-scrollarea-handle", TagStructure = TagStructure.NormalOrSelfClosing)]
+public class IslandScrollAreaHandleTagHelper : TagHelper
+{
+    [HtmlAttributeName("class")]
+    public string? Class { get; set; }
+
+    public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
+    {
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        var baseClass = "p-scrollarea-handle";
+        output.Attributes.SetAttribute("class", string.IsNullOrWhiteSpace(Class) ? baseClass : $"{baseClass} {Class}");
+
+        var childContent = await output.GetChildContentAsync();
+        output.Content.SetHtmlContent(childContent);
+    }
+}
+
+[HtmlTargetElement("island-scrollarea-corner", TagStructure = TagStructure.NormalOrSelfClosing)]
+[HtmlTargetElement("p-scrollarea-corner", TagStructure = TagStructure.NormalOrSelfClosing)]
+public class IslandScrollAreaCornerTagHelper : TagHelper
+{
+    public override void Process(TagHelperContext context, TagHelperOutput output)
+    {
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("class", "p-scrollarea-corner");
+    }
+}
+
+#endregion
+
 #region 3. Button Primitive
 
 /// <summary>

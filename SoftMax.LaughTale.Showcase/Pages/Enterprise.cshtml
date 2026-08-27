@@ -3536,6 +3536,209 @@
         </div>
     </section>
 
+    <!-- ScrollArea -->
+    <section id="sec-scrollarea" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>ScrollArea</h2>
+                <p>ScrollArea is a cross browser, lightweight and themable alternative to native browser scrollbar with drag controls and fade masks.</p>
+            </div>
+            <span class="aura-tag tag-cyan">Panels</span>
+        </div>
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Demo 1: Basic -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">A custom scrollable container with styled scrollbars.</p>
+                <div style="display: flex; justify-content: center;">
+                    <div style="max-width: 14rem; width: 100%;">
+                        <div style="text-transform: uppercase; font-family: var(--font-mono, monospace); font-size: 0.75rem; color: var(--p-text-muted); font-weight: 600; margin-bottom: 0.5rem; letter-spacing: -0.025em;">Automobiles</div>
+                        <island-scrollarea style="height: 18rem;">
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem; padding-right: 0.75rem;">
+                                <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Audi</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(200)</span></span>
+                                <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">BMW</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(350)</span></span>
+                                <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Mercedes-Benz</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(420)</span></span>
+                                <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Volkswagen</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(510)</span></span>
+                                <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Toyota</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(610)</span></span>
+                                <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Honda</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(280)</span></span>
+                                <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Hyundai</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(390)</span></span>
+                                <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Kia</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(260)</span></span>
+                                <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Ford</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(470)</span></span>
+                                <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Renault</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(530)</span></span>
+                                <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Peugeot</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(410)</span></span>
+                                <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Citroen</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(190)</span></span>
+                                <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Skoda</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(360)</span></span>
+                                <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Seat</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(210)</span></span>
+                                <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Opel</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(440)</span></span>
+                                <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Fiat</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(620)</span></span>
+                                <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Dacia</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(380)</span></span>
+                                <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Volvo</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(140)</span></span>
+                                <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Tesla</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(220)</span></span>
+                                <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Porsche</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(75)</span></span>
+                            </div>
+                        </island-scrollarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 2: Horizontal -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Horizontal</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">ScrollArea supports horizontal scrolling for content that extends beyond the horizontal viewport.</p>
+                <div style="display: flex; justify-content: center;">
+                    <div style="max-width: 28rem; width: 100%;">
+                        <island-scrollarea orientation="horizontal">
+                            <div style="display: flex; gap: 1rem; width: max-content; padding: 0.875rem;">
+                                <figure style="margin: 0; flex-shrink: 0;">
+                                    <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&auto=format&fit=crop" alt="Title 1" style="width: 18rem; height: 10rem; object-fit: cover; border-radius: 4px;" />
+                                    <figcaption style="margin-top: 0.5rem; font-size: 0.75rem; color: var(--p-text-color);"><span style="opacity: 0.6;">Photo by</span> <strong>Title 1</strong></figcaption>
+                                </figure>
+                                <figure style="margin: 0; flex-shrink: 0;">
+                                    <img src="https://images.unsplash.com/photo-1519046904884-53103b34b206?w=400&auto=format&fit=crop" alt="Title 2" style="width: 18rem; height: 10rem; object-fit: cover; border-radius: 4px;" />
+                                    <figcaption style="margin-top: 0.5rem; font-size: 0.75rem; color: var(--p-text-color);"><span style="opacity: 0.6;">Photo by</span> <strong>Title 2</strong></figcaption>
+                                </figure>
+                                <figure style="margin: 0; flex-shrink: 0;">
+                                    <img src="https://images.unsplash.com/photo-1473496169904-658ba7c44d8a?w=400&auto=format&fit=crop" alt="Title 3" style="width: 18rem; height: 10rem; object-fit: cover; border-radius: 4px;" />
+                                    <figcaption style="margin-top: 0.5rem; font-size: 0.75rem; color: var(--p-text-color);"><span style="opacity: 0.6;">Photo by</span> <strong>Title 3</strong></figcaption>
+                                </figure>
+                                <figure style="margin: 0; flex-shrink: 0;">
+                                    <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=400&auto=format&fit=crop" alt="Title 4" style="width: 18rem; height: 10rem; object-fit: cover; border-radius: 4px;" />
+                                    <figcaption style="margin-top: 0.5rem; font-size: 0.75rem; color: var(--p-text-color);"><span style="opacity: 0.6;">Photo by</span> <strong>Title 4</strong></figcaption>
+                                </figure>
+                                <figure style="margin: 0; flex-shrink: 0;">
+                                    <img src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=400&auto=format&fit=crop" alt="Title 5" style="width: 18rem; height: 10rem; object-fit: cover; border-radius: 4px;" />
+                                    <figcaption style="margin-top: 0.5rem; font-size: 0.75rem; color: var(--p-text-color);"><span style="opacity: 0.6;">Photo by</span> <strong>Title 5</strong></figcaption>
+                                </figure>
+                            </div>
+                        </island-scrollarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 3: Both Scrollbars -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Both Scrollbars</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Both vertical and horizontal scrollbars are displayed when the content overflows in both directions.</p>
+                <div style="display: flex; justify-content: center;">
+                    <div style="max-width: 24rem; width: 100%; border: 1px solid var(--p-border-color); border-radius: 6px; overflow: hidden; background: var(--p-surface-0);">
+                        <island-scrollarea orientation="both" style="height: 20rem;">
+                            <table style="min-width: 32rem; width: 100%; font-size: 0.8125rem; border-collapse: collapse;">
+                                <thead style="position: sticky; top: 0; z-index: 10; background: var(--p-surface-100);">
+                                    <tr style="border-bottom: 1px solid var(--p-border-color);">
+                                        <th style="padding: 0.5rem 1rem; text-align: left; text-transform: uppercase; font-family: var(--font-mono, monospace); font-weight: 600; color: var(--p-text-muted);">City</th>
+                                        <th style="padding: 0.5rem 1rem; text-align: left; text-transform: uppercase; font-family: var(--font-mono, monospace); font-weight: 600; color: var(--p-text-muted);">State</th>
+                                        <th style="padding: 0.5rem 1rem; text-align: left; text-transform: uppercase; font-family: var(--font-mono, monospace); font-weight: 600; color: var(--p-text-muted);">Population</th>
+                                        <th style="padding: 0.5rem 1rem; text-align: left; text-transform: uppercase; font-family: var(--font-mono, monospace); font-weight: 600; color: var(--p-text-muted);">Area (km²)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="border-bottom: 1px solid var(--p-border-color);"><td style="padding: 0.5rem 1rem; font-weight: 500; color: var(--p-text-color);">New York</td><td style="padding: 0.5rem 1rem; color: var(--p-text-muted);">NY</td><td style="padding: 0.5rem 1rem; color: var(--p-text-color);">8,419,600</td><td style="padding: 0.5rem 1rem; color: var(--p-text-color);">783.8</td></tr>
+                                    <tr style="border-bottom: 1px solid var(--p-border-color);"><td style="padding: 0.5rem 1rem; font-weight: 500; color: var(--p-text-color);">Los Angeles</td><td style="padding: 0.5rem 1rem; color: var(--p-text-muted);">CA</td><td style="padding: 0.5rem 1rem; color: var(--p-text-color);">3,980,400</td><td style="padding: 0.5rem 1rem; color: var(--p-text-color);">1,214.9</td></tr>
+                                    <tr style="border-bottom: 1px solid var(--p-border-color);"><td style="padding: 0.5rem 1rem; font-weight: 500; color: var(--p-text-color);">Chicago</td><td style="padding: 0.5rem 1rem; color: var(--p-text-muted);">IL</td><td style="padding: 0.5rem 1rem; color: var(--p-text-color);">2,716,000</td><td style="padding: 0.5rem 1rem; color: var(--p-text-color);">589.6</td></tr>
+                                    <tr style="border-bottom: 1px solid var(--p-border-color);"><td style="padding: 0.5rem 1rem; font-weight: 500; color: var(--p-text-color);">Houston</td><td style="padding: 0.5rem 1rem; color: var(--p-text-muted);">TX</td><td style="padding: 0.5rem 1rem; color: var(--p-text-color);">2,328,000</td><td style="padding: 0.5rem 1rem; color: var(--p-text-color);">1,651.1</td></tr>
+                                    <tr style="border-bottom: 1px solid var(--p-border-color);"><td style="padding: 0.5rem 1rem; font-weight: 500; color: var(--p-text-color);">Phoenix</td><td style="padding: 0.5rem 1rem; color: var(--p-text-muted);">AZ</td><td style="padding: 0.5rem 1rem; color: var(--p-text-color);">1,690,000</td><td style="padding: 0.5rem 1rem; color: var(--p-text-color);">1,340.6</td></tr>
+                                    <tr style="border-bottom: 1px solid var(--p-border-color);"><td style="padding: 0.5rem 1rem; font-weight: 500; color: var(--p-text-color);">Philadelphia</td><td style="padding: 0.5rem 1rem; color: var(--p-text-muted);">PA</td><td style="padding: 0.5rem 1rem; color: var(--p-text-color);">1,584,200</td><td style="padding: 0.5rem 1rem; color: var(--p-text-color);">369.6</td></tr>
+                                    <tr style="border-bottom: 1px solid var(--p-border-color);"><td style="padding: 0.5rem 1rem; font-weight: 500; color: var(--p-text-color);">San Antonio</td><td style="padding: 0.5rem 1rem; color: var(--p-text-muted);">TX</td><td style="padding: 0.5rem 1rem; color: var(--p-text-color);">1,547,200</td><td style="padding: 0.5rem 1rem; color: var(--p-text-color);">1,194.0</td></tr>
+                                    <tr style="border-bottom: 1px solid var(--p-border-color);"><td style="padding: 0.5rem 1rem; font-weight: 500; color: var(--p-text-color);">San Diego</td><td style="padding: 0.5rem 1rem; color: var(--p-text-muted);">CA</td><td style="padding: 0.5rem 1rem; color: var(--p-text-color);">1,423,800</td><td style="padding: 0.5rem 1rem; color: var(--p-text-color);">964.5</td></tr>
+                                    <tr style="border-bottom: 1px solid var(--p-border-color);"><td style="padding: 0.5rem 1rem; font-weight: 500; color: var(--p-text-color);">Dallas</td><td style="padding: 0.5rem 1rem; color: var(--p-text-muted);">TX</td><td style="padding: 0.5rem 1rem; color: var(--p-text-color);">1,341,100</td><td style="padding: 0.5rem 1rem; color: var(--p-text-color);">882.9</td></tr>
+                                    <tr style="border-bottom: 1px solid var(--p-border-color);"><td style="padding: 0.5rem 1rem; font-weight: 500; color: var(--p-text-color);">San Jose</td><td style="padding: 0.5rem 1rem; color: var(--p-text-muted);">CA</td><td style="padding: 0.5rem 1rem; color: var(--p-text-color);">1,035,300</td><td style="padding: 0.5rem 1rem; color: var(--p-text-color);">469.7</td></tr>
+                                </tbody>
+                            </table>
+                        </island-scrollarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 4: Scroll Fade -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Scroll Fade</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">The mask property adds a gradient fade effect at the scroll edges.</p>
+                <div style="display: flex; justify-content: center;">
+                    <div style="max-width: 14rem; width: 100%;">
+                        <div style="text-transform: uppercase; font-family: var(--font-mono, monospace); font-size: 0.75rem; color: var(--p-text-muted); font-weight: 600; margin-bottom: 0.5rem; letter-spacing: -0.025em;">Automobiles</div>
+                        <island-scrollarea mask="true" style="height: 18rem;">
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem; padding-right: 0.75rem;">
+                                <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Audi</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(200)</span></span>
+                                <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">BMW</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(350)</span></span>
+                                <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Mercedes-Benz</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(420)</span></span>
+                                <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Volkswagen</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(510)</span></span>
+                                <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Toyota</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(610)</span></span>
+                                <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Honda</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(280)</span></span>
+                                <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Hyundai</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(390)</span></span>
+                                <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Kia</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(260)</span></span>
+                                <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Ford</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(470)</span></span>
+                                <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Renault</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(530)</span></span>
+                                <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Peugeot</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(410)</span></span>
+                                <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Citroen</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(190)</span></span>
+                                <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Skoda</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(360)</span></span>
+                            </div>
+                        </island-scrollarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 5: Variant -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Variant</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Change the visibility behavior of scrollbars with the variant property (auto, hover, scroll, always, hidden).</p>
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.35rem; justify-content: center; margin-bottom: 1.5rem;">
+                        <button type="button" class="p-panel-ctrl-btn p-highlight" data-scrollarea-variant="auto">Auto</button>
+                        <button type="button" class="p-panel-ctrl-btn" data-scrollarea-variant="hover">Hover</button>
+                        <button type="button" class="p-panel-ctrl-btn" data-scrollarea-variant="scroll">Scroll</button>
+                        <button type="button" class="p-panel-ctrl-btn" data-scrollarea-variant="always">Always</button>
+                        <button type="button" class="p-panel-ctrl-btn" data-scrollarea-variant="hidden">Hidden</button>
+                    </div>
+                    <div style="max-width: 14rem; width: 100%;">
+                        <div style="text-transform: uppercase; font-family: var(--font-mono, monospace); font-size: 0.75rem; color: var(--p-text-muted); font-weight: 600; margin-bottom: 0.5rem; letter-spacing: -0.025em;">Automobiles</div>
+                        <island-scrollarea variant="auto" style="height: 18rem;">
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem; padding-right: 0.75rem;">
+                                <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Audi</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(200)</span></span>
+                                <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">BMW</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(350)</span></span>
+                                <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Mercedes-Benz</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(420)</span></span>
+                                <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Volkswagen</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(510)</span></span>
+                                <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Toyota</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(610)</span></span>
+                                <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Honda</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(280)</span></span>
+                                <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Hyundai</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(390)</span></span>
+                                <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Kia</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(260)</span></span>
+                            </div>
+                        </island-scrollarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 6: Custom -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Custom</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Scrollbar and thumb elements can be customized using classes on the sub-components.</p>
+                <div style="display: flex; justify-content: center;">
+                    <div style="max-width: 14rem; width: 100%;">
+                        <div style="text-transform: uppercase; font-family: var(--font-mono, monospace); font-size: 0.75rem; color: var(--p-text-muted); font-weight: 600; margin-bottom: 0.5rem; letter-spacing: -0.025em;">Automobiles</div>
+                        <div class="p-scrollarea p-component" data-island="scrollarea" data-hydrate="load" data-props='{"orientation":"vertical","variant":"always"}' data-p-variant="always" style="height: 18rem;">
+                            <div class="p-scrollarea-viewport" tabindex="0">
+                                <div class="p-scrollarea-content">
+                                    <div style="display: flex; flex-direction: column; gap: 0.5rem; padding-right: 0.75rem;">
+                                        <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Audi</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(200)</span></span>
+                                        <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">BMW</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(350)</span></span>
+                                        <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Mercedes-Benz</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(420)</span></span>
+                                        <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Volkswagen</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(510)</span></span>
+                                        <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Toyota</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(610)</span></span>
+                                        <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Honda</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(280)</span></span>
+                                        <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Hyundai</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(390)</span></span>
+                                        <span style="display: flex; align-items: baseline; gap: 0.25rem;"><span style="font-size: 0.875rem; color: var(--p-text-color);">Kia</span><span style="font-size: 0.6875rem; font-family: var(--font-mono, monospace); color: var(--p-text-muted);">(260)</span></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-scrollarea-scrollbar p-scrollarea-scrollbar-vertical" style="border-radius: 9999px; background: rgba(99, 102, 241, 0.12);" role="scrollbar" aria-orientation="vertical">
+                                <div class="p-scrollarea-handle" style="background: #6366f1; border-radius: 9999px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Accordion -->
     <section id="sec-accordion" class="component-card">
         <div class="card-header">

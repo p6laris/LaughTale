@@ -66,6 +66,7 @@ public static class NavigationData
                 new("Divider", "columns3", "/enterprise#sec-divider", false, null, "New"),
                 new("Fieldset", "layoutGrid", "/enterprise#sec-fieldset", false, null, "New"),
                 new("Panel", "square", "/enterprise#sec-panel", false, null, "New"),
+                new("ScrollArea", "chevronsUpDown", "/enterprise#sec-scrollarea", false, null, "New"),
                 new("Accordion", "folderTree", "/enterprise#sec-accordion"),
                 new("Sliding Tabs", "columns3", "/enterprise#sec-tabs"),
                 new("Timeline", "activity", "/enterprise#sec-timeline")
