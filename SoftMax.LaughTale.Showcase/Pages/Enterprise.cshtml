@@ -2949,6 +2949,151 @@
         </div>
     </section>
 
+    <!-- Card -->
+    <section id="sec-card" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>Card</h2>
+                <p>Card is a flexible container component with header, title, subtitle, content, and footer regions for structured presentations.</p>
+            </div>
+            <span class="aura-tag tag-blue">Container</span>
+        </div>
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Demo 1: Basic -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">A container with a header, body, and footer for structured content.</p>
+                <div style="display: flex; justify-content: center;">
+                    <island-card class="max-w-sm w-full">
+                        <island-card-body>
+                            <island-card-caption>
+                                <island-card-title>Starter Plan</island-card-title>
+                                <island-card-subtitle>For personal projects</island-card-subtitle>
+                            </island-card-caption>
+                            <island-card-content>
+                                <p style="margin: 0;">Includes essential features, basic analytics and access to community support.</p>
+                            </island-card-content>
+                            <island-card-footer>
+                                <span style="font-size: 0.875rem; color: var(--p-surface-500);">Cancel anytime. No credit card required.</span>
+                            </island-card-footer>
+                        </island-card-body>
+                    </island-card>
+                </div>
+            </div>
+
+            <!-- Demo 2: With Form -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">With Form</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Card can be used as a form container with input fields and action buttons.</p>
+                <div style="display: flex; justify-content: center;">
+                    <island-card class="max-w-sm w-full">
+                        <island-card-body>
+                            <island-card-caption>
+                                <island-card-title>Welcome back</island-card-title>
+                                <island-card-subtitle>Sign in with your email to continue.</island-card-subtitle>
+                            </island-card-caption>
+                            <island-card-content>
+                                <form style="display: flex; flex-direction: column; gap: 1rem; margin-top: 0.75rem;">
+                                    <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                                        <label for="card-email" style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color);">Email</label>
+                                        <island-input-text id="card-email" type="email" placeholder="name@company.com" fluid="true" />
+                                    </div>
+                                    <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                                            <label for="card-password" style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color);">Password</label>
+                                            <a href="javascript:void(0)" style="font-size: 0.75rem; color: var(--p-primary-600); text-decoration: none;">Forgot password?</a>
+                                        </div>
+                                        <island-input-text id="card-password" type="password" placeholder="••••••••" fluid="true" />
+                                    </div>
+                                </form>
+                            </island-card-content>
+                            <island-card-footer>
+                                <div style="display: flex; flex-direction: column; gap: 0.75rem; width: 100%;">
+                                    <island-button label="Login" fluid="true" />
+                                    <island-button label="Login with Google" severity="secondary" variant="outlined" fluid="true" />
+                                    <div style="margin-top: 0.5rem; text-align: center; font-size: 0.8125rem; color: var(--p-surface-500);">
+                                        Don't have an account? <a href="javascript:void(0)" style="color: var(--p-primary-600); font-weight: 600; text-decoration: none;">Sign up</a>
+                                    </div>
+                                </div>
+                            </island-card-footer>
+                        </island-card-body>
+                    </island-card>
+                </div>
+            </div>
+
+            <!-- Demo 3: Advanced -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Advanced</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Use the header template to place a cover image, floating avatar badge, and multi-action footer.</p>
+                <div style="display: flex; justify-content: center;">
+                    <island-card class="max-w-sm w-full overflow-hidden">
+                        <island-card-header>
+                            <div style="position: relative;">
+                                <img style="width: 100%; height: 160px; object-fit: cover; display: block;" alt="Sakura Market Cover" src="https://images.unsplash.com/photo-1513649718256-1a7162666bad?q=80&w=600&auto=format&fit=crop" />
+                                <div style="width: 4rem; height: 4rem; border-radius: 9999px; border: 3px solid var(--p-surface-0); position: absolute; bottom: -1.75rem; left: 1rem; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); background: var(--p-surface-0);">
+                                    <img style="width: 100%; height: 100%; object-fit: cover;" src="https://images.unsplash.com/photo-1722495178488-c8056c4ec2c0?q=80&w=200&auto=format&fit=crop" alt="Market Avatar" />
+                                </div>
+                            </div>
+                        </island-card-header>
+                        <island-card-body style="padding-top: 2.25rem;">
+                            <island-card-caption>
+                                <island-card-title>Sakura Fresh Market</island-card-title>
+                                <island-card-subtitle>
+                                    <div style="display: flex; align-items: center; gap: 0.4rem; margin-top: 0.25rem;">
+                                        <span style="background: #e0f2fe; color: #0369a1; font-size: 0.6875rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 4px;">Daily</span>
+                                        <span style="background: #dcfce7; color: #15803d; font-size: 0.6875rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 4px;">Premium</span>
+                                    </div>
+                                </island-card-subtitle>
+                            </island-card-caption>
+                            <island-card-content>
+                                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                                    <p style="margin: 0;">Sakura Fresh Market is your go-to store for fresh local produce, Japanese snacks, and daily essentials — all in one place!</p>
+                                    <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.8125rem;">
+                                        <span style="color: #f59e0b;">★</span> <span><strong>4.6</strong> (200+ reviews)</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.8125rem; color: var(--p-surface-600);">
+                                        <span>📍</span> <span>Tokyo, Shibuya-ku</span>
+                                    </div>
+                                </div>
+                            </island-card-content>
+                            <island-card-footer>
+                                <div style="display: flex; align-items: center; gap: 0.5rem; width: 100%; margin-top: 0.5rem;">
+                                    <island-button label="Call Us" severity="secondary" variant="outlined" style="flex: 1;" />
+                                    <island-button label="Visit Site" style="flex: 1;" />
+                                </div>
+                            </island-card-footer>
+                        </island-card-body>
+                    </island-card>
+                </div>
+            </div>
+
+            <!-- Demo 4: Pro Subscription -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Subscription Tier</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Structured card with feature description, pricing highlight, and upgrade button.</p>
+                <div style="display: flex; justify-content: center;">
+                    <island-card class="max-w-sm w-full">
+                        <island-card-body>
+                            <island-card-caption>
+                                <island-card-title>Pro Subscription</island-card-title>
+                                <island-card-subtitle>Everything you need to scale your workflow</island-card-subtitle>
+                            </island-card-caption>
+                            <island-card-content>
+                                <p style="margin: 0 0 1rem 0;">Get unlimited access to all features, priority support, and advanced analytics to help your team grow faster.</p>
+                                <div style="font-size: 1.5rem; font-weight: 800; color: var(--p-surface-900);">
+                                    $29 <span style="font-size: 0.875rem; font-weight: 500; color: var(--p-surface-500);">/ month</span>
+                                </div>
+                            </island-card-content>
+                            <island-card-footer>
+                                <island-button label="Upgrade Now" fluid="true" />
+                            </island-card-footer>
+                        </island-card-body>
+                    </island-card>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Accordion -->
     <section id="sec-accordion" class="component-card">
         <div class="card-header">

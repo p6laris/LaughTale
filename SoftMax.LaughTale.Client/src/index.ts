@@ -60,6 +60,7 @@ defineIsland('image-compare', () => import('./components/image-compare'));
 defineIsland('confirm-popup', () => import('./components/confirm-popup'));
 
 // Aura Additional Enterprise Components
+defineIsland('card', () => import('./components/card'));
 defineIsland('accordion', () => import('./components/accordion'));
 defineIsland('tabs', () => import('./components/tabs'));
 defineIsland('autocomplete', () => import('./components/autocomplete'));

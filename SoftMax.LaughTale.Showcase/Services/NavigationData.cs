@@ -62,6 +62,7 @@ public static class NavigationData
                 new("PickList", "arrowLeftRight", "/enterprise#sec-picklist"),
                 new("OrderList", "arrowLeftRight", "/enterprise#sec-orderlist"),
                 new("OrgChart Hierarchy", "folderTree", "/enterprise#sec-orgchart"),
+                new("Card", "layers", "/enterprise#sec-card", false, null, "New"),
                 new("Accordion", "folderTree", "/enterprise#sec-accordion"),
                 new("Sliding Tabs", "columns3", "/enterprise#sec-tabs"),
                 new("Timeline", "activity", "/enterprise#sec-timeline")

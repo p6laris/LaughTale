@@ -280,22 +280,55 @@ public class IslandErrorMessageTagHelper : TagHelper
 #region 2. Card Compound Primitives
 
 /// <summary>
-/// Compound Card Container.
+/// Compound Card Container (Aura Design System compliant).
 /// </summary>
 [HtmlTargetElement("island-card")]
+[HtmlTargetElement("island-card-root")]
 public class IslandCardTagHelper : TagHelper
 {
     [HtmlAttributeName("class")]
     public string? Class { get; set; }
 
+    [HtmlAttributeName("role")]
+    public string? Role { get; set; }
+
+    [HtmlAttributeName("title")]
+    public string? Title { get; set; }
+
+    [HtmlAttributeName("subtitle")]
+    public string? Subtitle { get; set; }
+
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
         output.TagName = "div";
-        var baseClass = "laughtale-card rounded-xl border border-surface-200 dark:border-surface-800 bg-surface-0 dark:bg-surface-900 text-surface-900 dark:text-surface-100 shadow-sm transition-all";
+        var baseClass = "p-card laughtale-card rounded-xl border border-surface-200 dark:border-surface-800 bg-surface-0 dark:bg-surface-900 text-surface-900 dark:text-surface-100 shadow-sm transition-all overflow-hidden flex flex-col";
         output.Attributes.SetAttribute("class", string.IsNullOrWhiteSpace(Class) ? baseClass : $"{baseClass} {Class}");
 
+        if (!string.IsNullOrWhiteSpace(Role))
+        {
+            output.Attributes.SetAttribute("role", Role);
+        }
+
         var childContent = await output.GetChildContentAsync();
-        output.Content.SetHtmlContent(childContent);
+        
+        if (!string.IsNullOrWhiteSpace(Title) || !string.IsNullOrWhiteSpace(Subtitle))
+        {
+            var headerHtml = "<div class=\"p-card-body p-6 flex flex-col gap-3\"><div class=\"p-card-caption flex flex-col gap-1\">";
+            if (!string.IsNullOrWhiteSpace(Title))
+            {
+                headerHtml += $"<div class=\"p-card-title font-bold text-xl text-surface-900 dark:text-surface-50\">{Title}</div>";
+            }
+            if (!string.IsNullOrWhiteSpace(Subtitle))
+            {
+                headerHtml += $"<div class=\"p-card-subtitle text-sm text-surface-500 dark:text-surface-400\">{Subtitle}</div>";
+            }
+            headerHtml += $"</div><div class=\"p-card-content text-sm text-surface-600 dark:text-surface-300 leading-relaxed\">{childContent.GetContent()}</div></div>";
+            output.Content.SetHtmlContent(headerHtml);
+        }
+        else
+        {
+            output.Content.SetHtmlContent(childContent);
+        }
     }
 }
 
@@ -308,7 +341,41 @@ public class IslandCardHeaderTagHelper : TagHelper
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
         output.TagName = "div";
-        var baseClass = "flex flex-col space-y-1.5 p-6 border-b border-surface-100 dark:border-surface-800";
+        var baseClass = "p-card-header overflow-hidden";
+        output.Attributes.SetAttribute("class", string.IsNullOrWhiteSpace(Class) ? baseClass : $"{baseClass} {Class}");
+
+        var childContent = await output.GetChildContentAsync();
+        output.Content.SetHtmlContent(childContent);
+    }
+}
+
+[HtmlTargetElement("island-card-body")]
+public class IslandCardBodyTagHelper : TagHelper
+{
+    [HtmlAttributeName("class")]
+    public string? Class { get; set; }
+
+    public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
+    {
+        output.TagName = "div";
+        var baseClass = "p-card-body p-6 flex flex-col gap-3";
+        output.Attributes.SetAttribute("class", string.IsNullOrWhiteSpace(Class) ? baseClass : $"{baseClass} {Class}");
+
+        var childContent = await output.GetChildContentAsync();
+        output.Content.SetHtmlContent(childContent);
+    }
+}
+
+[HtmlTargetElement("island-card-caption")]
+public class IslandCardCaptionTagHelper : TagHelper
+{
+    [HtmlAttributeName("class")]
+    public string? Class { get; set; }
+
+    public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
+    {
+        output.TagName = "div";
+        var baseClass = "p-card-caption flex flex-col gap-1";
         output.Attributes.SetAttribute("class", string.IsNullOrWhiteSpace(Class) ? baseClass : $"{baseClass} {Class}");
 
         var childContent = await output.GetChildContentAsync();
@@ -324,8 +391,8 @@ public class IslandCardTitleTagHelper : TagHelper
 
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "h3";
-        var baseClass = "font-bold text-lg leading-none tracking-tight text-surface-900 dark:text-surface-50";
+        output.TagName = "div";
+        var baseClass = "p-card-title font-bold text-xl text-surface-900 dark:text-surface-50 m-0";
         output.Attributes.SetAttribute("class", string.IsNullOrWhiteSpace(Class) ? baseClass : $"{baseClass} {Class}");
 
         var childContent = await output.GetChildContentAsync();
@@ -333,16 +400,17 @@ public class IslandCardTitleTagHelper : TagHelper
     }
 }
 
+[HtmlTargetElement("island-card-subtitle")]
 [HtmlTargetElement("island-card-description")]
-public class IslandCardDescriptionTagHelper : TagHelper
+public class IslandCardSubtitleTagHelper : TagHelper
 {
     [HtmlAttributeName("class")]
     public string? Class { get; set; }
 
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "p";
-        var baseClass = "text-xs text-surface-500 dark:text-surface-400";
+        output.TagName = "div";
+        var baseClass = "p-card-subtitle text-sm text-surface-500 dark:text-surface-400 m-0";
         output.Attributes.SetAttribute("class", string.IsNullOrWhiteSpace(Class) ? baseClass : $"{baseClass} {Class}");
 
         var childContent = await output.GetChildContentAsync();
@@ -359,7 +427,7 @@ public class IslandCardContentTagHelper : TagHelper
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
         output.TagName = "div";
-        var baseClass = "p-6";
+        var baseClass = "p-card-content text-sm text-surface-600 dark:text-surface-300 leading-relaxed";
         output.Attributes.SetAttribute("class", string.IsNullOrWhiteSpace(Class) ? baseClass : $"{baseClass} {Class}");
 
         var childContent = await output.GetChildContentAsync();
@@ -376,7 +444,7 @@ public class IslandCardFooterTagHelper : TagHelper
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
         output.TagName = "div";
-        var baseClass = "flex items-center p-6 pt-0 border-t border-surface-100 dark:border-surface-800 mt-4";
+        var baseClass = "p-card-footer mt-4 pt-0 flex items-center gap-2";
         output.Attributes.SetAttribute("class", string.IsNullOrWhiteSpace(Class) ? baseClass : $"{baseClass} {Class}");
 
         var childContent = await output.GetChildContentAsync();
