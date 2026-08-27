@@ -1,6 +1,6 @@
 /**
  * SoftMax.LaughTale: Enterprise Stepper Component (Aura Design System compliant)
- * Multi-step wizard workflow supporting horizontal, vertical with smooth slide animation,
+ * Multi-step wizard workflow supporting horizontal, vertical with smooth accordion slide animation,
  * linear validation enforcement, steps-only progress bar, headless templates, and keyboard accessibility.
  */
 
@@ -25,25 +25,23 @@ const STEPPER_CSS = `
     margin: 0;
     padding: 0;
     list-style-type: none;
-    overflow-x: auto;
     position: relative;
+    width: 100%;
 }
 
 .p-step {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    flex: 1 1 auto;
+    flex-shrink: 0;
     position: relative;
-}
-.p-step:last-child {
-    flex-grow: 0;
+    z-index: 2;
 }
 
 .p-step-header {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem;
+    gap: 0.75rem;
+    padding: 0.5rem 0.75rem;
     background: transparent;
     border: none;
     cursor: pointer;
@@ -61,7 +59,7 @@ const STEPPER_CSS = `
     outline-offset: 2px;
 }
 .p-step-header:disabled {
-    cursor: default;
+    cursor: not-allowed;
     opacity: 0.6;
 }
 
@@ -69,20 +67,22 @@ const STEPPER_CSS = `
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 2rem;
-    height: 2rem;
+    width: 2.25rem;
+    height: 2.25rem;
     border-radius: 9999px;
     border: 2px solid var(--p-surface-300, #cbd5e1);
     background: var(--p-surface-0, #ffffff);
     color: var(--p-surface-700, #334155);
-    font-weight: 600;
+    font-weight: 700;
     font-size: 0.875rem;
-    transition: all 0.2s ease;
+    transition: all 0.25s cubic-bezier(0.2, 0, 0, 1);
 }
 
 .p-step-active .p-step-number {
     border-color: var(--p-primary-500, #10b981);
     color: var(--p-primary-500, #10b981);
+    background: var(--p-surface-0, #ffffff);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
 }
 
 .p-step-completed .p-step-number {
@@ -102,6 +102,9 @@ const STEPPER_CSS = `
     color: var(--p-text-color, #0f172a);
     font-weight: 700;
 }
+.p-step-completed .p-step-title {
+    color: var(--p-text-color, #0f172a);
+}
 
 .p-stepper-separator {
     flex: 1 1 0;
@@ -109,6 +112,7 @@ const STEPPER_CSS = `
     background: var(--p-surface-200, #e2e8f0);
     margin: 0 0.75rem;
     transition: background-color 0.25s ease;
+    z-index: 1;
 }
 .p-stepper-separator.p-stepper-separator-active {
     background: var(--p-primary-500, #10b981);
@@ -138,6 +142,7 @@ const STEPPER_CSS = `
 .p-stepper-vertical {
     display: flex;
     flex-direction: column;
+    gap: 0;
 }
 
 .p-stepitem {
@@ -146,22 +151,39 @@ const STEPPER_CSS = `
     position: relative;
 }
 
+.p-stepitem:not(:last-child)::before {
+    content: "";
+    position: absolute;
+    left: calc(1.625rem - 1px);
+    top: 2.75rem;
+    bottom: 0;
+    width: 2px;
+    background: var(--p-surface-200, #e2e8f0);
+    transition: background-color 0.25s ease;
+    z-index: 1;
+}
+
+.p-stepitem-completed:not(:last-child)::before {
+    background: var(--p-primary-500, #10b981);
+}
+
+.p-stepitem > .p-step {
+    z-index: 2;
+}
+
 .p-stepitem-content-wrapper {
     display: grid;
     grid-template-rows: 0fr;
     transition: grid-template-rows 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
     opacity: 0;
-    margin-left: 1rem;
-    padding-left: 1.25rem;
-    border-left: 2px solid var(--p-surface-200, #e2e8f0);
+    margin-left: 3.25rem;
+    position: relative;
+    z-index: 2;
 }
+
 .p-stepitem-active > .p-stepitem-content-wrapper {
     grid-template-rows: 1fr;
     opacity: 1;
-    border-left-color: var(--p-surface-200, #e2e8f0);
-}
-.p-stepitem:last-child > .p-stepitem-content-wrapper {
-    border-left: 2px solid transparent;
 }
 
 .p-stepitem-content-inner {
@@ -191,6 +213,8 @@ const STEPPER_CSS = `
 [data-theme="dark"] .p-step-active .p-step-number {
     border-color: var(--p-primary-400, #34d399) !important;
     color: var(--p-primary-400, #34d399) !important;
+    background: var(--p-surface-900, #0f172a) !important;
+    box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.15);
 }
 
 .dark .p-step-completed .p-step-number,
@@ -206,14 +230,15 @@ const STEPPER_CSS = `
 }
 
 .dark .p-stepper-separator,
-.dark .p-stepitem-content-wrapper,
+.dark .p-stepitem:not(:last-child)::before,
 [data-theme="dark"] .p-stepper-separator,
-[data-theme="dark"] .p-stepitem-content-wrapper {
+[data-theme="dark"] .p-stepitem:not(:last-child)::before {
     background: var(--p-surface-700, #334155);
-    border-color: var(--p-surface-700, #334155);
 }
 .dark .p-stepper-separator.p-stepper-separator-active,
-[data-theme="dark"] .p-stepper-separator.p-stepper-separator-active {
+.dark .p-stepitem-completed:not(:last-child)::before,
+[data-theme="dark"] .p-stepper-separator.p-stepper-separator-active,
+[data-theme="dark"] .p-stepitem-completed:not(:last-child)::before {
     background: var(--p-primary-500, #10b981) !important;
 }
 `;
@@ -256,6 +281,36 @@ export default function StepperIsland(container: HTMLElement, props: StepperProp
         return Array.from(stepPanels ? stepPanels.querySelectorAll<HTMLElement>(':scope > .p-steppanel, .p-steppanel') : []);
     }
 
+    // Auto inject separators in Horizontal mode if missing
+    if (!isVertical && stepList) {
+        const renderedSteps = Array.from(stepList.children).filter(c => c.classList.contains('p-step'));
+        for (let i = 0; i < renderedSteps.length - 1; i++) {
+            if (!renderedSteps[i].nextElementSibling?.classList.contains('p-stepper-separator')) {
+                const sep = document.createElement('li');
+                sep.className = 'p-stepper-separator';
+                sep.setAttribute('aria-hidden', 'true');
+                renderedSteps[i].after(sep);
+            }
+        }
+    }
+
+    // Wrap vertical item panel contents for slide animation
+    if (isVertical) {
+        stepItems.forEach(item => {
+            const panel = item.querySelector<HTMLElement>('.p-steppanel');
+            let wrapper = item.querySelector<HTMLElement>('.p-stepitem-content-wrapper');
+            if (panel && !wrapper) {
+                wrapper = document.createElement('div');
+                wrapper.className = 'p-stepitem-content-wrapper';
+                const inner = document.createElement('div');
+                inner.className = 'p-stepitem-content-inner';
+                panel.parentNode?.insertBefore(wrapper, panel);
+                inner.appendChild(panel);
+                wrapper.appendChild(inner);
+            }
+        });
+    }
+
     function update() {
         const steps = getSteps();
         const panels = getPanels();
@@ -264,7 +319,6 @@ export default function StepperIsland(container: HTMLElement, props: StepperProp
 
         // Update Steps
         steps.forEach((step, idx) => {
-            const stepVal = step.getAttribute('data-value') || step.getAttribute('value') || String(idx + 1);
             const isCompleted = idx < resolvedIdx;
             const isActive = idx === resolvedIdx;
             const isFuture = idx > resolvedIdx;
@@ -280,7 +334,7 @@ export default function StepperIsland(container: HTMLElement, props: StepperProp
                 }
             }
 
-            // Separators
+            // Horizontal Separators
             const separator = step.nextElementSibling;
             if (separator && separator.classList.contains('p-stepper-separator')) {
                 separator.classList.toggle('p-stepper-separator-active', isCompleted);
@@ -290,27 +344,15 @@ export default function StepperIsland(container: HTMLElement, props: StepperProp
         // Update Panels & Vertical Items
         if (isVertical) {
             stepItems.forEach((item, idx) => {
-                const itemVal = item.getAttribute('data-value') || item.getAttribute('value') || String(idx + 1);
-                const isActive = itemVal === activeValue || idx === resolvedIdx;
+                const isCompleted = idx < resolvedIdx;
+                const isActive = idx === resolvedIdx;
                 item.classList.toggle('p-stepitem-active', isActive);
-
-                // Ensure smooth slide wrapper exists
-                let wrapper = item.querySelector<HTMLElement>('.p-stepitem-content-wrapper');
-                const panel = item.querySelector<HTMLElement>('.p-steppanel');
-                if (panel && !wrapper) {
-                    wrapper = document.createElement('div');
-                    wrapper.className = 'p-stepitem-content-wrapper';
-                    const inner = document.createElement('div');
-                    inner.className = 'p-stepitem-content-inner';
-                    panel.parentNode?.insertBefore(wrapper, panel);
-                    inner.appendChild(panel);
-                    wrapper.appendChild(inner);
-                }
+                item.classList.toggle('p-stepitem-completed', isCompleted);
             });
         } else {
             panels.forEach((panel, idx) => {
                 const panelVal = panel.getAttribute('data-value') || panel.getAttribute('value') || String(idx + 1);
-                const isActive = panelVal === activeValue || idx === resolvedIdx;
+                const isActive = panelVal === activeValue;
                 panel.classList.toggle('p-steppanel-active', isActive);
             });
         }
@@ -344,7 +386,10 @@ export default function StepperIsland(container: HTMLElement, props: StepperProp
     rootEl.addEventListener('click', (e) => {
         const target = e.target as HTMLElement;
         const actionBtn = target.closest<HTMLButtonElement>('[data-stepper-next], [data-stepper-prev], [data-stepper-action]');
-        if (!actionBtn) return;
+        if (!actionBtn || !rootEl.contains(actionBtn)) return;
+
+        const closestStepper = actionBtn.closest('.p-stepper');
+        if (closestStepper !== rootEl) return;
 
         e.preventDefault();
         const nextVal = actionBtn.getAttribute('data-stepper-next');
@@ -356,50 +401,22 @@ export default function StepperIsland(container: HTMLElement, props: StepperProp
         } else if (prevVal) {
             setActiveStep(prevVal);
         } else if (action === 'next') {
-            const steps = getSteps();
-            const currentIdx = steps.findIndex(s => (s.getAttribute('data-value') || s.getAttribute('value')) === activeValue);
-            if (currentIdx >= 0 && currentIdx < steps.length - 1) {
-                const nextStepVal = steps[currentIdx + 1].getAttribute('data-value') || steps[currentIdx + 1].getAttribute('value') || String(currentIdx + 2);
+            const currentSteps = getSteps();
+            const currentIdx = currentSteps.findIndex(s => (s.getAttribute('data-value') || s.getAttribute('value')) === activeValue);
+            if (currentIdx >= 0 && currentIdx < currentSteps.length - 1) {
+                const nextStepVal = currentSteps[currentIdx + 1].getAttribute('data-value') || currentSteps[currentIdx + 1].getAttribute('value') || String(currentIdx + 2);
                 setActiveStep(nextStepVal);
             }
         } else if (action === 'prev') {
-            const steps = getSteps();
-            const currentIdx = steps.findIndex(s => (s.getAttribute('data-value') || s.getAttribute('value')) === activeValue);
+            const currentSteps = getSteps();
+            const currentIdx = currentSteps.findIndex(s => (s.getAttribute('data-value') || s.getAttribute('value')) === activeValue);
             if (currentIdx > 0) {
-                const prevStepVal = steps[currentIdx - 1].getAttribute('data-value') || steps[currentIdx - 1].getAttribute('value') || String(currentIdx);
+                const prevStepVal = currentSteps[currentIdx - 1].getAttribute('data-value') || currentSteps[currentIdx - 1].getAttribute('value') || String(currentIdx);
                 setActiveStep(prevStepVal);
             }
         }
     });
 
-    // Auto inject separators in Horizontal mode if missing
-    if (!isVertical && stepList) {
-        const renderedSteps = Array.from(stepList.children).filter(c => c.classList.contains('p-step'));
-        for (let i = 0; i < renderedSteps.length - 1; i++) {
-            if (!renderedSteps[i].nextElementSibling?.classList.contains('p-stepper-separator')) {
-                const sep = document.createElement('div');
-                sep.className = 'p-stepper-separator';
-                renderedSteps[i].after(sep);
-            }
-        }
-    }
-
-    // Wrap vertical item panel contents for slide animation
-    if (isVertical) {
-        stepItems.forEach(item => {
-            const panel = item.querySelector<HTMLElement>('.p-steppanel');
-            let wrapper = item.querySelector<HTMLElement>('.p-stepitem-content-wrapper');
-            if (panel && !wrapper) {
-                wrapper = document.createElement('div');
-                wrapper.className = 'p-stepitem-content-wrapper';
-                const inner = document.createElement('div');
-                inner.className = 'p-stepitem-content-inner';
-                panel.parentNode?.insertBefore(wrapper, panel);
-                inner.appendChild(panel);
-                wrapper.appendChild(inner);
-            }
-        });
-    }
-
+    // Initial render state
     update();
 }
