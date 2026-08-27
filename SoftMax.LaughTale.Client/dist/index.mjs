@@ -14302,7 +14302,8 @@ function ScrollAreaIsland(container, props) {
     hHandle.addEventListener("pointerup", stopDrag);
     hHandle.addEventListener("pointercancel", stopDrag);
   }
-  const variantButtons = container.querySelectorAll("[data-scrollarea-variant]");
+  const searchScope = container.parentElement || container;
+  const variantButtons = searchScope.querySelectorAll("[data-scrollarea-variant]");
   if (variantButtons.length > 0) {
     variantButtons.forEach((btn) => {
       btn.addEventListener("click", () => {
@@ -14366,6 +14367,7 @@ var init_scrollarea = __esm({
     position: absolute;
     z-index: 10;
     box-sizing: border-box;
+    opacity: 0;
 }
 .p-scrollarea-scrollbar-vertical {
     top: 0;
@@ -14391,17 +14393,17 @@ var init_scrollarea = __esm({
 
 .p-scrollarea-handle {
     flex: 1;
-    background: var(--p-surface-300, #cbd5e1);
+    background: var(--p-surface-400, #94a3b8);
     border-radius: 9999px;
     position: relative;
     transition: background-color 0.15s ease, transform 0.15s ease;
     cursor: pointer;
 }
 .p-scrollarea-handle:hover {
-    background: var(--p-surface-400, #94a3b8);
+    background: var(--p-surface-500, #64748b);
 }
 .p-scrollarea-handle:active {
-    background: var(--p-surface-500, #64748b);
+    background: var(--p-surface-600, #475569);
 }
 
 /* Mask / Fade */
@@ -14411,6 +14413,14 @@ var init_scrollarea = __esm({
 }
 
 /* Variants */
+.p-scrollarea[data-p-variant="auto"] .p-scrollarea-scrollbar {
+    opacity: 0;
+}
+.p-scrollarea[data-p-variant="auto"]:hover .p-scrollarea-scrollbar,
+.p-scrollarea[data-p-variant="auto"].p-scrollarea-scrolling .p-scrollarea-scrollbar {
+    opacity: 1;
+}
+
 .p-scrollarea[data-p-variant="hover"] .p-scrollarea-scrollbar {
     opacity: 0;
 }
@@ -14426,25 +14436,26 @@ var init_scrollarea = __esm({
 }
 
 .p-scrollarea[data-p-variant="always"] .p-scrollarea-scrollbar {
-    opacity: 1;
+    opacity: 1 !important;
 }
 
 .p-scrollarea[data-p-variant="hidden"] .p-scrollarea-scrollbar {
     display: none !important;
+    opacity: 0 !important;
 }
 
 /* Dark Mode Tokens */
 .dark .p-scrollarea-handle,
 [data-theme="dark"] .p-scrollarea-handle {
-    background: var(--p-surface-700, #334155) !important;
+    background: var(--p-surface-600, #475569) !important;
 }
 .dark .p-scrollarea-handle:hover,
 [data-theme="dark"] .p-scrollarea-handle:hover {
-    background: var(--p-surface-600, #475569) !important;
+    background: var(--p-surface-500, #64748b) !important;
 }
 .dark .p-scrollarea-handle:active,
 [data-theme="dark"] .p-scrollarea-handle:active {
-    background: var(--p-surface-500, #64748b) !important;
+    background: var(--p-surface-400, #94a3b8) !important;
 }
 `;
   }
