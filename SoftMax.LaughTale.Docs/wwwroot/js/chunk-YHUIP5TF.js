@@ -1059,7 +1059,7 @@ defineIsland("tree-table", () => import("./treetable-STGV6W5W.js"));
 defineIsland("tree-select", () => import("./tree-select-3WADBRSW.js"));
 defineIsland("datatable", () => import("./datatable-FJYSSBES.js"));
 defineIsland("datagrid", () => import("./datatable-FJYSSBES.js"));
-defineIsland("modal", () => import("./modal-X37Z37NW.js"));
+defineIsland("modal", () => import("./modal-NMCDZM5K.js"));
 defineIsland("toast", () => import("./toast-WLFO7J5G.js"));
 defineIsland("input-number", () => import("./input-number-KQ2J2WMH.js"));
 defineIsland("input-otp", () => import("./input-otp-RUPMATZ7.js"));
@@ -1101,7 +1101,7 @@ defineIsland("inplace", () => import("./inplace-YJ5SS246.js"));
 defineIsland("command", () => import("./command-TIPBYJOC.js"));
 defineIsland("theme-studio", () => import("./theme-studio-GRGGOQAW.js"));
 defineIsland("dynamic-form", () => import("./dynamic-form-HHKJKPG7.js"));
-defineIsland("splitter", () => import("./splitter-7TG3GXYK.js"));
+defineIsland("splitter", () => import("./splitter-LDRSJA4P.js"));
 defineIsland("multiselect", () => import("./multiselect-3EIAIKUW.js"));
 defineIsland("cascadeselect", () => import("./cascadeselect-IUDOWSIX.js"));
 defineIsland("listbox", () => import("./listbox-XPMKTRZC.js"));
@@ -1144,4 +1144,4 @@ export {
   enableViewTransitions,
   getSlot
 };
-//# sourceMappingURL=chunk-WXKI6FKC.js.map
+//# sourceMappingURL=chunk-YHUIP5TF.js.map

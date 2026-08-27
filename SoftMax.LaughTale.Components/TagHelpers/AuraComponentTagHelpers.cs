@@ -2282,31 +2282,6 @@ public class IslandDynamicFormTagHelper : TagHelper
     }
 }
 
-/// <summary>
-/// TagHelper for <island-splitter />
-/// </summary>
-[HtmlTargetElement("island-splitter")]
-public class IslandSplitterTagHelper : TagHelper
-{
-    public string Layout { get; set; } = "horizontal";
-    public List<SplitterPanel>? Panels { get; set; }
-
-    public override void Process(TagHelperContext context, TagHelperOutput output)
-    {
-        output.TagName = "div";
-        output.TagMode = TagMode.StartTagAndEndTag;
-        output.Attributes.SetAttribute("data-island", "splitter");
-        output.Attributes.SetAttribute("data-hydrate", "load");
-
-        var props = new
-        {
-            layout = Layout,
-            panels = Panels ?? new()
-        };
-
-        output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
-    }
-}
 
 /// <summary>
 /// TagHelper for <island-multiselect />

@@ -982,6 +982,129 @@ public class IslandScrollAreaCornerTagHelper : TagHelper
 
 #endregion
 
+#region 2f. Splitter Primitives
+
+/// <summary>
+/// Enterprise Splitter TagHelper (Aura Design System compliant)
+/// </summary>
+[HtmlTargetElement("island-splitter", TagStructure = TagStructure.NormalOrSelfClosing)]
+[HtmlTargetElement("p-splitter", TagStructure = TagStructure.NormalOrSelfClosing)]
+public class IslandSplitterTagHelper : TagHelper
+{
+    [HtmlAttributeName("layout")]
+    public string Layout { get; set; } = "horizontal";
+
+    [HtmlAttributeName("sizes")]
+    public string? Sizes { get; set; }
+
+    [HtmlAttributeName("disabled")]
+    public bool Disabled { get; set; } = false;
+
+    [HtmlAttributeName("state-key")]
+    public string? StateKey { get; set; }
+
+    [HtmlAttributeName("class")]
+    public string? Class { get; set; }
+
+    [HtmlAttributeName("style")]
+    public string? Style { get; set; }
+
+    [HtmlAttributeName("hydrate")]
+    public HydrateStrategy Hydrate { get; set; } = HydrateStrategy.Load;
+
+    public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
+    {
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "splitter");
+        output.Attributes.SetAttribute("data-hydrate", Hydrate.ToString().ToLowerInvariant());
+
+        var isVertical = string.Equals(Layout, "vertical", StringComparison.OrdinalIgnoreCase);
+        var orientClass = isVertical ? "p-splitter-vertical" : "p-splitter-horizontal";
+
+        var classes = new List<string> { "p-splitter", "p-component", orientClass };
+        if (!string.IsNullOrWhiteSpace(Class)) classes.Add(Class);
+        output.Attributes.SetAttribute("class", string.Join(" ", classes));
+
+        if (Disabled) output.Attributes.SetAttribute("data-disabled", "true");
+        if (!string.IsNullOrWhiteSpace(StateKey)) output.Attributes.SetAttribute("data-state-key", StateKey);
+        if (!string.IsNullOrWhiteSpace(Style)) output.Attributes.SetAttribute("style", Style);
+
+        double[]? parsedSizes = null;
+        if (!string.IsNullOrWhiteSpace(Sizes))
+        {
+            try
+            {
+                var clean = Sizes.Trim().TrimStart('[').TrimEnd(']');
+                parsedSizes = clean.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(s => double.Parse(s.Trim()))
+                    .ToArray();
+            }
+            catch {}
+        }
+
+        var props = new
+        {
+            layout = isVertical ? "vertical" : "horizontal",
+            sizes = parsedSizes,
+            disabled = Disabled,
+            stateKey = StateKey
+        };
+        output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
+
+        var childContent = await output.GetChildContentAsync();
+        output.Content.SetHtmlContent(childContent);
+    }
+}
+
+[HtmlTargetElement("island-splitter-panel", TagStructure = TagStructure.NormalOrSelfClosing)]
+[HtmlTargetElement("island-splitterpanel", TagStructure = TagStructure.NormalOrSelfClosing)]
+[HtmlTargetElement("p-splitterpanel", TagStructure = TagStructure.NormalOrSelfClosing)]
+[HtmlTargetElement("p-splitter-panel", TagStructure = TagStructure.NormalOrSelfClosing)]
+public class IslandSplitterPanelTagHelper : TagHelper
+{
+    [HtmlAttributeName("size")]
+    public double? Size { get; set; }
+
+    [HtmlAttributeName("min-size")]
+    public double? MinSize { get; set; }
+
+    [HtmlAttributeName("max-size")]
+    public double? MaxSize { get; set; }
+
+    [HtmlAttributeName("collapsible")]
+    public bool Collapsible { get; set; } = false;
+
+    [HtmlAttributeName("collapsed-size")]
+    public double? CollapsedSize { get; set; }
+
+    [HtmlAttributeName("class")]
+    public string? Class { get; set; }
+
+    [HtmlAttributeName("style")]
+    public string? Style { get; set; }
+
+    public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
+    {
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        var baseClass = "p-splitterpanel";
+        output.Attributes.SetAttribute("class", string.IsNullOrWhiteSpace(Class) ? baseClass : $"{baseClass} {Class}");
+
+        if (Size.HasValue) output.Attributes.SetAttribute("data-size", Size.Value.ToString());
+        if (MinSize.HasValue) output.Attributes.SetAttribute("data-min-size", MinSize.Value.ToString());
+        if (MaxSize.HasValue) output.Attributes.SetAttribute("data-max-size", MaxSize.Value.ToString());
+        if (Collapsible) output.Attributes.SetAttribute("data-collapsible", "true");
+        if (CollapsedSize.HasValue) output.Attributes.SetAttribute("data-collapsed-size", CollapsedSize.Value.ToString());
+        if (!string.IsNullOrWhiteSpace(Style)) output.Attributes.SetAttribute("style", Style);
+
+        var childContent = await output.GetChildContentAsync();
+        output.Content.SetHtmlContent(childContent);
+    }
+}
+
+#endregion
+
 #region 3. Button Primitive
 
 /// <summary>

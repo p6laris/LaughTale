@@ -4533,3 +4533,133 @@ html {
 [data-theme="dark"] .p-scrollarea-handle:active {
     background: var(--p-surface-500, #64748b) !important;
 }
+
+
+/* ==========================================================================
+   Aura PrimeVue 4 Splitter Component Tokens & Layouts
+   ========================================================================== */
+.p-splitter {
+    display: flex;
+    flex-wrap: nowrap;
+    border: 1px solid var(--p-border-color, #e2e8f0);
+    background: var(--p-surface-0, #ffffff);
+    border-radius: var(--p-border-radius-md, 6px);
+    color: var(--p-text-color, #0f172a);
+    overflow: hidden;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.p-splitter-horizontal {
+    flex-direction: row;
+}
+
+.p-splitter-vertical {
+    flex-direction: column;
+}
+
+.p-splitterpanel {
+    flex-grow: 1;
+    overflow: auto;
+    box-sizing: border-box;
+    transition: flex-basis 0.15s cubic-bezier(0.2, 0, 0, 1);
+}
+.p-splitterpanel.p-splitterpanel-resizing {
+    transition: none !important;
+}
+
+.p-splitter-gutter {
+    flex-grow: 0;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    background: var(--p-surface-100, #f1f5f9);
+    user-select: none;
+    touch-action: none;
+    transition: background-color 0.15s ease, opacity 0.15s ease;
+    box-sizing: border-box;
+    outline: none;
+}
+
+.p-splitter-horizontal > .p-splitter-gutter {
+    width: 6px;
+    cursor: col-resize;
+}
+
+.p-splitter-vertical > .p-splitter-gutter {
+    height: 6px;
+    cursor: row-resize;
+}
+
+.p-splitter-gutter:hover,
+.p-splitter-gutter:focus-visible,
+.p-splitter-gutter[data-resizing="true"] {
+    background: var(--p-surface-200, #e2e8f0);
+}
+.p-splitter-gutter:focus-visible {
+    outline: 2px solid var(--p-primary-500, #10b981);
+    outline-offset: -1px;
+}
+
+.p-splitter-gutter-handle {
+    background: var(--p-surface-400, #94a3b8);
+    border-radius: 9999px;
+    transition: background-color 0.15s ease;
+}
+
+.p-splitter-horizontal > .p-splitter-gutter > .p-splitter-gutter-handle {
+    width: 2px;
+    height: 1.5rem;
+}
+
+.p-splitter-vertical > .p-splitter-gutter > .p-splitter-gutter-handle {
+    height: 2px;
+    width: 1.5rem;
+}
+
+.p-splitter-gutter:hover > .p-splitter-gutter-handle,
+.p-splitter-gutter[data-resizing="true"] > .p-splitter-gutter-handle {
+    background: var(--p-surface-600, #475569);
+}
+
+.p-splitter[data-disabled="true"] > .p-splitter-gutter {
+    cursor: default !important;
+    pointer-events: none !important;
+    opacity: 0.6;
+}
+
+/* Dark Mode Tokens */
+.dark .p-splitter,
+[data-theme="dark"] .p-splitter {
+    background: var(--p-surface-900, #0f172a) !important;
+    border-color: var(--p-surface-700, #334155) !important;
+    color: var(--p-surface-100, #f8fafc) !important;
+}
+
+.dark .p-splitter-gutter,
+[data-theme="dark"] .p-splitter-gutter {
+    background: var(--p-surface-800, #1e293b) !important;
+}
+
+.dark .p-splitter-gutter:hover,
+.dark .p-splitter-gutter:focus-visible,
+.dark .p-splitter-gutter[data-resizing="true"],
+[data-theme="dark"] .p-splitter-gutter:hover,
+[data-theme="dark"] .p-splitter-gutter:focus-visible,
+[data-theme="dark"] .p-splitter-gutter[data-resizing="true"] {
+    background: var(--p-surface-700, #334155) !important;
+}
+
+.dark .p-splitter-gutter-handle,
+[data-theme="dark"] .p-splitter-gutter-handle {
+    background: var(--p-surface-500, #64748b) !important;
+}
+
+.dark .p-splitter-gutter:hover > .p-splitter-gutter-handle,
+.dark .p-splitter-gutter[data-resizing="true"] > .p-splitter-gutter-handle,
+[data-theme="dark"] .p-splitter-gutter:hover > .p-splitter-gutter-handle,
+[data-theme="dark"] .p-splitter-gutter[data-resizing="true"] > .p-splitter-gutter-handle {
+    background: var(--p-surface-300, #cbd5e1) !important;
+}

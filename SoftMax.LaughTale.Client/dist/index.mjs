@@ -18260,75 +18260,350 @@ __export(splitter_exports, {
   default: () => SplitterIsland
 });
 function SplitterIsland(container, props) {
-  injectIslandStyle("splitter", CSS33);
-  const layout = props.layout || "horizontal";
+  injectIslandStyle("splitter", SPLITTER_CSS);
+  const rootEl = container.querySelector(".p-splitter") || container;
+  const layout = props.layout || (rootEl.classList.contains("p-splitter-vertical") ? "vertical" : "horizontal");
   const isHorizontal = layout === "horizontal";
-  const panels = props.panels && props.panels.length >= 2 ? props.panels : [
-    { id: "p1", size: 50, content: "Panel 1 (Left)" },
-    { id: "p2", size: 50, content: "Panel 2 (Right)" }
-  ];
-  let leftPercent = panels[0].size ?? 50;
-  container.innerHTML = `
-        <div class="laughtale-splitter" style="display: flex; flex-direction: ${isHorizontal ? "row" : "column"}; width: 100%; height: 320px; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); overflow: hidden; background: var(--p-surface-0);">
-            <!-- Panel 1 -->
-            <div class="splitter-panel-1" style="flex: 0 0 ${leftPercent}%; overflow: auto; padding: 1.25rem; background: var(--p-surface-50);">
-                ${panels[0].content || ""}
-            </div>
-
-            <!-- Gutter Divider Handle -->
-            <div class="splitter-gutter" style="flex: 0 0 8px; background: var(--p-surface-200); cursor: ${isHorizontal ? "col-resize" : "row-resize"}; display: flex; align-items: center; justify-content: center; user-select: none; transition: background 0.15s ease;">
-                <div style="width: ${isHorizontal ? "2px" : "16px"}; height: ${isHorizontal ? "16px" : "2px"}; background: var(--p-surface-400); border-radius: 1px;"></div>
-            </div>
-
-            <!-- Panel 2 -->
-            <div class="splitter-panel-2" style="flex: 1; overflow: auto; padding: 1.25rem; background: var(--p-surface-0);">
-                ${panels[1].content || ""}
-            </div>
-        </div>
-    `;
-  const panel1 = container.querySelector(".splitter-panel-1");
-  const gutter = container.querySelector(".splitter-gutter");
-  useDragGesture(gutter, {
-    axis: isHorizontal ? "x" : "y",
-    onDrag: (state) => {
-      const containerRect = container.querySelector(".laughtale-splitter").getBoundingClientRect();
-      let newPercent = isHorizontal ? (state.clientX - containerRect.left) / containerRect.width * 100 : (state.clientY - containerRect.top) / containerRect.height * 100;
-      newPercent = Math.max(10, Math.min(90, newPercent));
-      leftPercent = newPercent;
-      panel1.style.flex = `0 0 ${newPercent}%`;
-      container.dispatchEvent(new CustomEvent("splitter:resize", {
-        bubbles: true,
-        detail: { leftPercent: newPercent, rightPercent: 100 - newPercent }
-      }));
+  const isDisabled = !!props.disabled || rootEl.getAttribute("data-disabled") === "true";
+  const stateKey = props.stateKey || rootEl.getAttribute("data-state-key");
+  let panels = Array.from(rootEl.children).filter(
+    (el) => el.classList.contains("p-splitterpanel") || el.hasAttribute("data-splitterpanel")
+  );
+  if (panels.length === 0) {
+    panels = Array.from(rootEl.children).filter(
+      (el) => !el.classList.contains("p-splitter-gutter")
+    );
+  }
+  if (panels.length === 0) return;
+  rootEl.classList.add("p-splitter", "p-component", isHorizontal ? "p-splitter-horizontal" : "p-splitter-vertical");
+  if (isDisabled) rootEl.setAttribute("data-disabled", "true");
+  panels.forEach((p) => p.classList.add("p-splitterpanel"));
+  let currentSizes = [];
+  if (stateKey) {
+    try {
+      const cached = localStorage.getItem(stateKey);
+      if (cached) currentSizes = JSON.parse(cached);
+    } catch (_) {
     }
+  }
+  if (!currentSizes || currentSizes.length !== panels.length) {
+    if (props.sizes && props.sizes.length === panels.length) {
+      currentSizes = [...props.sizes];
+    } else {
+      const definedSizes = panels.map((p) => {
+        const s = p.getAttribute("data-size");
+        return s ? parseFloat(s) : null;
+      });
+      const hasDefined = definedSizes.some((s) => s !== null);
+      if (hasDefined) {
+        const filled = definedSizes.map((s) => s ?? 100 / panels.length);
+        const sum = filled.reduce((a, b) => a + b, 0);
+        currentSizes = filled.map((s) => s / sum * 100);
+      } else {
+        currentSizes = panels.map(() => 100 / panels.length);
+      }
+    }
+  }
+  Array.from(rootEl.querySelectorAll(":scope > .p-splitter-gutter")).forEach((g) => g.remove());
+  const gutters = [];
+  for (let i = 0; i < panels.length - 1; i++) {
+    const gutter = document.createElement("div");
+    gutter.className = "p-splitter-gutter";
+    gutter.setAttribute("role", "separator");
+    gutter.setAttribute("tabindex", isDisabled ? "-1" : "0");
+    gutter.setAttribute("aria-orientation", isHorizontal ? "vertical" : "horizontal");
+    gutter.setAttribute("aria-valuenow", currentSizes[i].toFixed(1));
+    const handle = document.createElement("div");
+    handle.className = "p-splitter-gutter-handle";
+    gutter.appendChild(handle);
+    panels[i].after(gutter);
+    gutters.push(gutter);
+  }
+  function applySizes(sizes, triggerEvents = false, eventType = "resize") {
+    const gutterWidthTotal = (panels.length - 1) * 6;
+    panels.forEach((p, idx) => {
+      const pct = sizes[idx];
+      p.style.flexBasis = `calc(${pct}% - ${gutterWidthTotal * pct / 100}px)`;
+      p.style.flexGrow = "0";
+      p.style.flexShrink = "0";
+      if (p.hasAttribute("data-compact-below")) {
+        const threshold = parseFloat(p.getAttribute("data-compact-below") || "28");
+        p.classList.toggle("p-compact", pct < threshold);
+      }
+    });
+    gutters.forEach((g, idx) => {
+      g.setAttribute("aria-valuenow", sizes[idx].toFixed(1));
+    });
+    if (stateKey && eventType === "resizeend") {
+      try {
+        localStorage.setItem(stateKey, JSON.stringify(sizes));
+      } catch (_) {
+      }
+    }
+    if (triggerEvents) {
+      container.dispatchEvent(new CustomEvent(`splitter:${eventType}`, {
+        bubbles: true,
+        detail: { sizes: [...sizes] }
+      }));
+      const metricBox = container.closest(".component-card")?.querySelector(".p-splitter-metrics");
+      if (metricBox) {
+        const format = (s) => s.map((n) => n.toFixed(1) + "%").join(", ");
+        if (eventType === "resizestart") {
+          const el = metricBox.querySelector('[data-metric="resizestart"]');
+          if (el) el.textContent = `[${format(sizes)}]`;
+        } else if (eventType === "resize") {
+          const el = metricBox.querySelector('[data-metric="resize"]');
+          if (el) el.textContent = `[${format(sizes)}]`;
+        } else if (eventType === "resizeend") {
+          const el = metricBox.querySelector('[data-metric="resizeend"]');
+          if (el) el.textContent = `[${format(sizes)}]`;
+        }
+      }
+      container.closest(".component-card")?.querySelectorAll("[data-splitter-size-label]").forEach((lbl) => {
+        const panelIdx = parseInt(lbl.getAttribute("data-splitter-size-label") || "0", 10);
+        if (sizes[panelIdx] !== void 0) {
+          lbl.textContent = `(${sizes[panelIdx].toFixed(1)}%)`;
+        }
+      });
+    }
+  }
+  applySizes(currentSizes);
+  if (isDisabled) return;
+  gutters.forEach((gutter, gutterIdx) => {
+    let isDragging = false;
+    let startPos = 0;
+    let startSizes = [];
+    const prevPanel = panels[gutterIdx];
+    const nextPanel = panels[gutterIdx + 1];
+    const prevMin = parseFloat(prevPanel.getAttribute("data-min-size") || "0");
+    const prevMax = parseFloat(prevPanel.getAttribute("data-max-size") || "100");
+    const prevCollapsible = prevPanel.hasAttribute("data-collapsible");
+    const prevCollapsedSize = parseFloat(prevPanel.getAttribute("data-collapsed-size") || "0");
+    const nextMin = parseFloat(nextPanel.getAttribute("data-min-size") || "0");
+    const nextMax = parseFloat(nextPanel.getAttribute("data-max-size") || "100");
+    const nextCollapsible = nextPanel.hasAttribute("data-collapsible");
+    const nextCollapsedSize = parseFloat(nextPanel.getAttribute("data-collapsed-size") || "0");
+    function onPointerDown(e) {
+      isDragging = true;
+      startPos = isHorizontal ? e.clientX : e.clientY;
+      startSizes = [...currentSizes];
+      gutter.setAttribute("data-resizing", "true");
+      gutter.setPointerCapture(e.pointerId);
+      document.body.style.userSelect = "none";
+      panels.forEach((p) => p.classList.add("p-splitterpanel-resizing"));
+      applySizes(currentSizes, true, "resizestart");
+    }
+    function onPointerMove(e) {
+      if (!isDragging) return;
+      const totalSize = isHorizontal ? rootEl.offsetWidth : rootEl.offsetHeight;
+      if (totalSize <= 0) return;
+      const currentPos = isHorizontal ? e.clientX : e.clientY;
+      const deltaPx = currentPos - startPos;
+      const deltaPct = deltaPx / totalSize * 100;
+      let newPrevSize = startSizes[gutterIdx] + deltaPct;
+      let newNextSize = startSizes[gutterIdx + 1] - deltaPct;
+      const combinedSize = startSizes[gutterIdx] + startSizes[gutterIdx + 1];
+      if (prevCollapsible && newPrevSize < prevMin) {
+        const midpoint = (prevMin + prevCollapsedSize) / 2;
+        if (newPrevSize < midpoint) {
+          newPrevSize = prevCollapsedSize;
+          newNextSize = combinedSize - prevCollapsedSize;
+        } else {
+          newPrevSize = prevMin;
+          newNextSize = combinedSize - prevMin;
+        }
+      } else {
+        newPrevSize = Math.max(prevMin, Math.min(prevMax, newPrevSize));
+        newNextSize = combinedSize - newPrevSize;
+      }
+      if (nextCollapsible && newNextSize < nextMin) {
+        const midpoint = (nextMin + nextCollapsedSize) / 2;
+        if (newNextSize < midpoint) {
+          newNextSize = nextCollapsedSize;
+          newPrevSize = combinedSize - nextCollapsedSize;
+        } else {
+          newNextSize = nextMin;
+          newPrevSize = combinedSize - nextMin;
+        }
+      } else {
+        newNextSize = Math.max(nextMin, Math.min(nextMax, newNextSize));
+        newPrevSize = combinedSize - newNextSize;
+      }
+      currentSizes[gutterIdx] = newPrevSize;
+      currentSizes[gutterIdx + 1] = newNextSize;
+      applySizes(currentSizes, true, "resize");
+    }
+    function onPointerUp(e) {
+      if (!isDragging) return;
+      isDragging = false;
+      gutter.removeAttribute("data-resizing");
+      try {
+        gutter.releasePointerCapture(e.pointerId);
+      } catch (_) {
+      }
+      document.body.style.userSelect = "";
+      panels.forEach((p) => p.classList.remove("p-splitterpanel-resizing"));
+      applySizes(currentSizes, true, "resizeend");
+    }
+    gutter.addEventListener("pointerdown", onPointerDown);
+    gutter.addEventListener("pointermove", onPointerMove);
+    gutter.addEventListener("pointerup", onPointerUp);
+    gutter.addEventListener("pointercancel", onPointerUp);
+    gutter.addEventListener("keydown", (e) => {
+      const step = 2;
+      let delta = 0;
+      if (isHorizontal && e.key === "ArrowLeft" || !isHorizontal && e.key === "ArrowUp") {
+        delta = -step;
+      } else if (isHorizontal && e.key === "ArrowRight" || !isHorizontal && e.key === "ArrowDown") {
+        delta = step;
+      } else if (e.key === "Home") {
+        delta = -100;
+      } else if (e.key === "End") {
+        delta = 100;
+      }
+      if (delta !== 0) {
+        e.preventDefault();
+        const combinedSize = currentSizes[gutterIdx] + currentSizes[gutterIdx + 1];
+        let newPrevSize = Math.max(prevMin, Math.min(prevMax, currentSizes[gutterIdx] + delta));
+        let newNextSize = combinedSize - newPrevSize;
+        currentSizes[gutterIdx] = newPrevSize;
+        currentSizes[gutterIdx + 1] = newNextSize;
+        applySizes(currentSizes, true, "resize");
+        applySizes(currentSizes, true, "resizeend");
+      }
+    });
   });
 }
-var CSS33;
+var SPLITTER_CSS;
 var init_splitter = __esm({
   "src/components/splitter.ts"() {
     "use strict";
     init_styles();
-    init_useDragGesture();
-    CSS33 = `
-[data-theme="dark"] .laughtale-splitter {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+    SPLITTER_CSS = `
+.p-splitter {
+    display: flex;
+    flex-wrap: nowrap;
+    border: 1px solid var(--p-border-color, #e2e8f0);
+    background: var(--p-surface-0, #ffffff);
+    border-radius: var(--p-border-radius-md, 6px);
+    color: var(--p-text-color, #0f172a);
+    overflow: hidden;
+    box-sizing: border-box;
+    position: relative;
 }
-[data-theme="dark"] .splitter-panel-1 {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-splitter-horizontal {
+    flex-direction: row;
 }
-[data-theme="dark"] .splitter-gutter {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-splitter-vertical {
+    flex-direction: column;
 }
-[data-theme="dark"] .splitter-panel-2 {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-splitterpanel {
+    flex-grow: 1;
+    overflow: auto;
+    box-sizing: border-box;
+    transition: flex-basis 0.15s cubic-bezier(0.2, 0, 0, 1);
+}
+.p-splitterpanel.p-splitterpanel-resizing {
+    transition: none !important;
+}
+
+.p-splitter-gutter {
+    flex-grow: 0;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    background: var(--p-surface-100, #f1f5f9);
+    user-select: none;
+    touch-action: none;
+    transition: background-color 0.15s ease, opacity 0.15s ease;
+    box-sizing: border-box;
+    outline: none;
+}
+
+.p-splitter-horizontal > .p-splitter-gutter {
+    width: 6px;
+    cursor: col-resize;
+}
+
+.p-splitter-vertical > .p-splitter-gutter {
+    height: 6px;
+    cursor: row-resize;
+}
+
+.p-splitter-gutter:hover,
+.p-splitter-gutter:focus-visible,
+.p-splitter-gutter[data-resizing="true"] {
+    background: var(--p-surface-200, #e2e8f0);
+}
+.p-splitter-gutter:focus-visible {
+    outline: 2px solid var(--p-primary-500, #10b981);
+    outline-offset: -1px;
+}
+
+.p-splitter-gutter-handle {
+    background: var(--p-surface-400, #94a3b8);
+    border-radius: 9999px;
+    transition: background-color 0.15s ease;
+}
+
+.p-splitter-horizontal > .p-splitter-gutter > .p-splitter-gutter-handle {
+    width: 2px;
+    height: 1.5rem;
+}
+
+.p-splitter-vertical > .p-splitter-gutter > .p-splitter-gutter-handle {
+    height: 2px;
+    width: 1.5rem;
+}
+
+.p-splitter-gutter:hover > .p-splitter-gutter-handle,
+.p-splitter-gutter[data-resizing="true"] > .p-splitter-gutter-handle {
+    background: var(--p-surface-600, #475569);
+}
+
+.p-splitter[data-disabled="true"] > .p-splitter-gutter {
+    cursor: default !important;
+    pointer-events: none !important;
+    opacity: 0.6;
+}
+
+/* Dark Mode Tokens */
+.dark .p-splitter,
+[data-theme="dark"] .p-splitter {
+    background: var(--p-surface-900, #0f172a) !important;
+    border-color: var(--p-surface-700, #334155) !important;
+    color: var(--p-surface-100, #f8fafc) !important;
+}
+
+.dark .p-splitter-gutter,
+[data-theme="dark"] .p-splitter-gutter {
+    background: var(--p-surface-800, #1e293b) !important;
+}
+
+.dark .p-splitter-gutter:hover,
+.dark .p-splitter-gutter:focus-visible,
+.dark .p-splitter-gutter[data-resizing="true"],
+[data-theme="dark"] .p-splitter-gutter:hover,
+[data-theme="dark"] .p-splitter-gutter:focus-visible,
+[data-theme="dark"] .p-splitter-gutter[data-resizing="true"] {
+    background: var(--p-surface-700, #334155) !important;
+}
+
+.dark .p-splitter-gutter-handle,
+[data-theme="dark"] .p-splitter-gutter-handle {
+    background: var(--p-surface-500, #64748b) !important;
+}
+
+.dark .p-splitter-gutter:hover > .p-splitter-gutter-handle,
+.dark .p-splitter-gutter[data-resizing="true"] > .p-splitter-gutter-handle,
+[data-theme="dark"] .p-splitter-gutter:hover > .p-splitter-gutter-handle,
+[data-theme="dark"] .p-splitter-gutter[data-resizing="true"] > .p-splitter-gutter-handle {
+    background: var(--p-surface-300, #cbd5e1) !important;
 }
 `;
   }
@@ -18340,7 +18615,7 @@ __export(multiselect_exports, {
   default: () => MultiSelectIsland
 });
 function MultiSelectIsland(container, props) {
-  injectIslandStyle("multiselect", CSS34);
+  injectIslandStyle("multiselect", CSS33);
   const options = props.options || [];
   let selected = new Set(props.selectedValues || []);
   let filterQuery = "";
@@ -18506,7 +18781,7 @@ function MultiSelectIsland(container, props) {
   renderDisplay();
   syncValue();
 }
-var CSS34;
+var CSS33;
 var init_multiselect = __esm({
   "src/components/multiselect.ts"() {
     "use strict";
@@ -18515,7 +18790,7 @@ var init_multiselect = __esm({
     init_useDisclosure();
     init_useClickOutside();
     init_useTransition();
-    CSS34 = `
+    CSS33 = `
 [data-theme="dark"] .laughtale-multiselect {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -18586,7 +18861,7 @@ __export(cascadeselect_exports, {
   default: () => CascadeSelectIsland
 });
 function CascadeSelectIsland(container, props) {
-  injectIslandStyle("cascadeselect", CSS35);
+  injectIslandStyle("cascadeselect", CSS34);
   const options = props.options || [];
   const size = props.size || "normal";
   const variant = props.variant || "outlined";
@@ -18799,7 +19074,7 @@ function CascadeSelectIsland(container, props) {
     }));
   }
 }
-var CSS35;
+var CSS34;
 var init_cascadeselect = __esm({
   "src/components/cascadeselect.ts"() {
     "use strict";
@@ -18807,7 +19082,7 @@ var init_cascadeselect = __esm({
     init_styles();
     init_useDisclosure();
     init_useClickOutside();
-    CSS35 = `
+    CSS34 = `
 .laughtale-cascadeselect {
     position: relative;
     display: inline-flex;
@@ -19012,7 +19287,7 @@ __export(listbox_exports, {
   default: () => ListboxIsland
 });
 function ListboxIsland(container, props) {
-  injectIslandStyle("laughtale-listbox", CSS36);
+  injectIslandStyle("laughtale-listbox", CSS35);
   const isMultiple = props.multiple === true || String(props.multiple) === "true";
   const isMetaKey = props.metaKeySelection !== false && String(props.metaKeySelection) !== "false";
   const isCheckbox = props.checkbox === true || String(props.checkbox) === "true";
@@ -19348,14 +19623,14 @@ function ListboxIsland(container, props) {
   }
   init();
 }
-var CSS36, checkSvg2, searchSvg2;
+var CSS35, checkSvg2, searchSvg2;
 var init_listbox = __esm({
   "src/components/listbox.ts"() {
     "use strict";
     init_lucide();
     init_styles();
     init_useDebounce();
-    CSS36 = `
+    CSS35 = `
 /* ==================== AURA LISTBOX ==================== */
 .laughtale-listbox,
 .p-listbox {
@@ -21827,7 +22102,7 @@ __export(terminal_exports, {
   default: () => TerminalIsland
 });
 function TerminalIsland(container, props) {
-  injectIslandStyle("terminal", CSS37);
+  injectIslandStyle("terminal", CSS36);
   const promptPrefix = props.prompt || "admin@softmax:~$";
   const welcome = props.welcomeMessage || 'Welcome to SoftMax.LaughTale CLI v3.0\nType "help" for available commands.';
   const commands = {
@@ -21926,13 +22201,13 @@ ${h.response}`).join("\n");
   }
   render();
 }
-var CSS37;
+var CSS36;
 var init_terminal = __esm({
   "src/components/terminal.ts"() {
     "use strict";
     init_styles();
     init_useClipboard();
-    CSS37 = `
+    CSS36 = `
 [data-theme="dark"] .laughtale-terminal {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -21963,7 +22238,7 @@ __export(dock_exports, {
   default: () => DockIsland
 });
 function DockIsland(container, props) {
-  injectIslandStyle("dock", CSS38);
+  injectIslandStyle("dock", CSS37);
   const items = props.items || [
     { label: "Overview", icon: "compass", url: "/" },
     { label: "Dashboard", icon: "bar-chart", url: "/dashboard" },
@@ -22005,13 +22280,13 @@ function DockIsland(container, props) {
     });
   });
 }
-var CSS38;
+var CSS37;
 var init_dock = __esm({
   "src/components/dock.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS38 = `
+    CSS37 = `
 [data-theme="dark"] .laughtale-dock {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -22032,7 +22307,7 @@ __export(galleria_exports, {
   default: () => GalleriaIsland
 });
 function GalleriaIsland(container, props) {
-  injectIslandStyle("galleria", CSS39);
+  injectIslandStyle("galleria", CSS38);
   const images = props.value && props.value.length > 0 ? props.value : [
     {
       itemImageSrc: "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800&auto=format&fit=crop&q=80",
@@ -22106,13 +22381,13 @@ function GalleriaIsland(container, props) {
   }
   render();
 }
-var CSS39;
+var CSS38;
 var init_galleria = __esm({
   "src/components/galleria.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS39 = `
+    CSS38 = `
 [data-theme="dark"] .laughtale-galleria {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -22143,7 +22418,7 @@ __export(blockui_exports, {
   default: () => BlockUIIsland
 });
 function BlockUIIsland(container, props) {
-  injectIslandStyle("blockui", CSS40);
+  injectIslandStyle("blockui", CSS39);
   let isBlocked = props.blocked ?? true;
   function render() {
     container.innerHTML = `
@@ -22166,12 +22441,12 @@ function BlockUIIsland(container, props) {
     render();
   });
 }
-var CSS40;
+var CSS39;
 var init_blockui = __esm({
   "src/components/blockui.ts"() {
     "use strict";
     init_styles();
-    CSS40 = `
+    CSS39 = `
 [data-theme="dark"] .laughtale-blockui-root {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -22903,7 +23178,7 @@ __export(select_exports, {
   default: () => SelectIsland
 });
 function SelectIsland(container, props) {
-  injectIslandStyle("laughtale-select", CSS41);
+  injectIslandStyle("laughtale-select", CSS40);
   const isMultiple = props.multiple === true || String(props.multiple) === "true";
   const isCheckmark = props.checkmark === true || String(props.checkmark) === "true";
   const isCheckbox = props.checkbox === true || String(props.checkbox) === "true";
@@ -23243,13 +23518,13 @@ function SelectIsland(container, props) {
   }
   render();
 }
-var CSS41;
+var CSS40;
 var init_select = __esm({
   "src/components/select.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS41 = `
+    CSS40 = `
 /* ==================== AURA SELECT ==================== */
 .laughtale-select,
 .p-select {
@@ -23676,7 +23951,7 @@ __export(checkbox_exports, {
   default: () => CheckboxIsland
 });
 function CheckboxIsland(container, props) {
-  injectIslandStyle("laughtale-checkbox", CSS42);
+  injectIslandStyle("laughtale-checkbox", CSS41);
   let isChecked = Boolean(props.checked);
   let isIndeterminate = Boolean(props.indeterminate);
   const size = props.size || "normal";
@@ -23748,13 +24023,13 @@ function CheckboxIsland(container, props) {
   }
   render();
 }
-var CSS42;
+var CSS41;
 var init_checkbox = __esm({
   "src/components/checkbox.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS42 = `
+    CSS41 = `
 .laughtale-checkbox-wrap {
     display: inline-flex;
     align-items: center;
@@ -23931,7 +24206,7 @@ __export(radio_button_exports, {
   default: () => RadioButtonIsland
 });
 function RadioButtonIsland(container, props) {
-  injectIslandStyle("laughtale-radio", CSS43);
+  injectIslandStyle("laughtale-radio", CSS42);
   const isCard = props.card === true || String(props.card) === "true";
   const isFilled = props.variant === "filled";
   const size = props.size || "normal";
@@ -24163,13 +24438,13 @@ function RadioButtonIsland(container, props) {
   }
   renderSingle();
 }
-var CSS43;
+var CSS42;
 var init_radio_button = __esm({
   "src/components/radio-button.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS43 = `
+    CSS42 = `
 /* ==================== AURA RADIOBUTTON ==================== */
 .laughtale-radio-root,
 .p-radiobutton-root {
@@ -24452,7 +24727,7 @@ __export(textarea_exports, {
   default: () => TextareaIsland
 });
 function TextareaIsland(container, props) {
-  injectIslandStyle("laughtale-textarea", CSS44);
+  injectIslandStyle("laughtale-textarea", CSS43);
   const isAutoResize = props.autoResize === true || String(props.autoResize) === "true";
   const isFluid = props.fluid === true || String(props.fluid) === "true";
   const isInvalid = props.invalid === true || String(props.invalid) === "true";
@@ -24528,12 +24803,12 @@ function TextareaIsland(container, props) {
     setTimeout(adjustHeight, 0);
   }
 }
-var CSS44;
+var CSS43;
 var init_textarea = __esm({
   "src/components/textarea.ts"() {
     "use strict";
     init_styles();
-    CSS44 = `
+    CSS43 = `
 /* ==================== AURA TEXTAREA ==================== */
 .p-textarea {
     font-family: var(--p-font-family, inherit);
@@ -24658,7 +24933,7 @@ __export(input_mask_exports, {
   default: () => InputMaskIsland
 });
 function InputMaskIsland(container, props) {
-  injectIslandStyle("laughtale-input-mask", CSS45);
+  injectIslandStyle("laughtale-input-mask", CSS44);
   const mask = props.mask || "(999) 999-9999";
   const slotChar = props.slotChar || "_";
   const autoClear = props.autoClear !== false && String(props.autoClear) !== "false";
@@ -24845,12 +25120,12 @@ function InputMaskIsland(container, props) {
   });
   syncValue();
 }
-var CSS45;
+var CSS44;
 var init_input_mask = __esm({
   "src/components/input-mask.ts"() {
     "use strict";
     init_styles();
-    CSS45 = `
+    CSS44 = `
 /* ==================== AURA INPUTMASK ==================== */
 .laughtale-input-mask,
 .p-inputmask {
@@ -24960,7 +25235,7 @@ __export(float_label_exports, {
   default: () => FloatLabelIsland
 });
 function FloatLabelIsland(container, props) {
-  injectIslandStyle("laughtale-float-label", CSS46);
+  injectIslandStyle("laughtale-float-label", CSS45);
   const variant = props.variant || "over";
   const initialHtml = container.innerHTML;
   const forAttr = props.for ? `for="${props.for}"` : "";
@@ -25038,12 +25313,12 @@ function FloatLabelIsland(container, props) {
   setTimeout(updateFloatingState, 50);
   setTimeout(updateFloatingState, 200);
 }
-var CSS46;
+var CSS45;
 var init_float_label = __esm({
   "src/components/float-label.ts"() {
     "use strict";
     init_styles();
-    CSS46 = `
+    CSS45 = `
 .laughtale-float-label {
     position: relative;
     display: inline-flex;
@@ -25170,7 +25445,7 @@ __export(ifta_label_exports, {
   default: () => IftaLabelIsland
 });
 function IftaLabelIsland(container, props) {
-  injectIslandStyle("laughtale-ifta-label", CSS47);
+  injectIslandStyle("laughtale-ifta-label", CSS46);
   const initialHtml = container.innerHTML;
   const forAttr = props.for ? `for="${props.for}"` : "";
   const existingLabel = container.querySelector("label");
@@ -25193,12 +25468,12 @@ function IftaLabelIsland(container, props) {
     }
   });
 }
-var CSS47;
+var CSS46;
 var init_ifta_label = __esm({
   "src/components/ifta-label.ts"() {
     "use strict";
     init_styles();
-    CSS47 = `
+    CSS46 = `
 .laughtale-ifta-label {
     position: relative;
     display: inline-flex;
@@ -25286,14 +25561,14 @@ __export(input_group_exports, {
   default: () => InputGroupIsland
 });
 function InputGroupIsland(container, props) {
-  injectIslandStyle("laughtale-inputgroup", CSS48);
+  injectIslandStyle("laughtale-inputgroup", CSS47);
   container.classList.add("laughtale-inputgroup", "p-inputgroup");
   if (props.size) {
     container.classList.add(`size-${props.size}`);
   }
 }
 function InputGroupAddonIsland(container, props) {
-  injectIslandStyle("laughtale-inputgroup", CSS48);
+  injectIslandStyle("laughtale-inputgroup", CSS47);
   container.classList.add("laughtale-inputgroup-addon", "p-inputgroup-addon");
   if (props.icon && !container.querySelector("svg")) {
     const svg = getLucideIcon(props.icon);
@@ -25305,13 +25580,13 @@ function InputGroupAddonIsland(container, props) {
     container.insertAdjacentHTML("beforeend", `<span>${props.text}</span>`);
   }
 }
-var CSS48;
+var CSS47;
 var init_input_group = __esm({
   "src/components/input-group.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS48 = `
+    CSS47 = `
 .laughtale-inputgroup,
 .p-inputgroup {
     display: flex;
@@ -25583,7 +25858,7 @@ __export(input_text_exports, {
   default: () => InputTextIsland
 });
 function InputTextIsland(container, props) {
-  injectIslandStyle("laughtale-inputtext", CSS49);
+  injectIslandStyle("laughtale-inputtext", CSS48);
   const [getValue, setValue] = useControllableState({
     defaultValue: props.value ?? "",
     onChange: (val) => {
@@ -25724,14 +25999,14 @@ function InputTextIsland(container, props) {
   }
   init();
 }
-var CSS49, xIcon;
+var CSS48, xIcon;
 var init_input_text = __esm({
   "src/components/input-text.ts"() {
     "use strict";
     init_styles();
     init_lucide();
     init_useControllableState();
-    CSS49 = `
+    CSS48 = `
 .laughtale-inputtext-wrap,
 .p-inputtext-wrap {
     position: relative;

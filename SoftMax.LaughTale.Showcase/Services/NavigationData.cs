@@ -57,7 +57,7 @@ public static class NavigationData
                 new("Tree", "folderTree", "/enterprise#sec-tree"),
                 new("TreeTable", "table2", "/enterprise#sec-treetable", false, null, "New"),
                 new("Paginator", "grid", "/enterprise#sec-paginator"),
-                new("Splitter Panels", "columns3", "/enterprise#sec-splitter"),
+                new("Splitter", "columns3", "/enterprise#sec-splitter", false, null, "New"),
                 new("Listbox", "listFilter", "/enterprise#sec-listbox"),
                 new("PickList", "arrowLeftRight", "/enterprise#sec-picklist"),
                 new("OrderList", "arrowLeftRight", "/enterprise#sec-orderlist"),
