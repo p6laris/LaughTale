@@ -980,7 +980,7 @@ defineIsland("tree-table", () => import("./treetable-STGV6W5W.js"));
 defineIsland("tree-select", () => import("./tree-select-3WADBRSW.js"));
 defineIsland("datatable", () => import("./datatable-FJYSSBES.js"));
 defineIsland("datagrid", () => import("./datatable-FJYSSBES.js"));
-defineIsland("modal", () => import("./modal-J2X2YCOR.js"));
+defineIsland("modal", () => import("./modal-STFWDP6Y.js"));
 defineIsland("toast", () => import("./toast-DWHTYR76.js"));
 defineIsland("input-number", () => import("./input-number-KQ2J2WMH.js"));
 defineIsland("input-otp", () => import("./input-otp-RUPMATZ7.js"));
@@ -1008,8 +1008,8 @@ defineIsland("confirm-popup", () => import("./confirm-popup-PAP5WFOR.js"));
 defineIsland("confirm-dialog", () => import("./confirm-dialog-4TP6SZFU.js"));
 defineIsland("dialog", () => import("./dialog-JPULUL5A.js"));
 defineIsland("confirmdialog", () => import("./confirm-dialog-4TP6SZFU.js"));
-defineIsland("fileupload", () => import("./fileupload-XT6S2ITL.js"));
-defineIsland("file-upload", () => import("./fileupload-XT6S2ITL.js"));
+defineIsland("fileupload", () => import("./fileupload-3RHVLDKC.js"));
+defineIsland("file-upload", () => import("./fileupload-3RHVLDKC.js"));
 defineIsland("scrollarea", () => import("./scrollarea-P6ZIAY6W.js"));
 defineIsland("panel", () => import("./panel-6YY5LZTY.js"));
 defineIsland("fieldset", () => import("./fieldset-ROG5PKGM.js"));
@@ -1022,7 +1022,7 @@ defineIsland("autocomplete", () => import("./autocomplete-RVYP54K4.js"));
 defineIsland("color-picker", () => import("./color-picker-VDAKHERO.js"));
 defineIsland("knob", () => import("./knob-QRIVX7GP.js"));
 defineIsland("tag", () => import("./tag-4UVJKKNI.js"));
-defineIsland("breadcrumb", () => import("./breadcrumb-BPOGWDWU.js"));
+defineIsland("breadcrumb", () => import("./breadcrumb-HOFDNZUE.js"));
 defineIsland("scroll-top", () => import("./scroll-top-WFJEPRKB.js"));
 defineIsland("inplace", () => import("./inplace-YJ5SS246.js"));
 defineIsland("command", () => import("./command-WMSPKKJO.js"));
@@ -1071,4 +1071,4 @@ export {
   enableViewTransitions,
   getSlot
 };
-//# sourceMappingURL=chunk-WFIXRNDS.js.map
+//# sourceMappingURL=chunk-VUKQIJIU.js.map

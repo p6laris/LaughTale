@@ -6952,7 +6952,7 @@
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Drag and drop files directly onto the container or browse from your device.</p>
                 <div style="display: flex; justify-content: center; align-items: center;">
                     <div style="width: 100%;">
-                        <island-fileupload mode="dropzone-only" max-file-size="1000000" accept="image/*,.pdf,.docx" empty-title="Drag and drop files to here to upload." empty-subtitle="MAX. 1MB" />
+                        <island-fileupload mode="advanced" name="demo[]" url="/api/upload" multiple="true" accept="image/*,.pdf" max-file-size="1000000" choose-label="Choose" upload-label="Upload" cancel-label="Cancel" />
                     </div>
                 </div>
             </div>
@@ -6961,7 +6961,7 @@
             <div data-fileupload-demo="basic" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
                 <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic</h3>
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Select and upload files with drag-and-drop support.</p>
-                <div style="display: flex; justify-content: center; align-items: center;">
+                <div style="display: flex; justify-content: center; align-items: center; min-height: 4rem;">
                     <div style="width: 100%;">
                         <island-fileupload mode="basic" name="demo[]" url="/api/upload" max-file-size="1000000" choose-label="Choose" upload-label="Upload" />
                     </div>
@@ -7009,7 +7009,7 @@
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Uploading implementation can be overridden by enabling customUpload property and defining a custom upload handler.</p>
                 <div style="display: flex; justify-content: center; align-items: center;">
                     <div style="width: 100%;">
-                        <island-fileupload mode="basic" custom-upload="true" choose-label="Custom Upload" upload-label="Process" />
+                        <island-fileupload mode="custom" accept="image/*" choose-label="Custom Upload" />
                     </div>
                 </div>
             </div>
@@ -7020,7 +7020,7 @@
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">A custom dropzone can be built with the content and empty slots. Files are added by dragging them onto the area or by clicking to browse.</p>
                 <div style="display: flex; justify-content: center; align-items: center;">
                     <div style="width: 100%;">
-                        <island-fileupload mode="dropzone-only" accept="image/*,.pdf" max-file-size="10000000" empty-title="Drop files here" empty-subtitle="or click to browse" />
+                        <island-fileupload mode="advanced" accept="image/*,.pdf" max-file-size="10000000" choose-label="Browse" upload-label="Upload" cancel-label="Clear" empty-title="Drop files here" empty-subtitle="or click to browse" />
                     </div>
                 </div>
             </div>
