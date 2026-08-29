@@ -111,7 +111,7 @@ public static class NavigationData
             new("Media & Files (5)", "image", null, false, new List<SidebarItem>
             {
                 new("Galleria Stage", "galleryThumbnails", "/enterprise#sec-galleria"),
-                new("Carousel Slider", "image", "/enterprise#sec-carousel"),
+                new("Carousel", "image", "/enterprise#sec-carousel", false, null, "New"),
                 new("FileUpload", "uploadCloud", "/enterprise#sec-fileupload", false, null, "New"),
                 new("Image Compare", "columns3", "/enterprise#sec-image-compare"),
                 new("Camera Snapshot", "camera", "/enterprise#sec-camera")

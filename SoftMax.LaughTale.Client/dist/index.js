@@ -30277,284 +30277,537 @@ ${h.response}`).join("\n");
     default: () => CarouselIsland
   });
   function CarouselIsland(container, props) {
-    const items = props.items || [];
-    const numVisible = props.numVisible || 1;
-    const numScroll = props.numScroll || 1;
-    const autoplay = props.autoplay || false;
-    const autoplayInterval = props.autoplayInterval || 5e3;
-    const circular = props.circular || false;
-    const showIndicators = props.showIndicators !== false;
-    const showNavigators = props.showNavigators !== false;
-    let currentIndex = 0;
-    let autoplayTimer = null;
-    let isDragging = false;
-    let startX = 0;
-    let currentTranslate = 0;
-    let prevTranslate = 0;
-    injectIslandStyle("carousel", `
-        .laughtale-carousel {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            width: 100%;
-        }
-        .carousel-content {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            position: relative;
-        }
-        .carousel-viewport {
-            overflow: hidden;
-            width: 100%;
-            border-radius: var(--p-border-radius);
-            touch-action: pan-y;
-        }
-        .carousel-track {
-            display: flex;
-            transition: transform 0.3s ease;
-            cursor: grab;
-        }
-        .carousel-track:active {
-            cursor: grabbing;
-        }
-        .carousel-item {
-            flex: 0 0 auto;
-            padding: 0.5rem;
-            box-sizing: border-box;
-        }
-        .carousel-item-content {
-            background: var(--p-surface-0);
-            border: 1px solid var(--p-border-color);
-            border-radius: var(--p-border-radius);
-            overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            transition: box-shadow 150ms ease, transform 150ms ease;
-            height: 100%;
-        }
-        [data-theme="dark"] .carousel-item-content {
-            box-shadow: 0 1px 3px rgba(0,0,0,0.5);
-        }
-        .carousel-item-content:hover {
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .carousel-img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            display: block;
-        }
-        .carousel-body {
-            padding: 1rem;
-        }
-        .carousel-title {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: var(--p-text-color);
-            margin-bottom: 0.5rem;
-        }
-        .carousel-desc {
-            font-size: 0.875rem;
-            color: var(--p-text-muted-color);
-        }
-        .carousel-btn {
-            background: var(--p-surface-0);
-            border: 1px solid var(--p-border-color);
-            color: var(--p-text-color);
-            width: 2.5rem;
-            height: 2.5rem;
-            border-radius: 9999px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: background 150ms ease, color 150ms ease, box-shadow 150ms ease;
-            flex-shrink: 0;
-            z-index: 2;
-        }
-        .carousel-btn:hover:not(:disabled) {
-            background: var(--p-surface-100);
-        }
-        .carousel-btn:focus-visible {
-            outline: none;
-            box-shadow: 0 0 0 2px var(--p-primary-color);
-        }
-        .carousel-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        .carousel-indicators {
-            display: flex;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-        .carousel-indicator {
-            width: 0.75rem;
-            height: 0.75rem;
-            border-radius: 50%;
-            background: var(--p-surface-300);
-            border: none;
-            cursor: pointer;
-            transition: background 150ms ease, transform 150ms ease;
-        }
-        .carousel-indicator.active {
-            background: var(--p-primary-color);
-            transform: scale(1.2);
-        }
-    `);
-    function getPositionByIndex(index) {
-      return -(index * (100 / numVisible));
+    injectIslandStyle("carousel", CAROUSEL_CSS);
+    const demoType = props.demoType || "basic";
+    const align = props.align || (demoType === "alignment" ? "start" : "center");
+    const orientation = props.orientation || (demoType === "orientation" ? "vertical" : "horizontal");
+    const isVertical = orientation === "vertical";
+    const slidesPerPage = props.slidesPerPage !== void 0 ? props.slidesPerPage : demoType === "alignment" ? 1.5 : demoType === "orientation" ? 1.3 : demoType === "loop" ? 1.75 : 1;
+    const loop = props.loop === true || demoType === "loop";
+    const autoSize = props.autoSize === true || demoType === "variable";
+    const spacing = props.spacing !== void 0 ? props.spacing : 16;
+    let currentSlide = props.slide || 0;
+    let itemCount = 5;
+    let customWidths = [];
+    if (demoType === "variable") {
+      customWidths = ["120px", "80px", "200px", "160px", "220px", "180px", "280px", "100px"];
+      itemCount = customWidths.length;
+    } else if (demoType === "gallery") {
+      const images = props.galleryImages || GALLERY_DEFAULT_IMAGES;
+      renderGalleryDemo(images);
+      return;
     }
-    function setPositionByIndex() {
-      const track = container.querySelector(".carousel-track");
-      if (!track) return;
-      currentTranslate = getPositionByIndex(currentIndex);
-      prevTranslate = currentTranslate;
-      track.style.transform = "translateX(" + currentTranslate + "%)";
-      updateIndicators();
-      updateButtons();
-    }
-    function render() {
-      const itemWidth = 100 / numVisible;
-      const totalPages = Math.ceil((items.length - numVisible) / numScroll) + 1;
-      container.innerHTML = `
-            <div class="laughtale-carousel">
-                <div class="carousel-content">
-                    ${showNavigators ? `
-                        <button type="button" class="carousel-btn prev-btn" aria-label="Previous">
-                            ${LucideIcons.chevronLeft}
-                        </button>
-                    ` : ""}
-                    
-                    <div class="carousel-viewport">
-                        <div class="carousel-track">
-                            ${items.map((item) => `
-                                <div class="carousel-item" style="width: ${itemWidth}%">
-                                    <div class="carousel-item-content">
-                                        ${item.image ? `<img src="${item.image}" alt="${item.title || ""}" class="carousel-img" />` : ""}
-                                        <div class="carousel-body">
-                                            ${item.title ? `<div class="carousel-title">${item.title}</div>` : ""}
-                                            ${item.description ? `<div class="carousel-desc">${item.description}</div>` : ""}
-                                        </div>
-                                    </div>
-                                </div>
-                            `).join("")}
-                        </div>
+    function renderStandardCarousel() {
+      const itemWidthStyle = autoSize ? "" : isVertical ? `height: calc((100% - ${spacing * (slidesPerPage - 1)}px) / ${slidesPerPage}); width: 100%;` : `width: calc((100% - ${spacing * (slidesPerPage - 1)}px) / ${slidesPerPage});`;
+      const itemsHtml = Array.from({ length: itemCount }, (_, i) => {
+        const widthOverride = autoSize ? `width: ${customWidths[i]};` : "";
+        return `
+                <div class="p-carousel-item" style="${itemWidthStyle} ${widthOverride} padding-right: ${!isVertical ? `${spacing}px` : "0"}; padding-bottom: ${isVertical ? `${spacing}px` : "0"};" role="group" aria-roledescription="slide" aria-label="Slide ${i + 1} of ${itemCount}" data-slide-index="${i}">
+                    <div class="p-carousel-card-num">
+                        <span>${i + 1}</span>
                     </div>
-
-                    ${showNavigators ? `
-                        <button type="button" class="carousel-btn next-btn" aria-label="Next">
-                            ${LucideIcons.chevronRight}
-                        </button>
-                    ` : ""}
                 </div>
-
-                ${showIndicators && totalPages > 1 ? `
-                    <div class="carousel-indicators">
-                        ${Array.from({ length: totalPages }).map((_, i) => `
-                            <button type="button" class="carousel-indicator ${i === 0 ? "active" : ""}" data-index="${i}" aria-label="Page ${i + 1}"></button>
-                        `).join("")}
+            `;
+      }).join("");
+      const indicatorsHtml = Array.from({ length: itemCount }, (_, i) => `
+            <li class="p-carousel-indicator">
+                <button type="button" class="p-carousel-indicator-button ${i === currentSlide ? "p-carousel-indicator-active" : ""}" aria-label="Slide ${i + 1}" data-indicator-index="${i}" ${i === currentSlide ? 'aria-current="true"' : ""}></button>
+            </li>
+        `).join("");
+      if (isVertical) {
+        return `
+                <div class="p-carousel p-carousel-vertical p-carousel-align-${align} p-carousel-snap-${align} ${props.class || ""}" role="region" aria-roledescription="carousel" aria-label="Vertical Content Slider" style="max-width: 24rem; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 1.5rem; ${props.style || ""}">
+                    <button type="button" class="p-carousel-prev" aria-label="Previous slide" data-carousel-prev>
+                        ${CHEVRON_UP}
+                    </button>
+                    <div class="p-carousel-content" style="height: 240px; width: 100%;" data-carousel-content>
+                        ${itemsHtml}
                     </div>
-                ` : ""}
+                    <button type="button" class="p-carousel-next" aria-label="Next slide" data-carousel-next>
+                        ${CHEVRON_DOWN}
+                    </button>
+                </div>
+            `;
+      }
+      return `
+            <div class="p-carousel p-carousel-align-${align} p-carousel-snap-${align} ${props.class || ""}" role="region" aria-roledescription="carousel" aria-label="Content Slider" style="max-width: 36rem; margin: 0 auto; ${props.style || ""}">
+                <div class="p-carousel-content" style="height: ${autoSize ? "140px" : "240px"}; width: 100%;" data-carousel-content>
+                    ${itemsHtml}
+                </div>
+                <div class="p-carousel-footer-bar">
+                    <ul class="p-carousel-indicator-list">
+                        ${indicatorsHtml}
+                    </ul>
+                    <div class="p-carousel-nav-group">
+                        <button type="button" class="p-carousel-prev" aria-label="Previous slide" data-carousel-prev>
+                            ${CHEVRON_LEFT}
+                        </button>
+                        <button type="button" class="p-carousel-next" aria-label="Next slide" data-carousel-next>
+                            ${CHEVRON_RIGHT}
+                        </button>
+                    </div>
+                </div>
             </div>
         `;
-      bindEvents();
-      setPositionByIndex();
-      if (autoplay) startAutoplay();
     }
-    function updateIndicators() {
-      if (!showIndicators) return;
-      const page = Math.floor(currentIndex / numScroll);
-      container.querySelectorAll(".carousel-indicator").forEach((ind, i) => {
-        ind.classList.toggle("active", i === page);
-      });
-    }
-    function updateButtons() {
-      if (!showNavigators || circular) return;
-      const prevBtn = container.querySelector(".prev-btn");
-      const nextBtn = container.querySelector(".next-btn");
-      if (prevBtn) prevBtn.disabled = currentIndex === 0;
-      if (nextBtn) nextBtn.disabled = currentIndex >= items.length - numVisible;
-    }
-    function navPrev() {
-      if (currentIndex === 0) {
-        if (circular) currentIndex = Math.max(0, items.length - numVisible);
-      } else {
-        currentIndex = Math.max(0, currentIndex - numScroll);
-      }
-      setPositionByIndex();
-    }
-    function navNext() {
-      if (currentIndex >= items.length - numVisible) {
-        if (circular) currentIndex = 0;
-      } else {
-        currentIndex = Math.min(items.length - numVisible, currentIndex + numScroll);
-      }
-      setPositionByIndex();
-    }
-    function startAutoplay() {
-      if (autoplayTimer) clearInterval(autoplayTimer);
-      autoplayTimer = window.setInterval(navNext, autoplayInterval);
-    }
-    function stopAutoplay() {
-      if (autoplayTimer) {
-        clearInterval(autoplayTimer);
-        autoplayTimer = null;
-      }
-    }
-    function bindEvents() {
-      const prevBtn = container.querySelector(".prev-btn");
-      const nextBtn = container.querySelector(".next-btn");
-      const track = container.querySelector(".carousel-track");
-      const indicators = container.querySelectorAll(".carousel-indicator");
-      prevBtn?.addEventListener("click", navPrev);
-      nextBtn?.addEventListener("click", navNext);
-      indicators.forEach((ind) => {
-        ind.addEventListener("click", (e) => {
-          const idx = Number(e.target.dataset.index);
-          currentIndex = Math.min(idx * numScroll, items.length - numVisible);
-          setPositionByIndex();
-        });
-      });
-      if (autoplay) {
-        container.addEventListener("mouseenter", stopAutoplay);
-        container.addEventListener("mouseleave", startAutoplay);
-      }
-      if (track) {
-        track.addEventListener("pointerdown", (e) => {
-          isDragging = true;
-          startX = e.clientX;
-          track.style.transition = "none";
-          if (autoplay) stopAutoplay();
-        });
-        window.addEventListener("pointermove", (e) => {
-          if (!isDragging) return;
-          const currentX = e.clientX;
-          const diff = (currentX - startX) / container.offsetWidth * 100;
-          track.style.transform = `translateX(${prevTranslate + diff}%)`;
-        });
-        window.addEventListener("pointerup", (e) => {
-          if (!isDragging) return;
-          isDragging = false;
-          track.style.transition = "transform 0.3s ease";
-          const diff = (e.clientX - startX) / container.offsetWidth * 100;
-          if (Math.abs(diff) > 10) {
-            if (diff > 0) navPrev();
-            else navNext();
-          } else {
-            setPositionByIndex();
+    function renderGalleryDemo(images) {
+      container.innerHTML = `
+            <div class="p-carousel-gallery-container" style="max-width: 42rem; margin: 0 auto; width: 100%;">
+                <!-- Main Stage Photo Carousel -->
+                <div class="p-carousel p-carousel-align-center p-carousel-snap-center" data-main-carousel style="width: 100%; border-radius: var(--p-border-radius, 12px); overflow: hidden; border: 1px solid var(--p-border-color);">
+                    <div class="p-carousel-content" style="height: 396px; width: 100%;" data-main-content>
+                        ${images.map((src, i) => `
+                            <div class="p-carousel-item" style="width: 100%; height: 100%; flex-shrink: 0;" data-slide-index="${i}">
+                                <img src="${src}" alt="Polar Bear in Nature ${i + 1}" draggable="false" style="width: 100%; height: 100%; object-fit: cover; select-none;" />
+                            </div>
+                        `).join("")}
+                    </div>
+                </div>
+
+                <!-- Synchronized Thumbnail Strip -->
+                <div class="p-carousel p-carousel-align-center p-carousel-snap-center" data-thumb-carousel style="margin-top: 0.75rem; width: 100%;">
+                    <div class="p-carousel-content" style="height: 90px; width: 100%; gap: 8px;" data-thumb-content>
+                        ${images.map((src, i) => `
+                            <div class="p-carousel-item p-carousel-gallery-thumb ${i === currentSlide ? "p-carousel-thumb-active" : ""}" style="width: calc((100% - 24px) / 4); height: 100%; flex-shrink: 0;" data-thumb-index="${i}">
+                                <img src="${src}" alt="Thumbnail ${i + 1}" draggable="false" style="width: 100%; height: 100%; object-fit: cover; border-radius: 6px;" />
+                            </div>
+                        `).join("")}
+                    </div>
+                </div>
+            </div>
+        `;
+      const mainContent = container.querySelector("[data-main-content]");
+      const thumbContent = container.querySelector("[data-thumb-content]");
+      function selectGallerySlide(index) {
+        currentSlide = index;
+        if (mainContent) {
+          const mainItem = mainContent.querySelector(`[data-slide-index="${index}"]`);
+          if (mainItem) {
+            mainContent.scrollTo({
+              left: mainItem.offsetLeft,
+              behavior: "smooth"
+            });
           }
-          if (autoplay) startAutoplay();
+        }
+        if (thumbContent) {
+          thumbContent.querySelectorAll(".p-carousel-gallery-thumb").forEach((thumb, i) => {
+            if (i === index) {
+              thumb.classList.add("p-carousel-thumb-active");
+            } else {
+              thumb.classList.remove("p-carousel-thumb-active");
+            }
+          });
+          const activeThumb = thumbContent.querySelector(`[data-thumb-index="${index}"]`);
+          if (activeThumb) {
+            thumbContent.scrollTo({
+              left: activeThumb.offsetLeft - thumbContent.clientWidth / 2 + activeThumb.clientWidth / 2,
+              behavior: "smooth"
+            });
+          }
+        }
+      }
+      container.querySelectorAll("[data-thumb-index]").forEach((thumb) => {
+        thumb.addEventListener("click", () => {
+          const idx = parseInt(thumb.getAttribute("data-thumb-index") || "0", 10);
+          selectGallerySlide(idx);
+        });
+      });
+      if (mainContent) {
+        let debounceTimer = null;
+        mainContent.addEventListener("scroll", () => {
+          clearTimeout(debounceTimer);
+          debounceTimer = setTimeout(() => {
+            const scrollLeft = mainContent.scrollLeft;
+            const items = mainContent.querySelectorAll("[data-slide-index]");
+            let closestIdx = 0;
+            let minDiff = Infinity;
+            items.forEach((item, i) => {
+              const diff = Math.abs(item.offsetLeft - scrollLeft);
+              if (diff < minDiff) {
+                minDiff = diff;
+                closestIdx = i;
+              }
+            });
+            if (closestIdx !== currentSlide) {
+              currentSlide = closestIdx;
+              if (thumbContent) {
+                thumbContent.querySelectorAll(".p-carousel-gallery-thumb").forEach((thumb, i) => {
+                  if (i === currentSlide) thumb.classList.add("p-carousel-thumb-active");
+                  else thumb.classList.remove("p-carousel-thumb-active");
+                });
+              }
+            }
+          }, 100);
         });
       }
+      return;
     }
-    render();
+    container.innerHTML = renderStandardCarousel();
+    const contentEl = container.querySelector("[data-carousel-content]");
+    const prevBtn = container.querySelector("[data-carousel-prev]");
+    const nextBtn = container.querySelector("[data-carousel-next]");
+    const indicators = container.querySelectorAll("[data-indicator-index]");
+    function scrollToSlide(index) {
+      if (!contentEl) return;
+      const targetItem = contentEl.querySelector(`[data-slide-index="${index}"]`);
+      if (!targetItem) return;
+      currentSlide = index;
+      if (isVertical) {
+        const targetTop = targetItem.offsetTop;
+        contentEl.scrollTo({
+          top: targetTop,
+          behavior: "smooth"
+        });
+      } else {
+        let targetLeft = targetItem.offsetLeft;
+        if (align === "center") {
+          targetLeft = targetItem.offsetLeft - contentEl.clientWidth / 2 + targetItem.clientWidth / 2;
+        } else if (align === "end") {
+          targetLeft = targetItem.offsetLeft - contentEl.clientWidth + targetItem.clientWidth;
+        }
+        contentEl.scrollTo({
+          left: Math.max(0, targetLeft),
+          behavior: "smooth"
+        });
+      }
+      updateUI();
+    }
+    function updateUI() {
+      indicators.forEach((ind, i) => {
+        if (i === currentSlide) {
+          ind.classList.add("p-carousel-indicator-active");
+          ind.setAttribute("aria-current", "true");
+        } else {
+          ind.classList.remove("p-carousel-indicator-active");
+          ind.removeAttribute("aria-current");
+        }
+      });
+      if (!loop) {
+        if (prevBtn) prevBtn.disabled = currentSlide <= 0;
+        if (nextBtn) nextBtn.disabled = currentSlide >= itemCount - 1;
+      } else {
+        if (prevBtn) prevBtn.disabled = false;
+        if (nextBtn) nextBtn.disabled = false;
+      }
+    }
+    if (prevBtn) {
+      prevBtn.addEventListener("click", () => {
+        if (currentSlide > 0) {
+          scrollToSlide(currentSlide - 1);
+        } else if (loop) {
+          scrollToSlide(itemCount - 1);
+        }
+      });
+    }
+    if (nextBtn) {
+      nextBtn.addEventListener("click", () => {
+        if (currentSlide < itemCount - 1) {
+          scrollToSlide(currentSlide + 1);
+        } else if (loop) {
+          scrollToSlide(0);
+        }
+      });
+    }
+    indicators.forEach((ind) => {
+      ind.addEventListener("click", () => {
+        const idx = parseInt(ind.getAttribute("data-indicator-index") || "0", 10);
+        scrollToSlide(idx);
+      });
+    });
+    if (contentEl) {
+      let scrollDebounce = null;
+      contentEl.addEventListener("scroll", () => {
+        clearTimeout(scrollDebounce);
+        scrollDebounce = setTimeout(() => {
+          const items = contentEl.querySelectorAll("[data-slide-index]");
+          let closestIdx = 0;
+          let minDiff = Infinity;
+          if (isVertical) {
+            const scrollTop = contentEl.scrollTop;
+            items.forEach((item, i) => {
+              const diff = Math.abs(item.offsetTop - scrollTop);
+              if (diff < minDiff) {
+                minDiff = diff;
+                closestIdx = i;
+              }
+            });
+          } else {
+            const scrollLeft = contentEl.scrollLeft;
+            const centerPoint = scrollLeft + contentEl.clientWidth / 2;
+            items.forEach((item, i) => {
+              const itemCenter = item.offsetLeft + item.clientWidth / 2;
+              const diff = Math.abs(itemCenter - centerPoint);
+              if (diff < minDiff) {
+                minDiff = diff;
+                closestIdx = i;
+              }
+            });
+          }
+          if (closestIdx !== currentSlide) {
+            currentSlide = closestIdx;
+            updateUI();
+          }
+        }, 80);
+      });
+    }
+    updateUI();
   }
+  var CAROUSEL_CSS, CHEVRON_LEFT, CHEVRON_RIGHT, CHEVRON_UP, CHEVRON_DOWN, GALLERY_DEFAULT_IMAGES;
   var init_carousel = __esm({
     "src/components/carousel.ts"() {
       "use strict";
-      init_lucide();
       init_styles();
+      CAROUSEL_CSS = `
+/* ==========================================================================
+   PrimeVue 4 Aura Carousel Component Tokens & Styles
+   ========================================================================== */
+.p-carousel {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-sizing: border-box;
+    width: 100%;
+    font-family: var(--p-font-family, inherit);
+}
+
+.p-carousel-vertical {
+    flex-direction: column;
+    align-items: center;
+}
+
+.p-carousel-content {
+    display: flex;
+    width: 100%;
+    position: relative;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.p-carousel-content::-webkit-scrollbar {
+    display: none;
+}
+
+.p-carousel-vertical .p-carousel-content {
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+/* Snap Types & Alignments */
+.p-carousel-snap-start {
+    scroll-snap-type: x mandatory;
+}
+.p-carousel-vertical.p-carousel-snap-start {
+    scroll-snap-type: y mandatory;
+}
+
+.p-carousel-snap-center {
+    scroll-snap-type: x mandatory;
+}
+.p-carousel-vertical.p-carousel-snap-center {
+    scroll-snap-type: y mandatory;
+}
+
+.p-carousel-snap-end {
+    scroll-snap-type: x mandatory;
+}
+.p-carousel-vertical.p-carousel-snap-end {
+    scroll-snap-type: y mandatory;
+}
+
+/* Items & Cards */
+.p-carousel-item {
+    flex: 0 0 auto;
+    box-sizing: border-box;
+    display: flex;
+    align-items: stretch;
+    transition: opacity 200ms ease, transform 200ms ease;
+}
+
+.p-carousel-align-start .p-carousel-item {
+    scroll-snap-align: start;
+}
+.p-carousel-align-center .p-carousel-item {
+    scroll-snap-align: center;
+}
+.p-carousel-align-end .p-carousel-item {
+    scroll-snap-align: end;
+}
+
+/* Number Card Box */
+.p-carousel-card-num {
+    height: 100%;
+    width: 100%;
+    font-size: 3rem;
+    font-weight: 700;
+    background: var(--p-surface-50, #f8fafc);
+    color: var(--p-surface-950, #0f172a);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--p-border-radius, 12px);
+    border: 1px solid var(--p-border-color, #e2e8f0);
+    box-sizing: border-box;
+    transition: background-color 150ms ease, border-color 150ms ease;
+}
+
+.dark .p-carousel-card-num,
+[data-theme="dark"] .p-carousel-card-num {
+    background: var(--p-surface-950, #020617);
+    color: var(--p-surface-0, #ffffff);
+    border-color: var(--p-surface-800, #1e293b);
+}
+
+/* Bottom Bar (Indicators + Prev/Next Controls) */
+.p-carousel-footer-bar {
+    display: flex;
+    align-items: center;
+    margin-top: 1rem;
+    gap: 1rem;
+    width: 100%;
+}
+
+.p-carousel-indicator-list {
+    display: flex;
+    align-items: center;
+    gap: var(--p-carousel-indicator-list-gap, 0.5rem);
+    padding: var(--p-carousel-indicator-list-padding, 0.25rem 0);
+    margin: 0;
+    list-style: none;
+}
+
+.p-carousel-indicator {
+    display: inline-flex;
+}
+
+.p-carousel-indicator-button {
+    width: var(--p-carousel-indicator-width, 1.75rem);
+    height: var(--p-carousel-indicator-height, 0.375rem);
+    border-radius: var(--p-carousel-indicator-border-radius, 9999px);
+    background: var(--p-carousel-indicator-background, var(--p-surface-200, #e2e8f0));
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: background-color 200ms ease, transform 150ms ease, width 200ms ease;
+    outline: none;
+}
+
+.dark .p-carousel-indicator-button,
+[data-theme="dark"] .p-carousel-indicator-button {
+    background: var(--p-surface-700, #334155);
+}
+
+.p-carousel-indicator-button:hover {
+    background: var(--p-carousel-indicator-hover-background, var(--p-surface-400, #94a3b8));
+}
+
+.p-carousel-indicator-button.p-carousel-indicator-active {
+    background: var(--p-carousel-indicator-active-background, var(--p-primary-color, #10b981));
+    width: 2.25rem;
+}
+
+/* Navigation Buttons */
+.p-carousel-nav-group {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    flex: 1;
+}
+
+.p-carousel-prev,
+.p-carousel-next {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 9999px;
+    border: 1px solid var(--p-border-color, #e2e8f0);
+    background: var(--p-surface-0, #ffffff);
+    color: var(--p-text-muted, #64748b);
+    cursor: pointer;
+    transition: background-color 150ms ease, color 150ms ease, opacity 150ms ease, transform 120ms ease;
+    outline: none;
+    padding: 0;
+    box-sizing: border-box;
+    flex-shrink: 0;
+}
+
+.dark .p-carousel-prev,
+.dark .p-carousel-next,
+[data-theme="dark"] .p-carousel-prev,
+[data-theme="dark"] .p-carousel-next {
+    background: var(--p-surface-800, #1e293b);
+    border-color: var(--p-surface-700, #334155);
+    color: var(--p-surface-400, #94a3b8);
+}
+
+.p-carousel-prev:hover:not(:disabled),
+.p-carousel-next:hover:not(:disabled) {
+    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-text-color, #0f172a);
+}
+
+.dark .p-carousel-prev:hover:not(:disabled),
+.dark .p-carousel-next:hover:not(:disabled),
+[data-theme="dark"] .p-carousel-prev:hover:not(:disabled),
+[data-theme="dark"] .p-carousel-next:hover:not(:disabled) {
+    background: var(--p-surface-700, #334155);
+    color: var(--p-surface-0, #ffffff);
+}
+
+.p-carousel-prev:active:not(:disabled),
+.p-carousel-next:active:not(:disabled) {
+    transform: scale(0.92);
+}
+
+.p-carousel-prev:disabled,
+.p-carousel-next:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* Gallery Thumbnails */
+.p-carousel-gallery-thumb {
+    cursor: pointer;
+    border-radius: var(--p-border-radius, 8px);
+    overflow: hidden;
+    transition: opacity 150ms ease, transform 150ms ease, border-color 150ms ease;
+    border: 2px solid transparent;
+}
+.p-carousel-gallery-thumb.p-carousel-thumb-active {
+    border-color: var(--p-primary-color, #10b981);
+    opacity: 1 !important;
+}
+.p-carousel-gallery-thumb:not(.p-carousel-thumb-active) {
+    opacity: 0.55;
+}
+.p-carousel-gallery-thumb:not(.p-carousel-thumb-active):hover {
+    opacity: 0.85;
+}
+`;
+      CHEVRON_LEFT = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>`;
+      CHEVRON_RIGHT = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`;
+      CHEVRON_UP = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>`;
+      CHEVRON_DOWN = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
+      GALLERY_DEFAULT_IMAGES = [
+        "https://images.unsplash.com/photo-1589656966895-2f33e7653819?q=80&w=1470&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1518717758536-85ae29035b6d?q=80&w=1470&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1704905832963-37d6f12654b7?q=80&w=1470&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1470130623320-9583a8d06241?q=80&w=2070&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1678841446310-d045487ef299?q=80&w=1470&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1497752531616-c3afd9760a11?q=80&w=1470&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1511885663737-eea53f6d6187?q=80&w=1374&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1598439210625-5067c578f3f6?q=80&w=1472&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1638255402906-e838358069ab?q=80&w=1631&auto=format&fit=crop"
+      ];
     }
   });
 

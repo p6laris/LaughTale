@@ -7505,13 +7505,53 @@
     <section id="sec-carousel" class="component-card">
         <div class="card-header">
             <div>
-                <h2>Carousel Slider</h2>
-                <p>Smooth slide carousel with touch swipe and custom page indicators.</p>
+                <h2>Carousel</h2>
+                <p>Carousel is a content slider featuring various customization options, native CSS scroll-snap, horizontal/vertical orientation, continuous looping, variable widths, and synchronized thumbnail galleries.</p>
             </div>
-            <span class="aura-tag tag-slate">Carousel</span>
+            <span class="aura-tag tag-emerald">PrimeVue 4 Aura</span>
         </div>
-        <div class="card-body">
-            <island-carousel items="@Model.CarouselSlides" />
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2.5rem;">
+            <!-- Demo 1: Basic -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Composition-based carousel using native scroll-snap with sub-components for root, content, items, navigation, and indicators.</p>
+                <island-carousel demo-type="basic" align="center" />
+            </div>
+
+            <!-- Demo 2: Alignment -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Alignment</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Use align to control snap alignment and slidesPerPage to show partial slides.</p>
+                <island-carousel demo-type="alignment" align="start" slides-per-page="1.5" />
+            </div>
+
+            <!-- Demo 3: Orientation -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Orientation</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Set orientation to vertical for a vertical carousel layout with top/bottom navigators.</p>
+                <island-carousel demo-type="orientation" orientation="vertical" slides-per-page="1.3" />
+            </div>
+
+            <!-- Demo 4: Loop -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Loop</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Enable continuous looping with the loop property. Use slidesPerPage to show partial slides.</p>
+                <island-carousel demo-type="loop" align="center" loop="true" slides-per-page="1.75" />
+            </div>
+
+            <!-- Demo 5: Variable Size -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Variable Size</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Enable autoSize to allow items with variable widths and natural intrinsic sizes.</p>
+                <island-carousel demo-type="variable" align="center" auto-size="true" />
+            </div>
+
+            <!-- Demo 6: Gallery -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Gallery</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Two carousels synchronized via slide input to create a gallery with thumbnail navigation.</p>
+                <island-carousel demo-type="gallery" align="center" />
+            </div>
         </div>
     </section>
 

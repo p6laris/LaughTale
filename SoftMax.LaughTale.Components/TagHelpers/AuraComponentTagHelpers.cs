@@ -4111,28 +4111,109 @@ public class IslandEnhancedInputTextTagHelper : TagHelper
 }
 
 /// <summary>
-/// TagHelper for <island-carousel /> — Touch-enabled content slider
+/// TagHelper for <island-carousel /> and <p-carousel /> — PrimeVue 4 Aura Content Slider
 /// </summary>
 [HtmlTargetElement("island-carousel")]
+[HtmlTargetElement("p-carousel")]
 public class IslandCarouselTagHelper : TagHelper
 {
     public List<CarouselItem>? Items { get; set; }
+
+    [HtmlAttributeName("align")]
+    public string Align { get; set; } = "center";
+
+    [HtmlAttributeName("orientation")]
+    public string Orientation { get; set; } = "horizontal";
+
+    [HtmlAttributeName("slides-per-page")]
+    public double? SlidesPerPage { get; set; }
+
+    [HtmlAttributeName("loop")]
+    public bool Loop { get; set; } = false;
+
+    [HtmlAttributeName("auto-size")]
+    public bool AutoSize { get; set; } = false;
+
+    [HtmlAttributeName("spacing")]
+    public int Spacing { get; set; } = 16;
+
+    [HtmlAttributeName("slide")]
+    public int? Slide { get; set; }
+
+    [HtmlAttributeName("num-visible")]
     public int NumVisible { get; set; } = 1;
+
+    [HtmlAttributeName("num-scroll")]
     public int NumScroll { get; set; } = 1;
+
+    [HtmlAttributeName("autoplay")]
     public bool Autoplay { get; set; } = false;
+
+    [HtmlAttributeName("autoplay-interval")]
     public int AutoplayInterval { get; set; } = 5000;
+
+    [HtmlAttributeName("circular")]
     public bool Circular { get; set; } = false;
+
+    [HtmlAttributeName("show-indicators")]
     public bool ShowIndicators { get; set; } = true;
+
+    [HtmlAttributeName("show-navigators")]
     public bool ShowNavigators { get; set; } = true;
+
+    [HtmlAttributeName("demo-type")]
+    public string? DemoType { get; set; }
+
+    [HtmlAttributeName("gallery-images")]
+    public List<string>? GalleryImages { get; set; }
+
+    [HtmlAttributeName("class")]
+    public string? Class { get; set; }
+
+    [HtmlAttributeName("style")]
+    public string? Style { get; set; }
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
         output.TagName = "div";
         output.TagMode = TagMode.StartTagAndEndTag;
         output.Attributes.SetAttribute("data-island", "carousel");
-        output.Attributes.SetAttribute("hydrate", "Visible");
-        var props = new { items = Items ?? new(), numVisible = NumVisible, numScroll = NumScroll, autoplay = Autoplay, autoplayInterval = AutoplayInterval, circular = Circular, showIndicators = ShowIndicators, showNavigators = ShowNavigators };
+        output.Attributes.SetAttribute("data-hydrate", "visible");
+
+        var props = new
+        {
+            items = Items,
+            align = Align,
+            orientation = Orientation,
+            slidesPerPage = SlidesPerPage,
+            loop = Loop,
+            autoSize = AutoSize,
+            spacing = Spacing,
+            slide = Slide,
+            numVisible = NumVisible,
+            numScroll = NumScroll,
+            autoplay = Autoplay,
+            autoplayInterval = AutoplayInterval,
+            circular = Circular,
+            showIndicators = ShowIndicators,
+            showNavigators = ShowNavigators,
+            demoType = DemoType,
+            galleryImages = GalleryImages,
+            @class = Class,
+            style = Style
+        };
+
         output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
+
+        if (!string.IsNullOrWhiteSpace(Class))
+        {
+            output.Attributes.SetAttribute("class", Class);
+        }
+
+        if (!string.IsNullOrWhiteSpace(Style))
+        {
+            output.Attributes.SetAttribute("style", Style);
+        }
     }
 }
 

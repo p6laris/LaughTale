@@ -76,7 +76,8 @@ public static class DocsNavigationData
                 new("MeterGroup Gauge", "barChart3", "/doc/22-meter-group", currentPath.Contains("22-meter-group")),
                 new("Avatar & AvatarGroup", "users", "/doc/23-avatar-group", currentPath.Contains("23-avatar-group")),
                 new("Image Compare Slider", "image", "/doc/24-image-compare", currentPath.Contains("24-image-compare")),
-                new("Progress & Skeleton", "loader2", "/doc/25-progress-skeleton", currentPath.Contains("25-progress-skeleton"))
+                new("Progress & Skeleton", "loader2", "/doc/25-progress-skeleton", currentPath.Contains("25-progress-skeleton")),
+                new("Carousel Slider", "image", "/doc/46-carousel", currentPath.Contains("46-carousel"))
             }),
 
             new SidebarItem("Composables & Architecture", "code", null, true, new List<SidebarItem>
