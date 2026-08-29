@@ -5185,3 +5185,231 @@ html {
     background: var(--p-surface-900, #0f172a);
     border-color: var(--p-surface-700, #334155);
 }
+
+/* ==========================================================================
+   Aura PrimeVue 4 ConfirmDialog Component Tokens & Modal Mask
+   ========================================================================== */
+.p-confirmdialog-mask {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 1200;
+    display: flex;
+    box-sizing: border-box;
+    padding: 1.5rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.p-confirmdialog-mask.p-confirmdialog-mask-active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Positioning rules */
+.p-confirmdialog-mask.p-confirmdialog-pos-center {
+    align-items: center;
+    justify-content: center;
+}
+.p-confirmdialog-mask.p-confirmdialog-pos-top {
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 3rem;
+}
+.p-confirmdialog-mask.p-confirmdialog-pos-bottom {
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 3rem;
+}
+.p-confirmdialog-mask.p-confirmdialog-pos-left {
+    align-items: center;
+    justify-content: flex-start;
+    padding-left: 3rem;
+}
+.p-confirmdialog-mask.p-confirmdialog-pos-right {
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 3rem;
+}
+.p-confirmdialog-mask.p-confirmdialog-pos-topleft {
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding-top: 3rem;
+    padding-left: 3rem;
+}
+.p-confirmdialog-mask.p-confirmdialog-pos-topright {
+    align-items: flex-start;
+    justify-content: flex-end;
+    padding-top: 3rem;
+    padding-right: 3rem;
+}
+.p-confirmdialog-mask.p-confirmdialog-pos-bottomleft {
+    align-items: flex-end;
+    justify-content: flex-start;
+    padding-bottom: 3rem;
+    padding-left: 3rem;
+}
+.p-confirmdialog-mask.p-confirmdialog-pos-bottomright {
+    align-items: flex-end;
+    justify-content: flex-end;
+    padding-bottom: 3rem;
+    padding-right: 3rem;
+}
+
+/* Dialog Container */
+.p-confirmdialog.p-dialog {
+    background: var(--p-surface-0, #ffffff);
+    border: 1px solid var(--p-border-color, #e2e8f0);
+    border-radius: var(--p-border-radius-xl, 12px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    min-width: 24rem;
+    max-width: 32rem;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transform: scale(0.94) translateY(6px);
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.p-confirmdialog-mask.p-confirmdialog-mask-active .p-confirmdialog.p-dialog {
+    transform: scale(1) translateY(0);
+}
+
+/* Header */
+.p-confirmdialog .p-dialog-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.5rem 0.75rem 1.5rem;
+    border-bottom: none;
+}
+
+.p-confirmdialog .p-dialog-title {
+    font-weight: 700;
+    font-size: 1.125rem;
+    color: var(--p-text-color, #0f172a);
+    margin: 0;
+}
+
+.p-confirmdialog .p-dialog-header-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 9999px;
+    border: none;
+    background: transparent;
+    color: var(--p-surface-500, #64748b);
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    padding: 0;
+}
+.p-confirmdialog .p-dialog-header-close:hover {
+    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-text-color, #0f172a);
+}
+
+/* Content */
+.p-confirmdialog .p-dialog-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 0.5rem 1.5rem 1.5rem 1.5rem;
+    flex: 1 1 auto;
+}
+
+.p-confirmdialog .p-confirmdialog-icon {
+    font-size: 1.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+    color: var(--p-primary-500, #10b981);
+}
+
+.p-confirmdialog-icon-danger {
+    color: #ef4444 !important;
+}
+.p-confirmdialog-icon-warning {
+    color: #f59e0b !important;
+}
+.p-confirmdialog-icon-info {
+    color: #3b82f6 !important;
+}
+
+.p-confirmdialog .p-confirmdialog-message {
+    font-size: 0.9375rem;
+    color: var(--p-surface-700, #334155);
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* Footer */
+.p-confirmdialog .p-dialog-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    padding: 0 1.5rem 1.25rem 1.5rem;
+    border-top: none;
+}
+
+/* Headless Variant */
+.p-confirmdialog-headless {
+    padding: 2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1.25rem;
+}
+
+.p-confirmdialog-headless-icon {
+    width: 4rem;
+    height: 4rem;
+    border-radius: 9999px;
+    background: var(--p-primary-50, #ecfdf5);
+    color: var(--p-primary-600, #059669);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--p-primary-200, #a7f3d0);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+}
+
+/* Dark Mode Tokens */
+.dark .p-confirmdialog.p-dialog,
+[data-theme="dark"] .p-confirmdialog.p-dialog {
+    background: var(--p-surface-900, #0f172a);
+    border-color: var(--p-surface-700, #334155);
+}
+.dark .p-confirmdialog .p-dialog-title,
+[data-theme="dark"] .p-confirmdialog .p-dialog-title {
+    color: var(--p-surface-0, #f8fafc);
+}
+.dark .p-confirmdialog .p-dialog-header-close,
+[data-theme="dark"] .p-confirmdialog .p-dialog-header-close {
+    color: var(--p-surface-400, #94a3b8);
+}
+.dark .p-confirmdialog .p-dialog-header-close:hover,
+[data-theme="dark"] .p-confirmdialog .p-dialog-header-close:hover {
+    background: var(--p-surface-800, #1e293b);
+    color: #ffffff;
+}
+.dark .p-confirmdialog .p-confirmdialog-message,
+[data-theme="dark"] .p-confirmdialog .p-confirmdialog-message {
+    color: var(--p-surface-300, #cbd5e1);
+}
+.dark .p-confirmdialog-headless-icon,
+[data-theme="dark"] .p-confirmdialog-headless-icon {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: rgba(16, 185, 129, 0.35);
+    color: #6ee7b7;
+}

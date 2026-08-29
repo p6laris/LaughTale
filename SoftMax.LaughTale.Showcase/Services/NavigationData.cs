@@ -83,12 +83,13 @@ public static class NavigationData
                 new("ScrollTop", "arrowUp", "/enterprise#sec-scroll-top"),
                 new("Command Palette", "terminal", "/enterprise#sec-command-palette")
             }),
-            new("Overlays & Dialogs (7)", "layers", null, false, new List<SidebarItem>
+            new("Overlays & Dialogs (8)", "layers", null, false, new List<SidebarItem>
             {
                 new("Modal Dialog", "layers", "/enterprise#sec-modal"),
                 new("Drawer Offcanvas", "sidebar", "/enterprise#sec-drawer"),
                 new("Popover", "messageSquare", "/enterprise#sec-popover"),
                 new("Tooltip", "info", "/enterprise#sec-tooltip"),
+                new("ConfirmDialog", "alertTriangle", "/enterprise#sec-confirm-dialog", false, null, "New"),
                 new("ConfirmPopup", "alertTriangle", "/enterprise#sec-confirm-popup"),
                 new("Toast Container", "bell", "/enterprise#sec-toast"),
                 new("BlockUI Locker", "lock", "/enterprise#sec-blockui")

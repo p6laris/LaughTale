@@ -58,6 +58,8 @@ defineIsland('drawer', () => import('./components/drawer'));
 defineIsland('speed-dial', () => import('./components/speed-dial'));
 defineIsland('image-compare', () => import('./components/image-compare'));
 defineIsland('confirm-popup', () => import('./components/confirm-popup'));
+defineIsland('confirm-dialog', () => import('./components/confirm-dialog'));
+defineIsland('confirmdialog', () => import('./components/confirm-dialog'));
 
 // Aura Additional Enterprise Components
 defineIsland('scrollarea', () => import('./components/scrollarea'));
