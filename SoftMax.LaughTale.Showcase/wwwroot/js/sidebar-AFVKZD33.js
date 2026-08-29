@@ -1,21 +1,12 @@
-/**
- * SoftMax.LaughTale: Enterprise Sidebar Component Suite (PrimeVue 4 Aura Design System)
- * Complete compound navigation panel system matching PrimeVue 4 Aura specifications:
- * 1. App-Level Navigation Tree Sidebar for app shell
- * 2. Variants Interactive Playground with Aura custom Select, SelectButton, and ToggleSwitch controls
- * 3. With Menu (Interactive Workspace Switcher + User Profile Popup Dropdown)
- * 4. Responsive (Mobile offcanvas overlay vs Desktop icon collapsible)
- * 5. Dual Sidebar (Left Navigation + Right Claude-style AI Chat Panel)
- * 6. Multi Sidebar (IDE-style stacked layout: primary iconbar + secondary settings panel + Table Editor)
- * 7. Nested Menu (Deep multi-level file hierarchy with CSS grid smooth expansion)
- * 8. Chat Application (ChatGPT-style history with pinned shortcuts, conversation groups, and hover trash)
- */
+import {
+  LucideIcons
+} from "./chunk-XHF3KYSF.js";
+import {
+  injectIslandStyle
+} from "./chunk-3TFPN5JM.js";
 
-import { SidebarItem } from '../types/models';
-import { LucideIcons } from '../icons/lucide';
-import { injectIslandStyle } from '../runtime/styles';
-
-const SIDEBAR_CSS = `
+// ../SoftMax.LaughTale.Client/src/components/sidebar.ts
+var SIDEBAR_CSS = `
 /* ==========================================================================
    1. App-Level Navigation Tree Sidebar (App Shell)
    ========================================================================== */
@@ -1117,144 +1108,84 @@ const SIDEBAR_CSS = `
     border-color: var(--p-surface-700, #334155);
 }
 `;
-
-export interface SidebarSubItem {
-    label: string;
-    isActive?: boolean;
-    url?: string;
-    subItems?: SidebarSubItem[];
+function SidebarIsland(container, props) {
+  injectIslandStyle("sidebar", SIDEBAR_CSS);
+  const hasAppItems = Array.isArray(props.items) && props.items.length > 0 && !props.groups;
+  if (hasAppItems) {
+    renderAppNavigationSidebar(container, props);
+  } else {
+    renderCompoundSidebar(container, props);
+  }
 }
-
-export interface SidebarItemModel {
-    label: string;
-    icon?: string;
-    badge?: string | number;
-    isActive?: boolean;
-    url?: string;
-    subItems?: SidebarSubItem[];
-    defaultOpen?: boolean;
-}
-
-export interface SidebarGroupModel {
-    label: string;
-    items: SidebarItemModel[];
-}
-
-export interface SidebarProps {
-    items?: SidebarItem[];
-    title?: string;
-    searchable?: boolean;
-    position?: 'left' | 'right';
-    collapsed?: boolean;
-
-    id?: string;
-    variant?: 'sidebar' | 'floating' | 'inset';
-    collapsible?: 'none' | 'offcanvas' | 'icon';
-    side?: 'left' | 'right';
-    overlay?: boolean;
-    openOnHover?: boolean;
-    backdrop?: boolean;
-    open?: boolean;
-    width?: string;
-    iconWidth?: string;
-    demoType?: 'variants' | 'menu' | 'responsive' | 'dual' | 'multi' | 'nested' | 'chat';
-    groups?: SidebarGroupModel[];
-    headerTitle?: string;
-    headerLogo?: string;
-    headerColor?: string;
-    showControls?: boolean;
-    class?: string;
-    style?: string;
-}
-
-export default function SidebarIsland(container: HTMLElement, props: SidebarProps) {
-    injectIslandStyle('sidebar', SIDEBAR_CSS);
-
-    const hasAppItems = Array.isArray(props.items) && props.items.length > 0 && !props.groups;
-
-    if (hasAppItems) {
-        renderAppNavigationSidebar(container, props);
-    } else {
-        renderCompoundSidebar(container, props);
+function renderAppNavigationSidebar(container, props) {
+  let collapsed = props.collapsed || false;
+  let searchQuery = "";
+  const items = props.items || [];
+  const position = props.position || "left";
+  const title = props.title || "Navigation";
+  const searchable = props.searchable !== false;
+  const expandedMap = {};
+  function initExpanded(itemList) {
+    itemList.forEach((item) => {
+      const label = item.label || item.Label || "";
+      const isExpanded = item.expanded !== false && item.Expanded !== false;
+      if (label && expandedMap[label] === void 0) {
+        expandedMap[label] = isExpanded;
+      }
+      const children = item.items || item.Items;
+      if (Array.isArray(children)) {
+        initExpanded(children);
+      }
+    });
+  }
+  initExpanded(items);
+  function renderNode(item, level = 0) {
+    const label = item.label || item.Label || item.title || item.Title || "";
+    const url = item.url || item.Url || "#";
+    const icon = item.icon || item.Icon || "";
+    const active = item.active || item.Active || false;
+    const badge = item.badge || item.Badge || "";
+    const children = item.items || item.Items;
+    const hasChildren = Array.isArray(children) && children.length > 0;
+    const isExpanded = expandedMap[label] ?? true;
+    const iconSvg = icon && LucideIcons[icon] ? LucideIcons[icon] : icon.startsWith("<svg") ? icon : "";
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      const matchesSelf = label.toLowerCase().includes(q);
+      const matchesChild = hasChildren && children.some((c) => (c.label || c.Label || "").toLowerCase().includes(q));
+      if (!matchesSelf && !matchesChild) return "";
     }
-}
-
-function renderAppNavigationSidebar(container: HTMLElement, props: SidebarProps) {
-    let collapsed = props.collapsed || false;
-    let searchQuery = '';
-    const items = props.items || [];
-    const position = props.position || 'left';
-    const title = props.title || 'Navigation';
-    const searchable = props.searchable !== false;
-
-    const expandedMap: Record<string, boolean> = {};
-
-    function initExpanded(itemList: SidebarItem[]) {
-        itemList.forEach(item => {
-            const label = (item as any).label || (item as any).Label || '';
-            const isExpanded = (item as any).expanded !== false && (item as any).Expanded !== false;
-            if (label && expandedMap[label] === undefined) {
-                expandedMap[label] = isExpanded;
-            }
-            const children = (item as any).items || (item as any).Items;
-            if (Array.isArray(children)) {
-                initExpanded(children);
-            }
-        });
-    }
-    initExpanded(items);
-
-    function renderNode(item: SidebarItem, level: number = 0): string {
-        const label = (item as any).label || (item as any).Label || (item as any).title || (item as any).Title || '';
-        const url = (item as any).url || (item as any).Url || '#';
-        const icon = (item as any).icon || (item as any).Icon || '';
-        const active = (item as any).active || (item as any).Active || false;
-        const badge = (item as any).badge || (item as any).Badge || '';
-        const children = (item as any).items || (item as any).Items;
-        const hasChildren = Array.isArray(children) && children.length > 0;
-        const isExpanded = expandedMap[label] ?? true;
-        const iconSvg = icon && (LucideIcons as any)[icon] ? (LucideIcons as any)[icon] : (icon.startsWith('<svg') ? icon : '');
-
-        if (searchQuery) {
-            const q = searchQuery.toLowerCase();
-            const matchesSelf = label.toLowerCase().includes(q);
-            const matchesChild = hasChildren && children.some((c: any) => ((c.label || c.Label || '').toLowerCase().includes(q)));
-            if (!matchesSelf && !matchesChild) return '';
-        }
-
-        if (hasChildren) {
-            return `
+    if (hasChildren) {
+      return `
                 <li class="sidebar-group-container" data-label="${label}">
                     <div class="sidebar-group-header" data-group-toggle="${label}" title="${label}">
                         <div style="display: flex; align-items: center; gap: 0.45rem;">
-                            ${iconSvg ? `<span class="sidebar-group-icon" style="display: flex; width: 16px; height: 16px; color: var(--p-primary-600);">${iconSvg}</span>` : ''}
+                            ${iconSvg ? `<span class="sidebar-group-icon" style="display: flex; width: 16px; height: 16px; color: var(--p-primary-600);">${iconSvg}</span>` : ""}
                             <span class="sidebar-item-label">${label}</span>
                         </div>
-                        <span class="sidebar-group-chevron ${isExpanded ? 'expanded' : ''}">
+                        <span class="sidebar-group-chevron ${isExpanded ? "expanded" : ""}">
                             ${LucideIcons.chevronRight}
                         </span>
                     </div>
-                    <ul class="sidebar-sub-tree" style="display: ${isExpanded ? 'flex' : 'none'};">
-                        ${children.map((child: SidebarItem) => renderNode(child, level + 1)).join('')}
+                    <ul class="sidebar-sub-tree" style="display: ${isExpanded ? "flex" : "none"};">
+                        ${children.map((child) => renderNode(child, level + 1)).join("")}
                     </ul>
                 </li>
             `;
-        }
-
-        return `
+    }
+    return `
             <li>
-                <a href="${url}" class="sidebar-item ${active ? 'active' : ''}" data-sidebar-link="${url}" title="${label}">
-                    ${iconSvg ? `<span class="sidebar-icon" style="display: flex; width: 18px; height: 18px; color: ${active ? 'var(--p-primary-600)' : 'var(--p-text-muted)'}; flex-shrink: 0;">${iconSvg}</span>` : ''}
+                <a href="${url}" class="sidebar-item ${active ? "active" : ""}" data-sidebar-link="${url}" title="${label}">
+                    ${iconSvg ? `<span class="sidebar-icon" style="display: flex; width: 18px; height: 18px; color: ${active ? "var(--p-primary-600)" : "var(--p-text-muted)"}; flex-shrink: 0;">${iconSvg}</span>` : ""}
                     <span class="sidebar-item-label">${label}</span>
-                    ${badge ? `<span class="sidebar-badge">${badge}</span>` : ''}
+                    ${badge ? `<span class="sidebar-badge">${badge}</span>` : ""}
                 </a>
             </li>
         `;
-    }
-
-    function render() {
-        container.innerHTML = `
-            <div class="laughtale-sidebar ${collapsed ? 'collapsed' : ''} ${position}">
+  }
+  function render() {
+    container.innerHTML = `
+            <div class="laughtale-sidebar ${collapsed ? "collapsed" : ""} ${position}">
                 <div class="sidebar-header">
                     <div class="sidebar-brand-group" style="display: flex; align-items: center; gap: 0.6rem; overflow: hidden;">
                         <span style="color: var(--p-primary-600); display: flex; flex-shrink: 0;">${LucideIcons.layers}</span>
@@ -1269,321 +1200,286 @@ function renderAppNavigationSidebar(container: HTMLElement, props: SidebarProps)
                     <div class="sidebar-search-box">
                         <input type="text" class="sidebar-search-input" placeholder="Filter components..." value="${searchQuery}" />
                     </div>
-                ` : ''}
+                ` : ""}
 
                 <div class="sidebar-body">
                     <ul class="sidebar-tree-menu">
-                        ${items.map(item => renderNode(item)).join('')}
+                        ${items.map((item) => renderNode(item)).join("")}
                     </ul>
                 </div>
             </div>
         `;
-
-        bindEvents();
-    }
-
-    function bindEvents() {
-        container.querySelector('.sidebar-toggle')?.addEventListener('click', () => {
-            collapsed = !collapsed;
-            render();
-        });
-
-        const searchInput = container.querySelector<HTMLInputElement>('.sidebar-search-input');
-        if (searchInput) {
-            searchInput.addEventListener('input', (e) => {
-                searchQuery = (e.target as HTMLInputElement).value;
-                const menuEl = container.querySelector('.sidebar-tree-menu');
-                if (menuEl) {
-                    menuEl.innerHTML = items.map(item => renderNode(item)).join('');
-                    bindGroupToggles();
-                    bindLinkClicks();
-                }
-            });
+    bindEvents();
+  }
+  function bindEvents() {
+    container.querySelector(".sidebar-toggle")?.addEventListener("click", () => {
+      collapsed = !collapsed;
+      render();
+    });
+    const searchInput = container.querySelector(".sidebar-search-input");
+    if (searchInput) {
+      searchInput.addEventListener("input", (e) => {
+        searchQuery = e.target.value;
+        const menuEl = container.querySelector(".sidebar-tree-menu");
+        if (menuEl) {
+          menuEl.innerHTML = items.map((item) => renderNode(item)).join("");
+          bindGroupToggles();
+          bindLinkClicks();
         }
-
-        bindGroupToggles();
-        bindLinkClicks();
+      });
     }
-
-    function bindGroupToggles() {
-        container.querySelectorAll('[data-group-toggle]').forEach(header => {
-            header.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const groupLabel = header.getAttribute('data-group-toggle');
-                if (groupLabel) {
-                    expandedMap[groupLabel] = !expandedMap[groupLabel];
-                    const groupContainer = container.querySelector(`[data-label="${groupLabel}"]`);
-                    if (groupContainer) {
-                        const subTree = groupContainer.querySelector<HTMLElement>('.sidebar-sub-tree');
-                        const chevron = groupContainer.querySelector<HTMLElement>('.sidebar-group-chevron');
-                        if (subTree) {
-                            subTree.style.display = expandedMap[groupLabel] ? 'flex' : 'none';
-                        }
-                        if (chevron) {
-                            chevron.classList.toggle('expanded', expandedMap[groupLabel]);
-                        }
-                    }
-                }
-            });
-        });
-    }
-
-    function bindLinkClicks() {
-        container.querySelectorAll<HTMLAnchorElement>('a[data-sidebar-link]').forEach(link => {
-            link.addEventListener('click', (e) => {
-                const href = link.getAttribute('href') || '';
-                const hashIndex = href.indexOf('#');
-                if (hashIndex >= 0) {
-                    const targetId = href.substring(hashIndex + 1);
-                    const targetEl = document.getElementById(targetId);
-
-                    if (targetEl) {
-                        e.preventDefault();
-                        targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-                        container.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
-                        link.classList.add('active');
-
-                        window.history.pushState(null, '', href);
-                    }
-                }
-            });
-        });
-    }
-
-    render();
+    bindGroupToggles();
+    bindLinkClicks();
+  }
+  function bindGroupToggles() {
+    container.querySelectorAll("[data-group-toggle]").forEach((header) => {
+      header.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const groupLabel = header.getAttribute("data-group-toggle");
+        if (groupLabel) {
+          expandedMap[groupLabel] = !expandedMap[groupLabel];
+          const groupContainer = container.querySelector(`[data-label="${groupLabel}"]`);
+          if (groupContainer) {
+            const subTree = groupContainer.querySelector(".sidebar-sub-tree");
+            const chevron = groupContainer.querySelector(".sidebar-group-chevron");
+            if (subTree) {
+              subTree.style.display = expandedMap[groupLabel] ? "flex" : "none";
+            }
+            if (chevron) {
+              chevron.classList.toggle("expanded", expandedMap[groupLabel]);
+            }
+          }
+        }
+      });
+    });
+  }
+  function bindLinkClicks() {
+    container.querySelectorAll("a[data-sidebar-link]").forEach((link) => {
+      link.addEventListener("click", (e) => {
+        const href = link.getAttribute("href") || "";
+        const hashIndex = href.indexOf("#");
+        if (hashIndex >= 0) {
+          const targetId = href.substring(hashIndex + 1);
+          const targetEl = document.getElementById(targetId);
+          if (targetEl) {
+            e.preventDefault();
+            targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
+            container.querySelectorAll(".sidebar-item").forEach((el) => el.classList.remove("active"));
+            link.classList.add("active");
+            window.history.pushState(null, "", href);
+          }
+        }
+      });
+    });
+  }
+  render();
 }
-
-/**
- * Render PrimeVue 4 Aura Compound Sidebar Component
- */
-function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
-    const demoType = props.demoType || (props as any).DemoType || 'variants';
-    const showControls = props.showControls !== false && demoType === 'variants';
-
-    let variant = props.variant || (props as any).Variant || 'sidebar';
-    let collapsible = props.collapsible || (props as any).Collapsible || 'icon';
-    let side = props.side || (props as any).Side || 'left';
-    let overlay = props.overlay || (props as any).Overlay || false;
-    let openOnHover = props.openOnHover || (props as any).OpenOnHover || false;
-    let backdrop = props.backdrop || (props as any).Backdrop || false;
-    let isOpen = props.open !== undefined ? props.open : ((props as any).Open !== undefined ? (props as any).Open : true);
-    let width = props.width || (props as any).Width || '16rem';
-
-    // State for dual sidebar right AI panel
-    let isAiOpen = true;
-
-    // Dropdown open states for Aura custom Select controls
-    let openSelectDropdown: 'variant' | 'collapsible' | null = null;
-
-    // Interactive company state for With Menu demo
-    let activeCompany = { name: 'Acme Inc', logo: 'A', color: 'linear-gradient(135deg, #8b5cf6, #4f46e5)' };
-    let showCompanyPopup = false;
-    let showUserPopup = false;
-
-    // Track expanded submenus with smooth CSS grid
-    const expandedSubmenus: Record<string, boolean> = {};
-
-    function getIconSvg(iconName?: string): string {
-        if (!iconName) return '';
-        if (iconName.startsWith('<svg')) return iconName;
-        if ((LucideIcons as any)[iconName]) return (LucideIcons as any)[iconName];
-        return '';
-    }
-
-    const defaultNavGroups: SidebarGroupModel[] = [
+function renderCompoundSidebar(container, props) {
+  const demoType = props.demoType || props.DemoType || "variants";
+  const showControls = props.showControls !== false && demoType === "variants";
+  let variant = props.variant || props.Variant || "sidebar";
+  let collapsible = props.collapsible || props.Collapsible || "icon";
+  let side = props.side || props.Side || "left";
+  let overlay = props.overlay || props.Overlay || false;
+  let openOnHover = props.openOnHover || props.OpenOnHover || false;
+  let backdrop = props.backdrop || props.Backdrop || false;
+  let isOpen = props.open !== void 0 ? props.open : props.Open !== void 0 ? props.Open : true;
+  let width = props.width || props.Width || "16rem";
+  let isAiOpen = true;
+  let openSelectDropdown = null;
+  let activeCompany = { name: "Acme Inc", logo: "A", color: "linear-gradient(135deg, #8b5cf6, #4f46e5)" };
+  let showCompanyPopup = false;
+  let showUserPopup = false;
+  const expandedSubmenus = {};
+  function getIconSvg(iconName) {
+    if (!iconName) return "";
+    if (iconName.startsWith("<svg")) return iconName;
+    if (LucideIcons[iconName]) return LucideIcons[iconName];
+    return "";
+  }
+  const defaultNavGroups = [
+    {
+      label: "Navigation",
+      items: [
+        { icon: "home", label: "Home", isActive: true },
+        { icon: "mail", label: "Inbox", badge: "12" },
+        { icon: "search", label: "Search" },
+        { icon: "bell", label: "Notifications", badge: "3" }
+      ]
+    },
+    {
+      label: "Projects",
+      items: [
         {
-            label: 'Navigation',
-            items: [
-                { icon: 'home', label: 'Home', isActive: true },
-                { icon: 'mail', label: 'Inbox', badge: '12' },
-                { icon: 'search', label: 'Search' },
-                { icon: 'bell', label: 'Notifications', badge: '3' }
-            ]
+          icon: "barChart3",
+          label: "Analytics",
+          defaultOpen: true,
+          subItems: [
+            { label: "Overview", isActive: true },
+            { label: "Reports" },
+            { label: "Real-time" }
+          ]
         },
+        { icon: "users", label: "Team" },
+        { icon: "calendar", label: "Calendar" },
         {
-            label: 'Projects',
-            items: [
-                {
-                    icon: 'barChart3',
-                    label: 'Analytics',
-                    defaultOpen: true,
-                    subItems: [
-                        { label: 'Overview', isActive: true },
-                        { label: 'Reports' },
-                        { label: 'Real-time' }
-                    ]
-                },
-                { icon: 'users', label: 'Team' },
-                { icon: 'calendar', label: 'Calendar' },
-                {
-                    icon: 'folder',
-                    label: 'Documents',
-                    subItems: [
-                        { label: 'Shared' },
-                        { label: 'Private' },
-                        { label: 'Archived' }
-                    ]
-                }
-            ]
-        },
-        {
-            label: 'Billing',
-            items: [
-                { icon: 'creditCard', label: 'Payments' },
-                { icon: 'shoppingCart', label: 'Orders' },
-                { icon: 'star', label: 'Subscriptions' }
-            ]
+          icon: "folder",
+          label: "Documents",
+          subItems: [
+            { label: "Shared" },
+            { label: "Private" },
+            { label: "Archived" }
+          ]
         }
-    ];
-
-    const groups: SidebarGroupModel[] = props.groups || defaultNavGroups;
-
-    function renderGroupsHtml(groupList: SidebarGroupModel[]): string {
-        return groupList.map((g, gIdx) => {
-            const itemsHtml = g.items.map((it, iIdx) => {
-                const subKey = `${gIdx}_${iIdx}`;
-                if (it.defaultOpen && expandedSubmenus[subKey] === undefined) {
-                    expandedSubmenus[subKey] = true;
-                }
-                const isSubExpanded = !!expandedSubmenus[subKey];
-                const hasSubs = Array.isArray(it.subItems) && it.subItems.length > 0;
-                const iconSvg = getIconSvg(it.icon);
-
-                let subTreeHtml = '';
-                if (hasSubs) {
-                    const subListHtml = it.subItems!.map(sub => `
+      ]
+    },
+    {
+      label: "Billing",
+      items: [
+        { icon: "creditCard", label: "Payments" },
+        { icon: "shoppingCart", label: "Orders" },
+        { icon: "star", label: "Subscriptions" }
+      ]
+    }
+  ];
+  const groups = props.groups || defaultNavGroups;
+  function renderGroupsHtml(groupList) {
+    return groupList.map((g, gIdx) => {
+      const itemsHtml = g.items.map((it, iIdx) => {
+        const subKey = `${gIdx}_${iIdx}`;
+        if (it.defaultOpen && expandedSubmenus[subKey] === void 0) {
+          expandedSubmenus[subKey] = true;
+        }
+        const isSubExpanded = !!expandedSubmenus[subKey];
+        const hasSubs = Array.isArray(it.subItems) && it.subItems.length > 0;
+        const iconSvg = getIconSvg(it.icon);
+        let subTreeHtml = "";
+        if (hasSubs) {
+          const subListHtml = it.subItems.map((sub) => `
                         <li class="p-sidebar-menu-sub-item">
-                            <button type="button" class="p-sidebar-menu-sub-button ${sub.isActive ? 'p-active' : ''}">
+                            <button type="button" class="p-sidebar-menu-sub-button ${sub.isActive ? "p-active" : ""}">
                                 <span>${sub.label}</span>
                             </button>
                         </li>
-                    `).join('');
-                    subTreeHtml = `
-                        <div class="p-sidebar-menu-sub-wrapper ${isSubExpanded ? 'p-expanded' : ''}">
+                    `).join("");
+          subTreeHtml = `
+                        <div class="p-sidebar-menu-sub-wrapper ${isSubExpanded ? "p-expanded" : ""}">
                             <ul class="p-sidebar-menu-sub">${subListHtml}</ul>
                         </div>
                     `;
-                }
-
-                const chevronSvg = `<svg class="p-sidebar-submenu-chevron ${isSubExpanded ? 'p-expanded' : ''}" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
-                const ellipsisSvg = `<svg class="p-sidebar-menu-action" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>`;
-                const trashSvg = `<button type="button" class="p-sidebar-menu-action" title="Delete conversation" style="border:none;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>`;
-
-                const actionButton = demoType === 'chat' ? trashSvg : (it.badge === undefined ? ellipsisSvg : '');
-
-                return `
+        }
+        const chevronSvg = `<svg class="p-sidebar-submenu-chevron ${isSubExpanded ? "p-expanded" : ""}" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
+        const ellipsisSvg = `<svg class="p-sidebar-menu-action" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>`;
+        const trashSvg = `<button type="button" class="p-sidebar-menu-action" title="Delete conversation" style="border:none;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>`;
+        const actionButton = demoType === "chat" ? trashSvg : it.badge === void 0 ? ellipsisSvg : "";
+        return `
                     <li class="p-sidebar-menu-item" data-subkey="${subKey}">
-                        <button type="button" class="p-sidebar-menu-button ${it.isActive ? 'p-active' : ''}" data-has-subs="${hasSubs}">
-                            ${iconSvg ? `<span class="p-sidebar-menu-button-icon">${iconSvg}</span>` : ''}
+                        <button type="button" class="p-sidebar-menu-button ${it.isActive ? "p-active" : ""}" data-has-subs="${hasSubs}">
+                            ${iconSvg ? `<span class="p-sidebar-menu-button-icon">${iconSvg}</span>` : ""}
                             <span class="p-sidebar-item-label">${it.label}</span>
-                            ${it.badge !== undefined ? `<span class="p-sidebar-menu-badge">${it.badge}</span>` : ''}
+                            ${it.badge !== void 0 ? `<span class="p-sidebar-menu-badge">${it.badge}</span>` : ""}
                             ${hasSubs ? chevronSvg : actionButton}
                         </button>
                         ${subTreeHtml}
                     </li>
                 `;
-            }).join('');
-
-            return `
+      }).join("");
+      return `
                 <div class="p-sidebar-group">
                     <div class="p-sidebar-group-label">${g.label}</div>
                     <ul class="p-sidebar-menu">${itemsHtml}</ul>
                 </div>
             `;
-        }).join('');
-    }
-
-    function renderControlsHtml(): string {
-        const variantLabel = variant === 'sidebar' ? 'Sidebar' : (variant === 'floating' ? 'Floating' : 'Inset');
-        const collapsibleLabel = collapsible === 'icon' ? 'Icon' : (collapsible === 'offcanvas' ? 'Offcanvas' : 'None');
-
-        return `
+    }).join("");
+  }
+  function renderControlsHtml() {
+    const variantLabel = variant === "sidebar" ? "Sidebar" : variant === "floating" ? "Floating" : "Inset";
+    const collapsibleLabel = collapsible === "icon" ? "Icon" : collapsible === "offcanvas" ? "Offcanvas" : "None";
+    return `
             <div class="p-sidebar-toolbar">
                 <div class="p-sidebar-toolbar-field">
                     <label class="p-sidebar-toolbar-label">Variant</label>
-                    <div class="p-sb-select-trigger ${openSelectDropdown === 'variant' ? 'p-active' : ''}" data-select-trigger="variant" tabindex="0">
+                    <div class="p-sb-select-trigger ${openSelectDropdown === "variant" ? "p-active" : ""}" data-select-trigger="variant" tabindex="0">
                         <span>${variantLabel}</span>
                         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                     </div>
-                    ${openSelectDropdown === 'variant' ? `
+                    ${openSelectDropdown === "variant" ? `
                         <div class="p-sb-select-dropdown">
-                            <div class="p-sb-select-option ${variant === 'sidebar' ? 'p-selected' : ''}" data-select-option="variant:sidebar">
+                            <div class="p-sb-select-option ${variant === "sidebar" ? "p-selected" : ""}" data-select-option="variant:sidebar">
                                 <span>Sidebar</span>
-                                ${variant === 'sidebar' ? '<span style="font-weight:700;">&#10003;</span>' : ''}
+                                ${variant === "sidebar" ? '<span style="font-weight:700;">&#10003;</span>' : ""}
                             </div>
-                            <div class="p-sb-select-option ${variant === 'floating' ? 'p-selected' : ''}" data-select-option="variant:floating">
+                            <div class="p-sb-select-option ${variant === "floating" ? "p-selected" : ""}" data-select-option="variant:floating">
                                 <span>Floating</span>
-                                ${variant === 'floating' ? '<span style="font-weight:700;">&#10003;</span>' : ''}
+                                ${variant === "floating" ? '<span style="font-weight:700;">&#10003;</span>' : ""}
                             </div>
-                            <div class="p-sb-select-option ${variant === 'inset' ? 'p-selected' : ''}" data-select-option="variant:inset">
+                            <div class="p-sb-select-option ${variant === "inset" ? "p-selected" : ""}" data-select-option="variant:inset">
                                 <span>Inset</span>
-                                ${variant === 'inset' ? '<span style="font-weight:700;">&#10003;</span>' : ''}
+                                ${variant === "inset" ? '<span style="font-weight:700;">&#10003;</span>' : ""}
                             </div>
                         </div>
-                    ` : ''}
+                    ` : ""}
                 </div>
 
                 <div class="p-sidebar-toolbar-field">
                     <label class="p-sidebar-toolbar-label">Collapsible</label>
-                    <div class="p-sb-select-trigger ${openSelectDropdown === 'collapsible' ? 'p-active' : ''}" data-select-trigger="collapsible" tabindex="0">
+                    <div class="p-sb-select-trigger ${openSelectDropdown === "collapsible" ? "p-active" : ""}" data-select-trigger="collapsible" tabindex="0">
                         <span>${collapsibleLabel}</span>
                         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                     </div>
-                    ${openSelectDropdown === 'collapsible' ? `
+                    ${openSelectDropdown === "collapsible" ? `
                         <div class="p-sb-select-dropdown">
-                            <div class="p-sb-select-option ${collapsible === 'icon' ? 'p-selected' : ''}" data-select-option="collapsible:icon">
+                            <div class="p-sb-select-option ${collapsible === "icon" ? "p-selected" : ""}" data-select-option="collapsible:icon">
                                 <span>Icon</span>
-                                ${collapsible === 'icon' ? '<span style="font-weight:700;">&#10003;</span>' : ''}
+                                ${collapsible === "icon" ? '<span style="font-weight:700;">&#10003;</span>' : ""}
                             </div>
-                            <div class="p-sb-select-option ${collapsible === 'offcanvas' ? 'p-selected' : ''}" data-select-option="collapsible:offcanvas">
+                            <div class="p-sb-select-option ${collapsible === "offcanvas" ? "p-selected" : ""}" data-select-option="collapsible:offcanvas">
                                 <span>Offcanvas</span>
-                                ${collapsible === 'offcanvas' ? '<span style="font-weight:700;">&#10003;</span>' : ''}
+                                ${collapsible === "offcanvas" ? '<span style="font-weight:700;">&#10003;</span>' : ""}
                             </div>
-                            <div class="p-sb-select-option ${collapsible === 'none' ? 'p-selected' : ''}" data-select-option="collapsible:none">
+                            <div class="p-sb-select-option ${collapsible === "none" ? "p-selected" : ""}" data-select-option="collapsible:none">
                                 <span>None</span>
-                                ${collapsible === 'none' ? '<span style="font-weight:700;">&#10003;</span>' : ''}
+                                ${collapsible === "none" ? '<span style="font-weight:700;">&#10003;</span>' : ""}
                             </div>
                         </div>
-                    ` : ''}
+                    ` : ""}
                 </div>
 
                 <div class="p-sidebar-toolbar-field">
                     <label class="p-sidebar-toolbar-label">Side</label>
                     <div class="p-sb-segmented">
-                        <button type="button" class="p-sb-seg-btn ${side === 'left' ? 'p-active' : ''}" data-sb-side="left">Left</button>
-                        <button type="button" class="p-sb-seg-btn ${side === 'right' ? 'p-active' : ''}" data-sb-side="right">Right</button>
+                        <button type="button" class="p-sb-seg-btn ${side === "left" ? "p-active" : ""}" data-sb-side="left">Left</button>
+                        <button type="button" class="p-sb-seg-btn ${side === "right" ? "p-active" : ""}" data-sb-side="right">Right</button>
                     </div>
                 </div>
 
                 <div class="p-sidebar-toolbar-field">
                     <label class="p-sidebar-toolbar-label">Overlay</label>
                     <div class="p-sb-switch-container" data-sb-toggle="overlay">
-                        <div class="p-sb-switch ${overlay ? 'p-checked' : ''}"></div>
+                        <div class="p-sb-switch ${overlay ? "p-checked" : ""}"></div>
                     </div>
                 </div>
 
                 <div class="p-sidebar-toolbar-field">
                     <label class="p-sidebar-toolbar-label">Open on Hover</label>
                     <div class="p-sb-switch-container" data-sb-toggle="hover">
-                        <div class="p-sb-switch ${openOnHover ? 'p-checked' : ''}"></div>
+                        <div class="p-sb-switch ${openOnHover ? "p-checked" : ""}"></div>
                     </div>
                 </div>
 
                 <div class="p-sidebar-toolbar-field">
                     <label class="p-sidebar-toolbar-label">Backdrop</label>
                     <div class="p-sb-switch-container" data-sb-toggle="backdrop">
-                        <div class="p-sb-switch ${backdrop ? 'p-checked' : ''}"></div>
+                        <div class="p-sb-switch ${backdrop ? "p-checked" : ""}"></div>
                     </div>
                 </div>
             </div>
         `;
-    }
-
-    function renderHeaderContent(): string {
-        if (demoType === 'chat') {
-            return `
+  }
+  function renderHeaderContent() {
+    if (demoType === "chat") {
+      return `
                 <ul class="p-sidebar-menu">
                     <li class="p-sidebar-menu-item">
                         <button type="button" class="p-sidebar-menu-button" style="padding: 0.35rem 0.5rem;">
@@ -1615,10 +1511,9 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                     </li>
                 </ul>
             `;
-        }
-
-        if (demoType === 'menu') {
-            return `
+    }
+    if (demoType === "menu") {
+      return `
                 <div style="position: relative;">
                     <ul class="p-sidebar-menu">
                         <li class="p-sidebar-menu-item">
@@ -1635,17 +1530,17 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                             <div class="p-sb-popup-item" data-select-company="Acme Inc|A|linear-gradient(135deg, #8b5cf6, #4f46e5)">
                                 <div style="display:flex; width:1.25rem; height:1.25rem; border-radius:4px; background: linear-gradient(135deg, #8b5cf6, #4f46e5); color:#fff; align-items:center; justify-content:center; font-weight:700; font-size:0.65rem;">A</div>
                                 <span>Acme Inc</span>
-                                ${activeCompany.name === 'Acme Inc' ? '<span style="margin-left:auto; color:var(--p-primary-600); font-weight:700;">&#10003;</span>' : ''}
+                                ${activeCompany.name === "Acme Inc" ? '<span style="margin-left:auto; color:var(--p-primary-600); font-weight:700;">&#10003;</span>' : ""}
                             </div>
                             <div class="p-sb-popup-item" data-select-company="Globex Corp|G|linear-gradient(135deg, #10b981, #0d9488)">
                                 <div style="display:flex; width:1.25rem; height:1.25rem; border-radius:4px; background: linear-gradient(135deg, #10b981, #0d9488); color:#fff; align-items:center; justify-content:center; font-weight:700; font-size:0.65rem;">G</div>
                                 <span>Globex Corp</span>
-                                ${activeCompany.name === 'Globex Corp' ? '<span style="margin-left:auto; color:var(--p-primary-600); font-weight:700;">&#10003;</span>' : ''}
+                                ${activeCompany.name === "Globex Corp" ? '<span style="margin-left:auto; color:var(--p-primary-600); font-weight:700;">&#10003;</span>' : ""}
                             </div>
                             <div class="p-sb-popup-item" data-select-company="Initech|I|linear-gradient(135deg, #f97316, #dc2626)">
                                 <div style="display:flex; width:1.25rem; height:1.25rem; border-radius:4px; background: linear-gradient(135deg, #f97316, #dc2626); color:#fff; align-items:center; justify-content:center; font-weight:700; font-size:0.65rem;">I</div>
                                 <span>Initech</span>
-                                ${activeCompany.name === 'Initech' ? '<span style="margin-left:auto; color:var(--p-primary-600); font-weight:700;">&#10003;</span>' : ''}
+                                ${activeCompany.name === "Initech" ? '<span style="margin-left:auto; color:var(--p-primary-600); font-weight:700;">&#10003;</span>' : ""}
                             </div>
                             <div style="border-top: 1px solid var(--p-border-color); margin: 0.25rem 0;"></div>
                             <div class="p-sb-popup-item" style="color: var(--p-text-muted);">
@@ -1653,13 +1548,12 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                                 <span>Add company</span>
                             </div>
                         </div>
-                    ` : ''}
+                    ` : ""}
                 </div>
             `;
-        }
-
-        if (demoType === 'nested') {
-            return `
+    }
+    if (demoType === "nested") {
+      return `
                 <ul class="p-sidebar-menu">
                     <li class="p-sidebar-menu-item">
                         <button type="button" class="p-sidebar-menu-button" style="padding: 0.35rem 0.5rem;">
@@ -1669,9 +1563,8 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                     </li>
                 </ul>
             `;
-        }
-
-        return `
+    }
+    return `
             <ul class="p-sidebar-menu">
                 <li class="p-sidebar-menu-item">
                     <button type="button" class="p-sidebar-menu-button" style="padding: 0.35rem 0.5rem;">
@@ -1681,11 +1574,10 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                 </li>
             </ul>
         `;
-    }
-
-    function renderFooterContent(): string {
-        if (demoType === 'menu') {
-            return `
+  }
+  function renderFooterContent() {
+    if (demoType === "menu") {
+      return `
                 <div style="position: relative;">
                     <ul class="p-sidebar-menu">
                         <li class="p-sidebar-menu-item">
@@ -1713,12 +1605,11 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                                 <span>Sign out</span>
                             </div>
                         </div>
-                    ` : ''}
+                    ` : ""}
                 </div>
             `;
-        }
-
-        return `
+    }
+    return `
             <ul class="p-sidebar-menu">
                 <li class="p-sidebar-menu-item">
                     <button type="button" class="p-sidebar-menu-button" style="padding: 0.35rem 0.5rem;">
@@ -1728,14 +1619,12 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                 </li>
             </ul>
         `;
-    }
-
-    function renderMainContent(): string {
-        const triggerIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg>`;
-        const chatIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>`;
-
-        if (demoType === 'nested') {
-            return `
+  }
+  function renderMainContent() {
+    const triggerIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg>`;
+    const chatIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>`;
+    if (demoType === "nested") {
+      return `
                 <div class="p-sidebar-main">
                     <header class="p-sidebar-main-header">
                         <button type="button" class="p-sidebar-trigger" data-sidebar-toggle aria-label="Toggle navigation">
@@ -1749,10 +1638,9 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                     </div>
                 </div>
             `;
-        }
-
-        if (demoType === 'dual') {
-            return `
+    }
+    if (demoType === "dual") {
+      return `
                 <div class="p-sidebar-main">
                     <header class="p-sidebar-main-header">
                         <button type="button" class="p-sidebar-trigger" data-sidebar-toggle aria-label="Toggle navigation">
@@ -1769,16 +1657,15 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                     </div>
                 </div>
             `;
-        }
-
-        return `
+    }
+    return `
             <div class="p-sidebar-main">
                 <header class="p-sidebar-main-header">
                     <button type="button" class="p-sidebar-trigger" data-sidebar-toggle aria-label="Toggle navigation">
                         ${triggerIconSvg}
                     </button>
                     <span style="font-size: 0.875rem; font-weight: 600; color: var(--p-text-color);">Dashboard</span>
-                    ${demoType === 'responsive' ? `<span style="margin-left: auto; font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.5rem; border-radius: 6px; background: var(--p-surface-100); color: var(--p-text-muted);">Desktop</span>` : ''}
+                    ${demoType === "responsive" ? `<span style="margin-left: auto; font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.5rem; border-radius: 6px; background: var(--p-surface-100); color: var(--p-text-muted);">Desktop</span>` : ""}
                 </header>
                 <div style="flex: 1; padding: 1rem; display: flex; flex-direction: column; gap: 1rem; overflow-y: auto;">
                     <div style="height: 6rem; border-radius: 8px; background: var(--p-surface-100); border: 1px solid var(--p-border-color); display: flex; align-items: center; justify-content: center; color: var(--p-text-muted); font-size: 0.875rem;">Main Content View</div>
@@ -1786,15 +1673,12 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                 </div>
             </div>
         `;
-    }
-
-    function renderAiRightPanel(): string {
-        if (demoType !== 'dual') return '';
-
-        const aiWidth = isAiOpen ? '18rem' : '0rem';
-
-        return `
-            <aside class="p-sidebar p-sidebar-collapsible-offcanvas p-sidebar-side-right ${!isAiOpen ? 'p-sidebar-collapsed' : ''}" style="width: ${aiWidth}; border-left: 1px solid var(--p-border-color);">
+  }
+  function renderAiRightPanel() {
+    if (demoType !== "dual") return "";
+    const aiWidth = isAiOpen ? "18rem" : "0rem";
+    return `
+            <aside class="p-sidebar p-sidebar-collapsible-offcanvas p-sidebar-side-right ${!isAiOpen ? "p-sidebar-collapsed" : ""}" style="width: ${aiWidth}; border-left: 1px solid var(--p-border-color);">
                 <div class="p-sidebar-aside">
                     <div class="p-sidebar-panel">
                         <div class="p-sidebar-header">
@@ -1827,21 +1711,18 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                 </div>
             </aside>
         `;
-    }
-
-    function renderComponent(): string {
-        const sidebarClasses = [
-            'p-sidebar',
-            `p-sidebar-variant-${variant}`,
-            `p-sidebar-collapsible-${collapsible}`,
-            `p-sidebar-side-${side}`,
-            overlay ? 'p-sidebar-overlay' : '',
-            !isOpen ? 'p-sidebar-collapsed' : ''
-        ].filter(Boolean).join(' ');
-
-        const sidebarWidth = isOpen ? width : (collapsible === 'icon' ? '3.5rem' : '0rem');
-
-        const sidebarHtml = `
+  }
+  function renderComponent() {
+    const sidebarClasses = [
+      "p-sidebar",
+      `p-sidebar-variant-${variant}`,
+      `p-sidebar-collapsible-${collapsible}`,
+      `p-sidebar-side-${side}`,
+      overlay ? "p-sidebar-overlay" : "",
+      !isOpen ? "p-sidebar-collapsed" : ""
+    ].filter(Boolean).join(" ");
+    const sidebarWidth = isOpen ? width : collapsible === "icon" ? "3.5rem" : "0rem";
+    const sidebarHtml = `
             <aside class="${sidebarClasses}" style="width: ${sidebarWidth};" data-sidebar-root>
                 <div class="p-sidebar-aside">
                     <div class="p-sidebar-panel">
@@ -1858,230 +1739,198 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                 </div>
             </aside>
         `;
-
-        const mainHtml = renderMainContent();
-        const aiRightPanelHtml = renderAiRightPanel();
-        const backdropHtml = (backdrop && isOpen) ? `<div class="p-sidebar-backdrop" data-sidebar-backdrop></div>` : '';
-        
-        let innerContent = '';
-        if (demoType === 'dual') {
-            innerContent = sidebarHtml + mainHtml + aiRightPanelHtml;
-        } else {
-            innerContent = side === 'right' ? (mainHtml + sidebarHtml) : (sidebarHtml + mainHtml);
-        }
-
-        const layoutHtml = `
+    const mainHtml = renderMainContent();
+    const aiRightPanelHtml = renderAiRightPanel();
+    const backdropHtml = backdrop && isOpen ? `<div class="p-sidebar-backdrop" data-sidebar-backdrop></div>` : "";
+    let innerContent = "";
+    if (demoType === "dual") {
+      innerContent = sidebarHtml + mainHtml + aiRightPanelHtml;
+    } else {
+      innerContent = side === "right" ? mainHtml + sidebarHtml : sidebarHtml + mainHtml;
+    }
+    const layoutHtml = `
             <div class="p-sidebar-layout">
                 ${backdropHtml}
                 ${innerContent}
             </div>
         `;
-
-        if (showControls) {
-            return `
+    if (showControls) {
+      return `
                 <div class="p-sidebar-playground-wrapper">
                     ${renderControlsHtml()}
                     ${layoutHtml}
                 </div>
             `;
-        }
-
-        return layoutHtml;
     }
-
-    function wireEvents() {
-        // Main Trigger Button
-        container.querySelectorAll('[data-sidebar-toggle]').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                isOpen = !isOpen;
-                render();
-            });
+    return layoutHtml;
+  }
+  function wireEvents() {
+    container.querySelectorAll("[data-sidebar-toggle]").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        isOpen = !isOpen;
+        render();
+      });
+    });
+    container.querySelectorAll("[data-ai-toggle]").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        isAiOpen = !isAiOpen;
+        render();
+      });
+    });
+    container.querySelectorAll("[data-sidebar-backdrop]").forEach((bd) => {
+      bd.addEventListener("click", () => {
+        isOpen = false;
+        render();
+      });
+    });
+    if (overlay) {
+      const mainEl = container.querySelector(".p-sidebar-main");
+      if (mainEl) {
+        mainEl.addEventListener("click", (e) => {
+          if (isOpen && !e.target.closest("[data-sidebar-toggle]")) {
+            isOpen = false;
+            render();
+          }
         });
-
-        // AI Chat Trigger Button
-        container.querySelectorAll('[data-ai-toggle]').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                isAiOpen = !isAiOpen;
-                render();
-            });
-        });
-
-        // Backdrop click dismisses
-        container.querySelectorAll('[data-sidebar-backdrop]').forEach(bd => {
-            bd.addEventListener('click', () => {
-                isOpen = false;
-                render();
-            });
-        });
-
-        // Click outside on main area closes overlay if overlay is active
-        if (overlay) {
-            const mainEl = container.querySelector('.p-sidebar-main');
-            if (mainEl) {
-                mainEl.addEventListener('click', (e) => {
-                    if (isOpen && !(e.target as HTMLElement).closest('[data-sidebar-toggle]')) {
-                        isOpen = false;
-                        render();
-                    }
-                });
-            }
-        }
-
-        // Submenu collapse / expand
-        container.querySelectorAll('.p-sidebar-menu-button[data-has-subs="true"]').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const li = btn.closest('.p-sidebar-menu-item');
-                const subKey = li?.getAttribute('data-subkey');
-                if (subKey) {
-                    expandedSubmenus[subKey] = !expandedSubmenus[subKey];
-                    const wrapper = li?.querySelector('.p-sidebar-menu-sub-wrapper');
-                    const chevron = li?.querySelector('.p-sidebar-submenu-chevron');
-                    if (wrapper) {
-                        wrapper.classList.toggle('p-expanded', expandedSubmenus[subKey]);
-                    }
-                    if (chevron) {
-                        chevron.classList.toggle('p-expanded', expandedSubmenus[subKey]);
-                    }
-                }
-            });
-        });
-
-        // Interactive company switcher popup
-        const compTrigger = container.querySelector('[data-company-trigger]');
-        if (compTrigger) {
-            compTrigger.addEventListener('click', (e) => {
-                e.stopPropagation();
-                showCompanyPopup = !showCompanyPopup;
-                showUserPopup = false;
-                render();
-            });
-        }
-
-        container.querySelectorAll('[data-select-company]').forEach(item => {
-            item.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const raw = item.getAttribute('data-select-company') || '';
-                const parts = raw.split('|');
-                if (parts.length >= 3) {
-                    activeCompany = { name: parts[0], logo: parts[1], color: parts[2] };
-                }
-                showCompanyPopup = false;
-                render();
-            });
-        });
-
-        // Interactive user profile popup
-        const userTrigger = container.querySelector('[data-user-trigger]');
-        if (userTrigger) {
-            userTrigger.addEventListener('click', (e) => {
-                e.stopPropagation();
-                showUserPopup = !showUserPopup;
-                showCompanyPopup = false;
-                render();
-            });
-        }
-
-        // Controls: Aura Select dropdown triggers
-        container.querySelectorAll('[data-select-trigger]').forEach(trig => {
-            trig.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const key = trig.getAttribute('data-select-trigger') as any;
-                openSelectDropdown = openSelectDropdown === key ? null : key;
-                render();
-            });
-        });
-
-        // Controls: Aura Select option selections
-        container.querySelectorAll('[data-select-option]').forEach(opt => {
-            opt.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const [category, val] = (opt.getAttribute('data-select-option') || '').split(':');
-                if (category === 'variant') {
-                    variant = val as any;
-                } else if (category === 'collapsible') {
-                    collapsible = val as any;
-                }
-                openSelectDropdown = null;
-                render();
-            });
-        });
-
-        // Controls: Side segmented buttons
-        container.querySelectorAll<HTMLButtonElement>('[data-sb-side]').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                side = btn.getAttribute('data-sb-side') as any;
-                render();
-            });
-        });
-
-        // Controls: ToggleSwitches
-        const overlayToggle = container.querySelector('[data-sb-toggle="overlay"]');
-        if (overlayToggle) {
-            overlayToggle.addEventListener('click', (e) => {
-                e.stopPropagation();
-                overlay = !overlay;
-                render();
-            });
-        }
-
-        const hoverToggle = container.querySelector('[data-sb-toggle="hover"]');
-        if (hoverToggle) {
-            hoverToggle.addEventListener('click', (e) => {
-                e.stopPropagation();
-                openOnHover = !openOnHover;
-                render();
-            });
-        }
-
-        const backdropToggle = container.querySelector('[data-sb-toggle="backdrop"]');
-        if (backdropToggle) {
-            backdropToggle.addEventListener('click', (e) => {
-                e.stopPropagation();
-                backdrop = !backdrop;
-                render();
-            });
-        }
-
-        // Open on hover logic
-        if (openOnHover) {
-            const aside = container.querySelector('[data-sidebar-root]');
-            if (aside) {
-                aside.addEventListener('mouseenter', () => {
-                    if (!isOpen) {
-                        isOpen = true;
-                        render();
-                    }
-                });
-                aside.addEventListener('mouseleave', () => {
-                    if (isOpen) {
-                        isOpen = false;
-                        render();
-                    }
-                });
-            }
-        }
-
-        // Global dismiss for open popups/dropdowns on outside click
-        const onDocClick = (e: MouseEvent) => {
-            if (openSelectDropdown || showCompanyPopup || showUserPopup) {
-                openSelectDropdown = null;
-                showCompanyPopup = false;
-                showUserPopup = false;
-                render();
-            }
-        };
-        document.addEventListener('click', onDocClick, { once: true });
+      }
     }
-
-    function render() {
-        container.innerHTML = renderComponent();
-        wireEvents();
+    container.querySelectorAll('.p-sidebar-menu-button[data-has-subs="true"]').forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const li = btn.closest(".p-sidebar-menu-item");
+        const subKey = li?.getAttribute("data-subkey");
+        if (subKey) {
+          expandedSubmenus[subKey] = !expandedSubmenus[subKey];
+          const wrapper = li?.querySelector(".p-sidebar-menu-sub-wrapper");
+          const chevron = li?.querySelector(".p-sidebar-submenu-chevron");
+          if (wrapper) {
+            wrapper.classList.toggle("p-expanded", expandedSubmenus[subKey]);
+          }
+          if (chevron) {
+            chevron.classList.toggle("p-expanded", expandedSubmenus[subKey]);
+          }
+        }
+      });
+    });
+    const compTrigger = container.querySelector("[data-company-trigger]");
+    if (compTrigger) {
+      compTrigger.addEventListener("click", (e) => {
+        e.stopPropagation();
+        showCompanyPopup = !showCompanyPopup;
+        showUserPopup = false;
+        render();
+      });
     }
-
-    render();
+    container.querySelectorAll("[data-select-company]").forEach((item) => {
+      item.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const raw = item.getAttribute("data-select-company") || "";
+        const parts = raw.split("|");
+        if (parts.length >= 3) {
+          activeCompany = { name: parts[0], logo: parts[1], color: parts[2] };
+        }
+        showCompanyPopup = false;
+        render();
+      });
+    });
+    const userTrigger = container.querySelector("[data-user-trigger]");
+    if (userTrigger) {
+      userTrigger.addEventListener("click", (e) => {
+        e.stopPropagation();
+        showUserPopup = !showUserPopup;
+        showCompanyPopup = false;
+        render();
+      });
+    }
+    container.querySelectorAll("[data-select-trigger]").forEach((trig) => {
+      trig.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const key = trig.getAttribute("data-select-trigger");
+        openSelectDropdown = openSelectDropdown === key ? null : key;
+        render();
+      });
+    });
+    container.querySelectorAll("[data-select-option]").forEach((opt) => {
+      opt.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const [category, val] = (opt.getAttribute("data-select-option") || "").split(":");
+        if (category === "variant") {
+          variant = val;
+        } else if (category === "collapsible") {
+          collapsible = val;
+        }
+        openSelectDropdown = null;
+        render();
+      });
+    });
+    container.querySelectorAll("[data-sb-side]").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        side = btn.getAttribute("data-sb-side");
+        render();
+      });
+    });
+    const overlayToggle = container.querySelector('[data-sb-toggle="overlay"]');
+    if (overlayToggle) {
+      overlayToggle.addEventListener("click", (e) => {
+        e.stopPropagation();
+        overlay = !overlay;
+        render();
+      });
+    }
+    const hoverToggle = container.querySelector('[data-sb-toggle="hover"]');
+    if (hoverToggle) {
+      hoverToggle.addEventListener("click", (e) => {
+        e.stopPropagation();
+        openOnHover = !openOnHover;
+        render();
+      });
+    }
+    const backdropToggle = container.querySelector('[data-sb-toggle="backdrop"]');
+    if (backdropToggle) {
+      backdropToggle.addEventListener("click", (e) => {
+        e.stopPropagation();
+        backdrop = !backdrop;
+        render();
+      });
+    }
+    if (openOnHover) {
+      const aside = container.querySelector("[data-sidebar-root]");
+      if (aside) {
+        aside.addEventListener("mouseenter", () => {
+          if (!isOpen) {
+            isOpen = true;
+            render();
+          }
+        });
+        aside.addEventListener("mouseleave", () => {
+          if (isOpen) {
+            isOpen = false;
+            render();
+          }
+        });
+      }
+    }
+    const onDocClick = (e) => {
+      if (openSelectDropdown || showCompanyPopup || showUserPopup) {
+        openSelectDropdown = null;
+        showCompanyPopup = false;
+        showUserPopup = false;
+        render();
+      }
+    };
+    document.addEventListener("click", onDocClick, { once: true });
+  }
+  function render() {
+    container.innerHTML = renderComponent();
+    wireEvents();
+  }
+  render();
 }
+export {
+  SidebarIsland as default
+};
+//# sourceMappingURL=sidebar-AFVKZD33.js.map

@@ -1817,6 +1817,27 @@ public class EnterpriseModel : PageModel
         })
     };
 
+    public List<SidebarGroupModel> SidebarDualGroups { get; set; } = new()
+    {
+        new(Label: "Navigation", Items: new()
+        {
+            new(Label: "Home", Icon: "home", IsActive: true),
+            new(Label: "Inbox", Icon: "mail", Badge: "5"),
+            new(Label: "Search", Icon: "search"),
+            new(Label: "Notifications", Icon: "bell")
+        }),
+        new(Label: "Projects", Items: new()
+        {
+            new(Label: "Analytics", Icon: "barChart3", DefaultOpen: true, SubItems: new()
+            {
+                new(Label: "Overview", IsActive: true),
+                new(Label: "Reports")
+            }),
+            new(Label: "Team", Icon: "users"),
+            new(Label: "Calendar", Icon: "calendar")
+        })
+    };
+
     public List<SidebarGroupModel> SidebarNestedGroups { get; set; } = new()
     {
         new(Label: "Files", Items: new()

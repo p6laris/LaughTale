@@ -5404,14 +5404,21 @@
                 <p-sidebar id="mobile-nav" demo-type="responsive" collapsible="icon" width="14rem" groups="@Model.SidebarVariantsGroups" />
             </div>
 
-            <!-- Demo 4: Nested Menu -->
+            <!-- Demo 4: Dual Sidebar -->
+            <div data-sidebar-demo="dual" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Dual Sidebar</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Two sidebars on opposite sides of the layout: a primary navigation on the left and an AI chat panel on the right.</p>
+                <p-sidebar id="dual-nav" demo-type="dual" collapsible="icon" groups="@Model.SidebarDualGroups" />
+            </div>
+
+            <!-- Demo 5: Nested Menu -->
             <div data-sidebar-demo="nested" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
                 <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Nested Menu</h3>
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Menu items become collapsible to reveal nested SidebarMenuSub structures with deep multi-level file trees.</p>
                 <p-sidebar id="nested-menu-demo" demo-type="nested" collapsible="icon" groups="@Model.SidebarNestedGroups" />
             </div>
 
-            <!-- Demo 5: Chat Application -->
+            <!-- Demo 6: Chat Application -->
             <div data-sidebar-demo="chat" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
                 <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Chat Application</h3>
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Chat history sidebar with grouped conversations (Today, Yesterday, Previous 7 days) and hover actions.</p>
