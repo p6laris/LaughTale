@@ -33834,6 +33834,8 @@ var init_sidebar = __esm({
     font-family: var(--p-font-family, inherit);
     border-radius: var(--p-border-radius, 8px);
     border: 1px solid var(--p-border-color, #e2e8f0);
+    isolation: isolate;
+    z-index: 1;
 }
 
 .p-sidebar-backdrop {
@@ -34267,8 +34269,49 @@ var init_sidebar = __esm({
 }
 
 .p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-header {
-    padding: 0.75rem 0.25rem;
-    align-items: center;
+    padding: 0.75rem 0 !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-header > div {
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+    gap: 0 !important;
+}
+
+.p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-header a {
+    margin: 0 auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-content {
+    padding: 0.5rem 0 !important;
+    align-items: center !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-group {
+    align-items: center !important;
+    width: 100% !important;
+}
+
+.p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-menu {
+    align-items: center !important;
+    width: 100% !important;
+}
+
+.p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-menu-item {
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
 }
 
 .p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-item-label,
@@ -34295,7 +34338,7 @@ var init_sidebar = __esm({
     padding: 0 !important;
     width: 2.5rem !important;
     height: 2.5rem !important;
-    margin: 0 auto !important;
+    margin: 0.15rem auto !important;
     border-radius: var(--p-border-radius, 8px) !important;
     box-sizing: border-box !important;
     overflow: hidden !important;
@@ -34306,6 +34349,28 @@ var init_sidebar = __esm({
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
+}
+
+.p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-footer {
+    padding: 0.65rem 0 !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-footer > div {
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+}
+
+.p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-footer > div > div {
+    justify-content: center !important;
+    align-items: center !important;
+    margin: 0 auto !important;
+    gap: 0 !important;
 }
 
 /* Offcanvas Collapsed Mode */
@@ -34347,6 +34412,9 @@ var init_sidebar = __esm({
     flex-direction: column;
     gap: 1.25rem;
     width: 100%;
+    isolation: isolate;
+    position: relative;
+    z-index: 1;
 }
 
 .p-sidebar-toolbar {
