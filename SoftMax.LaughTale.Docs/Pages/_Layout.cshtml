@@ -61,62 +61,9 @@
     <div class="docs-layout">
         
         <!-- Left Sidebar Navigation -->
-        <aside class="docs-sidebar">
-            <div class="nav-section-title">Getting Started</div>
-            <a href="/doc/01-getting-started" class="sidebar-link">Quickstart &amp; Setup</a>
-            <a href="/doc/02-hydration-strategies" class="sidebar-link">Hydration Strategies</a>
-
-            <div class="nav-section-title">Zero-JS Architecture</div>
-            <a href="/doc/06-declarative-directives" class="sidebar-link">Declarative Directives</a>
-
-            <div class="nav-section-title">Form &amp; Input Controls</div>
-            <a href="/doc/07-input-number" class="sidebar-link">Number &amp; Currency</a>
-            <a href="/doc/08-input-otp" class="sidebar-link">OTP Verification</a>
-            <a href="/doc/09-input-password" class="sidebar-link">Password &amp; Meter</a>
-            <a href="/doc/32-autocomplete" class="sidebar-link">AutoComplete Combobox</a>
-            <a href="/doc/33-color-picker" class="sidebar-link">ColorPicker Palette</a>
-            <a href="/doc/38-inplace" class="sidebar-link">Inplace Click-to-Edit</a>
-            <a href="/doc/10-toggle-switch" class="sidebar-link">Aura Spring Switch</a>
-            <a href="/doc/11-slider" class="sidebar-link">Range Slider</a>
-            <a href="/doc/12-rating" class="sidebar-link">Star Rating</a>
-            <a href="/doc/13-select-button" class="sidebar-link">Segmented SelectButton</a>
-            <a href="/doc/14-chips" class="sidebar-link">InputTags &amp; Chips</a>
-            <a href="/doc/15-datepicker" class="sidebar-link">Calendar DatePicker</a>
-
-            <div class="nav-section-title">Data &amp; Structure</div>
-            <a href="/doc/16-stepper" class="sidebar-link">Multi-Step Stepper</a>
-            <a href="/doc/17-timeline" class="sidebar-link">Audit Log Timeline</a>
-            <a href="/doc/18-camera" class="sidebar-link">Live WebRTC Camera</a>
-            <a href="/doc/19-datagrid" class="sidebar-link">Filterable DataGrid</a>
-            <a href="/doc/20-dropzone" class="sidebar-link">Document Dropzone</a>
-            <a href="/doc/21-tree-select" class="sidebar-link">Hierarchical TreeSelect</a>
-
-            <div class="nav-section-title">Panels &amp; Navigation</div>
-            <a href="/doc/41-command-palette" class="sidebar-link">Spotlight Command</a>
-            <a href="/doc/42-theme-studio" class="sidebar-link">TweakAura Studio</a>
-            <a href="/doc/30-accordion" class="sidebar-link">Accordion Panels</a>
-            <a href="/doc/31-tabs" class="sidebar-link">Tabs &amp; TabView</a>
-            <a href="/doc/36-breadcrumb" class="sidebar-link">Breadcrumb Navigation</a>
-            <a href="/doc/37-scroll-top" class="sidebar-link">ScrollTop Button</a>
-            <a href="/doc/26-drawer" class="sidebar-link">Offcanvas Drawer</a>
-            <a href="/doc/27-speed-dial" class="sidebar-link">SpeedDial FAB</a>
-            <a href="/doc/28-confirm-popup" class="sidebar-link">ConfirmPopup</a>
-            <a href="/doc/29-modal-toast" class="sidebar-link">Modal &amp; Toast</a>
-
-            <div class="nav-section-title">Metrics &amp; Visual Media</div>
-            <a href="/doc/34-knob" class="sidebar-link">Radial Dial Knob</a>
-            <a href="/doc/35-tag" class="sidebar-link">Status Tag &amp; Badge</a>
-            <a href="/doc/22-meter-group" class="sidebar-link">MeterGroup Gauge</a>
-            <a href="/doc/23-avatar-group" class="sidebar-link">Avatar &amp; AvatarGroup</a>
-            <a href="/doc/24-image-compare" class="sidebar-link">Image Compare Slider</a>
-            <a href="/doc/25-progress-skeleton" class="sidebar-link">Progress &amp; Skeleton</a>
-
-            <div class="nav-section-title">Composables &amp; Architecture</div>
-            <a href="/doc/39-composables" class="sidebar-link">Headless Composables</a>
-            <a href="/doc/40-theming-and-tokens" class="sidebar-link">Theming &amp; Tokens</a>
-            <a href="/doc/03-view-transitions" class="sidebar-link">View Transitions</a>
-            <a href="/doc/04-slots-and-projection" class="sidebar-link">Server Slot Projection</a>
-            <a href="/doc/05-content-collections" class="sidebar-link">Content Collections</a>
+                <!-- Left Sidebar Navigation Powered by LaughTale Island Sidebar -->
+        <aside class="docs-sidebar" style="padding: 0; border: none; background: transparent; height: calc(100vh - 60px); position: sticky; top: 60px;">
+            <island-sidebar items="@DocsNavigationData.GetDocsSidebarItems(Context.Request.Path)" title="LaughTale Docs" />
         </aside>
 
         <!-- Center Markdown Content Body -->

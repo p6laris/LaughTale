@@ -145,14 +145,20 @@ body {
     }
 }
 
-/* Left Sidebar Navigation */
+/* Left Sidebar Navigation Powered by LaughTale Island Sidebar */
 .docs-sidebar {
     position: sticky;
     top: 60px;
     height: calc(100vh - 60px);
-    overflow-y: auto;
-    padding: 2rem 0;
-    border-right: 1px solid var(--p-border-color);
+    overflow: visible;
+    padding: 0;
+    border-right: none;
+    display: flex;
+}
+.docs-sidebar .laughtale-sidebar {
+    height: calc(100vh - 60px);
+    border-top: none;
+    border-bottom: none;
 }
 
 .nav-section-title {
