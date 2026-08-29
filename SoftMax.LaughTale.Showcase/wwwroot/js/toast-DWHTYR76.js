@@ -1,21 +1,9 @@
-/**
- * SoftMax.LaughTale: Enterprise Toast Notification Component (PrimeVue 4 Aura Design System compliant)
- * Ultra-smooth 60/120 FPS GPU-accelerated toast notifications with zero-reflow transforms,
- * crisp Lucide vector SVGs, and authentic Aura pastel color palettes.
- */
+import {
+  injectIslandStyle
+} from "./chunk-3TFPN5JM.js";
 
-import { injectIslandStyle } from '../runtime/styles';
-
-export interface ToastMessage {
-    id?: string;
-    summary: string;
-    detail?: string;
-    severity?: 'success' | 'info' | 'warn' | 'error';
-    life?: number;
-    closable?: boolean;
-}
-
-const TOAST_CSS = `
+// ../SoftMax.LaughTale.Client/src/components/toast.ts
+var TOAST_CSS = `
 .p-toast {
     position: fixed;
     top: 1.25rem;
@@ -285,97 +273,83 @@ const TOAST_CSS = `
     color: #fecaca;
 }
 `;
-
-// Vector SVG Icons
-const INFO_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="16" y2="12"/><line x1="12" x2="12.01" y1="8" y2="8"/></svg>`;
-const SUCCESS_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
-const WARN_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>`;
-const ERROR_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" x2="9" y1="9" y2="15"/><line x1="9" x2="15" y1="9" y2="15"/></svg>`;
-const CLOSE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>`;
-
-class ToastService {
-    private containerEl: HTMLElement | null = null;
-
-    constructor() {
-        if (typeof document !== 'undefined') {
-            this.ensureContainer();
-        }
+var INFO_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="16" y2="12"/><line x1="12" x2="12.01" y1="8" y2="8"/></svg>`;
+var SUCCESS_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
+var WARN_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>`;
+var ERROR_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" x2="9" y1="9" y2="15"/><line x1="9" x2="15" y1="9" y2="15"/></svg>`;
+var CLOSE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>`;
+var ToastService = class {
+  containerEl = null;
+  constructor() {
+    if (typeof document !== "undefined") {
+      this.ensureContainer();
     }
-
-    private ensureContainer() {
-        if (this.containerEl) return;
-        injectIslandStyle('toast', TOAST_CSS);
-
-        this.containerEl = document.getElementById('aura-toast-container');
-        if (!this.containerEl) {
-            this.containerEl = document.createElement('div');
-            this.containerEl.id = 'aura-toast-container';
-            this.containerEl.className = 'p-toast p-component';
-            document.body.appendChild(this.containerEl);
-        }
+  }
+  ensureContainer() {
+    if (this.containerEl) return;
+    injectIslandStyle("toast", TOAST_CSS);
+    this.containerEl = document.getElementById("aura-toast-container");
+    if (!this.containerEl) {
+      this.containerEl = document.createElement("div");
+      this.containerEl.id = "aura-toast-container";
+      this.containerEl.className = "p-toast p-component";
+      document.body.appendChild(this.containerEl);
     }
-
-    public add(msg: ToastMessage) {
-        this.ensureContainer();
-        if (!this.containerEl) return;
-
-        const severity = msg.severity || 'info';
-        const life = msg.life || 3500;
-
-        let iconSvg = INFO_SVG;
-        if (severity === 'success') iconSvg = SUCCESS_SVG;
-        else if (severity === 'warn') iconSvg = WARN_SVG;
-        else if (severity === 'error') iconSvg = ERROR_SVG;
-
-        const toastEl = document.createElement('div');
-        toastEl.className = `p-toast-message p-toast-message-${severity}`;
-        toastEl.setAttribute('role', 'alert');
-        toastEl.setAttribute('aria-live', 'assertive');
-        toastEl.setAttribute('aria-atomic', 'true');
-
-        toastEl.innerHTML = `
+  }
+  add(msg) {
+    this.ensureContainer();
+    if (!this.containerEl) return;
+    const severity = msg.severity || "info";
+    const life = msg.life || 3500;
+    let iconSvg = INFO_SVG;
+    if (severity === "success") iconSvg = SUCCESS_SVG;
+    else if (severity === "warn") iconSvg = WARN_SVG;
+    else if (severity === "error") iconSvg = ERROR_SVG;
+    const toastEl = document.createElement("div");
+    toastEl.className = `p-toast-message p-toast-message-${severity}`;
+    toastEl.setAttribute("role", "alert");
+    toastEl.setAttribute("aria-live", "assertive");
+    toastEl.setAttribute("aria-atomic", "true");
+    toastEl.innerHTML = `
             <div class="p-toast-message-content">
                 <div class="p-toast-message-icon">
                     ${iconSvg}
                 </div>
                 <div class="p-toast-message-text">
                     <div class="p-toast-summary">${msg.summary}</div>
-                    ${msg.detail ? `<div class="p-toast-detail">${msg.detail}</div>` : ''}
+                    ${msg.detail ? `<div class="p-toast-detail">${msg.detail}</div>` : ""}
                 </div>
                 <button type="button" class="p-toast-close-button" aria-label="Close notification">
                     ${CLOSE_SVG}
                 </button>
             </div>
         `;
-
-        const closeBtn = toastEl.querySelector('.p-toast-close-button');
-        let isLeaving = false;
-
-        const removeToast = () => {
-            if (isLeaving) return;
-            isLeaving = true;
-            toastEl.classList.add('p-toast-message-leave');
-            setTimeout(() => {
-                toastEl.remove();
-            }, 180);
-        };
-
-        closeBtn?.addEventListener('click', (e) => {
-            e.stopPropagation();
-            removeToast();
-        });
-
-        this.containerEl.appendChild(toastEl);
-
-        if (life > 0) {
-            setTimeout(removeToast, life);
-        }
+    const closeBtn = toastEl.querySelector(".p-toast-close-button");
+    let isLeaving = false;
+    const removeToast = () => {
+      if (isLeaving) return;
+      isLeaving = true;
+      toastEl.classList.add("p-toast-message-leave");
+      setTimeout(() => {
+        toastEl.remove();
+      }, 180);
+    };
+    closeBtn?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      removeToast();
+    });
+    this.containerEl.appendChild(toastEl);
+    if (life > 0) {
+      setTimeout(removeToast, life);
     }
+  }
+};
+var globalToastService = new ToastService();
+window.$toast = globalToastService;
+function ToastIsland(container) {
+  injectIslandStyle("toast", TOAST_CSS);
 }
-
-const globalToastService = new ToastService();
-(window as any).$toast = globalToastService;
-
-export default function ToastIsland(container: HTMLElement) {
-    injectIslandStyle('toast', TOAST_CSS);
-}
+export {
+  ToastIsland as default
+};
+//# sourceMappingURL=toast-DWHTYR76.js.map

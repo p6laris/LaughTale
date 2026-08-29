@@ -8529,30 +8529,24 @@ var SoftMaxIslands = (() => {
 }
 
 @keyframes p-toast-enter {
-    from {
+    0% {
         opacity: 0;
         transform: translateY(-16px) scale(0.96);
     }
-    to {
+    100% {
         opacity: 1;
         transform: translateY(0) scale(1);
     }
 }
 
 @keyframes p-toast-leave {
-    from {
+    0% {
         opacity: 1;
         transform: translateY(0) scale(1);
-        max-height: 120px;
-        margin-bottom: 0.75rem;
     }
-    to {
+    100% {
         opacity: 0;
-        transform: translateY(-12px) scale(0.96);
-        max-height: 0;
-        margin-bottom: 0;
-        padding-top: 0;
-        padding-bottom: 0;
+        transform: translateY(-14px) scale(0.95);
     }
 }
 
@@ -8565,14 +8559,16 @@ var SoftMaxIslands = (() => {
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    animation: p-toast-enter 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    overflow: hidden;
     box-sizing: border-box;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform, opacity;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    animation: p-toast-enter 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .p-toast-message.p-toast-message-leave {
-    animation: p-toast-leave 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    pointer-events: none;
+    animation: p-toast-leave 0.18s cubic-bezier(0.4, 0, 1, 1) forwards !important;
 }
 
 .p-toast-message-content {
@@ -8624,7 +8620,7 @@ var SoftMaxIslands = (() => {
     margin-left: auto;
     flex-shrink: 0;
     padding: 0;
-    transition: background-color 0.15s ease, opacity 0.15s ease;
+    transition: background-color 0.15s ease;
 }
 .p-toast-close-button:hover {
     background: rgba(0, 0, 0, 0.06);
@@ -8839,12 +8835,14 @@ var SoftMaxIslands = (() => {
             </div>
         `;
           const closeBtn = toastEl.querySelector(".p-toast-close-button");
+          let isLeaving = false;
           const removeToast = () => {
-            if (toastEl.classList.contains("p-toast-message-leave")) return;
+            if (isLeaving) return;
+            isLeaving = true;
             toastEl.classList.add("p-toast-message-leave");
             setTimeout(() => {
               toastEl.remove();
-            }, 250);
+            }, 180);
           };
           closeBtn?.addEventListener("click", (e) => {
             e.stopPropagation();

@@ -5413,3 +5413,38 @@ html {
     border-color: rgba(16, 185, 129, 0.35);
     color: #6ee7b7;
 }
+
+
+/* Ultra-smooth GPU Toast Transitions */
+@keyframes p-toast-enter {
+    0% {
+        opacity: 0;
+        transform: translateY(-16px) scale(0.96);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes p-toast-leave {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-14px) scale(0.95);
+    }
+}
+
+.p-toast-message {
+    will-change: transform, opacity;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+.p-toast-message.p-toast-message-leave {
+    pointer-events: none;
+    animation: p-toast-leave 0.18s cubic-bezier(0.4, 0, 1, 1) forwards !important;
+}
