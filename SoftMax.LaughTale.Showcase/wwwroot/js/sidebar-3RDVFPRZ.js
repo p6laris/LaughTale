@@ -1,13 +1,12 @@
-/**
- * SoftMax.LaughTale: Enterprise Sidebar Component (PrimeVue 4 Aura Design System compliant)
- * Compound navigation panel system supporting collapsible icon mode, offcanvas mode,
- * floating/inset variants, dual & multi-sidebar layouts, deep nested menus, and AI chat panels.
- */
+import {
+  LucideIcons
+} from "./chunk-XHF3KYSF.js";
+import {
+  injectIslandStyle
+} from "./chunk-3TFPN5JM.js";
 
-import { LucideIcons } from '../icons/lucide';
-import { injectIslandStyle } from '../runtime/styles';
-
-const SIDEBAR_CSS = `
+// ../SoftMax.LaughTale.Client/src/components/sidebar.ts
+var SIDEBAR_CSS = `
 /* Layout Container */
 .p-sidebar-layout {
     display: flex;
@@ -455,183 +454,124 @@ const SIDEBAR_CSS = `
     color: #60a5fa;
 }
 `;
-
-export interface SidebarSubItem {
-    label: string;
-    isActive?: boolean;
-    url?: string;
-    subItems?: SidebarSubItem[];
-}
-
-export interface SidebarItemModel {
-    label: string;
-    icon?: string;
-    badge?: string | number;
-    isActive?: boolean;
-    url?: string;
-    subItems?: SidebarSubItem[];
-    defaultOpen?: boolean;
-}
-
-export interface SidebarGroupModel {
-    label: string;
-    items: SidebarItemModel[];
-}
-
-export interface SidebarProps {
-    id?: string;
-    variant?: 'sidebar' | 'floating' | 'inset';
-    collapsible?: 'none' | 'offcanvas' | 'icon';
-    side?: 'left' | 'right';
-    overlay?: boolean;
-    openOnHover?: boolean;
-    backdrop?: boolean;
-    open?: boolean;
-    width?: string;
-    iconWidth?: string;
-    demoType?: 'variants' | 'menu' | 'responsive' | 'dual' | 'multi' | 'nested' | 'chat';
-    groups?: SidebarGroupModel[];
-    headerTitle?: string;
-    headerLogo?: string;
-    headerColor?: string;
-    class?: string;
-    style?: string;
-}
-
-export default function SidebarIsland(container: HTMLElement, props: SidebarProps) {
-    injectIslandStyle('sidebar', SIDEBAR_CSS);
-
-    const demoType = props.demoType || (props as any).DemoType || 'variants';
-
-    let variant = props.variant || (props as any).Variant || 'sidebar';
-    let collapsible = props.collapsible || (props as any).Collapsible || 'icon';
-    let side = props.side || (props as any).Side || 'left';
-    let overlay = props.overlay || (props as any).Overlay || false;
-    let openOnHover = props.openOnHover || (props as any).OpenOnHover || false;
-    let backdrop = props.backdrop || (props as any).Backdrop || false;
-    let isOpen = props.open !== undefined ? props.open : ((props as any).Open !== undefined ? (props as any).Open : true);
-    let width = props.width || (props as any).Width || '16rem';
-
-    // State for interactive nested submenus
-    const expandedSubmenus: Record<string, boolean> = {};
-
-    function getIconSvg(iconName?: string): string {
-        if (!iconName) return '';
-        if (iconName.startsWith('<svg')) return iconName;
-        if ((LucideIcons as any)[iconName]) return (LucideIcons as any)[iconName];
-        return '';
-    }
-
-    const defaultNavGroups: SidebarGroupModel[] = [
+function SidebarIsland(container, props) {
+  injectIslandStyle("sidebar", SIDEBAR_CSS);
+  const demoType = props.demoType || props.DemoType || "variants";
+  let variant = props.variant || props.Variant || "sidebar";
+  let collapsible = props.collapsible || props.Collapsible || "icon";
+  let side = props.side || props.Side || "left";
+  let overlay = props.overlay || props.Overlay || false;
+  let openOnHover = props.openOnHover || props.OpenOnHover || false;
+  let backdrop = props.backdrop || props.Backdrop || false;
+  let isOpen = props.open !== void 0 ? props.open : props.Open !== void 0 ? props.Open : true;
+  let width = props.width || props.Width || "16rem";
+  const expandedSubmenus = {};
+  function getIconSvg(iconName) {
+    if (!iconName) return "";
+    if (iconName.startsWith("<svg")) return iconName;
+    if (LucideIcons[iconName]) return LucideIcons[iconName];
+    return "";
+  }
+  const defaultNavGroups = [
+    {
+      label: "Navigation",
+      items: [
+        { icon: "home", label: "Home", isActive: true },
+        { icon: "mail", label: "Inbox", badge: "12" },
+        { icon: "search", label: "Search" },
+        { icon: "bell", label: "Notifications", badge: "3" }
+      ]
+    },
+    {
+      label: "Projects",
+      items: [
         {
-            label: 'Navigation',
-            items: [
-                { icon: 'home', label: 'Home', isActive: true },
-                { icon: 'mail', label: 'Inbox', badge: '12' },
-                { icon: 'search', label: 'Search' },
-                { icon: 'bell', label: 'Notifications', badge: '3' }
-            ]
+          icon: "barChart3",
+          label: "Analytics",
+          defaultOpen: true,
+          subItems: [
+            { label: "Overview", isActive: true },
+            { label: "Reports" },
+            { label: "Real-time" }
+          ]
         },
+        { icon: "users", label: "Team" },
+        { icon: "calendar", label: "Calendar" },
         {
-            label: 'Projects',
-            items: [
-                {
-                    icon: 'barChart3',
-                    label: 'Analytics',
-                    defaultOpen: true,
-                    subItems: [
-                        { label: 'Overview', isActive: true },
-                        { label: 'Reports' },
-                        { label: 'Real-time' }
-                    ]
-                },
-                { icon: 'users', label: 'Team' },
-                { icon: 'calendar', label: 'Calendar' },
-                {
-                    icon: 'folder',
-                    label: 'Documents',
-                    subItems: [
-                        { label: 'Shared' },
-                        { label: 'Private' },
-                        { label: 'Archived' }
-                    ]
-                }
-            ]
-        },
-        {
-            label: 'Billing',
-            items: [
-                { icon: 'creditCard', label: 'Payments' },
-                { icon: 'shoppingCart', label: 'Orders' },
-                { icon: 'star', label: 'Subscriptions' }
-            ]
+          icon: "folder",
+          label: "Documents",
+          subItems: [
+            { label: "Shared" },
+            { label: "Private" },
+            { label: "Archived" }
+          ]
         }
-    ];
-
-    const groups: SidebarGroupModel[] = props.groups || defaultNavGroups;
-
-    // Render helper for groups
-    function renderGroupsHtml(groupList: SidebarGroupModel[]): string {
-        return groupList.map((g, gIdx) => {
-            const itemsHtml = g.items.map((it, iIdx) => {
-                const subKey = `${gIdx}_${iIdx}`;
-                if (it.defaultOpen && expandedSubmenus[subKey] === undefined) {
-                    expandedSubmenus[subKey] = true;
-                }
-                const isSubExpanded = !!expandedSubmenus[subKey];
-                const hasSubs = Array.isArray(it.subItems) && it.subItems.length > 0;
-                const iconSvg = getIconSvg(it.icon);
-
-                let subTreeHtml = '';
-                if (hasSubs && isSubExpanded) {
-                    const subListHtml = it.subItems!.map(sub => `
+      ]
+    },
+    {
+      label: "Billing",
+      items: [
+        { icon: "creditCard", label: "Payments" },
+        { icon: "shoppingCart", label: "Orders" },
+        { icon: "star", label: "Subscriptions" }
+      ]
+    }
+  ];
+  const groups = props.groups || defaultNavGroups;
+  function renderGroupsHtml(groupList) {
+    return groupList.map((g, gIdx) => {
+      const itemsHtml = g.items.map((it, iIdx) => {
+        const subKey = `${gIdx}_${iIdx}`;
+        if (it.defaultOpen && expandedSubmenus[subKey] === void 0) {
+          expandedSubmenus[subKey] = true;
+        }
+        const isSubExpanded = !!expandedSubmenus[subKey];
+        const hasSubs = Array.isArray(it.subItems) && it.subItems.length > 0;
+        const iconSvg = getIconSvg(it.icon);
+        let subTreeHtml = "";
+        if (hasSubs && isSubExpanded) {
+          const subListHtml = it.subItems.map((sub) => `
                         <li class="p-sidebar-menu-sub-item">
-                            <button type="button" class="p-sidebar-menu-sub-button ${sub.isActive ? 'p-active' : ''}">
+                            <button type="button" class="p-sidebar-menu-sub-button ${sub.isActive ? "p-active" : ""}">
                                 <span>${sub.label}</span>
                             </button>
                         </li>
-                    `).join('');
-                    subTreeHtml = `<ul class="p-sidebar-menu-sub">${subListHtml}</ul>`;
-                }
-
-                const chevronSvg = `<svg class="p-sidebar-submenu-chevron ${isSubExpanded ? 'p-expanded' : ''}" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
-                const ellipsisSvg = `<svg class="p-sidebar-menu-action" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>`;
-
-                return `
+                    `).join("");
+          subTreeHtml = `<ul class="p-sidebar-menu-sub">${subListHtml}</ul>`;
+        }
+        const chevronSvg = `<svg class="p-sidebar-submenu-chevron ${isSubExpanded ? "p-expanded" : ""}" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
+        const ellipsisSvg = `<svg class="p-sidebar-menu-action" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>`;
+        return `
                     <li class="p-sidebar-menu-item" data-subkey="${subKey}">
-                        <button type="button" class="p-sidebar-menu-button ${it.isActive ? 'p-active' : ''}" data-has-subs="${hasSubs}">
-                            ${iconSvg ? `<span class="p-sidebar-menu-button-icon">${iconSvg}</span>` : ''}
+                        <button type="button" class="p-sidebar-menu-button ${it.isActive ? "p-active" : ""}" data-has-subs="${hasSubs}">
+                            ${iconSvg ? `<span class="p-sidebar-menu-button-icon">${iconSvg}</span>` : ""}
                             <span class="p-sidebar-item-label">${it.label}</span>
-                            ${it.badge !== undefined ? `<span class="p-sidebar-menu-badge">${it.badge}</span>` : ''}
-                            ${hasSubs ? chevronSvg : (it.badge === undefined ? ellipsisSvg : '')}
+                            ${it.badge !== void 0 ? `<span class="p-sidebar-menu-badge">${it.badge}</span>` : ""}
+                            ${hasSubs ? chevronSvg : it.badge === void 0 ? ellipsisSvg : ""}
                         </button>
                         ${subTreeHtml}
                     </li>
                 `;
-            }).join('');
-
-            return `
+      }).join("");
+      return `
                 <div class="p-sidebar-group">
                     <div class="p-sidebar-group-label">${g.label}</div>
                     <ul class="p-sidebar-menu">${itemsHtml}</ul>
                 </div>
             `;
-        }).join('');
-    }
-
-    function renderComponent(): string {
-        const sidebarClasses = [
-            'p-sidebar',
-            `p-sidebar-variant-${variant}`,
-            `p-sidebar-collapsible-${collapsible}`,
-            `p-sidebar-side-${side}`,
-            overlay ? 'p-sidebar-overlay' : '',
-            !isOpen ? 'p-sidebar-collapsed' : ''
-        ].filter(Boolean).join(' ');
-
-        const sidebarWidth = isOpen ? width : (collapsible === 'icon' ? '3.5rem' : '0rem');
-
-        const sidebarHtml = `
+    }).join("");
+  }
+  function renderComponent() {
+    const sidebarClasses = [
+      "p-sidebar",
+      `p-sidebar-variant-${variant}`,
+      `p-sidebar-collapsible-${collapsible}`,
+      `p-sidebar-side-${side}`,
+      overlay ? "p-sidebar-overlay" : "",
+      !isOpen ? "p-sidebar-collapsed" : ""
+    ].filter(Boolean).join(" ");
+    const sidebarWidth = isOpen ? width : collapsible === "icon" ? "3.5rem" : "0rem";
+    const sidebarHtml = `
             <aside class="${sidebarClasses}" style="width: ${sidebarWidth};" data-sidebar-root>
                 <div class="p-sidebar-aside">
                     <div class="p-sidebar-panel">
@@ -662,10 +602,8 @@ export default function SidebarIsland(container: HTMLElement, props: SidebarProp
                 </div>
             </aside>
         `;
-
-        const triggerIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg>`;
-
-        const mainHtml = `
+    const triggerIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg>`;
+    const mainHtml = `
             <div class="p-sidebar-main">
                 <header class="p-sidebar-main-header">
                     <button type="button" class="p-sidebar-trigger" data-sidebar-toggle aria-label="Toggle navigation">
@@ -679,74 +617,64 @@ export default function SidebarIsland(container: HTMLElement, props: SidebarProp
                 </div>
             </div>
         `;
-
-        const backdropHtml = (backdrop && isOpen) ? `<div class="p-sidebar-backdrop" data-sidebar-backdrop></div>` : '';
-
-        // Ordering based on side
-        const innerContent = side === 'right' ? (mainHtml + sidebarHtml) : (sidebarHtml + mainHtml);
-
-        return `
+    const backdropHtml = backdrop && isOpen ? `<div class="p-sidebar-backdrop" data-sidebar-backdrop></div>` : "";
+    const innerContent = side === "right" ? mainHtml + sidebarHtml : sidebarHtml + mainHtml;
+    return `
             <div class="p-sidebar-layout">
                 ${backdropHtml}
                 ${innerContent}
             </div>
         `;
-    }
-
-    function wireEvents() {
-        // Toggle button
-        container.querySelectorAll('[data-sidebar-toggle]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                isOpen = !isOpen;
-                render();
-            });
-        });
-
-        // Backdrop click dismisses
-        container.querySelectorAll('[data-sidebar-backdrop]').forEach(bd => {
-            bd.addEventListener('click', () => {
-                isOpen = false;
-                render();
-            });
-        });
-
-        // Submenu collapse / expand
-        container.querySelectorAll('.p-sidebar-menu-button[data-has-subs="true"]').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                const li = btn.closest('.p-sidebar-menu-item');
-                const subKey = li?.getAttribute('data-subkey');
-                if (subKey) {
-                    expandedSubmenus[subKey] = !expandedSubmenus[subKey];
-                    render();
-                }
-            });
-        });
-
-        // Open on hover logic
-        if (openOnHover) {
-            const aside = container.querySelector('[data-sidebar-root]');
-            if (aside) {
-                aside.addEventListener('mouseenter', () => {
-                    if (!isOpen) {
-                        isOpen = true;
-                        render();
-                    }
-                });
-                aside.addEventListener('mouseleave', () => {
-                    if (isOpen) {
-                        isOpen = false;
-                        render();
-                    }
-                });
-            }
+  }
+  function wireEvents() {
+    container.querySelectorAll("[data-sidebar-toggle]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        isOpen = !isOpen;
+        render();
+      });
+    });
+    container.querySelectorAll("[data-sidebar-backdrop]").forEach((bd) => {
+      bd.addEventListener("click", () => {
+        isOpen = false;
+        render();
+      });
+    });
+    container.querySelectorAll('.p-sidebar-menu-button[data-has-subs="true"]').forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        const li = btn.closest(".p-sidebar-menu-item");
+        const subKey = li?.getAttribute("data-subkey");
+        if (subKey) {
+          expandedSubmenus[subKey] = !expandedSubmenus[subKey];
+          render();
         }
+      });
+    });
+    if (openOnHover) {
+      const aside = container.querySelector("[data-sidebar-root]");
+      if (aside) {
+        aside.addEventListener("mouseenter", () => {
+          if (!isOpen) {
+            isOpen = true;
+            render();
+          }
+        });
+        aside.addEventListener("mouseleave", () => {
+          if (isOpen) {
+            isOpen = false;
+            render();
+          }
+        });
+      }
     }
-
-    function render() {
-        container.innerHTML = renderComponent();
-        wireEvents();
-    }
-
-    render();
+  }
+  function render() {
+    container.innerHTML = renderComponent();
+    wireEvents();
+  }
+  render();
 }
+export {
+  SidebarIsland as default
+};
+//# sourceMappingURL=sidebar-3RDVFPRZ.js.map

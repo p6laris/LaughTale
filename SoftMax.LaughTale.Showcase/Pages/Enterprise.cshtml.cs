@@ -1783,6 +1783,120 @@ public class EnterpriseModel : PageModel
         })
     };
 
+    public List<SidebarGroupModel> SidebarVariantsGroups { get; set; } = new()
+    {
+        new(Label: "Navigation", Items: new()
+        {
+            new(Label: "Home", Icon: "home", IsActive: true),
+            new(Label: "Inbox", Icon: "mail", Badge: "12"),
+            new(Label: "Search", Icon: "search"),
+            new(Label: "Notifications", Icon: "bell", Badge: "3")
+        }),
+        new(Label: "Projects", Items: new()
+        {
+            new(Label: "Analytics", Icon: "barChart3", DefaultOpen: true, SubItems: new()
+            {
+                new(Label: "Overview", IsActive: true),
+                new(Label: "Reports"),
+                new(Label: "Real-time")
+            }),
+            new(Label: "Team", Icon: "users"),
+            new(Label: "Calendar", Icon: "calendar"),
+            new(Label: "Documents", Icon: "folder", SubItems: new()
+            {
+                new(Label: "Shared"),
+                new(Label: "Private"),
+                new(Label: "Archived")
+            })
+        }),
+        new(Label: "Billing", Items: new()
+        {
+            new(Label: "Payments", Icon: "creditCard"),
+            new(Label: "Orders", Icon: "shoppingCart"),
+            new(Label: "Subscriptions", Icon: "star")
+        })
+    };
+
+    public List<SidebarGroupModel> SidebarNestedGroups { get; set; } = new()
+    {
+        new(Label: "Files", Items: new()
+        {
+            new(Label: "Documents", Icon: "folder", DefaultOpen: true, SubItems: new()
+            {
+                new(Label: "Work", SubItems: new()
+                {
+                    new(Label: "Projects", SubItems: new()
+                    {
+                        new(Label: "Q1 Report", IsActive: true),
+                        new(Label: "Q2 Report"),
+                        new(Label: "Roadmap")
+                    }),
+                    new(Label: "Invoices"),
+                    new(Label: "Contracts")
+                }),
+                new(Label: "Personal", SubItems: new()
+                {
+                    new(Label: "Recipes"),
+                    new(Label: "Travel")
+                })
+            })
+        }),
+        new(Label: "Media", Items: new()
+        {
+            new(Label: "Photos", Icon: "image", SubItems: new()
+            {
+                new(Label: "2024"),
+                new(Label: "2025")
+            }),
+            new(Label: "Videos", Icon: "video", SubItems: new()
+            {
+                new(Label: "Tutorials"),
+                new(Label: "Recordings")
+            })
+        }),
+        new(Label: "Bookmarks", Items: new()
+        {
+            new(Label: "Websites", Icon: "globe", SubItems: new()
+            {
+                new(Label: "Blog"),
+                new(Label: "Portfolio"),
+                new(Label: "Documentation")
+            })
+        })
+    };
+
+    public List<SidebarGroupModel> SidebarChatHistoryGroups { get; set; } = new()
+    {
+        new(Label: "Today", Items: new()
+        {
+            new(Label: "PrimeVue Sidebar component", IsActive: true),
+            new(Label: "How to use Vue composables"),
+            new(Label: "Fix TypeScript generics issue")
+        }),
+        new(Label: "Yesterday", Items: new()
+        {
+            new(Label: "Design system architecture"),
+            new(Label: "Vue 3 new features overview"),
+            new(Label: "CSS light-dark() function usage")
+        }),
+        new(Label: "Previous 7 days", Items: new()
+        {
+            new(Label: "Build a dashboard layout"),
+            new(Label: "Tailwind v4 migration guide"),
+            new(Label: "Node.js API authentication"),
+            new(Label: "Monorepo setup with pnpm"),
+            new(Label: "Deploy Nuxt to Vercel")
+        }),
+        new(Label: "Previous 30 days", Items: new()
+        {
+            new(Label: "GraphQL schema design"),
+            new(Label: "WebSocket real-time updates"),
+            new(Label: "PostgreSQL query optimization"),
+            new(Label: "Docker compose for dev env")
+        })
+    };
+
+
 
 
 

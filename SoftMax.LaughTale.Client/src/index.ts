@@ -129,6 +129,8 @@ defineIsland('popover', () => import('./components/popover'));
 defineIsland('tooltip', () => import('./components/tooltip-component'));
 defineIsland('tooltip-component', () => import('./components/tooltip-component'));
 defineIsland('sidebar', () => import('./components/sidebar'));
+defineIsland('p-sidebar', () => import('./components/sidebar'));
+defineIsland('sidebar-layout', () => import('./components/sidebar'));
 
 // Export Headless Composables, Animations & Strongly-Typed Models
 export * from './composables/index';

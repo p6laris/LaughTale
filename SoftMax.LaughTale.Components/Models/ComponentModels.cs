@@ -473,3 +473,25 @@ public record TreeTableNode(
     bool Loading = false,
     string? Icon = null
 );
+
+public record SidebarSubItem(
+    string Label,
+    bool IsActive = false,
+    string? Url = null,
+    List<SidebarSubItem>? SubItems = null
+);
+
+public record SidebarItemModel(
+    string Label,
+    string? Icon = null,
+    string? Badge = null,
+    bool IsActive = false,
+    string? Url = null,
+    List<SidebarSubItem>? SubItems = null,
+    bool DefaultOpen = false
+);
+
+public record SidebarGroupModel(
+    string Label,
+    List<SidebarItemModel> Items
+);

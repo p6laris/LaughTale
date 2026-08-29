@@ -4574,14 +4574,64 @@ public class IslandTooltipTagHelper : TagHelper
 }
 
 /// <summary>
-/// TagHelper for <island-sidebar /> — Collapsible navigation panel
+/// TagHelper for <island-sidebar />, <p-sidebar />, and <island-sidebar-layout />
+/// PrimeVue 4 Aura Design System compound navigation panel system.
 /// </summary>
 [HtmlTargetElement("island-sidebar")]
+[HtmlTargetElement("p-sidebar")]
+[HtmlTargetElement("island-sidebar-layout")]
 public class IslandSidebarTagHelper : TagHelper
 {
+    [HtmlAttributeName("variant")]
+    public string Variant { get; set; } = "sidebar";
+
+    [HtmlAttributeName("collapsible")]
+    public string Collapsible { get; set; } = "icon";
+
+    [HtmlAttributeName("side")]
+    public string Side { get; set; } = "left";
+
+    [HtmlAttributeName("overlay")]
+    public bool Overlay { get; set; } = false;
+
+    [HtmlAttributeName("open-on-hover")]
+    public bool OpenOnHover { get; set; } = false;
+
+    [HtmlAttributeName("backdrop")]
+    public bool Backdrop { get; set; } = false;
+
+    [HtmlAttributeName("open")]
+    public bool Open { get; set; } = true;
+
+    [HtmlAttributeName("width")]
+    public string Width { get; set; } = "16rem";
+
+    [HtmlAttributeName("icon-width")]
+    public string IconWidth { get; set; } = "3.5rem";
+
+    [HtmlAttributeName("demo-type")]
+    public string DemoType { get; set; } = "variants";
+
+    [HtmlAttributeName("groups")]
+    public List<SidebarGroupModel>? Groups { get; set; }
+
+    [HtmlAttributeName("items")]
     public List<SidebarItem>? Items { get; set; }
-    public bool Collapsed { get; set; } = false;
-    public string Position { get; set; } = "left";
+
+    [HtmlAttributeName("header-title")]
+    public string? HeaderTitle { get; set; }
+
+    [HtmlAttributeName("header-logo")]
+    public string? HeaderLogo { get; set; }
+
+    [HtmlAttributeName("header-color")]
+    public string? HeaderColor { get; set; }
+
+    [HtmlAttributeName("class")]
+    public string? Class { get; set; }
+
+    [HtmlAttributeName("style")]
+    public string? Style { get; set; }
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
@@ -4589,8 +4639,39 @@ public class IslandSidebarTagHelper : TagHelper
         output.TagMode = TagMode.StartTagAndEndTag;
         output.Attributes.SetAttribute("data-island", "sidebar");
         output.Attributes.SetAttribute("data-hydrate", "load");
-        var props = new { items = Items ?? new(), collapsed = Collapsed, position = Position };
+
+        var props = new
+        {
+            variant = Variant,
+            collapsible = Collapsible,
+            side = Side,
+            overlay = Overlay,
+            openOnHover = OpenOnHover,
+            backdrop = Backdrop,
+            open = Open,
+            width = Width,
+            iconWidth = IconWidth,
+            demoType = DemoType,
+            groups = Groups,
+            items = Items,
+            headerTitle = HeaderTitle,
+            headerLogo = HeaderLogo,
+            headerColor = HeaderColor,
+            @class = Class,
+            style = Style
+        };
+
         output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
+
+        if (!string.IsNullOrWhiteSpace(Class))
+        {
+            output.Attributes.SetAttribute("class", Class);
+        }
+
+        if (!string.IsNullOrWhiteSpace(Style))
+        {
+            output.Attributes.SetAttribute("style", Style);
+        }
     }
 }
 
