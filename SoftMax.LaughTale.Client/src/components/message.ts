@@ -3,7 +3,7 @@
  * High-performance inline notification messages with severity levels,
  * variants (filled, outlined, simple), sizes (small, normal, large),
  * closable triggers with silky smooth 60fps height collapse slide exit animations,
- * auto-dismiss life timers, and full WAI-ARIA alert accessibility.
+ * zero lingering flex gaps, auto-dismiss life timers, and full WAI-ARIA alert accessibility.
  */
 
 import { LucideIcons } from '../icons/lucide';
@@ -544,7 +544,7 @@ export default function MessageIsland(container: HTMLElement, props: MessageProp
                     ];
                     if (listContainer) {
                         listContainer.innerHTML = dynamicMessages.map(msg => renderSingleMessage(msg as any)).join('');
-                        wireMessageClosers(listContainer);
+                        wireMessageClosers(listContainer, false);
                     }
                 });
             }
@@ -568,7 +568,7 @@ export default function MessageIsland(container: HTMLElement, props: MessageProp
             }
 
             if (listContainer) {
-                wireMessageClosers(listContainer);
+                wireMessageClosers(listContainer, false);
             }
         }
 
@@ -579,21 +579,38 @@ export default function MessageIsland(container: HTMLElement, props: MessageProp
 
     const slotContent = container.innerHTML.trim();
     container.innerHTML = renderSingleMessage(props, slotContent);
-    wireMessageClosers(container);
+    wireMessageClosers(container, true);
 
-    function wireMessageClosers(root: HTMLElement) {
+    function wireMessageClosers(root: HTMLElement, isStandaloneIsland: boolean) {
         root.querySelectorAll<HTMLElement>('[data-message-item]').forEach(msgEl => {
             const closeBtn = msgEl.querySelector('[data-message-close]');
             const lifeStr = msgEl.getAttribute('data-life');
 
             const dismissMessage = () => {
-                const currentHeight = msgEl.getBoundingClientRect().height;
-                msgEl.style.maxHeight = `${currentHeight}px`;
-                // Force reflow for silky smooth CSS interpolation
-                void msgEl.offsetHeight;
+                // If this is a standalone island container, we must animate and remove the entire container
+                // so no zero-height wrapper or flex gap remains in the parent!
+                const targetToAnimate = isStandaloneIsland && container.parentElement ? container : msgEl;
+                const currentHeight = targetToAnimate.getBoundingClientRect().height;
+
+                targetToAnimate.style.maxHeight = `${currentHeight}px`;
+                targetToAnimate.style.boxSizing = 'border-box';
+                targetToAnimate.style.overflow = 'hidden';
+                targetToAnimate.style.transition = 'max-height 280ms cubic-bezier(0.16, 1, 0.3, 1), opacity 240ms cubic-bezier(0.16, 1, 0.3, 1), margin 280ms cubic-bezier(0.16, 1, 0.3, 1), padding 280ms cubic-bezier(0.16, 1, 0.3, 1)';
+
                 msgEl.classList.add('p-message-exit');
+
+                // Force reflow for silky smooth CSS interpolation
+                void targetToAnimate.offsetHeight;
+
+                targetToAnimate.style.maxHeight = '0px';
+                targetToAnimate.style.opacity = '0';
+                targetToAnimate.style.marginTop = '0px';
+                targetToAnimate.style.marginBottom = '0px';
+                targetToAnimate.style.paddingTop = '0px';
+                targetToAnimate.style.paddingBottom = '0px';
+
                 setTimeout(() => {
-                    msgEl.remove();
+                    targetToAnimate.remove();
                 }, 280);
             };
 

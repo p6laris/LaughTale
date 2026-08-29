@@ -508,7 +508,7 @@ function MessageIsland(container, props) {
           ];
           if (listContainer) {
             listContainer.innerHTML = dynamicMessages.map((msg) => renderSingleMessage(msg)).join("");
-            wireMessageClosers(listContainer);
+            wireMessageClosers(listContainer, false);
           }
         });
       }
@@ -530,7 +530,7 @@ function MessageIsland(container, props) {
         });
       }
       if (listContainer) {
-        wireMessageClosers(listContainer);
+        wireMessageClosers(listContainer, false);
       }
     };
     var renderDynamicContainer = renderDynamicContainer2, wireDynamic = wireDynamic2;
@@ -540,18 +540,28 @@ function MessageIsland(container, props) {
   }
   const slotContent = container.innerHTML.trim();
   container.innerHTML = renderSingleMessage(props, slotContent);
-  wireMessageClosers(container);
-  function wireMessageClosers(root) {
+  wireMessageClosers(container, true);
+  function wireMessageClosers(root, isStandaloneIsland) {
     root.querySelectorAll("[data-message-item]").forEach((msgEl) => {
       const closeBtn = msgEl.querySelector("[data-message-close]");
       const lifeStr = msgEl.getAttribute("data-life");
       const dismissMessage = () => {
-        const currentHeight = msgEl.getBoundingClientRect().height;
-        msgEl.style.maxHeight = `${currentHeight}px`;
-        void msgEl.offsetHeight;
+        const targetToAnimate = isStandaloneIsland && container.parentElement ? container : msgEl;
+        const currentHeight = targetToAnimate.getBoundingClientRect().height;
+        targetToAnimate.style.maxHeight = `${currentHeight}px`;
+        targetToAnimate.style.boxSizing = "border-box";
+        targetToAnimate.style.overflow = "hidden";
+        targetToAnimate.style.transition = "max-height 280ms cubic-bezier(0.16, 1, 0.3, 1), opacity 240ms cubic-bezier(0.16, 1, 0.3, 1), margin 280ms cubic-bezier(0.16, 1, 0.3, 1), padding 280ms cubic-bezier(0.16, 1, 0.3, 1)";
         msgEl.classList.add("p-message-exit");
+        void targetToAnimate.offsetHeight;
+        targetToAnimate.style.maxHeight = "0px";
+        targetToAnimate.style.opacity = "0";
+        targetToAnimate.style.marginTop = "0px";
+        targetToAnimate.style.marginBottom = "0px";
+        targetToAnimate.style.paddingTop = "0px";
+        targetToAnimate.style.paddingBottom = "0px";
         setTimeout(() => {
-          msgEl.remove();
+          targetToAnimate.remove();
         }, 280);
       };
       if (closeBtn) {
@@ -580,4 +590,4 @@ function MessageIsland(container, props) {
 export {
   MessageIsland as default
 };
-//# sourceMappingURL=message-CRQJ5QC4.js.map
+//# sourceMappingURL=message-FJKBTJZJ.js.map
