@@ -585,6 +585,19 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
     let nodeMap = new Map<string, any>();
     let parentMap = new Map<string, any>();
 
+    function resolveNodeField(node: any, field: string): any {
+        if (!node || !field) return '';
+        const data = node.data || node;
+        if (data[field] !== undefined) return data[field];
+        const camel = field.charAt(0).toLowerCase() + field.slice(1);
+        if (data[camel] !== undefined) return data[camel];
+        const lower = field.toLowerCase();
+        for (const k of Object.keys(data)) {
+            if (k.toLowerCase() === lower) return data[k];
+        }
+        return undefined;
+    }
+
     function buildMaps(nodesList: any[], parent: any = null) {
         nodesList.forEach(node => {
             const key = String(node.key || node.id || Math.random().toString());
@@ -726,14 +739,14 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
 
     function compareNodes(a: any, b: any): number {
         if (sortMode === 'single' && sortField && sortOrder !== 0) {
-            const valA = a.data[sortField] ?? '';
-            const valB = b.data[sortField] ?? '';
+            const valA = resolveNodeField(a, sortField) ?? '';
+            const valB = resolveNodeField(b, sortField) ?? '';
             const res = typeof valA === 'number' ? (valA - valB) : String(valA).localeCompare(String(valB));
             return res * sortOrder;
         } else if (sortMode === 'multiple' && multiSortMeta.length > 0) {
             for (let meta of multiSortMeta) {
-                const valA = a.data[meta.field] ?? '';
-                const valB = b.data[meta.field] ?? '';
+                const valA = resolveNodeField(a, meta.field) ?? '';
+                const valB = resolveNodeField(b, meta.field) ?? '';
                 const res = typeof valA === 'number' ? (valA - valB) : String(valA).localeCompare(String(valB));
                 if (res !== 0) return res * meta.order;
             }
@@ -754,7 +767,7 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
             for (let [field, filterVal] of Object.entries(columnFilters)) {
                 if (filterVal) {
                     const q = filterVal.toLowerCase();
-                    const val = String(node.data?.[field] || '').toLowerCase();
+                    const val = String(resolveNodeField(node, field) || '').toLowerCase();
                     if (!val.includes(q)) return false;
                 }
             }
@@ -996,7 +1009,7 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
                                             </button>
                                             ${checkboxHtml}
                                             ${iconSvg}
-                                            <span style="font-weight: ${hasChildren && props.useNodeIcons ? '600' : '400'}; color: var(--p-surface-900);">${node.data[col.field] ?? ''}</span>
+                                            <span style="font-weight: ${hasChildren && props.useNodeIcons ? '600' : '400'}; color: var(--p-surface-900);">${resolveNodeField(node, col.field) ?? ''}</span>
                                         </div>
                                     </td>
                                 `;
@@ -1014,7 +1027,7 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
 
                             return `
                                 <td class="${frozenClass}" style="${widthStyle}">
-                                    <span style="color: var(--p-surface-700);">${node.data[col.field] ?? '—'}</span>
+                                    <span style="color: var(--p-surface-700);">${resolveNodeField(node, col.field) ?? '—'}</span>
                                 </td>
                             `;
                         }).join('')}

@@ -5375,6 +5375,18 @@ var SoftMaxIslands = (() => {
     }
     let nodeMap = /* @__PURE__ */ new Map();
     let parentMap = /* @__PURE__ */ new Map();
+    function resolveNodeField(node, field) {
+      if (!node || !field) return "";
+      const data = node.data || node;
+      if (data[field] !== void 0) return data[field];
+      const camel = field.charAt(0).toLowerCase() + field.slice(1);
+      if (data[camel] !== void 0) return data[camel];
+      const lower = field.toLowerCase();
+      for (const k of Object.keys(data)) {
+        if (k.toLowerCase() === lower) return data[k];
+      }
+      return void 0;
+    }
     function buildMaps(nodesList, parent = null) {
       nodesList.forEach((node) => {
         const key = String(node.key || node.id || Math.random().toString());
@@ -5511,14 +5523,14 @@ var SoftMaxIslands = (() => {
     }
     function compareNodes(a, b) {
       if (sortMode === "single" && sortField && sortOrder !== 0) {
-        const valA = a.data[sortField] ?? "";
-        const valB = b.data[sortField] ?? "";
+        const valA = resolveNodeField(a, sortField) ?? "";
+        const valB = resolveNodeField(b, sortField) ?? "";
         const res = typeof valA === "number" ? valA - valB : String(valA).localeCompare(String(valB));
         return res * sortOrder;
       } else if (sortMode === "multiple" && multiSortMeta.length > 0) {
         for (let meta of multiSortMeta) {
-          const valA = a.data[meta.field] ?? "";
-          const valB = b.data[meta.field] ?? "";
+          const valA = resolveNodeField(a, meta.field) ?? "";
+          const valB = resolveNodeField(b, meta.field) ?? "";
           const res = typeof valA === "number" ? valA - valB : String(valA).localeCompare(String(valB));
           if (res !== 0) return res * meta.order;
         }
@@ -5538,7 +5550,7 @@ var SoftMaxIslands = (() => {
         for (let [field, filterVal] of Object.entries(columnFilters)) {
           if (filterVal) {
             const q = filterVal.toLowerCase();
-            const val = String(node.data?.[field] || "").toLowerCase();
+            const val = String(resolveNodeField(node, field) || "").toLowerCase();
             if (!val.includes(q)) return false;
           }
         }
@@ -5755,7 +5767,7 @@ var SoftMaxIslands = (() => {
                                             </button>
                                             ${checkboxHtml}
                                             ${iconSvg}
-                                            <span style="font-weight: ${hasChildren && props.useNodeIcons ? "600" : "400"}; color: var(--p-surface-900);">${node.data[col.field] ?? ""}</span>
+                                            <span style="font-weight: ${hasChildren && props.useNodeIcons ? "600" : "400"}; color: var(--p-surface-900);">${resolveNodeField(node, col.field) ?? ""}</span>
                                         </div>
                                     </td>
                                 `;
@@ -5771,7 +5783,7 @@ var SoftMaxIslands = (() => {
             }
             return `
                                 <td class="${frozenClass}" style="${widthStyle}">
-                                    <span style="color: var(--p-surface-700);">${node.data[col.field] ?? "\u2014"}</span>
+                                    <span style="color: var(--p-surface-700);">${resolveNodeField(node, col.field) ?? "\u2014"}</span>
                                 </td>
                             `;
           }).join("")}
@@ -37516,6 +37528,8 @@ ${h.response}`).join("\n");
       defineIsland("tree", () => Promise.resolve().then(() => (init_tree(), tree_exports)));
       defineIsland("treetable", () => Promise.resolve().then(() => (init_treetable(), treetable_exports)));
       defineIsland("tree-table", () => Promise.resolve().then(() => (init_treetable(), treetable_exports)));
+      defineIsland("p-treetable", () => Promise.resolve().then(() => (init_treetable(), treetable_exports)));
+      defineIsland("island-treetable", () => Promise.resolve().then(() => (init_treetable(), treetable_exports)));
       defineIsland("tree-select", () => Promise.resolve().then(() => (init_tree_select(), tree_select_exports)));
       defineIsland("datatable", () => Promise.resolve().then(() => (init_datatable(), datatable_exports)));
       defineIsland("datagrid", () => Promise.resolve().then(() => (init_datatable(), datatable_exports)));

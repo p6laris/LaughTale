@@ -9,6 +9,7 @@ namespace SoftMax.LaughTale.Components.TagHelpers;
 /// Enterprise TreeTable TagHelper for Hierarchical Tabular Data (Aura Design System compliant).
 /// </summary>
 [HtmlTargetElement("island-treetable", TagStructure = TagStructure.NormalOrSelfClosing)]
+[HtmlTargetElement("p-treetable", TagStructure = TagStructure.NormalOrSelfClosing)]
 [HtmlTargetElement("island-tree-table", TagStructure = TagStructure.NormalOrSelfClosing)]
 public class IslandTreeTableTagHelper : TagHelper
 {
@@ -133,7 +134,7 @@ public class IslandTreeTableTagHelper : TagHelper
     public string? TopControls { get; set; }
 
     [HtmlAttributeName("hydrate")]
-    public HydrateStrategy Hydrate { get; set; } = HydrateStrategy.Visible;
+    public HydrateStrategy Hydrate { get; set; } = HydrateStrategy.Load;
 
     [HtmlAttributeName("class")]
     public string? Class { get; set; }
