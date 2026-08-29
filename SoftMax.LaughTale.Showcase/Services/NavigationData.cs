@@ -81,7 +81,7 @@ public static class NavigationData
                 new("Sidebar Tree", "folderTree", "/enterprise#sec-sidebar"),
                 new("Stepper", "listOrdered", "/enterprise#sec-stepper", false, null, "New"),
                 new("ScrollTop", "arrowUp", "/enterprise#sec-scroll-top"),
-                new("Command Palette", "terminal", "/enterprise#sec-command-palette")
+                new("CommandMenu", "terminal", "/enterprise#sec-command-palette", false, null, "New")
             }),
             new("Overlays & Dialogs (9)", "layers", null, false, new List<SidebarItem>
             {

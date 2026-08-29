@@ -20430,223 +20430,515 @@ var SoftMaxIslands = (() => {
   // src/components/command.ts
   var command_exports = {};
   __export(command_exports, {
-    default: () => CommandPaletteIsland
+    default: () => CommandMenuIsland
   });
-  function CommandPaletteIsland(container, props) {
-    injectIslandStyle("command", CSS26);
-    const placeholder = props.placeholder || "Type a command or search...";
-    const items = props.items || [
-      { id: "home", label: "Go to Overview", group: "Navigation", icon: "compass", url: "/", shortcut: "G H" },
-      { id: "docs", label: "Documentation Index", group: "Navigation", icon: "file-text", url: "/doc/01-getting-started", shortcut: "G D" },
-      { id: "showcase", label: "Showcase Components", group: "Navigation", icon: "layers", url: "/enterprise", shortcut: "G S" },
-      { id: "dash", label: "Enterprise Dashboard", group: "Navigation", icon: "bar-chart", url: "/dashboard", shortcut: "G B" },
-      { id: "theme-dark", label: "Toggle Dark Mode", group: "Theme & Preferences", icon: "moon", action: "toggle-dark", shortcut: "T D" },
-      { id: "studio", label: "Open TweakAura Studio", group: "Theme & Preferences", icon: "palette", action: "open-studio", shortcut: "T S" },
-      { id: "export-css", label: "Export Current CSS Theme", group: "Actions", icon: "share-2", action: "export-css" },
-      { id: "help", label: "Help & Shortcuts Guide", group: "Actions", icon: "help-circle", action: "help", shortcut: "?" }
-    ];
-    let search = "";
+  function CommandMenuIsland(container, props) {
+    injectIslandStyle("commandmenu", COMMAND_CSS);
+    const placeholder = props.placeholder || "Search for commands...";
+    const groups = props.model || [];
+    const filterType = props.filter || "default";
+    const withDialog = props.withDialog || false;
+    const hotkey = props.hotkey || "ctrl+l, meta+l";
+    const customTemplate = props.customTemplate || false;
+    let search = props.search || "";
     let selectedIndex = 0;
-    const disclosure = useDisclosure({ defaultIsOpen: false });
-    const scrollLock = useScrollLock();
-    container.innerHTML = `
-        <div class="laughtale-command-root">
-            <!-- Command Overlay Backdrop -->
-            <div class="command-backdrop" style="display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); align-items: flex-start; justify-content: center; padding-top: 12vh;">
-                <!-- Command Dialog Card -->
-                <div class="command-dialog" style="width: 100%; max-width: 580px; background: var(--p-surface-0, #ffffff); border: 1px solid var(--p-border-color, #e2e8f0); border-radius: var(--p-border-radius-xl, 0.75rem); box-shadow: var(--p-shadow-lg, 0 20px 25px -5px rgba(0,0,0,0.1)); overflow: hidden; display: flex; flex-direction: column;">
-                    
-                    <!-- Search Header -->
-                    <div style="display: flex; align-items: center; padding: 0.875rem 1.125rem; border-bottom: 1px solid var(--p-border-color, #e2e8f0); gap: 0.75rem;">
-                        <span style="color: var(--p-surface-400, #94a3b8); display: flex;">${LucideIcons.search}</span>
-                        <input type="text" 
-                               class="command-search-input" 
-                               placeholder="${placeholder}" 
-                               style="flex: 1; border: none; outline: none; background: transparent; font-size: 0.9375rem; color: var(--p-text-color, #0f172a); font-family: var(--p-font-family, inherit);" />
-                        <span class="aura-tag tag-slate" style="font-size: 0.6875rem; padding: 0.2rem 0.45rem; font-family: monospace;">ESC</span>
-                    </div>
-
-                    <!-- Command Items List -->
-                    <div class="command-items-container" style="max-height: 340px; overflow-y: auto; padding: 0.5rem;"></div>
-
-                    <!-- Footer Bar -->
-                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 1rem; border-top: 1px solid var(--p-border-color, #e2e8f0); background: var(--p-surface-50, #f8fafc); font-size: 0.75rem; color: var(--p-surface-500, #64748b);">
-                        <div style="display: flex; align-items: center; gap: 0.75rem;">
-                            <span>Navigate <kbd style="font-family: monospace; background: var(--p-surface-200); padding: 1px 4px; border-radius: 3px;">\u2191\u2193</kbd></span>
-                            <span>Select <kbd style="font-family: monospace; background: var(--p-surface-200); padding: 1px 4px; border-radius: 3px;">\u21B5</kbd></span>
+    let isDialogOpen = false;
+    function fuzzyScore(value, query) {
+      if (!query) return 1;
+      const v = value.toLowerCase();
+      const q = query.toLowerCase();
+      let ti = 0;
+      let qi = 0;
+      let score = 0;
+      while (ti < v.length && qi < q.length) {
+        if (v[ti] === q[qi]) {
+          score += 1;
+          qi++;
+        }
+        ti++;
+      }
+      return qi === q.length ? score / v.length : 0;
+    }
+    function getFilteredGroups() {
+      const q = search.trim().toLowerCase();
+      if (!q) return groups;
+      const result = [];
+      groups.forEach((g) => {
+        const matchedItems = g.items.filter((it) => {
+          const label = (it.label || "").toLowerCase();
+          const keywords = (it.keywords || []).map((k) => k.toLowerCase()).join(" ");
+          if (filterType === "fuzzy") {
+            return fuzzyScore(label, q) > 0 || keywords && fuzzyScore(keywords, q) > 0;
+          } else {
+            return label.includes(q) || keywords.includes(q);
+          }
+        });
+        if (matchedItems.length > 0) {
+          result.push({
+            label: g.label,
+            items: matchedItems
+          });
+        }
+      });
+      return result;
+    }
+    function getIconSvg(iconName) {
+      if (!iconName) return "";
+      if (iconName.startsWith("<svg")) return iconName;
+      if (LucideIcons[iconName]) return LucideIcons[iconName];
+      return "";
+    }
+    function renderContent(targetEl) {
+      const filtered = getFilteredGroups();
+      let flatIndex = 0;
+      const totalItems = filtered.reduce((acc, g) => acc + g.items.length, 0);
+      if (selectedIndex >= totalItems) {
+        selectedIndex = Math.max(0, totalItems - 1);
+      }
+      let listHtml = "";
+      if (totalItems === 0) {
+        listHtml = `
+                <div class="p-commandmenu-empty-message">
+                    ${props.emptyMessage ? props.emptyMessage : search ? `No results found for <strong>"${search}"</strong>` : "No results found"}
+                </div>
+            `;
+      } else {
+        filtered.forEach((g) => {
+          let itemsHtml = "";
+          g.items.forEach((it) => {
+            const isFocused = flatIndex === selectedIndex;
+            const iconSvg = getIconSvg(it.icon);
+            let itemLeftHtml = "";
+            if (customTemplate) {
+              const bgStyle = it.color || "background: var(--p-primary-500, #3b82f6);";
+              const isGradient = bgStyle.startsWith("bg-[") || bgStyle.includes("linear-gradient");
+              const inlineBg = isGradient ? bgStyle.startsWith("bg-[") ? bgStyle.replace("bg-[", "background: ").replace("]", ";") : `background: ${bgStyle};` : bgStyle.startsWith("background") ? bgStyle : `background: ${bgStyle};`;
+              itemLeftHtml = `
+                            <div class="p-commandmenu-item-left">
+                                <span class="p-commandmenu-item-icon-badge" style="${inlineBg}">
+                                    ${iconSvg ? `<span style="display:flex; transform:scale(0.8);">${iconSvg}</span>` : "\u26A1"}
+                                </span>
+                                <span class="p-commandmenu-item-label">${it.label}</span>
+                                ${it.category ? `<span class="p-commandmenu-item-category">${it.category}</span>` : ""}
+                            </div>
+                        `;
+            } else {
+              itemLeftHtml = `
+                            <div class="p-commandmenu-item-left">
+                                ${iconSvg ? `<span class="p-commandmenu-item-icon">${iconSvg}</span>` : ""}
+                                <span class="p-commandmenu-item-label">${it.label}</span>
+                            </div>
+                        `;
+            }
+            itemsHtml += `
+                        <div class="p-commandmenu-item ${isFocused ? "p-commandmenu-item-focus" : ""}" data-flat-index="${flatIndex}" data-url="${it.url || ""}" data-action="${it.action || ""}">
+                            ${itemLeftHtml}
+                            ${it.shortcut ? `<kbd class="p-commandmenu-kbd">${it.shortcut}</kbd>` : ""}
                         </div>
-                        <div>SoftMax.LaughTale Spotlight</div>
+                    `;
+            flatIndex++;
+          });
+          listHtml += `
+                    <div class="p-commandmenu-group">
+                        <div class="p-commandmenu-group-label">${g.label}</div>
+                        ${itemsHtml}
+                    </div>
+                `;
+        });
+      }
+      const arrowUpSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>';
+      const arrowDownSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
+      const searchSvg3 = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>';
+      targetEl.innerHTML = `
+            <div class="p-commandmenu p-component" ${withDialog ? 'style="border: none; box-shadow: none; max-width: 100%;"' : ""}>
+                <div class="p-commandmenu-header">
+                    <span class="p-commandmenu-search-icon">${searchSvg3}</span>
+                    <input type="text" class="p-commandmenu-input" placeholder="${placeholder}" value="${search}" />
+                </div>
+                <div class="p-commandmenu-list">
+                    ${listHtml}
+                </div>
+                <div class="p-commandmenu-footer">
+                    <div class="p-commandmenu-footer-content">
+                        <span style="display:inline-flex; align-items:center; gap: 0.35rem;">
+                            <kbd class="p-commandmenu-kbd">${arrowUpSvg}</kbd>
+                            <kbd class="p-commandmenu-kbd">${arrowDownSvg}</kbd>
+                            Navigate
+                        </span>
+                        <span style="display:inline-flex; align-items:center; gap: 0.35rem;">
+                            <kbd class="p-commandmenu-kbd">\u21B5</kbd>
+                            Select
+                        </span>
                     </div>
                 </div>
             </div>
-        </div>
-    `;
-    const backdrop = container.querySelector(".command-backdrop");
-    const dialog = container.querySelector(".command-dialog");
-    const input = container.querySelector(".command-search-input");
-    const listContainer = container.querySelector(".command-items-container");
-    const focusTrap = useFocusTrap(dialog, { initialFocusElement: input });
-    function getFilteredItems() {
-      if (!search.trim()) return items;
-      const q = search.toLowerCase();
-      return items.filter((it) => it.label.toLowerCase().includes(q) || it.group && it.group.toLowerCase().includes(q));
-    }
-    function renderList() {
-      const filtered = getFilteredItems();
-      if (filtered.length === 0) {
-        listContainer.innerHTML = `
-                <div style="padding: 2.5rem 1rem; text-align: center; color: var(--p-surface-400);">
-                    <div style="margin-bottom: 0.5rem; display: flex; justify-content: center;">${LucideIcons.alertCircle || "\u2139"}</div>
-                    <div style="font-size: 0.875rem; font-weight: 500;">No matching commands found</div>
-                </div>
-            `;
-        return;
-      }
-      const groups = {};
-      filtered.forEach((it) => {
-        const g = it.group || "General";
-        if (!groups[g]) groups[g] = [];
-        groups[g].push(it);
-      });
-      let flatIndex = 0;
-      let html = "";
-      for (const [groupName, groupItems] of Object.entries(groups)) {
-        html += `<div style="font-size: 0.6875rem; font-weight: 700; color: var(--p-surface-400); text-transform: uppercase; letter-spacing: 0.05em; padding: 0.5rem 0.75rem 0.25rem;">${groupName}</div>`;
-        groupItems.forEach((it) => {
-          const isSelected = flatIndex === selectedIndex;
-          const iconSvg = it.icon && LucideIcons[it.icon] ? LucideIcons[it.icon] : LucideIcons.terminal || "\u26A1";
-          html += `
-                    <div class="command-item ${isSelected ? "active" : ""}" 
-                         data-index="${flatIndex}" 
-                         data-id="${it.id}" 
-                         style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border-radius: var(--p-border-radius, 6px); cursor: pointer; background: ${isSelected ? "var(--p-surface-100, #f1f5f9)" : "transparent"}; color: var(--p-text-color, #0f172a); font-size: 0.875rem; transition: background 0.1s ease;">
-                        <div style="display: flex; align-items: center; gap: 0.625rem;">
-                            <span style="color: ${isSelected ? "var(--p-primary-600)" : "var(--p-surface-400)"}; display: flex;">${iconSvg}</span>
-                            <span>${it.label}</span>
-                        </div>
-                        ${it.shortcut ? `<span class="aura-tag tag-slate" style="font-size: 0.6875rem; padding: 0.15rem 0.4rem; font-family: monospace;">${it.shortcut}</span>` : ""}
-                    </div>
-                `;
-          flatIndex++;
+        `;
+      const input = targetEl.querySelector(".p-commandmenu-input");
+      if (input) {
+        input.focus();
+        input.setSelectionRange(input.value.length, input.value.length);
+        input.addEventListener("input", (e) => {
+          search = e.target.value;
+          selectedIndex = 0;
+          renderContent(targetEl);
+        });
+        input.addEventListener("keydown", (e) => {
+          if (e.key === "ArrowDown") {
+            e.preventDefault();
+            if (totalItems > 0) {
+              selectedIndex = (selectedIndex + 1) % totalItems;
+              renderContent(targetEl);
+            }
+          } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            if (totalItems > 0) {
+              selectedIndex = (selectedIndex - 1 + totalItems) % totalItems;
+              renderContent(targetEl);
+            }
+          } else if (e.key === "Enter") {
+            e.preventDefault();
+            executeSelectedItem(targetEl);
+          } else if (e.key === "Escape") {
+            if (withDialog) {
+              closeDialog();
+            } else if (search) {
+              search = "";
+              selectedIndex = 0;
+              renderContent(targetEl);
+            }
+          }
         });
       }
-      listContainer.innerHTML = html;
-      listContainer.querySelectorAll(".command-item").forEach((el) => {
+      targetEl.querySelectorAll(".p-commandmenu-item").forEach((el) => {
         el.addEventListener("mouseenter", () => {
-          selectedIndex = Number(el.getAttribute("data-index"));
-          renderList();
+          const idx = Number(el.getAttribute("data-flat-index"));
+          selectedIndex = idx;
+          targetEl.querySelectorAll(".p-commandmenu-item").forEach((item, i) => {
+            item.classList.toggle("p-commandmenu-item-focus", i === selectedIndex);
+          });
         });
         el.addEventListener("click", () => {
-          executeItem(filtered[Number(el.getAttribute("data-index"))]);
+          const idx = Number(el.getAttribute("data-flat-index"));
+          selectedIndex = idx;
+          executeSelectedItem(targetEl);
         });
       });
     }
-    function executeItem(item) {
-      if (!item) return;
-      close();
-      if (item.url) {
-        window.location.href = item.url;
-      } else if (item.action === "toggle-dark") {
+    function executeSelectedItem(targetEl) {
+      const activeEl = targetEl.querySelector(`.p-commandmenu-item[data-flat-index="${selectedIndex}"]`);
+      if (!activeEl) return;
+      const url = activeEl.getAttribute("data-url");
+      const action = activeEl.getAttribute("data-action");
+      if (withDialog) {
+        closeDialog();
+      }
+      if (url) {
+        window.location.href = url;
+      } else if (action === "toggle-dark") {
         document.documentElement.classList.toggle("dark");
         localStorage.setItem("theme", document.documentElement.classList.contains("dark") ? "dark" : "light");
-      } else if (item.action === "open-studio") {
-        document.dispatchEvent(new CustomEvent("studio:open"));
-      } else if (item.action === "export-css") {
-        document.dispatchEvent(new CustomEvent("studio:export"));
+      } else {
+        console.log("Command executed:", activeEl.textContent?.trim());
       }
     }
-    function open() {
-      disclosure.open();
-      backdrop.style.display = "flex";
-      scrollLock.lock();
-      focusTrap.activate();
-      search = "";
-      input.value = "";
-      selectedIndex = 0;
-      renderList();
-      input.focus();
+    function openDialog() {
+      if (isDialogOpen) return;
+      isDialogOpen = true;
+      const backdrop = document.createElement("div");
+      backdrop.className = "p-commandmenu-dialog-backdrop";
+      backdrop.innerHTML = `
+            <div class="p-commandmenu-dialog-card"></div>
+        `;
+      document.body.appendChild(backdrop);
+      const card = backdrop.querySelector(".p-commandmenu-dialog-card");
+      renderContent(card);
+      backdrop.addEventListener("click", (e) => {
+        if (e.target === backdrop) {
+          closeDialog();
+        }
+      });
+      useFocusTrap(card, { initialFocusElement: card.querySelector("input") || void 0 });
     }
-    function close() {
-      disclosure.close();
-      backdrop.style.display = "none";
-      scrollLock.unlock();
-      focusTrap.deactivate();
+    function closeDialog() {
+      isDialogOpen = false;
+      const backdrop = document.querySelector(".p-commandmenu-dialog-backdrop");
+      if (backdrop) backdrop.remove();
     }
-    backdrop.addEventListener("click", (e) => {
-      if (e.target === backdrop) close();
-    });
-    input.addEventListener("input", () => {
-      search = input.value;
-      selectedIndex = 0;
-      renderList();
-    });
-    input.addEventListener("keydown", (e) => {
-      const filtered = getFilteredItems();
-      if (e.key === "ArrowDown") {
-        e.preventDefault();
-        selectedIndex = (selectedIndex + 1) % Math.max(1, filtered.length);
-        renderList();
-      } else if (e.key === "ArrowUp") {
-        e.preventDefault();
-        selectedIndex = (selectedIndex - 1 + filtered.length) % Math.max(1, filtered.length);
-        renderList();
-      } else if (e.key === "Enter") {
-        e.preventDefault();
-        executeItem(filtered[selectedIndex]);
-      } else if (e.key === "Escape") {
-        e.preventDefault();
-        close();
-      }
-    });
-    useHotkeys([
-      { combo: "ctrl+k", handler: () => disclosure.isOpen ? close() : open(), allowInInputs: true },
-      { combo: "meta+k", handler: () => disclosure.isOpen ? close() : open(), allowInInputs: true },
-      { combo: "escape", handler: () => {
-        if (disclosure.isOpen) close();
-      }, allowInInputs: true }
-    ]);
-    document.addEventListener("command:open", () => open());
+    if (withDialog) {
+      container.innerHTML = `
+            <div class="p-commandmenu-dialog-trigger-wrapper" style="display: flex; align-items: center; justify-content: center; padding: 2rem 0;">
+                <span class="p-commandmenu-dialog-trigger" style="cursor: pointer; font-size: 0.9375rem; color: var(--p-text-color); display: inline-flex; align-items: center;">
+                    Press <kbd class="p-commandmenu-kbd" style="margin-left: 0.5rem; padding: 0.25rem 0.6rem; height: auto; font-size: 0.8125rem; font-weight: 600; background: var(--p-surface-100); border: 1px solid var(--p-border-color); border-radius: 6px;">CTRL/\u2318 + L</kbd>
+                </span>
+            </div>
+        `;
+      container.querySelector(".p-commandmenu-dialog-trigger")?.addEventListener("click", () => {
+        openDialog();
+      });
+      window.addEventListener("keydown", (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "l") {
+          e.preventDefault();
+          if (isDialogOpen) {
+            closeDialog();
+          } else {
+            openDialog();
+          }
+        }
+      });
+    } else {
+      renderContent(container);
+    }
   }
-  var CSS26;
+  var COMMAND_CSS;
   var init_command = __esm({
     "src/components/command.ts"() {
       "use strict";
       init_lucide();
       init_styles();
-      init_useDisclosure();
       init_useFocusTrap();
-      init_useHotkeys();
-      init_useScrollLock();
-      CSS26 = `
-[data-theme="dark"] .laughtale-command-root {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+      COMMAND_CSS = `
+.p-commandmenu {
+    display: flex;
+    flex-direction: column;
+    background: var(--p-commandmenu-background, var(--p-surface-0, #ffffff));
+    border: 1px solid var(--p-commandmenu-border-color, var(--p-border-color, #e2e8f0));
+    border-radius: var(--p-commandmenu-border-radius, var(--p-border-radius, 8px));
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    width: 100%;
+    max-width: 32rem;
+    box-sizing: border-box;
+    font-family: inherit;
 }
-[data-theme="dark"] .command-backdrop {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-commandmenu-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: var(--p-commandmenu-header-padding, 0.75rem 1rem);
+    background: var(--p-commandmenu-header-background, transparent);
+    border-bottom: 1px solid var(--p-commandmenu-header-border-color, var(--p-border-color, #e2e8f0));
 }
-[data-theme="dark"] .command-dialog {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-commandmenu-search-icon {
+    color: var(--p-surface-400, #94a3b8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
 }
-[data-theme="dark"] .command-search-input {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-commandmenu-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: var(--p-commandmenu-input-font-size, 0.875rem);
+    font-weight: var(--p-commandmenu-input-font-weight, 500);
+    color: var(--p-commandmenu-input-color, var(--p-text-color, #0f172a));
+    padding: var(--p-commandmenu-input-padding, 0.25rem 0);
+    font-family: inherit;
+    min-width: 0;
 }
-[data-theme="dark"] .command-items-container {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-commandmenu-input::placeholder {
+    color: var(--p-commandmenu-input-placeholder-color, var(--p-surface-400, #94a3b8));
 }
-[data-theme="dark"] .command-item {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-commandmenu-list {
+    padding: var(--p-commandmenu-list-padding, 0.5rem);
+    max-height: var(--p-commandmenu-height, 19rem);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    box-sizing: border-box;
+}
+
+.p-commandmenu-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+}
+
+.p-commandmenu-group-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--p-surface-400, #94a3b8);
+    padding: 0.35rem 0.65rem 0.2rem;
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+.p-commandmenu-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0.65rem;
+    border-radius: var(--p-border-radius, 6px);
+    cursor: pointer;
+    font-size: 0.875rem;
+    color: var(--p-text-color, #0f172a);
+    transition: background-color 0.12s ease, color 0.12s ease;
+    user-select: none;
+}
+
+.p-commandmenu-item:hover,
+.p-commandmenu-item.p-commandmenu-item-focus {
+    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-text-color, #0f172a);
+}
+
+.p-commandmenu-item-left {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    min-width: 0;
+    flex: 1;
+}
+
+.p-commandmenu-item-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--p-surface-500, #64748b);
+    flex-shrink: 0;
+}
+
+.p-commandmenu-item-icon-badge {
+    width: 1.35rem;
+    height: 1.35rem;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    flex-shrink: 0;
+    font-size: 0.75rem;
+}
+
+.p-commandmenu-item-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 500;
+}
+
+.p-commandmenu-item-category {
+    font-size: 0.75rem;
+    color: var(--p-text-muted, #94a3b8);
+    margin-left: auto;
+    opacity: 0.7;
+    flex-shrink: 0;
+}
+
+.p-commandmenu-empty-message {
+    padding: var(--p-commandmenu-empty-padding, 2.5rem 1rem);
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--p-commandmenu-empty-color, var(--p-surface-500, #64748b));
+}
+
+.p-commandmenu-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: var(--p-commandmenu-footer-padding, 0.625rem 1rem);
+    background: var(--p-commandmenu-footer-background, var(--p-surface-50, #f8fafc));
+    border-top: 1px solid var(--p-commandmenu-footer-border-color, var(--p-border-color, #e2e8f0));
+}
+
+.p-commandmenu-footer-content {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    font-size: 0.75rem;
+    color: var(--p-surface-500, #64748b);
+}
+
+.p-commandmenu-kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--p-surface-100, #f1f5f9);
+    border: 1px solid var(--p-border-color, #cbd5e1);
+    border-radius: 4px;
+    padding: 0 0.35rem;
+    min-width: 1.25rem;
+    height: 1.25rem;
+    font-family: inherit;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--p-surface-700, #334155);
+}
+
+/* Dialog Overlay */
+.p-commandmenu-dialog-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 14vh;
+}
+
+.p-commandmenu-dialog-card {
+    width: 100%;
+    max-width: 32rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    border-radius: var(--p-border-radius-xl, 10px);
+    overflow: hidden;
+}
+
+/* Dark Mode Tokens */
+.dark .p-commandmenu,
+[data-theme="dark"] .p-commandmenu {
+    background: var(--p-surface-900, #0f172a);
+    border-color: var(--p-surface-700, #334155);
+}
+
+.dark .p-commandmenu-header,
+[data-theme="dark"] .p-commandmenu-header {
+    border-color: var(--p-surface-700, #334155);
+}
+
+.dark .p-commandmenu-input,
+[data-theme="dark"] .p-commandmenu-input {
+    color: var(--p-surface-0, #f8fafc);
+}
+
+.dark .p-commandmenu-item,
+[data-theme="dark"] .p-commandmenu-item {
+    color: var(--p-surface-100, #f1f5f9);
+}
+
+.dark .p-commandmenu-item:hover,
+.dark .p-commandmenu-item.p-commandmenu-item-focus,
+[data-theme="dark"] .p-commandmenu-item:hover,
+[data-theme="dark"] .p-commandmenu-item.p-commandmenu-item-focus {
+    background: var(--p-surface-800, #1e293b);
+    color: var(--p-surface-0, #f8fafc);
+}
+
+.dark .p-commandmenu-group-label,
+[data-theme="dark"] .p-commandmenu-group-label {
+    color: var(--p-surface-400, #94a3b8);
+}
+
+.dark .p-commandmenu-footer,
+[data-theme="dark"] .p-commandmenu-footer {
+    background: var(--p-surface-850, #131d2e);
+    border-color: var(--p-surface-700, #334155);
+}
+
+.dark .p-commandmenu-kbd,
+[data-theme="dark"] .p-commandmenu-kbd {
+    background: var(--p-surface-800, #1e293b);
+    border-color: var(--p-surface-700, #334155);
+    color: var(--p-surface-200, #e2e8f0);
 }
 `;
     }
@@ -21481,7 +21773,7 @@ public static class AppTheme
     default: () => DynamicFormIsland
   });
   function DynamicFormIsland(container, props) {
-    injectIslandStyle("dynamic-form", CSS27);
+    injectIslandStyle("dynamic-form", CSS26);
     let schema = props.schema || null;
     if (!schema && props.schemaJson) {
       try {
@@ -21642,13 +21934,13 @@ public static class AppTheme
     }
     render();
   }
-  var CSS27;
+  var CSS26;
   var init_dynamic_form = __esm({
     "src/components/dynamic-form.ts"() {
       "use strict";
       init_styles();
       init_lucide();
-      CSS27 = `
+      CSS26 = `
 [data-theme="dark"] .p-input {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -22034,7 +22326,7 @@ public static class AppTheme
     default: () => MultiSelectIsland
   });
   function MultiSelectIsland(container, props) {
-    injectIslandStyle("multiselect", CSS28);
+    injectIslandStyle("multiselect", CSS27);
     const options = props.options || [];
     let selected = new Set(props.selectedValues || []);
     let filterQuery = "";
@@ -22200,7 +22492,7 @@ public static class AppTheme
     renderDisplay();
     syncValue();
   }
-  var CSS28;
+  var CSS27;
   var init_multiselect = __esm({
     "src/components/multiselect.ts"() {
       "use strict";
@@ -22209,7 +22501,7 @@ public static class AppTheme
       init_useDisclosure();
       init_useClickOutside();
       init_useTransition();
-      CSS28 = `
+      CSS27 = `
 [data-theme="dark"] .laughtale-multiselect {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -22280,7 +22572,7 @@ public static class AppTheme
     default: () => CascadeSelectIsland
   });
   function CascadeSelectIsland(container, props) {
-    injectIslandStyle("cascadeselect", CSS29);
+    injectIslandStyle("cascadeselect", CSS28);
     const options = props.options || [];
     const size = props.size || "normal";
     const variant = props.variant || "outlined";
@@ -22493,7 +22785,7 @@ public static class AppTheme
       }));
     }
   }
-  var CSS29;
+  var CSS28;
   var init_cascadeselect = __esm({
     "src/components/cascadeselect.ts"() {
       "use strict";
@@ -22501,7 +22793,7 @@ public static class AppTheme
       init_styles();
       init_useDisclosure();
       init_useClickOutside();
-      CSS29 = `
+      CSS28 = `
 .laughtale-cascadeselect {
     position: relative;
     display: inline-flex;
@@ -22706,7 +22998,7 @@ public static class AppTheme
     default: () => ListboxIsland
   });
   function ListboxIsland(container, props) {
-    injectIslandStyle("laughtale-listbox", CSS30);
+    injectIslandStyle("laughtale-listbox", CSS29);
     const isMultiple = props.multiple === true || String(props.multiple) === "true";
     const isMetaKey = props.metaKeySelection !== false && String(props.metaKeySelection) !== "false";
     const isCheckbox = props.checkbox === true || String(props.checkbox) === "true";
@@ -23042,14 +23334,14 @@ public static class AppTheme
     }
     init();
   }
-  var CSS30, checkSvg2, searchSvg2;
+  var CSS29, checkSvg2, searchSvg2;
   var init_listbox = __esm({
     "src/components/listbox.ts"() {
       "use strict";
       init_lucide();
       init_styles();
       init_useDebounce();
-      CSS30 = `
+      CSS29 = `
 /* ==================== AURA LISTBOX ==================== */
 .laughtale-listbox,
 .p-listbox {
@@ -25521,7 +25813,7 @@ public static class AppTheme
     default: () => TerminalIsland
   });
   function TerminalIsland(container, props) {
-    injectIslandStyle("terminal", CSS31);
+    injectIslandStyle("terminal", CSS30);
     const promptPrefix = props.prompt || "admin@softmax:~$";
     const welcome = props.welcomeMessage || 'Welcome to SoftMax.LaughTale CLI v3.0\nType "help" for available commands.';
     const commands = {
@@ -25620,13 +25912,13 @@ ${h.response}`).join("\n");
     }
     render();
   }
-  var CSS31;
+  var CSS30;
   var init_terminal = __esm({
     "src/components/terminal.ts"() {
       "use strict";
       init_styles();
       init_useClipboard();
-      CSS31 = `
+      CSS30 = `
 [data-theme="dark"] .laughtale-terminal {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -25657,7 +25949,7 @@ ${h.response}`).join("\n");
     default: () => DockIsland
   });
   function DockIsland(container, props) {
-    injectIslandStyle("dock", CSS32);
+    injectIslandStyle("dock", CSS31);
     const items = props.items || [
       { label: "Overview", icon: "compass", url: "/" },
       { label: "Dashboard", icon: "bar-chart", url: "/dashboard" },
@@ -25699,13 +25991,13 @@ ${h.response}`).join("\n");
       });
     });
   }
-  var CSS32;
+  var CSS31;
   var init_dock = __esm({
     "src/components/dock.ts"() {
       "use strict";
       init_styles();
       init_lucide();
-      CSS32 = `
+      CSS31 = `
 [data-theme="dark"] .laughtale-dock {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -25726,7 +26018,7 @@ ${h.response}`).join("\n");
     default: () => GalleriaIsland
   });
   function GalleriaIsland(container, props) {
-    injectIslandStyle("galleria", CSS33);
+    injectIslandStyle("galleria", CSS32);
     const images = props.value && props.value.length > 0 ? props.value : [
       {
         itemImageSrc: "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800&auto=format&fit=crop&q=80",
@@ -25800,13 +26092,13 @@ ${h.response}`).join("\n");
     }
     render();
   }
-  var CSS33;
+  var CSS32;
   var init_galleria = __esm({
     "src/components/galleria.ts"() {
       "use strict";
       init_styles();
       init_lucide();
-      CSS33 = `
+      CSS32 = `
 [data-theme="dark"] .laughtale-galleria {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -25837,7 +26129,7 @@ ${h.response}`).join("\n");
     default: () => BlockUIIsland
   });
   function BlockUIIsland(container, props) {
-    injectIslandStyle("blockui", CSS34);
+    injectIslandStyle("blockui", CSS33);
     let isBlocked = props.blocked ?? true;
     function render() {
       container.innerHTML = `
@@ -25860,12 +26152,12 @@ ${h.response}`).join("\n");
       render();
     });
   }
-  var CSS34;
+  var CSS33;
   var init_blockui = __esm({
     "src/components/blockui.ts"() {
       "use strict";
       init_styles();
-      CSS34 = `
+      CSS33 = `
 [data-theme="dark"] .laughtale-blockui-root {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -26597,7 +26889,7 @@ ${h.response}`).join("\n");
     default: () => SelectIsland
   });
   function SelectIsland(container, props) {
-    injectIslandStyle("laughtale-select", CSS35);
+    injectIslandStyle("laughtale-select", CSS34);
     const isMultiple = props.multiple === true || String(props.multiple) === "true";
     const isCheckmark = props.checkmark === true || String(props.checkmark) === "true";
     const isCheckbox = props.checkbox === true || String(props.checkbox) === "true";
@@ -26937,13 +27229,13 @@ ${h.response}`).join("\n");
     }
     render();
   }
-  var CSS35;
+  var CSS34;
   var init_select = __esm({
     "src/components/select.ts"() {
       "use strict";
       init_styles();
       init_lucide();
-      CSS35 = `
+      CSS34 = `
 /* ==================== AURA SELECT ==================== */
 .laughtale-select,
 .p-select {
@@ -27370,7 +27662,7 @@ ${h.response}`).join("\n");
     default: () => CheckboxIsland
   });
   function CheckboxIsland(container, props) {
-    injectIslandStyle("laughtale-checkbox", CSS36);
+    injectIslandStyle("laughtale-checkbox", CSS35);
     let isChecked = Boolean(props.checked);
     let isIndeterminate = Boolean(props.indeterminate);
     const size = props.size || "normal";
@@ -27442,13 +27734,13 @@ ${h.response}`).join("\n");
     }
     render();
   }
-  var CSS36;
+  var CSS35;
   var init_checkbox = __esm({
     "src/components/checkbox.ts"() {
       "use strict";
       init_styles();
       init_lucide();
-      CSS36 = `
+      CSS35 = `
 .laughtale-checkbox-wrap {
     display: inline-flex;
     align-items: center;
@@ -27625,7 +27917,7 @@ ${h.response}`).join("\n");
     default: () => RadioButtonIsland
   });
   function RadioButtonIsland(container, props) {
-    injectIslandStyle("laughtale-radio", CSS37);
+    injectIslandStyle("laughtale-radio", CSS36);
     const isCard = props.card === true || String(props.card) === "true";
     const isFilled = props.variant === "filled";
     const size = props.size || "normal";
@@ -27857,13 +28149,13 @@ ${h.response}`).join("\n");
     }
     renderSingle();
   }
-  var CSS37;
+  var CSS36;
   var init_radio_button = __esm({
     "src/components/radio-button.ts"() {
       "use strict";
       init_styles();
       init_lucide();
-      CSS37 = `
+      CSS36 = `
 /* ==================== AURA RADIOBUTTON ==================== */
 .laughtale-radio-root,
 .p-radiobutton-root {
@@ -28146,7 +28438,7 @@ ${h.response}`).join("\n");
     default: () => TextareaIsland
   });
   function TextareaIsland(container, props) {
-    injectIslandStyle("laughtale-textarea", CSS38);
+    injectIslandStyle("laughtale-textarea", CSS37);
     const isAutoResize = props.autoResize === true || String(props.autoResize) === "true";
     const isFluid = props.fluid === true || String(props.fluid) === "true";
     const isInvalid = props.invalid === true || String(props.invalid) === "true";
@@ -28222,12 +28514,12 @@ ${h.response}`).join("\n");
       setTimeout(adjustHeight, 0);
     }
   }
-  var CSS38;
+  var CSS37;
   var init_textarea = __esm({
     "src/components/textarea.ts"() {
       "use strict";
       init_styles();
-      CSS38 = `
+      CSS37 = `
 /* ==================== AURA TEXTAREA ==================== */
 .p-textarea {
     font-family: var(--p-font-family, inherit);
@@ -28352,7 +28644,7 @@ ${h.response}`).join("\n");
     default: () => InputMaskIsland
   });
   function InputMaskIsland(container, props) {
-    injectIslandStyle("laughtale-input-mask", CSS39);
+    injectIslandStyle("laughtale-input-mask", CSS38);
     const mask = props.mask || "(999) 999-9999";
     const slotChar = props.slotChar || "_";
     const autoClear = props.autoClear !== false && String(props.autoClear) !== "false";
@@ -28539,12 +28831,12 @@ ${h.response}`).join("\n");
     });
     syncValue();
   }
-  var CSS39;
+  var CSS38;
   var init_input_mask = __esm({
     "src/components/input-mask.ts"() {
       "use strict";
       init_styles();
-      CSS39 = `
+      CSS38 = `
 /* ==================== AURA INPUTMASK ==================== */
 .laughtale-input-mask,
 .p-inputmask {
@@ -28654,7 +28946,7 @@ ${h.response}`).join("\n");
     default: () => FloatLabelIsland
   });
   function FloatLabelIsland(container, props) {
-    injectIslandStyle("laughtale-float-label", CSS40);
+    injectIslandStyle("laughtale-float-label", CSS39);
     const variant = props.variant || "over";
     const initialHtml = container.innerHTML;
     const forAttr = props.for ? `for="${props.for}"` : "";
@@ -28732,12 +29024,12 @@ ${h.response}`).join("\n");
     setTimeout(updateFloatingState, 50);
     setTimeout(updateFloatingState, 200);
   }
-  var CSS40;
+  var CSS39;
   var init_float_label = __esm({
     "src/components/float-label.ts"() {
       "use strict";
       init_styles();
-      CSS40 = `
+      CSS39 = `
 .laughtale-float-label {
     position: relative;
     display: inline-flex;
@@ -28864,7 +29156,7 @@ ${h.response}`).join("\n");
     default: () => IftaLabelIsland
   });
   function IftaLabelIsland(container, props) {
-    injectIslandStyle("laughtale-ifta-label", CSS41);
+    injectIslandStyle("laughtale-ifta-label", CSS40);
     const initialHtml = container.innerHTML;
     const forAttr = props.for ? `for="${props.for}"` : "";
     const existingLabel = container.querySelector("label");
@@ -28887,12 +29179,12 @@ ${h.response}`).join("\n");
       }
     });
   }
-  var CSS41;
+  var CSS40;
   var init_ifta_label = __esm({
     "src/components/ifta-label.ts"() {
       "use strict";
       init_styles();
-      CSS41 = `
+      CSS40 = `
 .laughtale-ifta-label {
     position: relative;
     display: inline-flex;
@@ -28980,14 +29272,14 @@ ${h.response}`).join("\n");
     default: () => InputGroupIsland
   });
   function InputGroupIsland(container, props) {
-    injectIslandStyle("laughtale-inputgroup", CSS42);
+    injectIslandStyle("laughtale-inputgroup", CSS41);
     container.classList.add("laughtale-inputgroup", "p-inputgroup");
     if (props.size) {
       container.classList.add(`size-${props.size}`);
     }
   }
   function InputGroupAddonIsland(container, props) {
-    injectIslandStyle("laughtale-inputgroup", CSS42);
+    injectIslandStyle("laughtale-inputgroup", CSS41);
     container.classList.add("laughtale-inputgroup-addon", "p-inputgroup-addon");
     if (props.icon && !container.querySelector("svg")) {
       const svg = getLucideIcon(props.icon);
@@ -28999,13 +29291,13 @@ ${h.response}`).join("\n");
       container.insertAdjacentHTML("beforeend", `<span>${props.text}</span>`);
     }
   }
-  var CSS42;
+  var CSS41;
   var init_input_group = __esm({
     "src/components/input-group.ts"() {
       "use strict";
       init_styles();
       init_lucide();
-      CSS42 = `
+      CSS41 = `
 .laughtale-inputgroup,
 .p-inputgroup {
     display: flex;
@@ -29277,7 +29569,7 @@ ${h.response}`).join("\n");
     default: () => InputTextIsland
   });
   function InputTextIsland(container, props) {
-    injectIslandStyle("laughtale-inputtext", CSS43);
+    injectIslandStyle("laughtale-inputtext", CSS42);
     const [getValue, setValue] = useControllableState({
       defaultValue: props.value ?? "",
       onChange: (val) => {
@@ -29418,14 +29710,14 @@ ${h.response}`).join("\n");
     }
     init();
   }
-  var CSS43, xIcon;
+  var CSS42, xIcon;
   var init_input_text = __esm({
     "src/components/input-text.ts"() {
       "use strict";
       init_styles();
       init_lucide();
       init_useControllableState();
-      CSS43 = `
+      CSS42 = `
 .laughtale-inputtext-wrap,
 .p-inputtext-wrap {
     position: relative;
@@ -32259,6 +32551,10 @@ ${h.response}`).join("\n");
       defineIsland("scroll-top", () => Promise.resolve().then(() => (init_scroll_top(), scroll_top_exports)));
       defineIsland("inplace", () => Promise.resolve().then(() => (init_inplace(), inplace_exports)));
       defineIsland("command", () => Promise.resolve().then(() => (init_command(), command_exports)));
+      defineIsland("commandmenu", () => Promise.resolve().then(() => (init_command(), command_exports)));
+      defineIsland("command-menu", () => Promise.resolve().then(() => (init_command(), command_exports)));
+      defineIsland("command-palette", () => Promise.resolve().then(() => (init_command(), command_exports)));
+      defineIsland("commandpalette", () => Promise.resolve().then(() => (init_command(), command_exports)));
       defineIsland("theme-studio", () => Promise.resolve().then(() => (init_theme_studio(), theme_studio_exports)));
       defineIsland("dynamic-form", () => Promise.resolve().then(() => (init_dynamic_form(), dynamic_form_exports)));
       defineIsland("splitter", () => Promise.resolve().then(() => (init_splitter(), splitter_exports)));

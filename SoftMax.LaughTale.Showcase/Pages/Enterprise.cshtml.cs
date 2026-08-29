@@ -1259,6 +1259,230 @@ public class EnterpriseModel : PageModel
         new("Dell")
     };
 
+    public List<CommandMenuGroup> CommandMenuBasic { get; set; } = new()
+    {
+        new("Recents", new()
+        {
+            new("Check For Updates", Keywords: new() { "check", "updates" }),
+            new("Open Settings"),
+            new("Search Files"),
+            new("Open Terminal"),
+            new("View History", Keywords: new() { "history", "recent" }),
+            new("Open Chat")
+        }),
+        new("Files", new()
+        {
+            new("New File"),
+            new("New Folder"),
+            new("Save All"),
+            new("Change Theme"),
+            new("Run Task"),
+            new("Stop Task"),
+            new("Export Project"),
+            new("Import Project"),
+            new("Delete File"),
+            new("Duplicate File")
+        }),
+        new("Source", new()
+        {
+            new("Git: Commit"),
+            new("Git: Push"),
+            new("Git: Pull"),
+            new("Switch Account"),
+            new("Open Documentation"),
+            new("Git: Sync"),
+            new("Git: Create Branch"),
+            new("Git: Create Tag")
+        }),
+        new("Editor", new()
+        {
+            new("Align Left"),
+            new("Align Center"),
+            new("Align Right"),
+            new("Toggle Bold"),
+            new("Toggle Italic"),
+            new("Insert Link"),
+            new("Insert Image"),
+            new("Insert List")
+        })
+    };
+
+    public List<CommandMenuGroup> CommandMenuFilter { get; set; } = new()
+    {
+        new("Recents", new()
+        {
+            new("Check For Updates", Keywords: new() { "check", "updates" }),
+            new("Open Settings"),
+            new("Search Files"),
+            new("Open Terminal"),
+            new("View History", Keywords: new() { "history", "recent" }),
+            new("Open Chat")
+        }),
+        new("Files", new()
+        {
+            new("New File"),
+            new("New Folder"),
+            new("Save All"),
+            new("Change Theme"),
+            new("Run Task"),
+            new("Stop Task"),
+            new("Export Project"),
+            new("Import Project"),
+            new("Delete File"),
+            new("Duplicate File")
+        }),
+        new("Source", new()
+        {
+            new("Git: Commit"),
+            new("Git: Push"),
+            new("Git: Pull"),
+            new("Switch Account"),
+            new("Open Documentation"),
+            new("Git: Sync"),
+            new("Git: Create Branch"),
+            new("Git: Create Tag")
+        }),
+        new("Editor", new()
+        {
+            new("Align Left"),
+            new("Align Center"),
+            new("Align Right"),
+            new("Toggle Bold"),
+            new("Toggle Italic"),
+            new("Insert Link"),
+            new("Insert Image"),
+            new("Insert List")
+        }),
+        new("Navigation", new()
+        {
+            new("Go to Home"),
+            new("Go Back"),
+            new("Go Forward"),
+            new("Open Explorer"),
+            new("View Bookmarks"),
+            new("Open Minimap")
+        }),
+        new("View", new()
+        {
+            new("Toggle Preview"),
+            new("Maximize Window"),
+            new("Minimize Window"),
+            new("Grid View"),
+            new("List View"),
+            new("Light Mode"),
+            new("Dark Mode")
+        }),
+        new("Tools", new()
+        {
+            new("Open Calculator"),
+            new("Open Calendar"),
+            new("Open Timer"),
+            new("View Analytics"),
+            new("View Trends"),
+            new("Open Database")
+        })
+    };
+
+    public List<CommandMenuGroup> CommandMenuControlled { get; set; } = new()
+    {
+        new("Files", new()
+        {
+            new("New File"),
+            new("New Folder"),
+            new("Save All"),
+            new("Delete File")
+        }),
+        new("Source", new()
+        {
+            new("Git: Commit"),
+            new("Git: Push"),
+            new("Git: Pull"),
+            new("Git: Create Branch")
+        }),
+        new("Editor", new()
+        {
+            new("Toggle Bold"),
+            new("Toggle Italic")
+        })
+    };
+
+    public List<CommandMenuGroup> CommandMenuCustom { get; set; } = new()
+    {
+        new("Recents", new()
+        {
+            new("Check For Updates", Icon: "refreshCw", Category: "Command", Color: "background: linear-gradient(135deg, rgb(245,83,84), rgb(235,70,70))", Keywords: new() { "check", "updates" }),
+            new("Open Settings", Icon: "settings", Category: "Command", Color: "background: linear-gradient(135deg, rgb(96,165,250), rgb(59,130,246))"),
+            new("Search Files", Icon: "search", Category: "Command", Color: "background: linear-gradient(135deg, rgb(167,139,250), rgb(139,92,246))"),
+            new("Open Terminal", Icon: "terminal", Category: "View", Color: "background: linear-gradient(135deg, rgb(148,163,184), rgb(100,116,139))"),
+            new("View History", Icon: "history", Category: "View", Color: "background: linear-gradient(135deg, rgb(192,132,252), rgb(168,85,247))", Keywords: new() { "history", "recent" }),
+            new("Open Chat", Icon: "messageSquare", Category: "Communication", Color: "background: linear-gradient(135deg, rgb(34,211,238), rgb(6,182,212))")
+        }),
+        new("Files", new()
+        {
+            new("New File", Icon: "file", Category: "File", Color: "background: linear-gradient(135deg, rgb(52,211,153), rgb(16,185,129))"),
+            new("New Folder", Icon: "folder", Category: "File", Color: "background: linear-gradient(135deg, rgb(251,191,36), rgb(245,158,11))"),
+            new("Save All", Icon: "save", Category: "File", Color: "background: linear-gradient(135deg, rgb(34,197,94), rgb(22,163,74))"),
+            new("Change Theme", Icon: "palette", Category: "Appearance", Color: "background: linear-gradient(135deg, rgb(251,146,60), rgb(249,115,22))"),
+            new("Run Task", Icon: "play", Category: "Command", Color: "background: linear-gradient(135deg, rgb(34,197,94), rgb(21,128,61))"),
+            new("Stop Task", Icon: "square", Category: "Command", Color: "background: linear-gradient(135deg, rgb(239,68,68), rgb(220,38,38))"),
+            new("Export Project", Icon: "download", Category: "File", Color: "background: linear-gradient(135deg, rgb(147,51,234), rgb(126,34,206))"),
+            new("Import Project", Icon: "upload", Category: "File", Color: "background: linear-gradient(135deg, rgb(99,102,241), rgb(79,70,229))"),
+            new("Delete File", Icon: "trash2", Category: "File", Color: "background: linear-gradient(135deg, rgb(239,68,68), rgb(185,28,28))"),
+            new("Duplicate File", Icon: "copy", Category: "File", Color: "background: linear-gradient(135deg, rgb(156,163,175), rgb(107,114,128))")
+        }),
+        new("Source", new()
+        {
+            new("Git: Commit", Icon: "gitCommit", Category: "Source Control", Color: "background: linear-gradient(135deg, rgb(249,115,22), rgb(234,88,12))"),
+            new("Git: Push", Icon: "uploadCloud", Category: "Source Control", Color: "background: linear-gradient(135deg, rgb(14,165,233), rgb(2,132,199))"),
+            new("Git: Pull", Icon: "downloadCloud", Category: "Source Control", Color: "background: linear-gradient(135deg, rgb(59,130,246), rgb(37,99,235))"),
+            new("Switch Account", Icon: "users", Category: "Account", Color: "background: linear-gradient(135deg, rgb(236,72,153), rgb(219,39,119))"),
+            new("Open Documentation", Icon: "bookOpen", Category: "Help", Color: "background: linear-gradient(135deg, rgb(147,197,253), rgb(96,165,250))"),
+            new("Git: Sync", Icon: "refreshCw", Category: "Source Control", Color: "background: linear-gradient(135deg, rgb(74,222,128), rgb(34,197,94))"),
+            new("Git: Create Branch", Icon: "gitBranch", Category: "Source Control", Color: "background: linear-gradient(135deg, rgb(251,146,60), rgb(249,115,22))"),
+            new("Git: Create Tag", Icon: "tag", Category: "Source Control", Color: "background: linear-gradient(135deg, rgb(196,181,253), rgb(167,139,250))")
+        }),
+        new("Editor", new()
+        {
+            new("Align Left", Icon: "alignLeft", Category: "Editor", Color: "background: linear-gradient(135deg, rgb(147,197,253), rgb(59,130,246))"),
+            new("Align Center", Icon: "alignCenter", Category: "Editor", Color: "background: linear-gradient(135deg, rgb(147,197,253), rgb(59,130,246))"),
+            new("Align Right", Icon: "alignRight", Category: "Editor", Color: "background: linear-gradient(135deg, rgb(147,197,253), rgb(59,130,246))"),
+            new("Toggle Bold", Icon: "bold", Category: "Editor", Color: "background: linear-gradient(135deg, rgb(30,41,59), rgb(15,23,42))"),
+            new("Toggle Italic", Icon: "italic", Category: "Editor", Color: "background: linear-gradient(135deg, rgb(71,85,105), rgb(51,65,85))"),
+            new("Insert Link", Icon: "link", Category: "Editor", Color: "background: linear-gradient(135deg, rgb(59,130,246), rgb(37,99,235))"),
+            new("Insert Image", Icon: "image", Category: "Editor", Color: "background: linear-gradient(135deg, rgb(168,85,247), rgb(147,51,234))"),
+            new("Insert List", Icon: "list", Category: "Editor", Color: "background: linear-gradient(135deg, rgb(34,197,94), rgb(22,163,74))")
+        }),
+        new("Navigation", new()
+        {
+            new("Go to Home", Icon: "home", Category: "Navigation", Color: "background: linear-gradient(135deg, rgb(96,165,250), rgb(59,130,246))"),
+            new("Go Back", Icon: "arrowLeft", Category: "Navigation", Color: "background: linear-gradient(135deg, rgb(148,163,184), rgb(100,116,139))"),
+            new("Go Forward", Icon: "arrowRight", Category: "Navigation", Color: "background: linear-gradient(135deg, rgb(148,163,184), rgb(100,116,139))"),
+            new("Open Explorer", Icon: "compass", Category: "Navigation", Color: "background: linear-gradient(135deg, rgb(251,191,36), rgb(245,158,11))"),
+            new("View Bookmarks", Icon: "bookmark", Category: "Navigation", Color: "background: linear-gradient(135deg, rgb(249,115,22), rgb(234,88,12))"),
+            new("Open Minimap", Icon: "map", Category: "Navigation", Color: "background: linear-gradient(135deg, rgb(52,211,153), rgb(16,185,129))")
+        }),
+        new("View", new()
+        {
+            new("Toggle Preview", Icon: "eye", Category: "View", Color: "background: linear-gradient(135deg, rgb(147,51,234), rgb(126,34,206))"),
+            new("Maximize Window", Icon: "maximize2", Category: "View", Color: "background: linear-gradient(135deg, rgb(100,116,139), rgb(71,85,105))"),
+            new("Minimize Window", Icon: "minimize2", Category: "View", Color: "background: linear-gradient(135deg, rgb(148,163,184), rgb(100,116,139))"),
+            new("Grid View", Icon: "grid", Category: "View", Color: "background: linear-gradient(135deg, rgb(34,197,94), rgb(22,163,74))"),
+            new("List View", Icon: "list", Category: "View", Color: "background: linear-gradient(135deg, rgb(59,130,246), rgb(37,99,235))"),
+            new("Light Mode", Icon: "sun", Category: "View", Color: "background: linear-gradient(135deg, rgb(253,224,71), rgb(250,204,21))"),
+            new("Dark Mode", Icon: "moon", Category: "View", Color: "background: linear-gradient(135deg, rgb(30,41,59), rgb(15,23,42))")
+        }),
+        new("Tools", new()
+        {
+            new("Open Calculator", Icon: "calculator", Category: "Tools", Color: "background: linear-gradient(135deg, rgb(148,163,184), rgb(100,116,139))"),
+            new("Open Calendar", Icon: "calendar", Category: "Tools", Color: "background: linear-gradient(135deg, rgb(96,165,250), rgb(59,130,246))"),
+            new("Open Timer", Icon: "clock", Category: "Tools", Color: "background: linear-gradient(135deg, rgb(251,146,60), rgb(249,115,22))"),
+            new("View Analytics", Icon: "barChart3", Category: "Tools", Color: "background: linear-gradient(135deg, rgb(34,197,94), rgb(22,163,74))"),
+            new("View Trends", Icon: "trendingUp", Category: "Tools", Color: "background: linear-gradient(135deg, rgb(59,130,246), rgb(37,99,235))"),
+            new("Open Database", Icon: "database", Category: "Tools", Color: "background: linear-gradient(135deg, rgb(168,85,247), rgb(147,51,234))")
+        })
+    };
+
+
     public List<MenuItem> HeaderMenuItems { get; set; } = new()
     {
         new("Overview", "home", false, false, "#overview"),

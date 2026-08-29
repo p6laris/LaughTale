@@ -250,6 +250,23 @@ public record CommandPaletteItem(
     bool Disabled = false
 );
 
+public record CommandMenuItem(
+    string Label,
+    string? Icon = null,
+    string? Category = null,
+    string? Color = null,
+    List<string>? Keywords = null,
+    string? Shortcut = null,
+    string? Url = null,
+    string? Action = null,
+    bool Disabled = false
+);
+
+public record CommandMenuGroup(
+    string Label,
+    List<CommandMenuItem> Items
+);
+
 public record ThemeStudioPreset(
     string Id,
     string Name,

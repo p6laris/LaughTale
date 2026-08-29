@@ -5651,17 +5651,69 @@
         </div>
     </section>
 
-    <!-- Command Palette -->
+    <!-- Command Palette / CommandMenu -->
     <section id="sec-command-palette" class="component-card">
         <div class="card-header">
             <div>
-                <h2>Command Palette (Ctrl+K)</h2>
-                <p>Spotlight modal search for rapid command execution and keyboard navigation.</p>
+                <h2>CommandMenu</h2>
+                <p>CommandMenu is a search-driven command palette component with hierarchical grouping, fuzzy scoring, hotkeys, and modal Dialog support.</p>
             </div>
-            <span class="aura-tag tag-amber">Ctrl+K</span>
+            <span class="aura-tag tag-emerald">Navigation</span>
         </div>
-        <div class="card-body" style="max-width: 500px;">
-            <island-command-palette />
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Hero / Preview Demo -->
+            <div data-commandmenu-demo="preview" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Interactive Command Palette</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Search-driven menu with hierarchical sections, arrow-key navigation, and hotkey hints.</p>
+                <div style="display: flex; justify-content: center; align-items: center;">
+                    <p-commandmenu model="@Model.CommandMenuBasic" placeholder="Search for commands..." />
+                </div>
+            </div>
+
+            <!-- Demo 1: Basic -->
+            <div data-commandmenu-demo="basic" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">CommandMenu accepts Menu-style items via the model prop. Leaf items support an optional keywords field for the default scorer and groups are expressed as items with nested items.</p>
+                <div style="display: flex; justify-content: center; align-items: center;">
+                    <p-commandmenu model="@Model.CommandMenuBasic" placeholder="Search for commands..." />
+                </div>
+            </div>
+
+            <!-- Demo 2: Filter -->
+            <div data-commandmenu-demo="filter" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Filter</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">A custom filter function can be provided with the filter property. It receives the raw item and the current search term, and should return a positive score (higher = better rank), or 0 to drop the item.</p>
+                <div style="display: flex; justify-content: center; align-items: center;">
+                    <p-commandmenu model="@Model.CommandMenuFilter" filter="fuzzy" placeholder="Search for commands..." />
+                </div>
+            </div>
+
+            <!-- Demo 3: Controlled -->
+            <div data-commandmenu-demo="controlled" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Controlled</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">The search query is exposed via v-model:search. Bind it to external state to read, reset, or prefill the query — the filtered list updates in both directions.</p>
+                <div style="display: flex; justify-content: center; align-items: center;">
+                    <p-commandmenu model="@Model.CommandMenuControlled" placeholder="Search for commands..." />
+                </div>
+            </div>
+
+            <!-- Demo 4: With Dialog -->
+            <div data-commandmenu-demo="dialog" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">With Dialog</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">CommandMenu can be used inside a Dialog to create a command palette experience. Press Ctrl+L (or Cmd+L on Mac) to open.</p>
+                <div style="display: flex; justify-content: center; align-items: center;">
+                    <p-commandmenu model="@Model.CommandMenuFilter" with-dialog="true" hotkey="ctrl+l, meta+l" placeholder="Search for commands..." />
+                </div>
+            </div>
+
+            <!-- Demo 5: Custom Item & Submenu Templates -->
+            <div data-commandmenu-demo="custom" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Custom</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">The item and submenulabel slots are forwarded to the underlying Menu. Use them to render a custom icon, a category label, or any other per-item UI.</p>
+                <div style="display: flex; justify-content: center; align-items: center;">
+                    <p-commandmenu model="@Model.CommandMenuCustom" custom-template="true" placeholder="Search for commands..." />
+                </div>
+            </div>
         </div>
     </section>
 

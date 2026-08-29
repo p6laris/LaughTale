@@ -2288,28 +2288,98 @@ public class IslandInplaceTagHelper : TagHelper
 }
 
 /// <summary>
-/// TagHelper for <island-command /> (Spotlight Ctrl+K Command Palette)
+/// TagHelper for <island-commandmenu />, <p-commandmenu />, and <island-command />
+/// PrimeVue 4 Aura Design System compliant search-driven CommandMenu component.
 /// </summary>
+[HtmlTargetElement("island-commandmenu")]
+[HtmlTargetElement("island-command-menu")]
+[HtmlTargetElement("p-commandmenu")]
 [HtmlTargetElement("island-command")]
+[HtmlTargetElement("island-command-palette")]
 public class IslandCommandTagHelper : TagHelper
 {
-    public string? Placeholder { get; set; } = "Type a command or search...";
+    [HtmlAttributeName("model")]
+    public List<CommandMenuGroup>? Model { get; set; }
+
+    [HtmlAttributeName("items")]
     public List<CommandPaletteItem>? Items { get; set; }
+
+    [HtmlAttributeName("placeholder")]
+    public string? Placeholder { get; set; } = "Search for commands...";
+
+    [HtmlAttributeName("search")]
+    public string? Search { get; set; }
+
+    [HtmlAttributeName("filter")]
+    public string? Filter { get; set; } = "default";
+
+    [HtmlAttributeName("with-dialog")]
+    public bool WithDialog { get; set; } = false;
+
+    [HtmlAttributeName("hotkey")]
+    public string? Hotkey { get; set; } = "ctrl+l, meta+l";
+
+    [HtmlAttributeName("custom-template")]
+    public bool CustomTemplate { get; set; } = false;
+
+    [HtmlAttributeName("empty-message")]
+    public string? EmptyMessage { get; set; }
+
+    [HtmlAttributeName("class")]
+    public string? Class { get; set; }
+
+    [HtmlAttributeName("style")]
+    public string? Style { get; set; }
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
         output.TagName = "div";
         output.TagMode = TagMode.StartTagAndEndTag;
-        output.Attributes.SetAttribute("data-island", "command");
+        output.Attributes.SetAttribute("data-island", "commandmenu");
         output.Attributes.SetAttribute("data-hydrate", "load");
+
+        // Convert flat legacy items if model not provided
+        var groups = Model;
+        if (groups == null && Items != null && Items.Count > 0)
+        {
+            var dict = new Dictionary<string, List<CommandMenuItem>>();
+            foreach (var it in Items)
+            {
+                var g = it.Group ?? "General";
+                if (!dict.ContainsKey(g)) dict[g] = new();
+                dict[g].Add(new CommandMenuItem(it.Label, it.Icon, null, null, null, it.Shortcut, it.Url, it.Action, it.Disabled));
+            }
+
+            groups = new();
+            foreach (var kv in dict)
+            {
+                groups.Add(new CommandMenuGroup(kv.Key, kv.Value));
+            }
+        }
 
         var props = new
         {
+            model = groups ?? new(),
             placeholder = Placeholder,
-            items = Items ?? new()
+            search = Search,
+            filter = Filter,
+            withDialog = WithDialog,
+            hotkey = Hotkey,
+            customTemplate = CustomTemplate,
+            emptyMessage = EmptyMessage
         };
 
-        output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
+
+        if (!string.IsNullOrWhiteSpace(Class))
+        {
+            output.Attributes.SetAttribute("class", Class);
+        }
+
+        if (!string.IsNullOrWhiteSpace(Style))
+        {
+            output.Attributes.SetAttribute("style", Style);
+        }
     }
 }
 
