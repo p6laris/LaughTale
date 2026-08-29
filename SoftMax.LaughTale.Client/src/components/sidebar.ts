@@ -7,7 +7,7 @@
  * 4. Responsive (Mobile offcanvas overlay vs Desktop icon collapsible)
  * 5. Dual Sidebar (Left Navigation + Right Claude-style AI Chat Panel)
  * 6. Nested Menu (Deep multi-level file hierarchy with CSS grid smooth expansion)
- * 7. Chat Application (ChatGPT-style history with pinned shortcuts, conversation groups, hover trash, and realistic conversation UI)
+ * 7. Chat Application (ChatGPT-style history with pinned shortcuts, clean conversation groups, hover trash, and realistic conversation UI)
  */
 
 import { SidebarItem } from '../types/models';
@@ -640,12 +640,24 @@ const SIDEBAR_CSS = `
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 0.5rem 0.65rem;
+    padding: 0.35rem 0.5rem;
     display: flex;
     flex-direction: column;
-    gap: 0.85rem;
+    gap: 0.75rem;
     box-sizing: border-box;
     scrollbar-width: thin;
+    scrollbar-color: var(--p-surface-300) transparent;
+}
+
+.p-sidebar-content::-webkit-scrollbar {
+    width: 4px;
+}
+.p-sidebar-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+.p-sidebar-content::-webkit-scrollbar-thumb {
+    background: var(--p-surface-300);
+    border-radius: 4px;
 }
 
 .p-sidebar-footer {
@@ -660,14 +672,14 @@ const SIDEBAR_CSS = `
 .p-sidebar-group {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 0.2rem;
 }
 
 .p-sidebar-group-label {
-    font-size: 0.75rem;
+    font-size: 0.725rem;
     font-weight: 700;
     color: var(--p-sidebar-group-label-color, var(--p-surface-400, #94a3b8));
-    padding: 0.35rem 0.5rem;
+    padding: 0.25rem 0.5rem 0.15rem;
     user-select: none;
     letter-spacing: 0.02em;
 }
@@ -686,6 +698,7 @@ const SIDEBAR_CSS = `
     margin: 0;
     padding: 0;
     position: relative;
+    width: 100%;
 }
 
 .p-sidebar-menu-button {
@@ -700,13 +713,14 @@ const SIDEBAR_CSS = `
     background: transparent;
     border: none;
     cursor: pointer;
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     font-weight: 500;
     transition: background-color 0.12s ease, color 0.12s ease, transform 0.12s ease;
     box-sizing: border-box;
     text-align: left;
     outline: none;
     position: relative;
+    overflow: hidden;
 }
 
 .p-sidebar-menu-button:hover,
@@ -716,7 +730,7 @@ const SIDEBAR_CSS = `
 
 .p-sidebar-menu-button.p-active {
     background: var(--p-surface-100, #f1f5f9);
-    color: var(--p-primary-600, #2563eb);
+    color: #059669;
     font-weight: 600;
 }
 
@@ -732,7 +746,15 @@ const SIDEBAR_CSS = `
 }
 
 .p-sidebar-menu-button.p-active .p-sidebar-menu-button-icon {
-    color: var(--p-primary-600, #2563eb);
+    color: #059669;
+}
+
+.p-sidebar-item-label {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .p-sidebar-menu-badge {
@@ -743,6 +765,7 @@ const SIDEBAR_CSS = `
     border-radius: 9999px;
     background: var(--p-surface-200, #e2e8f0);
     color: var(--p-surface-700, #334155);
+    flex-shrink: 0;
 }
 
 .p-sidebar-submenu-chevron {
@@ -752,6 +775,7 @@ const SIDEBAR_CSS = `
     justify-content: center;
     color: var(--p-surface-400, #94a3b8);
     transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1);
+    flex-shrink: 0;
 }
 
 .p-sidebar-submenu-chevron.p-expanded {
@@ -760,7 +784,7 @@ const SIDEBAR_CSS = `
 
 .p-sidebar-menu-action {
     position: absolute;
-    right: 0.5rem;
+    right: 0.35rem;
     top: 50%;
     transform: translateY(-50%);
     display: none;
@@ -769,11 +793,12 @@ const SIDEBAR_CSS = `
     width: 1.5rem;
     height: 1.5rem;
     border-radius: 4px;
-    color: var(--p-surface-400, #94a3b8);
+    color: var(--p-surface-500, #64748b);
     cursor: pointer;
-    background: transparent;
+    background: var(--p-surface-200, #e2e8f0);
     border: none;
     transition: background-color 0.12s ease, color 0.12s ease, transform 0.12s ease;
+    z-index: 10;
 }
 
 .p-sidebar-menu-item:hover .p-sidebar-menu-action {
@@ -781,9 +806,9 @@ const SIDEBAR_CSS = `
 }
 
 .p-sidebar-menu-action:hover {
-    background: var(--p-surface-200, #e2e8f0);
-    color: #ef4444;
-    transform: translateY(-50%) scale(1.1);
+    background: #fee2e2;
+    color: #dc2626;
+    transform: translateY(-50%) scale(1.08);
 }
 
 /* Fluid CSS Grid Submenu Expand/Collapse Animation */
@@ -1200,14 +1225,26 @@ const SIDEBAR_CSS = `
 
 .dark .p-sidebar-menu-button.p-active,
 [data-theme="dark"] .p-sidebar-menu-button.p-active {
-    background: var(--p-surface-800, #1e293b);
-    color: #60a5fa;
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
 }
 
 .dark .p-sidebar-menu-badge,
 [data-theme="dark"] .p-sidebar-menu-badge {
     background: var(--p-surface-800, #1e293b);
     color: var(--p-surface-300, #cbd5e1);
+}
+
+.dark .p-sidebar-menu-action,
+[data-theme="dark"] .p-sidebar-menu-action {
+    background: var(--p-surface-800, #1e293b);
+    color: var(--p-surface-400, #94a3b8);
+}
+
+.dark .p-sidebar-menu-action:hover,
+[data-theme="dark"] .p-sidebar-menu-action:hover {
+    background: rgba(239, 68, 68, 0.2);
+    color: #f87171;
 }
 
 .dark .p-sidebar-menu-sub,
@@ -1538,7 +1575,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
     let openOnHover = props.openOnHover || (props as any).OpenOnHover || false;
     let backdrop = props.backdrop || (props as any).Backdrop || false;
     let isOpen = props.open !== undefined ? props.open : ((props as any).Open !== undefined ? (props as any).Open : true);
-    let width = props.width || (props as any).Width || (demoType === 'chat' ? '16.5rem' : '16rem');
+    let width = props.width || (props as any).Width || (demoType === 'chat' ? '18rem' : '16rem');
 
     let isAiOpen = true;
     let openSelectDropdown: 'variant' | 'collapsible' | null = null;
@@ -1614,11 +1651,8 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                 const isSubExpanded = !!expandedSubmenus[subKey];
                 const hasSubs = Array.isArray(it.subItems) && it.subItems.length > 0;
                 
-                // Icon handling: in chat demo, show message-square icon if collapsed, or plain
-                let iconSvg = getIconSvg(it.icon);
-                if (demoType === 'chat' && !iconSvg) {
-                    iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>`;
-                }
+                // Icon handling: in chat demo, do NOT show icons on chat history items
+                const iconSvg = demoType === 'chat' ? '' : getIconSvg(it.icon);
 
                 let subTreeHtml = '';
                 if (hasSubs) {
@@ -1638,7 +1672,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
 
                 const chevronSvg = `<svg class="p-sidebar-submenu-chevron ${isSubExpanded ? 'p-expanded' : ''}" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
                 const ellipsisSvg = `<svg class="p-sidebar-menu-action" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>`;
-                const trashSvg = `<button type="button" class="p-sidebar-menu-action" title="Delete chat" style="border:none;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>`;
+                const trashSvg = `<button type="button" class="p-sidebar-menu-action" title="Delete conversation" style="border:none;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>`;
 
                 const actionButton = demoType === 'chat' ? trashSvg : (it.badge === undefined ? ellipsisSvg : '');
 
@@ -2019,47 +2053,6 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
         `;
     }
 
-    function renderAiRightPanel(): string {
-        if (demoType !== 'dual') return '';
-
-        const aiWidth = isAiOpen ? '18rem' : '0rem';
-
-        return `
-            <aside class="p-sidebar p-sidebar-collapsible-offcanvas p-sidebar-side-right ${!isAiOpen ? 'p-sidebar-collapsed' : ''}" style="width: ${aiWidth}; border-left: 1px solid var(--p-border-color);" data-ai-sidebar-root>
-                <div class="p-sidebar-aside">
-                    <div class="p-sidebar-panel">
-                        <div class="p-sidebar-header">
-                            <span style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-500);">Weekly metrics overview</span>
-                        </div>
-                        <div class="p-sidebar-content">
-                            <div class="p-sb-chat-panel">
-                                <div class="p-sb-chat-bubble">Show me this week's metrics</div>
-                                <div class="p-sb-chat-metrics">
-                                    <p style="margin: 0; font-weight: 600; color: var(--p-text-color);">Here are your key metrics for this week:</p>
-                                    <div class="p-sb-chat-metrics-row">
-                                        <span>Page views</span>
-                                        <span class="p-sb-chat-metrics-val">12,482</span>
-                                    </div>
-                                    <div class="p-sb-chat-metrics-row">
-                                        <span>New users</span>
-                                        <span class="p-sb-chat-metrics-val">342</span>
-                                    </div>
-                                    <div class="p-sb-chat-metrics-row">
-                                        <span>Bounce rate</span>
-                                        <span class="p-sb-chat-metrics-val">34%</span>
-                                    </div>
-                                </div>
-                                <div class="p-sb-chat-input-box">
-                                    <input type="text" class="p-sb-chat-input" placeholder="Reply to Claude..." />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </aside>
-        `;
-    }
-
     function updateSidebarClasses() {
         const aside = container.querySelector<HTMLElement>('[data-sidebar-root]');
         if (!aside) return;
@@ -2113,15 +2106,9 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
         `;
 
         const mainHtml = renderMainContent();
-        const aiRightPanelHtml = renderAiRightPanel();
         const backdropHtml = `<div class="p-sidebar-backdrop" data-sidebar-backdrop style="display: ${backdrop && isOpen ? 'block' : 'none'};"></div>`;
         
-        let innerContent = '';
-        if (demoType === 'dual') {
-            innerContent = sidebarHtml + mainHtml + aiRightPanelHtml;
-        } else {
-            innerContent = side === 'right' ? (mainHtml + sidebarHtml) : (sidebarHtml + mainHtml);
-        }
+        const innerContent = side === 'right' ? (mainHtml + sidebarHtml) : (sidebarHtml + mainHtml);
 
         const layoutHtml = `
             <div class="p-sidebar-layout">
@@ -2149,19 +2136,6 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                 e.stopPropagation();
                 isOpen = !isOpen;
                 updateSidebarClasses();
-            });
-        });
-
-        // AI Chat Trigger Button
-        container.querySelectorAll('[data-ai-toggle]').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                isAiOpen = !isAiOpen;
-                const aiAside = container.querySelector<HTMLElement>('[data-ai-sidebar-root]');
-                if (aiAside) {
-                    aiAside.classList.toggle('p-sidebar-collapsed', !isAiOpen);
-                    aiAside.style.width = isAiOpen ? '18rem' : '0rem';
-                }
             });
         });
 
