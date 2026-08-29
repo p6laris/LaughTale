@@ -94,7 +94,7 @@ public static class NavigationData
                 new("Tooltip", "info", "/enterprise#sec-tooltip", false, null, "New"),
                 new("ConfirmDialog", "alertTriangle", "/enterprise#sec-confirm-dialog", false, null, "New"),
                 new("ConfirmPopup", "alertTriangle", "/enterprise#sec-confirm-popup"),
-                new("Toast Container", "bell", "/enterprise#sec-toast"),
+                new("Toast", "bell", "/enterprise#sec-toast", false, null, "New"),
                 new("BlockUI Locker", "lock", "/enterprise#sec-blockui")
             }),
             new("Feedback & Status (8)", "activity", null, false, new List<SidebarItem>

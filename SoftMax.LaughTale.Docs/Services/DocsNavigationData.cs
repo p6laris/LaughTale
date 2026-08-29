@@ -64,7 +64,8 @@ public static class DocsNavigationData
                 new("Offcanvas Drawer", "sidebar", "/doc/26-drawer", currentPath.Contains("26-drawer")),
                 new("SpeedDial FAB", "plus", "/doc/27-speed-dial", currentPath.Contains("27-speed-dial")),
                 new("ConfirmPopup", "alertTriangle", "/doc/28-confirm-popup", currentPath.Contains("28-confirm-popup")),
-                new("Modal & Toast", "messageSquare", "/doc/29-modal-toast", currentPath.Contains("29-modal-toast"))
+                new("Modal Dialog", "messageSquare", "/doc/29-modal-toast", currentPath.Contains("29-modal-toast")),
+                new("Toast Overlays", "bell", "/doc/45-toast", currentPath.Contains("45-toast"))
             }),
 
             new SidebarItem("Metrics & Visual Media", "barChart3", null, true, new List<SidebarItem>

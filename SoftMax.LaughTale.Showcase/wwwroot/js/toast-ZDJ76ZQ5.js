@@ -1,43 +1,12 @@
-/**
- * SoftMax.LaughTale: Enterprise Toast Component (PrimeVue 4 Aura Design System)
- * High-performance notification overlay engine supporting 7 viewport positions,
- * stacked card deck & expanded display modes, hover-pause timers, semantic severities,
- * promise/async flows, custom templates, action buttons, and full WAI-ARIA alert accessibility.
- */
+import {
+  LucideIcons
+} from "./chunk-XHF3KYSF.js";
+import {
+  injectIslandStyle
+} from "./chunk-3TFPN5JM.js";
 
-import { LucideIcons } from '../icons/lucide';
-import { injectIslandStyle } from '../runtime/styles';
-
-export interface ToastMessageOptions {
-    id?: string;
-    severity?: 'success' | 'info' | 'warn' | 'error' | 'secondary' | 'contrast';
-    summary?: string;
-    detail?: string;
-    life?: number;
-    sticky?: boolean;
-    group?: string;
-    icon?: string;
-    spin?: boolean;
-    closable?: boolean;
-    styleClass?: string;
-    contentHtml?: string;
-    actionLabel?: string;
-    onAction?: () => void;
-}
-
-export interface ToastContainerProps {
-    group?: string;
-    position?: 'top-right' | 'top-left' | 'top-center' | 'bottom-right' | 'bottom-left' | 'bottom-center' | 'center';
-    mode?: 'stacked' | 'expanded';
-    limit?: number;
-    gap?: number;
-    autoZIndex?: boolean;
-    baseZIndex?: number;
-    class?: string;
-    style?: string;
-}
-
-const TOAST_CSS = `
+// ../SoftMax.LaughTale.Client/src/components/toast.ts
+var TOAST_CSS = `
 /* ==========================================================================
    PrimeVue 4 Aura Toast Component Tokens & Positioning
    ========================================================================== */
@@ -419,266 +388,234 @@ const TOAST_CSS = `
     background: rgba(255, 255, 255, 0.12);
 }
 `;
-
-const CLOSE_SVG = `<svg class="p-toast-close-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
-
-export class ToastService {
-    private registeredContainers: Map<string, HTMLElement> = new Map();
-    private activeMessages: Map<string, { el: HTMLElement; timeoutId?: any; remainingLife: number; startTime: number }> = new Map();
-
-    constructor() {
-        if (typeof window !== 'undefined') {
-            this.initGlobalListeners();
-        }
+var CLOSE_SVG = `<svg class="p-toast-close-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
+var ToastService = class {
+  registeredContainers = /* @__PURE__ */ new Map();
+  activeMessages = /* @__PURE__ */ new Map();
+  constructor() {
+    if (typeof window !== "undefined") {
+      this.initGlobalListeners();
     }
-
-    private initGlobalListeners() {
-        document.addEventListener('toast:show', (e: Event) => {
-            const detail = (e as CustomEvent).detail;
-            if (detail) this.add(detail);
-        });
-
-        document.addEventListener('toast:clear', (e: Event) => {
-            const detail = (e as CustomEvent).detail;
-            if (detail?.group) {
-                this.removeGroup(detail.group);
-            } else {
-                this.removeAllGroups();
-            }
-        });
+  }
+  initGlobalListeners() {
+    document.addEventListener("toast:show", (e) => {
+      const detail = e.detail;
+      if (detail) this.add(detail);
+    });
+    document.addEventListener("toast:clear", (e) => {
+      const detail = e.detail;
+      if (detail?.group) {
+        this.removeGroup(detail.group);
+      } else {
+        this.removeAllGroups();
+      }
+    });
+  }
+  registerContainer(group, containerEl) {
+    this.registeredContainers.set(group || "default", containerEl);
+  }
+  unregisterContainer(group) {
+    this.registeredContainers.delete(group || "default");
+  }
+  getContainerForGroup(group, position) {
+    const targetGroup = group || "default";
+    let container = this.registeredContainers.get(targetGroup);
+    if (!container || !document.body.contains(container)) {
+      injectIslandStyle("toast", TOAST_CSS);
+      const pos = position || (targetGroup.startsWith("top-") || targetGroup.startsWith("bottom-") || targetGroup === "center" ? targetGroup : "top-right");
+      container = document.createElement("div");
+      container.id = `aura-toast-container-${targetGroup}`;
+      container.className = `p-toast p-toast-${pos} p-toast-mode-stacked`;
+      document.body.appendChild(container);
+      this.registeredContainers.set(targetGroup, container);
     }
-
-    public registerContainer(group: string, containerEl: HTMLElement) {
-        this.registeredContainers.set(group || 'default', containerEl);
+    return container;
+  }
+  add(msg) {
+    const id = msg.id || `toast_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const group = msg.group || "default";
+    const container = this.getContainerForGroup(group);
+    const severity = msg.severity || "info";
+    const sticky = msg.sticky === true;
+    const life = sticky ? 0 : msg.life !== void 0 ? msg.life : 3e3;
+    let iconSvg = "";
+    if (msg.spin) {
+      iconSvg = `<span class="p-toast-spin">${LucideIcons.loader2 || '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>'}</span>`;
+    } else if (msg.icon && LucideIcons[msg.icon]) {
+      iconSvg = LucideIcons[msg.icon];
+    } else {
+      switch (severity) {
+        case "success":
+          iconSvg = LucideIcons.check || '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>';
+          break;
+        case "warn":
+          iconSvg = LucideIcons.receipt || LucideIcons.alertTriangle || '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/></svg>';
+          break;
+        case "error":
+          iconSvg = LucideIcons.alertTriangle || LucideIcons.xCircle || '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
+          break;
+        case "secondary":
+          iconSvg = `<span class="p-toast-spin">${LucideIcons.loader2 || '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>'}</span>`;
+          break;
+        case "contrast":
+          iconSvg = LucideIcons.wifi || LucideIcons.sparkles || '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h.01"/><path d="M2 8.82a15 15 0 0 1 20 0"/></svg>';
+          break;
+        case "info":
+        default:
+          iconSvg = LucideIcons.sparkles || LucideIcons.info || '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>';
+          break;
+      }
     }
-
-    public unregisterContainer(group: string) {
-        this.registeredContainers.delete(group || 'default');
-    }
-
-    private getContainerForGroup(group?: string, position?: string): HTMLElement {
-        const targetGroup = group || 'default';
-        let container = this.registeredContainers.get(targetGroup);
-
-        if (!container || !document.body.contains(container)) {
-            injectIslandStyle('toast', TOAST_CSS);
-            const pos = position || (targetGroup.startsWith('top-') || targetGroup.startsWith('bottom-') || targetGroup === 'center' ? targetGroup : 'top-right');
-            container = document.createElement('div');
-            container.id = `aura-toast-container-${targetGroup}`;
-            container.className = `p-toast p-toast-${pos} p-toast-mode-stacked`;
-            document.body.appendChild(container);
-            this.registeredContainers.set(targetGroup, container);
-        }
-
-        return container;
-    }
-
-    public add(msg: ToastMessageOptions): string {
-        const id = msg.id || `toast_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-        const group = msg.group || 'default';
-        const container = this.getContainerForGroup(group);
-
-        const severity = msg.severity || 'info';
-        const sticky = msg.sticky === true;
-        const life = sticky ? 0 : (msg.life !== undefined ? msg.life : 3000);
-
-        let iconSvg = '';
-        if (msg.spin) {
-            iconSvg = `<span class="p-toast-spin">${LucideIcons.loader2 || '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>'}</span>`;
-        } else if (msg.icon && (LucideIcons as any)[msg.icon]) {
-            iconSvg = (LucideIcons as any)[msg.icon];
-        } else {
-            switch (severity) {
-                case 'success':
-                    iconSvg = LucideIcons.check || '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>';
-                    break;
-                case 'warn':
-                    iconSvg = LucideIcons.receipt || LucideIcons.alertTriangle || '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/></svg>';
-                    break;
-                case 'error':
-                    iconSvg = LucideIcons.alertTriangle || LucideIcons.xCircle || '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
-                    break;
-                case 'secondary':
-                    iconSvg = `<span class="p-toast-spin">${LucideIcons.loader2 || '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>'}</span>`;
-                    break;
-                case 'contrast':
-                    iconSvg = LucideIcons.wifi || LucideIcons.sparkles || '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h.01"/><path d="M2 8.82a15 15 0 0 1 20 0"/></svg>';
-                    break;
-                case 'info':
-                default:
-                    iconSvg = LucideIcons.sparkles || LucideIcons.info || '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>';
-                    break;
-            }
-        }
-
-        const toastEl = document.createElement('div');
-        toastEl.className = `p-toast-message p-toast-message-${severity} ${msg.styleClass || ''}`;
-        toastEl.setAttribute('role', 'alert');
-        toastEl.setAttribute('aria-live', 'assertive');
-        toastEl.setAttribute('aria-atomic', 'true');
-        toastEl.setAttribute('data-toast-id', id);
-        toastEl.setAttribute('data-toast-group', group);
-
-        if (msg.contentHtml) {
-            toastEl.innerHTML = `
+    const toastEl = document.createElement("div");
+    toastEl.className = `p-toast-message p-toast-message-${severity} ${msg.styleClass || ""}`;
+    toastEl.setAttribute("role", "alert");
+    toastEl.setAttribute("aria-live", "assertive");
+    toastEl.setAttribute("aria-atomic", "true");
+    toastEl.setAttribute("data-toast-id", id);
+    toastEl.setAttribute("data-toast-group", group);
+    if (msg.contentHtml) {
+      toastEl.innerHTML = `
                 <div class="p-toast-message-content">
                     <div style="width: 100%;">${msg.contentHtml}</div>
                     ${msg.closable !== false ? `
                         <button type="button" class="p-toast-close-button" aria-label="Close" title="Close" data-toast-close>
                             ${CLOSE_SVG}
                         </button>
-                    ` : ''}
+                    ` : ""}
                 </div>
             `;
-        } else {
-            toastEl.innerHTML = `
+    } else {
+      toastEl.innerHTML = `
                 <div class="p-toast-message-content">
                     <div class="p-toast-message-icon">${iconSvg}</div>
                     <div class="p-toast-message-text">
-                        ${msg.summary ? `<div class="p-toast-summary">${msg.summary}</div>` : ''}
-                        ${msg.detail ? `<div class="p-toast-detail">${msg.detail}</div>` : ''}
+                        ${msg.summary ? `<div class="p-toast-summary">${msg.summary}</div>` : ""}
+                        ${msg.detail ? `<div class="p-toast-detail">${msg.detail}</div>` : ""}
                         ${msg.actionLabel ? `
                             <button type="button" class="p-button p-button-sm p-button-primary" style="margin-top: 0.5rem; align-self: flex-start; padding: 0.25rem 0.65rem; font-size: 0.775rem;" data-toast-action-btn>
                                 ${msg.actionLabel}
                             </button>
-                        ` : ''}
+                        ` : ""}
                     </div>
                     ${msg.closable !== false ? `
                         <button type="button" class="p-toast-close-button" aria-label="Close" title="Close" data-toast-close>
                             ${CLOSE_SVG}
                         </button>
-                    ` : ''}
+                    ` : ""}
                 </div>
             `;
-        }
-
-        const closeBtn = toastEl.querySelector('[data-toast-close]');
-        if (closeBtn) {
-            closeBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                this.removeById(id);
-            });
-            closeBtn.addEventListener('keydown', (e: any) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    this.removeById(id);
-                }
-            });
-        }
-
-        const actionBtn = toastEl.querySelector('[data-toast-action-btn]');
-        if (actionBtn && msg.onAction) {
-            actionBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                msg.onAction!();
-            });
-        }
-
-        // Timer Pause on Hover
-        let timerInfo = {
-            el: toastEl,
-            timeoutId: undefined as any,
-            remainingLife: life,
-            startTime: Date.now()
-        };
-
-        const startTimer = (duration: number) => {
-            if (duration <= 0) return;
-            timerInfo.startTime = Date.now();
-            timerInfo.remainingLife = duration;
-            timerInfo.timeoutId = setTimeout(() => {
-                this.removeById(id);
-            }, duration);
-        };
-
-        const pauseTimer = () => {
-            if (timerInfo.timeoutId) {
-                clearTimeout(timerInfo.timeoutId);
-                timerInfo.timeoutId = undefined;
-                const elapsed = Date.now() - timerInfo.startTime;
-                timerInfo.remainingLife = Math.max(0, timerInfo.remainingLife - elapsed);
-            }
-        };
-
-        const resumeTimer = () => {
-            if (timerInfo.remainingLife > 0 && !timerInfo.timeoutId) {
-                startTimer(timerInfo.remainingLife);
-            }
-        };
-
-        toastEl.addEventListener('mouseenter', pauseTimer);
-        toastEl.addEventListener('mouseleave', resumeTimer);
-
-        if (life > 0) {
-            startTimer(life);
-        }
-
-        this.activeMessages.set(id, timerInfo);
-        container.appendChild(toastEl);
-
-        return id;
     }
-
-    public removeById(id: string) {
-        const item = this.activeMessages.get(id);
-        if (!item) return;
-
-        if (item.timeoutId) {
-            clearTimeout(item.timeoutId);
+    const closeBtn = toastEl.querySelector("[data-toast-close]");
+    if (closeBtn) {
+      closeBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        this.removeById(id);
+      });
+      closeBtn.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          this.removeById(id);
         }
-
-        const el = item.el;
-        el.classList.add('p-toast-message-leave');
-        this.activeMessages.delete(id);
-
-        setTimeout(() => {
-            el.remove();
-        }, 220);
+      });
     }
-
-    public remove(msg: ToastMessageOptions | string) {
-        if (typeof msg === 'string') {
-            this.removeById(msg);
-        } else if (msg.id) {
-            this.removeById(msg.id);
-        } else if (msg.group) {
-            this.removeGroup(msg.group);
-        }
+    const actionBtn = toastEl.querySelector("[data-toast-action-btn]");
+    if (actionBtn && msg.onAction) {
+      actionBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        msg.onAction();
+      });
     }
-
-    public removeGroup(group: string) {
-        this.activeMessages.forEach((item, id) => {
-            if (item.el.getAttribute('data-toast-group') === group) {
-                this.removeById(id);
-            }
-        });
+    let timerInfo = {
+      el: toastEl,
+      timeoutId: void 0,
+      remainingLife: life,
+      startTime: Date.now()
+    };
+    const startTimer = (duration) => {
+      if (duration <= 0) return;
+      timerInfo.startTime = Date.now();
+      timerInfo.remainingLife = duration;
+      timerInfo.timeoutId = setTimeout(() => {
+        this.removeById(id);
+      }, duration);
+    };
+    const pauseTimer = () => {
+      if (timerInfo.timeoutId) {
+        clearTimeout(timerInfo.timeoutId);
+        timerInfo.timeoutId = void 0;
+        const elapsed = Date.now() - timerInfo.startTime;
+        timerInfo.remainingLife = Math.max(0, timerInfo.remainingLife - elapsed);
+      }
+    };
+    const resumeTimer = () => {
+      if (timerInfo.remainingLife > 0 && !timerInfo.timeoutId) {
+        startTimer(timerInfo.remainingLife);
+      }
+    };
+    toastEl.addEventListener("mouseenter", pauseTimer);
+    toastEl.addEventListener("mouseleave", resumeTimer);
+    if (life > 0) {
+      startTimer(life);
     }
-
-    public removeAllGroups() {
-        this.activeMessages.forEach((_, id) => {
-            this.removeById(id);
-        });
+    this.activeMessages.set(id, timerInfo);
+    container.appendChild(toastEl);
+    return id;
+  }
+  removeById(id) {
+    const item = this.activeMessages.get(id);
+    if (!item) return;
+    if (item.timeoutId) {
+      clearTimeout(item.timeoutId);
     }
+    const el = item.el;
+    el.classList.add("p-toast-message-leave");
+    this.activeMessages.delete(id);
+    setTimeout(() => {
+      el.remove();
+    }, 220);
+  }
+  remove(msg) {
+    if (typeof msg === "string") {
+      this.removeById(msg);
+    } else if (msg.id) {
+      this.removeById(msg.id);
+    } else if (msg.group) {
+      this.removeGroup(msg.group);
+    }
+  }
+  removeGroup(group) {
+    this.activeMessages.forEach((item, id) => {
+      if (item.el.getAttribute("data-toast-group") === group) {
+        this.removeById(id);
+      }
+    });
+  }
+  removeAllGroups() {
+    this.activeMessages.forEach((_, id) => {
+      this.removeById(id);
+    });
+  }
+};
+var globalToast = new ToastService();
+if (typeof window !== "undefined") {
+  window.$toast = globalToast;
+  window.useToast = () => globalToast;
+  window.ToastService = ToastService;
 }
-
-export const globalToast = new ToastService();
-if (typeof window !== 'undefined') {
-    (window as any).$toast = globalToast;
-    (window as any).useToast = () => globalToast;
-    (window as any).ToastService = ToastService;
+function ToastIsland(container, props) {
+  injectIslandStyle("toast", TOAST_CSS);
+  const group = props.group || "default";
+  const position = props.position || "top-right";
+  const mode = props.mode === "expanded" ? "p-toast-mode-expanded" : "p-toast-mode-stacked";
+  container.className = `p-toast p-toast-${position} ${mode} ${props.class || ""}`;
+  if (props.gap) {
+    container.style.setProperty("--p-toast-gap", `${props.gap}px`);
+  }
+  globalToast.registerContainer(group, container);
 }
-
-export default function ToastIsland(container: HTMLElement, props: ToastContainerProps) {
-    injectIslandStyle('toast', TOAST_CSS);
-
-    const group = props.group || 'default';
-    const position = props.position || 'top-right';
-    const mode = props.mode === 'expanded' ? 'p-toast-mode-expanded' : 'p-toast-mode-stacked';
-
-    container.className = `p-toast p-toast-${position} ${mode} ${props.class || ''}`;
-    if (props.gap) {
-        container.style.setProperty('--p-toast-gap', `${props.gap}px`);
-    }
-
-    globalToast.registerContainer(group, container);
-}
+export {
+  ToastService,
+  ToastIsland as default,
+  globalToast
+};
+//# sourceMappingURL=toast-ZDJ76ZQ5.js.map

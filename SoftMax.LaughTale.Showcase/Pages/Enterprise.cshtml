@@ -7203,25 +7203,169 @@
         </div>
     </section>
 
-    <!-- Toast Container -->
+    <!-- Toast Notification Suite -->
     <section id="sec-toast" class="component-card">
         <div class="card-header">
             <div>
-                <h2>Toast Notification Dispatcher</h2>
-                <p>Non-blocking growl toast alerts with auto-dismiss timers and sound hooks.</p>
+                <h2>Toast</h2>
+                <p>Toast is used to display non-blocking messages in an overlay with 7 viewport positions, stacked deck and expanded display modes, promise flows, custom templates, and interactive action buttons.</p>
             </div>
-            <span class="aura-tag tag-emerald">Notifications</span>
+            <span class="aura-tag tag-emerald">PrimeVue 4 Aura</span>
         </div>
-        <div class="card-body" style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-            <button type="button" class="p-button p-button-success" onclick="document.dispatchEvent(new CustomEvent('toast:show', { detail: { severity: 'success', summary: 'Success', detail: 'Cluster node deployed successfully.' } }))">
-                Success Toast
-            </button>
-            <button type="button" class="p-button p-button-danger" onclick="document.dispatchEvent(new CustomEvent('toast:show', { detail: { severity: 'error', summary: 'Error', detail: 'Connection timeout to vault #04.' } }))">
-                Error Toast
-            </button>
-            <button type="button" class="p-button p-button-info" onclick="document.dispatchEvent(new CustomEvent('toast:show', { detail: { severity: 'info', summary: 'Info', detail: 'Backup snapshot initiated.' } }))">
-                Info Toast
-            </button>
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Demo 1: Basic -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Toasts are displayed by calling the add method with severity, summary, and detail.</p>
+                <div style="display: flex; justify-content: center;">
+                    <button type="button" class="p-button p-button-outlined p-button-secondary" onclick="window.$toast.add({ summary: 'Successfully completed', detail: 'The task was completed successfully. You can now view the details.', life: 3000 })" style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer;">
+                        Create toast
+                    </button>
+                </div>
+            </div>
+
+            <!-- Demo 2: Severity -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Severity</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">The severity option specifies the icon and color theme of the toast notification.</p>
+                <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem;">
+                    <button type="button" class="p-button p-button-outlined p-button-info" onclick="window.$toast.add({ severity: 'info', summary: 'Heads up', detail: 'There’s something you might want to check.', life: 3000 })" style="padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid #3b82f6; background: transparent; color: #2563eb; cursor: pointer;">
+                        Info
+                    </button>
+                    <button type="button" class="p-button p-button-outlined p-button-success" onclick="window.$toast.add({ severity: 'success', summary: 'Saved successfully', detail: 'Your changes have been saved.', life: 3000 })" style="padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid #10b981; background: transparent; color: #059669; cursor: pointer;">
+                        Success
+                    </button>
+                    <button type="button" class="p-button p-button-outlined p-button-warn" onclick="window.$toast.add({ severity: 'warn', summary: 'Check this', detail: 'Some fields may need your attention.', life: 3000 })" style="padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid #f59e0b; background: transparent; color: #d97706; cursor: pointer;">
+                        Warn
+                    </button>
+                    <button type="button" class="p-button p-button-outlined p-button-danger" onclick="window.$toast.add({ severity: 'error', summary: 'Something went wrong', detail: 'We couldn’t complete the action. Please try again.', life: 3000 })" style="padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid #ef4444; background: transparent; color: #dc2626; cursor: pointer;">
+                        Error
+                    </button>
+                    <button type="button" class="p-button p-button-outlined p-button-secondary" onclick="window.$toast.add({ severity: 'secondary', summary: 'For your information', detail: 'This is a secondary toast message.', life: 3000 })" style="padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: transparent; color: var(--p-text-color); cursor: pointer;">
+                        Secondary
+                    </button>
+                    <button type="button" class="p-button p-button-outlined" onclick="window.$toast.add({ severity: 'contrast', summary: 'High contrast', detail: 'This is a contrast toast message.', life: 3000 })" style="padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-surface-900); background: transparent; color: var(--p-surface-900); cursor: pointer;">
+                        Contrast
+                    </button>
+                </div>
+            </div>
+
+            <!-- Demo 3: Promise / Async -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Promise &amp; Async Flow</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">A sticky loading toast is shown while an async task executes, then replaced with success or error upon resolution.</p>
+                <div style="display: flex; justify-content: center;">
+                    <button type="button" class="p-button p-button-outlined p-button-secondary" onclick="
+                        const toastId = window.$toast.add({ severity: 'secondary', summary: 'Please wait...', detail: 'Your request is being processed. This may take a moment.', spin: true, group: 'promise', sticky: true });
+                        setTimeout(() => {
+                            window.$toast.removeById(toastId);
+                            if (Math.random() < 0.6) {
+                                window.$toast.add({ severity: 'success', summary: 'Success!', detail: 'Promise completed. Everything went smoothly. Thank you for your patience.', group: 'promise', life: 3500 });
+                            } else {
+                                window.$toast.add({ severity: 'error', summary: 'Oops, something went wrong', detail: 'Network timeout to auth cluster #02. Please try again.', group: 'promise', life: 3500 });
+                            }
+                        }, 2000);
+                    " style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer;">
+                        Run promise (2s)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Demo 4: Sticky -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Sticky Toast</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">A sticky toast stays visible until explicitly dismissed by the user or programmatically cleared.</p>
+                <div style="display: flex; justify-content: center; gap: 0.75rem;">
+                    <button type="button" class="p-button p-button-outlined p-button-secondary" onclick="window.$toast.add({ severity: 'info', summary: 'Sticky toast', detail: 'This toast stays until you dismiss it manually.', sticky: true })" style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer;">
+                        Create toast
+                    </button>
+                    <button type="button" class="p-button p-button-outlined p-button-secondary" onclick="window.$toast.removeAllGroups()" style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer;">
+                        Dismiss all toasts
+                    </button>
+                </div>
+            </div>
+
+            <!-- Demo 5: Custom Content Template -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Custom Template</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Toast content can be fully customized with links, metadata, and custom action buttons.</p>
+                <div style="display: flex; justify-content: center;">
+                    <button type="button" class="p-button p-button-outlined p-button-secondary" onclick="
+                        window.$toast.add({
+                            group: 'custom',
+                            life: 6000,
+                            contentHtml: `<div style='display:flex; flex-direction:column; gap:0.5rem;'><div><h4 style='font-size:0.875rem; font-weight:600; margin:0;'>Purchase complete! <a href=\'javascript:void(0)\' style=\'text-decoration:underline;\'>View receipt</a></h4><p style='margin:0.25rem 0 0 0; font-size:0.8125rem; opacity:0.85;'>Your order is being processed. Track all orders or <a href=\'javascript:void(0)\' style=\'text-decoration:underline;\'>learn about returns</a>.</p></div><div style='display:flex; align-items:center; gap:0.5rem; margin-top:0.25rem;'><button type=\'button\' onclick=\'window.$toast.removeGroup(\&quot;custom\&quot;)\' class=\'p-button p-button-sm p-button-secondary\' style=\'padding:0.25rem 0.65rem; font-size:0.75rem; border-radius:4px; border:1px solid var(--p-border-color); background:transparent; cursor:pointer;\'>Dismiss</button><button type=\'button\' onclick=\'window.$toast.removeGroup(\&quot;custom\&quot;)\' class=\'p-button p-button-sm p-button-primary\' style=\'padding:0.25rem 0.65rem; font-size:0.75rem; border-radius:4px; background:#4f46e5; border:1px solid #4f46e5; color:#ffffff; cursor:pointer;\'>Track all orders</button></div></div>`
+                        });
+                    " style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer;">
+                        Custom toast
+                    </button>
+                </div>
+            </div>
+
+            <!-- Demo 6: Viewport Positions -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Viewport Positions</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Location of the toast is customized across 7 viewport anchors.</p>
+                <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem;">
+                    <button type="button" class="p-button p-button-outlined p-button-secondary" onclick="window.$toast.add({ summary: 'Top Left', detail: 'Positioned at top-left anchor.', group: 'top-left', life: 3000 })" style="padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer;">
+                        Top Left
+                    </button>
+                    <button type="button" class="p-button p-button-outlined p-button-secondary" onclick="window.$toast.add({ summary: 'Top Center', detail: 'Positioned at top-center anchor.', group: 'top-center', life: 3000 })" style="padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer;">
+                        Top Center
+                    </button>
+                    <button type="button" class="p-button p-button-outlined p-button-secondary" onclick="window.$toast.add({ summary: 'Top Right', detail: 'Positioned at top-right anchor.', group: 'top-right', life: 3000 })" style="padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer;">
+                        Top Right
+                    </button>
+                    <button type="button" class="p-button p-button-outlined p-button-secondary" onclick="window.$toast.add({ summary: 'Bottom Left', detail: 'Positioned at bottom-left anchor.', group: 'bottom-left', life: 3000 })" style="padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer;">
+                        Bottom Left
+                    </button>
+                    <button type="button" class="p-button p-button-outlined p-button-secondary" onclick="window.$toast.add({ summary: 'Bottom Center', detail: 'Positioned at bottom-center anchor.', group: 'bottom-center', life: 3000 })" style="padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer;">
+                        Bottom Center
+                    </button>
+                    <button type="button" class="p-button p-button-outlined p-button-secondary" onclick="window.$toast.add({ summary: 'Bottom Right', detail: 'Positioned at bottom-right anchor.', group: 'bottom-right', life: 3000 })" style="padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer;">
+                        Bottom Right
+                    </button>
+                    <button type="button" class="p-button p-button-outlined p-button-secondary" onclick="window.$toast.add({ summary: 'Center', detail: 'Positioned at screen center anchor.', group: 'center', life: 3000 })" style="padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer;">
+                        Center
+                    </button>
+                </div>
+            </div>
+
+            <!-- Demo 7: Expanded Mode -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Expanded Mode</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Setting mode to expanded renders all toasts in an open vertical stack without overlapping cards.</p>
+                <div style="display: flex; justify-content: center;">
+                    <button type="button" class="p-button p-button-outlined p-button-secondary" onclick="
+                        window.$toast.add({ group: 'expanded', summary: 'Expanded notification', detail: 'Rendered in expanded vertical stack mode.', life: 3500 });
+                    " style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer;">
+                        Create toast (expanded)
+                    </button>
+                </div>
+                <island-toast group="expanded" mode="expanded" limit="7" />
+            </div>
+
+            <!-- Demo 8: Action Confirmation Button -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Interactive Action Button</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">An interactive action button can be embedded directly in the toast to confirm actions.</p>
+                <div style="display: flex; justify-content: center;">
+                    <button type="button" class="p-button p-button-outlined p-button-secondary" onclick="
+                        window.$toast.add({
+                            group: 'action',
+                            summary: 'Allow camera access',
+                            detail: 'We need access to your camera to scan QR codes.',
+                            actionLabel: 'Enable camera',
+                            onAction: () => {
+                                window.$toast.removeGroup('action');
+                                window.$toast.add({ group: 'action', severity: 'success', summary: 'Camera access granted', detail: 'You can now scan QR codes.', life: 3000 });
+                            }
+                        });
+                    " style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer;">
+                        Create toast with action
+                    </button>
+                </div>
+            </div>
         </div>
     </section>
 

@@ -980,8 +980,8 @@ defineIsland("tree-table", () => import("./treetable-STGV6W5W.js"));
 defineIsland("tree-select", () => import("./tree-select-3WADBRSW.js"));
 defineIsland("datatable", () => import("./datatable-FJYSSBES.js"));
 defineIsland("datagrid", () => import("./datatable-FJYSSBES.js"));
-defineIsland("modal", () => import("./modal-4OESGY4H.js"));
-defineIsland("toast", () => import("./toast-DWHTYR76.js"));
+defineIsland("modal", () => import("./modal-BXXSMNZQ.js"));
+defineIsland("toast", () => import("./toast-ZDJ76ZQ5.js"));
 defineIsland("input-number", () => import("./input-number-KQ2J2WMH.js"));
 defineIsland("input-otp", () => import("./input-otp-RUPMATZ7.js"));
 defineIsland("input-password", () => import("./input-password-2MPZDMLV.js"));
@@ -1082,6 +1082,9 @@ defineIsland("message", () => import("./message-FJKBTJZJ.js"));
 defineIsland("p-message", () => import("./message-FJKBTJZJ.js"));
 defineIsland("inline-message", () => import("./message-FJKBTJZJ.js"));
 defineIsland("inlinemessage", () => import("./message-FJKBTJZJ.js"));
+defineIsland("toast", () => import("./toast-ZDJ76ZQ5.js"));
+defineIsland("p-toast", () => import("./toast-ZDJ76ZQ5.js"));
+defineIsland("island-toast", () => import("./toast-ZDJ76ZQ5.js"));
 
 export {
   defineIsland,
@@ -1090,4 +1093,4 @@ export {
   enableViewTransitions,
   getSlot
 };
-//# sourceMappingURL=chunk-F5WF25ZP.js.map
+//# sourceMappingURL=chunk-7U5WG3SE.js.map

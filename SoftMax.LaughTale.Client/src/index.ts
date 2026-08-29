@@ -139,6 +139,9 @@ defineIsland('message', () => import('./components/message'));
 defineIsland('p-message', () => import('./components/message'));
 defineIsland('inline-message', () => import('./components/message'));
 defineIsland('inlinemessage', () => import('./components/message'));
+defineIsland('toast', () => import('./components/toast'));
+defineIsland('p-toast', () => import('./components/toast'));
+defineIsland('island-toast', () => import('./components/toast'));
 
 // Export Headless Composables, Animations & Strongly-Typed Models
 export * from './composables/index';
