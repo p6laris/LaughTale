@@ -1864,32 +1864,108 @@ public class IslandSpeedDialTagHelper : TagHelper
 }
 
 /// <summary>
-/// TagHelper for <island-image-compare />
+/// TagHelper for <island-compare />, <p-compare />, and <island-image-compare />
+/// PrimeVue 4 Aura Design System compliant side-by-side comparison slider.
 /// </summary>
+[HtmlTargetElement("island-compare")]
+[HtmlTargetElement("p-compare")]
 [HtmlTargetElement("island-image-compare")]
 public class IslandImageCompareTagHelper : TagHelper
 {
-    public string BeforeImage { get; set; } = string.Empty;
-    public string AfterImage { get; set; } = string.Empty;
-    public string? BeforeLabel { get; set; } = "Before";
-    public string? AfterLabel { get; set; } = "After";
+    [HtmlAttributeName("model-value")]
+    public double? ModelValue { get; set; }
+
+    [HtmlAttributeName("value")]
+    public double? Value { get; set; }
+
+    [HtmlAttributeName("min")]
+    public double Min { get; set; } = 0;
+
+    [HtmlAttributeName("max")]
+    public double Max { get; set; } = 100;
+
+    [HtmlAttributeName("step")]
+    public double Step { get; set; } = 1;
+
+    [HtmlAttributeName("orientation")]
+    public string Orientation { get; set; } = "horizontal";
+
+    [HtmlAttributeName("slide-on-hover")]
+    public bool SlideOnHover { get; set; } = false;
+
+    [HtmlAttributeName("custom-handle")]
+    public bool CustomHandle { get; set; } = false;
+
+    [HtmlAttributeName("disabled")]
+    public bool Disabled { get; set; } = false;
+
+    [HtmlAttributeName("readonly")]
+    public bool Readonly { get; set; } = false;
+
+    [HtmlAttributeName("before-image")]
+    public string? BeforeImage { get; set; }
+
+    [HtmlAttributeName("after-image")]
+    public string? AfterImage { get; set; }
+
+    [HtmlAttributeName("before-label")]
+    public string? BeforeLabel { get; set; }
+
+    [HtmlAttributeName("after-label")]
+    public string? AfterLabel { get; set; }
+
+    [HtmlAttributeName("demo-type")]
+    public string? DemoType { get; set; }
+
+    [HtmlAttributeName("aria-label")]
+    public string? AriaLabel { get; set; }
+
+    [HtmlAttributeName("class")]
+    public string? Class { get; set; }
+
+    [HtmlAttributeName("style")]
+    public string? Style { get; set; }
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
         output.TagName = "div";
         output.TagMode = TagMode.StartTagAndEndTag;
-        output.Attributes.SetAttribute("data-island", "image-compare");
+        output.Attributes.SetAttribute("data-island", "compare");
         output.Attributes.SetAttribute("data-hydrate", "load");
 
         var props = new
         {
+            modelValue = ModelValue ?? Value ?? 50,
+            value = Value ?? ModelValue ?? 50,
+            min = Min,
+            max = Max,
+            step = Step,
+            orientation = Orientation,
+            slideOnHover = SlideOnHover,
+            customHandle = CustomHandle,
+            disabled = Disabled,
+            @readonly = Readonly,
             beforeImage = BeforeImage,
             afterImage = AfterImage,
             beforeLabel = BeforeLabel,
-            afterLabel = AfterLabel
+            afterLabel = AfterLabel,
+            demoType = DemoType,
+            ariaLabel = AriaLabel,
+            @class = Class,
+            style = Style
         };
 
         output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
+
+        if (!string.IsNullOrWhiteSpace(Class))
+        {
+            output.Attributes.SetAttribute("class", Class);
+        }
+
+        if (!string.IsNullOrWhiteSpace(Style))
+        {
+            output.Attributes.SetAttribute("style", Style);
+        }
     }
 }
 

@@ -15181,97 +15181,440 @@ var init_speed_dial = __esm({
 // src/components/image-compare.ts
 var image_compare_exports = {};
 __export(image_compare_exports, {
-  default: () => ImageCompareIsland
+  default: () => CompareIsland
 });
-function ImageCompareIsland(container, props) {
-  injectIslandStyle("image-compare", CSS19);
-  let splitPercent = 50;
-  container.innerHTML = `
-        <div class="laughtale-image-compare" style="position: relative; width: 100%; max-width: 600px; height: 340px; border-radius: var(--p-border-radius-lg); overflow: hidden; user-select: none; border: 1px solid var(--p-border-color); box-shadow: var(--p-shadow-md); touch-action: none; cursor: ew-resize;">
-            <!-- After Image (Bottom) -->
-            <img src="${props.afterImage}" alt="After" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none;" />
-            ${props.afterLabel ? `<span style="position: absolute; bottom: 0.75rem; right: 0.75rem; background: rgba(0,0,0,0.6); color: #ffffff; padding: 0.25rem 0.5rem; border-radius: var(--p-border-radius); font-size: 0.75rem; font-weight: 600; pointer-events: none;">${props.afterLabel}</span>` : ""}
+function CompareIsland(container, props) {
+  injectIslandStyle("compare", COMPARE_CSS);
+  const demoType = props.demoType || "basic";
+  const orientation = props.orientation || (demoType === "vertical" ? "vertical" : "horizontal");
+  const isVertical = orientation === "vertical";
+  const slideOnHover = props.slideOnHover === true || demoType === "hover" || demoType === "with-chart";
+  const isCustomHandle = props.customHandle === true || demoType === "custom-handle";
+  const isControlled = demoType === "controlled";
+  const isWithChart = demoType === "with-chart";
+  const isTemplate = demoType === "template";
+  const disabled = props.disabled === true;
+  const readonly = props.readonly === true;
+  let currentValue = props.modelValue !== void 0 ? props.modelValue : props.value !== void 0 ? props.value : 50;
+  currentValue = Math.max(0, Math.min(100, currentValue));
+  const beforeImg = props.beforeImage || DEFAULT_BEFORE_IMG;
+  const afterImg = props.afterImage || DEFAULT_AFTER_IMG;
+  function renderDOM() {
+    const customHandleClass = isCustomHandle ? "p-compare-custom-handle" : "";
+    const verticalClass = isVertical ? "p-compare-vertical" : "";
+    const disabledClass = disabled ? "p-compare-disabled" : "";
+    let beforeContentHtml = "";
+    let afterContentHtml = "";
+    if (isWithChart) {
+      beforeContentHtml = `
+                <svg class="absolute h-full w-full" viewBox="0 0 644 189" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;">
+                    <g clip-path="url(#compare_chart_clip)">
+                        <path d="M0.5 118.499C0.5 118.499 82 102.999 113.5 89.4989C145 75.9989 188.444 87.7869 235 77.4989C272.684 69.1719 293.654 62.4939 329 46.9989C409.332 11.7849 479.5 86.5 510.5 78C541.5 69.5 635.951 0.848863 644 1.49886" stroke="#10b981" stroke-width="2.5" />
+                        <path d="M113.5 89.5006C82 103.001 0.5 118.501 0.5 118.501V188.501H644V1.50065C635.951 0.850647 541.5 69.5 510.5 78C479.5 86.5 409.332 11.7866 329 47.0006C293.654 62.4956 272.684 69.1736 235 77.5006C188.444 87.7886 145 76.0006 113.5 89.5006Z" fill="url(#compare_chart_gradient)" />
+                    </g>
+                    <defs>
+                        <clipPath id="compare_chart_clip">
+                            <rect width="644" height="189" fill="white" />
+                        </clipPath>
+                        <linearGradient id="compare_chart_gradient" x1="322.25" x2="322.25" y1="1.477" y2="188.5" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#10b981" stop-opacity="0.4" />
+                            <stop offset="1" stop-color="#10b981" stop-opacity="0" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+            `;
+      afterContentHtml = `
+                <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: var(--p-surface-50); color: var(--p-text-muted); font-size: 0.875rem;">
+                    <span>Hover to reveal chart trajectory</span>
+                </div>
+            `;
+    } else if (isTemplate) {
+      beforeContentHtml = `
+                <div style="width: 100%; height: 100%; background: #f3e8ff; padding: 1.5rem; display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
+                    <div style="width: 100%; max-width: 18rem; border-radius: 12px; border: 1px solid #e9d5ff; background: #ffffff; padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; box-shadow: 0 4px 12px rgba(147, 51, 234, 0.1);">
+                        <div style="display: flex; align-items: flex-start; justify-content: space-between;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <div style="width: 2.5rem; height: 2.5rem; border-radius: 9999px; overflow: hidden; background: #c084fc;">
+                                    <img src="https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png" style="width: 100%; height: 100%; object-fit: cover; filter: hue-rotate(260deg) saturate(150%);" />
+                                </div>
+                                <div>
+                                    <div style="font-weight: 600; color: #581c87; font-size: 0.9rem;">Amy Elsner</div>
+                                    <div style="font-size: 0.75rem; color: #9333ea;">Developer</div>
+                                </div>
+                            </div>
+                            <span style="background: #f3e8ff; color: #7e22ce; padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700;">Pro</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                            <div style="display: flex; justify-content: space-between; font-size: 0.75rem;">
+                                <span style="color: #9333ea;">Storage</span>
+                                <span style="color: #581c87; font-weight: 600;">7.2 GB / 10 GB</span>
+                            </div>
+                            <div style="height: 0.5rem; width: 100%; background: #f3e8ff; border-radius: 9999px; overflow: hidden;">
+                                <div style="height: 100%; width: 72%; background: #a855f7; border-radius: 9999px;"></div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem; padding-top: 0.25rem;">
+                            <button type="button" class="p-button p-button-sm" style="flex: 1; padding: 0.35rem; font-size: 0.75rem; border-radius: 6px; background: #9333ea; border: 1px solid #9333ea; color: #ffffff; cursor: pointer;">Upgrade</button>
+                            <button type="button" class="p-button p-button-sm p-button-outlined" style="padding: 0.35rem 0.6rem; font-size: 0.75rem; border-radius: 6px; border: 1px solid #e9d5ff; background: transparent; color: #7e22ce; cursor: pointer;">Settings</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+      afterContentHtml = `
+                <div style="width: 100%; height: 100%; background: #ecfdf5; padding: 1.5rem; display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
+                    <div style="width: 100%; max-width: 18rem; border-radius: 12px; border: 1px solid #a7f3d0; background: #ffffff; padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);">
+                        <div style="display: flex; align-items: flex-start; justify-content: space-between;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <div style="width: 2.5rem; height: 2.5rem; border-radius: 9999px; overflow: hidden; background: #34d399;">
+                                    <img src="https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png" style="width: 100%; height: 100%; object-fit: cover;" />
+                                </div>
+                                <div>
+                                    <div style="font-weight: 600; color: #064e3b; font-size: 0.9rem;">Amy Elsner</div>
+                                    <div style="font-size: 0.75rem; color: #059669;">Developer</div>
+                                </div>
+                            </div>
+                            <span style="background: #ecfdf5; color: #047857; padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700;">Pro</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                            <div style="display: flex; justify-content: space-between; font-size: 0.75rem;">
+                                <span style="color: #059669;">Storage</span>
+                                <span style="color: #064e3b; font-weight: 600;">7.2 GB / 10 GB</span>
+                            </div>
+                            <div style="height: 0.5rem; width: 100%; background: #ecfdf5; border-radius: 9999px; overflow: hidden;">
+                                <div style="height: 100%; width: 72%; background: #10b981; border-radius: 9999px;"></div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem; padding-top: 0.25rem;">
+                            <button type="button" class="p-button p-button-sm" style="flex: 1; padding: 0.35rem; font-size: 0.75rem; border-radius: 6px; background: #10b981; border: 1px solid #10b981; color: #ffffff; cursor: pointer;">Upgrade</button>
+                            <button type="button" class="p-button p-button-sm p-button-outlined" style="padding: 0.35rem 0.6rem; font-size: 0.75rem; border-radius: 6px; border: 1px solid #a7f3d0; background: transparent; color: #047857; cursor: pointer;">Settings</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+    } else {
+      beforeContentHtml = `<img src="${beforeImg}" alt="Before" draggable="false" />`;
+      afterContentHtml = `<img src="${afterImg}" alt="After" draggable="false" />`;
+    }
+    const iconHtml = demoType === "hover" || demoType === "vertical" || isTemplate ? CODE_SVG : ARROWS_H_SVG;
+    const iconRotateStyle = isVertical ? "transform: rotate(90deg);" : "";
+    const heightStyle = isWithChart ? "height: 189px;" : isTemplate ? "height: 320px;" : "aspect-ratio: 16/9;";
+    let containerHtml = `
+            <div class="p-compare ${verticalClass} ${customHandleClass} ${disabledClass} ${props.class || ""}" style="max-width: 32rem; margin: 0 auto; ${heightStyle} ${props.style || ""}" data-compare-root>
+                <!-- Hidden Accessible Range Input -->
+                <input type="range" class="p-compare-input" min="${props.min || 0}" max="${props.max || 100}" step="${props.step || 1}" value="${currentValue}" aria-label="${props.ariaLabel || "Compare images"}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${currentValue}" tabindex="0" ${disabled ? "disabled" : ""} data-compare-input />
 
-            <!-- Before Image (Top Clipped) -->
-            <div class="compare-clip" style="position: absolute; inset: 0; width: ${splitPercent}%; height: 100%; overflow: hidden; pointer-events: none;">
-                <img src="${props.beforeImage}" alt="Before" style="position: absolute; top: 0; left: 0; width: 600px; max-width: 600px; height: 340px; object-fit: cover;" />
-                ${props.beforeLabel ? `<span style="position: absolute; bottom: 0.75rem; left: 0.75rem; background: rgba(0,0,0,0.6); color: #ffffff; padding: 0.25rem 0.5rem; border-radius: var(--p-border-radius); font-size: 0.75rem; font-weight: 600;">${props.beforeLabel}</span>` : ""}
-            </div>
+                <!-- Layer After (Base Bottom) -->
+                <div class="p-compare-item p-compare-item-after" data-compare-after>
+                    ${afterContentHtml}
+                </div>
 
-            <!-- Divider Line & Handle -->
-            <div class="compare-handle-line" style="position: absolute; top: 0; bottom: 0; left: ${splitPercent}%; width: 2px; background: #ffffff; box-shadow: 0 0 6px rgba(0,0,0,0.6); pointer-events: none;">
-                <div class="compare-handle-knob" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 2.25rem; height: 2.25rem; border-radius: 50%; background: #ffffff; border: 2px solid var(--p-primary-600); box-shadow: 0 2px 8px rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center; font-size: 0.6875rem; font-weight: 700; color: var(--p-primary-600); transition: transform 0.15s ease;">
-                    \u25C0\u25B6
+                <!-- Layer Before (Clipped Top) -->
+                <div class="p-compare-item p-compare-item-before" data-compare-before>
+                    ${beforeContentHtml}
+                </div>
+
+                <!-- Divider Handle -->
+                <div class="p-compare-handle" data-compare-handle>
+                    <div class="p-compare-indicator" data-compare-indicator>
+                        ${isCustomHandle ? "" : `<span style="${iconRotateStyle} display: flex; align-items: center; justify-content: center;">${iconHtml}</span>`}
+                    </div>
                 </div>
             </div>
-        </div>
-    `;
-  const compareBox = container.querySelector(".laughtale-image-compare");
-  const clip = container.querySelector(".compare-clip");
-  const handleLine = container.querySelector(".compare-handle-line");
-  const knob = container.querySelector(".compare-handle-knob");
-  function updateSplit(p) {
-    splitPercent = Math.max(0, Math.min(100, p));
-    clip.style.width = `${splitPercent}%`;
-    handleLine.style.left = `${splitPercent}%`;
-    container.dispatchEvent(new CustomEvent("imagecompare:change", {
+        `;
+    if (isControlled) {
+      containerHtml += `
+                <div class="p-compare-controls" style="max-width: 32rem; margin: 1rem auto 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; width: 100%;">
+                    <button type="button" class="p-button p-button-outlined p-button-secondary" data-compare-set="25" style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer;">
+                        25%
+                    </button>
+                    <div style="display: flex; align-items: center; gap: 0.25rem;">
+                        <input type="number" min="0" max="100" value="${currentValue}" class="p-inputtext p-component" data-compare-num style="width: 5rem; text-align: center; padding: 0.45rem 0.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); font-weight: 600; font-size: 0.875rem;" />
+                        <span style="font-weight: 600; font-size: 0.875rem; color: var(--p-text-muted);">%</span>
+                    </div>
+                    <button type="button" class="p-button p-button-outlined p-button-secondary" data-compare-set="75" style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer;">
+                        75%
+                    </button>
+                </div>
+            `;
+    }
+    container.innerHTML = containerHtml;
+  }
+  renderDOM();
+  const rootEl = container.querySelector("[data-compare-root]");
+  const inputEl = container.querySelector("[data-compare-input]");
+  const beforeEl = container.querySelector("[data-compare-before]");
+  const handleEl = container.querySelector("[data-compare-handle]");
+  const numInput = container.querySelector("[data-compare-num]");
+  function updatePosition(pct) {
+    currentValue = Math.max(0, Math.min(100, pct));
+    if (isVertical) {
+      beforeEl.style.clipPath = `inset(0 0 ${100 - currentValue}% 0)`;
+      handleEl.style.top = `${currentValue}%`;
+    } else {
+      beforeEl.style.clipPath = `inset(0 ${100 - currentValue}% 0 0)`;
+      handleEl.style.left = `${currentValue}%`;
+    }
+    if (inputEl) {
+      inputEl.value = `${currentValue}`;
+      inputEl.setAttribute("aria-valuenow", `${currentValue}`);
+    }
+    if (numInput) {
+      numInput.value = `${Math.round(currentValue)}`;
+    }
+    container.dispatchEvent(new CustomEvent("compare:change", {
       bubbles: true,
-      detail: { split: splitPercent }
+      detail: { value: currentValue }
     }));
   }
+  updatePosition(currentValue);
+  if (disabled || readonly) return;
   let isDragging = false;
-  const updateFromPointer = (clientX) => {
-    const rect = compareBox.getBoundingClientRect();
-    if (rect.width <= 0) return;
-    const p = (clientX - rect.left) / rect.width * 100;
-    updateSplit(p);
-  };
+  function updateFromPointer(clientX, clientY) {
+    const rect = rootEl.getBoundingClientRect();
+    if (isVertical) {
+      if (rect.height <= 0) return;
+      const p = (clientY - rect.top) / rect.height * 100;
+      updatePosition(p);
+    } else {
+      if (rect.width <= 0) return;
+      const p = (clientX - rect.left) / rect.width * 100;
+      updatePosition(p);
+    }
+  }
   const onPointerDown = (e) => {
     isDragging = true;
-    knob.style.transform = "translate(-50%, -50%) scale(1.15)";
-    if ("setPointerCapture" in compareBox && e.pointerId !== void 0) {
-      try {
-        compareBox.setPointerCapture(e.pointerId);
-      } catch (_) {
-      }
+    try {
+      rootEl.setPointerCapture(e.pointerId);
+    } catch (_) {
     }
-    updateFromPointer(e.clientX);
+    updateFromPointer(e.clientX, e.clientY);
   };
   const onPointerMove = (e) => {
-    if (!isDragging) return;
-    updateFromPointer(e.clientX);
+    if (slideOnHover) {
+      updateFromPointer(e.clientX, e.clientY);
+    } else if (isDragging) {
+      updateFromPointer(e.clientX, e.clientY);
+    }
   };
   const onPointerUp = (e) => {
     if (!isDragging) return;
     isDragging = false;
-    knob.style.transform = "translate(-50%, -50%) scale(1)";
-    if ("releasePointerCapture" in compareBox && e.pointerId !== void 0) {
-      try {
-        compareBox.releasePointerCapture(e.pointerId);
-      } catch (_) {
-      }
+    try {
+      rootEl.releasePointerCapture(e.pointerId);
+    } catch (_) {
     }
   };
-  compareBox.addEventListener("pointerdown", onPointerDown);
-  compareBox.addEventListener("pointermove", onPointerMove);
-  compareBox.addEventListener("pointerup", onPointerUp);
-  compareBox.addEventListener("pointercancel", onPointerUp);
-  compareBox.addEventListener("mousedown", onPointerDown);
-  window.addEventListener("mousemove", onPointerMove);
-  window.addEventListener("mouseup", onPointerUp);
+  rootEl.addEventListener("pointerdown", onPointerDown);
+  rootEl.addEventListener("pointermove", onPointerMove);
+  rootEl.addEventListener("pointerup", onPointerUp);
+  rootEl.addEventListener("pointercancel", onPointerUp);
+  inputEl.addEventListener("input", () => {
+    updatePosition(parseFloat(inputEl.value));
+  });
+  inputEl.addEventListener("keydown", (e) => {
+    let step = props.step || 1;
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+      e.preventDefault();
+      updatePosition(currentValue + step);
+    } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+      e.preventDefault();
+      updatePosition(currentValue - step);
+    } else if (e.key === "PageUp") {
+      e.preventDefault();
+      updatePosition(currentValue + 10);
+    } else if (e.key === "PageDown") {
+      e.preventDefault();
+      updatePosition(currentValue - 10);
+    } else if (e.key === "Home") {
+      e.preventDefault();
+      updatePosition(0);
+    } else if (e.key === "End") {
+      e.preventDefault();
+      updatePosition(100);
+    }
+  });
+  container.querySelectorAll("[data-compare-set]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const val = parseFloat(btn.getAttribute("data-compare-set") || "50");
+      updatePosition(val);
+    });
+  });
+  if (numInput) {
+    numInput.addEventListener("change", () => {
+      const val = parseFloat(numInput.value || "50");
+      updatePosition(val);
+    });
+  }
 }
-var CSS19;
+var COMPARE_CSS, ARROWS_H_SVG, CODE_SVG, DEFAULT_BEFORE_IMG, DEFAULT_AFTER_IMG;
 var init_image_compare = __esm({
   "src/components/image-compare.ts"() {
     "use strict";
     init_styles();
-    CSS19 = `
-[data-theme="dark"] .laughtale-image-compare {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+    COMPARE_CSS = `
+/* ==========================================================================
+   PrimeVue 4 Aura Compare Component Tokens & Styles
+   ========================================================================== */
+.p-compare {
+    position: relative;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+    border-radius: var(--p-compare-border-radius, var(--p-border-radius, 12px));
+    border: 1px solid var(--p-border-color, #e2e8f0);
+    box-sizing: border-box;
+    font-family: var(--p-font-family, inherit);
+    cursor: ew-resize;
+    display: block;
+    width: 100%;
+}
+
+.p-compare-vertical {
+    cursor: ns-resize;
+}
+
+.p-compare-disabled {
+    opacity: 0.6;
+    cursor: not-allowed !important;
+    pointer-events: none;
+}
+
+/* Hidden Accessible Range Input */
+.p-compare-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* Compare Layers */
+.p-compare-item {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.p-compare-item-after {
+    z-index: 1;
+}
+
+.p-compare-item-before {
+    z-index: 2;
+    will-change: clip-path, width, height;
+}
+
+.p-compare-item img,
+.p-compare-item svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+}
+
+/* Compare Handle & Indicator */
+.p-compare-handle {
+    position: absolute;
+    z-index: 3;
+    pointer-events: none;
+    box-sizing: border-box;
+    background: var(--p-compare-handle-background, #ffffff);
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.45);
+    will-change: left, top;
+}
+
+/* Horizontal Handle */
+.p-compare:not(.p-compare-vertical) .p-compare-handle {
+    top: 0;
+    bottom: 0;
+    width: var(--p-compare-handle-size, 2px);
+    transform: translateX(-50%);
+}
+
+/* Vertical Handle */
+.p-compare-vertical .p-compare-handle {
+    left: 0;
+    right: 0;
+    height: var(--p-compare-handle-size, 2px);
+    transform: translateY(-50%);
+}
+
+.p-compare-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: var(--p-compare-indicator-size, 2.25rem);
+    height: var(--p-compare-indicator-size, 2.25rem);
+    border-radius: var(--p-compare-indicator-border-radius, 9999px);
+    background: var(--p-compare-indicator-background, #ffffff);
+    color: var(--p-text-color, #0f172a);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: auto;
+    cursor: ew-resize;
+    transition: transform 150ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 150ms ease;
+}
+
+.p-compare-vertical .p-compare-indicator {
+    cursor: ns-resize;
+}
+
+.p-compare-indicator:hover {
+    transform: translate(-50%, -50%) scale(1.1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+
+.p-compare:focus-within .p-compare-indicator {
+    outline: none;
+    box-shadow: 0 0 0 var(--p-compare-indicator-focus-ring-width, 3px) var(--p-compare-indicator-focus-ring-color, rgba(16, 185, 129, 0.4)), 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+/* Custom Translucent Bubble Handle */
+.p-compare-custom-handle .p-compare-handle {
+    background: transparent !important;
+    box-shadow: none !important;
+}
+.p-compare-custom-handle .p-compare-indicator {
+    width: 1.25rem !important;
+    height: 1.25rem !important;
+    background: rgba(255, 255, 255, 0.6) !important;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
+.p-compare-custom-handle .p-compare-indicator:hover {
+    transform: translate(-50%, -50%) scale(1.5) !important;
+}
+
+/* Dark Mode Tokens */
+.dark .p-compare,
+[data-theme="dark"] .p-compare {
+    border-color: var(--p-surface-800, #1e293b);
+}
+
+.dark .p-compare-indicator,
+[data-theme="dark"] .p-compare-indicator {
+    background: var(--p-surface-900, #0f172a);
+    color: var(--p-surface-0, #ffffff);
+    border: 1px solid var(--p-surface-700, #334155);
 }
 `;
+    ARROWS_H_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 8 4 4-4 4"/><path d="M2 12h20"/><path d="m6 8-4 4 4 4"/></svg>`;
+    CODE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>`;
+    DEFAULT_BEFORE_IMG = "https://primefaces.org/cdn/primevue/images/compare/island2.jpg";
+    DEFAULT_AFTER_IMG = "https://primefaces.org/cdn/primevue/images/compare/island1.jpg";
   }
 });
 
@@ -19234,7 +19577,7 @@ __export(autocomplete_exports, {
   default: () => AutoCompleteIsland
 });
 function AutoCompleteIsland(container, props) {
-  injectIslandStyle("autocomplete", CSS20);
+  injectIslandStyle("autocomplete", CSS19);
   const allItems = props.suggestions || props.items || [];
   const multiple = props.multiple === true;
   const showClear = props.showClear !== false;
@@ -19567,7 +19910,7 @@ function AutoCompleteIsland(container, props) {
   }
   renderChips();
 }
-var CSS20;
+var CSS19;
 var init_autocomplete = __esm({
   "src/components/autocomplete.ts"() {
     "use strict";
@@ -19576,7 +19919,7 @@ var init_autocomplete = __esm({
     init_useDisclosure();
     init_useClickOutside();
     init_useDebounce();
-    CSS20 = `
+    CSS19 = `
 .laughtale-autocomplete {
     position: relative;
     display: inline-flex;
@@ -19846,7 +20189,7 @@ __export(color_picker_exports, {
   default: () => ColorPickerIsland
 });
 function ColorPickerIsland(container, props) {
-  injectIslandStyle("color-picker", CSS21);
+  injectIslandStyle("color-picker", CSS20);
   let currentColor = props.value || "#10b981";
   let isOpen = false;
   const swatchesHtml = DEFAULT_PRESETS.map((c) => `
@@ -19970,7 +20313,7 @@ function ColorPickerIsland(container, props) {
   }
   syncValue();
 }
-var DEFAULT_PRESETS, CSS21;
+var DEFAULT_PRESETS, CSS20;
 var init_color_picker = __esm({
   "src/components/color-picker.ts"() {
     "use strict";
@@ -19992,7 +20335,7 @@ var init_color_picker = __esm({
       "#1e293b",
       "#000000"
     ];
-    CSS21 = `
+    CSS20 = `
 [data-theme="dark"] .color-swatch-btn {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -20028,7 +20371,7 @@ __export(knob_exports, {
   default: () => KnobIsland
 });
 function KnobIsland(container, props) {
-  injectIslandStyle("knob", CSS22);
+  injectIslandStyle("knob", CSS21);
   const min = props.min !== void 0 ? props.min : 0;
   const max = props.max !== void 0 ? props.max : 100;
   const step = props.step || 1;
@@ -20130,12 +20473,12 @@ function KnobIsland(container, props) {
   }
   syncValue();
 }
-var CSS22;
+var CSS21;
 var init_knob = __esm({
   "src/components/knob.ts"() {
     "use strict";
     init_styles();
-    CSS22 = `
+    CSS21 = `
 [data-theme="dark"] .laughtale-knob {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -20161,7 +20504,7 @@ __export(tag_exports, {
   default: () => TagIsland
 });
 function TagIsland(container, props) {
-  injectIslandStyle("tag", CSS23);
+  injectIslandStyle("tag", CSS22);
   const severity = props.severity || "info";
   const isRounded = props.rounded || false;
   let bg = "var(--p-blue-50, #eff6ff)";
@@ -20195,12 +20538,12 @@ function TagIsland(container, props) {
         </span>
     `;
 }
-var CSS23;
+var CSS22;
 var init_tag = __esm({
   "src/components/tag.ts"() {
     "use strict";
     init_styles();
-    CSS23 = `
+    CSS22 = `
 [data-theme="dark"] .laughtale-tag {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -20466,7 +20809,7 @@ __export(scroll_top_exports, {
   default: () => ScrollTopIsland
 });
 function ScrollTopIsland(container, props) {
-  injectIslandStyle("scroll-top", CSS24);
+  injectIslandStyle("scroll-top", CSS23);
   const threshold = props.threshold || 200;
   let isVisible = false;
   function render() {
@@ -20492,13 +20835,13 @@ function ScrollTopIsland(container, props) {
   window.addEventListener("scroll", checkScroll, { passive: true });
   render();
 }
-var CSS24;
+var CSS23;
 var init_scroll_top = __esm({
   "src/components/scroll-top.ts"() {
     "use strict";
     init_lucide();
     init_styles();
-    CSS24 = `
+    CSS23 = `
 [data-theme="dark"] .laughtale-scroll-top-btn {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -20514,7 +20857,7 @@ __export(inplace_exports, {
   default: () => InplaceIsland
 });
 function InplaceIsland(container, props) {
-  injectIslandStyle("inplace", CSS25);
+  injectIslandStyle("inplace", CSS24);
   let isEditing = false;
   let currentValue = props.value || "";
   function render() {
@@ -20594,13 +20937,13 @@ function InplaceIsland(container, props) {
   render();
   syncValue();
 }
-var CSS25;
+var CSS24;
 var init_inplace = __esm({
   "src/components/inplace.ts"() {
     "use strict";
     init_lucide();
     init_styles();
-    CSS25 = `
+    CSS24 = `
 [data-theme="dark"] .laughtale-inplace-display {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -22095,7 +22438,7 @@ __export(dynamic_form_exports, {
   default: () => DynamicFormIsland
 });
 function DynamicFormIsland(container, props) {
-  injectIslandStyle("dynamic-form", CSS26);
+  injectIslandStyle("dynamic-form", CSS25);
   let schema = props.schema || null;
   if (!schema && props.schemaJson) {
     try {
@@ -22256,13 +22599,13 @@ function DynamicFormIsland(container, props) {
   }
   render();
 }
-var CSS26;
+var CSS25;
 var init_dynamic_form = __esm({
   "src/components/dynamic-form.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS26 = `
+    CSS25 = `
 [data-theme="dark"] .p-input {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -22648,7 +22991,7 @@ __export(multiselect_exports, {
   default: () => MultiSelectIsland
 });
 function MultiSelectIsland(container, props) {
-  injectIslandStyle("multiselect", CSS27);
+  injectIslandStyle("multiselect", CSS26);
   const options = props.options || [];
   let selected = new Set(props.selectedValues || []);
   let filterQuery = "";
@@ -22814,7 +23157,7 @@ function MultiSelectIsland(container, props) {
   renderDisplay();
   syncValue();
 }
-var CSS27;
+var CSS26;
 var init_multiselect = __esm({
   "src/components/multiselect.ts"() {
     "use strict";
@@ -22823,7 +23166,7 @@ var init_multiselect = __esm({
     init_useDisclosure();
     init_useClickOutside();
     init_useTransition();
-    CSS27 = `
+    CSS26 = `
 [data-theme="dark"] .laughtale-multiselect {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -22894,7 +23237,7 @@ __export(cascadeselect_exports, {
   default: () => CascadeSelectIsland
 });
 function CascadeSelectIsland(container, props) {
-  injectIslandStyle("cascadeselect", CSS28);
+  injectIslandStyle("cascadeselect", CSS27);
   const options = props.options || [];
   const size = props.size || "normal";
   const variant = props.variant || "outlined";
@@ -23107,7 +23450,7 @@ function CascadeSelectIsland(container, props) {
     }));
   }
 }
-var CSS28;
+var CSS27;
 var init_cascadeselect = __esm({
   "src/components/cascadeselect.ts"() {
     "use strict";
@@ -23115,7 +23458,7 @@ var init_cascadeselect = __esm({
     init_styles();
     init_useDisclosure();
     init_useClickOutside();
-    CSS28 = `
+    CSS27 = `
 .laughtale-cascadeselect {
     position: relative;
     display: inline-flex;
@@ -23320,7 +23663,7 @@ __export(listbox_exports, {
   default: () => ListboxIsland
 });
 function ListboxIsland(container, props) {
-  injectIslandStyle("laughtale-listbox", CSS29);
+  injectIslandStyle("laughtale-listbox", CSS28);
   const isMultiple = props.multiple === true || String(props.multiple) === "true";
   const isMetaKey = props.metaKeySelection !== false && String(props.metaKeySelection) !== "false";
   const isCheckbox = props.checkbox === true || String(props.checkbox) === "true";
@@ -23656,14 +23999,14 @@ function ListboxIsland(container, props) {
   }
   init();
 }
-var CSS29, checkSvg2, searchSvg2;
+var CSS28, checkSvg2, searchSvg2;
 var init_listbox = __esm({
   "src/components/listbox.ts"() {
     "use strict";
     init_lucide();
     init_styles();
     init_useDebounce();
-    CSS29 = `
+    CSS28 = `
 /* ==================== AURA LISTBOX ==================== */
 .laughtale-listbox,
 .p-listbox {
@@ -26135,7 +26478,7 @@ __export(terminal_exports, {
   default: () => TerminalIsland
 });
 function TerminalIsland(container, props) {
-  injectIslandStyle("terminal", CSS30);
+  injectIslandStyle("terminal", CSS29);
   const promptPrefix = props.prompt || "admin@softmax:~$";
   const welcome = props.welcomeMessage || 'Welcome to SoftMax.LaughTale CLI v3.0\nType "help" for available commands.';
   const commands = {
@@ -26234,13 +26577,13 @@ ${h.response}`).join("\n");
   }
   render();
 }
-var CSS30;
+var CSS29;
 var init_terminal = __esm({
   "src/components/terminal.ts"() {
     "use strict";
     init_styles();
     init_useClipboard();
-    CSS30 = `
+    CSS29 = `
 [data-theme="dark"] .laughtale-terminal {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -26271,7 +26614,7 @@ __export(dock_exports, {
   default: () => DockIsland
 });
 function DockIsland(container, props) {
-  injectIslandStyle("dock", CSS31);
+  injectIslandStyle("dock", CSS30);
   const items = props.items || [
     { label: "Overview", icon: "compass", url: "/" },
     { label: "Dashboard", icon: "bar-chart", url: "/dashboard" },
@@ -26313,13 +26656,13 @@ function DockIsland(container, props) {
     });
   });
 }
-var CSS31;
+var CSS30;
 var init_dock = __esm({
   "src/components/dock.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS31 = `
+    CSS30 = `
 [data-theme="dark"] .laughtale-dock {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -26340,7 +26683,7 @@ __export(galleria_exports, {
   default: () => GalleriaIsland
 });
 function GalleriaIsland(container, props) {
-  injectIslandStyle("galleria", CSS32);
+  injectIslandStyle("galleria", CSS31);
   const images = props.value && props.value.length > 0 ? props.value : [
     {
       itemImageSrc: "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800&auto=format&fit=crop&q=80",
@@ -26414,13 +26757,13 @@ function GalleriaIsland(container, props) {
   }
   render();
 }
-var CSS32;
+var CSS31;
 var init_galleria = __esm({
   "src/components/galleria.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS32 = `
+    CSS31 = `
 [data-theme="dark"] .laughtale-galleria {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -26451,7 +26794,7 @@ __export(blockui_exports, {
   default: () => BlockUIIsland
 });
 function BlockUIIsland(container, props) {
-  injectIslandStyle("blockui", CSS33);
+  injectIslandStyle("blockui", CSS32);
   let isBlocked = props.blocked ?? true;
   function render() {
     container.innerHTML = `
@@ -26474,12 +26817,12 @@ function BlockUIIsland(container, props) {
     render();
   });
 }
-var CSS33;
+var CSS32;
 var init_blockui = __esm({
   "src/components/blockui.ts"() {
     "use strict";
     init_styles();
-    CSS33 = `
+    CSS32 = `
 [data-theme="dark"] .laughtale-blockui-root {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -27211,7 +27554,7 @@ __export(select_exports, {
   default: () => SelectIsland
 });
 function SelectIsland(container, props) {
-  injectIslandStyle("laughtale-select", CSS34);
+  injectIslandStyle("laughtale-select", CSS33);
   const isMultiple = props.multiple === true || String(props.multiple) === "true";
   const isCheckmark = props.checkmark === true || String(props.checkmark) === "true";
   const isCheckbox = props.checkbox === true || String(props.checkbox) === "true";
@@ -27551,13 +27894,13 @@ function SelectIsland(container, props) {
   }
   render();
 }
-var CSS34;
+var CSS33;
 var init_select = __esm({
   "src/components/select.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS34 = `
+    CSS33 = `
 /* ==================== AURA SELECT ==================== */
 .laughtale-select,
 .p-select {
@@ -27984,7 +28327,7 @@ __export(checkbox_exports, {
   default: () => CheckboxIsland
 });
 function CheckboxIsland(container, props) {
-  injectIslandStyle("laughtale-checkbox", CSS35);
+  injectIslandStyle("laughtale-checkbox", CSS34);
   let isChecked = Boolean(props.checked);
   let isIndeterminate = Boolean(props.indeterminate);
   const size = props.size || "normal";
@@ -28056,13 +28399,13 @@ function CheckboxIsland(container, props) {
   }
   render();
 }
-var CSS35;
+var CSS34;
 var init_checkbox = __esm({
   "src/components/checkbox.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS35 = `
+    CSS34 = `
 .laughtale-checkbox-wrap {
     display: inline-flex;
     align-items: center;
@@ -28239,7 +28582,7 @@ __export(radio_button_exports, {
   default: () => RadioButtonIsland
 });
 function RadioButtonIsland(container, props) {
-  injectIslandStyle("laughtale-radio", CSS36);
+  injectIslandStyle("laughtale-radio", CSS35);
   const isCard = props.card === true || String(props.card) === "true";
   const isFilled = props.variant === "filled";
   const size = props.size || "normal";
@@ -28471,13 +28814,13 @@ function RadioButtonIsland(container, props) {
   }
   renderSingle();
 }
-var CSS36;
+var CSS35;
 var init_radio_button = __esm({
   "src/components/radio-button.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS36 = `
+    CSS35 = `
 /* ==================== AURA RADIOBUTTON ==================== */
 .laughtale-radio-root,
 .p-radiobutton-root {
@@ -28760,7 +29103,7 @@ __export(textarea_exports, {
   default: () => TextareaIsland
 });
 function TextareaIsland(container, props) {
-  injectIslandStyle("laughtale-textarea", CSS37);
+  injectIslandStyle("laughtale-textarea", CSS36);
   const isAutoResize = props.autoResize === true || String(props.autoResize) === "true";
   const isFluid = props.fluid === true || String(props.fluid) === "true";
   const isInvalid = props.invalid === true || String(props.invalid) === "true";
@@ -28836,12 +29179,12 @@ function TextareaIsland(container, props) {
     setTimeout(adjustHeight, 0);
   }
 }
-var CSS37;
+var CSS36;
 var init_textarea = __esm({
   "src/components/textarea.ts"() {
     "use strict";
     init_styles();
-    CSS37 = `
+    CSS36 = `
 /* ==================== AURA TEXTAREA ==================== */
 .p-textarea {
     font-family: var(--p-font-family, inherit);
@@ -28966,7 +29309,7 @@ __export(input_mask_exports, {
   default: () => InputMaskIsland
 });
 function InputMaskIsland(container, props) {
-  injectIslandStyle("laughtale-input-mask", CSS38);
+  injectIslandStyle("laughtale-input-mask", CSS37);
   const mask = props.mask || "(999) 999-9999";
   const slotChar = props.slotChar || "_";
   const autoClear = props.autoClear !== false && String(props.autoClear) !== "false";
@@ -29153,12 +29496,12 @@ function InputMaskIsland(container, props) {
   });
   syncValue();
 }
-var CSS38;
+var CSS37;
 var init_input_mask = __esm({
   "src/components/input-mask.ts"() {
     "use strict";
     init_styles();
-    CSS38 = `
+    CSS37 = `
 /* ==================== AURA INPUTMASK ==================== */
 .laughtale-input-mask,
 .p-inputmask {
@@ -29268,7 +29611,7 @@ __export(float_label_exports, {
   default: () => FloatLabelIsland
 });
 function FloatLabelIsland(container, props) {
-  injectIslandStyle("laughtale-float-label", CSS39);
+  injectIslandStyle("laughtale-float-label", CSS38);
   const variant = props.variant || "over";
   const initialHtml = container.innerHTML;
   const forAttr = props.for ? `for="${props.for}"` : "";
@@ -29346,12 +29689,12 @@ function FloatLabelIsland(container, props) {
   setTimeout(updateFloatingState, 50);
   setTimeout(updateFloatingState, 200);
 }
-var CSS39;
+var CSS38;
 var init_float_label = __esm({
   "src/components/float-label.ts"() {
     "use strict";
     init_styles();
-    CSS39 = `
+    CSS38 = `
 .laughtale-float-label {
     position: relative;
     display: inline-flex;
@@ -29478,7 +29821,7 @@ __export(ifta_label_exports, {
   default: () => IftaLabelIsland
 });
 function IftaLabelIsland(container, props) {
-  injectIslandStyle("laughtale-ifta-label", CSS40);
+  injectIslandStyle("laughtale-ifta-label", CSS39);
   const initialHtml = container.innerHTML;
   const forAttr = props.for ? `for="${props.for}"` : "";
   const existingLabel = container.querySelector("label");
@@ -29501,12 +29844,12 @@ function IftaLabelIsland(container, props) {
     }
   });
 }
-var CSS40;
+var CSS39;
 var init_ifta_label = __esm({
   "src/components/ifta-label.ts"() {
     "use strict";
     init_styles();
-    CSS40 = `
+    CSS39 = `
 .laughtale-ifta-label {
     position: relative;
     display: inline-flex;
@@ -29594,14 +29937,14 @@ __export(input_group_exports, {
   default: () => InputGroupIsland
 });
 function InputGroupIsland(container, props) {
-  injectIslandStyle("laughtale-inputgroup", CSS41);
+  injectIslandStyle("laughtale-inputgroup", CSS40);
   container.classList.add("laughtale-inputgroup", "p-inputgroup");
   if (props.size) {
     container.classList.add(`size-${props.size}`);
   }
 }
 function InputGroupAddonIsland(container, props) {
-  injectIslandStyle("laughtale-inputgroup", CSS41);
+  injectIslandStyle("laughtale-inputgroup", CSS40);
   container.classList.add("laughtale-inputgroup-addon", "p-inputgroup-addon");
   if (props.icon && !container.querySelector("svg")) {
     const svg = getLucideIcon(props.icon);
@@ -29613,13 +29956,13 @@ function InputGroupAddonIsland(container, props) {
     container.insertAdjacentHTML("beforeend", `<span>${props.text}</span>`);
   }
 }
-var CSS41;
+var CSS40;
 var init_input_group = __esm({
   "src/components/input-group.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS41 = `
+    CSS40 = `
 .laughtale-inputgroup,
 .p-inputgroup {
     display: flex;
@@ -29891,7 +30234,7 @@ __export(input_text_exports, {
   default: () => InputTextIsland
 });
 function InputTextIsland(container, props) {
-  injectIslandStyle("laughtale-inputtext", CSS42);
+  injectIslandStyle("laughtale-inputtext", CSS41);
   const [getValue, setValue] = useControllableState({
     defaultValue: props.value ?? "",
     onChange: (val) => {
@@ -30032,14 +30375,14 @@ function InputTextIsland(container, props) {
   }
   init();
 }
-var CSS42, xIcon;
+var CSS41, xIcon;
 var init_input_text = __esm({
   "src/components/input-text.ts"() {
     "use strict";
     init_styles();
     init_lucide();
     init_useControllableState();
-    CSS42 = `
+    CSS41 = `
 .laughtale-inputtext-wrap,
 .p-inputtext-wrap {
     position: relative;
@@ -36606,6 +36949,10 @@ var init_index = __esm({
     defineIsland("drawer", () => Promise.resolve().then(() => (init_drawer(), drawer_exports)));
     defineIsland("speed-dial", () => Promise.resolve().then(() => (init_speed_dial(), speed_dial_exports)));
     defineIsland("image-compare", () => Promise.resolve().then(() => (init_image_compare(), image_compare_exports)));
+    defineIsland("imagecompare", () => Promise.resolve().then(() => (init_image_compare(), image_compare_exports)));
+    defineIsland("compare", () => Promise.resolve().then(() => (init_image_compare(), image_compare_exports)));
+    defineIsland("p-compare", () => Promise.resolve().then(() => (init_image_compare(), image_compare_exports)));
+    defineIsland("island-compare", () => Promise.resolve().then(() => (init_image_compare(), image_compare_exports)));
     defineIsland("confirm-popup", () => Promise.resolve().then(() => (init_confirm_popup(), confirm_popup_exports)));
     defineIsland("confirm-dialog", () => Promise.resolve().then(() => (init_confirm_dialog(), confirm_dialog_exports)));
     defineIsland("dialog", () => Promise.resolve().then(() => (init_dialog(), dialog_exports)));

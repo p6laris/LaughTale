@@ -1,36 +1,9 @@
-/**
- * SoftMax.LaughTale: Enterprise Compare Component (PrimeVue 4 Aura Design System)
- * High-performance side-by-side comparison slider supporting horizontal and vertical orientation,
- * slideOnHover, custom handles, SVG chart reveal, rich template comparison, controlled value sync,
- * pointer capture dragging, and hidden accessible range input for full WAI-ARIA compliance.
- */
+import {
+  injectIslandStyle
+} from "./chunk-3TFPN5JM.js";
 
-import { LucideIcons } from '../icons/lucide';
-import { injectIslandStyle } from '../runtime/styles';
-
-export interface CompareProps {
-    modelValue?: number;
-    value?: number;
-    min?: number;
-    max?: number;
-    step?: number;
-    orientation?: 'horizontal' | 'vertical';
-    slideOnHover?: boolean;
-    disabled?: boolean;
-    readonly?: boolean;
-    invalid?: boolean;
-    beforeImage?: string;
-    afterImage?: string;
-    beforeLabel?: string;
-    afterLabel?: string;
-    customHandle?: boolean;
-    demoType?: 'basic' | 'custom-handle' | 'hover' | 'vertical' | 'with-chart' | 'controlled' | 'template';
-    class?: string;
-    style?: string;
-    ariaLabel?: string;
-}
-
-const COMPARE_CSS = `
+// ../SoftMax.LaughTale.Client/src/components/image-compare.ts
+var COMPARE_CSS = `
 /* ==========================================================================
    PrimeVue 4 Aura Compare Component Tokens & Styles
    ========================================================================== */
@@ -190,43 +163,34 @@ const COMPARE_CSS = `
     border: 1px solid var(--p-surface-700, #334155);
 }
 `;
-
-const ARROWS_H_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 8 4 4-4 4"/><path d="M2 12h20"/><path d="m6 8-4 4 4 4"/></svg>`;
-const CODE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>`;
-
-const DEFAULT_BEFORE_IMG = 'https://primefaces.org/cdn/primevue/images/compare/island2.jpg';
-const DEFAULT_AFTER_IMG = 'https://primefaces.org/cdn/primevue/images/compare/island1.jpg';
-
-export default function CompareIsland(container: HTMLElement, props: CompareProps) {
-    injectIslandStyle('compare', COMPARE_CSS);
-
-    const demoType = props.demoType || 'basic';
-    const orientation = props.orientation || (demoType === 'vertical' ? 'vertical' : 'horizontal');
-    const isVertical = orientation === 'vertical';
-    const slideOnHover = props.slideOnHover === true || demoType === 'hover' || demoType === 'with-chart';
-    const isCustomHandle = props.customHandle === true || demoType === 'custom-handle';
-    const isControlled = demoType === 'controlled';
-    const isWithChart = demoType === 'with-chart';
-    const isTemplate = demoType === 'template';
-    const disabled = props.disabled === true;
-    const readonly = props.readonly === true;
-
-    let currentValue = props.modelValue !== undefined ? props.modelValue : (props.value !== undefined ? props.value : 50);
-    currentValue = Math.max(0, Math.min(100, currentValue));
-
-    const beforeImg = props.beforeImage || DEFAULT_BEFORE_IMG;
-    const afterImg = props.afterImage || DEFAULT_AFTER_IMG;
-
-    function renderDOM() {
-        const customHandleClass = isCustomHandle ? 'p-compare-custom-handle' : '';
-        const verticalClass = isVertical ? 'p-compare-vertical' : '';
-        const disabledClass = disabled ? 'p-compare-disabled' : '';
-
-        let beforeContentHtml = '';
-        let afterContentHtml = '';
-
-        if (isWithChart) {
-            beforeContentHtml = `
+var ARROWS_H_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 8 4 4-4 4"/><path d="M2 12h20"/><path d="m6 8-4 4 4 4"/></svg>`;
+var CODE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>`;
+var DEFAULT_BEFORE_IMG = "https://primefaces.org/cdn/primevue/images/compare/island2.jpg";
+var DEFAULT_AFTER_IMG = "https://primefaces.org/cdn/primevue/images/compare/island1.jpg";
+function CompareIsland(container, props) {
+  injectIslandStyle("compare", COMPARE_CSS);
+  const demoType = props.demoType || "basic";
+  const orientation = props.orientation || (demoType === "vertical" ? "vertical" : "horizontal");
+  const isVertical = orientation === "vertical";
+  const slideOnHover = props.slideOnHover === true || demoType === "hover" || demoType === "with-chart";
+  const isCustomHandle = props.customHandle === true || demoType === "custom-handle";
+  const isControlled = demoType === "controlled";
+  const isWithChart = demoType === "with-chart";
+  const isTemplate = demoType === "template";
+  const disabled = props.disabled === true;
+  const readonly = props.readonly === true;
+  let currentValue = props.modelValue !== void 0 ? props.modelValue : props.value !== void 0 ? props.value : 50;
+  currentValue = Math.max(0, Math.min(100, currentValue));
+  const beforeImg = props.beforeImage || DEFAULT_BEFORE_IMG;
+  const afterImg = props.afterImage || DEFAULT_AFTER_IMG;
+  function renderDOM() {
+    const customHandleClass = isCustomHandle ? "p-compare-custom-handle" : "";
+    const verticalClass = isVertical ? "p-compare-vertical" : "";
+    const disabledClass = disabled ? "p-compare-disabled" : "";
+    let beforeContentHtml = "";
+    let afterContentHtml = "";
+    if (isWithChart) {
+      beforeContentHtml = `
                 <svg class="absolute h-full w-full" viewBox="0 0 644 189" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;">
                     <g clip-path="url(#compare_chart_clip)">
                         <path d="M0.5 118.499C0.5 118.499 82 102.999 113.5 89.4989C145 75.9989 188.444 87.7869 235 77.4989C272.684 69.1719 293.654 62.4939 329 46.9989C409.332 11.7849 479.5 86.5 510.5 78C541.5 69.5 635.951 0.848863 644 1.49886" stroke="#10b981" stroke-width="2.5" />
@@ -243,13 +207,13 @@ export default function CompareIsland(container: HTMLElement, props: CompareProp
                     </defs>
                 </svg>
             `;
-            afterContentHtml = `
+      afterContentHtml = `
                 <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: var(--p-surface-50); color: var(--p-text-muted); font-size: 0.875rem;">
                     <span>Hover to reveal chart trajectory</span>
                 </div>
             `;
-        } else if (isTemplate) {
-            beforeContentHtml = `
+    } else if (isTemplate) {
+      beforeContentHtml = `
                 <div style="width: 100%; height: 100%; background: #f3e8ff; padding: 1.5rem; display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
                     <div style="width: 100%; max-width: 18rem; border-radius: 12px; border: 1px solid #e9d5ff; background: #ffffff; padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; box-shadow: 0 4px 12px rgba(147, 51, 234, 0.1);">
                         <div style="display: flex; align-items: flex-start; justify-content: space-between;">
@@ -280,7 +244,7 @@ export default function CompareIsland(container: HTMLElement, props: CompareProp
                     </div>
                 </div>
             `;
-            afterContentHtml = `
+      afterContentHtml = `
                 <div style="width: 100%; height: 100%; background: #ecfdf5; padding: 1.5rem; display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
                     <div style="width: 100%; max-width: 18rem; border-radius: 12px; border: 1px solid #a7f3d0; background: #ffffff; padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);">
                         <div style="display: flex; align-items: flex-start; justify-content: space-between;">
@@ -311,20 +275,17 @@ export default function CompareIsland(container: HTMLElement, props: CompareProp
                     </div>
                 </div>
             `;
-        } else {
-            beforeContentHtml = `<img src="${beforeImg}" alt="Before" draggable="false" />`;
-            afterContentHtml = `<img src="${afterImg}" alt="After" draggable="false" />`;
-        }
-
-        const iconHtml = (demoType === 'hover' || demoType === 'vertical' || isTemplate) ? CODE_SVG : ARROWS_H_SVG;
-        const iconRotateStyle = isVertical ? 'transform: rotate(90deg);' : '';
-
-        const heightStyle = isWithChart ? 'height: 189px;' : (isTemplate ? 'height: 320px;' : 'aspect-ratio: 16/9;');
-
-        let containerHtml = `
-            <div class="p-compare ${verticalClass} ${customHandleClass} ${disabledClass} ${props.class || ''}" style="max-width: 32rem; margin: 0 auto; ${heightStyle} ${props.style || ''}" data-compare-root>
+    } else {
+      beforeContentHtml = `<img src="${beforeImg}" alt="Before" draggable="false" />`;
+      afterContentHtml = `<img src="${afterImg}" alt="After" draggable="false" />`;
+    }
+    const iconHtml = demoType === "hover" || demoType === "vertical" || isTemplate ? CODE_SVG : ARROWS_H_SVG;
+    const iconRotateStyle = isVertical ? "transform: rotate(90deg);" : "";
+    const heightStyle = isWithChart ? "height: 189px;" : isTemplate ? "height: 320px;" : "aspect-ratio: 16/9;";
+    let containerHtml = `
+            <div class="p-compare ${verticalClass} ${customHandleClass} ${disabledClass} ${props.class || ""}" style="max-width: 32rem; margin: 0 auto; ${heightStyle} ${props.style || ""}" data-compare-root>
                 <!-- Hidden Accessible Range Input -->
-                <input type="range" class="p-compare-input" min="${props.min || 0}" max="${props.max || 100}" step="${props.step || 1}" value="${currentValue}" aria-label="${props.ariaLabel || 'Compare images'}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${currentValue}" tabindex="0" ${disabled ? 'disabled' : ''} data-compare-input />
+                <input type="range" class="p-compare-input" min="${props.min || 0}" max="${props.max || 100}" step="${props.step || 1}" value="${currentValue}" aria-label="${props.ariaLabel || "Compare images"}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${currentValue}" tabindex="0" ${disabled ? "disabled" : ""} data-compare-input />
 
                 <!-- Layer After (Base Bottom) -->
                 <div class="p-compare-item p-compare-item-after" data-compare-after>
@@ -339,14 +300,13 @@ export default function CompareIsland(container: HTMLElement, props: CompareProp
                 <!-- Divider Handle -->
                 <div class="p-compare-handle" data-compare-handle>
                     <div class="p-compare-indicator" data-compare-indicator>
-                        ${isCustomHandle ? '' : `<span style="${iconRotateStyle} display: flex; align-items: center; justify-content: center;">${iconHtml}</span>`}
+                        ${isCustomHandle ? "" : `<span style="${iconRotateStyle} display: flex; align-items: center; justify-content: center;">${iconHtml}</span>`}
                     </div>
                 </div>
             </div>
         `;
-
-        if (isControlled) {
-            containerHtml += `
+    if (isControlled) {
+      containerHtml += `
                 <div class="p-compare-controls" style="max-width: 32rem; margin: 1rem auto 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; width: 100%;">
                     <button type="button" class="p-button p-button-outlined p-button-secondary" data-compare-set="25" style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer;">
                         25%
@@ -360,132 +320,117 @@ export default function CompareIsland(container: HTMLElement, props: CompareProp
                     </button>
                 </div>
             `;
-        }
-
-        container.innerHTML = containerHtml;
     }
-
-    renderDOM();
-
-    const rootEl = container.querySelector<HTMLElement>('[data-compare-root]')!;
-    const inputEl = container.querySelector<HTMLInputElement>('[data-compare-input]')!;
-    const beforeEl = container.querySelector<HTMLElement>('[data-compare-before]')!;
-    const handleEl = container.querySelector<HTMLElement>('[data-compare-handle]')!;
-    const numInput = container.querySelector<HTMLInputElement>('[data-compare-num]');
-
-    function updatePosition(pct: number) {
-        currentValue = Math.max(0, Math.min(100, pct));
-
-        if (isVertical) {
-            beforeEl.style.clipPath = `inset(0 0 ${100 - currentValue}% 0)`;
-            handleEl.style.top = `${currentValue}%`;
-        } else {
-            beforeEl.style.clipPath = `inset(0 ${100 - currentValue}% 0 0)`;
-            handleEl.style.left = `${currentValue}%`;
-        }
-
-        if (inputEl) {
-            inputEl.value = `${currentValue}`;
-            inputEl.setAttribute('aria-valuenow', `${currentValue}`);
-        }
-        if (numInput) {
-            numInput.value = `${Math.round(currentValue)}`;
-        }
-
-        container.dispatchEvent(new CustomEvent('compare:change', {
-            bubbles: true,
-            detail: { value: currentValue }
-        }));
+    container.innerHTML = containerHtml;
+  }
+  renderDOM();
+  const rootEl = container.querySelector("[data-compare-root]");
+  const inputEl = container.querySelector("[data-compare-input]");
+  const beforeEl = container.querySelector("[data-compare-before]");
+  const handleEl = container.querySelector("[data-compare-handle]");
+  const numInput = container.querySelector("[data-compare-num]");
+  function updatePosition(pct) {
+    currentValue = Math.max(0, Math.min(100, pct));
+    if (isVertical) {
+      beforeEl.style.clipPath = `inset(0 0 ${100 - currentValue}% 0)`;
+      handleEl.style.top = `${currentValue}%`;
+    } else {
+      beforeEl.style.clipPath = `inset(0 ${100 - currentValue}% 0 0)`;
+      handleEl.style.left = `${currentValue}%`;
     }
-
-    updatePosition(currentValue);
-
-    if (disabled || readonly) return;
-
-    let isDragging = false;
-
-    function updateFromPointer(clientX: number, clientY: number) {
-        const rect = rootEl.getBoundingClientRect();
-        if (isVertical) {
-            if (rect.height <= 0) return;
-            const p = ((clientY - rect.top) / rect.height) * 100;
-            updatePosition(p);
-        } else {
-            if (rect.width <= 0) return;
-            const p = ((clientX - rect.left) / rect.width) * 100;
-            updatePosition(p);
-        }
+    if (inputEl) {
+      inputEl.value = `${currentValue}`;
+      inputEl.setAttribute("aria-valuenow", `${currentValue}`);
     }
-
-    const onPointerDown = (e: PointerEvent) => {
-        isDragging = true;
-        try {
-            rootEl.setPointerCapture(e.pointerId);
-        } catch (_) {}
-        updateFromPointer(e.clientX, e.clientY);
-    };
-
-    const onPointerMove = (e: PointerEvent) => {
-        if (slideOnHover) {
-            updateFromPointer(e.clientX, e.clientY);
-        } else if (isDragging) {
-            updateFromPointer(e.clientX, e.clientY);
-        }
-    };
-
-    const onPointerUp = (e: PointerEvent) => {
-        if (!isDragging) return;
-        isDragging = false;
-        try {
-            rootEl.releasePointerCapture(e.pointerId);
-        } catch (_) {}
-    };
-
-    rootEl.addEventListener('pointerdown', onPointerDown);
-    rootEl.addEventListener('pointermove', onPointerMove);
-    rootEl.addEventListener('pointerup', onPointerUp);
-    rootEl.addEventListener('pointercancel', onPointerUp);
-
-    // Keyboard support via hidden input
-    inputEl.addEventListener('input', () => {
-        updatePosition(parseFloat(inputEl.value));
-    });
-
-    inputEl.addEventListener('keydown', (e) => {
-        let step = props.step || 1;
-        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-            e.preventDefault();
-            updatePosition(currentValue + step);
-        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-            e.preventDefault();
-            updatePosition(currentValue - step);
-        } else if (e.key === 'PageUp') {
-            e.preventDefault();
-            updatePosition(currentValue + 10);
-        } else if (e.key === 'PageDown') {
-            e.preventDefault();
-            updatePosition(currentValue - 10);
-        } else if (e.key === 'Home') {
-            e.preventDefault();
-            updatePosition(0);
-        } else if (e.key === 'End') {
-            e.preventDefault();
-            updatePosition(100);
-        }
-    });
-
-    // Controlled demo button handlers
-    container.querySelectorAll<HTMLButtonElement>('[data-compare-set]').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const val = parseFloat(btn.getAttribute('data-compare-set') || '50');
-            updatePosition(val);
-        });
-    });
-
     if (numInput) {
-        numInput.addEventListener('change', () => {
-            const val = parseFloat(numInput.value || '50');
-            updatePosition(val);
-        });
+      numInput.value = `${Math.round(currentValue)}`;
     }
+    container.dispatchEvent(new CustomEvent("compare:change", {
+      bubbles: true,
+      detail: { value: currentValue }
+    }));
+  }
+  updatePosition(currentValue);
+  if (disabled || readonly) return;
+  let isDragging = false;
+  function updateFromPointer(clientX, clientY) {
+    const rect = rootEl.getBoundingClientRect();
+    if (isVertical) {
+      if (rect.height <= 0) return;
+      const p = (clientY - rect.top) / rect.height * 100;
+      updatePosition(p);
+    } else {
+      if (rect.width <= 0) return;
+      const p = (clientX - rect.left) / rect.width * 100;
+      updatePosition(p);
+    }
+  }
+  const onPointerDown = (e) => {
+    isDragging = true;
+    try {
+      rootEl.setPointerCapture(e.pointerId);
+    } catch (_) {
+    }
+    updateFromPointer(e.clientX, e.clientY);
+  };
+  const onPointerMove = (e) => {
+    if (slideOnHover) {
+      updateFromPointer(e.clientX, e.clientY);
+    } else if (isDragging) {
+      updateFromPointer(e.clientX, e.clientY);
+    }
+  };
+  const onPointerUp = (e) => {
+    if (!isDragging) return;
+    isDragging = false;
+    try {
+      rootEl.releasePointerCapture(e.pointerId);
+    } catch (_) {
+    }
+  };
+  rootEl.addEventListener("pointerdown", onPointerDown);
+  rootEl.addEventListener("pointermove", onPointerMove);
+  rootEl.addEventListener("pointerup", onPointerUp);
+  rootEl.addEventListener("pointercancel", onPointerUp);
+  inputEl.addEventListener("input", () => {
+    updatePosition(parseFloat(inputEl.value));
+  });
+  inputEl.addEventListener("keydown", (e) => {
+    let step = props.step || 1;
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+      e.preventDefault();
+      updatePosition(currentValue + step);
+    } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+      e.preventDefault();
+      updatePosition(currentValue - step);
+    } else if (e.key === "PageUp") {
+      e.preventDefault();
+      updatePosition(currentValue + 10);
+    } else if (e.key === "PageDown") {
+      e.preventDefault();
+      updatePosition(currentValue - 10);
+    } else if (e.key === "Home") {
+      e.preventDefault();
+      updatePosition(0);
+    } else if (e.key === "End") {
+      e.preventDefault();
+      updatePosition(100);
+    }
+  });
+  container.querySelectorAll("[data-compare-set]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const val = parseFloat(btn.getAttribute("data-compare-set") || "50");
+      updatePosition(val);
+    });
+  });
+  if (numInput) {
+    numInput.addEventListener("change", () => {
+      const val = parseFloat(numInput.value || "50");
+      updatePosition(val);
+    });
+  }
 }
+export {
+  CompareIsland as default
+};
+//# sourceMappingURL=image-compare-NOTN3X5T.js.map

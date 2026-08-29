@@ -113,7 +113,7 @@ public static class NavigationData
                 new("Galleria Stage", "galleryThumbnails", "/enterprise#sec-galleria"),
                 new("Carousel", "image", "/enterprise#sec-carousel", false, null, "New"),
                 new("FileUpload", "uploadCloud", "/enterprise#sec-fileupload", false, null, "New"),
-                new("Image Compare", "columns3", "/enterprise#sec-image-compare"),
+                new("Compare", "columns3", "/enterprise#sec-image-compare", false, null, "New"),
                 new("Camera Snapshot", "camera", "/enterprise#sec-camera")
             })
         };

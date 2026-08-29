@@ -1,34 +1,104 @@
 ---
-title: "Image Compare Slider"
-description: "Before and after image comparison slider with a draggable divider"
+title: "Compare Slider"
+description: "Side-by-side comparison slider supporting horizontal and vertical orientation, slideOnHover, custom handles, SVG charts, and rich templates"
 order: 24
-section: "Metrics & Display"
+section: "Metrics & Visual Media"
 ---
 
-# Image Compare Slider
+# Compare
 
-The `<island-image-compare />` TagHelper provides a before/after split slider allowing users to compare two images side-by-side by dragging the divider.
-
----
-
-## 🎮 Interactive Live Demo
-
-<div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); padding: 1.5rem; margin: 1.5rem 0;">
-    <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-primary-600); text-transform: uppercase; margin-bottom: 0.75rem;">Live Image Compare (Drag handle left/right)</div>
-    <island name="image-compare" props-json='{"beforeImage": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=340&fit=crop", "afterImage": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&h=340&fit=crop", "beforeLabel": "Raw Snapshot", "afterLabel": "Enhanced HD"}' hydrate="Load"></island>
-</div>
+Compare is used to display two items side by side with a slider. It supports horizontal and vertical layouts, hover sliding, custom drag indicators, SVG chart comparisons, and full WAI-ARIA range input accessibility.
 
 ---
 
-## 🚀 Basic Usage
+## 🎮 Interactive Live Demos
+
+### 1. Basic
+
+Composition-based comparison with Before and After image layers and a keyboard-accessible indicator handle.
+
+<island-compare demo-type="basic" />
+
+---
+
+### 2. Custom Handle
+
+The indicator handle can be customized with translucent blur styling, rounded icons, and scale effects on hover.
+
+<island-compare demo-type="custom-handle" custom-handle="true" />
+
+---
+
+### 3. Slide on Hover
+
+Enable `slideOnHover` to update the slider position automatically by hovering over the component.
+
+<island-compare demo-type="hover" slide-on-hover="true" />
+
+---
+
+### 4. Vertical Orientation
+
+Set `orientation="vertical"` for a vertical comparison layout with top and bottom layers.
+
+<island-compare demo-type="vertical" orientation="vertical" />
+
+---
+
+### 5. With Chart Reveal
+
+Combine `slideOnHover` with controlled values for interactive chart reveals with SVG clip paths and gradients.
+
+<island-compare demo-type="with-chart" slide-on-hover="true" />
+
+---
+
+### 6. Controlled Sync
+
+Bind the value with `v-model` or external buttons to keep external UI controls in sync with the slider.
+
+<island-compare demo-type="controlled" />
+
+---
+
+### 7. Creative Template Comparison
+
+Compare is not limited to images — any HTML cards, themes, or UI states can be compared side-by-side.
+
+<island-compare demo-type="template" />
+
+---
+
+## 🚀 Razor Usage
 
 ```razor
-<island-image-compare before-image="https://example.com/raw.jpg" 
-                      after-image="https://example.com/enhanced.jpg" 
-                      before-label="Original WebRTC" 
-                      after-label="Enhanced HD" 
-                      hydrate="Load" />
+<!-- Basic Compare -->
+<island-compare before-image="https://example.com/before.jpg" 
+                after-image="https://example.com/after.jpg" />
+
+<!-- Custom Handle & Hover -->
+<island-compare slide-on-hover="true" custom-handle="true" />
+
+<!-- Vertical Layout -->
+<island-compare orientation="vertical" />
+
+<!-- SVG Chart Reveal -->
+<island-compare demo-type="with-chart" slide-on-hover="true" />
+
+<!-- Controlled Two-Way Binding -->
+<island-compare demo-type="controlled" />
+
+<!-- Template Card Comparison -->
+<island-compare demo-type="template" />
 ```
+
+---
+
+## ⌨️ Accessibility
+
+- Hidden native `<input type="range" class="p-compare-input" min="0" max="100" />` for full screen reader and keyboard accessibility.
+- Keyboard support: `ArrowLeft`/`ArrowRight` (or `ArrowUp`/`ArrowDown`) adjusts value, `Home` (0%), `End` (100%), `PageUp` (+10%), `PageDown` (-10%).
+- `aria-label`, `aria-valuemin`, `aria-valuemax`, and `aria-valuenow` attributes.
 
 ---
 
@@ -36,7 +106,15 @@ The `<island-image-compare />` TagHelper provides a before/after split slider al
 
 | Attribute | Type | Default | Description |
 |---|---|---|---|
-| `before-image` | `string` | `""` | Image URL displayed on the left/top clip. |
-| `after-image` | `string` | `""` | Image URL displayed underneath on the right. |
-| `before-label` | `string?` | `"Before"` | Badge text for the before image. |
-| `after-label` | `string?` | `"After"` | Badge text for the after image. |
+| `model-value` | `double?` | `50` | Slider position percentage (0 to 100). |
+| `min` | `double` | `0` | Minimum boundary value. |
+| `max` | `double` | `100` | Maximum boundary value. |
+| `step` | `double` | `1` | Increment step factor. |
+| `orientation` | `string` | `"horizontal"` | Layout orientation: `horizontal` or `vertical`. |
+| `slide-on-hover` | `bool` | `false` | Update slider position automatically on mouse hover. |
+| `custom-handle` | `bool` | `false` | Render a translucent rounded bubble indicator. |
+| `disabled` | `bool` | `false` | Disables interaction and darkens the component. |
+| `readonly` | `bool` | `false` | Prevents value adjustment. |
+| `before-image` | `string?` | `null` | Image URL for the top/before layer. |
+| `after-image` | `string?` | `null` | Image URL for the bottom/after layer. |
+| `demo-type` | `string?` | `null` | Preconfigured demo preset (`basic`, `custom-handle`, `hover`, `vertical`, `with-chart`, `controlled`, `template`). |
