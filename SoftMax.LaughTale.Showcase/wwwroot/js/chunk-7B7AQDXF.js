@@ -980,7 +980,7 @@ defineIsland("tree-table", () => import("./treetable-STGV6W5W.js"));
 defineIsland("tree-select", () => import("./tree-select-3WADBRSW.js"));
 defineIsland("datatable", () => import("./datatable-FJYSSBES.js"));
 defineIsland("datagrid", () => import("./datatable-FJYSSBES.js"));
-defineIsland("modal", () => import("./modal-JRGMACQM.js"));
+defineIsland("modal", () => import("./modal-ZDL7ZZGK.js"));
 defineIsland("toast", () => import("./toast-DWHTYR76.js"));
 defineIsland("input-number", () => import("./input-number-KQ2J2WMH.js"));
 defineIsland("input-otp", () => import("./input-otp-RUPMATZ7.js"));
@@ -1025,8 +1025,12 @@ defineIsland("tag", () => import("./tag-4UVJKKNI.js"));
 defineIsland("breadcrumb", () => import("./breadcrumb-HOFDNZUE.js"));
 defineIsland("scroll-top", () => import("./scroll-top-WFJEPRKB.js"));
 defineIsland("inplace", () => import("./inplace-YJ5SS246.js"));
-defineIsland("command", () => import("./command-WMSPKKJO.js"));
-defineIsland("theme-studio", () => import("./theme-studio-GRGGOQAW.js"));
+defineIsland("command", () => import("./command-MRV6PAYH.js"));
+defineIsland("commandmenu", () => import("./command-MRV6PAYH.js"));
+defineIsland("command-menu", () => import("./command-MRV6PAYH.js"));
+defineIsland("command-palette", () => import("./command-MRV6PAYH.js"));
+defineIsland("commandpalette", () => import("./command-MRV6PAYH.js"));
+defineIsland("theme-studio", () => import("./theme-studio-3EYNUHMK.js"));
 defineIsland("dynamic-form", () => import("./dynamic-form-HHKJKPG7.js"));
 defineIsland("splitter", () => import("./splitter-LDRSJA4P.js"));
 defineIsland("multiselect", () => import("./multiselect-3EIAIKUW.js"));
@@ -1071,4 +1075,4 @@ export {
   enableViewTransitions,
   getSlot
 };
-//# sourceMappingURL=chunk-6LKHOZ5A.js.map
+//# sourceMappingURL=chunk-7B7AQDXF.js.map

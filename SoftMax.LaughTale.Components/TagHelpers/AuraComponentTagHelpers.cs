@@ -1706,7 +1706,7 @@ public class IslandDrawerTagHelper : TagHelper
             width = DrawerWidth,
             height = DrawerHeight
         };
-        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
 
         var maskClasses = $"p-drawer-mask p-drawer-{cleanPos}";
         if (Modal) maskClasses += " p-drawer-mask-modal";
@@ -2217,7 +2217,7 @@ public class IslandBreadcrumbTagHelper : TagHelper
             separator = Separator
         };
 
-        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
 
         if (!string.IsNullOrWhiteSpace(Class))
         {
@@ -2369,7 +2369,7 @@ public class IslandCommandTagHelper : TagHelper
             emptyMessage = EmptyMessage
         };
 
-        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
 
         if (!string.IsNullOrWhiteSpace(Class))
         {
@@ -4364,7 +4364,7 @@ public class IslandPopoverTagHelper : TagHelper
             dismissable = Dismissable,
             closeOnEscape = CloseOnEscape
         };
-        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
+        output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
 
         var popoverClasses = "p-popover p-component";
         if (!string.IsNullOrWhiteSpace(Class)) popoverClasses += $" {Class}";
@@ -4445,7 +4445,7 @@ public class IslandTooltipTagHelper : TagHelper
                 autoHide = AutoHide,
                 escape = Escape
             };
-            output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
+            output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
             output.Content.SetHtmlContent(content);
         }
         else

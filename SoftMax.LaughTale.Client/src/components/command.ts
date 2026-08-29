@@ -272,7 +272,7 @@ export interface CommandMenuGroup {
 }
 
 export interface CommandMenuProps {
-    model?: CommandMenuGroup[];
+    model?: any[];
     placeholder?: string;
     search?: string;
     filter?: 'default' | 'fuzzy';
@@ -285,14 +285,40 @@ export interface CommandMenuProps {
 export default function CommandMenuIsland(container: HTMLElement, props: CommandMenuProps) {
     injectIslandStyle('commandmenu', COMMAND_CSS);
 
-    const placeholder = props.placeholder || 'Search for commands...';
-    const groups: CommandMenuGroup[] = props.model || [];
-    const filterType = props.filter || 'default';
-    const withDialog = props.withDialog || false;
-    const hotkey = props.hotkey || 'ctrl+l, meta+l';
-    const customTemplate = props.customTemplate || false;
+    const placeholder = props.placeholder || (props as any).Placeholder || 'Search for commands...';
+    const filterType = props.filter || (props as any).Filter || 'default';
+    const withDialog = props.withDialog || (props as any).WithDialog || false;
+    const customTemplate = props.customTemplate || (props as any).CustomTemplate || false;
 
-    let search = props.search || '';
+    // Normalize raw items from PascalCase or camelCase
+    function normalizeGroups(rawList: any[]): CommandMenuGroup[] {
+        if (!Array.isArray(rawList)) return [];
+        return rawList.map(g => {
+            const groupLabel = g.label || g.Label || '';
+            const rawItems = g.items || g.Items || [];
+            const items: CommandMenuItem[] = Array.isArray(rawItems) ? rawItems.map((it: any) => ({
+                label: it.label || it.Label || '',
+                icon: it.icon || it.Icon,
+                category: it.category || it.Category,
+                color: it.color || it.Color,
+                keywords: it.keywords || it.Keywords || [],
+                shortcut: it.shortcut || it.Shortcut,
+                url: it.url || it.Url,
+                action: it.action || it.Action,
+                disabled: it.disabled || it.Disabled || false
+            })) : [];
+
+            return {
+                label: groupLabel,
+                items
+            };
+        });
+    }
+
+    const rawModel = props.model || (props as any).Model || [];
+    const groups: CommandMenuGroup[] = normalizeGroups(rawModel);
+
+    let search = props.search || (props as any).Search || '';
     let selectedIndex = 0;
     let isDialogOpen = false;
 
@@ -315,11 +341,11 @@ export default function CommandMenuIsland(container: HTMLElement, props: Command
         return qi === q.length ? score / v.length : 0;
     }
 
-    function getFilteredGroups(): { label: string; items: CommandMenuItem[] }[] {
+    function getFilteredGroups(): CommandMenuGroup[] {
         const q = search.trim().toLowerCase();
         if (!q) return groups;
 
-        const result: { label: string; items: CommandMenuItem[] }[] = [];
+        const result: CommandMenuGroup[] = [];
 
         groups.forEach(g => {
             const matchedItems = g.items.filter(it => {
@@ -362,9 +388,10 @@ export default function CommandMenuIsland(container: HTMLElement, props: Command
 
         let listHtml = '';
         if (totalItems === 0) {
+            const emptyMsg = props.emptyMessage || (props as any).EmptyMessage;
             listHtml = `
                 <div class="p-commandmenu-empty-message">
-                    ${props.emptyMessage ? props.emptyMessage : (search ? `No results found for <strong>"${search}"</strong>` : 'No results found')}
+                    ${emptyMsg ? emptyMsg : (search ? `No results found for <strong>"${search}"</strong>` : 'No results found')}
                 </div>
             `;
         } else {
@@ -450,13 +477,12 @@ export default function CommandMenuIsland(container: HTMLElement, props: Command
         // Wire events
         const input = targetEl.querySelector<HTMLInputElement>('.p-commandmenu-input');
         if (input) {
-            input.focus();
-            input.setSelectionRange(input.value.length, input.value.length);
-
             input.addEventListener('input', (e) => {
                 search = (e.target as HTMLInputElement).value;
                 selectedIndex = 0;
                 renderContent(targetEl);
+                const newInput = targetEl.querySelector<HTMLInputElement>('.p-commandmenu-input');
+                newInput?.focus();
             });
 
             input.addEventListener('keydown', (e) => {
@@ -465,12 +491,16 @@ export default function CommandMenuIsland(container: HTMLElement, props: Command
                     if (totalItems > 0) {
                         selectedIndex = (selectedIndex + 1) % totalItems;
                         renderContent(targetEl);
+                        const newInput = targetEl.querySelector<HTMLInputElement>('.p-commandmenu-input');
+                        newInput?.focus();
                     }
                 } else if (e.key === 'ArrowUp') {
                     e.preventDefault();
                     if (totalItems > 0) {
                         selectedIndex = (selectedIndex - 1 + totalItems) % totalItems;
                         renderContent(targetEl);
+                        const newInput = targetEl.querySelector<HTMLInputElement>('.p-commandmenu-input');
+                        newInput?.focus();
                     }
                 } else if (e.key === 'Enter') {
                     e.preventDefault();
@@ -482,6 +512,8 @@ export default function CommandMenuIsland(container: HTMLElement, props: Command
                         search = '';
                         selectedIndex = 0;
                         renderContent(targetEl);
+                        const newInput = targetEl.querySelector<HTMLInputElement>('.p-commandmenu-input');
+                        newInput?.focus();
                     }
                 }
             });
@@ -567,7 +599,6 @@ export default function CommandMenuIsland(container: HTMLElement, props: Command
             openDialog();
         });
 
-        // Global hotkey listener
         window.addEventListener('keydown', (e) => {
             if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'l') {
                 e.preventDefault();

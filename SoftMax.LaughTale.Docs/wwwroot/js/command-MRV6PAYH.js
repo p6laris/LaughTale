@@ -256,13 +256,35 @@ var COMMAND_CSS = `
 `;
 function CommandMenuIsland(container, props) {
   injectIslandStyle("commandmenu", COMMAND_CSS);
-  const placeholder = props.placeholder || "Search for commands...";
-  const groups = props.model || [];
-  const filterType = props.filter || "default";
-  const withDialog = props.withDialog || false;
-  const hotkey = props.hotkey || "ctrl+l, meta+l";
-  const customTemplate = props.customTemplate || false;
-  let search = props.search || "";
+  const placeholder = props.placeholder || props.Placeholder || "Search for commands...";
+  const filterType = props.filter || props.Filter || "default";
+  const withDialog = props.withDialog || props.WithDialog || false;
+  const customTemplate = props.customTemplate || props.CustomTemplate || false;
+  function normalizeGroups(rawList) {
+    if (!Array.isArray(rawList)) return [];
+    return rawList.map((g) => {
+      const groupLabel = g.label || g.Label || "";
+      const rawItems = g.items || g.Items || [];
+      const items = Array.isArray(rawItems) ? rawItems.map((it) => ({
+        label: it.label || it.Label || "",
+        icon: it.icon || it.Icon,
+        category: it.category || it.Category,
+        color: it.color || it.Color,
+        keywords: it.keywords || it.Keywords || [],
+        shortcut: it.shortcut || it.Shortcut,
+        url: it.url || it.Url,
+        action: it.action || it.Action,
+        disabled: it.disabled || it.Disabled || false
+      })) : [];
+      return {
+        label: groupLabel,
+        items
+      };
+    });
+  }
+  const rawModel = props.model || props.Model || [];
+  const groups = normalizeGroups(rawModel);
+  let search = props.search || props.Search || "";
   let selectedIndex = 0;
   let isDialogOpen = false;
   function fuzzyScore(value, query) {
@@ -319,9 +341,10 @@ function CommandMenuIsland(container, props) {
     }
     let listHtml = "";
     if (totalItems === 0) {
+      const emptyMsg = props.emptyMessage || props.EmptyMessage;
       listHtml = `
                 <div class="p-commandmenu-empty-message">
-                    ${props.emptyMessage ? props.emptyMessage : search ? `No results found for <strong>"${search}"</strong>` : "No results found"}
+                    ${emptyMsg ? emptyMsg : search ? `No results found for <strong>"${search}"</strong>` : "No results found"}
                 </div>
             `;
     } else {
@@ -397,12 +420,12 @@ function CommandMenuIsland(container, props) {
         `;
     const input = targetEl.querySelector(".p-commandmenu-input");
     if (input) {
-      input.focus();
-      input.setSelectionRange(input.value.length, input.value.length);
       input.addEventListener("input", (e) => {
         search = e.target.value;
         selectedIndex = 0;
         renderContent(targetEl);
+        const newInput = targetEl.querySelector(".p-commandmenu-input");
+        newInput?.focus();
       });
       input.addEventListener("keydown", (e) => {
         if (e.key === "ArrowDown") {
@@ -410,12 +433,16 @@ function CommandMenuIsland(container, props) {
           if (totalItems > 0) {
             selectedIndex = (selectedIndex + 1) % totalItems;
             renderContent(targetEl);
+            const newInput = targetEl.querySelector(".p-commandmenu-input");
+            newInput?.focus();
           }
         } else if (e.key === "ArrowUp") {
           e.preventDefault();
           if (totalItems > 0) {
             selectedIndex = (selectedIndex - 1 + totalItems) % totalItems;
             renderContent(targetEl);
+            const newInput = targetEl.querySelector(".p-commandmenu-input");
+            newInput?.focus();
           }
         } else if (e.key === "Enter") {
           e.preventDefault();
@@ -427,6 +454,8 @@ function CommandMenuIsland(container, props) {
             search = "";
             selectedIndex = 0;
             renderContent(targetEl);
+            const newInput = targetEl.querySelector(".p-commandmenu-input");
+            newInput?.focus();
           }
         }
       });
@@ -514,4 +543,4 @@ function CommandMenuIsland(container, props) {
 export {
   CommandMenuIsland as default
 };
-//# sourceMappingURL=command-ARN5V72Q.js.map
+//# sourceMappingURL=command-MRV6PAYH.js.map
