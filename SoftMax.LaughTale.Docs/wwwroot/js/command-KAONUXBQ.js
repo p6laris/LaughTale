@@ -256,13 +256,35 @@ var COMMAND_CSS = `
 `;
 function CommandMenuIsland(container, props) {
   injectIslandStyle("commandmenu", COMMAND_CSS);
-  const placeholder = props.placeholder || "Search for commands...";
-  const groups = props.model || [];
-  const filterType = props.filter || "default";
-  const withDialog = props.withDialog || false;
-  const hotkey = props.hotkey || "ctrl+l, meta+l";
-  const customTemplate = props.customTemplate || false;
-  let search = props.search || "";
+  const placeholder = props.placeholder || props.Placeholder || "Search for commands...";
+  const filterType = props.filter || props.Filter || "default";
+  const withDialog = props.withDialog || props.WithDialog || false;
+  const customTemplate = props.customTemplate || props.CustomTemplate || false;
+  function normalizeGroups(rawList) {
+    if (!Array.isArray(rawList)) return [];
+    return rawList.map((g) => {
+      const groupLabel = g.label || g.Label || "";
+      const rawItems = g.items || g.Items || [];
+      const items = Array.isArray(rawItems) ? rawItems.map((it) => ({
+        label: it.label || it.Label || "",
+        icon: it.icon || it.Icon,
+        category: it.category || it.Category,
+        color: it.color || it.Color,
+        keywords: it.keywords || it.Keywords || [],
+        shortcut: it.shortcut || it.Shortcut,
+        url: it.url || it.Url,
+        action: it.action || it.Action,
+        disabled: it.disabled || it.Disabled || false
+      })) : [];
+      return {
+        label: groupLabel,
+        items
+      };
+    });
+  }
+  const rawModel = props.model || props.Model || [];
+  const groups = normalizeGroups(rawModel);
+  let search = props.search || props.Search || "";
   let selectedIndex = 0;
   let isDialogOpen = false;
   function fuzzyScore(value, query) {
@@ -310,21 +332,51 @@ function CommandMenuIsland(container, props) {
     if (LucideIcons[iconName]) return LucideIcons[iconName];
     return "";
   }
-  function renderContent(targetEl) {
-    const filtered = getFilteredGroups();
-    let flatIndex = 0;
-    const totalItems = filtered.reduce((acc, g) => acc + g.items.length, 0);
-    if (selectedIndex >= totalItems) {
-      selectedIndex = Math.max(0, totalItems - 1);
-    }
-    let listHtml = "";
-    if (totalItems === 0) {
-      listHtml = `
-                <div class="p-commandmenu-empty-message">
-                    ${props.emptyMessage ? props.emptyMessage : search ? `No results found for <strong>"${search}"</strong>` : "No results found"}
+  function setupCommandMenu(targetEl) {
+    const arrowUpSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>';
+    const arrowDownSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
+    const searchSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>';
+    targetEl.innerHTML = `
+            <div class="p-commandmenu p-component" ${withDialog ? 'style="border: none; box-shadow: none; max-width: 100%;"' : ""}>
+                <div class="p-commandmenu-header">
+                    <span class="p-commandmenu-search-icon">${searchSvg}</span>
+                    <input type="text" class="p-commandmenu-input" placeholder="${placeholder}" value="${search}" />
                 </div>
-            `;
-    } else {
+                <div class="p-commandmenu-list"></div>
+                <div class="p-commandmenu-footer">
+                    <div class="p-commandmenu-footer-content">
+                        <span style="display:inline-flex; align-items:center; gap: 0.35rem;">
+                            <kbd class="p-commandmenu-kbd">${arrowUpSvg}</kbd>
+                            <kbd class="p-commandmenu-kbd">${arrowDownSvg}</kbd>
+                            Navigate
+                        </span>
+                        <span style="display:inline-flex; align-items:center; gap: 0.35rem;">
+                            <kbd class="p-commandmenu-kbd">\u21B5</kbd>
+                            Select
+                        </span>
+                    </div>
+                </div>
+            </div>
+        `;
+    const input = targetEl.querySelector(".p-commandmenu-input");
+    const listEl = targetEl.querySelector(".p-commandmenu-list");
+    function renderListOnly() {
+      const filtered = getFilteredGroups();
+      let flatIndex = 0;
+      const totalItems = filtered.reduce((acc, g) => acc + g.items.length, 0);
+      if (selectedIndex >= totalItems) {
+        selectedIndex = Math.max(0, totalItems - 1);
+      }
+      if (totalItems === 0) {
+        const emptyMsg = props.emptyMessage || props.EmptyMessage;
+        listEl.innerHTML = `
+                    <div class="p-commandmenu-empty-message">
+                        ${emptyMsg ? emptyMsg : search ? `No results found for <strong>"${search}"</strong>` : "No results found"}
+                    </div>
+                `;
+        return;
+      }
+      let listHtml = "";
       filtered.forEach((g) => {
         let itemsHtml = "";
         g.items.forEach((it) => {
@@ -367,101 +419,82 @@ function CommandMenuIsland(container, props) {
                     </div>
                 `;
       });
-    }
-    const arrowUpSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>';
-    const arrowDownSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
-    const searchSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>';
-    targetEl.innerHTML = `
-            <div class="p-commandmenu p-component" ${withDialog ? 'style="border: none; box-shadow: none; max-width: 100%;"' : ""}>
-                <div class="p-commandmenu-header">
-                    <span class="p-commandmenu-search-icon">${searchSvg}</span>
-                    <input type="text" class="p-commandmenu-input" placeholder="${placeholder}" value="${search}" />
-                </div>
-                <div class="p-commandmenu-list">
-                    ${listHtml}
-                </div>
-                <div class="p-commandmenu-footer">
-                    <div class="p-commandmenu-footer-content">
-                        <span style="display:inline-flex; align-items:center; gap: 0.35rem;">
-                            <kbd class="p-commandmenu-kbd">${arrowUpSvg}</kbd>
-                            <kbd class="p-commandmenu-kbd">${arrowDownSvg}</kbd>
-                            Navigate
-                        </span>
-                        <span style="display:inline-flex; align-items:center; gap: 0.35rem;">
-                            <kbd class="p-commandmenu-kbd">\u21B5</kbd>
-                            Select
-                        </span>
-                    </div>
-                </div>
-            </div>
-        `;
-    const input = targetEl.querySelector(".p-commandmenu-input");
-    if (input) {
-      input.focus();
-      input.setSelectionRange(input.value.length, input.value.length);
-      input.addEventListener("input", (e) => {
-        search = e.target.value;
-        selectedIndex = 0;
-        renderContent(targetEl);
+      listEl.innerHTML = listHtml;
+      listEl.querySelectorAll(".p-commandmenu-item").forEach((el) => {
+        el.addEventListener("mouseenter", () => {
+          const idx = Number(el.getAttribute("data-flat-index"));
+          selectedIndex = idx;
+          updateFocusItem();
+        });
+        el.addEventListener("click", () => {
+          const idx = Number(el.getAttribute("data-flat-index"));
+          selectedIndex = idx;
+          executeSelectedItem();
+        });
       });
-      input.addEventListener("keydown", (e) => {
-        if (e.key === "ArrowDown") {
-          e.preventDefault();
-          if (totalItems > 0) {
-            selectedIndex = (selectedIndex + 1) % totalItems;
-            renderContent(targetEl);
-          }
-        } else if (e.key === "ArrowUp") {
-          e.preventDefault();
-          if (totalItems > 0) {
-            selectedIndex = (selectedIndex - 1 + totalItems) % totalItems;
-            renderContent(targetEl);
-          }
-        } else if (e.key === "Enter") {
-          e.preventDefault();
-          executeSelectedItem(targetEl);
-        } else if (e.key === "Escape") {
-          if (withDialog) {
-            closeDialog();
-          } else if (search) {
-            search = "";
-            selectedIndex = 0;
-            renderContent(targetEl);
-          }
+    }
+    function updateFocusItem() {
+      const items = listEl.querySelectorAll(".p-commandmenu-item");
+      items.forEach((item, i) => {
+        const isFocused = i === selectedIndex;
+        item.classList.toggle("p-commandmenu-item-focus", isFocused);
+        if (isFocused) {
+          item.scrollIntoView({ block: "nearest" });
         }
       });
     }
-    targetEl.querySelectorAll(".p-commandmenu-item").forEach((el) => {
-      el.addEventListener("mouseenter", () => {
-        const idx = Number(el.getAttribute("data-flat-index"));
-        selectedIndex = idx;
-        targetEl.querySelectorAll(".p-commandmenu-item").forEach((item, i) => {
-          item.classList.toggle("p-commandmenu-item-focus", i === selectedIndex);
-        });
-      });
-      el.addEventListener("click", () => {
-        const idx = Number(el.getAttribute("data-flat-index"));
-        selectedIndex = idx;
-        executeSelectedItem(targetEl);
-      });
+    function executeSelectedItem() {
+      const activeEl = listEl.querySelector(`.p-commandmenu-item[data-flat-index="${selectedIndex}"]`);
+      if (!activeEl) return;
+      const url = activeEl.getAttribute("data-url");
+      const action = activeEl.getAttribute("data-action");
+      if (withDialog) {
+        closeDialog();
+      }
+      if (url) {
+        window.location.href = url;
+      } else if (action === "toggle-dark") {
+        document.documentElement.classList.toggle("dark");
+        localStorage.setItem("theme", document.documentElement.classList.contains("dark") ? "dark" : "light");
+      } else {
+        console.log("Command executed:", activeEl.textContent?.trim());
+      }
+    }
+    input.addEventListener("input", () => {
+      search = input.value;
+      selectedIndex = 0;
+      renderListOnly();
     });
-  }
-  function executeSelectedItem(targetEl) {
-    const activeEl = targetEl.querySelector(`.p-commandmenu-item[data-flat-index="${selectedIndex}"]`);
-    if (!activeEl) return;
-    const url = activeEl.getAttribute("data-url");
-    const action = activeEl.getAttribute("data-action");
-    if (withDialog) {
-      closeDialog();
-    }
-    if (url) {
-      window.location.href = url;
-    } else if (action === "toggle-dark") {
-      document.documentElement.classList.toggle("dark");
-      localStorage.setItem("theme", document.documentElement.classList.contains("dark") ? "dark" : "light");
-    } else {
-      console.log("Command executed:", activeEl.textContent?.trim());
-    }
+    input.addEventListener("keydown", (e) => {
+      const items = listEl.querySelectorAll(".p-commandmenu-item");
+      const count = items.length;
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        if (count > 0) {
+          selectedIndex = (selectedIndex + 1) % count;
+          updateFocusItem();
+        }
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        if (count > 0) {
+          selectedIndex = (selectedIndex - 1 + count) % count;
+          updateFocusItem();
+        }
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        executeSelectedItem();
+      } else if (e.key === "Escape") {
+        if (withDialog) {
+          closeDialog();
+        } else if (search) {
+          input.value = "";
+          search = "";
+          selectedIndex = 0;
+          renderListOnly();
+        }
+      }
+    });
+    renderListOnly();
   }
   function openDialog() {
     if (isDialogOpen) return;
@@ -473,13 +506,15 @@ function CommandMenuIsland(container, props) {
         `;
     document.body.appendChild(backdrop);
     const card = backdrop.querySelector(".p-commandmenu-dialog-card");
-    renderContent(card);
+    setupCommandMenu(card);
+    const input = card.querySelector(".p-commandmenu-input");
+    input?.focus();
     backdrop.addEventListener("click", (e) => {
       if (e.target === backdrop) {
         closeDialog();
       }
     });
-    useFocusTrap(card, { initialFocusElement: card.querySelector("input") || void 0 });
+    useFocusTrap(card, { initialFocusElement: input || void 0 });
   }
   function closeDialog() {
     isDialogOpen = false;
@@ -508,10 +543,10 @@ function CommandMenuIsland(container, props) {
       }
     });
   } else {
-    renderContent(container);
+    setupCommandMenu(container);
   }
 }
 export {
   CommandMenuIsland as default
 };
-//# sourceMappingURL=command-ARN5V72Q.js.map
+//# sourceMappingURL=command-KAONUXBQ.js.map
