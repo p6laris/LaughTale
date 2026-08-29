@@ -21,7 +21,7 @@ var SIDEBAR_CSS = `
     position: sticky;
     top: 0;
     left: 0;
-    transition: width 220ms cubic-bezier(0.4, 0, 0.2, 1), min-width 220ms cubic-bezier(0.4, 0, 0.2, 1);
+    transition: width 240ms cubic-bezier(0.16, 1, 0.3, 1), min-width 240ms cubic-bezier(0.16, 1, 0.3, 1);
     font-family: var(--p-font-family, inherit);
     overflow: hidden;
     border-radius: 0;
@@ -173,7 +173,7 @@ var SIDEBAR_CSS = `
 .sidebar-group-chevron {
     display: flex;
     align-items: center;
-    transition: transform 220ms cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1);
     color: var(--p-text-muted);
 }
 .sidebar-group-chevron.expanded {
@@ -309,7 +309,7 @@ var SIDEBAR_CSS = `
     flex-wrap: wrap;
     align-items: flex-end;
     gap: 1.25rem;
-    padding: 0.75rem 1rem;
+    padding: 0.85rem 1.15rem;
     background: var(--p-surface-0, #ffffff);
     border: 1px solid var(--p-border-color, #e2e8f0);
     border-radius: var(--p-border-radius, 8px);
@@ -320,6 +320,7 @@ var SIDEBAR_CSS = `
     display: flex;
     flex-direction: column;
     gap: 0.35rem;
+    position: relative;
 }
 
 .p-sidebar-toolbar-label {
@@ -329,27 +330,83 @@ var SIDEBAR_CSS = `
     letter-spacing: 0.01em;
 }
 
-/* Aura Custom Controls inside Playground */
-.p-sb-select {
-    padding: 0.45rem 2rem 0.45rem 0.75rem;
-    font-size: 0.8125rem;
-    font-weight: 500;
+/* Aura Custom Floating Select */
+.p-sb-select-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.45rem 0.85rem;
+    min-width: 9rem;
     border-radius: var(--p-border-radius, 6px);
     border: 1px solid var(--p-border-color, #cbd5e1);
     background: var(--p-surface-0, #ffffff);
     color: var(--p-text-color, #0f172a);
-    outline: none;
+    font-size: 0.8125rem;
+    font-weight: 500;
     cursor: pointer;
+    user-select: none;
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 0.65rem center;
+    outline: none;
 }
 
-.p-sb-select:focus {
+.p-sb-select-trigger:focus,
+.p-sb-select-trigger.p-active {
     border-color: var(--p-primary-500, #3b82f6);
     box-shadow: 0 0 0 1px var(--p-primary-500, #3b82f6);
+}
+
+.p-sb-select-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 0.25rem;
+    min-width: 100%;
+    background: var(--p-surface-0, #ffffff);
+    border: 1px solid var(--p-border-color, #e2e8f0);
+    border-radius: var(--p-border-radius, 8px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+    padding: 0.35rem;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    box-sizing: border-box;
+    animation: p-sb-popup-pop 160ms cubic-bezier(0.16, 1, 0.3, 1);
+    transform-origin: top left;
+}
+
+@keyframes p-sb-popup-pop {
+    from {
+        opacity: 0;
+        transform: scale(0.96) translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.p-sb-select-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.45rem 0.65rem;
+    border-radius: 5px;
+    font-size: 0.8125rem;
+    color: var(--p-text-color, #0f172a);
+    cursor: pointer;
+    transition: background-color 0.12s ease;
+}
+
+.p-sb-select-option:hover {
+    background: var(--p-surface-100, #f1f5f9);
+}
+
+.p-sb-select-option.p-selected {
+    background: var(--p-primary-50, #eff6ff);
+    color: var(--p-primary-600, #2563eb);
+    font-weight: 600;
 }
 
 .p-sb-segmented {
@@ -379,7 +436,6 @@ var SIDEBAR_CSS = `
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 }
 
-/* Aura ToggleSwitch */
 .p-sb-switch-container {
     display: flex;
     align-items: center;
@@ -410,7 +466,7 @@ var SIDEBAR_CSS = `
     background: #ffffff;
     border-radius: 50%;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .p-sb-switch.p-checked {
@@ -442,7 +498,7 @@ var SIDEBAR_CSS = `
     background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(2px);
     z-index: 90;
-    transition: opacity 0.22s ease;
+    transition: opacity 240ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .p-sidebar {
@@ -452,7 +508,7 @@ var SIDEBAR_CSS = `
     position: relative;
     z-index: 100;
     box-sizing: border-box;
-    transition: width 220ms cubic-bezier(0.4, 0, 0.2, 1), transform 220ms cubic-bezier(0.4, 0, 0.2, 1);
+    transition: width 240ms cubic-bezier(0.16, 1, 0.3, 1), transform 240ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 240ms ease;
     flex-shrink: 0;
     overflow: hidden;
 }
@@ -505,11 +561,11 @@ var SIDEBAR_CSS = `
 }
 
 /* Overlay Mode */
-.p-sidebar-overlay {
+.p-sidebar.p-sidebar-overlay {
     position: absolute !important;
     top: 0;
     bottom: 0;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.18), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
     z-index: 100;
 }
 .p-sidebar-side-left.p-sidebar-overlay {
@@ -519,19 +575,33 @@ var SIDEBAR_CSS = `
     right: 0;
 }
 
-/* Collapsed Icon Mode */
-.p-sidebar-collapsible-icon.p-sidebar-collapsed {
-    width: 3.5rem !important;
+/* Collapsed Icon Mode Smooth Fade */
+.p-sidebar-item-label,
+.p-sidebar-group-label,
+.p-sidebar-menu-badge,
+.p-sidebar-submenu-chevron,
+.p-sidebar-header-label,
+.p-sidebar-footer-label {
+    transition: opacity 180ms cubic-bezier(0.16, 1, 0.3, 1), transform 180ms cubic-bezier(0.16, 1, 0.3, 1);
+    opacity: 1;
+    transform: translateX(0);
+    white-space: nowrap;
 }
 
 .p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-item-label,
 .p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-group-label,
 .p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-menu-badge,
 .p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-submenu-chevron,
-.p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-menu-sub-wrapper,
-.p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-menu-action,
 .p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-header-label,
 .p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-footer-label {
+    opacity: 0;
+    transform: translateX(-6px);
+    pointer-events: none;
+    display: none;
+}
+
+.p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-menu-sub-wrapper,
+.p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-menu-action {
     display: none !important;
 }
 
@@ -624,7 +694,7 @@ var SIDEBAR_CSS = `
     cursor: pointer;
     font-size: 0.875rem;
     font-weight: 500;
-    transition: background-color 0.12s ease, color 0.12s ease;
+    transition: background-color 0.12s ease, color 0.12s ease, transform 0.12s ease;
     box-sizing: border-box;
     text-align: left;
     outline: none;
@@ -650,6 +720,7 @@ var SIDEBAR_CSS = `
     height: 1.125rem;
     flex-shrink: 0;
     color: var(--p-surface-500, #64748b);
+    transition: transform 0.15s ease;
 }
 
 .p-sidebar-menu-button.p-active .p-sidebar-menu-button-icon {
@@ -672,7 +743,7 @@ var SIDEBAR_CSS = `
     align-items: center;
     justify-content: center;
     color: var(--p-surface-400, #94a3b8);
-    transition: transform 220ms cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .p-sidebar-submenu-chevron.p-expanded {
@@ -694,6 +765,7 @@ var SIDEBAR_CSS = `
     cursor: pointer;
     background: transparent;
     border: none;
+    transition: background-color 0.12s ease, color 0.12s ease, transform 0.12s ease;
 }
 
 .p-sidebar-menu-item:hover .p-sidebar-menu-action {
@@ -703,17 +775,20 @@ var SIDEBAR_CSS = `
 .p-sidebar-menu-action:hover {
     background: var(--p-surface-200, #e2e8f0);
     color: var(--p-surface-700, #334155);
+    transform: translateY(-50%) scale(1.1);
 }
 
 /* Fluid CSS Grid Submenu Expand/Collapse Animation */
 .p-sidebar-menu-sub-wrapper {
     display: grid;
     grid-template-rows: 0fr;
-    transition: grid-template-rows 220ms cubic-bezier(0.4, 0, 0.2, 1);
+    transition: grid-template-rows 240ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms ease;
+    opacity: 0;
 }
 
 .p-sidebar-menu-sub-wrapper.p-expanded {
     grid-template-rows: 1fr;
+    opacity: 1;
 }
 
 .p-sidebar-menu-sub {
@@ -787,12 +862,16 @@ var SIDEBAR_CSS = `
     background: transparent;
     color: var(--p-surface-600, #475569);
     cursor: pointer;
-    transition: background-color 0.15s ease, color 0.15s ease;
+    transition: background-color 0.15s ease, color 0.15s ease, transform 0.12s ease;
 }
 
 .p-sidebar-trigger:hover {
     background: var(--p-surface-100, #f1f5f9);
     color: var(--p-text-color, #0f172a);
+}
+
+.p-sidebar-trigger:active {
+    transform: scale(0.94);
 }
 
 /* Interactive Popup Menu in Demo */
@@ -808,6 +887,8 @@ var SIDEBAR_CSS = `
     display: flex;
     flex-direction: column;
     gap: 0.2rem;
+    animation: p-sb-popup-pop 160ms cubic-bezier(0.16, 1, 0.3, 1);
+    transform-origin: top left;
 }
 
 .p-sb-popup-item {
@@ -826,6 +907,60 @@ var SIDEBAR_CSS = `
     background: var(--p-surface-100, #f1f5f9);
 }
 
+/* Dual Sidebar Claude AI Chat Panel */
+.p-sb-chat-panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 0.75rem;
+    gap: 0.75rem;
+}
+
+.p-sb-chat-bubble {
+    background: var(--p-surface-100, #f1f5f9);
+    border-radius: 12px;
+    padding: 0.65rem 0.85rem;
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    color: var(--p-text-color);
+}
+
+.p-sb-chat-metrics {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    font-size: 0.8125rem;
+}
+
+.p-sb-chat-metrics-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--p-text-muted);
+}
+
+.p-sb-chat-metrics-val {
+    font-weight: 600;
+    color: var(--p-text-color);
+}
+
+.p-sb-chat-input-box {
+    margin-top: auto;
+    border: 1px solid var(--p-border-color, #cbd5e1);
+    border-radius: 12px;
+    padding: 0.5rem 0.75rem;
+    background: var(--p-surface-0);
+}
+
+.p-sb-chat-input {
+    width: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 0.8125rem;
+    color: var(--p-text-color);
+}
+
 /* Dark Mode Tokens */
 .dark .p-sidebar-toolbar,
 [data-theme="dark"] .p-sidebar-toolbar {
@@ -838,11 +973,33 @@ var SIDEBAR_CSS = `
     color: var(--p-surface-300, #cbd5e1);
 }
 
-.dark .p-sb-select,
-[data-theme="dark"] .p-sb-select {
+.dark .p-sb-select-trigger,
+[data-theme="dark"] .p-sb-select-trigger {
     background: var(--p-surface-900, #0f172a);
     border-color: var(--p-surface-700, #334155);
     color: var(--p-surface-100, #f1f5f9);
+}
+
+.dark .p-sb-select-dropdown,
+[data-theme="dark"] .p-sb-select-dropdown {
+    background: var(--p-surface-900, #0f172a);
+    border-color: var(--p-surface-700, #334155);
+}
+
+.dark .p-sb-select-option,
+[data-theme="dark"] .p-sb-select-option {
+    color: var(--p-surface-100, #f1f5f9);
+}
+
+.dark .p-sb-select-option:hover,
+[data-theme="dark"] .p-sb-select-option:hover {
+    background: var(--p-surface-800, #1e293b);
+}
+
+.dark .p-sb-select-option.p-selected,
+[data-theme="dark"] .p-sb-select-option.p-selected {
+    background: var(--p-surface-800, #1e293b);
+    color: #60a5fa;
 }
 
 .dark .p-sb-segmented,
@@ -970,6 +1127,17 @@ var SIDEBAR_CSS = `
 .dark .p-sb-popup-item:hover,
 [data-theme="dark"] .p-sb-popup-item:hover {
     background: var(--p-surface-800, #1e293b);
+}
+
+.dark .p-sb-chat-bubble,
+[data-theme="dark"] .p-sb-chat-bubble {
+    background: var(--p-surface-800, #1e293b);
+}
+
+.dark .p-sb-chat-input-box,
+[data-theme="dark"] .p-sb-chat-input-box {
+    background: var(--p-surface-900, #0f172a);
+    border-color: var(--p-surface-700, #334155);
 }
 `;
 function SidebarIsland(container, props) {
@@ -1150,6 +1318,8 @@ function renderCompoundSidebar(container, props) {
   let backdrop = props.backdrop || props.Backdrop || false;
   let isOpen = props.open !== void 0 ? props.open : props.Open !== void 0 ? props.Open : true;
   let width = props.width || props.Width || "16rem";
+  let isAiOpen = true;
+  let openSelectDropdown = null;
   let activeCompany = { name: "Acme Inc", logo: "A", color: "linear-gradient(135deg, #8b5cf6, #4f46e5)" };
   let showCompanyPopup = false;
   let showUserPopup = false;
@@ -1256,24 +1426,56 @@ function renderCompoundSidebar(container, props) {
     }).join("");
   }
   function renderControlsHtml() {
+    const variantLabel = variant === "sidebar" ? "Sidebar" : variant === "floating" ? "Floating" : "Inset";
+    const collapsibleLabel = collapsible === "icon" ? "Icon" : collapsible === "offcanvas" ? "Offcanvas" : "None";
     return `
             <div class="p-sidebar-toolbar">
                 <div class="p-sidebar-toolbar-field">
                     <label class="p-sidebar-toolbar-label">Variant</label>
-                    <select class="p-sb-select" data-sb-variant>
-                        <option value="sidebar" ${variant === "sidebar" ? "selected" : ""}>Sidebar</option>
-                        <option value="floating" ${variant === "floating" ? "selected" : ""}>Floating</option>
-                        <option value="inset" ${variant === "inset" ? "selected" : ""}>Inset</option>
-                    </select>
+                    <div class="p-sb-select-trigger ${openSelectDropdown === "variant" ? "p-active" : ""}" data-select-trigger="variant" tabindex="0">
+                        <span>${variantLabel}</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                    </div>
+                    ${openSelectDropdown === "variant" ? `
+                        <div class="p-sb-select-dropdown">
+                            <div class="p-sb-select-option ${variant === "sidebar" ? "p-selected" : ""}" data-select-option="variant:sidebar">
+                                <span>Sidebar</span>
+                                ${variant === "sidebar" ? '<span style="font-weight:700;">&#10003;</span>' : ""}
+                            </div>
+                            <div class="p-sb-select-option ${variant === "floating" ? "p-selected" : ""}" data-select-option="variant:floating">
+                                <span>Floating</span>
+                                ${variant === "floating" ? '<span style="font-weight:700;">&#10003;</span>' : ""}
+                            </div>
+                            <div class="p-sb-select-option ${variant === "inset" ? "p-selected" : ""}" data-select-option="variant:inset">
+                                <span>Inset</span>
+                                ${variant === "inset" ? '<span style="font-weight:700;">&#10003;</span>' : ""}
+                            </div>
+                        </div>
+                    ` : ""}
                 </div>
 
                 <div class="p-sidebar-toolbar-field">
                     <label class="p-sidebar-toolbar-label">Collapsible</label>
-                    <select class="p-sb-select" data-sb-collapsible>
-                        <option value="icon" ${collapsible === "icon" ? "selected" : ""}>Icon</option>
-                        <option value="offcanvas" ${collapsible === "offcanvas" ? "selected" : ""}>Offcanvas</option>
-                        <option value="none" ${collapsible === "none" ? "selected" : ""}>None</option>
-                    </select>
+                    <div class="p-sb-select-trigger ${openSelectDropdown === "collapsible" ? "p-active" : ""}" data-select-trigger="collapsible" tabindex="0">
+                        <span>${collapsibleLabel}</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                    </div>
+                    ${openSelectDropdown === "collapsible" ? `
+                        <div class="p-sb-select-dropdown">
+                            <div class="p-sb-select-option ${collapsible === "icon" ? "p-selected" : ""}" data-select-option="collapsible:icon">
+                                <span>Icon</span>
+                                ${collapsible === "icon" ? '<span style="font-weight:700;">&#10003;</span>' : ""}
+                            </div>
+                            <div class="p-sb-select-option ${collapsible === "offcanvas" ? "p-selected" : ""}" data-select-option="collapsible:offcanvas">
+                                <span>Offcanvas</span>
+                                ${collapsible === "offcanvas" ? '<span style="font-weight:700;">&#10003;</span>' : ""}
+                            </div>
+                            <div class="p-sb-select-option ${collapsible === "none" ? "p-selected" : ""}" data-select-option="collapsible:none">
+                                <span>None</span>
+                                ${collapsible === "none" ? '<span style="font-weight:700;">&#10003;</span>' : ""}
+                            </div>
+                        </div>
+                    ` : ""}
                 </div>
 
                 <div class="p-sidebar-toolbar-field">
@@ -1360,25 +1562,38 @@ function renderCompoundSidebar(container, props) {
                             <div class="p-sb-popup-item" data-select-company="Acme Inc|A|linear-gradient(135deg, #8b5cf6, #4f46e5)">
                                 <div style="display:flex; width:1.25rem; height:1.25rem; border-radius:4px; background: linear-gradient(135deg, #8b5cf6, #4f46e5); color:#fff; align-items:center; justify-content:center; font-weight:700; font-size:0.65rem;">A</div>
                                 <span>Acme Inc</span>
-                                ${activeCompany.name === "Acme Inc" ? '<span style="margin-left:auto; color:var(--p-primary-600);">&#10003;</span>' : ""}
+                                ${activeCompany.name === "Acme Inc" ? '<span style="margin-left:auto; color:var(--p-primary-600); font-weight:700;">&#10003;</span>' : ""}
                             </div>
                             <div class="p-sb-popup-item" data-select-company="Globex Corp|G|linear-gradient(135deg, #10b981, #0d9488)">
                                 <div style="display:flex; width:1.25rem; height:1.25rem; border-radius:4px; background: linear-gradient(135deg, #10b981, #0d9488); color:#fff; align-items:center; justify-content:center; font-weight:700; font-size:0.65rem;">G</div>
                                 <span>Globex Corp</span>
-                                ${activeCompany.name === "Globex Corp" ? '<span style="margin-left:auto; color:var(--p-primary-600);">&#10003;</span>' : ""}
+                                ${activeCompany.name === "Globex Corp" ? '<span style="margin-left:auto; color:var(--p-primary-600); font-weight:700;">&#10003;</span>' : ""}
                             </div>
                             <div class="p-sb-popup-item" data-select-company="Initech|I|linear-gradient(135deg, #f97316, #dc2626)">
                                 <div style="display:flex; width:1.25rem; height:1.25rem; border-radius:4px; background: linear-gradient(135deg, #f97316, #dc2626); color:#fff; align-items:center; justify-content:center; font-weight:700; font-size:0.65rem;">I</div>
                                 <span>Initech</span>
-                                ${activeCompany.name === "Initech" ? '<span style="margin-left:auto; color:var(--p-primary-600);">&#10003;</span>' : ""}
+                                ${activeCompany.name === "Initech" ? '<span style="margin-left:auto; color:var(--p-primary-600); font-weight:700;">&#10003;</span>' : ""}
                             </div>
                             <div style="border-top: 1px solid var(--p-border-color); margin: 0.25rem 0;"></div>
                             <div class="p-sb-popup-item" style="color: var(--p-text-muted);">
-                                <span>+ Add company</span>
+                                <span class="p-sidebar-menu-button-icon">${LucideIcons.plus}</span>
+                                <span>Add company</span>
                             </div>
                         </div>
                     ` : ""}
                 </div>
+            `;
+    }
+    if (demoType === "nested") {
+      return `
+                <ul class="p-sidebar-menu">
+                    <li class="p-sidebar-menu-item">
+                        <button type="button" class="p-sidebar-menu-button" style="padding: 0.35rem 0.5rem;">
+                            <div style="display:flex; width:1.5rem; height:1.5rem; border-radius:6px; background: linear-gradient(135deg, #10b981, #0d9488); color:#fff; align-items:center; justify-content:center; font-weight:700; font-size:0.75rem; flex-shrink:0;">F</div>
+                            <span class="p-sidebar-item-label p-sidebar-header-label" style="font-weight: 700; font-size: 0.875rem;">File Manager</span>
+                        </button>
+                    </li>
+                </ul>
             `;
     }
     return `
@@ -1439,6 +1654,7 @@ function renderCompoundSidebar(container, props) {
   }
   function renderMainContent() {
     const triggerIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg>`;
+    const chatIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>`;
     if (demoType === "nested") {
       return `
                 <div class="p-sidebar-main">
@@ -1451,6 +1667,25 @@ function renderCompoundSidebar(container, props) {
                     <div style="flex: 1; padding: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
                         <h1 style="font-size: 1.35rem; font-weight: 700; color: var(--p-text-color); margin: 0;">Q1 Report</h1>
                         <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin: 0;">Documents &gt; Work &gt; Projects &gt; Q1 Report</p>
+                    </div>
+                </div>
+            `;
+    }
+    if (demoType === "dual") {
+      return `
+                <div class="p-sidebar-main">
+                    <header class="p-sidebar-main-header">
+                        <button type="button" class="p-sidebar-trigger" data-sidebar-toggle aria-label="Toggle navigation">
+                            ${triggerIconSvg}
+                        </button>
+                        <span style="font-size: 0.875rem; font-weight: 600; color: var(--p-text-color);">Dashboard</span>
+                        <button type="button" class="p-sidebar-trigger" data-ai-toggle style="margin-left: auto;" aria-label="Toggle AI chat panel">
+                            ${chatIconSvg}
+                        </button>
+                    </header>
+                    <div style="flex: 1; padding: 1rem; display: flex; flex-direction: column; gap: 1rem; overflow-y: auto;">
+                        <div style="height: 6rem; border-radius: 8px; background: var(--p-surface-100); border: 1px solid var(--p-border-color); display: flex; align-items: center; justify-content: center; color: var(--p-text-muted); font-size: 0.875rem;">Main Content View</div>
+                        <div style="flex: 1; min-height: 8rem; border-radius: 8px; background: var(--p-surface-100); border: 1px solid var(--p-border-color); display: flex; align-items: center; justify-content: center; color: var(--p-text-muted); font-size: 0.875rem;">Analytics &amp; Data Area</div>
                     </div>
                 </div>
             `;
@@ -1470,6 +1705,62 @@ function renderCompoundSidebar(container, props) {
                 </div>
             </div>
         `;
+  }
+  function renderAiRightPanel() {
+    if (demoType !== "dual") return "";
+    const aiWidth = isAiOpen ? "18rem" : "0rem";
+    return `
+            <aside class="p-sidebar p-sidebar-collapsible-offcanvas p-sidebar-side-right ${!isAiOpen ? "p-sidebar-collapsed" : ""}" style="width: ${aiWidth}; border-left: 1px solid var(--p-border-color);" data-ai-sidebar-root>
+                <div class="p-sidebar-aside">
+                    <div class="p-sidebar-panel">
+                        <div class="p-sidebar-header">
+                            <span style="font-size: 0.8125rem; font-weight: 700; color: var(--p-surface-500);">Weekly metrics overview</span>
+                        </div>
+                        <div class="p-sidebar-content">
+                            <div class="p-sb-chat-panel">
+                                <div class="p-sb-chat-bubble">Show me this week's metrics</div>
+                                <div class="p-sb-chat-metrics">
+                                    <p style="margin: 0; font-weight: 600; color: var(--p-text-color);">Here are your key metrics for this week:</p>
+                                    <div class="p-sb-chat-metrics-row">
+                                        <span>Page views</span>
+                                        <span class="p-sb-chat-metrics-val">12,482</span>
+                                    </div>
+                                    <div class="p-sb-chat-metrics-row">
+                                        <span>New users</span>
+                                        <span class="p-sb-chat-metrics-val">342</span>
+                                    </div>
+                                    <div class="p-sb-chat-metrics-row">
+                                        <span>Bounce rate</span>
+                                        <span class="p-sb-chat-metrics-val">34%</span>
+                                    </div>
+                                </div>
+                                <div class="p-sb-chat-input-box">
+                                    <input type="text" class="p-sb-chat-input" placeholder="Reply to Claude..." />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        `;
+  }
+  function updateSidebarClasses() {
+    const aside = container.querySelector("[data-sidebar-root]");
+    if (!aside) return;
+    aside.className = [
+      "p-sidebar",
+      `p-sidebar-variant-${variant}`,
+      `p-sidebar-collapsible-${collapsible}`,
+      `p-sidebar-side-${side}`,
+      overlay ? "p-sidebar-overlay" : "",
+      !isOpen ? "p-sidebar-collapsed" : ""
+    ].filter(Boolean).join(" ");
+    const sidebarWidth = isOpen ? width : collapsible === "icon" ? "3.5rem" : "0rem";
+    aside.style.width = sidebarWidth;
+    const backdropEl = container.querySelector("[data-sidebar-backdrop]");
+    if (backdropEl) {
+      backdropEl.style.display = backdrop && isOpen ? "block" : "none";
+    }
   }
   function renderComponent() {
     const sidebarClasses = [
@@ -1499,8 +1790,14 @@ function renderCompoundSidebar(container, props) {
             </aside>
         `;
     const mainHtml = renderMainContent();
-    const backdropHtml = backdrop && isOpen ? `<div class="p-sidebar-backdrop" data-sidebar-backdrop></div>` : "";
-    const innerContent = side === "right" ? mainHtml + sidebarHtml : sidebarHtml + mainHtml;
+    const aiRightPanelHtml = renderAiRightPanel();
+    const backdropHtml = `<div class="p-sidebar-backdrop" data-sidebar-backdrop style="display: ${backdrop && isOpen ? "block" : "none"};"></div>`;
+    let innerContent = "";
+    if (demoType === "dual") {
+      innerContent = sidebarHtml + mainHtml + aiRightPanelHtml;
+    } else {
+      innerContent = side === "right" ? mainHtml + sidebarHtml : sidebarHtml + mainHtml;
+    }
     const layoutHtml = `
             <div class="p-sidebar-layout">
                 ${backdropHtml}
@@ -1519,20 +1816,42 @@ function renderCompoundSidebar(container, props) {
   }
   function wireEvents() {
     container.querySelectorAll("[data-sidebar-toggle]").forEach((btn) => {
-      btn.addEventListener("click", () => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
         isOpen = !isOpen;
-        render();
+        updateSidebarClasses();
+      });
+    });
+    container.querySelectorAll("[data-ai-toggle]").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        isAiOpen = !isAiOpen;
+        const aiAside = container.querySelector("[data-ai-sidebar-root]");
+        if (aiAside) {
+          aiAside.classList.toggle("p-sidebar-collapsed", !isAiOpen);
+          aiAside.style.width = isAiOpen ? "18rem" : "0rem";
+        }
       });
     });
     container.querySelectorAll("[data-sidebar-backdrop]").forEach((bd) => {
       bd.addEventListener("click", () => {
         isOpen = false;
-        render();
+        updateSidebarClasses();
       });
     });
+    const mainEl = container.querySelector(".p-sidebar-main");
+    if (mainEl) {
+      mainEl.addEventListener("click", (e) => {
+        if (overlay && isOpen && !e.target.closest("[data-sidebar-toggle]")) {
+          isOpen = false;
+          updateSidebarClasses();
+        }
+      });
+    }
     container.querySelectorAll('.p-sidebar-menu-button[data-has-subs="true"]').forEach((btn) => {
       btn.addEventListener("click", (e) => {
         e.preventDefault();
+        e.stopPropagation();
         const li = btn.closest(".p-sidebar-menu-item");
         const subKey = li?.getAttribute("data-subkey");
         if (subKey) {
@@ -1578,50 +1897,54 @@ function renderCompoundSidebar(container, props) {
         render();
       });
     }
-    document.addEventListener("click", () => {
-      if (showCompanyPopup || showUserPopup) {
-        showCompanyPopup = false;
-        showUserPopup = false;
-        render();
-      }
-    }, { once: true });
-    const vSelect = container.querySelector("[data-sb-variant]");
-    if (vSelect) {
-      vSelect.addEventListener("change", () => {
-        variant = vSelect.value;
+    container.querySelectorAll("[data-select-trigger]").forEach((trig) => {
+      trig.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const key = trig.getAttribute("data-select-trigger");
+        openSelectDropdown = openSelectDropdown === key ? null : key;
         render();
       });
-    }
-    const cSelect = container.querySelector("[data-sb-collapsible]");
-    if (cSelect) {
-      cSelect.addEventListener("change", () => {
-        collapsible = cSelect.value;
+    });
+    container.querySelectorAll("[data-select-option]").forEach((opt) => {
+      opt.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const [category, val] = (opt.getAttribute("data-select-option") || "").split(":");
+        if (category === "variant") {
+          variant = val;
+        } else if (category === "collapsible") {
+          collapsible = val;
+        }
+        openSelectDropdown = null;
         render();
       });
-    }
+    });
     container.querySelectorAll("[data-sb-side]").forEach((btn) => {
-      btn.addEventListener("click", () => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
         side = btn.getAttribute("data-sb-side");
         render();
       });
     });
     const overlayToggle = container.querySelector('[data-sb-toggle="overlay"]');
     if (overlayToggle) {
-      overlayToggle.addEventListener("click", () => {
+      overlayToggle.addEventListener("click", (e) => {
+        e.stopPropagation();
         overlay = !overlay;
         render();
       });
     }
     const hoverToggle = container.querySelector('[data-sb-toggle="hover"]');
     if (hoverToggle) {
-      hoverToggle.addEventListener("click", () => {
+      hoverToggle.addEventListener("click", (e) => {
+        e.stopPropagation();
         openOnHover = !openOnHover;
         render();
       });
     }
     const backdropToggle = container.querySelector('[data-sb-toggle="backdrop"]');
     if (backdropToggle) {
-      backdropToggle.addEventListener("click", () => {
+      backdropToggle.addEventListener("click", (e) => {
+        e.stopPropagation();
         backdrop = !backdrop;
         render();
       });
@@ -1632,17 +1955,26 @@ function renderCompoundSidebar(container, props) {
         aside.addEventListener("mouseenter", () => {
           if (!isOpen) {
             isOpen = true;
-            render();
+            updateSidebarClasses();
           }
         });
         aside.addEventListener("mouseleave", () => {
           if (isOpen) {
             isOpen = false;
-            render();
+            updateSidebarClasses();
           }
         });
       }
     }
+    const onDocClick = () => {
+      if (openSelectDropdown || showCompanyPopup || showUserPopup) {
+        openSelectDropdown = null;
+        showCompanyPopup = false;
+        showUserPopup = false;
+        render();
+      }
+    };
+    document.addEventListener("click", onDocClick, { once: true });
   }
   function render() {
     container.innerHTML = renderComponent();
@@ -1653,4 +1985,4 @@ function renderCompoundSidebar(container, props) {
 export {
   SidebarIsland as default
 };
-//# sourceMappingURL=sidebar-RBZBGAXI.js.map
+//# sourceMappingURL=sidebar-OSEPYQPG.js.map

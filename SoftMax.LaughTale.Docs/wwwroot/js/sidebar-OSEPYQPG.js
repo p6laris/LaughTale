@@ -21,7 +21,7 @@ var SIDEBAR_CSS = `
     position: sticky;
     top: 0;
     left: 0;
-    transition: width 220ms cubic-bezier(0.4, 0, 0.2, 1), min-width 220ms cubic-bezier(0.4, 0, 0.2, 1);
+    transition: width 240ms cubic-bezier(0.16, 1, 0.3, 1), min-width 240ms cubic-bezier(0.16, 1, 0.3, 1);
     font-family: var(--p-font-family, inherit);
     overflow: hidden;
     border-radius: 0;
@@ -173,7 +173,7 @@ var SIDEBAR_CSS = `
 .sidebar-group-chevron {
     display: flex;
     align-items: center;
-    transition: transform 220ms cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1);
     color: var(--p-text-muted);
 }
 .sidebar-group-chevron.expanded {
@@ -372,12 +372,19 @@ var SIDEBAR_CSS = `
     flex-direction: column;
     gap: 0.125rem;
     box-sizing: border-box;
-    animation: p-sb-fade-in 0.15s ease;
+    animation: p-sb-popup-pop 160ms cubic-bezier(0.16, 1, 0.3, 1);
+    transform-origin: top left;
 }
 
-@keyframes p-sb-fade-in {
-    from { opacity: 0; transform: translateY(-4px); }
-    to { opacity: 1; transform: translateY(0); }
+@keyframes p-sb-popup-pop {
+    from {
+        opacity: 0;
+        transform: scale(0.96) translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
 }
 
 .p-sb-select-option {
@@ -459,7 +466,7 @@ var SIDEBAR_CSS = `
     background: #ffffff;
     border-radius: 50%;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .p-sb-switch.p-checked {
@@ -491,7 +498,7 @@ var SIDEBAR_CSS = `
     background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(2px);
     z-index: 90;
-    transition: opacity 0.22s ease;
+    transition: opacity 240ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .p-sidebar {
@@ -501,7 +508,7 @@ var SIDEBAR_CSS = `
     position: relative;
     z-index: 100;
     box-sizing: border-box;
-    transition: width 220ms cubic-bezier(0.4, 0, 0.2, 1), transform 220ms cubic-bezier(0.4, 0, 0.2, 1);
+    transition: width 240ms cubic-bezier(0.16, 1, 0.3, 1), transform 240ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 240ms ease;
     flex-shrink: 0;
     overflow: hidden;
 }
@@ -558,7 +565,7 @@ var SIDEBAR_CSS = `
     position: absolute !important;
     top: 0;
     bottom: 0;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.18), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
     z-index: 100;
 }
 .p-sidebar-side-left.p-sidebar-overlay {
@@ -568,19 +575,33 @@ var SIDEBAR_CSS = `
     right: 0;
 }
 
-/* Collapsed Icon Mode */
-.p-sidebar-collapsible-icon.p-sidebar-collapsed {
-    width: 3.5rem !important;
+/* Collapsed Icon Mode Smooth Fade */
+.p-sidebar-item-label,
+.p-sidebar-group-label,
+.p-sidebar-menu-badge,
+.p-sidebar-submenu-chevron,
+.p-sidebar-header-label,
+.p-sidebar-footer-label {
+    transition: opacity 180ms cubic-bezier(0.16, 1, 0.3, 1), transform 180ms cubic-bezier(0.16, 1, 0.3, 1);
+    opacity: 1;
+    transform: translateX(0);
+    white-space: nowrap;
 }
 
 .p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-item-label,
 .p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-group-label,
 .p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-menu-badge,
 .p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-submenu-chevron,
-.p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-menu-sub-wrapper,
-.p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-menu-action,
 .p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-header-label,
 .p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-footer-label {
+    opacity: 0;
+    transform: translateX(-6px);
+    pointer-events: none;
+    display: none;
+}
+
+.p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-menu-sub-wrapper,
+.p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-menu-action {
     display: none !important;
 }
 
@@ -673,7 +694,7 @@ var SIDEBAR_CSS = `
     cursor: pointer;
     font-size: 0.875rem;
     font-weight: 500;
-    transition: background-color 0.12s ease, color 0.12s ease;
+    transition: background-color 0.12s ease, color 0.12s ease, transform 0.12s ease;
     box-sizing: border-box;
     text-align: left;
     outline: none;
@@ -699,6 +720,7 @@ var SIDEBAR_CSS = `
     height: 1.125rem;
     flex-shrink: 0;
     color: var(--p-surface-500, #64748b);
+    transition: transform 0.15s ease;
 }
 
 .p-sidebar-menu-button.p-active .p-sidebar-menu-button-icon {
@@ -721,7 +743,7 @@ var SIDEBAR_CSS = `
     align-items: center;
     justify-content: center;
     color: var(--p-surface-400, #94a3b8);
-    transition: transform 220ms cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .p-sidebar-submenu-chevron.p-expanded {
@@ -743,6 +765,7 @@ var SIDEBAR_CSS = `
     cursor: pointer;
     background: transparent;
     border: none;
+    transition: background-color 0.12s ease, color 0.12s ease, transform 0.12s ease;
 }
 
 .p-sidebar-menu-item:hover .p-sidebar-menu-action {
@@ -752,17 +775,20 @@ var SIDEBAR_CSS = `
 .p-sidebar-menu-action:hover {
     background: var(--p-surface-200, #e2e8f0);
     color: var(--p-surface-700, #334155);
+    transform: translateY(-50%) scale(1.1);
 }
 
 /* Fluid CSS Grid Submenu Expand/Collapse Animation */
 .p-sidebar-menu-sub-wrapper {
     display: grid;
     grid-template-rows: 0fr;
-    transition: grid-template-rows 220ms cubic-bezier(0.4, 0, 0.2, 1);
+    transition: grid-template-rows 240ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms ease;
+    opacity: 0;
 }
 
 .p-sidebar-menu-sub-wrapper.p-expanded {
     grid-template-rows: 1fr;
+    opacity: 1;
 }
 
 .p-sidebar-menu-sub {
@@ -836,12 +862,16 @@ var SIDEBAR_CSS = `
     background: transparent;
     color: var(--p-surface-600, #475569);
     cursor: pointer;
-    transition: background-color 0.15s ease, color 0.15s ease;
+    transition: background-color 0.15s ease, color 0.15s ease, transform 0.12s ease;
 }
 
 .p-sidebar-trigger:hover {
     background: var(--p-surface-100, #f1f5f9);
     color: var(--p-text-color, #0f172a);
+}
+
+.p-sidebar-trigger:active {
+    transform: scale(0.94);
 }
 
 /* Interactive Popup Menu in Demo */
@@ -857,6 +887,8 @@ var SIDEBAR_CSS = `
     display: flex;
     flex-direction: column;
     gap: 0.2rem;
+    animation: p-sb-popup-pop 160ms cubic-bezier(0.16, 1, 0.3, 1);
+    transform-origin: top left;
 }
 
 .p-sb-popup-item {
@@ -1678,7 +1710,7 @@ function renderCompoundSidebar(container, props) {
     if (demoType !== "dual") return "";
     const aiWidth = isAiOpen ? "18rem" : "0rem";
     return `
-            <aside class="p-sidebar p-sidebar-collapsible-offcanvas p-sidebar-side-right ${!isAiOpen ? "p-sidebar-collapsed" : ""}" style="width: ${aiWidth}; border-left: 1px solid var(--p-border-color);">
+            <aside class="p-sidebar p-sidebar-collapsible-offcanvas p-sidebar-side-right ${!isAiOpen ? "p-sidebar-collapsed" : ""}" style="width: ${aiWidth}; border-left: 1px solid var(--p-border-color);" data-ai-sidebar-root>
                 <div class="p-sidebar-aside">
                     <div class="p-sidebar-panel">
                         <div class="p-sidebar-header">
@@ -1712,6 +1744,24 @@ function renderCompoundSidebar(container, props) {
             </aside>
         `;
   }
+  function updateSidebarClasses() {
+    const aside = container.querySelector("[data-sidebar-root]");
+    if (!aside) return;
+    aside.className = [
+      "p-sidebar",
+      `p-sidebar-variant-${variant}`,
+      `p-sidebar-collapsible-${collapsible}`,
+      `p-sidebar-side-${side}`,
+      overlay ? "p-sidebar-overlay" : "",
+      !isOpen ? "p-sidebar-collapsed" : ""
+    ].filter(Boolean).join(" ");
+    const sidebarWidth = isOpen ? width : collapsible === "icon" ? "3.5rem" : "0rem";
+    aside.style.width = sidebarWidth;
+    const backdropEl = container.querySelector("[data-sidebar-backdrop]");
+    if (backdropEl) {
+      backdropEl.style.display = backdrop && isOpen ? "block" : "none";
+    }
+  }
   function renderComponent() {
     const sidebarClasses = [
       "p-sidebar",
@@ -1741,7 +1791,7 @@ function renderCompoundSidebar(container, props) {
         `;
     const mainHtml = renderMainContent();
     const aiRightPanelHtml = renderAiRightPanel();
-    const backdropHtml = backdrop && isOpen ? `<div class="p-sidebar-backdrop" data-sidebar-backdrop></div>` : "";
+    const backdropHtml = `<div class="p-sidebar-backdrop" data-sidebar-backdrop style="display: ${backdrop && isOpen ? "block" : "none"};"></div>`;
     let innerContent = "";
     if (demoType === "dual") {
       innerContent = sidebarHtml + mainHtml + aiRightPanelHtml;
@@ -1769,32 +1819,34 @@ function renderCompoundSidebar(container, props) {
       btn.addEventListener("click", (e) => {
         e.stopPropagation();
         isOpen = !isOpen;
-        render();
+        updateSidebarClasses();
       });
     });
     container.querySelectorAll("[data-ai-toggle]").forEach((btn) => {
       btn.addEventListener("click", (e) => {
         e.stopPropagation();
         isAiOpen = !isAiOpen;
-        render();
+        const aiAside = container.querySelector("[data-ai-sidebar-root]");
+        if (aiAside) {
+          aiAside.classList.toggle("p-sidebar-collapsed", !isAiOpen);
+          aiAside.style.width = isAiOpen ? "18rem" : "0rem";
+        }
       });
     });
     container.querySelectorAll("[data-sidebar-backdrop]").forEach((bd) => {
       bd.addEventListener("click", () => {
         isOpen = false;
-        render();
+        updateSidebarClasses();
       });
     });
-    if (overlay) {
-      const mainEl = container.querySelector(".p-sidebar-main");
-      if (mainEl) {
-        mainEl.addEventListener("click", (e) => {
-          if (isOpen && !e.target.closest("[data-sidebar-toggle]")) {
-            isOpen = false;
-            render();
-          }
-        });
-      }
+    const mainEl = container.querySelector(".p-sidebar-main");
+    if (mainEl) {
+      mainEl.addEventListener("click", (e) => {
+        if (overlay && isOpen && !e.target.closest("[data-sidebar-toggle]")) {
+          isOpen = false;
+          updateSidebarClasses();
+        }
+      });
     }
     container.querySelectorAll('.p-sidebar-menu-button[data-has-subs="true"]').forEach((btn) => {
       btn.addEventListener("click", (e) => {
@@ -1903,18 +1955,18 @@ function renderCompoundSidebar(container, props) {
         aside.addEventListener("mouseenter", () => {
           if (!isOpen) {
             isOpen = true;
-            render();
+            updateSidebarClasses();
           }
         });
         aside.addEventListener("mouseleave", () => {
           if (isOpen) {
             isOpen = false;
-            render();
+            updateSidebarClasses();
           }
         });
       }
     }
-    const onDocClick = (e) => {
+    const onDocClick = () => {
       if (openSelectDropdown || showCompanyPopup || showUserPopup) {
         openSelectDropdown = null;
         showCompanyPopup = false;
@@ -1933,4 +1985,4 @@ function renderCompoundSidebar(container, props) {
 export {
   SidebarIsland as default
 };
-//# sourceMappingURL=sidebar-AFVKZD33.js.map
+//# sourceMappingURL=sidebar-OSEPYQPG.js.map
