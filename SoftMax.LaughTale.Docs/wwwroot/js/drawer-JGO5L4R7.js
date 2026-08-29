@@ -8,23 +8,24 @@ var DRAWER_CSS = `
     position: fixed;
     inset: 0;
     z-index: 1100;
-    display: none !important;
+    display: none;
     box-sizing: border-box;
     pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    background: rgba(15, 23, 42, 0);
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+    transition: background 0.3s cubic-bezier(0.16, 1, 0.3, 1), backdrop-filter 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .p-drawer-mask.p-drawer-mask-modal {
-    background: rgba(15, 23, 42, 0.45);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
+    background: rgba(15, 23, 42, 0);
 }
 
 .p-drawer-mask.p-drawer-mask-active {
-    display: flex !important;
-    opacity: 1;
     pointer-events: auto;
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
 }
 
 /* Positioning & Layout */
@@ -62,7 +63,8 @@ var DRAWER_CSS = `
     overflow: hidden;
     pointer-events: auto;
     will-change: transform, opacity;
-    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+    transform: translateZ(0);
+    transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
 }
 
 /* Position Transforms */
@@ -71,10 +73,10 @@ var DRAWER_CSS = `
     max-width: 100vw;
     height: 100%;
     border-right: 1px solid var(--p-border-color, #e2e8f0);
-    transform: translateX(-100%);
+    transform: translate3d(-100%, 0, 0);
 }
 .p-drawer-mask-active.p-drawer-left .p-drawer {
-    transform: translateX(0);
+    transform: translate3d(0, 0, 0);
 }
 
 .p-drawer-right .p-drawer {
@@ -82,10 +84,10 @@ var DRAWER_CSS = `
     max-width: 100vw;
     height: 100%;
     border-left: 1px solid var(--p-border-color, #e2e8f0);
-    transform: translateX(100%);
+    transform: translate3d(100%, 0, 0);
 }
 .p-drawer-mask-active.p-drawer-right .p-drawer {
-    transform: translateX(0);
+    transform: translate3d(0, 0, 0);
 }
 
 .p-drawer-top .p-drawer {
@@ -93,10 +95,10 @@ var DRAWER_CSS = `
     height: auto;
     max-height: 80vh;
     border-bottom: 1px solid var(--p-border-color, #e2e8f0);
-    transform: translateY(-100%);
+    transform: translate3d(0, -100%, 0);
 }
 .p-drawer-mask-active.p-drawer-top .p-drawer {
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0);
 }
 
 .p-drawer-bottom .p-drawer {
@@ -104,10 +106,10 @@ var DRAWER_CSS = `
     height: auto;
     max-height: 80vh;
     border-top: 1px solid var(--p-border-color, #e2e8f0);
-    transform: translateY(100%);
+    transform: translate3d(0, 100%, 0);
 }
 .p-drawer-mask-active.p-drawer-bottom .p-drawer {
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0);
 }
 
 .p-drawer-full .p-drawer {
@@ -150,8 +152,8 @@ var DRAWER_CSS = `
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 2rem;
-    height: 2rem;
+    width: 2.25rem;
+    height: 2.25rem;
     border-radius: 9999px;
     border: none;
     background: transparent;
@@ -273,11 +275,14 @@ function initGlobalDrawerDelegation() {
             maskEl.classList.add(`p-drawer-${cleanPos}`);
           }
           maskEl.style.display = "flex";
-          void maskEl.offsetWidth;
-          maskEl.classList.add("p-drawer-mask-active");
-          if (maskEl.classList.contains("p-drawer-mask-modal")) {
-            document.body.style.overflow = "hidden";
-          }
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              maskEl.classList.add("p-drawer-mask-active");
+              if (maskEl.classList.contains("p-drawer-mask-modal")) {
+                document.body.style.overflow = "hidden";
+              }
+            });
+          });
         }
       }
       return;
@@ -292,7 +297,7 @@ function initGlobalDrawerDelegation() {
           if (!maskEl.classList.contains("p-drawer-mask-active")) {
             maskEl.style.display = "none";
           }
-        }, 280);
+        }, 320);
         document.body.style.overflow = "";
       }
       return;
@@ -315,7 +320,7 @@ function initGlobalDrawerDelegation() {
           if (!target.classList.contains("p-drawer-mask-active")) {
             target.style.display = "none";
           }
-        }, 280);
+        }, 320);
         document.body.style.overflow = "";
       }
     }
@@ -343,7 +348,7 @@ function initGlobalDrawerDelegation() {
           if (!activeMask.classList.contains("p-drawer-mask-active")) {
             activeMask.style.display = "none";
           }
-        }, 280);
+        }, 320);
         document.body.style.overflow = "";
       }
     }
@@ -356,4 +361,4 @@ function DrawerIsland(container, props) {
 export {
   DrawerIsland as default
 };
-//# sourceMappingURL=drawer-ZMBE2B3C.js.map
+//# sourceMappingURL=drawer-JGO5L4R7.js.map

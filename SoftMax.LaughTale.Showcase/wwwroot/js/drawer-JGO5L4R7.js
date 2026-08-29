@@ -1,13 +1,9 @@
-/**
- * SoftMax.LaughTale: Enterprise Drawer Component (PrimeVue 4 Aura Design System compliant)
- * High-performance edge overlay panel with 5 positions (left, right, top, bottom, full),
- * zero-flash SSR, butter-smooth 60 FPS GPU slide-in / slide-out animations, global click delegation,
- * responsive widths, custom template slots, and interactive headless sidebar menus.
- */
+import {
+  injectIslandStyle
+} from "./chunk-3TFPN5JM.js";
 
-import { injectIslandStyle } from '../runtime/styles';
-
-const DRAWER_CSS = `
+// ../SoftMax.LaughTale.Client/src/components/drawer.ts
+var DRAWER_CSS = `
 .p-drawer-mask {
     position: fixed;
     inset: 0;
@@ -258,136 +254,111 @@ const DRAWER_CSS = `
     color: var(--p-surface-400, #94a3b8);
 }
 `;
-
-export interface DrawerProps {
-    id?: string;
-    header?: string;
-    title?: string;
-    position?: 'left' | 'right' | 'top' | 'bottom' | 'full';
-    visible?: boolean;
-    modal?: boolean;
-    dismissableMask?: boolean;
-    closable?: boolean;
-    closeOnEscape?: boolean;
-    width?: string;
-    height?: string;
-    style?: string;
-    class?: string;
-}
-
-let globalDrawerDelegationBound = false;
-
+var globalDrawerDelegationBound = false;
 function initGlobalDrawerDelegation() {
-    if (globalDrawerDelegationBound || typeof document === 'undefined') return;
-    globalDrawerDelegationBound = true;
-
-    document.addEventListener('click', (e) => {
-        const target = e.target as HTMLElement;
-        const trigger = target.closest<HTMLElement>('[data-drawer-target], [data-drawer-open]');
-        
-        if (trigger) {
-            e.preventDefault();
-            const drawerId = trigger.getAttribute('data-drawer-target') || trigger.getAttribute('data-drawer-open');
-            const pos = trigger.getAttribute('data-drawer-position');
-            if (drawerId) {
-                const drawerContainer = document.getElementById(drawerId);
-                const maskEl = drawerContainer?.querySelector<HTMLElement>('.p-drawer-mask');
-                if (maskEl) {
-                    if (pos) {
-                        const cleanPos = pos.toLowerCase().replace(/[^a-z]/g, '');
-                        maskEl.className = maskEl.className.replace(/p-drawer-(left|right|top|bottom|full)/g, '');
-                        maskEl.classList.add(`p-drawer-${cleanPos}`);
-                    }
-                    maskEl.style.display = 'flex';
-                    // Double RAF guarantees browser computes layout in un-active state before triggering active slide transition
-                    requestAnimationFrame(() => {
-                        requestAnimationFrame(() => {
-                            maskEl.classList.add('p-drawer-mask-active');
-                            if (maskEl.classList.contains('p-drawer-mask-modal')) {
-                                document.body.style.overflow = 'hidden';
-                            }
-                        });
-                    });
-                }
-            }
-            return;
+  if (globalDrawerDelegationBound || typeof document === "undefined") return;
+  globalDrawerDelegationBound = true;
+  document.addEventListener("click", (e) => {
+    const target = e.target;
+    const trigger = target.closest("[data-drawer-target], [data-drawer-open]");
+    if (trigger) {
+      e.preventDefault();
+      const drawerId = trigger.getAttribute("data-drawer-target") || trigger.getAttribute("data-drawer-open");
+      const pos = trigger.getAttribute("data-drawer-position");
+      if (drawerId) {
+        const drawerContainer = document.getElementById(drawerId);
+        const maskEl = drawerContainer?.querySelector(".p-drawer-mask");
+        if (maskEl) {
+          if (pos) {
+            const cleanPos = pos.toLowerCase().replace(/[^a-z]/g, "");
+            maskEl.className = maskEl.className.replace(/p-drawer-(left|right|top|bottom|full)/g, "");
+            maskEl.classList.add(`p-drawer-${cleanPos}`);
+          }
+          maskEl.style.display = "flex";
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              maskEl.classList.add("p-drawer-mask-active");
+              if (maskEl.classList.contains("p-drawer-mask-modal")) {
+                document.body.style.overflow = "hidden";
+              }
+            });
+          });
         }
-
-        // Close triggers
-        const closeBtn = target.closest<HTMLElement>('.p-drawer-close-button, [data-drawer-close]');
-        if (closeBtn) {
-            e.preventDefault();
-            const maskEl = closeBtn.closest<HTMLElement>('.p-drawer-mask');
-            if (maskEl) {
-                maskEl.classList.remove('p-drawer-mask-active');
-                setTimeout(() => {
-                    if (!maskEl.classList.contains('p-drawer-mask-active')) {
-                        maskEl.style.display = 'none';
-                    }
-                }, 320);
-                document.body.style.overflow = '';
-            }
-            return;
+      }
+      return;
+    }
+    const closeBtn = target.closest(".p-drawer-close-button, [data-drawer-close]");
+    if (closeBtn) {
+      e.preventDefault();
+      const maskEl = closeBtn.closest(".p-drawer-mask");
+      if (maskEl) {
+        maskEl.classList.remove("p-drawer-mask-active");
+        setTimeout(() => {
+          if (!maskEl.classList.contains("p-drawer-mask-active")) {
+            maskEl.style.display = "none";
+          }
+        }, 320);
+        document.body.style.overflow = "";
+      }
+      return;
+    }
+    if (target.classList.contains("p-drawer-mask")) {
+      const container = target.closest('[data-island="drawer"]');
+      let dismissable = true;
+      if (container) {
+        try {
+          const props = JSON.parse(container.getAttribute("data-props") || "{}");
+          if (props.dismissableMask === false) {
+            dismissable = false;
+          }
+        } catch {
         }
-
-        // Dismissable mask backdrop click
-        if (target.classList.contains('p-drawer-mask')) {
-            const container = target.closest<HTMLElement>('[data-island="drawer"]');
-            let dismissable = true;
-            if (container) {
-                try {
-                    const props = JSON.parse(container.getAttribute('data-props') || '{}');
-                    if (props.dismissableMask === false) {
-                        dismissable = false;
-                    }
-                } catch {}
-            }
-            if (dismissable) {
-                target.classList.remove('p-drawer-mask-active');
-                setTimeout(() => {
-                    if (!target.classList.contains('p-drawer-mask-active')) {
-                        target.style.display = 'none';
-                    }
-                }, 320);
-                document.body.style.overflow = '';
-            }
+      }
+      if (dismissable) {
+        target.classList.remove("p-drawer-mask-active");
+        setTimeout(() => {
+          if (!target.classList.contains("p-drawer-mask-active")) {
+            target.style.display = "none";
+          }
+        }, 320);
+        document.body.style.overflow = "";
+      }
+    }
+    const accordionTrigger = target.closest("[data-drawer-toggle]");
+    if (accordionTrigger) {
+      e.preventDefault();
+      const targetSubmenu = accordionTrigger.nextElementSibling;
+      if (targetSubmenu) {
+        const isHidden = targetSubmenu.style.display === "none" || targetSubmenu.classList.contains("hidden");
+        targetSubmenu.style.display = isHidden ? "block" : "none";
+        targetSubmenu.classList.toggle("hidden", !isHidden);
+        const chevron = accordionTrigger.querySelector(".p-drawer-chevron");
+        if (chevron) {
+          chevron.style.transform = isHidden ? "rotate(180deg)" : "rotate(0deg)";
         }
-
-        // Accordion toggles inside headless drawer
-        const accordionTrigger = target.closest<HTMLElement>('[data-drawer-toggle]');
-        if (accordionTrigger) {
-            e.preventDefault();
-            const targetSubmenu = accordionTrigger.nextElementSibling as HTMLElement;
-            if (targetSubmenu) {
-                const isHidden = targetSubmenu.style.display === 'none' || targetSubmenu.classList.contains('hidden');
-                targetSubmenu.style.display = isHidden ? 'block' : 'none';
-                targetSubmenu.classList.toggle('hidden', !isHidden);
-                const chevron = accordionTrigger.querySelector<HTMLElement>('.p-drawer-chevron');
-                if (chevron) {
-                    chevron.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
-                }
-            }
-        }
-    });
-
-    // Escape Key Handler
-    window.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            const activeMask = document.querySelector<HTMLElement>('.p-drawer-mask.p-drawer-mask-active');
-            if (activeMask) {
-                activeMask.classList.remove('p-drawer-mask-active');
-                setTimeout(() => {
-                    if (!activeMask.classList.contains('p-drawer-mask-active')) {
-                        activeMask.style.display = 'none';
-                    }
-                }, 320);
-                document.body.style.overflow = '';
-            }
-        }
-    });
+      }
+    }
+  });
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      const activeMask = document.querySelector(".p-drawer-mask.p-drawer-mask-active");
+      if (activeMask) {
+        activeMask.classList.remove("p-drawer-mask-active");
+        setTimeout(() => {
+          if (!activeMask.classList.contains("p-drawer-mask-active")) {
+            activeMask.style.display = "none";
+          }
+        }, 320);
+        document.body.style.overflow = "";
+      }
+    }
+  });
 }
-
-export default function DrawerIsland(container: HTMLElement, props: DrawerProps) {
-    injectIslandStyle('drawer', DRAWER_CSS);
-    initGlobalDrawerDelegation();
+function DrawerIsland(container, props) {
+  injectIslandStyle("drawer", DRAWER_CSS);
+  initGlobalDrawerDelegation();
 }
+export {
+  DrawerIsland as default
+};
+//# sourceMappingURL=drawer-JGO5L4R7.js.map
