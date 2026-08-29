@@ -87,7 +87,7 @@ public static class NavigationData
             {
                 new("Dialog", "layers", "/enterprise#sec-dialog", false, null, "New"),
                 new("Modal Dialog", "layers", "/enterprise#sec-modal"),
-                new("Drawer Offcanvas", "sidebar", "/enterprise#sec-drawer"),
+                new("Drawer", "sidebar", "/enterprise#sec-drawer", false, null, "New"),
                 new("Popover", "messageSquare", "/enterprise#sec-popover"),
                 new("Tooltip", "info", "/enterprise#sec-tooltip"),
                 new("ConfirmDialog", "alertTriangle", "/enterprise#sec-confirm-dialog", false, null, "New"),

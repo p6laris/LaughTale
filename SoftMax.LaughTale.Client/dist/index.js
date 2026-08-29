@@ -13700,119 +13700,361 @@ var SoftMaxIslands = (() => {
   __export(drawer_exports, {
     default: () => DrawerIsland
   });
-  function DrawerIsland(container, props) {
-    injectIslandStyle("drawer", CSS19);
-    const position = props.position || "right";
-    const width = props.width || "380px";
-    function render() {
-      container.innerHTML = `
-            <div class="laughtale-drawer-wrapper">
-                ${props.triggerText ? `
-                    <button type="button" class="p-button p-button-secondary drawer-open-btn">
-                        ${props.triggerText}
-                    </button>
-                ` : ""}
-
-                <!-- Backdrop -->
-                <div class="drawer-backdrop" style="display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.45); backdrop-filter: blur(4px); z-index: 1000; opacity: 0; transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1);"></div>
-
-                <!-- Drawer Panel -->
-                <div class="drawer-panel" style="display: flex; flex-direction: column; position: fixed; ${position}: 0; top: 0; bottom: 0; width: ${width}; max-width: 90vw; background: var(--p-surface-0); border-${position === "right" ? "left" : "right"}: 1px solid var(--p-border-color); box-shadow: var(--p-shadow-lg); z-index: 1001; transform: translateX(${position === "right" ? "100%" : "-100%"}); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); pointer-events: none;">
-                    
-                    <!-- Header -->
-                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 1.25rem; border-bottom: 1px solid var(--p-border-color);">
-                        <div style="font-size: 1.125rem; font-weight: 700; color: var(--p-surface-900);">
-                            ${props.title || "Panel"}
-                        </div>
-                        <button type="button" class="drawer-close-btn" style="border: none; background: transparent; color: var(--p-surface-400); cursor: pointer; display: flex; align-items: center; padding: 0.25rem;">
-                            ${LucideIcons.x}
-                        </button>
-                    </div>
-
-                    <!-- Projected Body Slot -->
-                    <div class="drawer-body" style="flex: 1; overflow-y: auto; padding: 1.25rem;">
-                        <div class="drawer-slot-container"></div>
-                    </div>
-                </div>
-            </div>
-        `;
-      const backdrop = container.querySelector(".drawer-backdrop");
-      const panel = container.querySelector(".drawer-panel");
-      const openBtn = container.querySelector(".drawer-open-btn");
-      const closeBtn = container.querySelector(".drawer-close-btn");
-      const focusTrap = useFocusTrap(panel);
-      const disclosure = useDisclosure({
-        defaultIsOpen: false,
-        onOpen: () => {
-          backdrop.style.display = "block";
-          setTimeout(() => {
-            backdrop.style.opacity = "1";
-            panel.style.transform = "translateX(0)";
-            panel.style.pointerEvents = "auto";
-          }, 10);
-          focusTrap.activate();
-        },
-        onClose: () => {
-          backdrop.style.opacity = "0";
-          panel.style.transform = `translateX(${position === "right" ? "100%" : "-100%"})`;
-          panel.style.pointerEvents = "none";
-          setTimeout(() => {
-            backdrop.style.display = "none";
-          }, 300);
-          focusTrap.deactivate();
+  function initGlobalDrawerDelegation() {
+    if (globalDrawerDelegationBound || typeof document === "undefined") return;
+    globalDrawerDelegationBound = true;
+    document.addEventListener("click", (e) => {
+      const target = e.target;
+      const trigger = target.closest("[data-drawer-target], [data-drawer-open]");
+      if (trigger) {
+        e.preventDefault();
+        const drawerId = trigger.getAttribute("data-drawer-target") || trigger.getAttribute("data-drawer-open");
+        const pos = trigger.getAttribute("data-drawer-position");
+        if (drawerId) {
+          const drawerContainer = document.getElementById(drawerId);
+          const maskEl = drawerContainer?.querySelector(".p-drawer-mask");
+          if (maskEl) {
+            if (pos) {
+              const cleanPos = pos.toLowerCase().replace(/[^a-z]/g, "");
+              maskEl.className = maskEl.className.replace(/p-drawer-(left|right|top|bottom|full)/g, "");
+              maskEl.classList.add(`p-drawer-${cleanPos}`);
+            }
+            maskEl.style.display = "flex";
+            void maskEl.offsetWidth;
+            maskEl.classList.add("p-drawer-mask-active");
+            if (maskEl.classList.contains("p-drawer-mask-modal")) {
+              document.body.style.overflow = "hidden";
+            }
+          }
         }
-      });
-      openBtn?.addEventListener("click", () => disclosure.open());
-      closeBtn?.addEventListener("click", () => disclosure.close());
-      backdrop?.addEventListener("click", () => disclosure.close());
-    }
-    render();
+        return;
+      }
+      const closeBtn = target.closest(".p-drawer-close-button, [data-drawer-close]");
+      if (closeBtn) {
+        e.preventDefault();
+        const maskEl = closeBtn.closest(".p-drawer-mask");
+        if (maskEl) {
+          maskEl.classList.remove("p-drawer-mask-active");
+          setTimeout(() => {
+            if (!maskEl.classList.contains("p-drawer-mask-active")) {
+              maskEl.style.display = "none";
+            }
+          }, 280);
+          document.body.style.overflow = "";
+        }
+        return;
+      }
+      if (target.classList.contains("p-drawer-mask")) {
+        const container = target.closest('[data-island="drawer"]');
+        let dismissable = true;
+        if (container) {
+          try {
+            const props = JSON.parse(container.getAttribute("data-props") || "{}");
+            if (props.dismissableMask === false) {
+              dismissable = false;
+            }
+          } catch {
+          }
+        }
+        if (dismissable) {
+          target.classList.remove("p-drawer-mask-active");
+          setTimeout(() => {
+            if (!target.classList.contains("p-drawer-mask-active")) {
+              target.style.display = "none";
+            }
+          }, 280);
+          document.body.style.overflow = "";
+        }
+      }
+      const accordionTrigger = target.closest("[data-drawer-toggle]");
+      if (accordionTrigger) {
+        e.preventDefault();
+        const targetSubmenu = accordionTrigger.nextElementSibling;
+        if (targetSubmenu) {
+          const isHidden = targetSubmenu.style.display === "none" || targetSubmenu.classList.contains("hidden");
+          targetSubmenu.style.display = isHidden ? "block" : "none";
+          targetSubmenu.classList.toggle("hidden", !isHidden);
+          const chevron = accordionTrigger.querySelector(".p-drawer-chevron");
+          if (chevron) {
+            chevron.style.transform = isHidden ? "rotate(180deg)" : "rotate(0deg)";
+          }
+        }
+      }
+    });
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        const activeMask = document.querySelector(".p-drawer-mask.p-drawer-mask-active");
+        if (activeMask) {
+          activeMask.classList.remove("p-drawer-mask-active");
+          setTimeout(() => {
+            if (!activeMask.classList.contains("p-drawer-mask-active")) {
+              activeMask.style.display = "none";
+            }
+          }, 280);
+          document.body.style.overflow = "";
+        }
+      }
+    });
   }
-  var CSS19;
+  function DrawerIsland(container, props) {
+    injectIslandStyle("drawer", DRAWER_CSS);
+    initGlobalDrawerDelegation();
+  }
+  var DRAWER_CSS, globalDrawerDelegationBound;
   var init_drawer = __esm({
     "src/components/drawer.ts"() {
       "use strict";
-      init_lucide();
       init_styles();
-      init_useDisclosure();
-      init_useFocusTrap();
-      CSS19 = `
-[data-theme="dark"] .laughtale-drawer-wrapper {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+      DRAWER_CSS = `
+.p-drawer-mask {
+    position: fixed;
+    inset: 0;
+    z-index: 1100;
+    display: none !important;
+    box-sizing: border-box;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
-[data-theme="dark"] .drawer-open-btn {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-drawer-mask.p-drawer-mask-modal {
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
 }
-[data-theme="dark"] .drawer-backdrop {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-drawer-mask.p-drawer-mask-active {
+    display: flex !important;
+    opacity: 1;
+    pointer-events: auto;
 }
-[data-theme="dark"] .drawer-panel {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+/* Positioning & Layout */
+.p-drawer-mask.p-drawer-left {
+    justify-content: flex-start;
+    align-items: stretch;
 }
-[data-theme="dark"] .drawer-close-btn {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+.p-drawer-mask.p-drawer-right {
+    justify-content: flex-end;
+    align-items: stretch;
 }
-[data-theme="dark"] .drawer-body {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+.p-drawer-mask.p-drawer-top {
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
 }
-[data-theme="dark"] .drawer-slot-container {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+.p-drawer-mask.p-drawer-bottom {
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: stretch;
+}
+.p-drawer-mask.p-drawer-full {
+    align-items: stretch;
+    justify-content: stretch;
+}
+
+/* Drawer Container */
+.p-drawer {
+    background: var(--p-surface-0, #ffffff);
+    border: none;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    pointer-events: auto;
+    will-change: transform, opacity;
+    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+}
+
+/* Position Transforms */
+.p-drawer-left .p-drawer {
+    width: 20rem;
+    max-width: 100vw;
+    height: 100%;
+    border-right: 1px solid var(--p-border-color, #e2e8f0);
+    transform: translateX(-100%);
+}
+.p-drawer-mask-active.p-drawer-left .p-drawer {
+    transform: translateX(0);
+}
+
+.p-drawer-right .p-drawer {
+    width: 20rem;
+    max-width: 100vw;
+    height: 100%;
+    border-left: 1px solid var(--p-border-color, #e2e8f0);
+    transform: translateX(100%);
+}
+.p-drawer-mask-active.p-drawer-right .p-drawer {
+    transform: translateX(0);
+}
+
+.p-drawer-top .p-drawer {
+    width: 100%;
+    height: auto;
+    max-height: 80vh;
+    border-bottom: 1px solid var(--p-border-color, #e2e8f0);
+    transform: translateY(-100%);
+}
+.p-drawer-mask-active.p-drawer-top .p-drawer {
+    transform: translateY(0);
+}
+
+.p-drawer-bottom .p-drawer {
+    width: 100%;
+    height: auto;
+    max-height: 80vh;
+    border-top: 1px solid var(--p-border-color, #e2e8f0);
+    transform: translateY(100%);
+}
+.p-drawer-mask-active.p-drawer-bottom .p-drawer {
+    transform: translateY(0);
+}
+
+.p-drawer-full .p-drawer {
+    width: 100vw;
+    height: 100vh;
+    transform: scale(0.96);
+    opacity: 0;
+}
+.p-drawer-mask-active.p-drawer-full .p-drawer {
+    transform: scale(1);
+    opacity: 1;
+}
+
+/* Header */
+.p-drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.5rem 1rem 1.5rem;
+    border-bottom: none;
+    user-select: none;
+    flex-shrink: 0;
+}
+
+.p-drawer-title {
+    font-weight: 700;
+    font-size: 1.125rem;
+    color: var(--p-text-color, #0f172a);
+    margin: 0;
+}
+
+.p-drawer-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-left: auto;
+}
+
+.p-drawer-close-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 9999px;
+    border: none;
+    background: transparent;
+    color: var(--p-surface-500, #64748b);
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    padding: 0;
+}
+.p-drawer-close-button:hover {
+    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-text-color, #0f172a);
+}
+
+/* Content */
+.p-drawer-content {
+    padding: 0 1.5rem 1.5rem 1.5rem;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+/* Footer */
+.p-drawer-footer {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--p-border-color, #e2e8f0);
+    flex-shrink: 0;
+}
+
+/* Headless Navigation Elements */
+.p-drawer-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.65rem 0.85rem;
+    border-radius: var(--p-border-radius, 8px);
+    color: var(--p-surface-700, #334155);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+.p-drawer-nav-item:hover {
+    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-text-color, #0f172a);
+}
+
+.p-drawer-nav-section-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--p-surface-500, #64748b);
+    padding: 0.75rem 0.85rem 0.35rem 0.85rem;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+}
+
+/* Dark Mode Tokens */
+.dark .p-drawer,
+[data-theme="dark"] .p-drawer {
+    background: var(--p-surface-900, #0f172a);
+    border-color: var(--p-surface-700, #334155);
+}
+.dark .p-drawer-title,
+[data-theme="dark"] .p-drawer-title {
+    color: var(--p-surface-0, #f8fafc);
+}
+.dark .p-drawer-close-button,
+[data-theme="dark"] .p-drawer-close-button {
+    color: var(--p-surface-400, #94a3b8);
+}
+.dark .p-drawer-close-button:hover,
+[data-theme="dark"] .p-drawer-close-button:hover {
+    background: var(--p-surface-800, #1e293b);
+    color: #ffffff;
+}
+.dark .p-drawer-footer,
+[data-theme="dark"] .p-drawer-footer {
+    border-color: var(--p-surface-700, #334155);
+}
+.dark .p-drawer-nav-item,
+[data-theme="dark"] .p-drawer-nav-item {
+    color: var(--p-surface-200, #e2e8f0);
+}
+.dark .p-drawer-nav-item:hover,
+[data-theme="dark"] .p-drawer-nav-item:hover {
+    background: var(--p-surface-800, #1e293b);
+    color: #ffffff;
+}
+.dark .p-drawer-nav-section-title,
+[data-theme="dark"] .p-drawer-nav-section-title {
+    color: var(--p-surface-400, #94a3b8);
 }
 `;
+      globalDrawerDelegationBound = false;
     }
   });
 
@@ -14543,7 +14785,7 @@ var SoftMaxIslands = (() => {
     default: () => ImageCompareIsland
   });
   function ImageCompareIsland(container, props) {
-    injectIslandStyle("image-compare", CSS20);
+    injectIslandStyle("image-compare", CSS19);
     let splitPercent = 50;
     container.innerHTML = `
         <div class="laughtale-image-compare" style="position: relative; width: 100%; max-width: 600px; height: 340px; border-radius: var(--p-border-radius-lg); overflow: hidden; user-select: none; border: 1px solid var(--p-border-color); box-shadow: var(--p-shadow-md); touch-action: none; cursor: ew-resize;">
@@ -14619,12 +14861,12 @@ var SoftMaxIslands = (() => {
     window.addEventListener("mousemove", onPointerMove);
     window.addEventListener("mouseup", onPointerUp);
   }
-  var CSS20;
+  var CSS19;
   var init_image_compare = __esm({
     "src/components/image-compare.ts"() {
       "use strict";
       init_styles();
-      CSS20 = `
+      CSS19 = `
 [data-theme="dark"] .laughtale-image-compare {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -17903,7 +18145,7 @@ var SoftMaxIslands = (() => {
     default: () => AutoCompleteIsland
   });
   function AutoCompleteIsland(container, props) {
-    injectIslandStyle("autocomplete", CSS21);
+    injectIslandStyle("autocomplete", CSS20);
     const allItems = props.suggestions || props.items || [];
     const multiple = props.multiple === true;
     const showClear = props.showClear !== false;
@@ -18236,7 +18478,7 @@ var SoftMaxIslands = (() => {
     }
     renderChips();
   }
-  var CSS21;
+  var CSS20;
   var init_autocomplete = __esm({
     "src/components/autocomplete.ts"() {
       "use strict";
@@ -18245,7 +18487,7 @@ var SoftMaxIslands = (() => {
       init_useDisclosure();
       init_useClickOutside();
       init_useDebounce();
-      CSS21 = `
+      CSS20 = `
 .laughtale-autocomplete {
     position: relative;
     display: inline-flex;
@@ -18515,7 +18757,7 @@ var SoftMaxIslands = (() => {
     default: () => ColorPickerIsland
   });
   function ColorPickerIsland(container, props) {
-    injectIslandStyle("color-picker", CSS22);
+    injectIslandStyle("color-picker", CSS21);
     let currentColor = props.value || "#10b981";
     let isOpen = false;
     const swatchesHtml = DEFAULT_PRESETS.map((c) => `
@@ -18639,7 +18881,7 @@ var SoftMaxIslands = (() => {
     }
     syncValue();
   }
-  var DEFAULT_PRESETS, CSS22;
+  var DEFAULT_PRESETS, CSS21;
   var init_color_picker = __esm({
     "src/components/color-picker.ts"() {
       "use strict";
@@ -18661,7 +18903,7 @@ var SoftMaxIslands = (() => {
         "#1e293b",
         "#000000"
       ];
-      CSS22 = `
+      CSS21 = `
 [data-theme="dark"] .color-swatch-btn {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -18697,7 +18939,7 @@ var SoftMaxIslands = (() => {
     default: () => KnobIsland
   });
   function KnobIsland(container, props) {
-    injectIslandStyle("knob", CSS23);
+    injectIslandStyle("knob", CSS22);
     const min = props.min !== void 0 ? props.min : 0;
     const max = props.max !== void 0 ? props.max : 100;
     const step = props.step || 1;
@@ -18799,12 +19041,12 @@ var SoftMaxIslands = (() => {
     }
     syncValue();
   }
-  var CSS23;
+  var CSS22;
   var init_knob = __esm({
     "src/components/knob.ts"() {
       "use strict";
       init_styles();
-      CSS23 = `
+      CSS22 = `
 [data-theme="dark"] .laughtale-knob {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -18830,7 +19072,7 @@ var SoftMaxIslands = (() => {
     default: () => TagIsland
   });
   function TagIsland(container, props) {
-    injectIslandStyle("tag", CSS24);
+    injectIslandStyle("tag", CSS23);
     const severity = props.severity || "info";
     const isRounded = props.rounded || false;
     let bg = "var(--p-blue-50, #eff6ff)";
@@ -18864,12 +19106,12 @@ var SoftMaxIslands = (() => {
         </span>
     `;
   }
-  var CSS24;
+  var CSS23;
   var init_tag = __esm({
     "src/components/tag.ts"() {
       "use strict";
       init_styles();
-      CSS24 = `
+      CSS23 = `
 [data-theme="dark"] .laughtale-tag {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -18885,7 +19127,7 @@ var SoftMaxIslands = (() => {
     default: () => BreadcrumbIsland
   });
   function BreadcrumbIsland(container, props) {
-    injectIslandStyle("breadcrumb", CSS25);
+    injectIslandStyle("breadcrumb", CSS24);
     const items = props.items || [];
     const homeUrl = props.homeUrl || "/";
     const itemsHtml = items.map((item, idx) => {
@@ -18923,13 +19165,13 @@ var SoftMaxIslands = (() => {
         </nav>
     `;
   }
-  var CSS25;
+  var CSS24;
   var init_breadcrumb = __esm({
     "src/components/breadcrumb.ts"() {
       "use strict";
       init_lucide();
       init_styles();
-      CSS25 = `
+      CSS24 = `
 [data-theme="dark"] .laughtale-breadcrumb {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -18945,7 +19187,7 @@ var SoftMaxIslands = (() => {
     default: () => ScrollTopIsland
   });
   function ScrollTopIsland(container, props) {
-    injectIslandStyle("scroll-top", CSS26);
+    injectIslandStyle("scroll-top", CSS25);
     const threshold = props.threshold || 200;
     let isVisible = false;
     function render() {
@@ -18971,13 +19213,13 @@ var SoftMaxIslands = (() => {
     window.addEventListener("scroll", checkScroll, { passive: true });
     render();
   }
-  var CSS26;
+  var CSS25;
   var init_scroll_top = __esm({
     "src/components/scroll-top.ts"() {
       "use strict";
       init_lucide();
       init_styles();
-      CSS26 = `
+      CSS25 = `
 [data-theme="dark"] .laughtale-scroll-top-btn {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -18993,7 +19235,7 @@ var SoftMaxIslands = (() => {
     default: () => InplaceIsland
   });
   function InplaceIsland(container, props) {
-    injectIslandStyle("inplace", CSS27);
+    injectIslandStyle("inplace", CSS26);
     let isEditing = false;
     let currentValue = props.value || "";
     function render() {
@@ -19073,13 +19315,13 @@ var SoftMaxIslands = (() => {
     render();
     syncValue();
   }
-  var CSS27;
+  var CSS26;
   var init_inplace = __esm({
     "src/components/inplace.ts"() {
       "use strict";
       init_lucide();
       init_styles();
-      CSS27 = `
+      CSS26 = `
 [data-theme="dark"] .laughtale-inplace-display {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -19115,7 +19357,7 @@ var SoftMaxIslands = (() => {
     default: () => CommandPaletteIsland
   });
   function CommandPaletteIsland(container, props) {
-    injectIslandStyle("command", CSS28);
+    injectIslandStyle("command", CSS27);
     const placeholder = props.placeholder || "Type a command or search...";
     const items = props.items || [
       { id: "home", label: "Go to Overview", group: "Navigation", icon: "compass", url: "/", shortcut: "G H" },
@@ -19289,7 +19531,7 @@ var SoftMaxIslands = (() => {
     ]);
     document.addEventListener("command:open", () => open());
   }
-  var CSS28;
+  var CSS27;
   var init_command = __esm({
     "src/components/command.ts"() {
       "use strict";
@@ -19299,7 +19541,7 @@ var SoftMaxIslands = (() => {
       init_useFocusTrap();
       init_useHotkeys();
       init_useScrollLock();
-      CSS28 = `
+      CSS27 = `
 [data-theme="dark"] .laughtale-command-root {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -20163,7 +20405,7 @@ public static class AppTheme
     default: () => DynamicFormIsland
   });
   function DynamicFormIsland(container, props) {
-    injectIslandStyle("dynamic-form", CSS29);
+    injectIslandStyle("dynamic-form", CSS28);
     let schema = props.schema || null;
     if (!schema && props.schemaJson) {
       try {
@@ -20324,13 +20566,13 @@ public static class AppTheme
     }
     render();
   }
-  var CSS29;
+  var CSS28;
   var init_dynamic_form = __esm({
     "src/components/dynamic-form.ts"() {
       "use strict";
       init_styles();
       init_lucide();
-      CSS29 = `
+      CSS28 = `
 [data-theme="dark"] .p-input {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -20716,7 +20958,7 @@ public static class AppTheme
     default: () => MultiSelectIsland
   });
   function MultiSelectIsland(container, props) {
-    injectIslandStyle("multiselect", CSS30);
+    injectIslandStyle("multiselect", CSS29);
     const options = props.options || [];
     let selected = new Set(props.selectedValues || []);
     let filterQuery = "";
@@ -20882,7 +21124,7 @@ public static class AppTheme
     renderDisplay();
     syncValue();
   }
-  var CSS30;
+  var CSS29;
   var init_multiselect = __esm({
     "src/components/multiselect.ts"() {
       "use strict";
@@ -20891,7 +21133,7 @@ public static class AppTheme
       init_useDisclosure();
       init_useClickOutside();
       init_useTransition();
-      CSS30 = `
+      CSS29 = `
 [data-theme="dark"] .laughtale-multiselect {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -20962,7 +21204,7 @@ public static class AppTheme
     default: () => CascadeSelectIsland
   });
   function CascadeSelectIsland(container, props) {
-    injectIslandStyle("cascadeselect", CSS31);
+    injectIslandStyle("cascadeselect", CSS30);
     const options = props.options || [];
     const size = props.size || "normal";
     const variant = props.variant || "outlined";
@@ -21175,7 +21417,7 @@ public static class AppTheme
       }));
     }
   }
-  var CSS31;
+  var CSS30;
   var init_cascadeselect = __esm({
     "src/components/cascadeselect.ts"() {
       "use strict";
@@ -21183,7 +21425,7 @@ public static class AppTheme
       init_styles();
       init_useDisclosure();
       init_useClickOutside();
-      CSS31 = `
+      CSS30 = `
 .laughtale-cascadeselect {
     position: relative;
     display: inline-flex;
@@ -21388,7 +21630,7 @@ public static class AppTheme
     default: () => ListboxIsland
   });
   function ListboxIsland(container, props) {
-    injectIslandStyle("laughtale-listbox", CSS32);
+    injectIslandStyle("laughtale-listbox", CSS31);
     const isMultiple = props.multiple === true || String(props.multiple) === "true";
     const isMetaKey = props.metaKeySelection !== false && String(props.metaKeySelection) !== "false";
     const isCheckbox = props.checkbox === true || String(props.checkbox) === "true";
@@ -21724,14 +21966,14 @@ public static class AppTheme
     }
     init();
   }
-  var CSS32, checkSvg2, searchSvg2;
+  var CSS31, checkSvg2, searchSvg2;
   var init_listbox = __esm({
     "src/components/listbox.ts"() {
       "use strict";
       init_lucide();
       init_styles();
       init_useDebounce();
-      CSS32 = `
+      CSS31 = `
 /* ==================== AURA LISTBOX ==================== */
 .laughtale-listbox,
 .p-listbox {
@@ -24203,7 +24445,7 @@ public static class AppTheme
     default: () => TerminalIsland
   });
   function TerminalIsland(container, props) {
-    injectIslandStyle("terminal", CSS33);
+    injectIslandStyle("terminal", CSS32);
     const promptPrefix = props.prompt || "admin@softmax:~$";
     const welcome = props.welcomeMessage || 'Welcome to SoftMax.LaughTale CLI v3.0\nType "help" for available commands.';
     const commands = {
@@ -24302,13 +24544,13 @@ ${h.response}`).join("\n");
     }
     render();
   }
-  var CSS33;
+  var CSS32;
   var init_terminal = __esm({
     "src/components/terminal.ts"() {
       "use strict";
       init_styles();
       init_useClipboard();
-      CSS33 = `
+      CSS32 = `
 [data-theme="dark"] .laughtale-terminal {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -24339,7 +24581,7 @@ ${h.response}`).join("\n");
     default: () => DockIsland
   });
   function DockIsland(container, props) {
-    injectIslandStyle("dock", CSS34);
+    injectIslandStyle("dock", CSS33);
     const items = props.items || [
       { label: "Overview", icon: "compass", url: "/" },
       { label: "Dashboard", icon: "bar-chart", url: "/dashboard" },
@@ -24381,13 +24623,13 @@ ${h.response}`).join("\n");
       });
     });
   }
-  var CSS34;
+  var CSS33;
   var init_dock = __esm({
     "src/components/dock.ts"() {
       "use strict";
       init_styles();
       init_lucide();
-      CSS34 = `
+      CSS33 = `
 [data-theme="dark"] .laughtale-dock {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -24408,7 +24650,7 @@ ${h.response}`).join("\n");
     default: () => GalleriaIsland
   });
   function GalleriaIsland(container, props) {
-    injectIslandStyle("galleria", CSS35);
+    injectIslandStyle("galleria", CSS34);
     const images = props.value && props.value.length > 0 ? props.value : [
       {
         itemImageSrc: "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800&auto=format&fit=crop&q=80",
@@ -24482,13 +24724,13 @@ ${h.response}`).join("\n");
     }
     render();
   }
-  var CSS35;
+  var CSS34;
   var init_galleria = __esm({
     "src/components/galleria.ts"() {
       "use strict";
       init_styles();
       init_lucide();
-      CSS35 = `
+      CSS34 = `
 [data-theme="dark"] .laughtale-galleria {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -24519,7 +24761,7 @@ ${h.response}`).join("\n");
     default: () => BlockUIIsland
   });
   function BlockUIIsland(container, props) {
-    injectIslandStyle("blockui", CSS36);
+    injectIslandStyle("blockui", CSS35);
     let isBlocked = props.blocked ?? true;
     function render() {
       container.innerHTML = `
@@ -24542,12 +24784,12 @@ ${h.response}`).join("\n");
       render();
     });
   }
-  var CSS36;
+  var CSS35;
   var init_blockui = __esm({
     "src/components/blockui.ts"() {
       "use strict";
       init_styles();
-      CSS36 = `
+      CSS35 = `
 [data-theme="dark"] .laughtale-blockui-root {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -25279,7 +25521,7 @@ ${h.response}`).join("\n");
     default: () => SelectIsland
   });
   function SelectIsland(container, props) {
-    injectIslandStyle("laughtale-select", CSS37);
+    injectIslandStyle("laughtale-select", CSS36);
     const isMultiple = props.multiple === true || String(props.multiple) === "true";
     const isCheckmark = props.checkmark === true || String(props.checkmark) === "true";
     const isCheckbox = props.checkbox === true || String(props.checkbox) === "true";
@@ -25619,13 +25861,13 @@ ${h.response}`).join("\n");
     }
     render();
   }
-  var CSS37;
+  var CSS36;
   var init_select = __esm({
     "src/components/select.ts"() {
       "use strict";
       init_styles();
       init_lucide();
-      CSS37 = `
+      CSS36 = `
 /* ==================== AURA SELECT ==================== */
 .laughtale-select,
 .p-select {
@@ -26052,7 +26294,7 @@ ${h.response}`).join("\n");
     default: () => CheckboxIsland
   });
   function CheckboxIsland(container, props) {
-    injectIslandStyle("laughtale-checkbox", CSS38);
+    injectIslandStyle("laughtale-checkbox", CSS37);
     let isChecked = Boolean(props.checked);
     let isIndeterminate = Boolean(props.indeterminate);
     const size = props.size || "normal";
@@ -26124,13 +26366,13 @@ ${h.response}`).join("\n");
     }
     render();
   }
-  var CSS38;
+  var CSS37;
   var init_checkbox = __esm({
     "src/components/checkbox.ts"() {
       "use strict";
       init_styles();
       init_lucide();
-      CSS38 = `
+      CSS37 = `
 .laughtale-checkbox-wrap {
     display: inline-flex;
     align-items: center;
@@ -26307,7 +26549,7 @@ ${h.response}`).join("\n");
     default: () => RadioButtonIsland
   });
   function RadioButtonIsland(container, props) {
-    injectIslandStyle("laughtale-radio", CSS39);
+    injectIslandStyle("laughtale-radio", CSS38);
     const isCard = props.card === true || String(props.card) === "true";
     const isFilled = props.variant === "filled";
     const size = props.size || "normal";
@@ -26539,13 +26781,13 @@ ${h.response}`).join("\n");
     }
     renderSingle();
   }
-  var CSS39;
+  var CSS38;
   var init_radio_button = __esm({
     "src/components/radio-button.ts"() {
       "use strict";
       init_styles();
       init_lucide();
-      CSS39 = `
+      CSS38 = `
 /* ==================== AURA RADIOBUTTON ==================== */
 .laughtale-radio-root,
 .p-radiobutton-root {
@@ -26828,7 +27070,7 @@ ${h.response}`).join("\n");
     default: () => TextareaIsland
   });
   function TextareaIsland(container, props) {
-    injectIslandStyle("laughtale-textarea", CSS40);
+    injectIslandStyle("laughtale-textarea", CSS39);
     const isAutoResize = props.autoResize === true || String(props.autoResize) === "true";
     const isFluid = props.fluid === true || String(props.fluid) === "true";
     const isInvalid = props.invalid === true || String(props.invalid) === "true";
@@ -26904,12 +27146,12 @@ ${h.response}`).join("\n");
       setTimeout(adjustHeight, 0);
     }
   }
-  var CSS40;
+  var CSS39;
   var init_textarea = __esm({
     "src/components/textarea.ts"() {
       "use strict";
       init_styles();
-      CSS40 = `
+      CSS39 = `
 /* ==================== AURA TEXTAREA ==================== */
 .p-textarea {
     font-family: var(--p-font-family, inherit);
@@ -27034,7 +27276,7 @@ ${h.response}`).join("\n");
     default: () => InputMaskIsland
   });
   function InputMaskIsland(container, props) {
-    injectIslandStyle("laughtale-input-mask", CSS41);
+    injectIslandStyle("laughtale-input-mask", CSS40);
     const mask = props.mask || "(999) 999-9999";
     const slotChar = props.slotChar || "_";
     const autoClear = props.autoClear !== false && String(props.autoClear) !== "false";
@@ -27221,12 +27463,12 @@ ${h.response}`).join("\n");
     });
     syncValue();
   }
-  var CSS41;
+  var CSS40;
   var init_input_mask = __esm({
     "src/components/input-mask.ts"() {
       "use strict";
       init_styles();
-      CSS41 = `
+      CSS40 = `
 /* ==================== AURA INPUTMASK ==================== */
 .laughtale-input-mask,
 .p-inputmask {
@@ -27336,7 +27578,7 @@ ${h.response}`).join("\n");
     default: () => FloatLabelIsland
   });
   function FloatLabelIsland(container, props) {
-    injectIslandStyle("laughtale-float-label", CSS42);
+    injectIslandStyle("laughtale-float-label", CSS41);
     const variant = props.variant || "over";
     const initialHtml = container.innerHTML;
     const forAttr = props.for ? `for="${props.for}"` : "";
@@ -27414,12 +27656,12 @@ ${h.response}`).join("\n");
     setTimeout(updateFloatingState, 50);
     setTimeout(updateFloatingState, 200);
   }
-  var CSS42;
+  var CSS41;
   var init_float_label = __esm({
     "src/components/float-label.ts"() {
       "use strict";
       init_styles();
-      CSS42 = `
+      CSS41 = `
 .laughtale-float-label {
     position: relative;
     display: inline-flex;
@@ -27546,7 +27788,7 @@ ${h.response}`).join("\n");
     default: () => IftaLabelIsland
   });
   function IftaLabelIsland(container, props) {
-    injectIslandStyle("laughtale-ifta-label", CSS43);
+    injectIslandStyle("laughtale-ifta-label", CSS42);
     const initialHtml = container.innerHTML;
     const forAttr = props.for ? `for="${props.for}"` : "";
     const existingLabel = container.querySelector("label");
@@ -27569,12 +27811,12 @@ ${h.response}`).join("\n");
       }
     });
   }
-  var CSS43;
+  var CSS42;
   var init_ifta_label = __esm({
     "src/components/ifta-label.ts"() {
       "use strict";
       init_styles();
-      CSS43 = `
+      CSS42 = `
 .laughtale-ifta-label {
     position: relative;
     display: inline-flex;
@@ -27662,14 +27904,14 @@ ${h.response}`).join("\n");
     default: () => InputGroupIsland
   });
   function InputGroupIsland(container, props) {
-    injectIslandStyle("laughtale-inputgroup", CSS44);
+    injectIslandStyle("laughtale-inputgroup", CSS43);
     container.classList.add("laughtale-inputgroup", "p-inputgroup");
     if (props.size) {
       container.classList.add(`size-${props.size}`);
     }
   }
   function InputGroupAddonIsland(container, props) {
-    injectIslandStyle("laughtale-inputgroup", CSS44);
+    injectIslandStyle("laughtale-inputgroup", CSS43);
     container.classList.add("laughtale-inputgroup-addon", "p-inputgroup-addon");
     if (props.icon && !container.querySelector("svg")) {
       const svg = getLucideIcon(props.icon);
@@ -27681,13 +27923,13 @@ ${h.response}`).join("\n");
       container.insertAdjacentHTML("beforeend", `<span>${props.text}</span>`);
     }
   }
-  var CSS44;
+  var CSS43;
   var init_input_group = __esm({
     "src/components/input-group.ts"() {
       "use strict";
       init_styles();
       init_lucide();
-      CSS44 = `
+      CSS43 = `
 .laughtale-inputgroup,
 .p-inputgroup {
     display: flex;
@@ -27959,7 +28201,7 @@ ${h.response}`).join("\n");
     default: () => InputTextIsland
   });
   function InputTextIsland(container, props) {
-    injectIslandStyle("laughtale-inputtext", CSS45);
+    injectIslandStyle("laughtale-inputtext", CSS44);
     const [getValue, setValue] = useControllableState({
       defaultValue: props.value ?? "",
       onChange: (val) => {
@@ -28100,14 +28342,14 @@ ${h.response}`).join("\n");
     }
     init();
   }
-  var CSS45, xIcon;
+  var CSS44, xIcon;
   var init_input_text = __esm({
     "src/components/input-text.ts"() {
       "use strict";
       init_styles();
       init_lucide();
       init_useControllableState();
-      CSS45 = `
+      CSS44 = `
 .laughtale-inputtext-wrap,
 .p-inputtext-wrap {
     position: relative;

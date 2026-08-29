@@ -1,12 +1,10 @@
 import {
+  useFocusTrap,
   useHotkeys
-} from "./chunk-ZFSVXRXK.js";
+} from "./chunk-AVQWSCJA.js";
 import {
   useScrollLock
 } from "./chunk-I7ZAYNYP.js";
-import {
-  useFocusTrap
-} from "./chunk-RBI7CHCL.js";
 import {
   useDisclosure
 } from "./chunk-KEONGXN5.js";
@@ -228,4 +226,4 @@ function CommandPaletteIsland(container, props) {
 export {
   CommandPaletteIsland as default
 };
-//# sourceMappingURL=command-TIPBYJOC.js.map
+//# sourceMappingURL=command-WMSPKKJO.js.map

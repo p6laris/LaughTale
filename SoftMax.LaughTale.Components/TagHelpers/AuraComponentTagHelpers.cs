@@ -1628,37 +1628,123 @@ public class IslandSkeletonTagHelper : TagHelper
 }
 
 /// <summary>
-/// TagHelper for <island-drawer />
+/// TagHelper for <island-drawer /> and <p-drawer />
+/// PrimeVue 4 Aura Design System compliant edge overlay drawer component.
 /// </summary>
 [HtmlTargetElement("island-drawer")]
+[HtmlTargetElement("p-drawer")]
 public class IslandDrawerTagHelper : TagHelper
 {
-    public string Position { get; set; } = "right";
+    [HtmlAttributeName("id")]
+    public string Id { get; set; } = $"drawer-{System.Guid.NewGuid():N}";
+
+    [HtmlAttributeName("header")]
+    public string? Header { get; set; }
+
+    [HtmlAttributeName("title")]
     public string? Title { get; set; }
-    public bool InteractiveSize { get; set; } = false;
-    public string? TriggerText { get; set; }
-    public string Width { get; set; } = "380px";
+
+    [HtmlAttributeName("position")]
+    public string Position { get; set; } = "left";
+
+    [HtmlAttributeName("visible")]
+    public bool Visible { get; set; } = false;
+
+    [HtmlAttributeName("modal")]
+    public bool Modal { get; set; } = true;
+
+    [HtmlAttributeName("dismissable-mask")]
+    public bool DismissableMask { get; set; } = true;
+
+    [HtmlAttributeName("closable")]
+    public bool Closable { get; set; } = true;
+
+    [HtmlAttributeName("close-on-escape")]
+    public bool CloseOnEscape { get; set; } = true;
+
+    [HtmlAttributeName("drawer-width")]
+    public string? DrawerWidth { get; set; }
+
+    [HtmlAttributeName("drawer-height")]
+    public string? DrawerHeight { get; set; }
+
+    [HtmlAttributeName("class")]
+    public string? Class { get; set; }
+
+    [HtmlAttributeName("style")]
+    public string? Style { get; set; }
+
+    [HtmlAttributeName("hydrate")]
+    public HydrateStrategy Hydrate { get; set; } = HydrateStrategy.Load;
 
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
         output.TagName = "div";
         output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("id", Id);
         output.Attributes.SetAttribute("data-island", "drawer");
-        output.Attributes.SetAttribute("data-hydrate", "load");
+        output.Attributes.SetAttribute("data-hydrate", Hydrate.ToString().ToLowerInvariant());
+        output.Attributes.SetAttribute("style", "display: contents;");
+
+        var displayHeader = Header ?? Title;
+        var cleanPos = (Position ?? "left").ToLowerInvariant().Trim();
+        if (cleanPos != "left" && cleanPos != "right" && cleanPos != "top" && cleanPos != "bottom" && cleanPos != "full")
+        {
+            cleanPos = "left";
+        }
 
         var props = new
         {
-            position = Position,
-            title = Title,
-            interactiveSize = InteractiveSize,
-            triggerText = TriggerText,
-            width = Width
+            id = Id,
+            header = displayHeader,
+            position = cleanPos,
+            visible = Visible,
+            modal = Modal,
+            dismissableMask = DismissableMask,
+            closable = Closable,
+            closeOnEscape = CloseOnEscape,
+            width = DrawerWidth,
+            height = DrawerHeight
         };
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
 
-        output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
+        var maskClasses = $"p-drawer-mask p-drawer-{cleanPos}";
+        if (Modal) maskClasses += " p-drawer-mask-modal";
+        if (Visible) maskClasses += " p-drawer-mask-active";
+
+        var maskStyle = Visible ? "display: flex !important;" : "display: none !important;";
+
+        var drawerStyle = "";
+        if (!string.IsNullOrWhiteSpace(DrawerWidth)) drawerStyle += $"width: {DrawerWidth};";
+        if (!string.IsNullOrWhiteSpace(DrawerHeight)) drawerStyle += $"height: {DrawerHeight};";
+        if (!string.IsNullOrWhiteSpace(Style)) drawerStyle += $" {Style}";
 
         var childContent = await output.GetChildContentAsync();
-        output.Content.SetHtmlContent($"<div data-slot=\"default\">{childContent.GetContent()}</div>");
+
+        var headerCloseButton = Closable ? @"
+            <button type=""button"" class=""p-drawer-close-button"" aria-label=""Close"">
+                <svg xmlns=""http://www.w3.org/2000/svg"" width=""16"" height=""16"" viewBox=""0 0 24 24"" fill=""none"" stroke=""currentColor"" stroke-width=""2"" stroke-linecap=""round"" stroke-linejoin=""round""><line x1=""18"" y1=""6"" x2=""6"" y2=""18""/><line x1=""6"" y1=""6"" x2=""18"" y2=""18""/></svg>
+            </button>" : "";
+
+        var headerHtml = !string.IsNullOrWhiteSpace(displayHeader) ? $@"
+            <div class=""p-drawer-header"">
+                <h3 class=""p-drawer-title"">{displayHeader}</h3>
+                <div class=""p-drawer-header-actions"">
+                    {headerCloseButton}
+                </div>
+            </div>" : "";
+
+        var drawerClasses = "p-drawer p-component";
+        if (!string.IsNullOrWhiteSpace(Class)) drawerClasses += $" {Class}";
+
+        output.Content.SetHtmlContent($@"
+            <div class=""{maskClasses}"" style=""{maskStyle}"">
+                <div class=""{drawerClasses}"" role=""complementary"" aria-modal=""{Modal.ToString().ToLowerInvariant()}"" style=""{drawerStyle}"">
+                    {headerHtml}
+                    {childContent.GetContent()}
+                </div>
+            </div>
+        ");
     }
 }
 

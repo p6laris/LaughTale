@@ -1059,7 +1059,7 @@ defineIsland("tree-table", () => import("./treetable-STGV6W5W.js"));
 defineIsland("tree-select", () => import("./tree-select-3WADBRSW.js"));
 defineIsland("datatable", () => import("./datatable-FJYSSBES.js"));
 defineIsland("datagrid", () => import("./datatable-FJYSSBES.js"));
-defineIsland("modal", () => import("./modal-X3WA2VV7.js"));
+defineIsland("modal", () => import("./modal-FHAEOJ7H.js"));
 defineIsland("toast", () => import("./toast-DWHTYR76.js"));
 defineIsland("input-number", () => import("./input-number-KQ2J2WMH.js"));
 defineIsland("input-otp", () => import("./input-otp-RUPMATZ7.js"));
@@ -1080,7 +1080,7 @@ defineIsland("meter-group", () => import("./meter-group-LDZQKTKU.js"));
 defineIsland("avatar-group", () => import("./avatar-group-VNSODI34.js"));
 defineIsland("progress-bar", () => import("./progress-bar-FCJC5G3P.js"));
 defineIsland("skeleton", () => import("./skeleton-4CLSEMFH.js"));
-defineIsland("drawer", () => import("./drawer-IT2PLXIN.js"));
+defineIsland("drawer", () => import("./drawer-ZMBE2B3C.js"));
 defineIsland("speed-dial", () => import("./speed-dial-DDAZL72V.js"));
 defineIsland("image-compare", () => import("./image-compare-6BR2BVQR.js"));
 defineIsland("confirm-popup", () => import("./confirm-popup-PAP5WFOR.js"));
@@ -1102,7 +1102,7 @@ defineIsland("tag", () => import("./tag-4UVJKKNI.js"));
 defineIsland("breadcrumb", () => import("./breadcrumb-BPOGWDWU.js"));
 defineIsland("scroll-top", () => import("./scroll-top-WFJEPRKB.js"));
 defineIsland("inplace", () => import("./inplace-YJ5SS246.js"));
-defineIsland("command", () => import("./command-TIPBYJOC.js"));
+defineIsland("command", () => import("./command-WMSPKKJO.js"));
 defineIsland("theme-studio", () => import("./theme-studio-GRGGOQAW.js"));
 defineIsland("dynamic-form", () => import("./dynamic-form-HHKJKPG7.js"));
 defineIsland("splitter", () => import("./splitter-LDRSJA4P.js"));
@@ -1148,4 +1148,4 @@ export {
   enableViewTransitions,
   getSlot
 };
-//# sourceMappingURL=chunk-GC2LL25A.js.map
+//# sourceMappingURL=chunk-2S4GESD7.js.map
