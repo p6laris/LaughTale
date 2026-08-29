@@ -74,7 +74,7 @@ public static class NavigationData
             }),
             new("Navigation & Menus (8)", "compass", null, false, new List<SidebarItem>
             {
-                new("Header Menu", "menu", "/enterprise#sec-menu"),
+                new("Menu", "menu", "/enterprise#sec-menu", false, null, "New"),
                 new("ContextMenu", "moreHorizontal", "/enterprise#sec-context-menu"),
                 new("Breadcrumb", "compass", "/enterprise#sec-breadcrumb", false, null, "New"),
                 new("macOS Dock", "layoutGrid", "/enterprise#sec-dock"),

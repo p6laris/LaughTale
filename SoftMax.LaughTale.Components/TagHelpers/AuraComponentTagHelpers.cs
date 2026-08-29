@@ -4263,14 +4263,52 @@ public class IslandDataViewTagHelper : TagHelper
 }
 
 /// <summary>
-/// TagHelper for <island-menu /> — Popup/inline menu
+/// TagHelper for <island-menu />, <p-menu />, and <island-navigation-menu />
+/// PrimeVue 4 Aura Design System compliant navigation and command menu.
 /// </summary>
 [HtmlTargetElement("island-menu")]
+[HtmlTargetElement("p-menu")]
+[HtmlTargetElement("island-navigation-menu")]
 public class IslandMenuTagHelper : TagHelper
 {
+    [HtmlAttributeName("model")]
+    public List<MenuItem>? Model { get; set; }
+
+    [HtmlAttributeName("items")]
     public List<MenuItem>? Items { get; set; }
-    public bool Popup { get; set; } = true;
+
+    [HtmlAttributeName("popup")]
+    public bool Popup { get; set; } = false;
+
+    [HtmlAttributeName("trigger-id")]
     public string? TriggerId { get; set; }
+
+    [HtmlAttributeName("trigger-text")]
+    public string? TriggerText { get; set; }
+
+    [HtmlAttributeName("trigger-icon")]
+    public string? TriggerIcon { get; set; }
+
+    [HtmlAttributeName("trigger-variant")]
+    public string? TriggerVariant { get; set; } = "outlined";
+
+    [HtmlAttributeName("trigger-severity")]
+    public string? TriggerSeverity { get; set; } = "secondary";
+
+    [HtmlAttributeName("trigger-icon-only")]
+    public bool TriggerIconOnly { get; set; } = false;
+
+    [HtmlAttributeName("expanded-keys")]
+    public Dictionary<string, bool>? ExpandedKeys { get; set; }
+
+    [HtmlAttributeName("custom-template")]
+    public bool CustomTemplate { get; set; } = false;
+
+    [HtmlAttributeName("class")]
+    public string? Class { get; set; }
+
+    [HtmlAttributeName("style")]
+    public string? Style { get; set; }
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
@@ -4278,8 +4316,34 @@ public class IslandMenuTagHelper : TagHelper
         output.TagMode = TagMode.StartTagAndEndTag;
         output.Attributes.SetAttribute("data-island", "menu");
         output.Attributes.SetAttribute("data-hydrate", "load");
-        var props = new { items = Items ?? new(), popup = Popup, triggerId = TriggerId };
+
+        var props = new
+        {
+            model = Model ?? Items ?? new(),
+            popup = Popup,
+            triggerId = TriggerId,
+            triggerText = TriggerText,
+            triggerIcon = TriggerIcon,
+            triggerVariant = TriggerVariant,
+            triggerSeverity = TriggerSeverity,
+            triggerIconOnly = TriggerIconOnly,
+            expandedKeys = ExpandedKeys ?? new(),
+            customTemplate = CustomTemplate,
+            @class = Class,
+            style = Style
+        };
+
         output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
+
+        if (!string.IsNullOrWhiteSpace(Class))
+        {
+            output.Attributes.SetAttribute("class", Class);
+        }
+
+        if (!string.IsNullOrWhiteSpace(Style))
+        {
+            output.Attributes.SetAttribute("style", Style);
+        }
     }
 }
 

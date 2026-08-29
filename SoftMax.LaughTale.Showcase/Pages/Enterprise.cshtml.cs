@@ -1482,6 +1482,189 @@ public class EnterpriseModel : PageModel
         })
     };
 
+    public List<MenuItem> MenuPreviewItems { get; set; } = new()
+    {
+        new(Label: "My Account", Items: new()
+        {
+            new(Label: "Profile", Icon: "user"),
+            new(Label: "Billing", Icon: "creditCard"),
+            new(Label: "Settings", Icon: "settings")
+        }),
+        new(Separator: true),
+        new(Label: "Notifications", Items: new()
+        {
+            new(Label: "Enable notifications", Checked: true),
+            new(Label: "Play sound", Checked: false)
+        }),
+        new(Separator: true),
+        new(Label: "Appearance", Items: new()
+        {
+            new(Label: "Light", RadioGroup: "theme", RadioSelected: true),
+            new(Label: "Dark", RadioGroup: "theme", RadioSelected: false),
+            new(Label: "System", RadioGroup: "theme", RadioSelected: false)
+        })
+    };
+
+    public List<MenuItem> MenuBasicItems { get; set; } = new()
+    {
+        new(Label: "My Account", Items: new()
+        {
+            new(Label: "Profile"),
+            new(Label: "Billing"),
+            new(Label: "Settings")
+        }),
+        new(Separator: true),
+        new(Label: "Security", Items: new()
+        {
+            new(Label: "Change Password"),
+            new(Label: "Two-Factor Auth")
+        }),
+        new(Separator: true),
+        new(Label: "Invite Members"),
+        new(Label: "Support"),
+        new(Separator: true),
+        new(Label: "Sign out")
+    };
+
+    public List<MenuItem> MenuGroupItems { get; set; } = new()
+    {
+        new(Label: "Notifications", Items: new()
+        {
+            new(Label: "Enable notifications", Checked: true),
+            new(Label: "Play sound", Checked: false),
+            new(Label: "Marketing emails", Checked: false)
+        }),
+        new(Separator: true),
+        new(Label: "System", Items: new()
+        {
+            new(Label: "Auto-update apps", Checked: true)
+        }),
+        new(Separator: true),
+        new(Label: "Appearance", Items: new()
+        {
+            new(Label: "Light", RadioGroup: "group-theme", RadioSelected: true),
+            new(Label: "Dark", RadioGroup: "group-theme", RadioSelected: false),
+            new(Label: "System", RadioGroup: "group-theme", RadioSelected: false)
+        }),
+        new(Separator: true),
+        new(Label: "Language", Items: new()
+        {
+            new(Label: "English", RadioGroup: "group-lang", RadioSelected: true),
+            new(Label: "Türkçe", RadioGroup: "group-lang", RadioSelected: false),
+            new(Label: "Deutsch", RadioGroup: "group-lang", RadioSelected: false)
+        })
+    };
+
+    public List<MenuItem> MenuToggleableItems { get; set; } = new()
+    {
+        new(Label: "Document", Items: new()
+        {
+            new(Label: "New file", Icon: "file"),
+            new(Label: "Open recent", Icon: "fileText"),
+            new(Label: "Duplicate", Icon: "copy"),
+            new(Label: "Import", Icon: "download", Items: new()
+            {
+                new(Label: "From file", Icon: "file"),
+                new(Label: "From cloud", Icon: "cloud"),
+                new(Label: "From URL", Icon: "globe")
+            }),
+            new(Label: "Export", Icon: "fileSpreadsheet", Items: new()
+            {
+                new(Label: "PDF"),
+                new(Label: "Word"),
+                new(Label: "Markdown"),
+                new(Label: "HTML"),
+                new(Label: "More", Items: new()
+                {
+                    new(Label: "EPUB"),
+                    new(Label: "RTF"),
+                    new(Label: "LaTeX"),
+                    new(Label: "Plain Text")
+                })
+            }),
+            new(Label: "Share", Icon: "share2", Items: new()
+            {
+                new(Label: "Send via email", Icon: "mail"),
+                new(Label: "Copy link", Icon: "link"),
+                new(Separator: true),
+                new(Label: "Social", Toggleable: false, Items: new()
+                {
+                    new(Label: "Twitter", Icon: "twitter"),
+                    new(Label: "Facebook", Icon: "facebook"),
+                    new(Label: "LinkedIn", Icon: "linkedin")
+                })
+            }),
+            new(Label: "Rename", Icon: "pencil")
+        })
+    };
+
+    public List<MenuItem> MenuPopupItems { get; set; } = new()
+    {
+        new(Label: "Document", Items: new()
+        {
+            new(Label: "New file", Icon: "file"),
+            new(Label: "Open recent", Icon: "fileText"),
+            new(Label: "Duplicate", Icon: "copy"),
+            new(Label: "Import", Icon: "download"),
+            new(Label: "Export", Icon: "fileSpreadsheet"),
+            new(Label: "Share", Icon: "share2"),
+            new(Label: "Rename", Icon: "pencil")
+        })
+    };
+
+    public List<MenuItem> MenuTemplateItems { get; set; } = new()
+    {
+        new(Separator: true),
+        new(Label: "Documents", Items: new()
+        {
+            new(Label: "New", Icon: "plus", Shortcut: "⌘+N"),
+            new(Label: "Search", Icon: "search", Shortcut: "⌘+S")
+        }),
+        new(Label: "Profile", Items: new()
+        {
+            new(Label: "Settings", Icon: "settings", Shortcut: "⌘+O"),
+            new(Label: "Messages", Icon: "mail", Badge: "2"),
+            new(Label: "Logout", Icon: "logOut", Shortcut: "⌘+Q", LinkClass: "text-red-500! dark:text-red-400!")
+        }),
+        new(Separator: true)
+    };
+
+    public List<MenuItem> MenuCommandItems { get; set; } = new()
+    {
+        new(Label: "New", Icon: "plus", Command: "new-file"),
+        new(Label: "Search", Icon: "search", Command: "search")
+    };
+
+    public List<MenuItem> MenuRouterItems { get; set; } = new()
+    {
+        new(Label: "Navigate", Items: new()
+        {
+            new(Label: "Router Link", Icon: "palette", Route: "/theming"),
+            new(Label: "Programmatic", Icon: "link", Route: "/installation"),
+            new(Label: "External", Icon: "home", Url: "https://vuejs.org/", Target: "_blank")
+        })
+    };
+
+    public List<MenuItem> MenuControlledItems { get; set; } = new()
+    {
+        new(Key: "dashboard", Label: "Dashboard", Icon: "home"),
+        new(Separator: true),
+        new(Key: "workspace", Label: "Workspace", Items: new()
+        {
+            new(Key: "projects", Label: "Projects", Icon: "folder", Items: new()
+            {
+                new(Key: "projects-active", Label: "Active", Icon: "briefcase"),
+                new(Key: "projects-completed", Label: "Completed", Icon: "checkCircle")
+            }),
+            new(Key: "reports", Label: "Reports", Icon: "file", Items: new()
+            {
+                new(Key: "reports-monthly", Label: "Monthly", Icon: "calendar"),
+                new(Key: "reports-yearly", Label: "Yearly", Icon: "barChart3")
+            })
+        })
+    };
+
+
 
     public List<MenuItem> HeaderMenuItems { get; set; } = new()
     {

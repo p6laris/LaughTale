@@ -5090,17 +5090,111 @@
         </div>
     </section>
 
-    <!-- Header Menu -->
+    <!-- Header Menu / Menu -->
     <section id="sec-menu" class="component-card">
         <div class="card-header">
             <div>
-                <h2>Header &amp; Navigation Menu</h2>
-                <p>Horizontal and dropdown navigation bar with active path detection.</p>
+                <h2>Menu</h2>
+                <p>Menu is a navigation / command component that supports dynamic popup overlay and static inline positioning.</p>
             </div>
-            <span class="aura-tag tag-slate">Menu</span>
+            <span class="aura-tag tag-emerald">Navigation</span>
         </div>
-        <div class="card-body">
-            <island-menu items="@Model.HeaderMenuItems" />
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Hero / Preview Demo -->
+            <div data-menu-demo="preview" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Interactive Menu Preview</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Popup navigation menu with account groups, live checkbox toggles, and radio selections.</p>
+                <div style="display: flex; justify-content: center; align-items: center; position: relative;">
+                    <button id="menu-btn-preview" type="button" class="p-button p-component p-button-outlined p-button-secondary">Account</button>
+                    <p-menu model="@Model.MenuPreviewItems" popup="true" trigger-id="menu-btn-preview" class="w-48" />
+                </div>
+            </div>
+
+            <!-- Demo 1: Basic -->
+            <div data-menu-demo="basic" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Items are grouped with the items property where each group displays a label header, while a flat separator entry divides the sections.</p>
+                <div style="display: flex; justify-content: center; align-items: center; position: relative;">
+                    <button id="menu-btn-basic" type="button" class="p-button p-component p-button-outlined p-button-secondary">Account</button>
+                    <p-menu model="@Model.MenuBasicItems" popup="true" trigger-id="menu-btn-basic" class="w-48" />
+                </div>
+            </div>
+
+            <!-- Demo 2: Group -->
+            <div data-menu-demo="group" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Group</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Items are organized into labeled groups separated by a separator. Checkbox and radio selections are driven from the model by toggling an item's icon through its command.</p>
+                <div style="display: flex; justify-content: center; align-items: center;">
+                    <p-menu model="@Model.MenuGroupItems" class="w-60" />
+                </div>
+            </div>
+
+            <!-- Demo 3: Toggleable -->
+            <div data-menu-demo="toggleable" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Toggleable</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Nested submenus are toggleable by default. Use toggleable to override the default per item (e.g. force a top-level group to be toggleable, or keep a nested group always open) and expandedKeys to control open/closed state.</p>
+                <div style="display: flex; justify-content: center; align-items: center;">
+                    <p-menu model="@Model.MenuToggleableItems" class="w-48" />
+                </div>
+            </div>
+
+            <!-- Demo 4: Popup -->
+            <div data-menu-demo="popup" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Popup</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Popup mode is enabled by setting the popup property to true and calling the toggle method to display the menu relative to its target.</p>
+                <div style="display: flex; justify-content: center; align-items: center; position: relative;">
+                    <button id="menu-btn-popup" type="button" class="p-button p-component p-button-outlined p-button-secondary p-button-icon-only" aria-label="Apps" style="width: 2.5rem; height: 2.5rem; display: inline-flex; align-items: center; justify-content: center;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+                    </button>
+                    <p-menu model="@Model.MenuPopupItems" popup="true" trigger-id="menu-btn-popup" class="w-48" />
+                </div>
+            </div>
+
+            <!-- Demo 5: Template -->
+            <div data-menu-demo="template" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Template</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Menu offers item customization with the item template that receives the menuitem instance from the model as a parameter. The submenu label has its own submenulabel template, additional slots named start and end are provided to embed content before or after the menu.</p>
+                <div style="display: flex; justify-content: center; align-items: center;">
+                    <p-menu model="@Model.MenuTemplateItems" custom-template="true" class="w-60" />
+                </div>
+            </div>
+
+            <!-- Demo 6: Command -->
+            <div data-menu-demo="command" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Command</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">The function to invoke when an item is clicked is defined using the command property.</p>
+                <div style="display: flex; justify-content: center; align-items: center;">
+                    <p-menu model="@Model.MenuCommandItems" class="w-48" />
+                </div>
+            </div>
+
+            <!-- Demo 7: Router -->
+            <div data-menu-demo="router" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Router</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Menu items support navigation via router-link, programmatic routing using commands, or external URLs.</p>
+                <div style="display: flex; justify-content: center; align-items: center;">
+                    <p-menu model="@Model.MenuRouterItems" class="w-52" />
+                </div>
+            </div>
+
+            <!-- Demo 8: Controlled -->
+            <div data-menu-demo="controlled" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Controlled</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Menu state can be controlled programmatically with the expandedKeys property that defines the keys of the toggleable submenus that are expanded.</p>
+                <div id="menu-controlled-wrapper" style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button type="button" class="p-button p-component p-button-outlined p-button-secondary p-button-sm" onclick="document.querySelector('#menu-controlled-wrapper [data-island=\'menu\']')?.__expandAll()" style="font-size: 0.8125rem; padding: 0.35rem 0.75rem; display: inline-flex; align-items: center; gap: 0.35rem;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                            Expand All
+                        </button>
+                        <button type="button" class="p-button p-component p-button-outlined p-button-secondary p-button-sm" onclick="document.querySelector('#menu-controlled-wrapper [data-island=\'menu\']')?.__collapseAll()" style="font-size: 0.8125rem; padding: 0.35rem 0.75rem; display: inline-flex; align-items: center; gap: 0.35rem;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>
+                            Collapse All
+                        </button>
+                    </div>
+                    <p-menu model="@Model.MenuControlledItems" class="w-60" />
+                </div>
+            </div>
         </div>
     </section>
 

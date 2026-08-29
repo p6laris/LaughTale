@@ -413,13 +413,24 @@ public record SplitButtonItem(
 // ─── Aura v2: New Component Models ─────────────────────────────────────
 
 public record MenuItem(
-    string Label,
+    string? Label = null,
     string? Icon = null,
     bool Separator = false,
     bool Disabled = false,
     string? Url = null,
     string? Action = null,
-    List<MenuItem>? Items = null
+    List<MenuItem>? Items = null,
+    string? Key = null,
+    string? Shortcut = null,
+    string? Badge = null,
+    string? Route = null,
+    string? Target = null,
+    bool? Toggleable = null,
+    string? LinkClass = null,
+    string? Command = null,
+    bool? Checked = null,
+    string? RadioGroup = null,
+    bool? RadioSelected = null
 );
 
 public record CarouselItem(
