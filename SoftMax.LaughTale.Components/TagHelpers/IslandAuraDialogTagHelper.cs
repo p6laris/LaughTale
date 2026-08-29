@@ -52,7 +52,7 @@ public class IslandAuraDialogTagHelper : TagHelper
     public string? Style { get; set; }
 
     [HtmlAttributeName("hydrate")]
-    public HydrateStrategy Hydrate { get; set; } = HydrateStrategy.Visible;
+    public HydrateStrategy Hydrate { get; set; } = HydrateStrategy.Load;
 
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
@@ -61,6 +61,7 @@ public class IslandAuraDialogTagHelper : TagHelper
         output.Attributes.SetAttribute("id", Id);
         output.Attributes.SetAttribute("data-island", "dialog");
         output.Attributes.SetAttribute("data-hydrate", Hydrate.ToString().ToLowerInvariant());
+        output.Attributes.SetAttribute("style", "display: contents;");
 
         var props = new
         {
@@ -81,6 +82,8 @@ public class IslandAuraDialogTagHelper : TagHelper
         var maskClasses = $"p-dialog-mask p-dialog-pos-{cleanPos}";
         if (Modal) maskClasses += " p-dialog-mask-modal";
         if (Visible) maskClasses += " p-dialog-mask-active";
+
+        var maskStyle = Visible ? "display: flex !important;" : "display: none !important;";
 
         var dialogStyle = !string.IsNullOrWhiteSpace(DialogWidth) ? $"width: {DialogWidth};" : "";
         if (!string.IsNullOrWhiteSpace(Style)) dialogStyle += $" {Style}";
@@ -111,7 +114,7 @@ public class IslandAuraDialogTagHelper : TagHelper
         if (!string.IsNullOrWhiteSpace(Class)) dialogClasses += $" {Class}";
 
         output.Content.SetHtmlContent($@"
-            <div class=""{maskClasses}"">
+            <div class=""{maskClasses}"" style=""{maskStyle}"">
                 <div class=""{dialogClasses}"" role=""dialog"" aria-modal=""{Modal.ToString().ToLowerInvariant()}"" style=""{dialogStyle}"">
                     {headerHtml}
                     {childContent.GetContent()}

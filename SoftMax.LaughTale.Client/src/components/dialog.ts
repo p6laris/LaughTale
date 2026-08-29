@@ -1,6 +1,6 @@
 /**
  * SoftMax.LaughTale: Enterprise Dialog Component (PrimeVue 4 Aura Design System compliant)
- * High-performance modal and non-modal overlay container with draggable header support,
+ * Zero-flash SSR overlay container with global click delegation, draggable header support,
  * maximizable fullscreen toggles, 9-direction positioning, inside scrolling, and headless templates.
  */
 
@@ -11,7 +11,7 @@ const DIALOG_CSS = `
     position: fixed;
     inset: 0;
     z-index: 1100;
-    display: flex;
+    display: none;
     box-sizing: border-box;
     padding: 1.5rem;
     pointer-events: none;
@@ -26,6 +26,7 @@ const DIALOG_CSS = `
 }
 
 .p-dialog-mask.p-dialog-mask-active {
+    display: flex !important;
     opacity: 1;
     pointer-events: auto;
 }
@@ -221,12 +222,106 @@ export interface DialogProps {
     width?: string;
 }
 
+// Global Delegation Initializer
+let globalDelegationBound = false;
+
+function initGlobalDialogDelegation() {
+    if (globalDelegationBound || typeof document === 'undefined') return;
+    globalDelegationBound = true;
+
+    document.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement;
+        const trigger = target.closest<HTMLElement>('[data-dialog-target], [data-dialog-open]');
+        
+        if (trigger) {
+            e.preventDefault();
+            const dialogId = trigger.getAttribute('data-dialog-target') || trigger.getAttribute('data-dialog-open');
+            const pos = trigger.getAttribute('data-dialog-position');
+            if (dialogId) {
+                const dialogContainer = document.getElementById(dialogId);
+                const maskEl = dialogContainer?.querySelector<HTMLElement>('.p-dialog-mask');
+                if (maskEl) {
+                    if (pos) {
+                        const cleanPos = pos.toLowerCase().replace(/[^a-z]/g, '');
+                        maskEl.className = maskEl.className.replace(/p-dialog-pos-[a-z]+/g, '');
+                        maskEl.classList.add(`p-dialog-pos-${cleanPos}`);
+                    }
+                    maskEl.style.display = 'flex';
+                    // Force reflow for smooth scale/opacity animation
+                    void maskEl.offsetWidth;
+                    maskEl.classList.add('p-dialog-mask-active');
+                    if (maskEl.classList.contains('p-dialog-mask-modal')) {
+                        document.body.style.overflow = 'hidden';
+                    }
+                }
+            }
+            return;
+        }
+
+        // Close triggers
+        const closeBtn = target.closest<HTMLElement>('.p-dialog-close-button, [data-dialog-close]');
+        if (closeBtn) {
+            e.preventDefault();
+            const maskEl = closeBtn.closest<HTMLElement>('.p-dialog-mask');
+            if (maskEl) {
+                maskEl.classList.remove('p-dialog-mask-active');
+                setTimeout(() => {
+                    if (!maskEl.classList.contains('p-dialog-mask-active')) {
+                        maskEl.style.display = 'none';
+                    }
+                }, 200);
+                document.body.style.overflow = '';
+            }
+            return;
+        }
+
+        // Dismissable mask backdrop click
+        if (target.classList.contains('p-dialog-mask')) {
+            const container = target.closest<HTMLElement>('[data-island="dialog"]');
+            let dismissable = true;
+            if (container) {
+                try {
+                    const props = JSON.parse(container.getAttribute('data-props') || '{}');
+                    if (props.dismissableMask === false && props.modal === true) {
+                        dismissable = false;
+                    }
+                } catch {}
+            }
+            if (dismissable) {
+                target.classList.remove('p-dialog-mask-active');
+                setTimeout(() => {
+                    if (!target.classList.contains('p-dialog-mask-active')) {
+                        target.style.display = 'none';
+                    }
+                }, 200);
+                document.body.style.overflow = '';
+            }
+        }
+    });
+
+    // Escape Key Handler
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            const activeMask = document.querySelector<HTMLElement>('.p-dialog-mask.p-dialog-mask-active');
+            if (activeMask) {
+                activeMask.classList.remove('p-dialog-mask-active');
+                setTimeout(() => {
+                    if (!activeMask.classList.contains('p-dialog-mask-active')) {
+                        activeMask.style.display = 'none';
+                    }
+                }, 200);
+                document.body.style.overflow = '';
+            }
+        }
+    });
+}
+
 export default function DialogIsland(container: HTMLElement, props: DialogProps) {
     injectIslandStyle('dialog', DIALOG_CSS);
+    initGlobalDialogDelegation();
 
     const maskEl = container.querySelector<HTMLElement>('.p-dialog-mask');
     const dialogEl = container.querySelector<HTMLElement>('.p-dialog');
-    const triggerButtons = document.querySelectorAll<HTMLElement>(`[data-dialog-target="${container.id}"], [data-dialog-open="${container.id}"]`);
 
     if (!maskEl || !dialogEl) return;
 
@@ -237,75 +332,16 @@ export default function DialogIsland(container: HTMLElement, props: DialogProps)
     let initialLeft = 0;
     let initialTop = 0;
 
-    const openDialog = (posOverride?: string) => {
-        if (posOverride) {
-            const cleanPos = posOverride.toLowerCase().replace(/[^a-z]/g, '');
-            maskEl.className = maskEl.className.replace(/p-dialog-pos-[a-z]+/g, '');
-            maskEl.classList.add(`p-dialog-pos-${cleanPos}`);
-        }
-        maskEl.classList.add('p-dialog-mask-active');
-        document.body.style.overflow = props.modal !== false ? 'hidden' : '';
-    };
-
-    const closeDialog = () => {
-        maskEl.classList.remove('p-dialog-mask-active');
-        document.body.style.overflow = '';
-        if (isMaximized) {
-            toggleMaximize();
-        }
-    };
-
-    const toggleMaximize = () => {
-        isMaximized = !isMaximized;
-        dialogEl.classList.toggle('p-dialog-maximized', isMaximized);
-        const maxBtn = dialogEl.querySelector('.p-dialog-maximize-button');
-        if (maxBtn) {
-            maxBtn.innerHTML = isMaximized ? RESTORE_ICON_SVG : MAXIMIZE_ICON_SVG;
-            maxBtn.setAttribute('aria-label', isMaximized ? 'Minimize' : 'Maximize');
-        }
-    };
-
-    // Bind triggers
-    triggerButtons.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const pos = btn.getAttribute('data-dialog-position');
-            openDialog(pos || undefined);
-        });
-    });
-
-    // Close Button
-    dialogEl.querySelectorAll('.p-dialog-close-button, [data-dialog-close]').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            closeDialog();
-        });
-    });
-
     // Maximize Button
     const maxBtn = dialogEl.querySelector('.p-dialog-maximize-button');
     if (maxBtn) {
         maxBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            toggleMaximize();
-        });
-    }
-
-    // Dismissable Mask
-    if (props.dismissableMask) {
-        maskEl.addEventListener('click', (e) => {
-            if (e.target === maskEl) {
-                closeDialog();
-            }
-        });
-    }
-
-    // Escape Key Dismiss
-    if (props.closeOnEscape !== false) {
-        window.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && maskEl.classList.contains('p-dialog-mask-active')) {
-                closeDialog();
-            }
+            e.stopPropagation();
+            isMaximized = !isMaximized;
+            dialogEl.classList.toggle('p-dialog-maximized', isMaximized);
+            maxBtn.innerHTML = isMaximized ? RESTORE_ICON_SVG : MAXIMIZE_ICON_SVG;
+            maxBtn.setAttribute('aria-label', isMaximized ? 'Minimize' : 'Maximize');
         });
     }
 
