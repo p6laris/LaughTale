@@ -20624,19 +20624,17 @@ var SoftMaxIslands = (() => {
           const isFocused = i === selectedIndex;
           item.classList.toggle("p-commandmenu-item-focus", isFocused);
           if (isFocused && shouldScroll) {
-            scrollToFocusedItem(item);
+            scrollToItemInContainer(item, listEl);
           }
         });
       }
-      function scrollToFocusedItem(itemEl) {
-        const itemTop = itemEl.offsetTop - listEl.offsetTop;
-        const itemBottom = itemTop + itemEl.offsetHeight;
-        const containerTop = listEl.scrollTop;
-        const containerBottom = containerTop + listEl.clientHeight;
-        if (itemTop < containerTop) {
-          listEl.scrollTop = itemTop;
-        } else if (itemBottom > containerBottom) {
-          listEl.scrollTop = itemBottom - listEl.clientHeight;
+      function scrollToItemInContainer(itemEl, containerEl) {
+        const itemRect = itemEl.getBoundingClientRect();
+        const containerRect = containerEl.getBoundingClientRect();
+        if (itemRect.top < containerRect.top) {
+          containerEl.scrollTop -= containerRect.top - itemRect.top + 4;
+        } else if (itemRect.bottom > containerRect.bottom) {
+          containerEl.scrollTop += itemRect.bottom - containerRect.bottom + 4;
         }
       }
       function executeSelectedItem() {
@@ -20645,8 +20643,6 @@ var SoftMaxIslands = (() => {
         const label = activeEl.getAttribute("data-label") || activeEl.textContent?.trim() || "Command";
         const url = activeEl.getAttribute("data-url");
         const action = activeEl.getAttribute("data-action");
-        activeEl.classList.add("p-commandmenu-item-active");
-        setTimeout(() => activeEl.classList.remove("p-commandmenu-item-active"), 200);
         if (feedbackEl) {
           feedbackEl.textContent = `\u2713 Selected: ${label}`;
           feedbackEl.style.opacity = "1";
@@ -20674,33 +20670,42 @@ var SoftMaxIslands = (() => {
         const count = items.length;
         if (e.key === "ArrowDown") {
           e.preventDefault();
+          e.stopPropagation();
           if (count > 0) {
             selectedIndex = (selectedIndex + 1) % count;
             updateFocusItem(true);
           }
         } else if (e.key === "ArrowUp") {
           e.preventDefault();
+          e.stopPropagation();
           if (count > 0) {
             selectedIndex = (selectedIndex - 1 + count) % count;
             updateFocusItem(true);
           }
         } else if (e.key === "Enter") {
           e.preventDefault();
+          e.stopPropagation();
           executeSelectedItem();
         } else if (e.key === "Home") {
+          e.preventDefault();
+          e.stopPropagation();
           if (count > 0) {
             selectedIndex = 0;
             updateFocusItem(true);
           }
         } else if (e.key === "End") {
+          e.preventDefault();
+          e.stopPropagation();
           if (count > 0) {
             selectedIndex = count - 1;
             updateFocusItem(true);
           }
         } else if (e.key === "Escape") {
           if (withDialog) {
+            e.preventDefault();
             closeDialog();
           } else if (search) {
+            e.preventDefault();
             input.value = "";
             search = "";
             selectedIndex = 0;
@@ -20774,7 +20779,7 @@ var SoftMaxIslands = (() => {
     background: var(--p-commandmenu-background, var(--p-surface-0, #ffffff));
     border: 1px solid var(--p-commandmenu-border-color, var(--p-border-color, #e2e8f0));
     border-radius: var(--p-commandmenu-border-radius, var(--p-border-radius, 8px));
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
     overflow: hidden;
     width: 100%;
     max-width: 32rem;
@@ -20790,6 +20795,8 @@ var SoftMaxIslands = (() => {
     padding: var(--p-commandmenu-header-padding, 0.75rem 1rem);
     background: var(--p-commandmenu-header-background, transparent);
     border-bottom: 1px solid var(--p-commandmenu-header-border-color, var(--p-border-color, #e2e8f0));
+    box-sizing: border-box;
+    flex-shrink: 0;
 }
 
 .p-commandmenu-search-icon {
@@ -20820,13 +20827,14 @@ var SoftMaxIslands = (() => {
 .p-commandmenu-list {
     padding: var(--p-commandmenu-list-padding, 0.5rem);
     height: 19rem;
-    max-height: var(--p-commandmenu-height, 19rem);
+    max-height: 19rem;
     overflow-y: auto;
+    overflow-x: hidden;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
     box-sizing: border-box;
-    scroll-behavior: smooth;
+    position: relative;
 }
 
 .p-commandmenu-group {
@@ -20853,25 +20861,21 @@ var SoftMaxIslands = (() => {
     cursor: pointer;
     font-size: 0.875rem;
     color: var(--p-text-color, #0f172a);
-    transition: background-color 0.1s ease, color 0.1s ease, transform 0.05s ease;
+    transition: background-color 0.1s ease, color 0.1s ease;
     user-select: none;
     outline: none;
+    box-sizing: border-box;
 }
 
 .p-commandmenu-item:hover,
 .p-commandmenu-item.p-commandmenu-item-focus {
-    background: var(--p-surface-100, #f1f5f9) !important;
-    color: var(--p-text-color, #0f172a) !important;
+    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-text-color, #0f172a);
 }
 
 .p-commandmenu-item.p-commandmenu-item-focus {
-    outline: 1px solid var(--p-primary-500, #3b82f6) !important;
-    outline-offset: -1px;
-}
-
-.p-commandmenu-item.p-commandmenu-item-active {
-    transform: scale(0.98);
-    background: rgba(59, 130, 246, 0.15) !important;
+    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-primary-600, #2563eb);
 }
 
 .p-commandmenu-item-left {
@@ -20931,6 +20935,8 @@ var SoftMaxIslands = (() => {
     padding: var(--p-commandmenu-footer-padding, 0.625rem 1rem);
     background: var(--p-commandmenu-footer-background, var(--p-surface-50, #f8fafc));
     border-top: 1px solid var(--p-commandmenu-footer-border-color, var(--p-border-color, #e2e8f0));
+    flex-shrink: 0;
+    box-sizing: border-box;
 }
 
 .p-commandmenu-footer-feedback {
@@ -21015,8 +21021,13 @@ var SoftMaxIslands = (() => {
 .dark .p-commandmenu-item.p-commandmenu-item-focus,
 [data-theme="dark"] .p-commandmenu-item:hover,
 [data-theme="dark"] .p-commandmenu-item.p-commandmenu-item-focus {
-    background: var(--p-surface-800, #1e293b) !important;
-    color: var(--p-surface-0, #f8fafc) !important;
+    background: var(--p-surface-800, #1e293b);
+    color: var(--p-surface-0, #f8fafc);
+}
+
+.dark .p-commandmenu-item.p-commandmenu-item-focus,
+[data-theme="dark"] .p-commandmenu-item.p-commandmenu-item-focus {
+    color: #60a5fa;
 }
 
 .dark .p-commandmenu-group-label,
