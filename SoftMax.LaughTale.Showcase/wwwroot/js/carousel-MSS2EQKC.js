@@ -23,6 +23,7 @@ var CAROUSEL_CSS = `
 
 .p-carousel-content {
     display: flex;
+    flex-direction: row;
     width: 100%;
     position: relative;
     overflow-x: auto;
@@ -33,48 +34,24 @@ var CAROUSEL_CSS = `
     box-sizing: border-box;
     user-select: none;
     -webkit-user-select: none;
+    scroll-snap-type: x mandatory;
 }
 
 .p-carousel-content::-webkit-scrollbar {
     display: none;
+    width: 0;
+    height: 0;
 }
 
+/* Vertical Carousel Content Flow */
 .p-carousel-vertical .p-carousel-content {
-    overflow-x: hidden;
-    overflow-y: auto;
+    flex-direction: column !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    scroll-snap-type: y mandatory !important;
 }
 
-/* Snap Types & Alignments */
-.p-carousel-snap-start {
-    scroll-snap-type: x mandatory;
-}
-.p-carousel-vertical.p-carousel-snap-start {
-    scroll-snap-type: y mandatory;
-}
-
-.p-carousel-snap-center {
-    scroll-snap-type: x mandatory;
-}
-.p-carousel-vertical.p-carousel-snap-center {
-    scroll-snap-type: y mandatory;
-}
-
-.p-carousel-snap-end {
-    scroll-snap-type: x mandatory;
-}
-.p-carousel-vertical.p-carousel-snap-end {
-    scroll-snap-type: y mandatory;
-}
-
-/* Items & Cards */
-.p-carousel-item {
-    flex: 0 0 auto;
-    box-sizing: border-box;
-    display: flex;
-    align-items: stretch;
-    transition: opacity 200ms ease, transform 200ms ease;
-}
-
+/* Alignments */
 .p-carousel-align-start .p-carousel-item {
     scroll-snap-align: start;
 }
@@ -83,6 +60,16 @@ var CAROUSEL_CSS = `
 }
 .p-carousel-align-end .p-carousel-item {
     scroll-snap-align: end;
+}
+
+/* Items & Cards */
+.p-carousel-item {
+    flex: 0 0 auto;
+    box-sizing: border-box;
+    display: flex;
+    align-items: stretch;
+    transition: opacity 280ms cubic-bezier(0.16, 1, 0.3, 1),
+                transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Number Card Box */
@@ -100,7 +87,12 @@ var CAROUSEL_CSS = `
     border-radius: var(--p-border-radius, 12px);
     border: 1px solid var(--p-border-color, #e2e8f0);
     box-sizing: border-box;
-    transition: background-color 150ms ease, border-color 150ms ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    transition: background-color 200ms ease, border-color 200ms ease, transform 200ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 200ms ease;
+}
+
+.p-carousel-card-num:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .dark .p-carousel-card-num,
@@ -108,6 +100,7 @@ var CAROUSEL_CSS = `
     background: var(--p-surface-950, #020617);
     color: var(--p-surface-0, #ffffff);
     border-color: var(--p-surface-800, #1e293b);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 /* Bottom Bar (Indicators + Prev/Next Controls) */
@@ -140,7 +133,9 @@ var CAROUSEL_CSS = `
     border: none;
     cursor: pointer;
     padding: 0;
-    transition: background-color 200ms ease, transform 150ms ease, width 200ms ease;
+    transition: background-color 280ms cubic-bezier(0.16, 1, 0.3, 1),
+                transform 280ms cubic-bezier(0.16, 1, 0.3, 1),
+                width 280ms cubic-bezier(0.16, 1, 0.3, 1);
     outline: none;
 }
 
@@ -155,7 +150,7 @@ var CAROUSEL_CSS = `
 
 .p-carousel-indicator-button.p-carousel-indicator-active {
     background: var(--p-carousel-indicator-active-background, var(--p-primary-color, #10b981));
-    width: 2.25rem;
+    width: 2.5rem;
 }
 
 /* Navigation Buttons */
@@ -179,7 +174,7 @@ var CAROUSEL_CSS = `
     background: var(--p-surface-0, #ffffff);
     color: var(--p-text-muted, #64748b);
     cursor: pointer;
-    transition: background-color 150ms ease, color 150ms ease, opacity 150ms ease, transform 120ms ease;
+    transition: background-color 180ms ease, color 180ms ease, opacity 180ms ease, transform 140ms cubic-bezier(0.16, 1, 0.3, 1);
     outline: none;
     padding: 0;
     box-sizing: border-box;
@@ -211,12 +206,12 @@ var CAROUSEL_CSS = `
 
 .p-carousel-prev:active:not(:disabled),
 .p-carousel-next:active:not(:disabled) {
-    transform: scale(0.92);
+    transform: scale(0.9);
 }
 
 .p-carousel-prev:disabled,
 .p-carousel-next:disabled {
-    opacity: 0.4;
+    opacity: 0.35;
     cursor: not-allowed;
 }
 
@@ -225,7 +220,7 @@ var CAROUSEL_CSS = `
     cursor: pointer;
     border-radius: var(--p-border-radius, 8px);
     overflow: hidden;
-    transition: opacity 150ms ease, transform 150ms ease, border-color 150ms ease;
+    transition: opacity 220ms ease, transform 220ms cubic-bezier(0.16, 1, 0.3, 1), border-color 220ms ease;
     border: 2px solid transparent;
 }
 .p-carousel-gallery-thumb.p-carousel-thumb-active {
@@ -239,10 +234,10 @@ var CAROUSEL_CSS = `
     opacity: 0.85;
 }
 `;
-var CHEVRON_LEFT = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>`;
-var CHEVRON_RIGHT = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`;
-var CHEVRON_UP = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>`;
-var CHEVRON_DOWN = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
+var CHEVRON_LEFT = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>`;
+var CHEVRON_RIGHT = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`;
+var CHEVRON_UP = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>`;
+var CHEVRON_DOWN = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
 var GALLERY_DEFAULT_IMAGES = [
   "https://images.unsplash.com/photo-1589656966895-2f33e7653819?q=80&w=1470&auto=format&fit=crop",
   "https://images.unsplash.com/photo-1518717758536-85ae29035b6d?q=80&w=1470&auto=format&fit=crop",
@@ -276,11 +271,11 @@ function CarouselIsland(container, props) {
     return;
   }
   function renderStandardCarousel() {
-    const itemWidthStyle = autoSize ? "" : isVertical ? `height: calc((100% - ${spacing * (slidesPerPage - 1)}px) / ${slidesPerPage}); width: 100%;` : `width: calc((100% - ${spacing * (slidesPerPage - 1)}px) / ${slidesPerPage});`;
+    const itemDimensionsStyle = isVertical ? `height: calc((240px - ${spacing * (Math.ceil(slidesPerPage) - 1)}px) / ${slidesPerPage}); width: 100%; flex: 0 0 auto; margin-bottom: ${spacing}px;` : autoSize ? `height: 100%; flex: 0 0 auto; margin-right: ${spacing}px;` : `width: calc((100% - ${spacing * (Math.ceil(slidesPerPage) - 1)}px) / ${slidesPerPage}); height: 100%; flex: 0 0 auto; margin-right: ${spacing}px;`;
     const itemsHtml = Array.from({ length: itemCount }, (_, i) => {
       const widthOverride = autoSize ? `width: ${customWidths[i]};` : "";
       return `
-                <div class="p-carousel-item" style="${itemWidthStyle} ${widthOverride} padding-right: ${!isVertical ? `${spacing}px` : "0"}; padding-bottom: ${isVertical ? `${spacing}px` : "0"};" role="group" aria-roledescription="slide" aria-label="Slide ${i + 1} of ${itemCount}" data-slide-index="${i}">
+                <div class="p-carousel-item" style="${itemDimensionsStyle} ${widthOverride}" role="group" aria-roledescription="slide" aria-label="Slide ${i + 1} of ${itemCount}" data-slide-index="${i}">
                     <div class="p-carousel-card-num">
                         <span>${i + 1}</span>
                     </div>
@@ -294,11 +289,11 @@ function CarouselIsland(container, props) {
         `).join("");
     if (isVertical) {
       return `
-                <div class="p-carousel p-carousel-vertical p-carousel-align-${align} p-carousel-snap-${align} ${props.class || ""}" role="region" aria-roledescription="carousel" aria-label="Vertical Content Slider" style="max-width: 24rem; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 1.5rem; ${props.style || ""}">
+                <div class="p-carousel p-carousel-vertical p-carousel-align-${align} ${props.class || ""}" role="region" aria-roledescription="carousel" aria-label="Vertical Content Slider" style="max-width: 24rem; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 1.5rem; ${props.style || ""}">
                     <button type="button" class="p-carousel-prev" aria-label="Previous slide" data-carousel-prev>
                         ${CHEVRON_UP}
                     </button>
-                    <div class="p-carousel-content" style="height: 240px; width: 100%;" data-carousel-content>
+                    <div class="p-carousel-content" style="height: 240px; width: 100%; flex-direction: column; overflow-y: auto; overflow-x: hidden;" data-carousel-content>
                         ${itemsHtml}
                     </div>
                     <button type="button" class="p-carousel-next" aria-label="Next slide" data-carousel-next>
@@ -308,7 +303,7 @@ function CarouselIsland(container, props) {
             `;
     }
     return `
-            <div class="p-carousel p-carousel-align-${align} p-carousel-snap-${align} ${props.class || ""}" role="region" aria-roledescription="carousel" aria-label="Content Slider" style="max-width: 36rem; margin: 0 auto; ${props.style || ""}">
+            <div class="p-carousel p-carousel-align-${align} ${props.class || ""}" role="region" aria-roledescription="carousel" aria-label="Content Slider" style="max-width: 36rem; margin: 0 auto; ${props.style || ""}">
                 <div class="p-carousel-content" style="height: ${autoSize ? "140px" : "240px"}; width: 100%;" data-carousel-content>
                     ${itemsHtml}
                 </div>
@@ -332,7 +327,7 @@ function CarouselIsland(container, props) {
     container.innerHTML = `
             <div class="p-carousel-gallery-container" style="max-width: 42rem; margin: 0 auto; width: 100%;">
                 <!-- Main Stage Photo Carousel -->
-                <div class="p-carousel p-carousel-align-center p-carousel-snap-center" data-main-carousel style="width: 100%; border-radius: var(--p-border-radius, 12px); overflow: hidden; border: 1px solid var(--p-border-color);">
+                <div class="p-carousel p-carousel-align-center" data-main-carousel style="width: 100%; border-radius: var(--p-border-radius, 12px); overflow: hidden; border: 1px solid var(--p-border-color);">
                     <div class="p-carousel-content" style="height: 396px; width: 100%;" data-main-content>
                         ${images.map((src, i) => `
                             <div class="p-carousel-item" style="width: 100%; height: 100%; flex-shrink: 0;" data-slide-index="${i}">
@@ -343,7 +338,7 @@ function CarouselIsland(container, props) {
                 </div>
 
                 <!-- Synchronized Thumbnail Strip -->
-                <div class="p-carousel p-carousel-align-center p-carousel-snap-center" data-thumb-carousel style="margin-top: 0.75rem; width: 100%;">
+                <div class="p-carousel p-carousel-align-center" data-thumb-carousel style="margin-top: 0.75rem; width: 100%;">
                     <div class="p-carousel-content" style="height: 90px; width: 100%; gap: 8px;" data-thumb-content>
                         ${images.map((src, i) => `
                             <div class="p-carousel-item p-carousel-gallery-thumb ${i === currentSlide ? "p-carousel-thumb-active" : ""}" style="width: calc((100% - 24px) / 4); height: 100%; flex-shrink: 0;" data-thumb-index="${i}">
@@ -415,7 +410,7 @@ function CarouselIsland(container, props) {
               });
             }
           }
-        }, 100);
+        }, 80);
       });
     }
     return;
@@ -431,9 +426,14 @@ function CarouselIsland(container, props) {
     if (!targetItem) return;
     currentSlide = index;
     if (isVertical) {
-      const targetTop = targetItem.offsetTop;
+      let targetTop = targetItem.offsetTop;
+      if (align === "center") {
+        targetTop = targetItem.offsetTop - contentEl.clientHeight / 2 + targetItem.clientHeight / 2;
+      } else if (align === "end") {
+        targetTop = targetItem.offsetTop - contentEl.clientHeight + targetItem.clientHeight;
+      }
       contentEl.scrollTo({
-        top: targetTop,
+        top: Math.max(0, targetTop),
         behavior: "smooth"
       });
     } else {
@@ -502,8 +502,10 @@ function CarouselIsland(container, props) {
         let minDiff = Infinity;
         if (isVertical) {
           const scrollTop = contentEl.scrollTop;
+          const centerPoint = scrollTop + contentEl.clientHeight / 2;
           items.forEach((item, i) => {
-            const diff = Math.abs(item.offsetTop - scrollTop);
+            const itemCenter = item.offsetTop + item.clientHeight / 2;
+            const diff = Math.abs(itemCenter - centerPoint);
             if (diff < minDiff) {
               minDiff = diff;
               closestIdx = i;
@@ -525,7 +527,7 @@ function CarouselIsland(container, props) {
           currentSlide = closestIdx;
           updateUI();
         }
-      }, 80);
+      }, 60);
     });
   }
   updateUI();
@@ -533,4 +535,4 @@ function CarouselIsland(container, props) {
 export {
   CarouselIsland as default
 };
-//# sourceMappingURL=carousel-HDSQ5P3L.js.map
+//# sourceMappingURL=carousel-MSS2EQKC.js.map
