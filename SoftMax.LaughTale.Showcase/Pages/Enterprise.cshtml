@@ -5778,12 +5778,52 @@
         <div class="card-header">
             <div>
                 <h2>ConfirmPopup</h2>
-                <p>Inline anchor confirmation popover before destructive operations.</p>
+                <p>ConfirmPopup displays a confirmation overlay positioned relatively to its target referrer button.</p>
             </div>
-            <span class="aura-tag tag-amber">Confirm</span>
+            <span class="aura-tag tag-emerald">Overlays</span>
         </div>
-        <div class="card-body">
-            <island-confirm-popup message="Are you sure you want to flush all cluster caches?" icon="alertTriangle" />
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Demo 1: Basic -->
+            <div data-confirmpopup-demo="basic" style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">ConfirmPopup is displayed by calling the require method of the ConfirmationService passing options to customize the popup.</p>
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <island-confirm-popup>
+                        <button type="button" class="p-button p-button-outlined p-button-secondary" data-confirmpopup-trigger="basic" data-confirmpopup-message="Are you sure you want to proceed?" style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer;">
+                            Save
+                        </button>
+                        <button type="button" class="p-button p-button-outlined p-button-danger" data-confirmpopup-trigger="delete" data-confirmpopup-message="Do you want to delete this record?" style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid #ef4444; background: transparent; color: #ef4444; cursor: pointer; margin-left: 0.5rem;">
+                            Delete
+                        </button>
+                    </island-confirm-popup>
+                </div>
+            </div>
+
+            <!-- Demo 2: Template -->
+            <div data-confirmpopup-demo="template" style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Template</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">The message section can be customized using custom template badges, dividers, and icon buttons.</p>
+                <div style="display: flex; align-items: center;">
+                    <island-confirm-popup>
+                        <button type="button" class="p-button p-button-primary" data-confirmpopup-trigger="template" data-confirmpopup-message="Please confirm to proceed moving forward." style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                            Save
+                        </button>
+                    </island-confirm-popup>
+                </div>
+            </div>
+
+            <!-- Demo 3: Headless -->
+            <div data-confirmpopup-demo="headless" style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Headless</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Headless mode lets you implement entire custom confirmation UI instead of the default elements.</p>
+                <div style="display: flex; align-items: center;">
+                    <island-confirm-popup>
+                        <button type="button" class="p-button p-button-primary" data-confirmpopup-trigger="headless" data-confirmpopup-message="Save your current process?" style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                            Save
+                        </button>
+                    </island-confirm-popup>
+                </div>
+            </div>
         </div>
     </section>
 

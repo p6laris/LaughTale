@@ -1059,7 +1059,7 @@ defineIsland("tree-table", () => import("./treetable-STGV6W5W.js"));
 defineIsland("tree-select", () => import("./tree-select-3WADBRSW.js"));
 defineIsland("datatable", () => import("./datatable-FJYSSBES.js"));
 defineIsland("datagrid", () => import("./datatable-FJYSSBES.js"));
-defineIsland("modal", () => import("./modal-VIPTGKJ4.js"));
+defineIsland("modal", () => import("./modal-E3YZEE5X.js"));
 defineIsland("toast", () => import("./toast-DWHTYR76.js"));
 defineIsland("input-number", () => import("./input-number-KQ2J2WMH.js"));
 defineIsland("input-otp", () => import("./input-otp-RUPMATZ7.js"));
@@ -1083,7 +1083,7 @@ defineIsland("skeleton", () => import("./skeleton-4CLSEMFH.js"));
 defineIsland("drawer", () => import("./drawer-IT2PLXIN.js"));
 defineIsland("speed-dial", () => import("./speed-dial-DDAZL72V.js"));
 defineIsland("image-compare", () => import("./image-compare-6BR2BVQR.js"));
-defineIsland("confirm-popup", () => import("./confirm-popup-BEUGNVJP.js"));
+defineIsland("confirm-popup", () => import("./confirm-popup-PAP5WFOR.js"));
 defineIsland("confirm-dialog", () => import("./confirm-dialog-4TP6SZFU.js"));
 defineIsland("confirmdialog", () => import("./confirm-dialog-4TP6SZFU.js"));
 defineIsland("scrollarea", () => import("./scrollarea-P6ZIAY6W.js"));
@@ -1147,4 +1147,4 @@ export {
   enableViewTransitions,
   getSlot
 };
-//# sourceMappingURL=chunk-7IA5IMKM.js.map
+//# sourceMappingURL=chunk-BVCWW4IQ.js.map

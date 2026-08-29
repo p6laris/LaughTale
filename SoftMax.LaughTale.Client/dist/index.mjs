@@ -14611,106 +14611,388 @@ __export(confirm_popup_exports, {
   default: () => ConfirmPopupIsland
 });
 function ConfirmPopupIsland(container, props) {
-  injectIslandStyle("confirm-popup", CSS21);
-  let isOpen = false;
-  function render() {
-    container.innerHTML = `
-            <div class="laughtale-confirm-popup" style="display: ${isOpen ? "block" : "none"}; position: absolute; z-index: 1000; background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); box-shadow: var(--p-shadow-lg); padding: 1rem; width: 260px; animation: scaleIn 0.15s ease;">
-                <div style="display: flex; align-items: flex-start; gap: 0.5rem; margin-bottom: 0.75rem;">
-                    <span style="color: #f59e0b; display: flex; align-items: center; margin-top: 2px;">${LucideIcons.alertTriangle}</span>
-                    <span style="font-size: 0.875rem; font-weight: 500; color: var(--p-surface-900); line-height: 1.4;">${props.message}</span>
-                </div>
-                <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
-                    <button type="button" class="btn-reject p-button p-button-secondary" style="padding: 0.35rem 0.65rem; font-size: 0.75rem;">
-                        ${props.rejectText || "Cancel"}
-                    </button>
-                    <button type="button" class="btn-accept p-button p-button-primary" style="padding: 0.35rem 0.65rem; font-size: 0.75rem; background: #ef4444; border-color: #ef4444;">
-                        ${props.acceptText || "Confirm"}
-                    </button>
-                </div>
-            </div>
-        `;
-    container.querySelector(".btn-reject")?.addEventListener("click", () => {
-      isOpen = false;
-      render();
-    });
-    container.querySelector(".btn-accept")?.addEventListener("click", () => {
-      isOpen = false;
-      render();
-      container.dispatchEvent(new CustomEvent("confirm:accept", {
-        bubbles: true,
-        detail: { action: props.actionName }
-      }));
-    });
-  }
-  if (props.targetSelector && props.targetSelector.trim()) {
-    try {
-      const trigger = document.querySelector(props.targetSelector);
-      if (trigger) {
-        trigger.addEventListener("click", (e) => {
-          e.preventDefault();
-          isOpen = !isOpen;
-          render();
-          if (isOpen) {
-            const rect = trigger.getBoundingClientRect();
-            const popup = container.querySelector(".laughtale-confirm-popup");
-            if (popup) {
-              popup.style.top = `${rect.bottom + window.scrollY + 6}px`;
-              popup.style.left = `${rect.left + window.scrollX}px`;
-            }
-          }
+  injectIslandStyle("confirm-popup", CONFIRM_POPUP_CSS);
+  const triggers = container.querySelectorAll("[data-confirmpopup-trigger]");
+  triggers.forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const action = btn.getAttribute("data-confirmpopup-trigger") || "basic";
+      const message = btn.getAttribute("data-confirmpopup-message");
+      if (action === "delete") {
+        globalConfirmPopup.require({
+          target: btn,
+          message: message || "Do you want to delete this record?",
+          acceptSeverity: "danger",
+          acceptLabel: "Delete",
+          rejectLabel: "Cancel",
+          accept: () => window.$toast?.add({ severity: "info", summary: "Confirmed", detail: "Record deleted", life: 3e3 }),
+          reject: () => window.$toast?.add({ severity: "error", summary: "Rejected", detail: "You have rejected", life: 3e3 })
+        });
+      } else if (action === "template") {
+        globalConfirmPopup.require({
+          target: btn,
+          message: message || "Please confirm to proceed moving forward.",
+          template: true,
+          acceptLabel: "Confirm",
+          rejectLabel: "Cancel",
+          accept: () => window.$toast?.add({ severity: "info", summary: "Confirmed", detail: "You have accepted", life: 3e3 }),
+          reject: () => window.$toast?.add({ severity: "error", summary: "Rejected", detail: "You have rejected", life: 3e3 })
+        });
+      } else if (action === "headless") {
+        globalConfirmPopup.require({
+          target: btn,
+          message: message || "Save your current process?",
+          headless: true,
+          acceptLabel: "Save",
+          rejectLabel: "Cancel",
+          accept: () => window.$toast?.add({ severity: "info", summary: "Confirmed", detail: "You have accepted", life: 3e3 }),
+          reject: () => window.$toast?.add({ severity: "error", summary: "Rejected", detail: "You have rejected", life: 3e3 })
+        });
+      } else {
+        globalConfirmPopup.require({
+          target: btn,
+          message: message || "Are you sure you want to proceed?",
+          acceptLabel: "Save",
+          rejectLabel: "Cancel",
+          accept: () => window.$toast?.add({ severity: "info", summary: "Confirmed", detail: "You have accepted", life: 3e3 }),
+          reject: () => window.$toast?.add({ severity: "error", summary: "Rejected", detail: "You have rejected", life: 3e3 })
         });
       }
-    } catch (e) {
-      console.warn("[SoftMax.LaughTale] Invalid targetSelector for confirm-popup:", props.targetSelector);
-    }
-  } else {
-    const fallbackBtn = document.createElement("button");
-    fallbackBtn.type = "button";
-    fallbackBtn.className = "p-button p-button-danger";
-    fallbackBtn.textContent = "Delete Record";
-    fallbackBtn.style.padding = "0.4rem 0.75rem";
-    fallbackBtn.style.fontSize = "0.8125rem";
-    fallbackBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      isOpen = !isOpen;
-      render();
-      if (isOpen) {
-        const popup = container.querySelector(".laughtale-confirm-popup");
-        if (popup) {
-          popup.style.position = "relative";
-          popup.style.marginTop = "0.5rem";
-          popup.style.display = "block";
-        }
-      }
     });
-    container.prepend(fallbackBtn);
-  }
-  render();
+  });
 }
-var CSS21;
+var CONFIRM_POPUP_CSS, ALERT_TRIANGLE_SVG, INFO_CIRCLE_SVG, EXCLAMATION_LARGE_SVG, CHECK_SVG, CLOSE_SVG2, ConfirmPopupManager, globalConfirmPopup;
 var init_confirm_popup = __esm({
   "src/components/confirm-popup.ts"() {
     "use strict";
-    init_lucide();
     init_styles();
-    CSS21 = `
-[data-theme="dark"] .laughtale-confirm-popup {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+    CONFIRM_POPUP_CSS = `
+.p-confirmpopup {
+    position: absolute;
+    z-index: 1100;
+    background: var(--p-surface-0, #ffffff);
+    border: 1px solid var(--p-border-color, #e2e8f0);
+    border-radius: var(--p-border-radius-lg, 10px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+    padding: 0.875rem 1rem;
+    min-width: 17rem;
+    max-width: 24rem;
+    box-sizing: border-box;
+    display: none;
+    opacity: 0;
+    transform: scale(0.95) translateY(4px);
+    transition: transform 0.16s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.16s ease;
 }
-[data-theme="dark"] .btn-reject {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+.p-confirmpopup.p-confirmpopup-active {
+    display: block;
+    opacity: 1;
+    transform: scale(1) translateY(0);
 }
-[data-theme="dark"] .btn-accept {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+
+/* Arrow pointer notch */
+.p-confirmpopup::before,
+.p-confirmpopup::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border: solid transparent;
+    pointer-events: none;
+}
+
+/* Flipped top - popup is below target, arrow points UP */
+.p-confirmpopup-flipped-top::before {
+    bottom: 100%;
+    left: var(--p-popup-arrow-left, 24px);
+    border-width: 8px;
+    border-bottom-color: var(--p-border-color, #e2e8f0);
+}
+.p-confirmpopup-flipped-top::after {
+    bottom: 100%;
+    left: calc(var(--p-popup-arrow-left, 24px) + 1px);
+    border-width: 7px;
+    border-bottom-color: var(--p-surface-0, #ffffff);
+}
+
+/* Flipped bottom - popup is above target, arrow points DOWN */
+.p-confirmpopup-flipped-bottom::before {
+    top: 100%;
+    left: var(--p-popup-arrow-left, 24px);
+    border-width: 8px;
+    border-top-color: var(--p-border-color, #e2e8f0);
+}
+.p-confirmpopup-flipped-bottom::after {
+    top: 100%;
+    left: calc(var(--p-popup-arrow-left, 24px) + 1px);
+    border-width: 7px;
+    border-top-color: var(--p-surface-0, #ffffff);
+}
+
+/* Body Content */
+.p-confirmpopup-content {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-bottom: 0.75rem;
+}
+
+.p-confirmpopup-icon {
+    font-size: 1.35rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--p-surface-700, #334155);
+}
+
+.p-confirmpopup-icon-danger {
+    color: #ef4444 !important;
+}
+
+.p-confirmpopup-message {
+    font-size: 0.875rem;
+    color: var(--p-text-color, #0f172a);
+    line-height: 1.45;
+    margin: 0;
+    font-weight: 500;
+}
+
+/* Footer Actions */
+.p-confirmpopup-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    padding-top: 0.25rem;
+}
+
+/* Template Variant */
+.p-confirmpopup-template-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.875rem;
+    padding: 0.5rem 0.5rem 0.875rem 0.5rem;
+    border-bottom: 1px solid var(--p-border-color, #e2e8f0);
+    margin-bottom: 0.75rem;
+}
+
+.p-confirmpopup-template-icon {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 9999px;
+    border: 3px solid var(--p-surface-400, #94a3b8);
+    color: var(--p-surface-600, #475569);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+}
+
+/* Headless Variant */
+.p-confirmpopup-headless {
+    padding: 0.25rem 0.25rem 0.5rem 0.25rem;
+}
+
+/* Dark Mode Tokens */
+.dark .p-confirmpopup,
+[data-theme="dark"] .p-confirmpopup {
+    background: var(--p-surface-900, #0f172a);
+    border-color: var(--p-surface-700, #334155);
+}
+.dark .p-confirmpopup-flipped-top::before,
+[data-theme="dark"] .p-confirmpopup-flipped-top::before {
+    border-bottom-color: var(--p-surface-700, #334155);
+}
+.dark .p-confirmpopup-flipped-top::after,
+[data-theme="dark"] .p-confirmpopup-flipped-top::after {
+    border-bottom-color: var(--p-surface-900, #0f172a);
+}
+.dark .p-confirmpopup-flipped-bottom::before,
+[data-theme="dark"] .p-confirmpopup-flipped-bottom::before {
+    border-top-color: var(--p-surface-700, #334155);
+}
+.dark .p-confirmpopup-flipped-bottom::after,
+[data-theme="dark"] .p-confirmpopup-flipped-bottom::after {
+    border-top-color: var(--p-surface-900, #0f172a);
+}
+.dark .p-confirmpopup-message,
+[data-theme="dark"] .p-confirmpopup-message {
+    color: var(--p-surface-100, #f8fafc);
+}
+.dark .p-confirmpopup-template-body,
+[data-theme="dark"] .p-confirmpopup-template-body {
+    border-color: var(--p-surface-700, #334155);
+}
+.dark .p-confirmpopup-template-icon,
+[data-theme="dark"] .p-confirmpopup-template-icon {
+    border-color: var(--p-surface-600, #475569);
+    color: var(--p-surface-300, #cbd5e1);
 }
 `;
+    ALERT_TRIANGLE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9"\u30C4\u30FC\u30EB height="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>`;
+    INFO_CIRCLE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="16" y2="12"/><line x1="12" x2="12.01" y1="8" y2="8"/></svg>`;
+    EXCLAMATION_LARGE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>`;
+    CHECK_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+    CLOSE_SVG2 = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>`;
+    ConfirmPopupManager = class {
+      popupEl = null;
+      currentOptions = null;
+      outsideClickListener = null;
+      constructor() {
+        if (typeof document !== "undefined") {
+          this.initDOM();
+        }
+      }
+      initDOM() {
+        if (this.popupEl) return;
+        injectIslandStyle("confirm-popup", CONFIRM_POPUP_CSS);
+        this.popupEl = document.createElement("div");
+        this.popupEl.className = "p-confirmpopup p-component";
+        this.popupEl.setAttribute("role", "alertdialog");
+        this.popupEl.setAttribute("aria-modal", "true");
+        window.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && this.popupEl?.classList.contains("p-confirmpopup-active")) {
+            this.close(false);
+          }
+        });
+        document.body.appendChild(this.popupEl);
+      }
+      require(options) {
+        this.initDOM();
+        if (!this.popupEl || !options.target) return;
+        if (this.currentOptions && this.currentOptions.target === options.target && this.popupEl.classList.contains("p-confirmpopup-active")) {
+          this.close(false);
+          return;
+        }
+        this.currentOptions = options;
+        this.renderContent(options);
+        this.alignToTarget(options.target);
+        this.popupEl.classList.add("p-confirmpopup-active");
+        setTimeout(() => {
+          if (this.outsideClickListener) {
+            document.removeEventListener("click", this.outsideClickListener);
+          }
+          this.outsideClickListener = (e) => {
+            if (this.popupEl && !this.popupEl.contains(e.target) && !options.target.contains(e.target)) {
+              this.close(false);
+            }
+          };
+          document.addEventListener("click", this.outsideClickListener);
+        }, 10);
+      }
+      close(accepted = false) {
+        if (!this.popupEl) return;
+        this.popupEl.classList.remove("p-confirmpopup-active");
+        if (this.outsideClickListener) {
+          document.removeEventListener("click", this.outsideClickListener);
+          this.outsideClickListener = null;
+        }
+        if (this.currentOptions) {
+          if (accepted && this.currentOptions.accept) {
+            this.currentOptions.accept();
+          } else if (!accepted && this.currentOptions.reject) {
+            this.currentOptions.reject();
+          }
+        }
+        this.currentOptions = null;
+      }
+      alignToTarget(target) {
+        if (!this.popupEl) return;
+        const targetRect = target.getBoundingClientRect();
+        const popupWidth = this.popupEl.offsetWidth || 280;
+        const popupHeight = this.popupEl.offsetHeight || 140;
+        const viewportHeight = window.innerHeight;
+        const spaceBelow = viewportHeight - targetRect.bottom;
+        const spaceAbove = targetRect.top;
+        const placeAbove = spaceBelow < popupHeight + 16 && spaceAbove > popupHeight + 16;
+        let top = 0;
+        if (placeAbove) {
+          top = targetRect.top + window.scrollY - popupHeight - 10;
+          this.popupEl.classList.remove("p-confirmpopup-flipped-top");
+          this.popupEl.classList.add("p-confirmpopup-flipped-bottom");
+        } else {
+          top = targetRect.bottom + window.scrollY + 10;
+          this.popupEl.classList.remove("p-confirmpopup-flipped-bottom");
+          this.popupEl.classList.add("p-confirmpopup-flipped-top");
+        }
+        let left = targetRect.left + window.scrollX;
+        const maxLeft = window.innerWidth - popupWidth - 16;
+        if (left > maxLeft) left = maxLeft;
+        if (left < 16) left = 16;
+        const targetCenter = targetRect.left + window.scrollX + targetRect.width / 2;
+        const arrowLeft = Math.max(16, Math.min(popupWidth - 24, targetCenter - left - 8));
+        this.popupEl.style.top = `${top}px`;
+        this.popupEl.style.left = `${left}px`;
+        this.popupEl.style.setProperty("--p-popup-arrow-left", `${arrowLeft}px`);
+      }
+      renderContent(opt) {
+        if (!this.popupEl) return;
+        if (opt.headless) {
+          this.popupEl.innerHTML = `
+                <div class="p-confirmpopup-headless">
+                    <span class="p-confirmpopup-message" style="display: block; font-size: 0.875rem;">${opt.message || "Save your current process?"}</span>
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.875rem;">
+                        <button type="button" class="btn-accept p-button p-button-primary p-button-sm" style="padding: 0.35rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                            ${opt.acceptLabel || "Save"}
+                        </button>
+                        <button type="button" class="btn-reject p-button p-button-text p-button-secondary p-button-sm" style="padding: 0.35rem 0.75rem; font-size: 0.8125rem; font-weight: 500; border: none; background: transparent; color: var(--p-surface-700); cursor: pointer;">
+                            ${opt.rejectLabel || "Cancel"}
+                        </button>
+                    </div>
+                </div>
+            `;
+        } else if (opt.template) {
+          this.popupEl.innerHTML = `
+                <div class="p-confirmpopup-template-body">
+                    <div class="p-confirmpopup-template-icon">
+                        ${EXCLAMATION_LARGE_SVG}
+                    </div>
+                    <p class="p-confirmpopup-message" style="font-size: 0.875rem; color: var(--p-text-color);">${opt.message || "Please confirm to proceed moving forward."}</p>
+                </div>
+                <div class="p-confirmpopup-footer">
+                    <button type="button" class="btn-reject p-button p-button-outlined p-button-secondary p-button-sm" style="display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.4rem 0.75rem; font-size: 0.8125rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: transparent; color: var(--p-text-color); cursor: pointer;">
+                        ${CLOSE_SVG2}
+                        <span>${opt.rejectLabel || "Cancel"}</span>
+                    </button>
+                    <button type="button" class="btn-accept p-button p-button-primary p-button-sm" style="display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.4rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                        ${CHECK_SVG}
+                        <span>${opt.acceptLabel || "Confirm"}</span>
+                    </button>
+                </div>
+            `;
+        } else {
+          const isDanger = opt.acceptSeverity === "danger" || opt.acceptProps && opt.acceptProps.severity === "danger";
+          const iconSvg = isDanger ? INFO_CIRCLE_SVG : ALERT_TRIANGLE_SVG;
+          const acceptLabel = opt.acceptLabel || opt.acceptProps?.label || (isDanger ? "Delete" : "Save");
+          const rejectLabel = opt.rejectLabel || opt.rejectProps?.label || "Cancel";
+          const acceptStyle = isDanger ? "background: #ef4444; border: 1px solid #ef4444; color: #ffffff;" : "background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff;";
+          this.popupEl.innerHTML = `
+                <div class="p-confirmpopup-content">
+                    <span class="p-confirmpopup-icon ${isDanger ? "p-confirmpopup-icon-danger" : ""}">
+                        ${iconSvg}
+                    </span>
+                    <span class="p-confirmpopup-message">${opt.message || "Are you sure you want to proceed?"}</span>
+                </div>
+                <div class="p-confirmpopup-footer">
+                    <button type="button" class="btn-reject p-button p-button-outlined p-button-secondary p-button-sm" style="padding: 0.35rem 0.75rem; font-size: 0.8125rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: transparent; color: var(--p-text-color); cursor: pointer;">
+                        ${rejectLabel}
+                    </button>
+                    <button type="button" class="btn-accept p-button p-button-primary p-button-sm" style="padding: 0.35rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: var(--p-border-radius); ${acceptStyle} cursor: pointer;">
+                        ${acceptLabel}
+                    </button>
+                </div>
+            `;
+        }
+        this.popupEl.querySelector(".btn-reject")?.addEventListener("click", () => this.close(false));
+        this.popupEl.querySelector(".btn-accept")?.addEventListener("click", () => this.close(true));
+      }
+    };
+    globalConfirmPopup = new ConfirmPopupManager();
+    window.$confirmPopup = globalConfirmPopup;
   }
 });
 
@@ -14739,7 +15021,7 @@ function showToastFeedback(summary, detail, severity = "info") {
   const textColor = isError ? "#ef4444" : "var(--p-primary-600, #059669)";
   toastItem.style.cssText = `background: var(--p-surface-0, #ffffff); border-left: 4px solid ${borderColor}; border-radius: var(--p-border-radius, 6px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); padding: 0.75rem 1rem; width: 18rem; pointer-events: auto; display: flex; align-items: flex-start; gap: 0.5rem; animation: slideInRight 0.2s ease;`;
   toastItem.innerHTML = `
-        <span style="color: ${textColor}; display: flex; align-items: center; margin-top: 2px;">${isError ? DANGER_ALERT_SVG : CHECK_SVG}</span>
+        <span style="color: ${textColor}; display: flex; align-items: center; margin-top: 2px;">${isError ? DANGER_ALERT_SVG : CHECK_SVG2}</span>
         <div>
             <div style="font-weight: 700; font-size: 0.875rem; color: var(--p-text-color, #0f172a);">${summary}</div>
             <div style="font-size: 0.8125rem; color: var(--p-text-muted, #64748b);">${detail}</div>
@@ -14810,7 +15092,7 @@ function ConfirmDialogIsland(container, props) {
     });
   });
 }
-var CONFIRM_DIALOG_CSS, CLOSE_SVG2, INFO_ICON_SVG, DANGER_ALERT_SVG, QUESTION_SVG, CHECK_SVG, CHECK_LARGE_SVG, LOCK_SVG, ConfirmDialogManager, globalConfirm;
+var CONFIRM_DIALOG_CSS, CLOSE_SVG3, INFO_ICON_SVG, DANGER_ALERT_SVG, QUESTION_SVG, CHECK_SVG2, CHECK_LARGE_SVG, LOCK_SVG, ConfirmDialogManager, globalConfirm;
 var init_confirm_dialog = __esm({
   "src/components/confirm-dialog.ts"() {
     "use strict";
@@ -15041,11 +15323,11 @@ var init_confirm_dialog = __esm({
     color: #6ee7b7;
 }
 `;
-    CLOSE_SVG2 = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>`;
+    CLOSE_SVG3 = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>`;
     INFO_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="16" y2="12"/><line x1="12" x2="12.01" y1="8" y2="8"/></svg>`;
     DANGER_ALERT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>`;
     QUESTION_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>`;
-    CHECK_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+    CHECK_SVG2 = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
     CHECK_LARGE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
     LOCK_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`;
     ConfirmDialogManager = class {
@@ -15152,7 +15434,7 @@ var init_confirm_dialog = __esm({
                     <div class="p-dialog-header">
                         <h3 class="p-dialog-title">${opt.header || "Confirmation"}</h3>
                         <button type="button" class="p-dialog-header-close" aria-label="Close dialog">
-                            ${CLOSE_SVG2}
+                            ${CLOSE_SVG3}
                         </button>
                     </div>
                     <div class="p-dialog-content">
@@ -17241,7 +17523,7 @@ __export(autocomplete_exports, {
   default: () => AutoCompleteIsland
 });
 function AutoCompleteIsland(container, props) {
-  injectIslandStyle("autocomplete", CSS22);
+  injectIslandStyle("autocomplete", CSS21);
   const allItems = props.suggestions || props.items || [];
   const multiple = props.multiple === true;
   const showClear = props.showClear !== false;
@@ -17574,7 +17856,7 @@ function AutoCompleteIsland(container, props) {
   }
   renderChips();
 }
-var CSS22;
+var CSS21;
 var init_autocomplete = __esm({
   "src/components/autocomplete.ts"() {
     "use strict";
@@ -17583,7 +17865,7 @@ var init_autocomplete = __esm({
     init_useDisclosure();
     init_useClickOutside();
     init_useDebounce();
-    CSS22 = `
+    CSS21 = `
 .laughtale-autocomplete {
     position: relative;
     display: inline-flex;
@@ -17853,7 +18135,7 @@ __export(color_picker_exports, {
   default: () => ColorPickerIsland
 });
 function ColorPickerIsland(container, props) {
-  injectIslandStyle("color-picker", CSS23);
+  injectIslandStyle("color-picker", CSS22);
   let currentColor = props.value || "#10b981";
   let isOpen = false;
   const swatchesHtml = DEFAULT_PRESETS.map((c) => `
@@ -17977,7 +18259,7 @@ function ColorPickerIsland(container, props) {
   }
   syncValue();
 }
-var DEFAULT_PRESETS, CSS23;
+var DEFAULT_PRESETS, CSS22;
 var init_color_picker = __esm({
   "src/components/color-picker.ts"() {
     "use strict";
@@ -17999,7 +18281,7 @@ var init_color_picker = __esm({
       "#1e293b",
       "#000000"
     ];
-    CSS23 = `
+    CSS22 = `
 [data-theme="dark"] .color-swatch-btn {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -18035,7 +18317,7 @@ __export(knob_exports, {
   default: () => KnobIsland
 });
 function KnobIsland(container, props) {
-  injectIslandStyle("knob", CSS24);
+  injectIslandStyle("knob", CSS23);
   const min = props.min !== void 0 ? props.min : 0;
   const max = props.max !== void 0 ? props.max : 100;
   const step = props.step || 1;
@@ -18137,12 +18419,12 @@ function KnobIsland(container, props) {
   }
   syncValue();
 }
-var CSS24;
+var CSS23;
 var init_knob = __esm({
   "src/components/knob.ts"() {
     "use strict";
     init_styles();
-    CSS24 = `
+    CSS23 = `
 [data-theme="dark"] .laughtale-knob {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -18168,7 +18450,7 @@ __export(tag_exports, {
   default: () => TagIsland
 });
 function TagIsland(container, props) {
-  injectIslandStyle("tag", CSS25);
+  injectIslandStyle("tag", CSS24);
   const severity = props.severity || "info";
   const isRounded = props.rounded || false;
   let bg = "var(--p-blue-50, #eff6ff)";
@@ -18202,12 +18484,12 @@ function TagIsland(container, props) {
         </span>
     `;
 }
-var CSS25;
+var CSS24;
 var init_tag = __esm({
   "src/components/tag.ts"() {
     "use strict";
     init_styles();
-    CSS25 = `
+    CSS24 = `
 [data-theme="dark"] .laughtale-tag {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -18223,7 +18505,7 @@ __export(breadcrumb_exports, {
   default: () => BreadcrumbIsland
 });
 function BreadcrumbIsland(container, props) {
-  injectIslandStyle("breadcrumb", CSS26);
+  injectIslandStyle("breadcrumb", CSS25);
   const items = props.items || [];
   const homeUrl = props.homeUrl || "/";
   const itemsHtml = items.map((item, idx) => {
@@ -18261,13 +18543,13 @@ function BreadcrumbIsland(container, props) {
         </nav>
     `;
 }
-var CSS26;
+var CSS25;
 var init_breadcrumb = __esm({
   "src/components/breadcrumb.ts"() {
     "use strict";
     init_lucide();
     init_styles();
-    CSS26 = `
+    CSS25 = `
 [data-theme="dark"] .laughtale-breadcrumb {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -18283,7 +18565,7 @@ __export(scroll_top_exports, {
   default: () => ScrollTopIsland
 });
 function ScrollTopIsland(container, props) {
-  injectIslandStyle("scroll-top", CSS27);
+  injectIslandStyle("scroll-top", CSS26);
   const threshold = props.threshold || 200;
   let isVisible = false;
   function render() {
@@ -18309,13 +18591,13 @@ function ScrollTopIsland(container, props) {
   window.addEventListener("scroll", checkScroll, { passive: true });
   render();
 }
-var CSS27;
+var CSS26;
 var init_scroll_top = __esm({
   "src/components/scroll-top.ts"() {
     "use strict";
     init_lucide();
     init_styles();
-    CSS27 = `
+    CSS26 = `
 [data-theme="dark"] .laughtale-scroll-top-btn {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -18331,7 +18613,7 @@ __export(inplace_exports, {
   default: () => InplaceIsland
 });
 function InplaceIsland(container, props) {
-  injectIslandStyle("inplace", CSS28);
+  injectIslandStyle("inplace", CSS27);
   let isEditing = false;
   let currentValue = props.value || "";
   function render() {
@@ -18411,13 +18693,13 @@ function InplaceIsland(container, props) {
   render();
   syncValue();
 }
-var CSS28;
+var CSS27;
 var init_inplace = __esm({
   "src/components/inplace.ts"() {
     "use strict";
     init_lucide();
     init_styles();
-    CSS28 = `
+    CSS27 = `
 [data-theme="dark"] .laughtale-inplace-display {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -18453,7 +18735,7 @@ __export(command_exports, {
   default: () => CommandPaletteIsland
 });
 function CommandPaletteIsland(container, props) {
-  injectIslandStyle("command", CSS29);
+  injectIslandStyle("command", CSS28);
   const placeholder = props.placeholder || "Type a command or search...";
   const items = props.items || [
     { id: "home", label: "Go to Overview", group: "Navigation", icon: "compass", url: "/", shortcut: "G H" },
@@ -18627,7 +18909,7 @@ function CommandPaletteIsland(container, props) {
   ]);
   document.addEventListener("command:open", () => open());
 }
-var CSS29;
+var CSS28;
 var init_command = __esm({
   "src/components/command.ts"() {
     "use strict";
@@ -18637,7 +18919,7 @@ var init_command = __esm({
     init_useFocusTrap();
     init_useHotkeys();
     init_useScrollLock();
-    CSS29 = `
+    CSS28 = `
 [data-theme="dark"] .laughtale-command-root {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -19501,7 +19783,7 @@ __export(dynamic_form_exports, {
   default: () => DynamicFormIsland
 });
 function DynamicFormIsland(container, props) {
-  injectIslandStyle("dynamic-form", CSS30);
+  injectIslandStyle("dynamic-form", CSS29);
   let schema = props.schema || null;
   if (!schema && props.schemaJson) {
     try {
@@ -19662,13 +19944,13 @@ function DynamicFormIsland(container, props) {
   }
   render();
 }
-var CSS30;
+var CSS29;
 var init_dynamic_form = __esm({
   "src/components/dynamic-form.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS30 = `
+    CSS29 = `
 [data-theme="dark"] .p-input {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -20054,7 +20336,7 @@ __export(multiselect_exports, {
   default: () => MultiSelectIsland
 });
 function MultiSelectIsland(container, props) {
-  injectIslandStyle("multiselect", CSS31);
+  injectIslandStyle("multiselect", CSS30);
   const options = props.options || [];
   let selected = new Set(props.selectedValues || []);
   let filterQuery = "";
@@ -20220,7 +20502,7 @@ function MultiSelectIsland(container, props) {
   renderDisplay();
   syncValue();
 }
-var CSS31;
+var CSS30;
 var init_multiselect = __esm({
   "src/components/multiselect.ts"() {
     "use strict";
@@ -20229,7 +20511,7 @@ var init_multiselect = __esm({
     init_useDisclosure();
     init_useClickOutside();
     init_useTransition();
-    CSS31 = `
+    CSS30 = `
 [data-theme="dark"] .laughtale-multiselect {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -20300,7 +20582,7 @@ __export(cascadeselect_exports, {
   default: () => CascadeSelectIsland
 });
 function CascadeSelectIsland(container, props) {
-  injectIslandStyle("cascadeselect", CSS32);
+  injectIslandStyle("cascadeselect", CSS31);
   const options = props.options || [];
   const size = props.size || "normal";
   const variant = props.variant || "outlined";
@@ -20513,7 +20795,7 @@ function CascadeSelectIsland(container, props) {
     }));
   }
 }
-var CSS32;
+var CSS31;
 var init_cascadeselect = __esm({
   "src/components/cascadeselect.ts"() {
     "use strict";
@@ -20521,7 +20803,7 @@ var init_cascadeselect = __esm({
     init_styles();
     init_useDisclosure();
     init_useClickOutside();
-    CSS32 = `
+    CSS31 = `
 .laughtale-cascadeselect {
     position: relative;
     display: inline-flex;
@@ -20726,7 +21008,7 @@ __export(listbox_exports, {
   default: () => ListboxIsland
 });
 function ListboxIsland(container, props) {
-  injectIslandStyle("laughtale-listbox", CSS33);
+  injectIslandStyle("laughtale-listbox", CSS32);
   const isMultiple = props.multiple === true || String(props.multiple) === "true";
   const isMetaKey = props.metaKeySelection !== false && String(props.metaKeySelection) !== "false";
   const isCheckbox = props.checkbox === true || String(props.checkbox) === "true";
@@ -21062,14 +21344,14 @@ function ListboxIsland(container, props) {
   }
   init();
 }
-var CSS33, checkSvg2, searchSvg2;
+var CSS32, checkSvg2, searchSvg2;
 var init_listbox = __esm({
   "src/components/listbox.ts"() {
     "use strict";
     init_lucide();
     init_styles();
     init_useDebounce();
-    CSS33 = `
+    CSS32 = `
 /* ==================== AURA LISTBOX ==================== */
 .laughtale-listbox,
 .p-listbox {
@@ -23541,7 +23823,7 @@ __export(terminal_exports, {
   default: () => TerminalIsland
 });
 function TerminalIsland(container, props) {
-  injectIslandStyle("terminal", CSS34);
+  injectIslandStyle("terminal", CSS33);
   const promptPrefix = props.prompt || "admin@softmax:~$";
   const welcome = props.welcomeMessage || 'Welcome to SoftMax.LaughTale CLI v3.0\nType "help" for available commands.';
   const commands = {
@@ -23640,13 +23922,13 @@ ${h.response}`).join("\n");
   }
   render();
 }
-var CSS34;
+var CSS33;
 var init_terminal = __esm({
   "src/components/terminal.ts"() {
     "use strict";
     init_styles();
     init_useClipboard();
-    CSS34 = `
+    CSS33 = `
 [data-theme="dark"] .laughtale-terminal {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -23677,7 +23959,7 @@ __export(dock_exports, {
   default: () => DockIsland
 });
 function DockIsland(container, props) {
-  injectIslandStyle("dock", CSS35);
+  injectIslandStyle("dock", CSS34);
   const items = props.items || [
     { label: "Overview", icon: "compass", url: "/" },
     { label: "Dashboard", icon: "bar-chart", url: "/dashboard" },
@@ -23719,13 +24001,13 @@ function DockIsland(container, props) {
     });
   });
 }
-var CSS35;
+var CSS34;
 var init_dock = __esm({
   "src/components/dock.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS35 = `
+    CSS34 = `
 [data-theme="dark"] .laughtale-dock {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -23746,7 +24028,7 @@ __export(galleria_exports, {
   default: () => GalleriaIsland
 });
 function GalleriaIsland(container, props) {
-  injectIslandStyle("galleria", CSS36);
+  injectIslandStyle("galleria", CSS35);
   const images = props.value && props.value.length > 0 ? props.value : [
     {
       itemImageSrc: "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800&auto=format&fit=crop&q=80",
@@ -23820,13 +24102,13 @@ function GalleriaIsland(container, props) {
   }
   render();
 }
-var CSS36;
+var CSS35;
 var init_galleria = __esm({
   "src/components/galleria.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS36 = `
+    CSS35 = `
 [data-theme="dark"] .laughtale-galleria {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -23857,7 +24139,7 @@ __export(blockui_exports, {
   default: () => BlockUIIsland
 });
 function BlockUIIsland(container, props) {
-  injectIslandStyle("blockui", CSS37);
+  injectIslandStyle("blockui", CSS36);
   let isBlocked = props.blocked ?? true;
   function render() {
     container.innerHTML = `
@@ -23880,12 +24162,12 @@ function BlockUIIsland(container, props) {
     render();
   });
 }
-var CSS37;
+var CSS36;
 var init_blockui = __esm({
   "src/components/blockui.ts"() {
     "use strict";
     init_styles();
-    CSS37 = `
+    CSS36 = `
 [data-theme="dark"] .laughtale-blockui-root {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -24617,7 +24899,7 @@ __export(select_exports, {
   default: () => SelectIsland
 });
 function SelectIsland(container, props) {
-  injectIslandStyle("laughtale-select", CSS38);
+  injectIslandStyle("laughtale-select", CSS37);
   const isMultiple = props.multiple === true || String(props.multiple) === "true";
   const isCheckmark = props.checkmark === true || String(props.checkmark) === "true";
   const isCheckbox = props.checkbox === true || String(props.checkbox) === "true";
@@ -24957,13 +25239,13 @@ function SelectIsland(container, props) {
   }
   render();
 }
-var CSS38;
+var CSS37;
 var init_select = __esm({
   "src/components/select.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS38 = `
+    CSS37 = `
 /* ==================== AURA SELECT ==================== */
 .laughtale-select,
 .p-select {
@@ -25390,7 +25672,7 @@ __export(checkbox_exports, {
   default: () => CheckboxIsland
 });
 function CheckboxIsland(container, props) {
-  injectIslandStyle("laughtale-checkbox", CSS39);
+  injectIslandStyle("laughtale-checkbox", CSS38);
   let isChecked = Boolean(props.checked);
   let isIndeterminate = Boolean(props.indeterminate);
   const size = props.size || "normal";
@@ -25462,13 +25744,13 @@ function CheckboxIsland(container, props) {
   }
   render();
 }
-var CSS39;
+var CSS38;
 var init_checkbox = __esm({
   "src/components/checkbox.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS39 = `
+    CSS38 = `
 .laughtale-checkbox-wrap {
     display: inline-flex;
     align-items: center;
@@ -25645,7 +25927,7 @@ __export(radio_button_exports, {
   default: () => RadioButtonIsland
 });
 function RadioButtonIsland(container, props) {
-  injectIslandStyle("laughtale-radio", CSS40);
+  injectIslandStyle("laughtale-radio", CSS39);
   const isCard = props.card === true || String(props.card) === "true";
   const isFilled = props.variant === "filled";
   const size = props.size || "normal";
@@ -25877,13 +26159,13 @@ function RadioButtonIsland(container, props) {
   }
   renderSingle();
 }
-var CSS40;
+var CSS39;
 var init_radio_button = __esm({
   "src/components/radio-button.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS40 = `
+    CSS39 = `
 /* ==================== AURA RADIOBUTTON ==================== */
 .laughtale-radio-root,
 .p-radiobutton-root {
@@ -26166,7 +26448,7 @@ __export(textarea_exports, {
   default: () => TextareaIsland
 });
 function TextareaIsland(container, props) {
-  injectIslandStyle("laughtale-textarea", CSS41);
+  injectIslandStyle("laughtale-textarea", CSS40);
   const isAutoResize = props.autoResize === true || String(props.autoResize) === "true";
   const isFluid = props.fluid === true || String(props.fluid) === "true";
   const isInvalid = props.invalid === true || String(props.invalid) === "true";
@@ -26242,12 +26524,12 @@ function TextareaIsland(container, props) {
     setTimeout(adjustHeight, 0);
   }
 }
-var CSS41;
+var CSS40;
 var init_textarea = __esm({
   "src/components/textarea.ts"() {
     "use strict";
     init_styles();
-    CSS41 = `
+    CSS40 = `
 /* ==================== AURA TEXTAREA ==================== */
 .p-textarea {
     font-family: var(--p-font-family, inherit);
@@ -26372,7 +26654,7 @@ __export(input_mask_exports, {
   default: () => InputMaskIsland
 });
 function InputMaskIsland(container, props) {
-  injectIslandStyle("laughtale-input-mask", CSS42);
+  injectIslandStyle("laughtale-input-mask", CSS41);
   const mask = props.mask || "(999) 999-9999";
   const slotChar = props.slotChar || "_";
   const autoClear = props.autoClear !== false && String(props.autoClear) !== "false";
@@ -26559,12 +26841,12 @@ function InputMaskIsland(container, props) {
   });
   syncValue();
 }
-var CSS42;
+var CSS41;
 var init_input_mask = __esm({
   "src/components/input-mask.ts"() {
     "use strict";
     init_styles();
-    CSS42 = `
+    CSS41 = `
 /* ==================== AURA INPUTMASK ==================== */
 .laughtale-input-mask,
 .p-inputmask {
@@ -26674,7 +26956,7 @@ __export(float_label_exports, {
   default: () => FloatLabelIsland
 });
 function FloatLabelIsland(container, props) {
-  injectIslandStyle("laughtale-float-label", CSS43);
+  injectIslandStyle("laughtale-float-label", CSS42);
   const variant = props.variant || "over";
   const initialHtml = container.innerHTML;
   const forAttr = props.for ? `for="${props.for}"` : "";
@@ -26752,12 +27034,12 @@ function FloatLabelIsland(container, props) {
   setTimeout(updateFloatingState, 50);
   setTimeout(updateFloatingState, 200);
 }
-var CSS43;
+var CSS42;
 var init_float_label = __esm({
   "src/components/float-label.ts"() {
     "use strict";
     init_styles();
-    CSS43 = `
+    CSS42 = `
 .laughtale-float-label {
     position: relative;
     display: inline-flex;
@@ -26884,7 +27166,7 @@ __export(ifta_label_exports, {
   default: () => IftaLabelIsland
 });
 function IftaLabelIsland(container, props) {
-  injectIslandStyle("laughtale-ifta-label", CSS44);
+  injectIslandStyle("laughtale-ifta-label", CSS43);
   const initialHtml = container.innerHTML;
   const forAttr = props.for ? `for="${props.for}"` : "";
   const existingLabel = container.querySelector("label");
@@ -26907,12 +27189,12 @@ function IftaLabelIsland(container, props) {
     }
   });
 }
-var CSS44;
+var CSS43;
 var init_ifta_label = __esm({
   "src/components/ifta-label.ts"() {
     "use strict";
     init_styles();
-    CSS44 = `
+    CSS43 = `
 .laughtale-ifta-label {
     position: relative;
     display: inline-flex;
@@ -27000,14 +27282,14 @@ __export(input_group_exports, {
   default: () => InputGroupIsland
 });
 function InputGroupIsland(container, props) {
-  injectIslandStyle("laughtale-inputgroup", CSS45);
+  injectIslandStyle("laughtale-inputgroup", CSS44);
   container.classList.add("laughtale-inputgroup", "p-inputgroup");
   if (props.size) {
     container.classList.add(`size-${props.size}`);
   }
 }
 function InputGroupAddonIsland(container, props) {
-  injectIslandStyle("laughtale-inputgroup", CSS45);
+  injectIslandStyle("laughtale-inputgroup", CSS44);
   container.classList.add("laughtale-inputgroup-addon", "p-inputgroup-addon");
   if (props.icon && !container.querySelector("svg")) {
     const svg = getLucideIcon(props.icon);
@@ -27019,13 +27301,13 @@ function InputGroupAddonIsland(container, props) {
     container.insertAdjacentHTML("beforeend", `<span>${props.text}</span>`);
   }
 }
-var CSS45;
+var CSS44;
 var init_input_group = __esm({
   "src/components/input-group.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS45 = `
+    CSS44 = `
 .laughtale-inputgroup,
 .p-inputgroup {
     display: flex;
@@ -27297,7 +27579,7 @@ __export(input_text_exports, {
   default: () => InputTextIsland
 });
 function InputTextIsland(container, props) {
-  injectIslandStyle("laughtale-inputtext", CSS46);
+  injectIslandStyle("laughtale-inputtext", CSS45);
   const [getValue, setValue] = useControllableState({
     defaultValue: props.value ?? "",
     onChange: (val) => {
@@ -27438,14 +27720,14 @@ function InputTextIsland(container, props) {
   }
   init();
 }
-var CSS46, xIcon;
+var CSS45, xIcon;
 var init_input_text = __esm({
   "src/components/input-text.ts"() {
     "use strict";
     init_styles();
     init_lucide();
     init_useControllableState();
-    CSS46 = `
+    CSS45 = `
 .laughtale-inputtext-wrap,
 .p-inputtext-wrap {
     position: relative;
