@@ -1,7 +1,7 @@
 /**
  * SoftMax.LaughTale: Enterprise Sidebar Component Suite (PrimeVue 4 Aura Design System)
  * Complete compound navigation panel system matching PrimeVue 4 Aura specifications:
- * 1. App-Level Navigation Tree Sidebar for app shell (Showcase & Docs) with non-destructive 60fps transitions
+ * 1. App-Level Navigation Sidebar (Showcase & Docs) powered by the 100% unified Compound Sidebar Engine
  * 2. Variants Interactive Playground with Aura custom Select, SelectButton, and ToggleSwitch controls
  * 3. With Menu (Interactive Workspace Switcher + User Profile Popup Dropdown)
  * 4. Responsive (Mobile offcanvas overlay vs Desktop icon collapsible)
@@ -16,114 +16,142 @@ import { injectIslandStyle } from '../runtime/styles';
 
 const SIDEBAR_CSS = `
 /* ==========================================================================
-   1. PrimeVue 4 Aura Compound Sidebar Layout & Components (Silky Smooth 60fps)
+   PrimeVue 4 Aura Compound Sidebar Layout & Components
    ========================================================================== */
-.p-sidebar-app-shell {
+
+/* Main Layout Container */
+.p-sidebar-layout {
+    display: flex;
+    position: relative;
+    width: 100%;
+    min-height: 32rem;
+    height: 32rem;
+    background: var(--p-sidebar-layout-background, var(--p-surface-0, #ffffff));
+    overflow: hidden;
+    box-sizing: border-box;
+    font-family: var(--p-font-family, inherit);
+    border-radius: var(--p-border-radius, 8px);
+    border: 1px solid var(--p-border-color, #e2e8f0);
+}
+
+.p-sidebar-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
+    z-index: 90;
+    transition: opacity 280ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Base Sidebar Element */
+.p-sidebar {
     display: flex;
     flex-direction: column;
-    height: 100vh;
-    width: 270px;
-    min-width: 270px;
-    background: var(--p-surface-0, #ffffff);
-    border-right: 1px solid var(--p-border-color, #e2e8f0);
-    position: sticky;
-    top: 0;
-    left: 0;
-    transition: width 280ms cubic-bezier(0.16, 1, 0.3, 1), min-width 280ms cubic-bezier(0.16, 1, 0.3, 1);
+    height: 100%;
+    position: relative;
+    z-index: 100;
+    box-sizing: border-box;
+    transition: width 280ms cubic-bezier(0.16, 1, 0.3, 1), transform 280ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 280ms ease;
+    flex-shrink: 0;
+    overflow: hidden;
+    will-change: width, transform;
     font-family: var(--p-font-family, inherit);
-    box-sizing: border-box;
-    z-index: 40;
-    overflow: hidden;
-    will-change: width, min-width;
 }
 
-.p-sidebar-app-shell.p-collapsed {
-    width: 64px;
-    min-width: 64px;
+.p-sidebar-app-dock {
+    height: 100vh !important;
+    position: sticky !important;
+    top: 0 !important;
+    left: 0 !important;
+    border-radius: 0 !important;
 }
 
-.p-sidebar-header-dock {
+.p-sidebar-aside {
     display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    padding: 0.85rem 1rem;
-    border-bottom: 1px solid var(--p-border-color, #e2e8f0);
-    height: 60px;
-    box-sizing: border-box;
-    flex-shrink: 0;
-    transition: padding 280ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.p-sidebar-app-shell.p-collapsed .p-sidebar-header-dock {
-    padding: 0.85rem 0.5rem;
-    justify-content: center;
-}
-
-.p-sidebar-brand {
-    display: flex;
-    align-items: center;
-    gap: 0.65rem;
-    text-decoration: none;
-    color: var(--p-text-color, #0f172a);
-    overflow: hidden;
-    white-space: nowrap;
+    flex-direction: column;
+    height: 100%;
     width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
-.p-sidebar-app-shell.p-collapsed .p-sidebar-brand {
-    justify-content: center;
-    width: auto;
-}
-
-.p-sidebar-brand-logo {
+.p-sidebar-panel {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    background: var(--p-sidebar-panel-background, var(--p-surface-0, #ffffff));
+    color: var(--p-sidebar-panel-color, var(--p-text-color, #0f172a));
+    box-sizing: border-box;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Sidebar Variants */
+.p-sidebar-variant-sidebar {
+    border-right: 1px solid var(--p-sidebar-border-color, var(--p-border-color, #e2e8f0));
+}
+.p-sidebar-side-right.p-sidebar-variant-sidebar {
+    border-right: none;
+    border-left: 1px solid var(--p-sidebar-border-color, var(--p-border-color, #e2e8f0));
+}
+
+.p-sidebar-variant-floating {
+    padding: 0.5rem;
+}
+.p-sidebar-variant-floating .p-sidebar-panel {
+    border: 1px solid var(--p-border-color, #e2e8f0);
+    border-radius: var(--p-sidebar-panel-floating-border-radius, 10px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+}
+
+.p-sidebar-variant-inset {
+    background: var(--p-surface-50, #f8fafc);
+    padding: 0.5rem;
+}
+.p-sidebar-variant-inset .p-sidebar-panel {
+    background: transparent;
+}
+
+/* Overlay Mode */
+.p-sidebar.p-sidebar-overlay {
+    position: absolute !important;
+    top: 0;
+    bottom: 0;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.18), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+}
+.p-sidebar-side-left.p-sidebar-overlay {
+    left: 0;
+}
+.p-sidebar-side-right.p-sidebar-overlay {
+    right: 0;
+}
+
+/* Header Dock */
+.p-sidebar-header {
+    padding: 0.75rem 0.85rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    border-bottom: 1px solid var(--p-border-color, #e2e8f0);
+    min-height: 60px;
     justify-content: center;
-    width: 2rem;
-    height: 2rem;
-    border-radius: 8px;
-    background: linear-gradient(135deg, var(--p-primary-600, #10b981), #047857);
-    color: #ffffff;
+}
+
+/* Search Box */
+.p-sidebar-search-container {
+    padding: 0.5rem 0.85rem 0.25rem;
     flex-shrink: 0;
-    transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.p-sidebar-brand-logo:hover {
-    transform: scale(1.05);
-}
-
-.p-sidebar-brand-text {
-    font-size: 0.9375rem;
-    font-weight: 800;
-    letter-spacing: -0.01em;
-    color: var(--p-text-color, #0f172a);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    opacity: 1;
-    max-width: 200px;
-    transform: translateX(0);
-    transition: opacity 200ms cubic-bezier(0.16, 1, 0.3, 1), transform 200ms cubic-bezier(0.16, 1, 0.3, 1), max-width 280ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.p-sidebar-app-shell.p-collapsed .p-sidebar-brand-text {
-    opacity: 0;
-    max-width: 0;
-    transform: translateX(-10px);
-    pointer-events: none;
-}
-
-/* Search Dock Smooth Collapse */
-.p-sidebar-search-dock {
-    padding: 0.65rem 0.85rem 0.35rem;
-    flex-shrink: 0;
-    max-height: 56px;
+    max-height: 52px;
     opacity: 1;
     overflow: hidden;
-    transition: max-height 280ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms ease, padding 280ms cubic-bezier(0.16, 1, 0.3, 1);
+    transition: max-height 260ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms ease, padding 260ms ease;
 }
 
-.p-sidebar-app-shell.p-collapsed .p-sidebar-search-dock {
+.p-sidebar-collapsed .p-sidebar-search-container {
     max-height: 0;
     opacity: 0;
     padding-top: 0;
@@ -158,32 +186,50 @@ const SIDEBAR_CSS = `
     font-family: inherit;
 }
 
-.p-sidebar-content-dock {
+/* Content Area */
+.p-sidebar-content {
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 0.5rem 0.65rem;
+    padding: 0.5rem 0.6rem;
     display: flex;
     flex-direction: column;
-    gap: 0.65rem;
+    gap: 0.75rem;
+    box-sizing: border-box;
     scrollbar-width: thin;
     scrollbar-color: var(--p-surface-300) transparent;
-    transition: padding 280ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.p-sidebar-app-shell.p-collapsed .p-sidebar-content-dock {
+.p-sidebar-collapsed .p-sidebar-content {
     padding: 0.5rem 0.35rem;
     align-items: center;
 }
 
-.p-sidebar-content-dock::-webkit-scrollbar {
+.p-sidebar-content::-webkit-scrollbar {
     width: 4px;
 }
-.p-sidebar-content-dock::-webkit-scrollbar-thumb {
+.p-sidebar-content::-webkit-scrollbar-thumb {
     background: var(--p-surface-300);
     border-radius: 4px;
 }
 
+/* Footer Area */
+.p-sidebar-footer {
+    padding: 0.65rem 0.85rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    border-top: 1px solid var(--p-border-color, #e2e8f0);
+}
+
+.p-sidebar-collapsed .p-sidebar-footer {
+    padding: 0.65rem 0.35rem;
+    align-items: center;
+}
+
+/* Group & Menu Items */
 .p-sidebar-group {
     display: flex;
     flex-direction: column;
@@ -191,125 +237,29 @@ const SIDEBAR_CSS = `
     width: 100%;
 }
 
-.p-sidebar-group-header-btn {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    padding: 0.4rem 0.5rem;
-    background: transparent;
-    border: none;
-    color: var(--p-surface-500, #64748b);
+.p-sidebar-group-label {
     font-size: 0.725rem;
     font-weight: 700;
+    color: var(--p-sidebar-group-label-color, var(--p-surface-400, #94a3b8));
+    padding: 0.25rem 0.5rem 0.15rem;
+    user-select: none;
+    letter-spacing: 0.02em;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
-    cursor: pointer;
-    border-radius: var(--p-border-radius, 6px);
-    transition: background-color 0.15s ease, color 0.15s ease, padding 280ms cubic-bezier(0.16, 1, 0.3, 1);
-    text-align: left;
-    box-sizing: border-box;
-    overflow: hidden;
-}
-
-.p-sidebar-group-header-btn:hover {
-    background: var(--p-surface-100, #f1f5f9);
-    color: var(--p-text-color, #0f172a);
-}
-
-.p-sidebar-app-shell.p-collapsed .p-sidebar-content-dock {
-    padding: 0.5rem 0 !important;
-    align-items: center !important;
-    width: 64px !important;
-    box-sizing: border-box !important;
-}
-
-.p-sidebar-app-shell.p-collapsed .p-sidebar-group {
-    align-items: center !important;
-    width: 100% !important;
-    margin: 0 auto !important;
-}
-
-.p-sidebar-app-shell.p-collapsed .p-sidebar-group-header-btn {
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    width: 44px !important;
-    height: 44px !important;
-    margin: 0.15rem auto !important;
-    padding: 0 !important;
-    border-radius: var(--p-border-radius, 8px) !important;
-    box-sizing: border-box !important;
-}
-
-.p-sidebar-app-shell.p-collapsed .p-sidebar-group-header-btn > div {
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    width: 100% !important;
-    height: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    gap: 0 !important;
-}
-
-.p-sidebar-app-shell.p-collapsed .p-sidebar-group-header-btn span.p-sidebar-menu-button-icon {
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    width: 22px !important;
-    height: 22px !important;
-    margin: 0 auto !important;
-}
-
-.p-sidebar-app-shell.p-collapsed .p-sidebar-menu {
-    align-items: center !important;
-    width: 100% !important;
-}
-
-.p-sidebar-app-shell.p-collapsed .p-sidebar-menu-item {
-    display: flex !important;
-    justify-content: center !important;
-    width: 100% !important;
-}
-
-.p-sidebar-app-shell.p-collapsed .p-sidebar-menu-button {
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    width: 44px !important;
-    height: 44px !important;
-    margin: 0.1rem auto !important;
-    padding: 0 !important;
-    gap: 0 !important;
-    border-radius: var(--p-border-radius, 8px) !important;
-    box-sizing: border-box !important;
-}
-
-.p-sidebar-app-shell.p-collapsed .p-sidebar-menu-button span.p-sidebar-menu-button-icon {
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    width: 22px !important;
-    height: 22px !important;
-    margin: 0 auto !important;
-}
-
-.p-sidebar-group-header-label {
+    white-space: nowrap;
     opacity: 1;
     max-width: 200px;
     transform: translateX(0);
+    transition: opacity 200ms cubic-bezier(0.16, 1, 0.3, 1), transform 200ms cubic-bezier(0.16, 1, 0.3, 1), max-width 260ms ease;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
-    transition: opacity 200ms cubic-bezier(0.16, 1, 0.3, 1), transform 200ms cubic-bezier(0.16, 1, 0.3, 1), max-width 280ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.p-sidebar-app-shell.p-collapsed .p-sidebar-group-header-label {
+.p-sidebar-collapsed .p-sidebar-group-label {
     opacity: 0;
     max-width: 0;
-    transform: translateX(-10px);
+    transform: translateX(-8px);
     pointer-events: none;
+    display: none;
 }
 
 .p-sidebar-menu {
@@ -318,7 +268,7 @@ const SIDEBAR_CSS = `
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.125rem;
+    gap: 0.15rem;
     width: 100%;
 }
 
@@ -328,6 +278,8 @@ const SIDEBAR_CSS = `
     padding: 0;
     position: relative;
     width: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .p-sidebar-menu-button {
@@ -335,6 +287,7 @@ const SIDEBAR_CSS = `
     align-items: center;
     gap: 0.65rem;
     width: 100%;
+    min-height: 2.25rem;
     padding: 0.45rem 0.65rem;
     border-radius: var(--p-border-radius, 6px);
     color: var(--p-sidebar-menu-button-color, var(--p-text-color, #0f172a));
@@ -344,7 +297,7 @@ const SIDEBAR_CSS = `
     cursor: pointer;
     font-size: 0.8125rem;
     font-weight: 500;
-    transition: background-color 0.15s ease, color 0.15s ease, padding 280ms cubic-bezier(0.16, 1, 0.3, 1), border-color 0.15s ease;
+    transition: background-color 0.12s ease, color 0.12s ease, padding 260ms ease, border-color 0.12s ease;
     box-sizing: border-box;
     text-align: left;
     outline: none;
@@ -364,12 +317,6 @@ const SIDEBAR_CSS = `
     border-color: var(--p-primary-200, #a7f3d0);
 }
 
-.p-sidebar-app-shell.p-collapsed .p-sidebar-menu-button {
-    justify-content: center;
-    padding: 0.5rem 0;
-    gap: 0;
-}
-
 .p-sidebar-menu-button-icon {
     display: inline-flex;
     align-items: center;
@@ -378,7 +325,7 @@ const SIDEBAR_CSS = `
     height: 1.25rem;
     flex-shrink: 0;
     color: var(--p-surface-500, #64748b);
-    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), color 0.15s ease;
+    transition: transform 0.15s ease, color 0.12s ease;
 }
 
 .p-sidebar-menu-button:hover .p-sidebar-menu-button-icon {
@@ -398,14 +345,7 @@ const SIDEBAR_CSS = `
     opacity: 1;
     max-width: 200px;
     transform: translateX(0);
-    transition: opacity 200ms cubic-bezier(0.16, 1, 0.3, 1), transform 200ms cubic-bezier(0.16, 1, 0.3, 1), max-width 280ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.p-sidebar-app-shell.p-collapsed .p-sidebar-item-label {
-    opacity: 0;
-    max-width: 0;
-    transform: translateX(-10px);
-    pointer-events: none;
+    transition: opacity 200ms cubic-bezier(0.16, 1, 0.3, 1), transform 200ms cubic-bezier(0.16, 1, 0.3, 1), max-width 260ms ease;
 }
 
 .p-sidebar-menu-badge {
@@ -422,37 +362,54 @@ const SIDEBAR_CSS = `
     transition: opacity 180ms ease, transform 180ms ease;
 }
 
-.p-sidebar-app-shell.p-collapsed .p-sidebar-menu-badge {
-    opacity: 0;
-    transform: scale(0.6);
-    pointer-events: none;
-}
-
 .p-sidebar-submenu-chevron {
     margin-left: auto;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     color: var(--p-surface-400, #94a3b8);
-    transition: transform 260ms cubic-bezier(0.16, 1, 0.3, 1), opacity 180ms ease;
+    transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1);
     flex-shrink: 0;
-    opacity: 1;
 }
 
 .p-sidebar-submenu-chevron.p-expanded {
     transform: rotate(180deg);
 }
 
-.p-sidebar-app-shell.p-collapsed .p-sidebar-submenu-chevron {
-    opacity: 0;
-    pointer-events: none;
+.p-sidebar-menu-action {
+    position: absolute;
+    right: 0.35rem;
+    top: 50%;
+    transform: translateY(-50%);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 4px;
+    color: var(--p-surface-500, #64748b);
+    cursor: pointer;
+    background: var(--p-surface-200, #e2e8f0);
+    border: none;
+    transition: background-color 0.12s ease, color 0.12s ease, transform 0.12s ease;
+    z-index: 10;
+}
+
+.p-sidebar-menu-item:hover .p-sidebar-menu-action {
+    display: inline-flex;
+}
+
+.p-sidebar-menu-action:hover {
+    background: #fee2e2;
+    color: #dc2626;
+    transform: translateY(-50%) scale(1.08);
 }
 
 /* Fluid CSS Grid Submenu Expand/Collapse Animation */
 .p-sidebar-menu-sub-wrapper {
     display: grid;
     grid-template-rows: 0fr;
-    transition: grid-template-rows 280ms cubic-bezier(0.16, 1, 0.3, 1), opacity 240ms ease;
+    transition: grid-template-rows 260ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms ease;
     opacity: 0;
 }
 
@@ -471,10 +428,6 @@ const SIDEBAR_CSS = `
     display: flex;
     flex-direction: column;
     gap: 0.125rem;
-}
-
-.p-sidebar-app-shell.p-collapsed .p-sidebar-menu-sub-wrapper {
-    display: none;
 }
 
 .p-sidebar-menu-sub-button {
@@ -504,107 +457,89 @@ const SIDEBAR_CSS = `
     background: var(--p-primary-50, #ecfdf5);
 }
 
-.p-sidebar-footer-dock {
-    padding: 0.65rem 0.85rem;
-    border-top: 1px solid var(--p-border-color, #e2e8f0);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-shrink: 0;
-    box-sizing: border-box;
-    transition: padding 280ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.p-sidebar-app-shell.p-collapsed .p-sidebar-footer-dock {
-    justify-content: center;
-    padding: 0.65rem 0;
-}
-
-.p-sidebar-footer-text {
-    opacity: 1;
-    max-width: 200px;
-    transform: translateX(0);
-    transition: opacity 200ms cubic-bezier(0.16, 1, 0.3, 1), transform 200ms cubic-bezier(0.16, 1, 0.3, 1), max-width 280ms cubic-bezier(0.16, 1, 0.3, 1);
-    overflow: hidden;
-    white-space: nowrap;
-}
-
-.p-sidebar-app-shell.p-collapsed .p-sidebar-footer-text {
-    opacity: 0;
-    max-width: 0;
-    transform: translateX(-10px);
-    pointer-events: none;
-}
-
-/* Dark Mode Tokens for App Shell */
-.dark .p-sidebar-app-shell,
-[data-theme="dark"] .p-sidebar-app-shell {
-    background: var(--p-surface-900, #0f172a);
-    border-color: var(--p-surface-800, #1e293b);
-}
-
-.dark .p-sidebar-header-dock,
-[data-theme="dark"] .p-sidebar-header-dock,
-.dark .p-sidebar-footer-dock,
-[data-theme="dark"] .p-sidebar-footer-dock {
-    border-color: var(--p-surface-800, #1e293b);
-}
-
-.dark .p-sidebar-search-box,
-[data-theme="dark"] .p-sidebar-search-box {
-    background: var(--p-surface-950, #020617);
-    border-color: var(--p-surface-800, #1e293b);
-}
-
-.dark .p-sidebar-menu-button,
-[data-theme="dark"] .p-sidebar-menu-button {
-    color: var(--p-surface-200, #e2e8f0);
-}
-
-.dark .p-sidebar-menu-button:hover,
-[data-theme="dark"] .p-sidebar-menu-button:hover {
-    background: var(--p-surface-800, #1e293b);
-    color: var(--p-surface-0, #f8fafc);
-}
-
-.dark .p-sidebar-menu-button.p-active,
-[data-theme="dark"] .p-sidebar-menu-button.p-active {
-    background: rgba(16, 185, 129, 0.15);
-    color: #6ee7b7;
-    border-color: rgba(16, 185, 129, 0.3);
-}
-
-.dark .p-sidebar-menu-badge,
-[data-theme="dark"] .p-sidebar-menu-badge {
-    background: var(--p-surface-800, #1e293b);
-    color: var(--p-surface-300, #cbd5e1);
-}
-
-.dark .p-sidebar-menu-sub,
-[data-theme="dark"] .p-sidebar-menu-sub {
-    border-color: var(--p-surface-800, #1e293b);
-}
-
-.dark .p-sidebar-menu-sub-button,
-[data-theme="dark"] .p-sidebar-menu-sub-button {
-    color: var(--p-surface-400, #94a3b8);
-}
-
-.dark .p-sidebar-menu-sub-button:hover,
-[data-theme="dark"] .p-sidebar-menu-sub-button:hover {
-    background: var(--p-surface-800, #1e293b);
-    color: var(--p-surface-0, #f8fafc);
-}
-
-.dark .p-sidebar-menu-sub-button.p-active,
-[data-theme="dark"] .p-sidebar-menu-sub-button.p-active {
-    background: rgba(16, 185, 129, 0.15);
-    color: #6ee7b7;
-}
-
 /* ==========================================================================
-   2. PrimeVue 4 Aura Compound Playground & Demo Layouts
+   Collapsed Icon Mode Rules (Applies to both App Shell and Demos)
    ========================================================================== */
+.p-sidebar-collapsible-icon.p-sidebar-collapsed {
+    width: 3.5rem !important; /* 56px compact icon dock */
+}
+
+.p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-header {
+    padding: 0.75rem 0.25rem;
+    align-items: center;
+}
+
+.p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-item-label,
+.p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-group-label,
+.p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-menu-badge,
+.p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-submenu-chevron,
+.p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-header-label,
+.p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-footer-label {
+    opacity: 0 !important;
+    max-width: 0 !important;
+    transform: translateX(-8px) !important;
+    pointer-events: none !important;
+    display: none !important;
+}
+
+.p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-menu-sub-wrapper,
+.p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-menu-action {
+    display: none !important;
+}
+
+.p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-menu-button {
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 0 !important;
+    width: 2.5rem !important;
+    height: 2.5rem !important;
+    margin: 0 auto !important;
+    border-radius: var(--p-border-radius, 8px) !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+}
+
+.p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-menu-button-icon {
+    margin: 0 auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* Offcanvas Collapsed Mode */
+.p-sidebar-collapsible-offcanvas.p-sidebar-collapsed {
+    width: 0 !important;
+    transform: translateX(-100%);
+}
+.p-sidebar-side-right.p-sidebar-collapsible-offcanvas.p-sidebar-collapsed {
+    transform: translateX(100%);
+}
+
+/* Trigger Button */
+.p-sidebar-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.1rem;
+    height: 2.1rem;
+    border-radius: var(--p-border-radius, 6px);
+    border: 1px solid var(--p-border-color, #cbd5e1);
+    background: transparent;
+    color: var(--p-surface-600, #475569);
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease, transform 0.12s ease;
+}
+
+.p-sidebar-trigger:hover {
+    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-text-color, #0f172a);
+}
+
+.p-sidebar-trigger:active {
+    transform: scale(0.94);
+}
+
+/* Controls Toolbar */
 .p-sidebar-playground-wrapper {
     display: flex;
     flex-direction: column;
@@ -784,213 +719,6 @@ const SIDEBAR_CSS = `
     transform: translateX(1.15rem);
 }
 
-.p-sidebar-layout {
-    display: flex;
-    position: relative;
-    width: 100%;
-    min-height: 32rem;
-    height: 32rem;
-    background: var(--p-sidebar-layout-background, var(--p-surface-0, #ffffff));
-    overflow: hidden;
-    box-sizing: border-box;
-    font-family: inherit;
-    border-radius: var(--p-border-radius, 8px);
-    border: 1px solid var(--p-border-color, #e2e8f0);
-}
-
-.p-sidebar-backdrop {
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(2px);
-    z-index: 90;
-    transition: opacity 280ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.p-sidebar {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    position: relative;
-    z-index: 100;
-    box-sizing: border-box;
-    transition: width 280ms cubic-bezier(0.16, 1, 0.3, 1), transform 280ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 280ms ease;
-    flex-shrink: 0;
-    overflow: hidden;
-    will-change: width, transform;
-}
-
-.p-sidebar-aside {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    width: 100%;
-    box-sizing: border-box;
-    overflow: hidden;
-}
-
-.p-sidebar-panel {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    width: 100%;
-    background: var(--p-sidebar-panel-background, var(--p-surface-0, #ffffff));
-    color: var(--p-sidebar-panel-color, var(--p-text-color, #0f172a));
-    box-sizing: border-box;
-    overflow: hidden;
-    position: relative;
-}
-
-.p-sidebar-variant-sidebar {
-    border-right: 1px solid var(--p-sidebar-border-color, var(--p-border-color, #e2e8f0));
-}
-.p-sidebar-side-right.p-sidebar-variant-sidebar {
-    border-right: none;
-    border-left: 1px solid var(--p-sidebar-border-color, var(--p-border-color, #e2e8f0));
-}
-
-.p-sidebar-variant-floating {
-    padding: 0.5rem;
-}
-.p-sidebar-variant-floating .p-sidebar-panel {
-    border: 1px solid var(--p-border-color, #e2e8f0);
-    border-radius: var(--p-sidebar-panel-floating-border-radius, 10px);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-}
-
-.p-sidebar-variant-inset {
-    background: var(--p-surface-50, #f8fafc);
-    padding: 0.5rem;
-}
-.p-sidebar-variant-inset .p-sidebar-panel {
-    background: transparent;
-}
-
-.p-sidebar.p-sidebar-overlay {
-    position: absolute !important;
-    top: 0;
-    bottom: 0;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.18), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-    z-index: 100;
-}
-.p-sidebar-side-left.p-sidebar-overlay {
-    left: 0;
-}
-.p-sidebar-side-right.p-sidebar-overlay {
-    right: 0;
-}
-
-.p-sidebar-collapsible-icon.p-sidebar-collapsed {
-    width: 3.5rem !important;
-}
-
-.p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-item-label,
-.p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-group-label,
-.p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-menu-badge,
-.p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-submenu-chevron,
-.p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-header-label,
-.p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-footer-label {
-    opacity: 0;
-    transform: translateX(-6px);
-    pointer-events: none;
-    display: none;
-}
-
-.p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-menu-sub-wrapper,
-.p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-menu-action {
-    display: none !important;
-}
-
-.p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-menu-button {
-    justify-content: center !important;
-    padding: 0.5rem 0 !important;
-}
-
-.p-sidebar-collapsible-offcanvas.p-sidebar-collapsed {
-    width: 0 !important;
-    transform: translateX(-100%);
-}
-.p-sidebar-side-right.p-sidebar-collapsible-offcanvas.p-sidebar-collapsed {
-    transform: translateX(100%);
-}
-
-.p-sidebar-header {
-    padding: var(--p-sidebar-header-padding, 0.65rem 0.75rem);
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-    flex-shrink: 0;
-    box-sizing: border-box;
-}
-
-.p-sidebar-content {
-    flex: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding: 0.35rem 0.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    box-sizing: border-box;
-    scrollbar-width: thin;
-    scrollbar-color: var(--p-surface-300) transparent;
-}
-
-.p-sidebar-content::-webkit-scrollbar {
-    width: 4px;
-}
-.p-sidebar-content::-webkit-scrollbar-thumb {
-    background: var(--p-surface-300);
-    border-radius: 4px;
-}
-
-.p-sidebar-footer {
-    padding: var(--p-sidebar-footer-padding, 0.65rem 0.75rem);
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-    flex-shrink: 0;
-    box-sizing: border-box;
-}
-
-.p-sidebar-group-label {
-    font-size: 0.725rem;
-    font-weight: 700;
-    color: var(--p-sidebar-group-label-color, var(--p-surface-400, #94a3b8));
-    padding: 0.25rem 0.5rem 0.15rem;
-    user-select: none;
-    letter-spacing: 0.02em;
-}
-
-.p-sidebar-menu-action {
-    position: absolute;
-    right: 0.35rem;
-    top: 50%;
-    transform: translateY(-50%);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    width: 1.5rem;
-    height: 1.5rem;
-    border-radius: 4px;
-    color: var(--p-surface-500, #64748b);
-    cursor: pointer;
-    background: var(--p-surface-200, #e2e8f0);
-    border: none;
-    transition: background-color 0.12s ease, color 0.12s ease, transform 0.12s ease;
-    z-index: 10;
-}
-
-.p-sidebar-menu-item:hover .p-sidebar-menu-action {
-    display: inline-flex;
-}
-
-.p-sidebar-menu-action:hover {
-    background: #fee2e2;
-    color: #dc2626;
-    transform: translateY(-50%) scale(1.08);
-}
-
 .p-sidebar-main {
     flex: 1;
     display: flex;
@@ -1011,29 +739,6 @@ const SIDEBAR_CSS = `
     border-bottom: 1px solid var(--p-border-color, #e2e8f0);
     background: var(--p-surface-0, #ffffff);
     flex-shrink: 0;
-}
-
-.p-sidebar-trigger {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.1rem;
-    height: 2.1rem;
-    border-radius: var(--p-border-radius, 6px);
-    border: 1px solid var(--p-border-color, #cbd5e1);
-    background: transparent;
-    color: var(--p-surface-600, #475569);
-    cursor: pointer;
-    transition: background-color 0.15s ease, color 0.15s ease, transform 0.12s ease;
-}
-
-.p-sidebar-trigger:hover {
-    background: var(--p-surface-100, #f1f5f9);
-    color: var(--p-text-color, #0f172a);
-}
-
-.p-sidebar-trigger:active {
-    transform: scale(0.94);
 }
 
 .p-sb-popup-menu {
@@ -1177,6 +882,89 @@ const SIDEBAR_CSS = `
     opacity: 0.9;
     transform: scale(1.05);
 }
+
+/* Dark Mode Tokens */
+.dark .p-sidebar-layout,
+[data-theme="dark"] .p-sidebar-layout {
+    background: var(--p-surface-950, #020617);
+    border-color: var(--p-surface-800, #1e293b);
+}
+
+.dark .p-sidebar-panel,
+[data-theme="dark"] .p-sidebar-panel {
+    background: var(--p-surface-900, #0f172a);
+    color: var(--p-surface-0, #f8fafc);
+}
+
+.dark .p-sidebar-header,
+[data-theme="dark"] .p-sidebar-header,
+.dark .p-sidebar-footer,
+[data-theme="dark"] .p-sidebar-footer {
+    border-color: var(--p-surface-800, #1e293b);
+}
+
+.dark .p-sidebar-search-box,
+[data-theme="dark"] .p-sidebar-search-box {
+    background: var(--p-surface-950, #020617);
+    border-color: var(--p-surface-800, #1e293b);
+}
+
+.dark .p-sidebar-menu-button,
+[data-theme="dark"] .p-sidebar-menu-button {
+    color: var(--p-surface-200, #e2e8f0);
+}
+
+.dark .p-sidebar-menu-button:hover,
+[data-theme="dark"] .p-sidebar-menu-button:hover {
+    background: var(--p-surface-800, #1e293b);
+    color: var(--p-surface-0, #f8fafc);
+}
+
+.dark .p-sidebar-menu-button.p-active,
+[data-theme="dark"] .p-sidebar-menu-button.p-active {
+    background: rgba(16, 185, 129, 0.15);
+    color: #6ee7b7;
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+.dark .p-sidebar-menu-badge,
+[data-theme="dark"] .p-sidebar-menu-badge {
+    background: var(--p-surface-800, #1e293b);
+    color: var(--p-surface-300, #cbd5e1);
+}
+
+.dark .p-sidebar-menu-sub,
+[data-theme="dark"] .p-sidebar-menu-sub {
+    border-color: var(--p-surface-800, #1e293b);
+}
+
+.dark .p-sidebar-menu-sub-button,
+[data-theme="dark"] .p-sidebar-menu-sub-button {
+    color: var(--p-surface-400, #94a3b8);
+}
+
+.dark .p-sidebar-menu-sub-button:hover,
+[data-theme="dark"] .p-sidebar-menu-sub-button:hover {
+    background: var(--p-surface-800, #1e293b);
+    color: var(--p-surface-0, #f8fafc);
+}
+
+.dark .p-sidebar-menu-sub-button.p-active,
+[data-theme="dark"] .p-sidebar-menu-sub-button.p-active {
+    background: rgba(16, 185, 129, 0.15);
+    color: #6ee7b7;
+}
+
+.dark .p-sidebar-main,
+[data-theme="dark"] .p-sidebar-main {
+    background: var(--p-surface-950, #020617);
+}
+
+.dark .p-sidebar-main-header,
+[data-theme="dark"] .p-sidebar-main-header {
+    background: var(--p-surface-900, #0f172a);
+    border-color: var(--p-surface-800, #1e293b);
+}
 `;
 
 export interface SidebarSubItem {
@@ -1218,7 +1006,7 @@ export interface SidebarProps {
     open?: boolean;
     width?: string;
     iconWidth?: string;
-    demoType?: 'variants' | 'menu' | 'responsive' | 'dual' | 'multi' | 'nested' | 'chat';
+    demoType?: 'variants' | 'menu' | 'responsive' | 'dual' | 'multi' | 'nested' | 'chat' | 'app';
     groups?: SidebarGroupModel[];
     headerTitle?: string;
     headerLogo?: string;
@@ -1234,230 +1022,56 @@ export default function SidebarIsland(container: HTMLElement, props: SidebarProp
     const hasAppItems = Array.isArray(props.items) && props.items.length > 0 && !props.groups;
 
     if (hasAppItems) {
-        renderAppNavigationSidebar(container, props);
+        // Convert hierarchical SidebarItem[] into SidebarGroupModel[] for the unified engine
+        const appGroups: SidebarGroupModel[] = [];
+        props.items!.forEach(topItem => {
+            const groupLabel = (topItem as any).label || (topItem as any).Label || '';
+            const subList = (topItem as any).items || (topItem as any).Items;
+            if (Array.isArray(subList) && subList.length > 0) {
+                const groupItems: SidebarItemModel[] = subList.map((sub: any) => ({
+                    label: sub.label || sub.Label || '',
+                    icon: sub.icon || sub.Icon || topItem.icon || (topItem as any).Icon || 'folder',
+                    url: sub.url || sub.Url,
+                    isActive: sub.active || sub.Active || false,
+                    badge: sub.badge || sub.Badge,
+                    defaultOpen: sub.expanded || sub.Expanded || false
+                }));
+                appGroups.push({ label: groupLabel, items: groupItems });
+            } else {
+                appGroups.push({
+                    label: '',
+                    items: [{
+                        label: groupLabel,
+                        icon: topItem.icon || (topItem as any).Icon || 'folder',
+                        url: topItem.url || (topItem as any).Url,
+                        isActive: topItem.active || (topItem as any).Active || false,
+                        badge: topItem.badge || (topItem as any).Badge
+                    }]
+                });
+            }
+        });
+
+        renderCompoundSidebar(container, {
+            ...props,
+            groups: appGroups,
+            demoType: 'app',
+            headerTitle: props.title || 'SoftMax Aura',
+            collapsible: 'icon',
+            variant: 'sidebar',
+            width: '16.5rem',
+            open: !props.collapsed
+        });
     } else {
         renderCompoundSidebar(container, props);
     }
 }
 
 /**
- * Render PrimeVue 4 Aura Full App Shell Sidebar (Non-destructive 60fps animations)
- */
-function renderAppNavigationSidebar(container: HTMLElement, props: SidebarProps) {
-    let isCollapsed = props.collapsed || false;
-    let searchQuery = '';
-    const items = props.items || [];
-    const title = props.title || 'SoftMax Aura';
-    const searchable = props.searchable !== false;
-
-    const expandedMap: Record<string, boolean> = {};
-
-    function initExpanded(itemList: SidebarItem[]) {
-        itemList.forEach(item => {
-            const label = (item as any).label || (item as any).Label || '';
-            const isExpanded = (item as any).expanded !== false && (item as any).Expanded !== false;
-            if (label && expandedMap[label] === undefined) {
-                expandedMap[label] = isExpanded;
-            }
-            const children = (item as any).items || (item as any).Items;
-            if (Array.isArray(children)) {
-                initExpanded(children);
-            }
-        });
-    }
-    initExpanded(items);
-
-    function getIconSvg(iconName?: string): string {
-        if (!iconName) return '';
-        if (iconName.startsWith('<svg')) return iconName;
-        if ((LucideIcons as any)[iconName]) return (LucideIcons as any)[iconName];
-        return '';
-    }
-
-    function renderNode(item: SidebarItem, level: number = 0): string {
-        const label = (item as any).label || (item as any).Label || (item as any).title || (item as any).Title || '';
-        const url = (item as any).url || (item as any).Url || '#';
-        const icon = (item as any).icon || (item as any).Icon || '';
-        const active = (item as any).active || (item as any).Active || false;
-        const badge = (item as any).badge || (item as any).Badge || '';
-        const children = (item as any).items || (item as any).Items;
-        const hasChildren = Array.isArray(children) && children.length > 0;
-        const isExpanded = expandedMap[label] ?? true;
-        const iconSvg = getIconSvg(icon);
-
-        if (searchQuery) {
-            const q = searchQuery.toLowerCase();
-            const matchesSelf = label.toLowerCase().includes(q);
-            const matchesChild = hasChildren && children.some((c: any) => ((c.label || c.Label || '').toLowerCase().includes(q)));
-            if (!matchesSelf && !matchesChild) return '';
-        }
-
-        if (hasChildren) {
-            const childrenHtml = children.map((child: SidebarItem) => renderNode(child, level + 1)).join('');
-            
-            return `
-                <div class="p-sidebar-group" data-label="${label}">
-                    <button type="button" class="p-sidebar-group-header-btn" data-group-toggle="${label}" title="${label}">
-                        <div style="display: flex; align-items: center; gap: 0.5rem; min-width: 0;">
-                            ${iconSvg ? `<span class="p-sidebar-menu-button-icon" style="color: var(--p-primary-600);">${iconSvg}</span>` : ''}
-                            <span class="p-sidebar-group-header-label">${label}</span>
-                        </div>
-                        <svg class="p-sidebar-submenu-chevron ${isExpanded ? 'p-expanded' : ''}" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-                    </button>
-                    <div class="p-sidebar-menu-sub-wrapper ${isExpanded ? 'p-expanded' : ''}">
-                        <ul class="p-sidebar-menu-sub" style="margin-left: 0.85rem;">
-                            ${childrenHtml}
-                        </ul>
-                    </div>
-                </div>
-            `;
-        }
-
-        return `
-            <li class="p-sidebar-menu-item">
-                <a href="${url}" class="p-sidebar-menu-button ${active ? 'p-active' : ''}" data-sidebar-link="${url}" title="${label}">
-                    ${iconSvg ? `<span class="p-sidebar-menu-button-icon">${iconSvg}</span>` : ''}
-                    <span class="p-sidebar-item-label">${label}</span>
-                    ${badge ? `<span class="p-sidebar-menu-badge">${badge}</span>` : ''}
-                </a>
-            </li>
-        `;
-    }
-
-    function toggleCollapse() {
-        isCollapsed = !isCollapsed;
-        const shell = container.querySelector<HTMLElement>('.p-sidebar-app-shell');
-        if (shell) {
-            shell.classList.toggle('p-collapsed', isCollapsed);
-        }
-    }
-
-    function render() {
-        const searchIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>`;
-
-        container.innerHTML = `
-            <aside class="p-sidebar-app-shell ${isCollapsed ? 'p-collapsed' : ''}" data-app-sidebar-root>
-                <!-- Header Dock -->
-                <div class="p-sidebar-header-dock">
-                    <a href="/" class="p-sidebar-brand" title="${title}">
-                        <div class="p-sidebar-brand-logo">
-                            ${LucideIcons.layers || '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.9a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg>'}
-                        </div>
-                        <span class="p-sidebar-brand-text">${title}</span>
-                    </a>
-                </div>
-
-                <!-- Search Input with Smooth Height Transition -->
-                ${searchable ? `
-                    <div class="p-sidebar-search-dock">
-                        <div class="p-sidebar-search-box">
-                            <span style="color: var(--p-surface-400); display: flex; align-items: center;">${searchIconSvg}</span>
-                            <input type="text" class="p-sidebar-search-input" placeholder="Search navigation..." value="${searchQuery}" />
-                        </div>
-                    </div>
-                ` : ''}
-
-                <!-- Navigation Groups Content -->
-                <div class="p-sidebar-content-dock">
-                    ${items.map(item => renderNode(item)).join('')}
-                </div>
-
-                <!-- Footer Dock -->
-                <div class="p-sidebar-footer-dock">
-                    <div style="display: flex; align-items: center; gap: 0.5rem; overflow: hidden;">
-                        <div style="width: 1.5rem; height: 1.5rem; border-radius: 9999px; background: var(--p-surface-200); display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700; color: var(--p-surface-700); flex-shrink: 0;">LT</div>
-                        <span class="p-sidebar-footer-text" style="font-size: 0.775rem; font-weight: 600; color: var(--p-text-muted); white-space: nowrap;">SoftMax LaughTale</span>
-                    </div>
-                    <span class="p-sidebar-footer-text aura-tag tag-emerald" style="font-size: 0.65rem; padding: 0.1rem 0.4rem;">v3.0</span>
-                </div>
-            </aside>
-        `;
-
-        bindEvents();
-    }
-
-    function bindEvents() {
-        // Global external trigger hook (non-destructive class toggle!)
-        const onGlobalToggle = () => {
-            toggleCollapse();
-        };
-        document.removeEventListener('app-sidebar:toggle', (window as any).__appSidebarHandler);
-        (window as any).__appSidebarHandler = onGlobalToggle;
-        document.addEventListener('app-sidebar:toggle', onGlobalToggle);
-
-        const searchInput = container.querySelector<HTMLInputElement>('.p-sidebar-search-input');
-        if (searchInput) {
-            searchInput.addEventListener('input', (e) => {
-                searchQuery = (e.target as HTMLInputElement).value;
-                const contentEl = container.querySelector('.p-sidebar-content-dock');
-                if (contentEl) {
-                    contentEl.innerHTML = items.map(item => renderNode(item)).join('');
-                    bindGroupToggles();
-                    bindLinkClicks();
-                }
-            });
-        }
-
-        bindGroupToggles();
-        bindLinkClicks();
-    }
-
-    function bindGroupToggles() {
-        container.querySelectorAll('[data-group-toggle]').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const groupLabel = btn.getAttribute('data-group-toggle');
-                if (groupLabel) {
-                    expandedMap[groupLabel] = !expandedMap[groupLabel];
-                    const isExp = expandedMap[groupLabel];
-                    const groupEl = btn.closest('.p-sidebar-group');
-                    if (groupEl) {
-                        const wrapper = groupEl.querySelector('.p-sidebar-menu-sub-wrapper');
-                        const chevron = btn.querySelector('.p-sidebar-submenu-chevron');
-                        if (wrapper) {
-                            wrapper.classList.toggle('p-expanded', isExp);
-                        }
-                        if (chevron) {
-                            chevron.classList.toggle('p-expanded', isExp);
-                        }
-                    }
-                }
-            });
-        });
-    }
-
-    function bindLinkClicks() {
-        container.querySelectorAll<HTMLAnchorElement>('a[data-sidebar-link]').forEach(link => {
-            link.addEventListener('click', (e) => {
-                const href = link.getAttribute('href') || '';
-                const hashIndex = href.indexOf('#');
-                if (hashIndex >= 0 && (href.startsWith('#') || href.startsWith(window.location.pathname))) {
-                    const targetId = href.substring(hashIndex + 1);
-                    const targetEl = document.getElementById(targetId);
-
-                    if (targetEl) {
-                        e.preventDefault();
-                        targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-                        container.querySelectorAll('.p-sidebar-menu-button').forEach(el => el.classList.remove('p-active'));
-                        link.classList.add('p-active');
-
-                        window.history.pushState(null, '', href);
-                    }
-                }
-            });
-        });
-    }
-
-    render();
-}
-
-/**
- * Render PrimeVue 4 Aura Compound Sidebar Component (Playground & Showcase Demos)
+ * Render PrimeVue 4 Aura Compound Sidebar Component
  */
 function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
     const demoType = props.demoType || (props as any).DemoType || 'variants';
+    const isAppMode = demoType === 'app';
     const showControls = props.showControls !== false && demoType === 'variants';
 
     let variant = props.variant || (props as any).Variant || 'sidebar';
@@ -1467,11 +1081,10 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
     let openOnHover = props.openOnHover || (props as any).OpenOnHover || false;
     let backdrop = props.backdrop || (props as any).Backdrop || false;
     let isOpen = props.open !== undefined ? props.open : ((props as any).Open !== undefined ? (props as any).Open : true);
-    let width = props.width || (props as any).Width || (demoType === 'chat' ? '18rem' : '16rem');
+    let width = props.width || (props as any).Width || (demoType === 'chat' ? '18rem' : '16.5rem');
+    let searchQuery = '';
 
-    let isAiOpen = true;
     let openSelectDropdown: 'variant' | 'collapsible' | null = null;
-
     let activeCompany = { name: 'Acme Inc', logo: 'A', color: 'linear-gradient(135deg, #8b5cf6, #4f46e5)' };
     let showCompanyPopup = false;
     let showUserPopup = false;
@@ -1535,7 +1148,13 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
 
     function renderGroupsHtml(groupList: SidebarGroupModel[]): string {
         return groupList.map((g, gIdx) => {
-            const itemsHtml = g.items.map((it, iIdx) => {
+            const filteredItems = searchQuery 
+                ? g.items.filter(it => it.label.toLowerCase().includes(searchQuery.toLowerCase()))
+                : g.items;
+
+            if (filteredItems.length === 0 && searchQuery) return '';
+
+            const itemsHtml = filteredItems.map((it, iIdx) => {
                 const subKey = `${gIdx}_${iIdx}`;
                 if (it.defaultOpen && expandedSubmenus[subKey] === undefined) {
                     expandedSubmenus[subKey] = true;
@@ -1566,14 +1185,20 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
 
                 const actionButton = demoType === 'chat' ? trashSvg : (it.badge === undefined ? ellipsisSvg : '');
 
+                const tagOrLink = it.url 
+                    ? `<a href="${it.url}" class="p-sidebar-menu-button ${it.isActive ? 'p-active' : ''}" data-sidebar-link="${it.url}" title="${it.label}">` 
+                    : `<button type="button" class="p-sidebar-menu-button ${it.isActive ? 'p-active' : ''}" data-has-subs="${hasSubs}" title="${it.label}">`;
+
+                const closeTag = it.url ? '</a>' : '</button>';
+
                 return `
                     <li class="p-sidebar-menu-item" data-subkey="${subKey}">
-                        <button type="button" class="p-sidebar-menu-button ${it.isActive ? 'p-active' : ''}" data-has-subs="${hasSubs}">
+                        ${tagOrLink}
                             ${iconSvg ? `<span class="p-sidebar-menu-button-icon">${iconSvg}</span>` : ''}
                             <span class="p-sidebar-item-label">${it.label}</span>
                             ${it.badge !== undefined ? `<span class="p-sidebar-menu-badge">${it.badge}</span>` : ''}
-                            ${hasSubs ? chevronSvg : actionButton}
-                        </button>
+                            ${hasSubs ? chevronSvg : (isAppMode ? '' : actionButton)}
+                        ${closeTag}
                         ${subTreeHtml}
                     </li>
                 `;
@@ -1581,100 +1206,27 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
 
             return `
                 <div class="p-sidebar-group">
-                    <div class="p-sidebar-group-label">${g.label}</div>
+                    ${g.label ? `<div class="p-sidebar-group-label">${g.label}</div>` : ''}
                     <ul class="p-sidebar-menu">${itemsHtml}</ul>
                 </div>
             `;
         }).join('');
     }
 
-    function renderControlsHtml(): string {
-        const variantLabel = variant === 'sidebar' ? 'Sidebar' : (variant === 'floating' ? 'Floating' : 'Inset');
-        const collapsibleLabel = collapsible === 'icon' ? 'Icon' : (collapsible === 'offcanvas' ? 'Offcanvas' : 'None');
-
-        return `
-            <div class="p-sidebar-toolbar">
-                <div class="p-sidebar-toolbar-field">
-                    <label class="p-sidebar-toolbar-label">Variant</label>
-                    <div class="p-sb-select-trigger ${openSelectDropdown === 'variant' ? 'p-active' : ''}" data-select-trigger="variant" tabindex="0">
-                        <span>${variantLabel}</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-                    </div>
-                    ${openSelectDropdown === 'variant' ? `
-                        <div class="p-sb-select-dropdown">
-                            <div class="p-sb-select-option ${variant === 'sidebar' ? 'p-selected' : ''}" data-select-option="variant:sidebar">
-                                <span>Sidebar</span>
-                                ${variant === 'sidebar' ? '<span style="font-weight:700;">&#10003;</span>' : ''}
-                            </div>
-                            <div class="p-sb-select-option ${variant === 'floating' ? 'p-selected' : ''}" data-select-option="variant:floating">
-                                <span>Floating</span>
-                                ${variant === 'floating' ? '<span style="font-weight:700;">&#10003;</span>' : ''}
-                            </div>
-                            <div class="p-sb-select-option ${variant === 'inset' ? 'p-selected' : ''}" data-select-option="variant:inset">
-                                <span>Inset</span>
-                                ${variant === 'inset' ? '<span style="font-weight:700;">&#10003;</span>' : ''}
-                            </div>
-                        </div>
-                    ` : ''}
-                </div>
-
-                <div class="p-sidebar-toolbar-field">
-                    <label class="p-sidebar-toolbar-label">Collapsible</label>
-                    <div class="p-sb-select-trigger ${openSelectDropdown === 'collapsible' ? 'p-active' : ''}" data-select-trigger="collapsible" tabindex="0">
-                        <span>${collapsibleLabel}</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-                    </div>
-                    ${openSelectDropdown === 'collapsible' ? `
-                        <div class="p-sb-select-dropdown">
-                            <div class="p-sb-select-option ${collapsible === 'icon' ? 'p-selected' : ''}" data-select-option="collapsible:icon">
-                                <span>Icon</span>
-                                ${collapsible === 'icon' ? '<span style="font-weight:700;">&#10003;</span>' : ''}
-                            </div>
-                            <div class="p-sb-select-option ${collapsible === 'offcanvas' ? 'p-selected' : ''}" data-select-option="collapsible:offcanvas">
-                                <span>Offcanvas</span>
-                                ${collapsible === 'offcanvas' ? '<span style="font-weight:700;">&#10003;</span>' : ''}
-                            </div>
-                            <div class="p-sb-select-option ${collapsible === 'none' ? 'p-selected' : ''}" data-select-option="collapsible:none">
-                                <span>None</span>
-                                ${collapsible === 'none' ? '<span style="font-weight:700;">&#10003;</span>' : ''}
-                            </div>
-                        </div>
-                    ` : ''}
-                </div>
-
-                <div class="p-sidebar-toolbar-field">
-                    <label class="p-sidebar-toolbar-label">Side</label>
-                    <div class="p-sb-segmented">
-                        <button type="button" class="p-sb-seg-btn ${side === 'left' ? 'p-active' : ''}" data-sb-side="left">Left</button>
-                        <button type="button" class="p-sb-seg-btn ${side === 'right' ? 'p-active' : ''}" data-sb-side="right">Right</button>
-                    </div>
-                </div>
-
-                <div class="p-sidebar-toolbar-field">
-                    <label class="p-sidebar-toolbar-label">Overlay</label>
-                    <div class="p-sb-switch-container" data-sb-toggle="overlay">
-                        <div class="p-sb-switch ${overlay ? 'p-checked' : ''}"></div>
-                    </div>
-                </div>
-
-                <div class="p-sidebar-toolbar-field">
-                    <label class="p-sidebar-toolbar-label">Open on Hover</label>
-                    <div class="p-sb-switch-container" data-sb-toggle="hover">
-                        <div class="p-sb-switch ${openOnHover ? 'p-checked' : ''}"></div>
-                    </div>
-                </div>
-
-                <div class="p-sidebar-toolbar-field">
-                    <label class="p-sidebar-toolbar-label">Backdrop</label>
-                    <div class="p-sb-switch-container" data-sb-toggle="backdrop">
-                        <div class="p-sb-switch ${backdrop ? 'p-checked' : ''}"></div>
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-
     function renderHeaderContent(): string {
+        const headerTitle = props.headerTitle || 'SoftMax Aura';
+
+        if (isAppMode) {
+            return `
+                <div style="display: flex; align-items: center; gap: 0.65rem; width: 100%; overflow: hidden;">
+                    <a href="/" style="display: flex; width: 2.1rem; height: 2.1rem; border-radius: 8px; background: linear-gradient(135deg, #10b981, #047857); color: #ffffff; align-items: center; justify-content: center; flex-shrink: 0; text-decoration: none;" title="${headerTitle}">
+                        ${LucideIcons.layers || '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.9a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg>'}
+                    </a>
+                    <span class="p-sidebar-item-label p-sidebar-header-label" style="font-weight: 800; font-size: 0.9375rem; color: var(--p-text-color);">${headerTitle}</span>
+                </div>
+            `;
+        }
+
         if (demoType === 'chat') {
             const chatGptSparkleIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>`;
             const newChatPenIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.375 2.625a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4Z"/></svg>`;
@@ -1755,19 +1307,6 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
             `;
         }
 
-        if (demoType === 'nested') {
-            return `
-                <ul class="p-sidebar-menu">
-                    <li class="p-sidebar-menu-item">
-                        <button type="button" class="p-sidebar-menu-button" style="padding: 0.35rem 0.5rem;">
-                            <div style="display:flex; width:1.5rem; height:1.5rem; border-radius:6px; background: linear-gradient(135deg, #10b981, #0d9488); color:#fff; align-items:center; justify-content:center; font-weight:700; font-size:0.75rem; flex-shrink:0;">F</div>
-                            <span class="p-sidebar-item-label p-sidebar-header-label" style="font-weight: 700; font-size: 0.875rem;">File Manager</span>
-                        </button>
-                    </li>
-                </ul>
-            `;
-        }
-
         return `
             <ul class="p-sidebar-menu">
                 <li class="p-sidebar-menu-item">
@@ -1781,6 +1320,18 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
     }
 
     function renderFooterContent(): string {
+        if (isAppMode) {
+            return `
+                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; overflow: hidden;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <div style="width: 1.6rem; height: 1.6rem; border-radius: 9999px; background: var(--p-surface-200); display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700; color: var(--p-surface-700); flex-shrink: 0;">LT</div>
+                        <span class="p-sidebar-item-label p-sidebar-footer-label" style="font-size: 0.775rem; font-weight: 600; color: var(--p-text-muted);">SoftMax LaughTale</span>
+                    </div>
+                    <span class="p-sidebar-menu-badge aura-tag tag-emerald" style="font-size: 0.65rem; padding: 0.1rem 0.4rem;">v3.0</span>
+                </div>
+            `;
+        }
+
         if (demoType === 'menu') {
             return `
                 <div style="position: relative;">
@@ -1949,6 +1500,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
 
         aside.className = [
             'p-sidebar',
+            isAppMode ? 'p-sidebar-app-dock' : '',
             `p-sidebar-variant-${variant}`,
             `p-sidebar-collapsible-${collapsible}`,
             `p-sidebar-side-${side}`,
@@ -1966,8 +1518,11 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
     }
 
     function renderComponent(): string {
+        const searchIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>`;
+
         const sidebarClasses = [
             'p-sidebar',
+            isAppMode ? 'p-sidebar-app-dock' : '',
             `p-sidebar-variant-${variant}`,
             `p-sidebar-collapsible-${collapsible}`,
             `p-sidebar-side-${side}`,
@@ -1984,6 +1539,14 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                         <div class="p-sidebar-header">
                             ${renderHeaderContent()}
                         </div>
+                        ${isAppMode ? `
+                            <div class="p-sidebar-search-container">
+                                <div class="p-sidebar-search-box">
+                                    <span style="color: var(--p-surface-400); display: flex; align-items: center;">${searchIconSvg}</span>
+                                    <input type="text" class="p-sidebar-search-input" placeholder="Filter navigation..." value="${searchQuery}" />
+                                </div>
+                            </div>
+                        ` : ''}
                         <div class="p-sidebar-content">
                             ${renderGroupsHtml(groups)}
                         </div>
@@ -1994,6 +1557,10 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                 </div>
             </aside>
         `;
+
+        if (isAppMode) {
+            return sidebarHtml;
+        }
 
         const mainHtml = renderMainContent();
         const backdropHtml = `<div class="p-sidebar-backdrop" data-sidebar-backdrop style="display: ${backdrop && isOpen ? 'block' : 'none'};"></div>`;
@@ -2029,6 +1596,30 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
             });
         });
 
+        // Global Event Hook for App Shell Trigger Button
+        if (isAppMode) {
+            const onAppToggle = () => {
+                isOpen = !isOpen;
+                updateSidebarClasses();
+            };
+            document.removeEventListener('app-sidebar:toggle', (window as any).__appSidebarUnifiedHandler);
+            (window as any).__appSidebarUnifiedHandler = onAppToggle;
+            document.addEventListener('app-sidebar:toggle', onAppToggle);
+
+            // Filter search input
+            const searchInput = container.querySelector<HTMLInputElement>('.p-sidebar-search-input');
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    searchQuery = (e.target as HTMLInputElement).value;
+                    const contentEl = container.querySelector('.p-sidebar-content');
+                    if (contentEl) {
+                        contentEl.innerHTML = renderGroupsHtml(groups);
+                        wireSubmenuAndLinks();
+                    }
+                });
+            }
+        }
+
         // Backdrop click dismisses smoothly
         container.querySelectorAll('[data-sidebar-backdrop]').forEach(bd => {
             bd.addEventListener('click', () => {
@@ -2048,26 +1639,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
             });
         }
 
-        // Submenu collapse / expand with animated CSS grid and chevrons
-        container.querySelectorAll('.p-sidebar-menu-button[data-has-subs="true"]').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const li = btn.closest('.p-sidebar-menu-item');
-                const subKey = li?.getAttribute('data-subkey');
-                if (subKey) {
-                    expandedSubmenus[subKey] = !expandedSubmenus[subKey];
-                    const wrapper = li?.querySelector('.p-sidebar-menu-sub-wrapper');
-                    const chevron = li?.querySelector('.p-sidebar-submenu-chevron');
-                    if (wrapper) {
-                        wrapper.classList.toggle('p-expanded', expandedSubmenus[subKey]);
-                    }
-                    if (chevron) {
-                        chevron.classList.toggle('p-expanded', expandedSubmenus[subKey]);
-                    }
-                }
-            });
-        });
+        wireSubmenuAndLinks();
 
         // Interactive company switcher popup
         const compTrigger = container.querySelector('[data-company-trigger]');
@@ -2195,6 +1767,51 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
             }
         };
         document.addEventListener('click', onDocClick, { once: true });
+    }
+
+    function wireSubmenuAndLinks() {
+        // Submenu collapse / expand with animated CSS grid and chevrons
+        container.querySelectorAll('.p-sidebar-menu-button[data-has-subs="true"]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const li = btn.closest('.p-sidebar-menu-item');
+                const subKey = li?.getAttribute('data-subkey');
+                if (subKey) {
+                    expandedSubmenus[subKey] = !expandedSubmenus[subKey];
+                    const wrapper = li?.querySelector('.p-sidebar-menu-sub-wrapper');
+                    const chevron = li?.querySelector('.p-sidebar-submenu-chevron');
+                    if (wrapper) {
+                        wrapper.classList.toggle('p-expanded', expandedSubmenus[subKey]);
+                    }
+                    if (chevron) {
+                        chevron.classList.toggle('p-expanded', expandedSubmenus[subKey]);
+                    }
+                }
+            });
+        });
+
+        // Smooth in-page anchor navigation
+        container.querySelectorAll<HTMLAnchorElement>('a[data-sidebar-link]').forEach(link => {
+            link.addEventListener('click', (e) => {
+                const href = link.getAttribute('href') || '';
+                const hashIndex = href.indexOf('#');
+                if (hashIndex >= 0 && (href.startsWith('#') || href.startsWith(window.location.pathname))) {
+                    const targetId = href.substring(hashIndex + 1);
+                    const targetEl = document.getElementById(targetId);
+
+                    if (targetEl) {
+                        e.preventDefault();
+                        targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                        container.querySelectorAll('.p-sidebar-menu-button').forEach(el => el.classList.remove('p-active'));
+                        link.classList.add('p-active');
+
+                        window.history.pushState(null, '', href);
+                    }
+                }
+            });
+        });
     }
 
     function render() {
