@@ -6049,3 +6049,70 @@ html {
 [data-theme="dark"] .p-drawer-nav-section-title {
     color: var(--p-surface-400, #94a3b8);
 }
+
+
+/* ==========================================================================
+   Aura PrimeVue 4 Popover Component (Anchored Overlay with Arrow Notch)
+   ========================================================================== */
+.p-popover {
+    position: fixed;
+    z-index: 1200;
+    box-sizing: border-box;
+    background: var(--p-surface-0, #ffffff);
+    border: 1px solid var(--p-border-color, #e2e8f0);
+    border-radius: var(--p-border-radius, 8px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    padding: 1.25rem;
+    color: var(--p-text-color, #0f172a);
+    pointer-events: none;
+    visibility: hidden;
+    opacity: 0;
+    transform: scale(0.95) translateY(4px);
+    transform-origin: center top;
+    will-change: transform, opacity;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.2s;
+}
+
+.p-popover.p-popover-active {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+    transform: scale(1) translateY(0);
+}
+
+.p-popover-arrow {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: var(--p-surface-0, #ffffff);
+    border: 1px solid var(--p-border-color, #e2e8f0);
+    transform: rotate(45deg);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.p-popover-arrow-top {
+    top: -6px;
+    border-bottom: none;
+    border-right: none;
+}
+
+.p-popover-arrow-bottom {
+    bottom: -6px;
+    border-top: none;
+    border-left: none;
+}
+
+.dark .p-popover,
+[data-theme="dark"] .p-popover {
+    background: var(--p-surface-900, #0f172a);
+    border-color: var(--p-surface-700, #334155);
+    color: var(--p-surface-0, #f8fafc);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+}
+
+.dark .p-popover-arrow,
+[data-theme="dark"] .p-popover-arrow {
+    background: var(--p-surface-900, #0f172a);
+    border-color: var(--p-surface-700, #334155);
+}

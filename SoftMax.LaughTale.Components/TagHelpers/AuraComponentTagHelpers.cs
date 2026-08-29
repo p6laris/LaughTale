@@ -4202,23 +4202,83 @@ public class IslandContextMenuTagHelper : TagHelper
 }
 
 /// <summary>
-/// TagHelper for <island-popover /> — Anchored floating panel
+/// TagHelper for <island-popover />, <p-popover />, and <p-overlay-panel />
+/// PrimeVue 4 Aura Design System compliant anchored floating popover container.
 /// </summary>
 [HtmlTargetElement("island-popover")]
+[HtmlTargetElement("p-popover")]
+[HtmlTargetElement("p-overlay-panel")]
 public class IslandPopoverTagHelper : TagHelper
 {
+    [HtmlAttributeName("id")]
+    public string Id { get; set; } = $"popover-{System.Guid.NewGuid():N}";
+
+    [HtmlAttributeName("target")]
+    public string? Target { get; set; }
+
+    [HtmlAttributeName("trigger-id")]
     public string? TriggerId { get; set; }
+
+    [HtmlAttributeName("placement")]
     public string Placement { get; set; } = "bottom";
+
+    [HtmlAttributeName("show-arrow")]
     public bool ShowArrow { get; set; } = true;
 
-    public override void Process(TagHelperContext context, TagHelperOutput output)
+    [HtmlAttributeName("dismissable")]
+    public bool Dismissable { get; set; } = true;
+
+    [HtmlAttributeName("close-on-escape")]
+    public bool CloseOnEscape { get; set; } = true;
+
+    [HtmlAttributeName("class")]
+    public string? Class { get; set; }
+
+    [HtmlAttributeName("style")]
+    public string? Style { get; set; }
+
+    [HtmlAttributeName("hydrate")]
+    public HydrateStrategy Hydrate { get; set; } = HydrateStrategy.Load;
+
+    public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
         output.TagName = "div";
         output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("id", Id);
         output.Attributes.SetAttribute("data-island", "popover");
-        output.Attributes.SetAttribute("hydrate", "Interaction");
-        var props = new { triggerId = TriggerId, placement = Placement, showArrow = ShowArrow };
-        output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
+        output.Attributes.SetAttribute("data-hydrate", Hydrate.ToString().ToLowerInvariant());
+        output.Attributes.SetAttribute("style", "display: contents;");
+
+        var effectiveTarget = Target ?? TriggerId;
+        var cleanPlacement = (Placement ?? "bottom").ToLowerInvariant().Trim();
+
+        var props = new
+        {
+            id = Id,
+            target = effectiveTarget,
+            placement = cleanPlacement,
+            showArrow = ShowArrow,
+            dismissable = Dismissable,
+            closeOnEscape = CloseOnEscape
+        };
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
+
+        var popoverClasses = "p-popover p-component";
+        if (!string.IsNullOrWhiteSpace(Class)) popoverClasses += $" {Class}";
+
+        var arrowHtml = ShowArrow ? @"<div class=""p-popover-arrow p-popover-arrow-top""></div>" : "";
+        var childContent = await output.GetChildContentAsync();
+
+        var popoverStyle = !string.IsNullOrWhiteSpace(Style) ? $" style=\"{Style}\"" : "";
+
+        output.Content.SetHtmlContent($@"
+            <div class=""{popoverClasses}"" role=""dialog"" aria-modal=""false""{popoverStyle}>
+                {arrowHtml}
+                <div class=""p-popover-content"">
+                    {childContent.GetContent()}
+                </div>
+            </div>
+        ");
     }
 }
 
