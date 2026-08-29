@@ -4422,6 +4422,95 @@ public class IslandContextMenuTagHelper : TagHelper
 }
 
 /// <summary>
+/// TagHelper for <island-tieredmenu />, <p-tieredmenu />, and <island-tiered-menu />
+/// PrimeVue 4 Aura Design System compliant hierarchical tiered menu with flyout submenus.
+/// </summary>
+[HtmlTargetElement("island-tieredmenu")]
+[HtmlTargetElement("p-tieredmenu")]
+[HtmlTargetElement("island-tiered-menu")]
+public class IslandTieredMenuTagHelper : TagHelper
+{
+    [HtmlAttributeName("model")]
+    public List<MenuItem>? Model { get; set; }
+
+    [HtmlAttributeName("items")]
+    public List<MenuItem>? Items { get; set; }
+
+    [HtmlAttributeName("popup")]
+    public bool Popup { get; set; } = false;
+
+    [HtmlAttributeName("trigger-id")]
+    public string? TriggerId { get; set; }
+
+    [HtmlAttributeName("trigger-text")]
+    public string? TriggerText { get; set; }
+
+    [HtmlAttributeName("trigger-icon")]
+    public string? TriggerIcon { get; set; }
+
+    [HtmlAttributeName("trigger-variant")]
+    public string? TriggerVariant { get; set; } = "outlined";
+
+    [HtmlAttributeName("trigger-severity")]
+    public string? TriggerSeverity { get; set; } = "primary";
+
+    [HtmlAttributeName("custom-template")]
+    public bool CustomTemplate { get; set; } = false;
+
+    [HtmlAttributeName("breakpoint")]
+    public string? Breakpoint { get; set; } = "960px";
+
+    [HtmlAttributeName("auto-z-index")]
+    public bool AutoZIndex { get; set; } = true;
+
+    [HtmlAttributeName("base-z-index")]
+    public int BaseZIndex { get; set; } = 0;
+
+    [HtmlAttributeName("class")]
+    public string? Class { get; set; }
+
+    [HtmlAttributeName("style")]
+    public string? Style { get; set; }
+
+    public override void Process(TagHelperContext context, TagHelperOutput output)
+    {
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "tieredmenu");
+        output.Attributes.SetAttribute("data-hydrate", "load");
+
+        var props = new
+        {
+            model = Model ?? Items ?? new(),
+            popup = Popup,
+            triggerId = TriggerId,
+            triggerText = TriggerText,
+            triggerIcon = TriggerIcon,
+            triggerVariant = TriggerVariant,
+            triggerSeverity = TriggerSeverity,
+            customTemplate = CustomTemplate,
+            breakpoint = Breakpoint,
+            autoZIndex = AutoZIndex,
+            baseZIndex = BaseZIndex,
+            @class = Class,
+            style = Style
+        };
+
+        output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
+
+        if (!string.IsNullOrWhiteSpace(Class))
+        {
+            output.Attributes.SetAttribute("class", Class);
+        }
+
+        if (!string.IsNullOrWhiteSpace(Style))
+        {
+            output.Attributes.SetAttribute("style", Style);
+        }
+    }
+}
+
+/// <summary>
 /// TagHelper for <island-popover />, <p-popover />, and <p-overlay-panel />
 /// PrimeVue 4 Aura Design System compliant anchored floating popover container.
 /// </summary>

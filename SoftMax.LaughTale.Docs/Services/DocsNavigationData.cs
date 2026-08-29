@@ -54,6 +54,7 @@ public static class DocsNavigationData
             new SidebarItem("Panels & Navigation", "columns3", null, true, new List<SidebarItem>
             {
                 new("Sidebar Compound Nav", "folderTree", "/enterprise#sec-sidebar", false, null, "New"),
+                new("TieredMenu Flyout", "menu", "/enterprise#sec-tieredmenu", false, null, "New"),
                 new("Spotlight Command", "command", "/doc/41-command-palette", currentPath.Contains("41-command-palette")),
                 new("TweakAura Studio", "palette", "/doc/42-theme-studio", currentPath.Contains("42-theme-studio")),
                 new("Accordion Panels", "list", "/doc/30-accordion", currentPath.Contains("30-accordion")),

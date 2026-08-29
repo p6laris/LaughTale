@@ -5278,8 +5278,65 @@
                 Right click inside this area to trigger the ContextMenu island.
             </div>
             <island-context-menu items="@Model.HeaderMenuItems" />
+    </section>
+
+    <!-- TieredMenu -->
+    <section id="sec-tieredmenu" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>TieredMenu</h2>
+                <p>TieredMenu displays submenus in nested overlays with cascading flyouts, popup trigger modes, shortcuts, badges, commands, and full WAI-ARIA accessibility.</p>
+            </div>
+            <span class="aura-tag tag-emerald">PrimeVue 4 Aura</span>
+        </div>
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Demo 1: Basic Inline -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic TieredMenu</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Standard inline navigation menu with multi-level flyout submenus on hover or keyboard navigation.</p>
+                <div style="display: flex; justify-content: center; padding: 1.5rem 0;">
+                    <island-tieredmenu items="@Model.TieredMenuBasicItems" />
+                </div>
+            </div>
+
+            <!-- Demo 2: Popup Overlay Mode -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Popup Overlay</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Popup mode is enabled by adding popup property and calling toggle method with the target button.</p>
+                <div style="display: flex; justify-content: center; padding: 1.5rem 0;">
+                    <island-tieredmenu items="@Model.TieredMenuBasicItems" popup="true" trigger-text="Toggle TieredMenu" trigger-icon="layers" trigger-variant="solid" trigger-severity="primary" />
+                </div>
+            </div>
+
+            <!-- Demo 3: Template with Shortcuts & Badges -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Template (Badges &amp; Keyboard Shortcuts)</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Item customization featuring action shortcuts (⌘+N, ⌘+C, etc.), notification badge pills, and nested flyout chevrons.</p>
+                <div style="display: flex; justify-content: center; padding: 1.5rem 0;">
+                    <island-tieredmenu items="@Model.TieredMenuTemplateItems" custom-template="true" />
+                </div>
+            </div>
+
+            <!-- Demo 4: Command Callbacks & Live Toast -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Command Callbacks &amp; Notifications</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">The command property defines the action callback to execute when an item is activated by click or key event.</p>
+                <div style="display: flex; justify-content: center; padding: 1.5rem 0;">
+                    <island-tieredmenu items="@Model.TieredMenuCommandItems" />
+                </div>
+            </div>
+
+            <!-- Demo 5: Router & External Links -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Router &amp; External Links</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Support for SPA routing links, internal documentation anchors, and external URL targets.</p>
+                <div style="display: flex; justify-content: center; padding: 1.5rem 0;">
+                    <island-tieredmenu items="@Model.TieredMenuRouterItems" />
+                </div>
+            </div>
         </div>
     </section>
+
 
     <!-- Breadcrumb -->
     <section id="sec-breadcrumb" class="component-card">

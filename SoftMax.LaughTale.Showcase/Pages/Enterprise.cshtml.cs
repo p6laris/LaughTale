@@ -1783,6 +1783,91 @@ public class EnterpriseModel : PageModel
         })
     };
 
+    public List<MenuItem> TieredMenuBasicItems { get; set; } = new()
+    {
+        new(Label: "File", Icon: "file", Items: new()
+        {
+            new(Label: "New", Icon: "plus", Items: new()
+            {
+                new(Label: "Document", Icon: "file"),
+                new(Label: "Image", Icon: "image"),
+                new(Label: "Video", Icon: "video")
+            }),
+            new(Label: "Open", Icon: "folderOpen"),
+            new(Label: "Print", Icon: "printer")
+        }),
+        new(Label: "Edit", Icon: "fileEdit", Items: new()
+        {
+            new(Label: "Copy", Icon: "copy"),
+            new(Label: "Delete", Icon: "trash2")
+        }),
+        new(Label: "Search", Icon: "search"),
+        new(Separator: true),
+        new(Label: "Share", Icon: "share2", Items: new()
+        {
+            new(Label: "Slack", Icon: "slack"),
+            new(Label: "Whatsapp", Icon: "phone")
+        })
+    };
+
+    public List<MenuItem> TieredMenuTemplateItems { get; set; } = new()
+    {
+        new(Label: "File", Icon: "file", Items: new()
+        {
+            new(Label: "New", Icon: "plus", Items: new()
+            {
+                new(Label: "Docs", Icon: "file", Shortcut: "⌘+N"),
+                new(Label: "Image", Icon: "image", Shortcut: "⌘+I"),
+                new(Label: "Video", Icon: "video", Shortcut: "⌘+L")
+            }),
+            new(Label: "Open", Icon: "folderOpen", Shortcut: "⌘+O"),
+            new(Label: "Print", Icon: "printer", Shortcut: "⌘+P")
+        }),
+        new(Label: "Edit", Icon: "fileEdit", Items: new()
+        {
+            new(Label: "Copy", Icon: "copy", Shortcut: "⌘+C"),
+            new(Label: "Delete", Icon: "trash2", Shortcut: "⌘+D")
+        }),
+        new(Label: "Search", Icon: "search", Shortcut: "⌘+S"),
+        new(Separator: true),
+        new(Label: "Share", Icon: "share2", Items: new()
+        {
+            new(Label: "Slack", Icon: "slack", Badge: "2"),
+            new(Label: "Whatsapp", Icon: "phone", Badge: "3")
+        })
+    };
+
+    public List<MenuItem> TieredMenuCommandItems { get; set; } = new()
+    {
+        new(Label: "File", Icon: "file", Items: new()
+        {
+            new(Label: "New", Icon: "plus", Command: "file_created"),
+            new(Label: "Print", Icon: "printer", Command: "printer_error")
+        }),
+        new(Label: "Search", Icon: "search", Command: "search_warn"),
+        new(Separator: true),
+        new(Label: "Sync", Icon: "cloud", Items: new()
+        {
+            new(Label: "Import", Icon: "cloudDownload", Command: "cloud_download"),
+            new(Label: "Export", Icon: "cloudUpload", Command: "cloud_upload")
+        })
+    };
+
+    public List<MenuItem> TieredMenuRouterItems { get; set; } = new()
+    {
+        new(Label: "Router", Icon: "palette", Items: new()
+        {
+            new(Label: "Theming", Route: "/doc/theming"),
+            new(Label: "UI Kit", Route: "/enterprise")
+        }),
+        new(Label: "Programmatic", Icon: "link", Route: "/About"),
+        new(Label: "External", Icon: "home", Items: new()
+        {
+            new(Label: "Vue.js", Url: "https://vuejs.org/", Target: "_blank"),
+            new(Label: "Vite.js", Url: "https://vite.dev/", Target: "_blank")
+        })
+    };
+
     public List<SidebarGroupModel> SidebarVariantsGroups { get; set; } = new()
     {
         new(Label: "Navigation", Items: new()
