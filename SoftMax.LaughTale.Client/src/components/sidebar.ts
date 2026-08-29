@@ -1,7 +1,7 @@
 /**
  * SoftMax.LaughTale: Enterprise Sidebar Component Suite (PrimeVue 4 Aura Design System)
  * Complete compound navigation panel system matching PrimeVue 4 Aura specifications:
- * 1. App-Level Navigation Tree Sidebar for app shell
+ * 1. App-Level Navigation Tree Sidebar for app shell (Showcase & Docs) with Aura Compound Design
  * 2. Variants Interactive Playground with Aura custom Select, SelectButton, and ToggleSwitch controls
  * 3. With Menu (Interactive Workspace Switcher + User Profile Popup Dropdown)
  * 4. Responsive (Mobile offcanvas overlay vs Desktop icon collapsible)
@@ -16,294 +16,409 @@ import { injectIslandStyle } from '../runtime/styles';
 
 const SIDEBAR_CSS = `
 /* ==========================================================================
-   1. App-Level Navigation Tree Sidebar (App Shell)
+   1. PrimeVue 4 Aura Compound Sidebar Layout & Components
    ========================================================================== */
-.laughtale-sidebar {
+.p-sidebar-app-shell {
     display: flex;
     flex-direction: column;
-    background: var(--p-surface-0);
-    border-right: 1px solid var(--p-border-color);
+    height: 100vh;
     width: 270px;
     min-width: 270px;
-    height: 100vh;
+    background: var(--p-surface-0, #ffffff);
+    border-right: 1px solid var(--p-border-color, #e2e8f0);
     position: sticky;
     top: 0;
     left: 0;
     transition: width 240ms cubic-bezier(0.16, 1, 0.3, 1), min-width 240ms cubic-bezier(0.16, 1, 0.3, 1);
     font-family: var(--p-font-family, inherit);
-    overflow: hidden;
-    border-radius: 0;
-    box-shadow: none;
+    box-sizing: border-box;
     z-index: 40;
+    overflow: hidden;
 }
-.laughtale-sidebar.collapsed {
-    width: 68px;
-    min-width: 68px;
+
+.p-sidebar-app-shell.p-collapsed {
+    width: 64px;
+    min-width: 64px;
 }
-.laughtale-sidebar.right {
-    border-right: none;
-    border-left: 1px solid var(--p-border-color);
-}
-.sidebar-header {
+
+.p-sidebar-header-dock {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 1rem 1.125rem;
-    border-bottom: 1px solid var(--p-border-color);
-    gap: 0.5rem;
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid var(--p-border-color, #e2e8f0);
     height: 60px;
     box-sizing: border-box;
     flex-shrink: 0;
 }
-.sidebar-search-box {
-    padding: 0.625rem 0.875rem 0.25rem;
-    flex-shrink: 0;
+
+.p-sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    text-decoration: none;
+    color: var(--p-text-color, #0f172a);
+    overflow: hidden;
+    white-space: nowrap;
 }
-.sidebar-search-input {
-    width: 100%;
-    background: var(--p-surface-50);
-    border: 1px solid var(--p-border-color);
-    border-radius: var(--p-border-radius);
-    padding: 0.4rem 0.65rem;
-    font-size: 0.775rem;
-    color: var(--p-text-color);
-    outline: none;
-    transition: border-color 0.15s ease, background 0.15s ease;
-    box-sizing: border-box;
-}
-.sidebar-search-input:focus {
-    border-color: var(--p-primary-500);
-    background: var(--p-surface-0);
-}
-.sidebar-toggle {
-    background: transparent;
-    border: none;
-    color: var(--p-text-muted);
-    cursor: pointer;
+
+.p-sidebar-brand-logo {
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: var(--p-border-radius);
-    width: 1.85rem;
-    height: 1.85rem;
-    transition: background 150ms ease, color 150ms ease;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--p-primary-600, #10b981), #047857);
+    color: #ffffff;
     flex-shrink: 0;
 }
-.sidebar-toggle:hover {
-    background: var(--p-surface-100);
-    color: var(--p-text-color);
+
+.p-sidebar-brand-text {
+    font-size: 0.9375rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    color: var(--p-text-color, #0f172a);
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
-.sidebar-body {
+
+.p-sidebar-search-dock {
+    padding: 0.65rem 0.85rem 0.35rem;
+    flex-shrink: 0;
+}
+
+.p-sidebar-search-box {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--p-surface-50, #f8fafc);
+    border: 1px solid var(--p-border-color, #cbd5e1);
+    border-radius: var(--p-border-radius, 6px);
+    padding: 0.35rem 0.65rem;
+    transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.p-sidebar-search-box:focus-within {
+    border-color: var(--p-primary-500, #10b981);
+    background: var(--p-surface-0, #ffffff);
+    box-shadow: 0 0 0 1px var(--p-primary-500, #10b981);
+}
+
+.p-sidebar-search-input {
+    width: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 0.8125rem;
+    color: var(--p-text-color, #0f172a);
+    font-family: inherit;
+}
+
+.p-sidebar-content-dock {
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 0.5rem 0.6rem;
+    padding: 0.5rem 0.65rem;
     display: flex;
     flex-direction: column;
-    gap: 0.2rem;
+    gap: 0.65rem;
     scrollbar-width: thin;
     scrollbar-color: var(--p-surface-300) transparent;
 }
-.sidebar-body::-webkit-scrollbar {
+
+.p-sidebar-content-dock::-webkit-scrollbar {
     width: 4px;
 }
-.sidebar-body::-webkit-scrollbar-track {
-    background: transparent;
-}
-.sidebar-body::-webkit-scrollbar-thumb {
+.p-sidebar-content-dock::-webkit-scrollbar-thumb {
     background: var(--p-surface-300);
     border-radius: 4px;
 }
-.sidebar-tree-menu {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+
+.p-sidebar-group {
     display: flex;
     flex-direction: column;
-    gap: 0.2rem;
-    width: 100%;
+    gap: 0.15rem;
 }
-.sidebar-item {
-    display: flex;
-    align-items: center;
-    padding: 0.45rem 0.65rem;
-    color: var(--p-text-color);
-    text-decoration: none;
-    border-radius: var(--p-border-radius);
-    transition: background 150ms ease, color 150ms ease;
-    gap: 0.6rem;
-    font-size: 0.8125rem;
-    font-weight: 500;
-    white-space: nowrap;
-    overflow: hidden;
-    cursor: pointer;
-    user-select: none;
-    border: 1px solid transparent;
-    box-sizing: border-box;
-}
-.sidebar-item:hover {
-    background: var(--p-surface-100);
-}
-.sidebar-item.active {
-    background: var(--p-primary-50);
-    color: var(--p-primary-700);
-    font-weight: 700;
-    border-color: var(--p-primary-200);
-}
-.dark .sidebar-item.active {
-    background: rgba(16, 185, 129, 0.15);
-    color: #6ee7b7;
-    border-color: rgba(16, 185, 129, 0.3);
-}
-.sidebar-group-container {
-    width: 100%;
-    list-style: none;
-}
-.sidebar-group-header {
+
+.p-sidebar-group-header-btn {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.5rem 0.65rem;
-    color: var(--p-text-muted);
+    width: 100%;
+    padding: 0.4rem 0.5rem;
+    background: transparent;
+    border: none;
+    color: var(--p-surface-500, #64748b);
     font-size: 0.725rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.04em;
     cursor: pointer;
-    border-radius: var(--p-border-radius);
-    transition: background 150ms ease, color 150ms ease;
-    box-sizing: border-box;
+    border-radius: var(--p-border-radius, 6px);
+    transition: background-color 0.15s ease, color 0.15s ease;
+    text-align: left;
 }
-.sidebar-group-header:hover {
-    background: var(--p-surface-100);
-    color: var(--p-text-color);
+
+.p-sidebar-group-header-btn:hover {
+    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-text-color, #0f172a);
 }
-.sidebar-group-chevron {
-    display: flex;
-    align-items: center;
-    transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1);
-    color: var(--p-text-muted);
-}
-.sidebar-group-chevron.expanded {
-    transform: rotate(90deg);
-}
-.sidebar-sub-tree {
+
+.p-sidebar-menu {
     list-style: none;
-    padding: 0 0 0 0.75rem;
-    margin: 0.15rem 0 0.35rem 0.35rem;
-    border-left: 1px solid var(--p-border-color);
+    margin: 0;
+    padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.15rem;
+    gap: 0.125rem;
 }
-.sidebar-badge {
+
+.p-sidebar-menu-item {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    width: 100%;
+}
+
+.p-sidebar-menu-button {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    width: 100%;
+    padding: 0.45rem 0.65rem;
+    border-radius: var(--p-border-radius, 6px);
+    color: var(--p-sidebar-menu-button-color, var(--p-text-color, #0f172a));
+    text-decoration: none;
+    background: transparent;
+    border: 1px solid transparent;
+    cursor: pointer;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    transition: background-color 0.12s ease, color 0.12s ease, transform 0.12s ease;
+    box-sizing: border-box;
+    text-align: left;
+    outline: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.p-sidebar-menu-button:hover,
+.p-sidebar-menu-button.p-hover {
+    background: var(--p-sidebar-menu-button-focus-background, var(--p-surface-100, #f1f5f9));
+}
+
+.p-sidebar-menu-button.p-active {
+    background: var(--p-primary-50, #ecfdf5);
+    color: var(--p-primary-700, #047857);
+    font-weight: 700;
+    border-color: var(--p-primary-200, #a7f3d0);
+}
+
+.p-sidebar-menu-button-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.125rem;
+    height: 1.125rem;
+    flex-shrink: 0;
+    color: var(--p-surface-500, #64748b);
+    transition: transform 0.15s ease;
+}
+
+.p-sidebar-menu-button.p-active .p-sidebar-menu-button-icon {
+    color: var(--p-primary-600, #10b981);
+}
+
+.p-sidebar-item-label {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.p-sidebar-menu-badge {
     margin-left: auto;
     font-size: 0.6875rem;
     font-weight: 700;
     padding: 0.1rem 0.4rem;
     border-radius: 9999px;
-    background: var(--p-surface-200);
-    color: var(--p-text-color);
+    background: var(--p-surface-200, #e2e8f0);
+    color: var(--p-surface-700, #334155);
+    flex-shrink: 0;
 }
-.collapsed .sidebar-body {
-    padding: 0.5rem 0 !important;
+
+.p-sidebar-submenu-chevron {
+    margin-left: auto;
+    display: inline-flex;
     align-items: center;
-}
-.collapsed .sidebar-tree-menu {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-.collapsed .sidebar-group-container {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-.collapsed .sidebar-item-label, 
-.collapsed .sidebar-header-title,
-.collapsed .sidebar-search-box,
-.collapsed .sidebar-badge,
-.collapsed .sidebar-group-chevron {
-    display: none !important;
-}
-.collapsed .sidebar-header {
     justify-content: center;
-    padding: 0;
+    color: var(--p-surface-400, #94a3b8);
+    transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1);
+    flex-shrink: 0;
 }
-.collapsed .sidebar-header .sidebar-brand-group {
-    display: none !important;
+
+.p-sidebar-submenu-chevron.p-expanded {
+    transform: rotate(180deg);
 }
-.collapsed .sidebar-header .sidebar-toggle {
-    margin: 0 auto;
+
+.p-sidebar-menu-sub-wrapper {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 240ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms ease;
+    opacity: 0;
 }
-.collapsed .sidebar-group-header {
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    width: 44px;
-    height: 38px;
-    margin: 0.5rem auto 0.25rem;
-    padding: 0.5rem 0 0 !important;
-    border-top: 1px solid var(--p-border-color);
+
+.p-sidebar-menu-sub-wrapper.p-expanded {
+    grid-template-rows: 1fr;
+    opacity: 1;
+}
+
+.p-sidebar-menu-sub {
+    overflow: hidden;
+    min-height: 0;
+    list-style: none;
+    margin: 0.15rem 0 0.25rem 1.15rem;
+    padding: 0 0 0 0.65rem;
+    border-left: 1px solid var(--p-border-color, #e2e8f0);
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+}
+
+.p-sidebar-menu-sub-button {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0.35rem 0.5rem;
+    border-radius: var(--p-border-radius, 4px);
+    font-size: 0.8125rem;
+    color: var(--p-surface-600, #475569);
+    text-decoration: none;
     cursor: pointer;
+    transition: background-color 0.12s ease, color 0.12s ease;
+    border: none;
+    background: transparent;
+    text-align: left;
+}
+
+.p-sidebar-menu-sub-button:hover {
+    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-text-color, #0f172a);
+}
+
+.p-sidebar-menu-sub-button.p-active {
+    font-weight: 700;
+    color: var(--p-primary-600, #10b981);
+    background: var(--p-primary-50, #ecfdf5);
+}
+
+.p-sidebar-footer-dock {
+    padding: 0.65rem 0.85rem;
+    border-top: 1px solid var(--p-border-color, #e2e8f0);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
     box-sizing: border-box;
 }
-.collapsed .sidebar-group-header > div {
-    display: flex !important;
-    align-items: center !important;
+
+/* Collapsed App Shell mode */
+.p-sidebar-app-shell.p-collapsed .p-sidebar-brand-text,
+.p-sidebar-app-shell.p-collapsed .p-sidebar-search-dock,
+.p-sidebar-app-shell.p-collapsed .p-sidebar-item-label,
+.p-sidebar-app-shell.p-collapsed .p-sidebar-menu-badge,
+.p-sidebar-app-shell.p-collapsed .p-sidebar-submenu-chevron,
+.p-sidebar-app-shell.p-collapsed .p-sidebar-group-header-label,
+.p-sidebar-app-shell.p-collapsed .p-sidebar-group-chevron,
+.p-sidebar-app-shell.p-collapsed .p-sidebar-footer-text {
+    display: none !important;
+}
+
+.p-sidebar-app-shell.p-collapsed .p-sidebar-menu-button {
     justify-content: center !important;
-    gap: 0 !important;
-    width: 100% !important;
+    padding: 0.5rem 0 !important;
 }
-.collapsed .sidebar-group-header span.sidebar-group-icon {
-    display: flex !important;
-    align-items: center !important;
+
+.p-sidebar-app-shell.p-collapsed .p-sidebar-group-header-btn {
     justify-content: center !important;
-    width: 20px !important;
-    height: 20px !important;
+    padding: 0.4rem 0 !important;
 }
-.collapsed .sidebar-sub-tree {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    width: 100% !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    border-left: none !important;
-    list-style: none !important;
-    gap: 0.2rem;
+
+.p-sidebar-app-shell.p-collapsed .p-sidebar-menu-sub-wrapper {
+    display: none !important;
 }
-.collapsed .sidebar-sub-tree > li {
-    display: flex !important;
-    justify-content: center !important;
-    width: 100% !important;
+
+/* Dark Mode Tokens for App Shell */
+.dark .p-sidebar-app-shell,
+[data-theme="dark"] .p-sidebar-app-shell {
+    background: var(--p-surface-900, #0f172a);
+    border-color: var(--p-surface-800, #1e293b);
 }
-.collapsed .sidebar-item {
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    padding: 0 !important;
-    width: 44px !important;
-    height: 44px !important;
-    margin: 0 auto !important;
-    box-sizing: border-box !important;
-    border-radius: var(--p-border-radius);
+
+.dark .p-sidebar-header-dock,
+[data-theme="dark"] .p-sidebar-header-dock,
+.dark .p-sidebar-footer-dock,
+[data-theme="dark"] .p-sidebar-footer-dock {
+    border-color: var(--p-surface-800, #1e293b);
 }
-.collapsed .sidebar-item span.sidebar-icon {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 20px !important;
-    height: 20px !important;
+
+.dark .p-sidebar-search-box,
+[data-theme="dark"] .p-sidebar-search-box {
+    background: var(--p-surface-950, #020617);
+    border-color: var(--p-surface-800, #1e293b);
 }
-.collapsed .sidebar-item:hover {
-    background: var(--p-surface-100);
+
+.dark .p-sidebar-menu-button,
+[data-theme="dark"] .p-sidebar-menu-button {
+    color: var(--p-surface-200, #e2e8f0);
+}
+
+.dark .p-sidebar-menu-button:hover,
+[data-theme="dark"] .p-sidebar-menu-button:hover {
+    background: var(--p-surface-800, #1e293b);
+    color: var(--p-surface-0, #f8fafc);
+}
+
+.dark .p-sidebar-menu-button.p-active,
+[data-theme="dark"] .p-sidebar-menu-button.p-active {
+    background: rgba(16, 185, 129, 0.15);
+    color: #6ee7b7;
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+.dark .p-sidebar-menu-badge,
+[data-theme="dark"] .p-sidebar-menu-badge {
+    background: var(--p-surface-800, #1e293b);
+    color: var(--p-surface-300, #cbd5e1);
+}
+
+.dark .p-sidebar-menu-sub,
+[data-theme="dark"] .p-sidebar-menu-sub {
+    border-color: var(--p-surface-800, #1e293b);
+}
+
+.dark .p-sidebar-menu-sub-button,
+[data-theme="dark"] .p-sidebar-menu-sub-button {
+    color: var(--p-surface-400, #94a3b8);
+}
+
+.dark .p-sidebar-menu-sub-button:hover,
+[data-theme="dark"] .p-sidebar-menu-sub-button:hover {
+    background: var(--p-surface-800, #1e293b);
+    color: var(--p-surface-0, #f8fafc);
+}
+
+.dark .p-sidebar-menu-sub-button.p-active,
+[data-theme="dark"] .p-sidebar-menu-sub-button.p-active {
+    background: rgba(16, 185, 129, 0.15);
+    color: #6ee7b7;
 }
 
 /* ==========================================================================
-   2. PrimeVue 4 Aura Compound Sidebar Layout & Components
+   2. PrimeVue 4 Aura Compound Playground & Demo Layouts
    ========================================================================== */
 .p-sidebar-playground-wrapper {
     display: flex;
@@ -338,7 +453,6 @@ const SIDEBAR_CSS = `
     letter-spacing: 0.01em;
 }
 
-/* Aura Custom Floating Select */
 .p-sb-select-trigger {
     display: flex;
     align-items: center;
@@ -485,7 +599,6 @@ const SIDEBAR_CSS = `
     transform: translateX(1.15rem);
 }
 
-/* Layout Container */
 .p-sidebar-layout {
     display: flex;
     position: relative;
@@ -542,7 +655,6 @@ const SIDEBAR_CSS = `
     position: relative;
 }
 
-/* Variants */
 .p-sidebar-variant-sidebar {
     border-right: 1px solid var(--p-sidebar-border-color, var(--p-border-color, #e2e8f0));
 }
@@ -568,7 +680,6 @@ const SIDEBAR_CSS = `
     background: transparent;
 }
 
-/* Overlay Mode */
 .p-sidebar.p-sidebar-overlay {
     position: absolute !important;
     top: 0;
@@ -583,17 +694,8 @@ const SIDEBAR_CSS = `
     right: 0;
 }
 
-/* Collapsed Icon Mode Smooth Fade */
-.p-sidebar-item-label,
-.p-sidebar-group-label,
-.p-sidebar-menu-badge,
-.p-sidebar-submenu-chevron,
-.p-sidebar-header-label,
-.p-sidebar-footer-label {
-    transition: opacity 180ms cubic-bezier(0.16, 1, 0.3, 1), transform 180ms cubic-bezier(0.16, 1, 0.3, 1);
-    opacity: 1;
-    transform: translateX(0);
-    white-space: nowrap;
+.p-sidebar-collapsible-icon.p-sidebar-collapsed {
+    width: 3.5rem !important;
 }
 
 .p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-item-label,
@@ -618,7 +720,6 @@ const SIDEBAR_CSS = `
     padding: 0.5rem 0 !important;
 }
 
-/* Offcanvas Collapsed Mode */
 .p-sidebar-collapsible-offcanvas.p-sidebar-collapsed {
     width: 0 !important;
     transform: translateX(-100%);
@@ -652,9 +753,6 @@ const SIDEBAR_CSS = `
 .p-sidebar-content::-webkit-scrollbar {
     width: 4px;
 }
-.p-sidebar-content::-webkit-scrollbar-track {
-    background: transparent;
-}
 .p-sidebar-content::-webkit-scrollbar-thumb {
     background: var(--p-surface-300);
     border-radius: 4px;
@@ -669,12 +767,6 @@ const SIDEBAR_CSS = `
     box-sizing: border-box;
 }
 
-.p-sidebar-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-}
-
 .p-sidebar-group-label {
     font-size: 0.725rem;
     font-weight: 700;
@@ -682,104 +774,6 @@ const SIDEBAR_CSS = `
     padding: 0.25rem 0.5rem 0.15rem;
     user-select: none;
     letter-spacing: 0.02em;
-}
-
-.p-sidebar-menu {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.125rem;
-}
-
-.p-sidebar-menu-item {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    position: relative;
-    width: 100%;
-}
-
-.p-sidebar-menu-button {
-    display: flex;
-    align-items: center;
-    gap: 0.65rem;
-    width: 100%;
-    padding: 0.45rem 0.65rem;
-    border-radius: var(--p-border-radius, 6px);
-    color: var(--p-sidebar-menu-button-color, var(--p-text-color, #0f172a));
-    text-decoration: none;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    font-size: 0.8125rem;
-    font-weight: 500;
-    transition: background-color 0.12s ease, color 0.12s ease, transform 0.12s ease;
-    box-sizing: border-box;
-    text-align: left;
-    outline: none;
-    position: relative;
-    overflow: hidden;
-}
-
-.p-sidebar-menu-button:hover,
-.p-sidebar-menu-button.p-hover {
-    background: var(--p-sidebar-menu-button-focus-background, var(--p-surface-100, #f1f5f9));
-}
-
-.p-sidebar-menu-button.p-active {
-    background: var(--p-surface-100, #f1f5f9);
-    color: #059669;
-    font-weight: 600;
-}
-
-.p-sidebar-menu-button-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 1.125rem;
-    height: 1.125rem;
-    flex-shrink: 0;
-    color: var(--p-surface-500, #64748b);
-    transition: transform 0.15s ease;
-}
-
-.p-sidebar-menu-button.p-active .p-sidebar-menu-button-icon {
-    color: #059669;
-}
-
-.p-sidebar-item-label {
-    flex: 1;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.p-sidebar-menu-badge {
-    margin-left: auto;
-    font-size: 0.7rem;
-    font-weight: 700;
-    padding: 0.1rem 0.4rem;
-    border-radius: 9999px;
-    background: var(--p-surface-200, #e2e8f0);
-    color: var(--p-surface-700, #334155);
-    flex-shrink: 0;
-}
-
-.p-sidebar-submenu-chevron {
-    margin-left: auto;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--p-surface-400, #94a3b8);
-    transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1);
-    flex-shrink: 0;
-}
-
-.p-sidebar-submenu-chevron.p-expanded {
-    transform: rotate(180deg);
 }
 
 .p-sidebar-menu-action {
@@ -809,57 +803,6 @@ const SIDEBAR_CSS = `
     background: #fee2e2;
     color: #dc2626;
     transform: translateY(-50%) scale(1.08);
-}
-
-/* Fluid CSS Grid Submenu Expand/Collapse Animation */
-.p-sidebar-menu-sub-wrapper {
-    display: grid;
-    grid-template-rows: 0fr;
-    transition: grid-template-rows 240ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms ease;
-    opacity: 0;
-}
-
-.p-sidebar-menu-sub-wrapper.p-expanded {
-    grid-template-rows: 1fr;
-    opacity: 1;
-}
-
-.p-sidebar-menu-sub {
-    overflow: hidden;
-    min-height: 0;
-    list-style: none;
-    margin: 0.15rem 0 0.25rem 1.15rem;
-    padding: 0 0 0 0.65rem;
-    border-left: 1px solid var(--p-border-color, #e2e8f0);
-    display: flex;
-    flex-direction: column;
-    gap: 0.125rem;
-}
-
-.p-sidebar-menu-sub-button {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    padding: 0.35rem 0.5rem;
-    border-radius: var(--p-border-radius, 4px);
-    font-size: 0.8125rem;
-    color: var(--p-surface-600, #475569);
-    text-decoration: none;
-    cursor: pointer;
-    transition: background-color 0.12s ease, color 0.12s ease;
-    border: none;
-    background: transparent;
-    text-align: left;
-}
-
-.p-sidebar-menu-sub-button:hover {
-    background: var(--p-surface-100, #f1f5f9);
-    color: var(--p-text-color, #0f172a);
-}
-
-.p-sidebar-menu-sub-button.p-active {
-    font-weight: 600;
-    color: var(--p-primary-600, #2563eb);
 }
 
 .p-sidebar-main {
@@ -907,7 +850,6 @@ const SIDEBAR_CSS = `
     transform: scale(0.94);
 }
 
-/* Interactive Popup Menu in Demo */
 .p-sb-popup-menu {
     position: absolute;
     background: var(--p-surface-0, #ffffff);
@@ -1049,279 +991,6 @@ const SIDEBAR_CSS = `
     opacity: 0.9;
     transform: scale(1.05);
 }
-
-/* Dual Sidebar Claude AI Chat Panel */
-.p-sb-chat-panel {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    padding: 0.75rem;
-    gap: 0.75rem;
-}
-
-.p-sb-chat-bubble {
-    background: var(--p-surface-100, #f1f5f9);
-    border-radius: 12px;
-    padding: 0.65rem 0.85rem;
-    font-size: 0.8125rem;
-    line-height: 1.4;
-    color: var(--p-text-color);
-}
-
-.p-sb-chat-metrics {
-    display: flex;
-    flex-direction: column;
-    gap: 0.45rem;
-    font-size: 0.8125rem;
-}
-
-.p-sb-chat-metrics-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: var(--p-text-muted);
-}
-
-.p-sb-chat-metrics-val {
-    font-weight: 600;
-    color: var(--p-text-color);
-}
-
-.p-sb-chat-input-box {
-    margin-top: auto;
-    border: 1px solid var(--p-border-color, #cbd5e1);
-    border-radius: 12px;
-    padding: 0.5rem 0.75rem;
-    background: var(--p-surface-0);
-}
-
-.p-sb-chat-input {
-    width: 100%;
-    border: none;
-    outline: none;
-    background: transparent;
-    font-size: 0.8125rem;
-    color: var(--p-text-color);
-}
-
-/* Dark Mode Tokens */
-.dark .p-sidebar-toolbar,
-[data-theme="dark"] .p-sidebar-toolbar {
-    background: var(--p-surface-900, #0f172a);
-    border-color: var(--p-surface-800, #1e293b);
-}
-
-.dark .p-sidebar-toolbar-label,
-[data-theme="dark"] .p-sidebar-toolbar-label {
-    color: var(--p-surface-300, #cbd5e1);
-}
-
-.dark .p-sb-select-trigger,
-[data-theme="dark"] .p-sb-select-trigger {
-    background: var(--p-surface-900, #0f172a);
-    border-color: var(--p-surface-700, #334155);
-    color: var(--p-surface-100, #f1f5f9);
-}
-
-.dark .p-sb-select-dropdown,
-[data-theme="dark"] .p-sb-select-dropdown {
-    background: var(--p-surface-900, #0f172a);
-    border-color: var(--p-surface-700, #334155);
-}
-
-.dark .p-sb-select-option,
-[data-theme="dark"] .p-sb-select-option {
-    color: var(--p-surface-100, #f1f5f9);
-}
-
-.dark .p-sb-select-option:hover,
-[data-theme="dark"] .p-sb-select-option:hover {
-    background: var(--p-surface-800, #1e293b);
-}
-
-.dark .p-sb-select-option.p-selected,
-[data-theme="dark"] .p-sb-select-option.p-selected {
-    background: var(--p-surface-800, #1e293b);
-    color: #60a5fa;
-}
-
-.dark .p-sb-segmented,
-[data-theme="dark"] .p-sb-segmented {
-    background: var(--p-surface-950, #020617);
-    border-color: var(--p-surface-800, #1e293b);
-}
-
-.dark .p-sb-seg-btn,
-[data-theme="dark"] .p-sb-seg-btn {
-    color: var(--p-surface-400, #94a3b8);
-}
-
-.dark .p-sb-seg-btn.p-active,
-[data-theme="dark"] .p-sb-seg-btn.p-active {
-    background: var(--p-surface-800, #1e293b);
-    color: var(--p-surface-0, #f8fafc);
-}
-
-.dark .p-sb-switch,
-[data-theme="dark"] .p-sb-switch {
-    background: var(--p-surface-700, #334155);
-}
-
-.dark .p-sb-switch.p-checked,
-[data-theme="dark"] .p-sb-switch.p-checked {
-    background: var(--p-primary-600, #2563eb);
-}
-
-.dark .p-sidebar-layout,
-[data-theme="dark"] .p-sidebar-layout {
-    background: var(--p-surface-950, #020617);
-    border-color: var(--p-surface-800, #1e293b);
-}
-
-.dark .p-sidebar-panel,
-[data-theme="dark"] .p-sidebar-panel {
-    background: var(--p-surface-900, #0f172a);
-    color: var(--p-surface-0, #f8fafc);
-}
-
-.dark .p-sidebar-variant-sidebar,
-[data-theme="dark"] .p-sidebar-variant-sidebar {
-    border-color: var(--p-surface-800, #1e293b);
-}
-
-.dark .p-sidebar-variant-floating .p-sidebar-panel,
-[data-theme="dark"] .p-sidebar-variant-floating .p-sidebar-panel {
-    border-color: var(--p-surface-800, #1e293b);
-}
-
-.dark .p-sidebar-variant-inset,
-[data-theme="dark"] .p-sidebar-variant-inset {
-    background: var(--p-surface-950, #020617);
-}
-
-.dark .p-sidebar-main,
-[data-theme="dark"] .p-sidebar-main {
-    background: var(--p-surface-950, #020617);
-}
-
-.dark .p-sidebar-main-header,
-[data-theme="dark"] .p-sidebar-main-header {
-    background: var(--p-surface-900, #0f172a);
-    border-color: var(--p-surface-800, #1e293b);
-}
-
-.dark .p-sidebar-menu-button,
-[data-theme="dark"] .p-sidebar-menu-button {
-    color: var(--p-surface-200, #e2e8f0);
-}
-
-.dark .p-sidebar-menu-button:hover,
-.dark .p-sidebar-menu-button.p-hover,
-[data-theme="dark"] .p-sidebar-menu-button:hover,
-[data-theme="dark"] .p-sidebar-menu-button.p-hover {
-    background: var(--p-surface-800, #1e293b);
-    color: var(--p-surface-0, #f8fafc);
-}
-
-.dark .p-sidebar-menu-button.p-active,
-[data-theme="dark"] .p-sidebar-menu-button.p-active {
-    background: rgba(16, 185, 129, 0.15);
-    color: #34d399;
-}
-
-.dark .p-sidebar-menu-badge,
-[data-theme="dark"] .p-sidebar-menu-badge {
-    background: var(--p-surface-800, #1e293b);
-    color: var(--p-surface-300, #cbd5e1);
-}
-
-.dark .p-sidebar-menu-action,
-[data-theme="dark"] .p-sidebar-menu-action {
-    background: var(--p-surface-800, #1e293b);
-    color: var(--p-surface-400, #94a3b8);
-}
-
-.dark .p-sidebar-menu-action:hover,
-[data-theme="dark"] .p-sidebar-menu-action:hover {
-    background: rgba(239, 68, 68, 0.2);
-    color: #f87171;
-}
-
-.dark .p-sidebar-menu-sub,
-[data-theme="dark"] .p-sidebar-menu-sub {
-    border-color: var(--p-surface-800, #1e293b);
-}
-
-.dark .p-sidebar-menu-sub-button,
-[data-theme="dark"] .p-sidebar-menu-sub-button {
-    color: var(--p-surface-400, #94a3b8);
-}
-
-.dark .p-sidebar-menu-sub-button:hover,
-[data-theme="dark"] .p-sidebar-menu-sub-button:hover {
-    background: var(--p-surface-800, #1e293b);
-    color: var(--p-surface-0, #f8fafc);
-}
-
-.dark .p-sidebar-menu-sub-button.p-active,
-[data-theme="dark"] .p-sidebar-menu-sub-button.p-active {
-    color: #60a5fa;
-}
-
-.dark .p-sb-popup-menu,
-[data-theme="dark"] .p-sb-popup-menu {
-    background: var(--p-surface-900, #0f172a);
-    border-color: var(--p-surface-700, #334155);
-}
-
-.dark .p-sb-popup-item,
-[data-theme="dark"] .p-sb-popup-item {
-    color: var(--p-surface-100, #f1f5f9);
-}
-
-.dark .p-sb-popup-item:hover,
-[data-theme="dark"] .p-sb-popup-item:hover {
-    background: var(--p-surface-800, #1e293b);
-}
-
-.dark .p-sb-chat-conversation,
-[data-theme="dark"] .p-sb-chat-conversation {
-    background: var(--p-surface-950, #020617);
-}
-
-.dark .p-sb-msg-user,
-[data-theme="dark"] .p-sb-msg-user {
-    background: var(--p-surface-800, #1e293b);
-    color: var(--p-surface-0, #f8fafc);
-}
-
-.dark .p-sb-chat-input-container,
-[data-theme="dark"] .p-sb-chat-input-container {
-    background: var(--p-surface-950, #020617);
-}
-
-.dark .p-sb-chat-input-pill,
-[data-theme="dark"] .p-sb-chat-input-pill {
-    background: var(--p-surface-900, #0f172a);
-    border-color: var(--p-surface-700, #334155);
-}
-
-.dark .p-sb-chat-send-btn,
-[data-theme="dark"] .p-sb-chat-send-btn {
-    background: var(--p-surface-100, #f1f5f9);
-    color: var(--p-surface-900, #0f172a);
-}
-
-.dark .p-sb-chat-bubble,
-[data-theme="dark"] .p-sb-chat-bubble {
-    background: var(--p-surface-800, #1e293b);
-}
-
-.dark .p-sb-chat-input-box,
-[data-theme="dark"] .p-sb-chat-input-box {
-    background: var(--p-surface-900, #0f172a);
-    border-color: var(--p-surface-700, #334155);
-}
 `;
 
 export interface SidebarSubItem {
@@ -1385,12 +1054,14 @@ export default function SidebarIsland(container: HTMLElement, props: SidebarProp
     }
 }
 
+/**
+ * Render PrimeVue 4 Aura Full App Shell Sidebar (Unified Design)
+ */
 function renderAppNavigationSidebar(container: HTMLElement, props: SidebarProps) {
     let collapsed = props.collapsed || false;
     let searchQuery = '';
     const items = props.items || [];
-    const position = props.position || 'left';
-    const title = props.title || 'Navigation';
+    const title = props.title || 'SoftMax Aura';
     const searchable = props.searchable !== false;
 
     const expandedMap: Record<string, boolean> = {};
@@ -1410,6 +1081,13 @@ function renderAppNavigationSidebar(container: HTMLElement, props: SidebarProps)
     }
     initExpanded(items);
 
+    function getIconSvg(iconName?: string): string {
+        if (!iconName) return '';
+        if (iconName.startsWith('<svg')) return iconName;
+        if ((LucideIcons as any)[iconName]) return (LucideIcons as any)[iconName];
+        return '';
+    }
+
     function renderNode(item: SidebarItem, level: number = 0): string {
         const label = (item as any).label || (item as any).Label || (item as any).title || (item as any).Title || '';
         const url = (item as any).url || (item as any).Url || '#';
@@ -1419,7 +1097,7 @@ function renderAppNavigationSidebar(container: HTMLElement, props: SidebarProps)
         const children = (item as any).items || (item as any).Items;
         const hasChildren = Array.isArray(children) && children.length > 0;
         const isExpanded = expandedMap[label] ?? true;
-        const iconSvg = icon && (LucideIcons as any)[icon] ? (LucideIcons as any)[icon] : (icon.startsWith('<svg') ? icon : '');
+        const iconSvg = getIconSvg(icon);
 
         if (searchQuery) {
             const q = searchQuery.toLowerCase();
@@ -1429,78 +1107,99 @@ function renderAppNavigationSidebar(container: HTMLElement, props: SidebarProps)
         }
 
         if (hasChildren) {
+            const childrenHtml = children.map((child: SidebarItem) => renderNode(child, level + 1)).join('');
+            
             return `
-                <li class="sidebar-group-container" data-label="${label}">
-                    <div class="sidebar-group-header" data-group-toggle="${label}" title="${label}">
-                        <div style="display: flex; align-items: center; gap: 0.45rem;">
-                            ${iconSvg ? `<span class="sidebar-group-icon" style="display: flex; width: 16px; height: 16px; color: var(--p-primary-600);">${iconSvg}</span>` : ''}
-                            <span class="sidebar-item-label">${label}</span>
+                <div class="p-sidebar-group" data-label="${label}">
+                    <button type="button" class="p-sidebar-group-header-btn" data-group-toggle="${label}" title="${label}">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; min-width: 0;">
+                            ${iconSvg ? `<span class="p-sidebar-menu-button-icon" style="color: var(--p-primary-600);">${iconSvg}</span>` : ''}
+                            <span class="p-sidebar-group-header-label">${label}</span>
                         </div>
-                        <span class="sidebar-group-chevron ${isExpanded ? 'expanded' : ''}">
-                            ${LucideIcons.chevronRight}
-                        </span>
+                        <svg class="p-sidebar-submenu-chevron ${isExpanded ? 'p-expanded' : ''}" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                    </button>
+                    <div class="p-sidebar-menu-sub-wrapper ${isExpanded ? 'p-expanded' : ''}">
+                        <ul class="p-sidebar-menu-sub" style="margin-left: 0.85rem;">
+                            ${childrenHtml}
+                        </ul>
                     </div>
-                    <ul class="sidebar-sub-tree" style="display: ${isExpanded ? 'flex' : 'none'};">
-                        ${children.map((child: SidebarItem) => renderNode(child, level + 1)).join('')}
-                    </ul>
-                </li>
+                </div>
             `;
         }
 
         return `
-            <li>
-                <a href="${url}" class="sidebar-item ${active ? 'active' : ''}" data-sidebar-link="${url}" title="${label}">
-                    ${iconSvg ? `<span class="sidebar-icon" style="display: flex; width: 18px; height: 18px; color: ${active ? 'var(--p-primary-600)' : 'var(--p-text-muted)'}; flex-shrink: 0;">${iconSvg}</span>` : ''}
-                    <span class="sidebar-item-label">${label}</span>
-                    ${badge ? `<span class="sidebar-badge">${badge}</span>` : ''}
+            <li class="p-sidebar-menu-item">
+                <a href="${url}" class="p-sidebar-menu-button ${active ? 'p-active' : ''}" data-sidebar-link="${url}" title="${label}">
+                    ${iconSvg ? `<span class="p-sidebar-menu-button-icon">${iconSvg}</span>` : ''}
+                    <span class="p-sidebar-item-label">${label}</span>
+                    ${badge ? `<span class="p-sidebar-menu-badge">${badge}</span>` : ''}
                 </a>
             </li>
         `;
     }
 
     function render() {
+        const triggerIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg>`;
+        const searchIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>`;
+
         container.innerHTML = `
-            <div class="laughtale-sidebar ${collapsed ? 'collapsed' : ''} ${position}">
-                <div class="sidebar-header">
-                    <div class="sidebar-brand-group" style="display: flex; align-items: center; gap: 0.6rem; overflow: hidden;">
-                        <span style="color: var(--p-primary-600); display: flex; flex-shrink: 0;">${LucideIcons.layers}</span>
-                        <span class="sidebar-header-title" style="font-weight: 800; font-size: 0.9rem; color: var(--p-text-color); white-space: nowrap;">${title}</span>
-                    </div>
-                    <button class="sidebar-toggle" aria-label="Toggle Sidebar" title="Collapse / Expand Sidebar">
-                        ${collapsed ? LucideIcons.chevronRight : LucideIcons.chevronLeft}
+            <aside class="p-sidebar-app-shell ${collapsed ? 'p-collapsed' : ''}">
+                <!-- Header Dock -->
+                <div class="p-sidebar-header-dock">
+                    <a href="/" class="p-sidebar-brand" title="${title}">
+                        <div class="p-sidebar-brand-logo">
+                            ${LucideIcons.layers || '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.9a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg>'}
+                        </div>
+                        <span class="p-sidebar-brand-text">${title}</span>
+                    </a>
+                    <button type="button" class="p-sidebar-trigger" data-app-sidebar-toggle title="Toggle Sidebar (${collapsed ? 'Expand' : 'Collapse'})">
+                        ${triggerIconSvg}
                     </button>
                 </div>
 
+                <!-- Search Input -->
                 ${searchable && !collapsed ? `
-                    <div class="sidebar-search-box">
-                        <input type="text" class="sidebar-search-input" placeholder="Filter components..." value="${searchQuery}" />
+                    <div class="p-sidebar-search-dock">
+                        <div class="p-sidebar-search-box">
+                            <span style="color: var(--p-surface-400); display: flex; align-items: center;">${searchIconSvg}</span>
+                            <input type="text" class="p-sidebar-search-input" placeholder="Search navigation..." value="${searchQuery}" />
+                        </div>
                     </div>
                 ` : ''}
 
-                <div class="sidebar-body">
-                    <ul class="sidebar-tree-menu">
-                        ${items.map(item => renderNode(item)).join('')}
-                    </ul>
+                <!-- Navigation Groups Content -->
+                <div class="p-sidebar-content-dock">
+                    ${items.map(item => renderNode(item)).join('')}
                 </div>
-            </div>
+
+                <!-- Footer Dock -->
+                <div class="p-sidebar-footer-dock">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; overflow: hidden;">
+                        <div style="width: 1.5rem; height: 1.5rem; border-radius: 9999px; background: var(--p-surface-200); display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700; color: var(--p-surface-700); flex-shrink: 0;">LT</div>
+                        <span class="p-sidebar-footer-text" style="font-size: 0.775rem; font-weight: 600; color: var(--p-text-muted); white-space: nowrap;">SoftMax LaughTale</span>
+                    </div>
+                    <span class="p-sidebar-footer-text aura-tag tag-emerald" style="font-size: 0.65rem; padding: 0.1rem 0.4rem;">v3.0</span>
+                </div>
+            </aside>
         `;
 
         bindEvents();
     }
 
     function bindEvents() {
-        container.querySelector('.sidebar-toggle')?.addEventListener('click', () => {
+        container.querySelector('[data-app-sidebar-toggle]')?.addEventListener('click', (e) => {
+            e.stopPropagation();
             collapsed = !collapsed;
             render();
         });
 
-        const searchInput = container.querySelector<HTMLInputElement>('.sidebar-search-input');
+        const searchInput = container.querySelector<HTMLInputElement>('.p-sidebar-search-input');
         if (searchInput) {
             searchInput.addEventListener('input', (e) => {
                 searchQuery = (e.target as HTMLInputElement).value;
-                const menuEl = container.querySelector('.sidebar-tree-menu');
-                if (menuEl) {
-                    menuEl.innerHTML = items.map(item => renderNode(item)).join('');
+                const contentEl = container.querySelector('.p-sidebar-content-dock');
+                if (contentEl) {
+                    contentEl.innerHTML = items.map(item => renderNode(item)).join('');
                     bindGroupToggles();
                     bindLinkClicks();
                 }
@@ -1512,22 +1211,23 @@ function renderAppNavigationSidebar(container: HTMLElement, props: SidebarProps)
     }
 
     function bindGroupToggles() {
-        container.querySelectorAll('[data-group-toggle]').forEach(header => {
-            header.addEventListener('click', (e) => {
+        container.querySelectorAll('[data-group-toggle]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                const groupLabel = header.getAttribute('data-group-toggle');
+                const groupLabel = btn.getAttribute('data-group-toggle');
                 if (groupLabel) {
                     expandedMap[groupLabel] = !expandedMap[groupLabel];
-                    const groupContainer = container.querySelector(`[data-label="${groupLabel}"]`);
-                    if (groupContainer) {
-                        const subTree = groupContainer.querySelector<HTMLElement>('.sidebar-sub-tree');
-                        const chevron = groupContainer.querySelector<HTMLElement>('.sidebar-group-chevron');
-                        if (subTree) {
-                            subTree.style.display = expandedMap[groupLabel] ? 'flex' : 'none';
+                    const isExp = expandedMap[groupLabel];
+                    const groupEl = btn.closest('.p-sidebar-group');
+                    if (groupEl) {
+                        const wrapper = groupEl.querySelector('.p-sidebar-menu-sub-wrapper');
+                        const chevron = btn.querySelector('.p-sidebar-submenu-chevron');
+                        if (wrapper) {
+                            wrapper.classList.toggle('p-expanded', isExp);
                         }
                         if (chevron) {
-                            chevron.classList.toggle('expanded', expandedMap[groupLabel]);
+                            chevron.classList.toggle('p-expanded', isExp);
                         }
                     }
                 }
@@ -1540,7 +1240,7 @@ function renderAppNavigationSidebar(container: HTMLElement, props: SidebarProps)
             link.addEventListener('click', (e) => {
                 const href = link.getAttribute('href') || '';
                 const hashIndex = href.indexOf('#');
-                if (hashIndex >= 0) {
+                if (hashIndex >= 0 && (href.startsWith('#') || href.startsWith(window.location.pathname))) {
                     const targetId = href.substring(hashIndex + 1);
                     const targetEl = document.getElementById(targetId);
 
@@ -1548,8 +1248,8 @@ function renderAppNavigationSidebar(container: HTMLElement, props: SidebarProps)
                         e.preventDefault();
                         targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-                        container.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
-                        link.classList.add('active');
+                        container.querySelectorAll('.p-sidebar-menu-button').forEach(el => el.classList.remove('p-active'));
+                        link.classList.add('p-active');
 
                         window.history.pushState(null, '', href);
                     }
@@ -1562,7 +1262,7 @@ function renderAppNavigationSidebar(container: HTMLElement, props: SidebarProps)
 }
 
 /**
- * Render PrimeVue 4 Aura Compound Sidebar Component
+ * Render PrimeVue 4 Aura Compound Sidebar Component (Playground & Showcase Demos)
  */
 function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
     const demoType = props.demoType || (props as any).DemoType || 'variants';
@@ -1650,8 +1350,6 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                 }
                 const isSubExpanded = !!expandedSubmenus[subKey];
                 const hasSubs = Array.isArray(it.subItems) && it.subItems.length > 0;
-                
-                // Icon handling: in chat demo, do NOT show icons on chat history items
                 const iconSvg = demoType === 'chat' ? '' : getIconSvg(it.icon);
 
                 let subTreeHtml = '';
