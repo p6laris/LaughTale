@@ -33259,6 +33259,8 @@ function renderAppNavigationSidebar(container, props) {
   render();
 }
 function renderCompoundSidebar(container, props) {
+  const demoType = props.demoType || props.DemoType || "variants";
+  const showControls = props.showControls !== false && demoType === "variants";
   let variant = props.variant || props.Variant || "sidebar";
   let collapsible = props.collapsible || props.Collapsible || "icon";
   let side = props.side || props.Side || "left";
@@ -33267,6 +33269,9 @@ function renderCompoundSidebar(container, props) {
   let backdrop = props.backdrop || props.Backdrop || false;
   let isOpen = props.open !== void 0 ? props.open : props.Open !== void 0 ? props.Open : true;
   let width = props.width || props.Width || "16rem";
+  let activeCompany = { name: "Acme Inc", logo: "A", color: "linear-gradient(135deg, #8b5cf6, #4f46e5)" };
+  let showCompanyPopup = false;
+  let showUserPopup = false;
   const expandedSubmenus = {};
   function getIconSvg(iconName) {
     if (!iconName) return "";
@@ -33331,7 +33336,7 @@ function renderCompoundSidebar(container, props) {
         const hasSubs = Array.isArray(it.subItems) && it.subItems.length > 0;
         const iconSvg = getIconSvg(it.icon);
         let subTreeHtml = "";
-        if (hasSubs && isSubExpanded) {
+        if (hasSubs) {
           const subListHtml = it.subItems.map((sub) => `
                         <li class="p-sidebar-menu-sub-item">
                             <button type="button" class="p-sidebar-menu-sub-button ${sub.isActive ? "p-active" : ""}">
@@ -33339,17 +33344,23 @@ function renderCompoundSidebar(container, props) {
                             </button>
                         </li>
                     `).join("");
-          subTreeHtml = `<ul class="p-sidebar-menu-sub">${subListHtml}</ul>`;
+          subTreeHtml = `
+                        <div class="p-sidebar-menu-sub-wrapper ${isSubExpanded ? "p-expanded" : ""}">
+                            <ul class="p-sidebar-menu-sub">${subListHtml}</ul>
+                        </div>
+                    `;
         }
         const chevronSvg = `<svg class="p-sidebar-submenu-chevron ${isSubExpanded ? "p-expanded" : ""}" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
         const ellipsisSvg = `<svg class="p-sidebar-menu-action" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>`;
+        const trashSvg = `<button type="button" class="p-sidebar-menu-action" title="Delete conversation" style="border:none;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>`;
+        const actionButton = demoType === "chat" ? trashSvg : it.badge === void 0 ? ellipsisSvg : "";
         return `
                     <li class="p-sidebar-menu-item" data-subkey="${subKey}">
                         <button type="button" class="p-sidebar-menu-button ${it.isActive ? "p-active" : ""}" data-has-subs="${hasSubs}">
                             ${iconSvg ? `<span class="p-sidebar-menu-button-icon">${iconSvg}</span>` : ""}
                             <span class="p-sidebar-item-label">${it.label}</span>
                             ${it.badge !== void 0 ? `<span class="p-sidebar-menu-badge">${it.badge}</span>` : ""}
-                            ${hasSubs ? chevronSvg : it.badge === void 0 ? ellipsisSvg : ""}
+                            ${hasSubs ? chevronSvg : actionButton}
                         </button>
                         ${subTreeHtml}
                     </li>
@@ -33362,6 +33373,222 @@ function renderCompoundSidebar(container, props) {
                 </div>
             `;
     }).join("");
+  }
+  function renderControlsHtml() {
+    return `
+            <div class="p-sidebar-toolbar">
+                <div class="p-sidebar-toolbar-field">
+                    <label class="p-sidebar-toolbar-label">Variant</label>
+                    <select class="p-sb-select" data-sb-variant>
+                        <option value="sidebar" ${variant === "sidebar" ? "selected" : ""}>Sidebar</option>
+                        <option value="floating" ${variant === "floating" ? "selected" : ""}>Floating</option>
+                        <option value="inset" ${variant === "inset" ? "selected" : ""}>Inset</option>
+                    </select>
+                </div>
+
+                <div class="p-sidebar-toolbar-field">
+                    <label class="p-sidebar-toolbar-label">Collapsible</label>
+                    <select class="p-sb-select" data-sb-collapsible>
+                        <option value="icon" ${collapsible === "icon" ? "selected" : ""}>Icon</option>
+                        <option value="offcanvas" ${collapsible === "offcanvas" ? "selected" : ""}>Offcanvas</option>
+                        <option value="none" ${collapsible === "none" ? "selected" : ""}>None</option>
+                    </select>
+                </div>
+
+                <div class="p-sidebar-toolbar-field">
+                    <label class="p-sidebar-toolbar-label">Side</label>
+                    <div class="p-sb-segmented">
+                        <button type="button" class="p-sb-seg-btn ${side === "left" ? "p-active" : ""}" data-sb-side="left">Left</button>
+                        <button type="button" class="p-sb-seg-btn ${side === "right" ? "p-active" : ""}" data-sb-side="right">Right</button>
+                    </div>
+                </div>
+
+                <div class="p-sidebar-toolbar-field">
+                    <label class="p-sidebar-toolbar-label">Overlay</label>
+                    <div class="p-sb-switch-container" data-sb-toggle="overlay">
+                        <div class="p-sb-switch ${overlay ? "p-checked" : ""}"></div>
+                    </div>
+                </div>
+
+                <div class="p-sidebar-toolbar-field">
+                    <label class="p-sidebar-toolbar-label">Open on Hover</label>
+                    <div class="p-sb-switch-container" data-sb-toggle="hover">
+                        <div class="p-sb-switch ${openOnHover ? "p-checked" : ""}"></div>
+                    </div>
+                </div>
+
+                <div class="p-sidebar-toolbar-field">
+                    <label class="p-sidebar-toolbar-label">Backdrop</label>
+                    <div class="p-sb-switch-container" data-sb-toggle="backdrop">
+                        <div class="p-sb-switch ${backdrop ? "p-checked" : ""}"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+  }
+  function renderHeaderContent() {
+    if (demoType === "chat") {
+      return `
+                <ul class="p-sidebar-menu">
+                    <li class="p-sidebar-menu-item">
+                        <button type="button" class="p-sidebar-menu-button" style="padding: 0.35rem 0.5rem;">
+                            <div style="display:flex; width:1.5rem; height:1.5rem; border-radius:9999px; background: var(--p-surface-900); color:var(--p-surface-0); align-items:center; justify-content:center; flex-shrink:0;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                            </div>
+                            <span class="p-sidebar-item-label p-sidebar-header-label" style="font-weight: 700; font-size: 0.875rem;">ChatGPT</span>
+                        </button>
+                    </li>
+                </ul>
+                <ul class="p-sidebar-menu" style="margin-top: 0.35rem;">
+                    <li class="p-sidebar-menu-item">
+                        <button type="button" class="p-sidebar-menu-button">
+                            <span class="p-sidebar-menu-button-icon">${LucideIcons.search}</span>
+                            <span class="p-sidebar-item-label">Search</span>
+                        </button>
+                    </li>
+                    <li class="p-sidebar-menu-item">
+                        <button type="button" class="p-sidebar-menu-button">
+                            <span class="p-sidebar-menu-button-icon">${LucideIcons.plus}</span>
+                            <span class="p-sidebar-item-label">New chat</span>
+                        </button>
+                    </li>
+                    <li class="p-sidebar-menu-item">
+                        <button type="button" class="p-sidebar-menu-button">
+                            <span class="p-sidebar-menu-button-icon">${LucideIcons.globe}</span>
+                            <span class="p-sidebar-item-label">Browse web</span>
+                        </button>
+                    </li>
+                </ul>
+            `;
+    }
+    if (demoType === "menu") {
+      return `
+                <div style="position: relative;">
+                    <ul class="p-sidebar-menu">
+                        <li class="p-sidebar-menu-item">
+                            <button type="button" class="p-sidebar-menu-button" data-company-trigger style="padding: 0.35rem 0.5rem;">
+                                <div style="display:flex; width:1.5rem; height:1.5rem; border-radius:6px; background: ${activeCompany.color}; color:#fff; align-items:center; justify-content:center; font-weight:700; font-size:0.75rem; flex-shrink:0;">${activeCompany.logo}</div>
+                                <span class="p-sidebar-item-label p-sidebar-header-label" style="font-weight: 700; font-size: 0.875rem;">${activeCompany.name}</span>
+                                <svg class="p-sidebar-submenu-chevron" style="margin-left: auto;" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                            </button>
+                        </li>
+                    </ul>
+                    ${showCompanyPopup ? `
+                        <div class="p-sb-popup-menu" style="top: 100%; left: 0; margin-top: 0.25rem;">
+                            <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-text-muted); padding: 0.25rem 0.5rem;">Companies</div>
+                            <div class="p-sb-popup-item" data-select-company="Acme Inc|A|linear-gradient(135deg, #8b5cf6, #4f46e5)">
+                                <div style="display:flex; width:1.25rem; height:1.25rem; border-radius:4px; background: linear-gradient(135deg, #8b5cf6, #4f46e5); color:#fff; align-items:center; justify-content:center; font-weight:700; font-size:0.65rem;">A</div>
+                                <span>Acme Inc</span>
+                                ${activeCompany.name === "Acme Inc" ? '<span style="margin-left:auto; color:var(--p-primary-600);">&#10003;</span>' : ""}
+                            </div>
+                            <div class="p-sb-popup-item" data-select-company="Globex Corp|G|linear-gradient(135deg, #10b981, #0d9488)">
+                                <div style="display:flex; width:1.25rem; height:1.25rem; border-radius:4px; background: linear-gradient(135deg, #10b981, #0d9488); color:#fff; align-items:center; justify-content:center; font-weight:700; font-size:0.65rem;">G</div>
+                                <span>Globex Corp</span>
+                                ${activeCompany.name === "Globex Corp" ? '<span style="margin-left:auto; color:var(--p-primary-600);">&#10003;</span>' : ""}
+                            </div>
+                            <div class="p-sb-popup-item" data-select-company="Initech|I|linear-gradient(135deg, #f97316, #dc2626)">
+                                <div style="display:flex; width:1.25rem; height:1.25rem; border-radius:4px; background: linear-gradient(135deg, #f97316, #dc2626); color:#fff; align-items:center; justify-content:center; font-weight:700; font-size:0.65rem;">I</div>
+                                <span>Initech</span>
+                                ${activeCompany.name === "Initech" ? '<span style="margin-left:auto; color:var(--p-primary-600);">&#10003;</span>' : ""}
+                            </div>
+                            <div style="border-top: 1px solid var(--p-border-color); margin: 0.25rem 0;"></div>
+                            <div class="p-sb-popup-item" style="color: var(--p-text-muted);">
+                                <span>+ Add company</span>
+                            </div>
+                        </div>
+                    ` : ""}
+                </div>
+            `;
+    }
+    return `
+            <ul class="p-sidebar-menu">
+                <li class="p-sidebar-menu-item">
+                    <button type="button" class="p-sidebar-menu-button" style="padding: 0.35rem 0.5rem;">
+                        <div style="display:flex; width:1.5rem; height:1.5rem; border-radius:6px; background: linear-gradient(135deg, #8b5cf6, #4f46e5); color:#fff; align-items:center; justify-content:center; font-weight:700; font-size:0.75rem; flex-shrink:0;">A</div>
+                        <span class="p-sidebar-item-label p-sidebar-header-label" style="font-weight: 700; font-size: 0.875rem;">Acme Inc</span>
+                    </button>
+                </li>
+            </ul>
+        `;
+  }
+  function renderFooterContent() {
+    if (demoType === "menu") {
+      return `
+                <div style="position: relative;">
+                    <ul class="p-sidebar-menu">
+                        <li class="p-sidebar-menu-item">
+                            <button type="button" class="p-sidebar-menu-button" data-user-trigger style="padding: 0.35rem 0.5rem;">
+                                <div style="display:flex; width:1.5rem; height:1.5rem; border-radius:9999px; background: var(--p-surface-300); color:var(--p-surface-800); align-items:center; justify-content:center; font-weight:700; font-size:0.65rem; flex-shrink:0;">JD</div>
+                                <span class="p-sidebar-item-label p-sidebar-footer-label" style="font-weight: 600; font-size: 0.8125rem;">John Doe</span>
+                                <svg class="p-sidebar-submenu-chevron" style="margin-left: auto;" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                            </button>
+                        </li>
+                    </ul>
+                    ${showUserPopup ? `
+                        <div class="p-sb-popup-menu" style="bottom: 100%; left: 0; margin-bottom: 0.25rem;">
+                            <div style="font-size: 0.725rem; font-weight: 600; color: var(--p-text-muted); padding: 0.25rem 0.5rem;">john@acme.com</div>
+                            <div class="p-sb-popup-item">
+                                <span class="p-sidebar-menu-button-icon">${LucideIcons.settings}</span>
+                                <span>Settings</span>
+                            </div>
+                            <div class="p-sb-popup-item">
+                                <span class="p-sidebar-menu-button-icon">${LucideIcons.bell}</span>
+                                <span>Notifications</span>
+                            </div>
+                            <div style="border-top: 1px solid var(--p-border-color); margin: 0.25rem 0;"></div>
+                            <div class="p-sb-popup-item" style="color: #ef4444;">
+                                <span class="p-sidebar-menu-button-icon">${LucideIcons.logOut}</span>
+                                <span>Sign out</span>
+                            </div>
+                        </div>
+                    ` : ""}
+                </div>
+            `;
+    }
+    return `
+            <ul class="p-sidebar-menu">
+                <li class="p-sidebar-menu-item">
+                    <button type="button" class="p-sidebar-menu-button" style="padding: 0.35rem 0.5rem;">
+                        <div style="display:flex; width:1.5rem; height:1.5rem; border-radius:9999px; background: var(--p-surface-300, #cbd5e1); color:var(--p-surface-800, #1e293b); align-items:center; justify-content:center; font-weight:700; font-size:0.65rem; flex-shrink:0;">JD</div>
+                        <span class="p-sidebar-item-label p-sidebar-footer-label" style="font-weight: 600; font-size: 0.8125rem;">John Doe</span>
+                    </button>
+                </li>
+            </ul>
+        `;
+  }
+  function renderMainContent() {
+    const triggerIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg>`;
+    if (demoType === "nested") {
+      return `
+                <div class="p-sidebar-main">
+                    <header class="p-sidebar-main-header">
+                        <button type="button" class="p-sidebar-trigger" data-sidebar-toggle aria-label="Toggle navigation">
+                            ${triggerIconSvg}
+                        </button>
+                        <span style="font-size: 0.875rem; font-weight: 600; color: var(--p-text-color);">File Manager</span>
+                    </header>
+                    <div style="flex: 1; padding: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                        <h1 style="font-size: 1.35rem; font-weight: 700; color: var(--p-text-color); margin: 0;">Q1 Report</h1>
+                        <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin: 0;">Documents &gt; Work &gt; Projects &gt; Q1 Report</p>
+                    </div>
+                </div>
+            `;
+    }
+    return `
+            <div class="p-sidebar-main">
+                <header class="p-sidebar-main-header">
+                    <button type="button" class="p-sidebar-trigger" data-sidebar-toggle aria-label="Toggle navigation">
+                        ${triggerIconSvg}
+                    </button>
+                    <span style="font-size: 0.875rem; font-weight: 600; color: var(--p-text-color);">Dashboard</span>
+                    ${demoType === "responsive" ? `<span style="margin-left: auto; font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.5rem; border-radius: 6px; background: var(--p-surface-100); color: var(--p-text-muted);">Desktop</span>` : ""}
+                </header>
+                <div style="flex: 1; padding: 1rem; display: flex; flex-direction: column; gap: 1rem; overflow-y: auto;">
+                    <div style="height: 6rem; border-radius: 8px; background: var(--p-surface-100); border: 1px solid var(--p-border-color); display: flex; align-items: center; justify-content: center; color: var(--p-text-muted); font-size: 0.875rem;">Main Content View</div>
+                    <div style="flex: 1; min-height: 8rem; border-radius: 8px; background: var(--p-surface-100); border: 1px solid var(--p-border-color); display: flex; align-items: center; justify-content: center; color: var(--p-text-muted); font-size: 0.875rem;">Analytics &amp; Data Area</div>
+                </div>
+            </div>
+        `;
   }
   function renderComponent() {
     const sidebarClasses = [
@@ -33378,55 +33605,36 @@ function renderCompoundSidebar(container, props) {
                 <div class="p-sidebar-aside">
                     <div class="p-sidebar-panel">
                         <div class="p-sidebar-header">
-                            <ul class="p-sidebar-menu">
-                                <li class="p-sidebar-menu-item">
-                                    <button type="button" class="p-sidebar-menu-button" style="padding: 0.35rem 0.5rem;">
-                                        <div style="display:flex; width:1.5rem; height:1.5rem; border-radius:6px; background: linear-gradient(135deg, #8b5cf6, #4f46e5); color:#fff; align-items:center; justify-content:center; font-weight:700; font-size:0.75rem; flex-shrink:0;">A</div>
-                                        <span class="p-sidebar-item-label p-sidebar-header-label" style="font-weight: 700; font-size: 0.875rem;">Acme Inc</span>
-                                    </button>
-                                </li>
-                            </ul>
+                            ${renderHeaderContent()}
                         </div>
                         <div class="p-sidebar-content">
                             ${renderGroupsHtml(groups)}
                         </div>
                         <div class="p-sidebar-footer">
-                            <ul class="p-sidebar-menu">
-                                <li class="p-sidebar-menu-item">
-                                    <button type="button" class="p-sidebar-menu-button" style="padding: 0.35rem 0.5rem;">
-                                        <div style="display:flex; width:1.5rem; height:1.5rem; border-radius:9999px; background: var(--p-surface-300, #cbd5e1); color:var(--p-surface-800, #1e293b); align-items:center; justify-content:center; font-weight:700; font-size:0.65rem; flex-shrink:0;">JD</div>
-                                        <span class="p-sidebar-item-label p-sidebar-footer-label" style="font-weight: 600; font-size: 0.8125rem;">John Doe</span>
-                                    </button>
-                                </li>
-                            </ul>
+                            ${renderFooterContent()}
                         </div>
                     </div>
                 </div>
             </aside>
         `;
-    const triggerIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg>`;
-    const mainHtml = `
-            <div class="p-sidebar-main">
-                <header class="p-sidebar-main-header">
-                    <button type="button" class="p-sidebar-trigger" data-sidebar-toggle aria-label="Toggle navigation">
-                        ${triggerIconSvg}
-                    </button>
-                    <span style="font-size: 0.875rem; font-weight: 600; color: var(--p-text-color);">Dashboard</span>
-                </header>
-                <div style="flex: 1; padding: 1rem; display: flex; flex-direction: column; gap: 1rem; overflow-y: auto;">
-                    <div style="height: 6rem; border-radius: 8px; background: var(--p-surface-100); border: 1px solid var(--p-border-color); display: flex; align-items: center; justify-content: center; color: var(--p-text-muted); font-size: 0.875rem;">Main Content View</div>
-                    <div style="flex: 1; min-height: 8rem; border-radius: 8px; background: var(--p-surface-100); border: 1px solid var(--p-border-color); display: flex; align-items: center; justify-content: center; color: var(--p-text-muted); font-size: 0.875rem;">Analytics &amp; Data Area</div>
-                </div>
-            </div>
-        `;
+    const mainHtml = renderMainContent();
     const backdropHtml = backdrop && isOpen ? `<div class="p-sidebar-backdrop" data-sidebar-backdrop></div>` : "";
     const innerContent = side === "right" ? mainHtml + sidebarHtml : sidebarHtml + mainHtml;
-    return `
+    const layoutHtml = `
             <div class="p-sidebar-layout">
                 ${backdropHtml}
                 ${innerContent}
             </div>
         `;
+    if (showControls) {
+      return `
+                <div class="p-sidebar-playground-wrapper">
+                    ${renderControlsHtml()}
+                    ${layoutHtml}
+                </div>
+            `;
+    }
+    return layoutHtml;
   }
   function wireEvents() {
     container.querySelectorAll("[data-sidebar-toggle]").forEach((btn) => {
@@ -33448,10 +33656,95 @@ function renderCompoundSidebar(container, props) {
         const subKey = li?.getAttribute("data-subkey");
         if (subKey) {
           expandedSubmenus[subKey] = !expandedSubmenus[subKey];
-          render();
+          const wrapper = li?.querySelector(".p-sidebar-menu-sub-wrapper");
+          const chevron = li?.querySelector(".p-sidebar-submenu-chevron");
+          if (wrapper) {
+            wrapper.classList.toggle("p-expanded", expandedSubmenus[subKey]);
+          }
+          if (chevron) {
+            chevron.classList.toggle("p-expanded", expandedSubmenus[subKey]);
+          }
         }
       });
     });
+    const compTrigger = container.querySelector("[data-company-trigger]");
+    if (compTrigger) {
+      compTrigger.addEventListener("click", (e) => {
+        e.stopPropagation();
+        showCompanyPopup = !showCompanyPopup;
+        showUserPopup = false;
+        render();
+      });
+    }
+    container.querySelectorAll("[data-select-company]").forEach((item) => {
+      item.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const raw = item.getAttribute("data-select-company") || "";
+        const parts = raw.split("|");
+        if (parts.length >= 3) {
+          activeCompany = { name: parts[0], logo: parts[1], color: parts[2] };
+        }
+        showCompanyPopup = false;
+        render();
+      });
+    });
+    const userTrigger = container.querySelector("[data-user-trigger]");
+    if (userTrigger) {
+      userTrigger.addEventListener("click", (e) => {
+        e.stopPropagation();
+        showUserPopup = !showUserPopup;
+        showCompanyPopup = false;
+        render();
+      });
+    }
+    document.addEventListener("click", () => {
+      if (showCompanyPopup || showUserPopup) {
+        showCompanyPopup = false;
+        showUserPopup = false;
+        render();
+      }
+    }, { once: true });
+    const vSelect = container.querySelector("[data-sb-variant]");
+    if (vSelect) {
+      vSelect.addEventListener("change", () => {
+        variant = vSelect.value;
+        render();
+      });
+    }
+    const cSelect = container.querySelector("[data-sb-collapsible]");
+    if (cSelect) {
+      cSelect.addEventListener("change", () => {
+        collapsible = cSelect.value;
+        render();
+      });
+    }
+    container.querySelectorAll("[data-sb-side]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        side = btn.getAttribute("data-sb-side");
+        render();
+      });
+    });
+    const overlayToggle = container.querySelector('[data-sb-toggle="overlay"]');
+    if (overlayToggle) {
+      overlayToggle.addEventListener("click", () => {
+        overlay = !overlay;
+        render();
+      });
+    }
+    const hoverToggle = container.querySelector('[data-sb-toggle="hover"]');
+    if (hoverToggle) {
+      hoverToggle.addEventListener("click", () => {
+        openOnHover = !openOnHover;
+        render();
+      });
+    }
+    const backdropToggle = container.querySelector('[data-sb-toggle="backdrop"]');
+    if (backdropToggle) {
+      backdropToggle.addEventListener("click", () => {
+        backdrop = !backdrop;
+        render();
+      });
+    }
     if (openOnHover) {
       const aside = container.querySelector("[data-sidebar-root]");
       if (aside) {
@@ -33497,7 +33790,7 @@ var init_sidebar = __esm({
     position: sticky;
     top: 0;
     left: 0;
-    transition: width 200ms cubic-bezier(0.4, 0, 0.2, 1), min-width 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    transition: width 220ms cubic-bezier(0.4, 0, 0.2, 1), min-width 220ms cubic-bezier(0.4, 0, 0.2, 1);
     font-family: var(--p-font-family, inherit);
     overflow: hidden;
     border-radius: 0;
@@ -33649,7 +33942,7 @@ var init_sidebar = __esm({
 .sidebar-group-chevron {
     display: flex;
     align-items: center;
-    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 220ms cubic-bezier(0.4, 0, 0.2, 1);
     color: var(--p-text-muted);
 }
 .sidebar-group-chevron.expanded {
@@ -33773,17 +34066,143 @@ var init_sidebar = __esm({
 /* ==========================================================================
    2. PrimeVue 4 Aura Compound Sidebar Layout & Components
    ========================================================================== */
+.p-sidebar-playground-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    width: 100%;
+}
+
+.p-sidebar-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 1.25rem;
+    padding: 0.75rem 1rem;
+    background: var(--p-surface-0, #ffffff);
+    border: 1px solid var(--p-border-color, #e2e8f0);
+    border-radius: var(--p-border-radius, 8px);
+    box-sizing: border-box;
+}
+
+.p-sidebar-toolbar-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.p-sidebar-toolbar-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--p-surface-600, #475569);
+    letter-spacing: 0.01em;
+}
+
+/* Aura Custom Controls inside Playground */
+.p-sb-select {
+    padding: 0.45rem 2rem 0.45rem 0.75rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    border-radius: var(--p-border-radius, 6px);
+    border: 1px solid var(--p-border-color, #cbd5e1);
+    background: var(--p-surface-0, #ffffff);
+    color: var(--p-text-color, #0f172a);
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.65rem center;
+}
+
+.p-sb-select:focus {
+    border-color: var(--p-primary-500, #3b82f6);
+    box-shadow: 0 0 0 1px var(--p-primary-500, #3b82f6);
+}
+
+.p-sb-segmented {
+    display: inline-flex;
+    background: var(--p-surface-100, #f1f5f9);
+    padding: 2px;
+    border-radius: var(--p-border-radius, 6px);
+    border: 1px solid var(--p-border-color, #cbd5e1);
+    gap: 2px;
+}
+
+.p-sb-seg-btn {
+    padding: 0.35rem 0.75rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    border: none;
+    background: transparent;
+    color: var(--p-surface-600, #475569);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.p-sb-seg-btn.p-active {
+    background: var(--p-surface-0, #ffffff);
+    color: var(--p-text-color, #0f172a);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+/* Aura ToggleSwitch */
+.p-sb-switch-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    user-select: none;
+    padding-bottom: 0.25rem;
+}
+
+.p-sb-switch {
+    width: 2.5rem;
+    height: 1.35rem;
+    background: var(--p-surface-300, #cbd5e1);
+    border-radius: 9999px;
+    position: relative;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.p-sb-switch::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 1.1rem;
+    height: 1.1rem;
+    background: #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.p-sb-switch.p-checked {
+    background: var(--p-primary-600, #2563eb);
+}
+
+.p-sb-switch.p-checked::after {
+    transform: translateX(1.15rem);
+}
+
+/* Layout Container */
 .p-sidebar-layout {
     display: flex;
     position: relative;
     width: 100%;
-    min-height: 28rem;
-    height: 28rem;
+    min-height: 32rem;
+    height: 32rem;
     background: var(--p-sidebar-layout-background, var(--p-surface-0, #ffffff));
     overflow: hidden;
     box-sizing: border-box;
     font-family: inherit;
     border-radius: var(--p-border-radius, 8px);
+    border: 1px solid var(--p-border-color, #e2e8f0);
 }
 
 .p-sidebar-backdrop {
@@ -33792,7 +34211,7 @@ var init_sidebar = __esm({
     background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(2px);
     z-index: 90;
-    transition: opacity 0.2s ease;
+    transition: opacity 0.22s ease;
 }
 
 .p-sidebar {
@@ -33802,8 +34221,9 @@ var init_sidebar = __esm({
     position: relative;
     z-index: 100;
     box-sizing: border-box;
-    transition: width 0.22s cubic-bezier(0.4, 0, 0.2, 1), transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: width 220ms cubic-bezier(0.4, 0, 0.2, 1), transform 220ms cubic-bezier(0.4, 0, 0.2, 1);
     flex-shrink: 0;
+    overflow: hidden;
 }
 
 .p-sidebar-aside {
@@ -33827,6 +34247,7 @@ var init_sidebar = __esm({
     position: relative;
 }
 
+/* Variants */
 .p-sidebar-variant-sidebar {
     border-right: 1px solid var(--p-sidebar-border-color, var(--p-border-color, #e2e8f0));
 }
@@ -33852,11 +34273,12 @@ var init_sidebar = __esm({
     background: transparent;
 }
 
+/* Overlay Mode */
 .p-sidebar-overlay {
     position: absolute !important;
     top: 0;
     bottom: 0;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
     z-index: 100;
 }
 .p-sidebar-side-left.p-sidebar-overlay {
@@ -33866,6 +34288,7 @@ var init_sidebar = __esm({
     right: 0;
 }
 
+/* Collapsed Icon Mode */
 .p-sidebar-collapsible-icon.p-sidebar-collapsed {
     width: 3.5rem !important;
 }
@@ -33874,7 +34297,7 @@ var init_sidebar = __esm({
 .p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-group-label,
 .p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-menu-badge,
 .p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-submenu-chevron,
-.p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-menu-sub,
+.p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-menu-sub-wrapper,
 .p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-menu-action,
 .p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-header-label,
 .p-sidebar-collapsible-icon.p-sidebar-collapsed .p-sidebar-footer-label {
@@ -33886,6 +34309,7 @@ var init_sidebar = __esm({
     padding: 0.5rem 0 !important;
 }
 
+/* Offcanvas Collapsed Mode */
 .p-sidebar-collapsible-offcanvas.p-sidebar-collapsed {
     width: 0 !important;
     transform: translateX(-100%);
@@ -34017,7 +34441,7 @@ var init_sidebar = __esm({
     align-items: center;
     justify-content: center;
     color: var(--p-surface-400, #94a3b8);
-    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 220ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .p-sidebar-submenu-chevron.p-expanded {
@@ -34037,6 +34461,8 @@ var init_sidebar = __esm({
     border-radius: 4px;
     color: var(--p-surface-400, #94a3b8);
     cursor: pointer;
+    background: transparent;
+    border: none;
 }
 
 .p-sidebar-menu-item:hover .p-sidebar-menu-action {
@@ -34048,7 +34474,20 @@ var init_sidebar = __esm({
     color: var(--p-surface-700, #334155);
 }
 
+/* Fluid CSS Grid Submenu Expand/Collapse Animation */
+.p-sidebar-menu-sub-wrapper {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 220ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.p-sidebar-menu-sub-wrapper.p-expanded {
+    grid-template-rows: 1fr;
+}
+
 .p-sidebar-menu-sub {
+    overflow: hidden;
+    min-height: 0;
     list-style: none;
     margin: 0.15rem 0 0.25rem 1.15rem;
     padding: 0 0 0 0.65rem;
@@ -34125,10 +34564,87 @@ var init_sidebar = __esm({
     color: var(--p-text-color, #0f172a);
 }
 
+/* Interactive Popup Menu in Demo */
+.p-sb-popup-menu {
+    position: absolute;
+    background: var(--p-surface-0, #ffffff);
+    border: 1px solid var(--p-border-color, #e2e8f0);
+    border-radius: var(--p-border-radius, 8px);
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.05);
+    padding: 0.35rem;
+    z-index: 1000;
+    min-width: 13rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.p-sb-popup-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 0.65rem;
+    border-radius: 6px;
+    font-size: 0.8125rem;
+    color: var(--p-text-color, #0f172a);
+    cursor: pointer;
+    transition: background-color 0.12s ease;
+}
+
+.p-sb-popup-item:hover {
+    background: var(--p-surface-100, #f1f5f9);
+}
+
 /* Dark Mode Tokens */
+.dark .p-sidebar-toolbar,
+[data-theme="dark"] .p-sidebar-toolbar {
+    background: var(--p-surface-900, #0f172a);
+    border-color: var(--p-surface-800, #1e293b);
+}
+
+.dark .p-sidebar-toolbar-label,
+[data-theme="dark"] .p-sidebar-toolbar-label {
+    color: var(--p-surface-300, #cbd5e1);
+}
+
+.dark .p-sb-select,
+[data-theme="dark"] .p-sb-select {
+    background: var(--p-surface-900, #0f172a);
+    border-color: var(--p-surface-700, #334155);
+    color: var(--p-surface-100, #f1f5f9);
+}
+
+.dark .p-sb-segmented,
+[data-theme="dark"] .p-sb-segmented {
+    background: var(--p-surface-950, #020617);
+    border-color: var(--p-surface-800, #1e293b);
+}
+
+.dark .p-sb-seg-btn,
+[data-theme="dark"] .p-sb-seg-btn {
+    color: var(--p-surface-400, #94a3b8);
+}
+
+.dark .p-sb-seg-btn.p-active,
+[data-theme="dark"] .p-sb-seg-btn.p-active {
+    background: var(--p-surface-800, #1e293b);
+    color: var(--p-surface-0, #f8fafc);
+}
+
+.dark .p-sb-switch,
+[data-theme="dark"] .p-sb-switch {
+    background: var(--p-surface-700, #334155);
+}
+
+.dark .p-sb-switch.p-checked,
+[data-theme="dark"] .p-sb-switch.p-checked {
+    background: var(--p-primary-600, #2563eb);
+}
+
 .dark .p-sidebar-layout,
 [data-theme="dark"] .p-sidebar-layout {
     background: var(--p-surface-950, #020617);
+    border-color: var(--p-surface-800, #1e293b);
 }
 
 .dark .p-sidebar-panel,
@@ -34207,6 +34723,22 @@ var init_sidebar = __esm({
 .dark .p-sidebar-menu-sub-button.p-active,
 [data-theme="dark"] .p-sidebar-menu-sub-button.p-active {
     color: #60a5fa;
+}
+
+.dark .p-sb-popup-menu,
+[data-theme="dark"] .p-sb-popup-menu {
+    background: var(--p-surface-900, #0f172a);
+    border-color: var(--p-surface-700, #334155);
+}
+
+.dark .p-sb-popup-item,
+[data-theme="dark"] .p-sb-popup-item {
+    color: var(--p-surface-100, #f1f5f9);
+}
+
+.dark .p-sb-popup-item:hover,
+[data-theme="dark"] .p-sb-popup-item:hover {
+    background: var(--p-surface-800, #1e293b);
 }
 `;
   }

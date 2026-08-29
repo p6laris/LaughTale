@@ -5387,114 +5387,35 @@
             <div data-sidebar-demo="variants" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
                 <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Variants</h3>
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Interactive playground for every sidebar variant, collapsible mode, side, overlay, open-on-hover and backdrop.</p>
-                
-                <div id="sidebar-playground-controls" style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end; margin-bottom: 1.25rem;">
-                    <div style="display: flex; flex-direction: column; gap: 0.35rem;">
-                        <label style="font-size: 0.75rem; font-weight: 700; color: var(--p-text-muted);">Variant</label>
-                        <select id="sb-opt-variant" class="p-select" style="padding: 0.4rem 0.75rem; border-radius: 6px; border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); font-size: 0.8125rem; min-width: 8.5rem;">
-                            <option value="sidebar" selected>Sidebar</option>
-                            <option value="floating">Floating</option>
-                            <option value="inset">Inset</option>
-                        </select>
-                    </div>
-                    <div style="display: flex; flex-direction: column; gap: 0.35rem;">
-                        <label style="font-size: 0.75rem; font-weight: 700; color: var(--p-text-muted);">Collapsible</label>
-                        <select id="sb-opt-collapsible" class="p-select" style="padding: 0.4rem 0.75rem; border-radius: 6px; border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); font-size: 0.8125rem; min-width: 8.5rem;">
-                            <option value="icon" selected>Icon</option>
-                            <option value="offcanvas">Offcanvas</option>
-                            <option value="none">None</option>
-                        </select>
-                    </div>
-                    <div style="display: flex; flex-direction: column; gap: 0.35rem;">
-                        <label style="font-size: 0.75rem; font-weight: 700; color: var(--p-text-muted);">Side</label>
-                        <select id="sb-opt-side" class="p-select" style="padding: 0.4rem 0.75rem; border-radius: 6px; border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); font-size: 0.8125rem; min-width: 7.5rem;">
-                            <option value="left" selected>Left</option>
-                            <option value="right">Right</option>
-                        </select>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 0.5rem; padding-bottom: 0.35rem;">
-                        <input type="checkbox" id="sb-opt-overlay" style="cursor: pointer;" />
-                        <label for="sb-opt-overlay" style="font-size: 0.8125rem; font-weight: 600; cursor: pointer;">Overlay</label>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 0.5rem; padding-bottom: 0.35rem;">
-                        <input type="checkbox" id="sb-opt-hover" style="cursor: pointer;" />
-                        <label for="sb-opt-hover" style="font-size: 0.8125rem; font-weight: 600; cursor: pointer;">Open on Hover</label>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 0.5rem; padding-bottom: 0.35rem;">
-                        <input type="checkbox" id="sb-opt-backdrop" style="cursor: pointer;" />
-                        <label for="sb-opt-backdrop" style="font-size: 0.8125rem; font-weight: 600; cursor: pointer;">Backdrop</label>
-                    </div>
-                </div>
-
-                <div id="sidebar-playground-mount" class="border border-surface-200 dark:border-surface-700 rounded-lg overflow-hidden" style="border: 1px solid var(--p-border-color); border-radius: 8px; overflow: hidden;">
-                    <p-sidebar id="variants-demo" variant="sidebar" collapsible="icon" side="left" groups="@Model.SidebarVariantsGroups" />
-                </div>
-                <script>
-                    document.addEventListener('DOMContentLoaded', () => {
-                        const mount = document.getElementById('sidebar-playground-mount');
-                        const vSel = document.getElementById('sb-opt-variant');
-                        const cSel = document.getElementById('sb-opt-collapsible');
-                        const sSel = document.getElementById('sb-opt-side');
-                        const oChk = document.getElementById('sb-opt-overlay');
-                        const hChk = document.getElementById('sb-opt-hover');
-                        const bChk = document.getElementById('sb-opt-backdrop');
-
-                        function updatePlayground() {
-                            if (!mount || !window.IslandRuntime) return;
-                            const el = mount.querySelector('[data-island="sidebar"]');
-                            if (!el) return;
-                            const currentProps = JSON.parse(el.getAttribute('data-props') || '{}');
-                            currentProps.variant = vSel ? vSel.value : 'sidebar';
-                            currentProps.collapsible = cSel ? cSel.value : 'icon';
-                            currentProps.side = sSel ? sSel.value : 'left';
-                            currentProps.overlay = oChk ? oChk.checked : false;
-                            currentProps.openOnHover = hChk ? hChk.checked : false;
-                            currentProps.backdrop = bChk ? bChk.checked : false;
-                            el.setAttribute('data-props', JSON.stringify(currentProps));
-                            window.IslandRuntime.hydrateAll(mount);
-                        }
-
-                        [vSel, cSel, sSel, oChk, hChk, bChk].forEach(ctrl => {
-                            ctrl?.addEventListener('change', updatePlayground);
-                        });
-                    });
-                </script>
+                <p-sidebar id="variants-demo" demo-type="variants" groups="@Model.SidebarVariantsGroups" />
             </div>
 
             <!-- Demo 2: With Menu -->
             <div data-sidebar-demo="with-menu" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
                 <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">With Menu</h3>
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Full application chrome with a workspace switcher in the header, grouped navigation, and a user menu in the footer.</p>
-                <div class="border border-surface-200 dark:border-surface-700 rounded-lg overflow-hidden" style="border: 1px solid var(--p-border-color); border-radius: 8px; overflow: hidden;">
-                    <p-sidebar id="menu-demo" collapsible="icon" groups="@Model.SidebarVariantsGroups" />
-                </div>
+                <p-sidebar id="menu-demo" demo-type="menu" collapsible="icon" groups="@Model.SidebarVariantsGroups" />
             </div>
 
             <!-- Demo 3: Responsive -->
             <div data-sidebar-demo="responsive" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
                 <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Responsive</h3>
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Adaptive layout switching smoothly between desktop icon mode and mobile offcanvas overlay.</p>
-                <div class="border border-surface-200 dark:border-surface-700 rounded-lg overflow-hidden" style="border: 1px solid var(--p-border-color); border-radius: 8px; overflow: hidden;">
-                    <p-sidebar id="mobile-nav" collapsible="icon" width="14rem" groups="@Model.SidebarVariantsGroups" />
-                </div>
+                <p-sidebar id="mobile-nav" demo-type="responsive" collapsible="icon" width="14rem" groups="@Model.SidebarVariantsGroups" />
             </div>
 
             <!-- Demo 4: Nested Menu -->
             <div data-sidebar-demo="nested" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
                 <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Nested Menu</h3>
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Menu items become collapsible to reveal nested SidebarMenuSub structures with deep multi-level file trees.</p>
-                <div class="border border-surface-200 dark:border-surface-700 rounded-lg overflow-hidden" style="border: 1px solid var(--p-border-color); border-radius: 8px; overflow: hidden;">
-                    <p-sidebar id="nested-menu-demo" collapsible="icon" groups="@Model.SidebarNestedGroups" />
-                </div>
+                <p-sidebar id="nested-menu-demo" demo-type="nested" collapsible="icon" groups="@Model.SidebarNestedGroups" />
             </div>
 
             <!-- Demo 5: Chat Application -->
             <div data-sidebar-demo="chat" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
                 <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Chat Application</h3>
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Chat history sidebar with grouped conversations (Today, Yesterday, Previous 7 days) and hover actions.</p>
-                <div class="border border-surface-200 dark:border-surface-700 rounded-lg overflow-hidden" style="border: 1px solid var(--p-border-color); border-radius: 8px; overflow: hidden;">
-                    <p-sidebar id="chat-history-demo" collapsible="icon" width="16rem" groups="@Model.SidebarChatHistoryGroups" />
-                </div>
+                <p-sidebar id="chat-history-demo" demo-type="chat" collapsible="icon" width="16rem" groups="@Model.SidebarChatHistoryGroups" />
             </div>
         </div>
     </section>
