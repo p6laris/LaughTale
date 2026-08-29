@@ -8,305 +8,6 @@ var __export = (target, all) => {
     __defProp(target, name, { get: all[name], enumerable: true });
 };
 
-// src/runtime/registry.ts
-function defineIsland(name, loader) {
-  registry.set(name, loader);
-}
-function hasIsland(name) {
-  return registry.has(name);
-}
-function getIslandDefinition(name) {
-  const loader = registry.get(name);
-  return loader ? { name, loader } : void 0;
-}
-var registry;
-var init_registry = __esm({
-  "src/runtime/registry.ts"() {
-    "use strict";
-    registry = /* @__PURE__ */ new Map();
-  }
-});
-
-// src/runtime/reviver.ts
-function reviveTuple(raw) {
-  if (Array.isArray(raw) && raw.length === 2 && typeof raw[0] === "number" && raw[0] in propTypes) {
-    return propTypes[raw[0]](raw[1]);
-  }
-  if (typeof raw === "string" && ISO_DATE_REGEX.test(raw)) {
-    const d = new Date(raw);
-    if (!isNaN(d.getTime())) return d;
-  }
-  if (Array.isArray(raw)) {
-    return reviveArray(raw);
-  }
-  if (typeof raw === "object" && raw !== null) {
-    return reviveObject(raw);
-  }
-  return raw;
-}
-function reviveArray(raw) {
-  return raw.map(reviveTuple);
-}
-function reviveObject(raw) {
-  if (!raw || typeof raw !== "object") return raw;
-  const result = {};
-  for (const [key, value] of Object.entries(raw)) {
-    result[key] = reviveTuple(value);
-  }
-  return result;
-}
-function parseAndReviveProps(rawJson) {
-  if (!rawJson || rawJson.trim() === "" || rawJson === "{}") {
-    return {};
-  }
-  try {
-    const parsed = JSON.parse(rawJson);
-    return reviveTuple(parsed);
-  } catch (err) {
-    console.error("[SoftMax.LaughTale] Failed to parse and revive island props:", err, rawJson);
-    return {};
-  }
-}
-var ISO_DATE_REGEX, propTypes;
-var init_reviver = __esm({
-  "src/runtime/reviver.ts"() {
-    "use strict";
-    ISO_DATE_REGEX = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})?)?$/;
-    propTypes = {
-      0: (val) => reviveObject(val),
-      1: (val) => reviveArray(val),
-      2: (val) => new RegExp(val),
-      3: (val) => new Date(val),
-      4: (val) => new Map(reviveArray(val)),
-      5: (val) => new Set(reviveArray(val)),
-      6: (val) => BigInt(val),
-      7: (val) => new URL(val, window.location.origin),
-      8: (val) => {
-        if (typeof val === "string") {
-          const binaryString = atob(val);
-          const bytes = new Uint8Array(binaryString.length);
-          for (let i = 0; i < binaryString.length; i++) {
-            bytes[i] = binaryString.charCodeAt(i);
-          }
-          return bytes;
-        }
-        return new Uint8Array(val);
-      }
-    };
-  }
-});
-
-// src/runtime/retry.ts
-async function importWithRetry(importFnOrUrl, retries = 3, baseDelayMs = 1e3) {
-  if (typeof importFnOrUrl === "function") {
-    for (let attempt = 0; attempt < retries; attempt++) {
-      try {
-        return await importFnOrUrl();
-      } catch (err) {
-        if (attempt === retries - 1) throw err;
-        const delay = baseDelayMs * Math.pow(2, attempt);
-        console.warn(`[SoftMax.LaughTale] Island dynamic import failed. Retrying in ${delay}ms (Attempt ${attempt + 1}/${retries})...`, err);
-        await new Promise((resolve) => setTimeout(resolve, delay));
-      }
-    }
-  }
-  let url = importFnOrUrl;
-  for (let attempt = 0; attempt < retries; attempt++) {
-    try {
-      return await import(
-        /* @vite-ignore */
-        url
-      );
-    } catch (err) {
-      if (attempt === retries - 1) throw err;
-      const delay = baseDelayMs * Math.pow(2, attempt);
-      console.warn(`[SoftMax.LaughTale] Failed to fetch island script at ${url}. Retrying with cache-buster in ${delay}ms...`, err);
-      await new Promise((resolve) => setTimeout(resolve, delay));
-      const parsed = new URL(url, document.baseURI);
-      parsed.searchParams.set("island-retry", Date.now().toString());
-      url = parsed.toString();
-    }
-  }
-  throw new Error(`[SoftMax.LaughTale] Permanent failure loading island module after ${retries} attempts.`);
-}
-var init_retry = __esm({
-  "src/runtime/retry.ts"() {
-    "use strict";
-  }
-});
-
-// src/runtime/streaming.ts
-function awaitStreamingReady(container) {
-  const islandId = container.getAttribute("data-island-id") || container.getAttribute("data-island");
-  const markerValue = `island:end:${islandId}`;
-  if (document.readyState === "complete" || !container.hasAttribute("data-streaming")) {
-    return Promise.resolve();
-  }
-  for (let node = container.lastChild; node; node = node.previousSibling) {
-    if (node.nodeType === Node.COMMENT_NODE && (node.nodeValue?.trim() === markerValue || node.nodeValue?.trim() === "island:end")) {
-      node.remove();
-      return Promise.resolve();
-    }
-  }
-  return new Promise((resolve) => {
-    let isResolved = false;
-    const onDone = () => {
-      if (!isResolved) {
-        isResolved = true;
-        observer.disconnect();
-        document.removeEventListener("DOMContentLoaded", onDone);
-        resolve();
-      }
-    };
-    const observer = new MutationObserver(() => {
-      for (let node = container.lastChild; node; node = node.previousSibling) {
-        if (node.nodeType === Node.COMMENT_NODE && (node.nodeValue?.trim() === markerValue || node.nodeValue?.trim() === "island:end")) {
-          node.remove();
-          onDone();
-          break;
-        }
-      }
-    });
-    observer.observe(container, { childList: true });
-    document.addEventListener("DOMContentLoaded", onDone);
-  });
-}
-var init_streaming = __esm({
-  "src/runtime/streaming.ts"() {
-    "use strict";
-  }
-});
-
-// src/runtime/hydrator.ts
-function hydrateIsland(container) {
-  if (container[HYDRATED_FLAG]) return;
-  const name = container.getAttribute("data-island") || container.getAttribute("name");
-  if (!name) return;
-  const strategy = (container.getAttribute("data-hydrate") || container.getAttribute("hydrate") || "load").toLowerCase();
-  const mediaQuery = container.getAttribute("data-media") || container.getAttribute("media");
-  switch (strategy) {
-    case "load":
-      executeHydration(container, name);
-      break;
-    case "idle":
-      hydrateIdle(container, name);
-      break;
-    case "visible":
-      hydrateVisible(container, name);
-      break;
-    case "interaction":
-      hydrateInteraction(container, name);
-      break;
-    case "media":
-      hydrateMedia(container, name, mediaQuery);
-      break;
-    case "never":
-      break;
-    default:
-      executeHydration(container, name);
-  }
-}
-async function executeHydration(container, name) {
-  if (container[HYDRATED_FLAG]) return;
-  container[HYDRATED_FLAG] = true;
-  const definition = getIslandDefinition(name);
-  if (!definition) {
-    console.warn(`[SoftMax.LaughTale] Island '${name}' is not registered in the client registry.`);
-    return;
-  }
-  try {
-    await awaitStreamingReady(container);
-    const rawProps = container.getAttribute("data-props") || container.getAttribute("props-json") || container.getAttribute("props");
-    const props = parseAndReviveProps(rawProps);
-    const module = await importWithRetry(definition.loader);
-    const mount = module.default || module;
-    if (typeof mount !== "function") {
-      console.error(`[SoftMax.LaughTale] Island '${name}' module does not export a mount function.`);
-      return;
-    }
-    const unmount = mount(container, props);
-    if (typeof unmount === "function") {
-      container.addEventListener("laughtale:unmount", unmount, { once: true });
-    }
-    container.dispatchEvent(new CustomEvent("laughtale:hydrated", {
-      bubbles: true,
-      composed: true,
-      detail: { name, strategy: container.getAttribute("data-hydrate") }
-    }));
-  } catch (error) {
-    container[HYDRATED_FLAG] = false;
-    console.error(`[SoftMax.LaughTale] Error hydrating island '${name}':`, error);
-    container.dispatchEvent(new CustomEvent("laughtale:hydration-error", {
-      bubbles: true,
-      composed: true,
-      detail: { name, error }
-    }));
-  }
-}
-function hydrateIdle(container, name) {
-  if ("requestIdleCallback" in window) {
-    window.requestIdleCallback(() => executeHydration(container, name), { timeout: 2e3 });
-  } else {
-    setTimeout(() => executeHydration(container, name), 200);
-  }
-}
-function hydrateVisible(container, name) {
-  const observer = new IntersectionObserver((entries) => {
-    for (const entry of entries) {
-      if (entry.isIntersecting) {
-        observer.disconnect();
-        executeHydration(container, name);
-        break;
-      }
-    }
-  }, { rootMargin: "120px" });
-  observer.observe(container);
-  for (let i = 0; i < container.children.length; i++) {
-    observer.observe(container.children[i]);
-  }
-}
-function hydrateInteraction(container, name) {
-  const events = ["mouseenter", "focusin", "touchstart", "click"];
-  const onInteract = () => {
-    events.forEach((e) => container.removeEventListener(e, onInteract));
-    executeHydration(container, name);
-  };
-  events.forEach((e) => container.addEventListener(e, onInteract, { once: true, passive: true }));
-}
-function hydrateMedia(container, name, query) {
-  if (!query) {
-    executeHydration(container, name);
-    return;
-  }
-  const mql = window.matchMedia(query);
-  if (mql.matches) {
-    executeHydration(container, name);
-  } else {
-    const handler = (e) => {
-      if (e.matches) {
-        mql.removeEventListener("change", handler);
-        executeHydration(container, name);
-      }
-    };
-    mql.addEventListener("change", handler);
-  }
-}
-function initIslands(root = document) {
-  const islands = root.querySelectorAll("[data-island], island, [hydrate], [data-hydrate]");
-  islands.forEach(hydrateIsland);
-}
-var HYDRATED_FLAG;
-var init_hydrator = __esm({
-  "src/runtime/hydrator.ts"() {
-    "use strict";
-    init_registry();
-    init_reviver();
-    init_retry();
-    init_streaming();
-    HYDRATED_FLAG = "__laughtale_hydrated";
-  }
-});
-
 // src/directives/security.ts
 function isSafeProperty(prop) {
   if (typeof prop !== "string") return true;
@@ -563,363 +264,6 @@ var init_reactivity = __esm({
     "use strict";
     init_security();
     elementScopeMap = /* @__PURE__ */ new WeakMap();
-  }
-});
-
-// src/directives/events.ts
-function bindElementEvents(element) {
-  const scope = getNearestScope(element);
-  for (const attr of Array.from(element.attributes)) {
-    if (attr.name.startsWith("l-on:")) {
-      const rawEvent = attr.name.slice(5);
-      const [eventName, ...modifiers] = rawEvent.split(".");
-      const stmt = attr.value;
-      let debounceMs = 0;
-      let throttleMs = 0;
-      for (let i = 0; i < modifiers.length; i++) {
-        if (modifiers[i] === "debounce") {
-          const next = modifiers[i + 1];
-          debounceMs = next ? parseDurationMs(next) : 250;
-        } else if (modifiers[i] === "throttle") {
-          const next = modifiers[i + 1];
-          throttleMs = next ? parseDurationMs(next) : 250;
-        }
-      }
-      let timer = null;
-      let lastExecution = 0;
-      const executeHandler = (e) => {
-        if (modifiers.includes("prevent")) e.preventDefault();
-        if (modifiers.includes("stop")) e.stopPropagation();
-        if (modifiers.includes("enter") && e.key !== "Enter") return;
-        if (modifiers.includes("escape") && e.key !== "Escape") return;
-        const emitFn = (channel, payload) => {
-          window.dispatchEvent(new CustomEvent(`laughtale:${channel}`, { detail: payload, bubbles: true }));
-        };
-        const context = {
-          $event: e,
-          $el: element,
-          $emit: emitFn
-        };
-        const activeState = scope ? scope.state : {};
-        executeStatement(stmt, activeState, context);
-      };
-      const handler = (e) => {
-        if (debounceMs > 0) {
-          clearTimeout(timer);
-          timer = setTimeout(() => executeHandler(e), debounceMs);
-        } else if (throttleMs > 0) {
-          const now = Date.now();
-          if (now - lastExecution >= throttleMs) {
-            lastExecution = now;
-            executeHandler(e);
-          }
-        } else {
-          executeHandler(e);
-        }
-      };
-      const isWindow = modifiers.includes("window");
-      const isDocument = modifiers.includes("document");
-      const isOnce = modifiers.includes("once");
-      const target = isWindow ? window : isDocument ? document : element;
-      target.addEventListener(eventName, handler, { once: isOnce });
-    }
-    if (attr.name.startsWith("l-listen:")) {
-      const channel = attr.name.slice(9);
-      const stmt = attr.value;
-      window.addEventListener(`laughtale:${channel}`, (e) => {
-        const context = {
-          $event: e.detail,
-          $el: element,
-          $emit: (c, p) => {
-            window.dispatchEvent(new CustomEvent(`laughtale:${c}`, { detail: p, bubbles: true }));
-          }
-        };
-        const activeState = scope ? scope.state : {};
-        executeStatement(stmt, activeState, context);
-      });
-    }
-    if (attr.name === "l-emit") {
-      const channel = attr.value;
-      element.addEventListener("click", () => {
-        window.dispatchEvent(new CustomEvent(`laughtale:${channel}`, { bubbles: true }));
-      });
-    }
-  }
-}
-function parseDurationMs(spec) {
-  if (spec.endsWith("ms")) return parseFloat(spec) || 250;
-  if (spec.endsWith("s")) return (parseFloat(spec) || 0.25) * 1e3;
-  return parseFloat(spec) || 250;
-}
-var init_events = __esm({
-  "src/directives/events.ts"() {
-    "use strict";
-    init_reactivity();
-  }
-});
-
-// src/directives/htmx.ts
-function bindServerAction(element) {
-  let method = "GET";
-  let url = "";
-  if (element.hasAttribute("l-get")) {
-    method = "GET";
-    url = element.getAttribute("l-get");
-  } else if (element.hasAttribute("l-post")) {
-    method = "POST";
-    url = element.getAttribute("l-post");
-  } else if (element.hasAttribute("l-put")) {
-    method = "PUT";
-    url = element.getAttribute("l-put");
-  } else if (element.hasAttribute("l-delete")) {
-    method = "DELETE";
-    url = element.getAttribute("l-delete");
-  } else return;
-  const targetSelector = element.getAttribute("l-target");
-  const swapMode = element.getAttribute("l-swap") || "innerHTML";
-  const indicatorSelector = element.getAttribute("l-indicator");
-  const confirmMessage = element.getAttribute("l-confirm");
-  const rawTrigger = element.getAttribute("l-trigger") || (element.tagName === "FORM" ? "submit" : element.tagName === "INPUT" ? "input" : "click");
-  let delayMs = 0;
-  const parts = rawTrigger.split(" ");
-  const eventName = parts[0];
-  for (const part of parts) {
-    if (part.startsWith("delay:")) {
-      delayMs = parseInt(part.slice(6), 10) || 0;
-    }
-  }
-  let timeoutId = null;
-  const executeRequest = async (e) => {
-    if (e) e.preventDefault();
-    if (confirmMessage && !window.confirm(confirmMessage)) {
-      return;
-    }
-    const indicator = indicatorSelector ? document.querySelector(indicatorSelector) : null;
-    if (indicator) indicator.style.display = "block";
-    try {
-      let requestUrl = url;
-      let body = null;
-      const headers = {
-        "X-LaughTale-Request": "true"
-      };
-      if (element.tagName === "INPUT" || element.tagName === "SELECT" || element.tagName === "TEXTAREA") {
-        const input = element;
-        const paramName = input.name || "query";
-        const separator = requestUrl.includes("?") ? "&" : "?";
-        requestUrl = `${requestUrl}${separator}${encodeURIComponent(paramName)}=${encodeURIComponent(input.value)}`;
-      } else if (element.tagName === "FORM") {
-        const formData = new FormData(element);
-        if (method === "GET") {
-          const searchParams = new URLSearchParams(formData).toString();
-          requestUrl = `${requestUrl}${requestUrl.includes("?") ? "&" : "?"}${searchParams}`;
-        } else {
-          body = formData;
-        }
-      }
-      const response = await fetch(requestUrl, { method, body, headers });
-      const html = await response.text();
-      const target = targetSelector ? document.querySelector(targetSelector) : element;
-      if (target) {
-        switch (swapMode) {
-          case "outerHTML":
-            target.outerHTML = html;
-            break;
-          case "beforeend":
-            target.insertAdjacentHTML("beforeend", html);
-            break;
-          case "afterbegin":
-            target.insertAdjacentHTML("afterbegin", html);
-            break;
-          case "beforebegin":
-            target.insertAdjacentHTML("beforebegin", html);
-            break;
-          case "afterend":
-            target.insertAdjacentHTML("afterend", html);
-            break;
-          case "none":
-            break;
-          case "innerHTML":
-          default:
-            target.innerHTML = html;
-            break;
-        }
-        initDirectives(target);
-        initIslands(target);
-      }
-    } catch (err) {
-      console.error("[SoftMax.LaughTale] Server fragment request failed:", err);
-    } finally {
-      if (indicator) indicator.style.display = "none";
-    }
-  };
-  element.addEventListener(eventName, (e) => {
-    if (delayMs > 0) {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => executeRequest(e), delayMs);
-    } else {
-      executeRequest(e);
-    }
-  });
-}
-var init_htmx = __esm({
-  "src/directives/htmx.ts"() {
-    "use strict";
-    init_directives();
-    init_hydrator();
-  }
-});
-
-// src/directives/masking.ts
-function bindInputMask(input) {
-  const pattern = input.getAttribute("l-mask");
-  if (!pattern) return;
-  input.addEventListener("input", () => {
-    const raw = input.value.replace(/[^a-zA-Z0-9]/g, "");
-    let formatted = "";
-    let rawIdx = 0;
-    for (let i = 0; i < pattern.length && rawIdx < raw.length; i++) {
-      const maskChar = pattern[i];
-      if (maskChar === "9") {
-        while (rawIdx < raw.length && !/\d/.test(raw[rawIdx])) rawIdx++;
-        if (rawIdx < raw.length) formatted += raw[rawIdx++];
-      } else if (maskChar === "a") {
-        while (rawIdx < raw.length && !/[a-zA-Z]/.test(raw[rawIdx])) rawIdx++;
-        if (rawIdx < raw.length) formatted += raw[rawIdx++];
-      } else if (maskChar === "*") {
-        formatted += raw[rawIdx++];
-      } else {
-        formatted += maskChar;
-        if (raw[rawIdx] === maskChar) rawIdx++;
-      }
-    }
-    input.value = formatted;
-  });
-}
-var init_masking = __esm({
-  "src/directives/masking.ts"() {
-    "use strict";
-  }
-});
-
-// src/directives/utils.ts
-function bindUtilityDirectives(element) {
-  const scope = getNearestScope(element);
-  if (element.hasAttribute("l-show")) {
-    const expr = element.getAttribute("l-show");
-    const originalDisplay = element.style.display || "";
-    const update = () => {
-      const state = scope ? scope.state : {};
-      const isVisible = Boolean(evaluateExpression(expr, state));
-      element.style.display = isVisible ? originalDisplay : "none";
-    };
-    if (scope) scope.listeners.add(update);
-    update();
-  }
-  if (element.hasAttribute("l-hide")) {
-    const expr = element.getAttribute("l-hide");
-    const originalDisplay = element.style.display || "";
-    const update = () => {
-      const state = scope ? scope.state : {};
-      const isHidden = Boolean(evaluateExpression(expr, state));
-      element.style.display = isHidden ? "none" : originalDisplay;
-    };
-    if (scope) scope.listeners.add(update);
-    update();
-  }
-  if (element.hasAttribute("l-copy")) {
-    const selector = element.getAttribute("l-copy");
-    const feedback = element.getAttribute("l-feedback") || "Copied!";
-    const originalHtml = element.innerHTML;
-    element.addEventListener("click", async () => {
-      const target = document.querySelector(selector);
-      const textToCopy = target ? target.value || target.textContent || "" : selector;
-      try {
-        await navigator.clipboard.writeText(textToCopy.trim());
-        element.innerHTML = feedback;
-        setTimeout(() => {
-          element.innerHTML = originalHtml;
-        }, 2e3);
-      } catch (err) {
-        console.error("[SoftMax.LaughTale] Failed to copy to clipboard:", err);
-      }
-    });
-  }
-  if (element.hasAttribute("l-toggle")) {
-    const selector = element.getAttribute("l-toggle");
-    const className = element.getAttribute("l-toggle-class") || "open";
-    element.addEventListener("click", (e) => {
-      e.stopPropagation();
-      const target = document.querySelector(selector);
-      if (target) {
-        target.classList.toggle(className);
-      }
-    });
-  }
-}
-var init_utils = __esm({
-  "src/directives/utils.ts"() {
-    "use strict";
-    init_reactivity();
-  }
-});
-
-// src/directives/hotkey.ts
-function bindHotkeyDirectives(element) {
-  const scope = getNearestScope(element);
-  for (const attr of Array.from(element.attributes)) {
-    if (attr.name === "l-hotkey" || attr.name === "l-shortcut" || attr.name.startsWith("l-hotkey.") || attr.name.startsWith("l-shortcut.")) {
-      const isGlobal = attr.name.includes(".global") || !attr.name.includes(".local");
-      const prevent = !attr.name.includes(".noprevent");
-      const shortcutSpec = attr.value.trim().toLowerCase();
-      const stmt = element.getAttribute("l-on:hotkey") || element.getAttribute("l-action");
-      const handler = (e) => {
-        if (matchesShortcut(e, shortcutSpec)) {
-          if (prevent) e.preventDefault();
-          if (stmt) {
-            const activeState = scope ? scope.state : {};
-            const context = {
-              $event: e,
-              $el: element,
-              $emit: (channel, payload) => {
-                window.dispatchEvent(new CustomEvent(`laughtale:${channel}`, { detail: payload, bubbles: true }));
-              }
-            };
-            executeStatement(stmt, activeState, context);
-          } else {
-            if (element.tagName === "INPUT" || element.tagName === "TEXTAREA") {
-              element.focus();
-            } else {
-              element.click();
-            }
-          }
-        }
-      };
-      const target = isGlobal ? window : element;
-      target.addEventListener("keydown", handler);
-    }
-  }
-}
-function matchesShortcut(e, spec) {
-  const parts = spec.split("+").map((s) => s.trim());
-  const needsCtrl = parts.includes("ctrl") || parts.includes("control") || parts.includes("cmd") || parts.includes("meta");
-  const needsAlt = parts.includes("alt") || parts.includes("option");
-  const needsShift = parts.includes("shift");
-  const keyPart = parts.find((p) => !["ctrl", "control", "cmd", "meta", "alt", "option", "shift"].includes(p));
-  const ctrlPressed = e.ctrlKey || e.metaKey;
-  if (needsCtrl !== ctrlPressed) return false;
-  if (needsAlt !== e.altKey) return false;
-  if (needsShift !== e.shiftKey) return false;
-  if (!keyPart) return true;
-  const actualKey = e.key.toLowerCase();
-  if (keyPart === "escape" || keyPart === "esc") return actualKey === "escape";
-  if (keyPart === "enter" || keyPart === "return") return actualKey === "enter";
-  if (keyPart === "space") return actualKey === " " || actualKey === "spacebar";
-  return actualKey === keyPart;
-}
-var init_hotkey = __esm({
-  "src/directives/hotkey.ts"() {
-    "use strict";
-    init_reactivity();
   }
 });
 
@@ -1282,501 +626,6 @@ var init_tooltip = __esm({
   }
 });
 
-// src/directives/outside.ts
-function bindOutsideClickDirectives(element) {
-  const scope = getNearestScope(element);
-  for (const attr of Array.from(element.attributes)) {
-    if (attr.name === "l-outside" || attr.name === "l-click-outside") {
-      const stmt = attr.value;
-      document.addEventListener("click", (e) => {
-        const target = e.target;
-        if (!element.contains(target)) {
-          const activeState = scope ? scope.state : {};
-          const context = {
-            $event: e,
-            $el: element,
-            $emit: (channel, payload) => {
-              window.dispatchEvent(new CustomEvent(`laughtale:${channel}`, { detail: payload, bubbles: true }));
-            }
-          };
-          executeStatement(stmt, activeState, context);
-        }
-      });
-    }
-  }
-}
-var init_outside = __esm({
-  "src/directives/outside.ts"() {
-    "use strict";
-    init_reactivity();
-  }
-});
-
-// src/directives/storage.ts
-function bindStoragePersistence(element, scope) {
-  for (const attr of Array.from(element.attributes)) {
-    if (attr.name === "l-persist" || attr.name.startsWith("l-persist.") || attr.name === "l-sync-storage") {
-      const key = attr.value || "laughtale_persisted_state";
-      const useSession = attr.name.includes(".session");
-      const storage = useSession ? sessionStorage : localStorage;
-      try {
-        const saved = storage.getItem(key);
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (typeof parsed === "object" && parsed !== null) {
-            Object.assign(scope.state, parsed);
-          }
-        }
-      } catch (err) {
-        console.warn(`[SoftMax.LaughTale] Failed to read persisted state for key "${key}":`, err);
-      }
-      let timer = null;
-      const save = () => {
-        clearTimeout(timer);
-        timer = setTimeout(() => {
-          try {
-            storage.setItem(key, JSON.stringify(scope.state));
-          } catch (err) {
-            console.warn(`[SoftMax.LaughTale] Failed to save persisted state for key "${key}":`, err);
-          }
-        }, 150);
-      };
-      scope.listeners.add(save);
-    }
-  }
-}
-var init_storage = __esm({
-  "src/directives/storage.ts"() {
-    "use strict";
-  }
-});
-
-// src/directives/poll.ts
-function bindPollingDirectives(element) {
-  const scope = getNearestScope(element);
-  for (const attr of Array.from(element.attributes)) {
-    if (attr.name.startsWith("l-poll")) {
-      let intervalMs = 3e3;
-      const parts = attr.name.split(".");
-      for (const part of parts) {
-        if (part.endsWith("s") && !part.endsWith("ms")) {
-          const sec = parseFloat(part);
-          if (!isNaN(sec)) intervalMs = sec * 1e3;
-        } else if (part.endsWith("ms")) {
-          const ms = parseFloat(part);
-          if (!isNaN(ms)) intervalMs = ms;
-        }
-      }
-      const stmt = attr.value;
-      const runPoll = () => {
-        if (!document.body.contains(element)) {
-          clearInterval(intervalId);
-          return;
-        }
-        if (stmt) {
-          const activeState = scope ? scope.state : {};
-          const context = {
-            $el: element,
-            $emit: (channel, payload) => {
-              window.dispatchEvent(new CustomEvent(`laughtale:${channel}`, { detail: payload, bubbles: true }));
-            }
-          };
-          executeStatement(stmt, activeState, context);
-        } else {
-          element.dispatchEvent(new CustomEvent("laughtale:poll-trigger", { bubbles: true }));
-        }
-      };
-      const intervalId = setInterval(runPoll, intervalMs);
-    }
-  }
-}
-var init_poll = __esm({
-  "src/directives/poll.ts"() {
-    "use strict";
-    init_reactivity();
-  }
-});
-
-// src/directives/intersect.ts
-function bindIntersectionDirectives(element) {
-  const scope = getNearestScope(element);
-  for (const attr of Array.from(element.attributes)) {
-    if (attr.name === "l-intersect" || attr.name.startsWith("l-intersect.") || attr.name === "l-viewport") {
-      const isOnce = attr.name.includes(".once");
-      const isHalf = attr.name.includes(".half");
-      const stmt = attr.value;
-      const threshold = isHalf ? 0.5 : 0.1;
-      const observer = new IntersectionObserver((entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            if (stmt) {
-              const activeState = scope ? scope.state : {};
-              const context = {
-                $event: entry,
-                $el: element,
-                $emit: (channel, payload) => {
-                  window.dispatchEvent(new CustomEvent(`laughtale:${channel}`, { detail: payload, bubbles: true }));
-                }
-              };
-              executeStatement(stmt, activeState, context);
-            }
-            element.dispatchEvent(new CustomEvent("laughtale:intersect", { bubbles: true, detail: entry }));
-            if (isOnce) {
-              observer.disconnect();
-            }
-          }
-        }
-      }, { threshold });
-      observer.observe(element);
-    }
-  }
-}
-var init_intersect = __esm({
-  "src/directives/intersect.ts"() {
-    "use strict";
-    init_reactivity();
-  }
-});
-
-// src/directives/scroll.ts
-function bindScrollToDirectives(element) {
-  for (const attr of Array.from(element.attributes)) {
-    if (attr.name === "l-scroll-to" || attr.name.startsWith("l-scroll-to.")) {
-      const target = attr.value.trim();
-      element.addEventListener("click", (e) => {
-        e.preventDefault();
-        if (target === "top") {
-          window.scrollTo({ top: 0, behavior: "smooth" });
-        } else if (target === "bottom") {
-          window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
-        } else if (target) {
-          const targetEl = document.querySelector(target);
-          if (targetEl) {
-            targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
-          }
-        }
-      });
-    }
-  }
-}
-var init_scroll = __esm({
-  "src/directives/scroll.ts"() {
-    "use strict";
-  }
-});
-
-// src/directives/badge.ts
-function bindBadgeDirectives(element) {
-  for (const attr of Array.from(element.attributes)) {
-    if (attr.name === "l-badge" || attr.name.startsWith("l-badge.")) {
-      const isDot = attr.name.includes(".dot");
-      const value = attr.value;
-      let severity = "danger";
-      if (attr.name.includes(".success")) severity = "success";
-      else if (attr.name.includes(".warning")) severity = "warning";
-      else if (attr.name.includes(".info")) severity = "info";
-      else if (attr.name.includes(".slate") || attr.name.includes(".secondary")) severity = "slate";
-      const compStyle = window.getComputedStyle(element);
-      if (compStyle.position === "static") {
-        element.style.position = "relative";
-      }
-      const badge = document.createElement("span");
-      badge.className = `aura-directive-badge badge-${severity}`;
-      let bg = "var(--p-red-500, #ef4444)";
-      let color = "#ffffff";
-      if (severity === "success") bg = "var(--p-emerald-500, #10b981)";
-      else if (severity === "warning") bg = "var(--p-amber-500, #f59e0b)";
-      else if (severity === "info") bg = "var(--p-blue-500, #3b82f6)";
-      else if (severity === "slate") {
-        bg = "var(--p-surface-600, #475569)";
-        color = "#ffffff";
-      }
-      if (isDot) {
-        badge.style.cssText = `
-                    position: absolute;
-                    top: -2px;
-                    right: -2px;
-                    width: 8px;
-                    height: 8px;
-                    background: ${bg};
-                    border-radius: 50%;
-                    border: 2px solid var(--p-surface-0, #ffffff);
-                    pointer-events: none;
-                `;
-      } else {
-        badge.textContent = value || "";
-        badge.style.cssText = `
-                    position: absolute;
-                    top: -6px;
-                    right: -6px;
-                    min-width: 18px;
-                    height: 18px;
-                    line-height: 18px;
-                    padding: 0 5px;
-                    font-size: 0.6875rem;
-                    font-weight: 700;
-                    text-align: center;
-                    background: ${bg};
-                    color: ${color};
-                    border-radius: 9999px;
-                    border: 2px solid var(--p-surface-0, #ffffff);
-                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-                    pointer-events: none;
-                `;
-      }
-      element.appendChild(badge);
-    }
-  }
-}
-var init_badge = __esm({
-  "src/directives/badge.ts"() {
-    "use strict";
-  }
-});
-
-// src/directives/teleport.ts
-function bindTeleportDirectives(element) {
-  for (const attr of Array.from(element.attributes)) {
-    if (attr.name === "l-teleport") {
-      const targetSelector = attr.value || "body";
-      const targetContainer = document.querySelector(targetSelector);
-      if (targetContainer && targetContainer !== element.parentElement) {
-        targetContainer.appendChild(element);
-      }
-    }
-  }
-}
-var init_teleport = __esm({
-  "src/directives/teleport.ts"() {
-    "use strict";
-  }
-});
-
-// src/directives/index.ts
-function initDirectives(root = document) {
-  const stateElements = root.querySelectorAll("[l-state]");
-  stateElements.forEach((el) => {
-    const rawJson = el.getAttribute("l-state");
-    try {
-      const initialData = rawJson ? JSON.parse(rawJson) : {};
-      const scope = createReactiveScope(el, initialData);
-      bindStoragePersistence(el, scope);
-    } catch (err) {
-      console.error("[SoftMax.LaughTale] Invalid JSON in l-state:", rawJson, err);
-    }
-  });
-  const allElements = root.querySelectorAll("*");
-  allElements.forEach((el) => {
-    for (const attr of Array.from(el.attributes)) {
-      if (attr.name === "l-bind" || attr.name.startsWith("l-bind:") || attr.name === "l-model" || attr.name === "l-class" || attr.name === "l-style") {
-        Promise.resolve().then(() => (init_reactivity(), reactivity_exports)).then(({ getNearestScope: getNearestScope2 }) => {
-          const nearest = getNearestScope2(el);
-          if (nearest) bindElementReactivity(el, nearest);
-        });
-        break;
-      }
-    }
-    bindElementEvents(el);
-    if (el.hasAttribute("l-get") || el.hasAttribute("l-post") || el.hasAttribute("l-put") || el.hasAttribute("l-delete")) {
-      bindServerAction(el);
-    }
-    if (el.hasAttribute("l-mask") && el.tagName === "INPUT") {
-      bindInputMask(el);
-    }
-    bindUtilityDirectives(el);
-    bindHotkeyDirectives(el);
-    bindTooltipDirectives(el);
-    bindOutsideClickDirectives(el);
-    bindPollingDirectives(el);
-    bindIntersectionDirectives(el);
-    bindScrollToDirectives(el);
-    bindBadgeDirectives(el);
-    bindTeleportDirectives(el);
-  });
-}
-var init_directives = __esm({
-  "src/directives/index.ts"() {
-    "use strict";
-    init_reactivity();
-    init_events();
-    init_htmx();
-    init_masking();
-    init_utils();
-    init_hotkey();
-    init_tooltip();
-    init_outside();
-    init_storage();
-    init_poll();
-    init_intersect();
-    init_scroll();
-    init_badge();
-    init_teleport();
-    init_security();
-    init_reactivity();
-    if (typeof document !== "undefined") {
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", () => initDirectives());
-      } else {
-        initDirectives();
-      }
-    }
-  }
-});
-
-// src/runtime/router.ts
-function enableViewTransitions() {
-  if (isRouterActive || typeof window === "undefined") return;
-  isRouterActive = true;
-  document.addEventListener("click", handleLinkClick);
-  window.addEventListener("popstate", handlePopState);
-}
-async function handleLinkClick(e) {
-  if (e.button !== 0 || e.ctrlKey || e.metaKey || e.altKey || e.shiftKey || e.defaultPrevented) {
-    return;
-  }
-  const anchor = e.target.closest("a");
-  if (!anchor || !anchor.href) return;
-  const url = new URL(anchor.href, window.location.href);
-  if (url.origin !== window.location.origin) return;
-  if (anchor.target && anchor.target !== "_self") return;
-  if (anchor.hasAttribute("download") || anchor.getAttribute("data-no-transition") !== null) return;
-  const currentPath = window.location.pathname.toLowerCase().replace(/\/$/, "");
-  const targetPath = url.pathname.toLowerCase().replace(/\/$/, "");
-  if ((currentPath === targetPath || !targetPath) && url.hash) {
-    return;
-  }
-  e.preventDefault();
-  await navigateTo(url.href, true);
-}
-async function handlePopState() {
-  await navigateTo(window.location.href, false);
-}
-async function navigateTo(urlStr, pushState = true) {
-  try {
-    const response = await fetch(urlStr, {
-      headers: {
-        "X-Requested-With": "SoftMaxIslands-ViewTransition"
-      }
-    });
-    if (!response.ok) {
-      window.location.href = urlStr;
-      return;
-    }
-    const htmlText = await response.text();
-    const parser = new DOMParser();
-    const newDoc = parser.parseFromString(htmlText, "text/html");
-    const persistentElements = /* @__PURE__ */ new Map();
-    document.querySelectorAll("[data-persist]").forEach((el) => {
-      const id = el.dataset.persist;
-      if (id) persistentElements.set(id, el);
-    });
-    const updateDom = () => {
-      document.title = newDoc.title;
-      document.body.innerHTML = newDoc.body.innerHTML;
-      persistentElements.forEach((liveEl, id) => {
-        const targetSlot = document.querySelector(`[data-persist="${id}"]`);
-        if (targetSlot && targetSlot.parentNode) {
-          targetSlot.parentNode.replaceChild(liveEl, targetSlot);
-        }
-      });
-      initIslands(document.body);
-      initDirectives(document.body);
-      const targetUrl = new URL(urlStr, window.location.origin);
-      if (targetUrl.hash) {
-        const targetEl = document.querySelector(targetUrl.hash);
-        if (targetEl) targetEl.scrollIntoView({ behavior: "smooth" });
-      } else {
-        window.scrollTo({ top: 0, behavior: "instant" });
-      }
-      if (pushState) {
-        window.history.pushState({}, "", urlStr);
-      }
-      window.dispatchEvent(new CustomEvent("island:page-loaded", { detail: { url: urlStr } }));
-    };
-    if ("startViewTransition" in document) {
-      document.startViewTransition(updateDom);
-    } else {
-      updateDom();
-    }
-  } catch (err) {
-    console.error("[SoftMax.LaughTale] View transition failed, falling back to full navigation:", err);
-    window.location.href = urlStr;
-  }
-}
-var isRouterActive;
-var init_router = __esm({
-  "src/runtime/router.ts"() {
-    "use strict";
-    init_hydrator();
-    init_directives();
-    isRouterActive = false;
-  }
-});
-
-// src/runtime/slots.ts
-function getSlot(container, name = "default") {
-  return container.querySelector(`[data-slot="${name}"]`);
-}
-function extractSlotContent(container, name = "default") {
-  const slotEl = getSlot(container, name);
-  if (!slotEl) return "";
-  return slotEl.innerHTML;
-}
-var init_slots = __esm({
-  "src/runtime/slots.ts"() {
-    "use strict";
-  }
-});
-
-// src/runtime/events.ts
-var init_events2 = __esm({
-  "src/runtime/events.ts"() {
-    "use strict";
-  }
-});
-
-// src/runtime/state.ts
-var init_state = __esm({
-  "src/runtime/state.ts"() {
-    "use strict";
-  }
-});
-
-// src/adapters/vanilla.ts
-function createVanillaIsland(mount) {
-  return mount;
-}
-var init_vanilla = __esm({
-  "src/adapters/vanilla.ts"() {
-    "use strict";
-  }
-});
-
-// src/adapters/preact.ts
-function createPreactIsland(Component, options = {}) {
-  return async (container, props) => {
-    try {
-      const preact = await import("preact");
-      const h = preact.h || preact.default?.h;
-      const render = preact.render || preact.default?.render;
-      if (render && h) {
-        render(h(Component, props), container);
-        return () => render(null, container);
-      }
-    } catch {
-      console.warn("[SoftMax.LaughTale] Preact package not found in bundle. Rendering component directly.");
-      if (typeof Component === "function") {
-        return Component(container, props);
-      }
-    }
-  };
-}
-var init_preact = __esm({
-  "src/adapters/preact.ts"() {
-    "use strict";
-  }
-});
-
 // src/icons/lucide.ts
 function normalizeLucideId(name) {
   if (!name) return "zap";
@@ -1995,287 +844,6 @@ var init_useFocusTrap = __esm({
   }
 });
 
-// src/composables/useFloatingPosition.ts
-function useFloatingPosition(reference, floating, options = {}) {
-  const offset = options.offset ?? 6;
-  const autoFlip = options.autoFlip !== false;
-  const viewportPadding = options.viewportPadding ?? 8;
-  let initialPlacement = options.placement ?? "bottom-start";
-  function computePosition() {
-    const refRect = reference.getBoundingClientRect();
-    const floatRect = floating.getBoundingClientRect();
-    const vpWidth = window.innerWidth;
-    const vpHeight = window.innerHeight;
-    let placement = initialPlacement;
-    if (autoFlip) {
-      const spaceTop = refRect.top;
-      const spaceBottom = vpHeight - refRect.bottom;
-      const spaceLeft = refRect.left;
-      const spaceRight = vpWidth - refRect.right;
-      if (placement.startsWith("bottom") && spaceBottom < floatRect.height + offset && spaceTop > spaceBottom) {
-        placement = placement.replace("bottom", "top");
-      } else if (placement.startsWith("top") && spaceTop < floatRect.height + offset && spaceBottom > spaceTop) {
-        placement = placement.replace("top", "bottom");
-      } else if (placement.startsWith("right") && spaceRight < floatRect.width + offset && spaceLeft > spaceRight) {
-        placement = placement.replace("right", "left");
-      } else if (placement.startsWith("left") && spaceLeft < floatRect.width + offset && spaceRight > spaceLeft) {
-        placement = placement.replace("left", "right");
-      }
-    }
-    let x = 0;
-    let y = 0;
-    switch (placement) {
-      case "bottom":
-        x = refRect.left + (refRect.width - floatRect.width) / 2;
-        y = refRect.bottom + offset;
-        break;
-      case "bottom-start":
-        x = refRect.left;
-        y = refRect.bottom + offset;
-        break;
-      case "bottom-end":
-        x = refRect.right - floatRect.width;
-        y = refRect.bottom + offset;
-        break;
-      case "top":
-        x = refRect.left + (refRect.width - floatRect.width) / 2;
-        y = refRect.top - floatRect.height - offset;
-        break;
-      case "top-start":
-        x = refRect.left;
-        y = refRect.top - floatRect.height - offset;
-        break;
-      case "top-end":
-        x = refRect.right - floatRect.width;
-        y = refRect.top - floatRect.height - offset;
-        break;
-      case "left":
-        x = refRect.left - floatRect.width - offset;
-        y = refRect.top + (refRect.height - floatRect.height) / 2;
-        break;
-      case "left-start":
-        x = refRect.left - floatRect.width - offset;
-        y = refRect.top;
-        break;
-      case "left-end":
-        x = refRect.left - floatRect.width - offset;
-        y = refRect.bottom - floatRect.height;
-        break;
-      case "right":
-        x = refRect.right + offset;
-        y = refRect.top + (refRect.height - floatRect.height) / 2;
-        break;
-      case "right-start":
-        x = refRect.right + offset;
-        y = refRect.top;
-        break;
-      case "right-end":
-        x = refRect.right + offset;
-        y = refRect.bottom - floatRect.height;
-        break;
-    }
-    x = Math.max(viewportPadding, Math.min(vpWidth - floatRect.width - viewportPadding, x));
-    y = Math.max(viewportPadding, Math.min(vpHeight - floatRect.height - viewportPadding, y));
-    return { x, y, actualPlacement: placement };
-  }
-  function update() {
-    const { x, y } = computePosition();
-    floating.style.position = "fixed";
-    floating.style.left = `${Math.round(x)}px`;
-    floating.style.top = `${Math.round(y)}px`;
-  }
-  return { update, computePosition };
-}
-var init_useFloatingPosition = __esm({
-  "src/composables/useFloatingPosition.ts"() {
-    "use strict";
-  }
-});
-
-// src/composables/useVirtualizer.ts
-function useVirtualizer(options) {
-  const overscan = options.overscan ?? 3;
-  let scrollTop = 0;
-  function getItemOffset(index) {
-    let offset = 0;
-    for (let i = 0; i < index; i++) {
-      offset += options.estimateSize(i);
-    }
-    return offset;
-  }
-  function getTotalSize() {
-    let total = 0;
-    for (let i = 0; i < options.count; i++) {
-      total += options.estimateSize(i);
-    }
-    return total;
-  }
-  function getVirtualItems() {
-    const scrollEl = options.getScrollElement();
-    const viewportHeight = scrollEl ? scrollEl.clientHeight : 400;
-    scrollTop = scrollEl ? scrollEl.scrollTop : 0;
-    const total = options.count;
-    if (total === 0) return [];
-    let startIndex = 0;
-    let runningOffset = 0;
-    while (startIndex < total && runningOffset + options.estimateSize(startIndex) < scrollTop) {
-      runningOffset += options.estimateSize(startIndex);
-      startIndex++;
-    }
-    let endIndex = startIndex;
-    let currentBottom = runningOffset;
-    while (endIndex < total && currentBottom < scrollTop + viewportHeight) {
-      currentBottom += options.estimateSize(endIndex);
-      endIndex++;
-    }
-    startIndex = Math.max(0, startIndex - overscan);
-    endIndex = Math.min(total - 1, endIndex + overscan);
-    const items = [];
-    let itemStart = getItemOffset(startIndex);
-    for (let i = startIndex; i <= endIndex; i++) {
-      const size = options.estimateSize(i);
-      items.push({
-        index: i,
-        start: itemStart,
-        size,
-        end: itemStart + size
-      });
-      itemStart += size;
-    }
-    return items;
-  }
-  return {
-    getTotalSize,
-    getVirtualItems
-  };
-}
-var init_useVirtualizer = __esm({
-  "src/composables/useVirtualizer.ts"() {
-    "use strict";
-  }
-});
-
-// src/composables/useDragGesture.ts
-function useDragGesture(targetElement, options = {}) {
-  const axis = options.axis ?? "both";
-  let isDragging = false;
-  let startX = 0;
-  let startY = 0;
-  function getDragState(e) {
-    const rect = targetElement.getBoundingClientRect();
-    const clientX = e.clientX;
-    const clientY = e.clientY;
-    const dx = axis === "y" ? 0 : clientX - startX;
-    const dy = axis === "x" ? 0 : clientY - startY;
-    const ratioX = rect.width > 0 ? Math.max(0, Math.min(1, (clientX - rect.left) / rect.width)) : 0;
-    const ratioY = rect.height > 0 ? Math.max(0, Math.min(1, (clientY - rect.top) / rect.height)) : 0;
-    return { clientX, clientY, dx, dy, ratioX, ratioY, isDragging };
-  }
-  const onPointerDown = (e) => {
-    isDragging = true;
-    startX = e.clientX;
-    startY = e.clientY;
-    if ("setPointerCapture" in targetElement && e.pointerId !== void 0) {
-      try {
-        targetElement.setPointerCapture(e.pointerId);
-      } catch (_) {
-      }
-    }
-    const state = getDragState(e);
-    options.onDragStart?.(state);
-    options.onDrag?.(state);
-  };
-  const onPointerMove = (e) => {
-    if (!isDragging) return;
-    const state = getDragState(e);
-    options.onDrag?.(state);
-  };
-  const onPointerUp = (e) => {
-    if (!isDragging) return;
-    isDragging = false;
-    if ("releasePointerCapture" in targetElement && e.pointerId !== void 0) {
-      try {
-        targetElement.releasePointerCapture(e.pointerId);
-      } catch (_) {
-      }
-    }
-    const state = getDragState(e);
-    options.onDragEnd?.(state);
-  };
-  targetElement.addEventListener("pointerdown", onPointerDown);
-  targetElement.addEventListener("pointermove", onPointerMove);
-  targetElement.addEventListener("pointerup", onPointerUp);
-  targetElement.addEventListener("pointercancel", onPointerUp);
-  function destroy() {
-    targetElement.removeEventListener("pointerdown", onPointerDown);
-    targetElement.removeEventListener("pointermove", onPointerMove);
-    targetElement.removeEventListener("pointerup", onPointerUp);
-    targetElement.removeEventListener("pointercancel", onPointerUp);
-  }
-  return { destroy };
-}
-var init_useDragGesture = __esm({
-  "src/composables/useDragGesture.ts"() {
-    "use strict";
-  }
-});
-
-// src/composables/useHotkeys.ts
-function useHotkeys(hotkeys, targetNode = typeof document !== "undefined" ? document : null) {
-  if (!targetNode) return { destroy: () => {
-  } };
-  function matchesCombo(e, comboStr) {
-    const parts = comboStr.toLowerCase().split("+").map((p) => p.trim());
-    const hasCtrl = parts.includes("ctrl") || parts.includes("control");
-    const hasMeta = parts.includes("meta") || parts.includes("cmd") || parts.includes("command");
-    const hasShift = parts.includes("shift");
-    const hasAlt = parts.includes("alt");
-    if (hasCtrl && !e.ctrlKey) return false;
-    if (hasMeta && !e.metaKey) return false;
-    if (hasShift && !e.shiftKey) return false;
-    if (hasAlt && !e.altKey) return false;
-    const mainKey = parts.find((p) => !["ctrl", "control", "meta", "cmd", "command", "shift", "alt"].includes(p));
-    if (!mainKey) return true;
-    const key = e.key.toLowerCase();
-    if (mainKey === "esc" || mainKey === "escape") return key === "escape";
-    if (mainKey === "enter") return key === "enter";
-    if (mainKey === "space") return key === " " || key === "space";
-    if (mainKey === "slash") return key === "/";
-    return key === mainKey;
-  }
-  function isInputElement(el) {
-    if (!el) return false;
-    const tag = el.tagName.toLowerCase();
-    return tag === "input" || tag === "textarea" || tag === "select" || el.hasAttribute("contenteditable");
-  }
-  function handleKeyDown(e) {
-    const keyEvent = e;
-    const target = keyEvent.target;
-    const isInput = isInputElement(target);
-    for (const item of hotkeys) {
-      if (isInput && !item.allowInInputs && item.combo !== "escape") {
-        continue;
-      }
-      if (matchesCombo(keyEvent, item.combo)) {
-        keyEvent.preventDefault();
-        item.handler(keyEvent);
-        break;
-      }
-    }
-  }
-  targetNode.addEventListener("keydown", handleKeyDown);
-  return {
-    destroy: () => {
-      targetNode.removeEventListener("keydown", handleKeyDown);
-    }
-  };
-}
-var init_useHotkeys = __esm({
-  "src/composables/useHotkeys.ts"() {
-    "use strict";
-  }
-});
-
 // src/composables/useClickOutside.ts
 function useClickOutside(target, handler, options = {}) {
   if (!target || typeof document === "undefined") return { destroy: () => {
@@ -2467,163 +1035,6 @@ var init_useClipboard = __esm({
   }
 });
 
-// src/composables/useKeyboardNav.ts
-function useKeyboardNav(options) {
-  let activeIndex = options.initialIndex ?? -1;
-  const loop = options.loop ?? true;
-  function handleKeyDown(e) {
-    const count = options.itemCount();
-    if (count === 0) return false;
-    const isVertical = options.orientation !== "horizontal";
-    const isHorizontal = options.orientation !== "vertical";
-    if (isVertical && e.key === "ArrowDown" || isHorizontal && e.key === "ArrowRight") {
-      e.preventDefault();
-      if (activeIndex < count - 1) {
-        activeIndex++;
-      } else if (loop) {
-        activeIndex = 0;
-      }
-      options.onHighlight?.(activeIndex);
-      return true;
-    }
-    if (isVertical && e.key === "ArrowUp" || isHorizontal && e.key === "ArrowLeft") {
-      e.preventDefault();
-      if (activeIndex > 0) {
-        activeIndex--;
-      } else if (loop) {
-        activeIndex = count - 1;
-      }
-      options.onHighlight?.(activeIndex);
-      return true;
-    }
-    if (e.key === "Home") {
-      e.preventDefault();
-      activeIndex = 0;
-      options.onHighlight?.(activeIndex);
-      return true;
-    }
-    if (e.key === "End") {
-      e.preventDefault();
-      activeIndex = count - 1;
-      options.onHighlight?.(activeIndex);
-      return true;
-    }
-    if (e.key === "Enter" || e.key === " ") {
-      if (activeIndex >= 0 && activeIndex < count) {
-        e.preventDefault();
-        options.onSelect?.(activeIndex);
-        return true;
-      }
-    }
-    if (e.key === "Escape") {
-      options.onEscape?.();
-      return true;
-    }
-    return false;
-  }
-  return {
-    handleKeyDown,
-    get activeIndex() {
-      return activeIndex;
-    },
-    setActiveIndex: (idx) => {
-      activeIndex = idx;
-      options.onHighlight?.(activeIndex);
-    },
-    reset: () => {
-      activeIndex = -1;
-    }
-  };
-}
-var init_useKeyboardNav = __esm({
-  "src/composables/useKeyboardNav.ts"() {
-    "use strict";
-  }
-});
-
-// src/composables/useEventListener.ts
-function useEventListener(target, type, listener, options) {
-  if (!target || typeof target.addEventListener !== "function") {
-    return () => {
-    };
-  }
-  target.addEventListener(type, listener, options);
-  return () => {
-    target.removeEventListener(type, listener, options);
-  };
-}
-var init_useEventListener = __esm({
-  "src/composables/useEventListener.ts"() {
-    "use strict";
-  }
-});
-
-// src/composables/animation/useSpring.ts
-function useSpring(initialValue, config = {}) {
-  const stiffness = config.stiffness ?? 170;
-  const damping = config.damping ?? 26;
-  const mass = config.mass ?? 1;
-  const precision = config.precision ?? 1e-3;
-  let current = initialValue;
-  let target = initialValue;
-  let velocity = 0;
-  let animFrame = null;
-  const updateListeners = /* @__PURE__ */ new Set();
-  function step() {
-    const displacement = current - target;
-    const springForce = -stiffness * displacement;
-    const dampingForce = -damping * velocity;
-    const acceleration = (springForce + dampingForce) / mass;
-    const dt = 1 / 60;
-    velocity += acceleration * dt;
-    current += velocity * dt;
-    updateListeners.forEach((fn) => fn(current));
-    if (Math.abs(displacement) < precision && Math.abs(velocity) < precision) {
-      current = target;
-      velocity = 0;
-      updateListeners.forEach((fn) => fn(current));
-      animFrame = null;
-    } else {
-      if (typeof requestAnimationFrame !== "undefined") {
-        animFrame = requestAnimationFrame(step);
-      }
-    }
-  }
-  function set(nextTarget) {
-    target = nextTarget;
-    if (animFrame === null && typeof requestAnimationFrame !== "undefined") {
-      animFrame = requestAnimationFrame(step);
-    } else if (typeof requestAnimationFrame === "undefined") {
-      current = nextTarget;
-      updateListeners.forEach((fn) => fn(current));
-    }
-  }
-  function stop() {
-    if (animFrame !== null && typeof cancelAnimationFrame !== "undefined") {
-      cancelAnimationFrame(animFrame);
-      animFrame = null;
-    }
-    velocity = 0;
-  }
-  function onUpdate(listener) {
-    updateListeners.add(listener);
-    return () => updateListeners.delete(listener);
-  }
-  return {
-    get value() {
-      return current;
-    },
-    set,
-    onUpdate,
-    stop
-  };
-}
-var init_useSpring = __esm({
-  "src/composables/animation/useSpring.ts"() {
-    "use strict";
-  }
-});
-
 // src/composables/animation/useTransition.ts
 function useTransition(element, options = {}) {
   const duration = options.duration ?? 200;
@@ -2776,520 +1187,6 @@ function useAutoAnimate(parent, options = {}) {
 var init_useAutoAnimate = __esm({
   "src/composables/animation/useAutoAnimate.ts"() {
     "use strict";
-  }
-});
-
-// src/composables/animation/useStagger.ts
-function useStagger(elements, options = {}) {
-  const staggerMs = options.staggerMs ?? 40;
-  const initialDelay = options.initialDelay ?? 0;
-  const duration = options.duration ?? 250;
-  const easing = options.easing ?? "cubic-bezier(0.16, 1, 0.3, 1)";
-  const list = Array.from(elements);
-  list.forEach((el, index) => {
-    const delay = initialDelay + index * staggerMs;
-    el.style.opacity = "0";
-    el.style.transform = "translateY(8px)";
-    el.style.transition = `opacity ${duration}ms ${easing} ${delay}ms, transform ${duration}ms ${easing} ${delay}ms`;
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        el.style.opacity = "1";
-        el.style.transform = "none";
-      });
-    });
-  });
-}
-var init_useStagger = __esm({
-  "src/composables/animation/useStagger.ts"() {
-    "use strict";
-  }
-});
-
-// src/composables/animation/useMorphLayout.ts
-function useMorphLayout(indicator, options = {}) {
-  const duration = options.duration ?? 200;
-  const easing = options.easing ?? "cubic-bezier(0.2, 0, 0, 1)";
-  indicator.style.position = "absolute";
-  indicator.style.transition = `left ${duration}ms ${easing}, top ${duration}ms ${easing}, width ${duration}ms ${easing}, height ${duration}ms ${easing}, opacity ${duration}ms ${easing}`;
-  indicator.style.pointerEvents = "none";
-  function moveTo(target) {
-    if (!target || !target.offsetParent) {
-      indicator.style.opacity = "0";
-      return;
-    }
-    indicator.style.opacity = "1";
-    indicator.style.left = `${target.offsetLeft}px`;
-    indicator.style.top = `${target.offsetTop}px`;
-    indicator.style.width = `${target.offsetWidth}px`;
-    indicator.style.height = `${target.offsetHeight}px`;
-  }
-  return { moveTo };
-}
-var init_useMorphLayout = __esm({
-  "src/composables/animation/useMorphLayout.ts"() {
-    "use strict";
-  }
-});
-
-// src/composables/index.ts
-var init_composables = __esm({
-  "src/composables/index.ts"() {
-    "use strict";
-    init_useDisclosure();
-    init_useFocusTrap();
-    init_useFloatingPosition();
-    init_useVirtualizer();
-    init_useDragGesture();
-    init_useHotkeys();
-    init_useClickOutside();
-    init_useScrollLock();
-    init_useControllableState();
-    init_useDebounce();
-    init_useClipboard();
-    init_useKeyboardNav();
-    init_useEventListener();
-    init_useSpring();
-    init_useTransition();
-    init_useAutoAnimate();
-    init_useStagger();
-    init_useMorphLayout();
-  }
-});
-
-// src/types/models.ts
-var init_models = __esm({
-  "src/types/models.ts"() {
-    "use strict";
-  }
-});
-
-// src/styles/animations.ts
-function initAnimationStyles() {
-  if (typeof document === "undefined") return;
-  if (document.getElementById("aura-animations")) return;
-  const styleEl = document.createElement("style");
-  styleEl.id = "aura-animations";
-  styleEl.textContent = `
-/* Base Component */
-.p-component {
-    font-family: var(--p-font-family, inherit);
-    font-size: 1rem;
-    line-height: 1.5;
-}
-
-/* 1. Anchored Overlays */
-.p-anchored-overlay-enter-active {
-    animation: p-anchored-overlay-enter 200ms ease-out forwards;
-}
-.p-anchored-overlay-leave-active {
-    animation: p-anchored-overlay-leave 150ms ease-in forwards;
-}
-@keyframes p-anchored-overlay-enter {
-    from { opacity: 0; transform: translateY(5%); }
-    to { opacity: 1; transform: translateY(0); }
-}
-@keyframes p-anchored-overlay-leave {
-    from { opacity: 1; transform: translateY(0); }
-    to { opacity: 0; transform: translateY(5%); }
-}
-
-/* 2. Collapsibles */
-.p-collapsible-enter-active {
-    animation: p-collapsible-enter 300ms cubic-bezier(0.65, 0, 0.35, 1) forwards;
-}
-.p-collapsible-leave-active {
-    animation: p-collapsible-leave 300ms cubic-bezier(0.65, 0, 0.35, 1) forwards;
-}
-@keyframes p-collapsible-enter {
-    from { grid-template-rows: 0fr; opacity: 0; transform: scale(0.97); }
-    to { grid-template-rows: 1fr; opacity: 1; transform: scale(1); }
-}
-@keyframes p-collapsible-leave {
-    from { grid-template-rows: 1fr; opacity: 1; transform: scale(1); }
-    to { grid-template-rows: 0fr; opacity: 0; transform: scale(0.97); }
-}
-
-/* 3. Dialog */
-.p-dialog-enter-active {
-    animation: p-dialog-enter 300ms ease-out forwards;
-}
-.p-dialog-leave-active {
-    animation: p-dialog-leave 200ms ease-in forwards;
-}
-@keyframes p-dialog-enter {
-    from { opacity: 0; transform: scale(0.95); filter: blur(8px); }
-    to { opacity: 1; transform: scale(1); filter: blur(0); }
-}
-@keyframes p-dialog-leave {
-    from { opacity: 1; transform: scale(1); filter: blur(0); }
-    to { opacity: 0; transform: scale(0.95); filter: blur(4px); }
-}
-
-/* 4. Drawer */
-.p-drawer-enter-active {
-    animation: p-drawer-enter 300ms cubic-bezier(0.32, 0.72, 0, 1) forwards;
-}
-.p-drawer-leave-active {
-    animation: p-drawer-leave 200ms cubic-bezier(0.32, 0.72, 0, 1) forwards;
-}
-@keyframes p-drawer-enter {
-    from { transform: translateX(-100%); }
-    to { transform: translateX(0); }
-}
-@keyframes p-drawer-leave {
-    from { transform: translateX(0); }
-    to { transform: translateX(-100%); }
-}
-
-.p-drawer-right-enter-active { animation: p-drawer-right-enter 300ms cubic-bezier(0.32, 0.72, 0, 1) forwards; }
-.p-drawer-right-leave-active { animation: p-drawer-right-leave 200ms cubic-bezier(0.32, 0.72, 0, 1) forwards; }
-@keyframes p-drawer-right-enter { from { transform: translateX(100%); } to { transform: translateX(0); } }
-@keyframes p-drawer-right-leave { from { transform: translateX(0); } to { transform: translateX(100%); } }
-
-.p-drawer-top-enter-active { animation: p-drawer-top-enter 300ms cubic-bezier(0.32, 0.72, 0, 1) forwards; }
-.p-drawer-top-leave-active { animation: p-drawer-top-leave 200ms cubic-bezier(0.32, 0.72, 0, 1) forwards; }
-@keyframes p-drawer-top-enter { from { transform: translateY(-100%); } to { transform: translateY(0); } }
-@keyframes p-drawer-top-leave { from { transform: translateY(0); } to { transform: translateY(-100%); } }
-
-.p-drawer-bottom-enter-active { animation: p-drawer-bottom-enter 300ms cubic-bezier(0.32, 0.72, 0, 1) forwards; }
-.p-drawer-bottom-leave-active { animation: p-drawer-bottom-leave 200ms cubic-bezier(0.32, 0.72, 0, 1) forwards; }
-@keyframes p-drawer-bottom-enter { from { transform: translateY(100%); } to { transform: translateY(0); } }
-@keyframes p-drawer-bottom-leave { from { transform: translateY(0); } to { transform: translateY(100%); } }
-
-/* 5. Message/Toast */
-.p-message-enter-active {
-    animation: p-message-enter 300ms ease-out forwards;
-}
-.p-message-leave-active {
-    animation: p-message-leave 200ms ease-in forwards;
-}
-@keyframes p-message-enter {
-    from { opacity: 0; transform: translateY(-100%); }
-    to { opacity: 1; transform: translateY(0); }
-}
-@keyframes p-message-leave {
-    from { opacity: 1; transform: translateY(0); }
-    to { opacity: 0; transform: translateX(100%); }
-}
-
-/* 6. Overlay Mask */
-.p-overlay-mask-enter-active {
-    animation: p-overlay-mask-enter 200ms ease forwards;
-}
-.p-overlay-mask-leave-active {
-    animation: p-overlay-mask-leave 150ms ease forwards;
-}
-@keyframes p-overlay-mask-enter {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-@keyframes p-overlay-mask-leave {
-    from { opacity: 1; }
-    to { opacity: 0; }
-}
-
-/* 7. Ripple */
-.p-ripple-effect {
-    position: absolute;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.4);
-    transform: scale(0);
-    animation: p-ripple-animation 600ms linear;
-    pointer-events: none;
-}
-@keyframes p-ripple-animation {
-    to {
-        transform: scale(4);
-        opacity: 0;
-    }
-}
-
-/* 8. Skeleton Shimmer */
-.p-skeleton-animation {
-    background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0, rgba(255, 255, 255, 0.2) 20%, rgba(255, 255, 255, 0.5) 60%, rgba(255, 255, 255, 0));
-    background-size: 200% 100%;
-    animation: p-skeleton-shimmer 1.5s infinite linear;
-}
-@keyframes p-skeleton-shimmer {
-    from { background-position: -200% 0; }
-    to { background-position: 200% 0; }
-}
-
-/* Reduced Motion */
-@media (prefers-reduced-motion: reduce) {
-    *,
-    ::before,
-    ::after {
-        animation-duration: 0s !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0s !important;
-        scroll-behavior: auto !important;
-    }
-}
-    `;
-  document.head.appendChild(styleEl);
-}
-function injectRipple(el, event) {
-  const rect = el.getBoundingClientRect();
-  const ripple = document.createElement("span");
-  const size = Math.max(rect.width, rect.height);
-  const x = event.clientX - rect.left - size / 2;
-  const y = event.clientY - rect.top - size / 2;
-  ripple.className = "p-ripple-effect";
-  ripple.style.width = `${size}px`;
-  ripple.style.height = `${size}px`;
-  ripple.style.left = `${x}px`;
-  ripple.style.top = `${y}px`;
-  el.appendChild(ripple);
-  setTimeout(() => {
-    ripple.remove();
-  }, 600);
-}
-var init_animations = __esm({
-  "src/styles/animations.ts"() {
-    "use strict";
-  }
-});
-
-// src/styles/design-tokens.ts
-function initDesignTokens() {
-  if (typeof document === "undefined") return;
-  if (document.getElementById("aura-design-tokens")) return;
-  const styleEl = document.createElement("style");
-  styleEl.id = "aura-design-tokens";
-  styleEl.textContent = `
-:root {
-  /* Primary palette (emerald by default) */
-  --p-primary-50: #ecfdf5;
-  --p-primary-100: #d1fae5;
-  --p-primary-200: #a7f3d0;
-  --p-primary-300: #6ee7b7;
-  --p-primary-400: #34d399;
-  --p-primary-500: #10b981;
-  --p-primary-600: #059669;
-  --p-primary-700: #047857;
-  --p-primary-800: #065f46;
-  --p-primary-900: #064e3b;
-  --p-primary-color: var(--p-primary-500);
-  --p-primary-color-text: #ffffff;
-
-  /* Surface palette */
-  --p-surface-0: #ffffff;
-  --p-surface-50: #f8fafc;
-  --p-surface-100: #f1f5f9;
-  --p-surface-200: #e2e8f0;
-  --p-surface-300: #cbd5e1;
-  --p-surface-400: #94a3b8;
-  --p-surface-500: #64748b;
-  --p-surface-600: #475569;
-  --p-surface-700: #334155;
-  --p-surface-800: #1e293b;
-  --p-surface-900: #0f172a;
-  --p-surface-950: #020617;
-  --p-text-color: var(--p-surface-900);
-  --p-text-muted-color: var(--p-surface-500);
-
-  /* Component tokens */
-  --p-content-bg: var(--p-surface-0);
-  --p-content-border: var(--p-surface-200);
-  --p-content-hover-bg: var(--p-surface-50);
-  --p-content-padding: 1rem;
-
-  /* Border radius */
-  --p-border-radius: 0.5rem;
-  --p-border-radius-sm: 0.375rem;
-  --p-border-radius-lg: 0.75rem;
-  --p-border-radius-xl: 1rem;
-  --p-border-radius-full: 9999px;
-
-  /* Shadows */
-  --p-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --p-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --p-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --p-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-
-  /* Focus ring */
-  --p-focus-ring-color: var(--p-primary-500);
-  --p-focus-ring-width: 2px;
-  --p-focus-ring-offset: 2px;
-  --p-focus-ring: 0 0 0 var(--p-focus-ring-offset) var(--p-content-bg), 0 0 0 calc(var(--p-focus-ring-offset) + var(--p-focus-ring-width)) var(--p-focus-ring-color);
-
-  /* Transitions */
-  --p-transition-duration: 150ms;
-  --p-transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
-
-  /* Form field tokens */
-  --p-field-border: var(--p-surface-300);
-  --p-field-hover-border: var(--p-surface-400);
-  --p-field-focus-border: var(--p-primary-500);
-  --p-field-bg: var(--p-surface-0);
-  --p-field-padding-x: 0.75rem;
-  --p-field-padding-y: 0.5rem;
-
-  /* Overlay tokens */
-  --p-overlay-bg: var(--p-surface-0);
-  --p-overlay-border: var(--p-surface-200);
-  --p-overlay-shadow: var(--p-shadow-lg);
-}
-
-/* Dark mode overrides */
-[data-theme="dark"], .dark {
-  --p-surface-0: #09090b;
-  --p-surface-50: #18181b;
-  --p-surface-100: #27272a;
-  --p-surface-200: #3f3f46;
-  --p-surface-300: #52525b;
-  --p-surface-400: #71717a;
-  --p-surface-500: #a1a1aa;
-  --p-surface-600: #d4d4d8;
-  --p-surface-700: #e4e4e7;
-  --p-surface-800: #f4f4f5;
-  --p-surface-900: #fafafa;
-  --p-surface-950: #ffffff;
-  
-  --p-text-color: var(--p-surface-50);
-  --p-text-muted-color: var(--p-surface-400);
-  --p-content-bg: var(--p-surface-900);
-  --p-content-border: var(--p-surface-700);
-  --p-content-hover-bg: var(--p-surface-800);
-  --p-field-bg: var(--p-surface-800);
-  --p-field-border: var(--p-surface-600);
-  --p-field-hover-border: var(--p-surface-500);
-  --p-overlay-bg: var(--p-surface-800);
-  --p-overlay-border: var(--p-surface-700);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]):not(.light) {
-    --p-surface-0: #09090b;
-    --p-surface-50: #18181b;
-    --p-surface-100: #27272a;
-    --p-surface-200: #3f3f46;
-    --p-surface-300: #52525b;
-    --p-surface-400: #71717a;
-    --p-surface-500: #a1a1aa;
-    --p-surface-600: #d4d4d8;
-    --p-surface-700: #e4e4e7;
-    --p-surface-800: #f4f4f5;
-    --p-surface-900: #fafafa;
-    --p-surface-950: #ffffff;
-    
-    --p-text-color: var(--p-surface-50);
-    --p-text-muted-color: var(--p-surface-400);
-    --p-content-bg: var(--p-surface-900);
-    --p-content-border: var(--p-surface-700);
-    --p-content-hover-bg: var(--p-surface-800);
-    --p-field-bg: var(--p-surface-800);
-    --p-field-border: var(--p-surface-600);
-    --p-field-hover-border: var(--p-surface-500);
-    --p-overlay-bg: var(--p-surface-800);
-    --p-overlay-border: var(--p-surface-700);
-  }
-}
-    `;
-  document.head.appendChild(styleEl);
-}
-function updateToken(name, value) {
-  if (typeof document !== "undefined") {
-    document.documentElement.style.setProperty(name, value);
-  }
-}
-function getToken(name) {
-  if (typeof document !== "undefined") {
-    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-  }
-  return "";
-}
-var AURA_PALETTES;
-var init_design_tokens = __esm({
-  "src/styles/design-tokens.ts"() {
-    "use strict";
-    AURA_PALETTES = {
-      emerald: {
-        "50": "#ecfdf5",
-        "100": "#d1fae5",
-        "200": "#a7f3d0",
-        "300": "#6ee7b7",
-        "400": "#34d399",
-        "500": "#10b981",
-        "600": "#059669",
-        "700": "#047857",
-        "800": "#065f46",
-        "900": "#064e3b"
-      },
-      blue: {
-        "50": "#eff6ff",
-        "100": "#dbeafe",
-        "200": "#bfdbfe",
-        "300": "#93c5fd",
-        "400": "#60a5fa",
-        "500": "#3b82f6",
-        "600": "#2563eb",
-        "700": "#1d4ed8",
-        "800": "#1e40af",
-        "900": "#1e3a8a"
-      },
-      violet: {
-        "50": "#f5f3ff",
-        "100": "#ede9fe",
-        "200": "#ddd6fe",
-        "300": "#c4b5fd",
-        "400": "#a78bfa",
-        "500": "#8b5cf6",
-        "600": "#7c3aed",
-        "700": "#6d28d9",
-        "800": "#5b21b6",
-        "900": "#4c1d95"
-      },
-      amber: {
-        "50": "#fffbeb",
-        "100": "#fef3c7",
-        "200": "#fde68a",
-        "300": "#fcd34d",
-        "400": "#fbbf24",
-        "500": "#f59e0b",
-        "600": "#d97706",
-        "700": "#b45309",
-        "800": "#92400e",
-        "900": "#78350f"
-      },
-      rose: {
-        "50": "#fff1f2",
-        "100": "#ffe4e6",
-        "200": "#fecdd3",
-        "300": "#fda4af",
-        "400": "#fb7185",
-        "500": "#f43f5e",
-        "600": "#e11d48",
-        "700": "#be123c",
-        "800": "#9f1239",
-        "900": "#881337"
-      },
-      cyan: {
-        "50": "#ecfeff",
-        "100": "#cffafe",
-        "200": "#a5f3fc",
-        "300": "#67e8f9",
-        "400": "#22d3ee",
-        "500": "#06b6d4",
-        "600": "#0891b2",
-        "700": "#0e7490",
-        "800": "#155e75",
-        "900": "#164e63"
-      },
-      slate: {
-        "50": "#f8fafc",
-        "100": "#f1f5f9",
-        "200": "#e2e8f0",
-        "300": "#cbd5e1",
-        "400": "#94a3b8",
-        "500": "#64748b",
-        "600": "#475569",
-        "700": "#334155",
-        "800": "#1e293b",
-        "900": "#0f172a"
-      }
-    };
   }
 });
 
@@ -4230,270 +2127,6 @@ var init_timeline = __esm({
       "bg-amber-500": "#f59e0b",
       "bg-rose-500": "#f43f5e"
     };
-  }
-});
-
-// src/components/camera.ts
-var camera_exports = {};
-__export(camera_exports, {
-  default: () => CameraIsland
-});
-function CameraIsland(container, props) {
-  injectIslandStyle("camera", CAMERA_CSS);
-  let stream = null;
-  let capturedPhotoData = null;
-  let isSimulated = false;
-  function render() {
-    if (capturedPhotoData) {
-      container.innerHTML = `
-                <div class="laughtale-camera-preview">
-                    <div class="laughtale-camera-header">
-                        <span>${props.title || "Captured Snapshot"}</span>
-                        <span class="laughtale-camera-badge">
-                            ${getLucideIcon("check", 14)} Verified
-                        </span>
-                    </div>
-                    <div style="position: relative; width: 100%; aspect-ratio: 4/3; background: #000; overflow: hidden;">
-                        <img src="${capturedPhotoData}" alt="Captured Snapshot" style="width: 100%; height: 100%; object-fit: cover;" />
-                    </div>
-                    <div class="laughtale-camera-controls">
-                        <button type="button" class="p-button p-button-secondary retake-btn" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius, 6px); background: var(--p-surface-800); border: 1px solid var(--p-surface-700); color: #ffffff; cursor: pointer;">
-                            ${getLucideIcon("refresh-cw", 16)} Retake Photo
-                        </button>
-                    </div>
-                </div>
-            `;
-      container.querySelector(".retake-btn")?.addEventListener("click", () => {
-        capturedPhotoData = null;
-        startCamera();
-      });
-      return;
-    }
-    container.innerHTML = `
-            <div class="laughtale-camera">
-                <div class="laughtale-camera-header">
-                    <span>${props.title || "Live Camera Capture"}</span>
-                    <span style="font-size: 0.75rem; color: var(--p-surface-400); display: flex; align-items: center; gap: 0.35rem;">
-                        ${getLucideIcon("camera", 14)} ${isSimulated ? "Simulation Mode" : "Hardware Stream"}
-                    </span>
-                </div>
-                
-                <div class="laughtale-camera-viewport">
-                    ${isSimulated ? `
-                        <canvas class="laughtale-sim-canvas" width="640" height="480" style="width: 100%; height: 100%; object-fit: cover;"></canvas>
-                    ` : `
-                        <video class="laughtale-camera-video" autoplay playsinline muted></video>
-                    `}
-                    
-                    ${props.showFaceGuide !== false ? `
-                        <div class="laughtale-camera-guide"></div>
-                        <div style="position: absolute; bottom: 1rem; left: 0; right: 0; text-align: center; color: rgba(255, 255, 255, 0.85); font-size: 0.75rem; font-weight: 500; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">
-                            Align subject inside oval guide
-                        </div>
-                    ` : ""}
-                </div>
-
-                <div class="laughtale-camera-controls">
-                    <button type="button" class="p-button p-button-primary capture-btn" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.625rem 1.5rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius, 6px); background: var(--p-primary-500, #10b981); border: 1px solid var(--p-primary-500, #10b981); color: #ffffff; cursor: pointer;">
-                        ${getLucideIcon("camera", 18)} Take Snapshot
-                    </button>
-                </div>
-            </div>
-        `;
-    if (isSimulated) {
-      drawSimulatedFeed();
-    } else {
-      const video = container.querySelector("video");
-      if (video && stream) video.srcObject = stream;
-    }
-    container.querySelector(".capture-btn")?.addEventListener("click", () => {
-      if (isSimulated) {
-        const simCanvas = container.querySelector(".laughtale-sim-canvas");
-        if (simCanvas) {
-          capturedPhotoData = simCanvas.toDataURL("image/jpeg", 0.92);
-          dispatchCaptureEvent();
-          render();
-        }
-      } else {
-        const video = container.querySelector("video");
-        if (video) {
-          const canvas = document.createElement("canvas");
-          canvas.width = video.videoWidth || 640;
-          canvas.height = video.videoHeight || 480;
-          const ctx = canvas.getContext("2d");
-          if (ctx) {
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            capturedPhotoData = canvas.toDataURL("image/jpeg", 0.92);
-            if (stream) {
-              stream.getTracks().forEach((t) => t.stop());
-              stream = null;
-            }
-            dispatchCaptureEvent();
-            render();
-          }
-        }
-      }
-    });
-  }
-  function dispatchCaptureEvent() {
-    if (props.targetInputName) {
-      let hiddenInput = document.querySelector(`input[name="${props.targetInputName}"]`);
-      if (!hiddenInput) {
-        hiddenInput = document.createElement("input");
-        hiddenInput.type = "hidden";
-        hiddenInput.name = props.targetInputName;
-        container.appendChild(hiddenInput);
-      }
-      hiddenInput.value = capturedPhotoData || "";
-    }
-    container.dispatchEvent(new CustomEvent("camera:captured", {
-      bubbles: true,
-      detail: { photoData: capturedPhotoData }
-    }));
-  }
-  function drawSimulatedFeed() {
-    const canvas = container.querySelector(".laughtale-sim-canvas");
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-    const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-    grad.addColorStop(0, "#1e293b");
-    grad.addColorStop(0.5, "#0f172a");
-    grad.addColorStop(1, "#020617");
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "#334155";
-    ctx.beginPath();
-    ctx.arc(canvas.width / 2, canvas.height / 2 - 20, 70, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(canvas.width / 2, canvas.height / 2 + 130, 110, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = "#64748b";
-    ctx.font = "14px monospace";
-    ctx.fillText(`LAUGHTALE HD CAPTURE \u2022 ${(/* @__PURE__ */ new Date()).toLocaleTimeString()}`, 20, canvas.height - 20);
-  }
-  async function startCamera() {
-    try {
-      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: "user",
-            width: { ideal: 1280 },
-            height: { ideal: 720 }
-          },
-          audio: false
-        });
-        isSimulated = false;
-      } else {
-        isSimulated = true;
-      }
-    } catch (err) {
-      console.warn("[SoftMax.LaughTale] Hardware camera stream denied or unavailable. Fallback to simulation mode:", err);
-      isSimulated = true;
-    }
-    render();
-  }
-  startCamera();
-  return () => {
-    if (stream) {
-      stream.getTracks().forEach((track) => track.stop());
-    }
-  };
-}
-var CAMERA_CSS;
-var init_camera = __esm({
-  "src/components/camera.ts"() {
-    "use strict";
-    init_styles();
-    init_lucide();
-    CAMERA_CSS = `
-.laughtale-camera-preview,
-.laughtale-camera {
-    position: relative;
-    border: 1px solid var(--p-border-color, #e2e8f0);
-    border-radius: var(--p-border-radius-lg, 8px);
-    overflow: hidden;
-    background: var(--p-surface-950, #020617);
-    color: #ffffff;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    max-width: 32rem;
-    margin: 0 auto;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
-
-.laughtale-camera-header {
-    padding: 0.75rem 1rem;
-    background: var(--p-surface-900, #0f172a);
-    color: var(--p-surface-0, #ffffff);
-    font-weight: 600;
-    font-size: 0.875rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 1px solid var(--p-surface-800, #1e293b);
-}
-
-.laughtale-camera-viewport {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 4/3;
-    background: #000000;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.laughtale-camera-video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.laughtale-camera-guide {
-    position: absolute;
-    width: 55%;
-    height: 75%;
-    border: 2px dashed rgba(255, 255, 255, 0.6);
-    border-radius: 50%;
-    pointer-events: none;
-    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.35);
-}
-
-.laughtale-camera-controls {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    padding: 1rem;
-    background: var(--p-surface-900, #0f172a);
-    border-top: 1px solid var(--p-surface-800, #1e293b);
-}
-
-.laughtale-camera-badge {
-    position: absolute;
-    top: 0.75rem;
-    right: 0.75rem;
-    background: #059669;
-    color: #ffffff;
-    padding: 0.3rem 0.65rem;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-}
-
-/* Dark theme overrides */
-[data-theme="dark"] .laughtale-camera-preview,
-[data-theme="dark"] .laughtale-camera {
-    border-color: var(--p-surface-800, #1e293b);
-}
-`;
   }
 });
 
@@ -8729,122 +6362,6 @@ var init_datatable = __esm({
     border-color: var(--p-surface-700, #334155);
 }
 `;
-  }
-});
-
-// src/components/modal.ts
-var modal_exports = {};
-__export(modal_exports, {
-  default: () => ModalDialogIsland
-});
-function ModalDialogIsland(container, props) {
-  injectIslandStyle("modal-dialog", `
-        .aura-dialog-mask {
-            position: fixed;
-            inset: 0;
-            background: rgba(15, 23, 42, 0.45);
-            backdrop-filter: blur(6px);
-            z-index: 1100;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1.5rem;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .aura-dialog-mask.modal-open {
-            opacity: 1;
-            pointer-events: auto;
-        }
-        .aura-dialog {
-            background: var(--p-surface-0);
-            border: 1px solid var(--p-border-color);
-            border-radius: var(--p-border-radius-xl);
-            box-shadow: var(--p-shadow-lg);
-            max-width: 32rem;
-            width: 100%;
-            overflow: hidden;
-            transform: scale(0.95) translateY(8px);
-            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .aura-dialog-mask.modal-open .aura-dialog {
-            transform: scale(1) translateY(0);
-        }
-    `);
-  const slotEl = getSlot(container);
-  const slotHtml = slotEl ? slotEl.innerHTML : '<p style="color: var(--p-text-muted); font-size: 0.875rem;">No slot content provided.</p>';
-  container.innerHTML = `
-        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-            <div style="display: flex; align-items: center; justify-content: space-between;">
-                <span style="font-size: 0.8125rem; font-weight: 600; color: var(--p-surface-600);">Server Slot Projection</span>
-                <span class="aura-tag tag-purple">Hydrate: Interaction</span>
-            </div>
-
-            <div>
-                <button type="button" class="p-button p-button-primary modal-open-btn">
-                    <span>\u{1F510}</span>
-                    ${props.triggerButtonText}
-                </button>
-            </div>
-
-            <div class="aura-dialog-mask modal-overlay">
-                <div class="aura-dialog">
-                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--p-border-color);">
-                        <h3 style="font-size: 1rem; font-weight: 700; color: var(--p-surface-950);">${props.dialogTitle}</h3>
-                        <button type="button" class="modal-close-btn" style="background: none; border: none; font-size: 1.125rem; color: var(--p-surface-400); cursor: pointer; padding: 0.25rem;">\u2715</button>
-                    </div>
-
-                    <!-- Projected C# Server Slot Content -->
-                    <div class="modal-body" style="padding: 1.5rem;">
-                        ${slotHtml}
-                    </div>
-
-                    <div style="display: flex; justify-content: flex-end; gap: 0.5rem; padding: 1rem 1.5rem; border-top: 1px solid var(--p-border-color); background: var(--p-surface-50);">
-                        <button type="button" class="p-button p-button-secondary modal-cancel-btn">Cancel</button>
-                        <button type="button" class="p-button p-button-primary modal-confirm-btn">Confirm Operation</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    
-  [data-theme="dark"] .dummy-dark {}
-`;
-  const openBtn = container.querySelector(".modal-open-btn");
-  const overlay = container.querySelector(".modal-overlay");
-  const dialog = container.querySelector(".aura-dialog");
-  const closeBtn = container.querySelector(".modal-close-btn");
-  const cancelBtn = container.querySelector(".modal-cancel-btn");
-  const confirmBtn = container.querySelector(".modal-confirm-btn");
-  const focusTrap = useFocusTrap(dialog);
-  const disclosure = useDisclosure({
-    defaultIsOpen: false,
-    onOpen: () => {
-      overlay.classList.add("modal-open");
-      focusTrap.activate();
-    },
-    onClose: () => {
-      overlay.classList.remove("modal-open");
-      focusTrap.deactivate();
-    }
-  });
-  openBtn.addEventListener("click", () => disclosure.open());
-  closeBtn.addEventListener("click", () => disclosure.close());
-  cancelBtn.addEventListener("click", () => disclosure.close());
-  confirmBtn.addEventListener("click", () => {
-    container.dispatchEvent(new CustomEvent("modal:confirmed", { bubbles: true }));
-    disclosure.close();
-  });
-  overlay.addEventListener("click", (e) => {
-    if (e.target === overlay) disclosure.close();
-  });
-}
-var init_modal = __esm({
-  "src/components/modal.ts"() {
-    "use strict";
-    init_index();
-    init_useDisclosure();
-    init_useFocusTrap();
   }
 });
 
@@ -18574,100 +16091,6 @@ var init_divider = __esm({
   }
 });
 
-// src/components/card.ts
-var card_exports = {};
-__export(card_exports, {
-  default: () => CardIsland
-});
-function CardIsland(container, props) {
-  injectIslandStyle("card", CARD_CSS);
-  if (props.role) {
-    container.setAttribute("role", props.role);
-  }
-}
-var CARD_CSS;
-var init_card = __esm({
-  "src/components/card.ts"() {
-    "use strict";
-    init_styles();
-    CARD_CSS = `
-.p-card {
-    background: var(--p-surface-0, #ffffff);
-    color: var(--p-surface-700, #334155);
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
-    border-radius: var(--p-border-radius-md, 8px);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    box-sizing: border-box;
-}
-
-.p-card-header {
-    overflow: hidden;
-    position: relative;
-}
-
-.p-card-body {
-    padding: 1.25rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
-.p-card-caption {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-}
-
-.p-card-title {
-    font-weight: 700;
-    font-size: 1.25rem;
-    color: var(--p-surface-900, #0f172a);
-    margin: 0;
-    line-height: 1.25;
-}
-
-.p-card-subtitle {
-    font-weight: 400;
-    font-size: 0.875rem;
-    color: var(--p-surface-500, #64748b);
-    margin: 0;
-}
-
-.p-card-content {
-    color: var(--p-surface-600, #475569);
-    font-size: 0.875rem;
-    line-height: 1.6;
-}
-
-.p-card-footer {
-    margin-top: 0.5rem;
-}
-
-/* Dark Mode Tokens */
-.dark .p-card,
-[data-theme="dark"] .p-card {
-    background: var(--p-surface-900, #0f172a) !important;
-    color: var(--p-surface-100, #f8fafc) !important;
-    border: 1px solid var(--p-surface-700, #334155) !important;
-}
-.dark .p-card-title,
-[data-theme="dark"] .p-card-title {
-    color: var(--p-surface-0, #ffffff) !important;
-}
-.dark .p-card-subtitle,
-[data-theme="dark"] .p-card-subtitle {
-    color: var(--p-surface-400, #94a3b8) !important;
-}
-.dark .p-card-content,
-[data-theme="dark"] .p-card-content {
-    color: var(--p-surface-300, #cbd5e1) !important;
-}
-`;
-  }
-});
-
 // src/components/accordion.ts
 var accordion_exports = {};
 __export(accordion_exports, {
@@ -22584,204 +20007,6 @@ var init_theme_studio = __esm({
   }
 });
 
-// src/components/dynamic-form.ts
-var dynamic_form_exports = {};
-__export(dynamic_form_exports, {
-  default: () => DynamicFormIsland
-});
-function DynamicFormIsland(container, props) {
-  injectIslandStyle("dynamic-form", CSS24);
-  let schema = props.schema || null;
-  if (!schema && props.schemaJson) {
-    try {
-      schema = JSON.parse(props.schemaJson);
-    } catch (err) {
-      console.error("[SoftMax.LaughTale DynamicForm] Failed to parse schemaJson:", err);
-    }
-  }
-  if (!schema) {
-    container.innerHTML = `<div style="color: var(--p-surface-400); font-size: 0.875rem;">No Form Schema provided.</div>`;
-    return;
-  }
-  const formData = {};
-  const errors = {};
-  schema.fields.forEach((f) => {
-    formData[f.name] = f.defaultValue !== void 0 && f.defaultValue !== null ? f.defaultValue : "";
-  });
-  function renderField(f) {
-    const val = formData[f.name] ?? "";
-    const error = errors[f.name];
-    let controlHtml = "";
-    switch (f.fieldType) {
-      case "Password":
-        controlHtml = `
-                    <div style="position: relative;">
-                        <input type="password" name="${f.name}" class="p-input form-field-input" data-field="${f.name}" value="${val}" placeholder="${f.placeholder || ""}" ${f.isRequired ? "required" : ""} style="width: 100%;" />
-                    </div>
-                `;
-        break;
-      case "Multiline":
-        controlHtml = `
-                    <textarea name="${f.name}" class="p-input form-field-input" data-field="${f.name}" rows="3" placeholder="${f.placeholder || ""}" ${f.isRequired ? "required" : ""} style="width: 100%; resize: vertical;">${val}</textarea>
-                `;
-        break;
-      case "Number":
-      case "Currency":
-        controlHtml = `
-                    <input type="number" name="${f.name}" class="p-input form-field-input" data-field="${f.name}" value="${val}" min="${f.min ?? ""}" max="${f.max ?? ""}" placeholder="${f.placeholder || ""}" ${f.isRequired ? "required" : ""} style="width: 100%;" />
-                `;
-        break;
-      case "Switch":
-        const checked = Boolean(val);
-        controlHtml = `
-                    <label style="display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-                        <input type="checkbox" name="${f.name}" class="form-field-checkbox" data-field="${f.name}" ${checked ? "checked" : ""} style="width: 1.25rem; height: 1.25rem; accent-color: var(--p-primary-600);" />
-                        <span style="font-size: 0.875rem; color: var(--p-surface-700);">${f.label}</span>
-                    </label>
-                `;
-        break;
-      case "Select":
-        const options = (f.options || []).map((opt) => `<option value="${opt.value}" ${opt.value === val ? "selected" : ""}>${opt.label}</option>`).join("");
-        controlHtml = `
-                    <select name="${f.name}" class="p-input form-field-select" data-field="${f.name}" style="width: 100%;">
-                        ${options}
-                    </select>
-                `;
-        break;
-      case "DatePicker":
-        controlHtml = `
-                    <input type="date" name="${f.name}" class="p-input form-field-input" data-field="${f.name}" value="${val}" style="width: 100%;" />
-                `;
-        break;
-      default:
-        controlHtml = `
-                    <input type="${f.fieldType === "Email" ? "email" : "text"}" name="${f.name}" class="p-input form-field-input" data-field="${f.name}" value="${val}" placeholder="${f.placeholder || ""}" ${f.isRequired ? "required" : ""} style="width: 100%;" />
-                `;
-        break;
-    }
-    return `
-            <div class="form-group" style="display: flex; flex-direction: column; gap: 0.35rem;">
-                ${f.fieldType !== "Switch" ? `
-                    <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-surface-800); display: flex; align-items: center; gap: 0.25rem;">
-                        ${f.label}
-                        ${f.isRequired ? '<span style="color: #ef4444;">*</span>' : ""}
-                    </label>
-                ` : ""}
-                ${controlHtml}
-                ${f.helpText ? `<span style="font-size: 0.75rem; color: var(--p-surface-400);">${f.helpText}</span>` : ""}
-                ${error ? `<span style="font-size: 0.75rem; color: #ef4444; font-weight: 500;">${error}</span>` : ""}
-            </div>
-        `;
-  }
-  function render() {
-    const fieldsHtml = schema.fields.map(renderField).join("");
-    container.innerHTML = `
-            <form class="laughtale-dynamic-form" style="background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); padding: 1.75rem; display: flex; flex-direction: column; gap: 1.25rem;">
-                <!-- Form Header -->
-                <div style="border-bottom: 1px solid var(--p-border-color); padding-bottom: 0.875rem;">
-                    <h3 style="font-size: 1.125rem; font-weight: 700; color: var(--p-surface-900); margin-bottom: 0.25rem;">${schema.title}</h3>
-                    ${schema.description ? `<p style="font-size: 0.8125rem; color: var(--p-surface-500);">${schema.description}</p>` : ""}
-                </div>
-
-                <!-- Form Fields Grid -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem;">
-                    ${fieldsHtml}
-                </div>
-
-                <!-- Submit Button -->
-                <div style="display: flex; justify-content: flex-end; border-top: 1px solid var(--p-border-color); padding-top: 1rem; margin-top: 0.5rem;">
-                    <button type="submit" class="p-button p-button-primary" style="padding: 0.5rem 1.25rem; font-size: 0.875rem;">
-                        ${schema.submitLabel || "Submit"}
-                    </button>
-                </div>
-            </form>
-        `;
-    bindEvents();
-  }
-  function validate() {
-    let valid = true;
-    Object.keys(errors).forEach((k) => delete errors[k]);
-    schema.fields.forEach((f) => {
-      const val = formData[f.name];
-      if (f.isRequired && (val === void 0 || val === null || val === "")) {
-        errors[f.name] = `${f.label} is required.`;
-        valid = false;
-      } else if (f.fieldType === "Email" && val && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(val))) {
-        errors[f.name] = `Invalid email address.`;
-        valid = false;
-      }
-    });
-    return valid;
-  }
-  function bindEvents() {
-    const form = container.querySelector(".laughtale-dynamic-form");
-    form.querySelectorAll(".form-field-input, .form-field-select").forEach((input) => {
-      input.addEventListener("input", (e) => {
-        const target = e.target;
-        const fieldName = target.getAttribute("data-field");
-        formData[fieldName] = target.value;
-      });
-    });
-    form.querySelectorAll(".form-field-checkbox").forEach((chk) => {
-      chk.addEventListener("change", (e) => {
-        const target = e.target;
-        const fieldName = target.getAttribute("data-field");
-        formData[fieldName] = target.checked;
-      });
-    });
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      if (validate()) {
-        container.dispatchEvent(new CustomEvent("form:submit", {
-          bubbles: true,
-          detail: { data: formData }
-        }));
-        const submitBtn = form.querySelector('button[type="submit"]');
-        const originalText = submitBtn.innerHTML;
-        submitBtn.innerHTML = `${LucideIcons.check} Submitted Successfully!`;
-        submitBtn.style.backgroundColor = "#059669";
-        setTimeout(() => {
-          submitBtn.innerHTML = originalText;
-          submitBtn.style.backgroundColor = "";
-        }, 2500);
-      } else {
-        render();
-      }
-    });
-  }
-  render();
-}
-var CSS24;
-var init_dynamic_form = __esm({
-  "src/components/dynamic-form.ts"() {
-    "use strict";
-    init_styles();
-    init_lucide();
-    CSS24 = `
-[data-theme="dark"] .p-input {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
-}
-[data-theme="dark"] .form-field-input {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
-}
-[data-theme="dark"] .form-field-checkbox {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
-}
-[data-theme="dark"] .laughtale-dynamic-form {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
-}
-`;
-  }
-});
-
 // src/components/splitter.ts
 var splitter_exports = {};
 __export(splitter_exports, {
@@ -23143,7 +20368,7 @@ __export(multiselect_exports, {
   default: () => MultiSelectIsland
 });
 function MultiSelectIsland(container, props) {
-  injectIslandStyle("multiselect", CSS25);
+  injectIslandStyle("multiselect", CSS24);
   const options = props.options || [];
   let selected = new Set(props.selectedValues || []);
   let filterQuery = "";
@@ -23309,7 +20534,7 @@ function MultiSelectIsland(container, props) {
   renderDisplay();
   syncValue();
 }
-var CSS25;
+var CSS24;
 var init_multiselect = __esm({
   "src/components/multiselect.ts"() {
     "use strict";
@@ -23318,7 +20543,7 @@ var init_multiselect = __esm({
     init_useDisclosure();
     init_useClickOutside();
     init_useTransition();
-    CSS25 = `
+    CSS24 = `
 [data-theme="dark"] .laughtale-multiselect {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -23389,7 +20614,7 @@ __export(cascadeselect_exports, {
   default: () => CascadeSelectIsland
 });
 function CascadeSelectIsland(container, props) {
-  injectIslandStyle("cascadeselect", CSS26);
+  injectIslandStyle("cascadeselect", CSS25);
   const options = props.options || [];
   const size = props.size || "normal";
   const variant = props.variant || "outlined";
@@ -23602,7 +20827,7 @@ function CascadeSelectIsland(container, props) {
     }));
   }
 }
-var CSS26;
+var CSS25;
 var init_cascadeselect = __esm({
   "src/components/cascadeselect.ts"() {
     "use strict";
@@ -23610,7 +20835,7 @@ var init_cascadeselect = __esm({
     init_styles();
     init_useDisclosure();
     init_useClickOutside();
-    CSS26 = `
+    CSS25 = `
 .laughtale-cascadeselect {
     position: relative;
     display: inline-flex;
@@ -23815,7 +21040,7 @@ __export(listbox_exports, {
   default: () => ListboxIsland
 });
 function ListboxIsland(container, props) {
-  injectIslandStyle("laughtale-listbox", CSS27);
+  injectIslandStyle("laughtale-listbox", CSS26);
   const isMultiple = props.multiple === true || String(props.multiple) === "true";
   const isMetaKey = props.metaKeySelection !== false && String(props.metaKeySelection) !== "false";
   const isCheckbox = props.checkbox === true || String(props.checkbox) === "true";
@@ -24151,14 +21376,14 @@ function ListboxIsland(container, props) {
   }
   init();
 }
-var CSS27, checkSvg2, searchSvg2;
+var CSS26, checkSvg2, searchSvg2;
 var init_listbox = __esm({
   "src/components/listbox.ts"() {
     "use strict";
     init_lucide();
     init_styles();
     init_useDebounce();
-    CSS27 = `
+    CSS26 = `
 /* ==================== AURA LISTBOX ==================== */
 .laughtale-listbox,
 .p-listbox {
@@ -26624,218 +23849,13 @@ var init_orgchart = __esm({
   }
 });
 
-// src/components/terminal.ts
-var terminal_exports = {};
-__export(terminal_exports, {
-  default: () => TerminalIsland
-});
-function TerminalIsland(container, props) {
-  injectIslandStyle("terminal", CSS28);
-  const promptPrefix = props.prompt || "admin@softmax:~$";
-  const welcome = props.welcomeMessage || 'Welcome to SoftMax.LaughTale CLI v3.0\nType "help" for available commands.';
-  const commands = {
-    "help": "Available commands: help, clear, status, date, version, info",
-    "status": "All Islands hydrated: 100% OK. System latency: 0.8ms.",
-    "version": "SoftMax.LaughTale Framework v3.0 (.NET 10 & TS)",
-    "info": "Architecture: SSR + Micro-Directives + Islands + Tailwind CSS v4",
-    "date": (/* @__PURE__ */ new Date()).toISOString(),
-    ...props.commands || {}
-  };
-  const history = [];
-  const commandHistory = [];
-  let historyIndex = -1;
-  const clipboard = useClipboard();
-  function render() {
-    container.innerHTML = `
-            <div class="laughtale-terminal" style="background: #030712; color: #38bdf8; font-family: var(--p-font-mono, monospace); font-size: 0.8125rem; border-radius: var(--p-border-radius-lg); border: 1px solid #1f2937; box-shadow: var(--p-shadow-lg); padding: 1.25rem; width: 100%; max-width: 640px; min-height: 240px; display: flex; flex-direction: column; overflow: hidden;">
-                <!-- Header Controls -->
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.875rem; border-bottom: 1px solid #1f2937; padding-bottom: 0.625rem;">
-                    <div style="display: flex; align-items: center; gap: 0.45rem;">
-                        <span style="width: 10px; height: 10px; border-radius: 50%; background: #ef4444; display: inline-block;"></span>
-                        <span style="width: 10px; height: 10px; border-radius: 50%; background: #f59e0b; display: inline-block;"></span>
-                        <span style="width: 10px; height: 10px; border-radius: 50%; background: #10b981; display: inline-block;"></span>
-                        <span style="color: #64748b; font-size: 0.6875rem; margin-left: 0.5rem;">bash \u2014 80x24</span>
-                    </div>
-                    <button type="button" class="btn-copy-terminal" style="background: transparent; border: none; color: #64748b; font-size: 0.75rem; cursor: pointer; padding: 0.15rem 0.35rem; border-radius: 4px;">
-                        Copy Log
-                    </button>
-                </div>
-
-                <!-- History Log -->
-                <div class="terminal-log" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 0.35rem;">
-                    <div style="color: #94a3b8; white-space: pre-wrap; margin-bottom: 0.5rem;">${welcome}</div>
-                    ${history.map((h) => `
-                        <div>
-                            <div style="color: #4ade80;"><span style="color: #64748b;">${promptPrefix}</span> ${h.command}</div>
-                            ${h.response ? `<div style="color: #e2e8f0; white-space: pre-wrap; margin-left: 0.5rem;">${h.response}</div>` : ""}
-                        </div>
-                    `).join("")}
-                </div>
-
-                <!-- Active Prompt Line -->
-                <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
-                    <span style="color: #4ade80; user-select: none;">${promptPrefix}</span>
-                    <input type="text" class="terminal-input" style="flex: 1; background: transparent; border: none; outline: none; color: #f8fafc; font-family: inherit; font-size: inherit;" autofocus />
-                </div>
-            </div>
-        `;
-    const input = container.querySelector(".terminal-input");
-    const log = container.querySelector(".terminal-log");
-    const copyBtn = container.querySelector(".btn-copy-terminal");
-    log.scrollTop = log.scrollHeight;
-    copyBtn.addEventListener("click", () => {
-      const allText = history.map((h) => `${promptPrefix} ${h.command}
-${h.response}`).join("\n");
-      clipboard.copy(allText);
-      copyBtn.textContent = "Copied!";
-      setTimeout(() => {
-        copyBtn.textContent = "Copy Log";
-      }, 2e3);
-    });
-    input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        const cmd = input.value.trim();
-        if (!cmd) return;
-        commandHistory.push(cmd);
-        historyIndex = commandHistory.length;
-        if (cmd === "clear") {
-          history.length = 0;
-        } else {
-          const resp = commands[cmd] || `command not found: ${cmd}`;
-          history.push({ command: cmd, response: resp });
-        }
-        container.dispatchEvent(new CustomEvent("terminal:command", {
-          bubbles: true,
-          detail: { command: cmd }
-        }));
-        render();
-      } else if (e.key === "ArrowUp") {
-        e.preventDefault();
-        if (historyIndex > 0) {
-          historyIndex--;
-          input.value = commandHistory[historyIndex] || "";
-        }
-      } else if (e.key === "ArrowDown") {
-        e.preventDefault();
-        if (historyIndex < commandHistory.length - 1) {
-          historyIndex++;
-          input.value = commandHistory[historyIndex] || "";
-        } else {
-          historyIndex = commandHistory.length;
-          input.value = "";
-        }
-      }
-    });
-  }
-  render();
-}
-var CSS28;
-var init_terminal = __esm({
-  "src/components/terminal.ts"() {
-    "use strict";
-    init_styles();
-    init_useClipboard();
-    CSS28 = `
-[data-theme="dark"] .laughtale-terminal {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
-}
-[data-theme="dark"] .btn-copy-terminal {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
-}
-[data-theme="dark"] .terminal-log {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
-}
-[data-theme="dark"] .terminal-input {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
-}
-`;
-  }
-});
-
-// src/components/dock.ts
-var dock_exports = {};
-__export(dock_exports, {
-  default: () => DockIsland
-});
-function DockIsland(container, props) {
-  injectIslandStyle("dock", CSS29);
-  const items = props.items || [
-    { label: "Overview", icon: "compass", url: "/" },
-    { label: "Dashboard", icon: "bar-chart", url: "/dashboard" },
-    { label: "Directives", icon: "sliders", url: "/enterprise" },
-    { label: "Docs", icon: "file-text", url: "/doc/01-getting-started" },
-    { label: "Theme Studio", icon: "palette", action: "open-studio" }
-  ];
-  container.innerHTML = `
-        <div class="laughtale-dock" style="display: inline-flex; align-items: center; gap: 0.75rem; background: rgba(255, 255, 255, 0.85); dark:bg-slate-900; backdrop-filter: blur(12px); border: 1px solid var(--p-border-color); border-radius: 9999px; padding: 0.5rem 1rem; box-shadow: var(--p-shadow-lg);">
-            ${items.map((it) => {
-    const iconSvg = LucideIcons[it.icon] || LucideIcons.terminal;
-    return `
-                    <button type="button" 
-                            class="dock-item-btn" 
-                            data-action="${it.action || ""}" 
-                            data-url="${it.url || ""}"
-                            title="${it.label}"
-                            style="width: 2.75rem; height: 2.75rem; border-radius: 9999px; border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-surface-700); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.2s ease;">
-                        ${iconSvg}
-                    </button>
-                `;
-  }).join("")}
-        </div>
-    `;
-  container.querySelectorAll(".dock-item-btn").forEach((btn) => {
-    btn.addEventListener("mouseenter", () => {
-      btn.style.transform = "scale(1.3) translateY(-4px)";
-      btn.style.boxShadow = "0 10px 15px -3px rgba(0,0,0,0.15)";
-    });
-    btn.addEventListener("mouseleave", () => {
-      btn.style.transform = "none";
-      btn.style.boxShadow = "none";
-    });
-    btn.addEventListener("click", () => {
-      const url = btn.getAttribute("data-url");
-      const action = btn.getAttribute("data-action");
-      if (url) window.location.href = url;
-      else if (action === "open-studio") document.dispatchEvent(new CustomEvent("studio:open"));
-    });
-  });
-}
-var CSS29;
-var init_dock = __esm({
-  "src/components/dock.ts"() {
-    "use strict";
-    init_styles();
-    init_lucide();
-    CSS29 = `
-[data-theme="dark"] .laughtale-dock {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
-}
-[data-theme="dark"] .dock-item-btn {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
-}
-`;
-  }
-});
-
 // src/components/galleria.ts
 var galleria_exports = {};
 __export(galleria_exports, {
   default: () => GalleriaIsland
 });
 function GalleriaIsland(container, props) {
-  injectIslandStyle("galleria", CSS30);
+  injectIslandStyle("galleria", CSS27);
   const images = props.value && props.value.length > 0 ? props.value : [
     {
       itemImageSrc: "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800&auto=format&fit=crop&q=80",
@@ -26909,13 +23929,13 @@ function GalleriaIsland(container, props) {
   }
   render();
 }
-var CSS30;
+var CSS27;
 var init_galleria = __esm({
   "src/components/galleria.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS30 = `
+    CSS27 = `
 [data-theme="dark"] .laughtale-galleria {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -26946,7 +23966,7 @@ __export(blockui_exports, {
   default: () => BlockUIIsland
 });
 function BlockUIIsland(container, props) {
-  injectIslandStyle("blockui", CSS31);
+  injectIslandStyle("blockui", CSS28);
   let isBlocked = props.blocked ?? true;
   function render() {
     container.innerHTML = `
@@ -26969,12 +23989,12 @@ function BlockUIIsland(container, props) {
     render();
   });
 }
-var CSS31;
+var CSS28;
 var init_blockui = __esm({
   "src/components/blockui.ts"() {
     "use strict";
     init_styles();
-    CSS31 = `
+    CSS28 = `
 [data-theme="dark"] .laughtale-blockui-root {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -27706,7 +24726,7 @@ __export(select_exports, {
   default: () => SelectIsland
 });
 function SelectIsland(container, props) {
-  injectIslandStyle("laughtale-select", CSS32);
+  injectIslandStyle("laughtale-select", CSS29);
   const isMultiple = props.multiple === true || String(props.multiple) === "true";
   const isCheckmark = props.checkmark === true || String(props.checkmark) === "true";
   const isCheckbox = props.checkbox === true || String(props.checkbox) === "true";
@@ -28046,13 +25066,13 @@ function SelectIsland(container, props) {
   }
   render();
 }
-var CSS32;
+var CSS29;
 var init_select = __esm({
   "src/components/select.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS32 = `
+    CSS29 = `
 /* ==================== AURA SELECT ==================== */
 .laughtale-select,
 .p-select {
@@ -28479,7 +25499,7 @@ __export(checkbox_exports, {
   default: () => CheckboxIsland
 });
 function CheckboxIsland(container, props) {
-  injectIslandStyle("laughtale-checkbox", CSS33);
+  injectIslandStyle("laughtale-checkbox", CSS30);
   let isChecked = Boolean(props.checked);
   let isIndeterminate = Boolean(props.indeterminate);
   const size = props.size || "normal";
@@ -28551,13 +25571,13 @@ function CheckboxIsland(container, props) {
   }
   render();
 }
-var CSS33;
+var CSS30;
 var init_checkbox = __esm({
   "src/components/checkbox.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS33 = `
+    CSS30 = `
 .laughtale-checkbox-wrap {
     display: inline-flex;
     align-items: center;
@@ -28734,7 +25754,7 @@ __export(radio_button_exports, {
   default: () => RadioButtonIsland
 });
 function RadioButtonIsland(container, props) {
-  injectIslandStyle("laughtale-radio", CSS34);
+  injectIslandStyle("laughtale-radio", CSS31);
   const isCard = props.card === true || String(props.card) === "true";
   const isFilled = props.variant === "filled";
   const size = props.size || "normal";
@@ -28966,13 +25986,13 @@ function RadioButtonIsland(container, props) {
   }
   renderSingle();
 }
-var CSS34;
+var CSS31;
 var init_radio_button = __esm({
   "src/components/radio-button.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS34 = `
+    CSS31 = `
 /* ==================== AURA RADIOBUTTON ==================== */
 .laughtale-radio-root,
 .p-radiobutton-root {
@@ -29255,7 +26275,7 @@ __export(textarea_exports, {
   default: () => TextareaIsland
 });
 function TextareaIsland(container, props) {
-  injectIslandStyle("laughtale-textarea", CSS35);
+  injectIslandStyle("laughtale-textarea", CSS32);
   const isAutoResize = props.autoResize === true || String(props.autoResize) === "true";
   const isFluid = props.fluid === true || String(props.fluid) === "true";
   const isInvalid = props.invalid === true || String(props.invalid) === "true";
@@ -29331,12 +26351,12 @@ function TextareaIsland(container, props) {
     setTimeout(adjustHeight, 0);
   }
 }
-var CSS35;
+var CSS32;
 var init_textarea = __esm({
   "src/components/textarea.ts"() {
     "use strict";
     init_styles();
-    CSS35 = `
+    CSS32 = `
 /* ==================== AURA TEXTAREA ==================== */
 .p-textarea {
     font-family: var(--p-font-family, inherit);
@@ -29461,7 +26481,7 @@ __export(input_mask_exports, {
   default: () => InputMaskIsland
 });
 function InputMaskIsland(container, props) {
-  injectIslandStyle("laughtale-input-mask", CSS36);
+  injectIslandStyle("laughtale-input-mask", CSS33);
   const mask = props.mask || "(999) 999-9999";
   const slotChar = props.slotChar || "_";
   const autoClear = props.autoClear !== false && String(props.autoClear) !== "false";
@@ -29648,12 +26668,12 @@ function InputMaskIsland(container, props) {
   });
   syncValue();
 }
-var CSS36;
+var CSS33;
 var init_input_mask = __esm({
   "src/components/input-mask.ts"() {
     "use strict";
     init_styles();
-    CSS36 = `
+    CSS33 = `
 /* ==================== AURA INPUTMASK ==================== */
 .laughtale-input-mask,
 .p-inputmask {
@@ -29763,7 +26783,7 @@ __export(float_label_exports, {
   default: () => FloatLabelIsland
 });
 function FloatLabelIsland(container, props) {
-  injectIslandStyle("laughtale-float-label", CSS37);
+  injectIslandStyle("laughtale-float-label", CSS34);
   const variant = props.variant || "over";
   const initialHtml = container.innerHTML;
   const forAttr = props.for ? `for="${props.for}"` : "";
@@ -29841,12 +26861,12 @@ function FloatLabelIsland(container, props) {
   setTimeout(updateFloatingState, 50);
   setTimeout(updateFloatingState, 200);
 }
-var CSS37;
+var CSS34;
 var init_float_label = __esm({
   "src/components/float-label.ts"() {
     "use strict";
     init_styles();
-    CSS37 = `
+    CSS34 = `
 .laughtale-float-label {
     position: relative;
     display: inline-flex;
@@ -29973,7 +26993,7 @@ __export(ifta_label_exports, {
   default: () => IftaLabelIsland
 });
 function IftaLabelIsland(container, props) {
-  injectIslandStyle("laughtale-ifta-label", CSS38);
+  injectIslandStyle("laughtale-ifta-label", CSS35);
   const initialHtml = container.innerHTML;
   const forAttr = props.for ? `for="${props.for}"` : "";
   const existingLabel = container.querySelector("label");
@@ -29996,12 +27016,12 @@ function IftaLabelIsland(container, props) {
     }
   });
 }
-var CSS38;
+var CSS35;
 var init_ifta_label = __esm({
   "src/components/ifta-label.ts"() {
     "use strict";
     init_styles();
-    CSS38 = `
+    CSS35 = `
 .laughtale-ifta-label {
     position: relative;
     display: inline-flex;
@@ -30089,14 +27109,14 @@ __export(input_group_exports, {
   default: () => InputGroupIsland
 });
 function InputGroupIsland(container, props) {
-  injectIslandStyle("laughtale-inputgroup", CSS39);
+  injectIslandStyle("laughtale-inputgroup", CSS36);
   container.classList.add("laughtale-inputgroup", "p-inputgroup");
   if (props.size) {
     container.classList.add(`size-${props.size}`);
   }
 }
 function InputGroupAddonIsland(container, props) {
-  injectIslandStyle("laughtale-inputgroup", CSS39);
+  injectIslandStyle("laughtale-inputgroup", CSS36);
   container.classList.add("laughtale-inputgroup-addon", "p-inputgroup-addon");
   if (props.icon && !container.querySelector("svg")) {
     const svg = getLucideIcon(props.icon);
@@ -30108,13 +27128,13 @@ function InputGroupAddonIsland(container, props) {
     container.insertAdjacentHTML("beforeend", `<span>${props.text}</span>`);
   }
 }
-var CSS39;
+var CSS36;
 var init_input_group = __esm({
   "src/components/input-group.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS39 = `
+    CSS36 = `
 .laughtale-inputgroup,
 .p-inputgroup {
     display: flex;
@@ -30386,7 +27406,7 @@ __export(input_text_exports, {
   default: () => InputTextIsland
 });
 function InputTextIsland(container, props) {
-  injectIslandStyle("laughtale-inputtext", CSS40);
+  injectIslandStyle("laughtale-inputtext", CSS37);
   const [getValue, setValue] = useControllableState({
     defaultValue: props.value ?? "",
     onChange: (val) => {
@@ -30527,14 +27547,14 @@ function InputTextIsland(container, props) {
   }
   init();
 }
-var CSS40, xIcon;
+var CSS37, xIcon;
 var init_input_text = __esm({
   "src/components/input-text.ts"() {
     "use strict";
     init_styles();
     init_lucide();
     init_useControllableState();
-    CSS40 = `
+    CSS37 = `
 .laughtale-inputtext-wrap,
 .p-inputtext-wrap {
     position: relative;
@@ -37538,154 +34558,2016 @@ var init_message = __esm({
   }
 });
 
-// src/index.ts
-var init_index = __esm({
-  "src/index.ts"() {
-    init_registry();
-    init_registry();
-    init_hydrator();
-    init_router();
-    init_slots();
-    init_styles();
-    init_events2();
-    init_state();
-    init_reviver();
-    init_retry();
-    init_streaming();
-    init_vanilla();
-    init_preact();
-    init_directives();
-    init_lucide();
-    init_composables();
-    init_models();
-    init_animations();
-    init_design_tokens();
-    defineIsland("stepper", () => Promise.resolve().then(() => (init_stepper(), stepper_exports)));
-    defineIsland("timeline", () => Promise.resolve().then(() => (init_timeline(), timeline_exports)));
-    defineIsland("camera", () => Promise.resolve().then(() => (init_camera(), camera_exports)));
-    defineIsland("dropzone", () => Promise.resolve().then(() => (init_dropzone(), dropzone_exports)));
-    defineIsland("tree", () => Promise.resolve().then(() => (init_tree(), tree_exports)));
-    defineIsland("treetable", () => Promise.resolve().then(() => (init_treetable(), treetable_exports)));
-    defineIsland("tree-table", () => Promise.resolve().then(() => (init_treetable(), treetable_exports)));
-    defineIsland("p-treetable", () => Promise.resolve().then(() => (init_treetable(), treetable_exports)));
-    defineIsland("island-treetable", () => Promise.resolve().then(() => (init_treetable(), treetable_exports)));
-    defineIsland("tree-select", () => Promise.resolve().then(() => (init_tree_select(), tree_select_exports)));
-    defineIsland("datatable", () => Promise.resolve().then(() => (init_datatable(), datatable_exports)));
-    defineIsland("datagrid", () => Promise.resolve().then(() => (init_datatable(), datatable_exports)));
-    defineIsland("modal", () => Promise.resolve().then(() => (init_modal(), modal_exports)));
-    defineIsland("toast", () => Promise.resolve().then(() => (init_toast(), toast_exports)));
-    defineIsland("input-number", () => Promise.resolve().then(() => (init_input_number(), input_number_exports)));
-    defineIsland("input-otp", () => Promise.resolve().then(() => (init_input_otp(), input_otp_exports)));
-    defineIsland("input-password", () => Promise.resolve().then(() => (init_input_password(), input_password_exports)));
-    defineIsland("toggle-switch", () => Promise.resolve().then(() => (init_toggle_switch(), toggle_switch_exports)));
-    defineIsland("toggle-button", () => Promise.resolve().then(() => (init_toggle_button(), toggle_button_exports)));
-    defineIsland("togglebutton", () => Promise.resolve().then(() => (init_toggle_button(), toggle_button_exports)));
-    defineIsland("button", () => Promise.resolve().then(() => (init_button(), button_exports)));
-    defineIsland("slider", () => Promise.resolve().then(() => (init_slider(), slider_exports)));
-    defineIsland("rating", () => Promise.resolve().then(() => (init_rating(), rating_exports)));
-    defineIsland("select-button", () => Promise.resolve().then(() => (init_select_button(), select_button_exports)));
-    defineIsland("chips", () => Promise.resolve().then(() => (init_input_tags(), input_tags_exports)));
-    defineIsland("input-tags", () => Promise.resolve().then(() => (init_input_tags(), input_tags_exports)));
-    defineIsland("inputtags", () => Promise.resolve().then(() => (init_input_tags(), input_tags_exports)));
-    defineIsland("tags", () => Promise.resolve().then(() => (init_input_tags(), input_tags_exports)));
-    defineIsland("datepicker", () => Promise.resolve().then(() => (init_datepicker(), datepicker_exports)));
-    defineIsland("meter-group", () => Promise.resolve().then(() => (init_meter_group(), meter_group_exports)));
-    defineIsland("avatar-group", () => Promise.resolve().then(() => (init_avatar_group(), avatar_group_exports)));
-    defineIsland("progress-bar", () => Promise.resolve().then(() => (init_progress_bar(), progress_bar_exports)));
-    defineIsland("skeleton", () => Promise.resolve().then(() => (init_skeleton(), skeleton_exports)));
-    defineIsland("drawer", () => Promise.resolve().then(() => (init_drawer(), drawer_exports)));
-    defineIsland("speed-dial", () => Promise.resolve().then(() => (init_speed_dial(), speed_dial_exports)));
-    defineIsland("image-compare", () => Promise.resolve().then(() => (init_image_compare(), image_compare_exports)));
-    defineIsland("imagecompare", () => Promise.resolve().then(() => (init_image_compare(), image_compare_exports)));
-    defineIsland("compare", () => Promise.resolve().then(() => (init_image_compare(), image_compare_exports)));
-    defineIsland("p-compare", () => Promise.resolve().then(() => (init_image_compare(), image_compare_exports)));
-    defineIsland("island-compare", () => Promise.resolve().then(() => (init_image_compare(), image_compare_exports)));
-    defineIsland("confirm-popup", () => Promise.resolve().then(() => (init_confirm_popup(), confirm_popup_exports)));
-    defineIsland("confirm-dialog", () => Promise.resolve().then(() => (init_confirm_dialog(), confirm_dialog_exports)));
-    defineIsland("dialog", () => Promise.resolve().then(() => (init_dialog(), dialog_exports)));
-    defineIsland("confirmdialog", () => Promise.resolve().then(() => (init_confirm_dialog(), confirm_dialog_exports)));
-    defineIsland("fileupload", () => Promise.resolve().then(() => (init_fileupload(), fileupload_exports)));
-    defineIsland("file-upload", () => Promise.resolve().then(() => (init_fileupload(), fileupload_exports)));
-    defineIsland("scrollarea", () => Promise.resolve().then(() => (init_scrollarea(), scrollarea_exports)));
-    defineIsland("panel", () => Promise.resolve().then(() => (init_panel(), panel_exports)));
-    defineIsland("fieldset", () => Promise.resolve().then(() => (init_fieldset(), fieldset_exports)));
-    defineIsland("divider", () => Promise.resolve().then(() => (init_divider(), divider_exports)));
-    defineIsland("card", () => Promise.resolve().then(() => (init_card(), card_exports)));
-    defineIsland("accordion", () => Promise.resolve().then(() => (init_accordion(), accordion_exports)));
-    defineIsland("tabs", () => Promise.resolve().then(() => (init_tabs(), tabs_exports)));
-    defineIsland("toolbar", () => Promise.resolve().then(() => (init_toolbar(), toolbar_exports)));
-    defineIsland("autocomplete", () => Promise.resolve().then(() => (init_autocomplete(), autocomplete_exports)));
-    defineIsland("color-picker", () => Promise.resolve().then(() => (init_color_picker(), color_picker_exports)));
-    defineIsland("knob", () => Promise.resolve().then(() => (init_knob(), knob_exports)));
-    defineIsland("tag", () => Promise.resolve().then(() => (init_tag(), tag_exports)));
-    defineIsland("breadcrumb", () => Promise.resolve().then(() => (init_breadcrumb(), breadcrumb_exports)));
-    defineIsland("scroll-top", () => Promise.resolve().then(() => (init_scroll_top(), scroll_top_exports)));
-    defineIsland("inplace", () => Promise.resolve().then(() => (init_inplace(), inplace_exports)));
-    defineIsland("command", () => Promise.resolve().then(() => (init_command(), command_exports)));
-    defineIsland("commandmenu", () => Promise.resolve().then(() => (init_command(), command_exports)));
-    defineIsland("command-menu", () => Promise.resolve().then(() => (init_command(), command_exports)));
-    defineIsland("command-palette", () => Promise.resolve().then(() => (init_command(), command_exports)));
-    defineIsland("commandpalette", () => Promise.resolve().then(() => (init_command(), command_exports)));
-    defineIsland("theme-studio", () => Promise.resolve().then(() => (init_theme_studio(), theme_studio_exports)));
-    defineIsland("dynamic-form", () => Promise.resolve().then(() => (init_dynamic_form(), dynamic_form_exports)));
-    defineIsland("splitter", () => Promise.resolve().then(() => (init_splitter(), splitter_exports)));
-    defineIsland("multiselect", () => Promise.resolve().then(() => (init_multiselect(), multiselect_exports)));
-    defineIsland("cascadeselect", () => Promise.resolve().then(() => (init_cascadeselect(), cascadeselect_exports)));
-    defineIsland("listbox", () => Promise.resolve().then(() => (init_listbox(), listbox_exports)));
-    defineIsland("picklist", () => Promise.resolve().then(() => (init_picklist(), picklist_exports)));
-    defineIsland("orderlist", () => Promise.resolve().then(() => (init_orderlist(), orderlist_exports)));
-    defineIsland("orgchart", () => Promise.resolve().then(() => (init_orgchart(), orgchart_exports)));
-    defineIsland("terminal", () => Promise.resolve().then(() => (init_terminal(), terminal_exports)));
-    defineIsland("dock", () => Promise.resolve().then(() => (init_dock(), dock_exports)));
-    defineIsland("galleria", () => Promise.resolve().then(() => (init_galleria(), galleria_exports)));
-    defineIsland("blockui", () => Promise.resolve().then(() => (init_blockui(), blockui_exports)));
-    defineIsland("split-button", () => Promise.resolve().then(() => (init_split_button(), split_button_exports)));
-    defineIsland("select", () => Promise.resolve().then(() => (init_select(), select_exports)));
-    defineIsland("checkbox", () => Promise.resolve().then(() => (init_checkbox(), checkbox_exports)));
-    defineIsland("radio-button", () => Promise.resolve().then(() => (init_radio_button(), radio_button_exports)));
-    defineIsland("radio", () => Promise.resolve().then(() => (init_radio_button(), radio_button_exports)));
-    defineIsland("textarea", () => Promise.resolve().then(() => (init_textarea(), textarea_exports)));
-    defineIsland("input-mask", () => Promise.resolve().then(() => (init_input_mask(), input_mask_exports)));
-    defineIsland("float-label", () => Promise.resolve().then(() => (init_float_label(), float_label_exports)));
-    defineIsland("ifta-label", () => Promise.resolve().then(() => (init_ifta_label(), ifta_label_exports)));
-    defineIsland("input-group", () => Promise.resolve().then(() => (init_input_group(), input_group_exports)));
-    defineIsland("input-group-addon", () => Promise.resolve().then(() => (init_input_group(), input_group_exports)).then((m) => ({ default: m.InputGroupAddonIsland })));
-    defineIsland("inputgroup", () => Promise.resolve().then(() => (init_input_group(), input_group_exports)));
-    defineIsland("inputgroup-addon", () => Promise.resolve().then(() => (init_input_group(), input_group_exports)).then((m) => ({ default: m.InputGroupAddonIsland })));
-    defineIsland("input-text", () => Promise.resolve().then(() => (init_input_text(), input_text_exports)));
-    defineIsland("enhanced-input", () => Promise.resolve().then(() => (init_input_text(), input_text_exports)));
-    defineIsland("carousel", () => Promise.resolve().then(() => (init_carousel(), carousel_exports)));
-    defineIsland("paginator", () => Promise.resolve().then(() => (init_paginator(), paginator_exports)));
-    defineIsland("dataview", () => Promise.resolve().then(() => (init_dataview(), dataview_exports)));
-    defineIsland("menubar", () => Promise.resolve().then(() => (init_menubar(), menubar_exports)));
-    defineIsland("p-menubar", () => Promise.resolve().then(() => (init_menubar(), menubar_exports)));
-    defineIsland("island-menubar", () => Promise.resolve().then(() => (init_menubar(), menubar_exports)));
-    defineIsland("menu", () => Promise.resolve().then(() => (init_menu(), menu_exports)));
-    defineIsland("p-menu", () => Promise.resolve().then(() => (init_menu(), menu_exports)));
-    defineIsland("context-menu", () => Promise.resolve().then(() => (init_context_menu(), context_menu_exports)));
-    defineIsland("contextmenu", () => Promise.resolve().then(() => (init_context_menu(), context_menu_exports)));
-    defineIsland("p-contextmenu", () => Promise.resolve().then(() => (init_context_menu(), context_menu_exports)));
-    defineIsland("island-contextmenu", () => Promise.resolve().then(() => (init_context_menu(), context_menu_exports)));
-    defineIsland("popover", () => Promise.resolve().then(() => (init_popover(), popover_exports)));
-    defineIsland("tooltip", () => Promise.resolve().then(() => (init_tooltip_component(), tooltip_component_exports)));
-    defineIsland("tooltip-component", () => Promise.resolve().then(() => (init_tooltip_component(), tooltip_component_exports)));
-    defineIsland("sidebar", () => Promise.resolve().then(() => (init_sidebar(), sidebar_exports)));
-    defineIsland("p-sidebar", () => Promise.resolve().then(() => (init_sidebar(), sidebar_exports)));
-    defineIsland("sidebar-layout", () => Promise.resolve().then(() => (init_sidebar(), sidebar_exports)));
-    defineIsland("tieredmenu", () => Promise.resolve().then(() => (init_tieredmenu(), tieredmenu_exports)));
-    defineIsland("tiered-menu", () => Promise.resolve().then(() => (init_tieredmenu(), tieredmenu_exports)));
-    defineIsland("p-tieredmenu", () => Promise.resolve().then(() => (init_tieredmenu(), tieredmenu_exports)));
-    defineIsland("island-tieredmenu", () => Promise.resolve().then(() => (init_tieredmenu(), tieredmenu_exports)));
-    defineIsland("message", () => Promise.resolve().then(() => (init_message(), message_exports)));
-    defineIsland("p-message", () => Promise.resolve().then(() => (init_message(), message_exports)));
-    defineIsland("inline-message", () => Promise.resolve().then(() => (init_message(), message_exports)));
-    defineIsland("inlinemessage", () => Promise.resolve().then(() => (init_message(), message_exports)));
-    defineIsland("toast", () => Promise.resolve().then(() => (init_toast(), toast_exports)));
-    defineIsland("p-toast", () => Promise.resolve().then(() => (init_toast(), toast_exports)));
-    defineIsland("island-toast", () => Promise.resolve().then(() => (init_toast(), toast_exports)));
+// src/runtime/registry.ts
+var registry = /* @__PURE__ */ new Map();
+function defineIsland(name, loader) {
+  registry.set(name, loader);
+}
+function hasIsland(name) {
+  return registry.has(name);
+}
+function getIslandDefinition(name) {
+  const loader = registry.get(name);
+  return loader ? { name, loader } : void 0;
+}
+
+// src/runtime/reviver.ts
+var ISO_DATE_REGEX = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})?)?$/;
+var propTypes = {
+  0: (val) => reviveObject(val),
+  1: (val) => reviveArray(val),
+  2: (val) => new RegExp(val),
+  3: (val) => new Date(val),
+  4: (val) => new Map(reviveArray(val)),
+  5: (val) => new Set(reviveArray(val)),
+  6: (val) => BigInt(val),
+  7: (val) => new URL(val, window.location.origin),
+  8: (val) => {
+    if (typeof val === "string") {
+      const binaryString = atob(val);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      return bytes;
+    }
+    return new Uint8Array(val);
   }
-});
-init_index();
+};
+function reviveTuple(raw) {
+  if (Array.isArray(raw) && raw.length === 2 && typeof raw[0] === "number" && raw[0] in propTypes) {
+    return propTypes[raw[0]](raw[1]);
+  }
+  if (typeof raw === "string" && ISO_DATE_REGEX.test(raw)) {
+    const d = new Date(raw);
+    if (!isNaN(d.getTime())) return d;
+  }
+  if (Array.isArray(raw)) {
+    return reviveArray(raw);
+  }
+  if (typeof raw === "object" && raw !== null) {
+    return reviveObject(raw);
+  }
+  return raw;
+}
+function reviveArray(raw) {
+  return raw.map(reviveTuple);
+}
+function reviveObject(raw) {
+  if (!raw || typeof raw !== "object") return raw;
+  const result = {};
+  for (const [key, value] of Object.entries(raw)) {
+    result[key] = reviveTuple(value);
+  }
+  return result;
+}
+function parseAndReviveProps(rawJson) {
+  if (!rawJson || rawJson.trim() === "" || rawJson === "{}") {
+    return {};
+  }
+  try {
+    const parsed = JSON.parse(rawJson);
+    return reviveTuple(parsed);
+  } catch (err) {
+    console.error("[SoftMax.LaughTale] Failed to parse and revive island props:", err, rawJson);
+    return {};
+  }
+}
+
+// src/runtime/retry.ts
+async function importWithRetry(importFnOrUrl, retries = 3, baseDelayMs = 1e3) {
+  if (typeof importFnOrUrl === "function") {
+    for (let attempt = 0; attempt < retries; attempt++) {
+      try {
+        return await importFnOrUrl();
+      } catch (err) {
+        if (attempt === retries - 1) throw err;
+        const delay = baseDelayMs * Math.pow(2, attempt);
+        console.warn(`[SoftMax.LaughTale] Island dynamic import failed. Retrying in ${delay}ms (Attempt ${attempt + 1}/${retries})...`, err);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
+    }
+  }
+  let url = importFnOrUrl;
+  for (let attempt = 0; attempt < retries; attempt++) {
+    try {
+      return await import(
+        /* @vite-ignore */
+        url
+      );
+    } catch (err) {
+      if (attempt === retries - 1) throw err;
+      const delay = baseDelayMs * Math.pow(2, attempt);
+      console.warn(`[SoftMax.LaughTale] Failed to fetch island script at ${url}. Retrying with cache-buster in ${delay}ms...`, err);
+      await new Promise((resolve) => setTimeout(resolve, delay));
+      const parsed = new URL(url, document.baseURI);
+      parsed.searchParams.set("island-retry", Date.now().toString());
+      url = parsed.toString();
+    }
+  }
+  throw new Error(`[SoftMax.LaughTale] Permanent failure loading island module after ${retries} attempts.`);
+}
+
+// src/runtime/streaming.ts
+function awaitStreamingReady(container) {
+  const islandId = container.getAttribute("data-island-id") || container.getAttribute("data-island");
+  const markerValue = `island:end:${islandId}`;
+  if (document.readyState === "complete" || !container.hasAttribute("data-streaming")) {
+    return Promise.resolve();
+  }
+  for (let node = container.lastChild; node; node = node.previousSibling) {
+    if (node.nodeType === Node.COMMENT_NODE && (node.nodeValue?.trim() === markerValue || node.nodeValue?.trim() === "island:end")) {
+      node.remove();
+      return Promise.resolve();
+    }
+  }
+  return new Promise((resolve) => {
+    let isResolved = false;
+    const onDone = () => {
+      if (!isResolved) {
+        isResolved = true;
+        observer.disconnect();
+        document.removeEventListener("DOMContentLoaded", onDone);
+        resolve();
+      }
+    };
+    const observer = new MutationObserver(() => {
+      for (let node = container.lastChild; node; node = node.previousSibling) {
+        if (node.nodeType === Node.COMMENT_NODE && (node.nodeValue?.trim() === markerValue || node.nodeValue?.trim() === "island:end")) {
+          node.remove();
+          onDone();
+          break;
+        }
+      }
+    });
+    observer.observe(container, { childList: true });
+    document.addEventListener("DOMContentLoaded", onDone);
+  });
+}
+
+// src/runtime/hydrator.ts
+var HYDRATED_FLAG = "__laughtale_hydrated";
+function hydrateIsland(container) {
+  if (container[HYDRATED_FLAG]) return;
+  const name = container.getAttribute("data-island") || container.getAttribute("name");
+  if (!name) return;
+  const strategy = (container.getAttribute("data-hydrate") || container.getAttribute("hydrate") || "load").toLowerCase();
+  const mediaQuery = container.getAttribute("data-media") || container.getAttribute("media");
+  switch (strategy) {
+    case "load":
+      executeHydration(container, name);
+      break;
+    case "idle":
+      hydrateIdle(container, name);
+      break;
+    case "visible":
+      hydrateVisible(container, name);
+      break;
+    case "interaction":
+      hydrateInteraction(container, name);
+      break;
+    case "media":
+      hydrateMedia(container, name, mediaQuery);
+      break;
+    case "never":
+      break;
+    default:
+      executeHydration(container, name);
+  }
+}
+async function executeHydration(container, name) {
+  if (container[HYDRATED_FLAG]) return;
+  container[HYDRATED_FLAG] = true;
+  const definition = getIslandDefinition(name);
+  if (!definition) {
+    console.warn(`[SoftMax.LaughTale] Island '${name}' is not registered in the client registry.`);
+    return;
+  }
+  try {
+    await awaitStreamingReady(container);
+    const rawProps = container.getAttribute("data-props") || container.getAttribute("props-json") || container.getAttribute("props");
+    const props = parseAndReviveProps(rawProps);
+    const module = await importWithRetry(definition.loader);
+    const mount = module.default || module;
+    if (typeof mount !== "function") {
+      console.error(`[SoftMax.LaughTale] Island '${name}' module does not export a mount function.`);
+      return;
+    }
+    const unmount = mount(container, props);
+    if (typeof unmount === "function") {
+      container.addEventListener("laughtale:unmount", unmount, { once: true });
+    }
+    container.dispatchEvent(new CustomEvent("laughtale:hydrated", {
+      bubbles: true,
+      composed: true,
+      detail: { name, strategy: container.getAttribute("data-hydrate") }
+    }));
+  } catch (error) {
+    container[HYDRATED_FLAG] = false;
+    console.error(`[SoftMax.LaughTale] Error hydrating island '${name}':`, error);
+    container.dispatchEvent(new CustomEvent("laughtale:hydration-error", {
+      bubbles: true,
+      composed: true,
+      detail: { name, error }
+    }));
+  }
+}
+function hydrateIdle(container, name) {
+  if ("requestIdleCallback" in window) {
+    window.requestIdleCallback(() => executeHydration(container, name), { timeout: 2e3 });
+  } else {
+    setTimeout(() => executeHydration(container, name), 200);
+  }
+}
+function hydrateVisible(container, name) {
+  const observer = new IntersectionObserver((entries) => {
+    for (const entry of entries) {
+      if (entry.isIntersecting) {
+        observer.disconnect();
+        executeHydration(container, name);
+        break;
+      }
+    }
+  }, { rootMargin: "120px" });
+  observer.observe(container);
+  for (let i = 0; i < container.children.length; i++) {
+    observer.observe(container.children[i]);
+  }
+}
+function hydrateInteraction(container, name) {
+  const events = ["mouseenter", "focusin", "touchstart", "click"];
+  const onInteract = () => {
+    events.forEach((e) => container.removeEventListener(e, onInteract));
+    executeHydration(container, name);
+  };
+  events.forEach((e) => container.addEventListener(e, onInteract, { once: true, passive: true }));
+}
+function hydrateMedia(container, name, query) {
+  if (!query) {
+    executeHydration(container, name);
+    return;
+  }
+  const mql = window.matchMedia(query);
+  if (mql.matches) {
+    executeHydration(container, name);
+  } else {
+    const handler = (e) => {
+      if (e.matches) {
+        mql.removeEventListener("change", handler);
+        executeHydration(container, name);
+      }
+    };
+    mql.addEventListener("change", handler);
+  }
+}
+function initIslands(root = document) {
+  const islands = root.querySelectorAll("[data-island], island, [hydrate], [data-hydrate]");
+  islands.forEach(hydrateIsland);
+}
+
+// src/directives/index.ts
+init_reactivity();
+
+// src/directives/events.ts
+init_reactivity();
+function bindElementEvents(element) {
+  const scope = getNearestScope(element);
+  for (const attr of Array.from(element.attributes)) {
+    if (attr.name.startsWith("l-on:")) {
+      const rawEvent = attr.name.slice(5);
+      const [eventName, ...modifiers] = rawEvent.split(".");
+      const stmt = attr.value;
+      let debounceMs = 0;
+      let throttleMs = 0;
+      for (let i = 0; i < modifiers.length; i++) {
+        if (modifiers[i] === "debounce") {
+          const next = modifiers[i + 1];
+          debounceMs = next ? parseDurationMs(next) : 250;
+        } else if (modifiers[i] === "throttle") {
+          const next = modifiers[i + 1];
+          throttleMs = next ? parseDurationMs(next) : 250;
+        }
+      }
+      let timer = null;
+      let lastExecution = 0;
+      const executeHandler = (e) => {
+        if (modifiers.includes("prevent")) e.preventDefault();
+        if (modifiers.includes("stop")) e.stopPropagation();
+        if (modifiers.includes("enter") && e.key !== "Enter") return;
+        if (modifiers.includes("escape") && e.key !== "Escape") return;
+        const emitFn = (channel, payload) => {
+          window.dispatchEvent(new CustomEvent(`laughtale:${channel}`, { detail: payload, bubbles: true }));
+        };
+        const context = {
+          $event: e,
+          $el: element,
+          $emit: emitFn
+        };
+        const activeState = scope ? scope.state : {};
+        executeStatement(stmt, activeState, context);
+      };
+      const handler = (e) => {
+        if (debounceMs > 0) {
+          clearTimeout(timer);
+          timer = setTimeout(() => executeHandler(e), debounceMs);
+        } else if (throttleMs > 0) {
+          const now = Date.now();
+          if (now - lastExecution >= throttleMs) {
+            lastExecution = now;
+            executeHandler(e);
+          }
+        } else {
+          executeHandler(e);
+        }
+      };
+      const isWindow = modifiers.includes("window");
+      const isDocument = modifiers.includes("document");
+      const isOnce = modifiers.includes("once");
+      const target = isWindow ? window : isDocument ? document : element;
+      target.addEventListener(eventName, handler, { once: isOnce });
+    }
+    if (attr.name.startsWith("l-listen:")) {
+      const channel = attr.name.slice(9);
+      const stmt = attr.value;
+      window.addEventListener(`laughtale:${channel}`, (e) => {
+        const context = {
+          $event: e.detail,
+          $el: element,
+          $emit: (c, p) => {
+            window.dispatchEvent(new CustomEvent(`laughtale:${c}`, { detail: p, bubbles: true }));
+          }
+        };
+        const activeState = scope ? scope.state : {};
+        executeStatement(stmt, activeState, context);
+      });
+    }
+    if (attr.name === "l-emit") {
+      const channel = attr.value;
+      element.addEventListener("click", () => {
+        window.dispatchEvent(new CustomEvent(`laughtale:${channel}`, { bubbles: true }));
+      });
+    }
+  }
+}
+function parseDurationMs(spec) {
+  if (spec.endsWith("ms")) return parseFloat(spec) || 250;
+  if (spec.endsWith("s")) return (parseFloat(spec) || 0.25) * 1e3;
+  return parseFloat(spec) || 250;
+}
+
+// src/directives/htmx.ts
+function bindServerAction(element) {
+  let method = "GET";
+  let url = "";
+  if (element.hasAttribute("l-get")) {
+    method = "GET";
+    url = element.getAttribute("l-get");
+  } else if (element.hasAttribute("l-post")) {
+    method = "POST";
+    url = element.getAttribute("l-post");
+  } else if (element.hasAttribute("l-put")) {
+    method = "PUT";
+    url = element.getAttribute("l-put");
+  } else if (element.hasAttribute("l-delete")) {
+    method = "DELETE";
+    url = element.getAttribute("l-delete");
+  } else return;
+  const targetSelector = element.getAttribute("l-target");
+  const swapMode = element.getAttribute("l-swap") || "innerHTML";
+  const indicatorSelector = element.getAttribute("l-indicator");
+  const confirmMessage = element.getAttribute("l-confirm");
+  const rawTrigger = element.getAttribute("l-trigger") || (element.tagName === "FORM" ? "submit" : element.tagName === "INPUT" ? "input" : "click");
+  let delayMs = 0;
+  const parts = rawTrigger.split(" ");
+  const eventName = parts[0];
+  for (const part of parts) {
+    if (part.startsWith("delay:")) {
+      delayMs = parseInt(part.slice(6), 10) || 0;
+    }
+  }
+  let timeoutId = null;
+  const executeRequest = async (e) => {
+    if (e) e.preventDefault();
+    if (confirmMessage && !window.confirm(confirmMessage)) {
+      return;
+    }
+    const indicator = indicatorSelector ? document.querySelector(indicatorSelector) : null;
+    if (indicator) indicator.style.display = "block";
+    try {
+      let requestUrl = url;
+      let body = null;
+      const headers = {
+        "X-LaughTale-Request": "true"
+      };
+      if (element.tagName === "INPUT" || element.tagName === "SELECT" || element.tagName === "TEXTAREA") {
+        const input = element;
+        const paramName = input.name || "query";
+        const separator = requestUrl.includes("?") ? "&" : "?";
+        requestUrl = `${requestUrl}${separator}${encodeURIComponent(paramName)}=${encodeURIComponent(input.value)}`;
+      } else if (element.tagName === "FORM") {
+        const formData = new FormData(element);
+        if (method === "GET") {
+          const searchParams = new URLSearchParams(formData).toString();
+          requestUrl = `${requestUrl}${requestUrl.includes("?") ? "&" : "?"}${searchParams}`;
+        } else {
+          body = formData;
+        }
+      }
+      const response = await fetch(requestUrl, { method, body, headers });
+      const html = await response.text();
+      const target = targetSelector ? document.querySelector(targetSelector) : element;
+      if (target) {
+        switch (swapMode) {
+          case "outerHTML":
+            target.outerHTML = html;
+            break;
+          case "beforeend":
+            target.insertAdjacentHTML("beforeend", html);
+            break;
+          case "afterbegin":
+            target.insertAdjacentHTML("afterbegin", html);
+            break;
+          case "beforebegin":
+            target.insertAdjacentHTML("beforebegin", html);
+            break;
+          case "afterend":
+            target.insertAdjacentHTML("afterend", html);
+            break;
+          case "none":
+            break;
+          case "innerHTML":
+          default:
+            target.innerHTML = html;
+            break;
+        }
+        initDirectives(target);
+        initIslands(target);
+      }
+    } catch (err) {
+      console.error("[SoftMax.LaughTale] Server fragment request failed:", err);
+    } finally {
+      if (indicator) indicator.style.display = "none";
+    }
+  };
+  element.addEventListener(eventName, (e) => {
+    if (delayMs > 0) {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => executeRequest(e), delayMs);
+    } else {
+      executeRequest(e);
+    }
+  });
+}
+
+// src/directives/masking.ts
+function bindInputMask(input) {
+  const pattern = input.getAttribute("l-mask");
+  if (!pattern) return;
+  input.addEventListener("input", () => {
+    const raw = input.value.replace(/[^a-zA-Z0-9]/g, "");
+    let formatted = "";
+    let rawIdx = 0;
+    for (let i = 0; i < pattern.length && rawIdx < raw.length; i++) {
+      const maskChar = pattern[i];
+      if (maskChar === "9") {
+        while (rawIdx < raw.length && !/\d/.test(raw[rawIdx])) rawIdx++;
+        if (rawIdx < raw.length) formatted += raw[rawIdx++];
+      } else if (maskChar === "a") {
+        while (rawIdx < raw.length && !/[a-zA-Z]/.test(raw[rawIdx])) rawIdx++;
+        if (rawIdx < raw.length) formatted += raw[rawIdx++];
+      } else if (maskChar === "*") {
+        formatted += raw[rawIdx++];
+      } else {
+        formatted += maskChar;
+        if (raw[rawIdx] === maskChar) rawIdx++;
+      }
+    }
+    input.value = formatted;
+  });
+}
+
+// src/directives/utils.ts
+init_reactivity();
+function bindUtilityDirectives(element) {
+  const scope = getNearestScope(element);
+  if (element.hasAttribute("l-show")) {
+    const expr = element.getAttribute("l-show");
+    const originalDisplay = element.style.display || "";
+    const update = () => {
+      const state = scope ? scope.state : {};
+      const isVisible = Boolean(evaluateExpression(expr, state));
+      element.style.display = isVisible ? originalDisplay : "none";
+    };
+    if (scope) scope.listeners.add(update);
+    update();
+  }
+  if (element.hasAttribute("l-hide")) {
+    const expr = element.getAttribute("l-hide");
+    const originalDisplay = element.style.display || "";
+    const update = () => {
+      const state = scope ? scope.state : {};
+      const isHidden = Boolean(evaluateExpression(expr, state));
+      element.style.display = isHidden ? "none" : originalDisplay;
+    };
+    if (scope) scope.listeners.add(update);
+    update();
+  }
+  if (element.hasAttribute("l-copy")) {
+    const selector = element.getAttribute("l-copy");
+    const feedback = element.getAttribute("l-feedback") || "Copied!";
+    const originalHtml = element.innerHTML;
+    element.addEventListener("click", async () => {
+      const target = document.querySelector(selector);
+      const textToCopy = target ? target.value || target.textContent || "" : selector;
+      try {
+        await navigator.clipboard.writeText(textToCopy.trim());
+        element.innerHTML = feedback;
+        setTimeout(() => {
+          element.innerHTML = originalHtml;
+        }, 2e3);
+      } catch (err) {
+        console.error("[SoftMax.LaughTale] Failed to copy to clipboard:", err);
+      }
+    });
+  }
+  if (element.hasAttribute("l-toggle")) {
+    const selector = element.getAttribute("l-toggle");
+    const className = element.getAttribute("l-toggle-class") || "open";
+    element.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const target = document.querySelector(selector);
+      if (target) {
+        target.classList.toggle(className);
+      }
+    });
+  }
+}
+
+// src/directives/hotkey.ts
+init_reactivity();
+function bindHotkeyDirectives(element) {
+  const scope = getNearestScope(element);
+  for (const attr of Array.from(element.attributes)) {
+    if (attr.name === "l-hotkey" || attr.name === "l-shortcut" || attr.name.startsWith("l-hotkey.") || attr.name.startsWith("l-shortcut.")) {
+      const isGlobal = attr.name.includes(".global") || !attr.name.includes(".local");
+      const prevent = !attr.name.includes(".noprevent");
+      const shortcutSpec = attr.value.trim().toLowerCase();
+      const stmt = element.getAttribute("l-on:hotkey") || element.getAttribute("l-action");
+      const handler = (e) => {
+        if (matchesShortcut(e, shortcutSpec)) {
+          if (prevent) e.preventDefault();
+          if (stmt) {
+            const activeState = scope ? scope.state : {};
+            const context = {
+              $event: e,
+              $el: element,
+              $emit: (channel, payload) => {
+                window.dispatchEvent(new CustomEvent(`laughtale:${channel}`, { detail: payload, bubbles: true }));
+              }
+            };
+            executeStatement(stmt, activeState, context);
+          } else {
+            if (element.tagName === "INPUT" || element.tagName === "TEXTAREA") {
+              element.focus();
+            } else {
+              element.click();
+            }
+          }
+        }
+      };
+      const target = isGlobal ? window : element;
+      target.addEventListener("keydown", handler);
+    }
+  }
+}
+function matchesShortcut(e, spec) {
+  const parts = spec.split("+").map((s) => s.trim());
+  const needsCtrl = parts.includes("ctrl") || parts.includes("control") || parts.includes("cmd") || parts.includes("meta");
+  const needsAlt = parts.includes("alt") || parts.includes("option");
+  const needsShift = parts.includes("shift");
+  const keyPart = parts.find((p) => !["ctrl", "control", "cmd", "meta", "alt", "option", "shift"].includes(p));
+  const ctrlPressed = e.ctrlKey || e.metaKey;
+  if (needsCtrl !== ctrlPressed) return false;
+  if (needsAlt !== e.altKey) return false;
+  if (needsShift !== e.shiftKey) return false;
+  if (!keyPart) return true;
+  const actualKey = e.key.toLowerCase();
+  if (keyPart === "escape" || keyPart === "esc") return actualKey === "escape";
+  if (keyPart === "enter" || keyPart === "return") return actualKey === "enter";
+  if (keyPart === "space") return actualKey === " " || actualKey === "spacebar";
+  return actualKey === keyPart;
+}
+
+// src/directives/index.ts
+init_tooltip();
+
+// src/directives/outside.ts
+init_reactivity();
+function bindOutsideClickDirectives(element) {
+  const scope = getNearestScope(element);
+  for (const attr of Array.from(element.attributes)) {
+    if (attr.name === "l-outside" || attr.name === "l-click-outside") {
+      const stmt = attr.value;
+      document.addEventListener("click", (e) => {
+        const target = e.target;
+        if (!element.contains(target)) {
+          const activeState = scope ? scope.state : {};
+          const context = {
+            $event: e,
+            $el: element,
+            $emit: (channel, payload) => {
+              window.dispatchEvent(new CustomEvent(`laughtale:${channel}`, { detail: payload, bubbles: true }));
+            }
+          };
+          executeStatement(stmt, activeState, context);
+        }
+      });
+    }
+  }
+}
+
+// src/directives/storage.ts
+function bindStoragePersistence(element, scope) {
+  for (const attr of Array.from(element.attributes)) {
+    if (attr.name === "l-persist" || attr.name.startsWith("l-persist.") || attr.name === "l-sync-storage") {
+      const key = attr.value || "laughtale_persisted_state";
+      const useSession = attr.name.includes(".session");
+      const storage = useSession ? sessionStorage : localStorage;
+      try {
+        const saved = storage.getItem(key);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (typeof parsed === "object" && parsed !== null) {
+            Object.assign(scope.state, parsed);
+          }
+        }
+      } catch (err) {
+        console.warn(`[SoftMax.LaughTale] Failed to read persisted state for key "${key}":`, err);
+      }
+      let timer = null;
+      const save = () => {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+          try {
+            storage.setItem(key, JSON.stringify(scope.state));
+          } catch (err) {
+            console.warn(`[SoftMax.LaughTale] Failed to save persisted state for key "${key}":`, err);
+          }
+        }, 150);
+      };
+      scope.listeners.add(save);
+    }
+  }
+}
+
+// src/directives/poll.ts
+init_reactivity();
+function bindPollingDirectives(element) {
+  const scope = getNearestScope(element);
+  for (const attr of Array.from(element.attributes)) {
+    if (attr.name.startsWith("l-poll")) {
+      let intervalMs = 3e3;
+      const parts = attr.name.split(".");
+      for (const part of parts) {
+        if (part.endsWith("s") && !part.endsWith("ms")) {
+          const sec = parseFloat(part);
+          if (!isNaN(sec)) intervalMs = sec * 1e3;
+        } else if (part.endsWith("ms")) {
+          const ms = parseFloat(part);
+          if (!isNaN(ms)) intervalMs = ms;
+        }
+      }
+      const stmt = attr.value;
+      const runPoll = () => {
+        if (!document.body.contains(element)) {
+          clearInterval(intervalId);
+          return;
+        }
+        if (stmt) {
+          const activeState = scope ? scope.state : {};
+          const context = {
+            $el: element,
+            $emit: (channel, payload) => {
+              window.dispatchEvent(new CustomEvent(`laughtale:${channel}`, { detail: payload, bubbles: true }));
+            }
+          };
+          executeStatement(stmt, activeState, context);
+        } else {
+          element.dispatchEvent(new CustomEvent("laughtale:poll-trigger", { bubbles: true }));
+        }
+      };
+      const intervalId = setInterval(runPoll, intervalMs);
+    }
+  }
+}
+
+// src/directives/intersect.ts
+init_reactivity();
+function bindIntersectionDirectives(element) {
+  const scope = getNearestScope(element);
+  for (const attr of Array.from(element.attributes)) {
+    if (attr.name === "l-intersect" || attr.name.startsWith("l-intersect.") || attr.name === "l-viewport") {
+      const isOnce = attr.name.includes(".once");
+      const isHalf = attr.name.includes(".half");
+      const stmt = attr.value;
+      const threshold = isHalf ? 0.5 : 0.1;
+      const observer = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            if (stmt) {
+              const activeState = scope ? scope.state : {};
+              const context = {
+                $event: entry,
+                $el: element,
+                $emit: (channel, payload) => {
+                  window.dispatchEvent(new CustomEvent(`laughtale:${channel}`, { detail: payload, bubbles: true }));
+                }
+              };
+              executeStatement(stmt, activeState, context);
+            }
+            element.dispatchEvent(new CustomEvent("laughtale:intersect", { bubbles: true, detail: entry }));
+            if (isOnce) {
+              observer.disconnect();
+            }
+          }
+        }
+      }, { threshold });
+      observer.observe(element);
+    }
+  }
+}
+
+// src/directives/scroll.ts
+function bindScrollToDirectives(element) {
+  for (const attr of Array.from(element.attributes)) {
+    if (attr.name === "l-scroll-to" || attr.name.startsWith("l-scroll-to.")) {
+      const target = attr.value.trim();
+      element.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (target === "top") {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        } else if (target === "bottom") {
+          window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+        } else if (target) {
+          const targetEl = document.querySelector(target);
+          if (targetEl) {
+            targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        }
+      });
+    }
+  }
+}
+
+// src/directives/badge.ts
+function bindBadgeDirectives(element) {
+  for (const attr of Array.from(element.attributes)) {
+    if (attr.name === "l-badge" || attr.name.startsWith("l-badge.")) {
+      const isDot = attr.name.includes(".dot");
+      const value = attr.value;
+      let severity = "danger";
+      if (attr.name.includes(".success")) severity = "success";
+      else if (attr.name.includes(".warning")) severity = "warning";
+      else if (attr.name.includes(".info")) severity = "info";
+      else if (attr.name.includes(".slate") || attr.name.includes(".secondary")) severity = "slate";
+      const compStyle = window.getComputedStyle(element);
+      if (compStyle.position === "static") {
+        element.style.position = "relative";
+      }
+      const badge = document.createElement("span");
+      badge.className = `aura-directive-badge badge-${severity}`;
+      let bg = "var(--p-red-500, #ef4444)";
+      let color = "#ffffff";
+      if (severity === "success") bg = "var(--p-emerald-500, #10b981)";
+      else if (severity === "warning") bg = "var(--p-amber-500, #f59e0b)";
+      else if (severity === "info") bg = "var(--p-blue-500, #3b82f6)";
+      else if (severity === "slate") {
+        bg = "var(--p-surface-600, #475569)";
+        color = "#ffffff";
+      }
+      if (isDot) {
+        badge.style.cssText = `
+                    position: absolute;
+                    top: -2px;
+                    right: -2px;
+                    width: 8px;
+                    height: 8px;
+                    background: ${bg};
+                    border-radius: 50%;
+                    border: 2px solid var(--p-surface-0, #ffffff);
+                    pointer-events: none;
+                `;
+      } else {
+        badge.textContent = value || "";
+        badge.style.cssText = `
+                    position: absolute;
+                    top: -6px;
+                    right: -6px;
+                    min-width: 18px;
+                    height: 18px;
+                    line-height: 18px;
+                    padding: 0 5px;
+                    font-size: 0.6875rem;
+                    font-weight: 700;
+                    text-align: center;
+                    background: ${bg};
+                    color: ${color};
+                    border-radius: 9999px;
+                    border: 2px solid var(--p-surface-0, #ffffff);
+                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+                    pointer-events: none;
+                `;
+      }
+      element.appendChild(badge);
+    }
+  }
+}
+
+// src/directives/teleport.ts
+function bindTeleportDirectives(element) {
+  for (const attr of Array.from(element.attributes)) {
+    if (attr.name === "l-teleport") {
+      const targetSelector = attr.value || "body";
+      const targetContainer = document.querySelector(targetSelector);
+      if (targetContainer && targetContainer !== element.parentElement) {
+        targetContainer.appendChild(element);
+      }
+    }
+  }
+}
+
+// src/directives/index.ts
+init_security();
+init_reactivity();
+function initDirectives(root = document) {
+  const stateElements = root.querySelectorAll("[l-state]");
+  stateElements.forEach((el) => {
+    const rawJson = el.getAttribute("l-state");
+    try {
+      const initialData = rawJson ? JSON.parse(rawJson) : {};
+      const scope = createReactiveScope(el, initialData);
+      bindStoragePersistence(el, scope);
+    } catch (err) {
+      console.error("[SoftMax.LaughTale] Invalid JSON in l-state:", rawJson, err);
+    }
+  });
+  const allElements = root.querySelectorAll("*");
+  allElements.forEach((el) => {
+    for (const attr of Array.from(el.attributes)) {
+      if (attr.name === "l-bind" || attr.name.startsWith("l-bind:") || attr.name === "l-model" || attr.name === "l-class" || attr.name === "l-style") {
+        Promise.resolve().then(() => (init_reactivity(), reactivity_exports)).then(({ getNearestScope: getNearestScope2 }) => {
+          const nearest = getNearestScope2(el);
+          if (nearest) bindElementReactivity(el, nearest);
+        });
+        break;
+      }
+    }
+    bindElementEvents(el);
+    if (el.hasAttribute("l-get") || el.hasAttribute("l-post") || el.hasAttribute("l-put") || el.hasAttribute("l-delete")) {
+      bindServerAction(el);
+    }
+    if (el.hasAttribute("l-mask") && el.tagName === "INPUT") {
+      bindInputMask(el);
+    }
+    bindUtilityDirectives(el);
+    bindHotkeyDirectives(el);
+    bindTooltipDirectives(el);
+    bindOutsideClickDirectives(el);
+    bindPollingDirectives(el);
+    bindIntersectionDirectives(el);
+    bindScrollToDirectives(el);
+    bindBadgeDirectives(el);
+    bindTeleportDirectives(el);
+  });
+}
+if (typeof document !== "undefined") {
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => initDirectives());
+  } else {
+    initDirectives();
+  }
+}
+
+// src/runtime/router.ts
+var isRouterActive = false;
+function enableViewTransitions() {
+  if (isRouterActive || typeof window === "undefined") return;
+  isRouterActive = true;
+  document.addEventListener("click", handleLinkClick);
+  window.addEventListener("popstate", handlePopState);
+}
+async function handleLinkClick(e) {
+  if (e.button !== 0 || e.ctrlKey || e.metaKey || e.altKey || e.shiftKey || e.defaultPrevented) {
+    return;
+  }
+  const anchor = e.target.closest("a");
+  if (!anchor || !anchor.href) return;
+  const url = new URL(anchor.href, window.location.href);
+  if (url.origin !== window.location.origin) return;
+  if (anchor.target && anchor.target !== "_self") return;
+  if (anchor.hasAttribute("download") || anchor.getAttribute("data-no-transition") !== null) return;
+  const currentPath = window.location.pathname.toLowerCase().replace(/\/$/, "");
+  const targetPath = url.pathname.toLowerCase().replace(/\/$/, "");
+  if ((currentPath === targetPath || !targetPath) && url.hash) {
+    return;
+  }
+  e.preventDefault();
+  await navigateTo(url.href, true);
+}
+async function handlePopState() {
+  await navigateTo(window.location.href, false);
+}
+async function navigateTo(urlStr, pushState = true) {
+  try {
+    const response = await fetch(urlStr, {
+      headers: {
+        "X-Requested-With": "SoftMaxIslands-ViewTransition"
+      }
+    });
+    if (!response.ok) {
+      window.location.href = urlStr;
+      return;
+    }
+    const htmlText = await response.text();
+    const parser = new DOMParser();
+    const newDoc = parser.parseFromString(htmlText, "text/html");
+    const persistentElements = /* @__PURE__ */ new Map();
+    document.querySelectorAll("[data-persist]").forEach((el) => {
+      const id = el.dataset.persist;
+      if (id) persistentElements.set(id, el);
+    });
+    const updateDom = () => {
+      document.title = newDoc.title;
+      document.body.innerHTML = newDoc.body.innerHTML;
+      persistentElements.forEach((liveEl, id) => {
+        const targetSlot = document.querySelector(`[data-persist="${id}"]`);
+        if (targetSlot && targetSlot.parentNode) {
+          targetSlot.parentNode.replaceChild(liveEl, targetSlot);
+        }
+      });
+      initIslands(document.body);
+      initDirectives(document.body);
+      const targetUrl = new URL(urlStr, window.location.origin);
+      if (targetUrl.hash) {
+        const targetEl = document.querySelector(targetUrl.hash);
+        if (targetEl) targetEl.scrollIntoView({ behavior: "smooth" });
+      } else {
+        window.scrollTo({ top: 0, behavior: "instant" });
+      }
+      if (pushState) {
+        window.history.pushState({}, "", urlStr);
+      }
+      window.dispatchEvent(new CustomEvent("island:page-loaded", { detail: { url: urlStr } }));
+    };
+    if ("startViewTransition" in document) {
+      document.startViewTransition(updateDom);
+    } else {
+      updateDom();
+    }
+  } catch (err) {
+    console.error("[SoftMax.LaughTale] View transition failed, falling back to full navigation:", err);
+    window.location.href = urlStr;
+  }
+}
+
+// src/runtime/slots.ts
+function getSlot(container, name = "default") {
+  return container.querySelector(`[data-slot="${name}"]`);
+}
+function extractSlotContent(container, name = "default") {
+  const slotEl = getSlot(container, name);
+  if (!slotEl) return "";
+  return slotEl.innerHTML;
+}
+
+// src/index.ts
+init_styles();
+
+// src/adapters/vanilla.ts
+function createVanillaIsland(mount) {
+  return mount;
+}
+
+// src/adapters/preact.ts
+function createPreactIsland(Component, options = {}) {
+  return async (container, props) => {
+    try {
+      const preact = await import("preact");
+      const h = preact.h || preact.default?.h;
+      const render = preact.render || preact.default?.render;
+      if (render && h) {
+        render(h(Component, props), container);
+        return () => render(null, container);
+      }
+    } catch {
+      console.warn("[SoftMax.LaughTale] Preact package not found in bundle. Rendering component directly.");
+      if (typeof Component === "function") {
+        return Component(container, props);
+      }
+    }
+  };
+}
+
+// src/index.ts
+init_lucide();
+
+// src/composables/index.ts
+init_useDisclosure();
+init_useFocusTrap();
+
+// src/composables/useFloatingPosition.ts
+function useFloatingPosition(reference, floating, options = {}) {
+  const offset = options.offset ?? 6;
+  const autoFlip = options.autoFlip !== false;
+  const viewportPadding = options.viewportPadding ?? 8;
+  let initialPlacement = options.placement ?? "bottom-start";
+  function computePosition() {
+    const refRect = reference.getBoundingClientRect();
+    const floatRect = floating.getBoundingClientRect();
+    const vpWidth = window.innerWidth;
+    const vpHeight = window.innerHeight;
+    let placement = initialPlacement;
+    if (autoFlip) {
+      const spaceTop = refRect.top;
+      const spaceBottom = vpHeight - refRect.bottom;
+      const spaceLeft = refRect.left;
+      const spaceRight = vpWidth - refRect.right;
+      if (placement.startsWith("bottom") && spaceBottom < floatRect.height + offset && spaceTop > spaceBottom) {
+        placement = placement.replace("bottom", "top");
+      } else if (placement.startsWith("top") && spaceTop < floatRect.height + offset && spaceBottom > spaceTop) {
+        placement = placement.replace("top", "bottom");
+      } else if (placement.startsWith("right") && spaceRight < floatRect.width + offset && spaceLeft > spaceRight) {
+        placement = placement.replace("right", "left");
+      } else if (placement.startsWith("left") && spaceLeft < floatRect.width + offset && spaceRight > spaceLeft) {
+        placement = placement.replace("left", "right");
+      }
+    }
+    let x = 0;
+    let y = 0;
+    switch (placement) {
+      case "bottom":
+        x = refRect.left + (refRect.width - floatRect.width) / 2;
+        y = refRect.bottom + offset;
+        break;
+      case "bottom-start":
+        x = refRect.left;
+        y = refRect.bottom + offset;
+        break;
+      case "bottom-end":
+        x = refRect.right - floatRect.width;
+        y = refRect.bottom + offset;
+        break;
+      case "top":
+        x = refRect.left + (refRect.width - floatRect.width) / 2;
+        y = refRect.top - floatRect.height - offset;
+        break;
+      case "top-start":
+        x = refRect.left;
+        y = refRect.top - floatRect.height - offset;
+        break;
+      case "top-end":
+        x = refRect.right - floatRect.width;
+        y = refRect.top - floatRect.height - offset;
+        break;
+      case "left":
+        x = refRect.left - floatRect.width - offset;
+        y = refRect.top + (refRect.height - floatRect.height) / 2;
+        break;
+      case "left-start":
+        x = refRect.left - floatRect.width - offset;
+        y = refRect.top;
+        break;
+      case "left-end":
+        x = refRect.left - floatRect.width - offset;
+        y = refRect.bottom - floatRect.height;
+        break;
+      case "right":
+        x = refRect.right + offset;
+        y = refRect.top + (refRect.height - floatRect.height) / 2;
+        break;
+      case "right-start":
+        x = refRect.right + offset;
+        y = refRect.top;
+        break;
+      case "right-end":
+        x = refRect.right + offset;
+        y = refRect.bottom - floatRect.height;
+        break;
+    }
+    x = Math.max(viewportPadding, Math.min(vpWidth - floatRect.width - viewportPadding, x));
+    y = Math.max(viewportPadding, Math.min(vpHeight - floatRect.height - viewportPadding, y));
+    return { x, y, actualPlacement: placement };
+  }
+  function update() {
+    const { x, y } = computePosition();
+    floating.style.position = "fixed";
+    floating.style.left = `${Math.round(x)}px`;
+    floating.style.top = `${Math.round(y)}px`;
+  }
+  return { update, computePosition };
+}
+
+// src/composables/useVirtualizer.ts
+function useVirtualizer(options) {
+  const overscan = options.overscan ?? 3;
+  let scrollTop = 0;
+  function getItemOffset(index) {
+    let offset = 0;
+    for (let i = 0; i < index; i++) {
+      offset += options.estimateSize(i);
+    }
+    return offset;
+  }
+  function getTotalSize() {
+    let total = 0;
+    for (let i = 0; i < options.count; i++) {
+      total += options.estimateSize(i);
+    }
+    return total;
+  }
+  function getVirtualItems() {
+    const scrollEl = options.getScrollElement();
+    const viewportHeight = scrollEl ? scrollEl.clientHeight : 400;
+    scrollTop = scrollEl ? scrollEl.scrollTop : 0;
+    const total = options.count;
+    if (total === 0) return [];
+    let startIndex = 0;
+    let runningOffset = 0;
+    while (startIndex < total && runningOffset + options.estimateSize(startIndex) < scrollTop) {
+      runningOffset += options.estimateSize(startIndex);
+      startIndex++;
+    }
+    let endIndex = startIndex;
+    let currentBottom = runningOffset;
+    while (endIndex < total && currentBottom < scrollTop + viewportHeight) {
+      currentBottom += options.estimateSize(endIndex);
+      endIndex++;
+    }
+    startIndex = Math.max(0, startIndex - overscan);
+    endIndex = Math.min(total - 1, endIndex + overscan);
+    const items = [];
+    let itemStart = getItemOffset(startIndex);
+    for (let i = startIndex; i <= endIndex; i++) {
+      const size = options.estimateSize(i);
+      items.push({
+        index: i,
+        start: itemStart,
+        size,
+        end: itemStart + size
+      });
+      itemStart += size;
+    }
+    return items;
+  }
+  return {
+    getTotalSize,
+    getVirtualItems
+  };
+}
+
+// src/composables/useDragGesture.ts
+function useDragGesture(targetElement, options = {}) {
+  const axis = options.axis ?? "both";
+  let isDragging = false;
+  let startX = 0;
+  let startY = 0;
+  function getDragState(e) {
+    const rect = targetElement.getBoundingClientRect();
+    const clientX = e.clientX;
+    const clientY = e.clientY;
+    const dx = axis === "y" ? 0 : clientX - startX;
+    const dy = axis === "x" ? 0 : clientY - startY;
+    const ratioX = rect.width > 0 ? Math.max(0, Math.min(1, (clientX - rect.left) / rect.width)) : 0;
+    const ratioY = rect.height > 0 ? Math.max(0, Math.min(1, (clientY - rect.top) / rect.height)) : 0;
+    return { clientX, clientY, dx, dy, ratioX, ratioY, isDragging };
+  }
+  const onPointerDown = (e) => {
+    isDragging = true;
+    startX = e.clientX;
+    startY = e.clientY;
+    if ("setPointerCapture" in targetElement && e.pointerId !== void 0) {
+      try {
+        targetElement.setPointerCapture(e.pointerId);
+      } catch (_) {
+      }
+    }
+    const state = getDragState(e);
+    options.onDragStart?.(state);
+    options.onDrag?.(state);
+  };
+  const onPointerMove = (e) => {
+    if (!isDragging) return;
+    const state = getDragState(e);
+    options.onDrag?.(state);
+  };
+  const onPointerUp = (e) => {
+    if (!isDragging) return;
+    isDragging = false;
+    if ("releasePointerCapture" in targetElement && e.pointerId !== void 0) {
+      try {
+        targetElement.releasePointerCapture(e.pointerId);
+      } catch (_) {
+      }
+    }
+    const state = getDragState(e);
+    options.onDragEnd?.(state);
+  };
+  targetElement.addEventListener("pointerdown", onPointerDown);
+  targetElement.addEventListener("pointermove", onPointerMove);
+  targetElement.addEventListener("pointerup", onPointerUp);
+  targetElement.addEventListener("pointercancel", onPointerUp);
+  function destroy() {
+    targetElement.removeEventListener("pointerdown", onPointerDown);
+    targetElement.removeEventListener("pointermove", onPointerMove);
+    targetElement.removeEventListener("pointerup", onPointerUp);
+    targetElement.removeEventListener("pointercancel", onPointerUp);
+  }
+  return { destroy };
+}
+
+// src/composables/useHotkeys.ts
+function useHotkeys(hotkeys, targetNode = typeof document !== "undefined" ? document : null) {
+  if (!targetNode) return { destroy: () => {
+  } };
+  function matchesCombo(e, comboStr) {
+    const parts = comboStr.toLowerCase().split("+").map((p) => p.trim());
+    const hasCtrl = parts.includes("ctrl") || parts.includes("control");
+    const hasMeta = parts.includes("meta") || parts.includes("cmd") || parts.includes("command");
+    const hasShift = parts.includes("shift");
+    const hasAlt = parts.includes("alt");
+    if (hasCtrl && !e.ctrlKey) return false;
+    if (hasMeta && !e.metaKey) return false;
+    if (hasShift && !e.shiftKey) return false;
+    if (hasAlt && !e.altKey) return false;
+    const mainKey = parts.find((p) => !["ctrl", "control", "meta", "cmd", "command", "shift", "alt"].includes(p));
+    if (!mainKey) return true;
+    const key = e.key.toLowerCase();
+    if (mainKey === "esc" || mainKey === "escape") return key === "escape";
+    if (mainKey === "enter") return key === "enter";
+    if (mainKey === "space") return key === " " || key === "space";
+    if (mainKey === "slash") return key === "/";
+    return key === mainKey;
+  }
+  function isInputElement(el) {
+    if (!el) return false;
+    const tag = el.tagName.toLowerCase();
+    return tag === "input" || tag === "textarea" || tag === "select" || el.hasAttribute("contenteditable");
+  }
+  function handleKeyDown(e) {
+    const keyEvent = e;
+    const target = keyEvent.target;
+    const isInput = isInputElement(target);
+    for (const item of hotkeys) {
+      if (isInput && !item.allowInInputs && item.combo !== "escape") {
+        continue;
+      }
+      if (matchesCombo(keyEvent, item.combo)) {
+        keyEvent.preventDefault();
+        item.handler(keyEvent);
+        break;
+      }
+    }
+  }
+  targetNode.addEventListener("keydown", handleKeyDown);
+  return {
+    destroy: () => {
+      targetNode.removeEventListener("keydown", handleKeyDown);
+    }
+  };
+}
+
+// src/composables/index.ts
+init_useClickOutside();
+init_useScrollLock();
+init_useControllableState();
+init_useDebounce();
+init_useClipboard();
+
+// src/composables/useKeyboardNav.ts
+function useKeyboardNav(options) {
+  let activeIndex = options.initialIndex ?? -1;
+  const loop = options.loop ?? true;
+  function handleKeyDown(e) {
+    const count = options.itemCount();
+    if (count === 0) return false;
+    const isVertical = options.orientation !== "horizontal";
+    const isHorizontal = options.orientation !== "vertical";
+    if (isVertical && e.key === "ArrowDown" || isHorizontal && e.key === "ArrowRight") {
+      e.preventDefault();
+      if (activeIndex < count - 1) {
+        activeIndex++;
+      } else if (loop) {
+        activeIndex = 0;
+      }
+      options.onHighlight?.(activeIndex);
+      return true;
+    }
+    if (isVertical && e.key === "ArrowUp" || isHorizontal && e.key === "ArrowLeft") {
+      e.preventDefault();
+      if (activeIndex > 0) {
+        activeIndex--;
+      } else if (loop) {
+        activeIndex = count - 1;
+      }
+      options.onHighlight?.(activeIndex);
+      return true;
+    }
+    if (e.key === "Home") {
+      e.preventDefault();
+      activeIndex = 0;
+      options.onHighlight?.(activeIndex);
+      return true;
+    }
+    if (e.key === "End") {
+      e.preventDefault();
+      activeIndex = count - 1;
+      options.onHighlight?.(activeIndex);
+      return true;
+    }
+    if (e.key === "Enter" || e.key === " ") {
+      if (activeIndex >= 0 && activeIndex < count) {
+        e.preventDefault();
+        options.onSelect?.(activeIndex);
+        return true;
+      }
+    }
+    if (e.key === "Escape") {
+      options.onEscape?.();
+      return true;
+    }
+    return false;
+  }
+  return {
+    handleKeyDown,
+    get activeIndex() {
+      return activeIndex;
+    },
+    setActiveIndex: (idx) => {
+      activeIndex = idx;
+      options.onHighlight?.(activeIndex);
+    },
+    reset: () => {
+      activeIndex = -1;
+    }
+  };
+}
+
+// src/composables/useEventListener.ts
+function useEventListener(target, type, listener, options) {
+  if (!target || typeof target.addEventListener !== "function") {
+    return () => {
+    };
+  }
+  target.addEventListener(type, listener, options);
+  return () => {
+    target.removeEventListener(type, listener, options);
+  };
+}
+
+// src/composables/animation/useSpring.ts
+function useSpring(initialValue, config = {}) {
+  const stiffness = config.stiffness ?? 170;
+  const damping = config.damping ?? 26;
+  const mass = config.mass ?? 1;
+  const precision = config.precision ?? 1e-3;
+  let current = initialValue;
+  let target = initialValue;
+  let velocity = 0;
+  let animFrame = null;
+  const updateListeners = /* @__PURE__ */ new Set();
+  function step() {
+    const displacement = current - target;
+    const springForce = -stiffness * displacement;
+    const dampingForce = -damping * velocity;
+    const acceleration = (springForce + dampingForce) / mass;
+    const dt = 1 / 60;
+    velocity += acceleration * dt;
+    current += velocity * dt;
+    updateListeners.forEach((fn) => fn(current));
+    if (Math.abs(displacement) < precision && Math.abs(velocity) < precision) {
+      current = target;
+      velocity = 0;
+      updateListeners.forEach((fn) => fn(current));
+      animFrame = null;
+    } else {
+      if (typeof requestAnimationFrame !== "undefined") {
+        animFrame = requestAnimationFrame(step);
+      }
+    }
+  }
+  function set(nextTarget) {
+    target = nextTarget;
+    if (animFrame === null && typeof requestAnimationFrame !== "undefined") {
+      animFrame = requestAnimationFrame(step);
+    } else if (typeof requestAnimationFrame === "undefined") {
+      current = nextTarget;
+      updateListeners.forEach((fn) => fn(current));
+    }
+  }
+  function stop() {
+    if (animFrame !== null && typeof cancelAnimationFrame !== "undefined") {
+      cancelAnimationFrame(animFrame);
+      animFrame = null;
+    }
+    velocity = 0;
+  }
+  function onUpdate(listener) {
+    updateListeners.add(listener);
+    return () => updateListeners.delete(listener);
+  }
+  return {
+    get value() {
+      return current;
+    },
+    set,
+    onUpdate,
+    stop
+  };
+}
+
+// src/composables/index.ts
+init_useTransition();
+init_useAutoAnimate();
+
+// src/composables/animation/useStagger.ts
+function useStagger(elements, options = {}) {
+  const staggerMs = options.staggerMs ?? 40;
+  const initialDelay = options.initialDelay ?? 0;
+  const duration = options.duration ?? 250;
+  const easing = options.easing ?? "cubic-bezier(0.16, 1, 0.3, 1)";
+  const list = Array.from(elements);
+  list.forEach((el, index) => {
+    const delay = initialDelay + index * staggerMs;
+    el.style.opacity = "0";
+    el.style.transform = "translateY(8px)";
+    el.style.transition = `opacity ${duration}ms ${easing} ${delay}ms, transform ${duration}ms ${easing} ${delay}ms`;
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        el.style.opacity = "1";
+        el.style.transform = "none";
+      });
+    });
+  });
+}
+
+// src/composables/animation/useMorphLayout.ts
+function useMorphLayout(indicator, options = {}) {
+  const duration = options.duration ?? 200;
+  const easing = options.easing ?? "cubic-bezier(0.2, 0, 0, 1)";
+  indicator.style.position = "absolute";
+  indicator.style.transition = `left ${duration}ms ${easing}, top ${duration}ms ${easing}, width ${duration}ms ${easing}, height ${duration}ms ${easing}, opacity ${duration}ms ${easing}`;
+  indicator.style.pointerEvents = "none";
+  function moveTo(target) {
+    if (!target || !target.offsetParent) {
+      indicator.style.opacity = "0";
+      return;
+    }
+    indicator.style.opacity = "1";
+    indicator.style.left = `${target.offsetLeft}px`;
+    indicator.style.top = `${target.offsetTop}px`;
+    indicator.style.width = `${target.offsetWidth}px`;
+    indicator.style.height = `${target.offsetHeight}px`;
+  }
+  return { moveTo };
+}
+
+// src/styles/animations.ts
+function initAnimationStyles() {
+  if (typeof document === "undefined") return;
+  if (document.getElementById("aura-animations")) return;
+  const styleEl = document.createElement("style");
+  styleEl.id = "aura-animations";
+  styleEl.textContent = `
+/* Base Component */
+.p-component {
+    font-family: var(--p-font-family, inherit);
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+/* 1. Anchored Overlays */
+.p-anchored-overlay-enter-active {
+    animation: p-anchored-overlay-enter 200ms ease-out forwards;
+}
+.p-anchored-overlay-leave-active {
+    animation: p-anchored-overlay-leave 150ms ease-in forwards;
+}
+@keyframes p-anchored-overlay-enter {
+    from { opacity: 0; transform: translateY(5%); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes p-anchored-overlay-leave {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(5%); }
+}
+
+/* 2. Collapsibles */
+.p-collapsible-enter-active {
+    animation: p-collapsible-enter 300ms cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+.p-collapsible-leave-active {
+    animation: p-collapsible-leave 300ms cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+@keyframes p-collapsible-enter {
+    from { grid-template-rows: 0fr; opacity: 0; transform: scale(0.97); }
+    to { grid-template-rows: 1fr; opacity: 1; transform: scale(1); }
+}
+@keyframes p-collapsible-leave {
+    from { grid-template-rows: 1fr; opacity: 1; transform: scale(1); }
+    to { grid-template-rows: 0fr; opacity: 0; transform: scale(0.97); }
+}
+
+/* 3. Dialog */
+.p-dialog-enter-active {
+    animation: p-dialog-enter 300ms ease-out forwards;
+}
+.p-dialog-leave-active {
+    animation: p-dialog-leave 200ms ease-in forwards;
+}
+@keyframes p-dialog-enter {
+    from { opacity: 0; transform: scale(0.95); filter: blur(8px); }
+    to { opacity: 1; transform: scale(1); filter: blur(0); }
+}
+@keyframes p-dialog-leave {
+    from { opacity: 1; transform: scale(1); filter: blur(0); }
+    to { opacity: 0; transform: scale(0.95); filter: blur(4px); }
+}
+
+/* 4. Drawer */
+.p-drawer-enter-active {
+    animation: p-drawer-enter 300ms cubic-bezier(0.32, 0.72, 0, 1) forwards;
+}
+.p-drawer-leave-active {
+    animation: p-drawer-leave 200ms cubic-bezier(0.32, 0.72, 0, 1) forwards;
+}
+@keyframes p-drawer-enter {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(0); }
+}
+@keyframes p-drawer-leave {
+    from { transform: translateX(0); }
+    to { transform: translateX(-100%); }
+}
+
+.p-drawer-right-enter-active { animation: p-drawer-right-enter 300ms cubic-bezier(0.32, 0.72, 0, 1) forwards; }
+.p-drawer-right-leave-active { animation: p-drawer-right-leave 200ms cubic-bezier(0.32, 0.72, 0, 1) forwards; }
+@keyframes p-drawer-right-enter { from { transform: translateX(100%); } to { transform: translateX(0); } }
+@keyframes p-drawer-right-leave { from { transform: translateX(0); } to { transform: translateX(100%); } }
+
+.p-drawer-top-enter-active { animation: p-drawer-top-enter 300ms cubic-bezier(0.32, 0.72, 0, 1) forwards; }
+.p-drawer-top-leave-active { animation: p-drawer-top-leave 200ms cubic-bezier(0.32, 0.72, 0, 1) forwards; }
+@keyframes p-drawer-top-enter { from { transform: translateY(-100%); } to { transform: translateY(0); } }
+@keyframes p-drawer-top-leave { from { transform: translateY(0); } to { transform: translateY(-100%); } }
+
+.p-drawer-bottom-enter-active { animation: p-drawer-bottom-enter 300ms cubic-bezier(0.32, 0.72, 0, 1) forwards; }
+.p-drawer-bottom-leave-active { animation: p-drawer-bottom-leave 200ms cubic-bezier(0.32, 0.72, 0, 1) forwards; }
+@keyframes p-drawer-bottom-enter { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes p-drawer-bottom-leave { from { transform: translateY(0); } to { transform: translateY(100%); } }
+
+/* 5. Message/Toast */
+.p-message-enter-active {
+    animation: p-message-enter 300ms ease-out forwards;
+}
+.p-message-leave-active {
+    animation: p-message-leave 200ms ease-in forwards;
+}
+@keyframes p-message-enter {
+    from { opacity: 0; transform: translateY(-100%); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes p-message-leave {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateX(100%); }
+}
+
+/* 6. Overlay Mask */
+.p-overlay-mask-enter-active {
+    animation: p-overlay-mask-enter 200ms ease forwards;
+}
+.p-overlay-mask-leave-active {
+    animation: p-overlay-mask-leave 150ms ease forwards;
+}
+@keyframes p-overlay-mask-enter {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+@keyframes p-overlay-mask-leave {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+/* 7. Ripple */
+.p-ripple-effect {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.4);
+    transform: scale(0);
+    animation: p-ripple-animation 600ms linear;
+    pointer-events: none;
+}
+@keyframes p-ripple-animation {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* 8. Skeleton Shimmer */
+.p-skeleton-animation {
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0, rgba(255, 255, 255, 0.2) 20%, rgba(255, 255, 255, 0.5) 60%, rgba(255, 255, 255, 0));
+    background-size: 200% 100%;
+    animation: p-skeleton-shimmer 1.5s infinite linear;
+}
+@keyframes p-skeleton-shimmer {
+    from { background-position: -200% 0; }
+    to { background-position: 200% 0; }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+        animation-duration: 0s !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0s !important;
+        scroll-behavior: auto !important;
+    }
+}
+    `;
+  document.head.appendChild(styleEl);
+}
+function injectRipple(el, event) {
+  const rect = el.getBoundingClientRect();
+  const ripple = document.createElement("span");
+  const size = Math.max(rect.width, rect.height);
+  const x = event.clientX - rect.left - size / 2;
+  const y = event.clientY - rect.top - size / 2;
+  ripple.className = "p-ripple-effect";
+  ripple.style.width = `${size}px`;
+  ripple.style.height = `${size}px`;
+  ripple.style.left = `${x}px`;
+  ripple.style.top = `${y}px`;
+  el.appendChild(ripple);
+  setTimeout(() => {
+    ripple.remove();
+  }, 600);
+}
+
+// src/styles/design-tokens.ts
+var AURA_PALETTES = {
+  emerald: {
+    "50": "#ecfdf5",
+    "100": "#d1fae5",
+    "200": "#a7f3d0",
+    "300": "#6ee7b7",
+    "400": "#34d399",
+    "500": "#10b981",
+    "600": "#059669",
+    "700": "#047857",
+    "800": "#065f46",
+    "900": "#064e3b"
+  },
+  blue: {
+    "50": "#eff6ff",
+    "100": "#dbeafe",
+    "200": "#bfdbfe",
+    "300": "#93c5fd",
+    "400": "#60a5fa",
+    "500": "#3b82f6",
+    "600": "#2563eb",
+    "700": "#1d4ed8",
+    "800": "#1e40af",
+    "900": "#1e3a8a"
+  },
+  violet: {
+    "50": "#f5f3ff",
+    "100": "#ede9fe",
+    "200": "#ddd6fe",
+    "300": "#c4b5fd",
+    "400": "#a78bfa",
+    "500": "#8b5cf6",
+    "600": "#7c3aed",
+    "700": "#6d28d9",
+    "800": "#5b21b6",
+    "900": "#4c1d95"
+  },
+  amber: {
+    "50": "#fffbeb",
+    "100": "#fef3c7",
+    "200": "#fde68a",
+    "300": "#fcd34d",
+    "400": "#fbbf24",
+    "500": "#f59e0b",
+    "600": "#d97706",
+    "700": "#b45309",
+    "800": "#92400e",
+    "900": "#78350f"
+  },
+  rose: {
+    "50": "#fff1f2",
+    "100": "#ffe4e6",
+    "200": "#fecdd3",
+    "300": "#fda4af",
+    "400": "#fb7185",
+    "500": "#f43f5e",
+    "600": "#e11d48",
+    "700": "#be123c",
+    "800": "#9f1239",
+    "900": "#881337"
+  },
+  cyan: {
+    "50": "#ecfeff",
+    "100": "#cffafe",
+    "200": "#a5f3fc",
+    "300": "#67e8f9",
+    "400": "#22d3ee",
+    "500": "#06b6d4",
+    "600": "#0891b2",
+    "700": "#0e7490",
+    "800": "#155e75",
+    "900": "#164e63"
+  },
+  slate: {
+    "50": "#f8fafc",
+    "100": "#f1f5f9",
+    "200": "#e2e8f0",
+    "300": "#cbd5e1",
+    "400": "#94a3b8",
+    "500": "#64748b",
+    "600": "#475569",
+    "700": "#334155",
+    "800": "#1e293b",
+    "900": "#0f172a"
+  }
+};
+function initDesignTokens() {
+  if (typeof document === "undefined") return;
+  if (document.getElementById("aura-design-tokens")) return;
+  const styleEl = document.createElement("style");
+  styleEl.id = "aura-design-tokens";
+  styleEl.textContent = `
+:root {
+  /* Primary palette (emerald by default) */
+  --p-primary-50: #ecfdf5;
+  --p-primary-100: #d1fae5;
+  --p-primary-200: #a7f3d0;
+  --p-primary-300: #6ee7b7;
+  --p-primary-400: #34d399;
+  --p-primary-500: #10b981;
+  --p-primary-600: #059669;
+  --p-primary-700: #047857;
+  --p-primary-800: #065f46;
+  --p-primary-900: #064e3b;
+  --p-primary-color: var(--p-primary-500);
+  --p-primary-color-text: #ffffff;
+
+  /* Surface palette */
+  --p-surface-0: #ffffff;
+  --p-surface-50: #f8fafc;
+  --p-surface-100: #f1f5f9;
+  --p-surface-200: #e2e8f0;
+  --p-surface-300: #cbd5e1;
+  --p-surface-400: #94a3b8;
+  --p-surface-500: #64748b;
+  --p-surface-600: #475569;
+  --p-surface-700: #334155;
+  --p-surface-800: #1e293b;
+  --p-surface-900: #0f172a;
+  --p-surface-950: #020617;
+  --p-text-color: var(--p-surface-900);
+  --p-text-muted-color: var(--p-surface-500);
+
+  /* Component tokens */
+  --p-content-bg: var(--p-surface-0);
+  --p-content-border: var(--p-surface-200);
+  --p-content-hover-bg: var(--p-surface-50);
+  --p-content-padding: 1rem;
+
+  /* Border radius */
+  --p-border-radius: 0.5rem;
+  --p-border-radius-sm: 0.375rem;
+  --p-border-radius-lg: 0.75rem;
+  --p-border-radius-xl: 1rem;
+  --p-border-radius-full: 9999px;
+
+  /* Shadows */
+  --p-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --p-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --p-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --p-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+
+  /* Focus ring */
+  --p-focus-ring-color: var(--p-primary-500);
+  --p-focus-ring-width: 2px;
+  --p-focus-ring-offset: 2px;
+  --p-focus-ring: 0 0 0 var(--p-focus-ring-offset) var(--p-content-bg), 0 0 0 calc(var(--p-focus-ring-offset) + var(--p-focus-ring-width)) var(--p-focus-ring-color);
+
+  /* Transitions */
+  --p-transition-duration: 150ms;
+  --p-transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Form field tokens */
+  --p-field-border: var(--p-surface-300);
+  --p-field-hover-border: var(--p-surface-400);
+  --p-field-focus-border: var(--p-primary-500);
+  --p-field-bg: var(--p-surface-0);
+  --p-field-padding-x: 0.75rem;
+  --p-field-padding-y: 0.5rem;
+
+  /* Overlay tokens */
+  --p-overlay-bg: var(--p-surface-0);
+  --p-overlay-border: var(--p-surface-200);
+  --p-overlay-shadow: var(--p-shadow-lg);
+}
+
+/* Dark mode overrides */
+[data-theme="dark"], .dark {
+  --p-surface-0: #09090b;
+  --p-surface-50: #18181b;
+  --p-surface-100: #27272a;
+  --p-surface-200: #3f3f46;
+  --p-surface-300: #52525b;
+  --p-surface-400: #71717a;
+  --p-surface-500: #a1a1aa;
+  --p-surface-600: #d4d4d8;
+  --p-surface-700: #e4e4e7;
+  --p-surface-800: #f4f4f5;
+  --p-surface-900: #fafafa;
+  --p-surface-950: #ffffff;
+  
+  --p-text-color: var(--p-surface-50);
+  --p-text-muted-color: var(--p-surface-400);
+  --p-content-bg: var(--p-surface-900);
+  --p-content-border: var(--p-surface-700);
+  --p-content-hover-bg: var(--p-surface-800);
+  --p-field-bg: var(--p-surface-800);
+  --p-field-border: var(--p-surface-600);
+  --p-field-hover-border: var(--p-surface-500);
+  --p-overlay-bg: var(--p-surface-800);
+  --p-overlay-border: var(--p-surface-700);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]):not(.light) {
+    --p-surface-0: #09090b;
+    --p-surface-50: #18181b;
+    --p-surface-100: #27272a;
+    --p-surface-200: #3f3f46;
+    --p-surface-300: #52525b;
+    --p-surface-400: #71717a;
+    --p-surface-500: #a1a1aa;
+    --p-surface-600: #d4d4d8;
+    --p-surface-700: #e4e4e7;
+    --p-surface-800: #f4f4f5;
+    --p-surface-900: #fafafa;
+    --p-surface-950: #ffffff;
+    
+    --p-text-color: var(--p-surface-50);
+    --p-text-muted-color: var(--p-surface-400);
+    --p-content-bg: var(--p-surface-900);
+    --p-content-border: var(--p-surface-700);
+    --p-content-hover-bg: var(--p-surface-800);
+    --p-field-bg: var(--p-surface-800);
+    --p-field-border: var(--p-surface-600);
+    --p-field-hover-border: var(--p-surface-500);
+    --p-overlay-bg: var(--p-surface-800);
+    --p-overlay-border: var(--p-surface-700);
+  }
+}
+    `;
+  document.head.appendChild(styleEl);
+}
+function updateToken(name, value) {
+  if (typeof document !== "undefined") {
+    document.documentElement.style.setProperty(name, value);
+  }
+}
+function getToken(name) {
+  if (typeof document !== "undefined") {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+  return "";
+}
+
+// src/index.ts
+defineIsland("stepper", () => Promise.resolve().then(() => (init_stepper(), stepper_exports)));
+defineIsland("timeline", () => Promise.resolve().then(() => (init_timeline(), timeline_exports)));
+defineIsland("dropzone", () => Promise.resolve().then(() => (init_dropzone(), dropzone_exports)));
+defineIsland("tree", () => Promise.resolve().then(() => (init_tree(), tree_exports)));
+defineIsland("treetable", () => Promise.resolve().then(() => (init_treetable(), treetable_exports)));
+defineIsland("tree-table", () => Promise.resolve().then(() => (init_treetable(), treetable_exports)));
+defineIsland("p-treetable", () => Promise.resolve().then(() => (init_treetable(), treetable_exports)));
+defineIsland("island-treetable", () => Promise.resolve().then(() => (init_treetable(), treetable_exports)));
+defineIsland("tree-select", () => Promise.resolve().then(() => (init_tree_select(), tree_select_exports)));
+defineIsland("datatable", () => Promise.resolve().then(() => (init_datatable(), datatable_exports)));
+defineIsland("datagrid", () => Promise.resolve().then(() => (init_datatable(), datatable_exports)));
+defineIsland("toast", () => Promise.resolve().then(() => (init_toast(), toast_exports)));
+defineIsland("input-number", () => Promise.resolve().then(() => (init_input_number(), input_number_exports)));
+defineIsland("input-otp", () => Promise.resolve().then(() => (init_input_otp(), input_otp_exports)));
+defineIsland("input-password", () => Promise.resolve().then(() => (init_input_password(), input_password_exports)));
+defineIsland("toggle-switch", () => Promise.resolve().then(() => (init_toggle_switch(), toggle_switch_exports)));
+defineIsland("toggle-button", () => Promise.resolve().then(() => (init_toggle_button(), toggle_button_exports)));
+defineIsland("togglebutton", () => Promise.resolve().then(() => (init_toggle_button(), toggle_button_exports)));
+defineIsland("button", () => Promise.resolve().then(() => (init_button(), button_exports)));
+defineIsland("slider", () => Promise.resolve().then(() => (init_slider(), slider_exports)));
+defineIsland("rating", () => Promise.resolve().then(() => (init_rating(), rating_exports)));
+defineIsland("select-button", () => Promise.resolve().then(() => (init_select_button(), select_button_exports)));
+defineIsland("chips", () => Promise.resolve().then(() => (init_input_tags(), input_tags_exports)));
+defineIsland("input-tags", () => Promise.resolve().then(() => (init_input_tags(), input_tags_exports)));
+defineIsland("inputtags", () => Promise.resolve().then(() => (init_input_tags(), input_tags_exports)));
+defineIsland("tags", () => Promise.resolve().then(() => (init_input_tags(), input_tags_exports)));
+defineIsland("datepicker", () => Promise.resolve().then(() => (init_datepicker(), datepicker_exports)));
+defineIsland("meter-group", () => Promise.resolve().then(() => (init_meter_group(), meter_group_exports)));
+defineIsland("avatar-group", () => Promise.resolve().then(() => (init_avatar_group(), avatar_group_exports)));
+defineIsland("progress-bar", () => Promise.resolve().then(() => (init_progress_bar(), progress_bar_exports)));
+defineIsland("skeleton", () => Promise.resolve().then(() => (init_skeleton(), skeleton_exports)));
+defineIsland("drawer", () => Promise.resolve().then(() => (init_drawer(), drawer_exports)));
+defineIsland("speed-dial", () => Promise.resolve().then(() => (init_speed_dial(), speed_dial_exports)));
+defineIsland("image-compare", () => Promise.resolve().then(() => (init_image_compare(), image_compare_exports)));
+defineIsland("imagecompare", () => Promise.resolve().then(() => (init_image_compare(), image_compare_exports)));
+defineIsland("compare", () => Promise.resolve().then(() => (init_image_compare(), image_compare_exports)));
+defineIsland("p-compare", () => Promise.resolve().then(() => (init_image_compare(), image_compare_exports)));
+defineIsland("island-compare", () => Promise.resolve().then(() => (init_image_compare(), image_compare_exports)));
+defineIsland("confirm-popup", () => Promise.resolve().then(() => (init_confirm_popup(), confirm_popup_exports)));
+defineIsland("confirm-dialog", () => Promise.resolve().then(() => (init_confirm_dialog(), confirm_dialog_exports)));
+defineIsland("dialog", () => Promise.resolve().then(() => (init_dialog(), dialog_exports)));
+defineIsland("confirmdialog", () => Promise.resolve().then(() => (init_confirm_dialog(), confirm_dialog_exports)));
+defineIsland("fileupload", () => Promise.resolve().then(() => (init_fileupload(), fileupload_exports)));
+defineIsland("file-upload", () => Promise.resolve().then(() => (init_fileupload(), fileupload_exports)));
+defineIsland("scrollarea", () => Promise.resolve().then(() => (init_scrollarea(), scrollarea_exports)));
+defineIsland("panel", () => Promise.resolve().then(() => (init_panel(), panel_exports)));
+defineIsland("fieldset", () => Promise.resolve().then(() => (init_fieldset(), fieldset_exports)));
+defineIsland("divider", () => Promise.resolve().then(() => (init_divider(), divider_exports)));
+defineIsland("accordion", () => Promise.resolve().then(() => (init_accordion(), accordion_exports)));
+defineIsland("tabs", () => Promise.resolve().then(() => (init_tabs(), tabs_exports)));
+defineIsland("toolbar", () => Promise.resolve().then(() => (init_toolbar(), toolbar_exports)));
+defineIsland("autocomplete", () => Promise.resolve().then(() => (init_autocomplete(), autocomplete_exports)));
+defineIsland("color-picker", () => Promise.resolve().then(() => (init_color_picker(), color_picker_exports)));
+defineIsland("knob", () => Promise.resolve().then(() => (init_knob(), knob_exports)));
+defineIsland("tag", () => Promise.resolve().then(() => (init_tag(), tag_exports)));
+defineIsland("breadcrumb", () => Promise.resolve().then(() => (init_breadcrumb(), breadcrumb_exports)));
+defineIsland("scroll-top", () => Promise.resolve().then(() => (init_scroll_top(), scroll_top_exports)));
+defineIsland("inplace", () => Promise.resolve().then(() => (init_inplace(), inplace_exports)));
+defineIsland("command", () => Promise.resolve().then(() => (init_command(), command_exports)));
+defineIsland("commandmenu", () => Promise.resolve().then(() => (init_command(), command_exports)));
+defineIsland("command-menu", () => Promise.resolve().then(() => (init_command(), command_exports)));
+defineIsland("command-palette", () => Promise.resolve().then(() => (init_command(), command_exports)));
+defineIsland("commandpalette", () => Promise.resolve().then(() => (init_command(), command_exports)));
+defineIsland("theme-studio", () => Promise.resolve().then(() => (init_theme_studio(), theme_studio_exports)));
+defineIsland("splitter", () => Promise.resolve().then(() => (init_splitter(), splitter_exports)));
+defineIsland("multiselect", () => Promise.resolve().then(() => (init_multiselect(), multiselect_exports)));
+defineIsland("cascadeselect", () => Promise.resolve().then(() => (init_cascadeselect(), cascadeselect_exports)));
+defineIsland("listbox", () => Promise.resolve().then(() => (init_listbox(), listbox_exports)));
+defineIsland("picklist", () => Promise.resolve().then(() => (init_picklist(), picklist_exports)));
+defineIsland("orderlist", () => Promise.resolve().then(() => (init_orderlist(), orderlist_exports)));
+defineIsland("orgchart", () => Promise.resolve().then(() => (init_orgchart(), orgchart_exports)));
+defineIsland("galleria", () => Promise.resolve().then(() => (init_galleria(), galleria_exports)));
+defineIsland("blockui", () => Promise.resolve().then(() => (init_blockui(), blockui_exports)));
+defineIsland("split-button", () => Promise.resolve().then(() => (init_split_button(), split_button_exports)));
+defineIsland("select", () => Promise.resolve().then(() => (init_select(), select_exports)));
+defineIsland("checkbox", () => Promise.resolve().then(() => (init_checkbox(), checkbox_exports)));
+defineIsland("radio-button", () => Promise.resolve().then(() => (init_radio_button(), radio_button_exports)));
+defineIsland("radio", () => Promise.resolve().then(() => (init_radio_button(), radio_button_exports)));
+defineIsland("textarea", () => Promise.resolve().then(() => (init_textarea(), textarea_exports)));
+defineIsland("input-mask", () => Promise.resolve().then(() => (init_input_mask(), input_mask_exports)));
+defineIsland("float-label", () => Promise.resolve().then(() => (init_float_label(), float_label_exports)));
+defineIsland("ifta-label", () => Promise.resolve().then(() => (init_ifta_label(), ifta_label_exports)));
+defineIsland("input-group", () => Promise.resolve().then(() => (init_input_group(), input_group_exports)));
+defineIsland("input-group-addon", () => Promise.resolve().then(() => (init_input_group(), input_group_exports)).then((m) => ({ default: m.InputGroupAddonIsland })));
+defineIsland("inputgroup", () => Promise.resolve().then(() => (init_input_group(), input_group_exports)));
+defineIsland("inputgroup-addon", () => Promise.resolve().then(() => (init_input_group(), input_group_exports)).then((m) => ({ default: m.InputGroupAddonIsland })));
+defineIsland("input-text", () => Promise.resolve().then(() => (init_input_text(), input_text_exports)));
+defineIsland("enhanced-input", () => Promise.resolve().then(() => (init_input_text(), input_text_exports)));
+defineIsland("carousel", () => Promise.resolve().then(() => (init_carousel(), carousel_exports)));
+defineIsland("paginator", () => Promise.resolve().then(() => (init_paginator(), paginator_exports)));
+defineIsland("dataview", () => Promise.resolve().then(() => (init_dataview(), dataview_exports)));
+defineIsland("menubar", () => Promise.resolve().then(() => (init_menubar(), menubar_exports)));
+defineIsland("p-menubar", () => Promise.resolve().then(() => (init_menubar(), menubar_exports)));
+defineIsland("island-menubar", () => Promise.resolve().then(() => (init_menubar(), menubar_exports)));
+defineIsland("menu", () => Promise.resolve().then(() => (init_menu(), menu_exports)));
+defineIsland("p-menu", () => Promise.resolve().then(() => (init_menu(), menu_exports)));
+defineIsland("context-menu", () => Promise.resolve().then(() => (init_context_menu(), context_menu_exports)));
+defineIsland("contextmenu", () => Promise.resolve().then(() => (init_context_menu(), context_menu_exports)));
+defineIsland("p-contextmenu", () => Promise.resolve().then(() => (init_context_menu(), context_menu_exports)));
+defineIsland("island-contextmenu", () => Promise.resolve().then(() => (init_context_menu(), context_menu_exports)));
+defineIsland("popover", () => Promise.resolve().then(() => (init_popover(), popover_exports)));
+defineIsland("tooltip", () => Promise.resolve().then(() => (init_tooltip_component(), tooltip_component_exports)));
+defineIsland("tooltip-component", () => Promise.resolve().then(() => (init_tooltip_component(), tooltip_component_exports)));
+defineIsland("sidebar", () => Promise.resolve().then(() => (init_sidebar(), sidebar_exports)));
+defineIsland("p-sidebar", () => Promise.resolve().then(() => (init_sidebar(), sidebar_exports)));
+defineIsland("sidebar-layout", () => Promise.resolve().then(() => (init_sidebar(), sidebar_exports)));
+defineIsland("tieredmenu", () => Promise.resolve().then(() => (init_tieredmenu(), tieredmenu_exports)));
+defineIsland("tiered-menu", () => Promise.resolve().then(() => (init_tieredmenu(), tieredmenu_exports)));
+defineIsland("p-tieredmenu", () => Promise.resolve().then(() => (init_tieredmenu(), tieredmenu_exports)));
+defineIsland("island-tieredmenu", () => Promise.resolve().then(() => (init_tieredmenu(), tieredmenu_exports)));
+defineIsland("message", () => Promise.resolve().then(() => (init_message(), message_exports)));
+defineIsland("p-message", () => Promise.resolve().then(() => (init_message(), message_exports)));
+defineIsland("inline-message", () => Promise.resolve().then(() => (init_message(), message_exports)));
+defineIsland("inlinemessage", () => Promise.resolve().then(() => (init_message(), message_exports)));
+defineIsland("toast", () => Promise.resolve().then(() => (init_toast(), toast_exports)));
+defineIsland("p-toast", () => Promise.resolve().then(() => (init_toast(), toast_exports)));
+defineIsland("island-toast", () => Promise.resolve().then(() => (init_toast(), toast_exports)));
 export {
   AURA_PALETTES,
   LucideIcons,

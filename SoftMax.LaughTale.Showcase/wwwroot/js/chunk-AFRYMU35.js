@@ -972,7 +972,6 @@ function getSlot(container, name = "default") {
 // ../SoftMax.LaughTale.Client/src/index.ts
 defineIsland("stepper", () => import("./stepper-YDR6TDZ5.js"));
 defineIsland("timeline", () => import("./timeline-RNI3KT3N.js"));
-defineIsland("camera", () => import("./camera-P2UEMHVO.js"));
 defineIsland("dropzone", () => import("./dropzone-E76UIQBF.js"));
 defineIsland("tree", () => import("./tree-Z4YCN4WI.js"));
 defineIsland("treetable", () => import("./treetable-H2R43JFX.js"));
@@ -982,7 +981,6 @@ defineIsland("island-treetable", () => import("./treetable-H2R43JFX.js"));
 defineIsland("tree-select", () => import("./tree-select-3WADBRSW.js"));
 defineIsland("datatable", () => import("./datatable-OERXWFWO.js"));
 defineIsland("datagrid", () => import("./datatable-OERXWFWO.js"));
-defineIsland("modal", () => import("./modal-NWH3XZXJ.js"));
 defineIsland("toast", () => import("./toast-RN33QYTD.js"));
 defineIsland("input-number", () => import("./input-number-KQ2J2WMH.js"));
 defineIsland("input-otp", () => import("./input-otp-RUPMATZ7.js"));
@@ -1020,7 +1018,6 @@ defineIsland("scrollarea", () => import("./scrollarea-P6ZIAY6W.js"));
 defineIsland("panel", () => import("./panel-6YY5LZTY.js"));
 defineIsland("fieldset", () => import("./fieldset-ROG5PKGM.js"));
 defineIsland("divider", () => import("./divider-VDZXMYK7.js"));
-defineIsland("card", () => import("./card-KVZGT5KH.js"));
 defineIsland("accordion", () => import("./accordion-BOH5KS7S.js"));
 defineIsland("tabs", () => import("./tabs-TMFGXLWQ.js"));
 defineIsland("toolbar", () => import("./toolbar-VX2UT74A.js"));
@@ -1036,8 +1033,7 @@ defineIsland("commandmenu", () => import("./command-NSIZVJSW.js"));
 defineIsland("command-menu", () => import("./command-NSIZVJSW.js"));
 defineIsland("command-palette", () => import("./command-NSIZVJSW.js"));
 defineIsland("commandpalette", () => import("./command-NSIZVJSW.js"));
-defineIsland("theme-studio", () => import("./theme-studio-3EYNUHMK.js"));
-defineIsland("dynamic-form", () => import("./dynamic-form-HHKJKPG7.js"));
+defineIsland("theme-studio", () => import("./theme-studio-QIBK5BD3.js"));
 defineIsland("splitter", () => import("./splitter-LDRSJA4P.js"));
 defineIsland("multiselect", () => import("./multiselect-3EIAIKUW.js"));
 defineIsland("cascadeselect", () => import("./cascadeselect-IUDOWSIX.js"));
@@ -1045,8 +1041,6 @@ defineIsland("listbox", () => import("./listbox-XPMKTRZC.js"));
 defineIsland("picklist", () => import("./picklist-BDC3JMBS.js"));
 defineIsland("orderlist", () => import("./orderlist-M32EVB6A.js"));
 defineIsland("orgchart", () => import("./orgchart-ZZ2CTL4E.js"));
-defineIsland("terminal", () => import("./terminal-5GNPD7X2.js"));
-defineIsland("dock", () => import("./dock-4NFTCE7J.js"));
 defineIsland("galleria", () => import("./galleria-M3PRIDVU.js"));
 defineIsland("blockui", () => import("./blockui-GN5ZCXLR.js"));
 defineIsland("split-button", () => import("./split-button-NMO6NCEV.js"));
@@ -1101,4 +1095,4 @@ export {
   enableViewTransitions,
   getSlot
 };
-//# sourceMappingURL=chunk-B537FQR6.js.map
+//# sourceMappingURL=chunk-AFRYMU35.js.map

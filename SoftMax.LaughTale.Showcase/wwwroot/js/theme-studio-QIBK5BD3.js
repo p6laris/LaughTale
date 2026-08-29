@@ -1,9 +1,7 @@
 import {
+  useClipboard,
   useScrollLock
-} from "./chunk-I7ZAYNYP.js";
-import {
-  useClipboard
-} from "./chunk-Y4YSQNFD.js";
+} from "./chunk-X4BCDK2N.js";
 import {
   useDisclosure
 } from "./chunk-KEONGXN5.js";
@@ -822,4 +820,4 @@ public static class AppTheme
 export {
   ThemeStudioIsland as default
 };
-//# sourceMappingURL=theme-studio-3EYNUHMK.js.map
+//# sourceMappingURL=theme-studio-QIBK5BD3.js.map

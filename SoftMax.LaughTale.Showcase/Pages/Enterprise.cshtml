@@ -21,22 +21,8 @@
 <!-- Main Component Section Container (Each Component Has Its Own Dedicated Tab View) -->
 <div class="enterprise-sections" style="width: 100%;">
 
-    <!-- Dynamic Form -->
-    <section id="sec-dynamic-form" class="component-card active-card" style="display: block;">
-        <div class="card-header">
-            <div>
-                <h2>Dynamic Form Generator</h2>
-                <p>Generated automatically from C# <code>OperatorRegistrationDto</code> with DataAnnotations reflection.</p>
-            </div>
-            <span class="aura-tag tag-emerald">Reflect</span>
-        </div>
-        <div class="card-body" style="max-width: 640px;">
-            <island-dynamic-form schema="@Model.RegistrationFormSchema" />
-        </div>
-    </section>
-
     <!-- InputText -->
-    <section id="sec-input-text" class="component-card">
+    <section id="sec-input-text" class="component-card active-card" style="display: block;">
         <div class="card-header">
             <div>
                 <h2>InputText</h2>
@@ -5454,20 +5440,6 @@
         </div>
     </section>
 
-    <!-- macOS Dock -->
-    <section id="sec-dock" class="component-card">
-        <div class="card-header">
-            <div>
-                <h2>macOS Dock</h2>
-                <p>Fisheye magnification dock navigation bar with smooth physics scaling.</p>
-            </div>
-            <span class="aura-tag tag-emerald">macOS</span>
-        </div>
-        <div class="card-body" style="display: flex; justify-content: center; padding: 2rem 0;">
-            <island-dock items="@Model.DockItems" position="Bottom" />
-        </div>
-    </section>
-
     <!-- Sidebar Compound Navigation System -->
     <section id="sec-sidebar" class="component-card">
         <div class="card-header">
@@ -6461,29 +6433,6 @@
         </div>
     </section>
 
-    <!-- Modal Dialog -->
-    <section id="sec-modal" class="component-card">
-        <div class="card-header">
-            <div>
-                <h2>Modal Dialog</h2>
-                <p>Accessible modal dialog window with backdrop blur and keyboard trap.</p>
-            </div>
-            <span class="aura-tag tag-slate">Modal</span>
-        </div>
-        <div class="card-body" style="max-width: 500px;">
-            <button type="button" class="p-button p-button-primary" onclick="document.dispatchEvent(new CustomEvent('modal:open', { detail: { id: 'demo-modal' } }))">
-                Open Modal Dialog
-            </button>
-            <island-modal id="demo-modal" title="Security Confirmation">
-                <p style="color: var(--p-text-color); margin-bottom: 1rem;">Confirm zero-trust node deployment to the production cluster?</p>
-                <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
-                    <button type="button" class="p-button p-button-secondary" onclick="document.dispatchEvent(new CustomEvent('modal:close', { detail: { id: 'demo-modal' } }))">Cancel</button>
-                    <button type="button" class="p-button p-button-primary" onclick="document.dispatchEvent(new CustomEvent('modal:close', { detail: { id: 'demo-modal' } }))">Confirm</button>
-                </div>
-            </island-modal>
-        </div>
-    </section>
-
     <!-- Drawer -->
     <section id="sec-drawer" class="component-card">
         <div class="card-header">
@@ -7440,7 +7389,7 @@
     <section id="sec-skeleton" class="component-card">
         <div class="card-header">
             <div>
-                <h2>Skeleton Placeholder</h2>
+                <h2>Skeleton</h2>
                 <p>Shimmer loading placeholders mimicking cards, text, and circular avatars.</p>
             </div>
             <span class="aura-tag tag-slate">Loading</span>
@@ -7511,25 +7460,11 @@
         </div>
     </section>
 
-    <!-- Terminal CLI -->
-    <section id="sec-terminal" class="component-card">
-        <div class="card-header">
-            <div>
-                <h2>Terminal CLI Island</h2>
-                <p>Interactive web CLI with command history, auto-scrolling, and custom response hooks.</p>
-            </div>
-            <span class="aura-tag tag-amber">CLI</span>
-        </div>
-        <div class="card-body">
-            <island-terminal welcome-message="SoftMax.LaughTale [Version 3.0.0] - Type 'help' or 'status'" prompt="operator@node-01:~$" />
-        </div>
-    </section>
-
     <!-- Galleria -->
     <section id="sec-galleria" class="component-card">
         <div class="card-header">
             <div>
-                <h2>Galleria Stage</h2>
+                <h2>Galleria</h2>
                 <p>Fullscreen responsive image gallery with thumbnail navigation strip.</p>
             </div>
             <span class="aura-tag tag-emerald">Media</span>
@@ -7738,20 +7673,6 @@
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Compare is not limited to images — any content can be placed inside the items for creative comparisons.</p>
                 <island-compare demo-type="template" />
             </div>
-        </div>
-    </section>
-
-    <!-- Camera -->
-    <section id="sec-camera" class="component-card">
-        <div class="card-header">
-            <div>
-                <h2>Camera Snapshot</h2>
-                <p>Webcam video stream grabber for taking profile snapshots directly in browser.</p>
-            </div>
-            <span class="aura-tag tag-slate">Camera</span>
-        </div>
-        <div class="card-body" style="max-width: 450px;">
-            <island-camera />
         </div>
     </section>
 
