@@ -29,12 +29,46 @@
         <!-- Right Main Viewport Area -->
         <div class="app-viewport" style="flex: 1; min-width: 0; display: flex; flex-direction: column; min-height: 100vh;">
             
-            <!-- Top App Header Bar -->
-            <header class="app-header" style="position: sticky; top: 0; z-index: 30; height: 60px; background: var(--p-surface-0); border-bottom: 1px solid var(--p-border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 1.75rem; box-sizing: border-box;">
-                <div style="display: flex; align-items: center; gap: 1rem;">
-                    <span style="font-weight: 700; font-size: 0.9375rem; color: var(--p-text-color);">
-                        @ViewData["Title"]
-                    </span>
+            <!-- Top App Header Bar with Demo-style Sidebar Trigger and Aura Breadcrumb -->
+            <header class="app-header" style="position: sticky; top: 0; z-index: 30; height: 60px; background: var(--p-surface-0); border-bottom: 1px solid var(--p-border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem; box-sizing: border-box;">
+                <div style="display: flex; align-items: center; gap: 0.85rem;">
+                    <!-- Demo-matching Sidebar Trigger Button -->
+                    <button type="button" 
+                            class="p-sidebar-trigger" 
+                            onclick="document.dispatchEvent(new CustomEvent('app-sidebar:toggle'))" 
+                            title="Toggle Sidebar Navigation" 
+                            aria-label="Toggle navigation"
+                            style="display: inline-flex; align-items: center; justify-content: center; width: 2.1rem; height: 2.1rem; border-radius: 6px; border: 1px solid var(--p-border-color); background: transparent; color: var(--p-text-muted); cursor: pointer; transition: background 0.15s ease, color 0.15s ease;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg>
+                    </button>
+
+                    <!-- PrimeVue 4 Aura Breadcrumb Navigation -->
+                    <nav class="p-breadcrumb p-breadcrumb-transparent" aria-label="Breadcrumb" style="background: transparent; border: none; padding: 0;">
+                        <ol class="p-breadcrumb-list" style="display: flex; align-items: center; gap: 0.35rem; margin: 0; padding: 0; list-style: none;">
+                            <li class="p-breadcrumb-item">
+                                <a href="/" class="p-breadcrumb-item-link" title="Showcase Home" style="display: inline-flex; align-items: center; gap: 0.35rem; color: var(--p-text-muted); text-decoration: none; font-size: 0.8125rem; font-weight: 500;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                                    <span>Home</span>
+                                </a>
+                            </li>
+                            <li class="p-breadcrumb-separator" style="color: var(--p-surface-400); display: inline-flex; align-items: center;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                            </li>
+                            <li class="p-breadcrumb-item">
+                                <a href="/enterprise" class="p-breadcrumb-item-link" style="color: var(--p-text-muted); text-decoration: none; font-size: 0.8125rem; font-weight: 500;">
+                                    <span>Enterprise</span>
+                                </a>
+                            </li>
+                            <li class="p-breadcrumb-separator" style="color: var(--p-surface-400); display: inline-flex; align-items: center;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                            </li>
+                            <li class="p-breadcrumb-item">
+                                <span class="p-breadcrumb-item-link p-breadcrumb-item-current" style="color: var(--p-text-color); font-weight: 600; font-size: 0.8125rem;" aria-current="page">
+                                    @ViewData["Title"]
+                                </span>
+                            </li>
+                        </ol>
+                    </nav>
                 </div>
 
                 <div style="display: flex; align-items: center; gap: 0.75rem;">
@@ -77,5 +111,3 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
-
-

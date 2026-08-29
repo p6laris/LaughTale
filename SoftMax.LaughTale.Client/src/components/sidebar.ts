@@ -326,6 +326,13 @@ const SIDEBAR_CSS = `
 }
 
 /* Collapsed App Shell mode */
+.p-sidebar-app-shell.p-collapsed .p-sidebar-header-dock {
+    justify-content: center !important;
+    padding: 0.85rem 0 !important;
+}
+.p-sidebar-app-shell.p-collapsed .p-sidebar-brand {
+    justify-content: center !important;
+}
 .p-sidebar-app-shell.p-collapsed .p-sidebar-brand-text,
 .p-sidebar-app-shell.p-collapsed .p-sidebar-search-dock,
 .p-sidebar-app-shell.p-collapsed .p-sidebar-item-label,
@@ -1152,9 +1159,6 @@ function renderAppNavigationSidebar(container: HTMLElement, props: SidebarProps)
                         </div>
                         <span class="p-sidebar-brand-text">${title}</span>
                     </a>
-                    <button type="button" class="p-sidebar-trigger" data-app-sidebar-toggle title="Toggle Sidebar (${collapsed ? 'Expand' : 'Collapse'})">
-                        ${triggerIconSvg}
-                    </button>
                 </div>
 
                 <!-- Search Input -->
@@ -1187,11 +1191,16 @@ function renderAppNavigationSidebar(container: HTMLElement, props: SidebarProps)
     }
 
     function bindEvents() {
-        container.querySelector('[data-app-sidebar-toggle]')?.addEventListener('click', (e) => {
-            e.stopPropagation();
-            collapsed = !collapsed;
-            render();
-        });
+        if (!(window as any).__appSidebarListenerAttached) {
+            (window as any).__appSidebarListenerAttached = true;
+            document.addEventListener('app-sidebar:toggle', () => {
+                const el = document.querySelector('.p-sidebar-app-shell');
+                if (el) {
+                    collapsed = !collapsed;
+                    render();
+                }
+            });
+        }
 
         const searchInput = container.querySelector<HTMLInputElement>('.p-sidebar-search-input');
         if (searchInput) {

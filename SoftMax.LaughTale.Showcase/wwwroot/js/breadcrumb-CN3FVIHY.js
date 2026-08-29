@@ -7,6 +7,11 @@ import {
 
 // ../SoftMax.LaughTale.Client/src/components/breadcrumb.ts
 var BREADCRUMB_CSS = `
+.p-breadcrumb-transparent {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+}
 .p-breadcrumb {
     background: var(--p-surface-0, #ffffff);
     border: 1px solid var(--p-border-color, #e2e8f0);
@@ -113,7 +118,12 @@ var BREADCRUMB_CSS = `
 
 /* Dark Mode Tokens */
 .dark .p-breadcrumb,
-[data-theme="dark"] .p-breadcrumb {
+[data-theme="dark"] .p-breadcrumb-transparent {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+}
+.p-breadcrumb {
     background: var(--p-surface-900, #0f172a);
     border-color: var(--p-surface-700, #334155);
 }
@@ -235,4 +245,4 @@ function BreadcrumbIsland(container, props) {
 export {
   BreadcrumbIsland as default
 };
-//# sourceMappingURL=breadcrumb-HOFDNZUE.js.map
+//# sourceMappingURL=breadcrumb-CN3FVIHY.js.map

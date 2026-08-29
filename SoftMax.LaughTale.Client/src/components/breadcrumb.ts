@@ -8,6 +8,11 @@ import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
 
 const BREADCRUMB_CSS = `
+.p-breadcrumb-transparent {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+}
 .p-breadcrumb {
     background: var(--p-surface-0, #ffffff);
     border: 1px solid var(--p-border-color, #e2e8f0);
@@ -114,7 +119,12 @@ const BREADCRUMB_CSS = `
 
 /* Dark Mode Tokens */
 .dark .p-breadcrumb,
-[data-theme="dark"] .p-breadcrumb {
+[data-theme="dark"] .p-breadcrumb-transparent {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+}
+.p-breadcrumb {
     background: var(--p-surface-900, #0f172a);
     border-color: var(--p-surface-700, #334155);
 }

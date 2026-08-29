@@ -20093,6 +20093,11 @@ var init_breadcrumb = __esm({
     init_lucide();
     init_styles();
     BREADCRUMB_CSS = `
+.p-breadcrumb-transparent {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+}
 .p-breadcrumb {
     background: var(--p-surface-0, #ffffff);
     border: 1px solid var(--p-border-color, #e2e8f0);
@@ -20199,7 +20204,12 @@ var init_breadcrumb = __esm({
 
 /* Dark Mode Tokens */
 .dark .p-breadcrumb,
-[data-theme="dark"] .p-breadcrumb {
+[data-theme="dark"] .p-breadcrumb-transparent {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+}
+.p-breadcrumb {
     background: var(--p-surface-900, #0f172a);
     border-color: var(--p-surface-700, #334155);
 }
@@ -33185,9 +33195,6 @@ function renderAppNavigationSidebar(container, props) {
                         </div>
                         <span class="p-sidebar-brand-text">${title}</span>
                     </a>
-                    <button type="button" class="p-sidebar-trigger" data-app-sidebar-toggle title="Toggle Sidebar (${collapsed ? "Expand" : "Collapse"})">
-                        ${triggerIconSvg}
-                    </button>
                 </div>
 
                 <!-- Search Input -->
@@ -33218,11 +33225,16 @@ function renderAppNavigationSidebar(container, props) {
     bindEvents();
   }
   function bindEvents() {
-    container.querySelector("[data-app-sidebar-toggle]")?.addEventListener("click", (e) => {
-      e.stopPropagation();
-      collapsed = !collapsed;
-      render();
-    });
+    if (!window.__appSidebarListenerAttached) {
+      window.__appSidebarListenerAttached = true;
+      document.addEventListener("app-sidebar:toggle", () => {
+        const el = document.querySelector(".p-sidebar-app-shell");
+        if (el) {
+          collapsed = !collapsed;
+          render();
+        }
+      });
+    }
     const searchInput = container.querySelector(".p-sidebar-search-input");
     if (searchInput) {
       searchInput.addEventListener("input", (e) => {
@@ -34280,6 +34292,13 @@ var init_sidebar = __esm({
 }
 
 /* Collapsed App Shell mode */
+.p-sidebar-app-shell.p-collapsed .p-sidebar-header-dock {
+    justify-content: center !important;
+    padding: 0.85rem 0 !important;
+}
+.p-sidebar-app-shell.p-collapsed .p-sidebar-brand {
+    justify-content: center !important;
+}
 .p-sidebar-app-shell.p-collapsed .p-sidebar-brand-text,
 .p-sidebar-app-shell.p-collapsed .p-sidebar-search-dock,
 .p-sidebar-app-shell.p-collapsed .p-sidebar-item-label,
