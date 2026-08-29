@@ -33268,7 +33268,7 @@ function renderCompoundSidebar(container, props) {
   let openOnHover = props.openOnHover || props.OpenOnHover || false;
   let backdrop = props.backdrop || props.Backdrop || false;
   let isOpen = props.open !== void 0 ? props.open : props.Open !== void 0 ? props.Open : true;
-  let width = props.width || props.Width || "16rem";
+  let width = props.width || props.Width || (demoType === "chat" ? "16.5rem" : "16rem");
   let isAiOpen = true;
   let openSelectDropdown = null;
   let activeCompany = { name: "Acme Inc", logo: "A", color: "linear-gradient(135deg, #8b5cf6, #4f46e5)" };
@@ -33336,7 +33336,10 @@ function renderCompoundSidebar(container, props) {
         }
         const isSubExpanded = !!expandedSubmenus[subKey];
         const hasSubs = Array.isArray(it.subItems) && it.subItems.length > 0;
-        const iconSvg = getIconSvg(it.icon);
+        let iconSvg = getIconSvg(it.icon);
+        if (demoType === "chat" && !iconSvg) {
+          iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>`;
+        }
         let subTreeHtml = "";
         if (hasSubs) {
           const subListHtml = it.subItems.map((sub) => `
@@ -33354,7 +33357,7 @@ function renderCompoundSidebar(container, props) {
         }
         const chevronSvg = `<svg class="p-sidebar-submenu-chevron ${isSubExpanded ? "p-expanded" : ""}" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
         const ellipsisSvg = `<svg class="p-sidebar-menu-action" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>`;
-        const trashSvg = `<button type="button" class="p-sidebar-menu-action" title="Delete conversation" style="border:none;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>`;
+        const trashSvg = `<button type="button" class="p-sidebar-menu-action" title="Delete chat" style="border:none;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>`;
         const actionButton = demoType === "chat" ? trashSvg : it.badge === void 0 ? ellipsisSvg : "";
         return `
                     <li class="p-sidebar-menu-item" data-subkey="${subKey}">
@@ -33462,18 +33465,21 @@ function renderCompoundSidebar(container, props) {
   }
   function renderHeaderContent() {
     if (demoType === "chat") {
+      const chatGptSparkleIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>`;
+      const newChatPenIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.375 2.625a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4Z"/></svg>`;
       return `
                 <ul class="p-sidebar-menu">
                     <li class="p-sidebar-menu-item">
                         <button type="button" class="p-sidebar-menu-button" style="padding: 0.35rem 0.5rem;">
-                            <div style="display:flex; width:1.5rem; height:1.5rem; border-radius:9999px; background: var(--p-surface-900); color:var(--p-surface-0); align-items:center; justify-content:center; flex-shrink:0;">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                            <div style="display:flex; width:1.6rem; height:1.6rem; border-radius:9999px; background: #10a37f; color:#ffffff; align-items:center; justify-content:center; flex-shrink:0;">
+                                ${chatGptSparkleIcon}
                             </div>
-                            <span class="p-sidebar-item-label p-sidebar-header-label" style="font-weight: 700; font-size: 0.875rem;">ChatGPT</span>
+                            <span class="p-sidebar-item-label p-sidebar-header-label" style="font-weight: 700; font-size: 0.9rem;">ChatGPT</span>
+                            <svg class="p-sidebar-submenu-chevron" style="margin-left: auto;" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                         </button>
                     </li>
                 </ul>
-                <ul class="p-sidebar-menu" style="margin-top: 0.35rem;">
+                <ul class="p-sidebar-menu" style="margin-top: 0.45rem; border-bottom: 1px solid var(--p-border-color); padding-bottom: 0.45rem;">
                     <li class="p-sidebar-menu-item">
                         <button type="button" class="p-sidebar-menu-button">
                             <span class="p-sidebar-menu-button-icon">${LucideIcons.search}</span>
@@ -33482,7 +33488,7 @@ function renderCompoundSidebar(container, props) {
                     </li>
                     <li class="p-sidebar-menu-item">
                         <button type="button" class="p-sidebar-menu-button">
-                            <span class="p-sidebar-menu-button-icon">${LucideIcons.plus}</span>
+                            <span class="p-sidebar-menu-button-icon">${newChatPenIcon}</span>
                             <span class="p-sidebar-item-label">New chat</span>
                         </button>
                     </li>
@@ -33606,6 +33612,62 @@ function renderCompoundSidebar(container, props) {
   function renderMainContent() {
     const triggerIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg>`;
     const chatIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>`;
+    if (demoType === "chat") {
+      const chatGptSparkle = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>`;
+      const arrowUpSend = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>`;
+      const paperclipIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>`;
+      const newChatPenIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.375 2.625a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4Z"/></svg>`;
+      return `
+                <div class="p-sidebar-main">
+                    <header class="p-sidebar-main-header" style="justify-content: space-between;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <button type="button" class="p-sidebar-trigger" data-sidebar-toggle aria-label="Toggle sidebar">
+                                ${triggerIconSvg}
+                            </button>
+                            <div style="display: flex; align-items: center; gap: 0.35rem; padding: 0.3rem 0.6rem; border-radius: 8px; background: var(--p-surface-100); font-weight: 600; font-size: 0.8125rem; color: var(--p-text-color); cursor: pointer;">
+                                <span>ChatGPT 4o</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                            </div>
+                        </div>
+                        <button type="button" class="p-sidebar-trigger" title="New chat">
+                            ${newChatPenIcon}
+                        </button>
+                    </header>
+
+                    <div class="p-sb-chat-conversation">
+                        <div class="p-sb-chat-history">
+                            <div class="p-sb-msg-user">
+                                How do I build a collapsible compound sidebar in Vue with smooth animations?
+                            </div>
+
+                            <div class="p-sb-msg-ai">
+                                <div class="p-sb-ai-avatar">${chatGptSparkle}</div>
+                                <div style="display: flex; flex-direction: column; gap: 0.5rem; flex: 1;">
+                                    <p style="margin: 0;">You can create a compound sidebar with PrimeVue's <code>Sidebar</code> component by pairing collapsible icon modes with CSS grid height transitions:</p>
+                                    <div class="p-sb-code-block">&lt;Sidebar :collapsible="'icon'" :variant="'sidebar'"&gt;
+  &lt;SidebarHeader&gt;...&lt;/SidebarHeader&gt;
+  &lt;SidebarContent&gt;...&lt;/SidebarContent&gt;
+&lt;/Sidebar&gt;</div>
+                                    <p style="margin: 0; color: var(--p-text-muted); font-size: 0.8125rem;">This keeps your application navigation compact without triggering cumulative layout shift.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-sb-chat-input-container">
+                            <div class="p-sb-chat-input-pill">
+                                <button type="button" style="background:transparent; border:none; color:var(--p-text-muted); cursor:pointer; display:flex; align-items:center;" title="Attach file">
+                                    ${paperclipIcon}
+                                </button>
+                                <input type="text" class="p-sb-chat-input-field" placeholder="Message ChatGPT..." />
+                                <button type="button" class="p-sb-chat-send-btn" title="Send prompt">
+                                    ${arrowUpSend}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+    }
     if (demoType === "nested") {
       return `
                 <div class="p-sidebar-main">
@@ -34707,7 +34769,7 @@ var init_sidebar = __esm({
 
 .p-sidebar-menu-action:hover {
     background: var(--p-surface-200, #e2e8f0);
-    color: var(--p-surface-700, #334155);
+    color: #ef4444;
     transform: translateY(-50%) scale(1.1);
 }
 
@@ -34838,6 +34900,116 @@ var init_sidebar = __esm({
 
 .p-sb-popup-item:hover {
     background: var(--p-surface-100, #f1f5f9);
+}
+
+/* Chat Application Styling */
+.p-sb-chat-conversation {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    background: var(--p-surface-0, #ffffff);
+}
+
+.p-sb-chat-history {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.p-sb-msg-user {
+    display: flex;
+    align-self: flex-end;
+    max-width: 80%;
+    background: var(--p-surface-100, #f1f5f9);
+    padding: 0.75rem 1rem;
+    border-radius: 16px 16px 4px 16px;
+    font-size: 0.875rem;
+    color: var(--p-text-color, #0f172a);
+    line-height: 1.45;
+}
+
+.p-sb-msg-ai {
+    display: flex;
+    gap: 0.85rem;
+    max-width: 90%;
+    font-size: 0.875rem;
+    color: var(--p-text-color, #0f172a);
+    line-height: 1.5;
+}
+
+.p-sb-ai-avatar {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 9999px;
+    background: #10a37f;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.p-sb-code-block {
+    background: var(--p-surface-900, #0f172a);
+    color: var(--p-surface-100, #f1f5f9);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.775rem;
+    line-height: 1.5;
+    margin-top: 0.5rem;
+    overflow-x: auto;
+}
+
+.p-sb-chat-input-container {
+    padding: 0.75rem 1.5rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    background: var(--p-surface-0, #ffffff);
+}
+
+.p-sb-chat-input-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    background: var(--p-surface-50, #f8fafc);
+    border: 1px solid var(--p-border-color, #cbd5e1);
+    border-radius: 9999px;
+    padding: 0.5rem 0.85rem 0.5rem 1rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.p-sb-chat-input-field {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 0.875rem;
+    color: var(--p-text-color, #0f172a);
+}
+
+.p-sb-chat-send-btn {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 9999px;
+    background: var(--p-surface-900, #0f172a);
+    color: var(--p-surface-0, #ffffff);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.12s ease, opacity 0.12s ease;
+}
+
+.p-sb-chat-send-btn:hover {
+    opacity: 0.9;
+    transform: scale(1.05);
 }
 
 /* Dual Sidebar Claude AI Chat Panel */
@@ -35060,6 +35232,34 @@ var init_sidebar = __esm({
 .dark .p-sb-popup-item:hover,
 [data-theme="dark"] .p-sb-popup-item:hover {
     background: var(--p-surface-800, #1e293b);
+}
+
+.dark .p-sb-chat-conversation,
+[data-theme="dark"] .p-sb-chat-conversation {
+    background: var(--p-surface-950, #020617);
+}
+
+.dark .p-sb-msg-user,
+[data-theme="dark"] .p-sb-msg-user {
+    background: var(--p-surface-800, #1e293b);
+    color: var(--p-surface-0, #f8fafc);
+}
+
+.dark .p-sb-chat-input-container,
+[data-theme="dark"] .p-sb-chat-input-container {
+    background: var(--p-surface-950, #020617);
+}
+
+.dark .p-sb-chat-input-pill,
+[data-theme="dark"] .p-sb-chat-input-pill {
+    background: var(--p-surface-900, #0f172a);
+    border-color: var(--p-surface-700, #334155);
+}
+
+.dark .p-sb-chat-send-btn,
+[data-theme="dark"] .p-sb-chat-send-btn {
+    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-surface-900, #0f172a);
 }
 
 .dark .p-sb-chat-bubble,
