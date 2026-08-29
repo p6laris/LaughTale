@@ -1,6 +1,6 @@
 import {
   initGlobalTooltipDelegation
-} from "./chunk-KFXEAQSZ.js";
+} from "./chunk-SNYGSZHS.js";
 import "./chunk-3TFPN5JM.js";
 
 // ../SoftMax.LaughTale.Client/src/components/tooltip-component.ts
@@ -24,4 +24,4 @@ function TooltipIsland(container, props) {
 export {
   TooltipIsland as default
 };
-//# sourceMappingURL=tooltip-component-MILCE64M.js.map
+//# sourceMappingURL=tooltip-component-HPZXU4E4.js.map

@@ -1000,16 +1000,30 @@ var SoftMaxIslands = (() => {
   });
 
   // src/directives/tooltip.ts
+  function findTooltipTarget(startEl) {
+    let curr = startEl;
+    while (curr && curr !== document.body && curr !== document.documentElement) {
+      for (const attr of Array.from(curr.attributes)) {
+        const name = attr.name.toLowerCase();
+        if (name === "p-tooltip" || name.startsWith("p-tooltip.") || name === "v-tooltip" || name.startsWith("v-tooltip.") || name === "data-tooltip" || name.startsWith("data-tooltip.") || name === "l-tooltip" || name.startsWith("l-tooltip.") || name === "data-tooltip-target") {
+          return curr;
+        }
+      }
+      curr = curr.parentElement;
+    }
+    return null;
+  }
   function parseTooltipConfig(element) {
     let rawValue = "";
     let position = "right";
     for (const attr of Array.from(element.attributes)) {
-      if (attr.name === "p-tooltip" || attr.name === "v-tooltip" || attr.name === "data-tooltip" || attr.name === "l-tooltip" || attr.name.startsWith("p-tooltip.") || attr.name.startsWith("v-tooltip.") || attr.name.startsWith("l-tooltip.")) {
+      const name = attr.name.toLowerCase();
+      if (name === "p-tooltip" || name === "v-tooltip" || name === "data-tooltip" || name === "l-tooltip" || name.startsWith("p-tooltip.") || name.startsWith("v-tooltip.") || name.startsWith("l-tooltip.") || name.startsWith("data-tooltip.")) {
         rawValue = attr.value;
-        if (attr.name.includes(".top")) position = "top";
-        else if (attr.name.includes(".bottom")) position = "bottom";
-        else if (attr.name.includes(".left")) position = "left";
-        else if (attr.name.includes(".right")) position = "right";
+        if (name.includes(".top")) position = "top";
+        else if (name.includes(".bottom")) position = "bottom";
+        else if (name.includes(".left")) position = "left";
+        else if (name.includes(".right")) position = "right";
         break;
       }
     }
@@ -1161,7 +1175,7 @@ var SoftMaxIslands = (() => {
     globalTooltipDelegationBound = true;
     injectIslandStyle("tooltip", TOOLTIP_CSS);
     document.addEventListener("mouseover", (e) => {
-      const target = e.target.closest("[p-tooltip], [v-tooltip], [data-tooltip], [l-tooltip], [data-tooltip-target]");
+      const target = findTooltipTarget(e.target);
       if (target) {
         const config = parseTooltipConfig(target);
         if (config && (config.event === "hover" || config.event === "both" || !config.event)) {
@@ -1170,14 +1184,14 @@ var SoftMaxIslands = (() => {
       }
     });
     document.addEventListener("mouseout", (e) => {
-      const target = e.target.closest("[p-tooltip], [v-tooltip], [data-tooltip], [l-tooltip], [data-tooltip-target]");
+      const target = findTooltipTarget(e.target);
       if (target && target === currentTargetEl) {
         const config = parseTooltipConfig(target);
         hideActiveTooltip(config?.hideDelay || 0);
       }
     });
     document.addEventListener("focusin", (e) => {
-      const target = e.target.closest("[p-tooltip], [v-tooltip], [data-tooltip], [l-tooltip], [data-tooltip-target]");
+      const target = findTooltipTarget(e.target);
       if (target) {
         const config = parseTooltipConfig(target);
         if (config && (config.event === "focus" || config.event === "both")) {
@@ -1186,7 +1200,7 @@ var SoftMaxIslands = (() => {
       }
     });
     document.addEventListener("focusout", (e) => {
-      const target = e.target.closest("[p-tooltip], [v-tooltip], [data-tooltip], [l-tooltip], [data-tooltip-target]");
+      const target = findTooltipTarget(e.target);
       if (target && target === currentTargetEl) {
         const config = parseTooltipConfig(target);
         hideActiveTooltip(config?.hideDelay || 0);
@@ -1220,9 +1234,9 @@ var SoftMaxIslands = (() => {
 }
 
 .p-tooltip.p-tooltip-active {
-    visibility: visible;
-    opacity: 1;
-    transform: scale(1);
+    visibility: visible !important;
+    opacity: 1 !important;
+    transform: scale(1) !important;
 }
 
 .p-tooltip.p-tooltip-interactive {
@@ -1230,16 +1244,18 @@ var SoftMaxIslands = (() => {
 }
 
 .p-tooltip-text {
-    background: var(--p-surface-700, #334155);
+    background: var(--p-surface-800, #1e293b);
     color: var(--p-surface-0, #ffffff);
     font-size: 0.75rem;
     font-weight: 500;
     line-height: 1.4;
-    padding: 0.375rem 0.75rem;
+    padding: 0.4rem 0.8rem;
     border-radius: var(--p-border-radius, 6px);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.25), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
     max-width: 18rem;
     word-break: break-word;
+    display: inline-flex;
+    align-items: center;
 }
 
 /* Arrow Notch */
@@ -1247,9 +1263,9 @@ var SoftMaxIslands = (() => {
     position: absolute;
     width: 8px;
     height: 8px;
-    background: var(--p-surface-700, #334155);
+    background: var(--p-surface-800, #1e293b);
     transform: rotate(45deg);
-    z-index: -1;
+    z-index: 1;
 }
 
 .p-tooltip-top .p-tooltip-arrow {
@@ -1272,7 +1288,7 @@ var SoftMaxIslands = (() => {
 /* Dark Mode Tokens */
 .dark .p-tooltip-text,
 [data-theme="dark"] .p-tooltip-text {
-    background: var(--p-surface-800, #1e293b);
+    background: var(--p-surface-900, #0f172a);
     color: var(--p-surface-0, #f8fafc);
     border: 1px solid var(--p-surface-700, #334155);
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
@@ -1280,7 +1296,7 @@ var SoftMaxIslands = (() => {
 
 .dark .p-tooltip-arrow,
 [data-theme="dark"] .p-tooltip-arrow {
-    background: var(--p-surface-800, #1e293b);
+    background: var(--p-surface-900, #0f172a);
     border-color: var(--p-surface-700, #334155);
 }
 `;
@@ -1289,6 +1305,9 @@ var SoftMaxIslands = (() => {
       showTimeoutId = null;
       hideTimeoutId = null;
       globalTooltipDelegationBound = false;
+      if (typeof document !== "undefined") {
+        initGlobalTooltipDelegation();
+      }
     }
   });
 

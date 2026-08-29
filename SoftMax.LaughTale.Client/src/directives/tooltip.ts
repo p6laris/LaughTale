@@ -2,7 +2,7 @@
  * SoftMax.LaughTale: Enterprise Tooltip Directive & Engine (PrimeVue 4 Aura Design System compliant)
  * High-performance floating advisory tooltip with 4-direction edge arrow notches (top, bottom, left, right),
  * custom show/hide delays, hover & focus trigger events, auto-hide toggle, rich HTML content support,
- * object configuration parsing, and zero-delay global event delegation.
+ * object configuration parsing, and robust attribute scanner traversing all parent nodes.
  */
 
 import { injectIslandStyle } from '../runtime/styles';
@@ -21,9 +21,9 @@ const TOOLTIP_CSS = `
 }
 
 .p-tooltip.p-tooltip-active {
-    visibility: visible;
-    opacity: 1;
-    transform: scale(1);
+    visibility: visible !important;
+    opacity: 1 !important;
+    transform: scale(1) !important;
 }
 
 .p-tooltip.p-tooltip-interactive {
@@ -31,16 +31,18 @@ const TOOLTIP_CSS = `
 }
 
 .p-tooltip-text {
-    background: var(--p-surface-700, #334155);
+    background: var(--p-surface-800, #1e293b);
     color: var(--p-surface-0, #ffffff);
     font-size: 0.75rem;
     font-weight: 500;
     line-height: 1.4;
-    padding: 0.375rem 0.75rem;
+    padding: 0.4rem 0.8rem;
     border-radius: var(--p-border-radius, 6px);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.25), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
     max-width: 18rem;
     word-break: break-word;
+    display: inline-flex;
+    align-items: center;
 }
 
 /* Arrow Notch */
@@ -48,9 +50,9 @@ const TOOLTIP_CSS = `
     position: absolute;
     width: 8px;
     height: 8px;
-    background: var(--p-surface-700, #334155);
+    background: var(--p-surface-800, #1e293b);
     transform: rotate(45deg);
-    z-index: -1;
+    z-index: 1;
 }
 
 .p-tooltip-top .p-tooltip-arrow {
@@ -73,7 +75,7 @@ const TOOLTIP_CSS = `
 /* Dark Mode Tokens */
 .dark .p-tooltip-text,
 [data-theme="dark"] .p-tooltip-text {
-    background: var(--p-surface-800, #1e293b);
+    background: var(--p-surface-900, #0f172a);
     color: var(--p-surface-0, #f8fafc);
     border: 1px solid var(--p-surface-700, #334155);
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
@@ -81,7 +83,7 @@ const TOOLTIP_CSS = `
 
 .dark .p-tooltip-arrow,
 [data-theme="dark"] .p-tooltip-arrow {
-    background: var(--p-surface-800, #1e293b);
+    background: var(--p-surface-900, #0f172a);
     border-color: var(--p-surface-700, #334155);
 }
 `;
@@ -103,26 +105,51 @@ let showTimeoutId: any = null;
 let hideTimeoutId: any = null;
 let globalTooltipDelegationBound = false;
 
+function findTooltipTarget(startEl: HTMLElement | null): HTMLElement | null {
+    let curr = startEl;
+    while (curr && curr !== document.body && curr !== document.documentElement) {
+        for (const attr of Array.from(curr.attributes)) {
+            const name = attr.name.toLowerCase();
+            if (
+                name === 'p-tooltip' || 
+                name.startsWith('p-tooltip.') || 
+                name === 'v-tooltip' || 
+                name.startsWith('v-tooltip.') || 
+                name === 'data-tooltip' || 
+                name.startsWith('data-tooltip.') || 
+                name === 'l-tooltip' || 
+                name.startsWith('l-tooltip.') ||
+                name === 'data-tooltip-target'
+            ) {
+                return curr;
+            }
+        }
+        curr = curr.parentElement;
+    }
+    return null;
+}
+
 function parseTooltipConfig(element: HTMLElement): TooltipConfig | null {
-    // Check attributes: p-tooltip, v-tooltip, data-tooltip, l-tooltip
     let rawValue = '';
-    let position: 'top' | 'bottom' | 'left' | 'right' = 'right'; // PrimeVue default position is right
+    let position: 'top' | 'bottom' | 'left' | 'right' = 'right'; // Default in PrimeVue is right
 
     for (const attr of Array.from(element.attributes)) {
+        const name = attr.name.toLowerCase();
         if (
-            attr.name === 'p-tooltip' || 
-            attr.name === 'v-tooltip' || 
-            attr.name === 'data-tooltip' || 
-            attr.name === 'l-tooltip' ||
-            attr.name.startsWith('p-tooltip.') || 
-            attr.name.startsWith('v-tooltip.') ||
-            attr.name.startsWith('l-tooltip.')
+            name === 'p-tooltip' || 
+            name === 'v-tooltip' || 
+            name === 'data-tooltip' || 
+            name === 'l-tooltip' ||
+            name.startsWith('p-tooltip.') || 
+            name.startsWith('v-tooltip.') ||
+            name.startsWith('l-tooltip.') ||
+            name.startsWith('data-tooltip.')
         ) {
             rawValue = attr.value;
-            if (attr.name.includes('.top')) position = 'top';
-            else if (attr.name.includes('.bottom')) position = 'bottom';
-            else if (attr.name.includes('.left')) position = 'left';
-            else if (attr.name.includes('.right')) position = 'right';
+            if (name.includes('.top')) position = 'top';
+            else if (name.includes('.bottom')) position = 'bottom';
+            else if (name.includes('.left')) position = 'left';
+            else if (name.includes('.right')) position = 'right';
             break;
         }
     }
@@ -154,7 +181,6 @@ function parseTooltipConfig(element: HTMLElement): TooltipConfig | null {
         } catch {}
     }
 
-    // Read companion attributes
     const posAttr = element.getAttribute('p-tooltip-position') || element.getAttribute('data-tooltip-position');
     if (posAttr) position = posAttr as any;
 
@@ -203,7 +229,6 @@ function positionTooltip(tooltipEl: HTMLElement, targetEl: HTMLElement, position
             break;
     }
 
-    // Viewport edge collision bounds
     if (left < 8) left = 8;
     if (left + tooltipRect.width > window.innerWidth - 8) {
         left = window.innerWidth - tooltipRect.width - 8;
@@ -306,9 +331,9 @@ export function initGlobalTooltipDelegation() {
 
     injectIslandStyle('tooltip', TOOLTIP_CSS);
 
-    // Mouseover / Mouseout
+    // Mouseover
     document.addEventListener('mouseover', (e) => {
-        const target = (e.target as HTMLElement).closest<HTMLElement>('[p-tooltip], [v-tooltip], [data-tooltip], [l-tooltip], [data-tooltip-target]');
+        const target = findTooltipTarget(e.target as HTMLElement);
         if (target) {
             const config = parseTooltipConfig(target);
             if (config && (config.event === 'hover' || config.event === 'both' || !config.event)) {
@@ -317,17 +342,18 @@ export function initGlobalTooltipDelegation() {
         }
     });
 
+    // Mouseout
     document.addEventListener('mouseout', (e) => {
-        const target = (e.target as HTMLElement).closest<HTMLElement>('[p-tooltip], [v-tooltip], [data-tooltip], [l-tooltip], [data-tooltip-target]');
+        const target = findTooltipTarget(e.target as HTMLElement);
         if (target && target === currentTargetEl) {
             const config = parseTooltipConfig(target);
             hideActiveTooltip(config?.hideDelay || 0);
         }
     });
 
-    // Focusin / Focusout
+    // Focusin
     document.addEventListener('focusin', (e) => {
-        const target = (e.target as HTMLElement).closest<HTMLElement>('[p-tooltip], [v-tooltip], [data-tooltip], [l-tooltip], [data-tooltip-target]');
+        const target = findTooltipTarget(e.target as HTMLElement);
         if (target) {
             const config = parseTooltipConfig(target);
             if (config && (config.event === 'focus' || config.event === 'both')) {
@@ -336,8 +362,9 @@ export function initGlobalTooltipDelegation() {
         }
     });
 
+    // Focusout
     document.addEventListener('focusout', (e) => {
-        const target = (e.target as HTMLElement).closest<HTMLElement>('[p-tooltip], [v-tooltip], [data-tooltip], [l-tooltip], [data-tooltip-target]');
+        const target = findTooltipTarget(e.target as HTMLElement);
         if (target && target === currentTargetEl) {
             const config = parseTooltipConfig(target);
             hideActiveTooltip(config?.hideDelay || 0);
@@ -350,6 +377,11 @@ export function initGlobalTooltipDelegation() {
             hideActiveTooltip(0);
         }
     });
+}
+
+// Auto-bind immediately upon file load
+if (typeof document !== 'undefined') {
+    initGlobalTooltipDelegation();
 }
 
 export function bindTooltipDirectives(element: HTMLElement): void {
