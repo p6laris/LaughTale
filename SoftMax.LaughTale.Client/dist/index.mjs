@@ -8477,102 +8477,358 @@ __export(toast_exports, {
   default: () => ToastIsland
 });
 function ToastIsland(container) {
-  injectIslandStyle("toast", CSS4);
-  const toastThemes = {
-    success: { bg: "#ecfdf5", border: "#a7f3d0", color: "#047857", icon: "\u2713" },
-    info: { bg: "#eff6ff", border: "#bfdbfe", color: "#1d4ed8", icon: "\u2139" },
-    warn: { bg: "#fffbeb", border: "#fde68a", color: "#b45309", icon: "\u26A0" },
-    error: { bg: "#fef2f2", border: "#fecaca", color: "#b91c1c", icon: "\u2715" }
-  };
-  container.style.position = "fixed";
-  container.style.top = "1.5rem";
-  container.style.right = "1.5rem";
-  container.style.zIndex = "9999";
-  container.style.display = "flex";
-  container.style.flexDirection = "column";
-  container.style.gap = "0.75rem";
-  container.style.pointerEvents = "none";
-  function addToast(msg) {
-    const severity = msg.severity || "success";
-    const theme = toastThemes[severity] || toastThemes.success;
-    const duration = msg.durationMs || 4e3;
-    const toastEl = document.createElement("div");
-    toastEl.className = "laughtale-toast";
-    toastEl.innerHTML = '<div class="toast-icon" style="background: ' + theme.bg + "; color: " + theme.color + ';">' + theme.icon + '</div><div style="flex: 1;"><div class="toast-title">' + msg.title + "</div>" + (msg.description ? '<div class="toast-desc">' + msg.description + "</div>" : "") + '</div><button type="button" class="toast-close">\u2715</button>';
-    toastEl.querySelector(".toast-close")?.addEventListener("click", () => {
-      toastEl.classList.add("leaving");
-      setTimeout(() => toastEl.remove(), 300);
-    });
-    container.appendChild(toastEl);
-    setTimeout(() => {
-      toastEl.classList.add("leaving");
-      setTimeout(() => toastEl.remove(), 300);
-    }, duration);
-  }
-  window.addEventListener("laughtale:toast", (e) => {
-    if (e.detail) addToast(e.detail);
-  });
+  injectIslandStyle("toast", TOAST_CSS);
 }
-var CSS4;
+var TOAST_CSS, INFO_SVG, SUCCESS_SVG, WARN_SVG, ERROR_SVG, CLOSE_SVG, ToastService, globalToastService;
 var init_toast = __esm({
   "src/components/toast.ts"() {
     "use strict";
     init_styles();
-    CSS4 = `
-@keyframes toast-slideIn {
-    from { opacity: 0; transform: translateX(100%); }
-    to { opacity: 1; transform: translateX(0); }
+    TOAST_CSS = `
+.p-toast {
+    position: fixed;
+    top: 1.25rem;
+    right: 1.25rem;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    pointer-events: none;
+    width: 25rem;
+    max-width: calc(100vw - 2.5rem);
+    box-sizing: border-box;
 }
-@keyframes toast-slideOut {
-    from { opacity: 1; transform: translateX(0); }
-    to { opacity: 0; transform: translateX(100%); }
+
+@keyframes p-toast-enter {
+    from {
+        opacity: 0;
+        transform: translateY(-16px) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
-.laughtale-toast {
+
+@keyframes p-toast-leave {
+    from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        max-height: 120px;
+        margin-bottom: 0.75rem;
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-12px) scale(0.96);
+        max-height: 0;
+        margin-bottom: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+}
+
+.p-toast-message {
     pointer-events: auto;
     display: flex;
+    flex-direction: column;
+    border-radius: var(--p-border-radius-lg, 10px);
+    padding: 1rem 1.25rem;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    animation: p-toast-enter 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    overflow: hidden;
+    box-sizing: border-box;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.p-toast-message.p-toast-message-leave {
+    animation: p-toast-leave 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.p-toast-message-content {
+    display: flex;
     align-items: flex-start;
-    gap: 0.75rem;
-    padding: 0.875rem 1.125rem;
-    border-radius: var(--p-border-radius-lg, 0.75rem);
-    background: var(--p-surface-0, #ffffff);
-    border: 1px solid var(--p-surface-200);
-    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
-    width: 340px;
-    animation: toast-slideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    gap: 0.875rem;
+    width: 100%;
 }
-.laughtale-toast.leaving {
-    animation: toast-slideOut 0.3s ease forwards;
-}
-.toast-icon {
+
+.p-toast-message-icon {
     width: 1.5rem;
     height: 1.5rem;
-    border-radius: 50%;
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: bold;
-    font-size: 0.75rem;
-    flex-shrink: 0;
+    margin-top: 0.125rem;
 }
-.toast-title { font-size: 0.875rem; font-weight: 600; color: var(--p-surface-900); }
-.toast-desc { font-size: 0.75rem; color: var(--p-surface-500); margin-top: 0.15rem; }
-.toast-close {
-    background: none;
+
+.p-toast-message-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex: 1 1 auto;
+}
+
+.p-toast-summary {
+    font-weight: 600;
+    font-size: 0.9375rem;
+    line-height: 1.25;
+}
+
+.p-toast-detail {
+    font-size: 0.875rem;
+    line-height: 1.4;
+    opacity: 0.95;
+}
+
+.p-toast-close-button {
+    background: transparent;
     border: none;
-    font-size: 1rem;
-    color: var(--p-surface-400);
     cursor: pointer;
-    padding: 0 0.25rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 9999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    flex-shrink: 0;
+    padding: 0;
+    transition: background-color 0.15s ease, opacity 0.15s ease;
 }
-.toast-close:hover { color: var(--p-surface-600); }
-[data-theme="dark"] .laughtale-toast {
-    background: var(--p-surface-800);
-    border-color: var(--p-surface-700);
+.p-toast-close-button:hover {
+    background: rgba(0, 0, 0, 0.06);
 }
-[data-theme="dark"] .toast-title { color: var(--p-surface-100); }
-[data-theme="dark"] .toast-desc { color: var(--p-surface-400); }
-[data-theme="dark"] .toast-close { color: var(--p-surface-400); }
+
+/* Severity Color Schemes - Info */
+.p-toast-message-info {
+    background: rgba(239, 246, 255, 0.96);
+    border: 1px solid #bfdbfe;
+    color: #1d4ed8;
+}
+.p-toast-message-info .p-toast-message-icon,
+.p-toast-message-info .p-toast-close-button {
+    color: #2563eb;
+}
+.p-toast-message-info .p-toast-summary {
+    color: #1d4ed8;
+}
+.p-toast-message-info .p-toast-detail {
+    color: #1e3a8a;
+}
+
+/* Severity Color Schemes - Success */
+.p-toast-message-success {
+    background: rgba(236, 253, 245, 0.96);
+    border: 1px solid #a7f3d0;
+    color: #047857;
+}
+.p-toast-message-success .p-toast-message-icon,
+.p-toast-message-success .p-toast-close-button {
+    color: #059669;
+}
+.p-toast-message-success .p-toast-summary {
+    color: #047857;
+}
+.p-toast-message-success .p-toast-detail {
+    color: #064e3b;
+}
+
+/* Severity Color Schemes - Warn */
+.p-toast-message-warn {
+    background: rgba(254, 252, 232, 0.96);
+    border: 1px solid #fef08a;
+    color: #a16207;
+}
+.p-toast-message-warn .p-toast-message-icon,
+.p-toast-message-warn .p-toast-close-button {
+    color: #d97706;
+}
+.p-toast-message-warn .p-toast-summary {
+    color: #a16207;
+}
+.p-toast-message-warn .p-toast-detail {
+    color: #713f12;
+}
+
+/* Severity Color Schemes - Error */
+.p-toast-message-error {
+    background: rgba(254, 242, 242, 0.96);
+    border: 1px solid #fecaca;
+    color: #b91c1c;
+}
+.p-toast-message-error .p-toast-message-icon,
+.p-toast-message-error .p-toast-close-button {
+    color: #dc2626;
+}
+.p-toast-message-error .p-toast-summary {
+    color: #b91c1c;
+}
+.p-toast-message-error .p-toast-detail {
+    color: #7f1d1d;
+}
+
+/* Dark Mode Tokens */
+.dark .p-toast-message-info,
+[data-theme="dark"] .p-toast-message-info {
+    background: rgba(23, 37, 84, 0.95);
+    border-color: #1e40af;
+    color: #93c5fd;
+}
+.dark .p-toast-message-info .p-toast-message-icon,
+.dark .p-toast-message-info .p-toast-close-button,
+[data-theme="dark"] .p-toast-message-info .p-toast-message-icon,
+[data-theme="dark"] .p-toast-message-info .p-toast-close-button {
+    color: #60a5fa;
+}
+.dark .p-toast-message-info .p-toast-summary,
+[data-theme="dark"] .p-toast-message-info .p-toast-summary {
+    color: #93c5fd;
+}
+.dark .p-toast-message-info .p-toast-detail,
+[data-theme="dark"] .p-toast-message-info .p-toast-detail {
+    color: #bfdbfe;
+}
+.dark .p-toast-close-button:hover,
+[data-theme="dark"] .p-toast-close-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.dark .p-toast-message-success,
+[data-theme="dark"] .p-toast-message-success {
+    background: rgba(6, 78, 59, 0.95);
+    border-color: #065f46;
+    color: #6ee7b7;
+}
+.dark .p-toast-message-success .p-toast-message-icon,
+.dark .p-toast-message-success .p-toast-close-button,
+[data-theme="dark"] .p-toast-message-success .p-toast-message-icon,
+[data-theme="dark"] .p-toast-message-success .p-toast-close-button {
+    color: #34d399;
+}
+.dark .p-toast-message-success .p-toast-summary,
+[data-theme="dark"] .p-toast-message-success .p-toast-summary {
+    color: #6ee7b7;
+}
+.dark .p-toast-message-success .p-toast-detail,
+[data-theme="dark"] .p-toast-message-success .p-toast-detail {
+    color: #a7f3d0;
+}
+
+.dark .p-toast-message-warn,
+[data-theme="dark"] .p-toast-message-warn {
+    background: rgba(69, 26, 3, 0.95);
+    border-color: #78350f;
+    color: #fde047;
+}
+.dark .p-toast-message-warn .p-toast-message-icon,
+.dark .p-toast-message-warn .p-toast-close-button,
+[data-theme="dark"] .p-toast-message-warn .p-toast-message-icon,
+[data-theme="dark"] .p-toast-message-warn .p-toast-close-button {
+    color: #facc15;
+}
+.dark .p-toast-message-warn .p-toast-summary,
+[data-theme="dark"] .p-toast-message-warn .p-toast-summary {
+    color: #fde047;
+}
+.dark .p-toast-message-warn .p-toast-detail,
+[data-theme="dark"] .p-toast-message-warn .p-toast-detail {
+    color: #fef08a;
+}
+
+.dark .p-toast-message-error,
+[data-theme="dark"] .p-toast-message-error {
+    background: rgba(69, 10, 10, 0.95);
+    border-color: #7f1d1d;
+    color: #fca5a5;
+}
+.dark .p-toast-message-error .p-toast-message-icon,
+.dark .p-toast-message-error .p-toast-close-button,
+[data-theme="dark"] .p-toast-message-error .p-toast-message-icon,
+[data-theme="dark"] .p-toast-message-error .p-toast-close-button {
+    color: #f87171;
+}
+.dark .p-toast-message-error .p-toast-summary,
+[data-theme="dark"] .p-toast-message-error .p-toast-summary {
+    color: #fca5a5;
+}
+.dark .p-toast-message-error .p-toast-detail,
+[data-theme="dark"] .p-toast-message-error .p-toast-detail {
+    color: #fecaca;
+}
 `;
+    INFO_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="16" y2="12"/><line x1="12" x2="12.01" y1="8" y2="8"/></svg>`;
+    SUCCESS_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
+    WARN_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>`;
+    ERROR_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" x2="9" y1="9" y2="15"/><line x1="9" x2="15" y1="9" y2="15"/></svg>`;
+    CLOSE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>`;
+    ToastService = class {
+      containerEl = null;
+      constructor() {
+        if (typeof document !== "undefined") {
+          this.ensureContainer();
+        }
+      }
+      ensureContainer() {
+        if (this.containerEl) return;
+        injectIslandStyle("toast", TOAST_CSS);
+        this.containerEl = document.getElementById("aura-toast-container");
+        if (!this.containerEl) {
+          this.containerEl = document.createElement("div");
+          this.containerEl.id = "aura-toast-container";
+          this.containerEl.className = "p-toast p-component";
+          document.body.appendChild(this.containerEl);
+        }
+      }
+      add(msg) {
+        this.ensureContainer();
+        if (!this.containerEl) return;
+        const severity = msg.severity || "info";
+        const life = msg.life || 3500;
+        let iconSvg = INFO_SVG;
+        if (severity === "success") iconSvg = SUCCESS_SVG;
+        else if (severity === "warn") iconSvg = WARN_SVG;
+        else if (severity === "error") iconSvg = ERROR_SVG;
+        const toastEl = document.createElement("div");
+        toastEl.className = `p-toast-message p-toast-message-${severity}`;
+        toastEl.setAttribute("role", "alert");
+        toastEl.setAttribute("aria-live", "assertive");
+        toastEl.setAttribute("aria-atomic", "true");
+        toastEl.innerHTML = `
+            <div class="p-toast-message-content">
+                <div class="p-toast-message-icon">
+                    ${iconSvg}
+                </div>
+                <div class="p-toast-message-text">
+                    <div class="p-toast-summary">${msg.summary}</div>
+                    ${msg.detail ? `<div class="p-toast-detail">${msg.detail}</div>` : ""}
+                </div>
+                <button type="button" class="p-toast-close-button" aria-label="Close notification">
+                    ${CLOSE_SVG}
+                </button>
+            </div>
+        `;
+        const closeBtn = toastEl.querySelector(".p-toast-close-button");
+        const removeToast = () => {
+          if (toastEl.classList.contains("p-toast-message-leave")) return;
+          toastEl.classList.add("p-toast-message-leave");
+          setTimeout(() => {
+            toastEl.remove();
+          }, 250);
+        };
+        closeBtn?.addEventListener("click", (e) => {
+          e.stopPropagation();
+          removeToast();
+        });
+        this.containerEl.appendChild(toastEl);
+        if (life > 0) {
+          setTimeout(removeToast, life);
+        }
+      }
+    };
+    globalToastService = new ToastService();
+    window.$toast = globalToastService;
   }
 });
 
@@ -8582,7 +8838,7 @@ __export(input_number_exports, {
   default: () => InputNumberIsland
 });
 function InputNumberIsland(container, props) {
-  injectIslandStyle("laughtale-inputnumber", CSS5);
+  injectIslandStyle("laughtale-inputnumber", CSS4);
   let rawValue = props.value !== void 0 && props.value !== null ? Number(props.value) : null;
   const step = props.step !== void 0 ? Number(props.step) : 1;
   const min = props.min !== void 0 ? Number(props.min) : void 0;
@@ -8853,12 +9109,12 @@ function InputNumberIsland(container, props) {
   render();
   syncTargetInput();
 }
-var CSS5;
+var CSS4;
 var init_input_number = __esm({
   "src/components/input-number.ts"() {
     "use strict";
     init_styles();
-    CSS5 = `
+    CSS4 = `
 .laughtale-inputnumber,
 .p-inputnumber {
     display: inline-flex;
@@ -9123,7 +9379,7 @@ __export(input_otp_exports, {
   default: () => InputOtpIsland
 });
 function InputOtpIsland(container, props) {
-  injectIslandStyle("laughtale-inputotp", CSS6);
+  injectIslandStyle("laughtale-inputotp", CSS5);
   const length = Number(props.length) || 4;
   const isMask = props.mask === true || String(props.mask) === "true";
   const isIntegerOnly = props.integerOnly !== false && String(props.integerOnly) !== "false";
@@ -9317,12 +9573,12 @@ function InputOtpIsland(container, props) {
     first?.focus();
   }
 }
-var CSS6;
+var CSS5;
 var init_input_otp = __esm({
   "src/components/input-otp.ts"() {
     "use strict";
     init_styles();
-    CSS6 = `
+    CSS5 = `
 .laughtale-input-otp,
 .p-inputotp {
     display: inline-flex;
@@ -9469,7 +9725,7 @@ __export(input_password_exports, {
   default: () => InputPasswordIsland
 });
 function InputPasswordIsland(container, props) {
-  injectIslandStyle("laughtale-password", CSS7);
+  injectIslandStyle("laughtale-password", CSS6);
   let isMasked = true;
   let currentVal = props.value || "";
   const minLength = Number(props.minLength) || 8;
@@ -9759,13 +10015,13 @@ function InputPasswordIsland(container, props) {
   updateVisuals();
   syncTargetInput();
 }
-var CSS7;
+var CSS6;
 var init_input_password = __esm({
   "src/components/input-password.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS7 = `
+    CSS6 = `
 .laughtale-password,
 .p-password {
     display: inline-flex;
@@ -10111,7 +10367,7 @@ __export(toggle_switch_exports, {
   default: () => ToggleSwitchIsland
 });
 function ToggleSwitchIsland(container, props) {
-  injectIslandStyle("laughtale-toggleswitch", CSS8);
+  injectIslandStyle("laughtale-toggleswitch", CSS7);
   let isChecked = props.checked === true || String(props.checked) === "true" || props.value === true || String(props.value) === "true";
   const isInvalid = props.invalid === true || String(props.invalid) === "true";
   const isDisabled = props.disabled === true || String(props.disabled) === "true";
@@ -10196,13 +10452,13 @@ function ToggleSwitchIsland(container, props) {
   }
   render();
 }
-var CSS8;
+var CSS7;
 var init_toggle_switch = __esm({
   "src/components/toggle-switch.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS8 = `
+    CSS7 = `
 /* ==================== AURA TOGGLESWITCH ==================== */
 .laughtale-toggleswitch,
 .p-toggleswitch {
@@ -10361,7 +10617,7 @@ __export(toggle_button_exports, {
   default: () => ToggleButtonIsland
 });
 function ToggleButtonIsland(container, props) {
-  injectIslandStyle("laughtale-togglebutton", CSS9);
+  injectIslandStyle("laughtale-togglebutton", CSS8);
   let isChecked = props.checked === true || String(props.checked) === "true" || props.value === true || String(props.value) === "true";
   const isFluid = props.fluid === true || String(props.fluid) === "true";
   const isInvalid = props.invalid === true || String(props.invalid) === "true";
@@ -10433,13 +10689,13 @@ function ToggleButtonIsland(container, props) {
   }
   render();
 }
-var CSS9;
+var CSS8;
 var init_toggle_button = __esm({
   "src/components/toggle-button.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS9 = `
+    CSS8 = `
 /* ==================== AURA TOGGLEBUTTON ==================== */
 .laughtale-togglebutton,
 .p-togglebutton {
@@ -10579,7 +10835,7 @@ __export(button_exports, {
   default: () => ButtonIsland
 });
 function ButtonIsland(container, props) {
-  injectIslandStyle("laughtale-button", CSS10);
+  injectIslandStyle("laughtale-button", CSS9);
   let isLoading = props.loading === true || String(props.loading) === "true";
   let isDisabled = props.disabled === true || String(props.disabled) === "true";
   const btnEl = container.tagName.toLowerCase() === "button" || container.tagName.toLowerCase() === "a" ? container : container.querySelector("button, a") || container;
@@ -10616,13 +10872,13 @@ function ButtonIsland(container, props) {
   });
   renderLoading();
 }
-var CSS10;
+var CSS9;
 var init_button = __esm({
   "src/components/button.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS10 = `
+    CSS9 = `
 /* CSS is provided globally in site.css / theme */
 `;
   }
@@ -10634,7 +10890,7 @@ __export(slider_exports, {
   default: () => SliderIsland
 });
 function SliderIsland(container, props) {
-  injectIslandStyle("laughtale-slider", CSS11);
+  injectIslandStyle("laughtale-slider", CSS10);
   const min = props.min !== void 0 ? Number(props.min) : 0;
   const max = props.max !== void 0 ? Number(props.max) : 100;
   const step = props.step !== void 0 ? Number(props.step) : 1;
@@ -10952,12 +11208,12 @@ function SliderIsland(container, props) {
   }
   render();
 }
-var CSS11;
+var CSS10;
 var init_slider = __esm({
   "src/components/slider.ts"() {
     "use strict";
     init_styles();
-    CSS11 = `
+    CSS10 = `
 /* ==================== AURA SLIDER ==================== */
 .laughtale-slider,
 .p-slider {
@@ -11107,7 +11363,7 @@ __export(rating_exports, {
   default: () => RatingIsland
 });
 function RatingIsland(container, props) {
-  injectIslandStyle("laughtale-rating", CSS12);
+  injectIslandStyle("laughtale-rating", CSS11);
   const totalStars = props.stars ? Number(props.stars) : 5;
   const isAllowHalf = props.allowHalf === true || String(props.allowHalf) === "true";
   const isCancelAllowed = props.cancel !== false && props.allowCancel !== false && String(props.cancel) !== "false" && String(props.allowCancel) !== "false";
@@ -11321,13 +11577,13 @@ function RatingIsland(container, props) {
   }
   init();
 }
-var CSS12, starFilledSvg, starEmptySvg, cancelSvg;
+var CSS11, starFilledSvg, starEmptySvg, cancelSvg;
 var init_rating = __esm({
   "src/components/rating.ts"() {
     "use strict";
     init_styles();
     init_useControllableState();
-    CSS12 = `
+    CSS11 = `
 .laughtale-rating,
 .p-rating {
     display: inline-flex;
@@ -11527,7 +11783,7 @@ __export(select_button_exports, {
   default: () => SelectButtonIsland
 });
 function SelectButtonIsland(container, props) {
-  injectIslandStyle("laughtale-selectbutton", CSS13);
+  injectIslandStyle("laughtale-selectbutton", CSS12);
   const isMultiple = props.multiple === true || String(props.multiple) === "true";
   const isUnselectable = props.unselectable !== false && String(props.unselectable) !== "false";
   const isFluid = props.fluid === true || String(props.fluid) === "true";
@@ -11647,13 +11903,13 @@ function SelectButtonIsland(container, props) {
   }
   render();
 }
-var CSS13;
+var CSS12;
 var init_select_button = __esm({
   "src/components/select-button.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS13 = `
+    CSS12 = `
 /* ==================== AURA SELECTBUTTON ==================== */
 .laughtale-selectbutton,
 .p-selectbutton {
@@ -11821,7 +12077,7 @@ __export(input_tags_exports, {
   default: () => InputTagsIsland
 });
 function InputTagsIsland(container, props) {
-  injectIslandStyle("laughtale-inputtags", CSS14);
+  injectIslandStyle("laughtale-inputtags", CSS13);
   let initialValues = [];
   const rawVal = props.values ?? props.value;
   if (Array.isArray(rawVal)) {
@@ -12187,13 +12443,13 @@ function InputTagsIsland(container, props) {
   }
   init();
 }
-var CSS14, xCircleIcon;
+var CSS13, xCircleIcon;
 var init_input_tags = __esm({
   "src/components/input-tags.ts"() {
     "use strict";
     init_styles();
     init_useControllableState();
-    CSS14 = `
+    CSS13 = `
 .laughtale-inputtags,
 .p-inputtags {
     display: inline-flex;
@@ -12444,7 +12700,7 @@ __export(datepicker_exports, {
   default: () => DatePickerIsland
 });
 function DatePickerIsland(container, props) {
-  injectIslandStyle("datepicker", CSS15);
+  injectIslandStyle("datepicker", CSS14);
   const selectionMode = props.selectionMode || "single";
   let currentView = props.view || "date";
   const isInline = props.inline === true;
@@ -12857,7 +13113,7 @@ function DatePickerIsland(container, props) {
   }
   renderComponent();
 }
-var CSS15, MONTH_NAMES, SHORT_MONTHS, WEEKDAYS;
+var CSS14, MONTH_NAMES, SHORT_MONTHS, WEEKDAYS;
 var init_datepicker = __esm({
   "src/components/datepicker.ts"() {
     "use strict";
@@ -12865,7 +13121,7 @@ var init_datepicker = __esm({
     init_styles();
     init_useDisclosure();
     init_useClickOutside();
-    CSS15 = `
+    CSS14 = `
 .laughtale-datepicker {
     position: relative;
     display: inline-flex;
@@ -13230,7 +13486,7 @@ __export(meter_group_exports, {
   default: () => MeterGroupIsland
 });
 function MeterGroupIsland(container, props) {
-  injectIslandStyle("meter-group", CSS16);
+  injectIslandStyle("meter-group", CSS15);
   const total = props.values.reduce((acc, curr) => acc + curr.value, 0);
   const barSegments = props.values.map((v) => {
     const pct = total > 0 ? v.value / total * 100 : 0;
@@ -13263,12 +13519,12 @@ function MeterGroupIsland(container, props) {
         </div>
     `;
 }
-var CSS16;
+var CSS15;
 var init_meter_group = __esm({
   "src/components/meter-group.ts"() {
     "use strict";
     init_styles();
-    CSS16 = `
+    CSS15 = `
 [data-theme="dark"] .laughtale-meter-group {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -13284,7 +13540,7 @@ __export(avatar_group_exports, {
   default: () => AvatarGroupIsland
 });
 function AvatarGroupIsland(container, props) {
-  injectIslandStyle("avatar-group", CSS17);
+  injectIslandStyle("avatar-group", CSS16);
   const max = props.max || 4;
   const visible = props.avatars.slice(0, max);
   const overflowCount = props.avatars.length - max;
@@ -13309,12 +13565,12 @@ function AvatarGroupIsland(container, props) {
         </div>
     `;
 }
-var CSS17;
+var CSS16;
 var init_avatar_group = __esm({
   "src/components/avatar-group.ts"() {
     "use strict";
     init_styles();
-    CSS17 = `
+    CSS16 = `
 [data-theme="dark"] .laughtale-avatar-group {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -13330,7 +13586,7 @@ __export(progress_bar_exports, {
   default: () => ProgressBarIsland
 });
 function ProgressBarIsland(container, props) {
-  injectIslandStyle("progress-bar", CSS18);
+  injectIslandStyle("progress-bar", CSS17);
   const isIndeterminate = props.mode === "indeterminate" || props.value === void 0;
   const value = Math.max(0, Math.min(100, props.value || 0));
   const height = props.height || "0.75rem";
@@ -13361,12 +13617,12 @@ function ProgressBarIsland(container, props) {
         `;
   }
 }
-var CSS18;
+var CSS17;
 var init_progress_bar = __esm({
   "src/components/progress-bar.ts"() {
     "use strict";
     init_styles();
-    CSS18 = `
+    CSS17 = `
 [data-theme="dark"] .laughtale-progress-bar {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -13382,7 +13638,7 @@ __export(skeleton_exports, {
   default: () => SkeletonIsland
 });
 function SkeletonIsland(container, props) {
-  injectIslandStyle("skeleton", CSS19);
+  injectIslandStyle("skeleton", CSS18);
   const shape = props.shape || "rectangle";
   const width = props.width || "100%";
   const height = props.height || "1.25rem";
@@ -13397,12 +13653,12 @@ function SkeletonIsland(container, props) {
         </style>
     `;
 }
-var CSS19;
+var CSS18;
 var init_skeleton = __esm({
   "src/components/skeleton.ts"() {
     "use strict";
     init_styles();
-    CSS19 = `
+    CSS18 = `
 [data-theme="dark"] .laughtale-skeleton {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -13418,7 +13674,7 @@ __export(drawer_exports, {
   default: () => DrawerIsland
 });
 function DrawerIsland(container, props) {
-  injectIslandStyle("drawer", CSS20);
+  injectIslandStyle("drawer", CSS19);
   const position = props.position || "right";
   const width = props.width || "380px";
   function render() {
@@ -13485,7 +13741,7 @@ function DrawerIsland(container, props) {
   }
   render();
 }
-var CSS20;
+var CSS19;
 var init_drawer = __esm({
   "src/components/drawer.ts"() {
     "use strict";
@@ -13493,7 +13749,7 @@ var init_drawer = __esm({
     init_styles();
     init_useDisclosure();
     init_useFocusTrap();
-    CSS20 = `
+    CSS19 = `
 [data-theme="dark"] .laughtale-drawer-wrapper {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -14260,7 +14516,7 @@ __export(image_compare_exports, {
   default: () => ImageCompareIsland
 });
 function ImageCompareIsland(container, props) {
-  injectIslandStyle("image-compare", CSS21);
+  injectIslandStyle("image-compare", CSS20);
   let splitPercent = 50;
   container.innerHTML = `
         <div class="laughtale-image-compare" style="position: relative; width: 100%; max-width: 600px; height: 340px; border-radius: var(--p-border-radius-lg); overflow: hidden; user-select: none; border: 1px solid var(--p-border-color); box-shadow: var(--p-shadow-md); touch-action: none; cursor: ew-resize;">
@@ -14336,12 +14592,12 @@ function ImageCompareIsland(container, props) {
   window.addEventListener("mousemove", onPointerMove);
   window.addEventListener("mouseup", onPointerUp);
 }
-var CSS21;
+var CSS20;
 var init_image_compare = __esm({
   "src/components/image-compare.ts"() {
     "use strict";
     init_styles();
-    CSS21 = `
+    CSS20 = `
 [data-theme="dark"] .laughtale-image-compare {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -14357,7 +14613,7 @@ __export(confirm_popup_exports, {
   default: () => ConfirmPopupIsland
 });
 function ConfirmPopupIsland(container, props) {
-  injectIslandStyle("confirm-popup", CSS22);
+  injectIslandStyle("confirm-popup", CSS21);
   let isOpen = false;
   function render() {
     container.innerHTML = `
@@ -14434,13 +14690,13 @@ function ConfirmPopupIsland(container, props) {
   }
   render();
 }
-var CSS22;
+var CSS21;
 var init_confirm_popup = __esm({
   "src/components/confirm-popup.ts"() {
     "use strict";
     init_lucide();
     init_styles();
-    CSS22 = `
+    CSS21 = `
 [data-theme="dark"] .laughtale-confirm-popup {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -14519,8 +14775,8 @@ function ConfirmDialogIsland(container, props) {
           acceptLabel: "Delete",
           rejectLabel: "Cancel",
           position,
-          accept: () => showToastFeedback("Record Deleted", "Record has been removed permanently.", "error"),
-          reject: () => showToastFeedback("Rejected", "You have cancelled record deletion.", "info")
+          accept: () => showToastFeedback("Confirmed", "Record deleted", "info"),
+          reject: () => showToastFeedback("Rejected", "You have rejected", "error")
         });
       } else if (action === "headless") {
         globalConfirm.require({
@@ -14549,14 +14805,14 @@ function ConfirmDialogIsland(container, props) {
           icon: icon || "info",
           acceptSeverity,
           position,
-          accept: () => showToastFeedback("Confirmed", "You have accepted.", "success"),
-          reject: () => showToastFeedback("Rejected", "You have rejected.", "info")
+          accept: () => showToastFeedback("Confirmed", "You have accepted", "info"),
+          reject: () => showToastFeedback("Rejected", "You have rejected", "error")
         });
       }
     });
   });
 }
-var CONFIRM_DIALOG_CSS, CLOSE_SVG, INFO_ICON_SVG, DANGER_ALERT_SVG, QUESTION_SVG, CHECK_SVG, CHECK_LARGE_SVG, LOCK_SVG, ConfirmDialogManager, globalConfirm;
+var CONFIRM_DIALOG_CSS, CLOSE_SVG2, INFO_ICON_SVG, DANGER_ALERT_SVG, QUESTION_SVG, CHECK_SVG, CHECK_LARGE_SVG, LOCK_SVG, ConfirmDialogManager, globalConfirm;
 var init_confirm_dialog = __esm({
   "src/components/confirm-dialog.ts"() {
     "use strict";
@@ -14787,7 +15043,7 @@ var init_confirm_dialog = __esm({
     color: #6ee7b7;
 }
 `;
-    CLOSE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>`;
+    CLOSE_SVG2 = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>`;
     INFO_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="16" y2="12"/><line x1="12" x2="12.01" y1="8" y2="8"/></svg>`;
     DANGER_ALERT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>`;
     QUESTION_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>`;
@@ -14898,7 +15154,7 @@ var init_confirm_dialog = __esm({
                     <div class="p-dialog-header">
                         <h3 class="p-dialog-title">${opt.header || "Confirmation"}</h3>
                         <button type="button" class="p-dialog-header-close" aria-label="Close dialog">
-                            ${CLOSE_SVG}
+                            ${CLOSE_SVG2}
                         </button>
                     </div>
                     <div class="p-dialog-content">
@@ -16987,7 +17243,7 @@ __export(autocomplete_exports, {
   default: () => AutoCompleteIsland
 });
 function AutoCompleteIsland(container, props) {
-  injectIslandStyle("autocomplete", CSS23);
+  injectIslandStyle("autocomplete", CSS22);
   const allItems = props.suggestions || props.items || [];
   const multiple = props.multiple === true;
   const showClear = props.showClear !== false;
@@ -17320,7 +17576,7 @@ function AutoCompleteIsland(container, props) {
   }
   renderChips();
 }
-var CSS23;
+var CSS22;
 var init_autocomplete = __esm({
   "src/components/autocomplete.ts"() {
     "use strict";
@@ -17329,7 +17585,7 @@ var init_autocomplete = __esm({
     init_useDisclosure();
     init_useClickOutside();
     init_useDebounce();
-    CSS23 = `
+    CSS22 = `
 .laughtale-autocomplete {
     position: relative;
     display: inline-flex;
@@ -17599,7 +17855,7 @@ __export(color_picker_exports, {
   default: () => ColorPickerIsland
 });
 function ColorPickerIsland(container, props) {
-  injectIslandStyle("color-picker", CSS24);
+  injectIslandStyle("color-picker", CSS23);
   let currentColor = props.value || "#10b981";
   let isOpen = false;
   const swatchesHtml = DEFAULT_PRESETS.map((c) => `
@@ -17723,7 +17979,7 @@ function ColorPickerIsland(container, props) {
   }
   syncValue();
 }
-var DEFAULT_PRESETS, CSS24;
+var DEFAULT_PRESETS, CSS23;
 var init_color_picker = __esm({
   "src/components/color-picker.ts"() {
     "use strict";
@@ -17745,7 +18001,7 @@ var init_color_picker = __esm({
       "#1e293b",
       "#000000"
     ];
-    CSS24 = `
+    CSS23 = `
 [data-theme="dark"] .color-swatch-btn {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -17781,7 +18037,7 @@ __export(knob_exports, {
   default: () => KnobIsland
 });
 function KnobIsland(container, props) {
-  injectIslandStyle("knob", CSS25);
+  injectIslandStyle("knob", CSS24);
   const min = props.min !== void 0 ? props.min : 0;
   const max = props.max !== void 0 ? props.max : 100;
   const step = props.step || 1;
@@ -17883,12 +18139,12 @@ function KnobIsland(container, props) {
   }
   syncValue();
 }
-var CSS25;
+var CSS24;
 var init_knob = __esm({
   "src/components/knob.ts"() {
     "use strict";
     init_styles();
-    CSS25 = `
+    CSS24 = `
 [data-theme="dark"] .laughtale-knob {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -17914,7 +18170,7 @@ __export(tag_exports, {
   default: () => TagIsland
 });
 function TagIsland(container, props) {
-  injectIslandStyle("tag", CSS26);
+  injectIslandStyle("tag", CSS25);
   const severity = props.severity || "info";
   const isRounded = props.rounded || false;
   let bg = "var(--p-blue-50, #eff6ff)";
@@ -17948,12 +18204,12 @@ function TagIsland(container, props) {
         </span>
     `;
 }
-var CSS26;
+var CSS25;
 var init_tag = __esm({
   "src/components/tag.ts"() {
     "use strict";
     init_styles();
-    CSS26 = `
+    CSS25 = `
 [data-theme="dark"] .laughtale-tag {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -17969,7 +18225,7 @@ __export(breadcrumb_exports, {
   default: () => BreadcrumbIsland
 });
 function BreadcrumbIsland(container, props) {
-  injectIslandStyle("breadcrumb", CSS27);
+  injectIslandStyle("breadcrumb", CSS26);
   const items = props.items || [];
   const homeUrl = props.homeUrl || "/";
   const itemsHtml = items.map((item, idx) => {
@@ -18007,13 +18263,13 @@ function BreadcrumbIsland(container, props) {
         </nav>
     `;
 }
-var CSS27;
+var CSS26;
 var init_breadcrumb = __esm({
   "src/components/breadcrumb.ts"() {
     "use strict";
     init_lucide();
     init_styles();
-    CSS27 = `
+    CSS26 = `
 [data-theme="dark"] .laughtale-breadcrumb {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -18029,7 +18285,7 @@ __export(scroll_top_exports, {
   default: () => ScrollTopIsland
 });
 function ScrollTopIsland(container, props) {
-  injectIslandStyle("scroll-top", CSS28);
+  injectIslandStyle("scroll-top", CSS27);
   const threshold = props.threshold || 200;
   let isVisible = false;
   function render() {
@@ -18055,13 +18311,13 @@ function ScrollTopIsland(container, props) {
   window.addEventListener("scroll", checkScroll, { passive: true });
   render();
 }
-var CSS28;
+var CSS27;
 var init_scroll_top = __esm({
   "src/components/scroll-top.ts"() {
     "use strict";
     init_lucide();
     init_styles();
-    CSS28 = `
+    CSS27 = `
 [data-theme="dark"] .laughtale-scroll-top-btn {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -18077,7 +18333,7 @@ __export(inplace_exports, {
   default: () => InplaceIsland
 });
 function InplaceIsland(container, props) {
-  injectIslandStyle("inplace", CSS29);
+  injectIslandStyle("inplace", CSS28);
   let isEditing = false;
   let currentValue = props.value || "";
   function render() {
@@ -18157,13 +18413,13 @@ function InplaceIsland(container, props) {
   render();
   syncValue();
 }
-var CSS29;
+var CSS28;
 var init_inplace = __esm({
   "src/components/inplace.ts"() {
     "use strict";
     init_lucide();
     init_styles();
-    CSS29 = `
+    CSS28 = `
 [data-theme="dark"] .laughtale-inplace-display {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -18199,7 +18455,7 @@ __export(command_exports, {
   default: () => CommandPaletteIsland
 });
 function CommandPaletteIsland(container, props) {
-  injectIslandStyle("command", CSS30);
+  injectIslandStyle("command", CSS29);
   const placeholder = props.placeholder || "Type a command or search...";
   const items = props.items || [
     { id: "home", label: "Go to Overview", group: "Navigation", icon: "compass", url: "/", shortcut: "G H" },
@@ -18373,7 +18629,7 @@ function CommandPaletteIsland(container, props) {
   ]);
   document.addEventListener("command:open", () => open());
 }
-var CSS30;
+var CSS29;
 var init_command = __esm({
   "src/components/command.ts"() {
     "use strict";
@@ -18383,7 +18639,7 @@ var init_command = __esm({
     init_useFocusTrap();
     init_useHotkeys();
     init_useScrollLock();
-    CSS30 = `
+    CSS29 = `
 [data-theme="dark"] .laughtale-command-root {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -19247,7 +19503,7 @@ __export(dynamic_form_exports, {
   default: () => DynamicFormIsland
 });
 function DynamicFormIsland(container, props) {
-  injectIslandStyle("dynamic-form", CSS31);
+  injectIslandStyle("dynamic-form", CSS30);
   let schema = props.schema || null;
   if (!schema && props.schemaJson) {
     try {
@@ -19408,13 +19664,13 @@ function DynamicFormIsland(container, props) {
   }
   render();
 }
-var CSS31;
+var CSS30;
 var init_dynamic_form = __esm({
   "src/components/dynamic-form.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS31 = `
+    CSS30 = `
 [data-theme="dark"] .p-input {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -19800,7 +20056,7 @@ __export(multiselect_exports, {
   default: () => MultiSelectIsland
 });
 function MultiSelectIsland(container, props) {
-  injectIslandStyle("multiselect", CSS32);
+  injectIslandStyle("multiselect", CSS31);
   const options = props.options || [];
   let selected = new Set(props.selectedValues || []);
   let filterQuery = "";
@@ -19966,7 +20222,7 @@ function MultiSelectIsland(container, props) {
   renderDisplay();
   syncValue();
 }
-var CSS32;
+var CSS31;
 var init_multiselect = __esm({
   "src/components/multiselect.ts"() {
     "use strict";
@@ -19975,7 +20231,7 @@ var init_multiselect = __esm({
     init_useDisclosure();
     init_useClickOutside();
     init_useTransition();
-    CSS32 = `
+    CSS31 = `
 [data-theme="dark"] .laughtale-multiselect {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -20046,7 +20302,7 @@ __export(cascadeselect_exports, {
   default: () => CascadeSelectIsland
 });
 function CascadeSelectIsland(container, props) {
-  injectIslandStyle("cascadeselect", CSS33);
+  injectIslandStyle("cascadeselect", CSS32);
   const options = props.options || [];
   const size = props.size || "normal";
   const variant = props.variant || "outlined";
@@ -20259,7 +20515,7 @@ function CascadeSelectIsland(container, props) {
     }));
   }
 }
-var CSS33;
+var CSS32;
 var init_cascadeselect = __esm({
   "src/components/cascadeselect.ts"() {
     "use strict";
@@ -20267,7 +20523,7 @@ var init_cascadeselect = __esm({
     init_styles();
     init_useDisclosure();
     init_useClickOutside();
-    CSS33 = `
+    CSS32 = `
 .laughtale-cascadeselect {
     position: relative;
     display: inline-flex;
@@ -20472,7 +20728,7 @@ __export(listbox_exports, {
   default: () => ListboxIsland
 });
 function ListboxIsland(container, props) {
-  injectIslandStyle("laughtale-listbox", CSS34);
+  injectIslandStyle("laughtale-listbox", CSS33);
   const isMultiple = props.multiple === true || String(props.multiple) === "true";
   const isMetaKey = props.metaKeySelection !== false && String(props.metaKeySelection) !== "false";
   const isCheckbox = props.checkbox === true || String(props.checkbox) === "true";
@@ -20808,14 +21064,14 @@ function ListboxIsland(container, props) {
   }
   init();
 }
-var CSS34, checkSvg2, searchSvg2;
+var CSS33, checkSvg2, searchSvg2;
 var init_listbox = __esm({
   "src/components/listbox.ts"() {
     "use strict";
     init_lucide();
     init_styles();
     init_useDebounce();
-    CSS34 = `
+    CSS33 = `
 /* ==================== AURA LISTBOX ==================== */
 .laughtale-listbox,
 .p-listbox {
@@ -23287,7 +23543,7 @@ __export(terminal_exports, {
   default: () => TerminalIsland
 });
 function TerminalIsland(container, props) {
-  injectIslandStyle("terminal", CSS35);
+  injectIslandStyle("terminal", CSS34);
   const promptPrefix = props.prompt || "admin@softmax:~$";
   const welcome = props.welcomeMessage || 'Welcome to SoftMax.LaughTale CLI v3.0\nType "help" for available commands.';
   const commands = {
@@ -23386,13 +23642,13 @@ ${h.response}`).join("\n");
   }
   render();
 }
-var CSS35;
+var CSS34;
 var init_terminal = __esm({
   "src/components/terminal.ts"() {
     "use strict";
     init_styles();
     init_useClipboard();
-    CSS35 = `
+    CSS34 = `
 [data-theme="dark"] .laughtale-terminal {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -23423,7 +23679,7 @@ __export(dock_exports, {
   default: () => DockIsland
 });
 function DockIsland(container, props) {
-  injectIslandStyle("dock", CSS36);
+  injectIslandStyle("dock", CSS35);
   const items = props.items || [
     { label: "Overview", icon: "compass", url: "/" },
     { label: "Dashboard", icon: "bar-chart", url: "/dashboard" },
@@ -23465,13 +23721,13 @@ function DockIsland(container, props) {
     });
   });
 }
-var CSS36;
+var CSS35;
 var init_dock = __esm({
   "src/components/dock.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS36 = `
+    CSS35 = `
 [data-theme="dark"] .laughtale-dock {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -23492,7 +23748,7 @@ __export(galleria_exports, {
   default: () => GalleriaIsland
 });
 function GalleriaIsland(container, props) {
-  injectIslandStyle("galleria", CSS37);
+  injectIslandStyle("galleria", CSS36);
   const images = props.value && props.value.length > 0 ? props.value : [
     {
       itemImageSrc: "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800&auto=format&fit=crop&q=80",
@@ -23566,13 +23822,13 @@ function GalleriaIsland(container, props) {
   }
   render();
 }
-var CSS37;
+var CSS36;
 var init_galleria = __esm({
   "src/components/galleria.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS37 = `
+    CSS36 = `
 [data-theme="dark"] .laughtale-galleria {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -23603,7 +23859,7 @@ __export(blockui_exports, {
   default: () => BlockUIIsland
 });
 function BlockUIIsland(container, props) {
-  injectIslandStyle("blockui", CSS38);
+  injectIslandStyle("blockui", CSS37);
   let isBlocked = props.blocked ?? true;
   function render() {
     container.innerHTML = `
@@ -23626,12 +23882,12 @@ function BlockUIIsland(container, props) {
     render();
   });
 }
-var CSS38;
+var CSS37;
 var init_blockui = __esm({
   "src/components/blockui.ts"() {
     "use strict";
     init_styles();
-    CSS38 = `
+    CSS37 = `
 [data-theme="dark"] .laughtale-blockui-root {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -24363,7 +24619,7 @@ __export(select_exports, {
   default: () => SelectIsland
 });
 function SelectIsland(container, props) {
-  injectIslandStyle("laughtale-select", CSS39);
+  injectIslandStyle("laughtale-select", CSS38);
   const isMultiple = props.multiple === true || String(props.multiple) === "true";
   const isCheckmark = props.checkmark === true || String(props.checkmark) === "true";
   const isCheckbox = props.checkbox === true || String(props.checkbox) === "true";
@@ -24703,13 +24959,13 @@ function SelectIsland(container, props) {
   }
   render();
 }
-var CSS39;
+var CSS38;
 var init_select = __esm({
   "src/components/select.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS39 = `
+    CSS38 = `
 /* ==================== AURA SELECT ==================== */
 .laughtale-select,
 .p-select {
@@ -25136,7 +25392,7 @@ __export(checkbox_exports, {
   default: () => CheckboxIsland
 });
 function CheckboxIsland(container, props) {
-  injectIslandStyle("laughtale-checkbox", CSS40);
+  injectIslandStyle("laughtale-checkbox", CSS39);
   let isChecked = Boolean(props.checked);
   let isIndeterminate = Boolean(props.indeterminate);
   const size = props.size || "normal";
@@ -25208,13 +25464,13 @@ function CheckboxIsland(container, props) {
   }
   render();
 }
-var CSS40;
+var CSS39;
 var init_checkbox = __esm({
   "src/components/checkbox.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS40 = `
+    CSS39 = `
 .laughtale-checkbox-wrap {
     display: inline-flex;
     align-items: center;
@@ -25391,7 +25647,7 @@ __export(radio_button_exports, {
   default: () => RadioButtonIsland
 });
 function RadioButtonIsland(container, props) {
-  injectIslandStyle("laughtale-radio", CSS41);
+  injectIslandStyle("laughtale-radio", CSS40);
   const isCard = props.card === true || String(props.card) === "true";
   const isFilled = props.variant === "filled";
   const size = props.size || "normal";
@@ -25623,13 +25879,13 @@ function RadioButtonIsland(container, props) {
   }
   renderSingle();
 }
-var CSS41;
+var CSS40;
 var init_radio_button = __esm({
   "src/components/radio-button.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS41 = `
+    CSS40 = `
 /* ==================== AURA RADIOBUTTON ==================== */
 .laughtale-radio-root,
 .p-radiobutton-root {
@@ -25912,7 +26168,7 @@ __export(textarea_exports, {
   default: () => TextareaIsland
 });
 function TextareaIsland(container, props) {
-  injectIslandStyle("laughtale-textarea", CSS42);
+  injectIslandStyle("laughtale-textarea", CSS41);
   const isAutoResize = props.autoResize === true || String(props.autoResize) === "true";
   const isFluid = props.fluid === true || String(props.fluid) === "true";
   const isInvalid = props.invalid === true || String(props.invalid) === "true";
@@ -25988,12 +26244,12 @@ function TextareaIsland(container, props) {
     setTimeout(adjustHeight, 0);
   }
 }
-var CSS42;
+var CSS41;
 var init_textarea = __esm({
   "src/components/textarea.ts"() {
     "use strict";
     init_styles();
-    CSS42 = `
+    CSS41 = `
 /* ==================== AURA TEXTAREA ==================== */
 .p-textarea {
     font-family: var(--p-font-family, inherit);
@@ -26118,7 +26374,7 @@ __export(input_mask_exports, {
   default: () => InputMaskIsland
 });
 function InputMaskIsland(container, props) {
-  injectIslandStyle("laughtale-input-mask", CSS43);
+  injectIslandStyle("laughtale-input-mask", CSS42);
   const mask = props.mask || "(999) 999-9999";
   const slotChar = props.slotChar || "_";
   const autoClear = props.autoClear !== false && String(props.autoClear) !== "false";
@@ -26305,12 +26561,12 @@ function InputMaskIsland(container, props) {
   });
   syncValue();
 }
-var CSS43;
+var CSS42;
 var init_input_mask = __esm({
   "src/components/input-mask.ts"() {
     "use strict";
     init_styles();
-    CSS43 = `
+    CSS42 = `
 /* ==================== AURA INPUTMASK ==================== */
 .laughtale-input-mask,
 .p-inputmask {
@@ -26420,7 +26676,7 @@ __export(float_label_exports, {
   default: () => FloatLabelIsland
 });
 function FloatLabelIsland(container, props) {
-  injectIslandStyle("laughtale-float-label", CSS44);
+  injectIslandStyle("laughtale-float-label", CSS43);
   const variant = props.variant || "over";
   const initialHtml = container.innerHTML;
   const forAttr = props.for ? `for="${props.for}"` : "";
@@ -26498,12 +26754,12 @@ function FloatLabelIsland(container, props) {
   setTimeout(updateFloatingState, 50);
   setTimeout(updateFloatingState, 200);
 }
-var CSS44;
+var CSS43;
 var init_float_label = __esm({
   "src/components/float-label.ts"() {
     "use strict";
     init_styles();
-    CSS44 = `
+    CSS43 = `
 .laughtale-float-label {
     position: relative;
     display: inline-flex;
@@ -26630,7 +26886,7 @@ __export(ifta_label_exports, {
   default: () => IftaLabelIsland
 });
 function IftaLabelIsland(container, props) {
-  injectIslandStyle("laughtale-ifta-label", CSS45);
+  injectIslandStyle("laughtale-ifta-label", CSS44);
   const initialHtml = container.innerHTML;
   const forAttr = props.for ? `for="${props.for}"` : "";
   const existingLabel = container.querySelector("label");
@@ -26653,12 +26909,12 @@ function IftaLabelIsland(container, props) {
     }
   });
 }
-var CSS45;
+var CSS44;
 var init_ifta_label = __esm({
   "src/components/ifta-label.ts"() {
     "use strict";
     init_styles();
-    CSS45 = `
+    CSS44 = `
 .laughtale-ifta-label {
     position: relative;
     display: inline-flex;
@@ -26746,14 +27002,14 @@ __export(input_group_exports, {
   default: () => InputGroupIsland
 });
 function InputGroupIsland(container, props) {
-  injectIslandStyle("laughtale-inputgroup", CSS46);
+  injectIslandStyle("laughtale-inputgroup", CSS45);
   container.classList.add("laughtale-inputgroup", "p-inputgroup");
   if (props.size) {
     container.classList.add(`size-${props.size}`);
   }
 }
 function InputGroupAddonIsland(container, props) {
-  injectIslandStyle("laughtale-inputgroup", CSS46);
+  injectIslandStyle("laughtale-inputgroup", CSS45);
   container.classList.add("laughtale-inputgroup-addon", "p-inputgroup-addon");
   if (props.icon && !container.querySelector("svg")) {
     const svg = getLucideIcon(props.icon);
@@ -26765,13 +27021,13 @@ function InputGroupAddonIsland(container, props) {
     container.insertAdjacentHTML("beforeend", `<span>${props.text}</span>`);
   }
 }
-var CSS46;
+var CSS45;
 var init_input_group = __esm({
   "src/components/input-group.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS46 = `
+    CSS45 = `
 .laughtale-inputgroup,
 .p-inputgroup {
     display: flex;
@@ -27043,7 +27299,7 @@ __export(input_text_exports, {
   default: () => InputTextIsland
 });
 function InputTextIsland(container, props) {
-  injectIslandStyle("laughtale-inputtext", CSS47);
+  injectIslandStyle("laughtale-inputtext", CSS46);
   const [getValue, setValue] = useControllableState({
     defaultValue: props.value ?? "",
     onChange: (val) => {
@@ -27184,14 +27440,14 @@ function InputTextIsland(container, props) {
   }
   init();
 }
-var CSS47, xIcon;
+var CSS46, xIcon;
 var init_input_text = __esm({
   "src/components/input-text.ts"() {
     "use strict";
     init_styles();
     init_lucide();
     init_useControllableState();
-    CSS47 = `
+    CSS46 = `
 .laughtale-inputtext-wrap,
 .p-inputtext-wrap {
     position: relative;

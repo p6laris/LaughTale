@@ -418,8 +418,8 @@ function ConfirmDialogIsland(container, props) {
           acceptLabel: "Delete",
           rejectLabel: "Cancel",
           position,
-          accept: () => showToastFeedback("Record Deleted", "Record has been removed permanently.", "error"),
-          reject: () => showToastFeedback("Rejected", "You have cancelled record deletion.", "info")
+          accept: () => showToastFeedback("Confirmed", "Record deleted", "info"),
+          reject: () => showToastFeedback("Rejected", "You have rejected", "error")
         });
       } else if (action === "headless") {
         globalConfirm.require({
@@ -448,8 +448,8 @@ function ConfirmDialogIsland(container, props) {
           icon: icon || "info",
           acceptSeverity,
           position,
-          accept: () => showToastFeedback("Confirmed", "You have accepted.", "success"),
-          reject: () => showToastFeedback("Rejected", "You have rejected.", "info")
+          accept: () => showToastFeedback("Confirmed", "You have accepted", "info"),
+          reject: () => showToastFeedback("Rejected", "You have rejected", "error")
         });
       }
     });
@@ -459,4 +459,4 @@ export {
   ConfirmDialogIsland as default,
   showToastFeedback
 };
-//# sourceMappingURL=confirm-dialog-UVUKB7BO.js.map
+//# sourceMappingURL=confirm-dialog-4TP6SZFU.js.map
