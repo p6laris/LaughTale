@@ -54,6 +54,12 @@ public class IslandFileUploadTagHelper : TagHelper
     [HtmlAttributeName("preview-images")]
     public bool PreviewImages { get; set; } = false;
 
+    [HtmlAttributeName("empty-title")]
+    public string? EmptyTitle { get; set; }
+
+    [HtmlAttributeName("empty-subtitle")]
+    public string? EmptySubtitle { get; set; }
+
     [HtmlAttributeName("class")]
     public string? Class { get; set; }
 
@@ -87,7 +93,9 @@ public class IslandFileUploadTagHelper : TagHelper
             chooseLabel = ChooseLabel,
             uploadLabel = UploadLabel,
             cancelLabel = CancelLabel,
-            previewImages = PreviewImages
+            previewImages = PreviewImages,
+            emptyTitle = EmptyTitle,
+            emptySubtitle = EmptySubtitle
         };
 
         output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));

@@ -11,18 +11,13 @@ var FILEUPLOAD_CSS = `
     width: 100%;
 }
 
-/* Basic Mode Container */
-.p-fileupload-basic-wrapper {
+/* Basic Mode */
+.p-fileupload-basic {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.75rem;
-    padding: 0.5rem 0.75rem;
-    border: 1px solid var(--p-border-color, #e2e8f0);
-    border-radius: var(--p-border-radius, 8px);
-    background: var(--p-surface-0, #ffffff);
+    gap: 1rem;
     width: 100%;
-    max-width: 32rem;
     box-sizing: border-box;
 }
 
@@ -42,6 +37,19 @@ var FILEUPLOAD_CSS = `
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    padding: 0.55rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: var(--p-border-radius, 6px);
+    background: var(--p-surface-900, #0f172a);
+    border: 1px solid var(--p-surface-900, #0f172a);
+    color: #ffffff;
+    transition: background-color 0.15s ease;
+    gap: 0.45rem;
+}
+
+.p-fileupload-choose:hover {
+    background: var(--p-surface-800, #1e293b);
 }
 
 .p-fileupload-choose input[type="file"] {
@@ -73,6 +81,7 @@ var FILEUPLOAD_CSS = `
     background: var(--p-surface-0, #ffffff);
     overflow: hidden;
     width: 100%;
+    box-sizing: border-box;
 }
 
 .p-fileupload-header {
@@ -86,9 +95,12 @@ var FILEUPLOAD_CSS = `
 }
 
 .p-fileupload-content {
-    padding: 1.5rem;
-    min-height: 10rem;
+    padding: 1.25rem;
+    min-height: 11rem;
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
@@ -98,20 +110,23 @@ var FILEUPLOAD_CSS = `
     outline-offset: -4px;
 }
 
+/* Standalone & Advanced Empty Dropzone */
 .p-fileupload-empty {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
-    padding: 2.5rem 1.5rem;
+    gap: 0.6rem;
+    padding: 2.75rem 1.5rem;
     color: var(--p-surface-500, #64748b);
     text-align: center;
     border: 2px dashed var(--p-border-color, #e2e8f0);
     border-radius: var(--p-border-radius, 8px);
     background: var(--p-surface-50, #f8fafc);
     cursor: pointer;
-    transition: border-color 0.2s ease, background 0.2s ease;
+    transition: border-color 0.2s ease, background 0.2s ease, transform 0.15s ease;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .p-fileupload-empty:hover {
@@ -119,10 +134,36 @@ var FILEUPLOAD_CSS = `
     background: var(--p-surface-0, #ffffff);
 }
 
+.p-fileupload-empty-icon {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 9999px;
+    background: var(--p-surface-100, #f1f5f9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--p-surface-600, #475569);
+    margin-bottom: 0.25rem;
+}
+
+.p-fileupload-empty-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--p-text-color, #0f172a);
+}
+
+.p-fileupload-empty-subtitle {
+    font-size: 0.75rem;
+    color: var(--p-text-muted, #64748b);
+    font-weight: 500;
+}
+
+/* File List Queue */
 .p-fileupload-file-list {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
+    width: 100%;
 }
 
 .p-fileupload-file-item {
@@ -181,7 +222,7 @@ var FILEUPLOAD_CSS = `
     background: var(--p-surface-200, #e2e8f0);
     border-radius: 9999px;
     overflow: hidden;
-    margin-top: 0.75rem;
+    margin: 0.5rem 1rem;
     position: relative;
 }
 
@@ -195,9 +236,10 @@ var FILEUPLOAD_CSS = `
 /* Image Grid Preview */
 .p-fileupload-image-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
-    gap: 0.875rem;
-    padding: 0.5rem 0;
+    grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr));
+    gap: 1rem;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .p-fileupload-image-card {
@@ -207,6 +249,7 @@ var FILEUPLOAD_CSS = `
     overflow: hidden;
     border: 1px solid var(--p-border-color, #e2e8f0);
     background: var(--p-surface-100, #f1f5f9);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .p-fileupload-image-card img {
@@ -217,12 +260,12 @@ var FILEUPLOAD_CSS = `
 
 .p-fileupload-image-card .p-fileupload-image-remove {
     position: absolute;
-    top: 0.35rem;
-    right: 0.35rem;
-    width: 1.5rem;
-    height: 1.5rem;
+    top: 0.4rem;
+    right: 0.4rem;
+    width: 1.6rem;
+    height: 1.6rem;
     border-radius: 9999px;
-    background: rgba(15, 23, 42, 0.75);
+    background: rgba(15, 23, 42, 0.8);
     color: #ffffff;
     border: none;
     cursor: pointer;
@@ -238,12 +281,6 @@ var FILEUPLOAD_CSS = `
 }
 
 /* Dark Mode Tokens */
-.dark .p-fileupload-basic-wrapper,
-[data-theme="dark"] .p-fileupload-basic-wrapper {
-    background: var(--p-surface-900, #0f172a);
-    border-color: var(--p-surface-700, #334155);
-}
-
 .dark .p-fileupload-advanced,
 [data-theme="dark"] .p-fileupload-advanced {
     background: var(--p-surface-900, #0f172a);
@@ -261,6 +298,17 @@ var FILEUPLOAD_CSS = `
     background: var(--p-surface-800, #1e293b);
     border-color: var(--p-surface-700, #334155);
     color: var(--p-surface-400, #94a3b8);
+}
+
+.dark .p-fileupload-empty-icon,
+[data-theme="dark"] .p-fileupload-empty-icon {
+    background: var(--p-surface-700, #334155);
+    color: var(--p-surface-200, #e2e8f0);
+}
+
+.dark .p-fileupload-empty-title,
+[data-theme="dark"] .p-fileupload-empty-title {
+    color: var(--p-surface-0, #f8fafc);
 }
 
 .dark .p-fileupload-file-item,
@@ -290,6 +338,8 @@ function FileUploadIsland(container, props) {
   const uploadLabel = props.uploadLabel || "Upload";
   const cancelLabel = props.cancelLabel || "Cancel";
   const previewImages = props.previewImages || false;
+  const emptyTitle = props.emptyTitle || "Drag and drop files to here to upload.";
+  const emptySubtitle = props.emptySubtitle || "MAX. 1MB";
   let fileQueue = [];
   let isUploading = false;
   function formatFileSize(bytes) {
@@ -360,32 +410,98 @@ function FileUploadIsland(container, props) {
     render();
   }
   function render() {
+    if (mode === "dropzone-only") {
+      const hasFiles2 = fileQueue.length > 0;
+      container.innerHTML = `
+                <div class="p-fileupload p-fileupload-dropzone-only" style="width: 100%;">
+                    <input type="file" accept="${accept}" ${multiple ? "multiple" : ""} class="p-fileupload-input" style="display: none;" />
+                    ${!hasFiles2 ? `
+                        <div class="p-fileupload-empty" data-click-trigger>
+                            <div class="p-fileupload-empty-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/><polyline points="12 13 12 9 10 11"/><polyline points="12 9 14 11"/></svg>
+                            </div>
+                            <div class="p-fileupload-empty-title">${emptyTitle}</div>
+                            <div class="p-fileupload-empty-subtitle">${emptySubtitle}</div>
+                        </div>
+                    ` : `
+                        <div class="p-fileupload-file-list">
+                            ${fileQueue.map((f) => `
+                                <div class="p-fileupload-file-item">
+                                    <div class="p-fileupload-file-info">
+                                        ${f.previewUrl ? `
+                                            <img src="${f.previewUrl}" alt="${f.name}" class="p-fileupload-thumbnail" />
+                                        ` : `
+                                            <div class="p-fileupload-thumbnail">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--p-surface-500);"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                                            </div>
+                                        `}
+                                        <div class="p-fileupload-file-details">
+                                            <span class="p-fileupload-file-name">${f.name}</span>
+                                            <span class="p-fileupload-file-size">${formatFileSize(f.size)}</span>
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                        <span style="font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.55rem; border-radius: 9999px; ${f.status === "completed" ? "background: rgba(16, 185, 129, 0.12); color: #10b981;" : "background: var(--p-surface-100); color: var(--p-surface-700);"}">
+                                            ${f.status === "completed" ? "Uploaded" : f.status === "uploading" ? `${f.progress}%` : "Ready"}
+                                        </span>
+                                        <button type="button" class="p-button p-button-text p-button-danger p-button-sm" data-remove-id="${f.id}" style="border: none; background: transparent; color: #ef4444; cursor: pointer; padding: 0.35rem; display: flex; align-items: center; border-radius: 9999px;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            `).join("")}
+                            <div style="display: flex; justify-content: flex-end; margin-top: 0.5rem;">
+                                <button type="button" class="p-button p-button-primary p-fileupload-upload-btn" style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                                    Upload All
+                                </button>
+                            </div>
+                        </div>
+                    `}
+                </div>
+            `;
+      const input2 = container.querySelector(".p-fileupload-input");
+      const dropArea = container.querySelector(".p-fileupload-empty");
+      dropArea?.addEventListener("click", () => input2?.click());
+      input2?.addEventListener("change", (e) => {
+        const target = e.target;
+        if (target.files && target.files.length > 0) addFiles(target.files);
+      });
+      container.querySelectorAll("[data-remove-id]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-remove-id");
+          if (id) removeFile(id);
+        });
+      });
+      const uploadBtn2 = container.querySelector(".p-fileupload-upload-btn");
+      uploadBtn2?.addEventListener("click", () => startUpload());
+      return;
+    }
     if (mode === "basic") {
       const hasFile = fileQueue.length > 0;
       const fileName = hasFile ? fileQueue.length === 1 ? fileQueue[0].name : `${fileQueue.length} files selected` : "No file chosen";
       if (auto) {
         container.innerHTML = `
-                    <div class="p-fileupload-basic-wrapper" style="justify-content: center; width: auto; min-width: 14rem;">
-                        <span class="p-button p-button-primary p-fileupload-choose" style="padding: 0.55rem 1.35rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; display: inline-flex; align-items: center; gap: 0.45rem;">
+                    <div class="p-fileupload p-fileupload-basic" style="justify-content: center;">
+                        <span class="p-fileupload-choose">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
                             <span>${chooseLabel}</span>
                             <input type="file" accept="${accept}" ${multiple ? "multiple" : ""} class="p-fileupload-input" />
                         </span>
-                        ${hasFile ? `<span class="p-fileupload-filename" style="margin-left: 0.5rem;">${fileName}</span>` : ""}
+                        ${hasFile ? `<span class="p-fileupload-filename">${fileName}</span>` : ""}
                     </div>
                 `;
       } else {
         container.innerHTML = `
-                    <div class="p-fileupload-basic-wrapper">
+                    <div class="p-fileupload p-fileupload-basic">
                         <div class="p-fileupload-basic-left">
-                            <span class="p-button p-button-primary p-fileupload-choose" style="padding: 0.5rem 1.15rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; display: inline-flex; align-items: center; gap: 0.45rem;">
+                            <span class="p-fileupload-choose">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
                                 <span>${chooseLabel}</span>
                                 <input type="file" accept="${accept}" ${multiple ? "multiple" : ""} class="p-fileupload-input" />
                             </span>
                             <span class="p-fileupload-filename">${fileName}</span>
                         </div>
-                        <button type="button" class="p-button p-button-outlined p-button-secondary p-fileupload-upload-btn" ${!hasFile || isUploading ? 'disabled style="opacity:0.5; pointer-events:none; cursor:not-allowed;"' : ""} style="padding: 0.5rem 1.15rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer;">
+                        <button type="button" class="p-button p-button-outlined p-button-secondary p-fileupload-upload-btn" ${!hasFile || isUploading ? 'disabled style="opacity:0.5; pointer-events:none; cursor:not-allowed;"' : ""} style="padding: 0.55rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer;">
                             ${uploadLabel}
                         </button>
                     </div>
@@ -410,7 +526,7 @@ function FileUploadIsland(container, props) {
             <div class="p-fileupload p-fileupload-advanced">
                 <!-- Toolbar Header -->
                 <div class="p-fileupload-header">
-                    <span class="p-button p-button-primary p-fileupload-choose" style="padding: 0.5rem 1.15rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; display: inline-flex; align-items: center; gap: 0.45rem;">
+                    <span class="p-fileupload-choose" style="padding: 0.5rem 1.15rem;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
                         <span>${chooseLabel}</span>
                         <input type="file" accept="${accept}" ${multiple ? "multiple" : ""} class="p-fileupload-input" />
@@ -426,10 +542,8 @@ function FileUploadIsland(container, props) {
                 </div>
 
                 ${isUploading ? `
-                    <div style="padding: 0 1rem;">
-                        <div class="p-fileupload-progressbar">
-                            <div class="p-fileupload-progressbar-value" style="width: ${progressAverage}%;"></div>
-                        </div>
+                    <div class="p-fileupload-progressbar">
+                        <div class="p-fileupload-progressbar-value" style="width: ${progressAverage}%;"></div>
                     </div>
                 ` : ""}
 
@@ -437,15 +551,17 @@ function FileUploadIsland(container, props) {
                 <div class="p-fileupload-content">
                     ${!hasFiles ? `
                         <div class="p-fileupload-empty" data-click-trigger>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color: var(--p-surface-400);"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/><polyline points="12 13 12 9 10 11"/><polyline points="12 9 14 11"/></svg>
-                            <div style="font-weight: 600; font-size: 0.95rem; color: var(--p-text-color);">Drag and drop files to here to upload.</div>
-                            <div style="font-size: 0.75rem; color: var(--p-text-muted); font-weight: 500;">MAX. 1MB</div>
+                            <div class="p-fileupload-empty-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/><polyline points="12 13 12 9 10 11"/><polyline points="12 9 14 11"/></svg>
+                            </div>
+                            <div class="p-fileupload-empty-title">${emptyTitle}</div>
+                            <div class="p-fileupload-empty-subtitle">${emptySubtitle}</div>
                         </div>
                     ` : previewImages ? `
                         <div class="p-fileupload-image-grid">
                             ${fileQueue.map((f) => `
                                 <div class="p-fileupload-image-card">
-                                    <img src="${f.previewUrl || "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=150&auto=format&fit=crop&q=80"}" alt="${f.name}" />
+                                    <img src="${f.previewUrl || "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=200&auto=format&fit=crop&q=80"}" alt="${f.name}" />
                                     <button type="button" class="p-fileupload-image-remove" data-remove-id="${f.id}" title="Remove image">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                                     </button>
@@ -532,4 +648,4 @@ function FileUploadIsland(container, props) {
 export {
   FileUploadIsland as default
 };
-//# sourceMappingURL=fileupload-XT6S2ITL.js.map
+//# sourceMappingURL=fileupload-GMVONV4B.js.map

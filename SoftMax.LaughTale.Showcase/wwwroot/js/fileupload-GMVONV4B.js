@@ -1,12 +1,9 @@
-/**
- * SoftMax.LaughTale: Enterprise FileUpload Component (PrimeVue 4 Aura Design System compliant)
- * High-performance, pixel-perfect file uploader matching PrimeVue 4 Aura specifications.
- * Supports Standalone Dropzone, Basic, Auto, Advanced, InputGroup, Custom, Dropzone Template, and Image Preview Grid.
- */
+import {
+  injectIslandStyle
+} from "./chunk-3TFPN5JM.js";
 
-import { injectIslandStyle } from '../runtime/styles';
-
-const FILEUPLOAD_CSS = `
+// ../SoftMax.LaughTale.Client/src/components/fileupload.ts
+var FILEUPLOAD_CSS = `
 .p-fileupload {
     display: flex;
     flex-direction: column;
@@ -331,138 +328,94 @@ const FILEUPLOAD_CSS = `
     border-color: var(--p-surface-700, #334155);
 }
 `;
-
-export interface FileUploadProps {
-    id?: string;
-    mode?: 'basic' | 'advanced' | 'dropzone-only';
-    name?: string;
-    url?: string;
-    accept?: string;
-    maxFileSize?: number;
-    multiple?: boolean;
-    auto?: boolean;
-    customUpload?: boolean;
-    chooseLabel?: string;
-    uploadLabel?: string;
-    cancelLabel?: string;
-    previewImages?: boolean;
-    emptyTitle?: string;
-    emptySubtitle?: string;
-}
-
-interface UploadedFileItem {
-    id: string;
-    name: string;
-    size: number;
-    type: string;
-    previewUrl?: string;
-    progress: number;
-    status: 'pending' | 'uploading' | 'completed' | 'error';
-}
-
-export default function FileUploadIsland(container: HTMLElement, props: FileUploadProps) {
-    injectIslandStyle('fileupload', FILEUPLOAD_CSS);
-
-    const mode = props.mode || 'basic';
-    const accept = props.accept || '*/*';
-    const multiple = props.multiple || false;
-    const auto = props.auto || false;
-    const chooseLabel = props.chooseLabel || (mode === 'basic' ? 'Choose' : 'Choose');
-    const uploadLabel = props.uploadLabel || 'Upload';
-    const cancelLabel = props.cancelLabel || 'Cancel';
-    const previewImages = props.previewImages || false;
-    const emptyTitle = props.emptyTitle || 'Drag and drop files to here to upload.';
-    const emptySubtitle = props.emptySubtitle || 'MAX. 1MB';
-
-    // Instance-isolated state
-    let fileQueue: UploadedFileItem[] = [];
-    let isUploading = false;
-
-    function formatFileSize(bytes: number): string {
-        if (bytes === 0) return '0 B';
-        const k = 1024;
-        const sizes = ['B', 'KB', 'MB', 'GB'];
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+function FileUploadIsland(container, props) {
+  injectIslandStyle("fileupload", FILEUPLOAD_CSS);
+  const mode = props.mode || "basic";
+  const accept = props.accept || "*/*";
+  const multiple = props.multiple || false;
+  const auto = props.auto || false;
+  const chooseLabel = props.chooseLabel || (mode === "basic" ? "Choose" : "Choose");
+  const uploadLabel = props.uploadLabel || "Upload";
+  const cancelLabel = props.cancelLabel || "Cancel";
+  const previewImages = props.previewImages || false;
+  const emptyTitle = props.emptyTitle || "Drag and drop files to here to upload.";
+  const emptySubtitle = props.emptySubtitle || "MAX. 1MB";
+  let fileQueue = [];
+  let isUploading = false;
+  function formatFileSize(bytes) {
+    if (bytes === 0) return "0 B";
+    const k = 1024;
+    const sizes = ["B", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
+  }
+  function addFiles(files) {
+    Array.from(files).forEach((file) => {
+      if (props.maxFileSize && file.size > props.maxFileSize) {
+        alert(`File "${file.name}" exceeds maximum allowed size of ${formatFileSize(props.maxFileSize)}`);
+        return;
+      }
+      const item = {
+        id: Math.random().toString(36).substring(2, 9),
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        progress: 0,
+        status: "pending"
+      };
+      if (file.type.startsWith("image/")) {
+        item.previewUrl = URL.createObjectURL(file);
+      }
+      fileQueue.push(item);
+    });
+    if (auto) {
+      render();
+      startUpload();
+    } else {
+      render();
     }
-
-    function addFiles(files: FileList | File[]) {
-        Array.from(files).forEach((file) => {
-            if (props.maxFileSize && file.size > props.maxFileSize) {
-                alert(`File "${file.name}" exceeds maximum allowed size of ${formatFileSize(props.maxFileSize)}`);
-                return;
-            }
-
-            const item: UploadedFileItem = {
-                id: Math.random().toString(36).substring(2, 9),
-                name: file.name,
-                size: file.size,
-                type: file.type,
-                progress: 0,
-                status: 'pending'
-            };
-
-            if (file.type.startsWith('image/')) {
-                item.previewUrl = URL.createObjectURL(file);
-            }
-
-            fileQueue.push(item);
-        });
-
-        if (auto) {
-            render();
-            startUpload();
-        } else {
-            render();
-        }
-    }
-
-    function startUpload() {
-        if (fileQueue.length === 0 || isUploading) return;
-        isUploading = true;
-        render();
-
-        let currentProgress = 0;
-        const interval = setInterval(() => {
-            currentProgress += 20;
-            if (currentProgress >= 100) {
-                currentProgress = 100;
-                clearInterval(interval);
-                isUploading = false;
-                fileQueue.forEach(f => {
-                    f.progress = 100;
-                    f.status = 'completed';
-                });
-                render();
-            } else {
-                fileQueue.forEach(f => {
-                    f.progress = currentProgress;
-                    f.status = 'uploading';
-                });
-                render();
-            }
-        }, 100);
-    }
-
-    function cancelAll() {
-        fileQueue = [];
+  }
+  function startUpload() {
+    if (fileQueue.length === 0 || isUploading) return;
+    isUploading = true;
+    render();
+    let currentProgress = 0;
+    const interval = setInterval(() => {
+      currentProgress += 20;
+      if (currentProgress >= 100) {
+        currentProgress = 100;
+        clearInterval(interval);
         isUploading = false;
+        fileQueue.forEach((f) => {
+          f.progress = 100;
+          f.status = "completed";
+        });
         render();
-    }
-
-    function removeFile(id: string) {
-        fileQueue = fileQueue.filter(f => f.id !== id);
+      } else {
+        fileQueue.forEach((f) => {
+          f.progress = currentProgress;
+          f.status = "uploading";
+        });
         render();
-    }
-
-    function render() {
-        // Dropzone Only Mode (Hero / Preview card)
-        if (mode === 'dropzone-only') {
-            const hasFiles = fileQueue.length > 0;
-            container.innerHTML = `
+      }
+    }, 100);
+  }
+  function cancelAll() {
+    fileQueue = [];
+    isUploading = false;
+    render();
+  }
+  function removeFile(id) {
+    fileQueue = fileQueue.filter((f) => f.id !== id);
+    render();
+  }
+  function render() {
+    if (mode === "dropzone-only") {
+      const hasFiles2 = fileQueue.length > 0;
+      container.innerHTML = `
                 <div class="p-fileupload p-fileupload-dropzone-only" style="width: 100%;">
-                    <input type="file" accept="${accept}" ${multiple ? 'multiple' : ''} class="p-fileupload-input" style="display: none;" />
-                    ${!hasFiles ? `
+                    <input type="file" accept="${accept}" ${multiple ? "multiple" : ""} class="p-fileupload-input" style="display: none;" />
+                    ${!hasFiles2 ? `
                         <div class="p-fileupload-empty" data-click-trigger>
                             <div class="p-fileupload-empty-icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/><polyline points="12 13 12 9 10 11"/><polyline points="12 9 14 11"/></svg>
@@ -472,7 +425,7 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
                         </div>
                     ` : `
                         <div class="p-fileupload-file-list">
-                            ${fileQueue.map(f => `
+                            ${fileQueue.map((f) => `
                                 <div class="p-fileupload-file-item">
                                     <div class="p-fileupload-file-info">
                                         ${f.previewUrl ? `
@@ -488,15 +441,15 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
                                         </div>
                                     </div>
                                     <div style="display: flex; align-items: center; gap: 0.75rem;">
-                                        <span style="font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.55rem; border-radius: 9999px; ${f.status === 'completed' ? 'background: rgba(16, 185, 129, 0.12); color: #10b981;' : 'background: var(--p-surface-100); color: var(--p-surface-700);'}">
-                                            ${f.status === 'completed' ? 'Uploaded' : (f.status === 'uploading' ? `${f.progress}%` : 'Ready')}
+                                        <span style="font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.55rem; border-radius: 9999px; ${f.status === "completed" ? "background: rgba(16, 185, 129, 0.12); color: #10b981;" : "background: var(--p-surface-100); color: var(--p-surface-700);"}">
+                                            ${f.status === "completed" ? "Uploaded" : f.status === "uploading" ? `${f.progress}%` : "Ready"}
                                         </span>
                                         <button type="button" class="p-button p-button-text p-button-danger p-button-sm" data-remove-id="${f.id}" style="border: none; background: transparent; color: #ef4444; cursor: pointer; padding: 0.35rem; display: flex; align-items: center; border-radius: 9999px;">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                                         </button>
                                     </div>
                                 </div>
-                            `).join('')}
+                            `).join("")}
                             <div style="display: flex; justify-content: flex-end; margin-top: 0.5rem;">
                                 <button type="button" class="p-button p-button-primary p-fileupload-upload-btn" style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
                                     Upload All
@@ -506,96 +459,83 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
                     `}
                 </div>
             `;
-
-            const input = container.querySelector<HTMLInputElement>('.p-fileupload-input');
-            const dropArea = container.querySelector<HTMLElement>('.p-fileupload-empty');
-            dropArea?.addEventListener('click', () => input?.click());
-            input?.addEventListener('change', (e) => {
-                const target = e.target as HTMLInputElement;
-                if (target.files && target.files.length > 0) addFiles(target.files);
-            });
-
-            container.querySelectorAll<HTMLElement>('[data-remove-id]').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const id = btn.getAttribute('data-remove-id');
-                    if (id) removeFile(id);
-                });
-            });
-
-            const uploadBtn = container.querySelector<HTMLButtonElement>('.p-fileupload-upload-btn');
-            uploadBtn?.addEventListener('click', () => startUpload());
-            return;
-        }
-
-        // Basic Mode
-        if (mode === 'basic') {
-            const hasFile = fileQueue.length > 0;
-            const fileName = hasFile 
-                ? (fileQueue.length === 1 ? fileQueue[0].name : `${fileQueue.length} files selected`) 
-                : 'No file chosen';
-            
-            if (auto) {
-                container.innerHTML = `
+      const input2 = container.querySelector(".p-fileupload-input");
+      const dropArea = container.querySelector(".p-fileupload-empty");
+      dropArea?.addEventListener("click", () => input2?.click());
+      input2?.addEventListener("change", (e) => {
+        const target = e.target;
+        if (target.files && target.files.length > 0) addFiles(target.files);
+      });
+      container.querySelectorAll("[data-remove-id]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-remove-id");
+          if (id) removeFile(id);
+        });
+      });
+      const uploadBtn2 = container.querySelector(".p-fileupload-upload-btn");
+      uploadBtn2?.addEventListener("click", () => startUpload());
+      return;
+    }
+    if (mode === "basic") {
+      const hasFile = fileQueue.length > 0;
+      const fileName = hasFile ? fileQueue.length === 1 ? fileQueue[0].name : `${fileQueue.length} files selected` : "No file chosen";
+      if (auto) {
+        container.innerHTML = `
                     <div class="p-fileupload p-fileupload-basic" style="justify-content: center;">
                         <span class="p-fileupload-choose">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
                             <span>${chooseLabel}</span>
-                            <input type="file" accept="${accept}" ${multiple ? 'multiple' : ''} class="p-fileupload-input" />
+                            <input type="file" accept="${accept}" ${multiple ? "multiple" : ""} class="p-fileupload-input" />
                         </span>
-                        ${hasFile ? `<span class="p-fileupload-filename">${fileName}</span>` : ''}
+                        ${hasFile ? `<span class="p-fileupload-filename">${fileName}</span>` : ""}
                     </div>
                 `;
-            } else {
-                container.innerHTML = `
+      } else {
+        container.innerHTML = `
                     <div class="p-fileupload p-fileupload-basic">
                         <div class="p-fileupload-basic-left">
                             <span class="p-fileupload-choose">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
                                 <span>${chooseLabel}</span>
-                                <input type="file" accept="${accept}" ${multiple ? 'multiple' : ''} class="p-fileupload-input" />
+                                <input type="file" accept="${accept}" ${multiple ? "multiple" : ""} class="p-fileupload-input" />
                             </span>
                             <span class="p-fileupload-filename">${fileName}</span>
                         </div>
-                        <button type="button" class="p-button p-button-outlined p-button-secondary p-fileupload-upload-btn" ${!hasFile || isUploading ? 'disabled style="opacity:0.5; pointer-events:none; cursor:not-allowed;"' : ''} style="padding: 0.55rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer;">
+                        <button type="button" class="p-button p-button-outlined p-button-secondary p-fileupload-upload-btn" ${!hasFile || isUploading ? 'disabled style="opacity:0.5; pointer-events:none; cursor:not-allowed;"' : ""} style="padding: 0.55rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer;">
                             ${uploadLabel}
                         </button>
                     </div>
                 `;
-            }
-
-            const input = container.querySelector<HTMLInputElement>('.p-fileupload-input');
-            input?.addEventListener('change', (e) => {
-                const target = e.target as HTMLInputElement;
-                if (target.files && target.files.length > 0) {
-                    addFiles(target.files);
-                }
-            });
-
-            const uploadBtn = container.querySelector<HTMLButtonElement>('.p-fileupload-upload-btn');
-            uploadBtn?.addEventListener('click', () => {
-                startUpload();
-            });
-            return;
+      }
+      const input2 = container.querySelector(".p-fileupload-input");
+      input2?.addEventListener("change", (e) => {
+        const target = e.target;
+        if (target.files && target.files.length > 0) {
+          addFiles(target.files);
         }
-
-        // Advanced Mode
-        const hasFiles = fileQueue.length > 0;
-        const progressAverage = hasFiles ? Math.round(fileQueue.reduce((acc, f) => acc + f.progress, 0) / fileQueue.length) : 0;
-
-        container.innerHTML = `
+      });
+      const uploadBtn2 = container.querySelector(".p-fileupload-upload-btn");
+      uploadBtn2?.addEventListener("click", () => {
+        startUpload();
+      });
+      return;
+    }
+    const hasFiles = fileQueue.length > 0;
+    const progressAverage = hasFiles ? Math.round(fileQueue.reduce((acc, f) => acc + f.progress, 0) / fileQueue.length) : 0;
+    container.innerHTML = `
             <div class="p-fileupload p-fileupload-advanced">
                 <!-- Toolbar Header -->
                 <div class="p-fileupload-header">
                     <span class="p-fileupload-choose" style="padding: 0.5rem 1.15rem;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
                         <span>${chooseLabel}</span>
-                        <input type="file" accept="${accept}" ${multiple ? 'multiple' : ''} class="p-fileupload-input" />
+                        <input type="file" accept="${accept}" ${multiple ? "multiple" : ""} class="p-fileupload-input" />
                     </span>
-                    <button type="button" class="p-button p-button-outlined p-button-secondary p-fileupload-upload-btn" ${!hasFiles || isUploading ? 'disabled style="opacity:0.5; pointer-events:none; cursor:not-allowed;"' : ''} style="padding: 0.5rem 1.15rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer; display: inline-flex; align-items: center; gap: 0.45rem;">
+                    <button type="button" class="p-button p-button-outlined p-button-secondary p-fileupload-upload-btn" ${!hasFiles || isUploading ? 'disabled style="opacity:0.5; pointer-events:none; cursor:not-allowed;"' : ""} style="padding: 0.5rem 1.15rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer; display: inline-flex; align-items: center; gap: 0.45rem;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
                         <span>${uploadLabel}</span>
                     </button>
-                    <button type="button" class="p-button p-button-outlined p-button-secondary p-fileupload-cancel-btn" ${!hasFiles || isUploading ? 'disabled style="opacity:0.5; pointer-events:none; cursor:not-allowed;"' : ''} style="padding: 0.5rem 1.15rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer; display: inline-flex; align-items: center; gap: 0.45rem;">
+                    <button type="button" class="p-button p-button-outlined p-button-secondary p-fileupload-cancel-btn" ${!hasFiles || isUploading ? 'disabled style="opacity:0.5; pointer-events:none; cursor:not-allowed;"' : ""} style="padding: 0.5rem 1.15rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer; display: inline-flex; align-items: center; gap: 0.45rem;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                         <span>${cancelLabel}</span>
                     </button>
@@ -605,7 +545,7 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
                     <div class="p-fileupload-progressbar">
                         <div class="p-fileupload-progressbar-value" style="width: ${progressAverage}%;"></div>
                     </div>
-                ` : ''}
+                ` : ""}
 
                 <!-- Content / Drop Area -->
                 <div class="p-fileupload-content">
@@ -617,20 +557,20 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
                             <div class="p-fileupload-empty-title">${emptyTitle}</div>
                             <div class="p-fileupload-empty-subtitle">${emptySubtitle}</div>
                         </div>
-                    ` : (previewImages ? `
+                    ` : previewImages ? `
                         <div class="p-fileupload-image-grid">
-                            ${fileQueue.map(f => `
+                            ${fileQueue.map((f) => `
                                 <div class="p-fileupload-image-card">
-                                    <img src="${f.previewUrl || 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=200&auto=format&fit=crop&q=80'}" alt="${f.name}" />
+                                    <img src="${f.previewUrl || "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=200&auto=format&fit=crop&q=80"}" alt="${f.name}" />
                                     <button type="button" class="p-fileupload-image-remove" data-remove-id="${f.id}" title="Remove image">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                                     </button>
                                 </div>
-                            `).join('')}
+                            `).join("")}
                         </div>
                     ` : `
                         <div class="p-fileupload-file-list">
-                            ${fileQueue.map(f => `
+                            ${fileQueue.map((f) => `
                                 <div class="p-fileupload-file-item">
                                     <div class="p-fileupload-file-info">
                                         ${f.previewUrl ? `
@@ -646,72 +586,66 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
                                         </div>
                                     </div>
                                     <div style="display: flex; align-items: center; gap: 0.75rem;">
-                                        <span style="font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.55rem; border-radius: 9999px; ${f.status === 'completed' ? 'background: rgba(16, 185, 129, 0.12); color: #10b981;' : 'background: var(--p-surface-100); color: var(--p-surface-700);'}">
-                                            ${f.status === 'completed' ? 'Uploaded' : (f.status === 'uploading' ? `${f.progress}%` : 'Pending')}
+                                        <span style="font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.55rem; border-radius: 9999px; ${f.status === "completed" ? "background: rgba(16, 185, 129, 0.12); color: #10b981;" : "background: var(--p-surface-100); color: var(--p-surface-700);"}">
+                                            ${f.status === "completed" ? "Uploaded" : f.status === "uploading" ? `${f.progress}%` : "Pending"}
                                         </span>
                                         <button type="button" class="p-button p-button-text p-button-danger p-button-sm" data-remove-id="${f.id}" style="border: none; background: transparent; color: #ef4444; cursor: pointer; padding: 0.35rem; display: flex; align-items: center; border-radius: 9999px;">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                                         </button>
                                     </div>
                                 </div>
-                            `).join('')}
+                            `).join("")}
                         </div>
-                    `)}
+                    `}
                 </div>
             </div>
         `;
-
-        // Event listeners
-        const input = container.querySelector<HTMLInputElement>('.p-fileupload-input');
-        input?.addEventListener('change', (e) => {
-            const target = e.target as HTMLInputElement;
-            if (target.files && target.files.length > 0) {
-                addFiles(target.files);
-            }
-        });
-
-        const uploadBtn = container.querySelector<HTMLButtonElement>('.p-fileupload-upload-btn');
-        uploadBtn?.addEventListener('click', () => {
-            startUpload();
-        });
-
-        const cancelBtn = container.querySelector<HTMLButtonElement>('.p-fileupload-cancel-btn');
-        cancelBtn?.addEventListener('click', () => {
-            cancelAll();
-        });
-
-        const emptyClick = container.querySelector<HTMLElement>('[data-click-trigger]');
-        emptyClick?.addEventListener('click', () => {
-            input?.click();
-        });
-
-        // Drop handling
-        const contentArea = container.querySelector<HTMLElement>('.p-fileupload-content');
-        if (contentArea) {
-            contentArea.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                contentArea.classList.add('p-fileupload-highlight');
-            });
-            contentArea.addEventListener('dragleave', () => {
-                contentArea.classList.remove('p-fileupload-highlight');
-            });
-            contentArea.addEventListener('drop', (e) => {
-                e.preventDefault();
-                contentArea.classList.remove('p-fileupload-highlight');
-                if (e.dataTransfer?.files && e.dataTransfer.files.length > 0) {
-                    addFiles(e.dataTransfer.files);
-                }
-            });
+    const input = container.querySelector(".p-fileupload-input");
+    input?.addEventListener("change", (e) => {
+      const target = e.target;
+      if (target.files && target.files.length > 0) {
+        addFiles(target.files);
+      }
+    });
+    const uploadBtn = container.querySelector(".p-fileupload-upload-btn");
+    uploadBtn?.addEventListener("click", () => {
+      startUpload();
+    });
+    const cancelBtn = container.querySelector(".p-fileupload-cancel-btn");
+    cancelBtn?.addEventListener("click", () => {
+      cancelAll();
+    });
+    const emptyClick = container.querySelector("[data-click-trigger]");
+    emptyClick?.addEventListener("click", () => {
+      input?.click();
+    });
+    const contentArea = container.querySelector(".p-fileupload-content");
+    if (contentArea) {
+      contentArea.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        contentArea.classList.add("p-fileupload-highlight");
+      });
+      contentArea.addEventListener("dragleave", () => {
+        contentArea.classList.remove("p-fileupload-highlight");
+      });
+      contentArea.addEventListener("drop", (e) => {
+        e.preventDefault();
+        contentArea.classList.remove("p-fileupload-highlight");
+        if (e.dataTransfer?.files && e.dataTransfer.files.length > 0) {
+          addFiles(e.dataTransfer.files);
         }
-
-        // Individual remove buttons
-        container.querySelectorAll<HTMLElement>('[data-remove-id]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const id = btn.getAttribute('data-remove-id');
-                if (id) removeFile(id);
-            });
-        });
+      });
     }
-
-    render();
+    container.querySelectorAll("[data-remove-id]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const id = btn.getAttribute("data-remove-id");
+        if (id) removeFile(id);
+      });
+    });
+  }
+  render();
 }
+export {
+  FileUploadIsland as default
+};
+//# sourceMappingURL=fileupload-GMVONV4B.js.map
