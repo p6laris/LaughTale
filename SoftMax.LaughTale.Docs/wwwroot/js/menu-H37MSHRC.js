@@ -60,6 +60,25 @@ var MENU_CSS = `
     box-sizing: border-box;
 }
 
+.p-menu-submenu-wrapper {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 220ms cubic-bezier(0.4, 0, 0.2, 1), opacity 180ms ease, visibility 220ms ease;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.p-menu-submenu-wrapper.p-expanded {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    visibility: visible;
+}
+
+.p-menu-submenu-inner {
+    overflow: hidden;
+    min-height: 0;
+}
+
 .p-menu-submenu-list {
     list-style: none;
     margin: 0;
@@ -177,7 +196,7 @@ var MENU_CSS = `
     align-items: center;
     justify-content: center;
     color: var(--p-surface-400, #94a3b8);
-    transition: transform 0.15s ease;
+    transition: transform 220ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .p-menu-item-submenu-icon.p-expanded {
@@ -333,21 +352,24 @@ function MenuIsland(container, props) {
     }
     const chevronSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
     let subHtml = "";
-    if (isGroup && isExpanded) {
+    if (isGroup) {
       const subItemsHtml = item.items.map((sub, i) => renderItemContent(sub, `${path}.${i}`, depth + 1)).join("");
-      subHtml = `<ul class="p-menu-submenu-list" role="group">${subItemsHtml}</ul>`;
+      subHtml = `
+                <div class="p-menu-submenu-wrapper ${isExpanded ? "p-expanded" : ""}" role="region">
+                    <div class="p-menu-submenu-inner">
+                        <ul class="p-menu-submenu-list" role="group">${subItemsHtml}</ul>
+                    </div>
+                </div>
+            `;
     }
-    let linkClasses = ["p-menu-item-link"];
     let customInlineStyle = "";
-    if (item.linkClass) {
-      if (item.linkClass.includes("text-red")) {
-        customInlineStyle = "color: #ef4444 !important;";
-      }
+    if (item.linkClass && item.linkClass.includes("text-red")) {
+      customInlineStyle = "color: #ef4444 !important;";
     }
     return `
             <li class="p-menu-item ${item.disabled ? "p-disabled" : ""}" role="none" data-path="${path}" data-key="${item.key || ""}">
                 <div class="p-menu-item-content">
-                    <a class="${linkClasses.join(" ")}" style="${customInlineStyle}" role="menuitem" tabindex="-1" href="${item.url || item.route || "#"}" ${item.target ? `target="${item.target}"` : ""}>
+                    <a class="p-menu-item-link" style="${customInlineStyle}" role="menuitem" tabindex="-1" href="${item.url || item.route || "#"}" ${item.target ? `target="${item.target}"` : ""}>
                         ${iconHtml}
                         <span class="p-menu-item-label">${item.label}</span>
                         ${item.badge !== void 0 ? `<span class="p-menu-item-badge">${item.badge}</span>` : ""}
@@ -400,7 +422,7 @@ function MenuIsland(container, props) {
   }
   function wireEvents(menuEl) {
     menuEl.querySelectorAll(".p-menu-item").forEach((li) => {
-      const link = li.querySelector(".p-menu-item-link");
+      const link = li.querySelector(":scope > .p-menu-item-content > .p-menu-item-link");
       if (!link) return;
       link.addEventListener("click", (e) => {
         const path = li.getAttribute("data-path") || "";
@@ -411,12 +433,20 @@ function MenuIsland(container, props) {
         const isToggleableSubmenu = isGroup && (item.toggleable === true || path.includes(".") && item.toggleable !== false);
         if (isToggleableSubmenu) {
           e.preventDefault();
+          const isNowExpanded = key ? !expandedKeys[key] : !expandedKeys[path];
           if (key) {
-            expandedKeys[key] = !expandedKeys[key];
+            expandedKeys[key] = isNowExpanded;
           } else {
-            expandedKeys[path] = !expandedKeys[path];
+            expandedKeys[path] = isNowExpanded;
           }
-          updateContent();
+          const wrapper = li.querySelector(":scope > .p-menu-submenu-wrapper");
+          const chevron = li.querySelector(":scope > .p-menu-item-content .p-menu-item-submenu-icon");
+          if (wrapper) {
+            wrapper.classList.toggle("p-expanded", isNowExpanded);
+          }
+          if (chevron) {
+            chevron.classList.toggle("p-expanded", isNowExpanded);
+          }
           return;
         }
         if (item.checked !== void 0) {
@@ -572,23 +602,19 @@ function MenuIsland(container, props) {
     updateContent();
   }
   container.__expandAll = () => {
-    const keys = {};
-    function collect(list) {
-      list.forEach((it) => {
-        if (it.key) keys[it.key] = true;
-        if (it.items) collect(it.items);
-      });
-    }
-    collect(itemsState);
-    expandedKeys = keys;
-    updateContent();
+    const root = isPopup ? popupEl : container;
+    if (!root) return;
+    root.querySelectorAll(".p-menu-submenu-wrapper").forEach((w) => w.classList.add("p-expanded"));
+    root.querySelectorAll(".p-menu-item-submenu-icon").forEach((c) => c.classList.add("p-expanded"));
   };
   container.__collapseAll = () => {
-    expandedKeys = {};
-    updateContent();
+    const root = isPopup ? popupEl : container;
+    if (!root) return;
+    root.querySelectorAll(".p-menu-submenu-wrapper").forEach((w) => w.classList.remove("p-expanded"));
+    root.querySelectorAll(".p-menu-item-submenu-icon").forEach((c) => c.classList.remove("p-expanded"));
   };
 }
 export {
   MenuIsland as default
 };
-//# sourceMappingURL=menu-B2C3HHBI.js.map
+//# sourceMappingURL=menu-H37MSHRC.js.map

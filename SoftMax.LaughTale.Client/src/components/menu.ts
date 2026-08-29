@@ -1,7 +1,7 @@
 /**
  * SoftMax.LaughTale: Enterprise Menu Component (PrimeVue 4 Aura Design System compliant)
  * Navigation and command menu supporting dynamic popup overlay (fixed body-anchored),
- * static inline mode, static group headers, toggleable collapsible submenus,
+ * static inline mode, static group headers, butter-smooth grid collapse/expand animations,
  * interactive checkbox/radio groups, custom templates, and WAI-ARIA keyboard navigation.
  */
 
@@ -60,6 +60,25 @@ const MENU_CSS = `
     flex-direction: column;
     gap: 0.125rem;
     box-sizing: border-box;
+}
+
+.p-menu-submenu-wrapper {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 220ms cubic-bezier(0.4, 0, 0.2, 1), opacity 180ms ease, visibility 220ms ease;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.p-menu-submenu-wrapper.p-expanded {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    visibility: visible;
+}
+
+.p-menu-submenu-inner {
+    overflow: hidden;
+    min-height: 0;
 }
 
 .p-menu-submenu-list {
@@ -179,7 +198,7 @@ const MENU_CSS = `
     align-items: center;
     justify-content: center;
     color: var(--p-surface-400, #94a3b8);
-    transition: transform 0.15s ease;
+    transition: transform 220ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .p-menu-item-submenu-icon.p-expanded {
@@ -349,10 +368,6 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps) {
         }
 
         const isGroup = Array.isArray(item.items) && item.items.length > 0;
-
-        // In PrimeVue Menu:
-        // Top-level groups (depth === 0) without explicit toggleable are rendered as group headers (.p-menu-submenu-label).
-        // Nested groups (depth > 0) or items with explicit toggleable === true are toggleable submenus.
         const isToggleableSubmenu = isGroup && (item.toggleable === true || (depth > 0 && item.toggleable !== false));
         const isStaticGroupHeader = isGroup && !isToggleableSubmenu;
 
@@ -389,23 +404,26 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps) {
         const chevronSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
 
         let subHtml = '';
-        if (isGroup && isExpanded) {
+        if (isGroup) {
             const subItemsHtml = item.items!.map((sub, i) => renderItemContent(sub, `${path}.${i}`, depth + 1)).join('');
-            subHtml = `<ul class="p-menu-submenu-list" role="group">${subItemsHtml}</ul>`;
+            subHtml = `
+                <div class="p-menu-submenu-wrapper ${isExpanded ? 'p-expanded' : ''}" role="region">
+                    <div class="p-menu-submenu-inner">
+                        <ul class="p-menu-submenu-list" role="group">${subItemsHtml}</ul>
+                    </div>
+                </div>
+            `;
         }
 
-        let linkClasses = ['p-menu-item-link'];
         let customInlineStyle = '';
-        if (item.linkClass) {
-            if (item.linkClass.includes('text-red')) {
-                customInlineStyle = 'color: #ef4444 !important;';
-            }
+        if (item.linkClass && item.linkClass.includes('text-red')) {
+            customInlineStyle = 'color: #ef4444 !important;';
         }
 
         return `
             <li class="p-menu-item ${item.disabled ? 'p-disabled' : ''}" role="none" data-path="${path}" data-key="${item.key || ''}">
                 <div class="p-menu-item-content">
-                    <a class="${linkClasses.join(' ')}" style="${customInlineStyle}" role="menuitem" tabindex="-1" href="${item.url || item.route || '#'}" ${item.target ? `target="${item.target}"` : ''}>
+                    <a class="p-menu-item-link" style="${customInlineStyle}" role="menuitem" tabindex="-1" href="${item.url || item.route || '#'}" ${item.target ? `target="${item.target}"` : ''}>
                         ${iconHtml}
                         <span class="p-menu-item-label">${item.label}</span>
                         ${item.badge !== undefined ? `<span class="p-menu-item-badge">${item.badge}</span>` : ''}
@@ -464,7 +482,7 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps) {
 
     function wireEvents(menuEl: HTMLElement) {
         menuEl.querySelectorAll<HTMLElement>('.p-menu-item').forEach(li => {
-            const link = li.querySelector<HTMLElement>('.p-menu-item-link');
+            const link = li.querySelector<HTMLElement>(':scope > .p-menu-item-content > .p-menu-item-link');
             if (!link) return;
 
             link.addEventListener('click', (e) => {
@@ -479,12 +497,22 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps) {
 
                 if (isToggleableSubmenu) {
                     e.preventDefault();
+                    const isNowExpanded = key ? !expandedKeys[key] : !expandedKeys[path];
                     if (key) {
-                        expandedKeys[key] = !expandedKeys[key];
+                        expandedKeys[key] = isNowExpanded;
                     } else {
-                        expandedKeys[path] = !expandedKeys[path];
+                        expandedKeys[path] = isNowExpanded;
                     }
-                    updateContent();
+
+                    const wrapper = li.querySelector<HTMLElement>(':scope > .p-menu-submenu-wrapper');
+                    const chevron = li.querySelector<HTMLElement>(':scope > .p-menu-item-content .p-menu-item-submenu-icon');
+
+                    if (wrapper) {
+                        wrapper.classList.toggle('p-expanded', isNowExpanded);
+                    }
+                    if (chevron) {
+                        chevron.classList.toggle('p-expanded', isNowExpanded);
+                    }
                     return;
                 }
 
@@ -622,14 +650,12 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps) {
         const menuEl = popupEl.querySelector<HTMLElement>('.p-menu')!;
         wireEvents(menuEl);
 
-        // Precise positioning directly below trigger
         const rect = trigger.getBoundingClientRect();
         menuEl.style.position = 'fixed';
         menuEl.style.top = `${rect.bottom + 4}px`;
         menuEl.style.left = `${rect.left}px`;
         menuEl.style.zIndex = '9999';
 
-        // Auto-close on click outside
         const clickOutsideHandler = (e: MouseEvent) => {
             if (popupEl && !popupEl.contains(e.target as Node) && !trigger.contains(e.target as Node)) {
                 closePopup();
@@ -666,20 +692,16 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps) {
 
     // Programmatic controls for Controlled demo
     (container as any).__expandAll = () => {
-        const keys: Record<string, boolean> = {};
-        function collect(list: MenuItemData[]) {
-            list.forEach(it => {
-                if (it.key) keys[it.key] = true;
-                if (it.items) collect(it.items);
-            });
-        }
-        collect(itemsState);
-        expandedKeys = keys;
-        updateContent();
+        const root = isPopup ? popupEl : container;
+        if (!root) return;
+        root.querySelectorAll<HTMLElement>('.p-menu-submenu-wrapper').forEach(w => w.classList.add('p-expanded'));
+        root.querySelectorAll<HTMLElement>('.p-menu-item-submenu-icon').forEach(c => c.classList.add('p-expanded'));
     };
 
     (container as any).__collapseAll = () => {
-        expandedKeys = {};
-        updateContent();
+        const root = isPopup ? popupEl : container;
+        if (!root) return;
+        root.querySelectorAll<HTMLElement>('.p-menu-submenu-wrapper').forEach(w => w.classList.remove('p-expanded'));
+        root.querySelectorAll<HTMLElement>('.p-menu-item-submenu-icon').forEach(c => c.classList.remove('p-expanded'));
     };
 }
