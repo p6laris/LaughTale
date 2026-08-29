@@ -5198,6 +5198,72 @@
         </div>
     </section>
 
+    <!-- Menubar -->
+    <section id="sec-menubar" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>Menubar</h2>
+                <p>Menubar is a horizontal navigation menu component supporting cascading submenus, mobile responsiveness, and custom template slots.</p>
+            </div>
+            <span class="aura-tag tag-emerald">Navigation</span>
+        </div>
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Hero / Preview Demo -->
+            <div data-menubar-demo="preview" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Interactive Menubar Preview</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Horizontal menubar with cascading dropdown submenus and vector icons.</p>
+                <div style="display: flex; justify-content: center; align-items: center;">
+                    <p-menubar model="@Model.MenubarBasicItems" />
+                </div>
+            </div>
+
+            <!-- Demo 1: Basic -->
+            <div data-menubar-demo="basic" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Menubar requires nested menuitems as its model with labels, vector icons, and section separators.</p>
+                <div style="display: flex; justify-content: center; align-items: center;">
+                    <p-menubar model="@Model.MenubarBasicItems" />
+                </div>
+            </div>
+
+            <!-- Demo 2: Submenus -->
+            <div data-menubar-demo="submenus" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Submenus</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Menuitems with nested items create cascading multi-level flyout submenus with rightward expansion.</p>
+                <div style="display: flex; justify-content: center; align-items: center;">
+                    <p-menubar model="@Model.MenubarSubmenusItems" />
+                </div>
+            </div>
+
+            <!-- Demo 3: Template -->
+            <div data-menubar-demo="template" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Template</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Menubar offers item customization with start and end slots to embed brand logos, search inputs, user avatars, and badge counters.</p>
+                <div style="display: flex; justify-content: center; align-items: center;">
+                    <p-menubar model="@Model.MenubarTemplateItems" custom-template="true" />
+                </div>
+            </div>
+
+            <!-- Demo 4: Command -->
+            <div data-menubar-demo="command" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Command</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">The command property defines the callback to run when an item is activated by click or keyboard event.</p>
+                <div style="display: flex; justify-content: center; align-items: center;">
+                    <p-menubar model="@Model.MenubarCommandItems" />
+                </div>
+            </div>
+
+            <!-- Demo 5: Router -->
+            <div data-menubar-demo="router" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Router</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Menu items support navigation via router-link, programmatic routing using commands, or external URLs.</p>
+                <div style="display: flex; justify-content: center; align-items: center;">
+                    <p-menubar model="@Model.MenubarRouterItems" />
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- ContextMenu -->
     <section id="sec-context-menu" class="component-card">
         <div class="card-header">

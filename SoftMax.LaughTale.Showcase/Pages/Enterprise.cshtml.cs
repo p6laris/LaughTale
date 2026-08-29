@@ -1670,6 +1670,120 @@ public class EnterpriseModel : PageModel
         ["reports"] = true
     };
 
+    public List<MenuItem> MenubarBasicItems { get; set; } = new()
+    {
+        new(Label: "File", Items: new()
+        {
+            new(Label: "New Document", Icon: "file"),
+            new(Label: "Open", Icon: "folderOpen"),
+            new(Separator: true),
+            new(Label: "Save", Icon: "save"),
+            new(Label: "Save As…", Icon: "download")
+        }),
+        new(Label: "Edit", Items: new()
+        {
+            new(Label: "Undo", Icon: "undo"),
+            new(Label: "Redo", Icon: "rotateCcw"),
+            new(Separator: true),
+            new(Label: "Cut", Icon: "scissors"),
+            new(Label: "Copy", Icon: "copy"),
+            new(Label: "Paste", Icon: "clipboard")
+        }),
+        new(Label: "View", Items: new()
+        {
+            new(Label: "Zoom In"),
+            new(Label: "Zoom Out"),
+            new(Label: "Reset Zoom"),
+            new(Separator: true),
+            new(Label: "Full Screen")
+        }),
+        new(Label: "Help", Items: new()
+        {
+            new(Label: "Documentation"),
+            new(Label: "Support"),
+            new(Separator: true),
+            new(Label: "About")
+        })
+    };
+
+    public List<MenuItem> MenubarSubmenusItems { get; set; } = new()
+    {
+        new(Label: "File", Items: new()
+        {
+            new(Label: "New File"),
+            new(Label: "Open File…"),
+            new(Label: "Open Recent", Items: new()
+            {
+                new(Label: "todo.md"),
+                new(Label: "changelog.md"),
+                new(Label: "readme.md"),
+                new(Label: "Older", Items: new()
+                {
+                    new(Label: "release-notes.md"),
+                    new(Label: "roadmap.md"),
+                    new(Label: "contributing.md"),
+                    new(Label: "license.txt")
+                }),
+                new(Separator: true),
+                new(Label: "Clear Recent")
+            }),
+            new(Separator: true),
+            new(Label: "Save"),
+            new(Label: "Save As…")
+        }),
+        new(Label: "View", Items: new()
+        {
+            new(Label: "Reload"),
+            new(Label: "Force Reload"),
+            new(Separator: true),
+            new(Label: "Toggle DevTools")
+        })
+    };
+
+    public List<MenuItem> MenubarTemplateItems { get; set; } = new()
+    {
+        new(Label: "Home", Icon: "home"),
+        new(Label: "Projects", Icon: "search", Badge: "3", Items: new()
+        {
+            new(Label: "Core", Icon: "zap", Shortcut: "⌘+S"),
+            new(Label: "Blocks", Icon: "server", Shortcut: "⌘+B"),
+            new(Separator: true),
+            new(Label: "UI Kit", Icon: "pencil", Shortcut: "⌘+U")
+        })
+    };
+
+    public List<MenuItem> MenubarCommandItems { get; set; } = new()
+    {
+        new(Label: "File", Icon: "file", Items: new()
+        {
+            new(Label: "New", Icon: "plus", Command: "new-doc"),
+            new(Label: "Print", Icon: "printer", Command: "print")
+        }),
+        new(Label: "Search", Icon: "search", Command: "search"),
+        new(Separator: true),
+        new(Label: "Sync", Icon: "cloud", Items: new()
+        {
+            new(Label: "Import", Icon: "download", Command: "download-cloud"),
+            new(Label: "Export", Icon: "upload", Command: "share-cloud")
+        })
+    };
+
+    public List<MenuItem> MenubarRouterItems { get; set; } = new()
+    {
+        new(Label: "Router", Icon: "palette", Items: new()
+        {
+            new(Label: "Installation", Route: "/installation"),
+            new(Label: "Configuration", Route: "/configuration")
+        }),
+        new(Label: "Programmatic", Icon: "link", Route: "/installation"),
+        new(Label: "External", Icon: "home", Items: new()
+        {
+            new(Label: "Vue.js", Url: "https://vuejs.org/", Target: "_blank"),
+            new(Label: "Vite.js", Url: "https://vitejs.dev/", Target: "_blank")
+        })
+    };
+
+
 
 
     public List<MenuItem> HeaderMenuItems { get; set; } = new()

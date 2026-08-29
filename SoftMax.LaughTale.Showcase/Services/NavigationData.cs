@@ -72,9 +72,10 @@ public static class NavigationData
                 new("Toolbar", "columns3", "/enterprise#sec-toolbar", false, null, "New"),
                 new("Timeline", "activity", "/enterprise#sec-timeline")
             }),
-            new("Navigation & Menus (8)", "compass", null, false, new List<SidebarItem>
+            new("Navigation & Menus (9)", "compass", null, false, new List<SidebarItem>
             {
                 new("Menu", "menu", "/enterprise#sec-menu", false, null, "New"),
+                new("Menubar", "compass", "/enterprise#sec-menubar", false, null, "New"),
                 new("ContextMenu", "moreHorizontal", "/enterprise#sec-context-menu"),
                 new("Breadcrumb", "compass", "/enterprise#sec-breadcrumb", false, null, "New"),
                 new("macOS Dock", "layoutGrid", "/enterprise#sec-dock"),

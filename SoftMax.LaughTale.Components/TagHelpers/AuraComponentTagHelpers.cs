@@ -4263,6 +4263,59 @@ public class IslandDataViewTagHelper : TagHelper
 }
 
 /// <summary>
+/// TagHelper for <island-menubar />, <p-menubar />, and <island-menu-bar />
+/// PrimeVue 4 Aura Design System compliant horizontal navigation menubar.
+/// </summary>
+[HtmlTargetElement("island-menubar")]
+[HtmlTargetElement("p-menubar")]
+[HtmlTargetElement("island-menu-bar")]
+public class IslandMenubarTagHelper : TagHelper
+{
+    [HtmlAttributeName("model")]
+    public List<MenuItem>? Model { get; set; }
+
+    [HtmlAttributeName("items")]
+    public List<MenuItem>? Items { get; set; }
+
+    [HtmlAttributeName("custom-template")]
+    public bool CustomTemplate { get; set; } = false;
+
+    [HtmlAttributeName("class")]
+    public string? Class { get; set; }
+
+    [HtmlAttributeName("style")]
+    public string? Style { get; set; }
+
+    public override void Process(TagHelperContext context, TagHelperOutput output)
+    {
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "menubar");
+        output.Attributes.SetAttribute("data-hydrate", "load");
+
+        var props = new
+        {
+            model = Model ?? Items ?? new(),
+            customTemplate = CustomTemplate,
+            @class = Class,
+            style = Style
+        };
+
+        output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
+
+        if (!string.IsNullOrWhiteSpace(Class))
+        {
+            output.Attributes.SetAttribute("class", Class);
+        }
+
+        if (!string.IsNullOrWhiteSpace(Style))
+        {
+            output.Attributes.SetAttribute("style", Style);
+        }
+    }
+}
+
+/// <summary>
 /// TagHelper for <island-menu />, <p-menu />, and <island-navigation-menu />
 /// PrimeVue 4 Aura Design System compliant navigation and command menu.
 /// </summary>
