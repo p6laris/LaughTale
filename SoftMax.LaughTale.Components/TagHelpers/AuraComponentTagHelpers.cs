@@ -4283,24 +4283,73 @@ public class IslandPopoverTagHelper : TagHelper
 }
 
 /// <summary>
-/// TagHelper for <island-tooltip /> — Rich tooltip component
+/// TagHelper for <island-tooltip /> and <p-tooltip />
+/// PrimeVue 4 Aura Design System compliant advisory tooltip component.
 /// </summary>
 [HtmlTargetElement("island-tooltip")]
+[HtmlTargetElement("p-tooltip")]
 public class IslandTooltipTagHelper : TagHelper
 {
+    [HtmlAttributeName("target")]
     public string? Target { get; set; }
-    public string Position { get; set; } = "top";
-    public int ShowDelay { get; set; } = 300;
-    public int HideDelay { get; set; } = 100;
 
-    public override void Process(TagHelperContext context, TagHelperOutput output)
+    [HtmlAttributeName("text")]
+    public string? Text { get; set; }
+
+    [HtmlAttributeName("value")]
+    public string? Value { get; set; }
+
+    [HtmlAttributeName("position")]
+    public string Position { get; set; } = "top";
+
+    [HtmlAttributeName("show-delay")]
+    public int ShowDelay { get; set; } = 0;
+
+    [HtmlAttributeName("hide-delay")]
+    public int HideDelay { get; set; } = 0;
+
+    [HtmlAttributeName("event")]
+    public string Event { get; set; } = "hover";
+
+    [HtmlAttributeName("auto-hide")]
+    public bool AutoHide { get; set; } = true;
+
+    [HtmlAttributeName("escape")]
+    public bool Escape { get; set; } = true;
+
+    public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "div";
-        output.TagMode = TagMode.StartTagAndEndTag;
-        output.Attributes.SetAttribute("data-island", "tooltip-component");
-        output.Attributes.SetAttribute("hydrate", "Interaction");
-        var props = new { target = Target, position = Position, showDelay = ShowDelay, hideDelay = HideDelay };
-        output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
+        var childContent = await output.GetChildContentAsync();
+        var content = childContent.GetContent();
+        var effectiveText = Value ?? Text;
+
+        if (!string.IsNullOrWhiteSpace(Target))
+        {
+            output.TagName = "div";
+            output.TagMode = TagMode.StartTagAndEndTag;
+            output.Attributes.SetAttribute("data-island", "tooltip-component");
+            output.Attributes.SetAttribute("data-hydrate", "load");
+            output.Attributes.SetAttribute("style", "display: none;");
+
+            var props = new
+            {
+                target = Target,
+                value = effectiveText ?? content,
+                position = Position,
+                showDelay = ShowDelay,
+                hideDelay = HideDelay,
+                @event = Event,
+                autoHide = AutoHide,
+                escape = Escape
+            };
+            output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
+            output.Content.SetHtmlContent(content);
+        }
+        else
+        {
+            output.TagName = null;
+            output.Content.SetHtmlContent(content);
+        }
     }
 }
 

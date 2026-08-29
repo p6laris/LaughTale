@@ -1,4 +1,7 @@
 import {
+  bindTooltipDirectives
+} from "./chunk-KFXEAQSZ.js";
+import {
   bindElementReactivity,
   createReactiveScope,
   evaluateExpression,
@@ -597,88 +600,6 @@ function matchesShortcut(e, spec) {
   return actualKey === keyPart;
 }
 
-// ../SoftMax.LaughTale.Client/src/directives/tooltip.ts
-function bindTooltipDirectives(element) {
-  for (const attr of Array.from(element.attributes)) {
-    if (attr.name === "l-tooltip" || attr.name.startsWith("l-tooltip.")) {
-      const text = attr.value;
-      if (!text) return;
-      let position = "top";
-      if (attr.name.includes(".bottom")) position = "bottom";
-      else if (attr.name.includes(".left")) position = "left";
-      else if (attr.name.includes(".right")) position = "right";
-      let tooltipEl = null;
-      const showTooltip = () => {
-        if (tooltipEl) return;
-        tooltipEl = document.createElement("div");
-        tooltipEl.className = "aura-directive-tooltip";
-        tooltipEl.textContent = text;
-        tooltipEl.style.cssText = `
-                    position: fixed;
-                    z-index: 99999;
-                    background: var(--p-surface-900, #1e293b);
-                    color: var(--p-surface-0, #ffffff);
-                    font-size: 0.75rem;
-                    font-weight: 500;
-                    padding: 0.35rem 0.65rem;
-                    border-radius: 6px;
-                    pointer-events: none;
-                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-                    opacity: 0;
-                    transform: scale(0.95);
-                    transition: opacity 150ms ease, transform 150ms ease;
-                    white-space: nowrap;
-                `;
-        document.body.appendChild(tooltipEl);
-        const rect = element.getBoundingClientRect();
-        const tooltipRect = tooltipEl.getBoundingClientRect();
-        let top = 0;
-        let left = 0;
-        switch (position) {
-          case "top":
-            top = rect.top - tooltipRect.height - 8;
-            left = rect.left + (rect.width - tooltipRect.width) / 2;
-            break;
-          case "bottom":
-            top = rect.bottom + 8;
-            left = rect.left + (rect.width - tooltipRect.width) / 2;
-            break;
-          case "left":
-            top = rect.top + (rect.height - tooltipRect.height) / 2;
-            left = rect.left - tooltipRect.width - 8;
-            break;
-          case "right":
-            top = rect.top + (rect.height - tooltipRect.height) / 2;
-            left = rect.right + 8;
-            break;
-        }
-        tooltipEl.style.top = `${Math.max(4, top)}px`;
-        tooltipEl.style.left = `${Math.max(4, left)}px`;
-        requestAnimationFrame(() => {
-          if (tooltipEl) {
-            tooltipEl.style.opacity = "1";
-            tooltipEl.style.transform = "scale(1)";
-          }
-        });
-      };
-      const hideTooltip = () => {
-        if (!tooltipEl) return;
-        const el = tooltipEl;
-        tooltipEl = null;
-        el.style.opacity = "0";
-        el.style.transform = "scale(0.95)";
-        setTimeout(() => {
-          if (el.parentNode) el.parentNode.removeChild(el);
-        }, 150);
-      };
-      element.addEventListener("mouseenter", showTooltip);
-      element.addEventListener("mouseleave", hideTooltip);
-      element.addEventListener("focus", showTooltip);
-      element.addEventListener("blur", hideTooltip);
-    }
-  }
-}
-
 // ../SoftMax.LaughTale.Client/src/directives/outside.ts
 function bindOutsideClickDirectives(element) {
   const scope = getNearestScope(element);
@@ -1059,7 +980,7 @@ defineIsland("tree-table", () => import("./treetable-STGV6W5W.js"));
 defineIsland("tree-select", () => import("./tree-select-3WADBRSW.js"));
 defineIsland("datatable", () => import("./datatable-FJYSSBES.js"));
 defineIsland("datagrid", () => import("./datatable-FJYSSBES.js"));
-defineIsland("modal", () => import("./modal-B2RYNRGP.js"));
+defineIsland("modal", () => import("./modal-7CROXCH2.js"));
 defineIsland("toast", () => import("./toast-DWHTYR76.js"));
 defineIsland("input-number", () => import("./input-number-KQ2J2WMH.js"));
 defineIsland("input-otp", () => import("./input-otp-RUPMATZ7.js"));
@@ -1137,8 +1058,8 @@ defineIsland("dataview", () => import("./dataview-7JZHVNBV.js"));
 defineIsland("menu", () => import("./menu-3E34L5JL.js"));
 defineIsland("context-menu", () => import("./context-menu-LU6WIMC7.js"));
 defineIsland("popover", () => import("./popover-ANO4CF5O.js"));
-defineIsland("tooltip", () => import("./tooltip-component-ITV3NTAM.js"));
-defineIsland("tooltip-component", () => import("./tooltip-component-ITV3NTAM.js"));
+defineIsland("tooltip", () => import("./tooltip-component-MILCE64M.js"));
+defineIsland("tooltip-component", () => import("./tooltip-component-MILCE64M.js"));
 defineIsland("sidebar", () => import("./sidebar-WZP7ZAUW.js"));
 
 export {
@@ -1148,4 +1069,4 @@ export {
   enableViewTransitions,
   getSlot
 };
-//# sourceMappingURL=chunk-HVCZ5JJN.js.map
+//# sourceMappingURL=chunk-LDXOBCVB.js.map

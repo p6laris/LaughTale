@@ -923,90 +923,343 @@ var init_hotkey = __esm({
   }
 });
 
-// src/directives/tooltip.ts
-function bindTooltipDirectives(element) {
-  for (const attr of Array.from(element.attributes)) {
-    if (attr.name === "l-tooltip" || attr.name.startsWith("l-tooltip.")) {
-      const text = attr.value;
-      if (!text) return;
-      let position = "top";
-      if (attr.name.includes(".bottom")) position = "bottom";
-      else if (attr.name.includes(".left")) position = "left";
-      else if (attr.name.includes(".right")) position = "right";
-      let tooltipEl = null;
-      const showTooltip = () => {
-        if (tooltipEl) return;
-        tooltipEl = document.createElement("div");
-        tooltipEl.className = "aura-directive-tooltip";
-        tooltipEl.textContent = text;
-        tooltipEl.style.cssText = `
-                    position: fixed;
-                    z-index: 99999;
-                    background: var(--p-surface-900, #1e293b);
-                    color: var(--p-surface-0, #ffffff);
-                    font-size: 0.75rem;
-                    font-weight: 500;
-                    padding: 0.35rem 0.65rem;
-                    border-radius: 6px;
-                    pointer-events: none;
-                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-                    opacity: 0;
-                    transform: scale(0.95);
-                    transition: opacity 150ms ease, transform 150ms ease;
-                    white-space: nowrap;
-                `;
-        document.body.appendChild(tooltipEl);
-        const rect = element.getBoundingClientRect();
-        const tooltipRect = tooltipEl.getBoundingClientRect();
-        let top = 0;
-        let left = 0;
-        switch (position) {
-          case "top":
-            top = rect.top - tooltipRect.height - 8;
-            left = rect.left + (rect.width - tooltipRect.width) / 2;
-            break;
-          case "bottom":
-            top = rect.bottom + 8;
-            left = rect.left + (rect.width - tooltipRect.width) / 2;
-            break;
-          case "left":
-            top = rect.top + (rect.height - tooltipRect.height) / 2;
-            left = rect.left - tooltipRect.width - 8;
-            break;
-          case "right":
-            top = rect.top + (rect.height - tooltipRect.height) / 2;
-            left = rect.right + 8;
-            break;
-        }
-        tooltipEl.style.top = `${Math.max(4, top)}px`;
-        tooltipEl.style.left = `${Math.max(4, left)}px`;
-        requestAnimationFrame(() => {
-          if (tooltipEl) {
-            tooltipEl.style.opacity = "1";
-            tooltipEl.style.transform = "scale(1)";
-          }
-        });
-      };
-      const hideTooltip = () => {
-        if (!tooltipEl) return;
-        const el = tooltipEl;
-        tooltipEl = null;
-        el.style.opacity = "0";
-        el.style.transform = "scale(0.95)";
-        setTimeout(() => {
-          if (el.parentNode) el.parentNode.removeChild(el);
-        }, 150);
-      };
-      element.addEventListener("mouseenter", showTooltip);
-      element.addEventListener("mouseleave", hideTooltip);
-      element.addEventListener("focus", showTooltip);
-      element.addEventListener("blur", hideTooltip);
-    }
+// src/directives/csp.ts
+function getCspNonce() {
+  if (typeof document === "undefined") return null;
+  const meta = document.querySelector('meta[name="csp-nonce"]');
+  return meta ? meta.content : null;
+}
+function applyNonceToStyle(style) {
+  const nonce = getCspNonce();
+  if (nonce) {
+    style.setAttribute("nonce", nonce);
   }
 }
+var init_csp = __esm({
+  "src/directives/csp.ts"() {
+    "use strict";
+  }
+});
+
+// src/runtime/styles.ts
+function injectIslandStyle(islandName, css) {
+  if (injectedStyles.has(islandName) || typeof document === "undefined") {
+    return;
+  }
+  injectedStyles.add(islandName);
+  const styleEl = document.createElement("style");
+  styleEl.setAttribute("data-island-style", islandName);
+  styleEl.textContent = css;
+  applyNonceToStyle(styleEl);
+  document.head.appendChild(styleEl);
+}
+function removeIslandStyle(islandName) {
+  if (typeof document === "undefined") return;
+  const existing = document.querySelector(`style[data-island-style="${islandName}"]`);
+  if (existing) {
+    existing.remove();
+    injectedStyles.delete(islandName);
+  }
+}
+var injectedStyles;
+var init_styles = __esm({
+  "src/runtime/styles.ts"() {
+    "use strict";
+    init_csp();
+    injectedStyles = /* @__PURE__ */ new Set();
+  }
+});
+
+// src/directives/tooltip.ts
+function parseTooltipConfig(element) {
+  let rawValue = "";
+  let position = "right";
+  for (const attr of Array.from(element.attributes)) {
+    if (attr.name === "p-tooltip" || attr.name === "v-tooltip" || attr.name === "data-tooltip" || attr.name === "l-tooltip" || attr.name.startsWith("p-tooltip.") || attr.name.startsWith("v-tooltip.") || attr.name.startsWith("l-tooltip.")) {
+      rawValue = attr.value;
+      if (attr.name.includes(".top")) position = "top";
+      else if (attr.name.includes(".bottom")) position = "bottom";
+      else if (attr.name.includes(".left")) position = "left";
+      else if (attr.name.includes(".right")) position = "right";
+      break;
+    }
+  }
+  if (!rawValue) {
+    const targetId = element.getAttribute("data-tooltip-target");
+    if (targetId) {
+      const template = document.getElementById(targetId);
+      if (template) rawValue = template.innerHTML;
+    }
+  }
+  if (!rawValue) return null;
+  if (rawValue.trim().startsWith("{") && rawValue.trim().endsWith("}")) {
+    try {
+      const parsed = JSON.parse(rawValue);
+      return {
+        value: parsed.value || "",
+        position: parsed.position || position,
+        showDelay: parsed.showDelay !== void 0 ? Number(parsed.showDelay) : 0,
+        hideDelay: parsed.hideDelay !== void 0 ? Number(parsed.hideDelay) : 0,
+        event: parsed.event || "hover",
+        autoHide: parsed.autoHide !== false,
+        escape: parsed.escape !== false,
+        class: parsed.class || ""
+      };
+    } catch {
+    }
+  }
+  const posAttr = element.getAttribute("p-tooltip-position") || element.getAttribute("data-tooltip-position");
+  if (posAttr) position = posAttr;
+  const showDelayAttr = element.getAttribute("p-tooltip-show-delay") || element.getAttribute("data-tooltip-show-delay");
+  const hideDelayAttr = element.getAttribute("p-tooltip-hide-delay") || element.getAttribute("data-tooltip-hide-delay");
+  const eventAttr = element.getAttribute("p-tooltip-event") || element.getAttribute("data-tooltip-event");
+  const autoHideAttr = element.getAttribute("p-tooltip-auto-hide") || element.getAttribute("data-tooltip-auto-hide");
+  const escapeAttr = element.getAttribute("p-tooltip-escape") || element.getAttribute("data-tooltip-escape");
+  return {
+    value: rawValue,
+    position,
+    showDelay: showDelayAttr ? parseInt(showDelayAttr, 10) : 0,
+    hideDelay: hideDelayAttr ? parseInt(hideDelayAttr, 10) : 0,
+    event: eventAttr || "hover",
+    autoHide: autoHideAttr !== "false",
+    escape: escapeAttr !== "false"
+  };
+}
+function positionTooltip(tooltipEl, targetEl, position) {
+  const targetRect = targetEl.getBoundingClientRect();
+  const tooltipRect = tooltipEl.getBoundingClientRect();
+  const margin = 8;
+  let top = 0;
+  let left = 0;
+  switch (position) {
+    case "top":
+      top = targetRect.top - tooltipRect.height - margin;
+      left = targetRect.left + targetRect.width / 2 - tooltipRect.width / 2;
+      break;
+    case "bottom":
+      top = targetRect.bottom + margin;
+      left = targetRect.left + targetRect.width / 2 - tooltipRect.width / 2;
+      break;
+    case "left":
+      top = targetRect.top + targetRect.height / 2 - tooltipRect.height / 2;
+      left = targetRect.left - tooltipRect.width - margin;
+      break;
+    case "right":
+    default:
+      top = targetRect.top + targetRect.height / 2 - tooltipRect.height / 2;
+      left = targetRect.right + margin;
+      break;
+  }
+  if (left < 8) left = 8;
+  if (left + tooltipRect.width > window.innerWidth - 8) {
+    left = window.innerWidth - tooltipRect.width - 8;
+  }
+  if (top < 8) top = 8;
+  if (top + tooltipRect.height > window.innerHeight - 8) {
+    top = window.innerHeight - tooltipRect.height - 8;
+  }
+  tooltipEl.style.top = `${Math.round(top)}px`;
+  tooltipEl.style.left = `${Math.round(left)}px`;
+}
+function showTooltipForElement(targetEl, config) {
+  if (hideTimeoutId) {
+    clearTimeout(hideTimeoutId);
+    hideTimeoutId = null;
+  }
+  if (showTimeoutId) {
+    clearTimeout(showTimeoutId);
+    showTimeoutId = null;
+  }
+  const triggerShow = () => {
+    if (!activeTooltipEl) {
+      activeTooltipEl = document.createElement("div");
+      activeTooltipEl.className = "p-tooltip p-component";
+      activeTooltipEl.setAttribute("role", "tooltip");
+      document.body.appendChild(activeTooltipEl);
+    }
+    currentTargetEl = targetEl;
+    const pos = config.position || "right";
+    activeTooltipEl.className = `p-tooltip p-component p-tooltip-${pos} ${config.class || ""}`;
+    if (!config.autoHide) {
+      activeTooltipEl.classList.add("p-tooltip-interactive");
+    }
+    if (config.escape) {
+      activeTooltipEl.innerHTML = `
+                <div class="p-tooltip-arrow"></div>
+                <div class="p-tooltip-text">${escapeHtml(config.value)}</div>
+            `;
+    } else {
+      activeTooltipEl.innerHTML = `
+                <div class="p-tooltip-arrow"></div>
+                <div class="p-tooltip-text">${config.value}</div>
+            `;
+    }
+    positionTooltip(activeTooltipEl, targetEl, pos);
+    activeTooltipEl.classList.add("p-tooltip-active");
+  };
+  if (config.showDelay && config.showDelay > 0) {
+    showTimeoutId = setTimeout(triggerShow, config.showDelay);
+  } else {
+    triggerShow();
+  }
+}
+function hideActiveTooltip(delay = 0) {
+  if (showTimeoutId) {
+    clearTimeout(showTimeoutId);
+    showTimeoutId = null;
+  }
+  if (hideTimeoutId) {
+    clearTimeout(hideTimeoutId);
+    hideTimeoutId = null;
+  }
+  const triggerHide = () => {
+    if (activeTooltipEl) {
+      activeTooltipEl.classList.remove("p-tooltip-active");
+      currentTargetEl = null;
+    }
+  };
+  if (delay > 0) {
+    hideTimeoutId = setTimeout(triggerHide, delay);
+  } else {
+    triggerHide();
+  }
+}
+function escapeHtml(str) {
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+function initGlobalTooltipDelegation() {
+  if (globalTooltipDelegationBound || typeof document === "undefined") return;
+  globalTooltipDelegationBound = true;
+  injectIslandStyle("tooltip", TOOLTIP_CSS);
+  document.addEventListener("mouseover", (e) => {
+    const target = e.target.closest("[p-tooltip], [v-tooltip], [data-tooltip], [l-tooltip], [data-tooltip-target]");
+    if (target) {
+      const config = parseTooltipConfig(target);
+      if (config && (config.event === "hover" || config.event === "both" || !config.event)) {
+        showTooltipForElement(target, config);
+      }
+    }
+  });
+  document.addEventListener("mouseout", (e) => {
+    const target = e.target.closest("[p-tooltip], [v-tooltip], [data-tooltip], [l-tooltip], [data-tooltip-target]");
+    if (target && target === currentTargetEl) {
+      const config = parseTooltipConfig(target);
+      hideActiveTooltip(config?.hideDelay || 0);
+    }
+  });
+  document.addEventListener("focusin", (e) => {
+    const target = e.target.closest("[p-tooltip], [v-tooltip], [data-tooltip], [l-tooltip], [data-tooltip-target]");
+    if (target) {
+      const config = parseTooltipConfig(target);
+      if (config && (config.event === "focus" || config.event === "both")) {
+        showTooltipForElement(target, config);
+      }
+    }
+  });
+  document.addEventListener("focusout", (e) => {
+    const target = e.target.closest("[p-tooltip], [v-tooltip], [data-tooltip], [l-tooltip], [data-tooltip-target]");
+    if (target && target === currentTargetEl) {
+      const config = parseTooltipConfig(target);
+      hideActiveTooltip(config?.hideDelay || 0);
+    }
+  });
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && activeTooltipEl) {
+      hideActiveTooltip(0);
+    }
+  });
+}
+function bindTooltipDirectives(element) {
+  initGlobalTooltipDelegation();
+}
+var TOOLTIP_CSS, activeTooltipEl, currentTargetEl, showTimeoutId, hideTimeoutId, globalTooltipDelegationBound;
 var init_tooltip = __esm({
   "src/directives/tooltip.ts"() {
     "use strict";
+    init_styles();
+    TOOLTIP_CSS = `
+.p-tooltip {
+    position: fixed;
+    z-index: 100000;
+    pointer-events: none;
+    visibility: hidden;
+    opacity: 0;
+    transform: scale(0.92);
+    transform-origin: center center;
+    will-change: transform, opacity;
+    transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.15s ease, visibility 0.15s;
+}
+
+.p-tooltip.p-tooltip-active {
+    visibility: visible;
+    opacity: 1;
+    transform: scale(1);
+}
+
+.p-tooltip.p-tooltip-interactive {
+    pointer-events: auto;
+}
+
+.p-tooltip-text {
+    background: var(--p-surface-700, #334155);
+    color: var(--p-surface-0, #ffffff);
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1.4;
+    padding: 0.375rem 0.75rem;
+    border-radius: var(--p-border-radius, 6px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    max-width: 18rem;
+    word-break: break-word;
+}
+
+/* Arrow Notch */
+.p-tooltip-arrow {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: var(--p-surface-700, #334155);
+    transform: rotate(45deg);
+    z-index: -1;
+}
+
+.p-tooltip-top .p-tooltip-arrow {
+    bottom: -4px;
+    left: calc(50% - 4px);
+}
+.p-tooltip-bottom .p-tooltip-arrow {
+    top: -4px;
+    left: calc(50% - 4px);
+}
+.p-tooltip-left .p-tooltip-arrow {
+    right: -4px;
+    top: calc(50% - 4px);
+}
+.p-tooltip-right .p-tooltip-arrow {
+    left: -4px;
+    top: calc(50% - 4px);
+}
+
+/* Dark Mode Tokens */
+.dark .p-tooltip-text,
+[data-theme="dark"] .p-tooltip-text {
+    background: var(--p-surface-800, #1e293b);
+    color: var(--p-surface-0, #f8fafc);
+    border: 1px solid var(--p-surface-700, #334155);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+}
+
+.dark .p-tooltip-arrow,
+[data-theme="dark"] .p-tooltip-arrow {
+    background: var(--p-surface-800, #1e293b);
+    border-color: var(--p-surface-700, #334155);
+}
+`;
+    activeTooltipEl = null;
+    currentTargetEl = null;
+    showTimeoutId = null;
+    hideTimeoutId = null;
+    globalTooltipDelegationBound = false;
   }
 });
 
@@ -1453,53 +1706,6 @@ function extractSlotContent(container, name = "default") {
 var init_slots = __esm({
   "src/runtime/slots.ts"() {
     "use strict";
-  }
-});
-
-// src/directives/csp.ts
-function getCspNonce() {
-  if (typeof document === "undefined") return null;
-  const meta = document.querySelector('meta[name="csp-nonce"]');
-  return meta ? meta.content : null;
-}
-function applyNonceToStyle(style) {
-  const nonce = getCspNonce();
-  if (nonce) {
-    style.setAttribute("nonce", nonce);
-  }
-}
-var init_csp = __esm({
-  "src/directives/csp.ts"() {
-    "use strict";
-  }
-});
-
-// src/runtime/styles.ts
-function injectIslandStyle(islandName, css) {
-  if (injectedStyles.has(islandName) || typeof document === "undefined") {
-    return;
-  }
-  injectedStyles.add(islandName);
-  const styleEl = document.createElement("style");
-  styleEl.setAttribute("data-island-style", islandName);
-  styleEl.textContent = css;
-  applyNonceToStyle(styleEl);
-  document.head.appendChild(styleEl);
-}
-function removeIslandStyle(islandName) {
-  if (typeof document === "undefined") return;
-  const existing = document.querySelector(`style[data-island-style="${islandName}"]`);
-  if (existing) {
-    existing.remove();
-    injectedStyles.delete(islandName);
-  }
-}
-var injectedStyles;
-var init_styles = __esm({
-  "src/runtime/styles.ts"() {
-    "use strict";
-    init_csp();
-    injectedStyles = /* @__PURE__ */ new Set();
   }
 });
 
@@ -12119,7 +12325,7 @@ function InputTagsIsland(container, props) {
   }
   let activeSuggestionIndex = -1;
   let filteredSuggestions = [];
-  function escapeHtml(str) {
+  function escapeHtml2(str) {
     return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   }
   function createTagElement(tag, index) {
@@ -12130,9 +12336,9 @@ function InputTagsIsland(container, props) {
     el.setAttribute("role", "option");
     el.setAttribute("aria-selected", "true");
     el.innerHTML = `
-            <span class="p-inputtags-tag-label">${escapeHtml(tag)}</span>
+            <span class="p-inputtags-tag-label">${escapeHtml2(tag)}</span>
             ${!isDisabled && !isReadonly ? `
-                <button type="button" class="p-inputtags-tag-remove" data-index="${index}" aria-label="Remove ${escapeHtml(tag)}" tabindex="-1">
+                <button type="button" class="p-inputtags-tag-remove" data-index="${index}" aria-label="Remove ${escapeHtml2(tag)}" tabindex="-1">
                     ${xCircleIcon}
                 </button>
             ` : ""}
@@ -12256,9 +12462,9 @@ function InputTagsIsland(container, props) {
     if (isDisabled) container.classList.add("is-disabled");
     let tagsHtml = tags.map((tag, idx) => `
             <span class="p-inputtags-tag" data-index="${idx}" tabindex="0" role="option" aria-selected="true">
-                <span class="p-inputtags-tag-label">${escapeHtml(tag)}</span>
+                <span class="p-inputtags-tag-label">${escapeHtml2(tag)}</span>
                 ${!isDisabled && !isReadonly ? `
-                    <button type="button" class="p-inputtags-tag-remove" data-index="${idx}" aria-label="Remove ${escapeHtml(tag)}" tabindex="-1">
+                    <button type="button" class="p-inputtags-tag-remove" data-index="${idx}" aria-label="Remove ${escapeHtml2(tag)}" tabindex="-1">
                         ${xCircleIcon}
                     </button>
                 ` : ""}
@@ -12387,7 +12593,7 @@ function InputTagsIsland(container, props) {
     input?.setAttribute("aria-expanded", "true");
     panel.innerHTML = filteredSuggestions.map((item, idx) => `
             <div class="p-inputtags-item ${idx === activeSuggestionIndex ? "is-highlighted" : ""}" data-index="${idx}">
-                <span>${escapeHtml(item)}</span>
+                <span>${escapeHtml2(item)}</span>
             </div>
         `).join("");
     panel.querySelectorAll(".p-inputtags-item").forEach((itemEl) => {
@@ -28203,18 +28409,18 @@ function InputTextIsland(container, props) {
                 ${xIcon}
             </button>
         ` : "";
-    const idAttr = inputId ? `id="${escapeHtml(inputId)}"` : "";
-    const nameAttr = inputName ? `name="${escapeHtml(inputName)}"` : "";
-    const ariaLabelAttr = props.ariaLabel ? `aria-label="${escapeHtml(props.ariaLabel)}"` : "";
-    const ariaLabelledByAttr = props.ariaLabelledBy ? `aria-labelledby="${escapeHtml(props.ariaLabelledBy)}"` : "";
-    const ariaDescribedByAttr = props.ariaDescribedBy ? `aria-describedby="${escapeHtml(props.ariaDescribedBy)}"` : "";
+    const idAttr = inputId ? `id="${escapeHtml2(inputId)}"` : "";
+    const nameAttr = inputName ? `name="${escapeHtml2(inputName)}"` : "";
+    const ariaLabelAttr = props.ariaLabel ? `aria-label="${escapeHtml2(props.ariaLabel)}"` : "";
+    const ariaLabelledByAttr = props.ariaLabelledBy ? `aria-labelledby="${escapeHtml2(props.ariaLabelledBy)}"` : "";
+    const ariaDescribedByAttr = props.ariaDescribedBy ? `aria-describedby="${escapeHtml2(props.ariaDescribedBy)}"` : "";
     container.innerHTML = `
             ${leftIconHtml}
             <input
                 type="${props.type || "text"}"
                 class="${inputClasses}"
-                value="${escapeHtml(val)}"
-                placeholder="${escapeHtml(props.placeholder || "")}"
+                value="${escapeHtml2(val)}"
+                placeholder="${escapeHtml2(props.placeholder || "")}"
                 ${idAttr}
                 ${nameAttr}
                 ${ariaLabelAttr}
@@ -28237,7 +28443,7 @@ function InputTextIsland(container, props) {
     }
     bindEvents();
   }
-  function escapeHtml(str) {
+  function escapeHtml2(str) {
     return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   }
   function bindEvents() {
@@ -30530,108 +30736,26 @@ __export(tooltip_component_exports, {
   default: () => TooltipIsland
 });
 function TooltipIsland(container, props) {
+  initGlobalTooltipDelegation();
   const targetSelector = props.target;
-  const position = props.position || "top";
-  const showDelay = props.showDelay || 300;
-  const hideDelay = props.hideDelay || 100;
-  let showTimer = null;
-  let hideTimer = null;
-  let activeTarget = null;
-  const contentHtml = container.innerHTML;
-  container.innerHTML = `
-
-`;
-  injectIslandStyle("tooltip", `
-        .laughtale-tooltip {
-            position: absolute;
-            background: var(--p-surface-900);
-            color: var(--p-surface-0);
-            padding: 0.5rem 0.75rem;
-            border-radius: var(--p-border-radius);
-            font-size: 0.75rem;
-            font-family: var(--p-font-family, inherit);
-            pointer-events: none;
-            z-index: 2000;
-            opacity: 0;
-            transition: opacity 150ms ease;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-        }
-        [data-theme="dark"] .laughtale-tooltip {
-            background: var(--p-surface-100);
-            color: var(--p-text-color);
-        }
-        .laughtale-tooltip.visible {
-            opacity: 1;
-        }
-        .tooltip-arrow {
-            position: absolute;
-            width: 0;
-            height: 0;
-            border-style: solid;
-        }
-        .tooltip-arrow.top {
-            bottom: -4px;
-            left: calc(50% - 4px);
-            border-width: 4px 4px 0 4px;
-            border-color: var(--p-surface-900) transparent transparent transparent;
-        }
-        [data-theme="dark"] .tooltip-arrow.top {
-            border-color: var(--p-surface-100) transparent transparent transparent;
-        }
-    `);
-  let tooltipEl = null;
-  function createTooltip() {
-    if (!tooltipEl) {
-      tooltipEl = document.createElement("div");
-      tooltipEl.className = "laughtale-tooltip";
-      tooltipEl.innerHTML = `
-<div class="tooltip-arrow ' + position + '"></div>
-                <div class="tooltip-content">${contentHtml}</div>
-`;
-      document.body.appendChild(tooltipEl);
+  const tooltipText = props.value || props.text || container.textContent?.trim();
+  if (targetSelector && tooltipText) {
+    const targetEl = document.querySelector(targetSelector);
+    if (targetEl) {
+      targetEl.setAttribute("p-tooltip", tooltipText);
+      if (props.position) targetEl.setAttribute("p-tooltip-position", props.position);
+      if (props.showDelay !== void 0) targetEl.setAttribute("p-tooltip-show-delay", props.showDelay.toString());
+      if (props.hideDelay !== void 0) targetEl.setAttribute("p-tooltip-hide-delay", props.hideDelay.toString());
+      if (props.event) targetEl.setAttribute("p-tooltip-event", props.event);
+      if (props.autoHide !== void 0) targetEl.setAttribute("p-tooltip-auto-hide", props.autoHide.toString());
+      if (props.escape !== void 0) targetEl.setAttribute("p-tooltip-escape", props.escape.toString());
     }
   }
-  function show(target) {
-    if (hideTimer) clearTimeout(hideTimer);
-    activeTarget = target;
-    showTimer = window.setTimeout(() => {
-      createTooltip();
-      if (tooltipEl && activeTarget) {
-        const rect = activeTarget.getBoundingClientRect();
-        if (position === "top") {
-          tooltipEl.style.top = rect.top + window.scrollY - tooltipEl.offsetHeight - 8 + "px";
-          tooltipEl.style.left = rect.left + window.scrollX + rect.width / 2 - tooltipEl.offsetWidth / 2 + "px";
-        }
-        tooltipEl.classList.add("visible");
-      }
-    }, showDelay);
-  }
-  function hide() {
-    if (showTimer) clearTimeout(showTimer);
-    hideTimer = window.setTimeout(() => {
-      if (tooltipEl) {
-        tooltipEl.classList.remove("visible");
-        setTimeout(() => {
-          if (tooltipEl && tooltipEl.parentNode) {
-            tooltipEl.parentNode.removeChild(tooltipEl);
-            tooltipEl = null;
-          }
-        }, 150);
-      }
-    }, hideDelay);
-  }
-  const targets = document.querySelectorAll(targetSelector);
-  targets.forEach((target) => {
-    target.addEventListener("mouseenter", () => show(target));
-    target.addEventListener("mouseleave", hide);
-    target.addEventListener("focus", () => show(target));
-    target.addEventListener("blur", hide);
-  });
 }
 var init_tooltip_component = __esm({
   "src/components/tooltip-component.ts"() {
     "use strict";
-    init_styles();
+    init_tooltip();
   }
 });
 
