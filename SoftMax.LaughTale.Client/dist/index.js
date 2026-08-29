@@ -7782,7 +7782,10 @@ var SoftMaxIslands = (() => {
             `;
       }
       let toolbarHtml = "";
-      const hasToolbar = props.title || props.globalFilterFields || props.exportFilename || showInteractiveSize || loading;
+      const showSearch = Array.isArray(props.globalFilterFields) && props.globalFilterFields.length > 0;
+      const showExport = !!props.exportFilename && props.exportFilename.trim() !== "" || !!props.showExport;
+      const showRefresh = !!props.showRefresh;
+      const hasToolbar = !!props.title || showSearch || showExport || showInteractiveSize || showRefresh;
       if (hasToolbar) {
         toolbarHtml = `
                 <div class="p-datatable-header-toolbar">
@@ -7796,21 +7799,25 @@ var SoftMaxIslands = (() => {
                             </div>
                         ` : ""}
 
-                        ${props.globalFilterFields ? `
+                        ${showSearch ? `
                             <div style="position: relative; display: flex; align-items: center;">
                                 <input type="text" class="p-datatable-global-filter p-datatable-filter-input" placeholder="Search keyword..." value="${globalFilter}" style="width: 180px;" />
                             </div>
                         ` : ""}
 
-                        <button type="button" class="p-datatable-refresh-btn" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.4rem 0.75rem; border-radius: 6px; border: 1px solid var(--p-surface-300); background: var(--p-surface-0); color: inherit; font-size: 0.8125rem; font-weight: 600; cursor: pointer;">
-                            <span>${LucideIcons.refreshCw}</span>
-                            <span>Refresh</span>
-                        </button>
+                        ${showRefresh ? `
+                            <button type="button" class="p-datatable-refresh-btn" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.4rem 0.75rem; border-radius: 6px; border: 1px solid var(--p-surface-300); background: var(--p-surface-0); color: inherit; font-size: 0.8125rem; font-weight: 600; cursor: pointer;">
+                                <span>${LucideIcons.refreshCw}</span>
+                                <span>Refresh</span>
+                            </button>
+                        ` : ""}
 
-                        <button type="button" class="p-datatable-export-btn" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.4rem 0.75rem; border-radius: 6px; border: 1px solid var(--p-surface-300); background: var(--p-surface-0); color: inherit; font-size: 0.8125rem; font-weight: 600; cursor: pointer;">
-                            <span>${LucideIcons.fileSpreadsheet}</span>
-                            <span>Export CSV</span>
-                        </button>
+                        ${showExport ? `
+                            <button type="button" class="p-datatable-export-btn" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.4rem 0.75rem; border-radius: 6px; border: 1px solid var(--p-surface-300); background: var(--p-surface-0); color: inherit; font-size: 0.8125rem; font-weight: 600; cursor: pointer;">
+                                <span>${LucideIcons.fileSpreadsheet}</span>
+                                <span>Export CSV</span>
+                            </button>
+                        ` : ""}
                     </div>
                 </div>
             `;
