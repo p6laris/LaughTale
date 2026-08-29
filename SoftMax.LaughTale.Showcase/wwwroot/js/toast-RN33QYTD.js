@@ -15,6 +15,7 @@ var TOAST_CSS = `
     z-index: var(--p-toast-z-index, 1100);
     display: flex;
     flex-direction: column;
+    gap: var(--p-toast-gap, 0.75rem);
     pointer-events: none;
     width: var(--p-toast-width, 25rem);
     max-width: calc(100vw - 2.5rem);
@@ -58,58 +59,6 @@ var TOAST_CSS = `
     transform: translate(-50%, -50%);
 }
 
-/* Stacked Card Deck Mode */
-.p-toast-mode-stacked {
-    position: relative;
-}
-
-.p-toast-mode-stacked .p-toast-message {
-    transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1),
-                opacity 240ms cubic-bezier(0.16, 1, 0.3, 1),
-                box-shadow 280ms ease,
-                max-height 280ms cubic-bezier(0.16, 1, 0.3, 1),
-                margin 280ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.p-toast-mode-stacked .p-toast-message:nth-child(n+2) {
-    margin-top: -3.85rem;
-}
-
-.p-toast-mode-stacked .p-toast-message:nth-last-child(1) {
-    transform: scale(1) translateY(0);
-    z-index: 10;
-}
-.p-toast-mode-stacked .p-toast-message:nth-last-child(2) {
-    transform: scale(0.96) translateY(-8px);
-    opacity: 0.9;
-    z-index: 9;
-}
-.p-toast-mode-stacked .p-toast-message:nth-last-child(3) {
-    transform: scale(0.92) translateY(-16px);
-    opacity: 0.8;
-    z-index: 8;
-}
-.p-toast-mode-stacked .p-toast-message:nth-last-child(n+4) {
-    transform: scale(0.88) translateY(-24px);
-    opacity: 0;
-    pointer-events: none;
-    z-index: 7;
-}
-
-/* Expanded on Hover or Focus within Stack */
-.p-toast-mode-stacked:hover .p-toast-message,
-.p-toast-mode-stacked:focus-within .p-toast-message,
-.p-toast-mode-expanded .p-toast-message {
-    transform: scale(1) translateY(0) !important;
-    opacity: 1 !important;
-    margin-top: 0.75rem !important;
-    pointer-events: auto !important;
-}
-
-.p-toast-mode-expanded {
-    gap: var(--p-toast-gap, 0.75rem);
-}
-
 /* Toast Message Card */
 .p-toast-message {
     pointer-events: auto;
@@ -123,9 +72,15 @@ var TOAST_CSS = `
     backdrop-filter: blur(var(--p-toast-blur, 10px));
     -webkit-backdrop-filter: blur(var(--p-toast-blur, 10px));
     box-sizing: border-box;
-    will-change: transform, opacity, max-height;
+    will-change: transform, opacity, max-height, padding, margin;
     overflow: hidden;
     animation: p-toast-enter 240ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    transition: opacity 220ms cubic-bezier(0.16, 1, 0.3, 1),
+                transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
+                max-height 260ms cubic-bezier(0.16, 1, 0.3, 1),
+                padding 260ms cubic-bezier(0.16, 1, 0.3, 1),
+                margin 260ms cubic-bezier(0.16, 1, 0.3, 1),
+                border-width 260ms ease;
 }
 
 .p-toast-message.p-toast-message-leave {
@@ -137,18 +92,19 @@ var TOAST_CSS = `
     margin-top: 0 !important;
     margin-bottom: 0 !important;
     border-width: 0 !important;
-    transform: translateY(-10px) scale(0.95) !important;
-    transition: all 220ms cubic-bezier(0.4, 0, 1, 1) forwards !important;
+    transform: translateY(-8px) scale(0.96) !important;
 }
 
 @keyframes p-toast-enter {
     from {
         opacity: 0;
-        transform: translateY(-14px) scale(0.96);
+        transform: translateY(-12px) scale(0.97);
+        max-height: 0;
     }
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
+        max-height: 300px;
     }
 }
 
@@ -425,7 +381,7 @@ var ToastService = class {
       const pos = position || (targetGroup.startsWith("top-") || targetGroup.startsWith("bottom-") || targetGroup === "center" ? targetGroup : "top-right");
       container = document.createElement("div");
       container.id = `aura-toast-container-${targetGroup}`;
-      container.className = `p-toast p-toast-${pos} p-toast-mode-stacked`;
+      container.className = `p-toast p-toast-${pos}`;
       document.body.appendChild(container);
       this.registeredContainers.set(targetGroup, container);
     }
@@ -568,11 +524,14 @@ var ToastService = class {
       clearTimeout(item.timeoutId);
     }
     const el = item.el;
+    const currentHeight = el.getBoundingClientRect().height;
+    el.style.maxHeight = `${currentHeight}px`;
+    void el.offsetHeight;
     el.classList.add("p-toast-message-leave");
     this.activeMessages.delete(id);
     setTimeout(() => {
       el.remove();
-    }, 220);
+    }, 260);
   }
   remove(msg) {
     if (typeof msg === "string") {
@@ -606,8 +565,7 @@ function ToastIsland(container, props) {
   injectIslandStyle("toast", TOAST_CSS);
   const group = props.group || "default";
   const position = props.position || "top-right";
-  const mode = props.mode === "expanded" ? "p-toast-mode-expanded" : "p-toast-mode-stacked";
-  container.className = `p-toast p-toast-${position} ${mode} ${props.class || ""}`;
+  container.className = `p-toast p-toast-${position} ${props.class || ""}`;
   if (props.gap) {
     container.style.setProperty("--p-toast-gap", `${props.gap}px`);
   }
@@ -618,4 +576,4 @@ export {
   ToastIsland as default,
   globalToast
 };
-//# sourceMappingURL=toast-ZDJ76ZQ5.js.map
+//# sourceMappingURL=toast-RN33QYTD.js.map
