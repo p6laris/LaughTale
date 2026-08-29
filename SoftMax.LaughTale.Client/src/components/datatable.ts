@@ -609,13 +609,30 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
     const expandedKeys = new Set<any>();
     let editingCell: { rowKey: any; field: string } | null = null;
 
-    // Helper: resolve deep nested property path (e.g. 'country.name')
+    // Helper: resolve deep nested property path (e.g. 'country.name') with case-insensitive fallback
     function resolveField(obj: any, field: string): any {
         if (!obj || !field) return '';
         if (field.includes('.')) {
-            return field.split('.').reduce((acc, part) => acc?.[part], obj);
+            return field.split('.').reduce((acc, part) => {
+                if (acc == null) return undefined;
+                if (acc[part] !== undefined) return acc[part];
+                const camel = part.charAt(0).toLowerCase() + part.slice(1);
+                if (acc[camel] !== undefined) return acc[camel];
+                const lower = part.toLowerCase();
+                for (const k of Object.keys(acc)) {
+                    if (k.toLowerCase() === lower) return acc[k];
+                }
+                return undefined;
+            }, obj);
         }
-        return obj[field];
+        if (obj[field] !== undefined) return obj[field];
+        const camel = field.charAt(0).toLowerCase() + field.slice(1);
+        if (obj[camel] !== undefined) return obj[camel];
+        const lower = field.toLowerCase();
+        for (const k of Object.keys(obj)) {
+            if (k.toLowerCase() === lower) return obj[k];
+        }
+        return undefined;
     }
 
     // Helper: Rich Cell Renderer

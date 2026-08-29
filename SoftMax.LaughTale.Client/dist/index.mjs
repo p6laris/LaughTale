@@ -7377,9 +7377,26 @@ function DataTableIsland(container, props) {
   function resolveField(obj, field) {
     if (!obj || !field) return "";
     if (field.includes(".")) {
-      return field.split(".").reduce((acc, part) => acc?.[part], obj);
+      return field.split(".").reduce((acc, part) => {
+        if (acc == null) return void 0;
+        if (acc[part] !== void 0) return acc[part];
+        const camel2 = part.charAt(0).toLowerCase() + part.slice(1);
+        if (acc[camel2] !== void 0) return acc[camel2];
+        const lower2 = part.toLowerCase();
+        for (const k of Object.keys(acc)) {
+          if (k.toLowerCase() === lower2) return acc[k];
+        }
+        return void 0;
+      }, obj);
     }
-    return obj[field];
+    if (obj[field] !== void 0) return obj[field];
+    const camel = field.charAt(0).toLowerCase() + field.slice(1);
+    if (obj[camel] !== void 0) return obj[camel];
+    const lower = field.toLowerCase();
+    for (const k of Object.keys(obj)) {
+      if (k.toLowerCase() === lower) return obj[k];
+    }
+    return void 0;
   }
   function renderCellContent(row, col, rawVal) {
     const fieldName = (col.field || "").toLowerCase();

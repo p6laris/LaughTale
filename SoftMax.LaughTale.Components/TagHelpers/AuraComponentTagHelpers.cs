@@ -5097,7 +5097,7 @@ public class IslandDataTableTagHelper : TagHelper
     public string? EditMode { get; set; }
     public bool Loading { get; set; } = false;
     public string LoadingMode { get; set; } = "overlay";
-    public string ExportFilename { get; set; } = "export";
+    public string? ExportFilename { get; set; }
     public string EmptyMessage { get; set; } = "No records found.";
     public string? TableStyle { get; set; }
     public string? Title { get; set; }
