@@ -5601,6 +5601,453 @@
         </div>
     </section>
 
+    <!-- Dialog -->
+    <section id="sec-dialog" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>Dialog</h2>
+                <p>Dialog is a versatile container component to display content in an overlay window with modal, draggable, maximizable, and responsive capabilities.</p>
+            </div>
+            <span class="aura-tag tag-emerald">Overlays</span>
+        </div>
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Demo 1: Basic -->
+            <div data-dialog-demo="basic" style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Dialog is used as a container and visibility is controlled with triggers or bindings.</p>
+                <div style="display: flex; align-items: center;">
+                    <button type="button" class="p-button p-button-primary" data-dialog-target="dlg-basic" style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                        Edit Profile
+                    </button>
+                    <island-aura-dialog id="dlg-basic" header="Edit Profile" dialog-width="26rem">
+                        <div class="p-dialog-content" style="display: flex; flex-direction: column; gap: 1.25rem;">
+                            <div style="display: flex; align-items: center; gap: 1rem; padding-bottom: 0.5rem;">
+                                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="Amanda Miller" style="width: 3rem; height: 3rem; border-radius: 9999px; object-fit: cover;" />
+                                <div>
+                                    <div style="font-weight: 700; font-size: 0.95rem; color: var(--p-text-color);">Amanda Miller</div>
+                                    <div style="font-size: 0.8125rem; color: var(--p-text-muted);">amanda@example.com</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                                <label for="dlg-basic-name" style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color);">Name</label>
+                                <input id="dlg-basic-name" type="text" class="p-inputtext p-component" value="Amanda Miller" style="padding: 0.5rem 0.75rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); font-size: 0.875rem;" />
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                                <label for="dlg-basic-username" style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color);">Username</label>
+                                <input id="dlg-basic-username" type="text" class="p-inputtext p-component" value="@@amandamilier" style="padding: 0.5rem 0.75rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); font-size: 0.875rem;" />
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                                <label for="dlg-basic-email" style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color);">Email</label>
+                                <input id="dlg-basic-email" type="email" class="p-inputtext p-component" value="amanda@example.com" style="padding: 0.5rem 0.75rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); font-size: 0.875rem;" />
+                            </div>
+                        </div>
+                        <div class="p-dialog-footer">
+                            <button type="button" class="p-button p-button-outlined p-button-secondary p-button-sm" data-dialog-close style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: transparent; color: var(--p-text-color); cursor: pointer;">
+                                Cancel
+                            </button>
+                            <button type="button" class="p-button p-button-primary p-button-sm" data-dialog-close style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                                Save Changes
+                            </button>
+                        </div>
+                    </island-aura-dialog>
+                </div>
+            </div>
+
+            <!-- Demo 2: Template -->
+            <div data-dialog-demo="template" style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Template</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Header and Footer sections allow rich custom UI via templating.</p>
+                <div style="display: flex; align-items: center;">
+                    <button type="button" class="p-button p-button-primary" data-dialog-target="dlg-template" style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                        Show
+                    </button>
+                    <island-aura-dialog id="dlg-template" dialog-width="25rem">
+                        <div class="p-dialog-header">
+                            <div style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                                <img src="https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png" alt="Amy Elsner" style="width: 2rem; height: 2rem; border-radius: 9999px; object-fit: cover;" />
+                                <span style="font-weight: 700; font-size: 1rem; color: var(--p-text-color);">Amy Elsner</span>
+                            </div>
+                            <div class="p-dialog-header-actions">
+                                <button type="button" class="p-dialog-header-action p-dialog-close-button" aria-label="Close">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-dialog-content" style="display: flex; flex-direction: column; gap: 1rem;">
+                            <span style="font-size: 0.875rem; color: var(--p-text-muted);">Update your information.</span>
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <label for="dlg-tmpl-user" style="font-size: 0.875rem; font-weight: 600; width: 5.5rem; color: var(--p-text-color);">Username</label>
+                                <input id="dlg-tmpl-user" type="text" class="p-inputtext p-component" value="amy.elsner" style="flex: 1; padding: 0.45rem 0.75rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); font-size: 0.875rem;" />
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <label for="dlg-tmpl-email" style="font-size: 0.875rem; font-weight: 600; width: 5.5rem; color: var(--p-text-color);">Email</label>
+                                <input id="dlg-tmpl-email" type="email" class="p-inputtext p-component" value="amy.elsner@@primevue.org" style="flex: 1; padding: 0.45rem 0.75rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); font-size: 0.875rem;" />
+                            </div>
+                        </div>
+                        <div class="p-dialog-footer">
+                            <button type="button" class="p-button p-button-text p-button-secondary p-button-sm" data-dialog-close style="padding: 0.45rem 0.85rem; font-size: 0.875rem; font-weight: 500; border: none; background: transparent; color: var(--p-surface-700); cursor: pointer;">
+                                Cancel
+                            </button>
+                            <button type="button" class="p-button p-button-outlined p-button-secondary p-button-sm" data-dialog-close style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer;">
+                                Save
+                            </button>
+                        </div>
+                    </island-aura-dialog>
+                </div>
+            </div>
+
+            <!-- Demo 3: Draggable -->
+            <div data-dialog-demo="draggable" style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Draggable</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Enabling draggable lets the user reposition the Dialog anywhere by dragging from its header.</p>
+                <div style="display: flex; align-items: center;">
+                    <button type="button" class="p-button p-button-primary" data-dialog-target="dlg-draggable" style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                        Open Note
+                    </button>
+                    <island-aura-dialog id="dlg-draggable" header="Quick Note" draggable="true" dialog-width="25rem">
+                        <div class="p-dialog-content" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                            <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin: 0;">Drag this dialog by its header to reposition it anywhere on the screen.</p>
+                            <textarea class="p-textarea p-component" rows="4" style="width: 100%; padding: 0.6rem 0.75rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); font-size: 0.875rem; resize: none; box-sizing: border-box;">Remember to review the design specs for the new dashboard layout before the meeting tomorrow.</textarea>
+                        </div>
+                        <div class="p-dialog-footer">
+                            <button type="button" class="p-button p-button-outlined p-button-secondary p-button-sm" data-dialog-close style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: transparent; color: var(--p-text-color); cursor: pointer;">
+                                Discard
+                            </button>
+                            <button type="button" class="p-button p-button-primary p-button-sm" data-dialog-close style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                                Save Note
+                            </button>
+                        </div>
+                    </island-aura-dialog>
+                </div>
+            </div>
+
+            <!-- Demo 4: Position -->
+            <div data-dialog-demo="position" style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Position</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">The position property displays a Dialog at any edge or corner of the screen.</p>
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; max-width: 28rem; margin: 0 auto;">
+                    <div style="display: flex; justify-content: center; gap: 0.5rem; width: 100%;">
+                        <button type="button" class="p-button p-button-outlined p-button-secondary" data-dialog-target="dlg-position" data-dialog-position="left" style="flex: 1; padding: 0.45rem 0.75rem; font-size: 0.8125rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer;">
+                            Left
+                        </button>
+                        <button type="button" class="p-button p-button-outlined p-button-secondary" data-dialog-target="dlg-position" data-dialog-position="right" style="flex: 1; padding: 0.45rem 0.75rem; font-size: 0.8125rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer;">
+                            Right
+                        </button>
+                    </div>
+                    <div style="display: flex; justify-content: center; gap: 0.5rem; width: 100%;">
+                        <button type="button" class="p-button p-button-outlined p-button-secondary" data-dialog-target="dlg-position" data-dialog-position="topleft" style="flex: 1; padding: 0.45rem 0.75rem; font-size: 0.8125rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer;">
+                            TopLeft
+                        </button>
+                        <button type="button" class="p-button p-button-outlined p-button-secondary" data-dialog-target="dlg-position" data-dialog-position="top" style="flex: 1; padding: 0.45rem 0.75rem; font-size: 0.8125rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer;">
+                            Top
+                        </button>
+                        <button type="button" class="p-button p-button-outlined p-button-secondary" data-dialog-target="dlg-position" data-dialog-position="topright" style="flex: 1; padding: 0.45rem 0.75rem; font-size: 0.8125rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer;">
+                            TopRight
+                        </button>
+                    </div>
+                    <div style="display: flex; justify-content: center; gap: 0.5rem; width: 100%;">
+                        <button type="button" class="p-button p-button-outlined p-button-secondary" data-dialog-target="dlg-position" data-dialog-position="bottomleft" style="flex: 1; padding: 0.45rem 0.75rem; font-size: 0.8125rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer;">
+                            BottomLeft
+                        </button>
+                        <button type="button" class="p-button p-button-outlined p-button-secondary" data-dialog-target="dlg-position" data-dialog-position="bottom" style="flex: 1; padding: 0.45rem 0.75rem; font-size: 0.8125rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer;">
+                            Bottom
+                        </button>
+                        <button type="button" class="p-button p-button-outlined p-button-secondary" data-dialog-target="dlg-position" data-dialog-position="bottomright" style="flex: 1; padding: 0.45rem 0.75rem; font-size: 0.8125rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer;">
+                            BottomRight
+                        </button>
+                    </div>
+                    <island-aura-dialog id="dlg-position" header="Edit Profile" dialog-width="25rem">
+                        <div class="p-dialog-content" style="display: flex; flex-direction: column; gap: 1rem;">
+                            <span style="font-size: 0.875rem; color: var(--p-text-muted);">Update your information.</span>
+                            <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                                <label for="dlg-pos-user" style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color);">Username</label>
+                                <input id="dlg-pos-user" type="text" class="p-inputtext p-component" placeholder="username" style="padding: 0.5rem 0.75rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); font-size: 0.875rem;" />
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                                <label for="dlg-pos-email" style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color);">Email</label>
+                                <input id="dlg-pos-email" type="email" class="p-inputtext p-component" placeholder="user@@example.com" style="padding: 0.5rem 0.75rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); font-size: 0.875rem;" />
+                            </div>
+                        </div>
+                        <div class="p-dialog-footer">
+                            <button type="button" class="p-button p-button-outlined p-button-secondary p-button-sm" data-dialog-close style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: transparent; color: var(--p-text-color); cursor: pointer;">
+                                Cancel
+                            </button>
+                            <button type="button" class="p-button p-button-primary p-button-sm" data-dialog-close style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                                Save
+                            </button>
+                        </div>
+                    </island-aura-dialog>
+                </div>
+            </div>
+
+            <!-- Demo 5: Maximizable -->
+            <div data-dialog-demo="maximizable" style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Maximizable</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Adding maximizable enables the header full screen expansion mode.</p>
+                <div style="display: flex; align-items: center;">
+                    <button type="button" class="p-button p-button-primary" data-dialog-target="dlg-maximizable" style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                        Show
+                    </button>
+                    <island-aura-dialog id="dlg-maximizable" header="Article Preview" maximizable="true" dialog-width="48rem">
+                        <div class="p-dialog-content" style="display: flex; flex-direction: column; gap: 1rem;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; color: var(--p-text-muted);">
+                                <span>Published on Feb 1, 2026</span>
+                                <span>•</span>
+                                <span>5 min read</span>
+                            </div>
+                            <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--p-text-color); margin: 0;">Getting Started with Component-Driven Development</h2>
+                            <p style="font-size: 0.9rem; line-height: 1.6; color: var(--p-surface-700); margin: 0;">
+                                Component-driven development is an approach that focuses on building loosely coupled, independent components that can be composed together to build complex user interfaces. This methodology promotes reusability, testability, and maintainability.
+                            </p>
+                            <p style="font-size: 0.9rem; line-height: 1.6; color: var(--p-surface-700); margin: 0;">
+                                Modern frameworks and libraries have embraced this pattern, providing tools and conventions that make it straightforward to create, compose, and manage components at scale.
+                            </p>
+                        </div>
+                        <div class="p-dialog-footer" style="justify-content: space-between;">
+                            <span style="font-size: 0.8125rem; color: var(--p-text-muted);">Author: Jane Doe • Last updated: Feb 1, 2026</span>
+                            <button type="button" class="p-button p-button-primary p-button-sm" data-dialog-close style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                                Close
+                            </button>
+                        </div>
+                    </island-aura-dialog>
+                </div>
+            </div>
+
+            <!-- Demo 6: Full Screen -->
+            <div data-dialog-demo="fullscreen" style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Full Screen</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">A full screen Dialog covering the entire viewport.</p>
+                <div style="display: flex; align-items: center;">
+                    <button type="button" class="p-button p-button-primary" data-dialog-target="dlg-fullscreen" style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                        View Gallery
+                    </button>
+                    <island-aura-dialog id="dlg-fullscreen" header="Photo Gallery" style="width: 100vw; height: 100vh; max-width: 100vw; max-height: 100vh; border-radius: 0;">
+                        <div class="p-dialog-content" style="display: flex; flex-direction: column; gap: 1rem;">
+                            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.75rem;">
+                                @for (int i = 1; i <= 18; i++)
+                                {
+                                    <div style="aspect-ratio: 1; border-radius: var(--p-border-radius); background: var(--p-surface-100); display: flex; align-items: center; justify-content: center; color: var(--p-surface-400);">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                                    </div>
+                                }
+                            </div>
+                            <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin: 0;">Showing 18 of 64 photos</p>
+                        </div>
+                    </island-aura-dialog>
+                </div>
+            </div>
+
+            <!-- Demo 7: Modal & Dismissable Mask -->
+            <div data-dialog-demo="modal" style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Modal</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Mask layer behind the Dialog is enabled with modal, and dismissableMask allows closing by clicking outside.</p>
+                <div style="display: flex; align-items: center;">
+                    <button type="button" class="p-button p-button-primary" data-dialog-target="dlg-modal" style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                        Edit Profile
+                    </button>
+                    <island-aura-dialog id="dlg-modal" header="Edit Profile" modal="true" dismissable-mask="true" dialog-width="25rem">
+                        <div class="p-dialog-content" style="display: flex; flex-direction: column; gap: 1rem;">
+                            <span style="font-size: 0.875rem; color: var(--p-text-muted);">Update your information. Click outside the dialog to dismiss.</span>
+                            <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                                <label for="dlg-mdl-user" style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color);">Username</label>
+                                <input id="dlg-mdl-user" type="text" class="p-inputtext p-component" placeholder="username" style="padding: 0.5rem 0.75rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); font-size: 0.875rem;" />
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                                <label for="dlg-mdl-email" style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color);">Email</label>
+                                <input id="dlg-mdl-email" type="email" class="p-inputtext p-component" placeholder="user@@example.com" style="padding: 0.5rem 0.75rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); font-size: 0.875rem;" />
+                            </div>
+                        </div>
+                        <div class="p-dialog-footer">
+                            <button type="button" class="p-button p-button-outlined p-button-secondary p-button-sm" data-dialog-close style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: transparent; color: var(--p-text-color); cursor: pointer;">
+                                Cancel
+                            </button>
+                            <button type="button" class="p-button p-button-primary p-button-sm" data-dialog-close style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                                Save
+                            </button>
+                        </div>
+                    </island-aura-dialog>
+                </div>
+            </div>
+
+            <!-- Demo 8: Without Modal -->
+            <div data-dialog-demo="withoutmodal" style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Without Modal</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Non-modal dialogs allow interacting with the background page simultaneously.</p>
+                <div style="display: flex; align-items: center;">
+                    <button type="button" class="p-button p-button-primary" data-dialog-target="dlg-nomodal" style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                        Show
+                    </button>
+                    <island-aura-dialog id="dlg-nomodal" header="Edit Profile" modal="false" dialog-width="25rem">
+                        <div class="p-dialog-content" style="display: flex; flex-direction: column; gap: 1rem;">
+                            <span style="font-size: 0.875rem; color: var(--p-text-muted);">Update your information without blocking page interaction.</span>
+                            <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                                <label for="dlg-nomdl-user" style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color);">Username</label>
+                                <input id="dlg-nomdl-user" type="text" class="p-inputtext p-component" placeholder="username" style="padding: 0.5rem 0.75rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); font-size: 0.875rem;" />
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                                <label for="dlg-nomdl-email" style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color);">Email</label>
+                                <input id="dlg-nomdl-email" type="email" class="p-inputtext p-component" placeholder="user@@example.com" style="padding: 0.5rem 0.75rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); font-size: 0.875rem;" />
+                            </div>
+                        </div>
+                        <div class="p-dialog-footer">
+                            <button type="button" class="p-button p-button-outlined p-button-secondary p-button-sm" data-dialog-close style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: transparent; color: var(--p-text-color); cursor: pointer;">
+                                Cancel
+                            </button>
+                            <button type="button" class="p-button p-button-primary p-button-sm" data-dialog-close style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                                Save
+                            </button>
+                        </div>
+                    </island-aura-dialog>
+                </div>
+            </div>
+
+            <!-- Demo 9: Confirmation -->
+            <div data-dialog-demo="confirmation" style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Confirmation</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">A confirmation dialog can be built by disabling the header close button and providing explicit actions in the content.</p>
+                <div style="display: flex; align-items: center;">
+                    <button type="button" class="p-button p-button-danger" data-dialog-target="dlg-confirm" style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: #ef4444; border: 1px solid #ef4444; color: #ffffff; cursor: pointer;">
+                        Delete Account
+                    </button>
+                    <island-aura-dialog id="dlg-confirm" header="Delete your account." closable="false" dialog-width="26rem">
+                        <div class="p-dialog-content">
+                            <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0; line-height: 1.5;">This action cannot be undone. All of your data, including projects, files, and settings will be permanently removed.</p>
+                        </div>
+                        <div class="p-dialog-footer">
+                            <button type="button" class="p-button p-button-outlined p-button-secondary p-button-sm" data-dialog-close style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: transparent; color: var(--p-text-color); cursor: pointer;">
+                                Cancel
+                            </button>
+                            <button type="button" class="p-button p-button-danger p-button-sm" data-dialog-close style="padding: 0.45rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: #ef4444; border: 1px solid #ef4444; color: #ffffff; cursor: pointer;">
+                                Delete
+                            </button>
+                        </div>
+                    </island-aura-dialog>
+                </div>
+            </div>
+
+            <!-- Demo 10: Long Content (Inside Scroll) -->
+            <div data-dialog-demo="longcontent" style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Long Content</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">When content exceeds the available space, the content area scrolls while header and footer stay fixed.</p>
+                <div style="display: flex; align-items: center;">
+                    <button type="button" class="p-button p-button-primary" data-dialog-target="dlg-longcontent" style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                        Inside Scroll
+                    </button>
+                    <island-aura-dialog id="dlg-longcontent" header="Terms of Service" dialog-width="40rem">
+                        <div class="p-dialog-content" style="max-height: 20rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1.25rem;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <span class="aura-tag tag-blue" style="font-size: 0.75rem;">Updated</span>
+                                <span style="font-size: 0.8125rem; color: var(--p-text-muted);">Last revised: January 1, 2026</span>
+                            </div>
+                            <div>
+                                <h4 style="font-size: 0.95rem; font-weight: 700; margin: 0 0 0.35rem 0; color: var(--p-text-color);">1. Acceptance of Terms</h4>
+                                <p style="font-size: 0.875rem; line-height: 1.55; color: var(--p-surface-700); margin: 0;">By accessing and using this service, you accept and agree to be bound by the terms and provisions of this agreement.</p>
+                            </div>
+                            <div>
+                                <h4 style="font-size: 0.95rem; font-weight: 700; margin: 0 0 0.35rem 0; color: var(--p-text-color);">2. Use License</h4>
+                                <p style="font-size: 0.875rem; line-height: 1.55; color: var(--p-surface-700); margin: 0;">Permission is granted to temporarily download one copy of the materials for personal, non-commercial transitory viewing only.</p>
+                            </div>
+                            <div>
+                                <h4 style="font-size: 0.95rem; font-weight: 700; margin: 0 0 0.35rem 0; color: var(--p-text-color);">3. Privacy Policy</h4>
+                                <p style="font-size: 0.875rem; line-height: 1.55; color: var(--p-surface-700); margin: 0;">Your privacy is critically important to us. We are committed to safeguarding and protecting your data according to enterprise zero-trust standards.</p>
+                            </div>
+                            <div>
+                                <h4 style="font-size: 0.95rem; font-weight: 700; margin: 0 0 0.35rem 0; color: var(--p-text-color);">4. Termination</h4>
+                                <p style="font-size: 0.875rem; line-height: 1.55; color: var(--p-surface-700); margin: 0;">We reserve the right to suspend or terminate accounts that breach terms of use or perform unauthorized automated penetration testing.</p>
+                            </div>
+                        </div>
+                        <div class="p-dialog-footer">
+                            <button type="button" class="p-button p-button-outlined p-button-secondary p-button-sm" data-dialog-close style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: transparent; color: var(--p-text-color); cursor: pointer;">
+                                Decline
+                            </button>
+                            <button type="button" class="p-button p-button-primary p-button-sm" data-dialog-close style="padding: 0.45rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                                Accept
+                            </button>
+                        </div>
+                    </island-aura-dialog>
+                </div>
+            </div>
+
+            <!-- Demo 11: Responsive -->
+            <div data-dialog-demo="responsive" style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Responsive</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Dialog dimensions adapt across breakpoints smoothly.</p>
+                <div style="display: flex; align-items: center;">
+                    <button type="button" class="p-button p-button-primary" data-dialog-target="dlg-responsive" style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                        New Event
+                    </button>
+                    <island-aura-dialog id="dlg-responsive" header="Create Event" style="width: 90vw; max-width: 36rem;">
+                        <div class="p-dialog-content" style="display: flex; flex-direction: column; gap: 1rem;">
+                            <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                                <label for="dlg-rsp-name" style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color);">Event Name</label>
+                                <input id="dlg-rsp-name" type="text" class="p-inputtext p-component" placeholder="e.g. Team Standup" style="padding: 0.5rem 0.75rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); font-size: 0.875rem;" />
+                            </div>
+                            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                                <div style="flex: 1; min-width: 12rem; display: flex; flex-direction: column; gap: 0.35rem;">
+                                    <label for="dlg-rsp-org" style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color);">Organizer</label>
+                                    <input id="dlg-rsp-org" type="text" class="p-inputtext p-component" placeholder="Name" style="padding: 0.5rem 0.75rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); font-size: 0.875rem;" />
+                                </div>
+                                <div style="flex: 1; min-width: 12rem; display: flex; flex-direction: column; gap: 0.35rem;">
+                                    <label for="dlg-rsp-mail" style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color);">Email</label>
+                                    <input id="dlg-rsp-mail" type="email" class="p-inputtext p-component" placeholder="organizer@@example.com" style="padding: 0.5rem 0.75rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); font-size: 0.875rem;" />
+                                </div>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                                <label for="dlg-rsp-desc" style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color);">Description</label>
+                                <textarea id="dlg-rsp-desc" class="p-textarea p-component" rows="3" placeholder="Event details..." style="padding: 0.5rem 0.75rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); font-size: 0.875rem; resize: none;"></textarea>
+                            </div>
+                        </div>
+                        <div class="p-dialog-footer">
+                            <button type="button" class="p-button p-button-outlined p-button-secondary p-button-sm" data-dialog-close style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: transparent; color: var(--p-text-color); cursor: pointer;">
+                                Cancel
+                            </button>
+                            <button type="button" class="p-button p-button-primary p-button-sm" data-dialog-close style="padding: 0.45rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                                Create Event
+                            </button>
+                        </div>
+                    </island-aura-dialog>
+                </div>
+            </div>
+
+            <!-- Demo 12: Headless -->
+            <div data-dialog-demo="headless" style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Headless</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Headless mode lets you implement custom UI containers and radial gradients instead of default elements.</p>
+                <div style="display: flex; align-items: center;">
+                    <button type="button" class="p-button p-button-primary" data-dialog-target="dlg-headless" style="display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        <span>Login</span>
+                    </button>
+                    <island-aura-dialog id="dlg-headless" closable="false" style="border: none; background: transparent; box-shadow: none; width: 22rem;">
+                        <div style="border-radius: 16px; background: radial-gradient(circle at left top, var(--p-primary-500), var(--p-primary-800)); padding: 2rem; display: flex; flex-direction: column; gap: 1.25rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);">
+                            <div style="display: flex; justify-content: center;">
+                                <svg width="35" height="40" viewBox="0 0 35 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M25.87 18.05L23.16 17.45L25.27 20.46V29.78L32.49 23.76V13.53L29.18 14.73L25.87 18.04V18.05ZM25.27 35.49L29.18 31.58V27.67L25.27 30.98V35.49ZM20.16 17.14H20.03H20.17H20.16ZM30.1 5.19L34.89 4.81L33.08 12.33L24.1 15.67L30.08 5.2L30.1 5.19ZM5.72 14.74L2.41 13.54V23.77L9.63 29.79V20.47L11.74 17.46L9.03 18.06L5.72 14.75V14.74ZM9.63 30.98L5.72 27.67V31.58L9.63 35.49V30.98ZM4.8 5.2L10.78 15.67L1.81 12.33L0 4.81L4.79 5.19L4.8 5.2ZM24.37 21.05V34.59L22.56 37.29L20.46 39.4H14.44L12.34 37.29L10.53 34.59V21.05L12.42 18.23L17.45 26.8L22.48 18.23L24.37 21.05ZM22.85 0L22.57 0.69L17.45 13.08L12.33 0.69L12.05 0H22.85Z" fill="rgba(255,255,255,0.9)" />
+                                </svg>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                                <label for="dlg-hd-user" style="font-size: 0.8125rem; font-weight: 600; color: #ffffff;">Username</label>
+                                <input id="dlg-hd-user" type="text" class="p-inputtext p-component" placeholder="username" style="padding: 0.6rem 0.75rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.25); background: rgba(255,255,255,0.15); color: #ffffff; font-size: 0.875rem;" />
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                                <label for="dlg-hd-pass" style="font-size: 0.8125rem; font-weight: 600; color: #ffffff;">Password</label>
+                                <input id="dlg-hd-pass" type="password" class="p-inputtext p-component" placeholder="••••••••" style="padding: 0.6rem 0.75rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.25); background: rgba(255,255,255,0.15); color: #ffffff; font-size: 0.875rem;" />
+                            </div>
+                            <div style="display: flex; gap: 0.75rem; margin-top: 0.5rem;">
+                                <button type="button" class="p-button p-button-text" data-dialog-close style="flex: 1; padding: 0.55rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.3); background: transparent; color: #ffffff; font-weight: 600; font-size: 0.875rem; cursor: pointer;">
+                                    Cancel
+                                </button>
+                                <button type="button" class="p-button p-button-text" data-dialog-close style="flex: 1; padding: 0.55rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.2); color: #ffffff; font-weight: 600; font-size: 0.875rem; cursor: pointer;">
+                                    Sign-In
+                                </button>
+                            </div>
+                        </div>
+                    </island-aura-dialog>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Modal Dialog -->
     <section id="sec-modal" class="component-card">
         <div class="card-header">

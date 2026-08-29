@@ -83,8 +83,9 @@ public static class NavigationData
                 new("ScrollTop", "arrowUp", "/enterprise#sec-scroll-top"),
                 new("Command Palette", "terminal", "/enterprise#sec-command-palette")
             }),
-            new("Overlays & Dialogs (8)", "layers", null, false, new List<SidebarItem>
+            new("Overlays & Dialogs (9)", "layers", null, false, new List<SidebarItem>
             {
+                new("Dialog", "layers", "/enterprise#sec-dialog", false, null, "New"),
                 new("Modal Dialog", "layers", "/enterprise#sec-modal"),
                 new("Drawer Offcanvas", "sidebar", "/enterprise#sec-drawer"),
                 new("Popover", "messageSquare", "/enterprise#sec-popover"),
