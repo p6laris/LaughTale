@@ -2173,13 +2173,33 @@ public class IslandTagTagHelper : TagHelper
 }
 
 /// <summary>
-/// TagHelper for <island-breadcrumb />
+/// TagHelper for <island-breadcrumb /> and <p-breadcrumb />
+/// PrimeVue 4 Aura Design System compliant hierarchical navigation component.
 /// </summary>
 [HtmlTargetElement("island-breadcrumb")]
+[HtmlTargetElement("p-breadcrumb")]
 public class IslandBreadcrumbTagHelper : TagHelper
 {
+    [HtmlAttributeName("items")]
     public List<BreadcrumbItem>? Items { get; set; }
+
+    [HtmlAttributeName("home-url")]
     public string HomeUrl { get; set; } = "/";
+
+    [HtmlAttributeName("home-icon")]
+    public string? HomeIcon { get; set; }
+
+    [HtmlAttributeName("home-label")]
+    public string? HomeLabel { get; set; }
+
+    [HtmlAttributeName("separator")]
+    public string Separator { get; set; } = "chevron";
+
+    [HtmlAttributeName("class")]
+    public string? Class { get; set; }
+
+    [HtmlAttributeName("style")]
+    public string? Style { get; set; }
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
@@ -2191,10 +2211,23 @@ public class IslandBreadcrumbTagHelper : TagHelper
         var props = new
         {
             items = Items ?? new(),
-            homeUrl = HomeUrl
+            homeUrl = HomeUrl,
+            homeIcon = HomeIcon,
+            homeLabel = HomeLabel,
+            separator = Separator
         };
 
-        output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
+        output.Attributes.SetAttribute("data-props", JsonSerializer.Serialize(props));
+
+        if (!string.IsNullOrWhiteSpace(Class))
+        {
+            output.Attributes.SetAttribute("class", Class);
+        }
+
+        if (!string.IsNullOrWhiteSpace(Style))
+        {
+            output.Attributes.SetAttribute("style", Style);
+        }
     }
 }
 

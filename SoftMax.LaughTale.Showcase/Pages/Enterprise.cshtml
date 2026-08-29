@@ -5126,12 +5126,76 @@
         <div class="card-header">
             <div>
                 <h2>Breadcrumb</h2>
-                <p>Navigational trail showing current hierarchy path with home icon.</p>
+                <p>Breadcrumb provides contextual information about page hierarchy with custom separators, ellipsis, and item templates.</p>
             </div>
-            <span class="aura-tag tag-slate">Nav</span>
+            <span class="aura-tag tag-emerald">Navigation</span>
         </div>
-        <div class="card-body">
-            <island-breadcrumb items="@Model.Breadcrumbs" />
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Hero / Preview Demo -->
+            <div data-breadcrumb-demo="preview" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Interactive Navigational Hierarchy</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Breadcrumb trail with collapsible ellipsis and rich links.</p>
+                <div style="display: flex; justify-content: center; align-items: center;">
+                    <div style="width: 100%; max-width: 42rem;">
+                        <island-breadcrumb items="@Model.BreadcrumbEllipsis" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 1: Basic -->
+            <div data-breadcrumb-demo="basic" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Shows the current location within a navigational hierarchy.</p>
+                <div style="display: flex; justify-content: center; align-items: center;">
+                    <div style="width: 100%; max-width: 38rem;">
+                        <island-breadcrumb items="@Model.BreadcrumbBasic" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 2: Route -->
+            <div data-breadcrumb-demo="route" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Route</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">A breadcrumb can be used with routing libraries to navigate between pages.</p>
+                <div style="display: flex; justify-content: center; align-items: center;">
+                    <div style="width: 100%; max-width: 48rem;">
+                        <island-breadcrumb items="@Model.BreadcrumbRoute" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 3: Custom Separator -->
+            <div data-breadcrumb-demo="separator" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Custom Separator</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">A breadcrumb allows customization of the separator between items using the separator template.</p>
+                <div style="display: flex; justify-content: center; align-items: center;">
+                    <div style="width: 100%; max-width: 38rem;">
+                        <island-breadcrumb items="@Model.BreadcrumbBasic" separator="slash" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 4: Ellipsis -->
+            <div data-breadcrumb-demo="ellipsis" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Ellipsis</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">An ellipsis can be used to indicate hidden breadcrumb items.</p>
+                <div style="display: flex; justify-content: center; align-items: center;">
+                    <div style="width: 100%; max-width: 38rem;">
+                        <island-breadcrumb items="@Model.BreadcrumbEllipsis" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 5: Custom Item -->
+            <div data-breadcrumb-demo="custom" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Custom Item</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Custom content can be placed inside the items using the item template with icons, badges, and tags.</p>
+                <div style="display: flex; justify-content: center; align-items: center;">
+                    <div style="width: 100%; max-width: 48rem;">
+                        <island-breadcrumb items="@Model.BreadcrumbCustomItem" home-label="Home" />
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 

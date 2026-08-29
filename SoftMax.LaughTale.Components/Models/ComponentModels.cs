@@ -232,7 +232,11 @@ public record BreadcrumbItem(
     string Label,
     string? Url = null,
     string? Icon = null,
-    bool IsCurrent = false
+    bool IsCurrent = false,
+    string? Badge = null,
+    string? BadgeSeverity = null,
+    bool IsEllipsis = false,
+    bool Disabled = false
 );
 
 public record CommandPaletteItem(

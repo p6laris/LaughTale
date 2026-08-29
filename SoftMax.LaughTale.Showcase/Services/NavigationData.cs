@@ -76,7 +76,7 @@ public static class NavigationData
             {
                 new("Header Menu", "menu", "/enterprise#sec-menu"),
                 new("ContextMenu", "moreHorizontal", "/enterprise#sec-context-menu"),
-                new("Breadcrumb", "compass", "/enterprise#sec-breadcrumb"),
+                new("Breadcrumb", "compass", "/enterprise#sec-breadcrumb", false, null, "New"),
                 new("macOS Dock", "layoutGrid", "/enterprise#sec-dock"),
                 new("Sidebar Tree", "folderTree", "/enterprise#sec-sidebar"),
                 new("Stepper", "listOrdered", "/enterprise#sec-stepper", false, null, "New"),

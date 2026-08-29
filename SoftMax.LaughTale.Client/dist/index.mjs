@@ -19843,55 +19843,235 @@ __export(breadcrumb_exports, {
   default: () => BreadcrumbIsland
 });
 function BreadcrumbIsland(container, props) {
-  injectIslandStyle("breadcrumb", CSS24);
+  injectIslandStyle("breadcrumb", BREADCRUMB_CSS);
   const items = props.items || [];
-  const homeUrl = props.homeUrl || "/";
+  const homeUrl = props.home?.url || props.homeUrl || "/";
+  const homeIcon = props.home?.icon || props.homeIcon || "home";
+  const homeLabel = props.home?.label || "";
+  const separatorType = props.separator || "chevron";
+  function getSeparatorHtml() {
+    if (separatorType === "slash") {
+      return '<span class="p-breadcrumb-separator" aria-hidden="true">/</span>';
+    }
+    if (separatorType === "arrow") {
+      return '<span class="p-breadcrumb-separator" aria-hidden="true">&gt;</span>';
+    }
+    return `
+            <span class="p-breadcrumb-separator" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </span>
+        `;
+  }
+  function renderItemContent(item) {
+    let iconHtml = "";
+    if (item.icon) {
+      if (item.icon.startsWith("<svg")) {
+        iconHtml = item.icon;
+      } else if (LucideIcons[item.icon]) {
+        iconHtml = LucideIcons[item.icon];
+      } else {
+        iconHtml = `<span class="${item.icon}"></span>`;
+      }
+    }
+    const badgeHtml = item.badge ? `<span class="p-breadcrumb-badge p-breadcrumb-badge-${item.badgeSeverity || "primary"}">${item.badge}</span>` : "";
+    if (item.isEllipsis) {
+      return `<span class="p-breadcrumb-ellipsis" title="Show hidden path">...</span>`;
+    }
+    return `
+            ${iconHtml ? `<span style="display:inline-flex; align-items:center;">${iconHtml}</span>` : ""}
+            ${item.label ? `<span>${item.label}</span>` : ""}
+            ${badgeHtml}
+        `;
+  }
+  const separatorHtml = getSeparatorHtml();
   const itemsHtml = items.map((item, idx) => {
     const isLast = idx === items.length - 1;
+    const isCurrent = item.isCurrent || isLast;
     const label = item.label || item.Label || "";
-    const url = item.url || item.Url || "";
-    const icon = item.icon || item.Icon || "";
+    const url = item.url || item.Url;
+    const icon = item.icon || item.Icon;
+    const isEllipsis = item.isEllipsis || item.IsEllipsis;
+    const badge = item.badge || item.Badge;
+    const badgeSeverity = item.badgeSeverity || item.BadgeSeverity;
+    const normalizedItem = {
+      label,
+      url,
+      icon,
+      isCurrent,
+      isEllipsis,
+      badge,
+      badgeSeverity
+    };
+    const content = renderItemContent(normalizedItem);
+    let inner = "";
+    if (isCurrent && !isEllipsis) {
+      inner = `<span class="p-breadcrumb-item-link p-breadcrumb-item-current" aria-current="page">${content}</span>`;
+    } else if (url && !isEllipsis) {
+      inner = `<a href="${url}" class="p-breadcrumb-item-link">${content}</a>`;
+    } else {
+      inner = `<span class="p-breadcrumb-item-link">${content}</span>`;
+    }
     return `
-            <li style="display: flex; align-items: center; gap: 0.5rem;">
-                <span style="color: var(--p-text-muted); display: flex; align-items: center;">${LucideIcons.chevronRight}</span>
-                ${url && !isLast ? `
-                    <a href="${url}" style="color: var(--p-text-muted); text-decoration: none; font-size: 0.8125rem; font-weight: 500; display: flex; align-items: center; gap: 0.35rem; transition: color 0.15s ease;">
-                        ${icon ? `<span>${icon}</span>` : ""}
-                        <span>${label}</span>
-                    </a>
-                ` : `
-                    <span style="color: var(--p-text-color); font-size: 0.8125rem; font-weight: 600; display: flex; align-items: center; gap: 0.35rem;">
-                        ${icon ? `<span>${icon}</span>` : ""}
-                        <span>${label}</span>
-                    </span>
-                `}
+            <li class="p-breadcrumb-separator-wrapper" style="display: inline-flex; align-items: center;">
+                ${separatorHtml}
+            </li>
+            <li class="p-breadcrumb-item">
+                ${inner}
             </li>
         `;
   }).join("");
+  const homeSvg = LucideIcons.home || '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>';
   container.innerHTML = `
-        <nav class="laughtale-breadcrumb" style="display: block;">
-            <ul style="list-style: none; display: flex; align-items: center; gap: 0.5rem; padding: 0; margin: 0;">
-                <li>
-                    <a href="${homeUrl}" style="color: var(--p-surface-600); display: flex; align-items: center; transition: color 0.15s ease;" title="Home">
-                        ${LucideIcons.home}
+        <nav class="p-breadcrumb p-component" aria-label="Breadcrumb">
+            <ol class="p-breadcrumb-list">
+                <li class="p-breadcrumb-item">
+                    <a href="${homeUrl}" class="p-breadcrumb-item-link" title="Home" aria-label="Home">
+                        ${homeSvg}
+                        ${homeLabel ? `<span>${homeLabel}</span>` : ""}
                     </a>
                 </li>
                 ${itemsHtml}
-            </ul>
+            </ol>
         </nav>
     `;
 }
-var CSS24;
+var BREADCRUMB_CSS;
 var init_breadcrumb = __esm({
   "src/components/breadcrumb.ts"() {
     "use strict";
     init_lucide();
     init_styles();
-    CSS24 = `
-[data-theme="dark"] .laughtale-breadcrumb {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+    BREADCRUMB_CSS = `
+.p-breadcrumb {
+    background: var(--p-surface-0, #ffffff);
+    border: 1px solid var(--p-border-color, #e2e8f0);
+    border-radius: var(--p-border-radius, 8px);
+    padding: 0.75rem 1.25rem;
+    display: inline-flex;
+    align-items: center;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.p-breadcrumb-list {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.p-breadcrumb-item {
+    display: inline-flex;
+    align-items: center;
+}
+
+.p-breadcrumb-item-link {
+    color: var(--p-text-muted, #64748b);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.25rem 0.4rem;
+    border-radius: 4px;
+    transition: color 0.15s ease, background-color 0.15s ease;
+    cursor: pointer;
+}
+
+.p-breadcrumb-item-link:hover {
+    color: var(--p-text-color, #0f172a);
+    background: var(--p-surface-100, #f1f5f9);
+}
+
+.p-breadcrumb-item-current {
+    color: var(--p-text-color, #0f172a);
+    font-weight: 600;
+    cursor: default;
+}
+
+.p-breadcrumb-item-current:hover {
+    background: transparent;
+}
+
+.p-breadcrumb-separator {
+    color: var(--p-surface-400, #94a3b8);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8125rem;
+    user-select: none;
+    padding: 0 0.15rem;
+}
+
+.p-breadcrumb-ellipsis {
+    color: var(--p-text-muted, #64748b);
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 0.15rem 0.35rem;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.p-breadcrumb-ellipsis:hover {
+    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-text-color, #0f172a);
+}
+
+.p-breadcrumb-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.15rem 0.45rem;
+    border-radius: 9999px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+}
+
+.p-breadcrumb-badge-primary {
+    background: rgba(59, 130, 246, 0.12);
+    color: var(--p-primary-600, #2563eb);
+}
+
+.p-breadcrumb-badge-info {
+    background: rgba(14, 165, 233, 0.12);
+    color: #0284c7;
+}
+
+.p-breadcrumb-badge-success {
+    background: rgba(16, 185, 129, 0.12);
+    color: #10b981;
+}
+
+/* Dark Mode Tokens */
+.dark .p-breadcrumb,
+[data-theme="dark"] .p-breadcrumb {
+    background: var(--p-surface-900, #0f172a);
+    border-color: var(--p-surface-700, #334155);
+}
+
+.dark .p-breadcrumb-item-link,
+[data-theme="dark"] .p-breadcrumb-item-link {
+    color: var(--p-surface-400, #94a3b8);
+}
+
+.dark .p-breadcrumb-item-link:hover,
+[data-theme="dark"] .p-breadcrumb-item-link:hover {
+    color: var(--p-surface-0, #f8fafc);
+    background: var(--p-surface-800, #1e293b);
+}
+
+.dark .p-breadcrumb-item-current,
+[data-theme="dark"] .p-breadcrumb-item-current {
+    color: var(--p-surface-0, #f8fafc);
+}
+
+.dark .p-breadcrumb-separator,
+[data-theme="dark"] .p-breadcrumb-separator {
+    color: var(--p-surface-600, #475569);
 }
 `;
   }
@@ -19903,7 +20083,7 @@ __export(scroll_top_exports, {
   default: () => ScrollTopIsland
 });
 function ScrollTopIsland(container, props) {
-  injectIslandStyle("scroll-top", CSS25);
+  injectIslandStyle("scroll-top", CSS24);
   const threshold = props.threshold || 200;
   let isVisible = false;
   function render() {
@@ -19929,13 +20109,13 @@ function ScrollTopIsland(container, props) {
   window.addEventListener("scroll", checkScroll, { passive: true });
   render();
 }
-var CSS25;
+var CSS24;
 var init_scroll_top = __esm({
   "src/components/scroll-top.ts"() {
     "use strict";
     init_lucide();
     init_styles();
-    CSS25 = `
+    CSS24 = `
 [data-theme="dark"] .laughtale-scroll-top-btn {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -19951,7 +20131,7 @@ __export(inplace_exports, {
   default: () => InplaceIsland
 });
 function InplaceIsland(container, props) {
-  injectIslandStyle("inplace", CSS26);
+  injectIslandStyle("inplace", CSS25);
   let isEditing = false;
   let currentValue = props.value || "";
   function render() {
@@ -20031,13 +20211,13 @@ function InplaceIsland(container, props) {
   render();
   syncValue();
 }
-var CSS26;
+var CSS25;
 var init_inplace = __esm({
   "src/components/inplace.ts"() {
     "use strict";
     init_lucide();
     init_styles();
-    CSS26 = `
+    CSS25 = `
 [data-theme="dark"] .laughtale-inplace-display {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -20073,7 +20253,7 @@ __export(command_exports, {
   default: () => CommandPaletteIsland
 });
 function CommandPaletteIsland(container, props) {
-  injectIslandStyle("command", CSS27);
+  injectIslandStyle("command", CSS26);
   const placeholder = props.placeholder || "Type a command or search...";
   const items = props.items || [
     { id: "home", label: "Go to Overview", group: "Navigation", icon: "compass", url: "/", shortcut: "G H" },
@@ -20247,7 +20427,7 @@ function CommandPaletteIsland(container, props) {
   ]);
   document.addEventListener("command:open", () => open());
 }
-var CSS27;
+var CSS26;
 var init_command = __esm({
   "src/components/command.ts"() {
     "use strict";
@@ -20257,7 +20437,7 @@ var init_command = __esm({
     init_useFocusTrap();
     init_useHotkeys();
     init_useScrollLock();
-    CSS27 = `
+    CSS26 = `
 [data-theme="dark"] .laughtale-command-root {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -21121,7 +21301,7 @@ __export(dynamic_form_exports, {
   default: () => DynamicFormIsland
 });
 function DynamicFormIsland(container, props) {
-  injectIslandStyle("dynamic-form", CSS28);
+  injectIslandStyle("dynamic-form", CSS27);
   let schema = props.schema || null;
   if (!schema && props.schemaJson) {
     try {
@@ -21282,13 +21462,13 @@ function DynamicFormIsland(container, props) {
   }
   render();
 }
-var CSS28;
+var CSS27;
 var init_dynamic_form = __esm({
   "src/components/dynamic-form.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS28 = `
+    CSS27 = `
 [data-theme="dark"] .p-input {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -21674,7 +21854,7 @@ __export(multiselect_exports, {
   default: () => MultiSelectIsland
 });
 function MultiSelectIsland(container, props) {
-  injectIslandStyle("multiselect", CSS29);
+  injectIslandStyle("multiselect", CSS28);
   const options = props.options || [];
   let selected = new Set(props.selectedValues || []);
   let filterQuery = "";
@@ -21840,7 +22020,7 @@ function MultiSelectIsland(container, props) {
   renderDisplay();
   syncValue();
 }
-var CSS29;
+var CSS28;
 var init_multiselect = __esm({
   "src/components/multiselect.ts"() {
     "use strict";
@@ -21849,7 +22029,7 @@ var init_multiselect = __esm({
     init_useDisclosure();
     init_useClickOutside();
     init_useTransition();
-    CSS29 = `
+    CSS28 = `
 [data-theme="dark"] .laughtale-multiselect {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -21920,7 +22100,7 @@ __export(cascadeselect_exports, {
   default: () => CascadeSelectIsland
 });
 function CascadeSelectIsland(container, props) {
-  injectIslandStyle("cascadeselect", CSS30);
+  injectIslandStyle("cascadeselect", CSS29);
   const options = props.options || [];
   const size = props.size || "normal";
   const variant = props.variant || "outlined";
@@ -22133,7 +22313,7 @@ function CascadeSelectIsland(container, props) {
     }));
   }
 }
-var CSS30;
+var CSS29;
 var init_cascadeselect = __esm({
   "src/components/cascadeselect.ts"() {
     "use strict";
@@ -22141,7 +22321,7 @@ var init_cascadeselect = __esm({
     init_styles();
     init_useDisclosure();
     init_useClickOutside();
-    CSS30 = `
+    CSS29 = `
 .laughtale-cascadeselect {
     position: relative;
     display: inline-flex;
@@ -22346,7 +22526,7 @@ __export(listbox_exports, {
   default: () => ListboxIsland
 });
 function ListboxIsland(container, props) {
-  injectIslandStyle("laughtale-listbox", CSS31);
+  injectIslandStyle("laughtale-listbox", CSS30);
   const isMultiple = props.multiple === true || String(props.multiple) === "true";
   const isMetaKey = props.metaKeySelection !== false && String(props.metaKeySelection) !== "false";
   const isCheckbox = props.checkbox === true || String(props.checkbox) === "true";
@@ -22682,14 +22862,14 @@ function ListboxIsland(container, props) {
   }
   init();
 }
-var CSS31, checkSvg2, searchSvg2;
+var CSS30, checkSvg2, searchSvg2;
 var init_listbox = __esm({
   "src/components/listbox.ts"() {
     "use strict";
     init_lucide();
     init_styles();
     init_useDebounce();
-    CSS31 = `
+    CSS30 = `
 /* ==================== AURA LISTBOX ==================== */
 .laughtale-listbox,
 .p-listbox {
@@ -25161,7 +25341,7 @@ __export(terminal_exports, {
   default: () => TerminalIsland
 });
 function TerminalIsland(container, props) {
-  injectIslandStyle("terminal", CSS32);
+  injectIslandStyle("terminal", CSS31);
   const promptPrefix = props.prompt || "admin@softmax:~$";
   const welcome = props.welcomeMessage || 'Welcome to SoftMax.LaughTale CLI v3.0\nType "help" for available commands.';
   const commands = {
@@ -25260,13 +25440,13 @@ ${h.response}`).join("\n");
   }
   render();
 }
-var CSS32;
+var CSS31;
 var init_terminal = __esm({
   "src/components/terminal.ts"() {
     "use strict";
     init_styles();
     init_useClipboard();
-    CSS32 = `
+    CSS31 = `
 [data-theme="dark"] .laughtale-terminal {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -25297,7 +25477,7 @@ __export(dock_exports, {
   default: () => DockIsland
 });
 function DockIsland(container, props) {
-  injectIslandStyle("dock", CSS33);
+  injectIslandStyle("dock", CSS32);
   const items = props.items || [
     { label: "Overview", icon: "compass", url: "/" },
     { label: "Dashboard", icon: "bar-chart", url: "/dashboard" },
@@ -25339,13 +25519,13 @@ function DockIsland(container, props) {
     });
   });
 }
-var CSS33;
+var CSS32;
 var init_dock = __esm({
   "src/components/dock.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS33 = `
+    CSS32 = `
 [data-theme="dark"] .laughtale-dock {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -25366,7 +25546,7 @@ __export(galleria_exports, {
   default: () => GalleriaIsland
 });
 function GalleriaIsland(container, props) {
-  injectIslandStyle("galleria", CSS34);
+  injectIslandStyle("galleria", CSS33);
   const images = props.value && props.value.length > 0 ? props.value : [
     {
       itemImageSrc: "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800&auto=format&fit=crop&q=80",
@@ -25440,13 +25620,13 @@ function GalleriaIsland(container, props) {
   }
   render();
 }
-var CSS34;
+var CSS33;
 var init_galleria = __esm({
   "src/components/galleria.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS34 = `
+    CSS33 = `
 [data-theme="dark"] .laughtale-galleria {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -25477,7 +25657,7 @@ __export(blockui_exports, {
   default: () => BlockUIIsland
 });
 function BlockUIIsland(container, props) {
-  injectIslandStyle("blockui", CSS35);
+  injectIslandStyle("blockui", CSS34);
   let isBlocked = props.blocked ?? true;
   function render() {
     container.innerHTML = `
@@ -25500,12 +25680,12 @@ function BlockUIIsland(container, props) {
     render();
   });
 }
-var CSS35;
+var CSS34;
 var init_blockui = __esm({
   "src/components/blockui.ts"() {
     "use strict";
     init_styles();
-    CSS35 = `
+    CSS34 = `
 [data-theme="dark"] .laughtale-blockui-root {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -26237,7 +26417,7 @@ __export(select_exports, {
   default: () => SelectIsland
 });
 function SelectIsland(container, props) {
-  injectIslandStyle("laughtale-select", CSS36);
+  injectIslandStyle("laughtale-select", CSS35);
   const isMultiple = props.multiple === true || String(props.multiple) === "true";
   const isCheckmark = props.checkmark === true || String(props.checkmark) === "true";
   const isCheckbox = props.checkbox === true || String(props.checkbox) === "true";
@@ -26577,13 +26757,13 @@ function SelectIsland(container, props) {
   }
   render();
 }
-var CSS36;
+var CSS35;
 var init_select = __esm({
   "src/components/select.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS36 = `
+    CSS35 = `
 /* ==================== AURA SELECT ==================== */
 .laughtale-select,
 .p-select {
@@ -27010,7 +27190,7 @@ __export(checkbox_exports, {
   default: () => CheckboxIsland
 });
 function CheckboxIsland(container, props) {
-  injectIslandStyle("laughtale-checkbox", CSS37);
+  injectIslandStyle("laughtale-checkbox", CSS36);
   let isChecked = Boolean(props.checked);
   let isIndeterminate = Boolean(props.indeterminate);
   const size = props.size || "normal";
@@ -27082,13 +27262,13 @@ function CheckboxIsland(container, props) {
   }
   render();
 }
-var CSS37;
+var CSS36;
 var init_checkbox = __esm({
   "src/components/checkbox.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS37 = `
+    CSS36 = `
 .laughtale-checkbox-wrap {
     display: inline-flex;
     align-items: center;
@@ -27265,7 +27445,7 @@ __export(radio_button_exports, {
   default: () => RadioButtonIsland
 });
 function RadioButtonIsland(container, props) {
-  injectIslandStyle("laughtale-radio", CSS38);
+  injectIslandStyle("laughtale-radio", CSS37);
   const isCard = props.card === true || String(props.card) === "true";
   const isFilled = props.variant === "filled";
   const size = props.size || "normal";
@@ -27497,13 +27677,13 @@ function RadioButtonIsland(container, props) {
   }
   renderSingle();
 }
-var CSS38;
+var CSS37;
 var init_radio_button = __esm({
   "src/components/radio-button.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS38 = `
+    CSS37 = `
 /* ==================== AURA RADIOBUTTON ==================== */
 .laughtale-radio-root,
 .p-radiobutton-root {
@@ -27786,7 +27966,7 @@ __export(textarea_exports, {
   default: () => TextareaIsland
 });
 function TextareaIsland(container, props) {
-  injectIslandStyle("laughtale-textarea", CSS39);
+  injectIslandStyle("laughtale-textarea", CSS38);
   const isAutoResize = props.autoResize === true || String(props.autoResize) === "true";
   const isFluid = props.fluid === true || String(props.fluid) === "true";
   const isInvalid = props.invalid === true || String(props.invalid) === "true";
@@ -27862,12 +28042,12 @@ function TextareaIsland(container, props) {
     setTimeout(adjustHeight, 0);
   }
 }
-var CSS39;
+var CSS38;
 var init_textarea = __esm({
   "src/components/textarea.ts"() {
     "use strict";
     init_styles();
-    CSS39 = `
+    CSS38 = `
 /* ==================== AURA TEXTAREA ==================== */
 .p-textarea {
     font-family: var(--p-font-family, inherit);
@@ -27992,7 +28172,7 @@ __export(input_mask_exports, {
   default: () => InputMaskIsland
 });
 function InputMaskIsland(container, props) {
-  injectIslandStyle("laughtale-input-mask", CSS40);
+  injectIslandStyle("laughtale-input-mask", CSS39);
   const mask = props.mask || "(999) 999-9999";
   const slotChar = props.slotChar || "_";
   const autoClear = props.autoClear !== false && String(props.autoClear) !== "false";
@@ -28179,12 +28359,12 @@ function InputMaskIsland(container, props) {
   });
   syncValue();
 }
-var CSS40;
+var CSS39;
 var init_input_mask = __esm({
   "src/components/input-mask.ts"() {
     "use strict";
     init_styles();
-    CSS40 = `
+    CSS39 = `
 /* ==================== AURA INPUTMASK ==================== */
 .laughtale-input-mask,
 .p-inputmask {
@@ -28294,7 +28474,7 @@ __export(float_label_exports, {
   default: () => FloatLabelIsland
 });
 function FloatLabelIsland(container, props) {
-  injectIslandStyle("laughtale-float-label", CSS41);
+  injectIslandStyle("laughtale-float-label", CSS40);
   const variant = props.variant || "over";
   const initialHtml = container.innerHTML;
   const forAttr = props.for ? `for="${props.for}"` : "";
@@ -28372,12 +28552,12 @@ function FloatLabelIsland(container, props) {
   setTimeout(updateFloatingState, 50);
   setTimeout(updateFloatingState, 200);
 }
-var CSS41;
+var CSS40;
 var init_float_label = __esm({
   "src/components/float-label.ts"() {
     "use strict";
     init_styles();
-    CSS41 = `
+    CSS40 = `
 .laughtale-float-label {
     position: relative;
     display: inline-flex;
@@ -28504,7 +28684,7 @@ __export(ifta_label_exports, {
   default: () => IftaLabelIsland
 });
 function IftaLabelIsland(container, props) {
-  injectIslandStyle("laughtale-ifta-label", CSS42);
+  injectIslandStyle("laughtale-ifta-label", CSS41);
   const initialHtml = container.innerHTML;
   const forAttr = props.for ? `for="${props.for}"` : "";
   const existingLabel = container.querySelector("label");
@@ -28527,12 +28707,12 @@ function IftaLabelIsland(container, props) {
     }
   });
 }
-var CSS42;
+var CSS41;
 var init_ifta_label = __esm({
   "src/components/ifta-label.ts"() {
     "use strict";
     init_styles();
-    CSS42 = `
+    CSS41 = `
 .laughtale-ifta-label {
     position: relative;
     display: inline-flex;
@@ -28620,14 +28800,14 @@ __export(input_group_exports, {
   default: () => InputGroupIsland
 });
 function InputGroupIsland(container, props) {
-  injectIslandStyle("laughtale-inputgroup", CSS43);
+  injectIslandStyle("laughtale-inputgroup", CSS42);
   container.classList.add("laughtale-inputgroup", "p-inputgroup");
   if (props.size) {
     container.classList.add(`size-${props.size}`);
   }
 }
 function InputGroupAddonIsland(container, props) {
-  injectIslandStyle("laughtale-inputgroup", CSS43);
+  injectIslandStyle("laughtale-inputgroup", CSS42);
   container.classList.add("laughtale-inputgroup-addon", "p-inputgroup-addon");
   if (props.icon && !container.querySelector("svg")) {
     const svg = getLucideIcon(props.icon);
@@ -28639,13 +28819,13 @@ function InputGroupAddonIsland(container, props) {
     container.insertAdjacentHTML("beforeend", `<span>${props.text}</span>`);
   }
 }
-var CSS43;
+var CSS42;
 var init_input_group = __esm({
   "src/components/input-group.ts"() {
     "use strict";
     init_styles();
     init_lucide();
-    CSS43 = `
+    CSS42 = `
 .laughtale-inputgroup,
 .p-inputgroup {
     display: flex;
@@ -28917,7 +29097,7 @@ __export(input_text_exports, {
   default: () => InputTextIsland
 });
 function InputTextIsland(container, props) {
-  injectIslandStyle("laughtale-inputtext", CSS44);
+  injectIslandStyle("laughtale-inputtext", CSS43);
   const [getValue, setValue] = useControllableState({
     defaultValue: props.value ?? "",
     onChange: (val) => {
@@ -29058,14 +29238,14 @@ function InputTextIsland(container, props) {
   }
   init();
 }
-var CSS44, xIcon;
+var CSS43, xIcon;
 var init_input_text = __esm({
   "src/components/input-text.ts"() {
     "use strict";
     init_styles();
     init_lucide();
     init_useControllableState();
-    CSS44 = `
+    CSS43 = `
 .laughtale-inputtext-wrap,
 .p-inputtext-wrap {
     position: relative;

@@ -1223,6 +1223,42 @@ public class EnterpriseModel : PageModel
         new("Node Zero-Trust #01")
     };
 
+    public List<BreadcrumbItem> BreadcrumbBasic { get; set; } = new()
+    {
+        new("Products", "/enterprise"),
+        new("Electronics", "/enterprise"),
+        new("Laptops", "/enterprise"),
+        new("Dell")
+    };
+
+    public List<BreadcrumbItem> BreadcrumbRoute { get; set; } = new()
+    {
+        new("Components", "/enterprise"),
+        new("Form", "/enterprise"),
+        new("Input", "/enterprise"),
+        new("InputText", "/enterprise"),
+        new("Variants", "/enterprise"),
+        new("Filled", "/enterprise"),
+        new("Outlined")
+    };
+
+    public List<BreadcrumbItem> BreadcrumbEllipsis { get; set; } = new()
+    {
+        new("", IsEllipsis: true),
+        new("Electronics", "/enterprise"),
+        new("Laptops", "/enterprise"),
+        new("Dell")
+    };
+
+    public List<BreadcrumbItem> BreadcrumbCustomItem { get; set; } = new()
+    {
+        new("Products", "/enterprise", Icon: "package"),
+        new("Electronics", "/enterprise", Icon: "zap"),
+        new("Computers", "/enterprise", Icon: "monitor"),
+        new("Laptops", "/enterprise", Badge: "Apple", BadgeSeverity: "primary"),
+        new("Dell")
+    };
+
     public List<MenuItem> HeaderMenuItems { get; set; } = new()
     {
         new("Overview", "home", false, false, "#overview"),
