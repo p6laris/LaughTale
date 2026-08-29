@@ -61,6 +61,8 @@ defineIsland('confirm-popup', () => import('./components/confirm-popup'));
 defineIsland('confirm-dialog', () => import('./components/confirm-dialog'));
 defineIsland('dialog', () => import('./components/dialog'));
 defineIsland('confirmdialog', () => import('./components/confirm-dialog'));
+defineIsland('fileupload', () => import('./components/fileupload'));
+defineIsland('file-upload', () => import('./components/fileupload'));
 
 // Aura Additional Enterprise Components
 defineIsland('scrollarea', () => import('./components/scrollarea'));

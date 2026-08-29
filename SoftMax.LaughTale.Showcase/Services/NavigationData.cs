@@ -109,7 +109,7 @@ public static class NavigationData
             {
                 new("Galleria Stage", "galleryThumbnails", "/enterprise#sec-galleria"),
                 new("Carousel Slider", "image", "/enterprise#sec-carousel"),
-                new("File Dropzone", "uploadCloud", "/enterprise#sec-dropzone"),
+                new("FileUpload", "uploadCloud", "/enterprise#sec-fileupload", false, null, "New"),
                 new("Image Compare", "columns3", "/enterprise#sec-image-compare"),
                 new("Camera Snapshot", "camera", "/enterprise#sec-camera")
             })
