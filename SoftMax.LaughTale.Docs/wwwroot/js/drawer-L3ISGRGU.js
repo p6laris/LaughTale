@@ -8,24 +8,21 @@ var DRAWER_CSS = `
     position: fixed;
     inset: 0;
     z-index: 1100;
-    display: none;
+    display: flex;
     box-sizing: border-box;
     pointer-events: none;
-    background: rgba(15, 23, 42, 0);
-    backdrop-filter: blur(0px);
-    -webkit-backdrop-filter: blur(0px);
-    transition: background 0.3s cubic-bezier(0.16, 1, 0.3, 1), backdrop-filter 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.p-drawer-mask.p-drawer-mask-modal {
-    background: rgba(15, 23, 42, 0);
-}
-
-.p-drawer-mask.p-drawer-mask-active {
-    pointer-events: auto;
+    visibility: hidden;
+    opacity: 0;
     background: rgba(15, 23, 42, 0.45);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
+    transition: opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.p-drawer-mask.p-drawer-mask-active {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
 }
 
 /* Positioning & Layout */
@@ -56,20 +53,19 @@ var DRAWER_CSS = `
 .p-drawer {
     background: var(--p-surface-0, #ffffff);
     border: none;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     overflow: hidden;
     pointer-events: auto;
     will-change: transform, opacity;
-    transform: translateZ(0);
-    transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
 }
 
 /* Position Transforms */
 .p-drawer-left .p-drawer {
-    width: 20rem;
+    width: 22rem;
     max-width: 100vw;
     height: 100%;
     border-right: 1px solid var(--p-border-color, #e2e8f0);
@@ -80,7 +76,7 @@ var DRAWER_CSS = `
 }
 
 .p-drawer-right .p-drawer {
-    width: 20rem;
+    width: 22rem;
     max-width: 100vw;
     height: 100%;
     border-left: 1px solid var(--p-border-color, #e2e8f0);
@@ -115,7 +111,7 @@ var DRAWER_CSS = `
 .p-drawer-full .p-drawer {
     width: 100vw;
     height: 100vh;
-    transform: scale(0.96);
+    transform: scale(0.95);
     opacity: 0;
 }
 .p-drawer-mask-active.p-drawer-full .p-drawer {
@@ -274,15 +270,10 @@ function initGlobalDrawerDelegation() {
             maskEl.className = maskEl.className.replace(/p-drawer-(left|right|top|bottom|full)/g, "");
             maskEl.classList.add(`p-drawer-${cleanPos}`);
           }
-          maskEl.style.display = "flex";
-          requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-              maskEl.classList.add("p-drawer-mask-active");
-              if (maskEl.classList.contains("p-drawer-mask-modal")) {
-                document.body.style.overflow = "hidden";
-              }
-            });
-          });
+          maskEl.classList.add("p-drawer-mask-active");
+          if (maskEl.classList.contains("p-drawer-mask-modal")) {
+            document.body.style.overflow = "hidden";
+          }
         }
       }
       return;
@@ -293,11 +284,6 @@ function initGlobalDrawerDelegation() {
       const maskEl = closeBtn.closest(".p-drawer-mask");
       if (maskEl) {
         maskEl.classList.remove("p-drawer-mask-active");
-        setTimeout(() => {
-          if (!maskEl.classList.contains("p-drawer-mask-active")) {
-            maskEl.style.display = "none";
-          }
-        }, 320);
         document.body.style.overflow = "";
       }
       return;
@@ -316,11 +302,6 @@ function initGlobalDrawerDelegation() {
       }
       if (dismissable) {
         target.classList.remove("p-drawer-mask-active");
-        setTimeout(() => {
-          if (!target.classList.contains("p-drawer-mask-active")) {
-            target.style.display = "none";
-          }
-        }, 320);
         document.body.style.overflow = "";
       }
     }
@@ -344,11 +325,6 @@ function initGlobalDrawerDelegation() {
       const activeMask = document.querySelector(".p-drawer-mask.p-drawer-mask-active");
       if (activeMask) {
         activeMask.classList.remove("p-drawer-mask-active");
-        setTimeout(() => {
-          if (!activeMask.classList.contains("p-drawer-mask-active")) {
-            activeMask.style.display = "none";
-          }
-        }, 320);
         document.body.style.overflow = "";
       }
     }
@@ -361,4 +337,4 @@ function DrawerIsland(container, props) {
 export {
   DrawerIsland as default
 };
-//# sourceMappingURL=drawer-JGO5L4R7.js.map
+//# sourceMappingURL=drawer-L3ISGRGU.js.map

@@ -1712,8 +1712,6 @@ public class IslandDrawerTagHelper : TagHelper
         if (Modal) maskClasses += " p-drawer-mask-modal";
         if (Visible) maskClasses += " p-drawer-mask-active";
 
-        var maskStyle = Visible ? "display: flex !important;" : "display: none !important;";
-
         var drawerStyle = "";
         if (!string.IsNullOrWhiteSpace(DrawerWidth)) drawerStyle += $"width: {DrawerWidth};";
         if (!string.IsNullOrWhiteSpace(DrawerHeight)) drawerStyle += $"height: {DrawerHeight};";
@@ -1738,7 +1736,7 @@ public class IslandDrawerTagHelper : TagHelper
         if (!string.IsNullOrWhiteSpace(Class)) drawerClasses += $" {Class}";
 
         output.Content.SetHtmlContent($@"
-            <div class=""{maskClasses}"" style=""{maskStyle}"">
+            <div class=""{maskClasses}"">
                 <div class=""{drawerClasses}"" role=""complementary"" aria-modal=""{Modal.ToString().ToLowerInvariant()}"" style=""{drawerStyle}"">
                     {headerHtml}
                     {childContent.GetContent()}
