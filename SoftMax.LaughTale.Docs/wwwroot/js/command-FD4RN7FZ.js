@@ -16,12 +16,13 @@ var COMMAND_CSS = `
     background: var(--p-commandmenu-background, var(--p-surface-0, #ffffff));
     border: 1px solid var(--p-commandmenu-border-color, var(--p-border-color, #e2e8f0));
     border-radius: var(--p-commandmenu-border-radius, var(--p-border-radius, 8px));
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
     overflow: hidden;
     width: 100%;
     max-width: 32rem;
     box-sizing: border-box;
     font-family: inherit;
+    position: relative;
 }
 
 .p-commandmenu-header {
@@ -60,12 +61,14 @@ var COMMAND_CSS = `
 
 .p-commandmenu-list {
     padding: var(--p-commandmenu-list-padding, 0.5rem);
+    height: 19rem;
     max-height: var(--p-commandmenu-height, 19rem);
     overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
     box-sizing: border-box;
+    scroll-behavior: smooth;
 }
 
 .p-commandmenu-group {
@@ -92,14 +95,25 @@ var COMMAND_CSS = `
     cursor: pointer;
     font-size: 0.875rem;
     color: var(--p-text-color, #0f172a);
-    transition: background-color 0.12s ease, color 0.12s ease;
+    transition: background-color 0.1s ease, color 0.1s ease, transform 0.05s ease;
     user-select: none;
+    outline: none;
 }
 
 .p-commandmenu-item:hover,
 .p-commandmenu-item.p-commandmenu-item-focus {
-    background: var(--p-surface-100, #f1f5f9);
-    color: var(--p-text-color, #0f172a);
+    background: var(--p-surface-100, #f1f5f9) !important;
+    color: var(--p-text-color, #0f172a) !important;
+}
+
+.p-commandmenu-item.p-commandmenu-item-focus {
+    outline: 1px solid var(--p-primary-500, #3b82f6) !important;
+    outline-offset: -1px;
+}
+
+.p-commandmenu-item.p-commandmenu-item-active {
+    transform: scale(0.98);
+    background: rgba(59, 130, 246, 0.15) !important;
 }
 
 .p-commandmenu-item-left {
@@ -155,10 +169,20 @@ var COMMAND_CSS = `
 .p-commandmenu-footer {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: space-between;
     padding: var(--p-commandmenu-footer-padding, 0.625rem 1rem);
     background: var(--p-commandmenu-footer-background, var(--p-surface-50, #f8fafc));
     border-top: 1px solid var(--p-commandmenu-footer-border-color, var(--p-border-color, #e2e8f0));
+}
+
+.p-commandmenu-footer-feedback {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--p-primary-600, #2563eb);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 12rem;
 }
 
 .p-commandmenu-footer-content {
@@ -167,6 +191,7 @@ var COMMAND_CSS = `
     gap: 0.85rem;
     font-size: 0.75rem;
     color: var(--p-surface-500, #64748b);
+    margin-left: auto;
 }
 
 .p-commandmenu-kbd {
@@ -232,8 +257,8 @@ var COMMAND_CSS = `
 .dark .p-commandmenu-item.p-commandmenu-item-focus,
 [data-theme="dark"] .p-commandmenu-item:hover,
 [data-theme="dark"] .p-commandmenu-item.p-commandmenu-item-focus {
-    background: var(--p-surface-800, #1e293b);
-    color: var(--p-surface-0, #f8fafc);
+    background: var(--p-surface-800, #1e293b) !important;
+    color: var(--p-surface-0, #f8fafc) !important;
 }
 
 .dark .p-commandmenu-group-label,
@@ -332,22 +357,53 @@ function CommandMenuIsland(container, props) {
     if (LucideIcons[iconName]) return LucideIcons[iconName];
     return "";
   }
-  function renderContent(targetEl) {
-    const filtered = getFilteredGroups();
-    let flatIndex = 0;
-    const totalItems = filtered.reduce((acc, g) => acc + g.items.length, 0);
-    if (selectedIndex >= totalItems) {
-      selectedIndex = Math.max(0, totalItems - 1);
-    }
-    let listHtml = "";
-    if (totalItems === 0) {
-      const emptyMsg = props.emptyMessage || props.EmptyMessage;
-      listHtml = `
-                <div class="p-commandmenu-empty-message">
-                    ${emptyMsg ? emptyMsg : search ? `No results found for <strong>"${search}"</strong>` : "No results found"}
+  function setupCommandMenu(targetEl) {
+    const arrowUpSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>';
+    const arrowDownSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
+    const searchSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>';
+    targetEl.innerHTML = `
+            <div class="p-commandmenu p-component" ${withDialog ? 'style="border: none; box-shadow: none; max-width: 100%;"' : ""}>
+                <div class="p-commandmenu-header">
+                    <span class="p-commandmenu-search-icon">${searchSvg}</span>
+                    <input type="text" class="p-commandmenu-input" placeholder="${placeholder}" value="${search}" />
                 </div>
-            `;
-    } else {
+                <div class="p-commandmenu-list" tabindex="-1"></div>
+                <div class="p-commandmenu-footer">
+                    <span class="p-commandmenu-footer-feedback"></span>
+                    <div class="p-commandmenu-footer-content">
+                        <span style="display:inline-flex; align-items:center; gap: 0.35rem;">
+                            <kbd class="p-commandmenu-kbd">${arrowUpSvg}</kbd>
+                            <kbd class="p-commandmenu-kbd">${arrowDownSvg}</kbd>
+                            Navigate
+                        </span>
+                        <span style="display:inline-flex; align-items:center; gap: 0.35rem;">
+                            <kbd class="p-commandmenu-kbd">\u21B5</kbd>
+                            Select
+                        </span>
+                    </div>
+                </div>
+            </div>
+        `;
+    const input = targetEl.querySelector(".p-commandmenu-input");
+    const listEl = targetEl.querySelector(".p-commandmenu-list");
+    const feedbackEl = targetEl.querySelector(".p-commandmenu-footer-feedback");
+    function renderListOnly() {
+      const filtered = getFilteredGroups();
+      let flatIndex = 0;
+      const totalItems = filtered.reduce((acc, g) => acc + g.items.length, 0);
+      if (selectedIndex >= totalItems) {
+        selectedIndex = Math.max(0, totalItems - 1);
+      }
+      if (totalItems === 0) {
+        const emptyMsg = props.emptyMessage || props.EmptyMessage;
+        listEl.innerHTML = `
+                    <div class="p-commandmenu-empty-message">
+                        ${emptyMsg ? emptyMsg : search ? `No results found for <strong>"${search}"</strong>` : "No results found"}
+                    </div>
+                `;
+        return;
+      }
+      let listHtml = "";
       filtered.forEach((g) => {
         let itemsHtml = "";
         g.items.forEach((it) => {
@@ -376,7 +432,11 @@ function CommandMenuIsland(container, props) {
                         `;
           }
           itemsHtml += `
-                        <div class="p-commandmenu-item ${isFocused ? "p-commandmenu-item-focus" : ""}" data-flat-index="${flatIndex}" data-url="${it.url || ""}" data-action="${it.action || ""}">
+                        <div class="p-commandmenu-item ${isFocused ? "p-commandmenu-item-focus" : ""}" 
+                             data-flat-index="${flatIndex}" 
+                             data-label="${it.label}"
+                             data-url="${it.url || ""}" 
+                             data-action="${it.action || ""}">
                             ${itemLeftHtml}
                             ${it.shortcut ? `<kbd class="p-commandmenu-kbd">${it.shortcut}</kbd>` : ""}
                         </div>
@@ -390,107 +450,112 @@ function CommandMenuIsland(container, props) {
                     </div>
                 `;
       });
-    }
-    const arrowUpSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>';
-    const arrowDownSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
-    const searchSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>';
-    targetEl.innerHTML = `
-            <div class="p-commandmenu p-component" ${withDialog ? 'style="border: none; box-shadow: none; max-width: 100%;"' : ""}>
-                <div class="p-commandmenu-header">
-                    <span class="p-commandmenu-search-icon">${searchSvg}</span>
-                    <input type="text" class="p-commandmenu-input" placeholder="${placeholder}" value="${search}" />
-                </div>
-                <div class="p-commandmenu-list">
-                    ${listHtml}
-                </div>
-                <div class="p-commandmenu-footer">
-                    <div class="p-commandmenu-footer-content">
-                        <span style="display:inline-flex; align-items:center; gap: 0.35rem;">
-                            <kbd class="p-commandmenu-kbd">${arrowUpSvg}</kbd>
-                            <kbd class="p-commandmenu-kbd">${arrowDownSvg}</kbd>
-                            Navigate
-                        </span>
-                        <span style="display:inline-flex; align-items:center; gap: 0.35rem;">
-                            <kbd class="p-commandmenu-kbd">\u21B5</kbd>
-                            Select
-                        </span>
-                    </div>
-                </div>
-            </div>
-        `;
-    const input = targetEl.querySelector(".p-commandmenu-input");
-    if (input) {
-      input.addEventListener("input", (e) => {
-        search = e.target.value;
-        selectedIndex = 0;
-        renderContent(targetEl);
-        const newInput = targetEl.querySelector(".p-commandmenu-input");
-        newInput?.focus();
+      listEl.innerHTML = listHtml;
+      listEl.querySelectorAll(".p-commandmenu-item").forEach((el) => {
+        el.addEventListener("mouseenter", () => {
+          const idx = Number(el.getAttribute("data-flat-index"));
+          selectedIndex = idx;
+          updateFocusItem(false);
+        });
+        el.addEventListener("click", () => {
+          const idx = Number(el.getAttribute("data-flat-index"));
+          selectedIndex = idx;
+          executeSelectedItem();
+        });
       });
-      input.addEventListener("keydown", (e) => {
-        if (e.key === "ArrowDown") {
-          e.preventDefault();
-          if (totalItems > 0) {
-            selectedIndex = (selectedIndex + 1) % totalItems;
-            renderContent(targetEl);
-            const newInput = targetEl.querySelector(".p-commandmenu-input");
-            newInput?.focus();
-          }
-        } else if (e.key === "ArrowUp") {
-          e.preventDefault();
-          if (totalItems > 0) {
-            selectedIndex = (selectedIndex - 1 + totalItems) % totalItems;
-            renderContent(targetEl);
-            const newInput = targetEl.querySelector(".p-commandmenu-input");
-            newInput?.focus();
-          }
-        } else if (e.key === "Enter") {
-          e.preventDefault();
-          executeSelectedItem(targetEl);
-        } else if (e.key === "Escape") {
-          if (withDialog) {
-            closeDialog();
-          } else if (search) {
-            search = "";
-            selectedIndex = 0;
-            renderContent(targetEl);
-            const newInput = targetEl.querySelector(".p-commandmenu-input");
-            newInput?.focus();
-          }
+      updateFocusItem(false);
+    }
+    function updateFocusItem(shouldScroll = true) {
+      const items = listEl.querySelectorAll(".p-commandmenu-item");
+      items.forEach((item, i) => {
+        const isFocused = i === selectedIndex;
+        item.classList.toggle("p-commandmenu-item-focus", isFocused);
+        if (isFocused && shouldScroll) {
+          scrollToFocusedItem(item);
         }
       });
     }
-    targetEl.querySelectorAll(".p-commandmenu-item").forEach((el) => {
-      el.addEventListener("mouseenter", () => {
-        const idx = Number(el.getAttribute("data-flat-index"));
-        selectedIndex = idx;
-        targetEl.querySelectorAll(".p-commandmenu-item").forEach((item, i) => {
-          item.classList.toggle("p-commandmenu-item-focus", i === selectedIndex);
-        });
-      });
-      el.addEventListener("click", () => {
-        const idx = Number(el.getAttribute("data-flat-index"));
-        selectedIndex = idx;
-        executeSelectedItem(targetEl);
-      });
+    function scrollToFocusedItem(itemEl) {
+      const itemTop = itemEl.offsetTop - listEl.offsetTop;
+      const itemBottom = itemTop + itemEl.offsetHeight;
+      const containerTop = listEl.scrollTop;
+      const containerBottom = containerTop + listEl.clientHeight;
+      if (itemTop < containerTop) {
+        listEl.scrollTop = itemTop;
+      } else if (itemBottom > containerBottom) {
+        listEl.scrollTop = itemBottom - listEl.clientHeight;
+      }
+    }
+    function executeSelectedItem() {
+      const activeEl = listEl.querySelector(`.p-commandmenu-item[data-flat-index="${selectedIndex}"]`);
+      if (!activeEl) return;
+      const label = activeEl.getAttribute("data-label") || activeEl.textContent?.trim() || "Command";
+      const url = activeEl.getAttribute("data-url");
+      const action = activeEl.getAttribute("data-action");
+      activeEl.classList.add("p-commandmenu-item-active");
+      setTimeout(() => activeEl.classList.remove("p-commandmenu-item-active"), 200);
+      if (feedbackEl) {
+        feedbackEl.textContent = `\u2713 Selected: ${label}`;
+        feedbackEl.style.opacity = "1";
+        setTimeout(() => {
+          feedbackEl.style.opacity = "0";
+        }, 2500);
+      }
+      if (withDialog) {
+        setTimeout(() => closeDialog(), 200);
+      }
+      if (url) {
+        window.location.href = url;
+      } else if (action === "toggle-dark") {
+        document.documentElement.classList.toggle("dark");
+        localStorage.setItem("theme", document.documentElement.classList.contains("dark") ? "dark" : "light");
+      }
+    }
+    input.addEventListener("input", () => {
+      search = input.value;
+      selectedIndex = 0;
+      renderListOnly();
     });
-  }
-  function executeSelectedItem(targetEl) {
-    const activeEl = targetEl.querySelector(`.p-commandmenu-item[data-flat-index="${selectedIndex}"]`);
-    if (!activeEl) return;
-    const url = activeEl.getAttribute("data-url");
-    const action = activeEl.getAttribute("data-action");
-    if (withDialog) {
-      closeDialog();
-    }
-    if (url) {
-      window.location.href = url;
-    } else if (action === "toggle-dark") {
-      document.documentElement.classList.toggle("dark");
-      localStorage.setItem("theme", document.documentElement.classList.contains("dark") ? "dark" : "light");
-    } else {
-      console.log("Command executed:", activeEl.textContent?.trim());
-    }
+    input.addEventListener("keydown", (e) => {
+      const items = listEl.querySelectorAll(".p-commandmenu-item");
+      const count = items.length;
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        if (count > 0) {
+          selectedIndex = (selectedIndex + 1) % count;
+          updateFocusItem(true);
+        }
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        if (count > 0) {
+          selectedIndex = (selectedIndex - 1 + count) % count;
+          updateFocusItem(true);
+        }
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        executeSelectedItem();
+      } else if (e.key === "Home") {
+        if (count > 0) {
+          selectedIndex = 0;
+          updateFocusItem(true);
+        }
+      } else if (e.key === "End") {
+        if (count > 0) {
+          selectedIndex = count - 1;
+          updateFocusItem(true);
+        }
+      } else if (e.key === "Escape") {
+        if (withDialog) {
+          closeDialog();
+        } else if (search) {
+          input.value = "";
+          search = "";
+          selectedIndex = 0;
+          renderListOnly();
+        }
+      }
+    });
+    renderListOnly();
   }
   function openDialog() {
     if (isDialogOpen) return;
@@ -502,13 +567,15 @@ function CommandMenuIsland(container, props) {
         `;
     document.body.appendChild(backdrop);
     const card = backdrop.querySelector(".p-commandmenu-dialog-card");
-    renderContent(card);
+    setupCommandMenu(card);
+    const input = card.querySelector(".p-commandmenu-input");
+    input?.focus();
     backdrop.addEventListener("click", (e) => {
       if (e.target === backdrop) {
         closeDialog();
       }
     });
-    useFocusTrap(card, { initialFocusElement: card.querySelector("input") || void 0 });
+    useFocusTrap(card, { initialFocusElement: input || void 0 });
   }
   function closeDialog() {
     isDialogOpen = false;
@@ -537,10 +604,10 @@ function CommandMenuIsland(container, props) {
       }
     });
   } else {
-    renderContent(container);
+    setupCommandMenu(container);
   }
 }
 export {
   CommandMenuIsland as default
 };
-//# sourceMappingURL=command-MRV6PAYH.js.map
+//# sourceMappingURL=command-FD4RN7FZ.js.map
