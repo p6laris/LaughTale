@@ -29,7 +29,7 @@ public class IslandConfirmDialogTagHelper : TagHelper
     public bool CloseOnEscape { get; set; } = true;
 
     [HtmlAttributeName("hydrate")]
-    public HydrateStrategy Hydrate { get; set; } = HydrateStrategy.Visible;
+    public HydrateStrategy Hydrate { get; set; } = HydrateStrategy.Load;
 
     [HtmlAttributeName("class")]
     public string? Class { get; set; }

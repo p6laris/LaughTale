@@ -972,7 +972,7 @@ function getSlot(container, name = "default") {
 // ../SoftMax.LaughTale.Client/src/index.ts
 defineIsland("stepper", () => import("./stepper-YDR6TDZ5.js"));
 defineIsland("timeline", () => import("./timeline-RNI3KT3N.js"));
-defineIsland("camera", () => import("./camera-KAAHJRTE.js"));
+defineIsland("camera", () => import("./camera-P2UEMHVO.js"));
 defineIsland("dropzone", () => import("./dropzone-E76UIQBF.js"));
 defineIsland("tree", () => import("./tree-Z4YCN4WI.js"));
 defineIsland("treetable", () => import("./treetable-H2R43JFX.js"));
@@ -982,7 +982,7 @@ defineIsland("island-treetable", () => import("./treetable-H2R43JFX.js"));
 defineIsland("tree-select", () => import("./tree-select-3WADBRSW.js"));
 defineIsland("datatable", () => import("./datatable-OERXWFWO.js"));
 defineIsland("datagrid", () => import("./datatable-OERXWFWO.js"));
-defineIsland("modal", () => import("./modal-T7VF2JHF.js"));
+defineIsland("modal", () => import("./modal-NWH3XZXJ.js"));
 defineIsland("toast", () => import("./toast-RN33QYTD.js"));
 defineIsland("input-number", () => import("./input-number-KQ2J2WMH.js"));
 defineIsland("input-otp", () => import("./input-otp-RUPMATZ7.js"));
@@ -1101,4 +1101,4 @@ export {
   enableViewTransitions,
   getSlot
 };
-//# sourceMappingURL=chunk-Z5KCFJM6.js.map
+//# sourceMappingURL=chunk-B537FQR6.js.map
