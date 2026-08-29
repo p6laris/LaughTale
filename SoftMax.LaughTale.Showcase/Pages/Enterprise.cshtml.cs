@@ -1664,6 +1664,12 @@ public class EnterpriseModel : PageModel
         })
     };
 
+    public Dictionary<string, bool> MenuControlledExpandedKeys { get; set; } = new()
+    {
+        ["workspace"] = true,
+        ["reports"] = true
+    };
+
 
 
     public List<MenuItem> HeaderMenuItems { get; set; } = new()

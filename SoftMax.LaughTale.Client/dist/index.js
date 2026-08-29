@@ -31661,57 +31661,66 @@ ${h.response}`).join("\n");
     }
     const rawData = props.model || props.items || props.Model || props.Items || [];
     let itemsState = normalizeItems(rawData);
-    let isOpen = !isPopup;
-    let focusedIndex = 0;
+    let popupEl = null;
+    let isOpen = false;
     function getIconSvg(iconName) {
       if (!iconName) return "";
       if (iconName.startsWith("<svg")) return iconName;
       if (LucideIcons[iconName]) return LucideIcons[iconName];
       return "";
     }
-    function renderItemContent(item, path) {
+    function renderItemContent(item, path, depth = 0) {
       if (item.separator) {
         return `<li class="p-menu-separator" role="separator"></li>`;
       }
       const isGroup = Array.isArray(item.items) && item.items.length > 0;
-      const isToggleable = item.toggleable !== false && isGroup;
-      const isExpanded = isToggleable ? item.key ? !!expandedKeys[item.key] : expandedKeys[path] !== false : true;
-      if (isGroup && !isToggleable) {
-        const subItemsHtml = item.items.map((sub, i) => renderItemContent(sub, `${path}.${i}`)).join("");
+      const isToggleableSubmenu = isGroup && (item.toggleable === true || depth > 0 && item.toggleable !== false);
+      const isStaticGroupHeader = isGroup && !isToggleableSubmenu;
+      if (isStaticGroupHeader) {
+        const subItemsHtml = item.items.map((sub, i) => renderItemContent(sub, `${path}.${i}`, depth + 1)).join("");
+        const headerLabelClass = customTemplate ? "text-primary font-bold text-sm" : "p-menu-submenu-label";
+        const headerLabelStyle = customTemplate ? "color: var(--p-primary-500, #3b82f6); font-weight: 700; font-size: 0.8125rem; padding: 0.5rem 0.75rem 0.25rem;" : "";
         return `
                 <li class="p-menu-item" role="none">
-                    <div class="p-menu-submenu-label">${item.label}</div>
+                    <div class="${headerLabelClass}" style="${headerLabelStyle}">${item.label}</div>
                     <ul class="p-menu-list" role="group">
                         ${subItemsHtml}
                     </ul>
                 </li>
             `;
       }
+      const isExpanded = isToggleableSubmenu ? item.key ? !!expandedKeys[item.key] : !!expandedKeys[path] : false;
       let iconHtml = "";
       if (item.checked !== void 0) {
-        iconHtml = item.checked ? `<span class="p-menu-item-icon p-menu-check-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>` : `<span class="p-menu-item-icon p-menu-blank-icon"></span>`;
+        iconHtml = item.checked ? `<span class="p-menu-item-icon p-menu-check-icon"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>` : `<span class="p-menu-item-icon p-menu-blank-icon"></span>`;
       } else if (item.radioSelected !== void 0) {
         iconHtml = item.radioSelected ? `<span class="p-menu-item-icon"><span class="p-menu-dot-icon"></span></span>` : `<span class="p-menu-item-icon p-menu-blank-icon"></span>`;
       } else if (item.icon) {
         const svg = getIconSvg(item.icon);
         if (svg) iconHtml = `<span class="p-menu-item-icon">${svg}</span>`;
       }
-      const chevronSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
+      const chevronSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
       let subHtml = "";
       if (isGroup && isExpanded) {
-        const subItemsHtml = item.items.map((sub, i) => renderItemContent(sub, `${path}.${i}`)).join("");
+        const subItemsHtml = item.items.map((sub, i) => renderItemContent(sub, `${path}.${i}`, depth + 1)).join("");
         subHtml = `<ul class="p-menu-submenu-list" role="group">${subItemsHtml}</ul>`;
       }
-      const extraClass = item.linkClass || "";
+      let linkClasses = ["p-menu-item-link"];
+      let customInlineStyle = "";
+      if (item.linkClass) {
+        if (item.linkClass.includes("text-red")) {
+          customInlineStyle = "color: #ef4444 !important;";
+        }
+      }
       return `
             <li class="p-menu-item ${item.disabled ? "p-disabled" : ""}" role="none" data-path="${path}" data-key="${item.key || ""}">
                 <div class="p-menu-item-content">
-                    <a class="p-menu-item-link ${extraClass}" role="menuitem" tabindex="-1" href="${item.url || item.route || "#"}" ${item.target ? `target="${item.target}"` : ""}>
+                    <a class="${linkClasses.join(" ")}" style="${customInlineStyle}" role="menuitem" tabindex="-1" href="${item.url || item.route || "#"}" ${item.target ? `target="${item.target}"` : ""}>
                         ${iconHtml}
                         <span class="p-menu-item-label">${item.label}</span>
                         ${item.badge !== void 0 ? `<span class="p-menu-item-badge">${item.badge}</span>` : ""}
                         ${item.shortcut ? `<span class="p-menu-item-shortcut">${item.shortcut}</span>` : ""}
-                        ${isGroup ? `<span class="p-menu-item-submenu-icon ${isExpanded ? "p-expanded" : ""}">${chevronSvg}</span>` : ""}
+                        ${isToggleableSubmenu ? `<span class="p-menu-item-submenu-icon ${isExpanded ? "p-expanded" : ""}">${chevronSvg}</span>` : ""}
                     </a>
                 </div>
                 ${subHtml}
@@ -31719,7 +31728,7 @@ ${h.response}`).join("\n");
         `;
     }
     function renderMenuHtml() {
-      const itemsHtml = itemsState.map((it, i) => renderItemContent(it, `${i}`)).join("");
+      const itemsHtml = itemsState.map((it, i) => renderItemContent(it, `${i}`, 0)).join("");
       let startHtml = "";
       if (customTemplate) {
         startHtml = `
@@ -31748,7 +31757,7 @@ ${h.response}`).join("\n");
       const customClass = props.class || props.Class || "";
       const customStyle = props.style || props.Style || "";
       return `
-            <div class="p-menu p-component ${isPopup ? "p-menu-popup" : ""} ${customClass}" style="${customStyle}" role="menu" tabindex="0">
+            <div class="p-menu p-component ${isPopup ? "p-menu-popup-overlay" : ""} ${customClass}" style="${customStyle}" role="menu" tabindex="0">
                 ${startHtml}
                 <ul class="p-menu-list" role="menubar">
                     ${itemsHtml}
@@ -31767,27 +31776,27 @@ ${h.response}`).join("\n");
           const item = findItemByPath(itemsState, path);
           if (!item || item.disabled) return;
           const isGroup = Array.isArray(item.items) && item.items.length > 0;
-          const isToggleable = item.toggleable !== false && isGroup;
-          if (isToggleable) {
+          const isToggleableSubmenu = isGroup && (item.toggleable === true || path.includes(".") && item.toggleable !== false);
+          if (isToggleableSubmenu) {
             e.preventDefault();
             if (key) {
               expandedKeys[key] = !expandedKeys[key];
             } else {
-              expandedKeys[path] = expandedKeys[path] === false ? true : false;
+              expandedKeys[path] = !expandedKeys[path];
             }
-            render();
+            updateContent();
             return;
           }
           if (item.checked !== void 0) {
             e.preventDefault();
             item.checked = !item.checked;
-            render();
+            updateContent();
             return;
           }
           if (item.radioGroup && item.radioSelected !== void 0) {
             e.preventDefault();
             setRadioSelection(itemsState, item.radioGroup, item);
-            render();
+            updateContent();
             return;
           }
           if (item.command || item.action) {
@@ -31799,34 +31808,32 @@ ${h.response}`).join("\n");
             }
           }
           if (isPopup) {
-            isOpen = false;
-            render();
+            closePopup();
           }
         });
       });
       menuEl.addEventListener("keydown", (e) => {
         const links = menuEl.querySelectorAll(".p-menu-item-link");
         if (links.length === 0) return;
+        const active = document.activeElement;
+        let currentIdx = Array.from(links).indexOf(active);
         if (e.key === "ArrowDown") {
           e.preventDefault();
-          focusedIndex = (focusedIndex + 1) % links.length;
-          links[focusedIndex]?.focus();
+          currentIdx = (currentIdx + 1) % links.length;
+          links[currentIdx]?.focus();
         } else if (e.key === "ArrowUp") {
           e.preventDefault();
-          focusedIndex = (focusedIndex - 1 + links.length) % links.length;
-          links[focusedIndex]?.focus();
+          currentIdx = (currentIdx - 1 + links.length) % links.length;
+          links[currentIdx]?.focus();
         } else if (e.key === "Home") {
           e.preventDefault();
-          focusedIndex = 0;
           links[0]?.focus();
         } else if (e.key === "End") {
           e.preventDefault();
-          focusedIndex = links.length - 1;
-          links[focusedIndex]?.focus();
+          links[links.length - 1]?.focus();
         } else if (e.key === "Escape" && isPopup) {
           e.preventDefault();
-          isOpen = false;
-          render();
+          closePopup();
         }
       });
     }
@@ -31866,47 +31873,71 @@ ${h.response}`).join("\n");
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            animation: slideIn 0.2s ease;
         `;
       toast.textContent = `\u2713 ${msg}`;
       document.body.appendChild(toast);
       setTimeout(() => toast.remove(), 2500);
     }
-    function render() {
-      if (!isOpen && isPopup) {
-        container.innerHTML = "";
+    function updateContent() {
+      if (isPopup) {
+        if (popupEl) {
+          popupEl.innerHTML = renderMenuHtml();
+          const menuEl = popupEl.querySelector(".p-menu");
+          wireEvents(menuEl);
+        }
+      } else {
+        container.innerHTML = renderMenuHtml();
+        const menuEl = container.querySelector(".p-menu");
+        wireEvents(menuEl);
+      }
+    }
+    function openPopup(trigger) {
+      if (isOpen) {
+        closePopup();
         return;
       }
-      container.innerHTML = renderMenuHtml();
-      const menuEl = container.querySelector(".p-menu");
+      isOpen = true;
+      popupEl = document.createElement("div");
+      popupEl.className = "p-menu-popup-wrapper";
+      popupEl.innerHTML = renderMenuHtml();
+      document.body.appendChild(popupEl);
+      const menuEl = popupEl.querySelector(".p-menu");
       wireEvents(menuEl);
-      if (isPopup) {
-        const trigger = document.getElementById(props.triggerId || "") || container.previousElementSibling;
-        if (trigger) {
-          const rect = trigger.getBoundingClientRect();
-          menuEl.style.top = `${rect.bottom + window.scrollY + 6}px`;
-          menuEl.style.left = `${rect.left + window.scrollX}px`;
-          const closeHandler = (e) => {
-            if (!container.contains(e.target) && !trigger.contains(e.target)) {
-              isOpen = false;
-              render();
-              document.removeEventListener("click", closeHandler);
-            }
-          };
-          setTimeout(() => document.addEventListener("click", closeHandler), 0);
+      const rect = trigger.getBoundingClientRect();
+      menuEl.style.position = "fixed";
+      menuEl.style.top = `${rect.bottom + 4}px`;
+      menuEl.style.left = `${rect.left}px`;
+      menuEl.style.zIndex = "9999";
+      const clickOutsideHandler = (e) => {
+        if (popupEl && !popupEl.contains(e.target) && !trigger.contains(e.target)) {
+          closePopup();
+          document.removeEventListener("click", clickOutsideHandler);
         }
+      };
+      setTimeout(() => document.addEventListener("click", clickOutsideHandler), 0);
+    }
+    function closePopup() {
+      isOpen = false;
+      if (popupEl) {
+        popupEl.remove();
+        popupEl = null;
       }
     }
     if (isPopup) {
-      const trigger = document.getElementById(props.triggerId || "");
-      if (trigger) {
-        trigger.addEventListener("click", (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          isOpen = !isOpen;
-          render();
-        });
+      container.innerHTML = "";
+      const triggerId = props.triggerId || props.TriggerId;
+      if (triggerId) {
+        const trigger = document.getElementById(triggerId);
+        if (trigger) {
+          trigger.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            openPopup(trigger);
+          });
+        }
       }
+    } else {
+      updateContent();
     }
     container.__expandAll = () => {
       const keys = {};
@@ -31918,13 +31949,12 @@ ${h.response}`).join("\n");
       }
       collect(itemsState);
       expandedKeys = keys;
-      render();
+      updateContent();
     };
     container.__collapseAll = () => {
       expandedKeys = {};
-      render();
+      updateContent();
     };
-    render();
   }
   var MENU_CSS;
   var init_menu = __esm({
@@ -31940,19 +31970,30 @@ ${h.response}`).join("\n");
     color: var(--p-menu-color, var(--p-text-color, #0f172a));
     border: 1px solid var(--p-menu-border-color, var(--p-border-color, #e2e8f0));
     border-radius: var(--p-menu-border-radius, var(--p-border-radius, 8px));
-    box-shadow: var(--p-menu-shadow, 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05));
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
     min-width: 12.5rem;
     box-sizing: border-box;
     font-family: inherit;
     user-select: none;
     overflow: hidden;
-    transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
-.p-menu.p-menu-popup {
-    position: absolute;
+.p-menu-popup-overlay {
+    position: fixed;
     z-index: 1050;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.12), 0 4px 6px -4px rgba(0, 0, 0, 0.08);
+    animation: p-menu-fade-in 0.15s cubic-bezier(0, 0, 0.2, 1);
+}
+
+@keyframes p-menu-fade-in {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 .p-menu-start {
@@ -31965,29 +32006,34 @@ ${h.response}`).join("\n");
     box-sizing: border-box;
 }
 
-.p-menu-list,
-.p-menu-submenu-list {
+.p-menu-list {
     list-style: none;
     margin: 0;
-    padding: var(--p-menu-list-padding, 0.375rem);
+    padding: 0.375rem;
     display: flex;
     flex-direction: column;
-    gap: var(--p-menu-list-gap, 0.125rem);
+    gap: 0.125rem;
     box-sizing: border-box;
 }
 
 .p-menu-submenu-list {
-    padding-left: 1.25rem;
+    list-style: none;
+    margin: 0;
+    padding: 0.125rem 0 0.125rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    box-sizing: border-box;
 }
 
 .p-menu-submenu-label {
-    font-size: var(--p-menu-submenu-label-font-size, 0.75rem);
-    font-weight: var(--p-menu-submenu-label-font-weight, 700);
-    color: var(--p-menu-submenu-label-color, var(--p-surface-500, #64748b));
-    padding: var(--p-menu-submenu-label-padding, 0.5rem 0.65rem 0.25rem);
-    background: var(--p-menu-submenu-label-background, transparent);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--p-surface-400, #94a3b8);
+    padding: 0.5rem 0.75rem 0.25rem;
     text-transform: none;
     letter-spacing: normal;
+    user-select: none;
 }
 
 .p-menu-separator {
@@ -32013,23 +32059,23 @@ ${h.response}`).join("\n");
 .p-menu-item-link {
     display: flex;
     align-items: center;
-    gap: var(--p-menu-item-gap, 0.5rem);
-    padding: var(--p-menu-item-padding, 0.45rem 0.65rem);
+    gap: 0.5rem;
+    padding: 0.45rem 0.65rem;
     color: var(--p-menu-item-color, var(--p-text-color, #0f172a));
-    border-radius: var(--p-menu-item-border-radius, var(--p-border-radius, 6px));
+    border-radius: var(--p-border-radius, 6px);
     text-decoration: none;
     cursor: pointer;
-    font-size: var(--p-menu-item-label-font-size, 0.875rem);
-    font-weight: var(--p-menu-item-label-font-weight, 500);
+    font-size: 0.875rem;
+    font-weight: 500;
     transition: background-color 0.12s ease, color 0.12s ease;
     outline: none;
+    box-sizing: border-box;
 }
 
 .p-menu-item-link:hover,
-.p-menu-item.p-focus > .p-menu-item-content > .p-menu-item-link,
 .p-menu-item-link.p-focus {
-    background: var(--p-menu-item-focus-background, var(--p-surface-100, #f1f5f9));
-    color: var(--p-menu-item-focus-color, var(--p-text-color, #0f172a));
+    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-text-color, #0f172a);
 }
 
 .p-menu-item.p-disabled > .p-menu-item-content > .p-menu-item-link {
@@ -32042,9 +32088,9 @@ ${h.response}`).join("\n");
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: var(--p-menu-item-icon-color, var(--p-surface-500, #64748b));
-    width: var(--p-menu-item-icon-size, 1.125rem);
-    height: var(--p-menu-item-icon-size, 1.125rem);
+    color: var(--p-surface-500, #64748b);
+    width: 1.125rem;
+    height: 1.125rem;
     flex-shrink: 0;
 }
 
@@ -32068,7 +32114,7 @@ ${h.response}`).join("\n");
 
 .p-menu-item-badge {
     margin-left: auto;
-    background: var(--p-primary-500, #3b82f6);
+    background: #000000;
     color: #ffffff;
     font-size: 0.75rem;
     font-weight: 700;
@@ -32094,23 +32140,23 @@ ${h.response}`).join("\n");
     transform: rotate(180deg);
 }
 
-/* Checkbox & Radio Indicators in Menu */
+/* Indicators */
 .p-menu-check-icon {
     width: 1rem;
     height: 1rem;
-    color: var(--p-primary-500, #3b82f6);
+    color: var(--p-primary-500, #10b981);
     display: inline-flex;
     align-items: center;
     justify-content: center;
 }
 
 .p-menu-dot-icon {
-    width: 0.5rem;
-    height: 0.5rem;
+    width: 0.375rem;
+    height: 0.375rem;
     border-radius: 9999px;
-    background: var(--p-primary-500, #3b82f6);
+    background: var(--p-surface-900, #0f172a);
     display: inline-block;
-    margin: 0.25rem;
+    margin: 0.3125rem;
 }
 
 .p-menu-blank-icon {
@@ -32119,12 +32165,12 @@ ${h.response}`).join("\n");
     display: inline-block;
 }
 
-/* Dark Mode Tokens */
+/* Dark Mode */
 .dark .p-menu,
 [data-theme="dark"] .p-menu {
-    background: var(--p-menu-background, var(--p-surface-900, #0f172a));
-    color: var(--p-menu-color, var(--p-surface-0, #f8fafc));
-    border-color: var(--p-menu-border-color, var(--p-surface-700, #334155));
+    background: var(--p-surface-900, #0f172a);
+    color: var(--p-surface-0, #f8fafc);
+    border-color: var(--p-surface-700, #334155);
 }
 
 .dark .p-menu-start,
@@ -32142,9 +32188,7 @@ ${h.response}`).join("\n");
 }
 
 .dark .p-menu-item-link:hover,
-.dark .p-menu-item.p-focus > .p-menu-item-content > .p-menu-item-link,
-[data-theme="dark"] .p-menu-item-link:hover,
-[data-theme="dark"] .p-menu-item.p-focus > .p-menu-item-content > .p-menu-item-link {
+[data-theme="dark"] .p-menu-item-link:hover {
     background: var(--p-surface-800, #1e293b);
     color: var(--p-surface-0, #f8fafc);
 }
@@ -32156,9 +32200,20 @@ ${h.response}`).join("\n");
     color: var(--p-surface-300, #cbd5e1);
 }
 
+.dark .p-menu-item-badge,
+[data-theme="dark"] .p-menu-item-badge {
+    background: #ffffff;
+    color: #000000;
+}
+
 .dark .p-menu-submenu-label,
 [data-theme="dark"] .p-menu-submenu-label {
     color: var(--p-surface-400, #94a3b8);
+}
+
+.dark .p-menu-dot-icon,
+[data-theme="dark"] .p-menu-dot-icon {
+    background: var(--p-surface-0, #f8fafc);
 }
 `;
     }
