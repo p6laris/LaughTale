@@ -4558,23 +4558,76 @@ public class IslandMenuTagHelper : TagHelper
 }
 
 /// <summary>
-/// TagHelper for <island-context-menu /> — Right-click menu
+/// TagHelper for <island-contextmenu />, <p-contextmenu />, and <island-context-menu />
+/// PrimeVue 4 Aura Design System compliant overlay ContextMenu.
 /// </summary>
+[HtmlTargetElement("island-contextmenu")]
+[HtmlTargetElement("p-contextmenu")]
 [HtmlTargetElement("island-context-menu")]
 public class IslandContextMenuTagHelper : TagHelper
 {
+    [HtmlAttributeName("model")]
+    public List<MenuItem>? Model { get; set; }
+
+    [HtmlAttributeName("items")]
     public List<MenuItem>? Items { get; set; }
+
+    [HtmlAttributeName("target")]
+    public string? Target { get; set; }
+
+    [HtmlAttributeName("target-selector")]
     public string? TargetSelector { get; set; }
+
+    [HtmlAttributeName("global")]
     public bool Global { get; set; } = false;
+
+    [HtmlAttributeName("breakpoint")]
+    public string Breakpoint { get; set; } = "960px";
+
+    [HtmlAttributeName("demo-type")]
+    public string? DemoType { get; set; }
+
+    [HtmlAttributeName("aria-label")]
+    public string? AriaLabel { get; set; }
+
+    [HtmlAttributeName("class")]
+    public string? Class { get; set; }
+
+    [HtmlAttributeName("style")]
+    public string? Style { get; set; }
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
         output.TagName = "div";
         output.TagMode = TagMode.StartTagAndEndTag;
-        output.Attributes.SetAttribute("data-island", "context-menu");
+        output.Attributes.SetAttribute("data-island", "contextmenu");
         output.Attributes.SetAttribute("data-hydrate", "load");
-        var props = new { items = Items ?? new(), targetSelector = TargetSelector, global = Global };
+
+        var props = new
+        {
+            model = Model ?? Items ?? new(),
+            items = Items ?? Model ?? new(),
+            target = Target ?? TargetSelector,
+            targetSelector = TargetSelector ?? Target,
+            global = Global,
+            breakpoint = Breakpoint,
+            demoType = DemoType,
+            ariaLabel = AriaLabel,
+            @class = Class,
+            style = Style
+        };
+
         output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
+
+        if (!string.IsNullOrWhiteSpace(Class))
+        {
+            output.Attributes.SetAttribute("class", Class);
+        }
+
+        if (!string.IsNullOrWhiteSpace(Style))
+        {
+            output.Attributes.SetAttribute("style", Style);
+        }
     }
 }
 

@@ -5269,15 +5269,53 @@
         <div class="card-header">
             <div>
                 <h2>ContextMenu</h2>
-                <p>Right-click context menu overlay with nested submenus and command actions.</p>
+                <p>ContextMenu displays an overlay menu on right click of its target. Supports multi-level cascading submenus, global document attachment, custom item templates with badges &amp; shortcuts, dynamic command callbacks, and router navigation.</p>
             </div>
-            <span class="aura-tag tag-slate">Context</span>
+            <span class="aura-tag tag-emerald">PrimeVue 4 Aura</span>
         </div>
-        <div class="card-body">
-            <div style="padding: 2.5rem; border: 2px dashed var(--p-border-color); border-radius: var(--p-border-radius); text-align: center; color: var(--p-text-muted);">
-                Right click inside this area to trigger the ContextMenu island.
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Demo 1: Basic -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">ContextMenu is attached to a target element and activated with a right-click.</p>
+                <island-contextmenu demo-type="basic" />
             </div>
-            <island-context-menu items="@Model.HeaderMenuItems" />
+
+            <!-- Demo 2: Submenus -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Submenus</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Submenus are defined by nesting menu items within the items property of a parent menu item.</p>
+                <island-contextmenu demo-type="submenus" />
+            </div>
+
+            <!-- Demo 3: Global -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Global</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Setting the global property to true attaches the context menu to the entire card area.</p>
+                <island-contextmenu demo-type="global" global="true" />
+            </div>
+
+            <!-- Demo 4: Template -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Template</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">ContextMenu offers item customization with shortcuts, custom icons, and numeric badges.</p>
+                <island-contextmenu demo-type="template" />
+            </div>
+
+            <!-- Demo 5: Command -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Command</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">The function to invoke when an item is clicked is defined using the command property, with live state updates and toast notifications.</p>
+                <island-contextmenu demo-type="command" />
+            </div>
+
+            <!-- Demo 6: Router -->
+            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Router</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Menu items support navigation via router links, programmatic routing using commands, or external URLs.</p>
+                <island-contextmenu demo-type="router" />
+            </div>
+        </div>
     </section>
 
     <!-- TieredMenu -->

@@ -980,7 +980,7 @@ defineIsland("tree-table", () => import("./treetable-STGV6W5W.js"));
 defineIsland("tree-select", () => import("./tree-select-3WADBRSW.js"));
 defineIsland("datatable", () => import("./datatable-S7RUX5Z6.js"));
 defineIsland("datagrid", () => import("./datatable-S7RUX5Z6.js"));
-defineIsland("modal", () => import("./modal-3HPZAJB6.js"));
+defineIsland("modal", () => import("./modal-P2BZ2MES.js"));
 defineIsland("toast", () => import("./toast-RN33QYTD.js"));
 defineIsland("input-number", () => import("./input-number-KQ2J2WMH.js"));
 defineIsland("input-otp", () => import("./input-otp-RUPMATZ7.js"));
@@ -1070,8 +1070,10 @@ defineIsland("p-menubar", () => import("./menubar-ECTNCLLG.js"));
 defineIsland("island-menubar", () => import("./menubar-ECTNCLLG.js"));
 defineIsland("menu", () => import("./menu-H37MSHRC.js"));
 defineIsland("p-menu", () => import("./menu-H37MSHRC.js"));
-defineIsland("navigation-menu", () => import("./menu-H37MSHRC.js"));
-defineIsland("context-menu", () => import("./context-menu-LU6WIMC7.js"));
+defineIsland("context-menu", () => import("./context-menu-7KBOXHMX.js"));
+defineIsland("contextmenu", () => import("./context-menu-7KBOXHMX.js"));
+defineIsland("p-contextmenu", () => import("./context-menu-7KBOXHMX.js"));
+defineIsland("island-contextmenu", () => import("./context-menu-7KBOXHMX.js"));
 defineIsland("popover", () => import("./popover-ANO4CF5O.js"));
 defineIsland("tooltip", () => import("./tooltip-component-HPZXU4E4.js"));
 defineIsland("tooltip-component", () => import("./tooltip-component-HPZXU4E4.js"));
@@ -1097,4 +1099,4 @@ export {
   enableViewTransitions,
   getSlot
 };
-//# sourceMappingURL=chunk-KKRGNZOR.js.map
+//# sourceMappingURL=chunk-W4C3BEFW.js.map
