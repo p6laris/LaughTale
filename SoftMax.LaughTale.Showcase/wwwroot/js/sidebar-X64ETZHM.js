@@ -1,15 +1,12 @@
-/**
- * SoftMax.LaughTale: Enterprise Sidebar Component (PrimeVue 4 Aura Design System compliant)
- * Unified module supporting both:
- * 1. App-Level Navigation Tree Sidebar (sticky shell sidebar with real-time search and deep hierarchy)
- * 2. PrimeVue 4 Aura Compound Sidebar Navigation Panel System (variants, collapsible modes, nested submenus, chat history)
- */
+import {
+  LucideIcons
+} from "./chunk-XHF3KYSF.js";
+import {
+  injectIslandStyle
+} from "./chunk-3TFPN5JM.js";
 
-import { SidebarItem } from '../types/models';
-import { LucideIcons } from '../icons/lucide';
-import { injectIslandStyle } from '../runtime/styles';
-
-const SIDEBAR_CSS = `
+// ../SoftMax.LaughTale.Client/src/components/sidebar.ts
+var SIDEBAR_CSS = `
 /* ==========================================================================
    1. App-Level Navigation Tree Sidebar (App Shell)
    ========================================================================== */
@@ -736,150 +733,84 @@ const SIDEBAR_CSS = `
     color: #60a5fa;
 }
 `;
-
-export interface SidebarSubItem {
-    label: string;
-    isActive?: boolean;
-    url?: string;
-    subItems?: SidebarSubItem[];
+function SidebarIsland(container, props) {
+  injectIslandStyle("sidebar", SIDEBAR_CSS);
+  const hasAppItems = Array.isArray(props.items) && props.items.length > 0 && !props.groups;
+  if (hasAppItems) {
+    renderAppNavigationSidebar(container, props);
+  } else {
+    renderCompoundSidebar(container, props);
+  }
 }
-
-export interface SidebarItemModel {
-    label: string;
-    icon?: string;
-    badge?: string | number;
-    isActive?: boolean;
-    url?: string;
-    subItems?: SidebarSubItem[];
-    defaultOpen?: boolean;
-}
-
-export interface SidebarGroupModel {
-    label: string;
-    items: SidebarItemModel[];
-}
-
-export interface SidebarProps {
-    // App Navigation Tree props
-    items?: SidebarItem[];
-    title?: string;
-    searchable?: boolean;
-    position?: 'left' | 'right';
-    collapsed?: boolean;
-
-    // Compound PrimeVue 4 Aura Sidebar props
-    id?: string;
-    variant?: 'sidebar' | 'floating' | 'inset';
-    collapsible?: 'none' | 'offcanvas' | 'icon';
-    side?: 'left' | 'right';
-    overlay?: boolean;
-    openOnHover?: boolean;
-    backdrop?: boolean;
-    open?: boolean;
-    width?: string;
-    iconWidth?: string;
-    demoType?: 'variants' | 'menu' | 'responsive' | 'dual' | 'multi' | 'nested' | 'chat';
-    groups?: SidebarGroupModel[];
-    headerTitle?: string;
-    headerLogo?: string;
-    headerColor?: string;
-    class?: string;
-    style?: string;
-}
-
-export default function SidebarIsland(container: HTMLElement, props: SidebarProps) {
-    injectIslandStyle('sidebar', SIDEBAR_CSS);
-
-    const hasAppItems = Array.isArray(props.items) && props.items.length > 0 && !props.groups;
-
-    if (hasAppItems) {
-        renderAppNavigationSidebar(container, props);
-    } else {
-        renderCompoundSidebar(container, props);
+function renderAppNavigationSidebar(container, props) {
+  let collapsed = props.collapsed || false;
+  let searchQuery = "";
+  const items = props.items || [];
+  const position = props.position || "left";
+  const title = props.title || "Navigation";
+  const searchable = props.searchable !== false;
+  const expandedMap = {};
+  function initExpanded(itemList) {
+    itemList.forEach((item) => {
+      const label = item.label || item.Label || "";
+      const isExpanded = item.expanded !== false && item.Expanded !== false;
+      if (label && expandedMap[label] === void 0) {
+        expandedMap[label] = isExpanded;
+      }
+      const children = item.items || item.Items;
+      if (Array.isArray(children)) {
+        initExpanded(children);
+      }
+    });
+  }
+  initExpanded(items);
+  function renderNode(item, level = 0) {
+    const label = item.label || item.Label || item.title || item.Title || "";
+    const url = item.url || item.Url || "#";
+    const icon = item.icon || item.Icon || "";
+    const active = item.active || item.Active || false;
+    const badge = item.badge || item.Badge || "";
+    const children = item.items || item.Items;
+    const hasChildren = Array.isArray(children) && children.length > 0;
+    const isExpanded = expandedMap[label] ?? true;
+    const iconSvg = icon && LucideIcons[icon] ? LucideIcons[icon] : icon.startsWith("<svg") ? icon : "";
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      const matchesSelf = label.toLowerCase().includes(q);
+      const matchesChild = hasChildren && children.some((c) => (c.label || c.Label || "").toLowerCase().includes(q));
+      if (!matchesSelf && !matchesChild) return "";
     }
-}
-
-/**
- * Render App-Level Navigation Tree Sidebar (Persistent App Shell)
- */
-function renderAppNavigationSidebar(container: HTMLElement, props: SidebarProps) {
-    let collapsed = props.collapsed || false;
-    let searchQuery = '';
-    const items = props.items || [];
-    const position = props.position || 'left';
-    const title = props.title || 'Navigation';
-    const searchable = props.searchable !== false;
-
-    // Track expanded state for parent categories by label
-    const expandedMap: Record<string, boolean> = {};
-
-    function initExpanded(itemList: SidebarItem[]) {
-        itemList.forEach(item => {
-            const label = (item as any).label || (item as any).Label || '';
-            const isExpanded = (item as any).expanded !== false && (item as any).Expanded !== false;
-            if (label && expandedMap[label] === undefined) {
-                expandedMap[label] = isExpanded;
-            }
-            const children = (item as any).items || (item as any).Items;
-            if (Array.isArray(children)) {
-                initExpanded(children);
-            }
-        });
-    }
-    initExpanded(items);
-
-    function renderNode(item: SidebarItem, level: number = 0): string {
-        const label = (item as any).label || (item as any).Label || (item as any).title || (item as any).Title || '';
-        const url = (item as any).url || (item as any).Url || '#';
-        const icon = (item as any).icon || (item as any).Icon || '';
-        const active = (item as any).active || (item as any).Active || false;
-        const badge = (item as any).badge || (item as any).Badge || '';
-        const children = (item as any).items || (item as any).Items;
-        const hasChildren = Array.isArray(children) && children.length > 0;
-        const isExpanded = expandedMap[label] ?? true;
-        const iconSvg = icon && (LucideIcons as any)[icon] ? (LucideIcons as any)[icon] : (icon.startsWith('<svg') ? icon : '');
-
-        // Search query filter matching
-        if (searchQuery) {
-            const q = searchQuery.toLowerCase();
-            const matchesSelf = label.toLowerCase().includes(q);
-            const matchesChild = hasChildren && children.some((c: any) => ((c.label || c.Label || '').toLowerCase().includes(q)));
-            if (!matchesSelf && !matchesChild) return '';
-        }
-
-        if (hasChildren) {
-            return `
+    if (hasChildren) {
+      return `
                 <li class="sidebar-group-container" data-label="${label}">
                     <div class="sidebar-group-header" data-group-toggle="${label}" title="${label}">
                         <div style="display: flex; align-items: center; gap: 0.45rem;">
-                            ${iconSvg ? `<span class="sidebar-group-icon" style="display: flex; width: 16px; height: 16px; color: var(--p-primary-600);">${iconSvg}</span>` : ''}
+                            ${iconSvg ? `<span class="sidebar-group-icon" style="display: flex; width: 16px; height: 16px; color: var(--p-primary-600);">${iconSvg}</span>` : ""}
                             <span class="sidebar-item-label">${label}</span>
                         </div>
-                        <span class="sidebar-group-chevron ${isExpanded ? 'expanded' : ''}">
+                        <span class="sidebar-group-chevron ${isExpanded ? "expanded" : ""}">
                             ${LucideIcons.chevronRight}
                         </span>
                     </div>
-                    <ul class="sidebar-sub-tree" style="display: ${isExpanded ? 'flex' : 'none'};">
-                        ${children.map((child: SidebarItem) => renderNode(child, level + 1)).join('')}
+                    <ul class="sidebar-sub-tree" style="display: ${isExpanded ? "flex" : "none"};">
+                        ${children.map((child) => renderNode(child, level + 1)).join("")}
                     </ul>
                 </li>
             `;
-        }
-
-        return `
+    }
+    return `
             <li>
-                <a href="${url}" class="sidebar-item ${active ? 'active' : ''}" data-sidebar-link="${url}" title="${label}">
-                    ${iconSvg ? `<span class="sidebar-icon" style="display: flex; width: 18px; height: 18px; color: ${active ? 'var(--p-primary-600)' : 'var(--p-text-muted)'}; flex-shrink: 0;">${iconSvg}</span>` : ''}
+                <a href="${url}" class="sidebar-item ${active ? "active" : ""}" data-sidebar-link="${url}" title="${label}">
+                    ${iconSvg ? `<span class="sidebar-icon" style="display: flex; width: 18px; height: 18px; color: ${active ? "var(--p-primary-600)" : "var(--p-text-muted)"}; flex-shrink: 0;">${iconSvg}</span>` : ""}
                     <span class="sidebar-item-label">${label}</span>
-                    ${badge ? `<span class="sidebar-badge">${badge}</span>` : ''}
+                    ${badge ? `<span class="sidebar-badge">${badge}</span>` : ""}
                 </a>
             </li>
         `;
-    }
-
-    function render() {
-        container.innerHTML = `
-            <div class="laughtale-sidebar ${collapsed ? 'collapsed' : ''} ${position}">
+  }
+  function render() {
+    container.innerHTML = `
+            <div class="laughtale-sidebar ${collapsed ? "collapsed" : ""} ${position}">
                 <div class="sidebar-header">
                     <div class="sidebar-brand-group" style="display: flex; align-items: center; gap: 0.6rem; overflow: hidden;">
                         <span style="color: var(--p-primary-600); display: flex; flex-shrink: 0;">${LucideIcons.layers}</span>
@@ -894,223 +825,197 @@ function renderAppNavigationSidebar(container: HTMLElement, props: SidebarProps)
                     <div class="sidebar-search-box">
                         <input type="text" class="sidebar-search-input" placeholder="Filter components..." value="${searchQuery}" />
                     </div>
-                ` : ''}
+                ` : ""}
 
                 <div class="sidebar-body">
                     <ul class="sidebar-tree-menu">
-                        ${items.map(item => renderNode(item)).join('')}
+                        ${items.map((item) => renderNode(item)).join("")}
                     </ul>
                 </div>
             </div>
         `;
-
-        bindEvents();
-    }
-
-    function bindEvents() {
-        container.querySelector('.sidebar-toggle')?.addEventListener('click', () => {
-            collapsed = !collapsed;
-            render();
-        });
-
-        const searchInput = container.querySelector<HTMLInputElement>('.sidebar-search-input');
-        if (searchInput) {
-            searchInput.addEventListener('input', (e) => {
-                searchQuery = (e.target as HTMLInputElement).value;
-                const menuEl = container.querySelector('.sidebar-tree-menu');
-                if (menuEl) {
-                    menuEl.innerHTML = items.map(item => renderNode(item)).join('');
-                    bindGroupToggles();
-                    bindLinkClicks();
-                }
-            });
+    bindEvents();
+  }
+  function bindEvents() {
+    container.querySelector(".sidebar-toggle")?.addEventListener("click", () => {
+      collapsed = !collapsed;
+      render();
+    });
+    const searchInput = container.querySelector(".sidebar-search-input");
+    if (searchInput) {
+      searchInput.addEventListener("input", (e) => {
+        searchQuery = e.target.value;
+        const menuEl = container.querySelector(".sidebar-tree-menu");
+        if (menuEl) {
+          menuEl.innerHTML = items.map((item) => renderNode(item)).join("");
+          bindGroupToggles();
+          bindLinkClicks();
         }
-
-        bindGroupToggles();
-        bindLinkClicks();
+      });
     }
-
-    function bindGroupToggles() {
-        container.querySelectorAll('[data-group-toggle]').forEach(header => {
-            header.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const groupLabel = header.getAttribute('data-group-toggle');
-                if (groupLabel) {
-                    expandedMap[groupLabel] = !expandedMap[groupLabel];
-                    const groupContainer = container.querySelector(`[data-label="${groupLabel}"]`);
-                    if (groupContainer) {
-                        const subTree = groupContainer.querySelector<HTMLElement>('.sidebar-sub-tree');
-                        const chevron = groupContainer.querySelector<HTMLElement>('.sidebar-group-chevron');
-                        if (subTree) {
-                            subTree.style.display = expandedMap[groupLabel] ? 'flex' : 'none';
-                        }
-                        if (chevron) {
-                            chevron.classList.toggle('expanded', expandedMap[groupLabel]);
-                        }
-                    }
-                }
-            });
-        });
-    }
-
-    function bindLinkClicks() {
-        container.querySelectorAll<HTMLAnchorElement>('a[data-sidebar-link]').forEach(link => {
-            link.addEventListener('click', (e) => {
-                const href = link.getAttribute('href') || '';
-                const hashIndex = href.indexOf('#');
-                if (hashIndex >= 0) {
-                    const targetId = href.substring(hashIndex + 1);
-                    const targetEl = document.getElementById(targetId);
-
-                    if (targetEl) {
-                        e.preventDefault();
-                        targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-                        container.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
-                        link.classList.add('active');
-
-                        window.history.pushState(null, '', href);
-                    }
-                }
-            });
-        });
-    }
-
-    render();
+    bindGroupToggles();
+    bindLinkClicks();
+  }
+  function bindGroupToggles() {
+    container.querySelectorAll("[data-group-toggle]").forEach((header) => {
+      header.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const groupLabel = header.getAttribute("data-group-toggle");
+        if (groupLabel) {
+          expandedMap[groupLabel] = !expandedMap[groupLabel];
+          const groupContainer = container.querySelector(`[data-label="${groupLabel}"]`);
+          if (groupContainer) {
+            const subTree = groupContainer.querySelector(".sidebar-sub-tree");
+            const chevron = groupContainer.querySelector(".sidebar-group-chevron");
+            if (subTree) {
+              subTree.style.display = expandedMap[groupLabel] ? "flex" : "none";
+            }
+            if (chevron) {
+              chevron.classList.toggle("expanded", expandedMap[groupLabel]);
+            }
+          }
+        }
+      });
+    });
+  }
+  function bindLinkClicks() {
+    container.querySelectorAll("a[data-sidebar-link]").forEach((link) => {
+      link.addEventListener("click", (e) => {
+        const href = link.getAttribute("href") || "";
+        const hashIndex = href.indexOf("#");
+        if (hashIndex >= 0) {
+          const targetId = href.substring(hashIndex + 1);
+          const targetEl = document.getElementById(targetId);
+          if (targetEl) {
+            e.preventDefault();
+            targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
+            container.querySelectorAll(".sidebar-item").forEach((el) => el.classList.remove("active"));
+            link.classList.add("active");
+            window.history.pushState(null, "", href);
+          }
+        }
+      });
+    });
+  }
+  render();
 }
-
-/**
- * Render PrimeVue 4 Aura Compound Sidebar Component
- */
-function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
-    let variant = props.variant || (props as any).Variant || 'sidebar';
-    let collapsible = props.collapsible || (props as any).Collapsible || 'icon';
-    let side = props.side || (props as any).Side || 'left';
-    let overlay = props.overlay || (props as any).Overlay || false;
-    let openOnHover = props.openOnHover || (props as any).OpenOnHover || false;
-    let backdrop = props.backdrop || (props as any).Backdrop || false;
-    let isOpen = props.open !== undefined ? props.open : ((props as any).Open !== undefined ? (props as any).Open : true);
-    let width = props.width || (props as any).Width || '16rem';
-
-    const expandedSubmenus: Record<string, boolean> = {};
-
-    function getIconSvg(iconName?: string): string {
-        if (!iconName) return '';
-        if (iconName.startsWith('<svg')) return iconName;
-        if ((LucideIcons as any)[iconName]) return (LucideIcons as any)[iconName];
-        return '';
-    }
-
-    const defaultNavGroups: SidebarGroupModel[] = [
+function renderCompoundSidebar(container, props) {
+  let variant = props.variant || props.Variant || "sidebar";
+  let collapsible = props.collapsible || props.Collapsible || "icon";
+  let side = props.side || props.Side || "left";
+  let overlay = props.overlay || props.Overlay || false;
+  let openOnHover = props.openOnHover || props.OpenOnHover || false;
+  let backdrop = props.backdrop || props.Backdrop || false;
+  let isOpen = props.open !== void 0 ? props.open : props.Open !== void 0 ? props.Open : true;
+  let width = props.width || props.Width || "16rem";
+  const expandedSubmenus = {};
+  function getIconSvg(iconName) {
+    if (!iconName) return "";
+    if (iconName.startsWith("<svg")) return iconName;
+    if (LucideIcons[iconName]) return LucideIcons[iconName];
+    return "";
+  }
+  const defaultNavGroups = [
+    {
+      label: "Navigation",
+      items: [
+        { icon: "home", label: "Home", isActive: true },
+        { icon: "mail", label: "Inbox", badge: "12" },
+        { icon: "search", label: "Search" },
+        { icon: "bell", label: "Notifications", badge: "3" }
+      ]
+    },
+    {
+      label: "Projects",
+      items: [
         {
-            label: 'Navigation',
-            items: [
-                { icon: 'home', label: 'Home', isActive: true },
-                { icon: 'mail', label: 'Inbox', badge: '12' },
-                { icon: 'search', label: 'Search' },
-                { icon: 'bell', label: 'Notifications', badge: '3' }
-            ]
+          icon: "barChart3",
+          label: "Analytics",
+          defaultOpen: true,
+          subItems: [
+            { label: "Overview", isActive: true },
+            { label: "Reports" },
+            { label: "Real-time" }
+          ]
         },
+        { icon: "users", label: "Team" },
+        { icon: "calendar", label: "Calendar" },
         {
-            label: 'Projects',
-            items: [
-                {
-                    icon: 'barChart3',
-                    label: 'Analytics',
-                    defaultOpen: true,
-                    subItems: [
-                        { label: 'Overview', isActive: true },
-                        { label: 'Reports' },
-                        { label: 'Real-time' }
-                    ]
-                },
-                { icon: 'users', label: 'Team' },
-                { icon: 'calendar', label: 'Calendar' },
-                {
-                    icon: 'folder',
-                    label: 'Documents',
-                    subItems: [
-                        { label: 'Shared' },
-                        { label: 'Private' },
-                        { label: 'Archived' }
-                    ]
-                }
-            ]
-        },
-        {
-            label: 'Billing',
-            items: [
-                { icon: 'creditCard', label: 'Payments' },
-                { icon: 'shoppingCart', label: 'Orders' },
-                { icon: 'star', label: 'Subscriptions' }
-            ]
+          icon: "folder",
+          label: "Documents",
+          subItems: [
+            { label: "Shared" },
+            { label: "Private" },
+            { label: "Archived" }
+          ]
         }
-    ];
-
-    const groups: SidebarGroupModel[] = props.groups || defaultNavGroups;
-
-    function renderGroupsHtml(groupList: SidebarGroupModel[]): string {
-        return groupList.map((g, gIdx) => {
-            const itemsHtml = g.items.map((it, iIdx) => {
-                const subKey = `${gIdx}_${iIdx}`;
-                if (it.defaultOpen && expandedSubmenus[subKey] === undefined) {
-                    expandedSubmenus[subKey] = true;
-                }
-                const isSubExpanded = !!expandedSubmenus[subKey];
-                const hasSubs = Array.isArray(it.subItems) && it.subItems.length > 0;
-                const iconSvg = getIconSvg(it.icon);
-
-                let subTreeHtml = '';
-                if (hasSubs && isSubExpanded) {
-                    const subListHtml = it.subItems!.map(sub => `
+      ]
+    },
+    {
+      label: "Billing",
+      items: [
+        { icon: "creditCard", label: "Payments" },
+        { icon: "shoppingCart", label: "Orders" },
+        { icon: "star", label: "Subscriptions" }
+      ]
+    }
+  ];
+  const groups = props.groups || defaultNavGroups;
+  function renderGroupsHtml(groupList) {
+    return groupList.map((g, gIdx) => {
+      const itemsHtml = g.items.map((it, iIdx) => {
+        const subKey = `${gIdx}_${iIdx}`;
+        if (it.defaultOpen && expandedSubmenus[subKey] === void 0) {
+          expandedSubmenus[subKey] = true;
+        }
+        const isSubExpanded = !!expandedSubmenus[subKey];
+        const hasSubs = Array.isArray(it.subItems) && it.subItems.length > 0;
+        const iconSvg = getIconSvg(it.icon);
+        let subTreeHtml = "";
+        if (hasSubs && isSubExpanded) {
+          const subListHtml = it.subItems.map((sub) => `
                         <li class="p-sidebar-menu-sub-item">
-                            <button type="button" class="p-sidebar-menu-sub-button ${sub.isActive ? 'p-active' : ''}">
+                            <button type="button" class="p-sidebar-menu-sub-button ${sub.isActive ? "p-active" : ""}">
                                 <span>${sub.label}</span>
                             </button>
                         </li>
-                    `).join('');
-                    subTreeHtml = `<ul class="p-sidebar-menu-sub">${subListHtml}</ul>`;
-                }
-
-                const chevronSvg = `<svg class="p-sidebar-submenu-chevron ${isSubExpanded ? 'p-expanded' : ''}" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
-                const ellipsisSvg = `<svg class="p-sidebar-menu-action" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>`;
-
-                return `
+                    `).join("");
+          subTreeHtml = `<ul class="p-sidebar-menu-sub">${subListHtml}</ul>`;
+        }
+        const chevronSvg = `<svg class="p-sidebar-submenu-chevron ${isSubExpanded ? "p-expanded" : ""}" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
+        const ellipsisSvg = `<svg class="p-sidebar-menu-action" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>`;
+        return `
                     <li class="p-sidebar-menu-item" data-subkey="${subKey}">
-                        <button type="button" class="p-sidebar-menu-button ${it.isActive ? 'p-active' : ''}" data-has-subs="${hasSubs}">
-                            ${iconSvg ? `<span class="p-sidebar-menu-button-icon">${iconSvg}</span>` : ''}
+                        <button type="button" class="p-sidebar-menu-button ${it.isActive ? "p-active" : ""}" data-has-subs="${hasSubs}">
+                            ${iconSvg ? `<span class="p-sidebar-menu-button-icon">${iconSvg}</span>` : ""}
                             <span class="p-sidebar-item-label">${it.label}</span>
-                            ${it.badge !== undefined ? `<span class="p-sidebar-menu-badge">${it.badge}</span>` : ''}
-                            ${hasSubs ? chevronSvg : (it.badge === undefined ? ellipsisSvg : '')}
+                            ${it.badge !== void 0 ? `<span class="p-sidebar-menu-badge">${it.badge}</span>` : ""}
+                            ${hasSubs ? chevronSvg : it.badge === void 0 ? ellipsisSvg : ""}
                         </button>
                         ${subTreeHtml}
                     </li>
                 `;
-            }).join('');
-
-            return `
+      }).join("");
+      return `
                 <div class="p-sidebar-group">
                     <div class="p-sidebar-group-label">${g.label}</div>
                     <ul class="p-sidebar-menu">${itemsHtml}</ul>
                 </div>
             `;
-        }).join('');
-    }
-
-    function renderComponent(): string {
-        const sidebarClasses = [
-            'p-sidebar',
-            `p-sidebar-variant-${variant}`,
-            `p-sidebar-collapsible-${collapsible}`,
-            `p-sidebar-side-${side}`,
-            overlay ? 'p-sidebar-overlay' : '',
-            !isOpen ? 'p-sidebar-collapsed' : ''
-        ].filter(Boolean).join(' ');
-
-        const sidebarWidth = isOpen ? width : (collapsible === 'icon' ? '3.5rem' : '0rem');
-
-        const sidebarHtml = `
+    }).join("");
+  }
+  function renderComponent() {
+    const sidebarClasses = [
+      "p-sidebar",
+      `p-sidebar-variant-${variant}`,
+      `p-sidebar-collapsible-${collapsible}`,
+      `p-sidebar-side-${side}`,
+      overlay ? "p-sidebar-overlay" : "",
+      !isOpen ? "p-sidebar-collapsed" : ""
+    ].filter(Boolean).join(" ");
+    const sidebarWidth = isOpen ? width : collapsible === "icon" ? "3.5rem" : "0rem";
+    const sidebarHtml = `
             <aside class="${sidebarClasses}" style="width: ${sidebarWidth};" data-sidebar-root>
                 <div class="p-sidebar-aside">
                     <div class="p-sidebar-panel">
@@ -1141,10 +1046,8 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                 </div>
             </aside>
         `;
-
-        const triggerIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg>`;
-
-        const mainHtml = `
+    const triggerIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg>`;
+    const mainHtml = `
             <div class="p-sidebar-main">
                 <header class="p-sidebar-main-header">
                     <button type="button" class="p-sidebar-trigger" data-sidebar-toggle aria-label="Toggle navigation">
@@ -1158,69 +1061,64 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                 </div>
             </div>
         `;
-
-        const backdropHtml = (backdrop && isOpen) ? `<div class="p-sidebar-backdrop" data-sidebar-backdrop></div>` : '';
-
-        const innerContent = side === 'right' ? (mainHtml + sidebarHtml) : (sidebarHtml + mainHtml);
-
-        return `
+    const backdropHtml = backdrop && isOpen ? `<div class="p-sidebar-backdrop" data-sidebar-backdrop></div>` : "";
+    const innerContent = side === "right" ? mainHtml + sidebarHtml : sidebarHtml + mainHtml;
+    return `
             <div class="p-sidebar-layout">
                 ${backdropHtml}
                 ${innerContent}
             </div>
         `;
-    }
-
-    function wireEvents() {
-        container.querySelectorAll('[data-sidebar-toggle]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                isOpen = !isOpen;
-                render();
-            });
-        });
-
-        container.querySelectorAll('[data-sidebar-backdrop]').forEach(bd => {
-            bd.addEventListener('click', () => {
-                isOpen = false;
-                render();
-            });
-        });
-
-        container.querySelectorAll('.p-sidebar-menu-button[data-has-subs="true"]').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                const li = btn.closest('.p-sidebar-menu-item');
-                const subKey = li?.getAttribute('data-subkey');
-                if (subKey) {
-                    expandedSubmenus[subKey] = !expandedSubmenus[subKey];
-                    render();
-                }
-            });
-        });
-
-        if (openOnHover) {
-            const aside = container.querySelector('[data-sidebar-root]');
-            if (aside) {
-                aside.addEventListener('mouseenter', () => {
-                    if (!isOpen) {
-                        isOpen = true;
-                        render();
-                    }
-                });
-                aside.addEventListener('mouseleave', () => {
-                    if (isOpen) {
-                        isOpen = false;
-                        render();
-                    }
-                });
-            }
+  }
+  function wireEvents() {
+    container.querySelectorAll("[data-sidebar-toggle]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        isOpen = !isOpen;
+        render();
+      });
+    });
+    container.querySelectorAll("[data-sidebar-backdrop]").forEach((bd) => {
+      bd.addEventListener("click", () => {
+        isOpen = false;
+        render();
+      });
+    });
+    container.querySelectorAll('.p-sidebar-menu-button[data-has-subs="true"]').forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        const li = btn.closest(".p-sidebar-menu-item");
+        const subKey = li?.getAttribute("data-subkey");
+        if (subKey) {
+          expandedSubmenus[subKey] = !expandedSubmenus[subKey];
+          render();
         }
+      });
+    });
+    if (openOnHover) {
+      const aside = container.querySelector("[data-sidebar-root]");
+      if (aside) {
+        aside.addEventListener("mouseenter", () => {
+          if (!isOpen) {
+            isOpen = true;
+            render();
+          }
+        });
+        aside.addEventListener("mouseleave", () => {
+          if (isOpen) {
+            isOpen = false;
+            render();
+          }
+        });
+      }
     }
-
-    function render() {
-        container.innerHTML = renderComponent();
-        wireEvents();
-    }
-
-    render();
+  }
+  function render() {
+    container.innerHTML = renderComponent();
+    wireEvents();
+  }
+  render();
 }
+export {
+  SidebarIsland as default
+};
+//# sourceMappingURL=sidebar-X64ETZHM.js.map
