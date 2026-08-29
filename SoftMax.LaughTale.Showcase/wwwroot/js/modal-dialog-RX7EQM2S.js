@@ -1,6 +1,6 @@
 import {
   getSlot
-} from "./chunk-CX5HDLUX.js";
+} from "./chunk-ZPZ2V5TW.js";
 import "./chunk-SNYGSZHS.js";
 import "./chunk-YSGXRJIU.js";
 import "./chunk-RBI7CHCL.js";
@@ -98,4 +98,4 @@ function ModalDialogIsland(container, props) {
 export {
   ModalDialogIsland as default
 };
-//# sourceMappingURL=modal-dialog-PXFT7S7I.js.map
+//# sourceMappingURL=modal-dialog-RX7EQM2S.js.map

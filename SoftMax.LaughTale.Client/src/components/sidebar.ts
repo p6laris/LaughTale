@@ -217,9 +217,82 @@ const SIDEBAR_CSS = `
     color: var(--p-text-color, #0f172a);
 }
 
+.p-sidebar-app-shell.p-collapsed .p-sidebar-content-dock {
+    padding: 0.5rem 0 !important;
+    align-items: center !important;
+    width: 64px !important;
+    box-sizing: border-box !important;
+}
+
+.p-sidebar-app-shell.p-collapsed .p-sidebar-group {
+    align-items: center !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+}
+
 .p-sidebar-app-shell.p-collapsed .p-sidebar-group-header-btn {
-    justify-content: center;
-    padding: 0.4rem 0;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 44px !important;
+    height: 44px !important;
+    margin: 0.15rem auto !important;
+    padding: 0 !important;
+    border-radius: var(--p-border-radius, 8px) !important;
+    box-sizing: border-box !important;
+}
+
+.p-sidebar-app-shell.p-collapsed .p-sidebar-group-header-btn > div {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    gap: 0 !important;
+}
+
+.p-sidebar-app-shell.p-collapsed .p-sidebar-group-header-btn span.p-sidebar-menu-button-icon {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 22px !important;
+    height: 22px !important;
+    margin: 0 auto !important;
+}
+
+.p-sidebar-app-shell.p-collapsed .p-sidebar-menu {
+    align-items: center !important;
+    width: 100% !important;
+}
+
+.p-sidebar-app-shell.p-collapsed .p-sidebar-menu-item {
+    display: flex !important;
+    justify-content: center !important;
+    width: 100% !important;
+}
+
+.p-sidebar-app-shell.p-collapsed .p-sidebar-menu-button {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 44px !important;
+    height: 44px !important;
+    margin: 0.1rem auto !important;
+    padding: 0 !important;
+    gap: 0 !important;
+    border-radius: var(--p-border-radius, 8px) !important;
+    box-sizing: border-box !important;
+}
+
+.p-sidebar-app-shell.p-collapsed .p-sidebar-menu-button span.p-sidebar-menu-button-icon {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 22px !important;
+    height: 22px !important;
+    margin: 0 auto !important;
 }
 
 .p-sidebar-group-header-label {
