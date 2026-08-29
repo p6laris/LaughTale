@@ -20514,6 +20514,28 @@ function CommandMenuIsland(container, props) {
     listEl.addEventListener("mousemove", () => {
       isUsingKeyboard = false;
     });
+    function ensureVisible(itemEl) {
+      const containerRect = listEl.getBoundingClientRect();
+      const itemRect = itemEl.getBoundingClientRect();
+      if (itemRect.top < containerRect.top) {
+        listEl.scrollTop -= containerRect.top - itemRect.top;
+      } else if (itemRect.bottom > containerRect.bottom) {
+        listEl.scrollTop += itemRect.bottom - containerRect.bottom;
+      }
+    }
+    function selectItem(index, shouldScroll) {
+      const items = listEl.querySelectorAll(".p-commandmenu-item");
+      if (items.length === 0) return;
+      selectedIndex = Math.max(0, Math.min(index, items.length - 1));
+      items.forEach((item, i) => {
+        const isSelected = i === selectedIndex;
+        item.classList.toggle("p-commandmenu-item-focus", isSelected);
+        item.setAttribute("aria-selected", isSelected ? "true" : "false");
+      });
+      if (shouldScroll && items[selectedIndex]) {
+        ensureVisible(items[selectedIndex]);
+      }
+    }
     function renderListOnly() {
       const filtered = getFilteredGroups();
       let flatIndex = 0;
@@ -20579,29 +20601,23 @@ function CommandMenuIsland(container, props) {
       });
       listEl.innerHTML = listHtml;
       listEl.querySelectorAll(".p-commandmenu-item").forEach((el) => {
+        el.addEventListener("mousemove", () => {
+          isUsingKeyboard = false;
+        });
         el.addEventListener("mouseenter", () => {
           if (isUsingKeyboard) return;
           const idx = Number(el.getAttribute("data-flat-index"));
-          selectedIndex = idx;
-          updateFocusItem(false);
+          selectItem(idx, false);
         });
-        el.addEventListener("click", () => {
+        el.addEventListener("click", (e) => {
+          e.preventDefault();
+          isUsingKeyboard = false;
           const idx = Number(el.getAttribute("data-flat-index"));
-          selectedIndex = idx;
+          selectItem(idx, false);
           executeSelectedItem();
         });
       });
-      updateFocusItem(false);
-    }
-    function updateFocusItem(shouldScroll = true) {
-      const items = listEl.querySelectorAll(".p-commandmenu-item");
-      items.forEach((item, i) => {
-        const isFocused = i === selectedIndex;
-        item.classList.toggle("p-commandmenu-item-focus", isFocused);
-        if (isFocused && shouldScroll) {
-          item.scrollIntoView({ block: "nearest", inline: "nearest" });
-        }
-      });
+      selectItem(selectedIndex, false);
     }
     function executeSelectedItem() {
       const activeEl = listEl.querySelector(`.p-commandmenu-item[data-flat-index="${selectedIndex}"]`);
@@ -20633,16 +20649,16 @@ function CommandMenuIsland(container, props) {
         e.stopPropagation();
         isUsingKeyboard = true;
         if (count > 0) {
-          selectedIndex = (selectedIndex + 1) % count;
-          updateFocusItem(true);
+          const nextIdx = (selectedIndex + 1) % count;
+          selectItem(nextIdx, true);
         }
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
         e.stopPropagation();
         isUsingKeyboard = true;
         if (count > 0) {
-          selectedIndex = (selectedIndex - 1 + count) % count;
-          updateFocusItem(true);
+          const prevIdx = (selectedIndex - 1 + count) % count;
+          selectItem(prevIdx, true);
         }
       } else if (e.key === "Enter") {
         e.preventDefault();
@@ -20653,16 +20669,14 @@ function CommandMenuIsland(container, props) {
         e.stopPropagation();
         isUsingKeyboard = true;
         if (count > 0) {
-          selectedIndex = 0;
-          updateFocusItem(true);
+          selectItem(0, true);
         }
       } else if (e.key === "End") {
         e.preventDefault();
         e.stopPropagation();
         isUsingKeyboard = true;
         if (count > 0) {
-          selectedIndex = count - 1;
-          updateFocusItem(true);
+          selectItem(count - 1, true);
         }
       } else if (e.key === "Escape") {
         if (withDialog) {
@@ -20750,7 +20764,6 @@ var init_command = __esm({
     box-sizing: border-box;
     font-family: inherit;
     position: relative;
-    contain: layout paint;
 }
 
 .p-commandmenu-header {
@@ -20809,6 +20822,7 @@ var init_command = __esm({
     display: flex;
     flex-direction: column;
     gap: 0.125rem;
+    position: static;
 }
 
 .p-commandmenu-group-label {
@@ -20846,12 +20860,10 @@ var init_command = __esm({
 .p-commandmenu-item.p-commandmenu-item-focus {
     background: var(--p-surface-100, #f1f5f9) !important;
     color: var(--p-primary-600, #2563eb) !important;
-    outline: 1px solid var(--p-primary-500, #3b82f6) !important;
-    outline-offset: -1px;
 }
 
 .p-commandmenu-item.p-commandmenu-item-active {
-    background: rgba(59, 130, 246, 0.2) !important;
+    background: rgba(59, 130, 246, 0.15) !important;
 }
 
 .p-commandmenu-item-left {
@@ -20994,7 +21006,6 @@ var init_command = __esm({
 .dark .p-commandmenu-item.p-commandmenu-item-focus,
 [data-theme="dark"] .p-commandmenu-item.p-commandmenu-item-focus {
     color: #60a5fa !important;
-    outline: 1px solid var(--p-primary-500, #3b82f6) !important;
 }
 
 .dark .p-commandmenu-group-label,

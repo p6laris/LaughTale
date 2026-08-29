@@ -1,7 +1,7 @@
 /**
  * SoftMax.LaughTale: Enterprise CommandMenu Component (PrimeVue 4 Aura Design System compliant)
- * Search-driven command palette with zero-shift fixed geometry, stable scrollbar gutter,
- * mouse-decoupled keyboard arrow navigation, and modal Dialog integration.
+ * Search-driven command palette with unified selection state, flawless mouse click & hover,
+ * smooth arrow key navigation with viewport tracking, and modal Dialog integration.
  */
 
 import { LucideIcons } from '../icons/lucide';
@@ -22,7 +22,6 @@ const COMMAND_CSS = `
     box-sizing: border-box;
     font-family: inherit;
     position: relative;
-    contain: layout paint;
 }
 
 .p-commandmenu-header {
@@ -81,6 +80,7 @@ const COMMAND_CSS = `
     display: flex;
     flex-direction: column;
     gap: 0.125rem;
+    position: static;
 }
 
 .p-commandmenu-group-label {
@@ -118,12 +118,10 @@ const COMMAND_CSS = `
 .p-commandmenu-item.p-commandmenu-item-focus {
     background: var(--p-surface-100, #f1f5f9) !important;
     color: var(--p-primary-600, #2563eb) !important;
-    outline: 1px solid var(--p-primary-500, #3b82f6) !important;
-    outline-offset: -1px;
 }
 
 .p-commandmenu-item.p-commandmenu-item-active {
-    background: rgba(59, 130, 246, 0.2) !important;
+    background: rgba(59, 130, 246, 0.15) !important;
 }
 
 .p-commandmenu-item-left {
@@ -266,7 +264,6 @@ const COMMAND_CSS = `
 .dark .p-commandmenu-item.p-commandmenu-item-focus,
 [data-theme="dark"] .p-commandmenu-item.p-commandmenu-item-focus {
     color: #60a5fa !important;
-    outline: 1px solid var(--p-primary-500, #3b82f6) !important;
 }
 
 .dark .p-commandmenu-group-label,
@@ -444,10 +441,37 @@ export default function CommandMenuIsland(container: HTMLElement, props: Command
         const input = targetEl.querySelector<HTMLInputElement>('.p-commandmenu-input')!;
         const listEl = targetEl.querySelector<HTMLElement>('.p-commandmenu-list')!;
 
-        // When mouse moves, enable mouse hover interactions
         listEl.addEventListener('mousemove', () => {
             isUsingKeyboard = false;
         });
+
+        function ensureVisible(itemEl: HTMLElement) {
+            const containerRect = listEl.getBoundingClientRect();
+            const itemRect = itemEl.getBoundingClientRect();
+
+            if (itemRect.top < containerRect.top) {
+                listEl.scrollTop -= (containerRect.top - itemRect.top);
+            } else if (itemRect.bottom > containerRect.bottom) {
+                listEl.scrollTop += (itemRect.bottom - containerRect.bottom);
+            }
+        }
+
+        function selectItem(index: number, shouldScroll: boolean) {
+            const items = listEl.querySelectorAll<HTMLElement>('.p-commandmenu-item');
+            if (items.length === 0) return;
+
+            selectedIndex = Math.max(0, Math.min(index, items.length - 1));
+
+            items.forEach((item, i) => {
+                const isSelected = i === selectedIndex;
+                item.classList.toggle('p-commandmenu-item-focus', isSelected);
+                item.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+            });
+
+            if (shouldScroll && items[selectedIndex]) {
+                ensureVisible(items[selectedIndex]);
+            }
+        }
 
         function renderListOnly() {
             const filtered = getFilteredGroups();
@@ -526,31 +550,24 @@ export default function CommandMenuIsland(container: HTMLElement, props: Command
 
             // Wire hover & click events on items
             listEl.querySelectorAll<HTMLElement>('.p-commandmenu-item').forEach(el => {
-                el.addEventListener('mouseenter', () => {
-                    if (isUsingKeyboard) return; // Do not let mouse override keyboard navigation while scrolling
-                    const idx = Number(el.getAttribute('data-flat-index'));
-                    selectedIndex = idx;
-                    updateFocusItem(false);
+                el.addEventListener('mousemove', () => {
+                    isUsingKeyboard = false;
                 });
-                el.addEventListener('click', () => {
+                el.addEventListener('mouseenter', () => {
+                    if (isUsingKeyboard) return;
                     const idx = Number(el.getAttribute('data-flat-index'));
-                    selectedIndex = idx;
+                    selectItem(idx, false);
+                });
+                el.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    isUsingKeyboard = false;
+                    const idx = Number(el.getAttribute('data-flat-index'));
+                    selectItem(idx, false);
                     executeSelectedItem();
                 });
             });
 
-            updateFocusItem(false);
-        }
-
-        function updateFocusItem(shouldScroll = true) {
-            const items = listEl.querySelectorAll<HTMLElement>('.p-commandmenu-item');
-            items.forEach((item, i) => {
-                const isFocused = i === selectedIndex;
-                item.classList.toggle('p-commandmenu-item-focus', isFocused);
-                if (isFocused && shouldScroll) {
-                    item.scrollIntoView({ block: 'nearest', inline: 'nearest' });
-                }
-            });
+            selectItem(selectedIndex, false);
         }
 
         function executeSelectedItem() {
@@ -575,14 +592,14 @@ export default function CommandMenuIsland(container: HTMLElement, props: Command
             }
         }
 
-        // Live input handling
+        // Live input typing
         input.addEventListener('input', () => {
             search = input.value;
             selectedIndex = 0;
             renderListOnly();
         });
 
-        // Keyboard navigation with mouse decouple
+        // Arrow keys & Enter key handling
         input.addEventListener('keydown', (e) => {
             const items = listEl.querySelectorAll<HTMLElement>('.p-commandmenu-item');
             const count = items.length;
@@ -592,16 +609,16 @@ export default function CommandMenuIsland(container: HTMLElement, props: Command
                 e.stopPropagation();
                 isUsingKeyboard = true;
                 if (count > 0) {
-                    selectedIndex = (selectedIndex + 1) % count;
-                    updateFocusItem(true);
+                    const nextIdx = (selectedIndex + 1) % count;
+                    selectItem(nextIdx, true);
                 }
             } else if (e.key === 'ArrowUp') {
                 e.preventDefault();
                 e.stopPropagation();
                 isUsingKeyboard = true;
                 if (count > 0) {
-                    selectedIndex = (selectedIndex - 1 + count) % count;
-                    updateFocusItem(true);
+                    const prevIdx = (selectedIndex - 1 + count) % count;
+                    selectItem(prevIdx, true);
                 }
             } else if (e.key === 'Enter') {
                 e.preventDefault();
@@ -612,16 +629,14 @@ export default function CommandMenuIsland(container: HTMLElement, props: Command
                 e.stopPropagation();
                 isUsingKeyboard = true;
                 if (count > 0) {
-                    selectedIndex = 0;
-                    updateFocusItem(true);
+                    selectItem(0, true);
                 }
             } else if (e.key === 'End') {
                 e.preventDefault();
                 e.stopPropagation();
                 isUsingKeyboard = true;
                 if (count > 0) {
-                    selectedIndex = count - 1;
-                    updateFocusItem(true);
+                    selectItem(count - 1, true);
                 }
             } else if (e.key === 'Escape') {
                 if (withDialog) {
