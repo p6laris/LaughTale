@@ -35590,9 +35590,18 @@ ${h.response}`).join("\n");
         }
         if (clearBtn) {
           clearBtn.addEventListener("click", () => {
-            dynamicMessages = [];
             if (listContainer) {
-              listContainer.innerHTML = "";
+              const items = listContainer.querySelectorAll("[data-message-item]");
+              items.forEach((el) => {
+                const currentHeight = el.getBoundingClientRect().height;
+                el.style.maxHeight = `${currentHeight}px`;
+                void el.offsetHeight;
+                el.classList.add("p-message-exit");
+              });
+              setTimeout(() => {
+                dynamicMessages = [];
+                listContainer.innerHTML = "";
+              }, 280);
             }
           });
         }
@@ -35613,10 +35622,13 @@ ${h.response}`).join("\n");
         const closeBtn = msgEl.querySelector("[data-message-close]");
         const lifeStr = msgEl.getAttribute("data-life");
         const dismissMessage = () => {
+          const currentHeight = msgEl.getBoundingClientRect().height;
+          msgEl.style.maxHeight = `${currentHeight}px`;
+          void msgEl.offsetHeight;
           msgEl.classList.add("p-message-exit");
           setTimeout(() => {
             msgEl.remove();
-          }, 180);
+          }, 280);
         };
         if (closeBtn) {
           closeBtn.addEventListener("click", (e) => {
@@ -35661,27 +35673,42 @@ ${h.response}`).join("\n");
     position: relative;
     box-sizing: border-box;
     font-family: var(--p-font-family, inherit);
-    transition: opacity 200ms cubic-bezier(0.16, 1, 0.3, 1), transform 200ms cubic-bezier(0.16, 1, 0.3, 1), max-height 200ms ease, margin 200ms ease;
+    overflow: hidden;
+    will-change: opacity, transform, max-height, padding, margin;
+    transition: opacity 240ms cubic-bezier(0.16, 1, 0.3, 1),
+                transform 240ms cubic-bezier(0.16, 1, 0.3, 1),
+                max-height 280ms cubic-bezier(0.16, 1, 0.3, 1),
+                padding 280ms cubic-bezier(0.16, 1, 0.3, 1),
+                margin 280ms cubic-bezier(0.16, 1, 0.3, 1),
+                border-width 280ms ease;
 }
 
 .p-message.p-message-enter {
-    animation: p-message-enter-anim 200ms cubic-bezier(0.16, 1, 0.3, 1);
+    animation: p-message-slide-down 260ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .p-message.p-message-exit {
-    opacity: 0;
-    transform: scale(0.95) translateY(-4px);
-    pointer-events: none;
+    opacity: 0 !important;
+    max-height: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    border-width: 0 !important;
+    transform: translateY(-8px) scale(0.98) !important;
+    pointer-events: none !important;
 }
 
-@keyframes p-message-enter-anim {
+@keyframes p-message-slide-down {
     from {
         opacity: 0;
-        transform: scale(0.96) translateY(-4px);
+        transform: translateY(-10px) scale(0.97);
+        max-height: 0;
     }
     to {
         opacity: 1;
-        transform: scale(1) translateY(0);
+        transform: translateY(0) scale(1);
+        max-height: 200px;
     }
 }
 
@@ -35692,6 +35719,12 @@ ${h.response}`).join("\n");
     padding: var(--p-message-content-padding, 0.5rem 0.75rem);
     width: 100%;
     box-sizing: border-box;
+    transition: padding 280ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.p-message-exit .p-message-content {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
 }
 
 .p-message-icon {
