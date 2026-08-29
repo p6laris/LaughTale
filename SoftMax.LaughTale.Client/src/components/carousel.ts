@@ -2,8 +2,8 @@
  * SoftMax.LaughTale: Enterprise Carousel Component (PrimeVue 4 Aura Design System)
  * Native CSS scroll-snap content slider supporting alignment (start, center, end),
  * partial slidesPerPage (e.g. 1.5, 1.3, 1.75), horizontal & vertical orientation,
- * continuous looping, autoSize variable widths, synchronized gallery thumbnails,
- * silky smooth 60fps cubic-bezier transitions, pointer drag swiping, indicators, and WAI-ARIA.
+ * continuous looping, autoSize variable widths with pixel-perfect delta scrolling,
+ * synchronized gallery thumbnails, silky smooth 60fps transitions, and WAI-ARIA.
  */
 
 import { LucideIcons } from '../icons/lucide';
@@ -303,10 +303,10 @@ export default function CarouselIsland(container: HTMLElement, props: CarouselPr
 
     function renderStandardCarousel(): string {
         const itemDimensionsStyle = isVertical
-            ? `height: calc((240px - ${(spacing * (Math.ceil(slidesPerPage) - 1))}px) / ${slidesPerPage}); width: 100%; flex: 0 0 auto; margin-bottom: ${spacing}px;`
+            ? `height: calc((240px - ${(spacing * (Math.ceil(slidesPerPage) - 1))}px) / ${slidesPerPage}); width: 100%; flex: 0 0 auto;`
             : (autoSize
-                ? `height: 100%; flex: 0 0 auto; margin-right: ${spacing}px;`
-                : `width: calc((100% - ${(spacing * (Math.ceil(slidesPerPage) - 1))}px) / ${slidesPerPage}); height: 100%; flex: 0 0 auto; margin-right: ${spacing}px;`);
+                ? `height: 100%; flex: 0 0 auto;`
+                : `width: calc((100% - ${(spacing * (Math.ceil(slidesPerPage) - 1))}px) / ${slidesPerPage}); height: 100%; flex: 0 0 auto;`);
 
         const itemsHtml = Array.from({ length: itemCount }, (_, i) => {
             const widthOverride = autoSize ? `width: ${customWidths[i]};` : '';
@@ -331,7 +331,7 @@ export default function CarouselIsland(container: HTMLElement, props: CarouselPr
                     <button type="button" class="p-carousel-prev" aria-label="Previous slide" data-carousel-prev>
                         ${CHEVRON_UP}
                     </button>
-                    <div class="p-carousel-content" style="height: 240px; width: 100%; flex-direction: column; overflow-y: auto; overflow-x: hidden;" data-carousel-content>
+                    <div class="p-carousel-content" style="height: 240px; width: 100%; flex-direction: column; overflow-y: auto; overflow-x: hidden; gap: ${spacing}px;" data-carousel-content>
                         ${itemsHtml}
                     </div>
                     <button type="button" class="p-carousel-next" aria-label="Next slide" data-carousel-next>
@@ -343,7 +343,7 @@ export default function CarouselIsland(container: HTMLElement, props: CarouselPr
 
         return `
             <div class="p-carousel p-carousel-align-${align} ${props.class || ''}" role="region" aria-roledescription="carousel" aria-label="Content Slider" style="max-width: 36rem; margin: 0 auto; ${props.style || ''}">
-                <div class="p-carousel-content" style="height: ${autoSize ? '140px' : '240px'}; width: 100%;" data-carousel-content>
+                <div class="p-carousel-content" style="height: ${autoSize ? '140px' : '240px'}; width: 100%; gap: ${spacing}px;" data-carousel-content>
                     ${itemsHtml}
                 </div>
                 <div class="p-carousel-footer-bar">
@@ -475,28 +475,45 @@ export default function CarouselIsland(container: HTMLElement, props: CarouselPr
 
         currentSlide = index;
 
+        const itemRect = targetItem.getBoundingClientRect();
+        const containerRect = contentEl.getBoundingClientRect();
+
         if (isVertical) {
-            let targetTop = targetItem.offsetTop;
+            let delta = 0;
             if (align === 'center') {
-                targetTop = targetItem.offsetTop - (contentEl.clientHeight / 2) + (targetItem.clientHeight / 2);
+                delta = (itemRect.top + itemRect.height / 2) - (containerRect.top + containerRect.height / 2);
             } else if (align === 'end') {
-                targetTop = targetItem.offsetTop - contentEl.clientHeight + targetItem.clientHeight;
+                delta = itemRect.bottom - containerRect.bottom;
+            } else {
+                delta = itemRect.top - containerRect.top;
             }
-            contentEl.scrollTo({
-                top: Math.max(0, targetTop),
-                behavior: 'smooth'
-            });
+
+            if (index === 0) {
+                contentEl.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                contentEl.scrollTo({
+                    top: Math.max(0, contentEl.scrollTop + delta),
+                    behavior: 'smooth'
+                });
+            }
         } else {
-            let targetLeft = targetItem.offsetLeft;
+            let delta = 0;
             if (align === 'center') {
-                targetLeft = targetItem.offsetLeft - (contentEl.clientWidth / 2) + (targetItem.clientWidth / 2);
+                delta = (itemRect.left + itemRect.width / 2) - (containerRect.left + containerRect.width / 2);
             } else if (align === 'end') {
-                targetLeft = targetItem.offsetLeft - contentEl.clientWidth + targetItem.clientWidth;
+                delta = itemRect.right - containerRect.right;
+            } else {
+                delta = itemRect.left - containerRect.left;
             }
-            contentEl.scrollTo({
-                left: Math.max(0, targetLeft),
-                behavior: 'smooth'
-            });
+
+            if (index === 0) {
+                contentEl.scrollTo({ left: 0, behavior: 'smooth' });
+            } else {
+                contentEl.scrollTo({
+                    left: Math.max(0, contentEl.scrollLeft + delta),
+                    behavior: 'smooth'
+                });
+            }
         }
 
         updateUI();
@@ -555,31 +572,36 @@ export default function CarouselIsland(container: HTMLElement, props: CarouselPr
             clearTimeout(scrollDebounce);
             scrollDebounce = setTimeout(() => {
                 const items = contentEl.querySelectorAll<HTMLElement>('[data-slide-index]');
+                const containerRect = contentEl.getBoundingClientRect();
                 let closestIdx = 0;
                 let minDiff = Infinity;
 
                 if (isVertical) {
-                    const scrollTop = contentEl.scrollTop;
-                    const centerPoint = scrollTop + (contentEl.clientHeight / 2);
+                    const targetCenter = containerRect.top + (containerRect.height / 2);
                     items.forEach((item, i) => {
-                        const itemCenter = item.offsetTop + (item.clientHeight / 2);
-                        const diff = Math.abs(itemCenter - centerPoint);
+                        const r = item.getBoundingClientRect();
+                        const itemCenter = r.top + (r.height / 2);
+                        const diff = Math.abs(itemCenter - targetCenter);
                         if (diff < minDiff) {
                             minDiff = diff;
                             closestIdx = i;
                         }
                     });
                 } else {
-                    const scrollLeft = contentEl.scrollLeft;
-                    const centerPoint = scrollLeft + (contentEl.clientWidth / 2);
+                    const targetCenter = containerRect.left + (containerRect.width / 2);
                     items.forEach((item, i) => {
-                        const itemCenter = item.offsetLeft + (item.clientWidth / 2);
-                        const diff = Math.abs(itemCenter - centerPoint);
+                        const r = item.getBoundingClientRect();
+                        const itemCenter = r.left + (r.width / 2);
+                        const diff = Math.abs(itemCenter - targetCenter);
                         if (diff < minDiff) {
                             minDiff = diff;
                             closestIdx = i;
                         }
                     });
+                }
+
+                if (contentEl.scrollLeft <= 4) {
+                    closestIdx = 0;
                 }
 
                 if (closestIdx !== currentSlide) {

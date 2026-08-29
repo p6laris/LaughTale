@@ -980,7 +980,7 @@ defineIsland("tree-table", () => import("./treetable-STGV6W5W.js"));
 defineIsland("tree-select", () => import("./tree-select-3WADBRSW.js"));
 defineIsland("datatable", () => import("./datatable-FJYSSBES.js"));
 defineIsland("datagrid", () => import("./datatable-FJYSSBES.js"));
-defineIsland("modal", () => import("./modal-MSPS6H3M.js"));
+defineIsland("modal", () => import("./modal-IKP7BQ5D.js"));
 defineIsland("toast", () => import("./toast-RN33QYTD.js"));
 defineIsland("input-number", () => import("./input-number-KQ2J2WMH.js"));
 defineIsland("input-otp", () => import("./input-otp-RUPMATZ7.js"));
@@ -1058,7 +1058,7 @@ defineIsland("inputgroup", () => import("./input-group-SYXCWTLZ.js"));
 defineIsland("inputgroup-addon", () => import("./input-group-SYXCWTLZ.js").then((m) => ({ default: m.InputGroupAddonIsland })));
 defineIsland("input-text", () => import("./input-text-N5PAAEU3.js"));
 defineIsland("enhanced-input", () => import("./input-text-N5PAAEU3.js"));
-defineIsland("carousel", () => import("./carousel-MSS2EQKC.js"));
+defineIsland("carousel", () => import("./carousel-7TXEVN2V.js"));
 defineIsland("paginator", () => import("./paginator-NY74SK5Q.js"));
 defineIsland("dataview", () => import("./dataview-7JZHVNBV.js"));
 defineIsland("menubar", () => import("./menubar-ECTNCLLG.js"));
@@ -1093,4 +1093,4 @@ export {
   enableViewTransitions,
   getSlot
 };
-//# sourceMappingURL=chunk-YVAVHEYY.js.map
+//# sourceMappingURL=chunk-KHTXP6TD.js.map
