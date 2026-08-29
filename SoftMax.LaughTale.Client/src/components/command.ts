@@ -1,7 +1,7 @@
 /**
  * SoftMax.LaughTale: Enterprise CommandMenu Component (PrimeVue 4 Aura Design System compliant)
- * Search-driven command palette with zero-shift fixed geometry, getBoundingClientRect
- * viewport-confined scrolling, keyboard navigation, and modal Dialog integration.
+ * Search-driven command palette with zero-shift fixed geometry, stable scrollbar gutter,
+ * mouse-decoupled keyboard arrow navigation, and modal Dialog integration.
  */
 
 import { LucideIcons } from '../icons/lucide';
@@ -17,18 +17,20 @@ const COMMAND_CSS = `
     border-radius: var(--p-commandmenu-border-radius, var(--p-border-radius, 8px));
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
     overflow: hidden;
-    width: 100%;
-    max-width: 32rem;
+    width: 32rem;
+    max-width: 100%;
     box-sizing: border-box;
     font-family: inherit;
     position: relative;
+    contain: layout paint;
 }
 
 .p-commandmenu-header {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    padding: var(--p-commandmenu-header-padding, 0.75rem 1rem);
+    padding: 0.75rem 1rem;
+    height: 3.25rem;
     background: var(--p-commandmenu-header-background, transparent);
     border-bottom: 1px solid var(--p-commandmenu-header-border-color, var(--p-border-color, #e2e8f0));
     box-sizing: border-box;
@@ -48,10 +50,10 @@ const COMMAND_CSS = `
     border: none;
     outline: none;
     background: transparent;
-    font-size: var(--p-commandmenu-input-font-size, 0.875rem);
-    font-weight: var(--p-commandmenu-input-font-weight, 500);
+    font-size: 0.875rem;
+    font-weight: 500;
     color: var(--p-commandmenu-input-color, var(--p-text-color, #0f172a));
-    padding: var(--p-commandmenu-input-padding, 0.25rem 0);
+    padding: 0.25rem 0;
     font-family: inherit;
     min-width: 0;
 }
@@ -61,11 +63,13 @@ const COMMAND_CSS = `
 }
 
 .p-commandmenu-list {
-    padding: var(--p-commandmenu-list-padding, 0.5rem);
+    padding: 0.5rem;
     height: 19rem;
     max-height: 19rem;
+    min-height: 19rem;
     overflow-y: auto;
     overflow-x: hidden;
+    scrollbar-gutter: stable;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
@@ -86,6 +90,7 @@ const COMMAND_CSS = `
     padding: 0.35rem 0.65rem 0.2rem;
     text-transform: none;
     letter-spacing: normal;
+    user-select: none;
 }
 
 .p-commandmenu-item {
@@ -101,17 +106,24 @@ const COMMAND_CSS = `
     user-select: none;
     outline: none;
     box-sizing: border-box;
+    min-height: 2.25rem;
 }
 
 .p-commandmenu-item:hover,
 .p-commandmenu-item.p-commandmenu-item-focus {
-    background: var(--p-surface-100, #f1f5f9);
-    color: var(--p-text-color, #0f172a);
+    background: var(--p-surface-100, #f1f5f9) !important;
+    color: var(--p-text-color, #0f172a) !important;
 }
 
 .p-commandmenu-item.p-commandmenu-item-focus {
-    background: var(--p-surface-100, #f1f5f9);
-    color: var(--p-primary-600, #2563eb);
+    background: var(--p-surface-100, #f1f5f9) !important;
+    color: var(--p-primary-600, #2563eb) !important;
+    outline: 1px solid var(--p-primary-500, #3b82f6) !important;
+    outline-offset: -1px;
+}
+
+.p-commandmenu-item.p-commandmenu-item-active {
+    background: rgba(59, 130, 246, 0.2) !important;
 }
 
 .p-commandmenu-item-left {
@@ -158,31 +170,22 @@ const COMMAND_CSS = `
 }
 
 .p-commandmenu-empty-message {
-    padding: var(--p-commandmenu-empty-padding, 2.5rem 1rem);
+    padding: 2.5rem 1rem;
     text-align: center;
     font-size: 0.875rem;
-    color: var(--p-commandmenu-empty-color, var(--p-surface-500, #64748b));
+    color: var(--p-surface-500, #64748b);
 }
 
 .p-commandmenu-footer {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: var(--p-commandmenu-footer-padding, 0.625rem 1rem);
+    justify-content: flex-end;
+    padding: 0.625rem 1rem;
+    height: 2.75rem;
     background: var(--p-commandmenu-footer-background, var(--p-surface-50, #f8fafc));
     border-top: 1px solid var(--p-commandmenu-footer-border-color, var(--p-border-color, #e2e8f0));
     flex-shrink: 0;
     box-sizing: border-box;
-}
-
-.p-commandmenu-footer-feedback {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--p-primary-600, #2563eb);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 12rem;
 }
 
 .p-commandmenu-footer-content {
@@ -191,7 +194,6 @@ const COMMAND_CSS = `
     gap: 0.85rem;
     font-size: 0.75rem;
     color: var(--p-surface-500, #64748b);
-    margin-left: auto;
 }
 
 .p-commandmenu-kbd {
@@ -224,8 +226,8 @@ const COMMAND_CSS = `
 }
 
 .p-commandmenu-dialog-card {
-    width: 100%;
-    max-width: 32rem;
+    width: 32rem;
+    max-width: 100%;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     border-radius: var(--p-border-radius-xl, 10px);
     overflow: hidden;
@@ -257,13 +259,14 @@ const COMMAND_CSS = `
 .dark .p-commandmenu-item.p-commandmenu-item-focus,
 [data-theme="dark"] .p-commandmenu-item:hover,
 [data-theme="dark"] .p-commandmenu-item.p-commandmenu-item-focus {
-    background: var(--p-surface-800, #1e293b);
-    color: var(--p-surface-0, #f8fafc);
+    background: var(--p-surface-800, #1e293b) !important;
+    color: var(--p-surface-0, #f8fafc) !important;
 }
 
 .dark .p-commandmenu-item.p-commandmenu-item-focus,
 [data-theme="dark"] .p-commandmenu-item.p-commandmenu-item-focus {
-    color: #60a5fa;
+    color: #60a5fa !important;
+    outline: 1px solid var(--p-primary-500, #3b82f6) !important;
 }
 
 .dark .p-commandmenu-group-label,
@@ -352,6 +355,7 @@ export default function CommandMenuIsland(container: HTMLElement, props: Command
     let search = props.search || (props as any).Search || '';
     let selectedIndex = 0;
     let isDialogOpen = false;
+    let isUsingKeyboard = false;
 
     function fuzzyScore(value: string, query: string): number {
         if (!query) return 1;
@@ -411,17 +415,17 @@ export default function CommandMenuIsland(container: HTMLElement, props: Command
     function setupCommandMenu(targetEl: HTMLElement) {
         const arrowUpSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>';
         const arrowDownSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
-        const searchSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>';
 
         targetEl.innerHTML = `
-            <div class="p-commandmenu p-component" ${withDialog ? 'style="border: none; box-shadow: none; max-width: 100%;"' : ''}>
+            <div class="p-commandmenu p-component" ${withDialog ? 'style="border: none; box-shadow: none; width: 100%;"' : ''}>
                 <div class="p-commandmenu-header">
-                    <span class="p-commandmenu-search-icon">${searchSvg}</span>
+                    <span class="p-commandmenu-search-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                    </span>
                     <input type="text" class="p-commandmenu-input" placeholder="${placeholder}" value="${search}" />
                 </div>
                 <div class="p-commandmenu-list" tabindex="-1"></div>
                 <div class="p-commandmenu-footer">
-                    <span class="p-commandmenu-footer-feedback"></span>
                     <div class="p-commandmenu-footer-content">
                         <span style="display:inline-flex; align-items:center; gap: 0.35rem;">
                             <kbd class="p-commandmenu-kbd">${arrowUpSvg}</kbd>
@@ -439,7 +443,11 @@ export default function CommandMenuIsland(container: HTMLElement, props: Command
 
         const input = targetEl.querySelector<HTMLInputElement>('.p-commandmenu-input')!;
         const listEl = targetEl.querySelector<HTMLElement>('.p-commandmenu-list')!;
-        const feedbackEl = targetEl.querySelector<HTMLElement>('.p-commandmenu-footer-feedback')!;
+
+        // When mouse moves, enable mouse hover interactions
+        listEl.addEventListener('mousemove', () => {
+            isUsingKeyboard = false;
+        });
 
         function renderListOnly() {
             const filtered = getFilteredGroups();
@@ -519,6 +527,7 @@ export default function CommandMenuIsland(container: HTMLElement, props: Command
             // Wire hover & click events on items
             listEl.querySelectorAll<HTMLElement>('.p-commandmenu-item').forEach(el => {
                 el.addEventListener('mouseenter', () => {
+                    if (isUsingKeyboard) return; // Do not let mouse override keyboard navigation while scrolling
                     const idx = Number(el.getAttribute('data-flat-index'));
                     selectedIndex = idx;
                     updateFocusItem(false);
@@ -539,42 +548,23 @@ export default function CommandMenuIsland(container: HTMLElement, props: Command
                 const isFocused = i === selectedIndex;
                 item.classList.toggle('p-commandmenu-item-focus', isFocused);
                 if (isFocused && shouldScroll) {
-                    scrollToItemInContainer(item, listEl);
+                    item.scrollIntoView({ block: 'nearest', inline: 'nearest' });
                 }
             });
-        }
-
-        function scrollToItemInContainer(itemEl: HTMLElement, containerEl: HTMLElement) {
-            const itemRect = itemEl.getBoundingClientRect();
-            const containerRect = containerEl.getBoundingClientRect();
-
-            if (itemRect.top < containerRect.top) {
-                // Item is above the scroll viewport
-                containerEl.scrollTop -= (containerRect.top - itemRect.top) + 4;
-            } else if (itemRect.bottom > containerRect.bottom) {
-                // Item is below the scroll viewport
-                containerEl.scrollTop += (itemRect.bottom - containerRect.bottom) + 4;
-            }
         }
 
         function executeSelectedItem() {
             const activeEl = listEl.querySelector<HTMLElement>(`.p-commandmenu-item[data-flat-index="${selectedIndex}"]`);
             if (!activeEl) return;
 
-            const label = activeEl.getAttribute('data-label') || activeEl.textContent?.trim() || 'Command';
             const url = activeEl.getAttribute('data-url');
             const action = activeEl.getAttribute('data-action');
 
-            if (feedbackEl) {
-                feedbackEl.textContent = `✓ Selected: ${label}`;
-                feedbackEl.style.opacity = '1';
-                setTimeout(() => {
-                    feedbackEl.style.opacity = '0';
-                }, 2500);
-            }
+            activeEl.classList.add('p-commandmenu-item-active');
+            setTimeout(() => activeEl.classList.remove('p-commandmenu-item-active'), 150);
 
             if (withDialog) {
-                setTimeout(() => closeDialog(), 200);
+                setTimeout(() => closeDialog(), 150);
             }
 
             if (url) {
@@ -585,14 +575,14 @@ export default function CommandMenuIsland(container: HTMLElement, props: Command
             }
         }
 
-        // Live input handling (preserves cursor, backspace, selection natively)
+        // Live input handling
         input.addEventListener('input', () => {
             search = input.value;
             selectedIndex = 0;
             renderListOnly();
         });
 
-        // Keyboard navigation with strict event prevention to stop page scrolling
+        // Keyboard navigation with mouse decouple
         input.addEventListener('keydown', (e) => {
             const items = listEl.querySelectorAll<HTMLElement>('.p-commandmenu-item');
             const count = items.length;
@@ -600,6 +590,7 @@ export default function CommandMenuIsland(container: HTMLElement, props: Command
             if (e.key === 'ArrowDown') {
                 e.preventDefault();
                 e.stopPropagation();
+                isUsingKeyboard = true;
                 if (count > 0) {
                     selectedIndex = (selectedIndex + 1) % count;
                     updateFocusItem(true);
@@ -607,6 +598,7 @@ export default function CommandMenuIsland(container: HTMLElement, props: Command
             } else if (e.key === 'ArrowUp') {
                 e.preventDefault();
                 e.stopPropagation();
+                isUsingKeyboard = true;
                 if (count > 0) {
                     selectedIndex = (selectedIndex - 1 + count) % count;
                     updateFocusItem(true);
@@ -618,6 +610,7 @@ export default function CommandMenuIsland(container: HTMLElement, props: Command
             } else if (e.key === 'Home') {
                 e.preventDefault();
                 e.stopPropagation();
+                isUsingKeyboard = true;
                 if (count > 0) {
                     selectedIndex = 0;
                     updateFocusItem(true);
@@ -625,6 +618,7 @@ export default function CommandMenuIsland(container: HTMLElement, props: Command
             } else if (e.key === 'End') {
                 e.preventDefault();
                 e.stopPropagation();
+                isUsingKeyboard = true;
                 if (count > 0) {
                     selectedIndex = count - 1;
                     updateFocusItem(true);
