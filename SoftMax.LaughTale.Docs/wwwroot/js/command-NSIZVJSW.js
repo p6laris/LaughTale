@@ -23,7 +23,7 @@ var COMMAND_CSS = `
     box-sizing: border-box;
     font-family: inherit;
     position: relative;
-    contain: layout paint;
+    outline: none;
 }
 
 .p-commandmenu-header {
@@ -76,12 +76,14 @@ var COMMAND_CSS = `
     gap: 0.5rem;
     box-sizing: border-box;
     position: relative;
+    outline: none;
 }
 
 .p-commandmenu-group {
     display: flex;
     flex-direction: column;
     gap: 0.125rem;
+    position: static;
 }
 
 .p-commandmenu-group-label {
@@ -119,12 +121,10 @@ var COMMAND_CSS = `
 .p-commandmenu-item.p-commandmenu-item-focus {
     background: var(--p-surface-100, #f1f5f9) !important;
     color: var(--p-primary-600, #2563eb) !important;
-    outline: 1px solid var(--p-primary-500, #3b82f6) !important;
-    outline-offset: -1px;
 }
 
 .p-commandmenu-item.p-commandmenu-item-active {
-    background: rgba(59, 130, 246, 0.2) !important;
+    background: rgba(59, 130, 246, 0.15) !important;
 }
 
 .p-commandmenu-item-left {
@@ -267,7 +267,6 @@ var COMMAND_CSS = `
 .dark .p-commandmenu-item.p-commandmenu-item-focus,
 [data-theme="dark"] .p-commandmenu-item.p-commandmenu-item-focus {
     color: #60a5fa !important;
-    outline: 1px solid var(--p-primary-500, #3b82f6) !important;
 }
 
 .dark .p-commandmenu-group-label,
@@ -371,7 +370,7 @@ function CommandMenuIsland(container, props) {
     const arrowUpSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>';
     const arrowDownSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
     targetEl.innerHTML = `
-            <div class="p-commandmenu p-component" ${withDialog ? 'style="border: none; box-shadow: none; width: 100%;"' : ""}>
+            <div class="p-commandmenu p-component" tabindex="0" ${withDialog ? 'style="border: none; box-shadow: none; width: 100%;"' : ""}>
                 <div class="p-commandmenu-header">
                     <span class="p-commandmenu-search-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
@@ -394,11 +393,34 @@ function CommandMenuIsland(container, props) {
                 </div>
             </div>
         `;
+    const rootEl = targetEl.querySelector(".p-commandmenu");
     const input = targetEl.querySelector(".p-commandmenu-input");
     const listEl = targetEl.querySelector(".p-commandmenu-list");
     listEl.addEventListener("mousemove", () => {
       isUsingKeyboard = false;
     });
+    function ensureVisible(itemEl) {
+      const containerRect = listEl.getBoundingClientRect();
+      const itemRect = itemEl.getBoundingClientRect();
+      if (itemRect.top < containerRect.top) {
+        listEl.scrollTop -= containerRect.top - itemRect.top;
+      } else if (itemRect.bottom > containerRect.bottom) {
+        listEl.scrollTop += itemRect.bottom - containerRect.bottom;
+      }
+    }
+    function selectItem(index, shouldScroll) {
+      const items = listEl.querySelectorAll(".p-commandmenu-item");
+      if (items.length === 0) return;
+      selectedIndex = Math.max(0, Math.min(index, items.length - 1));
+      items.forEach((item, i) => {
+        const isSelected = i === selectedIndex;
+        item.classList.toggle("p-commandmenu-item-focus", isSelected);
+        item.setAttribute("aria-selected", isSelected ? "true" : "false");
+      });
+      if (shouldScroll && items[selectedIndex]) {
+        ensureVisible(items[selectedIndex]);
+      }
+    }
     function renderListOnly() {
       const filtered = getFilteredGroups();
       let flatIndex = 0;
@@ -464,29 +486,24 @@ function CommandMenuIsland(container, props) {
       });
       listEl.innerHTML = listHtml;
       listEl.querySelectorAll(".p-commandmenu-item").forEach((el) => {
+        el.addEventListener("mousemove", () => {
+          isUsingKeyboard = false;
+        });
         el.addEventListener("mouseenter", () => {
           if (isUsingKeyboard) return;
           const idx = Number(el.getAttribute("data-flat-index"));
-          selectedIndex = idx;
-          updateFocusItem(false);
+          selectItem(idx, false);
         });
-        el.addEventListener("click", () => {
+        el.addEventListener("click", (e) => {
+          e.preventDefault();
+          isUsingKeyboard = false;
           const idx = Number(el.getAttribute("data-flat-index"));
-          selectedIndex = idx;
+          selectItem(idx, false);
           executeSelectedItem();
+          input.focus({ preventScroll: true });
         });
       });
-      updateFocusItem(false);
-    }
-    function updateFocusItem(shouldScroll = true) {
-      const items = listEl.querySelectorAll(".p-commandmenu-item");
-      items.forEach((item, i) => {
-        const isFocused = i === selectedIndex;
-        item.classList.toggle("p-commandmenu-item-focus", isFocused);
-        if (isFocused && shouldScroll) {
-          item.scrollIntoView({ block: "nearest", inline: "nearest" });
-        }
-      });
+      selectItem(selectedIndex, false);
     }
     function executeSelectedItem() {
       const activeEl = listEl.querySelector(`.p-commandmenu-item[data-flat-index="${selectedIndex}"]`);
@@ -510,7 +527,7 @@ function CommandMenuIsland(container, props) {
       selectedIndex = 0;
       renderListOnly();
     });
-    input.addEventListener("keydown", (e) => {
+    function handleKeyDown(e) {
       const items = listEl.querySelectorAll(".p-commandmenu-item");
       const count = items.length;
       if (e.key === "ArrowDown") {
@@ -518,16 +535,16 @@ function CommandMenuIsland(container, props) {
         e.stopPropagation();
         isUsingKeyboard = true;
         if (count > 0) {
-          selectedIndex = (selectedIndex + 1) % count;
-          updateFocusItem(true);
+          const nextIdx = (selectedIndex + 1) % count;
+          selectItem(nextIdx, true);
         }
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
         e.stopPropagation();
         isUsingKeyboard = true;
         if (count > 0) {
-          selectedIndex = (selectedIndex - 1 + count) % count;
-          updateFocusItem(true);
+          const prevIdx = (selectedIndex - 1 + count) % count;
+          selectItem(prevIdx, true);
         }
       } else if (e.key === "Enter") {
         e.preventDefault();
@@ -538,16 +555,14 @@ function CommandMenuIsland(container, props) {
         e.stopPropagation();
         isUsingKeyboard = true;
         if (count > 0) {
-          selectedIndex = 0;
-          updateFocusItem(true);
+          selectItem(0, true);
         }
       } else if (e.key === "End") {
         e.preventDefault();
         e.stopPropagation();
         isUsingKeyboard = true;
         if (count > 0) {
-          selectedIndex = count - 1;
-          updateFocusItem(true);
+          selectItem(count - 1, true);
         }
       } else if (e.key === "Escape") {
         if (withDialog) {
@@ -561,7 +576,8 @@ function CommandMenuIsland(container, props) {
           renderListOnly();
         }
       }
-    });
+    }
+    rootEl.addEventListener("keydown", handleKeyDown);
     renderListOnly();
   }
   function openDialog() {
@@ -617,4 +633,4 @@ function CommandMenuIsland(container, props) {
 export {
   CommandMenuIsland as default
 };
-//# sourceMappingURL=command-WBQOMMGK.js.map
+//# sourceMappingURL=command-NSIZVJSW.js.map

@@ -1,7 +1,7 @@
 /**
  * SoftMax.LaughTale: Enterprise CommandMenu Component (PrimeVue 4 Aura Design System compliant)
- * Search-driven command palette with unified selection state, flawless mouse click & hover,
- * smooth arrow key navigation with viewport tracking, and modal Dialog integration.
+ * Search-driven command palette with unified selection state, root-level keyboard capture,
+ * precise viewport scroll tracking, and modal Dialog integration.
  */
 
 import { LucideIcons } from '../icons/lucide';
@@ -22,6 +22,7 @@ const COMMAND_CSS = `
     box-sizing: border-box;
     font-family: inherit;
     position: relative;
+    outline: none;
 }
 
 .p-commandmenu-header {
@@ -74,6 +75,7 @@ const COMMAND_CSS = `
     gap: 0.5rem;
     box-sizing: border-box;
     position: relative;
+    outline: none;
 }
 
 .p-commandmenu-group {
@@ -414,7 +416,7 @@ export default function CommandMenuIsland(container: HTMLElement, props: Command
         const arrowDownSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
 
         targetEl.innerHTML = `
-            <div class="p-commandmenu p-component" ${withDialog ? 'style="border: none; box-shadow: none; width: 100%;"' : ''}>
+            <div class="p-commandmenu p-component" tabindex="0" ${withDialog ? 'style="border: none; box-shadow: none; width: 100%;"' : ''}>
                 <div class="p-commandmenu-header">
                     <span class="p-commandmenu-search-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
@@ -438,6 +440,7 @@ export default function CommandMenuIsland(container: HTMLElement, props: Command
             </div>
         `;
 
+        const rootEl = targetEl.querySelector<HTMLElement>('.p-commandmenu')!;
         const input = targetEl.querySelector<HTMLInputElement>('.p-commandmenu-input')!;
         const listEl = targetEl.querySelector<HTMLElement>('.p-commandmenu-list')!;
 
@@ -564,6 +567,7 @@ export default function CommandMenuIsland(container: HTMLElement, props: Command
                     const idx = Number(el.getAttribute('data-flat-index'));
                     selectItem(idx, false);
                     executeSelectedItem();
+                    input.focus({ preventScroll: true });
                 });
             });
 
@@ -599,8 +603,8 @@ export default function CommandMenuIsland(container: HTMLElement, props: Command
             renderListOnly();
         });
 
-        // Arrow keys & Enter key handling
-        input.addEventListener('keydown', (e) => {
+        // Universal keyboard handler on the entire command palette container
+        function handleKeyDown(e: KeyboardEvent) {
             const items = listEl.querySelectorAll<HTMLElement>('.p-commandmenu-item');
             const count = items.length;
 
@@ -650,7 +654,9 @@ export default function CommandMenuIsland(container: HTMLElement, props: Command
                     renderListOnly();
                 }
             }
-        });
+        }
+
+        rootEl.addEventListener('keydown', handleKeyDown);
 
         renderListOnly();
     }
