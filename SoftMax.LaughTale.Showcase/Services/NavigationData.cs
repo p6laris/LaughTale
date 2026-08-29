@@ -97,8 +97,9 @@ public static class NavigationData
                 new("Toast Container", "bell", "/enterprise#sec-toast"),
                 new("BlockUI Locker", "lock", "/enterprise#sec-blockui")
             }),
-            new("Feedback & Status (7)", "activity", null, false, new List<SidebarItem>
+            new("Feedback & Status (8)", "activity", null, false, new List<SidebarItem>
             {
+                new("Message", "info", "/enterprise#sec-message", false, null, "New"),
                 new("ProgressBar", "loader2", "/enterprise#sec-progress-bar"),
                 new("Skeleton Placeholder", "loader2", "/enterprise#sec-skeleton"),
                 new("MeterGroup Gauge", "gauge", "/enterprise#sec-meter-group"),

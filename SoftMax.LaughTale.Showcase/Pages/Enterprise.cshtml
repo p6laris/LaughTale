@@ -7077,6 +7077,132 @@
         </div>
     </section>
 
+    <!-- Message Component Suite -->
+    <section id="sec-message" class="component-card">
+        <div class="card-header">
+            <div>
+                <h2>Message</h2>
+                <p>Message component is used to display inline messages with severities, outlined and simple variants, sizes, closable actions, life timers, and form validation integration.</p>
+            </div>
+            <span class="aura-tag tag-emerald">PrimeVue 4 Aura</span>
+        </div>
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Demo 1: Basic -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">An inline message for informational, success, warning, or error feedback.</p>
+                <div style="max-width: 28rem; margin: 0 auto;">
+                    <island-message severity="info" closable="true" icon="sparkles" text="Upgrade now and save %5." />
+                </div>
+            </div>
+
+            <!-- Demo 2: Severity Levels -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Severity Levels</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">The severity option specifies the semantic tone and color palette of the message.</p>
+                <div style="max-width: 32rem; margin: 0 auto; display: flex; flex-direction: column; gap: 1rem;">
+                    <island-message severity="success" closable="true" icon="check" text="Your account is now ready." />
+                    <island-message severity="info" closable="true" icon="sparkles" text="Upgrade now and save %5." />
+                    <island-message severity="warn" closable="true" icon="receipt" text="Your subscription is about to expire." />
+                    <island-message severity="error" closable="true" icon="alertTriangle" text="Something went wrong." />
+                    <island-message severity="secondary" closable="true" icon="loader2" spin="true" text="Processing may take a few moments." />
+                    <island-message severity="contrast" closable="true" icon="wifi" text="You're currently in offline mode." />
+                </div>
+            </div>
+
+            <!-- Demo 3: Custom Icons & Avatars -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Custom Icon &amp; Avatar</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">The icon of a message can be customized with custom vector icons or user avatars.</p>
+                <div style="max-width: 28rem; margin: 0 auto; display: flex; flex-direction: column; gap: 1rem;">
+                    <island-message severity="warn" icon="receipt" text="Your subscription is about to expire." />
+                    <island-message severity="info" avatar="https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png" text="How may I help you?" />
+                </div>
+            </div>
+
+            <!-- Demo 4: Variants (Outlined & Simple) -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Variants (Outlined &amp; Simple)</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Configure the variant value as outlined or simple borderless text.</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                    <div>
+                        <h4 style="font-size: 0.875rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--p-text-color);">Outlined Variant</h4>
+                        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                            <island-message severity="success" variant="outlined" closable="true" icon="check" text="Your account is now ready." />
+                            <island-message severity="info" variant="outlined" closable="true" icon="sparkles" text="<a href='javascript:void(0)'>Upgrade</a> now and save %5." />
+                            <island-message severity="warn" variant="outlined" closable="true" icon="receipt" text="Your subscription is about to expire. <a href='javascript:void(0)'>Renew</a>" />
+                            <island-message severity="error" variant="outlined" closable="true" icon="alertTriangle" text="Something went wrong. Please <a href='javascript:void(0)'>try again</a>." />
+                            <island-message severity="secondary" variant="outlined" closable="true" icon="loader2" spin="true" text="Processing may take a few moments." />
+                            <island-message severity="contrast" variant="outlined" closable="true" icon="wifi" text="You're currently in offline mode." />
+                        </div>
+                    </div>
+                    <div>
+                        <h4 style="font-size: 0.875rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--p-text-color);">Simple Variant</h4>
+                        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                            <island-message severity="success" variant="simple" closable="true" icon="check" text="Your account is now ready." />
+                            <island-message severity="info" variant="simple" closable="true" icon="sparkles" text="<a href='javascript:void(0)'>Upgrade</a> now and save %5." />
+                            <island-message severity="warn" variant="simple" closable="true" icon="receipt" text="Your subscription is about to expire. <a href='javascript:void(0)'>Renew</a>" />
+                            <island-message severity="error" variant="simple" closable="true" icon="alertTriangle" text="Something went wrong. Please <a href='javascript:void(0)'>try again</a>." />
+                            <island-message severity="secondary" variant="simple" closable="true" icon="loader2" spin="true" text="Processing may take a few moments." />
+                            <island-message severity="contrast" variant="simple" closable="true" icon="wifi" text="You're currently in offline mode." />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo 5: Sizes -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Sizes</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Small and large sizes as alternatives to the standard base size.</p>
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem; max-width: 32rem; margin: 0 auto;">
+                    <island-message severity="info" size="small" closable="true" icon="sparkles" text="Small: Upgrade now and save %5." />
+                    <island-message severity="info" closable="true" icon="sparkles" text="Normal: Upgrade now and save %5." />
+                    <island-message severity="info" size="large" closable="true" icon="sparkles" text="Large: Upgrade now and save %5." />
+                </div>
+            </div>
+
+            <!-- Demo 6: Dynamic Messages -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Dynamic Messages</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Multiple messages can be dynamically added and cleared on demand.</p>
+                <div style="max-width: 28rem; margin: 0 auto;">
+                    <island-message dynamic="true" />
+                </div>
+            </div>
+
+            <!-- Demo 7: Auto-Dismiss Life Timer -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Auto-Dismiss Life Timer</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Messages can disappear automatically after the specified life delay in milliseconds (3000ms).</p>
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+                    <button type="button" class="p-button p-button-primary" onclick="const container = document.getElementById('msg-life-demo'); container.innerHTML = ''; const msg = document.createElement('div'); msg.setAttribute('data-island', 'message'); msg.setAttribute('data-props', JSON.stringify({ severity: 'success', life: 3000, icon: 'check', text: 'Your account is now ready (auto-closing in 3s).' })); container.appendChild(msg); window.LaughTale?.hydrate(msg);">
+                        Show Auto-Closing Message (3s)
+                    </button>
+                    <div id="msg-life-demo" style="width: 100%; max-width: 28rem;"></div>
+                </div>
+            </div>
+
+            <!-- Demo 8: Form Validation Integration -->
+            <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
+                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Form Validation Integration</h3>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Validation errors in forms are displayed using simple variant and small size.</p>
+                <div style="max-width: 24rem; margin: 0 auto; display: flex; flex-direction: column; gap: 1.25rem;">
+                    <island-message severity="error" icon="alertCircle" text="Validation Failed" />
+                    
+                    <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                        <input type="text" class="p-inputtext" placeholder="Username" style="width: 100%; border: 1px solid #ef4444; border-radius: var(--p-border-radius); padding: 0.5rem 0.75rem;" />
+                        <island-message severity="error" variant="simple" size="small" icon="alertCircle" text="Username is required" />
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                        <input type="text" class="p-inputtext" placeholder="Phone: (999) 999-9999" style="width: 100%; border: 1px solid #ef4444; border-radius: var(--p-border-radius); padding: 0.5rem 0.75rem;" />
+                        <island-message severity="error" variant="simple" size="small" icon="alertCircle" text="Phone number is required" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Toast Container -->
     <section id="sec-toast" class="component-card">
         <div class="card-header">

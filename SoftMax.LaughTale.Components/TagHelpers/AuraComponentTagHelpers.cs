@@ -4765,6 +4765,96 @@ public class IslandSidebarTagHelper : TagHelper
 }
 
 /// <summary>
+/// TagHelper for <island-message />, <p-message />, and <island-inline-message />
+/// PrimeVue 4 Aura Design System compliant inline and contextual message notification.
+/// </summary>
+[HtmlTargetElement("island-message")]
+[HtmlTargetElement("p-message")]
+[HtmlTargetElement("island-inline-message")]
+[HtmlTargetElement("p-inlinemessage")]
+public class IslandMessageTagHelper : TagHelper
+{
+    [HtmlAttributeName("severity")]
+    public string Severity { get; set; } = "info";
+
+    [HtmlAttributeName("variant")]
+    public string? Variant { get; set; }
+
+    [HtmlAttributeName("size")]
+    public string? Size { get; set; }
+
+    [HtmlAttributeName("closable")]
+    public bool Closable { get; set; } = false;
+
+    [HtmlAttributeName("life")]
+    public int? Life { get; set; }
+
+    [HtmlAttributeName("icon")]
+    public string? Icon { get; set; }
+
+    [HtmlAttributeName("avatar")]
+    public string? Avatar { get; set; }
+
+    [HtmlAttributeName("spin")]
+    public bool Spin { get; set; } = false;
+
+    [HtmlAttributeName("text")]
+    public string? Text { get; set; }
+
+    [HtmlAttributeName("content")]
+    public string? Content { get; set; }
+
+    [HtmlAttributeName("dynamic")]
+    public bool Dynamic { get; set; } = false;
+
+    [HtmlAttributeName("class")]
+    public string? Class { get; set; }
+
+    [HtmlAttributeName("style")]
+    public string? Style { get; set; }
+
+    public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
+    {
+        output.TagName = "div";
+        output.TagMode = TagMode.StartTagAndEndTag;
+        output.Attributes.SetAttribute("data-island", "message");
+        output.Attributes.SetAttribute("data-hydrate", "load");
+
+        var childContent = await output.GetChildContentAsync();
+        var innerHtml = childContent.GetContent();
+
+        var props = new
+        {
+            severity = Severity,
+            variant = Variant,
+            size = Size,
+            closable = Closable,
+            life = Life,
+            icon = Icon,
+            avatar = Avatar,
+            spin = Spin,
+            text = Text ?? Content ?? (string.IsNullOrWhiteSpace(innerHtml) ? null : innerHtml.Trim()),
+            dynamic = Dynamic,
+            @class = Class,
+            style = Style
+        };
+
+        output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
+        output.Content.SetHtmlContent(innerHtml);
+
+        if (!string.IsNullOrWhiteSpace(Class))
+        {
+            output.Attributes.SetAttribute("class", Class);
+        }
+
+        if (!string.IsNullOrWhiteSpace(Style))
+        {
+            output.Attributes.SetAttribute("style", Style);
+        }
+    }
+}
+
+/// <summary>
 /// TagHelper for <island-datatable /> / <island-table /> (Aura DataTable Component)
 /// </summary>
 [HtmlTargetElement("island-datatable")]

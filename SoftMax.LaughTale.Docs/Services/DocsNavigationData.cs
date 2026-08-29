@@ -69,6 +69,7 @@ public static class DocsNavigationData
 
             new SidebarItem("Metrics & Visual Media", "barChart3", null, true, new List<SidebarItem>
             {
+                new("Message Alerts", "info", "/doc/44-message", currentPath.Contains("44-message")),
                 new("Radial Dial Knob", "gauge", "/doc/34-knob", currentPath.Contains("34-knob")),
                 new("Status Tag & Badge", "tag", "/doc/35-tag", currentPath.Contains("35-tag")),
                 new("MeterGroup Gauge", "barChart3", "/doc/22-meter-group", currentPath.Contains("22-meter-group")),

@@ -135,6 +135,10 @@ defineIsland('tieredmenu', () => import('./components/tieredmenu'));
 defineIsland('tiered-menu', () => import('./components/tieredmenu'));
 defineIsland('p-tieredmenu', () => import('./components/tieredmenu'));
 defineIsland('island-tieredmenu', () => import('./components/tieredmenu'));
+defineIsland('message', () => import('./components/message'));
+defineIsland('p-message', () => import('./components/message'));
+defineIsland('inline-message', () => import('./components/message'));
+defineIsland('inlinemessage', () => import('./components/message'));
 
 // Export Headless Composables, Animations & Strongly-Typed Models
 export * from './composables/index';
