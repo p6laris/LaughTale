@@ -16290,6 +16290,18 @@ function FileUploadIsland(container, props) {
       progress: props.initialFile.status === "completed" ? 100 : 0,
       status: props.initialFile.status || "pending"
     });
+  } else if (props.initialImages && props.initialImages.length > 0) {
+    props.initialImages.forEach((img) => {
+      fileQueue.push({
+        id: img.id,
+        name: img.name,
+        size: 245e3,
+        type: "image/jpeg",
+        previewUrl: img.previewUrl,
+        progress: 0,
+        status: "pending"
+      });
+    });
   }
   function formatFileSize(bytes) {
     if (bytes === 0) return "0 B";
@@ -16363,7 +16375,7 @@ function FileUploadIsland(container, props) {
       const hasFile = fileQueue.length > 0;
       const currentFile = hasFile ? fileQueue[0] : null;
       container.innerHTML = `
-                <div class="p-fileupload p-fileupload-custom" style="display: flex; flex-direction: column; align-items: center; gap: 1rem; width: 100%;">
+                <div class="p-fileupload p-fileupload-custom" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
                     <span class="p-fileupload-choose">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
                         <span>${chooseLabel}</span>
@@ -16404,16 +16416,14 @@ function FileUploadIsland(container, props) {
                 `;
       } else {
         container.innerHTML = `
-                    <div class="p-fileupload p-fileupload-basic" style="justify-content: space-between; width: 100%;">
-                        <div class="p-fileupload-basic-left">
-                            <span class="p-fileupload-choose">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
-                                <span>${chooseLabel}</span>
-                                <input type="file" accept="${accept}" ${multiple ? "multiple" : ""} class="p-fileupload-input" />
-                            </span>
-                            <span class="p-fileupload-filename">${fileName}</span>
-                        </div>
-                        <button type="button" class="p-button p-button-outlined p-button-secondary p-fileupload-upload-btn" ${!hasFile || isUploading ? 'disabled style="opacity:0.5; pointer-events:none; cursor:not-allowed;"' : ""} style="padding: 0.55rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer;">
+                    <div class="p-fileupload p-fileupload-basic" style="justify-content: center; width: 100%;">
+                        <span class="p-fileupload-choose">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                            <span>${chooseLabel}</span>
+                            <input type="file" accept="${accept}" ${multiple ? "multiple" : ""} class="p-fileupload-input" />
+                        </span>
+                        <span class="p-fileupload-filename" style="margin-left: 0.5rem; margin-right: 0.5rem;">${fileName}</span>
+                        <button type="button" class="p-button p-button-outlined p-button-secondary p-fileupload-upload-btn" ${!hasFile || isUploading ? 'disabled style="opacity:0.5; pointer-events:none; cursor:not-allowed;"' : ""} style="padding: 0.5rem 1.15rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer;">
                             ${uploadLabel}
                         </button>
                     </div>
@@ -16586,7 +16596,7 @@ var init_fileupload = __esm({
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    padding: 0.55rem 1.25rem;
+    padding: 0.5rem 1.15rem;
     font-size: 0.875rem;
     font-weight: 600;
     border-radius: var(--p-border-radius, 6px);
@@ -16601,6 +16611,16 @@ var init_fileupload = __esm({
 .p-fileupload-choose:hover {
     background: var(--p-surface-800, #1e293b);
     border-color: var(--p-surface-800, #1e293b);
+}
+
+.p-fileupload-choose.p-button-secondary {
+    background: var(--p-surface-100, #f1f5f9);
+    border: 1px solid var(--p-border-color, #e2e8f0);
+    color: var(--p-surface-800, #1e293b);
+}
+
+.p-fileupload-choose.p-button-secondary:hover {
+    background: var(--p-surface-200, #e2e8f0);
 }
 
 .p-fileupload-choose input[type="file"] {
@@ -16620,7 +16640,7 @@ var init_fileupload = __esm({
 .p-fileupload-filename {
     font-size: 0.875rem;
     color: var(--p-text-muted, #64748b);
-    max-width: 18rem;
+    max-width: 16rem;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -16691,6 +16711,7 @@ var init_fileupload = __esm({
     height: 3rem;
     border-radius: 9999px;
     background: var(--p-surface-100, #f1f5f9);
+    border: 1px solid var(--p-border-color, #e2e8f0);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -16861,14 +16882,14 @@ var init_fileupload = __esm({
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 1rem;
+    margin-top: 1.25rem;
 }
 
 .p-fileupload-custom-preview img {
-    max-width: 16rem;
-    max-height: 18rem;
+    max-width: 18rem;
+    max-height: 22rem;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
     border: 1px solid var(--p-border-color, #e2e8f0);
 }
 
@@ -16896,6 +16917,7 @@ var init_fileupload = __esm({
 [data-theme="dark"] .p-fileupload-empty-icon {
     background: var(--p-surface-700, #334155);
     color: var(--p-surface-200, #e2e8f0);
+    border-color: var(--p-surface-600, #475569);
 }
 
 .dark .p-fileupload-empty-title,
