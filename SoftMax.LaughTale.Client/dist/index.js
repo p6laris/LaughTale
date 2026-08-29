@@ -30447,49 +30447,61 @@ ${h.response}`).join("\n");
     const prevBtn = container.querySelector("[data-carousel-prev]");
     const nextBtn = container.querySelector("[data-carousel-next]");
     const indicators = container.querySelectorAll("[data-indicator-index]");
+    function applyCenterPadding() {
+      if (!contentEl || align !== "center") return;
+      const firstItem = contentEl.querySelector('[data-slide-index="0"]');
+      const lastItem = contentEl.querySelector(`[data-slide-index="${itemCount - 1}"]`);
+      if (!firstItem || !lastItem) return;
+      if (isVertical) {
+        const padTop = Math.max(0, contentEl.clientHeight / 2 - firstItem.offsetHeight / 2);
+        const padBottom = Math.max(0, contentEl.clientHeight / 2 - lastItem.offsetHeight / 2);
+        contentEl.style.paddingTop = `${padTop}px`;
+        contentEl.style.paddingBottom = `${padBottom}px`;
+      } else {
+        const padLeft = Math.max(0, contentEl.clientWidth / 2 - firstItem.offsetWidth / 2);
+        const padRight = Math.max(0, contentEl.clientWidth / 2 - lastItem.offsetWidth / 2);
+        contentEl.style.paddingLeft = `${padLeft}px`;
+        contentEl.style.paddingRight = `${padRight}px`;
+      }
+    }
+    setTimeout(applyCenterPadding, 20);
+    window.addEventListener("resize", applyCenterPadding);
+    let isProgrammaticScroll = false;
+    let scrollTimeoutId = null;
     function scrollToSlide(index) {
       if (!contentEl) return;
       const targetItem = contentEl.querySelector(`[data-slide-index="${index}"]`);
       if (!targetItem) return;
-      currentSlide = index;
-      const itemRect = targetItem.getBoundingClientRect();
-      const containerRect = contentEl.getBoundingClientRect();
+      currentSlide = Math.max(0, Math.min(itemCount - 1, index));
+      isProgrammaticScroll = true;
+      clearTimeout(scrollTimeoutId);
       if (isVertical) {
-        let delta = 0;
+        let targetTop = targetItem.offsetTop;
         if (align === "center") {
-          delta = itemRect.top + itemRect.height / 2 - (containerRect.top + containerRect.height / 2);
+          targetTop = targetItem.offsetTop - contentEl.clientHeight / 2 + targetItem.offsetHeight / 2;
         } else if (align === "end") {
-          delta = itemRect.bottom - containerRect.bottom;
-        } else {
-          delta = itemRect.top - containerRect.top;
+          targetTop = targetItem.offsetTop - contentEl.clientHeight + targetItem.offsetHeight;
         }
-        if (index === 0) {
-          contentEl.scrollTo({ top: 0, behavior: "smooth" });
-        } else {
-          contentEl.scrollTo({
-            top: Math.max(0, contentEl.scrollTop + delta),
-            behavior: "smooth"
-          });
-        }
+        contentEl.scrollTo({
+          top: Math.max(0, targetTop),
+          behavior: "smooth"
+        });
       } else {
-        let delta = 0;
+        let targetLeft = targetItem.offsetLeft;
         if (align === "center") {
-          delta = itemRect.left + itemRect.width / 2 - (containerRect.left + containerRect.width / 2);
+          targetLeft = targetItem.offsetLeft - contentEl.clientWidth / 2 + targetItem.offsetWidth / 2;
         } else if (align === "end") {
-          delta = itemRect.right - containerRect.right;
-        } else {
-          delta = itemRect.left - containerRect.left;
+          targetLeft = targetItem.offsetLeft - contentEl.clientWidth + targetItem.offsetWidth;
         }
-        if (index === 0) {
-          contentEl.scrollTo({ left: 0, behavior: "smooth" });
-        } else {
-          contentEl.scrollTo({
-            left: Math.max(0, contentEl.scrollLeft + delta),
-            behavior: "smooth"
-          });
-        }
+        contentEl.scrollTo({
+          left: Math.max(0, targetLeft),
+          behavior: "smooth"
+        });
       }
       updateUI();
+      scrollTimeoutId = setTimeout(() => {
+        isProgrammaticScroll = false;
+      }, 400);
     }
     function updateUI() {
       indicators.forEach((ind, i) => {
@@ -30536,43 +30548,39 @@ ${h.response}`).join("\n");
     if (contentEl) {
       let scrollDebounce = null;
       contentEl.addEventListener("scroll", () => {
+        if (isProgrammaticScroll) return;
         clearTimeout(scrollDebounce);
         scrollDebounce = setTimeout(() => {
+          if (isProgrammaticScroll) return;
           const items = contentEl.querySelectorAll("[data-slide-index]");
-          const containerRect = contentEl.getBoundingClientRect();
           let closestIdx = 0;
           let minDiff = Infinity;
           if (isVertical) {
-            const targetCenter = containerRect.top + containerRect.height / 2;
+            const viewportCenter = contentEl.scrollTop + contentEl.clientHeight / 2;
             items.forEach((item, i) => {
-              const r = item.getBoundingClientRect();
-              const itemCenter = r.top + r.height / 2;
-              const diff = Math.abs(itemCenter - targetCenter);
+              const itemCenter = item.offsetTop + item.offsetHeight / 2;
+              const diff = Math.abs(itemCenter - viewportCenter);
               if (diff < minDiff) {
                 minDiff = diff;
                 closestIdx = i;
               }
             });
           } else {
-            const targetCenter = containerRect.left + containerRect.width / 2;
+            const viewportCenter = contentEl.scrollLeft + contentEl.clientWidth / 2;
             items.forEach((item, i) => {
-              const r = item.getBoundingClientRect();
-              const itemCenter = r.left + r.width / 2;
-              const diff = Math.abs(itemCenter - targetCenter);
+              const itemCenter = item.offsetLeft + item.offsetWidth / 2;
+              const diff = Math.abs(itemCenter - viewportCenter);
               if (diff < minDiff) {
                 minDiff = diff;
                 closestIdx = i;
               }
             });
           }
-          if (contentEl.scrollLeft <= 4) {
-            closestIdx = 0;
-          }
           if (closestIdx !== currentSlide) {
             currentSlide = closestIdx;
             updateUI();
           }
-        }, 60);
+        }, 80);
       });
     }
     updateUI();
