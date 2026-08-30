@@ -214,7 +214,7 @@ Studio comes after — it has nothing to edit until components are headless.
 | **P0** | Unblock | LT-10xx | 2 d | Four gates green simultaneously |
 | **P1** | Contracts + harnesses + 6 reference components | LT-11xx | 3 wk | Reference set passes every gate |
 | **P2** | Codegen & de-bloat | LT-12xx | 2 wk | `LaughTale.Components` under 3,000 LOC |
-| **P3** | The migration pass (70 components) | LT-13xx | 4 wk | All gates green across all 76 |
+| **P3** | The migration pass (70 components) | LT-13xx | 3 wk | All gates green across all 76 |
 | **P4** | Theme Studio, for real | LT-14xx | 2.5 wk | Visual part editing + export + eject |
 | **P5** | Forms, antiforgery, validation, server i18n | LT-15xx | 2.5 wk | Every input round-trips model binding |
 | **P6** | Honest build & CI | LT-16xx | 1 wk | Budgets enforced; README numbers build-emitted |
@@ -225,7 +225,7 @@ Studio comes after — it has nothing to edit until components are headless.
 | **P11** | Templates, DX, release | LT-21xx | 2 wk | `dotnet new laughtale-web` on a clean machine |
 | **P12** | Server-driven island refresh | LT-22xx | 1.5 wk | Island re-renders server-side, no navigation |
 
-Roughly 25 weeks. **P0–P4 (~12 weeks) is where the framework stops actively misbehaving and
+Roughly 24 weeks. **P0–P4 (~11 weeks) is where the framework stops actively misbehaving and
 the Studio starts working.** Everything after makes it competitive.
 
 ---
