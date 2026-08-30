@@ -402,6 +402,36 @@ that makes LaughTale a real ASP.NET Core citizen.
 - **LT-1504 — Culture flow.** `done` · Server `CultureInfo` flows into `ctx.locale` and `ctx.dir`; client `Intl` formatting agrees with server parsing.
 - **LT-1505 — `IStringLocalizer` for component strings.** `done` · Aria labels, "no results", month names, pagination text.
 - **LT-1506 — Progressive enhancement baseline.** `done` · Documented no-JS behavior per component.
+- **LT-1507 — Cached pages must not leak per-user island props.** `P0` · **security.**
+  Island props are serialized into a `data-props` HTML attribute. If the page is stored by
+  output caching, a CDN, a reverse proxy or the browser, those props are stored with it —
+  so a page rendered for user A can be served to user B carrying A's name, balance or id.
+  There is no `OutputCache`, `ResponseCache`, `ETag` or `VaryBy` handling anywhere in the
+  solution today, which means nothing currently prevents this.
+  Design: mark user-specific props (`[IslandPrivate]`, or a per-island cacheability flag);
+  the TagHelper then either forces `Cache-Control: private, no-store` on the response, or —
+  better — defers that island to a per-user server fetch so the cached shell stays public.
+  That deferral is exactly the mechanism LT-22xx already builds, so the two should share one
+  implementation. Add a dev-mode runtime warning when a response carries a public cache
+  header while any island on it has non-empty props, and an analyzer for the static case.
+  **Exit gate:** a test renders a page for user A, caches it, requests it as user B, and
+  asserts none of A's prop values appear in B's response.
+- **LT-1508 — Server-side data contract for data components.** `P1`
+  No `IQueryable`, `Skip` or `Take` exists anywhere, so DataTable, DataView and TreeTable
+  page, sort and filter in the browser — meaning every row is shipped to the client. The
+  first user with 100,000 rows hits this immediately, and server-side data is the single
+  most-requested feature of every .NET grid.
+  Design: `IslandDataRequest` (page, size, sort[], filter[]) → `IslandDataResult<T>` (rows,
+  totalCount); an `IQueryable<T>` extension applying all three in an EF Core-translatable
+  way; `app.MapIslandData<T>(...)` endpoint helper; a `lazy` mode on the client that issues
+  requests carrying the antiforgery token (LT-1503). One contract, reused by every data
+  component.
+  **Security note:** sort and filter field names arrive from the client. They must be
+  validated against an allowlist derived from the model — never concatenated into a query.
+  Dynamic ordering from user input is a standard injection vector.
+  **Exit gate:** a 100,000-row table pages, sorts and filters against EF Core with a
+  single-page payload, and the generated SQL is verified translatable (no client-side
+  evaluation).
 
 **Phase exit gate:** a Razor Pages form using island inputs posts, binds, validates and re-renders with errors — in `en-US` and in `ckb-IQ` (RTL), with JS enabled and disabled. (`done`)
 
@@ -414,6 +444,31 @@ that makes LaughTale a real ASP.NET Core citizen.
 - **LT-1603 — Correct the size claims.** `done` · Accurate size metrics across standalone runtime and component bundles.
 - **LT-1604 — Build-emitted numbers.** `done` · Build-driven size reporting.
 - **LT-1605 — Public API lock.** `done` · Stable exported surface and types.
+- **LT-1607 — Real browser tests.** `P1`
+  All 268 tests run in happy-dom, which is not a browser. Scroll, focus, layout,
+  `IntersectionObserver`, View Transitions and `adoptedStyleSheets` all behave differently
+  in real engines — and DOM behavior is this library's entire job, so this is the largest
+  blind spot in the test suite.
+  Playwright against Chromium, Firefox and WebKit, covering specifically what happy-dom
+  cannot: `Visible`-strategy hydration driven by real scrolling, focus trapping, View
+  Transitions, print layout, and constructable stylesheets. Run the LT-1101 leak harness in
+  a real engine too — happy-dom's listener counts are not Chrome's.
+  **Exit gate:** `npx playwright test` green on all three engines in CI.
+- **LT-1608 — Component API consistency audit.** `P1` · must land **before** the API freeze.
+  DataTable accepts both `value` and `data` for the same thing; across 76 components there
+  are likely many more synonyms. Enumerate every prop, identify duplicate meanings, choose
+  one canonical name each, and alias the loser for one major version with a deprecation
+  warning. Generate the report so it is checkable rather than a one-off review.
+  **Exit gate:** generated report shows zero duplicate-meaning prop names; CI fails when a
+  new synonym is introduced.
+- **LT-1609 — Declare and enforce the browser support floor.** `P1`
+  State the minimum supported browsers explicitly, then enforce them. The features that
+  actually vary: View Transitions, `adoptedStyleSheets` (Safari 16.4+),
+  `requestIdleCallback` (unsupported in Safari — the `setTimeout` fallback in `hydrator.ts`
+  already covers it), `IntersectionObserver`, and `ElementInternals`. Each needs a
+  documented, tested degradation path, not silent breakage.
+  **Exit gate:** the matrix is published in the docs and the Playwright WebKit run (LT-1607)
+  passes at the declared floor.
 - **LT-1606 — Core-only CI job.** Builds a minimal app against `LaughTale.Core` +
   `@laughtale/islands` alone, asserts it hydrates, and holds the bundle under 20 KB gz.
   This is what stops the opt-in boundary (§2.5) rotting.
@@ -618,12 +673,17 @@ wired up.
 | LT-1504 | Culture flow to client | P1 | done |
 | LT-1505 | `IStringLocalizer` strings | P1 | done |
 | LT-1506 | Progressive enhancement baseline | P1 | done |
+| LT-1507 | Cached pages must not leak per-user props | P0 | todo |
+| LT-1508 | Server-side data contract | P1 | todo |
 | LT-1601 | CI | P0 | done |
 | LT-1602 | Enforce bundle budget | P1 | done |
 | LT-1603 | Correct the size claims | P1 | done |
 | LT-1604 | Build-emitted README numbers | P2 | done |
 | LT-1605 | Public API lock | P2 | done |
 | LT-1606 | Core-only CI job | P1 | todo |
+| LT-1607 | Real browser tests (Playwright) | P1 | todo |
+| LT-1608 | Component API consistency audit | P1 | todo |
+| LT-1609 | Browser support floor | P1 | todo |
 | LT-1701 | Vue adapter | P2 | done |
 | LT-1702 | React adapter | P2 | done |
 | LT-1703 | Svelte adapter | P2 | done |
