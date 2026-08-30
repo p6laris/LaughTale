@@ -682,8 +682,8 @@ wired up.
 | LT-1605 | Public API lock | P2 | done |
 | LT-1606 | Core-only CI job | P1 | done |
 | LT-1607 | Real browser tests (Playwright) | P1 | done |
-| LT-1608 | Component API consistency audit | P1 | todo |
-| LT-1609 | Browser support floor | P1 | todo |
+| LT-1608 | Component API consistency audit | P1 | done |
+| LT-1609 | Browser support floor | P1 | done |
 | LT-1701 | Vue adapter | P2 | done |
 | LT-1702 | React adapter | P2 | done |
 | LT-1703 | Svelte adapter | P2 | done |
@@ -711,8 +711,8 @@ wired up.
 | LT-2104 | Docs | P2 | done |
 | LT-2105 | Error boundaries | P2 | done |
 | LT-2106 | Tailwind preset | P3 | done |
-| LT-2107 | Split npm packages | P1 | todo |
-| LT-2108 | Split NuGet packages | P1 | todo |
+| LT-2107 | Split npm packages | P1 | done |
+| LT-2108 | Split NuGet packages | P1 | done |
 | LT-2201 | Server island render endpoint | P2 | done |
 | LT-2202 | Client `refresh()` with morphing | P2 | done |
 | LT-2203 | Refresh auth + antiforgery | P1 | done |

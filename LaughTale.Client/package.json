@@ -19,7 +19,18 @@
       "import": "./dist/runtime.mjs",
       "types": "./dist/runtime.d.ts",
       "default": "./dist/runtime.js"
-    }
+    },
+    "./islands": {
+      "import": "./dist/runtime.mjs",
+      "types": "./dist/runtime.d.ts",
+      "default": "./dist/runtime.js"
+    },
+    "./adapters/react": "./dist/adapters/react.js",
+    "./adapters/vue": "./dist/adapters/vue.js",
+    "./adapters/svelte": "./dist/adapters/svelte.js",
+    "./adapters/preact": "./dist/adapters/preact.js",
+    "./adapters/vanilla": "./dist/adapters/vanilla.js",
+    "./tailwind": "./dist/styles/tailwind.preset.js"
   },
   "scripts": {
     "build": "npm run typecheck && node esbuild.config.mjs --prod",
