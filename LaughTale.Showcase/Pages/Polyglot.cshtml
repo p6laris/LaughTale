@@ -28,40 +28,22 @@
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
 
     <!-- 1. REACT 19 ISLAND -->
-    <div>
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
-            <span style="font-weight: 700; font-size: 0.875rem; color: var(--p-text-color);">1. React 19 (Sales Emitter)</span>
-            <span class="aura-tag tag-sky text-xs">hydrate="Load"</span>
-        </div>
-        <island name="polyglot-react" 
-                framework="React" 
-                props="@(new { Title = "React 19 Telemetry", InitialScore = 1500, Badge = "Live Emitter" })" 
-                hydrate="Load" />
-    </div>
+    <island name="polyglot-react" 
+            framework="React" 
+            props="@(new { Title = "React 19 Telemetry", InitialScore = 1500, Badge = "Live Emitter" })" 
+            hydrate="Load" />
 
     <!-- 2. VUE 3 ISLAND -->
-    <div>
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
-            <span style="font-weight: 700; font-size: 0.875rem; color: var(--p-text-color);">2. Vue 3 (Inventory Listener)</span>
-            <span class="aura-tag tag-emerald text-xs">hydrate="Load"</span>
-        </div>
-        <island name="polyglot-vue" 
-                framework="Vue" 
-                props="@(new { Warehouse = "Erbil Central Logistics", InitialStock = 45 })" 
-                hydrate="Load" />
-    </div>
+    <island name="polyglot-vue" 
+            framework="Vue" 
+            props="@(new { Warehouse = "Erbil Central Logistics", InitialStock = 45 })" 
+            hydrate="Load" />
 
     <!-- 3. SVELTE 5 ISLAND -->
-    <div>
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
-            <span style="font-weight: 700; font-size: 0.875rem; color: var(--p-text-color);">3. Svelte 5 (CPU Dial)</span>
-            <span class="aura-tag tag-amber text-xs">hydrate="Load"</span>
-        </div>
-        <island name="polyglot-svelte" 
-                framework="Svelte" 
-                props="@(new { GaugeTitle = "Cluster Node 01", InitialLoad = 40 })" 
-                hydrate="Load" />
-    </div>
+    <island name="polyglot-svelte" 
+            framework="Svelte" 
+            props="@(new { GaugeTitle = "Cluster Node 01", InitialLoad = 40 })" 
+            hydrate="Load" />
 
 </div>
 
@@ -69,27 +51,15 @@
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.5rem;">
 
     <!-- 4. PREACT ISLAND -->
-    <div>
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
-            <span style="font-weight: 700; font-size: 0.875rem; color: var(--p-text-color);">4. Preact (3KB Mini Sparkline)</span>
-            <span class="aura-tag tag-indigo text-xs">hydrate="Visible"</span>
-        </div>
-        <island name="polyglot-preact" 
-                framework="Preact" 
-                props="@(new { MetricName = "Transactions per Second" })" 
-                hydrate="Visible" />
-    </div>
+    <island name="polyglot-preact" 
+            framework="Preact" 
+            props="@(new { MetricName = "Transactions per Second" })" 
+            hydrate="Visible" />
 
     <!-- 5. VANILLA TS ISLAND -->
-    <div>
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
-            <span style="font-weight: 700; font-size: 0.875rem; color: var(--p-text-color);">5. Vanilla TS (Audit Ledger)</span>
-            <span class="aura-tag tag-slate text-xs">hydrate="Load"</span>
-        </div>
-        <island name="polyglot-vanilla" 
-                framework="Vanilla" 
-                props="@(new { LogTitle = "Inter-Island Event Ledger" })" 
-                hydrate="Load" />
-    </div>
+    <island name="polyglot-vanilla" 
+            framework="Vanilla" 
+            props="@(new { LogTitle = "Inter-Island Event Ledger" })" 
+            hydrate="Load" />
 
 </div>
