@@ -578,7 +578,8 @@ Standardize events on `laughtale:<component>:<event>` (`bubbles: true`, `detail`
 ---
 
 ### `LT-705` — No compression or caching guidance
-**Severity:** P3 · **Status:** todo
+**Severity:** P3 · **Status:** done
+
 
 **Fix.** Document (and wire into the Showcase) Brotli precompression, immutable cache headers for hashed chunks, `<link rel=modulepreload>` for above-the-fold islands, and HTTP/2 push-free preload hints.
 
