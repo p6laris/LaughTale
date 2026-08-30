@@ -67,8 +67,12 @@
     <!-- Global Theme Studio Island Drawer -->
     <island-theme-studio />
 
-    <!-- Global Command Palette Island for Instant Search -->
-    <island-command placeholder="Type a command or search documentation..." />
+    <!-- Global Command Palette Spotlight Modal (Hidden by Default) -->
+    <div id="command-palette-backdrop" class="command-palette-backdrop" style="display: none;">
+        <div class="command-palette-modal" onclick="event.stopPropagation()">
+            <island-command placeholder="Type a command or search documentation..." />
+        </div>
+    </div>
 
     <!-- Main 3-Column Docs Layout -->
     <div class="docs-layout">
@@ -92,65 +96,6 @@
 
     <!-- Client Islands Engine Bundle -->
     <script type="module" src="~/js/main.js"></script>
-
-    <!-- Active Navigation, Code Copying & ScrollSpy Script -->
-    <script>
-        function setupDocsEnhancements() {
-            // 1. Keyboard Shortcut (Ctrl+K / Cmd+K) for Command Palette
-            document.addEventListener('keydown', (e) => {
-                if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-                    e.preventDefault();
-                    document.dispatchEvent(new CustomEvent('command-palette:open'));
-                }
-            });
-
-            // 2. Add One-Click Copy Buttons to all Markdown Pre/Code Blocks
-            document.querySelectorAll('.laughtale-markdown-content pre').forEach((pre) => {
-                if (pre.querySelector('.copy-btn')) return;
-                
-                const btn = document.createElement('button');
-                btn.className = 'copy-btn p-button p-button-secondary p-button-sm';
-                btn.type = 'button';
-                btn.innerText = 'Copy';
-                btn.style.position = 'absolute';
-                btn.style.top = '0.5rem';
-                btn.style.right = '0.5rem';
-                btn.style.fontSize = '0.75rem';
-                btn.style.padding = '0.2rem 0.5rem';
-
-                btn.addEventListener('click', async () => {
-                    const code = pre.querySelector('code')?.innerText || pre.innerText;
-                    await navigator.clipboard.writeText(code);
-                    btn.innerText = 'Copied!';
-                    setTimeout(() => { btn.innerText = 'Copy'; }, 2000);
-                });
-
-                pre.style.position = 'relative';
-                pre.appendChild(btn);
-            });
-
-            // 3. TOC ScrollSpy Observer
-            const headings = document.querySelectorAll('.laughtale-markdown-content h2, .laughtale-markdown-content h3');
-            const tocLinks = document.querySelectorAll('.toc-link');
-            
-            if (headings.length > 0 && tocLinks.length > 0) {
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            const id = entry.target.getAttribute('id');
-                            tocLinks.forEach(l => {
-                                l.classList.toggle('active', l.getAttribute('href') === `#${id}`);
-                            });
-                        }
-                    });
-                }, { rootMargin: '0px 0px -70% 0px' });
-
-                headings.forEach(h => observer.observe(h));
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', setupDocsEnhancements);
-        window.addEventListener('island:page-loaded', setupDocsEnhancements);
-    </script>
+    <script src="~/js/docs-enhancer.js" asp-append-version="true"></script>
 </body>
 </html>
