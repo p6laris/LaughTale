@@ -308,15 +308,6 @@ public class IslandGenerator : IIncrementalGenerator
         sb.AppendLine("        }");
         sb.AppendLine("    }");
         sb.AppendLine("}");
-        sb.AppendLine();
-        sb.AppendLine("// ── AOT-Compatible JsonSerializerContext (LT-1204) ──────────────────────");
-        sb.AppendLine("[System.Text.Json.Serialization.JsonSourceGenerationOptions(");
-        sb.AppendLine("    PropertyNamingPolicy = System.Text.Json.Serialization.JsonKnownNamingPolicy.CamelCase,");
-        sb.AppendLine("    DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]");
-        sb.AppendLine($"[System.Text.Json.Serialization.JsonSerializable(typeof({model.TypeName}))]");
-        sb.AppendLine($"internal partial class {model.TypeName}JsonSerializerContext : System.Text.Json.Serialization.JsonSerializerContext");
-        sb.AppendLine("{");
-        sb.AppendLine("}");
 
         return sb.ToString();
     }

@@ -10,6 +10,7 @@
     <AssemblyName>LaughTale.Generators</AssemblyName>
     <RootNamespace>LaughTale.Generators</RootNamespace>
     <Description>Roslyn source generators for LaughTale Islands Architecture</Description>
+    <NoWarn>$(NoWarn);RS2008</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
