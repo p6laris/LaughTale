@@ -1,0 +1,183 @@
+﻿/**
+ * LaughTale: Tri-State Hydration & Shared IntersectionObserver Tests (LT-205, LT-206)
+ */
+
+import './setup.ts';
+import { describe, it, beforeEach } from 'node:test';
+import assert from 'node:assert/strict';
+
+import { defineIsland } from '../src/runtime/registry.ts';
+import { hydrateIsland, retryIsland, getIslandState } from '../src/runtime/hydrator.ts';
+
+describe('Hydrator Tri-State & Shared Viewport Observer Suite (LT-205, LT-206)', () => {
+
+    beforeEach(() => {
+        document.body.innerHTML = '';
+    });
+
+    it('hydrateIsland: transitions from idle to pending to mounted on success', async () => {
+        let mounted = false;
+        defineIsland('success-widget', () => Promise.resolve({
+            default: (el: HTMLElement) => {
+                mounted = true;
+            }
+        }));
+
+        const container = document.createElement('div');
+        container.setAttribute('data-island', 'success-widget');
+        container.setAttribute('data-hydrate', 'load');
+        document.body.appendChild(container);
+
+        assert.equal(getIslandState(container), 'idle');
+
+        hydrateIsland(container);
+        await new Promise(r => setTimeout(r, 20));
+
+        assert.equal(mounted, true);
+        assert.equal(getIslandState(container), 'mounted');
+    });
+
+    it('hydrateIsland: transitions to failed and dispatches exactly one laughtale:hydration-error on mount throw', async () => {
+        let errorEventsCount = 0;
+        let caughtError: any = null;
+
+        defineIsland('failing-widget', () => Promise.resolve({
+            default: () => {
+                throw new Error('Mount runtime explosion!');
+            }
+        }));
+
+        const container = document.createElement('div');
+        container.setAttribute('data-island', 'failing-widget');
+        container.setAttribute('data-hydrate', 'load');
+        container.addEventListener('laughtale:hydration-error', (e: any) => {
+            errorEventsCount++;
+            caughtError = e.detail?.error;
+        });
+        document.body.appendChild(container);
+
+        hydrateIsland(container);
+        await new Promise(r => setTimeout(r, 20));
+
+        assert.equal(getIslandState(container), 'failed');
+        assert.equal(errorEventsCount, 1, 'Expected exactly one hydration error event');
+        assert.ok(caughtError?.message.includes('Mount runtime explosion!'));
+
+        // Triggering hydrateIsland again should do nothing because it's locked in failed state
+        hydrateIsland(container);
+        await new Promise(r => setTimeout(r, 20));
+        assert.equal(errorEventsCount, 1, 'Hydration error event was triggered multiple times on failed island');
+    });
+
+    it('hydrateIsland: ignores concurrent interaction events while pending', async () => {
+        let loaderInvocationCount = 0;
+
+        defineIsland('slow-widget', () => {
+            loaderInvocationCount++;
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    resolve({
+                        default: (el: HTMLElement) => {}
+                    });
+                }, 50);
+            });
+        });
+
+        const container = document.createElement('div');
+        container.setAttribute('data-island', 'slow-widget');
+        container.setAttribute('data-hydrate', 'interaction');
+        document.body.appendChild(container);
+
+        hydrateIsland(container); // Attaches interaction listeners
+
+        // Fire multiple interaction events rapidly
+        container.dispatchEvent(new Event('mouseenter'));
+        container.dispatchEvent(new Event('focusin'));
+        container.dispatchEvent(new Event('click'));
+
+        await new Promise(r => setTimeout(r, 80));
+
+        assert.equal(loaderInvocationCount, 1, 'Loader was invoked multiple times concurrently');
+        assert.equal(getIslandState(container), 'mounted');
+    });
+
+    it('retryIsland: resets failed state and re-attempts hydration to success', async () => {
+        let shouldFail = true;
+        let mountCount = 0;
+
+        defineIsland('retryable-widget', () => Promise.resolve({
+            default: () => {
+                if (shouldFail) {
+                    throw new Error('First attempt fail');
+                }
+                mountCount++;
+            }
+        }));
+
+        const container = document.createElement('div');
+        container.setAttribute('data-island', 'retryable-widget');
+        container.setAttribute('data-hydrate', 'load');
+        document.body.appendChild(container);
+
+        hydrateIsland(container);
+        await new Promise(r => setTimeout(r, 20));
+
+        assert.equal(getIslandState(container), 'failed');
+        assert.equal(mountCount, 0);
+
+        // Fix failure condition and retry
+        shouldFail = false;
+        await retryIsland(container);
+        await new Promise(r => setTimeout(r, 20));
+
+        assert.equal(getIslandState(container), 'mounted');
+        assert.equal(mountCount, 1, 'Island was not mounted after retry');
+    });
+
+    it('hydrateVisible: 100 visible-strategy islands share exactly 1 IntersectionObserver instance (LT-206)', () => {
+        let observerInstancesCreated = 0;
+        let totalObservedElements = 0;
+        let totalUnobservedElements = 0;
+
+        const originalObserver = globalThis.IntersectionObserver;
+        class MockIntersectionObserver {
+            constructor(public callback: any, public options: any) {
+                observerInstancesCreated++;
+            }
+            observe(target: Element) {
+                totalObservedElements++;
+            }
+            unobserve(target: Element) {
+                totalUnobservedElements++;
+            }
+            disconnect() {}
+        }
+        (globalThis as any).IntersectionObserver = MockIntersectionObserver;
+
+        try {
+            const islands: HTMLElement[] = [];
+            for (let i = 0; i < 100; i++) {
+                defineIsland(`visible-card-${i}`, () => Promise.resolve({ default: () => {} }));
+                const el = document.createElement('div');
+                el.setAttribute('data-island', `visible-card-${i}`);
+                el.setAttribute('data-hydrate', 'visible');
+                document.body.appendChild(el);
+                islands.push(el);
+                hydrateIsland(el);
+            }
+
+            assert.equal(observerInstancesCreated, 1, 'Expected exactly 1 shared IntersectionObserver instance for 100 islands');
+            assert.equal(totalObservedElements, 100, 'Expected 100 elements to be observed');
+
+            // Trigger unmount on 20 islands
+            for (let i = 0; i < 20; i++) {
+                islands[i].dispatchEvent(new CustomEvent('laughtale:unmount'));
+            }
+
+            assert.equal(totalUnobservedElements, 20, 'Expected 20 elements to be unobserved on unmount');
+        } finally {
+            globalThis.IntersectionObserver = originalObserver;
+        }
+    });
+
+});

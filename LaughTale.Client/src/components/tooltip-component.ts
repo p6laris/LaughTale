@@ -1,0 +1,37 @@
+﻿/**
+ * LaughTale: Enterprise Tooltip Island Component (PrimeVue 4 Aura Design System compliant)
+ */
+
+import { initGlobalTooltipDelegation } from '../directives/tooltip';
+
+export interface TooltipProps {
+    value?: string;
+    text?: string;
+    target?: string;
+    position?: 'top' | 'bottom' | 'left' | 'right';
+    showDelay?: number;
+    hideDelay?: number;
+    event?: 'hover' | 'focus' | 'both';
+    autoHide?: boolean;
+    escape?: boolean;
+}
+
+export default function TooltipIsland(container: HTMLElement, props: TooltipProps) {
+    initGlobalTooltipDelegation();
+
+    const targetSelector = props.target;
+    const tooltipText = props.value || props.text || container.textContent?.trim();
+
+    if (targetSelector && tooltipText) {
+        const targetEl = document.querySelector<HTMLElement>(targetSelector);
+        if (targetEl) {
+            targetEl.setAttribute('p-tooltip', tooltipText);
+            if (props.position) targetEl.setAttribute('p-tooltip-position', props.position);
+            if (props.showDelay !== undefined) targetEl.setAttribute('p-tooltip-show-delay', props.showDelay.toString());
+            if (props.hideDelay !== undefined) targetEl.setAttribute('p-tooltip-hide-delay', props.hideDelay.toString());
+            if (props.event) targetEl.setAttribute('p-tooltip-event', props.event);
+            if (props.autoHide !== undefined) targetEl.setAttribute('p-tooltip-auto-hide', props.autoHide.toString());
+            if (props.escape !== undefined) targetEl.setAttribute('p-tooltip-escape', props.escape.toString());
+        }
+    }
+}

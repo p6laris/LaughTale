@@ -1,6 +1,6 @@
-# 🏴‍☠️ SoftMax.LaughTale: Spec-Driven Development Roadmap (Branch: `comp`)
+﻿# 🏴‍☠️ LaughTale: Spec-Driven Development Roadmap (Branch: `comp`)
 
-This document serves as the master tracking board for the step-driven evolution of **SoftMax.LaughTale** into a production-grade Islands Architecture framework for .NET 10 & TypeScript.
+This document serves as the master tracking board for the step-driven evolution of **LaughTale** into a production-grade Islands Architecture framework for .NET 10 & TypeScript.
 
 ---
 
@@ -14,9 +14,9 @@ This document serves as the master tracking board for the step-driven evolution 
 | **Phase 4** | **HTML Streaming SSR Support** | 🟢 Completed | [Spec 4](#spec-4-html-streaming-ssr-support) |
 | **Phase 5** | **Preact / React Multi-Framework Adapter** | 🟢 Completed | [Spec 5](#spec-5-multi-framework-adapters) |
 | **Phase 6** | **Markdig Markdown & Content Collections** | 🟢 Completed | [Spec 6](#spec-6-markdig-markdown--content-collections) |
-| **Phase 7** | **Dedicated Documentation Portal (`SoftMax.LaughTale.Docs`)** | 🟢 Completed | [Spec 7](#spec-7-dedicated-docs-portal) |
+| **Phase 7** | **Dedicated Documentation Portal (`LaughTale.Docs`)** | 🟢 Completed | [Spec 7](#spec-7-dedicated-docs-portal) |
 | **Phase 8** | **Rich Declarative Directives Engine (`l-*`)** | 🟢 Completed | [Spec 8](#spec-8-rich-declarative-directives-engine) |
-| **Phase 9** | **Real Enterprise Components Library (`SoftMax.LaughTale.Components`)** | 🟢 Completed | [Spec 9](#spec-9-real-enterprise-components-library) |
+| **Phase 9** | **Real Enterprise Components Library (`LaughTale.Components`)** | 🟢 Completed | [Spec 9](#spec-9-real-enterprise-components-library) |
 | **Phase 10**| **Interactive Docs & Showcase for Enterprise Components** | 🟢 Completed | [Spec 10](#spec-10-docs--showcase-integration) |
 
 ---
@@ -41,12 +41,12 @@ This document serves as the master tracking board for the step-driven evolution 
   - `l-copy` / `l-feedback`: Clipboard copy utility with temporary feedback text.
   - `l-emit` / `l-listen`: Inter-directive event bus.
   - `LaughTaleDirectiveTagHelper.cs`: C# Razor TagHelper providing IDE Intellisense and validation in Visual Studio / Rider.
-* **Status**: ✅ Verified (`SoftMax.LaughTale.Client/src/directives/`, `LaughTaleDirectiveTagHelper.cs`)
+* **Status**: ✅ Verified (`LaughTale.Client/src/directives/`, `LaughTaleDirectiveTagHelper.cs`)
 
 ---
 
-### Spec 9: Real Enterprise Components Library (`SoftMax.LaughTale.Components`)
-* **Goal**: A dedicated library `SoftMax.LaughTale.Components` providing pre-built, production-ready enterprise UI TagHelpers for C# Razor:
+### Spec 9: Real Enterprise Components Library (`LaughTale.Components`)
+* **Goal**: A dedicated library `LaughTale.Components` providing pre-built, production-ready enterprise UI TagHelpers for C# Razor:
   - `<island-stepper ... />`: Multi-step form wizard with validation, linear/non-linear mode, and C# step slots.
   - `<island-timeline ... />`: Interactive event and audit log timeline with expandable detail cards.
   - `<island-camera ... />`: Live WebRTC webcam/mobile camera stream with face framing and snapshot capture.
@@ -55,12 +55,12 @@ This document serves as the master tracking board for the step-driven evolution 
   - `<island-datagrid ... />`: Filterable data table with multi-column sorting and pagination.
   - `<island-modal ... />`: Animated server-slot dialog with backdrop blur and ESC dismiss.
   - `<island-toast ... />`: Toast notifications container and dispatcher.
-* **Status**: ✅ Verified (`SoftMax.LaughTale.Components`)
+* **Status**: ✅ Verified (`LaughTale.Components`)
 
 ---
 
 ### Spec 10: Docs & Showcase Integration
 * **Goal**: Live testing and interactive documentation across both web portals:
-  - `SoftMax.LaughTale.Docs` (`http://localhost:5001`): New guides in `06-declarative-directives.md` and `07-enterprise-components.md`.
-  - `SoftMax.LaughTale.Showcase` (`http://localhost:5000`): Live interactive `/enterprise` page.
+  - `LaughTale.Docs` (`http://localhost:5001`): New guides in `06-declarative-directives.md` and `07-enterprise-components.md`.
+  - `LaughTale.Showcase` (`http://localhost:5000`): Live interactive `/enterprise` page.
 * **Status**: ✅ Verified & Running live

@@ -1,0 +1,9 @@
+<Solution>
+  <Project Path="LaughTale.Core/LaughTale.Core.csproj" />
+  <Project Path="LaughTale.Generators/LaughTale.Generators.csproj" />
+  <Project Path="LaughTale.Components/LaughTale.Components.csproj" />
+  <Project Path="LaughTale.Markdown/LaughTale.Markdown.csproj" />
+  <Project Path="LaughTale.Showcase/LaughTale.Showcase.csproj" />
+  <Project Path="LaughTale.Docs/LaughTale.Docs.csproj" />
+  <Project Path="LaughTale.Tests/LaughTale.Tests.csproj" />
+</Solution>

@@ -1,0 +1,26 @@
+﻿@namespace LaughTale.Markdown.Components
+@using Microsoft.AspNetCore.Components
+
+<div class="laughtale-markdown-content @Class" style="@Style">
+    @if (Html != null)
+    {
+        @((MarkupString)Html)
+    }
+</div>
+
+@code {
+    /// <summary>
+    /// The pre-rendered HTML content string containing embedded island tags.
+    /// </summary>
+    [Parameter] public string? Html { get; set; }
+
+    /// <summary>
+    /// Optional CSS class for markdown container.
+    /// </summary>
+    [Parameter] public string? Class { get; set; }
+
+    /// <summary>
+    /// Optional inline styling.
+    /// </summary>
+    [Parameter] public string? Style { get; set; }
+}

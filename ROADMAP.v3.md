@@ -1,4 +1,4 @@
-# SoftMax.LaughTale — Production Readiness Roadmap (v3)
+# LaughTale — Production Readiness Roadmap (v3)
 
 > **Status of this document:** This is the *canonical, machine-editable* work plan.
 > `ROADMAP.md` tracks what was **built**; this file tracks what must be **fixed, hardened, and unified** before v3.0 can be called production-grade.
@@ -62,7 +62,7 @@ Two claims in `README.md` are also materially false and should be corrected befo
 ## 3. LT-1xx — Security (P0/P1)
 
 ### `LT-101` — Directive expression sandbox is escapable
-**Severity:** P0 · **Status:** done · **Files:** `SoftMax.LaughTale.Client/src/directives/security.ts`, `src/directives/reactivity.ts:53-97`
+**Severity:** P0 · **Status:** done · **Files:** `LaughTale.Client/src/directives/security.ts`, `src/directives/reactivity.ts:53-97`
 **Resolution:** Replaced `new Function` with AST lexer, recursive-descent parser, and tree-walking interpreter in `src/directives/expression/`. All 46 escape vector tests in `tests/expression-sandbox.test.ts` pass, and `grep` confirms 0 instances of `new Function` or `eval` in `src/directives/`.
 
 **Evidence.** `evaluateExpression` builds `new Function('state','window','document','location','cookie', ..., 'with(state){ return (expr); }')` and passes `undefined` for the shadowed globals. `createSandboxState` adds a `has` trap returning `false` for blocked names. Under `with`, a `has` trap returning `false` means the identifier **falls through to the enclosing scope** rather than being blocked. Only the five explicitly shadowed parameters are neutralized. Working escapes from any `l-bind` / `l-on` expression:
@@ -122,7 +122,7 @@ const fn = new Function('item', item.command);   // item comes from data-props, 
 ---
 
 ### `LT-104` — Framework is incompatible with a strict CSP
-**Severity:** P0 · **Status:** done · **Files:** `SoftMax.LaughTale.Core/Security/*`, `src/directives/csp.ts`, `src/runtime/styles.ts`
+**Severity:** P0 · **Status:** done · **Files:** `LaughTale.Core/Security/*`, `src/directives/csp.ts`, `src/runtime/styles.ts`
 **Resolution:** Implemented `LaughTaleCspMiddleware`, `LaughTaleCspOptions`, `ICspNonceProvider`, and `UseLaughTaleCsp` extension in .NET Core. Implemented multi-tier nonce discovery and automatic nonce stamping on dynamically injected `<style>` tags in the TypeScript client runtime. Verified 100% pass across .NET and TypeScript test suites.
 
 **Evidence.** Four `new Function` sites plus 170 `innerHTML` assignments mean the framework requires `script-src 'unsafe-eval'`, which is disqualifying for most enterprise buyers — the exact audience "Enterprise Components" targets.
@@ -134,7 +134,7 @@ const fn = new Function('item', item.command);   // item comes from data-props, 
 ---
 
 ### `LT-105` — Prop serialization is an unbounded data-exfiltration surface
-**Severity:** P1 · **Status:** done · **Files:** `SoftMax.LaughTale.Core/Serialization/IslandJson.cs`, `SoftMax.LaughTale.Core/Attributes/IslandIgnoreAttribute.cs`, `SoftMax.LaughTale.Generators/IslandGenerator.cs`
+**Severity:** P1 · **Status:** done · **Files:** `LaughTale.Core/Serialization/IslandJson.cs`, `LaughTale.Core/Attributes/IslandIgnoreAttribute.cs`, `LaughTale.Generators/IslandGenerator.cs`
 **Resolution:** Configured `MaxDepth = 8` and `ReferenceHandler.IgnoreCycles` in `IslandJson.Options` with custom `IslandSerializationException`. Added `[IslandIgnore]` attribute to declaratively exclude properties from client-side serialization. Added compile-time Roslyn diagnostic `SMI004` (Error) flagging unignored sensitive credential properties on `[Island]` contracts. Verified with xUnit test suite (5/5 passed).
 
 **Evidence.** `SerializeProps` serializes **whatever object it is handed**, in full, into a `data-props` attribute in public HTML. `JavaScriptEncoder.Default` correctly prevents *injection*, but nothing prevents *over-disclosure*: pass an EF entity and its navigation properties, `PasswordHash`, and internal IDs ship to the browser. There is no `MaxDepth`, no `ReferenceHandler`, so a cyclic graph throws mid-render (500 on a rendered page, hard to diagnose).
@@ -150,7 +150,7 @@ const fn = new Function('item', item.command);   // item comes from data-props, 
 ---
 
 ### `LT-106` — `sanitizeUrl` blocks all `data:` URIs and misses obfuscation
-**Severity:** P2 · **Status:** done · **File:** `SoftMax.LaughTale.Client/src/directives/security.ts`
+**Severity:** P2 · **Status:** done · **File:** `LaughTale.Client/src/directives/security.ts`
 **Resolution:** Re-engineered `sanitizeUrl` to strip control characters and perform WHATWG URL parsing with protocol allowlists (`http`, `https`, `mailto`, `tel`, `blob`, relative paths). Allowed legitimate raster image `data:` URIs (`image/png`, `image/jpeg`, `image/webp`, `image/gif`) and blocked obfuscated/dangerous script protocols with `'about:blank'`. Added 25-form test matrix in `tests/security.test.ts` (35/35 passed).
 
 **Evidence.** `DANGEROUS_PROTOCOLS = /^\s*(javascript|data|vbscript):/i` rejects legitimate `data:image/png;base64,…` (breaking avatars, icons, and the Studio's own export preview) while still missing entity-encoded and control-char-split forms (`java&#09;script:`, `java\x00script:`).
@@ -162,7 +162,7 @@ const fn = new Function('item', item.command);   // item comes from data-props, 
 ---
 
 ### `LT-107` — Router trusts and injects a full HTML response
-**Severity:** P1 · **Status:** done · **File:** `SoftMax.LaughTale.Client/src/runtime/router.ts`
+**Severity:** P1 · **Status:** done · **File:** `LaughTale.Client/src/runtime/router.ts`
 **Resolution:** Hardened `navigateTo` in `router.ts` to verify final URL origin (`new URL(response.url).origin === window.location.origin`) and fall back to full browser navigation on cross-origin redirects, dispatched `laughtale:unmount` to active unpersisted islands before DOM morphing, and safely re-executed new page scripts stamped with the CSP nonce via `applyNonceToScript`. Added unit test suite in `tests/router.test.ts` (3/3 passed).
 
 **Evidence.** `document.body.innerHTML = newDoc.body.innerHTML` on a fetched response. Same-origin is checked on the *link*, but not on the *final* response after redirects — an open redirect on the app turns into full-page content injection. Inline `<script>` in the new body silently does not execute (a correctness bug), while `<img onerror>` does.
@@ -176,7 +176,7 @@ const fn = new Function('item', item.command);   // item comes from data-props, 
 ## 4. LT-2xx — Lifecycle, memory & correctness (P0/P1)
 
 ### `LT-201` — No unmount lifecycle: every navigation leaks
-**Severity:** P0 · **Status:** done · **Files:** `SoftMax.LaughTale.Client/src/runtime/scope.ts`, `src/runtime/router.ts`, `src/runtime/hydrator.ts`
+**Severity:** P0 · **Status:** done · **Files:** `LaughTale.Client/src/runtime/scope.ts`, `src/runtime/router.ts`, `src/runtime/hydrator.ts`
 **Resolution:** Created `createScope()` and `IslandScope` in `src/runtime/scope.ts` managing LIFO teardowns of event listeners, observers, timers, and custom callbacks with error isolation and idempotency. Exported `createScope` from `src/index.ts`. Router dispatches `laughtale:unmount` to active unpersisted islands before DOM morphing. Added unit test suite in `tests/scope.test.ts` (6/6 passed).
 
 **Evidence.** The hydrator already supports it — `hydrator.ts:77` wires `laughtale:unmount` if `mount()` returns a function — but **zero components return one**. Across the component tree there are 436 `addEventListener` calls and 7 `removeEventListener` calls; 26 files attach listeners to `document`/`window`, which outlive the element entirely. The router then discards the DOM via `innerHTML` **without ever dispatching `laughtale:unmount`**, so even a compliant component would never be told to clean up. Result: navigate the showcase 50 times and you accumulate thousands of live handlers, orphaned `IntersectionObserver`s, and running `setInterval`s.
@@ -208,7 +208,7 @@ Persistent islands must be *excluded* — they are moved, not destroyed.
 ---
 
 ### `LT-202` — Router swaps `<body>` but never `<head>`
-**Severity:** P1 · **Status:** done · **File:** `SoftMax.LaughTale.Client/src/runtime/router.ts`
+**Severity:** P1 · **Status:** done · **File:** `LaughTale.Client/src/runtime/router.ts`
 **Resolution:** Implemented `reconcileHead` in `router.ts` with key-based diffing for `<meta>` tags (descriptions, OpenGraph, Twitter), `<link rel="canonical">`, and route `<link rel="stylesheet">` tags. Added stylesheet load synchronization with a 500ms fallback before transition completion to eliminate FOUC, while strictly preserving global viewport, charset, and CSP nonce tags. Unit tests verified in `tests/router.test.ts` (4/4 passed).
 
 **Evidence.** `updateDom` copies `document.title` and `newDoc.body.innerHTML` only. Consequences on every client-side navigation: page-specific `<link rel=stylesheet>` never loads (unstyled content), `<meta name=description>` / OpenGraph tags stay stale (**SEO and social previews are wrong for every route but the entry route**), canonical links are wrong, and `<script>` in head never runs.
@@ -220,7 +220,7 @@ Persistent islands must be *excluded* — they are moved, not destroyed.
 ---
 
 ### `LT-203` — View transition starts before content is ready
-**Severity:** P1 · **Status:** done · **File:** `SoftMax.LaughTale.Client/src/runtime/router.ts`
+**Severity:** P1 · **Status:** done · **File:** `LaughTale.Client/src/runtime/router.ts`
 **Resolution:** Implemented module-scoped `AbortController` cancellation to abort in-flight requests when rapid new navigations occur, eliminating out-of-order response race conditions. Handled `AbortError` gracefully without page reloads. Synchronized image decoding (`img.decode()`) with a 500ms safety timeout race before finishing DOM transitions. Unit tests verified in `tests/router.test.ts` (5/5 passed).
 
 **Evidence.** `startViewTransition(updateDom)` is called with the new HTML already fetched, but images and (post-`LT-202`) stylesheets in the new body have not loaded. The transition therefore snapshots a half-painted frame — visible flash on image-heavy pages.
@@ -232,7 +232,7 @@ Persistent islands must be *excluded* — they are moved, not destroyed.
 ---
 
 ### `LT-204` — `pushState` ordering and lost scroll restoration
-**Severity:** P2 · **Status:** done · **File:** `SoftMax.LaughTale.Client/src/runtime/router.ts`
+**Severity:** P2 · **Status:** done · **File:** `LaughTale.Client/src/runtime/router.ts`
 **Resolution:** Configured `history.scrollRestoration = 'manual'` during router initialization, recorded departure scroll coordinates `{ scrollX, scrollY }` via `history.replaceState` before navigations, and restored scroll coordinates seamlessly on `popstate` events while preserving `#hash` navigation and top-page resets on new link clicks. Unit tests verified in `tests/router.test.ts` (7/7 passed).
 
 **Evidence.** `pushState` runs *after* the DOM update, so if `updateDom` throws mid-way the URL and DOM disagree. `handlePopState` scrolls to top rather than restoring the previous scroll offset, so Back on a long list always loses the user's place.
@@ -244,7 +244,7 @@ Persistent islands must be *excluded* — they are moved, not destroyed.
 ---
 
 ### `LT-205` — Hydration error leaves the island in a retryable-but-broken state
-**Severity:** P1 · **Status:** done · **File:** `SoftMax.LaughTale.Client/src/runtime/hydrator.ts`
+**Severity:** P1 · **Status:** done · **File:** `LaughTale.Client/src/runtime/hydrator.ts`
 **Resolution:** Implemented a tri-state lifecycle (`'idle' | 'pending' | 'mounted' | 'failed'`) with synchronous entry gating to eliminate race conditions across concurrent interaction events. Locked failed islands in `'failed'` to prevent duplicate listener accumulation and runaway error loops, and exposed `retryIsland(container)` and `getIslandState(container)` in `src/index.ts`. Unit tests verified in `tests/hydrator.test.ts` (4/4 passed).
 
 **Evidence.** On error the catch block sets `HYDRATED_FLAG = false`. If `mount()` threw *after* attaching listeners or DOM, the partial state persists and the next trigger (a second `mouseenter` under the `interaction` strategy) mounts **again**, producing duplicate handlers. Compounded by the fact that `hydrateInteraction` registers with `{ once: true }` per event but four event types — hovering *then* clicking can enter `executeHydration` twice before the flag is set on a slow module load.
@@ -256,7 +256,7 @@ Persistent islands must be *excluded* — they are moved, not destroyed.
 ---
 
 ### `LT-206` — `IntersectionObserver` leaks for never-visible islands
-**Severity:** P2 · **Status:** done · **File:** `SoftMax.LaughTale.Client/src/runtime/hydrator.ts`
+**Severity:** P2 · **Status:** done · **File:** `LaughTale.Client/src/runtime/hydrator.ts`
 **Resolution:** Replaced per-island `IntersectionObserver` creation with a singleton shared `IntersectionObserver` keyed by a `WeakMap<Element, VisibleIslandMeta>`. Attached `laughtale:unmount` listeners to off-screen visible islands to cleanly detach them from the shared observer when navigating away. Unit tests verified in `tests/hydrator.test.ts` (5/5 passed).
 
 **Evidence.** `hydrateVisible` creates an observer per island and only disconnects on intersection. Islands below a footer the user never reaches keep observers alive forever; after `LT-201`'s router unmount they will be orphaned too. Children are observed at hydration time only, so children added later (streaming SSR) are missed.
@@ -268,7 +268,7 @@ Persistent islands must be *excluded* — they are moved, not destroyed.
 ---
 
 ### `LT-207` — `retry.ts` is typed and implemented for the wrong input
-**Severity:** P1 · **Status:** done · **File:** `SoftMax.LaughTale.Client/src/runtime/retry.ts`
+**Severity:** P1 · **Status:** done · **File:** `LaughTale.Client/src/runtime/retry.ts`
 **Resolution:** Refactored `importWithRetry` with type-safe `RetryOptions`, exponential backoff with full randomized jitter (`0.75x - 1.25x`), dynamic URL cache-busting, and root `Error` preservation upon retry exhaustion. Unit tests verified in `tests/retry.test.ts` (4/4 passed). Section 4 (LT-2xx Lifecycle & Memory) is now 100% complete!
 
 **Evidence.** Two live `tsc` errors: the function accepts `string | (() => Promise<T>)` but passes that union straight to `import(specifier)` and to `new URL(...)`. The registry supplies a **thunk**, so the string branch is dead code that would throw if ever reached, and cache-busting on retry (`?retry=n`) never actually happens for thunks — meaning a retry re-imports the identical failed module URL from the browser's module cache and **fails identically every time**. The advertised "network resilience" does not work.
@@ -293,7 +293,7 @@ Persistent islands must be *excluded* — they are moved, not destroyed.
 ---
 
 ### `LT-302` — Production bundle is 1.4 MB; the "sub-2 KB" claim is false
-**Severity:** P1 · **Status:** done · **File:** `SoftMax.LaughTale.Client/esbuild.config.mjs`, `package.json`
+**Severity:** P1 · **Status:** done · **File:** `LaughTale.Client/esbuild.config.mjs`, `package.json`
 
 **Evidence.** `dist/index.js` = **1,397,185 bytes**, `dist/index.mjs` = 1,360,051. Causes: (a) `"build": "node esbuild.config.mjs"` never passes `--prod`, so `minify` is always `false` and sourcemaps always ship; (b) the config uses `outfile` with no `splitting: true`, and the IIFE target **cannot** code-split — so all ~130 `defineIsland` dynamic imports are inlined into one file; (c) `src/index.ts` also `export *`s the composables, animations, design-tokens and models barrels, defeating tree-shaking for consumers. Meanwhile `Showcase/wwwroot/js` contains 98 properly-split chunks from a *different* pipeline — there are two competing build paths and the published package uses the wrong one.
 
@@ -356,7 +356,7 @@ Persistent islands must be *excluded* — they are moved, not destroyed.
 ## 6. LT-4xx — API design & unification (P2)
 
 ### `LT-401` — 114 TagHelpers in one 5,151-line file with copy-pasted attribute logic
-**Severity:** P2 · **Status:** done · **File:** `SoftMax.LaughTale.Components/TagHelpers/AuraComponentTagHelpers.cs`
+**Severity:** P2 · **Status:** done · **File:** `LaughTale.Components/TagHelpers/AuraComponentTagHelpers.cs`
 
 **Evidence.** One file, 114 `[HtmlTargetElement]` declarations. Each `Process` override hand-rolls the same camelCase/kebab-case fallback block:
 ```csharp
@@ -620,9 +620,10 @@ Standardize events on `laughtale:<component>:<event>` (`bubbles: true`, `detail`
 ## 11. LT-9xx — Production readiness & release (P1/P2)
 
 ### `LT-901` — Packaging and versioning
-**Severity:** P1 · **Status:** todo
+**Severity:** P1 · **Status:** done
 
-**Evidence.** `IsPackable`/`PackageId` is set on 5 projects (good), but `SoftMax.LaughTale.Tests` is among them (it should not be packable), and there is no release pipeline, no `CHANGELOG.md`, no `LICENSE` file at the repo root despite `package.json` declaring MIT.
+
+**Evidence.** `IsPackable`/`PackageId` is set on 5 projects (good), but `LaughTale.Tests` is among them (it should not be packable), and there is no release pipeline, no `CHANGELOG.md`, no `LICENSE` file at the repo root despite `package.json` declaring MIT.
 
 **Fix.** Mark test project `IsPackable=false`. Add `Directory.Build.props` centralizing version, authors, license, repo URL, symbol packages, and deterministic builds. Add `LICENSE`, `CHANGELOG.md` (Keep a Changelog), and a documented SemVer policy. Publish `@softmax/islands` to npm from CI. Ensure the Generators package ships as an analyzer (`analyzers/dotnet/cs`) and Core ships a `.props` wiring `@addTagHelper` automatically.
 

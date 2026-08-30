@@ -1,5 +1,5 @@
-# ==============================================================================
-# SoftMax.LaughTale: Master Launch Script (Inline Terminal Execution)
+﻿# ==============================================================================
+# LaughTale: Master Launch Script (Inline Terminal Execution)
 # ==============================================================================
 [CmdletBinding()]
 param(
@@ -13,23 +13,23 @@ param(
 $ErrorActionPreference = "Stop"
 
 Write-Host "==========================================================" -ForegroundColor Cyan
-Write-Host " [SoftMax.LaughTale] Modern Islands Architecture Runner" -ForegroundColor White
+Write-Host " [LaughTale] Modern Islands Architecture Runner" -ForegroundColor White
 Write-Host "==========================================================" -ForegroundColor Cyan
 
 # 1. Cleanly stop any existing instances
 Write-Host "`n[1/3] Stopping previously running instances..." -ForegroundColor Yellow
-Get-Process -Name "SoftMax.LaughTale.Showcase","SoftMax.LaughTale.Docs" -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+Get-Process -Name "LaughTale.Showcase","LaughTale.Docs" -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
 Start-Sleep -Milliseconds 400
 
 # 2. Optional build of client assets
 if ($Build) {
     Write-Host "`n[2/3] Compiling TypeScript & Islands bundles..." -ForegroundColor Yellow
     
-    Push-Location "SoftMax.LaughTale.Client"
+    Push-Location "LaughTale.Client"
     npm run build --silent
     Pop-Location
 
-    Push-Location "SoftMax.LaughTale.Showcase"
+    Push-Location "LaughTale.Showcase"
     npm run build --silent
     Pop-Location
 
@@ -44,20 +44,20 @@ Write-Host "`n[3/3] Launching application(s)..." -ForegroundColor Yellow
 if ($ShowcaseOnly) {
     Write-Host "Starting Enterprise Showcase inline at http://localhost:$ShowcasePort..." -ForegroundColor Green
     Write-Host "Press Ctrl+C to stop.`n" -ForegroundColor DarkGray
-    dotnet run --project SoftMax.LaughTale.Showcase/SoftMax.LaughTale.Showcase.csproj --urls "http://localhost:$ShowcasePort"
+    dotnet run --project LaughTale.Showcase/LaughTale.Showcase.csproj --urls "http://localhost:$ShowcasePort"
     exit
 }
 
 if ($DocsOnly) {
     Write-Host "Starting Documentation Portal inline at http://localhost:$DocsPort..." -ForegroundColor Green
     Write-Host "Press Ctrl+C to stop.`n" -ForegroundColor DarkGray
-    dotnet run --project SoftMax.LaughTale.Docs/SoftMax.LaughTale.Docs.csproj --urls "http://localhost:$DocsPort"
+    dotnet run --project LaughTale.Docs/LaughTale.Docs.csproj --urls "http://localhost:$DocsPort"
     exit
 }
 
 # Dual Service Mode: Docs in background hidden process, Showcase in foreground inline
 Write-Host "Launching Documentation Portal in background at http://localhost:$DocsPort..." -ForegroundColor Cyan
-$docsProcess = Start-Process -FilePath "dotnet" -ArgumentList "run --project SoftMax.LaughTale.Docs/SoftMax.LaughTale.Docs.csproj --urls http://localhost:$DocsPort" -WindowStyle Hidden -PassThru
+$docsProcess = Start-Process -FilePath "dotnet" -ArgumentList "run --project LaughTale.Docs/LaughTale.Docs.csproj --urls http://localhost:$DocsPort" -WindowStyle Hidden -PassThru
 
 Write-Host "Launching Enterprise Showcase in foreground at http://localhost:$ShowcasePort..." -ForegroundColor Green
 Write-Host ""
@@ -70,14 +70,14 @@ Write-Host "==========================================================" -Foregro
 Write-Host ""
 
 try {
-    dotnet run --project SoftMax.LaughTale.Showcase/SoftMax.LaughTale.Showcase.csproj --urls "http://localhost:$ShowcasePort"
+    dotnet run --project LaughTale.Showcase/LaughTale.Showcase.csproj --urls "http://localhost:$ShowcasePort"
 }
 finally {
     Write-Host "`nShutting down background services..." -ForegroundColor Yellow
     if ($docsProcess -and -not $docsProcess.HasExited) {
         Stop-Process -Id $docsProcess.Id -Force -ErrorAction SilentlyContinue
     }
-    Get-Process -Name "SoftMax.LaughTale.Showcase","SoftMax.LaughTale.Docs" -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+    Get-Process -Name "LaughTale.Showcase","LaughTale.Docs" -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
     Write-Host "All services stopped." -ForegroundColor Green
 }
 

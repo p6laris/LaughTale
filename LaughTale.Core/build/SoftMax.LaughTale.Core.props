@@ -1,0 +1,5 @@
+<Project>
+  <ItemGroup>
+    <RazorExtension Include="LaughTale.Core" />
+  </ItemGroup>
+</Project>
