@@ -361,7 +361,9 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
         updateToken('--p-surface-900', n.s900);
         updateToken('--p-surface-950', n.s950);
 
-        root.style.setProperty('--p-border-radius', currentRadius);
+        const root = typeof document !== 'undefined' ? document.documentElement : null;
+        if (root) {
+            root.style.setProperty('--p-border-radius', currentRadius);
         const radNum = parseFloat(currentRadius) || 0;
         root.style.setProperty('--p-border-radius-lg', currentRadius === '9999px' ? '9999px' : `${radNum * 1.5}rem`);
         root.style.setProperty('--p-border-radius-xl', currentRadius === '9999px' ? '9999px' : `${radNum * 2}rem`);
@@ -418,6 +420,7 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
             root.classList.toggle('dark', isSysDark);
             root.setAttribute('data-theme', isSysDark ? 'dark' : 'light');
         }
+    }
 
         saveTheme({
             primary: currentCustomHex || currentPrimary,

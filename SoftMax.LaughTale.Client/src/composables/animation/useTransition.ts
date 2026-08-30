@@ -13,6 +13,7 @@ export interface UseTransitionOptions {
     onEnterEnd?: () => void;
     onExitStart?: () => void;
     onExitEnd?: () => void;
+
 }
 
 export function useTransition(element: HTMLElement | null, options: UseTransitionOptions = {}) {

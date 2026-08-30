@@ -552,7 +552,8 @@ Standardize events on `laughtale:<component>:<event>` (`bubbles: true`, `detail`
 ---
 
 ### `LT-702` — No prefetching on the router
-**Severity:** P2 · **Status:** todo
+**Severity:** P2 · **Status:** done
+
 
 **Fix.** Prefetch on `mouseenter`/`touchstart` (150 ms intent delay) and for in-viewport links via the shared observer from `LT-206`; respect `navigator.connection.saveData` and `prefers-reduced-data`. Add an in-memory response cache with a short TTL, invalidated on non-GET.
 

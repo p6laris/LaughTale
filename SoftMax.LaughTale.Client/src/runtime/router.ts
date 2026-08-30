@@ -10,6 +10,7 @@
 import { initIslands } from './hydrator';
 import { initDirectives } from '../directives/index';
 import { applyNonceToScript } from '../directives/csp';
+import { prefetchManager } from '../router/prefetch';
 
 let isRouterActive = false;
 let inFlightController: AbortController | null = null;
@@ -32,6 +33,15 @@ export function enableViewTransitions(): void {
 
     document.addEventListener('click', handleLinkClick);
     window.addEventListener('popstate', handlePopState);
+    prefetchManager.observeViewportLinks(document);
+
+    // Attach intent-based prefetching for hover and touch
+    document.addEventListener('mouseover', (e) => {
+        const anchor = (e.target as HTMLElement)?.closest?.('a');
+        if (anchor && anchor.href) {
+            prefetchManager.attachHoverListener(anchor);
+        }
+    }, { passive: true });
 }
 
 async function handleLinkClick(e: MouseEvent) {
@@ -192,28 +202,37 @@ export async function navigateTo(
     }
 
     try {
-        const response = await fetch(urlStr, {
-            signal,
-            headers: {
-                'X-Requested-With': 'SoftMaxIslands-ViewTransition'
+        let finalUrl = new URL(urlStr, window.location.href);
+        let htmlText = prefetchManager.getCachedResponse(urlStr);
+
+        if (!htmlText) {
+            const response = await fetch(urlStr, {
+                signal,
+                headers: {
+                    'X-Requested-With': 'SoftMaxIslands-ViewTransition'
+                }
+            });
+
+            if (!response.ok) {
+                window.location.href = urlStr;
+                return;
             }
-        });
 
-        if (!response.ok) {
-            window.location.href = urlStr;
-            return;
+            // 2. Cross-Origin Redirect Verification
+            // If an open redirect navigated cross-origin, fall back to native browser navigation
+            if (response.url) {
+                finalUrl = new URL(response.url, window.location.href);
+            }
+            if (finalUrl.origin !== window.location.origin) {
+                console.warn(`[SoftMax.LaughTale Router] Blocked cross-origin HTML injection from "${finalUrl.href}". Falling back to hard navigation.`);
+                window.location.href = finalUrl.href;
+                return;
+            }
+
+            htmlText = await response.text();
+            prefetchManager.setCachedResponse(urlStr, htmlText);
         }
 
-        // 2. Cross-Origin Redirect Verification
-        // If an open redirect navigated cross-origin, fall back to native browser navigation
-        const finalUrl = response.url ? new URL(response.url, window.location.href) : new URL(urlStr, window.location.href);
-        if (finalUrl.origin !== window.location.origin) {
-            console.warn(`[SoftMax.LaughTale Router] Blocked cross-origin HTML injection from "${finalUrl.href}". Falling back to hard navigation.`);
-            window.location.href = finalUrl.href;
-            return;
-        }
-
-        const htmlText = await response.text();
         const parser = new DOMParser();
         const newDoc = parser.parseFromString(htmlText, 'text/html');
 
