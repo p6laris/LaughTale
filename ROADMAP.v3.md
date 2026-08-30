@@ -540,7 +540,8 @@ Standardize events on `laughtale:<component>:<event>` (`bubbles: true`, `detail`
 ## 9. LT-7xx — Performance (P2)
 
 ### `LT-701` — Establish a measured performance baseline
-**Severity:** P2 · **Status:** todo
+**Severity:** P2 · **Status:** done
+
 
 **Evidence.** Every performance number in `README.md` is asserted, not measured — and the one that is checkable (bundle size) is wrong by ~700×. Credibility depends on replacing claims with a reproducible benchmark.
 
