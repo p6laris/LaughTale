@@ -588,7 +588,8 @@ Standardize events on `laughtale:<component>:<event>` (`bubbles: true`, `detail`
 ## 10. LT-8xx — Accessibility (P1 for enterprise)
 
 ### `LT-801` — 28 of 76 components have zero ARIA
-**Severity:** P1 · **Status:** todo
+**Severity:** P1 · **Status:** done
+
 
 **Evidence.** Components with **no `aria-` attribute at all** include `multiselect`, `menu`, `popover`, `drawer`, `color-picker`, `fileupload`, `dropzone`, `galleria`, `treetable`, `radio-button`, `progress-bar`, `knob`, `tooltip-component`, and `theme-studio` itself. Across the entire library there are only **2 `aria-live` regions** — meaning `toast` notifications are effectively invisible to screen readers, which is a compliance failure for the notification pattern specifically.
 

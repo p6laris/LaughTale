@@ -41,6 +41,9 @@ export { renderThemeMatrix, captureStyleSignature, type MatrixPermutation, type 
 export { measureHydration, measureThroughput, recordHydrationMetric, getHydrationMetrics, clearHydrationMetrics, calculatePercentiles, type BenchmarkMetric, type HydrationMetric } from './runtime/benchmark';
 export { PrefetchManager, prefetchManager, type CachedResponse, type PrefetchOptions } from './router/prefetch';
 export { extractIconSymbols, generateSubsetSprite, computeSpriteHash } from './icons/subset-generator';
+export { announce, clearAnnouncements, getAnnouncerElement, type AnnouncePriority } from './accessibility/announcer';
+export { applyAriaAttributes, setRovingTabindex, handleRovingKeydown } from './accessibility/aria';
+
 
 
 
