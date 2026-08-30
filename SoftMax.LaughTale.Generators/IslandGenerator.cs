@@ -22,6 +22,8 @@ namespace SoftMax.LaughTale.Generators;
 public class IslandGenerator : IIncrementalGenerator
 {
     private const string IslandAttributeName = "SoftMax.LaughTale.Core.Attributes.IslandAttribute";
+    private const string IslandIgnoreAttributeName = "SoftMax.LaughTale.Core.Attributes.IslandIgnoreAttribute";
+    private const string JsonIgnoreAttributeName = "System.Text.Json.Serialization.JsonIgnoreAttribute";
     private const string GenerateTypeScriptAttributeName = "SoftMax.LaughTale.Core.Attributes.GenerateTypeScriptAttribute";
 
     // ── Diagnostics Descriptors ───────────────────────────────────────────────
@@ -42,6 +44,19 @@ public class IslandGenerator : IIncrementalGenerator
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true
     );
+
+    private static readonly DiagnosticDescriptor SensitiveCredentialExposureRule = new(
+        id: "SMI004",
+        title: "Sensitive Credential Property in Island Props",
+        messageFormat: "Property '{0}' on island props '{1}' matches sensitive credential pattern '{2}' and will be serialized to public HTML. Decorate with [IslandIgnore] or remove from props.",
+        category: "SoftMax.LaughTale.Security",
+        defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true
+    );
+
+    private static readonly Regex SensitivePropertyPattern = new(
+        @"password|secret|token|hash|apikey|connectionstring|passwd|pwd|privatekey",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
     private static readonly HashSet<string> BannedTypes = new(StringComparer.OrdinalIgnoreCase)
     {
@@ -136,6 +151,26 @@ public class IslandGenerator : IIncrementalGenerator
         foreach (var member in symbol.GetMembers().OfType<IPropertySymbol>())
         {
             if (member.DeclaredAccessibility != Accessibility.Public || member.IsStatic) continue;
+
+            var hasIgnoreAttr = member.GetAttributes().Any(a =>
+                a.AttributeClass?.ToDisplayString() is IslandIgnoreAttributeName or JsonIgnoreAttributeName or "IslandIgnore" or "JsonIgnore");
+
+            // Diagnostic SMI004: Sensitive Credential Check
+            if (!hasIgnoreAttr && SensitivePropertyPattern.IsMatch(member.Name))
+            {
+                var syntaxRef = member.DeclaringSyntaxReferences.FirstOrDefault();
+                var loc = syntaxRef?.GetSyntax().GetLocation() ?? ctx.TargetNode.GetLocation();
+                propertyDiagnostics.Add(Diagnostic.Create(
+                    SensitiveCredentialExposureRule,
+                    loc,
+                    member.Name,
+                    symbol.Name,
+                    SensitivePropertyPattern.Match(member.Name).Value
+                ));
+            }
+
+            // If explicitly ignored, do not expose in TagHelper attributes or TypeScript props
+            if (hasIgnoreAttr) continue;
 
             var typeDisplay = member.Type.ToDisplayString();
 

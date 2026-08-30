@@ -20,6 +20,7 @@ export { createPreactIsland } from './adapters/preact';
 export { initDirectives } from './directives/index';
 export { LucideIcons, getLucideIcon } from './icons/lucide';
 export { registerCommand, unregisterCommand, getCommand, executeCommand, clearCommands, listCommands, type CommandHandler } from './runtime/commands';
+export { getCspNonce, setCspNonce, applyNonceToStyle, applyNonceToScript } from './directives/csp';
 
 // Auto-register built-in enterprise components
 defineIsland('stepper', () => import('./components/stepper'));

@@ -1368,9 +1368,36 @@ var SoftMaxIslands = (() => {
 
   // src/directives/csp.ts
   function getCspNonce() {
+    if (cachedNonce) return cachedNonce;
     if (typeof document === "undefined") return null;
     const meta = document.querySelector('meta[name="csp-nonce"]');
-    return meta ? meta.content : null;
+    if (meta?.content) {
+      cachedNonce = meta.content.trim();
+      return cachedNonce;
+    }
+    if (typeof window !== "undefined" && window.__LAUGHTALE_NONCE__) {
+      cachedNonce = String(window.__LAUGHTALE_NONCE__).trim();
+      return cachedNonce;
+    }
+    const scriptWithNonce = document.querySelector("script[nonce]");
+    if (scriptWithNonce) {
+      const nonce = scriptWithNonce.nonce || scriptWithNonce.getAttribute("nonce");
+      if (nonce) {
+        cachedNonce = nonce.trim();
+        return cachedNonce;
+      }
+    }
+    if (document.currentScript) {
+      const currentNonce = document.currentScript.nonce || document.currentScript.getAttribute("nonce");
+      if (currentNonce) {
+        cachedNonce = currentNonce.trim();
+        return cachedNonce;
+      }
+    }
+    return null;
+  }
+  function setCspNonce(nonce) {
+    cachedNonce = nonce ? nonce.trim() : null;
   }
   function applyNonceToStyle(style) {
     const nonce = getCspNonce();
@@ -1378,9 +1405,17 @@ var SoftMaxIslands = (() => {
       style.setAttribute("nonce", nonce);
     }
   }
+  function applyNonceToScript(script) {
+    const nonce = getCspNonce();
+    if (nonce) {
+      script.setAttribute("nonce", nonce);
+    }
+  }
+  var cachedNonce;
   var init_csp = __esm({
     "src/directives/csp.ts"() {
       "use strict";
+      cachedNonce = null;
     }
   });
 
@@ -35711,6 +35746,8 @@ public static class AppTheme
   __export(index_exports, {
     AURA_PALETTES: () => AURA_PALETTES,
     LucideIcons: () => LucideIcons,
+    applyNonceToScript: () => applyNonceToScript,
+    applyNonceToStyle: () => applyNonceToStyle,
     awaitStreamingReady: () => awaitStreamingReady,
     clearCommands: () => clearCommands,
     createPreactIsland: () => createPreactIsland,
@@ -35720,6 +35757,7 @@ public static class AppTheme
     executeCommand: () => executeCommand,
     extractSlotContent: () => extractSlotContent,
     getCommand: () => getCommand,
+    getCspNonce: () => getCspNonce,
     getIslandDefinition: () => getIslandDefinition,
     getLucideIcon: () => getLucideIcon,
     getSlot: () => getSlot,
@@ -35739,6 +35777,7 @@ public static class AppTheme
     registerCommand: () => registerCommand,
     removeIslandStyle: () => removeIslandStyle,
     reviveTuple: () => reviveTuple,
+    setCspNonce: () => setCspNonce,
     unregisterCommand: () => unregisterCommand,
     updateToken: () => updateToken,
     useAutoAnimate: () => useAutoAnimate,
@@ -36775,6 +36814,7 @@ public static class AppTheme
   // src/index.ts
   init_lucide();
   init_commands();
+  init_csp();
 
   // src/composables/index.ts
   init_useDisclosure();

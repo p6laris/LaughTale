@@ -1339,9 +1339,36 @@ var init_reactivity = __esm({
 
 // src/directives/csp.ts
 function getCspNonce() {
+  if (cachedNonce) return cachedNonce;
   if (typeof document === "undefined") return null;
   const meta = document.querySelector('meta[name="csp-nonce"]');
-  return meta ? meta.content : null;
+  if (meta?.content) {
+    cachedNonce = meta.content.trim();
+    return cachedNonce;
+  }
+  if (typeof window !== "undefined" && window.__LAUGHTALE_NONCE__) {
+    cachedNonce = String(window.__LAUGHTALE_NONCE__).trim();
+    return cachedNonce;
+  }
+  const scriptWithNonce = document.querySelector("script[nonce]");
+  if (scriptWithNonce) {
+    const nonce = scriptWithNonce.nonce || scriptWithNonce.getAttribute("nonce");
+    if (nonce) {
+      cachedNonce = nonce.trim();
+      return cachedNonce;
+    }
+  }
+  if (document.currentScript) {
+    const currentNonce = document.currentScript.nonce || document.currentScript.getAttribute("nonce");
+    if (currentNonce) {
+      cachedNonce = currentNonce.trim();
+      return cachedNonce;
+    }
+  }
+  return null;
+}
+function setCspNonce(nonce) {
+  cachedNonce = nonce ? nonce.trim() : null;
 }
 function applyNonceToStyle(style) {
   const nonce = getCspNonce();
@@ -1349,9 +1376,17 @@ function applyNonceToStyle(style) {
     style.setAttribute("nonce", nonce);
   }
 }
+function applyNonceToScript(script) {
+  const nonce = getCspNonce();
+  if (nonce) {
+    script.setAttribute("nonce", nonce);
+  }
+}
+var cachedNonce;
 var init_csp = __esm({
   "src/directives/csp.ts"() {
     "use strict";
+    cachedNonce = null;
   }
 });
 
@@ -36690,6 +36725,7 @@ function createPreactIsland(Component, options = {}) {
 // src/index.ts
 init_lucide();
 init_commands();
+init_csp();
 
 // src/composables/index.ts
 init_useDisclosure();
@@ -37691,6 +37727,8 @@ defineIsland("island-toast", () => Promise.resolve().then(() => (init_toast(), t
 export {
   AURA_PALETTES,
   LucideIcons,
+  applyNonceToScript,
+  applyNonceToStyle,
   awaitStreamingReady,
   clearCommands,
   createPreactIsland,
@@ -37700,6 +37738,7 @@ export {
   executeCommand,
   extractSlotContent,
   getCommand,
+  getCspNonce,
   getIslandDefinition,
   getLucideIcon,
   getSlot,
@@ -37719,6 +37758,7 @@ export {
   registerCommand,
   removeIslandStyle,
   reviveTuple,
+  setCspNonce,
   unregisterCommand,
   updateToken,
   useAutoAnimate,

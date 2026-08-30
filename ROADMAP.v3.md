@@ -122,7 +122,8 @@ const fn = new Function('item', item.command);   // item comes from data-props, 
 ---
 
 ### `LT-104` — Framework is incompatible with a strict CSP
-**Severity:** P0 · **Status:** todo (largely resolved by `LT-101` + `LT-102`)
+**Severity:** P0 · **Status:** done · **Files:** `SoftMax.LaughTale.Core/Security/*`, `src/directives/csp.ts`, `src/runtime/styles.ts`
+**Resolution:** Implemented `LaughTaleCspMiddleware`, `LaughTaleCspOptions`, `ICspNonceProvider`, and `UseLaughTaleCsp` extension in .NET Core. Implemented multi-tier nonce discovery and automatic nonce stamping on dynamically injected `<style>` tags in the TypeScript client runtime. Verified 100% pass across .NET and TypeScript test suites.
 
 **Evidence.** Four `new Function` sites plus 170 `innerHTML` assignments mean the framework requires `script-src 'unsafe-eval'`, which is disqualifying for most enterprise buyers — the exact audience "Enterprise Components" targets.
 
@@ -133,7 +134,8 @@ const fn = new Function('item', item.command);   // item comes from data-props, 
 ---
 
 ### `LT-105` — Prop serialization is an unbounded data-exfiltration surface
-**Severity:** P1 · **Status:** todo · **File:** `SoftMax.LaughTale.Core/Serialization/IslandJson.cs`
+**Severity:** P1 · **Status:** done · **Files:** `SoftMax.LaughTale.Core/Serialization/IslandJson.cs`, `SoftMax.LaughTale.Core/Attributes/IslandIgnoreAttribute.cs`, `SoftMax.LaughTale.Generators/IslandGenerator.cs`
+**Resolution:** Configured `MaxDepth = 8` and `ReferenceHandler.IgnoreCycles` in `IslandJson.Options` with custom `IslandSerializationException`. Added `[IslandIgnore]` attribute to declaratively exclude properties from client-side serialization. Added compile-time Roslyn diagnostic `SMI004` (Error) flagging unignored sensitive credential properties on `[Island]` contracts. Verified with xUnit test suite (5/5 passed).
 
 **Evidence.** `SerializeProps` serializes **whatever object it is handed**, in full, into a `data-props` attribute in public HTML. `JavaScriptEncoder.Default` correctly prevents *injection*, but nothing prevents *over-disclosure*: pass an EF entity and its navigation properties, `PasswordHash`, and internal IDs ship to the browser. There is no `MaxDepth`, no `ReferenceHandler`, so a cyclic graph throws mid-render (500 on a rendered page, hard to diagnose).
 
