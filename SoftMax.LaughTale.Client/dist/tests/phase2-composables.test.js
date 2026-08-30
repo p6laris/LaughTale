@@ -258,7 +258,14 @@ var DANGEROUS_ATTRIBUTES = /* @__PURE__ */ new Set([
   "onmouseenter",
   "onmouseleave"
 ]);
-var DANGEROUS_PROTOCOLS = /^\s*(javascript|vbscript|data(?!\s*:\s*image\/(png|jpeg|jpg|gif|webp))):/i;
+var SAFE_PROTOCOLS = /* @__PURE__ */ new Set([
+  "http:",
+  "https:",
+  "mailto:",
+  "tel:",
+  "blob:"
+]);
+var SAFE_IMAGE_DATA_REGEX = /^data:image\/(png|jpeg|jpg|gif|webp|svg\+xml)(?:;[a-z0-9-]+=[a-z0-9-]+)*;base64,[a-z0-9+/=\s]+$/i;
 var ALLOWED_TAGS = /* @__PURE__ */ new Set([
   // Typography & Inline Formatting
   "a",
@@ -411,11 +418,38 @@ function isSafeProperty(prop) {
 function sanitizeUrl(url) {
   if (typeof url !== "string") return "";
   const trimmed = url.trim();
-  if (DANGEROUS_PROTOCOLS.test(trimmed)) {
+  if (!trimmed) return "";
+  const cleaned = trimmed.replace(/[\u0000-\u001F\u007F\s]+/g, "");
+  const lowerCleaned = cleaned.toLowerCase();
+  if (lowerCleaned.startsWith("javascript:") || lowerCleaned.startsWith("vbscript:") || lowerCleaned.startsWith("data:text/html") || lowerCleaned.startsWith("data:application/") || lowerCleaned.startsWith("data:text/javascript") || lowerCleaned.startsWith("file:")) {
     console.warn(`[SoftMax.LaughTale Security] Blocked dangerous URL protocol: "${trimmed}"`);
     return "about:blank";
   }
-  return trimmed;
+  if (trimmed.startsWith("/") || trimmed.startsWith("./") || trimmed.startsWith("../") || trimmed.startsWith("#") || trimmed.startsWith("?")) {
+    return trimmed;
+  }
+  if (lowerCleaned.startsWith("data:")) {
+    if (SAFE_IMAGE_DATA_REGEX.test(cleaned)) {
+      return trimmed;
+    }
+    console.warn(`[SoftMax.LaughTale Security] Blocked non-whitelisted data URI: "${trimmed}"`);
+    return "about:blank";
+  }
+  try {
+    const base = typeof document !== "undefined" && document.baseURI ? document.baseURI : "http://localhost";
+    const parsed = new URL(trimmed, base);
+    if (parsed.protocol) {
+      if (SAFE_PROTOCOLS.has(parsed.protocol)) {
+        return trimmed;
+      }
+      console.warn(`[SoftMax.LaughTale Security] Blocked disallowed protocol "${parsed.protocol}": "${trimmed}"`);
+      return "about:blank";
+    }
+    return trimmed;
+  } catch {
+    console.warn(`[SoftMax.LaughTale Security] Failed to parse URL: "${trimmed}"`);
+    return "about:blank";
+  }
 }
 function isSafeAttribute(attrName) {
   const lower = attrName.toLowerCase();

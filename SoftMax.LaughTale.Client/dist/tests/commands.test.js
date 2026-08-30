@@ -183,10 +183,35 @@ var LucideIcons = new Proxy({}, {
 });
 
 // src/directives/csp.ts
+var cachedNonce = null;
 function getCspNonce() {
+  if (cachedNonce) return cachedNonce;
   if (typeof document === "undefined") return null;
   const meta = document.querySelector('meta[name="csp-nonce"]');
-  return meta ? meta.content : null;
+  if (meta?.content) {
+    cachedNonce = meta.content.trim();
+    return cachedNonce;
+  }
+  if (typeof window !== "undefined" && window.__LAUGHTALE_NONCE__) {
+    cachedNonce = String(window.__LAUGHTALE_NONCE__).trim();
+    return cachedNonce;
+  }
+  const scriptWithNonce = document.querySelector("script[nonce]");
+  if (scriptWithNonce) {
+    const nonce = scriptWithNonce.nonce || scriptWithNonce.getAttribute("nonce");
+    if (nonce) {
+      cachedNonce = nonce.trim();
+      return cachedNonce;
+    }
+  }
+  if (document.currentScript) {
+    const currentNonce = document.currentScript.nonce || document.currentScript.getAttribute("nonce");
+    if (currentNonce) {
+      cachedNonce = currentNonce.trim();
+      return cachedNonce;
+    }
+  }
+  return null;
 }
 function applyNonceToStyle(style) {
   const nonce = getCspNonce();
@@ -210,15 +235,49 @@ function injectIslandStyle(islandName, css) {
 }
 
 // src/directives/security.ts
-var DANGEROUS_PROTOCOLS = /^\s*(javascript|vbscript|data(?!\s*:\s*image\/(png|jpeg|jpg|gif|webp))):/i;
+var SAFE_PROTOCOLS = /* @__PURE__ */ new Set([
+  "http:",
+  "https:",
+  "mailto:",
+  "tel:",
+  "blob:"
+]);
+var SAFE_IMAGE_DATA_REGEX = /^data:image\/(png|jpeg|jpg|gif|webp|svg\+xml)(?:;[a-z0-9-]+=[a-z0-9-]+)*;base64,[a-z0-9+/=\s]+$/i;
 function sanitizeUrl(url) {
   if (typeof url !== "string") return "";
   const trimmed = url.trim();
-  if (DANGEROUS_PROTOCOLS.test(trimmed)) {
+  if (!trimmed) return "";
+  const cleaned = trimmed.replace(/[\u0000-\u001F\u007F\s]+/g, "");
+  const lowerCleaned = cleaned.toLowerCase();
+  if (lowerCleaned.startsWith("javascript:") || lowerCleaned.startsWith("vbscript:") || lowerCleaned.startsWith("data:text/html") || lowerCleaned.startsWith("data:application/") || lowerCleaned.startsWith("data:text/javascript") || lowerCleaned.startsWith("file:")) {
     console.warn(`[SoftMax.LaughTale Security] Blocked dangerous URL protocol: "${trimmed}"`);
     return "about:blank";
   }
-  return trimmed;
+  if (trimmed.startsWith("/") || trimmed.startsWith("./") || trimmed.startsWith("../") || trimmed.startsWith("#") || trimmed.startsWith("?")) {
+    return trimmed;
+  }
+  if (lowerCleaned.startsWith("data:")) {
+    if (SAFE_IMAGE_DATA_REGEX.test(cleaned)) {
+      return trimmed;
+    }
+    console.warn(`[SoftMax.LaughTale Security] Blocked non-whitelisted data URI: "${trimmed}"`);
+    return "about:blank";
+  }
+  try {
+    const base = typeof document !== "undefined" && document.baseURI ? document.baseURI : "http://localhost";
+    const parsed = new URL(trimmed, base);
+    if (parsed.protocol) {
+      if (SAFE_PROTOCOLS.has(parsed.protocol)) {
+        return trimmed;
+      }
+      console.warn(`[SoftMax.LaughTale Security] Blocked disallowed protocol "${parsed.protocol}": "${trimmed}"`);
+      return "about:blank";
+    }
+    return trimmed;
+  } catch {
+    console.warn(`[SoftMax.LaughTale Security] Failed to parse URL: "${trimmed}"`);
+    return "about:blank";
+  }
 }
 var trustedTypesPolicy = null;
 if (typeof window !== "undefined" && window.trustedTypes?.createPolicy) {

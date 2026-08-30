@@ -150,7 +150,8 @@ const fn = new Function('item', item.command);   // item comes from data-props, 
 ---
 
 ### `LT-106` — `sanitizeUrl` blocks all `data:` URIs and misses obfuscation
-**Severity:** P2 · **Status:** todo · **File:** `src/directives/security.ts`
+**Severity:** P2 · **Status:** done · **File:** `SoftMax.LaughTale.Client/src/directives/security.ts`
+**Resolution:** Re-engineered `sanitizeUrl` to strip control characters and perform WHATWG URL parsing with protocol allowlists (`http`, `https`, `mailto`, `tel`, `blob`, relative paths). Allowed legitimate raster image `data:` URIs (`image/png`, `image/jpeg`, `image/webp`, `image/gif`) and blocked obfuscated/dangerous script protocols with `'about:blank'`. Added 25-form test matrix in `tests/security.test.ts` (35/35 passed).
 
 **Evidence.** `DANGEROUS_PROTOCOLS = /^\s*(javascript|data|vbscript):/i` rejects legitimate `data:image/png;base64,…` (breaking avatars, icons, and the Studio's own export preview) while still missing entity-encoded and control-char-split forms (`java&#09;script:`, `java\x00script:`).
 

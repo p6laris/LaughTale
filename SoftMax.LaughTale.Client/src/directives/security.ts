@@ -38,7 +38,15 @@ const DANGEROUS_ATTRIBUTES = new Set([
     'onmouseleave'
 ]);
 
-const DANGEROUS_PROTOCOLS = /^\s*(javascript|vbscript|data(?!\s*:\s*image\/(png|jpeg|jpg|gif|webp))):/i;
+const SAFE_PROTOCOLS = new Set([
+    'http:',
+    'https:',
+    'mailto:',
+    'tel:',
+    'blob:'
+]);
+
+const SAFE_IMAGE_DATA_REGEX = /^data:image\/(png|jpeg|jpg|gif|webp|svg\+xml)(?:;[a-z0-9-]+=[a-z0-9-]+)*;base64,[a-z0-9+/=\s]+$/i;
 
 const ALLOWED_TAGS = new Set([
     // Typography & Inline Formatting
@@ -87,16 +95,72 @@ export function isSafeProperty(prop: string | symbol): boolean {
 }
 
 /**
- * Sanitizes URLs to prevent javascript: or dangerous data: URL injection in href/src/action.
+ * Sanitizes URLs to prevent javascript:, vbscript:, or dangerous data: injection in href/src/action.
+ * Allows safe protocols (http, https, mailto, tel, blob), relative paths (/path, #hash, ?query),
+ * and legitimate raster image data URIs (png, jpeg, webp, gif).
  */
 export function sanitizeUrl(url: unknown): string {
     if (typeof url !== 'string') return '';
     const trimmed = url.trim();
-    if (DANGEROUS_PROTOCOLS.test(trimmed)) {
+    if (!trimmed) return '';
+
+    // 1. Strip all control characters (ASCII 0-31, 127) and whitespace before inspecting scheme
+    const cleaned = trimmed.replace(/[\u0000-\u001F\u007F\s]+/g, '');
+    const lowerCleaned = cleaned.toLowerCase();
+
+    // 2. Early check for explicit dangerous schemes
+    if (
+        lowerCleaned.startsWith('javascript:') ||
+        lowerCleaned.startsWith('vbscript:') ||
+        lowerCleaned.startsWith('data:text/html') ||
+        lowerCleaned.startsWith('data:application/') ||
+        lowerCleaned.startsWith('data:text/javascript') ||
+        lowerCleaned.startsWith('file:')
+    ) {
         console.warn(`[SoftMax.LaughTale Security] Blocked dangerous URL protocol: "${trimmed}"`);
         return 'about:blank';
     }
-    return trimmed;
+
+    // 3. Fast-path for safe relative paths and anchors
+    if (
+        trimmed.startsWith('/') ||
+        trimmed.startsWith('./') ||
+        trimmed.startsWith('../') ||
+        trimmed.startsWith('#') ||
+        trimmed.startsWith('?')
+    ) {
+        return trimmed;
+    }
+
+    // 4. Data URI validation: only permit safe raster images
+    if (lowerCleaned.startsWith('data:')) {
+        if (SAFE_IMAGE_DATA_REGEX.test(cleaned)) {
+            return trimmed;
+        }
+        console.warn(`[SoftMax.LaughTale Security] Blocked non-whitelisted data URI: "${trimmed}"`);
+        return 'about:blank';
+    }
+
+    // 5. Parse with WHATWG URL constructor
+    try {
+        const base = typeof document !== 'undefined' && document.baseURI ? document.baseURI : 'http://localhost';
+        const parsed = new URL(trimmed, base);
+
+        // If the original string had a protocol, check if it's in our safe allowlist
+        if (parsed.protocol) {
+            if (SAFE_PROTOCOLS.has(parsed.protocol)) {
+                return trimmed;
+            }
+            console.warn(`[SoftMax.LaughTale Security] Blocked disallowed protocol "${parsed.protocol}": "${trimmed}"`);
+            return 'about:blank';
+        }
+
+        return trimmed;
+    } catch {
+        // Fallback: if unparseable and not relative, block
+        console.warn(`[SoftMax.LaughTale Security] Failed to parse URL: "${trimmed}"`);
+        return 'about:blank';
+    }
 }
 
 /**

@@ -11,7 +11,7 @@ esbuild.buildSync({
         'tests/security.test.ts',
         'tests/expression-sandbox.test.ts',
         'tests/commands.test.ts',
-        'tests/new-components.test.ts',
+        'tests/csp.test.ts',
         'tests/phase2-components.test.ts',
         'tests/phase2-composables.test.ts'
     ],
@@ -32,7 +32,7 @@ const result = spawnSync('node', [
     'dist/tests/security.test.js',
     'dist/tests/expression-sandbox.test.js',
     'dist/tests/commands.test.js',
-    'dist/tests/new-components.test.js',
+    'dist/tests/csp.test.js',
     'dist/tests/phase2-components.test.js',
     'dist/tests/phase2-composables.test.js'
 ], {

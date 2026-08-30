@@ -50,10 +50,35 @@ import { describe, it, beforeEach } from "node:test";
 import assert from "node:assert";
 
 // src/directives/csp.ts
+var cachedNonce = null;
 function getCspNonce() {
+  if (cachedNonce) return cachedNonce;
   if (typeof document === "undefined") return null;
   const meta = document.querySelector('meta[name="csp-nonce"]');
-  return meta ? meta.content : null;
+  if (meta?.content) {
+    cachedNonce = meta.content.trim();
+    return cachedNonce;
+  }
+  if (typeof window !== "undefined" && window.__LAUGHTALE_NONCE__) {
+    cachedNonce = String(window.__LAUGHTALE_NONCE__).trim();
+    return cachedNonce;
+  }
+  const scriptWithNonce = document.querySelector("script[nonce]");
+  if (scriptWithNonce) {
+    const nonce = scriptWithNonce.nonce || scriptWithNonce.getAttribute("nonce");
+    if (nonce) {
+      cachedNonce = nonce.trim();
+      return cachedNonce;
+    }
+  }
+  if (document.currentScript) {
+    const currentNonce = document.currentScript.nonce || document.currentScript.getAttribute("nonce");
+    if (currentNonce) {
+      cachedNonce = currentNonce.trim();
+      return cachedNonce;
+    }
+  }
+  return null;
 }
 function applyNonceToStyle(style) {
   const nonce = getCspNonce();

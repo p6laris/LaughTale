@@ -83,7 +83,14 @@ var DANGEROUS_ATTRIBUTES = /* @__PURE__ */ new Set([
   "onmouseenter",
   "onmouseleave"
 ]);
-var DANGEROUS_PROTOCOLS = /^\s*(javascript|vbscript|data(?!\s*:\s*image\/(png|jpeg|jpg|gif|webp))):/i;
+var SAFE_PROTOCOLS = /* @__PURE__ */ new Set([
+  "http:",
+  "https:",
+  "mailto:",
+  "tel:",
+  "blob:"
+]);
+var SAFE_IMAGE_DATA_REGEX = /^data:image\/(png|jpeg|jpg|gif|webp|svg\+xml)(?:;[a-z0-9-]+=[a-z0-9-]+)*;base64,[a-z0-9+/=\s]+$/i;
 var ALLOWED_TAGS = /* @__PURE__ */ new Set([
   // Typography & Inline Formatting
   "a",
@@ -236,11 +243,38 @@ function isSafeProperty(prop) {
 function sanitizeUrl(url) {
   if (typeof url !== "string") return "";
   const trimmed = url.trim();
-  if (DANGEROUS_PROTOCOLS.test(trimmed)) {
+  if (!trimmed) return "";
+  const cleaned = trimmed.replace(/[\u0000-\u001F\u007F\s]+/g, "");
+  const lowerCleaned = cleaned.toLowerCase();
+  if (lowerCleaned.startsWith("javascript:") || lowerCleaned.startsWith("vbscript:") || lowerCleaned.startsWith("data:text/html") || lowerCleaned.startsWith("data:application/") || lowerCleaned.startsWith("data:text/javascript") || lowerCleaned.startsWith("file:")) {
     console.warn(`[SoftMax.LaughTale Security] Blocked dangerous URL protocol: "${trimmed}"`);
     return "about:blank";
   }
-  return trimmed;
+  if (trimmed.startsWith("/") || trimmed.startsWith("./") || trimmed.startsWith("../") || trimmed.startsWith("#") || trimmed.startsWith("?")) {
+    return trimmed;
+  }
+  if (lowerCleaned.startsWith("data:")) {
+    if (SAFE_IMAGE_DATA_REGEX.test(cleaned)) {
+      return trimmed;
+    }
+    console.warn(`[SoftMax.LaughTale Security] Blocked non-whitelisted data URI: "${trimmed}"`);
+    return "about:blank";
+  }
+  try {
+    const base = typeof document !== "undefined" && document.baseURI ? document.baseURI : "http://localhost";
+    const parsed = new URL(trimmed, base);
+    if (parsed.protocol) {
+      if (SAFE_PROTOCOLS.has(parsed.protocol)) {
+        return trimmed;
+      }
+      console.warn(`[SoftMax.LaughTale Security] Blocked disallowed protocol "${parsed.protocol}": "${trimmed}"`);
+      return "about:blank";
+    }
+    return trimmed;
+  } catch {
+    console.warn(`[SoftMax.LaughTale Security] Failed to parse URL: "${trimmed}"`);
+    return "about:blank";
+  }
 }
 function isSafeAttribute(attrName) {
   const lower = attrName.toLowerCase();
@@ -1526,5 +1560,65 @@ describe("SoftMax.LaughTale Directive Security & Sandboxing Suite", () => {
       assert.equal(/javascript:/i.test(clean), false, `javascript: URI survived in ${vec.name}: ${clean}`);
     }
     assert.equal(executionCount, 0, "Exploit handler was executed during sanitization!");
+  });
+  describe("URL Sanitization 25-Form Matrix Suite (LT-106)", () => {
+    const testMatrix = [
+      // Safe Web & Communication Protocols
+      { input: "https://softmax.dev/api/v1", expected: "https://softmax.dev/api/v1", desc: "Standard HTTPS URL" },
+      { input: "http://example.com/home", expected: "http://example.com/home", desc: "Standard HTTP URL" },
+      { input: "mailto:support@softmax.dev", expected: "mailto:support@softmax.dev", desc: "Mailto protocol" },
+      { input: "tel:+1234567890", expected: "tel:+1234567890", desc: "Telephone protocol" },
+      { input: "blob:https://softmax.dev/550e8400-e29b-41d4-a716-446655440000", expected: "blob:https://softmax.dev/550e8400-e29b-41d4-a716-446655440000", desc: "Blob URL" },
+      // Relative URLs & Anchors
+      { input: "/dashboard/analytics", expected: "/dashboard/analytics", desc: "Absolute root path" },
+      { input: "./components/button", expected: "./components/button", desc: "Current directory relative path" },
+      { input: "../images/logo.png", expected: "../images/logo.png", desc: "Parent directory relative path" },
+      { input: "#section-overview", expected: "#section-overview", desc: "Anchor fragment" },
+      { input: "?tab=profile&view=compact", expected: "?tab=profile&view=compact", desc: "Query string" },
+      // Legitimate Raster Image Data URIs
+      {
+        input: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+        expected: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+        desc: "Base64 PNG image data URI"
+      },
+      {
+        input: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAABAAEBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA=",
+        expected: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAABAAEBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA=",
+        desc: "Base64 JPEG image data URI"
+      },
+      {
+        input: "data:image/webp;base64,UklGRkAAAABXRUJQVlA4IDQAAADwAQCdASoBAAEAAQAcJaACdLoB+AA=",
+        expected: "data:image/webp;base64,UklGRkAAAABXRUJQVlA4IDQAAADwAQCdASoBAAEAAQAcJaACdLoB+AA=",
+        desc: "Base64 WebP image data URI"
+      },
+      {
+        input: "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+        expected: "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+        desc: "Base64 GIF image data URI"
+      },
+      // Malicious & Obfuscated Script Protocols (Blocked to about:blank)
+      { input: "javascript:alert(1)", expected: "about:blank", desc: "Direct javascript URI" },
+      { input: "  JaVaScRiPt:alert(document.cookie)", expected: "about:blank", desc: "Mixed-case javascript URI with whitespace" },
+      { input: "jav\0ascript:alert(1)", expected: "about:blank", desc: "Null-byte injected javascript URI" },
+      { input: "javascript:alert(1)", expected: "about:blank", desc: "Control char 0x01 injected javascript URI" },
+      { input: "jav	ascript:alert(1)", expected: "about:blank", desc: "Tab injected javascript URI" },
+      { input: "jav\rascript:alert(1)", expected: "about:blank", desc: "CR injected javascript URI" },
+      { input: "jav\nascript:alert(1)", expected: "about:blank", desc: "LF injected javascript URI" },
+      { input: "vbscript:msgbox(1)", expected: "about:blank", desc: "VBScript protocol" },
+      { input: "data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==", expected: "about:blank", desc: "HTML data URI base64" },
+      { input: "data:text/html,<script>alert(1)</script>", expected: "about:blank", desc: "HTML data URI raw script" },
+      { input: "data:application/javascript;base64,YWxlcnQoMSk=", expected: "about:blank", desc: "JavaScript data URI" },
+      { input: "file:///etc/passwd", expected: "about:blank", desc: "File scheme" },
+      // Null, undefined, empty
+      { input: "", expected: "", desc: "Empty string" },
+      { input: null, expected: "", desc: "Null input" },
+      { input: void 0, expected: "", desc: "Undefined input" }
+    ];
+    for (const test of testMatrix) {
+      it(`sanitizeUrl: correctly handles [${test.desc}]`, () => {
+        const actual = sanitizeUrl(test.input);
+        assert.equal(actual, test.expected, `Failed for "${test.input}" (${test.desc})`);
+      });
+    }
   });
 });
