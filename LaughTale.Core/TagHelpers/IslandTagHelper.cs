@@ -52,6 +52,9 @@ public class IslandTagHelper : TagHelper
     [HtmlAttributeName("id")]
     public string? Id { get; set; }
 
+    [HtmlAttributeName("fallback")]
+    public string? Fallback { get; set; }
+
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
         output.TagName = "div";
@@ -81,6 +84,11 @@ public class IslandTagHelper : TagHelper
             output.Attributes.SetAttribute("data-media", Media);
         }
 
+        if (!string.IsNullOrWhiteSpace(Fallback))
+        {
+            output.Attributes.SetAttribute("data-fallback", Fallback);
+        }
+
         if (!string.IsNullOrWhiteSpace(Id))
         {
             output.Attributes.SetAttribute("id", Id);
@@ -97,9 +105,22 @@ public class IslandTagHelper : TagHelper
         }
 
         var childContent = await output.GetChildContentAsync();
+        var sb = new System.Text.StringBuilder();
+
         if (!childContent.IsEmptyOrWhiteSpace)
         {
-            output.Content.SetHtmlContent($"<div data-slot=\"default\" class=\"island-slot\">{childContent.GetContent()}</div><!--island:end:{Name}-->");
+            sb.Append($"<div data-slot=\"default\" class=\"island-slot\">{childContent.GetContent()}</div>");
+        }
+
+        if (!string.IsNullOrWhiteSpace(Fallback))
+        {
+            sb.Append($"<template data-slot=\"fallback\" class=\"island-fallback-template\">{System.Net.WebUtility.HtmlEncode(Fallback)}</template>");
+        }
+
+        if (sb.Length > 0)
+        {
+            sb.Append($"<!--island:end:{Name}-->");
+            output.Content.SetHtmlContent(sb.ToString());
         }
 
         IslandDiagnostics.ValidateIsland(

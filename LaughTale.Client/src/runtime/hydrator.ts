@@ -8,6 +8,7 @@ import { getIslandDefinition } from './registry';
 import { parseAndReviveProps } from './reviver';
 import { importWithRetry } from './retry';
 import { awaitStreamingReady } from './streaming';
+import { renderErrorBoundary } from './error-boundary';
 
 export type HydrateStrategy = 'load' | 'idle' | 'visible' | 'media' | 'interaction' | 'never';
 export type HydrationState = 'idle' | 'pending' | 'mounted' | 'failed';
@@ -226,6 +227,13 @@ async function executeHydration(container: HTMLElement, name: string): Promise<v
             composed: true,
             detail: { name, error }
         }));
+
+        // Render fallback content & dev-mode diagnostic overlay
+        try {
+            renderErrorBoundary(container, name, error);
+        } catch (boundaryErr) {
+            console.error(`[LaughTale] Error rendering error boundary for island '${name}':`, boundaryErr);
+        }
     }
 }
 

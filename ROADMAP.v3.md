@@ -646,7 +646,8 @@ Standardize events on `laughtale:<component>:<event>` (`bubbles: true`, `detail`
 ---
 
 ### `LT-904` — Error boundaries
-**Severity:** P2 · **Status:** todo
+**Severity:** P2 · **Status:** done
+
 
 **Fix.** A failing island currently logs and leaves a blank region. Add `<island fallback="...">` server-rendered fallback content, shown when hydration fails, plus a dev-mode overlay with the stack trace.
 
