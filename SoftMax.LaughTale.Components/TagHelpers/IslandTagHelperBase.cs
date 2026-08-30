@@ -66,6 +66,12 @@ public abstract class IslandTagHelperBase : TagHelper
     protected virtual object? BuildProps() => null;
 
     /// <summary>
+    /// Builds optional server-rendered HTML markup or skeleton placeholder.
+    /// When non-null and no child content is provided, output is stamped with data-lt-ssr="true".
+    /// </summary>
+    protected virtual string? BuildSsrHtml() => null;
+
+    /// <summary>
     /// Override to customize the wrapper HTML element tag. Default is "div".
     /// </summary>
     protected virtual string WrapperTagName => "div";
@@ -118,6 +124,15 @@ public abstract class IslandTagHelperBase : TagHelper
         if (!childContent.IsEmptyOrWhiteSpace)
         {
             output.Content.SetHtmlContent(childContent);
+        }
+        else
+        {
+            var ssrHtml = BuildSsrHtml();
+            if (!string.IsNullOrWhiteSpace(ssrHtml))
+            {
+                output.Attributes.SetAttribute("data-lt-ssr", "true");
+                output.Content.SetHtmlContent(ssrHtml);
+            }
         }
 
         IslandDiagnostics.ValidateIsland(

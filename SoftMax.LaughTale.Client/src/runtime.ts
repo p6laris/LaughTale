@@ -26,6 +26,7 @@ export { IslandStore, useSharedState } from './runtime/state';
 export { parseAndReviveProps, reviveTuple } from './runtime/reviver';
 export { importWithRetry, type RetryOptions } from './runtime/retry';
 export { awaitStreamingReady } from './runtime/streaming';
+export { hasSsrContent, getSsrRoot, markSsrHydrated, SSR_ATTR, SSR_HYDRATED_ATTR } from './runtime/ssr';
 export { createVanillaIsland } from './adapters/vanilla';
 export { createPreactIsland, type PreactAdapterOptions } from './adapters/preact';
 export { initDirectives } from './directives/index';

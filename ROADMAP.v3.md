@@ -451,7 +451,7 @@ Standardize events on `laughtale:<component>:<event>` (`bubbles: true`, `detail`
 ---
 
 ### `LT-503` — No SSR-first markup for interactive components
-**Severity:** P2 · **Status:** todo
+**Severity:** P2 · **Status:** done
 
 **Evidence.** Most components build their DOM client-side from `data-props` (170 `innerHTML` sites). This contradicts the framework's core promise: a `hydrate="Visible"` datatable is an **empty box** until scrolled into view, invisible to search engines and to users with JS disabled — and it causes layout shift when it finally fills in.
 
