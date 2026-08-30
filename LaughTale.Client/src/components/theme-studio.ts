@@ -665,11 +665,35 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
         }, 2000);
     });
 
-    document.addEventListener('studio:open', open);
+    document.addEventListener('studio:open', open, { signal: ctx?.signal });
     document.addEventListener('studio:export', () => {
         open();
         copyCssBtn.click();
-    });
+    }, { signal: ctx?.signal });
+
+    let isInspectorActive = false;
+    let hoveredElement: HTMLElement | null = null;
+
+    document.addEventListener('mouseover', (e) => {
+        if (!isInspectorActive) return;
+        const target = e.target as HTMLElement;
+        const partEl = target?.closest<HTMLElement>('[data-part]');
+        if (partEl && !container.contains(partEl)) {
+            if (hoveredElement && hoveredElement !== partEl) {
+                hoveredElement.style.outline = '';
+            }
+            hoveredElement = partEl;
+            hoveredElement.style.outline = '2px dashed var(--p-primary-500)';
+        }
+    }, { signal: ctx?.signal });
+
+    document.addEventListener('mouseout', () => {
+        if (!isInspectorActive) return;
+        if (hoveredElement) {
+            hoveredElement.style.outline = '';
+            hoveredElement = null;
+        }
+    }, { signal: ctx?.signal });
 
     const saved = loadSavedTheme();
     if (saved) {

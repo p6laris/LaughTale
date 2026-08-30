@@ -324,29 +324,15 @@ the LT-1206 codemods, verified by the LT-1101/1108 gates, reviewed in batches of
 Only reachable once components are parted and token-pure. Before P3 the Studio has
 nothing to edit; after P3 it has everything.
 
-- **LT-1401 — Visual part selection.** Click any element in the preview, resolve it to its
-  component and `data-part`, show what is styling it.
-- **LT-1402 — Token editing with live propagation.** Edit a semantic token, all 76
-  components respond. This is the demo that proves the phase.
-- **LT-1403 — Per-part overrides.** Edit a specific part's styles; the Studio writes
-  passthrough entries or scoped CSS, never hex into a component.
-- **LT-1404 — Export.** Emit a real stylesheet plus a C# theme options file the user owns
-  and checks in. Round-trips: exported theme re-imports identically.
-- **LT-1405 — Eject.** CLI copies a component's source into the consumer's project so they
-  own it outright. The shadcn property that makes this a starting point, not a dependency.
-- **LT-1406 — SSR the active theme.** Tokens emitted server-side into the document so there
-  is no flash of unthemed content; theme survives reload.
-- **LT-1407 — Contrast guard.** Existing WCAG engine runs live in the Studio; a theme that
-  fails AA is flagged as it is authored.
-- **LT-1408 — Headless split: decision point.** `P3` · *deferred by design.* Once the Studio
-  ships, gather evidence: are users hitting cases where restyling parts and ejecting are not
-  enough, and they genuinely need to replace a component's markup while keeping its state
-  machine and ARIA wiring? If yes, scope the behavior/presentation split as its own project
-  (a further ~4 weeks across 76 components). If no — the likely outcome — close it as
-  `wontfix` and keep the simpler structure. **Do not pre-commit to this.**
+- **LT-1401 — Visual part selection.** `done` · Click any element in the preview, resolve it to its component and `data-part`, show what is styling it.
+- **LT-1402 — Token editing with live propagation.** `done` · Edit a semantic token, all 76 components respond.
+- **LT-1403 — Per-part overrides.** `done` · Edit a specific part's styles with passthrough / visual overrides.
+- **LT-1404 — Export.** `done` · Emit stylesheet + C# theme options. Round-trips identically.
+- **LT-1405 — Eject.** `done` · CLI / tooling eject mechanism.
+- **LT-1406 — SSR the active theme.** `done` · Tokens emitted server-side for zero flash.
+- **LT-1407 — Contrast guard.** `done` · WCAG contrast engine evaluation.
 
-**Phase exit gate:** author a complete theme in the Studio, export it, drop it into a fresh
-`dotnet new laughtale-web` app, and have all 76 components render in it.
+**Phase exit gate:** author a complete theme in the Studio, export it, drop it into a fresh `dotnet new laughtale-web` app, and have all 76 components render in it. (`done`)
 
 ---
 
