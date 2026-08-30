@@ -473,7 +473,7 @@ Standardize events on `laughtale:<component>:<event>` (`bubbles: true`, `detail`
 ## 8. LT-6xx — Theming & Studio integration (P1) — *the headline feature*
 
 ### `LT-601` — 2,025 hardcoded hex colors make the Studio structurally unable to work
-**Severity:** P1 · **Status:** todo · **Files:** 66 of 76 `src/components/*.ts`
+**Severity:** P1 · **Status:** done · **Files:** 66 of 76 `src/components/*.ts`
 
 **Evidence.** `grep -rho "#[0-9a-fA-F]\{6\}" src/components` → **2,025 matches across 66 files**. The Theme Studio writes ~20 CSS custom properties to `document.documentElement` (`theme-studio.ts:406-446`). Those two facts do not meet: a user changes the primary color and the vast majority of component surfaces do not move. **This is why the Studio feels like a toy.** Everything else in this section is blocked on it.
 
