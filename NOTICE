@@ -1,0 +1,29 @@
+# Third-Party Notices & Attribution
+
+LaughTale is licensed under the MIT License (see `LICENSE`).
+
+This project incorporates design concepts, CSS token architecture, and open-source icons from the following upstream projects:
+
+---
+
+### 1. PrimeVue / Aura Design System
+- **Website**: https://primevue.org / https://primeng.org
+- **License**: MIT License
+- **Copyright**: (c) 2016-2026 PrimeTek Informatics
+- **Description**: Component CSS structure, accessibility conventions, and the Aura design system token semantics are inspired by PrimeTek's open-source UI libraries.
+
+---
+
+### 2. Lucide Icons
+- **Website**: https://lucide.dev
+- **License**: ISC License
+- **Copyright**: (c) 2022-2026 Lucide Contributors
+- **Description**: SVG icon paths and icon metadata used across LaughTale UI components are derived from Lucide Static.
+
+---
+
+### 3. Astro Islands Architecture
+- **Website**: https://astro.build
+- **License**: MIT License
+- **Copyright**: (c) 2021-2026 Fred K. Schott and Astro Contributors
+- **Description**: Conceptual partial hydration strategies (`load`, `idle`, `visible`, `media`, `interaction`) are inspired by Astro's Islands Architecture.
