@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise Textarea Component (Aura Textarea)
  * Multi-line text input with dynamic auto-resizing, size metrics,
@@ -21,6 +23,8 @@ export interface TextareaProps {
     targetInputName?: string;
     name?: string;
     inputId?: string;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 const CSS = `
@@ -140,7 +144,7 @@ const CSS = `
 }
 `;
 
-export default function TextareaIsland(container: HTMLElement, props: TextareaProps) {
+export default function TextareaIsland(container: HTMLElement, props: TextareaProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-textarea', CSS);
 
     const isAutoResize = props.autoResize === true || String(props.autoResize) === 'true';

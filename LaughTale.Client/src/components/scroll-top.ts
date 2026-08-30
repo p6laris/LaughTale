@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise ScrollTop Component (Aura ScrollTop inspired)
  */
@@ -8,6 +10,8 @@ import { injectIslandStyle } from '../runtime/styles';
 export interface ScrollTopProps {
     threshold?: number; // scroll threshold in px, default 200
     behavior?: 'smooth' | 'auto';
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 
@@ -19,7 +23,7 @@ const CSS = `
 }
 `;
 
-export default function ScrollTopIsland(container: HTMLElement, props: ScrollTopProps) {
+export default function ScrollTopIsland(container: HTMLElement, props: ScrollTopProps, ctx?: IslandContext) {
     injectIslandStyle('scroll-top', CSS);
     const threshold = props.threshold || 200;
     let isVisible = false;

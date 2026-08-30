@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise Timeline Component (Aura Design System compliant)
  * Flexible chronological event sequence visualizer supporting vertical/horizontal orientations,
@@ -15,6 +17,8 @@ export interface TimelineProps {
     title?: string;
     interactive?: boolean;
     activityFeed?: boolean;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 const TIMELINE_CSS = `
@@ -277,7 +281,7 @@ const COLOR_MAP: Record<string, string> = {
     'bg-rose-500': '#f43f5e'
 };
 
-export default function TimelineIsland(container: HTMLElement, props: TimelineProps) {
+export default function TimelineIsland(container: HTMLElement, props: TimelineProps, ctx?: IslandContext) {
     injectIslandStyle('timeline', TIMELINE_CSS);
 
     const rawEvents: any[] = props.value || props.events || [];

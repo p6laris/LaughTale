@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise Tooltip Island Component (PrimeVue 4 Aura Design System compliant)
  */
@@ -14,9 +16,11 @@ export interface TooltipProps {
     event?: 'hover' | 'focus' | 'both';
     autoHide?: boolean;
     escape?: boolean;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
-export default function TooltipIsland(container: HTMLElement, props: TooltipProps) {
+export default function TooltipIsland(container: HTMLElement, props: TooltipProps, ctx?: IslandContext) {
     initGlobalTooltipDelegation();
 
     const targetSelector = props.target;

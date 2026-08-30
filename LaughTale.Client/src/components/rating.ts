@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise Rating Component (Aura Rating)
  * Star-based selection with half-star precision, vertical orientation,
@@ -23,6 +25,8 @@ export interface RatingProps {
     targetInputName?: string;
     name?: string;
     inputId?: string;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 const CSS = `
@@ -218,7 +222,7 @@ const starFilledSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 2
 const starEmptySvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
 const cancelSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>`;
 
-export default function RatingIsland(container: HTMLElement, props: RatingProps) {
+export default function RatingIsland(container: HTMLElement, props: RatingProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-rating', CSS);
 
     const totalStars = props.stars ? Number(props.stars) : 5;

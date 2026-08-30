@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise DataView Component (Aura Design System compliant)
  * Displays data in List or Grid layouts with pagination, real-time sorting,
@@ -34,6 +36,8 @@ export interface DataViewProps {
     showSort?: boolean;
     loading?: boolean;
     title?: string;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 const DATAVIEW_CSS = `
@@ -484,7 +488,7 @@ const DATAVIEW_CSS = `
 }
 `;
 
-export default function DataViewIsland(container: HTMLElement, props: DataViewProps) {
+export default function DataViewIsland(container: HTMLElement, props: DataViewProps, ctx?: IslandContext) {
     injectIslandStyle('dataview', DATAVIEW_CSS);
 
     const rawItems: DataViewItem[] = [...(props.value || props.items || [])];

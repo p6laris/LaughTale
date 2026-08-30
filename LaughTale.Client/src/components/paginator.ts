@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise Paginator Component (Aura Design System compliant)
  * Rich pagination bar with customizable templates, rows per page dropdown,
@@ -22,6 +24,8 @@ export interface PaginatorProps {
     targetInputName?: string;
     targetSelector?: string;
     images?: string[];
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 const PAGINATOR_CSS = `
@@ -272,7 +276,7 @@ const DEFAULT_IMAGES = [
     'https://primefaces.org/cdn/primevue/images/nature/nature6.jpg'
 ];
 
-export default function PaginatorIsland(container: HTMLElement, props: PaginatorProps) {
+export default function PaginatorIsland(container: HTMLElement, props: PaginatorProps, ctx?: IslandContext) {
     injectIslandStyle('paginator', PAGINATOR_CSS);
 
     let first = props.first || 0;

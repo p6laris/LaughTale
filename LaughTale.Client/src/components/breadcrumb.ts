@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise Breadcrumb Component (PrimeVue 4 Aura Design System compliant)
  * Semantic breadcrumb navigation with list hierarchy, custom separators, collapsible ellipsis,
@@ -168,13 +170,15 @@ export interface BreadcrumbProps {
         icon?: string;
         url?: string;
         label?: string;
-    };
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
+};
     homeUrl?: string;
     homeIcon?: string;
     separator?: 'chevron' | 'slash' | 'arrow' | string;
 }
 
-export default function BreadcrumbIsland(container: HTMLElement, props: BreadcrumbProps) {
+export default function BreadcrumbIsland(container: HTMLElement, props: BreadcrumbProps, ctx?: IslandContext) {
     injectIslandStyle('breadcrumb', BREADCRUMB_CSS);
 
     const items = props.items || [];

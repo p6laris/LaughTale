@@ -1,4 +1,4 @@
-﻿/**
+/**
  * LaughTale: Enterprise OrderList Component (Aura Design System compliant)
  * Clean, instant, and accessible list reordering with selection modes, checkboxes,
  * live filtering, and rich item templates.
@@ -7,6 +7,8 @@
 import { OrderListItem } from '../types/models';
 import { injectIslandStyle } from '../runtime/styles';
 import { LucideIcons } from '../icons/lucide';
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 
 export interface OrderListProps<T = any> {
     value?: OrderListItem<T>[];
@@ -25,6 +27,8 @@ export interface OrderListProps<T = any> {
     disabled?: boolean;
     targetInputName?: string;
     emptyMessage?: string;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 const ORDERLIST_CSS = `

@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise ColorPicker Component (Aura ColorPicker inspired)
  * Pixel-perfect popover with preset swatches, hex input, and native color spectrum picker.
@@ -10,6 +12,8 @@ export interface ColorPickerProps {
     value?: string; // Hex color e.g. 'var(--lt-primary-500, #10b981)'
     targetInputName?: string;
     disabled?: boolean;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 const DEFAULT_PRESETS = [
@@ -47,7 +51,7 @@ const CSS = `
 }
 `;
 
-export default function ColorPickerIsland(container: HTMLElement, props: ColorPickerProps) {
+export default function ColorPickerIsland(container: HTMLElement, props: ColorPickerProps, ctx?: IslandContext) {
     injectIslandStyle('color-picker', CSS);
     let currentColor = props.value || 'var(--lt-primary-500, #10b981)';
     let isOpen = false;

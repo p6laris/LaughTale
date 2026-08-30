@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 /**
  * LaughTale: Enterprise Sidebar Component Suite (PrimeVue 4 Aura Design System)
  * Complete compound navigation panel system matching PrimeVue 4 Aura specifications:
@@ -1082,9 +1084,11 @@ export interface SidebarProps {
     showControls?: boolean;
     class?: string;
     style?: string;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
-export default function SidebarIsland(container: HTMLElement, props: SidebarProps) {
+export default function SidebarIsland(container: HTMLElement, props: SidebarProps, ctx?: IslandContext) {
     injectIslandStyle('sidebar', SIDEBAR_CSS);
 
     const hasAppItems = Array.isArray(props.items) && props.items.length > 0 && !props.groups;

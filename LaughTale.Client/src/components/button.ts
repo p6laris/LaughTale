@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise Button Component (Aura Button)
  * Complete button interactive runtime supporting async loading toggles,
@@ -29,13 +31,15 @@ export interface ButtonProps {
     href?: string;
     target?: string;
     ariaLabel?: string;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 const CSS = `
 /* CSS is provided globally in site.css / theme */
 `;
 
-export default function ButtonIsland(container: HTMLElement, props: ButtonProps) {
+export default function ButtonIsland(container: HTMLElement, props: ButtonProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-button', CSS);
 
     let isLoading = props.loading === true || String(props.loading) === 'true';

@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise SelectButton Component (Aura SelectButton)
  * Segmented button group supporting single and multiple selection,
@@ -35,6 +37,8 @@ export interface SelectButtonProps {
     name?: string;
     targetInputName?: string;
     inputId?: string;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 const CSS = `
@@ -197,7 +201,7 @@ const CSS = `
 }
 `;
 
-export default function SelectButtonIsland(container: HTMLElement, props: SelectButtonProps) {
+export default function SelectButtonIsland(container: HTMLElement, props: SelectButtonProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-selectbutton', CSS);
 
     const isMultiple = props.multiple === true || String(props.multiple) === 'true';

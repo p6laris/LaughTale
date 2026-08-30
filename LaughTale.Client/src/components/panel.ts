@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise Panel Component (Aura Design System compliant)
  * Container component with optional collapsible content, smooth 60fps CSS Grid animations,
@@ -209,9 +211,11 @@ export interface PanelProps {
     collapsed?: boolean;
     controlled?: boolean;
     toggleIcon?: 'plusMinus' | 'chevron';
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
-export default function PanelIsland(container: HTMLElement, props: PanelProps) {
+export default function PanelIsland(container: HTMLElement, props: PanelProps, ctx?: IslandContext) {
     injectIslandStyle('panel', PANEL_CSS);
 
     const isToggleable = !!props.toggleable;

@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise InputMask Component (Aura Mask / InputMask)
  * High-performance input masking engine with cursor preservation, optional characters (?),
@@ -22,6 +24,8 @@ export interface InputMaskProps {
     inputId?: string;
     name?: string;
     targetInputName?: string;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 const CSS = `
@@ -134,7 +138,7 @@ interface MaskToken {
     slotChar: string;
 }
 
-export default function InputMaskIsland(container: HTMLElement, props: InputMaskProps) {
+export default function InputMaskIsland(container: HTMLElement, props: InputMaskProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-input-mask', CSS);
 
     const mask = props.mask || '(999) 999-9999';

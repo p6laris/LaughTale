@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise Dialog Component (PrimeVue 4 Aura Design System compliant)
  * Zero-flash SSR overlay container with global click delegation, draggable header support,
@@ -220,6 +222,8 @@ export interface DialogProps {
     style?: string;
     class?: string;
     width?: string;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 // Global Delegation Initializer
@@ -316,7 +320,7 @@ function initGlobalDialogDelegation() {
     });
 }
 
-export default function DialogIsland(container: HTMLElement, props: DialogProps) {
+export default function DialogIsland(container: HTMLElement, props: DialogProps, ctx?: IslandContext) {
     injectIslandStyle('dialog', DIALOG_CSS);
     initGlobalDialogDelegation();
 

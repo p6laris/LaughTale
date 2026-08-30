@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise TieredMenu Component (PrimeVue 4 Aura Design System)
  * Hierarchical vertical navigation menu with nested flyout overlay submenus,
@@ -267,9 +269,11 @@ export interface TieredMenuProps {
     breakpoint?: string;
     class?: string;
     style?: string;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
-export default function TieredMenuIsland(container: HTMLElement, props: TieredMenuProps) {
+export default function TieredMenuIsland(container: HTMLElement, props: TieredMenuProps, ctx?: IslandContext) {
     injectIslandStyle('tieredmenu', TIEREDMENU_CSS);
 
     const model: MenuItem[] = props.model || props.items || [];

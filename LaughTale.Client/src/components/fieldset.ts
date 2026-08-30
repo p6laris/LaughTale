@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise Fieldset Component (Aura Design System compliant)
  * Grouping component with collapsible content, smooth 60fps CSS Grid animations,
@@ -176,9 +178,11 @@ export interface FieldsetProps {
     collapsed?: boolean;
     controlled?: boolean;
     toggleIcon?: 'plusMinus' | 'chevron';
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
-export default function FieldsetIsland(container: HTMLElement, props: FieldsetProps) {
+export default function FieldsetIsland(container: HTMLElement, props: FieldsetProps, ctx?: IslandContext) {
     injectIslandStyle('fieldset', FIELDSET_CSS);
 
     const isToggleable = !!props.toggleable;

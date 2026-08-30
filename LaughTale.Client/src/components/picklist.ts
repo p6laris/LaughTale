@@ -1,4 +1,4 @@
-﻿/**
+/**
  * LaughTale: Enterprise PickList Component (Aura Design System compliant)
  * Clean, instant dual-list transfer & reordering with selection modes, checkboxes,
  * live filtering, rich templates, auto-scrolling, and keyboard navigation.
@@ -7,6 +7,8 @@
 import { PickListItem } from '../types/models';
 import { injectIslandStyle } from '../runtime/styles';
 import { LucideIcons } from '../icons/lucide';
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 
 export interface PickListProps<T = any> {
     source?: PickListItem<T>[];
@@ -30,6 +32,8 @@ export interface PickListProps<T = any> {
     targetInputName?: string;
     emptyMessageSource?: string;
     emptyMessageTarget?: string;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 const PICKLIST_CSS = `

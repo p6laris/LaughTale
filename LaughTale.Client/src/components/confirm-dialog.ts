@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise ConfirmDialog Component (Aura Design System compliant)
  * Modal confirmation overlay backed by a global service, declarative trigger bindings,
@@ -259,6 +261,8 @@ export interface ConfirmDialogProps {
     ariaLabel?: string;
     dismissableMask?: boolean;
     closeOnEscape?: boolean;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 // Vector SVG Icons
@@ -458,7 +462,7 @@ export function showToastFeedback(summary: string, detail: string, severity: 'su
     }, 3000);
 }
 
-export default function ConfirmDialogIsland(container: HTMLElement, props: ConfirmDialogProps) {
+export default function ConfirmDialogIsland(container: HTMLElement, props: ConfirmDialogProps, ctx?: IslandContext) {
     injectIslandStyle('confirm-dialog', CONFIRM_DIALOG_CSS);
 
     // Bind all declarative triggers inside container or document

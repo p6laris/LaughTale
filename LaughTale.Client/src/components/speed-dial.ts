@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise SpeedDial Island Component
  * Strictly compliant with Aura Design System tokens, animations, and trigonometry.
@@ -27,6 +29,8 @@ export interface SpeedDialButtonProps {
     rounded?: boolean;
     iconOnly?: boolean;
     styleClass?: string;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 export interface SpeedDialTooltipOptions {
@@ -431,7 +435,7 @@ const SPEEDDIAL_CSS = `
 }
 `;
 
-export default function SpeedDialIsland(container: HTMLElement, props: SpeedDialProps) {
+export default function SpeedDialIsland(container: HTMLElement, props: SpeedDialProps, ctx?: IslandContext) {
     injectIslandStyle('speed-dial', SPEEDDIAL_CSS);
 
     const items = props.model || props.actions || [];

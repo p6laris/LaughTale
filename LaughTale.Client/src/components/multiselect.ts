@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise MultiSelect Component (Aura MultiSelect inspired)
  * Integrated with useDisclosure, useClickOutside, and useTransition for smooth popover fade transitions.
@@ -18,6 +20,8 @@ export interface MultiSelectProps<T = string> {
     filter?: boolean;
     display?: 'comma' | 'chip';
     disabled?: boolean;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 

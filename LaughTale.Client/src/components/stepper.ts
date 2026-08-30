@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise Stepper Component (Aura Design System compliant)
  * Multi-step wizard workflow supporting horizontal, vertical with smooth accordion slide animation,
@@ -247,9 +249,11 @@ export interface StepperProps {
     value?: string | number;
     linear?: boolean;
     layout?: 'horizontal' | 'vertical';
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
-export default function StepperIsland(container: HTMLElement, props: StepperProps) {
+export default function StepperIsland(container: HTMLElement, props: StepperProps, ctx?: IslandContext) {
     injectIslandStyle('stepper', STEPPER_CSS);
 
     const rootEl = container.querySelector<HTMLElement>('.p-stepper') || container;

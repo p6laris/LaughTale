@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise Splitter Component (Aura Design System compliant)
  * Resizable multi-panel layout with horizontal/vertical orientation, min/max constraints,
@@ -140,9 +142,11 @@ export interface SplitterProps {
     disabled?: boolean;
     stateKey?: string;
     stateStorage?: 'local' | 'session';
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
-export default function SplitterIsland(container: HTMLElement, props: SplitterProps) {
+export default function SplitterIsland(container: HTMLElement, props: SplitterProps, ctx?: IslandContext) {
     injectIslandStyle('splitter', SPLITTER_CSS);
 
     const rootEl = container.querySelector<HTMLElement>('.p-splitter') || container;

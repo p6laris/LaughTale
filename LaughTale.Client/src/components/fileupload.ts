@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise FileUpload Component (PrimeVue 4 Aura Design System compliant)
  * High-performance, pixel-perfect file uploader matching PrimeVue 4 Aura specifications.
@@ -404,7 +406,9 @@ export interface FileUploadProps {
         size: number;
         previewUrl?: string;
         status?: 'pending' | 'completed' | 'uploading';
-    };
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
+};
     initialImages?: Array<{
         id: string;
         name: string;
@@ -422,7 +426,7 @@ interface UploadedFileItem {
     status: 'pending' | 'uploading' | 'completed' | 'error';
 }
 
-export default function FileUploadIsland(container: HTMLElement, props: FileUploadProps) {
+export default function FileUploadIsland(container: HTMLElement, props: FileUploadProps, ctx?: IslandContext) {
     injectIslandStyle('fileupload', FILEUPLOAD_CSS);
 
     const mode = props.mode || 'basic';

@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿import { injectIslandStyle } from '../runtime/styles';
 /**
  * LaughTale: Enterprise Radial Knob / Dial Component (Aura Knob inspired)
@@ -14,6 +16,8 @@ export interface KnobProps {
     valueTemplate?: string; // e.g. '{value}%'
     targetInputName?: string;
     disabled?: boolean;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 
@@ -35,7 +39,7 @@ const CSS = `
 }
 `;
 
-export default function KnobIsland(container: HTMLElement, props: KnobProps) {
+export default function KnobIsland(container: HTMLElement, props: KnobProps, ctx?: IslandContext) {
     injectIslandStyle('knob', CSS);
     const min = props.min !== undefined ? props.min : 0;
     const max = props.max !== undefined ? props.max : 100;

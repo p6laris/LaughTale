@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise Checkbox Component (Aura Checkbox)
  * Accessible, theme-aware tri-state checkbox with Radix UI spring micro-interactions.
@@ -20,6 +22,8 @@ export interface CheckboxProps {
     size?: 'small' | 'normal' | 'large';
     variant?: 'outlined' | 'filled';
     targetInputName?: string;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 const CSS = `
@@ -191,7 +195,7 @@ const CSS = `
 }
 `;
 
-export default function CheckboxIsland(container: HTMLElement, props: CheckboxProps) {
+export default function CheckboxIsland(container: HTMLElement, props: CheckboxProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-checkbox', CSS);
     
     let isChecked = Boolean(props.checked);

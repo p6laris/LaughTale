@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise SplitButton Component (Aura Design System compliant)
  * Main action button paired with a dropdown trigger menu with nested submenu support.
@@ -26,6 +28,8 @@ export interface SplitButtonProps {
     menuButtonProps?: Record<string, any>;
     appendTo?: string;
     action?: string;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 // Global active coordinator: guarantees only ONE SplitButton menu is open at any time
@@ -420,7 +424,7 @@ const SPLITBUTTON_CSS = `
 }
 `;
 
-export default function SplitButtonIsland(container: HTMLElement, props: SplitButtonProps) {
+export default function SplitButtonIsland(container: HTMLElement, props: SplitButtonProps, ctx?: IslandContext) {
     injectIslandStyle('split-button', SPLITBUTTON_CSS);
 
     const label = props.label || '';

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * LaughTale: Enterprise CascadeSelect Component (Aura CascadeSelect)
  * Hierarchical multi-level flyout cascading selector for deeply nested categories and locations.
  * Integrated with useDisclosure, useClickOutside, and Aura design system tokens.
@@ -8,6 +8,8 @@ import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
 import { useDisclosure } from '../composables/useDisclosure';
 import { useClickOutside } from '../composables/useClickOutside';
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 
 export interface CascadeSelectNode<T = string> {
     name?: string;
@@ -38,6 +40,8 @@ export interface CascadeSelectProps<T = string> {
     loading?: boolean;
     optionLabel?: string;
     optionGroupLabel?: string;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 const CSS = `

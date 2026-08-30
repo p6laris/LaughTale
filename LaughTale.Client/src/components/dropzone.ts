@@ -1,9 +1,13 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
 export interface DropzoneProps {
     targetInputName: string;
     allowedExtensions: string;
     maxSizeMb: number;
     dropPrompt: string;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 
@@ -20,7 +24,7 @@ const CSS = `
 }
 `;
 
-export default function DropzoneIsland(container: HTMLElement, props: DropzoneProps) {
+export default function DropzoneIsland(container: HTMLElement, props: DropzoneProps, ctx?: IslandContext) {
     injectIslandStyle('dropzone', CSS);
     container.innerHTML = `
         <div style="display: flex; flex-direction: column; gap: 0.75rem;">

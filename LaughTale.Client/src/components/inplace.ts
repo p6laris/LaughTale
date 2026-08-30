@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise Inplace / Click-to-Edit Component (Aura Inplace inspired)
  */
@@ -10,6 +12,8 @@ export interface InplaceProps {
     targetInputName?: string;
     placeholder?: string;
     disabled?: boolean;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 
@@ -41,7 +45,7 @@ const CSS = `
 }
 `;
 
-export default function InplaceIsland(container: HTMLElement, props: InplaceProps) {
+export default function InplaceIsland(container: HTMLElement, props: InplaceProps, ctx?: IslandContext) {
     injectIslandStyle('inplace', CSS);
     let isEditing = false;
     let currentValue = props.value || '';

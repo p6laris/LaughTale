@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise FloatLabel Component (Aura FloatLabel)
  * Smooth floating label wrapper with 'over', 'in', and 'on' variants,
@@ -12,6 +14,8 @@ export interface FloatLabelProps {
     variant?: 'over' | 'in' | 'on';
     for?: string;
     invalid?: boolean;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 const CSS = `
@@ -133,7 +137,7 @@ const CSS = `
 }
 `;
 
-export default function FloatLabelIsland(container: HTMLElement, props: FloatLabelProps) {
+export default function FloatLabelIsland(container: HTMLElement, props: FloatLabelProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-float-label', CSS);
     
     const variant = props.variant || 'over';

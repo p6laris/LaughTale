@@ -1,4 +1,4 @@
-﻿/**
+/**
  * LaughTale: Enterprise OrganizationChart Component (Aura Design System compliant)
  * Precision table-based hierarchical tree with collapsible branches,
  * single/multiple/checkbox selection modes, custom node templates, and accessible keyboard navigation.
@@ -6,6 +6,8 @@
 
 import { OrgChartNode } from '../types/models';
 import { injectIslandStyle } from '../runtime/styles';
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 
 export interface OrgChartProps<T = any> {
     value?: OrgChartNode<T>;
@@ -16,6 +18,8 @@ export interface OrgChartProps<T = any> {
     collapsedKeys?: string[] | Record<string, boolean>;
     toggleIcon?: 'chevron' | 'plusMinus';
     targetInputName?: string;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 const ORGCHART_CSS = `

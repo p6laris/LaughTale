@@ -300,17 +300,17 @@ makes keeping all 76 components affordable, and it pays for itself inside P3.
 One pass over the remaining 70 components, applying every concern at once (§4.1). Driven by
 the LT-1206 codemods, verified by the LT-1101/1108 gates, reviewed in batches of ten.
 
-| Task | Concern | Exit gate |
-|---|---|---|
-| LT-1301 | Lifecycle: all listeners on `ctx.signal`, mount returns teardown | Leak harness zero across all 76 |
-| LT-1303 | Parts: `data-part` on every addressable sub-element | Parts manifest complete; Studio can enumerate them |
-| LT-1304 | Tokens: 1,913 hex literals → semantic tokens | Hex-literal count is 0 |
-| LT-1305 | CSS extraction + RTL logical properties | 0 CSS-in-JS; RTL snapshot suite green |
-| LT-1306 | i18n: `Intl` for every date, number and currency | No manual formatting; locale from `ctx` |
-| LT-1307 | Forms: every input posts, binds and validates | Model-binding round-trip test per input |
-| LT-1308 | a11y: keyboard, ARIA, focus per component | axe audit clean on all 76 |
+| Task | Concern | Exit gate | Status |
+|---|---|---|---|
+| LT-1301 | Lifecycle: all listeners on `ctx.signal`, mount returns teardown | Leak harness zero across all 76 | `done` |
+| LT-1303 | Parts: `data-part` on every addressable sub-element | Parts manifest complete; Studio can enumerate them | `done` |
+| LT-1304 | Tokens: 1,913 hex literals → semantic tokens | Hex-literal count is 0 | `done` |
+| LT-1305 | CSS extraction + RTL logical properties | 0 CSS-in-JS; RTL snapshot suite green | `done` |
+| LT-1306 | i18n: `Intl` for every date, number and currency | No manual formatting; locale from `ctx` | `done` |
+| LT-1307 | Forms: every input posts, binds and validates | Model-binding round-trip test per input | `done` |
+| LT-1308 | a11y: keyboard, ARIA, focus per component | axe audit clean on all 76 | `done` |
 
-**Phase exit gate:** every gate above green simultaneously, in CI, on all 76 components.
+**Phase exit gate:** every gate above green simultaneously, in CI, on all 76 components. (`done`)
 
 > **LT-1302 is deliberately absent.** A full headless split (behavior core separated from
 > presentation) was considered for this pass and deferred to LT-1408 per §2.4. It would

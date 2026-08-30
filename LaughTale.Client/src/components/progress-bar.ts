@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿import { injectIslandStyle } from '../runtime/styles';
 /**
  * LaughTale: Enterprise ProgressBar & ProgressSpinner Component (Aura ProgressBar inspired)
@@ -9,6 +11,8 @@ export interface ProgressBarProps {
     showValue?: boolean;
     height?: string;
     color?: string;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 
@@ -20,7 +24,7 @@ const CSS = `
 }
 `;
 
-export default function ProgressBarIsland(container: HTMLElement, props: ProgressBarProps) {
+export default function ProgressBarIsland(container: HTMLElement, props: ProgressBarProps, ctx?: IslandContext) {
     injectIslandStyle('progress-bar', CSS);
     const isIndeterminate = props.mode === 'indeterminate' || props.value === undefined;
     const value = Math.max(0, Math.min(100, props.value || 0));

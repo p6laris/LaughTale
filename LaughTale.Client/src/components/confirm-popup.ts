@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise ConfirmPopup Component (PrimeVue 4 Aura Design System compliant)
  * Anchored confirmation popup overlay with target alignment, arrow notches, smooth animations,
@@ -199,6 +201,8 @@ export interface ConfirmPopupProps {
     acceptText?: string;
     rejectText?: string;
     actionName?: string;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 // Vector SVGs
@@ -394,7 +398,7 @@ class ConfirmPopupManager {
 const globalConfirmPopup = new ConfirmPopupManager();
 (window as any).$confirmPopup = globalConfirmPopup;
 
-export default function ConfirmPopupIsland(container: HTMLElement, props: ConfirmPopupProps) {
+export default function ConfirmPopupIsland(container: HTMLElement, props: ConfirmPopupProps, ctx?: IslandContext) {
     injectIslandStyle('confirm-popup', CONFIRM_POPUP_CSS);
 
     const triggers = container.querySelectorAll<HTMLButtonElement>('[data-confirmpopup-trigger]');

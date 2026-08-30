@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise AutoComplete & Combobox Component (Aura AutoComplete)
  * Features: Typeahead suggestions on typing, Dropdown button trigger, Clear button, Multi-chip tokens,
@@ -44,6 +46,8 @@ export interface AutoCompleteProps {
     scrollHeight?: string;
     optionGroupLabel?: string;
     optionGroupChildren?: string;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 const CSS = `
@@ -308,7 +312,7 @@ const CSS = `
 }
 `;
 
-export default function AutoCompleteIsland(container: HTMLElement, props: AutoCompleteProps) {
+export default function AutoCompleteIsland(container: HTMLElement, props: AutoCompleteProps, ctx?: IslandContext) {
     injectIslandStyle('autocomplete', CSS);
     
     const allItems: AutoCompleteItem[] = props.suggestions || props.items || [];

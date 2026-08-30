@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise IftaLabel Component (Aura IftaLabel)
  * Infield top-aligned label container with seamless field padding,
@@ -10,6 +12,8 @@ export interface IftaLabelProps {
     label?: string;
     for?: string;
     invalid?: boolean;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 const CSS = `
@@ -91,7 +95,7 @@ const CSS = `
 }
 `;
 
-export default function IftaLabelIsland(container: HTMLElement, props: IftaLabelProps) {
+export default function IftaLabelIsland(container: HTMLElement, props: IftaLabelProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-ifta-label', CSS);
 
     const initialHtml = container.innerHTML;

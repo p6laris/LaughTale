@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise ToggleSwitch Component (Aura ToggleSwitch)
  * Pixel-perfect boolean toggle switch with handle icon templating, custom styling,
@@ -23,6 +25,8 @@ export interface ToggleSwitchProps {
     ariaLabelledBy?: string;
     sliderClass?: string;
     handleClass?: string;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 const CSS = `
@@ -176,7 +180,7 @@ const CSS = `
 }
 `;
 
-export default function ToggleSwitchIsland(container: HTMLElement, props: ToggleSwitchProps) {
+export default function ToggleSwitchIsland(container: HTMLElement, props: ToggleSwitchProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-toggleswitch', CSS);
 
     let isChecked = props.checked === true || String(props.checked) === 'true' || props.value === true || String(props.value) === 'true';

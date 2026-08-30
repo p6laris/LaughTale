@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿import { injectIslandStyle } from '../runtime/styles';
 /**
  * LaughTale: Enterprise Skeleton Shimmer Placeholder (Aura Skeleton inspired)
@@ -8,6 +10,8 @@ export interface SkeletonProps {
     width?: string;
     height?: string;
     borderRadius?: string;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 
@@ -19,7 +23,7 @@ const CSS = `
 }
 `;
 
-export default function SkeletonIsland(container: HTMLElement, props: SkeletonProps) {
+export default function SkeletonIsland(container: HTMLElement, props: SkeletonProps, ctx?: IslandContext) {
     injectIslandStyle('skeleton', CSS);
     const shape = props.shape || 'rectangle';
     const width = props.width || '100%';

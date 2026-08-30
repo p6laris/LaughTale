@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise Tabs Component (Aura Design System compliant)
  * PrimeVue 4 Aura-exact tabs container with animated indicator bar,
@@ -246,12 +248,14 @@ export interface TabsProps {
     scrollable?: boolean;
     selectOnFocus?: boolean;
     lazy?: boolean;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 const CHEVRON_LEFT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>`;
 const CHEVRON_RIGHT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`;
 
-export default function TabsIsland(container: HTMLElement, props: TabsProps) {
+export default function TabsIsland(container: HTMLElement, props: TabsProps, ctx?: IslandContext) {
     injectIslandStyle('tabs', TABS_CSS);
 
     const rootEl = container.querySelector<HTMLElement>('.p-tabs') || container;

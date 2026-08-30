@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿import { injectIslandStyle } from '../runtime/styles';
 /**
  * LaughTale: Enterprise MeterGroup Gauge Component (Aura MeterGroup inspired)
@@ -14,6 +16,8 @@ export interface MeterGroupProps {
     values: MeterValue[];
     title?: string;
     showLabels?: boolean;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 
@@ -25,7 +29,7 @@ const CSS = `
 }
 `;
 
-export default function MeterGroupIsland(container: HTMLElement, props: MeterGroupProps) {
+export default function MeterGroupIsland(container: HTMLElement, props: MeterGroupProps, ctx?: IslandContext) {
     injectIslandStyle('meter-group', CSS);
     const total = props.values.reduce((acc, curr) => acc + curr.value, 0);
 

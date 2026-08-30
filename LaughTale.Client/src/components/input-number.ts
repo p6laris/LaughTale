@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise InputNumber Component (Aura InputNumber)
  * Seamless unified container design matching PrimeVue Aura pixel-for-pixel:
@@ -34,6 +36,8 @@ export interface InputNumberProps {
     disabled?: boolean | string;
     inputClass?: string;
     inputStyle?: Record<string, string> | string;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 const CSS = `
@@ -293,7 +297,7 @@ const CSS = `
 }
 `;
 
-export default function InputNumberIsland(container: HTMLElement, props: InputNumberProps) {
+export default function InputNumberIsland(container: HTMLElement, props: InputNumberProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-inputnumber', CSS);
 
     let rawValue: number | null = props.value !== undefined && props.value !== null ? Number(props.value) : null;

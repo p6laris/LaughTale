@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise Toolbar Component (Aura Design System compliant)
  * Grouping component for buttons and controls with start, center, and end slot sections.
@@ -70,12 +72,14 @@ const TOOLBAR_CSS = `
 
 export interface ToolbarProps {
     ariaLabel?: string;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 const PLAY_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 2px;"><polygon points="6 3 20 12 6 21 6 3"/></svg>`;
 const PAUSE_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>`;
 
-export default function ToolbarIsland(container: HTMLElement, props: ToolbarProps) {
+export default function ToolbarIsland(container: HTMLElement, props: ToolbarProps, ctx?: IslandContext) {
     injectIslandStyle('toolbar', TOOLBAR_CSS);
 
     const rootEl = container.querySelector<HTMLElement>('.p-toolbar') || container;

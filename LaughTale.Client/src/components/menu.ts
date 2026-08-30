@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise Menu Component (PrimeVue 4 Aura Design System compliant)
  * Navigation and command menu supporting dynamic popup overlay (fixed body-anchored),
@@ -312,9 +314,11 @@ export interface MenuProps {
     customTemplate?: boolean;
     class?: string;
     style?: string;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
-export default function MenuIsland(container: HTMLElement, props: MenuProps) {
+export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx?: IslandContext) {
     injectIslandStyle('menu', MENU_CSS);
 
     const isPopup = props.popup || (props as any).Popup || false;

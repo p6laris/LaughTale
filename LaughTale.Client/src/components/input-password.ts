@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise InputPassword Component (Aura InputPassword)
  * High-fidelity password input with toggle visibility mask, live strength metering,
@@ -28,6 +30,8 @@ export interface InputPasswordProps {
     readonlyMode?: boolean | string;
     invalid?: boolean | string;
     inputClass?: string;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 const CSS = `
@@ -368,7 +372,7 @@ const CSS = `
 }
 `;
 
-export default function InputPasswordIsland(container: HTMLElement, props: InputPasswordProps) {
+export default function InputPasswordIsland(container: HTMLElement, props: InputPasswordProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-password', CSS);
 
     let isMasked = true;

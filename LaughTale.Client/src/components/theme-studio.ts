@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: TweakAura Live Theme Studio (tweakcn-inspired)
  * Interactive theme customizer with real-time CSS variable injection, palette presets, radius sliders, and 1-click export.
@@ -11,6 +13,8 @@ import { AURA_PALETTES, generatePaletteRamp, updateToken, saveTheme, loadSavedTh
 
 export interface ThemeStudioProps {
     defaultOpen?: boolean;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 interface ColorPreset {
@@ -72,7 +76,7 @@ const NEUTRAL_PRESETS: Record<string, NeutralPreset> = {
     }
 };
 
-export default function ThemeStudioIsland(container: HTMLElement, props: ThemeStudioProps = {}) {
+export default function ThemeStudioIsland(container: HTMLElement, props: ThemeStudioProps = {}, ctx?: IslandContext) {
     let currentPrimary = 'emerald';
     let currentCustomHex = '';
     let currentNeutral = 'slate';

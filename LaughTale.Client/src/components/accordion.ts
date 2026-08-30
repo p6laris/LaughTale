@@ -1,12 +1,19 @@
-﻿/**
- * LaughTale: Enterprise Accordion Component (Aura Design System compliant)
- * Expandable collapsible panel groups with butter-smooth 60fps CSS Grid animations,
- * single/multiple modes, controlled state, custom triggers, dynamic indicators,
- * disabled states, radio-grouped selection, and full W3C APG keyboard accessibility.
- */
-
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
-import { AccordionProps, AccordionTab } from '../types/models';
+import { AccordionTab } from '../types/models';
+
+export interface AccordionProps {
+    tabs?: AccordionTab[];
+    multiple?: boolean;
+    controlled?: boolean;
+    withRadio?: boolean;
+    customIndicator?: 'css' | 'match';
+    value?: string | number | (string | number)[];
+    activeIndex?: number | number[];
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
+}
 
 const SVG_ICONS = {
     chevronDown: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>',
@@ -237,7 +244,7 @@ const ACCORDION_CSS = `
 }
 `;
 
-export default function AccordionIsland(container: HTMLElement, props: AccordionProps) {
+export default function AccordionIsland(container: HTMLElement, props: AccordionProps, ctx?: IslandContext) {
     injectIslandStyle('accordion', ACCORDION_CSS);
 
     const tabs: AccordionTab[] = (props.tabs || []).map((t, i) => ({

@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise InputTags Component (Aura InputTags / Chips)
  * Zero-flicker incremental DOM tokenization, custom delimiters, paste splitting,
@@ -26,6 +28,8 @@ export interface InputTagsProps {
     invalid?: boolean;
     targetInputName?: string;
     inputId?: string;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 const CSS = `
@@ -272,7 +276,7 @@ const CSS = `
 
 const xCircleIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>`;
 
-export default function InputTagsIsland(container: HTMLElement, props: InputTagsProps) {
+export default function InputTagsIsland(container: HTMLElement, props: InputTagsProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-inputtags', CSS);
 
     // Initial value parsing

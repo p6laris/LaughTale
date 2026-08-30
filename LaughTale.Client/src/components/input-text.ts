@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise InputText Component (Aura InputText)
  * Standard and enhanced text input with size scales, filled/outlined variants,
@@ -31,6 +33,8 @@ export interface InputTextProps {
     ariaLabelledBy?: string;
     ariaDescribedBy?: string;
     helpText?: string;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 const CSS = `
@@ -235,7 +239,7 @@ const CSS = `
 
 const xIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
 
-export default function InputTextIsland(container: HTMLElement, props: InputTextProps) {
+export default function InputTextIsland(container: HTMLElement, props: InputTextProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-inputtext', CSS);
 
     const [getValue, setValue] = useControllableState<string>({

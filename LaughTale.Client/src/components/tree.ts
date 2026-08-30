@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise Tree Component (Aura Design System compliant)
  * Rich hierarchical tree data visualizer with expand/collapse, custom node icons,
@@ -33,6 +35,8 @@ export interface TreeProps {
     skeleton?: boolean;
     emptyMessage?: string;
     events?: boolean;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 const TREE_CSS = `
@@ -310,7 +314,7 @@ const SVG_ICONS = {
 // Global Drag Store for multi-tree drag&drop
 let globalDraggedNode: { node: any; sourceScope?: string } | null = null;
 
-export default function TreeIsland(container: HTMLElement, props: TreeProps) {
+export default function TreeIsland(container: HTMLElement, props: TreeProps, ctx?: IslandContext) {
     injectIslandStyle('tree', TREE_CSS);
 
     let treeData: any[] = JSON.parse(JSON.stringify(props.value || props.nodes || []));

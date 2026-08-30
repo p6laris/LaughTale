@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise Message Component (PrimeVue 4 Aura Design System)
  * High-performance inline notification messages with severity levels,
@@ -429,10 +431,13 @@ export interface MessageProps {
     class?: string;
     style?: string;
     dynamic?: boolean;
-    messages?: Array<{ severity: string; content: string; closable?: boolean }>;
+    messages?: Array<{ severity: string; content: string; closable?: boolean
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
+}>;
 }
 
-export default function MessageIsland(container: HTMLElement, props: MessageProps) {
+export default function MessageIsland(container: HTMLElement, props: MessageProps, ctx?: IslandContext) {
     injectIslandStyle('message', MESSAGE_CSS);
 
     const isDynamic = props.dynamic === true;

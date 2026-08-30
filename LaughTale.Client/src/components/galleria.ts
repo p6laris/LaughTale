@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise Galleria Component (Aura Galleria inspired)
  * Image gallery carousel with thumbnail strip, caption overlay, and interactive navigation.
@@ -10,6 +12,8 @@ import { LucideIcons } from '../icons/lucide';
 export interface GalleriaProps {
     value?: GalleriaItem[];
     autoPlay?: boolean;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 
@@ -36,7 +40,7 @@ const CSS = `
 }
 `;
 
-export default function GalleriaIsland(container: HTMLElement, props: GalleriaProps) {
+export default function GalleriaIsland(container: HTMLElement, props: GalleriaProps, ctx?: IslandContext) {
     injectIslandStyle('galleria', CSS);
     const images: GalleriaItem[] = props.value && props.value.length > 0 ? props.value : [
         {

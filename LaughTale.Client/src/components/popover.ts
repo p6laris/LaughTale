@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise Popover Component (PrimeVue 4 Aura Design System compliant)
  * High-performance anchored overlay popup with dynamic viewport edge flipping,
@@ -81,6 +83,8 @@ export interface PopoverProps {
     showArrow?: boolean;
     dismissable?: boolean;
     closeOnEscape?: boolean;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 let globalPopoverDelegationBound = false;
@@ -208,7 +212,7 @@ function initGlobalPopoverDelegation() {
     }, { passive: true });
 }
 
-export default function PopoverIsland(container: HTMLElement, props: PopoverProps) {
+export default function PopoverIsland(container: HTMLElement, props: PopoverProps, ctx?: IslandContext) {
     injectIslandStyle('popover', POPOVER_CSS);
     initGlobalPopoverDelegation();
 }

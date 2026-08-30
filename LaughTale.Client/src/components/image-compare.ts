@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise Compare Component (PrimeVue 4 Aura Design System)
  * High-performance side-by-side comparison slider supporting horizontal and vertical orientation,
@@ -28,6 +30,8 @@ export interface CompareProps {
     class?: string;
     style?: string;
     ariaLabel?: string;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 const COMPARE_CSS = `
@@ -197,7 +201,7 @@ const CODE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
 const DEFAULT_BEFORE_IMG = 'https://primefaces.org/cdn/primevue/images/compare/island2.jpg';
 const DEFAULT_AFTER_IMG = 'https://primefaces.org/cdn/primevue/images/compare/island1.jpg';
 
-export default function CompareIsland(container: HTMLElement, props: CompareProps) {
+export default function CompareIsland(container: HTMLElement, props: CompareProps, ctx?: IslandContext) {
     injectIslandStyle('compare', COMPARE_CSS);
 
     const demoType = props.demoType || 'basic';

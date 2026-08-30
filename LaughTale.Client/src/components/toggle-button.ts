@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise ToggleButton Component (Aura ToggleButton)
  * Binary toggle button with dynamic state labels, Lucide icons, size metrics,
@@ -24,6 +26,8 @@ export interface ToggleButtonProps {
     inputId?: string;
     ariaLabel?: string;
     ariaLabelledBy?: string;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 const CSS = `
@@ -158,7 +162,7 @@ const CSS = `
 }
 `;
 
-export default function ToggleButtonIsland(container: HTMLElement, props: ToggleButtonProps) {
+export default function ToggleButtonIsland(container: HTMLElement, props: ToggleButtonProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-togglebutton', CSS);
 
     let isChecked = props.checked === true || String(props.checked) === 'true' || props.value === true || String(props.value) === 'true';

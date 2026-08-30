@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise InputOtp Component (Aura InputOtp)
  * Multi-cell OTP PIN input with auto-advance, backspace navigation,
@@ -22,6 +24,8 @@ export interface InputOtpProps {
     readonlyMode?: boolean | string;
     invalid?: boolean | string;
     autofocus?: boolean | string;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 const CSS = `
@@ -163,7 +167,7 @@ const CSS = `
 }
 `;
 
-export default function InputOtpIsland(container: HTMLElement, props: InputOtpProps) {
+export default function InputOtpIsland(container: HTMLElement, props: InputOtpProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-inputotp', CSS);
 
     const length = Number(props.length) || 4;

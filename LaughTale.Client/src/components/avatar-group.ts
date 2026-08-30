@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿import { injectIslandStyle } from '../runtime/styles';
 /**
  * LaughTale: Enterprise Avatar & AvatarGroup Component (Aura AvatarGroup inspired)
@@ -14,6 +16,8 @@ export interface AvatarGroupProps {
     avatars: AvatarItem[];
     max?: number;
     size?: 'sm' | 'md' | 'lg';
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 
@@ -25,7 +29,7 @@ const CSS = `
 }
 `;
 
-export default function AvatarGroupIsland(container: HTMLElement, props: AvatarGroupProps) {
+export default function AvatarGroupIsland(container: HTMLElement, props: AvatarGroupProps, ctx?: IslandContext) {
     injectIslandStyle('avatar-group', CSS);
     const max = props.max || 4;
     const visible = props.avatars.slice(0, max);

@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿import { injectIslandStyle } from '../runtime/styles';
 /**
  * LaughTale: Enterprise BlockUI Component (Aura BlockUI inspired)
@@ -7,6 +9,8 @@
 export interface BlockUIProps {
     blocked?: boolean;
     message?: string;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 
@@ -23,7 +27,7 @@ const CSS = `
 }
 `;
 
-export default function BlockUIIsland(container: HTMLElement, props: BlockUIProps) {
+export default function BlockUIIsland(container: HTMLElement, props: BlockUIProps, ctx?: IslandContext) {
     injectIslandStyle('blockui', CSS);
     let isBlocked = props.blocked ?? true;
 

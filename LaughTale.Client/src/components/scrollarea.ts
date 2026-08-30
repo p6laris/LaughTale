@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise ScrollArea Component (Aura Design System compliant)
  * Custom themed scrollbar container with smooth drag scrolling, dynamic size calculation,
@@ -140,9 +142,11 @@ export interface ScrollAreaProps {
     orientation?: 'vertical' | 'horizontal' | 'both';
     variant?: 'auto' | 'hover' | 'scroll' | 'always' | 'hidden';
     mask?: boolean;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
-export default function ScrollAreaIsland(container: HTMLElement, props: ScrollAreaProps) {
+export default function ScrollAreaIsland(container: HTMLElement, props: ScrollAreaProps, ctx?: IslandContext) {
     injectIslandStyle('scrollarea', SCROLLAREA_CSS);
 
     const rootEl = container.querySelector<HTMLElement>('.p-scrollarea') || container;

@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise Slider Component (Aura Slider)
  * High-performance Pointer Capture dragging engine supporting single and range modes,
@@ -24,6 +26,8 @@ export interface SliderProps {
     inputId?: string;
     ariaLabel?: string;
     ariaLabelledBy?: string;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 const CSS = `
@@ -168,7 +172,7 @@ const CSS = `
 }
 `;
 
-export default function SliderIsland(container: HTMLElement, props: SliderProps) {
+export default function SliderIsland(container: HTMLElement, props: SliderProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-slider', CSS);
 
     const min = props.min !== undefined ? Number(props.min) : 0;

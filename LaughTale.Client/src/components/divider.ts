@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise Divider Component (Aura Design System compliant)
  * Separates content horizontally or vertically with solid, dotted, or dashed borders,
@@ -111,9 +113,11 @@ export interface DividerProps {
     layout?: 'horizontal' | 'vertical';
     type?: 'solid' | 'dotted' | 'dashed';
     align?: 'left' | 'center' | 'right' | 'top' | 'bottom';
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
-export default function DividerIsland(container: HTMLElement, props: DividerProps) {
+export default function DividerIsland(container: HTMLElement, props: DividerProps, ctx?: IslandContext) {
     injectIslandStyle('divider', DIVIDER_CSS);
 
     const isVertical = props.layout === 'vertical';

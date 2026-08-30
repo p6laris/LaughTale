@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise CommandMenu Component (PrimeVue 4 Aura Design System compliant)
  * Search-driven command palette with unified selection state, root-level keyboard capture,
@@ -313,9 +315,11 @@ export interface CommandMenuProps {
     hotkey?: string;
     customTemplate?: boolean;
     emptyMessage?: string;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
-export default function CommandMenuIsland(container: HTMLElement, props: CommandMenuProps) {
+export default function CommandMenuIsland(container: HTMLElement, props: CommandMenuProps, ctx?: IslandContext) {
     injectIslandStyle('commandmenu', COMMAND_CSS);
 
     const placeholder = props.placeholder || (props as any).Placeholder || 'Search for commands...';

@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿import { injectIslandStyle } from '../runtime/styles';
 /**
  * LaughTale: Enterprise Status Tag & Badge Component (Aura Tag inspired)
@@ -8,6 +10,8 @@ export interface TagProps {
     severity?: 'success' | 'info' | 'warning' | 'danger' | 'secondary' | 'contrast';
     rounded?: boolean;
     icon?: string;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 
@@ -19,7 +23,7 @@ const CSS = `
 }
 `;
 
-export default function TagIsland(container: HTMLElement, props: TagProps) {
+export default function TagIsland(container: HTMLElement, props: TagProps, ctx?: IslandContext) {
     injectIslandStyle('tag', CSS);
     const severity = props.severity || 'info';
     const isRounded = props.rounded || false;

@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise Menubar Component (PrimeVue 4 Aura Design System compliant)
  * Horizontal navigation menubar with multi-level cascading dropdowns, responsive mobile drawer/button,
@@ -335,9 +337,11 @@ export interface MenubarProps {
     customTemplate?: boolean;
     class?: string;
     style?: string;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
-export default function MenubarIsland(container: HTMLElement, props: MenubarProps) {
+export default function MenubarIsland(container: HTMLElement, props: MenubarProps, ctx?: IslandContext) {
     injectIslandStyle('menubar', MENUBAR_CSS);
 
     const customTemplate = props.customTemplate || (props as any).CustomTemplate || false;

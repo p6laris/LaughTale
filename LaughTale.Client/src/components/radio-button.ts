@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise RadioButton Component (Aura RadioButton)
  * Mutual exclusion radio selector with zero-flicker incremental DOM updates,
@@ -39,6 +41,8 @@ export interface RadioButtonProps {
     options?: (RadioButtonOption | string)[];
     selectedValue?: string;
     layout?: 'horizontal' | 'vertical';
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 const CSS = `
@@ -316,7 +320,7 @@ const CSS = `
 }
 `;
 
-export default function RadioButtonIsland(container: HTMLElement, props: RadioButtonProps) {
+export default function RadioButtonIsland(container: HTMLElement, props: RadioButtonProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-radio', CSS);
 
     const isCard = props.card === true || String(props.card) === 'true';

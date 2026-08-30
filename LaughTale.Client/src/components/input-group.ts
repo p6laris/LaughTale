@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise InputGroup & InputGroupAddon (Aura InputGroup)
  * High-precision grouping container matching PrimeVue Aura pixel-for-pixel:
@@ -11,6 +13,8 @@ import { getLucideIcon } from '../icons/lucide';
 export interface InputGroupProps {
     size?: 'small' | 'normal' | 'large';
     fluid?: boolean;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 export interface InputGroupAddonProps {
@@ -282,7 +286,7 @@ const CSS = `
 }
 `;
 
-export default function InputGroupIsland(container: HTMLElement, props: InputGroupProps) {
+export default function InputGroupIsland(container: HTMLElement, props: InputGroupProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-inputgroup', CSS);
     
     container.classList.add('laughtale-inputgroup', 'p-inputgroup');

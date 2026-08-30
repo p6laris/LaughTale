@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise TreeSelect Component (Aura TreeSelect)
  * Hierarchical selection with single, multiple, and tri-state checkbox modes,
@@ -51,6 +53,8 @@ export interface TreeSelectProps {
     header?: string;
     footer?: string;
     metaKeySelection?: boolean;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 const CSS = `
@@ -490,7 +494,7 @@ const chevronDownSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" heigh
 const searchSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>`;
 const xSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
 
-export default function TreeSelectIsland(container: HTMLElement, props: TreeSelectProps) {
+export default function TreeSelectIsland(container: HTMLElement, props: TreeSelectProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-treeselect', CSS);
 
     const rawNodes: TreeNodeItem[] = props.nodes || props.options || props.departments || [];

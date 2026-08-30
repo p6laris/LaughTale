@@ -1,3 +1,5 @@
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise TreeTable Component (Aura Design System compliant)
  * Hierarchical data grid visualizer in tabular format with expand/collapse rows,
@@ -23,7 +25,10 @@ export interface TreeTableProps {
     sortMode?: 'single' | 'multiple';
     sortField?: string;
     sortOrder?: number;
-    multiSortMeta?: { field: string; order: number }[];
+    multiSortMeta?: { field: string; order: number
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
+}[];
     removableSort?: boolean;
     paginator?: boolean;
     rows?: number;
@@ -525,7 +530,7 @@ const SVG_ICONS = {
     plus: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>'
 };
 
-export default function TreeTableIsland(container: HTMLElement, props: TreeTableProps) {
+export default function TreeTableIsland(container: HTMLElement, props: TreeTableProps, ctx?: IslandContext) {
     injectIslandStyle('treetable', TREETABLE_CSS);
 
     let rawNodes: any[] = JSON.parse(JSON.stringify(props.value || props.nodes || []));
