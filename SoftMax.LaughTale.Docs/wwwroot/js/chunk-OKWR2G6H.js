@@ -1,55 +1,4 @@
-// tests/setup.ts
-import { Window } from "happy-dom";
-var win = new Window({
-  url: "http://localhost:5000"
-});
-globalThis.window = win;
-globalThis.document = win.document;
-globalThis.HTMLElement = win.HTMLElement;
-globalThis.HTMLInputElement = win.HTMLInputElement;
-globalThis.HTMLSelectElement = win.HTMLSelectElement;
-globalThis.HTMLTextAreaElement = win.HTMLTextAreaElement;
-globalThis.HTMLButtonElement = win.HTMLButtonElement;
-globalThis.CustomEvent = win.CustomEvent;
-globalThis.Event = win.Event;
-globalThis.MouseEvent = win.MouseEvent;
-globalThis.KeyboardEvent = win.KeyboardEvent;
-globalThis.Node = win.Node;
-globalThis.localStorage = win.localStorage;
-globalThis.sessionStorage = win.sessionStorage;
-globalThis.requestAnimationFrame = (cb) => setTimeout(cb, 16);
-try {
-  Object.defineProperty(globalThis.navigator, "clipboard", {
-    value: {
-      writeText: async (_text) => Promise.resolve()
-    },
-    configurable: true
-  });
-} catch {
-}
-globalThis.MutationObserver = win.MutationObserver || class {
-  observe() {
-  }
-  disconnect() {
-  }
-};
-globalThis.IntersectionObserver = class {
-  callback;
-  constructor(cb) {
-    this.callback = cb;
-  }
-  observe(el) {
-    this.callback([{ isIntersecting: true, target: el }]);
-  }
-  disconnect() {
-  }
-};
-
-// tests/security.test.ts
-import { describe, it } from "node:test";
-import assert from "node:assert/strict";
-
-// src/directives/security.ts
+// ../SoftMax.LaughTale.Client/src/directives/security.ts
 var BLOCKED_PROPERTIES = /* @__PURE__ */ new Set([
   "__proto__",
   "prototype",
@@ -100,31 +49,8 @@ function isSafeAttribute(attrName) {
   }
   return true;
 }
-function sanitizeHtml(html) {
-  if (typeof html !== "string") return "";
-  if (typeof document !== "undefined") {
-    const div = document.createElement("div");
-    div.innerHTML = html;
-    const dangerous = div.querySelectorAll("script, iframe, object, embed, applet, link, meta, style");
-    dangerous.forEach((el) => el.remove());
-    const allElements = div.querySelectorAll("*");
-    allElements.forEach((el) => {
-      for (const attr of Array.from(el.attributes)) {
-        if (attr.name.toLowerCase().startsWith("on")) {
-          el.removeAttribute(attr.name);
-        } else if (["href", "src", "action"].includes(attr.name.toLowerCase())) {
-          if (DANGEROUS_PROTOCOLS.test(attr.value)) {
-            el.removeAttribute(attr.name);
-          }
-        }
-      }
-    });
-    return div.innerHTML;
-  }
-  return html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "").replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, "").replace(/\son\w+\s*=\s*(['"]).*?\1/gi, "");
-}
 
-// src/directives/expression/lexer.ts
+// ../SoftMax.LaughTale.Client/src/directives/expression/lexer.ts
 var FORBIDDEN_KEYWORDS = /* @__PURE__ */ new Set([
   "new",
   "function",
@@ -409,7 +335,7 @@ var Lexer = class {
   }
 };
 
-// src/directives/expression/parser.ts
+// ../SoftMax.LaughTale.Client/src/directives/expression/parser.ts
 var ParseError = class extends Error {
   pos;
   constructor(message, pos = 0) {
@@ -828,7 +754,7 @@ var Parser = class _Parser {
   }
 };
 
-// src/directives/expression/evaluator.ts
+// ../SoftMax.LaughTale.Client/src/directives/expression/evaluator.ts
 var FORBIDDEN_PROPERTIES = /* @__PURE__ */ new Set([
   "constructor",
   "__proto__",
@@ -1186,8 +1112,17 @@ function applyUpdate(target, operator, prefix, state, extraContext) {
   return void 0;
 }
 
-// src/directives/reactivity.ts
+// ../SoftMax.LaughTale.Client/src/directives/reactivity.ts
 var elementScopeMap = /* @__PURE__ */ new WeakMap();
+function getNearestScope(element) {
+  let current = element;
+  while (current) {
+    const scope = elementScopeMap.get(current);
+    if (scope) return scope;
+    current = current.parentElement;
+  }
+  return void 0;
+}
 function createReactiveScope(container, initialData) {
   const listeners = /* @__PURE__ */ new Set();
   const state = new Proxy(initialData, {
@@ -1222,46 +1157,107 @@ function evaluateExpression(expr, state, extraContext = {}) {
     return void 0;
   }
 }
+function executeStatement(stmt, state, extraContext = {}) {
+  try {
+    const ast = parseExpressionToAst(stmt);
+    if (!ast) return;
+    evaluateAst(ast, state, extraContext);
+  } catch (err) {
+    console.warn(`[SoftMax.LaughTale] Error executing statement "${stmt}":`, err);
+  }
+}
+function bindElementReactivity(element, scope) {
+  for (const attr of Array.from(element.attributes)) {
+    if (attr.name === "l-bind") {
+      const expr = attr.value;
+      const update = () => {
+        const val = evaluateExpression(expr, scope.state);
+        element.textContent = String(val ?? "");
+      };
+      scope.listeners.add(update);
+      update();
+    } else if (attr.name.startsWith("l-bind:")) {
+      const targetAttr = attr.name.slice(7);
+      if (!isSafeAttribute(targetAttr)) {
+        continue;
+      }
+      const expr = attr.value;
+      const update = () => {
+        let val = evaluateExpression(expr, scope.state);
+        if (["href", "src", "action"].includes(targetAttr.toLowerCase())) {
+          val = sanitizeUrl(val);
+        }
+        if (val === false || val === null || val === void 0) {
+          element.removeAttribute(targetAttr);
+        } else if (val === true) {
+          element.setAttribute(targetAttr, "");
+        } else {
+          element.setAttribute(targetAttr, String(val));
+        }
+      };
+      scope.listeners.add(update);
+      update();
+    } else if (attr.name === "l-class") {
+      const expr = attr.value;
+      const update = () => {
+        const val = evaluateExpression(expr, scope.state);
+        if (typeof val === "object" && val !== null) {
+          for (const [className, active] of Object.entries(val)) {
+            element.classList.toggle(className, Boolean(active));
+          }
+        } else if (typeof val === "string") {
+          element.className = val;
+        }
+      };
+      scope.listeners.add(update);
+      update();
+    } else if (attr.name === "l-style") {
+      const expr = attr.value;
+      const update = () => {
+        const val = evaluateExpression(expr, scope.state);
+        if (typeof val === "object" && val !== null) {
+          Object.assign(element.style, val);
+        }
+      };
+      scope.listeners.add(update);
+      update();
+    }
+  }
+  if (element.hasAttribute("l-model")) {
+    const propName = element.getAttribute("l-model");
+    if (!isSafeProperty(propName)) {
+      console.warn(`[SoftMax.LaughTale Security] Blocked l-model binding on restricted property: "${propName}"`);
+      return;
+    }
+    const input = element;
+    const update = () => {
+      const val = scope.state[propName];
+      if (input.type === "checkbox") {
+        input.checked = Boolean(val);
+      } else {
+        input.value = val ?? "";
+      }
+    };
+    scope.listeners.add(update);
+    update();
+    const eventName = input.type === "checkbox" || input.tagName === "SELECT" ? "change" : "input";
+    input.addEventListener(eventName, () => {
+      if (input.type === "checkbox") {
+        scope.state[propName] = input.checked;
+      } else if (input.type === "number") {
+        scope.state[propName] = input.value === "" ? null : Number(input.value);
+      } else {
+        scope.state[propName] = input.value;
+      }
+    });
+  }
+}
 
-// tests/security.test.ts
-describe("SoftMax.LaughTale Directive Security & Sandboxing Suite", () => {
-  it("sanitizeUrl: neutralizes javascript: and data:text/html protocol attacks", () => {
-    assert.equal(sanitizeUrl("javascript:alert(1)"), "about:blank");
-    assert.equal(sanitizeUrl("  JAVASCRIPT:alert(document.cookie)  "), "about:blank");
-    assert.equal(sanitizeUrl("data:text/html,<script>alert(1)</script>"), "about:blank");
-    assert.equal(sanitizeUrl("https://softmax.dev/dashboard"), "https://softmax.dev/dashboard");
-    assert.equal(sanitizeUrl("/doc/01-getting-started"), "/doc/01-getting-started");
-  });
-  it("isSafeAttribute: blocks dangerous inline event attributes", () => {
-    assert.equal(isSafeAttribute("onerror"), false);
-    assert.equal(isSafeAttribute("onload"), false);
-    assert.equal(isSafeAttribute("onclick"), false);
-    assert.equal(isSafeAttribute("formaction"), false);
-    assert.equal(isSafeAttribute("href"), true);
-    assert.equal(isSafeAttribute("class"), true);
-    assert.equal(isSafeAttribute("style"), true);
-  });
-  it("isSafeProperty: prevents prototype pollution and global access", () => {
-    assert.equal(isSafeProperty("__proto__"), false);
-    assert.equal(isSafeProperty("prototype"), false);
-    assert.equal(isSafeProperty("constructor"), false);
-    assert.equal(isSafeProperty("cookie"), false);
-    assert.equal(isSafeProperty("window"), false);
-    assert.equal(isSafeProperty("userCount"), true);
-  });
-  it("sanitizeHtml: strips malicious script tags and event handlers", () => {
-    const dirty = '<div onclick="alert(1)">Hello <script>alert("xss")</script></div>';
-    const clean = sanitizeHtml(dirty);
-    assert.ok(!clean.includes("<script>"));
-    assert.ok(!clean.includes("onclick"));
-    assert.ok(clean.includes("Hello"));
-  });
-  it("createSandboxState: blocks prototype pollution mutations on reactive state", () => {
-    const container = document.createElement("div");
-    const scope = createReactiveScope(container, { count: 1 });
-    scope.state["__proto__"] = { hacked: true };
-    assert.equal(Object.prototype.hacked, void 0);
-    const res = evaluateExpression("count * 10", scope.state);
-    assert.equal(res, 10);
-  });
-});
+export {
+  getNearestScope,
+  createReactiveScope,
+  evaluateExpression,
+  executeStatement,
+  bindElementReactivity
+};
+//# sourceMappingURL=chunk-OKWR2G6H.js.map

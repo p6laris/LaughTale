@@ -1,9 +1,10 @@
 /**
  * SoftMax.LaughTale: Declarative Reactivity Engine (Hardened Security Edition)
- * Lightweight JavaScript Proxy state management, expression evaluation, XSS prevention, and two-way data binding.
+ * Lightweight JavaScript Proxy state management, AST expression evaluation, XSS prevention, and two-way data binding.
  */
 
-import { createSandboxState, isSafeAttribute, isSafeProperty, sanitizeUrl } from './security';
+import { isSafeAttribute, isSafeProperty, sanitizeUrl } from './security.ts';
+import { parseExpressionToAst, evaluateAst } from './expression/index.ts';
 
 export interface ReactiveScope {
     state: Record<string, any>;
@@ -52,47 +53,22 @@ export function createReactiveScope(container: HTMLElement, initialData: Record<
 
 export function evaluateExpression(expr: string, state: Record<string, any>, extraContext: Record<string, any> = {}): any {
     try {
-        const sandboxState = createSandboxState(state);
-        const contextKeys = Object.keys(extraContext).filter(isSafeProperty);
-        const contextValues = contextKeys.map(k => extraContext[k]);
-
-        // Sandboxed execution with masked globals
-        const fn = new Function(
-            'state',
-            'window',
-            'document',
-            'location',
-            'cookie',
-            ...contextKeys,
-            `with(state) { return (${expr}); }`
-        );
-
-        return fn(sandboxState, undefined, undefined, undefined, undefined, ...contextValues);
+        const ast = parseExpressionToAst(expr);
+        if (!ast) return undefined;
+        return evaluateAst(ast, state, extraContext);
     } catch (err) {
-        console.error(`[SoftMax.LaughTale] Error evaluating expression "${expr}":`, err);
+        console.warn(`[SoftMax.LaughTale] Error evaluating expression "${expr}":`, err);
         return undefined;
     }
 }
 
 export function executeStatement(stmt: string, state: Record<string, any>, extraContext: Record<string, any> = {}): void {
     try {
-        const sandboxState = createSandboxState(state);
-        const contextKeys = Object.keys(extraContext).filter(isSafeProperty);
-        const contextValues = contextKeys.map(k => extraContext[k]);
-
-        const fn = new Function(
-            'state',
-            'window',
-            'document',
-            'location',
-            'cookie',
-            ...contextKeys,
-            `with(state) { ${stmt}; }`
-        );
-
-        fn(sandboxState, undefined, undefined, undefined, undefined, ...contextValues);
+        const ast = parseExpressionToAst(stmt);
+        if (!ast) return;
+        evaluateAst(ast, state, extraContext);
     } catch (err) {
-        console.error(`[SoftMax.LaughTale] Error executing statement "${stmt}":`, err);
+        console.warn(`[SoftMax.LaughTale] Error executing statement "${stmt}":`, err);
     }
 }
 

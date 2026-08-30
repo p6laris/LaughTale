@@ -7,7 +7,7 @@ import {
   evaluateExpression,
   executeStatement,
   getNearestScope
-} from "./chunk-RQ5UXIGU.js";
+} from "./chunk-OKWR2G6H.js";
 
 // ../SoftMax.LaughTale.Client/src/runtime/registry.ts
 var registry = /* @__PURE__ */ new Map();
@@ -849,7 +849,7 @@ function initDirectives(root = document) {
   allElements.forEach((el) => {
     for (const attr of Array.from(el.attributes)) {
       if (attr.name === "l-bind" || attr.name.startsWith("l-bind:") || attr.name === "l-model" || attr.name === "l-class" || attr.name === "l-style") {
-        import("./reactivity-F3SKD4OT.js").then(({ getNearestScope: getNearestScope2 }) => {
+        import("./reactivity-VOLEANQH.js").then(({ getNearestScope: getNearestScope2 }) => {
           const nearest = getNearestScope2(el);
           if (nearest) bindElementReactivity(el, nearest);
         });
@@ -1095,4 +1095,4 @@ export {
   enableViewTransitions,
   getSlot
 };
-//# sourceMappingURL=chunk-AFRYMU35.js.map
+//# sourceMappingURL=chunk-UO2U4QGO.js.map
