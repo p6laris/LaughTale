@@ -4,7 +4,7 @@
 
 import { defineIsland, initIslands, initDirectives, enableViewTransitions } from '../../LaughTale.Client/src/index';
 
-// 1. Register available islands with lazy dynamic import
+// 1. Register Core Docs Islands
 defineIsland('interactive-counter', () => import('./islands/counter'));
 defineIsland('file-dropzone', () => import('./islands/dropzone'));
 defineIsland('cascade-tree', () => import('./islands/cascade-tree'));
@@ -13,7 +13,12 @@ defineIsland('event-receiver', () => import('./islands/receiver'));
 defineIsland('modal-dialog', () => import('./islands/modal-dialog'));
 defineIsland('persistent-telemetry', () => import('./islands/persistent-player'));
 
-// 2. Command Palette Spotlight Modal Handlers
+// 2. Register Live Polyglot Islands
+defineIsland('polyglot-react', () => import('./islands/polyglot-react'));
+defineIsland('polyglot-vue', () => import('./islands/polyglot-vue'));
+defineIsland('polyglot-svelte', () => import('./islands/polyglot-svelte'));
+
+// 3. Command Palette Spotlight Modal Handlers
 export function openCommandPalette() {
     const backdrop = document.getElementById('command-palette-backdrop');
     if (backdrop) {
@@ -30,7 +35,7 @@ export function closeCommandPalette() {
     }
 }
 
-// 3. Syntax Tokenizer for Code Viewer
+// 4. Syntax Tokenizer for Code Viewer
 function tokenizeCode(codeText: string, lang: string): string {
     let html = codeText
         .replace(/&/g, '&amp;')
@@ -145,7 +150,6 @@ function enhanceCodeBlocks() {
 }
 
 function setupDocsEnhancements() {
-    // Keyboard Shortcut (Ctrl+K / Cmd+K)
     document.addEventListener('keydown', (e) => {
         if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
             e.preventDefault();
@@ -160,7 +164,6 @@ function setupDocsEnhancements() {
 
     enhanceCodeBlocks();
 
-    // TOC ScrollSpy
     const headings = document.querySelectorAll('.laughtale-markdown-content h2, .laughtale-markdown-content h3');
     const tocLinks = document.querySelectorAll('.toc-link');
     
@@ -187,7 +190,6 @@ function initialize() {
     setupDocsEnhancements();
 }
 
-// 4. Initialize runtime
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initialize);
 } else {
@@ -196,4 +198,4 @@ if (document.readyState === 'loading') {
 
 window.addEventListener('island:page-loaded', setupDocsEnhancements);
 
-console.log('[LaughTale] Docs client runtime initialized with sleek code viewer.');
+console.log('[LaughTale] Docs client runtime initialized with polyglot islands.');

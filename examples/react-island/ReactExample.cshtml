@@ -1,0 +1,15 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "React 19 Island";
+}
+
+<div class="container py-4">
+    <h2>React Island Integration</h2>
+    
+    <!-- LaughTale Island TagHelper -->
+    <island name="counter-widget" 
+            framework="React" 
+            props="@(new MyApp.Models.CounterProps(InitialCount: 10, Step: 5, Label: "Server Nodes"))" 
+            hydrate="Visible" />
+</div>

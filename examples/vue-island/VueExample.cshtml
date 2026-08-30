@@ -1,0 +1,14 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Vue 3 Island";
+}
+
+<div class="container py-4">
+    <h2>Vue 3 Island Integration</h2>
+    
+    <island name="inventory-widget" 
+            framework="Vue" 
+            props="@(new MyApp.Models.InventoryProps(WarehouseCode: "WH-NORTH-02", InitialStock: 120))" 
+            hydrate="Load" />
+</div>

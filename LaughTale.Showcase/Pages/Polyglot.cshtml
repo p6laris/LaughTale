@@ -1,0 +1,95 @@
+@page "/polyglot"
+@model LaughTale.Showcase.Pages.PolyglotModel
+@{
+    ViewData["Title"] = "Polyglot Islands Lab (React + Vue + Svelte + Preact + Vanilla)";
+}
+
+<!-- Top Header Hero -->
+<div style="margin-bottom: 2rem; background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-xl); padding: 2rem 2.5rem; box-shadow: var(--p-shadow-sm);">
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                <span class="aura-tag tag-indigo">Polyglot Architecture</span>
+                <span class="aura-tag tag-emerald">5 Frameworks Live</span>
+                <span class="aura-tag tag-slate">Inter-Island Event Bus</span>
+            </div>
+            <h1 style="font-size: 2rem; font-weight: 800; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Polyglot Multi-Framework Lab</h1>
+            <p style="font-size: 1rem; color: var(--p-text-muted); margin: 0; max-width: 800px;">
+                Demonstrating <strong>React 19</strong>, <strong>Vue 3</strong>, <strong>Svelte 5</strong>, <strong>Preact</strong>, and <strong>Vanilla TypeScript</strong> running concurrently on this single ASP.NET Core Razor page with real-time cross-island event communication.
+            </p>
+        </div>
+        <div>
+            <span class="aura-tag tag-slate" style="font-size: 0.8125rem;">Server Render Time: @Model.ServerTime UTC</span>
+        </div>
+    </div>
+</div>
+
+<!-- 3-Column Top Grid: React, Vue, Svelte -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+
+    <!-- 1. REACT 19 ISLAND -->
+    <div>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+            <span style="font-weight: 700; font-size: 0.875rem; color: var(--p-text-color);">1. React 19 (Sales Emitter)</span>
+            <span class="aura-tag tag-sky text-xs">hydrate="Load"</span>
+        </div>
+        <island name="polyglot-react" 
+                framework="React" 
+                props="@(new { Title = "React 19 Telemetry", InitialScore = 1500, Badge = "Live Emitter" })" 
+                hydrate="Load" />
+    </div>
+
+    <!-- 2. VUE 3 ISLAND -->
+    <div>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+            <span style="font-weight: 700; font-size: 0.875rem; color: var(--p-text-color);">2. Vue 3 (Inventory Listener)</span>
+            <span class="aura-tag tag-emerald text-xs">hydrate="Load"</span>
+        </div>
+        <island name="polyglot-vue" 
+                framework="Vue" 
+                props="@(new { Warehouse = "Erbil Central Logistics", InitialStock = 45 })" 
+                hydrate="Load" />
+    </div>
+
+    <!-- 3. SVELTE 5 ISLAND -->
+    <div>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+            <span style="font-weight: 700; font-size: 0.875rem; color: var(--p-text-color);">3. Svelte 5 (CPU Dial)</span>
+            <span class="aura-tag tag-amber text-xs">hydrate="Load"</span>
+        </div>
+        <island name="polyglot-svelte" 
+                framework="Svelte" 
+                props="@(new { GaugeTitle = "Cluster Node 01", InitialLoad = 40 })" 
+                hydrate="Load" />
+    </div>
+
+</div>
+
+<!-- 2-Column Bottom Grid: Preact & Vanilla -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.5rem;">
+
+    <!-- 4. PREACT ISLAND -->
+    <div>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+            <span style="font-weight: 700; font-size: 0.875rem; color: var(--p-text-color);">4. Preact (3KB Mini Sparkline)</span>
+            <span class="aura-tag tag-indigo text-xs">hydrate="Visible"</span>
+        </div>
+        <island name="polyglot-preact" 
+                framework="Preact" 
+                props="@(new { MetricName = "Transactions per Second" })" 
+                hydrate="Visible" />
+    </div>
+
+    <!-- 5. VANILLA TS ISLAND -->
+    <div>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+            <span style="font-weight: 700; font-size: 0.875rem; color: var(--p-text-color);">5. Vanilla TS (Audit Ledger)</span>
+            <span class="aura-tag tag-slate text-xs">hydrate="Load"</span>
+        </div>
+        <island name="polyglot-vanilla" 
+                framework="Vanilla" 
+                props="@(new { LogTitle = "Inter-Island Event Ledger" })" 
+                hydrate="Load" />
+    </div>
+
+</div>

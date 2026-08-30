@@ -1,0 +1,14 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Svelte 5 Island";
+}
+
+<div class="container py-4">
+    <h2>Svelte 5 Island Integration</h2>
+    
+    <island name="gauge-widget" 
+            framework="Svelte" 
+            props="@(new MyApp.Models.GaugeProps(Title: "Server Memory", Percentage: 38))" 
+            hydrate="Idle" />
+</div>

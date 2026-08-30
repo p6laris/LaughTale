@@ -11,6 +11,7 @@ public static class NavigationData
             new("Overview", "compass", null, false, new List<SidebarItem>
             {
                 new("Showcase Home", "home", "/", currentPath == "/"),
+                new("Polyglot Live Lab", "globe", "/polyglot", currentPath.StartsWith("/polyglot"), null, "Live"),
                 new("Components Catalog", "layers", "/components", currentPath.StartsWith("/components")),
                 new("Dashboard", "activity", "/dashboard", currentPath.StartsWith("/dashboard")),
                 new("Architecture", "fileText", "/About", currentPath.StartsWith("/About"))
