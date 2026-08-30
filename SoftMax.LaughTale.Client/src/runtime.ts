@@ -37,3 +37,5 @@ export { registerCommand, unregisterCommand, getCommand, executeCommand, clearCo
 export { getCspNonce, setCspNonce, applyNonceToStyle, applyNonceToScript } from './directives/csp';
 export { createScope, type IslandScope } from './runtime/scope';
 export { initDesignTokens, updateToken, getToken, AURA_PALETTES, generatePaletteRamp, saveTheme, loadSavedTheme, applySavedTheme, generateThemeExports, type SavedThemeConfig, THEME_STORAGE_KEY } from './styles/design-tokens';
+export { renderThemeMatrix, captureStyleSignature, type MatrixPermutation, type ComponentMatrixSnapshot } from './testing/visual-harness';
+

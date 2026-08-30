@@ -518,7 +518,8 @@ Standardize events on `laughtale:<component>:<event>` (`bubbles: true`, `detail`
 ---
 
 ### `LT-604` — No visual regression safety net
-**Severity:** P2 · **Status:** todo
+**Severity:** P2 · **Status:** done
+
 
 **Evidence.** `LT-601` touches 66 files and 2,025 values, and `LT-401` rewrites 114 TagHelpers. Neither is safe to attempt without pixel-level verification, and there is currently none.
 
