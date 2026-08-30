@@ -220,7 +220,8 @@ Persistent islands must be *excluded* — they are moved, not destroyed.
 ---
 
 ### `LT-203` — View transition starts before content is ready
-**Severity:** P1 · **Status:** todo · **File:** `src/runtime/router.ts:116-120`
+**Severity:** P1 · **Status:** done · **File:** `SoftMax.LaughTale.Client/src/runtime/router.ts`
+**Resolution:** Implemented module-scoped `AbortController` cancellation to abort in-flight requests when rapid new navigations occur, eliminating out-of-order response race conditions. Handled `AbortError` gracefully without page reloads. Synchronized image decoding (`img.decode()`) with a 500ms safety timeout race before finishing DOM transitions. Unit tests verified in `tests/router.test.ts` (5/5 passed).
 
 **Evidence.** `startViewTransition(updateDom)` is called with the new HTML already fetched, but images and (post-`LT-202`) stylesheets in the new body have not loaded. The transition therefore snapshots a half-painted frame — visible flash on image-heavy pages.
 

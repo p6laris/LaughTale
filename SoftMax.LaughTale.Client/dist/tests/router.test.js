@@ -2671,10 +2671,12 @@ if (typeof document !== "undefined") {
 }
 
 // src/runtime/router.ts
+var inFlightController = null;
 async function reconcileHead(newHead) {
   if (!document.head || !newHead) return;
   const getHeadKey = (el) => {
     const tagName = el.tagName.toLowerCase();
+    if (tagName === "title") return "title";
     if (tagName === "meta") {
       const name = el.getAttribute("name");
       if (name) {
@@ -2748,8 +2750,14 @@ async function reconcileHead(newHead) {
   }
 }
 async function navigateTo(urlStr, pushState = true) {
+  if (inFlightController) {
+    inFlightController.abort();
+  }
+  inFlightController = new AbortController();
+  const signal = inFlightController.signal;
   try {
     const response = await fetch(urlStr, {
+      signal,
       headers: {
         "X-Requested-With": "SoftMaxIslands-ViewTransition"
       }
@@ -2783,6 +2791,17 @@ async function navigateTo(urlStr, pushState = true) {
       document.title = newDoc.title;
       if (newDoc.head) {
         await reconcileHead(newDoc.head);
+      }
+      const images = Array.from(newDoc.body.querySelectorAll("img[src]"));
+      const imagePromises = images.map((img) => {
+        if ("decode" in img && typeof img.decode === "function") {
+          return img.decode().catch(() => {
+          });
+        }
+        return Promise.resolve();
+      });
+      if (imagePromises.length > 0) {
+        await Promise.race([Promise.all(imagePromises), new Promise((r) => setTimeout(r, 500))]);
       }
       document.body.innerHTML = newDoc.body.innerHTML;
       persistentElements.forEach((liveEl, id) => {
@@ -2823,13 +2842,20 @@ async function navigateTo(urlStr, pushState = true) {
       await updateDom();
     }
   } catch (err) {
+    if (err?.name === "AbortError" || signal.aborted) {
+      return;
+    }
     console.error("[SoftMax.LaughTale] View transition failed, falling back to full navigation:", err);
     window.location.href = urlStr;
+  } finally {
+    if (inFlightController?.signal === signal) {
+      inFlightController = null;
+    }
   }
 }
 
 // tests/router.test.ts
-describe("Router Cross-Origin Security, Head Reconciliation & Lifecycle Suite (LT-107, LT-202)", () => {
+describe("Router Cross-Origin Security, Head Reconciliation, Concurrency & Lifecycle Suite (LT-107, LT-202, LT-203)", () => {
   beforeEach(() => {
     document.body.innerHTML = "";
     document.head.innerHTML = `
@@ -2952,6 +2978,47 @@ describe("Router Cross-Origin Security, Head Reconciliation & Lifecycle Suite (L
       const viewportMeta = document.querySelector('meta[name="viewport"]');
       assert.ok(cspNonceMeta, "CSP nonce meta was unexpectedly removed");
       assert.ok(viewportMeta, "Viewport meta was unexpectedly removed");
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+  it("navigateTo: cancels in-flight navigation when a newer navigation is triggered (LT-203)", async () => {
+    let routeASignalAborted = false;
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = ((url, opts) => {
+      if (url.includes("/slow-route-a")) {
+        const signal = opts?.signal;
+        return new Promise((resolve, reject) => {
+          if (signal) {
+            signal.addEventListener("abort", () => {
+              routeASignalAborted = true;
+              const err = new Error("Aborted");
+              err.name = "AbortError";
+              reject(err);
+            });
+          }
+          setTimeout(() => {
+            resolve({
+              ok: true,
+              url: window.location.href,
+              text: async () => "<html><head><title>Route A</title></head><body><h1>Route A Body</h1></body></html>"
+            });
+          }, 80);
+        });
+      }
+      return Promise.resolve({
+        ok: true,
+        url: window.location.href,
+        text: async () => "<html><head><title>Route B</title></head><body><h1>Route B Body</h1></body></html>"
+      });
+    });
+    try {
+      const navA = navigateTo("/slow-route-a", false);
+      const navB = navigateTo("/fast-route-b", false);
+      await Promise.all([navA, navB]);
+      assert.equal(routeASignalAborted, true, "Prior in-flight request was not aborted");
+      assert.equal(document.title, "Route B", "DOM was overwritten by aborted Route A instead of Route B");
+      assert.ok(document.body.innerHTML.includes("Route B Body"), "Body does not contain Route B content");
     } finally {
       globalThis.fetch = originalFetch;
     }

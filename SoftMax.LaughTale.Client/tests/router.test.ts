@@ -1,5 +1,5 @@
 /**
- * SoftMax.LaughTale: Router Cross-Origin Security, Head Reconciliation & Lifecycle Unit Tests (LT-107, LT-202)
+ * SoftMax.LaughTale: Router Cross-Origin Security, Head Reconciliation, Concurrency & Lifecycle Unit Tests (LT-107, LT-202, LT-203)
  */
 
 import './setup.ts';
@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { navigateTo } from '../src/runtime/router.ts';
 import { setCspNonce } from '../src/directives/csp.ts';
 
-describe('Router Cross-Origin Security, Head Reconciliation & Lifecycle Suite (LT-107, LT-202)', () => {
+describe('Router Cross-Origin Security, Head Reconciliation, Concurrency & Lifecycle Suite (LT-107, LT-202, LT-203)', () => {
 
     beforeEach(() => {
         document.body.innerHTML = '';
@@ -160,6 +160,55 @@ describe('Router Cross-Origin Security, Head Reconciliation & Lifecycle Suite (L
             const viewportMeta = document.querySelector('meta[name="viewport"]');
             assert.ok(cspNonceMeta, 'CSP nonce meta was unexpectedly removed');
             assert.ok(viewportMeta, 'Viewport meta was unexpectedly removed');
+        } finally {
+            globalThis.fetch = originalFetch;
+        }
+    });
+
+    it('navigateTo: cancels in-flight navigation when a newer navigation is triggered (LT-203)', async () => {
+        let routeASignalAborted = false;
+
+        const originalFetch = globalThis.fetch;
+        globalThis.fetch = ((url: string, opts?: any) => {
+            if (url.includes('/slow-route-a')) {
+                const signal = opts?.signal;
+                return new Promise((resolve, reject) => {
+                    if (signal) {
+                        signal.addEventListener('abort', () => {
+                            routeASignalAborted = true;
+                            const err = new Error('Aborted');
+                            err.name = 'AbortError';
+                            reject(err);
+                        });
+                    }
+                    setTimeout(() => {
+                        resolve({
+                            ok: true,
+                            url: window.location.href,
+                            text: async () => '<html><head><title>Route A</title></head><body><h1>Route A Body</h1></body></html>'
+                        } as any);
+                    }, 80);
+                });
+            }
+
+            // Fast Route B
+            return Promise.resolve({
+                ok: true,
+                url: window.location.href,
+                text: async () => '<html><head><title>Route B</title></head><body><h1>Route B Body</h1></body></html>'
+            } as any);
+        }) as any;
+
+        try {
+            // Trigger slow Route A, then immediately trigger fast Route B
+            const navA = navigateTo('/slow-route-a', false);
+            const navB = navigateTo('/fast-route-b', false);
+
+            await Promise.all([navA, navB]);
+
+            assert.equal(routeASignalAborted, true, 'Prior in-flight request was not aborted');
+            assert.equal(document.title, 'Route B', 'DOM was overwritten by aborted Route A instead of Route B');
+            assert.ok(document.body.innerHTML.includes('Route B Body'), 'Body does not contain Route B content');
         } finally {
             globalThis.fetch = originalFetch;
         }

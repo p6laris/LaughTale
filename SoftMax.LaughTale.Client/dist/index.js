@@ -36729,6 +36729,7 @@ public static class AppTheme
   // src/runtime/router.ts
   init_csp();
   var isRouterActive = false;
+  var inFlightController = null;
   function enableViewTransitions() {
     if (isRouterActive || typeof window === "undefined") return;
     isRouterActive = true;
@@ -36760,6 +36761,7 @@ public static class AppTheme
     if (!document.head || !newHead) return;
     const getHeadKey = (el) => {
       const tagName = el.tagName.toLowerCase();
+      if (tagName === "title") return "title";
       if (tagName === "meta") {
         const name = el.getAttribute("name");
         if (name) {
@@ -36833,8 +36835,14 @@ public static class AppTheme
     }
   }
   async function navigateTo(urlStr, pushState = true) {
+    if (inFlightController) {
+      inFlightController.abort();
+    }
+    inFlightController = new AbortController();
+    const signal = inFlightController.signal;
     try {
       const response = await fetch(urlStr, {
+        signal,
         headers: {
           "X-Requested-With": "SoftMaxIslands-ViewTransition"
         }
@@ -36868,6 +36876,17 @@ public static class AppTheme
         document.title = newDoc.title;
         if (newDoc.head) {
           await reconcileHead(newDoc.head);
+        }
+        const images = Array.from(newDoc.body.querySelectorAll("img[src]"));
+        const imagePromises = images.map((img) => {
+          if ("decode" in img && typeof img.decode === "function") {
+            return img.decode().catch(() => {
+            });
+          }
+          return Promise.resolve();
+        });
+        if (imagePromises.length > 0) {
+          await Promise.race([Promise.all(imagePromises), new Promise((r) => setTimeout(r, 500))]);
         }
         document.body.innerHTML = newDoc.body.innerHTML;
         persistentElements.forEach((liveEl, id) => {
@@ -36908,8 +36927,15 @@ public static class AppTheme
         await updateDom();
       }
     } catch (err) {
+      if (err?.name === "AbortError" || signal.aborted) {
+        return;
+      }
       console.error("[SoftMax.LaughTale] View transition failed, falling back to full navigation:", err);
       window.location.href = urlStr;
+    } finally {
+      if (inFlightController?.signal === signal) {
+        inFlightController = null;
+      }
     }
   }
 

@@ -1,9 +1,10 @@
 /**
  * SoftMax.LaughTale: View Transitions & Persistent Islands Router (Hardened Edition)
  * 
- * Intercepts link navigation, verifies same-origin on redirects, dispatches laughtale:unmount
- * on destroyed islands, reconciles <head> metadata & stylesheets, performs animated page morphing
- * via View Transitions API, preserves persistent island state ([data-persist]), and executes scripts with CSP nonces.
+ * Intercepts link navigation, aborts in-flight navigations upon new clicks, verifies same-origin
+ * on redirects, dispatches laughtale:unmount on destroyed islands, reconciles <head> metadata & stylesheets,
+ * synchronizes image decoding, performs animated page morphing via View Transitions API, preserves
+ * persistent island state ([data-persist]), and executes scripts with CSP nonces.
  */
 
 import { initIslands } from './hydrator';
@@ -11,6 +12,7 @@ import { initDirectives } from '../directives/index';
 import { applyNonceToScript } from '../directives/csp';
 
 let isRouterActive = false;
+let inFlightController: AbortController | null = null;
 
 /**
  * Initializes the View Transitions router across the application.
@@ -62,6 +64,7 @@ export async function reconcileHead(newHead: HTMLHeadElement): Promise<void> {
     // Helper: compute a key for head elements to diff them accurately
     const getHeadKey = (el: Element): string | null => {
         const tagName = el.tagName.toLowerCase();
+        if (tagName === 'title') return 'title';
         if (tagName === 'meta') {
             const name = el.getAttribute('name');
             if (name) {
@@ -145,11 +148,20 @@ export async function reconcileHead(newHead: HTMLHeadElement): Promise<void> {
 }
 
 /**
- * Performs a hardened View Transition navigation to a target URL.
+ * Performs a hardened, race-condition-free View Transition navigation to a target URL.
  */
 export async function navigateTo(urlStr: string, pushState = true): Promise<void> {
+    // 1. In-Flight Navigation Cancellation
+    // Abort previous in-flight request if user rapidly clicked a new link
+    if (inFlightController) {
+        inFlightController.abort();
+    }
+    inFlightController = new AbortController();
+    const signal = inFlightController.signal;
+
     try {
         const response = await fetch(urlStr, {
+            signal,
             headers: {
                 'X-Requested-With': 'SoftMaxIslands-ViewTransition'
             }
@@ -160,7 +172,7 @@ export async function navigateTo(urlStr: string, pushState = true): Promise<void
             return;
         }
 
-        // 1. Cross-Origin Redirect Verification
+        // 2. Cross-Origin Redirect Verification
         // If an open redirect navigated cross-origin, fall back to native browser navigation
         const finalUrl = response.url ? new URL(response.url, window.location.href) : new URL(urlStr, window.location.href);
         if (finalUrl.origin !== window.location.origin) {
@@ -173,21 +185,21 @@ export async function navigateTo(urlStr: string, pushState = true): Promise<void
         const parser = new DOMParser();
         const newDoc = parser.parseFromString(htmlText, 'text/html');
 
-        // 2. Dispatch unmount lifecycle event to active unpersisted islands
+        // 3. Dispatch unmount lifecycle event to active unpersisted islands
         document.querySelectorAll<HTMLElement>('[data-island]').forEach(el => {
             if (!el.closest('[data-persist]')) {
                 el.dispatchEvent(new CustomEvent('laughtale:unmount', { bubbles: false }));
             }
         });
 
-        // 3. Extract persistent elements before updating DOM
+        // 4. Extract persistent elements before updating DOM
         const persistentElements = new Map<string, HTMLElement>();
         document.querySelectorAll<HTMLElement>('[data-persist]').forEach(el => {
             const id = el.dataset.persist;
             if (id) persistentElements.set(id, el);
         });
 
-        // 4. Extract executable scripts from incoming document body
+        // 5. Extract executable scripts from incoming document body
         const newScripts = Array.from(newDoc.body.querySelectorAll('script'));
         newScripts.forEach(s => s.remove());
 
@@ -199,6 +211,18 @@ export async function navigateTo(urlStr: string, pushState = true): Promise<void
             // Reconcile <head> (meta tags, OpenGraph, canonical links, route stylesheets)
             if (newDoc.head) {
                 await reconcileHead(newDoc.head);
+            }
+
+            // Await critical image decodes with 500ms safety timeout to eliminate visual stutter
+            const images = Array.from(newDoc.body.querySelectorAll('img[src]'));
+            const imagePromises = images.map(img => {
+                if ('decode' in img && typeof (img as any).decode === 'function') {
+                    return (img as HTMLImageElement).decode().catch(() => {});
+                }
+                return Promise.resolve();
+            });
+            if (imagePromises.length > 0) {
+                await Promise.race([Promise.all(imagePromises), new Promise(r => setTimeout(r, 500))]);
             }
 
             // Replace body content
@@ -253,8 +277,16 @@ export async function navigateTo(urlStr: string, pushState = true): Promise<void
             await updateDom();
         }
 
-    } catch (err) {
+    } catch (err: any) {
+        if (err?.name === 'AbortError' || signal.aborted) {
+            // Navigation was superseded by a newer navigation; exit silently
+            return;
+        }
         console.error('[SoftMax.LaughTale] View transition failed, falling back to full navigation:', err);
         window.location.href = urlStr;
+    } finally {
+        if (inFlightController?.signal === signal) {
+            inFlightController = null;
+        }
     }
 }
