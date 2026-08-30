@@ -26,7 +26,7 @@ interface ColorPreset {
 const PRIMARY_PRESETS: Record<string, ColorPreset> = Object.entries(AURA_PALETTES).reduce((acc, [key, ramp]) => {
     acc[key] = {
         name: key.charAt(0).toUpperCase() + key.slice(1),
-        hex: ramp['500'] || 'var(--lt-primary-500, #10b981)',
+        hex: ramp['500'] || '#10b981',
         ramp
     };
     return acc;
@@ -51,28 +51,28 @@ interface NeutralPreset {
 const NEUTRAL_PRESETS: Record<string, NeutralPreset> = {
     slate: {
         name: 'Slate',
-        s0: 'var(--lt-surface-0, #ffffff)', s50: 'var(--lt-surface-50, #f8fafc)', s100: 'var(--lt-surface-100, #f1f5f9)', s200: 'var(--lt-surface-200, #e2e8f0)', s300: 'var(--lt-surface-300, #cbd5e1)',
-        s400: 'var(--lt-surface-400, #94a3b8)', s500: 'var(--lt-surface-500, #64748b)', s600: 'var(--lt-surface-600, #475569)', s700: 'var(--lt-surface-700, #334155)', s800: 'var(--lt-surface-800, #1e293b)', s900: 'var(--lt-surface-900, #0f172a)', s950: 'var(--lt-surface-950, #020617)'
+        s0: '#ffffff', s50: '#f8fafc', s100: '#f1f5f9', s200: '#e2e8f0', s300: '#cbd5e1',
+        s400: '#94a3b8', s500: '#64748b', s600: '#475569', s700: '#334155', s800: '#1e293b', s900: '#0f172a', s950: '#020617'
     },
     zinc: {
         name: 'Zinc',
-        s0: 'var(--lt-surface-0, #ffffff)', s50: 'var(--lt-surface-50, #fafafa)', s100: 'var(--lt-surface-50, #f4f4f5)', s200: 'var(--lt-surface-100, #e4e4e7)', s300: 'var(--lt-surface-200, #d4d4d8)',
-        s400: 'var(--lt-surface-300, #a1a1aa)', s500: 'var(--lt-surface-400, #71717a)', s600: 'var(--lt-surface-500, #52525b)', s700: 'var(--lt-surface-600, #3f3f46)', s800: 'var(--lt-surface-700, #27272a)', s900: 'var(--lt-surface-800, #18181b)', s950: 'var(--lt-surface-900, #09090b)'
+        s0: '#ffffff', s50: '#fafafa', s100: '#f4f4f5', s200: '#e4e4e7', s300: '#d4d4d8',
+        s400: '#a1a1aa', s500: '#71717a', s600: '#52525b', s700: '#3f3f46', s800: '#27272a', s900: '#18181b', s950: '#09090b'
     },
     stone: {
         name: 'Stone',
-        s0: 'var(--lt-surface-0, #ffffff)', s50: '#fafaf9', s100: '#f5f5f4', s200: '#e7e5e4', s300: '#d6d3d1',
+        s0: '#ffffff', s50: '#fafaf9', s100: '#f5f5f4', s200: '#e7e5e4', s300: '#d6d3d1',
         s400: '#a8a29e', s500: '#78716c', s600: '#57534e', s700: '#44403c', s800: '#292524', s900: '#1c1917', s950: '#0c0a09'
     },
     neutral: {
         name: 'Neutral',
-        s0: 'var(--lt-surface-0, #ffffff)', s50: 'var(--lt-surface-50, #fafafa)', s100: 'var(--lt-surface-100, #f5f5f5)', s200: '#e5e5e5', s300: '#d4d4d4',
+        s0: '#ffffff', s50: '#fafafa', s100: '#f5f5f5', s200: '#e5e5e5', s300: '#d4d4d4',
         s400: '#a3a3a3', s500: '#737373', s600: '#525252', s700: '#404040', s800: '#262626', s900: '#171717', s950: '#0a0a0a'
     },
     gray: {
         name: 'Gray',
-        s0: 'var(--lt-surface-0, #ffffff)', s50: 'var(--lt-surface-50, #f9fafb)', s100: 'var(--lt-surface-100, #f3f4f6)', s200: 'var(--lt-surface-200, #e5e7eb)', s300: 'var(--lt-surface-300, #d1d5db)',
-        s400: 'var(--lt-surface-400, #9ca3af)', s500: 'var(--lt-surface-500, #6b7280)', s600: 'var(--lt-surface-600, #4b5563)', s700: 'var(--lt-surface-700, #374151)', s800: 'var(--lt-surface-800, #1f2937)', s900: 'var(--lt-surface-900, #111827)', s950: 'var(--lt-surface-950, #030712)'
+        s0: '#ffffff', s50: '#f9fafb', s100: '#f3f4f6', s200: '#e5e7eb', s300: '#d1d5db',
+        s400: '#9ca3af', s500: '#6b7280', s600: '#4b5563', s700: '#374151', s800: '#1f2937', s900: '#111827', s950: '#030712'
     }
 };
 
@@ -193,63 +193,63 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
                         <div style="display: flex; flex-direction: column; gap: 0.5rem; max-height: 240px; overflow-y: auto;">
                             <button type="button" class="preset-theme-btn" data-theme="emerald-zero-trust" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer; text-align: left;">
                                 <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                    <span style="width: 1rem; height: 1rem; border-radius: 3px; background: var(--lt-primary-500, #10b981);"></span>
+                                    <span style="width: 1rem; height: 1rem; border-radius: 3px; background: #10b981;"></span>
                                     <span style="font-size: 0.8125rem; font-weight: 600; color: var(--lt-surface-800);">Emerald Zero-Trust</span>
                                 </div>
                                 <span style="font-size: 0.6875rem; color: var(--lt-surface-400);">Default</span>
                             </button>
                             <button type="button" class="preset-theme-btn" data-theme="krd-golden" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer; text-align: left;">
                                 <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                    <span style="width: 1rem; height: 1rem; border-radius: 3px; background: var(--lt-warn-500, var(--lt-warn-500));"></span>
+                                    <span style="width: 1rem; height: 1rem; border-radius: 3px; background: #eab308;"></span>
                                     <span style="font-size: 0.8125rem; font-weight: 600; color: var(--lt-surface-800);">KRD Golden</span>
                                 </div>
                                 <span style="font-size: 0.6875rem; color: var(--lt-surface-400);">Radius 0.5</span>
                             </button>
                             <button type="button" class="preset-theme-btn" data-theme="supabase-violet" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer; text-align: left;">
                                 <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                    <span style="width: 1rem; height: 1rem; border-radius: 3px; background: var(--lt-primary-500, #10b981);"></span>
+                                    <span style="width: 1rem; height: 1rem; border-radius: 3px; background: #8b5cf6;"></span>
                                     <span style="font-size: 0.8125rem; font-weight: 600; color: var(--lt-surface-800);">Supabase Violet</span>
                                 </div>
                                 <span style="font-size: 0.6875rem; color: var(--lt-surface-400);">Radius 0.375</span>
                             </button>
                             <button type="button" class="preset-theme-btn" data-theme="sunset-ember" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer; text-align: left;">
                                 <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                    <span style="width: 1rem; height: 1rem; border-radius: 3px; background: var(--lt-danger-500, var(--lt-danger-500));"></span>
+                                    <span style="width: 1rem; height: 1rem; border-radius: 3px; background: #f43f5e;"></span>
                                     <span style="font-size: 0.8125rem; font-weight: 600; color: var(--lt-surface-800);">Sunset Ember</span>
                                 </div>
                                 <span style="font-size: 0.6875rem; color: var(--lt-surface-400);">Radius 0.75</span>
                             </button>
                             <button type="button" class="preset-theme-btn" data-theme="ocean-blue" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer; text-align: left;">
                                 <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                    <span style="width: 1rem; height: 1rem; border-radius: 3px; background: var(--lt-info-500, var(--lt-info-500));"></span>
+                                    <span style="width: 1rem; height: 1rem; border-radius: 3px; background: #3b82f6;"></span>
                                     <span style="font-size: 0.8125rem; font-weight: 600; color: var(--lt-surface-800);">Ocean Blue</span>
                                 </div>
                                 <span style="font-size: 0.6875rem; color: var(--lt-surface-400);">Radius 0.5</span>
                             </button>
                             <button type="button" class="preset-theme-btn" data-theme="cyber-cyan" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer; text-align: left;">
                                 <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                    <span style="width: 1rem; height: 1rem; border-radius: 3px; background: var(--lt-info-500);"></span>
+                                    <span style="width: 1rem; height: 1rem; border-radius: 3px; background: #06b6d4;"></span>
                                     <span style="font-size: 0.8125rem; font-weight: 600; color: var(--lt-surface-800);">Cyberpunk Cyan</span>
                                 </div>
                                 <span style="font-size: 0.6875rem; color: var(--lt-surface-400);">Radius 0.0</span>
                             </button>
                             <button type="button" class="preset-theme-btn" data-theme="lime-minimal" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer; text-align: left;">
                                 <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                    <span style="width: 1rem; height: 1rem; border-radius: 3px; background: var(--lt-success-500);"></span>
+                                    <span style="width: 1rem; height: 1rem; border-radius: 3px; background: #84cc16;"></span>
                                     <span style="font-size: 0.8125rem; font-weight: 600; color: var(--lt-surface-800);">Lime Minimal</span>
                                 </div>
                                 <span style="font-size: 0.6875rem; color: var(--lt-surface-400);">Radius 0.25</span>
                             </button>
                             <button type="button" class="preset-theme-btn" data-theme="sunset-orange" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer; text-align: left;">
                                 <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                    <span style="width: 1rem; height: 1rem; border-radius: 3px; background: var(--lt-warn-500);"></span>
+                                    <span style="width: 1rem; height: 1rem; border-radius: 3px; background: #f97316;"></span>
                                     <span style="font-size: 0.8125rem; font-weight: 600; color: var(--lt-surface-800);">Sunset Orange</span>
                                 </div>
                                 <span style="font-size: 0.6875rem; color: var(--lt-surface-400);">Radius 0.5</span>
                             </button>
                             <button type="button" class="preset-theme-btn" data-theme="sakura-pink" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer; text-align: left;">
                                 <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                    <span style="width: 1rem; height: 1rem; border-radius: 3px; background: var(--lt-primary-500);"></span>
+                                    <span style="width: 1rem; height: 1rem; border-radius: 3px; background: #ec4899;"></span>
                                     <span style="font-size: 0.8125rem; font-weight: 600; color: var(--lt-surface-800);">Sakura Pink</span>
                                 </div>
                                 <span style="font-size: 0.6875rem; color: var(--lt-surface-400);">Radius 1.0</span>

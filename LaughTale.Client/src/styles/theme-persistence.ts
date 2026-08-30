@@ -1,4 +1,4 @@
-﻿/**
+/**
  * LaughTale: Theme Persistence & Zero-FOUC Engine (LT-603)
  * Handles resilient localStorage and cookie caching, SSR state sync, and multi-format theme export.
  */
@@ -87,8 +87,22 @@ export function applySavedTheme(): boolean {
 
     // Apply radius if configured
     if (saved.radius) {
+        updateToken('--lt-radius', saved.radius);
         updateToken('--lt-radius-md', saved.radius);
         updateToken('--p-border-radius', saved.radius);
+    }
+
+    // Apply neutral surface if configured
+    if (saved.neutral) {
+        const neutralRamp = AURA_PALETTES[saved.neutral.toLowerCase()] || AURA_PALETTES.slate;
+        if (neutralRamp) {
+            updateToken('--lt-surface-0', '#ffffff');
+            updateToken('--p-surface-0', '#ffffff');
+            for (const [shade, hex] of Object.entries(neutralRamp)) {
+                updateToken(`--lt-surface-${shade}`, hex);
+                updateToken(`--p-surface-${shade}`, hex);
+            }
+        }
     }
 
     // Apply dark mode if specified

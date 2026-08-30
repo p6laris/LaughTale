@@ -5,14 +5,8 @@ import * as path from 'path';
 const isWatch = process.argv.includes('--watch');
 const outDir = 'wwwroot/js';
 
-// Auto-clean stale hashed chunks before rebuild
-if (fs.existsSync(outDir)) {
-    for (const file of fs.readdirSync(outDir)) {
-        const fullPath = path.join(outDir, file);
-        try {
-            if (fs.statSync(fullPath).isFile()) fs.unlinkSync(fullPath);
-        } catch {}
-    }
+if (!fs.existsSync(outDir)) {
+    fs.mkdirSync(outDir, { recursive: true });
 }
 
 const ctx = await esbuild.context({
