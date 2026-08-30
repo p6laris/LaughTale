@@ -6,5 +6,6 @@
   <Project Path="LaughTale.Showcase/LaughTale.Showcase.csproj" />
   <Project Path="LaughTale.Docs/LaughTale.Docs.csproj" />
   <Project Path="LaughTale.Templates/LaughTale.Templates.csproj" />
+  <Project Path="LaughTale.Cli/LaughTale.Cli.csproj" />
   <Project Path="LaughTale.Tests/LaughTale.Tests.csproj" />
 </Solution>
