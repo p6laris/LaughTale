@@ -312,7 +312,7 @@ export default function TimelineIsland(container: HTMLElement, props: TimelinePr
 
     function getIconSvg(iconName?: string): string {
         if (!iconName) return '';
-        const key = iconName.toLowerCase().replace(/[-_]/g, '') as keyof typeof ICONS;
+        const key: string = iconName.toLowerCase().replace(/[-_]/g, '');
         if (key === 'shoppingcart') return ICONS.shoppingCart;
         if (key === 'creditcard') return ICONS.creditCard;
         if (key === 'truck') return ICONS.truck;

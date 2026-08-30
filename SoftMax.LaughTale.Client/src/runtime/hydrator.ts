@@ -137,8 +137,8 @@ async function executeHydration(container: HTMLElement, name: string): Promise<v
         const props = parseAndReviveProps(rawProps);
 
         // 3. Load component module with retry resilience
-        const module = await importWithRetry(definition.loader);
-        const mount = module.default || module;
+        const module: any = await importWithRetry(definition.loader);
+        const mount = module?.default || module;
 
         if (typeof mount !== 'function') {
             throw new Error(`Island '${name}' module does not export a mount function.`);

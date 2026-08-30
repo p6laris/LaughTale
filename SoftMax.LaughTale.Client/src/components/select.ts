@@ -785,9 +785,9 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps)
         }
 
         // Select all header click
-        const selectAllHeader = container.querySelector('.p-select-header-all');
+        const selectAllHeader = container.querySelector<HTMLElement>('.p-select-header-all');
         if (selectAllHeader) {
-            selectAllHeader.onclick = (e) => {
+            selectAllHeader.onclick = (e: MouseEvent) => {
                 e.stopPropagation();
                 if (selectedValues.length === flatOptions.length) {
                     selectedValues = [];

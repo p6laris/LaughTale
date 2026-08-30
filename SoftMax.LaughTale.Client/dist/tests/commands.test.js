@@ -17,6 +17,7 @@ globalThis.KeyboardEvent = win.KeyboardEvent;
 globalThis.Node = win.Node;
 globalThis.localStorage = win.localStorage;
 globalThis.sessionStorage = win.sessionStorage;
+globalThis.DOMParser = win.DOMParser;
 globalThis.requestAnimationFrame = (cb) => setTimeout(cb, 16);
 try {
   Object.defineProperty(globalThis.navigator, "clipboard", {
@@ -1555,7 +1556,9 @@ function SplitButtonIsland(container, props) {
   });
   function handleItemClick(itemData, e) {
     if (itemData.disabled) return;
-    if (itemData.command) {
+    if (typeof itemData.command === "function") {
+      itemData.command(itemData);
+    } else if (typeof itemData.command === "string") {
       executeCommand(itemData.command, itemData);
     }
     if (itemData.url) {

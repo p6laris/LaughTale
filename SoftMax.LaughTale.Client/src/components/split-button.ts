@@ -628,7 +628,9 @@ export default function SplitButtonIsland(container: HTMLElement, props: SplitBu
     function handleItemClick(itemData: SplitButtonItem, e: MouseEvent | KeyboardEvent) {
         if (itemData.disabled) return;
 
-        if (itemData.command) {
+        if (typeof itemData.command === 'function') {
+            itemData.command(itemData);
+        } else if (typeof itemData.command === 'string') {
             executeCommand(itemData.command, itemData);
         }
 

@@ -1390,6 +1390,7 @@ globalThis.KeyboardEvent = win.KeyboardEvent;
 globalThis.Node = win.Node;
 globalThis.localStorage = win.localStorage;
 globalThis.sessionStorage = win.sessionStorage;
+globalThis.DOMParser = win.DOMParser;
 globalThis.requestAnimationFrame = (cb) => setTimeout(cb, 16);
 try {
   Object.defineProperty(globalThis.navigator, "clipboard", {
@@ -1583,37 +1584,54 @@ function parseAndReviveProps(rawJson) {
 }
 
 // src/runtime/retry.ts
-async function importWithRetry(importFnOrUrl, retries = 3, baseDelayMs = 1e3) {
-  if (typeof importFnOrUrl === "function") {
-    for (let attempt = 0; attempt < retries; attempt++) {
+async function importWithRetry(loader, options = 3, legacyBaseDelayMs = 1e3) {
+  const opts = typeof options === "number" ? { retries: options, baseDelayMs: legacyBaseDelayMs, maxDelayMs: 1e4, jitter: true } : {
+    retries: options?.retries ?? 3,
+    baseDelayMs: options?.baseDelayMs ?? 1e3,
+    maxDelayMs: options?.maxDelayMs ?? 1e4,
+    jitter: options?.jitter ?? true
+  };
+  let lastError = null;
+  if (typeof loader === "function") {
+    for (let attempt = 0; attempt < opts.retries; attempt++) {
       try {
-        return await importFnOrUrl();
+        return await loader();
       } catch (err) {
-        if (attempt === retries - 1) throw err;
-        const delay = baseDelayMs * Math.pow(2, attempt);
-        console.warn(`[SoftMax.LaughTale] Island dynamic import failed. Retrying in ${delay}ms (Attempt ${attempt + 1}/${retries})...`, err);
+        lastError = err;
+        if (attempt === opts.retries - 1) {
+          throw err;
+        }
+        const rawDelay = Math.min(opts.maxDelayMs, opts.baseDelayMs * Math.pow(2, attempt));
+        const jitterFactor = opts.jitter ? 0.75 + Math.random() * 0.5 : 1;
+        const delay = Math.round(rawDelay * jitterFactor);
+        console.warn(`[SoftMax.LaughTale] Island dynamic import failed. Retrying in ${delay}ms (Attempt ${attempt + 1}/${opts.retries})...`, err);
         await new Promise((resolve) => setTimeout(resolve, delay));
       }
     }
-  }
-  let url = importFnOrUrl;
-  for (let attempt = 0; attempt < retries; attempt++) {
-    try {
-      return await import(
-        /* @vite-ignore */
-        url
-      );
-    } catch (err) {
-      if (attempt === retries - 1) throw err;
-      const delay = baseDelayMs * Math.pow(2, attempt);
-      console.warn(`[SoftMax.LaughTale] Failed to fetch island script at ${url}. Retrying with cache-buster in ${delay}ms...`, err);
-      await new Promise((resolve) => setTimeout(resolve, delay));
-      const parsed = new URL(url, document.baseURI);
-      parsed.searchParams.set("island-retry", Date.now().toString());
-      url = parsed.toString();
+  } else {
+    let url = loader;
+    for (let attempt = 0; attempt < opts.retries; attempt++) {
+      try {
+        return await import(
+          /* @vite-ignore */
+          url
+        );
+      } catch (err) {
+        lastError = err;
+        if (attempt === opts.retries - 1) {
+          throw err;
+        }
+        const rawDelay = Math.min(opts.maxDelayMs, opts.baseDelayMs * Math.pow(2, attempt));
+        const jitterFactor = opts.jitter ? 0.75 + Math.random() * 0.5 : 1;
+        const delay = Math.round(rawDelay * jitterFactor);
+        console.warn(`[SoftMax.LaughTale] Failed to fetch island script at ${url}. Retrying with cache-buster in ${delay}ms...`, err);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        const separator = url.includes("?") ? "&" : "?";
+        url = `${url.replace(/([?&])island-retry=[^&]*/, "")}${separator}island-retry=${Date.now()}`;
+      }
     }
   }
-  throw new Error(`[SoftMax.LaughTale] Permanent failure loading island module after ${retries} attempts.`);
+  throw lastError || new Error(`[SoftMax.LaughTale] Failed to load island after ${opts.retries} attempts.`);
 }
 
 // src/runtime/streaming.ts
@@ -1654,9 +1672,43 @@ function awaitStreamingReady(container) {
 }
 
 // src/runtime/hydrator.ts
-var HYDRATED_FLAG = "__laughtale_hydrated";
+var HYDRATION_STATE_KEY = "__laughtale_state__";
+var visibleElementsMap = /* @__PURE__ */ new WeakMap();
+var sharedVisibleObserver = null;
+function getSharedVisibleObserver() {
+  if (typeof window === "undefined" || !("IntersectionObserver" in window)) {
+    return null;
+  }
+  if (!sharedVisibleObserver) {
+    sharedVisibleObserver = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          const meta = visibleElementsMap.get(entry.target);
+          if (meta) {
+            unobserveVisibleIsland(meta.container);
+            executeHydration(meta.container, meta.name);
+          }
+        }
+      }
+    }, { rootMargin: "120px" });
+  }
+  return sharedVisibleObserver;
+}
+function unobserveVisibleIsland(container) {
+  const observer = getSharedVisibleObserver();
+  if (!observer) return;
+  observer.unobserve(container);
+  visibleElementsMap.delete(container);
+  for (let i = 0; i < container.children.length; i++) {
+    observer.unobserve(container.children[i]);
+    visibleElementsMap.delete(container.children[i]);
+  }
+}
+function getIslandState(container) {
+  return container[HYDRATION_STATE_KEY] || "idle";
+}
 function hydrateIsland(container) {
-  if (container[HYDRATED_FLAG]) return;
+  if (getIslandState(container) !== "idle") return;
   const name = container.getAttribute("data-island") || container.getAttribute("name");
   if (!name) return;
   const strategy = (container.getAttribute("data-hydrate") || container.getAttribute("hydrate") || "load").toLowerCase();
@@ -1684,10 +1736,14 @@ function hydrateIsland(container) {
   }
 }
 async function executeHydration(container, name) {
-  if (container[HYDRATED_FLAG]) return;
-  container[HYDRATED_FLAG] = true;
+  const currentState = getIslandState(container);
+  if (currentState === "pending" || currentState === "mounted" || currentState === "failed") {
+    return;
+  }
+  container[HYDRATION_STATE_KEY] = "pending";
   const definition = getIslandDefinition(name);
   if (!definition) {
+    container[HYDRATION_STATE_KEY] = "failed";
     console.warn(`[SoftMax.LaughTale] Island '${name}' is not registered in the client registry.`);
     return;
   }
@@ -1696,22 +1752,22 @@ async function executeHydration(container, name) {
     const rawProps = container.getAttribute("data-props") || container.getAttribute("props-json") || container.getAttribute("props");
     const props = parseAndReviveProps(rawProps);
     const module = await importWithRetry(definition.loader);
-    const mount = module.default || module;
+    const mount = module?.default || module;
     if (typeof mount !== "function") {
-      console.error(`[SoftMax.LaughTale] Island '${name}' module does not export a mount function.`);
-      return;
+      throw new Error(`Island '${name}' module does not export a mount function.`);
     }
     const unmount = mount(container, props);
     if (typeof unmount === "function") {
       container.addEventListener("laughtale:unmount", unmount, { once: true });
     }
+    container[HYDRATION_STATE_KEY] = "mounted";
     container.dispatchEvent(new CustomEvent("laughtale:hydrated", {
       bubbles: true,
       composed: true,
       detail: { name, strategy: container.getAttribute("data-hydrate") }
     }));
   } catch (error) {
-    container[HYDRATED_FLAG] = false;
+    container[HYDRATION_STATE_KEY] = "failed";
     console.error(`[SoftMax.LaughTale] Error hydrating island '${name}':`, error);
     container.dispatchEvent(new CustomEvent("laughtale:hydration-error", {
       bubbles: true,
@@ -1728,19 +1784,21 @@ function hydrateIdle(container, name) {
   }
 }
 function hydrateVisible(container, name) {
-  const observer = new IntersectionObserver((entries) => {
-    for (const entry of entries) {
-      if (entry.isIntersecting) {
-        observer.disconnect();
-        executeHydration(container, name);
-        break;
-      }
-    }
-  }, { rootMargin: "120px" });
+  const observer = getSharedVisibleObserver();
+  if (!observer) {
+    executeHydration(container, name);
+    return;
+  }
+  const meta = { container, name };
+  visibleElementsMap.set(container, meta);
   observer.observe(container);
   for (let i = 0; i < container.children.length; i++) {
+    visibleElementsMap.set(container.children[i], meta);
     observer.observe(container.children[i]);
   }
+  container.addEventListener("laughtale:unmount", () => {
+    unobserveVisibleIsland(container);
+  }, { once: true });
 }
 function hydrateInteraction(container, name) {
   const events = ["mouseenter", "focusin", "touchstart", "click"];

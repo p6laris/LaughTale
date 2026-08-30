@@ -7,7 +7,7 @@
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "node esbuild.config.mjs",
+    "build": "npm run typecheck && node esbuild.config.mjs",
     "typecheck": "tsc --noEmit",
     "test": "node run-tests.mjs"
   },

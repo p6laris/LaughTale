@@ -14,6 +14,15 @@ export function getSlot(container: HTMLElement, name = 'default'): HTMLElement |
 }
 
 /**
+ * Checks whether an island element contains a slot with the specified name.
+ * @param container The island root DOM element.
+ * @param name The slot name (default: "default").
+ */
+export function hasSlot(container: HTMLElement, name = 'default'): boolean {
+    return getSlot(container, name) !== null;
+}
+
+/**
  * Extracts and detaches the server-rendered HTML content of a slot.
  */
 export function extractSlotContent(container: HTMLElement, name = 'default'): string {

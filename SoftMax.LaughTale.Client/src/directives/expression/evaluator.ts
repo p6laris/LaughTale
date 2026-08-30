@@ -3,8 +3,8 @@
  * Tree-walking AST interpreter ensuring total isolation and zero global scope leakage.
  */
 
-import { ASTNode, IdentifierNode, MemberExpressionNode, IndexExpressionNode } from './ast.ts';
-import { Parser } from './parser.ts';
+import { ASTNode, IdentifierNode, MemberExpressionNode, IndexExpressionNode } from './ast';
+import { Parser } from './parser';
 
 const FORBIDDEN_PROPERTIES = new Set([
     'constructor',

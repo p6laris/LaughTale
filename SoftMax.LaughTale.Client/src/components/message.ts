@@ -583,7 +583,7 @@ export default function MessageIsland(container: HTMLElement, props: MessageProp
 
     function wireMessageClosers(root: HTMLElement, isStandaloneIsland: boolean) {
         root.querySelectorAll<HTMLElement>('[data-message-item]').forEach(msgEl => {
-            const closeBtn = msgEl.querySelector('[data-message-close]');
+            const closeBtn = msgEl.querySelector<HTMLElement>('[data-message-close]');
             const lifeStr = msgEl.getAttribute('data-life');
 
             const dismissMessage = () => {

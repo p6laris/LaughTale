@@ -1,17 +1,9 @@
 "use strict";
 var SoftMaxIslands = (() => {
-  var __create = Object.create;
   var __defProp = Object.defineProperty;
   var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
   var __getOwnPropNames = Object.getOwnPropertyNames;
-  var __getProtoOf = Object.getPrototypeOf;
   var __hasOwnProp = Object.prototype.hasOwnProperty;
-  var __require = /* @__PURE__ */ ((x) => typeof require !== "undefined" ? require : typeof Proxy !== "undefined" ? new Proxy(x, {
-    get: (a, b) => (typeof require !== "undefined" ? require : a)[b]
-  }) : x)(function(x) {
-    if (typeof require !== "undefined") return require.apply(this, arguments);
-    throw Error('Dynamic require of "' + x + '" is not supported');
-  });
   var __esm = (fn, res) => function __init() {
     return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
   };
@@ -27,14 +19,6 @@ var SoftMaxIslands = (() => {
     }
     return to;
   };
-  var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
-    // If the importer is in node compatibility mode or this is not an ESM
-    // file that has been converted to a CommonJS file using a Babel-
-    // compatible transform (i.e. "__esModule" has not been set), then set
-    // "default" to the CommonJS "module.exports" for node compatibility.
-    isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
-    mod
-  ));
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
   // src/directives/security.ts
@@ -10907,6 +10891,7 @@ var SoftMaxIslands = (() => {
       }));
     }
     init();
+    syncValue(getRating());
   }
   var CSS10, starFilledSvg, starEmptySvg, cancelSvg;
   var init_rating = __esm({
@@ -21627,6 +21612,7 @@ public static class AppTheme
     const itemsList = container.querySelector(".multiselect-items-list");
     const clearBtn = container.querySelector(".multiselect-clear-btn");
     const chevron = container.querySelector(".multiselect-chevron");
+    const overlayTransition = useTransition(overlay, { preset: "fade" });
     const disclosure = useDisclosure({
       defaultIsOpen: false,
       onOpen: () => {
@@ -21634,12 +21620,12 @@ public static class AppTheme
         filterInput.value = "";
         filterQuery = "";
         renderList();
-        useTransition(overlay, { type: "fade", isMounted: true });
+        overlayTransition.enter();
         filterInput.focus();
       },
       onClose: () => {
         chevron.style.transform = "none";
-        useTransition(overlay, { type: "fade", isMounted: false });
+        overlayTransition.exit();
       }
     });
     useClickOutside(container, () => disclosure.close());
@@ -22316,9 +22302,9 @@ public static class AppTheme
       function matches(item) {
         if (!q) return true;
         if (props.filterMatchMode === "startsWith") {
-          return item.label.toLowerCase().startsWith(q) || item.code && item.code.toLowerCase().startsWith(q);
+          return Boolean(item.label.toLowerCase().startsWith(q) || item.code && item.code.toLowerCase().startsWith(q));
         }
-        return item.label.toLowerCase().includes(q) || item.code && item.code.toLowerCase().includes(q);
+        return Boolean(item.label.toLowerCase().includes(q) || item.code && item.code.toLowerCase().includes(q));
       }
       for (const opt of rawOptions) {
         if (opt.items && opt.items.length > 0) {
@@ -22379,9 +22365,9 @@ public static class AppTheme
       function matches(item) {
         if (!q) return true;
         if (props.filterMatchMode === "startsWith") {
-          return item.label.toLowerCase().startsWith(q) || item.code && item.code.toLowerCase().startsWith(q);
+          return Boolean(item.label.toLowerCase().startsWith(q) || item.code && item.code.toLowerCase().startsWith(q));
         }
-        return item.label.toLowerCase().includes(q) || item.code && item.code.toLowerCase().includes(q);
+        return Boolean(item.label.toLowerCase().includes(q) || item.code && item.code.toLowerCase().includes(q));
       }
       const isGrouped = rawOptions.some((o) => o.items && o.items.length > 0);
       if (isGrouped) {
@@ -25400,7 +25386,9 @@ public static class AppTheme
     });
     function handleItemClick(itemData, e) {
       if (itemData.disabled) return;
-      if (itemData.command) {
+      if (typeof itemData.command === "function") {
+        itemData.command(itemData);
+      } else if (typeof itemData.command === "string") {
         executeCommand(itemData.command, itemData);
       }
       if (itemData.url) {
@@ -33322,6 +33310,20 @@ public static class AppTheme
       if (isAppMode) {
         return sidebarHtml;
       }
+      function renderControlsHtml() {
+        return `
+                <div class="p-sidebar-toolbar">
+                    <div class="p-sidebar-toolbar-field">
+                        <span class="p-sidebar-toolbar-label">Side</span>
+                        <button type="button" class="p-sb-select-trigger" data-sb-control="side">${side}</button>
+                    </div>
+                    <div class="p-sidebar-toolbar-field">
+                        <span class="p-sidebar-toolbar-label">Variant</span>
+                        <button type="button" class="p-sb-select-trigger" data-sb-control="variant">${variant}</button>
+                    </div>
+                </div>
+            `;
+      }
       const mainHtml = renderMainContent();
       const backdropHtml = `<div class="p-sidebar-backdrop" data-sidebar-backdrop style="display: ${backdrop && isOpen ? "block" : "none"};"></div>`;
       const innerContent = side === "right" ? mainHtml + sidebarHtml : sidebarHtml + mainHtml;
@@ -35779,6 +35781,7 @@ public static class AppTheme
   var index_exports = {};
   __export(index_exports, {
     AURA_PALETTES: () => AURA_PALETTES,
+    IslandStore: () => IslandStore,
     LucideIcons: () => LucideIcons,
     applyNonceToScript: () => applyNonceToScript,
     applyNonceToStyle: () => applyNonceToStyle,
@@ -35788,6 +35791,7 @@ public static class AppTheme
     createScope: () => createScope,
     createVanillaIsland: () => createVanillaIsland,
     defineIsland: () => defineIsland,
+    emitIslandEvent: () => emitIslandEvent,
     enableViewTransitions: () => enableViewTransitions,
     executeCommand: () => executeCommand,
     extractSlotContent: () => extractSlotContent,
@@ -35799,6 +35803,7 @@ public static class AppTheme
     getSlot: () => getSlot,
     getToken: () => getToken,
     hasIsland: () => hasIsland,
+    hasSlot: () => hasSlot,
     hydrateIsland: () => hydrateIsland,
     importWithRetry: () => importWithRetry,
     initAnimationStyles: () => initAnimationStyles,
@@ -35809,6 +35814,7 @@ public static class AppTheme
     injectRipple: () => injectRipple,
     listCommands: () => listCommands,
     navigateTo: () => navigateTo,
+    onIslandEvent: () => onIslandEvent,
     parseAndReviveProps: () => parseAndReviveProps,
     registerCommand: () => registerCommand,
     removeIslandStyle: () => removeIslandStyle,
@@ -35831,6 +35837,7 @@ public static class AppTheme
     useKeyboardNav: () => useKeyboardNav,
     useMorphLayout: () => useMorphLayout,
     useScrollLock: () => useScrollLock,
+    useSharedState: () => useSharedState,
     useSpring: () => useSpring,
     useStagger: () => useStagger,
     useThrottle: () => useThrottle,
@@ -36089,7 +36096,7 @@ public static class AppTheme
       const rawProps = container.getAttribute("data-props") || container.getAttribute("props-json") || container.getAttribute("props");
       const props = parseAndReviveProps(rawProps);
       const module = await importWithRetry(definition.loader);
-      const mount = module.default || module;
+      const mount = module?.default || module;
       if (typeof mount !== "function") {
         throw new Error(`Island '${name}' module does not export a mount function.`);
       }
@@ -37033,6 +37040,9 @@ public static class AppTheme
   function getSlot(container, name = "default") {
     return container.querySelector(`[data-slot="${name}"]`);
   }
+  function hasSlot(container, name = "default") {
+    return getSlot(container, name) !== null;
+  }
   function extractSlotContent(container, name = "default") {
     const slotEl = getSlot(container, name);
     if (!slotEl) return "";
@@ -37041,6 +37051,65 @@ public static class AppTheme
 
   // src/index.ts
   init_styles();
+
+  // src/runtime/events.ts
+  var bus = /* @__PURE__ */ new Map();
+  function emitIslandEvent(event, detail) {
+    const handlers = bus.get(event);
+    if (handlers) {
+      handlers.forEach((fn) => {
+        try {
+          fn(detail);
+        } catch (err) {
+          console.error(`[SoftMax.LaughTale] Error in event listener for "${event}":`, err);
+        }
+      });
+    }
+    window.dispatchEvent(new CustomEvent(`island:${event}`, { detail }));
+  }
+  function onIslandEvent(event, handler) {
+    if (!bus.has(event)) {
+      bus.set(event, /* @__PURE__ */ new Set());
+    }
+    bus.get(event).add(handler);
+    return () => {
+      const set = bus.get(event);
+      if (set) {
+        set.delete(handler);
+        if (set.size === 0) bus.delete(event);
+      }
+    };
+  }
+
+  // src/runtime/state.ts
+  var IslandStore = class {
+    value;
+    listeners = /* @__PURE__ */ new Set();
+    constructor(initialValue) {
+      this.value = initialValue;
+    }
+    get() {
+      return this.value;
+    }
+    set(next) {
+      const prev = this.value;
+      this.value = typeof next === "function" ? next(prev) : next;
+      if (this.value !== prev) {
+        this.listeners.forEach((fn) => fn(this.value, prev));
+      }
+    }
+    subscribe(listener) {
+      this.listeners.add(listener);
+      return () => this.listeners.delete(listener);
+    }
+  };
+  var stores = /* @__PURE__ */ new Map();
+  function useSharedState(key, initialValue) {
+    if (!stores.has(key)) {
+      stores.set(key, new IslandStore(initialValue));
+    }
+    return stores.get(key);
+  }
 
   // src/adapters/vanilla.ts
   function createVanillaIsland(mount) {
@@ -37051,7 +37120,11 @@ public static class AppTheme
   function createPreactIsland(Component, options = {}) {
     return async (container, props) => {
       try {
-        const preact = await import("preact");
+        const preactPkg = "preact";
+        const preact = await import(
+          /* @vite-ignore */
+          preactPkg
+        );
         const h = preact.h || preact.default?.h;
         const render = preact.render || preact.default?.render;
         if (render && h) {

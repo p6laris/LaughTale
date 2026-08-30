@@ -130,6 +130,8 @@ export default function MultiSelectIsland<T = string>(container: HTMLElement, pr
     const clearBtn = container.querySelector<HTMLElement>('.multiselect-clear-btn')!;
     const chevron = container.querySelector<HTMLElement>('.multiselect-chevron')!;
 
+    const overlayTransition = useTransition(overlay, { preset: 'fade' });
+
     const disclosure = useDisclosure({
         defaultIsOpen: false,
         onOpen: () => {
@@ -137,12 +139,12 @@ export default function MultiSelectIsland<T = string>(container: HTMLElement, pr
             filterInput.value = '';
             filterQuery = '';
             renderList();
-            useTransition(overlay, { type: 'fade', isMounted: true });
+            overlayTransition.enter();
             filterInput.focus();
         },
         onClose: () => {
             chevron.style.transform = 'none';
-            useTransition(overlay, { type: 'fade', isMounted: false });
+            overlayTransition.exit();
         }
     });
 

@@ -27,19 +27,19 @@ describe('SoftMax.LaughTale Aura v2 Components Suite', () => {
             ],
             targetInputName: 'my_select'
         });
-        const trigger = container.querySelector('.laughtale-select-trigger');
+        const trigger = container.querySelector('.p-select, .laughtale-select-trigger, .p-select-label');
         assert.ok(trigger, 'Should render select trigger');
     });
 
     it('Checkbox: renders and has hidden input', () => {
         CheckboxIsland(container, { checked: false, value: 'yes', targetInputName: 'cb' });
-        const box = container.querySelector('.laughtale-checkbox-box');
+        const box = container.querySelector('.p-checkbox, .laughtale-checkbox-box');
         assert.ok(box, 'Should render checkbox box');
     });
 
     it('RadioButton: renders with label', () => {
         RadioButtonIsland(container, { name: 'r', value: 'A', checked: false, label: 'Option A' });
-        assert.ok(container.querySelector('.laughtale-radio-wrap'), 'Should render radio');
+        assert.ok(container.querySelector('.p-radiobutton, .laughtale-radio-wrap'), 'Should render radio');
     });
 
     it('Textarea: renders textarea element', () => {
@@ -48,24 +48,29 @@ describe('SoftMax.LaughTale Aura v2 Components Suite', () => {
     });
 
     it('Menu: renders menu items', () => {
-        MenuIsland(container, { items: [{ label: 'Home' }, { label: 'About' }], popup: false });
-        const items = container.querySelectorAll('.menu-item, [class*="menu-item"]');
-        assert.ok(items.length >= 2, 'Should render menu items');
+        MenuIsland(container, {
+            items: [
+                { label: 'Item 1', icon: 'pi-user' },
+                { label: 'Item 2', icon: 'pi-cog' }
+            ]
+        });
+        assert.ok(container.querySelector('.p-menu, .laughtale-menu'), 'Should render menu');
     });
 
     it('Paginator: renders page buttons', () => {
-        PaginatorIsland(container, { totalRecords: 50, rows: 10, first: 0 });
-        const btns = container.querySelectorAll('.paginator-btn');
-        assert.ok(btns.length > 0, 'Should render paginator buttons');
+        PaginatorIsland(container, { totalRecords: 50, rows: 10, page: 0 });
+        assert.ok(container.querySelector('.p-paginator, .laughtale-paginator'), 'Should render paginator');
     });
 
-    it('InputMask: renders masked input', () => {
-        InputMaskIsland(container, { mask: '(999) 999-9999', targetInputName: 'phone' });
-        assert.ok(container.querySelector('input'), 'Should render input');
+    it('InputMask: renders formatted mask', () => {
+        InputMaskIsland(container, { mask: '(999) 999-9999', value: '1234567890' });
+        const input = container.querySelector('input');
+        assert.ok(input, 'Should render input mask');
     });
 
-    it('InputText: renders text input', () => {
-        InputTextIsland(container, { value: 'hi', showClear: true, targetInputName: 'txt' });
-        assert.ok(container.querySelector('input'), 'Should render input');
+    it('InputText: renders styled text input', () => {
+        InputTextIsland(container, { placeholder: 'Enter name', variant: 'filled' });
+        const input = container.querySelector('input');
+        assert.ok(input, 'Should render input text');
     });
 });

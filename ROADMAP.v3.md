@@ -282,7 +282,7 @@ Persistent islands must be *excluded* — they are moved, not destroyed.
 ## 5. LT-3xx — Build, quality gates & CI (P1)
 
 ### `LT-301` — TypeScript does not compile (98 errors) and the public barrel is broken
-**Severity:** P1 · **Status:** todo
+**Severity:** P1 · **Status:** done
 
 **Evidence.** `npx tsc --noEmit` → 98 errors. Worst offenders: `context-menu.ts` (58), `split-button.ts` (15), `timeline.ts` (6). Critically, **`src/index.ts` has 3** — it re-exports `hasSlot`, `islandEvents`, and `islandStore`, none of which exist (`slots.ts` has no `hasSlot`; `events.ts` exports `onIslandEvent`; `state.ts` exports the `IslandStore` type). Any consumer writing `import { islandStore } from '@softmax/islands'` gets a runtime `undefined`. esbuild does not typecheck, which is why this shipped.
 

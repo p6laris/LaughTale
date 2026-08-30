@@ -10,8 +10,8 @@ export { hydrateIsland, initIslands, retryIsland, getIslandState, type HydrateSt
 export { enableViewTransitions, navigateTo } from './runtime/router';
 export { getSlot, extractSlotContent, hasSlot } from './runtime/slots';
 export { injectIslandStyle, removeIslandStyle } from './runtime/styles';
-export { islandEvents } from './runtime/events';
-export { islandStore } from './runtime/state';
+export { emitIslandEvent, onIslandEvent } from './runtime/events';
+export { IslandStore, useSharedState } from './runtime/state';
 export { parseAndReviveProps, reviveTuple } from './runtime/reviver';
 export { importWithRetry, type RetryOptions } from './runtime/retry';
 export { awaitStreamingReady } from './runtime/streaming';

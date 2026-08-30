@@ -449,9 +449,9 @@ export default function ListboxIsland(container: HTMLElement, props: ListboxProp
         function matches(item: ListboxOptionItem): boolean {
             if (!q) return true;
             if (props.filterMatchMode === 'startsWith') {
-                return item.label.toLowerCase().startsWith(q) || (item.code && item.code.toLowerCase().startsWith(q));
+                return Boolean(item.label.toLowerCase().startsWith(q) || (item.code && item.code.toLowerCase().startsWith(q)));
             }
-            return item.label.toLowerCase().includes(q) || (item.code && item.code.toLowerCase().includes(q));
+            return Boolean(item.label.toLowerCase().includes(q) || (item.code && item.code.toLowerCase().includes(q)));
         }
 
         for (const opt of rawOptions) {
@@ -519,9 +519,9 @@ export default function ListboxIsland(container: HTMLElement, props: ListboxProp
         function matches(item: ListboxOptionItem): boolean {
             if (!q) return true;
             if (props.filterMatchMode === 'startsWith') {
-                return item.label.toLowerCase().startsWith(q) || (item.code && item.code.toLowerCase().startsWith(q));
+                return Boolean(item.label.toLowerCase().startsWith(q) || (item.code && item.code.toLowerCase().startsWith(q)));
             }
-            return item.label.toLowerCase().includes(q) || (item.code && item.code.toLowerCase().includes(q));
+            return Boolean(item.label.toLowerCase().includes(q) || (item.code && item.code.toLowerCase().includes(q)));
         }
 
         const isGrouped = rawOptions.some(o => o.items && o.items.length > 0);

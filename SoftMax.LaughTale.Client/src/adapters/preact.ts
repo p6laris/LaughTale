@@ -14,9 +14,10 @@ export function createPreactIsland(
     return async (container: HTMLElement, props: any) => {
         try {
             // Dynamic import of preact if available or fallback
-            const preact = await import('preact');
-            const h = preact.h || (preact as any).default?.h;
-            const render = preact.render || (preact as any).default?.render;
+            const preactPkg = 'preact';
+            const preact: any = await import(/* @vite-ignore */ preactPkg);
+            const h = preact.h || preact.default?.h;
+            const render = preact.render || preact.default?.render;
 
             if (render && h) {
                 render(h(Component, props), container);

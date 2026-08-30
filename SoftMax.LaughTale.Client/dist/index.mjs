@@ -10878,6 +10878,7 @@ function RatingIsland(container, props) {
     }));
   }
   init();
+  syncValue(getRating());
 }
 var CSS10, starFilledSvg, starEmptySvg, cancelSvg;
 var init_rating = __esm({
@@ -21598,6 +21599,7 @@ function MultiSelectIsland(container, props) {
   const itemsList = container.querySelector(".multiselect-items-list");
   const clearBtn = container.querySelector(".multiselect-clear-btn");
   const chevron = container.querySelector(".multiselect-chevron");
+  const overlayTransition = useTransition(overlay, { preset: "fade" });
   const disclosure = useDisclosure({
     defaultIsOpen: false,
     onOpen: () => {
@@ -21605,12 +21607,12 @@ function MultiSelectIsland(container, props) {
       filterInput.value = "";
       filterQuery = "";
       renderList();
-      useTransition(overlay, { type: "fade", isMounted: true });
+      overlayTransition.enter();
       filterInput.focus();
     },
     onClose: () => {
       chevron.style.transform = "none";
-      useTransition(overlay, { type: "fade", isMounted: false });
+      overlayTransition.exit();
     }
   });
   useClickOutside(container, () => disclosure.close());
@@ -22287,9 +22289,9 @@ function ListboxIsland(container, props) {
     function matches(item) {
       if (!q) return true;
       if (props.filterMatchMode === "startsWith") {
-        return item.label.toLowerCase().startsWith(q) || item.code && item.code.toLowerCase().startsWith(q);
+        return Boolean(item.label.toLowerCase().startsWith(q) || item.code && item.code.toLowerCase().startsWith(q));
       }
-      return item.label.toLowerCase().includes(q) || item.code && item.code.toLowerCase().includes(q);
+      return Boolean(item.label.toLowerCase().includes(q) || item.code && item.code.toLowerCase().includes(q));
     }
     for (const opt of rawOptions) {
       if (opt.items && opt.items.length > 0) {
@@ -22350,9 +22352,9 @@ function ListboxIsland(container, props) {
     function matches(item) {
       if (!q) return true;
       if (props.filterMatchMode === "startsWith") {
-        return item.label.toLowerCase().startsWith(q) || item.code && item.code.toLowerCase().startsWith(q);
+        return Boolean(item.label.toLowerCase().startsWith(q) || item.code && item.code.toLowerCase().startsWith(q));
       }
-      return item.label.toLowerCase().includes(q) || item.code && item.code.toLowerCase().includes(q);
+      return Boolean(item.label.toLowerCase().includes(q) || item.code && item.code.toLowerCase().includes(q));
     }
     const isGrouped = rawOptions.some((o) => o.items && o.items.length > 0);
     if (isGrouped) {
@@ -25371,7 +25373,9 @@ function SplitButtonIsland(container, props) {
   });
   function handleItemClick(itemData, e) {
     if (itemData.disabled) return;
-    if (itemData.command) {
+    if (typeof itemData.command === "function") {
+      itemData.command(itemData);
+    } else if (typeof itemData.command === "string") {
       executeCommand(itemData.command, itemData);
     }
     if (itemData.url) {
@@ -33293,6 +33297,20 @@ function renderCompoundSidebar(container, props) {
     if (isAppMode) {
       return sidebarHtml;
     }
+    function renderControlsHtml() {
+      return `
+                <div class="p-sidebar-toolbar">
+                    <div class="p-sidebar-toolbar-field">
+                        <span class="p-sidebar-toolbar-label">Side</span>
+                        <button type="button" class="p-sb-select-trigger" data-sb-control="side">${side}</button>
+                    </div>
+                    <div class="p-sidebar-toolbar-field">
+                        <span class="p-sidebar-toolbar-label">Variant</span>
+                        <button type="button" class="p-sb-select-trigger" data-sb-control="variant">${variant}</button>
+                    </div>
+                </div>
+            `;
+    }
     const mainHtml = renderMainContent();
     const backdropHtml = `<div class="p-sidebar-backdrop" data-sidebar-backdrop style="display: ${backdrop && isOpen ? "block" : "none"};"></div>`;
     const innerContent = side === "right" ? mainHtml + sidebarHtml : sidebarHtml + mainHtml;
@@ -35997,7 +36015,7 @@ async function executeHydration(container, name) {
     const rawProps = container.getAttribute("data-props") || container.getAttribute("props-json") || container.getAttribute("props");
     const props = parseAndReviveProps(rawProps);
     const module = await importWithRetry(definition.loader);
-    const mount = module.default || module;
+    const mount = module?.default || module;
     if (typeof mount !== "function") {
       throw new Error(`Island '${name}' module does not export a mount function.`);
     }
@@ -36941,6 +36959,9 @@ async function navigateTo(urlStr, pushState = true, restoreScroll) {
 function getSlot(container, name = "default") {
   return container.querySelector(`[data-slot="${name}"]`);
 }
+function hasSlot(container, name = "default") {
+  return getSlot(container, name) !== null;
+}
 function extractSlotContent(container, name = "default") {
   const slotEl = getSlot(container, name);
   if (!slotEl) return "";
@@ -36949,6 +36970,65 @@ function extractSlotContent(container, name = "default") {
 
 // src/index.ts
 init_styles();
+
+// src/runtime/events.ts
+var bus = /* @__PURE__ */ new Map();
+function emitIslandEvent(event, detail) {
+  const handlers = bus.get(event);
+  if (handlers) {
+    handlers.forEach((fn) => {
+      try {
+        fn(detail);
+      } catch (err) {
+        console.error(`[SoftMax.LaughTale] Error in event listener for "${event}":`, err);
+      }
+    });
+  }
+  window.dispatchEvent(new CustomEvent(`island:${event}`, { detail }));
+}
+function onIslandEvent(event, handler) {
+  if (!bus.has(event)) {
+    bus.set(event, /* @__PURE__ */ new Set());
+  }
+  bus.get(event).add(handler);
+  return () => {
+    const set = bus.get(event);
+    if (set) {
+      set.delete(handler);
+      if (set.size === 0) bus.delete(event);
+    }
+  };
+}
+
+// src/runtime/state.ts
+var IslandStore = class {
+  value;
+  listeners = /* @__PURE__ */ new Set();
+  constructor(initialValue) {
+    this.value = initialValue;
+  }
+  get() {
+    return this.value;
+  }
+  set(next) {
+    const prev = this.value;
+    this.value = typeof next === "function" ? next(prev) : next;
+    if (this.value !== prev) {
+      this.listeners.forEach((fn) => fn(this.value, prev));
+    }
+  }
+  subscribe(listener) {
+    this.listeners.add(listener);
+    return () => this.listeners.delete(listener);
+  }
+};
+var stores = /* @__PURE__ */ new Map();
+function useSharedState(key, initialValue) {
+  if (!stores.has(key)) {
+    stores.set(key, new IslandStore(initialValue));
+  }
+  return stores.get(key);
+}
 
 // src/adapters/vanilla.ts
 function createVanillaIsland(mount) {
@@ -36959,7 +37039,11 @@ function createVanillaIsland(mount) {
 function createPreactIsland(Component, options = {}) {
   return async (container, props) => {
     try {
-      const preact = await import("preact");
+      const preactPkg = "preact";
+      const preact = await import(
+        /* @vite-ignore */
+        preactPkg
+      );
       const h = preact.h || preact.default?.h;
       const render = preact.render || preact.default?.render;
       if (render && h) {
@@ -38031,6 +38115,7 @@ defineIsland("p-toast", () => Promise.resolve().then(() => (init_toast(), toast_
 defineIsland("island-toast", () => Promise.resolve().then(() => (init_toast(), toast_exports)));
 export {
   AURA_PALETTES,
+  IslandStore,
   LucideIcons,
   applyNonceToScript,
   applyNonceToStyle,
@@ -38040,6 +38125,7 @@ export {
   createScope,
   createVanillaIsland,
   defineIsland,
+  emitIslandEvent,
   enableViewTransitions,
   executeCommand,
   extractSlotContent,
@@ -38051,6 +38137,7 @@ export {
   getSlot,
   getToken,
   hasIsland,
+  hasSlot,
   hydrateIsland,
   importWithRetry,
   initAnimationStyles,
@@ -38061,6 +38148,7 @@ export {
   injectRipple,
   listCommands,
   navigateTo,
+  onIslandEvent,
   parseAndReviveProps,
   registerCommand,
   removeIslandStyle,
@@ -38083,6 +38171,7 @@ export {
   useKeyboardNav,
   useMorphLayout,
   useScrollLock,
+  useSharedState,
   useSpring,
   useStagger,
   useThrottle,

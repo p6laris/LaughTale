@@ -20,8 +20,8 @@ import {
     AssignmentExpressionNode,
     UpdateExpressionNode,
     SequenceExpressionNode
-} from './ast.ts';
-import { Lexer, Token, TokenType } from './lexer.ts';
+} from './ast';
+import { Lexer, Token, TokenType } from './lexer';
 
 export class ParseError extends Error {
     public pos: number;

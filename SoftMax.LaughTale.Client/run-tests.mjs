@@ -13,6 +13,9 @@ esbuild.buildSync({
         'tests/commands.test.ts',
         'tests/csp.test.ts',
         'tests/router.test.ts',
+        'tests/scope.test.ts',
+        'tests/hydrator.test.ts',
+        'tests/retry.test.ts',
         'tests/phase2-components.test.ts',
         'tests/phase2-composables.test.ts'
     ],
@@ -35,6 +38,9 @@ const result = spawnSync('node', [
     'dist/tests/commands.test.js',
     'dist/tests/csp.test.js',
     'dist/tests/router.test.js',
+    'dist/tests/scope.test.js',
+    'dist/tests/hydrator.test.js',
+    'dist/tests/retry.test.js',
     'dist/tests/phase2-components.test.js',
     'dist/tests/phase2-composables.test.js'
 ], {

@@ -467,4 +467,5 @@ export default function RatingIsland(container: HTMLElement, props: RatingProps)
     }
 
     init();
+    syncValue(getRating());
 }

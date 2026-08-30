@@ -3,8 +3,8 @@
  * Lightweight JavaScript Proxy state management, AST expression evaluation, XSS prevention, and two-way data binding.
  */
 
-import { isSafeAttribute, isSafeProperty, sanitizeUrl } from './security.ts';
-import { parseExpressionToAst, evaluateAst } from './expression/index.ts';
+import { isSafeAttribute, isSafeProperty, sanitizeUrl } from './security';
+import { parseExpressionToAst, evaluateAst } from './expression/index';
 
 export interface ReactiveScope {
     state: Record<string, any>;

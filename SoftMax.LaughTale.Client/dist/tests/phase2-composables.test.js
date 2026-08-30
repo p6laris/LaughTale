@@ -17,6 +17,7 @@ globalThis.KeyboardEvent = win.KeyboardEvent;
 globalThis.Node = win.Node;
 globalThis.localStorage = win.localStorage;
 globalThis.sessionStorage = win.sessionStorage;
+globalThis.DOMParser = win.DOMParser;
 globalThis.requestAnimationFrame = (cb) => setTimeout(cb, 16);
 try {
   Object.defineProperty(globalThis.navigator, "clipboard", {

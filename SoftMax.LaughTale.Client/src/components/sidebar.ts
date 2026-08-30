@@ -1630,6 +1630,21 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
             return sidebarHtml;
         }
 
+        function renderControlsHtml(): string {
+            return `
+                <div class="p-sidebar-toolbar">
+                    <div class="p-sidebar-toolbar-field">
+                        <span class="p-sidebar-toolbar-label">Side</span>
+                        <button type="button" class="p-sb-select-trigger" data-sb-control="side">${side}</button>
+                    </div>
+                    <div class="p-sidebar-toolbar-field">
+                        <span class="p-sidebar-toolbar-label">Variant</span>
+                        <button type="button" class="p-sb-select-trigger" data-sb-control="variant">${variant}</button>
+                    </div>
+                </div>
+            `;
+        }
+
         const mainHtml = renderMainContent();
         const backdropHtml = `<div class="p-sidebar-backdrop" data-sidebar-backdrop style="display: ${backdrop && isOpen ? 'block' : 'none'};"></div>`;
         

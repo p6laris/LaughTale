@@ -256,13 +256,54 @@ export interface GalleriaItem {
     title?: string;
 }
 
+export interface MenuItem {
+    label?: string;
+    icon?: string;
+    command?: string | ((...args: any[]) => void);
+    url?: string;
+    items?: MenuItem[];
+    disabled?: boolean;
+    visible?: boolean;
+    target?: string;
+    separator?: boolean;
+    style?: string;
+    class?: string;
+    badge?: string | number;
+    badgeSeverity?: string;
+    shortcut?: string;
+    route?: string;
+    expanded?: boolean;
+    [key: string]: any;
+}
+
+export interface SidebarItem {
+    label?: string;
+    icon?: string;
+    to?: string;
+    href?: string;
+    badge?: string | number;
+    badgeClass?: string;
+    active?: boolean;
+    disabled?: boolean;
+    items?: SidebarItem[];
+    separator?: boolean;
+    header?: boolean;
+    [key: string]: any;
+}
+
 export interface SplitButtonItem {
-    label: string;
+    label?: string;
     icon?: string;
     action?: string;
+    command?: string | ((...args: any[]) => void);
     url?: string;
-    severity?: ButtonSeverity;
+    severity?: ButtonSeverity | string;
     disabled?: boolean;
+    separator?: boolean;
+    items?: SplitButtonItem[];
+    route?: string;
+    target?: string;
+    [key: string]: any;
 }
 
 // Dynamic Form Schema Strongly Typed
