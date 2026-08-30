@@ -405,7 +405,7 @@ Standardize events on `laughtale:<component>:<event>` (`bubbles: true`, `detail`
 ---
 
 ### `LT-404` — C# and TS models drift silently
-**Severity:** P2 · **Status:** todo · **Files:** `Components/Models/ComponentModels.cs` (497 lines) ↔ `src/types/models.ts`
+**Severity:** P2 · **Status:** done · **Files:** `Components/Models/ComponentModels.cs` (497 lines) ↔ `src/types/models.ts`
 
 **Evidence.** The two are maintained by hand. `tsc` already catches the fallout: `tieredmenu.ts` imports `MenuItem` from `../types/models` — it does not exist; `split-button.ts` has 15 errors because `SplitButtonItem` lacks `command`, `items`, `target`, and `separator` that the runtime clearly uses. The C# side and the TS side have diverged and nothing detects it.
 
