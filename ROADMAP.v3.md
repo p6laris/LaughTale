@@ -356,7 +356,7 @@ Persistent islands must be *excluded* — they are moved, not destroyed.
 ## 6. LT-4xx — API design & unification (P2)
 
 ### `LT-401` — 114 TagHelpers in one 5,151-line file with copy-pasted attribute logic
-**Severity:** P2 · **Status:** todo · **File:** `SoftMax.LaughTale.Components/TagHelpers/AuraComponentTagHelpers.cs`
+**Severity:** P2 · **Status:** done · **File:** `SoftMax.LaughTale.Components/TagHelpers/AuraComponentTagHelpers.cs`
 
 **Evidence.** One file, 114 `[HtmlTargetElement]` declarations. Each `Process` override hand-rolls the same camelCase/kebab-case fallback block:
 ```csharp
