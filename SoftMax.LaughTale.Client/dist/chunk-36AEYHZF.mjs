@@ -1,1 +1,0 @@
-function r(e){let a=e.value!==void 0,t=e.defaultValue!==void 0?e.defaultValue:e.value;function n(){return a?e.value:t}function o(l){let u=typeof l=="function"?l(n()):l;a||(t=u),e.onChange?.(u)}return[n,o]}export{r as a};

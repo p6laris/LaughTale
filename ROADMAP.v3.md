@@ -332,7 +332,7 @@ Persistent islands must be *excluded* — they are moved, not destroyed.
 ---
 
 ### `LT-305` — Build artifacts are committed to git
-**Severity:** P2 · **Status:** todo
+**Severity:** P2 · **Status:** done
 
 **Evidence.** `Showcase/wwwroot/js` (98 `.js` + `.map`, 3.9 MB), `Docs/wwwroot/js`, and `Components/wwwroot/js` are all tracked. `git diff --stat` on the working tree emits 58 KB of noise, burying real changes and making review of the actual source diff impractical. `.gitignore` has no entry for them.
 

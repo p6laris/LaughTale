@@ -10,6 +10,11 @@
 **/node_modules/
 **/npm-debug.log*
 **/yarn-error.log*
+**/dist/
+
+## Generated Client & Showcase Bundles
+**/wwwroot/js/
+!**/wwwroot/js/.gitkeep
 
 ## OS generated
 .DS_Store

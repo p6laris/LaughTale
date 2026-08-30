@@ -1,1 +1,0 @@
-function c(n={}){let e=!!n.defaultIsOpen,i=new Set;function t(){n.onToggle?.(e),i.forEach(o=>o(e))}function s(){e||(e=!0,n.onOpen?.(),t())}function l(){e&&(e=!1,n.onClose?.(),t())}function r(){e?l():s()}function u(o){o?s():l()}function a(o){return i.add(o),()=>i.delete(o)}return{get isOpen(){return e},open:s,close:l,toggle:r,setOpen:u,onChange:a}}export{c as a};
