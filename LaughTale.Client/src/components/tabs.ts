@@ -20,7 +20,7 @@ const TABS_CSS = `
     display: flex;
     position: relative;
     background: transparent;
-    border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
+    border-bottom: 1px solid var(--lt-surface-200);
     box-sizing: border-box;
     align-items: center;
     width: 100%;
@@ -57,7 +57,7 @@ const TABS_CSS = `
     padding: 0.75rem 1.125rem;
     border: none;
     background: transparent;
-    color: var(--p-surface-500, #64748b);
+    color: var(--lt-surface-500);
     font-weight: 600;
     font-size: 0.875rem;
     cursor: pointer;
@@ -73,12 +73,12 @@ const TABS_CSS = `
 }
 
 .p-tab:hover:not(.p-tab-active):not(:disabled):not([aria-disabled="true"]) {
-    color: var(--p-surface-800, #1e293b);
+    color: var(--lt-surface-800);
 }
 
 .p-tab-active {
-    color: var(--p-primary-600, #059669);
-    border-bottom-color: var(--p-primary-500, #10b981);
+    color: var(--lt-primary-600);
+    border-bottom-color: var(--lt-primary-500);
     font-weight: 700;
 }
 
@@ -89,7 +89,7 @@ const TABS_CSS = `
 }
 
 .p-tab:focus-visible {
-    outline: 2px solid var(--p-primary-500, #10b981);
+    outline: 2px solid var(--lt-primary-500);
     outline-offset: -2px;
 }
 
@@ -98,7 +98,7 @@ const TABS_CSS = `
     position: absolute;
     bottom: -1px;
     height: 2px;
-    background: var(--p-primary-500, #10b981);
+    background: var(--lt-primary-500);
     transition: left 0.2s cubic-bezier(0.2, 0, 0, 1), width 0.2s cubic-bezier(0.2, 0, 0, 1);
     z-index: 3;
     pointer-events: none;
@@ -118,7 +118,7 @@ const TABS_CSS = `
     z-index: 10;
     transition: opacity 0.25s ease, color 0.15s ease;
     outline: none;
-    color: var(--p-surface-600, #475569);
+    color: var(--lt-surface-600);
     padding: 0;
     box-shadow: none;
 }
@@ -127,19 +127,19 @@ const TABS_CSS = `
     left: 0;
     justify-content: flex-start;
     padding-left: 0.5rem;
-    background: linear-gradient(to right, var(--p-surface-50, #f8fafc) 35%, rgba(248, 250, 252, 0.7) 65%, transparent 100%);
+    background: linear-gradient(to right, var(--lt-surface-50) 35%, rgba(248, 250, 252, 0.7) 65%, transparent 100%);
 }
 
 .p-tablist-next-button {
     right: 0;
     justify-content: flex-end;
     padding-right: 0.5rem;
-    background: linear-gradient(to left, var(--p-surface-50, #f8fafc) 35%, rgba(248, 250, 252, 0.7) 65%, transparent 100%);
+    background: linear-gradient(to left, var(--lt-surface-50) 35%, rgba(248, 250, 252, 0.7) 65%, transparent 100%);
 }
 
 .p-tablist-prev-button:hover:not(:disabled),
 .p-tablist-next-button:hover:not(:disabled) {
-    color: var(--p-text-color, #0f172a);
+    color: var(--lt-text-primary);
 }
 
 .p-tablist-prev-button:disabled,
@@ -172,7 +172,7 @@ const TABS_CSS = `
 /* Custom Capsule Indicator */
 .p-tablist-capsule {
     border-bottom: none;
-    background: var(--p-surface-100, #f1f5f9);
+    background: var(--lt-surface-100);
     padding: 0.25rem;
     border-radius: var(--p-border-radius-md, 6px);
     width: fit-content;
@@ -183,62 +183,62 @@ const TABS_CSS = `
 .p-tablist-capsule .p-tab {
     border-bottom: none;
     margin-bottom: 0;
-    border-radius: var(--p-border-radius-sm, 4px);
+    border-radius: var(--lt-radius-sm);
     padding: 0.5rem 1rem;
-    color: var(--p-surface-600, #475569);
+    color: var(--lt-surface-600);
 }
 .p-tablist-capsule .p-tab-active {
-    background: var(--p-surface-0, #ffffff);
-    color: var(--p-text-color, #0f172a);
+    background: var(--lt-surface-0);
+    color: var(--lt-text-primary);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 /* Dark Mode Tokens */
 .dark .p-tablist,
 [data-theme="dark"] .p-tablist {
-    border-bottom-color: var(--p-surface-700, #334155);
+    border-bottom-color: var(--lt-surface-700);
 }
 .dark .p-tab,
 [data-theme="dark"] .p-tab {
-    color: var(--p-surface-400, #94a3b8);
+    color: var(--lt-surface-400);
 }
 .dark .p-tab:hover:not(.p-tab-active):not(:disabled):not([aria-disabled="true"]),
 [data-theme="dark"] .p-tab:hover:not(.p-tab-active):not(:disabled):not([aria-disabled="true"]) {
-    color: var(--p-surface-100, #f8fafc);
+    color: var(--lt-surface-100);
 }
 .dark .p-tab-active,
 [data-theme="dark"] .p-tab-active {
-    color: var(--p-primary-400, #34d399);
-    border-bottom-color: var(--p-primary-400, #34d399);
+    color: var(--lt-primary-400);
+    border-bottom-color: var(--lt-primary-400);
 }
 .dark .p-tablist-active-bar,
 [data-theme="dark"] .p-tablist-active-bar {
-    background: var(--p-primary-400, #34d399);
+    background: var(--lt-primary-400);
 }
 .dark .p-tablist-prev-button,
 [data-theme="dark"] .p-tablist-prev-button {
-    background: linear-gradient(to right, var(--p-surface-900, #0f172a) 35%, rgba(15, 23, 42, 0.7) 65%, transparent 100%);
-    color: var(--p-surface-400, #94a3b8);
+    background: linear-gradient(to right, var(--lt-surface-900) 35%, rgba(15, 23, 42, 0.7) 65%, transparent 100%);
+    color: var(--lt-surface-400);
 }
 .dark .p-tablist-next-button,
 [data-theme="dark"] .p-tablist-next-button {
-    background: linear-gradient(to left, var(--p-surface-900, #0f172a) 35%, rgba(15, 23, 42, 0.7) 65%, transparent 100%);
-    color: var(--p-surface-400, #94a3b8);
+    background: linear-gradient(to left, var(--lt-surface-900) 35%, rgba(15, 23, 42, 0.7) 65%, transparent 100%);
+    color: var(--lt-surface-400);
 }
 .dark .p-tablist-prev-button:hover:not(:disabled),
 .dark .p-tablist-next-button:hover:not(:disabled),
 [data-theme="dark"] .p-tablist-prev-button:hover:not(:disabled),
 [data-theme="dark"] .p-tablist-next-button:hover:not(:disabled) {
-    color: var(--lt-surface-0, #ffffff);
+    color: var(--lt-surface-0, var(--lt-surface-0));
 }
 .dark .p-tablist-capsule,
 [data-theme="dark"] .p-tablist-capsule {
-    background: var(--p-surface-800, #1e293b);
+    background: var(--lt-surface-800);
 }
 .dark .p-tablist-capsule .p-tab-active,
 [data-theme="dark"] .p-tablist-capsule .p-tab-active {
-    background: var(--p-surface-900, #0f172a);
-    color: var(--p-surface-0, #f8fafc);
+    background: var(--lt-surface-900);
+    color: var(--lt-surface-0);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 `;

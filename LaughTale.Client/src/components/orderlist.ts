@@ -38,7 +38,7 @@ const ORDERLIST_CSS = `
     gap: 1.25rem;
     width: 100%;
     font-family: var(--p-font-family, inherit);
-    color: var(--p-surface-800, #1e293b);
+    color: var(--lt-surface-800);
 }
 
 .p-orderlist-controls {
@@ -57,18 +57,18 @@ const ORDERLIST_CSS = `
     width: 2.25rem;
     height: 2.25rem;
     padding: 0;
-    border-radius: var(--p-border-radius, 6px);
-    border: 1px solid var(--p-surface-300, #cbd5e1);
-    background: var(--p-surface-0, #ffffff);
-    color: var(--p-surface-700, #334155);
+    border-radius: var(--lt-radius);
+    border: 1px solid var(--lt-surface-300);
+    background: var(--lt-surface-0);
+    color: var(--lt-surface-700);
     cursor: pointer;
     transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
     outline: none;
 }
 .p-orderlist-control-btn:hover:not(:disabled) {
-    background: var(--p-surface-100, #f1f5f9);
-    color: var(--p-surface-900, #0f172a);
-    border-color: var(--p-surface-400, #94a3b8);
+    background: var(--lt-surface-100);
+    color: var(--lt-surface-900);
+    border-color: var(--lt-surface-400);
 }
 .p-orderlist-control-btn:disabled {
     opacity: 0.4;
@@ -79,9 +79,9 @@ const ORDERLIST_CSS = `
     flex: 1 1 0;
     display: flex;
     flex-direction: column;
-    border: 1px solid var(--p-surface-200, #e2e8f0);
-    border-radius: var(--p-border-radius-lg, 8px);
-    background: var(--p-surface-0, #ffffff);
+    border: 1px solid var(--lt-surface-200);
+    border-radius: var(--lt-radius-lg);
+    background: var(--lt-surface-0);
     overflow: hidden;
     min-width: 0;
     box-shadow: var(--p-shadow-xs, 0 1px 2px 0 rgba(0, 0, 0, 0.05));
@@ -89,11 +89,11 @@ const ORDERLIST_CSS = `
 
 .p-orderlist-header {
     padding: 0.75rem 1rem;
-    background: var(--p-surface-50, #f8fafc);
-    border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
+    background: var(--lt-surface-50);
+    border-bottom: 1px solid var(--lt-surface-200);
     font-size: 0.875rem;
     font-weight: 700;
-    color: var(--p-surface-800, #1e293b);
+    color: var(--lt-surface-800);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -102,8 +102,8 @@ const ORDERLIST_CSS = `
 
 .p-orderlist-filter-container {
     padding: 0.5rem 0.75rem;
-    background: var(--p-surface-50, #f8fafc);
-    border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
+    background: var(--lt-surface-50);
+    border-bottom: 1px solid var(--lt-surface-200);
     position: relative;
     display: flex;
     align-items: center;
@@ -112,21 +112,21 @@ const ORDERLIST_CSS = `
     width: 100%;
     padding: 0.4rem 2rem 0.4rem 0.65rem;
     font-size: 0.8125rem;
-    border: 1px solid var(--p-surface-300, #cbd5e1);
-    border-radius: var(--p-border-radius, 6px);
-    background: var(--p-surface-0, #ffffff);
+    border: 1px solid var(--lt-surface-300);
+    border-radius: var(--lt-radius);
+    background: var(--lt-surface-0);
     color: inherit;
     outline: none;
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 .p-orderlist-filter-input:focus {
-    border-color: var(--p-primary-500, #10b981);
+    border-color: var(--lt-primary-500);
     box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
 }
 .p-orderlist-filter-icon {
     position: absolute;
     right: 1.25rem;
-    color: var(--p-surface-400, #94a3b8);
+    color: var(--lt-surface-400);
     pointer-events: none;
     display: flex;
     align-items: center;
@@ -150,17 +150,17 @@ const ORDERLIST_CSS = `
     align-items: center;
     gap: 0.75rem;
     font-size: 0.875rem;
-    color: var(--p-surface-700, #334155);
+    color: var(--lt-surface-700);
     user-select: none;
     transition: background-color 0.12s ease, color 0.12s ease;
 }
 .p-orderlist-item:hover:not(.p-highlight) {
-    background: var(--p-surface-100, #f1f5f9);
-    color: var(--p-surface-900, #0f172a);
+    background: var(--lt-surface-100);
+    color: var(--lt-surface-900);
 }
 .p-orderlist-item.p-highlight {
     background: rgba(16, 185, 129, 0.1) !important;
-    color: var(--p-primary-700, #047857) !important;
+    color: var(--lt-primary-700) !important;
     font-weight: 600;
 }
 
@@ -172,16 +172,16 @@ const ORDERLIST_CSS = `
     width: 1.125rem;
     height: 1.125rem;
     border-radius: var(--p-border-radius-xs, 4px);
-    border: 2px solid var(--p-surface-300, #cbd5e1);
-    background: var(--p-surface-0, #ffffff);
+    border: 2px solid var(--lt-surface-300);
+    background: var(--lt-surface-0);
     cursor: pointer;
     transition: background-color 0.12s ease, border-color 0.12s ease;
     flex-shrink: 0;
 }
 .p-checkbox-box.p-checked {
-    background: var(--p-primary-500, #10b981);
-    border-color: var(--p-primary-500, #10b981);
-    color: var(--lt-surface-0, #ffffff);
+    background: var(--lt-primary-500);
+    border-color: var(--lt-primary-500);
+    color: var(--lt-surface-0, var(--lt-surface-0));
 }
 
 /* Product Item Content */
@@ -195,12 +195,12 @@ const ORDERLIST_CSS = `
     width: 2.5rem;
     height: 2.5rem;
     border-radius: 6px;
-    background: var(--p-surface-100, #f1f5f9);
-    border: 1px solid var(--p-surface-200, #e2e8f0);
+    background: var(--lt-surface-100);
+    border: 1px solid var(--lt-surface-200);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--p-primary-600, #059669);
+    color: var(--lt-primary-600);
     flex-shrink: 0;
 }
 .p-orderlist-product-details {
@@ -213,19 +213,19 @@ const ORDERLIST_CSS = `
 .p-orderlist-product-name {
     font-weight: 600;
     font-size: 0.875rem;
-    color: var(--p-surface-900, #0f172a);
+    color: var(--lt-surface-900);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 .p-orderlist-product-category {
     font-size: 0.75rem;
-    color: var(--p-surface-500, #64748b);
+    color: var(--lt-surface-500);
 }
 .p-orderlist-product-price {
     font-weight: 700;
     font-size: 0.875rem;
-    color: var(--p-surface-900, #0f172a);
+    color: var(--lt-surface-900);
 }
 
 /* Numbered Digits */
@@ -233,7 +233,7 @@ const ORDERLIST_CSS = `
     font-variant-numeric: tabular-nums;
     font-size: 0.8125rem;
     font-weight: 600;
-    color: var(--p-surface-400, #94a3b8);
+    color: var(--lt-surface-400);
     width: 1.5rem;
     text-align: right;
     flex-shrink: 0;
@@ -242,10 +242,10 @@ const ORDERLIST_CSS = `
 /* Footer / Status Bar */
 .p-orderlist-footer {
     padding: 0.5rem 1rem;
-    background: var(--p-surface-50, #f8fafc);
-    border-top: 1px solid var(--p-surface-200, #e2e8f0);
+    background: var(--lt-surface-50);
+    border-top: 1px solid var(--lt-surface-200);
     font-size: 0.75rem;
-    color: var(--p-surface-500, #64748b);
+    color: var(--lt-surface-500);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -255,7 +255,7 @@ const ORDERLIST_CSS = `
 .p-orderlist-empty {
     padding: 2.5rem 1rem;
     text-align: center;
-    color: var(--p-surface-400, #94a3b8);
+    color: var(--lt-surface-400);
     font-size: 0.8125rem;
     font-style: italic;
 }
@@ -263,12 +263,12 @@ const ORDERLIST_CSS = `
 /* Dark Mode Tokens */
 .dark .p-orderlist,
 [data-theme="dark"] .p-orderlist {
-    color: var(--p-surface-100, #f1f5f9) !important;
+    color: var(--lt-surface-100) !important;
 }
 .dark .p-orderlist-list-container,
 [data-theme="dark"] .p-orderlist-list-container {
-    background: var(--p-surface-900, #0f172a) !important;
-    border-color: var(--p-surface-700, #334155) !important;
+    background: var(--lt-surface-900) !important;
+    border-color: var(--lt-surface-700) !important;
 }
 .dark .p-orderlist-header,
 .dark .p-orderlist-filter-container,
@@ -276,42 +276,42 @@ const ORDERLIST_CSS = `
 [data-theme="dark"] .p-orderlist-header,
 [data-theme="dark"] .p-orderlist-filter-container,
 [data-theme="dark"] .p-orderlist-footer {
-    background: var(--p-surface-800, #1e293b) !important;
-    border-color: var(--p-surface-700, #334155) !important;
-    color: var(--p-surface-100, #f1f5f9) !important;
+    background: var(--lt-surface-800) !important;
+    border-color: var(--lt-surface-700) !important;
+    color: var(--lt-surface-100) !important;
 }
 .dark .p-orderlist-filter-input,
 [data-theme="dark"] .p-orderlist-filter-input {
-    background: var(--p-surface-900, #0f172a) !important;
-    border-color: var(--p-surface-600, #475569) !important;
-    color: var(--lt-surface-0, #ffffff) !important;
+    background: var(--lt-surface-900) !important;
+    border-color: var(--lt-surface-600) !important;
+    color: var(--lt-surface-0, var(--lt-surface-0)) !important;
 }
 .dark .p-orderlist-control-btn,
 [data-theme="dark"] .p-orderlist-control-btn {
-    background: var(--p-surface-800, #1e293b) !important;
-    border-color: var(--p-surface-600, #475569) !important;
-    color: var(--p-surface-200, #e2e8f0) !important;
+    background: var(--lt-surface-800) !important;
+    border-color: var(--lt-surface-600) !important;
+    color: var(--lt-surface-200) !important;
 }
 .dark .p-orderlist-control-btn:hover:not(:disabled),
 [data-theme="dark"] .p-orderlist-control-btn:hover:not(:disabled) {
-    background: var(--p-surface-700, #334155) !important;
-    color: var(--lt-surface-0, #ffffff) !important;
+    background: var(--lt-surface-700) !important;
+    color: var(--lt-surface-0, var(--lt-surface-0)) !important;
 }
 .dark .p-orderlist-item:hover:not(.p-highlight),
 [data-theme="dark"] .p-orderlist-item:hover:not(.p-highlight) {
-    background: var(--p-surface-800, #1e293b) !important;
-    color: var(--lt-surface-0, #ffffff) !important;
+    background: var(--lt-surface-800) !important;
+    color: var(--lt-surface-0, var(--lt-surface-0)) !important;
 }
 .dark .p-orderlist-product-name,
 .dark .p-orderlist-product-price,
 [data-theme="dark"] .p-orderlist-product-name,
 [data-theme="dark"] .p-orderlist-product-price {
-    color: var(--p-surface-100, #f1f5f9) !important;
+    color: var(--lt-surface-100) !important;
 }
 .dark .p-orderlist-product-img,
 [data-theme="dark"] .p-orderlist-product-img {
-    background: var(--p-surface-800, #1e293b) !important;
-    border-color: var(--p-surface-700, #334155) !important;
+    background: var(--lt-surface-800) !important;
+    border-color: var(--lt-surface-700) !important;
 }
 `;
 
@@ -415,7 +415,7 @@ export default function OrderListIsland<T = any>(container: HTMLElement, props: 
                     </ul>
                     <div class="p-orderlist-footer">
                         <span class="p-orderlist-selection-status">No selected item</span>
-                        ${isFilter ? `<span class="p-orderlist-results-status" style="font-size: 0.6875rem; color: var(--p-surface-400);">0 results available</span>` : ''}
+                        ${isFilter ? `<span class="p-orderlist-results-status" style="font-size: 0.6875rem; color: var(--lt-surface-400);">0 results available</span>` : ''}
                     </div>
                 </div>
             </div>

@@ -67,10 +67,10 @@ const CSS = `
 .p-listbox {
     display: inline-flex;
     flex-direction: column;
-    background: var(--p-surface-0);
-    color: var(--p-text-color);
-    border: 1px solid var(--p-border-color);
-    border-radius: var(--p-border-radius);
+    background: var(--lt-surface-0);
+    color: var(--lt-text-primary);
+    border: 1px solid var(--lt-surface-200);
+    border-radius: var(--lt-radius);
     font-family: var(--p-font-family, inherit);
     box-sizing: border-box;
     overflow: hidden;
@@ -88,17 +88,17 @@ const CSS = `
 
 .p-listbox.is-focused,
 .p-listbox:focus-within {
-    border-color: var(--p-primary-500) !important;
+    border-color: var(--lt-primary-500) !important;
 }
 
 /* Filled Variant */
 .p-listbox.variant-filled {
-    background-color: var(--p-surface-100);
+    background-color: var(--lt-surface-100);
     border-color: transparent;
 }
 .p-listbox.variant-filled.is-focused {
-    background-color: var(--p-surface-0);
-    border-color: var(--p-primary-500) !important;
+    background-color: var(--lt-surface-0);
+    border-color: var(--lt-primary-500) !important;
 }
 
 /* Sizes */
@@ -119,14 +119,14 @@ const CSS = `
 
 /* Invalid State */
 .p-listbox.is-invalid {
-    border-color: var(--p-red-500, #ef4444) !important;
+    border-color: var(--p-red-500, var(--lt-danger-500)) !important;
 }
 
 /* Disabled State */
 .p-listbox.is-disabled {
     opacity: 0.65;
     cursor: not-allowed;
-    background-color: var(--p-surface-100);
+    background-color: var(--lt-surface-100);
 }
 .p-listbox.is-disabled .p-listbox-option {
     cursor: not-allowed;
@@ -139,11 +139,11 @@ const CSS = `
     align-items: center;
     justify-content: space-between;
     padding: 0.625rem 0.875rem;
-    background: var(--p-surface-50);
-    border-bottom: 1px solid var(--p-border-color);
+    background: var(--lt-surface-50);
+    border-bottom: 1px solid var(--lt-surface-200);
     font-size: 0.8125rem;
     font-weight: 700;
-    color: var(--p-text-color);
+    color: var(--lt-text-primary);
 }
 .p-listbox-header-count {
     font-size: 0.75rem;
@@ -152,8 +152,8 @@ const CSS = `
 }
 .p-listbox-footer {
     padding: 0.5rem 0.875rem;
-    background: var(--p-surface-50);
-    border-top: 1px solid var(--p-border-color);
+    background: var(--lt-surface-50);
+    border-top: 1px solid var(--lt-surface-200);
     font-size: 0.75rem;
     color: var(--p-text-muted);
 }
@@ -164,8 +164,8 @@ const CSS = `
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 0.75rem;
-    background: var(--p-surface-50);
-    border-bottom: 1px solid var(--p-border-color);
+    background: var(--lt-surface-50);
+    border-bottom: 1px solid var(--lt-surface-200);
 }
 .p-listbox-filter-input {
     flex: 1;
@@ -173,15 +173,15 @@ const CSS = `
     font-family: inherit;
     font-size: 0.8125rem;
     padding: 0.3125rem 0.5rem;
-    background: var(--p-surface-0);
-    border: 1px solid var(--p-border-color);
-    border-radius: calc(var(--p-border-radius) - 2px);
-    color: var(--p-text-color);
+    background: var(--lt-surface-0);
+    border: 1px solid var(--lt-surface-200);
+    border-radius: calc(var(--lt-radius) - 2px);
+    color: var(--lt-text-primary);
     outline: none;
     box-sizing: border-box;
 }
 .p-listbox-filter-input:focus {
-    border-color: var(--p-primary-500);
+    border-color: var(--lt-primary-500);
 }
 
 /* Options List Container */
@@ -211,7 +211,7 @@ const CSS = `
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: var(--p-text-muted);
-    background: var(--p-surface-50);
+    background: var(--lt-surface-50);
 }
 
 /* Option Items */
@@ -222,7 +222,7 @@ const CSS = `
     padding: 0.5rem 0.875rem;
     cursor: pointer;
     font-size: 0.8125rem;
-    color: var(--p-text-color);
+    color: var(--lt-text-primary);
     background: transparent;
     transition: background 150ms ease, color 150ms ease;
     user-select: none;
@@ -230,31 +230,31 @@ const CSS = `
 }
 
 .p-listbox-option:hover:not(.p-disabled) {
-    background: var(--p-surface-100);
-    color: var(--p-text-color);
+    background: var(--lt-surface-100);
+    color: var(--lt-text-primary);
 }
 
 .p-listbox-option.p-highlight {
-    background: var(--p-primary-50, #ecfdf5);
-    color: var(--p-primary-700, #047857);
+    background: var(--lt-primary-50);
+    color: var(--lt-primary-700);
     font-weight: 600;
 }
 .p-listbox-option.p-highlight:hover:not(.p-disabled) {
-    background: var(--p-primary-100, #d1fae5);
-    color: var(--p-primary-800, #065f46);
+    background: var(--lt-primary-100);
+    color: var(--lt-primary-800);
 }
 
 .p-listbox-option.p-highlight-none {
     background: transparent !important;
-    color: var(--p-text-color) !important;
+    color: var(--lt-text-primary) !important;
     font-weight: normal !important;
 }
 .p-listbox-option.p-highlight-none:hover:not(.p-disabled) {
-    background: var(--p-surface-100) !important;
+    background: var(--lt-surface-100) !important;
 }
 
 .p-listbox-option.p-focus {
-    box-shadow: inset 0 0 0 1px var(--p-primary-500);
+    box-shadow: inset 0 0 0 1px var(--lt-primary-500);
 }
 
 .p-listbox-option.p-disabled {
@@ -264,7 +264,7 @@ const CSS = `
 
 /* Striped Listbox */
 .p-listbox-striped .p-listbox-option:nth-child(even):not(.p-highlight) {
-    background: var(--p-surface-50);
+    background: var(--lt-surface-50);
 }
 
 /* Option Content */
@@ -282,13 +282,13 @@ const CSS = `
     font-size: 0.6875rem;
     font-weight: 700;
     padding: 0.125rem 0.375rem;
-    border-radius: calc(var(--p-border-radius) - 2px);
-    background: var(--p-surface-100);
-    color: var(--p-surface-700);
+    border-radius: calc(var(--lt-radius) - 2px);
+    background: var(--lt-surface-100);
+    color: var(--lt-surface-700);
 }
 .p-listbox-option.p-highlight .p-listbox-option-badge {
-    background: var(--p-primary-100);
-    color: var(--p-primary-800);
+    background: var(--lt-primary-100);
+    color: var(--lt-primary-800);
 }
 
 /* Option Checkbox */
@@ -298,17 +298,17 @@ const CSS = `
     justify-content: center;
     width: 1.125rem;
     height: 1.125rem;
-    border: 1px solid var(--p-border-color);
+    border: 1px solid var(--lt-surface-200);
     border-radius: 4px;
-    background: var(--p-surface-0);
+    background: var(--lt-surface-0);
     margin-right: 0.5rem;
     transition: all 150ms ease;
     flex-shrink: 0;
 }
 .p-listbox-option.p-highlight .p-listbox-option-checkbox {
-    background: var(--p-primary-500);
-    border-color: var(--p-primary-500);
-    color: var(--lt-surface-0, #ffffff);
+    background: var(--lt-primary-500);
+    border-color: var(--lt-primary-500);
+    color: var(--lt-surface-0, var(--lt-surface-0));
 }
 
 /* Option Checkmark Icon */
@@ -316,67 +316,67 @@ const CSS = `
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: var(--p-primary-600);
+    color: var(--lt-primary-600);
     margin-left: 0.5rem;
     flex-shrink: 0;
 }
 
 /* ==================== DARK MODE ==================== */
 .dark .p-listbox {
-    background: var(--p-surface-900);
-    color: var(--p-surface-0);
-    border-color: var(--p-surface-700);
+    background: var(--lt-surface-900);
+    color: var(--lt-surface-0);
+    border-color: var(--lt-surface-700);
 }
 .dark .p-listbox.variant-filled {
-    background-color: var(--p-surface-800);
+    background-color: var(--lt-surface-800);
 }
 .dark .p-listbox.variant-filled.is-focused {
-    background-color: var(--p-surface-900);
+    background-color: var(--lt-surface-900);
 }
 .dark .p-listbox-header,
 .dark .p-listbox-footer,
 .dark .p-listbox-filter-container,
 .dark .p-listbox-option-group-label {
-    background: var(--p-surface-850, #141b26);
-    border-color: var(--p-surface-700);
+    background: var(--lt-surface-850);
+    border-color: var(--lt-surface-700);
 }
 .dark .p-listbox-filter-input {
-    background: var(--p-surface-900);
-    border-color: var(--p-surface-700);
-    color: var(--p-surface-0);
+    background: var(--lt-surface-900);
+    border-color: var(--lt-surface-700);
+    color: var(--lt-surface-0);
 }
 .dark .p-listbox-option {
-    color: var(--p-surface-100);
+    color: var(--lt-surface-100);
 }
 .dark .p-listbox-option:hover:not(.p-disabled) {
-    background: var(--p-surface-800);
-    color: var(--p-surface-0);
+    background: var(--lt-surface-800);
+    color: var(--lt-surface-0);
 }
 .dark .p-listbox-option.p-highlight {
     background: rgba(16, 185, 129, 0.16);
-    color: var(--p-primary-300, #6ee7b7);
+    color: var(--lt-primary-300);
 }
 .dark .p-listbox-option.p-highlight:hover:not(.p-disabled) {
     background: rgba(16, 185, 129, 0.24);
-    color: var(--p-primary-200, #a7f3d0);
+    color: var(--lt-primary-200);
 }
 .dark .p-listbox-option-badge {
-    background: var(--p-surface-800);
-    color: var(--p-surface-200);
+    background: var(--lt-surface-800);
+    color: var(--lt-surface-200);
 }
 .dark .p-listbox-option.p-highlight .p-listbox-option-badge {
     background: rgba(16, 185, 129, 0.25);
-    color: var(--p-primary-200);
+    color: var(--lt-primary-200);
 }
 .dark .p-listbox-option-checkbox {
-    background: var(--p-surface-900);
-    border-color: var(--p-surface-600);
+    background: var(--lt-surface-900);
+    border-color: var(--lt-surface-600);
 }
 .dark .p-listbox-option-checkmark {
-    color: var(--p-primary-400);
+    color: var(--lt-primary-400);
 }
 .dark .p-listbox-striped .p-listbox-option:nth-child(even):not(.p-highlight) {
-    background: var(--p-surface-850, #141b26);
+    background: var(--lt-surface-850);
 }
 `;
 
@@ -498,7 +498,7 @@ export default function ListboxIsland(container: HTMLElement, props: ListboxProp
             ` : ''}
             ${isFilter ? `
                 <div class="p-listbox-filter-container">
-                    <span style="color: var(--p-surface-400); display: flex;">${searchSvg}</span>
+                    <span style="color: var(--lt-surface-400); display: flex;">${searchSvg}</span>
                     <input type="text" class="p-listbox-filter-input" placeholder="${props.filterPlaceholder || 'Filter...'}" ${isDisabled ? 'disabled' : ''} />
                 </div>
             ` : ''}
@@ -598,7 +598,7 @@ export default function ListboxIsland(container: HTMLElement, props: ListboxProp
         if (item.flag) {
             leadingHtml = `<span style="font-size: 1.1rem; line-height: 1; flex-shrink: 0;">${item.flag}</span>`;
         } else if (item.icon) {
-            leadingHtml = `<span style="display: flex; flex-shrink: 0; color: var(--p-primary-600);">${getLucideIcon(item.icon, 16)}</span>`;
+            leadingHtml = `<span style="display: flex; flex-shrink: 0; color: var(--lt-primary-600);">${getLucideIcon(item.icon, 16)}</span>`;
         }
 
         let trailingHtml = '';

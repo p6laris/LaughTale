@@ -65,10 +65,10 @@ const CSS = `
     justify-content: space-between;
     min-height: 2.5rem;
     padding: 0.375rem 0.75rem;
-    background: var(--p-surface-0);
-    border: 1px solid var(--p-border-color);
-    border-radius: var(--p-border-radius);
-    color: var(--p-text-color);
+    background: var(--lt-surface-0);
+    border: 1px solid var(--lt-surface-200);
+    border-radius: var(--lt-radius);
+    color: var(--lt-text-primary);
     font-family: var(--p-font-family, inherit);
     font-size: 0.875rem;
     line-height: 1.25;
@@ -86,27 +86,27 @@ const CSS = `
 }
 
 .p-select:hover:not(.is-disabled):not([readonly]) {
-    border-color: var(--p-surface-400);
+    border-color: var(--lt-surface-400);
 }
 
 .p-select.is-open,
 .p-select:focus-visible {
-    border-color: var(--p-primary-500) !important;
-    box-shadow: 0 0 0 1px var(--p-primary-500) !important;
+    border-color: var(--lt-primary-500) !important;
+    box-shadow: 0 0 0 1px var(--lt-primary-500) !important;
 }
 
 /* Filled Variant */
 .p-select.variant-filled {
-    background-color: var(--p-surface-100);
+    background-color: var(--lt-surface-100);
     border-color: transparent;
 }
 .p-select.variant-filled:hover:not(.is-disabled):not([readonly]) {
-    background-color: var(--p-surface-200);
+    background-color: var(--lt-surface-200);
 }
 .p-select.variant-filled.is-open,
 .p-select.variant-filled:focus-visible {
-    background-color: var(--p-surface-0);
-    border-color: var(--p-primary-500) !important;
+    background-color: var(--lt-surface-0);
+    border-color: var(--lt-primary-500) !important;
 }
 
 /* Sizes */
@@ -125,18 +125,18 @@ const CSS = `
 
 /* Invalid State */
 .p-select.is-invalid {
-    border-color: var(--p-red-500, #ef4444) !important;
+    border-color: var(--p-red-500, var(--lt-danger-500)) !important;
 }
 .p-select.is-invalid:focus-visible,
 .p-select.is-invalid.is-open {
-    box-shadow: 0 0 0 1px var(--p-red-500, #ef4444) !important;
+    box-shadow: 0 0 0 1px var(--p-red-500, var(--lt-danger-500)) !important;
 }
 
 /* Disabled State */
 .p-select.is-disabled {
     opacity: 0.6;
     cursor: not-allowed;
-    background-color: var(--p-surface-100);
+    background-color: var(--lt-surface-100);
 }
 
 /* Select Trigger Content */
@@ -148,7 +148,7 @@ const CSS = `
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    color: var(--p-text-color);
+    color: var(--lt-text-primary);
 }
 .p-select-label.p-placeholder {
     color: var(--p-text-muted);
@@ -185,8 +185,8 @@ const CSS = `
     transition: color 150ms ease, background 150ms ease;
 }
 .p-select-clear-icon:hover {
-    color: var(--p-text-color);
-    background: var(--p-surface-200);
+    color: var(--lt-text-primary);
+    background: var(--lt-surface-200);
 }
 
 .p-select-dropdown {
@@ -198,7 +198,7 @@ const CSS = `
 }
 .p-select.is-open .p-select-dropdown {
     transform: rotate(180deg);
-    color: var(--p-primary-500);
+    color: var(--lt-primary-500);
 }
 
 /* Chips in Trigger */
@@ -213,10 +213,10 @@ const CSS = `
     align-items: center;
     gap: 0.375rem;
     padding: 0.125rem 0.5rem;
-    background: var(--p-surface-100);
-    border-radius: calc(var(--p-border-radius) - 2px);
+    background: var(--lt-surface-100);
+    border-radius: calc(var(--lt-radius) - 2px);
     font-size: 0.75rem;
-    color: var(--p-surface-700);
+    color: var(--lt-surface-700);
 }
 .p-select-chip-remove {
     cursor: pointer;
@@ -224,7 +224,7 @@ const CSS = `
     display: flex;
 }
 .p-select-chip-remove:hover {
-    color: var(--p-text-color);
+    color: var(--lt-text-primary);
 }
 
 /* ==================== SELECT OVERLAY ==================== */
@@ -235,9 +235,9 @@ const CSS = `
     min-width: 100%;
     width: max-content;
     max-width: 24rem;
-    background: var(--p-surface-0);
-    border: 1px solid var(--p-border-color);
-    border-radius: var(--p-border-radius);
+    background: var(--lt-surface-0);
+    border: 1px solid var(--lt-surface-200);
+    border-radius: var(--lt-radius);
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
     z-index: 1100;
     overflow: hidden;
@@ -258,24 +258,24 @@ const CSS = `
 .p-select-filter-container {
     position: relative;
     padding: 0.5rem;
-    border-bottom: 1px solid var(--p-border-color);
-    background: var(--p-surface-0);
+    border-bottom: 1px solid var(--lt-surface-200);
+    background: var(--lt-surface-0);
 }
 .p-select-filter-input {
     width: 100%;
     padding: 0.375rem 0.625rem 0.375rem 2rem;
-    background: var(--p-surface-0);
-    border: 1px solid var(--p-border-color);
-    border-radius: calc(var(--p-border-radius) - 2px);
-    color: var(--p-text-color);
+    background: var(--lt-surface-0);
+    border: 1px solid var(--lt-surface-200);
+    border-radius: calc(var(--lt-radius) - 2px);
+    color: var(--lt-text-primary);
     font-size: 0.8125rem;
     outline: none;
     box-sizing: border-box;
     transition: border-color 150ms ease, box-shadow 150ms ease;
 }
 .p-select-filter-input:focus {
-    border-color: var(--p-primary-500);
-    box-shadow: 0 0 0 1px var(--p-primary-500);
+    border-color: var(--lt-primary-500);
+    box-shadow: 0 0 0 1px var(--lt-primary-500);
 }
 .p-select-filter-icon {
     position: absolute;
@@ -293,15 +293,15 @@ const CSS = `
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 0.75rem;
-    border-bottom: 1px solid var(--p-border-color);
+    border-bottom: 1px solid var(--lt-surface-200);
     font-size: 0.8125rem;
     font-weight: 600;
-    color: var(--p-text-color);
+    color: var(--lt-text-primary);
     cursor: pointer;
-    background: var(--p-surface-50);
+    background: var(--lt-surface-50);
 }
 .p-select-header-all:hover {
-    background: var(--p-surface-100);
+    background: var(--lt-surface-100);
 }
 
 /* List Options */
@@ -331,25 +331,25 @@ const CSS = `
     align-items: center;
     justify-content: space-between;
     padding: 0.5rem 0.75rem;
-    border-radius: calc(var(--p-border-radius) - 2px);
+    border-radius: calc(var(--lt-radius) - 2px);
     font-size: 0.875rem;
-    color: var(--p-text-color);
+    color: var(--lt-text-primary);
     cursor: pointer;
     transition: background 120ms ease, color 120ms ease;
     gap: 0.75rem;
 }
 
 .p-select-option:hover:not(.p-disabled) {
-    background: var(--p-surface-100);
+    background: var(--lt-surface-100);
 }
 
 .p-select-option.p-highlight {
-    background: var(--p-primary-50, #ecfdf5);
-    color: var(--p-primary-700, #047857);
+    background: var(--lt-primary-50);
+    color: var(--lt-primary-700);
     font-weight: 600;
 }
 .p-select-option.p-highlight:hover:not(.p-disabled) {
-    background: var(--p-primary-100, #d1fae5);
+    background: var(--lt-primary-100);
 }
 
 .p-select-option.p-disabled {
@@ -367,9 +367,9 @@ const CSS = `
 .p-select-option-checkbox {
     width: 1.125rem;
     height: 1.125rem;
-    border: 1px solid var(--p-border-color);
-    border-radius: calc(var(--p-border-radius) - 4px);
-    background: var(--p-surface-0);
+    border: 1px solid var(--lt-surface-200);
+    border-radius: calc(var(--lt-radius) - 4px);
+    background: var(--lt-surface-0);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -378,13 +378,13 @@ const CSS = `
 }
 .p-select-option.p-highlight .p-select-option-checkbox,
 .p-select-option-checkbox.is-checked {
-    background: var(--p-primary-500);
-    border-color: var(--p-primary-500);
-    color: var(--lt-surface-0, #ffffff);
+    background: var(--lt-primary-500);
+    border-color: var(--lt-primary-500);
+    color: var(--lt-surface-0, var(--lt-surface-0));
 }
 
 .p-select-option-checkmark {
-    color: var(--p-primary-600);
+    color: var(--lt-primary-600);
     display: flex;
 }
 
@@ -393,8 +393,8 @@ const CSS = `
     font-weight: 700;
     padding: 0.125rem 0.375rem;
     border-radius: 9999px;
-    background: var(--p-surface-200);
-    color: var(--p-surface-700);
+    background: var(--lt-surface-200);
+    color: var(--lt-surface-700);
 }
 
 .p-select-empty-message {
@@ -406,71 +406,71 @@ const CSS = `
 
 /* ==================== DARK MODE ==================== */
 .dark .p-select {
-    background: var(--p-surface-900);
-    border-color: var(--p-surface-700);
-    color: var(--p-surface-0);
+    background: var(--lt-surface-900);
+    border-color: var(--lt-surface-700);
+    color: var(--lt-surface-0);
 }
 .dark .p-select:hover:not(.is-disabled):not([readonly]) {
-    border-color: var(--p-surface-500);
+    border-color: var(--lt-surface-500);
 }
 .dark .p-select.variant-filled {
-    background-color: var(--p-surface-800);
+    background-color: var(--lt-surface-800);
 }
 .dark .p-select.variant-filled:hover:not(.is-disabled):not([readonly]) {
-    background-color: var(--p-surface-700);
+    background-color: var(--lt-surface-700);
 }
 .dark .p-select.variant-filled.is-open {
-    background-color: var(--p-surface-900);
+    background-color: var(--lt-surface-900);
 }
 .dark .p-select.is-disabled {
-    background-color: var(--p-surface-800);
+    background-color: var(--lt-surface-800);
 }
 .dark .p-select-chip {
-    background: var(--p-surface-800);
-    color: var(--p-surface-200);
+    background: var(--lt-surface-800);
+    color: var(--lt-surface-200);
 }
 .dark .p-select-overlay {
-    background: var(--p-surface-900);
-    border-color: var(--p-surface-700);
+    background: var(--lt-surface-900);
+    border-color: var(--lt-surface-700);
 }
 .dark .p-select-filter-container {
-    background: var(--p-surface-900);
-    border-color: var(--p-surface-700);
+    background: var(--lt-surface-900);
+    border-color: var(--lt-surface-700);
 }
 .dark .p-select-filter-input {
-    background: var(--p-surface-950, #090d14);
-    border-color: var(--p-surface-700);
-    color: var(--p-surface-0);
+    background: var(--lt-surface-950);
+    border-color: var(--lt-surface-700);
+    color: var(--lt-surface-0);
 }
 .dark .p-select-header-all {
-    background: var(--p-surface-850, #141b26);
-    border-color: var(--p-surface-700);
+    background: var(--lt-surface-850);
+    border-color: var(--lt-surface-700);
 }
 .dark .p-select-header-all:hover {
-    background: var(--p-surface-800);
+    background: var(--lt-surface-800);
 }
 .dark .p-select-option:hover:not(.p-disabled) {
-    background: var(--p-surface-800);
-    color: var(--p-surface-0);
+    background: var(--lt-surface-800);
+    color: var(--lt-surface-0);
 }
 .dark .p-select-option.p-highlight {
     background: rgba(16, 185, 129, 0.16);
-    color: var(--p-primary-300, #6ee7b7);
+    color: var(--lt-primary-300);
 }
 .dark .p-select-option.p-highlight:hover:not(.p-disabled) {
     background: rgba(16, 185, 129, 0.24);
-    color: var(--p-primary-200, #a7f3d0);
+    color: var(--lt-primary-200);
 }
 .dark .p-select-option-checkbox {
-    background: var(--p-surface-950, #090d14);
-    border-color: var(--p-surface-600);
+    background: var(--lt-surface-950);
+    border-color: var(--lt-surface-600);
 }
 .dark .p-select-option-checkmark {
-    color: var(--p-primary-400);
+    color: var(--lt-primary-400);
 }
 .dark .p-select-option-badge {
-    background: var(--p-surface-800);
-    color: var(--p-surface-200);
+    background: var(--lt-surface-800);
+    color: var(--lt-surface-200);
 }
 `;
 
@@ -642,7 +642,7 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
 
         const flagHtml = opt.flag ? `<span style="font-size: 1.125rem; line-height: 1;">${opt.flag}</span>` : '';
         const iconHtml = opt.icon ? `<span style="font-size: 1.125rem; line-height: 1;">${opt.icon}</span>` : '';
-        const avatarHtml = opt.avatar ? `<div style="position: relative; width: 1.75rem; height: 1.75rem; border-radius: 50%; background: var(--p-surface-200); color: var(--p-surface-700); font-weight: 700; font-size: 0.6875rem; display: flex; align-items: center; justify-content: center;">${opt.avatar}${opt.statusClass ? `<span style="position: absolute; bottom: -1px; right: -1px; width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid var(--p-surface-0);" class="${opt.statusClass}"></span>` : ''}</div>` : '';
+        const avatarHtml = opt.avatar ? `<div style="position: relative; width: 1.75rem; height: 1.75rem; border-radius: 50%; background: var(--lt-surface-200); color: var(--lt-surface-700); font-weight: 700; font-size: 0.6875rem; display: flex; align-items: center; justify-content: center;">${opt.avatar}${opt.statusClass ? `<span style="position: absolute; bottom: -1px; right: -1px; width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid var(--lt-surface-0);" class="${opt.statusClass}"></span>` : ''}</div>` : '';
         const badgeHtml = opt.badge !== undefined ? `<span class="p-select-option-badge">${opt.badge}</span>` : '';
         const descHtml = opt.description ? `<div style="font-size: 0.75rem; color: var(--p-text-muted);">${opt.description}</div>` : '';
 

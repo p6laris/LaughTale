@@ -28,7 +28,7 @@ const DIVIDER_CSS = `
     left: 0;
     width: 100%;
     content: "";
-    border-top: 1px solid var(--p-surface-200, #e2e8f0);
+    border-top: 1px solid var(--lt-surface-200);
 }
 .p-divider-horizontal.p-divider-solid:before {
     border-top-style: solid;
@@ -41,8 +41,8 @@ const DIVIDER_CSS = `
 }
 .p-divider-horizontal .p-divider-content {
     padding: 0 0.75rem;
-    background: var(--p-surface-0, #ffffff);
-    color: var(--p-surface-700, #334155);
+    background: var(--lt-surface-0);
+    color: var(--lt-surface-700);
     z-index: 1;
 }
 .p-divider-horizontal.p-divider-left {
@@ -70,7 +70,7 @@ const DIVIDER_CSS = `
     left: 50%;
     height: 100%;
     content: "";
-    border-left: 1px solid var(--p-surface-200, #e2e8f0);
+    border-left: 1px solid var(--lt-surface-200);
 }
 .p-divider-vertical.p-divider-solid:before {
     border-left-style: solid;
@@ -83,8 +83,8 @@ const DIVIDER_CSS = `
 }
 .p-divider-vertical .p-divider-content {
     padding: 0.5rem 0;
-    background: var(--p-surface-0, #ffffff);
-    color: var(--p-surface-700, #334155);
+    background: var(--lt-surface-0);
+    color: var(--lt-surface-700);
     z-index: 1;
 }
 .p-divider-vertical.p-divider-top {
@@ -100,12 +100,12 @@ const DIVIDER_CSS = `
 /* Dark Mode Tokens */
 .dark .p-divider:before,
 [data-theme="dark"] .p-divider:before {
-    border-color: var(--p-surface-700, #334155) !important;
+    border-color: var(--lt-surface-700) !important;
 }
 .dark .p-divider .p-divider-content,
 [data-theme="dark"] .p-divider .p-divider-content {
-    background: var(--p-surface-900, #0f172a) !important;
-    color: var(--p-surface-200, #e2e8f0) !important;
+    background: var(--lt-surface-900) !important;
+    color: var(--lt-surface-200) !important;
 }
 `;
 

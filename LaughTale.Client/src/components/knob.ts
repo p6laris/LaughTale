@@ -12,7 +12,7 @@ export interface KnobProps {
     max?: number;
     step?: number;
     size?: number; // px, default 96
-    color?: string; // default var(--p-primary-600)
+    color?: string; // default var(--lt-primary-600)
     valueTemplate?: string; // e.g. '{value}%'
     targetInputName?: string;
     disabled?: boolean;
@@ -23,19 +23,19 @@ export interface KnobProps {
 
 const CSS = `
 [data-theme="dark"] .laughtale-knob {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+    background: var(--lt-surface-900) !important;
+    color: var(--lt-surface-100) !important;
+    border-color: var(--lt-surface-700) !important;
 }
 [data-theme="dark"] .knob-progress-circle {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+    background: var(--lt-surface-900) !important;
+    color: var(--lt-surface-100) !important;
+    border-color: var(--lt-surface-700) !important;
 }
 [data-theme="dark"] .knob-value-display {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+    background: var(--lt-surface-900) !important;
+    color: var(--lt-surface-100) !important;
+    border-color: var(--lt-surface-700) !important;
 }
 `;
 
@@ -64,11 +64,11 @@ export default function KnobIsland(container: HTMLElement, props: KnobProps, ctx
         <div class="laughtale-knob" style="position: relative; display: inline-flex; align-items: center; justify-content: center; width: ${size}px; height: ${size}px; user-select: none; cursor: ${props.disabled ? 'not-allowed' : 'pointer'}; touch-action: none;">
             <svg width="${size}" height="${size}" style="transform: rotate(-90deg); pointer-events: none;">
                 <!-- Background Circle -->
-                <circle cx="${size / 2}" cy="${size / 2}" r="${radius}" fill="transparent" stroke="var(--p-surface-200)" stroke-width="${strokeWidth}" />
+                <circle cx="${size / 2}" cy="${size / 2}" r="${radius}" fill="transparent" stroke="var(--lt-surface-200)" stroke-width="${strokeWidth}" />
                 <!-- Progress Arc -->
-                <circle class="knob-progress-circle" cx="${size / 2}" cy="${size / 2}" r="${radius}" fill="transparent" stroke="${props.color || 'var(--p-primary-600)'}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-dasharray="${circumference}" stroke-dashoffset="${initialOffset}" style="transition: stroke-dashoffset 0.05s ease;" />
+                <circle class="knob-progress-circle" cx="${size / 2}" cy="${size / 2}" r="${radius}" fill="transparent" stroke="${props.color || 'var(--lt-primary-600)'}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-dasharray="${circumference}" stroke-dashoffset="${initialOffset}" style="transition: stroke-dashoffset 0.05s ease;" />
             </svg>
-            <span class="knob-value-display" style="position: absolute; font-size: ${size * 0.2}px; font-weight: 700; color: var(--p-surface-900); pointer-events: none;">
+            <span class="knob-value-display" style="position: absolute; font-size: ${size * 0.2}px; font-weight: 700; color: var(--lt-surface-900); pointer-events: none;">
                 ${initialText}
             </span>
         </div>

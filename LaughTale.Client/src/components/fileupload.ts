@@ -35,28 +35,28 @@ const FILEUPLOAD_CSS = `
     padding: 0.5rem 1.15rem;
     font-size: 0.875rem;
     font-weight: 600;
-    border-radius: var(--p-border-radius, 6px);
-    background: var(--p-surface-900, #0f172a);
-    border: 1px solid var(--p-surface-900, #0f172a);
-    color: var(--lt-surface-0, #ffffff);
+    border-radius: var(--lt-radius);
+    background: var(--lt-surface-900);
+    border: 1px solid var(--lt-surface-900);
+    color: var(--lt-surface-0, var(--lt-surface-0));
     transition: background-color 0.15s ease, border-color 0.15s ease;
     gap: 0.45rem;
     user-select: none;
 }
 
 .p-fileupload-choose:hover {
-    background: var(--p-surface-800, #1e293b);
-    border-color: var(--p-surface-800, #1e293b);
+    background: var(--lt-surface-800);
+    border-color: var(--lt-surface-800);
 }
 
 .p-fileupload-choose.p-button-secondary {
-    background: var(--p-surface-100, #f1f5f9);
-    border: 1px solid var(--p-border-color, #e2e8f0);
-    color: var(--p-surface-800, #1e293b);
+    background: var(--lt-surface-100);
+    border: 1px solid var(--lt-surface-200);
+    color: var(--lt-surface-800);
 }
 
 .p-fileupload-choose.p-button-secondary:hover {
-    background: var(--p-surface-200, #e2e8f0);
+    background: var(--lt-surface-200);
 }
 
 .p-fileupload-choose input[type="file"] {
@@ -75,7 +75,7 @@ const FILEUPLOAD_CSS = `
 
 .p-fileupload-filename {
     font-size: 0.875rem;
-    color: var(--p-text-muted, #64748b);
+    color: var(--p-text-muted, var(--lt-surface-500));
     max-width: 16rem;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -84,9 +84,9 @@ const FILEUPLOAD_CSS = `
 
 /* Advanced Mode Container */
 .p-fileupload-advanced {
-    border: 1px solid var(--p-border-color, #e2e8f0);
-    border-radius: var(--p-border-radius, 8px);
-    background: var(--p-surface-0, #ffffff);
+    border: 1px solid var(--lt-surface-200);
+    border-radius: var(--lt-radius);
+    background: var(--lt-surface-0);
     overflow: hidden;
     width: 100%;
     box-sizing: border-box;
@@ -97,8 +97,8 @@ const FILEUPLOAD_CSS = `
     align-items: center;
     gap: 0.5rem;
     padding: 0.75rem 1rem;
-    background: var(--p-surface-50, #f8fafc);
-    border-bottom: 1px solid var(--p-border-color, #e2e8f0);
+    background: var(--lt-surface-50);
+    border-bottom: 1px solid var(--lt-surface-200);
     flex-wrap: wrap;
 }
 
@@ -114,7 +114,7 @@ const FILEUPLOAD_CSS = `
 
 .p-fileupload-content.p-fileupload-highlight {
     background: rgba(59, 130, 246, 0.04);
-    outline: 2px dashed var(--p-primary-500, #3b82f6);
+    outline: 2px dashed var(--lt-primary-500);
     outline-offset: -4px;
 }
 
@@ -126,11 +126,11 @@ const FILEUPLOAD_CSS = `
     justify-content: center;
     gap: 0.5rem;
     padding: 2.25rem 1.5rem;
-    color: var(--p-surface-500, #64748b);
+    color: var(--lt-surface-500);
     text-align: center;
-    border: 2px dashed var(--p-border-color, #e2e8f0);
-    border-radius: var(--p-border-radius, 8px);
-    background: var(--p-surface-50, #f8fafc);
+    border: 2px dashed var(--lt-surface-200);
+    border-radius: var(--lt-radius);
+    background: var(--lt-surface-50);
     cursor: pointer;
     transition: border-color 0.2s ease, background 0.2s ease;
     width: 100%;
@@ -138,32 +138,32 @@ const FILEUPLOAD_CSS = `
 }
 
 .p-fileupload-empty:hover {
-    border-color: var(--p-primary-500, #3b82f6);
-    background: var(--p-surface-0, #ffffff);
+    border-color: var(--lt-primary-500);
+    background: var(--lt-surface-0);
 }
 
 .p-fileupload-empty-icon {
     width: 3rem;
     height: 3rem;
     border-radius: 9999px;
-    background: var(--p-surface-100, #f1f5f9);
-    border: 1px solid var(--p-border-color, #e2e8f0);
+    background: var(--lt-surface-100);
+    border: 1px solid var(--lt-surface-200);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--p-surface-600, #475569);
+    color: var(--lt-surface-600);
     margin-bottom: 0.25rem;
 }
 
 .p-fileupload-empty-title {
     font-weight: 600;
     font-size: 0.95rem;
-    color: var(--p-text-color, #0f172a);
+    color: var(--lt-text-primary);
 }
 
 .p-fileupload-empty-subtitle {
     font-size: 0.75rem;
-    color: var(--p-text-muted, #64748b);
+    color: var(--p-text-muted, var(--lt-surface-500));
     font-weight: 500;
 }
 
@@ -180,9 +180,9 @@ const FILEUPLOAD_CSS = `
     align-items: center;
     justify-content: space-between;
     padding: 0.75rem 1rem;
-    border: 1px solid var(--p-border-color, #e2e8f0);
-    border-radius: var(--p-border-radius, 8px);
-    background: var(--p-surface-0, #ffffff);
+    border: 1px solid var(--lt-surface-200);
+    border-radius: var(--lt-radius);
+    background: var(--lt-surface-0);
     gap: 1rem;
 }
 
@@ -199,12 +199,12 @@ const FILEUPLOAD_CSS = `
     height: 3rem;
     border-radius: 6px;
     object-fit: cover;
-    background: var(--p-surface-100, #f1f5f9);
+    background: var(--lt-surface-100);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    border: 1px solid var(--p-border-color, #e2e8f0);
+    border: 1px solid var(--lt-surface-200);
 }
 
 .p-fileupload-file-details {
@@ -216,7 +216,7 @@ const FILEUPLOAD_CSS = `
 .p-fileupload-file-name {
     font-size: 0.875rem;
     font-weight: 600;
-    color: var(--p-text-color, #0f172a);
+    color: var(--lt-text-primary);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -224,7 +224,7 @@ const FILEUPLOAD_CSS = `
 
 .p-fileupload-file-size {
     font-size: 0.75rem;
-    color: var(--p-text-muted, #64748b);
+    color: var(--p-text-muted, var(--lt-surface-500));
 }
 
 .p-fileupload-badge {
@@ -237,22 +237,22 @@ const FILEUPLOAD_CSS = `
 
 .p-fileupload-badge-pending {
     background: rgba(249, 115, 22, 0.12);
-    color: #ea580c;
+    color: var(--lt-warn-600);
 }
 
 .p-fileupload-badge-completed {
     background: rgba(16, 185, 129, 0.12);
-    color: var(--lt-primary-500, #10b981);
+    color: var(--lt-primary-500, var(--lt-primary-500));
 }
 
 .p-fileupload-badge-uploading {
     background: rgba(59, 130, 246, 0.12);
-    color: #2563eb;
+    color: var(--lt-info-600, var(--lt-info-600));
 }
 
 .p-fileupload-progressbar {
     height: 0.35rem;
-    background: var(--p-surface-200, #e2e8f0);
+    background: var(--lt-surface-200);
     border-radius: 9999px;
     overflow: hidden;
     margin: 0.5rem 1rem;
@@ -261,7 +261,7 @@ const FILEUPLOAD_CSS = `
 
 .p-fileupload-progressbar-value {
     height: 100%;
-    background: var(--p-primary-500, #3b82f6);
+    background: var(--lt-primary-500);
     border-radius: 9999px;
     transition: width 0.25s ease;
 }
@@ -278,10 +278,10 @@ const FILEUPLOAD_CSS = `
 .p-fileupload-image-card {
     position: relative;
     aspect-ratio: 1;
-    border-radius: var(--p-border-radius, 8px);
+    border-radius: var(--lt-radius);
     overflow: hidden;
-    border: 1px solid var(--p-border-color, #e2e8f0);
-    background: var(--p-surface-100, #f1f5f9);
+    border: 1px solid var(--lt-surface-200);
+    background: var(--lt-surface-100);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
@@ -299,7 +299,7 @@ const FILEUPLOAD_CSS = `
     height: 1.6rem;
     border-radius: 9999px;
     background: rgba(15, 23, 42, 0.8);
-    color: var(--lt-surface-0, #ffffff);
+    color: var(--lt-surface-0, var(--lt-surface-0));
     border: none;
     cursor: pointer;
     display: flex;
@@ -326,62 +326,62 @@ const FILEUPLOAD_CSS = `
     max-height: 22rem;
     border-radius: 8px;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-    border: 1px solid var(--p-border-color, #e2e8f0);
+    border: 1px solid var(--lt-surface-200);
 }
 
 /* Dark Mode Tokens */
 .dark .p-fileupload-advanced,
 [data-theme="dark"] .p-fileupload-advanced {
-    background: var(--p-surface-900, #0f172a);
-    border-color: var(--p-surface-700, #334155);
+    background: var(--lt-surface-900);
+    border-color: var(--lt-surface-700);
 }
 
 .dark .p-fileupload-header,
 [data-theme="dark"] .p-fileupload-header {
-    background: var(--p-surface-800, #1e293b);
-    border-color: var(--p-surface-700, #334155);
+    background: var(--lt-surface-800);
+    border-color: var(--lt-surface-700);
 }
 
 .dark .p-fileupload-empty,
 [data-theme="dark"] .p-fileupload-empty {
-    background: var(--p-surface-800, #1e293b);
-    border-color: var(--p-surface-700, #334155);
-    color: var(--p-surface-400, #94a3b8);
+    background: var(--lt-surface-800);
+    border-color: var(--lt-surface-700);
+    color: var(--lt-surface-400);
 }
 
 .dark .p-fileupload-empty-icon,
 [data-theme="dark"] .p-fileupload-empty-icon {
-    background: var(--p-surface-700, #334155);
-    color: var(--p-surface-200, #e2e8f0);
-    border-color: var(--p-surface-600, #475569);
+    background: var(--lt-surface-700);
+    color: var(--lt-surface-200);
+    border-color: var(--lt-surface-600);
 }
 
 .dark .p-fileupload-empty-title,
 [data-theme="dark"] .p-fileupload-empty-title {
-    color: var(--p-surface-0, #f8fafc);
+    color: var(--lt-surface-0);
 }
 
 .dark .p-fileupload-file-item,
 [data-theme="dark"] .p-fileupload-file-item {
-    background: var(--p-surface-800, #1e293b);
-    border-color: var(--p-surface-700, #334155);
+    background: var(--lt-surface-800);
+    border-color: var(--lt-surface-700);
 }
 
 .dark .p-fileupload-file-name,
 [data-theme="dark"] .p-fileupload-file-name {
-    color: var(--p-surface-0, #f8fafc);
+    color: var(--lt-surface-0);
 }
 
 .dark .p-fileupload-thumbnail,
 [data-theme="dark"] .p-fileupload-thumbnail {
-    background: var(--p-surface-800, #1e293b);
-    border-color: var(--p-surface-700, #334155);
+    background: var(--lt-surface-800);
+    border-color: var(--lt-surface-700);
 }
 
 .dark .p-fileupload-image-card,
 [data-theme="dark"] .p-fileupload-image-card {
-    background: var(--p-surface-800, #1e293b);
-    border-color: var(--p-surface-700, #334155);
+    background: var(--lt-surface-800);
+    border-color: var(--lt-surface-700);
 }
 `;
 
@@ -606,7 +606,7 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
                             <input type="file" accept="${accept}" ${multiple ? 'multiple' : ''} class="p-fileupload-input" />
                         </span>
                         <span class="p-fileupload-filename" style="margin-left: 0.5rem; margin-right: 0.5rem;">${fileName}</span>
-                        <button type="button" class="p-button p-button-outlined p-button-secondary p-fileupload-upload-btn" ${!hasFile || isUploading ? 'disabled style="opacity:0.5; pointer-events:none; cursor:not-allowed;"' : ''} style="padding: 0.5rem 1.15rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer;">
+                        <button type="button" class="p-button p-button-outlined p-button-secondary p-fileupload-upload-btn" ${!hasFile || isUploading ? 'disabled style="opacity:0.5; pointer-events:none; cursor:not-allowed;"' : ''} style="padding: 0.5rem 1.15rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--lt-radius); border: 1px solid var(--lt-surface-200); background: var(--lt-surface-0); color: var(--lt-text-primary); cursor: pointer;">
                             ${uploadLabel}
                         </button>
                     </div>
@@ -641,11 +641,11 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
                         <span>${chooseLabel}</span>
                         <input type="file" accept="${accept}" ${multiple ? 'multiple' : ''} class="p-fileupload-input" />
                     </span>
-                    <button type="button" class="p-button p-button-outlined p-button-secondary p-fileupload-upload-btn" ${!hasFiles || isUploading ? 'disabled style="opacity:0.5; pointer-events:none; cursor:not-allowed;"' : ''} style="padding: 0.5rem 1.15rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer; display: inline-flex; align-items: center; gap: 0.45rem;">
+                    <button type="button" class="p-button p-button-outlined p-button-secondary p-fileupload-upload-btn" ${!hasFiles || isUploading ? 'disabled style="opacity:0.5; pointer-events:none; cursor:not-allowed;"' : ''} style="padding: 0.5rem 1.15rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--lt-radius); border: 1px solid var(--lt-surface-200); background: var(--lt-surface-0); color: var(--lt-text-primary); cursor: pointer; display: inline-flex; align-items: center; gap: 0.45rem;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
                         <span>${uploadLabel}</span>
                     </button>
-                    <button type="button" class="p-button p-button-outlined p-button-secondary p-fileupload-cancel-btn" ${!hasFiles || isUploading ? 'disabled style="opacity:0.5; pointer-events:none; cursor:not-allowed;"' : ''} style="padding: 0.5rem 1.15rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer; display: inline-flex; align-items: center; gap: 0.45rem;">
+                    <button type="button" class="p-button p-button-outlined p-button-secondary p-fileupload-cancel-btn" ${!hasFiles || isUploading ? 'disabled style="opacity:0.5; pointer-events:none; cursor:not-allowed;"' : ''} style="padding: 0.5rem 1.15rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--lt-radius); border: 1px solid var(--lt-surface-200); background: var(--lt-surface-0); color: var(--lt-text-primary); cursor: pointer; display: inline-flex; align-items: center; gap: 0.45rem;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                         <span>${cancelLabel}</span>
                     </button>
@@ -687,7 +687,7 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
                                             <img src="${f.previewUrl}" alt="${f.name}" class="p-fileupload-thumbnail" />
                                         ` : `
                                             <div class="p-fileupload-thumbnail">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--p-surface-500);"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--lt-surface-500);"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
                                             </div>
                                         `}
                                         <div class="p-fileupload-file-details">
@@ -699,7 +699,7 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
                                         <span class="p-fileupload-badge p-fileupload-badge-${f.status === 'completed' ? 'completed' : (f.status === 'uploading' ? 'uploading' : 'pending')}">
                                             ${f.status === 'completed' ? 'Uploaded' : (f.status === 'uploading' ? `${f.progress}%` : 'Pending')}
                                         </span>
-                                        <button type="button" class="p-button p-button-text p-button-danger p-button-sm" data-remove-id="${f.id}" style="border: none; background: transparent; color: var(--lt-danger-500, #ef4444); cursor: pointer; padding: 0.35rem; display: flex; align-items: center; border-radius: 9999px;">
+                                        <button type="button" class="p-button p-button-text p-button-danger p-button-sm" data-remove-id="${f.id}" style="border: none; background: transparent; color: var(--lt-danger-500, var(--lt-danger-500)); cursor: pointer; padding: 0.35rem; display: flex; align-items: center; border-radius: 9999px;">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                                         </button>
                                     </div>

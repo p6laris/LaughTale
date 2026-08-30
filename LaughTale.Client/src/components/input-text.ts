@@ -59,10 +59,10 @@ const CSS = `
     width: 100%;
     font-family: inherit;
     font-size: 0.875rem;
-    color: var(--p-text-color);
-    background: var(--p-surface-0);
-    border: 1px solid var(--p-border-color);
-    border-radius: var(--p-border-radius);
+    color: var(--lt-text-primary);
+    background: var(--lt-surface-0);
+    border: 1px solid var(--lt-surface-200);
+    border-radius: var(--lt-radius);
     padding: 0.5rem 0.75rem;
     line-height: 1.25;
     transition: background 150ms ease, border-color 150ms ease, box-shadow 150ms ease, color 150ms ease;
@@ -72,27 +72,27 @@ const CSS = `
 }
 
 .p-inputtext:hover:not(:disabled):not(.is-invalid):not(.p-invalid) {
-    border-color: var(--p-surface-400);
+    border-color: var(--lt-surface-400);
 }
 
 .p-inputtext:focus,
 .p-inputtext:focus-visible {
-    border-color: var(--p-primary-500) !important;
-    box-shadow: 0 0 0 1px var(--p-primary-500) !important;
+    border-color: var(--lt-primary-500) !important;
+    box-shadow: 0 0 0 1px var(--lt-primary-500) !important;
 }
 
 /* Variant: Filled */
 .p-inputtext.variant-filled,
 .p-inputtext.p-variant-filled {
-    background: var(--p-surface-100);
+    background: var(--lt-surface-100);
     border-color: transparent;
 }
 .p-inputtext.variant-filled:hover:not(:disabled) {
-    background: var(--p-surface-200);
+    background: var(--lt-surface-200);
 }
 .p-inputtext.variant-filled:focus {
-    background: var(--p-surface-0);
-    border-color: var(--p-primary-500) !important;
+    background: var(--lt-surface-0);
+    border-color: var(--lt-primary-500) !important;
 }
 
 /* Sizes */
@@ -100,30 +100,30 @@ const CSS = `
 .p-inputtext.p-inputtext-sm {
     padding: 0.3125rem 0.625rem;
     font-size: 0.75rem;
-    border-radius: calc(var(--p-border-radius) - 2px);
+    border-radius: calc(var(--lt-radius) - 2px);
 }
 
 .p-inputtext.size-large,
 .p-inputtext.p-inputtext-lg {
     padding: 0.6875rem 1rem;
     font-size: 1.0625rem;
-    border-radius: calc(var(--p-border-radius) + 2px);
+    border-radius: calc(var(--lt-radius) + 2px);
 }
 
 /* Invalid State */
 .p-inputtext.is-invalid,
 .p-inputtext.p-invalid {
-    border-color: var(--p-red-500, #ef4444) !important;
+    border-color: var(--p-red-500, var(--lt-danger-500)) !important;
 }
 .p-inputtext.is-invalid:focus,
 .p-inputtext.p-invalid:focus {
-    box-shadow: 0 0 0 1px var(--p-red-500, #ef4444) !important;
+    box-shadow: 0 0 0 1px var(--p-red-500, var(--lt-danger-500)) !important;
 }
 
 /* Disabled State */
 .p-inputtext:disabled,
 .p-inputtext.is-disabled {
-    background: var(--p-surface-100);
+    background: var(--lt-surface-100);
     color: var(--p-text-muted);
     opacity: 0.75;
     cursor: not-allowed;
@@ -140,7 +140,7 @@ const CSS = `
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--p-surface-400);
+    color: var(--lt-surface-400);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -180,7 +180,7 @@ const CSS = `
     transform: translateY(-50%);
     background: transparent;
     border: none;
-    color: var(--p-surface-400);
+    color: var(--lt-surface-400);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -191,8 +191,8 @@ const CSS = `
     transition: color 150ms ease, background 150ms ease, opacity 150ms ease;
 }
 .p-inputtext-clear:hover {
-    background: var(--p-surface-200);
-    color: var(--p-surface-700);
+    background: var(--lt-surface-200);
+    color: var(--lt-surface-700);
 }
 .p-inputtext-clear svg {
     width: 14px;
@@ -212,28 +212,28 @@ const CSS = `
 
 /* ==================== DARK MODE ==================== */
 .dark .p-inputtext {
-    background: var(--p-surface-900);
-    border-color: var(--p-surface-700);
-    color: var(--p-surface-0);
+    background: var(--lt-surface-900);
+    border-color: var(--lt-surface-700);
+    color: var(--lt-surface-0);
 }
 .dark .p-inputtext:hover:not(:disabled):not(.is-invalid):not(.p-invalid) {
-    border-color: var(--p-surface-500);
+    border-color: var(--lt-surface-500);
 }
 .dark .p-inputtext.variant-filled,
 .dark .p-inputtext.p-variant-filled {
-    background: var(--p-surface-800);
+    background: var(--lt-surface-800);
 }
 .dark .p-inputtext.variant-filled:focus {
-    background: var(--p-surface-900);
+    background: var(--lt-surface-900);
 }
 .dark .p-inputtext:disabled {
-    background: var(--p-surface-800);
-    border-color: var(--p-surface-700);
-    color: var(--p-surface-500);
+    background: var(--lt-surface-800);
+    border-color: var(--lt-surface-700);
+    color: var(--lt-surface-500);
 }
 .dark .p-inputtext-clear:hover {
-    background: var(--p-surface-700);
-    color: var(--p-surface-200);
+    background: var(--lt-surface-700);
+    color: var(--lt-surface-200);
 }
 `;
 

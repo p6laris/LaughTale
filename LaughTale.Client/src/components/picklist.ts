@@ -43,7 +43,7 @@ const PICKLIST_CSS = `
     gap: 1.25rem;
     width: 100%;
     font-family: var(--p-font-family, inherit);
-    color: var(--p-surface-800, #1e293b);
+    color: var(--lt-surface-800);
 }
 
 .p-picklist-controls {
@@ -61,18 +61,18 @@ const PICKLIST_CSS = `
     width: 2.25rem;
     height: 2.25rem;
     padding: 0;
-    border-radius: var(--p-border-radius, 6px);
-    border: 1px solid var(--p-surface-300, #cbd5e1);
-    background: var(--p-surface-0, #ffffff);
-    color: var(--p-surface-700, #334155);
+    border-radius: var(--lt-radius);
+    border: 1px solid var(--lt-surface-300);
+    background: var(--lt-surface-0);
+    color: var(--lt-surface-700);
     cursor: pointer;
     transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
     outline: none;
 }
 .p-picklist-control-btn:hover:not(:disabled) {
-    background: var(--p-surface-100, #f1f5f9);
-    color: var(--p-surface-900, #0f172a);
-    border-color: var(--p-surface-400, #94a3b8);
+    background: var(--lt-surface-100);
+    color: var(--lt-surface-900);
+    border-color: var(--lt-surface-400);
 }
 .p-picklist-control-btn:disabled {
     opacity: 0.4;
@@ -83,9 +83,9 @@ const PICKLIST_CSS = `
     flex: 1 1 0;
     display: flex;
     flex-direction: column;
-    border: 1px solid var(--p-surface-200, #e2e8f0);
-    border-radius: var(--p-border-radius-lg, 8px);
-    background: var(--p-surface-0, #ffffff);
+    border: 1px solid var(--lt-surface-200);
+    border-radius: var(--lt-radius-lg);
+    background: var(--lt-surface-0);
     overflow: hidden;
     min-width: 0;
     box-shadow: var(--p-shadow-xs, 0 1px 2px 0 rgba(0, 0, 0, 0.05));
@@ -93,11 +93,11 @@ const PICKLIST_CSS = `
 
 .p-picklist-header {
     padding: 0.75rem 1rem;
-    background: var(--p-surface-50, #f8fafc);
-    border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
+    background: var(--lt-surface-50);
+    border-bottom: 1px solid var(--lt-surface-200);
     font-size: 0.875rem;
     font-weight: 700;
-    color: var(--p-surface-800, #1e293b);
+    color: var(--lt-surface-800);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -106,8 +106,8 @@ const PICKLIST_CSS = `
 
 .p-picklist-filter-container {
     padding: 0.5rem 0.75rem;
-    background: var(--p-surface-50, #f8fafc);
-    border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
+    background: var(--lt-surface-50);
+    border-bottom: 1px solid var(--lt-surface-200);
     position: relative;
     display: flex;
     align-items: center;
@@ -116,21 +116,21 @@ const PICKLIST_CSS = `
     width: 100%;
     padding: 0.4rem 2rem 0.4rem 0.65rem;
     font-size: 0.8125rem;
-    border: 1px solid var(--p-surface-300, #cbd5e1);
-    border-radius: var(--p-border-radius, 6px);
-    background: var(--p-surface-0, #ffffff);
+    border: 1px solid var(--lt-surface-300);
+    border-radius: var(--lt-radius);
+    background: var(--lt-surface-0);
     color: inherit;
     outline: none;
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 .p-picklist-filter-input:focus {
-    border-color: var(--p-primary-500, #10b981);
+    border-color: var(--lt-primary-500);
     box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
 }
 .p-picklist-filter-icon {
     position: absolute;
     right: 1.25rem;
-    color: var(--p-surface-400, #94a3b8);
+    color: var(--lt-surface-400);
     pointer-events: none;
     display: flex;
     align-items: center;
@@ -155,17 +155,17 @@ const PICKLIST_CSS = `
     align-items: center;
     gap: 0.75rem;
     font-size: 0.875rem;
-    color: var(--p-surface-700, #334155);
+    color: var(--lt-surface-700);
     user-select: none;
     transition: background-color 0.12s ease, color 0.12s ease;
 }
 .p-picklist-item:hover:not(.p-highlight) {
-    background: var(--p-surface-100, #f1f5f9);
-    color: var(--p-surface-900, #0f172a);
+    background: var(--lt-surface-100);
+    color: var(--lt-surface-900);
 }
 .p-picklist-item.p-highlight {
     background: rgba(16, 185, 129, 0.1) !important;
-    color: var(--p-primary-700, #047857) !important;
+    color: var(--lt-primary-700) !important;
     font-weight: 600;
 }
 
@@ -177,21 +177,21 @@ const PICKLIST_CSS = `
     width: 1.125rem;
     height: 1.125rem;
     border-radius: var(--p-border-radius-xs, 4px);
-    border: 2px solid var(--p-surface-300, #cbd5e1);
-    background: var(--p-surface-0, #ffffff);
+    border: 2px solid var(--lt-surface-300);
+    background: var(--lt-surface-0);
     cursor: pointer;
     transition: background-color 0.12s ease, border-color 0.12s ease;
     flex-shrink: 0;
 }
 .p-checkbox-box.p-checked {
-    background: var(--p-primary-500, #10b981);
-    border-color: var(--p-primary-500, #10b981);
-    color: var(--lt-surface-0, #ffffff);
+    background: var(--lt-primary-500);
+    border-color: var(--lt-primary-500);
+    color: var(--lt-surface-0, var(--lt-surface-0));
 }
 .p-checkbox-box.p-indeterminate {
-    background: var(--p-primary-500, #10b981);
-    border-color: var(--p-primary-500, #10b981);
-    color: var(--lt-surface-0, #ffffff);
+    background: var(--lt-primary-500);
+    border-color: var(--lt-primary-500);
+    color: var(--lt-surface-0, var(--lt-surface-0));
 }
 
 /* Custom Item Content */
@@ -205,12 +205,12 @@ const PICKLIST_CSS = `
     width: 2.75rem;
     height: 2.75rem;
     border-radius: 6px;
-    background: var(--p-surface-100, #f1f5f9);
-    border: 1px solid var(--p-surface-200, #e2e8f0);
+    background: var(--lt-surface-100);
+    border: 1px solid var(--lt-surface-200);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--p-primary-600, #059669);
+    color: var(--lt-primary-600);
     flex-shrink: 0;
 }
 .p-picklist-product-details {
@@ -223,19 +223,19 @@ const PICKLIST_CSS = `
 .p-picklist-product-name {
     font-weight: 600;
     font-size: 0.875rem;
-    color: var(--p-surface-900, #0f172a);
+    color: var(--lt-surface-900);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 .p-picklist-product-category {
     font-size: 0.75rem;
-    color: var(--p-surface-500, #64748b);
+    color: var(--lt-surface-500);
 }
 .p-picklist-product-price {
     font-weight: 700;
     font-size: 0.875rem;
-    color: var(--p-surface-900, #0f172a);
+    color: var(--lt-surface-900);
 }
 
 .p-picklist-member-item {
@@ -248,8 +248,8 @@ const PICKLIST_CSS = `
     width: 2rem;
     height: 2rem;
     border-radius: 9999px;
-    background: var(--p-primary-100, #d1fae5);
-    color: var(--p-primary-700, #047857);
+    background: var(--lt-primary-100);
+    color: var(--lt-primary-700);
     font-weight: 700;
     font-size: 0.75rem;
     display: flex;
@@ -262,66 +262,66 @@ const PICKLIST_CSS = `
 .p-picklist-empty {
     padding: 2.5rem 1rem;
     text-align: center;
-    color: var(--p-surface-400, #94a3b8);
+    color: var(--lt-surface-400);
     font-size: 0.8125rem;
     font-style: italic;
 }
 
 /* Striped Rows */
 .p-picklist-striped .p-picklist-item:nth-child(even):not(.p-highlight) {
-    background: var(--p-surface-50, #f8fafc);
+    background: var(--lt-surface-50);
 }
 
 /* Dark Mode Tokens */
 .dark .p-picklist,
 [data-theme="dark"] .p-picklist {
-    color: var(--p-surface-100, #f1f5f9) !important;
+    color: var(--lt-surface-100) !important;
 }
 .dark .p-picklist-list-container,
 [data-theme="dark"] .p-picklist-list-container {
-    background: var(--p-surface-900, #0f172a) !important;
-    border-color: var(--p-surface-700, #334155) !important;
+    background: var(--lt-surface-900) !important;
+    border-color: var(--lt-surface-700) !important;
 }
 .dark .p-picklist-header,
 .dark .p-picklist-filter-container,
 [data-theme="dark"] .p-picklist-header,
 [data-theme="dark"] .p-picklist-filter-container {
-    background: var(--p-surface-800, #1e293b) !important;
-    border-color: var(--p-surface-700, #334155) !important;
-    color: var(--p-surface-100, #f1f5f9) !important;
+    background: var(--lt-surface-800) !important;
+    border-color: var(--lt-surface-700) !important;
+    color: var(--lt-surface-100) !important;
 }
 .dark .p-picklist-filter-input,
 [data-theme="dark"] .p-picklist-filter-input {
-    background: var(--p-surface-900, #0f172a) !important;
-    border-color: var(--p-surface-600, #475569) !important;
-    color: var(--lt-surface-0, #ffffff) !important;
+    background: var(--lt-surface-900) !important;
+    border-color: var(--lt-surface-600) !important;
+    color: var(--lt-surface-0, var(--lt-surface-0)) !important;
 }
 .dark .p-picklist-control-btn,
 [data-theme="dark"] .p-picklist-control-btn {
-    background: var(--p-surface-800, #1e293b) !important;
-    border-color: var(--p-surface-600, #475569) !important;
-    color: var(--p-surface-200, #e2e8f0) !important;
+    background: var(--lt-surface-800) !important;
+    border-color: var(--lt-surface-600) !important;
+    color: var(--lt-surface-200) !important;
 }
 .dark .p-picklist-control-btn:hover:not(:disabled),
 [data-theme="dark"] .p-picklist-control-btn:hover:not(:disabled) {
-    background: var(--p-surface-700, #334155) !important;
-    color: var(--lt-surface-0, #ffffff) !important;
+    background: var(--lt-surface-700) !important;
+    color: var(--lt-surface-0, var(--lt-surface-0)) !important;
 }
 .dark .p-picklist-item:hover:not(.p-highlight),
 [data-theme="dark"] .p-picklist-item:hover:not(.p-highlight) {
-    background: var(--p-surface-800, #1e293b) !important;
-    color: var(--lt-surface-0, #ffffff) !important;
+    background: var(--lt-surface-800) !important;
+    color: var(--lt-surface-0, var(--lt-surface-0)) !important;
 }
 .dark .p-picklist-product-name,
 [data-theme="dark"] .p-picklist-product-name,
 .dark .p-picklist-product-price,
 [data-theme="dark"] .p-picklist-product-price {
-    color: var(--p-surface-100, #f1f5f9) !important;
+    color: var(--lt-surface-100) !important;
 }
 .dark .p-picklist-product-img,
 [data-theme="dark"] .p-picklist-product-img {
-    background: var(--p-surface-800, #1e293b) !important;
-    border-color: var(--p-surface-700, #334155) !important;
+    background: var(--lt-surface-800) !important;
+    border-color: var(--lt-surface-700) !important;
 }
 `;
 
@@ -387,8 +387,8 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
                 <div class="p-picklist-member-item">
                     <div class="p-picklist-member-avatar">${initials}</div>
                     <div style="display: flex; flex-direction: column;">
-                        <span style="font-weight: 600; color: var(--p-surface-900);">${item.name}</span>
-                        ${item.role ? `<span style="font-size: 0.75rem; color: var(--p-surface-500);">${item.role}</span>` : ''}
+                        <span style="font-weight: 600; color: var(--lt-surface-900);">${item.name}</span>
+                        ${item.role ? `<span style="font-size: 0.75rem; color: var(--lt-surface-500);">${item.role}</span>` : ''}
                     </div>
                 </div>
             `;
@@ -453,7 +453,7 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
                             ${sourceHeaderCheckboxHtml}
                             <span>${sourceHeader}</span>
                         </div>
-                        <span class="p-source-count" style="font-size: 0.75rem; font-weight: 600; color: var(--p-surface-500);">0 items</span>
+                        <span class="p-source-count" style="font-size: 0.75rem; font-weight: 600; color: var(--lt-surface-500);">0 items</span>
                     </div>
                     ${sourceFilterHtml}
                     <ul class="p-picklist-list picklist-source-list" style="height: ${scrollHeight};" role="listbox" aria-multiselectable="true" tabindex="0">
@@ -483,7 +483,7 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
                             ${targetHeaderCheckboxHtml}
                             <span>${targetHeader}</span>
                         </div>
-                        <span class="p-target-count" style="font-size: 0.75rem; font-weight: 600; color: var(--p-surface-500);">0 items</span>
+                        <span class="p-target-count" style="font-size: 0.75rem; font-weight: 600; color: var(--lt-surface-500);">0 items</span>
                     </div>
                     ${targetFilterHtml}
                     <ul class="p-picklist-list picklist-target-list" style="height: ${scrollHeight};" role="listbox" aria-multiselectable="true" tabindex="0">

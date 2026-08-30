@@ -14,12 +14,12 @@ const POPOVER_CSS = `
     position: fixed;
     z-index: 1200;
     box-sizing: border-box;
-    background: var(--p-surface-0, #ffffff);
-    border: 1px solid var(--p-border-color, #e2e8f0);
-    border-radius: var(--p-border-radius, 8px);
+    background: var(--lt-surface-0);
+    border: 1px solid var(--lt-surface-200);
+    border-radius: var(--lt-radius);
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
     padding: 1.25rem;
-    color: var(--p-text-color, #0f172a);
+    color: var(--lt-text-primary);
     pointer-events: none;
     visibility: hidden;
     opacity: 0;
@@ -41,8 +41,8 @@ const POPOVER_CSS = `
     position: absolute;
     width: 10px;
     height: 10px;
-    background: var(--p-surface-0, #ffffff);
-    border: 1px solid var(--p-border-color, #e2e8f0);
+    background: var(--lt-surface-0);
+    border: 1px solid var(--lt-surface-200);
     transform: rotate(45deg);
     pointer-events: none;
     z-index: 1;
@@ -63,16 +63,16 @@ const POPOVER_CSS = `
 /* Dark Mode Tokens */
 .dark .p-popover,
 [data-theme="dark"] .p-popover {
-    background: var(--p-surface-900, #0f172a);
-    border-color: var(--p-surface-700, #334155);
-    color: var(--p-surface-0, #f8fafc);
+    background: var(--lt-surface-900);
+    border-color: var(--lt-surface-700);
+    color: var(--lt-surface-0);
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
 }
 
 .dark .p-popover-arrow,
 [data-theme="dark"] .p-popover-arrow {
-    background: var(--p-surface-900, #0f172a);
-    border-color: var(--p-surface-700, #334155);
+    background: var(--lt-surface-900);
+    border-color: var(--lt-surface-700);
 }
 `;
 

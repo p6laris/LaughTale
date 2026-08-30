@@ -12,9 +12,9 @@ const CONFIRM_POPUP_CSS = `
 .p-confirmpopup {
     position: absolute;
     z-index: 1100;
-    background: var(--p-surface-0, #ffffff);
-    border: 1px solid var(--p-border-color, #e2e8f0);
-    border-radius: var(--p-border-radius-lg, 10px);
+    background: var(--lt-surface-0);
+    border: 1px solid var(--lt-surface-200);
+    border-radius: var(--lt-radius-lg);
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
     padding: 0.875rem 1rem;
     min-width: 17rem;
@@ -48,13 +48,13 @@ const CONFIRM_POPUP_CSS = `
     bottom: 100%;
     left: var(--p-popup-arrow-left, 24px);
     border-width: 8px;
-    border-bottom-color: var(--p-border-color, #e2e8f0);
+    border-bottom-color: var(--lt-surface-200);
 }
 .p-confirmpopup-flipped-top::after {
     bottom: 100%;
     left: calc(var(--p-popup-arrow-left, 24px) + 1px);
     border-width: 7px;
-    border-bottom-color: var(--p-surface-0, #ffffff);
+    border-bottom-color: var(--lt-surface-0);
 }
 
 /* Flipped bottom - popup is above target, arrow points DOWN */
@@ -62,13 +62,13 @@ const CONFIRM_POPUP_CSS = `
     top: 100%;
     left: var(--p-popup-arrow-left, 24px);
     border-width: 8px;
-    border-top-color: var(--p-border-color, #e2e8f0);
+    border-top-color: var(--lt-surface-200);
 }
 .p-confirmpopup-flipped-bottom::after {
     top: 100%;
     left: calc(var(--p-popup-arrow-left, 24px) + 1px);
     border-width: 7px;
-    border-top-color: var(--p-surface-0, #ffffff);
+    border-top-color: var(--lt-surface-0);
 }
 
 /* Body Content */
@@ -85,16 +85,16 @@ const CONFIRM_POPUP_CSS = `
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    color: var(--p-surface-700, #334155);
+    color: var(--lt-surface-700);
 }
 
 .p-confirmpopup-icon-danger {
-    color: var(--lt-danger-500, #ef4444) !important;
+    color: var(--lt-danger-500, var(--lt-danger-500)) !important;
 }
 
 .p-confirmpopup-message {
     font-size: 0.875rem;
-    color: var(--p-text-color, #0f172a);
+    color: var(--lt-text-primary);
     line-height: 1.45;
     margin: 0;
     font-weight: 500;
@@ -117,7 +117,7 @@ const CONFIRM_POPUP_CSS = `
     text-align: center;
     gap: 0.875rem;
     padding: 0.5rem 0.5rem 0.875rem 0.5rem;
-    border-bottom: 1px solid var(--p-border-color, #e2e8f0);
+    border-bottom: 1px solid var(--lt-surface-200);
     margin-bottom: 0.75rem;
 }
 
@@ -125,8 +125,8 @@ const CONFIRM_POPUP_CSS = `
     width: 3.5rem;
     height: 3.5rem;
     border-radius: 9999px;
-    border: 3px solid var(--p-surface-400, #94a3b8);
-    color: var(--p-surface-600, #475569);
+    border: 3px solid var(--lt-surface-400);
+    color: var(--lt-surface-600);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -141,37 +141,37 @@ const CONFIRM_POPUP_CSS = `
 /* Dark Mode Tokens */
 .dark .p-confirmpopup,
 [data-theme="dark"] .p-confirmpopup {
-    background: var(--p-surface-900, #0f172a);
-    border-color: var(--p-surface-700, #334155);
+    background: var(--lt-surface-900);
+    border-color: var(--lt-surface-700);
 }
 .dark .p-confirmpopup-flipped-top::before,
 [data-theme="dark"] .p-confirmpopup-flipped-top::before {
-    border-bottom-color: var(--p-surface-700, #334155);
+    border-bottom-color: var(--lt-surface-700);
 }
 .dark .p-confirmpopup-flipped-top::after,
 [data-theme="dark"] .p-confirmpopup-flipped-top::after {
-    border-bottom-color: var(--p-surface-900, #0f172a);
+    border-bottom-color: var(--lt-surface-900);
 }
 .dark .p-confirmpopup-flipped-bottom::before,
 [data-theme="dark"] .p-confirmpopup-flipped-bottom::before {
-    border-top-color: var(--p-surface-700, #334155);
+    border-top-color: var(--lt-surface-700);
 }
 .dark .p-confirmpopup-flipped-bottom::after,
 [data-theme="dark"] .p-confirmpopup-flipped-bottom::after {
-    border-top-color: var(--p-surface-900, #0f172a);
+    border-top-color: var(--lt-surface-900);
 }
 .dark .p-confirmpopup-message,
 [data-theme="dark"] .p-confirmpopup-message {
-    color: var(--p-surface-100, #f8fafc);
+    color: var(--lt-surface-100);
 }
 .dark .p-confirmpopup-template-body,
 [data-theme="dark"] .p-confirmpopup-template-body {
-    border-color: var(--p-surface-700, #334155);
+    border-color: var(--lt-surface-700);
 }
 .dark .p-confirmpopup-template-icon,
 [data-theme="dark"] .p-confirmpopup-template-icon {
-    border-color: var(--p-surface-600, #475569);
-    color: var(--p-surface-300, #cbd5e1);
+    border-color: var(--lt-surface-600);
+    color: var(--lt-surface-300);
 }
 `;
 
@@ -337,10 +337,10 @@ class ConfirmPopupManager {
                 <div class="p-confirmpopup-headless">
                     <span class="p-confirmpopup-message" style="display: block; font-size: 0.875rem;">${opt.message || 'Save your current process?'}</span>
                     <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.875rem;">
-                        <button type="button" class="btn-accept p-button p-button-primary p-button-sm" style="padding: 0.35rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: var(--lt-surface-0, #ffffff); cursor: pointer;">
+                        <button type="button" class="btn-accept p-button p-button-primary p-button-sm" style="padding: 0.35rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: var(--lt-radius); background: var(--lt-surface-900); border: 1px solid var(--lt-surface-900); color: var(--lt-surface-0, var(--lt-surface-0)); cursor: pointer;">
                             ${opt.acceptLabel || 'Save'}
                         </button>
-                        <button type="button" class="btn-reject p-button p-button-text p-button-secondary p-button-sm" style="padding: 0.35rem 0.75rem; font-size: 0.8125rem; font-weight: 500; border: none; background: transparent; color: var(--p-surface-700); cursor: pointer;">
+                        <button type="button" class="btn-reject p-button p-button-text p-button-secondary p-button-sm" style="padding: 0.35rem 0.75rem; font-size: 0.8125rem; font-weight: 500; border: none; background: transparent; color: var(--lt-surface-700); cursor: pointer;">
                             ${opt.rejectLabel || 'Cancel'}
                         </button>
                     </div>
@@ -352,14 +352,14 @@ class ConfirmPopupManager {
                     <div class="p-confirmpopup-template-icon">
                         ${EXCLAMATION_LARGE_SVG}
                     </div>
-                    <p class="p-confirmpopup-message" style="font-size: 0.875rem; color: var(--p-text-color);">${opt.message || 'Please confirm to proceed moving forward.'}</p>
+                    <p class="p-confirmpopup-message" style="font-size: 0.875rem; color: var(--lt-text-primary);">${opt.message || 'Please confirm to proceed moving forward.'}</p>
                 </div>
                 <div class="p-confirmpopup-footer">
-                    <button type="button" class="btn-reject p-button p-button-outlined p-button-secondary p-button-sm" style="display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.4rem 0.75rem; font-size: 0.8125rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: transparent; color: var(--p-text-color); cursor: pointer;">
+                    <button type="button" class="btn-reject p-button p-button-outlined p-button-secondary p-button-sm" style="display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.4rem 0.75rem; font-size: 0.8125rem; font-weight: 600; border-radius: var(--lt-radius); border: 1px solid var(--lt-surface-200); background: transparent; color: var(--lt-text-primary); cursor: pointer;">
                         ${CLOSE_SVG}
                         <span>${opt.rejectLabel || 'Cancel'}</span>
                     </button>
-                    <button type="button" class="btn-accept p-button p-button-primary p-button-sm" style="display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.4rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: var(--lt-surface-0, #ffffff); cursor: pointer;">
+                    <button type="button" class="btn-accept p-button p-button-primary p-button-sm" style="display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.4rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: var(--lt-radius); background: var(--lt-surface-900); border: 1px solid var(--lt-surface-900); color: var(--lt-surface-0, var(--lt-surface-0)); cursor: pointer;">
                         ${CHECK_SVG}
                         <span>${opt.acceptLabel || 'Confirm'}</span>
                     </button>
@@ -370,7 +370,7 @@ class ConfirmPopupManager {
             const iconSvg = isDanger ? INFO_CIRCLE_SVG : ALERT_TRIANGLE_SVG;
             const acceptLabel = opt.acceptLabel || (opt.acceptProps?.label) || (isDanger ? 'Delete' : 'Save');
             const rejectLabel = opt.rejectLabel || (opt.rejectProps?.label) || 'Cancel';
-            const acceptStyle = isDanger ? 'background: var(--lt-danger-500, #ef4444); border: 1px solid var(--lt-danger-500, #ef4444); color: var(--lt-surface-0, #ffffff);' : 'background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: var(--lt-surface-0, #ffffff);';
+            const acceptStyle = isDanger ? 'background: var(--lt-danger-500, var(--lt-danger-500)); border: 1px solid var(--lt-danger-500, var(--lt-danger-500)); color: var(--lt-surface-0, var(--lt-surface-0));' : 'background: var(--lt-surface-900); border: 1px solid var(--lt-surface-900); color: var(--lt-surface-0, var(--lt-surface-0));';
 
             this.popupEl.innerHTML = `
                 <div class="p-confirmpopup-content">
@@ -380,10 +380,10 @@ class ConfirmPopupManager {
                     <span class="p-confirmpopup-message">${opt.message || 'Are you sure you want to proceed?'}</span>
                 </div>
                 <div class="p-confirmpopup-footer">
-                    <button type="button" class="btn-reject p-button p-button-outlined p-button-secondary p-button-sm" style="padding: 0.35rem 0.75rem; font-size: 0.8125rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: transparent; color: var(--p-text-color); cursor: pointer;">
+                    <button type="button" class="btn-reject p-button p-button-outlined p-button-secondary p-button-sm" style="padding: 0.35rem 0.75rem; font-size: 0.8125rem; font-weight: 600; border-radius: var(--lt-radius); border: 1px solid var(--lt-surface-200); background: transparent; color: var(--lt-text-primary); cursor: pointer;">
                         ${rejectLabel}
                     </button>
-                    <button type="button" class="btn-accept p-button p-button-primary p-button-sm" style="padding: 0.35rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: var(--p-border-radius); ${acceptStyle} cursor: pointer;">
+                    <button type="button" class="btn-accept p-button p-button-primary p-button-sm" style="padding: 0.35rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: var(--lt-radius); ${acceptStyle} cursor: pointer;">
                         ${acceptLabel}
                     </button>
                 </div>

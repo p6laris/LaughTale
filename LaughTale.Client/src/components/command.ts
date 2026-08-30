@@ -14,9 +14,9 @@ const COMMAND_CSS = `
 .p-commandmenu {
     display: flex;
     flex-direction: column;
-    background: var(--p-commandmenu-background, var(--p-surface-0, #ffffff));
-    border: 1px solid var(--p-commandmenu-border-color, var(--p-border-color, #e2e8f0));
-    border-radius: var(--p-commandmenu-border-radius, var(--p-border-radius, 8px));
+    background: var(--p-commandmenu-background, var(--lt-surface-0));
+    border: 1px solid var(--p-commandmenu-border-color, var(--lt-surface-200));
+    border-radius: var(--p-commandmenu-border-radius, var(--lt-radius));
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
     overflow: hidden;
     width: 32rem;
@@ -34,13 +34,13 @@ const COMMAND_CSS = `
     padding: 0.75rem 1rem;
     height: 3.25rem;
     background: var(--p-commandmenu-header-background, transparent);
-    border-bottom: 1px solid var(--p-commandmenu-header-border-color, var(--p-border-color, #e2e8f0));
+    border-bottom: 1px solid var(--p-commandmenu-header-border-color, var(--lt-surface-200));
     box-sizing: border-box;
     flex-shrink: 0;
 }
 
 .p-commandmenu-search-icon {
-    color: var(--p-surface-400, #94a3b8);
+    color: var(--lt-surface-400);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -54,14 +54,14 @@ const COMMAND_CSS = `
     background: transparent;
     font-size: 0.875rem;
     font-weight: 500;
-    color: var(--p-commandmenu-input-color, var(--p-text-color, #0f172a));
+    color: var(--p-commandmenu-input-color, var(--lt-text-primary));
     padding: 0.25rem 0;
     font-family: inherit;
     min-width: 0;
 }
 
 .p-commandmenu-input::placeholder {
-    color: var(--p-commandmenu-input-placeholder-color, var(--p-surface-400, #94a3b8));
+    color: var(--p-commandmenu-input-placeholder-color, var(--lt-surface-400));
 }
 
 .p-commandmenu-list {
@@ -90,7 +90,7 @@ const COMMAND_CSS = `
 .p-commandmenu-group-label {
     font-size: 0.75rem;
     font-weight: 700;
-    color: var(--p-surface-400, #94a3b8);
+    color: var(--lt-surface-400);
     padding: 0.35rem 0.65rem 0.2rem;
     text-transform: none;
     letter-spacing: normal;
@@ -102,10 +102,10 @@ const COMMAND_CSS = `
     align-items: center;
     justify-content: space-between;
     padding: 0.5rem 0.65rem;
-    border-radius: var(--p-border-radius, 6px);
+    border-radius: var(--lt-radius);
     cursor: pointer;
     font-size: 0.875rem;
-    color: var(--p-text-color, #0f172a);
+    color: var(--lt-text-primary);
     transition: background-color 0.1s ease, color 0.1s ease;
     user-select: none;
     outline: none;
@@ -115,13 +115,13 @@ const COMMAND_CSS = `
 
 .p-commandmenu-item:hover,
 .p-commandmenu-item.p-commandmenu-item-focus {
-    background: var(--p-surface-100, #f1f5f9) !important;
-    color: var(--p-text-color, #0f172a) !important;
+    background: var(--lt-surface-100) !important;
+    color: var(--lt-text-primary) !important;
 }
 
 .p-commandmenu-item.p-commandmenu-item-focus {
-    background: var(--p-surface-100, #f1f5f9) !important;
-    color: var(--p-primary-600, #2563eb) !important;
+    background: var(--lt-surface-100) !important;
+    color: var(--lt-primary-600) !important;
 }
 
 .p-commandmenu-item.p-commandmenu-item-active {
@@ -140,7 +140,7 @@ const COMMAND_CSS = `
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--p-surface-500, #64748b);
+    color: var(--lt-surface-500);
     flex-shrink: 0;
 }
 
@@ -151,7 +151,7 @@ const COMMAND_CSS = `
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--lt-surface-0, #ffffff);
+    color: var(--lt-surface-0, var(--lt-surface-0));
     flex-shrink: 0;
     font-size: 0.75rem;
 }
@@ -165,7 +165,7 @@ const COMMAND_CSS = `
 
 .p-commandmenu-item-category {
     font-size: 0.75rem;
-    color: var(--p-text-muted, #94a3b8);
+    color: var(--p-text-muted, var(--lt-surface-400));
     margin-left: auto;
     opacity: 0.7;
     flex-shrink: 0;
@@ -175,7 +175,7 @@ const COMMAND_CSS = `
     padding: 2.5rem 1rem;
     text-align: center;
     font-size: 0.875rem;
-    color: var(--p-surface-500, #64748b);
+    color: var(--lt-surface-500);
 }
 
 .p-commandmenu-footer {
@@ -184,8 +184,8 @@ const COMMAND_CSS = `
     justify-content: flex-end;
     padding: 0.625rem 1rem;
     height: 2.75rem;
-    background: var(--p-commandmenu-footer-background, var(--p-surface-50, #f8fafc));
-    border-top: 1px solid var(--p-commandmenu-footer-border-color, var(--p-border-color, #e2e8f0));
+    background: var(--p-commandmenu-footer-background, var(--lt-surface-50));
+    border-top: 1px solid var(--p-commandmenu-footer-border-color, var(--lt-surface-200));
     flex-shrink: 0;
     box-sizing: border-box;
 }
@@ -195,15 +195,15 @@ const COMMAND_CSS = `
     align-items: center;
     gap: 0.85rem;
     font-size: 0.75rem;
-    color: var(--p-surface-500, #64748b);
+    color: var(--lt-surface-500);
 }
 
 .p-commandmenu-kbd {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: var(--p-surface-100, #f1f5f9);
-    border: 1px solid var(--p-border-color, #cbd5e1);
+    background: var(--lt-surface-100);
+    border: 1px solid var(--lt-surface-200);
     border-radius: 4px;
     padding: 0 0.35rem;
     min-width: 1.25rem;
@@ -211,7 +211,7 @@ const COMMAND_CSS = `
     font-family: inherit;
     font-size: 0.7rem;
     font-weight: 600;
-    color: var(--p-surface-700, #334155);
+    color: var(--lt-surface-700);
 }
 
 /* Dialog Overlay */
@@ -238,54 +238,54 @@ const COMMAND_CSS = `
 /* Dark Mode Tokens */
 .dark .p-commandmenu,
 [data-theme="dark"] .p-commandmenu {
-    background: var(--p-surface-900, #0f172a);
-    border-color: var(--p-surface-700, #334155);
+    background: var(--lt-surface-900);
+    border-color: var(--lt-surface-700);
 }
 
 .dark .p-commandmenu-header,
 [data-theme="dark"] .p-commandmenu-header {
-    border-color: var(--p-surface-700, #334155);
+    border-color: var(--lt-surface-700);
 }
 
 .dark .p-commandmenu-input,
 [data-theme="dark"] .p-commandmenu-input {
-    color: var(--p-surface-0, #f8fafc);
+    color: var(--lt-surface-0);
 }
 
 .dark .p-commandmenu-item,
 [data-theme="dark"] .p-commandmenu-item {
-    color: var(--p-surface-100, #f1f5f9);
+    color: var(--lt-surface-100);
 }
 
 .dark .p-commandmenu-item:hover,
 .dark .p-commandmenu-item.p-commandmenu-item-focus,
 [data-theme="dark"] .p-commandmenu-item:hover,
 [data-theme="dark"] .p-commandmenu-item.p-commandmenu-item-focus {
-    background: var(--p-surface-800, #1e293b) !important;
-    color: var(--p-surface-0, #f8fafc) !important;
+    background: var(--lt-surface-800) !important;
+    color: var(--lt-surface-0) !important;
 }
 
 .dark .p-commandmenu-item.p-commandmenu-item-focus,
 [data-theme="dark"] .p-commandmenu-item.p-commandmenu-item-focus {
-    color: #60a5fa !important;
+    color: var(--lt-info-400, var(--lt-info-400)) !important;
 }
 
 .dark .p-commandmenu-group-label,
 [data-theme="dark"] .p-commandmenu-group-label {
-    color: var(--p-surface-400, #94a3b8);
+    color: var(--lt-surface-400);
 }
 
 .dark .p-commandmenu-footer,
 [data-theme="dark"] .p-commandmenu-footer {
-    background: var(--p-surface-850, #131d2e);
-    border-color: var(--p-surface-700, #334155);
+    background: var(--lt-surface-850);
+    border-color: var(--lt-surface-700);
 }
 
 .dark .p-commandmenu-kbd,
 [data-theme="dark"] .p-commandmenu-kbd {
-    background: var(--p-surface-800, #1e293b);
-    border-color: var(--p-surface-700, #334155);
-    color: var(--p-surface-200, #e2e8f0);
+    background: var(--lt-surface-800);
+    border-color: var(--lt-surface-700);
+    color: var(--lt-surface-200);
 }
 `;
 
@@ -508,7 +508,7 @@ export default function CommandMenuIsland(container: HTMLElement, props: Command
 
                     let itemLeftHtml = '';
                     if (customTemplate) {
-                        const bgStyle = it.color || 'background: var(--p-primary-500, #3b82f6);';
+                        const bgStyle = it.color || 'background: var(--lt-primary-500);';
                         const isGradient = bgStyle.startsWith('bg-[') || bgStyle.includes('linear-gradient');
                         const inlineBg = isGradient 
                             ? (bgStyle.startsWith('bg-[') ? bgStyle.replace('bg-[', 'background: ').replace(']', ';') : `background: ${bgStyle};`)
@@ -701,8 +701,8 @@ export default function CommandMenuIsland(container: HTMLElement, props: Command
     if (withDialog) {
         container.innerHTML = `
             <div class="p-commandmenu-dialog-trigger-wrapper" style="display: flex; align-items: center; justify-content: center; padding: 2rem 0;">
-                <span class="p-commandmenu-dialog-trigger" style="cursor: pointer; font-size: 0.9375rem; color: var(--p-text-color); display: inline-flex; align-items: center;">
-                    Press <kbd class="p-commandmenu-kbd" style="margin-left: 0.5rem; padding: 0.25rem 0.6rem; height: auto; font-size: 0.8125rem; font-weight: 600; background: var(--p-surface-100); border: 1px solid var(--p-border-color); border-radius: 6px;">CTRL/⌘ + L</kbd>
+                <span class="p-commandmenu-dialog-trigger" style="cursor: pointer; font-size: 0.9375rem; color: var(--lt-text-primary); display: inline-flex; align-items: center;">
+                    Press <kbd class="p-commandmenu-kbd" style="margin-left: 0.5rem; padding: 0.25rem 0.6rem; height: auto; font-size: 0.8125rem; font-weight: 600; background: var(--lt-surface-100); border: 1px solid var(--lt-surface-200); border-radius: 6px;">CTRL/⌘ + L</kbd>
                 </span>
             </div>
         `;

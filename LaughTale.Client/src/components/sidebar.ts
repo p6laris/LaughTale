@@ -28,12 +28,12 @@ const SIDEBAR_CSS = `
     width: 100%;
     min-height: 32rem;
     height: 32rem;
-    background: var(--p-sidebar-layout-background, var(--p-surface-0, #ffffff));
+    background: var(--p-sidebar-layout-background, var(--lt-surface-0));
     overflow: hidden;
     box-sizing: border-box;
     font-family: var(--p-font-family, inherit);
-    border-radius: var(--p-border-radius, 8px);
-    border: 1px solid var(--p-border-color, #e2e8f0);
+    border-radius: var(--lt-radius);
+    border: 1px solid var(--lt-surface-200);
     isolation: isolate;
     z-index: 1;
 }
@@ -84,8 +84,8 @@ const SIDEBAR_CSS = `
     flex-direction: column;
     height: 100%;
     width: 100%;
-    background: var(--p-sidebar-panel-background, var(--p-surface-0, #ffffff));
-    color: var(--p-sidebar-panel-color, var(--p-text-color, #0f172a));
+    background: var(--p-sidebar-panel-background, var(--lt-surface-0));
+    color: var(--p-sidebar-panel-color, var(--lt-text-primary));
     box-sizing: border-box;
     overflow: hidden;
     position: relative;
@@ -93,24 +93,24 @@ const SIDEBAR_CSS = `
 
 /* Sidebar Variants */
 .p-sidebar-variant-sidebar {
-    border-right: 1px solid var(--p-sidebar-border-color, var(--p-border-color, #e2e8f0));
+    border-right: 1px solid var(--p-sidebar-border-color, var(--lt-surface-200));
 }
 .p-sidebar-side-right.p-sidebar-variant-sidebar {
     border-right: none;
-    border-left: 1px solid var(--p-sidebar-border-color, var(--p-border-color, #e2e8f0));
+    border-left: 1px solid var(--p-sidebar-border-color, var(--lt-surface-200));
 }
 
 .p-sidebar-variant-floating {
     padding: 0.5rem;
 }
 .p-sidebar-variant-floating .p-sidebar-panel {
-    border: 1px solid var(--p-border-color, #e2e8f0);
+    border: 1px solid var(--lt-surface-200);
     border-radius: var(--p-sidebar-panel-floating-border-radius, 10px);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
 }
 
 .p-sidebar-variant-inset {
-    background: var(--p-surface-50, #f8fafc);
+    background: var(--lt-surface-50);
     padding: 0.5rem;
 }
 .p-sidebar-variant-inset .p-sidebar-panel {
@@ -140,7 +140,7 @@ const SIDEBAR_CSS = `
     gap: 0.35rem;
     flex-shrink: 0;
     box-sizing: border-box;
-    border-bottom: 1px solid var(--p-border-color, #e2e8f0);
+    border-bottom: 1px solid var(--lt-surface-200);
     min-height: 60px;
     justify-content: center;
 }
@@ -167,17 +167,17 @@ const SIDEBAR_CSS = `
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    background: var(--p-surface-50, #f8fafc);
-    border: 1px solid var(--p-border-color, #cbd5e1);
-    border-radius: var(--p-border-radius, 6px);
+    background: var(--lt-surface-50);
+    border: 1px solid var(--lt-surface-200);
+    border-radius: var(--lt-radius);
     padding: 0.35rem 0.65rem;
     transition: border-color 0.15s ease, background 0.15s ease;
 }
 
 .p-sidebar-search-box:focus-within {
-    border-color: var(--p-primary-500, #10b981);
-    background: var(--p-surface-0, #ffffff);
-    box-shadow: 0 0 0 1px var(--p-primary-500, #10b981);
+    border-color: var(--lt-primary-500);
+    background: var(--lt-surface-0);
+    box-shadow: 0 0 0 1px var(--lt-primary-500);
 }
 
 .p-sidebar-search-input {
@@ -186,7 +186,7 @@ const SIDEBAR_CSS = `
     outline: none;
     background: transparent;
     font-size: 0.8125rem;
-    color: var(--p-text-color, #0f172a);
+    color: var(--lt-text-primary);
     font-family: inherit;
 }
 
@@ -201,7 +201,7 @@ const SIDEBAR_CSS = `
     gap: 0.75rem;
     box-sizing: border-box;
     scrollbar-width: thin;
-    scrollbar-color: var(--p-surface-300) transparent;
+    scrollbar-color: var(--lt-surface-300) transparent;
 }
 
 .p-sidebar-collapsed .p-sidebar-content {
@@ -213,7 +213,7 @@ const SIDEBAR_CSS = `
     width: 4px;
 }
 .p-sidebar-content::-webkit-scrollbar-thumb {
-    background: var(--p-surface-300);
+    background: var(--lt-surface-300);
     border-radius: 4px;
 }
 
@@ -225,7 +225,7 @@ const SIDEBAR_CSS = `
     gap: 0.35rem;
     flex-shrink: 0;
     box-sizing: border-box;
-    border-top: 1px solid var(--p-border-color, #e2e8f0);
+    border-top: 1px solid var(--lt-surface-200);
 }
 
 .p-sidebar-collapsed .p-sidebar-footer {
@@ -244,7 +244,7 @@ const SIDEBAR_CSS = `
 .p-sidebar-group-label {
     font-size: 0.725rem;
     font-weight: 700;
-    color: var(--p-sidebar-group-label-color, var(--p-surface-400, #94a3b8));
+    color: var(--p-sidebar-group-label-color, var(--lt-surface-400));
     padding: 0.25rem 0.5rem 0.15rem;
     user-select: none;
     letter-spacing: 0.02em;
@@ -293,8 +293,8 @@ const SIDEBAR_CSS = `
     width: 100%;
     min-height: 2.25rem;
     padding: 0.45rem 0.65rem;
-    border-radius: var(--p-border-radius, 6px);
-    color: var(--p-sidebar-menu-button-color, var(--p-text-color, #0f172a));
+    border-radius: var(--lt-radius);
+    color: var(--p-sidebar-menu-button-color, var(--lt-text-primary));
     text-decoration: none;
     background: transparent;
     border: 1px solid transparent;
@@ -311,14 +311,14 @@ const SIDEBAR_CSS = `
 
 .p-sidebar-menu-button:hover,
 .p-sidebar-menu-button.p-hover {
-    background: var(--p-sidebar-menu-button-focus-background, var(--p-surface-100, #f1f5f9));
+    background: var(--p-sidebar-menu-button-focus-background, var(--lt-surface-100));
 }
 
 .p-sidebar-menu-button.p-active {
-    background: var(--p-primary-50, #ecfdf5);
-    color: var(--p-primary-700, #047857);
+    background: var(--lt-primary-50);
+    color: var(--lt-primary-700);
     font-weight: 700;
-    border-color: var(--p-primary-200, #a7f3d0);
+    border-color: var(--lt-primary-200);
 }
 
 .p-sidebar-menu-button-icon {
@@ -328,7 +328,7 @@ const SIDEBAR_CSS = `
     width: 1.25rem;
     height: 1.25rem;
     flex-shrink: 0;
-    color: var(--p-surface-500, #64748b);
+    color: var(--lt-surface-500);
     transition: transform 0.15s ease, color 0.12s ease;
 }
 
@@ -337,7 +337,7 @@ const SIDEBAR_CSS = `
 }
 
 .p-sidebar-menu-button.p-active .p-sidebar-menu-button-icon {
-    color: var(--p-primary-600, #10b981);
+    color: var(--lt-primary-600);
 }
 
 .p-sidebar-item-label {
@@ -358,8 +358,8 @@ const SIDEBAR_CSS = `
     font-weight: 700;
     padding: 0.1rem 0.4rem;
     border-radius: 9999px;
-    background: var(--p-surface-200, #e2e8f0);
-    color: var(--p-surface-700, #334155);
+    background: var(--lt-surface-200);
+    color: var(--lt-surface-700);
     flex-shrink: 0;
     opacity: 1;
     transform: scale(1);
@@ -371,7 +371,7 @@ const SIDEBAR_CSS = `
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: var(--p-surface-400, #94a3b8);
+    color: var(--lt-surface-400);
     transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1);
     flex-shrink: 0;
 }
@@ -391,9 +391,9 @@ const SIDEBAR_CSS = `
     width: 1.5rem;
     height: 1.5rem;
     border-radius: 4px;
-    color: var(--p-surface-500, #64748b);
+    color: var(--lt-surface-500);
     cursor: pointer;
-    background: var(--p-surface-200, #e2e8f0);
+    background: var(--lt-surface-200);
     border: none;
     transition: background-color 0.12s ease, color 0.12s ease, transform 0.12s ease;
     z-index: 10;
@@ -404,8 +404,8 @@ const SIDEBAR_CSS = `
 }
 
 .p-sidebar-menu-action:hover {
-    background: #fee2e2;
-    color: #dc2626;
+    background: var(--lt-danger-100, var(--lt-danger-100));
+    color: var(--lt-danger-600, var(--lt-danger-600));
     transform: translateY(-50%) scale(1.08);
 }
 
@@ -428,7 +428,7 @@ const SIDEBAR_CSS = `
     list-style: none;
     margin: 0.15rem 0 0.25rem 1.15rem;
     padding: 0 0 0 0.65rem;
-    border-left: 1px solid var(--p-border-color, #e2e8f0);
+    border-left: 1px solid var(--lt-surface-200);
     display: flex;
     flex-direction: column;
     gap: 0.125rem;
@@ -439,9 +439,9 @@ const SIDEBAR_CSS = `
     align-items: center;
     width: 100%;
     padding: 0.35rem 0.5rem;
-    border-radius: var(--p-border-radius, 4px);
+    border-radius: var(--lt-radius);
     font-size: 0.8125rem;
-    color: var(--p-surface-600, #475569);
+    color: var(--lt-surface-600);
     text-decoration: none;
     cursor: pointer;
     transition: background-color 0.12s ease, color 0.12s ease;
@@ -451,14 +451,14 @@ const SIDEBAR_CSS = `
 }
 
 .p-sidebar-menu-sub-button:hover {
-    background: var(--p-surface-100, #f1f5f9);
-    color: var(--p-text-color, #0f172a);
+    background: var(--lt-surface-100);
+    color: var(--lt-text-primary);
 }
 
 .p-sidebar-menu-sub-button.p-active {
     font-weight: 700;
-    color: var(--p-primary-600, #10b981);
-    background: var(--p-primary-50, #ecfdf5);
+    color: var(--lt-primary-600);
+    background: var(--lt-primary-50);
 }
 
 /* ==========================================================================
@@ -539,7 +539,7 @@ const SIDEBAR_CSS = `
     width: 2.5rem !important;
     height: 2.5rem !important;
     margin: 0.15rem auto !important;
-    border-radius: var(--p-border-radius, 8px) !important;
+    border-radius: var(--lt-radius) !important;
     box-sizing: border-box !important;
     overflow: hidden !important;
 }
@@ -589,17 +589,17 @@ const SIDEBAR_CSS = `
     justify-content: center;
     width: 2.1rem;
     height: 2.1rem;
-    border-radius: var(--p-border-radius, 6px);
-    border: 1px solid var(--p-border-color, #cbd5e1);
+    border-radius: var(--lt-radius);
+    border: 1px solid var(--lt-surface-200);
     background: transparent;
-    color: var(--p-surface-600, #475569);
+    color: var(--lt-surface-600);
     cursor: pointer;
     transition: background-color 0.15s ease, color 0.15s ease, transform 0.12s ease;
 }
 
 .p-sidebar-trigger:hover {
-    background: var(--p-surface-100, #f1f5f9);
-    color: var(--p-text-color, #0f172a);
+    background: var(--lt-surface-100);
+    color: var(--lt-text-primary);
 }
 
 .p-sidebar-trigger:active {
@@ -623,9 +623,9 @@ const SIDEBAR_CSS = `
     align-items: flex-end;
     gap: 1.25rem;
     padding: 0.85rem 1.15rem;
-    background: var(--p-surface-0, #ffffff);
-    border: 1px solid var(--p-border-color, #e2e8f0);
-    border-radius: var(--p-border-radius, 8px);
+    background: var(--lt-surface-0);
+    border: 1px solid var(--lt-surface-200);
+    border-radius: var(--lt-radius);
     box-sizing: border-box;
 }
 
@@ -639,7 +639,7 @@ const SIDEBAR_CSS = `
 .p-sidebar-toolbar-label {
     font-size: 0.75rem;
     font-weight: 700;
-    color: var(--p-surface-600, #475569);
+    color: var(--lt-surface-600);
     letter-spacing: 0.01em;
 }
 
@@ -650,10 +650,10 @@ const SIDEBAR_CSS = `
     gap: 0.75rem;
     padding: 0.45rem 0.85rem;
     min-width: 9rem;
-    border-radius: var(--p-border-radius, 6px);
-    border: 1px solid var(--p-border-color, #cbd5e1);
-    background: var(--p-surface-0, #ffffff);
-    color: var(--p-text-color, #0f172a);
+    border-radius: var(--lt-radius);
+    border: 1px solid var(--lt-surface-200);
+    background: var(--lt-surface-0);
+    color: var(--lt-text-primary);
     font-size: 0.8125rem;
     font-weight: 500;
     cursor: pointer;
@@ -664,8 +664,8 @@ const SIDEBAR_CSS = `
 
 .p-sb-select-trigger:focus,
 .p-sb-select-trigger.p-active {
-    border-color: var(--p-primary-500, #3b82f6);
-    box-shadow: 0 0 0 1px var(--p-primary-500, #3b82f6);
+    border-color: var(--lt-primary-500);
+    box-shadow: 0 0 0 1px var(--lt-primary-500);
 }
 
 .p-sb-select-dropdown {
@@ -674,9 +674,9 @@ const SIDEBAR_CSS = `
     left: 0;
     margin-top: 0.25rem;
     min-width: 100%;
-    background: var(--p-surface-0, #ffffff);
-    border: 1px solid var(--p-border-color, #e2e8f0);
-    border-radius: var(--p-border-radius, 8px);
+    background: var(--lt-surface-0);
+    border: 1px solid var(--lt-surface-200);
+    border-radius: var(--lt-radius);
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
     padding: 0.35rem;
     z-index: 1000;
@@ -706,27 +706,27 @@ const SIDEBAR_CSS = `
     padding: 0.45rem 0.65rem;
     border-radius: 5px;
     font-size: 0.8125rem;
-    color: var(--p-text-color, #0f172a);
+    color: var(--lt-text-primary);
     cursor: pointer;
     transition: background-color 0.12s ease;
 }
 
 .p-sb-select-option:hover {
-    background: var(--p-surface-100, #f1f5f9);
+    background: var(--lt-surface-100);
 }
 
 .p-sb-select-option.p-selected {
-    background: var(--p-primary-50, #eff6ff);
-    color: var(--p-primary-600, #2563eb);
+    background: var(--lt-primary-50);
+    color: var(--lt-primary-600);
     font-weight: 600;
 }
 
 .p-sb-segmented {
     display: inline-flex;
-    background: var(--p-surface-100, #f1f5f9);
+    background: var(--lt-surface-100);
     padding: 2px;
-    border-radius: var(--p-border-radius, 6px);
-    border: 1px solid var(--p-border-color, #cbd5e1);
+    border-radius: var(--lt-radius);
+    border: 1px solid var(--lt-surface-200);
     gap: 2px;
 }
 
@@ -736,15 +736,15 @@ const SIDEBAR_CSS = `
     font-weight: 600;
     border: none;
     background: transparent;
-    color: var(--p-surface-600, #475569);
+    color: var(--lt-surface-600);
     border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .p-sb-seg-btn.p-active {
-    background: var(--p-surface-0, #ffffff);
-    color: var(--p-text-color, #0f172a);
+    background: var(--lt-surface-0);
+    color: var(--lt-text-primary);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 }
 
@@ -760,7 +760,7 @@ const SIDEBAR_CSS = `
 .p-sb-switch {
     width: 2.5rem;
     height: 1.35rem;
-    background: var(--p-surface-300, #cbd5e1);
+    background: var(--lt-surface-300);
     border-radius: 9999px;
     position: relative;
     transition: background-color 0.2s ease;
@@ -775,14 +775,14 @@ const SIDEBAR_CSS = `
     left: 2px;
     width: 1.1rem;
     height: 1.1rem;
-    background: var(--lt-surface-0, #ffffff);
+    background: var(--lt-surface-0, var(--lt-surface-0));
     border-radius: 50%;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
     transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .p-sb-switch.p-checked {
-    background: var(--p-primary-600, #2563eb);
+    background: var(--lt-primary-600);
 }
 
 .p-sb-switch.p-checked::after {
@@ -795,7 +795,7 @@ const SIDEBAR_CSS = `
     flex-direction: column;
     height: 100%;
     min-width: 0;
-    background: var(--p-surface-50, #f8fafc);
+    background: var(--lt-surface-50);
     overflow: hidden;
     position: relative;
 }
@@ -806,16 +806,16 @@ const SIDEBAR_CSS = `
     align-items: center;
     gap: 0.75rem;
     padding: 0 1rem;
-    border-bottom: 1px solid var(--p-border-color, #e2e8f0);
-    background: var(--p-surface-0, #ffffff);
+    border-bottom: 1px solid var(--lt-surface-200);
+    background: var(--lt-surface-0);
     flex-shrink: 0;
 }
 
 .p-sb-popup-menu {
     position: absolute;
-    background: var(--p-surface-0, #ffffff);
-    border: 1px solid var(--p-border-color, #e2e8f0);
-    border-radius: var(--p-border-radius, 8px);
+    background: var(--lt-surface-0);
+    border: 1px solid var(--lt-surface-200);
+    border-radius: var(--lt-radius);
     box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.05);
     padding: 0.35rem;
     z-index: 1000;
@@ -834,13 +834,13 @@ const SIDEBAR_CSS = `
     padding: 0.45rem 0.65rem;
     border-radius: 6px;
     font-size: 0.8125rem;
-    color: var(--p-text-color, #0f172a);
+    color: var(--lt-text-primary);
     cursor: pointer;
     transition: background-color 0.12s ease;
 }
 
 .p-sb-popup-item:hover {
-    background: var(--p-surface-100, #f1f5f9);
+    background: var(--lt-surface-100);
 }
 
 /* Chat Application Styling */
@@ -849,7 +849,7 @@ const SIDEBAR_CSS = `
     flex-direction: column;
     height: 100%;
     overflow: hidden;
-    background: var(--p-surface-0, #ffffff);
+    background: var(--lt-surface-0);
 }
 
 .p-sb-chat-history {
@@ -865,11 +865,11 @@ const SIDEBAR_CSS = `
     display: flex;
     align-self: flex-end;
     max-width: 80%;
-    background: var(--p-surface-100, #f1f5f9);
+    background: var(--lt-surface-100);
     padding: 0.75rem 1rem;
     border-radius: 16px 16px 4px 16px;
     font-size: 0.875rem;
-    color: var(--p-text-color, #0f172a);
+    color: var(--lt-text-primary);
     line-height: 1.45;
 }
 
@@ -878,7 +878,7 @@ const SIDEBAR_CSS = `
     gap: 0.85rem;
     max-width: 90%;
     font-size: 0.875rem;
-    color: var(--p-text-color, #0f172a);
+    color: var(--lt-text-primary);
     line-height: 1.5;
 }
 
@@ -886,8 +886,8 @@ const SIDEBAR_CSS = `
     width: 2rem;
     height: 2rem;
     border-radius: 9999px;
-    background: #10a37f;
-    color: var(--lt-surface-0, #ffffff);
+    background: var(--lt-primary-500);
+    color: var(--lt-surface-0, var(--lt-surface-0));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -895,8 +895,8 @@ const SIDEBAR_CSS = `
 }
 
 .p-sb-code-block {
-    background: var(--p-surface-900, #0f172a);
-    color: var(--p-surface-100, #f1f5f9);
+    background: var(--lt-surface-900);
+    color: var(--lt-surface-100);
     padding: 0.75rem 1rem;
     border-radius: 8px;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
@@ -911,15 +911,15 @@ const SIDEBAR_CSS = `
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    background: var(--p-surface-0, #ffffff);
+    background: var(--lt-surface-0);
 }
 
 .p-sb-chat-input-pill {
     display: flex;
     align-items: center;
     gap: 0.65rem;
-    background: var(--p-surface-50, #f8fafc);
-    border: 1px solid var(--p-border-color, #cbd5e1);
+    background: var(--lt-surface-50);
+    border: 1px solid var(--lt-surface-200);
     border-radius: 9999px;
     padding: 0.5rem 0.85rem 0.5rem 1rem;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
@@ -931,15 +931,15 @@ const SIDEBAR_CSS = `
     outline: none;
     background: transparent;
     font-size: 0.875rem;
-    color: var(--p-text-color, #0f172a);
+    color: var(--lt-text-primary);
 }
 
 .p-sb-chat-send-btn {
     width: 2rem;
     height: 2rem;
     border-radius: 9999px;
-    background: var(--p-surface-900, #0f172a);
-    color: var(--p-surface-0, #ffffff);
+    background: var(--lt-surface-900);
+    color: var(--lt-surface-0);
     border: none;
     cursor: pointer;
     display: flex;
@@ -956,84 +956,84 @@ const SIDEBAR_CSS = `
 /* Dark Mode Tokens */
 .dark .p-sidebar-layout,
 [data-theme="dark"] .p-sidebar-layout {
-    background: var(--p-surface-950, #020617);
-    border-color: var(--p-surface-800, #1e293b);
+    background: var(--lt-surface-950);
+    border-color: var(--lt-surface-800);
 }
 
 .dark .p-sidebar-panel,
 [data-theme="dark"] .p-sidebar-panel {
-    background: var(--p-surface-900, #0f172a);
-    color: var(--p-surface-0, #f8fafc);
+    background: var(--lt-surface-900);
+    color: var(--lt-surface-0);
 }
 
 .dark .p-sidebar-header,
 [data-theme="dark"] .p-sidebar-header,
 .dark .p-sidebar-footer,
 [data-theme="dark"] .p-sidebar-footer {
-    border-color: var(--p-surface-800, #1e293b);
+    border-color: var(--lt-surface-800);
 }
 
 .dark .p-sidebar-search-box,
 [data-theme="dark"] .p-sidebar-search-box {
-    background: var(--p-surface-950, #020617);
-    border-color: var(--p-surface-800, #1e293b);
+    background: var(--lt-surface-950);
+    border-color: var(--lt-surface-800);
 }
 
 .dark .p-sidebar-menu-button,
 [data-theme="dark"] .p-sidebar-menu-button {
-    color: var(--p-surface-200, #e2e8f0);
+    color: var(--lt-surface-200);
 }
 
 .dark .p-sidebar-menu-button:hover,
 [data-theme="dark"] .p-sidebar-menu-button:hover {
-    background: var(--p-surface-800, #1e293b);
-    color: var(--p-surface-0, #f8fafc);
+    background: var(--lt-surface-800);
+    color: var(--lt-surface-0);
 }
 
 .dark .p-sidebar-menu-button.p-active,
 [data-theme="dark"] .p-sidebar-menu-button.p-active {
     background: rgba(16, 185, 129, 0.15);
-    color: #6ee7b7;
+    color: var(--lt-primary-300, var(--lt-primary-300));
     border-color: rgba(16, 185, 129, 0.3);
 }
 
 .dark .p-sidebar-menu-badge,
 [data-theme="dark"] .p-sidebar-menu-badge {
-    background: var(--p-surface-800, #1e293b);
-    color: var(--p-surface-300, #cbd5e1);
+    background: var(--lt-surface-800);
+    color: var(--lt-surface-300);
 }
 
 .dark .p-sidebar-menu-sub,
 [data-theme="dark"] .p-sidebar-menu-sub {
-    border-color: var(--p-surface-800, #1e293b);
+    border-color: var(--lt-surface-800);
 }
 
 .dark .p-sidebar-menu-sub-button,
 [data-theme="dark"] .p-sidebar-menu-sub-button {
-    color: var(--p-surface-400, #94a3b8);
+    color: var(--lt-surface-400);
 }
 
 .dark .p-sidebar-menu-sub-button:hover,
 [data-theme="dark"] .p-sidebar-menu-sub-button:hover {
-    background: var(--p-surface-800, #1e293b);
-    color: var(--p-surface-0, #f8fafc);
+    background: var(--lt-surface-800);
+    color: var(--lt-surface-0);
 }
 
 .dark .p-sidebar-menu-sub-button.p-active,
 [data-theme="dark"] .p-sidebar-menu-sub-button.p-active {
     background: rgba(16, 185, 129, 0.15);
-    color: #6ee7b7;
+    color: var(--lt-primary-300, var(--lt-primary-300));
 }
 
 .dark .p-sidebar-main,
 [data-theme="dark"] .p-sidebar-main {
-    background: var(--p-surface-950, #020617);
+    background: var(--lt-surface-950);
 }
 
 .dark .p-sidebar-main-header,
 [data-theme="dark"] .p-sidebar-main-header {
-    background: var(--p-surface-900, #0f172a);
-    border-color: var(--p-surface-800, #1e293b);
+    background: var(--lt-surface-900);
+    border-color: var(--lt-surface-800);
 }
 `;
 
@@ -1157,7 +1157,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
     let searchQuery = '';
 
     let openSelectDropdown: 'variant' | 'collapsible' | null = null;
-    let activeCompany = { name: 'Acme Inc', logo: 'A', color: 'linear-gradient(135deg, #8b5cf6, #4f46e5)' };
+    let activeCompany = { name: 'Acme Inc', logo: 'A', color: 'linear-gradient(135deg, var(--lt-primary-500, var(--lt-primary-500)), var(--lt-info-600, var(--lt-info-600)))' };
     let showCompanyPopup = false;
     let showUserPopup = false;
 
@@ -1291,10 +1291,10 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
         if (isAppMode) {
             return `
                 <div style="display: flex; align-items: center; gap: 0.65rem; width: 100%; overflow: hidden;">
-                    <a href="/" style="display: flex; width: 2.1rem; height: 2.1rem; border-radius: 8px; background: linear-gradient(135deg, var(--lt-primary-500, #10b981), #047857); color: var(--lt-surface-0, #ffffff); align-items: center; justify-content: center; flex-shrink: 0; text-decoration: none;" title="${headerTitle}">
+                    <a href="/" style="display: flex; width: 2.1rem; height: 2.1rem; border-radius: 8px; background: linear-gradient(135deg, var(--lt-primary-500, var(--lt-primary-500)), var(--lt-primary-700, var(--lt-primary-700))); color: var(--lt-surface-0, var(--lt-surface-0)); align-items: center; justify-content: center; flex-shrink: 0; text-decoration: none;" title="${headerTitle}">
                         ${LucideIcons.layers || '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.9a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg>'}
                     </a>
-                    <span class="p-sidebar-item-label p-sidebar-header-label" style="font-weight: 800; font-size: 0.9375rem; color: var(--p-text-color);">${headerTitle}</span>
+                    <span class="p-sidebar-item-label p-sidebar-header-label" style="font-weight: 800; font-size: 0.9375rem; color: var(--lt-text-primary);">${headerTitle}</span>
                 </div>
             `;
         }
@@ -1307,7 +1307,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                 <ul class="p-sidebar-menu">
                     <li class="p-sidebar-menu-item">
                         <button type="button" class="p-sidebar-menu-button" style="padding: 0.35rem 0.5rem;">
-                            <div style="display:flex; width:1.6rem; height:1.6rem; border-radius:9999px; background: #10a37f; color:var(--lt-surface-0, #ffffff); align-items:center; justify-content:center; flex-shrink:0;">
+                            <div style="display:flex; width:1.6rem; height:1.6rem; border-radius:9999px; background: var(--lt-primary-500); color:var(--lt-surface-0, var(--lt-surface-0)); align-items:center; justify-content:center; flex-shrink:0;">
                                 ${chatGptSparkleIcon}
                             </div>
                             <span class="p-sidebar-item-label p-sidebar-header-label" style="font-weight: 700; font-size: 0.9rem;">ChatGPT</span>
@@ -1315,7 +1315,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                         </button>
                     </li>
                 </ul>
-                <ul class="p-sidebar-menu" style="margin-top: 0.45rem; border-bottom: 1px solid var(--p-border-color); padding-bottom: 0.45rem;">
+                <ul class="p-sidebar-menu" style="margin-top: 0.45rem; border-bottom: 1px solid var(--lt-surface-200); padding-bottom: 0.45rem;">
                     <li class="p-sidebar-menu-item">
                         <button type="button" class="p-sidebar-menu-button">
                             <span class="p-sidebar-menu-button-icon">${LucideIcons.search}</span>
@@ -1344,7 +1344,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                     <ul class="p-sidebar-menu">
                         <li class="p-sidebar-menu-item">
                             <button type="button" class="p-sidebar-menu-button" data-company-trigger style="padding: 0.35rem 0.5rem;">
-                                <div style="display:flex; width:1.5rem; height:1.5rem; border-radius:6px; background: ${activeCompany.color}; color:#fff; align-items:center; justify-content:center; font-weight:700; font-size:0.75rem; flex-shrink:0;">${activeCompany.logo}</div>
+                                <div style="display:flex; width:1.5rem; height:1.5rem; border-radius:6px; background: ${activeCompany.color}; color:var(--lt-surface-0, var(--lt-surface-0)); align-items:center; justify-content:center; font-weight:700; font-size:0.75rem; flex-shrink:0;">${activeCompany.logo}</div>
                                 <span class="p-sidebar-item-label p-sidebar-header-label" style="font-weight: 700; font-size: 0.875rem;">${activeCompany.name}</span>
                                 <svg class="p-sidebar-submenu-chevron" style="margin-left: auto;" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                             </button>
@@ -1353,22 +1353,22 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                     ${showCompanyPopup ? `
                         <div class="p-sb-popup-menu" style="top: 100%; left: 0; margin-top: 0.25rem;">
                             <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-text-muted); padding: 0.25rem 0.5rem;">Companies</div>
-                            <div class="p-sb-popup-item" data-select-company="Acme Inc|A|linear-gradient(135deg, #8b5cf6, #4f46e5)">
-                                <div style="display:flex; width:1.25rem; height:1.25rem; border-radius:4px; background: linear-gradient(135deg, #8b5cf6, #4f46e5); color:#fff; align-items:center; justify-content:center; font-weight:700; font-size:0.65rem;">A</div>
+                            <div class="p-sb-popup-item" data-select-company="Acme Inc|A|linear-gradient(135deg, var(--lt-primary-500, var(--lt-primary-500)), var(--lt-info-600, var(--lt-info-600)))">
+                                <div style="display:flex; width:1.25rem; height:1.25rem; border-radius:4px; background: linear-gradient(135deg, var(--lt-primary-500, var(--lt-primary-500)), var(--lt-info-600, var(--lt-info-600))); color:var(--lt-surface-0, var(--lt-surface-0)); align-items:center; justify-content:center; font-weight:700; font-size:0.65rem;">A</div>
                                 <span>Acme Inc</span>
-                                ${activeCompany.name === 'Acme Inc' ? '<span style="margin-left:auto; color:var(--p-primary-600); font-weight:700;">&#10003;</span>' : ''}
+                                ${activeCompany.name === 'Acme Inc' ? '<span style="margin-left:auto; color:var(--lt-primary-600); font-weight:700;">✓</span>' : ''}
                             </div>
-                            <div class="p-sb-popup-item" data-select-company="Globex Corp|G|linear-gradient(135deg, var(--lt-primary-500, #10b981), #0d9488)">
-                                <div style="display:flex; width:1.25rem; height:1.25rem; border-radius:4px; background: linear-gradient(135deg, var(--lt-primary-500, #10b981), #0d9488); color:#fff; align-items:center; justify-content:center; font-weight:700; font-size:0.65rem;">G</div>
+                            <div class="p-sb-popup-item" data-select-company="Globex Corp|G|linear-gradient(135deg, var(--lt-primary-500), var(--lt-primary-600))">
+                                <div style="display:flex; width:1.25rem; height:1.25rem; border-radius:4px; background: linear-gradient(135deg, var(--lt-primary-500), var(--lt-primary-600)); color:var(--lt-surface-0); align-items:center; justify-content:center; font-weight:700; font-size:0.65rem;">G</div>
                                 <span>Globex Corp</span>
-                                ${activeCompany.name === 'Globex Corp' ? '<span style="margin-left:auto; color:var(--p-primary-600); font-weight:700;">&#10003;</span>' : ''}
+                                ${activeCompany.name === 'Globex Corp' ? '<span style="margin-left:auto; color:var(--lt-primary-600); font-weight:700;">✓</span>' : ''}
                             </div>
-                            <div class="p-sb-popup-item" data-select-company="Initech|I|linear-gradient(135deg, #f97316, #dc2626)">
-                                <div style="display:flex; width:1.25rem; height:1.25rem; border-radius:4px; background: linear-gradient(135deg, #f97316, #dc2626); color:#fff; align-items:center; justify-content:center; font-weight:700; font-size:0.65rem;">I</div>
+                            <div class="p-sb-popup-item" data-select-company="Initech|I|linear-gradient(135deg, var(--lt-warn-500), var(--lt-danger-600, var(--lt-danger-600)))">
+                                <div style="display:flex; width:1.25rem; height:1.25rem; border-radius:4px; background: linear-gradient(135deg, var(--lt-warn-500), var(--lt-danger-600, var(--lt-danger-600))); color:var(--lt-surface-0, var(--lt-surface-0)); align-items:center; justify-content:center; font-weight:700; font-size:0.65rem;">I</div>
                                 <span>Initech</span>
-                                ${activeCompany.name === 'Initech' ? '<span style="margin-left:auto; color:var(--p-primary-600); font-weight:700;">&#10003;</span>' : ''}
+                                ${activeCompany.name === 'Initech' ? '<span style="margin-left:auto; color:var(--lt-primary-600); font-weight:700;">✓</span>' : ''}
                             </div>
-                            <div style="border-top: 1px solid var(--p-border-color); margin: 0.25rem 0;"></div>
+                            <div style="border-top: 1px solid var(--lt-surface-200); margin: 0.25rem 0;"></div>
                             <div class="p-sb-popup-item" style="color: var(--p-text-muted);">
                                 <span class="p-sidebar-menu-button-icon">${LucideIcons.plus}</span>
                                 <span>Add company</span>
@@ -1383,7 +1383,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
             <ul class="p-sidebar-menu">
                 <li class="p-sidebar-menu-item">
                     <button type="button" class="p-sidebar-menu-button" style="padding: 0.35rem 0.5rem;">
-                        <div style="display:flex; width:1.5rem; height:1.5rem; border-radius:6px; background: linear-gradient(135deg, #8b5cf6, #4f46e5); color:#fff; align-items:center; justify-content:center; font-weight:700; font-size:0.75rem; flex-shrink:0;">A</div>
+                        <div style="display:flex; width:1.5rem; height:1.5rem; border-radius:6px; background: linear-gradient(135deg, var(--lt-primary-500, var(--lt-primary-500)), var(--lt-info-600, var(--lt-info-600))); color:var(--lt-surface-0, var(--lt-surface-0)); align-items:center; justify-content:center; font-weight:700; font-size:0.75rem; flex-shrink:0;">A</div>
                         <span class="p-sidebar-item-label p-sidebar-header-label" style="font-weight: 700; font-size: 0.875rem;">Acme Inc</span>
                     </button>
                 </li>
@@ -1396,7 +1396,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
             return `
                 <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; overflow: hidden;">
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <div style="width: 1.6rem; height: 1.6rem; border-radius: 9999px; background: var(--p-surface-200); display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700; color: var(--p-surface-700); flex-shrink: 0;">LT</div>
+                        <div style="width: 1.6rem; height: 1.6rem; border-radius: 9999px; background: var(--lt-surface-200); display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700; color: var(--lt-surface-700); flex-shrink: 0;">LT</div>
                         <span class="p-sidebar-item-label p-sidebar-footer-label" style="font-size: 0.775rem; font-weight: 600; color: var(--p-text-muted);">LaughTale</span>
                     </div>
                     <span class="p-sidebar-menu-badge aura-tag tag-emerald" style="font-size: 0.65rem; padding: 0.1rem 0.4rem;">v3.0</span>
@@ -1410,7 +1410,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                     <ul class="p-sidebar-menu">
                         <li class="p-sidebar-menu-item">
                             <button type="button" class="p-sidebar-menu-button" data-user-trigger style="padding: 0.35rem 0.5rem;">
-                                <div style="display:flex; width:1.5rem; height:1.5rem; border-radius:9999px; background: var(--p-surface-300); color:var(--p-surface-800); align-items:center; justify-content:center; font-weight:700; font-size:0.65rem; flex-shrink:0;">JD</div>
+                                <div style="display:flex; width:1.5rem; height:1.5rem; border-radius:9999px; background: var(--lt-surface-300); color:var(--lt-surface-800); align-items:center; justify-content:center; font-weight:700; font-size:0.65rem; flex-shrink:0;">JD</div>
                                 <span class="p-sidebar-item-label p-sidebar-footer-label" style="font-weight: 600; font-size: 0.8125rem;">John Doe</span>
                                 <svg class="p-sidebar-submenu-chevron" style="margin-left: auto;" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                             </button>
@@ -1427,8 +1427,8 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                                 <span class="p-sidebar-menu-button-icon">${LucideIcons.bell}</span>
                                 <span>Notifications</span>
                             </div>
-                            <div style="border-top: 1px solid var(--p-border-color); margin: 0.25rem 0;"></div>
-                            <div class="p-sb-popup-item" style="color: var(--lt-danger-500, #ef4444);">
+                            <div style="border-top: 1px solid var(--lt-surface-200); margin: 0.25rem 0;"></div>
+                            <div class="p-sb-popup-item" style="color: var(--lt-danger-500, var(--lt-danger-500));">
                                 <span class="p-sidebar-menu-button-icon">${LucideIcons.logOut}</span>
                                 <span>Sign out</span>
                             </div>
@@ -1442,7 +1442,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
             <ul class="p-sidebar-menu">
                 <li class="p-sidebar-menu-item">
                     <button type="button" class="p-sidebar-menu-button" style="padding: 0.35rem 0.5rem;">
-                        <div style="display:flex; width:1.5rem; height:1.5rem; border-radius:9999px; background: var(--p-surface-300, #cbd5e1); color:var(--p-surface-800, #1e293b); align-items:center; justify-content:center; font-weight:700; font-size:0.65rem; flex-shrink:0;">JD</div>
+                        <div style="display:flex; width:1.5rem; height:1.5rem; border-radius:9999px; background: var(--lt-surface-300); color:var(--lt-surface-800); align-items:center; justify-content:center; font-weight:700; font-size:0.65rem; flex-shrink:0;">JD</div>
                         <span class="p-sidebar-item-label p-sidebar-footer-label" style="font-weight: 600; font-size: 0.8125rem;">John Doe</span>
                     </button>
                 </li>
@@ -1467,7 +1467,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                             <button type="button" class="p-sidebar-trigger" data-sidebar-toggle aria-label="Toggle sidebar">
                                 ${triggerIconSvg}
                             </button>
-                            <div style="display: flex; align-items: center; gap: 0.35rem; padding: 0.3rem 0.6rem; border-radius: 8px; background: var(--p-surface-100); font-weight: 600; font-size: 0.8125rem; color: var(--p-text-color); cursor: pointer;">
+                            <div style="display: flex; align-items: center; gap: 0.35rem; padding: 0.3rem 0.6rem; border-radius: 8px; background: var(--lt-surface-100); font-weight: 600; font-size: 0.8125rem; color: var(--lt-text-primary); cursor: pointer;">
                                 <span>ChatGPT 4o</span>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                             </div>
@@ -1519,10 +1519,10 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                         <button type="button" class="p-sidebar-trigger" data-sidebar-toggle aria-label="Toggle navigation">
                             ${triggerIconSvg}
                         </button>
-                        <span style="font-size: 0.875rem; font-weight: 600; color: var(--p-text-color);">File Manager</span>
+                        <span style="font-size: 0.875rem; font-weight: 600; color: var(--lt-text-primary);">File Manager</span>
                     </header>
                     <div style="flex: 1; padding: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
-                        <h1 style="font-size: 1.35rem; font-weight: 700; color: var(--p-text-color); margin: 0;">Q1 Report</h1>
+                        <h1 style="font-size: 1.35rem; font-weight: 700; color: var(--lt-text-primary); margin: 0;">Q1 Report</h1>
                         <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin: 0;">Documents &gt; Work &gt; Projects &gt; Q1 Report</p>
                     </div>
                 </div>
@@ -1536,14 +1536,14 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                         <button type="button" class="p-sidebar-trigger" data-sidebar-toggle aria-label="Toggle navigation">
                             ${triggerIconSvg}
                         </button>
-                        <span style="font-size: 0.875rem; font-weight: 600; color: var(--p-text-color);">Dashboard</span>
+                        <span style="font-size: 0.875rem; font-weight: 600; color: var(--lt-text-primary);">Dashboard</span>
                         <button type="button" class="p-sidebar-trigger" data-ai-toggle style="margin-left: auto;" aria-label="Toggle AI chat panel">
                             ${chatIconSvg}
                         </button>
                     </header>
                     <div style="flex: 1; padding: 1rem; display: flex; flex-direction: column; gap: 1rem; overflow-y: auto;">
-                        <div style="height: 6rem; border-radius: 8px; background: var(--p-surface-100); border: 1px solid var(--p-border-color); display: flex; align-items: center; justify-content: center; color: var(--p-text-muted); font-size: 0.875rem;">Main Content View</div>
-                        <div style="flex: 1; min-height: 8rem; border-radius: 8px; background: var(--p-surface-100); border: 1px solid var(--p-border-color); display: flex; align-items: center; justify-content: center; color: var(--p-text-muted); font-size: 0.875rem;">Analytics &amp; Data Area</div>
+                        <div style="height: 6rem; border-radius: 8px; background: var(--lt-surface-100); border: 1px solid var(--lt-surface-200); display: flex; align-items: center; justify-content: center; color: var(--p-text-muted); font-size: 0.875rem;">Main Content View</div>
+                        <div style="flex: 1; min-height: 8rem; border-radius: 8px; background: var(--lt-surface-100); border: 1px solid var(--lt-surface-200); display: flex; align-items: center; justify-content: center; color: var(--p-text-muted); font-size: 0.875rem;">Analytics &amp; Data Area</div>
                     </div>
                 </div>
             `;
@@ -1555,12 +1555,12 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                     <button type="button" class="p-sidebar-trigger" data-sidebar-toggle aria-label="Toggle navigation">
                         ${triggerIconSvg}
                     </button>
-                    <span style="font-size: 0.875rem; font-weight: 600; color: var(--p-text-color);">Dashboard</span>
-                    ${demoType === 'responsive' ? `<span style="margin-left: auto; font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.5rem; border-radius: 6px; background: var(--p-surface-100); color: var(--p-text-muted);">Desktop</span>` : ''}
+                    <span style="font-size: 0.875rem; font-weight: 600; color: var(--lt-text-primary);">Dashboard</span>
+                    ${demoType === 'responsive' ? `<span style="margin-left: auto; font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.5rem; border-radius: 6px; background: var(--lt-surface-100); color: var(--p-text-muted);">Desktop</span>` : ''}
                 </header>
                 <div style="flex: 1; padding: 1rem; display: flex; flex-direction: column; gap: 1rem; overflow-y: auto;">
-                    <div style="height: 6rem; border-radius: 8px; background: var(--p-surface-100); border: 1px solid var(--p-border-color); display: flex; align-items: center; justify-content: center; color: var(--p-text-muted); font-size: 0.875rem;">Main Content View</div>
-                    <div style="flex: 1; min-height: 8rem; border-radius: 8px; background: var(--p-surface-100); border: 1px solid var(--p-border-color); display: flex; align-items: center; justify-content: center; color: var(--p-text-muted); font-size: 0.875rem;">Analytics &amp; Data Area</div>
+                    <div style="height: 6rem; border-radius: 8px; background: var(--lt-surface-100); border: 1px solid var(--lt-surface-200); display: flex; align-items: center; justify-content: center; color: var(--p-text-muted); font-size: 0.875rem;">Main Content View</div>
+                    <div style="flex: 1; min-height: 8rem; border-radius: 8px; background: var(--lt-surface-100); border: 1px solid var(--lt-surface-200); display: flex; align-items: center; justify-content: center; color: var(--p-text-muted); font-size: 0.875rem;">Analytics &amp; Data Area</div>
                 </div>
             </div>
         `;
@@ -1614,7 +1614,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                         ${isAppMode ? `
                             <div class="p-sidebar-search-container">
                                 <div class="p-sidebar-search-box">
-                                    <span style="color: var(--p-surface-400); display: flex; align-items: center;">${searchIconSvg}</span>
+                                    <span style="color: var(--lt-surface-400); display: flex; align-items: center;">${searchIconSvg}</span>
                                     <input type="text" class="p-sidebar-search-input" placeholder="Filter navigation..." value="${searchQuery}" />
                                 </div>
                             </div>

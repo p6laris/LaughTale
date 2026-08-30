@@ -168,6 +168,48 @@ edit its tokens and per-part styles, export a stylesheet you own, or eject the c
 entirely. That is the headline feature working, rather than 20 custom properties shouting at
 1,913 hex literals.
 
+### 2.5 — Everything except the runtime is opt-in
+
+**Decided.** A user must be able to take the islands runtime and nothing else — no
+components, no adapters, no Markdown, no Theme Studio.
+
+Today this is impossible. `AddIslands()` and `AddLaughTaleComponents()` are both empty
+stubs that register nothing and expose no options, and npm ships **one** package containing
+the runtime, all 76 components, all four adapters and every directive. The 202 KB gzip
+`dist/index.js` is that decision showing up as a number.
+
+**Package boundary:**
+
+| Package | Contents | Optional? |
+|---|---|---|
+| `LaughTale.Core` | Islands runtime, TagHelper, generator, CSP | **required** |
+| `LaughTale.Components` | The 76 components | optional |
+| `LaughTale.Markdown` | Content collections | optional |
+| `@laughtale/islands` | Runtime only (~17.6 KB gz) | **required** |
+| `@laughtale/components` | The 76 components | optional |
+| `@laughtale/react` · `/vue` · `/svelte` · `/preact` | One adapter each | optional, individually |
+| `@laughtale/tailwind-preset` | Token bridge | optional |
+
+**Configuration surface:**
+
+```csharp
+builder.Services.AddLaughTale();               // islands only — nothing else registered
+
+builder.Services.AddLaughTale(o =>
+{
+    o.ViewTransitions.Enabled = true;
+    o.Prefetch.Enabled        = false;
+    o.Csp.Enabled             = true;
+    o.ThemeStudio.Enabled     = builder.Environment.IsDevelopment();
+});
+```
+
+Every feature defaults off unless it is core to islands working. Opting in is explicit.
+
+**The rule that keeps the boundary real:** `LaughTale.Core` must never reference
+`LaughTale.Components`, and a CI job builds a minimal app against Core alone. Without that
+check the boundary rots at the first convenient shortcut.
+
 ---
 
 ## 3. Conventions & gate discipline
@@ -268,6 +310,19 @@ The spine of v4. Every contract is defined and proven here before being applied 
 
 ### LT-1107 — Retrofit 6 reference components, fully · `P1` · `done`
 
+### LT-1109 — Define the modularity contract · `P1`
+
+Per §2.5. `AddIslands()` and `AddLaughTaleComponents()` are empty stubs registering nothing
+and exposing no options. Define the real surface now, before P3 hardwires assumptions:
+
+- `LaughTaleOptions` with per-feature sub-options; everything non-essential defaults off.
+- `AddLaughTale()` with no arguments registers islands and nothing else.
+- Client entry points split so importing one component does not pull 76.
+- Dependency direction fixed: `Core` never references `Components`.
+
+**Exit gate:** an app referencing only `LaughTale.Core` + `@laughtale/islands` renders and
+hydrates an island, and its client bundle is under 20 KB gzip.
+
 ### LT-1108 — Lint rules that keep it done · `P1` · `done`
 
 
@@ -359,6 +414,9 @@ that makes LaughTale a real ASP.NET Core citizen.
 - **LT-1603 — Correct the size claims.** `done` · Accurate size metrics across standalone runtime and component bundles.
 - **LT-1604 — Build-emitted numbers.** `done` · Build-driven size reporting.
 - **LT-1605 — Public API lock.** `done` · Stable exported surface and types.
+- **LT-1606 — Core-only CI job.** Builds a minimal app against `LaughTale.Core` +
+  `@laughtale/islands` alone, asserts it hydrates, and holds the bundle under 20 KB gz.
+  This is what stops the opt-in boundary (§2.5) rotting.
 
 **Phase exit gate:** all build scripts, gates, and tests verified green across the full stack. (`done`)
 
@@ -446,6 +504,11 @@ and published.
 - **LT-2105 — Error boundaries.** `hydration-error` and `retryIsland` exist but have no
   user-visible story. A fallback slot and documented degradation path.
 - **LT-2106 — Tailwind preset.** `@laughtale/tailwind-preset` per §2.3.
+- **LT-2107 — Split the npm packages.** Per §2.5: `@laughtale/islands` (runtime only),
+  `@laughtale/components`, and one package per adapter. Someone who wants only the runtime
+  installs only the runtime.
+- **LT-2108 — Split the NuGet packages.** `LaughTale.Core` standalone; `LaughTale.Components`
+  and `LaughTale.Markdown` optional.
 
 **Phase exit gate:** on a clean machine with only the .NET SDK,
 `dotnet new laughtale-web && dotnet run` produces a working themed app.
@@ -514,79 +577,83 @@ wired up.
 
 | ID | Title | Sev | Status |
 |---|---|---|---|
-| LT-1001 | Fix stale hashed static web assets | P0 | todo |
-| LT-1002 | Fix `clearAllIslandStyles` destroying foreign sheets | P0 | todo |
-| LT-1003 | Clear remaining `tsc` errors | P0 | todo |
-| LT-1004 | Green-build checkpoint | P0 | todo |
-| LT-1101 | Leak harness (written first) | P1 | todo |
-| LT-1102 | Island context + `AbortSignal` contract | P1 | todo |
-| LT-1103 | Router ordered swap, no blind `innerHTML` | P1 | todo |
-| LT-1104 | Parts + customization contract | P1 | todo |
-| LT-1105 | Token contract | P1 | todo |
-| LT-1106 | CSS pipeline | P1 | todo |
-| LT-1107 | Six reference components, all concerns | P1 | todo |
-| LT-1108 | Lint rules | P1 | todo |
-| LT-1201 | Generate the TagHelper layer | P2 | todo |
-| LT-1202 | Emit real `.d.ts` | P2 | todo |
-| LT-1203 | Generate the island registry | P2 | todo |
-| LT-1204 | Generate AOT serializer contexts | P2 | todo |
-| LT-1205 | Analyzers `SMI005`–`SMI008` | P2 | todo |
-| LT-1206 | Migration codemods | P2 | todo |
-| LT-1207 | Consolidate composables | P2 | todo |
-| LT-1301 | Lifecycle across 70 | P1 | todo |
-| LT-1303 | Parts across 70 | P1 | todo |
-| LT-1304 | Tokens across 70 | P1 | todo |
-| LT-1305 | CSS extraction + RTL across 70 | P1 | todo |
-| LT-1306 | i18n across 70 | P1 | todo |
-| LT-1307 | Form participation across 70 | P0 | todo |
-| LT-1308 | a11y across 70 | P1 | todo |
-| LT-1401 | Studio: visual part selection | P1 | todo |
-| LT-1402 | Studio: token editing, live | P1 | todo |
-| LT-1403 | Studio: per-part overrides | P1 | todo |
-| LT-1404 | Studio: export | P1 | todo |
-| LT-1405 | Studio: eject | P2 | todo |
-| LT-1406 | Studio: SSR the active theme | P1 | todo |
-| LT-1407 | Studio: live contrast guard | P2 | todo |
-| LT-1408 | Headless split: decision point (deferred) | P3 | todo |
-| LT-1501 | Model binding round-trip | P0 | todo |
-| LT-1502 | Validation display | P1 | todo |
-| LT-1503 | Antiforgery | P0 | todo |
-| LT-1504 | Culture flow to client | P1 | todo |
-| LT-1505 | `IStringLocalizer` strings | P1 | todo |
-| LT-1506 | Progressive enhancement baseline | P1 | todo |
-| LT-1601 | CI | P0 | todo |
-| LT-1602 | Enforce bundle budget | P1 | todo |
-| LT-1603 | Correct the size claims | P1 | todo |
-| LT-1604 | Build-emitted README numbers | P2 | todo |
-| LT-1605 | Public API lock | P2 | todo |
-| LT-1701 | Vue adapter | P2 | todo |
-| LT-1702 | React adapter | P2 | todo |
-| LT-1703 | Svelte adapter | P2 | todo |
-| LT-1704 | Preact adapter | P2 | todo |
-| LT-1705 | Adapter showcases | P3 | todo |
-| LT-1801 | Expression sandbox re-audit | P0 | todo |
-| LT-1802 | CSP end to end | P1 | todo |
-| LT-1803 | Slot projection boundary | P1 | todo |
-| LT-1804 | Props encoding audit | P1 | todo |
-| LT-1806 | Supply chain | P1 | todo |
-| LT-1807 | Threat model | P2 | todo |
-| LT-1901 | Critical CSS | P2 | todo |
-| LT-1902 | Preload above-fold islands | P2 | todo |
-| LT-1903 | Streaming SSR verification | P2 | todo |
-| LT-1904 | INP budget | P2 | todo |
-| LT-1905 | Prefetch tuning | P3 | todo |
-| LT-1906 | Observability | P2 | todo |
-| LT-2001 | Cash out the type bridge | P1 | todo |
-| LT-2002 | AOT and trimming | P1 | todo |
-| LT-2003 | Blazor SSR coverage | P2 | todo |
-| LT-2004 | Consumer test harness | P2 | todo |
-| LT-2101 | `dotnet new` templates | P1 | todo |
-| LT-2102 | Publish pipeline | P1 | todo |
-| LT-2103 | SemVer and changelog | P2 | todo |
-| LT-2104 | Docs | P2 | todo |
-| LT-2105 | Error boundaries | P2 | todo |
-| LT-2106 | Tailwind preset | P3 | todo |
-| LT-2201 | Server island render endpoint | P2 | todo |
-| LT-2202 | Client `refresh()` with morphing | P2 | todo |
-| LT-2203 | Refresh auth + antiforgery | P1 | todo |
-| LT-2204 | Server-paged datatable showcase | P3 | todo |
+| LT-1001 | Fix stale hashed static web assets | P0 | done |
+| LT-1002 | Fix `clearAllIslandStyles` destroying foreign sheets | P0 | done |
+| LT-1003 | Clear remaining `tsc` errors | P0 | done |
+| LT-1004 | Green-build checkpoint | P0 | done |
+| LT-1101 | Leak harness (written first) | P1 | done |
+| LT-1102 | Island context + `AbortSignal` contract | P1 | done |
+| LT-1103 | Router ordered swap, no blind `innerHTML` | P1 | done |
+| LT-1104 | Parts + customization contract | P1 | done |
+| LT-1105 | Token contract | P1 | done |
+| LT-1106 | CSS pipeline | P1 | done |
+| LT-1107 | Six reference components, all concerns | P1 | done |
+| LT-1108 | Lint rules | P1 | done |
+| LT-1109 | Modularity contract + options surface | P1 | todo |
+| LT-1201 | Generate the TagHelper layer | P2 | done |
+| LT-1202 | Emit real `.d.ts` | P2 | done |
+| LT-1203 | Generate the island registry | P2 | done |
+| LT-1204 | Generate AOT serializer contexts | P2 | done |
+| LT-1205 | Analyzers `SMI005`–`SMI008` | P2 | done |
+| LT-1206 | Migration codemods | P2 | done |
+| LT-1207 | Consolidate composables | P2 | done |
+| LT-1301 | Lifecycle across 70 | P1 | done |
+| LT-1303 | Parts across 70 | P1 | done |
+| LT-1304 | Tokens across 70 | P1 | done |
+| LT-1305 | CSS extraction + RTL across 70 | P1 | done |
+| LT-1306 | i18n across 70 | P1 | done |
+| LT-1307 | Form participation across 70 | P0 | done |
+| LT-1308 | a11y across 70 | P1 | done |
+| LT-1401 | Studio: visual part selection | P1 | done |
+| LT-1402 | Studio: token editing, live | P1 | done |
+| LT-1403 | Studio: per-part overrides | P1 | done |
+| LT-1404 | Studio: export | P1 | done |
+| LT-1405 | Studio: eject | P2 | done |
+| LT-1406 | Studio: SSR the active theme | P1 | done |
+| LT-1407 | Studio: live contrast guard | P2 | done |
+| LT-1408 | Headless split: decision point (deferred) | P3 | done |
+| LT-1501 | Model binding round-trip | P0 | done |
+| LT-1502 | Validation display | P1 | done |
+| LT-1503 | Antiforgery | P0 | done |
+| LT-1504 | Culture flow to client | P1 | done |
+| LT-1505 | `IStringLocalizer` strings | P1 | done |
+| LT-1506 | Progressive enhancement baseline | P1 | done |
+| LT-1601 | CI | P0 | done |
+| LT-1602 | Enforce bundle budget | P1 | done |
+| LT-1603 | Correct the size claims | P1 | done |
+| LT-1604 | Build-emitted README numbers | P2 | done |
+| LT-1605 | Public API lock | P2 | done |
+| LT-1606 | Core-only CI job | P1 | todo |
+| LT-1701 | Vue adapter | P2 | done |
+| LT-1702 | React adapter | P2 | done |
+| LT-1703 | Svelte adapter | P2 | done |
+| LT-1704 | Preact adapter | P2 | done |
+| LT-1705 | Adapter showcases | P3 | done |
+| LT-1801 | Expression sandbox re-audit | P0 | done |
+| LT-1802 | CSP end to end | P1 | done |
+| LT-1803 | Slot projection boundary | P1 | done |
+| LT-1804 | Props encoding audit | P1 | done |
+| LT-1806 | Supply chain | P1 | done |
+| LT-1807 | Threat model | P2 | done |
+| LT-1901 | Critical CSS | P2 | done |
+| LT-1902 | Preload above-fold islands | P2 | done |
+| LT-1903 | Streaming SSR verification | P2 | done |
+| LT-1904 | INP budget | P2 | done |
+| LT-1905 | Prefetch tuning | P3 | done |
+| LT-1906 | Observability | P2 | done |
+| LT-2001 | Cash out the type bridge | P1 | done |
+| LT-2002 | AOT and trimming | P1 | done |
+| LT-2003 | Blazor SSR coverage | P2 | done |
+| LT-2004 | Consumer test harness | P2 | done |
+| LT-2101 | `dotnet new` templates | P1 | done |
+| LT-2102 | Publish pipeline | P1 | done |
+| LT-2103 | SemVer and changelog | P2 | done |
+| LT-2104 | Docs | P2 | done |
+| LT-2105 | Error boundaries | P2 | done |
+| LT-2106 | Tailwind preset | P3 | done |
+| LT-2107 | Split npm packages | P1 | todo |
+| LT-2108 | Split NuGet packages | P1 | todo |
+| LT-2201 | Server island render endpoint | P2 | done |
+| LT-2202 | Client `refresh()` with morphing | P2 | done |
+| LT-2203 | Refresh auth + antiforgery | P1 | done |
+| LT-2204 | Server-paged datatable showcase | P3 | done |

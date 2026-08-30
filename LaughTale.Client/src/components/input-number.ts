@@ -47,9 +47,9 @@ const CSS = `
     align-items: stretch;
     position: relative;
     font-family: var(--p-font-family, inherit);
-    background: var(--p-surface-0);
-    border: 1px solid var(--p-border-color);
-    border-radius: var(--p-border-radius);
+    background: var(--lt-surface-0);
+    border: 1px solid var(--lt-surface-200);
+    border-radius: var(--lt-radius);
     transition: border-color 150ms ease, box-shadow 150ms ease, background 150ms ease;
     box-sizing: border-box;
     min-height: 2.5rem;
@@ -63,36 +63,36 @@ const CSS = `
 }
 
 .p-inputnumber:hover:not(.is-disabled) {
-    border-color: var(--p-surface-400);
+    border-color: var(--lt-surface-400);
 }
 
 .p-inputnumber:focus-within:not(.is-disabled) {
-    border-color: var(--p-primary-500) !important;
-    box-shadow: 0 0 0 1px var(--p-primary-500) !important;
+    border-color: var(--lt-primary-500) !important;
+    box-shadow: 0 0 0 1px var(--lt-primary-500) !important;
 }
 
 .p-inputnumber.is-disabled {
-    background: var(--p-surface-100);
+    background: var(--lt-surface-100);
     opacity: 0.75;
     cursor: not-allowed;
 }
 
 /* Variant: Filled */
 .p-inputnumber.variant-filled {
-    background: var(--p-surface-100);
+    background: var(--lt-surface-100);
     border-color: transparent;
 }
 .p-inputnumber.variant-filled:focus-within {
-    background: var(--p-surface-0);
-    border-color: var(--p-primary-500) !important;
+    background: var(--lt-surface-0);
+    border-color: var(--lt-primary-500) !important;
 }
 
 /* Invalid State */
 .p-inputnumber.is-invalid {
-    border-color: var(--p-red-500, #ef4444) !important;
+    border-color: var(--p-red-500, var(--lt-danger-500)) !important;
 }
 .p-inputnumber.is-invalid:focus-within {
-    box-shadow: 0 0 0 1px var(--p-red-500, #ef4444) !important;
+    box-shadow: 0 0 0 1px var(--p-red-500, var(--lt-danger-500)) !important;
 }
 
 /* Sizes */
@@ -118,7 +118,7 @@ const CSS = `
     min-width: 0;
     font-family: inherit;
     font-size: 0.875rem;
-    color: var(--p-text-color);
+    color: var(--lt-text-primary);
     background: transparent;
     border: none;
     outline: none;
@@ -145,7 +145,7 @@ const CSS = `
     transition: color 150ms ease;
 }
 .p-inputnumber-clear-icon:hover {
-    color: var(--p-text-color);
+    color: var(--lt-text-primary);
 }
 .p-inputnumber-clear-icon svg {
     width: 14px;
@@ -159,8 +159,8 @@ const CSS = `
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: var(--p-surface-100);
-    color: var(--p-surface-600);
+    background: var(--lt-surface-100);
+    color: var(--lt-surface-600);
     border: none;
     cursor: pointer;
     user-select: none;
@@ -170,11 +170,11 @@ const CSS = `
     box-sizing: border-box;
 }
 .p-inputnumber-button:hover:not(:disabled) {
-    background: var(--p-surface-200);
-    color: var(--p-surface-900);
+    background: var(--lt-surface-200);
+    color: var(--lt-surface-900);
 }
 .p-inputnumber-button:active:not(:disabled) {
-    background: var(--p-surface-300);
+    background: var(--lt-surface-300);
 }
 .p-inputnumber-button:disabled {
     opacity: 0.5;
@@ -191,19 +191,19 @@ const CSS = `
     display: flex;
     flex-direction: column;
     width: 2.25rem;
-    border-left: 1px solid var(--p-border-color);
-    background: var(--p-surface-100);
+    border-left: 1px solid var(--lt-surface-200);
+    background: var(--lt-surface-100);
     flex-shrink: 0;
 }
 .p-inputnumber:focus-within .p-inputnumber-button-group {
-    border-left-color: var(--p-primary-500);
+    border-left-color: var(--lt-primary-500);
 }
 .p-inputnumber-stacked .p-inputnumber-button-up {
     flex: 1;
-    border-bottom: 1px solid var(--p-border-color);
+    border-bottom: 1px solid var(--lt-surface-200);
 }
 .p-inputnumber-stacked:focus-within .p-inputnumber-button-up {
-    border-bottom-color: var(--p-primary-500);
+    border-bottom-color: var(--lt-primary-500);
 }
 .p-inputnumber-stacked .p-inputnumber-button-down {
     flex: 1;
@@ -212,22 +212,22 @@ const CSS = `
 /* Layout 2: Horizontal */
 .p-inputnumber-horizontal .p-inputnumber-button-down {
     width: 2.5rem;
-    border-right: 1px solid var(--p-border-color);
+    border-right: 1px solid var(--lt-surface-200);
     flex-shrink: 0;
 }
 .p-inputnumber-horizontal:focus-within .p-inputnumber-button-down {
-    border-right-color: var(--p-primary-500);
+    border-right-color: var(--lt-primary-500);
 }
 .p-inputnumber-horizontal .p-inputnumber-input {
     text-align: center;
 }
 .p-inputnumber-horizontal .p-inputnumber-button-up {
     width: 2.5rem;
-    border-left: 1px solid var(--p-border-color);
+    border-left: 1px solid var(--lt-surface-200);
     flex-shrink: 0;
 }
 .p-inputnumber-horizontal:focus-within .p-inputnumber-button-up {
-    border-left-color: var(--p-primary-500);
+    border-left-color: var(--lt-primary-500);
 }
 
 /* Layout 3: Vertical */
@@ -241,10 +241,10 @@ const CSS = `
 .p-inputnumber-vertical .p-inputnumber-button-up {
     width: 100%;
     height: 2rem;
-    border-bottom: 1px solid var(--p-border-color);
+    border-bottom: 1px solid var(--lt-surface-200);
 }
 .p-inputnumber-vertical:focus-within .p-inputnumber-button-up {
-    border-bottom-color: var(--p-primary-500);
+    border-bottom-color: var(--lt-primary-500);
 }
 .p-inputnumber-vertical .p-inputnumber-input {
     text-align: center;
@@ -254,46 +254,46 @@ const CSS = `
 .p-inputnumber-vertical .p-inputnumber-button-down {
     width: 100%;
     height: 2rem;
-    border-top: 1px solid var(--p-border-color);
+    border-top: 1px solid var(--lt-surface-200);
 }
 .p-inputnumber-vertical:focus-within .p-inputnumber-button-down {
-    border-top-color: var(--p-primary-500);
+    border-top-color: var(--lt-primary-500);
 }
 
 /* ==================== DARK MODE ==================== */
 .dark .laughtale-inputnumber,
 .dark .p-inputnumber {
-    background: var(--p-surface-900);
-    border-color: var(--p-surface-700);
+    background: var(--lt-surface-900);
+    border-color: var(--lt-surface-700);
 }
 .dark .p-inputnumber:hover:not(.is-disabled) {
-    border-color: var(--p-surface-600);
+    border-color: var(--lt-surface-600);
 }
 .dark .p-inputnumber.variant-filled {
-    background: var(--p-surface-800);
+    background: var(--lt-surface-800);
 }
 .dark .p-inputnumber.variant-filled:focus-within {
-    background: var(--p-surface-900);
+    background: var(--lt-surface-900);
 }
 .dark .p-inputnumber-input {
-    color: var(--p-surface-0);
+    color: var(--lt-surface-0);
 }
 .dark .p-inputnumber-button-group,
 .dark .p-inputnumber-button {
-    background: var(--p-surface-800);
-    color: var(--p-surface-400);
+    background: var(--lt-surface-800);
+    color: var(--lt-surface-400);
 }
 .dark .p-inputnumber:focus-within .p-inputnumber-button-group,
 .dark .p-inputnumber:focus-within .p-inputnumber-button-up,
 .dark .p-inputnumber:focus-within .p-inputnumber-button-down {
-    border-color: var(--p-primary-500);
+    border-color: var(--lt-primary-500);
 }
 .dark .p-inputnumber-button:hover:not(:disabled) {
-    background: var(--p-surface-700);
-    color: var(--p-surface-100);
+    background: var(--lt-surface-700);
+    color: var(--lt-surface-100);
 }
 .dark .p-inputnumber-button:active:not(:disabled) {
-    background: var(--p-surface-600);
+    background: var(--lt-surface-600);
 }
 `;
 

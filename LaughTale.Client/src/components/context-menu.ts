@@ -47,10 +47,10 @@ const CONTEXTMENU_CSS = `
     position: fixed;
     z-index: var(--p-contextmenu-z-index, 1200);
     min-width: 14rem;
-    background: var(--p-contextmenu-background, var(--p-surface-0, #ffffff));
-    color: var(--p-contextmenu-color, var(--p-surface-700, #334155));
-    border: 1px solid var(--p-contextmenu-border-color, var(--p-surface-200, #e2e8f0));
-    border-radius: var(--p-contextmenu-border-radius, var(--p-border-radius, 8px));
+    background: var(--p-contextmenu-background, var(--lt-surface-0));
+    color: var(--p-contextmenu-color, var(--lt-surface-700));
+    border: 1px solid var(--p-contextmenu-border-color, var(--lt-surface-200));
+    border-radius: var(--p-contextmenu-border-radius, var(--lt-radius));
     box-shadow: var(--p-contextmenu-shadow, 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1));
     padding: var(--p-contextmenu-list-padding, 0.25rem);
     font-family: var(--p-font-family, inherit);
@@ -88,7 +88,7 @@ const CONTEXTMENU_CSS = `
     align-items: center;
     gap: var(--p-contextmenu-item-gap, 0.5rem);
     padding: var(--p-contextmenu-item-padding, 0.5rem 0.75rem);
-    color: var(--p-contextmenu-item-color, var(--p-surface-700, #334155));
+    color: var(--p-contextmenu-item-color, var(--lt-surface-700));
     border-radius: var(--p-contextmenu-item-border-radius, 6px);
     text-decoration: none;
     cursor: pointer;
@@ -102,8 +102,8 @@ const CONTEXTMENU_CSS = `
 .p-contextmenu-item-content:hover,
 .p-contextmenu-item-content:focus-visible,
 .p-contextmenu-item.p-contextmenu-item-active > .p-contextmenu-item-content {
-    background: var(--p-contextmenu-item-focus-background, var(--p-surface-100, #f1f5f9));
-    color: var(--p-contextmenu-item-focus-color, var(--p-surface-900, #0f172a));
+    background: var(--p-contextmenu-item-focus-background, var(--lt-surface-100));
+    color: var(--p-contextmenu-item-focus-color, var(--lt-surface-900));
 }
 
 .p-contextmenu-item.p-disabled > .p-contextmenu-item-content {
@@ -116,13 +116,13 @@ const CONTEXTMENU_CSS = `
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: var(--p-contextmenu-item-icon-color, var(--p-surface-500, #64748b));
+    color: var(--p-contextmenu-item-icon-color, var(--lt-surface-500));
     flex-shrink: 0;
 }
 
 .p-contextmenu-item-content:hover .p-contextmenu-item-icon,
 .p-contextmenu-item.p-contextmenu-item-active > .p-contextmenu-item-content .p-contextmenu-item-icon {
-    color: var(--p-contextmenu-item-icon-focus-color, var(--p-surface-900, #0f172a));
+    color: var(--p-contextmenu-item-icon-focus-color, var(--lt-surface-900));
 }
 
 .p-contextmenu-item-label {
@@ -133,9 +133,9 @@ const CONTEXTMENU_CSS = `
 .p-contextmenu-shortcut {
     margin-left: auto;
     font-size: 0.75rem;
-    color: var(--p-text-muted, #94a3b8);
-    background: var(--p-surface-100, #f1f5f9);
-    border: 1px solid var(--p-surface-200, #e2e8f0);
+    color: var(--p-text-muted, var(--lt-surface-400));
+    background: var(--lt-surface-100);
+    border: 1px solid var(--lt-surface-200);
     border-radius: 4px;
     padding: 0.1rem 0.35rem;
 }
@@ -146,20 +146,20 @@ const CONTEXTMENU_CSS = `
     font-weight: 700;
     border-radius: 9999px;
     padding: 0.1rem 0.45rem;
-    background: var(--p-primary-color, #10b981);
-    color: var(--lt-surface-0, #ffffff);
+    background: var(--lt-primary-500);
+    color: var(--lt-surface-0, var(--lt-surface-0));
 }
 
 .p-contextmenu-submenu-icon {
     margin-left: auto;
-    color: var(--p-contextmenu-submenu-icon-color, var(--p-surface-400, #94a3b8));
+    color: var(--p-contextmenu-submenu-icon-color, var(--lt-surface-400));
     display: inline-flex;
     align-items: center;
 }
 
 .p-contextmenu-separator {
     height: 1px;
-    background: var(--p-contextmenu-separator-border-color, var(--p-surface-200, #e2e8f0));
+    background: var(--p-contextmenu-separator-border-color, var(--lt-surface-200));
     margin: 0.25rem 0;
 }
 
@@ -169,9 +169,9 @@ const CONTEXTMENU_CSS = `
     top: 0;
     left: 100%;
     min-width: 13rem;
-    background: var(--p-contextmenu-background, var(--p-surface-0, #ffffff));
-    border: 1px solid var(--p-contextmenu-border-color, var(--p-surface-200, #e2e8f0));
-    border-radius: var(--p-contextmenu-border-radius, var(--p-border-radius, 8px));
+    background: var(--p-contextmenu-background, var(--lt-surface-0));
+    border: 1px solid var(--p-contextmenu-border-color, var(--lt-surface-200));
+    border-radius: var(--p-contextmenu-border-radius, var(--lt-radius));
     box-shadow: var(--p-contextmenu-shadow, 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1));
     padding: var(--p-contextmenu-list-padding, 0.25rem);
     display: none;
@@ -200,9 +200,9 @@ const CONTEXTMENU_CSS = `
     max-width: 28rem;
     margin: 0 auto;
     height: 10rem;
-    border-radius: var(--p-border-radius, 8px);
-    border: 2px dashed var(--p-border-color, #cbd5e1);
-    color: var(--p-text-muted, #64748b);
+    border-radius: var(--lt-radius);
+    border: 2px dashed var(--lt-surface-200);
+    color: var(--p-text-muted, var(--lt-surface-500));
     font-size: 0.875rem;
     font-weight: 500;
     user-select: none;
@@ -211,8 +211,8 @@ const CONTEXTMENU_CSS = `
 }
 
 .p-contextmenu-target-box:hover {
-    border-color: var(--p-primary-color, #10b981);
-    background: var(--p-surface-50, #f8fafc);
+    border-color: var(--lt-primary-500);
+    background: var(--lt-surface-50);
 }
 
 /* Dark Mode Tokens */
@@ -220,9 +220,9 @@ const CONTEXTMENU_CSS = `
 .dark .p-contextmenu-sublist-wrapper,
 [data-theme="dark"] .p-contextmenu,
 [data-theme="dark"] .p-contextmenu-sublist-wrapper {
-    background: var(--p-surface-900, #0f172a);
-    border-color: var(--p-surface-800, #1e293b);
-    color: var(--p-surface-200, #e2e8f0);
+    background: var(--lt-surface-900);
+    border-color: var(--lt-surface-800);
+    color: var(--lt-surface-200);
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
 }
 
@@ -230,31 +230,31 @@ const CONTEXTMENU_CSS = `
 .dark .p-contextmenu-item.p-contextmenu-item-active > .p-contextmenu-item-content,
 [data-theme="dark"] .p-contextmenu-item-content:hover,
 [data-theme="dark"] .p-contextmenu-item.p-contextmenu-item-active > .p-contextmenu-item-content {
-    background: var(--p-surface-800, #1e293b);
-    color: var(--p-surface-0, #ffffff);
+    background: var(--lt-surface-800);
+    color: var(--lt-surface-0);
 }
 
 .dark .p-contextmenu-separator,
 [data-theme="dark"] .p-contextmenu-separator {
-    background: var(--p-surface-800, #1e293b);
+    background: var(--lt-surface-800);
 }
 
 .dark .p-contextmenu-shortcut,
 [data-theme="dark"] .p-contextmenu-shortcut {
-    background: var(--p-surface-800, #1e293b);
-    border-color: var(--p-surface-700, #334155);
-    color: var(--p-surface-400, #94a3b8);
+    background: var(--lt-surface-800);
+    border-color: var(--lt-surface-700);
+    color: var(--lt-surface-400);
 }
 
 .dark .p-contextmenu-target-box,
 [data-theme="dark"] .p-contextmenu-target-box {
-    border-color: var(--p-surface-700, #334155);
-    color: var(--p-surface-400, #94a3b8);
+    border-color: var(--lt-surface-700);
+    color: var(--lt-surface-400);
 }
 .dark .p-contextmenu-target-box:hover,
 [data-theme="dark"] .p-contextmenu-target-box:hover {
-    border-color: var(--p-primary-color, #10b981);
-    background: var(--p-surface-900, #0f172a);
+    border-color: var(--lt-primary-500);
+    background: var(--lt-surface-900);
 }
 `;
 
@@ -385,21 +385,21 @@ export default function ContextMenuIsland(container: HTMLElement, props: Context
 
             return `
                 <div class="flex justify-center" style="width: 100%;">
-                    <ul class="p-contextmenu-product-list" style="margin: 0 auto; list-style: none; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; width: 100%; max-width: 32rem; background: var(--p-surface-0);">
+                    <ul class="p-contextmenu-product-list" style="margin: 0 auto; list-style: none; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); padding: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; width: 100%; max-width: 32rem; background: var(--lt-surface-0);">
                         ${products.map(p => `
-                            <li class="p-contextmenu-product-item" data-product-id="${p.id}" style="padding: 0.5rem; border-radius: var(--p-border-radius); border: 2px solid transparent; transition: all 180ms ease; cursor: context-menu;">
+                            <li class="p-contextmenu-product-item" data-product-id="${p.id}" style="padding: 0.5rem; border-radius: var(--lt-radius); border: 2px solid transparent; transition: all 180ms ease; cursor: context-menu;">
                                 <div style="display: flex; align-items: center; gap: 1rem;">
-                                    <div style="width: 4rem; height: 3rem; border-radius: 6px; background: var(--p-surface-100); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.25rem;">
+                                    <div style="width: 4rem; height: 3rem; border-radius: 6px; background: var(--lt-surface-100); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.25rem;">
                                         ${getLucideIcon('package', 24)}
                                     </div>
                                     <div style="flex: 1; display: flex; flex-direction: column; gap: 0.25rem;">
-                                        <span style="font-weight: 700; font-size: 0.875rem; color: var(--p-text-color);">${p.name}</span>
+                                        <span style="font-weight: 700; font-size: 0.875rem; color: var(--lt-text-primary);">${p.name}</span>
                                         <div style="display: flex; align-items: center; gap: 0.35rem; color: var(--p-text-muted); font-size: 0.75rem;">
                                             <span>${getLucideIcon('tag', 12)}</span>
                                             <span>${p.category}</span>
                                         </div>
                                     </div>
-                                    <span style="font-weight: 700; font-size: 0.875rem; color: var(--p-text-color); margin-left: 1rem;">$${p.price}</span>
+                                    <span style="font-weight: 700; font-size: 0.875rem; color: var(--lt-text-primary); margin-left: 1rem;">$${p.price}</span>
                                 </div>
                             </li>
                         `).join('')}
@@ -419,14 +419,14 @@ export default function ContextMenuIsland(container: HTMLElement, props: Context
 
             return `
                 <div class="flex justify-center" style="width: 100%;">
-                    <ul class="p-contextmenu-user-list" style="margin: 0 auto; list-style: none; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; width: 100%; max-width: 26rem; background: var(--p-surface-0);">
+                    <ul class="p-contextmenu-user-list" style="margin: 0 auto; list-style: none; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); padding: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; width: 100%; max-width: 26rem; background: var(--lt-surface-0);">
                         ${users.map(u => `
-                            <li class="p-contextmenu-user-item" data-user-id="${u.id}" style="padding: 0.6rem 0.75rem; border-radius: var(--p-border-radius); border: 2px solid transparent; transition: all 180ms ease; display: flex; align-items: center; justify-content: space-between; cursor: context-menu;">
+                            <li class="p-contextmenu-user-item" data-user-id="${u.id}" style="padding: 0.6rem 0.75rem; border-radius: var(--lt-radius); border: 2px solid transparent; transition: all 180ms ease; display: flex; align-items: center; justify-content: space-between; cursor: context-menu;">
                                 <div style="display: flex; align-items: center; gap: 0.75rem;">
-                                    <div style="width: 2rem; height: 2rem; border-radius: 9999px; background: var(--p-primary-100); color: var(--p-primary-700); font-weight: 700; font-size: 0.75rem; display: flex; align-items: center; justify-content: center;">
+                                    <div style="width: 2rem; height: 2rem; border-radius: 9999px; background: var(--lt-primary-100); color: var(--lt-primary-700); font-weight: 700; font-size: 0.75rem; display: flex; align-items: center; justify-content: center;">
                                         ${u.name.split(' ').map(n => n[0]).join('')}
                                     </div>
-                                    <span style="font-weight: 600; font-size: 0.875rem; color: var(--p-text-color);">${u.name}</span>
+                                    <span style="font-weight: 600; font-size: 0.875rem; color: var(--lt-text-primary);">${u.name}</span>
                                 </div>
                                 <span class="aura-tag p-user-role-badge tag-${u.badge}">${u.role}</span>
                             </li>
@@ -439,8 +439,8 @@ export default function ContextMenuIsland(container: HTMLElement, props: Context
         if (demoType === 'router') {
             return `
                 <div style="display: flex; justify-content: center; width: 100%;">
-                    <div class="p-contextmenu-target-box p-contextmenu-router-target" style="width: 5rem; height: 5rem; border-radius: var(--p-border-radius); border: 2px solid var(--p-primary-color); display: flex; align-items: center; justify-content: center; cursor: context-menu;">
-                        <span style="color: var(--p-primary-color);">${getLucideIcon('shield', 36)}</span>
+                    <div class="p-contextmenu-target-box p-contextmenu-router-target" style="width: 5rem; height: 5rem; border-radius: var(--lt-radius); border: 2px solid var(--lt-primary-500); display: flex; align-items: center; justify-content: center; cursor: context-menu;">
+                        <span style="color: var(--lt-primary-500);">${getLucideIcon('shield', 36)}</span>
                     </div>
                 </div>
             `;
@@ -606,7 +606,7 @@ export default function ContextMenuIsland(container: HTMLElement, props: Context
                 e.stopPropagation();
 
                 container.querySelectorAll<HTMLElement>('.p-contextmenu-product-item').forEach(p => p.style.borderColor = 'transparent');
-                item.style.borderColor = 'var(--p-primary-color, #10b981)';
+                item.style.borderColor = 'var(--lt-primary-500)';
                 selectedTargetEl = item;
 
                 showMenu(e.clientX, e.clientY);
@@ -619,7 +619,7 @@ export default function ContextMenuIsland(container: HTMLElement, props: Context
                 e.stopPropagation();
 
                 container.querySelectorAll<HTMLElement>('.p-contextmenu-user-item').forEach(u => u.style.borderColor = 'transparent');
-                item.style.borderColor = 'var(--p-primary-color, #10b981)';
+                item.style.borderColor = 'var(--lt-primary-500)';
                 selectedTargetEl = item;
 
                 showMenu(e.clientX, e.clientY);

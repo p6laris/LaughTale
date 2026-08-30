@@ -106,14 +106,14 @@ const CAROUSEL_CSS = `
     width: 100%;
     font-size: 3rem;
     font-weight: 700;
-    background: var(--p-surface-50, #f8fafc);
-    color: var(--p-surface-950, #0f172a);
+    background: var(--lt-surface-50);
+    color: var(--lt-surface-950);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    border-radius: var(--p-border-radius, 12px);
-    border: 1px solid var(--p-border-color, #e2e8f0);
+    border-radius: var(--lt-radius);
+    border: 1px solid var(--lt-surface-200);
     box-sizing: border-box;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
     transition: background-color 200ms ease, border-color 200ms ease, transform 200ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 200ms ease;
@@ -125,9 +125,9 @@ const CAROUSEL_CSS = `
 
 .dark .p-carousel-card-num,
 [data-theme="dark"] .p-carousel-card-num {
-    background: var(--p-surface-950, #020617);
-    color: var(--p-surface-0, #ffffff);
-    border-color: var(--p-surface-800, #1e293b);
+    background: var(--lt-surface-950);
+    color: var(--lt-surface-0);
+    border-color: var(--lt-surface-800);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
@@ -157,7 +157,7 @@ const CAROUSEL_CSS = `
     width: var(--p-carousel-indicator-width, 1.75rem);
     height: var(--p-carousel-indicator-height, 0.375rem);
     border-radius: var(--p-carousel-indicator-border-radius, 9999px);
-    background: var(--p-carousel-indicator-background, var(--p-surface-200, #e2e8f0));
+    background: var(--p-carousel-indicator-background, var(--lt-surface-200));
     border: none;
     cursor: pointer;
     padding: 0;
@@ -169,15 +169,15 @@ const CAROUSEL_CSS = `
 
 .dark .p-carousel-indicator-button,
 [data-theme="dark"] .p-carousel-indicator-button {
-    background: var(--p-surface-700, #334155);
+    background: var(--lt-surface-700);
 }
 
 .p-carousel-indicator-button:hover {
-    background: var(--p-carousel-indicator-hover-background, var(--p-surface-400, #94a3b8));
+    background: var(--p-carousel-indicator-hover-background, var(--lt-surface-400));
 }
 
 .p-carousel-indicator-button.p-carousel-indicator-active {
-    background: var(--p-carousel-indicator-active-background, var(--p-primary-color, #10b981));
+    background: var(--p-carousel-indicator-active-background, var(--lt-primary-500));
     width: 2.5rem;
 }
 
@@ -198,9 +198,9 @@ const CAROUSEL_CSS = `
     width: 2.25rem;
     height: 2.25rem;
     border-radius: 9999px;
-    border: 1px solid var(--p-border-color, #e2e8f0);
-    background: var(--p-surface-0, #ffffff);
-    color: var(--p-text-muted, #64748b);
+    border: 1px solid var(--lt-surface-200);
+    background: var(--lt-surface-0);
+    color: var(--p-text-muted, var(--lt-surface-500));
     cursor: pointer;
     transition: background-color 180ms ease, color 180ms ease, opacity 180ms ease, transform 140ms cubic-bezier(0.16, 1, 0.3, 1);
     outline: none;
@@ -213,23 +213,23 @@ const CAROUSEL_CSS = `
 .dark .p-carousel-next,
 [data-theme="dark"] .p-carousel-prev,
 [data-theme="dark"] .p-carousel-next {
-    background: var(--p-surface-800, #1e293b);
-    border-color: var(--p-surface-700, #334155);
-    color: var(--p-surface-400, #94a3b8);
+    background: var(--lt-surface-800);
+    border-color: var(--lt-surface-700);
+    color: var(--lt-surface-400);
 }
 
 .p-carousel-prev:hover:not(:disabled),
 .p-carousel-next:hover:not(:disabled) {
-    background: var(--p-surface-100, #f1f5f9);
-    color: var(--p-text-color, #0f172a);
+    background: var(--lt-surface-100);
+    color: var(--lt-text-primary);
 }
 
 .dark .p-carousel-prev:hover:not(:disabled),
 .dark .p-carousel-next:hover:not(:disabled),
 [data-theme="dark"] .p-carousel-prev:hover:not(:disabled),
 [data-theme="dark"] .p-carousel-next:hover:not(:disabled) {
-    background: var(--p-surface-700, #334155);
-    color: var(--p-surface-0, #ffffff);
+    background: var(--lt-surface-700);
+    color: var(--lt-surface-0);
 }
 
 .p-carousel-prev:active:not(:disabled),
@@ -246,13 +246,13 @@ const CAROUSEL_CSS = `
 /* Gallery Thumbnails */
 .p-carousel-gallery-thumb {
     cursor: pointer;
-    border-radius: var(--p-border-radius, 8px);
+    border-radius: var(--lt-radius);
     overflow: hidden;
     transition: opacity 220ms ease, transform 220ms cubic-bezier(0.16, 1, 0.3, 1), border-color 220ms ease;
     border: 2px solid transparent;
 }
 .p-carousel-gallery-thumb.p-carousel-thumb-active {
-    border-color: var(--p-primary-color, #10b981);
+    border-color: var(--lt-primary-500);
     opacity: 1 !important;
 }
 .p-carousel-gallery-thumb:not(.p-carousel-thumb-active) {
@@ -371,7 +371,7 @@ export default function CarouselIsland(container: HTMLElement, props: CarouselPr
         container.innerHTML = `
             <div class="p-carousel-gallery-container" style="max-width: 42rem; margin: 0 auto; width: 100%;">
                 <!-- Main Stage Photo Carousel -->
-                <div class="p-carousel p-carousel-align-center" data-main-carousel style="width: 100%; border-radius: var(--p-border-radius, 12px); overflow: hidden; border: 1px solid var(--p-border-color);">
+                <div class="p-carousel p-carousel-align-center" data-main-carousel style="width: 100%; border-radius: var(--lt-radius); overflow: hidden; border: 1px solid var(--lt-surface-200);">
                     <div class="p-carousel-content" style="height: 396px; width: 100%;" data-main-content>
                         ${images.map((src, i) => `
                             <div class="p-carousel-item" style="width: 100%; height: 100%; flex-shrink: 0;" data-slide-index="${i}">

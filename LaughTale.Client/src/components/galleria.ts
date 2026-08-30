@@ -19,24 +19,24 @@ export interface GalleriaProps {
 
 const CSS = `
 [data-theme="dark"] .laughtale-galleria {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+    background: var(--lt-surface-900) !important;
+    color: var(--lt-surface-100) !important;
+    border-color: var(--lt-surface-700) !important;
 }
 [data-theme="dark"] .galleria-prev-btn {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+    background: var(--lt-surface-900) !important;
+    color: var(--lt-surface-100) !important;
+    border-color: var(--lt-surface-700) !important;
 }
 [data-theme="dark"] .galleria-next-btn {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+    background: var(--lt-surface-900) !important;
+    color: var(--lt-surface-100) !important;
+    border-color: var(--lt-surface-700) !important;
 }
 [data-theme="dark"] .galleria-thumb {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+    background: var(--lt-surface-900) !important;
+    color: var(--lt-surface-100) !important;
+    border-color: var(--lt-surface-700) !important;
 }
 `;
 
@@ -69,29 +69,29 @@ export default function GalleriaIsland(container: HTMLElement, props: GalleriaPr
         const current = images[activeIndex];
 
         container.innerHTML = `
-            <div class="laughtale-galleria" style="width: 100%; max-width: 640px; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); overflow: hidden; background: var(--p-surface-0); font-family: var(--p-font-family, inherit);">
+            <div class="laughtale-galleria" style="width: 100%; max-width: 640px; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius-lg); overflow: hidden; background: var(--lt-surface-0); font-family: var(--p-font-family, inherit);">
                 <!-- Main Image Stage -->
-                <div style="position: relative; width: 100%; height: 320px; background: var(--lt-surface-950, #020617); overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                <div style="position: relative; width: 100%; height: 320px; background: var(--lt-surface-950, var(--lt-surface-950)); overflow: hidden; display: flex; align-items: center; justify-content: center;">
                     <img src="${current.itemImageSrc}" alt="${current.alt}" style="width: 100%; height: 100%; object-fit: cover; transition: opacity 0.25s ease;" />
                     
                     <!-- Prev / Next Nav Buttons -->
-                    <button type="button" class="galleria-prev-btn" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); width: 2.25rem; height: 2.25rem; border-radius: 9999px; background: rgba(0,0,0,0.5); color: var(--lt-surface-0, #ffffff); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                    <button type="button" class="galleria-prev-btn" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); width: 2.25rem; height: 2.25rem; border-radius: 9999px; background: rgba(0,0,0,0.5); color: var(--lt-surface-0, var(--lt-surface-0)); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;">
                         <span style="transform: rotate(90deg); display: flex;">${LucideIcons.chevronDown}</span>
                     </button>
-                    <button type="button" class="galleria-next-btn" style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); width: 2.25rem; height: 2.25rem; border-radius: 9999px; background: rgba(0,0,0,0.5); color: var(--lt-surface-0, #ffffff); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                    <button type="button" class="galleria-next-btn" style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); width: 2.25rem; height: 2.25rem; border-radius: 9999px; background: rgba(0,0,0,0.5); color: var(--lt-surface-0, var(--lt-surface-0)); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;">
                         <span style="transform: rotate(-90deg); display: flex;">${LucideIcons.chevronDown}</span>
                     </button>
 
                     <!-- Caption Bar -->
-                    <div style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.8)); padding: 1rem; color: var(--lt-surface-0, #ffffff);">
+                    <div style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.8)); padding: 1rem; color: var(--lt-surface-0, var(--lt-surface-0));">
                         <div style="font-size: 0.875rem; font-weight: 700;">${current.title || current.alt}</div>
                     </div>
                 </div>
 
                 <!-- Thumbnail Strip -->
-                <div style="display: flex; gap: 0.5rem; padding: 0.75rem; background: var(--p-surface-50); overflow-x: auto;">
+                <div style="display: flex; gap: 0.5rem; padding: 0.75rem; background: var(--lt-surface-50); overflow-x: auto;">
                     ${images.map((img, idx) => `
-                        <div class="galleria-thumb ${idx === activeIndex ? 'active' : ''}" data-index="${idx}" style="flex: 0 0 72px; height: 48px; border-radius: 4px; overflow: hidden; border: ${idx === activeIndex ? '2px solid var(--p-primary-600)' : '2px solid transparent'}; cursor: pointer; opacity: ${idx === activeIndex ? '1' : '0.6'}; transition: all 0.15s ease;">
+                        <div class="galleria-thumb ${idx === activeIndex ? 'active' : ''}" data-index="${idx}" style="flex: 0 0 72px; height: 48px; border-radius: 4px; overflow: hidden; border: ${idx === activeIndex ? '2px solid var(--lt-primary-600)' : '2px solid transparent'}; cursor: pointer; opacity: ${idx === activeIndex ? '1' : '0.6'}; transition: all 0.15s ease;">
                             <img src="${img.thumbnailImageSrc}" alt="${img.alt}" style="width: 100%; height: 100%; object-fit: cover;" />
                         </div>
                     `).join('')}

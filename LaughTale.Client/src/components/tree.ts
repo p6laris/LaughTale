@@ -42,9 +42,9 @@ export interface TreeProps {
 const TREE_CSS = `
 .p-tree {
     position: relative;
-    background: var(--p-surface-0, #ffffff);
-    color: var(--p-surface-700, #334155);
-    border: 1px solid var(--p-surface-200, #e2e8f0);
+    background: var(--lt-surface-0);
+    color: var(--lt-surface-700);
+    border: 1px solid var(--lt-surface-200);
     border-radius: var(--p-border-radius-md, 6px);
     padding: 0.75rem;
     font-family: var(--p-font-family, inherit);
@@ -68,17 +68,17 @@ const TREE_CSS = `
     width: 100%;
     padding: 0.5rem 0.75rem 0.5rem 2.25rem;
     font-size: 0.875rem;
-    color: var(--p-surface-900, #0f172a);
-    background: var(--p-surface-0, #ffffff);
-    border: 1px solid var(--p-surface-300, #cbd5e1);
-    border-radius: var(--p-border-radius, 6px);
+    color: var(--lt-surface-900);
+    background: var(--lt-surface-0);
+    border: 1px solid var(--lt-surface-300);
+    border-radius: var(--lt-radius);
     outline: none;
     transition: border-color 0.2s, box-shadow 0.2s;
     box-sizing: border-box;
 }
 
 .p-tree-filter-input:focus {
-    border-color: var(--p-primary-500, #10b981);
+    border-color: var(--lt-primary-500);
     box-shadow: 0 0 0 2px var(--p-primary-100, rgba(16, 185, 129, 0.2));
 }
 
@@ -87,7 +87,7 @@ const TREE_CSS = `
     left: 0.75rem;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--p-surface-400, #94a3b8);
+    color: var(--lt-surface-400);
     pointer-events: none;
     display: flex;
     align-items: center;
@@ -113,7 +113,7 @@ const TREE_CSS = `
     display: flex;
     align-items: center;
     padding: 0.375rem 0.5rem;
-    border-radius: var(--p-border-radius-sm, 6px);
+    border-radius: var(--lt-radius-sm);
     cursor: pointer;
     user-select: none;
     transition: background-color 0.15s ease, color 0.15s ease;
@@ -122,18 +122,18 @@ const TREE_CSS = `
 }
 
 .p-tree-node-content:hover {
-    background-color: var(--p-surface-100, #f1f5f9);
-    color: var(--p-surface-900, #0f172a);
+    background-color: var(--lt-surface-100);
+    color: var(--lt-surface-900);
 }
 
 .p-tree-node-content.p-tree-node-selected {
-    background-color: var(--p-primary-50, #ecfdf5);
-    color: var(--p-primary-700, #047857);
+    background-color: var(--lt-primary-50);
+    color: var(--lt-primary-700);
     font-weight: 600;
 }
 
 .p-tree-node-content:focus-visible {
-    box-shadow: inset 0 0 0 2px var(--p-primary-500, #10b981);
+    box-shadow: inset 0 0 0 2px var(--lt-primary-500);
 }
 
 .p-tree-node-toggle-button {
@@ -146,15 +146,15 @@ const TREE_CSS = `
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    color: var(--p-surface-500, #64748b);
+    color: var(--lt-surface-500);
     transition: background-color 0.15s ease, transform 0.2s ease;
     flex-shrink: 0;
     padding: 0;
 }
 
 .p-tree-node-toggle-button:hover {
-    background-color: var(--p-surface-200, #e2e8f0);
-    color: var(--p-surface-900, #0f172a);
+    background-color: var(--lt-surface-200);
+    color: var(--lt-surface-900);
 }
 
 .p-tree-node-toggle-button.p-tree-node-toggle-placeholder {
@@ -174,8 +174,8 @@ const TREE_CSS = `
     width: 1.125rem;
     height: 1.125rem;
     border-radius: 4px;
-    border: 1px solid var(--p-surface-300, #cbd5e1);
-    background: var(--p-surface-0, #ffffff);
+    border: 1px solid var(--lt-surface-300);
+    background: var(--lt-surface-0);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -183,27 +183,27 @@ const TREE_CSS = `
 }
 
 .p-tree-checkbox-box.p-highlight {
-    background: var(--p-primary-500, #10b981);
-    border-color: var(--p-primary-500, #10b981);
-    color: var(--lt-surface-0, #ffffff);
+    background: var(--lt-primary-500);
+    border-color: var(--lt-primary-500);
+    color: var(--lt-surface-0, var(--lt-surface-0));
 }
 
 .p-tree-checkbox-box.p-indeterminate {
-    background: var(--p-primary-500, #10b981);
-    border-color: var(--p-primary-500, #10b981);
-    color: var(--lt-surface-0, #ffffff);
+    background: var(--lt-primary-500);
+    border-color: var(--lt-primary-500);
+    color: var(--lt-surface-0, var(--lt-surface-0));
 }
 
 .p-tree-node-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: var(--p-surface-500, #64748b);
+    color: var(--lt-surface-500);
     flex-shrink: 0;
 }
 
 .p-tree-node-content.p-tree-node-selected .p-tree-node-icon {
-    color: var(--p-primary-600, #059669);
+    color: var(--lt-primary-600);
 }
 
 .p-tree-node-label {
@@ -217,8 +217,8 @@ const TREE_CSS = `
     opacity: 0.4;
 }
 .p-tree-node-dragover {
-    background-color: var(--p-primary-50, #ecfdf5) !important;
-    border: 1px dashed var(--p-primary-500, #10b981) !important;
+    background-color: var(--lt-primary-50) !important;
+    border: 1px dashed var(--lt-primary-500) !important;
 }
 
 /* Loading Overlay */
@@ -247,13 +247,13 @@ const TREE_CSS = `
     width: 1rem;
     height: 1rem;
     border-radius: 50%;
-    background: var(--p-surface-200, #e2e8f0);
+    background: var(--lt-surface-200);
     animation: pSkeletonGlow 1.5s infinite;
 }
 .p-tree-skeleton-text {
     height: 0.875rem;
     border-radius: 4px;
-    background: var(--p-surface-200, #e2e8f0);
+    background: var(--lt-surface-200);
     animation: pSkeletonGlow 1.5s infinite;
 }
 @keyframes pSkeletonGlow {
@@ -264,30 +264,30 @@ const TREE_CSS = `
 /* Dark Mode Tokens */
 .dark .p-tree,
 [data-theme="dark"] .p-tree {
-    background: var(--p-surface-900, #0f172a) !important;
-    color: var(--p-surface-100, #f8fafc) !important;
-    border-color: var(--p-surface-700, #334155) !important;
+    background: var(--lt-surface-900) !important;
+    color: var(--lt-surface-100) !important;
+    border-color: var(--lt-surface-700) !important;
 }
 .dark .p-tree-filter-input,
 [data-theme="dark"] .p-tree-filter-input {
-    background: var(--p-surface-950, #020617) !important;
-    color: var(--p-surface-50, #f8fafc) !important;
-    border-color: var(--p-surface-700, #334155) !important;
+    background: var(--lt-surface-950) !important;
+    color: var(--lt-surface-50) !important;
+    border-color: var(--lt-surface-700) !important;
 }
 .dark .p-tree-node-content:hover,
 [data-theme="dark"] .p-tree-node-content:hover {
-    background-color: var(--p-surface-800, #1e293b) !important;
-    color: var(--p-surface-0, #ffffff) !important;
+    background-color: var(--lt-surface-800) !important;
+    color: var(--lt-surface-0) !important;
 }
 .dark .p-tree-node-content.p-tree-node-selected,
 [data-theme="dark"] .p-tree-node-content.p-tree-node-selected {
     background-color: rgba(16, 185, 129, 0.16) !important;
-    color: var(--p-primary-300, #6ee7b7) !important;
+    color: var(--lt-primary-300) !important;
 }
 .dark .p-tree-checkbox-box,
 [data-theme="dark"] .p-tree-checkbox-box {
-    background: var(--p-surface-950, #020617) !important;
-    border-color: var(--p-surface-700, #334155) !important;
+    background: var(--lt-surface-950) !important;
+    border-color: var(--lt-surface-700) !important;
 }
 .dark .p-tree-loading-overlay,
 [data-theme="dark"] .p-tree-loading-overlay {
@@ -620,10 +620,10 @@ export default function TreeIsland(container: HTMLElement, props: TreeProps, ctx
         if (showControls) {
             controlsHtml = `
                 <div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;">
-                    <button type="button" class="p-tree-expand-all p-button p-component p-button-outlined" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.35rem 0.75rem; font-size: 0.8125rem; font-weight: 600; border-radius: 6px; border: 1px solid var(--p-surface-300); background: var(--p-surface-0); cursor: pointer; color: var(--p-surface-700);">
+                    <button type="button" class="p-tree-expand-all p-button p-component p-button-outlined" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.35rem 0.75rem; font-size: 0.8125rem; font-weight: 600; border-radius: 6px; border: 1px solid var(--lt-surface-300); background: var(--lt-surface-0); cursor: pointer; color: var(--lt-surface-700);">
                         ${SVG_ICONS.plus} Expand All
                     </button>
-                    <button type="button" class="p-tree-collapse-all p-button p-component p-button-outlined" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.35rem 0.75rem; font-size: 0.8125rem; font-weight: 600; border-radius: 6px; border: 1px solid var(--p-surface-300); background: var(--p-surface-0); cursor: pointer; color: var(--p-surface-700);">
+                    <button type="button" class="p-tree-collapse-all p-button p-component p-button-outlined" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.35rem 0.75rem; font-size: 0.8125rem; font-weight: 600; border-radius: 6px; border: 1px solid var(--lt-surface-300); background: var(--lt-surface-0); cursor: pointer; color: var(--lt-surface-700);">
                         ${SVG_ICONS.minus} Collapse All
                     </button>
                 </div>
@@ -640,11 +640,11 @@ export default function TreeIsland(container: HTMLElement, props: TreeProps, ctx
             const isSome = (selectedCount > 0 || partialCount > 0) && !isAll;
 
             selectAllHtml = `
-                <div class="p-tree-select-all-header" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0.5rem 0.75rem 0.5rem; border-bottom: 1px solid var(--p-surface-200); margin-bottom: 0.5rem; cursor: pointer;">
+                <div class="p-tree-select-all-header" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0.5rem 0.75rem 0.5rem; border-bottom: 1px solid var(--lt-surface-200); margin-bottom: 0.5rem; cursor: pointer;">
                     <div class="p-tree-checkbox-box ${isAll ? 'p-highlight' : isSome ? 'p-indeterminate' : ''}">
                         ${isAll ? SVG_ICONS.check : isSome ? SVG_ICONS.minus : ''}
                     </div>
-                    <label style="font-weight: 600; font-size: 0.875rem; color: var(--p-surface-800); cursor: pointer;">Select All</label>
+                    <label style="font-weight: 600; font-size: 0.875rem; color: var(--lt-surface-800); cursor: pointer;">Select All</label>
                 </div>
             `;
         }
@@ -654,17 +654,17 @@ export default function TreeIsland(container: HTMLElement, props: TreeProps, ctx
         if (keyboardInfo) {
             const selectedCount = Object.values(multiSelectionKeys).filter(Boolean).length;
             keyboardBannerHtml = `
-                <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.65rem 0.85rem; border-radius: 6px; border: 1px solid var(--p-surface-200); background: var(--p-surface-50); margin-bottom: 0.75rem;">
-                    <span style="font-size: 0.8125rem; color: var(--p-surface-600);">
-                        <kbd style="padding: 0.15rem 0.4rem; font-size: 0.75rem; border-radius: 4px; background: var(--p-surface-200); font-family: monospace;">↑</kbd>
-                        <kbd style="padding: 0.15rem 0.4rem; font-size: 0.75rem; border-radius: 4px; background: var(--p-surface-200); font-family: monospace;">↓</kbd> navigate,
-                        <kbd style="padding: 0.15rem 0.4rem; font-size: 0.75rem; border-radius: 4px; background: var(--p-surface-200); font-family: monospace;">→</kbd> expand,
-                        <kbd style="padding: 0.15rem 0.4rem; font-size: 0.75rem; border-radius: 4px; background: var(--p-surface-200); font-family: monospace;">←</kbd> collapse,
-                        <kbd style="padding: 0.15rem 0.4rem; font-size: 0.75rem; border-radius: 4px; background: var(--p-surface-200); font-family: monospace;">Space</kbd> select
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.65rem 0.85rem; border-radius: 6px; border: 1px solid var(--lt-surface-200); background: var(--lt-surface-50); margin-bottom: 0.75rem;">
+                    <span style="font-size: 0.8125rem; color: var(--lt-surface-600);">
+                        <kbd style="padding: 0.15rem 0.4rem; font-size: 0.75rem; border-radius: 4px; background: var(--lt-surface-200); font-family: monospace;">↑</kbd>
+                        <kbd style="padding: 0.15rem 0.4rem; font-size: 0.75rem; border-radius: 4px; background: var(--lt-surface-200); font-family: monospace;">↓</kbd> navigate,
+                        <kbd style="padding: 0.15rem 0.4rem; font-size: 0.75rem; border-radius: 4px; background: var(--lt-surface-200); font-family: monospace;">→</kbd> expand,
+                        <kbd style="padding: 0.15rem 0.4rem; font-size: 0.75rem; border-radius: 4px; background: var(--lt-surface-200); font-family: monospace;">←</kbd> collapse,
+                        <kbd style="padding: 0.15rem 0.4rem; font-size: 0.75rem; border-radius: 4px; background: var(--lt-surface-200); font-family: monospace;">Space</kbd> select
                     </span>
                     <div style="display: flex; align-items: center; gap: 0.4rem;">
-                        <span style="font-size: 0.8125rem; font-weight: 600; color: var(--p-surface-700);">Selected</span>
-                        <span style="font-size: 0.75rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 9999px; background: ${selectedCount ? 'var(--p-primary-500)' : 'var(--p-surface-300)'}; color: var(--lt-surface-0, #ffffff);">${selectedCount}</span>
+                        <span style="font-size: 0.8125rem; font-weight: 600; color: var(--lt-surface-700);">Selected</span>
+                        <span style="font-size: 0.75rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 9999px; background: ${selectedCount ? 'var(--lt-primary-500)' : 'var(--lt-surface-300)'}; color: var(--lt-surface-0, var(--lt-surface-0));">${selectedCount}</span>
                     </div>
                 </div>
             `;
@@ -686,7 +686,7 @@ export default function TreeIsland(container: HTMLElement, props: TreeProps, ctx
         if (isLoading && props.loadingMode !== 'icon') {
             loadingOverlayHtml = `
                 <div class="p-tree-loading-overlay">
-                    <span style="color: var(--p-primary-500);">${SVG_ICONS.spinner}</span>
+                    <span style="color: var(--lt-primary-500);">${SVG_ICONS.spinner}</span>
                 </div>
             `;
         }
@@ -706,18 +706,18 @@ export default function TreeIsland(container: HTMLElement, props: TreeProps, ctx
             `;
         } else if (displayNodes.length === 0) {
             if (filterQuery) {
-                treeBodyHtml = `<div style="padding: 1rem; text-align: center; color: var(--p-surface-500); font-size: 0.875rem;">No options found.</div>`;
+                treeBodyHtml = `<div style="padding: 1rem; text-align: center; color: var(--lt-surface-500); font-size: 0.875rem;">No options found.</div>`;
             } else {
                 treeBodyHtml = `
                     <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.75rem; padding: 2.5rem 1rem; text-align: center;">
-                        <div style="width: 3.5rem; height: 3.5rem; border-radius: 9999px; background: var(--p-surface-100); display: flex; align-items: center; justify-content: center; color: var(--p-surface-400);">
+                        <div style="width: 3.5rem; height: 3.5rem; border-radius: 9999px; background: var(--lt-surface-100); display: flex; align-items: center; justify-content: center; color: var(--lt-surface-400);">
                             <span style="transform: scale(1.4);">${SVG_ICONS.folder}</span>
                         </div>
                         <div>
-                            <p style="margin: 0; font-weight: 700; color: var(--p-surface-900); font-size: 0.9375rem;">No folders yet</p>
-                            <p style="margin: 0.25rem 0 0 0; font-size: 0.8125rem; color: var(--p-surface-500);">Create your first folder to start building a tree.</p>
+                            <p style="margin: 0; font-weight: 700; color: var(--lt-surface-900); font-size: 0.9375rem;">No folders yet</p>
+                            <p style="margin: 0.25rem 0 0 0; font-size: 0.8125rem; color: var(--lt-surface-500);">Create your first folder to start building a tree.</p>
                         </div>
-                        <button type="button" class="p-tree-add-node-btn p-button p-component p-button-sm" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.4rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: 6px; background: var(--p-primary-500); color: var(--lt-surface-0, #ffffff); border: none; cursor: pointer;">
+                        <button type="button" class="p-tree-add-node-btn p-button p-component p-button-sm" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.4rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: 6px; background: var(--lt-primary-500); color: var(--lt-surface-0, var(--lt-surface-0)); border: none; cursor: pointer;">
                             ${SVG_ICONS.plus} New Folder
                         </button>
                     </div>

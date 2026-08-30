@@ -16,9 +16,9 @@ const SVG_ICONS = {
 
 const PANEL_CSS = `
 .p-panel {
-    border: 1px solid var(--p-border-color, #e2e8f0);
-    background: var(--p-surface-0, #ffffff);
-    color: var(--p-text-color, #0f172a);
+    border: 1px solid var(--lt-surface-200);
+    background: var(--lt-surface-0);
+    color: var(--lt-text-primary);
     border-radius: var(--p-border-radius-md, 6px);
     overflow: hidden;
     box-sizing: border-box;
@@ -31,9 +31,9 @@ const PANEL_CSS = `
     align-items: center;
     justify-content: space-between;
     padding: 0.875rem 1.125rem;
-    background: var(--p-surface-0, #ffffff);
-    color: var(--p-text-color, #0f172a);
-    border-bottom: 1px solid var(--p-border-color, #e2e8f0);
+    background: var(--lt-surface-0);
+    color: var(--lt-text-primary);
+    border-bottom: 1px solid var(--lt-surface-200);
     box-sizing: border-box;
     transition: border-color 0.2s ease;
 }
@@ -45,7 +45,7 @@ const PANEL_CSS = `
     font-weight: 700;
     font-size: 1rem;
     line-height: 1.25;
-    color: var(--p-text-color, #0f172a);
+    color: var(--lt-text-primary);
 }
 
 .p-panel-icons {
@@ -58,9 +58,9 @@ const PANEL_CSS = `
     width: 2rem;
     height: 2rem;
     border-radius: 9999px;
-    border: 1px solid var(--p-border-color, #e2e8f0);
-    background: var(--p-surface-0, #ffffff);
-    color: var(--p-surface-600, #475569);
+    border: 1px solid var(--lt-surface-200);
+    background: var(--lt-surface-0);
+    color: var(--lt-surface-600);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -71,12 +71,12 @@ const PANEL_CSS = `
     box-sizing: border-box;
 }
 .p-panel-toggle-button:hover {
-    background: var(--p-surface-100, #f1f5f9);
-    color: var(--p-surface-900, #0f172a);
-    border-color: var(--p-surface-300, #cbd5e1);
+    background: var(--lt-surface-100);
+    color: var(--lt-surface-900);
+    border-color: var(--lt-surface-300);
 }
 .p-panel-toggle-button:focus-visible {
-    outline: 2px solid var(--p-primary-500, #10b981);
+    outline: 2px solid var(--lt-primary-500);
     outline-offset: 1px;
 }
 
@@ -110,7 +110,7 @@ const PANEL_CSS = `
     padding: 1.125rem;
     font-size: 0.875rem;
     line-height: 1.6;
-    color: var(--p-surface-700, #334155);
+    color: var(--lt-surface-700);
     transition: opacity 200ms ease, transform 200ms ease;
     opacity: 1;
     transform: translateY(0);
@@ -122,9 +122,9 @@ const PANEL_CSS = `
 
 .p-panel-footer {
     padding: 0.75rem 1.125rem;
-    border-top: 1px solid var(--p-border-color, #e2e8f0);
-    background: var(--p-surface-0, #ffffff);
-    color: var(--p-text-muted, #64748b);
+    border-top: 1px solid var(--lt-surface-200);
+    background: var(--lt-surface-0);
+    color: var(--p-text-muted, var(--lt-surface-500));
     font-size: 0.8125rem;
 }
 
@@ -140,68 +140,68 @@ const PANEL_CSS = `
     font-size: 0.875rem;
     font-weight: 600;
     border-radius: 6px;
-    border: 1px solid var(--p-surface-300, #cbd5e1);
-    background: var(--p-surface-0, #ffffff);
-    color: var(--p-surface-700, #334155);
+    border: 1px solid var(--lt-surface-300);
+    background: var(--lt-surface-0);
+    color: var(--lt-surface-700);
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
 }
 .p-panel-ctrl-btn:hover {
-    background: var(--p-surface-100, #f1f5f9);
+    background: var(--lt-surface-100);
 }
 .p-panel-ctrl-btn.p-highlight {
-    background: var(--p-surface-900, #0f172a);
-    border-color: var(--p-surface-900, #0f172a);
-    color: var(--lt-surface-0, #ffffff);
+    background: var(--lt-surface-900);
+    border-color: var(--lt-surface-900);
+    color: var(--lt-surface-0, var(--lt-surface-0));
 }
 
 /* Dark Mode Tokens */
 .dark .p-panel,
 [data-theme="dark"] .p-panel {
-    background: var(--p-surface-900, #0f172a) !important;
-    border-color: var(--p-surface-700, #334155) !important;
-    color: var(--p-surface-100, #f8fafc) !important;
+    background: var(--lt-surface-900) !important;
+    border-color: var(--lt-surface-700) !important;
+    color: var(--lt-surface-100) !important;
 }
 .dark .p-panel-header,
 [data-theme="dark"] .p-panel-header {
-    background: var(--p-surface-900, #0f172a) !important;
-    border-color: var(--p-surface-700, #334155) !important;
+    background: var(--lt-surface-900) !important;
+    border-color: var(--lt-surface-700) !important;
 }
 .dark .p-panel-title,
 [data-theme="dark"] .p-panel-title {
-    color: var(--p-surface-0, #ffffff) !important;
+    color: var(--lt-surface-0) !important;
 }
 .dark .p-panel-toggle-button,
 [data-theme="dark"] .p-panel-toggle-button {
-    background: var(--p-surface-900, #0f172a) !important;
-    border-color: var(--p-surface-700, #334155) !important;
-    color: var(--p-surface-300, #cbd5e1) !important;
+    background: var(--lt-surface-900) !important;
+    border-color: var(--lt-surface-700) !important;
+    color: var(--lt-surface-300) !important;
 }
 .dark .p-panel-toggle-button:hover,
 [data-theme="dark"] .p-panel-toggle-button:hover {
-    background: var(--p-surface-800, #1e293b) !important;
+    background: var(--lt-surface-800) !important;
 }
 .dark .p-panel-content,
 [data-theme="dark"] .p-panel-content {
-    color: var(--p-surface-300, #cbd5e1) !important;
+    color: var(--lt-surface-300) !important;
 }
 .dark .p-panel-footer,
 [data-theme="dark"] .p-panel-footer {
-    background: var(--p-surface-900, #0f172a) !important;
-    border-color: var(--p-surface-700, #334155) !important;
-    color: var(--p-surface-400, #94a3b8) !important;
+    background: var(--lt-surface-900) !important;
+    border-color: var(--lt-surface-700) !important;
+    color: var(--lt-surface-400) !important;
 }
 .dark .p-panel-ctrl-btn,
 [data-theme="dark"] .p-panel-ctrl-btn {
-    background: var(--p-surface-900, #0f172a) !important;
-    border-color: var(--p-surface-700, #334155) !important;
-    color: var(--p-surface-200, #e2e8f0) !important;
+    background: var(--lt-surface-900) !important;
+    border-color: var(--lt-surface-700) !important;
+    color: var(--lt-surface-200) !important;
 }
 .dark .p-panel-ctrl-btn.p-highlight,
 [data-theme="dark"] .p-panel-ctrl-btn.p-highlight {
-    background: var(--p-surface-0, #ffffff) !important;
-    border-color: var(--p-surface-0, #ffffff) !important;
-    color: var(--p-surface-900, #0f172a) !important;
+    background: var(--lt-surface-0) !important;
+    border-color: var(--lt-surface-0) !important;
+    color: var(--lt-surface-900) !important;
 }
 `;
 

@@ -23,9 +23,9 @@ export interface MeterGroupProps {
 
 const CSS = `
 [data-theme="dark"] .laughtale-meter-group {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+    background: var(--lt-surface-900) !important;
+    color: var(--lt-surface-100) !important;
+    border-color: var(--lt-surface-700) !important;
 }
 `;
 
@@ -43,17 +43,17 @@ export default function MeterGroupIsland(container: HTMLElement, props: MeterGro
     const legendItems = props.values.map((v) => `
         <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem;">
             <div style="width: 0.625rem; height: 0.625rem; border-radius: 50%; background: ${v.color}; flex-shrink: 0;"></div>
-            <span style="color: var(--p-surface-600);">${v.label}</span>
-            <span style="font-weight: 700; color: var(--p-surface-900); font-family: var(--p-font-mono);">${v.value}%</span>
+            <span style="color: var(--lt-surface-600);">${v.label}</span>
+            <span style="font-weight: 700; color: var(--lt-surface-900); font-family: var(--p-font-mono);">${v.value}%</span>
         </div>
     `).join('');
 
     container.innerHTML = `
         <div class="laughtale-metergroup" style="display: flex; flex-direction: column; gap: 0.75rem; width: 100%;">
-            ${props.title ? `<div style="font-size: 0.875rem; font-weight: 700; color: var(--p-surface-900);">${props.title}</div>` : ''}
+            ${props.title ? `<div style="font-size: 0.875rem; font-weight: 700; color: var(--lt-surface-900);">${props.title}</div>` : ''}
             
             <!-- Meter Track -->
-            <div style="display: flex; height: 0.75rem; border-radius: 9999px; overflow: hidden; background: var(--p-surface-100); border: 1px solid var(--p-border-color); gap: 2px;">
+            <div style="display: flex; height: 0.75rem; border-radius: 9999px; overflow: hidden; background: var(--lt-surface-100); border: 1px solid var(--lt-surface-200); gap: 2px;">
                 ${barSegments}
             </div>
 

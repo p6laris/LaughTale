@@ -31,7 +31,7 @@ const ORGCHART_CSS = `
     overflow-x: auto;
     font-family: var(--p-font-family, inherit);
     padding: 1.5rem 0.5rem;
-    color: var(--p-surface-800, #1e293b);
+    color: var(--lt-surface-800);
 }
 
 .p-organizationchart-table {
@@ -53,9 +53,9 @@ const ORGCHART_CSS = `
     align-items: center;
     justify-content: center;
     position: relative;
-    background: var(--p-surface-0, #ffffff);
-    border: 1px solid var(--p-surface-200, #e2e8f0);
-    border-radius: var(--p-border-radius-lg, 8px);
+    background: var(--lt-surface-0);
+    border: 1px solid var(--lt-surface-200);
+    border-radius: var(--lt-radius-lg);
     padding: 0.75rem 1.25rem;
     min-width: 9.5rem;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
@@ -68,15 +68,15 @@ const ORGCHART_CSS = `
     cursor: pointer;
 }
 .p-organizationchart-node.p-organizationchart-selectable:hover:not(.p-highlight) {
-    background: var(--p-surface-50, #f8fafc);
-    border-color: var(--p-surface-300, #cbd5e1);
+    background: var(--lt-surface-50);
+    border-color: var(--lt-surface-300);
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
 }
 
 .p-organizationchart-node.p-highlight {
     background: rgba(16, 185, 129, 0.08) !important;
-    border-color: var(--p-primary-500, #10b981) !important;
-    color: var(--p-primary-700, #047857) !important;
+    border-color: var(--lt-primary-500) !important;
+    color: var(--lt-primary-700) !important;
     font-weight: 600;
 }
 
@@ -96,12 +96,12 @@ const ORGCHART_CSS = `
 .p-organizationchart-line-down {
     width: 1px;
     height: 20px;
-    background-color: var(--p-surface-300, #cbd5e1);
+    background-color: var(--lt-surface-300);
     margin: 0 auto;
 }
 
 .p-organizationchart-line-left {
-    border-right: 1px solid var(--p-surface-300, #cbd5e1);
+    border-right: 1px solid var(--lt-surface-300);
 }
 
 .p-organizationchart-line-right {
@@ -109,7 +109,7 @@ const ORGCHART_CSS = `
 }
 
 .p-organizationchart-line-top {
-    border-top: 1px solid var(--p-surface-300, #cbd5e1);
+    border-top: 1px solid var(--lt-surface-300);
 }
 
 /* Toggle / Collapse Button */
@@ -121,9 +121,9 @@ const ORGCHART_CSS = `
     width: 1.375rem;
     height: 1.375rem;
     border-radius: 9999px;
-    background: var(--p-surface-0, #ffffff);
-    border: 1px solid var(--p-surface-300, #cbd5e1);
-    color: var(--p-surface-600, #475569);
+    background: var(--lt-surface-0);
+    border: 1px solid var(--lt-surface-300);
+    color: var(--lt-surface-600);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -135,9 +135,9 @@ const ORGCHART_CSS = `
     transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
 }
 .p-organizationchart-node-toggle-button:hover {
-    background: var(--p-surface-100, #f1f5f9);
-    border-color: var(--p-primary-500, #10b981);
-    color: var(--p-primary-600, #059669);
+    background: var(--lt-surface-100);
+    border-color: var(--lt-primary-500);
+    color: var(--lt-primary-600);
 }
 
 /* Checkbox */
@@ -148,22 +148,22 @@ const ORGCHART_CSS = `
     width: 1.125rem;
     height: 1.125rem;
     border-radius: var(--p-border-radius-xs, 4px);
-    border: 2px solid var(--p-surface-300, #cbd5e1);
-    background: var(--p-surface-0, #ffffff);
+    border: 2px solid var(--lt-surface-300);
+    background: var(--lt-surface-0);
     cursor: pointer;
     transition: background-color 0.12s ease, border-color 0.12s ease;
     flex-shrink: 0;
     margin-right: 0.625rem;
 }
 .p-checkbox-box.p-checked {
-    background: var(--p-primary-500, #10b981);
-    border-color: var(--p-primary-500, #10b981);
-    color: var(--lt-surface-0, #ffffff);
+    background: var(--lt-primary-500);
+    border-color: var(--lt-primary-500);
+    color: var(--lt-surface-0, var(--lt-surface-0));
 }
 .p-checkbox-box.p-indeterminate {
-    background: var(--p-primary-500, #10b981);
-    border-color: var(--p-primary-500, #10b981);
-    color: var(--lt-surface-0, #ffffff);
+    background: var(--lt-primary-500);
+    border-color: var(--lt-primary-500);
+    color: var(--lt-surface-0, var(--lt-surface-0));
 }
 
 /* Custom Card Content */
@@ -177,8 +177,8 @@ const ORGCHART_CSS = `
     width: 2.25rem;
     height: 2.25rem;
     border-radius: 9999px;
-    background: var(--p-primary-100, #d1fae5);
-    color: var(--p-primary-700, #047857);
+    background: var(--lt-primary-100);
+    color: var(--lt-primary-700);
     font-weight: 700;
     font-size: 0.8125rem;
     display: flex;
@@ -203,36 +203,36 @@ const ORGCHART_CSS = `
 .p-orgchart-label {
     font-weight: 600;
     font-size: 0.875rem;
-    color: var(--p-surface-900, #0f172a);
+    color: var(--lt-surface-900);
     line-height: 1.25;
 }
 .p-orgchart-desc {
     font-size: 0.75rem;
-    color: var(--p-surface-500, #64748b);
+    color: var(--lt-surface-500);
     line-height: 1.2;
 }
 
 /* Dark Mode Tokens */
 .dark .p-organizationchart,
 [data-theme="dark"] .p-organizationchart {
-    color: var(--p-surface-100, #f1f5f9) !important;
+    color: var(--lt-surface-100) !important;
 }
 .dark .p-organizationchart-node,
 [data-theme="dark"] .p-organizationchart-node {
-    background: var(--p-surface-900, #0f172a) !important;
-    border-color: var(--p-surface-700, #334155) !important;
-    color: var(--p-surface-100, #f1f5f9) !important;
+    background: var(--lt-surface-900) !important;
+    border-color: var(--lt-surface-700) !important;
+    color: var(--lt-surface-100) !important;
 }
 .dark .p-organizationchart-node.p-organizationchart-selectable:hover:not(.p-highlight),
 [data-theme="dark"] .p-organizationchart-node.p-organizationchart-selectable:hover:not(.p-highlight) {
-    background: var(--p-surface-800, #1e293b) !important;
-    border-color: var(--p-surface-600, #475569) !important;
+    background: var(--lt-surface-800) !important;
+    border-color: var(--lt-surface-600) !important;
 }
 .dark .p-organizationchart-node.p-highlight,
 [data-theme="dark"] .p-organizationchart-node.p-highlight {
     background: rgba(16, 185, 129, 0.15) !important;
-    border-color: var(--p-primary-500, #10b981) !important;
-    color: var(--p-primary-400, #34d399) !important;
+    border-color: var(--lt-primary-500) !important;
+    color: var(--lt-primary-400) !important;
 }
 .dark .p-organizationchart-line-down,
 .dark .p-organizationchart-line-left,
@@ -240,22 +240,22 @@ const ORGCHART_CSS = `
 [data-theme="dark"] .p-organizationchart-line-down,
 [data-theme="dark"] .p-organizationchart-line-left,
 [data-theme="dark"] .p-organizationchart-line-top {
-    background-color: var(--p-surface-700, #334155) !important;
-    border-color: var(--p-surface-700, #334155) !important;
+    background-color: var(--lt-surface-700) !important;
+    border-color: var(--lt-surface-700) !important;
 }
 .dark .p-organizationchart-node-toggle-button,
 [data-theme="dark"] .p-organizationchart-node-toggle-button {
-    background: var(--p-surface-800, #1e293b) !important;
-    border-color: var(--p-surface-600, #475569) !important;
-    color: var(--p-surface-300, #cbd5e1) !important;
+    background: var(--lt-surface-800) !important;
+    border-color: var(--lt-surface-600) !important;
+    color: var(--lt-surface-300) !important;
 }
 .dark .p-orgchart-label,
 [data-theme="dark"] .p-orgchart-label {
-    color: var(--p-surface-100, #f1f5f9) !important;
+    color: var(--lt-surface-100) !important;
 }
 .dark .p-orgchart-desc,
 [data-theme="dark"] .p-orgchart-desc {
-    color: var(--p-surface-400, #94a3b8) !important;
+    color: var(--lt-surface-400) !important;
 }
 `;
 
@@ -381,7 +381,7 @@ export default function OrgChartIsland<T = any>(container: HTMLElement, props: O
                     <div class="p-orgchart-avatar">${initials}</div>
                     <div class="p-orgchart-details">
                         <span class="p-orgchart-label">${node.label}</span>
-                        ${node.title ? `<span class="p-orgchart-desc" style="color: var(--p-primary-600); font-weight: 600;">${node.title}</span>` : ''}
+                        ${node.title ? `<span class="p-orgchart-desc" style="color: var(--lt-primary-600); font-weight: 600;">${node.title}</span>` : ''}
                     </div>
                 </div>
             `;

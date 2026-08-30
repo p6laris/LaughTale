@@ -23,9 +23,9 @@ export interface AvatarGroupProps {
 
 const CSS = `
 [data-theme="dark"] .laughtale-avatar-group {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+    background: var(--lt-surface-900) !important;
+    color: var(--lt-surface-100) !important;
+    border-color: var(--lt-surface-700) !important;
 }
 `;
 
@@ -39,9 +39,9 @@ export default function AvatarGroupIsland(container: HTMLElement, props: AvatarG
     const fontSize = props.size === 'sm' ? '0.6875rem' : props.size === 'lg' ? '0.9375rem' : '0.75rem';
 
     const avatarElements = visible.map((av) => {
-        const bg = av.bg || 'var(--p-surface-800)';
+        const bg = av.bg || 'var(--lt-surface-800)';
         return `
-            <div class="avatar-circle" title="${av.name || av.label || ''}" style="width: ${sizePx}; height: ${sizePx}; border-radius: 50%; border: 2px solid var(--lt-surface-0, #ffffff); background: ${bg}; color: var(--lt-surface-0, #ffffff); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: ${fontSize}; margin-left: -0.5rem; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.1); flex-shrink: 0;">
+            <div class="avatar-circle" title="${av.name || av.label || ''}" style="width: ${sizePx}; height: ${sizePx}; border-radius: 50%; border: 2px solid var(--lt-surface-0, var(--lt-surface-0)); background: ${bg}; color: var(--lt-surface-0, var(--lt-surface-0)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: ${fontSize}; margin-left: -0.5rem; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.1); flex-shrink: 0;">
                 ${av.image ? `<img src="${av.image}" alt="${av.name || ''}" style="width: 100%; height: 100%; object-fit: cover;" />` : (av.label || 'U')}
             </div>
         `;
@@ -51,7 +51,7 @@ export default function AvatarGroupIsland(container: HTMLElement, props: AvatarG
         <div class="laughtale-avatar-group" style="display: inline-flex; align-items: center; padding-left: 0.5rem;">
             ${avatarElements}
             ${overflowCount > 0 ? `
-                <div class="avatar-overflow" style="width: ${sizePx}; height: ${sizePx}; border-radius: 50%; border: 2px solid var(--lt-surface-0, #ffffff); background: var(--p-surface-200); color: var(--p-surface-700); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: ${fontSize}; margin-left: -0.5rem; box-shadow: 0 1px 2px rgba(0,0,0,0.1); flex-shrink: 0;">
+                <div class="avatar-overflow" style="width: ${sizePx}; height: ${sizePx}; border-radius: 50%; border: 2px solid var(--lt-surface-0, var(--lt-surface-0)); background: var(--lt-surface-200); color: var(--lt-surface-700); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: ${fontSize}; margin-left: -0.5rem; box-shadow: 0 1px 2px rgba(0,0,0,0.1); flex-shrink: 0;">
                     +${overflowCount}
                 </div>
             ` : ''}

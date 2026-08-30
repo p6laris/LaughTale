@@ -39,10 +39,10 @@ const CSS = `
     justify-content: center;
     gap: 0.5rem;
     padding: 0.5rem 1rem;
-    background: var(--p-surface-0, #ffffff);
-    border: 1px solid var(--p-border-color, #cbd5e1);
-    border-radius: var(--p-border-radius, 6px);
-    color: var(--p-text-color, #0f172a);
+    background: var(--lt-surface-0);
+    border: 1px solid var(--lt-surface-200);
+    border-radius: var(--lt-radius);
+    color: var(--lt-text-primary);
     font-family: var(--p-font-family, inherit);
     font-size: 0.875rem;
     font-weight: 500;
@@ -61,27 +61,27 @@ const CSS = `
 }
 
 .p-togglebutton:hover:not(.p-disabled):not(.p-togglebutton-checked) {
-    background: var(--p-surface-100, #f1f5f9);
-    border-color: var(--p-surface-400, #94a3b8);
+    background: var(--lt-surface-100);
+    border-color: var(--lt-surface-400);
 }
 
 .p-togglebutton:focus-visible:not(.p-disabled) {
-    border-color: var(--p-primary-500, #10b981) !important;
-    box-shadow: 0 0 0 1px var(--p-primary-500, #10b981) !important;
+    border-color: var(--lt-primary-500) !important;
+    box-shadow: 0 0 0 1px var(--lt-primary-500) !important;
 }
 
 /* Checked (On) State */
 .p-togglebutton.p-togglebutton-checked,
 .p-togglebutton.is-checked {
-    background: var(--p-primary-50, #ecfdf5);
-    border-color: var(--p-primary-500, #10b981);
-    color: var(--p-primary-700, #047857);
+    background: var(--lt-primary-50);
+    border-color: var(--lt-primary-500);
+    color: var(--lt-primary-700);
     font-weight: 600;
 }
 
 .p-togglebutton.p-togglebutton-checked:hover:not(.p-disabled),
 .p-togglebutton.is-checked:hover:not(.p-disabled) {
-    background: var(--p-primary-100, #d1fae5);
+    background: var(--lt-primary-100);
 }
 
 /* Sizes */
@@ -102,11 +102,11 @@ const CSS = `
 /* Invalid State */
 .p-togglebutton.p-invalid,
 .p-togglebutton.is-invalid {
-    border-color: var(--p-red-500, #ef4444) !important;
+    border-color: var(--p-red-500, var(--lt-danger-500)) !important;
 }
 .p-togglebutton.p-invalid:focus-visible,
 .p-togglebutton.is-invalid:focus-visible {
-    box-shadow: 0 0 0 1px var(--p-red-500, #ef4444) !important;
+    box-shadow: 0 0 0 1px var(--p-red-500, var(--lt-danger-500)) !important;
 }
 
 /* Disabled State */
@@ -114,9 +114,9 @@ const CSS = `
 .p-togglebutton.p-disabled {
     opacity: 0.6;
     cursor: not-allowed;
-    background: var(--p-surface-100, #f1f5f9);
-    border-color: var(--p-surface-300, #cbd5e1);
-    color: var(--p-text-muted, #64748b);
+    background: var(--lt-surface-100);
+    border-color: var(--lt-surface-300);
+    color: var(--p-text-muted, var(--lt-surface-500));
     pointer-events: none;
 }
 
@@ -135,30 +135,30 @@ const CSS = `
 
 /* ==================== DARK MODE ==================== */
 .dark .p-togglebutton {
-    background: var(--p-surface-900, #0f172a);
-    border-color: var(--p-surface-700, #334155);
-    color: var(--p-surface-0, #f8fafc);
+    background: var(--lt-surface-900);
+    border-color: var(--lt-surface-700);
+    color: var(--lt-surface-0);
 }
 .dark .p-togglebutton:hover:not(.p-disabled):not(.p-togglebutton-checked) {
-    background: var(--p-surface-800, #1e293b);
-    border-color: var(--p-surface-500, #64748b);
+    background: var(--lt-surface-800);
+    border-color: var(--lt-surface-500);
 }
 .dark .p-togglebutton.p-togglebutton-checked,
 .dark .p-togglebutton.is-checked {
     background: rgba(16, 185, 129, 0.16);
-    border-color: var(--p-primary-500, #10b981);
-    color: var(--p-primary-300, #6ee7b7);
+    border-color: var(--lt-primary-500);
+    color: var(--lt-primary-300);
 }
 .dark .p-togglebutton.p-togglebutton-checked:hover:not(.p-disabled),
 .dark .p-togglebutton.is-checked:hover:not(.p-disabled) {
     background: rgba(16, 185, 129, 0.24);
-    color: var(--p-primary-200, #a7f3d0);
+    color: var(--lt-primary-200);
 }
 .dark .p-togglebutton:disabled,
 .dark .p-togglebutton.p-disabled {
-    background: var(--p-surface-850, #141b26);
-    border-color: var(--p-surface-700, #334155);
-    color: var(--p-surface-500, #64748b);
+    background: var(--lt-surface-850);
+    border-color: var(--lt-surface-700);
+    color: var(--lt-surface-500);
 }
 `;
 

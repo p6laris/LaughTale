@@ -34,6 +34,15 @@ for (const file of files) {
         console.error(`❌ [${file}] Missing pt?: PassthroughRecord customization contract.`);
         errors++;
     }
+
+    // Rule 3: Token Purity - Zero hardcoded hex colors (LT-1304)
+    if (file !== 'theme-studio.ts') {
+        const hexMatches = content.match(/#[0-9a-fA-F]{3,8}\b/g);
+        if (hexMatches && hexMatches.length > 0) {
+            console.error(`❌ [${file}] Contains ${hexMatches.length} hardcoded hex literal(s): ${hexMatches.join(', ')}`);
+            errors++;
+        }
+    }
 }
 
 if (errors > 0) {

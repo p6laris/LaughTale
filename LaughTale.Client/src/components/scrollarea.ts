@@ -72,17 +72,17 @@ const SCROLLAREA_CSS = `
 
 .p-scrollarea-handle {
     flex: 1;
-    background: var(--p-surface-400, #94a3b8);
+    background: var(--lt-surface-400);
     border-radius: 9999px;
     position: relative;
     transition: background-color 0.15s ease, transform 0.15s ease;
     cursor: pointer;
 }
 .p-scrollarea-handle:hover {
-    background: var(--p-surface-500, #64748b);
+    background: var(--lt-surface-500);
 }
 .p-scrollarea-handle:active {
-    background: var(--p-surface-600, #475569);
+    background: var(--lt-surface-600);
 }
 
 /* Mask / Fade */
@@ -126,15 +126,15 @@ const SCROLLAREA_CSS = `
 /* Dark Mode Tokens */
 .dark .p-scrollarea-handle,
 [data-theme="dark"] .p-scrollarea-handle {
-    background: var(--p-surface-600, #475569) !important;
+    background: var(--lt-surface-600) !important;
 }
 .dark .p-scrollarea-handle:hover,
 [data-theme="dark"] .p-scrollarea-handle:hover {
-    background: var(--p-surface-500, #64748b) !important;
+    background: var(--lt-surface-500) !important;
 }
 .dark .p-scrollarea-handle:active,
 [data-theme="dark"] .p-scrollarea-handle:active {
-    background: var(--p-surface-400, #94a3b8) !important;
+    background: var(--lt-surface-400) !important;
 }
 `;
 

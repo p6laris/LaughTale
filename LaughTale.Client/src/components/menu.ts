@@ -14,10 +14,10 @@ const MENU_CSS = `
 .p-menu {
     display: inline-flex;
     flex-direction: column;
-    background: var(--p-menu-background, var(--p-surface-0, #ffffff));
-    color: var(--p-menu-color, var(--p-text-color, #0f172a));
-    border: 1px solid var(--p-menu-border-color, var(--p-border-color, #e2e8f0));
-    border-radius: var(--p-menu-border-radius, var(--p-border-radius, 8px));
+    background: var(--p-menu-background, var(--lt-surface-0));
+    color: var(--p-menu-color, var(--lt-text-primary));
+    border: 1px solid var(--p-menu-border-color, var(--lt-surface-200));
+    border-radius: var(--p-menu-border-radius, var(--lt-radius));
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
     min-width: 12.5rem;
     box-sizing: border-box;
@@ -45,12 +45,12 @@ const MENU_CSS = `
 }
 
 .p-menu-start {
-    border-bottom: 1px solid var(--p-menu-border-color, var(--p-border-color, #e2e8f0));
+    border-bottom: 1px solid var(--p-menu-border-color, var(--lt-surface-200));
     box-sizing: border-box;
 }
 
 .p-menu-end {
-    border-top: 1px solid var(--p-menu-border-color, var(--p-border-color, #e2e8f0));
+    border-top: 1px solid var(--p-menu-border-color, var(--lt-surface-200));
     box-sizing: border-box;
 }
 
@@ -96,7 +96,7 @@ const MENU_CSS = `
 .p-menu-submenu-label {
     font-size: 0.75rem;
     font-weight: 700;
-    color: var(--p-surface-400, #94a3b8);
+    color: var(--lt-surface-400);
     padding: 0.5rem 0.75rem 0.25rem;
     text-transform: none;
     letter-spacing: normal;
@@ -105,7 +105,7 @@ const MENU_CSS = `
 
 .p-menu-separator {
     height: 1px;
-    background: var(--p-menu-separator-border-color, var(--p-border-color, #e2e8f0));
+    background: var(--p-menu-separator-border-color, var(--lt-surface-200));
     margin: 0.25rem 0;
     list-style: none;
     padding: 0;
@@ -128,8 +128,8 @@ const MENU_CSS = `
     align-items: center;
     gap: 0.5rem;
     padding: 0.45rem 0.65rem;
-    color: var(--p-menu-item-color, var(--p-text-color, #0f172a));
-    border-radius: var(--p-border-radius, 6px);
+    color: var(--p-menu-item-color, var(--lt-text-primary));
+    border-radius: var(--lt-radius);
     text-decoration: none;
     cursor: pointer;
     font-size: 0.875rem;
@@ -141,8 +141,8 @@ const MENU_CSS = `
 
 .p-menu-item-link:hover,
 .p-menu-item-link.p-focus {
-    background: var(--p-surface-100, #f1f5f9);
-    color: var(--p-text-color, #0f172a);
+    background: var(--lt-surface-100);
+    color: var(--lt-text-primary);
 }
 
 .p-menu-item.p-disabled > .p-menu-item-content > .p-menu-item-link {
@@ -155,7 +155,7 @@ const MENU_CSS = `
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: var(--p-surface-500, #64748b);
+    color: var(--lt-surface-500);
     width: 1.125rem;
     height: 1.125rem;
     flex-shrink: 0;
@@ -171,9 +171,9 @@ const MENU_CSS = `
 .p-menu-item-shortcut {
     margin-left: auto;
     font-size: 0.75rem;
-    color: var(--p-surface-500, #64748b);
-    background: var(--p-surface-100, #f1f5f9);
-    border: 1px solid var(--p-border-color, #cbd5e1);
+    color: var(--lt-surface-500);
+    background: var(--lt-surface-100);
+    border: 1px solid var(--lt-surface-200);
     border-radius: 4px;
     padding: 0.1rem 0.35rem;
     font-weight: 500;
@@ -181,8 +181,8 @@ const MENU_CSS = `
 
 .p-menu-item-badge {
     margin-left: auto;
-    background: #000000;
-    color: var(--lt-surface-0, #ffffff);
+    background: var(--lt-surface-950, var(--lt-surface-950));
+    color: var(--lt-surface-0, var(--lt-surface-0));
     font-size: 0.75rem;
     font-weight: 700;
     min-width: 1.25rem;
@@ -199,7 +199,7 @@ const MENU_CSS = `
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: var(--p-surface-400, #94a3b8);
+    color: var(--lt-surface-400);
     transition: transform 220ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -211,7 +211,7 @@ const MENU_CSS = `
 .p-menu-check-icon {
     width: 1rem;
     height: 1rem;
-    color: var(--p-primary-500, #10b981);
+    color: var(--lt-primary-500);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -221,7 +221,7 @@ const MENU_CSS = `
     width: 0.375rem;
     height: 0.375rem;
     border-radius: 9999px;
-    background: var(--p-surface-900, #0f172a);
+    background: var(--lt-surface-900);
     display: inline-block;
     margin: 0.3125rem;
 }
@@ -235,9 +235,9 @@ const MENU_CSS = `
 /* Dark Mode */
 .dark .p-menu,
 [data-theme="dark"] .p-menu {
-    background: var(--p-surface-900, #0f172a);
-    color: var(--p-surface-0, #f8fafc);
-    border-color: var(--p-surface-700, #334155);
+    background: var(--lt-surface-900);
+    color: var(--lt-surface-0);
+    border-color: var(--lt-surface-700);
 }
 
 .dark .p-menu-start,
@@ -246,41 +246,41 @@ const MENU_CSS = `
 [data-theme="dark"] .p-menu-end,
 .dark .p-menu-separator,
 [data-theme="dark"] .p-menu-separator {
-    border-color: var(--p-surface-700, #334155);
+    border-color: var(--lt-surface-700);
 }
 
 .dark .p-menu-item-link,
 [data-theme="dark"] .p-menu-item-link {
-    color: var(--p-surface-100, #f1f5f9);
+    color: var(--lt-surface-100);
 }
 
 .dark .p-menu-item-link:hover,
 [data-theme="dark"] .p-menu-item-link:hover {
-    background: var(--p-surface-800, #1e293b);
-    color: var(--p-surface-0, #f8fafc);
+    background: var(--lt-surface-800);
+    color: var(--lt-surface-0);
 }
 
 .dark .p-menu-item-shortcut,
 [data-theme="dark"] .p-menu-item-shortcut {
-    background: var(--p-surface-800, #1e293b);
-    border-color: var(--p-surface-700, #334155);
-    color: var(--p-surface-300, #cbd5e1);
+    background: var(--lt-surface-800);
+    border-color: var(--lt-surface-700);
+    color: var(--lt-surface-300);
 }
 
 .dark .p-menu-item-badge,
 [data-theme="dark"] .p-menu-item-badge {
-    background: var(--lt-surface-0, #ffffff);
-    color: #000000;
+    background: var(--lt-surface-0, var(--lt-surface-0));
+    color: var(--lt-surface-950, var(--lt-surface-950));
 }
 
 .dark .p-menu-submenu-label,
 [data-theme="dark"] .p-menu-submenu-label {
-    color: var(--p-surface-400, #94a3b8);
+    color: var(--lt-surface-400);
 }
 
 .dark .p-menu-dot-icon,
 [data-theme="dark"] .p-menu-dot-icon {
-    background: var(--p-surface-0, #f8fafc);
+    background: var(--lt-surface-0);
 }
 `;
 
@@ -378,7 +378,7 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
         if (isStaticGroupHeader) {
             const subItemsHtml = item.items!.map((sub, i) => renderItemContent(sub, `${path}.${i}`, depth + 1)).join('');
             const headerLabelClass = customTemplate ? 'text-primary font-bold text-sm' : 'p-menu-submenu-label';
-            const headerLabelStyle = customTemplate ? 'color: var(--p-primary-500, #3b82f6); font-weight: 700; font-size: 0.8125rem; padding: 0.5rem 0.75rem 0.25rem;' : '';
+            const headerLabelStyle = customTemplate ? 'color: var(--lt-primary-500); font-weight: 700; font-size: 0.8125rem; padding: 0.5rem 0.75rem 0.25rem;' : '';
             return `
                 <li class="p-menu-item" role="none">
                     <div class="${headerLabelClass}" style="${headerLabelStyle}">${item.label}</div>
@@ -421,7 +421,7 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
 
         let customInlineStyle = '';
         if (item.linkClass && item.linkClass.includes('text-red')) {
-            customInlineStyle = 'color: var(--lt-danger-500, #ef4444) !important;';
+            customInlineStyle = 'color: var(--lt-danger-500, var(--lt-danger-500)) !important;';
         }
 
         return `
@@ -447,10 +447,10 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
         if (customTemplate) {
             startHtml = `
                 <div class="p-menu-start" style="padding: 0.65rem 0.85rem; display: flex; align-items: center; gap: 0.65rem;">
-                    <span style="display: inline-flex; align-items: center; justify-content: center; width: 1.75rem; height: 1.75rem; background: var(--p-primary-500, #3b82f6); border-radius: 6px; color: #fff;">
+                    <span style="display: inline-flex; align-items: center; justify-content: center; width: 1.75rem; height: 1.75rem; background: var(--lt-primary-500); border-radius: 6px; color: var(--lt-surface-0, var(--lt-surface-0));">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg>
                     </span>
-                    <span style="font-weight: 700; font-size: 0.9375rem; letter-spacing: -0.01em;">PRIME<span style="color: var(--p-primary-500, #3b82f6);">APP</span></span>
+                    <span style="font-weight: 700; font-size: 0.9375rem; letter-spacing: -0.01em;">PRIME<span style="color: var(--lt-primary-500);">APP</span></span>
                 </div>
             `;
         }
@@ -460,10 +460,10 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
             endHtml = `
                 <div class="p-menu-end" style="padding: 0.5rem 0.75rem;">
                     <button type="button" class="p-menu-item-link" style="width: 100%; border: none; background: transparent; padding: 0.4rem 0.5rem; display: flex; align-items: center; gap: 0.65rem; border-radius: 6px; cursor: pointer;">
-                        <span style="width: 2rem; height: 2rem; border-radius: 9999px; background: linear-gradient(135deg, var(--lt-warn-500, #f59e0b), var(--lt-danger-500, #ef4444)); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700;">AE</span>
+                        <span style="width: 2rem; height: 2rem; border-radius: 9999px; background: linear-gradient(135deg, var(--lt-warn-500, var(--lt-warn-500)), var(--lt-danger-500, var(--lt-danger-500))); color: var(--lt-surface-0, var(--lt-surface-0)); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700;">AE</span>
                         <span style="display: flex; flex-direction: column; align-items: flex-start; line-height: 1.2;">
-                            <span style="font-size: 0.8125rem; font-weight: 700; color: var(--p-text-color);">Amy Elsner</span>
-                            <span style="font-size: 0.7rem; color: var(--p-surface-500);">Admin</span>
+                            <span style="font-size: 0.8125rem; font-weight: 700; color: var(--lt-text-primary);">Amy Elsner</span>
+                            <span style="font-size: 0.7rem; color: var(--lt-surface-500);">Admin</span>
                         </span>
                     </button>
                 </div>
@@ -608,8 +608,8 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
             position: fixed;
             bottom: 2rem;
             right: 2rem;
-            background: ${severity === 'success' ? 'var(--lt-primary-500, #10b981)' : 'var(--lt-warn-500, #f59e0b)'};
-            color: var(--lt-surface-0, #ffffff);
+            background: ${severity === 'success' ? 'var(--lt-primary-500, var(--lt-primary-500))' : 'var(--lt-warn-500, var(--lt-warn-500))'};
+            color: var(--lt-surface-0, var(--lt-surface-0));
             padding: 0.75rem 1.25rem;
             border-radius: 8px;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);

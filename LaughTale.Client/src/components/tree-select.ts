@@ -82,10 +82,10 @@ const CSS = `
     width: 100%;
     min-height: 2.5rem;
     padding: 0.375rem 0.75rem;
-    background: var(--p-surface-0);
-    border: 1px solid var(--p-border-color);
-    border-radius: var(--p-border-radius);
-    color: var(--p-text-color);
+    background: var(--lt-surface-0);
+    border: 1px solid var(--lt-surface-200);
+    border-radius: var(--lt-radius);
+    color: var(--lt-text-primary);
     cursor: pointer;
     font-size: 0.875rem;
     line-height: 1.25;
@@ -96,26 +96,26 @@ const CSS = `
 }
 
 .p-treeselect-label-container:hover:not(.is-disabled) {
-    border-color: var(--p-surface-400);
+    border-color: var(--lt-surface-400);
 }
 
 .p-treeselect.is-focused .p-treeselect-label-container,
 .p-treeselect-label-container:focus-visible {
-    border-color: var(--p-primary-500) !important;
-    box-shadow: 0 0 0 1px var(--p-primary-500) !important;
+    border-color: var(--lt-primary-500) !important;
+    box-shadow: 0 0 0 1px var(--lt-primary-500) !important;
 }
 
 /* Filled Variant */
 .p-treeselect.variant-filled .p-treeselect-label-container {
-    background-color: var(--p-surface-100);
+    background-color: var(--lt-surface-100);
     border-color: transparent;
 }
 .p-treeselect.variant-filled .p-treeselect-label-container:hover:not(.is-disabled) {
-    background-color: var(--p-surface-200);
+    background-color: var(--lt-surface-200);
 }
 .p-treeselect.variant-filled.is-focused .p-treeselect-label-container {
-    background-color: var(--p-surface-0);
-    border-color: var(--p-primary-500) !important;
+    background-color: var(--lt-surface-0);
+    border-color: var(--lt-primary-500) !important;
 }
 
 /* Sizes */
@@ -134,10 +134,10 @@ const CSS = `
 
 /* Invalid State */
 .p-treeselect.is-invalid .p-treeselect-label-container {
-    border-color: var(--p-red-500, #ef4444) !important;
+    border-color: var(--p-red-500, var(--lt-danger-500)) !important;
 }
 .p-treeselect.is-invalid.is-focused .p-treeselect-label-container {
-    box-shadow: 0 0 0 1px var(--p-red-500, #ef4444) !important;
+    box-shadow: 0 0 0 1px var(--p-red-500, var(--lt-danger-500)) !important;
 }
 
 /* Disabled State */
@@ -146,7 +146,7 @@ const CSS = `
     cursor: not-allowed;
 }
 .p-treeselect.is-disabled .p-treeselect-label-container {
-    background-color: var(--p-surface-100);
+    background-color: var(--lt-surface-100);
     cursor: not-allowed;
     pointer-events: none;
 }
@@ -161,7 +161,7 @@ const CSS = `
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    color: var(--p-text-color);
+    color: var(--lt-text-primary);
 }
 .p-treeselect-label.p-placeholder {
     color: var(--p-text-muted);
@@ -172,10 +172,10 @@ const CSS = `
     align-items: center;
     gap: 0.25rem;
     padding: 0.125rem 0.5rem;
-    background: var(--p-surface-100);
-    color: var(--p-surface-800);
-    border: 1px solid var(--p-border-color);
-    border-radius: calc(var(--p-border-radius) - 2px);
+    background: var(--lt-surface-100);
+    color: var(--lt-surface-800);
+    border: 1px solid var(--lt-surface-200);
+    border-radius: calc(var(--lt-radius) - 2px);
     font-size: 0.75rem;
     font-weight: 500;
 }
@@ -184,7 +184,7 @@ const CSS = `
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    color: var(--p-surface-500);
+    color: var(--lt-surface-500);
     border: none;
     background: transparent;
     padding: 0;
@@ -192,7 +192,7 @@ const CSS = `
     border-radius: 9999px;
 }
 .p-treeselect-token-remove:hover {
-    color: var(--p-surface-900);
+    color: var(--lt-surface-900);
 }
 
 /* Actions (Clear & Chevron) */
@@ -208,20 +208,20 @@ const CSS = `
     justify-content: center;
     background: transparent;
     border: none;
-    color: var(--p-surface-400);
+    color: var(--lt-surface-400);
     cursor: pointer;
     padding: 0.125rem;
     border-radius: 9999px;
     transition: color 150ms ease;
 }
 .p-treeselect-clear-icon:hover {
-    color: var(--p-surface-700);
+    color: var(--lt-surface-700);
 }
 .p-treeselect-dropdown-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: var(--p-surface-500);
+    color: var(--lt-surface-500);
     transition: transform 200ms ease;
 }
 .p-treeselect.is-open .p-treeselect-dropdown-icon {
@@ -236,9 +236,9 @@ const CSS = `
     right: 0;
     min-width: 100%;
     z-index: 1000;
-    background: var(--p-surface-0);
-    border: 1px solid var(--p-border-color);
-    border-radius: var(--p-border-radius);
+    background: var(--lt-surface-0);
+    border: 1px solid var(--lt-surface-200);
+    border-radius: var(--lt-radius);
     box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
     overflow: hidden;
     display: none;
@@ -250,8 +250,8 @@ const CSS = `
 /* Filter / Search */
 .p-treeselect-filter-container {
     padding: 0.5rem;
-    background: var(--p-surface-50);
-    border-bottom: 1px solid var(--p-border-color);
+    background: var(--lt-surface-50);
+    border-bottom: 1px solid var(--lt-surface-200);
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -261,30 +261,30 @@ const CSS = `
     font-family: inherit;
     font-size: 0.8125rem;
     padding: 0.375rem 0.625rem;
-    background: var(--p-surface-0);
-    border: 1px solid var(--p-border-color);
-    border-radius: calc(var(--p-border-radius) - 2px);
-    color: var(--p-text-color);
+    background: var(--lt-surface-0);
+    border: 1px solid var(--lt-surface-200);
+    border-radius: calc(var(--lt-radius) - 2px);
+    color: var(--lt-text-primary);
     outline: none;
     box-sizing: border-box;
 }
 .p-treeselect-filter-input:focus {
-    border-color: var(--p-primary-500);
+    border-color: var(--lt-primary-500);
 }
 
 /* Header & Footer Templates */
 .p-treeselect-header {
     padding: 0.5rem 0.75rem;
-    background: var(--p-surface-50);
-    border-bottom: 1px solid var(--p-border-color);
+    background: var(--lt-surface-50);
+    border-bottom: 1px solid var(--lt-surface-200);
     font-size: 0.8125rem;
     font-weight: 600;
-    color: var(--p-text-color);
+    color: var(--lt-text-primary);
 }
 .p-treeselect-footer {
     padding: 0.5rem 0.75rem;
-    background: var(--p-surface-50);
-    border-top: 1px solid var(--p-border-color);
+    background: var(--lt-surface-50);
+    border-top: 1px solid var(--lt-surface-200);
     font-size: 0.75rem;
     display: flex;
     align-items: center;
@@ -317,31 +317,31 @@ const CSS = `
     align-items: center;
     gap: 0.375rem;
     padding: 0.375rem 0.5rem;
-    border-radius: calc(var(--p-border-radius) - 2px);
+    border-radius: calc(var(--lt-radius) - 2px);
     cursor: pointer;
-    color: var(--p-text-color);
+    color: var(--lt-text-primary);
     font-size: 0.8125rem;
     transition: background 150ms ease, color 150ms ease;
     outline: none;
 }
 .p-treenode-content:hover:not(.p-disabled) {
-    background: var(--p-surface-100);
-    color: var(--p-text-color);
+    background: var(--lt-surface-100);
+    color: var(--lt-text-primary);
 }
 .p-treenode-content.p-highlight {
-    background: var(--p-primary-50, #ecfdf5);
-    color: var(--p-primary-700, #047857);
+    background: var(--lt-primary-50);
+    color: var(--lt-primary-700);
     font-weight: 600;
 }
 .p-treenode-content.p-highlight:hover:not(.p-disabled) {
-    background: var(--p-primary-100, #d1fae5);
-    color: var(--p-primary-800, #065f46);
+    background: var(--lt-primary-100);
+    color: var(--lt-primary-800);
 }
 .p-treenode-content.p-highlight .p-tree-toggler {
-    color: var(--p-primary-700, #047857);
+    color: var(--lt-primary-700);
 }
 .p-treenode-content.p-highlight .p-treenode-icon {
-    color: var(--p-primary-600, #059669);
+    color: var(--lt-primary-600);
 }
 
 .p-tree-toggler {
@@ -351,7 +351,7 @@ const CSS = `
     width: 1.25rem;
     height: 1.25rem;
     cursor: pointer;
-    color: var(--p-surface-500);
+    color: var(--lt-surface-500);
     border-radius: 9999px;
     transition: transform 150ms ease, color 150ms ease;
     border: none;
@@ -359,7 +359,7 @@ const CSS = `
     padding: 0;
 }
 .p-tree-toggler:hover {
-    color: var(--p-surface-900);
+    color: var(--lt-surface-900);
 }
 .p-tree-toggler.p-expanded {
     transform: rotate(90deg);
@@ -374,7 +374,7 @@ const CSS = `
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: var(--p-primary-600);
+    color: var(--lt-primary-600);
     width: 16px;
     height: 16px;
 }
@@ -393,24 +393,24 @@ const CSS = `
     justify-content: center;
     width: 1.125rem;
     height: 1.125rem;
-    border: 1px solid var(--p-border-color);
+    border: 1px solid var(--lt-surface-200);
     border-radius: 4px;
-    background: var(--p-surface-0);
+    background: var(--lt-surface-0);
     cursor: pointer;
     transition: all 150ms ease;
 }
 .p-tree-checkbox:hover {
-    border-color: var(--p-primary-500);
+    border-color: var(--lt-primary-500);
 }
 .p-tree-checkbox.p-checked {
-    background: var(--p-primary-500);
-    border-color: var(--p-primary-500);
-    color: var(--lt-surface-0, #ffffff);
+    background: var(--lt-primary-500);
+    border-color: var(--lt-primary-500);
+    color: var(--lt-surface-0, var(--lt-surface-0));
 }
 .p-tree-checkbox.p-indeterminate {
-    background: var(--p-primary-500);
-    border-color: var(--p-primary-500);
-    color: var(--lt-surface-0, #ffffff);
+    background: var(--lt-primary-500);
+    border-color: var(--lt-primary-500);
+    color: var(--lt-surface-0, var(--lt-surface-0));
 }
 .p-tree-checkbox svg {
     width: 12px;
@@ -419,71 +419,71 @@ const CSS = `
 
 /* ==================== DARK MODE ==================== */
 .dark .p-treeselect-label-container {
-    background-color: var(--p-surface-900);
-    border-color: var(--p-surface-700);
-    color: var(--p-surface-0);
+    background-color: var(--lt-surface-900);
+    border-color: var(--lt-surface-700);
+    color: var(--lt-surface-0);
 }
 .dark .p-treeselect-label-container:hover:not(.is-disabled) {
-    border-color: var(--p-surface-500);
+    border-color: var(--lt-surface-500);
 }
 .dark .p-treeselect.variant-filled .p-treeselect-label-container {
-    background-color: var(--p-surface-800);
+    background-color: var(--lt-surface-800);
 }
 .dark .p-treeselect.variant-filled .p-treeselect-label-container:hover:not(.is-disabled) {
-    background-color: var(--p-surface-700);
+    background-color: var(--lt-surface-700);
 }
 .dark .p-treeselect.variant-filled.is-focused .p-treeselect-label-container {
-    background-color: var(--p-surface-900);
+    background-color: var(--lt-surface-900);
 }
 .dark .p-treeselect-token {
-    background: var(--p-surface-800);
-    color: var(--p-surface-100);
-    border-color: var(--p-surface-700);
+    background: var(--lt-surface-800);
+    color: var(--lt-surface-100);
+    border-color: var(--lt-surface-700);
 }
 .dark .p-treeselect-overlay {
-    background: var(--p-surface-900);
-    border-color: var(--p-surface-700);
+    background: var(--lt-surface-900);
+    border-color: var(--lt-surface-700);
     box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5);
 }
 .dark .p-treeselect-filter-container,
 .dark .p-treeselect-header,
 .dark .p-treeselect-footer {
-    background: var(--p-surface-850, #141b26);
-    border-color: var(--p-surface-700);
+    background: var(--lt-surface-850);
+    border-color: var(--lt-surface-700);
 }
 .dark .p-treeselect-filter-input {
-    background: var(--p-surface-900);
-    border-color: var(--p-surface-700);
-    color: var(--p-surface-0);
+    background: var(--lt-surface-900);
+    border-color: var(--lt-surface-700);
+    color: var(--lt-surface-0);
 }
 .dark .p-treenode-content:hover:not(.p-disabled) {
-    background: var(--p-surface-800);
-    color: var(--p-surface-0);
+    background: var(--lt-surface-800);
+    color: var(--lt-surface-0);
 }
 .dark .p-treenode-content.p-highlight {
     background: rgba(16, 185, 129, 0.16);
-    color: var(--p-primary-300, #6ee7b7);
+    color: var(--lt-primary-300);
     font-weight: 600;
 }
 .dark .p-treenode-content.p-highlight:hover:not(.p-disabled) {
     background: rgba(16, 185, 129, 0.24);
-    color: var(--p-primary-200, #a7f3d0);
+    color: var(--lt-primary-200);
 }
 .dark .p-treenode-content.p-highlight .p-tree-toggler {
-    color: var(--p-primary-300);
+    color: var(--lt-primary-300);
 }
 .dark .p-treenode-content.p-highlight .p-treenode-icon {
-    color: var(--p-primary-400);
+    color: var(--lt-primary-400);
 }
 .dark .p-tree-toggler {
-    color: var(--p-surface-400);
+    color: var(--lt-surface-400);
 }
 .dark .p-tree-toggler:hover {
-    color: var(--p-surface-100);
+    color: var(--lt-surface-100);
 }
 .dark .p-tree-checkbox {
-    background: var(--p-surface-900);
-    border-color: var(--p-surface-600);
+    background: var(--lt-surface-900);
+    border-color: var(--lt-surface-600);
 }
 `;
 
@@ -617,7 +617,7 @@ export default function TreeSelectIsland(container: HTMLElement, props: TreeSele
                 ${props.header ? `<div class="p-treeselect-header">${props.header}</div>` : ''}
                 ${isFilter ? `
                     <div class="p-treeselect-filter-container">
-                        <span style="color: var(--p-surface-400); display: flex;">${searchSvg}</span>
+                        <span style="color: var(--lt-surface-400); display: flex;">${searchSvg}</span>
                         <input type="text" class="p-treeselect-filter-input" placeholder="${props.filterPlaceholder || 'Search tree...'}" />
                     </div>
                 ` : ''}

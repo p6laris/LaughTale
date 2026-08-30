@@ -61,9 +61,9 @@ export interface TreeTableProps {
 const TREETABLE_CSS = `
 .p-treetable {
     position: relative;
-    background: var(--p-surface-0, #ffffff);
-    color: var(--p-surface-700, #334155);
-    border: 1px solid var(--p-surface-200, #e2e8f0);
+    background: var(--lt-surface-0);
+    color: var(--lt-surface-700);
+    border: 1px solid var(--lt-surface-200);
     border-radius: var(--p-border-radius-md, 6px);
     font-family: var(--p-font-family, inherit);
     box-sizing: border-box;
@@ -71,10 +71,10 @@ const TREETABLE_CSS = `
 }
 
 .p-treetable-header {
-    background: var(--p-surface-0, #ffffff);
-    color: var(--p-surface-900, #0f172a);
+    background: var(--lt-surface-0);
+    color: var(--lt-surface-900);
     padding: 0.875rem 1.25rem;
-    border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
+    border-bottom: 1px solid var(--lt-surface-200);
     font-weight: 700;
     font-size: 1.125rem;
     display: flex;
@@ -83,10 +83,10 @@ const TREETABLE_CSS = `
 }
 
 .p-treetable-footer {
-    background: var(--p-surface-50, #f8fafc);
-    color: var(--p-surface-700, #334155);
+    background: var(--lt-surface-50);
+    color: var(--lt-surface-700);
     padding: 0.75rem 1.25rem;
-    border-top: 1px solid var(--p-surface-200, #e2e8f0);
+    border-top: 1px solid var(--lt-surface-200);
     font-size: 0.875rem;
     font-weight: 500;
     display: flex;
@@ -102,10 +102,10 @@ const TREETABLE_CSS = `
 }
 
 .p-treetable-thead > tr > th {
-    background: var(--p-surface-0, #ffffff);
-    color: var(--p-surface-700, #334155);
+    background: var(--lt-surface-0);
+    color: var(--lt-surface-700);
     padding: 0.75rem 1rem;
-    border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
+    border-bottom: 1px solid var(--lt-surface-200);
     border-top: none;
     border-left: none;
     border-right: none;
@@ -128,43 +128,43 @@ const TREETABLE_CSS = `
     cursor: pointer;
 }
 .p-treetable-thead > tr > th.p-sortable-column:hover {
-    background: var(--p-surface-100, #f1f5f9);
-    color: var(--p-surface-900, #0f172a);
+    background: var(--lt-surface-100);
+    color: var(--lt-surface-900);
 }
 
 .p-treetable-thead > tr > th.p-highlight {
-    color: var(--p-primary-600, #10b981);
+    color: var(--lt-primary-600);
 }
 
 .p-treetable-sort-icon {
     display: inline-flex;
     align-items: center;
-    color: var(--p-surface-400, #94a3b8);
+    color: var(--lt-surface-400);
     transition: color 0.15s ease;
 }
 .p-treetable-thead > tr > th.p-highlight .p-treetable-sort-icon {
-    color: var(--p-primary-600, #10b981);
+    color: var(--lt-primary-600);
 }
 
 .p-treetable-tbody > tr {
-    background: var(--p-surface-0, #ffffff);
-    color: var(--p-surface-700, #334155);
+    background: var(--lt-surface-0);
+    color: var(--lt-surface-700);
     transition: background-color 0.15s ease;
 }
 
 .p-treetable-tbody > tr:not(.p-highlight):hover {
-    background: var(--p-surface-50, #f8fafc);
-    color: var(--p-surface-900, #0f172a);
+    background: var(--lt-surface-50);
+    color: var(--lt-surface-900);
 }
 
 .p-treetable-tbody > tr.p-highlight {
-    background: var(--p-primary-50, #ecfdf5);
-    color: var(--p-primary-700, #047857);
+    background: var(--lt-primary-50);
+    color: var(--lt-primary-700);
 }
 
 .p-treetable-tbody > tr > td {
     padding: 0.75rem 1rem;
-    border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
+    border-bottom: 1px solid var(--lt-surface-200);
     border-top: none;
     border-left: none;
     border-right: none;
@@ -176,7 +176,7 @@ const TREETABLE_CSS = `
 /* Gridlines mode */
 .p-treetable.p-treetable-gridlines .p-treetable-thead > tr > th,
 .p-treetable.p-treetable-gridlines .p-treetable-tbody > tr > td {
-    border: 1px solid var(--p-surface-200, #e2e8f0);
+    border: 1px solid var(--lt-surface-200);
 }
 
 /* Size Variants */
@@ -202,14 +202,14 @@ const TREETABLE_CSS = `
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    color: var(--p-surface-500, #64748b);
+    color: var(--lt-surface-500);
     transition: background-color 0.15s ease, transform 0.2s ease, color 0.15s ease;
     margin-right: 0.35rem;
     padding: 0;
 }
 .p-treetable-toggler:hover {
-    background-color: var(--p-surface-200, #e2e8f0);
-    color: var(--p-surface-900, #0f172a);
+    background-color: var(--lt-surface-200);
+    color: var(--lt-surface-900);
 }
 .p-treetable-toggler.p-hidden-space {
     visibility: hidden;
@@ -221,8 +221,8 @@ const TREETABLE_CSS = `
     width: 1.125rem;
     height: 1.125rem;
     border-radius: 4px;
-    border: 1px solid var(--p-surface-300, #cbd5e1);
-    background: var(--p-surface-0, #ffffff);
+    border: 1px solid var(--lt-surface-300);
+    background: var(--lt-surface-0);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -232,20 +232,20 @@ const TREETABLE_CSS = `
     flex-shrink: 0;
 }
 .p-treetable-checkbox.p-highlight {
-    background: var(--p-primary-500, #10b981);
-    border-color: var(--p-primary-500, #10b981);
-    color: var(--lt-surface-0, #ffffff);
+    background: var(--lt-primary-500);
+    border-color: var(--lt-primary-500);
+    color: var(--lt-surface-0, var(--lt-surface-0));
 }
 .p-treetable-checkbox.p-indeterminate {
-    background: var(--p-primary-500, #10b981);
-    border-color: var(--p-primary-500, #10b981);
-    color: var(--lt-surface-0, #ffffff);
+    background: var(--lt-primary-500);
+    border-color: var(--lt-primary-500);
+    color: var(--lt-surface-0, var(--lt-surface-0));
 }
 
 /* Sort badge for multi-sort */
 .p-sortable-badge {
-    background: var(--p-primary-500, #10b981);
-    color: var(--lt-surface-0, #ffffff);
+    background: var(--lt-primary-500);
+    color: var(--lt-surface-0, var(--lt-surface-0));
     font-size: 0.6875rem;
     font-weight: 700;
     width: 1.125rem;
@@ -274,13 +274,13 @@ const TREETABLE_CSS = `
     position: sticky;
     left: 0;
     z-index: 2;
-    background: var(--p-surface-0, #ffffff);
+    background: var(--lt-surface-0);
 }
 .p-frozen-right {
     position: sticky;
     right: 0;
     z-index: 2;
-    background: var(--p-surface-0, #ffffff);
+    background: var(--lt-surface-0);
 }
 
 /* Scrollable Container */
@@ -300,10 +300,10 @@ const TREETABLE_CSS = `
     font-weight: 600;
     letter-spacing: 0.02em;
 }
-.p-tag-warn { background: #fef3c7; color: #b45309; }
-.p-tag-info { background: #e0f2fe; color: #0369a1; }
-.p-tag-success { background: #dcfce7; color: #15803d; }
-.p-tag-secondary { background: var(--lt-surface-100, #f1f5f9); color: var(--lt-surface-600, #475569); }
+.p-tag-warn { background: var(--lt-warn-100, var(--lt-warn-100)); color: var(--lt-warn-700, var(--lt-warn-700)); }
+.p-tag-info { background: var(--lt-info-100); color: var(--lt-info-700); }
+.p-tag-success { background: var(--lt-success-100, var(--lt-success-100)); color: var(--lt-success-700, var(--lt-success-700)); }
+.p-tag-secondary { background: var(--lt-surface-100, var(--lt-surface-100)); color: var(--lt-surface-600, var(--lt-surface-600)); }
 
 /* Paginator Integration */
 .p-treetable-paginator {
@@ -311,8 +311,8 @@ const TREETABLE_CSS = `
     align-items: center;
     justify-content: space-between;
     padding: 0.65rem 1rem;
-    border-top: 1px solid var(--p-surface-200, #e2e8f0);
-    background: var(--p-surface-0, #ffffff);
+    border-top: 1px solid var(--lt-surface-200);
+    background: var(--lt-surface-0);
     flex-wrap: wrap;
     gap: 0.75rem;
 }
@@ -326,17 +326,17 @@ const TREETABLE_CSS = `
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    color: var(--p-surface-700, #334155);
+    color: var(--lt-surface-700);
     font-weight: 600;
     font-size: 0.8125rem;
     transition: background-color 0.15s ease;
 }
 .p-treetable-paginator-btn:hover:not(:disabled) {
-    background: var(--p-surface-100, #f1f5f9);
+    background: var(--lt-surface-100);
 }
 .p-treetable-paginator-btn.p-highlight {
-    background: var(--p-surface-900, #0f172a);
-    color: var(--lt-surface-0, #ffffff);
+    background: var(--lt-surface-900);
+    color: var(--lt-surface-0, var(--lt-surface-0));
 }
 .p-treetable-paginator-btn:disabled {
     opacity: 0.35;
@@ -360,7 +360,7 @@ const TREETABLE_CSS = `
 /* Skeleton Rows */
 .p-treetable-skeleton-line {
     height: 1.125rem;
-    background: var(--p-surface-200, #e2e8f0);
+    background: var(--lt-surface-200);
     border-radius: 4px;
     animation: pTableSkeletonPulse 1.5s infinite;
 }
@@ -373,8 +373,8 @@ const TREETABLE_CSS = `
 .p-treetable-contextmenu {
     position: fixed;
     z-index: 9999;
-    background: var(--p-surface-0, #ffffff);
-    border: 1px solid var(--p-surface-200, #e2e8f0);
+    background: var(--lt-surface-0);
+    border: 1px solid var(--lt-surface-200);
     border-radius: 6px;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     padding: 0.35rem;
@@ -389,14 +389,14 @@ const TREETABLE_CSS = `
     gap: 0.5rem;
     padding: 0.45rem 0.65rem;
     font-size: 0.8125rem;
-    color: var(--p-surface-700);
+    color: var(--lt-surface-700);
     border-radius: 4px;
     cursor: pointer;
     transition: background 0.15s ease;
 }
 .p-treetable-contextmenu-item:hover {
-    background: var(--p-surface-100);
-    color: var(--p-surface-900);
+    background: var(--lt-surface-100);
+    color: var(--lt-surface-900);
 }
 
 /* Column Toggle Popover */
@@ -405,8 +405,8 @@ const TREETABLE_CSS = `
     top: 100%;
     right: 0;
     margin-top: 0.5rem;
-    background: var(--p-surface-0, #ffffff);
-    border: 1px solid var(--p-surface-200, #e2e8f0);
+    background: var(--lt-surface-0);
+    border: 1px solid var(--lt-surface-200);
     border-radius: 8px;
     box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
     z-index: 50;
@@ -432,65 +432,65 @@ const TREETABLE_CSS = `
 /* Dark Mode Tokens */
 .dark .p-treetable,
 [data-theme="dark"] .p-treetable {
-    background: var(--p-surface-900, #0f172a) !important;
-    color: var(--p-surface-100, #f8fafc) !important;
-    border-color: var(--p-surface-700, #334155) !important;
+    background: var(--lt-surface-900) !important;
+    color: var(--lt-surface-100) !important;
+    border-color: var(--lt-surface-700) !important;
 }
 .dark .p-treetable-header,
 [data-theme="dark"] .p-treetable-header {
-    background: var(--p-surface-900, #0f172a) !important;
-    color: var(--p-surface-0, #ffffff) !important;
-    border-color: var(--p-surface-700, #334155) !important;
+    background: var(--lt-surface-900) !important;
+    color: var(--lt-surface-0) !important;
+    border-color: var(--lt-surface-700) !important;
 }
 .dark .p-treetable-footer,
 [data-theme="dark"] .p-treetable-footer {
-    background: var(--p-surface-950, #020617) !important;
-    color: var(--p-surface-200, #e2e8f0) !important;
-    border-color: var(--p-surface-700, #334155) !important;
+    background: var(--lt-surface-950) !important;
+    color: var(--lt-surface-200) !important;
+    border-color: var(--lt-surface-700) !important;
 }
 .dark .p-treetable-thead > tr > th,
 [data-theme="dark"] .p-treetable-thead > tr > th {
-    background: var(--p-surface-900, #0f172a) !important;
-    color: var(--p-surface-200, #e2e8f0) !important;
-    border-color: var(--p-surface-700, #334155) !important;
+    background: var(--lt-surface-900) !important;
+    color: var(--lt-surface-200) !important;
+    border-color: var(--lt-surface-700) !important;
 }
 .dark .p-treetable-tbody > tr,
 [data-theme="dark"] .p-treetable-tbody > tr {
-    background: var(--p-surface-900, #0f172a) !important;
-    color: var(--p-surface-200, #e2e8f0) !important;
+    background: var(--lt-surface-900) !important;
+    color: var(--lt-surface-200) !important;
 }
 .dark .p-treetable-tbody > tr:not(.p-highlight):hover,
 [data-theme="dark"] .p-treetable-tbody > tr:not(.p-highlight):hover {
-    background: var(--p-surface-800, #1e293b) !important;
-    color: var(--p-surface-0, #ffffff) !important;
+    background: var(--lt-surface-800) !important;
+    color: var(--lt-surface-0) !important;
 }
 .dark .p-treetable-tbody > tr.p-highlight,
 [data-theme="dark"] .p-treetable-tbody > tr.p-highlight {
     background: rgba(16, 185, 129, 0.16) !important;
-    color: var(--p-primary-300, #6ee7b7) !important;
+    color: var(--lt-primary-300) !important;
 }
 .dark .p-treetable-tbody > tr > td,
 [data-theme="dark"] .p-treetable-tbody > tr > td {
-    border-color: var(--p-surface-700, #334155) !important;
+    border-color: var(--lt-surface-700) !important;
 }
 .dark .p-frozen-left,
 .dark .p-frozen-right {
-    background: var(--p-surface-900, #0f172a) !important;
+    background: var(--lt-surface-900) !important;
 }
 .dark .p-treetable-paginator,
 [data-theme="dark"] .p-treetable-paginator {
-    background: var(--p-surface-900, #0f172a) !important;
-    border-color: var(--p-surface-700, #334155) !important;
+    background: var(--lt-surface-900) !important;
+    border-color: var(--lt-surface-700) !important;
 }
 .dark .p-treetable-paginator-btn.p-highlight,
 [data-theme="dark"] .p-treetable-paginator-btn.p-highlight {
-    background: var(--p-surface-0, #ffffff) !important;
-    color: var(--p-surface-900, #0f172a) !important;
+    background: var(--lt-surface-0) !important;
+    color: var(--lt-surface-900) !important;
 }
 .dark .p-treetable-checkbox,
 [data-theme="dark"] .p-treetable-checkbox {
-    background: var(--p-surface-950, #020617) !important;
-    border-color: var(--p-surface-700, #334155) !important;
+    background: var(--lt-surface-950) !important;
+    border-color: var(--lt-surface-700) !important;
 }
 .dark .p-treetable-loading-mask,
 [data-theme="dark"] .p-treetable-loading-mask {
@@ -500,8 +500,8 @@ const TREETABLE_CSS = `
 [data-theme="dark"] .p-treetable-contextmenu,
 .dark .p-treetable-popover,
 [data-theme="dark"] .p-treetable-popover {
-    background: var(--p-surface-900, #0f172a) !important;
-    border-color: var(--p-surface-700, #334155) !important;
+    background: var(--lt-surface-900) !important;
+    border-color: var(--lt-surface-700) !important;
 }
 `;
 
@@ -817,18 +817,18 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
         if (props.topControls === 'size') {
             topControlsHtml = `
                 <div class="p-treetable-top-controls">
-                    <div class="p-selectbutton p-button-group" style="display: inline-flex; border: 1px solid var(--p-surface-300); border-radius: 6px; overflow: hidden;">
-                        <button type="button" class="p-treetable-size-btn ${size === 'small' ? 'p-highlight' : ''}" data-size="small" style="padding: 0.45rem 1rem; border: none; background: ${size === 'small' ? 'var(--p-primary-500)' : 'var(--p-surface-0)'}; color: ${size === 'small' ? 'var(--lt-surface-0, #ffffff)' : 'var(--p-surface-700)'}; cursor: pointer; font-size: 0.8125rem; font-weight: 600;">Small</button>
-                        <button type="button" class="p-treetable-size-btn ${size === 'normal' ? 'p-highlight' : ''}" data-size="normal" style="padding: 0.45rem 1rem; border: none; border-left: 1px solid var(--p-surface-200); border-right: 1px solid var(--p-surface-200); background: ${size === 'normal' ? 'var(--p-primary-500)' : 'var(--p-surface-0)'}; color: ${size === 'normal' ? 'var(--lt-surface-0, #ffffff)' : 'var(--p-surface-700)'}; cursor: pointer; font-size: 0.8125rem; font-weight: 600;">Normal</button>
-                        <button type="button" class="p-treetable-size-btn ${size === 'large' ? 'p-highlight' : ''}" data-size="large" style="padding: 0.45rem 1rem; border: none; background: ${size === 'large' ? 'var(--p-primary-500)' : 'var(--p-surface-0)'}; color: ${size === 'large' ? 'var(--lt-surface-0, #ffffff)' : 'var(--p-surface-700)'}; cursor: pointer; font-size: 0.8125rem; font-weight: 600;">Large</button>
+                    <div class="p-selectbutton p-button-group" style="display: inline-flex; border: 1px solid var(--lt-surface-300); border-radius: 6px; overflow: hidden;">
+                        <button type="button" class="p-treetable-size-btn ${size === 'small' ? 'p-highlight' : ''}" data-size="small" style="padding: 0.45rem 1rem; border: none; background: ${size === 'small' ? 'var(--lt-primary-500)' : 'var(--lt-surface-0)'}; color: ${size === 'small' ? 'var(--lt-surface-0, var(--lt-surface-0))' : 'var(--lt-surface-700)'}; cursor: pointer; font-size: 0.8125rem; font-weight: 600;">Small</button>
+                        <button type="button" class="p-treetable-size-btn ${size === 'normal' ? 'p-highlight' : ''}" data-size="normal" style="padding: 0.45rem 1rem; border: none; border-left: 1px solid var(--lt-surface-200); border-right: 1px solid var(--lt-surface-200); background: ${size === 'normal' ? 'var(--lt-primary-500)' : 'var(--lt-surface-0)'}; color: ${size === 'normal' ? 'var(--lt-surface-0, var(--lt-surface-0))' : 'var(--lt-surface-700)'}; cursor: pointer; font-size: 0.8125rem; font-weight: 600;">Normal</button>
+                        <button type="button" class="p-treetable-size-btn ${size === 'large' ? 'p-highlight' : ''}" data-size="large" style="padding: 0.45rem 1rem; border: none; background: ${size === 'large' ? 'var(--lt-primary-500)' : 'var(--lt-surface-0)'}; color: ${size === 'large' ? 'var(--lt-surface-0, var(--lt-surface-0))' : 'var(--lt-surface-700)'}; cursor: pointer; font-size: 0.8125rem; font-weight: 600;">Large</button>
                     </div>
                 </div>
             `;
         } else if (props.topControls === 'metaKey') {
             topControlsHtml = `
                 <div class="p-treetable-top-controls justify-center">
-                    <label style="display: inline-flex; align-items: center; gap: 0.6rem; cursor: pointer; font-size: 0.875rem; font-weight: 600; color: var(--p-surface-800);">
-                        <input type="checkbox" class="p-treetable-metakey-switch" ${metaKeySelection ? 'checked' : ''} style="width: 1.25rem; height: 1.25rem; accent-color: var(--p-primary-500);" />
+                    <label style="display: inline-flex; align-items: center; gap: 0.6rem; cursor: pointer; font-size: 0.875rem; font-weight: 600; color: var(--lt-surface-800);">
+                        <input type="checkbox" class="p-treetable-metakey-switch" ${metaKeySelection ? 'checked' : ''} style="width: 1.25rem; height: 1.25rem; accent-color: var(--lt-primary-500);" />
                         <span>MetaKey</span>
                     </label>
                 </div>
@@ -836,7 +836,7 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
         } else if (props.topControls === 'controlled') {
             topControlsHtml = `
                 <div class="p-treetable-top-controls">
-                    <button type="button" class="p-treetable-toggle-apps-btn" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 1rem; font-size: 0.8125rem; font-weight: 600; border-radius: 6px; border: none; background: var(--p-primary-500); color: var(--lt-surface-0, #ffffff); cursor: pointer;">
+                    <button type="button" class="p-treetable-toggle-apps-btn" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 1rem; font-size: 0.8125rem; font-weight: 600; border-radius: 6px; border: none; background: var(--lt-primary-500); color: var(--lt-surface-0, var(--lt-surface-0)); cursor: pointer;">
                         Toggle Applications
                     </button>
                 </div>
@@ -844,8 +844,8 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
         } else if (props.topControls === 'refresh') {
             topControlsHtml = `
                 <div class="p-treetable-top-controls" style="justify-content: space-between;">
-                    <span style="font-size: 0.875rem; color: var(--p-surface-500);">Click refresh to simulate a network fetch.</span>
-                    <button type="button" class="p-treetable-refresh-btn" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: 6px; border: 1px solid var(--p-surface-300); background: var(--p-surface-0); color: var(--p-surface-700); cursor: pointer;">
+                    <span style="font-size: 0.875rem; color: var(--lt-surface-500);">Click refresh to simulate a network fetch.</span>
+                    <button type="button" class="p-treetable-refresh-btn" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: 6px; border: 1px solid var(--lt-surface-300); background: var(--lt-surface-0); color: var(--lt-surface-700); cursor: pointer;">
                         ${SVG_ICONS.refresh} Refresh
                     </button>
                 </div>
@@ -854,8 +854,8 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
             topControlsHtml = `
                 <div class="p-treetable-top-controls justify-end">
                     <div style="position: relative; width: 240px;">
-                        <span style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--p-surface-400);">${SVG_ICONS.search}</span>
-                        <input type="text" class="p-treetable-global-search" placeholder="Keyword search" value="${globalFilter}" style="width: 100%; padding: 0.45rem 0.75rem 0.45rem 2.25rem; font-size: 0.8125rem; border-radius: 6px; border: 1px solid var(--p-surface-300); background: var(--p-surface-0); color: var(--p-surface-900); outline: none; box-sizing: border-box;" />
+                        <span style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--lt-surface-400);">${SVG_ICONS.search}</span>
+                        <input type="text" class="p-treetable-global-search" placeholder="Keyword search" value="${globalFilter}" style="width: 100%; padding: 0.45rem 0.75rem 0.45rem 2.25rem; font-size: 0.8125rem; border-radius: 6px; border: 1px solid var(--lt-surface-300); background: var(--lt-surface-0); color: var(--lt-surface-900); outline: none; box-sizing: border-box;" />
                     </div>
                 </div>
             `;
@@ -863,14 +863,14 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
             topControlsHtml = `
                 <div class="p-treetable-top-controls justify-end">
                     <div style="position: relative;">
-                        <button type="button" class="p-treetable-column-toggle-btn" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: 6px; border: 1px solid var(--p-surface-300); background: var(--p-surface-0); color: var(--p-surface-700); cursor: pointer;">
+                        <button type="button" class="p-treetable-column-toggle-btn" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: 6px; border: 1px solid var(--lt-surface-300); background: var(--lt-surface-0); color: var(--lt-surface-700); cursor: pointer;">
                             ${SVG_ICONS.cog} Columns
                         </button>
                         ${showPopover ? `
                             <div class="p-treetable-popover">
-                                <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 0.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid var(--p-surface-200);">
+                                <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 0.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid var(--lt-surface-200);">
                                     <span style="font-weight: 700; font-size: 0.8125rem;">Columns</span>
-                                    <button type="button" class="p-treetable-reset-cols-btn" style="border: none; background: transparent; color: var(--p-primary-600); cursor: pointer; font-size: 0.75rem; font-weight: 600;">Reset</button>
+                                    <button type="button" class="p-treetable-reset-cols-btn" style="border: none; background: transparent; color: var(--lt-primary-600); cursor: pointer; font-size: 0.75rem; font-weight: 600;">Reset</button>
                                 </div>
                                 <div style="display: flex; flex-direction: column; gap: 0.35rem; max-height: 200px; overflow-y: auto;">
                                     ${columns.map(col => `
@@ -960,15 +960,15 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
                 <tbody class="p-treetable-tbody">
                     <tr>
                         <td colspan="${visibleCols.length + (props.showActions ? 1 : 0)}" style="text-align: center; padding: 3rem 1rem;">
-                            <div style="display: flex; flex-direction: column; align-items: center; gap: 0.75rem; color: var(--p-surface-500);">
-                                <div style="width: 3.5rem; height: 3.5rem; border-radius: 9999px; background: var(--p-surface-100); display: flex; align-items: center; justify-content: center; color: var(--p-surface-400);">
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 0.75rem; color: var(--lt-surface-500);">
+                                <div style="width: 3.5rem; height: 3.5rem; border-radius: 9999px; background: var(--lt-surface-100); display: flex; align-items: center; justify-content: center; color: var(--lt-surface-400);">
                                     <span style="transform: scale(1.6);">${SVG_ICONS.folder}</span>
                                 </div>
                                 <div>
-                                    <p style="margin: 0; font-weight: 700; font-size: 1rem; color: var(--p-surface-900);">${props.emptyMessage || 'No folders yet'}</p>
-                                    <p style="margin: 0.25rem 0 0; font-size: 0.8125rem; color: var(--p-surface-500);">Create your first folder to start building a tree.</p>
+                                    <p style="margin: 0; font-weight: 700; font-size: 1rem; color: var(--lt-surface-900);">${props.emptyMessage || 'No folders yet'}</p>
+                                    <p style="margin: 0.25rem 0 0; font-size: 0.8125rem; color: var(--lt-surface-500);">Create your first folder to start building a tree.</p>
                                 </div>
-                                <button type="button" class="p-treetable-empty-add-btn" style="margin-top: 0.25rem; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: 6px; border: none; background: var(--p-primary-500); color: var(--lt-surface-0, #ffffff); cursor: pointer;">
+                                <button type="button" class="p-treetable-empty-add-btn" style="margin-top: 0.25rem; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: 6px; border: none; background: var(--lt-primary-500); color: var(--lt-surface-0, var(--lt-surface-0)); cursor: pointer;">
                                     ${SVG_ICONS.plus} New Folder
                                 </button>
                             </div>
@@ -995,7 +995,7 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
 
                             if (isExp) {
                                 const toggleSvg = hasChildren ? (node.loading ? SVG_ICONS.spinner : (isExpanded ? SVG_ICONS.chevronDown : SVG_ICONS.chevronRight)) : '';
-                                const iconSvg = props.useNodeIcons ? `<span style="display: inline-flex; align-items: center; margin-right: 0.5rem; color: var(--p-surface-400);">${getIcon(node.data.type, isExpanded)}</span>` : '';
+                                const iconSvg = props.useNodeIcons ? `<span style="display: inline-flex; align-items: center; margin-right: 0.5rem; color: var(--lt-surface-400);">${getIcon(node.data.type, isExpanded)}</span>` : '';
 
                                 let checkboxHtml = '';
                                 if (selectionMode === 'checkbox') {
@@ -1014,7 +1014,7 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
                                             </button>
                                             ${checkboxHtml}
                                             ${iconSvg}
-                                            <span style="font-weight: ${hasChildren && props.useNodeIcons ? '600' : '400'}; color: var(--p-surface-900);">${resolveNodeField(node, col.field) ?? ''}</span>
+                                            <span style="font-weight: ${hasChildren && props.useNodeIcons ? '600' : '400'}; color: var(--lt-surface-900);">${resolveNodeField(node, col.field) ?? ''}</span>
                                         </div>
                                     </td>
                                 `;
@@ -1032,17 +1032,17 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
 
                             return `
                                 <td class="${frozenClass}" style="${widthStyle}">
-                                    <span style="color: var(--p-surface-700);">${resolveNodeField(node, col.field) ?? '—'}</span>
+                                    <span style="color: var(--lt-surface-700);">${resolveNodeField(node, col.field) ?? '—'}</span>
                                 </td>
                             `;
                         }).join('')}
                         ${props.showActions ? `
                             <td style="text-align: center;">
                                 <div style="display: inline-flex; align-items: center; gap: 0.4rem;">
-                                    <button type="button" class="p-treetable-action-view" style="width: 2rem; height: 2rem; border-radius: 9999px; border: none; background: var(--p-surface-100); color: var(--p-surface-700); display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                                    <button type="button" class="p-treetable-action-view" style="width: 2rem; height: 2rem; border-radius: 9999px; border: none; background: var(--lt-surface-100); color: var(--lt-surface-700); display: flex; align-items: center; justify-content: center; cursor: pointer;">
                                         ${SVG_ICONS.search}
                                     </button>
-                                    <button type="button" class="p-treetable-action-edit" style="width: 2rem; height: 2rem; border-radius: 9999px; border: none; background: #dcfce7; color: #15803d; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                                    <button type="button" class="p-treetable-action-edit" style="width: 2rem; height: 2rem; border-radius: 9999px; border: none; background: var(--lt-success-100, var(--lt-success-100)); color: var(--lt-success-700, var(--lt-success-700)); display: flex; align-items: center; justify-content: center; cursor: pointer;">
                                         ${SVG_ICONS.pencil}
                                     </button>
                                 </div>
@@ -1061,11 +1061,11 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
             if (props.headlessPaginator) {
                 paginatorHtml = `
                     <div class="p-treetable-paginator" style="justify-content: center;">
-                        <div style="display: flex; align-items: center; gap: 1rem; border: 1px solid var(--p-surface-200); border-radius: 9999px; padding: 0.25rem 0.75rem;">
+                        <div style="display: flex; align-items: center; gap: 1rem; border: 1px solid var(--lt-surface-200); border-radius: 9999px; padding: 0.25rem 0.75rem;">
                             <button type="button" class="p-treetable-prev-btn p-treetable-paginator-btn" ${currentPage === 0 ? 'disabled' : ''}>
                                 ${SVG_ICONS.chevronLeft}
                             </button>
-                            <span style="font-size: 0.8125rem; font-weight: 600; color: var(--p-surface-700);">
+                            <span style="font-size: 0.8125rem; font-weight: 600; color: var(--lt-surface-700);">
                                 Page ${currentPage + 1} of ${totalPages} (${totalRecords} items)
                             </span>
                             <button type="button" class="p-treetable-next-btn p-treetable-paginator-btn" ${currentPage >= totalPages - 1 ? 'disabled' : ''}>
@@ -1081,8 +1081,8 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
                 paginatorHtml = `
                     <div class="p-treetable-paginator">
                         <div style="display: flex; align-items: center; gap: 0.5rem;">
-                            <span style="font-size: 0.8125rem; color: var(--p-surface-500);">Rows:</span>
-                            <select class="p-treetable-rpp-select" style="padding: 0.25rem 0.5rem; font-size: 0.8125rem; border-radius: 6px; border: 1px solid var(--p-surface-300); background: var(--p-surface-0); color: var(--p-surface-700);">
+                            <span style="font-size: 0.8125rem; color: var(--lt-surface-500);">Rows:</span>
+                            <select class="p-treetable-rpp-select" style="padding: 0.25rem 0.5rem; font-size: 0.8125rem; border-radius: 6px; border: 1px solid var(--lt-surface-300); background: var(--lt-surface-0); color: var(--lt-surface-700);">
                                 ${rowsPerPageOptions.map(opt => `<option value="${opt}" ${opt === rowsPerPage ? 'selected' : ''}>${opt}</option>`).join('')}
                             </select>
                         </div>
@@ -1096,7 +1096,7 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
                             <button type="button" class="p-treetable-next-btn p-treetable-paginator-btn" ${currentPage >= totalPages - 1 ? 'disabled' : ''}>${SVG_ICONS.chevronRight}</button>
                             <button type="button" class="p-treetable-last-btn p-treetable-paginator-btn" ${currentPage >= totalPages - 1 ? 'disabled' : ''}>${SVG_ICONS.lastPage}</button>
                         </div>
-                        <div style="font-size: 0.8125rem; color: var(--p-surface-500);">
+                        <div style="font-size: 0.8125rem; color: var(--lt-surface-500);">
                             ${firstRecord} to ${lastRecord} of ${totalRecords}
                         </div>
                     </div>
@@ -1107,7 +1107,7 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
         // Footer
         let footerHtml = props.footerText ? `
             <div class="p-treetable-footer">
-                <button type="button" class="p-treetable-footer-reload-btn" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: 6px; border: none; background: var(--lt-warn-500, #f59e0b); color: var(--lt-surface-0, #ffffff); cursor: pointer;">
+                <button type="button" class="p-treetable-footer-reload-btn" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: 6px; border: none; background: var(--lt-warn-500, var(--lt-warn-500)); color: var(--lt-surface-0, var(--lt-surface-0)); cursor: pointer;">
                     ${SVG_ICONS.refresh} ${props.footerText}
                 </button>
             </div>
@@ -1116,9 +1116,9 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
         // Loading Overlay
         let loadingMaskHtml = isLoading && !isSkeleton ? `
             <div class="p-treetable-loading-mask">
-                <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; color: var(--p-primary-500);">
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; color: var(--lt-primary-500);">
                     ${SVG_ICONS.spinner}
-                    <span style="font-size: 0.8125rem; font-weight: 600; color: var(--p-surface-700);">Loading nodes…</span>
+                    <span style="font-size: 0.8125rem; font-weight: 600; color: var(--lt-surface-700);">Loading nodes…</span>
                 </div>
             </div>
         ` : '';
@@ -1343,7 +1343,7 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
             <div class="p-treetable-contextmenu-item" data-action="view">
                 ${SVG_ICONS.search} View
             </div>
-            <div class="p-treetable-contextmenu-item" data-action="delete" style="color: var(--lt-danger-500, #ef4444);">
+            <div class="p-treetable-contextmenu-item" data-action="delete" style="color: var(--lt-danger-500, var(--lt-danger-500));">
                 ${SVG_ICONS.trash} Delete
             </div>
         `;

@@ -54,7 +54,7 @@ const CSS = `
     border-radius: 9999px;
     padding: 0.125rem;
     transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1), color 150ms ease, opacity 150ms ease;
-    color: var(--p-surface-300);
+    color: var(--lt-surface-300);
     outline: none;
 }
 
@@ -63,11 +63,11 @@ const CSS = `
 }
 
 .p-rating:not(.p-readonly):not(.p-disabled) .p-rating-item:focus-visible {
-    box-shadow: 0 0 0 2px var(--p-primary-500);
+    box-shadow: 0 0 0 2px var(--lt-primary-500);
 }
 
 .p-rating-item.p-rating-item-active {
-    color: var(--p-primary-500, #f59e0b);
+    color: var(--lt-primary-500);
 }
 
 .p-rating-icon {
@@ -108,7 +108,7 @@ const CSS = `
     width: 50%;
     height: 100%;
     overflow: hidden;
-    color: var(--p-primary-500, #f59e0b);
+    color: var(--lt-primary-500);
     pointer-events: none;
 }
 .p-rating-half-overlay .p-rating-icon {
@@ -134,7 +134,7 @@ const CSS = `
     cursor: pointer;
     padding: 0.125rem;
     margin-right: 0.25rem;
-    color: var(--p-surface-400);
+    color: var(--lt-surface-400);
     border-radius: 9999px;
     transition: color 150ms ease, background 150ms ease, transform 150ms ease;
     outline: none;
@@ -144,7 +144,7 @@ const CSS = `
     margin-bottom: 0.25rem;
 }
 .p-rating-cancel-item:hover {
-    color: var(--p-red-500, #ef4444);
+    color: var(--p-red-500, var(--lt-danger-500));
     transform: scale(1.1);
 }
 .p-rating-cancel-item:focus-visible {
@@ -174,11 +174,11 @@ const CSS = `
 .p-rating-text-item {
     font-size: 1.25rem;
     font-weight: 700;
-    color: var(--p-surface-300);
+    color: var(--lt-surface-300);
     transition: color 150ms ease, transform 150ms ease;
 }
 .p-rating-text-item.p-rating-item-active {
-    color: var(--p-primary-500);
+    color: var(--lt-primary-500);
 }
 
 /* States */
@@ -198,23 +198,23 @@ const CSS = `
 
 /* ==================== DARK MODE ==================== */
 .dark .p-rating-item {
-    color: var(--p-surface-600);
+    color: var(--lt-surface-600);
 }
 .dark .p-rating-item.p-rating-item-active,
 .dark .p-rating-half-overlay {
-    color: var(--p-primary-400, #fbbf24);
+    color: var(--lt-primary-400);
 }
 .dark .p-rating-cancel-item {
-    color: var(--p-surface-500);
+    color: var(--lt-surface-500);
 }
 .dark .p-rating-cancel-item:hover {
     color: var(--p-red-400);
 }
 .dark .p-rating-text-item {
-    color: var(--p-surface-700);
+    color: var(--lt-surface-700);
 }
 .dark .p-rating-text-item.p-rating-item-active {
-    color: var(--p-primary-400);
+    color: var(--lt-primary-400);
 }
 `;
 

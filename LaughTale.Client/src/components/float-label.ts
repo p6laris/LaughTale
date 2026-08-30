@@ -54,14 +54,14 @@ const CSS = `
     transform: translateY(0);
     font-size: 0.75rem;
     font-weight: 600;
-    color: var(--p-primary-500);
+    color: var(--lt-primary-500);
 }
 
 /* Variant: on (Floats on the top border line with surface pill masking) */
 .laughtale-float-label-on > label {
     top: 50%;
     transform: translateY(-50%);
-    background: var(--p-surface-0);
+    background: var(--lt-surface-0);
     padding: 0 0.35rem;
     border-radius: 2px;
 }
@@ -71,7 +71,7 @@ const CSS = `
     transform: translateY(-50%);
     font-size: 0.75rem;
     font-weight: 600;
-    color: var(--p-primary-500);
+    color: var(--lt-primary-500);
     z-index: 15;
 }
 
@@ -86,7 +86,7 @@ const CSS = `
     transform: translateY(0);
     font-size: 0.6875rem;
     font-weight: 600;
-    color: var(--p-primary-500);
+    color: var(--lt-primary-500);
 }
 .laughtale-float-label-in input,
 .laughtale-float-label-in .p-input,
@@ -115,25 +115,25 @@ const CSS = `
 .laughtale-float-label:has(.invalid) > label,
 .laughtale-float-label:has(.is-invalid) > label,
 .laughtale-float-label:has(:invalid) > label {
-    color: var(--p-red-500, #ef4444) !important;
+    color: var(--p-red-500, var(--lt-danger-500)) !important;
 }
 
 /* Dark Mode Tokens */
 .dark .laughtale-float-label > label {
-    color: var(--p-surface-400);
+    color: var(--lt-surface-400);
 }
 .dark .laughtale-float-label-on > label {
-    background: var(--p-surface-900);
+    background: var(--lt-surface-900);
 }
 .dark .laughtale-float-label.has-value > label,
 .dark .laughtale-float-label:focus-within > label {
-    color: var(--p-primary-400);
+    color: var(--lt-primary-400);
 }
 .dark .laughtale-float-label.invalid > label,
 .dark .laughtale-float-label:has(.invalid) > label,
 .dark .laughtale-float-label:has(.is-invalid) > label,
 .dark .laughtale-float-label:has(:invalid) > label {
-    color: #f87171 !important;
+    color: var(--lt-danger-400, var(--lt-danger-400)) !important;
 }
 `;
 

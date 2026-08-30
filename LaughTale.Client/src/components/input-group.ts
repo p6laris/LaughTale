@@ -79,21 +79,21 @@ const CSS = `
 .laughtale-inputgroup > *:first-child,
 .p-inputgroup > *:first-child {
     margin-left: 0 !important;
-    border-top-left-radius: var(--p-border-radius) !important;
-    border-bottom-left-radius: var(--p-border-radius) !important;
+    border-top-left-radius: var(--lt-radius) !important;
+    border-bottom-left-radius: var(--lt-radius) !important;
 }
 
 /* Last child outer corners */
 .laughtale-inputgroup > *:last-child,
 .p-inputgroup > *:last-child {
-    border-top-right-radius: var(--p-border-radius) !important;
-    border-bottom-right-radius: var(--p-border-radius) !important;
+    border-top-right-radius: var(--lt-radius) !important;
+    border-bottom-right-radius: var(--lt-radius) !important;
 }
 
 /* Only child */
 .laughtale-inputgroup > *:only-child,
 .p-inputgroup > *:only-child {
-    border-radius: var(--p-border-radius) !important;
+    border-radius: var(--lt-radius) !important;
 }
 
 /* Inner inputs, triggers, select boxes, and buttons corner & height overrides */
@@ -134,8 +134,8 @@ const CSS = `
 .p-inputgroup > *:first-child .dp-trigger,
 .p-inputgroup > *:first-child .laughtale-select-trigger,
 .p-inputgroup > *:first-child.p-button {
-    border-top-left-radius: var(--p-border-radius) !important;
-    border-bottom-left-radius: var(--p-border-radius) !important;
+    border-top-left-radius: var(--lt-radius) !important;
+    border-bottom-left-radius: var(--lt-radius) !important;
 }
 
 .laughtale-inputgroup > *:last-child input,
@@ -152,8 +152,8 @@ const CSS = `
 .p-inputgroup > *:last-child .dp-trigger,
 .p-inputgroup > *:last-child .laughtale-select-trigger,
 .p-inputgroup > *:last-child.p-button {
-    border-top-right-radius: var(--p-border-radius) !important;
-    border-bottom-right-radius: var(--p-border-radius) !important;
+    border-top-right-radius: var(--lt-radius) !important;
+    border-bottom-right-radius: var(--lt-radius) !important;
 }
 
 /* Addon Styling */
@@ -163,9 +163,9 @@ const CSS = `
     align-items: center;
     justify-content: center;
     padding: 0 0.85rem;
-    background: var(--p-surface-50);
+    background: var(--lt-surface-50);
     color: var(--p-text-muted);
-    border: 1px solid var(--p-border-color);
+    border: 1px solid var(--lt-surface-200);
     font-size: 0.875rem;
     font-weight: 500;
     min-width: 2.75rem;
@@ -195,7 +195,7 @@ const CSS = `
     padding: 0 1rem;
     font-size: 0.875rem;
     font-weight: 600;
-    border: 1px solid var(--p-border-color);
+    border: 1px solid var(--lt-surface-200);
     cursor: pointer;
     transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
     flex-shrink: 0;
@@ -206,27 +206,27 @@ const CSS = `
 /* Primary Contrast button */
 .laughtale-inputgroup .p-button-primary,
 .p-inputgroup .p-button-primary {
-    background: var(--p-surface-950);
-    color: var(--p-surface-0);
-    border-color: var(--p-surface-950);
+    background: var(--lt-surface-950);
+    color: var(--lt-surface-0);
+    border-color: var(--lt-surface-950);
 }
 .laughtale-inputgroup .p-button-primary:hover,
 .p-inputgroup .p-button-primary:hover {
-    background: var(--p-surface-800);
-    border-color: var(--p-surface-800);
+    background: var(--lt-surface-800);
+    border-color: var(--lt-surface-800);
 }
 
 /* Secondary Button */
 .laughtale-inputgroup .p-button-secondary,
 .p-inputgroup .p-button-secondary {
-    background: var(--p-surface-0);
+    background: var(--lt-surface-0);
     color: var(--p-text-muted);
-    border-color: var(--p-border-color);
+    border-color: var(--lt-surface-200);
 }
 .laughtale-inputgroup .p-button-secondary:hover,
 .p-inputgroup .p-button-secondary:hover {
-    background: var(--p-surface-100);
-    color: var(--p-text-color);
+    background: var(--lt-surface-100);
+    color: var(--lt-text-primary);
 }
 
 /* FloatLabel & IftaLabel inside InputGroup */
@@ -264,25 +264,25 @@ const CSS = `
 /* Dark Mode Tokens */
 .dark .laughtale-inputgroup-addon,
 .dark .p-inputgroup-addon {
-    background: var(--p-surface-800);
-    border-color: var(--p-surface-700);
-    color: var(--p-surface-300);
+    background: var(--lt-surface-800);
+    border-color: var(--lt-surface-700);
+    color: var(--lt-surface-300);
 }
 .dark .laughtale-inputgroup-addon svg,
 .dark .p-inputgroup-addon svg {
-    color: var(--p-surface-400);
+    color: var(--lt-surface-400);
 }
 .dark .laughtale-inputgroup .p-button-primary,
 .dark .p-inputgroup .p-button-primary {
-    background: var(--p-surface-0);
-    color: var(--p-surface-950);
-    border-color: var(--p-surface-0);
+    background: var(--lt-surface-0);
+    color: var(--lt-surface-950);
+    border-color: var(--lt-surface-0);
 }
 .dark .laughtale-inputgroup .p-button-secondary,
 .dark .p-inputgroup .p-button-secondary {
-    background: var(--p-surface-900);
-    border-color: var(--p-surface-700);
-    color: var(--p-surface-300);
+    background: var(--lt-surface-900);
+    border-color: var(--lt-surface-700);
+    color: var(--lt-surface-300);
 }
 `;
 

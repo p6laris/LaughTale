@@ -60,10 +60,10 @@ const CSS = `
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    background: var(--p-surface-0);
-    border: 1px solid var(--p-border-color);
-    border-radius: var(--p-border-radius);
-    color: var(--p-text-color);
+    background: var(--lt-surface-0);
+    border: 1px solid var(--lt-surface-200);
+    border-radius: var(--lt-radius);
+    color: var(--lt-text-primary);
     cursor: pointer;
     user-select: none;
     transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
@@ -71,18 +71,18 @@ const CSS = `
     gap: 0.5rem;
 }
 .dp-trigger.variant-filled {
-    background: var(--p-surface-50);
+    background: var(--lt-surface-50);
 }
 .dp-trigger.focused {
-    border-color: var(--p-primary-500);
-    box-shadow: 0 0 0 1px var(--p-primary-500);
+    border-color: var(--lt-primary-500);
+    box-shadow: 0 0 0 1px var(--lt-primary-500);
 }
 .dp-trigger.invalid {
-    border-color: var(--lt-danger-500, #ef4444) !important;
-    box-shadow: 0 0 0 1px var(--lt-danger-500, #ef4444) !important;
+    border-color: var(--lt-danger-500, var(--lt-danger-500)) !important;
+    box-shadow: 0 0 0 1px var(--lt-danger-500, var(--lt-danger-500)) !important;
 }
 .dp-trigger.disabled {
-    background: var(--p-surface-100);
+    background: var(--lt-surface-100);
     opacity: 0.65;
     cursor: not-allowed;
 }
@@ -109,7 +109,7 @@ const CSS = `
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    color: var(--p-text-color);
+    color: var(--lt-text-primary);
 }
 .dp-label.placeholder {
     color: var(--p-text-muted);
@@ -129,9 +129,9 @@ const CSS = `
     display: none;
 }
 .dp-panel {
-    background: var(--p-surface-0);
-    border: 1px solid var(--p-border-color);
-    border-radius: var(--p-border-radius);
+    background: var(--lt-surface-0);
+    border: 1px solid var(--lt-surface-200);
+    border-radius: var(--lt-radius);
     box-shadow: var(--p-shadow-lg);
     padding: 0.875rem;
     width: 19rem;
@@ -158,26 +158,26 @@ const CSS = `
     border-radius: 50%;
     border: none;
     background: transparent;
-    color: var(--p-text-color);
+    color: var(--lt-text-primary);
     cursor: pointer;
     transition: background 150ms ease;
 }
 .dp-nav-btn:hover {
-    background: var(--p-surface-100);
+    background: var(--lt-surface-100);
 }
 .dp-title-btn {
     border: none;
     background: transparent;
     font-weight: 600;
     font-size: 0.9375rem;
-    color: var(--p-text-color);
+    color: var(--lt-text-primary);
     cursor: pointer;
     padding: 0.25rem 0.5rem;
-    border-radius: calc(var(--p-border-radius) - 2px);
+    border-radius: calc(var(--lt-radius) - 2px);
     transition: background 150ms ease;
 }
 .dp-title-btn:hover {
-    background: var(--p-surface-100);
+    background: var(--lt-surface-100);
 }
 
 /* Calendar Grid */
@@ -204,7 +204,7 @@ const CSS = `
     border-radius: 50%;
     border: none;
     background: transparent;
-    color: var(--p-text-color);
+    color: var(--lt-text-primary);
     font-size: 0.8125rem;
     cursor: pointer;
     transition: background 120ms ease, color 120ms ease;
@@ -212,24 +212,24 @@ const CSS = `
     user-select: none;
 }
 .dp-day-cell:hover:not(.disabled):not(.selected) {
-    background: var(--p-surface-100);
+    background: var(--lt-surface-100);
 }
 .dp-day-cell.other-month {
     color: var(--p-text-muted);
     opacity: 0.4;
 }
 .dp-day-cell.today:not(.selected) {
-    border: 1px solid var(--p-primary-500);
+    border: 1px solid var(--lt-primary-500);
     font-weight: 700;
 }
 .dp-day-cell.selected {
-    background: var(--p-primary-500) !important;
-    color: var(--lt-surface-0, #ffffff) !important;
+    background: var(--lt-primary-500) !important;
+    color: var(--lt-surface-0, var(--lt-surface-0)) !important;
     font-weight: 700;
 }
 .dp-day-cell.in-range {
-    background: var(--p-primary-50);
-    color: var(--p-primary-700);
+    background: var(--lt-primary-50);
+    color: var(--lt-primary-700);
     border-radius: 0;
 }
 .dp-day-cell.range-start {
@@ -258,20 +258,20 @@ const CSS = `
     align-items: center;
     justify-content: center;
     padding: 0.75rem 0.5rem;
-    border-radius: calc(var(--p-border-radius) - 2px);
+    border-radius: calc(var(--lt-radius) - 2px);
     border: none;
     background: transparent;
-    color: var(--p-text-color);
+    color: var(--lt-text-primary);
     font-size: 0.875rem;
     cursor: pointer;
     transition: background 150ms ease;
 }
 .dp-view-btn:hover {
-    background: var(--p-surface-100);
+    background: var(--lt-surface-100);
 }
 .dp-view-btn.selected {
-    background: var(--p-primary-500);
-    color: var(--lt-surface-0, #ffffff);
+    background: var(--lt-primary-500);
+    color: var(--lt-surface-0, var(--lt-surface-0));
     font-weight: 700;
 }
 
@@ -281,7 +281,7 @@ const CSS = `
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    border-top: 1px solid var(--p-border-color);
+    border-top: 1px solid var(--lt-surface-200);
     padding-top: 0.75rem;
     margin-top: 0.75rem;
 }
@@ -294,7 +294,7 @@ const CSS = `
 .dp-time-val {
     font-size: 1rem;
     font-weight: 600;
-    color: var(--p-text-color);
+    color: var(--lt-text-primary);
     min-width: 2rem;
     text-align: center;
 }
@@ -310,13 +310,13 @@ const CSS = `
     border-radius: 4px;
 }
 .dp-time-btn:hover {
-    background: var(--p-surface-100);
-    color: var(--p-text-color);
+    background: var(--lt-surface-100);
+    color: var(--lt-text-primary);
 }
 .dp-ampm-btn {
-    border: 1px solid var(--p-border-color);
-    background: var(--p-surface-50);
-    color: var(--p-text-color);
+    border: 1px solid var(--lt-surface-200);
+    background: var(--lt-surface-50);
+    color: var(--lt-text-primary);
     border-radius: 4px;
     padding: 0.25rem 0.5rem;
     font-size: 0.75rem;
@@ -329,14 +329,14 @@ const CSS = `
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-top: 1px solid var(--p-border-color);
+    border-top: 1px solid var(--lt-surface-200);
     padding-top: 0.65rem;
     margin-top: 0.75rem;
 }
 .dp-bar-btn {
     border: none;
     background: transparent;
-    color: var(--p-primary-600);
+    color: var(--lt-primary-600);
     font-weight: 600;
     font-size: 0.8125rem;
     cursor: pointer;
@@ -345,44 +345,44 @@ const CSS = `
     transition: background 150ms ease;
 }
 .dp-bar-btn:hover {
-    background: var(--p-primary-50);
+    background: var(--lt-primary-50);
 }
 
 /* Dark Mode Tokens */
 .dark .dp-trigger {
-    background: var(--p-surface-900);
-    border-color: var(--p-surface-700);
-    color: var(--p-surface-0);
+    background: var(--lt-surface-900);
+    border-color: var(--lt-surface-700);
+    color: var(--lt-surface-0);
 }
 .dark .dp-trigger.variant-filled {
-    background: var(--p-surface-800);
+    background: var(--lt-surface-800);
 }
 .dark .dp-panel {
-    background: var(--p-surface-900);
-    border-color: var(--p-surface-700);
+    background: var(--lt-surface-900);
+    border-color: var(--lt-surface-700);
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
 }
 .dark .dp-nav-btn:hover, .dark .dp-title-btn:hover, .dark .dp-day-cell:hover:not(.disabled):not(.selected), .dark .dp-view-btn:hover {
-    background: var(--p-surface-800);
-    color: var(--p-surface-0);
+    background: var(--lt-surface-800);
+    color: var(--lt-surface-0);
 }
 .dark .dp-day-cell.in-range {
     background: rgba(16, 185, 129, 0.15);
-    color: #6ee7b7;
+    color: var(--lt-primary-300, var(--lt-primary-300));
 }
 .dark .dp-day-cell.selected, .dark .dp-view-btn.selected {
-    background: var(--p-primary-500) !important;
-    color: var(--p-surface-950) !important;
+    background: var(--lt-primary-500) !important;
+    color: var(--lt-surface-950) !important;
 }
 .dark .dp-timepicker, .dark .dp-buttonbar {
-    border-color: var(--p-surface-700);
+    border-color: var(--lt-surface-700);
 }
 .dark .dp-ampm-btn {
-    background: var(--p-surface-800);
-    border-color: var(--p-surface-700);
+    background: var(--lt-surface-800);
+    border-color: var(--lt-surface-700);
 }
 .dark .dp-bar-btn {
-    color: #6ee7b7;
+    color: var(--lt-primary-300, var(--lt-primary-300));
 }
 .dark .dp-bar-btn:hover {
     background: rgba(16, 185, 129, 0.15);

@@ -16,9 +16,9 @@ const SVG_ICONS = {
 
 const FIELDSET_CSS = `
 .p-fieldset {
-    border: 1px solid var(--p-border-color, #e2e8f0);
-    background: var(--p-surface-0, #ffffff);
-    color: var(--p-text-color, #0f172a);
+    border: 1px solid var(--lt-surface-200);
+    background: var(--lt-surface-0);
+    color: var(--lt-text-primary);
     border-radius: var(--p-border-radius-md, 6px);
     padding: 0 1.125rem 1.125rem 1.125rem;
     margin: 0;
@@ -30,7 +30,7 @@ const FIELDSET_CSS = `
 .p-fieldset-legend {
     padding: 0 0.5rem;
     border: none;
-    color: var(--p-text-color, #0f172a);
+    color: var(--lt-text-primary);
     background: transparent;
     border-radius: 6px;
     font-weight: 600;
@@ -48,8 +48,8 @@ const FIELDSET_CSS = `
     position: relative;
     padding: 0.35rem 0.6rem;
     border: none;
-    background: var(--p-surface-0, #ffffff);
-    color: var(--p-text-color, #0f172a);
+    background: var(--lt-surface-0);
+    color: var(--lt-text-primary);
     border-radius: 6px;
     transition: background-color 0.15s ease, color 0.15s ease;
     text-decoration: none;
@@ -57,16 +57,16 @@ const FIELDSET_CSS = `
     font-family: inherit;
 }
 .p-fieldset-toggle-button:hover {
-    background: var(--p-surface-100, #f1f5f9);
-    color: var(--p-surface-900, #0f172a);
+    background: var(--lt-surface-100);
+    color: var(--lt-surface-900);
 }
 .p-fieldset-toggle-button:focus-visible {
-    outline: 2px solid var(--p-primary-500, #10b981);
+    outline: 2px solid var(--lt-primary-500);
     outline-offset: 1px;
 }
 
 .p-fieldset-toggle-icon {
-    color: var(--p-surface-500, #64748b);
+    color: var(--lt-surface-500);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -101,7 +101,7 @@ const FIELDSET_CSS = `
     padding-top: 0.5rem;
     font-size: 0.875rem;
     line-height: 1.5;
-    color: var(--p-surface-700, #334155);
+    color: var(--lt-surface-700);
     transition: opacity 200ms ease, transform 200ms ease;
     opacity: 1;
     transform: translateY(0);
@@ -123,52 +123,52 @@ const FIELDSET_CSS = `
     font-size: 0.875rem;
     font-weight: 600;
     border-radius: 6px;
-    border: 1px solid var(--p-surface-300, #cbd5e1);
-    background: var(--p-surface-0, #ffffff);
-    color: var(--p-surface-700, #334155);
+    border: 1px solid var(--lt-surface-300);
+    background: var(--lt-surface-0);
+    color: var(--lt-surface-700);
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
 }
 .p-fieldset-ctrl-btn:hover {
-    background: var(--p-surface-100, #f1f5f9);
+    background: var(--lt-surface-100);
 }
 .p-fieldset-ctrl-btn.p-highlight {
-    background: var(--p-surface-900, #0f172a);
-    border-color: var(--p-surface-900, #0f172a);
-    color: var(--lt-surface-0, #ffffff);
+    background: var(--lt-surface-900);
+    border-color: var(--lt-surface-900);
+    color: var(--lt-surface-0, var(--lt-surface-0));
 }
 
 /* Dark Mode Tokens */
 .dark .p-fieldset,
 [data-theme="dark"] .p-fieldset {
-    background: var(--p-surface-900, #0f172a) !important;
-    border-color: var(--p-surface-700, #334155) !important;
-    color: var(--p-surface-100, #f8fafc) !important;
+    background: var(--lt-surface-900) !important;
+    border-color: var(--lt-surface-700) !important;
+    color: var(--lt-surface-100) !important;
 }
 .dark .p-fieldset-toggle-button,
 [data-theme="dark"] .p-fieldset-toggle-button {
-    background: var(--p-surface-900, #0f172a) !important;
-    color: var(--p-surface-100, #f8fafc) !important;
+    background: var(--lt-surface-900) !important;
+    color: var(--lt-surface-100) !important;
 }
 .dark .p-fieldset-toggle-button:hover,
 [data-theme="dark"] .p-fieldset-toggle-button:hover {
-    background: var(--p-surface-800, #1e293b) !important;
+    background: var(--lt-surface-800) !important;
 }
 .dark .p-fieldset-content,
 [data-theme="dark"] .p-fieldset-content {
-    color: var(--p-surface-300, #cbd5e1) !important;
+    color: var(--lt-surface-300) !important;
 }
 .dark .p-fieldset-ctrl-btn,
 [data-theme="dark"] .p-fieldset-ctrl-btn {
-    background: var(--p-surface-900, #0f172a) !important;
-    border-color: var(--p-surface-700, #334155) !important;
-    color: var(--p-surface-200, #e2e8f0) !important;
+    background: var(--lt-surface-900) !important;
+    border-color: var(--lt-surface-700) !important;
+    color: var(--lt-surface-200) !important;
 }
 .dark .p-fieldset-ctrl-btn.p-highlight,
 [data-theme="dark"] .p-fieldset-ctrl-btn.p-highlight {
-    background: var(--p-surface-0, #ffffff) !important;
-    border-color: var(--p-surface-0, #ffffff) !important;
-    color: var(--p-surface-900, #0f172a) !important;
+    background: var(--lt-surface-0) !important;
+    border-color: var(--lt-surface-0) !important;
+    color: var(--lt-surface-900) !important;
 }
 `;
 

@@ -17,9 +17,9 @@ export interface SkeletonProps {
 
 const CSS = `
 [data-theme="dark"] .laughtale-skeleton {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+    background: var(--lt-surface-900) !important;
+    color: var(--lt-surface-100) !important;
+    border-color: var(--lt-surface-700) !important;
 }
 `;
 
@@ -28,10 +28,10 @@ export default function SkeletonIsland(container: HTMLElement, props: SkeletonPr
     const shape = props.shape || 'rectangle';
     const width = props.width || '100%';
     const height = props.height || '1.25rem';
-    const radius = props.borderRadius || (shape === 'circle' ? '50%' : 'var(--p-border-radius)');
+    const radius = props.borderRadius || (shape === 'circle' ? '50%' : 'var(--lt-radius)');
 
     container.innerHTML = `
-        <div class="laughtale-skeleton" style="width: ${width}; height: ${height}; border-radius: ${radius}; background: linear-gradient(90deg, var(--p-surface-100) 25%, var(--p-surface-200) 50%, var(--p-surface-100) 75%); background-size: 200% 100%; animation: skeletonShimmer 1.5s infinite ease-in-out;"></div>
+        <div class="laughtale-skeleton" style="width: ${width}; height: ${height}; border-radius: ${radius}; background: linear-gradient(90deg, var(--lt-surface-100) 25%, var(--lt-surface-200) 50%, var(--lt-surface-100) 75%); background-size: 200% 100%; animation: skeletonShimmer 1.5s infinite ease-in-out;"></div>
         <style>
             @@keyframes skeletonShimmer {
                 0% { background-position: 200% 0; }

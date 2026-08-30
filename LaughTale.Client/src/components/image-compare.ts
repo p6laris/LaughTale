@@ -44,8 +44,8 @@ const COMPARE_CSS = `
     user-select: none;
     -webkit-user-select: none;
     touch-action: none;
-    border-radius: var(--p-compare-border-radius, var(--p-border-radius, 12px));
-    border: 1px solid var(--p-border-color, #e2e8f0);
+    border-radius: var(--p-compare-border-radius, var(--lt-radius));
+    border: 1px solid var(--lt-surface-200);
     box-sizing: border-box;
     font-family: var(--p-font-family, inherit);
     cursor: ew-resize;
@@ -110,7 +110,7 @@ const COMPARE_CSS = `
     z-index: 3;
     pointer-events: none;
     box-sizing: border-box;
-    background: var(--p-compare-handle-background, #ffffff);
+    background: var(--p-compare-handle-background, var(--lt-surface-0));
     box-shadow: 0 0 8px rgba(0, 0, 0, 0.45);
     will-change: left, top;
 }
@@ -139,8 +139,8 @@ const COMPARE_CSS = `
     width: var(--p-compare-indicator-size, 2.25rem);
     height: var(--p-compare-indicator-size, 2.25rem);
     border-radius: var(--p-compare-indicator-border-radius, 9999px);
-    background: var(--p-compare-indicator-background, #ffffff);
-    color: var(--p-text-color, #0f172a);
+    background: var(--p-compare-indicator-background, var(--lt-surface-0));
+    color: var(--lt-text-primary);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
     display: flex;
     align-items: center;
@@ -184,14 +184,14 @@ const COMPARE_CSS = `
 /* Dark Mode Tokens */
 .dark .p-compare,
 [data-theme="dark"] .p-compare {
-    border-color: var(--p-surface-800, #1e293b);
+    border-color: var(--lt-surface-800);
 }
 
 .dark .p-compare-indicator,
 [data-theme="dark"] .p-compare-indicator {
-    background: var(--p-surface-900, #0f172a);
-    color: var(--p-surface-0, #ffffff);
-    border: 1px solid var(--p-surface-700, #334155);
+    background: var(--lt-surface-900);
+    color: var(--lt-surface-0);
+    border: 1px solid var(--lt-surface-700);
 }
 `;
 
@@ -233,7 +233,7 @@ export default function CompareIsland(container: HTMLElement, props: CompareProp
             beforeContentHtml = `
                 <svg class="absolute h-full w-full" viewBox="0 0 644 189" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;">
                     <g clip-path="url(#compare_chart_clip)">
-                        <path d="M0.5 118.499C0.5 118.499 82 102.999 113.5 89.4989C145 75.9989 188.444 87.7869 235 77.4989C272.684 69.1719 293.654 62.4939 329 46.9989C409.332 11.7849 479.5 86.5 510.5 78C541.5 69.5 635.951 0.848863 644 1.49886" stroke="var(--lt-primary-500, #10b981)" stroke-width="2.5" />
+                        <path d="M0.5 118.499C0.5 118.499 82 102.999 113.5 89.4989C145 75.9989 188.444 87.7869 235 77.4989C272.684 69.1719 293.654 62.4939 329 46.9989C409.332 11.7849 479.5 86.5 510.5 78C541.5 69.5 635.951 0.848863 644 1.49886" stroke="var(--lt-primary-500, var(--lt-primary-500))" stroke-width="2.5" />
                         <path d="M113.5 89.5006C82 103.001 0.5 118.501 0.5 118.501V188.501H644V1.50065C635.951 0.850647 541.5 69.5 510.5 78C479.5 86.5 409.332 11.7866 329 47.0006C293.654 62.4956 272.684 69.1736 235 77.5006C188.444 87.7886 145 76.0006 113.5 89.5006Z" fill="url(#compare_chart_gradient)" />
                     </g>
                     <defs>
@@ -241,76 +241,76 @@ export default function CompareIsland(container: HTMLElement, props: CompareProp
                             <rect width="644" height="189" fill="white" />
                         </clipPath>
                         <linearGradient id="compare_chart_gradient" x1="322.25" x2="322.25" y1="1.477" y2="188.5" gradientUnits="userSpaceOnUse">
-                            <stop stop-color="var(--lt-primary-500, #10b981)" stop-opacity="0.4" />
-                            <stop offset="1" stop-color="var(--lt-primary-500, #10b981)" stop-opacity="0" />
+                            <stop stop-color="var(--lt-primary-500, var(--lt-primary-500))" stop-opacity="0.4" />
+                            <stop offset="1" stop-color="var(--lt-primary-500, var(--lt-primary-500))" stop-opacity="0" />
                         </linearGradient>
                     </defs>
                 </svg>
             `;
             afterContentHtml = `
-                <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: var(--p-surface-50); color: var(--p-text-muted); font-size: 0.875rem;">
+                <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: var(--lt-surface-50); color: var(--p-text-muted); font-size: 0.875rem;">
                     <span>Hover to reveal chart trajectory</span>
                 </div>
             `;
         } else if (isTemplate) {
             beforeContentHtml = `
-                <div style="width: 100%; height: 100%; background: #f3e8ff; padding: 1.5rem; display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
-                    <div style="width: 100%; max-width: 18rem; border-radius: 12px; border: 1px solid #e9d5ff; background: var(--lt-surface-0, #ffffff); padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; box-shadow: 0 4px 12px rgba(147, 51, 234, 0.1);">
+                <div style="width: 100%; height: 100%; background: var(--lt-primary-50); padding: 1.5rem; display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
+                    <div style="width: 100%; max-width: 18rem; border-radius: 12px; border: 1px solid var(--lt-primary-100); background: var(--lt-surface-0, var(--lt-surface-0)); padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; box-shadow: 0 4px 12px rgba(147, 51, 234, 0.1);">
                         <div style="display: flex; align-items: flex-start; justify-content: space-between;">
                             <div style="display: flex; align-items: center; gap: 0.75rem;">
-                                <div style="width: 2.5rem; height: 2.5rem; border-radius: 9999px; overflow: hidden; background: #c084fc;">
+                                <div style="width: 2.5rem; height: 2.5rem; border-radius: 9999px; overflow: hidden; background: var(--lt-primary-400);">
                                     <img src="https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png" style="width: 100%; height: 100%; object-fit: cover; filter: hue-rotate(260deg) saturate(150%);" />
                                 </div>
                                 <div>
-                                    <div style="font-weight: 600; color: #581c87; font-size: 0.9rem;">Amy Elsner</div>
-                                    <div style="font-size: 0.75rem; color: #9333ea;">Developer</div>
+                                    <div style="font-weight: 600; color: var(--lt-primary-900); font-size: 0.9rem;">Amy Elsner</div>
+                                    <div style="font-size: 0.75rem; color: var(--lt-primary-600);">Developer</div>
                                 </div>
                             </div>
-                            <span style="background: #f3e8ff; color: #7e22ce; padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700;">Pro</span>
+                            <span style="background: var(--lt-primary-50); color: var(--lt-primary-700); padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700;">Pro</span>
                         </div>
                         <div style="display: flex; flex-direction: column; gap: 0.35rem;">
                             <div style="display: flex; justify-content: space-between; font-size: 0.75rem;">
-                                <span style="color: #9333ea;">Storage</span>
-                                <span style="color: #581c87; font-weight: 600;">7.2 GB / 10 GB</span>
+                                <span style="color: var(--lt-primary-600);">Storage</span>
+                                <span style="color: var(--lt-primary-900); font-weight: 600;">7.2 GB / 10 GB</span>
                             </div>
-                            <div style="height: 0.5rem; width: 100%; background: #f3e8ff; border-radius: 9999px; overflow: hidden;">
-                                <div style="height: 100%; width: 72%; background: #a855f7; border-radius: 9999px;"></div>
+                            <div style="height: 0.5rem; width: 100%; background: var(--lt-primary-50); border-radius: 9999px; overflow: hidden;">
+                                <div style="height: 100%; width: 72%; background: var(--lt-primary-500); border-radius: 9999px;"></div>
                             </div>
                         </div>
                         <div style="display: flex; gap: 0.5rem; padding-top: 0.25rem;">
-                            <button type="button" class="p-button p-button-sm" style="flex: 1; padding: 0.35rem; font-size: 0.75rem; border-radius: 6px; background: #9333ea; border: 1px solid #9333ea; color: var(--lt-surface-0, #ffffff); cursor: pointer;">Upgrade</button>
-                            <button type="button" class="p-button p-button-sm p-button-outlined" style="padding: 0.35rem 0.6rem; font-size: 0.75rem; border-radius: 6px; border: 1px solid #e9d5ff; background: transparent; color: #7e22ce; cursor: pointer;">Settings</button>
+                            <button type="button" class="p-button p-button-sm" style="flex: 1; padding: 0.35rem; font-size: 0.75rem; border-radius: 6px; background: var(--lt-primary-600); border: 1px solid var(--lt-primary-600); color: var(--lt-surface-0, var(--lt-surface-0)); cursor: pointer;">Upgrade</button>
+                            <button type="button" class="p-button p-button-sm p-button-outlined" style="padding: 0.35rem 0.6rem; font-size: 0.75rem; border-radius: 6px; border: 1px solid var(--lt-primary-100); background: transparent; color: var(--lt-primary-700); cursor: pointer;">Settings</button>
                         </div>
                     </div>
                 </div>
             `;
             afterContentHtml = `
-                <div style="width: 100%; height: 100%; background: #ecfdf5; padding: 1.5rem; display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
-                    <div style="width: 100%; max-width: 18rem; border-radius: 12px; border: 1px solid #a7f3d0; background: var(--lt-surface-0, #ffffff); padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);">
+                <div style="width: 100%; height: 100%; background: var(--lt-primary-50, var(--lt-primary-50)); padding: 1.5rem; display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
+                    <div style="width: 100%; max-width: 18rem; border-radius: 12px; border: 1px solid var(--lt-primary-200, var(--lt-primary-200)); background: var(--lt-surface-0, var(--lt-surface-0)); padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);">
                         <div style="display: flex; align-items: flex-start; justify-content: space-between;">
                             <div style="display: flex; align-items: center; gap: 0.75rem;">
-                                <div style="width: 2.5rem; height: 2.5rem; border-radius: 9999px; overflow: hidden; background: #34d399;">
+                                <div style="width: 2.5rem; height: 2.5rem; border-radius: 9999px; overflow: hidden; background: var(--lt-primary-400, var(--lt-primary-400));">
                                     <img src="https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png" style="width: 100%; height: 100%; object-fit: cover;" />
                                 </div>
                                 <div>
-                                    <div style="font-weight: 600; color: #064e3b; font-size: 0.9rem;">Amy Elsner</div>
-                                    <div style="font-size: 0.75rem; color: var(--lt-primary-600, #059669);">Developer</div>
+                                    <div style="font-weight: 600; color: var(--lt-primary-900); font-size: 0.9rem;">Amy Elsner</div>
+                                    <div style="font-size: 0.75rem; color: var(--lt-primary-600, var(--lt-primary-600));">Developer</div>
                                 </div>
                             </div>
-                            <span style="background: #ecfdf5; color: #047857; padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700;">Pro</span>
+                            <span style="background: var(--lt-primary-50, var(--lt-primary-50)); color: var(--lt-primary-700, var(--lt-primary-700)); padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700;">Pro</span>
                         </div>
                         <div style="display: flex; flex-direction: column; gap: 0.35rem;">
                             <div style="display: flex; justify-content: space-between; font-size: 0.75rem;">
-                                <span style="color: var(--lt-primary-600, #059669);">Storage</span>
-                                <span style="color: #064e3b; font-weight: 600;">7.2 GB / 10 GB</span>
+                                <span style="color: var(--lt-primary-600, var(--lt-primary-600));">Storage</span>
+                                <span style="color: var(--lt-primary-900); font-weight: 600;">7.2 GB / 10 GB</span>
                             </div>
-                            <div style="height: 0.5rem; width: 100%; background: #ecfdf5; border-radius: 9999px; overflow: hidden;">
-                                <div style="height: 100%; width: 72%; background: var(--lt-primary-500, #10b981); border-radius: 9999px;"></div>
+                            <div style="height: 0.5rem; width: 100%; background: var(--lt-primary-50, var(--lt-primary-50)); border-radius: 9999px; overflow: hidden;">
+                                <div style="height: 100%; width: 72%; background: var(--lt-primary-500, var(--lt-primary-500)); border-radius: 9999px;"></div>
                             </div>
                         </div>
                         <div style="display: flex; gap: 0.5rem; padding-top: 0.25rem;">
-                            <button type="button" class="p-button p-button-sm" style="flex: 1; padding: 0.35rem; font-size: 0.75rem; border-radius: 6px; background: var(--lt-primary-500, #10b981); border: 1px solid var(--lt-primary-500, #10b981); color: var(--lt-surface-0, #ffffff); cursor: pointer;">Upgrade</button>
-                            <button type="button" class="p-button p-button-sm p-button-outlined" style="padding: 0.35rem 0.6rem; font-size: 0.75rem; border-radius: 6px; border: 1px solid #a7f3d0; background: transparent; color: #047857; cursor: pointer;">Settings</button>
+                            <button type="button" class="p-button p-button-sm" style="flex: 1; padding: 0.35rem; font-size: 0.75rem; border-radius: 6px; background: var(--lt-primary-500, var(--lt-primary-500)); border: 1px solid var(--lt-primary-500, var(--lt-primary-500)); color: var(--lt-surface-0, var(--lt-surface-0)); cursor: pointer;">Upgrade</button>
+                            <button type="button" class="p-button p-button-sm p-button-outlined" style="padding: 0.35rem 0.6rem; font-size: 0.75rem; border-radius: 6px; border: 1px solid var(--lt-primary-200, var(--lt-primary-200)); background: transparent; color: var(--lt-primary-700, var(--lt-primary-700)); cursor: pointer;">Settings</button>
                         </div>
                     </div>
                 </div>
@@ -352,14 +352,14 @@ export default function CompareIsland(container: HTMLElement, props: CompareProp
         if (isControlled) {
             containerHtml += `
                 <div class="p-compare-controls" style="max-width: 32rem; margin: 1rem auto 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; width: 100%;">
-                    <button type="button" class="p-button p-button-outlined p-button-secondary" data-compare-set="25" style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer;">
+                    <button type="button" class="p-button p-button-outlined p-button-secondary" data-compare-set="25" style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--lt-radius); border: 1px solid var(--lt-surface-200); background: var(--lt-surface-0); color: var(--lt-text-primary); cursor: pointer;">
                         25%
                     </button>
                     <div style="display: flex; align-items: center; gap: 0.25rem;">
-                        <input type="number" min="0" max="100" value="${currentValue}" class="p-inputtext p-component" data-compare-num style="width: 5rem; text-align: center; padding: 0.45rem 0.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); font-weight: 600; font-size: 0.875rem;" />
+                        <input type="number" min="0" max="100" value="${currentValue}" class="p-inputtext p-component" data-compare-num style="width: 5rem; text-align: center; padding: 0.45rem 0.5rem; border-radius: var(--lt-radius); border: 1px solid var(--lt-surface-200); background: var(--lt-surface-0); color: var(--lt-text-primary); font-weight: 600; font-size: 0.875rem;" />
                         <span style="font-weight: 600; font-size: 0.875rem; color: var(--p-text-muted);">%</span>
                     </div>
-                    <button type="button" class="p-button p-button-outlined p-button-secondary" data-compare-set="75" style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer;">
+                    <button type="button" class="p-button p-button-outlined p-button-secondary" data-compare-set="75" style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--lt-radius); border: 1px solid var(--lt-surface-200); background: var(--lt-surface-0); color: var(--lt-text-primary); cursor: pointer;">
                         75%
                     </button>
                 </div>

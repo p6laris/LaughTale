@@ -50,10 +50,10 @@ const CSS = `
     font-size: 1.25rem;
     font-weight: 700;
     text-align: center;
-    color: var(--p-text-color);
-    background: var(--p-surface-0);
-    border: 1px solid var(--p-border-color);
-    border-radius: var(--p-border-radius);
+    color: var(--lt-text-primary);
+    background: var(--lt-surface-0);
+    border: 1px solid var(--lt-surface-200);
+    border-radius: var(--lt-radius);
     outline: none;
     transition: border-color 150ms ease, box-shadow 150ms ease, background 150ms ease;
     box-sizing: border-box;
@@ -62,18 +62,18 @@ const CSS = `
 }
 
 .p-inputotp-input:hover:not(:disabled) {
-    border-color: var(--p-surface-400);
+    border-color: var(--lt-surface-400);
 }
 
 .p-inputotp-input:focus {
-    border-color: var(--p-primary-500) !important;
-    box-shadow: 0 0 0 1px var(--p-primary-500) !important;
+    border-color: var(--lt-primary-500) !important;
+    box-shadow: 0 0 0 1px var(--lt-primary-500) !important;
     z-index: 2;
     position: relative;
 }
 
 .p-inputotp-input:disabled {
-    background: var(--p-surface-100);
+    background: var(--lt-surface-100);
     color: var(--p-text-muted);
     cursor: not-allowed;
     opacity: 0.75;
@@ -81,12 +81,12 @@ const CSS = `
 
 /* Variant: Filled */
 .p-inputotp.variant-filled .p-inputotp-input {
-    background: var(--p-surface-100);
+    background: var(--lt-surface-100);
     border-color: transparent;
 }
 .p-inputotp.variant-filled .p-inputotp-input:focus {
-    background: var(--p-surface-0);
-    border-color: var(--p-primary-500) !important;
+    background: var(--lt-surface-0);
+    border-color: var(--lt-primary-500) !important;
 }
 
 /* Sizes */
@@ -105,10 +105,10 @@ const CSS = `
 
 /* Invalid State */
 .p-inputotp.is-invalid .p-inputotp-input {
-    border-color: var(--p-red-500, #ef4444) !important;
+    border-color: var(--p-red-500, var(--lt-danger-500)) !important;
 }
 .p-inputotp.is-invalid .p-inputotp-input:focus {
-    box-shadow: 0 0 0 1px var(--p-red-500, #ef4444) !important;
+    box-shadow: 0 0 0 1px var(--p-red-500, var(--lt-danger-500)) !important;
 }
 
 /* Grouped Layout with Joined Borders */
@@ -144,26 +144,26 @@ const CSS = `
 
 /* ==================== DARK MODE ==================== */
 .dark .p-inputotp-input {
-    background: var(--p-surface-900);
-    border-color: var(--p-surface-700);
-    color: var(--p-surface-0);
+    background: var(--lt-surface-900);
+    border-color: var(--lt-surface-700);
+    color: var(--lt-surface-0);
 }
 .dark .p-inputotp-input:hover:not(:disabled) {
-    border-color: var(--p-surface-600);
+    border-color: var(--lt-surface-600);
 }
 .dark .p-inputotp.variant-filled .p-inputotp-input {
-    background: var(--p-surface-800);
+    background: var(--lt-surface-800);
 }
 .dark .p-inputotp.variant-filled .p-inputotp-input:focus {
-    background: var(--p-surface-900);
+    background: var(--lt-surface-900);
 }
 .dark .p-inputotp-input:disabled {
-    background: var(--p-surface-800);
-    border-color: var(--p-surface-700);
-    color: var(--p-surface-500);
+    background: var(--lt-surface-800);
+    border-color: var(--lt-surface-700);
+    color: var(--lt-surface-500);
 }
 .dark .p-inputotp-separator {
-    color: var(--p-surface-400);
+    color: var(--lt-surface-400);
 }
 `;
 

@@ -32,11 +32,11 @@ const CSS = `
 .p-textarea {
     font-family: var(--p-font-family, inherit);
     font-size: 0.875rem;
-    color: var(--p-text-color, #0f172a);
-    background: var(--p-surface-0, #ffffff);
+    color: var(--lt-text-primary);
+    background: var(--lt-surface-0);
     padding: 0.5rem 0.75rem;
-    border: 1px solid var(--p-border-color, #cbd5e1);
-    border-radius: var(--p-border-radius, 6px);
+    border: 1px solid var(--lt-surface-200);
+    border-radius: var(--lt-radius);
     outline: none;
     line-height: 1.5;
     box-sizing: border-box;
@@ -46,13 +46,13 @@ const CSS = `
 }
 
 .p-textarea:hover:not(:disabled):not(.p-disabled):not(.p-invalid) {
-    border-color: var(--p-surface-400, #94a3b8);
+    border-color: var(--lt-surface-400);
 }
 
 .p-textarea:focus:not(:disabled):not(.p-disabled):not(.p-invalid),
 .p-textarea:focus-visible:not(:disabled):not(.p-disabled):not(.p-invalid) {
-    border-color: var(--p-primary-500, #10b981) !important;
-    box-shadow: 0 0 0 1px var(--p-primary-500, #10b981) !important;
+    border-color: var(--lt-primary-500) !important;
+    box-shadow: 0 0 0 1px var(--lt-primary-500) !important;
 }
 
 /* Fluid */
@@ -78,11 +78,11 @@ const CSS = `
 /* Variant: Filled */
 .p-textarea.p-textarea-filled,
 .p-textarea.variant-filled {
-    background: var(--p-surface-100, #f1f5f9);
+    background: var(--lt-surface-100);
 }
 .p-textarea.p-textarea-filled:focus,
 .p-textarea.variant-filled:focus {
-    background: var(--p-surface-0, #ffffff);
+    background: var(--lt-surface-0);
 }
 
 /* Disabled */
@@ -90,25 +90,25 @@ const CSS = `
 .p-textarea.p-disabled {
     opacity: 0.6;
     cursor: not-allowed;
-    background: var(--p-surface-200, #e2e8f0);
-    color: var(--p-text-muted, #64748b);
+    background: var(--lt-surface-200);
+    color: var(--p-text-muted, var(--lt-surface-500));
     pointer-events: none;
 }
 
 /* Invalid */
 .p-textarea.p-invalid,
 .p-textarea.is-invalid {
-    border-color: var(--p-red-500, #ef4444) !important;
+    border-color: var(--p-red-500, var(--lt-danger-500)) !important;
 }
 .p-textarea.p-invalid:focus,
 .p-textarea.is-invalid:focus {
-    box-shadow: 0 0 0 1px var(--p-red-500, #ef4444) !important;
+    box-shadow: 0 0 0 1px var(--p-red-500, var(--lt-danger-500)) !important;
 }
 
 /* Counter */
 .p-textarea-counter {
     font-size: 0.75rem;
-    color: var(--p-text-muted, #64748b);
+    color: var(--p-text-muted, var(--lt-surface-500));
     text-align: right;
     margin-top: 0.25rem;
     font-family: var(--p-font-mono, monospace);
@@ -116,31 +116,31 @@ const CSS = `
 
 /* ==================== DARK MODE ==================== */
 .dark .p-textarea {
-    background: var(--p-surface-950, #090d14);
-    border-color: var(--p-surface-700, #334155);
-    color: var(--p-surface-0, #f8fafc);
+    background: var(--lt-surface-950);
+    border-color: var(--lt-surface-700);
+    color: var(--lt-surface-0);
 }
 .dark .p-textarea:hover:not(:disabled):not(.p-disabled):not(.p-invalid) {
-    border-color: var(--p-surface-500, #64748b);
+    border-color: var(--lt-surface-500);
 }
 .dark .p-textarea:focus:not(:disabled):not(.p-disabled):not(.p-invalid),
 .dark .p-textarea:focus-visible:not(:disabled):not(.p-disabled):not(.p-invalid) {
-    border-color: var(--p-primary-400, #34d399) !important;
-    box-shadow: 0 0 0 1px var(--p-primary-400, #34d399) !important;
+    border-color: var(--lt-primary-400) !important;
+    box-shadow: 0 0 0 1px var(--lt-primary-400) !important;
 }
 .dark .p-textarea.p-textarea-filled,
 .dark .p-textarea.variant-filled {
-    background: var(--p-surface-850, #141b26);
+    background: var(--lt-surface-850);
 }
 .dark .p-textarea.p-textarea-filled:focus,
 .dark .p-textarea.variant-filled:focus {
-    background: var(--p-surface-950, #090d14);
+    background: var(--lt-surface-950);
 }
 .dark .p-textarea:disabled,
 .dark .p-textarea.p-disabled {
-    background: var(--p-surface-800, #1e293b);
-    border-color: var(--p-surface-700, #334155);
-    color: var(--p-surface-500, #64748b);
+    background: var(--lt-surface-800);
+    border-color: var(--lt-surface-700);
+    color: var(--lt-surface-500);
 }
 `;
 

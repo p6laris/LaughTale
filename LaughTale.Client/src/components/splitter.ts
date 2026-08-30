@@ -12,10 +12,10 @@ const SPLITTER_CSS = `
 .p-splitter {
     display: flex;
     flex-wrap: nowrap;
-    border: 1px solid var(--p-border-color, #e2e8f0);
-    background: var(--p-surface-0, #ffffff);
+    border: 1px solid var(--lt-surface-200);
+    background: var(--lt-surface-0);
     border-radius: var(--p-border-radius-md, 6px);
-    color: var(--p-text-color, #0f172a);
+    color: var(--lt-text-primary);
     overflow: hidden;
     box-sizing: border-box;
     position: relative;
@@ -46,7 +46,7 @@ const SPLITTER_CSS = `
     align-items: center;
     justify-content: center;
     z-index: 5;
-    background: var(--p-surface-100, #f1f5f9);
+    background: var(--lt-surface-100);
     user-select: none;
     touch-action: none;
     transition: background-color 0.15s ease, opacity 0.15s ease;
@@ -67,15 +67,15 @@ const SPLITTER_CSS = `
 .p-splitter-gutter:hover,
 .p-splitter-gutter:focus-visible,
 .p-splitter-gutter[data-resizing="true"] {
-    background: var(--p-surface-200, #e2e8f0);
+    background: var(--lt-surface-200);
 }
 .p-splitter-gutter:focus-visible {
-    outline: 2px solid var(--p-primary-500, #10b981);
+    outline: 2px solid var(--lt-primary-500);
     outline-offset: -1px;
 }
 
 .p-splitter-gutter-handle {
-    background: var(--p-surface-400, #94a3b8);
+    background: var(--lt-surface-400);
     border-radius: 9999px;
     transition: background-color 0.15s ease;
 }
@@ -92,7 +92,7 @@ const SPLITTER_CSS = `
 
 .p-splitter-gutter:hover > .p-splitter-gutter-handle,
 .p-splitter-gutter[data-resizing="true"] > .p-splitter-gutter-handle {
-    background: var(--p-surface-600, #475569);
+    background: var(--lt-surface-600);
 }
 
 .p-splitter[data-disabled="true"] > .p-splitter-gutter {
@@ -104,14 +104,14 @@ const SPLITTER_CSS = `
 /* Dark Mode Tokens */
 .dark .p-splitter,
 [data-theme="dark"] .p-splitter {
-    background: var(--p-surface-900, #0f172a) !important;
-    border-color: var(--p-surface-700, #334155) !important;
-    color: var(--p-surface-100, #f8fafc) !important;
+    background: var(--lt-surface-900) !important;
+    border-color: var(--lt-surface-700) !important;
+    color: var(--lt-surface-100) !important;
 }
 
 .dark .p-splitter-gutter,
 [data-theme="dark"] .p-splitter-gutter {
-    background: var(--p-surface-800, #1e293b) !important;
+    background: var(--lt-surface-800) !important;
 }
 
 .dark .p-splitter-gutter:hover,
@@ -120,19 +120,19 @@ const SPLITTER_CSS = `
 [data-theme="dark"] .p-splitter-gutter:hover,
 [data-theme="dark"] .p-splitter-gutter:focus-visible,
 [data-theme="dark"] .p-splitter-gutter[data-resizing="true"] {
-    background: var(--p-surface-700, #334155) !important;
+    background: var(--lt-surface-700) !important;
 }
 
 .dark .p-splitter-gutter-handle,
 [data-theme="dark"] .p-splitter-gutter-handle {
-    background: var(--p-surface-500, #64748b) !important;
+    background: var(--lt-surface-500) !important;
 }
 
 .dark .p-splitter-gutter:hover > .p-splitter-gutter-handle,
 .dark .p-splitter-gutter[data-resizing="true"] > .p-splitter-gutter-handle,
 [data-theme="dark"] .p-splitter-gutter:hover > .p-splitter-gutter-handle,
 [data-theme="dark"] .p-splitter-gutter[data-resizing="true"] > .p-splitter-gutter-handle {
-    background: var(--p-surface-300, #cbd5e1) !important;
+    background: var(--lt-surface-300) !important;
 }
 `;
 

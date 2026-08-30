@@ -46,10 +46,10 @@ const DATAVIEW_CSS = `
     flex-direction: column;
     width: 100%;
     font-family: var(--p-font-family, inherit);
-    color: var(--p-surface-800, #1e293b);
-    background: var(--p-surface-0, #ffffff);
-    border: 1px solid var(--p-surface-200, #e2e8f0);
-    border-radius: var(--p-border-radius-lg, 10px);
+    color: var(--lt-surface-800);
+    background: var(--lt-surface-0);
+    border: 1px solid var(--lt-surface-200);
+    border-radius: var(--lt-radius-lg);
     overflow: hidden;
     box-shadow: var(--p-shadow-xs, 0 1px 2px 0 rgba(0, 0, 0, 0.05));
 }
@@ -60,8 +60,8 @@ const DATAVIEW_CSS = `
     align-items: center;
     justify-content: space-between;
     padding: 1rem 1.25rem;
-    background: var(--p-surface-50, #f8fafc);
-    border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
+    background: var(--lt-surface-50);
+    border-bottom: 1px solid var(--lt-surface-200);
     flex-wrap: wrap;
     gap: 0.75rem;
 }
@@ -69,7 +69,7 @@ const DATAVIEW_CSS = `
 .p-dataview-title {
     font-size: 1rem;
     font-weight: 700;
-    color: var(--p-surface-900, #0f172a);
+    color: var(--lt-surface-900);
 }
 
 .p-dataview-controls {
@@ -82,9 +82,9 @@ const DATAVIEW_CSS = `
 /* Layout Switcher */
 .p-layout-switcher {
     display: inline-flex;
-    border-radius: var(--p-border-radius, 6px);
-    border: 1px solid var(--p-surface-300, #cbd5e1);
-    background: var(--p-surface-0, #ffffff);
+    border-radius: var(--lt-radius);
+    border: 1px solid var(--lt-surface-300);
+    background: var(--lt-surface-0);
     overflow: hidden;
 }
 .p-layout-btn {
@@ -97,16 +97,16 @@ const DATAVIEW_CSS = `
     border: none;
     background: transparent;
     cursor: pointer;
-    color: var(--p-surface-600, #475569);
+    color: var(--lt-surface-600);
     transition: all 0.15s ease;
 }
 .p-layout-btn:hover {
-    background: var(--p-surface-100, #f1f5f9);
-    color: var(--p-surface-900, #0f172a);
+    background: var(--lt-surface-100);
+    color: var(--lt-surface-900);
 }
 .p-layout-btn.p-active {
-    background: var(--p-primary-500, #10b981);
-    color: var(--lt-surface-0, #ffffff);
+    background: var(--lt-primary-500);
+    color: var(--lt-surface-0, var(--lt-surface-0));
 }
 
 /* Sort Select */
@@ -114,22 +114,22 @@ const DATAVIEW_CSS = `
     padding: 0.4rem 0.75rem;
     font-size: 0.8125rem;
     font-weight: 600;
-    border-radius: var(--p-border-radius, 6px);
-    border: 1px solid var(--p-surface-300, #cbd5e1);
-    background: var(--p-surface-0, #ffffff);
-    color: var(--p-surface-700, #334155);
+    border-radius: var(--lt-radius);
+    border: 1px solid var(--lt-surface-300);
+    background: var(--lt-surface-0);
+    color: var(--lt-surface-700);
     outline: none;
     cursor: pointer;
     transition: all 0.15s ease;
 }
 .p-dataview-sort-select:focus {
-    border-color: var(--p-primary-500, #10b981);
+    border-color: var(--lt-primary-500);
     box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
 }
 
 /* Content Layouts */
 .p-dataview-content {
-    background: var(--p-surface-0, #ffffff);
+    background: var(--lt-surface-0);
 }
 
 /* List Layout */
@@ -142,14 +142,14 @@ const DATAVIEW_CSS = `
     flex-direction: column;
     padding: 1.5rem;
     gap: 1.25rem;
-    border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
+    border-bottom: 1px solid var(--lt-surface-200);
     transition: background-color 0.15s ease;
 }
 .p-dataview-list-item:last-child {
     border-bottom: none;
 }
 .p-dataview-list-item:hover {
-    background: var(--p-surface-50, #f8fafc);
+    background: var(--lt-surface-50);
 }
 
 @media (min-width: 640px) {
@@ -164,13 +164,13 @@ const DATAVIEW_CSS = `
     width: 100%;
     max-width: 10rem;
     aspect-ratio: 4 / 3;
-    border-radius: var(--p-border-radius, 6px);
-    background: var(--p-surface-100, #f1f5f9);
-    border: 1px solid var(--p-surface-200, #e2e8f0);
+    border-radius: var(--lt-radius);
+    background: var(--lt-surface-100);
+    border: 1px solid var(--lt-surface-200);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--p-primary-600, #059669);
+    color: var(--lt-primary-600);
     flex-shrink: 0;
     overflow: hidden;
 }
@@ -197,12 +197,12 @@ const DATAVIEW_CSS = `
 .p-dataview-item-category {
     font-size: 0.8125rem;
     font-weight: 500;
-    color: var(--p-surface-500, #64748b);
+    color: var(--lt-surface-500);
 }
 .p-dataview-item-name {
     font-size: 1.125rem;
     font-weight: 700;
-    color: var(--p-surface-900, #0f172a);
+    color: var(--lt-surface-900);
 }
 
 /* Rating Badge */
@@ -212,16 +212,16 @@ const DATAVIEW_CSS = `
     gap: 0.35rem;
     padding: 0.25rem 0.6rem;
     border-radius: 9999px;
-    background: var(--p-surface-0, #ffffff);
-    border: 1px solid var(--p-surface-200, #e2e8f0);
+    background: var(--lt-surface-0);
+    border: 1px solid var(--lt-surface-200);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     font-size: 0.8125rem;
     font-weight: 700;
-    color: var(--p-surface-900, #0f172a);
+    color: var(--lt-surface-900);
     width: fit-content;
 }
 .p-rating-star {
-    color: #eab308;
+    color: var(--lt-warn-500, var(--lt-warn-500));
     display: flex;
     align-items: center;
 }
@@ -241,7 +241,7 @@ const DATAVIEW_CSS = `
 .p-dataview-price {
     font-size: 1.35rem;
     font-weight: 700;
-    color: var(--p-surface-900, #0f172a);
+    color: var(--lt-surface-900);
 }
 
 .p-dataview-btn-group {
@@ -255,9 +255,9 @@ const DATAVIEW_CSS = `
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 1rem;
-    border-radius: var(--p-border-radius, 6px);
-    background: var(--p-primary-500, #10b981);
-    color: var(--lt-surface-0, #ffffff);
+    border-radius: var(--lt-radius);
+    background: var(--lt-primary-500);
+    color: var(--lt-surface-0, var(--lt-surface-0));
     font-weight: 600;
     font-size: 0.8125rem;
     border: none;
@@ -266,12 +266,12 @@ const DATAVIEW_CSS = `
     white-space: nowrap;
 }
 .p-dataview-btn-buy:hover:not(:disabled) {
-    background: var(--p-primary-600, #059669);
+    background: var(--lt-primary-600);
 }
 .p-dataview-btn-buy:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-    background: var(--p-surface-400, #94a3b8);
+    background: var(--lt-surface-400);
 }
 
 .p-dataview-btn-wishlist {
@@ -280,22 +280,22 @@ const DATAVIEW_CSS = `
     justify-content: center;
     width: 2.25rem;
     height: 2.25rem;
-    border-radius: var(--p-border-radius, 6px);
-    border: 1px solid var(--p-surface-300, #cbd5e1);
-    background: var(--p-surface-0, #ffffff);
-    color: var(--p-surface-700, #334155);
+    border-radius: var(--lt-radius);
+    border: 1px solid var(--lt-surface-300);
+    background: var(--lt-surface-0);
+    color: var(--lt-surface-700);
     cursor: pointer;
     transition: all 0.15s ease;
 }
 .p-dataview-btn-wishlist:hover {
-    border-color: #f43f5e;
-    color: #f43f5e;
-    background: #fff1f2;
+    border-color: var(--lt-danger-500, var(--lt-danger-500));
+    color: var(--lt-danger-500, var(--lt-danger-500));
+    background: var(--lt-danger-50);
 }
 .p-dataview-btn-wishlist.p-wishlisted {
-    background: #f43f5e;
-    border-color: #f43f5e;
-    color: var(--lt-surface-0, #ffffff);
+    background: var(--lt-danger-500, var(--lt-danger-500));
+    border-color: var(--lt-danger-500, var(--lt-danger-500));
+    color: var(--lt-surface-0, var(--lt-surface-0));
 }
 
 /* Grid Layout */
@@ -309,9 +309,9 @@ const DATAVIEW_CSS = `
 .p-dataview-grid-card {
     display: flex;
     flex-direction: column;
-    border: 1px solid var(--p-surface-200, #e2e8f0);
-    border-radius: var(--p-border-radius-lg, 10px);
-    background: var(--p-surface-0, #ffffff);
+    border: 1px solid var(--lt-surface-200);
+    border-radius: var(--lt-radius-lg);
+    background: var(--lt-surface-0);
     padding: 1.25rem;
     transition: all 0.2s ease;
 }
@@ -324,13 +324,13 @@ const DATAVIEW_CSS = `
     position: relative;
     width: 100%;
     aspect-ratio: 16 / 10;
-    border-radius: var(--p-border-radius, 8px);
-    background: var(--p-surface-50, #f8fafc);
-    border: 1px solid var(--p-surface-200, #e2e8f0);
+    border-radius: var(--lt-radius);
+    background: var(--lt-surface-50);
+    border: 1px solid var(--lt-surface-200);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--p-primary-600, #059669);
+    color: var(--lt-primary-600);
     overflow: hidden;
     margin-bottom: 1.25rem;
 }
@@ -360,14 +360,14 @@ const DATAVIEW_CSS = `
     text-transform: capitalize;
     z-index: 2;
 }
-.p-tag-success { background: #dcfce7; color: #15803d; }
-.p-tag-warn { background: #fef3c7; color: #b45309; }
-.p-tag-danger { background: #fee2e2; color: #b91c1c; }
+.p-tag-success { background: var(--lt-success-100, var(--lt-success-100)); color: var(--lt-success-700, var(--lt-success-700)); }
+.p-tag-warn { background: var(--lt-warn-100, var(--lt-warn-100)); color: var(--lt-warn-700, var(--lt-warn-700)); }
+.p-tag-danger { background: var(--lt-danger-100, var(--lt-danger-100)); color: var(--lt-danger-700, var(--lt-danger-700)); }
 
 /* Skeleton Shimmer */
 .p-skeleton {
     border-radius: 4px;
-    background: linear-gradient(90deg, var(--p-surface-200, #e2e8f0) 25%, var(--p-surface-100, #f1f5f9) 50%, var(--p-surface-200, #e2e8f0) 75%);
+    background: linear-gradient(90deg, var(--lt-surface-200) 25%, var(--lt-surface-100) 50%, var(--lt-surface-200) 75%);
     background-size: 200% 100%;
     animation: p-skeleton-shimmer 1.5s infinite;
 }
@@ -382,10 +382,10 @@ const DATAVIEW_CSS = `
     align-items: center;
     justify-content: space-between;
     padding: 0.75rem 1.25rem;
-    background: var(--p-surface-0, #ffffff);
-    border-top: 1px solid var(--p-surface-200, #e2e8f0);
+    background: var(--lt-surface-0);
+    border-top: 1px solid var(--lt-surface-200);
     font-size: 0.8125rem;
-    color: var(--p-surface-600, #475569);
+    color: var(--lt-surface-600);
     flex-wrap: wrap;
     gap: 0.75rem;
 }
@@ -401,22 +401,22 @@ const DATAVIEW_CSS = `
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: var(--p-border-radius, 6px);
+    border-radius: var(--lt-radius);
     border: 1px solid transparent;
     background: transparent;
     cursor: pointer;
     font-weight: 600;
     font-size: 0.8125rem;
-    color: var(--p-surface-700, #334155);
+    color: var(--lt-surface-700);
     transition: all 0.15s ease;
 }
 .p-paginator-page:hover:not(:disabled), .p-paginator-nav:hover:not(:disabled) {
-    background: var(--p-surface-100, #f1f5f9);
-    color: var(--p-surface-900, #0f172a);
+    background: var(--lt-surface-100);
+    color: var(--lt-surface-900);
 }
 .p-paginator-page.p-paginator-page-active {
-    background: var(--p-primary-500, #10b981);
-    color: var(--lt-surface-0, #ffffff);
+    background: var(--lt-primary-500);
+    color: var(--lt-surface-0, var(--lt-surface-0));
 }
 .p-paginator-page:disabled, .p-paginator-nav:disabled {
     opacity: 0.4;
@@ -426,41 +426,41 @@ const DATAVIEW_CSS = `
 /* Dark Mode Tokens */
 .dark .p-dataview,
 [data-theme="dark"] .p-dataview {
-    background: var(--p-surface-900, #0f172a) !important;
-    color: var(--p-surface-100, #f1f5f9) !important;
-    border-color: var(--p-surface-700, #334155) !important;
+    background: var(--lt-surface-900) !important;
+    color: var(--lt-surface-100) !important;
+    border-color: var(--lt-surface-700) !important;
 }
 .dark .p-dataview-header,
 .dark .p-dataview-paginator,
 [data-theme="dark"] .p-dataview-header,
 [data-theme="dark"] .p-dataview-paginator {
-    background: var(--p-surface-800, #1e293b) !important;
-    border-color: var(--p-surface-700, #334155) !important;
-    color: var(--p-surface-200, #e2e8f0) !important;
+    background: var(--lt-surface-800) !important;
+    border-color: var(--lt-surface-700) !important;
+    color: var(--lt-surface-200) !important;
 }
 .dark .p-dataview-content,
 [data-theme="dark"] .p-dataview-content {
-    background: var(--p-surface-900, #0f172a) !important;
+    background: var(--lt-surface-900) !important;
 }
 .dark .p-dataview-list-item,
 [data-theme="dark"] .p-dataview-list-item {
-    border-color: var(--p-surface-800, #1e293b) !important;
+    border-color: var(--lt-surface-800) !important;
 }
 .dark .p-dataview-list-item:hover,
 [data-theme="dark"] .p-dataview-list-item:hover {
-    background: var(--p-surface-800, #1e293b) !important;
+    background: var(--lt-surface-800) !important;
 }
 .dark .p-dataview-grid-card,
 [data-theme="dark"] .p-dataview-grid-card {
-    background: var(--p-surface-900, #0f172a) !important;
-    border-color: var(--p-surface-700, #334155) !important;
+    background: var(--lt-surface-900) !important;
+    border-color: var(--lt-surface-700) !important;
 }
 .dark .p-dataview-grid-image-box,
 .dark .p-dataview-list-image-box,
 [data-theme="dark"] .p-dataview-grid-image-box,
 [data-theme="dark"] .p-dataview-list-image-box {
-    background: var(--p-surface-800, #1e293b) !important;
-    border-color: var(--p-surface-700, #334155) !important;
+    background: var(--lt-surface-800) !important;
+    border-color: var(--lt-surface-700) !important;
 }
 .dark .p-layout-switcher,
 .dark .p-dataview-sort-select,
@@ -468,9 +468,9 @@ const DATAVIEW_CSS = `
 [data-theme="dark"] .p-layout-switcher,
 [data-theme="dark"] .p-dataview-sort-select,
 [data-theme="dark"] .p-dataview-btn-wishlist {
-    background: var(--p-surface-800, #1e293b) !important;
-    border-color: var(--p-surface-600, #475569) !important;
-    color: var(--p-surface-200, #e2e8f0) !important;
+    background: var(--lt-surface-800) !important;
+    border-color: var(--lt-surface-600) !important;
+    color: var(--lt-surface-200) !important;
 }
 .dark .p-dataview-item-name,
 .dark .p-dataview-price,
@@ -478,13 +478,13 @@ const DATAVIEW_CSS = `
 [data-theme="dark"] .p-dataview-item-name,
 [data-theme="dark"] .p-dataview-price,
 [data-theme="dark"] .p-dataview-title {
-    color: var(--p-surface-100, #f1f5f9) !important;
+    color: var(--lt-surface-100) !important;
 }
 .dark .p-dataview-rating-pill,
 [data-theme="dark"] .p-dataview-rating-pill {
-    background: var(--p-surface-800, #1e293b) !important;
-    border-color: var(--p-surface-700, #334155) !important;
-    color: var(--p-surface-100, #f1f5f9) !important;
+    background: var(--lt-surface-800) !important;
+    border-color: var(--lt-surface-700) !important;
+    color: var(--lt-surface-100) !important;
 }
 `;
 
@@ -732,7 +732,7 @@ export default function DataViewIsland(container: HTMLElement, props: DataViewPr
                     </div>
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                         <span>Rows per page:</span>
-                        <select class="p-dataview-rows-select" style="padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px solid var(--p-surface-300); background: var(--p-surface-0); color: inherit; font-size: 0.8125rem;">
+                        <select class="p-dataview-rows-select" style="padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px solid var(--lt-surface-300); background: var(--lt-surface-0); color: inherit; font-size: 0.8125rem;">
                             ${rowsPerPageOptions.map(opt => `<option value="${opt}" ${opt === rowsPerPage ? 'selected' : ''}>${opt}</option>`).join('')}
                         </select>
                     </div>

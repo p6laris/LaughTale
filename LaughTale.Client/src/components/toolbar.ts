@@ -15,9 +15,9 @@ const TOOLBAR_CSS = `
     justify-content: space-between;
     flex-wrap: wrap;
     padding: 0.75rem 1rem;
-    background: var(--p-surface-0, #ffffff);
-    border: 1px solid var(--p-border-color, #e2e8f0);
-    border-radius: var(--p-border-radius, 6px);
+    background: var(--lt-surface-0);
+    border: 1px solid var(--lt-surface-200);
+    border-radius: var(--lt-radius);
     gap: 0.75rem;
     box-sizing: border-box;
     width: 100%;
@@ -50,23 +50,23 @@ const TOOLBAR_CSS = `
 /* Toggle item active styling */
 .p-toolbar [data-toggle-active="true"],
 .p-toolbar .p-button-active-toggle {
-    background: var(--p-surface-0, #ffffff) !important;
-    color: var(--p-primary-600, #059669) !important;
+    background: var(--lt-surface-0) !important;
+    color: var(--lt-primary-600) !important;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
     font-weight: 700 !important;
 }
 
 .dark .p-toolbar [data-toggle-active="true"],
 [data-theme="dark"] .p-toolbar .p-button-active-toggle {
-    background: var(--p-surface-700, #334155) !important;
-    color: var(--p-primary-400, #34d399) !important;
+    background: var(--lt-surface-700) !important;
+    color: var(--lt-primary-400) !important;
 }
 
 /* Dark Mode Tokens */
 .dark .p-toolbar,
 [data-theme="dark"] .p-toolbar {
-    background: var(--p-surface-900, #0f172a);
-    border-color: var(--p-surface-700, #334155);
+    background: var(--lt-surface-900);
+    border-color: var(--lt-surface-700);
 }
 `;
 
@@ -98,12 +98,12 @@ export default function ToolbarIsland(container: HTMLElement, props: ToolbarProp
             const isActive = btn.classList.toggle('p-button-active-toggle');
             btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
             if (isActive) {
-                btn.style.background = 'var(--p-surface-0)';
-                btn.style.color = 'var(--p-primary-600)';
+                btn.style.background = 'var(--lt-surface-0)';
+                btn.style.color = 'var(--lt-primary-600)';
                 btn.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
             } else {
                 btn.style.background = 'transparent';
-                btn.style.color = 'var(--p-surface-700)';
+                btn.style.color = 'var(--lt-surface-700)';
                 btn.style.boxShadow = 'none';
             }
         });
@@ -118,13 +118,13 @@ export default function ToolbarIsland(container: HTMLElement, props: ToolbarProp
                 b.classList.remove('p-button-active-toggle');
                 b.setAttribute('aria-pressed', 'false');
                 b.style.background = 'transparent';
-                b.style.color = 'var(--p-surface-700)';
+                b.style.color = 'var(--lt-surface-700)';
                 b.style.boxShadow = 'none';
             });
             btn.classList.add('p-button-active-toggle');
             btn.setAttribute('aria-pressed', 'true');
-            btn.style.background = 'var(--p-surface-0)';
-            btn.style.color = 'var(--p-primary-600)';
+            btn.style.background = 'var(--lt-surface-0)';
+            btn.style.color = 'var(--lt-primary-600)';
             btn.style.boxShadow = '0 1px 2px rgba(0,0,0,0.06)';
         });
     });
@@ -136,11 +136,11 @@ export default function ToolbarIsland(container: HTMLElement, props: ToolbarProp
             e.preventDefault();
             viewButtons.forEach(b => {
                 b.style.background = 'transparent';
-                b.style.color = 'var(--p-surface-600)';
+                b.style.color = 'var(--lt-surface-600)';
                 b.style.boxShadow = 'none';
             });
-            btn.style.background = 'var(--p-surface-0)';
-            btn.style.color = 'var(--p-primary-600)';
+            btn.style.background = 'var(--lt-surface-0)';
+            btn.style.color = 'var(--lt-primary-600)';
             btn.style.boxShadow = '0 1px 2px rgba(0,0,0,0.06)';
         });
     });
@@ -168,7 +168,7 @@ export default function ToolbarIsland(container: HTMLElement, props: ToolbarProp
             if (countSpan) {
                 countSpan.textContent = isStarred ? '1.4k + 1' : '1.4k';
             }
-            starBtn.style.color = isStarred ? '#eab308' : 'var(--p-text-color)';
+            starBtn.style.color = isStarred ? 'var(--lt-warn-500, var(--lt-warn-500))' : 'var(--lt-text-primary)';
         });
     }
 }

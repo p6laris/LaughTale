@@ -73,28 +73,28 @@ const CSS = `
     display: block;
     width: 2.5rem; /* 40px */
     height: 1.5rem; /* 24px */
-    background: var(--p-surface-300, #cbd5e1);
+    background: var(--lt-surface-300);
     border-radius: 9999px;
     transition: background 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
     box-sizing: border-box;
 }
 
 .p-toggleswitch:hover:not(.p-disabled):not(.p-toggleswitch-checked) .p-toggleswitch-slider {
-    background: var(--p-surface-400, #94a3b8);
+    background: var(--lt-surface-400);
 }
 
 .p-toggleswitch:focus-within:not(.p-disabled) .p-toggleswitch-slider,
 .p-toggleswitch-input:focus-visible ~ .p-toggleswitch-slider {
-    box-shadow: 0 0 0 1px var(--p-primary-500, #10b981) !important;
+    box-shadow: 0 0 0 1px var(--lt-primary-500) !important;
 }
 
 /* Checked State */
 .p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-slider {
-    background: var(--p-primary-500, #10b981);
+    background: var(--lt-primary-500);
 }
 
 .p-toggleswitch.p-toggleswitch-checked:hover:not(.p-disabled) .p-toggleswitch-slider {
-    background: var(--p-primary-600, #059669);
+    background: var(--lt-primary-600);
 }
 
 /* Handle Thumb */
@@ -104,7 +104,7 @@ const CSS = `
     left: 3px;
     width: 1.125rem; /* 18px */
     height: 1.125rem; /* 18px */
-    background: var(--p-surface-0, #ffffff);
+    background: var(--lt-surface-0);
     border-radius: 50%;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.06);
     transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1), background 150ms ease, color 150ms ease;
@@ -112,12 +112,12 @@ const CSS = `
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
-    color: var(--p-surface-600, #475569);
+    color: var(--lt-surface-600);
 }
 
 .p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-handle {
     transform: translateX(16px);
-    color: var(--p-primary-600, #059669);
+    color: var(--lt-primary-600);
 }
 
 /* Handle Icon */
@@ -136,47 +136,47 @@ const CSS = `
 /* Invalid State */
 .p-toggleswitch.p-invalid .p-toggleswitch-slider,
 .p-toggleswitch.is-invalid .p-toggleswitch-slider {
-    border: 1px solid var(--p-red-500, #ef4444) !important;
+    border: 1px solid var(--p-red-500, var(--lt-danger-500)) !important;
 }
 .p-toggleswitch.p-invalid:focus-within .p-toggleswitch-slider,
 .p-toggleswitch.is-invalid:focus-within .p-toggleswitch-slider {
-    box-shadow: 0 0 0 1px var(--p-red-500, #ef4444) !important;
+    box-shadow: 0 0 0 1px var(--p-red-500, var(--lt-danger-500)) !important;
 }
 
 /* Label */
 .p-toggleswitch-label {
     font-size: 0.875rem;
     font-weight: 500;
-    color: var(--p-text-color, #0f172a);
+    color: var(--lt-text-primary);
     cursor: pointer;
 }
 
 /* ==================== DARK MODE ==================== */
 .dark .p-toggleswitch-slider {
-    background: var(--p-surface-700, #334155);
+    background: var(--lt-surface-700);
 }
 .dark .p-toggleswitch:hover:not(.p-disabled):not(.p-toggleswitch-checked) .p-toggleswitch-slider {
-    background: var(--p-surface-600, #475569);
+    background: var(--lt-surface-600);
 }
 .dark .p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-slider {
-    background: var(--p-primary-500, #10b981);
+    background: var(--lt-primary-500);
 }
 .dark .p-toggleswitch.p-toggleswitch-checked:hover:not(.p-disabled) .p-toggleswitch-slider {
-    background: var(--p-primary-400, #34d399);
+    background: var(--lt-primary-400);
 }
 .dark .p-toggleswitch-handle {
-    background: var(--p-surface-0, #ffffff);
-    color: var(--p-surface-600, #475569);
+    background: var(--lt-surface-0);
+    color: var(--lt-surface-600);
 }
 .dark .p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-handle {
-    background: var(--p-surface-0, #ffffff);
-    color: var(--p-primary-600, #059669);
+    background: var(--lt-surface-0);
+    color: var(--lt-primary-600);
 }
 .dark .p-toggleswitch.p-disabled .p-toggleswitch-slider {
-    background: var(--p-surface-800, #1e293b);
+    background: var(--lt-surface-800);
 }
 .dark .p-toggleswitch.p-disabled .p-toggleswitch-handle {
-    background: var(--p-surface-500, #64748b);
+    background: var(--lt-surface-500);
 }
 `;
 

@@ -56,9 +56,9 @@ const CSS = `
     display: flex;
     align-items: center;
     position: relative;
-    background: var(--p-surface-0);
-    border: 1px solid var(--p-border-color);
-    border-radius: var(--p-border-radius);
+    background: var(--lt-surface-0);
+    border: 1px solid var(--lt-surface-200);
+    border-radius: var(--lt-radius);
     transition: border-color 150ms ease, box-shadow 150ms ease, background 150ms ease;
     box-sizing: border-box;
     min-height: 2.5rem;
@@ -67,36 +67,36 @@ const CSS = `
 }
 
 .p-password-container:hover:not(.is-disabled) {
-    border-color: var(--p-surface-400);
+    border-color: var(--lt-surface-400);
 }
 
 .p-password-container:focus-within:not(.is-disabled) {
-    border-color: var(--p-primary-500) !important;
-    box-shadow: 0 0 0 1px var(--p-primary-500) !important;
+    border-color: var(--lt-primary-500) !important;
+    box-shadow: 0 0 0 1px var(--lt-primary-500) !important;
 }
 
 .p-password.is-disabled .p-password-container {
-    background: var(--p-surface-100);
+    background: var(--lt-surface-100);
     opacity: 0.75;
     cursor: not-allowed;
 }
 
 /* Variant: Filled */
 .p-password.variant-filled .p-password-container {
-    background: var(--p-surface-100);
+    background: var(--lt-surface-100);
     border-color: transparent;
 }
 .p-password.variant-filled .p-password-container:focus-within {
-    background: var(--p-surface-0);
-    border-color: var(--p-primary-500) !important;
+    background: var(--lt-surface-0);
+    border-color: var(--lt-primary-500) !important;
 }
 
 /* Invalid State */
 .p-password.is-invalid .p-password-container {
-    border-color: var(--p-red-500, #ef4444) !important;
+    border-color: var(--p-red-500, var(--lt-danger-500)) !important;
 }
 .p-password.is-invalid .p-password-container:focus-within {
-    box-shadow: 0 0 0 1px var(--p-red-500, #ef4444) !important;
+    box-shadow: 0 0 0 1px var(--p-red-500, var(--lt-danger-500)) !important;
 }
 
 /* Sizes */
@@ -121,7 +121,7 @@ const CSS = `
     align-items: center;
     justify-content: center;
     padding-left: 0.75rem;
-    color: var(--p-surface-400);
+    color: var(--lt-surface-400);
     pointer-events: none;
     flex-shrink: 0;
 }
@@ -137,7 +137,7 @@ const CSS = `
     min-width: 0;
     font-family: inherit;
     font-size: 0.875rem;
-    color: var(--p-text-color);
+    color: var(--lt-text-primary);
     background: transparent;
     border: none;
     outline: none;
@@ -157,7 +157,7 @@ const CSS = `
     justify-content: center;
     background: transparent;
     border: none;
-    color: var(--p-surface-400);
+    color: var(--lt-surface-400);
     cursor: pointer;
     padding: 0 0.625rem;
     height: 100%;
@@ -165,7 +165,7 @@ const CSS = `
     user-select: none;
 }
 .p-password-action-btn:hover:not(:disabled) {
-    color: var(--p-surface-700);
+    color: var(--lt-surface-700);
 }
 .p-password-action-btn svg {
     width: 16px;
@@ -182,7 +182,7 @@ const CSS = `
 }
 .p-password-meter-track {
     height: 6px;
-    background: var(--p-surface-200);
+    background: var(--lt-surface-200);
     border-radius: 9999px;
     overflow: hidden;
     width: 100%;
@@ -221,15 +221,15 @@ const CSS = `
     font-weight: 600;
     padding: 0.25rem 0.625rem;
     border-radius: 9999px;
-    border: 1px solid var(--p-border-color);
-    background: var(--p-surface-0);
-    color: var(--p-surface-600);
+    border: 1px solid var(--lt-surface-200);
+    background: var(--lt-surface-0);
+    color: var(--lt-surface-600);
     transition: all 200ms ease;
 }
 .p-password-chip.is-met {
-    background: var(--p-emerald-500, #10b981);
-    border-color: var(--p-emerald-500, #10b981);
-    color: var(--lt-surface-0, #ffffff);
+    background: var(--p-emerald-500, var(--lt-primary-500));
+    border-color: var(--p-emerald-500, var(--lt-primary-500));
+    color: var(--lt-surface-0, var(--lt-surface-0));
 }
 .p-password-chip svg {
     width: 12px;
@@ -249,11 +249,11 @@ const CSS = `
     gap: 0.5rem;
     font-size: 0.8125rem;
     font-weight: 500;
-    color: var(--p-surface-500);
+    color: var(--lt-surface-500);
     transition: color 200ms ease;
 }
 .p-password-list-item.is-met {
-    color: var(--p-emerald-600, #059669);
+    color: var(--p-emerald-600, var(--lt-primary-600));
     font-weight: 600;
 }
 .p-password-list-item svg {
@@ -268,9 +268,9 @@ const CSS = `
     top: calc(100% + 8px);
     left: 0;
     width: 320px;
-    background: var(--p-surface-0);
-    border: 1px solid var(--p-border-color);
-    border-radius: var(--p-border-radius);
+    background: var(--lt-surface-0);
+    border: 1px solid var(--lt-surface-200);
+    border-radius: var(--lt-radius);
     box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
     padding: 1rem;
     z-index: 100;
@@ -286,9 +286,9 @@ const CSS = `
     left: 1.5rem;
     width: 8px;
     height: 8px;
-    background: var(--p-surface-0);
-    border-left: 1px solid var(--p-border-color);
-    border-top: 1px solid var(--p-border-color);
+    background: var(--lt-surface-0);
+    border-left: 1px solid var(--lt-surface-200);
+    border-top: 1px solid var(--lt-surface-200);
     transform: rotate(45deg);
 }
 @keyframes pPasswordFadeIn {
@@ -302,7 +302,7 @@ const CSS = `
     justify-content: space-between;
     font-size: 0.875rem;
     font-weight: 700;
-    color: var(--p-text-color);
+    color: var(--lt-text-primary);
 }
 .p-password-popover-header-title {
     display: flex;
@@ -312,63 +312,63 @@ const CSS = `
 .p-password-popover-header-title svg {
     width: 16px;
     height: 16px;
-    color: var(--p-surface-600);
+    color: var(--lt-surface-600);
 }
 
 /* ==================== DARK MODE ==================== */
 .dark .p-password-container {
-    background: var(--p-surface-900);
-    border-color: var(--p-surface-700);
+    background: var(--lt-surface-900);
+    border-color: var(--lt-surface-700);
 }
 .dark .p-password-container:hover:not(.is-disabled) {
-    border-color: var(--p-surface-600);
+    border-color: var(--lt-surface-600);
 }
 .dark .p-password.variant-filled .p-password-container {
-    background: var(--p-surface-800);
+    background: var(--lt-surface-800);
 }
 .dark .p-password.variant-filled .p-password-container:focus-within {
-    background: var(--p-surface-900);
+    background: var(--lt-surface-900);
 }
 .dark .p-password-input {
-    color: var(--p-surface-0);
+    color: var(--lt-surface-0);
 }
 .dark .p-password-action-btn {
-    color: var(--p-surface-400);
+    color: var(--lt-surface-400);
 }
 .dark .p-password-action-btn:hover:not(:disabled) {
-    color: var(--p-surface-100);
+    color: var(--lt-surface-100);
 }
 .dark .p-password-meter-track {
-    background: var(--p-surface-800);
+    background: var(--lt-surface-800);
 }
 .dark .p-password-chip {
-    background: var(--p-surface-800);
-    border-color: var(--p-surface-700);
-    color: var(--p-surface-300);
+    background: var(--lt-surface-800);
+    border-color: var(--lt-surface-700);
+    color: var(--lt-surface-300);
 }
 .dark .p-password-chip.is-met {
-    background: var(--p-emerald-600, #059669);
-    border-color: var(--p-emerald-600, #059669);
-    color: var(--lt-surface-0, #ffffff);
+    background: var(--p-emerald-600, var(--lt-primary-600));
+    border-color: var(--p-emerald-600, var(--lt-primary-600));
+    color: var(--lt-surface-0, var(--lt-surface-0));
 }
 .dark .p-password-list-item {
-    color: var(--p-surface-400);
+    color: var(--lt-surface-400);
 }
 .dark .p-password-list-item.is-met {
-    color: var(--p-emerald-400, #34d399);
+    color: var(--p-emerald-400, var(--lt-primary-400));
 }
 .dark .p-password-popover {
-    background: var(--p-surface-900);
-    border-color: var(--p-surface-700);
+    background: var(--lt-surface-900);
+    border-color: var(--lt-surface-700);
     box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5);
 }
 .dark .p-password-popover::before {
-    background: var(--p-surface-900);
-    border-left-color: var(--p-surface-700);
-    border-top-color: var(--p-surface-700);
+    background: var(--lt-surface-900);
+    border-left-color: var(--lt-surface-700);
+    border-top-color: var(--lt-surface-700);
 }
 .dark .p-password-popover-header-title svg {
-    color: var(--p-surface-300);
+    color: var(--lt-surface-300);
 }
 `;
 
@@ -402,16 +402,16 @@ export default function InputPasswordIsland(container: HTMLElement, props: Input
     }
 
     function calculateStrength(pwd: string): { score: number; label: string; color: string; bgColor: string; width: string } {
-        if (!pwd) return { score: 0, label: 'Empty', color: 'var(--lt-surface-400, #94a3b8)', bgColor: 'var(--lt-surface-100, #f1f5f9)', width: '0%' };
+        if (!pwd) return { score: 0, label: 'Empty', color: 'var(--lt-surface-400, var(--lt-surface-400))', bgColor: 'var(--lt-surface-100, var(--lt-surface-100))', width: '0%' };
         const rules = checkRules(pwd);
         const passed = Object.values(rules).filter(Boolean).length;
 
         if (passed <= 1) {
-            return { score: 1, label: 'Too Weak', color: 'var(--lt-danger-500, #ef4444)', bgColor: 'rgba(239, 68, 68, 0.15)', width: '25%' };
+            return { score: 1, label: 'Too Weak', color: 'var(--lt-danger-500, var(--lt-danger-500))', bgColor: 'rgba(239, 68, 68, 0.15)', width: '25%' };
         } else if (passed <= 3) {
-            return { score: 2, label: 'Medium', color: 'var(--lt-warn-500, #f59e0b)', bgColor: 'rgba(245, 158, 11, 0.15)', width: '60%' };
+            return { score: 2, label: 'Medium', color: 'var(--lt-warn-500, var(--lt-warn-500))', bgColor: 'rgba(245, 158, 11, 0.15)', width: '60%' };
         } else {
-            return { score: 3, label: 'Strong', color: 'var(--lt-primary-500, #10b981)', bgColor: 'rgba(16, 185, 129, 0.15)', width: '100%' };
+            return { score: 3, label: 'Strong', color: 'var(--lt-primary-500, var(--lt-primary-500))', bgColor: 'rgba(16, 185, 129, 0.15)', width: '100%' };
         }
     }
 

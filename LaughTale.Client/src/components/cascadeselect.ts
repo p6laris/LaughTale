@@ -64,10 +64,10 @@ const CSS = `
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    background: var(--p-surface-0);
-    border: 1px solid var(--p-border-color);
-    border-radius: var(--p-border-radius);
-    color: var(--p-text-color);
+    background: var(--lt-surface-0);
+    border: 1px solid var(--lt-surface-200);
+    border-radius: var(--lt-radius);
+    color: var(--lt-text-primary);
     cursor: pointer;
     user-select: none;
     transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
@@ -75,18 +75,18 @@ const CSS = `
     gap: 0.5rem;
 }
 .cs-trigger.variant-filled {
-    background: var(--p-surface-50);
+    background: var(--lt-surface-50);
 }
 .cs-trigger.focused {
-    border-color: var(--p-primary-500);
-    box-shadow: 0 0 0 1px var(--p-primary-500);
+    border-color: var(--lt-primary-500);
+    box-shadow: 0 0 0 1px var(--lt-primary-500);
 }
 .cs-trigger.invalid {
-    border-color: var(--lt-danger-500, #ef4444) !important;
-    box-shadow: 0 0 0 1px var(--lt-danger-500, #ef4444) !important;
+    border-color: var(--lt-danger-500, var(--lt-danger-500)) !important;
+    box-shadow: 0 0 0 1px var(--lt-danger-500, var(--lt-danger-500)) !important;
 }
 .cs-trigger.disabled {
-    background: var(--p-surface-100);
+    background: var(--lt-surface-100);
     opacity: 0.65;
     cursor: not-allowed;
 }
@@ -113,7 +113,7 @@ const CSS = `
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    color: var(--p-text-color);
+    color: var(--lt-text-primary);
 }
 .cs-label.placeholder {
     color: var(--p-text-muted);
@@ -138,8 +138,8 @@ const CSS = `
     transition: color 0.15s ease, background 0.15s ease;
 }
 .cs-btn-icon:hover {
-    color: var(--p-text-color);
-    background: var(--p-surface-100);
+    color: var(--lt-text-primary);
+    background: var(--lt-surface-100);
 }
 .cs-chevron {
     display: flex;
@@ -164,9 +164,9 @@ const CSS = `
 }
 
 .cs-panel {
-    background: var(--p-surface-0);
-    border: 1px solid var(--p-border-color);
-    border-radius: var(--p-border-radius);
+    background: var(--lt-surface-0);
+    border: 1px solid var(--lt-surface-200);
+    border-radius: var(--lt-radius);
     box-shadow: var(--p-shadow-lg);
     width: 100%;
     min-width: 100%;
@@ -180,8 +180,8 @@ const CSS = `
     align-items: center;
     justify-content: space-between;
     padding: 0.5rem 0.75rem;
-    border-radius: calc(var(--p-border-radius) - 2px);
-    color: var(--p-text-color);
+    border-radius: calc(var(--lt-radius) - 2px);
+    color: var(--lt-text-primary);
     cursor: pointer;
     font-size: 0.875rem;
     user-select: none;
@@ -189,11 +189,11 @@ const CSS = `
     gap: 0.5rem;
 }
 .cs-item:hover, .cs-item.highlighted {
-    background: var(--p-surface-100);
+    background: var(--lt-surface-100);
 }
 .cs-item.selected {
-    background: var(--p-primary-50);
-    color: var(--p-primary-700);
+    background: var(--lt-primary-50);
+    color: var(--lt-primary-700);
     font-weight: 600;
 }
 .cs-item.disabled {
@@ -207,9 +207,9 @@ const CSS = `
     top: 0;
     left: calc(100% + 2px);
     z-index: 1001;
-    background: var(--p-surface-0);
-    border: 1px solid var(--p-border-color);
-    border-radius: var(--p-border-radius);
+    background: var(--lt-surface-0);
+    border: 1px solid var(--lt-surface-200);
+    border-radius: var(--lt-radius);
     box-shadow: var(--p-shadow-lg);
     width: 100%;
     min-width: 100%;
@@ -219,25 +219,25 @@ const CSS = `
 
 /* Dark Mode Tokens */
 .dark .cs-trigger {
-    background: var(--p-surface-900);
-    border-color: var(--p-surface-700);
-    color: var(--p-surface-0);
+    background: var(--lt-surface-900);
+    border-color: var(--lt-surface-700);
+    color: var(--lt-surface-0);
 }
 .dark .cs-trigger.variant-filled {
-    background: var(--p-surface-800);
+    background: var(--lt-surface-800);
 }
 .dark .cs-panel, .dark .cs-sub-panel {
-    background: var(--p-surface-900);
-    border-color: var(--p-surface-700);
+    background: var(--lt-surface-900);
+    border-color: var(--lt-surface-700);
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
 }
 .dark .cs-item:hover, .dark .cs-item.highlighted {
-    background: var(--p-surface-800);
-    color: var(--p-surface-0);
+    background: var(--lt-surface-800);
+    color: var(--lt-surface-0);
 }
 .dark .cs-item.selected {
     background: rgba(16, 185, 129, 0.15);
-    color: #6ee7b7;
+    color: var(--lt-primary-300, var(--lt-primary-300));
 }
 `;
 
@@ -357,7 +357,7 @@ export default function CascadeSelectIsland<T = string>(container: HTMLElement, 
 
             let leadingHtml = '';
             if (n.icon && LucideIcons[n.icon]) {
-                leadingHtml = `<span style="display: flex; width: 16px; height: 16px; color: var(--p-primary-600); margin-right: 0.4rem;">${LucideIcons[n.icon]}</span>`;
+                leadingHtml = `<span style="display: flex; width: 16px; height: 16px; color: var(--lt-primary-600); margin-right: 0.4rem;">${LucideIcons[n.icon]}</span>`;
             } else if (n.image) {
                 leadingHtml = `<img src="${n.image}" alt="" style="width: 18px; height: 18px; border-radius: 2px; margin-right: 0.4rem; object-fit: cover;" />`;
             }

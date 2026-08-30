@@ -37,10 +37,10 @@ const CSS = `
     width: 100%;
     min-height: 2.5rem;
     padding: 0.375rem 0.75rem;
-    background: var(--p-surface-0);
-    border: 1px solid var(--p-border-color);
-    border-radius: var(--p-border-radius);
-    color: var(--p-text-color);
+    background: var(--lt-surface-0);
+    border: 1px solid var(--lt-surface-200);
+    border-radius: var(--lt-radius);
+    color: var(--lt-text-primary);
     font-family: var(--p-font-family, inherit);
     font-size: 0.875rem;
     line-height: 1.25;
@@ -55,25 +55,25 @@ const CSS = `
 }
 
 .p-inputmask:hover:not(:disabled):not([readonly]) {
-    border-color: var(--p-surface-400);
+    border-color: var(--lt-surface-400);
 }
 
 .p-inputmask:focus {
-    border-color: var(--p-primary-500) !important;
-    box-shadow: 0 0 0 1px var(--p-primary-500) !important;
+    border-color: var(--lt-primary-500) !important;
+    box-shadow: 0 0 0 1px var(--lt-primary-500) !important;
 }
 
 /* Filled Variant */
 .p-inputmask.variant-filled {
-    background-color: var(--p-surface-100);
+    background-color: var(--lt-surface-100);
     border-color: transparent;
 }
 .p-inputmask.variant-filled:hover:not(:disabled):not([readonly]) {
-    background-color: var(--p-surface-200);
+    background-color: var(--lt-surface-200);
 }
 .p-inputmask.variant-filled:focus {
-    background-color: var(--p-surface-0);
-    border-color: var(--p-primary-500) !important;
+    background-color: var(--lt-surface-0);
+    border-color: var(--lt-primary-500) !important;
 }
 
 /* Sizes */
@@ -92,10 +92,10 @@ const CSS = `
 
 /* Invalid State */
 .p-inputmask.is-invalid {
-    border-color: var(--p-red-500, #ef4444) !important;
+    border-color: var(--p-red-500, var(--lt-danger-500)) !important;
 }
 .p-inputmask.is-invalid:focus {
-    box-shadow: 0 0 0 1px var(--p-red-500, #ef4444) !important;
+    box-shadow: 0 0 0 1px var(--p-red-500, var(--lt-danger-500)) !important;
 }
 
 /* Disabled State */
@@ -103,30 +103,30 @@ const CSS = `
 .p-inputmask.is-disabled {
     opacity: 0.65;
     cursor: not-allowed;
-    background-color: var(--p-surface-100);
+    background-color: var(--lt-surface-100);
 }
 
 /* Dark mode overrides */
 .dark .p-inputmask {
-    background-color: var(--p-surface-900);
-    border-color: var(--p-surface-700);
-    color: var(--p-surface-0);
+    background-color: var(--lt-surface-900);
+    border-color: var(--lt-surface-700);
+    color: var(--lt-surface-0);
 }
 .dark .p-inputmask:hover:not(:disabled):not([readonly]) {
-    border-color: var(--p-surface-500);
+    border-color: var(--lt-surface-500);
 }
 .dark .p-inputmask.variant-filled {
-    background-color: var(--p-surface-800);
+    background-color: var(--lt-surface-800);
 }
 .dark .p-inputmask.variant-filled:hover:not(:disabled):not([readonly]) {
-    background-color: var(--p-surface-700);
+    background-color: var(--lt-surface-700);
 }
 .dark .p-inputmask.variant-filled:focus {
-    background-color: var(--p-surface-900);
+    background-color: var(--lt-surface-900);
 }
 .dark .p-inputmask:disabled,
 .dark .p-inputmask.is-disabled {
-    background-color: var(--p-surface-800);
+    background-color: var(--lt-surface-800);
 }
 `;
 

@@ -79,7 +79,7 @@ const SPEEDDIAL_CSS = `
 }
 
 .p-speeddial-button:focus-visible {
-    outline: 2px solid var(--p-primary-500, #10b981);
+    outline: 2px solid var(--lt-primary-500);
     outline-offset: 2px;
 }
 
@@ -159,9 +159,9 @@ const SPEEDDIAL_CSS = `
     align-items: center !important;
     justify-content: center !important;
     text-decoration: none !important;
-    border: 1px solid var(--p-surface-200, #e2e8f0) !important;
-    background: var(--p-surface-0, #ffffff) !important;
-    color: var(--p-surface-600, #475569) !important;
+    border: 1px solid var(--lt-surface-200) !important;
+    background: var(--lt-surface-0) !important;
+    color: var(--lt-surface-600) !important;
     box-shadow: 0 3px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
     cursor: pointer !important;
     position: relative !important;
@@ -177,15 +177,15 @@ const SPEEDDIAL_CSS = `
 }
 
 .p-speeddial-action:hover:not(:disabled) {
-    background: var(--p-surface-100, #f1f5f9) !important;
-    color: var(--p-surface-900, #0f172a) !important;
-    border-color: var(--p-surface-300, #cbd5e1) !important;
+    background: var(--lt-surface-100) !important;
+    color: var(--lt-surface-900) !important;
+    border-color: var(--lt-surface-300) !important;
     transform: scale(1.1) !important;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
 }
 
 .p-speeddial-action:focus-visible {
-    outline: 2px solid var(--p-primary-500, #10b981) !important;
+    outline: 2px solid var(--lt-primary-500) !important;
     outline-offset: 2px !important;
 }
 
@@ -216,10 +216,10 @@ const SPEEDDIAL_CSS = `
     justify-content: center;
     width: 5.5rem;
     padding: 0.5rem 1rem;
-    border-radius: var(--p-border-radius, 6px);
-    background: var(--p-surface-0, #ffffff);
-    border: 1px solid var(--p-surface-200, #e2e8f0);
-    color: var(--p-surface-700, #334155);
+    border-radius: var(--lt-radius);
+    background: var(--lt-surface-0);
+    border: 1px solid var(--lt-surface-200);
+    color: var(--lt-surface-700);
     font-weight: 500;
     font-size: 0.875rem;
     box-shadow: 0 2px 4px rgba(0,0,0,0.06);
@@ -231,9 +231,9 @@ const SPEEDDIAL_CSS = `
     width: 3rem;
     height: 3rem;
     border-radius: 50%;
-    background: var(--p-surface-0, #ffffff);
-    border: 1px solid var(--p-surface-200, #e2e8f0);
-    color: var(--p-surface-600, #475569);
+    background: var(--lt-surface-0);
+    border: 1px solid var(--lt-surface-200);
+    color: var(--lt-surface-600);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -252,9 +252,9 @@ const SPEEDDIAL_CSS = `
 
 .p-speeddial-custom-item:hover .p-speeddial-custom-label,
 .p-speeddial-custom-item:hover .p-speeddial-custom-icon {
-    background: var(--p-surface-100, #f1f5f9);
-    color: var(--p-surface-900, #0f172a);
-    border-color: var(--p-surface-300, #cbd5e1);
+    background: var(--lt-surface-100);
+    color: var(--lt-surface-900);
+    border-color: var(--lt-surface-300);
 }
 
 .p-speeddial-custom-item:hover .p-speeddial-custom-icon {
@@ -264,13 +264,13 @@ const SPEEDDIAL_CSS = `
 /* Tooltips */
 .p-speeddial-tooltip {
     position: absolute;
-    background: var(--p-surface-900, #0f172a);
-    color: var(--lt-surface-0, #ffffff);
+    background: var(--lt-surface-900);
+    color: var(--lt-surface-0, var(--lt-surface-0));
     padding: 0.35rem 0.65rem;
     font-size: 0.75rem;
     font-weight: 600;
     line-height: 1;
-    border-radius: var(--p-border-radius-sm, 4px);
+    border-radius: var(--lt-radius-sm);
     white-space: nowrap;
     pointer-events: none;
     z-index: 1000 !important;
@@ -298,7 +298,7 @@ const SPEEDDIAL_CSS = `
     top: 50%;
     transform: translateY(-50%);
     border-width: 4px 0 4px 4px;
-    border-color: transparent transparent transparent var(--p-surface-900, #0f172a);
+    border-color: transparent transparent transparent var(--lt-surface-900);
 }
 .p-speeddial-tooltip.tooltip-left.p-tooltip-visible {
     opacity: 1;
@@ -316,7 +316,7 @@ const SPEEDDIAL_CSS = `
     top: 50%;
     transform: translateY(-50%);
     border-width: 4px 4px 4px 0;
-    border-color: transparent var(--p-surface-900, #0f172a) transparent transparent;
+    border-color: transparent var(--lt-surface-900) transparent transparent;
 }
 .p-speeddial-tooltip.tooltip-right.p-tooltip-visible {
     opacity: 1;
@@ -334,7 +334,7 @@ const SPEEDDIAL_CSS = `
     left: 50%;
     transform: translateX(-50%);
     border-width: 4px 4px 0 4px;
-    border-color: var(--p-surface-900, #0f172a) transparent transparent transparent;
+    border-color: var(--lt-surface-900) transparent transparent transparent;
 }
 .p-speeddial-tooltip.tooltip-top.p-tooltip-visible {
     opacity: 1;
@@ -352,7 +352,7 @@ const SPEEDDIAL_CSS = `
     left: 50%;
     transform: translateX(-50%);
     border-width: 0 4px 4px 4px;
-    border-color: transparent transparent var(--p-surface-900, #0f172a) transparent;
+    border-color: transparent transparent var(--lt-surface-900) transparent;
 }
 .p-speeddial-tooltip.tooltip-bottom.p-tooltip-visible {
     opacity: 1;
@@ -380,58 +380,58 @@ const SPEEDDIAL_CSS = `
 /* Dark Mode */
 .dark .p-speeddial-action,
 [data-theme="dark"] .p-speeddial-action {
-    background: var(--p-surface-900, #0f172a) !important;
-    border-color: var(--p-surface-700, #334155) !important;
-    color: var(--p-surface-300, #cbd5e1) !important;
+    background: var(--lt-surface-900) !important;
+    border-color: var(--lt-surface-700) !important;
+    color: var(--lt-surface-300) !important;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4) !important;
 }
 
 .dark .p-speeddial-action:hover:not(:disabled),
 [data-theme="dark"] .p-speeddial-action:hover:not(:disabled) {
-    background: var(--p-surface-800, #1e293b) !important;
-    color: var(--lt-surface-0, #ffffff) !important;
-    border-color: var(--p-surface-600, #475569) !important;
+    background: var(--lt-surface-800) !important;
+    color: var(--lt-surface-0, var(--lt-surface-0)) !important;
+    border-color: var(--lt-surface-600) !important;
 }
 
 .dark .p-speeddial-custom-label,
 .dark .p-speeddial-custom-icon,
 [data-theme="dark"] .p-speeddial-custom-label,
 [data-theme="dark"] .p-speeddial-custom-icon {
-    background: var(--p-surface-900, #0f172a);
-    border-color: var(--p-surface-700, #334155);
-    color: var(--p-surface-400, #94a3b8);
+    background: var(--lt-surface-900);
+    border-color: var(--lt-surface-700);
+    color: var(--lt-surface-400);
 }
 
 .dark .p-speeddial-custom-item:hover .p-speeddial-custom-label,
 .dark .p-speeddial-custom-item:hover .p-speeddial-custom-icon,
 [data-theme="dark"] .p-speeddial-custom-item:hover .p-speeddial-custom-label,
 [data-theme="dark"] .p-speeddial-custom-item:hover .p-speeddial-custom-icon {
-    background: var(--p-surface-800, #1e293b);
-    color: var(--lt-surface-0, #ffffff);
-    border-color: var(--p-surface-600, #475569);
+    background: var(--lt-surface-800);
+    color: var(--lt-surface-0, var(--lt-surface-0));
+    border-color: var(--lt-surface-600);
 }
 
 .dark .p-speeddial-tooltip,
 [data-theme="dark"] .p-speeddial-tooltip {
-    background: var(--p-surface-800, #1e293b);
-    color: var(--lt-surface-0, #ffffff);
-    border: 1px solid var(--p-surface-700, #334155);
+    background: var(--lt-surface-800);
+    color: var(--lt-surface-0, var(--lt-surface-0));
+    border: 1px solid var(--lt-surface-700);
 }
 .dark .p-speeddial-tooltip.tooltip-left::after,
 [data-theme="dark"] .p-speeddial-tooltip.tooltip-left::after {
-    border-color: transparent transparent transparent var(--p-surface-800, #1e293b);
+    border-color: transparent transparent transparent var(--lt-surface-800);
 }
 .dark .p-speeddial-tooltip.tooltip-right::after,
 [data-theme="dark"] .p-speeddial-tooltip.tooltip-right::after {
-    border-color: transparent var(--p-surface-800, #1e293b) transparent transparent;
+    border-color: transparent var(--lt-surface-800) transparent transparent;
 }
 .dark .p-speeddial-tooltip.tooltip-top::after,
 [data-theme="dark"] .p-speeddial-tooltip.tooltip-top::after {
-    border-color: var(--p-surface-800, #1e293b) transparent transparent transparent;
+    border-color: var(--lt-surface-800) transparent transparent transparent;
 }
 .dark .p-speeddial-tooltip.tooltip-bottom::after,
 [data-theme="dark"] .p-speeddial-tooltip.tooltip-bottom::after {
-    border-color: transparent transparent var(--p-surface-800, #1e293b) transparent;
+    border-color: transparent transparent var(--lt-surface-800) transparent;
 }
 `;
 

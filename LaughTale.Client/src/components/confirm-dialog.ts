@@ -81,8 +81,8 @@ const CONFIRM_DIALOG_CSS = `
 
 /* Dialog Container */
 .p-confirmdialog.p-dialog {
-    background: var(--p-surface-0, #ffffff);
-    border: 1px solid var(--p-border-color, #e2e8f0);
+    background: var(--lt-surface-0);
+    border: 1px solid var(--lt-surface-200);
     border-radius: var(--p-border-radius-xl, 12px);
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
     min-width: 24rem;
@@ -112,7 +112,7 @@ const CONFIRM_DIALOG_CSS = `
 .p-confirmdialog .p-dialog-title {
     font-weight: 700;
     font-size: 1.125rem;
-    color: var(--p-text-color, #0f172a);
+    color: var(--lt-text-primary);
     margin: 0;
 }
 
@@ -125,14 +125,14 @@ const CONFIRM_DIALOG_CSS = `
     border-radius: 9999px;
     border: none;
     background: transparent;
-    color: var(--p-surface-500, #64748b);
+    color: var(--lt-surface-500);
     cursor: pointer;
     transition: background-color 0.15s ease, color 0.15s ease;
     padding: 0;
 }
 .p-confirmdialog .p-dialog-header-close:hover {
-    background: var(--p-surface-100, #f1f5f9);
-    color: var(--p-text-color, #0f172a);
+    background: var(--lt-surface-100);
+    color: var(--lt-text-primary);
 }
 
 /* Content */
@@ -151,22 +151,22 @@ const CONFIRM_DIALOG_CSS = `
     justify-content: center;
     flex-shrink: 0;
     margin-top: 0.125rem;
-    color: var(--p-primary-500, #10b981);
+    color: var(--lt-primary-500);
 }
 
 .p-confirmdialog-icon-danger {
-    color: var(--lt-danger-500, #ef4444) !important;
+    color: var(--lt-danger-500, var(--lt-danger-500)) !important;
 }
 .p-confirmdialog-icon-warning {
-    color: var(--lt-warn-500, #f59e0b) !important;
+    color: var(--lt-warn-500, var(--lt-warn-500)) !important;
 }
 .p-confirmdialog-icon-info {
-    color: var(--lt-info-500, #3b82f6) !important;
+    color: var(--lt-info-500, var(--lt-info-500)) !important;
 }
 
 .p-confirmdialog .p-confirmdialog-message {
     font-size: 0.9375rem;
-    color: var(--p-surface-700, #334155);
+    color: var(--lt-surface-700);
     line-height: 1.5;
     margin: 0;
 }
@@ -195,43 +195,43 @@ const CONFIRM_DIALOG_CSS = `
     width: 4rem;
     height: 4rem;
     border-radius: 9999px;
-    background: var(--p-primary-50, #ecfdf5);
-    color: var(--p-primary-600, #059669);
+    background: var(--lt-primary-50);
+    color: var(--lt-primary-600);
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid var(--p-primary-200, #a7f3d0);
+    border: 2px solid var(--lt-primary-200);
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
 }
 
 /* Dark Mode Tokens */
 .dark .p-confirmdialog.p-dialog,
 [data-theme="dark"] .p-confirmdialog.p-dialog {
-    background: var(--p-surface-900, #0f172a);
-    border-color: var(--p-surface-700, #334155);
+    background: var(--lt-surface-900);
+    border-color: var(--lt-surface-700);
 }
 .dark .p-confirmdialog .p-dialog-title,
 [data-theme="dark"] .p-confirmdialog .p-dialog-title {
-    color: var(--p-surface-0, #f8fafc);
+    color: var(--lt-surface-0);
 }
 .dark .p-confirmdialog .p-dialog-header-close,
 [data-theme="dark"] .p-confirmdialog .p-dialog-header-close {
-    color: var(--p-surface-400, #94a3b8);
+    color: var(--lt-surface-400);
 }
 .dark .p-confirmdialog .p-dialog-header-close:hover,
 [data-theme="dark"] .p-confirmdialog .p-dialog-header-close:hover {
-    background: var(--p-surface-800, #1e293b);
-    color: var(--lt-surface-0, #ffffff);
+    background: var(--lt-surface-800);
+    color: var(--lt-surface-0, var(--lt-surface-0));
 }
 .dark .p-confirmdialog .p-confirmdialog-message,
 [data-theme="dark"] .p-confirmdialog .p-confirmdialog-message {
-    color: var(--p-surface-300, #cbd5e1);
+    color: var(--lt-surface-300);
 }
 .dark .p-confirmdialog-headless-icon,
 [data-theme="dark"] .p-confirmdialog-headless-icon {
     background: rgba(16, 185, 129, 0.15);
     border-color: rgba(16, 185, 129, 0.35);
-    color: #6ee7b7;
+    color: var(--lt-primary-300, var(--lt-primary-300));
 }
 `;
 
@@ -367,14 +367,14 @@ class ConfirmDialogManager {
                             ${LOCK_SVG}
                         </div>
                         <div>
-                            <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem 0;">${opt.header || 'Save Changes?'}</h3>
+                            <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--lt-text-primary); margin: 0 0 0.5rem 0;">${opt.header || 'Save Changes?'}</h3>
                             <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0; line-height: 1.5;">${opt.message || 'Are you sure you want to proceed with saving your profile changes?'}</p>
                         </div>
                         <div style="display: flex; gap: 0.75rem; width: 100%; margin-top: 0.5rem;">
-                            <button type="button" class="btn-reject p-button p-button-outlined p-button-secondary" style="flex: 1; padding: 0.5rem 1rem; border-radius: var(--p-border-radius); font-weight: 600; font-size: 0.875rem;">
+                            <button type="button" class="btn-reject p-button p-button-outlined p-button-secondary" style="flex: 1; padding: 0.5rem 1rem; border-radius: var(--lt-radius); font-weight: 600; font-size: 0.875rem;">
                                 ${opt.rejectLabel || 'Cancel'}
                             </button>
-                            <button type="button" class="btn-accept p-button p-button-primary" style="flex: 1; padding: 0.5rem 1rem; border-radius: var(--p-border-radius); font-weight: 600; font-size: 0.875rem;">
+                            <button type="button" class="btn-accept p-button p-button-primary" style="flex: 1; padding: 0.5rem 1rem; border-radius: var(--lt-radius); font-weight: 600; font-size: 0.875rem;">
                                 ${opt.acceptLabel || 'Save'}
                             </button>
                         </div>
@@ -386,7 +386,7 @@ class ConfirmDialogManager {
         } else {
             const isDanger = opt.acceptSeverity === 'danger' || (opt.icon && (opt.icon.includes('trash') || opt.icon.includes('danger')));
             const acceptBtnClass = isDanger ? 'p-button p-button-danger p-button-sm' : 'p-button p-button-primary p-button-sm';
-            const acceptStyle = isDanger ? 'background: var(--lt-danger-500, #ef4444); border: 1px solid var(--lt-danger-500, #ef4444); color: var(--lt-surface-0, #ffffff);' : 'background: var(--p-primary-500); border: 1px solid var(--p-primary-500); color: var(--lt-surface-0, #ffffff);';
+            const acceptStyle = isDanger ? 'background: var(--lt-danger-500, var(--lt-danger-500)); border: 1px solid var(--lt-danger-500, var(--lt-danger-500)); color: var(--lt-surface-0, var(--lt-surface-0));' : 'background: var(--lt-primary-500); border: 1px solid var(--lt-primary-500); color: var(--lt-surface-0, var(--lt-surface-0));';
 
             this.maskEl.innerHTML = `
                 <div class="p-confirmdialog p-dialog p-component" role="alertdialog">
@@ -401,10 +401,10 @@ class ConfirmDialogManager {
                         <p class="p-confirmdialog-message">${opt.message || 'Are you sure you want to proceed?'}</p>
                     </div>
                     <div class="p-dialog-footer">
-                        <button type="button" class="btn-reject p-button p-button-outlined p-button-secondary p-button-sm" style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: transparent; color: var(--p-text-color);">
+                        <button type="button" class="btn-reject p-button p-button-outlined p-button-secondary p-button-sm" style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--lt-radius); border: 1px solid var(--lt-surface-200); background: transparent; color: var(--lt-text-primary);">
                             ${opt.rejectLabel || 'Cancel'}
                         </button>
-                        <button type="button" class="btn-accept ${acceptBtnClass}" style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); ${acceptStyle}">
+                        <button type="button" class="btn-accept ${acceptBtnClass}" style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--lt-radius); ${acceptStyle}">
                             ${opt.acceptLabel || (isDanger ? 'Delete' : 'Save')}
                         </button>
                     </div>
@@ -441,16 +441,16 @@ export function showToastFeedback(summary: string, detail: string, severity: 'su
 
     const toastItem = document.createElement('div');
     const isError = severity === 'error' || severity === 'warn';
-    const borderColor = isError ? 'var(--lt-danger-500, #ef4444)' : 'var(--p-primary-500, #10b981)';
+    const borderColor = isError ? 'var(--lt-danger-500, var(--lt-danger-500))' : 'var(--lt-primary-500)';
     const bgColor = isError ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)';
-    const textColor = isError ? 'var(--lt-danger-500, #ef4444)' : 'var(--p-primary-600, #059669)';
+    const textColor = isError ? 'var(--lt-danger-500, var(--lt-danger-500))' : 'var(--lt-primary-600)';
 
-    toastItem.style.cssText = `background: var(--p-surface-0, #ffffff); border-left: 4px solid ${borderColor}; border-radius: var(--p-border-radius, 6px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); padding: 0.75rem 1rem; width: 18rem; pointer-events: auto; display: flex; align-items: flex-start; gap: 0.5rem; animation: slideInRight 0.2s ease;`;
+    toastItem.style.cssText = `background: var(--lt-surface-0); border-left: 4px solid ${borderColor}; border-radius: var(--lt-radius); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); padding: 0.75rem 1rem; width: 18rem; pointer-events: auto; display: flex; align-items: flex-start; gap: 0.5rem; animation: slideInRight 0.2s ease;`;
     toastItem.innerHTML = `
         <span style="color: ${textColor}; display: flex; align-items: center; margin-top: 2px;">${isError ? DANGER_ALERT_SVG : CHECK_SVG}</span>
         <div>
-            <div style="font-weight: 700; font-size: 0.875rem; color: var(--p-text-color, #0f172a);">${summary}</div>
-            <div style="font-size: 0.8125rem; color: var(--p-text-muted, #64748b);">${detail}</div>
+            <div style="font-weight: 700; font-size: 0.875rem; color: var(--lt-text-primary);">${summary}</div>
+            <div style="font-size: 0.8125rem; color: var(--p-text-muted, var(--lt-surface-500));">${detail}</div>
         </div>
     `;
 
