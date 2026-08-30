@@ -6,6 +6,8 @@
 import { SplitButtonItem, ButtonSeverity } from '../types/models';
 import { injectIslandStyle } from '../runtime/styles';
 import { LucideIcons } from '../icons/lucide';
+import { executeCommand } from '../runtime/commands';
+import { sanitizeUrl } from '../directives/security';
 
 export interface SplitButtonProps {
     label?: string;
@@ -627,19 +629,17 @@ export default function SplitButtonIsland(container: HTMLElement, props: SplitBu
         if (itemData.disabled) return;
 
         if (itemData.command) {
-            try {
-                const fn = new Function('item', itemData.command);
-                fn(itemData);
-            } catch (err) {
-                console.error('SplitButton command execution error:', err);
-            }
+            executeCommand(itemData.command, itemData);
         }
 
         if (itemData.url) {
-            if (itemData.target === '_blank') {
-                window.open(itemData.url, '_blank', 'noopener,noreferrer');
-            } else {
-                window.location.href = itemData.url;
+            const safeUrl = sanitizeUrl(itemData.url);
+            if (safeUrl && safeUrl !== 'about:blank') {
+                if (itemData.target === '_blank') {
+                    window.open(safeUrl, '_blank', 'noopener,noreferrer');
+                } else {
+                    window.location.href = safeUrl;
+                }
             }
         }
 

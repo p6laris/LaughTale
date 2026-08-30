@@ -1807,6 +1807,55 @@ var SoftMaxIslands = (() => {
     }
   });
 
+  // src/runtime/commands.ts
+  function registerCommand(name, handler) {
+    if (typeof name !== "string" || !name.trim()) {
+      console.warn("[SoftMax.LaughTale Commands] Invalid command name provided to registerCommand");
+      return;
+    }
+    if (typeof handler !== "function") {
+      console.warn(`[SoftMax.LaughTale Commands] Invalid handler provided for command "${name}"`);
+      return;
+    }
+    commandRegistry.set(name.trim(), handler);
+  }
+  function unregisterCommand(name) {
+    return commandRegistry.delete(name.trim());
+  }
+  function getCommand(name) {
+    return commandRegistry.get(name.trim());
+  }
+  function executeCommand(name, item) {
+    if (!name || typeof name !== "string") {
+      return false;
+    }
+    const handler = commandRegistry.get(name.trim());
+    if (!handler) {
+      console.warn(`[SoftMax.LaughTale Commands] Command "${name}" is not registered in the client registry.`);
+      return false;
+    }
+    try {
+      handler(item);
+      return true;
+    } catch (err) {
+      console.error(`[SoftMax.LaughTale Commands] Error executing command "${name}":`, err);
+      return false;
+    }
+  }
+  function clearCommands() {
+    commandRegistry.clear();
+  }
+  function listCommands() {
+    return Array.from(commandRegistry.keys());
+  }
+  var commandRegistry;
+  var init_commands = __esm({
+    "src/runtime/commands.ts"() {
+      "use strict";
+      commandRegistry = /* @__PURE__ */ new Map();
+    }
+  });
+
   // src/composables/useDisclosure.ts
   function useDisclosure(options = {}) {
     let isOpen = Boolean(options.defaultIsOpen);
@@ -13499,18 +13548,16 @@ var SoftMaxIslands = (() => {
           detail: { item, index }
         }));
         if (item?.command) {
-          try {
-            const fn = new Function("item", item.command);
-            fn(item);
-          } catch (err) {
-            console.error("SpeedDial command error:", err);
-          }
+          executeCommand(item.command, item);
         }
         if (item?.url) {
-          if (item.target === "_blank") {
-            window.open(item.url, "_blank", "noopener,noreferrer");
-          } else {
-            window.location.href = item.url;
+          const safeUrl = sanitizeUrl(item.url);
+          if (safeUrl && safeUrl !== "about:blank") {
+            if (item.target === "_blank") {
+              window.open(safeUrl, "_blank", "noopener,noreferrer");
+            } else {
+              window.location.href = safeUrl;
+            }
           }
         }
         close();
@@ -13550,6 +13597,8 @@ var SoftMaxIslands = (() => {
       "use strict";
       init_lucide();
       init_styles();
+      init_commands();
+      init_security();
       SPEEDDIAL_CSS = `
 .p-speeddial {
     position: relative;
@@ -25269,18 +25318,16 @@ public static class AppTheme
     function handleItemClick(itemData, e) {
       if (itemData.disabled) return;
       if (itemData.command) {
-        try {
-          const fn = new Function("item", itemData.command);
-          fn(itemData);
-        } catch (err) {
-          console.error("SplitButton command execution error:", err);
-        }
+        executeCommand(itemData.command, itemData);
       }
       if (itemData.url) {
-        if (itemData.target === "_blank") {
-          window.open(itemData.url, "_blank", "noopener,noreferrer");
-        } else {
-          window.location.href = itemData.url;
+        const safeUrl = sanitizeUrl(itemData.url);
+        if (safeUrl && safeUrl !== "about:blank") {
+          if (itemData.target === "_blank") {
+            window.open(safeUrl, "_blank", "noopener,noreferrer");
+          } else {
+            window.location.href = safeUrl;
+          }
         }
       }
       container.dispatchEvent(new CustomEvent("splitbutton:action", {
@@ -25413,6 +25460,8 @@ public static class AppTheme
       "use strict";
       init_styles();
       init_lucide();
+      init_commands();
+      init_security();
       activeSplitButtonClose = null;
       SPLITBUTTON_CSS = `
 .p-splitbutton {
@@ -34682,7 +34731,7 @@ public static class AppTheme
           const label = link.getAttribute("data-item-label");
           const href = link.getAttribute("href");
           if (command) {
-            executeCommand(command, label || "");
+            executeCommand2(command, label || "");
           }
           container.dispatchEvent(new CustomEvent("tieredmenu:select", {
             bubbles: true,
@@ -34765,7 +34814,7 @@ public static class AppTheme
         }
       });
     }
-    function executeCommand(commandStr, label) {
+    function executeCommand2(commandStr, label) {
       let severity = "info";
       let summary = label;
       let detail = `Action triggered for ${label}`;
@@ -35649,11 +35698,14 @@ public static class AppTheme
     AURA_PALETTES: () => AURA_PALETTES,
     LucideIcons: () => LucideIcons,
     awaitStreamingReady: () => awaitStreamingReady,
+    clearCommands: () => clearCommands,
     createPreactIsland: () => createPreactIsland,
     createVanillaIsland: () => createVanillaIsland,
     defineIsland: () => defineIsland,
     enableViewTransitions: () => enableViewTransitions,
+    executeCommand: () => executeCommand,
     extractSlotContent: () => extractSlotContent,
+    getCommand: () => getCommand,
     getIslandDefinition: () => getIslandDefinition,
     getLucideIcon: () => getLucideIcon,
     getSlot: () => getSlot,
@@ -35667,10 +35719,13 @@ public static class AppTheme
     initIslands: () => initIslands,
     injectIslandStyle: () => injectIslandStyle,
     injectRipple: () => injectRipple,
+    listCommands: () => listCommands,
     navigateTo: () => navigateTo,
     parseAndReviveProps: () => parseAndReviveProps,
+    registerCommand: () => registerCommand,
     removeIslandStyle: () => removeIslandStyle,
     reviveTuple: () => reviveTuple,
+    unregisterCommand: () => unregisterCommand,
     updateToken: () => updateToken,
     useAutoAnimate: () => useAutoAnimate,
     useClickOutside: () => useClickOutside,
@@ -36705,6 +36760,7 @@ public static class AppTheme
 
   // src/index.ts
   init_lucide();
+  init_commands();
 
   // src/composables/index.ts
   init_useDisclosure();

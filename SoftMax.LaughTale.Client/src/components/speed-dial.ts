@@ -5,6 +5,8 @@
 
 import { getLucideIcon, LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
+import { executeCommand } from '../runtime/commands';
+import { sanitizeUrl } from '../directives/security';
 
 export interface SpeedDialActionItem {
     id?: string;
@@ -745,19 +747,17 @@ export default function SpeedDialIsland(container: HTMLElement, props: SpeedDial
             }));
 
             if (item?.command) {
-                try {
-                    const fn = new Function('item', item.command);
-                    fn(item);
-                } catch (err) {
-                    console.error('SpeedDial command error:', err);
-                }
+                executeCommand(item.command, item);
             }
 
             if (item?.url) {
-                if (item.target === '_blank') {
-                    window.open(item.url, '_blank', 'noopener,noreferrer');
-                } else {
-                    window.location.href = item.url;
+                const safeUrl = sanitizeUrl(item.url);
+                if (safeUrl && safeUrl !== 'about:blank') {
+                    if (item.target === '_blank') {
+                        window.open(safeUrl, '_blank', 'noopener,noreferrer');
+                    } else {
+                        window.location.href = safeUrl;
+                    }
                 }
             }
 

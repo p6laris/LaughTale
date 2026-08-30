@@ -19,6 +19,7 @@ export { createVanillaIsland } from './adapters/vanilla';
 export { createPreactIsland } from './adapters/preact';
 export { initDirectives } from './directives/index';
 export { LucideIcons, getLucideIcon } from './icons/lucide';
+export { registerCommand, unregisterCommand, getCommand, executeCommand, clearCommands, listCommands, type CommandHandler } from './runtime/commands';
 
 // Auto-register built-in enterprise components
 defineIsland('stepper', () => import('./components/stepper'));
