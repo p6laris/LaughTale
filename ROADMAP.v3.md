@@ -608,7 +608,8 @@ Standardize events on `laughtale:<component>:<event>` (`bubbles: true`, `detail`
 ---
 
 ### `LT-803` — Focus management across view transitions
-**Severity:** P2 · **Status:** todo
+**Severity:** P2 · **Status:** done
+
 
 **Evidence.** Replacing `document.body.innerHTML` destroys the focused element; focus resets to `<body>`, so keyboard and screen-reader users lose their position on every navigation and are given no announcement that the page changed.
 

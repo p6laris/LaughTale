@@ -12,6 +12,7 @@ import { initDirectives } from '../directives/index';
 import { applyNonceToScript } from '../directives/csp';
 import { prefetchManager } from '../router/prefetch';
 import { isReducedMotionPreferred } from '../styles/animations';
+import { announce } from '../accessibility/announcer';
 
 let isRouterActive = false;
 let inFlightController: AbortController | null = null;
@@ -325,6 +326,21 @@ export async function navigateTo(
 
             // Dispatch navigation event
             window.dispatchEvent(new CustomEvent('island:page-loaded', { detail: { url: finalUrl.href } }));
+
+            // Accessible Focus Management & Page Announcement (LT-803)
+            const focusTarget = document.querySelector<HTMLElement>('[data-skip-target]') ||
+                document.querySelector<HTMLElement>('h1') ||
+                document.querySelector<HTMLElement>('[autofocus]') ||
+                document.querySelector<HTMLElement>('main');
+            if (focusTarget) {
+                if (!focusTarget.hasAttribute('tabindex')) {
+                    focusTarget.setAttribute('tabindex', '-1');
+                }
+                focusTarget.focus({ preventScroll: true });
+            }
+
+            const titleAnnouncement = document.title ? `${document.title} loaded` : 'Page loaded';
+            announce(titleAnnouncement, 'polite');
         };
 
         if ('startViewTransition' in document && !isReducedMotionPreferred()) {
