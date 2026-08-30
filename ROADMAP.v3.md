@@ -488,7 +488,8 @@ Standardize events on `laughtale:<component>:<event>` (`bubbles: true`, `detail`
 ---
 
 ### `LT-602` — Two competing palette sources
-**Severity:** P2 · **Status:** todo · **Files:** `theme-studio.ts:29+` (`PRIMARY_PRESETS`) vs `styles/design-tokens.ts` (`AURA_PALETTES`)
+**Severity:** P2 · **Status:** done · **Files:** `theme-studio.ts:29+` (`PRIMARY_PRESETS`) vs `styles/design-tokens.ts` (`AURA_PALETTES`)
+
 
 **Evidence.** `design-tokens.ts` defines full 50–900 ramps. `theme-studio.ts` defines its *own* `ColorPreset` type carrying only `lightP50/100/200/500/600/700` and `darkP50/100/200` — nine shades, inconsistently named, duplicating the same colors. The Studio therefore cannot set shades 300, 400, 800, 900, 950 at all, so any component using them ignores theming even after `LT-601`.
 

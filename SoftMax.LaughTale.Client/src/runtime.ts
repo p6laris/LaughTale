@@ -36,4 +36,4 @@ export { LucideIcons, getLucideIcon } from './icons/lucide';
 export { registerCommand, unregisterCommand, getCommand, executeCommand, clearCommands, listCommands, type CommandHandler } from './runtime/commands';
 export { getCspNonce, setCspNonce, applyNonceToStyle, applyNonceToScript } from './directives/csp';
 export { createScope, type IslandScope } from './runtime/scope';
-export { initDesignTokens, updateToken, getToken, AURA_PALETTES } from './styles/design-tokens';
+export { initDesignTokens, updateToken, getToken, AURA_PALETTES, generatePaletteRamp } from './styles/design-tokens';

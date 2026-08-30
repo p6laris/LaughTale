@@ -7,6 +7,7 @@ import { LucideIcons } from '../icons/lucide';
 import { useDisclosure } from '../composables/useDisclosure';
 import { useScrollLock } from '../composables/useScrollLock';
 import { useClipboard } from '../composables/useClipboard';
+import { AURA_PALETTES, generatePaletteRamp, updateToken } from '../styles/design-tokens';
 
 export interface ThemeStudioProps {
     defaultOpen?: boolean;
@@ -15,110 +16,17 @@ export interface ThemeStudioProps {
 interface ColorPreset {
     name: string;
     hex: string;
-    lightP50: string;
-    lightP100: string;
-    lightP200: string;
-    lightP500: string;
-    lightP600: string;
-    lightP700: string;
-    darkP50: string;
-    darkP100: string;
-    darkP200: string;
+    ramp: Record<string, string>;
 }
 
-const PRIMARY_PRESETS: Record<string, ColorPreset> = {
-    emerald: {
-        name: 'Emerald',
-        hex: '#10b981',
-        lightP50: '#ecfdf5', lightP100: '#d1fae5', lightP200: '#a7f3d0',
-        lightP500: '#10b981', lightP600: '#059669', lightP700: '#047857',
-        darkP50: '#064e3b', darkP100: '#065f46', darkP200: '#047857'
-    },
-    indigo: {
-        name: 'Indigo',
-        hex: '#6366f1',
-        lightP50: '#eef2ff', lightP100: '#e0e7ff', lightP200: '#c7d2fe',
-        lightP500: '#6366f1', lightP600: '#4f46e5', lightP700: '#4338ca',
-        darkP50: '#312e81', darkP100: '#3730a3', darkP200: '#4338ca'
-    },
-    violet: {
-        name: 'Violet',
-        hex: '#8b5cf6',
-        lightP50: '#f5f3ff', lightP100: '#ede9fe', lightP200: '#ddd6fe',
-        lightP500: '#8b5cf6', lightP600: '#7c3aed', lightP700: '#6d28d9',
-        darkP50: '#4c1d95', darkP100: '#5b21b6', darkP200: '#6d28d9'
-    },
-    rose: {
-        name: 'Rose',
-        hex: '#f43f5e',
-        lightP50: '#fff1f2', lightP100: '#ffe4e6', lightP200: '#fecdd3',
-        lightP500: '#f43f5e', lightP600: '#e11d48', lightP700: '#be123c',
-        darkP50: '#881337', darkP100: '#9f1239', darkP200: '#be123c'
-    },
-    amber: {
-        name: 'Amber',
-        hex: '#f59e0b',
-        lightP50: '#fffbeb', lightP100: '#fef3c7', lightP200: '#fde68a',
-        lightP500: '#f59e0b', lightP600: '#d97706', lightP700: '#b45309',
-        darkP50: '#78350f', darkP100: '#92400e', darkP200: '#b45309'
-    },
-    cyan: {
-        name: 'Cyan',
-        hex: '#06b6d4',
-        lightP50: '#ecfeff', lightP100: '#cffafe', lightP200: '#a5f3fc',
-        lightP500: '#06b6d4', lightP600: '#0891b2', lightP700: '#0e7490',
-        darkP50: '#164e63', darkP100: '#155e75', darkP200: '#0e7490'
-    },
-    yellow: {
-        name: 'KRD Yellow',
-        hex: '#eab308',
-        lightP50: '#fefce8', lightP100: '#fef9c3', lightP200: '#fef08a',
-        lightP500: '#eab308', lightP600: '#ca8a04', lightP700: '#a16207',
-        darkP50: '#713f12', darkP100: '#854d0e', darkP200: '#a16207'
-    },
-    blue: {
-        name: 'Blue',
-        hex: '#3b82f6',
-        lightP50: '#eff6ff', lightP100: '#dbeafe', lightP200: '#bfdbfe',
-        lightP500: '#3b82f6', lightP600: '#2563eb', lightP700: '#1d4ed8',
-        darkP50: '#1e3a5f', darkP100: '#1e40af', darkP200: '#1d4ed8'
-    },
-    lime: {
-        name: 'Lime',
-        hex: '#84cc16',
-        lightP50: '#f7fee7', lightP100: '#ecfccb', lightP200: '#d9f99d',
-        lightP500: '#84cc16', lightP600: '#65a30d', lightP700: '#4d7c0f',
-        darkP50: '#365314', darkP100: '#3f6212', darkP200: '#4d7c0f'
-    },
-    teal: {
-        name: 'Teal',
-        hex: '#14b8a6',
-        lightP50: '#f0fdfa', lightP100: '#ccfbf1', lightP200: '#99f6e4',
-        lightP500: '#14b8a6', lightP600: '#0d9488', lightP700: '#0f766e',
-        darkP50: '#134e4a', darkP100: '#115e59', darkP200: '#0f766e'
-    },
-    orange: {
-        name: 'Orange',
-        hex: '#f97316',
-        lightP50: '#fff7ed', lightP100: '#ffedd5', lightP200: '#fed7aa',
-        lightP500: '#f97316', lightP600: '#ea580c', lightP700: '#c2410c',
-        darkP50: '#7c2d12', darkP100: '#9a3412', darkP200: '#c2410c'
-    },
-    pink: {
-        name: 'Pink',
-        hex: '#ec4899',
-        lightP50: '#fdf2f8', lightP100: '#fce7f3', lightP200: '#fbcfe8',
-        lightP500: '#ec4899', lightP600: '#db2777', lightP700: '#be185d',
-        darkP50: '#831843', darkP100: '#9d174d', darkP200: '#be185d'
-    },
-    sky: {
-        name: 'Sky',
-        hex: '#0ea5e9',
-        lightP50: '#f0f9ff', lightP100: '#e0f2fe', lightP200: '#bae6fd',
-        lightP500: '#0ea5e9', lightP600: '#0284c7', lightP700: '#0369a1',
-        darkP50: '#0c4a6e', darkP100: '#075985', darkP200: '#0369a1'
-    }
-};
+const PRIMARY_PRESETS: Record<string, ColorPreset> = Object.entries(AURA_PALETTES).reduce((acc, [key, ramp]) => {
+    acc[key] = {
+        name: key.charAt(0).toUpperCase() + key.slice(1),
+        hex: ramp['500'] || '#10b981',
+        ramp
+    };
+    return acc;
+}, {} as Record<string, ColorPreset>);
 
 interface NeutralPreset {
     name: string;
@@ -403,37 +311,49 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
     `).join('');
 
     function applyTheme() {
-        const root = document.documentElement;
-        const p = PRIMARY_PRESETS[currentPrimary] || PRIMARY_PRESETS.emerald;
-        const n = NEUTRAL_PRESETS[currentNeutral] || NEUTRAL_PRESETS.slate;
-
+        let currentRamp: Record<string, string>;
         if (currentCustomHex) {
-            root.style.setProperty('--p-primary-500', currentCustomHex);
-            root.style.setProperty('--p-primary-600', currentCustomHex);
-            root.style.setProperty('--p-primary-700', currentCustomHex);
+            currentRamp = generatePaletteRamp(currentCustomHex);
             if (primaryLabel) primaryLabel.textContent = `Custom (${currentCustomHex})`;
         } else {
-            root.style.setProperty('--p-primary-50', p.lightP50);
-            root.style.setProperty('--p-primary-100', p.lightP100);
-            root.style.setProperty('--p-primary-200', p.lightP200);
-            root.style.setProperty('--p-primary-500', p.lightP500);
-            root.style.setProperty('--p-primary-600', p.lightP600);
-            root.style.setProperty('--p-primary-700', p.lightP700);
+            const p = PRIMARY_PRESETS[currentPrimary] || PRIMARY_PRESETS.emerald;
+            currentRamp = p.ramp;
             if (primaryLabel) primaryLabel.textContent = p.name;
         }
 
-        root.style.setProperty('--p-surface-0', n.s0);
-        root.style.setProperty('--p-surface-50', n.s50);
-        root.style.setProperty('--p-surface-100', n.s100);
-        root.style.setProperty('--p-surface-200', n.s200);
-        root.style.setProperty('--p-surface-300', n.s300);
-        root.style.setProperty('--p-surface-400', n.s400);
-        root.style.setProperty('--p-surface-500', n.s500);
-        root.style.setProperty('--p-surface-600', n.s600);
-        root.style.setProperty('--p-surface-700', n.s700);
-        root.style.setProperty('--p-surface-800', n.s800);
-        root.style.setProperty('--p-surface-900', n.s900);
-        root.style.setProperty('--p-surface-950', n.s950);
+        for (const [shade, hex] of Object.entries(currentRamp)) {
+            updateToken(`--lt-primary-${shade}`, hex);
+            updateToken(`--p-primary-${shade}`, hex);
+        }
+        updateToken('--lt-primary-color', currentRamp['500'] || '#10b981');
+        updateToken('--p-primary-color', currentRamp['500'] || '#10b981');
+
+        const n = NEUTRAL_PRESETS[currentNeutral] || NEUTRAL_PRESETS.slate;
+        updateToken('--lt-surface-0', n.s0);
+        updateToken('--lt-surface-50', n.s50);
+        updateToken('--lt-surface-100', n.s100);
+        updateToken('--lt-surface-200', n.s200);
+        updateToken('--lt-surface-300', n.s300);
+        updateToken('--lt-surface-400', n.s400);
+        updateToken('--lt-surface-500', n.s500);
+        updateToken('--lt-surface-600', n.s600);
+        updateToken('--lt-surface-700', n.s700);
+        updateToken('--lt-surface-800', n.s800);
+        updateToken('--lt-surface-900', n.s900);
+        updateToken('--lt-surface-950', n.s950);
+
+        updateToken('--p-surface-0', n.s0);
+        updateToken('--p-surface-50', n.s50);
+        updateToken('--p-surface-100', n.s100);
+        updateToken('--p-surface-200', n.s200);
+        updateToken('--p-surface-300', n.s300);
+        updateToken('--p-surface-400', n.s400);
+        updateToken('--p-surface-500', n.s500);
+        updateToken('--p-surface-600', n.s600);
+        updateToken('--p-surface-700', n.s700);
+        updateToken('--p-surface-800', n.s800);
+        updateToken('--p-surface-900', n.s900);
+        updateToken('--p-surface-950', n.s950);
 
         root.style.setProperty('--p-border-radius', currentRadius);
         const radNum = parseFloat(currentRadius) || 0;
