@@ -40,5 +40,7 @@ export { initDesignTokens, updateToken, getToken, AURA_PALETTES, generatePalette
 export { renderThemeMatrix, captureStyleSignature, type MatrixPermutation, type ComponentMatrixSnapshot } from './testing/visual-harness';
 export { measureHydration, measureThroughput, recordHydrationMetric, getHydrationMetrics, clearHydrationMetrics, calculatePercentiles, type BenchmarkMetric, type HydrationMetric } from './runtime/benchmark';
 export { PrefetchManager, prefetchManager, type CachedResponse, type PrefetchOptions } from './router/prefetch';
+export { extractIconSymbols, generateSubsetSprite, computeSpriteHash } from './icons/subset-generator';
+
 
 

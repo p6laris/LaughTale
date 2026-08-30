@@ -570,7 +570,8 @@ Standardize events on `laughtale:<component>:<event>` (`bubbles: true`, `detail`
 ---
 
 ### `LT-704` — Icon sprite is 10,688 lines shipped wholesale
-**Severity:** P2 · **Status:** todo · **File:** `Components/wwwroot/icons/lucide-sprites.svg`
+**Severity:** P2 · **Status:** done · **File:** `Components/wwwroot/icons/lucide-sprites.svg`
+
 
 **Fix.** Generate a **subset** sprite containing only icons actually referenced (scan `src/` and `.cshtml` at build time). Expect a 90%+ reduction. Serve with a content hash and long-lived cache headers.
 
