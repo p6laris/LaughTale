@@ -36726,6 +36726,7 @@ public static class AppTheme
   }
 
   // src/runtime/router.ts
+  init_csp();
   var isRouterActive = false;
   function enableViewTransitions() {
     if (isRouterActive || typeof window === "undefined") return;
@@ -36765,14 +36766,27 @@ public static class AppTheme
         window.location.href = urlStr;
         return;
       }
+      const finalUrl = response.url ? new URL(response.url, window.location.href) : new URL(urlStr, window.location.href);
+      if (finalUrl.origin !== window.location.origin) {
+        console.warn(`[SoftMax.LaughTale Router] Blocked cross-origin HTML injection from "${finalUrl.href}". Falling back to hard navigation.`);
+        window.location.href = finalUrl.href;
+        return;
+      }
       const htmlText = await response.text();
       const parser = new DOMParser();
       const newDoc = parser.parseFromString(htmlText, "text/html");
+      document.querySelectorAll("[data-island]").forEach((el) => {
+        if (!el.closest("[data-persist]")) {
+          el.dispatchEvent(new CustomEvent("laughtale:unmount", { bubbles: false }));
+        }
+      });
       const persistentElements = /* @__PURE__ */ new Map();
       document.querySelectorAll("[data-persist]").forEach((el) => {
         const id = el.dataset.persist;
         if (id) persistentElements.set(id, el);
       });
+      const newScripts = Array.from(newDoc.body.querySelectorAll("script"));
+      newScripts.forEach((s) => s.remove());
       const updateDom = () => {
         document.title = newDoc.title;
         document.body.innerHTML = newDoc.body.innerHTML;
@@ -36781,6 +36795,18 @@ public static class AppTheme
           if (targetSlot && targetSlot.parentNode) {
             targetSlot.parentNode.replaceChild(liveEl, targetSlot);
           }
+        });
+        newScripts.forEach((script) => {
+          if (script.type && script.type !== "text/javascript" && script.type !== "module" && script.type !== "application/javascript") {
+            return;
+          }
+          const newScript = document.createElement("script");
+          Array.from(script.attributes).forEach((attr) => {
+            newScript.setAttribute(attr.name, attr.value);
+          });
+          newScript.textContent = script.textContent;
+          applyNonceToScript(newScript);
+          document.body.appendChild(newScript);
         });
         initIslands(document.body);
         initDirectives(document.body);
@@ -36792,9 +36818,9 @@ public static class AppTheme
           window.scrollTo({ top: 0, behavior: "instant" });
         }
         if (pushState) {
-          window.history.pushState({}, "", urlStr);
+          window.history.pushState({}, "", finalUrl.href);
         }
-        window.dispatchEvent(new CustomEvent("island:page-loaded", { detail: { url: urlStr } }));
+        window.dispatchEvent(new CustomEvent("island:page-loaded", { detail: { url: finalUrl.href } }));
       };
       if ("startViewTransition" in document) {
         document.startViewTransition(updateDom);

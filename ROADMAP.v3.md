@@ -162,7 +162,8 @@ const fn = new Function('item', item.command);   // item comes from data-props, 
 ---
 
 ### `LT-107` — Router trusts and injects a full HTML response
-**Severity:** P1 · **Status:** todo · **File:** `src/runtime/router.ts:85`
+**Severity:** P1 · **Status:** done · **File:** `SoftMax.LaughTale.Client/src/runtime/router.ts`
+**Resolution:** Hardened `navigateTo` in `router.ts` to verify final URL origin (`new URL(response.url).origin === window.location.origin`) and fall back to full browser navigation on cross-origin redirects, dispatched `laughtale:unmount` to active unpersisted islands before DOM morphing, and safely re-executed new page scripts stamped with the CSP nonce via `applyNonceToScript`. Added unit test suite in `tests/router.test.ts` (3/3 passed).
 
 **Evidence.** `document.body.innerHTML = newDoc.body.innerHTML` on a fetched response. Same-origin is checked on the *link*, but not on the *final* response after redirects — an open redirect on the app turns into full-page content injection. Inline `<script>` in the new body silently does not execute (a correctness bug), while `<img onerror>` does.
 

@@ -22,6 +22,7 @@ const win = new Window({
 (globalThis as any).Node = win.Node;
 (globalThis as any).localStorage = win.localStorage;
 (globalThis as any).sessionStorage = win.sessionStorage;
+(globalThis as any).DOMParser = win.DOMParser;
 (globalThis as any).requestAnimationFrame = (cb: () => void) => setTimeout(cb, 16);
 
 // Mock navigator.clipboard
