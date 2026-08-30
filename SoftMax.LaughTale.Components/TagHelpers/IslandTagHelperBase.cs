@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using SoftMax.LaughTale.Core.Diagnostics;
 using SoftMax.LaughTale.Core.Enums;
 using SoftMax.LaughTale.Core.Serialization;
 
@@ -118,5 +119,12 @@ public abstract class IslandTagHelperBase : TagHelper
         {
             output.Content.SetHtmlContent(childContent);
         }
+
+        IslandDiagnostics.ValidateIsland(
+            IslandName,
+            Hydrate,
+            Media,
+            Persist,
+            output);
     }
 }

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using SoftMax.LaughTale.Core.Diagnostics;
 using SoftMax.LaughTale.Core.Enums;
 using SoftMax.LaughTale.Core.Serialization;
 using System.Threading.Tasks;
@@ -82,5 +83,12 @@ public class IslandTagHelper : TagHelper
         {
             output.Content.SetHtmlContent($"<div data-slot=\"default\" class=\"island-slot\">{childContent.GetContent()}</div><!--island:end:{Name}-->");
         }
+
+        IslandDiagnostics.ValidateIsland(
+            Name,
+            Hydrate,
+            Media,
+            !string.IsNullOrWhiteSpace(Persist),
+            output);
     }
 }

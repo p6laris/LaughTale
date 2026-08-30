@@ -416,7 +416,7 @@ Standardize events on `laughtale:<component>:<event>` (`bubbles: true`, `detail`
 ---
 
 ### `LT-405` — `IslandTagHelper` does not validate at runtime
-**Severity:** P3 · **Status:** todo · **File:** `Core/TagHelpers/IslandTagHelper.cs`
+**Severity:** P3 · **Status:** done · **File:** `Core/TagHelpers/IslandTagHelper.cs`
 
 **Evidence.** `Name` is never validated (`SMI001` only covers `[Island]`-attributed records, not the raw `<island name="...">` tag). A typo produces a silent client-side `console.warn` and a dead region of the page. `Media` is accepted without checking that `Hydrate == Media`, so `media="..."` on a `Load` island is silently ignored.
 

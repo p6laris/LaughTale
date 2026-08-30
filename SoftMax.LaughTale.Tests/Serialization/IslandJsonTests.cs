@@ -85,10 +85,10 @@ public class IslandJsonTests
     [Fact]
     public void SerializeProps_ExceedingMaxDepth_ThrowsDescriptiveIslandSerializationException()
     {
-        // Build a graph deeper than 8 levels (MaxDepth = 8)
+        // Build a graph deeper than 32 levels (MaxDepth = 32)
         var root = new DeepNode { Value = "L0" };
         var current = root;
-        for (int i = 1; i <= 15; i++)
+        for (int i = 1; i <= 35; i++)
         {
             var next = new DeepNode { Value = $"L{i}" };
             current.Child = next;

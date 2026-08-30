@@ -40,7 +40,7 @@ public static class IslandJson
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             Encoder = JavaScriptEncoder.Default,
             WriteIndented = false,
-            MaxDepth = 8,
+            MaxDepth = 32,
             ReferenceHandler = ReferenceHandler.IgnoreCycles,
             TypeInfoResolver = resolver
         };
