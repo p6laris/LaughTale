@@ -13,6 +13,16 @@ Vue components hydrate cleanly inside Razor Pages with reactive prop binding, sl
 
 ---
 
+## ⚡ Live Interactive Vue Island
+
+Try this live Vue 3 Composition component running directly inside this documentation page:
+
+<div style="max-width: 440px; margin: 1.5rem 0;">
+    <island name="polyglot-vue" props-json='{"warehouse": "Central Distribution Center", "initialStock": 85}' hydrate="Load"></island>
+</div>
+
+---
+
 ## 📦 Installation
 
 To use Vue 3 inside your LaughTale client bundle:

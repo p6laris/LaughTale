@@ -25,6 +25,18 @@ Explore in-depth documentation and recipes for each supported framework:
 
 ---
 
+## ⚡ Live Interactive Polyglot Demo
+
+Interact with **React 19**, **Vue 3**, and **Svelte 5** live in real-time below. Click the **"+ $250 Sale"** button in React to see Vue and Svelte update instantly across LaughTale's event bus!
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin: 1.5rem 0;">
+    <island name="polyglot-react" props-json='{"title": "React 19 Emitter", "initialScore": 2500, "badge": "Live"}' hydrate="Load"></island>
+    <island name="polyglot-vue" props-json='{"warehouse": "Central Logistics Hub", "initialStock": 45}' hydrate="Load"></island>
+    <island name="polyglot-svelte" props-json='{"gaugeTitle": "Svelte 5 Load Dial", "initialLoad": 35}' hydrate="Load"></island>
+</div>
+
+---
+
 ## 🎮 Complete Polyglot Page: React + Vue + Svelte on One Razor Page
 
 Here is a full, real-world Razor Page demonstrating 3 different framework islands communicating seamlessly over the LaughTale event bus:

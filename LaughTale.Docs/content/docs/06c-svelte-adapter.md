@@ -13,6 +13,16 @@ Svelte compiles components to razor-sharp, zero-virtual-DOM JavaScript, resultin
 
 ---
 
+## ⚡ Live Interactive Svelte Island
+
+Try this live Svelte 5 Runes component running directly inside this documentation page:
+
+<div style="max-width: 440px; margin: 1.5rem 0;">
+    <island name="polyglot-svelte" props-json='{"gaugeTitle": "Cluster Node 01 Load", "initialLoad": 42}' hydrate="Load"></island>
+</div>
+
+---
+
 ## 📦 Installation
 
 To use Svelte inside your LaughTale project:

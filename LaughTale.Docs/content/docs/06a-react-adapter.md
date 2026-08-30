@@ -13,6 +13,16 @@ This allows you to build rich, stateful React component trees that hydrate on de
 
 ---
 
+## ⚡ Live Interactive React Island
+
+Try this live React 19 component running directly inside this documentation page:
+
+<div style="max-width: 440px; margin: 1.5rem 0;">
+    <island name="polyglot-react" props-json='{"title": "React 19 Interactive Widget", "initialScore": 1250, "badge": "Live"}' hydrate="Load"></island>
+</div>
+
+---
+
 ## 📦 Installation
 
 To use React inside your LaughTale client bundle:

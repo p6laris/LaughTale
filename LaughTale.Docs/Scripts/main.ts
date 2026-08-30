@@ -35,47 +35,73 @@ export function closeCommandPalette() {
     }
 }
 
-// 4. Syntax Tokenizer for Code Viewer
-function tokenizeCode(codeText: string, lang: string): string {
-    let html = codeText
+// 4. Robust Single-Pass Syntax Lexer for Code Viewer
+function escapeHtml(str: string): string {
+    return str
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
 
-    const patterns = [
-        { regex: /(\/\/[^\n]*|\/\*[\s\S]*?\*\/|&lt;!--[\s\S]*?--&gt;)/g, cls: 'tok-comment' },
-        { regex: /(&quot;[\s\S]*?&quot;|'[^']*'|`[^`]*`)/g, cls: 'tok-str' },
-        { regex: /\b(l-state|l-bind|l-model|l-on|l-show|l-hide|l-class|l-style|l-get|l-post|l-target|l-swap|l-indicator|l-mask|l-copy|l-emit|l-listen|@page|@model|@addTagHelper|@inject|@using|@section|@if|@foreach|@else)\b/g, cls: 'tok-directive' },
-        { regex: /(&lt;\/?)(island[\w-]*|stepper-panel|button|div|input|span|section|aside|table|thead|tbody|tr|th|td|pre|code|svg|path|form|header|main|h[1-6]|select|p|ul|li|label|nav|article|template|script|style)/gi, cls: 'tok-tag' },
-        { regex: /\b(name|props|hydrate|framework|media|persist|class|style|id|slot|header|value|columns|sortable|paginator|rows|lazy|data-url|type|placeholder|onclick|modal|dismissable-mask|maximizable|draggable|position)\b(?==)/g, cls: 'tok-attr' },
-        { regex: /\b(import|export|default|from|function|const|let|var|return|class|record|struct|public|private|protected|static|readonly|async|await|new|this|typeof|instanceof|interface|type|extends|implements|namespace|using|switch|case|break|try|catch|throw|if|else|for|while)\b/g, cls: 'tok-kw' },
-        { regex: /\b(string|number|boolean|void|any|unknown|never|object|int|double|float|decimal|bool|char|byte|Task|ActionResult|List|Dictionary|IEnumerable|IslandContext|IslandDataRequest|IslandDataResult|HydrateStrategy|IslandFramework)\b/g, cls: 'tok-type' },
-        { regex: /\b(useState|useEffect|useMemo|useCallback|useRef|ref|computed|onMounted|onUnmounted|createReactAdapter|createVueAdapter|createSvelteAdapter|createPreactAdapter|createVanillaIsland|emitIslandEvent|onIslandEvent|refreshIsland|hydrateIsland|MapLaughTaleIslandRefresh|AddLaughTale)\b(?=\s*\()/g, cls: 'tok-fn' },
-        { regex: /\b(true|false|null|undefined|\d+(\.\d+)?)\b/g, cls: 'tok-num' }
-    ];
+function tokenizeCode(codeText: string, lang: string): string {
+    const masterRegex = new RegExp(
+        [
+            '(?<comment>//[^\n]*|/\\*[\\s\\S]*?\\*/|<!--[\\s\\S]*?-->)',
+            '(?<string>"(?:\\\\.|[^"\\\\])*"|\'(?:\\\\.|[^\'\\\\])*\'|`(?:\\\\.|[^`\\\\])*`)',
+            '(?<directive>\\b(?:l-state|l-bind|l-model|l-on|l-show|l-hide|l-class|l-style|l-get|l-post|l-target|l-swap|l-indicator|l-mask|l-copy|l-emit|l-listen|l-trigger)\\b|@[a-zA-Z_]\\w*)',
+            '(?<tag></?[a-zA-Z0-9_-]+)',
+            '(?<attr>\\b[a-zA-Z0-9_-]+(?=\\s*=))',
+            '(?<keyword>\\b(?:import|export|default|from|function|const|let|var|return|class|record|struct|public|private|protected|static|readonly|async|await|new|this|typeof|instanceof|interface|type|extends|implements|namespace|using|switch|case|break|try|catch|throw|if|else|for|while|get|set)\\b)',
+            '(?<typename>\\b(?:string|number|boolean|void|any|unknown|never|object|int|double|float|decimal|bool|char|byte|Task|ActionResult|List|Dictionary|IEnumerable|IslandContext|IslandDataRequest|IslandDataResult|HydrateStrategy|IslandFramework|PageModel)\\b)',
+            '(?<fn>\\b[a-zA-Z_$][a-zA-Z0-9_$]*(?=\\s*\\())',
+            '(?<number>\\b(?:true|false|null|undefined|\\d+(?:\\.\\d+)?)\\b)'
+        ].join('|'),
+        'g'
+    );
 
-    const placeholders: { key: string; html: string }[] = [];
-    let placeholderIdx = 0;
+    let result = '';
+    let lastIndex = 0;
+    let match: RegExpExecArray | null;
 
-    function saveMatch(match: string, cls: string) {
-        const key = `___TOK_${placeholderIdx++}___`;
-        placeholders.push({ key, html: `<span class="${cls}">${match}</span>` });
-        return key;
+    while ((match = masterRegex.exec(codeText)) !== null) {
+        if (match.index > lastIndex) {
+            result += escapeHtml(codeText.slice(lastIndex, match.index));
+        }
+
+        const groups = (match as any).groups || {};
+        const text = escapeHtml(match[0]);
+
+        if (groups.comment) {
+            result += `<span class="tok-comment">${text}</span>`;
+        } else if (groups.string) {
+            result += `<span class="tok-str">${text}</span>`;
+        } else if (groups.directive) {
+            result += `<span class="tok-directive">${text}</span>`;
+        } else if (groups.tag) {
+            result += `<span class="tok-tag">${text}</span>`;
+        } else if (groups.attr) {
+            result += `<span class="tok-attr">${text}</span>`;
+        } else if (groups.keyword) {
+            result += `<span class="tok-kw">${text}</span>`;
+        } else if (groups.typename) {
+            result += `<span class="tok-type">${text}</span>`;
+        } else if (groups.fn) {
+            result += `<span class="tok-fn">${text}</span>`;
+        } else if (groups.number) {
+            result += `<span class="tok-num">${text}</span>`;
+        } else {
+            result += text;
+        }
+
+        lastIndex = masterRegex.lastIndex;
     }
 
-    html = html.replace(/(\/\/[^\n]*|\/\*[\s\S]*?\*\/|&lt;!--[\s\S]*?--&gt;)/g, m => saveMatch(m, 'tok-comment'));
-    html = html.replace(/(&quot;[\s\S]*?&quot;|'[^']*'|`[^`]*`)/g, m => saveMatch(m, 'tok-str'));
-
-    for (let i = 2; i < patterns.length; i++) {
-        const p = patterns[i];
-        html = html.replace(p.regex, (m) => `<span class="${p.cls}">${m}</span>`);
+    if (lastIndex < codeText.length) {
+        result += escapeHtml(codeText.slice(lastIndex));
     }
 
-    for (let i = placeholders.length - 1; i >= 0; i--) {
-        html = html.replace(placeholders[i].key, placeholders[i].html);
-    }
-
-    return html;
+    return result;
 }
 
 function enhanceCodeBlocks() {

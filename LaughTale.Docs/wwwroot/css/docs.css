@@ -448,7 +448,7 @@ html.dark .sidebar-link.active {
     margin-bottom: 0.4rem;
 }
 
-.laughtale-markdown-content code {
+.laughtale-markdown-content :not(pre) > code {
     font-family: var(--p-font-mono);
     font-size: 0.85em;
     background-color: var(--p-surface-100);
@@ -458,7 +458,7 @@ html.dark .sidebar-link.active {
     border: 1px solid var(--p-surface-200);
 }
 
-html.dark .laughtale-markdown-content code {
+html.dark .laughtale-markdown-content :not(pre) > code {
     background-color: #111827;
     color: #38bdf8;
     border-color: #1f2937;
@@ -621,6 +621,17 @@ html.dark .code-window {
     tab-size: 4;
     white-space: pre;
     word-break: normal;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+}
+
+.code-window-body pre span {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    display: inline !important;
 }
 
 /* Syntax Highlighting Tokens */
