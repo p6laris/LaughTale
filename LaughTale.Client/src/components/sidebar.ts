@@ -1878,9 +1878,18 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
             });
         });
 
-        // Smooth in-page anchor navigation
+        // Smooth in-page anchor navigation and scroll retention
+        const storageKey = 'lt_sb_scroll_' + (isAppMode ? 'app' : 'sb');
+
         container.querySelectorAll<HTMLAnchorElement>('a[data-sidebar-link]').forEach(link => {
             link.addEventListener('click', (e) => {
+                const contentEl = container.querySelector<HTMLElement>('.p-sidebar-content');
+                if (contentEl) {
+                    try {
+                        sessionStorage.setItem(storageKey, contentEl.scrollTop.toString());
+                    } catch {}
+                }
+
                 const href = link.getAttribute('href') || '';
                 const hashIndex = href.indexOf('#');
                 if (hashIndex >= 0 && (href.startsWith('#') || href.startsWith(window.location.pathname))) {
@@ -1901,9 +1910,50 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
         });
     }
 
+    function restoreScrollAndActiveItem() {
+        const storageKey = 'lt_sb_scroll_' + (isAppMode ? 'app' : 'sb');
+        const contentEl = container.querySelector<HTMLElement>('.p-sidebar-content');
+        if (!contentEl) return;
+
+        // 1. Restore previous scroll position from sessionStorage
+        try {
+            const saved = sessionStorage.getItem(storageKey);
+            if (saved !== null) {
+                const pos = parseInt(saved, 10);
+                if (!isNaN(pos)) {
+                    contentEl.scrollTop = pos;
+                }
+            }
+        } catch {}
+
+        // 2. Auto-scroll active item into view
+        const activeEl = container.querySelector<HTMLElement>('.p-sidebar-menu-button.p-active, .p-sidebar-menu-sub-button.p-active');
+        if (activeEl) {
+            const parentItem = activeEl.closest<HTMLElement>('.p-sidebar-menu-item');
+            if (parentItem) {
+                const wrapper = parentItem.querySelector('.p-sidebar-menu-sub-wrapper');
+                const chevron = parentItem.querySelector('.p-sidebar-submenu-chevron');
+                wrapper?.classList.add('p-expanded');
+                chevron?.classList.add('p-expanded');
+            }
+
+            setTimeout(() => {
+                activeEl.scrollIntoView({ block: 'nearest', behavior: 'instant' });
+            }, 30);
+        }
+
+        // 3. Save scroll position on user scroll
+        contentEl.addEventListener('scroll', () => {
+            try {
+                sessionStorage.setItem(storageKey, contentEl.scrollTop.toString());
+            } catch {}
+        }, { passive: true });
+    }
+
     function render() {
         container.innerHTML = renderComponent();
         wireEvents();
+        restoreScrollAndActiveItem();
     }
 
     render();
