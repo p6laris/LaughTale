@@ -310,7 +310,7 @@ Persistent islands must be *excluded* — they are moved, not destroyed.
 ---
 
 ### `LT-303` — The client test suite does not run
-**Severity:** P1 · **Status:** todo · **Files:** `run-tests.mjs`, `tests/new-components.test.ts`
+**Severity:** P1 · **Status:** done · **Files:** `run-tests.mjs`, `tests/new-components.test.ts`
 
 **Evidence.** `npm test` fails at the esbuild bundling step: `Could not resolve "../src/components/dynamic-form.ts"` and `"../src/components/terminal.ts"` — tests reference components that no longer exist. Additionally `run-tests.mjs` ends with `process.exit(result.status ?? 0)`: when the runner is killed by a signal `status` is `null`, so a **crashed test run reports success**.
 
