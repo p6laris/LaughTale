@@ -343,7 +343,7 @@ Persistent islands must be *excluded* — they are moved, not destroyed.
 ---
 
 ### `LT-306` — .NET test coverage is 9 tests for 114 TagHelpers
-**Severity:** P1 · **Status:** todo
+**Severity:** P1 · **Status:** done
 
 **Evidence.** `dotnet test` → 9 passed, across 3 files, against `AuraComponentTagHelpers.cs` (5,151 lines, 114 `[HtmlTargetElement]` targets), `CompoundTagHelpers.cs` (1,601 lines), and the Roslyn generator.
 

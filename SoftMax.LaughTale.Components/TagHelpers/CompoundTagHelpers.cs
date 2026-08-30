@@ -1405,7 +1405,7 @@ public class IslandDialogTriggerTagHelper : TagHelper
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
         output.TagName = "div";
-        var dialogId = context.Items["CurrentDialogId"] as string;
+        var dialogId = context.Items.TryGetValue("CurrentDialogId", out var dId) ? dId as string : "default-dialog";
 
         output.Attributes.SetAttribute("class", "dialog-trigger inline-block cursor-pointer");
         output.Attributes.SetAttribute("onclick", $"const c = document.getElementById('{dialogId}-content'); if (c) c.classList.remove('hidden');");
@@ -1424,7 +1424,7 @@ public class IslandDialogContentTagHelper : TagHelper
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
         output.TagName = "div";
-        var dialogId = context.Items["CurrentDialogId"] as string;
+        var dialogId = context.Items.TryGetValue("CurrentDialogId", out var dId) ? dId as string : "default-dialog";
 
         var baseClass = "dialog-content-wrapper hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4";
         output.Attributes.SetAttribute("class", baseClass);
@@ -1501,7 +1501,7 @@ public class IslandDialogCloseTagHelper : TagHelper
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
         output.TagName = "div";
-        var dialogId = context.Items["CurrentDialogId"] as string;
+        var dialogId = context.Items.TryGetValue("CurrentDialogId", out var dId) ? dId as string : "default-dialog";
 
         output.Attributes.SetAttribute("class", "inline-block cursor-pointer");
         output.Attributes.SetAttribute("onclick", $"const c = document.getElementById('{dialogId}-content'); if (c) c.classList.add('hidden');");
@@ -1565,7 +1565,7 @@ public class IslandAccordionTriggerTagHelper : TagHelper
         output.TagName = "button";
         output.Attributes.SetAttribute("type", "button");
 
-        var itemId = context.Items["CurrentAccordionItemId"] as string;
+        var itemId = context.Items.TryGetValue("CurrentAccordionItemId", out var aId) ? aId as string : "default-item";
         output.Attributes.SetAttribute("onclick", $"const c = document.getElementById('{itemId}-content'); const ch = this.querySelector('.acc-chevron'); if (c) c.classList.toggle('hidden'); if (ch) ch.classList.toggle('rotate-180');");
 
         var baseClass = "flex flex-1 items-center justify-between py-4 px-6 font-semibold text-sm text-surface-900 dark:text-surface-100 hover:bg-surface-50 dark:hover:bg-surface-800/50 transition-all text-left w-full select-none";
@@ -1587,7 +1587,7 @@ public class IslandAccordionContentTagHelper : TagHelper
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
         output.TagName = "div";
-        var itemId = context.Items["CurrentAccordionItemId"] as string;
+        var itemId = context.Items.TryGetValue("CurrentAccordionItemId", out var aId) ? aId as string : "default-item";
 
         output.Attributes.SetAttribute("id", $"{itemId}-content");
         var baseClass = "hidden px-6 pb-4 pt-1 text-sm text-surface-600 dark:text-surface-400 bg-surface-50/50 dark:bg-surface-900/50";
