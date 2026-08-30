@@ -630,7 +630,8 @@ Standardize events on `laughtale:<component>:<event>` (`bubbles: true`, `detail`
 ---
 
 ### `LT-902` — Observability
-**Severity:** P2 · **Status:** todo
+**Severity:** P2 · **Status:** done
+
 
 **Fix.** Structured `ILogger` in Core (island rendered, prop serialization size, slot projection). Client: an optional `onError` hook so hydration failures reach Sentry/App Insights instead of `console.error` (currently the only error channel — `hydrator.ts:89`). Emit `PerformanceMark`s around hydration for RUM.
 

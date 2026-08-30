@@ -1,4 +1,4 @@
-﻿/**
+/**
  * LaughTale: Strongly-Typed TypeScript Models
  * 1-to-1 Type Parity with C# ComponentModels & Enums (LT-404)
  */
@@ -472,3 +472,27 @@ export interface DynamicFormSchema<TData = Record<string, any>> {
     submitLabel?: string;
     method?: 'POST' | 'PUT' | 'PATCH' | 'GET';
 }
+
+export interface AccordionTab {
+    id?: string;
+    header: string;
+    content?: string;
+    icon?: string;
+    badge?: string | number;
+    subtitle?: string;
+    price?: string | number;
+    disabled?: boolean;
+    toggleIcon?: string;
+}
+
+export interface AccordionProps {
+    tabs?: AccordionTab[];
+    multiple?: boolean;
+    controlled?: boolean;
+    withRadio?: boolean;
+    customIndicator?: 'css' | 'match';
+    value?: string | number | (string | number)[];
+    activeIndex?: number | number[];
+}
+
+

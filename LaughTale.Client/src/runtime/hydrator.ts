@@ -1,4 +1,4 @@
-﻿/**
+/**
  * LaughTale: Multi-Strategy Client Hydration Engine (Hardened Edition)
  * Supercharged with Astro-grade prop revival, query retry, singleton child viewport observation,
  * streaming SSR, tri-state lifecycle tracking ('idle' | 'pending' | 'mounted' | 'failed'), and explicit retry recovery.
@@ -11,6 +11,24 @@ import { awaitStreamingReady } from './streaming';
 
 export type HydrateStrategy = 'load' | 'idle' | 'visible' | 'media' | 'interaction' | 'never';
 export type HydrationState = 'idle' | 'pending' | 'mounted' | 'failed';
+
+export type HydrationErrorHandler = (error: Error, context: { islandName: string; element: HTMLElement }) => void;
+
+let globalErrorHandler: HydrationErrorHandler | null = null;
+
+/**
+ * Registers a global error handler callback for hydration failures (e.g. Sentry, Application Insights).
+ */
+export function setHydrationErrorHandler(handler: HydrationErrorHandler | null): void {
+    globalErrorHandler = handler;
+}
+
+/**
+ * Returns the currently active hydration error handler.
+ */
+export function getHydrationErrorHandler(): HydrationErrorHandler | null {
+    return globalErrorHandler;
+}
 
 const HYDRATION_STATE_KEY = '__laughtale_state__';
 
@@ -128,6 +146,14 @@ async function executeHydration(container: HTMLElement, name: string): Promise<v
         return;
     }
 
+    const startMark = `laughtale:hydrate:start:${name}`;
+    const endMark = `laughtale:hydrate:end:${name}`;
+    const measureName = `laughtale:hydrate:${name}`;
+
+    if (typeof performance !== 'undefined' && typeof performance.mark === 'function') {
+        try { performance.mark(startMark); } catch {}
+    }
+
     try {
         // 1. Await streaming SSR completion if applicable
         await awaitStreamingReady(container);
@@ -166,14 +192,34 @@ async function executeHydration(container: HTMLElement, name: string): Promise<v
 
         (container as any)[HYDRATION_STATE_KEY] = 'mounted';
 
-        // 6. Dispatch success lifecycle event
+        // 6. RUM Performance Mark & Measure
+        if (typeof performance !== 'undefined' && typeof performance.mark === 'function') {
+            try {
+                performance.mark(endMark);
+                if (typeof performance.measure === 'function') {
+                    performance.measure(measureName, startMark, endMark);
+                }
+            } catch {}
+        }
+
+        // 7. Dispatch success lifecycle event
         container.dispatchEvent(new CustomEvent('laughtale:hydrated', {
             bubbles: true,
             composed: true,
             detail: { name, strategy: container.getAttribute('data-hydrate') }
         }));
-    } catch (error) {
+    } catch (error: any) {
         (container as any)[HYDRATION_STATE_KEY] = 'failed';
+
+        // Notify custom telemetry error handler if registered
+        if (globalErrorHandler) {
+            try {
+                globalErrorHandler(error, { islandName: name, element: container });
+            } catch (handlerErr) {
+                console.error(`[LaughTale] Error in custom hydration error handler:`, handlerErr);
+            }
+        }
+
         console.error(`[LaughTale] Error hydrating island '${name}':`, error);
         container.dispatchEvent(new CustomEvent('laughtale:hydration-error', {
             bubbles: true,

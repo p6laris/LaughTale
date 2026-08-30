@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using LaughTale.Core.Diagnostics;
 using LaughTale.Core.Enums;
 using LaughTale.Core.Serialization;
@@ -12,6 +14,17 @@ namespace LaughTale.Core.TagHelpers;
 [HtmlTargetElement("island", TagStructure = TagStructure.NormalOrSelfClosing)]
 public class IslandTagHelper : TagHelper
 {
+    private readonly ILogger<IslandTagHelper> _logger;
+
+    public IslandTagHelper() : this(NullLogger<IslandTagHelper>.Instance)
+    {
+    }
+
+    public IslandTagHelper(ILogger<IslandTagHelper>? logger)
+    {
+        _logger = logger ?? NullLogger<IslandTagHelper>.Instance;
+    }
+
     [HtmlAttributeName("name")]
     public string Name { get; set; } = string.Empty;
 
@@ -44,9 +57,14 @@ public class IslandTagHelper : TagHelper
         output.TagName = "div";
         output.TagMode = TagMode.StartTagAndEndTag;
 
+        var serializedProps = IslandJson.SerializeProps(Props);
+        var propBytes = System.Text.Encoding.UTF8.GetByteCount(serializedProps);
+
         output.Attributes.SetAttribute("data-island", Name);
-        output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(Props));
+        output.Attributes.SetAttribute("data-props", serializedProps);
         output.Attributes.SetAttribute("data-hydrate", Hydrate.ToString().ToLowerInvariant());
+
+        _logger.LogDebug("LaughTale Island rendered: Name={Name}, Strategy={Strategy}, PropsSize={PropsBytes}B", Name, Hydrate, propBytes);
 
         if (Framework != IslandFramework.Vanilla)
         {

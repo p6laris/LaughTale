@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - SoftMax.LaughTale</title>
+    <title>@ViewData["Title"] - LaughTale</title>
     <!-- Aura-Inspired Stylesheet -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <script>
@@ -23,7 +23,7 @@
 
         <!-- Left Full-Height Sidebar (Sticky Top: 0, 100vh) -->
         <aside class="app-sidebar-dock" style="position: sticky; top: 0; height: 100vh; z-index: 40; flex-shrink: 0;">
-            <island-sidebar items="@SoftMax.LaughTale.Showcase.Services.NavigationData.GetGlobalSidebarItems(Context.Request.Path)" title="SoftMax Aura" />
+            <island-sidebar items="@LaughTale.Showcase.Services.NavigationData.GetGlobalSidebarItems(Context.Request.Path)" title="LaughTale Aura" />
         </aside>
 
         <!-- Right Main Viewport Area -->

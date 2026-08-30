@@ -1,4 +1,4 @@
-﻿/**
+/**
  * LaughTale Client Runtime API
  * High-performance Islands Architecture hydration & multi-framework engine.
  */
@@ -19,7 +19,7 @@ export {
     type IslandLoader,
     type IslandDefinition
 } from './runtime/registry';
-export { hydrateIsland, initIslands, retryIsland, getIslandState, type HydrateStrategy, type HydrationState } from './runtime/hydrator';
+export { hydrateIsland, initIslands, retryIsland, getIslandState, setHydrationErrorHandler, getHydrationErrorHandler, type HydrateStrategy, type HydrationState, type HydrationErrorHandler } from './runtime/hydrator';
 export { enableViewTransitions, navigateTo } from './runtime/router';
 export { getSlot, extractSlotContent, hasSlot } from './runtime/slots';
 export { injectIslandStyle, flushPendingStyles, removeIslandStyle, clearAllIslandStyles, isAdoptedStyleSheetsSupported } from './runtime/styles';
