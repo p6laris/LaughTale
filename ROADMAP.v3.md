@@ -562,7 +562,8 @@ Standardize events on `laughtale:<component>:<event>` (`bubbles: true`, `detail`
 ---
 
 ### `LT-703` — Style injection is per-island and unbatched
-**Severity:** P3 · **Status:** todo · **File:** `src/runtime/styles.ts` (42 LOC)
+**Severity:** P3 · **Status:** done · **File:** `src/runtime/styles.ts`
+
 
 **Fix.** Batch injections in a single `requestAnimationFrame`, deduplicate by content hash, and prefer `CSSStyleSheet` + `adoptedStyleSheets` where supported (avoids re-parsing). Carry the CSP nonce from `LT-104`.
 
