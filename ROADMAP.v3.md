@@ -232,7 +232,8 @@ Persistent islands must be *excluded* — they are moved, not destroyed.
 ---
 
 ### `LT-204` — `pushState` ordering and lost scroll restoration
-**Severity:** P2 · **Status:** todo · **File:** `src/runtime/router.ts:99-110`
+**Severity:** P2 · **Status:** done · **File:** `SoftMax.LaughTale.Client/src/runtime/router.ts`
+**Resolution:** Configured `history.scrollRestoration = 'manual'` during router initialization, recorded departure scroll coordinates `{ scrollX, scrollY }` via `history.replaceState` before navigations, and restored scroll coordinates seamlessly on `popstate` events while preserving `#hash` navigation and top-page resets on new link clicks. Unit tests verified in `tests/router.test.ts` (7/7 passed).
 
 **Evidence.** `pushState` runs *after* the DOM update, so if `updateDom` throws mid-way the URL and DOM disagree. `handlePopState` scrolls to top rather than restoring the previous scroll offset, so Back on a long list always loses the user's place.
 

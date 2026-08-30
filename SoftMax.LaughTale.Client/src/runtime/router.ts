@@ -3,8 +3,8 @@
  * 
  * Intercepts link navigation, aborts in-flight navigations upon new clicks, verifies same-origin
  * on redirects, dispatches laughtale:unmount on destroyed islands, reconciles <head> metadata & stylesheets,
- * synchronizes image decoding, performs animated page morphing via View Transitions API, preserves
- * persistent island state ([data-persist]), and executes scripts with CSP nonces.
+ * synchronizes image decoding, manages scroll restoration, performs animated page morphing via View Transitions API,
+ * preserves persistent island state ([data-persist]), and executes scripts with CSP nonces.
  */
 
 import { initIslands } from './hydrator';
@@ -20,6 +20,15 @@ let inFlightController: AbortController | null = null;
 export function enableViewTransitions(): void {
     if (isRouterActive || typeof window === 'undefined') return;
     isRouterActive = true;
+
+    // Enable manual scroll restoration to prevent native scroll jumping during view transitions
+    if ('history' in window && 'scrollRestoration' in window.history) {
+        try {
+            window.history.scrollRestoration = 'manual';
+        } catch {
+            // ignore
+        }
+    }
 
     document.addEventListener('click', handleLinkClick);
     window.addEventListener('popstate', handlePopState);
@@ -49,8 +58,14 @@ async function handleLinkClick(e: MouseEvent) {
     await navigateTo(url.href, true);
 }
 
-async function handlePopState() {
-    await navigateTo(window.location.href, false);
+async function handlePopState(e: PopStateEvent) {
+    const state = e.state || {};
+    const restoreScroll = (typeof state.scrollY === 'number') ? {
+        scrollX: state.scrollX || 0,
+        scrollY: state.scrollY
+    } : undefined;
+
+    await navigateTo(window.location.href, false, restoreScroll);
 }
 
 /**
@@ -150,7 +165,11 @@ export async function reconcileHead(newHead: HTMLHeadElement): Promise<void> {
 /**
  * Performs a hardened, race-condition-free View Transition navigation to a target URL.
  */
-export async function navigateTo(urlStr: string, pushState = true): Promise<void> {
+export async function navigateTo(
+    urlStr: string,
+    pushState = true,
+    restoreScroll?: { scrollX?: number; scrollY?: number }
+): Promise<void> {
     // 1. In-Flight Navigation Cancellation
     // Abort previous in-flight request if user rapidly clicked a new link
     if (inFlightController) {
@@ -158,6 +177,19 @@ export async function navigateTo(urlStr: string, pushState = true): Promise<void
     }
     inFlightController = new AbortController();
     const signal = inFlightController.signal;
+
+    // Save scroll coordinates of current page before departure
+    if (pushState && typeof window !== 'undefined' && 'history' in window) {
+        try {
+            window.history.replaceState({
+                ...window.history.state,
+                scrollX: window.scrollX || 0,
+                scrollY: window.scrollY || 0
+            }, '', window.location.href);
+        } catch {
+            // ignore
+        }
+    }
 
     try {
         const response = await fetch(urlStr, {
@@ -254,17 +286,21 @@ export async function navigateTo(urlStr: string, pushState = true): Promise<void
             initIslands(document.body);
             initDirectives(document.body);
 
-            // Handle scroll position or hash anchor
-            const targetUrl = new URL(urlStr, window.location.origin);
-            if (targetUrl.hash) {
-                const targetEl = document.querySelector(targetUrl.hash);
-                if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth' });
+            // Handle scroll restoration or hash anchor
+            if (restoreScroll && typeof restoreScroll.scrollY === 'number') {
+                window.scrollTo({ left: restoreScroll.scrollX || 0, top: restoreScroll.scrollY, behavior: 'instant' as any });
             } else {
-                window.scrollTo({ top: 0, behavior: 'instant' as any });
+                const targetUrl = new URL(urlStr, window.location.origin);
+                if (targetUrl.hash) {
+                    const targetEl = document.querySelector(targetUrl.hash);
+                    if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    window.scrollTo({ top: 0, left: 0, behavior: 'instant' as any });
+                }
             }
 
             if (pushState) {
-                window.history.pushState({}, '', finalUrl.href);
+                window.history.pushState({ scrollX: 0, scrollY: 0 }, '', finalUrl.href);
             }
 
             // Dispatch navigation event

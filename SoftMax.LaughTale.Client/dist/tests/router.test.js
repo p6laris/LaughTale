@@ -2671,7 +2671,46 @@ if (typeof document !== "undefined") {
 }
 
 // src/runtime/router.ts
+var isRouterActive = false;
 var inFlightController = null;
+function enableViewTransitions() {
+  if (isRouterActive || typeof window === "undefined") return;
+  isRouterActive = true;
+  if ("history" in window && "scrollRestoration" in window.history) {
+    try {
+      window.history.scrollRestoration = "manual";
+    } catch {
+    }
+  }
+  document.addEventListener("click", handleLinkClick);
+  window.addEventListener("popstate", handlePopState);
+}
+async function handleLinkClick(e) {
+  if (e.button !== 0 || e.ctrlKey || e.metaKey || e.altKey || e.shiftKey || e.defaultPrevented) {
+    return;
+  }
+  const anchor = e.target.closest("a");
+  if (!anchor || !anchor.href) return;
+  const url = new URL(anchor.href, window.location.href);
+  if (url.origin !== window.location.origin) return;
+  if (anchor.target && anchor.target !== "_self") return;
+  if (anchor.hasAttribute("download") || anchor.getAttribute("data-no-transition") !== null) return;
+  const currentPath = window.location.pathname.toLowerCase().replace(/\/$/, "");
+  const targetPath = url.pathname.toLowerCase().replace(/\/$/, "");
+  if ((currentPath === targetPath || !targetPath) && url.hash) {
+    return;
+  }
+  e.preventDefault();
+  await navigateTo(url.href, true);
+}
+async function handlePopState(e) {
+  const state = e.state || {};
+  const restoreScroll = typeof state.scrollY === "number" ? {
+    scrollX: state.scrollX || 0,
+    scrollY: state.scrollY
+  } : void 0;
+  await navigateTo(window.location.href, false, restoreScroll);
+}
 async function reconcileHead(newHead) {
   if (!document.head || !newHead) return;
   const getHeadKey = (el) => {
@@ -2749,12 +2788,22 @@ async function reconcileHead(newHead) {
     await Promise.all(pendingStylesheets);
   }
 }
-async function navigateTo(urlStr, pushState = true) {
+async function navigateTo(urlStr, pushState = true, restoreScroll) {
   if (inFlightController) {
     inFlightController.abort();
   }
   inFlightController = new AbortController();
   const signal = inFlightController.signal;
+  if (pushState && typeof window !== "undefined" && "history" in window) {
+    try {
+      window.history.replaceState({
+        ...window.history.state,
+        scrollX: window.scrollX || 0,
+        scrollY: window.scrollY || 0
+      }, "", window.location.href);
+    } catch {
+    }
+  }
   try {
     const response = await fetch(urlStr, {
       signal,
@@ -2824,15 +2873,19 @@ async function navigateTo(urlStr, pushState = true) {
       });
       initIslands(document.body);
       initDirectives(document.body);
-      const targetUrl = new URL(urlStr, window.location.origin);
-      if (targetUrl.hash) {
-        const targetEl = document.querySelector(targetUrl.hash);
-        if (targetEl) targetEl.scrollIntoView({ behavior: "smooth" });
+      if (restoreScroll && typeof restoreScroll.scrollY === "number") {
+        window.scrollTo({ left: restoreScroll.scrollX || 0, top: restoreScroll.scrollY, behavior: "instant" });
       } else {
-        window.scrollTo({ top: 0, behavior: "instant" });
+        const targetUrl = new URL(urlStr, window.location.origin);
+        if (targetUrl.hash) {
+          const targetEl = document.querySelector(targetUrl.hash);
+          if (targetEl) targetEl.scrollIntoView({ behavior: "smooth" });
+        } else {
+          window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+        }
       }
       if (pushState) {
-        window.history.pushState({}, "", finalUrl.href);
+        window.history.pushState({ scrollX: 0, scrollY: 0 }, "", finalUrl.href);
       }
       window.dispatchEvent(new CustomEvent("island:page-loaded", { detail: { url: finalUrl.href } }));
     };
@@ -2855,7 +2908,7 @@ async function navigateTo(urlStr, pushState = true) {
 }
 
 // tests/router.test.ts
-describe("Router Cross-Origin Security, Head Reconciliation, Concurrency & Lifecycle Suite (LT-107, LT-202, LT-203)", () => {
+describe("Router Comprehensive Suite (LT-107, LT-202, LT-203, LT-204)", () => {
   beforeEach(() => {
     document.body.innerHTML = "";
     document.head.innerHTML = `
@@ -3022,5 +3075,35 @@ describe("Router Cross-Origin Security, Head Reconciliation, Concurrency & Lifec
     } finally {
       globalThis.fetch = originalFetch;
     }
+  });
+  it("navigateTo: preserves departure scroll in history and restores scroll position (LT-204)", async () => {
+    let scrollToOptions = null;
+    const originalScrollTo = window.scrollTo;
+    window.scrollTo = ((opts) => {
+      scrollToOptions = opts;
+    });
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = (async () => {
+      return {
+        ok: true,
+        url: window.location.href,
+        text: async () => "<html><head><title>Restored Page</title></head><body><h1>Content</h1></body></html>"
+      };
+    });
+    try {
+      Object.defineProperty(window, "scrollX", { value: 0, configurable: true, writable: true });
+      Object.defineProperty(window, "scrollY", { value: 1250, configurable: true, writable: true });
+      await navigateTo("/blog/post-1", true);
+      assert.equal(window.history.state?.scrollY, 0);
+      await navigateTo("/blog", false, { scrollX: 0, scrollY: 1250 });
+      assert.deepEqual(scrollToOptions, { left: 0, top: 1250, behavior: "instant" });
+    } finally {
+      globalThis.fetch = originalFetch;
+      window.scrollTo = originalScrollTo;
+    }
+  });
+  it("enableViewTransitions: sets history.scrollRestoration to manual (LT-204)", () => {
+    enableViewTransitions();
+    assert.equal(window.history.scrollRestoration, "manual");
   });
 });

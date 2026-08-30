@@ -36733,6 +36733,12 @@ public static class AppTheme
   function enableViewTransitions() {
     if (isRouterActive || typeof window === "undefined") return;
     isRouterActive = true;
+    if ("history" in window && "scrollRestoration" in window.history) {
+      try {
+        window.history.scrollRestoration = "manual";
+      } catch {
+      }
+    }
     document.addEventListener("click", handleLinkClick);
     window.addEventListener("popstate", handlePopState);
   }
@@ -36754,8 +36760,13 @@ public static class AppTheme
     e.preventDefault();
     await navigateTo(url.href, true);
   }
-  async function handlePopState() {
-    await navigateTo(window.location.href, false);
+  async function handlePopState(e) {
+    const state = e.state || {};
+    const restoreScroll = typeof state.scrollY === "number" ? {
+      scrollX: state.scrollX || 0,
+      scrollY: state.scrollY
+    } : void 0;
+    await navigateTo(window.location.href, false, restoreScroll);
   }
   async function reconcileHead(newHead) {
     if (!document.head || !newHead) return;
@@ -36834,12 +36845,22 @@ public static class AppTheme
       await Promise.all(pendingStylesheets);
     }
   }
-  async function navigateTo(urlStr, pushState = true) {
+  async function navigateTo(urlStr, pushState = true, restoreScroll) {
     if (inFlightController) {
       inFlightController.abort();
     }
     inFlightController = new AbortController();
     const signal = inFlightController.signal;
+    if (pushState && typeof window !== "undefined" && "history" in window) {
+      try {
+        window.history.replaceState({
+          ...window.history.state,
+          scrollX: window.scrollX || 0,
+          scrollY: window.scrollY || 0
+        }, "", window.location.href);
+      } catch {
+      }
+    }
     try {
       const response = await fetch(urlStr, {
         signal,
@@ -36909,15 +36930,19 @@ public static class AppTheme
         });
         initIslands(document.body);
         initDirectives(document.body);
-        const targetUrl = new URL(urlStr, window.location.origin);
-        if (targetUrl.hash) {
-          const targetEl = document.querySelector(targetUrl.hash);
-          if (targetEl) targetEl.scrollIntoView({ behavior: "smooth" });
+        if (restoreScroll && typeof restoreScroll.scrollY === "number") {
+          window.scrollTo({ left: restoreScroll.scrollX || 0, top: restoreScroll.scrollY, behavior: "instant" });
         } else {
-          window.scrollTo({ top: 0, behavior: "instant" });
+          const targetUrl = new URL(urlStr, window.location.origin);
+          if (targetUrl.hash) {
+            const targetEl = document.querySelector(targetUrl.hash);
+            if (targetEl) targetEl.scrollIntoView({ behavior: "smooth" });
+          } else {
+            window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+          }
         }
         if (pushState) {
-          window.history.pushState({}, "", finalUrl.href);
+          window.history.pushState({ scrollX: 0, scrollY: 0 }, "", finalUrl.href);
         }
         window.dispatchEvent(new CustomEvent("island:page-loaded", { detail: { url: finalUrl.href } }));
       };

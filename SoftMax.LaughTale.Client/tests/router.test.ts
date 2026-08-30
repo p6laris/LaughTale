@@ -1,15 +1,15 @@
 /**
- * SoftMax.LaughTale: Router Cross-Origin Security, Head Reconciliation, Concurrency & Lifecycle Unit Tests (LT-107, LT-202, LT-203)
+ * SoftMax.LaughTale: Router Cross-Origin Security, Head Reconciliation, Concurrency, Scroll & Lifecycle Tests (LT-107, LT-202, LT-203, LT-204)
  */
 
 import './setup.ts';
 import { describe, it, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { navigateTo } from '../src/runtime/router.ts';
+import { navigateTo, enableViewTransitions } from '../src/runtime/router.ts';
 import { setCspNonce } from '../src/directives/csp.ts';
 
-describe('Router Cross-Origin Security, Head Reconciliation, Concurrency & Lifecycle Suite (LT-107, LT-202, LT-203)', () => {
+describe('Router Comprehensive Suite (LT-107, LT-202, LT-203, LT-204)', () => {
 
     beforeEach(() => {
         document.body.innerHTML = '';
@@ -35,7 +35,6 @@ describe('Router Cross-Origin Security, Head Reconciliation, Concurrency & Lifec
         });
         document.body.appendChild(island);
 
-        // Mock global fetch to return a new page
         const originalFetch = globalThis.fetch;
         globalThis.fetch = (async () => {
             return {
@@ -134,28 +133,22 @@ describe('Router Cross-Origin Security, Head Reconciliation, Concurrency & Lifec
         try {
             await navigateTo('/about', false);
 
-            // Assert title updated
             assert.equal(document.title, 'About Us - SoftMax');
 
-            // Assert description updated
             const descMeta = document.querySelector('meta[name="description"]');
             assert.equal(descMeta?.getAttribute('content'), 'Updated About Us Description');
 
-            // Assert OpenGraph updated
             const ogMeta = document.querySelector('meta[property="og:title"]');
             assert.equal(ogMeta?.getAttribute('content'), 'About Us OG Title');
 
-            // Assert canonical link updated
             const canonicalLink = document.querySelector('link[rel="canonical"]');
             assert.equal(canonicalLink?.getAttribute('href'), 'https://mysite.com/about');
 
-            // Assert new stylesheet added and old one removed
             const aboutCss = document.querySelector('link[href="/css/about.css"]');
             const homeCss = document.querySelector('link[href="/css/home.css"]');
             assert.ok(aboutCss, 'New stylesheet /css/about.css was not added to head');
             assert.equal(homeCss, null, 'Old stylesheet /css/home.css was not removed from head');
 
-            // Assert protected global tags were preserved
             const cspNonceMeta = document.querySelector('meta[name="csp-nonce"]');
             const viewportMeta = document.querySelector('meta[name="viewport"]');
             assert.ok(cspNonceMeta, 'CSP nonce meta was unexpectedly removed');
@@ -191,7 +184,6 @@ describe('Router Cross-Origin Security, Head Reconciliation, Concurrency & Lifec
                 });
             }
 
-            // Fast Route B
             return Promise.resolve({
                 ok: true,
                 url: window.location.href,
@@ -200,7 +192,6 @@ describe('Router Cross-Origin Security, Head Reconciliation, Concurrency & Lifec
         }) as any;
 
         try {
-            // Trigger slow Route A, then immediately trigger fast Route B
             const navA = navigateTo('/slow-route-a', false);
             const navB = navigateTo('/fast-route-b', false);
 
@@ -212,6 +203,42 @@ describe('Router Cross-Origin Security, Head Reconciliation, Concurrency & Lifec
         } finally {
             globalThis.fetch = originalFetch;
         }
+    });
+
+    it('navigateTo: preserves departure scroll in history and restores scroll position (LT-204)', async () => {
+        let scrollToOptions: any = null;
+        const originalScrollTo = window.scrollTo;
+        window.scrollTo = ((opts: any) => {
+            scrollToOptions = opts;
+        }) as any;
+
+        const originalFetch = globalThis.fetch;
+        globalThis.fetch = (async () => {
+            return {
+                ok: true,
+                url: window.location.href,
+                text: async () => '<html><head><title>Restored Page</title></head><body><h1>Content</h1></body></html>'
+            } as any;
+        }) as any;
+
+        try {
+            Object.defineProperty(window, 'scrollX', { value: 0, configurable: true, writable: true });
+            Object.defineProperty(window, 'scrollY', { value: 1250, configurable: true, writable: true });
+
+            await navigateTo('/blog/post-1', true);
+            assert.equal(window.history.state?.scrollY, 0);
+
+            await navigateTo('/blog', false, { scrollX: 0, scrollY: 1250 });
+            assert.deepEqual(scrollToOptions, { left: 0, top: 1250, behavior: 'instant' });
+        } finally {
+            globalThis.fetch = originalFetch;
+            window.scrollTo = originalScrollTo;
+        }
+    });
+
+    it('enableViewTransitions: sets history.scrollRestoration to manual (LT-204)', () => {
+        enableViewTransitions();
+        assert.equal(window.history.scrollRestoration, 'manual');
     });
 
 });
