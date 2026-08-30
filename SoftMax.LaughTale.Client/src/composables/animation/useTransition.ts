@@ -3,6 +3,8 @@
  * Coordinates enter and exit transitions for modals, drawers, tooltips, and collapsing panels.
  */
 
+import { getReducedMotionSafeDuration } from '../../styles/animations';
+
 export type TransitionPreset = 'fade' | 'scale' | 'slide-up' | 'slide-down' | 'slide-left' | 'slide-right' | 'collapse';
 
 export interface UseTransitionOptions {
@@ -13,11 +15,11 @@ export interface UseTransitionOptions {
     onEnterEnd?: () => void;
     onExitStart?: () => void;
     onExitEnd?: () => void;
-
 }
 
 export function useTransition(element: HTMLElement | null, options: UseTransitionOptions = {}) {
-    const duration = options.duration ?? 200;
+    const rawDuration = options.duration ?? 200;
+    const duration = getReducedMotionSafeDuration(rawDuration);
     const easing = options.easing ?? 'cubic-bezier(0.16, 1, 0.3, 1)';
     const preset = options.preset ?? 'fade';
 
@@ -66,6 +68,16 @@ export function useTransition(element: HTMLElement | null, options: UseTransitio
         if (!element) return;
         options.onEnterStart?.();
 
+        const visible = getPresetStyles('visible');
+
+        if (duration === 0) {
+            Object.assign(element.style, visible);
+            element.style.display = 'block';
+            options.onEnterEnd?.();
+            cb?.();
+            return;
+        }
+
         element.style.transition = `all ${duration}ms ${easing}`;
         element.style.willChange = 'transform, opacity';
 
@@ -75,7 +87,6 @@ export function useTransition(element: HTMLElement | null, options: UseTransitio
 
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
-                const visible = getPresetStyles('visible');
                 Object.assign(element.style, visible);
 
                 setTimeout(() => {
@@ -91,10 +102,19 @@ export function useTransition(element: HTMLElement | null, options: UseTransitio
         if (!element) return;
         options.onExitStart?.();
 
+        const hidden = getPresetStyles('hidden');
+
+        if (duration === 0) {
+            Object.assign(element.style, hidden);
+            element.style.display = 'none';
+            options.onExitEnd?.();
+            cb?.();
+            return;
+        }
+
         element.style.transition = `all ${duration}ms ${easing}`;
         element.style.willChange = 'transform, opacity';
 
-        const hidden = getPresetStyles('hidden');
         Object.assign(element.style, hidden);
 
         setTimeout(() => {

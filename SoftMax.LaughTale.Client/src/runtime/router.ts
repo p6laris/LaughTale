@@ -11,6 +11,7 @@ import { initIslands } from './hydrator';
 import { initDirectives } from '../directives/index';
 import { applyNonceToScript } from '../directives/csp';
 import { prefetchManager } from '../router/prefetch';
+import { isReducedMotionPreferred } from '../styles/animations';
 
 let isRouterActive = false;
 let inFlightController: AbortController | null = null;
@@ -326,7 +327,7 @@ export async function navigateTo(
             window.dispatchEvent(new CustomEvent('island:page-loaded', { detail: { url: finalUrl.href } }));
         };
 
-        if ('startViewTransition' in document) {
+        if ('startViewTransition' in document && !isReducedMotionPreferred()) {
             await (document as any).startViewTransition(updateDom);
         } else {
             await updateDom();

@@ -600,7 +600,8 @@ Standardize events on `laughtale:<component>:<event>` (`bubbles: true`, `detail`
 ---
 
 ### `LT-802` — No reduced-motion support
-**Severity:** P2 · **Status:** todo · **File:** `src/styles/animations.ts`
+**Severity:** P2 · **Status:** done · **File:** `src/styles/animations.ts`
+
 
 **Fix.** Gate all animation behind `prefers-reduced-motion: reduce`, including View Transitions (skip `startViewTransition` entirely when reduced motion is requested).
 
