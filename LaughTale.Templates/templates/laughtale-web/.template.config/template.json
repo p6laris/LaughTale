@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "LaughTale Team",
+  "classifications": ["Web", "MVC", "Razor", "Islands"],
+  "name": "LaughTale Web Application",
+  "generatorVersions": "[1.0.0.0-*)",
+  "description": "An ASP.NET Core Razor Pages application configured with LaughTale Islands Architecture, View Transitions, and Aura Design System tokens.",
+  "groupIdentity": "LaughTale.Templates.Web",
+  "identity": "LaughTale.Templates.Web.CSharp",
+  "shortName": "laughtale-web",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "sourceName": "LaughTaleApp",
+  "preferNameDirectory": true,
+  "symbols": {
+    "Framework": {
+      "type": "parameter",
+      "description": "The target framework for the project.",
+      "datatype": "string",
+      "defaultValue": "net10.0",
+      "replaces": "net10.0"
+    }
+  }
+}

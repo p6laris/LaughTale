@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "LaughTale Team",
+  "classifications": ["Web", "Islands", "Component"],
+  "name": "LaughTale Island Component",
+  "generatorVersions": "[1.0.0.0-*)",
+  "description": "A custom LaughTale Island component with C# props record, Roslyn TagHelper generation, and TypeScript mount handler.",
+  "groupIdentity": "LaughTale.Templates.Island",
+  "identity": "LaughTale.Templates.Island.CSharp",
+  "shortName": "laughtale-island",
+  "tags": {
+    "language": "C#",
+    "type": "item"
+  },
+  "sourceName": "MyIsland",
+  "symbols": {
+    "IslandName": {
+      "type": "parameter",
+      "datatype": "string",
+      "description": "The kebab-case name of the island (e.g. user-badge).",
+      "defaultValue": "my-island",
+      "replaces": "my-island"
+    }
+  }
+}
