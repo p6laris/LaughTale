@@ -1,4 +1,4 @@
-﻿/**
+/**
  * LaughTale: Enterprise Select Component (Aura Select / Dropdown)
  * Feature-complete select component supporting single, multiple, checkmark, checkbox modes,
  * chips display, debounced filter with search icon, grouping, custom avatar/flag templates,
@@ -7,6 +7,8 @@
 
 import { injectIslandStyle } from '../runtime/styles';
 import { getLucideIcon } from '../icons/lucide';
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 
 export interface SelectOption {
     label: string;
@@ -49,6 +51,8 @@ export interface SelectProps {
     targetInputName?: string;
     header?: string;
     footer?: string;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 const CSS = `
@@ -470,7 +474,7 @@ const CSS = `
 }
 `;
 
-export default function SelectIsland(container: HTMLElement, props: SelectProps) {
+export default function SelectIsland(container: HTMLElement, props: SelectProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-select', CSS);
 
     const isMultiple = props.multiple === true || String(props.multiple) === 'true';
@@ -642,16 +646,18 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps)
         const badgeHtml = opt.badge !== undefined ? `<span class="p-select-option-badge">${opt.badge}</span>` : '';
         const descHtml = opt.description ? `<div style="font-size: 0.75rem; color: var(--p-text-muted);">${opt.description}</div>` : '';
 
-        const checkmarkHtml = (isCheckmark || isMultiple) && checked ? `<span class="p-select-option-checkmark">${getLucideIcon('check', 16)}</span>` : '';
+        const checkmarkHtml = (isCheckmark || isMultiple) && checked ? `<span class="p-select-option-checkmark" data-part="checkmark">${getLucideIcon('check', 16)}</span>` : '';
         const checkboxHtml = isCheckbox || isMultiple ? `
-            <div class="p-select-option-checkbox ${checked ? 'is-checked' : ''}">
+            <div class="p-select-option-checkbox ${checked ? 'is-checked' : ''}" data-part="checkbox">
                 ${checked ? getLucideIcon('check', 12) : ''}
             </div>
         ` : '';
 
+        const itemPart = resolvePart('item', `p-select-option ${high} ${dis}`, props.pt, props.studioOverrides);
+
         return `
-            <li class="p-select-option ${high} ${dis}" data-value="${opt.value}" role="option" aria-selected="${checked ? 'true' : 'false'}" id="${id}">
-                <div class="p-select-option-content">
+            <li class="${itemPart.className}" style="${itemPart.style}" data-part="item" data-value="${opt.value}" role="option" aria-selected="${checked ? 'true' : 'false'}" id="${id}">
+                <div class="p-select-option-content" data-part="itemContent">
                     ${checkboxHtml}
                     ${flagHtml}
                     ${iconHtml}
@@ -683,34 +689,41 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps)
         const allSelected = flatOptions.length > 0 && selectedValues.length === flatOptions.length;
         const isIndeterminate = selectedValues.length > 0 && !allSelected;
 
-        container.className = rootClasses;
+        applyPart(container, 'root', rootClasses, props.pt, props.studioOverrides);
         container.setAttribute('tabindex', isDisabled ? '-1' : '0');
         container.setAttribute('role', 'combobox');
         container.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
         container.setAttribute('aria-haspopup', 'listbox');
 
+        const labelPart = resolvePart('label', 'p-select-label', props.pt, props.studioOverrides);
+        const triggerPart = resolvePart('trigger', 'p-select-trigger-wrap', props.pt, props.studioOverrides);
+        const panelPart = resolvePart('panel', `p-select-overlay ${isOpen ? 'is-visible' : ''}`, props.pt, props.studioOverrides);
+        const listPart = resolvePart('list', 'p-select-list', props.pt, props.studioOverrides);
+
         container.innerHTML = `
-            ${renderTriggerLabel()}
-            <div class="p-select-actions">
-                ${showClear && hasSelected && !isDisabled ? `<span class="p-select-clear-icon" title="Clear selection">${getLucideIcon('x', 14)}</span>` : ''}
-                ${isLoading ? `<span class="p-select-dropdown">${getLucideIcon('loader-2', 16)}</span>` : `<span class="p-select-dropdown">${getLucideIcon('chevron-down', 16)}</span>`}
+            <div class="${triggerPart.className}" style="${triggerPart.style}" data-part="trigger">
+                ${renderTriggerLabel()}
             </div>
-            <div class="p-select-overlay ${isOpen ? 'is-visible' : ''}">
+            <div class="p-select-actions" data-part="actions">
+                ${showClear && hasSelected && !isDisabled ? `<span class="p-select-clear-icon" data-part="clearButton" title="Clear selection">${getLucideIcon('x', 14)}</span>` : ''}
+                ${isLoading ? `<span class="p-select-dropdown" data-part="indicator">${getLucideIcon('loader-2', 16)}</span>` : `<span class="p-select-dropdown" data-part="indicator">${getLucideIcon('chevron-down', 16)}</span>`}
+            </div>
+            <div class="${panelPart.className}" style="${panelPart.style}" data-part="panel">
                 ${hasFilter ? `
-                    <div class="p-select-filter-container">
+                    <div class="p-select-filter-container" data-part="filterContainer">
                         <span class="p-select-filter-icon">${getLucideIcon('search', 14)}</span>
-                        <input type="text" class="p-select-filter-input" placeholder="${props.filterPlaceholder || 'Search...'}" value="${filterQuery}" />
+                        <input type="text" class="p-select-filter-input" data-part="filterInput" placeholder="${props.filterPlaceholder || 'Search...'}" value="${filterQuery}" />
                     </div>
                 ` : ''}
                 ${isMultiple && isCheckbox ? `
-                    <div class="p-select-header-all">
+                    <div class="p-select-header-all" data-part="headerAll">
                         <div class="p-select-option-checkbox ${allSelected ? 'is-checked' : ''}">
                             ${allSelected ? getLucideIcon('check', 12) : (isIndeterminate ? getLucideIcon('minus', 12) : '')}
                         </div>
                         <span>Select All (${selectedValues.length}/${flatOptions.length})</span>
                     </div>
                 ` : ''}
-                <ul class="p-select-list" role="listbox" style="max-height: ${scrollHeight};">
+                <ul class="${listPart.className}" style="max-height: ${scrollHeight}; ${listPart.style}" data-part="list" role="listbox">
                     ${renderListItems()}
                 </ul>
             </div>
@@ -862,6 +875,15 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps)
             bubbles: true,
             detail: { value: payload }
         }));
+    }
+
+    if (typeof document !== 'undefined') {
+        const handleOutsideClick = (e: MouseEvent) => {
+            if (!container.contains(e.target as Node)) {
+                toggleOverlay(false);
+            }
+        };
+        document.addEventListener('click', handleOutsideClick, { signal: ctx?.signal });
     }
 
     render();

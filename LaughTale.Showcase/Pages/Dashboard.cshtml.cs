@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using LaughTale.Components.Models;
 
 namespace LaughTale.Showcase.Pages;
@@ -24,10 +24,10 @@ public class DashboardModel : PageModel
 
     public List<Dictionary<string, object>> AuditRows { get; set; } = new()
     {
-        new() { { "id", "TX-9021" }, { "actor", "sec-admin@softmax.dev" }, { "action", "Rotate HMAC Signing Key" }, { "status", "Success" }, { "timestamp", "1 min ago" } },
+        new() { { "id", "TX-9021" }, { "actor", "sec-admin@laughtale.dev" }, { "action", "Rotate HMAC Signing Key" }, { "status", "Success" }, { "timestamp", "1 min ago" } },
         new() { { "id", "TX-9022" }, { "actor", "gateway-worker-04" }, { "action", "Batch Token Issuance" }, { "status", "Success" }, { "timestamp", "3 mins ago" } },
         new() { { "id", "TX-9023" }, { "actor", "audit-crawler" }, { "action", "Vulnerability Scan" }, { "status", "Completed" }, { "timestamp", "12 mins ago" } },
-        new() { { "id", "TX-9024" }, { "actor", "devops-lead@softmax.dev" }, { "action", "Deploy Net10 Islands Node" }, { "status", "Success" }, { "timestamp", "24 mins ago" } }
+        new() { { "id", "TX-9024" }, { "actor", "devops-lead@laughtale.dev" }, { "action", "Deploy Net10 Islands Node" }, { "status", "Success" }, { "timestamp", "24 mins ago" } }
     };
 
     public List<CommandPaletteItem> CommandItems { get; set; } = new()

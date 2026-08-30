@@ -13,7 +13,7 @@ public static class IslandJson
 {
     /// <summary>
     /// Strict, secure serializer options for client-side island props injection.
-    /// Enforces a maximum recursion depth of 8, ignores circular object references,
+    /// Enforces a maximum recursion depth of 32, ignores circular object references,
     /// and excludes properties decorated with [IslandIgnore].
     /// </summary>
     public static readonly JsonSerializerOptions Options = CreateDefaultOptions();

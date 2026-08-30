@@ -37,7 +37,7 @@ An enterprise-grade, high-performance **Islands Architecture framework for ASP.N
 
 ```bash
 # Clone the repository
-git clone https://github.com/softmax/LaughTale.git
+git clone https://github.com/laughtale/LaughTale.git
 cd LaughTale
 
 # Run the Showcase & Docs

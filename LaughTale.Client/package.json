@@ -1,5 +1,5 @@
 {
-  "name": "@softmax/islands",
+  "name": "laughtale",
   "version": "1.0.0",
   "description": "Ultra-lightweight multi-strategy client-side hydration engine for LaughTale Islands Architecture",
   "type": "module",
@@ -22,7 +22,8 @@
     "build": "npm run typecheck && node esbuild.config.mjs --prod",
     "build:dev": "node esbuild.config.mjs",
     "typecheck": "tsc --noEmit",
-    "test": "node run-tests.mjs"
+    "lint:contracts": "node scripts/verify-contracts.mjs",
+    "test": "node scripts/verify-contracts.mjs && node run-tests.mjs"
   },
   "keywords": [
     "islands",
@@ -31,7 +32,7 @@
     "dotnet",
     "blazor"
   ],
-  "author": "SoftMax",
+  "author": "LaughTale",
   "license": "MIT",
   "devDependencies": {
     "esbuild": "^0.25.0",

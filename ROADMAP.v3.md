@@ -284,7 +284,7 @@ Persistent islands must be *excluded* — they are moved, not destroyed.
 ### `LT-301` — TypeScript does not compile (98 errors) and the public barrel is broken
 **Severity:** P1 · **Status:** done
 
-**Evidence.** `npx tsc --noEmit` → 98 errors. Worst offenders: `context-menu.ts` (58), `split-button.ts` (15), `timeline.ts` (6). Critically, **`src/index.ts` has 3** — it re-exports `hasSlot`, `islandEvents`, and `islandStore`, none of which exist (`slots.ts` has no `hasSlot`; `events.ts` exports `onIslandEvent`; `state.ts` exports the `IslandStore` type). Any consumer writing `import { islandStore } from '@softmax/islands'` gets a runtime `undefined`. esbuild does not typecheck, which is why this shipped.
+**Evidence.** `npx tsc --noEmit` → 98 errors. Worst offenders: `context-menu.ts` (58), `split-button.ts` (15), `timeline.ts` (6). Critically, **`src/index.ts` has 3** — it re-exports `hasSlot`, `islandEvents`, and `islandStore`, none of which exist (`slots.ts` has no `hasSlot`; `events.ts` exports `onIslandEvent`; `state.ts` exports the `IslandStore` type). Any consumer writing `import { islandStore } from 'laughtale'` gets a runtime `undefined`. esbuild does not typecheck, which is why this shipped.
 
 **Fix.** Fix all 98 (start with `index.ts` and `runtime/`). Enable `strict: true` incrementally per-directory. Add `"typecheck"` to a pre-build step so `npm run build` fails on type errors.
 
@@ -300,7 +300,7 @@ Persistent islands must be *excluded* — they are moved, not destroyed.
 **Fix.**
 1. `"build": "npm run typecheck && node esbuild.config.mjs --prod"`; keep a separate `build:dev`.
 2. ESM build: `splitting: true`, `outdir: 'dist'`, `metafile: true`. Drop the monolithic IIFE, or restrict the IIFE entry to the **runtime only** (hydrator + registry + router ≈ the genuine sub-5 KB core) and load components as chunks.
-3. Split the package: `@softmax/islands` (runtime) and `@softmax/islands-components` (the 76 components), with subpath exports.
+3. Split the package: `laughtale` (runtime) and `laughtale-components` (the 76 components), with subpath exports.
 4. Delete the duplicate pipeline; make one build script the source for Showcase, Docs, and `dist`.
 5. Add a **bundle-size budget** gate: fail CI if the runtime entry exceeds **8 KB gzipped**.
 6. Correct the README numbers to measured values.
@@ -625,7 +625,7 @@ Standardize events on `laughtale:<component>:<event>` (`bubbles: true`, `detail`
 
 **Evidence.** `IsPackable`/`PackageId` is set on 5 projects (good), but `LaughTale.Tests` is among them (it should not be packable), and there is no release pipeline, no `CHANGELOG.md`, no `LICENSE` file at the repo root despite `package.json` declaring MIT.
 
-**Fix.** Mark test project `IsPackable=false`. Add `Directory.Build.props` centralizing version, authors, license, repo URL, symbol packages, and deterministic builds. Add `LICENSE`, `CHANGELOG.md` (Keep a Changelog), and a documented SemVer policy. Publish `@softmax/islands` to npm from CI. Ensure the Generators package ships as an analyzer (`analyzers/dotnet/cs`) and Core ships a `.props` wiring `@addTagHelper` automatically.
+**Fix.** Mark test project `IsPackable=false`. Add `Directory.Build.props` centralizing version, authors, license, repo URL, symbol packages, and deterministic builds. Add `LICENSE`, `CHANGELOG.md` (Keep a Changelog), and a documented SemVer policy. Publish `laughtale` to npm from CI. Ensure the Generators package ships as an analyzer (`analyzers/dotnet/cs`) and Core ships a `.props` wiring `@addTagHelper` automatically.
 
 ---
 

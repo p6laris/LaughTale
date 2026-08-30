@@ -4,7 +4,7 @@
  * streaming SSR, tri-state lifecycle tracking ('idle' | 'pending' | 'mounted' | 'failed'), and explicit retry recovery.
  */
 
-import { getIslandDefinition } from './registry';
+import { getIslandDefinition, type IslandContext } from './registry';
 import { parseAndReviveProps } from './reviver';
 import { importWithRetry } from './retry';
 import { awaitStreamingReady } from './streaming';
@@ -176,9 +176,26 @@ async function executeHydration(container: HTMLElement, name: string): Promise<v
             (container as any).island = module.createHandle(container, props);
         }
 
-        // 5. Mount island and register unmount hook
-        const unmount = await mount(container, props);
+        // 5. Construct structural IslandContext (LT-1102)
+        const abortController = new AbortController();
+        const cleanups: (() => void)[] = [];
+
+        const ctx: IslandContext = {
+            signal: abortController.signal,
+            onCleanup: (fn: () => void) => cleanups.push(fn),
+            container,
+            name,
+            locale: container.getAttribute('lang') || (typeof document !== 'undefined' ? document.documentElement.lang : 'en') || 'en',
+            dir: ((container.getAttribute('dir') || (typeof document !== 'undefined' ? document.documentElement.dir : 'ltr') || 'ltr').toLowerCase()) as 'ltr' | 'rtl'
+        };
+
+        // 6. Mount island with context and register unmount hook
+        const unmount = await mount(container, props, ctx);
         const cleanup = () => {
+            try {
+                abortController.abort();
+            } catch {}
+
             if (typeof unmount === 'function') {
                 try {
                     unmount();
@@ -186,6 +203,15 @@ async function executeHydration(container: HTMLElement, name: string): Promise<v
                     console.error(`[LaughTale] Error unmounting island '${name}':`, e);
                 }
             }
+
+            while (cleanups.length > 0) {
+                try {
+                    cleanups.pop()!();
+                } catch (e) {
+                    console.error(`[LaughTale] Error in cleanup callback for island '${name}':`, e);
+                }
+            }
+
             delete (container as any).island;
         };
 

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * LaughTale: Batched Island CSS Injection & Constructable StyleSheets (LT-703)
  * 
  * Batches island stylesheets in a single microtask frame, preferring document.adoptedStyleSheets
@@ -130,7 +130,8 @@ export function clearAllIslandStyles(): void {
     pendingStyles.clear();
 
     if (isAdoptedStyleSheetsSupported()) {
-        document.adoptedStyleSheets = [];
+        const islandSheets = new Set(adoptedSheetMap.values());
+        document.adoptedStyleSheets = document.adoptedStyleSheets.filter(s => !islandSheets.has(s));
         adoptedSheetMap.clear();
     }
 

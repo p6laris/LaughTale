@@ -1,4 +1,4 @@
-﻿/**
+/**
  * LaughTale: Enterprise Sidebar Component Suite (PrimeVue 4 Aura Design System)
  * Complete compound navigation panel system matching PrimeVue 4 Aura specifications:
  * 1. App-Level Navigation Sidebar (Showcase & Docs) powered by the 100% unified Compound Sidebar Engine
@@ -1123,7 +1123,7 @@ export default function SidebarIsland(container: HTMLElement, props: SidebarProp
             ...props,
             groups: appGroups,
             demoType: 'app',
-            headerTitle: props.title || 'SoftMax Aura',
+            headerTitle: props.title || 'LaughTale Aura',
             collapsible: 'icon',
             variant: 'sidebar',
             width: '16.5rem',
@@ -1282,7 +1282,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
     }
 
     function renderHeaderContent(): string {
-        const headerTitle = props.headerTitle || 'SoftMax Aura';
+        const headerTitle = props.headerTitle || 'LaughTale Aura';
 
         if (isAppMode) {
             return `
@@ -1393,7 +1393,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                 <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; overflow: hidden;">
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                         <div style="width: 1.6rem; height: 1.6rem; border-radius: 9999px; background: var(--p-surface-200); display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700; color: var(--p-surface-700); flex-shrink: 0;">LT</div>
-                        <span class="p-sidebar-item-label p-sidebar-footer-label" style="font-size: 0.775rem; font-weight: 600; color: var(--p-text-muted);">SoftMax LaughTale</span>
+                        <span class="p-sidebar-item-label p-sidebar-footer-label" style="font-size: 0.775rem; font-weight: 600; color: var(--p-text-muted);">LaughTale</span>
                     </div>
                     <span class="p-sidebar-menu-badge aura-tag tag-emerald" style="font-size: 0.65rem; padding: 0.1rem 0.4rem;">v3.0</span>
                 </div>

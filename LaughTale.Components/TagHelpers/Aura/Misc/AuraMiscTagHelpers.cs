@@ -1,4 +1,4 @@
-﻿// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
 //   Modularized Aura TagHelpers
 // ----------------------------------------------------------------------
 
@@ -345,7 +345,7 @@ public class IslandThemeStudioTagHelper : TagHelper
 public class IslandTerminalTagHelper : TagHelper
 {
     public string? WelcomeMessage { get; set; }
-    public string Prompt { get; set; } = "admin@softmax:~$";
+    public string Prompt { get; set; } = "admin@laughtale:~$";
     public Dictionary<string, string>? Commands { get; set; }
 
     public override void Process(TagHelperContext context, TagHelperOutput output)

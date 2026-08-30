@@ -15,10 +15,12 @@ export {
     type IslandFactory,
     type IslandTeardown,
     type IslandLoader,
-    type IslandDefinition
+    type IslandDefinition,
+    type IslandContext
 } from './runtime/registry';
 export { hydrateIsland, initIslands, retryIsland, getIslandState, setHydrationErrorHandler, getHydrationErrorHandler, type HydrateStrategy, type HydrationState, type HydrationErrorHandler } from './runtime/hydrator';
 export { enableViewTransitions, navigateTo } from './runtime/router';
+export { resolvePart, applyPart, type PassthroughRecord, type PartOptions, type ResolvedPart } from './runtime/parts';
 export { getSlot, extractSlotContent, hasSlot } from './runtime/slots';
 export { injectIslandStyle, flushPendingStyles, removeIslandStyle, clearAllIslandStyles, isAdoptedStyleSheetsSupported } from './runtime/styles';
 export { emitIslandEvent, onIslandEvent } from './runtime/events';
@@ -45,6 +47,8 @@ export { announce, clearAnnouncements, getAnnouncerElement, type AnnouncePriorit
 export { applyAriaAttributes, setRovingTabindex, handleRovingKeydown } from './accessibility/aria';
 export { initAnimationStyles, injectRipple, isReducedMotionPreferred, getReducedMotionSafeDuration } from './styles/animations';
 export { renderErrorBoundary, isDevMode } from './runtime/error-boundary';
+export { MemoryLeakHarness, leakHarness, type LeakReport } from './testing/leak-harness';
+
 
 
 

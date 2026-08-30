@@ -1,12 +1,22 @@
-﻿/**
+/**
  * LaughTale: Island Factory & Loader Registry
  */
 
 export type IslandTeardown = () => void;
 
+export interface IslandContext {
+    signal: AbortSignal;
+    onCleanup(fn: () => void): void;
+    container: HTMLElement;
+    name: string;
+    locale: string;
+    dir: 'ltr' | 'rtl';
+}
+
 export type IslandFactory<TProps = any, THandle = any> = (
     container: HTMLElement,
-    props: TProps
+    props: TProps,
+    ctx?: IslandContext
 ) => void | IslandTeardown | Promise<void | IslandTeardown>;
 
 export interface IslandModule<TProps = any, THandle = any> {

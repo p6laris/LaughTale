@@ -1,4 +1,4 @@
-﻿---
+---
 title: "Headless Composables & Animations"
 description: "Framework-agnostic UI primitives: useDisclosure, useFocusTrap, useFloatingPosition, useSpring, and useAutoAnimate"
 order: 39
@@ -25,7 +25,7 @@ import {
     useHotkeys,
     useClickOutside,
     useScrollLock
-} from '@softmax/islands';
+} from 'laughtale';
 ```
 
 ### `useDisclosure`
@@ -55,7 +55,7 @@ focusTrap.deactivate();
 ## ✨ 2. Composable Physics-Based Animations
 
 ```typescript
-import { useSpring, useTransition, useAutoAnimate, useStagger } from '@softmax/islands';
+import { useSpring, useTransition, useAutoAnimate, useStagger } from 'laughtale';
 ```
 
 ### `useSpring`

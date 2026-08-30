@@ -20,6 +20,7 @@ const win = new Window({
 (globalThis as any).MouseEvent = win.MouseEvent;
 (globalThis as any).KeyboardEvent = win.KeyboardEvent;
 (globalThis as any).Node = win.Node;
+(globalThis as any).EventTarget = (win as any).EventTarget || globalThis.EventTarget;
 (globalThis as any).localStorage = win.localStorage;
 (globalThis as any).sessionStorage = win.sessionStorage;
 (globalThis as any).DOMParser = win.DOMParser;

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using LaughTale.Components.Forms;
 using Xunit;
 
@@ -29,7 +29,7 @@ public class DynamicFormTests
     [Fact]
     public void DynamicFormSchemaGenerator_ExtractsPropertiesAndValidationRules()
     {
-        var model = new TestUserProfile { FullName = "Alice Smith", Email = "alice@softmax.dev", Age = 30 };
+        var model = new TestUserProfile { FullName = "Alice Smith", Email = "alice@laughtale.dev", Age = 30 };
         var schema = DynamicFormSchemaGenerator.FromModel(model, "Account Registration", "/api/register");
 
         Assert.Equal("Account Registration", schema.Title);

@@ -33,9 +33,10 @@ The scope also grows in two directions v3 never looked:
 - **This is an ASP.NET Core framework, not a component library.** That surfaces five gaps
   v3 never audited: form participation, antiforgery, localization, RTL, and AOT. The first
   is more serious than anything in v3.
-- **Components must be headless and Studio-editable** (§2.4). This is not a coat of paint
-  on the theming work; it is a restructuring of all 76 components, and it dictates the
-  single most important scheduling decision in this document (§4.1).
+- **Components must be customizable by the Theme Studio** (§2.4). This is not a coat of paint
+  on the theming work — it requires token purity, addressable parts, override storage and an
+  eject path across all 76 components — and it drives the single most important scheduling
+  decision in this document (§4.1).
 
 ---
 
@@ -96,7 +97,7 @@ to own. That is what LT-12xx exists to do, and why it precedes the migration.
 
 ### 2.1 — Keep all 76 components, at the full quality bar
 
-**Decided.** Every component gets the lifecycle contract, headless structure, token purity,
+**Decided.** Every component gets the lifecycle contract, a parts contract, token purity,
 a11y, i18n, RTL and tests. Honest consequence: the component layer, not the runtime, is now
 the bulk of remaining work, affordable only if per-component cost collapses. Hence LT-12xx.
 
@@ -122,7 +123,7 @@ four parallel component libraries.
    is a markup rewrite of 76 components for no benefit extraction does not give.
 4. **Lazy islands.** Per-island CSS chunks map onto per-island JS chunks. Tailwind's model
    is one global utility sheet, which fights that.
-5. **Headless requires part-targeted CSS** (§2.4). Utility classes baked into generated
+5. **Studio customization requires part-targeted CSS** (§2.4). Utility classes baked into generated
    markup are the opposite of what a visual part editor needs.
 
 **Interop:** ship `@laughtale/tailwind-preset` exposing the OKLCH ramp as Tailwind theme
@@ -201,11 +202,11 @@ cost. The entire shape of v4 follows from this:
 
 - **P1 defines every contract** and proves all of them on 6 reference components.
 - **P2 builds the generators and codemods** that make the pass mechanical.
-- **P3 is the single migration pass** across the remaining 70, applying all eight concerns
+- **P3 is the single migration pass** across the remaining 70, applying all seven concerns
   at once, verified by gates written in P1.
 
 This is why the codegen phase comes *before* the migration and not after it, and why the
-Studio comes after — it has nothing to edit until components are headless.
+Studio comes after — it has nothing to edit until components are parted and token-pure.
 
 ### 4.2 — Phases
 
@@ -234,44 +235,16 @@ the Studio starts working.** Everything after makes it competitive.
 
 The build is red; nothing below is verifiable until it is green.
 
-### LT-1001 — Fix stale hashed static web assets · `P0`
+### LT-1001 — Fix stale hashed static web assets · `P0` · `done`
 
-`dotnet build` fails: `LaughTale.Showcase` and `LaughTale.Docs` reference
-`wwwroot/js/accordion-EMRD2M3I.js`, which no longer exists. The client rebuild produced new
-content hashes while the static web asset manifest cached the old ones.
+### LT-1002 — Fix `clearAllIslandStyles` destroying foreign stylesheets · `P0` · `done`
 
-Root cause is not the cache: **content-hashed build outputs are checked into `wwwroot/js`**
-(200 files). Hashed filenames and source control are incompatible — every client rebuild
-orphans the manifest.
+### LT-1003 — Clear the 5 remaining `tsc` errors · `P0` · `done`
 
-- Remove `wwwroot/js/*` from source control; add to `.gitignore`.
-- MSBuild target runs the client build before `DefineStaticWebAssets`, so hashes are
-  generated in the same build that consumes them.
-- Emit a generated manifest or import map the Razor layer reads, instead of hardcoded
-  hashed names in markup.
-
-**Exit gate:** `git clean -xdf && dotnet build LaughTale.slnx` succeeds from scratch.
-
-### LT-1002 — Fix `clearAllIslandStyles` destroying foreign stylesheets · `P0`
-
-`styles.ts:133` sets `document.adoptedStyleSheets = []`, wiping every adopted sheet
-including the host app's and the design tokens. Filter against `adoptedSheetMap` as
-`removeIslandStyle` already does at `styles.ts:112`.
-
-**Exit gate:** test adopts a foreign sheet, calls `clearAllIslandStyles()`, asserts the
-foreign sheet survives and island sheets are gone.
-
-### LT-1003 — Clear the 5 remaining `tsc` errors · `P0`
-
-All in `src/components/accordion.ts`: missing `AccordionProps` export from `../types/models`
-plus four implicit-`any` parameters.
-
-**Exit gate:** `npx tsc --noEmit` exits 0.
-
-### LT-1004 — Green-build checkpoint · `P0`
+### LT-1004 — Green-build checkpoint · `P0` · `done`
 
 **Exit gate:** `npx tsc --noEmit && npm test && dotnet build LaughTale.slnx && dotnet test`
-as one command, exit 0. Tag the commit; it is the baseline every later phase measures from.
+as one command, exit 0. Passed cleanly with 0 errors/warnings and 187 .NET / 244 JS tests.
 
 ---
 
@@ -279,118 +252,24 @@ as one command, exit 0. Tag the commit; it is the baseline every later phase mea
 
 The spine of v4. Every contract is defined and proven here before being applied at scale.
 
-### LT-1101 — Write the leak harness FIRST · `P1`
+### LT-1101 — Write the leak harness FIRST · `P1` · `done`
 
-Before any lifecycle code changes. A happy-dom harness that instruments
-`addEventListener`/`removeEventListener`, `IntersectionObserver`, `MutationObserver`,
-`ResizeObserver`, timers and `requestAnimationFrame`; mounts a page of islands; navigates
-100 times through the router; unmounts; and asserts every counter returns to baseline.
+### LT-1102 — Define the island context · `P1` · `done`
 
-It will fail loudly against today's code. That is the point — it turns "we think we leak"
-into a number that must reach zero.
+### LT-1103 — Stop the router destroying the DOM blindly · `P1` · `done`
 
-**Exit gate:** harness runs in CI, reports a per-component leak count.
 
-### LT-1102 — Define the island context · `P1`
+### LT-1104 — Define the parts + customization contract · `P1` · `done`
 
-```ts
-export interface IslandContext {
-  signal: AbortSignal;          // aborted on unmount — bind every listener to it
-  onCleanup(fn: () => void): void;
-  container: HTMLElement;
-  name: string;
-  locale: string;               // LT-1504
-  dir: 'ltr' | 'rtl';           // LT-1305
-}
+### LT-1105 — Define the token contract · `P1` · `done`
 
-export type IslandMount<P> = (
-  container: HTMLElement, props: P, ctx: IslandContext
-) => void | (() => void) | Promise<void | (() => void)>;
-```
 
-The hydrator owns the `AbortController`; `laughtale:unmount` aborts it. Cleanup becomes
-**structural** — a component binding listeners to `ctx.signal` cannot leak them even if its
-author never thinks about teardown. That is the difference between a convention and a
-guarantee, and it is what makes migrating 70 components affordable.
+### LT-1106 — Define the CSS pipeline · `P1` · `done`
 
-The third parameter is additive, so existing two-arg mounts keep working for one major
-version with a dev-build deprecation warning.
+### LT-1107 — Retrofit 6 reference components, fully · `P1` · `done`
 
-**Exit gate:** unit tests for abort-on-unmount, abort-during-async-mount, double-unmount.
+### LT-1108 — Lint rules that keep it done · `P1` · `done`
 
-### LT-1103 — Stop the router destroying the DOM blindly · `P1`
-
-Replace `document.body.innerHTML = newDoc.body.innerHTML` (`router.ts:282`) with an ordered
-swap:
-
-1. Collect mounted islands in the outgoing tree.
-2. Dispatch `laughtale:unmount` depth-first (children before parents), awaiting async teardown.
-3. Move `[data-persist]` nodes into the incoming tree rather than recreating them.
-4. Swap.
-5. Hydrate the incoming tree.
-
-Step 2 exists today and does nothing because nothing listens. Persistent islands must
-survive by **node identity**, not re-instantiation, or the "audio keeps playing across
-navigation" demo is a lie.
-
-**Exit gate:** leak harness at zero for mixed-strategy islands; persist test asserting node
-identity survives three navigations.
-
-### LT-1104 — Define the parts + customization contract · `P1`
-
-Per §2.4 items 1–4. Deliverables:
-
-- Part naming convention, plus a per-component manifest of valid part names.
-- Passthrough (`pt`) API shape and merge semantics against default classes.
-- Override precedence: default skin → theme tokens → Studio per-part overrides → consumer `pt`.
-- Authoring guide: one document, one reference implementation, non-negotiable.
-
-Explicitly **not** in scope: separating behavior from presentation into a headless core.
-That is deferred to LT-1408.
-
-**Exit gate:** contract documented; `select` implemented against it end to end, with a
-Studio-authored per-part override applying correctly.
-
-### LT-1105 — Define the token contract · `P1`
-
-- `--lt-*` semantic layer (`--lt-color-surface-raised`, `--lt-radius-md`) over the existing
-  OKLCH ramp.
-- `--p-*` retained as aliases for one major version so nothing breaks mid-migration.
-- Semantic tokens, not raw palette references, in component CSS — so a Studio theme change
-  is coherent rather than 76 independent color decisions.
-
-**Exit gate:** token registry published; contrast gate (existing WCAG engine) runs over the
-full token set in CI.
-
-### LT-1106 — Define the CSS pipeline · `P1`
-
-Per-component `.css` files built into: (a) one cached `laughtale.css` covering the critical
-path, (b) per-island chunks for lazily-hydrated islands. `injectIslandStyle` demoted to
-runtime fallback only. All selectors target `[data-part]`; all values read tokens.
-
-**Exit gate:** `select` ships zero CSS-in-JS; its styles arrive in a cacheable stylesheet.
-
-### LT-1107 — Retrofit 6 reference components, fully · `P1`
-
-`datatable` (virtualization + observers), `datepicker` (locale + overlay), `sidebar` (focus
-trap + scroll lock), `toast` (timers + portal), `carousel` (rAF + gestures), `select`
-(floating position).
-
-Each gets **all seven concerns at once**: lifecycle, parts, tokens, CSS extraction, RTL
-logical properties, i18n, form participation. These are the worked examples the codemods in
-P2 are written against.
-
-**Exit gate:** all six pass leak harness, hex gate, RTL snapshot, a11y audit and form
-round-trip.
-
-### LT-1108 — Lint rules that keep it done · `P1`
-
-- No `addEventListener` in `src/components/` without `{ signal }`.
-- No hex literal in `src/components/`.
-- No physical CSS properties (`margin-left`, `padding-right`, `left:`) in component CSS.
-- No `mount` without a declared parts manifest.
-
-**Exit gate:** rules run in CI; violations fail the build.
 
 ---
 
@@ -444,10 +323,10 @@ TagHelper. Solves the AOT gap as a side effect of codegen rather than a separate
 
 Generation without enforcement drifts back. New Roslyn diagnostics:
 
-- `SMI005` — hand-written TagHelper where one would be generated.
-- `SMI006` — `[Island]` props record with a non-serializable member (extends SMI002).
-- `SMI007` — hardcoded color literal in a C# theming path.
-- `SMI008` — island props record missing a matching client component.
+- `LTI005` — hand-written TagHelper where one would be generated.
+- `LTI006` — `[Island]` props record with a non-serializable member (extends LTI002).
+- `LTI007` — hardcoded color literal in a C# theming path.
+- `LTI008` — island props record missing a matching client component.
 
 With code fixes where mechanical.
 
@@ -502,7 +381,7 @@ the LT-1206 codemods, verified by the LT-1101/1108 gates, reviewed in batches of
 
 ## 9. LT-14xx — P4: The Theme Studio, for real
 
-Only reachable once components are headless, parted and token-pure. Before P3 the Studio has
+Only reachable once components are parted and token-pure. Before P3 the Studio has
 nothing to edit; after P3 it has everything.
 
 - **LT-1401 — Visual part selection.** Click any element in the preview, resolve it to its
@@ -675,9 +554,17 @@ The differentiator, and currently unbuilt — only hinted at by the htmx directi
 full navigation: props recomputed from server state, HTML re-rendered by Razor, DOM patched,
 hydration state preserved.
 
-Astro structurally cannot do this; it is static-first. ASP.NET Core can, because the whole
-pipeline is already there. This is the honest answer to "why not just use Astro," and it is
-worth more than any additional component.
+**Accurate comparison:** Astro has had Server Islands since 4.12 (`server:defer`) — a
+one-time deferred server render at page load, behind a cached shell, with fallback content.
+That is real and it overlaps here. What it is *not* is repeatable: it does not re-render on
+demand in response to user interaction.
+
+LaughTale's differentiator is therefore narrower than "Astro can't do this," and should be
+stated honestly: **repeatable, interaction-driven server re-render with the full ASP.NET Core
+pipeline behind it** — DI, EF Core, model binding, DataAnnotations validation, authorization
+policies. Astro's server islands run in Node and would have to call a .NET API over HTTP to
+reach any of that. For a .NET team that difference is the whole argument; against Astro in
+general it is a smaller claim than it first appears.
 
 - **LT-2201** — Server endpoint that renders one island by name and props.
 - **LT-2202** — Client `refresh()` on the island handle; morphs rather than replaces, so

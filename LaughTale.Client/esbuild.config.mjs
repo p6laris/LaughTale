@@ -1,4 +1,4 @@
-﻿import * as esbuild from 'esbuild';
+import * as esbuild from 'esbuild';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as zlib from 'zlib';
@@ -36,7 +36,7 @@ await esbuild.build({
     minify: isProd,
     sourcemap: !isProd,
     format: 'iife',
-    globalName: 'SoftMaxIslands',
+    globalName: 'LaughTaleIslands',
     target: 'es2022',
     outfile: 'dist/runtime.js'
 });
@@ -48,7 +48,7 @@ await esbuild.build({
     minify: isProd,
     sourcemap: !isProd,
     format: 'iife',
-    globalName: 'SoftMaxIslands',
+    globalName: 'LaughTaleIslands',
     target: 'es2022',
     outfile: 'dist/index.js'
 });

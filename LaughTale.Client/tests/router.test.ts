@@ -1,4 +1,4 @@
-﻿/**
+/**
  * LaughTale: Router Cross-Origin Security, Head Reconciliation, Concurrency, Scroll & Lifecycle Tests (LT-107, LT-202, LT-203, LT-204)
  */
 
@@ -116,7 +116,7 @@ describe('Router Comprehensive Suite (LT-107, LT-202, LT-203, LT-204)', () => {
                 text: async () => `
                     <html>
                     <head>
-                        <title>About Us - SoftMax</title>
+                        <title>About Us - LaughTale</title>
                         <meta name="description" content="Updated About Us Description">
                         <meta property="og:title" content="About Us OG Title">
                         <link rel="canonical" href="https://mysite.com/about">
@@ -133,7 +133,7 @@ describe('Router Comprehensive Suite (LT-107, LT-202, LT-203, LT-204)', () => {
         try {
             await navigateTo('/about', false);
 
-            assert.equal(document.title, 'About Us - SoftMax');
+            assert.equal(document.title, 'About Us - LaughTale');
 
             const descMeta = document.querySelector('meta[name="description"]');
             assert.equal(descMeta?.getAttribute('content'), 'Updated About Us Description');
@@ -241,4 +241,83 @@ describe('Router Comprehensive Suite (LT-107, LT-202, LT-203, LT-204)', () => {
         assert.equal(window.history.scrollRestoration, 'manual');
     });
 
+    it('navigateTo: dispatches unmount depth-first (children before parents) (LT-1103)', async () => {
+        const unmountOrder: string[] = [];
+
+        const parent = document.createElement('div');
+        parent.setAttribute('data-island', 'parent-comp');
+        const child = document.createElement('div');
+        child.setAttribute('data-island', 'child-comp');
+        const grandchild = document.createElement('div');
+        grandchild.setAttribute('data-island', 'grandchild-comp');
+
+        child.appendChild(grandchild);
+        parent.appendChild(child);
+        document.body.appendChild(parent);
+
+        parent.addEventListener('laughtale:unmount', () => unmountOrder.push('parent'));
+        child.addEventListener('laughtale:unmount', () => unmountOrder.push('child'));
+        grandchild.addEventListener('laughtale:unmount', () => unmountOrder.push('grandchild'));
+
+        const originalFetch = globalThis.fetch;
+        globalThis.fetch = (async () => ({
+            ok: true,
+            url: window.location.href,
+            text: async () => '<html><head><title>New Route</title></head><body><h1>New Page</h1></body></html>'
+        })) as any;
+
+        try {
+            await navigateTo('/test-depth-route', false);
+            assert.deepEqual(unmountOrder, ['grandchild', 'child', 'parent'], 'Unmount events must fire depth-first (children first)');
+        } finally {
+            globalThis.fetch = originalFetch;
+        }
+    });
+
+    it('navigateTo: preserves persistent element exact node identity across multiple navigations (LT-1103)', async () => {
+        document.body.innerHTML = `
+            <div data-persist="audio-player" id="live-player">
+                <audio src="track.mp3"></audio>
+            </div>
+            <div id="page-content">Page 1</div>
+        `;
+
+        const originalPlayerNode = document.getElementById('live-player');
+        assert.ok(originalPlayerNode !== null);
+
+        const originalFetch = globalThis.fetch;
+        globalThis.fetch = (async (url: any) => ({
+            ok: true,
+            url: String(url),
+            text: async () => `
+                <html>
+                <head><title>Route Step</title></head>
+                <body>
+                    <div data-persist="audio-player"></div>
+                    <div id="page-content">Next Page</div>
+                </body>
+                </html>
+            `
+        })) as any;
+
+        try {
+            // Navigation 1
+            await navigateTo('/page-2', false);
+            const playerAfterNav1 = document.getElementById('live-player');
+            assert.strictEqual(playerAfterNav1, originalPlayerNode, 'Node identity must be strictly preserved on nav 1');
+
+            // Navigation 2
+            await navigateTo('/page-3', false);
+            const playerAfterNav2 = document.getElementById('live-player');
+            assert.strictEqual(playerAfterNav2, originalPlayerNode, 'Node identity must be strictly preserved on nav 2');
+
+            // Navigation 3
+            await navigateTo('/page-4', false);
+            const playerAfterNav3 = document.getElementById('live-player');
+            assert.strictEqual(playerAfterNav3, originalPlayerNode, 'Node identity must be strictly preserved on nav 3');
+        } finally {
+            globalThis.fetch = originalFetch;
+        }
+    });
 });
+

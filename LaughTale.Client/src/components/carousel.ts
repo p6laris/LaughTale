@@ -1,4 +1,4 @@
-﻿/**
+/**
  * LaughTale: Enterprise Carousel Component (PrimeVue 4 Aura Design System)
  * Native CSS scroll-snap content slider supporting alignment (start, center, end),
  * partial slidesPerPage (e.g. 1.5, 1.3, 1.75), horizontal & vertical orientation,
@@ -8,6 +8,8 @@
 
 import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 
 export interface CarouselProps {
     items?: any[];
@@ -25,6 +27,8 @@ export interface CarouselProps {
     galleryImages?: string[];
     class?: string;
     style?: string;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 const CAROUSEL_CSS = `
@@ -276,7 +280,7 @@ const GALLERY_DEFAULT_IMAGES = [
     'https://images.unsplash.com/photo-1638255402906-e838358069ab?q=80&w=1631&auto=format&fit=crop'
 ];
 
-export default function CarouselIsland(container: HTMLElement, props: CarouselProps) {
+export default function CarouselIsland(container: HTMLElement, props: CarouselProps, ctx?: IslandContext) {
     injectIslandStyle('carousel', CAROUSEL_CSS);
 
     const demoType = props.demoType || 'basic';
@@ -560,7 +564,7 @@ export default function CarouselIsland(container: HTMLElement, props: CarouselPr
             } else if (loop) {
                 scrollToSlide(itemCount - 1);
             }
-        });
+        }, { signal: ctx?.signal });
     }
 
     if (nextBtn) {
@@ -570,14 +574,14 @@ export default function CarouselIsland(container: HTMLElement, props: CarouselPr
             } else if (loop) {
                 scrollToSlide(0);
             }
-        });
+        }, { signal: ctx?.signal });
     }
 
     indicators.forEach(ind => {
         ind.addEventListener('click', () => {
             const idx = parseInt(ind.getAttribute('data-indicator-index') || '0', 10);
             scrollToSlide(idx);
-        });
+        }, { signal: ctx?.signal });
     });
 
     if (contentEl) {
@@ -620,6 +624,10 @@ export default function CarouselIsland(container: HTMLElement, props: CarouselPr
                     updateUI();
                 }
             }, 80);
+        }, { signal: ctx?.signal });
+
+        ctx?.onCleanup(() => {
+            if (scrollDebounce) clearTimeout(scrollDebounce);
         });
     }
 

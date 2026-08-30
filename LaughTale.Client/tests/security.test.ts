@@ -1,4 +1,4 @@
-﻿/**
+/**
  * LaughTale: Directive Security & Sandboxing Unit Tests (LT-103)
  */
 
@@ -20,7 +20,7 @@ describe('LaughTale Directive Security & Sandboxing Suite', () => {
         assert.equal(sanitizeUrl('javascript:alert(1)'), 'about:blank');
         assert.equal(sanitizeUrl('  JAVASCRIPT:alert(document.cookie)  '), 'about:blank');
         assert.equal(sanitizeUrl('data:text/html,<script>alert(1)</script>'), 'about:blank');
-        assert.equal(sanitizeUrl('https://softmax.dev/dashboard'), 'https://softmax.dev/dashboard');
+        assert.equal(sanitizeUrl('https://laughtale.dev/dashboard'), 'https://laughtale.dev/dashboard');
         assert.equal(sanitizeUrl('/doc/01-getting-started'), '/doc/01-getting-started');
     });
 
@@ -57,11 +57,11 @@ describe('LaughTale Directive Security & Sandboxing Suite', () => {
     });
 
     it('sanitizeHtml: preserves legitimate rich-text formatting and safe media', () => {
-        const safeInput = '<p>Hello <strong>World</strong>, visit <a href="https://softmax.dev" target="_blank">Docs</a> <img src="/img/icon.png" alt="Logo" width="24" height="24"></p>';
+        const safeInput = '<p>Hello <strong>World</strong>, visit <a href="https://laughtale.dev" target="_blank">Docs</a> <img src="/img/icon.png" alt="Logo" width="24" height="24"></p>';
         const result = sanitizeHtml(safeInput);
 
         assert.ok(result.includes('<strong>World</strong>'));
-        assert.ok(result.includes('href="https://softmax.dev"'));
+        assert.ok(result.includes('href="https://laughtale.dev"'));
         assert.ok(result.includes('rel="noopener noreferrer"'));
         assert.ok(result.includes('src="/img/icon.png"'));
         assert.ok(result.includes('alt="Logo"'));
@@ -120,11 +120,11 @@ describe('LaughTale Directive Security & Sandboxing Suite', () => {
 
         const testMatrix = [
             // Safe Web & Communication Protocols
-            { input: 'https://softmax.dev/api/v1', expected: 'https://softmax.dev/api/v1', desc: 'Standard HTTPS URL' },
+            { input: 'https://laughtale.dev/api/v1', expected: 'https://laughtale.dev/api/v1', desc: 'Standard HTTPS URL' },
             { input: 'http://example.com/home', expected: 'http://example.com/home', desc: 'Standard HTTP URL' },
-            { input: 'mailto:support@softmax.dev', expected: 'mailto:support@softmax.dev', desc: 'Mailto protocol' },
+            { input: 'mailto:support@laughtale.dev', expected: 'mailto:support@laughtale.dev', desc: 'Mailto protocol' },
             { input: 'tel:+1234567890', expected: 'tel:+1234567890', desc: 'Telephone protocol' },
-            { input: 'blob:https://softmax.dev/550e8400-e29b-41d4-a716-446655440000', expected: 'blob:https://softmax.dev/550e8400-e29b-41d4-a716-446655440000', desc: 'Blob URL' },
+            { input: 'blob:https://laughtale.dev/550e8400-e29b-41d4-a716-446655440000', expected: 'blob:https://laughtale.dev/550e8400-e29b-41d4-a716-446655440000', desc: 'Blob URL' },
 
             // Relative URLs & Anchors
             { input: '/dashboard/analytics', expected: '/dashboard/analytics', desc: 'Absolute root path' },

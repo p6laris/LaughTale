@@ -16,11 +16,7 @@ public class IslandTagHelper : TagHelper
 {
     private readonly ILogger<IslandTagHelper> _logger;
 
-    public IslandTagHelper() : this(NullLogger<IslandTagHelper>.Instance)
-    {
-    }
-
-    public IslandTagHelper(ILogger<IslandTagHelper>? logger)
+    public IslandTagHelper(ILogger<IslandTagHelper>? logger = null)
     {
         _logger = logger ?? NullLogger<IslandTagHelper>.Instance;
     }

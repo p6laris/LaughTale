@@ -1,4 +1,4 @@
-﻿/**
+/**
  * LaughTale: Enterprise DatePicker Component (Aura DatePicker)
  * Accessible, theme-aware calendar & time picker with Single/Range/Multiple selection,
  * Month/Year views, Button Bar, and full Theme Studio token scaling.
@@ -8,6 +8,8 @@ import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
 import { useDisclosure } from '../composables/useDisclosure';
 import { useClickOutside } from '../composables/useClickOutside';
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 
 export interface DatePickerProps {
     targetInputName?: string;
@@ -29,6 +31,8 @@ export interface DatePickerProps {
     fluid?: boolean;
     size?: 'small' | 'normal' | 'large';
     variant?: 'outlined' | 'filled';
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 const CSS = `
@@ -389,7 +393,7 @@ const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'Ju
 const SHORT_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const WEEKDAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 
-export default function DatePickerIsland(container: HTMLElement, props: DatePickerProps) {
+export default function DatePickerIsland(container: HTMLElement, props: DatePickerProps, ctx?: IslandContext) {
     injectIslandStyle('datepicker', CSS);
 
     const selectionMode = props.selectionMode || 'single';
@@ -461,12 +465,12 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
         const size = props.size || 'normal';
         const variant = props.variant || 'outlined';
 
+        applyPart(container, 'root', `laughtale-datepicker ${props.fluid ? 'fluid' : ''} ${isInline ? 'inline' : ''}`, props.pt, props.studioOverrides);
+
         if (isInline) {
             container.innerHTML = `
-                <div class="laughtale-datepicker inline">
-                    <div class="dp-panel">
-                        ${renderPanelContent()}
-                    </div>
+                <div class="dp-panel" data-part="panel">
+                    ${renderPanelContent()}
                 </div>
             `;
             bindPanelEvents(container.querySelector('.dp-panel')!);
@@ -474,25 +478,24 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
         }
 
         container.innerHTML = `
-            <div class="laughtale-datepicker ${props.fluid ? 'fluid' : ''}">
-                <div class="dp-trigger size-${size} variant-${variant} ${props.invalid ? 'invalid' : ''} ${props.disabled ? 'disabled' : ''}" 
-                     tabindex="${props.disabled ? -1 : 0}" 
-                     role="combobox" 
-                     aria-expanded="false">
-                    <span class="dp-label ${displayText ? '' : 'placeholder'}">
-                        ${displayText || props.placeholder || 'Select Date...'}
+            <div class="dp-trigger size-${size} variant-${variant} ${props.invalid ? 'invalid' : ''} ${props.disabled ? 'disabled' : ''}" 
+                 data-part="trigger"
+                 tabindex="${props.disabled ? -1 : 0}" 
+                 role="combobox" 
+                 aria-expanded="false">
+                <span class="dp-label ${displayText ? '' : 'placeholder'}" data-part="label">
+                    ${displayText || props.placeholder || 'Select Date...'}
+                </span>
+                ${props.showIcon !== false ? `
+                    <span class="dp-icon" data-part="icon">
+                        ${LucideIcons.calendar}
                     </span>
-                    ${props.showIcon !== false ? `
-                        <span class="dp-icon">
-                            ${LucideIcons.calendar}
-                        </span>
-                    ` : ''}
-                </div>
+                ` : ''}
+            </div>
 
-                <div class="dp-overlay">
-                    <div class="dp-panel">
-                        ${renderPanelContent()}
-                    </div>
+            <div class="dp-overlay" data-part="overlay">
+                <div class="dp-panel" data-part="panel">
+                    ${renderPanelContent()}
                 </div>
             </div>
         `;
@@ -515,12 +518,12 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
             }
         });
 
-        useClickOutside(container, () => disclosure.close());
+        useClickOutside(container, () => disclosure.close(), { signal: ctx?.signal });
 
         trigger.addEventListener('click', () => {
             if (props.disabled) return;
             disclosure.toggle();
-        });
+        }, { signal: ctx?.signal });
 
         trigger.addEventListener('keydown', (e) => {
             if (props.disabled) return;
@@ -530,7 +533,7 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
             } else if (e.key === 'Escape') {
                 disclosure.close();
             }
-        });
+        }, { signal: ctx?.signal });
 
         bindPanelEvents(panel, disclosure);
     }

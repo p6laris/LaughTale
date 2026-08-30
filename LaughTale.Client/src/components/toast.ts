@@ -1,4 +1,4 @@
-﻿/**
+/**
  * LaughTale: Enterprise Toast Component (PrimeVue 4 Aura Design System)
  * High-performance notification overlay engine supporting 7 viewport positions,
  * clean vertical list flow with customizable gap, hover-pause timers, semantic severities,
@@ -7,6 +7,8 @@
 
 import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 
 export interface ToastMessageOptions {
     id?: string;
@@ -23,6 +25,7 @@ export interface ToastMessageOptions {
     contentHtml?: string;
     actionLabel?: string;
     onAction?: () => void;
+    pt?: PassthroughRecord;
 }
 
 export interface ToastContainerProps {
@@ -34,6 +37,8 @@ export interface ToastContainerProps {
     baseZIndex?: number;
     class?: string;
     style?: string;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 const TOAST_CSS = `
@@ -626,16 +631,21 @@ if (typeof window !== 'undefined') {
     (window as any).ToastService = ToastService;
 }
 
-export default function ToastIsland(container: HTMLElement, props: ToastContainerProps) {
+export default function ToastIsland(container: HTMLElement, props: ToastContainerProps, ctx?: IslandContext) {
     injectIslandStyle('toast', TOAST_CSS);
 
     const group = props.group || 'default';
     const position = props.position || 'top-right';
 
-    container.className = `p-toast p-toast-${position} ${props.class || ''}`;
+    applyPart(container, 'root', `p-toast p-toast-${position} ${props.class || ''}`, props.pt, props.studioOverrides);
     if (props.gap) {
         container.style.setProperty('--p-toast-gap', `${props.gap}px`);
     }
 
     globalToast.registerContainer(group, container);
+
+    ctx?.onCleanup(() => {
+        globalToast.unregisterContainer(group);
+        globalToast.removeGroup(group);
+    });
 }

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * LaughTale: Enterprise Drawer Component (PrimeVue 4 Aura Design System compliant)
  * High-performance edge overlay panel with 5 positions (left, right, top, bottom, full),
  * zero-flash SSR, silky-smooth 60 FPS GPU slide-in & slide-out transitions, global click delegation,
@@ -255,6 +255,9 @@ const DRAWER_CSS = `
 }
 `;
 
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
+
 export interface DrawerProps {
     id?: string;
     header?: string;
@@ -269,11 +272,13 @@ export interface DrawerProps {
     height?: string;
     style?: string;
     class?: string;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 let globalDrawerDelegationBound = false;
 
-function initGlobalDrawerDelegation() {
+function initGlobalDrawerDelegation(signal?: AbortSignal) {
     if (globalDrawerDelegationBound || typeof document === 'undefined') return;
     globalDrawerDelegationBound = true;
 
@@ -348,7 +353,7 @@ function initGlobalDrawerDelegation() {
                 }
             }
         }
-    });
+    }, { signal });
 
     // Escape Key Handler
     window.addEventListener('keydown', (e) => {
@@ -359,10 +364,11 @@ function initGlobalDrawerDelegation() {
                 document.body.style.overflow = '';
             }
         }
-    });
+    }, { signal });
 }
 
-export default function DrawerIsland(container: HTMLElement, props: DrawerProps) {
+export default function DrawerIsland(container: HTMLElement, props: DrawerProps, ctx?: IslandContext) {
     injectIslandStyle('drawer', DRAWER_CSS);
-    initGlobalDrawerDelegation();
+    applyPart(container, 'root', props.class || '', props.pt, props.studioOverrides);
+    initGlobalDrawerDelegation(ctx?.signal);
 }

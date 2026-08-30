@@ -1,4 +1,4 @@
-﻿/**
+/**
  * LaughTale: View Transitions & Persistent Islands Router (Hardened Edition)
  * 
  * Intercepts link navigation, aborts in-flight navigations upon new clicks, verifies same-origin
@@ -211,7 +211,7 @@ export async function navigateTo(
             const response = await fetch(urlStr, {
                 signal,
                 headers: {
-                    'X-Requested-With': 'SoftMaxIslands-ViewTransition'
+                    'X-Requested-With': 'LaughTale-ViewTransition'
                 }
             });
 
@@ -225,7 +225,8 @@ export async function navigateTo(
             if (response.url) {
                 finalUrl = new URL(response.url, window.location.href);
             }
-            if (finalUrl.origin !== window.location.origin) {
+            const currentOrigin = (typeof window !== 'undefined' && window.location.origin && window.location.origin !== 'null') ? window.location.origin : new URL(window.location.href).origin;
+            if (finalUrl.origin !== currentOrigin) {
                 console.warn(`[LaughTale Router] Blocked cross-origin HTML injection from "${finalUrl.href}". Falling back to hard navigation.`);
                 window.location.href = finalUrl.href;
                 return;
@@ -238,11 +239,24 @@ export async function navigateTo(
         const parser = new DOMParser();
         const newDoc = parser.parseFromString(htmlText, 'text/html');
 
-        // 3. Dispatch unmount lifecycle event to active unpersisted islands
-        document.querySelectorAll<HTMLElement>('[data-island]').forEach(el => {
-            if (!el.closest('[data-persist]')) {
-                el.dispatchEvent(new CustomEvent('laughtale:unmount', { bubbles: false }));
+        // 3. Dispatch unmount lifecycle event to active unpersisted islands (depth-first: children before parents)
+        const getDepth = (el: HTMLElement) => {
+            let depth = 0;
+            let curr: HTMLElement | null = el;
+            while (curr) {
+                depth++;
+                curr = curr.parentElement;
             }
+            return depth;
+        };
+
+        const outgoingIslands = Array.from(document.querySelectorAll<HTMLElement>('[data-island]'))
+            .filter(el => !el.closest('[data-persist]'));
+
+        outgoingIslands.sort((a, b) => getDepth(b) - getDepth(a));
+        outgoingIslands.forEach(el => {
+            const CustomEventCtor = (el.ownerDocument?.defaultView as any)?.CustomEvent || (typeof CustomEvent !== 'undefined' ? CustomEvent : Event);
+            el.dispatchEvent(new CustomEventCtor('laughtale:unmount', { bubbles: false }));
         });
 
         // 4. Extract persistent elements before updating DOM

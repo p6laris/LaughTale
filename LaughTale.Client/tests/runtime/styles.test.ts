@@ -55,4 +55,31 @@ describe('Batched Island Styles & Adopted StyleSheets Suite (LT-703)', () => {
         assert.ok(styleEl !== null);
         assert.equal(styleEl?.textContent, '.badge { padding: 2px 6px; }');
     });
+    it('clearAllIslandStyles preserves foreign adopted stylesheets and only removes island sheets', () => {
+        class MockCSSStyleSheet {
+            cssText: string = '';
+            replaceSync(css: string) { this.cssText = css; }
+        }
+        (globalThis as any).CSSStyleSheet = MockCSSStyleSheet;
+        (document as any).adoptedStyleSheets = [];
+
+        const foreignSheet = new MockCSSStyleSheet();
+        foreignSheet.replaceSync('body { background: #000; }');
+        document.adoptedStyleSheets = [foreignSheet as any];
+
+        injectIslandStyle('mock-component', '.mock-component { color: blue; }');
+        flushPendingStyles();
+
+        assert.ok(document.adoptedStyleSheets.length >= 1);
+
+        clearAllIslandStyles();
+
+        // Foreign sheet MUST still be present in adoptedStyleSheets
+        assert.ok(document.adoptedStyleSheets.includes(foreignSheet as any), 'Foreign stylesheet must survive clearAllIslandStyles');
+
+        // Cleanup
+        delete (globalThis as any).CSSStyleSheet;
+        delete (document as any).adoptedStyleSheets;
+    });
 });
+

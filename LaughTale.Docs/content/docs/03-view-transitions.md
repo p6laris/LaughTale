@@ -1,4 +1,4 @@
-﻿---
+---
 title: "View Transitions & Persistent Islands"
 description: "Seamless SPA navigation without full page reloads or audio/state resets"
 order: 3
@@ -33,7 +33,7 @@ In your C# Razor layout or page:
 In your main TypeScript bootstrap file:
 
 ```typescript
-import { initIslands, enableViewTransitions } from '@softmax/laughtale';
+import { initIslands, enableViewTransitions } from 'laughtale';
 
 // Enables seamless link click interception and state morphing
 enableViewTransitions();

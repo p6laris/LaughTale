@@ -161,14 +161,14 @@ export interface SpeedDialTooltipOptions {
 }
 
 export interface AccordionTab {
-    id: string;
+    id?: string;
     header: string;
     content?: string;
     icon?: string;
     disabled?: boolean;
-    badge?: string;
+    badge?: string | number;
     subtitle?: string;
-    price?: string;
+    price?: string | number;
     toggleIcon?: string;
 }
 
@@ -473,18 +473,6 @@ export interface DynamicFormSchema<TData = Record<string, any>> {
     method?: 'POST' | 'PUT' | 'PATCH' | 'GET';
 }
 
-export interface AccordionTab {
-    id?: string;
-    header: string;
-    content?: string;
-    icon?: string;
-    badge?: string | number;
-    subtitle?: string;
-    price?: string | number;
-    disabled?: boolean;
-    toggleIcon?: string;
-}
-
 export interface AccordionProps {
     tabs?: AccordionTab[];
     multiple?: boolean;
@@ -494,5 +482,6 @@ export interface AccordionProps {
     value?: string | number | (string | number)[];
     activeIndex?: number | number[];
 }
+
 
 

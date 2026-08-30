@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using LaughTale.Components.Enums;
 using LaughTale.Components.Models;
 using LaughTale.Components.TagHelpers;
@@ -24,6 +26,17 @@ public class TagHelpersTests
         );
 
         return (context, output);
+    }
+
+    [Fact]
+    public void IslandTagHelper_InstantiatesViaActivatorUtilitiesWithoutAmbiguity()
+    {
+        var services = new Microsoft.Extensions.DependencyInjection.ServiceCollection();
+        services.AddLogging();
+        var provider = services.BuildServiceProvider();
+
+        var tagHelper = Microsoft.Extensions.DependencyInjection.ActivatorUtilities.CreateInstance<LaughTale.Core.TagHelpers.IslandTagHelper>(provider);
+        Assert.NotNull(tagHelper);
     }
 
     [Fact]

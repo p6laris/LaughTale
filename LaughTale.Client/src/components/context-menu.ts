@@ -1,4 +1,4 @@
-﻿/**
+/**
  * LaughTale: Enterprise ContextMenu Component (PrimeVue 4 Aura Design System)
  * Native right-click context menu overlay with multi-level recursive submenus,
  * smart viewport collision bounding, keyboard accessibility (WAI-ARIA menubar),
@@ -363,7 +363,7 @@ export default function ContextMenuIsland(container: HTMLElement, props: Context
             menuItems = [
                 { label: 'Router Link', icon: 'palette', route: '/enterprise#sec-contextmenu' },
                 { label: 'Programmatic', icon: 'link' },
-                { label: 'External', icon: 'home', url: 'https://github.com/SoftMax-Official/LaughTale' }
+                { label: 'External', icon: 'home', url: 'https://github.com/laughtale/LaughTale' }
             ];
         }
     }

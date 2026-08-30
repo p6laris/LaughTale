@@ -1,4 +1,4 @@
-﻿/**
+/**
  * LaughTale: Enterprise DataTable Component (Aura Design System compliant)
  * High-performance tabular data grid supporting sorting, filtering, pagination, selection,
  * frozen columns, row expansion, in-place cell editing, loading states, and CSV export.
@@ -6,6 +6,8 @@
 
 import { injectIslandStyle } from '../runtime/styles';
 import { LucideIcons } from '../icons/lucide';
+import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
+import type { IslandContext } from '../runtime/registry';
 
 export interface DataTableColumn {
     field: string;
@@ -38,6 +40,8 @@ export interface DataTableProps {
     metaKeySelection?: boolean;
     dataKey?: string;
     paginator?: boolean;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
     rows?: number;
     first?: number;
     rowsPerPageOptions?: number[];
@@ -570,7 +574,7 @@ const DATATABLE_CSS = `
 }
 `;
 
-export default function DataTableIsland(container: HTMLElement, props: DataTableProps) {
+export default function DataTableIsland(container: HTMLElement, props: DataTableProps, ctx?: IslandContext) {
     injectIslandStyle('datatable', DATATABLE_CSS);
 
     const rawData: Record<string, any>[] = [...(props.value || props.data || [])];
@@ -1146,7 +1150,7 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
             `;
         }
 
-        const scrollWrapperStyle = scrollHeight ? `max-height: ${scrollHeight}; overflow-y: auto;` : '';
+        applyPart(container, 'root', rootClasses.join(' '), props.pt, props.studioOverrides);
 
         container.innerHTML = `
             <div class="${rootClasses.join(' ')}">
@@ -1154,12 +1158,12 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                 ${toolbarHtml}
                 ${selectionBarHtml}
                 <div class="p-datatable-scrollable-wrapper" style="${scrollWrapperStyle}">
-                    <table class="p-datatable-table" style="${props.tableStyle || ''}">
-                        <thead class="p-datatable-thead">
+                    <table class="p-datatable-table" data-part="table" style="${props.tableStyle || ''}">
+                        <thead class="p-datatable-thead" data-part="thead">
                             <tr>${headerCells}</tr>
                             ${filterRowHtml}
                         </thead>
-                        <tbody class="p-datatable-tbody">
+                        <tbody class="p-datatable-tbody" data-part="tbody">
                             ${bodyRowsHtml}
                         </tbody>
                     </table>
