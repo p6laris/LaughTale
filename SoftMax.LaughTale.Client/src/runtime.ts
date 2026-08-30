@@ -36,6 +36,6 @@ export { LucideIcons, getLucideIcon } from './icons/lucide';
 export { registerCommand, unregisterCommand, getCommand, executeCommand, clearCommands, listCommands, type CommandHandler } from './runtime/commands';
 export { getCspNonce, setCspNonce, applyNonceToStyle, applyNonceToScript } from './directives/csp';
 export { createScope, type IslandScope } from './runtime/scope';
-export { initDesignTokens, updateToken, getToken, AURA_PALETTES, generatePaletteRamp, saveTheme, loadSavedTheme, applySavedTheme, generateThemeExports, type SavedThemeConfig, THEME_STORAGE_KEY } from './styles/design-tokens';
+export { initDesignTokens, updateToken, getToken, AURA_PALETTES, generatePaletteRamp, saveTheme, loadSavedTheme, applySavedTheme, generateThemeExports, type SavedThemeConfig, THEME_STORAGE_KEY, calculateRelativeLuminance, calculateContrastRatio, checkWcagCompliance, type WcagComplianceResult } from './styles/design-tokens';
 export { renderThemeMatrix, captureStyleSignature, type MatrixPermutation, type ComponentMatrixSnapshot } from './testing/visual-harness';
 

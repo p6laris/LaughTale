@@ -530,7 +530,8 @@ Standardize events on `laughtale:<component>:<event>` (`bubbles: true`, `detail`
 ---
 
 ### `LT-605` — Studio only covers color and radius
-**Severity:** P3 · **Status:** todo
+**Severity:** P3 · **Status:** done
+
 
 **Fix.** Extend to typography (family, scale, weights), spacing density, shadow elevation, border width, and motion duration/easing — plus a **live contrast checker** flagging any token pair below WCAG AA, and per-component overrides (`--lt-button-radius` falling back to `--lt-radius-md`).
 

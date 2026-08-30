@@ -7,7 +7,7 @@ import { LucideIcons } from '../icons/lucide';
 import { useDisclosure } from '../composables/useDisclosure';
 import { useScrollLock } from '../composables/useScrollLock';
 import { useClipboard } from '../composables/useClipboard';
-import { AURA_PALETTES, generatePaletteRamp, updateToken, saveTheme, loadSavedTheme, generateThemeExports } from '../styles/design-tokens';
+import { AURA_PALETTES, generatePaletteRamp, updateToken, saveTheme, loadSavedTheme, generateThemeExports, checkWcagCompliance } from '../styles/design-tokens';
 
 export interface ThemeStudioProps {
     defaultOpen?: boolean;
@@ -312,13 +312,19 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
 
     function applyTheme() {
         let currentRamp: Record<string, string>;
+        let primaryName: string;
         if (currentCustomHex) {
             currentRamp = generatePaletteRamp(currentCustomHex);
-            if (primaryLabel) primaryLabel.textContent = `Custom (${currentCustomHex})`;
+            primaryName = `Custom (${currentCustomHex})`;
         } else {
             const p = PRIMARY_PRESETS[currentPrimary] || PRIMARY_PRESETS.emerald;
             currentRamp = p.ramp;
-            if (primaryLabel) primaryLabel.textContent = p.name;
+            primaryName = p.name;
+        }
+
+        const contrast = checkWcagCompliance(currentRamp['500'] || '#10b981', '#ffffff');
+        if (primaryLabel) {
+            primaryLabel.textContent = `${primaryName} • ${contrast.formattedRatio} (${contrast.grade})`;
         }
 
         for (const [shade, hex] of Object.entries(currentRamp)) {
