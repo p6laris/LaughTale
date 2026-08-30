@@ -6,8 +6,21 @@
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./runtime": {
+      "import": "./dist/runtime.mjs",
+      "types": "./dist/runtime.d.ts",
+      "default": "./dist/runtime.js"
+    }
+  },
   "scripts": {
-    "build": "npm run typecheck && node esbuild.config.mjs",
+    "build": "npm run typecheck && node esbuild.config.mjs --prod",
+    "build:dev": "node esbuild.config.mjs",
     "typecheck": "tsc --noEmit",
     "test": "node run-tests.mjs"
   },

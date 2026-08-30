@@ -293,7 +293,7 @@ Persistent islands must be *excluded* — they are moved, not destroyed.
 ---
 
 ### `LT-302` — Production bundle is 1.4 MB; the "sub-2 KB" claim is false
-**Severity:** P1 · **Status:** todo · **File:** `SoftMax.LaughTale.Client/esbuild.config.mjs`, `package.json`
+**Severity:** P1 · **Status:** done · **File:** `SoftMax.LaughTale.Client/esbuild.config.mjs`, `package.json`
 
 **Evidence.** `dist/index.js` = **1,397,185 bytes**, `dist/index.mjs` = 1,360,051. Causes: (a) `"build": "node esbuild.config.mjs"` never passes `--prod`, so `minify` is always `false` and sourcemaps always ship; (b) the config uses `outfile` with no `splitting: true`, and the IIFE target **cannot** code-split — so all ~130 `defineIsland` dynamic imports are inlined into one file; (c) `src/index.ts` also `export *`s the composables, animations, design-tokens and models barrels, defeating tree-shaking for consumers. Meanwhile `Showcase/wwwroot/js` contains 98 properly-split chunks from a *different* pipeline — there are two competing build paths and the published package uses the wrong one.
 
