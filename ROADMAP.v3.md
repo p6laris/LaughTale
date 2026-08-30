@@ -375,7 +375,7 @@ repeated per property, per component. This is the largest maintenance liability 
 ---
 
 ### `LT-402` — Alias sprawl: no canonical component name
-**Severity:** P2 · **Status:** todo · **File:** `src/index.ts:23-146`
+**Severity:** P2 · **Status:** done · **File:** `src/index.ts:23-146`
 
 **Evidence.** The registry defines the same component under many names: `image-compare` / `imagecompare` / `compare` / `p-compare` / `island-compare` (5 for one component); `treetable` / `tree-table` / `p-treetable` / `island-treetable`; `command` / `commandmenu` / `command-menu` / `command-palette` / `commandpalette`. `toast` is registered **twice** (lines 35 and 144) — the second silently overwrites the first. ~130 registrations cover ~76 components. Users cannot know the right name, docs cannot be authoritative, and every alias is API surface that must be supported forever.
 
