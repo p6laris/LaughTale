@@ -208,11 +208,20 @@ export async function navigateTo(
         let htmlText = prefetchManager.getCachedResponse(urlStr);
 
         if (!htmlText) {
+            const headers: Record<string, string> = {
+                'X-Requested-With': 'LaughTale-ViewTransition'
+            };
+            const csrfInput = document.querySelector<HTMLInputElement>('input[name="__RequestVerificationToken"]');
+            const csrfMeta = document.querySelector<HTMLMetaElement>('meta[name="request-verification-token"], meta[name="csrf-token"]');
+            const token = csrfInput?.value || csrfMeta?.content;
+            if (token) {
+                headers['RequestVerificationToken'] = token;
+                headers['X-CSRF-TOKEN'] = token;
+            }
+
             const response = await fetch(urlStr, {
                 signal,
-                headers: {
-                    'X-Requested-With': 'LaughTale-ViewTransition'
-                }
+                headers
             });
 
             if (!response.ok) {

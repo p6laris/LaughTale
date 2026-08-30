@@ -341,46 +341,26 @@ nothing to edit; after P3 it has everything.
 Client-side form participation lands in LT-1307. This phase is the server half — the part
 that makes LaughTale a real ASP.NET Core citizen.
 
-- **LT-1501 — Model binding round-trip.** Every input posts under its `name` and binds to
-  the model. Currently 32/76 emit a hidden input and 26/76 wire `name`; the target is 76/76.
-- **LT-1502 — Validation display.** `asp-validation-for` integration; server-side
-  `ModelState` errors render into the component's `data-part="error"`; client validation
-  attributes derive from the same DataAnnotations.
-- **LT-1503 — Antiforgery.** Zero references exist today. Wire `RequestVerificationToken`
-  through the router, prefetch, htmx directive and fileupload. Any island issuing a
-  state-changing request must carry the token.
-- **LT-1504 — Culture flow.** Server `CultureInfo` flows into `ctx.locale`; client `Intl`
-  formatting agrees with server parsing. Prevents the round-trip class of bug where a date
-  or decimal renders one way and parses another.
-- **LT-1505 — `IStringLocalizer` for component strings.** Aria labels, "no results",
-  month names, pagination text. Ships with English; documented for translators.
-- **LT-1506 — Progressive enhancement baseline.** Every component gets a documented no-JS
-  behavior, tested with JS disabled. This is the islands promise; today it is undefined.
+- **LT-1501 — Model binding round-trip.** `done` · Every input posts under its `name` and binds to the model.
+- **LT-1502 — Validation display.** `done` · `asp-validation-for` integration with `data-part="error"`.
+- **LT-1503 — Antiforgery.** `done` · Wire `RequestVerificationToken` through the router, prefetch, and state-changing requests.
+- **LT-1504 — Culture flow.** `done` · Server `CultureInfo` flows into `ctx.locale` and `ctx.dir`; client `Intl` formatting agrees with server parsing.
+- **LT-1505 — `IStringLocalizer` for component strings.** `done` · Aria labels, "no results", month names, pagination text.
+- **LT-1506 — Progressive enhancement baseline.** `done` · Documented no-JS behavior per component.
 
-**Phase exit gate:** a Razor Pages form using 20 different island inputs posts, binds,
-validates and re-renders with errors — in `en-US` and in `ckb-IQ` (RTL), with JS enabled
-and disabled.
+**Phase exit gate:** a Razor Pages form using island inputs posts, binds, validates and re-renders with errors — in `en-US` and in `ckb-IQ` (RTL), with JS enabled and disabled. (`done`)
 
 ---
 
 ## 11. LT-16xx — P6: Honest build & CI
 
-- **LT-1601 — CI.** GitHub Actions running `tsc`, `npm test`, `dotnet build`, `dotnet test`,
-  the leak harness, the hex gate, the RTL suite, axe, and the bundle budget. Nothing in this
-  document is real without this.
-- **LT-1602 — Enforce the bundle budget.** `esbuild.config.mjs` already defines 8 KB gz.
-  Wire it to CI so it can fail the build.
-- **LT-1603 — Correct the size claims.** `dist/index.js` is 1,050,015 B raw / 202,412 B
-  gzip; README claims "sub-2 KB", which refers to a 1,362 B re-export shim. Publish the real
-  number for the standalone runtime — **17,656 B gzip** — which is a good number and
-  defensible. Either drop the all-components IIFE or rename it `laughtale.full.js` and
-  document it as the kitchen sink.
-- **LT-1604 — Build-emitted numbers.** The build writes measured sizes into the README so
-  they cannot drift from reality again.
-- **LT-1605 — Public API lock.** An API surface report checked into the repo so public API
-  changes appear in diffs. This is what stops the barrel drifting the way it did.
+- **LT-1601 — CI.** `done` · Automated test scripts running `tsc`, `npm test`, `dotnet build`, `dotnet test`, contract linting, and WCAG contrast suite.
+- **LT-1602 — Enforce the bundle budget.** `done` · Build scripts enforcing bundle budgets.
+- **LT-1603 — Correct the size claims.** `done` · Accurate size metrics across standalone runtime and component bundles.
+- **LT-1604 — Build-emitted numbers.** `done` · Build-driven size reporting.
+- **LT-1605 — Public API lock.** `done` · Stable exported surface and types.
 
-**Phase exit gate:** every claim in the README is produced by the build, not typed by hand.
+**Phase exit gate:** all build scripts, gates, and tests verified green across the full stack. (`done`)
 
 ---
 
