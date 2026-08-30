@@ -355,23 +355,23 @@ const TOAST_CSS = `
 .dark .p-toast-message-secondary,
 [data-theme="dark"] .p-toast-message-secondary {
     background: rgba(30, 41, 59, 0.92);
-    border-color: #334155;
-    color: #cbd5e1;
+    border-color: var(--lt-surface-700, #334155);
+    color: var(--lt-surface-300, #cbd5e1);
 }
 .dark .p-toast-message-secondary .p-toast-message-icon,
 .dark .p-toast-message-secondary .p-toast-close-button {
-    color: #cbd5e1;
+    color: var(--lt-surface-300, #cbd5e1);
 }
 
 .dark .p-toast-message-contrast,
 [data-theme="dark"] .p-toast-message-contrast {
-    background: #ffffff;
-    border-color: #e2e8f0;
-    color: #0f172a;
+    background: var(--lt-surface-0, #ffffff);
+    border-color: var(--lt-surface-200, #e2e8f0);
+    color: var(--lt-surface-900, #0f172a);
 }
 .dark .p-toast-message-contrast .p-toast-message-icon,
 .dark .p-toast-message-contrast .p-toast-close-button {
-    color: #0f172a;
+    color: var(--lt-surface-900, #0f172a);
 }
 
 .dark .p-toast-close-button:hover,

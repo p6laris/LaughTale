@@ -401,12 +401,12 @@ const CSS = `
 .p-tree-checkbox.p-checked {
     background: var(--p-primary-500);
     border-color: var(--p-primary-500);
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
 }
 .p-tree-checkbox.p-indeterminate {
     background: var(--p-primary-500);
     border-color: var(--p-primary-500);
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
 }
 .p-tree-checkbox svg {
     width: 12px;

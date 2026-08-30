@@ -278,80 +278,20 @@ The spine of v4. Every contract is defined and proven here before being applied 
 The repo carries a great deal of code that a generator should be writing. This phase is what
 makes keeping all 76 components affordable, and it pays for itself inside P3.
 
-### LT-1201 — Generate the TagHelper layer · `P2`
+### LT-1201 — Generate the TagHelper layer · `P2` · `done`
 
-`LaughTale.Components` is 9,975 LOC containing 132 TagHelper classes, 266
-`[HtmlTargetElement]` and 733 `[HtmlAttributeName]` properties. Nearly all of it is the same
-five mechanical steps: declare properties, set `data-island`, serialize props, handle slot,
-emit. `IslandGenerator` already generates per-island TagHelpers — it is simply not used for
-the bulk of the library.
+### LT-1202 — Emit real TypeScript declarations · `P2` · `done`
 
-Drive every TagHelper from its `[Island]` props record. One record produces the TagHelper,
-the TS interface, the registry entry and the serializer context.
+### LT-1203 — Generate the island registry · `P2` · `done`
 
-Expected: **9,975 LOC → under 3,000**, with the remainder being genuinely custom behavior.
+### LT-1204 — Generate AOT-safe serializer contexts · `P2` · `done`
 
-**Exit gate:** `LaughTale.Components` under 3,000 hand-written LOC; showcase renders
-identically (snapshot diff clean).
+### LT-1205 — Analyzers that enforce the patterns · `P2` · `done`
 
-### LT-1202 — Emit real TypeScript declarations · `P2`
+### LT-1206 — Write the migration codemods · `P2` · `done`
 
-`IslandGenerator.GenerateManifestComment` currently emits TS contracts as a **C# string
-constant** inside a `.g.cs`. Nothing can consume it; no `.d.ts` ever reaches `tsc`. The
-type-safe-boundary claim is unbacked.
+### LT-1207 — Consolidate the composables · `P2` · `done`
 
-Replace with an MSBuild task writing real `.d.ts` into the client project.
-
-**Exit gate:** renaming a C# props property breaks `npx tsc --noEmit`. That failing build
-*is* the feature.
-
-### LT-1203 — Generate the island registry · `P2`
-
-Registry entries and lazy loaders are hand-maintained and drift. Generate from the
-filesystem plus the `[Island]` attributes.
-
-**Exit gate:** adding a component file requires no hand edit to any registry.
-
-### LT-1204 — Generate AOT-safe serializer contexts · `P2`
-
-Per LT-2002. A `JsonSerializerContext` per island props type, generated alongside the
-TagHelper. Solves the AOT gap as a side effect of codegen rather than a separate migration.
-
-**Exit gate:** showcase publishes with `PublishAot=true`.
-
-### LT-1205 — Analyzers that enforce the patterns · `P2`
-
-Generation without enforcement drifts back. New Roslyn diagnostics:
-
-- `LTI005` — hand-written TagHelper where one would be generated.
-- `LTI006` — `[Island]` props record with a non-serializable member (extends LTI002).
-- `LTI007` — hardcoded color literal in a C# theming path.
-- `LTI008` — island props record missing a matching client component.
-
-With code fixes where mechanical.
-
-**Exit gate:** diagnostics ship in the analyzer package with tests; showcase compiles clean.
-
-### LT-1206 — Write the migration codemods · `P2`
-
-Checked into `scripts/codemods/`, each idempotent and re-runnable:
-
-- `hex-to-token.mjs` — 1,913 replacements, semantic-token aware, reports ambiguous cases
-  for human review rather than guessing.
-- `listeners-to-signal.mjs` — 436 call sites onto `ctx.signal`.
-- `css-extract.mjs` — TS template literal → `.css` file plus import.
-- `physical-to-logical.mjs` — RTL property conversion.
-- `parts-scaffold.mjs` — inserts `data-part` attributes from a per-component manifest.
-
-**Exit gate:** each codemod reproduces the six reference components from LT-1107 byte-for-byte.
-
-### LT-1207 — Consolidate the composables · `P2`
-
-25 composables (1,879 LOC) exist, yet 436 raw listener bindings suggest they are bypassed.
-Audit usage, delete duplicates, and make the composables the only sanctioned path for
-listeners, observers and timers — all `ctx.signal`-aware.
-
-**Exit gate:** no component binds a listener, observer or timer except through a composable.
 
 ---
 

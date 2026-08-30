@@ -153,13 +153,13 @@ const CONFIRM_DIALOG_CSS = `
 }
 
 .p-confirmdialog-icon-danger {
-    color: #ef4444 !important;
+    color: var(--lt-danger-500, #ef4444) !important;
 }
 .p-confirmdialog-icon-warning {
-    color: #f59e0b !important;
+    color: var(--lt-warn-500, #f59e0b) !important;
 }
 .p-confirmdialog-icon-info {
-    color: #3b82f6 !important;
+    color: var(--lt-info-500, #3b82f6) !important;
 }
 
 .p-confirmdialog .p-confirmdialog-message {
@@ -219,7 +219,7 @@ const CONFIRM_DIALOG_CSS = `
 .dark .p-confirmdialog .p-dialog-header-close:hover,
 [data-theme="dark"] .p-confirmdialog .p-dialog-header-close:hover {
     background: var(--p-surface-800, #1e293b);
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
 }
 .dark .p-confirmdialog .p-confirmdialog-message,
 [data-theme="dark"] .p-confirmdialog .p-confirmdialog-message {
@@ -382,7 +382,7 @@ class ConfirmDialogManager {
         } else {
             const isDanger = opt.acceptSeverity === 'danger' || (opt.icon && (opt.icon.includes('trash') || opt.icon.includes('danger')));
             const acceptBtnClass = isDanger ? 'p-button p-button-danger p-button-sm' : 'p-button p-button-primary p-button-sm';
-            const acceptStyle = isDanger ? 'background: #ef4444; border: 1px solid #ef4444; color: #ffffff;' : 'background: var(--p-primary-500); border: 1px solid var(--p-primary-500); color: #ffffff;';
+            const acceptStyle = isDanger ? 'background: var(--lt-danger-500, #ef4444); border: 1px solid var(--lt-danger-500, #ef4444); color: var(--lt-surface-0, #ffffff);' : 'background: var(--p-primary-500); border: 1px solid var(--p-primary-500); color: var(--lt-surface-0, #ffffff);';
 
             this.maskEl.innerHTML = `
                 <div class="p-confirmdialog p-dialog p-component" role="alertdialog">
@@ -437,9 +437,9 @@ export function showToastFeedback(summary: string, detail: string, severity: 'su
 
     const toastItem = document.createElement('div');
     const isError = severity === 'error' || severity === 'warn';
-    const borderColor = isError ? '#ef4444' : 'var(--p-primary-500, #10b981)';
+    const borderColor = isError ? 'var(--lt-danger-500, #ef4444)' : 'var(--p-primary-500, #10b981)';
     const bgColor = isError ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)';
-    const textColor = isError ? '#ef4444' : 'var(--p-primary-600, #059669)';
+    const textColor = isError ? 'var(--lt-danger-500, #ef4444)' : 'var(--p-primary-600, #059669)';
 
     toastItem.style.cssText = `background: var(--p-surface-0, #ffffff); border-left: 4px solid ${borderColor}; border-radius: var(--p-border-radius, 6px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); padding: 0.75rem 1rem; width: 18rem; pointer-events: auto; display: flex; align-items: flex-start; gap: 0.5rem; animation: slideInRight 0.2s ease;`;
     toastItem.innerHTML = `

@@ -88,7 +88,7 @@ const STEPPER_CSS = `
 .p-step-completed .p-step-number {
     background: var(--p-primary-500, #10b981);
     border-color: var(--p-primary-500, #10b981);
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
 }
 
 .p-step-title {
@@ -221,7 +221,7 @@ const STEPPER_CSS = `
 [data-theme="dark"] .p-step-completed .p-step-number {
     background: var(--p-primary-500, #10b981) !important;
     border-color: var(--p-primary-500, #10b981) !important;
-    color: #ffffff !important;
+    color: var(--lt-surface-0, #ffffff) !important;
 }
 
 .dark .p-step-active .p-step-title,

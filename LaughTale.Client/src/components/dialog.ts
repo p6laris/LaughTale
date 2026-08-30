@@ -198,7 +198,7 @@ const DIALOG_CSS = `
 .dark .p-dialog-header-action:hover,
 [data-theme="dark"] .p-dialog-header-action:hover {
     background: var(--p-surface-800, #1e293b);
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
 }
 `;
 

@@ -180,7 +180,7 @@ const MENU_CSS = `
 .p-menu-item-badge {
     margin-left: auto;
     background: #000000;
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
     font-size: 0.75rem;
     font-weight: 700;
     min-width: 1.25rem;
@@ -267,7 +267,7 @@ const MENU_CSS = `
 
 .dark .p-menu-item-badge,
 [data-theme="dark"] .p-menu-item-badge {
-    background: #ffffff;
+    background: var(--lt-surface-0, #ffffff);
     color: #000000;
 }
 
@@ -417,7 +417,7 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps) {
 
         let customInlineStyle = '';
         if (item.linkClass && item.linkClass.includes('text-red')) {
-            customInlineStyle = 'color: #ef4444 !important;';
+            customInlineStyle = 'color: var(--lt-danger-500, #ef4444) !important;';
         }
 
         return `
@@ -456,7 +456,7 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps) {
             endHtml = `
                 <div class="p-menu-end" style="padding: 0.5rem 0.75rem;">
                     <button type="button" class="p-menu-item-link" style="width: 100%; border: none; background: transparent; padding: 0.4rem 0.5rem; display: flex; align-items: center; gap: 0.65rem; border-radius: 6px; cursor: pointer;">
-                        <span style="width: 2rem; height: 2rem; border-radius: 9999px; background: linear-gradient(135deg, #f59e0b, #ef4444); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700;">AE</span>
+                        <span style="width: 2rem; height: 2rem; border-radius: 9999px; background: linear-gradient(135deg, var(--lt-warn-500, #f59e0b), var(--lt-danger-500, #ef4444)); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700;">AE</span>
                         <span style="display: flex; flex-direction: column; align-items: flex-start; line-height: 1.2;">
                             <span style="font-size: 0.8125rem; font-weight: 700; color: var(--p-text-color);">Amy Elsner</span>
                             <span style="font-size: 0.7rem; color: var(--p-surface-500);">Admin</span>
@@ -604,8 +604,8 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps) {
             position: fixed;
             bottom: 2rem;
             right: 2rem;
-            background: ${severity === 'success' ? '#10b981' : '#f59e0b'};
-            color: #ffffff;
+            background: ${severity === 'success' ? 'var(--lt-primary-500, #10b981)' : 'var(--lt-warn-500, #f59e0b)'};
+            color: var(--lt-surface-0, #ffffff);
             padding: 0.75rem 1.25rem;
             border-radius: 8px;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);

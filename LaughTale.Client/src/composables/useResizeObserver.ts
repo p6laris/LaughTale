@@ -1,10 +1,11 @@
-﻿/**
+/**
  * LaughTale: Composable useResizeObserver
  * Element resize tracking.
  */
 
 export interface UseResizeObserverOptions {
   box?: ResizeObserverBoxOptions;
+  signal?: AbortSignal;
 }
 
 export interface ElementSize {
@@ -54,6 +55,10 @@ export function useResizeObserver(
     state.observe = (el: Element) => observer.observe(el, options);
     state.unobserve = (el: Element) => observer.unobserve(el);
     state.disconnect = () => observer.disconnect();
+
+    if (options?.signal) {
+      options.signal.addEventListener('abort', () => state.disconnect(), { once: true });
+    }
   }
 
   return state;

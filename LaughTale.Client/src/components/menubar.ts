@@ -150,7 +150,7 @@ const MENUBAR_CSS = `
 
 .p-menubar-item-badge {
     background: #000000;
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
     font-size: 0.75rem;
     font-weight: 700;
     min-width: 1.25rem;
@@ -309,7 +309,7 @@ const MENUBAR_CSS = `
 
 .dark .p-menubar-item-badge,
 [data-theme="dark"] .p-menubar-item-badge {
-    background: #ffffff;
+    background: var(--lt-surface-0, #ffffff);
     color: #000000;
 }
 `;
@@ -430,7 +430,7 @@ export default function MenubarIsland(container: HTMLElement, props: MenubarProp
                     <div style="position: relative; display: flex; align-items: center;">
                         <input type="text" placeholder="Search" style="padding: 0.4rem 0.75rem; border-radius: 6px; border: 1px solid var(--p-border-color, #cbd5e1); font-size: 0.8125rem; width: 9rem; outline: none; background: transparent; color: inherit;" />
                     </div>
-                    <span style="width: 2rem; height: 2rem; border-radius: 9999px; background: linear-gradient(135deg, #f59e0b, #ef4444); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700;">AE</span>
+                    <span style="width: 2rem; height: 2rem; border-radius: 9999px; background: linear-gradient(135deg, var(--lt-warn-500, #f59e0b), var(--lt-danger-500, #ef4444)); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700;">AE</span>
                 </div>
             `;
         }
@@ -573,18 +573,18 @@ export default function MenubarIsland(container: HTMLElement, props: MenubarProp
     function showFeedback(msg: string, severity: 'success' | 'error' | 'warn' | 'info') {
         const toast = document.createElement('div');
         const bgColors = {
-            success: '#10b981',
-            error: '#ef4444',
-            warn: '#f59e0b',
-            info: '#3b82f6'
+            success: 'var(--lt-primary-500, #10b981)',
+            error: 'var(--lt-danger-500, #ef4444)',
+            warn: 'var(--lt-warn-500, #f59e0b)',
+            info: 'var(--lt-info-500, #3b82f6)'
         };
 
         toast.style.cssText = `
             position: fixed;
             bottom: 2rem;
             right: 2rem;
-            background: ${bgColors[severity] || '#3b82f6'};
-            color: #ffffff;
+            background: ${bgColors[severity] || 'var(--lt-info-500, #3b82f6)'};
+            color: var(--lt-surface-0, #ffffff);
             padding: 0.75rem 1.25rem;
             border-radius: 8px;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);

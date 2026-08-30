@@ -227,7 +227,7 @@ const TABS_CSS = `
 .dark .p-tablist-next-button:hover:not(:disabled),
 [data-theme="dark"] .p-tablist-prev-button:hover:not(:disabled),
 [data-theme="dark"] .p-tablist-next-button:hover:not(:disabled) {
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
 }
 .dark .p-tablist-capsule,
 [data-theme="dark"] .p-tablist-capsule {

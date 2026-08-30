@@ -36,7 +36,7 @@ const FILEUPLOAD_CSS = `
     border-radius: var(--p-border-radius, 6px);
     background: var(--p-surface-900, #0f172a);
     border: 1px solid var(--p-surface-900, #0f172a);
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
     transition: background-color 0.15s ease, border-color 0.15s ease;
     gap: 0.45rem;
     user-select: none;
@@ -240,7 +240,7 @@ const FILEUPLOAD_CSS = `
 
 .p-fileupload-badge-completed {
     background: rgba(16, 185, 129, 0.12);
-    color: #10b981;
+    color: var(--lt-primary-500, #10b981);
 }
 
 .p-fileupload-badge-uploading {
@@ -297,7 +297,7 @@ const FILEUPLOAD_CSS = `
     height: 1.6rem;
     border-radius: 9999px;
     background: rgba(15, 23, 42, 0.8);
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
     border: none;
     cursor: pointer;
     display: flex;
@@ -695,7 +695,7 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
                                         <span class="p-fileupload-badge p-fileupload-badge-${f.status === 'completed' ? 'completed' : (f.status === 'uploading' ? 'uploading' : 'pending')}">
                                             ${f.status === 'completed' ? 'Uploaded' : (f.status === 'uploading' ? `${f.progress}%` : 'Pending')}
                                         </span>
-                                        <button type="button" class="p-button p-button-text p-button-danger p-button-sm" data-remove-id="${f.id}" style="border: none; background: transparent; color: #ef4444; cursor: pointer; padding: 0.35rem; display: flex; align-items: center; border-radius: 9999px;">
+                                        <button type="button" class="p-button p-button-text p-button-danger p-button-sm" data-remove-id="${f.id}" style="border: none; background: transparent; color: var(--lt-danger-500, #ef4444); cursor: pointer; padding: 0.35rem; display: flex; align-items: center; border-radius: 9999px;">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                                         </button>
                                     </div>

@@ -177,7 +177,7 @@ const ORDERLIST_CSS = `
 .p-checkbox-box.p-checked {
     background: var(--p-primary-500, #10b981);
     border-color: var(--p-primary-500, #10b981);
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
 }
 
 /* Product Item Content */
@@ -280,7 +280,7 @@ const ORDERLIST_CSS = `
 [data-theme="dark"] .p-orderlist-filter-input {
     background: var(--p-surface-900, #0f172a) !important;
     border-color: var(--p-surface-600, #475569) !important;
-    color: #ffffff !important;
+    color: var(--lt-surface-0, #ffffff) !important;
 }
 .dark .p-orderlist-control-btn,
 [data-theme="dark"] .p-orderlist-control-btn {
@@ -291,12 +291,12 @@ const ORDERLIST_CSS = `
 .dark .p-orderlist-control-btn:hover:not(:disabled),
 [data-theme="dark"] .p-orderlist-control-btn:hover:not(:disabled) {
     background: var(--p-surface-700, #334155) !important;
-    color: #ffffff !important;
+    color: var(--lt-surface-0, #ffffff) !important;
 }
 .dark .p-orderlist-item:hover:not(.p-highlight),
 [data-theme="dark"] .p-orderlist-item:hover:not(.p-highlight) {
     background: var(--p-surface-800, #1e293b) !important;
-    color: #ffffff !important;
+    color: var(--lt-surface-0, #ffffff) !important;
 }
 .dark .p-orderlist-product-name,
 .dark .p-orderlist-product-price,

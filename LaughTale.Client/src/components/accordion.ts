@@ -183,7 +183,7 @@ const ACCORDION_CSS = `
 .p-accordion-ctrl-btn.p-highlight {
     background: var(--p-primary-500, #10b981);
     border-color: var(--p-primary-500, #10b981);
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
 }
 
 /* Dark Mode Tokens */
@@ -228,7 +228,7 @@ const ACCORDION_CSS = `
 .dark .p-accordion-ctrl-btn.p-highlight,
 [data-theme="dark"] .p-accordion-ctrl-btn.p-highlight {
     background: var(--p-primary-500, #10b981) !important;
-    color: #ffffff !important;
+    color: var(--lt-surface-0, #ffffff) !important;
 }
 .dark .p-accordion-radio-circle,
 [data-theme="dark"] .p-accordion-radio-circle {
@@ -389,7 +389,7 @@ export default function AccordionIsland(container: HTMLElement, props: Accordion
             if (tab.icon) {
                 if (tab.icon === 'user') customIconHtml = `<span style="display: inline-flex; align-items: center; margin-right: 0.5rem; color: var(--p-surface-400);">${SVG_ICONS.user}</span>`;
                 else if (tab.icon === 'shield') customIconHtml = `<span style="display: inline-flex; align-items: center; margin-right: 0.5rem; color: var(--p-primary-500);">${SVG_ICONS.shield}</span>`;
-                else if (tab.icon === 'zap') customIconHtml = `<span style="display: inline-flex; align-items: center; margin-right: 0.5rem; color: #f59e0b;">${SVG_ICONS.zap}</span>`;
+                else if (tab.icon === 'zap') customIconHtml = `<span style="display: inline-flex; align-items: center; margin-right: 0.5rem; color: var(--lt-warn-500, #f59e0b);">${SVG_ICONS.zap}</span>`;
             }
 
             // Badge / Subtitle / Price

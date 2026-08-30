@@ -7,15 +7,15 @@ import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
 
 export interface ColorPickerProps {
-    value?: string; // Hex color e.g. '#10b981'
+    value?: string; // Hex color e.g. 'var(--lt-primary-500, #10b981)'
     targetInputName?: string;
     disabled?: boolean;
 }
 
 const DEFAULT_PRESETS = [
-    '#10b981', '#059669', '#3b82f6', '#2563eb', '#6366f1',
-    '#8b5cf6', '#ec4899', '#f43f5e', '#ef4444', '#f59e0b',
-    '#14b8a6', '#06b6d4', '#64748b', '#1e293b', '#000000'
+    'var(--lt-primary-500, #10b981)', 'var(--lt-primary-600, #059669)', 'var(--lt-info-500, #3b82f6)', '#2563eb', '#6366f1',
+    '#8b5cf6', '#ec4899', '#f43f5e', 'var(--lt-danger-500, #ef4444)', 'var(--lt-warn-500, #f59e0b)',
+    '#14b8a6', '#06b6d4', 'var(--lt-surface-500, #64748b)', 'var(--lt-surface-800, #1e293b)', '#000000'
 ];
 
 
@@ -49,7 +49,7 @@ const CSS = `
 
 export default function ColorPickerIsland(container: HTMLElement, props: ColorPickerProps) {
     injectIslandStyle('color-picker', CSS);
-    let currentColor = props.value || '#10b981';
+    let currentColor = props.value || 'var(--lt-primary-500, #10b981)';
     let isOpen = false;
 
     const swatchesHtml = DEFAULT_PRESETS.map(c => `
@@ -57,7 +57,7 @@ export default function ColorPickerIsland(container: HTMLElement, props: ColorPi
                 class="color-swatch-btn" 
                 data-color="${c}" 
                 title="${c}"
-                style="width: 1.75rem; height: 1.75rem; border-radius: 4px; border: ${c.toLowerCase() === currentColor.toLowerCase() ? '2px solid #ffffff' : '1px solid rgba(0,0,0,0.15)'}; background: ${c}; cursor: pointer; box-shadow: ${c.toLowerCase() === currentColor.toLowerCase() ? '0 0 0 2px var(--p-primary-600)' : 'none'}; transition: transform 0.15s ease, box-shadow 0.15s ease;">
+                style="width: 1.75rem; height: 1.75rem; border-radius: 4px; border: ${c.toLowerCase() === currentColor.toLowerCase() ? '2px solid var(--lt-surface-0, #ffffff)' : '1px solid rgba(0,0,0,0.15)'}; background: ${c}; cursor: pointer; box-shadow: ${c.toLowerCase() === currentColor.toLowerCase() ? '0 0 0 2px var(--p-primary-600)' : 'none'}; transition: transform 0.15s ease, box-shadow 0.15s ease;">
         </button>
     `).join('');
 
@@ -125,7 +125,7 @@ export default function ColorPickerIsland(container: HTMLElement, props: ColorPi
         container.querySelectorAll<HTMLButtonElement>('.color-swatch-btn').forEach(btn => {
             const btnColor = btn.getAttribute('data-color') || '';
             const isMatch = btnColor.toLowerCase() === currentColor.toLowerCase();
-            btn.style.border = isMatch ? '2px solid #ffffff' : '1px solid rgba(0,0,0,0.15)';
+            btn.style.border = isMatch ? '2px solid var(--lt-surface-0, #ffffff)' : '1px solid rgba(0,0,0,0.15)';
             btn.style.boxShadow = isMatch ? '0 0 0 2px var(--p-primary-600)' : 'none';
         });
 

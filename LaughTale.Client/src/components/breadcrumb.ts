@@ -114,7 +114,7 @@ const BREADCRUMB_CSS = `
 
 .p-breadcrumb-badge-success {
     background: rgba(16, 185, 129, 0.12);
-    color: #10b981;
+    color: var(--lt-primary-500, #10b981);
 }
 
 /* Dark Mode Tokens */

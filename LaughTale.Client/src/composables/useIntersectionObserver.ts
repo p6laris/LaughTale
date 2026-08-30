@@ -1,4 +1,4 @@
-﻿/**
+/**
  * LaughTale: Composable useIntersectionObserver
  * Reactive viewport intersection tracking.
  */
@@ -8,6 +8,7 @@ export interface UseIntersectionObserverOptions {
   rootMargin?: string;
   threshold?: number | number[];
   once?: boolean;
+  signal?: AbortSignal;
 }
 
 export interface UseIntersectionObserverReturn {
@@ -46,6 +47,10 @@ export function useIntersectionObserver(
     state.observe = (el: Element) => observer.observe(el);
     state.unobserve = (el: Element) => observer.unobserve(el);
     state.disconnect = () => observer.disconnect();
+
+    if (options?.signal) {
+      options.signal.addEventListener('abort', () => state.disconnect(), { once: true });
+    }
   }
 
   return state;

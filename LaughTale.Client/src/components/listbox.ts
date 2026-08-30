@@ -304,7 +304,7 @@ const CSS = `
 .p-listbox-option.p-highlight .p-listbox-option-checkbox {
     background: var(--p-primary-500);
     border-color: var(--p-primary-500);
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
 }
 
 /* Option Checkmark Icon */

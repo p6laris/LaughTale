@@ -143,7 +143,7 @@ const CONTEXTMENU_CSS = `
     border-radius: 9999px;
     padding: 0.1rem 0.45rem;
     background: var(--p-primary-color, #10b981);
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
 }
 
 .p-contextmenu-submenu-icon {

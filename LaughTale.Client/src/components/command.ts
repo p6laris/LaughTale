@@ -149,7 +149,7 @@ const COMMAND_CSS = `
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
     flex-shrink: 0;
     font-size: 0.75rem;
 }

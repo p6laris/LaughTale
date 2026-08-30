@@ -229,18 +229,18 @@ const TREETABLE_CSS = `
 .p-treetable-checkbox.p-highlight {
     background: var(--p-primary-500, #10b981);
     border-color: var(--p-primary-500, #10b981);
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
 }
 .p-treetable-checkbox.p-indeterminate {
     background: var(--p-primary-500, #10b981);
     border-color: var(--p-primary-500, #10b981);
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
 }
 
 /* Sort badge for multi-sort */
 .p-sortable-badge {
     background: var(--p-primary-500, #10b981);
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
     font-size: 0.6875rem;
     font-weight: 700;
     width: 1.125rem;
@@ -298,7 +298,7 @@ const TREETABLE_CSS = `
 .p-tag-warn { background: #fef3c7; color: #b45309; }
 .p-tag-info { background: #e0f2fe; color: #0369a1; }
 .p-tag-success { background: #dcfce7; color: #15803d; }
-.p-tag-secondary { background: #f1f5f9; color: #475569; }
+.p-tag-secondary { background: var(--lt-surface-100, #f1f5f9); color: var(--lt-surface-600, #475569); }
 
 /* Paginator Integration */
 .p-treetable-paginator {
@@ -331,7 +331,7 @@ const TREETABLE_CSS = `
 }
 .p-treetable-paginator-btn.p-highlight {
     background: var(--p-surface-900, #0f172a);
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
 }
 .p-treetable-paginator-btn:disabled {
     opacity: 0.35;
@@ -813,9 +813,9 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
             topControlsHtml = `
                 <div class="p-treetable-top-controls">
                     <div class="p-selectbutton p-button-group" style="display: inline-flex; border: 1px solid var(--p-surface-300); border-radius: 6px; overflow: hidden;">
-                        <button type="button" class="p-treetable-size-btn ${size === 'small' ? 'p-highlight' : ''}" data-size="small" style="padding: 0.45rem 1rem; border: none; background: ${size === 'small' ? 'var(--p-primary-500)' : 'var(--p-surface-0)'}; color: ${size === 'small' ? '#ffffff' : 'var(--p-surface-700)'}; cursor: pointer; font-size: 0.8125rem; font-weight: 600;">Small</button>
-                        <button type="button" class="p-treetable-size-btn ${size === 'normal' ? 'p-highlight' : ''}" data-size="normal" style="padding: 0.45rem 1rem; border: none; border-left: 1px solid var(--p-surface-200); border-right: 1px solid var(--p-surface-200); background: ${size === 'normal' ? 'var(--p-primary-500)' : 'var(--p-surface-0)'}; color: ${size === 'normal' ? '#ffffff' : 'var(--p-surface-700)'}; cursor: pointer; font-size: 0.8125rem; font-weight: 600;">Normal</button>
-                        <button type="button" class="p-treetable-size-btn ${size === 'large' ? 'p-highlight' : ''}" data-size="large" style="padding: 0.45rem 1rem; border: none; background: ${size === 'large' ? 'var(--p-primary-500)' : 'var(--p-surface-0)'}; color: ${size === 'large' ? '#ffffff' : 'var(--p-surface-700)'}; cursor: pointer; font-size: 0.8125rem; font-weight: 600;">Large</button>
+                        <button type="button" class="p-treetable-size-btn ${size === 'small' ? 'p-highlight' : ''}" data-size="small" style="padding: 0.45rem 1rem; border: none; background: ${size === 'small' ? 'var(--p-primary-500)' : 'var(--p-surface-0)'}; color: ${size === 'small' ? 'var(--lt-surface-0, #ffffff)' : 'var(--p-surface-700)'}; cursor: pointer; font-size: 0.8125rem; font-weight: 600;">Small</button>
+                        <button type="button" class="p-treetable-size-btn ${size === 'normal' ? 'p-highlight' : ''}" data-size="normal" style="padding: 0.45rem 1rem; border: none; border-left: 1px solid var(--p-surface-200); border-right: 1px solid var(--p-surface-200); background: ${size === 'normal' ? 'var(--p-primary-500)' : 'var(--p-surface-0)'}; color: ${size === 'normal' ? 'var(--lt-surface-0, #ffffff)' : 'var(--p-surface-700)'}; cursor: pointer; font-size: 0.8125rem; font-weight: 600;">Normal</button>
+                        <button type="button" class="p-treetable-size-btn ${size === 'large' ? 'p-highlight' : ''}" data-size="large" style="padding: 0.45rem 1rem; border: none; background: ${size === 'large' ? 'var(--p-primary-500)' : 'var(--p-surface-0)'}; color: ${size === 'large' ? 'var(--lt-surface-0, #ffffff)' : 'var(--p-surface-700)'}; cursor: pointer; font-size: 0.8125rem; font-weight: 600;">Large</button>
                     </div>
                 </div>
             `;
@@ -831,7 +831,7 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
         } else if (props.topControls === 'controlled') {
             topControlsHtml = `
                 <div class="p-treetable-top-controls">
-                    <button type="button" class="p-treetable-toggle-apps-btn" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 1rem; font-size: 0.8125rem; font-weight: 600; border-radius: 6px; border: none; background: var(--p-primary-500); color: #ffffff; cursor: pointer;">
+                    <button type="button" class="p-treetable-toggle-apps-btn" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 1rem; font-size: 0.8125rem; font-weight: 600; border-radius: 6px; border: none; background: var(--p-primary-500); color: var(--lt-surface-0, #ffffff); cursor: pointer;">
                         Toggle Applications
                     </button>
                 </div>
@@ -963,7 +963,7 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
                                     <p style="margin: 0; font-weight: 700; font-size: 1rem; color: var(--p-surface-900);">${props.emptyMessage || 'No folders yet'}</p>
                                     <p style="margin: 0.25rem 0 0; font-size: 0.8125rem; color: var(--p-surface-500);">Create your first folder to start building a tree.</p>
                                 </div>
-                                <button type="button" class="p-treetable-empty-add-btn" style="margin-top: 0.25rem; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: 6px; border: none; background: var(--p-primary-500); color: #ffffff; cursor: pointer;">
+                                <button type="button" class="p-treetable-empty-add-btn" style="margin-top: 0.25rem; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: 6px; border: none; background: var(--p-primary-500); color: var(--lt-surface-0, #ffffff); cursor: pointer;">
                                     ${SVG_ICONS.plus} New Folder
                                 </button>
                             </div>
@@ -1102,7 +1102,7 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
         // Footer
         let footerHtml = props.footerText ? `
             <div class="p-treetable-footer">
-                <button type="button" class="p-treetable-footer-reload-btn" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: 6px; border: none; background: #f59e0b; color: #ffffff; cursor: pointer;">
+                <button type="button" class="p-treetable-footer-reload-btn" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: 6px; border: none; background: var(--lt-warn-500, #f59e0b); color: var(--lt-surface-0, #ffffff); cursor: pointer;">
                     ${SVG_ICONS.refresh} ${props.footerText}
                 </button>
             </div>
@@ -1338,7 +1338,7 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
             <div class="p-treetable-contextmenu-item" data-action="view">
                 ${SVG_ICONS.search} View
             </div>
-            <div class="p-treetable-contextmenu-item" data-action="delete" style="color: #ef4444;">
+            <div class="p-treetable-contextmenu-item" data-action="delete" style="color: var(--lt-danger-500, #ef4444);">
                 ${SVG_ICONS.trash} Delete
             </div>
         `;

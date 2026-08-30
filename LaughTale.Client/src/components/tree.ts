@@ -181,13 +181,13 @@ const TREE_CSS = `
 .p-tree-checkbox-box.p-highlight {
     background: var(--p-primary-500, #10b981);
     border-color: var(--p-primary-500, #10b981);
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
 }
 
 .p-tree-checkbox-box.p-indeterminate {
     background: var(--p-primary-500, #10b981);
     border-color: var(--p-primary-500, #10b981);
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
 }
 
 .p-tree-node-icon {
@@ -660,7 +660,7 @@ export default function TreeIsland(container: HTMLElement, props: TreeProps) {
                     </span>
                     <div style="display: flex; align-items: center; gap: 0.4rem;">
                         <span style="font-size: 0.8125rem; font-weight: 600; color: var(--p-surface-700);">Selected</span>
-                        <span style="font-size: 0.75rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 9999px; background: ${selectedCount ? 'var(--p-primary-500)' : 'var(--p-surface-300)'}; color: #ffffff;">${selectedCount}</span>
+                        <span style="font-size: 0.75rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 9999px; background: ${selectedCount ? 'var(--p-primary-500)' : 'var(--p-surface-300)'}; color: var(--lt-surface-0, #ffffff);">${selectedCount}</span>
                     </div>
                 </div>
             `;
@@ -713,7 +713,7 @@ export default function TreeIsland(container: HTMLElement, props: TreeProps) {
                             <p style="margin: 0; font-weight: 700; color: var(--p-surface-900); font-size: 0.9375rem;">No folders yet</p>
                             <p style="margin: 0.25rem 0 0 0; font-size: 0.8125rem; color: var(--p-surface-500);">Create your first folder to start building a tree.</p>
                         </div>
-                        <button type="button" class="p-tree-add-node-btn p-button p-component p-button-sm" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.4rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: 6px; background: var(--p-primary-500); color: #ffffff; border: none; cursor: pointer;">
+                        <button type="button" class="p-tree-add-node-btn p-button p-component p-button-sm" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.4rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: 6px; background: var(--p-primary-500); color: var(--lt-surface-0, #ffffff); border: none; cursor: pointer;">
                             ${SVG_ICONS.plus} New Folder
                         </button>
                     </div>

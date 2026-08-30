@@ -380,7 +380,7 @@ const CSS = `
 .p-select-option-checkbox.is-checked {
     background: var(--p-primary-500);
     border-color: var(--p-primary-500);
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
 }
 
 .p-select-option-checkmark {

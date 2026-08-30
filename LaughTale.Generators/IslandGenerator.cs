@@ -238,6 +238,7 @@ public class IslandGenerator : IIncrementalGenerator
         sb.AppendLine($"namespace {model.Namespace}.TagHelpers;");
         sb.AppendLine();
         sb.AppendLine($"[HtmlTargetElement(\"{tagName}\", TagStructure = TagStructure.NormalOrSelfClosing)]");
+        sb.AppendLine($"[HtmlTargetElement(\"island-{model.IslandName}\", TagStructure = TagStructure.NormalOrSelfClosing)]");
         sb.AppendLine($"public partial class {tagHelperName} : TagHelper");
         sb.AppendLine("{");
         sb.AppendLine("    [HtmlAttributeName(\"hydrate\")]");
@@ -254,6 +255,12 @@ public class IslandGenerator : IIncrementalGenerator
         sb.AppendLine();
         sb.AppendLine("    [HtmlAttributeName(\"style\")]");
         sb.AppendLine("    public string? Style { get; set; }");
+        sb.AppendLine();
+        sb.AppendLine("    [HtmlAttributeName(\"pt\")]");
+        sb.AppendLine("    public object? Pt { get; set; }");
+        sb.AppendLine();
+        sb.AppendLine("    [HtmlAttributeName(\"studio-overrides\")]");
+        sb.AppendLine("    public object? StudioOverrides { get; set; }");
         sb.AppendLine();
 
         // Generate properties for each props member
@@ -282,15 +289,15 @@ public class IslandGenerator : IIncrementalGenerator
         sb.AppendLine("            output.Attributes.SetAttribute(\"style\", Style);");
         sb.AppendLine();
 
-        // Anonymous props serializer
+        // Anonymous props serializer with pt & studioOverrides
         sb.AppendLine("        var propsObj = new");
         sb.AppendLine("        {");
-        for (int i = 0; i < model.Properties.Length; i++)
+        foreach (var prop in model.Properties)
         {
-            var prop = model.Properties[i];
-            var comma = i < model.Properties.Length - 1 ? "," : "";
-            sb.AppendLine($"            {prop.Name}{comma}");
+            sb.AppendLine($"            {prop.Name},");
         }
+        sb.AppendLine("            Pt,");
+        sb.AppendLine("            StudioOverrides");
         sb.AppendLine("        };");
         sb.AppendLine("        output.Attributes.SetAttribute(\"data-props\", IslandJson.SerializeProps(propsObj));");
         sb.AppendLine();
@@ -300,6 +307,15 @@ public class IslandGenerator : IIncrementalGenerator
         sb.AppendLine("            output.Content.SetHtmlContent($\"<div data-slot=\\\"default\\\" class=\\\"island-slot\\\">{childContent.GetContent()}</div>\");");
         sb.AppendLine("        }");
         sb.AppendLine("    }");
+        sb.AppendLine("}");
+        sb.AppendLine();
+        sb.AppendLine("// ── AOT-Compatible JsonSerializerContext (LT-1204) ──────────────────────");
+        sb.AppendLine("[System.Text.Json.Serialization.JsonSourceGenerationOptions(");
+        sb.AppendLine("    PropertyNamingPolicy = System.Text.Json.Serialization.JsonKnownNamingPolicy.CamelCase,");
+        sb.AppendLine("    DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]");
+        sb.AppendLine($"[System.Text.Json.Serialization.JsonSerializable(typeof({model.TypeName}))]");
+        sb.AppendLine($"internal partial class {model.TypeName}JsonSerializerContext : System.Text.Json.Serialization.JsonSerializerContext");
+        sb.AppendLine("{");
         sb.AppendLine("}");
 
         return sb.ToString();
@@ -320,8 +336,10 @@ public class IslandGenerator : IIncrementalGenerator
             {
                 var tsPropName = ToCamelCase(prop.Name);
                 var nullability = prop.IsNullable ? " | null" : "";
-                sb.AppendLine($"    {tsPropName}: {prop.TsTypeName}{nullability};");
+                sb.AppendLine($"    {tsPropName}?: {prop.TsTypeName}{nullability};");
             }
+            sb.AppendLine("    pt?: Record<string, any>;");
+            sb.AppendLine("    studioOverrides?: Record<string, any>;");
             sb.AppendLine("}");
             sb.AppendLine();
         }

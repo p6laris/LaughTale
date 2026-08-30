@@ -107,7 +107,7 @@ const SPLITBUTTON_CSS = `
 /* Solid Severities */
 .p-splitbutton .p-button-primary {
     background: var(--p-primary-500, #10b981);
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
     border-color: var(--p-primary-500, #10b981);
 }
 .p-splitbutton .p-button-primary:hover:not(:disabled) {
@@ -127,7 +127,7 @@ const SPLITBUTTON_CSS = `
 
 .p-splitbutton .p-button-success {
     background: #22c55e;
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
     border-color: #22c55e;
 }
 .p-splitbutton .p-button-success:hover:not(:disabled) {
@@ -137,7 +137,7 @@ const SPLITBUTTON_CSS = `
 
 .p-splitbutton .p-button-info {
     background: #0ea5e9;
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
     border-color: #0ea5e9;
 }
 .p-splitbutton .p-button-info:hover:not(:disabled) {
@@ -146,9 +146,9 @@ const SPLITBUTTON_CSS = `
 }
 
 .p-splitbutton .p-button-warn {
-    background: #f59e0b;
-    color: #ffffff;
-    border-color: #f59e0b;
+    background: var(--lt-warn-500, #f59e0b);
+    color: var(--lt-surface-0, #ffffff);
+    border-color: var(--lt-warn-500, #f59e0b);
 }
 .p-splitbutton .p-button-warn:hover:not(:disabled) {
     background: #d97706;
@@ -157,7 +157,7 @@ const SPLITBUTTON_CSS = `
 
 .p-splitbutton .p-button-help {
     background: #a855f7;
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
     border-color: #a855f7;
 }
 .p-splitbutton .p-button-help:hover:not(:disabled) {
@@ -166,9 +166,9 @@ const SPLITBUTTON_CSS = `
 }
 
 .p-splitbutton .p-button-danger {
-    background: #ef4444;
-    color: #ffffff;
-    border-color: #ef4444;
+    background: var(--lt-danger-500, #ef4444);
+    color: var(--lt-surface-0, #ffffff);
+    border-color: var(--lt-danger-500, #ef4444);
 }
 .p-splitbutton .p-button-danger:hover:not(:disabled) {
     background: #dc2626;
@@ -176,13 +176,13 @@ const SPLITBUTTON_CSS = `
 }
 
 .p-splitbutton .p-button-contrast {
-    background: #0f172a;
-    color: #ffffff;
-    border-color: #0f172a;
+    background: var(--lt-surface-900, #0f172a);
+    color: var(--lt-surface-0, #ffffff);
+    border-color: var(--lt-surface-900, #0f172a);
 }
 .p-splitbutton .p-button-contrast:hover:not(:disabled) {
-    background: #1e293b;
-    border-color: #1e293b;
+    background: var(--lt-surface-800, #1e293b);
+    border-color: var(--lt-surface-800, #1e293b);
 }
 
 /* Outlined Variant */
@@ -194,13 +194,13 @@ const SPLITBUTTON_CSS = `
 .p-splitbutton-outlined .p-button-success:hover:not(:disabled) { background: rgba(34, 197, 94, 0.08); }
 .p-splitbutton-outlined .p-button-info { background: transparent; color: #0ea5e9; border-color: #0ea5e9; }
 .p-splitbutton-outlined .p-button-info:hover:not(:disabled) { background: rgba(14, 165, 233, 0.08); }
-.p-splitbutton-outlined .p-button-warn { background: transparent; color: #f59e0b; border-color: #f59e0b; }
+.p-splitbutton-outlined .p-button-warn { background: transparent; color: var(--lt-warn-500, #f59e0b); border-color: var(--lt-warn-500, #f59e0b); }
 .p-splitbutton-outlined .p-button-warn:hover:not(:disabled) { background: rgba(245, 158, 11, 0.08); }
 .p-splitbutton-outlined .p-button-help { background: transparent; color: #a855f7; border-color: #a855f7; }
 .p-splitbutton-outlined .p-button-help:hover:not(:disabled) { background: rgba(168, 85, 247, 0.08); }
-.p-splitbutton-outlined .p-button-danger { background: transparent; color: #ef4444; border-color: #ef4444; }
+.p-splitbutton-outlined .p-button-danger { background: transparent; color: var(--lt-danger-500, #ef4444); border-color: var(--lt-danger-500, #ef4444); }
 .p-splitbutton-outlined .p-button-danger:hover:not(:disabled) { background: rgba(239, 68, 68, 0.08); }
-.p-splitbutton-outlined .p-button-contrast { background: transparent; color: #0f172a; border-color: #0f172a; }
+.p-splitbutton-outlined .p-button-contrast { background: transparent; color: var(--lt-surface-900, #0f172a); border-color: var(--lt-surface-900, #0f172a); }
 .p-splitbutton-outlined .p-button-contrast:hover:not(:disabled) { background: rgba(15, 23, 42, 0.08); }
 
 .p-splitbutton-outlined .p-splitbutton-button {
@@ -229,7 +229,7 @@ const SPLITBUTTON_CSS = `
 .p-splitbutton-text .p-button-info:hover:not(:disabled),
 .p-splitbutton-text .p-button-info[aria-expanded="true"] { background: rgba(14, 165, 233, 0.1) !important; }
 
-.p-splitbutton-text .p-button-warn { color: #f59e0b !important; }
+.p-splitbutton-text .p-button-warn { color: var(--lt-warn-500, #f59e0b) !important; }
 .p-splitbutton-text .p-button-warn:hover:not(:disabled),
 .p-splitbutton-text .p-button-warn[aria-expanded="true"] { background: rgba(245, 158, 11, 0.1) !important; }
 
@@ -237,11 +237,11 @@ const SPLITBUTTON_CSS = `
 .p-splitbutton-text .p-button-help:hover:not(:disabled),
 .p-splitbutton-text .p-button-help[aria-expanded="true"] { background: rgba(168, 85, 247, 0.1) !important; }
 
-.p-splitbutton-text .p-button-danger { color: #ef4444 !important; }
+.p-splitbutton-text .p-button-danger { color: var(--lt-danger-500, #ef4444) !important; }
 .p-splitbutton-text .p-button-danger:hover:not(:disabled),
 .p-splitbutton-text .p-button-danger[aria-expanded="true"] { background: rgba(239, 68, 68, 0.1) !important; }
 
-.p-splitbutton-text .p-button-contrast { color: #0f172a !important; }
+.p-splitbutton-text .p-button-contrast { color: var(--lt-surface-900, #0f172a) !important; }
 .p-splitbutton-text .p-button-contrast:hover:not(:disabled),
 .p-splitbutton-text .p-button-contrast[aria-expanded="true"] { background: rgba(15, 23, 42, 0.1) !important; }
 
@@ -400,7 +400,7 @@ const SPLITBUTTON_CSS = `
 [data-theme="dark"] .p-splitbutton-menu .p-menu-item.p-menu-active > .p-menu-item-link,
 [data-theme="dark"] .p-splitbutton-menu .p-menu-item.p-focus > .p-menu-item-link {
     background: var(--p-surface-800, #1e293b) !important;
-    color: #ffffff !important;
+    color: var(--lt-surface-0, #ffffff) !important;
 }
 
 .dark .p-splitbutton-menu .p-menu-separator,

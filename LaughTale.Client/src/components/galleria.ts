@@ -67,19 +67,19 @@ export default function GalleriaIsland(container: HTMLElement, props: GalleriaPr
         container.innerHTML = `
             <div class="laughtale-galleria" style="width: 100%; max-width: 640px; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); overflow: hidden; background: var(--p-surface-0); font-family: var(--p-font-family, inherit);">
                 <!-- Main Image Stage -->
-                <div style="position: relative; width: 100%; height: 320px; background: #020617; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                <div style="position: relative; width: 100%; height: 320px; background: var(--lt-surface-950, #020617); overflow: hidden; display: flex; align-items: center; justify-content: center;">
                     <img src="${current.itemImageSrc}" alt="${current.alt}" style="width: 100%; height: 100%; object-fit: cover; transition: opacity 0.25s ease;" />
                     
                     <!-- Prev / Next Nav Buttons -->
-                    <button type="button" class="galleria-prev-btn" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); width: 2.25rem; height: 2.25rem; border-radius: 9999px; background: rgba(0,0,0,0.5); color: #ffffff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                    <button type="button" class="galleria-prev-btn" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); width: 2.25rem; height: 2.25rem; border-radius: 9999px; background: rgba(0,0,0,0.5); color: var(--lt-surface-0, #ffffff); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;">
                         <span style="transform: rotate(90deg); display: flex;">${LucideIcons.chevronDown}</span>
                     </button>
-                    <button type="button" class="galleria-next-btn" style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); width: 2.25rem; height: 2.25rem; border-radius: 9999px; background: rgba(0,0,0,0.5); color: #ffffff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                    <button type="button" class="galleria-next-btn" style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); width: 2.25rem; height: 2.25rem; border-radius: 9999px; background: rgba(0,0,0,0.5); color: var(--lt-surface-0, #ffffff); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;">
                         <span style="transform: rotate(-90deg); display: flex;">${LucideIcons.chevronDown}</span>
                     </button>
 
                     <!-- Caption Bar -->
-                    <div style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.8)); padding: 1rem; color: #ffffff;">
+                    <div style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.8)); padding: 1rem; color: var(--lt-surface-0, #ffffff);">
                         <div style="font-size: 0.875rem; font-weight: 700;">${current.title || current.alt}</div>
                     </div>
                 </div>

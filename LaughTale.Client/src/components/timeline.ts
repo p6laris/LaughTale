@@ -212,7 +212,7 @@ const TIMELINE_CSS = `
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
 }
 
 .p-timeline-pulse {
@@ -268,12 +268,12 @@ const ICONS = {
 };
 
 const COLOR_MAP: Record<string, string> = {
-    'bg-blue-500': '#3b82f6',
-    'bg-green-500': '#10b981',
+    'bg-blue-500': 'var(--lt-info-500, #3b82f6)',
+    'bg-green-500': 'var(--lt-primary-500, #10b981)',
     'bg-orange-500': '#f97316',
     'bg-lime-500': '#84cc16',
     'bg-violet-500': '#8b5cf6',
-    'bg-amber-500': '#f59e0b',
+    'bg-amber-500': 'var(--lt-warn-500, #f59e0b)',
     'bg-rose-500': '#f43f5e'
 };
 
@@ -328,11 +328,11 @@ export default function TimelineIsland(container: HTMLElement, props: TimelinePr
     }
 
     function getColorHex(colorStr?: string): string {
-        if (!colorStr) return '#10b981';
+        if (!colorStr) return 'var(--lt-primary-500, #10b981)';
         const clean = colorStr.replace('!', '').trim();
         if (COLOR_MAP[clean]) return COLOR_MAP[clean];
         if (clean.startsWith('#') || clean.startsWith('rgb')) return clean;
-        return '#10b981';
+        return 'var(--lt-primary-500, #10b981)';
     }
 
     function renderMarker(item: any, isLast: boolean): string {
@@ -343,10 +343,10 @@ export default function TimelineIsland(container: HTMLElement, props: TimelinePr
             let iconHtml = '';
 
             if (status === 'completed') {
-                btnStyle += ' background: #22c55e; color: #ffffff; cursor: default;';
+                btnStyle += ' background: #22c55e; color: var(--lt-surface-0, #ffffff); cursor: default;';
                 iconHtml = ICONS.check;
             } else if (status === 'current') {
-                btnStyle += ' background: var(--p-primary-500, #10b981); color: #ffffff; cursor: pointer; transform: scale(1.05);';
+                btnStyle += ' background: var(--p-primary-500, #10b981); color: var(--lt-surface-0, #ffffff); cursor: pointer; transform: scale(1.05);';
                 iconHtml = getIconSvg(item.icon) || ICONS.userPlus;
             } else {
                 btnStyle += ' background: var(--p-surface-200, #e2e8f0); color: var(--p-surface-400, #94a3b8); cursor: not-allowed;';
@@ -365,7 +365,7 @@ export default function TimelineIsland(container: HTMLElement, props: TimelinePr
         // 2. Activity Feed Avatar Marker
         if (isActivityFeed && item.user) {
             const avatar = typeof item.user === 'object' ? item.user.avatar : (item.id === '1' ? 'SC' : item.id === '2' ? 'AK' : item.id === '3' ? 'MJ' : item.id === '4' ? 'DP' : 'EW');
-            const color = item.id === '1' ? '#8b5cf6' : item.id === '2' ? '#3b82f6' : item.id === '3' ? '#10b981' : item.id === '4' ? '#f59e0b' : '#f43f5e';
+            const color = item.id === '1' ? '#8b5cf6' : item.id === '2' ? 'var(--lt-info-500, #3b82f6)' : item.id === '3' ? 'var(--lt-primary-500, #10b981)' : item.id === '4' ? 'var(--lt-warn-500, #f59e0b)' : '#f43f5e';
             return `
                 <div class="p-timeline-event-marker">
                     <span class="p-timeline-avatar" style="background: ${color};">
@@ -381,7 +381,7 @@ export default function TimelineIsland(container: HTMLElement, props: TimelinePr
             const colorHex = getColorHex(item.color);
             return `
                 <div class="p-timeline-event-marker">
-                    <span style="display: inline-flex; align-items: center; justify-content: center; width: 2.75rem; height: 2.75rem; border-radius: 9999px; color: #ffffff; background: ${colorHex}; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+                    <span style="display: inline-flex; align-items: center; justify-content: center; width: 2.75rem; height: 2.75rem; border-radius: 9999px; color: var(--lt-surface-0, #ffffff); background: ${colorHex}; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
                         ${iconSvg}
                     </span>
                 </div>

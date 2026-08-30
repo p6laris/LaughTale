@@ -150,7 +150,7 @@ const PANEL_CSS = `
 .p-panel-ctrl-btn.p-highlight {
     background: var(--p-surface-900, #0f172a);
     border-color: var(--p-surface-900, #0f172a);
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
 }
 
 /* Dark Mode Tokens */

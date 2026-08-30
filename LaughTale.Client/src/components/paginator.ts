@@ -86,7 +86,7 @@ const PAGINATOR_CSS = `
 .p-paginator-page.p-highlight,
 .p-paginator-page.p-paginator-page-selected {
     background: var(--p-surface-900, #0f172a) !important;
-    color: #ffffff !important;
+    color: var(--lt-surface-0, #ffffff) !important;
     font-weight: 600;
 }
 
@@ -223,7 +223,7 @@ const PAGINATOR_CSS = `
 [data-theme="dark"] .p-paginator-last:hover:not(:disabled),
 [data-theme="dark"] .p-paginator-action-btn:hover:not(:disabled) {
     background: var(--p-surface-800, #1e293b) !important;
-    color: #ffffff !important;
+    color: var(--lt-surface-0, #ffffff) !important;
 }
 .dark .p-paginator-page.p-highlight,
 [data-theme="dark"] .p-paginator-page.p-highlight {
@@ -238,7 +238,7 @@ const PAGINATOR_CSS = `
 [data-theme="dark"] .p-paginator-jtp-input {
     background-color: var(--p-surface-800, #1e293b) !important;
     border-color: var(--p-surface-600, #475569) !important;
-    color: #ffffff !important;
+    color: var(--lt-surface-0, #ffffff) !important;
 }
 .dark .p-paginator-current,
 .dark .p-paginator-jtp-container,

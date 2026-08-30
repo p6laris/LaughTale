@@ -234,7 +234,7 @@ const DRAWER_CSS = `
 .dark .p-drawer-close-button:hover,
 [data-theme="dark"] .p-drawer-close-button:hover {
     background: var(--p-surface-800, #1e293b);
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
 }
 .dark .p-drawer-footer,
 [data-theme="dark"] .p-drawer-footer {
@@ -247,7 +247,7 @@ const DRAWER_CSS = `
 .dark .p-drawer-nav-item:hover,
 [data-theme="dark"] .p-drawer-nav-item:hover {
     background: var(--p-surface-800, #1e293b);
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
 }
 .dark .p-drawer-nav-section-title,
 [data-theme="dark"] .p-drawer-nav-section-title {

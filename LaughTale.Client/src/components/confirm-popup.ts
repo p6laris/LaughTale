@@ -87,7 +87,7 @@ const CONFIRM_POPUP_CSS = `
 }
 
 .p-confirmpopup-icon-danger {
-    color: #ef4444 !important;
+    color: var(--lt-danger-500, #ef4444) !important;
 }
 
 .p-confirmpopup-message {
@@ -333,7 +333,7 @@ class ConfirmPopupManager {
                 <div class="p-confirmpopup-headless">
                     <span class="p-confirmpopup-message" style="display: block; font-size: 0.875rem;">${opt.message || 'Save your current process?'}</span>
                     <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.875rem;">
-                        <button type="button" class="btn-accept p-button p-button-primary p-button-sm" style="padding: 0.35rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                        <button type="button" class="btn-accept p-button p-button-primary p-button-sm" style="padding: 0.35rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: var(--lt-surface-0, #ffffff); cursor: pointer;">
                             ${opt.acceptLabel || 'Save'}
                         </button>
                         <button type="button" class="btn-reject p-button p-button-text p-button-secondary p-button-sm" style="padding: 0.35rem 0.75rem; font-size: 0.8125rem; font-weight: 500; border: none; background: transparent; color: var(--p-surface-700); cursor: pointer;">
@@ -355,7 +355,7 @@ class ConfirmPopupManager {
                         ${CLOSE_SVG}
                         <span>${opt.rejectLabel || 'Cancel'}</span>
                     </button>
-                    <button type="button" class="btn-accept p-button p-button-primary p-button-sm" style="display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.4rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                    <button type="button" class="btn-accept p-button p-button-primary p-button-sm" style="display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.4rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: var(--lt-surface-0, #ffffff); cursor: pointer;">
                         ${CHECK_SVG}
                         <span>${opt.acceptLabel || 'Confirm'}</span>
                     </button>
@@ -366,7 +366,7 @@ class ConfirmPopupManager {
             const iconSvg = isDanger ? INFO_CIRCLE_SVG : ALERT_TRIANGLE_SVG;
             const acceptLabel = opt.acceptLabel || (opt.acceptProps?.label) || (isDanger ? 'Delete' : 'Save');
             const rejectLabel = opt.rejectLabel || (opt.rejectProps?.label) || 'Cancel';
-            const acceptStyle = isDanger ? 'background: #ef4444; border: 1px solid #ef4444; color: #ffffff;' : 'background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff;';
+            const acceptStyle = isDanger ? 'background: var(--lt-danger-500, #ef4444); border: 1px solid var(--lt-danger-500, #ef4444); color: var(--lt-surface-0, #ffffff);' : 'background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: var(--lt-surface-0, #ffffff);';
 
             this.popupEl.innerHTML = `
                 <div class="p-confirmpopup-content">

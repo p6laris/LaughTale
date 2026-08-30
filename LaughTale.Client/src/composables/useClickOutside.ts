@@ -1,4 +1,4 @@
-﻿/**
+/**
  * LaughTale: Headless useClickOutside Composable
  * Detects pointer and mouse clicks outside of a target element with support for ignore elements.
  */
@@ -6,6 +6,7 @@
 export interface UseClickOutsideOptions {
     ignoreElements?: Array<HTMLElement | null | undefined>;
     capture?: boolean;
+    signal?: AbortSignal;
 }
 
 export function useClickOutside(
@@ -35,8 +36,10 @@ export function useClickOutside(
     }
 
     const capture = options.capture ?? false;
-    document.addEventListener('pointerdown', listener, { capture });
-    document.addEventListener('touchstart', listener, { capture });
+    const listenerOpts: AddEventListenerOptions = { capture, signal: options.signal };
+
+    document.addEventListener('pointerdown', listener, listenerOpts);
+    document.addEventListener('touchstart', listener, listenerOpts);
 
     return {
         destroy: () => {

@@ -88,8 +88,8 @@ const CSS = `
     z-index: 2;
 }
 .ac-input-container.invalid {
-    border-color: #ef4444 !important;
-    box-shadow: 0 0 0 1px #ef4444 !important;
+    border-color: var(--lt-danger-500, #ef4444) !important;
+    box-shadow: 0 0 0 1px var(--lt-danger-500, #ef4444) !important;
 }
 .ac-input-container.disabled {
     background: var(--p-surface-100);
@@ -145,7 +145,7 @@ const CSS = `
     font-size: 0.75rem;
 }
 .ac-chip-remove:hover {
-    color: #ef4444;
+    color: var(--lt-danger-500, #ef4444);
 }
 
 .ac-input {
@@ -515,7 +515,7 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
 
         let statusHtml = '';
         if (item.status) {
-            const statusColor = item.status === 'online' ? '#10b981' : (item.status === 'away' ? '#f59e0b' : '#94a3b8');
+            const statusColor = item.status === 'online' ? 'var(--lt-primary-500, #10b981)' : (item.status === 'away' ? 'var(--lt-warn-500, #f59e0b)' : 'var(--lt-surface-400, #94a3b8)');
             statusHtml = `<span style="width: 8px; height: 8px; border-radius: 50%; background: ${statusColor}; margin-right: 0.35rem; display: inline-block;"></span>`;
         }
 

@@ -132,7 +132,7 @@ const DATATABLE_CSS = `
     height: 1.125rem;
     border-radius: 9999px;
     background: var(--p-primary-500, #10b981);
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
     font-size: 0.6875rem;
     font-weight: 700;
 }
@@ -279,7 +279,7 @@ const DATATABLE_CSS = `
 .p-checkbox-box.p-checked, .p-radio-box.p-checked {
     background: var(--p-primary-500, #10b981);
     border-color: var(--p-primary-500, #10b981);
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
 }
 
 /* Aura Tags & Badges */
@@ -428,7 +428,7 @@ const DATATABLE_CSS = `
 }
 .p-size-btn.p-active {
     background: var(--p-primary-500, #10b981);
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
 }
 
 /* Paginator Integration */
@@ -471,7 +471,7 @@ const DATATABLE_CSS = `
 }
 .p-paginator-page.p-paginator-page-active {
     background: var(--p-primary-500, #10b981);
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
 }
 .p-paginator-page:disabled, .p-paginator-nav:disabled {
     opacity: 0.4;
@@ -558,7 +558,7 @@ const DATATABLE_CSS = `
 [data-theme="dark"] .p-datatable-filter-input {
     background: var(--p-surface-900, #0f172a) !important;
     border-color: var(--p-surface-600, #475569) !important;
-    color: #ffffff !important;
+    color: var(--lt-surface-0, #ffffff) !important;
 }
 .dark .p-datatable-loading-overlay,
 [data-theme="dark"] .p-datatable-loading-overlay {

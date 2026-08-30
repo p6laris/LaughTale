@@ -154,12 +154,12 @@ const ORGCHART_CSS = `
 .p-checkbox-box.p-checked {
     background: var(--p-primary-500, #10b981);
     border-color: var(--p-primary-500, #10b981);
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
 }
 .p-checkbox-box.p-indeterminate {
     background: var(--p-primary-500, #10b981);
     border-color: var(--p-primary-500, #10b981);
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
 }
 
 /* Custom Card Content */

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * LaughTale: Headless useFocusTrap Composable
  * Traps keyboard focus (Tab / Shift+Tab) within a container element for accessible modals & dialogs.
  */
@@ -17,6 +17,7 @@ export interface UseFocusTrapOptions {
     autoFocus?: boolean;
     restoreFocus?: boolean;
     initialFocusElement?: HTMLElement | null;
+    signal?: AbortSignal;
 }
 
 export interface UseFocusTrapReturn {
@@ -63,7 +64,7 @@ export function useFocusTrap(container: HTMLElement, options: UseFocusTrapOption
         isActive = true;
         previouslyFocusedElement = document.activeElement as HTMLElement | null;
 
-        document.addEventListener('keydown', handleKeyDown);
+        document.addEventListener('keydown', handleKeyDown, { signal: options.signal });
 
         if (options.autoFocus !== false) {
             setTimeout(() => {
@@ -86,6 +87,10 @@ export function useFocusTrap(container: HTMLElement, options: UseFocusTrapOption
         if (options.restoreFocus !== false && previouslyFocusedElement && typeof previouslyFocusedElement.focus === 'function') {
             previouslyFocusedElement.focus();
         }
+    }
+
+    if (options.signal) {
+        options.signal.addEventListener('abort', deactivate, { once: true });
     }
 
     return { activate, deactivate };

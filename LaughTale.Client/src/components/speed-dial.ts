@@ -261,7 +261,7 @@ const SPEEDDIAL_CSS = `
 .p-speeddial-tooltip {
     position: absolute;
     background: var(--p-surface-900, #0f172a);
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
     padding: 0.35rem 0.65rem;
     font-size: 0.75rem;
     font-weight: 600;
@@ -385,7 +385,7 @@ const SPEEDDIAL_CSS = `
 .dark .p-speeddial-action:hover:not(:disabled),
 [data-theme="dark"] .p-speeddial-action:hover:not(:disabled) {
     background: var(--p-surface-800, #1e293b) !important;
-    color: #ffffff !important;
+    color: var(--lt-surface-0, #ffffff) !important;
     border-color: var(--p-surface-600, #475569) !important;
 }
 
@@ -403,14 +403,14 @@ const SPEEDDIAL_CSS = `
 [data-theme="dark"] .p-speeddial-custom-item:hover .p-speeddial-custom-label,
 [data-theme="dark"] .p-speeddial-custom-item:hover .p-speeddial-custom-icon {
     background: var(--p-surface-800, #1e293b);
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
     border-color: var(--p-surface-600, #475569);
 }
 
 .dark .p-speeddial-tooltip,
 [data-theme="dark"] .p-speeddial-tooltip {
     background: var(--p-surface-800, #1e293b);
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
     border: 1px solid var(--p-surface-700, #334155);
 }
 .dark .p-speeddial-tooltip.tooltip-left::after,

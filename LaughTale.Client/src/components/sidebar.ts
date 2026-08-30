@@ -773,7 +773,7 @@ const SIDEBAR_CSS = `
     left: 2px;
     width: 1.1rem;
     height: 1.1rem;
-    background: #ffffff;
+    background: var(--lt-surface-0, #ffffff);
     border-radius: 50%;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
     transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1);
@@ -885,7 +885,7 @@ const SIDEBAR_CSS = `
     height: 2rem;
     border-radius: 9999px;
     background: #10a37f;
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1287,7 +1287,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
         if (isAppMode) {
             return `
                 <div style="display: flex; align-items: center; gap: 0.65rem; width: 100%; overflow: hidden;">
-                    <a href="/" style="display: flex; width: 2.1rem; height: 2.1rem; border-radius: 8px; background: linear-gradient(135deg, #10b981, #047857); color: #ffffff; align-items: center; justify-content: center; flex-shrink: 0; text-decoration: none;" title="${headerTitle}">
+                    <a href="/" style="display: flex; width: 2.1rem; height: 2.1rem; border-radius: 8px; background: linear-gradient(135deg, var(--lt-primary-500, #10b981), #047857); color: var(--lt-surface-0, #ffffff); align-items: center; justify-content: center; flex-shrink: 0; text-decoration: none;" title="${headerTitle}">
                         ${LucideIcons.layers || '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.9a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg>'}
                     </a>
                     <span class="p-sidebar-item-label p-sidebar-header-label" style="font-weight: 800; font-size: 0.9375rem; color: var(--p-text-color);">${headerTitle}</span>
@@ -1303,7 +1303,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                 <ul class="p-sidebar-menu">
                     <li class="p-sidebar-menu-item">
                         <button type="button" class="p-sidebar-menu-button" style="padding: 0.35rem 0.5rem;">
-                            <div style="display:flex; width:1.6rem; height:1.6rem; border-radius:9999px; background: #10a37f; color:#ffffff; align-items:center; justify-content:center; flex-shrink:0;">
+                            <div style="display:flex; width:1.6rem; height:1.6rem; border-radius:9999px; background: #10a37f; color:var(--lt-surface-0, #ffffff); align-items:center; justify-content:center; flex-shrink:0;">
                                 ${chatGptSparkleIcon}
                             </div>
                             <span class="p-sidebar-item-label p-sidebar-header-label" style="font-weight: 700; font-size: 0.9rem;">ChatGPT</span>
@@ -1354,8 +1354,8 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                                 <span>Acme Inc</span>
                                 ${activeCompany.name === 'Acme Inc' ? '<span style="margin-left:auto; color:var(--p-primary-600); font-weight:700;">&#10003;</span>' : ''}
                             </div>
-                            <div class="p-sb-popup-item" data-select-company="Globex Corp|G|linear-gradient(135deg, #10b981, #0d9488)">
-                                <div style="display:flex; width:1.25rem; height:1.25rem; border-radius:4px; background: linear-gradient(135deg, #10b981, #0d9488); color:#fff; align-items:center; justify-content:center; font-weight:700; font-size:0.65rem;">G</div>
+                            <div class="p-sb-popup-item" data-select-company="Globex Corp|G|linear-gradient(135deg, var(--lt-primary-500, #10b981), #0d9488)">
+                                <div style="display:flex; width:1.25rem; height:1.25rem; border-radius:4px; background: linear-gradient(135deg, var(--lt-primary-500, #10b981), #0d9488); color:#fff; align-items:center; justify-content:center; font-weight:700; font-size:0.65rem;">G</div>
                                 <span>Globex Corp</span>
                                 ${activeCompany.name === 'Globex Corp' ? '<span style="margin-left:auto; color:var(--p-primary-600); font-weight:700;">&#10003;</span>' : ''}
                             </div>
@@ -1424,7 +1424,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                                 <span>Notifications</span>
                             </div>
                             <div style="border-top: 1px solid var(--p-border-color); margin: 0.25rem 0;"></div>
-                            <div class="p-sb-popup-item" style="color: #ef4444;">
+                            <div class="p-sb-popup-item" style="color: var(--lt-danger-500, #ef4444);">
                                 <span class="p-sidebar-menu-button-icon">${LucideIcons.logOut}</span>
                                 <span>Sign out</span>
                             </div>

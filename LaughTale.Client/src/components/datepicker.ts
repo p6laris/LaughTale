@@ -78,8 +78,8 @@ const CSS = `
     box-shadow: 0 0 0 1px var(--p-primary-500);
 }
 .dp-trigger.invalid {
-    border-color: #ef4444 !important;
-    box-shadow: 0 0 0 1px #ef4444 !important;
+    border-color: var(--lt-danger-500, #ef4444) !important;
+    box-shadow: 0 0 0 1px var(--lt-danger-500, #ef4444) !important;
 }
 .dp-trigger.disabled {
     background: var(--p-surface-100);
@@ -224,7 +224,7 @@ const CSS = `
 }
 .dp-day-cell.selected {
     background: var(--p-primary-500) !important;
-    color: #ffffff !important;
+    color: var(--lt-surface-0, #ffffff) !important;
     font-weight: 700;
 }
 .dp-day-cell.in-range {
@@ -271,7 +271,7 @@ const CSS = `
 }
 .dp-view-btn.selected {
     background: var(--p-primary-500);
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
     font-weight: 700;
 }
 

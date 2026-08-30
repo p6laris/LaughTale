@@ -102,7 +102,7 @@ const DATAVIEW_CSS = `
 }
 .p-layout-btn.p-active {
     background: var(--p-primary-500, #10b981);
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
 }
 
 /* Sort Select */
@@ -253,7 +253,7 @@ const DATAVIEW_CSS = `
     padding: 0.5rem 1rem;
     border-radius: var(--p-border-radius, 6px);
     background: var(--p-primary-500, #10b981);
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
     font-weight: 600;
     font-size: 0.8125rem;
     border: none;
@@ -291,7 +291,7 @@ const DATAVIEW_CSS = `
 .p-dataview-btn-wishlist.p-wishlisted {
     background: #f43f5e;
     border-color: #f43f5e;
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
 }
 
 /* Grid Layout */
@@ -412,7 +412,7 @@ const DATAVIEW_CSS = `
 }
 .p-paginator-page.p-paginator-page-active {
     background: var(--p-primary-500, #10b981);
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
 }
 .p-paginator-page:disabled, .p-paginator-nav:disabled {
     opacity: 0.4;

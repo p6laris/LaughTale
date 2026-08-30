@@ -225,7 +225,7 @@ const CSS = `
 .p-password-chip.is-met {
     background: var(--p-emerald-500, #10b981);
     border-color: var(--p-emerald-500, #10b981);
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
 }
 .p-password-chip svg {
     width: 12px;
@@ -345,7 +345,7 @@ const CSS = `
 .dark .p-password-chip.is-met {
     background: var(--p-emerald-600, #059669);
     border-color: var(--p-emerald-600, #059669);
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
 }
 .dark .p-password-list-item {
     color: var(--p-surface-400);
@@ -398,16 +398,16 @@ export default function InputPasswordIsland(container: HTMLElement, props: Input
     }
 
     function calculateStrength(pwd: string): { score: number; label: string; color: string; bgColor: string; width: string } {
-        if (!pwd) return { score: 0, label: 'Empty', color: '#94a3b8', bgColor: '#f1f5f9', width: '0%' };
+        if (!pwd) return { score: 0, label: 'Empty', color: 'var(--lt-surface-400, #94a3b8)', bgColor: 'var(--lt-surface-100, #f1f5f9)', width: '0%' };
         const rules = checkRules(pwd);
         const passed = Object.values(rules).filter(Boolean).length;
 
         if (passed <= 1) {
-            return { score: 1, label: 'Too Weak', color: '#ef4444', bgColor: 'rgba(239, 68, 68, 0.15)', width: '25%' };
+            return { score: 1, label: 'Too Weak', color: 'var(--lt-danger-500, #ef4444)', bgColor: 'rgba(239, 68, 68, 0.15)', width: '25%' };
         } else if (passed <= 3) {
-            return { score: 2, label: 'Medium', color: '#f59e0b', bgColor: 'rgba(245, 158, 11, 0.15)', width: '60%' };
+            return { score: 2, label: 'Medium', color: 'var(--lt-warn-500, #f59e0b)', bgColor: 'rgba(245, 158, 11, 0.15)', width: '60%' };
         } else {
-            return { score: 3, label: 'Strong', color: '#10b981', bgColor: 'rgba(16, 185, 129, 0.15)', width: '100%' };
+            return { score: 3, label: 'Strong', color: 'var(--lt-primary-500, #10b981)', bgColor: 'rgba(16, 185, 129, 0.15)', width: '100%' };
         }
     }
 

@@ -50,7 +50,7 @@ const CSS = `
                 box-shadow 150ms ease;
     box-sizing: border-box;
     flex-shrink: 0;
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
 }
 
 /* Variants */
@@ -119,15 +119,15 @@ const CSS = `
 .laughtale-checkbox-wrap.indeterminate .laughtale-checkbox-box {
     background: var(--p-primary-500);
     border-color: var(--p-primary-500);
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
 }
 
 /* Invalid State */
 .laughtale-checkbox-wrap.invalid .laughtale-checkbox-box {
-    border-color: #ef4444 !important;
+    border-color: var(--lt-danger-500, #ef4444) !important;
 }
 .laughtale-checkbox-wrap.invalid:focus-within:not(.disabled) .laughtale-checkbox-box {
-    box-shadow: 0 0 0 1px var(--p-surface-0), 0 0 0 3px #ef4444;
+    box-shadow: 0 0 0 1px var(--p-surface-0), 0 0 0 3px var(--lt-danger-500, #ef4444);
 }
 
 /* Icon Micro-Interaction */

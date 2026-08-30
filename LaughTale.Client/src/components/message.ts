@@ -379,33 +379,33 @@ const MESSAGE_CSS = `
 [data-theme="dark"] .p-message-secondary {
     background: rgba(100, 116, 139, 0.15);
     border-color: rgba(148, 163, 184, 0.25);
-    color: #cbd5e1;
+    color: var(--lt-surface-300, #cbd5e1);
 }
 .dark .p-message-secondary .p-message-icon,
 [data-theme="dark"] .p-message-secondary .p-message-icon {
-    color: #cbd5e1;
+    color: var(--lt-surface-300, #cbd5e1);
 }
 
 .dark .p-message-contrast,
 [data-theme="dark"] .p-message-contrast {
-    background: #ffffff;
-    border-color: #e2e8f0;
-    color: #0f172a;
+    background: var(--lt-surface-0, #ffffff);
+    border-color: var(--lt-surface-200, #e2e8f0);
+    color: var(--lt-surface-900, #0f172a);
 }
 .dark .p-message-contrast .p-message-icon,
 [data-theme="dark"] .p-message-contrast .p-message-icon {
-    color: #0f172a;
+    color: var(--lt-surface-900, #0f172a);
 }
 
 .dark .p-message-outlined.p-message-contrast,
 [data-theme="dark"] .p-message-outlined.p-message-contrast {
-    border-color: #ffffff;
-    color: #ffffff;
+    border-color: var(--lt-surface-0, #ffffff);
+    color: var(--lt-surface-0, #ffffff);
 }
 
 .dark .p-message-simple.p-message-contrast,
 [data-theme="dark"] .p-message-simple.p-message-contrast {
-    color: #ffffff;
+    color: var(--lt-surface-0, #ffffff);
 }
 
 .dark .p-message-close-button:hover,

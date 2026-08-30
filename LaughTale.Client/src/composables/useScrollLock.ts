@@ -1,4 +1,4 @@
-﻿/**
+/**
  * LaughTale: Headless useScrollLock Composable
  * Disables background page scrolling when modals or offcanvas drawers are active.
  */
@@ -7,7 +7,7 @@ let lockCount = 0;
 let originalOverflow = '';
 let originalPaddingRight = '';
 
-export function useScrollLock() {
+export function useScrollLock(signal?: AbortSignal) {
     function lock() {
         if (typeof document === 'undefined') return;
 
@@ -32,6 +32,10 @@ export function useScrollLock() {
             document.body.style.overflow = originalOverflow;
             document.body.style.paddingRight = originalPaddingRight;
         }
+    }
+
+    if (signal) {
+        signal.addEventListener('abort', unlock, { once: true });
     }
 
     return { lock, unlock };

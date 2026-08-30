@@ -78,8 +78,8 @@ const CSS = `
     box-shadow: 0 0 0 1px var(--p-primary-500);
 }
 .cs-trigger.invalid {
-    border-color: #ef4444 !important;
-    box-shadow: 0 0 0 1px #ef4444 !important;
+    border-color: var(--lt-danger-500, #ef4444) !important;
+    box-shadow: 0 0 0 1px var(--lt-danger-500, #ef4444) !important;
 }
 .cs-trigger.disabled {
     background: var(--p-surface-100);

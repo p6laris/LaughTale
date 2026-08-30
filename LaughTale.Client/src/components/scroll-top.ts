@@ -28,7 +28,7 @@ export default function ScrollTopIsland(container: HTMLElement, props: ScrollTop
         container.innerHTML = `
             <button type="button" 
                     class="laughtale-scroll-top-btn" 
-                    style="display: ${isVisible ? 'flex' : 'none'}; position: fixed; bottom: 2rem; right: 2rem; z-index: 999; width: 2.75rem; height: 2.75rem; border-radius: 50%; border: none; background: var(--p-primary-600); color: #ffffff; box-shadow: var(--p-shadow-lg); cursor: pointer; align-items: center; justify-content: center; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); animation: fadeIn 0.2s ease;" 
+                    style="display: ${isVisible ? 'flex' : 'none'}; position: fixed; bottom: 2rem; right: 2rem; z-index: 999; width: 2.75rem; height: 2.75rem; border-radius: 50%; border: none; background: var(--p-primary-600); color: var(--lt-surface-0, #ffffff); box-shadow: var(--p-shadow-lg); cursor: pointer; align-items: center; justify-content: center; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); animation: fadeIn 0.2s ease;" 
                     title="Scroll to Top">
                 ${LucideIcons.arrowUp}
             </button>

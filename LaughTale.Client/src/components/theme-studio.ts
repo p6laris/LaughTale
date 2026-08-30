@@ -22,7 +22,7 @@ interface ColorPreset {
 const PRIMARY_PRESETS: Record<string, ColorPreset> = Object.entries(AURA_PALETTES).reduce((acc, [key, ramp]) => {
     acc[key] = {
         name: key.charAt(0).toUpperCase() + key.slice(1),
-        hex: ramp['500'] || '#10b981',
+        hex: ramp['500'] || 'var(--lt-primary-500, #10b981)',
         ramp
     };
     return acc;
@@ -47,27 +47,27 @@ interface NeutralPreset {
 const NEUTRAL_PRESETS: Record<string, NeutralPreset> = {
     slate: {
         name: 'Slate',
-        s0: '#ffffff', s50: '#f8fafc', s100: '#f1f5f9', s200: '#e2e8f0', s300: '#cbd5e1',
-        s400: '#94a3b8', s500: '#64748b', s600: '#475569', s700: '#334155', s800: '#1e293b', s900: '#0f172a', s950: '#020617'
+        s0: 'var(--lt-surface-0, #ffffff)', s50: 'var(--lt-surface-50, #f8fafc)', s100: 'var(--lt-surface-100, #f1f5f9)', s200: 'var(--lt-surface-200, #e2e8f0)', s300: 'var(--lt-surface-300, #cbd5e1)',
+        s400: 'var(--lt-surface-400, #94a3b8)', s500: 'var(--lt-surface-500, #64748b)', s600: 'var(--lt-surface-600, #475569)', s700: 'var(--lt-surface-700, #334155)', s800: 'var(--lt-surface-800, #1e293b)', s900: 'var(--lt-surface-900, #0f172a)', s950: 'var(--lt-surface-950, #020617)'
     },
     zinc: {
         name: 'Zinc',
-        s0: '#ffffff', s50: '#fafafa', s100: '#f4f4f5', s200: '#e4e4e7', s300: '#d4d4d8',
+        s0: 'var(--lt-surface-0, #ffffff)', s50: '#fafafa', s100: '#f4f4f5', s200: '#e4e4e7', s300: '#d4d4d8',
         s400: '#a1a1aa', s500: '#71717a', s600: '#52525b', s700: '#3f3f46', s800: '#27272a', s900: '#18181b', s950: '#09090b'
     },
     stone: {
         name: 'Stone',
-        s0: '#ffffff', s50: '#fafaf9', s100: '#f5f5f4', s200: '#e7e5e4', s300: '#d6d3d1',
+        s0: 'var(--lt-surface-0, #ffffff)', s50: '#fafaf9', s100: '#f5f5f4', s200: '#e7e5e4', s300: '#d6d3d1',
         s400: '#a8a29e', s500: '#78716c', s600: '#57534e', s700: '#44403c', s800: '#292524', s900: '#1c1917', s950: '#0c0a09'
     },
     neutral: {
         name: 'Neutral',
-        s0: '#ffffff', s50: '#fafafa', s100: '#f5f5f5', s200: '#e5e5e5', s300: '#d4d4d4',
+        s0: 'var(--lt-surface-0, #ffffff)', s50: '#fafafa', s100: '#f5f5f5', s200: '#e5e5e5', s300: '#d4d4d4',
         s400: '#a3a3a3', s500: '#737373', s600: '#525252', s700: '#404040', s800: '#262626', s900: '#171717', s950: '#0a0a0a'
     },
     gray: {
         name: 'Gray',
-        s0: '#ffffff', s50: '#f9fafb', s100: '#f3f4f6', s200: '#e5e7eb', s300: '#d1d5db',
+        s0: 'var(--lt-surface-0, #ffffff)', s50: '#f9fafb', s100: '#f3f4f6', s200: '#e5e7eb', s300: '#d1d5db',
         s400: '#9ca3af', s500: '#6b7280', s600: '#4b5563', s700: '#374151', s800: '#1f2937', s900: '#111827', s950: '#030712'
     }
 };
@@ -135,7 +135,7 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
                         </div>
                         <div class="studio-color-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(2.1rem, 1fr)); gap: 0.4rem; margin-bottom: 0.75rem;"></div>
                         <div style="display: flex; align-items: center; gap: 0.5rem; background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 0.35rem 0.6rem;">
-                            <input type="color" class="studio-custom-color-input" value="#10b981" style="width: 1.75rem; height: 1.75rem; border: none; border-radius: 4px; cursor: pointer; background: transparent;" />
+                            <input type="color" class="studio-custom-color-input" value="var(--lt-primary-500, #10b981)" style="width: 1.75rem; height: 1.75rem; border: none; border-radius: 4px; cursor: pointer; background: transparent;" />
                             <span style="font-size: 0.75rem; font-family: monospace; color: var(--p-surface-600);">Custom Hex Accent</span>
                         </div>
                     </div>
@@ -189,7 +189,7 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
                         <div style="display: flex; flex-direction: column; gap: 0.5rem; max-height: 240px; overflow-y: auto;">
                             <button type="button" class="preset-theme-btn" data-theme="emerald-zero-trust" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); background: var(--p-surface-50); cursor: pointer; text-align: left;">
                                 <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                    <span style="width: 1rem; height: 1rem; border-radius: 3px; background: #10b981;"></span>
+                                    <span style="width: 1rem; height: 1rem; border-radius: 3px; background: var(--lt-primary-500, #10b981);"></span>
                                     <span style="font-size: 0.8125rem; font-weight: 600; color: var(--p-surface-800);">Emerald Zero-Trust</span>
                                 </div>
                                 <span style="font-size: 0.6875rem; color: var(--p-surface-400);">Default</span>
@@ -217,7 +217,7 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
                             </button>
                             <button type="button" class="preset-theme-btn" data-theme="ocean-blue" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); background: var(--p-surface-50); cursor: pointer; text-align: left;">
                                 <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                    <span style="width: 1rem; height: 1rem; border-radius: 3px; background: #3b82f6;"></span>
+                                    <span style="width: 1rem; height: 1rem; border-radius: 3px; background: var(--lt-info-500, #3b82f6);"></span>
                                     <span style="font-size: 0.8125rem; font-weight: 600; color: var(--p-surface-800);">Ocean Blue</span>
                                 </div>
                                 <span style="font-size: 0.6875rem; color: var(--p-surface-400);">Radius 0.5</span>
@@ -297,7 +297,7 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
                 class="studio-color-swatch ${key === currentPrimary ? 'active' : ''}" 
                 data-color="${key}" 
                 title="${p.name}" 
-                style="width: 100%; aspect-ratio: 1; border-radius: var(--p-border-radius, 6px); background: ${p.hex}; border: ${key === currentPrimary ? '2px solid #ffffff' : '1px solid rgba(0,0,0,0.1)'}; box-shadow: ${key === currentPrimary ? '0 0 0 2px var(--p-surface-900)' : 'none'}; cursor: pointer; transition: transform 0.15s ease;">
+                style="width: 100%; aspect-ratio: 1; border-radius: var(--p-border-radius, 6px); background: ${p.hex}; border: ${key === currentPrimary ? '2px solid var(--lt-surface-0, #ffffff)' : '1px solid rgba(0,0,0,0.1)'}; box-shadow: ${key === currentPrimary ? '0 0 0 2px var(--p-surface-900)' : 'none'}; cursor: pointer; transition: transform 0.15s ease;">
         </button>
     `).join('');
 
@@ -322,7 +322,7 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
             primaryName = p.name;
         }
 
-        const contrast = checkWcagCompliance(currentRamp['500'] || '#10b981', '#ffffff');
+        const contrast = checkWcagCompliance(currentRamp['500'] || 'var(--lt-primary-500, #10b981)', 'var(--lt-surface-0, #ffffff)');
         if (primaryLabel) {
             primaryLabel.textContent = `${primaryName} • ${contrast.formattedRatio} (${contrast.grade})`;
         }
@@ -331,8 +331,8 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
             updateToken(`--lt-primary-${shade}`, hex);
             updateToken(`--p-primary-${shade}`, hex);
         }
-        updateToken('--lt-primary-color', currentRamp['500'] || '#10b981');
-        updateToken('--p-primary-color', currentRamp['500'] || '#10b981');
+        updateToken('--lt-primary-color', currentRamp['500'] || 'var(--lt-primary-500, #10b981)');
+        updateToken('--p-primary-color', currentRamp['500'] || 'var(--lt-primary-500, #10b981)');
 
         const n = NEUTRAL_PRESETS[currentNeutral] || NEUTRAL_PRESETS.slate;
         updateToken('--lt-surface-0', n.s0);
