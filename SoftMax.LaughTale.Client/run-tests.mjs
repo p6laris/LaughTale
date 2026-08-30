@@ -3,18 +3,32 @@ import { spawnSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 
-// 1. Dynamically discover all test suites
-const testDir = 'tests';
-const testFiles = fs.readdirSync(testDir).filter(f => f.endsWith('.test.ts'));
+// 1. Dynamically discover all test suites recursively
+function findTestFiles(dir) {
+    let results = [];
+    const list = fs.readdirSync(dir, { withFileTypes: true });
+    for (const file of list) {
+        const fullPath = path.join(dir, file.name);
+        if (file.isDirectory()) {
+            results = results.concat(findTestFiles(fullPath));
+        } else if (file.name.endsWith('.test.ts')) {
+            results.push(fullPath);
+        }
+    }
+    return results;
+}
 
-console.log(`📦 Discovered ${testFiles.length} test suites in ${testDir}/...`);
+const testFiles = findTestFiles('tests');
+
+console.log(`📦 Discovered ${testFiles.length} test suites in tests/...`);
 console.log('📦 Bundling test suites with esbuild...');
 
 try {
     esbuild.buildSync({
-        entryPoints: testFiles.map(f => path.join(testDir, f)),
+        entryPoints: testFiles,
         bundle: true,
         outdir: 'dist/tests',
+        outbase: 'tests',
         platform: 'node',
         format: 'esm',
         target: 'node20',
@@ -26,7 +40,7 @@ try {
 }
 
 console.log('🚀 Running Node.js Native Test Runner...');
-const distTestFiles = testFiles.map(f => path.join('dist', 'tests', f.replace(/\.ts$/, '.js')));
+const distTestFiles = testFiles.map(f => path.join('dist', f.replace(/\.ts$/, '.js')));
 const result = spawnSync('node', ['--test', ...distTestFiles], {
     stdio: 'inherit',
     shell: true

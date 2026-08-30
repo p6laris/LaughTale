@@ -429,7 +429,7 @@ Standardize events on `laughtale:<component>:<event>` (`bubbles: true`, `detail`
 ## 7. LT-5xx — Component design system (P2)
 
 ### `LT-501` — Extract a primitive layer
-**Severity:** P2 · **Status:** todo
+**Severity:** P2 · **Status:** done
 
 **Evidence.** `sidebar.ts` is 1,891 lines; `datatable.ts` 1,463; `treetable.ts` 1,372. The `composables/` directory already contains exactly the right primitives (`useFloatingPosition`, `useFocusTrap`, `useVirtualizer`, `useKeyboardNav`, `useScrollLock`) but the large components predate them and reimplement positioning, focus trapping, and keyboard navigation inline.
 

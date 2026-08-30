@@ -16,6 +16,7 @@ export * from './useDebounce';
 export * from './useClipboard';
 export * from './useKeyboardNav';
 export * from './useEventListener';
+export * from './useDataSource';
 
 // Animation Composables
 export * from './animation/useSpring';
