@@ -696,9 +696,9 @@ no leaks, no full navigation.
 P0  Unblock ............................ 2 d   ← start here, unambiguous
 P1  Contracts + harnesses + 6 refs ..... 3 wk  ← everything downstream depends on this
 P2  Codegen & de-bloat ................. 2 wk  ← pays for itself inside P3
-P3  The migration pass (70) ............ 4 wk  ← the bulk; codemod-driven
+P3  The migration pass (70) ............ 3 wk  ← the bulk; codemod-driven
 P4  Theme Studio, for real ............. 2.5 wk ← the headline feature finally works
-────────────────────────────────────────────── 12 wk: framework stops misbehaving
+────────────────────────────────────────────── 11 wk: framework stops misbehaving
 P5  Forms / antiforgery / i18n ......... 2.5 wk
 P6  Honest build & CI .................. 1 wk  ← pull earlier if any parallel capacity
 P7  Adapters ........................... 1.5 wk
@@ -707,7 +707,8 @@ P9  Performance ........................ 1.5 wk
 P10 Type boundary & AOT ................ 1.5 wk
 P11 Templates & release ................ 2 wk
 P12 Server-driven refresh .............. 1.5 wk
-────────────────────────────────────────────── ~25 wk to 1.0
+────────────────────────────────────────────── ~24 wk to 1.0
+    (+4 wk only if LT-1408 decides headless is genuinely needed)
 ```
 
 **If capacity allows only one thing in parallel, make it P6 (CI).** Every other phase's exit
