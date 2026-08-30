@@ -3,7 +3,20 @@
  * Ultra-lightweight Islands Architecture hydration & lifecycle engine.
  */
 
-export { defineIsland, getIslandDefinition, hasIsland, type IslandDefinition } from './runtime/registry';
+export {
+    defineIsland,
+    getIslandDefinition,
+    hasIsland,
+    getIslandLoader,
+    resolveIslandName,
+    listIslands,
+    LEGACY_ALIASES,
+    type IslandModule,
+    type IslandFactory,
+    type IslandTeardown,
+    type IslandLoader,
+    type IslandDefinition
+} from './runtime/registry';
 export { hydrateIsland, initIslands, retryIsland, getIslandState, type HydrateStrategy, type HydrationState } from './runtime/hydrator';
 export { enableViewTransitions, navigateTo } from './runtime/router';
 export { getSlot, extractSlotContent, hasSlot } from './runtime/slots';
