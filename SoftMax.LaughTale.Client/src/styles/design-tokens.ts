@@ -385,4 +385,5 @@ export function getToken(name: string): string {
 }
 
 export { generatePaletteRamp, hexToOklch, oklchToHex, type OklchColor, type RgbColor } from './palette-generator';
+export { saveTheme, loadSavedTheme, applySavedTheme, generateThemeExports, type SavedThemeConfig, THEME_STORAGE_KEY } from './theme-persistence';
 

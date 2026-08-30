@@ -7,7 +7,7 @@ import { LucideIcons } from '../icons/lucide';
 import { useDisclosure } from '../composables/useDisclosure';
 import { useScrollLock } from '../composables/useScrollLock';
 import { useClipboard } from '../composables/useClipboard';
-import { AURA_PALETTES, generatePaletteRamp, updateToken } from '../styles/design-tokens';
+import { AURA_PALETTES, generatePaletteRamp, updateToken, saveTheme, loadSavedTheme, generateThemeExports } from '../styles/design-tokens';
 
 export interface ThemeStudioProps {
     defaultOpen?: boolean;
@@ -412,6 +412,13 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
             root.classList.toggle('dark', isSysDark);
             root.setAttribute('data-theme', isSysDark ? 'dark' : 'light');
         }
+
+        saveTheme({
+            primary: currentCustomHex || currentPrimary,
+            neutral: currentNeutral,
+            radius: currentRadius,
+            darkMode: currentThemeMode === 'dark'
+        });
     }
 
     function open() {
@@ -616,32 +623,14 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
     }
 
     copyCssBtn.addEventListener('click', () => {
-        const p = PRIMARY_PRESETS[currentPrimary] || PRIMARY_PRESETS.emerald;
-        const n = NEUTRAL_PRESETS[currentNeutral] || NEUTRAL_PRESETS.slate;
-        const primaryVal = currentCustomHex || p.hex;
+        const exports = generateThemeExports({
+            primary: currentCustomHex || currentPrimary,
+            neutral: currentNeutral,
+            radius: currentRadius,
+            darkMode: currentThemeMode === 'dark'
+        });
 
-        const cssSnippet = `
-:root {
-    --p-primary-color: ${primaryVal};
-    --p-primary-50: ${p.lightP50};
-    --p-primary-500: ${p.lightP500};
-    --p-primary-600: ${p.lightP600};
-    --p-primary-700: ${p.lightP700};
-    --p-surface-0: ${n.s0};
-    --p-surface-50: ${n.s50};
-    --p-surface-900: ${n.s900};
-    --p-border-radius: ${currentRadius};
-    --p-content-padding: ${currentDensity === 'compact' ? '0.625rem' : currentDensity === 'spacious' ? '1.5rem' : '1rem'};
-}
-
-[data-theme="dark"], .dark {
-    --p-primary-50: ${p.darkP50};
-    --p-surface-0: ${n.s900};
-    --p-surface-50: ${n.s950};
-    --p-surface-900: ${n.s50};
-}`.trim();
-
-        clipboard.copy(cssSnippet);
+        clipboard.copy(exports.css);
         copyCssBtn.innerHTML = `${LucideIcons.check} Copied to Clipboard!`;
         setTimeout(() => {
             copyCssBtn.innerHTML = `${LucideIcons.copy} Copy CSS Custom Properties`;
@@ -649,21 +638,14 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
     });
 
     copyCSharpBtn.addEventListener('click', () => {
-        const p = PRIMARY_PRESETS[currentPrimary] || PRIMARY_PRESETS.emerald;
-        const primaryHex = currentCustomHex || p.hex;
-        const primaryName = currentCustomHex ? 'Custom' : p.name;
+        const exports = generateThemeExports({
+            primary: currentCustomHex || currentPrimary,
+            neutral: currentNeutral,
+            radius: currentRadius,
+            darkMode: currentThemeMode === 'dark'
+        });
 
-        const csharpSnippet = `
-public static class AppTheme
-{
-    public const string PrimaryHex = "${primaryHex}";
-    public const string PrimaryName = "${primaryName}";
-    public const string NeutralBase = "${currentNeutral}";
-    public const string BorderRadius = "${currentRadius}";
-    public const string Density = "${currentDensity}";
-}`.trim();
-
-        clipboard.copy(csharpSnippet);
+        clipboard.copy(exports.csharp);
         copyCSharpBtn.innerHTML = `${LucideIcons.check} Copied C# Code!`;
         setTimeout(() => {
             copyCSharpBtn.innerHTML = `${LucideIcons.code} Copy C# Theme Tokens`;
@@ -675,6 +657,20 @@ public static class AppTheme
         open();
         copyCssBtn.click();
     });
+
+    const saved = loadSavedTheme();
+    if (saved) {
+        if (saved.primary && saved.primary.startsWith('#')) {
+            currentCustomHex = saved.primary;
+        } else if (saved.primary) {
+            currentPrimary = saved.primary;
+        }
+        if (saved.neutral) currentNeutral = saved.neutral;
+        if (saved.radius) currentRadius = saved.radius;
+        if (typeof saved.darkMode === 'boolean') {
+            currentThemeMode = saved.darkMode ? 'dark' : 'light';
+        }
+    }
 
     applyTheme();
 }

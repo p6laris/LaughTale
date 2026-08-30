@@ -500,7 +500,8 @@ Standardize events on `laughtale:<component>:<event>` (`bubbles: true`, `detail`
 ---
 
 ### `LT-603` — Studio changes do not persist and there is no server-side theme
-**Severity:** P1 · **Status:** todo
+**Severity:** P1 · **Status:** done
+
 
 **Evidence.** `grep localStorage src/components/theme-studio.ts` → **no matches**. A theme is lost on reload. And since tokens are applied by JS to `documentElement` after hydration, the first paint always uses defaults — a **flash of default theme** on every cold load, which is precisely the "sub-20 ms first paint" promise undermined.
 
