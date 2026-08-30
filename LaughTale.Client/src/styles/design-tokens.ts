@@ -1,4 +1,4 @@
-﻿/**
+/**
  * LaughTale: Canonical Design Token Contract (LT-601)
  * Single source of truth for dynamic CSS custom properties across light/dark themes.
  */
@@ -188,23 +188,73 @@ export function initDesignTokens(): void {
   --lt-border-subtle: var(--lt-surface-100);
   --lt-border-default: var(--lt-surface-200);
   --lt-border-strong: var(--lt-surface-300);
+  --p-border-color: var(--lt-border-default);
+
+  /* Status palettes */
+  --lt-info-50: #eff6ff;
+  --lt-info-100: #dbeafe;
+  --lt-info-200: #bfdbfe;
+  --lt-info-300: #93c5fd;
+  --lt-info-400: #60a5fa;
+  --lt-info-500: #3b82f6;
+  --lt-info-600: #2563eb;
+  --lt-info-700: #1d4ed8;
+  --lt-info-800: #1e40af;
+  --lt-info-900: #1e3a8a;
+  --lt-info-950: #172554;
+
+  --lt-success-50: #ecfdf5;
+  --lt-success-100: #d1fae5;
+  --lt-success-200: #a7f3d0;
+  --lt-success-300: #6ee7b7;
+  --lt-success-400: #34d399;
+  --lt-success-500: #10b981;
+  --lt-success-600: #059669;
+  --lt-success-700: #047857;
+  --lt-success-800: #065f46;
+  --lt-success-900: #064e3b;
+  --lt-success-950: #022c22;
+
+  --lt-warn-50: #fffbeb;
+  --lt-warn-100: #fef3c7;
+  --lt-warn-200: #fde68a;
+  --lt-warn-300: #fcd34d;
+  --lt-warn-400: #fbbf24;
+  --lt-warn-500: #f59e0b;
+  --lt-warn-600: #d97706;
+  --lt-warn-700: #b45309;
+  --lt-warn-800: #92400e;
+  --lt-warn-900: #78350f;
+  --lt-warn-950: #451a03;
+
+  --lt-danger-50: #fef2f2;
+  --lt-danger-100: #fee2e2;
+  --lt-danger-200: #fecaca;
+  --lt-danger-300: #fca5a5;
+  --lt-danger-400: #f87171;
+  --lt-danger-500: #ef4444;
+  --lt-danger-600: #dc2626;
+  --lt-danger-700: #b91c1c;
+  --lt-danger-800: #991b1b;
+  --lt-danger-900: #7f1d1d;
+  --lt-danger-950: #450a0a;
 
   /* Semantic tokens */
-  --lt-success-bg: #ecfdf5;
-  --lt-success-fg: #059669;
-  --lt-success-border: #a7f3d0;
+  --lt-success-bg: var(--lt-success-50);
+  --lt-success-fg: var(--lt-success-600);
+  --lt-success-border: var(--lt-success-200);
 
-  --lt-warning-bg: #fffbeb;
-  --lt-warning-fg: #d97706;
-  --lt-warning-border: #fde68a;
+  --lt-warning-bg: var(--lt-warn-50);
+  --lt-warning-fg: var(--lt-warn-600);
+  --lt-warning-border: var(--lt-warn-200);
 
-  --lt-danger-bg: #fef2f2;
-  --lt-danger-fg: #dc2626;
-  --lt-danger-border: #fecaca;
+  --lt-danger-bg: var(--lt-danger-50);
+  --lt-danger-fg: var(--lt-danger-600);
+  --lt-danger-border: var(--lt-danger-200);
 
-  --lt-info-bg: #eff6ff;
-  --lt-info-fg: #2563eb;
-  --lt-info-border: #bfdbfe;
+  --lt-info-bg: var(--lt-info-50);
+  --lt-info-fg: var(--lt-info-600);
+  --lt-info-border: var(--lt-info-200);
 
   /* Component tokens */
   --lt-content-bg: var(--lt-surface-0);
@@ -217,6 +267,7 @@ export function initDesignTokens(): void {
   --p-content-padding: var(--lt-content-padding);
 
   /* Border radius */
+  --lt-radius: 0.5rem;
   --lt-radius-none: 0px;
   --lt-radius-sm: 0.375rem;
   --lt-radius-md: 0.5rem;

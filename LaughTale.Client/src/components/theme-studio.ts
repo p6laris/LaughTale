@@ -367,64 +367,101 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
 
         const root = typeof document !== 'undefined' ? document.documentElement : null;
         if (root) {
+            root.style.setProperty('--lt-radius', currentRadius);
+            root.style.setProperty('--lt-radius-md', currentRadius);
             root.style.setProperty('--p-border-radius', currentRadius);
-        const radNum = parseFloat(currentRadius) || 0;
-        root.style.setProperty('--p-border-radius-lg', currentRadius === '9999px' ? '9999px' : `${radNum * 1.5}rem`);
-        root.style.setProperty('--p-border-radius-xl', currentRadius === '9999px' ? '9999px' : `${radNum * 2}rem`);
-        if (radiusLabel) radiusLabel.textContent = currentRadius;
+            const radNum = parseFloat(currentRadius) || 0;
+            const lgVal = currentRadius === '9999px' ? '9999px' : `${radNum * 1.5}rem`;
+            const xlVal = currentRadius === '9999px' ? '9999px' : `${radNum * 2}rem`;
+            root.style.setProperty('--lt-radius-lg', lgVal);
+            root.style.setProperty('--lt-radius-xl', xlVal);
+            root.style.setProperty('--p-border-radius-lg', lgVal);
+            root.style.setProperty('--p-border-radius-xl', xlVal);
+            if (radiusLabel) radiusLabel.textContent = currentRadius;
 
-        if (currentDensity === 'compact') {
-            root.style.setProperty('--p-content-padding', '0.625rem');
-            root.style.setProperty('--p-field-padding-y', '0.35rem');
-            root.style.setProperty('--p-field-padding-x', '0.5rem');
-        } else if (currentDensity === 'spacious') {
-            root.style.setProperty('--p-content-padding', '1.5rem');
-            root.style.setProperty('--p-field-padding-y', '0.65rem');
-            root.style.setProperty('--p-field-padding-x', '1rem');
-        } else {
-            root.style.setProperty('--p-content-padding', '1rem');
-            root.style.setProperty('--p-field-padding-y', '0.5rem');
-            root.style.setProperty('--p-field-padding-x', '0.75rem');
-        }
+            if (currentDensity === 'compact') {
+                root.style.setProperty('--lt-content-padding', '0.625rem');
+                root.style.setProperty('--lt-field-padding-y', '0.35rem');
+                root.style.setProperty('--lt-field-padding-x', '0.5rem');
+                root.style.setProperty('--p-content-padding', '0.625rem');
+                root.style.setProperty('--p-field-padding-y', '0.35rem');
+                root.style.setProperty('--p-field-padding-x', '0.5rem');
+            } else if (currentDensity === 'spacious') {
+                root.style.setProperty('--lt-content-padding', '1.5rem');
+                root.style.setProperty('--lt-field-padding-y', '0.65rem');
+                root.style.setProperty('--lt-field-padding-x', '1rem');
+                root.style.setProperty('--p-content-padding', '1.5rem');
+                root.style.setProperty('--p-field-padding-y', '0.65rem');
+                root.style.setProperty('--p-field-padding-x', '1rem');
+            } else {
+                root.style.setProperty('--lt-content-padding', '1rem');
+                root.style.setProperty('--lt-field-padding-y', '0.5rem');
+                root.style.setProperty('--lt-field-padding-x', '0.75rem');
+                root.style.setProperty('--p-content-padding', '1rem');
+                root.style.setProperty('--p-field-padding-y', '0.5rem');
+                root.style.setProperty('--p-field-padding-x', '0.75rem');
+            }
 
-        if (currentShadow === 'none') {
-            root.style.setProperty('--p-shadow-sm', 'none');
-            root.style.setProperty('--p-shadow-md', 'none');
-            root.style.setProperty('--p-shadow-lg', 'none');
-        } else if (currentShadow === 'subtle') {
-            root.style.setProperty('--p-shadow-sm', '0 1px 2px rgba(0,0,0,0.03)');
-            root.style.setProperty('--p-shadow-md', '0 2px 4px rgba(0,0,0,0.05)');
-            root.style.setProperty('--p-shadow-lg', '0 4px 8px rgba(0,0,0,0.06)');
-        } else if (currentShadow === 'bold') {
-            root.style.setProperty('--p-shadow-sm', '0 2px 4px rgba(0,0,0,0.1)');
-            root.style.setProperty('--p-shadow-md', '0 8px 16px rgba(0,0,0,0.15)');
-            root.style.setProperty('--p-shadow-lg', '0 16px 32px rgba(0,0,0,0.2)');
-        } else {
-            root.style.setProperty('--p-shadow-sm', '0 1px 2px 0 rgba(0, 0, 0, 0.05)');
-            root.style.setProperty('--p-shadow-md', '0 4px 6px -1px rgba(0, 0, 0, 0.07)');
-            root.style.setProperty('--p-shadow-lg', '0 10px 15px -3px rgba(0, 0, 0, 0.08)');
-        }
+            if (currentShadow === 'none') {
+                root.style.setProperty('--lt-shadow-sm', 'none');
+                root.style.setProperty('--lt-shadow-md', 'none');
+                root.style.setProperty('--lt-shadow-lg', 'none');
+                root.style.setProperty('--p-shadow-sm', 'none');
+                root.style.setProperty('--p-shadow-md', 'none');
+                root.style.setProperty('--p-shadow-lg', 'none');
+            } else if (currentShadow === 'subtle') {
+                const s1 = '0 1px 2px rgba(0,0,0,0.03)';
+                const s2 = '0 2px 4px rgba(0,0,0,0.05)';
+                const s3 = '0 4px 8px rgba(0,0,0,0.06)';
+                root.style.setProperty('--lt-shadow-sm', s1);
+                root.style.setProperty('--lt-shadow-md', s2);
+                root.style.setProperty('--lt-shadow-lg', s3);
+                root.style.setProperty('--p-shadow-sm', s1);
+                root.style.setProperty('--p-shadow-md', s2);
+                root.style.setProperty('--p-shadow-lg', s3);
+            } else if (currentShadow === 'bold') {
+                const s1 = '0 2px 4px rgba(0,0,0,0.1)';
+                const s2 = '0 8px 16px rgba(0,0,0,0.15)';
+                const s3 = '0 16px 32px rgba(0,0,0,0.2)';
+                root.style.setProperty('--lt-shadow-sm', s1);
+                root.style.setProperty('--lt-shadow-md', s2);
+                root.style.setProperty('--lt-shadow-lg', s3);
+                root.style.setProperty('--p-shadow-sm', s1);
+                root.style.setProperty('--p-shadow-md', s2);
+                root.style.setProperty('--p-shadow-lg', s3);
+            } else {
+                const s1 = '0 1px 2px 0 rgba(0, 0, 0, 0.05)';
+                const s2 = '0 4px 6px -1px rgba(0, 0, 0, 0.07)';
+                const s3 = '0 10px 15px -3px rgba(0, 0, 0, 0.08)';
+                root.style.setProperty('--lt-shadow-sm', s1);
+                root.style.setProperty('--lt-shadow-md', s2);
+                root.style.setProperty('--lt-shadow-lg', s3);
+                root.style.setProperty('--p-shadow-sm', s1);
+                root.style.setProperty('--p-shadow-md', s2);
+                root.style.setProperty('--p-shadow-lg', s3);
+            }
 
-        if (currentFont === 'inter') {
-            root.style.setProperty('--p-font-family', 'Inter, -apple-system, sans-serif');
-        } else if (currentFont === 'mono') {
-            root.style.setProperty('--p-font-family', 'JetBrains Mono, monospace');
-        } else {
-            root.style.setProperty('--p-font-family', 'Plus Jakarta Sans, sans-serif');
-        }
+            let fontVal = 'Plus Jakarta Sans, sans-serif';
+            if (currentFont === 'inter') {
+                fontVal = 'Inter, -apple-system, sans-serif';
+            } else if (currentFont === 'mono') {
+                fontVal = 'JetBrains Mono, monospace';
+            }
+            root.style.setProperty('--lt-font-family', fontVal);
+            root.style.setProperty('--p-font-family', fontVal);
 
-        if (currentThemeMode === 'dark') {
-            root.classList.add('dark');
-            root.setAttribute('data-theme', 'dark');
-        } else if (currentThemeMode === 'light') {
-            root.classList.remove('dark');
-            root.setAttribute('data-theme', 'light');
-        } else {
-            const isSysDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            root.classList.toggle('dark', isSysDark);
-            root.setAttribute('data-theme', isSysDark ? 'dark' : 'light');
+            if (currentThemeMode === 'dark') {
+                root.classList.add('dark');
+                root.setAttribute('data-theme', 'dark');
+            } else if (currentThemeMode === 'light') {
+                root.classList.remove('dark');
+                root.setAttribute('data-theme', 'light');
+            } else {
+                const isSysDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                root.classList.toggle('dark', isSysDark);
+                root.setAttribute('data-theme', isSysDark ? 'dark' : 'light');
+            }
         }
-    }
 
         saveTheme({
             primary: currentCustomHex || currentPrimary,

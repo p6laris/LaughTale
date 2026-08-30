@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    Aura Docs Theme for LaughTale.Docs
    ========================================================================== */
 
@@ -7,62 +7,185 @@
 :root {
     --p-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --p-font-mono: 'JetBrains Mono', monospace;
+    --lt-font-family: var(--p-font-family);
 
-    /* Aura Neutral Palette */
-    --p-surface-0: #ffffff;
-    --p-surface-50: #f8fafc;
-    --p-surface-100: #f1f5f9;
-    --p-surface-200: #e2e8f0;
-    --p-surface-300: #cbd5e1;
-    --p-surface-400: #94a3b8;
-    --p-surface-500: #64748b;
-    --p-surface-600: #475569;
-    --p-surface-700: #334155;
-    --p-surface-800: #1e293b;
-    --p-surface-900: #0f172a;
-    --p-surface-950: #020617;
+    /* Neutral Surface Tokens */
+    --lt-surface-0: #ffffff;
+    --lt-surface-50: #f8fafc;
+    --lt-surface-100: #f1f5f9;
+    --lt-surface-200: #e2e8f0;
+    --lt-surface-300: #cbd5e1;
+    --lt-surface-400: #94a3b8;
+    --lt-surface-500: #64748b;
+    --lt-surface-600: #475569;
+    --lt-surface-700: #334155;
+    --lt-surface-800: #1e293b;
+    --lt-surface-900: #0f172a;
+    --lt-surface-950: #020617;
 
-    /* Aura Emerald Primary */
-    --p-primary-50: #ecfdf5;
-    --p-primary-100: #d1fae5;
-    --p-primary-200: #a7f3d0;
-    --p-primary-500: #10b981;
-    --p-primary-600: #059669;
-    --p-primary-700: #047857;
+    --p-surface-0: var(--lt-surface-0);
+    --p-surface-50: var(--lt-surface-50);
+    --p-surface-100: var(--lt-surface-100);
+    --p-surface-200: var(--lt-surface-200);
+    --p-surface-300: var(--lt-surface-300);
+    --p-surface-400: var(--lt-surface-400);
+    --p-surface-500: var(--lt-surface-500);
+    --p-surface-600: var(--lt-surface-600);
+    --p-surface-700: var(--lt-surface-700);
+    --p-surface-800: var(--lt-surface-800);
+    --p-surface-900: var(--lt-surface-900);
+    --p-surface-950: var(--lt-surface-950);
 
-    --p-text-color: var(--p-surface-900);
-    --p-text-muted: var(--p-surface-500);
-    --p-border-color: var(--p-surface-200);
-    --p-border-radius: 0.5rem;
-    --p-border-radius-lg: 0.75rem;
-    --p-border-radius-xl: 1rem;
-    --p-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --p-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07);
-    --p-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+    /* Primary Tokens */
+    --lt-primary-50: #ecfdf5;
+    --lt-primary-100: #d1fae5;
+    --lt-primary-200: #a7f3d0;
+    --lt-primary-300: #6ee7b7;
+    --lt-primary-400: #34d399;
+    --lt-primary-500: #10b981;
+    --lt-primary-600: #059669;
+    --lt-primary-700: #047857;
+    --lt-primary-800: #065f46;
+    --lt-primary-900: #064e3b;
+    --lt-primary-950: #022c22;
+    --lt-primary-color: var(--lt-primary-500);
+
+    --p-primary-50: var(--lt-primary-50);
+    --p-primary-100: var(--lt-primary-100);
+    --p-primary-200: var(--lt-primary-200);
+    --p-primary-300: var(--lt-primary-300);
+    --p-primary-400: var(--lt-primary-400);
+    --p-primary-500: var(--lt-primary-500);
+    --p-primary-600: var(--lt-primary-600);
+    --p-primary-700: var(--lt-primary-700);
+    --p-primary-800: var(--lt-primary-800);
+    --p-primary-900: var(--lt-primary-900);
+    --p-primary-950: var(--lt-primary-950);
+    --p-primary-color: var(--lt-primary-color);
+
+    /* Status Palettes */
+    --lt-info-50: #eff6ff;
+    --lt-info-100: #dbeafe;
+    --lt-info-200: #bfdbfe;
+    --lt-info-300: #93c5fd;
+    --lt-info-400: #60a5fa;
+    --lt-info-500: #3b82f6;
+    --lt-info-600: #2563eb;
+    --lt-info-700: #1d4ed8;
+    --lt-info-800: #1e40af;
+    --lt-info-900: #1e3a8a;
+    --lt-info-950: #172554;
+
+    --lt-success-50: #ecfdf5;
+    --lt-success-100: #d1fae5;
+    --lt-success-200: #a7f3d0;
+    --lt-success-300: #6ee7b7;
+    --lt-success-400: #34d399;
+    --lt-success-500: #10b981;
+    --lt-success-600: #059669;
+    --lt-success-700: #047857;
+    --lt-success-800: #065f46;
+    --lt-success-900: #064e3b;
+    --lt-success-950: #022c22;
+
+    --lt-warn-50: #fffbeb;
+    --lt-warn-100: #fef3c7;
+    --lt-warn-200: #fde68a;
+    --lt-warn-300: #fcd34d;
+    --lt-warn-400: #fbbf24;
+    --lt-warn-500: #f59e0b;
+    --lt-warn-600: #d97706;
+    --lt-warn-700: #b45309;
+    --lt-warn-800: #92400e;
+    --lt-warn-900: #78350f;
+    --lt-warn-950: #451a03;
+
+    --lt-danger-50: #fef2f2;
+    --lt-danger-100: #fee2e2;
+    --lt-danger-200: #fecaca;
+    --lt-danger-300: #fca5a5;
+    --lt-danger-400: #f87171;
+    --lt-danger-500: #ef4444;
+    --lt-danger-600: #dc2626;
+    --lt-danger-700: #b91c1c;
+    --lt-danger-800: #991b1b;
+    --lt-danger-900: #7f1d1d;
+    --lt-danger-950: #450a0a;
+
+    --lt-text-primary: var(--lt-surface-900);
+    --lt-text-secondary: var(--lt-surface-600);
+    --lt-text-muted: var(--lt-surface-500);
+    --lt-text-inverse: var(--lt-surface-0);
+    --lt-border-default: var(--lt-surface-200);
+    --lt-border-subtle: var(--lt-surface-100);
+    --lt-border-strong: var(--lt-surface-300);
+
+    --p-text-color: var(--lt-text-primary);
+    --p-text-muted: var(--lt-text-muted);
+    --p-border-color: var(--lt-border-default);
+
+    --lt-radius: 0.5rem;
+    --lt-radius-sm: 0.375rem;
+    --lt-radius-md: 0.5rem;
+    --lt-radius-lg: 0.75rem;
+    --lt-radius-xl: 1rem;
+    --lt-radius-full: 9999px;
+    --p-border-radius: var(--lt-radius-md);
+    --p-border-radius-lg: var(--lt-radius-lg);
+    --p-border-radius-xl: var(--lt-radius-xl);
+
+    --lt-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --lt-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07);
+    --lt-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+    --p-shadow-sm: var(--lt-shadow-sm);
+    --p-shadow-md: var(--lt-shadow-md);
+    --p-shadow-lg: var(--lt-shadow-lg);
+
+    --lt-content-bg: var(--lt-surface-0);
+    --lt-content-border: var(--lt-border-default);
+    --lt-content-hover-bg: var(--lt-surface-50);
+    --lt-content-padding: 1rem;
+    --p-content-bg: var(--lt-content-bg);
+    --p-content-border: var(--lt-content-border);
+    --p-content-hover-bg: var(--lt-content-hover-bg);
+    --p-content-padding: var(--lt-content-padding);
 }
 
 /* Dark Mode Tokens */
-:root.dark, html.dark body {
-    --p-surface-0: #090d16;
-    --p-surface-50: #0f172a;
-    --p-surface-100: #1e293b;
-    --p-surface-200: #334155;
-    --p-surface-300: #475569;
-    --p-surface-400: #64748b;
-    --p-surface-500: #94a3b8;
-    --p-surface-600: #cbd5e1;
-    --p-surface-700: #e2e8f0;
-    --p-surface-800: #f1f5f9;
-    --p-surface-900: #f8fafc;
-    --p-surface-950: #ffffff;
+:root.dark, html.dark body, [data-theme="dark"] {
+    --lt-surface-0: #090d16;
+    --lt-surface-50: #0f172a;
+    --lt-surface-100: #1e293b;
+    --lt-surface-200: #334155;
+    --lt-surface-300: #475569;
+    --lt-surface-400: #64748b;
+    --lt-surface-500: #94a3b8;
+    --lt-surface-600: #cbd5e1;
+    --lt-surface-700: #e2e8f0;
+    --lt-surface-800: #f1f5f9;
+    --lt-surface-900: #f8fafc;
+    --lt-surface-950: #ffffff;
 
-    --p-primary-50: #064e3b;
-    --p-primary-100: #065f46;
-    --p-primary-200: #047857;
+    --p-surface-0: var(--lt-surface-0);
+    --p-surface-50: var(--lt-surface-50);
+    --p-surface-100: var(--lt-surface-100);
+    --p-surface-200: var(--lt-surface-200);
+    --p-surface-300: var(--lt-surface-300);
+    --p-surface-400: var(--lt-surface-400);
+    --p-surface-500: var(--lt-surface-500);
+    --p-surface-600: var(--lt-surface-600);
+    --p-surface-700: var(--lt-surface-700);
+    --p-surface-800: var(--lt-surface-800);
+    --p-surface-900: var(--lt-surface-900);
+    --p-surface-950: var(--lt-surface-950);
 
-    --p-border-color: #1e293b;
-    --p-text-color: #f8fafc;
-    --p-text-muted: #94a3b8;
+    --lt-text-primary: var(--lt-surface-900);
+    --lt-text-secondary: var(--lt-surface-600);
+    --lt-text-muted: var(--lt-surface-400);
+    --lt-border-default: var(--lt-surface-200);
+    --p-text-color: var(--lt-text-primary);
+    --p-text-muted: var(--lt-text-muted);
+    --p-border-color: var(--lt-border-default);
     background-color: var(--p-surface-0);
     color: var(--p-text-color);
 }

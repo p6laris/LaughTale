@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <!-- Auto-bundle TypeScript islands before build -->
-  <Target Name="BuildIslandsJs" BeforeTargets="BeforeBuild" Condition="'$(DesignTimeBuild)' != 'true'">
+  <Target Name="BuildIslandsJs" BeforeTargets="AssignTargetPaths;ResolveStaticWebAssetsInputs;BeforeBuild" Condition="'$(DesignTimeBuild)' != 'true'">
     <Exec Command="npm run build" WorkingDirectory="$(ProjectDir)" Condition="Exists('$(ProjectDir)package.json')" />
   </Target>
 

@@ -10,6 +10,7 @@ import { importWithRetry } from './retry';
 import { awaitStreamingReady } from './streaming';
 import { renderErrorBoundary } from './error-boundary';
 import { refreshIsland } from './refresh';
+import { initDesignTokens } from '../styles/design-tokens';
 
 export type HydrateStrategy = 'load' | 'idle' | 'visible' | 'media' | 'interaction' | 'never';
 export type HydrationState = 'idle' | 'pending' | 'mounted' | 'failed';
@@ -343,6 +344,7 @@ export async function rehydrateIsland(container: HTMLElement): Promise<void> {
 }
 
 export function initIslands(root: ParentNode = document): void {
+    initDesignTokens();
     const islands = root.querySelectorAll<HTMLElement>('[data-island], island, [hydrate], [data-hydrate]');
     islands.forEach(hydrateIsland);
 }
