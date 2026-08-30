@@ -144,15 +144,29 @@ async function executeHydration(container: HTMLElement, name: string): Promise<v
             throw new Error(`Island '${name}' module does not export a mount function.`);
         }
 
-        // 4. Mount island and register unmount hook
-        const unmount = mount(container, props);
-        if (typeof unmount === 'function') {
-            container.addEventListener('laughtale:unmount', unmount, { once: true });
+        // 4. Attach imperative handle if defined
+        if (typeof module?.createHandle === 'function') {
+            (container as any).island = module.createHandle(container, props);
         }
+
+        // 5. Mount island and register unmount hook
+        const unmount = await mount(container, props);
+        const cleanup = () => {
+            if (typeof unmount === 'function') {
+                try {
+                    unmount();
+                } catch (e) {
+                    console.error(`[SoftMax.LaughTale] Error unmounting island '${name}':`, e);
+                }
+            }
+            delete (container as any).island;
+        };
+
+        container.addEventListener('laughtale:unmount', cleanup, { once: true });
 
         (container as any)[HYDRATION_STATE_KEY] = 'mounted';
 
-        // 5. Dispatch success lifecycle event
+        // 6. Dispatch success lifecycle event
         container.dispatchEvent(new CustomEvent('laughtale:hydrated', {
             bubbles: true,
             composed: true,

@@ -386,7 +386,7 @@ repeated per property, per component. This is the largest maintenance liability 
 ---
 
 ### `LT-403` — No unified island contract
-**Severity:** P2 · **Status:** todo
+**Severity:** P2 · **Status:** done
 
 **Evidence.** `hydrator.ts:69` does `module.default || module` and only checks `typeof mount === 'function'`. There is no shared interface — every component invents its own props shape, its own event names, its own imperative API (or none). Nothing is discoverable, and nothing can be composed generically.
 

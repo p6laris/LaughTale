@@ -2,18 +2,27 @@
  * SoftMax.LaughTale: Island Factory & Loader Registry
  */
 
-export type IslandFactory<TProps = any> = (
+export type IslandTeardown = () => void;
+
+export type IslandFactory<TProps = any, THandle = any> = (
     container: HTMLElement,
     props: TProps
-) => void | (() => void) | Promise<void | (() => void)>;
+) => void | IslandTeardown | Promise<void | IslandTeardown>;
 
-export type IslandLoader<TProps = any> = () => Promise<
-    { default: IslandFactory<TProps> } | IslandFactory<TProps>
+export interface IslandModule<TProps = any, THandle = any> {
+    default: IslandFactory<TProps, THandle>;
+    readonly displayName?: string;
+    readonly propsSchema?: Record<string, any>;
+    readonly createHandle?: (container: HTMLElement, props: TProps) => THandle;
+}
+
+export type IslandLoader<TProps = any, THandle = any> = () => Promise<
+    IslandModule<TProps, THandle> | { default: IslandFactory<TProps, THandle> } | IslandFactory<TProps, THandle>
 >;
 
-export interface IslandDefinition<TProps = any> {
+export interface IslandDefinition<TProps = any, THandle = any> {
     name: string;
-    loader: IslandLoader<TProps>;
+    loader: IslandLoader<TProps, THandle>;
 }
 
 /**
@@ -91,8 +100,11 @@ export function resolveIslandName(name: string): string {
  * @param name The canonical name matching C# [Island("name")]
  * @param loader Async import factory e.g. () => import('./my-island')
  */
-export function defineIsland<TProps = any>(name: string, loader: IslandLoader<TProps>): void {
-    registry.set(name, loader);
+export function defineIsland<TProps = any, THandle = any>(
+    name: string,
+    loader: IslandLoader<TProps, THandle>
+): void {
+    registry.set(name, loader as IslandLoader);
 }
 
 /**
@@ -118,6 +130,13 @@ export function getIslandDefinition(name: string): IslandDefinition | undefined 
     const resolved = resolveIslandName(name);
     const loader = registry.get(resolved);
     return loader ? { name: resolved, loader } : undefined;
+}
+
+/**
+ * Returns a list of all currently registered canonical island names.
+ */
+export function listIslands(): string[] {
+    return Array.from(registry.keys());
 }
 
 /**
