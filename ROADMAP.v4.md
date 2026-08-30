@@ -149,7 +149,7 @@ Studio customization requires exactly four things:
    plus scoped CSS, giving the Studio somewhere to put what was authored, and consumers a
    way to override without forking. **Required.**
 4. **Eject.** A CLI copies a component's source into the consumer's project so they own it
-   outright. This is the actual shadcn property, it is cheap, and it is the escape hatch for
+   outright. This is the direct code ownership property, it is cheap, and it is the escape hatch for
    anything the Studio cannot express. **Required.**
 
 **A full headless split — behavior core entirely separated from presentation, so users can

@@ -20,7 +20,7 @@ npx laughtale list
 
 Outputs all available components, their source files, and supported slot names.
 
-### 2. Eject a Component (shadcn-style)
+### 2. Eject a Component (Direct Code Ownership)
 To take complete ownership of a component's markup, TypeScript logic, and styles:
 
 ```bash

@@ -1,6 +1,6 @@
-﻿---
+---
 title: "Theming, Design Tokens & Customization"
-description: "shadcn-style CSS custom properties, radii scales, elevation tokens, and semantic variants"
+description: "Enterprise CSS custom properties, radii scales, elevation tokens, and semantic variants"
 order: 40
 section: "Composables & Architecture"
 ---

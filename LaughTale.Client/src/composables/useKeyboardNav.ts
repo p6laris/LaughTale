@@ -1,6 +1,6 @@
-﻿/**
+/**
  * LaughTale: Composable useKeyboardNav
- * Radix / shadcn style keyboard arrow navigation for dropdowns, listboxes, menus, and command palettes.
+ * Radix UI style keyboard arrow navigation for dropdowns, listboxes, menus, and command palettes.
  */
 
 export interface UseKeyboardNavOptions {
