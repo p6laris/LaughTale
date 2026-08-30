@@ -35823,37 +35823,54 @@ function parseAndReviveProps(rawJson) {
 }
 
 // src/runtime/retry.ts
-async function importWithRetry(importFnOrUrl, retries = 3, baseDelayMs = 1e3) {
-  if (typeof importFnOrUrl === "function") {
-    for (let attempt = 0; attempt < retries; attempt++) {
+async function importWithRetry(loader, options = 3, legacyBaseDelayMs = 1e3) {
+  const opts = typeof options === "number" ? { retries: options, baseDelayMs: legacyBaseDelayMs, maxDelayMs: 1e4, jitter: true } : {
+    retries: options?.retries ?? 3,
+    baseDelayMs: options?.baseDelayMs ?? 1e3,
+    maxDelayMs: options?.maxDelayMs ?? 1e4,
+    jitter: options?.jitter ?? true
+  };
+  let lastError = null;
+  if (typeof loader === "function") {
+    for (let attempt = 0; attempt < opts.retries; attempt++) {
       try {
-        return await importFnOrUrl();
+        return await loader();
       } catch (err) {
-        if (attempt === retries - 1) throw err;
-        const delay = baseDelayMs * Math.pow(2, attempt);
-        console.warn(`[SoftMax.LaughTale] Island dynamic import failed. Retrying in ${delay}ms (Attempt ${attempt + 1}/${retries})...`, err);
+        lastError = err;
+        if (attempt === opts.retries - 1) {
+          throw err;
+        }
+        const rawDelay = Math.min(opts.maxDelayMs, opts.baseDelayMs * Math.pow(2, attempt));
+        const jitterFactor = opts.jitter ? 0.75 + Math.random() * 0.5 : 1;
+        const delay = Math.round(rawDelay * jitterFactor);
+        console.warn(`[SoftMax.LaughTale] Island dynamic import failed. Retrying in ${delay}ms (Attempt ${attempt + 1}/${opts.retries})...`, err);
         await new Promise((resolve) => setTimeout(resolve, delay));
       }
     }
-  }
-  let url = importFnOrUrl;
-  for (let attempt = 0; attempt < retries; attempt++) {
-    try {
-      return await import(
-        /* @vite-ignore */
-        url
-      );
-    } catch (err) {
-      if (attempt === retries - 1) throw err;
-      const delay = baseDelayMs * Math.pow(2, attempt);
-      console.warn(`[SoftMax.LaughTale] Failed to fetch island script at ${url}. Retrying with cache-buster in ${delay}ms...`, err);
-      await new Promise((resolve) => setTimeout(resolve, delay));
-      const parsed = new URL(url, document.baseURI);
-      parsed.searchParams.set("island-retry", Date.now().toString());
-      url = parsed.toString();
+  } else {
+    let url = loader;
+    for (let attempt = 0; attempt < opts.retries; attempt++) {
+      try {
+        return await import(
+          /* @vite-ignore */
+          url
+        );
+      } catch (err) {
+        lastError = err;
+        if (attempt === opts.retries - 1) {
+          throw err;
+        }
+        const rawDelay = Math.min(opts.maxDelayMs, opts.baseDelayMs * Math.pow(2, attempt));
+        const jitterFactor = opts.jitter ? 0.75 + Math.random() * 0.5 : 1;
+        const delay = Math.round(rawDelay * jitterFactor);
+        console.warn(`[SoftMax.LaughTale] Failed to fetch island script at ${url}. Retrying with cache-buster in ${delay}ms...`, err);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        const separator = url.includes("?") ? "&" : "?";
+        url = `${url.replace(/([?&])island-retry=[^&]*/, "")}${separator}island-retry=${Date.now()}`;
+      }
     }
   }
-  throw new Error(`[SoftMax.LaughTale] Permanent failure loading island module after ${retries} attempts.`);
+  throw lastError || new Error(`[SoftMax.LaughTale] Failed to load island after ${opts.retries} attempts.`);
 }
 
 // src/runtime/streaming.ts

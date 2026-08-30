@@ -268,7 +268,8 @@ Persistent islands must be *excluded* — they are moved, not destroyed.
 ---
 
 ### `LT-207` — `retry.ts` is typed and implemented for the wrong input
-**Severity:** P1 · **Status:** todo · **File:** `src/runtime/retry.ts:28,36`
+**Severity:** P1 · **Status:** done · **File:** `SoftMax.LaughTale.Client/src/runtime/retry.ts`
+**Resolution:** Refactored `importWithRetry` with type-safe `RetryOptions`, exponential backoff with full randomized jitter (`0.75x - 1.25x`), dynamic URL cache-busting, and root `Error` preservation upon retry exhaustion. Unit tests verified in `tests/retry.test.ts` (4/4 passed). Section 4 (LT-2xx Lifecycle & Memory) is now 100% complete!
 
 **Evidence.** Two live `tsc` errors: the function accepts `string | (() => Promise<T>)` but passes that union straight to `import(specifier)` and to `new URL(...)`. The registry supplies a **thunk**, so the string branch is dead code that would throw if ever reached, and cache-busting on retry (`?retry=n`) never actually happens for thunks — meaning a retry re-imports the identical failed module URL from the browser's module cache and **fails identically every time**. The advertised "network resilience" does not work.
 
