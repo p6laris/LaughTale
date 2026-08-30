@@ -33,7 +33,7 @@ public class DashboardModel : PageModel
     public List<CommandPaletteItem> CommandItems { get; set; } = new()
     {
         new("dash", "Open Enterprise Dashboard", "Navigation", "bar-chart", "G D", "/dashboard"),
-        new("showcase", "Showcase Components Suite", "Navigation", "layers", "G S", "/enterprise"),
+        new("showcase", "Showcase Components Suite", "Navigation", "layers", "G S", "/components"),
         new("docs", "Documentation Portal", "Navigation", "file-text", "G P", "/doc/01-getting-started"),
         new("studio", "Launch TweakAura Theme Studio", "Theme & Customization", "palette", "T S", null, "open-studio"),
         new("theme-toggle", "Toggle Dark / Light Mode", "Theme & Customization", "moon", "T D", null, "toggle-dark"),

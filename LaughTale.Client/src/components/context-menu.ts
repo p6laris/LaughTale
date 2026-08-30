@@ -365,7 +365,7 @@ export default function ContextMenuIsland(container: HTMLElement, props: Context
             ];
         } else if (demoType === 'router') {
             menuItems = [
-                { label: 'Router Link', icon: 'palette', route: '/enterprise#sec-contextmenu' },
+                { label: 'Router Link', icon: 'palette', route: '/components#sec-context-menu' },
                 { label: 'Programmatic', icon: 'link' },
                 { label: 'External', icon: 'home', url: 'https://github.com/laughtale/LaughTale' }
             ];
