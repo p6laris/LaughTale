@@ -251,9 +251,159 @@ var DANGEROUS_ATTRIBUTES = /* @__PURE__ */ new Set([
   "onblur",
   "onchange",
   "onsubmit",
-  "formaction"
+  "formaction",
+  "onanimationstart",
+  "onanimationend",
+  "ontransitionend",
+  "onmouseenter",
+  "onmouseleave"
 ]);
-var DANGEROUS_PROTOCOLS = /^\s*(javascript|data|vbscript):/i;
+var DANGEROUS_PROTOCOLS = /^\s*(javascript|vbscript|data(?!\s*:\s*image\/(png|jpeg|jpg|gif|webp))):/i;
+var ALLOWED_TAGS = /* @__PURE__ */ new Set([
+  // Typography & Inline Formatting
+  "a",
+  "abbr",
+  "b",
+  "bdi",
+  "bdo",
+  "blockquote",
+  "br",
+  "cite",
+  "code",
+  "data",
+  "dd",
+  "dfn",
+  "div",
+  "dl",
+  "dt",
+  "em",
+  "figcaption",
+  "figure",
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
+  "hr",
+  "i",
+  "kbd",
+  "li",
+  "mark",
+  "ol",
+  "p",
+  "pre",
+  "q",
+  "rp",
+  "rt",
+  "ruby",
+  "s",
+  "samp",
+  "small",
+  "span",
+  "strong",
+  "sub",
+  "sup",
+  "time",
+  "u",
+  "ul",
+  "var",
+  "wbr",
+  // Tables
+  "table",
+  "tbody",
+  "td",
+  "tfoot",
+  "th",
+  "thead",
+  "tr",
+  "caption",
+  "col",
+  "colgroup",
+  // Safe Media
+  "img",
+  "picture",
+  "source",
+  // Vector Graphics (Safe SVG primitives)
+  "svg",
+  "path",
+  "g",
+  "circle",
+  "rect",
+  "line",
+  "polyline",
+  "polygon",
+  "text",
+  "tspan",
+  "use"
+]);
+var ALLOWED_ATTRS = /* @__PURE__ */ new Set([
+  // Global Safe Attributes
+  "class",
+  "id",
+  "title",
+  "dir",
+  "lang",
+  "role",
+  "tabindex",
+  "aria-label",
+  "aria-labelledby",
+  "aria-describedby",
+  "aria-hidden",
+  "aria-expanded",
+  "aria-disabled",
+  "aria-checked",
+  "aria-current",
+  "aria-haspopup",
+  "aria-controls",
+  // Link & Media Attributes
+  "href",
+  "src",
+  "alt",
+  "width",
+  "height",
+  "target",
+  "rel",
+  "loading",
+  "decoding",
+  "sizes",
+  "srcset",
+  "type",
+  // Table Attributes
+  "colspan",
+  "rowspan",
+  "headers",
+  "scope",
+  // SVG Attributes
+  "viewbox",
+  "fill",
+  "stroke",
+  "stroke-width",
+  "stroke-linecap",
+  "stroke-linejoin",
+  "d",
+  "cx",
+  "cy",
+  "r",
+  "rx",
+  "ry",
+  "x",
+  "y",
+  "x1",
+  "y1",
+  "x2",
+  "y2",
+  "points",
+  "transform",
+  "clip-path",
+  "fill-rule",
+  "stroke-dasharray",
+  "stroke-dashoffset",
+  "xmlns",
+  "href",
+  "xlink:href"
+]);
+var URL_ATTRS = /* @__PURE__ */ new Set(["href", "src", "action", "poster", "xlink:href"]);
 function isSafeProperty(prop) {
   if (typeof prop !== "string") return true;
   return !BLOCKED_PROPERTIES.has(prop);
@@ -275,28 +425,98 @@ function isSafeAttribute(attrName) {
   }
   return true;
 }
-function sanitizeHtml(html) {
-  if (typeof html !== "string") return "";
-  if (typeof document !== "undefined") {
-    const div = document.createElement("div");
-    div.innerHTML = html;
-    const dangerous = div.querySelectorAll("script, iframe, object, embed, applet, link, meta, style");
-    dangerous.forEach((el) => el.remove());
-    const allElements = div.querySelectorAll("*");
-    allElements.forEach((el) => {
-      for (const attr of Array.from(el.attributes)) {
-        if (attr.name.toLowerCase().startsWith("on")) {
-          el.removeAttribute(attr.name);
-        } else if (["href", "src", "action"].includes(attr.name.toLowerCase())) {
-          if (DANGEROUS_PROTOCOLS.test(attr.value)) {
-            el.removeAttribute(attr.name);
-          }
-        }
-      }
+var trustedTypesPolicy = null;
+if (typeof window !== "undefined" && window.trustedTypes?.createPolicy) {
+  try {
+    trustedTypesPolicy = window.trustedTypes.createPolicy("laughtale-html", {
+      createHTML: (s) => s
     });
-    return div.innerHTML;
+  } catch {
   }
-  return html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "").replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, "").replace(/\son\w+\s*=\s*(['"]).*?\1/gi, "");
+}
+function parseInertHtml(html) {
+  if (typeof DOMParser !== "undefined") {
+    try {
+      return new DOMParser().parseFromString(html, "text/html");
+    } catch {
+    }
+  }
+  if (typeof document !== "undefined" && document.implementation?.createHTMLDocument) {
+    try {
+      const doc = document.implementation.createHTMLDocument("");
+      doc.body.innerHTML = html;
+      return doc;
+    } catch {
+    }
+  }
+  return null;
+}
+function cleanNode(node) {
+  if (node.nodeType === 3) {
+    return node;
+  }
+  if (node.nodeType === 8) {
+    return null;
+  }
+  if (node.nodeType !== 1) {
+    return null;
+  }
+  const el = node;
+  const tagName = el.tagName.toLowerCase();
+  if (!ALLOWED_TAGS.has(tagName)) {
+    return null;
+  }
+  const attrs = Array.from(el.attributes);
+  for (const attr of attrs) {
+    const attrName = attr.name.toLowerCase();
+    if (attrName.startsWith("on")) {
+      el.removeAttribute(attr.name);
+      continue;
+    }
+    if (!ALLOWED_ATTRS.has(attrName) && !attrName.startsWith("data-") && !attrName.startsWith("aria-")) {
+      el.removeAttribute(attr.name);
+      continue;
+    }
+    if (URL_ATTRS.has(attrName)) {
+      const safeUrl = sanitizeUrl(attr.value);
+      if (safeUrl === "about:blank" && attr.value.trim().toLowerCase() !== "about:blank") {
+        el.removeAttribute(attr.name);
+      } else {
+        el.setAttribute(attr.name, safeUrl);
+      }
+    }
+  }
+  if (tagName === "a" && el.getAttribute("target") === "_blank") {
+    const rel = el.getAttribute("rel") || "";
+    if (!rel.includes("noopener")) {
+      el.setAttribute("rel", (rel + " noopener noreferrer").trim());
+    }
+  }
+  const children = Array.from(el.childNodes);
+  for (const child of children) {
+    const cleaned = cleanNode(child);
+    if (!cleaned) {
+      el.removeChild(child);
+    }
+  }
+  return el;
+}
+function sanitizeHtml(html) {
+  if (typeof html !== "string" || !html.trim()) return "";
+  const doc = parseInertHtml(html);
+  if (!doc || !doc.body) {
+    return "";
+  }
+  const cleanedNodes = Array.from(doc.body.childNodes).map(cleanNode).filter((n) => n !== null);
+  const container = doc.createElement("div");
+  for (const n of cleanedNodes) {
+    container.appendChild(n);
+  }
+  const result = container.innerHTML;
+  if (trustedTypesPolicy) {
+    return trustedTypesPolicy.createHTML(result);
+  }
+  return result;
 }
 function createSandboxState(state) {
   return new Proxy(state, {

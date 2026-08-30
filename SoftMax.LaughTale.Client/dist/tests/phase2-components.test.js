@@ -1875,289 +1875,1126 @@ function TextareaIsland(container, props) {
 }
 
 // src/components/menu.ts
-function MenuIsland(container, props) {
-  const items = props.items || [];
-  const popup = props.popup || false;
-  let isOpen = !popup;
-  injectIslandStyle("menu", `
-        .laughtale-menu {
-            background: var(--p-surface-0);
-            border: 1px solid var(--p-border-color);
-            border-radius: var(--p-border-radius);
-            min-width: 12.5rem;
-            padding: 0.5rem 0;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
-            font-family: var(--p-font-family, inherit);
-        }
-        [data-theme="dark"] .laughtale-menu {
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.5);
-        }
-        .menu-list {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
-        .menu-item {
-            display: flex;
-            align-items: center;
-            padding: 0.5rem 1rem;
-            color: var(--p-text-color);
-            text-decoration: none;
-            cursor: pointer;
-            transition: background 150ms ease, color 150ms ease;
-            gap: 0.5rem;
-            font-size: 0.875rem;
-        }
-        .menu-item:hover {
-            background: var(--p-surface-100);
-        }
-        .menu-item.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            pointer-events: none;
-        }
-        .menu-separator {
-            height: 1px;
-            background: var(--p-border-color);
-            margin: 0.5rem 0;
-        }
-        
-        .p-anchored-overlay-enter {
-            opacity: 0;
-            transform: scaleY(0.8);
-        }
-        .p-anchored-overlay-enter-active {
-            opacity: 1;
-            transform: scaleY(1);
-            transition: opacity 150ms ease, transform 150ms ease;
-            transform-origin: top;
-        }
-        .p-anchored-overlay-leave-active {
-            opacity: 0;
-            transition: opacity 150ms ease;
-        }
-    `);
-  function renderMenu(menuItems) {
-    return `
-            <ul class="menu-list">
-                ${menuItems.map((item) => {
-      const isSeparator = item.separator || item.Separator;
-      if (isSeparator) return `<li class="menu-separator"></li>`;
-      const label = item.label || item.Label || item.title || item.Title || "";
-      const url = item.url || item.Url || "#";
-      const icon = item.icon || item.Icon || "";
-      const disabled = item.disabled || item.Disabled;
-      const iconSvg = icon && LucideIcons[icon] ? LucideIcons[icon] : icon.startsWith("<svg") ? icon : "";
-      return `
-                        <li>
-                            <a class="menu-item ${disabled ? "disabled" : ""}" href="${url}" tabindex="0">
-                                ${iconSvg ? `<span style="width: 16px; height: 16px; display: flex;">${iconSvg}</span>` : ""}
-                                <span>${label}</span>
-                            </a>
-                        </li>
-                    `;
-    }).join("")}
-            </ul>
-        `;
-  }
-  function render() {
-    if (!isOpen && popup) {
-      container.innerHTML = `
-
-`;
-      return;
-    }
-    const menuHtml = `
-            <div class="laughtale-menu ${popup ? "p-anchored-overlay-enter-active" : ""}" style="${popup ? "position: absolute; z-index: 1000;" : ""}">
-                ${renderMenu(items)}
-            </div>
-        `;
-    container.innerHTML = menuHtml;
-    if (popup) {
-      const menuEl = container.querySelector(".laughtale-menu");
-      const trigger = document.getElementById(props.triggerId || "");
-      if (trigger && menuEl) {
-        const rect = trigger.getBoundingClientRect();
-        menuEl.style.top = `${rect.bottom + window.scrollY + 4}px`;
-        menuEl.style.left = `${rect.left + window.scrollX}px`;
-        const closeHandler = (e) => {
-          if (!container.contains(e.target) && !trigger.contains(e.target)) {
-            isOpen = false;
-            render();
-            document.removeEventListener("click", closeHandler);
-          }
-        };
-        setTimeout(() => document.addEventListener("click", closeHandler), 0);
-      }
-    }
-  }
-  if (popup && props.triggerId) {
-    const trigger = document.getElementById(props.triggerId);
-    trigger?.addEventListener("click", (e) => {
-      e.preventDefault();
-      isOpen = !isOpen;
-      render();
-    });
-  }
-  render();
-}
-
-// src/components/paginator.ts
-var CSS5 = `
-.laughtale-paginator {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.75rem 1rem;
-    background: var(--p-surface-0);
-    border: 1px solid var(--p-border-color, var(--p-surface-200));
-    border-radius: var(--p-border-radius, 0.5rem);
+var MENU_CSS = `
+.p-menu {
+    display: inline-flex;
+    flex-direction: column;
+    background: var(--p-menu-background, var(--p-surface-0, #ffffff));
+    color: var(--p-menu-color, var(--p-text-color, #0f172a));
+    border: 1px solid var(--p-menu-border-color, var(--p-border-color, #e2e8f0));
+    border-radius: var(--p-menu-border-radius, var(--p-border-radius, 8px));
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    min-width: 12.5rem;
+    box-sizing: border-box;
     font-family: inherit;
-    color: var(--p-text-color);
-    gap: 1rem;
-    flex-wrap: wrap;
+    user-select: none;
+    overflow: hidden;
 }
-.paginator-left, .paginator-right {
+
+.p-menu-popup-overlay {
+    position: fixed;
+    z-index: 1050;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.12), 0 4px 6px -4px rgba(0, 0, 0, 0.08);
+    animation: p-menu-fade-in 0.15s cubic-bezier(0, 0, 0.2, 1);
+}
+
+@keyframes p-menu-fade-in {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.p-menu-start {
+    border-bottom: 1px solid var(--p-menu-border-color, var(--p-border-color, #e2e8f0));
+    box-sizing: border-box;
+}
+
+.p-menu-end {
+    border-top: 1px solid var(--p-menu-border-color, var(--p-border-color, #e2e8f0));
+    box-sizing: border-box;
+}
+
+.p-menu-list {
+    list-style: none;
+    margin: 0;
+    padding: 0.375rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    box-sizing: border-box;
+}
+
+.p-menu-submenu-wrapper {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 220ms cubic-bezier(0.4, 0, 0.2, 1), opacity 180ms ease, visibility 220ms ease;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.p-menu-submenu-wrapper.p-expanded {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    visibility: visible;
+}
+
+.p-menu-submenu-inner {
+    overflow: hidden;
+    min-height: 0;
+}
+
+.p-menu-submenu-list {
+    list-style: none;
+    margin: 0;
+    padding: 0.125rem 0 0.125rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    box-sizing: border-box;
+}
+
+.p-menu-submenu-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--p-surface-400, #94a3b8);
+    padding: 0.5rem 0.75rem 0.25rem;
+    text-transform: none;
+    letter-spacing: normal;
+    user-select: none;
+}
+
+.p-menu-separator {
+    height: 1px;
+    background: var(--p-menu-separator-border-color, var(--p-border-color, #e2e8f0));
+    margin: 0.25rem 0;
+    list-style: none;
+    padding: 0;
+}
+
+.p-menu-item {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.p-menu-item-content {
+    display: block;
+    box-sizing: border-box;
+}
+
+.p-menu-item-link {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    padding: 0.45rem 0.65rem;
+    color: var(--p-menu-item-color, var(--p-text-color, #0f172a));
+    border-radius: var(--p-border-radius, 6px);
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: background-color 0.12s ease, color 0.12s ease;
+    outline: none;
+    box-sizing: border-box;
 }
-.paginator-pages {
-    display: flex;
+
+.p-menu-item-link:hover,
+.p-menu-item-link.p-focus {
+    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-text-color, #0f172a);
+}
+
+.p-menu-item.p-disabled > .p-menu-item-content > .p-menu-item-link {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.p-menu-item-icon {
+    display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
+    justify-content: center;
+    color: var(--p-surface-500, #64748b);
+    width: 1.125rem;
+    height: 1.125rem;
+    flex-shrink: 0;
 }
-.paginator-btn {
+
+.p-menu-item-label {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.p-menu-item-shortcut {
+    margin-left: auto;
+    font-size: 0.75rem;
+    color: var(--p-surface-500, #64748b);
+    background: var(--p-surface-100, #f1f5f9);
+    border: 1px solid var(--p-border-color, #cbd5e1);
+    border-radius: 4px;
+    padding: 0.1rem 0.35rem;
+    font-weight: 500;
+}
+
+.p-menu-item-badge {
+    margin-left: auto;
+    background: #000000;
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    min-width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 9999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 0.35rem;
+}
+
+.p-menu-item-submenu-icon {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--p-surface-400, #94a3b8);
+    transition: transform 220ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.p-menu-item-submenu-icon.p-expanded {
+    transform: rotate(180deg);
+}
+
+/* Indicators */
+.p-menu-check-icon {
+    width: 1rem;
+    height: 1rem;
+    color: var(--p-primary-500, #10b981);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.p-menu-dot-icon {
+    width: 0.375rem;
+    height: 0.375rem;
+    border-radius: 9999px;
+    background: var(--p-surface-900, #0f172a);
+    display: inline-block;
+    margin: 0.3125rem;
+}
+
+.p-menu-blank-icon {
+    width: 1rem;
+    height: 1rem;
+    display: inline-block;
+}
+
+/* Dark Mode */
+.dark .p-menu,
+[data-theme="dark"] .p-menu {
+    background: var(--p-surface-900, #0f172a);
+    color: var(--p-surface-0, #f8fafc);
+    border-color: var(--p-surface-700, #334155);
+}
+
+.dark .p-menu-start,
+[data-theme="dark"] .p-menu-start,
+.dark .p-menu-end,
+[data-theme="dark"] .p-menu-end,
+.dark .p-menu-separator,
+[data-theme="dark"] .p-menu-separator {
+    border-color: var(--p-surface-700, #334155);
+}
+
+.dark .p-menu-item-link,
+[data-theme="dark"] .p-menu-item-link {
+    color: var(--p-surface-100, #f1f5f9);
+}
+
+.dark .p-menu-item-link:hover,
+[data-theme="dark"] .p-menu-item-link:hover {
+    background: var(--p-surface-800, #1e293b);
+    color: var(--p-surface-0, #f8fafc);
+}
+
+.dark .p-menu-item-shortcut,
+[data-theme="dark"] .p-menu-item-shortcut {
+    background: var(--p-surface-800, #1e293b);
+    border-color: var(--p-surface-700, #334155);
+    color: var(--p-surface-300, #cbd5e1);
+}
+
+.dark .p-menu-item-badge,
+[data-theme="dark"] .p-menu-item-badge {
+    background: #ffffff;
+    color: #000000;
+}
+
+.dark .p-menu-submenu-label,
+[data-theme="dark"] .p-menu-submenu-label {
+    color: var(--p-surface-400, #94a3b8);
+}
+
+.dark .p-menu-dot-icon,
+[data-theme="dark"] .p-menu-dot-icon {
+    background: var(--p-surface-0, #f8fafc);
+}
+`;
+function MenuIsland(container, props) {
+  injectIslandStyle("menu", MENU_CSS);
+  const isPopup = props.popup || props.Popup || false;
+  let expandedKeys = { ...props.expandedKeys || props.ExpandedKeys || {} };
+  const customTemplate = props.customTemplate || props.CustomTemplate || false;
+  function normalizeItems(rawList) {
+    if (!Array.isArray(rawList)) return [];
+    return rawList.map((it2) => {
+      const rawSub = it2.items || it2.Items;
+      return {
+        label: it2.label || it2.Label || "",
+        icon: it2.icon || it2.Icon,
+        separator: it2.separator || it2.Separator || false,
+        disabled: it2.disabled || it2.Disabled || false,
+        url: it2.url || it2.Url,
+        action: it2.action || it2.Action,
+        items: Array.isArray(rawSub) ? normalizeItems(rawSub) : void 0,
+        key: it2.key || it2.Key,
+        shortcut: it2.shortcut || it2.Shortcut,
+        badge: it2.badge || it2.Badge,
+        route: it2.route || it2.Route,
+        target: it2.target || it2.Target,
+        toggleable: it2.toggleable !== void 0 ? it2.toggleable : it2.Toggleable !== void 0 ? it2.Toggleable : void 0,
+        linkClass: it2.linkClass || it2.LinkClass,
+        command: it2.command || it2.Command,
+        checked: it2.checked !== void 0 ? it2.checked : it2.Checked,
+        radioGroup: it2.radioGroup || it2.RadioGroup,
+        radioSelected: it2.radioSelected !== void 0 ? it2.radioSelected : it2.RadioSelected
+      };
+    });
+  }
+  const rawData = props.model || props.items || props.Model || props.Items || [];
+  let itemsState = normalizeItems(rawData);
+  let popupEl = null;
+  let isOpen = false;
+  function getIconSvg(iconName) {
+    if (!iconName) return "";
+    if (iconName.startsWith("<svg")) return iconName;
+    if (LucideIcons[iconName]) return LucideIcons[iconName];
+    return "";
+  }
+  function renderItemContent(item, path, depth = 0) {
+    if (item.separator) {
+      return `<li class="p-menu-separator" role="separator"></li>`;
+    }
+    const isGroup = Array.isArray(item.items) && item.items.length > 0;
+    const isToggleableSubmenu = isGroup && (item.toggleable === true || depth > 0 && item.toggleable !== false);
+    const isStaticGroupHeader = isGroup && !isToggleableSubmenu;
+    if (isStaticGroupHeader) {
+      const subItemsHtml = item.items.map((sub, i) => renderItemContent(sub, `${path}.${i}`, depth + 1)).join("");
+      const headerLabelClass = customTemplate ? "text-primary font-bold text-sm" : "p-menu-submenu-label";
+      const headerLabelStyle = customTemplate ? "color: var(--p-primary-500, #3b82f6); font-weight: 700; font-size: 0.8125rem; padding: 0.5rem 0.75rem 0.25rem;" : "";
+      return `
+                <li class="p-menu-item" role="none">
+                    <div class="${headerLabelClass}" style="${headerLabelStyle}">${item.label}</div>
+                    <ul class="p-menu-list" role="group">
+                        ${subItemsHtml}
+                    </ul>
+                </li>
+            `;
+    }
+    const isExpanded = isToggleableSubmenu ? item.key ? !!expandedKeys[item.key] : !!expandedKeys[path] : false;
+    let iconHtml = "";
+    if (item.checked !== void 0) {
+      iconHtml = item.checked ? `<span class="p-menu-item-icon p-menu-check-icon"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>` : `<span class="p-menu-item-icon p-menu-blank-icon"></span>`;
+    } else if (item.radioSelected !== void 0) {
+      iconHtml = item.radioSelected ? `<span class="p-menu-item-icon"><span class="p-menu-dot-icon"></span></span>` : `<span class="p-menu-item-icon p-menu-blank-icon"></span>`;
+    } else if (item.icon) {
+      const svg = getIconSvg(item.icon);
+      if (svg) iconHtml = `<span class="p-menu-item-icon">${svg}</span>`;
+    }
+    const chevronSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
+    let subHtml = "";
+    if (isGroup) {
+      const subItemsHtml = item.items.map((sub, i) => renderItemContent(sub, `${path}.${i}`, depth + 1)).join("");
+      subHtml = `
+                <div class="p-menu-submenu-wrapper ${isExpanded ? "p-expanded" : ""}" role="region">
+                    <div class="p-menu-submenu-inner">
+                        <ul class="p-menu-submenu-list" role="group">${subItemsHtml}</ul>
+                    </div>
+                </div>
+            `;
+    }
+    let customInlineStyle = "";
+    if (item.linkClass && item.linkClass.includes("text-red")) {
+      customInlineStyle = "color: #ef4444 !important;";
+    }
+    return `
+            <li class="p-menu-item ${item.disabled ? "p-disabled" : ""}" role="none" data-path="${path}" data-key="${item.key || ""}">
+                <div class="p-menu-item-content">
+                    <a class="p-menu-item-link" style="${customInlineStyle}" role="menuitem" tabindex="-1" href="${item.url || item.route || "#"}" ${item.target ? `target="${item.target}"` : ""}>
+                        ${iconHtml}
+                        <span class="p-menu-item-label">${item.label}</span>
+                        ${item.badge !== void 0 ? `<span class="p-menu-item-badge">${item.badge}</span>` : ""}
+                        ${item.shortcut ? `<span class="p-menu-item-shortcut">${item.shortcut}</span>` : ""}
+                        ${isToggleableSubmenu ? `<span class="p-menu-item-submenu-icon ${isExpanded ? "p-expanded" : ""}">${chevronSvg}</span>` : ""}
+                    </a>
+                </div>
+                ${subHtml}
+            </li>
+        `;
+  }
+  function renderMenuHtml() {
+    const itemsHtml = itemsState.map((it2, i) => renderItemContent(it2, `${i}`, 0)).join("");
+    let startHtml = "";
+    if (customTemplate) {
+      startHtml = `
+                <div class="p-menu-start" style="padding: 0.65rem 0.85rem; display: flex; align-items: center; gap: 0.65rem;">
+                    <span style="display: inline-flex; align-items: center; justify-content: center; width: 1.75rem; height: 1.75rem; background: var(--p-primary-500, #3b82f6); border-radius: 6px; color: #fff;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg>
+                    </span>
+                    <span style="font-weight: 700; font-size: 0.9375rem; letter-spacing: -0.01em;">PRIME<span style="color: var(--p-primary-500, #3b82f6);">APP</span></span>
+                </div>
+            `;
+    }
+    let endHtml = "";
+    if (customTemplate) {
+      endHtml = `
+                <div class="p-menu-end" style="padding: 0.5rem 0.75rem;">
+                    <button type="button" class="p-menu-item-link" style="width: 100%; border: none; background: transparent; padding: 0.4rem 0.5rem; display: flex; align-items: center; gap: 0.65rem; border-radius: 6px; cursor: pointer;">
+                        <span style="width: 2rem; height: 2rem; border-radius: 9999px; background: linear-gradient(135deg, #f59e0b, #ef4444); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700;">AE</span>
+                        <span style="display: flex; flex-direction: column; align-items: flex-start; line-height: 1.2;">
+                            <span style="font-size: 0.8125rem; font-weight: 700; color: var(--p-text-color);">Amy Elsner</span>
+                            <span style="font-size: 0.7rem; color: var(--p-surface-500);">Admin</span>
+                        </span>
+                    </button>
+                </div>
+            `;
+    }
+    const customClass = props.class || props.Class || "";
+    const customStyle = props.style || props.Style || "";
+    return `
+            <div class="p-menu p-component ${isPopup ? "p-menu-popup-overlay" : ""} ${customClass}" style="${customStyle}" role="menu" tabindex="0">
+                ${startHtml}
+                <ul class="p-menu-list" role="menubar">
+                    ${itemsHtml}
+                </ul>
+                ${endHtml}
+            </div>
+        `;
+  }
+  function wireEvents(menuEl) {
+    menuEl.querySelectorAll(".p-menu-item").forEach((li) => {
+      const link = li.querySelector(":scope > .p-menu-item-content > .p-menu-item-link");
+      if (!link) return;
+      link.addEventListener("click", (e) => {
+        const path = li.getAttribute("data-path") || "";
+        const key = li.getAttribute("data-key");
+        const item = findItemByPath(itemsState, path);
+        if (!item || item.disabled) return;
+        const isGroup = Array.isArray(item.items) && item.items.length > 0;
+        const isToggleableSubmenu = isGroup && (item.toggleable === true || path.includes(".") && item.toggleable !== false);
+        if (isToggleableSubmenu) {
+          e.preventDefault();
+          const isNowExpanded = key ? !expandedKeys[key] : !expandedKeys[path];
+          if (key) {
+            expandedKeys[key] = isNowExpanded;
+          } else {
+            expandedKeys[path] = isNowExpanded;
+          }
+          const wrapper = li.querySelector(":scope > .p-menu-submenu-wrapper");
+          const chevron = li.querySelector(":scope > .p-menu-item-content .p-menu-item-submenu-icon");
+          if (wrapper) {
+            wrapper.classList.toggle("p-expanded", isNowExpanded);
+          }
+          if (chevron) {
+            chevron.classList.toggle("p-expanded", isNowExpanded);
+          }
+          return;
+        }
+        if (item.checked !== void 0) {
+          e.preventDefault();
+          item.checked = !item.checked;
+          updateContent();
+          return;
+        }
+        if (item.radioGroup && item.radioSelected !== void 0) {
+          e.preventDefault();
+          setRadioSelection(itemsState, item.radioGroup, item);
+          updateContent();
+          return;
+        }
+        if (item.command || item.action) {
+          e.preventDefault();
+          if (item.command === "new-file") {
+            showFeedback("File created", "success");
+          } else if (item.command === "search") {
+            showFeedback("No results found", "warn");
+          }
+        }
+        if (isPopup) {
+          closePopup();
+        }
+      });
+    });
+    menuEl.addEventListener("keydown", (e) => {
+      const links = menuEl.querySelectorAll(".p-menu-item-link");
+      if (links.length === 0) return;
+      const active = document.activeElement;
+      let currentIdx = Array.from(links).indexOf(active);
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        currentIdx = (currentIdx + 1) % links.length;
+        links[currentIdx]?.focus();
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        currentIdx = (currentIdx - 1 + links.length) % links.length;
+        links[currentIdx]?.focus();
+      } else if (e.key === "Home") {
+        e.preventDefault();
+        links[0]?.focus();
+      } else if (e.key === "End") {
+        e.preventDefault();
+        links[links.length - 1]?.focus();
+      } else if (e.key === "Escape" && isPopup) {
+        e.preventDefault();
+        closePopup();
+      }
+    });
+  }
+  function setRadioSelection(list, group, selectedItem) {
+    list.forEach((it2) => {
+      if (it2.radioGroup === group && it2.radioSelected !== void 0) {
+        it2.radioSelected = it2 === selectedItem;
+      }
+      if (it2.items) {
+        setRadioSelection(it2.items, group, selectedItem);
+      }
+    });
+  }
+  function findItemByPath(list, path) {
+    const parts = path.split(".").map(Number);
+    let curr = { items: list };
+    for (const p of parts) {
+      if (!curr.items || !curr.items[p]) return null;
+      curr = curr.items[p];
+    }
+    return curr;
+  }
+  function showFeedback(msg, severity) {
+    const toast = document.createElement("div");
+    toast.style.cssText = `
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: ${severity === "success" ? "#10b981" : "#f59e0b"};
+            color: #ffffff;
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+            font-size: 0.875rem;
+            font-weight: 600;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        `;
+    toast.textContent = `\u2713 ${msg}`;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2500);
+  }
+  function updateContent() {
+    if (isPopup) {
+      if (popupEl) {
+        popupEl.innerHTML = renderMenuHtml();
+        const menuEl = popupEl.querySelector(".p-menu");
+        wireEvents(menuEl);
+      }
+    } else {
+      container.innerHTML = renderMenuHtml();
+      const menuEl = container.querySelector(".p-menu");
+      wireEvents(menuEl);
+    }
+  }
+  function openPopup(trigger) {
+    if (isOpen) {
+      closePopup();
+      return;
+    }
+    isOpen = true;
+    popupEl = document.createElement("div");
+    popupEl.className = "p-menu-popup-wrapper";
+    popupEl.innerHTML = renderMenuHtml();
+    document.body.appendChild(popupEl);
+    const menuEl = popupEl.querySelector(".p-menu");
+    wireEvents(menuEl);
+    const rect = trigger.getBoundingClientRect();
+    menuEl.style.position = "fixed";
+    menuEl.style.top = `${rect.bottom + 4}px`;
+    menuEl.style.left = `${rect.left}px`;
+    menuEl.style.zIndex = "9999";
+    const clickOutsideHandler = (e) => {
+      if (popupEl && !popupEl.contains(e.target) && !trigger.contains(e.target)) {
+        closePopup();
+        document.removeEventListener("click", clickOutsideHandler);
+      }
+    };
+    setTimeout(() => document.addEventListener("click", clickOutsideHandler), 0);
+  }
+  function closePopup() {
+    isOpen = false;
+    if (popupEl) {
+      popupEl.remove();
+      popupEl = null;
+    }
+  }
+  if (isPopup) {
+    container.innerHTML = "";
+    const triggerId = props.triggerId || props.TriggerId;
+    if (triggerId) {
+      const trigger = document.getElementById(triggerId);
+      if (trigger) {
+        trigger.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          openPopup(trigger);
+        });
+      }
+    }
+  } else {
+    updateContent();
+  }
+  container.__expandAll = () => {
+    const root = isPopup ? popupEl : container;
+    if (!root) return;
+    root.querySelectorAll(".p-menu-submenu-wrapper").forEach((w) => w.classList.add("p-expanded"));
+    root.querySelectorAll(".p-menu-item-submenu-icon").forEach((c) => c.classList.add("p-expanded"));
+  };
+  container.__collapseAll = () => {
+    const root = isPopup ? popupEl : container;
+    if (!root) return;
+    root.querySelectorAll(".p-menu-submenu-wrapper").forEach((w) => w.classList.remove("p-expanded"));
+    root.querySelectorAll(".p-menu-item-submenu-icon").forEach((c) => c.classList.remove("p-expanded"));
+  };
+}
+
+// src/components/paginator.ts
+var PAGINATOR_CSS = `
+.p-paginator {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-width: 2rem;
-    height: 2rem;
-    padding: 0 0.25rem;
-    border-radius: var(--p-border-radius, 0.5rem);
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    padding: 0.5rem 1rem;
+    background: var(--p-surface-0, #ffffff);
+    border-radius: var(--p-border-radius-lg, 8px);
+    border: 1px solid var(--p-surface-200, #e2e8f0);
+    color: var(--p-surface-700, #334155);
+    font-family: var(--p-font-family, inherit);
+    user-select: none;
+    transition: all 0.15s ease;
+}
+
+.p-paginator-start,
+.p-paginator-end {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.p-paginator-first,
+.p-paginator-prev,
+.p-paginator-next,
+.p-paginator-last,
+.p-paginator-page,
+.p-paginator-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    min-width: 2.25rem;
+    border-radius: 9999px;
     border: 1px solid transparent;
     background: transparent;
-    color: var(--p-text-color);
-    cursor: pointer;
-    transition: all 150ms ease;
+    color: var(--p-surface-600, #475569);
     font-size: 0.875rem;
-}
-.paginator-btn:hover:not(:disabled) {
-    background: var(--p-surface-100);
-}
-.paginator-btn:focus-visible {
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.12s ease, color 0.12s ease, border-color 0.12s ease;
     outline: none;
-    box-shadow: 0 0 0 2px var(--p-primary-500);
+    box-sizing: border-box;
+    padding: 0;
 }
-.paginator-btn.active {
-    background: var(--p-primary-500);
-    color: white;
+
+.p-paginator-page:hover:not(:disabled):not(.p-highlight),
+.p-paginator-first:hover:not(:disabled),
+.p-paginator-prev:hover:not(:disabled),
+.p-paginator-next:hover:not(:disabled),
+.p-paginator-last:hover:not(:disabled),
+.p-paginator-action-btn:hover:not(:disabled) {
+    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-surface-900, #0f172a);
+}
+
+.p-paginator-page.p-highlight,
+.p-paginator-page.p-paginator-page-selected {
+    background: var(--p-surface-900, #0f172a) !important;
+    color: #ffffff !important;
     font-weight: 600;
 }
-.paginator-btn:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
+
+.p-paginator-first:disabled,
+.p-paginator-prev:disabled,
+.p-paginator-next:disabled,
+.p-paginator-last:disabled,
+.p-paginator-page:disabled,
+.p-paginator-action-btn:disabled {
+    opacity: 0.3;
+    cursor: default;
 }
-.paginator-select {
-    padding: 0.25rem 2rem 0.25rem 0.75rem;
-    border-radius: var(--p-border-radius, 0.5rem);
-    border: 1px solid var(--p-border-color, var(--p-surface-200));
-    background: var(--p-surface-0);
-    color: var(--p-text-color);
+
+.p-paginator-pages {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.p-paginator-current {
+    font-size: 0.875rem;
+    color: var(--p-surface-500, #64748b);
+    padding: 0 0.75rem;
+    white-space: nowrap;
+}
+
+.p-paginator-rpp-select,
+.p-paginator-jtp-select {
     appearance: none;
-    cursor: pointer;
+    padding: 0.35rem 2rem 0.35rem 0.75rem;
+    border-radius: var(--p-border-radius, 6px);
+    border: 1px solid var(--p-surface-300, #cbd5e1);
+    background: var(--p-surface-0, #ffffff) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 0.6rem center;
+    color: var(--p-surface-800, #1e293b);
+    font-size: 0.875rem;
+    font-weight: 500;
     outline: none;
+    cursor: pointer;
+    transition: border-color 0.15s ease;
+}
+.p-paginator-rpp-select:focus,
+.p-paginator-jtp-select:focus,
+.p-paginator-jtp-input:focus {
+    border-color: var(--p-primary-500, #10b981);
+}
+
+.p-paginator-jtp-container {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
     font-size: 0.875rem;
+    color: var(--p-surface-600, #475569);
+    padding: 0 0.5rem;
 }
-.paginator-info {
+
+.p-paginator-jtp-input {
+    width: 3.5rem;
+    padding: 0.35rem 0.5rem;
+    text-align: center;
+    border-radius: var(--p-border-radius, 6px);
+    border: 1px solid var(--p-surface-300, #cbd5e1);
+    background: var(--p-surface-0, #ffffff);
+    color: inherit;
     font-size: 0.875rem;
-    color: var(--p-surface-500);
+    outline: none;
 }
-[data-theme="dark"] .laughtale-paginator {
-    background: var(--p-surface-900);
-    border-color: var(--p-surface-700);
-    color: var(--p-surface-100);
+
+.p-paginator-slider {
+    width: 8rem;
+    accent-color: var(--p-primary-500, #10b981);
+    cursor: pointer;
 }
-[data-theme="dark"] .paginator-btn {
-    color: var(--p-surface-200);
+
+/* Image gallery container */
+.p-paginator-image-display {
+    width: 100%;
+    margin-top: 1.25rem;
+    display: flex;
+    justify-content: center;
 }
-[data-theme="dark"] .paginator-btn:hover:not(:disabled) {
-    background: var(--p-surface-800);
+.p-paginator-image-card {
+    width: 100%;
+    max-width: 36rem;
+    height: 20rem;
+    border-radius: var(--p-border-radius-lg, 8px);
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    background: var(--p-surface-100, #f1f5f9);
+    border: 1px solid var(--p-surface-200, #e2e8f0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
 }
-[data-theme="dark"] .paginator-btn.active {
-    background: var(--p-primary-500);
-    color: white;
+.p-paginator-image-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: opacity 0.2s ease;
 }
-[data-theme="dark"] .paginator-select {
-    background: var(--p-surface-800);
-    border-color: var(--p-surface-600);
-    color: var(--p-surface-100);
+
+/* Dark Mode Tokens */
+.dark .p-paginator,
+[data-theme="dark"] .p-paginator {
+    background: var(--p-surface-900, #0f172a) !important;
+    border-color: var(--p-surface-700, #334155) !important;
+    color: var(--p-surface-200, #e2e8f0) !important;
+}
+.dark .p-paginator-page,
+.dark .p-paginator-first,
+.dark .p-paginator-prev,
+.dark .p-paginator-next,
+.dark .p-paginator-last,
+.dark .p-paginator-action-btn,
+[data-theme="dark"] .p-paginator-page,
+[data-theme="dark"] .p-paginator-first,
+[data-theme="dark"] .p-paginator-prev,
+[data-theme="dark"] .p-paginator-next,
+[data-theme="dark"] .p-paginator-last,
+[data-theme="dark"] .p-paginator-action-btn {
+    color: var(--p-surface-300, #cbd5e1) !important;
+}
+.dark .p-paginator-page:hover:not(:disabled):not(.p-highlight),
+.dark .p-paginator-first:hover:not(:disabled),
+.dark .p-paginator-prev:hover:not(:disabled),
+.dark .p-paginator-next:hover:not(:disabled),
+.dark .p-paginator-last:hover:not(:disabled),
+.dark .p-paginator-action-btn:hover:not(:disabled),
+[data-theme="dark"] .p-paginator-page:hover:not(:disabled):not(.p-highlight),
+[data-theme="dark"] .p-paginator-first:hover:not(:disabled),
+[data-theme="dark"] .p-paginator-prev:hover:not(:disabled),
+[data-theme="dark"] .p-paginator-next:hover:not(:disabled),
+[data-theme="dark"] .p-paginator-last:hover:not(:disabled),
+[data-theme="dark"] .p-paginator-action-btn:hover:not(:disabled) {
+    background: var(--p-surface-800, #1e293b) !important;
+    color: #ffffff !important;
+}
+.dark .p-paginator-page.p-highlight,
+[data-theme="dark"] .p-paginator-page.p-highlight {
+    background: var(--p-surface-0, #ffffff) !important;
+    color: var(--p-surface-900, #0f172a) !important;
+}
+.dark .p-paginator-rpp-select,
+.dark .p-paginator-jtp-select,
+.dark .p-paginator-jtp-input,
+[data-theme="dark"] .p-paginator-rpp-select,
+[data-theme="dark"] .p-paginator-jtp-select,
+[data-theme="dark"] .p-paginator-jtp-input {
+    background-color: var(--p-surface-800, #1e293b) !important;
+    border-color: var(--p-surface-600, #475569) !important;
+    color: #ffffff !important;
+}
+.dark .p-paginator-current,
+.dark .p-paginator-jtp-container,
+[data-theme="dark"] .p-paginator-current,
+[data-theme="dark"] .p-paginator-jtp-container {
+    color: var(--p-surface-400, #94a3b8) !important;
+}
+.dark .p-paginator-image-card,
+[data-theme="dark"] .p-paginator-image-card {
+    background: var(--p-surface-800, #1e293b) !important;
+    border-color: var(--p-surface-700, #334155) !important;
 }
 `;
+var ICONS = {
+  first: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m11 17-5-5 5-5"/><path d="m18 17-5-5 5-5"/></svg>',
+  prev: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>',
+  next: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>',
+  last: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 17 5-5-5-5"/><path d="m13 17 5-5-5-5"/></svg>',
+  refresh: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>',
+  settings: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>'
+};
+var DEFAULT_IMAGES = [
+  "https://primefaces.org/cdn/primevue/images/nature/nature1.jpg",
+  "https://primefaces.org/cdn/primevue/images/nature/nature2.jpg",
+  "https://primefaces.org/cdn/primevue/images/nature/nature3.jpg",
+  "https://primefaces.org/cdn/primevue/images/nature/nature4.jpg",
+  "https://primefaces.org/cdn/primevue/images/nature/nature5.jpg",
+  "https://primefaces.org/cdn/primevue/images/nature/nature6.jpg"
+];
 function PaginatorIsland(container, props) {
-  injectIslandStyle("paginator", CSS5);
+  injectIslandStyle("paginator", PAGINATOR_CSS);
   let first = props.first || 0;
   let rows = props.rows || 10;
-  const totalRecords = props.totalRecords || 0;
-  const options = props.rowsPerPageOptions || [10, 20, 50];
-  const compact = props.compact || false;
-  function changePage(newFirst) {
-    first = Math.max(0, Math.min(newFirst, totalRecords - 1));
-    const page = Math.floor(first / rows);
-    container.dispatchEvent(new CustomEvent("page-change", {
-      detail: { first, rows, page },
-      bubbles: true
-    }));
+  let totalRecords = props.totalRecords || 0;
+  const pageLinkSize = props.pageLinkSize || 5;
+  const rowsPerPageOptions = props.rowsPerPageOptions;
+  const template = props.template;
+  const currentPageReportTemplate = props.currentPageReportTemplate || "Showing {first} to {last} of {totalRecords}";
+  const showFirstLast = props.showFirstLast !== false;
+  const showJumpToPageDropdown = !!props.showJumpToPageDropdown;
+  const showJumpToPageInput = !!props.showJumpToPageInput;
+  const showSlider = !!props.showSlider;
+  const images = props.images && props.images.length > 0 ? props.images : props.totalRecords === 6 && rows === 1 ? DEFAULT_IMAGES : [];
+  function getTotalPages() {
+    return Math.ceil(totalRecords / rows) || 1;
+  }
+  function getCurrentPage() {
+    return Math.floor(first / rows);
+  }
+  function setPage(pageIndex) {
+    const totalPages = getTotalPages();
+    const clampedPage = Math.max(0, Math.min(pageIndex, totalPages - 1));
+    const newFirst = clampedPage * rows;
+    if (newFirst !== first) {
+      first = newFirst;
+      render();
+      dispatchEvents();
+    }
+  }
+  function setRows(newRows) {
+    rows = newRows;
+    first = 0;
     render();
+    dispatchEvents();
+  }
+  function formatReportText() {
+    const totalPages = getTotalPages();
+    const currentPage = getCurrentPage() + 1;
+    const firstRecord = totalRecords > 0 ? first + 1 : 0;
+    const lastRecord = Math.min(first + rows, totalRecords);
+    return currentPageReportTemplate.replace(/{currentPage}/g, String(currentPage)).replace(/{totalPages}/g, String(totalPages)).replace(/{rows}/g, String(rows)).replace(/{first}/g, String(firstRecord)).replace(/{last}/g, String(lastRecord)).replace(/{totalRecords}/g, String(totalRecords));
   }
   function render() {
-    const pageCount = Math.ceil(totalRecords / rows) || 1;
-    const currentPage = Math.floor(first / rows);
-    let startPage = Math.max(0, currentPage - 2);
-    let endPage = Math.min(pageCount - 1, startPage + 4);
-    if (endPage - startPage < 4) {
-      startPage = Math.max(0, endPage - 4);
+    const totalPages = getTotalPages();
+    const currentPage = getCurrentPage();
+    const isFirstPage = currentPage === 0;
+    const isLastPage = currentPage >= totalPages - 1;
+    let startPage = Math.max(0, currentPage - Math.floor(pageLinkSize / 2));
+    let endPage = Math.min(totalPages - 1, startPage + pageLinkSize - 1);
+    if (endPage - startPage + 1 < pageLinkSize) {
+      startPage = Math.max(0, endPage - pageLinkSize + 1);
     }
-    const pages = [];
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(i);
+    const pageButtons = [];
+    for (let p = startPage; p <= endPage; p++) {
+      const isSelected = p === currentPage;
+      pageButtons.push(`
+                <button type="button" 
+                        class="p-paginator-page ${isSelected ? "p-highlight" : ""}" 
+                        data-page="${p}" 
+                        aria-label="Page ${p + 1}" 
+                        aria-current="${isSelected ? "page" : void 0}">
+                    ${p + 1}
+                </button>
+            `);
     }
-    const isFirst = currentPage === 0;
-    const isLast = currentPage >= pageCount - 1;
-    const showFrom = totalRecords > 0 ? first + 1 : 0;
-    const showTo = Math.min(first + rows, totalRecords);
-    const infoText = "Showing " + showFrom + "-" + showTo + " of " + totalRecords;
-    const pagesHtml = pages.map(
-      (p) => '<button class="paginator-btn btn-page ' + (p === currentPage ? "active" : "") + '" data-page="' + p + '">' + (p + 1) + "</button>"
-    ).join("");
-    const optionsHtml = options.length > 0 ? '<select class="paginator-select">' + options.map((opt) => '<option value="' + opt + '"' + (opt === rows ? " selected" : "") + ">" + opt + "</option>").join("") + "</select>" : "";
-    container.innerHTML = '<div class="laughtale-paginator' + (compact ? " compact" : "") + '"><div class="paginator-left"><button class="paginator-btn btn-first"' + (isFirst ? " disabled" : "") + ' aria-label="First Page"><span style="display:flex;">' + LucideIcons.chevronsLeft + '</span></button><button class="paginator-btn btn-prev"' + (isFirst ? " disabled" : "") + ' aria-label="Previous Page"><span style="display:flex;">' + LucideIcons.chevronLeft + '</span></button><div class="paginator-pages">' + pagesHtml + '</div><button class="paginator-btn btn-next"' + (isLast ? " disabled" : "") + ' aria-label="Next Page"><span style="display:flex;">' + LucideIcons.chevronRight + '</span></button><button class="paginator-btn btn-last"' + (isLast ? " disabled" : "") + ' aria-label="Last Page"><span style="display:flex;">' + LucideIcons.chevronsRight + '</span></button></div><div class="paginator-right">' + optionsHtml + '<span class="paginator-info">' + infoText + "</span></div></div>";
+    const firstBtnHtml = showFirstLast ? `
+            <button type="button" class="p-paginator-first" data-action="first" title="First Page" aria-label="First Page" ${isFirstPage ? "disabled" : ""}>
+                ${ICONS.first}
+            </button>
+        ` : "";
+    const prevBtnHtml = `
+            <button type="button" class="p-paginator-prev" data-action="prev" title="Previous Page" aria-label="Previous Page" ${isFirstPage ? "disabled" : ""}>
+                ${ICONS.prev}
+            </button>
+        `;
+    const nextBtnHtml = `
+            <button type="button" class="p-paginator-next" data-action="next" title="Next Page" aria-label="Next Page" ${isLastPage ? "disabled" : ""}>
+                ${ICONS.next}
+            </button>
+        `;
+    const lastBtnHtml = showFirstLast ? `
+            <button type="button" class="p-paginator-last" data-action="last" title="Last Page" aria-label="Last Page" ${isLastPage ? "disabled" : ""}>
+                ${ICONS.last}
+            </button>
+        ` : "";
+    let rppHtml = "";
+    if (rowsPerPageOptions && rowsPerPageOptions.length > 0) {
+      const optionsHtml = rowsPerPageOptions.map((opt) => `
+                <option value="${opt}" ${opt === rows ? "selected" : ""}>${opt}</option>
+            `).join("");
+      rppHtml = `<select class="p-paginator-rpp-select" aria-label="Rows per page">${optionsHtml}</select>`;
+    }
+    let jtpDropdownHtml = "";
+    if (showJumpToPageDropdown) {
+      const jtpOptions = Array.from({ length: totalPages }, (_, i) => `
+                <option value="${i}" ${i === currentPage ? "selected" : ""}>${i + 1}</option>
+            `).join("");
+      jtpDropdownHtml = `
+                <div class="p-paginator-jtp-container">
+                    <span>Jump to page:</span>
+                    <select class="p-paginator-jtp-select">${jtpOptions}</select>
+                    <span>of ${totalPages}</span>
+                </div>
+            `;
+    }
+    let jtpInputHtml = "";
+    if (showJumpToPageInput) {
+      jtpInputHtml = `
+                <div class="p-paginator-jtp-container">
+                    <span>Go to:</span>
+                    <input type="number" class="p-paginator-jtp-input" min="1" max="${totalPages}" value="${currentPage + 1}" />
+                    <span>/ ${totalPages}</span>
+                </div>
+            `;
+    }
+    let sliderHtml = "";
+    if (showSlider) {
+      sliderHtml = `
+                <div class="p-paginator-jtp-container">
+                    <input type="range" class="p-paginator-slider" min="0" max="${totalPages - 1}" value="${currentPage}" />
+                </div>
+            `;
+    }
+    const reportHtml = props.currentPageReportTemplate ? `
+            <span class="p-paginator-current">${formatReportText()}</span>
+        ` : "";
+    let elementsHtml = "";
+    if (template) {
+      const tokens = template.split(/\s+/);
+      const renderedTokens = tokens.map((token) => {
+        switch (token) {
+          case "FirstPageLink":
+            return firstBtnHtml;
+          case "PrevPageLink":
+            return prevBtnHtml;
+          case "PageLinks":
+            return `<div class="p-paginator-pages">${pageButtons.join("")}</div>`;
+          case "NextPageLink":
+            return nextBtnHtml;
+          case "LastPageLink":
+            return lastBtnHtml;
+          case "RowsPerPageDropdown":
+            return rppHtml;
+          case "CurrentPageReport":
+            return reportHtml;
+          case "JumpToPageDropdown":
+            return jtpDropdownHtml;
+          case "JumpToPageInput":
+            return jtpInputHtml;
+          case "Slider":
+            return sliderHtml;
+          default:
+            return "";
+        }
+      });
+      elementsHtml = renderedTokens.join("");
+    } else {
+      elementsHtml = `
+                ${firstBtnHtml}
+                ${prevBtnHtml}
+                <div class="p-paginator-pages">${pageButtons.join("")}</div>
+                ${nextBtnHtml}
+                ${lastBtnHtml}
+                ${rppHtml}
+                ${jtpDropdownHtml}
+                ${jtpInputHtml}
+                ${sliderHtml}
+                ${reportHtml}
+            `;
+    }
+    let imageDisplayHtml = "";
+    if (images.length > 0) {
+      const currentImg = images[currentPage % images.length];
+      imageDisplayHtml = `
+                <div class="p-paginator-image-display">
+                    <div class="p-paginator-image-card">
+                        <img src="${currentImg}" alt="Nature ${currentPage + 1}" loading="eager" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop&q=80';" />
+                    </div>
+                </div>
+            `;
+    }
+    container.innerHTML = `
+            <div class="p-paginator-wrapper" style="width: 100%;">
+                <div class="p-paginator p-component" role="navigation" aria-label="Pagination Navigation">
+                    ${elementsHtml}
+                </div>
+                ${imageDisplayHtml}
+            </div>
+        `;
     bindEvents();
   }
   function bindEvents() {
-    container.querySelector(".btn-first")?.addEventListener("click", () => changePage(0));
-    container.querySelector(".btn-prev")?.addEventListener("click", () => changePage(first - rows));
-    container.querySelector(".btn-next")?.addEventListener("click", () => changePage(first + rows));
-    container.querySelector(".btn-last")?.addEventListener("click", () => changePage(Math.floor((totalRecords - 1) / rows) * rows));
-    container.querySelectorAll(".btn-page").forEach((btn) => {
-      btn.addEventListener("click", (e) => {
-        const page = Number(e.currentTarget.dataset.page);
-        changePage(page * rows);
+    const rootEl = container.firstElementChild;
+    if (!rootEl) return;
+    rootEl.querySelector('[data-action="first"]')?.addEventListener("click", () => setPage(0));
+    rootEl.querySelector('[data-action="prev"]')?.addEventListener("click", () => setPage(getCurrentPage() - 1));
+    rootEl.querySelector('[data-action="next"]')?.addEventListener("click", () => setPage(getCurrentPage() + 1));
+    rootEl.querySelector('[data-action="last"]')?.addEventListener("click", () => setPage(getTotalPages() - 1));
+    rootEl.querySelectorAll(".p-paginator-page").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const p = parseInt(btn.getAttribute("data-page") || "0", 10);
+        setPage(p);
       });
     });
-    const select = container.querySelector(".paginator-select");
-    if (select) {
-      select.addEventListener("change", (e) => {
-        rows = Number(e.target.value);
-        changePage(0);
+    const rppSelect = rootEl.querySelector(".p-paginator-rpp-select");
+    if (rppSelect) {
+      rppSelect.addEventListener("change", (e) => {
+        const val = parseInt(e.target.value, 10);
+        if (!isNaN(val)) setRows(val);
+      });
+    }
+    const jtpSelect = rootEl.querySelector(".p-paginator-jtp-select");
+    if (jtpSelect) {
+      jtpSelect.addEventListener("change", (e) => {
+        const val = parseInt(e.target.value, 10);
+        if (!isNaN(val)) setPage(val);
+      });
+    }
+    const jtpInput = rootEl.querySelector(".p-paginator-jtp-input");
+    if (jtpInput) {
+      jtpInput.addEventListener("change", (e) => {
+        const val = parseInt(e.target.value, 10);
+        if (!isNaN(val)) setPage(val - 1);
+      });
+    }
+    const slider = rootEl.querySelector(".p-paginator-slider");
+    if (slider) {
+      slider.addEventListener("input", (e) => {
+        const val = parseInt(e.target.value, 10);
+        if (!isNaN(val)) setPage(val);
       });
     }
   }
+  function dispatchEvents() {
+    const page = getCurrentPage();
+    container.dispatchEvent(new CustomEvent("page", {
+      bubbles: true,
+      detail: {
+        first,
+        rows,
+        page,
+        pageCount: getTotalPages()
+      }
+    }));
+    container.dispatchEvent(new CustomEvent("page-change", {
+      bubbles: true,
+      detail: { first, rows, page }
+    }));
+    if (props.targetInputName) {
+      let hidden = container.querySelector(`input[name="${props.targetInputName}"]`);
+      if (!hidden) {
+        hidden = document.createElement("input");
+        hidden.type = "hidden";
+        hidden.name = props.targetInputName;
+        container.appendChild(hidden);
+      }
+      hidden.value = JSON.stringify({ first, rows, page });
+    }
+  }
   render();
+  dispatchEvents();
 }
 
 // src/components/input-mask.ts
-var CSS6 = `
+var CSS5 = `
 /* ==================== AURA INPUTMASK ==================== */
 .laughtale-input-mask,
 .p-inputmask {
@@ -2259,7 +3096,7 @@ var CSS6 = `
 }
 `;
 function InputMaskIsland(container, props) {
-  injectIslandStyle("laughtale-input-mask", CSS6);
+  injectIslandStyle("laughtale-input-mask", CSS5);
   const mask = props.mask || "(999) 999-9999";
   const slotChar = props.slotChar || "_";
   const autoClear = props.autoClear !== false && String(props.autoClear) !== "false";
@@ -2465,7 +3302,7 @@ function useControllableState(options) {
 }
 
 // src/components/input-text.ts
-var CSS7 = `
+var CSS6 = `
 .laughtale-inputtext-wrap,
 .p-inputtext-wrap {
     position: relative;
@@ -2666,7 +3503,7 @@ var CSS7 = `
 `;
 var xIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
 function InputTextIsland(container, props) {
-  injectIslandStyle("laughtale-inputtext", CSS7);
+  injectIslandStyle("laughtale-inputtext", CSS6);
   const [getValue, setValue] = useControllableState({
     defaultValue: props.value ?? "",
     onChange: (val) => {

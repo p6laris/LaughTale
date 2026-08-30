@@ -49,6 +49,17 @@ globalThis.IntersectionObserver = class {
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
+// src/directives/security.ts
+var trustedTypesPolicy = null;
+if (typeof window !== "undefined" && window.trustedTypes?.createPolicy) {
+  try {
+    trustedTypesPolicy = window.trustedTypes.createPolicy("laughtale-html", {
+      createHTML: (s) => s
+    });
+  } catch {
+  }
+}
+
 // src/directives/expression/lexer.ts
 var FORBIDDEN_KEYWORDS = /* @__PURE__ */ new Set([
   "new",

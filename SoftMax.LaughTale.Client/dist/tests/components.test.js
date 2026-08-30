@@ -2786,6 +2786,881 @@ function RatingIsland(container, props) {
   init();
 }
 
+// src/components/accordion.ts
+var SVG_ICONS = {
+  chevronDown: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>',
+  chevronRight: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>',
+  folder: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>',
+  folderOpen: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 14 1.5-6h13l-2.5 6H6Z"/><path d="M4 18h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2Z"/></svg>',
+  plus: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>',
+  minus: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>',
+  check: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+  user: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>',
+  shield: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>',
+  zap: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>'
+};
+var ACCORDION_CSS = `
+.p-accordion {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    border: 1px solid var(--p-surface-200, #e2e8f0);
+    border-radius: var(--p-border-radius-md, 6px);
+    overflow: hidden;
+    background: var(--p-surface-0, #ffffff);
+    font-family: var(--p-font-family, inherit);
+    box-sizing: border-box;
+}
+
+.p-accordionpanel {
+    border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
+    transition: background-color 0.2s ease;
+}
+.p-accordionpanel:last-child {
+    border-bottom: none;
+}
+
+.p-accordionheader {
+    margin: 0;
+    padding: 0;
+}
+
+.p-accordionheader-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 1rem 1.25rem;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    color: var(--p-surface-700, #334155);
+    background: var(--p-surface-0, #ffffff);
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    transition: background-color 0.2s cubic-bezier(0.2, 0, 0, 1), color 0.2s cubic-bezier(0.2, 0, 0, 1);
+    box-sizing: border-box;
+}
+.p-accordionheader-toggle:hover:not(:disabled) {
+    background: var(--p-surface-50, #f8fafc);
+    color: var(--p-surface-900, #0f172a);
+}
+.p-accordionpanel.p-accordionpanel-active > .p-accordionheader > .p-accordionheader-toggle {
+    color: var(--p-primary-600, #10b981);
+    font-weight: 700;
+}
+
+.p-accordionheader-toggle-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--p-surface-400, #94a3b8);
+    transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1), color 0.2s ease;
+    flex-shrink: 0;
+}
+.p-accordionpanel.p-accordionpanel-active > .p-accordionheader > .p-accordionheader-toggle .p-accordionheader-toggle-icon {
+    color: var(--p-primary-600, #10b981);
+}
+.p-accordion-css-indicator .p-accordionpanel.p-accordionpanel-active .p-accordionheader-toggle-icon {
+    transform: rotate(180deg);
+}
+
+/* 60fps CSS Grid Smooth Collapse/Expand Transition */
+.p-accordioncontent {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 280ms cubic-bezier(0.2, 0, 0, 1);
+    background: var(--p-surface-0, #ffffff);
+    overflow: hidden;
+}
+.p-accordionpanel.p-accordionpanel-active > .p-accordioncontent {
+    grid-template-rows: 1fr;
+}
+
+.p-accordioncontent-wrapper {
+    min-height: 0;
+    overflow: hidden;
+}
+
+.p-accordioncontent-content {
+    padding: 0.25rem 1.25rem 1.25rem 1.25rem;
+    color: var(--p-surface-600, #475569);
+    font-size: 0.875rem;
+    line-height: 1.65;
+    transition: opacity 220ms ease, transform 240ms cubic-bezier(0.2, 0, 0, 1);
+    opacity: 0;
+    transform: translateY(-6px);
+}
+.p-accordionpanel.p-accordionpanel-active > .p-accordioncontent .p-accordioncontent-content {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.p-accordionpanel.p-disabled {
+    opacity: 0.5;
+}
+.p-accordionpanel.p-disabled .p-accordionheader-toggle {
+    cursor: not-allowed;
+}
+
+/* Radio variant */
+.p-accordion-radio-circle {
+    width: 1.125rem;
+    height: 1.125rem;
+    border-radius: 9999px;
+    border: 2px solid var(--p-surface-300, #cbd5e1);
+    background: var(--p-surface-0, #ffffff);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+    transition: border-color 0.2s ease;
+}
+.p-accordionpanel.p-accordionpanel-active .p-accordion-radio-circle {
+    border-color: var(--p-primary-600, #10b981);
+}
+.p-accordion-radio-inner {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+    background: var(--p-primary-600, #10b981);
+    display: none;
+    transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+.p-accordionpanel.p-accordionpanel-active .p-accordion-radio-inner {
+    display: block;
+    animation: pRadioPop 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+@keyframes pRadioPop {
+    0% { transform: scale(0); }
+    100% { transform: scale(1); }
+}
+
+/* Controlled top buttons */
+.p-accordion-top-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+.p-accordion-ctrl-btn {
+    padding: 0.45rem 0.9rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    border-radius: 6px;
+    border: 1px solid var(--p-surface-300, #cbd5e1);
+    background: var(--p-surface-0, #ffffff);
+    color: var(--p-surface-700, #334155);
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+.p-accordion-ctrl-btn:hover {
+    background: var(--p-surface-100, #f1f5f9);
+}
+.p-accordion-ctrl-btn.p-highlight {
+    background: var(--p-primary-500, #10b981);
+    border-color: var(--p-primary-500, #10b981);
+    color: #ffffff;
+}
+
+/* Dark Mode Tokens */
+.dark .p-accordion,
+[data-theme="dark"] .p-accordion {
+    background: var(--p-surface-900, #0f172a) !important;
+    border-color: var(--p-surface-700, #334155) !important;
+    color: var(--p-surface-100, #f8fafc) !important;
+}
+.dark .p-accordionpanel,
+[data-theme="dark"] .p-accordionpanel {
+    border-color: var(--p-surface-700, #334155) !important;
+}
+.dark .p-accordionheader-toggle,
+[data-theme="dark"] .p-accordionheader-toggle {
+    background: var(--p-surface-900, #0f172a) !important;
+    color: var(--p-surface-200, #e2e8f0) !important;
+}
+.dark .p-accordionheader-toggle:hover:not(:disabled),
+[data-theme="dark"] .p-accordionheader-toggle:hover:not(:disabled) {
+    background: var(--p-surface-800, #1e293b) !important;
+    color: var(--p-surface-0, #ffffff) !important;
+}
+.dark .p-accordionpanel.p-accordionpanel-active > .p-accordionheader > .p-accordionheader-toggle,
+[data-theme="dark"] .p-accordionpanel.p-accordionpanel-active > .p-accordionheader > .p-accordionheader-toggle {
+    color: var(--p-primary-400, #34d399) !important;
+}
+.dark .p-accordioncontent,
+[data-theme="dark"] .p-accordioncontent {
+    background: var(--p-surface-900, #0f172a) !important;
+}
+.dark .p-accordioncontent-content,
+[data-theme="dark"] .p-accordioncontent-content {
+    color: var(--p-surface-300, #cbd5e1) !important;
+}
+.dark .p-accordion-ctrl-btn,
+[data-theme="dark"] .p-accordion-ctrl-btn {
+    background: var(--p-surface-900, #0f172a) !important;
+    border-color: var(--p-surface-700, #334155) !important;
+    color: var(--p-surface-200, #e2e8f0) !important;
+}
+.dark .p-accordion-ctrl-btn.p-highlight,
+[data-theme="dark"] .p-accordion-ctrl-btn.p-highlight {
+    background: var(--p-primary-500, #10b981) !important;
+    color: #ffffff !important;
+}
+.dark .p-accordion-radio-circle,
+[data-theme="dark"] .p-accordion-radio-circle {
+    background: var(--p-surface-950, #020617) !important;
+    border-color: var(--p-surface-700, #334155) !important;
+}
+`;
+function AccordionIsland(container, props) {
+  injectIslandStyle("accordion", ACCORDION_CSS);
+  const tabs = (props.tabs || []).map((t, i) => ({
+    id: t.id || String(i),
+    header: t.header || `Header ${i + 1}`,
+    content: t.content || "",
+    icon: t.icon,
+    badge: t.badge,
+    subtitle: t.subtitle,
+    price: t.price,
+    disabled: !!t.disabled,
+    toggleIcon: t.toggleIcon
+  }));
+  const isMultiple = !!props.multiple;
+  const isControlled = !!props.controlled;
+  const withRadio = !!props.withRadio;
+  const customIndicator = props.customIndicator || "css";
+  let activeKeys = /* @__PURE__ */ new Set();
+  if (props.value !== void 0 && props.value !== null) {
+    if (Array.isArray(props.value)) {
+      props.value.forEach((v) => activeKeys.add(String(v)));
+    } else {
+      activeKeys.add(String(props.value));
+    }
+  } else if (props.activeIndex !== void 0 && props.activeIndex !== null) {
+    if (Array.isArray(props.activeIndex)) {
+      props.activeIndex.forEach((i) => activeKeys.add(String(i)));
+    } else {
+      activeKeys.add(String(props.activeIndex));
+    }
+  } else if (tabs.length > 0) {
+    activeKeys.add("0");
+  }
+  function togglePanel(idxStr) {
+    const idx = Number(idxStr);
+    if (tabs[idx]?.disabled) return;
+    const isOpening = !activeKeys.has(idxStr);
+    if (!isMultiple) {
+      container.querySelectorAll(".p-accordionpanel").forEach((panel) => {
+        const k = panel.getAttribute("data-panel-idx");
+        if (k !== idxStr) {
+          panel.classList.remove("p-accordionpanel-active");
+          const toggleBtn = panel.querySelector(".p-accordionheader-toggle");
+          if (toggleBtn) toggleBtn.setAttribute("aria-expanded", "false");
+          if (customIndicator === "match") {
+            const iconSpan = panel.querySelector(".p-accordionheader-toggle-icon");
+            if (iconSpan) iconSpan.innerHTML = SVG_ICONS.folder;
+          } else if (tabs[Number(k)]?.toggleIcon === "plusMinus") {
+            const iconSpan = panel.querySelector(".p-accordionheader-toggle-icon");
+            if (iconSpan) iconSpan.innerHTML = SVG_ICONS.plus;
+          }
+        }
+      });
+      activeKeys.clear();
+    }
+    const targetPanel = container.querySelector(`.p-accordionpanel[data-panel-idx="${idxStr}"]`);
+    if (targetPanel) {
+      if (isOpening) {
+        activeKeys.add(idxStr);
+        targetPanel.classList.add("p-accordionpanel-active");
+        targetPanel.querySelector(".p-accordionheader-toggle")?.setAttribute("aria-expanded", "true");
+        if (customIndicator === "match") {
+          const iconSpan = targetPanel.querySelector(".p-accordionheader-toggle-icon");
+          if (iconSpan) iconSpan.innerHTML = SVG_ICONS.folderOpen;
+        } else if (tabs[idx]?.toggleIcon === "plusMinus") {
+          const iconSpan = targetPanel.querySelector(".p-accordionheader-toggle-icon");
+          if (iconSpan) iconSpan.innerHTML = SVG_ICONS.minus;
+        }
+      } else {
+        activeKeys.delete(idxStr);
+        targetPanel.classList.remove("p-accordionpanel-active");
+        targetPanel.querySelector(".p-accordionheader-toggle")?.setAttribute("aria-expanded", "false");
+        if (customIndicator === "match") {
+          const iconSpan = targetPanel.querySelector(".p-accordionheader-toggle-icon");
+          if (iconSpan) iconSpan.innerHTML = SVG_ICONS.folder;
+        } else if (tabs[idx]?.toggleIcon === "plusMinus") {
+          const iconSpan = targetPanel.querySelector(".p-accordionheader-toggle-icon");
+          if (iconSpan) iconSpan.innerHTML = SVG_ICONS.plus;
+        }
+      }
+    }
+    if (isControlled) {
+      container.querySelectorAll(".p-accordion-ctrl-btn").forEach((btn) => {
+        const k = btn.getAttribute("data-ctrl-idx");
+        btn.classList.toggle("p-highlight", k !== null && activeKeys.has(k));
+      });
+    }
+    container.dispatchEvent(new CustomEvent("accordion:change", {
+      bubbles: true,
+      detail: { value: Array.from(activeKeys) }
+    }));
+  }
+  function renderInitial() {
+    let topControlsHtml = "";
+    if (isControlled) {
+      topControlsHtml = `
+                <div class="p-accordion-top-controls">
+                    ${tabs.map((_, i) => {
+        const k = String(i);
+        const isActive = activeKeys.has(k);
+        return `
+                            <button type="button" class="p-accordion-ctrl-btn ${isActive ? "p-highlight" : ""}" data-ctrl-idx="${k}">
+                                ${i + 1}
+                            </button>
+                        `;
+      }).join("")}
+                </div>
+            `;
+    }
+    const panelsHtml = tabs.map((tab, idx) => {
+      const k = String(idx);
+      const isActive = activeKeys.has(k);
+      const disabledClass = tab.disabled ? "p-disabled" : "";
+      const activeClass = isActive ? "p-accordionpanel-active" : "";
+      const headerId = `acc-header-${idx}`;
+      const contentId = `acc-content-${idx}`;
+      let indicatorSvg = SVG_ICONS.chevronDown;
+      if (customIndicator === "match") {
+        indicatorSvg = isActive ? SVG_ICONS.folderOpen : SVG_ICONS.folder;
+      } else if (tab.toggleIcon === "plusMinus") {
+        indicatorSvg = isActive ? SVG_ICONS.minus : SVG_ICONS.plus;
+      }
+      let radioHtml = withRadio ? `
+                <span class="p-accordion-radio-circle">
+                    <span class="p-accordion-radio-inner"></span>
+                </span>
+            ` : "";
+      let customIconHtml = "";
+      if (tab.icon) {
+        if (tab.icon === "user") customIconHtml = `<span style="display: inline-flex; align-items: center; margin-right: 0.5rem; color: var(--p-surface-400);">${SVG_ICONS.user}</span>`;
+        else if (tab.icon === "shield") customIconHtml = `<span style="display: inline-flex; align-items: center; margin-right: 0.5rem; color: var(--p-primary-500);">${SVG_ICONS.shield}</span>`;
+        else if (tab.icon === "zap") customIconHtml = `<span style="display: inline-flex; align-items: center; margin-right: 0.5rem; color: #f59e0b;">${SVG_ICONS.zap}</span>`;
+      }
+      let extraHeaderHtml = "";
+      if (tab.badge) {
+        extraHeaderHtml += `<span style="background: var(--p-primary-100, #dcfce7); color: var(--p-primary-700, #15803d); font-size: 0.75rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 9999px; margin-left: 0.5rem;">${tab.badge}</span>`;
+      }
+      if (tab.price) {
+        extraHeaderHtml += `<span style="font-weight: 700; font-size: 0.875rem; color: var(--p-surface-900); margin-left: auto; margin-right: 1rem;">${tab.price}</span>`;
+      }
+      return `
+                <div class="p-accordionpanel ${activeClass} ${disabledClass}" data-panel-idx="${k}">
+                    <div class="p-accordionheader" role="heading" aria-level="2">
+                        <button type="button" 
+                                class="p-accordionheader-toggle" 
+                                id="${headerId}"
+                                aria-controls="${contentId}"
+                                aria-expanded="${isActive ? "true" : "false"}"
+                                aria-disabled="${tab.disabled ? "true" : "false"}"
+                                ${tab.disabled ? "disabled" : ""}
+                                data-toggle-idx="${k}">
+                            <div style="display: flex; align-items: center; width: 100%;">
+                                ${radioHtml}
+                                ${customIconHtml}
+                                <span class="p-accordionheader-title">${tab.header}</span>
+                                ${extraHeaderHtml}
+                            </div>
+                            <span class="p-accordionheader-toggle-icon">
+                                ${indicatorSvg}
+                            </span>
+                        </button>
+                    </div>
+                    <div class="p-accordioncontent" 
+                         id="${contentId}" 
+                         role="region" 
+                         aria-labelledby="${headerId}">
+                        <div class="p-accordioncontent-wrapper">
+                            <div class="p-accordioncontent-content">
+                                ${tab.content}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+    }).join("");
+    const cssIndicatorClass = customIndicator === "css" ? "p-accordion-css-indicator" : "";
+    container.innerHTML = `
+            ${topControlsHtml}
+            <div class="p-accordion p-component ${cssIndicatorClass}" role="tablist">
+                ${panelsHtml}
+            </div>
+        `;
+    bindEvents();
+  }
+  function bindEvents() {
+    container.querySelectorAll(".p-accordion-ctrl-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const k = btn.getAttribute("data-ctrl-idx");
+        if (k !== null) togglePanel(k);
+      });
+    });
+    const headerButtons = container.querySelectorAll(".p-accordionheader-toggle");
+    headerButtons.forEach((btn, index) => {
+      btn.addEventListener("click", () => {
+        const k = btn.getAttribute("data-toggle-idx");
+        if (k !== null) togglePanel(k);
+      });
+      btn.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowDown") {
+          e.preventDefault();
+          const next = (index + 1) % headerButtons.length;
+          headerButtons[next]?.focus();
+        } else if (e.key === "ArrowUp") {
+          e.preventDefault();
+          const prev = (index - 1 + headerButtons.length) % headerButtons.length;
+          headerButtons[prev]?.focus();
+        } else if (e.key === "Home") {
+          e.preventDefault();
+          headerButtons[0]?.focus();
+        } else if (e.key === "End") {
+          e.preventDefault();
+          headerButtons[headerButtons.length - 1]?.focus();
+        }
+      });
+    });
+  }
+  renderInitial();
+}
+
+// src/components/tabs.ts
+var TABS_CSS = `
+.p-tabs {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.p-tablist {
+    display: flex;
+    position: relative;
+    background: transparent;
+    border-bottom: 1px solid var(--p-surface-200, #e2e8f0);
+    box-sizing: border-box;
+    align-items: center;
+    width: 100%;
+    overflow: hidden;
+}
+
+.p-tablist-content {
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    position: relative;
+    flex: 1 1 auto;
+    scroll-behavior: smooth;
+}
+.p-tablist-content::-webkit-scrollbar {
+    display: none;
+}
+
+.p-tablist-tab-list {
+    display: flex;
+    position: relative;
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    gap: 0;
+    width: auto;
+}
+
+.p-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.125rem;
+    border: none;
+    background: transparent;
+    color: var(--p-surface-500, #64748b);
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color 0.15s ease, border-color 0.15s ease;
+    outline: none;
+    user-select: none;
+    position: relative;
+    z-index: 2;
+    white-space: nowrap;
+}
+
+.p-tab:hover:not(.p-tab-active):not(:disabled):not([aria-disabled="true"]) {
+    color: var(--p-surface-800, #1e293b);
+}
+
+.p-tab-active {
+    color: var(--p-primary-600, #059669);
+    border-bottom-color: var(--p-primary-500, #10b981);
+    font-weight: 700;
+}
+
+.p-tab:disabled,
+.p-tab[aria-disabled="true"] {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.p-tab:focus-visible {
+    outline: 2px solid var(--p-primary-500, #10b981);
+    outline-offset: -2px;
+}
+
+/* Active indicator bar */
+.p-tablist-active-bar {
+    position: absolute;
+    bottom: -1px;
+    height: 2px;
+    background: var(--p-primary-500, #10b981);
+    transition: left 0.2s cubic-bezier(0.2, 0, 0, 1), width 0.2s cubic-bezier(0.2, 0, 0, 1);
+    z-index: 3;
+    pointer-events: none;
+}
+
+/* Smooth Gradient Fade Mask Navigation Buttons */
+.p-tablist-prev-button,
+.p-tablist-next-button {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 3.5rem;
+    display: flex;
+    align-items: center;
+    border: none;
+    cursor: pointer;
+    z-index: 10;
+    transition: opacity 0.25s ease, color 0.15s ease;
+    outline: none;
+    color: var(--p-surface-600, #475569);
+    padding: 0;
+    box-shadow: none;
+}
+
+.p-tablist-prev-button {
+    left: 0;
+    justify-content: flex-start;
+    padding-left: 0.5rem;
+    background: linear-gradient(to right, var(--p-surface-50, #f8fafc) 35%, rgba(248, 250, 252, 0.7) 65%, transparent 100%);
+}
+
+.p-tablist-next-button {
+    right: 0;
+    justify-content: flex-end;
+    padding-right: 0.5rem;
+    background: linear-gradient(to left, var(--p-surface-50, #f8fafc) 35%, rgba(248, 250, 252, 0.7) 65%, transparent 100%);
+}
+
+.p-tablist-prev-button:hover:not(:disabled),
+.p-tablist-next-button:hover:not(:disabled) {
+    color: var(--p-text-color, #0f172a);
+}
+
+.p-tablist-prev-button:disabled,
+.p-tablist-next-button:disabled {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Tab Panels */
+.p-tabpanels {
+    padding: 1.25rem 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.p-tabpanel {
+    display: none;
+    width: 100%;
+}
+.p-tabpanel.p-tabpanel-active {
+    display: block;
+    animation: p-tabpanel-fadein 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+
+@keyframes p-tabpanel-fadein {
+    from { opacity: 0; transform: translateY(2px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Custom Capsule Indicator */
+.p-tablist-capsule {
+    border-bottom: none;
+    background: var(--p-surface-100, #f1f5f9);
+    padding: 0.25rem;
+    border-radius: var(--p-border-radius-md, 6px);
+    width: fit-content;
+}
+.p-tablist-capsule .p-tablist-active-bar {
+    display: none;
+}
+.p-tablist-capsule .p-tab {
+    border-bottom: none;
+    margin-bottom: 0;
+    border-radius: var(--p-border-radius-sm, 4px);
+    padding: 0.5rem 1rem;
+    color: var(--p-surface-600, #475569);
+}
+.p-tablist-capsule .p-tab-active {
+    background: var(--p-surface-0, #ffffff);
+    color: var(--p-text-color, #0f172a);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Dark Mode Tokens */
+.dark .p-tablist,
+[data-theme="dark"] .p-tablist {
+    border-bottom-color: var(--p-surface-700, #334155);
+}
+.dark .p-tab,
+[data-theme="dark"] .p-tab {
+    color: var(--p-surface-400, #94a3b8);
+}
+.dark .p-tab:hover:not(.p-tab-active):not(:disabled):not([aria-disabled="true"]),
+[data-theme="dark"] .p-tab:hover:not(.p-tab-active):not(:disabled):not([aria-disabled="true"]) {
+    color: var(--p-surface-100, #f8fafc);
+}
+.dark .p-tab-active,
+[data-theme="dark"] .p-tab-active {
+    color: var(--p-primary-400, #34d399);
+    border-bottom-color: var(--p-primary-400, #34d399);
+}
+.dark .p-tablist-active-bar,
+[data-theme="dark"] .p-tablist-active-bar {
+    background: var(--p-primary-400, #34d399);
+}
+.dark .p-tablist-prev-button,
+[data-theme="dark"] .p-tablist-prev-button {
+    background: linear-gradient(to right, var(--p-surface-900, #0f172a) 35%, rgba(15, 23, 42, 0.7) 65%, transparent 100%);
+    color: var(--p-surface-400, #94a3b8);
+}
+.dark .p-tablist-next-button,
+[data-theme="dark"] .p-tablist-next-button {
+    background: linear-gradient(to left, var(--p-surface-900, #0f172a) 35%, rgba(15, 23, 42, 0.7) 65%, transparent 100%);
+    color: var(--p-surface-400, #94a3b8);
+}
+.dark .p-tablist-prev-button:hover:not(:disabled),
+.dark .p-tablist-next-button:hover:not(:disabled),
+[data-theme="dark"] .p-tablist-prev-button:hover:not(:disabled),
+[data-theme="dark"] .p-tablist-next-button:hover:not(:disabled) {
+    color: #ffffff;
+}
+.dark .p-tablist-capsule,
+[data-theme="dark"] .p-tablist-capsule {
+    background: var(--p-surface-800, #1e293b);
+}
+.dark .p-tablist-capsule .p-tab-active,
+[data-theme="dark"] .p-tablist-capsule .p-tab-active {
+    background: var(--p-surface-900, #0f172a);
+    color: var(--p-surface-0, #f8fafc);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+`;
+var CHEVRON_LEFT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>`;
+var CHEVRON_RIGHT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`;
+function TabsIsland(container, props) {
+  injectIslandStyle("tabs", TABS_CSS);
+  const rootEl = container.querySelector(".p-tabs") || container;
+  rootEl.classList.add("p-tabs", "p-component");
+  const isScrollable = !!props.scrollable || rootEl.hasAttribute("data-scrollable");
+  const selectOnFocus = !!props.selectOnFocus || rootEl.hasAttribute("data-select-on-focus");
+  const isLazy = !!props.lazy || rootEl.hasAttribute("data-lazy");
+  let activeValue = String(props.value || rootEl.getAttribute("data-value") || "");
+  const tabList = rootEl.querySelector(".p-tablist");
+  const tabPanels = rootEl.querySelector(".p-tabpanels");
+  if (!tabList) return;
+  let contentContainer = tabList.querySelector(".p-tablist-content");
+  if (!contentContainer) {
+    contentContainer = document.createElement("div");
+    contentContainer.className = "p-tablist-content";
+    let tabUl = tabList.querySelector(".p-tablist-tab-list, ul");
+    if (!tabUl) {
+      tabUl = document.createElement("ul");
+      tabUl.className = "p-tablist-tab-list";
+      const directTabs = Array.from(tabList.querySelectorAll(":scope > .p-tab, :scope > [data-tab-value]"));
+      directTabs.forEach((t) => tabUl.appendChild(t));
+    } else {
+      tabUl.classList.add("p-tablist-tab-list");
+    }
+    contentContainer.appendChild(tabUl);
+    tabList.appendChild(contentContainer);
+  }
+  const tabsListWrapper = contentContainer.querySelector(".p-tablist-tab-list, ul") || contentContainer;
+  let activeBar = contentContainer.querySelector(".p-tablist-active-bar");
+  const isCapsule = tabList.classList.contains("p-tablist-capsule");
+  if (!activeBar && !isCapsule) {
+    activeBar = document.createElement("div");
+    activeBar.className = "p-tablist-active-bar";
+    contentContainer.appendChild(activeBar);
+  }
+  function getTabs() {
+    return Array.from(tabsListWrapper.querySelectorAll(".p-tab, [data-tab-value]"));
+  }
+  function getPanels() {
+    return Array.from(tabPanels ? tabPanels.querySelectorAll(":scope > .p-tabpanel, .p-tabpanel") : []);
+  }
+  const allTabs = getTabs();
+  if (!activeValue && allTabs.length > 0) {
+    activeValue = allTabs[0].getAttribute("data-value") || allTabs[0].getAttribute("value") || "0";
+  }
+  function updateActiveBar(targetTab) {
+    if (!activeBar || isCapsule) return;
+    if (!targetTab) {
+      activeBar.style.width = "0px";
+      return;
+    }
+    const left = targetTab.offsetLeft;
+    const width = targetTab.offsetWidth;
+    activeBar.style.left = `${left}px`;
+    activeBar.style.width = `${width}px`;
+  }
+  function update() {
+    const tabs = getTabs();
+    const panels = getPanels();
+    let activeTabEl = null;
+    tabs.forEach((tab) => {
+      const val = tab.getAttribute("data-value") || tab.getAttribute("value");
+      const isActive = val === activeValue;
+      tab.classList.toggle("p-tab-active", isActive);
+      tab.setAttribute("aria-selected", isActive ? "true" : "false");
+      tab.setAttribute("tabindex", isActive ? "0" : "-1");
+      if (isActive) {
+        activeTabEl = tab;
+      }
+    });
+    panels.forEach((panel) => {
+      const val = panel.getAttribute("data-value") || panel.getAttribute("value");
+      const isActive = val === activeValue;
+      panel.classList.toggle("p-tabpanel-active", isActive);
+    });
+    rootEl.setAttribute("data-value", activeValue);
+    updateActiveBar(activeTabEl);
+    if (isScrollable && activeTabEl && contentContainer) {
+      const containerLeft = contentContainer.scrollLeft;
+      const containerRight = containerLeft + contentContainer.clientWidth;
+      const tabLeft = activeTabEl.offsetLeft;
+      const tabRight = tabLeft + activeTabEl.offsetWidth;
+      if (tabLeft < containerLeft) {
+        contentContainer.scrollTo({ left: tabLeft - 40, behavior: "smooth" });
+      } else if (tabRight > containerRight) {
+        contentContainer.scrollTo({ left: tabRight - contentContainer.clientWidth + 40, behavior: "smooth" });
+      }
+    }
+  }
+  function setActiveTab(value) {
+    const targetTab = getTabs().find((t) => (t.getAttribute("data-value") || t.getAttribute("value")) === value);
+    if (targetTab && (targetTab.hasAttribute("disabled") || targetTab.getAttribute("aria-disabled") === "true")) {
+      return;
+    }
+    activeValue = value;
+    update();
+    container.dispatchEvent(new CustomEvent("tabs:change", {
+      bubbles: true,
+      detail: { value: activeValue }
+    }));
+  }
+  allTabs.forEach((tab, idx) => {
+    const val = tab.getAttribute("data-value") || tab.getAttribute("value") || String(idx);
+    const isDisabled = tab.hasAttribute("disabled") || tab.getAttribute("aria-disabled") === "true";
+    tab.addEventListener("click", (e) => {
+      e.preventDefault();
+      if (isDisabled) return;
+      setActiveTab(val);
+    });
+    if (selectOnFocus) {
+      tab.addEventListener("focus", () => {
+        if (!isDisabled) setActiveTab(val);
+      });
+    }
+    tab.addEventListener("keydown", (e) => {
+      const tabs = getTabs().filter((t) => !t.hasAttribute("disabled") && t.getAttribute("aria-disabled") !== "true");
+      const currentIdx = tabs.indexOf(tab);
+      if (currentIdx === -1) return;
+      let nextIdx = -1;
+      if (e.key === "ArrowRight") {
+        nextIdx = (currentIdx + 1) % tabs.length;
+      } else if (e.key === "ArrowLeft") {
+        nextIdx = (currentIdx - 1 + tabs.length) % tabs.length;
+      } else if (e.key === "Home") {
+        nextIdx = 0;
+      } else if (e.key === "End") {
+        nextIdx = tabs.length - 1;
+      }
+      if (nextIdx !== -1) {
+        e.preventDefault();
+        const nextTab = tabs[nextIdx];
+        nextTab.focus();
+        const nextVal = nextTab.getAttribute("data-value") || nextTab.getAttribute("value") || String(nextIdx);
+        setActiveTab(nextVal);
+      }
+    });
+  });
+  if (isScrollable && contentContainer) {
+    let checkScrollButtons2 = function() {
+      if (!contentContainer || !prevBtn || !nextBtn) return;
+      const { scrollLeft, scrollWidth, clientWidth } = contentContainer;
+      prevBtn.disabled = scrollLeft <= 4;
+      nextBtn.disabled = scrollLeft + clientWidth >= scrollWidth - 4;
+    };
+    var checkScrollButtons = checkScrollButtons2;
+    let prevBtn = tabList.querySelector(".p-tablist-prev-button");
+    let nextBtn = tabList.querySelector(".p-tablist-next-button");
+    if (!prevBtn) {
+      prevBtn = document.createElement("button");
+      prevBtn.type = "button";
+      prevBtn.className = "p-tablist-prev-button";
+      prevBtn.setAttribute("aria-label", "Previous Tab");
+      prevBtn.innerHTML = CHEVRON_LEFT_SVG;
+      tabList.insertBefore(prevBtn, contentContainer);
+    }
+    if (!nextBtn) {
+      nextBtn = document.createElement("button");
+      nextBtn.type = "button";
+      nextBtn.className = "p-tablist-next-button";
+      nextBtn.setAttribute("aria-label", "Next Tab");
+      nextBtn.innerHTML = CHEVRON_RIGHT_SVG;
+      tabList.appendChild(nextBtn);
+    }
+    prevBtn.addEventListener("click", () => {
+      contentContainer?.scrollBy({ left: -220, behavior: "smooth" });
+    });
+    nextBtn.addEventListener("click", () => {
+      contentContainer?.scrollBy({ left: 220, behavior: "smooth" });
+    });
+    contentContainer.addEventListener("scroll", checkScrollButtons2);
+    setTimeout(checkScrollButtons2, 50);
+    window.addEventListener("resize", checkScrollButtons2);
+  }
+  const demoCard = container.closest("[data-tabs-demo]") || container.parentElement;
+  if (demoCard) {
+    demoCard.querySelectorAll(":scope > * [data-tabs-target], :scope > [data-tabs-target]").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        const targetTab = btn.getAttribute("data-tabs-target");
+        if (targetTab) setActiveTab(targetTab);
+      });
+    });
+  }
+  setTimeout(update, 50);
+  window.addEventListener("resize", () => {
+    const tabs = getTabs();
+    const activeTabEl = tabs.find((t) => (t.getAttribute("data-value") || t.getAttribute("value")) === activeValue);
+    updateActiveBar(activeTabEl || null);
+  });
+}
+
 // src/composables/useDisclosure.ts
 function useDisclosure(options = {}) {
   let isOpen = Boolean(options.defaultIsOpen);
@@ -2830,343 +3705,6 @@ function useDisclosure(options = {}) {
     setOpen,
     onChange
   };
-}
-
-// src/composables/animation/useTransition.ts
-function useTransition(element, options = {}) {
-  const duration = options.duration ?? 200;
-  const easing = options.easing ?? "cubic-bezier(0.16, 1, 0.3, 1)";
-  const preset = options.preset ?? "fade";
-  function getPresetStyles(state) {
-    switch (preset) {
-      case "fade":
-        return {
-          opacity: state === "visible" ? "1" : "0",
-          transform: "none"
-        };
-      case "scale":
-        return {
-          opacity: state === "visible" ? "1" : "0",
-          transform: state === "visible" ? "scale(1)" : "scale(0.95)"
-        };
-      case "slide-up":
-        return {
-          opacity: state === "visible" ? "1" : "0",
-          transform: state === "visible" ? "translateY(0)" : "translateY(12px)"
-        };
-      case "slide-down":
-        return {
-          opacity: state === "visible" ? "1" : "0",
-          transform: state === "visible" ? "translateY(0)" : "translateY(-12px)"
-        };
-      case "slide-left":
-        return {
-          transform: state === "visible" ? "translateX(0)" : "translateX(100%)"
-        };
-      case "slide-right":
-        return {
-          transform: state === "visible" ? "translateX(0)" : "translateX(-100%)"
-        };
-      case "collapse":
-        return {
-          height: state === "visible" ? "auto" : "0px",
-          opacity: state === "visible" ? "1" : "0",
-          overflow: "hidden"
-        };
-      default:
-        return { opacity: state === "visible" ? "1" : "0" };
-    }
-  }
-  function enter(cb) {
-    if (!element) return;
-    options.onEnterStart?.();
-    element.style.transition = `all ${duration}ms ${easing}`;
-    element.style.willChange = "transform, opacity";
-    const hidden = getPresetStyles("hidden");
-    Object.assign(element.style, hidden);
-    element.style.display = "block";
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        const visible = getPresetStyles("visible");
-        Object.assign(element.style, visible);
-        setTimeout(() => {
-          element.style.willChange = "auto";
-          options.onEnterEnd?.();
-          cb?.();
-        }, duration);
-      });
-    });
-  }
-  function exit(cb) {
-    if (!element) return;
-    options.onExitStart?.();
-    element.style.transition = `all ${duration}ms ${easing}`;
-    element.style.willChange = "transform, opacity";
-    const hidden = getPresetStyles("hidden");
-    Object.assign(element.style, hidden);
-    setTimeout(() => {
-      element.style.display = "none";
-      element.style.willChange = "auto";
-      options.onExitEnd?.();
-      cb?.();
-    }, duration);
-  }
-  return { enter, exit };
-}
-
-// src/components/accordion.ts
-var CSS7 = `
-[data-theme="dark"] .accordion-tab {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
-}
-[data-theme="dark"] .accordion-header-btn {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
-}
-[data-theme="dark"] .accordion-content {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
-}
-[data-theme="dark"] .tab-slot {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
-}
-[data-theme="dark"] .laughtale-accordion {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
-}
-`;
-function AccordionIsland(container, props) {
-  injectIslandStyle("accordion", CSS7);
-  const tabs = props.tabs || [];
-  let activeIndices = /* @__PURE__ */ new Set();
-  if (Array.isArray(props.activeIndex)) {
-    props.activeIndex.forEach((i) => activeIndices.add(i));
-  } else if (typeof props.activeIndex === "number") {
-    activeIndices.add(props.activeIndex);
-  } else {
-    activeIndices.add(0);
-  }
-  const disclosures = {};
-  tabs.forEach((_, idx) => {
-    disclosures[idx] = useDisclosure({
-      defaultIsOpen: activeIndices.has(idx)
-    });
-  });
-  function render() {
-    const tabHtml = tabs.map((tab, idx) => {
-      const isOpen = disclosures[idx]?.isOpen ?? false;
-      const headerText = tab.header || tab.Header || tab.title || tab.Title || tab.label || tab.Label || `Tab ${idx + 1}`;
-      const contentText = tab.content || tab.Content || "";
-      const iconText = tab.icon || tab.Icon || "";
-      return `
-                <div class="accordion-tab ${isOpen ? "tab-open" : ""}" data-idx="${idx}" style="border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); margin-bottom: 0.5rem; background: var(--p-surface-0); overflow: hidden;">
-                    <button type="button" 
-                            class="accordion-header-btn" 
-                            data-idx="${idx}" 
-                            ${tab.disabled ? "disabled" : ""} 
-                            style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0.875rem 1.25rem; border: none; background: ${isOpen ? "var(--p-surface-50)" : "var(--p-surface-0)"}; color: var(--p-text-color); font-weight: 600; font-size: 0.875rem; cursor: ${tab.disabled ? "not-allowed" : "pointer"}; text-align: left; transition: background 0.15s ease;">
-                        <span style="display: flex; align-items: center; gap: 0.5rem;">
-                            ${iconText ? `<span>${iconText}</span>` : ""}
-                            <span>${headerText}</span>
-                        </span>
-                        <span class="chevron-icon" style="color: var(--p-text-muted); display: flex; align-items: center; transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1); transform: rotate(${isOpen ? "180deg" : "0deg"});">
-                            ${LucideIcons.chevronDown}
-                        </span>
-                    </button>
-                    <div class="accordion-content" style="display: ${isOpen ? "block" : "none"}; padding: 1.25rem; border-top: 1px solid var(--p-border-color); font-size: 0.875rem; color: var(--p-text-muted); line-height: 1.6; background: var(--p-surface-0);">
-                        <div class="tab-slot" data-slot-index="${idx}">${contentText}</div>
-                    </div>
-                </div>
-            `;
-    }).join("");
-    container.innerHTML = `
-            <div class="laughtale-accordion" style="width: 100%;">
-                ${tabHtml}
-            </div>
-        `;
-    bindEvents();
-  }
-  function toggleTab(idx) {
-    if (!props.multiple) {
-      tabs.forEach((_, otherIdx) => {
-        if (otherIdx !== idx) disclosures[otherIdx]?.close();
-      });
-    }
-    disclosures[idx]?.toggle();
-    updateDOM();
-  }
-  function updateDOM() {
-    container.querySelectorAll(".accordion-tab").forEach((tabEl) => {
-      const idx = Number(tabEl.getAttribute("data-idx"));
-      const isOpen = disclosures[idx]?.isOpen ?? false;
-      const contentEl = tabEl.querySelector(".accordion-content");
-      const chevronEl = tabEl.querySelector(".chevron-icon");
-      const headerBtn = tabEl.querySelector(".accordion-header-btn");
-      tabEl.classList.toggle("tab-open", isOpen);
-      headerBtn.style.background = isOpen ? "var(--p-surface-50)" : "var(--p-surface-0)";
-      chevronEl.style.transform = `rotate(${isOpen ? "180deg" : "0deg"})`;
-      const transition = useTransition(contentEl, { preset: "collapse" });
-      if (isOpen) {
-        transition.enter();
-      } else {
-        contentEl.style.display = "none";
-        transition.exit();
-      }
-    });
-    const activeList = tabs.map((_, idx) => idx).filter((idx) => disclosures[idx]?.isOpen);
-    container.dispatchEvent(new CustomEvent("accordion:change", {
-      bubbles: true,
-      detail: { activeIndex: activeList }
-    }));
-  }
-  function bindEvents() {
-    container.querySelectorAll(".accordion-header-btn").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const idx = Number(btn.getAttribute("data-idx"));
-        toggleTab(idx);
-      });
-    });
-  }
-  render();
-}
-
-// src/components/tabs.ts
-var TABS_CSS = `
-.laughtale-tabs {
-    width: 100%;
-}
-
-.tabs-header-bar {
-    display: flex;
-    border-bottom: 1px solid var(--p-border-color);
-    gap: 0.5rem;
-    overflow-x: auto;
-    position: relative;
-}
-
-.tab-header-btn {
-    position: relative;
-    padding: 0.75rem 1.25rem;
-    border: none;
-    background: transparent;
-    color: var(--p-text-muted);
-    font-weight: 500;
-    font-size: 0.875rem;
-    cursor: pointer;
-    transition: color 0.2s ease, border-color 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    border-bottom: 2px solid transparent;
-    outline: none;
-    user-select: none;
-}
-
-.tab-header-btn:hover:not(:disabled) {
-    color: var(--p-text-color);
-}
-
-.tab-header-btn.tab-active {
-    color: var(--p-primary-600);
-    font-weight: 700;
-    border-bottom-color: var(--p-primary-600);
-}
-
-.tab-header-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.tab-panel-body {
-    padding: 1.25rem 0;
-    font-size: 0.875rem;
-    color: var(--p-text-color);
-    line-height: 1.6;
-}
-
-.dark .tab-header-btn.tab-active,
-[data-theme="dark"] .tab-header-btn.tab-active {
-    color: var(--p-primary-500);
-    border-bottom-color: var(--p-primary-500);
-}
-`;
-function TabsIsland(container, props) {
-  injectIslandStyle("tabs", TABS_CSS);
-  const tabs = props.tabs || [];
-  let activeIndex = props.activeIndex || 0;
-  const initialSlots = {};
-  container.querySelectorAll("[data-slot]").forEach((el) => {
-    const slotKey = el.getAttribute("data-slot") || "";
-    if (slotKey) {
-      initialSlots[slotKey] = el.cloneNode(true);
-    }
-  });
-  function render() {
-    const headerButtons = tabs.map((tab, idx) => {
-      const isActive = idx === activeIndex;
-      const headerText = tab.header || tab.Header || tab.title || tab.Title || tab.label || tab.Label || `Tab ${idx + 1}`;
-      const iconText = tab.icon || tab.Icon || "";
-      return `
-                <button type="button" 
-                        class="tab-header-btn ${isActive ? "tab-active" : ""}" 
-                        data-idx="${idx}" 
-                        ${tab.disabled ? 'disabled aria-disabled="true"' : ""}
-                        role="tab"
-                        aria-selected="${isActive}">
-                    ${iconText ? `<span>${iconText}</span>` : ""}
-                    <span>${headerText}</span>
-                </button>
-            `;
-    }).join("");
-    const activeContent = tabs[activeIndex]?.content || tabs[activeIndex]?.Content || "";
-    container.innerHTML = `
-            <div class="laughtale-tabs">
-                <div class="tabs-header-bar" role="tablist">
-                    ${headerButtons}
-                </div>
-                <div class="tab-panel-body" role="tabpanel">
-                    <div class="tab-slot-content">${activeContent}</div>
-                </div>
-            </div>
-        `;
-    const slotEl = initialSlots[`tab-${activeIndex}`];
-    const targetContainer = container.querySelector(".tab-slot-content");
-    if (slotEl && targetContainer) {
-      targetContainer.innerHTML = "";
-      targetContainer.appendChild(slotEl.cloneNode(true));
-    }
-    container.querySelectorAll(".tab-header-btn").forEach((btn) => {
-      btn.addEventListener("click", (e) => {
-        e.preventDefault();
-        const idx = Number(btn.getAttribute("data-idx"));
-        if (tabs[idx]?.disabled) return;
-        activeIndex = idx;
-        render();
-        if (props.targetInputName) {
-          let hidden = container.querySelector(`input[name="${props.targetInputName}"]`);
-          if (!hidden) {
-            hidden = document.createElement("input");
-            hidden.type = "hidden";
-            hidden.name = props.targetInputName;
-            container.appendChild(hidden);
-          }
-          hidden.value = String(activeIndex);
-        }
-        container.dispatchEvent(new CustomEvent("tabs:change", {
-          bubbles: true,
-          detail: { activeIndex, tab: tabs[activeIndex] }
-        }));
-      });
-    });
-  }
-  render();
 }
 
 // src/composables/useClickOutside.ts
@@ -3223,7 +3761,7 @@ function useDebounce(fn, delayMs = 250) {
 }
 
 // src/components/autocomplete.ts
-var CSS8 = `
+var CSS7 = `
 .laughtale-autocomplete {
     position: relative;
     display: inline-flex;
@@ -3485,7 +4023,7 @@ var CSS8 = `
 }
 `;
 function AutoCompleteIsland(container, props) {
-  injectIslandStyle("autocomplete", CSS8);
+  injectIslandStyle("autocomplete", CSS7);
   const allItems = props.suggestions || props.items || [];
   const multiple = props.multiple === true;
   const showClear = props.showClear !== false;
@@ -3837,7 +4375,7 @@ var DEFAULT_PRESETS = [
   "#1e293b",
   "#000000"
 ];
-var CSS9 = `
+var CSS8 = `
 [data-theme="dark"] .color-swatch-btn {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -3865,7 +4403,7 @@ var CSS9 = `
 }
 `;
 function ColorPickerIsland(container, props) {
-  injectIslandStyle("color-picker", CSS9);
+  injectIslandStyle("color-picker", CSS8);
   let currentColor = props.value || "#10b981";
   let isOpen = false;
   const swatchesHtml = DEFAULT_PRESETS.map((c) => `
@@ -3991,7 +4529,7 @@ function ColorPickerIsland(container, props) {
 }
 
 // src/components/knob.ts
-var CSS10 = `
+var CSS9 = `
 [data-theme="dark"] .laughtale-knob {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -4009,7 +4547,7 @@ var CSS10 = `
 }
 `;
 function KnobIsland(container, props) {
-  injectIslandStyle("knob", CSS10);
+  injectIslandStyle("knob", CSS9);
   const min = props.min !== void 0 ? props.min : 0;
   const max = props.max !== void 0 ? props.max : 100;
   const step = props.step || 1;
@@ -4113,7 +4651,7 @@ function KnobIsland(container, props) {
 }
 
 // src/components/inplace.ts
-var CSS11 = `
+var CSS10 = `
 [data-theme="dark"] .laughtale-inplace-display {
     background: var(--p-surface-900) !important;
     color: var(--p-surface-100) !important;
@@ -4141,7 +4679,7 @@ var CSS11 = `
 }
 `;
 function InplaceIsland(container, props) {
-  injectIslandStyle("inplace", CSS11);
+  injectIslandStyle("inplace", CSS10);
   let isEditing = false;
   let currentValue = props.value || "";
   function render() {
@@ -4223,89 +4761,432 @@ function InplaceIsland(container, props) {
 }
 
 // src/components/image-compare.ts
-var CSS12 = `
-[data-theme="dark"] .laughtale-image-compare {
-    background: var(--p-surface-900) !important;
-    color: var(--p-surface-100) !important;
-    border-color: var(--p-surface-700) !important;
+var COMPARE_CSS = `
+/* ==========================================================================
+   PrimeVue 4 Aura Compare Component Tokens & Styles
+   ========================================================================== */
+.p-compare {
+    position: relative;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+    border-radius: var(--p-compare-border-radius, var(--p-border-radius, 12px));
+    border: 1px solid var(--p-border-color, #e2e8f0);
+    box-sizing: border-box;
+    font-family: var(--p-font-family, inherit);
+    cursor: ew-resize;
+    display: block;
+    width: 100%;
+}
+
+.p-compare-vertical {
+    cursor: ns-resize;
+}
+
+.p-compare-disabled {
+    opacity: 0.6;
+    cursor: not-allowed !important;
+    pointer-events: none;
+}
+
+/* Hidden Accessible Range Input */
+.p-compare-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* Compare Layers */
+.p-compare-item {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.p-compare-item-after {
+    z-index: 1;
+}
+
+.p-compare-item-before {
+    z-index: 2;
+    will-change: clip-path, width, height;
+}
+
+.p-compare-item img,
+.p-compare-item svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+}
+
+/* Compare Handle & Indicator */
+.p-compare-handle {
+    position: absolute;
+    z-index: 3;
+    pointer-events: none;
+    box-sizing: border-box;
+    background: var(--p-compare-handle-background, #ffffff);
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.45);
+    will-change: left, top;
+}
+
+/* Horizontal Handle */
+.p-compare:not(.p-compare-vertical) .p-compare-handle {
+    top: 0;
+    bottom: 0;
+    width: var(--p-compare-handle-size, 2px);
+    transform: translateX(-50%);
+}
+
+/* Vertical Handle */
+.p-compare-vertical .p-compare-handle {
+    left: 0;
+    right: 0;
+    height: var(--p-compare-handle-size, 2px);
+    transform: translateY(-50%);
+}
+
+.p-compare-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: var(--p-compare-indicator-size, 2.25rem);
+    height: var(--p-compare-indicator-size, 2.25rem);
+    border-radius: var(--p-compare-indicator-border-radius, 9999px);
+    background: var(--p-compare-indicator-background, #ffffff);
+    color: var(--p-text-color, #0f172a);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: auto;
+    cursor: ew-resize;
+    transition: transform 150ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 150ms ease;
+}
+
+.p-compare-vertical .p-compare-indicator {
+    cursor: ns-resize;
+}
+
+.p-compare-indicator:hover {
+    transform: translate(-50%, -50%) scale(1.1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+
+.p-compare:focus-within .p-compare-indicator {
+    outline: none;
+    box-shadow: 0 0 0 var(--p-compare-indicator-focus-ring-width, 3px) var(--p-compare-indicator-focus-ring-color, rgba(16, 185, 129, 0.4)), 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+/* Custom Translucent Bubble Handle */
+.p-compare-custom-handle .p-compare-handle {
+    background: transparent !important;
+    box-shadow: none !important;
+}
+.p-compare-custom-handle .p-compare-indicator {
+    width: 1.25rem !important;
+    height: 1.25rem !important;
+    background: rgba(255, 255, 255, 0.6) !important;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
+.p-compare-custom-handle .p-compare-indicator:hover {
+    transform: translate(-50%, -50%) scale(1.5) !important;
+}
+
+/* Dark Mode Tokens */
+.dark .p-compare,
+[data-theme="dark"] .p-compare {
+    border-color: var(--p-surface-800, #1e293b);
+}
+
+.dark .p-compare-indicator,
+[data-theme="dark"] .p-compare-indicator {
+    background: var(--p-surface-900, #0f172a);
+    color: var(--p-surface-0, #ffffff);
+    border: 1px solid var(--p-surface-700, #334155);
 }
 `;
-function ImageCompareIsland(container, props) {
-  injectIslandStyle("image-compare", CSS12);
-  let splitPercent = 50;
-  container.innerHTML = `
-        <div class="laughtale-image-compare" style="position: relative; width: 100%; max-width: 600px; height: 340px; border-radius: var(--p-border-radius-lg); overflow: hidden; user-select: none; border: 1px solid var(--p-border-color); box-shadow: var(--p-shadow-md); touch-action: none; cursor: ew-resize;">
-            <!-- After Image (Bottom) -->
-            <img src="${props.afterImage}" alt="After" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none;" />
-            ${props.afterLabel ? `<span style="position: absolute; bottom: 0.75rem; right: 0.75rem; background: rgba(0,0,0,0.6); color: #ffffff; padding: 0.25rem 0.5rem; border-radius: var(--p-border-radius); font-size: 0.75rem; font-weight: 600; pointer-events: none;">${props.afterLabel}</span>` : ""}
+var ARROWS_H_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 8 4 4-4 4"/><path d="M2 12h20"/><path d="m6 8-4 4 4 4"/></svg>`;
+var CODE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>`;
+var DEFAULT_BEFORE_IMG = "https://primefaces.org/cdn/primevue/images/compare/island2.jpg";
+var DEFAULT_AFTER_IMG = "https://primefaces.org/cdn/primevue/images/compare/island1.jpg";
+function CompareIsland(container, props) {
+  injectIslandStyle("compare", COMPARE_CSS);
+  const demoType = props.demoType || "basic";
+  const orientation = props.orientation || (demoType === "vertical" ? "vertical" : "horizontal");
+  const isVertical = orientation === "vertical";
+  const slideOnHover = props.slideOnHover === true || demoType === "hover" || demoType === "with-chart";
+  const isCustomHandle = props.customHandle === true || demoType === "custom-handle";
+  const isControlled = demoType === "controlled";
+  const isWithChart = demoType === "with-chart";
+  const isTemplate = demoType === "template";
+  const disabled = props.disabled === true;
+  const readonly = props.readonly === true;
+  let currentValue = props.modelValue !== void 0 ? props.modelValue : props.value !== void 0 ? props.value : 50;
+  currentValue = Math.max(0, Math.min(100, currentValue));
+  const beforeImg = props.beforeImage || DEFAULT_BEFORE_IMG;
+  const afterImg = props.afterImage || DEFAULT_AFTER_IMG;
+  function renderDOM() {
+    const customHandleClass = isCustomHandle ? "p-compare-custom-handle" : "";
+    const verticalClass = isVertical ? "p-compare-vertical" : "";
+    const disabledClass = disabled ? "p-compare-disabled" : "";
+    let beforeContentHtml = "";
+    let afterContentHtml = "";
+    if (isWithChart) {
+      beforeContentHtml = `
+                <svg class="absolute h-full w-full" viewBox="0 0 644 189" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;">
+                    <g clip-path="url(#compare_chart_clip)">
+                        <path d="M0.5 118.499C0.5 118.499 82 102.999 113.5 89.4989C145 75.9989 188.444 87.7869 235 77.4989C272.684 69.1719 293.654 62.4939 329 46.9989C409.332 11.7849 479.5 86.5 510.5 78C541.5 69.5 635.951 0.848863 644 1.49886" stroke="#10b981" stroke-width="2.5" />
+                        <path d="M113.5 89.5006C82 103.001 0.5 118.501 0.5 118.501V188.501H644V1.50065C635.951 0.850647 541.5 69.5 510.5 78C479.5 86.5 409.332 11.7866 329 47.0006C293.654 62.4956 272.684 69.1736 235 77.5006C188.444 87.7886 145 76.0006 113.5 89.5006Z" fill="url(#compare_chart_gradient)" />
+                    </g>
+                    <defs>
+                        <clipPath id="compare_chart_clip">
+                            <rect width="644" height="189" fill="white" />
+                        </clipPath>
+                        <linearGradient id="compare_chart_gradient" x1="322.25" x2="322.25" y1="1.477" y2="188.5" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#10b981" stop-opacity="0.4" />
+                            <stop offset="1" stop-color="#10b981" stop-opacity="0" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+            `;
+      afterContentHtml = `
+                <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: var(--p-surface-50); color: var(--p-text-muted); font-size: 0.875rem;">
+                    <span>Hover to reveal chart trajectory</span>
+                </div>
+            `;
+    } else if (isTemplate) {
+      beforeContentHtml = `
+                <div style="width: 100%; height: 100%; background: #f3e8ff; padding: 1.5rem; display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
+                    <div style="width: 100%; max-width: 18rem; border-radius: 12px; border: 1px solid #e9d5ff; background: #ffffff; padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; box-shadow: 0 4px 12px rgba(147, 51, 234, 0.1);">
+                        <div style="display: flex; align-items: flex-start; justify-content: space-between;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <div style="width: 2.5rem; height: 2.5rem; border-radius: 9999px; overflow: hidden; background: #c084fc;">
+                                    <img src="https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png" style="width: 100%; height: 100%; object-fit: cover; filter: hue-rotate(260deg) saturate(150%);" />
+                                </div>
+                                <div>
+                                    <div style="font-weight: 600; color: #581c87; font-size: 0.9rem;">Amy Elsner</div>
+                                    <div style="font-size: 0.75rem; color: #9333ea;">Developer</div>
+                                </div>
+                            </div>
+                            <span style="background: #f3e8ff; color: #7e22ce; padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700;">Pro</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                            <div style="display: flex; justify-content: space-between; font-size: 0.75rem;">
+                                <span style="color: #9333ea;">Storage</span>
+                                <span style="color: #581c87; font-weight: 600;">7.2 GB / 10 GB</span>
+                            </div>
+                            <div style="height: 0.5rem; width: 100%; background: #f3e8ff; border-radius: 9999px; overflow: hidden;">
+                                <div style="height: 100%; width: 72%; background: #a855f7; border-radius: 9999px;"></div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem; padding-top: 0.25rem;">
+                            <button type="button" class="p-button p-button-sm" style="flex: 1; padding: 0.35rem; font-size: 0.75rem; border-radius: 6px; background: #9333ea; border: 1px solid #9333ea; color: #ffffff; cursor: pointer;">Upgrade</button>
+                            <button type="button" class="p-button p-button-sm p-button-outlined" style="padding: 0.35rem 0.6rem; font-size: 0.75rem; border-radius: 6px; border: 1px solid #e9d5ff; background: transparent; color: #7e22ce; cursor: pointer;">Settings</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+      afterContentHtml = `
+                <div style="width: 100%; height: 100%; background: #ecfdf5; padding: 1.5rem; display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
+                    <div style="width: 100%; max-width: 18rem; border-radius: 12px; border: 1px solid #a7f3d0; background: #ffffff; padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);">
+                        <div style="display: flex; align-items: flex-start; justify-content: space-between;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <div style="width: 2.5rem; height: 2.5rem; border-radius: 9999px; overflow: hidden; background: #34d399;">
+                                    <img src="https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png" style="width: 100%; height: 100%; object-fit: cover;" />
+                                </div>
+                                <div>
+                                    <div style="font-weight: 600; color: #064e3b; font-size: 0.9rem;">Amy Elsner</div>
+                                    <div style="font-size: 0.75rem; color: #059669;">Developer</div>
+                                </div>
+                            </div>
+                            <span style="background: #ecfdf5; color: #047857; padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700;">Pro</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                            <div style="display: flex; justify-content: space-between; font-size: 0.75rem;">
+                                <span style="color: #059669;">Storage</span>
+                                <span style="color: #064e3b; font-weight: 600;">7.2 GB / 10 GB</span>
+                            </div>
+                            <div style="height: 0.5rem; width: 100%; background: #ecfdf5; border-radius: 9999px; overflow: hidden;">
+                                <div style="height: 100%; width: 72%; background: #10b981; border-radius: 9999px;"></div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem; padding-top: 0.25rem;">
+                            <button type="button" class="p-button p-button-sm" style="flex: 1; padding: 0.35rem; font-size: 0.75rem; border-radius: 6px; background: #10b981; border: 1px solid #10b981; color: #ffffff; cursor: pointer;">Upgrade</button>
+                            <button type="button" class="p-button p-button-sm p-button-outlined" style="padding: 0.35rem 0.6rem; font-size: 0.75rem; border-radius: 6px; border: 1px solid #a7f3d0; background: transparent; color: #047857; cursor: pointer;">Settings</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+    } else {
+      beforeContentHtml = `<img src="${beforeImg}" alt="Before" draggable="false" />`;
+      afterContentHtml = `<img src="${afterImg}" alt="After" draggable="false" />`;
+    }
+    const iconHtml = demoType === "hover" || demoType === "vertical" || isTemplate ? CODE_SVG : ARROWS_H_SVG;
+    const iconRotateStyle = isVertical ? "transform: rotate(90deg);" : "";
+    const heightStyle = isWithChart ? "height: 189px;" : isTemplate ? "height: 320px;" : "aspect-ratio: 16/9;";
+    let containerHtml = `
+            <div class="p-compare ${verticalClass} ${customHandleClass} ${disabledClass} ${props.class || ""}" style="max-width: 32rem; margin: 0 auto; ${heightStyle} ${props.style || ""}" data-compare-root>
+                <!-- Hidden Accessible Range Input -->
+                <input type="range" class="p-compare-input" min="${props.min || 0}" max="${props.max || 100}" step="${props.step || 1}" value="${currentValue}" aria-label="${props.ariaLabel || "Compare images"}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${currentValue}" tabindex="0" ${disabled ? "disabled" : ""} data-compare-input />
 
-            <!-- Before Image (Top Clipped) -->
-            <div class="compare-clip" style="position: absolute; inset: 0; width: ${splitPercent}%; height: 100%; overflow: hidden; pointer-events: none;">
-                <img src="${props.beforeImage}" alt="Before" style="position: absolute; top: 0; left: 0; width: 600px; max-width: 600px; height: 340px; object-fit: cover;" />
-                ${props.beforeLabel ? `<span style="position: absolute; bottom: 0.75rem; left: 0.75rem; background: rgba(0,0,0,0.6); color: #ffffff; padding: 0.25rem 0.5rem; border-radius: var(--p-border-radius); font-size: 0.75rem; font-weight: 600;">${props.beforeLabel}</span>` : ""}
-            </div>
+                <!-- Layer After (Base Bottom) -->
+                <div class="p-compare-item p-compare-item-after" data-compare-after>
+                    ${afterContentHtml}
+                </div>
 
-            <!-- Divider Line & Handle -->
-            <div class="compare-handle-line" style="position: absolute; top: 0; bottom: 0; left: ${splitPercent}%; width: 2px; background: #ffffff; box-shadow: 0 0 6px rgba(0,0,0,0.6); pointer-events: none;">
-                <div class="compare-handle-knob" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 2.25rem; height: 2.25rem; border-radius: 50%; background: #ffffff; border: 2px solid var(--p-primary-600); box-shadow: 0 2px 8px rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center; font-size: 0.6875rem; font-weight: 700; color: var(--p-primary-600); transition: transform 0.15s ease;">
-                    \u25C0\u25B6
+                <!-- Layer Before (Clipped Top) -->
+                <div class="p-compare-item p-compare-item-before" data-compare-before>
+                    ${beforeContentHtml}
+                </div>
+
+                <!-- Divider Handle -->
+                <div class="p-compare-handle" data-compare-handle>
+                    <div class="p-compare-indicator" data-compare-indicator>
+                        ${isCustomHandle ? "" : `<span style="${iconRotateStyle} display: flex; align-items: center; justify-content: center;">${iconHtml}</span>`}
+                    </div>
                 </div>
             </div>
-        </div>
-    `;
-  const compareBox = container.querySelector(".laughtale-image-compare");
-  const clip = container.querySelector(".compare-clip");
-  const handleLine = container.querySelector(".compare-handle-line");
-  const knob = container.querySelector(".compare-handle-knob");
-  function updateSplit(p) {
-    splitPercent = Math.max(0, Math.min(100, p));
-    clip.style.width = `${splitPercent}%`;
-    handleLine.style.left = `${splitPercent}%`;
-    container.dispatchEvent(new CustomEvent("imagecompare:change", {
+        `;
+    if (isControlled) {
+      containerHtml += `
+                <div class="p-compare-controls" style="max-width: 32rem; margin: 1rem auto 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; width: 100%;">
+                    <button type="button" class="p-button p-button-outlined p-button-secondary" data-compare-set="25" style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer;">
+                        25%
+                    </button>
+                    <div style="display: flex; align-items: center; gap: 0.25rem;">
+                        <input type="number" min="0" max="100" value="${currentValue}" class="p-inputtext p-component" data-compare-num style="width: 5rem; text-align: center; padding: 0.45rem 0.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); font-weight: 600; font-size: 0.875rem;" />
+                        <span style="font-weight: 600; font-size: 0.875rem; color: var(--p-text-muted);">%</span>
+                    </div>
+                    <button type="button" class="p-button p-button-outlined p-button-secondary" data-compare-set="75" style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer;">
+                        75%
+                    </button>
+                </div>
+            `;
+    }
+    container.innerHTML = containerHtml;
+  }
+  renderDOM();
+  const rootEl = container.querySelector("[data-compare-root]");
+  const inputEl = container.querySelector("[data-compare-input]");
+  const beforeEl = container.querySelector("[data-compare-before]");
+  const handleEl = container.querySelector("[data-compare-handle]");
+  const numInput = container.querySelector("[data-compare-num]");
+  function updatePosition(pct) {
+    currentValue = Math.max(0, Math.min(100, pct));
+    if (isVertical) {
+      beforeEl.style.clipPath = `inset(0 0 ${100 - currentValue}% 0)`;
+      handleEl.style.top = `${currentValue}%`;
+    } else {
+      beforeEl.style.clipPath = `inset(0 ${100 - currentValue}% 0 0)`;
+      handleEl.style.left = `${currentValue}%`;
+    }
+    if (inputEl) {
+      inputEl.value = `${currentValue}`;
+      inputEl.setAttribute("aria-valuenow", `${currentValue}`);
+    }
+    if (numInput) {
+      numInput.value = `${Math.round(currentValue)}`;
+    }
+    container.dispatchEvent(new CustomEvent("compare:change", {
       bubbles: true,
-      detail: { split: splitPercent }
+      detail: { value: currentValue }
     }));
   }
+  updatePosition(currentValue);
+  if (disabled || readonly) return;
   let isDragging = false;
-  const updateFromPointer = (clientX) => {
-    const rect = compareBox.getBoundingClientRect();
-    if (rect.width <= 0) return;
-    const p = (clientX - rect.left) / rect.width * 100;
-    updateSplit(p);
-  };
+  function updateFromPointer(clientX, clientY) {
+    const rect = rootEl.getBoundingClientRect();
+    if (isVertical) {
+      if (rect.height <= 0) return;
+      const p = (clientY - rect.top) / rect.height * 100;
+      updatePosition(p);
+    } else {
+      if (rect.width <= 0) return;
+      const p = (clientX - rect.left) / rect.width * 100;
+      updatePosition(p);
+    }
+  }
   const onPointerDown = (e) => {
     isDragging = true;
-    knob.style.transform = "translate(-50%, -50%) scale(1.15)";
-    if ("setPointerCapture" in compareBox && e.pointerId !== void 0) {
-      try {
-        compareBox.setPointerCapture(e.pointerId);
-      } catch (_) {
-      }
+    try {
+      rootEl.setPointerCapture(e.pointerId);
+    } catch (_) {
     }
-    updateFromPointer(e.clientX);
+    updateFromPointer(e.clientX, e.clientY);
   };
   const onPointerMove = (e) => {
-    if (!isDragging) return;
-    updateFromPointer(e.clientX);
+    if (slideOnHover) {
+      updateFromPointer(e.clientX, e.clientY);
+    } else if (isDragging) {
+      updateFromPointer(e.clientX, e.clientY);
+    }
   };
   const onPointerUp = (e) => {
     if (!isDragging) return;
     isDragging = false;
-    knob.style.transform = "translate(-50%, -50%) scale(1)";
-    if ("releasePointerCapture" in compareBox && e.pointerId !== void 0) {
-      try {
-        compareBox.releasePointerCapture(e.pointerId);
-      } catch (_) {
-      }
+    try {
+      rootEl.releasePointerCapture(e.pointerId);
+    } catch (_) {
     }
   };
-  compareBox.addEventListener("pointerdown", onPointerDown);
-  compareBox.addEventListener("pointermove", onPointerMove);
-  compareBox.addEventListener("pointerup", onPointerUp);
-  compareBox.addEventListener("pointercancel", onPointerUp);
-  compareBox.addEventListener("mousedown", onPointerDown);
-  window.addEventListener("mousemove", onPointerMove);
-  window.addEventListener("mouseup", onPointerUp);
+  rootEl.addEventListener("pointerdown", onPointerDown);
+  rootEl.addEventListener("pointermove", onPointerMove);
+  rootEl.addEventListener("pointerup", onPointerUp);
+  rootEl.addEventListener("pointercancel", onPointerUp);
+  inputEl.addEventListener("input", () => {
+    updatePosition(parseFloat(inputEl.value));
+  });
+  inputEl.addEventListener("keydown", (e) => {
+    let step = props.step || 1;
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+      e.preventDefault();
+      updatePosition(currentValue + step);
+    } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+      e.preventDefault();
+      updatePosition(currentValue - step);
+    } else if (e.key === "PageUp") {
+      e.preventDefault();
+      updatePosition(currentValue + 10);
+    } else if (e.key === "PageDown") {
+      e.preventDefault();
+      updatePosition(currentValue - 10);
+    } else if (e.key === "Home") {
+      e.preventDefault();
+      updatePosition(0);
+    } else if (e.key === "End") {
+      e.preventDefault();
+      updatePosition(100);
+    }
+  });
+  container.querySelectorAll("[data-compare-set]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const val = parseFloat(btn.getAttribute("data-compare-set") || "50");
+      updatePosition(val);
+    });
+  });
+  if (numInput) {
+    numInput.addEventListener("change", () => {
+      const val = parseFloat(numInput.value || "50");
+      updatePosition(val);
+    });
+  }
 }
 
 // tests/components.test.ts
@@ -4401,7 +5282,7 @@ describe("SoftMax.LaughTale Aura Enterprise Components Suite", () => {
     assert.strictEqual(hidden.value, "10");
   });
   it("ImageCompare: handles split divider pointer dragging", () => {
-    ImageCompareIsland(container, {
+    CompareIsland(container, {
       beforeImage: "before.jpg",
       afterImage: "after.jpg",
       beforeLabel: "Before",

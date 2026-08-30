@@ -30,7 +30,7 @@ function isSafeAttribute(attrName) {
   }
   return true;
 }
-var BLOCKED_PROPERTIES, DANGEROUS_ATTRIBUTES, DANGEROUS_PROTOCOLS;
+var BLOCKED_PROPERTIES, DANGEROUS_ATTRIBUTES, DANGEROUS_PROTOCOLS, trustedTypesPolicy;
 var init_security = __esm({
   "src/directives/security.ts"() {
     "use strict";
@@ -60,9 +60,23 @@ var init_security = __esm({
       "onblur",
       "onchange",
       "onsubmit",
-      "formaction"
+      "formaction",
+      "onanimationstart",
+      "onanimationend",
+      "ontransitionend",
+      "onmouseenter",
+      "onmouseleave"
     ]);
-    DANGEROUS_PROTOCOLS = /^\s*(javascript|data|vbscript):/i;
+    DANGEROUS_PROTOCOLS = /^\s*(javascript|vbscript|data(?!\s*:\s*image\/(png|jpeg|jpg|gif|webp))):/i;
+    trustedTypesPolicy = null;
+    if (typeof window !== "undefined" && window.trustedTypes?.createPolicy) {
+      try {
+        trustedTypesPolicy = window.trustedTypes.createPolicy("laughtale-html", {
+          createHTML: (s) => s
+        });
+      } catch {
+      }
+    }
   }
 });
 

@@ -76,9 +76,159 @@ var DANGEROUS_ATTRIBUTES = /* @__PURE__ */ new Set([
   "onblur",
   "onchange",
   "onsubmit",
-  "formaction"
+  "formaction",
+  "onanimationstart",
+  "onanimationend",
+  "ontransitionend",
+  "onmouseenter",
+  "onmouseleave"
 ]);
-var DANGEROUS_PROTOCOLS = /^\s*(javascript|data|vbscript):/i;
+var DANGEROUS_PROTOCOLS = /^\s*(javascript|vbscript|data(?!\s*:\s*image\/(png|jpeg|jpg|gif|webp))):/i;
+var ALLOWED_TAGS = /* @__PURE__ */ new Set([
+  // Typography & Inline Formatting
+  "a",
+  "abbr",
+  "b",
+  "bdi",
+  "bdo",
+  "blockquote",
+  "br",
+  "cite",
+  "code",
+  "data",
+  "dd",
+  "dfn",
+  "div",
+  "dl",
+  "dt",
+  "em",
+  "figcaption",
+  "figure",
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
+  "hr",
+  "i",
+  "kbd",
+  "li",
+  "mark",
+  "ol",
+  "p",
+  "pre",
+  "q",
+  "rp",
+  "rt",
+  "ruby",
+  "s",
+  "samp",
+  "small",
+  "span",
+  "strong",
+  "sub",
+  "sup",
+  "time",
+  "u",
+  "ul",
+  "var",
+  "wbr",
+  // Tables
+  "table",
+  "tbody",
+  "td",
+  "tfoot",
+  "th",
+  "thead",
+  "tr",
+  "caption",
+  "col",
+  "colgroup",
+  // Safe Media
+  "img",
+  "picture",
+  "source",
+  // Vector Graphics (Safe SVG primitives)
+  "svg",
+  "path",
+  "g",
+  "circle",
+  "rect",
+  "line",
+  "polyline",
+  "polygon",
+  "text",
+  "tspan",
+  "use"
+]);
+var ALLOWED_ATTRS = /* @__PURE__ */ new Set([
+  // Global Safe Attributes
+  "class",
+  "id",
+  "title",
+  "dir",
+  "lang",
+  "role",
+  "tabindex",
+  "aria-label",
+  "aria-labelledby",
+  "aria-describedby",
+  "aria-hidden",
+  "aria-expanded",
+  "aria-disabled",
+  "aria-checked",
+  "aria-current",
+  "aria-haspopup",
+  "aria-controls",
+  // Link & Media Attributes
+  "href",
+  "src",
+  "alt",
+  "width",
+  "height",
+  "target",
+  "rel",
+  "loading",
+  "decoding",
+  "sizes",
+  "srcset",
+  "type",
+  // Table Attributes
+  "colspan",
+  "rowspan",
+  "headers",
+  "scope",
+  // SVG Attributes
+  "viewbox",
+  "fill",
+  "stroke",
+  "stroke-width",
+  "stroke-linecap",
+  "stroke-linejoin",
+  "d",
+  "cx",
+  "cy",
+  "r",
+  "rx",
+  "ry",
+  "x",
+  "y",
+  "x1",
+  "y1",
+  "x2",
+  "y2",
+  "points",
+  "transform",
+  "clip-path",
+  "fill-rule",
+  "stroke-dasharray",
+  "stroke-dashoffset",
+  "xmlns",
+  "href",
+  "xlink:href"
+]);
+var URL_ATTRS = /* @__PURE__ */ new Set(["href", "src", "action", "poster", "xlink:href"]);
 function isSafeProperty(prop) {
   if (typeof prop !== "string") return true;
   return !BLOCKED_PROPERTIES.has(prop);
@@ -100,28 +250,98 @@ function isSafeAttribute(attrName) {
   }
   return true;
 }
-function sanitizeHtml(html) {
-  if (typeof html !== "string") return "";
-  if (typeof document !== "undefined") {
-    const div = document.createElement("div");
-    div.innerHTML = html;
-    const dangerous = div.querySelectorAll("script, iframe, object, embed, applet, link, meta, style");
-    dangerous.forEach((el) => el.remove());
-    const allElements = div.querySelectorAll("*");
-    allElements.forEach((el) => {
-      for (const attr of Array.from(el.attributes)) {
-        if (attr.name.toLowerCase().startsWith("on")) {
-          el.removeAttribute(attr.name);
-        } else if (["href", "src", "action"].includes(attr.name.toLowerCase())) {
-          if (DANGEROUS_PROTOCOLS.test(attr.value)) {
-            el.removeAttribute(attr.name);
-          }
-        }
-      }
+var trustedTypesPolicy = null;
+if (typeof window !== "undefined" && window.trustedTypes?.createPolicy) {
+  try {
+    trustedTypesPolicy = window.trustedTypes.createPolicy("laughtale-html", {
+      createHTML: (s) => s
     });
-    return div.innerHTML;
+  } catch {
   }
-  return html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "").replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, "").replace(/\son\w+\s*=\s*(['"]).*?\1/gi, "");
+}
+function parseInertHtml(html) {
+  if (typeof DOMParser !== "undefined") {
+    try {
+      return new DOMParser().parseFromString(html, "text/html");
+    } catch {
+    }
+  }
+  if (typeof document !== "undefined" && document.implementation?.createHTMLDocument) {
+    try {
+      const doc = document.implementation.createHTMLDocument("");
+      doc.body.innerHTML = html;
+      return doc;
+    } catch {
+    }
+  }
+  return null;
+}
+function cleanNode(node) {
+  if (node.nodeType === 3) {
+    return node;
+  }
+  if (node.nodeType === 8) {
+    return null;
+  }
+  if (node.nodeType !== 1) {
+    return null;
+  }
+  const el = node;
+  const tagName = el.tagName.toLowerCase();
+  if (!ALLOWED_TAGS.has(tagName)) {
+    return null;
+  }
+  const attrs = Array.from(el.attributes);
+  for (const attr of attrs) {
+    const attrName = attr.name.toLowerCase();
+    if (attrName.startsWith("on")) {
+      el.removeAttribute(attr.name);
+      continue;
+    }
+    if (!ALLOWED_ATTRS.has(attrName) && !attrName.startsWith("data-") && !attrName.startsWith("aria-")) {
+      el.removeAttribute(attr.name);
+      continue;
+    }
+    if (URL_ATTRS.has(attrName)) {
+      const safeUrl = sanitizeUrl(attr.value);
+      if (safeUrl === "about:blank" && attr.value.trim().toLowerCase() !== "about:blank") {
+        el.removeAttribute(attr.name);
+      } else {
+        el.setAttribute(attr.name, safeUrl);
+      }
+    }
+  }
+  if (tagName === "a" && el.getAttribute("target") === "_blank") {
+    const rel = el.getAttribute("rel") || "";
+    if (!rel.includes("noopener")) {
+      el.setAttribute("rel", (rel + " noopener noreferrer").trim());
+    }
+  }
+  const children = Array.from(el.childNodes);
+  for (const child of children) {
+    const cleaned = cleanNode(child);
+    if (!cleaned) {
+      el.removeChild(child);
+    }
+  }
+  return el;
+}
+function sanitizeHtml(html) {
+  if (typeof html !== "string" || !html.trim()) return "";
+  const doc = parseInertHtml(html);
+  if (!doc || !doc.body) {
+    return "";
+  }
+  const cleanedNodes = Array.from(doc.body.childNodes).map(cleanNode).filter((n) => n !== null);
+  const container = doc.createElement("div");
+  for (const n of cleanedNodes) {
+    container.appendChild(n);
+  }
+  const result = container.innerHTML;
+  if (trustedTypesPolicy) {
+    return trustedTypesPolicy.createHTML(result);
+  }
+  return result;
 }
 
 // src/directives/expression/lexer.ts
@@ -1249,13 +1469,6 @@ describe("SoftMax.LaughTale Directive Security & Sandboxing Suite", () => {
     assert.equal(isSafeProperty("window"), false);
     assert.equal(isSafeProperty("userCount"), true);
   });
-  it("sanitizeHtml: strips malicious script tags and event handlers", () => {
-    const dirty = '<div onclick="alert(1)">Hello <script>alert("xss")</script></div>';
-    const clean = sanitizeHtml(dirty);
-    assert.ok(!clean.includes("<script>"));
-    assert.ok(!clean.includes("onclick"));
-    assert.ok(clean.includes("Hello"));
-  });
   it("createSandboxState: blocks prototype pollution mutations on reactive state", () => {
     const container = document.createElement("div");
     const scope = createReactiveScope(container, { count: 1 });
@@ -1263,5 +1476,55 @@ describe("SoftMax.LaughTale Directive Security & Sandboxing Suite", () => {
     assert.equal(Object.prototype.hacked, void 0);
     const res = evaluateExpression("count * 10", scope.state);
     assert.equal(res, 10);
+  });
+  it("sanitizeHtml: preserves legitimate rich-text formatting and safe media", () => {
+    const safeInput = '<p>Hello <strong>World</strong>, visit <a href="https://softmax.dev" target="_blank">Docs</a> <img src="/img/icon.png" alt="Logo" width="24" height="24"></p>';
+    const result = sanitizeHtml(safeInput);
+    assert.ok(result.includes("<strong>World</strong>"));
+    assert.ok(result.includes('href="https://softmax.dev"'));
+    assert.ok(result.includes('rel="noopener noreferrer"'));
+    assert.ok(result.includes('src="/img/icon.png"'));
+    assert.ok(result.includes('alt="Logo"'));
+  });
+  it("sanitizeHtml: OWASP XSS Filter Evasion Suite (25+ vectors)", () => {
+    let executionCount = 0;
+    globalThis.recordExploit = () => {
+      executionCount++;
+    };
+    const owaspVectors = [
+      { name: "Standard onerror", payload: '<img src="x" onerror="recordExploit()">' },
+      { name: "Unquoted slash onerror", payload: "<img/src=x/onerror=recordExploit()>" },
+      { name: "SVG onload", payload: '<svg onload="recordExploit()">' },
+      { name: "SVG nested script", payload: "<svg><script>recordExploit()</script></svg>" },
+      { name: "SVG animate onbegin", payload: '<svg><animate onbegin="recordExploit()">' },
+      { name: "Iframe javascript URI", payload: '<iframe src="javascript:recordExploit()"></iframe>' },
+      { name: "Object data javascript URI", payload: '<object data="javascript:recordExploit()"></object>' },
+      { name: "Embed src javascript URI", payload: '<embed src="javascript:recordExploit()">' },
+      { name: "Link javascript URI", payload: '<link rel="stylesheet" href="javascript:recordExploit()">' },
+      { name: "Meta refresh javascript URI", payload: '<meta http-equiv="refresh" content="0;url=javascript:recordExploit()">' },
+      { name: "Form action javascript URI", payload: '<form action="javascript:recordExploit()"><input type="submit"></form>' },
+      { name: "Anchor javascript URI", payload: '<a href="javascript:recordExploit()">Click</a>' },
+      { name: "Anchor mixed-case javascript URI", payload: '<a href="  JaVaScRiPt:recordExploit()">Click</a>' },
+      { name: "Anchor data text/html base64", payload: '<a href="data:text/html;base64,PHNjcmlwdD5yZWNvcmRFeHBsb2l0KCk8L3NjcmlwdD4=">Click</a>' },
+      { name: "Body onload", payload: '<body onload="recordExploit()">' },
+      { name: "Inline onmouseover", payload: '<b onmouseover="recordExploit()">Hover me</b>' },
+      { name: "Autofocus onfocus", payload: '<input autofocus onfocus="recordExploit()">' },
+      { name: "Details ontoggle", payload: '<details open ontoggle="recordExploit()">' },
+      { name: "Video error", payload: '<video><source onerror="recordExploit()"></video>' },
+      { name: "Audio onerror", payload: '<audio src="x" onerror="recordExploit()">' },
+      { name: "Script tag with external src", payload: '<script src="//evil.com/xss.js"></script>' },
+      { name: "Nested recursive script tag", payload: "<scr<script>ipt>recordExploit()</script>" },
+      { name: "Malformed broken tag", payload: "<<SCRIPT>recordExploit();//<</SCRIPT>" },
+      { name: "Script with CDATA", payload: "<script>/*<![CDATA[*/recordExploit()/*]]>*/</script>" },
+      { name: "Applet tag", payload: '<applet code="Exploit.class"></applet>' }
+    ];
+    for (const vec of owaspVectors) {
+      const clean = sanitizeHtml(vec.payload);
+      assert.equal(/<script\b/i.test(clean), false, `Script tag survived in ${vec.name}: ${clean}`);
+      assert.equal(/\bon\w+\s*=/i.test(clean), false, `Inline event handler survived in ${vec.name}: ${clean}`);
+      assert.equal(/<(iframe|object|embed|applet|meta|link|base|form)\b/i.test(clean), false, `Dangerous tag survived in ${vec.name}: ${clean}`);
+      assert.equal(/javascript:/i.test(clean), false, `javascript: URI survived in ${vec.name}: ${clean}`);
+    }
+    assert.equal(executionCount, 0, "Exploit handler was executed during sanitization!");
   });
 });

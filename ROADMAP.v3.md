@@ -106,7 +106,8 @@ const fn = new Function('item', item.command);   // item comes from data-props, 
 ---
 
 ### `LT-103` — `sanitizeHtml` executes payloads while sanitizing them
-**Severity:** P0 · **Status:** todo · **File:** `src/directives/security.ts` (`sanitizeHtml`)
+**Severity:** P0 · **Status:** done · **File:** `src/directives/security.ts` (`sanitizeHtml`)
+**Resolution:** Re-architected `sanitizeHtml` to parse untrusted HTML exclusively in an inert `Document` via `DOMParser`/`createHTMLDocument`. Replaced leaky tag denylist and buggy regex fallback with strict element and attribute allowlists, URL protocol validation, and browser `trustedTypes` policy support. Verified against 25+ OWASP XSS evasion vectors with 0 payload executions.
 
 **Evidence.** The function assigns `div.innerHTML = html` on a `div` created from the **live** `document`. Detached-node parsing still initiates resource loads, so `<img src=x onerror=...>` and `<svg onload=...>` fire **before** the subsequent `removeAttribute('on*')` cleanup runs. The regex fallback path is also bypassable via `<img/src=x onerror=y>` (no quotes) and `<scr<script>ipt>` nesting.
 

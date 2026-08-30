@@ -210,7 +210,7 @@ function injectIslandStyle(islandName, css) {
 }
 
 // src/directives/security.ts
-var DANGEROUS_PROTOCOLS = /^\s*(javascript|data|vbscript):/i;
+var DANGEROUS_PROTOCOLS = /^\s*(javascript|vbscript|data(?!\s*:\s*image\/(png|jpeg|jpg|gif|webp))):/i;
 function sanitizeUrl(url) {
   if (typeof url !== "string") return "";
   const trimmed = url.trim();
@@ -219,6 +219,15 @@ function sanitizeUrl(url) {
     return "about:blank";
   }
   return trimmed;
+}
+var trustedTypesPolicy = null;
+if (typeof window !== "undefined" && window.trustedTypes?.createPolicy) {
+  try {
+    trustedTypesPolicy = window.trustedTypes.createPolicy("laughtale-html", {
+      createHTML: (s) => s
+    });
+  } catch {
+  }
 }
 
 // src/components/speed-dial.ts
