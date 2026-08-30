@@ -518,11 +518,11 @@ public class ComponentsModel : PageModel
 
     public List<DockItem> DockItems { get; set; } = new()
     {
-        new("CLI Terminal", "⚡", "/components"),
-        new("HSM Security", "🔒", "/components"),
-        new("Telemetry", "📊", "/components"),
-        new("Theme Studio", "🎨", "/components"),
-        new("Configuration", "⚙️", "/components")
+        new("CLI Terminal", "terminal", "/components"),
+        new("HSM Security", "lock", "/components"),
+        new("Telemetry", "activity", "/components"),
+        new("Theme Studio", "palette", "/components"),
+        new("Configuration", "settings", "/components")
     };
 
     public List<StepperStep> StepperSteps { get; set; } = new()
