@@ -164,7 +164,7 @@
 }
 
 /* Dark Mode Tokens */
-:root.dark, html.dark body, [data-theme="dark"] {
+html.dark, :root.dark, [data-theme="dark"], body.dark, html.dark body {
     --lt-surface-0: #090d16;
     --lt-surface-50: #0f172a;
     --lt-surface-100: #1e293b;
@@ -200,6 +200,18 @@
     --p-border-color: var(--lt-border-default);
     background-color: var(--p-surface-0);
     color: var(--p-text-color);
+}
+
+html.dark .docs-sidebar,
+html.dark .laughtale-sidebar,
+html.dark .docs-navbar,
+[data-theme="dark"] .docs-sidebar,
+[data-theme="dark"] .laughtale-sidebar,
+[data-theme="dark"] .docs-navbar {
+    background: var(--p-surface-0) !important;
+    background-color: var(--p-surface-0) !important;
+    color: var(--p-text-color) !important;
+    border-color: var(--p-border-color) !important;
 }
 
 /* ==================== ZERO-TRANSPARENCY OVERLAY ENFORCEMENT ==================== */

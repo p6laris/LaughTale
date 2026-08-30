@@ -34,7 +34,8 @@
                         class="p-button p-button-secondary" 
                         style="padding: 0.35rem 0.85rem; font-size: 0.8125rem; display: inline-flex; align-items: center; gap: 0.5rem;"
                         title="Search documentation (Ctrl+K)">
-                    <span>🔍 Search</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                    <span>Search</span>
                     <kbd style="font-size: 0.6875rem; background: var(--p-surface-200); padding: 0.1rem 0.35rem; border-radius: 4px; border: 1px solid var(--p-border-color);">Ctrl K</kbd>
                 </button>
 
@@ -42,17 +43,18 @@
                 <button type="button" 
                         onclick="document.dispatchEvent(new CustomEvent('studio:open'))" 
                         class="p-button p-button-primary" 
-                        style="padding: 0.35rem 0.75rem; font-size: 0.8125rem;">
-                    🎨 Studio
+                        style="padding: 0.35rem 0.75rem; font-size: 0.8125rem; display: inline-flex; align-items: center; gap: 0.4rem;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
+                    <span>Studio</span>
                 </button>
 
                 <!-- Dark Mode Toggle Button -->
                 <button type="button" 
-                        onclick="document.documentElement.classList.toggle('dark'); localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light')" 
+                        onclick="document.documentElement.classList.toggle('dark'); const isDark = document.documentElement.classList.contains('dark'); document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light'); localStorage.setItem('theme', isDark ? 'dark' : 'light');" 
                         class="p-button p-button-secondary" 
-                        style="padding: 0.35rem 0.65rem; font-size: 0.8125rem;"
+                        style="padding: 0.35rem 0.65rem; font-size: 0.8125rem; display: inline-flex; align-items: center; justify-content: center;"
                         title="Toggle Dark Mode">
-                    🌓
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
                 </button>
 
                 <!-- Persistent Telemetry Island across View Transitions -->

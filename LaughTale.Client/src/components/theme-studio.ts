@@ -10,6 +10,7 @@ import { useDisclosure } from '../composables/useDisclosure';
 import { useScrollLock } from '../composables/useScrollLock';
 import { useClipboard } from '../composables/useClipboard';
 import { AURA_PALETTES, generatePaletteRamp, updateToken, saveTheme, loadSavedTheme, generateThemeExports, checkWcagCompliance } from '../styles/design-tokens';
+import { applyNeutralSurfaceTokens } from '../styles/theme-persistence';
 
 export interface ThemeStudioProps {
     defaultOpen?: boolean;
@@ -338,32 +339,7 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
         updateToken('--lt-primary-color', currentRamp['500'] || '#10b981');
         updateToken('--p-primary-color', currentRamp['500'] || '#10b981');
 
-        const n = NEUTRAL_PRESETS[currentNeutral] || NEUTRAL_PRESETS.slate;
-        updateToken('--lt-surface-0', n.s0);
-        updateToken('--lt-surface-50', n.s50);
-        updateToken('--lt-surface-100', n.s100);
-        updateToken('--lt-surface-200', n.s200);
-        updateToken('--lt-surface-300', n.s300);
-        updateToken('--lt-surface-400', n.s400);
-        updateToken('--lt-surface-500', n.s500);
-        updateToken('--lt-surface-600', n.s600);
-        updateToken('--lt-surface-700', n.s700);
-        updateToken('--lt-surface-800', n.s800);
-        updateToken('--lt-surface-900', n.s900);
-        updateToken('--lt-surface-950', n.s950);
-
-        updateToken('--p-surface-0', n.s0);
-        updateToken('--p-surface-50', n.s50);
-        updateToken('--p-surface-100', n.s100);
-        updateToken('--p-surface-200', n.s200);
-        updateToken('--p-surface-300', n.s300);
-        updateToken('--p-surface-400', n.s400);
-        updateToken('--p-surface-500', n.s500);
-        updateToken('--p-surface-600', n.s600);
-        updateToken('--p-surface-700', n.s700);
-        updateToken('--p-surface-800', n.s800);
-        updateToken('--p-surface-900', n.s900);
-        updateToken('--p-surface-950', n.s950);
+        applyNeutralSurfaceTokens(currentNeutral);
 
         const root = typeof document !== 'undefined' ? document.documentElement : null;
         if (root) {

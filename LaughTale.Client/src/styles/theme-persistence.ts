@@ -102,17 +102,9 @@ export function applySavedTheme(): boolean {
         updateToken('--p-border-radius-xl', xlVal);
     }
 
-    // Apply neutral surface if configured
+    // Apply neutral surface if configured (Dark-mode aware)
     if (saved.neutral) {
-        const neutralRamp = AURA_PALETTES[saved.neutral.toLowerCase()] || AURA_PALETTES.slate;
-        if (neutralRamp) {
-            updateToken('--lt-surface-0', '#ffffff');
-            updateToken('--p-surface-0', '#ffffff');
-            for (const [shade, hex] of Object.entries(neutralRamp)) {
-                updateToken(`--lt-surface-${shade}`, hex);
-                updateToken(`--p-surface-${shade}`, hex);
-            }
-        }
+        applyNeutralSurfaceTokens(saved.neutral);
     }
 
     // Apply density if configured
@@ -250,3 +242,79 @@ export function generateThemeExports(config: SavedThemeConfig): { css: string; c
 
     return { css, csharp, json };
 }
+
+export function applyNeutralSurfaceTokens(neutralName?: string) {
+    const root = typeof document !== 'undefined' ? document.documentElement : null;
+    if (!root) return;
+
+    const isDark = root.classList.contains('dark') || root.getAttribute('data-theme') === 'dark';
+    const activeNeutral = neutralName || loadSavedTheme()?.neutral || 'slate';
+    const neutralRamp = AURA_PALETTES[activeNeutral.toLowerCase()] || AURA_PALETTES.slate;
+
+    if (isDark) {
+        // Dark Mode: Surface-0 is darkest, text is light
+        updateToken('--lt-surface-0', '#090d16');
+        updateToken('--p-surface-0', '#090d16');
+        updateToken('--lt-surface-50', '#0f172a');
+        updateToken('--p-surface-50', '#0f172a');
+        updateToken('--lt-surface-100', '#1e293b');
+        updateToken('--p-surface-100', '#1e293b');
+        updateToken('--lt-surface-200', '#334155');
+        updateToken('--p-surface-200', '#334155');
+        updateToken('--lt-surface-300', '#475569');
+        updateToken('--p-surface-300', '#475569');
+        updateToken('--lt-surface-400', '#64748b');
+        updateToken('--p-surface-400', '#64748b');
+        updateToken('--lt-surface-500', '#94a3b8');
+        updateToken('--p-surface-500', '#94a3b8');
+        updateToken('--lt-surface-600', '#cbd5e1');
+        updateToken('--p-surface-600', '#cbd5e1');
+        updateToken('--lt-surface-700', '#e2e8f0');
+        updateToken('--p-surface-700', '#e2e8f0');
+        updateToken('--lt-surface-800', '#f1f5f9');
+        updateToken('--p-surface-800', '#f1f5f9');
+        updateToken('--lt-surface-900', '#f8fafc');
+        updateToken('--p-surface-900', '#f8fafc');
+        updateToken('--lt-surface-950', '#ffffff');
+        updateToken('--p-surface-950', '#ffffff');
+
+        updateToken('--lt-text-primary', '#f8fafc');
+        updateToken('--p-text-color', '#f8fafc');
+        updateToken('--lt-text-secondary', '#cbd5e1');
+        updateToken('--lt-text-muted', '#94a3b8');
+        updateToken('--p-text-muted', '#94a3b8');
+        updateToken('--lt-border-default', '#334155');
+        updateToken('--p-border-color', '#334155');
+    } else {
+        // Light Mode: Surface-0 is white, text is dark
+        updateToken('--lt-surface-0', '#ffffff');
+        updateToken('--p-surface-0', '#ffffff');
+        if (neutralRamp) {
+            for (const [shade, hex] of Object.entries(neutralRamp)) {
+                updateToken('--lt-surface-' + shade, hex);
+                updateToken('--p-surface-' + shade, hex);
+            }
+        }
+        updateToken('--lt-text-primary', '#0f172a');
+        updateToken('--p-text-color', '#0f172a');
+        updateToken('--lt-text-secondary', '#475569');
+        updateToken('--lt-text-muted', '#64748b');
+        updateToken('--p-text-muted', '#64748b');
+        updateToken('--lt-border-default', '#e2e8f0');
+        updateToken('--p-border-color', '#e2e8f0');
+    }
+}
+
+// Auto-observe dark mode toggles and synchronize tokens
+if (typeof window !== 'undefined' && typeof MutationObserver !== 'undefined') {
+    const observer = new MutationObserver((mutations) => {
+        for (const m of mutations) {
+            if (m.type === 'attributes' && (m.attributeName === 'class' || m.attributeName === 'data-theme')) {
+                applyNeutralSurfaceTokens();
+                break;
+            }
+        }
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class', 'data-theme'] });
+}
+
