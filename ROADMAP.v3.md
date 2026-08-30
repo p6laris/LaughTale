@@ -440,7 +440,7 @@ Standardize events on `laughtale:<component>:<event>` (`bubbles: true`, `detail`
 ---
 
 ### `LT-502` — Virtualization missing from data-heavy components
-**Severity:** P2 · **Status:** todo
+**Severity:** P2 · **Status:** done
 
 **Evidence.** `useVirtualizer` exists (88 LOC) but `datatable.ts`, `treetable.ts`, `listbox.ts`, `multiselect.ts`, `orderlist.ts`, and `picklist.ts` render all rows. A 10k-row datatable produces 10k DOM nodes at hydration — seconds of blocking main-thread work, exactly the scenario "enterprise" implies.
 
