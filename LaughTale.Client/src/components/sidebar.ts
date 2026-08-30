@@ -117,6 +117,45 @@ const SIDEBAR_CSS = `
     background: transparent;
 }
 
+/* Dark Mode Overrides */
+html.dark .p-sidebar,
+html.dark .p-sidebar-panel,
+html.dark .p-sidebar-layout,
+[data-theme="dark"] .p-sidebar,
+[data-theme="dark"] .p-sidebar-panel,
+[data-theme="dark"] .p-sidebar-layout,
+.dark .p-sidebar,
+.dark .p-sidebar-panel,
+.dark .p-sidebar-layout {
+    background: var(--p-surface-0, #090d16) !important;
+    background-color: var(--p-surface-0, #090d16) !important;
+    color: var(--p-text-color, #f8fafc) !important;
+    border-color: var(--p-border-color, #1e293b) !important;
+}
+
+html.dark .p-sidebar-search-input,
+[data-theme="dark"] .p-sidebar-search-input,
+.dark .p-sidebar-search-input {
+    background: var(--p-surface-50, #0f172a) !important;
+    background-color: var(--p-surface-50, #0f172a) !important;
+    color: var(--p-text-color, #f8fafc) !important;
+    border-color: var(--p-border-color, #334155) !important;
+}
+
+html.dark .p-sidebar-menu-button:hover,
+[data-theme="dark"] .p-sidebar-menu-button:hover,
+.dark .p-sidebar-menu-button:hover {
+    background: var(--p-surface-100, #1e293b) !important;
+    color: #ffffff !important;
+}
+
+html.dark .p-sidebar-menu-button.p-sidebar-active,
+[data-theme="dark"] .p-sidebar-menu-button.p-sidebar-active,
+.dark .p-sidebar-menu-button.p-sidebar-active {
+    background: var(--p-primary-950, rgba(16, 185, 129, 0.15)) !important;
+    color: var(--p-primary-400, #34d399) !important;
+}
+
 /* Overlay Mode */
 .p-sidebar.p-sidebar-overlay {
     position: absolute !important;

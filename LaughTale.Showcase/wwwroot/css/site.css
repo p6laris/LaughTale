@@ -196,12 +196,15 @@
     --p-overlay-bg: var(--lt-overlay-bg);
 }
 
-.dark, [data-theme="dark"] {
-    --lt-surface-0: #0b1120;
-    --lt-surface-50: #020617;
-    --lt-surface-100: #0f172a;
-    --lt-surface-200: #1e293b;
-    --lt-surface-300: #334155;
+html.dark,
+:root.dark,
+[data-theme="dark"],
+.dark {
+    --lt-surface-0: #090d16;
+    --lt-surface-50: #0f172a;
+    --lt-surface-100: #1e293b;
+    --lt-surface-200: #334155;
+    --lt-surface-300: #475569;
     --lt-surface-400: #64748b;
     --lt-surface-500: #94a3b8;
     --lt-surface-600: #cbd5e1;
@@ -223,13 +226,103 @@
     --p-surface-900: var(--lt-surface-900);
     --p-surface-950: var(--lt-surface-950);
 
-    --lt-text-primary: var(--lt-surface-900);
-    --lt-text-secondary: var(--lt-surface-600);
-    --lt-text-muted: var(--lt-surface-400);
-    --lt-border-default: var(--lt-surface-200);
-    --p-text-color: var(--lt-text-primary);
-    --p-text-muted: var(--lt-text-muted);
-    --p-border-color: var(--lt-border-default);
+    --lt-text-primary: #f8fafc;
+    --lt-text-secondary: #cbd5e1;
+    --lt-text-muted: #94a3b8;
+    --lt-border-default: #334155;
+    --p-text-color: #f8fafc;
+    --p-text-muted: #94a3b8;
+    --p-border-color: #334155;
+    background-color: var(--p-surface-50);
+    color: var(--p-text-color);
+}
+
+html.dark body,
+[data-theme="dark"] body,
+.dark body {
+    background-color: var(--p-surface-50, #0f172a) !important;
+    color: var(--p-text-color, #f8fafc) !important;
+}
+
+/* App Header & Layout */
+html.dark .app-header,
+[data-theme="dark"] .app-header,
+.dark .app-header {
+    background: var(--p-surface-0, #090d16) !important;
+    border-color: var(--p-border-color, #1e293b) !important;
+}
+
+/* Inputs & Form Controls in Dark Mode */
+html.dark .p-input,
+html.dark .p-inputtext,
+html.dark .p-inputnumber input,
+html.dark input[type="text"],
+html.dark input[type="email"],
+html.dark input[type="password"],
+html.dark input[type="number"],
+html.dark textarea,
+html.dark select,
+[data-theme="dark"] .p-input,
+[data-theme="dark"] .p-inputtext,
+[data-theme="dark"] .p-inputnumber input,
+[data-theme="dark"] input[type="text"],
+[data-theme="dark"] input[type="email"],
+[data-theme="dark"] input[type="password"],
+[data-theme="dark"] input[type="number"],
+[data-theme="dark"] textarea,
+[data-theme="dark"] select,
+.dark .p-input,
+.dark .p-inputtext,
+.dark .p-inputnumber input,
+.dark input[type="text"],
+.dark input[type="email"],
+.dark input[type="password"],
+.dark input[type="number"],
+.dark textarea,
+.dark select {
+    background-color: var(--p-surface-0, #090d16) !important;
+    color: var(--p-text-color, #f8fafc) !important;
+    border-color: var(--p-border-color, #334155) !important;
+}
+
+html.dark .p-inputgroup-addon,
+[data-theme="dark"] .p-inputgroup-addon,
+.dark .p-inputgroup-addon {
+    background-color: var(--p-surface-100, #1e293b) !important;
+    color: var(--p-text-muted, #94a3b8) !important;
+    border-color: var(--p-border-color, #334155) !important;
+}
+
+html.dark .component-card,
+html.dark .aura-card,
+html.dark .p-card,
+[data-theme="dark"] .component-card,
+[data-theme="dark"] .aura-card,
+[data-theme="dark"] .p-card,
+.dark .component-card,
+.dark .aura-card,
+.dark .p-card {
+    background-color: var(--p-surface-0, #090d16) !important;
+    border-color: var(--p-border-color, #1e293b) !important;
+    color: var(--p-text-color, #f8fafc) !important;
+}
+
+html.dark .card-header h2,
+html.dark .page-title,
+[data-theme="dark"] .card-header h2,
+[data-theme="dark"] .page-title,
+.dark .card-header h2,
+.dark .page-title {
+    color: var(--p-text-color, #f8fafc) !important;
+}
+
+html.dark .card-header p,
+html.dark .page-desc,
+[data-theme="dark"] .card-header p,
+[data-theme="dark"] .page-desc,
+.dark .card-header p,
+.dark .page-desc {
+    color: var(--p-text-muted, #94a3b8) !important;
 }
 
 * {
