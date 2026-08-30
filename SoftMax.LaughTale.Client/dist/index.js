@@ -35987,6 +35987,37 @@ public static class AppTheme
 
   // src/runtime/hydrator.ts
   var HYDRATION_STATE_KEY = "__laughtale_state__";
+  var visibleElementsMap = /* @__PURE__ */ new WeakMap();
+  var sharedVisibleObserver = null;
+  function getSharedVisibleObserver() {
+    if (typeof window === "undefined" || !("IntersectionObserver" in window)) {
+      return null;
+    }
+    if (!sharedVisibleObserver) {
+      sharedVisibleObserver = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            const meta = visibleElementsMap.get(entry.target);
+            if (meta) {
+              unobserveVisibleIsland(meta.container);
+              executeHydration(meta.container, meta.name);
+            }
+          }
+        }
+      }, { rootMargin: "120px" });
+    }
+    return sharedVisibleObserver;
+  }
+  function unobserveVisibleIsland(container) {
+    const observer = getSharedVisibleObserver();
+    if (!observer) return;
+    observer.unobserve(container);
+    visibleElementsMap.delete(container);
+    for (let i = 0; i < container.children.length; i++) {
+      observer.unobserve(container.children[i]);
+      visibleElementsMap.delete(container.children[i]);
+    }
+  }
   function getIslandState(container) {
     return container[HYDRATION_STATE_KEY] || "idle";
   }
@@ -36073,19 +36104,21 @@ public static class AppTheme
     }
   }
   function hydrateVisible(container, name) {
-    const observer = new IntersectionObserver((entries) => {
-      for (const entry of entries) {
-        if (entry.isIntersecting) {
-          observer.disconnect();
-          executeHydration(container, name);
-          break;
-        }
-      }
-    }, { rootMargin: "120px" });
+    const observer = getSharedVisibleObserver();
+    if (!observer) {
+      executeHydration(container, name);
+      return;
+    }
+    const meta = { container, name };
+    visibleElementsMap.set(container, meta);
     observer.observe(container);
     for (let i = 0; i < container.children.length; i++) {
+      visibleElementsMap.set(container.children[i], meta);
       observer.observe(container.children[i]);
     }
+    container.addEventListener("laughtale:unmount", () => {
+      unobserveVisibleIsland(container);
+    }, { once: true });
   }
   function hydrateInteraction(container, name) {
     const events = ["mouseenter", "focusin", "touchstart", "click"];

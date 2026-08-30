@@ -256,7 +256,8 @@ Persistent islands must be *excluded* — they are moved, not destroyed.
 ---
 
 ### `LT-206` — `IntersectionObserver` leaks for never-visible islands
-**Severity:** P2 · **Status:** todo · **File:** `src/runtime/hydrator.ts:110-127`
+**Severity:** P2 · **Status:** done · **File:** `SoftMax.LaughTale.Client/src/runtime/hydrator.ts`
+**Resolution:** Replaced per-island `IntersectionObserver` creation with a singleton shared `IntersectionObserver` keyed by a `WeakMap<Element, VisibleIslandMeta>`. Attached `laughtale:unmount` listeners to off-screen visible islands to cleanly detach them from the shared observer when navigating away. Unit tests verified in `tests/hydrator.test.ts` (5/5 passed).
 
 **Evidence.** `hydrateVisible` creates an observer per island and only disconnects on intersection. Islands below a footer the user never reaches keep observers alive forever; after `LT-201`'s router unmount they will be orphaned too. Children are observed at hydration time only, so children added later (streaming SSR) are missed.
 

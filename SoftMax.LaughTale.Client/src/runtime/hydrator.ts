@@ -1,6 +1,6 @@
 /**
  * SoftMax.LaughTale: Multi-Strategy Client Hydration Engine (Hardened Edition)
- * Supercharged with Astro-grade prop revival, query retry, child viewport observation,
+ * Supercharged with Astro-grade prop revival, query retry, singleton child viewport observation,
  * streaming SSR, tri-state lifecycle tracking ('idle' | 'pending' | 'mounted' | 'failed'), and explicit retry recovery.
  */
 
@@ -13,6 +13,49 @@ export type HydrateStrategy = 'load' | 'idle' | 'visible' | 'media' | 'interacti
 export type HydrationState = 'idle' | 'pending' | 'mounted' | 'failed';
 
 const HYDRATION_STATE_KEY = '__laughtale_state__';
+
+interface VisibleIslandMeta {
+    container: HTMLElement;
+    name: string;
+}
+
+const visibleElementsMap = new WeakMap<Element, VisibleIslandMeta>();
+let sharedVisibleObserver: IntersectionObserver | null = null;
+
+function getSharedVisibleObserver(): IntersectionObserver | null {
+    if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
+        return null;
+    }
+
+    if (!sharedVisibleObserver) {
+        sharedVisibleObserver = new IntersectionObserver((entries) => {
+            for (const entry of entries) {
+                if (entry.isIntersecting) {
+                    const meta = visibleElementsMap.get(entry.target);
+                    if (meta) {
+                        unobserveVisibleIsland(meta.container);
+                        executeHydration(meta.container, meta.name);
+                    }
+                }
+            }
+        }, { rootMargin: '120px' });
+    }
+
+    return sharedVisibleObserver;
+}
+
+function unobserveVisibleIsland(container: HTMLElement): void {
+    const observer = getSharedVisibleObserver();
+    if (!observer) return;
+
+    observer.unobserve(container);
+    visibleElementsMap.delete(container);
+
+    for (let i = 0; i < container.children.length; i++) {
+        observer.unobserve(container.children[i]);
+        visibleElementsMap.delete(container.children[i]);
+    }
+}
 
 /**
  * Returns the current hydration lifecycle state of an island container.
@@ -135,26 +178,31 @@ function hydrateIdle(container: HTMLElement, name: string): void {
 }
 
 /**
- * Child-Targeted Viewport Observer
- * Observes container and all its child nodes so `display: contents` layouts never miss scroll events.
+ * Singleton Child-Targeted Viewport Observer
+ * Observes container and its child nodes using a single shared IntersectionObserver
+ * and automatically unobserves when laughtale:unmount is received.
  */
 function hydrateVisible(container: HTMLElement, name: string): void {
-    const observer = new IntersectionObserver((entries) => {
-        for (const entry of entries) {
-            if (entry.isIntersecting) {
-                observer.disconnect();
-                executeHydration(container, name);
-                break;
-            }
-        }
-    }, { rootMargin: '120px' });
+    const observer = getSharedVisibleObserver();
+    if (!observer) {
+        executeHydration(container, name);
+        return;
+    }
 
+    const meta: VisibleIslandMeta = { container, name };
+    visibleElementsMap.set(container, meta);
     observer.observe(container);
 
-    // Also observe children to support `display: contents` styling
+    // Also observe children to support `display: contents` layouts
     for (let i = 0; i < container.children.length; i++) {
+        visibleElementsMap.set(container.children[i], meta);
         observer.observe(container.children[i]);
     }
+
+    // Teardown observer if island is unmounted before scrolling into view
+    container.addEventListener('laughtale:unmount', () => {
+        unobserveVisibleIsland(container);
+    }, { once: true });
 }
 
 function hydrateInteraction(container: HTMLElement, name: string): void {

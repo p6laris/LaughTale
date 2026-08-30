@@ -1,5 +1,5 @@
 /**
- * SoftMax.LaughTale: Tri-State Hydration Lifecycle & Recovery Tests (LT-205)
+ * SoftMax.LaughTale: Tri-State Hydration & Shared IntersectionObserver Tests (LT-205, LT-206)
  */
 
 import './setup.ts';
@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { defineIsland } from '../src/runtime/registry.ts';
 import { hydrateIsland, retryIsland, getIslandState } from '../src/runtime/hydrator.ts';
 
-describe('Tri-State Island Hydration Lifecycle Suite (LT-205)', () => {
+describe('Hydrator Tri-State & Shared Viewport Observer Suite (LT-205, LT-206)', () => {
 
     beforeEach(() => {
         document.body.innerHTML = '';
@@ -132,6 +132,52 @@ describe('Tri-State Island Hydration Lifecycle Suite (LT-205)', () => {
 
         assert.equal(getIslandState(container), 'mounted');
         assert.equal(mountCount, 1, 'Island was not mounted after retry');
+    });
+
+    it('hydrateVisible: 100 visible-strategy islands share exactly 1 IntersectionObserver instance (LT-206)', () => {
+        let observerInstancesCreated = 0;
+        let totalObservedElements = 0;
+        let totalUnobservedElements = 0;
+
+        const originalObserver = globalThis.IntersectionObserver;
+        class MockIntersectionObserver {
+            constructor(public callback: any, public options: any) {
+                observerInstancesCreated++;
+            }
+            observe(target: Element) {
+                totalObservedElements++;
+            }
+            unobserve(target: Element) {
+                totalUnobservedElements++;
+            }
+            disconnect() {}
+        }
+        (globalThis as any).IntersectionObserver = MockIntersectionObserver;
+
+        try {
+            const islands: HTMLElement[] = [];
+            for (let i = 0; i < 100; i++) {
+                defineIsland(`visible-card-${i}`, () => Promise.resolve({ default: () => {} }));
+                const el = document.createElement('div');
+                el.setAttribute('data-island', `visible-card-${i}`);
+                el.setAttribute('data-hydrate', 'visible');
+                document.body.appendChild(el);
+                islands.push(el);
+                hydrateIsland(el);
+            }
+
+            assert.equal(observerInstancesCreated, 1, 'Expected exactly 1 shared IntersectionObserver instance for 100 islands');
+            assert.equal(totalObservedElements, 100, 'Expected 100 elements to be observed');
+
+            // Trigger unmount on 20 islands
+            for (let i = 0; i < 20; i++) {
+                islands[i].dispatchEvent(new CustomEvent('laughtale:unmount'));
+            }
+
+            assert.equal(totalUnobservedElements, 20, 'Expected 20 elements to be unobserved on unmount');
+        } finally {
+            globalThis.IntersectionObserver = originalObserver;
+        }
     });
 
 });
