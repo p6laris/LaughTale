@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -28,7 +28,7 @@ public class IslandGenerator : IIncrementalGenerator
 
     // ── Diagnostics Descriptors ───────────────────────────────────────────────
     private static readonly DiagnosticDescriptor InvalidIslandNameRule = new(
-        id: "SMI001",
+        id: "LTI001",
         title: "Invalid Island Name",
         messageFormat: "The island name '{0}' on '{1}' is invalid (must be lowercase kebab-case)",
         category: "LaughTale.Naming",
@@ -37,7 +37,7 @@ public class IslandGenerator : IIncrementalGenerator
     );
 
     private static readonly DiagnosticDescriptor NonSerializableTypeRule = new(
-        id: "SMI002",
+        id: "LTI002",
         title: "Non-Serializable Property in Island Props",
         messageFormat: "Property '{0}' on island props '{1}' has non-serializable type '{2}'",
         category: "LaughTale.Serialization",
@@ -46,7 +46,7 @@ public class IslandGenerator : IIncrementalGenerator
     );
 
     private static readonly DiagnosticDescriptor SensitiveCredentialExposureRule = new(
-        id: "SMI004",
+        id: "LTI004",
         title: "Sensitive Credential Property in Island Props",
         messageFormat: "Property '{0}' on island props '{1}' matches sensitive credential pattern '{2}' and will be serialized to public HTML. Decorate with [IslandIgnore] or remove from props.",
         category: "LaughTale.Security",
