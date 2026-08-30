@@ -2,8 +2,8 @@
  * SoftMax.LaughTale: View Transitions & Persistent Islands Router (Hardened Edition)
  * 
  * Intercepts link navigation, verifies same-origin on redirects, dispatches laughtale:unmount
- * on destroyed islands, performs animated page morphing via View Transitions API,
- * preserves persistent island state ([data-persist]), and executes scripts with CSP nonces.
+ * on destroyed islands, reconciles <head> metadata & stylesheets, performs animated page morphing
+ * via View Transitions API, preserves persistent island state ([data-persist]), and executes scripts with CSP nonces.
  */
 
 import { initIslands } from './hydrator';
@@ -49,6 +49,99 @@ async function handleLinkClick(e: MouseEvent) {
 
 async function handlePopState() {
     await navigateTo(window.location.href, false);
+}
+
+/**
+ * Diffs and reconciles the document head with elements from the newly fetched document.
+ * Preserves security tokens (<meta name="csp-nonce">), viewport, and charset while
+ * updating dynamic page metadata and route stylesheets.
+ */
+export async function reconcileHead(newHead: HTMLHeadElement): Promise<void> {
+    if (!document.head || !newHead) return;
+
+    // Helper: compute a key for head elements to diff them accurately
+    const getHeadKey = (el: Element): string | null => {
+        const tagName = el.tagName.toLowerCase();
+        if (tagName === 'meta') {
+            const name = el.getAttribute('name');
+            if (name) {
+                // Protected global meta tokens
+                if (name === 'viewport' || name === 'csp-nonce') return null;
+                return `meta:name:${name.toLowerCase()}`;
+            }
+            const prop = el.getAttribute('property');
+            if (prop) return `meta:property:${prop.toLowerCase()}`;
+            const httpEquiv = el.getAttribute('http-equiv');
+            if (httpEquiv) return `meta:http-equiv:${httpEquiv.toLowerCase()}`;
+            if (el.hasAttribute('charset')) return null; // Protected charset
+            return `meta:raw:${el.outerHTML}`;
+        }
+        if (tagName === 'link') {
+            const rel = (el.getAttribute('rel') || '').toLowerCase();
+            const href = el.getAttribute('href') || '';
+            if (rel === 'stylesheet') return `link:stylesheet:${href}`;
+            if (rel === 'canonical') return `link:canonical`;
+            if (rel === 'icon' || rel === 'shortcut icon') return `link:icon`;
+            return `link:${rel}:${href}`;
+        }
+        return null;
+    };
+
+    // 1. Index existing dynamic head elements
+    const existingDynamicElements = new Map<string, Element>();
+    Array.from(document.head.children).forEach(child => {
+        // Do not touch dynamic island injected styles
+        if (child.hasAttribute('data-island-style')) return;
+        const key = getHeadKey(child);
+        if (key) {
+            existingDynamicElements.set(key, child);
+        }
+    });
+
+    // 2. Process incoming head elements
+    const newKeys = new Set<string>();
+    const pendingStylesheets: Promise<void>[] = [];
+
+    Array.from(newHead.children).forEach(incomingEl => {
+        const key = getHeadKey(incomingEl);
+        if (!key) return; // Static / ignored tag
+        newKeys.add(key);
+
+        const existing = existingDynamicElements.get(key);
+        if (existing) {
+            // If identical, keep it
+            if (existing.outerHTML === incomingEl.outerHTML) {
+                return;
+            }
+            // Replace if modified
+            const clone = incomingEl.cloneNode(true) as HTMLElement;
+            existing.replaceWith(clone);
+        } else {
+            // New head element
+            const clone = incomingEl.cloneNode(true) as HTMLElement;
+            if (clone.tagName.toLowerCase() === 'link' && clone.getAttribute('rel')?.toLowerCase() === 'stylesheet') {
+                const sheetPromise = new Promise<void>(resolve => {
+                    const timeout = setTimeout(resolve, 500); // 500ms safety fallback
+                    clone.onload = () => { clearTimeout(timeout); resolve(); };
+                    clone.onerror = () => { clearTimeout(timeout); resolve(); };
+                });
+                pendingStylesheets.push(sheetPromise);
+            }
+            document.head.appendChild(clone);
+        }
+    });
+
+    // 3. Remove obsolete head elements
+    existingDynamicElements.forEach((existingEl, key) => {
+        if (!newKeys.has(key)) {
+            existingEl.remove();
+        }
+    });
+
+    // 4. Await all pending stylesheets to prevent FOUC
+    if (pendingStylesheets.length > 0) {
+        await Promise.all(pendingStylesheets);
+    }
 }
 
 /**
@@ -99,9 +192,14 @@ export async function navigateTo(urlStr: string, pushState = true): Promise<void
         newScripts.forEach(s => s.remove());
 
         // Use native View Transition API if supported
-        const updateDom = () => {
+        const updateDom = async () => {
             // Update document title
             document.title = newDoc.title;
+
+            // Reconcile <head> (meta tags, OpenGraph, canonical links, route stylesheets)
+            if (newDoc.head) {
+                await reconcileHead(newDoc.head);
+            }
 
             // Replace body content
             document.body.innerHTML = newDoc.body.innerHTML;
@@ -150,9 +248,9 @@ export async function navigateTo(urlStr: string, pushState = true): Promise<void
         };
 
         if ('startViewTransition' in document) {
-            (document as any).startViewTransition(updateDom);
+            await (document as any).startViewTransition(updateDom);
         } else {
-            updateDom();
+            await updateDom();
         }
 
     } catch (err) {

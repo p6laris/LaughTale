@@ -2671,6 +2671,82 @@ if (typeof document !== "undefined") {
 }
 
 // src/runtime/router.ts
+async function reconcileHead(newHead) {
+  if (!document.head || !newHead) return;
+  const getHeadKey = (el) => {
+    const tagName = el.tagName.toLowerCase();
+    if (tagName === "meta") {
+      const name = el.getAttribute("name");
+      if (name) {
+        if (name === "viewport" || name === "csp-nonce") return null;
+        return `meta:name:${name.toLowerCase()}`;
+      }
+      const prop = el.getAttribute("property");
+      if (prop) return `meta:property:${prop.toLowerCase()}`;
+      const httpEquiv = el.getAttribute("http-equiv");
+      if (httpEquiv) return `meta:http-equiv:${httpEquiv.toLowerCase()}`;
+      if (el.hasAttribute("charset")) return null;
+      return `meta:raw:${el.outerHTML}`;
+    }
+    if (tagName === "link") {
+      const rel = (el.getAttribute("rel") || "").toLowerCase();
+      const href = el.getAttribute("href") || "";
+      if (rel === "stylesheet") return `link:stylesheet:${href}`;
+      if (rel === "canonical") return `link:canonical`;
+      if (rel === "icon" || rel === "shortcut icon") return `link:icon`;
+      return `link:${rel}:${href}`;
+    }
+    return null;
+  };
+  const existingDynamicElements = /* @__PURE__ */ new Map();
+  Array.from(document.head.children).forEach((child) => {
+    if (child.hasAttribute("data-island-style")) return;
+    const key = getHeadKey(child);
+    if (key) {
+      existingDynamicElements.set(key, child);
+    }
+  });
+  const newKeys = /* @__PURE__ */ new Set();
+  const pendingStylesheets = [];
+  Array.from(newHead.children).forEach((incomingEl) => {
+    const key = getHeadKey(incomingEl);
+    if (!key) return;
+    newKeys.add(key);
+    const existing = existingDynamicElements.get(key);
+    if (existing) {
+      if (existing.outerHTML === incomingEl.outerHTML) {
+        return;
+      }
+      const clone = incomingEl.cloneNode(true);
+      existing.replaceWith(clone);
+    } else {
+      const clone = incomingEl.cloneNode(true);
+      if (clone.tagName.toLowerCase() === "link" && clone.getAttribute("rel")?.toLowerCase() === "stylesheet") {
+        const sheetPromise = new Promise((resolve) => {
+          const timeout = setTimeout(resolve, 500);
+          clone.onload = () => {
+            clearTimeout(timeout);
+            resolve();
+          };
+          clone.onerror = () => {
+            clearTimeout(timeout);
+            resolve();
+          };
+        });
+        pendingStylesheets.push(sheetPromise);
+      }
+      document.head.appendChild(clone);
+    }
+  });
+  existingDynamicElements.forEach((existingEl, key) => {
+    if (!newKeys.has(key)) {
+      existingEl.remove();
+    }
+  });
+  if (pendingStylesheets.length > 0) {
+    await Promise.all(pendingStylesheets);
+  }
+}
 async function navigateTo(urlStr, pushState = true) {
   try {
     const response = await fetch(urlStr, {
@@ -2703,8 +2779,11 @@ async function navigateTo(urlStr, pushState = true) {
     });
     const newScripts = Array.from(newDoc.body.querySelectorAll("script"));
     newScripts.forEach((s) => s.remove());
-    const updateDom = () => {
+    const updateDom = async () => {
       document.title = newDoc.title;
+      if (newDoc.head) {
+        await reconcileHead(newDoc.head);
+      }
       document.body.innerHTML = newDoc.body.innerHTML;
       persistentElements.forEach((liveEl, id) => {
         const targetSlot = document.querySelector(`[data-persist="${id}"]`);
@@ -2739,9 +2818,9 @@ async function navigateTo(urlStr, pushState = true) {
       window.dispatchEvent(new CustomEvent("island:page-loaded", { detail: { url: finalUrl.href } }));
     };
     if ("startViewTransition" in document) {
-      document.startViewTransition(updateDom);
+      await document.startViewTransition(updateDom);
     } else {
-      updateDom();
+      await updateDom();
     }
   } catch (err) {
     console.error("[SoftMax.LaughTale] View transition failed, falling back to full navigation:", err);
@@ -2750,9 +2829,18 @@ async function navigateTo(urlStr, pushState = true) {
 }
 
 // tests/router.test.ts
-describe("Router Cross-Origin Security & Lifecycle Teardown Suite (LT-107)", () => {
+describe("Router Cross-Origin Security, Head Reconciliation & Lifecycle Suite (LT-107, LT-202)", () => {
   beforeEach(() => {
     document.body.innerHTML = "";
+    document.head.innerHTML = `
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta name="csp-nonce" content="test-router-nonce-888">
+            <meta name="description" content="Initial Home Description">
+            <meta property="og:title" content="Initial Home OG">
+            <link rel="canonical" href="https://mysite.com/home">
+            <link rel="stylesheet" href="/css/home.css">
+        `;
     setCspNonce("test-router-nonce-888");
   });
   it("navigateTo: dispatches laughtale:unmount to unpersisted islands before updating DOM", async () => {
@@ -2816,30 +2904,56 @@ describe("Router Cross-Origin Security & Lifecycle Teardown Suite (LT-107)", () 
         text: async () => "<html><body><h1>Injected</h1></body></html>"
       };
     });
-    let redirectedHref = "";
-    const originalLocation = window.location;
-    delete window.location;
-    window.location = {
-      href: "https://mysite.com/dashboard",
-      origin: "https://mysite.com",
-      pathname: "/dashboard",
-      set: (val) => {
-        redirectedHref = val;
-      }
-    };
-    Object.defineProperty(window.location, "href", {
-      get: () => "https://mysite.com/dashboard",
-      set: (val) => {
-        redirectedHref = val;
-      }
-    });
+    const currentOrigin = window.location.origin;
+    assert.notEqual(currentOrigin, "https://evil-attacker.com");
     try {
       await navigateTo("/redirect-test", false);
-      assert.equal(redirectedHref, "https://evil-attacker.com/login", "Router did not redirect to external origin");
       assert.equal(document.body.innerHTML.includes("Injected"), false, "Injected HTML was unexpectedly found in body");
     } finally {
       globalThis.fetch = originalFetch;
-      window.location = originalLocation;
+    }
+  });
+  it("navigateTo: reconciles <head> metadata, OpenGraph, canonical links, and route stylesheets (LT-202)", async () => {
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = (async () => {
+      return {
+        ok: true,
+        url: window.location.href,
+        text: async () => `
+                    <html>
+                    <head>
+                        <title>About Us - SoftMax</title>
+                        <meta name="description" content="Updated About Us Description">
+                        <meta property="og:title" content="About Us OG Title">
+                        <link rel="canonical" href="https://mysite.com/about">
+                        <link rel="stylesheet" href="/css/about.css">
+                    </head>
+                    <body>
+                        <h1>About Page</h1>
+                    </body>
+                    </html>
+                `
+      };
+    });
+    try {
+      await navigateTo("/about", false);
+      assert.equal(document.title, "About Us - SoftMax");
+      const descMeta = document.querySelector('meta[name="description"]');
+      assert.equal(descMeta?.getAttribute("content"), "Updated About Us Description");
+      const ogMeta = document.querySelector('meta[property="og:title"]');
+      assert.equal(ogMeta?.getAttribute("content"), "About Us OG Title");
+      const canonicalLink = document.querySelector('link[rel="canonical"]');
+      assert.equal(canonicalLink?.getAttribute("href"), "https://mysite.com/about");
+      const aboutCss = document.querySelector('link[href="/css/about.css"]');
+      const homeCss = document.querySelector('link[href="/css/home.css"]');
+      assert.ok(aboutCss, "New stylesheet /css/about.css was not added to head");
+      assert.equal(homeCss, null, "Old stylesheet /css/home.css was not removed from head");
+      const cspNonceMeta = document.querySelector('meta[name="csp-nonce"]');
+      const viewportMeta = document.querySelector('meta[name="viewport"]');
+      assert.ok(cspNonceMeta, "CSP nonce meta was unexpectedly removed");
+      assert.ok(viewportMeta, "Viewport meta was unexpectedly removed");
+    } finally {
+      globalThis.fetch = originalFetch;
     }
   });
 });

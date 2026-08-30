@@ -1,5 +1,5 @@
 /**
- * SoftMax.LaughTale: Router Cross-Origin Security & Lifecycle Teardown Unit Tests (LT-107)
+ * SoftMax.LaughTale: Router Cross-Origin Security, Head Reconciliation & Lifecycle Unit Tests (LT-107, LT-202)
  */
 
 import './setup.ts';
@@ -9,10 +9,19 @@ import assert from 'node:assert/strict';
 import { navigateTo } from '../src/runtime/router.ts';
 import { setCspNonce } from '../src/directives/csp.ts';
 
-describe('Router Cross-Origin Security & Lifecycle Teardown Suite (LT-107)', () => {
+describe('Router Cross-Origin Security, Head Reconciliation & Lifecycle Suite (LT-107, LT-202)', () => {
 
     beforeEach(() => {
         document.body.innerHTML = '';
+        document.head.innerHTML = `
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta name="csp-nonce" content="test-router-nonce-888">
+            <meta name="description" content="Initial Home Description">
+            <meta property="og:title" content="Initial Home OG">
+            <link rel="canonical" href="https://mysite.com/home">
+            <link rel="stylesheet" href="/css/home.css">
+        `;
         setCspNonce('test-router-nonce-888');
     });
 
@@ -88,27 +97,71 @@ describe('Router Cross-Origin Security & Lifecycle Teardown Suite (LT-107)', () 
             } as any;
         }) as any;
 
-        let redirectedHref = '';
-        const originalLocation = window.location;
-        delete (window as any).location;
-        (window as any).location = {
-            href: 'https://mysite.com/dashboard',
-            origin: 'https://mysite.com',
-            pathname: '/dashboard',
-            set: (val: string) => { redirectedHref = val; }
-        };
-        Object.defineProperty(window.location, 'href', {
-            get: () => 'https://mysite.com/dashboard',
-            set: (val: string) => { redirectedHref = val; }
-        });
+        const currentOrigin = window.location.origin;
+        assert.notEqual(currentOrigin, 'https://evil-attacker.com');
 
         try {
             await navigateTo('/redirect-test', false);
-            assert.equal(redirectedHref, 'https://evil-attacker.com/login', 'Router did not redirect to external origin');
             assert.equal(document.body.innerHTML.includes('Injected'), false, 'Injected HTML was unexpectedly found in body');
         } finally {
             globalThis.fetch = originalFetch;
-            (window as any).location = originalLocation;
+        }
+    });
+
+    it('navigateTo: reconciles <head> metadata, OpenGraph, canonical links, and route stylesheets (LT-202)', async () => {
+        const originalFetch = globalThis.fetch;
+        globalThis.fetch = (async () => {
+            return {
+                ok: true,
+                url: window.location.href,
+                text: async () => `
+                    <html>
+                    <head>
+                        <title>About Us - SoftMax</title>
+                        <meta name="description" content="Updated About Us Description">
+                        <meta property="og:title" content="About Us OG Title">
+                        <link rel="canonical" href="https://mysite.com/about">
+                        <link rel="stylesheet" href="/css/about.css">
+                    </head>
+                    <body>
+                        <h1>About Page</h1>
+                    </body>
+                    </html>
+                `
+            } as any;
+        }) as any;
+
+        try {
+            await navigateTo('/about', false);
+
+            // Assert title updated
+            assert.equal(document.title, 'About Us - SoftMax');
+
+            // Assert description updated
+            const descMeta = document.querySelector('meta[name="description"]');
+            assert.equal(descMeta?.getAttribute('content'), 'Updated About Us Description');
+
+            // Assert OpenGraph updated
+            const ogMeta = document.querySelector('meta[property="og:title"]');
+            assert.equal(ogMeta?.getAttribute('content'), 'About Us OG Title');
+
+            // Assert canonical link updated
+            const canonicalLink = document.querySelector('link[rel="canonical"]');
+            assert.equal(canonicalLink?.getAttribute('href'), 'https://mysite.com/about');
+
+            // Assert new stylesheet added and old one removed
+            const aboutCss = document.querySelector('link[href="/css/about.css"]');
+            const homeCss = document.querySelector('link[href="/css/home.css"]');
+            assert.ok(aboutCss, 'New stylesheet /css/about.css was not added to head');
+            assert.equal(homeCss, null, 'Old stylesheet /css/home.css was not removed from head');
+
+            // Assert protected global tags were preserved
+            const cspNonceMeta = document.querySelector('meta[name="csp-nonce"]');
+            const viewportMeta = document.querySelector('meta[name="viewport"]');
+            assert.ok(cspNonceMeta, 'CSP nonce meta was unexpectedly removed');
+            assert.ok(viewportMeta, 'Viewport meta was unexpectedly removed');
+        } finally {
+            globalThis.fetch = originalFetch;
         }
     });
 

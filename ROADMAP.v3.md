@@ -208,7 +208,8 @@ Persistent islands must be *excluded* — they are moved, not destroyed.
 ---
 
 ### `LT-202` — Router swaps `<body>` but never `<head>`
-**Severity:** P1 · **Status:** todo · **File:** `src/runtime/router.ts:80-114`
+**Severity:** P1 · **Status:** done · **File:** `SoftMax.LaughTale.Client/src/runtime/router.ts`
+**Resolution:** Implemented `reconcileHead` in `router.ts` with key-based diffing for `<meta>` tags (descriptions, OpenGraph, Twitter), `<link rel="canonical">`, and route `<link rel="stylesheet">` tags. Added stylesheet load synchronization with a 500ms fallback before transition completion to eliminate FOUC, while strictly preserving global viewport, charset, and CSP nonce tags. Unit tests verified in `tests/router.test.ts` (4/4 passed).
 
 **Evidence.** `updateDom` copies `document.title` and `newDoc.body.innerHTML` only. Consequences on every client-side navigation: page-specific `<link rel=stylesheet>` never loads (unstyled content), `<meta name=description>` / OpenGraph tags stay stale (**SEO and social previews are wrong for every route but the entry route**), canonical links are wrong, and `<script>` in head never runs.
 

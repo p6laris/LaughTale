@@ -36666,6 +36666,82 @@ async function handleLinkClick(e) {
 async function handlePopState() {
   await navigateTo(window.location.href, false);
 }
+async function reconcileHead(newHead) {
+  if (!document.head || !newHead) return;
+  const getHeadKey = (el) => {
+    const tagName = el.tagName.toLowerCase();
+    if (tagName === "meta") {
+      const name = el.getAttribute("name");
+      if (name) {
+        if (name === "viewport" || name === "csp-nonce") return null;
+        return `meta:name:${name.toLowerCase()}`;
+      }
+      const prop = el.getAttribute("property");
+      if (prop) return `meta:property:${prop.toLowerCase()}`;
+      const httpEquiv = el.getAttribute("http-equiv");
+      if (httpEquiv) return `meta:http-equiv:${httpEquiv.toLowerCase()}`;
+      if (el.hasAttribute("charset")) return null;
+      return `meta:raw:${el.outerHTML}`;
+    }
+    if (tagName === "link") {
+      const rel = (el.getAttribute("rel") || "").toLowerCase();
+      const href = el.getAttribute("href") || "";
+      if (rel === "stylesheet") return `link:stylesheet:${href}`;
+      if (rel === "canonical") return `link:canonical`;
+      if (rel === "icon" || rel === "shortcut icon") return `link:icon`;
+      return `link:${rel}:${href}`;
+    }
+    return null;
+  };
+  const existingDynamicElements = /* @__PURE__ */ new Map();
+  Array.from(document.head.children).forEach((child) => {
+    if (child.hasAttribute("data-island-style")) return;
+    const key = getHeadKey(child);
+    if (key) {
+      existingDynamicElements.set(key, child);
+    }
+  });
+  const newKeys = /* @__PURE__ */ new Set();
+  const pendingStylesheets = [];
+  Array.from(newHead.children).forEach((incomingEl) => {
+    const key = getHeadKey(incomingEl);
+    if (!key) return;
+    newKeys.add(key);
+    const existing = existingDynamicElements.get(key);
+    if (existing) {
+      if (existing.outerHTML === incomingEl.outerHTML) {
+        return;
+      }
+      const clone = incomingEl.cloneNode(true);
+      existing.replaceWith(clone);
+    } else {
+      const clone = incomingEl.cloneNode(true);
+      if (clone.tagName.toLowerCase() === "link" && clone.getAttribute("rel")?.toLowerCase() === "stylesheet") {
+        const sheetPromise = new Promise((resolve) => {
+          const timeout = setTimeout(resolve, 500);
+          clone.onload = () => {
+            clearTimeout(timeout);
+            resolve();
+          };
+          clone.onerror = () => {
+            clearTimeout(timeout);
+            resolve();
+          };
+        });
+        pendingStylesheets.push(sheetPromise);
+      }
+      document.head.appendChild(clone);
+    }
+  });
+  existingDynamicElements.forEach((existingEl, key) => {
+    if (!newKeys.has(key)) {
+      existingEl.remove();
+    }
+  });
+  if (pendingStylesheets.length > 0) {
+    await Promise.all(pendingStylesheets);
+  }
+}
 async function navigateTo(urlStr, pushState = true) {
   try {
     const response = await fetch(urlStr, {
@@ -36698,8 +36774,11 @@ async function navigateTo(urlStr, pushState = true) {
     });
     const newScripts = Array.from(newDoc.body.querySelectorAll("script"));
     newScripts.forEach((s) => s.remove());
-    const updateDom = () => {
+    const updateDom = async () => {
       document.title = newDoc.title;
+      if (newDoc.head) {
+        await reconcileHead(newDoc.head);
+      }
       document.body.innerHTML = newDoc.body.innerHTML;
       persistentElements.forEach((liveEl, id) => {
         const targetSlot = document.querySelector(`[data-persist="${id}"]`);
@@ -36734,9 +36813,9 @@ async function navigateTo(urlStr, pushState = true) {
       window.dispatchEvent(new CustomEvent("island:page-loaded", { detail: { url: finalUrl.href } }));
     };
     if ("startViewTransition" in document) {
-      document.startViewTransition(updateDom);
+      await document.startViewTransition(updateDom);
     } else {
-      updateDom();
+      await updateDom();
     }
   } catch (err) {
     console.error("[SoftMax.LaughTale] View transition failed, falling back to full navigation:", err);
