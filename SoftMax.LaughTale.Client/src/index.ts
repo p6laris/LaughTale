@@ -21,6 +21,7 @@ export { initDirectives } from './directives/index';
 export { LucideIcons, getLucideIcon } from './icons/lucide';
 export { registerCommand, unregisterCommand, getCommand, executeCommand, clearCommands, listCommands, type CommandHandler } from './runtime/commands';
 export { getCspNonce, setCspNonce, applyNonceToStyle, applyNonceToScript } from './directives/csp';
+export { createScope, type IslandScope } from './runtime/scope';
 
 // Auto-register built-in enterprise components
 defineIsland('stepper', () => import('./components/stepper'));

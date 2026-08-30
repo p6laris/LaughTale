@@ -36787,6 +36787,58 @@ init_lucide();
 init_commands();
 init_csp();
 
+// src/runtime/scope.ts
+function createScope() {
+  const cleanups = [];
+  let isDisposed = false;
+  return {
+    on(target, event, handler, options) {
+      if (isDisposed || !target) return;
+      target.addEventListener(event, handler, options);
+      cleanups.push(() => {
+        target.removeEventListener(event, handler, options);
+      });
+    },
+    observe(observer) {
+      if (isDisposed || !observer) return;
+      cleanups.push(() => {
+        try {
+          observer.disconnect();
+        } catch {
+        }
+      });
+    },
+    timer(id) {
+      if (isDisposed || id === null || id === void 0) return;
+      cleanups.push(() => {
+        try {
+          clearInterval(id);
+          clearTimeout(id);
+        } catch {
+        }
+      });
+    },
+    cleanup(fn) {
+      if (isDisposed || typeof fn !== "function") return;
+      cleanups.push(fn);
+    },
+    dispose() {
+      if (isDisposed) return;
+      isDisposed = true;
+      while (cleanups.length > 0) {
+        const cleanupFn = cleanups.pop();
+        if (typeof cleanupFn === "function") {
+          try {
+            cleanupFn();
+          } catch (error) {
+            console.error("[SoftMax.LaughTale Scope] Error executing cleanup task:", error);
+          }
+        }
+      }
+    }
+  };
+}
+
 // src/composables/index.ts
 init_useDisclosure();
 init_useFocusTrap();
@@ -37792,6 +37844,7 @@ export {
   awaitStreamingReady,
   clearCommands,
   createPreactIsland,
+  createScope,
   createVanillaIsland,
   defineIsland,
   enableViewTransitions,

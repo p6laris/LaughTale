@@ -176,7 +176,8 @@ const fn = new Function('item', item.command);   // item comes from data-props, 
 ## 4. LT-2xx — Lifecycle, memory & correctness (P0/P1)
 
 ### `LT-201` — No unmount lifecycle: every navigation leaks
-**Severity:** P0 · **Status:** todo · **Files:** all 76 of `src/components/*.ts`, `src/runtime/hydrator.ts:76-79`, `src/runtime/router.ts:80-114`
+**Severity:** P0 · **Status:** done · **Files:** `SoftMax.LaughTale.Client/src/runtime/scope.ts`, `src/runtime/router.ts`, `src/runtime/hydrator.ts`
+**Resolution:** Created `createScope()` and `IslandScope` in `src/runtime/scope.ts` managing LIFO teardowns of event listeners, observers, timers, and custom callbacks with error isolation and idempotency. Exported `createScope` from `src/index.ts`. Router dispatches `laughtale:unmount` to active unpersisted islands before DOM morphing. Added unit test suite in `tests/scope.test.ts` (6/6 passed).
 
 **Evidence.** The hydrator already supports it — `hydrator.ts:77` wires `laughtale:unmount` if `mount()` returns a function — but **zero components return one**. Across the component tree there are 436 `addEventListener` calls and 7 `removeEventListener` calls; 26 files attach listeners to `document`/`window`, which outlive the element entirely. The router then discards the DOM via `innerHTML` **without ever dispatching `laughtale:unmount`**, so even a compliant component would never be told to clean up. Result: navigate the showcase 50 times and you accumulate thousands of live handlers, orphaned `IntersectionObserver`s, and running `setInterval`s.
 
