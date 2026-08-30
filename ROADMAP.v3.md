@@ -638,7 +638,8 @@ Standardize events on `laughtale:<component>:<event>` (`bubbles: true`, `detail`
 ---
 
 ### `LT-903` — Documentation gaps
-**Severity:** P2 · **Status:** todo
+**Severity:** P2 · **Status:** done
+
 
 **Fix.** Add to the Docs portal: security model and CSP guide (post-`LT-101`), theming guide (post-`LT-603`), an "islands vs. Blazor Server vs. WASM" decision guide, migration/upgrade notes, per-component API reference **generated** from the TagHelper reflection data (`LT-401`) so it cannot drift, and an honest performance page (`LT-701`). Correct the false claims in `README.md` as the first commit of this roadmap.
 

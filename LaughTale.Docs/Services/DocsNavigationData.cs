@@ -1,4 +1,4 @@
-﻿using LaughTale.Components.Models;
+using LaughTale.Components.Models;
 
 namespace LaughTale.Docs.Services;
 
@@ -104,7 +104,11 @@ public static class DocsNavigationData
                 new("Theming & Tokens", "droplet", "/doc/40-theming-and-tokens", currentPath.Contains("40-theming-and-tokens")),
                 new("View Transitions", "play", "/doc/03-view-transitions", currentPath.Contains("03-view-transitions")),
                 new("Server Slot Projection", "box", "/doc/04-slots-and-projection", currentPath.Contains("04-slots-and-projection")),
-                new("Content Collections", "database", "/doc/05-content-collections", currentPath.Contains("05-content-collections"))
+                new("Content Collections", "database", "/doc/05-content-collections", currentPath.Contains("05-content-collections")),
+                new("Security & CSP", "shieldAlert", "/doc/63-security-and-csp", currentPath.Contains("63-security-and-csp"), null, "New"),
+                new("OKLCH Design Tokens", "palette", "/doc/64-theming-and-design-tokens", currentPath.Contains("64-theming-and-design-tokens"), null, "New"),
+                new("Islands vs Blazor Guide", "layers", "/doc/65-architecture-decision-guide", currentPath.Contains("65-architecture-decision-guide"), null, "New"),
+                new("Migration to v3.0.0", "gitCommit", "/doc/66-migration-and-upgrade-guide", currentPath.Contains("66-migration-and-upgrade-guide"), null, "v3.0")
             })
         };
     }

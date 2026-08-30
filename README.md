@@ -1,101 +1,51 @@
-﻿# 🏝️ LaughTale 2.0
+# 🏝️ LaughTale 3.0
 
-A high-performance, Astro-grade **LaughTale Islands Architecture framework for ASP.NET Core & Blazor SSR (.NET 9/10 + TypeScript)**.
+An enterprise-grade, high-performance **Islands Architecture framework for ASP.NET Core & Blazor SSR (.NET 10 + TypeScript)**.
 
 ---
 
 ## ⚡ Key Features
 
-- 🚀 **Sub-20ms First Paint**: 90% of the page is static SSR HTML.
-- 💤 **6 Hydration Strategies**: `Load`, `Idle`, `Visible` (scroll), `Media`, `Interaction`, `Never`.
-- 📥 **C# Server Slot Projection**: Pass arbitrary server-rendered HTML into client TypeScript islands.
-- 🚀 **Seamless View Transitions**: Instant SPA-like page morphing via native HTML5 View Transitions API.
-- 🔄 **Persistent Islands (`persist="id"`)**: Preserve island state (e.g. audio player, draft status) across page navigations.
-- 🎨 **On-Demand Scoped CSS**: Stylesheets injected dynamically only when an island hydrates.
-- 🔍 **Roslyn Compile-Time Diagnostics**: `SMI001` (invalid names) and `SMI002` (non-serializable types) caught at compile-time.
-- ⚡ **Zero SignalR / Server Memory**: 100% stateless HTTP.
+- 🚀 **Ultra-Fast First Paint**: 95% of the page is static SSR HTML; interactive islands hydrate on demand.
+- 💤 **6 Hydration Strategies**: `Load`, `Idle`, `Visible` (IntersectionObserver), `Media`, `Interaction`, `Never`.
+- 🛡️ **Defense-in-Depth Security**: Automated CSP nonces, AST expression sandboxing, and OWASP URL sanitization.
+- 🎨 **Enterprise Aura Design System**: 70+ components with dark mode, OKLCH palette generation, and WCAG AA/AAA compliance.
+- 📥 **Server Slot Projection**: Pass arbitrary server-rendered HTML into client TypeScript islands seamlessly.
+- 🚀 **View Transitions Router**: Smooth page morphing with accessible focus management, prefetching, and reduced-motion support.
+- 🔄 **Persistent Islands (`persist="id"`)**: Preserve component DOM subtree and state across client navigations.
+- 📊 **Real User Monitoring (RUM)**: Built-in W3C User Timing marks & measures and custom telemetry error handlers.
+- ⚡ **Zero SignalR Overhead**: 100% stateless HTTP architecture.
 
 ---
 
-## 🏛️ Projects in this Toolkit
+## 🏛️ Projects in this Solution
 
 | Project | Purpose | Target |
 |---|---|---|
-| **`LaughTale.Core`** | Core runtime: `HydrateStrategy`, `<Island />` component, TagHelpers, Slots, and JSON serializer. | `net10.0` |
+| **`LaughTale.Core`** | Core runtime: `HydrateStrategy`, `<island />` TagHelper, Slots, CSP middleware, and `IslandJson` serializer. | `net10.0` |
+| **`LaughTale.Components`** | 70+ Enterprise UI TagHelpers (Forms, Overlays, DataGrids, Trees, Charts, Menus, Theming). | `net10.0` |
+| **`LaughTale.Markdown`** | Markdig content collection pipeline with embedded Island support. | `net10.0` |
 | **`LaughTale.Generators`** | Roslyn Source Generator & Diagnostic Analyzer (`SMI001`, `SMI002`). | `netstandard2.0` |
-| **`LaughTale.Client`** | Sub-2 KB TypeScript hydration engine, View Transitions router & event bus. | `@softmax/islands` |
-| **`LaughTale.Showcase`** | Live demo application showcasing all 6 hydration modes, slots, and persistent islands. | `net10.0` Web App |
+| **`LaughTale.Client`** | Client runtime (< 8 KB gzipped), View Transitions router, directives, and composables. | `laughtale` (NPM) |
+| **`LaughTale.Showcase`** | Enterprise showcase demonstrating all components, theming, and hydration modes. | `net10.0` Web App |
+| **`LaughTale.Docs`** | Interactive documentation portal with runnable live examples. | `net10.0` Web App |
+| **`LaughTale.Tests`** | Comprehensive test suite (185 .NET tests, 237 JS tests). | `net10.0` |
 
 ---
 
-## 🚀 Astro-Inspired Capabilities in Action
+## 🚀 Quickstart
 
-### 1. C# Server Slot Projection
-```razor
-<!-- C# renders server content inside the Island slot -->
-<island name="modal-dialog" 
-        props="@(new ModalDialogProps("Open Citizen Agreement", "Legal Marriage Agreement"))" 
-        hydrate="Interaction">
-    <!-- Server-rendered slot content -->
-    <div class="p-4 bg-amber-50 rounded-2xl">
-        <h4>📜 Official Legal Disclaimer</h4>
-        <p>Verified under Law No. 15 of 2008 &bull; @DateTime.UtcNow.ToString("yyyy-MM-dd")</p>
-    </div>
-</island>
-```
+```bash
+# Clone the repository
+git clone https://github.com/softmax/LaughTale.git
+cd LaughTale
 
-In TypeScript (`modal-dialog.ts`):
-```typescript
-import { getSlot, injectIslandStyle } from '@softmax/islands';
-
-export default function ModalDialogIsland(container: HTMLElement, props: ModalDialogProps) {
-    const slotEl = getSlot(container); // Queries server-rendered slot without wiping it out
-    // ... wrap with animated modal dialog ...
-}
+# Run the Showcase & Docs
+./run.ps1
 ```
 
 ---
 
-### 2. Persistent Islands Across View Transitions
-```razor
-<!-- Layout header widget that never resets or stops when navigating between pages -->
-<island name="persistent-player" 
-        props="@(new PersistentPlayerProps("KRG Live Stream", 120))" 
-        persist="global-player" 
-        hydrate="Load" />
-```
+## 📄 License
 
----
-
-### 3. Roslyn Compile-Time Diagnostics
-```csharp
-// ❌ Compile Error SMI001: Name must be lowercase kebab-case
-[Island("Invalid_Name_123")]
-public record BadNameProps(string Label);
-
-// ⚠️ Compile Warning SMI002: CancellationToken cannot be serialized across client boundary
-[Island("task-runner")]
-public record TaskRunnerProps(CancellationToken Token);
-```
-
----
-
-## ⏱️ Hydration Strategies Reference
-
-| Strategy | Usage | How It Works |
-|---|---|---|
-| `Load` | `hydrate="Load"` | Hydrates immediately on `DOMContentLoaded`. |
-| `Idle` | `hydrate="Idle"` | Hydrates when browser CPU is idle (`requestIdleCallback`). |
-| `Visible` | `hydrate="Visible"` | Hydrates **only when scrolled into the viewport** (`IntersectionObserver`). |
-| `Media` | `hydrate="Media" media="(max-width: 768px)"` | Hydrates only when matching CSS media query. |
-| `Interaction` | `hydrate="Interaction"` | Hydrates on first `mouseenter`, `focusin`, or `click`. |
-| `Never` | `hydrate="Never"` | Pure SSR markup, zero client JS. |
-
----
-
-## 🏃 Running the Showcase App
-
-```powershell
-dotnet run --project LaughTale/LaughTale.Showcase/LaughTale.Showcase.csproj
-```
-Open **`https://localhost:5001`** and navigate between the **Showcase Hub** and **Architecture Docs** to see View Transitions and persistent islands in action!
+Distributed under the [MIT License](LICENSE). Copyright (c) 2026 LaughTale.
