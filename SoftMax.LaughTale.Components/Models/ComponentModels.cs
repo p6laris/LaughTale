@@ -495,3 +495,24 @@ public record SidebarGroupModel(
     string Label,
     List<SidebarItemModel> Items
 );
+
+public interface IComponentStateProps
+{
+    bool? Loading { get; set; }
+    string? Error { get; set; }
+    string? EmptyMessage { get; set; }
+    bool? Disabled { get; set; }
+}
+
+public record ComponentStateProps(
+    bool? Loading = null,
+    string? Error = null,
+    string? EmptyMessage = null,
+    bool? Disabled = null
+) : IComponentStateProps
+{
+    public bool? Loading { get; set; } = Loading;
+    public string? Error { get; set; } = Error;
+    public string? EmptyMessage { get; set; } = EmptyMessage;
+    public bool? Disabled { get; set; } = Disabled;
+}

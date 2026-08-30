@@ -29,6 +29,8 @@ export { parseAndReviveProps, reviveTuple } from './runtime/reviver';
 export { importWithRetry, type RetryOptions } from './runtime/retry';
 export { awaitStreamingReady } from './runtime/streaming';
 export { hasSsrContent, getSsrRoot, markSsrHydrated, SSR_ATTR, SSR_HYDRATED_ATTR } from './runtime/ssr';
+export { renderSkeleton, renderEmptyState, renderErrorState } from './runtime/states';
+export type { ComponentStateProps, SkeletonOptions, StateMessageOptions } from './types/states';
 export { createVanillaIsland } from './adapters/vanilla';
 export { createPreactIsland } from './adapters/preact';
 export { initDirectives } from './directives/index';

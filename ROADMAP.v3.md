@@ -462,7 +462,7 @@ Standardize events on `laughtale:<component>:<event>` (`bubbles: true`, `detail`
 ---
 
 ### `LT-504` — No documented component states
-**Severity:** P3 · **Status:** todo
+**Severity:** P3 · **Status:** done
 
 **Evidence.** Loading, empty, error, and disabled states are ad hoc — `skeleton.ts` exists but is not integrated into the components that need it.
 
