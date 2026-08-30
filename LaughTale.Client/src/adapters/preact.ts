@@ -60,3 +60,5 @@ export function createPreactIsland<TProps = any>(
         }
     };
 }
+
+export const createPreactAdapter = createPreactIsland;

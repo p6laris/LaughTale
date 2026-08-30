@@ -65,3 +65,5 @@ export function createVueIsland<TProps = any>(
         }
     };
 }
+
+export const createVueAdapter = createVueIsland;

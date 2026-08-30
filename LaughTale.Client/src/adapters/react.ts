@@ -67,3 +67,5 @@ export function createReactIsland<TProps = any>(
         }
     };
 }
+
+export const createReactAdapter = createReactIsland;

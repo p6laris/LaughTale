@@ -90,3 +90,5 @@ export function createSvelteIsland<TProps = any>(
         }
     };
 }
+
+export const createSvelteAdapter = createSvelteIsland;
