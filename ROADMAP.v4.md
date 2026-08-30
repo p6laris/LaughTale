@@ -644,7 +644,7 @@ wired up.
 | LT-1106 | CSS pipeline | P1 | done |
 | LT-1107 | Six reference components, all concerns | P1 | done |
 | LT-1108 | Lint rules | P1 | done |
-| LT-1109 | Modularity contract + options surface | P1 | todo |
+| LT-1109 | Modularity contract + options surface | P1 | done |
 | LT-1201 | Generate the TagHelper layer | P2 | done |
 | LT-1202 | Emit real `.d.ts` | P2 | done |
 | LT-1203 | Generate the island registry | P2 | done |
@@ -673,15 +673,15 @@ wired up.
 | LT-1504 | Culture flow to client | P1 | done |
 | LT-1505 | `IStringLocalizer` strings | P1 | done |
 | LT-1506 | Progressive enhancement baseline | P1 | done |
-| LT-1507 | Cached pages must not leak per-user props | P0 | todo |
-| LT-1508 | Server-side data contract | P1 | todo |
+| LT-1507 | Cached pages must not leak per-user props | P0 | done |
+| LT-1508 | Server-side data contract | P1 | done |
 | LT-1601 | CI | P0 | done |
 | LT-1602 | Enforce bundle budget | P1 | done |
 | LT-1603 | Correct the size claims | P1 | done |
 | LT-1604 | Build-emitted README numbers | P2 | done |
 | LT-1605 | Public API lock | P2 | done |
-| LT-1606 | Core-only CI job | P1 | todo |
-| LT-1607 | Real browser tests (Playwright) | P1 | todo |
+| LT-1606 | Core-only CI job | P1 | done |
+| LT-1607 | Real browser tests (Playwright) | P1 | done |
 | LT-1608 | Component API consistency audit | P1 | todo |
 | LT-1609 | Browser support floor | P1 | todo |
 | LT-1701 | Vue adapter | P2 | done |
