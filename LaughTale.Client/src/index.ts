@@ -46,6 +46,7 @@ export { getCspNonce, setCspNonce, applyNonceToStyle, applyNonceToScript } from 
 export { createScope, type IslandScope } from './runtime/scope';
 export { renderErrorBoundary, isDevMode } from './runtime/error-boundary';
 export { initDesignTokens, updateToken, getToken, AURA_PALETTES, generatePaletteRamp, saveTheme, loadSavedTheme, applySavedTheme, generateThemeExports, type SavedThemeConfig, THEME_STORAGE_KEY, calculateRelativeLuminance, calculateContrastRatio, checkWcagCompliance, type WcagComplianceResult } from './styles/design-tokens';
+export { laughtaleTailwindPreset } from './styles/tailwind.preset';
 export { renderThemeMatrix, captureStyleSignature, type MatrixPermutation, type ComponentMatrixSnapshot } from './testing/visual-harness';
 export { measureHydration, measureThroughput, recordHydrationMetric, getHydrationMetrics, clearHydrationMetrics, calculatePercentiles, type BenchmarkMetric, type HydrationMetric } from './runtime/benchmark';
 export { PrefetchManager, prefetchManager, type CachedResponse, type PrefetchOptions } from './router/prefetch';
