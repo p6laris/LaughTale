@@ -654,7 +654,8 @@ Standardize events on `laughtale:<component>:<event>` (`bubbles: true`, `detail`
 ---
 
 ### `LT-905` — Browser support policy
-**Severity:** P3 · **Status:** todo
+**Severity:** P3 · **Status:** done
+
 
 **Fix.** `target: es2022` and View Transitions imply a modern-evergreen policy. State it explicitly, document graceful degradation for Safari (View Transitions), and test the fallback paths.
 

@@ -50,5 +50,7 @@ try {
     observe(el: any) {
         this.callback([{ isIntersecting: true, target: el }]);
     }
+    unobserve(_el: any) {}
     disconnect() {}
 };
+
