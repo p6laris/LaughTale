@@ -141,6 +141,15 @@
     --p-shadow-md: var(--lt-shadow-md);
     --p-shadow-lg: var(--lt-shadow-lg);
 
+    --lt-field-padding-x: 0.75rem;
+    --lt-field-padding-y: 0.5rem;
+    --lt-button-padding-x: 1rem;
+    --lt-button-padding-y: 0.5rem;
+    --p-field-padding-x: var(--lt-field-padding-x);
+    --p-field-padding-y: var(--lt-field-padding-y);
+    --p-button-padding-x: var(--lt-button-padding-x);
+    --p-button-padding-y: var(--lt-button-padding-y);
+
     --lt-content-bg: var(--lt-surface-0);
     --lt-content-border: var(--lt-border-default);
     --lt-content-hover-bg: var(--lt-surface-50);
@@ -149,6 +158,9 @@
     --p-content-border: var(--lt-content-border);
     --p-content-hover-bg: var(--lt-content-hover-bg);
     --p-content-padding: var(--lt-content-padding);
+
+    --lt-overlay-bg: var(--lt-surface-0);
+    --p-overlay-bg: var(--lt-overlay-bg);
 }
 
 /* Dark Mode Tokens */
@@ -188,6 +200,60 @@
     --p-border-color: var(--lt-border-default);
     background-color: var(--p-surface-0);
     color: var(--p-text-color);
+}
+
+/* ==================== ZERO-TRANSPARENCY OVERLAY ENFORCEMENT ==================== */
+.p-select-overlay,
+.p-treeselect-overlay,
+.p-multiselect-overlay,
+.p-autocomplete-overlay,
+.p-datepicker-overlay,
+.p-menu,
+.p-tieredmenu,
+.p-contextmenu,
+.p-popover,
+.p-dialog,
+.p-confirm-dialog,
+.p-commandmenu,
+.colorpicker-palette-overlay,
+.theme-studio-drawer {
+    background-color: var(--lt-surface-0, #ffffff) !important;
+    color: var(--lt-text-primary, #0f172a) !important;
+    border: 1px solid var(--lt-surface-200, #e2e8f0) !important;
+    box-shadow: var(--p-shadow-lg, 0 10px 15px -3px rgba(0, 0, 0, 0.1)) !important;
+}
+
+.dark .p-select-overlay,
+.dark .p-treeselect-overlay,
+.dark .p-multiselect-overlay,
+.dark .p-autocomplete-overlay,
+.dark .p-datepicker-overlay,
+.dark .p-menu,
+.dark .p-tieredmenu,
+.dark .p-contextmenu,
+.dark .p-popover,
+.dark .p-dialog,
+.dark .p-confirm-dialog,
+.dark .p-commandmenu,
+.dark .colorpicker-palette-overlay,
+.dark .theme-studio-drawer,
+[data-theme="dark"] .p-select-overlay,
+[data-theme="dark"] .p-treeselect-overlay,
+[data-theme="dark"] .p-multiselect-overlay,
+[data-theme="dark"] .p-autocomplete-overlay,
+[data-theme="dark"] .p-datepicker-overlay,
+[data-theme="dark"] .p-menu,
+[data-theme="dark"] .p-tieredmenu,
+[data-theme="dark"] .p-contextmenu,
+[data-theme="dark"] .p-popover,
+[data-theme="dark"] .p-dialog,
+[data-theme="dark"] .p-confirm-dialog,
+[data-theme="dark"] .p-commandmenu,
+[data-theme="dark"] .colorpicker-palette-overlay,
+[data-theme="dark"] .theme-studio-drawer {
+    background-color: var(--lt-surface-0, #09090b) !important;
+    color: var(--lt-text-primary, #fafafa) !important;
+    border-color: var(--lt-surface-200, #27272a) !important;
 }
 
 * {

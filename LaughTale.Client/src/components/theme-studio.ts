@@ -335,8 +335,8 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
             updateToken(`--lt-primary-${shade}`, hex);
             updateToken(`--p-primary-${shade}`, hex);
         }
-        updateToken('--lt-primary-color', currentRamp['500'] || 'var(--lt-primary-500, #10b981)');
-        updateToken('--p-primary-color', currentRamp['500'] || 'var(--lt-primary-500, #10b981)');
+        updateToken('--lt-primary-color', currentRamp['500'] || '#10b981');
+        updateToken('--p-primary-color', currentRamp['500'] || '#10b981');
 
         const n = NEUTRAL_PRESETS[currentNeutral] || NEUTRAL_PRESETS.slate;
         updateToken('--lt-surface-0', n.s0);
@@ -383,62 +383,85 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
                 root.style.setProperty('--lt-content-padding', '0.625rem');
                 root.style.setProperty('--lt-field-padding-y', '0.35rem');
                 root.style.setProperty('--lt-field-padding-x', '0.5rem');
+                root.style.setProperty('--lt-button-padding-y', '0.35rem');
+                root.style.setProperty('--lt-button-padding-x', '0.65rem');
                 root.style.setProperty('--p-content-padding', '0.625rem');
                 root.style.setProperty('--p-field-padding-y', '0.35rem');
                 root.style.setProperty('--p-field-padding-x', '0.5rem');
+                root.style.setProperty('--p-button-padding-y', '0.35rem');
+                root.style.setProperty('--p-button-padding-x', '0.65rem');
             } else if (currentDensity === 'spacious') {
                 root.style.setProperty('--lt-content-padding', '1.5rem');
                 root.style.setProperty('--lt-field-padding-y', '0.65rem');
                 root.style.setProperty('--lt-field-padding-x', '1rem');
+                root.style.setProperty('--lt-button-padding-y', '0.65rem');
+                root.style.setProperty('--lt-button-padding-x', '1.25rem');
                 root.style.setProperty('--p-content-padding', '1.5rem');
                 root.style.setProperty('--p-field-padding-y', '0.65rem');
                 root.style.setProperty('--p-field-padding-x', '1rem');
+                root.style.setProperty('--p-button-padding-y', '0.65rem');
+                root.style.setProperty('--p-button-padding-x', '1.25rem');
             } else {
                 root.style.setProperty('--lt-content-padding', '1rem');
                 root.style.setProperty('--lt-field-padding-y', '0.5rem');
                 root.style.setProperty('--lt-field-padding-x', '0.75rem');
+                root.style.setProperty('--lt-button-padding-y', '0.5rem');
+                root.style.setProperty('--lt-button-padding-x', '1rem');
                 root.style.setProperty('--p-content-padding', '1rem');
                 root.style.setProperty('--p-field-padding-y', '0.5rem');
                 root.style.setProperty('--p-field-padding-x', '0.75rem');
+                root.style.setProperty('--p-button-padding-y', '0.5rem');
+                root.style.setProperty('--p-button-padding-x', '1rem');
             }
 
             if (currentShadow === 'none') {
                 root.style.setProperty('--lt-shadow-sm', 'none');
                 root.style.setProperty('--lt-shadow-md', 'none');
                 root.style.setProperty('--lt-shadow-lg', 'none');
+                root.style.setProperty('--lt-shadow-xl', 'none');
                 root.style.setProperty('--p-shadow-sm', 'none');
                 root.style.setProperty('--p-shadow-md', 'none');
                 root.style.setProperty('--p-shadow-lg', 'none');
+                root.style.setProperty('--p-shadow-xl', 'none');
             } else if (currentShadow === 'subtle') {
                 const s1 = '0 1px 2px rgba(0,0,0,0.03)';
                 const s2 = '0 2px 4px rgba(0,0,0,0.05)';
                 const s3 = '0 4px 8px rgba(0,0,0,0.06)';
+                const s4 = '0 8px 16px rgba(0,0,0,0.08)';
                 root.style.setProperty('--lt-shadow-sm', s1);
                 root.style.setProperty('--lt-shadow-md', s2);
                 root.style.setProperty('--lt-shadow-lg', s3);
+                root.style.setProperty('--lt-shadow-xl', s4);
                 root.style.setProperty('--p-shadow-sm', s1);
                 root.style.setProperty('--p-shadow-md', s2);
                 root.style.setProperty('--p-shadow-lg', s3);
+                root.style.setProperty('--p-shadow-xl', s4);
             } else if (currentShadow === 'bold') {
                 const s1 = '0 2px 4px rgba(0,0,0,0.1)';
                 const s2 = '0 8px 16px rgba(0,0,0,0.15)';
                 const s3 = '0 16px 32px rgba(0,0,0,0.2)';
+                const s4 = '0 24px 48px rgba(0,0,0,0.25)';
                 root.style.setProperty('--lt-shadow-sm', s1);
                 root.style.setProperty('--lt-shadow-md', s2);
                 root.style.setProperty('--lt-shadow-lg', s3);
+                root.style.setProperty('--lt-shadow-xl', s4);
                 root.style.setProperty('--p-shadow-sm', s1);
                 root.style.setProperty('--p-shadow-md', s2);
                 root.style.setProperty('--p-shadow-lg', s3);
+                root.style.setProperty('--p-shadow-xl', s4);
             } else {
                 const s1 = '0 1px 2px 0 rgba(0, 0, 0, 0.05)';
                 const s2 = '0 4px 6px -1px rgba(0, 0, 0, 0.07)';
                 const s3 = '0 10px 15px -3px rgba(0, 0, 0, 0.08)';
+                const s4 = '0 20px 25px -5px rgba(0, 0, 0, 0.1)';
                 root.style.setProperty('--lt-shadow-sm', s1);
                 root.style.setProperty('--lt-shadow-md', s2);
                 root.style.setProperty('--lt-shadow-lg', s3);
+                root.style.setProperty('--lt-shadow-xl', s4);
                 root.style.setProperty('--p-shadow-sm', s1);
                 root.style.setProperty('--p-shadow-md', s2);
                 root.style.setProperty('--p-shadow-lg', s3);
+                root.style.setProperty('--p-shadow-xl', s4);
             }
 
             let fontVal = 'Plus Jakarta Sans, sans-serif';
@@ -467,6 +490,9 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
             primary: currentCustomHex || currentPrimary,
             neutral: currentNeutral,
             radius: currentRadius,
+            density: currentDensity,
+            shadow: currentShadow,
+            font: currentFont,
             darkMode: currentThemeMode === 'dark'
         });
     }
@@ -741,9 +767,65 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
         }
         if (saved.neutral) currentNeutral = saved.neutral;
         if (saved.radius) currentRadius = saved.radius;
+        if (saved.density) currentDensity = saved.density;
+        if (saved.shadow) currentShadow = saved.shadow;
+        if (saved.font) currentFont = saved.font;
         if (typeof saved.darkMode === 'boolean') {
             currentThemeMode = saved.darkMode ? 'dark' : 'light';
         }
+
+        // Sync mode buttons
+        container.querySelectorAll('.mode-btn').forEach(b => {
+            const m = b.getAttribute('data-mode');
+            const isActive = m === (typeof saved.darkMode === 'boolean' ? (saved.darkMode ? 'dark' : 'light') : 'system');
+            b.classList.toggle('active', isActive);
+            (b as HTMLElement).style.borderColor = isActive ? 'var(--lt-primary-500)' : 'var(--lt-surface-200)';
+            (b as HTMLElement).style.background = isActive ? 'var(--lt-primary-50)' : 'var(--lt-surface-50)';
+        });
+
+        // Sync radius buttons
+        container.querySelectorAll('.radius-btn').forEach(b => {
+            const r = b.getAttribute('data-radius');
+            const isActive = r === currentRadius;
+            b.classList.toggle('active', isActive);
+            (b as HTMLElement).style.borderColor = isActive ? 'var(--lt-primary-500)' : 'var(--lt-surface-200)';
+            (b as HTMLElement).style.background = isActive ? 'var(--lt-primary-50)' : 'var(--lt-surface-50)';
+            (b as HTMLElement).style.color = isActive ? 'var(--lt-primary-700)' : 'inherit';
+            (b as HTMLElement).style.fontWeight = isActive ? 'bold' : 'normal';
+        });
+
+        // Sync density buttons
+        container.querySelectorAll('.density-btn').forEach(b => {
+            const d = b.getAttribute('data-density');
+            const isActive = d === currentDensity;
+            b.classList.toggle('active', isActive);
+            (b as HTMLElement).style.borderColor = isActive ? 'var(--lt-primary-500)' : 'var(--lt-surface-200)';
+            (b as HTMLElement).style.background = isActive ? 'var(--lt-primary-50)' : 'var(--lt-surface-50)';
+            (b as HTMLElement).style.color = isActive ? 'var(--lt-primary-700)' : 'inherit';
+            (b as HTMLElement).style.fontWeight = isActive ? '600' : 'normal';
+        });
+
+        // Sync shadow buttons
+        container.querySelectorAll('.shadow-btn').forEach(b => {
+            const s = b.getAttribute('data-shadow');
+            const isActive = s === currentShadow;
+            b.classList.toggle('active', isActive);
+            (b as HTMLElement).style.borderColor = isActive ? 'var(--lt-primary-500)' : 'var(--lt-surface-200)';
+            (b as HTMLElement).style.background = isActive ? 'var(--lt-primary-50)' : 'var(--lt-surface-50)';
+            (b as HTMLElement).style.color = isActive ? 'var(--lt-primary-700)' : 'inherit';
+            (b as HTMLElement).style.fontWeight = isActive ? '600' : 'normal';
+        });
+
+        // Sync font buttons
+        container.querySelectorAll('.font-btn').forEach(b => {
+            const f = b.getAttribute('data-font');
+            const isActive = f === currentFont;
+            b.classList.toggle('active', isActive);
+            (b as HTMLElement).style.borderColor = isActive ? 'var(--lt-primary-500)' : 'var(--lt-surface-200)';
+            (b as HTMLElement).style.background = isActive ? 'var(--lt-primary-50)' : 'var(--lt-surface-50)';
+            (b as HTMLElement).style.color = isActive ? 'var(--lt-primary-700)' : 'inherit';
+            (b as HTMLElement).style.fontWeight = isActive ? '600' : 'normal';
+        });
     }
 
     applyTheme();

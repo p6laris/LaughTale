@@ -12,6 +12,9 @@ export interface SavedThemeConfig {
     primary: string;   // Preset name ('emerald') or hex ('#6366f1')
     neutral: string;   // Neutral preset name ('slate', 'zinc')
     radius: string;    // e.g. '0.5rem'
+    density?: string;  // 'compact' | 'normal' | 'spacious'
+    shadow?: string;   // 'none' | 'subtle' | 'layered' | 'bold'
+    font?: string;     // 'sans' | 'inter' | 'mono'
     darkMode?: boolean;
 }
 
@@ -90,6 +93,13 @@ export function applySavedTheme(): boolean {
         updateToken('--lt-radius', saved.radius);
         updateToken('--lt-radius-md', saved.radius);
         updateToken('--p-border-radius', saved.radius);
+        const radNum = parseFloat(saved.radius) || 0;
+        const lgVal = saved.radius === '9999px' ? '9999px' : `${radNum * 1.5}rem`;
+        const xlVal = saved.radius === '9999px' ? '9999px' : `${radNum * 2}rem`;
+        updateToken('--lt-radius-lg', lgVal);
+        updateToken('--lt-radius-xl', xlVal);
+        updateToken('--p-border-radius-lg', lgVal);
+        updateToken('--p-border-radius-xl', xlVal);
     }
 
     // Apply neutral surface if configured
@@ -103,6 +113,100 @@ export function applySavedTheme(): boolean {
                 updateToken(`--p-surface-${shade}`, hex);
             }
         }
+    }
+
+    // Apply density if configured
+    if (saved.density) {
+        if (saved.density === 'compact') {
+            updateToken('--lt-content-padding', '0.625rem');
+            updateToken('--lt-field-padding-y', '0.35rem');
+            updateToken('--lt-field-padding-x', '0.5rem');
+            updateToken('--p-content-padding', '0.625rem');
+            updateToken('--p-field-padding-y', '0.35rem');
+            updateToken('--p-field-padding-x', '0.5rem');
+            updateToken('--p-button-padding-y', '0.35rem');
+            updateToken('--p-button-padding-x', '0.65rem');
+        } else if (saved.density === 'spacious') {
+            updateToken('--lt-content-padding', '1.5rem');
+            updateToken('--lt-field-padding-y', '0.65rem');
+            updateToken('--lt-field-padding-x', '1rem');
+            updateToken('--p-content-padding', '1.5rem');
+            updateToken('--p-field-padding-y', '0.65rem');
+            updateToken('--p-field-padding-x', '1rem');
+            updateToken('--p-button-padding-y', '0.65rem');
+            updateToken('--p-button-padding-x', '1.25rem');
+        } else {
+            updateToken('--lt-content-padding', '1rem');
+            updateToken('--lt-field-padding-y', '0.5rem');
+            updateToken('--lt-field-padding-x', '0.75rem');
+            updateToken('--p-content-padding', '1rem');
+            updateToken('--p-field-padding-y', '0.5rem');
+            updateToken('--p-field-padding-x', '0.75rem');
+            updateToken('--p-button-padding-y', '0.5rem');
+            updateToken('--p-button-padding-x', '1rem');
+        }
+    }
+
+    // Apply shadow if configured
+    if (saved.shadow) {
+        if (saved.shadow === 'none') {
+            updateToken('--lt-shadow-sm', 'none');
+            updateToken('--lt-shadow-md', 'none');
+            updateToken('--lt-shadow-lg', 'none');
+            updateToken('--lt-shadow-xl', 'none');
+            updateToken('--p-shadow-sm', 'none');
+            updateToken('--p-shadow-md', 'none');
+            updateToken('--p-shadow-lg', 'none');
+            updateToken('--p-shadow-xl', 'none');
+        } else if (saved.shadow === 'subtle') {
+            const s1 = '0 1px 2px rgba(0,0,0,0.03)';
+            const s2 = '0 2px 4px rgba(0,0,0,0.05)';
+            const s3 = '0 4px 8px rgba(0,0,0,0.06)';
+            const s4 = '0 8px 16px rgba(0,0,0,0.08)';
+            updateToken('--lt-shadow-sm', s1);
+            updateToken('--lt-shadow-md', s2);
+            updateToken('--lt-shadow-lg', s3);
+            updateToken('--lt-shadow-xl', s4);
+            updateToken('--p-shadow-sm', s1);
+            updateToken('--p-shadow-md', s2);
+            updateToken('--p-shadow-lg', s3);
+            updateToken('--p-shadow-xl', s4);
+        } else if (saved.shadow === 'bold') {
+            const s1 = '0 2px 4px rgba(0,0,0,0.1)';
+            const s2 = '0 8px 16px rgba(0,0,0,0.15)';
+            const s3 = '0 16px 32px rgba(0,0,0,0.2)';
+            const s4 = '0 24px 48px rgba(0,0,0,0.25)';
+            updateToken('--lt-shadow-sm', s1);
+            updateToken('--lt-shadow-md', s2);
+            updateToken('--lt-shadow-lg', s3);
+            updateToken('--lt-shadow-xl', s4);
+            updateToken('--p-shadow-sm', s1);
+            updateToken('--p-shadow-md', s2);
+            updateToken('--p-shadow-lg', s3);
+            updateToken('--p-shadow-xl', s4);
+        } else {
+            const s1 = '0 1px 2px 0 rgba(0, 0, 0, 0.05)';
+            const s2 = '0 4px 6px -1px rgba(0, 0, 0, 0.07)';
+            const s3 = '0 10px 15px -3px rgba(0, 0, 0, 0.08)';
+            const s4 = '0 20px 25px -5px rgba(0, 0, 0, 0.1)';
+            updateToken('--lt-shadow-sm', s1);
+            updateToken('--lt-shadow-md', s2);
+            updateToken('--lt-shadow-lg', s3);
+            updateToken('--lt-shadow-xl', s4);
+            updateToken('--p-shadow-sm', s1);
+            updateToken('--p-shadow-md', s2);
+            updateToken('--p-shadow-lg', s3);
+            updateToken('--p-shadow-xl', s4);
+        }
+    }
+
+    // Apply font if configured
+    if (saved.font) {
+        let fontVal = 'Plus Jakarta Sans, sans-serif';
+        if (saved.font === 'inter') fontVal = 'Inter, -apple-system, sans-serif';
+        else if (saved.font === 'mono') fontVal = 'JetBrains Mono, monospace';
+        updateToken('--lt-font-family', fontVal);
+        updateToken('--p-font-family', fontVal);
     }
 
     // Apply dark mode if specified
