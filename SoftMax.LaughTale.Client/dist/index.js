@@ -35794,6 +35794,7 @@ public static class AppTheme
     getCommand: () => getCommand,
     getCspNonce: () => getCspNonce,
     getIslandDefinition: () => getIslandDefinition,
+    getIslandState: () => getIslandState,
     getLucideIcon: () => getLucideIcon,
     getSlot: () => getSlot,
     getToken: () => getToken,
@@ -35811,6 +35812,7 @@ public static class AppTheme
     parseAndReviveProps: () => parseAndReviveProps,
     registerCommand: () => registerCommand,
     removeIslandStyle: () => removeIslandStyle,
+    retryIsland: () => retryIsland,
     reviveTuple: () => reviveTuple,
     setCspNonce: () => setCspNonce,
     unregisterCommand: () => unregisterCommand,
@@ -35984,9 +35986,12 @@ public static class AppTheme
   }
 
   // src/runtime/hydrator.ts
-  var HYDRATED_FLAG = "__laughtale_hydrated";
+  var HYDRATION_STATE_KEY = "__laughtale_state__";
+  function getIslandState(container) {
+    return container[HYDRATION_STATE_KEY] || "idle";
+  }
   function hydrateIsland(container) {
-    if (container[HYDRATED_FLAG]) return;
+    if (getIslandState(container) !== "idle") return;
     const name = container.getAttribute("data-island") || container.getAttribute("name");
     if (!name) return;
     const strategy = (container.getAttribute("data-hydrate") || container.getAttribute("hydrate") || "load").toLowerCase();
@@ -36013,11 +36018,21 @@ public static class AppTheme
         executeHydration(container, name);
     }
   }
+  async function retryIsland(container) {
+    const name = container.getAttribute("data-island") || container.getAttribute("name");
+    if (!name) return;
+    container[HYDRATION_STATE_KEY] = "idle";
+    await executeHydration(container, name);
+  }
   async function executeHydration(container, name) {
-    if (container[HYDRATED_FLAG]) return;
-    container[HYDRATED_FLAG] = true;
+    const currentState = getIslandState(container);
+    if (currentState === "pending" || currentState === "mounted" || currentState === "failed") {
+      return;
+    }
+    container[HYDRATION_STATE_KEY] = "pending";
     const definition = getIslandDefinition(name);
     if (!definition) {
+      container[HYDRATION_STATE_KEY] = "failed";
       console.warn(`[SoftMax.LaughTale] Island '${name}' is not registered in the client registry.`);
       return;
     }
@@ -36028,20 +36043,20 @@ public static class AppTheme
       const module = await importWithRetry(definition.loader);
       const mount = module.default || module;
       if (typeof mount !== "function") {
-        console.error(`[SoftMax.LaughTale] Island '${name}' module does not export a mount function.`);
-        return;
+        throw new Error(`Island '${name}' module does not export a mount function.`);
       }
       const unmount = mount(container, props);
       if (typeof unmount === "function") {
         container.addEventListener("laughtale:unmount", unmount, { once: true });
       }
+      container[HYDRATION_STATE_KEY] = "mounted";
       container.dispatchEvent(new CustomEvent("laughtale:hydrated", {
         bubbles: true,
         composed: true,
         detail: { name, strategy: container.getAttribute("data-hydrate") }
       }));
     } catch (error) {
-      container[HYDRATED_FLAG] = false;
+      container[HYDRATION_STATE_KEY] = "failed";
       console.error(`[SoftMax.LaughTale] Error hydrating island '${name}':`, error);
       container.dispatchEvent(new CustomEvent("laughtale:hydration-error", {
         bubbles: true,

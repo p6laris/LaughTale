@@ -244,7 +244,8 @@ Persistent islands must be *excluded* — they are moved, not destroyed.
 ---
 
 ### `LT-205` — Hydration error leaves the island in a retryable-but-broken state
-**Severity:** P1 · **Status:** todo · **File:** `src/runtime/hydrator.ts:87-95`
+**Severity:** P1 · **Status:** done · **File:** `SoftMax.LaughTale.Client/src/runtime/hydrator.ts`
+**Resolution:** Implemented a tri-state lifecycle (`'idle' | 'pending' | 'mounted' | 'failed'`) with synchronous entry gating to eliminate race conditions across concurrent interaction events. Locked failed islands in `'failed'` to prevent duplicate listener accumulation and runaway error loops, and exposed `retryIsland(container)` and `getIslandState(container)` in `src/index.ts`. Unit tests verified in `tests/hydrator.test.ts` (4/4 passed).
 
 **Evidence.** On error the catch block sets `HYDRATED_FLAG = false`. If `mount()` threw *after* attaching listeners or DOM, the partial state persists and the next trigger (a second `mouseenter` under the `interaction` strategy) mounts **again**, producing duplicate handlers. Compounded by the fact that `hydrateInteraction` registers with `{ once: true }` per event but four event types — hovering *then* clicking can enter `executeHydration` twice before the flag is set on a slow module load.
 

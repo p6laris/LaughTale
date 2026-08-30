@@ -6,7 +6,7 @@
 import { defineIsland } from './runtime/registry';
 
 export { defineIsland, getIslandDefinition, hasIsland } from './runtime/registry';
-export { hydrateIsland, initIslands, type HydrateStrategy } from './runtime/hydrator';
+export { hydrateIsland, initIslands, retryIsland, getIslandState, type HydrateStrategy, type HydrationState } from './runtime/hydrator';
 export { enableViewTransitions, navigateTo } from './runtime/router';
 export { getSlot, extractSlotContent, hasSlot } from './runtime/slots';
 export { injectIslandStyle, removeIslandStyle } from './runtime/styles';

@@ -1,6 +1,7 @@
 /**
- * SoftMax.LaughTale: Multi-Strategy Client Hydration Engine
- * Supercharged with Astro-grade prop revival, query retry, child viewport observation & streaming SSR.
+ * SoftMax.LaughTale: Multi-Strategy Client Hydration Engine (Hardened Edition)
+ * Supercharged with Astro-grade prop revival, query retry, child viewport observation,
+ * streaming SSR, tri-state lifecycle tracking ('idle' | 'pending' | 'mounted' | 'failed'), and explicit retry recovery.
  */
 
 import { getIslandDefinition } from './registry';
@@ -9,11 +10,22 @@ import { importWithRetry } from './retry';
 import { awaitStreamingReady } from './streaming';
 
 export type HydrateStrategy = 'load' | 'idle' | 'visible' | 'media' | 'interaction' | 'never';
+export type HydrationState = 'idle' | 'pending' | 'mounted' | 'failed';
 
-const HYDRATED_FLAG = '__laughtale_hydrated';
+const HYDRATION_STATE_KEY = '__laughtale_state__';
 
+/**
+ * Returns the current hydration lifecycle state of an island container.
+ */
+export function getIslandState(container: HTMLElement): HydrationState {
+    return (container as any)[HYDRATION_STATE_KEY] || 'idle';
+}
+
+/**
+ * Initiates hydration for an island container based on its strategy.
+ */
 export function hydrateIsland(container: HTMLElement): void {
-    if ((container as any)[HYDRATED_FLAG]) return;
+    if (getIslandState(container) !== 'idle') return;
 
     const name = container.getAttribute('data-island') || container.getAttribute('name');
     if (!name) return;
@@ -45,12 +57,30 @@ export function hydrateIsland(container: HTMLElement): void {
     }
 }
 
+/**
+ * Explicitly retries hydration on an island in the 'failed' state.
+ */
+export async function retryIsland(container: HTMLElement): Promise<void> {
+    const name = container.getAttribute('data-island') || container.getAttribute('name');
+    if (!name) return;
+
+    // Reset state to allow clean re-execution
+    (container as any)[HYDRATION_STATE_KEY] = 'idle';
+    await executeHydration(container, name);
+}
+
 async function executeHydration(container: HTMLElement, name: string): Promise<void> {
-    if ((container as any)[HYDRATED_FLAG]) return;
-    (container as any)[HYDRATED_FLAG] = true;
+    const currentState = getIslandState(container);
+    if (currentState === 'pending' || currentState === 'mounted' || currentState === 'failed') {
+        return;
+    }
+
+    // Synchronously mark as pending to prevent concurrent execution
+    (container as any)[HYDRATION_STATE_KEY] = 'pending';
 
     const definition = getIslandDefinition(name);
     if (!definition) {
+        (container as any)[HYDRATION_STATE_KEY] = 'failed';
         console.warn(`[SoftMax.LaughTale] Island '${name}' is not registered in the client registry.`);
         return;
     }
@@ -68,8 +98,7 @@ async function executeHydration(container: HTMLElement, name: string): Promise<v
         const mount = module.default || module;
 
         if (typeof mount !== 'function') {
-            console.error(`[SoftMax.LaughTale] Island '${name}' module does not export a mount function.`);
-            return;
+            throw new Error(`Island '${name}' module does not export a mount function.`);
         }
 
         // 4. Mount island and register unmount hook
@@ -78,6 +107,8 @@ async function executeHydration(container: HTMLElement, name: string): Promise<v
             container.addEventListener('laughtale:unmount', unmount, { once: true });
         }
 
+        (container as any)[HYDRATION_STATE_KEY] = 'mounted';
+
         // 5. Dispatch success lifecycle event
         container.dispatchEvent(new CustomEvent('laughtale:hydrated', {
             bubbles: true,
@@ -85,7 +116,7 @@ async function executeHydration(container: HTMLElement, name: string): Promise<v
             detail: { name, strategy: container.getAttribute('data-hydrate') }
         }));
     } catch (error) {
-        (container as any)[HYDRATED_FLAG] = false;
+        (container as any)[HYDRATION_STATE_KEY] = 'failed';
         console.error(`[SoftMax.LaughTale] Error hydrating island '${name}':`, error);
         container.dispatchEvent(new CustomEvent('laughtale:hydration-error', {
             bubbles: true,
