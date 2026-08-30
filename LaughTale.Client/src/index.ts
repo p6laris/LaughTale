@@ -34,6 +34,9 @@ export { hasSsrContent, getSsrRoot, markSsrHydrated, SSR_ATTR, SSR_HYDRATED_ATTR
 export { renderSkeleton, renderEmptyState, renderErrorState } from './runtime/states';
 export type { ComponentStateProps, SkeletonOptions, StateMessageOptions } from './types/states';
 export { createVanillaIsland } from './adapters/vanilla';
+export { createReactIsland } from './adapters/react';
+export { createVueIsland } from './adapters/vue';
+export { createSvelteIsland } from './adapters/svelte';
 export { createPreactIsland } from './adapters/preact';
 export { initDirectives } from './directives/index';
 export { LucideIcons, getLucideIcon } from './icons/lucide';
