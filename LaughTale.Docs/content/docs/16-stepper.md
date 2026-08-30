@@ -1,57 +1,81 @@
-﻿---
-title: "Multi-Step Stepper Wizard"
-description: "Multi-step form progression with server-rendered C# Razor slots"
+---
+title: "Stepper Multi-Step Wizard"
+description: "Linear and non-linear multi-step form wizard with validation, progress indicators, and server-rendered C# Razor step slots."
 order: 16
-section: "Data & Structure"
+section: "Data & Tables"
 ---
 
-# Multi-Step Stepper Wizard
+# Stepper Multi-Step Wizard
 
-The `<island-stepper />` TagHelper provides a multi-step form workflow that projects server-rendered C# Razor slots per step with progress indicators and validation guards.
+Stepper is a structured multi-step form and process wizard component that guides users through complex enterprise workflows with linear or non-linear progression, validation gates, and server-rendered Razor step slots.
 
 ---
 
-## 🚀 Basic Usage
+## 🎮 Interactive Live Demos
+
+### 1. Basic Multi-Step Wizard
 
 ```razor
-@using LaughTale.Components.Models
+@page
+@model StepperPageModel
 
-@{
-    var steps = new List<StepperStep>
-    {
-        new("step-1", "Identity", "Biometrics", "1"),
-        new("step-2", "Department", "Role Allocation", "2"),
-        new("step-3", "Clearance", "Sign-Off", "3")
-    };
-}
+<island-stepper value="1" linear="true">
+    <stepper-panel header="Account Details">
+        <div class="p-4 bg-surface-50 rounded-lg">
+            <h4>Step 1: Create Account</h4>
+            <div class="form-group my-3">
+                <label>Email Address</label>
+                <input type="email" class="p-inputtext" placeholder="user@company.io" />
+            </div>
+            <button type="button" class="p-button p-button-primary" onclick="$stepper.next()">Next Step &rarr;</button>
+        </div>
+    </stepper-panel>
 
-<island-stepper steps="@steps" hydrate="Load">
-    <!-- Step 1 C# Slot -->
-    <div data-step="0">
-        <h3>Step 1: Facial Biometrics</h3>
-        <p>Verify your physical identity.</p>
-    </div>
+    <stepper-panel header="Profile Information">
+        <div class="p-4 bg-surface-50 rounded-lg">
+            <h4>Step 2: Profile Details</h4>
+            <div class="form-group my-3">
+                <label>Full Name</label>
+                <input type="text" class="p-inputtext" placeholder="Alice Montgomery" />
+            </div>
+            <div class="flex gap-2">
+                <button type="button" class="p-button p-button-secondary" onclick="$stepper.prev()">&larr; Previous</button>
+                <button type="button" class="p-button p-button-primary" onclick="$stepper.next()">Next Step &rarr;</button>
+            </div>
+        </div>
+    </stepper-panel>
 
-    <!-- Step 2 C# Slot -->
-    <div data-step="1">
-        <h3>Step 2: Department Assignment</h3>
-        <p>Select your organizational unit.</p>
-    </div>
-
-    <!-- Step 3 C# Slot -->
-    <div data-step="2">
-        <h3>Step 3: Document Vault Upload</h3>
-        <p>Upload your signed credentials.</p>
-    </div>
+    <stepper-panel header="Confirmation">
+        <div class="p-4 bg-surface-50 rounded-lg">
+            <h4>Step 3: Review & Submit</h4>
+            <p class="text-sm text-muted">Please confirm your details before completing setup.</p>
+            <div class="flex gap-2 mt-4">
+                <button type="button" class="p-button p-button-secondary" onclick="$stepper.prev()">&larr; Previous</button>
+                <button type="button" class="p-button p-button-success" onclick="alert('Account Created!')">Complete Registration</button>
+            </div>
+        </div>
+    </stepper-panel>
 </island-stepper>
 ```
 
 ---
 
-## 📋 TagHelper Attributes
+## ⚙️ C# TagHelper Attributes & API
 
 | Attribute | Type | Default | Description |
 |---|---|---|---|
-| `steps` | `List<StepperStep>` | `new()` | Step definitions containing `Id`, `Title`, `Description`, and `Icon`. |
-| `active-step` | `int` | `0` | 0-indexed initial active step. |
-| `linear` | `bool` | `true` | Enforces sequential forward progression. |
+| `value` | `int` | `1` | The currently active step index (1-based). |
+| `linear` | `bool` | `true` | When true, enforces sequential step completion. |
+| `orientation` | `string` | `"horizontal"` | `"horizontal"` or `"vertical"` step layout. |
+| `class` | `string` | `null` | Additional CSS class for the root wrapper. |
+
+---
+
+## 🧩 Addressable Parts (`data-part`)
+
+| Part Name | Target Element | Description |
+|---|---|---|
+| `root` | `.p-stepper` | Outer wizard container. |
+| `nav` | `.p-stepper-nav` | Step headers indicator track. |
+| `step` | `.p-stepper-step` | Individual step item (circle & label). |
+| `panel` | `.p-stepper-panel` | Active step body container. |

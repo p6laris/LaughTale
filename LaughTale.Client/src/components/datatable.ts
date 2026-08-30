@@ -1150,6 +1150,8 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
             `;
         }
 
+        const scrollWrapperStyle = props.scrollHeight ? `max-height: ${props.scrollHeight}; overflow-y: auto;` : 'overflow-x: auto;';
+
         applyPart(container, 'root', rootClasses.join(' '), props.pt, props.studioOverrides);
 
         container.innerHTML = `

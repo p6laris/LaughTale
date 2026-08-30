@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -22,12 +22,22 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="30" height="28" viewBox="0 0 25 24" style="color: var(--p-primary-600); flex-shrink: 0;"><path fill="currentColor" d="M8.967 4.43a4.3 4.3 0 0 0-.286-.679c-.367-.697-.942-1.33-1.667-1.683a.75.75 0 1 0-.657 1.349c.382.185.746.557.997 1.033q.1.194.17.39a4.3 4.3 0 0 0-1.748-.093a4.31 4.31 0 0 0-3.008 1.97a.75.75 0 0 0 1.269.8A2.81 2.81 0 0 1 6.001 6.23a2.8 2.8 0 0 1 1.723.286a5.55 5.55 0 0 0-2.446 2.516a.75.75 0 1 0 1.35.654A4.04 4.04 0 0 1 8.642 7.74c.39.957.71 1.885.913 2.951c.258 1.355.331 2.964.068 5.15a11.3 11.3 0 0 0-6.166 3.667a.75.75 0 0 0 .568 1.24h16a.75.75 0 0 0 .568-1.24a11.3 11.3 0 0 0-9.435-3.89c.223-2.114.145-3.765-.13-5.208c-.21-1.108-.535-2.076-.907-3.012a4.04 4.04 0 0 1 2.435.7a.75.75 0 1 0 .843-1.242a5.55 5.55 0 0 0-3.687-.932c.29-.49.732-.895 1.293-1.14a2.81 2.81 0 0 1 2.347.04a.75.75 0 0 0 .648-1.35a4.31 4.31 0 0 0-3.596-.063a4.3 4.3 0 0 0-1.437 1.02m9.207 14.82H5.877a9.77 9.77 0 0 1 6.148-2.164a9.78 9.78 0 0 1 6.149 2.163"/><path fill="currentColor" d="M18.025 7.5a2.75 2.75 0 1 0 0 5.5a2.75 2.75 0 0 0 0-5.5m-1.25 2.75a1.25 1.25 0 1 1 2.5 0a1.25 1.25 0 0 1-2.5 0"/></svg>
                     <div>
                         <span class="brand-title">LaughTale</span>
-                        <span class="aura-tag tag-slate" style="margin-left: 0.5rem; font-size: 0.6875rem;">Docs v3.0</span>
+                        <span class="aura-tag tag-slate" style="margin-left: 0.5rem; font-size: 0.6875rem;">Docs v4.0</span>
                     </div>
                 </a>
             </div>
 
             <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <!-- Global Search Trigger Button (Ctrl+K) -->
+                <button type="button" 
+                        onclick="document.dispatchEvent(new CustomEvent('command-palette:open'))" 
+                        class="p-button p-button-secondary" 
+                        style="padding: 0.35rem 0.85rem; font-size: 0.8125rem; display: inline-flex; align-items: center; gap: 0.5rem;"
+                        title="Search documentation (Ctrl+K)">
+                    <span>🔍 Search</span>
+                    <kbd style="font-size: 0.6875rem; background: var(--p-surface-200); padding: 0.1rem 0.35rem; border-radius: 4px; border: 1px solid var(--p-border-color);">Ctrl K</kbd>
+                </button>
+
                 <!-- Launch Theme Studio Button -->
                 <button type="button" 
                         onclick="document.dispatchEvent(new CustomEvent('studio:open'))" 
@@ -57,11 +67,13 @@
     <!-- Global Theme Studio Island Drawer -->
     <island-theme-studio />
 
+    <!-- Global Command Palette Island for Instant Search -->
+    <island-command placeholder="Type a command or search documentation..." />
+
     <!-- Main 3-Column Docs Layout -->
     <div class="docs-layout">
         
-        <!-- Left Sidebar Navigation -->
-                <!-- Left Sidebar Navigation Powered by LaughTale Island Sidebar -->
+        <!-- Left Sidebar Navigation Powered by LaughTale Island Sidebar -->
         <aside class="docs-sidebar" style="padding: 0; border: none; background: transparent; height: calc(100vh - 60px); position: sticky; top: 60px;">
             <island-sidebar items="@DocsNavigationData.GetDocsSidebarItems(Context.Request.Path)" title="LaughTale Docs" />
         </aside>
@@ -81,17 +93,43 @@
     <!-- Client Islands Engine Bundle -->
     <script type="module" src="~/js/main.js"></script>
 
-    <!-- Active Navigation & ScrollSpy Script -->
+    <!-- Active Navigation, Code Copying & ScrollSpy Script -->
     <script>
-        function updateActiveState() {
-            // 1. Highlight Active Sidebar Link
-            const currentPath = window.location.pathname.toLowerCase();
-            document.querySelectorAll('.sidebar-link').forEach(link => {
-                const href = link.getAttribute('href')?.toLowerCase();
-                link.classList.toggle('active', href === currentPath || (currentPath === '/' && href?.includes('01-getting-started')));
+        function setupDocsEnhancements() {
+            // 1. Keyboard Shortcut (Ctrl+K / Cmd+K) for Command Palette
+            document.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                    e.preventDefault();
+                    document.dispatchEvent(new CustomEvent('command-palette:open'));
+                }
             });
 
-            // 2. TOC ScrollSpy Observer
+            // 2. Add One-Click Copy Buttons to all Markdown Pre/Code Blocks
+            document.querySelectorAll('.laughtale-markdown-content pre').forEach((pre) => {
+                if (pre.querySelector('.copy-btn')) return;
+                
+                const btn = document.createElement('button');
+                btn.className = 'copy-btn p-button p-button-secondary p-button-sm';
+                btn.type = 'button';
+                btn.innerText = 'Copy';
+                btn.style.position = 'absolute';
+                btn.style.top = '0.5rem';
+                btn.style.right = '0.5rem';
+                btn.style.fontSize = '0.75rem';
+                btn.style.padding = '0.2rem 0.5rem';
+
+                btn.addEventListener('click', async () => {
+                    const code = pre.querySelector('code')?.innerText || pre.innerText;
+                    await navigator.clipboard.writeText(code);
+                    btn.innerText = 'Copied!';
+                    setTimeout(() => { btn.innerText = 'Copy'; }, 2000);
+                });
+
+                pre.style.position = 'relative';
+                pre.appendChild(btn);
+            });
+
+            // 3. TOC ScrollSpy Observer
             const headings = document.querySelectorAll('.laughtale-markdown-content h2, .laughtale-markdown-content h3');
             const tocLinks = document.querySelectorAll('.toc-link');
             
@@ -111,8 +149,8 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', updateActiveState);
-        window.addEventListener('island:page-loaded', updateActiveState);
+        document.addEventListener('DOMContentLoaded', setupDocsEnhancements);
+        window.addEventListener('island:page-loaded', setupDocsEnhancements);
     </script>
 </body>
 </html>

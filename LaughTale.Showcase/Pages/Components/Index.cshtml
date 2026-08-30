@@ -1,0 +1,58 @@
+@page "/components"
+@model LaughTale.Showcase.Pages.Components.IndexModel
+@{
+    ViewData["Title"] = "Component Explorer (76 Components)";
+}
+
+<!-- Hero Header -->
+<div style="margin-bottom: 2.5rem; background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-xl); padding: 2rem 2.5rem; box-shadow: var(--p-shadow-sm);">
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                <span class="aura-tag tag-emerald">76 Components</span>
+                <span class="aura-tag tag-indigo">100% Token Pure</span>
+                <span class="aura-tag tag-slate">WCAG AA/AAA</span>
+            </div>
+            <h1 style="font-size: 2rem; font-weight: 800; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Component Catalog</h1>
+            <p style="font-size: 1rem; color: var(--p-text-muted); margin: 0; max-width: 720px;">
+                Enterprise-grade UI components for ASP.NET Core Razor Pages &amp; Blazor SSR. Built on the Aura Design System with full Dark/Light mode awareness, OKLCH color palettes, and zero runtime dependencies.
+            </p>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <a href="/enterprise" class="p-button p-button-primary" style="padding: 0.6rem 1.25rem; font-weight: 600; text-decoration: none;">
+                ⚡ Interactive Live Sandbox
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Category Grid -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.5rem;">
+    @foreach (var cat in Model.Categories)
+    {
+        <div class="p-card" style="background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.15s ease, box-shadow 0.15s ease;">
+            <div>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+                    <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--p-text-color); margin: 0;">@cat.Title</h3>
+                    <span class="aura-tag tag-slate">@cat.Count Components</span>
+                </div>
+                <p style="font-size: 0.875rem; color: var(--p-text-muted); margin-bottom: 1.25rem; line-height: 1.5;">@cat.Description</p>
+                
+                <div style="display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.5rem;">
+                    @foreach (var comp in cat.FeaturedComponents)
+                    {
+                        <span style="font-size: 0.75rem; background: var(--p-surface-100); color: var(--p-text-color); padding: 0.2rem 0.5rem; border-radius: 4px; border: 1px solid var(--p-border-color);">
+                            @comp
+                        </span>
+                    }
+                </div>
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: flex-end; border-top: 1px solid var(--p-border-color); padding-top: 1rem;">
+                <a href="@cat.Link" class="p-button p-button-secondary" style="font-size: 0.8125rem; text-decoration: none; padding: 0.4rem 0.85rem;">
+                    Explore Demos &rarr;
+                </a>
+            </div>
+        </div>
+    }
+</div>

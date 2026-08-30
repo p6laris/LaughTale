@@ -14,11 +14,28 @@ public static class DocsNavigationData
 
         return new List<SidebarItem>
         {
-            new SidebarItem("Getting Started", "zap", null, true, new List<SidebarItem>
+            new SidebarItem("Framework Architecture", "zap", null, true, new List<SidebarItem>
             {
                 new("Quickstart & Setup", "zap", "/doc/01-getting-started", currentPath.Contains("01-getting-started")),
                 new("Hydration Strategies", "layers", "/doc/02-hydration-strategies", currentPath.Contains("02-hydration-strategies")),
-                new("Declarative Directives", "terminal", "/doc/06-declarative-directives", currentPath.Contains("06-declarative-directives"))
+                new("View Transitions", "play", "/doc/03-view-transitions", currentPath.Contains("03-view-transitions")),
+                new("Server-Driven Refresh", "refreshCw", "/doc/04-server-refresh-and-morphing", currentPath.Contains("04-server-refresh-and-morphing")),
+                new("Data Contracts & EF Core", "database", "/doc/05-data-contracts-and-efcore", currentPath.Contains("05-data-contracts-and-efcore")),
+                new("Declarative Directives (l-*)", "terminal", "/doc/07-declarative-directives", currentPath.Contains("07-declarative-directives")),
+                new("Security & Hardening", "shieldAlert", "/doc/08-security-and-hardening", currentPath.Contains("08-security-and-hardening")),
+                new("Theming & Tokens", "palette", "/doc/09-theming-and-design-tokens", currentPath.Contains("09-theming-and-design-tokens")),
+                new("CLI & Ejection", "terminal", "/doc/10-cli-and-ejection", currentPath.Contains("10-cli-and-ejection")),
+                new("Production & Optimization", "activity", "/doc/11-production-and-optimization", currentPath.Contains("11-production-and-optimization"))
+            }),
+
+            new SidebarItem("Multi-Framework Adapters", "box", null, true, new List<SidebarItem>
+            {
+                new("Polyglot Architecture", "globe", "/doc/06-multi-framework-adapters", currentPath.Contains("06-multi-framework-adapters"), null, "Overview"),
+                new("React 18 & 19 Islands", "code", "/doc/06a-react-adapter", currentPath.Contains("06a-react-adapter"), null, "React"),
+                new("Vue 3 Islands", "code", "/doc/06b-vue-adapter", currentPath.Contains("06b-vue-adapter"), null, "Vue"),
+                new("Svelte 4 & 5 Islands", "code", "/doc/06c-svelte-adapter", currentPath.Contains("06c-svelte-adapter"), null, "Svelte"),
+                new("Preact (3KB) Islands", "zap", "/doc/06d-preact-adapter", currentPath.Contains("06d-preact-adapter"), null, "Preact"),
+                new("Vanilla TypeScript", "terminal", "/doc/06e-vanilla-adapter", currentPath.Contains("06e-vanilla-adapter"), null, "Vanilla")
             }),
 
             new SidebarItem("Form & Input Controls", "edit3", null, true, new List<SidebarItem>
@@ -96,21 +113,6 @@ public static class DocsNavigationData
                 new("Progress & Skeleton", "loader2", "/doc/25-progress-skeleton", currentPath.Contains("25-progress-skeleton")),
                 new("Carousel Slider", "image", "/doc/46-carousel", currentPath.Contains("46-carousel")),
                 new("FileUpload Manager", "uploadCloud", "/doc/18-fileupload", currentPath.Contains("18-fileupload"), null, "New")
-            }),
-
-            new SidebarItem("Composables & Architecture", "code", null, true, new List<SidebarItem>
-            {
-                new("Headless Composables", "code", "/doc/39-composables", currentPath.Contains("39-composables")),
-                new("Theming & Tokens", "droplet", "/doc/40-theming-and-tokens", currentPath.Contains("40-theming-and-tokens")),
-                new("View Transitions", "play", "/doc/03-view-transitions", currentPath.Contains("03-view-transitions")),
-                new("Server Slot Projection", "box", "/doc/04-slots-and-projection", currentPath.Contains("04-slots-and-projection")),
-                new("Content Collections", "database", "/doc/05-content-collections", currentPath.Contains("05-content-collections")),
-                new("Security & CSP", "shieldAlert", "/doc/63-security-and-csp", currentPath.Contains("63-security-and-csp"), null, "New"),
-                new("OKLCH Design Tokens", "palette", "/doc/64-theming-and-design-tokens", currentPath.Contains("64-theming-and-design-tokens"), null, "New"),
-                new("Islands vs Blazor Guide", "layers", "/doc/65-architecture-decision-guide", currentPath.Contains("65-architecture-decision-guide"), null, "New"),
-                new("Migration to v3.0.0", "gitCommit", "/doc/66-migration-and-upgrade-guide", currentPath.Contains("66-migration-and-upgrade-guide"), null, "v3.0"),
-                new("Browser Support Matrix", "globe", "/doc/67-browser-support-and-compatibility", currentPath.Contains("67-browser-support-and-compatibility"), null, "v3.0"),
-                new("Parts & Passthrough Contract", "puzzle", "/doc/68-parts-and-passthrough-contract", currentPath.Contains("68-parts-and-passthrough-contract"), null, "v4.0")
             })
         };
     }

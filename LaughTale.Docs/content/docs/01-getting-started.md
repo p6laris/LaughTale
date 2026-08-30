@@ -1,131 +1,219 @@
 ---
 title: "Getting Started with LaughTale"
-description: "High-performance Islands Architecture framework for .NET 10 & TypeScript"
+description: "Architecture philosophy, quickstart scaffolding, manual installation, and end-to-end island development for ASP.NET Core & TypeScript."
 order: 1
 section: "Core Concepts"
 ---
 
 # Getting Started with LaughTale
 
-Welcome to **LaughTale**, the premier Islands Architecture framework designed from the ground up for **.NET 10** and **TypeScript**.
+Welcome to **LaughTale**, an enterprise-grade, high-performance **Islands Architecture framework for ASP.NET Core & Blazor SSR (.NET 10 + TypeScript)**.
 
-LaughTale enables you to combine the speed and SEO of pure **Server-Side Rendering (SSR)** with Astro-grade client-side interactivity, multi-framework adapters, and 100% opt-in modularity.
+LaughTale bridges the gap between ultra-fast, SEO-optimized **Server-Side Rendering (SSR)** and modern, component-driven client-side interactivity. By adopting an Islands Architecture, 95% of your page renders as static, zero-JavaScript HTML, while isolated interactive widgets ("islands") hydrate independently on demand.
 
 ---
 
-## ⚡ Scaffolding a New Project
+## ⚡ Architecture Philosophy
 
-The easiest way to start is using the official `dotnet new` template:
+Traditional .NET frontend approaches force engineering teams into difficult trade-offs:
+- **Full Client-Side SPAs (React / Angular / Vue)**: Heavy initial JavaScript payloads, slower First Contentful Paint (FCP), complex API client generation, and SEO challenges.
+- **Blazor WebAssembly**: Requires downloading the entire .NET runtime (megabytes of WebAssembly binaries) to the browser before the app becomes interactive.
+- **Blazor Server**: Requires a persistent, stateful WebSocket / SignalR connection for every active user tab, incurring significant server memory overhead and latency on unstable network connections.
+
+**LaughTale delivers the optimal balance:**
+1. **100% Stateless HTTP Architecture**: Zero SignalR server memory overhead; scales effortlessly across load-balanced serverless or containerized environments.
+2. **Selective Client Hydration**: JavaScript is executed **only** for the exact interactive components that require it, using 6 distinct scheduling strategies (`Load`, `Idle`, `Visible`, `Media`, `Interaction`, `Never`).
+3. **Multi-Framework Agnostic**: Mount your choice of **React 18/19**, **Vue 3**, **Svelte 4/5**, **Preact**, or **Vanilla TypeScript** inside the same Razor page.
+4. **Defense-in-Depth Security**: Compile-time Roslyn diagnostics (`LTI001`–`LTI004`), automated CSP nonces, AST expression sandboxing, and output cache privacy protection (`[IslandPrivate]`).
+
+---
+
+## 🚀 Quickstart: Scaffolding a New Project
+
+The quickest way to start is using the official `LaughTale.Templates` package:
 
 ```bash
-# Install the project templates
+# 1. Install the LaughTale project templates
 dotnet new install LaughTale.Templates
 
-# Generate a new Razor Pages web application with LaughTale preconfigured
-dotnet new laughtale-web -n MyWebApp
-cd MyWebApp
+# 2. Scaffold a new Razor Pages web application with LaughTale preconfigured
+dotnet new laughtale-web -n MyAwesomeApp
+cd MyAwesomeApp
 
-# Run the app
+# 3. Restore and run the application
 dotnet run
 ```
 
+Navigate to `http://localhost:5000` to explore the live interactive application.
+
 ---
 
-## 📦 Manual Installation
+## 📦 Manual Installation in an Existing Project
 
-Add the core LaughTale packages to your ASP.NET Core web application:
+To add LaughTale to an existing ASP.NET Core (.NET 10) application:
 
+### Step 1: Install NuGet Packages
 ```bash
 dotnet add package LaughTale.Core
 dotnet add package LaughTale.Components
 ```
 
-In your `Program.cs`, register LaughTale services with optional feature flags:
+### Step 2: Install the Client Runtime
+```bash
+npm install laughtale
+```
+
+### Step 3: Configure Services in `Program.cs`
+Register LaughTale services with full configuration options:
 
 ```csharp
 using LaughTale.Core.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Register Razor Pages or MVC
 builder.Services.AddRazorPages();
 
-// Configure LaughTale: everything non-essential defaults to off
+// Register LaughTale Core & Optional Subsystems
 builder.Services.AddLaughTale(options =>
 {
+    // Enable SPA-like View Transitions across MPA navigations
     options.ViewTransitions.Enabled = true;
-    options.Prefetch.Enabled = false;
+    
+    // Enable intelligent hover-based viewport prefetching
+    options.Prefetch.Enabled = true;
+    options.Prefetch.HoverDelayMs = 65;
+    
+    // Enable automated Content Security Policy (CSP) nonces
     options.Csp.Enabled = true;
+    options.Csp.EnforceHeader = true;
+    
+    // Enable runtime Theme Studio in Development environment
     options.ThemeStudio.Enabled = builder.Environment.IsDevelopment();
 });
 
 var app = builder.Build();
+
+app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+// Register LaughTale CSP middleware (if enabled)
+app.UseLaughTaleCsp();
+
+app.UseRouting();
+app.UseAuthorization();
+
 app.MapRazorPages();
 
-// Optional: Enable server-driven island re-rendering
+// Map server-driven island re-rendering endpoint (/_laughtale/island/{name})
 app.MapLaughTaleIslandRefresh();
 
 app.Run();
 ```
 
+### Step 4: Import TagHelpers in `_ViewImports.cshtml`
+Add the LaughTale TagHelper directives to your `Pages/_ViewImports.cshtml` or `Views/_ViewImports.cshtml`:
+
+```razor
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@addTagHelper *, LaughTale.Core
+@addTagHelper *, LaughTale.Components
+```
+
 ---
 
-## 🏗️ Declaring Your First Island
+## 🏗️ Anatomy of an Island: End-to-End Example
 
-### 1. In C# (Props Contract)
-Define your component props model and decorate it with `[Island]`:
+Building an island involves three simple steps:
+
+### 1. C# ViewModel / Props Contract
+Define your component's data model as a C# record or class decorated with the `[Island]` attribute:
 
 ```csharp
 using LaughTale.Core.Attributes;
 using LaughTale.Core.Enums;
 
-[Island("interactive-counter", DefaultStrategy = HydrateStrategy.Visible)]
-public record CounterProps(int InitialCount, int Step, string Label);
+namespace MyApp.Models;
+
+[Island("analytics-chart", DefaultStrategy = HydrateStrategy.Visible)]
+public record AnalyticsChartProps(
+    string MetricName,
+    double CurrentValue,
+    List<double> HistoricalData,
+    string Unit = "ms"
+);
 ```
 
-### 2. In Razor (TagHelper Markup)
-In your `.cshtml` view, render the island:
+### 2. Razor View Markup (`.cshtml`)
+Render the island using either the universal `<island>` TagHelper or the strongly-typed generated TagHelper:
 
 ```razor
-<island name="interactive-counter" 
-        props="@(new CounterProps(10, 2, "Workers"))" 
-        hydrate="Visible">
-    <!-- Server-rendered fallback skeleton rendered before JS loads -->
-    <div class="skeleton">Loading Counter...</div>
-</island>
+@page
+@model MyApp.Pages.IndexModel
+
+<div class="dashboard-grid">
+    <!-- Hydrates only when scrolled into the viewport -->
+    <island name="analytics-chart" 
+            props="@(new AnalyticsChartProps("API Gateway Latency", 4.2, new() { 3.8, 4.1, 4.2, 5.0, 4.2 }))" 
+            hydrate="Visible"
+            class="chart-card">
+        
+        <!-- SSR Fallback Skeleton (Rendered on Server, displayed until client JS hydrates) -->
+        <div class="chart-skeleton">
+            <div class="skeleton-bar animate-pulse">Loading Live Telemetry Chart...</div>
+        </div>
+    </island>
+</div>
 ```
 
-### 3. In TypeScript (Client Island)
-In your frontend module (`src/components/counter.ts`):
+### 3. Client-Side TypeScript Component
+In your client entry (`src/components/analytics-chart.ts`):
 
 ```typescript
 import { IslandContext } from 'laughtale';
 
-export default function CounterIsland(
+interface ChartProps {
+    metricName: string;
+    currentValue: number;
+    historicalData: number[];
+    unit: string;
+}
+
+export default function AnalyticsChart(
     container: HTMLElement, 
-    props: { initialCount: number; step: number; label: string },
+    props: ChartProps, 
     ctx?: IslandContext
 ) {
-    let count = props.initialCount;
-    container.innerHTML = `<button type="button" class="btn">${props.label}: ${count}</button>`;
-    
+    // Render client interactive canvas / SVG
+    container.innerHTML = `
+        <div class="p-card">
+            <h3>${props.metricName}</h3>
+            <div class="metric-value">${props.currentValue} ${props.unit}</div>
+            <button type="button" class="p-button p-button-sm">Inspect Data</button>
+        </div>
+    `;
+
     const btn = container.querySelector('button')!;
+    
+    // Automatically cleaned up when island unmounts via AbortSignal
     btn.addEventListener('click', () => {
-        count += props.step;
-        btn.textContent = `${props.label}: ${count}`;
+        alert(`Historical Data Points: ${props.historicalData.join(', ')}`);
     }, { signal: ctx?.signal });
+
+    // Optional unmount cleanup hook
+    return () => {
+        console.log(`[AnalyticsChart] Island '${ctx?.name}' cleanly torn down.`);
+    };
 }
 ```
 
 ---
 
-## 🔄 Hydration Strategies
+## 🎯 Next Guides
 
-LaughTale provides 6 declarative hydration modes:
-
-1. `Load`: Hydrates immediately when the window loads.
-2. `Idle`: Hydrates during browser idle time via `requestIdleCallback`.
-3. `Visible`: Hydrates when scrolled into the viewport using `IntersectionObserver`.
-4. `Media`: Hydrates only when a CSS media query matches (e.g. `media="(max-width: 768px)"`).
-5. `Interaction`: Hydrates on first user pointerenter or focus.
-6. `Never`: Server-only render; no client JS executed.
+* [Hydration Strategies & Lifecycle](/doc/02-hydration-strategies) — Deep dive on all 6 hydration modes.
+* [View Transitions & MPA Router](/doc/03-view-transitions) — Seamless SPA fluidity for Multi-Page apps.
+* [Server-Driven Refresh & DOM Morphing](/doc/04-server-refresh-and-morphing) — Re-render server islands on demand without full page reloads.
+* [Entity Framework Core Data Contracts](/doc/05-data-contracts-and-efcore) — Handle 100,000+ row datasets with server-side sorting and filtering.
+* [Multi-Framework Adapters](/doc/06-multi-framework-adapters) — Mount React, Vue, Svelte, and Preact components.
+* [Declarative Directives (`l-*`)](/doc/07-declarative-directives) — Build client reactivity directly in Razor HTML without writing separate TypeScript files.
