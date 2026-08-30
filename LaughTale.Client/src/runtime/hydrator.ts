@@ -9,6 +9,7 @@ import { parseAndReviveProps } from './reviver';
 import { importWithRetry } from './retry';
 import { awaitStreamingReady } from './streaming';
 import { renderErrorBoundary } from './error-boundary';
+import { refreshIsland } from './refresh';
 
 export type HydrateStrategy = 'load' | 'idle' | 'visible' | 'media' | 'interaction' | 'never';
 export type HydrationState = 'idle' | 'pending' | 'mounted' | 'failed';
@@ -171,10 +172,12 @@ async function executeHydration(container: HTMLElement, name: string): Promise<v
             throw new Error(`Island '${name}' module does not export a mount function.`);
         }
 
-        // 4. Attach imperative handle if defined
-        if (typeof module?.createHandle === 'function') {
-            (container as any).island = module.createHandle(container, props);
-        }
+        // 4. Attach imperative handle if defined, otherwise attach standard island handle
+        const customHandle = typeof module?.createHandle === 'function' ? module.createHandle(container, props) : {};
+        (container as any).island = {
+            ...customHandle,
+            refresh: (newProps?: Record<string, any>) => refreshIsland(container, newProps)
+        };
 
         // 5. Construct structural IslandContext (LT-1102)
         const abortController = new AbortController();
@@ -327,6 +330,16 @@ function hydrateMedia(container: HTMLElement, name: string, query: string | null
         };
         mql.addEventListener('change', handler);
     }
+}
+
+/**
+ * Forces re-hydration of an island with updated props (used by server-driven refresh).
+ */
+export async function rehydrateIsland(container: HTMLElement): Promise<void> {
+    const name = container.getAttribute('data-island');
+    if (!name) return;
+    delete (container as any)[HYDRATION_STATE_KEY];
+    await executeHydration(container, name);
 }
 
 export function initIslands(root: ParentNode = document): void {
