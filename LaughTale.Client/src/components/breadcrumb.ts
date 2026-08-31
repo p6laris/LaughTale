@@ -120,36 +120,57 @@ const BREADCRUMB_CSS = `
 }
 
 /* Dark Mode Tokens */
-.dark .p-breadcrumb,
-[data-theme="dark"] .p-breadcrumb-transparent {
+html.dark .p-breadcrumb-transparent,
+[data-theme="dark"] .p-breadcrumb-transparent,
+.dark .p-breadcrumb-transparent {
     background: transparent !important;
     border: none !important;
     padding: 0 !important;
 }
-.p-breadcrumb {
-    background: var(--lt-surface-900);
-    border-color: var(--lt-surface-700);
+
+html.dark .p-breadcrumb,
+[data-theme="dark"] .p-breadcrumb,
+.dark .p-breadcrumb {
+    background: var(--p-surface-0, #090d16);
+    border-color: var(--p-border-color, #334155);
 }
 
-.dark .p-breadcrumb-item-link,
-[data-theme="dark"] .p-breadcrumb-item-link {
-    color: var(--lt-surface-400);
+html.dark .p-breadcrumb-item-link,
+[data-theme="dark"] .p-breadcrumb-item-link,
+.dark .p-breadcrumb-item-link {
+    color: var(--p-text-muted, #94a3b8);
 }
 
-.dark .p-breadcrumb-item-link:hover,
-[data-theme="dark"] .p-breadcrumb-item-link:hover {
-    color: var(--lt-surface-0);
-    background: var(--lt-surface-800);
+html.dark .p-breadcrumb-item-link:hover,
+[data-theme="dark"] .p-breadcrumb-item-link:hover,
+.dark .p-breadcrumb-item-link:hover {
+    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-100, #1e293b);
 }
 
-.dark .p-breadcrumb-item-current,
-[data-theme="dark"] .p-breadcrumb-item-current {
-    color: var(--lt-surface-0);
+html.dark .p-breadcrumb-item-current,
+[data-theme="dark"] .p-breadcrumb-item-current,
+.dark .p-breadcrumb-item-current {
+    color: var(--p-text-color, #f8fafc);
 }
 
-.dark .p-breadcrumb-separator,
-[data-theme="dark"] .p-breadcrumb-separator {
-    color: var(--lt-surface-600);
+html.dark .p-breadcrumb-separator,
+[data-theme="dark"] .p-breadcrumb-separator,
+.dark .p-breadcrumb-separator {
+    color: var(--p-surface-400, #64748b);
+}
+
+html.dark .p-breadcrumb-ellipsis,
+[data-theme="dark"] .p-breadcrumb-ellipsis,
+.dark .p-breadcrumb-ellipsis {
+    color: var(--p-text-muted, #94a3b8);
+}
+
+html.dark .p-breadcrumb-ellipsis:hover,
+[data-theme="dark"] .p-breadcrumb-ellipsis:hover,
+.dark .p-breadcrumb-ellipsis:hover {
+    background: var(--p-surface-100, #1e293b);
+    color: var(--p-text-color, #f8fafc);
 }
 `;
 
