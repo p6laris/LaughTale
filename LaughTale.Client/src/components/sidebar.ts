@@ -1145,22 +1145,24 @@ export interface SidebarProps {
 export default function SidebarIsland(container: HTMLElement, props: SidebarProps, ctx?: IslandContext) {
     injectIslandStyle('sidebar', SIDEBAR_CSS);
 
-    const hasAppItems = Array.isArray(props.items) && props.items.length > 0 && !props.groups;
+    const items = props.items || (props as any).Items;
+    const groups = props.groups || (props as any).Groups;
+    const hasAppItems = Array.isArray(items) && items.length > 0 && !groups;
 
     if (hasAppItems) {
         // Convert hierarchical SidebarItem[] into SidebarGroupModel[] for the unified engine
         const appGroups: SidebarGroupModel[] = [];
-        props.items!.forEach(topItem => {
-            const groupLabel = (topItem as any).label || (topItem as any).Label || '';
-            const subList = (topItem as any).items || (topItem as any).Items;
+        items.forEach((topItem: any) => {
+            const groupLabel = topItem.label || topItem.Label || '';
+            const subList = topItem.items || topItem.Items;
             if (Array.isArray(subList) && subList.length > 0) {
                 const groupItems: SidebarItemModel[] = subList.map((sub: any) => ({
                     label: sub.label || sub.Label || '',
-                    icon: sub.icon || sub.Icon || topItem.icon || (topItem as any).Icon || 'folder',
+                    icon: sub.icon || sub.Icon || topItem.icon || topItem.Icon || 'folder',
                     url: sub.url || sub.Url,
                     isActive: sub.active || sub.Active || false,
                     badge: sub.badge || sub.Badge,
-                    defaultOpen: sub.expanded || sub.Expanded || false
+                    defaultOpen: sub.expanded !== undefined ? sub.expanded : (sub.Expanded !== undefined ? sub.Expanded : false)
                 }));
                 appGroups.push({ label: groupLabel, items: groupItems });
             } else {
@@ -1168,10 +1170,10 @@ export default function SidebarIsland(container: HTMLElement, props: SidebarProp
                     label: '',
                     items: [{
                         label: groupLabel,
-                        icon: topItem.icon || (topItem as any).Icon || 'folder',
-                        url: topItem.url || (topItem as any).Url,
-                        isActive: topItem.active || (topItem as any).Active || false,
-                        badge: topItem.badge || (topItem as any).Badge
+                        icon: topItem.icon || topItem.Icon || 'folder',
+                        url: topItem.url || topItem.Url,
+                        isActive: topItem.active || topItem.Active || false,
+                        badge: topItem.badge || topItem.Badge
                     }]
                 });
             }
@@ -1180,15 +1182,19 @@ export default function SidebarIsland(container: HTMLElement, props: SidebarProp
         renderCompoundSidebar(container, {
             ...props,
             groups: appGroups,
-            demoType: 'app',
-            headerTitle: props.title || 'LaughTale Aura',
-            collapsible: 'icon',
-            variant: 'sidebar',
-            width: '16.5rem',
-            open: !props.collapsed
+            demoType: props.demoType || (props as any).DemoType || 'app',
+            headerTitle: props.title || (props as any).Title || 'LaughTale Aura',
+            collapsible: props.collapsible || (props as any).Collapsible || 'icon',
+            variant: props.variant || (props as any).Variant || 'sidebar',
+            width: props.width || (props as any).Width || '16.5rem',
+            open: props.collapsed !== undefined ? !props.collapsed : ((props as any).Collapsed !== undefined ? !(props as any).Collapsed : true)
         }, ctx);
     } else {
-        renderCompoundSidebar(container, props, ctx);
+        const demoType = props.demoType || (props as any).DemoType || (props.showControls ? 'variants' : 'app');
+        renderCompoundSidebar(container, {
+            ...props,
+            demoType
+        }, ctx);
     }
 }
 
@@ -1196,9 +1202,9 @@ export default function SidebarIsland(container: HTMLElement, props: SidebarProp
  * Render LaughTale Aura Compound Sidebar Component
  */
 function renderCompoundSidebar(container: HTMLElement, props: SidebarProps, ctx?: IslandContext) {
-    const demoType = props.demoType || (props as any).DemoType || 'variants';
+    const demoType = props.demoType || (props as any).DemoType || 'app';
     const isAppMode = demoType === 'app';
-    const showControls = props.showControls !== false && demoType === 'variants';
+    const showControls = props.showControls === true || (demoType === 'variants' && props.showControls !== false);
 
     let variant = props.variant || (props as any).Variant || 'sidebar';
     let collapsible = props.collapsible || (props as any).Collapsible || 'icon';

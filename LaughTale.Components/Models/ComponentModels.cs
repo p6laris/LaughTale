@@ -837,8 +837,31 @@ public record DrawerProps(
 
 [LaughTale.Core.Attributes.Island("sidebar")]
 public record SidebarProps(
-    bool Visible = false, string? Position = "left", bool Modal = true,
-    bool DismissableMask = true, bool CloseOnEscape = true, bool FullScreen = false, string? Header = null
+    List<SidebarItem>? Items = null,
+    string? Title = null,
+    bool Collapsed = false,
+    string? DemoType = null,
+    List<SidebarGroupModel>? Groups = null,
+    string? Variant = "sidebar",
+    string? Collapsible = "icon",
+    string? Side = "left",
+    bool Overlay = false,
+    bool OpenOnHover = false,
+    bool Backdrop = false,
+    bool Open = true,
+    string? Width = null,
+    string? IconWidth = null,
+    string? HeaderTitle = null,
+    string? HeaderLogo = null,
+    string? HeaderColor = null,
+    bool ShowControls = false,
+    bool Visible = true,
+    string? Position = "left",
+    bool Modal = false,
+    bool DismissableMask = true,
+    bool CloseOnEscape = true,
+    bool FullScreen = false,
+    string? Header = null
 );
 
 [LaughTale.Core.Attributes.Island("toast")]
