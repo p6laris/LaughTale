@@ -17,16 +17,19 @@ public static class DocsNavigationData
             new SidebarItem("Framework Architecture", "zap", null, true, new List<SidebarItem>
             {
                 new("Quickstart & Setup", "zap", "/doc/01-getting-started", currentPath.Contains("01-getting-started")),
+                new("Philosophy & Architecture", "cpu", "/doc/01a-philosophy-and-architecture", currentPath.Contains("01a-philosophy-and-architecture")),
                 new("Hydration Strategies", "layers", "/doc/02-hydration-strategies", currentPath.Contains("02-hydration-strategies")),
-                new("View Transitions", "play", "/doc/03-view-transitions", currentPath.Contains("03-view-transitions")),
+                new("View Transitions & State", "play", "/doc/03-view-transitions", currentPath.Contains("03-view-transitions")),
                 new("Server-Driven Refresh", "refreshCw", "/doc/04-server-refresh-and-morphing", currentPath.Contains("04-server-refresh-and-morphing")),
                 new("Data Contracts & EF Core", "database", "/doc/05-data-contracts-and-efcore", currentPath.Contains("05-data-contracts-and-efcore")),
                 new("i18n & Kurdish RTL", "globe", "/doc/05a-localization-and-rtl", currentPath.Contains("05a-localization-and-rtl")),
-                new("Declarative Directives (l-*)", "terminal", "/doc/07-declarative-directives", currentPath.Contains("07-declarative-directives")),
+                new("Declarative Directives (l-*)", "terminal", "/doc/06-declarative-directives", currentPath.Contains("06-declarative-directives")),
                 new("Security & Hardening", "shieldAlert", "/doc/08-security-and-hardening", currentPath.Contains("08-security-and-hardening")),
+                new("Forms & Validation", "checkSquare", "/doc/08a-forms-and-validation", currentPath.Contains("08a-forms-and-validation")),
                 new("Theming & Tokens", "palette", "/doc/09-theming-and-design-tokens", currentPath.Contains("09-theming-and-design-tokens")),
                 new("CLI & Ejection", "terminal", "/doc/10-cli-and-ejection", currentPath.Contains("10-cli-and-ejection")),
-                new("Production & Optimization", "activity", "/doc/11-production-and-optimization", currentPath.Contains("11-production-and-optimization"))
+                new("Production & Optimization", "activity", "/doc/11-production-and-optimization", currentPath.Contains("11-production-and-optimization")),
+                new("Benchmarks & Performance", "trendingUp", "/doc/11a-benchmarks-and-performance", currentPath.Contains("11a-benchmarks-and-performance"))
             }),
 
             new SidebarItem("Multi-Framework Adapters", "box", null, true, new List<SidebarItem>

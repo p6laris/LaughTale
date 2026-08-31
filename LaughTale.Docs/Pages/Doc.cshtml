@@ -1,4 +1,4 @@
-﻿@page "/doc/{slug}"
+@page "/doc/{slug}"
 @model LaughTale.Docs.Pages.DocModel
 @{
     ViewData["Title"] = Model.Doc?.Metadata.Title ?? "Documentation";
@@ -8,7 +8,58 @@
 {
     <article class="laughtale-markdown-content">
         @Html.Raw(Model.Doc.HtmlContent)
+
+        <!-- Document Bottom Navigation (Previous / Next) -->
+        <div class="docs-nav-footer" style="display: flex; justify-content: space-between; align-items: center; margin-top: 3.5rem; padding-top: 2rem; border-top: 1px solid var(--lt-surface-200, #e2e8f0); gap: 1rem; flex-wrap: wrap;">
+            @if (Model.PreviousDoc.HasValue)
+            {
+                <a href="@Model.PreviousDoc.Value.Url" class="docs-nav-card" style="display: flex; flex-direction: column; padding: 1rem 1.25rem; border-radius: 8px; border: 1px solid var(--lt-surface-200, #e2e8f0); background: var(--lt-surface-50, #f8fafc); text-decoration: none; min-width: 200px; transition: all 0.15s ease;">
+                    <span style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--lt-primary-600, #059669); margin-bottom: 0.25rem;">← Previous</span>
+                    <span style="font-size: 0.9375rem; font-weight: 700; color: var(--lt-surface-900, #0f172a);">@Model.PreviousDoc.Value.Title</span>
+                </a>
+            }
+            else
+            {
+                <div></div>
+            }
+
+            @if (Model.NextDoc.HasValue)
+            {
+                <a href="@Model.NextDoc.Value.Url" class="docs-nav-card" style="display: flex; flex-direction: column; align-items: flex-end; padding: 1rem 1.25rem; border-radius: 8px; border: 1px solid var(--lt-surface-200, #e2e8f0); background: var(--lt-surface-50, #f8fafc); text-decoration: none; min-width: 200px; transition: all 0.15s ease; text-align: right;">
+                    <span style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--lt-primary-600, #059669); margin-bottom: 0.25rem;">Next →</span>
+                    <span style="font-size: 0.9375rem; font-weight: 700; color: var(--lt-surface-900, #0f172a);">@Model.NextDoc.Value.Title</span>
+                </a>
+            }
+        </div>
     </article>
+
+    <script>
+        // Attach 1-click Copy button to all code blocks
+        document.querySelectorAll('pre > code').forEach(codeBlock => {
+            const pre = codeBlock.parentElement;
+            if (!pre || pre.querySelector('.code-copy-btn')) return;
+
+            pre.style.position = 'relative';
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'code-copy-btn';
+            btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg><span>Copy</span>`;
+            btn.style.cssText = 'position: absolute; top: 0.5rem; right: 0.5rem; display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.25rem 0.6rem; font-size: 0.75rem; font-weight: 600; border-radius: 4px; border: 1px solid var(--lt-surface-300, #cbd5e1); background: var(--lt-surface-0, #fff); color: var(--lt-surface-700, #334155); cursor: pointer; opacity: 0.8; transition: opacity 0.2s; z-index: 10;';
+
+            btn.addEventListener('mouseenter', () => btn.style.opacity = '1');
+            btn.addEventListener('mouseleave', () => btn.style.opacity = '0.8');
+            btn.addEventListener('click', async () => {
+                const text = codeBlock.innerText;
+                await navigator.clipboard.writeText(text);
+                btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span style="color: #10b981;">Copied!</span>`;
+                setTimeout(() => {
+                    btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg><span>Copy</span>`;
+                }, 2000);
+            });
+
+            pre.appendChild(btn);
+        });
+    </script>
 }
 else
 {
