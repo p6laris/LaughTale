@@ -33,6 +33,10 @@
     "./tailwind": "./dist/styles/tailwind.preset.js"
   },
   "scripts": {
+    "gen:icons": "node ../scripts/gen-icons.mjs",
+    "prebuild": "npm run gen:icons",
+    "pretypecheck": "npm run gen:icons",
+    "pretest": "npm run gen:icons",
     "build": "npm run typecheck && node esbuild.config.mjs --prod",
     "build:dev": "node esbuild.config.mjs",
     "typecheck": "tsc --noEmit",
