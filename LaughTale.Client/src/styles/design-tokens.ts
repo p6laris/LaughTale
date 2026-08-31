@@ -513,7 +513,10 @@ export function initDesignTokens(): void {
   [dir="rtl"] .p-paginator-next svg,
   [dir="rtl"] .p-paginator-last svg,
   [dir="rtl"] .p-breadcrumb-chevron svg,
+  [dir="rtl"] .p-breadcrumb-separator svg,
+  [dir="rtl"] .p-breadcrumb-separator-wrapper svg,
   [dir="rtl"] .p-tree-toggler svg,
+  [dir="rtl"] .p-treetable-toggler svg,
   [dir="rtl"] .p-submenu-icon svg,
   [dir="rtl"] .p-picklist-transfer-controls .p-picklist-control-btn svg {
     transform: scaleX(-1);

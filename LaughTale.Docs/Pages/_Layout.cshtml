@@ -51,7 +51,7 @@
                 <button type="button" 
                         onclick="document.dispatchEvent(new CustomEvent('studio:open'))" 
                         class="p-button p-button-primary" 
-                        style="padding: 0.35rem 0.75rem; font-size: 0.8125rem; display: inline-flex; align-items: center; gap: 0.4rem;">
+                        style="direction: ltr; padding: 0.35rem 0.75rem; font-size: 0.8125rem; display: inline-flex; align-items: center; gap: 0.4rem;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
                     <span>Studio</span>
                 </button>
@@ -60,9 +60,10 @@
                 <button type="button" 
                         onclick="const isKu = document.documentElement.lang.startsWith('ku') || document.documentElement.lang.startsWith('ckb'); const targetLang = isKu ? 'en-US' : 'ku'; const targetDir = isKu ? 'ltr' : 'rtl'; document.documentElement.lang = targetLang; document.documentElement.dir = targetDir; document.cookie = `.AspNetCore.Culture=c=${targetLang}|uic=${targetLang}; path=/; max-age=31536000; SameSite=Lax`; window.location.reload();" 
                         class="p-button p-button-secondary" 
-                        style="padding: 0.35rem 0.65rem; font-size: 0.8125rem; display: inline-flex; align-items: center; gap: 0.35rem; font-weight: 600;"
+                        style="direction: ltr; padding: 0.35rem 0.65rem; font-size: 0.8125rem; display: inline-flex; align-items: center; gap: 0.35rem; font-weight: 600;"
                         title="Toggle Language & RTL (کوردی / English)">
-                    <span>@(isRtl ? "☀️ کوردی" : "🇺🇸 EN")</span>
+                    <span>@(isRtl ? "☀️" : "🇺🇸")</span>
+                    <span style="font-family: var(--p-font-family, sans-serif);">@(isRtl ? "کوردی" : "EN")</span>
                 </button>
 
                 <!-- Dark Mode Toggle Button -->
