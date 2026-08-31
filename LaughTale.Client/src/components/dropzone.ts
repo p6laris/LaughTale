@@ -12,15 +12,17 @@ export interface DropzoneProps {
 
 
 const CSS = `
-[data-theme="dark"] .dropzone-box {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-100) !important;
-    border-color: var(--lt-surface-700) !important;
+html.dark .dropzone-box,
+[data-theme="dark"] .dropzone-box,
+.dark .dropzone-box {
+    background: var(--p-surface-0, #090d16) !important;
+    color: var(--p-text-color, #f8fafc) !important;
+    border-color: var(--p-border-color, #334155) !important;
 }
-[data-theme="dark"] .file-input {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-100) !important;
-    border-color: var(--lt-surface-700) !important;
+html.dark .dropzone-box:hover,
+[data-theme="dark"] .dropzone-box:hover,
+.dark .dropzone-box:hover {
+    border-color: var(--p-primary-500, #10b981) !important;
 }
 `;
 

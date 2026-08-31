@@ -22,10 +22,10 @@ export interface MeterGroupProps {
 
 
 const CSS = `
-[data-theme="dark"] .laughtale-meter-group {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-100) !important;
-    border-color: var(--lt-surface-700) !important;
+html.dark .laughtale-metergroup,
+[data-theme="dark"] .laughtale-metergroup,
+.dark .laughtale-metergroup {
+    color: var(--p-text-color, #f8fafc) !important;
 }
 `;
 

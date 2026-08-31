@@ -15,15 +15,22 @@ export interface BlockUIProps {
 
 
 const CSS = `
-[data-theme="dark"] .laughtale-blockui-root {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-100) !important;
-    border-color: var(--lt-surface-700) !important;
+html.dark .laughtale-blockui-root,
+[data-theme="dark"] .laughtale-blockui-root,
+.dark .laughtale-blockui-root {
+    background: transparent !important;
 }
-[data-theme="dark"] .blockui-mask {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-100) !important;
-    border-color: var(--lt-surface-700) !important;
+html.dark .blockui-mask,
+[data-theme="dark"] .blockui-mask,
+.dark .blockui-mask {
+    background: rgba(9, 13, 22, 0.75) !important;
+}
+html.dark .blockui-mask > div,
+[data-theme="dark"] .blockui-mask > div,
+.dark .blockui-mask > div {
+    background: var(--p-surface-0, #090d16) !important;
+    border-color: var(--p-border-color, #334155) !important;
+    color: var(--p-text-color, #f8fafc) !important;
 }
 `;
 
