@@ -1,0 +1,197 @@
+﻿@page "/localization"
+@model LaughTale.Showcase.Pages.LocalizationModel
+@{
+    ViewData["Title"] = Model.IsRtl ? "تاقیگەی ناوخۆییکردن و زمانی کوردی (i18n & RTL)" : "i18n & Kurdish RTL Live Lab";
+}
+
+<div class="localization-showcase-container" style="display: flex; flex-direction: column; gap: 2rem;">
+
+    <!-- Hero Banner -->
+    <div style="background: linear-gradient(135deg, var(--p-surface-0) 0%, var(--p-surface-50) 100%); border: 1px solid var(--p-border-color); border-radius: 1rem; padding: 2rem; box-shadow: 0 4px 20px -5px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 1.25rem;">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="width: 3.5rem; height: 3.5rem; border-radius: 1rem; background: linear-gradient(135deg, var(--p-primary-500), var(--p-primary-700)); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.75rem; box-shadow: 0 8px 16px -4px rgba(16, 185, 129, 0.4);">
+                    🌐
+                </div>
+                <div>
+                    <h1 style="margin: 0; font-size: 1.65rem; font-weight: 800; color: var(--p-text-color);">
+                        @(Model.IsRtl ? "تاقیگەی زمانی کوردی و ئاڕاستەی RTL" : "LaughTale i18n & Kurdish RTL Suite")
+                    </h1>
+                    <p style="margin: 0.25rem 0 0; color: var(--p-text-muted); font-size: 0.9rem;">
+                        @(Model.IsRtl 
+                            ? "پشتیوانی تەواو لە زمانی کوردی (سۆرانی)، فۆنتی سپێدە (Speda)، ئاڕاستەی ڕاست بۆ چەپ (RTL)، و پێکبەستن لەگەڵ ASP.NET Core" 
+                            : "Enterprise bi-directional RTL support, Speda font integration, and ASP.NET Core IStringLocalizer culture bridge.")
+                    </p>
+                </div>
+            </div>
+
+            <!-- Quick Language Switcher Buttons -->
+            <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <button type="button" 
+                        onclick="document.cookie = '.AspNetCore.Culture=c=en-US|uic=en-US; path=/; max-age=31536000'; window.location.reload();" 
+                        class="p-button @(!Model.IsRtl ? "p-button-primary" : "p-button-secondary")" 
+                        style="padding: 0.45rem 0.85rem; font-size: 0.85rem; font-weight: 600; cursor: pointer;">
+                    🇺🇸 English (LTR)
+                </button>
+                <button type="button" 
+                        onclick="document.cookie = '.AspNetCore.Culture=c=ku|uic=ku; path=/; max-age=31536000'; window.location.reload();" 
+                        class="p-button @(Model.IsRtl ? "p-button-primary" : "p-button-secondary")" 
+                        style="padding: 0.45rem 0.85rem; font-size: 0.85rem; font-weight: 600; cursor: pointer; font-family: 'Speda', sans-serif;">
+                    ☀️ کوردی - سپێدە (RTL)
+                </button>
+            </div>
+        </div>
+
+        <!-- Live Runtime Telemetry Pills -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem; margin-top: 0.5rem; padding-top: 1.25rem; border-top: 1px solid var(--p-border-color);">
+            <div style="padding: 0.75rem 1rem; border-radius: 0.5rem; background: var(--p-surface-100); border: 1px solid var(--p-border-color);">
+                <div style="font-size: 0.7rem; color: var(--p-text-muted); text-transform: uppercase; font-weight: 700;">@(Model.IsRtl ? "زمانی چالاک" : "Active Culture")</div>
+                <div style="font-size: 1rem; font-weight: 700; color: var(--p-text-color); margin-top: 0.2rem;">@Model.CurrentCulture.Name (@Model.CurrentCulture.DisplayName)</div>
+            </div>
+            <div style="padding: 0.75rem 1rem; border-radius: 0.5rem; background: var(--p-surface-100); border: 1px solid var(--p-border-color);">
+                <div style="font-size: 0.7rem; color: var(--p-text-muted); text-transform: uppercase; font-weight: 700;">@(Model.IsRtl ? "ئاڕاستە" : "Layout Direction")</div>
+                <div style="font-size: 1rem; font-weight: 700; color: var(--p-primary-600); margin-top: 0.2rem;">@(Model.IsRtl ? "ڕاست بۆ چەپ (RTL)" : "Left to Right (LTR)")</div>
+            </div>
+            <div style="padding: 0.75rem 1rem; border-radius: 0.5rem; background: var(--p-surface-100); border: 1px solid var(--p-border-color);">
+                <div style="font-size: 0.7rem; color: var(--p-text-muted); text-transform: uppercase; font-weight: 700;">@(Model.IsRtl ? "فۆنتی بەکارهاتوو" : "Active Font")</div>
+                <div style="font-size: 1rem; font-weight: 700; color: var(--p-text-color); margin-top: 0.2rem;">@Model.CurrentFont (@(Model.IsRtl ? "فۆنتی فەرمی سپێدە" : "Tailwind Default"))</div>
+            </div>
+            <div style="padding: 0.75rem 1rem; border-radius: 0.5rem; background: var(--p-surface-100); border: 1px solid var(--p-border-color);">
+                <div style="font-size: 0.7rem; color: var(--p-text-muted); text-transform: uppercase; font-weight: 700;">@(Model.IsRtl ? "یەکەم ڕۆژی هەفتە" : "First Day of Week")</div>
+                <div style="font-size: 1rem; font-weight: 700; color: var(--p-text-color); margin-top: 0.2rem;">@(Model.IsRtl ? "شەممە (Saturday)" : "Sunday")</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 1: Localized DataTable Grid Demo -->
+    <div style="background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: 1rem; padding: 1.75rem; display: flex; flex-direction: column; gap: 1.25rem;">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+            <div>
+                <h2 style="margin: 0; font-size: 1.25rem; font-weight: 700; color: var(--p-text-color);">
+                    @(Model.IsRtl ? "خشتەی زانیارییەکان لەگەڵ فلتەر و لاپەڕەبەندی" : "Localized DataTable & Pagination")
+                </h2>
+                <p style="margin: 0.25rem 0 0; color: var(--p-text-muted); font-size: 0.85rem;">
+                    @(Model.IsRtl ? "سەرجەم دەقەکانی گەڕان، فلتەرکردن، لاپەڕەبەندی و ستوونەکان بە کوردی ڕەسەن نمایشکراون." : "Search messages, filter operators, row counts, and table headers dynamically match active culture.")
+                </p>
+            </div>
+            <span class="aura-tag tag-primary">76 Components i18n</span>
+        </div>
+
+        <island-datatable value="@Model.Customers" 
+                          paginator="true" 
+                          rows="5" 
+                          show-gridlines="true" 
+                          striped-rows="true"
+                          filter-display="row"
+                          selection-mode="single">
+        </island-datatable>
+    </div>
+
+    <!-- Section 2: Interactive Controls & Form Controls -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.5rem;">
+
+        <!-- Card A: DatePicker & Calendar in Kurdish -->
+        <div style="background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: 1rem; padding: 1.75rem; display: flex; flex-direction: column; gap: 1.25rem;">
+            <div>
+                <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--p-text-color);">
+                    @(Model.IsRtl ? "ڕۆژژمێری کوردی (DatePicker)" : "Localized DatePicker")
+                </h3>
+                <p style="margin: 0.25rem 0 0; color: var(--p-text-muted); font-size: 0.825rem;">
+                    @(Model.IsRtl ? "ڕۆژەکانی هەفتە، مانگەکان، و دوگمەی (ئەمڕۆ / سڕینەوە) لەگەڵ ئاڕاستەی RTL." : "Culture-bound day names, month names, and action buttons.")
+                </p>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <label style="font-size: 0.85rem; font-weight: 600; color: var(--p-text-color);">
+                    @(Model.IsRtl ? "بەرواری داواکاری هەڵبژێرە:" : "Select Booking Date:")
+                </label>
+                <island-datepicker placeholder="@(Model.IsRtl ? "بەروار هەڵبژێرە..." : "Select date...")" />
+            </div>
+
+            <div style="padding: 0.85rem 1rem; background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: 0.5rem; font-size: 0.8rem; color: var(--p-text-muted);">
+                💡 <strong>@(Model.IsRtl ? "تێبینی:" : "Note:")</strong> @(Model.IsRtl ? "لە زمانی کوردیدا یەکەم ڕۆژی هەفتە لە شەممەوە دەستپێدەکات." : "In Kurdish locale, the week begins on Saturday (firstDayOfWeek = 6).")
+            </div>
+        </div>
+
+        <!-- Card B: Kurdish FileUpload -->
+        <div style="background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: 1rem; padding: 1.75rem; display: flex; flex-direction: column; gap: 1.25rem;">
+            <div>
+                <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--p-text-color);">
+                    @(Model.IsRtl ? "بارکردنی فایل (FileUpload)" : "Localized FileUpload")
+                </h3>
+                <p style="margin: 0.25rem 0 0; color: var(--p-text-muted); font-size: 0.825rem;">
+                    @(Model.IsRtl ? "دوگمەکانی هەڵبژاردن، بارکردن، و ڕاکێشانی فایل بە زمانی کوردی." : "Choose, Upload, Cancel buttons and drag & drop message.")
+                </p>
+            </div>
+
+            <island-fileupload multiple="true" 
+                              max-file-size="5000000" 
+                              choose-label="@(Model.IsRtl ? "فایل هەڵبژێرە" : "Choose File")" 
+                              upload-label="@(Model.IsRtl ? "بارکردن" : "Upload")" 
+                              cancel-label="@(Model.IsRtl ? "پاشگەزبوونەوە" : "Cancel")" />
+        </div>
+
+    </div>
+
+    <!-- Section 3: ASP.NET Core Server-Side Model Binding & Validation -->
+    <div style="background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: 1rem; padding: 1.75rem; display: flex; flex-direction: column; gap: 1.25rem;">
+        <div>
+            <h2 style="margin: 0; font-size: 1.25rem; font-weight: 700; color: var(--p-text-color);">
+                @(Model.IsRtl ? "فۆرمی دڵنیابوونەوە لەگەڵ ASP.NET Core (Model Validation)" : "Server Form Validation & Model Binding")
+            </h2>
+            <p style="margin: 0.25rem 0 0; color: var(--p-text-muted); font-size: 0.85rem;">
+                @(Model.IsRtl ? "فۆرمێک کە زانیاری دەنێرێت بۆ سێرڤەر و پەیامەکانی هەڵە (Validation) بە زمانی کوردی دەردەخات." : "Demonstrating full round-trip POST with culture-aware validation errors and anti-forgery protection.")
+            </p>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.SubmissionMessage))
+        {
+            <div class="aura-message message-success" style="padding: 1rem; border-radius: 0.5rem; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #059669; font-weight: 600;">
+                ✓ @Model.SubmissionMessage
+            </div>
+        }
+
+        <form method="post" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; align-items: flex-end;">
+            
+            <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+                <label asp-for="FullName" style="font-size: 0.85rem; font-weight: 600; color: var(--p-text-color);">
+                    @(Model.IsRtl ? "ناوی تەواو:" : "Full Name:")
+                </label>
+                <input asp-for="FullName" 
+                       class="p-inputtext" 
+                       placeholder="@(Model.IsRtl ? "بۆ نموونە: دانا کەریم" : "e.g. Dana Karim")" 
+                       style="padding: 0.6rem 0.75rem; border-radius: var(--p-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-50); color: var(--p-text-color); font-family: inherit; font-size: 0.9rem;" />
+                <span asp-validation-for="FullName" style="color: #ef4444; font-size: 0.775rem; font-weight: 600;"></span>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+                <label asp-for="Email" style="font-size: 0.85rem; font-weight: 600; color: var(--p-text-color);">
+                    @(Model.IsRtl ? "ئیمەیڵ:" : "Email Address:")
+                </label>
+                <input asp-for="Email" 
+                       type="email" 
+                       class="p-inputtext" 
+                       placeholder="@(Model.IsRtl ? "name@domain.com" : "name@domain.com")" 
+                       style="padding: 0.6rem 0.75rem; border-radius: var(--p-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-50); color: var(--p-text-color); font-family: inherit; font-size: 0.9rem;" />
+                <span asp-validation-for="Email" style="color: #ef4444; font-size: 0.775rem; font-weight: 600;"></span>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+                <label asp-for="City" style="font-size: 0.85rem; font-weight: 600; color: var(--p-text-color);">
+                    @(Model.IsRtl ? "شار:" : "City:")
+                </label>
+                <input asp-for="City" 
+                       class="p-inputtext" 
+                       placeholder="@(Model.IsRtl ? "هەولێر، سلێمانی، دهۆک..." : "Erbil, Sulaymaniyah, Duhok...")" 
+                       style="padding: 0.6rem 0.75rem; border-radius: var(--p-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-50); color: var(--p-text-color); font-family: inherit; font-size: 0.9rem;" />
+            </div>
+
+            <div>
+                <button type="submit" class="p-button p-button-primary" style="width: 100%; padding: 0.65rem 1.25rem; font-weight: 700; font-size: 0.9rem; cursor: pointer;">
+                    @(Model.IsRtl ? "ناردنی فۆرم ↵" : "Submit Form ↵")
+                </button>
+            </div>
+        </form>
+    </div>
+
+</div>
