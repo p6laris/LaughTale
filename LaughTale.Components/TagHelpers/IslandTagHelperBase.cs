@@ -1,6 +1,11 @@
-﻿using Microsoft.AspNetCore.Razor.TagHelpers;
+using System.Globalization;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.Extensions.DependencyInjection;
 using LaughTale.Core.Diagnostics;
 using LaughTale.Core.Enums;
+using LaughTale.Core.Localization;
 using LaughTale.Core.Serialization;
 
 namespace LaughTale.Components.TagHelpers;
@@ -12,6 +17,10 @@ namespace LaughTale.Components.TagHelpers;
 /// </summary>
 public abstract class IslandTagHelperBase : TagHelper
 {
+    [ViewContext]
+    [HtmlAttributeNotBound]
+    public ViewContext? ViewContext { get; set; }
+
     /// <summary>
     /// The unique client-side island registration name (e.g. "datatable", "datepicker").
     /// </summary>
@@ -80,6 +89,19 @@ public abstract class IslandTagHelperBase : TagHelper
     {
         output.TagName = WrapperTagName;
         output.TagMode = TagMode.StartTagAndEndTag;
+
+        // Culture & Direction Flow (LT-1504)
+        var currentCulture = CultureInfo.CurrentUICulture;
+        if (!output.Attributes.ContainsName("lang"))
+        {
+            output.Attributes.SetAttribute("lang", currentCulture.Name);
+        }
+        if (!output.Attributes.ContainsName("dir"))
+        {
+            var localizer = ViewContext?.HttpContext?.RequestServices?.GetService<ILaughTaleLocalizer>();
+            var isRtl = localizer?.IsRightToLeft(currentCulture) ?? currentCulture.TextInfo.IsRightToLeft;
+            output.Attributes.SetAttribute("dir", isRtl ? "rtl" : "ltr");
+        }
 
         output.Attributes.SetAttribute("data-island", IslandName);
         output.Attributes.SetAttribute("data-hydrate", Hydrate.ToString().ToLowerInvariant());

@@ -172,4 +172,55 @@ public class TagHelpersTests
         Assert.Equal("/dashboard", root.GetProperty("homeUrl").GetString());
         Assert.Equal(2, root.GetProperty("items").GetArrayLength());
     }
+
+    [Fact]
+    public async Task IslandTagHelper_EmitsLangAndDirAttributes()
+    {
+        var prevCulture = System.Globalization.CultureInfo.CurrentUICulture;
+        try
+        {
+            System.Globalization.CultureInfo.CurrentUICulture = System.Globalization.CultureInfo.GetCultureInfo("en-US");
+
+            var helper = new LaughTale.Core.TagHelpers.IslandTagHelper
+            {
+                Name = "test-island"
+            };
+
+            var (context, output) = CreateTagHelperContext("island");
+            await helper.ProcessAsync(context, output);
+
+            Assert.Equal("en-US", output.Attributes["lang"].Value);
+            Assert.Equal("ltr", output.Attributes["dir"].Value);
+        }
+        finally
+        {
+            System.Globalization.CultureInfo.CurrentUICulture = prevCulture;
+        }
+    }
+
+    private class TestIslandBaseTagHelper : IslandTagHelperBase
+    {
+        public override string IslandName => "test-base-island";
+    }
+
+    [Fact]
+    public async Task IslandTagHelperBase_EmitsArabicRtlWhenCultureIsArabic()
+    {
+        var prevCulture = System.Globalization.CultureInfo.CurrentUICulture;
+        try
+        {
+            System.Globalization.CultureInfo.CurrentUICulture = System.Globalization.CultureInfo.GetCultureInfo("ar-SA");
+
+            var helper = new TestIslandBaseTagHelper();
+            var (context, output) = CreateTagHelperContext("island-test-base");
+            await helper.ProcessAsync(context, output);
+
+            Assert.Equal("ar-SA", output.Attributes["lang"].Value);
+            Assert.Equal("rtl", output.Attributes["dir"].Value);
+        }
+        finally
+        {
+            System.Globalization.CultureInfo.CurrentUICulture = prevCulture;
+        }
+    }
 }

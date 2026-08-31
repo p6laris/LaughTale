@@ -11,6 +11,7 @@ import { awaitStreamingReady } from './streaming';
 import { renderErrorBoundary } from './error-boundary';
 import { refreshIsland } from './refresh';
 import { initDesignTokens } from '../styles/design-tokens';
+import { useLocale } from '../composables/useLocale';
 
 export type HydrateStrategy = 'load' | 'idle' | 'visible' | 'media' | 'interaction' | 'never';
 export type HydrationState = 'idle' | 'pending' | 'mounted' | 'failed';
@@ -180,18 +181,25 @@ async function executeHydration(container: HTMLElement, name: string): Promise<v
             refresh: (newProps?: Record<string, any>) => refreshIsland(container, newProps)
         };
 
-        // 5. Construct structural IslandContext (LT-1102)
+        // 5. Construct structural IslandContext (LT-1102, LT-1504)
         const abortController = new AbortController();
         const cleanups: (() => void)[] = [];
+
+        const localeVal = container.getAttribute('lang') || (typeof document !== 'undefined' ? document.documentElement.lang : 'en') || 'en';
+        const dirVal = ((container.getAttribute('dir') || (typeof document !== 'undefined' ? document.documentElement.dir : 'ltr') || 'ltr').toLowerCase()) as 'ltr' | 'rtl';
 
         const ctx: IslandContext = {
             signal: abortController.signal,
             onCleanup: (fn: () => void) => cleanups.push(fn),
             container,
             name,
-            locale: container.getAttribute('lang') || (typeof document !== 'undefined' ? document.documentElement.lang : 'en') || 'en',
-            dir: ((container.getAttribute('dir') || (typeof document !== 'undefined' ? document.documentElement.dir : 'ltr') || 'ltr').toLowerCase()) as 'ltr' | 'rtl'
+            locale: localeVal,
+            dir: dirVal
         };
+
+        const localeHelpers = useLocale(ctx);
+        ctx.t = localeHelpers.t;
+        ctx.dictionary = localeHelpers.dictionary;
 
         // 6. Mount island with context and register unmount hook
         const unmount = await mount(container, props, ctx);

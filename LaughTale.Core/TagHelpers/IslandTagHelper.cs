@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using LaughTale.Core.Attributes;
 using LaughTale.Core.Diagnostics;
 using LaughTale.Core.Enums;
+using LaughTale.Core.Localization;
 using LaughTale.Core.Serialization;
 
 namespace LaughTale.Core.TagHelpers;
@@ -21,10 +22,12 @@ namespace LaughTale.Core.TagHelpers;
 public class IslandTagHelper : TagHelper
 {
     private readonly ILogger<IslandTagHelper> _logger;
+    private readonly ILaughTaleLocalizer? _localizer;
 
-    public IslandTagHelper(ILogger<IslandTagHelper>? logger = null)
+    public IslandTagHelper(ILogger<IslandTagHelper>? logger = null, ILaughTaleLocalizer? localizer = null)
     {
         _logger = logger ?? NullLogger<IslandTagHelper>.Instance;
+        _localizer = localizer;
     }
 
     [ViewContext]
@@ -71,6 +74,18 @@ public class IslandTagHelper : TagHelper
 
         // LT-1507: Cache Leak Guard & Privacy Enforcement
         EnforceCachePrivacy();
+
+        // Culture & Direction Flow (LT-1504)
+        var currentCulture = System.Globalization.CultureInfo.CurrentUICulture;
+        if (!output.Attributes.ContainsName("lang"))
+        {
+            output.Attributes.SetAttribute("lang", currentCulture.Name);
+        }
+        if (!output.Attributes.ContainsName("dir"))
+        {
+            var isRtl = _localizer?.IsRightToLeft(currentCulture) ?? currentCulture.TextInfo.IsRightToLeft;
+            output.Attributes.SetAttribute("dir", isRtl ? "rtl" : "ltr");
+        }
 
         var serializedProps = IslandJson.SerializeProps(Props);
         var propBytes = System.Text.Encoding.UTF8.GetByteCount(serializedProps);

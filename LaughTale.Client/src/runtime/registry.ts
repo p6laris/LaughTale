@@ -11,6 +11,8 @@ export interface IslandContext {
     name: string;
     locale: string;
     dir: 'ltr' | 'rtl';
+    t?: (key: string, ...args: any[]) => string;
+    dictionary?: Record<string, any>;
 }
 
 export type IslandFactory<TProps = any, THandle = any> = (

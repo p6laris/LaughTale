@@ -1,4 +1,4 @@
-﻿/**
+/**
  * LaughTale: Headless UI & Animation Composables Suite
  */
 
@@ -17,6 +17,7 @@ export * from './useClipboard';
 export * from './useKeyboardNav';
 export * from './useEventListener';
 export * from './useDataSource';
+export * from './useLocale';
 
 // Animation Composables
 export * from './animation/useSpring';
