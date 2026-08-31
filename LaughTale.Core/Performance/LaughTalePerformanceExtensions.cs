@@ -75,12 +75,25 @@ namespace LaughTale.Core.Performance
                     if (path.StartsWith("/_lt/", StringComparison.OrdinalIgnoreCase) ||
                         path.StartsWith("/js/", StringComparison.OrdinalIgnoreCase) ||
                         path.StartsWith("/css/", StringComparison.OrdinalIgnoreCase) ||
+                        path.StartsWith("/fonts/", StringComparison.OrdinalIgnoreCase) ||
+                        path.StartsWith("/font/", StringComparison.OrdinalIgnoreCase) ||
+                        path.StartsWith("/images/", StringComparison.OrdinalIgnoreCase) ||
+                        path.StartsWith("/img/", StringComparison.OrdinalIgnoreCase) ||
                         path.StartsWith("/dist/", StringComparison.OrdinalIgnoreCase) ||
                         path.StartsWith("/_content/", StringComparison.OrdinalIgnoreCase) ||
                         path.StartsWith("/icons/", StringComparison.OrdinalIgnoreCase) ||
                         path.EndsWith(".js", StringComparison.OrdinalIgnoreCase) ||
                         path.EndsWith(".css", StringComparison.OrdinalIgnoreCase) ||
-                        path.EndsWith(".svg", StringComparison.OrdinalIgnoreCase))
+                        path.EndsWith(".svg", StringComparison.OrdinalIgnoreCase) ||
+                        path.EndsWith(".woff2", StringComparison.OrdinalIgnoreCase) ||
+                        path.EndsWith(".woff", StringComparison.OrdinalIgnoreCase) ||
+                        path.EndsWith(".ttf", StringComparison.OrdinalIgnoreCase) ||
+                        path.EndsWith(".otf", StringComparison.OrdinalIgnoreCase) ||
+                        path.EndsWith(".eot", StringComparison.OrdinalIgnoreCase) ||
+                        path.EndsWith(".png", StringComparison.OrdinalIgnoreCase) ||
+                        path.EndsWith(".webp", StringComparison.OrdinalIgnoreCase) ||
+                        path.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) ||
+                        path.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase))
                     {
                         ctx.Context.Response.Headers[HeaderNames.CacheControl] = headerValue;
                     }

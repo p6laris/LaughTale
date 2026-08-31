@@ -16,8 +16,22 @@ const ctx = await esbuild.context({
     format: 'esm',
     target: 'es2022',
     outdir: outDir,
-    sourcemap: true
+    sourcemap: true,
+    minify: true
 });
+
+async function minifyCss() {
+    const cssPath = path.resolve('wwwroot/css/site.css');
+    if (fs.existsSync(cssPath)) {
+        await esbuild.build({
+            entryPoints: [cssPath],
+            outfile: cssPath,
+            minify: true,
+            allowOverwrite: true
+        });
+        console.log('[Showcase] site.css minified.');
+    }
+}
 
 if (isWatch) {
     await ctx.watch();
@@ -25,6 +39,7 @@ if (isWatch) {
 } else {
     await ctx.rebuild();
     await ctx.dispose();
+    await minifyCss();
     console.log('[Showcase] Islands bundle created with code splitting in wwwroot/js/');
 }
 

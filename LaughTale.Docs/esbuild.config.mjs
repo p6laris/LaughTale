@@ -17,8 +17,20 @@ async function build() {
         outdir: outDir,
         target: 'es2022',
         sourcemap: true,
-        minify: false
+        minify: true
     });
+
+    const cssPath = path.resolve('wwwroot/css/docs.css');
+    if (fs.existsSync(cssPath)) {
+        await esbuild.build({
+            entryPoints: [cssPath],
+            outfile: cssPath,
+            minify: true,
+            allowOverwrite: true
+        });
+        console.log('[Docs] docs.css minified.');
+    }
+
     console.log('[Docs] Islands bundle created with code splitting in wwwroot/js/');
 }
 
