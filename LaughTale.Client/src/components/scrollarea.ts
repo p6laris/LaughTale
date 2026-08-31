@@ -124,17 +124,20 @@ const SCROLLAREA_CSS = `
 }
 
 /* Dark Mode Tokens */
-.dark .p-scrollarea-handle,
-[data-theme="dark"] .p-scrollarea-handle {
-    background: var(--lt-surface-600) !important;
+html.dark .p-scrollarea-handle,
+[data-theme="dark"] .p-scrollarea-handle,
+.dark .p-scrollarea-handle {
+    background: var(--p-surface-600, #475569) !important;
 }
-.dark .p-scrollarea-handle:hover,
-[data-theme="dark"] .p-scrollarea-handle:hover {
-    background: var(--lt-surface-500) !important;
+html.dark .p-scrollarea-handle:hover,
+[data-theme="dark"] .p-scrollarea-handle:hover,
+.dark .p-scrollarea-handle:hover {
+    background: var(--p-surface-500, #64748b) !important;
 }
-.dark .p-scrollarea-handle:active,
-[data-theme="dark"] .p-scrollarea-handle:active {
-    background: var(--lt-surface-400) !important;
+html.dark .p-scrollarea-handle:active,
+[data-theme="dark"] .p-scrollarea-handle:active,
+.dark .p-scrollarea-handle:active {
+    background: var(--p-surface-400, #94a3b8) !important;
 }
 `;
 

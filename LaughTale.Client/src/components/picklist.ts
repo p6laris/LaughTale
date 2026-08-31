@@ -273,55 +273,66 @@ const PICKLIST_CSS = `
 }
 
 /* Dark Mode Tokens */
-.dark .p-picklist,
-[data-theme="dark"] .p-picklist {
-    color: var(--lt-surface-100) !important;
+html.dark .p-picklist,
+[data-theme="dark"] .p-picklist,
+.dark .p-picklist {
+    color: var(--p-text-color, #f8fafc) !important;
 }
-.dark .p-picklist-list-container,
-[data-theme="dark"] .p-picklist-list-container {
-    background: var(--lt-surface-900) !important;
-    border-color: var(--lt-surface-700) !important;
+html.dark .p-picklist-list-container,
+[data-theme="dark"] .p-picklist-list-container,
+.dark .p-picklist-list-container {
+    background: var(--p-surface-0, #090d16) !important;
+    border-color: var(--p-border-color, #334155) !important;
 }
-.dark .p-picklist-header,
-.dark .p-picklist-filter-container,
+html.dark .p-picklist-header,
+html.dark .p-picklist-filter-container,
 [data-theme="dark"] .p-picklist-header,
-[data-theme="dark"] .p-picklist-filter-container {
-    background: var(--lt-surface-800) !important;
-    border-color: var(--lt-surface-700) !important;
-    color: var(--lt-surface-100) !important;
+[data-theme="dark"] .p-picklist-filter-container,
+.dark .p-picklist-header,
+.dark .p-picklist-filter-container {
+    background: var(--p-surface-50, #0f172a) !important;
+    border-color: var(--p-border-color, #334155) !important;
+    color: var(--p-text-color, #f8fafc) !important;
 }
-.dark .p-picklist-filter-input,
-[data-theme="dark"] .p-picklist-filter-input {
-    background: var(--lt-surface-900) !important;
-    border-color: var(--lt-surface-600) !important;
-    color: var(--lt-surface-0, var(--lt-surface-0)) !important;
+html.dark .p-picklist-filter-input,
+[data-theme="dark"] .p-picklist-filter-input,
+.dark .p-picklist-filter-input {
+    background: var(--p-surface-0, #090d16) !important;
+    border-color: var(--p-border-color, #334155) !important;
+    color: var(--p-text-color, #f8fafc) !important;
 }
-.dark .p-picklist-control-btn,
-[data-theme="dark"] .p-picklist-control-btn {
-    background: var(--lt-surface-800) !important;
-    border-color: var(--lt-surface-600) !important;
-    color: var(--lt-surface-200) !important;
+html.dark .p-picklist-control-btn,
+[data-theme="dark"] .p-picklist-control-btn,
+.dark .p-picklist-control-btn {
+    background: var(--p-surface-0, #090d16) !important;
+    border-color: var(--p-border-color, #334155) !important;
+    color: var(--p-text-muted, #94a3b8) !important;
 }
-.dark .p-picklist-control-btn:hover:not(:disabled),
-[data-theme="dark"] .p-picklist-control-btn:hover:not(:disabled) {
-    background: var(--lt-surface-700) !important;
-    color: var(--lt-surface-0, var(--lt-surface-0)) !important;
+html.dark .p-picklist-control-btn:hover:not(:disabled),
+[data-theme="dark"] .p-picklist-control-btn:hover:not(:disabled),
+.dark .p-picklist-control-btn:hover:not(:disabled) {
+    background: var(--p-surface-100, #1e293b) !important;
+    color: var(--p-text-color, #f8fafc) !important;
 }
-.dark .p-picklist-item:hover:not(.p-highlight),
-[data-theme="dark"] .p-picklist-item:hover:not(.p-highlight) {
-    background: var(--lt-surface-800) !important;
-    color: var(--lt-surface-0, var(--lt-surface-0)) !important;
+html.dark .p-picklist-item:hover:not(.p-highlight),
+[data-theme="dark"] .p-picklist-item:hover:not(.p-highlight),
+.dark .p-picklist-item:hover:not(.p-highlight) {
+    background: var(--p-surface-100, #1e293b) !important;
+    color: var(--p-text-color, #f8fafc) !important;
 }
-.dark .p-picklist-product-name,
+html.dark .p-picklist-product-name,
+html.dark .p-picklist-product-price,
 [data-theme="dark"] .p-picklist-product-name,
-.dark .p-picklist-product-price,
-[data-theme="dark"] .p-picklist-product-price {
-    color: var(--lt-surface-100) !important;
+[data-theme="dark"] .p-picklist-product-price,
+.dark .p-picklist-product-name,
+.dark .p-picklist-product-price {
+    color: var(--p-text-color, #f8fafc) !important;
 }
-.dark .p-picklist-product-img,
-[data-theme="dark"] .p-picklist-product-img {
-    background: var(--lt-surface-800) !important;
-    border-color: var(--lt-surface-700) !important;
+html.dark .p-picklist-product-img,
+[data-theme="dark"] .p-picklist-product-img,
+.dark .p-picklist-product-img {
+    background: var(--p-surface-100, #1e293b) !important;
+    border-color: var(--p-border-color, #334155) !important;
 }
 `;
 

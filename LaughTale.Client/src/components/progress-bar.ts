@@ -17,10 +17,10 @@ export interface ProgressBarProps {
 
 
 const CSS = `
-[data-theme="dark"] .laughtale-progress-bar {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-100) !important;
-    border-color: var(--lt-surface-700) !important;
+html.dark .laughtale-progress-bar,
+[data-theme="dark"] .laughtale-progress-bar,
+.dark .laughtale-progress-bar {
+    background: var(--p-surface-100, #1e293b) !important;
 }
 `;
 
