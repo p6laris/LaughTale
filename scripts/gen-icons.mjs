@@ -161,7 +161,11 @@ export function scanReferencedIcons(rootDir = '.') {
         /<(?:lt|aura|island)-icon[^>]*\bname=["']([^"']+)["']/gi,
         /\b(?:icon|iconLeft|iconRight|onIcon|offIcon)=["']([^"']+)["']/gi,
         /LucideIcons\.Get\(["']([^"']+)["']/gi,
-        /getLucideIcon\(["']([^"']+)["']/gi
+        /getLucideIcon\(["']([^"']+)["']/gi,
+        // The TS `LucideIcons` Proxy is used as property access (LucideIcons.chevronDown,
+        // LucideIcons.arrowUp), not just the .Get(...) call above — negative lookahead
+        // excludes matching "Get" itself as a property name when it's actually that call.
+        /LucideIcons\.([A-Za-z][A-Za-z0-9]*)\b(?!\()/g
     ];
 
     function walk(dir) {

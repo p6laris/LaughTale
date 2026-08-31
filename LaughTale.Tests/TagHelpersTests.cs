@@ -247,6 +247,25 @@ public class TagHelpersTests
 
         var content = output.Content.GetContent();
         Assert.Contains("<use href=\"/_lt/icons.svg#check\"></use>", content);
+        Assert.Equal("true", output.Attributes["aria-hidden"].Value);
+    }
+
+    [Fact]
+    public void IconTagHelper_AccessibleTitle_EmitsRoleImgAndAriaLabel()
+    {
+        var helper = new IconTagHelper
+        {
+            Name = "trash",
+            Size = 18,
+            Title = "Delete Record"
+        };
+
+        var (context, output) = CreateTagHelperContext("lt-icon");
+        helper.Process(context, output);
+
+        Assert.Equal("img", output.Attributes["role"].Value);
+        Assert.Equal("Delete Record", output.Attributes["aria-label"].Value);
+        Assert.False(output.Attributes.ContainsName("aria-hidden"));
     }
 
     [Fact]

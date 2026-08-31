@@ -44,6 +44,15 @@ public class IconTagHelper : TagHelper
     public string SpritePath { get; set; } = "/_lt/icons.svg";
 
     /// <summary>
+    /// Accessible label. When set, the icon is exposed to assistive tech as
+    /// <c>role="img"</c> with this text as its <c>aria-label</c>, instead of the default
+    /// <c>aria-hidden="true"</c> (decorative). Set this whenever the icon conveys meaning
+    /// on its own — e.g. an icon-only button — not when it's alongside visible text.
+    /// </summary>
+    [HtmlAttributeName("title")]
+    public string? Title { get; set; }
+
+    /// <summary>
     /// Additional CSS classes to attach to the SVG element.
     /// </summary>
     [HtmlAttributeName("class")]
@@ -74,7 +83,16 @@ public class IconTagHelper : TagHelper
         output.Attributes.SetAttribute("stroke-linecap", "round");
         output.Attributes.SetAttribute("stroke-linejoin", "round");
         output.Attributes.SetAttribute("data-part", "icon");
-        output.Attributes.SetAttribute("aria-hidden", "true");
+
+        if (string.IsNullOrWhiteSpace(Title))
+        {
+            output.Attributes.SetAttribute("aria-hidden", "true");
+        }
+        else
+        {
+            output.Attributes.SetAttribute("role", "img");
+            output.Attributes.SetAttribute("aria-label", Title);
+        }
 
         if (!string.IsNullOrWhiteSpace(Style))
         {

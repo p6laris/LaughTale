@@ -21,10 +21,19 @@ export function normalizeLucideId(name: string): string {
     return kebab;
 }
 
-export function getLucideIcon(name: string, size: number = 16, strokeWidth: number = 2): string {
+function escapeHtml(text: string): string {
+    return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+/**
+ * @param title Accessible label. When provided, the icon is exposed to assistive tech as
+ * `role="img"` with a `<title>`. Omit for a purely decorative icon (default: `aria-hidden`).
+ */
+export function getLucideIcon(name: string, size: number = 16, strokeWidth: number = 2, title?: string): string {
     if (!name) return '';
     const iconId = normalizeLucideId(name);
-    return `<svg class="p-icon p-icon-${iconId}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round"><use href="/icons/lucide-sprites.svg#${iconId}"></use></svg>`;
+    const a11yAttrs = title ? `role="img" aria-label="${escapeHtml(title)}"` : 'aria-hidden="true"';
+    return `<svg class="p-icon p-icon-${iconId}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" ${a11yAttrs}><use href="/_lt/icons.svg#${iconId}"></use></svg>`;
 }
 
 // Global safe proxy: LucideIcons.anyName NEVER returns undefined!

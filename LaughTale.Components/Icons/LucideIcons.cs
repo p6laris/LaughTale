@@ -22,10 +22,18 @@ public static class LucideIcons
         return kebab;
     }
 
-    public static string Get(string iconName, int size = 16)
+    /// <param name="title">
+    /// Accessible label. When provided, the icon is exposed to assistive tech as
+    /// <c>role="img"</c> with an <c>aria-label</c>. Omit for a purely decorative icon
+    /// (default: <c>aria-hidden</c>).
+    /// </param>
+    public static string Get(string iconName, int size = 16, string? title = null)
     {
         if (string.IsNullOrWhiteSpace(iconName)) return string.Empty;
         var iconId = NormalizeId(iconName);
-        return $@"<svg class=""p-icon p-icon-{iconId}"" width=""{size}"" height=""{size}"" viewBox=""0 0 24 24"" fill=""none"" stroke=""currentColor"" stroke-width=""2"" stroke-linecap=""round"" stroke-linejoin=""round""><use href=""/icons/lucide-sprites.svg#{iconId}""></use></svg>";
+        var a11yAttrs = string.IsNullOrWhiteSpace(title)
+            ? "aria-hidden=\"true\""
+            : $"role=\"img\" aria-label=\"{System.Net.WebUtility.HtmlEncode(title)}\"";
+        return $@"<svg class=""p-icon p-icon-{iconId}"" width=""{size}"" height=""{size}"" viewBox=""0 0 24 24"" fill=""none"" stroke=""currentColor"" stroke-width=""2"" stroke-linecap=""round"" stroke-linejoin=""round"" {a11yAttrs}><use href=""/_lt/icons.svg#{iconId}""></use></svg>";
     }
 }
