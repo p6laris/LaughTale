@@ -262,36 +262,42 @@ const TREE_CSS = `
 }
 
 /* Dark Mode Tokens */
-.dark .p-tree,
-[data-theme="dark"] .p-tree {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-100) !important;
-    border-color: var(--lt-surface-700) !important;
+html.dark .p-tree,
+[data-theme="dark"] .p-tree,
+.dark .p-tree {
+    background: var(--p-surface-0, #090d16) !important;
+    color: var(--p-text-color, #f8fafc) !important;
+    border-color: var(--p-border-color, #334155) !important;
 }
-.dark .p-tree-filter-input,
-[data-theme="dark"] .p-tree-filter-input {
-    background: var(--lt-surface-950) !important;
-    color: var(--lt-surface-50) !important;
-    border-color: var(--lt-surface-700) !important;
+html.dark .p-tree-filter-input,
+[data-theme="dark"] .p-tree-filter-input,
+.dark .p-tree-filter-input {
+    background: var(--p-surface-0, #090d16) !important;
+    color: var(--p-text-color, #f8fafc) !important;
+    border-color: var(--p-border-color, #334155) !important;
 }
-.dark .p-tree-node-content:hover,
-[data-theme="dark"] .p-tree-node-content:hover {
-    background-color: var(--lt-surface-800) !important;
-    color: var(--lt-surface-0) !important;
+html.dark .p-tree-node-content:hover,
+[data-theme="dark"] .p-tree-node-content:hover,
+.dark .p-tree-node-content:hover {
+    background-color: var(--p-surface-100, #1e293b) !important;
+    color: var(--p-text-color, #f8fafc) !important;
 }
-.dark .p-tree-node-content.p-tree-node-selected,
-[data-theme="dark"] .p-tree-node-content.p-tree-node-selected {
+html.dark .p-tree-node-content.p-tree-node-selected,
+[data-theme="dark"] .p-tree-node-content.p-tree-node-selected,
+.dark .p-tree-node-content.p-tree-node-selected {
     background-color: rgba(16, 185, 129, 0.16) !important;
-    color: var(--lt-primary-300) !important;
+    color: var(--p-primary-300, #6ee7b7) !important;
 }
-.dark .p-tree-checkbox-box,
-[data-theme="dark"] .p-tree-checkbox-box {
-    background: var(--lt-surface-950) !important;
-    border-color: var(--lt-surface-700) !important;
+html.dark .p-tree-checkbox-box,
+[data-theme="dark"] .p-tree-checkbox-box,
+.dark .p-tree-checkbox-box {
+    background: var(--p-surface-50, #0f172a) !important;
+    border-color: var(--p-border-color, #334155) !important;
 }
-.dark .p-tree-loading-overlay,
-[data-theme="dark"] .p-tree-loading-overlay {
-    background: rgba(15, 23, 42, 0.7) !important;
+html.dark .p-tree-loading-overlay,
+[data-theme="dark"] .p-tree-loading-overlay,
+.dark .p-tree-loading-overlay {
+    background: rgba(9, 13, 22, 0.7) !important;
 }
 `;
 

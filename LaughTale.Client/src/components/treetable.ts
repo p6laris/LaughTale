@@ -428,80 +428,97 @@ const TREETABLE_CSS = `
 .p-treetable-top-controls.justify-center {
     justify-content: center;
 }
-
 /* Dark Mode Tokens */
-.dark .p-treetable,
-[data-theme="dark"] .p-treetable {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-100) !important;
-    border-color: var(--lt-surface-700) !important;
+html.dark .p-treetable,
+[data-theme="dark"] .p-treetable,
+.dark .p-treetable {
+    background: var(--p-surface-0, #090d16) !important;
+    color: var(--p-text-color, #f8fafc) !important;
+    border-color: var(--p-border-color, #334155) !important;
 }
-.dark .p-treetable-header,
-[data-theme="dark"] .p-treetable-header {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-0) !important;
-    border-color: var(--lt-surface-700) !important;
+html.dark .p-treetable-header,
+[data-theme="dark"] .p-treetable-header,
+.dark .p-treetable-header {
+    background: var(--p-surface-50, #0f172a) !important;
+    color: var(--p-text-color, #f8fafc) !important;
+    border-color: var(--p-border-color, #334155) !important;
 }
-.dark .p-treetable-footer,
-[data-theme="dark"] .p-treetable-footer {
-    background: var(--lt-surface-950) !important;
-    color: var(--lt-surface-200) !important;
-    border-color: var(--lt-surface-700) !important;
+html.dark .p-treetable-footer,
+[data-theme="dark"] .p-treetable-footer,
+.dark .p-treetable-footer {
+    background: var(--p-surface-50, #0f172a) !important;
+    color: var(--p-text-color, #f8fafc) !important;
+    border-color: var(--p-border-color, #334155) !important;
 }
-.dark .p-treetable-thead > tr > th,
-[data-theme="dark"] .p-treetable-thead > tr > th {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-200) !important;
-    border-color: var(--lt-surface-700) !important;
+html.dark .p-treetable-thead > tr > th,
+[data-theme="dark"] .p-treetable-thead > tr > th,
+.dark .p-treetable-thead > tr > th {
+    background: var(--p-surface-50, #0f172a) !important;
+    color: var(--p-text-color, #f8fafc) !important;
+    border-color: var(--p-border-color, #334155) !important;
 }
-.dark .p-treetable-tbody > tr,
-[data-theme="dark"] .p-treetable-tbody > tr {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-200) !important;
+html.dark .p-treetable-tbody > tr,
+[data-theme="dark"] .p-treetable-tbody > tr,
+.dark .p-treetable-tbody > tr {
+    background: var(--p-surface-0, #090d16) !important;
+    color: var(--p-text-color, #f8fafc) !important;
 }
-.dark .p-treetable-tbody > tr:not(.p-highlight):hover,
-[data-theme="dark"] .p-treetable-tbody > tr:not(.p-highlight):hover {
-    background: var(--lt-surface-800) !important;
-    color: var(--lt-surface-0) !important;
+html.dark .p-treetable-tbody > tr:not(.p-highlight):hover,
+[data-theme="dark"] .p-treetable-tbody > tr:not(.p-highlight):hover,
+.dark .p-treetable-tbody > tr:not(.p-highlight):hover {
+    background: var(--p-surface-100, #1e293b) !important;
+    color: var(--p-text-color, #f8fafc) !important;
 }
-.dark .p-treetable-tbody > tr.p-highlight,
-[data-theme="dark"] .p-treetable-tbody > tr.p-highlight {
+html.dark .p-treetable-tbody > tr.p-highlight,
+[data-theme="dark"] .p-treetable-tbody > tr.p-highlight,
+.dark .p-treetable-tbody > tr.p-highlight {
     background: rgba(16, 185, 129, 0.16) !important;
-    color: var(--lt-primary-300) !important;
+    color: var(--p-primary-300, #6ee7b7) !important;
 }
-.dark .p-treetable-tbody > tr > td,
-[data-theme="dark"] .p-treetable-tbody > tr > td {
-    border-color: var(--lt-surface-700) !important;
+html.dark .p-treetable-tbody > tr > td,
+[data-theme="dark"] .p-treetable-tbody > tr > td,
+.dark .p-treetable-tbody > tr > td {
+    border-color: var(--p-border-color, #334155) !important;
 }
+html.dark .p-frozen-left,
+html.dark .p-frozen-right,
+[data-theme="dark"] .p-frozen-left,
+[data-theme="dark"] .p-frozen-right,
 .dark .p-frozen-left,
 .dark .p-frozen-right {
-    background: var(--lt-surface-900) !important;
+    background: var(--p-surface-0, #090d16) !important;
 }
-.dark .p-treetable-paginator,
-[data-theme="dark"] .p-treetable-paginator {
-    background: var(--lt-surface-900) !important;
-    border-color: var(--lt-surface-700) !important;
+html.dark .p-treetable-paginator,
+[data-theme="dark"] .p-treetable-paginator,
+.dark .p-treetable-paginator {
+    background: var(--p-surface-0, #090d16) !important;
+    border-color: var(--p-border-color, #334155) !important;
 }
-.dark .p-treetable-paginator-btn.p-highlight,
-[data-theme="dark"] .p-treetable-paginator-btn.p-highlight {
-    background: var(--lt-surface-0) !important;
-    color: var(--lt-surface-900) !important;
+html.dark .p-treetable-paginator-btn.p-highlight,
+[data-theme="dark"] .p-treetable-paginator-btn.p-highlight,
+.dark .p-treetable-paginator-btn.p-highlight {
+    background: rgba(16, 185, 129, 0.16) !important;
+    color: var(--p-primary-300, #6ee7b7) !important;
 }
-.dark .p-treetable-checkbox,
-[data-theme="dark"] .p-treetable-checkbox {
-    background: var(--lt-surface-950) !important;
-    border-color: var(--lt-surface-700) !important;
+html.dark .p-treetable-checkbox,
+[data-theme="dark"] .p-treetable-checkbox,
+.dark .p-treetable-checkbox {
+    background: var(--p-surface-50, #0f172a) !important;
+    border-color: var(--p-border-color, #334155) !important;
 }
-.dark .p-treetable-loading-mask,
-[data-theme="dark"] .p-treetable-loading-mask {
-    background: rgba(15, 23, 42, 0.8) !important;
+html.dark .p-treetable-loading-mask,
+[data-theme="dark"] .p-treetable-loading-mask,
+.dark .p-treetable-loading-mask {
+    background: rgba(9, 13, 22, 0.8) !important;
 }
-.dark .p-treetable-contextmenu,
+html.dark .p-treetable-contextmenu,
+html.dark .p-treetable-popover,
 [data-theme="dark"] .p-treetable-contextmenu,
-.dark .p-treetable-popover,
-[data-theme="dark"] .p-treetable-popover {
-    background: var(--lt-surface-900) !important;
-    border-color: var(--lt-surface-700) !important;
+[data-theme="dark"] .p-treetable-popover,
+.dark .p-treetable-contextmenu,
+.dark .p-treetable-popover {
+    background: var(--p-surface-0, #090d16) !important;
+    border-color: var(--p-border-color, #334155) !important;
 }
 `;
 

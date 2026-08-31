@@ -194,66 +194,86 @@ const PAGINATOR_CSS = `
 }
 
 /* Dark Mode Tokens */
-.dark .p-paginator,
-[data-theme="dark"] .p-paginator {
-    background: var(--lt-surface-900) !important;
-    border-color: var(--lt-surface-700) !important;
-    color: var(--lt-surface-200) !important;
+html.dark .p-paginator,
+[data-theme="dark"] .p-paginator,
+.dark .p-paginator {
+    background: var(--p-surface-0, #090d16) !important;
+    border-color: var(--p-border-color, #334155) !important;
+    color: var(--p-text-color, #f8fafc) !important;
 }
-.dark .p-paginator-page,
-.dark .p-paginator-first,
-.dark .p-paginator-prev,
-.dark .p-paginator-next,
-.dark .p-paginator-last,
-.dark .p-paginator-action-btn,
+html.dark .p-paginator-page,
+html.dark .p-paginator-first,
+html.dark .p-paginator-prev,
+html.dark .p-paginator-next,
+html.dark .p-paginator-last,
+html.dark .p-paginator-action-btn,
 [data-theme="dark"] .p-paginator-page,
 [data-theme="dark"] .p-paginator-first,
 [data-theme="dark"] .p-paginator-prev,
 [data-theme="dark"] .p-paginator-next,
 [data-theme="dark"] .p-paginator-last,
-[data-theme="dark"] .p-paginator-action-btn {
-    color: var(--lt-surface-300) !important;
+[data-theme="dark"] .p-paginator-action-btn,
+.dark .p-paginator-page,
+.dark .p-paginator-first,
+.dark .p-paginator-prev,
+.dark .p-paginator-next,
+.dark .p-paginator-last,
+.dark .p-paginator-action-btn {
+    color: var(--p-text-muted, #94a3b8) !important;
 }
-.dark .p-paginator-page:hover:not(:disabled):not(.p-highlight),
-.dark .p-paginator-first:hover:not(:disabled),
-.dark .p-paginator-prev:hover:not(:disabled),
-.dark .p-paginator-next:hover:not(:disabled),
-.dark .p-paginator-last:hover:not(:disabled),
-.dark .p-paginator-action-btn:hover:not(:disabled),
+html.dark .p-paginator-page:hover:not(:disabled):not(.p-highlight),
+html.dark .p-paginator-first:hover:not(:disabled),
+html.dark .p-paginator-prev:hover:not(:disabled),
+html.dark .p-paginator-next:hover:not(:disabled),
+html.dark .p-paginator-last:hover:not(:disabled),
+html.dark .p-paginator-action-btn:hover:not(:disabled),
 [data-theme="dark"] .p-paginator-page:hover:not(:disabled):not(.p-highlight),
 [data-theme="dark"] .p-paginator-first:hover:not(:disabled),
 [data-theme="dark"] .p-paginator-prev:hover:not(:disabled),
 [data-theme="dark"] .p-paginator-next:hover:not(:disabled),
 [data-theme="dark"] .p-paginator-last:hover:not(:disabled),
-[data-theme="dark"] .p-paginator-action-btn:hover:not(:disabled) {
-    background: var(--lt-surface-800) !important;
-    color: var(--lt-surface-0, var(--lt-surface-0)) !important;
+[data-theme="dark"] .p-paginator-action-btn:hover:not(:disabled),
+.dark .p-paginator-page:hover:not(:disabled):not(.p-highlight),
+.dark .p-paginator-first:hover:not(:disabled),
+.dark .p-paginator-prev:hover:not(:disabled),
+.dark .p-paginator-next:hover:not(:disabled),
+.dark .p-paginator-last:hover:not(:disabled),
+.dark .p-paginator-action-btn:hover:not(:disabled) {
+    background: var(--p-surface-100, #1e293b) !important;
+    color: var(--p-text-color, #f8fafc) !important;
 }
-.dark .p-paginator-page.p-highlight,
-[data-theme="dark"] .p-paginator-page.p-highlight {
-    background: var(--lt-surface-0) !important;
-    color: var(--lt-surface-900) !important;
+html.dark .p-paginator-page.p-highlight,
+[data-theme="dark"] .p-paginator-page.p-highlight,
+.dark .p-paginator-page.p-highlight {
+    background: rgba(16, 185, 129, 0.16) !important;
+    color: var(--p-primary-300, #6ee7b7) !important;
 }
-.dark .p-paginator-rpp-select,
-.dark .p-paginator-jtp-select,
-.dark .p-paginator-jtp-input,
+html.dark .p-paginator-rpp-select,
+html.dark .p-paginator-jtp-select,
+html.dark .p-paginator-jtp-input,
 [data-theme="dark"] .p-paginator-rpp-select,
 [data-theme="dark"] .p-paginator-jtp-select,
-[data-theme="dark"] .p-paginator-jtp-input {
-    background-color: var(--lt-surface-800) !important;
-    border-color: var(--lt-surface-600) !important;
-    color: var(--lt-surface-0, var(--lt-surface-0)) !important;
+[data-theme="dark"] .p-paginator-jtp-input,
+.dark .p-paginator-rpp-select,
+.dark .p-paginator-jtp-select,
+.dark .p-paginator-jtp-input {
+    background-color: var(--p-surface-100, #1e293b) !important;
+    border-color: var(--p-border-color, #334155) !important;
+    color: var(--p-text-color, #f8fafc) !important;
 }
-.dark .p-paginator-current,
-.dark .p-paginator-jtp-container,
+html.dark .p-paginator-current,
+html.dark .p-paginator-jtp-container,
 [data-theme="dark"] .p-paginator-current,
-[data-theme="dark"] .p-paginator-jtp-container {
-    color: var(--lt-surface-400) !important;
+[data-theme="dark"] .p-paginator-jtp-container,
+.dark .p-paginator-current,
+.dark .p-paginator-jtp-container {
+    color: var(--p-text-muted, #94a3b8) !important;
 }
-.dark .p-paginator-image-card,
-[data-theme="dark"] .p-paginator-image-card {
-    background: var(--lt-surface-800) !important;
-    border-color: var(--lt-surface-700) !important;
+html.dark .p-paginator-image-card,
+[data-theme="dark"] .p-paginator-image-card,
+.dark .p-paginator-image-card {
+    background: var(--p-surface-100, #1e293b) !important;
+    border-color: var(--p-border-color, #334155) !important;
 }
 `;
 
