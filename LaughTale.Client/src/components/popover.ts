@@ -61,18 +61,20 @@ const POPOVER_CSS = `
 }
 
 /* Dark Mode Tokens */
-.dark .p-popover,
-[data-theme="dark"] .p-popover {
-    background: var(--lt-surface-900);
-    border-color: var(--lt-surface-700);
-    color: var(--lt-surface-0);
+html.dark .p-popover,
+[data-theme="dark"] .p-popover,
+.dark .p-popover {
+    background: var(--p-surface-0, #090d16);
+    border-color: var(--p-border-color, #334155);
+    color: var(--p-text-color, #f8fafc);
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
 }
 
-.dark .p-popover-arrow,
-[data-theme="dark"] .p-popover-arrow {
-    background: var(--lt-surface-900);
-    border-color: var(--lt-surface-700);
+html.dark .p-popover-arrow,
+[data-theme="dark"] .p-popover-arrow,
+.dark .p-popover-arrow {
+    background: var(--p-surface-0, #090d16);
+    border-color: var(--p-border-color, #334155);
 }
 `;
 

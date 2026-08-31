@@ -205,33 +205,39 @@ const CONFIRM_DIALOG_CSS = `
 }
 
 /* Dark Mode Tokens */
-.dark .p-confirmdialog.p-dialog,
-[data-theme="dark"] .p-confirmdialog.p-dialog {
-    background: var(--lt-surface-900);
-    border-color: var(--lt-surface-700);
+html.dark .p-confirmdialog.p-dialog,
+[data-theme="dark"] .p-confirmdialog.p-dialog,
+.dark .p-confirmdialog.p-dialog {
+    background: var(--p-surface-0, #090d16);
+    border-color: var(--p-border-color, #334155);
 }
-.dark .p-confirmdialog .p-dialog-title,
-[data-theme="dark"] .p-confirmdialog .p-dialog-title {
-    color: var(--lt-surface-0);
+html.dark .p-confirmdialog .p-dialog-title,
+[data-theme="dark"] .p-confirmdialog .p-dialog-title,
+.dark .p-confirmdialog .p-dialog-title {
+    color: var(--p-text-color, #f8fafc);
 }
-.dark .p-confirmdialog .p-dialog-header-close,
-[data-theme="dark"] .p-confirmdialog .p-dialog-header-close {
-    color: var(--lt-surface-400);
+html.dark .p-confirmdialog .p-dialog-header-close,
+[data-theme="dark"] .p-confirmdialog .p-dialog-header-close,
+.dark .p-confirmdialog .p-dialog-header-close {
+    color: var(--p-text-muted, #94a3b8);
 }
-.dark .p-confirmdialog .p-dialog-header-close:hover,
-[data-theme="dark"] .p-confirmdialog .p-dialog-header-close:hover {
-    background: var(--lt-surface-800);
-    color: var(--lt-surface-0, var(--lt-surface-0));
+html.dark .p-confirmdialog .p-dialog-header-close:hover,
+[data-theme="dark"] .p-confirmdialog .p-dialog-header-close:hover,
+.dark .p-confirmdialog .p-dialog-header-close:hover {
+    background: var(--p-surface-100, #1e293b);
+    color: var(--p-text-color, #f8fafc);
 }
-.dark .p-confirmdialog .p-confirmdialog-message,
-[data-theme="dark"] .p-confirmdialog .p-confirmdialog-message {
-    color: var(--lt-surface-300);
+html.dark .p-confirmdialog .p-confirmdialog-message,
+[data-theme="dark"] .p-confirmdialog .p-confirmdialog-message,
+.dark .p-confirmdialog .p-confirmdialog-message {
+    color: var(--p-text-color, #f8fafc);
 }
-.dark .p-confirmdialog-headless-icon,
-[data-theme="dark"] .p-confirmdialog-headless-icon {
+html.dark .p-confirmdialog-headless-icon,
+[data-theme="dark"] .p-confirmdialog-headless-icon,
+.dark .p-confirmdialog-headless-icon {
     background: rgba(16, 185, 129, 0.15);
     border-color: rgba(16, 185, 129, 0.35);
-    color: var(--lt-primary-300, var(--lt-primary-300));
+    color: var(--p-primary-300, #6ee7b7);
 }
 `;
 

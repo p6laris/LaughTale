@@ -218,40 +218,48 @@ const DRAWER_CSS = `
 }
 
 /* Dark Mode Tokens */
-.dark .p-drawer,
-[data-theme="dark"] .p-drawer {
-    background: var(--lt-surface-900);
-    border-color: var(--lt-surface-700);
+html.dark .p-drawer,
+[data-theme="dark"] .p-drawer,
+.dark .p-drawer {
+    background: var(--p-surface-0, #090d16);
+    border-color: var(--p-border-color, #334155);
 }
-.dark .p-drawer-title,
-[data-theme="dark"] .p-drawer-title {
-    color: var(--lt-surface-0);
+html.dark .p-drawer-title,
+[data-theme="dark"] .p-drawer-title,
+.dark .p-drawer-title {
+    color: var(--p-text-color, #f8fafc);
 }
-.dark .p-drawer-close-button,
-[data-theme="dark"] .p-drawer-close-button {
-    color: var(--lt-surface-400);
+html.dark .p-drawer-close-button,
+[data-theme="dark"] .p-drawer-close-button,
+.dark .p-drawer-close-button {
+    color: var(--p-text-muted, #94a3b8);
 }
-.dark .p-drawer-close-button:hover,
-[data-theme="dark"] .p-drawer-close-button:hover {
-    background: var(--lt-surface-800);
-    color: var(--lt-surface-0, var(--lt-surface-0));
+html.dark .p-drawer-close-button:hover,
+[data-theme="dark"] .p-drawer-close-button:hover,
+.dark .p-drawer-close-button:hover {
+    background: var(--p-surface-100, #1e293b);
+    color: var(--p-text-color, #f8fafc);
 }
-.dark .p-drawer-footer,
-[data-theme="dark"] .p-drawer-footer {
-    border-color: var(--lt-surface-700);
+html.dark .p-drawer-footer,
+[data-theme="dark"] .p-drawer-footer,
+.dark .p-drawer-footer {
+    border-color: var(--p-border-color, #334155);
 }
-.dark .p-drawer-nav-item,
-[data-theme="dark"] .p-drawer-nav-item {
-    color: var(--lt-surface-200);
+html.dark .p-drawer-nav-item,
+[data-theme="dark"] .p-drawer-nav-item,
+.dark .p-drawer-nav-item {
+    color: var(--p-text-color, #f8fafc);
 }
-.dark .p-drawer-nav-item:hover,
-[data-theme="dark"] .p-drawer-nav-item:hover {
-    background: var(--lt-surface-800);
-    color: var(--lt-surface-0, var(--lt-surface-0));
+html.dark .p-drawer-nav-item:hover,
+[data-theme="dark"] .p-drawer-nav-item:hover,
+.dark .p-drawer-nav-item:hover {
+    background: var(--p-surface-100, #1e293b);
+    color: var(--p-text-color, #f8fafc);
 }
-.dark .p-drawer-nav-section-title,
-[data-theme="dark"] .p-drawer-nav-section-title {
-    color: var(--lt-surface-400);
+html.dark .p-drawer-nav-section-title,
+[data-theme="dark"] .p-drawer-nav-section-title,
+.dark .p-drawer-nav-section-title {
+    color: var(--p-text-muted, #94a3b8);
 }
 `;
 

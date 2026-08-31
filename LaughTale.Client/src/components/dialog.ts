@@ -184,23 +184,33 @@ const DIALOG_CSS = `
 }
 
 /* Dark Mode Tokens */
-.dark .p-dialog,
-[data-theme="dark"] .p-dialog {
-    background: var(--lt-surface-900);
-    border-color: var(--lt-surface-700);
+html.dark .p-dialog,
+[data-theme="dark"] .p-dialog,
+.dark .p-dialog {
+    background: var(--p-surface-0, #090d16);
+    border-color: var(--p-border-color, #334155);
+    color: var(--p-text-color, #f8fafc);
 }
-.dark .p-dialog-title,
-[data-theme="dark"] .p-dialog-title {
-    color: var(--lt-surface-0);
+html.dark .p-dialog-title,
+[data-theme="dark"] .p-dialog-title,
+.dark .p-dialog-title {
+    color: var(--p-text-color, #f8fafc);
 }
-.dark .p-dialog-header-action,
-[data-theme="dark"] .p-dialog-header-action {
-    color: var(--lt-surface-400);
+html.dark .p-dialog-content,
+[data-theme="dark"] .p-dialog-content,
+.dark .p-dialog-content {
+    color: var(--p-text-color, #f8fafc);
 }
-.dark .p-dialog-header-action:hover,
-[data-theme="dark"] .p-dialog-header-action:hover {
-    background: var(--lt-surface-800);
-    color: var(--lt-surface-0, var(--lt-surface-0));
+html.dark .p-dialog-header-action,
+[data-theme="dark"] .p-dialog-header-action,
+.dark .p-dialog-header-action {
+    color: var(--p-text-muted, #94a3b8);
+}
+html.dark .p-dialog-header-action:hover,
+[data-theme="dark"] .p-dialog-header-action:hover,
+.dark .p-dialog-header-action:hover {
+    background: var(--p-surface-100, #1e293b);
+    color: var(--p-text-color, #f8fafc);
 }
 `;
 
