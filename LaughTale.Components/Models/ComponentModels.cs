@@ -522,10 +522,10 @@ public record ComponentStateProps(
 
 [LaughTale.Core.Attributes.Island("input-number")]
 public record InputNumberProps(
-    double? Value = null, string? Name = null, string? Mode = "decimal", string? Currency = "USD", string? Locale = null,
+    double? Value = null, string? Name = null, InputNumberMode Mode = InputNumberMode.Decimal, string? Currency = "USD", string? Locale = null,
     bool UseGrouping = true, int? MinFractionDigits = null, int? MaxFractionDigits = null,
     string? Prefix = null, string? Suffix = null, double? Min = null, double? Max = null, double Step = 1,
-    bool ShowButtons = false, string? ButtonLayout = "stacked", string? Variant = "outlined", string? Size = "normal",
+    bool ShowButtons = false, ButtonLayout ButtonLayout = ButtonLayout.Stacked, InputVariant Variant = InputVariant.Outlined, ComponentSize Size = ComponentSize.Normal,
     bool Fluid = false, bool Invalid = false, bool ShowClear = false, string? Placeholder = null,
     string? TargetInput = null, bool Disabled = false
 );
@@ -537,11 +537,11 @@ public record NumberProps(
 
 [LaughTale.Core.Attributes.Island("datepicker")]
 public record DatePickerProps(
-    string? Value = null, string? SelectionMode = "single", string? DateFormat = "mm/dd/yy",
+    string? Value = null, DatePickerSelectionMode SelectionMode = DatePickerSelectionMode.Single, string? DateFormat = "mm/dd/yy",
     bool Inline = false, bool ShowIcon = true, bool ShowButtonBar = false, bool ShowTime = false,
     bool TimeOnly = false, bool HourFormat24 = false, int StepMinute = 1, string? MinDate = null,
     string? MaxDate = null, object? DisabledDates = null, object? DisabledDays = null,
-    bool Invalid = false, bool Fluid = false, string? Variant = "outlined", string? Size = "normal",
+    bool Invalid = false, bool Fluid = false, InputVariant Variant = InputVariant.Outlined, ComponentSize Size = ComponentSize.Normal,
     string? Placeholder = null, bool Disabled = false
 );
 
@@ -550,7 +550,7 @@ public record SelectProps(
     object? Value = null, object? Options = null, string? OptionLabel = "label", string? OptionValue = "value",
     string? Placeholder = "Select an option", bool Filter = false, string? FilterPlaceholder = "Search...",
     bool ShowClear = false, bool Checkmark = false, bool Invalid = false, bool Fluid = false,
-    string? Variant = "outlined", string? Size = "normal", bool Disabled = false
+    InputVariant Variant = InputVariant.Outlined, ComponentSize Size = ComponentSize.Normal, bool Disabled = false
 );
 
 [LaughTale.Core.Attributes.Island("autocomplete")]
@@ -558,7 +558,7 @@ public record AutoCompleteProps(
     string? Value = null, object? Suggestions = null, string? Placeholder = "Search...",
     bool Multiple = false, bool Dropdown = false, int MinLength = 1, int Delay = 300,
     bool CompleteOnFocus = false, bool Invalid = false, bool Fluid = false,
-    string? Variant = "outlined", string? Size = "normal", bool Disabled = false
+    InputVariant Variant = InputVariant.Outlined, ComponentSize Size = ComponentSize.Normal, bool Disabled = false
 );
 
 [LaughTale.Core.Attributes.Island("cascade-select")]
@@ -566,14 +566,14 @@ public record CascadeSelectProps(
     object? Value = null, object? Options = null, string? OptionLabel = "label", string? OptionValue = "value",
     string? OptionGroupLabel = "label", string? OptionGroupChildren = "children",
     string? Placeholder = "Select a category", bool ShowClear = false, bool Invalid = false,
-    bool Fluid = false, string? Variant = "outlined", string? Size = "normal", bool Disabled = false
+    bool Fluid = false, InputVariant Variant = InputVariant.Outlined, ComponentSize Size = ComponentSize.Normal, bool Disabled = false
 );
 
 [LaughTale.Core.Attributes.Island("checkbox")]
 public record CheckboxProps(
     bool Checked = false, bool Binary = true, string? Value = null, string? Label = null,
-    bool Indeterminate = false, bool Invalid = false, string? Variant = "outlined",
-    string? Size = "normal", bool Disabled = false
+    bool Indeterminate = false, bool Invalid = false, InputVariant Variant = InputVariant.Outlined,
+    ComponentSize Size = ComponentSize.Normal, bool Disabled = false
 );
 
 [LaughTale.Core.Attributes.Island("color-picker")]
@@ -586,13 +586,13 @@ public record ColorPickerProps(
 public record InputMaskProps(
     string? Value = null, string? Mask = "99/99/9999", string? SlotChar = "_",
     bool AutoClear = true, bool Unmask = false, bool Invalid = false, bool Fluid = false,
-    string? Variant = "outlined", string? Size = "normal", string? Placeholder = null, bool Disabled = false
+    InputVariant Variant = InputVariant.Outlined, ComponentSize Size = ComponentSize.Normal, string? Placeholder = null, bool Disabled = false
 );
 
 [LaughTale.Core.Attributes.Island("input-otp")]
 public record InputOtpProps(
     string? Value = null, int Length = 4, bool IntegerOnly = false, bool Mask = false,
-    string? Variant = "outlined", string? Size = "normal", bool Invalid = false, bool Disabled = false
+    InputVariant Variant = InputVariant.Outlined, ComponentSize Size = ComponentSize.Normal, bool Invalid = false, bool Disabled = false
 );
 
 [LaughTale.Core.Attributes.Island("input-password")]
@@ -600,8 +600,8 @@ public record InputPasswordProps(
     string? Value = null, bool ToggleMask = true, bool Feedback = false,
     string? PromptLabel = "Please enter a password", string? WeakLabel = "Too simple",
     string? MediumLabel = "Average complexity", string? StrongLabel = "Complex password",
-    bool Invalid = false, bool Fluid = false, string? Variant = "outlined",
-    string? Size = "normal", string? Placeholder = null, bool Disabled = false
+    bool Invalid = false, bool Fluid = false, InputVariant Variant = InputVariant.Outlined,
+    ComponentSize Size = ComponentSize.Normal, string? Placeholder = null, bool Disabled = false
 );
 
 [LaughTale.Core.Attributes.Island("input-tags")]
@@ -610,14 +610,14 @@ public record InputTagsProps(
     int? Max = null, bool AllowDuplicates = false, bool AllowDuplicate = false,
     string? Separator = ",", bool AddOnBlur = true, bool AddOnPaste = true,
     bool Typeahead = false, object? Suggestions = null, string? InputId = null,
-    bool Invalid = false, bool Fluid = false, string? Variant = "outlined",
-    string? Size = "normal", bool Disabled = false
+    bool Invalid = false, bool Fluid = false, InputVariant Variant = InputVariant.Outlined,
+    ComponentSize Size = ComponentSize.Normal, bool Disabled = false
 );
 
 [LaughTale.Core.Attributes.Island("input-text")]
 public record InputTextProps(
-    string? Value = null, string? Placeholder = null, string? Variant = "outlined",
-    string? Size = "normal", bool Fluid = false, bool Invalid = false,
+    string? Value = null, string? Placeholder = null, InputVariant Variant = InputVariant.Outlined,
+    ComponentSize Size = ComponentSize.Normal, bool Fluid = false, bool Invalid = false,
     bool ShowClear = false, bool Disabled = false, string? InputId = null,
     string? IconLeft = null, string? IconRight = null, string? HelpText = null
 );
@@ -646,13 +646,13 @@ public record MultiSelectProps(
     string? SelectedItemsLabel = "{0} items selected", bool Filter = false,
     string? FilterPlaceholder = "Search...", bool ShowClear = false,
     bool ShowSelectAll = true, bool Invalid = false, bool Fluid = false,
-    string? Variant = "outlined", string? Size = "normal", bool Disabled = false
+    InputVariant Variant = InputVariant.Outlined, ComponentSize Size = ComponentSize.Normal, bool Disabled = false
 );
 
 [LaughTale.Core.Attributes.Island("radio-button")]
 public record RadioButtonProps(
     string? Value = null, string? GroupValue = null, string? Name = null,
-    string? Label = null, string? Variant = "outlined", string? Size = "normal",
+    string? Label = null, InputVariant Variant = InputVariant.Outlined, ComponentSize Size = ComponentSize.Normal,
     bool Invalid = false, bool Disabled = false
 );
 
@@ -665,7 +665,7 @@ public record RatingProps(
 public record SelectButtonProps(
     string? Value = null, object? Options = null, string? OptionLabel = "label",
     string? OptionValue = "value", bool Multiple = false, bool AllowEmpty = true,
-    string? Size = "normal", bool Fluid = false, bool Invalid = false, bool Disabled = false
+    ComponentSize Size = ComponentSize.Normal, bool Fluid = false, bool Invalid = false, bool Disabled = false
 );
 
 [LaughTale.Core.Attributes.Island("slider")]
@@ -677,20 +677,20 @@ public record SliderProps(
 [LaughTale.Core.Attributes.Island("textarea")]
 public record TextareaProps(
     string? Value = null, int? Rows = 3, int? Cols = 20, bool AutoResize = false,
-    string? Variant = "outlined", string? Size = "normal", bool Fluid = false,
+    InputVariant Variant = InputVariant.Outlined, ComponentSize Size = ComponentSize.Normal, bool Fluid = false,
     bool Invalid = false, string? Placeholder = null, bool Disabled = false
 );
 
 [LaughTale.Core.Attributes.Island("toggle-button")]
 public record ToggleButtonProps(
     bool Checked = false, string? OnLabel = "Yes", string? OffLabel = "No",
-    string? OnIcon = null, string? OffIcon = null, string? Size = "normal",
+    string? OnIcon = null, string? OffIcon = null, ComponentSize Size = ComponentSize.Normal,
     bool Invalid = false, bool Disabled = false
 );
 
 [LaughTale.Core.Attributes.Island("toggle-switch")]
 public record ToggleSwitchProps(
-    bool Checked = false, string? Size = "normal", bool Invalid = false, bool Disabled = false
+    bool Checked = false, ComponentSize Size = ComponentSize.Normal, bool Invalid = false, bool Disabled = false
 );
 
 [LaughTale.Core.Attributes.Island("tree-select")]
@@ -698,7 +698,7 @@ public record TreeSelectProps(
     object? Value = null, object? Options = null, string? Placeholder = "Select Item",
     string? SelectionMode = "single", string? Display = "comma", bool Filter = false,
     string? FilterPlaceholder = "Filter...", bool ShowClear = false, bool Fluid = false,
-    string? Variant = "outlined", string? Size = "normal", bool Invalid = false, bool Disabled = false
+    InputVariant Variant = InputVariant.Outlined, ComponentSize Size = ComponentSize.Normal, bool Invalid = false, bool Disabled = false
 );
 
 [LaughTale.Core.Attributes.Island("datatable")]
@@ -707,7 +707,7 @@ public record DataTableProps(
     object? RowsPerPageOptions = null, bool Sortable = true, bool Filterable = false,
     string? SelectionMode = null, bool ResizableColumns = false, bool ReorderableColumns = false,
     bool Scrollable = false, string? ScrollHeight = null, bool StripedRows = false,
-    bool ShowGridlines = false, string? Size = "normal", bool Loading = false
+    bool ShowGridlines = false, ComponentSize Size = ComponentSize.Normal, bool Loading = false
 );
 
 [LaughTale.Core.Attributes.Island("dataview")]
@@ -872,7 +872,7 @@ public record MeterGroupProps(
 
 [LaughTale.Core.Attributes.Island("skeleton")]
 public record SkeletonProps(
-    string? Shape = "rectangle", string? Size = null, string? Width = "100%",
+    string? Shape = "rectangle", ComponentSize? Size = null, string? Width = "100%",
     string? Height = "1rem", string? BorderRadius = null, string? Animation = "wave"
 );
 
@@ -941,7 +941,7 @@ public record DividerProps(
 
 [LaughTale.Core.Attributes.Island("input-group")]
 public record InputGroupProps(
-    string? Size = "normal", bool Fluid = false
+    ComponentSize Size = ComponentSize.Normal, bool Fluid = false
 );
 
 [LaughTale.Core.Attributes.Island("input-group-addon")]
@@ -951,7 +951,7 @@ public record InputGroupAddonProps(
 
 [LaughTale.Core.Attributes.Island("float-label")]
 public record FloatLabelProps(
-    string? Label = null, object? Variant = null, bool Invalid = false
+    string? Label = null, FloatLabelVariant Variant = FloatLabelVariant.Over, bool Invalid = false
 );
 
 [LaughTale.Core.Attributes.Island("ifta-label")]
@@ -966,13 +966,13 @@ public record IconFieldProps(
 
 [LaughTale.Core.Attributes.Island("badge")]
 public record BadgeProps(
-    string? Value = null, string? Severity = null, string? Size = "normal"
+    string? Value = null, string? Severity = null, ComponentSize Size = ComponentSize.Normal
 );
 
 [LaughTale.Core.Attributes.Island("avatar")]
 public record AvatarProps(
     string? Label = null, string? Icon = null, string? Image = null,
-    string? Size = "normal", string? Shape = "square"
+    ComponentSize Size = ComponentSize.Normal, string? Shape = "square"
 );
 
 [LaughTale.Core.Attributes.Island("avatar-group")]

@@ -248,4 +248,36 @@ public class TagHelpersTests
         var content = output.Content.GetContent();
         Assert.Contains("<use href=\"/_lt/icons.svg#check\"></use>", content);
     }
+
+    [Fact]
+    public void TagHelperEnums_SerializeToCamelCaseJson()
+    {
+        var helper = new IslandInputTextTagHelper
+        {
+            Variant = InputVariant.Filled,
+            Size = ComponentSize.Large,
+            Value = "Hello Enum"
+        };
+
+        var (context, output) = CreateTagHelperContext("island-input-text");
+        helper.Process(context, output);
+
+        var propsJson = output.Attributes["data-props"].Value.ToString()!;
+        Assert.Contains("\"variant\":\"filled\"", propsJson);
+        Assert.Contains("\"size\":\"large\"", propsJson);
+    }
+
+    [Fact]
+    public void TagHelperEnums_TypoFailsParsing()
+    {
+        var validParsed = Enum.TryParse<InputVariant>("Outlined", ignoreCase: true, out var validResult);
+        Assert.True(validParsed);
+        Assert.Equal(InputVariant.Outlined, validResult);
+
+        var typoParsed = Enum.TryParse<InputVariant>("outlnied", ignoreCase: true, out _);
+        Assert.False(typoParsed, "A typo'd variant must fail enum parsing.");
+
+        var sizeTypoParsed = Enum.TryParse<ComponentSize>("normalll", ignoreCase: true, out _);
+        Assert.False(sizeTypoParsed, "A typo'd size must fail enum parsing.");
+    }
 }
