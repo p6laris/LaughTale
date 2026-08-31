@@ -26,6 +26,7 @@ public static class ServiceCollectionExtensions
 
         // Core island services
         services.TryAddSingleton<ILaughTaleLocalizer, LaughTaleLocalizer>();
+        services.TryAddSingleton<LaughTale.Core.Security.IIslandAuthorizationRegistry, LaughTale.Core.Security.IslandAuthorizationRegistry>();
 
         return services;
     }

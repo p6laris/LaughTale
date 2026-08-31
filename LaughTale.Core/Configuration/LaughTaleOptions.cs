@@ -43,6 +43,39 @@ public sealed class LaughTaleOptions
     /// Self-hosted SVG icon sprite and Lucide integration options.
     /// </summary>
     public IconOptions Icons { get; set; } = new();
+
+    /// <summary>
+    /// Server-driven island refresh, antiforgery, and authorization options (LT-2203).
+    /// </summary>
+    public IslandRefreshOptions Refresh { get; set; } = new();
+}
+
+/// <summary>
+/// Server-driven island refresh, antiforgery, and authorization policy configuration.
+/// </summary>
+public sealed class IslandRefreshOptions
+{
+    /// <summary>
+    /// Gets or sets whether CSRF antiforgery tokens must be validated on refresh POST requests. Default: true.
+    /// </summary>
+    public bool RequireAntiforgery { get; set; } = true;
+
+    /// <summary>
+    /// Per-island policy requirements (islandName -> policyName).
+    /// </summary>
+    public Dictionary<string, string> IslandPolicies { get; } = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Registers a required authorization policy for a given island.
+    /// </summary>
+    public IslandRefreshOptions RequirePolicy(string islandName, string policyName)
+    {
+        if (!string.IsNullOrWhiteSpace(islandName) && !string.IsNullOrWhiteSpace(policyName))
+        {
+            IslandPolicies[islandName] = policyName;
+        }
+        return this;
+    }
 }
 
 /// <summary>

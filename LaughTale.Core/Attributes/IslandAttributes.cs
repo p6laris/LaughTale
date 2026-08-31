@@ -1,4 +1,4 @@
-﻿using LaughTale.Core.Enums;
+using LaughTale.Core.Enums;
 
 namespace LaughTale.Core.Attributes;
 
@@ -48,5 +48,20 @@ public sealed class InputMaskAttribute : Attribute
     public InputMaskAttribute(string mask)
     {
         Mask = mask ?? throw new ArgumentNullException(nameof(mask));
+    }
+}
+
+/// <summary>
+/// Specifies the authorization policy or roles required to render or refresh this island.
+/// </summary>
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false, Inherited = true)]
+public sealed class IslandAuthorizeAttribute : Attribute
+{
+    public string? Policy { get; set; }
+    public string? Roles { get; set; }
+
+    public IslandAuthorizeAttribute(string? policy = null)
+    {
+        Policy = policy;
     }
 }

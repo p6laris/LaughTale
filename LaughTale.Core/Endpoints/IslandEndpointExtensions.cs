@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -19,12 +20,16 @@ namespace LaughTale.Core.Endpoints;
 public static class IslandEndpointExtensions
 {
     /// <summary>
-    /// Maps the LaughTale server-driven island refresh endpoint.
+    /// Maps the LaughTale server-driven island refresh endpoint with strict authorization and antiforgery enforcement (LT-2203).
     /// </summary>
     public static IEndpointRouteBuilder MapLaughTaleIslandRefresh(
         this IEndpointRouteBuilder endpoints, 
-        string pattern = "/_laughtale/island/{name}")
+        string pattern = "/_laughtale/island/{name}",
+        Action<LaughTale.Core.Configuration.IslandRefreshOptions>? configure = null)
     {
+        var localOptions = new LaughTale.Core.Configuration.IslandRefreshOptions();
+        configure?.Invoke(localOptions);
+
         endpoints.MapPost(pattern, async (string name, HttpContext context) =>
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -32,7 +37,46 @@ public static class IslandEndpointExtensions
                 return Results.BadRequest(new { error = "Island name is required." });
             }
 
-            // Read props from JSON body if present
+            var laughTaleOptions = context.RequestServices.GetService<Microsoft.Extensions.Options.IOptions<LaughTale.Core.Configuration.LaughTaleOptions>>()?.Value;
+
+            // 1. Antiforgery validation (LT-1503 / LT-2203)
+            var requireAntiforgery = localOptions.RequireAntiforgery && (laughTaleOptions?.Refresh.RequireAntiforgery ?? true);
+            if (requireAntiforgery)
+            {
+                var antiforgery = context.RequestServices.GetService<Microsoft.AspNetCore.Antiforgery.IAntiforgery>();
+                if (antiforgery != null)
+                {
+                    try
+                    {
+                        await antiforgery.ValidateRequestAsync(context);
+                    }
+                    catch
+                    {
+                        return Results.StatusCode(StatusCodes.Status400BadRequest);
+                    }
+                }
+            }
+
+            // 2. Authorization policy check (LT-2203)
+            var authService = context.RequestServices.GetService<Microsoft.AspNetCore.Authorization.IAuthorizationService>();
+            var authRegistry = context.RequestServices.GetService<LaughTale.Core.Security.IIslandAuthorizationRegistry>();
+
+            string? policy = null;
+            if (localOptions.IslandPolicies.TryGetValue(name, out var localPol)) policy = localPol;
+            else if (laughTaleOptions?.Refresh.IslandPolicies.TryGetValue(name, out var globalPol) == true) policy = globalPol;
+            else if (authRegistry != null) policy = authRegistry.GetPolicy(name);
+
+            if (!string.IsNullOrWhiteSpace(policy) && authService != null)
+            {
+                var authResult = await authService.AuthorizeAsync(context.User, policy);
+                if (!authResult.Succeeded)
+                {
+                    // 403 Forbidden: Render nothing, zero props leaked in the response body.
+                    return Results.StatusCode(StatusCodes.Status403Forbidden);
+                }
+            }
+
+            // 3. Read props from JSON body if present
             string propsJson = "{}";
             if (context.Request.ContentLength > 0)
             {
@@ -40,7 +84,7 @@ public static class IslandEndpointExtensions
                 propsJson = await reader.ReadToEndAsync();
             }
 
-            // Render island container with updated props
+            // 4. Render island container with updated props
             var html = $"<div data-island=\"{System.Net.WebUtility.HtmlEncode(name)}\" data-props=\"{System.Net.WebUtility.HtmlEncode(propsJson)}\" data-hydrate=\"load\"></div>";
 
             context.Response.ContentType = "text/html; charset=utf-8";
@@ -48,7 +92,9 @@ public static class IslandEndpointExtensions
             return Results.Empty;
         })
         .WithName("LaughTaleIslandRefresh")
-        .Produces(StatusCodes.Status200OK, contentType: "text/html");
+        .Produces(StatusCodes.Status200OK, contentType: "text/html")
+        .Produces(StatusCodes.Status403Forbidden)
+        .Produces(StatusCodes.Status400BadRequest);
 
         return endpoints;
     }
