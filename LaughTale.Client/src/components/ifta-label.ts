@@ -81,17 +81,29 @@ const CSS = `
 }
 
 /* Dark Mode Tokens */
+html.dark .laughtale-ifta-label > label,
+[data-theme="dark"] .laughtale-ifta-label > label,
 .dark .laughtale-ifta-label > label {
-    color: var(--lt-surface-400);
+    color: var(--p-text-muted, #94a3b8);
 }
+html.dark .laughtale-ifta-label:focus-within > label,
+[data-theme="dark"] .laughtale-ifta-label:focus-within > label,
 .dark .laughtale-ifta-label:focus-within > label {
-    color: var(--lt-primary-400);
+    color: var(--p-primary-400, #34d399);
 }
+html.dark .laughtale-ifta-label.invalid > label,
+html.dark .laughtale-ifta-label:has(.invalid) > label,
+html.dark .laughtale-ifta-label:has(.is-invalid) > label,
+html.dark .laughtale-ifta-label:has(:invalid) > label,
+[data-theme="dark"] .laughtale-ifta-label.invalid > label,
+[data-theme="dark"] .laughtale-ifta-label:has(.invalid) > label,
+[data-theme="dark"] .laughtale-ifta-label:has(.is-invalid) > label,
+[data-theme="dark"] .laughtale-ifta-label:has(:invalid) > label,
 .dark .laughtale-ifta-label.invalid > label,
 .dark .laughtale-ifta-label:has(.invalid) > label,
 .dark .laughtale-ifta-label:has(.is-invalid) > label,
 .dark .laughtale-ifta-label:has(:invalid) > label {
-    color: var(--lt-danger-400, var(--lt-danger-400)) !important;
+    color: var(--p-red-400, #f87171) !important;
 }
 `;
 

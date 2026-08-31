@@ -211,29 +211,48 @@ const CSS = `
 }
 
 /* ==================== DARK MODE ==================== */
+html.dark .p-inputtext,
+[data-theme="dark"] .p-inputtext,
 .dark .p-inputtext {
-    background: var(--lt-surface-900);
-    border-color: var(--lt-surface-700);
-    color: var(--lt-surface-0);
+    background: var(--p-surface-0, #090d16);
+    border-color: var(--p-border-color, #334155);
+    color: var(--p-text-color, #f8fafc);
 }
+html.dark .p-inputtext:hover:not(:disabled):not(.is-invalid):not(.p-invalid),
+[data-theme="dark"] .p-inputtext:hover:not(:disabled):not(.is-invalid):not(.p-invalid),
 .dark .p-inputtext:hover:not(:disabled):not(.is-invalid):not(.p-invalid) {
-    border-color: var(--lt-surface-500);
+    border-color: var(--p-surface-400, #64748b);
 }
+html.dark .p-inputtext.variant-filled,
+html.dark .p-inputtext.p-variant-filled,
+[data-theme="dark"] .p-inputtext.variant-filled,
+[data-theme="dark"] .p-inputtext.p-variant-filled,
 .dark .p-inputtext.variant-filled,
 .dark .p-inputtext.p-variant-filled {
-    background: var(--lt-surface-800);
+    background: var(--p-surface-100, #1e293b);
 }
+html.dark .p-inputtext.variant-filled:focus,
+[data-theme="dark"] .p-inputtext.variant-filled:focus,
 .dark .p-inputtext.variant-filled:focus {
-    background: var(--lt-surface-900);
+    background: var(--p-surface-0, #090d16);
 }
+html.dark .p-inputtext:disabled,
+[data-theme="dark"] .p-inputtext:disabled,
 .dark .p-inputtext:disabled {
-    background: var(--lt-surface-800);
-    border-color: var(--lt-surface-700);
-    color: var(--lt-surface-500);
+    background: var(--p-surface-100, #1e293b);
+    border-color: var(--p-border-color, #334155);
+    color: var(--p-text-muted, #94a3b8);
 }
+html.dark .p-inputtext-clear:hover,
+[data-theme="dark"] .p-inputtext-clear:hover,
 .dark .p-inputtext-clear:hover {
-    background: var(--lt-surface-700);
-    color: var(--lt-surface-200);
+    background: var(--p-surface-100, #1e293b);
+    color: var(--p-text-color, #f8fafc);
+}
+html.dark .p-inputtext-icon,
+[data-theme="dark"] .p-inputtext-icon,
+.dark .p-inputtext-icon {
+    color: var(--p-text-muted, #94a3b8);
 }
 `;
 

@@ -119,21 +119,37 @@ const CSS = `
 }
 
 /* Dark Mode Tokens */
+html.dark .laughtale-float-label > label,
+[data-theme="dark"] .laughtale-float-label > label,
 .dark .laughtale-float-label > label {
-    color: var(--lt-surface-400);
+    color: var(--p-text-muted, #94a3b8);
 }
+html.dark .laughtale-float-label-on > label,
+[data-theme="dark"] .laughtale-float-label-on > label,
 .dark .laughtale-float-label-on > label {
-    background: var(--lt-surface-900);
+    background: var(--p-surface-0, #090d16);
 }
+html.dark .laughtale-float-label.has-value > label,
+html.dark .laughtale-float-label:focus-within > label,
+[data-theme="dark"] .laughtale-float-label.has-value > label,
+[data-theme="dark"] .laughtale-float-label:focus-within > label,
 .dark .laughtale-float-label.has-value > label,
 .dark .laughtale-float-label:focus-within > label {
-    color: var(--lt-primary-400);
+    color: var(--p-primary-400, #34d399);
 }
+html.dark .laughtale-float-label.invalid > label,
+html.dark .laughtale-float-label:has(.invalid) > label,
+html.dark .laughtale-float-label:has(.is-invalid) > label,
+html.dark .laughtale-float-label:has(:invalid) > label,
+[data-theme="dark"] .laughtale-float-label.invalid > label,
+[data-theme="dark"] .laughtale-float-label:has(.invalid) > label,
+[data-theme="dark"] .laughtale-float-label:has(.is-invalid) > label,
+[data-theme="dark"] .laughtale-float-label:has(:invalid) > label,
 .dark .laughtale-float-label.invalid > label,
 .dark .laughtale-float-label:has(.invalid) > label,
 .dark .laughtale-float-label:has(.is-invalid) > label,
 .dark .laughtale-float-label:has(:invalid) > label {
-    color: var(--lt-danger-400, var(--lt-danger-400)) !important;
+    color: var(--p-red-400, #f87171) !important;
 }
 `;
 
