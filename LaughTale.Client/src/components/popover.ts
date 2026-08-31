@@ -10,6 +10,8 @@ import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
 
 const POPOVER_CSS = `
+island-popover,
+.laughtale-popover,
 .p-popover {
     position: fixed;
     z-index: 1200;
@@ -29,6 +31,8 @@ const POPOVER_CSS = `
     transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.2s;
 }
 
+island-popover.p-popover-active,
+.laughtale-popover.p-popover-active,
 .p-popover.p-popover-active {
     visibility: visible;
     opacity: 1;
@@ -216,6 +220,15 @@ function initGlobalPopoverDelegation(signal?: AbortSignal) {
 
 export default function PopoverIsland(container: HTMLElement, props: PopoverProps, ctx?: IslandContext) {
     injectIslandStyle('popover', POPOVER_CSS);
+    container.classList.add('laughtale-popover', 'p-popover', 'p-component');
     container.setAttribute('data-part', 'root');
+
+    // Add arrow notch if not already present
+    if (props.showArrow !== false && !container.querySelector('.p-popover-arrow')) {
+        const arrow = document.createElement('div');
+        arrow.className = 'p-popover-arrow p-popover-arrow-top';
+        container.appendChild(arrow);
+    }
+
     initGlobalPopoverDelegation(ctx?.signal);
 }

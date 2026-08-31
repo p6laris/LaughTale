@@ -39,13 +39,14 @@ html.dark .avatar-overflow,
 export default function AvatarGroupIsland(container: HTMLElement, props: AvatarGroupProps, ctx?: IslandContext) {
     injectIslandStyle('avatar-group', CSS);
     const max = props.max || 4;
-    const visible = props.avatars.slice(0, max);
-    const overflowCount = props.avatars.length - max;
+    const rawAvatars: AvatarItem[] = Array.isArray(props.avatars) ? props.avatars : (Array.isArray((props as any).items) ? (props as any).items : []);
+    const visible = rawAvatars.slice(0, max);
+    const overflowCount = rawAvatars.length - max;
 
     const sizePx = props.size === 'sm' ? '1.75rem' : props.size === 'lg' ? '2.75rem' : '2.25rem';
     const fontSize = props.size === 'sm' ? '0.6875rem' : props.size === 'lg' ? '0.9375rem' : '0.75rem';
 
-    const avatarElements = visible.map((av) => {
+    const avatarElements = visible.map((av: AvatarItem) => {
         const bg = av.bg || 'var(--lt-surface-800)';
         return `
             <div class="avatar-circle" data-part="root" title="${av.name || av.label || ''}" style="width: ${sizePx}; height: ${sizePx}; border-radius: 50%; border: 2px solid var(--lt-surface-0, var(--lt-surface-0)); background: ${bg}; color: var(--lt-surface-0, var(--lt-surface-0)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: ${fontSize}; margin-left: -0.5rem; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.1); flex-shrink: 0;">

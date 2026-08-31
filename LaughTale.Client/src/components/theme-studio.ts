@@ -186,7 +186,7 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
                         </div>
                         <div class="studio-color-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(2.1rem, 1fr)); gap: 0.4rem; margin-bottom: 0.75rem;"></div>
                         <div style="display: flex; align-items: center; gap: 0.5rem; background: var(--lt-surface-50); border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); padding: 0.35rem 0.6rem;">
-                            <input type="color" class="studio-custom-color-input" value="var(--lt-primary-500, #10b981)" style="width: 1.75rem; height: 1.75rem; border: none; border-radius: 4px; cursor: pointer; background: transparent;" />
+                            <input type="color" class="studio-custom-color-input" value="#10b981" style="width: 1.75rem; height: 1.75rem; border: none; border-radius: 4px; cursor: pointer; background: transparent;" />
                             <span style="font-size: 0.75rem; font-family: monospace; color: var(--lt-surface-600);">Custom Hex Accent</span>
                         </div>
                     </div>

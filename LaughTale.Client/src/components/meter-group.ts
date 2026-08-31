@@ -31,20 +31,22 @@ html.dark .laughtale-metergroup,
 
 export default function MeterGroupIsland(container: HTMLElement, props: MeterGroupProps, ctx?: IslandContext) {
     injectIslandStyle('meter-group', CSS);
-    const total = props.values.reduce((acc, curr) => acc + curr.value, 0);
+    const rawValues: MeterValue[] = Array.isArray(props.values) ? props.values : (Array.isArray((props as any).value) ? (props as any).value : []);
+    const total = rawValues.reduce((acc: number, curr: MeterValue) => acc + (curr?.value || 0), 0);
 
-    const barSegments = props.values.map((v) => {
-        const pct = total > 0 ? (v.value / total) * 100 : 0;
+    const barSegments = rawValues.map((v: MeterValue) => {
+        const val = v?.value || 0;
+        const pct = total > 0 ? (val / total) * 100 : 0;
         return `
-            <div style="height: 100%; width: ${pct}%; background: ${v.color}; transition: width 0.4s ease;" title="${v.label}: ${v.value}%"></div>
+            <div style="height: 100%; width: ${pct}%; background: ${v?.color || 'var(--p-primary-500)'}; transition: width 0.4s ease;" title="${v?.label || ''}: ${val}%"></div>
         `;
     }).join('');
 
-    const legendItems = props.values.map((v) => `
+    const legendItems = rawValues.map((v: MeterValue) => `
         <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem;">
-            <div style="width: 0.625rem; height: 0.625rem; border-radius: 50%; background: ${v.color}; flex-shrink: 0;"></div>
-            <span style="color: var(--lt-surface-600);">${v.label}</span>
-            <span style="font-weight: 700; color: var(--lt-surface-900); font-family: var(--p-font-mono);">${v.value}%</span>
+            <div style="width: 0.625rem; height: 0.625rem; border-radius: 50%; background: ${v?.color || 'var(--p-primary-500)'}; flex-shrink: 0;"></div>
+            <span style="color: var(--lt-surface-600);">${v?.label || ''}</span>
+            <span style="font-weight: 700; color: var(--lt-surface-900); font-family: var(--p-font-mono);">${v?.value || 0}%</span>
         </div>
     `).join('');
 
