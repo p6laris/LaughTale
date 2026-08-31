@@ -1,4 +1,4 @@
-import { IslandContext, onIslandEvent } from '../../../LaughTale.Client/src/index';
+import { IslandContext, onIslandEvent, emitIslandEvent } from '../../../LaughTale.Client/src/index';
 
 const ICONS = {
     trendingUp: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>`,
@@ -71,12 +71,28 @@ export default function PreactPolyglotIsland(
                     </div>
                 </div>
 
-                <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--p-text-muted); margin-top: 1rem; border-top: 1px solid var(--p-border-color); padding-top: 0.75rem;">
-                    <span>Floor: <strong>${min} tx/s</strong></span>
-                    <span>Peak: <strong>${max} tx/s</strong></span>
+                <!-- Footer & Action -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; border-top: 1px solid var(--p-border-color); padding-top: 0.75rem;">
+                    <span style="font-size: 0.75rem; color: var(--p-text-muted);">Peak: <strong>${max} tx/s</strong></span>
+                    <button type="button" class="btn-burst p-button p-button-outlined p-button-sm" style="font-size: 0.75rem; padding: 0.35rem 0.65rem; display: inline-flex; align-items: center; gap: 0.35rem; font-weight: 600;">
+                        ${ICONS.zap} Burst (+25 tx/s)
+                    </button>
                 </div>
             </div>
         `;
+
+        container.querySelector('.btn-burst')?.addEventListener('click', () => {
+            const newTx = (data[data.length - 1] || 40) + 25;
+            data.push(newTx);
+            if (data.length > 10) data.shift();
+            emitIslandEvent('polyglot:burst', {
+                source: 'Preact Island',
+                throughput: newTx,
+                latencyMs: (Math.random() * 2 + 1.5).toFixed(1),
+                timestamp: new Date().toLocaleTimeString()
+            });
+            render();
+        }, { signal: ctx?.signal });
     }
 
     render();

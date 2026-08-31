@@ -1,4 +1,4 @@
-import { IslandContext, onIslandEvent } from '../../../LaughTale.Client/src/index';
+import { IslandContext, onIslandEvent, emitIslandEvent } from '../../../LaughTale.Client/src/index';
 
 const ICONS = {
     cpu: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/><path d="M15 2v2"/><path d="M15 20v2"/><path d="M2 15h2"/><path d="M2 9h2"/><path d="M20 15h2"/><path d="M20 9h2"/><path d="M9 2v2"/><path d="M9 20v2"/></svg>`,
@@ -83,6 +83,12 @@ export default function SveltePolyglotIsland(
 
         container.querySelector('.btn-stress')?.addEventListener('click', () => {
             load = Math.min(98, load + 25);
+            emitIslandEvent('polyglot:spike', {
+                source: 'Svelte 5 Island',
+                node: title,
+                loadPercent: load,
+                timestamp: new Date().toLocaleTimeString()
+            });
             render();
         }, { signal: ctx?.signal });
     }

@@ -82,17 +82,25 @@ export default function VanillaPolyglotIsland(
 
     render();
 
-    const unsubscribe = onIslandEvent('polyglot:sale', (payload: any) => {
+    function logEvent(actionName: string, payload: any) {
         logs.unshift({
             time: payload.timestamp || new Date().toLocaleTimeString(),
             source: payload.source || 'EventBus',
-            action: 'EVENT:polyglot:sale',
+            action: `EVENT:${actionName}`,
             payload: JSON.stringify(payload)
         });
-        if (logs.length > 8) logs.pop();
+        if (logs.length > 10) logs.pop();
         render();
-    });
+    }
 
-    ctx?.onCleanup(() => unsubscribe?.());
-    return () => unsubscribe?.();
+    const unsubs = [
+        onIslandEvent('polyglot:sale', (payload: any) => logEvent('polyglot:sale', payload)),
+        onIslandEvent('polyglot:cart', (payload: any) => logEvent('polyglot:cart', payload)),
+        onIslandEvent('polyglot:restock', (payload: any) => logEvent('polyglot:restock', payload)),
+        onIslandEvent('polyglot:spike', (payload: any) => logEvent('polyglot:spike', payload)),
+        onIslandEvent('polyglot:burst', (payload: any) => logEvent('polyglot:burst', payload))
+    ];
+
+    ctx?.onCleanup(() => unsubs.forEach(u => u?.()));
+    return () => unsubs.forEach(u => u?.());
 }
