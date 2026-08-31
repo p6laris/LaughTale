@@ -42,10 +42,10 @@ export default function VanillaPolyglotIsland(
                     </div>
 
                     <!-- Terminal Event Log Box -->
-                    <div style="background: var(--p-surface-950, #0f172a); border: 1px solid var(--p-surface-800, #1e293b); border-radius: var(--p-border-radius-md); padding: 0.85rem; min-height: 120px; max-height: 130px; overflow-y: auto; font-family: var(--p-font-mono, monospace); font-size: 0.75rem; line-height: 1.6; color: #cbd5e1;">
+                    <div style="background: #090d16; border: 1px solid #1e293b; border-radius: var(--p-border-radius-md); padding: 0.85rem; min-height: 120px; max-height: 130px; overflow-y: auto; font-family: var(--p-font-mono, monospace); font-size: 0.75rem; line-height: 1.6; color: #cbd5e1; box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);">
                         ${logs.length === 0 ? `
-                            <div style="color: #64748b; font-style: italic; display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0;">
-                                <span style="width: 7px; height: 7px; border-radius: 50%; background: #10b981; animation: pulse 1.5s infinite;"></span>
+                            <div style="color: #94a3b8; font-style: italic; display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0;">
+                                <span style="width: 7px; height: 7px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px #10b981; animation: pulse 1.5s infinite;"></span>
                                 Listening to cross-framework broadcasts... (Click React or Svelte buttons!)
                             </div>
                         ` : ''}
