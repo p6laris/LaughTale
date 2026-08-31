@@ -264,6 +264,13 @@ public class IslandGenerator : IIncrementalGenerator
         sb.AppendLine($"[HtmlTargetElement(\"island-{model.IslandName}\", TagStructure = TagStructure.NormalOrSelfClosing)]");
         sb.AppendLine($"[HtmlTargetElement(\"lt-{model.IslandName}\", TagStructure = TagStructure.NormalOrSelfClosing)]");
         sb.AppendLine($"[HtmlTargetElement(\"aura-{model.IslandName}\", TagStructure = TagStructure.NormalOrSelfClosing)]");
+        if (model.IslandName.Contains("-"))
+        {
+            var noHyphen = model.IslandName.Replace("-", "");
+            sb.AppendLine($"[HtmlTargetElement(\"island-{noHyphen}\", TagStructure = TagStructure.NormalOrSelfClosing)]");
+            sb.AppendLine($"[HtmlTargetElement(\"lt-{noHyphen}\", TagStructure = TagStructure.NormalOrSelfClosing)]");
+            sb.AppendLine($"[HtmlTargetElement(\"aura-{noHyphen}\", TagStructure = TagStructure.NormalOrSelfClosing)]");
+        }
         if (model.IslandName == "input-number")
         {
             sb.AppendLine("[HtmlTargetElement(\"island-number\", TagStructure = TagStructure.NormalOrSelfClosing)]");
