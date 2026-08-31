@@ -2,9 +2,11 @@ using System;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using LaughTale.Core.Attributes;
@@ -67,8 +69,52 @@ public class IslandTagHelper : TagHelper
     [HtmlAttributeName("private")]
     public bool? IsPrivate { get; set; }
 
+    [HtmlAttributeName("policy")]
+    public string? Policy { get; set; }
+
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
+        // LT-2203: Initial Island Render Authorization Check
+        var httpContext = ViewContext?.HttpContext;
+        var requestServices = httpContext?.RequestServices;
+        if (httpContext != null && requestServices != null)
+        {
+            var authService = requestServices.GetService<IAuthorizationService>();
+            var authRegistry = requestServices.GetService<LaughTale.Core.Security.IIslandAuthorizationRegistry>();
+            var laughTaleOptions = requestServices.GetService<Microsoft.Extensions.Options.IOptions<LaughTale.Core.Configuration.LaughTaleOptions>>()?.Value;
+
+            string? requiredPolicy = Policy;
+
+            if (string.IsNullOrWhiteSpace(requiredPolicy) && Props != null)
+            {
+                var authAttr = Props.GetType().GetCustomAttribute<IslandAuthorizeAttribute>();
+                if (authAttr != null)
+                {
+                    requiredPolicy = authAttr.Policy;
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(requiredPolicy) && laughTaleOptions?.Refresh.IslandPolicies.TryGetValue(Name, out var optPol) == true)
+            {
+                requiredPolicy = optPol;
+            }
+
+            if (string.IsNullOrWhiteSpace(requiredPolicy) && authRegistry != null)
+            {
+                requiredPolicy = authRegistry.GetPolicy(Name);
+            }
+
+            if (!string.IsNullOrWhiteSpace(requiredPolicy) && authService != null)
+            {
+                var authResult = await authService.AuthorizeAsync(httpContext.User, requiredPolicy);
+                if (!authResult.Succeeded)
+                {
+                    output.SuppressOutput();
+                    return;
+                }
+            }
+        }
+
         output.TagName = "div";
         output.TagMode = TagMode.StartTagAndEndTag;
 

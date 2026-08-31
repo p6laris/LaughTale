@@ -196,11 +196,28 @@ public class IslandGenerator : IIncrementalGenerator
             ));
         }
 
+        var authAttr = symbol.GetAttributes().FirstOrDefault(a =>
+            a.AttributeClass?.ToDisplayString() is "LaughTale.Core.Attributes.IslandAuthorizeAttribute" or "IslandAuthorizeAttribute" or "IslandAuthorize");
+        string? policy = null;
+        if (authAttr != null)
+        {
+            if (authAttr.ConstructorArguments.Length > 0 && authAttr.ConstructorArguments[0].Value is string ctorPolicy)
+            {
+                policy = ctorPolicy;
+            }
+            else
+            {
+                var namedPolicy = authAttr.NamedArguments.FirstOrDefault(na => na.Key == "Policy").Value.Value as string;
+                policy = namedPolicy;
+            }
+        }
+
         var model = new IslandModel(
             Namespace: symbol.ContainingNamespace.ToDisplayString(),
             TypeName: symbol.Name,
             IslandName: islandName,
-            Properties: properties.ToImmutableArray()
+            Properties: properties.ToImmutableArray(),
+            Policy: policy
         );
 
         return new IslandModelResult(model, nameDiagnostic, propertyDiagnostics.ToImmutableArray());
@@ -233,7 +250,11 @@ public class IslandGenerator : IIncrementalGenerator
         sb.AppendLine("#nullable enable");
         sb.AppendLine("using System;");
         sb.AppendLine("using System.Threading.Tasks;");
+        sb.AppendLine("using Microsoft.AspNetCore.Authorization;");
+        sb.AppendLine("using Microsoft.AspNetCore.Mvc.Rendering;");
+        sb.AppendLine("using Microsoft.AspNetCore.Mvc.ViewFeatures;");
         sb.AppendLine("using Microsoft.AspNetCore.Razor.TagHelpers;");
+        sb.AppendLine("using Microsoft.Extensions.DependencyInjection;");
         sb.AppendLine("using LaughTale.Core.Enums;");
         sb.AppendLine("using LaughTale.Core.Serialization;");
         sb.AppendLine();
@@ -250,6 +271,14 @@ public class IslandGenerator : IIncrementalGenerator
         }
         sb.AppendLine($"public partial class {tagHelperName} : TagHelper");
         sb.AppendLine("{");
+        sb.AppendLine("    [ViewContext]");
+        sb.AppendLine("    [HtmlAttributeNotBound]");
+        sb.AppendLine("    public ViewContext? ViewContext { get; set; }");
+        sb.AppendLine();
+        var defaultPolicyValue = model.Policy != null ? $"\"{model.Policy}\"" : "null";
+        sb.AppendLine("    [HtmlAttributeName(\"policy\")]");
+        sb.AppendLine($"    public string? Policy {{ get; set; }} = {defaultPolicyValue};");
+        sb.AppendLine();
         sb.AppendLine("    [HtmlAttributeName(\"hydrate\")]");
         sb.AppendLine("    public HydrateStrategy Hydrate { get; set; } = HydrateStrategy.Load;");
         sb.AppendLine();
@@ -322,6 +351,37 @@ public class IslandGenerator : IIncrementalGenerator
         sb.AppendLine();
         sb.AppendLine("    public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)");
         sb.AppendLine("    {");
+        sb.AppendLine("        var httpContext = ViewContext?.HttpContext;");
+        sb.AppendLine("        var requestServices = httpContext?.RequestServices;");
+        sb.AppendLine("        if (httpContext != null && requestServices != null)");
+        sb.AppendLine("        {");
+        sb.AppendLine("            var authService = requestServices.GetService<IAuthorizationService>();");
+        sb.AppendLine("            var authRegistry = requestServices.GetService<LaughTale.Core.Security.IIslandAuthorizationRegistry>();");
+        sb.AppendLine("            var laughTaleOptions = requestServices.GetService<Microsoft.Extensions.Options.IOptions<LaughTale.Core.Configuration.LaughTaleOptions>>()?.Value;");
+        sb.AppendLine();
+        sb.AppendLine("            string? requiredPolicy = Policy;");
+        sb.AppendLine();
+        sb.AppendLine($"            if (string.IsNullOrWhiteSpace(requiredPolicy) && laughTaleOptions?.Refresh.IslandPolicies.TryGetValue(\"{islandDataName}\", out var optPol) == true)");
+        sb.AppendLine("            {");
+        sb.AppendLine("                requiredPolicy = optPol;");
+        sb.AppendLine("            }");
+        sb.AppendLine();
+        sb.AppendLine("            if (string.IsNullOrWhiteSpace(requiredPolicy) && authRegistry != null)");
+        sb.AppendLine("            {");
+        sb.AppendLine($"                requiredPolicy = authRegistry.GetPolicy(\"{islandDataName}\");");
+        sb.AppendLine("            }");
+        sb.AppendLine();
+        sb.AppendLine("            if (!string.IsNullOrWhiteSpace(requiredPolicy) && authService != null)");
+        sb.AppendLine("            {");
+        sb.AppendLine("                var authResult = await authService.AuthorizeAsync(httpContext.User, requiredPolicy);");
+        sb.AppendLine("                if (!authResult.Succeeded)");
+        sb.AppendLine("                {");
+        sb.AppendLine("                    output.SuppressOutput();");
+        sb.AppendLine("                    return;");
+        sb.AppendLine("                }");
+        sb.AppendLine("            }");
+        sb.AppendLine("        }");
+        sb.AppendLine();
         sb.AppendLine("        Process(context, output);");
         sb.AppendLine("        var childContent = await output.GetChildContentAsync();");
         sb.AppendLine("        if (!childContent.IsEmptyOrWhiteSpace)");
@@ -460,7 +520,8 @@ internal record IslandModel(
     string Namespace,
     string TypeName,
     string IslandName,
-    ImmutableArray<PropertyModel> Properties
+    ImmutableArray<PropertyModel> Properties,
+    string? Policy = null
 );
 
 internal record PropertyModel(
