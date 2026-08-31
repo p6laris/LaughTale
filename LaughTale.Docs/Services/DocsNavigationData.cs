@@ -18,6 +18,7 @@ public static class DocsNavigationData
             {
                 new("Quickstart & Setup", "zap", "/doc/01-getting-started", currentPath.Contains("01-getting-started")),
                 new("Philosophy & Architecture", "cpu", "/doc/01a-philosophy-and-architecture", currentPath.Contains("01a-philosophy-and-architecture")),
+                new("Headless & Standalone Core", "box", "/doc/01b-headless-and-custom-islands", currentPath.Contains("01b-headless-and-custom-islands")),
                 new("Hydration Strategies", "layers", "/doc/02-hydration-strategies", currentPath.Contains("02-hydration-strategies")),
                 new("View Transitions & State", "play", "/doc/03-view-transitions", currentPath.Contains("03-view-transitions")),
                 new("Server-Driven Refresh", "refreshCw", "/doc/04-server-refresh-and-morphing", currentPath.Contains("04-server-refresh-and-morphing")),
