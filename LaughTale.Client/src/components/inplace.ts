@@ -18,30 +18,25 @@ export interface InplaceProps {
 
 
 const CSS = `
-[data-theme="dark"] .laughtale-inplace-display {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-100) !important;
-    border-color: var(--lt-surface-700) !important;
+html.dark .laughtale-inplace-display,
+[data-theme="dark"] .laughtale-inplace-display,
+.dark .laughtale-inplace-display {
+    background: var(--p-surface-100, #1e293b) !important;
+    color: var(--p-text-color, #f8fafc) !important;
+    border-color: var(--p-border-color, #334155) !important;
 }
-[data-theme="dark"] .laughtale-inplace-editor {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-100) !important;
-    border-color: var(--lt-surface-700) !important;
+html.dark .laughtale-inplace-editor,
+[data-theme="dark"] .laughtale-inplace-editor,
+.dark .laughtale-inplace-editor {
+    background: transparent !important;
+    color: var(--p-text-color, #f8fafc) !important;
 }
-[data-theme="dark"] .inplace-input {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-100) !important;
-    border-color: var(--lt-surface-700) !important;
-}
-[data-theme="dark"] .btn-inplace-save {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-100) !important;
-    border-color: var(--lt-surface-700) !important;
-}
-[data-theme="dark"] .btn-inplace-cancel {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-100) !important;
-    border-color: var(--lt-surface-700) !important;
+html.dark .inplace-input,
+[data-theme="dark"] .inplace-input,
+.dark .inplace-input {
+    background: var(--p-surface-0, #090d16) !important;
+    color: var(--p-text-color, #f8fafc) !important;
+    border-color: var(--p-primary-500, #10b981) !important;
 }
 `;
 

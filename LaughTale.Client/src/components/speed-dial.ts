@@ -376,62 +376,72 @@ const SPEEDDIAL_CSS = `
     opacity: 1;
     pointer-events: auto;
 }
-
 /* Dark Mode */
-.dark .p-speeddial-action,
-[data-theme="dark"] .p-speeddial-action {
-    background: var(--lt-surface-900) !important;
-    border-color: var(--lt-surface-700) !important;
-    color: var(--lt-surface-300) !important;
+html.dark .p-speeddial-action,
+[data-theme="dark"] .p-speeddial-action,
+.dark .p-speeddial-action {
+    background: var(--p-surface-0, #090d16) !important;
+    border-color: var(--p-border-color, #334155) !important;
+    color: var(--p-text-muted, #94a3b8) !important;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4) !important;
 }
 
-.dark .p-speeddial-action:hover:not(:disabled),
-[data-theme="dark"] .p-speeddial-action:hover:not(:disabled) {
-    background: var(--lt-surface-800) !important;
-    color: var(--lt-surface-0, var(--lt-surface-0)) !important;
-    border-color: var(--lt-surface-600) !important;
+html.dark .p-speeddial-action:hover:not(:disabled),
+[data-theme="dark"] .p-speeddial-action:hover:not(:disabled),
+.dark .p-speeddial-action:hover:not(:disabled) {
+    background: var(--p-surface-100, #1e293b) !important;
+    color: var(--p-text-color, #f8fafc) !important;
+    border-color: var(--p-surface-400, #64748b) !important;
 }
 
-.dark .p-speeddial-custom-label,
-.dark .p-speeddial-custom-icon,
+html.dark .p-speeddial-custom-label,
+html.dark .p-speeddial-custom-icon,
 [data-theme="dark"] .p-speeddial-custom-label,
-[data-theme="dark"] .p-speeddial-custom-icon {
-    background: var(--lt-surface-900);
-    border-color: var(--lt-surface-700);
-    color: var(--lt-surface-400);
+[data-theme="dark"] .p-speeddial-custom-icon,
+.dark .p-speeddial-custom-label,
+.dark .p-speeddial-custom-icon {
+    background: var(--p-surface-0, #090d16);
+    border-color: var(--p-border-color, #334155);
+    color: var(--p-text-muted, #94a3b8);
 }
 
-.dark .p-speeddial-custom-item:hover .p-speeddial-custom-label,
-.dark .p-speeddial-custom-item:hover .p-speeddial-custom-icon,
+html.dark .p-speeddial-custom-item:hover .p-speeddial-custom-label,
+html.dark .p-speeddial-custom-item:hover .p-speeddial-custom-icon,
 [data-theme="dark"] .p-speeddial-custom-item:hover .p-speeddial-custom-label,
-[data-theme="dark"] .p-speeddial-custom-item:hover .p-speeddial-custom-icon {
-    background: var(--lt-surface-800);
-    color: var(--lt-surface-0, var(--lt-surface-0));
-    border-color: var(--lt-surface-600);
+[data-theme="dark"] .p-speeddial-custom-item:hover .p-speeddial-custom-icon,
+.dark .p-speeddial-custom-item:hover .p-speeddial-custom-label,
+.dark .p-speeddial-custom-item:hover .p-speeddial-custom-icon {
+    background: var(--p-surface-100, #1e293b);
+    color: var(--p-text-color, #f8fafc);
+    border-color: var(--p-surface-400, #64748b);
 }
 
-.dark .p-speeddial-tooltip,
-[data-theme="dark"] .p-speeddial-tooltip {
-    background: var(--lt-surface-800);
-    color: var(--lt-surface-0, var(--lt-surface-0));
-    border: 1px solid var(--lt-surface-700);
+html.dark .p-speeddial-tooltip,
+[data-theme="dark"] .p-speeddial-tooltip,
+.dark .p-speeddial-tooltip {
+    background: var(--p-surface-100, #1e293b);
+    color: var(--p-text-color, #f8fafc);
+    border: 1px solid var(--p-border-color, #334155);
 }
-.dark .p-speeddial-tooltip.tooltip-left::after,
-[data-theme="dark"] .p-speeddial-tooltip.tooltip-left::after {
-    border-color: transparent transparent transparent var(--lt-surface-800);
+html.dark .p-speeddial-tooltip.tooltip-left::after,
+[data-theme="dark"] .p-speeddial-tooltip.tooltip-left::after,
+.dark .p-speeddial-tooltip.tooltip-left::after {
+    border-color: transparent transparent transparent var(--p-surface-100, #1e293b);
 }
-.dark .p-speeddial-tooltip.tooltip-right::after,
-[data-theme="dark"] .p-speeddial-tooltip.tooltip-right::after {
-    border-color: transparent var(--lt-surface-800) transparent transparent;
+html.dark .p-speeddial-tooltip.tooltip-right::after,
+[data-theme="dark"] .p-speeddial-tooltip.tooltip-right::after,
+.dark .p-speeddial-tooltip.tooltip-right::after {
+    border-color: transparent var(--p-surface-100, #1e293b) transparent transparent;
 }
-.dark .p-speeddial-tooltip.tooltip-top::after,
-[data-theme="dark"] .p-speeddial-tooltip.tooltip-top::after {
-    border-color: var(--lt-surface-800) transparent transparent transparent;
+html.dark .p-speeddial-tooltip.tooltip-top::after,
+[data-theme="dark"] .p-speeddial-tooltip.tooltip-top::after,
+.dark .p-speeddial-tooltip.tooltip-top::after {
+    border-color: var(--p-surface-100, #1e293b) transparent transparent transparent;
 }
-.dark .p-speeddial-tooltip.tooltip-bottom::after,
-[data-theme="dark"] .p-speeddial-tooltip.tooltip-bottom::after {
-    border-color: transparent transparent var(--lt-surface-800) transparent;
+html.dark .p-speeddial-tooltip.tooltip-bottom::after,
+[data-theme="dark"] .p-speeddial-tooltip.tooltip-bottom::after,
+.dark .p-speeddial-tooltip.tooltip-bottom::after {
+    border-color: transparent transparent var(--p-surface-100, #1e293b) transparent;
 }
 `;
 
