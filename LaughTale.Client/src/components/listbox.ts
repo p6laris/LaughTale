@@ -320,63 +320,96 @@ const CSS = `
     margin-left: 0.5rem;
     flex-shrink: 0;
 }
-
 /* ==================== DARK MODE ==================== */
+html.dark .p-listbox,
+[data-theme="dark"] .p-listbox,
 .dark .p-listbox {
-    background: var(--lt-surface-900);
-    color: var(--lt-surface-0);
-    border-color: var(--lt-surface-700);
+    background: var(--p-surface-0, #090d16);
+    color: var(--p-text-color, #f8fafc);
+    border-color: var(--p-border-color, #334155);
 }
+html.dark .p-listbox.variant-filled,
+[data-theme="dark"] .p-listbox.variant-filled,
 .dark .p-listbox.variant-filled {
-    background-color: var(--lt-surface-800);
+    background-color: var(--p-surface-100, #1e293b);
 }
+html.dark .p-listbox.variant-filled.is-focused,
+[data-theme="dark"] .p-listbox.variant-filled.is-focused,
 .dark .p-listbox.variant-filled.is-focused {
-    background-color: var(--lt-surface-900);
+    background-color: var(--p-surface-0, #090d16);
 }
+html.dark .p-listbox-header,
+html.dark .p-listbox-footer,
+html.dark .p-listbox-filter-container,
+html.dark .p-listbox-option-group-label,
+[data-theme="dark"] .p-listbox-header,
+[data-theme="dark"] .p-listbox-footer,
+[data-theme="dark"] .p-listbox-filter-container,
+[data-theme="dark"] .p-listbox-option-group-label,
 .dark .p-listbox-header,
 .dark .p-listbox-footer,
 .dark .p-listbox-filter-container,
 .dark .p-listbox-option-group-label {
-    background: var(--lt-surface-850);
-    border-color: var(--lt-surface-700);
+    background: var(--p-surface-50, #0f172a);
+    border-color: var(--p-border-color, #334155);
 }
+html.dark .p-listbox-filter-input,
+[data-theme="dark"] .p-listbox-filter-input,
 .dark .p-listbox-filter-input {
-    background: var(--lt-surface-900);
-    border-color: var(--lt-surface-700);
-    color: var(--lt-surface-0);
+    background: var(--p-surface-0, #090d16);
+    border-color: var(--p-border-color, #334155);
+    color: var(--p-text-color, #f8fafc);
 }
+html.dark .p-listbox-option,
+[data-theme="dark"] .p-listbox-option,
 .dark .p-listbox-option {
-    color: var(--lt-surface-100);
+    color: var(--p-text-color, #f8fafc);
 }
+html.dark .p-listbox-option:hover:not(.p-disabled),
+[data-theme="dark"] .p-listbox-option:hover:not(.p-disabled),
 .dark .p-listbox-option:hover:not(.p-disabled) {
-    background: var(--lt-surface-800);
-    color: var(--lt-surface-0);
+    background: var(--p-surface-100, #1e293b);
+    color: var(--p-text-color, #f8fafc);
 }
+html.dark .p-listbox-option.p-highlight,
+[data-theme="dark"] .p-listbox-option.p-highlight,
 .dark .p-listbox-option.p-highlight {
     background: rgba(16, 185, 129, 0.16);
-    color: var(--lt-primary-300);
+    color: var(--p-primary-300, #6ee7b7);
 }
+html.dark .p-listbox-option.p-highlight:hover:not(.p-disabled),
+[data-theme="dark"] .p-listbox-option.p-highlight:hover:not(.p-disabled),
 .dark .p-listbox-option.p-highlight:hover:not(.p-disabled) {
     background: rgba(16, 185, 129, 0.24);
-    color: var(--lt-primary-200);
+    color: var(--p-primary-200, #a7f3d0);
 }
+html.dark .p-listbox-option-badge,
+[data-theme="dark"] .p-listbox-option-badge,
 .dark .p-listbox-option-badge {
-    background: var(--lt-surface-800);
-    color: var(--lt-surface-200);
+    background: var(--p-surface-100, #1e293b);
+    color: var(--p-text-muted, #94a3b8);
 }
+html.dark .p-listbox-option.p-highlight .p-listbox-option-badge,
+[data-theme="dark"] .p-listbox-option.p-highlight .p-listbox-option-badge,
 .dark .p-listbox-option.p-highlight .p-listbox-option-badge {
     background: rgba(16, 185, 129, 0.25);
-    color: var(--lt-primary-200);
+    color: var(--p-primary-200, #a7f3d0);
 }
+html.dark .p-listbox-option-checkbox,
+[data-theme="dark"] .p-listbox-option-checkbox,
 .dark .p-listbox-option-checkbox {
-    background: var(--lt-surface-900);
-    border-color: var(--lt-surface-600);
+    background: var(--p-surface-50, #0f172a);
+    border-color: var(--p-border-color, #334155);
 }
+html.dark .p-listbox-option-checkmark,
+[data-theme="dark"] .p-listbox-option-checkmark,
 .dark .p-listbox-option-checkmark {
-    color: var(--lt-primary-400);
+    color: var(--p-primary-400, #34d399);
 }
+html.dark .p-listbox-striped .p-listbox-option:nth-child(even):not(.p-highlight),
+[data-theme="dark"] .p-listbox-striped .p-listbox-option:nth-child(even):not(.p-highlight),
 .dark .p-listbox-striped .p-listbox-option:nth-child(even):not(.p-highlight) {
-    background: var(--lt-surface-850);
+    background: var(--p-surface-50, #0f172a);
 }
 `;
 

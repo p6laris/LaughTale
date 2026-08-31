@@ -26,65 +26,44 @@ export interface MultiSelectProps<T = string> {
 
 
 const CSS = `
-[data-theme="dark"] .laughtale-multiselect {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-100) !important;
-    border-color: var(--lt-surface-700) !important;
+html.dark .multiselect-trigger,
+[data-theme="dark"] .multiselect-trigger,
+.dark .multiselect-trigger {
+    background: var(--p-surface-0, #090d16) !important;
+    color: var(--p-text-color, #f8fafc) !important;
+    border-color: var(--p-border-color, #334155) !important;
 }
-[data-theme="dark"] .multiselect-trigger {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-100) !important;
-    border-color: var(--lt-surface-700) !important;
+html.dark .multiselect-overlay,
+[data-theme="dark"] .multiselect-overlay,
+.dark .multiselect-overlay {
+    background: var(--p-surface-0, #090d16) !important;
+    color: var(--p-text-color, #f8fafc) !important;
+    border-color: var(--p-border-color, #334155) !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5) !important;
 }
-[data-theme="dark"] .p-input {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-100) !important;
-    border-color: var(--lt-surface-700) !important;
+html.dark .multiselect-select-all,
+[data-theme="dark"] .multiselect-select-all,
+.dark .multiselect-select-all {
+    background: var(--p-surface-50, #0f172a) !important;
+    border-color: var(--p-border-color, #334155) !important;
+    color: var(--p-text-color, #f8fafc) !important;
 }
-[data-theme="dark"] .multiselect-label-container {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-100) !important;
-    border-color: var(--lt-surface-700) !important;
+html.dark .multiselect-filter-input,
+[data-theme="dark"] .multiselect-filter-input,
+.dark .multiselect-filter-input {
+    color: var(--p-text-color, #f8fafc) !important;
 }
-[data-theme="dark"] .multiselect-clear-btn {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-100) !important;
-    border-color: var(--lt-surface-700) !important;
+html.dark .multiselect-item:hover,
+[data-theme="dark"] .multiselect-item:hover,
+.dark .multiselect-item:hover {
+    background: var(--p-surface-100, #1e293b) !important;
+    color: var(--p-text-color, #f8fafc) !important;
 }
-[data-theme="dark"] .multiselect-chevron {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-100) !important;
-    border-color: var(--lt-surface-700) !important;
-}
-[data-theme="dark"] .multiselect-overlay {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-100) !important;
-    border-color: var(--lt-surface-700) !important;
-}
-[data-theme="dark"] .multiselect-filter-input {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-100) !important;
-    border-color: var(--lt-surface-700) !important;
-}
-[data-theme="dark"] .multiselect-select-all {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-100) !important;
-    border-color: var(--lt-surface-700) !important;
-}
-[data-theme="dark"] .multiselect-items-list {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-100) !important;
-    border-color: var(--lt-surface-700) !important;
-}
-[data-theme="dark"] .chip-remove-btn {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-100) !important;
-    border-color: var(--lt-surface-700) !important;
-}
-[data-theme="dark"] .multiselect-item {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-100) !important;
-    border-color: var(--lt-surface-700) !important;
+html.dark .chip-item,
+[data-theme="dark"] .chip-item,
+.dark .chip-item {
+    background: var(--p-surface-100, #1e293b) !important;
+    color: var(--p-text-color, #f8fafc) !important;
 }
 `;
 

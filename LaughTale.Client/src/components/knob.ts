@@ -22,20 +22,15 @@ export interface KnobProps {
 
 
 const CSS = `
-[data-theme="dark"] .laughtale-knob {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-100) !important;
-    border-color: var(--lt-surface-700) !important;
+html.dark .knob-value-display,
+[data-theme="dark"] .knob-value-display,
+.dark .knob-value-display {
+    color: var(--p-text-color, #f8fafc) !important;
 }
-[data-theme="dark"] .knob-progress-circle {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-100) !important;
-    border-color: var(--lt-surface-700) !important;
-}
-[data-theme="dark"] .knob-value-display {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-100) !important;
-    border-color: var(--lt-surface-700) !important;
+html.dark .laughtale-knob circle:first-child,
+[data-theme="dark"] .laughtale-knob circle:first-child,
+.dark .laughtale-knob circle:first-child {
+    stroke: var(--p-border-color, #334155) !important;
 }
 `;
 
