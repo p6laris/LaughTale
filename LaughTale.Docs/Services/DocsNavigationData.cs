@@ -130,18 +130,18 @@ public static class DocsNavigationData
 
         foreach (var category in sidebarItems)
         {
-            if (category.Children == null || category.Children.Count == 0) continue;
+            if (category.Items == null || category.Items.Count == 0) continue;
 
             var items = new List<CommandMenuItem>();
-            foreach (var child in category.Children)
+            foreach (var child in category.Items)
             {
                 if (string.IsNullOrEmpty(child.Url)) continue;
                 items.Add(new CommandMenuItem(
-                    child.Title,
+                    child.Label,
                     child.Icon,
-                    category.Title,
+                    category.Label,
                     null,
-                    new List<string> { category.Title, child.Title, child.Badge ?? "" },
+                    new List<string> { category.Label, child.Label, child.Badge ?? "" },
                     null,
                     child.Url
                 ));
@@ -149,7 +149,7 @@ public static class DocsNavigationData
 
             if (items.Count > 0)
             {
-                groups.Add(new CommandMenuGroup(category.Title, items));
+                groups.Add(new CommandMenuGroup(category.Label, items));
             }
         }
 
