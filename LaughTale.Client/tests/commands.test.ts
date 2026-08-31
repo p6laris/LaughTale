@@ -1,5 +1,5 @@
 ﻿/**
- * LaughTale: Client Command Registry & Action Handling Tests (LT-102)
+ * LaughTale: Client Command Registry & Action Handling Tests
  */
 
 import './setup.ts';
@@ -18,7 +18,7 @@ import {
 import SpeedDialIsland from '../src/components/speed-dial.ts';
 import SplitButtonIsland from '../src/components/split-button.ts';
 
-describe('Client Command Registry & Component Action Suite (LT-102)', () => {
+describe('Client Command Registry & Component Action Suite', () => {
 
     beforeEach(() => {
         clearCommands();

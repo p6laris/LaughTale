@@ -1,5 +1,5 @@
 /**
- * LaughTale Migration Codemod: Hex to Semantic Tokens (LT-1206)
+ * LaughTale Migration Codemod: Hex to Semantic Tokens
  * Replaces hardcoded hex literals in components with semantic design tokens.
  */
 

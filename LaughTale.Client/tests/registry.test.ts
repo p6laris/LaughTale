@@ -10,7 +10,7 @@ import {
     clearRegistry
 } from '../src/runtime/registry';
 
-describe('Island Registry & Canonical Alias Resolution Suite (LT-402)', () => {
+describe('Island Registry & Canonical Alias Resolution Suite', () => {
     beforeEach(() => {
         clearRegistry();
     });

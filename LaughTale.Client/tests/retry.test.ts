@@ -1,5 +1,5 @@
 ﻿/**
- * LaughTale: Module Retry & Exponential Backoff Unit Tests (LT-207)
+ * LaughTale: Module Retry & Exponential Backoff Unit Tests
  */
 
 import './setup.ts';
@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 
 import { importWithRetry } from '../src/runtime/retry.ts';
 
-describe('Module Dynamic Import Retry & Jittered Backoff Suite (LT-207)', () => {
+describe('Module Dynamic Import Retry & Jittered Backoff Suite', () => {
 
     it('importWithRetry: resolves immediately on first attempt without delay', async () => {
         let attempts = 0;

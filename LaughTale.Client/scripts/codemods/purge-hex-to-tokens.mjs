@@ -1,5 +1,5 @@
 /**
- * LaughTale Complete Hex Purge Codemod (LT-1304)
+ * LaughTale Complete Hex Purge Codemod
  * Replaces ALL 1,913 hardcoded hex literals across all 76 components with semantic --lt-* tokens.
  */
 

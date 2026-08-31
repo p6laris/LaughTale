@@ -200,8 +200,8 @@ html.dark .p-compare-indicator,
 const ARROWS_H_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 8 4 4-4 4"/><path d="M2 12h20"/><path d="m6 8-4 4 4 4"/></svg>`;
 const CODE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>`;
 
-const DEFAULT_BEFORE_IMG = 'https://primefaces.org/cdn/LaughTale/images/compare/island2.jpg';
-const DEFAULT_AFTER_IMG = 'https://primefaces.org/cdn/LaughTale/images/compare/island1.jpg';
+const DEFAULT_BEFORE_IMG = '/images/compare/island2.jpg';
+const DEFAULT_AFTER_IMG = '/images/compare/island1.jpg';
 
 export default function CompareIsland(container: HTMLElement, props: CompareProps, ctx?: IslandContext) {
     injectIslandStyle('compare', COMPARE_CSS);
@@ -261,7 +261,7 @@ export default function CompareIsland(container: HTMLElement, props: CompareProp
                         <div style="display: flex; align-items: flex-start; justify-content: space-between;">
                             <div style="display: flex; align-items: center; gap: 0.75rem;">
                                 <div style="width: 2.5rem; height: 2.5rem; border-radius: 9999px; overflow: hidden; background: var(--lt-primary-400);">
-                                    <img src="https://primefaces.org/cdn/LaughTale/images/avatar/amyelsner.png" style="width: 100%; height: 100%; object-fit: cover; filter: hue-rotate(260deg) saturate(150%);" />
+                                    <img src="/images/avatar/amyelsner.png" style="width: 100%; height: 100%; object-fit: cover; filter: hue-rotate(260deg) saturate(150%);" />
                                 </div>
                                 <div>
                                     <div style="font-weight: 600; color: var(--lt-primary-900); font-size: 0.9rem;">Amy Elsner</div>
@@ -292,7 +292,7 @@ export default function CompareIsland(container: HTMLElement, props: CompareProp
                         <div style="display: flex; align-items: flex-start; justify-content: space-between;">
                             <div style="display: flex; align-items: center; gap: 0.75rem;">
                                 <div style="width: 2.5rem; height: 2.5rem; border-radius: 9999px; overflow: hidden; background: var(--lt-primary-400, var(--lt-primary-400));">
-                                    <img src="https://primefaces.org/cdn/LaughTale/images/avatar/amyelsner.png" style="width: 100%; height: 100%; object-fit: cover;" />
+                                    <img src="/images/avatar/amyelsner.png" style="width: 100%; height: 100%; object-fit: cover;" />
                                 </div>
                                 <div>
                                     <div style="font-weight: 600; color: var(--lt-primary-900); font-size: 0.9rem;">Amy Elsner</div>

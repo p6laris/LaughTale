@@ -16,7 +16,7 @@ import type {
     CascadeSelectNode
 } from '../src/types/models';
 
-describe('TypeScript & C# Model Parity Suite (LT-404)', () => {
+describe('TypeScript & C# Model Parity Suite', () => {
     it('instantiates and validates MenuItem model structure', () => {
         const item: MenuItem = {
             label: 'Settings',

@@ -2,7 +2,7 @@ import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts
 import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise Checkbox Component (Aura Checkbox)
- * Accessible, theme-aware tri-state checkbox with Radix UI spring micro-interactions.
+ * Accessible, theme-aware tri-state checkbox with LaughTale Core spring micro-interactions.
  * Integrates with Theme Studio tokens and full dark mode support.
  */
 
@@ -112,7 +112,7 @@ const CSS = `
     border-color: var(--lt-primary-600);
 }
 
-/* Focus States (Radix Focus Ring) */
+/* Focus States (LaughTale Core Focus Ring) */
 .laughtale-checkbox-wrap:focus-within:not(.disabled) .laughtale-checkbox-box {
     box-shadow: 0 0 0 1px var(--lt-surface-0), 0 0 0 3px var(--lt-primary-500);
     border-color: var(--lt-primary-500);

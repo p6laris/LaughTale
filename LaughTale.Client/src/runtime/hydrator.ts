@@ -181,7 +181,7 @@ async function executeHydration(container: HTMLElement, name: string): Promise<v
             refresh: (newProps?: Record<string, any>) => refreshIsland(container, newProps)
         };
 
-        // 5. Construct structural IslandContext (LT-1102, LT-1504)
+        // 5. Construct structural IslandContext (, )
         const abortController = new AbortController();
         const cleanups: (() => void)[] = [];
 

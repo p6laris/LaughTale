@@ -3,7 +3,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { generatePaletteRamp, hexToOklch, oklchToHex, parseHex, rgbToHex } from '../../src/styles/palette-generator.ts';
 
-describe('OKLCH Palette Generator Suite (LT-602)', () => {
+describe('OKLCH Palette Generator Suite', () => {
     it('parses and formats hex codes accurately', () => {
         assert.deepEqual(parseHex('#ff0000'), { r: 255, g: 0, b: 0 });
         assert.deepEqual(parseHex('#0f0'), { r: 0, g: 255, b: 0 });

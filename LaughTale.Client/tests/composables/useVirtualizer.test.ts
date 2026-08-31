@@ -3,7 +3,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { useVirtualizer, shouldVirtualize } from '../../src/composables/useVirtualizer.ts';
 
-describe('useVirtualizer High-Performance Virtual Scrolling Suite (LT-502)', () => {
+describe('useVirtualizer High-Performance Virtual Scrolling Suite', () => {
     it('evaluates shouldVirtualize threshold correctly', () => {
         assert.equal(shouldVirtualize(50, 100), false);
         assert.equal(shouldVirtualize(100, 100), true);

@@ -1,5 +1,5 @@
 /**
- * LaughTale Migration Codemod: Batch Retrofit Components (LT-1301 - LT-1308)
+ * LaughTale Migration Codemod: Batch Retrofit Components ()
  * Ensures:
  * 1. IslandContext & PassthroughRecord imports in every component
  * 2. `pt?: PassthroughRecord; studioOverrides?: Record<string, any>;` on props interfaces

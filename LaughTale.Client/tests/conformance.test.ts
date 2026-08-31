@@ -7,7 +7,7 @@ import '../src/index.ts';
 import { listIslands, getIslandDefinition } from '../src/runtime/registry.ts';
 import { hydrateIsland } from '../src/runtime/hydrator.ts';
 
-describe('Island Conformance & Contract Verification Suite (LT-403)', () => {
+describe('Island Conformance & Contract Verification Suite', () => {
     const islands = listIslands();
 
     it('registers a comprehensive suite of canonical island components', () => {

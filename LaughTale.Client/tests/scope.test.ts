@@ -1,5 +1,5 @@
 ﻿/**
- * LaughTale: Island Scope Teardown & Lifecycle Unit Tests (LT-201)
+ * LaughTale: Island Scope Teardown & Lifecycle Unit Tests
  */
 
 import './setup.ts';
@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 
 import { createScope } from '../src/runtime/scope.ts';
 
-describe('Island Resource Scope & Teardown Lifecycle Suite (LT-201)', () => {
+describe('Island Resource Scope & Teardown Lifecycle Suite', () => {
 
     let container: HTMLElement;
 

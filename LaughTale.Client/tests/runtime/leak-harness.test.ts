@@ -5,7 +5,7 @@ import { MemoryLeakHarness } from '../../src/testing/leak-harness.ts';
 import { defineIsland, clearRegistry } from '../../src/runtime/registry.ts';
 import { hydrateIsland } from '../../src/runtime/hydrator.ts';
 
-describe('Memory Leak Detection Harness Suite (LT-1101)', () => {
+describe('Memory Leak Detection Harness Suite', () => {
     const harness = new MemoryLeakHarness();
 
     beforeEach(() => {

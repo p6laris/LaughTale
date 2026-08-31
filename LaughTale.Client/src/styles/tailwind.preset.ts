@@ -1,5 +1,5 @@
 /**
- * LaughTale Tailwind CSS Preset (@laughtale/tailwind-preset / LT-2106)
+ * LaughTale Tailwind CSS Preset (@laughtale/tailwind-preset / )
  * Maps Tailwind theme tokens to LaughTale's semantic CSS custom properties,
  * enabling seamless interop between Tailwind utility classes and LaughTale islands.
  */

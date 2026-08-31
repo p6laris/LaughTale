@@ -1,5 +1,5 @@
 /**
- * LaughTale: Server-Driven Island Refresh with DOM Morphing (P12 / LT-22xx)
+ * LaughTale: Server-Driven Island Refresh with DOM Morphing (P12 / )
  * Re-renders an individual island on demand from the server, morphs the DOM in-place,
  * preserving input focus, active text selections, and scroll positions without full page reloads.
  */

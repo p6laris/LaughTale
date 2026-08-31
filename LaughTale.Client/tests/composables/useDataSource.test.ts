@@ -18,7 +18,7 @@ const sampleUsers: User[] = [
     { id: 5, name: 'Eve Adams', role: 'Editor', score: 91 }
 ];
 
-describe('useDataSource Headless Primitive Suite (LT-501)', () => {
+describe('useDataSource Headless Primitive Suite', () => {
     it('initializes with default state and paginated slice', () => {
         const ds = useDataSource({
             data: sampleUsers,

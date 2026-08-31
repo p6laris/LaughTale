@@ -1,5 +1,5 @@
 ﻿/**
- * LaughTale: CSP Nonce Discovery & Style Stamping Unit Tests (LT-104)
+ * LaughTale: CSP Nonce Discovery & Style Stamping Unit Tests
  */
 
 import './setup.ts';
@@ -14,7 +14,7 @@ import {
 } from '../src/directives/csp.ts';
 import { injectIslandStyle, removeIslandStyle } from '../src/runtime/styles.ts';
 
-describe('Content Security Policy (CSP) Nonce Discovery & Style Stamping Suite (LT-104)', () => {
+describe('Content Security Policy (CSP) Nonce Discovery & Style Stamping Suite', () => {
 
     beforeEach(() => {
         setCspNonce(null);

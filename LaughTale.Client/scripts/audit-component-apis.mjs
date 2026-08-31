@@ -7,7 +7,7 @@ const __dirname = path.dirname(__filename);
 const componentsDir = path.resolve(__dirname, '../src/components');
 const outputReport = path.resolve(__dirname, '../docs/api-consistency-report.md');
 
-console.log('[LaughTale API Audit] Scanning component props interfaces for naming consistency (LT-1608)...');
+console.log('[LaughTale API Audit] Scanning component props interfaces for naming consistency...');
 
 const files = fs.readdirSync(componentsDir).filter(f => f.endsWith('.ts'));
 
@@ -96,7 +96,7 @@ for (const file of files) {
 }
 
 // Generate Markdown report
-let md = `# LaughTale Component API Consistency Audit (LT-1608)\n\n`;
+let md = `# LaughTale Component API Consistency Audit\n\n`;
 md += `**Total Components Scanned:** ${files.length}\n`;
 md += `**Total Prop Declarations:** ${totalPropsFound}\n`;
 md += `**Aliased/Synonym Normalizations:** ${aliasesNormalized}\n\n`;

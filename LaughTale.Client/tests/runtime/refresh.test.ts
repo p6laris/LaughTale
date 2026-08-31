@@ -5,7 +5,7 @@ import { defineIsland, clearRegistry } from '../../src/runtime/registry.ts';
 import { hydrateIsland } from '../../src/runtime/hydrator.ts';
 import { refreshIsland } from '../../src/runtime/refresh.ts';
 
-describe('Server-Driven Island Refresh Suite (LT-22xx / P12)', () => {
+describe('Server-Driven Island Refresh Suite ( / P12)', () => {
     beforeEach(() => {
         clearRegistry();
         document.body.innerHTML = '';

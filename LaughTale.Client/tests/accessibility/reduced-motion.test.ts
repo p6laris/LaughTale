@@ -7,7 +7,7 @@ import {
 } from '../../src/styles/animations.ts';
 import { useTransition } from '../../src/composables/animation/useTransition.ts';
 
-describe('Reduced Motion Accessibility Suite (LT-802)', () => {
+describe('Reduced Motion Accessibility Suite', () => {
     it('isReducedMotionPreferred returns boolean based on matchMedia query', () => {
         const originalMatchMedia = window.matchMedia;
 

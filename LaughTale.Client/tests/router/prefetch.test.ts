@@ -6,7 +6,7 @@ import {
     prefetchManager
 } from '../../src/router/prefetch.ts';
 
-describe('Router Predictive Prefetching Suite (LT-702)', () => {
+describe('Router Predictive Prefetching Suite', () => {
     beforeEach(() => {
         prefetchManager.invalidate();
     });

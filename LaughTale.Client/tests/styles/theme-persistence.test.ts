@@ -10,7 +10,7 @@ import {
     type SavedThemeConfig
 } from '../../src/styles/theme-persistence.ts';
 
-describe('Theme Persistence & Export Suite (LT-603)', () => {
+describe('Theme Persistence & Export Suite', () => {
     beforeEach(() => {
         localStorage.clear();
         document.cookie = `${THEME_STORAGE_KEY}=; max-age=0`;

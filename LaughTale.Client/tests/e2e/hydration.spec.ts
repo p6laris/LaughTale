@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('LaughTale Real Browser Hydration & View Transitions Suite (LT-1607)', () => {
+test.describe('LaughTale Real Browser Hydration & View Transitions Suite', () => {
     test('hydrates interactive island in real browser DOM engine', async ({ page }) => {
         // Set up test HTML fixture in page
         await page.setContent(`

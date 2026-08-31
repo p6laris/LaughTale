@@ -72,7 +72,7 @@ public class IslandTagHelper : TagHelper
         output.TagName = "div";
         output.TagMode = TagMode.StartTagAndEndTag;
 
-        // LT-1507: Cache Leak Guard & Privacy Enforcement
+        // : Cache Leak Guard & Privacy Enforcement
         EnforceCachePrivacy();
 
         // Culture & Direction Flow

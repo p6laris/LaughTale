@@ -7,7 +7,7 @@ import {
     getAnnouncerElement
 } from '../../src/accessibility/announcer.ts';
 
-describe('Screen Reader Live Region Announcer Suite (LT-801)', () => {
+describe('Screen Reader Live Region Announcer Suite', () => {
     beforeEach(() => {
         clearAnnouncements();
     });

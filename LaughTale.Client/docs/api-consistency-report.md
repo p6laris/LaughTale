@@ -1,4 +1,4 @@
-# LaughTale Component API Consistency Audit (LT-1608)
+# LaughTale Component API Consistency Audit
 
 **Total Components Scanned:** 76
 **Total Prop Declarations:** 934

@@ -1,5 +1,5 @@
 /**
- * LaughTale: Router Cross-Origin Security, Head Reconciliation, Concurrency, Scroll & Lifecycle Tests (LT-107, LT-202, LT-203, LT-204)
+ * LaughTale: Router Cross-Origin Security, Head Reconciliation, Concurrency, Scroll & Lifecycle Tests (, , , )
  */
 
 import './setup.ts';
@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { navigateTo, enableViewTransitions } from '../src/runtime/router.ts';
 import { setCspNonce } from '../src/directives/csp.ts';
 
-describe('Router Comprehensive Suite (LT-107, LT-202, LT-203, LT-204)', () => {
+describe('Router Comprehensive Suite (, , , )', () => {
 
     beforeEach(() => {
         document.body.innerHTML = '';
@@ -107,7 +107,7 @@ describe('Router Comprehensive Suite (LT-107, LT-202, LT-203, LT-204)', () => {
         }
     });
 
-    it('navigateTo: reconciles <head> metadata, OpenGraph, canonical links, and route stylesheets (LT-202)', async () => {
+    it('navigateTo: reconciles <head> metadata, OpenGraph, canonical links, and route stylesheets', async () => {
         const originalFetch = globalThis.fetch;
         globalThis.fetch = (async () => {
             return {
@@ -158,7 +158,7 @@ describe('Router Comprehensive Suite (LT-107, LT-202, LT-203, LT-204)', () => {
         }
     });
 
-    it('navigateTo: cancels in-flight navigation when a newer navigation is triggered (LT-203)', async () => {
+    it('navigateTo: cancels in-flight navigation when a newer navigation is triggered', async () => {
         let routeASignalAborted = false;
 
         const originalFetch = globalThis.fetch;
@@ -205,7 +205,7 @@ describe('Router Comprehensive Suite (LT-107, LT-202, LT-203, LT-204)', () => {
         }
     });
 
-    it('navigateTo: preserves departure scroll in history and restores scroll position (LT-204)', async () => {
+    it('navigateTo: preserves departure scroll in history and restores scroll position', async () => {
         let scrollToOptions: any = null;
         const originalScrollTo = window.scrollTo;
         window.scrollTo = ((opts: any) => {
@@ -236,12 +236,12 @@ describe('Router Comprehensive Suite (LT-107, LT-202, LT-203, LT-204)', () => {
         }
     });
 
-    it('enableViewTransitions: sets history.scrollRestoration to manual (LT-204)', () => {
+    it('enableViewTransitions: sets history.scrollRestoration to manual', () => {
         enableViewTransitions();
         assert.equal(window.history.scrollRestoration, 'manual');
     });
 
-    it('navigateTo: dispatches unmount depth-first (children before parents) (LT-1103)', async () => {
+    it('navigateTo: dispatches unmount depth-first (children before parents)', async () => {
         const unmountOrder: string[] = [];
 
         const parent = document.createElement('div');
@@ -274,7 +274,7 @@ describe('Router Comprehensive Suite (LT-107, LT-202, LT-203, LT-204)', () => {
         }
     });
 
-    it('navigateTo: preserves persistent element exact node identity across multiple navigations (LT-1103)', async () => {
+    it('navigateTo: preserves persistent element exact node identity across multiple navigations', async () => {
         document.body.innerHTML = `
             <div data-persist="audio-player" id="live-player">
                 <audio src="track.mp3"></audio>

@@ -3,7 +3,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { resolvePart, applyPart } from '../../src/runtime/parts.ts';
 
-describe('Parts & Passthrough (pt) Contract Suite (LT-1104)', () => {
+describe('Parts & Passthrough (pt) Contract Suite', () => {
     it('resolvePart returns default classes and sets data-part attribute', () => {
         const result = resolvePart('trigger', 'p-select-trigger p-component');
 

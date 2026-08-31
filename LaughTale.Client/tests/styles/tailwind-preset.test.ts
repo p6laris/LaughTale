@@ -3,7 +3,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { laughtaleTailwindPreset } from '../../src/styles/tailwind.preset.ts';
 
-describe('LaughTale Tailwind CSS Preset Suite (LT-2106 / P11)', () => {
+describe('LaughTale Tailwind CSS Preset Suite ( / P11)', () => {
     it('provides complete primary color ramp mapping to CSS variables', () => {
         const colors = laughtaleTailwindPreset.theme.extend.colors;
         assert.ok(colors.primary);

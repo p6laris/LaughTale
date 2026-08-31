@@ -9,7 +9,7 @@ import {
 } from '../../src/runtime/styles.ts';
 import { setCspNonce } from '../../src/directives/csp.ts';
 
-describe('Batched Island Styles & Adopted StyleSheets Suite (LT-703)', () => {
+describe('Batched Island Styles & Adopted StyleSheets Suite', () => {
     beforeEach(() => {
         clearAllIslandStyles();
         document.head.innerHTML = '';

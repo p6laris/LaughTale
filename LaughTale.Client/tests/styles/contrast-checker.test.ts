@@ -7,7 +7,7 @@ import {
     checkWcagCompliance
 } from '../../src/styles/contrast-checker.ts';
 
-describe('WCAG Contrast Engine & Compliance Suite (LT-605)', () => {
+describe('WCAG Contrast Engine & Compliance Suite', () => {
     it('calculates relative luminance per W3C WCAG 2.1 specifications', () => {
         assert.equal(calculateRelativeLuminance({ r: 255, g: 255, b: 255 }), 1.0);
         assert.equal(calculateRelativeLuminance({ r: 0, g: 0, b: 0 }), 0.0);

@@ -80,4 +80,4 @@ app.Run();
 
 ## 📄 License & Attribution
 
-Distributed under the [MIT License](LICENSE). See [NOTICE](NOTICE) for third-party open-source attributions (PrimeVue, Lucide, Astro).
+Distributed under the [MIT License](LICENSE). See [NOTICE](NOTICE) for third-party open-source notices.

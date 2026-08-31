@@ -10,7 +10,7 @@ import {
     clearHydrationMetrics
 } from '../../src/runtime/benchmark.ts';
 
-describe('Performance Benchmarking & Metrics Suite (LT-701)', () => {
+describe('Performance Benchmarking & Metrics Suite', () => {
     beforeEach(() => {
         clearHydrationMetrics();
     });

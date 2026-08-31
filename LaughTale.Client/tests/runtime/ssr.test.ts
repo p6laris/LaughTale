@@ -3,7 +3,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { hasSsrContent, getSsrRoot, markSsrHydrated, SSR_ATTR, SSR_HYDRATED_ATTR } from '../../src/runtime/ssr.ts';
 
-describe('SSR Progressive Enhancement & Detection Suite (LT-503)', () => {
+describe('SSR Progressive Enhancement & Detection Suite', () => {
     it('detects SSR content on container with data-lt-ssr attribute', () => {
         const container = document.createElement('div');
         container.setAttribute(SSR_ATTR, 'true');

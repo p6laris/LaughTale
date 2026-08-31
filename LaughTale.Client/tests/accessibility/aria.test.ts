@@ -7,7 +7,7 @@ import {
     handleRovingKeydown
 } from '../../src/accessibility/aria.ts';
 
-describe('WAI-ARIA 1.2 & Roving Tabindex Suite (LT-801)', () => {
+describe('WAI-ARIA 1.2 & Roving Tabindex Suite', () => {
     it('applyAriaAttributes sets and removes ARIA attributes accurately', () => {
         const btn = document.createElement('button');
 

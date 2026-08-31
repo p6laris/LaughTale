@@ -1,5 +1,5 @@
 /**
- * LaughTale Master Token Migration Codemod (LT-1304 / LT-1105)
+ * LaughTale Master Token Migration Codemod ( / )
  * Converts all legacy --p-* variables and hardcoded hex fallbacks across all 76 components
  * into pure semantic --lt-* tokens with zero hardcoded hex literals.
  */

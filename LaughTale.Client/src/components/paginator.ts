@@ -288,12 +288,12 @@ const ICONS = {
 
 // Scenic nature images with reliable fallback
 const DEFAULT_IMAGES = [
-    'https://primefaces.org/cdn/LaughTale/images/nature/nature1.jpg',
-    'https://primefaces.org/cdn/LaughTale/images/nature/nature2.jpg',
-    'https://primefaces.org/cdn/LaughTale/images/nature/nature3.jpg',
-    'https://primefaces.org/cdn/LaughTale/images/nature/nature4.jpg',
-    'https://primefaces.org/cdn/LaughTale/images/nature/nature5.jpg',
-    'https://primefaces.org/cdn/LaughTale/images/nature/nature6.jpg'
+    '/images/nature/nature1.jpg',
+    '/images/nature/nature2.jpg',
+    '/images/nature/nature3.jpg',
+    '/images/nature/nature4.jpg',
+    '/images/nature/nature5.jpg',
+    '/images/nature/nature6.jpg'
 ];
 
 export default function PaginatorIsland(container: HTMLElement, props: PaginatorProps, ctx?: IslandContext) {

@@ -1,5 +1,5 @@
 /**
- * LaughTale: Directive Security & Sandboxing Unit Tests (LT-103)
+ * LaughTale: Directive Security & Sandboxing Unit Tests
  */
 
 import './setup.ts';
@@ -116,7 +116,7 @@ describe('LaughTale Directive Security & Sandboxing Suite', () => {
         assert.equal(executionCount, 0, 'Exploit handler was executed during sanitization!');
     });
 
-    describe('URL Sanitization 25-Form Matrix Suite (LT-106)', () => {
+    describe('URL Sanitization 25-Form Matrix Suite', () => {
 
         const testMatrix = [
             // Safe Web & Communication Protocols

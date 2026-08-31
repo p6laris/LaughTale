@@ -297,7 +297,7 @@ export default function TieredMenuIsland(container: HTMLElement, props: TieredMe
     function getIconSvg(iconName?: string): string {
         if (!iconName) return '';
         if (iconName.startsWith('<svg')) return iconName;
-        // Map common PrimeIcons names to Lucide icons
+        // Map common Icons names to Lucide icons
         const iconMap: Record<string, string> = {
             'pi-file': 'file',
             'pi-file-edit': 'fileEdit',

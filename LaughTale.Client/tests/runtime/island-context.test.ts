@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { defineIsland, clearRegistry, type IslandContext } from '../../src/runtime/registry.ts';
 import { hydrateIsland } from '../../src/runtime/hydrator.ts';
 
-describe('IslandContext & Lifecycle AbortSignal Suite (LT-1102)', () => {
+describe('IslandContext & Lifecycle AbortSignal Suite', () => {
     beforeEach(() => {
         clearRegistry();
         document.body.innerHTML = '';

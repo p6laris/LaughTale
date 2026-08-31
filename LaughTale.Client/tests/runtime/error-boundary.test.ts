@@ -5,7 +5,7 @@ import { defineIsland, clearRegistry } from '../../src/runtime/registry.ts';
 import { hydrateIsland } from '../../src/runtime/hydrator.ts';
 import { renderErrorBoundary } from '../../src/runtime/error-boundary.ts';
 
-describe('Island Error Boundary & Dev-Mode Overlay Suite (LT-904)', () => {
+describe('Island Error Boundary & Dev-Mode Overlay Suite', () => {
     beforeEach(() => {
         clearRegistry();
         document.body.innerHTML = '';

@@ -22,7 +22,7 @@ namespace LaughTale.Tests;
 public record CustomCounterProps(int StartCount, string Label);
 
 /// <summary>
-/// Verifies the Core-Only isolation boundary (LT-1606 / §2.5).
+/// Verifies the Core-Only isolation boundary ( / §2.5).
 /// Guarantees that an application using only LaughTale.Core can configure, render, and execute islands.
 /// </summary>
 public class CoreOnlyBoundaryTests

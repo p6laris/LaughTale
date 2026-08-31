@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 
 import { evaluateExpression, executeStatement } from '../src/directives/reactivity.ts';
 
-describe('Directive Expression Sandbox Security Suite (LT-101)', () => {
+describe('Directive Expression Sandbox Security Suite', () => {
 
     const scope = {
         count: 42,

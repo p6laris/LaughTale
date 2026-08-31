@@ -35,15 +35,15 @@ const getNow = (): number => {
  * Calculates statistical percentiles from numeric timing samples.
  */
 export function calculatePercentiles(samples: number[]): {
-    p50: number;
-    p95: number;
-    p99: number;
+    number;
+    number;
+    number;
     min: number;
     max: number;
     mean: number;
 } {
     if (samples.length === 0) {
-        return { p50: 0, p95: 0, p99: 0, min: 0, max: 0, mean: 0 };
+        return { 0, 0, 0, min: 0, max: 0, mean: 0 };
     }
 
     const sorted = [...samples].sort((a, b) => a - b);
@@ -56,9 +56,9 @@ export function calculatePercentiles(samples: number[]): {
     };
 
     return {
-        p50: getP(0.5),
-        p95: getP(0.95),
-        p99: getP(0.99),
+        getP(0.5),
+        getP(0.95),
+        getP(0.99),
         min: sorted[0],
         max: sorted[sorted.length - 1],
         mean: Math.round(mean * 1000) / 1000

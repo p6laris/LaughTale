@@ -17,7 +17,7 @@ const SAMPLE_MASTER_SPRITE = `
 </svg>
 `;
 
-describe('Icon Subset Sprite Generator Suite (LT-704)', () => {
+describe('Icon Subset Sprite Generator Suite', () => {
     it('extractIconSymbols parses all symbols and creates normalized lookups', () => {
         const symbols = extractIconSymbols(SAMPLE_MASTER_SPRITE);
         assert.equal(symbols.has('lucide-check'), true);

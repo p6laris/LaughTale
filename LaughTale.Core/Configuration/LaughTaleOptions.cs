@@ -4,7 +4,7 @@ using LaughTale.Core.Localization;
 namespace LaughTale.Core.Configuration;
 
 /// <summary>
-/// Root configuration options for LaughTale Islands Architecture (LT-1109 / §2.5).
+/// Root configuration options for LaughTale Islands Architecture ( / §2.5).
 /// Every non-essential feature defaults to disabled for maximum modularity and performance.
 /// </summary>
 public sealed class LaughTaleOptions

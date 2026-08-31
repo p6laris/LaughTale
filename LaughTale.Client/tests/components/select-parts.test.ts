@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import SelectIsland from '../../src/components/select.ts';
 import { MemoryLeakHarness } from '../../src/testing/leak-harness.ts';
 
-describe('Select Reference Component Parts, Passthrough & Lifecycle Suite (LT-1104, LT-1107)', () => {
+describe('Select Reference Component Parts, Passthrough & Lifecycle Suite (, )', () => {
     it('renders data-part attributes on all sub-elements', () => {
         const container = document.createElement('div');
         SelectIsland(container, {

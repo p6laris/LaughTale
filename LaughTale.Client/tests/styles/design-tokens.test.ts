@@ -3,7 +3,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { initDesignTokens, updateToken, getToken, AURA_PALETTES } from '../../src/styles/design-tokens.ts';
 
-describe('Design Tokens Contract & Unification Suite (LT-601)', () => {
+describe('Design Tokens Contract & Unification Suite', () => {
     it('initializes design tokens in document head', () => {
         initDesignTokens();
         const styleEl = document.getElementById('laughtale-design-tokens');

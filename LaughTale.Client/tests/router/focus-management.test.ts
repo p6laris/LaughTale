@@ -5,7 +5,7 @@ import { navigateTo } from '../../src/runtime/router.ts';
 import { getAnnouncerElement, clearAnnouncements } from '../../src/accessibility/announcer.ts';
 import { prefetchManager } from '../../src/router/prefetch.ts';
 
-describe('Router Accessible Focus & Announcements Suite (LT-803)', () => {
+describe('Router Accessible Focus & Announcements Suite', () => {
     beforeEach(() => {
         prefetchManager.invalidate();
         clearAnnouncements();

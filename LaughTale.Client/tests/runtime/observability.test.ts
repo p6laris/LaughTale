@@ -11,7 +11,7 @@ import {
     getHydrationErrorHandler
 } from '../../src/runtime/hydrator.ts';
 
-describe('Client Hydration Observability & RUM Suite (LT-902)', () => {
+describe('Client Hydration Observability & RUM Suite', () => {
     beforeEach(() => {
         clearRegistry();
         setHydrationErrorHandler(null);

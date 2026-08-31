@@ -3,7 +3,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { renderSkeleton, renderEmptyState, renderErrorState } from '../../src/runtime/states.ts';
 
-describe('Component State Convention & Presentation Suite (LT-504)', () => {
+describe('Component State Convention & Presentation Suite', () => {
     it('renderSkeleton: produces accessible pulse loader with correct lines', () => {
         const html = renderSkeleton({ lines: 3, height: '2rem' });
         assert.ok(html.includes('role="status"'));

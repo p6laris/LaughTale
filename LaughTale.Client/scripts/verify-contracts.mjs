@@ -1,5 +1,5 @@
 /**
- * LaughTale: Architecture & Contract Verification Gate (LT-1108)
+ * LaughTale: Architecture & Contract Verification Gate
  * Enforces strict lint rules:
  * 1. Reference components must accept `ctx?: IslandContext` and pass `signal` on `addEventListener`.
  * 2. Component props interfaces must include `pt?: PassthroughRecord` and `studioOverrides?: Record<string, any>`.
@@ -35,7 +35,7 @@ for (const file of files) {
         errors++;
     }
 
-    // Rule 3: Token Purity - Zero hardcoded hex colors (LT-1304)
+    // Rule 3: Token Purity - Zero hardcoded hex colors
     if (file !== 'theme-studio.ts') {
         const hexMatches = content.match(/#[0-9a-fA-F]{3,8}\b/g);
         if (hexMatches && hexMatches.length > 0) {

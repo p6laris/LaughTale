@@ -7,7 +7,7 @@ import {
     type MatrixPermutation
 } from '../../src/testing/visual-harness.ts';
 
-describe('Visual Regression Matrix Harness Suite (LT-604)', () => {
+describe('Visual Regression Matrix Harness Suite', () => {
     it('captureStyleSignature generates deterministic signature strings', () => {
         const el = document.createElement('button');
         el.className = 'btn btn-primary';

@@ -1,5 +1,5 @@
 ﻿/**
- * LaughTale: Tri-State Hydration & Shared IntersectionObserver Tests (LT-205, LT-206)
+ * LaughTale: Tri-State Hydration & Shared IntersectionObserver Tests (, )
  */
 
 import './setup.ts';
@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { defineIsland } from '../src/runtime/registry.ts';
 import { hydrateIsland, retryIsland, getIslandState } from '../src/runtime/hydrator.ts';
 
-describe('Hydrator Tri-State & Shared Viewport Observer Suite (LT-205, LT-206)', () => {
+describe('Hydrator Tri-State & Shared Viewport Observer Suite (, )', () => {
 
     beforeEach(() => {
         document.body.innerHTML = '';
@@ -134,7 +134,7 @@ describe('Hydrator Tri-State & Shared Viewport Observer Suite (LT-205, LT-206)',
         assert.equal(mountCount, 1, 'Island was not mounted after retry');
     });
 
-    it('hydrateVisible: 100 visible-strategy islands share exactly 1 IntersectionObserver instance (LT-206)', () => {
+    it('hydrateVisible: 100 visible-strategy islands share exactly 1 IntersectionObserver instance', () => {
         let observerInstancesCreated = 0;
         let totalObservedElements = 0;
         let totalUnobservedElements = 0;

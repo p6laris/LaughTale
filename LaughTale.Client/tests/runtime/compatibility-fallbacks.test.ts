@@ -5,7 +5,7 @@ import { defineIsland, clearRegistry } from '../../src/runtime/registry.ts';
 import { hydrateIsland } from '../../src/runtime/hydrator.ts';
 import { injectIslandStyle, clearAllIslandStyles } from '../../src/runtime/styles.ts';
 
-describe('Browser Support & Compatibility Fallbacks Suite (LT-905)', () => {
+describe('Browser Support & Compatibility Fallbacks Suite', () => {
     beforeEach(() => {
         clearRegistry();
         clearAllIslandStyles();
