@@ -1,4 +1,4 @@
-﻿---
+---
 title: Security & Production Hardening
 description: Enterprise security architecture — Strict Content Security Policy (CSP), anti-CSRF auto-propagation, AST sandboxing with zero eval, and reflection allowlisting.
 order: 8
@@ -79,10 +79,33 @@ LaughTale encodes all user-provided strings and JSON properties before rendering
 
 ---
 
+## 🔐 5. Dual-Layer Island Authorization (LT-2203)
+
+In traditional SPAs or hybrid islands, client-side re-render requests can bypass Razor page gates if endpoints blindly trust incoming parameters. LaughTale introduces **Dual-Layer Island Authorization**:
+
+1. **Initial TagHelper Render Guard**:
+   - `IslandTagHelper` and all 76 Aura TagHelpers check `IAuthorizationService.AuthorizeAsync(HttpContext.User, policy)`.
+   - On authorization failure, `output.SuppressOutput()` is invoked, ensuring **zero container markup and zero props JSON are transmitted**.
+2. **Server-Driven Refresh Gating**:
+   - `POST /_laughtale/island/{name}` independently validates the policy against the authenticated `HttpContext.User` on the live connection.
+   - If user permissions change or are revoked mid-session, refresh returns **`403 Forbidden` with an empty payload**.
+3. **`[IslandAuthorize]` Attribute Auto-Binding**:
+   - Mark props models directly with `[IslandAuthorize("PolicyName")]`.
+   - Both initial TagHelper renderers and refresh routers auto-discover and enforce the policy automatically.
+
+```csharp
+[Island("executive-analytics")]
+[IslandAuthorize("ExecutiveOnly")]
+public record ExecutiveAnalyticsProps(decimal MonthlyRevenue, decimal NetMargin);
+```
+
+---
+
 ## 📋 Security Checklist for Production
 
 - [x] Enable HTTPS redirection (`app.UseHttpsRedirection()`).
 - [x] Configure strict CSP headers without `unsafe-eval`.
 - [x] Define explicit property allowlists on public `MapIslandData` endpoints.
-- [x] Ensure anti-forgery token middleware is enabled in ASP.NET Core.
+- [x] Ensure anti-forgery token middleware is enabled in ASP.NET Core (`options.Refresh.RequireAntiforgery = true`).
 - [x] Use `[IslandPrivate]` on sensitive model properties (e.g. PasswordHash, InternalNotes).
+- [x] Enforce `[IslandAuthorize]` or `options.Refresh.RequirePolicy(...)` on sensitive UI islands.

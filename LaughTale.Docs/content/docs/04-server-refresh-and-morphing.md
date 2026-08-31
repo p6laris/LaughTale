@@ -1,4 +1,4 @@
-﻿---
+---
 title: Server-Driven Refresh & DOM Morphing
 description: Dynamically update and re-render server islands on demand with Idiomorph DOM morphing that preserves focus, cursor positions, and client state.
 order: 5
@@ -76,3 +76,55 @@ You can also trigger a server refresh directly in your HTML using LaughTale's `l
 ## 🛡️ 4. Anti-Forgery Token Integration
 
 All server-driven refresh calls automatically discover and append ASP.NET Core `__RequestVerificationToken` headers (`X-CSRF-TOKEN`), protecting your application against Cross-Site Request Forgery out-of-the-box.
+
+```csharp
+// Program.cs
+builder.Services.AddLaughTale(options =>
+{
+    // Enforces CSRF token validation on all refresh requests (default: true)
+    options.Refresh.RequireAntiforgery = true;
+});
+```
+
+---
+
+## 🔒 5. Authorization & Policy Enforcement (LT-2203)
+
+Initial page renders can be conditionally wrapped with `@if (await AuthorizationService.AuthorizeAsync(User, "Policy"))`. However, because `island.refresh()` is a separate server-side request issued after page load, LaughTale **independently re-evaluates the exact same authorization policy against `HttpContext.User`** on every refresh call.
+
+### A. Decorator Pattern with `[IslandAuthorize]`
+Decorate your props model or record with `[IslandAuthorize]`. LaughTale automatically registers and enforces the policy for both initial TagHelper rendering and subsequent refresh endpoints:
+
+```csharp
+using LaughTale.Core.Attributes;
+
+[Island("sales-dashboard")]
+[IslandAuthorize("RequireSalesManager")]
+public record SalesDashboardProps(string Region, decimal Target);
+```
+
+### B. Global Policy Configuration
+You can also configure authorization policies per island in `Program.cs`:
+
+```csharp
+builder.Services.AddLaughTale(options =>
+{
+    options.Refresh.RequirePolicy("admin-panel", "AdminOnly");
+    options.Refresh.RequirePolicy("financial-report", "RequireFinanceRole");
+});
+```
+
+### C. Declarative TagHelper Attribute
+Pass the policy directly on `<island>` or any generated TagHelper:
+
+```html
+<island name="financial-report" policy="RequireFinanceRole" props="Model.ReportData" />
+
+<!-- Or with typed Aura TagHelpers -->
+<aura-datatable policy="AdminOnly" data-source="Model.AuditLogs" />
+```
+
+### 🛡️ Leak-Proof Security Contract
+- **Initial Render**: If the user is unauthorized, `IslandTagHelper` calls `output.SuppressOutput()`, rendering **zero HTML elements, zero container tags, and zero props**.
+- **Refresh Endpoint**: If a user's role or policy changes/revokes after page load, calling `island.refresh()` returns **`403 Forbidden` with an empty response body**, preventing any confidential props from leaking over the wire.
+

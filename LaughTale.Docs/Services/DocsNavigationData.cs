@@ -62,6 +62,7 @@ public static class DocsNavigationData
 
             new SidebarItem("Buttons & Actions", "zap", null, true, new List<SidebarItem>
             {
+                new("Icons & SVG Sprites", "zap", "/doc/07a-icons-and-svg-sprites", currentPath.Contains("07a-icons-and-svg-sprites"), null, "New"),
                 new("Button & SplitButton", "zap", "/doc/60-button", currentPath.Contains("60-button"), null, "New"),
                 new("SpeedDial FAB", "plus", "/doc/27-speed-dial", currentPath.Contains("27-speed-dial"))
             }),
