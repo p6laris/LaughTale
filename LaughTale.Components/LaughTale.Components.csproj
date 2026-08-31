@@ -22,4 +22,8 @@
                       ReferenceOutputAssembly="false" />
   </ItemGroup>
 
+  <Target Name="GenerateIconSprite" BeforeTargets="BeforeBuild" Condition="Exists('..\scripts\gen-icons.mjs')">
+    <Exec Command="node ..\scripts\gen-icons.mjs" ContinueOnError="true" StandardOutputImportance="low" />
+  </Target>
+
 </Project>

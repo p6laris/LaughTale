@@ -38,6 +38,37 @@ public sealed class LaughTaleOptions
     /// Internationalization (i18n), culture resolution, and ASP.NET Core IStringLocalizer options.
     /// </summary>
     public LaughTaleLocalizationOptions Localization { get; set; } = new();
+
+    /// <summary>
+    /// Self-hosted SVG icon sprite and Lucide integration options.
+    /// </summary>
+    public IconOptions Icons { get; set; } = new();
+}
+
+/// <summary>
+/// Self-hosted icon sprite and Lucide rendering configuration.
+/// </summary>
+public sealed class IconOptions
+{
+    /// <summary>
+    /// Path or URL prefix for the self-hosted SVG sprite. Default: "/_lt/icons.svg".
+    /// </summary>
+    public string SpritePath { get; set; } = "/_lt/icons.svg";
+
+    /// <summary>
+    /// Default CSS class applied to rendered SVG icon elements. Default: "lt-icon".
+    /// </summary>
+    public string DefaultClass { get; set; } = "lt-icon";
+
+    /// <summary>
+    /// Default dimension in pixels for icon elements. Default: 16.
+    /// </summary>
+    public int DefaultSize { get; set; } = 16;
+
+    /// <summary>
+    /// Default stroke-width for icons. Default: 2.
+    /// </summary>
+    public double DefaultStrokeWidth { get; set; } = 2.0;
 }
 
 /// <summary>

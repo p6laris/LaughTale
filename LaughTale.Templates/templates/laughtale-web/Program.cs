@@ -24,5 +24,6 @@ app.UseAuthorization();
 
 app.MapRazorPages();
 app.MapLaughTaleIslandRefresh();
+app.MapLaughTaleIcons();
 
 app.Run();

@@ -223,4 +223,29 @@ public class TagHelpersTests
             System.Globalization.CultureInfo.CurrentUICulture = prevCulture;
         }
     }
+
+    [Fact]
+    public void IconTagHelper_RendersCleanSvgWithUseElement()
+    {
+        var helper = new IconTagHelper
+        {
+            Name = "check",
+            Size = 24,
+            Color = "#10b981",
+            Class = "custom-icon-class"
+        };
+
+        var (context, output) = CreateTagHelperContext("lt-icon");
+        helper.Process(context, output);
+
+        Assert.Equal("svg", output.TagName);
+        Assert.Equal("lt-icon lt-icon-check custom-icon-class", output.Attributes["class"].Value);
+        Assert.Equal("24", output.Attributes["width"].Value);
+        Assert.Equal("24", output.Attributes["height"].Value);
+        Assert.Equal("#10b981", output.Attributes["stroke"].Value);
+        Assert.Equal("icon", output.Attributes["data-part"].Value);
+
+        var content = output.Content.GetContent();
+        Assert.Contains("<use href=\"/_lt/icons.svg#check\"></use>", content);
+    }
 }
