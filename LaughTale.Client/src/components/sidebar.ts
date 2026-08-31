@@ -146,7 +146,13 @@ html.dark .p-sidebar-menu-button:hover,
 [data-theme="dark"] .p-sidebar-menu-button:hover,
 .dark .p-sidebar-menu-button:hover {
     background: var(--p-surface-100) !important;
-    color: var(--p-surface-0) !important;
+    color: var(--p-text-color) !important;
+}
+
+html.dark .p-sidebar-menu-button:hover .p-sidebar-menu-button-icon,
+[data-theme="dark"] .p-sidebar-menu-button:hover .p-sidebar-menu-button-icon,
+.dark .p-sidebar-menu-button:hover .p-sidebar-menu-button-icon {
+    color: var(--p-primary-400) !important;
 }
 
 html.dark .p-sidebar-menu-button.p-sidebar-active,
@@ -1033,7 +1039,7 @@ html.dark .p-sidebar-menu-button:hover,
 [data-theme="dark"] .p-sidebar-menu-button:hover,
 .dark .p-sidebar-menu-button:hover {
     background: var(--p-surface-100);
-    color: var(--p-surface-0);
+    color: var(--p-text-color);
 }
 
 html.dark .p-sidebar-menu-button.p-active,

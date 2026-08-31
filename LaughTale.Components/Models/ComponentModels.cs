@@ -1013,3 +1013,16 @@ public record DropzoneProps(
     string? Url = null, string? Name = "file", bool Multiple = true,
     string? Accept = null, int? MaxFileSize = null, string? Message = "Drag & Drop files here or browse"
 );
+
+[LaughTale.Core.Attributes.Island("theme-studio")]
+public record ThemeStudioProps(
+    bool Visible = false,
+    string? Position = "right"
+);
+
+[LaughTale.Core.Attributes.Island("command")]
+public record CommandProps(
+    string? Placeholder = "Type a command or search...",
+    bool Visible = false
+);
+
