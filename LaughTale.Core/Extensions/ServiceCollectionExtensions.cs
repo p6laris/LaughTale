@@ -1,7 +1,9 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using LaughTale.Core.Configuration;
+using LaughTale.Core.Localization;
 
 namespace LaughTale.Core.Extensions;
 
@@ -23,6 +25,27 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IOptions<LaughTaleOptions>>(new OptionsWrapper<LaughTaleOptions>(options));
 
         // Core island services
+        services.TryAddSingleton<ILaughTaleLocalizer, LaughTaleLocalizer>();
+
+        return services;
+    }
+
+    /// <summary>
+    /// Registers and configures LaughTale localization engine with custom dictionaries and IStringLocalizer support.
+    /// </summary>
+    public static IServiceCollection AddLaughTaleLocalization(
+        this IServiceCollection services,
+        Action<LaughTaleLocalizationOptions>? configure = null)
+    {
+        var locOptions = new LaughTaleLocalizationOptions();
+        configure?.Invoke(locOptions);
+
+        services.Configure<LaughTaleOptions>(opt =>
+        {
+            opt.Localization = locOptions;
+        });
+
+        services.TryAddSingleton<ILaughTaleLocalizer, LaughTaleLocalizer>();
         return services;
     }
 

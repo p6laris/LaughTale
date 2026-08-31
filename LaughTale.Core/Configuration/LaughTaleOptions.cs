@@ -1,4 +1,5 @@
 using System;
+using LaughTale.Core.Localization;
 
 namespace LaughTale.Core.Configuration;
 
@@ -32,6 +33,11 @@ public sealed class LaughTaleOptions
     /// Output caching and personal data protection options. Defaults to active safety.
     /// </summary>
     public CachingOptions Caching { get; set; } = new();
+
+    /// <summary>
+    /// Internationalization (i18n), culture resolution, and ASP.NET Core IStringLocalizer options.
+    /// </summary>
+    public LaughTaleLocalizationOptions Localization { get; set; } = new();
 }
 
 /// <summary>
