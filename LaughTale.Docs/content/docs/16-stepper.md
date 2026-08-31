@@ -7,6 +7,14 @@ category: Navigation
 ---
 
 # 🪜 Stepper Component
+<div class="docs-live-sample" style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+    <div style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--p-primary-600); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.4rem;">
+        <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--p-primary-500); box-shadow: 0 0 8px var(--p-primary-500);"></span>
+        Live Interactive Preview
+    </div>
+    <div data-island="stepper" data-props='{"activeStep": 1, "linear": false, "steps": [{"title": "Account", "icon": "user"}, {"title": "Address", "icon": "mapPin"}, {"title": "Confirmation", "icon": "check"}]}' data-hydrate="load"></div>
+</div>
+
 
 `<island-stepper />` provides a multi-step workflow container for complex forms, user onboarding, and checkout processes.
 
