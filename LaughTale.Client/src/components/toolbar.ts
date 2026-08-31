@@ -56,17 +56,22 @@ const TOOLBAR_CSS = `
     font-weight: 700 !important;
 }
 
+html.dark .p-toolbar [data-toggle-active="true"],
+html.dark .p-toolbar .p-button-active-toggle,
+[data-theme="dark"] .p-toolbar [data-toggle-active="true"],
+[data-theme="dark"] .p-toolbar .p-button-active-toggle,
 .dark .p-toolbar [data-toggle-active="true"],
-[data-theme="dark"] .p-toolbar .p-button-active-toggle {
-    background: var(--lt-surface-700) !important;
-    color: var(--lt-primary-400) !important;
+.dark .p-toolbar .p-button-active-toggle {
+    background: var(--p-surface-100, #1e293b) !important;
+    color: var(--p-primary-500, #10b981) !important;
 }
 
 /* Dark Mode Tokens */
-.dark .p-toolbar,
-[data-theme="dark"] .p-toolbar {
-    background: var(--lt-surface-900);
-    border-color: var(--lt-surface-700);
+html.dark .p-toolbar,
+[data-theme="dark"] .p-toolbar,
+.dark .p-toolbar {
+    background: var(--p-surface-0, #090d16);
+    border-color: var(--p-border-color, #334155);
 }
 `;
 

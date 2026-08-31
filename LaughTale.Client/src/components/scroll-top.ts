@@ -16,10 +16,19 @@ export interface ScrollTopProps {
 
 
 const CSS = `
-[data-theme="dark"] .laughtale-scroll-top-btn {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-100) !important;
-    border-color: var(--lt-surface-700) !important;
+.laughtale-scroll-top-btn {
+    background: var(--p-primary-500, #10b981) !important;
+    color: #ffffff !important;
+}
+.laughtale-scroll-top-btn:hover {
+    background: var(--p-primary-400, #34d399) !important;
+}
+
+html.dark .laughtale-scroll-top-btn,
+[data-theme="dark"] .laughtale-scroll-top-btn,
+.dark .laughtale-scroll-top-btn {
+    background: var(--p-primary-500, #10b981) !important;
+    color: #ffffff !important;
 }
 `;
 
