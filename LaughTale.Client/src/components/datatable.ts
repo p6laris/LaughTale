@@ -597,7 +597,22 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
     injectIslandStyle('datatable', DATATABLE_CSS);
 
     const rawData: Record<string, any>[] = [...(props.value || props.data || [])];
-    const columns: DataTableColumn[] = props.columns || [];
+    let columns: DataTableColumn[] = [...(props.columns || [])];
+    if (columns.length === 0 && rawData.length > 0 && rawData[0] && typeof rawData[0] === 'object') {
+        columns = Object.keys(rawData[0]).map(key => {
+            let title = key;
+            if (key.toLowerCase() === 'id') {
+                title = 'ID';
+            } else {
+                title = key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1').trim();
+            }
+            return {
+                field: key,
+                header: title,
+                sortable: true
+            };
+        });
+    }
     let currentSize = props.size || 'normal';
     const showGridlines = !!props.showGridlines;
     const stripedRows = !!props.stripedRows;

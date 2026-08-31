@@ -8,6 +8,7 @@ import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
 import { useDisclosure } from '../composables/useDisclosure';
 import { useClickOutside } from '../composables/useClickOutside';
+import { useLocale } from '../composables/useLocale';
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 
@@ -437,6 +438,17 @@ const WEEKDAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 export default function DatePickerIsland(container: HTMLElement, props: DatePickerProps, ctx?: IslandContext) {
     injectIslandStyle('datepicker', CSS);
 
+    const locale = useLocale(ctx);
+    const monthNames = locale.dictionary?.monthNames || MONTH_NAMES;
+    const shortMonths = locale.dictionary?.monthNamesShort || SHORT_MONTHS;
+    const firstDayOfWeek = locale.dictionary?.firstDayOfWeek ?? 0;
+    const dayNamesMin = locale.dictionary?.dayNamesMin || WEEKDAYS;
+
+    const orderedWeekdays: string[] = [];
+    for (let i = 0; i < 7; i++) {
+        orderedWeekdays.push(dayNamesMin[(firstDayOfWeek + i) % 7]);
+    }
+
     const selectionMode = props.selectionMode || 'single';
     let currentView: 'date' | 'month' | 'year' = props.view || 'date';
     const isInline = props.inline === true;
@@ -602,7 +614,7 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
                     ${LucideIcons.chevronLeft}
                 </button>
                 <button type="button" class="dp-title-btn btn-title">
-                    ${currentView === 'date' ? `${MONTH_NAMES[month]} ${year}` : (currentView === 'month' ? `${year}` : `${Math.floor(year / 10) * 10} - ${Math.floor(year / 10) * 10 + 9}`)}
+                    ${currentView === 'date' ? `${monthNames[month]} ${year}` : (currentView === 'month' ? `${year}` : `${Math.floor(year / 10) * 10} - ${Math.floor(year / 10) * 10 + 9}`)}
                 </button>
                 <button type="button" class="dp-nav-btn btn-next" aria-label="Next">
                     ${LucideIcons.chevronRight}
@@ -615,15 +627,15 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
 
             ${props.showButtonBar ? `
                 <div class="dp-buttonbar">
-                    <button type="button" class="dp-bar-btn btn-today">Today</button>
-                    <button type="button" class="dp-bar-btn btn-clear">Clear</button>
+                    <button type="button" class="dp-bar-btn btn-today">${locale.t('today') || 'Today'}</button>
+                    <button type="button" class="dp-bar-btn btn-clear">${locale.t('clear') || 'Clear'}</button>
                 </div>
             ` : ''}
         `;
     }
 
     function renderDateView(year: number, month: number): string {
-        const firstDayIndex = new Date(year, month, 1).getDay();
+        const firstDayIndex = (new Date(year, month, 1).getDay() - firstDayOfWeek + 7) % 7;
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const daysInPrevMonth = new Date(year, month, 0).getDate();
         const today = new Date();
@@ -679,7 +691,7 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
 
         return `
             <div class="dp-weekdays">
-                ${WEEKDAYS.map(w => `<span>${w}</span>`).join('')}
+                ${orderedWeekdays.map(w => `<span>${w}</span>`).join('')}
             </div>
             <div class="dp-days-grid">
                 ${cellsHtml}
@@ -690,7 +702,7 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
     function renderMonthView(year: number): string {
         return `
             <div class="dp-month-grid">
-                ${SHORT_MONTHS.map((m, idx) => {
+                ${shortMonths.map((m, idx) => {
                     const isSelected = selectedDates.some(d => d.getFullYear() === year && d.getMonth() === idx);
                     return `<button type="button" class="dp-view-btn ${isSelected ? 'selected' : ''}" data-month="${idx}">${m}</button>`;
                 }).join('')}
