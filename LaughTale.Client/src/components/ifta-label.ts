@@ -17,6 +17,7 @@ export interface IftaLabelProps {
 }
 
 const CSS = `
+island-ifta-label,
 .laughtale-ifta-label {
     position: relative;
     display: inline-flex;
@@ -26,6 +27,7 @@ const CSS = `
     box-sizing: border-box;
 }
 
+island-ifta-label > label,
 .laughtale-ifta-label > label {
     position: absolute;
     top: 0.4rem;
@@ -40,6 +42,18 @@ const CSS = `
     user-select: none;
 }
 
+island-ifta-label input,
+island-ifta-label textarea,
+island-ifta-label select,
+island-ifta-label .p-input,
+island-ifta-label .p-password-container,
+island-ifta-label .p-inputtags,
+island-ifta-label .cs-trigger,
+island-ifta-label .dp-trigger,
+island-ifta-label .ac-input-container,
+island-ifta-label .p-select,
+island-ifta-label .p-treeselect,
+island-ifta-label .p-multiselect,
 .laughtale-ifta-label input,
 .laughtale-ifta-label textarea,
 .laughtale-ifta-label select,
@@ -59,6 +73,9 @@ const CSS = `
     box-sizing: border-box;
 }
 
+island-ifta-label .p-inputtags input,
+island-ifta-label .p-password-container input,
+island-ifta-label .p-inputgroup input,
 .laughtale-ifta-label .p-inputtags input,
 .laughtale-ifta-label .p-password-container input,
 .laughtale-ifta-label .p-inputgroup input {
@@ -68,11 +85,16 @@ const CSS = `
 }
 
 /* Focus State */
+island-ifta-label:focus-within > label,
 .laughtale-ifta-label:focus-within > label {
     color: var(--lt-primary-500);
 }
 
 /* Invalid State */
+island-ifta-label.invalid > label,
+island-ifta-label:has(.invalid) > label,
+island-ifta-label:has(.is-invalid) > label,
+island-ifta-label:has(:invalid) > label,
 .laughtale-ifta-label.invalid > label,
 .laughtale-ifta-label:has(.invalid) > label,
 .laughtale-ifta-label:has(.is-invalid) > label,
@@ -81,24 +103,42 @@ const CSS = `
 }
 
 /* Dark Mode Tokens */
+html.dark island-ifta-label > label,
 html.dark .laughtale-ifta-label > label,
+[data-theme="dark"] island-ifta-label > label,
 [data-theme="dark"] .laughtale-ifta-label > label,
+.dark island-ifta-label > label,
 .dark .laughtale-ifta-label > label {
     color: var(--p-text-muted);
 }
+html.dark island-ifta-label:focus-within > label,
 html.dark .laughtale-ifta-label:focus-within > label,
+[data-theme="dark"] island-ifta-label:focus-within > label,
 [data-theme="dark"] .laughtale-ifta-label:focus-within > label,
+.dark island-ifta-label:focus-within > label,
 .dark .laughtale-ifta-label:focus-within > label {
     color: var(--p-primary-400);
 }
+html.dark island-ifta-label.invalid > label,
+html.dark island-ifta-label:has(.invalid) > label,
+html.dark island-ifta-label:has(.is-invalid) > label,
+html.dark island-ifta-label:has(:invalid) > label,
 html.dark .laughtale-ifta-label.invalid > label,
 html.dark .laughtale-ifta-label:has(.invalid) > label,
 html.dark .laughtale-ifta-label:has(.is-invalid) > label,
 html.dark .laughtale-ifta-label:has(:invalid) > label,
+[data-theme="dark"] island-ifta-label.invalid > label,
+[data-theme="dark"] island-ifta-label:has(.invalid) > label,
+[data-theme="dark"] island-ifta-label:has(.is-invalid) > label,
+[data-theme="dark"] island-ifta-label:has(:invalid) > label,
 [data-theme="dark"] .laughtale-ifta-label.invalid > label,
 [data-theme="dark"] .laughtale-ifta-label:has(.invalid) > label,
 [data-theme="dark"] .laughtale-ifta-label:has(.is-invalid) > label,
 [data-theme="dark"] .laughtale-ifta-label:has(:invalid) > label,
+.dark island-ifta-label.invalid > label,
+.dark island-ifta-label:has(.invalid) > label,
+.dark island-ifta-label:has(.is-invalid) > label,
+.dark island-ifta-label:has(:invalid) > label,
 .dark .laughtale-ifta-label.invalid > label,
 .dark .laughtale-ifta-label:has(.invalid) > label,
 .dark .laughtale-ifta-label:has(.is-invalid) > label,
@@ -110,26 +150,24 @@ html.dark .laughtale-ifta-label:has(:invalid) > label,
 export default function IftaLabelIsland(container: HTMLElement, props: IftaLabelProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-ifta-label', CSS);
 
-    const initialHtml = container.innerHTML;
-    const forAttr = props.for ? `for="${props.for}"` : '';
+    container.classList.add('laughtale-ifta-label');
+    if (props.invalid) {
+        container.classList.add('invalid');
+    }
+    container.setAttribute('data-part', 'root');
 
     // Check if label element already exists in slotted markup
-    const existingLabel = container.querySelector('label');
-    const labelText = props.label || (existingLabel ? existingLabel.textContent : 'Label');
-
-    container.innerHTML = `
-        <div class="laughtale-ifta-label ${props.invalid ? 'invalid' : ''}" data-part="root">
-            ${initialHtml}
-            ${!existingLabel && labelText ? `<label ${forAttr}>${labelText}</label>` : ''}
-        </div>
-    `;
-
-    const wrap = container.querySelector<HTMLElement>('.laughtale-ifta-label')!;
-    const labelEl = wrap.querySelector('label');
+    let labelEl = container.querySelector('label');
+    if (!labelEl && props.label) {
+        labelEl = document.createElement('label');
+        if (props.for) labelEl.setAttribute('for', props.for);
+        labelEl.textContent = props.label;
+        container.appendChild(labelEl);
+    }
 
     // Label click focus delegation
     labelEl?.addEventListener('click', () => {
-        const input = wrap.querySelector<HTMLElement>('input, textarea, select, .cs-trigger, .dp-trigger, .ac-input, .p-inputtags-input, .p-password-input');
+        const input = container.querySelector<HTMLElement>('input, textarea, select, .cs-trigger, .dp-trigger, .ac-input, .p-inputtags-input, .p-password-input');
         if (input) {
             input.focus();
             if (typeof (input as any).click === 'function' && !input.matches('input, textarea')) {

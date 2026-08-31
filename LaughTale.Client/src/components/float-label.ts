@@ -19,6 +19,7 @@ export interface FloatLabelProps {
 }
 
 const CSS = `
+island-float-label,
 .laughtale-float-label {
     position: relative;
     display: inline-flex;
@@ -29,6 +30,7 @@ const CSS = `
     box-sizing: border-box;
 }
 
+island-float-label > label,
 .laughtale-float-label > label {
     position: absolute;
     left: 0.75rem;
@@ -43,10 +45,18 @@ const CSS = `
 }
 
 /* Variant: over (Floats completely above the input) */
+island-float-label[variant="over"] > label,
 .laughtale-float-label-over > label {
     top: 50%;
     transform: translateY(-50%);
 }
+island-float-label[variant="over"]:has(textarea) > label,
+.laughtale-float-label-over:has(textarea) > label {
+    top: 1rem;
+    transform: none;
+}
+island-float-label[variant="over"].has-value > label,
+island-float-label[variant="over"]:focus-within > label,
 .laughtale-float-label-over.has-value > label,
 .laughtale-float-label-over:focus-within > label {
     top: -1.25rem;
@@ -58,6 +68,7 @@ const CSS = `
 }
 
 /* Variant: on (Floats on the top border line with surface pill masking) */
+island-float-label[variant="on"] > label,
 .laughtale-float-label-on > label {
     top: 50%;
     transform: translateY(-50%);
@@ -65,6 +76,13 @@ const CSS = `
     padding: 0 0.35rem;
     border-radius: 2px;
 }
+island-float-label[variant="on"]:has(textarea) > label,
+.laughtale-float-label-on:has(textarea) > label {
+    top: 1rem;
+    transform: none;
+}
+island-float-label[variant="on"].has-value > label,
+island-float-label[variant="on"]:focus-within > label,
 .laughtale-float-label-on.has-value > label,
 .laughtale-float-label-on:focus-within > label {
     top: 0;
@@ -76,10 +94,18 @@ const CSS = `
 }
 
 /* Variant: in (Infield top-aligned label) */
+island-float-label[variant="in"] > label,
 .laughtale-float-label-in > label {
     top: 50%;
     transform: translateY(-50%);
 }
+island-float-label[variant="in"]:has(textarea) > label,
+.laughtale-float-label-in:has(textarea) > label {
+    top: 1rem;
+    transform: none;
+}
+island-float-label[variant="in"].has-value > label,
+island-float-label[variant="in"]:focus-within > label,
 .laughtale-float-label-in.has-value > label,
 .laughtale-float-label-in:focus-within > label {
     top: 0.35rem;
@@ -157,33 +183,31 @@ export default function FloatLabelIsland(container: HTMLElement, props: FloatLab
     injectIslandStyle('laughtale-float-label', CSS);
     
     const variant = props.variant || 'over';
-    const initialHtml = container.innerHTML;
-    const forAttr = props.for ? `for="${props.for}"` : '';
+    container.classList.add('laughtale-float-label', `laughtale-float-label-${variant}`);
+    if (props.invalid) {
+        container.classList.add('invalid');
+    }
+    container.setAttribute('data-part', 'root');
 
     // Check if label element already exists in slotted content
-    const existingLabel = container.querySelector('label');
-    const labelText = props.label || (existingLabel ? existingLabel.textContent : 'Label');
-
-    container.innerHTML = `
-        <div class="laughtale-float-label laughtale-float-label-${variant} ${props.invalid ? 'invalid' : ''}" data-part="root">
-            ${initialHtml}
-            ${!existingLabel && labelText ? `<label ${forAttr}>${labelText}</label>` : ''}
-        </div>
-    `;
-
-    const wrap = container.querySelector<HTMLElement>('.laughtale-float-label')!;
-    const labelEl = wrap.querySelector('label');
+    let labelEl = container.querySelector('label');
+    if (!labelEl && props.label) {
+        labelEl = document.createElement('label');
+        if (props.for) labelEl.setAttribute('for', props.for);
+        labelEl.textContent = props.label;
+        container.appendChild(labelEl);
+    }
 
     // Find interactive child input / textarea / custom island
     const findTarget = (): HTMLElement | null => {
-        return wrap.querySelector('input, textarea, select, .cs-trigger, .dp-trigger, .ac-input, .p-inputtags-input, .p-password-input');
+        return container.querySelector('input, textarea, select, .cs-trigger, .dp-trigger, .ac-input, .p-inputtags-input, .p-password-input');
     };
 
     function updateFloatingState() {
-        const input = wrap.querySelector<HTMLInputElement | HTMLTextAreaElement>('input:not([type="hidden"]), textarea, select');
-        const customText = wrap.querySelector<HTMLElement>('.cs-label:not(.placeholder), .dp-label:not(.placeholder), .ac-input, .p-select-label:not(.p-placeholder), .p-treeselect-label:not(.p-placeholder), .p-multiselect-label:not(.p-placeholder)');
-        const tags = wrap.querySelectorAll<HTMLElement>('.p-inputtags-tag, .chip-item, .p-chip, .p-select-chip');
-        const hiddenInp = wrap.querySelector<HTMLInputElement>('input[type="hidden"]');
+        const input = container.querySelector<HTMLInputElement | HTMLTextAreaElement>('input:not([type="hidden"]), textarea, select');
+        const customText = container.querySelector<HTMLElement>('.cs-label:not(.placeholder), .dp-label:not(.placeholder), .ac-input, .p-select-label:not(.p-placeholder), .p-treeselect-label:not(.p-placeholder), .p-multiselect-label:not(.p-placeholder)');
+        const tags = container.querySelectorAll<HTMLElement>('.p-inputtags-tag, .chip-item, .p-chip, .p-select-chip');
+        const hiddenInp = container.querySelector<HTMLInputElement>('input[type="hidden"]');
 
         let hasVal = false;
         if (input && input.value && input.value.trim().length > 0) {
@@ -196,12 +220,12 @@ export default function FloatLabelIsland(container: HTMLElement, props: FloatLab
             hasVal = true;
         }
 
-        const currentlyHas = wrap.classList.contains('has-value');
+        const currentlyHas = container.classList.contains('has-value');
         if (currentlyHas !== hasVal) {
             if (hasVal) {
-                wrap.classList.add('has-value');
+                container.classList.add('has-value');
             } else {
-                wrap.classList.remove('has-value');
+                container.classList.remove('has-value');
             }
         }
     }
@@ -218,34 +242,34 @@ export default function FloatLabelIsland(container: HTMLElement, props: FloatLab
     }, { signal: ctx?.signal });
 
     // Event listeners
-    wrap.addEventListener('input', updateFloatingState, { signal: ctx?.signal });
-    wrap.addEventListener('change', updateFloatingState, { signal: ctx?.signal });
-    wrap.addEventListener('focusin', () => {
-        wrap.classList.add('is-focused');
+    container.addEventListener('input', updateFloatingState, { signal: ctx?.signal });
+    container.addEventListener('change', updateFloatingState, { signal: ctx?.signal });
+    container.addEventListener('focusin', () => {
+        container.classList.add('is-focused');
         updateFloatingState();
     }, { signal: ctx?.signal });
-    wrap.addEventListener('focusout', () => {
-        wrap.classList.remove('is-focused');
+    container.addEventListener('focusout', () => {
+        container.classList.remove('is-focused');
         updateFloatingState();
     }, { signal: ctx?.signal });
 
     // Custom island change events
-    wrap.addEventListener('inputtags:change', updateFloatingState, { signal: ctx?.signal });
-    wrap.addEventListener('chips:change', updateFloatingState, { signal: ctx?.signal });
-    wrap.addEventListener('tags:add', updateFloatingState, { signal: ctx?.signal });
-    wrap.addEventListener('tags:remove', updateFloatingState, { signal: ctx?.signal });
-    wrap.addEventListener('password:change', updateFloatingState, { signal: ctx?.signal });
-    wrap.addEventListener('otp:change', updateFloatingState, { signal: ctx?.signal });
-    wrap.addEventListener('cascadeselect:change', updateFloatingState, { signal: ctx?.signal });
-    wrap.addEventListener('datepicker:change', updateFloatingState, { signal: ctx?.signal });
-    wrap.addEventListener('autocomplete:change', updateFloatingState, { signal: ctx?.signal });
-    wrap.addEventListener('select:change', updateFloatingState, { signal: ctx?.signal });
+    container.addEventListener('inputtags:change', updateFloatingState, { signal: ctx?.signal });
+    container.addEventListener('chips:change', updateFloatingState, { signal: ctx?.signal });
+    container.addEventListener('tags:add', updateFloatingState, { signal: ctx?.signal });
+    container.addEventListener('tags:remove', updateFloatingState, { signal: ctx?.signal });
+    container.addEventListener('password:change', updateFloatingState, { signal: ctx?.signal });
+    container.addEventListener('otp:change', updateFloatingState, { signal: ctx?.signal });
+    container.addEventListener('cascadeselect:change', updateFloatingState, { signal: ctx?.signal });
+    container.addEventListener('datepicker:change', updateFloatingState, { signal: ctx?.signal });
+    container.addEventListener('autocomplete:change', updateFloatingState, { signal: ctx?.signal });
+    container.addEventListener('select:change', updateFloatingState, { signal: ctx?.signal });
 
     // MutationObserver to detect child tag additions (childList only, preventing attribute loops)
     const observer = new MutationObserver(() => {
         updateFloatingState();
     });
-    observer.observe(wrap, { childList: true, subtree: true });
+    observer.observe(container, { childList: true, subtree: true });
 
     // Initial passes
     updateFloatingState();

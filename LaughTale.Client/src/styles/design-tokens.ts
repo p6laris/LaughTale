@@ -562,6 +562,38 @@ export function initDesignTokens(): void {
     padding-right: 1.5rem;
     padding-left: 0;
   }
+
+  /* Custom Island Elements Base Layout Rules */
+  island-float-label,
+  .laughtale-float-label {
+    position: relative;
+    display: inline-flex;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 0.75rem;
+    box-sizing: border-box;
+  }
+
+  island-ifta-label,
+  .laughtale-ifta-label {
+    position: relative;
+    display: inline-flex;
+    flex-direction: column;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  island-textarea,
+  island-input-number,
+  island-input-text,
+  island-input-password,
+  island-select,
+  island-auto-complete,
+  island-date-picker {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+  }
 }
     `;
     document.head.appendChild(styleEl);
