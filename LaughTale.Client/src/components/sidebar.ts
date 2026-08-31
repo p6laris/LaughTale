@@ -1358,7 +1358,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps, ctx?
             return `
                 <div style="display: flex; align-items: center; gap: 0.65rem; width: 100%; overflow: hidden;">
                     <a href="/" style="display: flex; width: 2.1rem; height: 2.1rem; border-radius: 8px; background: linear-gradient(135deg, var(--lt-primary-500, var(--lt-primary-500)), var(--lt-primary-700, var(--lt-primary-700))); color: #ffffff; align-items: center; justify-content: center; flex-shrink: 0; text-decoration: none;" title="${headerTitle}">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="20" height="20" fill="currentColor"><rect x="20" y="12" width="22" height="60" rx="6" /><path d="M20 54 C20 68 32 80 48 80 L72 80 C84 80 92 72 92 60 C92 50 84 44 76 45 C73 45.5 71 42.5 71 39.5 C71 36.5 74 34 78 34 C88 34 98 42 98 56 C98 74 82 86 64 86 L44 86 C22 86 14 72 14 54 Z" /><circle cx="78" cy="22" r="5" /></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="20" height="20" fill="currentColor"><path d="M26 14 L42 14 C42 42 62 58 84 58 L84 74 C52 74 26 52 26 14 Z" /><circle cx="34" cy="74" r="6" /></svg>
                     </a>
                     <span class="p-sidebar-item-label p-sidebar-header-label" style="font-weight: 800; font-size: 0.9375rem; color: var(--lt-text-primary);">${headerTitle}</span>
                 </div>
