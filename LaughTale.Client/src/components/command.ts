@@ -1,7 +1,7 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 ﻿/**
- * LaughTale: Enterprise CommandMenu Component (PrimeVue 4 Aura Design System compliant)
+ * LaughTale: Enterprise CommandMenu Component (LaughTale Aura Design System)
  * Search-driven command palette with unified selection state, root-level keyboard capture,
  * precise viewport scroll tracking, and modal Dialog integration.
  */

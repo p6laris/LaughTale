@@ -1,5 +1,5 @@
 /**
- * LaughTale: Enterprise Toast Component (PrimeVue 4 Aura Design System)
+ * LaughTale: Enterprise Toast Component (LaughTale Aura Design System)
  * High-performance notification overlay engine supporting 7 viewport positions,
  * clean vertical list flow with customizable gap, hover-pause timers, semantic severities,
  * promise/async flows, custom templates, action buttons, and full WAI-ARIA alert accessibility.
@@ -43,7 +43,7 @@ export interface ToastContainerProps {
 
 const TOAST_CSS = `
 /* ==========================================================================
-   PrimeVue 4 Aura Toast Component Tokens & Positioning
+   LaughTale Aura Toast Component Tokens & Positioning
    ========================================================================== */
 .p-toast {
     position: fixed;

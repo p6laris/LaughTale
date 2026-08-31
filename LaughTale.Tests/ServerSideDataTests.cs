@@ -177,7 +177,7 @@ public class ServerSideDataTests
     }
 
     [Fact]
-    public void PrimeVueCompatibility_AliasesMapSeamlessly()
+    public void LaughTaleCompatibility_AliasesMapSeamlessly()
     {
         var query = GenerateDataset(500);
         var request = new IslandDataRequest

@@ -2,7 +2,7 @@ import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts
 import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise InputNumber Component (Aura InputNumber)
- * Seamless unified container design matching PrimeVue Aura pixel-for-pixel:
+ * Seamless unified container design matching LaughTale Aura pixel-for-pixel:
  * Single outer focus ring enclosing buttons and inputs, zero blue selection on click,
  * precision internationalization, and complete dark mode themer tokens.
  */

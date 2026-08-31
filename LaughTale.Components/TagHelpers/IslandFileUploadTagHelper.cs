@@ -8,7 +8,7 @@ namespace LaughTale.Components.TagHelpers;
 
 /// <summary>
 /// TagHelper for <island-fileupload />, <p-fileupload />, and <island-file-upload />
-/// PrimeVue 4 Aura Design System compliant advanced file uploader component.
+/// LaughTale Aura Design System advanced file uploader component.
 /// </summary>
 [HtmlTargetElement("island-fileupload")]
 [HtmlTargetElement("island-file-upload")]

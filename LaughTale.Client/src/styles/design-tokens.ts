@@ -1,5 +1,5 @@
 /**
- * LaughTale: Canonical Design Token Contract (LT-601)
+ * LaughTale: Canonical Design Token Contract
  * Single source of truth for dynamic CSS custom properties across light/dark themes.
  */
 

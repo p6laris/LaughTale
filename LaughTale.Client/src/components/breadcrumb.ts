@@ -1,7 +1,7 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 ﻿/**
- * LaughTale: Enterprise Breadcrumb Component (PrimeVue 4 Aura Design System compliant)
+ * LaughTale: Enterprise Breadcrumb Component (LaughTale Aura Design System)
  * Semantic breadcrumb navigation with list hierarchy, custom separators, collapsible ellipsis,
  * custom item templates (icons, badges), route integration, and full WCAG / WAI-ARIA compliance.
  */

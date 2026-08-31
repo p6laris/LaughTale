@@ -1,5 +1,5 @@
 ﻿/**
- * LaughTale: Accessible Live Region Screen Reader Announcer (LT-801)
+ * LaughTale: Accessible Live Region Screen Reader Announcer
  * 
  * Automatically manages persistent polite and assertive aria-live regions
  * for dynamic status updates, toast messages, and validation alerts per WCAG 2.1 SC 4.1.3.

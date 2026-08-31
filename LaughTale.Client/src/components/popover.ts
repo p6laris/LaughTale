@@ -1,7 +1,7 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 ﻿/**
- * LaughTale: Enterprise Popover Component (PrimeVue 4 Aura Design System compliant)
+ * LaughTale: Enterprise Popover Component (LaughTale Aura Design System)
  * High-performance anchored overlay popup with dynamic viewport edge flipping,
  * pointing arrow notch, pure GPU CSS scale transitions, external trigger anchor support,
  * zero-flash SSR, and global click / Escape delegation.

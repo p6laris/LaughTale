@@ -1,5 +1,5 @@
 /**
- * LaughTale: Enterprise Drawer Component (PrimeVue 4 Aura Design System compliant)
+ * LaughTale: Enterprise Drawer Component (LaughTale Aura Design System)
  * High-performance edge overlay panel with 5 positions (left, right, top, bottom, full),
  * zero-flash SSR, silky-smooth 60 FPS GPU slide-in & slide-out transitions, global click delegation,
  * responsive widths, custom template slots, and interactive headless sidebar menus.

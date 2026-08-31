@@ -1,5 +1,5 @@
 /**
- * LaughTale: Parts & Customization Passthrough Contract (LT-1104)
+ * LaughTale: Parts & Customization Passthrough Contract
  * Provides standardized data-part attribute resolution, passthrough (pt) merging,
  * and Studio override precedence mechanics across all components.
  */

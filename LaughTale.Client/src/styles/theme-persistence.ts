@@ -1,5 +1,5 @@
 /**
- * LaughTale: Theme Persistence & Zero-FOUC Engine (LT-603)
+ * LaughTale: Theme Persistence & Zero-FOUC Engine
  * Handles resilient localStorage and cookie caching, SSR state sync, and multi-format theme export.
  */
 

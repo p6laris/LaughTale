@@ -6,7 +6,7 @@ using LaughTale.Core.Enums;
 namespace LaughTale.Components.TagHelpers;
 
 /// <summary>
-/// Enterprise PrimeVue 4 Aura Toolbar container component.
+/// Enterprise LaughTale Aura Toolbar container component.
 /// </summary>
 [HtmlTargetElement("island-toolbar")]
 [HtmlTargetElement("p-toolbar")]

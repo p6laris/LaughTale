@@ -220,7 +220,7 @@ public class IslandInplaceTagHelper : TagHelper
 
 /// <summary>
 /// TagHelper for <island-commandmenu />, <p-commandmenu />, and <island-command />
-/// PrimeVue 4 Aura Design System compliant search-driven CommandMenu component.
+/// LaughTale Aura Design System search-driven CommandMenu component.
 /// </summary>
 [HtmlTargetElement("island-commandmenu")]
 [HtmlTargetElement("island-command-menu")]
@@ -394,7 +394,7 @@ public class IslandBlockUITagHelper : TagHelper
 
 /// <summary>
 /// TagHelper for <island-message />, <p-message />, and <island-inline-message />
-/// PrimeVue 4 Aura Design System compliant inline and contextual message notification.
+/// LaughTale Aura Design System inline and contextual message notification.
 /// </summary>
 [HtmlTargetElement("island-message")]
 [HtmlTargetElement("p-message")]

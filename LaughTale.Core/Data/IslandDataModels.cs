@@ -5,8 +5,8 @@ using System.Text.Json.Serialization;
 namespace LaughTale.Core.Data;
 
 /// <summary>
-/// Server-side data request model for DataTable, DataView, and TreeTable components (LT-1508).
-/// Fully compatible with standard PrimeVue / LaughTale client island payload formats.
+/// Server-side data request model for DataTable, DataView, and TreeTable components.
+/// Fully compatible with standard LaughTale / LaughTale client island payload formats.
 /// </summary>
 public sealed class IslandDataRequest
 {
@@ -23,7 +23,7 @@ public sealed class IslandDataRequest
     public int PageSize { get; set; } = 10;
 
     /// <summary>
-    /// 0-based offset index (PrimeVue standard: first = (page - 1) * pageSize).
+    /// 0-based offset index (LaughTale standard: first = (page - 1) * pageSize).
     /// </summary>
     [JsonPropertyName("first")]
     public int? First
@@ -39,7 +39,7 @@ public sealed class IslandDataRequest
     }
 
     /// <summary>
-    /// Number of rows per page (PrimeVue alias for PageSize).
+    /// Number of rows per page (LaughTale alias for PageSize).
     /// </summary>
     [JsonPropertyName("rows")]
     public int? Rows
@@ -73,7 +73,7 @@ public sealed class IslandDataRequest
     public List<IslandSortDescriptor> Sort { get; set; } = new();
 
     /// <summary>
-    /// Multi-column sorting specifications (PrimeVue alias: multiSortMeta).
+    /// Multi-column sorting specifications (LaughTale alias: multiSortMeta).
     /// </summary>
     [JsonPropertyName("multiSortMeta")]
     public List<IslandSortDescriptor>? MultiSortMeta
@@ -95,7 +95,7 @@ public sealed class IslandDataRequest
     public List<IslandFilterDescriptor> Filter { get; set; } = new();
 
     /// <summary>
-    /// Column filter dictionary (PrimeVue format: { "name": { "value": "foo", "matchMode": "contains" } }).
+    /// Column filter dictionary (LaughTale format: { "name": { "value": "foo", "matchMode": "contains" } }).
     /// </summary>
     [JsonPropertyName("filters")]
     public Dictionary<string, IslandFilterValue>? Filters { get; set; }
@@ -209,7 +209,7 @@ public sealed class IslandFilterDescriptor
 }
 
 /// <summary>
-/// PrimeVue filter dictionary value structure.
+/// LaughTale filter dictionary value structure.
 /// </summary>
 public sealed class IslandFilterValue
 {
@@ -241,13 +241,13 @@ public sealed record IslandDataResult<T>(
     public int TotalPages => (int)Math.Ceiling((double)TotalCount / Math.Max(1, PageSize));
 
     /// <summary>
-    /// PrimeVue data alias for Items.
+    /// LaughTale data alias for Items.
     /// </summary>
     [JsonPropertyName("data")]
     public IReadOnlyList<T> Data => Items;
 
     /// <summary>
-    /// PrimeVue totalRecords alias for TotalCount.
+    /// LaughTale totalRecords alias for TotalCount.
     /// </summary>
     [JsonPropertyName("totalRecords")]
     public int TotalRecords => TotalCount;

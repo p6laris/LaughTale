@@ -13,7 +13,7 @@ using LaughTale.Core.Serialization;
 namespace LaughTale.Core.Endpoints;
 
 /// <summary>
-/// Server-side island refresh endpoints (P12).
+/// Server-side island refresh endpoints .
 /// Enables repeatable on-demand server rendering of individual islands with DOM morphing.
 /// </summary>
 public static class IslandEndpointExtensions
@@ -54,7 +54,7 @@ public static class IslandEndpointExtensions
     }
 
     /// <summary>
-    /// Maps a server-side data endpoint for DataTable, DataView, and TreeTable components (LT-1508).
+    /// Maps a server-side data endpoint for DataTable, DataView, and TreeTable components.
     /// Handles filtering, multi-sorting, global search, and pagination safely via Expression Trees.
     /// </summary>
     public static IEndpointRouteBuilder MapIslandData<T>(

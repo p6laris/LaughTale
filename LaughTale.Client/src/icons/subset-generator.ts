@@ -1,5 +1,5 @@
 ﻿/**
- * LaughTale: Icon Subset Sprite Generator & Content Hasher (LT-704)
+ * LaughTale: Icon Subset Sprite Generator & Content Hasher
  * 
  * Extracts only referenced SVG <symbol> definitions from the master Lucide icon set,
  * eliminating 90%+ of unused SVG payload weight and providing deterministic content hashing.

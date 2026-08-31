@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace LaughTale.Core.Data;
 
 /// <summary>
-/// LINQ and EF Core translatable query extensions for LaughTale server-side data components (LT-1508).
+/// LINQ and EF Core translatable query extensions for LaughTale server-side data components.
 /// Applies safe expression-tree filtering, global multi-column search, multi-sort, and pagination.
 /// </summary>
 public static class QueryableExtensions

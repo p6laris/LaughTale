@@ -1,5 +1,5 @@
 /**
- * LaughTale: Lifecycle & Memory Leak Detection Harness (LT-1101)
+ * LaughTale: Lifecycle & Memory Leak Detection Harness
  * Instruments DOM event listeners, observers, and window timers
  * to verify 100% complete resource teardown across navigation & hydration cycles.
  */

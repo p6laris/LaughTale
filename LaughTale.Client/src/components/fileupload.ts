@@ -1,8 +1,8 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 ﻿/**
- * LaughTale: Enterprise FileUpload Component (PrimeVue 4 Aura Design System compliant)
- * High-performance, pixel-perfect file uploader matching PrimeVue 4 Aura specifications.
+ * LaughTale: Enterprise FileUpload Component (LaughTale Aura Design System)
+ * High-performance, pixel-perfect file uploader matching LaughTale Aura specifications.
  * Implements Basic, Auto, Advanced, InputGroup, Custom Upload, Dropzone Template, and Image Preview Grid.
  */
 
@@ -555,7 +555,7 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
     }
 
     function render() {
-        // Custom Mode (Single Photo Showcase matching PrimeVue Custom Upload demo)
+        // Custom Mode (Single Photo Showcase matching LaughTale Custom Upload demo)
         if (mode === 'custom') {
             const hasFile = fileQueue.length > 0;
             const currentFile = hasFile ? fileQueue[0] : null;

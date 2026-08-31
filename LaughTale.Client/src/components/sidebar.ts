@@ -1,8 +1,8 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 /**
- * LaughTale: Enterprise Sidebar Component Suite (PrimeVue 4 Aura Design System)
- * Complete compound navigation panel system matching PrimeVue 4 Aura specifications:
+ * LaughTale: Enterprise Sidebar Component Suite (LaughTale Aura Design System)
+ * Complete compound navigation panel system matching LaughTale Aura specifications:
  * 1. App-Level Navigation Sidebar (Showcase & Docs) powered by the 100% unified Compound Sidebar Engine
  * 2. Variants Interactive Playground with Aura custom Select, SelectButton, and ToggleSwitch controls
  * 3. With Menu (Interactive Workspace Switcher + User Profile Popup Dropdown)
@@ -18,7 +18,7 @@ import { injectIslandStyle } from '../runtime/styles';
 
 const SIDEBAR_CSS = `
 /* ==========================================================================
-   PrimeVue 4 Aura Compound Sidebar Layout & Components
+   LaughTale Aura Compound Sidebar Layout & Components
    ========================================================================== */
 
 /* Main Layout Container */
@@ -1193,7 +1193,7 @@ export default function SidebarIsland(container: HTMLElement, props: SidebarProp
 }
 
 /**
- * Render PrimeVue 4 Aura Compound Sidebar Component
+ * Render LaughTale Aura Compound Sidebar Component
  */
 function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
     const demoType = props.demoType || (props as any).DemoType || 'variants';
@@ -1540,7 +1540,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                             <div class="p-sb-msg-ai">
                                 <div class="p-sb-ai-avatar">${chatGptSparkle}</div>
                                 <div style="display: flex; flex-direction: column; gap: 0.5rem; flex: 1;">
-                                    <p style="margin: 0;">You can create a compound sidebar with PrimeVue's <code>Sidebar</code> component by pairing collapsible icon modes with CSS grid height transitions:</p>
+                                    <p style="margin: 0;">You can create a compound sidebar with LaughTale's <code>Sidebar</code> component by pairing collapsible icon modes with CSS grid height transitions:</p>
                                     <div class="p-sb-code-block">&lt;Sidebar :collapsible="'icon'" :variant="'sidebar'"&gt;
   &lt;SidebarHeader&gt;...&lt;/SidebarHeader&gt;
   &lt;SidebarContent&gt;...&lt;/SidebarContent&gt;

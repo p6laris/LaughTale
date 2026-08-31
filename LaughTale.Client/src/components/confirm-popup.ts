@@ -1,7 +1,7 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 ﻿/**
- * LaughTale: Enterprise ConfirmPopup Component (PrimeVue 4 Aura Design System compliant)
+ * LaughTale: Enterprise ConfirmPopup Component (LaughTale Aura Design System)
  * Anchored confirmation popup overlay with target alignment, arrow notches, smooth animations,
  * support for Basic, Template, and Headless modes, and seamless Toast notifications.
  */

@@ -1,5 +1,5 @@
 /**
- * LaughTale: Island Error Boundary & Dev-Mode Overlay Engine (LT-904)
+ * LaughTale: Island Error Boundary & Dev-Mode Overlay Engine
  * Provides resilient server-rendered fallback slot activation and dev-mode diagnostic overlays with live retry.
  */
 

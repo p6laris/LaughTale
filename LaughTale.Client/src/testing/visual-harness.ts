@@ -1,5 +1,5 @@
 ﻿/**
- * LaughTale: Visual Regression Matrix Harness (LT-604)
+ * LaughTale: Visual Regression Matrix Harness
  * Generates deterministic 8-permutation render matrices across theme, density, and palette axes.
  */
 

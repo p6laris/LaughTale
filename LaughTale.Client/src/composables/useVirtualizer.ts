@@ -1,5 +1,5 @@
 ﻿/**
- * LaughTale: Headless useVirtualizer Composable (LT-502)
+ * LaughTale: Headless useVirtualizer Composable
  * High-performance virtual scrolling engine for rendering large lists and data grids (10,000+ rows) at 60 FPS.
  */
 

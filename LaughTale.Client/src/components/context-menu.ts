@@ -1,7 +1,7 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 /**
- * LaughTale: Enterprise ContextMenu Component (PrimeVue 4 Aura Design System)
+ * LaughTale: Enterprise ContextMenu Component (LaughTale Aura Design System)
  * Native right-click context menu overlay with multi-level recursive submenus,
  * smart viewport collision bounding, keyboard accessibility (WAI-ARIA menubar),
  * custom templates with shortcuts & badges, command callbacks, and toast integrations.
@@ -41,7 +41,7 @@ export interface ContextMenuProps {
 
 const CONTEXTMENU_CSS = `
 /* ==========================================================================
-   PrimeVue 4 Aura ContextMenu Component Tokens & Styles
+   LaughTale Aura ContextMenu Component Tokens & Styles
    ========================================================================== */
 .p-contextmenu {
     position: fixed;

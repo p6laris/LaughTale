@@ -6,7 +6,7 @@ namespace LaughTale.Components.TagHelpers;
 
 /// <summary>
 /// TagHelper for <island-toast /> and <p-toast />
-/// PrimeVue 4 Aura Design System compliant non-blocking toast overlay notification.
+/// LaughTale Aura Design System non-blocking toast overlay notification.
 /// </summary>
 [HtmlTargetElement("island-toast", TagStructure = TagStructure.NormalOrSelfClosing)]
 [HtmlTargetElement("p-toast", TagStructure = TagStructure.NormalOrSelfClosing)]

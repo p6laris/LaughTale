@@ -1,5 +1,5 @@
 ﻿/**
- * LaughTale: Standard Component State Presentation Helpers (LT-504)
+ * LaughTale: Standard Component State Presentation Helpers
  */
 
 import type { SkeletonOptions, StateMessageOptions } from '../types/states';

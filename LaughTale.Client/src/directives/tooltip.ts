@@ -1,5 +1,5 @@
 /**
- * LaughTale: Enterprise Tooltip Directive & Engine (PrimeVue 4 Aura Design System compliant)
+ * LaughTale: Enterprise Tooltip Directive & Engine (LaughTale Aura Design System)
  * High-performance floating advisory tooltip with 4-direction edge arrow notches (top, bottom, left, right),
  * custom show/hide delays, hover & focus trigger events, auto-hide toggle, rich HTML content support,
  * object configuration parsing, and robust attribute scanner traversing all parent nodes.
@@ -133,7 +133,7 @@ function findTooltipTarget(startEl: HTMLElement | null): HTMLElement | null {
 
 function parseTooltipConfig(element: HTMLElement): TooltipConfig | null {
     let rawValue = '';
-    let position: 'top' | 'bottom' | 'left' | 'right' = 'right'; // Default in PrimeVue is right
+    let position: 'top' | 'bottom' | 'left' | 'right' = 'right'; // Default in LaughTale is right
 
     for (const attr of Array.from(element.attributes)) {
         const name = attr.name.toLowerCase();

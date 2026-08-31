@@ -2,7 +2,7 @@ import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts
 import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise Tabs Component (Aura Design System compliant)
- * PrimeVue 4 Aura-exact tabs container with animated indicator bar,
+ * LaughTale Aura-exact tabs container with animated indicator bar,
  * gradient fade mask scroll navigation, controlled values, lazy loading, custom indicator, and ARIA keyboard support.
  */
 

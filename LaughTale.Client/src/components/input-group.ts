@@ -2,7 +2,7 @@ import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts
 import type { IslandContext } from '../runtime/registry';
 ﻿/**
  * LaughTale: Enterprise InputGroup & InputGroupAddon (Aura InputGroup)
- * High-precision grouping container matching PrimeVue Aura pixel-for-pixel:
+ * High-precision grouping container matching LaughTale Aura pixel-for-pixel:
  * single unified rounded pill, border-collapse, exact identical height across all parts,
  * unclipped focus rings, native inputs, selects, buttons, checkboxes, and floating labels.
  */

@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 namespace LaughTale.Core.Localization;
 
 /// <summary>
-/// Comprehensive client/server localization dictionary conforming to PrimeVue 4 and Aura specifications.
+/// Comprehensive client/server localization dictionary conforming to LaughTale and Aura specifications.
 /// Serialized directly to client islands and queried on the server for default component labels.
 /// </summary>
 public sealed class LaughTaleLocaleDictionary

@@ -1,5 +1,5 @@
 ﻿/**
- * LaughTale: Router Predictive Prefetching & Response Cache (LT-702)
+ * LaughTale: Router Predictive Prefetching & Response Cache
  * Anticipates navigation via hover intent (150ms) and viewport visibility with data saver awareness.
  */
 

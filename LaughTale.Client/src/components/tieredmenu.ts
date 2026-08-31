@@ -1,7 +1,7 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 ﻿/**
- * LaughTale: Enterprise TieredMenu Component (PrimeVue 4 Aura Design System)
+ * LaughTale: Enterprise TieredMenu Component (LaughTale Aura Design System)
  * Hierarchical vertical navigation menu with nested flyout overlay submenus,
  * inline/popup trigger modes, custom item templates (badges & shortcuts), action commands,
  * router links, and complete WAI-ARIA keyboard navigation & accessibility.
@@ -13,7 +13,7 @@ import { injectIslandStyle } from '../runtime/styles';
 
 const TIEREDMENU_CSS = `
 /* ==========================================================================
-   PrimeVue 4 Aura TieredMenu Component Tokens & Layout
+   LaughTale Aura TieredMenu Component Tokens & Layout
    ========================================================================== */
 .p-tieredmenu {
     display: inline-block;
@@ -674,7 +674,7 @@ export default function TieredMenuIsland(container: HTMLElement, props: TieredMe
     }
 
     function executeCommand(commandStr: string, label: string) {
-        // Dispatch toast notification event matching PrimeVue toast
+        // Dispatch toast notification event matching LaughTale toast
         let severity = 'info';
         let summary = label;
         let detail = `Action triggered for ${label}`;

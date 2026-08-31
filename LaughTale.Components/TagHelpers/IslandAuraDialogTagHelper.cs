@@ -6,7 +6,7 @@ using LaughTale.Core.Enums;
 namespace LaughTale.Components.TagHelpers;
 
 /// <summary>
-/// Enterprise PrimeVue 4 Aura Dialog overlay container.
+/// Enterprise LaughTale Aura Dialog overlay container.
 /// </summary>
 [HtmlTargetElement("island-aura-dialog")]
 [HtmlTargetElement("p-dialog")]

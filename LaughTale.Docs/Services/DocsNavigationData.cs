@@ -21,6 +21,7 @@ public static class DocsNavigationData
                 new("View Transitions", "play", "/doc/03-view-transitions", currentPath.Contains("03-view-transitions")),
                 new("Server-Driven Refresh", "refreshCw", "/doc/04-server-refresh-and-morphing", currentPath.Contains("04-server-refresh-and-morphing")),
                 new("Data Contracts & EF Core", "database", "/doc/05-data-contracts-and-efcore", currentPath.Contains("05-data-contracts-and-efcore")),
+                new("i18n & Kurdish RTL", "globe", "/doc/05a-localization-and-rtl", currentPath.Contains("05a-localization-and-rtl")),
                 new("Declarative Directives (l-*)", "terminal", "/doc/07-declarative-directives", currentPath.Contains("07-declarative-directives")),
                 new("Security & Hardening", "shieldAlert", "/doc/08-security-and-hardening", currentPath.Contains("08-security-and-hardening")),
                 new("Theming & Tokens", "palette", "/doc/09-theming-and-design-tokens", currentPath.Contains("09-theming-and-design-tokens")),

@@ -1,6 +1,6 @@
 /**
  * LaughTale: Strongly-Typed TypeScript Models
- * 1-to-1 Type Parity with C# ComponentModels & Enums (LT-404)
+ * 1-to-1 Type Parity with C# ComponentModels & Enums
  */
 
 export type ComponentVariant = 'solid' | 'outline' | 'subtle' | 'ghost' | 'destructive' | 'secondary';

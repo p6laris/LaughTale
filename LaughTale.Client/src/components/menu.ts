@@ -1,7 +1,7 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 ﻿/**
- * LaughTale: Enterprise Menu Component (PrimeVue 4 Aura Design System compliant)
+ * LaughTale: Enterprise Menu Component (LaughTale Aura Design System)
  * Navigation and command menu supporting dynamic popup overlay (fixed body-anchored),
  * static inline mode, static group headers, butter-smooth grid collapse/expand animations,
  * interactive checkbox/radio groups, custom templates, and WAI-ARIA keyboard navigation.

@@ -10,7 +10,7 @@ namespace LaughTale.Core.Extensions;
 public static class ServiceCollectionExtensions
 {
     /// <summary>
-    /// Registers LaughTale Islands Architecture core runtime and services with optional feature configuration (LT-1109).
+    /// Registers LaughTale Islands Architecture core runtime and services with optional feature configuration.
     /// </summary>
     /// <param name="services">The IServiceCollection instance.</param>
     /// <param name="configure">Optional delegate to configure LaughTaleOptions.</param>

@@ -1,5 +1,5 @@
 ﻿/**
- * LaughTale: Live WCAG AA/AAA Contrast Ratio Calculator (LT-605)
+ * LaughTale: Live WCAG AA/AAA Contrast Ratio Calculator
  * Pure-math relative luminance and contrast ratio validator per W3C WCAG 2.1 standards.
  */
 

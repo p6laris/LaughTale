@@ -1,7 +1,7 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 ﻿/**
- * LaughTale: Enterprise Dialog Component (PrimeVue 4 Aura Design System compliant)
+ * LaughTale: Enterprise Dialog Component (LaughTale Aura Design System)
  * Zero-flash SSR overlay container with global click delegation, draggable header support,
  * maximizable fullscreen toggles, 9-direction positioning, inside scrolling, and headless templates.
  */

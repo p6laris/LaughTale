@@ -110,7 +110,7 @@ public sealed class ThemeStudioOptions
 }
 
 /// <summary>
-/// Output caching and personal data leak protection options (LT-1507).
+/// Output caching and personal data leak protection options.
 /// </summary>
 public sealed class CachingOptions
 {

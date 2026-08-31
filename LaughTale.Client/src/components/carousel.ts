@@ -1,5 +1,5 @@
 /**
- * LaughTale: Enterprise Carousel Component (PrimeVue 4 Aura Design System)
+ * LaughTale: Enterprise Carousel Component (LaughTale Aura Design System)
  * Native CSS scroll-snap content slider supporting alignment (start, center, end),
  * partial slidesPerPage (e.g. 1.5, 1.3, 1.75), horizontal & vertical orientation,
  * continuous looping, autoSize variable widths with pixel-perfect center alignment padding,
@@ -33,7 +33,7 @@ export interface CarouselProps {
 
 const CAROUSEL_CSS = `
 /* ==========================================================================
-   PrimeVue 4 Aura Carousel Component Tokens & Styles
+   LaughTale Aura Carousel Component Tokens & Styles
    ========================================================================== */
 .p-carousel {
     display: flex;

@@ -90,7 +90,7 @@ public abstract class IslandTagHelperBase : TagHelper
         output.TagName = WrapperTagName;
         output.TagMode = TagMode.StartTagAndEndTag;
 
-        // Culture & Direction Flow (LT-1504)
+        // Culture & Direction Flow
         var currentCulture = CultureInfo.CurrentUICulture;
         if (!output.Attributes.ContainsName("lang"))
         {

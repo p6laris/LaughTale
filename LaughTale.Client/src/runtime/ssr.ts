@@ -1,5 +1,5 @@
 ﻿/**
- * LaughTale: Server-Rendered (SSR) Progressive Enhancement Engine (LT-503)
+ * LaughTale: Server-Rendered (SSR) Progressive Enhancement Engine
  * Detects server-rendered markup stamped with data-lt-ssr and enables non-destructive client adoption.
  */
 

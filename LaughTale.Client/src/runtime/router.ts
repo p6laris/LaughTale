@@ -350,7 +350,7 @@ export async function navigateTo(
             // Dispatch navigation event
             window.dispatchEvent(new CustomEvent('island:page-loaded', { detail: { url: finalUrl.href } }));
 
-            // Accessible Focus Management & Page Announcement (LT-803)
+            // Accessible Focus Management & Page Announcement
             const focusTarget = document.querySelector<HTMLElement>('[data-skip-target]') ||
                 document.querySelector<HTMLElement>('h1') ||
                 document.querySelector<HTMLElement>('[autofocus]') ||

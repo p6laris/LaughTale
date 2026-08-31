@@ -4444,7 +4444,7 @@ html {
 
 
 /* ==========================================================================
-   Aura PrimeVue 4 Divider Component Tokens & Layouts
+   LaughTale Aura Divider Component Tokens & Layouts
    ========================================================================== */
 .p-divider {
     box-sizing: border-box;
@@ -4555,7 +4555,7 @@ html {
 
 
 /* ==========================================================================
-   Aura PrimeVue 4 Fieldset Component Tokens & Layouts
+   LaughTale Aura Fieldset Component Tokens & Layouts
    ========================================================================== */
 .p-fieldset {
     border: 1px solid var(--p-border-color, #e2e8f0);
@@ -4715,7 +4715,7 @@ html {
 
 
 /* ==========================================================================
-   Aura PrimeVue 4 Panel Component Tokens & Layouts
+   LaughTale Aura Panel Component Tokens & Layouts
    ========================================================================== */
 .p-panel {
     border: 1px solid var(--p-border-color, #e2e8f0);
@@ -4908,7 +4908,7 @@ html {
 
 
 /* ==========================================================================
-   Aura PrimeVue 4 ScrollArea Component Tokens & Layouts
+   LaughTale Aura ScrollArea Component Tokens & Layouts
    ========================================================================== */
 .p-scrollarea {
     position: relative;
@@ -5030,7 +5030,7 @@ html {
 
 
 /* ==========================================================================
-   Aura PrimeVue 4 Splitter Component Tokens & Layouts
+   LaughTale Aura Splitter Component Tokens & Layouts
    ========================================================================== */
 .p-splitter {
     display: flex;
@@ -5160,7 +5160,7 @@ html {
 
 
 /* ==========================================================================
-   Aura PrimeVue 4 Stepper Component Tokens & Transitions
+   LaughTale Aura Stepper Component Tokens & Transitions
    ========================================================================== */
 .p-stepper {
     display: flex;
@@ -5398,7 +5398,7 @@ html {
 }
 
 /* ==========================================================================
-   Aura PrimeVue 4 Tabs Component Tokens & Transitions
+   LaughTale Aura Tabs Component Tokens & Transitions
    ========================================================================== */
 .p-tabs {
     display: flex;
@@ -5634,7 +5634,7 @@ html {
 }
 
 /* ==========================================================================
-   Aura PrimeVue 4 Toolbar Component Tokens & Layout
+   LaughTale Aura Toolbar Component Tokens & Layout
    ========================================================================== */
 .p-toolbar {
     display: flex;
@@ -5681,7 +5681,7 @@ html {
 }
 
 /* ==========================================================================
-   Aura PrimeVue 4 ConfirmDialog Component Tokens & Modal Mask
+   LaughTale Aura ConfirmDialog Component Tokens & Modal Mask
    ========================================================================== */
 .p-confirmdialog-mask {
     position: fixed;
@@ -5944,7 +5944,7 @@ html {
 }
 
 /* ==========================================================================
-   Aura PrimeVue 4 ConfirmPopup Component & Arrow Pointer Tokens
+   LaughTale Aura ConfirmPopup Component & Arrow Pointer Tokens
    ========================================================================== */
 .p-confirmpopup {
     position: absolute;
@@ -6105,7 +6105,7 @@ html {
 
 
 /* ==========================================================================
-   Aura PrimeVue 4 Dialog Component & Modal Mask (Zero-Flash SSR)
+   LaughTale Aura Dialog Component & Modal Mask (Zero-Flash SSR)
    ========================================================================== */
 .p-dialog-mask {
     position: fixed;
@@ -6304,7 +6304,7 @@ html {
 
 
 /* ==========================================================================
-   Aura PrimeVue 4 Drawer Component (Pure GPU 60fps Slide Animations)
+   LaughTale Aura Drawer Component (Pure GPU 60fps Slide Animations)
    ========================================================================== */
 .p-drawer-mask {
     position: fixed;
@@ -6546,7 +6546,7 @@ html {
 
 
 /* ==========================================================================
-   Aura PrimeVue 4 Popover Component (Anchored Overlay with Arrow Notch)
+   LaughTale Aura Popover Component (Anchored Overlay with Arrow Notch)
    ========================================================================== */
 .p-popover {
     position: fixed;
@@ -6613,7 +6613,7 @@ html {
 
 
 /* ==========================================================================
-   Aura PrimeVue 4 Tooltip Component (Floating Advisory Tooltip)
+   LaughTale Aura Tooltip Component (Floating Advisory Tooltip)
    ========================================================================== */
 .p-tooltip {
     position: fixed;
@@ -6692,7 +6692,7 @@ html {
 
 
 /* ==========================================================================
-   Aura PrimeVue 4 FileUpload Component
+   LaughTale Aura FileUpload Component
    ========================================================================== */
 .p-fileupload {
     display: flex;
@@ -6941,7 +6941,7 @@ html {
 
 
 /* ==========================================================================
-   Aura PrimeVue 4 Breadcrumb Component
+   LaughTale Aura Breadcrumb Component
    ========================================================================== */
 .p-breadcrumb {
     background: var(--p-surface-0, #ffffff);
@@ -7076,7 +7076,7 @@ html {
 
 
 /* ==========================================================================
-   Aura PrimeVue 4 CommandMenu Component
+   LaughTale Aura CommandMenu Component
    ========================================================================== */
 .p-commandmenu {
     display: flex;
@@ -7302,7 +7302,7 @@ html {
 
 
 /* ==========================================================================
-   Aura PrimeVue 4 Menu Component
+   LaughTale Aura Menu Component
    ========================================================================== */
 .p-menu {
     display: inline-flex;
@@ -7508,7 +7508,7 @@ html {
 
 
 /* ==========================================================================
-   Aura PrimeVue 4 Menubar Component
+   LaughTale Aura Menubar Component
    ========================================================================== */
 .p-menubar {
     display: flex;

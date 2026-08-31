@@ -1,5 +1,5 @@
 ﻿/**
- * LaughTale: Standard Component State Contracts (LT-504)
+ * LaughTale: Standard Component State Contracts
  * Unified interface for loading, error, empty, and disabled states across islands.
  */
 

@@ -1,5 +1,5 @@
 ﻿/**
- * LaughTale: WAI-ARIA 1.2 Attributes & Roving Tabindex Engine (LT-801)
+ * LaughTale: WAI-ARIA 1.2 Attributes & Roving Tabindex Engine
  * 
  * Provides declarative ARIA attribute bindings, APG-compliant roving tabindex navigation,
  * and keyboard focus orchestration for composite widgets (menus, tabs, toolbars, grids).

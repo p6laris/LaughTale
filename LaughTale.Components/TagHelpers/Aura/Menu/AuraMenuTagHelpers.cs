@@ -14,7 +14,7 @@ namespace LaughTale.Components.TagHelpers;
 
 /// <summary>
 /// TagHelper for <island-breadcrumb /> and <p-breadcrumb />
-/// PrimeVue 4 Aura Design System compliant hierarchical navigation component.
+/// LaughTale Aura Design System hierarchical navigation component.
 /// </summary>
 [HtmlTargetElement("island-breadcrumb")]
 [HtmlTargetElement("p-breadcrumb")]
@@ -247,7 +247,7 @@ public class IslandSplitButtonTagHelper : TagHelper
 
 /// <summary>
 /// TagHelper for <island-menubar />, <p-menubar />, and <island-menu-bar />
-/// PrimeVue 4 Aura Design System compliant horizontal navigation menubar.
+/// LaughTale Aura Design System horizontal navigation menubar.
 /// </summary>
 [HtmlTargetElement("island-menubar")]
 [HtmlTargetElement("p-menubar")]
@@ -300,7 +300,7 @@ public class IslandMenubarTagHelper : TagHelper
 
 /// <summary>
 /// TagHelper for <island-menu />, <p-menu />, and <island-navigation-menu />
-/// PrimeVue 4 Aura Design System compliant navigation and command menu.
+/// LaughTale Aura Design System navigation and command menu.
 /// </summary>
 [HtmlTargetElement("island-menu")]
 [HtmlTargetElement("p-menu")]
@@ -385,7 +385,7 @@ public class IslandMenuTagHelper : TagHelper
 
 /// <summary>
 /// TagHelper for <island-contextmenu />, <p-contextmenu />, and <island-context-menu />
-/// PrimeVue 4 Aura Design System compliant overlay ContextMenu.
+/// LaughTale Aura Design System overlay ContextMenu.
 /// </summary>
 [HtmlTargetElement("island-contextmenu")]
 [HtmlTargetElement("p-contextmenu")]
@@ -459,7 +459,7 @@ public class IslandContextMenuTagHelper : TagHelper
 
 /// <summary>
 /// TagHelper for <island-tieredmenu />, <p-tieredmenu />, and <island-tiered-menu />
-/// PrimeVue 4 Aura Design System compliant hierarchical tiered menu with flyout submenus.
+/// LaughTale Aura Design System hierarchical tiered menu with flyout submenus.
 /// </summary>
 [HtmlTargetElement("island-tieredmenu")]
 [HtmlTargetElement("p-tieredmenu")]

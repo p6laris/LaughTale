@@ -14,7 +14,7 @@ namespace LaughTale.Components.TagHelpers;
 
 /// <summary>
 /// TagHelper for <island-drawer /> and <p-drawer />
-/// PrimeVue 4 Aura Design System compliant edge overlay drawer component.
+/// LaughTale Aura Design System edge overlay drawer component.
 /// </summary>
 [HtmlTargetElement("island-drawer")]
 [HtmlTargetElement("p-drawer")]
@@ -165,7 +165,7 @@ public class IslandConfirmPopupTagHelper : TagHelper
 
 /// <summary>
 /// TagHelper for <island-popover />, <p-popover />, and <p-overlay-panel />
-/// PrimeVue 4 Aura Design System compliant anchored floating popover container.
+/// LaughTale Aura Design System anchored floating popover container.
 /// </summary>
 [HtmlTargetElement("island-popover")]
 [HtmlTargetElement("p-popover")]
@@ -246,7 +246,7 @@ public class IslandPopoverTagHelper : TagHelper
 
 /// <summary>
 /// TagHelper for <island-tooltip /> and <p-tooltip />
-/// PrimeVue 4 Aura Design System compliant advisory tooltip component.
+/// LaughTale Aura Design System advisory tooltip component.
 /// </summary>
 [HtmlTargetElement("island-tooltip")]
 [HtmlTargetElement("p-tooltip")]
@@ -317,7 +317,7 @@ public class IslandTooltipTagHelper : TagHelper
 
 /// <summary>
 /// TagHelper for <island-sidebar />, <p-sidebar />, and <island-sidebar-layout />
-/// PrimeVue 4 Aura Design System compound navigation panel system.
+/// LaughTale Aura Design System compound navigation panel system.
 /// </summary>
 [HtmlTargetElement("island-sidebar")]
 [HtmlTargetElement("p-sidebar")]

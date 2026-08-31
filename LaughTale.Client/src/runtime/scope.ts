@@ -1,5 +1,5 @@
 ﻿/**
- * LaughTale: Island Resource Scope & Teardown Lifecycle Helper (LT-201)
+ * LaughTale: Island Resource Scope & Teardown Lifecycle Helper
  * 
  * Provides automated resource tracking for event listeners, observers, timers, and custom
  * teardown callbacks. Executing scope.dispose() cleanly releases all attached resources,

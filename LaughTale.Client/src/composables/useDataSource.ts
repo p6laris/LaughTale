@@ -1,5 +1,5 @@
 ﻿/**
- * LaughTale: Headless DataSource Composable (LT-501)
+ * LaughTale: Headless DataSource Composable
  * Standardized generic engine for sorting, filtering, and pagination across data islands.
  */
 

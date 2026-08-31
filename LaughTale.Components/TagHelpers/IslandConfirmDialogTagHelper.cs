@@ -6,7 +6,7 @@ using LaughTale.Core.Enums;
 namespace LaughTale.Components.TagHelpers;
 
 /// <summary>
-/// Enterprise PrimeVue 4 Aura ConfirmDialog modal confirmation component.
+/// Enterprise LaughTale Aura ConfirmDialog modal confirmation component.
 /// </summary>
 [HtmlTargetElement("island-confirm-dialog")]
 [HtmlTargetElement("island-confirmdialog")]

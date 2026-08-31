@@ -1,7 +1,7 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 ﻿/**
- * LaughTale: Enterprise Menubar Component (PrimeVue 4 Aura Design System compliant)
+ * LaughTale: Enterprise Menubar Component (LaughTale Aura Design System)
  * Horizontal navigation menubar with multi-level cascading dropdowns, responsive mobile drawer/button,
  * customizable start and end slots, badge/shortcut rendering, and full WAI-ARIA keyboard navigation.
  */

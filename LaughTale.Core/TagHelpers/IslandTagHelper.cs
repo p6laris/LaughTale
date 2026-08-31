@@ -16,7 +16,7 @@ using LaughTale.Core.Serialization;
 namespace LaughTale.Core.TagHelpers;
 
 /// <summary>
-/// ASP.NET Core MVC &amp; Razor Pages TagHelper for rendering Islands with multi-framework, slots, streaming SSR, and cache leak protection (LT-1507).
+/// ASP.NET Core MVC &amp; Razor Pages TagHelper for rendering Islands with multi-framework, slots, streaming SSR, and cache leak protection.
 /// </summary>
 [HtmlTargetElement("island", TagStructure = TagStructure.NormalOrSelfClosing)]
 public class IslandTagHelper : TagHelper
@@ -75,7 +75,7 @@ public class IslandTagHelper : TagHelper
         // LT-1507: Cache Leak Guard & Privacy Enforcement
         EnforceCachePrivacy();
 
-        // Culture & Direction Flow (LT-1504)
+        // Culture & Direction Flow
         var currentCulture = System.Globalization.CultureInfo.CurrentUICulture;
         if (!output.Attributes.ContainsName("lang"))
         {

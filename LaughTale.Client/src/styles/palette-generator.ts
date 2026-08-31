@@ -1,5 +1,5 @@
 ﻿/**
- * LaughTale: OKLCH Palette Ramp Generator (LT-602)
+ * LaughTale: OKLCH Palette Ramp Generator
  * High-precision, zero-dependency perceptual color ramp generation.
  */
 

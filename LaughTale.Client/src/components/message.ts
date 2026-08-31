@@ -1,7 +1,7 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 ﻿/**
- * LaughTale: Enterprise Message Component (PrimeVue 4 Aura Design System)
+ * LaughTale: Enterprise Message Component (LaughTale Aura Design System)
  * High-performance inline notification messages with severity levels,
  * variants (filled, outlined, simple), sizes (small, normal, large),
  * closable triggers with silky smooth 60fps height collapse slide exit animations,
@@ -13,7 +13,7 @@ import { injectIslandStyle } from '../runtime/styles';
 
 const MESSAGE_CSS = `
 /* ==========================================================================
-   PrimeVue 4 Aura Message Component Tokens & Styles
+   LaughTale Aura Message Component Tokens & Styles
    ========================================================================== */
 .p-message {
     display: flex;

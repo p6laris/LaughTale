@@ -1,5 +1,5 @@
 ﻿/**
- * LaughTale: Performance Benchmarking & Metric Reporting (LT-701)
+ * LaughTale: Performance Benchmarking & Metric Reporting
  * High-precision profiling for hydration latency, rendering throughput, and statistical percentiles.
  */
 

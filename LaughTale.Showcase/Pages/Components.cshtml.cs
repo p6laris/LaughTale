@@ -427,12 +427,12 @@ public class ComponentsModel : PageModel
 
         public List<string> PaginatorImages { get; set; } = new()
     {
-        "https://primefaces.org/cdn/primevue/images/nature/nature1.jpg",
-        "https://primefaces.org/cdn/primevue/images/nature/nature2.jpg",
-        "https://primefaces.org/cdn/primevue/images/nature/nature3.jpg",
-        "https://primefaces.org/cdn/primevue/images/nature/nature4.jpg",
-        "https://primefaces.org/cdn/primevue/images/nature/nature5.jpg",
-        "https://primefaces.org/cdn/primevue/images/nature/nature6.jpg"
+        "https://primefaces.org/cdn/LaughTale/images/nature/nature1.jpg",
+        "https://primefaces.org/cdn/LaughTale/images/nature/nature2.jpg",
+        "https://primefaces.org/cdn/LaughTale/images/nature/nature3.jpg",
+        "https://primefaces.org/cdn/LaughTale/images/nature/nature4.jpg",
+        "https://primefaces.org/cdn/LaughTale/images/nature/nature5.jpg",
+        "https://primefaces.org/cdn/LaughTale/images/nature/nature6.jpg"
     };
 
     public OrgChartNode OrgChartBasic { get; set; } = new("0", "Founder", Children: new()
@@ -1975,7 +1975,7 @@ public class ComponentsModel : PageModel
     {
         new(Label: "Today", Items: new()
         {
-            new(Label: "PrimeVue Sidebar component", IsActive: true),
+            new(Label: "LaughTale Sidebar component", IsActive: true),
             new(Label: "How to use Vue composables"),
             new(Label: "Fix TypeScript generics issue")
         }),

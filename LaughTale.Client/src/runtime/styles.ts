@@ -1,5 +1,5 @@
 /**
- * LaughTale: Batched Island CSS Injection & Constructable StyleSheets (LT-703)
+ * LaughTale: Batched Island CSS Injection & Constructable StyleSheets
  * 
  * Batches island stylesheets in a single microtask frame, preferring document.adoptedStyleSheets
  * when supported to avoid DOM node churn and layout reflow thrashing. Falls back to <style> with CSP nonce.

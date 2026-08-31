@@ -14,7 +14,7 @@ namespace LaughTale.Components.TagHelpers;
 
 /// <summary>
 /// TagHelper for <island-compare />, <p-compare />, and <island-image-compare />
-/// PrimeVue 4 Aura Design System compliant side-by-side comparison slider.
+/// LaughTale Aura Design System side-by-side comparison slider.
 /// </summary>
 [HtmlTargetElement("island-compare")]
 [HtmlTargetElement("p-compare")]
@@ -145,7 +145,7 @@ public class IslandGalleriaTagHelper : TagHelper
 }
 
 /// <summary>
-/// TagHelper for <island-carousel /> and <p-carousel /> — PrimeVue 4 Aura Content Slider
+/// TagHelper for <island-carousel /> and <p-carousel /> — LaughTale Aura Content Slider
 /// </summary>
 [HtmlTargetElement("island-carousel")]
 [HtmlTargetElement("p-carousel")]
