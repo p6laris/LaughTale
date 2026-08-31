@@ -1186,7 +1186,7 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                     </div>
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                         <span>${locale.t('rowsPerPage') || 'Rows per page'}:</span>
-                        <select class="p-datatable-rows-select" style="padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px solid var(--lt-surface-300); background: var(--lt-surface-0); color: inherit; font-size: 0.8125rem;">
+                        <select class="p-datatable-rows-select" aria-label="${locale.t('rowsPerPage') || 'Rows per page'}" style="padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px solid var(--lt-surface-300); background: var(--lt-surface-0); color: inherit; font-size: 0.8125rem;">
                             ${rowsPerPageOptions.map(opt => `<option value="${opt}" ${opt === rowsPerPage ? 'selected' : ''}>${opt}</option>`).join('')}
                         </select>
                     </div>

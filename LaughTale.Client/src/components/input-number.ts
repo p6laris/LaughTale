@@ -1,6 +1,7 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
-﻿/**
+
+/**
  * LaughTale: Enterprise InputNumber Component (Aura InputNumber)
  * Seamless unified container design matching LaughTale Aura pixel-for-pixel:
  * Single outer focus ring enclosing buttons and inputs, zero blue selection on click,
@@ -34,6 +35,9 @@ export interface InputNumberProps {
     showClear?: boolean | string;
     placeholder?: string;
     disabled?: boolean | string;
+    name?: string;
+    ariaLabel?: string;
+    ariaLabelledBy?: string;
     inputClass?: string;
     inputStyle?: Record<string, string> | string;
     pt?: PassthroughRecord;
@@ -95,7 +99,6 @@ const CSS = `
     box-shadow: 0 0 0 1px var(--p-red-500, var(--lt-danger-500)) !important;
 }
 
-/* Sizes */
 .p-inputnumber.size-small {
     min-height: 2rem;
 }
@@ -477,6 +480,7 @@ export default function InputNumberIsland(container: HTMLElement, props: InputNu
                 ${min !== undefined ? `aria-valuemin="${min}"` : ''}
                 ${max !== undefined ? `aria-valuemax="${max}"` : ''}
                 ${isInvalid ? 'aria-invalid="true"' : ''}
+                ${props.ariaLabel ? `aria-label="${props.ariaLabel}"` : (props.name ? `aria-label="${props.name}"` : 'aria-label="Number input"')}
                 autocomplete="off"
             />
         `;

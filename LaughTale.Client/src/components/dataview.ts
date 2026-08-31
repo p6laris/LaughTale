@@ -563,7 +563,7 @@ export default function DataViewIsland(container: HTMLElement, props: DataViewPr
                     <div class="p-dataview-title">${props.title || ''}</div>
                     <div class="p-dataview-controls">
                         ${showSort ? `
-                            <select class="p-dataview-sort-select">
+                            <select class="p-dataview-sort-select" aria-label="Sort by price">
                                 <option value="" ${!sortField ? 'selected' : ''}>Sort by Price...</option>
                                 <option value="lowtohigh" ${sortField === 'price' && sortOrder === 1 ? 'selected' : ''}>Price Low to High</option>
                                 <option value="hightolow" ${sortField === 'price' && sortOrder === -1 ? 'selected' : ''}>Price High to Low</option>
@@ -748,7 +748,7 @@ export default function DataViewIsland(container: HTMLElement, props: DataViewPr
                     </div>
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                         <span>Rows per page:</span>
-                        <select class="p-dataview-rows-select" style="padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px solid var(--lt-surface-300); background: var(--lt-surface-0); color: inherit; font-size: 0.8125rem;">
+                        <select class="p-dataview-rows-select" aria-label="Rows per page" style="padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px solid var(--lt-surface-300); background: var(--lt-surface-0); color: inherit; font-size: 0.8125rem;">
                             ${rowsPerPageOptions.map(opt => `<option value="${opt}" ${opt === rowsPerPage ? 'selected' : ''}>${opt}</option>`).join('')}
                         </select>
                     </div>

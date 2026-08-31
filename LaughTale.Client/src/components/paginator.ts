@@ -424,7 +424,7 @@ export default function PaginatorIsland(container: HTMLElement, props: Paginator
             jtpDropdownHtml = `
                 <div class="p-paginator-jtp-container">
                     <span>Jump to page:</span>
-                    <select class="p-paginator-jtp-select">${jtpOptions}</select>
+                    <select class="p-paginator-jtp-select" aria-label="Jump to page">${jtpOptions}</select>
                     <span>of ${totalPages}</span>
                 </div>
             `;

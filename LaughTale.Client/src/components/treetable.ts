@@ -1110,19 +1110,19 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
                     <div class="p-treetable-paginator">
                         <div style="display: flex; align-items: center; gap: 0.5rem;">
                             <span style="font-size: 0.8125rem; color: var(--lt-surface-500);">Rows:</span>
-                            <select class="p-treetable-rpp-select" style="padding: 0.25rem 0.5rem; font-size: 0.8125rem; border-radius: 6px; border: 1px solid var(--lt-surface-300); background: var(--lt-surface-0); color: var(--lt-surface-700);">
+                            <select class="p-treetable-rpp-select" aria-label="Rows per page" style="padding: 0.25rem 0.5rem; font-size: 0.8125rem; border-radius: 6px; border: 1px solid var(--lt-surface-300); background: var(--lt-surface-0); color: var(--lt-surface-700);">
                                 ${rowsPerPageOptions.map(opt => `<option value="${opt}" ${opt === rowsPerPage ? 'selected' : ''}>${opt}</option>`).join('')}
                             </select>
                         </div>
                         <div style="display: flex; align-items: center; gap: 0.25rem;">
-                            <button type="button" class="p-treetable-first-btn p-treetable-paginator-btn" ${currentPage === 0 ? 'disabled' : ''}>${SVG_ICONS.firstPage}</button>
-                            <button type="button" class="p-treetable-prev-btn p-treetable-paginator-btn" ${currentPage === 0 ? 'disabled' : ''}>${SVG_ICONS.chevronLeft}</button>
+                            <button type="button" class="p-treetable-first-btn p-treetable-paginator-btn" aria-label="First Page" ${currentPage === 0 ? 'disabled' : ''}>${SVG_ICONS.firstPage}</button>
+                            <button type="button" class="p-treetable-prev-btn p-treetable-paginator-btn" aria-label="Previous Page" ${currentPage === 0 ? 'disabled' : ''}>${SVG_ICONS.chevronLeft}</button>
                             ${Array.from({ length: Math.min(5, totalPages) }).map((_, i) => {
                                 const p = i;
-                                return `<button type="button" class="p-treetable-page-btn p-treetable-paginator-btn ${p === currentPage ? 'p-highlight' : ''}" data-page="${p}">${p + 1}</button>`;
+                                return `<button type="button" class="p-treetable-page-btn p-treetable-paginator-btn ${p === currentPage ? 'p-highlight' : ''}" data-page="${p}" aria-label="Page ${p + 1}">${p + 1}</button>`;
                             }).join('')}
-                            <button type="button" class="p-treetable-next-btn p-treetable-paginator-btn" ${currentPage >= totalPages - 1 ? 'disabled' : ''}>${SVG_ICONS.chevronRight}</button>
-                            <button type="button" class="p-treetable-last-btn p-treetable-paginator-btn" ${currentPage >= totalPages - 1 ? 'disabled' : ''}>${SVG_ICONS.lastPage}</button>
+                            <button type="button" class="p-treetable-next-btn p-treetable-paginator-btn" aria-label="Next Page" ${currentPage >= totalPages - 1 ? 'disabled' : ''}>${SVG_ICONS.chevronRight}</button>
+                            <button type="button" class="p-treetable-last-btn p-treetable-paginator-btn" aria-label="Last Page" ${currentPage >= totalPages - 1 ? 'disabled' : ''}>${SVG_ICONS.lastPage}</button>
                         </div>
                         <div style="font-size: 0.8125rem; color: var(--lt-surface-500);">
                             ${firstRecord} to ${lastRecord} of ${totalRecords}

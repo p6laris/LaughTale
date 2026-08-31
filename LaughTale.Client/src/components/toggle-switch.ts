@@ -237,7 +237,7 @@ export default function ToggleSwitchIsland(container: HTMLElement, props: Toggle
                 ${isChecked ? 'checked' : ''}
                 ${isDisabled ? 'disabled' : ''}
                 aria-checked="${isChecked ? 'true' : 'false'}"
-                ${props.ariaLabel ? `aria-label="${props.ariaLabel}"` : ''}
+                ${props.ariaLabel ? `aria-label="${props.ariaLabel}"` : (props.label ? `aria-label="${props.label}"` : (props.name ? `aria-label="${props.name}"` : 'aria-label="Toggle switch"'))}
                 ${props.ariaLabelledBy ? `aria-labelledby="${props.ariaLabelledBy}"` : ''}
                 tabindex="${isDisabled ? '-1' : '0'}"
             />
