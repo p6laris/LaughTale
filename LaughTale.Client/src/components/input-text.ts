@@ -214,14 +214,14 @@ const CSS = `
 html.dark .p-inputtext,
 [data-theme="dark"] .p-inputtext,
 .dark .p-inputtext {
-    background: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-0);
+    border-color: var(--p-border-color);
+    color: var(--p-text-color);
 }
 html.dark .p-inputtext:hover:not(:disabled):not(.is-invalid):not(.p-invalid),
 [data-theme="dark"] .p-inputtext:hover:not(:disabled):not(.is-invalid):not(.p-invalid),
 .dark .p-inputtext:hover:not(:disabled):not(.is-invalid):not(.p-invalid) {
-    border-color: var(--p-surface-400, #64748b);
+    border-color: var(--p-surface-400);
 }
 html.dark .p-inputtext.variant-filled,
 html.dark .p-inputtext.p-variant-filled,
@@ -229,30 +229,30 @@ html.dark .p-inputtext.p-variant-filled,
 [data-theme="dark"] .p-inputtext.p-variant-filled,
 .dark .p-inputtext.variant-filled,
 .dark .p-inputtext.p-variant-filled {
-    background: var(--p-surface-100, #1e293b);
+    background: var(--p-surface-100);
 }
 html.dark .p-inputtext.variant-filled:focus,
 [data-theme="dark"] .p-inputtext.variant-filled:focus,
 .dark .p-inputtext.variant-filled:focus {
-    background: var(--p-surface-0, #090d16);
+    background: var(--p-surface-0);
 }
 html.dark .p-inputtext:disabled,
 [data-theme="dark"] .p-inputtext:disabled,
 .dark .p-inputtext:disabled {
-    background: var(--p-surface-100, #1e293b);
-    border-color: var(--p-border-color, #334155);
-    color: var(--p-text-muted, #94a3b8);
+    background: var(--p-surface-100);
+    border-color: var(--p-border-color);
+    color: var(--p-text-muted);
 }
 html.dark .p-inputtext-clear:hover,
 [data-theme="dark"] .p-inputtext-clear:hover,
 .dark .p-inputtext-clear:hover {
-    background: var(--p-surface-100, #1e293b);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-100);
+    color: var(--p-text-color);
 }
 html.dark .p-inputtext-icon,
 [data-theme="dark"] .p-inputtext-icon,
 .dark .p-inputtext-icon {
-    color: var(--p-text-muted, #94a3b8);
+    color: var(--p-text-muted);
 }
 `;
 
@@ -310,7 +310,7 @@ export default function InputTextIsland(container: HTMLElement, props: InputText
 
         container.className = wrapClasses;
 
-        const leftIconHtml = leftIconSvg ? `<span class="p-inputtext-icon p-inputtext-icon-left">${leftIconSvg}</span>` : '';
+        const leftIconHtml = leftIconSvg ? `<span class="p-inputtext-icon p-inputtext-icon-left" data-part="root">${leftIconSvg}</span>` : '';
         const rightIconHtml = rightIconSvg ? `<span class="p-inputtext-icon p-inputtext-icon-right">${rightIconSvg}</span>` : '';
         const clearBtnHtml = hasClear ? `
             <button type="button" class="p-inputtext-clear" aria-label="Clear text" tabindex="-1" style="display: ${val ? 'flex' : 'none'};">
@@ -347,7 +347,7 @@ export default function InputTextIsland(container: HTMLElement, props: InputText
 
         if (props.helpText) {
             const helpEl = document.createElement('small');
-            helpEl.className = 'p-inputtext-help';
+            helpEl.className = 'p-inputtext-help'; container.setAttribute('data-part', 'root');
             if (props.ariaDescribedBy) helpEl.id = props.ariaDescribedBy;
             helpEl.textContent = props.helpText;
             container.parentElement?.insertBefore(helpEl, container.nextSibling);
@@ -377,17 +377,17 @@ export default function InputTextIsland(container: HTMLElement, props: InputText
                 bubbles: true,
                 detail: { value: val }
             }));
-        });
+        }, { signal: ctx?.signal });
 
         input.addEventListener('change', () => {
             container.dispatchEvent(new CustomEvent('inputtext:change', {
                 bubbles: true,
                 detail: { value: input.value }
             }));
-        });
+        }, { signal: ctx?.signal });
 
         if (clearBtn) {
-            clearBtn.addEventListener('mousedown', (e) => e.preventDefault()); // Prevent input blur
+            clearBtn.addEventListener('mousedown', (e) => e.preventDefault(), { signal: ctx?.signal }); // Prevent input blur
             clearBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 input.value = '';
@@ -404,7 +404,7 @@ export default function InputTextIsland(container: HTMLElement, props: InputText
                 }));
                 // Dispatch native input event for FloatLabel/IftaLabel detection
                 input.dispatchEvent(new Event('input', { bubbles: true }));
-            });
+            }, { signal: ctx?.signal });
         }
     }
 

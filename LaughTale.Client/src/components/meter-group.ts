@@ -25,7 +25,7 @@ const CSS = `
 html.dark .laughtale-metergroup,
 [data-theme="dark"] .laughtale-metergroup,
 .dark .laughtale-metergroup {
-    color: var(--p-text-color, #f8fafc) !important;
+    color: var(--p-text-color) !important;
 }
 `;
 
@@ -49,7 +49,7 @@ export default function MeterGroupIsland(container: HTMLElement, props: MeterGro
     `).join('');
 
     container.innerHTML = `
-        <div class="laughtale-metergroup" style="display: flex; flex-direction: column; gap: 0.75rem; width: 100%;">
+        <div class="laughtale-metergroup" data-part="root" style="display: flex; flex-direction: column; gap: 0.75rem; width: 100%;">
             ${props.title ? `<div style="font-size: 0.875rem; font-weight: 700; color: var(--lt-surface-900);">${props.title}</div>` : ''}
             
             <!-- Meter Track -->

@@ -62,16 +62,16 @@ html.dark .p-toolbar .p-button-active-toggle,
 [data-theme="dark"] .p-toolbar .p-button-active-toggle,
 .dark .p-toolbar [data-toggle-active="true"],
 .dark .p-toolbar .p-button-active-toggle {
-    background: var(--p-surface-100, #1e293b) !important;
-    color: var(--p-primary-500, #10b981) !important;
+    background: var(--p-surface-100) !important;
+    color: var(--p-primary-500) !important;
 }
 
 /* Dark Mode Tokens */
 html.dark .p-toolbar,
 [data-theme="dark"] .p-toolbar,
 .dark .p-toolbar {
-    background: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
+    background: var(--p-surface-0);
+    border-color: var(--p-border-color);
 }
 `;
 
@@ -88,6 +88,7 @@ export default function ToolbarIsland(container: HTMLElement, props: ToolbarProp
     injectIslandStyle('toolbar', TOOLBAR_CSS);
 
     const rootEl = container.querySelector<HTMLElement>('.p-toolbar') || container;
+    container.setAttribute('data-part', 'root');
     rootEl.classList.add('p-toolbar', 'p-component');
     rootEl.setAttribute('role', 'toolbar');
     rootEl.setAttribute('aria-orientation', 'horizontal');
@@ -111,7 +112,7 @@ export default function ToolbarIsland(container: HTMLElement, props: ToolbarProp
                 btn.style.color = 'var(--lt-surface-700)';
                 btn.style.boxShadow = 'none';
             }
-        });
+        }, { signal: ctx?.signal });
     });
 
     // 2. Alignment Exclusive Switcher (Left, Center, Right)
@@ -131,7 +132,7 @@ export default function ToolbarIsland(container: HTMLElement, props: ToolbarProp
             btn.style.background = 'var(--lt-surface-0)';
             btn.style.color = 'var(--lt-primary-600)';
             btn.style.boxShadow = '0 1px 2px rgba(0,0,0,0.06)';
-        });
+        }, { signal: ctx?.signal });
     });
 
     // 3. Grid / List View Switcher
@@ -147,7 +148,7 @@ export default function ToolbarIsland(container: HTMLElement, props: ToolbarProp
             btn.style.background = 'var(--lt-surface-0)';
             btn.style.color = 'var(--lt-primary-600)';
             btn.style.boxShadow = '0 1px 2px rgba(0,0,0,0.06)';
-        });
+        }, { signal: ctx?.signal });
     });
 
     // 4. Media Player Controls (Play / Pause toggle & scrubbing)
@@ -159,7 +160,7 @@ export default function ToolbarIsland(container: HTMLElement, props: ToolbarProp
             isPlaying = !isPlaying;
             playBtn.setAttribute('aria-label', isPlaying ? 'Pause' : 'Play');
             playBtn.innerHTML = isPlaying ? PAUSE_ICON_SVG : PLAY_ICON_SVG;
-        });
+        }, { signal: ctx?.signal });
     }
 
     // 5. Star Repo Counter Toggle
@@ -174,6 +175,6 @@ export default function ToolbarIsland(container: HTMLElement, props: ToolbarProp
                 countSpan.textContent = isStarred ? '1.4k + 1' : '1.4k';
             }
             starBtn.style.color = isStarred ? 'var(--lt-warn-500, var(--lt-warn-500))' : 'var(--lt-text-primary)';
-        });
+        }, { signal: ctx?.signal });
     }
 }

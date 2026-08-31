@@ -21,9 +21,9 @@ const CSS = `
 html.dark .laughtale-galleria,
 [data-theme="dark"] .laughtale-galleria,
 .dark .laughtale-galleria {
-    background: var(--p-surface-0, #090d16) !important;
-    color: var(--p-text-color, #f8fafc) !important;
-    border-color: var(--p-border-color, #334155) !important;
+    background: var(--p-surface-0) !important;
+    color: var(--p-text-color) !important;
+    border-color: var(--p-border-color) !important;
 }
 html.dark .galleria-prev-btn,
 html.dark .galleria-next-btn,
@@ -32,17 +32,17 @@ html.dark .galleria-next-btn,
 .dark .galleria-prev-btn,
 .dark .galleria-next-btn {
     background: rgba(0, 0, 0, 0.6) !important;
-    color: #ffffff !important;
+    color: var(--p-surface-0) !important;
 }
 html.dark .galleria-thumb,
 [data-theme="dark"] .galleria-thumb,
 .dark .galleria-thumb {
-    border-color: var(--p-border-color, #334155) !important;
+    border-color: var(--p-border-color) !important;
 }
 html.dark .galleria-thumb.active,
 [data-theme="dark"] .galleria-thumb.active,
 .dark .galleria-thumb.active {
-    border-color: var(--p-primary-500, #10b981) !important;
+    border-color: var(--p-primary-500) !important;
 }
 `;
 
@@ -75,7 +75,7 @@ export default function GalleriaIsland(container: HTMLElement, props: GalleriaPr
         const current = images[activeIndex];
 
         container.innerHTML = `
-            <div class="laughtale-galleria" style="width: 100%; max-width: 640px; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius-lg); overflow: hidden; background: var(--lt-surface-0); font-family: var(--p-font-family, inherit);">
+            <div class="laughtale-galleria" data-part="root" style="width: 100%; max-width: 640px; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius-lg); overflow: hidden; background: var(--lt-surface-0); font-family: var(--p-font-family, inherit);">
                 <!-- Main Image Stage -->
                 <div style="position: relative; width: 100%; height: 320px; background: var(--lt-surface-950, var(--lt-surface-950)); overflow: hidden; display: flex; align-items: center; justify-content: center;">
                     <img src="${current.itemImageSrc}" alt="${current.alt}" style="width: 100%; height: 100%; object-fit: cover; transition: opacity 0.25s ease;" />
@@ -112,18 +112,18 @@ export default function GalleriaIsland(container: HTMLElement, props: GalleriaPr
         container.querySelector('.galleria-prev-btn')?.addEventListener('click', () => {
             activeIndex = (activeIndex - 1 + images.length) % images.length;
             render();
-        });
+        }, { signal: ctx?.signal });
 
         container.querySelector('.galleria-next-btn')?.addEventListener('click', () => {
             activeIndex = (activeIndex + 1) % images.length;
             render();
-        });
+        }, { signal: ctx?.signal });
 
         container.querySelectorAll('.galleria-thumb').forEach(thumb => {
             thumb.addEventListener('click', () => {
                 activeIndex = Number(thumb.getAttribute('data-index'));
                 render();
-            });
+            }, { signal: ctx?.signal });
         });
     }
 

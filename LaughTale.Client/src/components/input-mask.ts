@@ -113,29 +113,29 @@ html.dark .p-inputmask,
 [data-theme="dark"] .p-inputmask,
 .dark .laughtale-input-mask,
 .dark .p-inputmask {
-    background-color: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
-    color: var(--p-text-color, #f8fafc);
+    background-color: var(--p-surface-0);
+    border-color: var(--p-border-color);
+    color: var(--p-text-color);
 }
 html.dark .p-inputmask:hover:not(:disabled):not([readonly]),
 [data-theme="dark"] .p-inputmask:hover:not(:disabled):not([readonly]),
 .dark .p-inputmask:hover:not(:disabled):not([readonly]) {
-    border-color: var(--p-surface-400, #64748b);
+    border-color: var(--p-surface-400);
 }
 html.dark .p-inputmask.variant-filled,
 [data-theme="dark"] .p-inputmask.variant-filled,
 .dark .p-inputmask.variant-filled {
-    background-color: var(--p-surface-100, #1e293b);
+    background-color: var(--p-surface-100);
 }
 html.dark .p-inputmask.variant-filled:hover:not(:disabled):not([readonly]),
 [data-theme="dark"] .p-inputmask.variant-filled:hover:not(:disabled):not([readonly]),
 .dark .p-inputmask.variant-filled:hover:not(:disabled):not([readonly]) {
-    background-color: var(--p-surface-200, #334155);
+    background-color: var(--p-surface-200);
 }
 html.dark .p-inputmask.variant-filled:focus,
 [data-theme="dark"] .p-inputmask.variant-filled:focus,
 .dark .p-inputmask.variant-filled:focus {
-    background-color: var(--p-surface-0, #090d16);
+    background-color: var(--p-surface-0);
 }
 html.dark .p-inputmask:disabled,
 html.dark .p-inputmask.is-disabled,
@@ -143,9 +143,9 @@ html.dark .p-inputmask.is-disabled,
 [data-theme="dark"] .p-inputmask.is-disabled,
 .dark .p-inputmask:disabled,
 .dark .p-inputmask.is-disabled {
-    background-color: var(--p-surface-100, #1e293b);
-    border-color: var(--p-border-color, #334155);
-    color: var(--p-text-muted, #94a3b8);
+    background-color: var(--p-surface-100);
+    border-color: var(--p-border-color);
+    color: var(--p-text-muted);
 }
 `;
 
@@ -277,7 +277,7 @@ export default function InputMaskIsland(container: HTMLElement, props: InputMask
     container.innerHTML = `
         <input 
             type="text"
-            class="${rootClasses}"
+            class="${rootClasses}" data-part="root"
             value="${currentFormatted}"
             placeholder="${props.placeholder || tokens.map(t => t.isSlot ? t.slotChar : t.char).join('')}"
             ${isDisabled ? 'disabled' : ''}
@@ -320,7 +320,7 @@ export default function InputMaskIsland(container: HTMLElement, props: InputMask
             const pos = getFirstSlotIndex(input.value);
             setTimeout(() => input.setSelectionRange(pos, pos), 10);
         }
-    });
+    }, { signal: ctx?.signal });
 
     input.addEventListener('blur', () => {
         const formatted = formatValue(input.value);
@@ -330,7 +330,7 @@ export default function InputMaskIsland(container: HTMLElement, props: InputMask
             input.value = '';
         }
         syncValue();
-    });
+    }, { signal: ctx?.signal });
 
     input.addEventListener('input', (e) => {
         const inputType = (e as InputEvent).inputType;
@@ -354,7 +354,7 @@ export default function InputMaskIsland(container: HTMLElement, props: InputMask
         input.setSelectionRange(nextSlot, nextSlot);
 
         syncValue();
-    });
+    }, { signal: ctx?.signal });
 
     input.addEventListener('keydown', (e) => {
         if (e.key === 'Backspace') {
@@ -377,7 +377,7 @@ export default function InputMaskIsland(container: HTMLElement, props: InputMask
                 }
             }
         }
-    });
+    }, { signal: ctx?.signal });
 
     syncValue();
 }

@@ -208,36 +208,36 @@ const CONFIRM_DIALOG_CSS = `
 html.dark .p-confirmdialog.p-dialog,
 [data-theme="dark"] .p-confirmdialog.p-dialog,
 .dark .p-confirmdialog.p-dialog {
-    background: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
+    background: var(--p-surface-0);
+    border-color: var(--p-border-color);
 }
 html.dark .p-confirmdialog .p-dialog-title,
 [data-theme="dark"] .p-confirmdialog .p-dialog-title,
 .dark .p-confirmdialog .p-dialog-title {
-    color: var(--p-text-color, #f8fafc);
+    color: var(--p-text-color);
 }
 html.dark .p-confirmdialog .p-dialog-header-close,
 [data-theme="dark"] .p-confirmdialog .p-dialog-header-close,
 .dark .p-confirmdialog .p-dialog-header-close {
-    color: var(--p-text-muted, #94a3b8);
+    color: var(--p-text-muted);
 }
 html.dark .p-confirmdialog .p-dialog-header-close:hover,
 [data-theme="dark"] .p-confirmdialog .p-dialog-header-close:hover,
 .dark .p-confirmdialog .p-dialog-header-close:hover {
-    background: var(--p-surface-100, #1e293b);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-100);
+    color: var(--p-text-color);
 }
 html.dark .p-confirmdialog .p-confirmdialog-message,
 [data-theme="dark"] .p-confirmdialog .p-confirmdialog-message,
 .dark .p-confirmdialog .p-confirmdialog-message {
-    color: var(--p-text-color, #f8fafc);
+    color: var(--p-text-color);
 }
 html.dark .p-confirmdialog-headless-icon,
 [data-theme="dark"] .p-confirmdialog-headless-icon,
 .dark .p-confirmdialog-headless-icon {
     background: rgba(16, 185, 129, 0.15);
     border-color: rgba(16, 185, 129, 0.35);
-    color: var(--p-primary-300, #6ee7b7);
+    color: var(--p-primary-300);
 }
 `;
 
@@ -259,6 +259,7 @@ export interface ConfirmDialogOptions {
     reject?: () => void;
     template?: string;
     headless?: boolean;
+    signal?: AbortSignal;
 }
 
 export interface ConfirmDialogProps {
@@ -269,6 +270,7 @@ export interface ConfirmDialogProps {
     closeOnEscape?: boolean;
     pt?: PassthroughRecord;
     studioOverrides?: Record<string, any>;
+    signal?: AbortSignal;
 }
 
 // Vector SVG Icons
@@ -292,12 +294,13 @@ class ConfirmDialogManager {
         }
     }
 
-    private initDOM() {
+    private initDOM(signal?: AbortSignal) {
         if (this.maskEl) return;
         injectIslandStyle('confirm-dialog', CONFIRM_DIALOG_CSS);
 
         this.maskEl = document.createElement('div');
         this.maskEl.className = 'p-confirmdialog-mask p-confirmdialog-pos-center';
+        this.maskEl.setAttribute('data-part', 'root');
         this.maskEl.setAttribute('role', 'dialog');
         this.maskEl.setAttribute('aria-modal', 'true');
 
@@ -305,19 +308,19 @@ class ConfirmDialogManager {
             if (e.target === this.maskEl) {
                 this.close(false);
             }
-        });
+        }, { signal });
 
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && this.maskEl?.classList.contains('p-confirmdialog-mask-active')) {
                 this.close(false);
             }
-        });
+        }, { signal });
 
         document.body.appendChild(this.maskEl);
     }
 
     public require(options: ConfirmDialogOptions) {
-        this.initDOM();
+        this.initDOM(options.signal);
         this.currentOptions = options;
         const pos = (options.position || 'center').toLowerCase().replace(/[^a-z]/g, '');
         
@@ -348,7 +351,7 @@ class ConfirmDialogManager {
         if (!iconName) return INFO_ICON_SVG;
         const n = iconName.toLowerCase();
         if (n.includes('danger') || n.includes('trash') || n.includes('alert') || n.includes('triangle')) {
-            return `<span class="p-confirmdialog-icon p-confirmdialog-icon-danger">${DANGER_ALERT_SVG}</span>`;
+            return `<span class="p-confirmdialog-icon p-confirmdialog-icon-danger" data-part="root">${DANGER_ALERT_SVG}</span>`;
         }
         if (n.includes('warning') || n.includes('exclamation')) {
             return `<span class="p-confirmdialog-icon p-confirmdialog-icon-warning">${DANGER_ALERT_SVG}</span>`;
@@ -419,9 +422,9 @@ class ConfirmDialogManager {
         }
 
         // Attach events
-        this.maskEl.querySelector('.p-dialog-header-close')?.addEventListener('click', () => this.close(false));
-        this.maskEl.querySelector('.btn-reject')?.addEventListener('click', () => this.close(false));
-        this.maskEl.querySelector('.btn-accept')?.addEventListener('click', () => this.close(true));
+        this.maskEl.querySelector('.p-dialog-header-close')?.addEventListener('click', () => this.close(false), { signal: opt.signal });
+        this.maskEl.querySelector('.btn-reject')?.addEventListener('click', () => this.close(false), { signal: opt.signal });
+        this.maskEl.querySelector('.btn-accept')?.addEventListener('click', () => this.close(true), { signal: opt.signal });
     }
 }
 
@@ -527,6 +530,6 @@ export default function ConfirmDialogIsland(container: HTMLElement, props: Confi
                     reject: () => showToastFeedback('Rejected', 'You have rejected', 'error')
                 });
             }
-        });
+        }, { signal: ctx?.signal });
     });
 }

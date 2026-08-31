@@ -202,44 +202,44 @@ const STEPPER_CSS = `
 html.dark .p-step-header:hover:not(:disabled),
 [data-theme="dark"] .p-step-header:hover:not(:disabled),
 .dark .p-step-header:hover:not(:disabled) {
-    background: var(--p-surface-100, #1e293b) !important;
+    background: var(--p-surface-100) !important;
 }
 
 html.dark .p-step-number,
 [data-theme="dark"] .p-step-number,
 .dark .p-step-number {
-    background: var(--p-surface-0, #090d16) !important;
-    border-color: var(--p-border-color, #334155) !important;
-    color: var(--p-text-muted, #94a3b8) !important;
+    background: var(--p-surface-0) !important;
+    border-color: var(--p-border-color) !important;
+    color: var(--p-text-muted) !important;
 }
 
 html.dark .p-step-active .p-step-number,
 [data-theme="dark"] .p-step-active .p-step-number,
 .dark .p-step-active .p-step-number {
-    border-color: var(--p-primary-500, #10b981) !important;
-    color: var(--p-primary-500, #10b981) !important;
-    background: var(--p-surface-0, #090d16) !important;
+    border-color: var(--p-primary-500) !important;
+    color: var(--p-primary-500) !important;
+    background: var(--p-surface-0) !important;
     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
 }
 
 html.dark .p-step-completed .p-step-number,
 [data-theme="dark"] .p-step-completed .p-step-number,
 .dark .p-step-completed .p-step-number {
-    background: var(--p-primary-500, #10b981) !important;
-    border-color: var(--p-primary-500, #10b981) !important;
-    color: #ffffff !important;
+    background: var(--p-primary-500) !important;
+    border-color: var(--p-primary-500) !important;
+    color: var(--p-surface-0) !important;
 }
 
 html.dark .p-step-active .p-step-title,
 [data-theme="dark"] .p-step-active .p-step-title,
 .dark .p-step-active .p-step-title {
-    color: var(--p-text-color, #f8fafc) !important;
+    color: var(--p-text-color) !important;
 }
 
 html.dark .p-step-title,
 [data-theme="dark"] .p-step-title,
 .dark .p-step-title {
-    color: var(--p-text-muted, #94a3b8);
+    color: var(--p-text-muted);
 }
 
 html.dark .p-stepper-separator,
@@ -248,7 +248,7 @@ html.dark .p-stepitem:not(:last-child)::before,
 [data-theme="dark"] .p-stepitem:not(:last-child)::before,
 .dark .p-stepper-separator,
 .dark .p-stepitem:not(:last-child)::before {
-    background: var(--p-border-color, #334155);
+    background: var(--p-border-color);
 }
 html.dark .p-stepper-separator.p-stepper-separator-active,
 html.dark .p-stepitem-completed:not(:last-child)::before,
@@ -256,7 +256,7 @@ html.dark .p-stepitem-completed:not(:last-child)::before,
 [data-theme="dark"] .p-stepitem-completed:not(:last-child)::before,
 .dark .p-stepper-separator.p-stepper-separator-active,
 .dark .p-stepitem-completed:not(:last-child)::before {
-    background: var(--p-primary-500, #10b981) !important;
+    background: var(--p-primary-500) !important;
 }
 `;
 
@@ -306,7 +306,7 @@ export default function StepperIsland(container: HTMLElement, props: StepperProp
         for (let i = 0; i < renderedSteps.length - 1; i++) {
             if (!renderedSteps[i].nextElementSibling?.classList.contains('p-stepper-separator')) {
                 const sep = document.createElement('li');
-                sep.className = 'p-stepper-separator';
+                sep.className = 'p-stepper-separator'; container.setAttribute('data-part', 'root');
                 sep.setAttribute('aria-hidden', 'true');
                 renderedSteps[i].after(sep);
             }
@@ -398,7 +398,7 @@ export default function StepperIsland(container: HTMLElement, props: StepperProp
             const currentIdx = steps.findIndex(s => (s.getAttribute('data-value') || s.getAttribute('value')) === activeValue);
             if (isLinear && idx > currentIdx) return;
             setActiveStep(stepVal);
-        });
+        }, { signal: ctx?.signal });
     });
 
     // Action button handlers inside panels (Next / Back / Callback)
@@ -434,7 +434,7 @@ export default function StepperIsland(container: HTMLElement, props: StepperProp
                 setActiveStep(prevStepVal);
             }
         }
-    });
+    }, { signal: ctx?.signal });
 
     // Initial render state
     update();

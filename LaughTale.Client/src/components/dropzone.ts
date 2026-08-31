@@ -15,14 +15,14 @@ const CSS = `
 html.dark .dropzone-box,
 [data-theme="dark"] .dropzone-box,
 .dark .dropzone-box {
-    background: var(--p-surface-0, #090d16) !important;
-    color: var(--p-text-color, #f8fafc) !important;
-    border-color: var(--p-border-color, #334155) !important;
+    background: var(--p-surface-0) !important;
+    color: var(--p-text-color) !important;
+    border-color: var(--p-border-color) !important;
 }
 html.dark .dropzone-box:hover,
 [data-theme="dark"] .dropzone-box:hover,
 .dark .dropzone-box:hover {
-    border-color: var(--p-primary-500, #10b981) !important;
+    border-color: var(--p-primary-500) !important;
 }
 `;
 
@@ -32,7 +32,7 @@ export default function DropzoneIsland(container: HTMLElement, props: DropzonePr
         <div style="display: flex; flex-direction: column; gap: 0.75rem;">
             <div style="display: flex; align-items: center; justify-content: space-between;">
                 <span style="font-size: 0.8125rem; font-weight: 600; color: var(--lt-surface-600);">Document Vault</span>
-                <span class="aura-tag tag-cyan">Hydrate: Visible</span>
+                <span class="aura-tag tag-cyan" data-part="root">Hydrate: Visible</span>
             </div>
 
             <div class="dropzone-box" style="border: 2px dashed var(--lt-surface-200); border-radius: var(--lt-radius-lg); padding: 2rem 1.5rem; text-align: center; cursor: pointer; transition: all 0.2s ease; background-color: var(--lt-surface-50);">
@@ -56,18 +56,18 @@ export default function DropzoneIsland(container: HTMLElement, props: DropzonePr
     const input = container.querySelector('.file-input') as HTMLInputElement;
     const preview = container.querySelector('.preview-area') as HTMLElement;
 
-    box.addEventListener('click', () => input.click());
+    box.addEventListener('click', () => input.click(), { signal: ctx?.signal });
 
     box.addEventListener('dragover', (e) => {
         e.preventDefault();
         box.style.borderColor = 'var(--lt-primary-500)';
         box.style.backgroundColor = 'var(--lt-primary-50)';
-    });
+    }, { signal: ctx?.signal });
 
     box.addEventListener('dragleave', () => {
         box.style.borderColor = 'var(--lt-surface-200)';
         box.style.backgroundColor = 'var(--lt-surface-50)';
-    });
+    }, { signal: ctx?.signal });
 
     box.addEventListener('drop', (e) => {
         e.preventDefault();
@@ -77,13 +77,13 @@ export default function DropzoneIsland(container: HTMLElement, props: DropzonePr
             input.files = e.dataTransfer.files;
             handleFiles(input.files[0]);
         }
-    });
+    }, { signal: ctx?.signal });
 
     input.addEventListener('change', () => {
         if (input.files?.length) {
             handleFiles(input.files[0]);
         }
-    });
+    }, { signal: ctx?.signal });
 
     function handleFiles(file: File) {
         const sizeMb = file.size / (1024 * 1024);

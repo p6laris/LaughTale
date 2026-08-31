@@ -27,22 +27,22 @@ const CSS = `
 html.dark .colorpicker-hex-label,
 [data-theme="dark"] .colorpicker-hex-label,
 .dark .colorpicker-hex-label {
-    color: var(--p-text-color, #f8fafc) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .colorpicker-palette-overlay,
 [data-theme="dark"] .colorpicker-palette-overlay,
 .dark .colorpicker-palette-overlay {
-    background: var(--p-surface-0, #090d16) !important;
-    color: var(--p-text-color, #f8fafc) !important;
-    border-color: var(--p-border-color, #334155) !important;
+    background: var(--p-surface-0) !important;
+    color: var(--p-text-color) !important;
+    border-color: var(--p-border-color) !important;
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5) !important;
 }
 html.dark .color-hex-input,
 [data-theme="dark"] .color-hex-input,
 .dark .color-hex-input {
     background: transparent !important;
-    color: var(--p-text-color, #f8fafc) !important;
-    border-color: var(--p-border-color, #334155) !important;
+    color: var(--p-text-color) !important;
+    border-color: var(--p-border-color) !important;
 }
 `;
 
@@ -53,7 +53,7 @@ export default function ColorPickerIsland(container: HTMLElement, props: ColorPi
 
     const swatchesHtml = DEFAULT_PRESETS.map(c => `
         <button type="button" 
-                class="color-swatch-btn" 
+                class="color-swatch-btn" data-part="root" 
                 data-color="${c}" 
                 title="${c}"
                 style="width: 1.75rem; height: 1.75rem; border-radius: 4px; border: ${c.toLowerCase() === currentColor.toLowerCase() ? '2px solid var(--lt-surface-0, var(--lt-surface-0))' : '1px solid rgba(0,0,0,0.15)'}; background: ${c}; cursor: pointer; box-shadow: ${c.toLowerCase() === currentColor.toLowerCase() ? '0 0 0 2px var(--lt-primary-600)' : 'none'}; transition: transform 0.15s ease, box-shadow 0.15s ease;">
@@ -140,7 +140,7 @@ export default function ColorPickerIsland(container: HTMLElement, props: ColorPi
         triggerBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             toggleOverlay();
-        });
+        }, { signal: ctx?.signal });
 
         container.querySelectorAll<HTMLButtonElement>('.color-swatch-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -148,25 +148,25 @@ export default function ColorPickerIsland(container: HTMLElement, props: ColorPi
                 const color = btn.getAttribute('data-color')!;
                 applyColor(color);
                 toggleOverlay(false);
-            });
+            }, { signal: ctx?.signal });
         });
 
         nativeInput.addEventListener('input', () => {
             applyColor(nativeInput.value);
-        });
+        }, { signal: ctx?.signal });
 
         hexInput.addEventListener('input', () => {
             const raw = hexInput.value.trim().replace('#', '');
             if (/^[0-9A-Fa-f]{6}$/.test(raw) || /^[0-9A-Fa-f]{3}$/.test(raw)) {
                 applyColor(`#${raw}`, true);
             }
-        });
+        }, { signal: ctx?.signal });
 
         document.addEventListener('click', (e) => {
             if (!container.contains(e.target as Node)) {
                 toggleOverlay(false);
             }
-        });
+        }, { signal: ctx?.signal });
     }
 
     function syncValue() {

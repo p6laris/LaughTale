@@ -159,59 +159,59 @@ const PANEL_CSS = `
 html.dark .p-panel,
 [data-theme="dark"] .p-panel,
 .dark .p-panel {
-    background: var(--p-surface-0, #090d16) !important;
-    border-color: var(--p-border-color, #334155) !important;
-    color: var(--p-text-color, #f8fafc) !important;
+    background: var(--p-surface-0) !important;
+    border-color: var(--p-border-color) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-panel-header,
 [data-theme="dark"] .p-panel-header,
 .dark .p-panel-header {
-    background: var(--p-surface-0, #090d16) !important;
-    border-color: var(--p-border-color, #334155) !important;
+    background: var(--p-surface-0) !important;
+    border-color: var(--p-border-color) !important;
 }
 html.dark .p-panel-title,
 [data-theme="dark"] .p-panel-title,
 .dark .p-panel-title {
-    color: var(--p-text-color, #f8fafc) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-panel-toggle-button,
 [data-theme="dark"] .p-panel-toggle-button,
 .dark .p-panel-toggle-button {
-    background: var(--p-surface-0, #090d16) !important;
-    border-color: var(--p-border-color, #334155) !important;
-    color: var(--p-text-muted, #94a3b8) !important;
+    background: var(--p-surface-0) !important;
+    border-color: var(--p-border-color) !important;
+    color: var(--p-text-muted) !important;
 }
 html.dark .p-panel-toggle-button:hover,
 [data-theme="dark"] .p-panel-toggle-button:hover,
 .dark .p-panel-toggle-button:hover {
-    background: var(--p-surface-100, #1e293b) !important;
-    color: var(--p-text-color, #f8fafc) !important;
+    background: var(--p-surface-100) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-panel-content,
 [data-theme="dark"] .p-panel-content,
 .dark .p-panel-content {
-    color: var(--p-text-color, #f8fafc) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-panel-footer,
 [data-theme="dark"] .p-panel-footer,
 .dark .p-panel-footer {
-    background: var(--p-surface-0, #090d16) !important;
-    border-color: var(--p-border-color, #334155) !important;
-    color: var(--p-text-muted, #94a3b8) !important;
+    background: var(--p-surface-0) !important;
+    border-color: var(--p-border-color) !important;
+    color: var(--p-text-muted) !important;
 }
 html.dark .p-panel-ctrl-btn,
 [data-theme="dark"] .p-panel-ctrl-btn,
 .dark .p-panel-ctrl-btn {
-    background: var(--p-surface-100, #1e293b) !important;
-    border-color: var(--p-border-color, #334155) !important;
-    color: var(--p-text-color, #f8fafc) !important;
+    background: var(--p-surface-100) !important;
+    border-color: var(--p-border-color) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-panel-ctrl-btn.p-highlight,
 [data-theme="dark"] .p-panel-ctrl-btn.p-highlight,
 .dark .p-panel-ctrl-btn.p-highlight {
-    background: var(--p-primary-500, #10b981) !important;
-    border-color: var(--p-primary-500, #10b981) !important;
-    color: #ffffff !important;
+    background: var(--p-primary-500) !important;
+    border-color: var(--p-primary-500) !important;
+    color: var(--p-surface-0) !important;
 }
 `;
 
@@ -227,6 +227,7 @@ export interface PanelProps {
 
 export default function PanelIsland(container: HTMLElement, props: PanelProps, ctx?: IslandContext) {
     injectIslandStyle('panel', PANEL_CSS);
+    container.setAttribute('data-part', 'root');
 
     const isToggleable = !!props.toggleable;
     const isControlled = !!props.controlled;
@@ -271,14 +272,14 @@ export default function PanelIsland(container: HTMLElement, props: PanelProps, c
     if (isToggleable && toggleBtn) {
         toggleBtn.addEventListener('click', () => {
             updateState(!isCollapsed);
-        });
+        }, { signal: ctx?.signal });
 
         toggleBtn.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
                 updateState(!isCollapsed);
             }
-        });
+        }, { signal: ctx?.signal });
     }
 
     if (isControlled) {
@@ -290,7 +291,7 @@ export default function PanelIsland(container: HTMLElement, props: PanelProps, c
                 } else if (action === 'close') {
                     updateState(true);
                 }
-            });
+            }, { signal: ctx?.signal });
         });
     }
 }

@@ -21,22 +21,22 @@ const CSS = `
 html.dark .laughtale-inplace-display,
 [data-theme="dark"] .laughtale-inplace-display,
 .dark .laughtale-inplace-display {
-    background: var(--p-surface-100, #1e293b) !important;
-    color: var(--p-text-color, #f8fafc) !important;
-    border-color: var(--p-border-color, #334155) !important;
+    background: var(--p-surface-100) !important;
+    color: var(--p-text-color) !important;
+    border-color: var(--p-border-color) !important;
 }
 html.dark .laughtale-inplace-editor,
 [data-theme="dark"] .laughtale-inplace-editor,
 .dark .laughtale-inplace-editor {
     background: transparent !important;
-    color: var(--p-text-color, #f8fafc) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .inplace-input,
 [data-theme="dark"] .inplace-input,
 .dark .inplace-input {
-    background: var(--p-surface-0, #090d16) !important;
-    color: var(--p-text-color, #f8fafc) !important;
-    border-color: var(--p-primary-500, #10b981) !important;
+    background: var(--p-surface-0) !important;
+    color: var(--p-text-color) !important;
+    border-color: var(--p-primary-500) !important;
 }
 `;
 
@@ -48,7 +48,7 @@ export default function InplaceIsland(container: HTMLElement, props: InplaceProp
     function render() {
         if (!isEditing) {
             container.innerHTML = `
-                <div class="laughtale-inplace-display" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.35rem 0.6rem; border-radius: var(--lt-radius); border: 1px dashed var(--lt-surface-200); background: var(--lt-surface-50); cursor: ${props.disabled ? 'default' : 'pointer'}; transition: background 0.15s ease;">
+                <div class="laughtale-inplace-display" data-part="root" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.35rem 0.6rem; border-radius: var(--lt-radius); border: 1px dashed var(--lt-surface-200); background: var(--lt-surface-50); cursor: ${props.disabled ? 'default' : 'pointer'}; transition: background 0.15s ease;">
                     <span style="font-size: 0.875rem; color: ${currentValue ? 'var(--lt-surface-900)' : 'var(--lt-surface-400)'}; font-weight: 500;">
                         ${currentValue || props.placeholder || 'Click to edit...'}
                     </span>
@@ -60,7 +60,7 @@ export default function InplaceIsland(container: HTMLElement, props: InplaceProp
                 container.querySelector('.laughtale-inplace-display')?.addEventListener('click', () => {
                     isEditing = true;
                     render();
-                });
+                }, { signal: ctx?.signal });
             }
         } else {
             container.innerHTML = `
@@ -88,12 +88,12 @@ export default function InplaceIsland(container: HTMLElement, props: InplaceProp
                 isEditing = false;
                 render();
                 syncValue();
-            });
+            }, { signal: ctx?.signal });
 
             container.querySelector('.btn-inplace-cancel')?.addEventListener('click', () => {
                 isEditing = false;
                 render();
-            });
+            }, { signal: ctx?.signal });
 
             input.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') {
@@ -105,7 +105,7 @@ export default function InplaceIsland(container: HTMLElement, props: InplaceProp
                     isEditing = false;
                     render();
                 }
-            });
+            }, { signal: ctx?.signal });
         }
     }
 

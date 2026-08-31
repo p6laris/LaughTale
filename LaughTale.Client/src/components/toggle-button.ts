@@ -140,15 +140,15 @@ html.dark .p-togglebutton,
 [data-theme="dark"] .p-togglebutton,
 .dark .laughtale-togglebutton,
 .dark .p-togglebutton {
-    background: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-0);
+    border-color: var(--p-border-color);
+    color: var(--p-text-color);
 }
 html.dark .p-togglebutton:hover:not(.p-disabled):not(.p-togglebutton-checked),
 [data-theme="dark"] .p-togglebutton:hover:not(.p-disabled):not(.p-togglebutton-checked),
 .dark .p-togglebutton:hover:not(.p-disabled):not(.p-togglebutton-checked) {
-    background: var(--p-surface-100, #1e293b);
-    border-color: var(--p-surface-400, #64748b);
+    background: var(--p-surface-100);
+    border-color: var(--p-surface-400);
 }
 html.dark .p-togglebutton.p-togglebutton-checked,
 html.dark .p-togglebutton.is-checked,
@@ -157,8 +157,8 @@ html.dark .p-togglebutton.is-checked,
 .dark .p-togglebutton.p-togglebutton-checked,
 .dark .p-togglebutton.is-checked {
     background: rgba(16, 185, 129, 0.16);
-    border-color: var(--p-primary-500, #10b981);
-    color: var(--p-primary-300, #6ee7b7);
+    border-color: var(--p-primary-500);
+    color: var(--p-primary-300);
 }
 html.dark .p-togglebutton.p-togglebutton-checked:hover:not(.p-disabled),
 html.dark .p-togglebutton.is-checked:hover:not(.p-disabled),
@@ -167,7 +167,7 @@ html.dark .p-togglebutton.is-checked:hover:not(.p-disabled),
 .dark .p-togglebutton.p-togglebutton-checked:hover:not(.p-disabled),
 .dark .p-togglebutton.is-checked:hover:not(.p-disabled) {
     background: rgba(16, 185, 129, 0.24);
-    color: var(--p-primary-200, #a7f3d0);
+    color: var(--p-primary-200);
 }
 html.dark .p-togglebutton:disabled,
 html.dark .p-togglebutton.p-disabled,
@@ -175,9 +175,9 @@ html.dark .p-togglebutton.p-disabled,
 [data-theme="dark"] .p-togglebutton.p-disabled,
 .dark .p-togglebutton:disabled,
 .dark .p-togglebutton.p-disabled {
-    background: var(--p-surface-100, #1e293b);
-    border-color: var(--p-border-color, #334155);
-    color: var(--p-text-muted, #94a3b8);
+    background: var(--p-surface-100);
+    border-color: var(--p-border-color);
+    color: var(--p-text-muted);
 }
 `;
 
@@ -218,7 +218,7 @@ export default function ToggleButtonIsland(container: HTMLElement, props: Toggle
         const currentLabel = isChecked ? onLabel : offLabel;
         const currentIconName = isChecked ? onIcon : offIcon;
         const iconSize = size === 'small' ? 14 : (size === 'large' ? 18 : 16);
-        const iconHtml = currentIconName ? `<span class="p-togglebutton-icon">${getLucideIcon(currentIconName, iconSize)}</span>` : '';
+        const iconHtml = currentIconName ? `<span class="p-togglebutton-icon" data-part="root">${getLucideIcon(currentIconName, iconSize)}</span>` : '';
         const labelHtml = currentLabel ? `<span class="p-togglebutton-label">${currentLabel}</span>` : '';
 
         container.innerHTML = `

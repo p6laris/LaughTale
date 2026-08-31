@@ -558,10 +558,10 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
     toggleBtn.addEventListener('click', () => {
         if (disclosure.isOpen) close();
         else open();
-    });
+    }, { signal: ctx?.signal });
 
-    closeBtn.addEventListener('click', close);
-    backdrop.addEventListener('click', close);
+    closeBtn.addEventListener('click', close, { signal: ctx?.signal });
+    backdrop.addEventListener('click', close, { signal: ctx?.signal });
 
     container.querySelectorAll('.mode-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -575,7 +575,7 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
             (btn as HTMLElement).style.borderColor = 'var(--lt-primary-500)';
             (btn as HTMLElement).style.background = 'var(--lt-primary-50)';
             applyTheme();
-        });
+        }, { signal: ctx?.signal });
     });
 
     colorGrid.querySelectorAll('.studio-color-swatch').forEach(btn => {
@@ -587,14 +587,14 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
                 (b as HTMLElement).style.boxShadow = k === currentPrimary ? '0 0 0 2px var(--lt-surface-900)' : 'none';
             });
             applyTheme();
-        });
+        }, { signal: ctx?.signal });
     });
 
     if (customColorInput) {
         customColorInput.addEventListener('input', () => {
             currentCustomHex = customColorInput.value;
             applyTheme();
-        });
+        }, { signal: ctx?.signal });
     }
 
     neutralGrid.querySelectorAll('.studio-neutral-swatch').forEach(btn => {
@@ -605,7 +605,7 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
                 (b as HTMLElement).style.border = k === currentNeutral ? '2px solid var(--lt-primary-500)' : '1px solid var(--lt-surface-200)';
             });
             applyTheme();
-        });
+        }, { signal: ctx?.signal });
     });
 
     container.querySelectorAll('.radius-btn').forEach(btn => {
@@ -624,7 +624,7 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
             (btn as HTMLElement).style.color = 'var(--lt-primary-700)';
             (btn as HTMLElement).style.fontWeight = 'bold';
             applyTheme();
-        });
+        }, { signal: ctx?.signal });
     });
 
     container.querySelectorAll('.density-btn').forEach(btn => {
@@ -639,7 +639,7 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
             (btn as HTMLElement).style.borderColor = 'var(--lt-primary-500)';
             (btn as HTMLElement).style.background = 'var(--lt-primary-50)';
             applyTheme();
-        });
+        }, { signal: ctx?.signal });
     });
 
     container.querySelectorAll('.shadow-btn').forEach(btn => {
@@ -654,7 +654,7 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
             (btn as HTMLElement).style.borderColor = 'var(--lt-primary-500)';
             (btn as HTMLElement).style.background = 'var(--lt-primary-50)';
             applyTheme();
-        });
+        }, { signal: ctx?.signal });
     });
 
     container.querySelectorAll('.font-btn').forEach(btn => {
@@ -673,7 +673,7 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
             (btn as HTMLElement).style.color = 'var(--lt-primary-700)';
             (btn as HTMLElement).style.fontWeight = '700';
             applyTheme();
-        });
+        }, { signal: ctx?.signal });
     });
 
     container.querySelectorAll('.lang-btn').forEach(btn => {
@@ -715,7 +715,7 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
                 }
             }
             applyTheme();
-        });
+        }, { signal: ctx?.signal });
     });
 
     container.querySelectorAll('.preset-theme-btn').forEach(btn => {
@@ -769,7 +769,7 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
                 currentDensity = 'spacious';
             }
             applyTheme();
-        });
+        }, { signal: ctx?.signal });
     });
 
     if (resetBtn) {
@@ -783,7 +783,7 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
             currentFont = 'sans';
             currentThemeMode = 'system';
             applyTheme();
-        });
+        }, { signal: ctx?.signal });
     }
 
     copyCssBtn.addEventListener('click', () => {
@@ -799,7 +799,7 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
         setTimeout(() => {
             copyCssBtn.innerHTML = `${LucideIcons.copy} Copy CSS Custom Properties`;
         }, 2000);
-    });
+    }, { signal: ctx?.signal });
 
     copyCSharpBtn.addEventListener('click', () => {
         const exports = generateThemeExports({
@@ -814,7 +814,7 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
         setTimeout(() => {
             copyCSharpBtn.innerHTML = `${LucideIcons.code} Copy C# Theme Tokens`;
         }, 2000);
-    });
+    }, { signal: ctx?.signal });
 
     document.addEventListener('studio:open', open, { signal: ctx?.signal });
     document.addEventListener('studio:export', () => {

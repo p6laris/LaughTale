@@ -142,39 +142,39 @@ const FIELDSET_CSS = `
 html.dark .p-fieldset,
 [data-theme="dark"] .p-fieldset,
 .dark .p-fieldset {
-    background: var(--p-surface-0, #090d16) !important;
-    border-color: var(--p-border-color, #334155) !important;
-    color: var(--p-text-color, #f8fafc) !important;
+    background: var(--p-surface-0) !important;
+    border-color: var(--p-border-color) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-fieldset-toggle-button,
 [data-theme="dark"] .p-fieldset-toggle-button,
 .dark .p-fieldset-toggle-button {
-    background: var(--p-surface-0, #090d16) !important;
-    color: var(--p-text-color, #f8fafc) !important;
+    background: var(--p-surface-0) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-fieldset-toggle-button:hover,
 [data-theme="dark"] .p-fieldset-toggle-button:hover,
 .dark .p-fieldset-toggle-button:hover {
-    background: var(--p-surface-100, #1e293b) !important;
+    background: var(--p-surface-100) !important;
 }
 html.dark .p-fieldset-content,
 [data-theme="dark"] .p-fieldset-content,
 .dark .p-fieldset-content {
-    color: var(--p-text-color, #f8fafc) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-fieldset-ctrl-btn,
 [data-theme="dark"] .p-fieldset-ctrl-btn,
 .dark .p-fieldset-ctrl-btn {
-    background: var(--p-surface-100, #1e293b) !important;
-    border-color: var(--p-border-color, #334155) !important;
-    color: var(--p-text-color, #f8fafc) !important;
+    background: var(--p-surface-100) !important;
+    border-color: var(--p-border-color) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-fieldset-ctrl-btn.p-highlight,
 [data-theme="dark"] .p-fieldset-ctrl-btn.p-highlight,
 .dark .p-fieldset-ctrl-btn.p-highlight {
-    background: var(--p-primary-500, #10b981) !important;
-    border-color: var(--p-primary-500, #10b981) !important;
-    color: #ffffff !important;
+    background: var(--p-primary-500) !important;
+    border-color: var(--p-primary-500) !important;
+    color: var(--p-surface-0) !important;
 }
 `;
 
@@ -190,6 +190,7 @@ export interface FieldsetProps {
 
 export default function FieldsetIsland(container: HTMLElement, props: FieldsetProps, ctx?: IslandContext) {
     injectIslandStyle('fieldset', FIELDSET_CSS);
+    container.setAttribute('data-part', 'root');
 
     const isToggleable = !!props.toggleable;
     const isControlled = !!props.controlled;
@@ -234,14 +235,14 @@ export default function FieldsetIsland(container: HTMLElement, props: FieldsetPr
     if (isToggleable && toggleBtn) {
         toggleBtn.addEventListener('click', () => {
             updateState(!isCollapsed);
-        });
+        }, { signal: ctx?.signal });
 
         toggleBtn.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
                 updateState(!isCollapsed);
             }
-        });
+        }, { signal: ctx?.signal });
     }
 
     if (isControlled) {
@@ -253,7 +254,7 @@ export default function FieldsetIsland(container: HTMLElement, props: FieldsetPr
                 } else if (action === 'close') {
                     updateState(true);
                 }
-            });
+            }, { signal: ctx?.signal });
         });
     }
 }

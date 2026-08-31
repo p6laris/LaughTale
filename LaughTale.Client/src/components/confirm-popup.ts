@@ -142,44 +142,44 @@ const CONFIRM_POPUP_CSS = `
 html.dark .p-confirmpopup,
 [data-theme="dark"] .p-confirmpopup,
 .dark .p-confirmpopup {
-    background: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
+    background: var(--p-surface-0);
+    border-color: var(--p-border-color);
 }
 html.dark .p-confirmpopup-flipped-top::before,
 [data-theme="dark"] .p-confirmpopup-flipped-top::before,
 .dark .p-confirmpopup-flipped-top::before {
-    border-bottom-color: var(--p-border-color, #334155);
+    border-bottom-color: var(--p-border-color);
 }
 html.dark .p-confirmpopup-flipped-top::after,
 [data-theme="dark"] .p-confirmpopup-flipped-top::after,
 .dark .p-confirmpopup-flipped-top::after {
-    border-bottom-color: var(--p-surface-0, #090d16);
+    border-bottom-color: var(--p-surface-0);
 }
 html.dark .p-confirmpopup-flipped-bottom::before,
 [data-theme="dark"] .p-confirmpopup-flipped-bottom::before,
 .dark .p-confirmpopup-flipped-bottom::before {
-    border-top-color: var(--p-border-color, #334155);
+    border-top-color: var(--p-border-color);
 }
 html.dark .p-confirmpopup-flipped-bottom::after,
 [data-theme="dark"] .p-confirmpopup-flipped-bottom::after,
 .dark .p-confirmpopup-flipped-bottom::after {
-    border-top-color: var(--p-surface-0, #090d16);
+    border-top-color: var(--p-surface-0);
 }
 html.dark .p-confirmpopup-message,
 [data-theme="dark"] .p-confirmpopup-message,
 .dark .p-confirmpopup-message {
-    color: var(--p-text-color, #f8fafc);
+    color: var(--p-text-color);
 }
 html.dark .p-confirmpopup-template-body,
 [data-theme="dark"] .p-confirmpopup-template-body,
 .dark .p-confirmpopup-template-body {
-    border-color: var(--p-border-color, #334155);
+    border-color: var(--p-border-color);
 }
 html.dark .p-confirmpopup-template-icon,
 [data-theme="dark"] .p-confirmpopup-template-icon,
 .dark .p-confirmpopup-template-icon {
-    border-color: var(--p-border-color, #334155);
-    color: var(--p-text-muted, #94a3b8);
+    border-color: var(--p-border-color);
+    color: var(--p-text-muted);
 }
 `;
 
@@ -200,6 +200,7 @@ export interface ConfirmPopupOptions {
     reject?: () => void;
     template?: boolean;
     headless?: boolean;
+    signal?: AbortSignal;
 }
 
 export interface ConfirmPopupProps {
@@ -211,6 +212,7 @@ export interface ConfirmPopupProps {
     actionName?: string;
     pt?: PassthroughRecord;
     studioOverrides?: Record<string, any>;
+    signal?: AbortSignal;
 }
 
 // Vector SVGs
@@ -231,12 +233,13 @@ class ConfirmPopupManager {
         }
     }
 
-    private initDOM() {
+    private initDOM(signal?: AbortSignal) {
         if (this.popupEl) return;
         injectIslandStyle('confirm-popup', CONFIRM_POPUP_CSS);
 
         this.popupEl = document.createElement('div');
         this.popupEl.className = 'p-confirmpopup p-component';
+        this.popupEl.setAttribute('data-part', 'root');
         this.popupEl.setAttribute('role', 'alertdialog');
         this.popupEl.setAttribute('aria-modal', 'true');
 
@@ -244,7 +247,7 @@ class ConfirmPopupManager {
             if (e.key === 'Escape' && this.popupEl?.classList.contains('p-confirmpopup-active')) {
                 this.close(false);
             }
-        });
+        }, { signal });
 
         document.body.appendChild(this.popupEl);
     }
@@ -275,7 +278,7 @@ class ConfirmPopupManager {
                     this.close(false);
                 }
             };
-            document.addEventListener('click', this.outsideClickListener);
+            document.addEventListener('click', this.outsideClickListener, { signal: options.signal });
         }, 10);
     }
 
@@ -342,7 +345,7 @@ class ConfirmPopupManager {
 
         if (opt.headless) {
             this.popupEl.innerHTML = `
-                <div class="p-confirmpopup-headless">
+                <div class="p-confirmpopup-headless" data-part="root">
                     <span class="p-confirmpopup-message" style="display: block; font-size: 0.875rem;">${opt.message || 'Save your current process?'}</span>
                     <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.875rem;">
                         <button type="button" class="btn-accept p-button p-button-primary p-button-sm" style="padding: 0.35rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: var(--lt-radius); background: var(--lt-surface-900); border: 1px solid var(--lt-surface-900); color: var(--lt-surface-0, var(--lt-surface-0)); cursor: pointer;">
@@ -398,8 +401,8 @@ class ConfirmPopupManager {
             `;
         }
 
-        this.popupEl.querySelector('.btn-reject')?.addEventListener('click', () => this.close(false));
-        this.popupEl.querySelector('.btn-accept')?.addEventListener('click', () => this.close(true));
+        this.popupEl.querySelector('.btn-reject')?.addEventListener('click', () => this.close(false), { signal: opt.signal });
+        this.popupEl.querySelector('.btn-accept')?.addEventListener('click', () => this.close(true), { signal: opt.signal });
     }
 }
 
@@ -458,6 +461,6 @@ export default function ConfirmPopupIsland(container: HTMLElement, props: Confir
                     reject: () => (window as any).$toast?.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 })
                 });
             }
-        });
+        }, { signal: ctx?.signal });
     });
 }

@@ -146,36 +146,36 @@ const CSS = `
 html.dark .p-inputotp-input,
 [data-theme="dark"] .p-inputotp-input,
 .dark .p-inputotp-input {
-    background: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-0);
+    border-color: var(--p-border-color);
+    color: var(--p-text-color);
 }
 html.dark .p-inputotp-input:hover:not(:disabled),
 [data-theme="dark"] .p-inputotp-input:hover:not(:disabled),
 .dark .p-inputotp-input:hover:not(:disabled) {
-    border-color: var(--p-surface-400, #64748b);
+    border-color: var(--p-surface-400);
 }
 html.dark .p-inputotp.variant-filled .p-inputotp-input,
 [data-theme="dark"] .p-inputotp.variant-filled .p-inputotp-input,
 .dark .p-inputotp.variant-filled .p-inputotp-input {
-    background: var(--p-surface-100, #1e293b);
+    background: var(--p-surface-100);
 }
 html.dark .p-inputotp.variant-filled .p-inputotp-input:focus,
 [data-theme="dark"] .p-inputotp.variant-filled .p-inputotp-input:focus,
 .dark .p-inputotp.variant-filled .p-inputotp-input:focus {
-    background: var(--p-surface-0, #090d16);
+    background: var(--p-surface-0);
 }
 html.dark .p-inputotp-input:disabled,
 [data-theme="dark"] .p-inputotp-input:disabled,
 .dark .p-inputotp-input:disabled {
-    background: var(--p-surface-100, #1e293b);
-    border-color: var(--p-border-color, #334155);
-    color: var(--p-text-muted, #94a3b8);
+    background: var(--p-surface-100);
+    border-color: var(--p-border-color);
+    color: var(--p-text-muted);
 }
 html.dark .p-inputotp-separator,
 [data-theme="dark"] .p-inputotp-separator,
 .dark .p-inputotp-separator {
-    color: var(--p-text-muted, #94a3b8);
+    color: var(--p-text-muted);
 }
 `;
 
@@ -197,7 +197,7 @@ export default function InputOtpIsland(container: HTMLElement, props: InputOtpPr
     let values: string[] = Array.from({ length }, (_, i) => initialVal[i] || '');
 
     function render() {
-        container.className = 'laughtale-input-otp p-inputotp';
+        container.className = 'laughtale-input-otp p-inputotp'; container.setAttribute('data-part', 'root');
         if (isFilled) container.classList.add('variant-filled');
         if (props.size) container.classList.add(`size-${props.size}`);
         if (isInvalid) container.classList.add('is-invalid');
@@ -214,7 +214,7 @@ export default function InputOtpIsland(container: HTMLElement, props: InputOtpPr
 
         if (isGrouped && length % 2 === 0) {
             const mid = length / 2;
-            html += '<div class="p-inputotp-group">';
+            html += '<div class="p-inputotp-group" data-part="root">';
             for (let i = 0; i < mid; i++) {
                 html += `
                     <input type="${inputType}"
@@ -280,7 +280,7 @@ export default function InputOtpIsland(container: HTMLElement, props: InputOtpPr
             // Select on focus for instant replacement
             input.addEventListener('focus', () => {
                 input.select();
-            });
+            }, { signal: ctx?.signal });
 
             // Input handling with auto-advance
             input.addEventListener('input', (e) => {
@@ -307,7 +307,7 @@ export default function InputOtpIsland(container: HTMLElement, props: InputOtpPr
                 }
 
                 syncOtp();
-            });
+            }, { signal: ctx?.signal });
 
             // Keyboard navigation
             input.addEventListener('keydown', (e) => {
@@ -347,7 +347,7 @@ export default function InputOtpIsland(container: HTMLElement, props: InputOtpPr
                     inputs[length - 1].select();
                     e.preventDefault();
                 }
-            });
+            }, { signal: ctx?.signal });
 
             // Paste parsing (e.g. user pastes "482910")
             input.addEventListener('paste', (e) => {
@@ -373,7 +373,7 @@ export default function InputOtpIsland(container: HTMLElement, props: InputOtpPr
                     inputs[nextFocus].focus();
                     inputs[nextFocus].select();
                 }
-            });
+            }, { signal: ctx?.signal });
         });
     }
 

@@ -187,30 +187,30 @@ const DIALOG_CSS = `
 html.dark .p-dialog,
 [data-theme="dark"] .p-dialog,
 .dark .p-dialog {
-    background: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-0);
+    border-color: var(--p-border-color);
+    color: var(--p-text-color);
 }
 html.dark .p-dialog-title,
 [data-theme="dark"] .p-dialog-title,
 .dark .p-dialog-title {
-    color: var(--p-text-color, #f8fafc);
+    color: var(--p-text-color);
 }
 html.dark .p-dialog-content,
 [data-theme="dark"] .p-dialog-content,
 .dark .p-dialog-content {
-    color: var(--p-text-color, #f8fafc);
+    color: var(--p-text-color);
 }
 html.dark .p-dialog-header-action,
 [data-theme="dark"] .p-dialog-header-action,
 .dark .p-dialog-header-action {
-    color: var(--p-text-muted, #94a3b8);
+    color: var(--p-text-muted);
 }
 html.dark .p-dialog-header-action:hover,
 [data-theme="dark"] .p-dialog-header-action:hover,
 .dark .p-dialog-header-action:hover {
-    background: var(--p-surface-100, #1e293b);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-100);
+    color: var(--p-text-color);
 }
 `;
 
@@ -239,7 +239,7 @@ export interface DialogProps {
 // Global Delegation Initializer
 let globalDelegationBound = false;
 
-function initGlobalDialogDelegation() {
+function initGlobalDialogDelegation(signal?: AbortSignal) {
     if (globalDelegationBound || typeof document === 'undefined') return;
     globalDelegationBound = true;
 
@@ -311,33 +311,34 @@ function initGlobalDialogDelegation() {
                 document.body.style.overflow = '';
             }
         }
-    });
-
-    // Escape Key Handler
-    window.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            const activeMask = document.querySelector<HTMLElement>('.p-dialog-mask.p-dialog-mask-active');
-            if (activeMask) {
-                activeMask.classList.remove('p-dialog-mask-active');
-                setTimeout(() => {
-                    if (!activeMask.classList.contains('p-dialog-mask-active')) {
-                        activeMask.style.display = 'none';
-                    }
-                }, 200);
-                document.body.style.overflow = '';
-            }
-        }
-    });
+    }, { signal });
 }
 
 export default function DialogIsland(container: HTMLElement, props: DialogProps, ctx?: IslandContext) {
     injectIslandStyle('dialog', DIALOG_CSS);
-    initGlobalDialogDelegation();
+    initGlobalDialogDelegation(ctx?.signal);
 
     const maskEl = container.querySelector<HTMLElement>('.p-dialog-mask');
     const dialogEl = container.querySelector<HTMLElement>('.p-dialog');
 
     if (!maskEl || !dialogEl) return;
+
+    container.setAttribute('data-part', 'root');
+    dialogEl.setAttribute('data-part', 'dialog');
+    maskEl.setAttribute('data-part', 'mask');
+
+    // Per-island Escape Key Handler
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && maskEl.classList.contains('p-dialog-mask-active')) {
+            maskEl.classList.remove('p-dialog-mask-active');
+            setTimeout(() => {
+                if (!maskEl.classList.contains('p-dialog-mask-active')) {
+                    maskEl.style.display = 'none';
+                }
+            }, 200);
+            document.body.style.overflow = '';
+        }
+    }, { signal: ctx?.signal });
 
     let isMaximized = false;
     let isDragging = false;
@@ -356,7 +357,7 @@ export default function DialogIsland(container: HTMLElement, props: DialogProps,
             dialogEl.classList.toggle('p-dialog-maximized', isMaximized);
             maxBtn.innerHTML = isMaximized ? RESTORE_ICON_SVG : MAXIMIZE_ICON_SVG;
             maxBtn.setAttribute('aria-label', isMaximized ? 'Minimize' : 'Maximize');
-        });
+        }, { signal: ctx?.signal });
     }
 
     // Draggable Implementation
@@ -395,9 +396,9 @@ export default function DialogIsland(container: HTMLElement, props: DialogProps,
                     document.removeEventListener('mouseup', onMouseUp);
                 };
 
-                document.addEventListener('mousemove', onMouseMove);
-                document.addEventListener('mouseup', onMouseUp);
-            });
+                document.addEventListener('mousemove', onMouseMove, { signal: ctx?.signal });
+                document.addEventListener('mouseup', onMouseUp, { signal: ctx?.signal });
+            }, { signal: ctx?.signal });
         }
     }
 }

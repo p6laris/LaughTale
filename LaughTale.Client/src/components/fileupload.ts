@@ -334,64 +334,64 @@ const FILEUPLOAD_CSS = `
 html.dark .p-fileupload-advanced,
 [data-theme="dark"] .p-fileupload-advanced,
 .dark .p-fileupload-advanced {
-    background: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
+    background: var(--p-surface-0);
+    border-color: var(--p-border-color);
 }
 
 html.dark .p-fileupload-header,
 [data-theme="dark"] .p-fileupload-header,
 .dark .p-fileupload-header {
-    background: var(--p-surface-50, #0f172a);
-    border-color: var(--p-border-color, #334155);
+    background: var(--p-surface-50);
+    border-color: var(--p-border-color);
 }
 
 html.dark .p-fileupload-empty,
 [data-theme="dark"] .p-fileupload-empty,
 .dark .p-fileupload-empty {
-    background: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
-    color: var(--p-text-muted, #94a3b8);
+    background: var(--p-surface-0);
+    border-color: var(--p-border-color);
+    color: var(--p-text-muted);
 }
 
 html.dark .p-fileupload-empty-icon,
 [data-theme="dark"] .p-fileupload-empty-icon,
 .dark .p-fileupload-empty-icon {
-    background: var(--p-surface-100, #1e293b);
-    color: var(--p-text-color, #f8fafc);
-    border-color: var(--p-border-color, #334155);
+    background: var(--p-surface-100);
+    color: var(--p-text-color);
+    border-color: var(--p-border-color);
 }
 
 html.dark .p-fileupload-empty-title,
 [data-theme="dark"] .p-fileupload-empty-title,
 .dark .p-fileupload-empty-title {
-    color: var(--p-text-color, #f8fafc);
+    color: var(--p-text-color);
 }
 
 html.dark .p-fileupload-file-item,
 [data-theme="dark"] .p-fileupload-file-item,
 .dark .p-fileupload-file-item {
-    background: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
+    background: var(--p-surface-0);
+    border-color: var(--p-border-color);
 }
 
 html.dark .p-fileupload-file-name,
 [data-theme="dark"] .p-fileupload-file-name,
 .dark .p-fileupload-file-name {
-    color: var(--p-text-color, #f8fafc);
+    color: var(--p-text-color);
 }
 
 html.dark .p-fileupload-thumbnail,
 [data-theme="dark"] .p-fileupload-thumbnail,
 .dark .p-fileupload-thumbnail {
-    background: var(--p-surface-100, #1e293b);
-    border-color: var(--p-border-color, #334155);
+    background: var(--p-surface-100);
+    border-color: var(--p-border-color);
 }
 
 html.dark .p-fileupload-image-card,
 [data-theme="dark"] .p-fileupload-image-card,
 .dark .p-fileupload-image-card {
-    background: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
+    background: var(--p-surface-0);
+    border-color: var(--p-border-color);
 }
 `;
 
@@ -562,7 +562,7 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
             const currentFile = hasFile ? fileQueue[0] : null;
 
             container.innerHTML = `
-                <div class="p-fileupload p-fileupload-custom" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+                <div class="p-fileupload p-fileupload-custom" data-part="root" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
                     <span class="p-fileupload-choose">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
                         <span>${chooseLabel}</span>
@@ -585,7 +585,7 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
                     fileQueue = [];
                     addFiles(target.files);
                 }
-            });
+            }, { signal: ctx?.signal });
             return;
         }
 
@@ -629,12 +629,12 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
                 if (target.files && target.files.length > 0) {
                     addFiles(target.files);
                 }
-            });
+            }, { signal: ctx?.signal });
 
             const uploadBtn = container.querySelector<HTMLButtonElement>('.p-fileupload-upload-btn');
             uploadBtn?.addEventListener('click', () => {
                 startUpload();
-            });
+            }, { signal: ctx?.signal });
             return;
         }
 
@@ -728,22 +728,22 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
             if (target.files && target.files.length > 0) {
                 addFiles(target.files);
             }
-        });
+        }, { signal: ctx?.signal });
 
         const uploadBtn = container.querySelector<HTMLButtonElement>('.p-fileupload-upload-btn');
         uploadBtn?.addEventListener('click', () => {
             startUpload();
-        });
+        }, { signal: ctx?.signal });
 
         const cancelBtn = container.querySelector<HTMLButtonElement>('.p-fileupload-cancel-btn');
         cancelBtn?.addEventListener('click', () => {
             cancelAll();
-        });
+        }, { signal: ctx?.signal });
 
         const emptyClick = container.querySelector<HTMLElement>('[data-click-trigger]');
         emptyClick?.addEventListener('click', () => {
             input?.click();
-        });
+        }, { signal: ctx?.signal });
 
         // Drop handling
         const contentArea = container.querySelector<HTMLElement>('.p-fileupload-content');
@@ -751,17 +751,17 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
             contentArea.addEventListener('dragover', (e) => {
                 e.preventDefault();
                 contentArea.classList.add('p-fileupload-highlight');
-            });
+            }, { signal: ctx?.signal });
             contentArea.addEventListener('dragleave', () => {
                 contentArea.classList.remove('p-fileupload-highlight');
-            });
+            }, { signal: ctx?.signal });
             contentArea.addEventListener('drop', (e) => {
                 e.preventDefault();
                 contentArea.classList.remove('p-fileupload-highlight');
                 if (e.dataTransfer?.files && e.dataTransfer.files.length > 0) {
                     addFiles(e.dataTransfer.files);
                 }
-            });
+            }, { signal: ctx?.signal });
         }
 
         // Individual remove buttons
@@ -769,7 +769,7 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
             btn.addEventListener('click', () => {
                 const id = btn.getAttribute('data-remove-id');
                 if (id) removeFile(id);
-            });
+            }, { signal: ctx?.signal });
         });
     }
 

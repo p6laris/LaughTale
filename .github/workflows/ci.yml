@@ -2,9 +2,9 @@ name: LaughTale CI
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main, master, comp ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ main, master, comp ]
 
 jobs:
   build-and-test:

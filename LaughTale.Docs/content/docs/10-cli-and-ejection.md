@@ -20,10 +20,10 @@ You can install the LaughTale CLI globally via .NET tools or use it via `npx`:
 
 ```bash
 # Install as a .NET Global Tool
-dotnet tool install --global SoftMax.LaughTale.Cli
+dotnet tool install --global LaughTale.Cli
 
 # Or run instantly via npx
-npx @softmax/laughtale --help
+npx laughtale --help
 ```
 
 ---
@@ -41,7 +41,7 @@ What it sets up:
 - Creates `src/islands/` and `src/components/` directory structure.
 - Adds `esbuild.config.mjs` with automated code-splitting.
 - Configures `Program.cs` and `_ViewImports.cshtml`.
-- Installs `@softmax/laughtale-client` npm dependency.
+- Installs `laughtale` npm dependency.
 
 ---
 

@@ -221,45 +221,45 @@ const DRAWER_CSS = `
 html.dark .p-drawer,
 [data-theme="dark"] .p-drawer,
 .dark .p-drawer {
-    background: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
+    background: var(--p-surface-0);
+    border-color: var(--p-border-color);
 }
 html.dark .p-drawer-title,
 [data-theme="dark"] .p-drawer-title,
 .dark .p-drawer-title {
-    color: var(--p-text-color, #f8fafc);
+    color: var(--p-text-color);
 }
 html.dark .p-drawer-close-button,
 [data-theme="dark"] .p-drawer-close-button,
 .dark .p-drawer-close-button {
-    color: var(--p-text-muted, #94a3b8);
+    color: var(--p-text-muted);
 }
 html.dark .p-drawer-close-button:hover,
 [data-theme="dark"] .p-drawer-close-button:hover,
 .dark .p-drawer-close-button:hover {
-    background: var(--p-surface-100, #1e293b);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-100);
+    color: var(--p-text-color);
 }
 html.dark .p-drawer-footer,
 [data-theme="dark"] .p-drawer-footer,
 .dark .p-drawer-footer {
-    border-color: var(--p-border-color, #334155);
+    border-color: var(--p-border-color);
 }
 html.dark .p-drawer-nav-item,
 [data-theme="dark"] .p-drawer-nav-item,
 .dark .p-drawer-nav-item {
-    color: var(--p-text-color, #f8fafc);
+    color: var(--p-text-color);
 }
 html.dark .p-drawer-nav-item:hover,
 [data-theme="dark"] .p-drawer-nav-item:hover,
 .dark .p-drawer-nav-item:hover {
-    background: var(--p-surface-100, #1e293b);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-100);
+    color: var(--p-text-color);
 }
 html.dark .p-drawer-nav-section-title,
 [data-theme="dark"] .p-drawer-nav-section-title,
 .dark .p-drawer-nav-section-title {
-    color: var(--p-text-muted, #94a3b8);
+    color: var(--p-text-muted);
 }
 
 /* Bi-Directional RTL Support */
@@ -374,21 +374,22 @@ function initGlobalDrawerDelegation(signal?: AbortSignal) {
             }
         }
     }, { signal });
+}
 
-    // Escape Key Handler
+export default function DrawerIsland(container: HTMLElement, props: DrawerProps, ctx?: IslandContext) {
+    injectIslandStyle('drawer', DRAWER_CSS);
+    container.setAttribute('data-part', 'root');
+    applyPart(container, 'root', props.class || '', props.pt, props.studioOverrides);
+    initGlobalDrawerDelegation();
+
+    // Escape Key Handler for this Drawer instance
     window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
-            const activeMask = document.querySelector<HTMLElement>('.p-drawer-mask.p-drawer-mask-active');
+            const activeMask = container.querySelector<HTMLElement>('.p-drawer-mask.p-drawer-mask-active');
             if (activeMask) {
                 activeMask.classList.remove('p-drawer-mask-active');
                 document.body.style.overflow = '';
             }
         }
-    }, { signal });
-}
-
-export default function DrawerIsland(container: HTMLElement, props: DrawerProps, ctx?: IslandContext) {
-    injectIslandStyle('drawer', DRAWER_CSS);
-    applyPart(container, 'root', props.class || '', props.pt, props.studioOverrides);
-    initGlobalDrawerDelegation(ctx?.signal);
+    }, { signal: ctx?.signal });
 }

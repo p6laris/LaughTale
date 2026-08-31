@@ -20,43 +20,43 @@ html.dark .laughtale-tag.tag-info,
 [data-theme="dark"] .laughtale-tag.tag-info,
 .dark .laughtale-tag.tag-info {
     background: rgba(59, 130, 246, 0.16) !important;
-    color: #93c5fd !important;
+    color: var(--p-info-300) !important;
     border-color: rgba(59, 130, 246, 0.3) !important;
 }
 html.dark .laughtale-tag.tag-success,
 [data-theme="dark"] .laughtale-tag.tag-success,
 .dark .laughtale-tag.tag-success {
     background: rgba(16, 185, 129, 0.16) !important;
-    color: #6ee7b7 !important;
+    color: var(--p-primary-300) !important;
     border-color: rgba(16, 185, 129, 0.3) !important;
 }
 html.dark .laughtale-tag.tag-warning,
 [data-theme="dark"] .laughtale-tag.tag-warning,
 .dark .laughtale-tag.tag-warning {
     background: rgba(245, 158, 11, 0.16) !important;
-    color: #fcd34d !important;
+    color: var(--p-warn-300) !important;
     border-color: rgba(245, 158, 11, 0.3) !important;
 }
 html.dark .laughtale-tag.tag-danger,
 [data-theme="dark"] .laughtale-tag.tag-danger,
 .dark .laughtale-tag.tag-danger {
     background: rgba(239, 68, 68, 0.16) !important;
-    color: #fca5a5 !important;
+    color: var(--p-danger-300) !important;
     border-color: rgba(239, 68, 68, 0.3) !important;
 }
 html.dark .laughtale-tag.tag-secondary,
 [data-theme="dark"] .laughtale-tag.tag-secondary,
 .dark .laughtale-tag.tag-secondary {
-    background: var(--p-surface-100, #1e293b) !important;
-    color: var(--p-text-color, #f8fafc) !important;
-    border-color: var(--p-border-color, #334155) !important;
+    background: var(--p-surface-100) !important;
+    color: var(--p-text-color) !important;
+    border-color: var(--p-border-color) !important;
 }
 html.dark .laughtale-tag.tag-contrast,
 [data-theme="dark"] .laughtale-tag.tag-contrast,
 .dark .laughtale-tag.tag-contrast {
-    background: var(--p-surface-0, #090d16) !important;
-    color: var(--p-text-color, #f8fafc) !important;
-    border-color: var(--p-border-color, #334155) !important;
+    background: var(--p-surface-0) !important;
+    color: var(--p-text-color) !important;
+    border-color: var(--p-border-color) !important;
 }
 `;
 
@@ -92,7 +92,7 @@ export default function TagIsland(container: HTMLElement, props: TagProps, ctx?:
     }
 
     container.innerHTML = `
-        <span class="laughtale-tag tag-${severity}" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.25rem 0.6rem; font-size: 0.75rem; font-weight: 700; background: ${bg}; color: ${color}; border: 1px solid ${border}; border-radius: ${isRounded ? '9999px' : 'var(--lt-radius)'};">
+        <span class="laughtale-tag tag-${severity}" data-part="root" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.25rem 0.6rem; font-size: 0.75rem; font-weight: 700; background: ${bg}; color: ${color}; border: 1px solid ${border}; border-radius: ${isRounded ? '9999px' : 'var(--lt-radius)'};">
             ${props.icon ? `<span>${props.icon}</span>` : ''}
             <span>${props.value}</span>
         </span>

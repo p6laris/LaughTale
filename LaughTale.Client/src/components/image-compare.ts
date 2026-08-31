@@ -185,15 +185,15 @@ const COMPARE_CSS = `
 html.dark .p-compare,
 [data-theme="dark"] .p-compare,
 .dark .p-compare {
-    border-color: var(--p-border-color, #334155);
+    border-color: var(--p-border-color);
 }
 
 html.dark .p-compare-indicator,
 [data-theme="dark"] .p-compare-indicator,
 .dark .p-compare-indicator {
-    background: var(--p-surface-0, #090d16);
-    color: var(--p-text-color, #f8fafc);
-    border: 1px solid var(--p-border-color, #334155);
+    background: var(--p-surface-0);
+    color: var(--p-text-color);
+    border: 1px solid var(--p-border-color);
 }
 `;
 
@@ -233,7 +233,7 @@ export default function CompareIsland(container: HTMLElement, props: CompareProp
 
         if (isWithChart) {
             beforeContentHtml = `
-                <svg class="absolute h-full w-full" viewBox="0 0 644 189" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;">
+                <svg class="absolute h-full w-full" data-part="root" viewBox="0 0 644 189" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;">
                     <g clip-path="url(#compare_chart_clip)">
                         <path d="M0.5 118.499C0.5 118.499 82 102.999 113.5 89.4989C145 75.9989 188.444 87.7869 235 77.4989C272.684 69.1719 293.654 62.4939 329 46.9989C409.332 11.7849 479.5 86.5 510.5 78C541.5 69.5 635.951 0.848863 644 1.49886" stroke="var(--lt-primary-500, var(--lt-primary-500))" stroke-width="2.5" />
                         <path d="M113.5 89.5006C82 103.001 0.5 118.501 0.5 118.501V188.501H644V1.50065C635.951 0.850647 541.5 69.5 510.5 78C479.5 86.5 409.332 11.7866 329 47.0006C293.654 62.4956 272.684 69.1736 235 77.5006C188.444 87.7886 145 76.0006 113.5 89.5006Z" fill="url(#compare_chart_gradient)" />
@@ -447,15 +447,15 @@ export default function CompareIsland(container: HTMLElement, props: CompareProp
         } catch (_) {}
     };
 
-    rootEl.addEventListener('pointerdown', onPointerDown);
-    rootEl.addEventListener('pointermove', onPointerMove);
-    rootEl.addEventListener('pointerup', onPointerUp);
-    rootEl.addEventListener('pointercancel', onPointerUp);
+    rootEl.addEventListener('pointerdown', onPointerDown, { signal: ctx?.signal });
+    rootEl.addEventListener('pointermove', onPointerMove, { signal: ctx?.signal });
+    rootEl.addEventListener('pointerup', onPointerUp, { signal: ctx?.signal });
+    rootEl.addEventListener('pointercancel', onPointerUp, { signal: ctx?.signal });
 
     // Keyboard support via hidden input
     inputEl.addEventListener('input', () => {
         updatePosition(parseFloat(inputEl.value));
-    });
+    }, { signal: ctx?.signal });
 
     inputEl.addEventListener('keydown', (e) => {
         let step = props.step || 1;
@@ -478,20 +478,20 @@ export default function CompareIsland(container: HTMLElement, props: CompareProp
             e.preventDefault();
             updatePosition(100);
         }
-    });
+    }, { signal: ctx?.signal });
 
     // Controlled demo button handlers
     container.querySelectorAll<HTMLButtonElement>('[data-compare-set]').forEach(btn => {
         btn.addEventListener('click', () => {
             const val = parseFloat(btn.getAttribute('data-compare-set') || '50');
             updatePosition(val);
-        });
+        }, { signal: ctx?.signal });
     });
 
     if (numInput) {
         numInput.addEventListener('change', () => {
             const val = parseFloat(numInput.value || '50');
             updatePosition(val);
-        });
+        }, { signal: ctx?.signal });
     }
 }

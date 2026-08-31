@@ -28,9 +28,9 @@ html.dark .blockui-mask,
 html.dark .blockui-mask > div,
 [data-theme="dark"] .blockui-mask > div,
 .dark .blockui-mask > div {
-    background: var(--p-surface-0, #090d16) !important;
-    border-color: var(--p-border-color, #334155) !important;
-    color: var(--p-text-color, #f8fafc) !important;
+    background: var(--p-surface-0) !important;
+    border-color: var(--p-border-color) !important;
+    color: var(--p-text-color) !important;
 }
 `;
 
@@ -40,7 +40,7 @@ export default function BlockUIIsland(container: HTMLElement, props: BlockUIProp
 
     function render() {
         container.innerHTML = `
-            <div class="laughtale-blockui-root" style="position: relative; width: 100%;">
+            <div class="laughtale-blockui-root" data-part="root" style="position: relative; width: 100%;">
                 <!-- Blocked Glass Overlay -->
                 <div class="blockui-mask" style="display: ${isBlocked ? 'flex' : 'none'}; position: absolute; inset: 0; z-index: 100; background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(3px); align-items: center; justify-content: center; border-radius: inherit;">
                     <div style="display: flex; flex-direction: column; align-items: center; gap: 0.75rem; background: var(--lt-surface-0); border: 1px solid var(--lt-surface-200); padding: 1rem 1.5rem; border-radius: var(--lt-radius-lg); box-shadow: var(--p-shadow-md);">
@@ -59,5 +59,5 @@ export default function BlockUIIsland(container: HTMLElement, props: BlockUIProp
     container.addEventListener('blockui:toggle', () => {
         isBlocked = !isBlocked;
         render();
-    });
+    }, { signal: ctx?.signal });
 }

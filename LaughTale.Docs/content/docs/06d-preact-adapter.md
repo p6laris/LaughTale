@@ -47,7 +47,7 @@ public class TelemetryModel : PageModel
 ```tsx
 import { h, render } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
-import { IslandContext, emitIslandEvent, onIslandEvent } from '@softmax/laughtale-client';
+import { IslandContext, emitIslandEvent, onIslandEvent } from 'laughtale';
 
 export interface ThroughputProps {
     metricName: string;

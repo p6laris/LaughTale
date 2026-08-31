@@ -122,12 +122,12 @@ const CSS = `
 html.dark .laughtale-float-label > label,
 [data-theme="dark"] .laughtale-float-label > label,
 .dark .laughtale-float-label > label {
-    color: var(--p-text-muted, #94a3b8);
+    color: var(--p-text-muted);
 }
 html.dark .laughtale-float-label-on > label,
 [data-theme="dark"] .laughtale-float-label-on > label,
 .dark .laughtale-float-label-on > label {
-    background: var(--p-surface-0, #090d16);
+    background: var(--p-surface-0);
 }
 html.dark .laughtale-float-label.has-value > label,
 html.dark .laughtale-float-label:focus-within > label,
@@ -135,7 +135,7 @@ html.dark .laughtale-float-label:focus-within > label,
 [data-theme="dark"] .laughtale-float-label:focus-within > label,
 .dark .laughtale-float-label.has-value > label,
 .dark .laughtale-float-label:focus-within > label {
-    color: var(--p-primary-400, #34d399);
+    color: var(--p-primary-400);
 }
 html.dark .laughtale-float-label.invalid > label,
 html.dark .laughtale-float-label:has(.invalid) > label,
@@ -149,7 +149,7 @@ html.dark .laughtale-float-label:has(:invalid) > label,
 .dark .laughtale-float-label:has(.invalid) > label,
 .dark .laughtale-float-label:has(.is-invalid) > label,
 .dark .laughtale-float-label:has(:invalid) > label {
-    color: var(--p-red-400, #f87171) !important;
+    color: var(--p-red-400) !important;
 }
 `;
 
@@ -165,7 +165,7 @@ export default function FloatLabelIsland(container: HTMLElement, props: FloatLab
     const labelText = props.label || (existingLabel ? existingLabel.textContent : 'Label');
 
     container.innerHTML = `
-        <div class="laughtale-float-label laughtale-float-label-${variant} ${props.invalid ? 'invalid' : ''}">
+        <div class="laughtale-float-label laughtale-float-label-${variant} ${props.invalid ? 'invalid' : ''}" data-part="root">
             ${initialHtml}
             ${!existingLabel && labelText ? `<label ${forAttr}>${labelText}</label>` : ''}
         </div>
@@ -215,31 +215,31 @@ export default function FloatLabelIsland(container: HTMLElement, props: FloatLab
                 (target as any).click();
             }
         }
-    });
+    }, { signal: ctx?.signal });
 
     // Event listeners
-    wrap.addEventListener('input', updateFloatingState);
-    wrap.addEventListener('change', updateFloatingState);
+    wrap.addEventListener('input', updateFloatingState, { signal: ctx?.signal });
+    wrap.addEventListener('change', updateFloatingState, { signal: ctx?.signal });
     wrap.addEventListener('focusin', () => {
         wrap.classList.add('is-focused');
         updateFloatingState();
-    });
+    }, { signal: ctx?.signal });
     wrap.addEventListener('focusout', () => {
         wrap.classList.remove('is-focused');
         updateFloatingState();
-    });
+    }, { signal: ctx?.signal });
 
     // Custom island change events
-    wrap.addEventListener('inputtags:change', updateFloatingState);
-    wrap.addEventListener('chips:change', updateFloatingState);
-    wrap.addEventListener('tags:add', updateFloatingState);
-    wrap.addEventListener('tags:remove', updateFloatingState);
-    wrap.addEventListener('password:change', updateFloatingState);
-    wrap.addEventListener('otp:change', updateFloatingState);
-    wrap.addEventListener('cascadeselect:change', updateFloatingState);
-    wrap.addEventListener('datepicker:change', updateFloatingState);
-    wrap.addEventListener('autocomplete:change', updateFloatingState);
-    wrap.addEventListener('select:change', updateFloatingState);
+    wrap.addEventListener('inputtags:change', updateFloatingState, { signal: ctx?.signal });
+    wrap.addEventListener('chips:change', updateFloatingState, { signal: ctx?.signal });
+    wrap.addEventListener('tags:add', updateFloatingState, { signal: ctx?.signal });
+    wrap.addEventListener('tags:remove', updateFloatingState, { signal: ctx?.signal });
+    wrap.addEventListener('password:change', updateFloatingState, { signal: ctx?.signal });
+    wrap.addEventListener('otp:change', updateFloatingState, { signal: ctx?.signal });
+    wrap.addEventListener('cascadeselect:change', updateFloatingState, { signal: ctx?.signal });
+    wrap.addEventListener('datepicker:change', updateFloatingState, { signal: ctx?.signal });
+    wrap.addEventListener('autocomplete:change', updateFloatingState, { signal: ctx?.signal });
+    wrap.addEventListener('select:change', updateFloatingState, { signal: ctx?.signal });
 
     // MutationObserver to detect child tag additions (childList only, preventing attribute loops)
     const observer = new MutationObserver(() => {

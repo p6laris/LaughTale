@@ -236,9 +236,9 @@ const MENU_CSS = `
 html.dark .p-menu,
 [data-theme="dark"] .p-menu,
 .dark .p-menu {
-    background: var(--p-surface-0, #090d16);
-    color: var(--p-text-color, #f8fafc);
-    border-color: var(--p-border-color, #334155);
+    background: var(--p-surface-0);
+    color: var(--p-text-color);
+    border-color: var(--p-border-color);
 }
 
 html.dark .p-menu-start,
@@ -250,47 +250,47 @@ html.dark .p-menu-separator,
 .dark .p-menu-start,
 .dark .p-menu-end,
 .dark .p-menu-separator {
-    border-color: var(--p-border-color, #334155);
+    border-color: var(--p-border-color);
 }
 
 html.dark .p-menu-item-link,
 [data-theme="dark"] .p-menu-item-link,
 .dark .p-menu-item-link {
-    color: var(--p-text-color, #f8fafc);
+    color: var(--p-text-color);
 }
 
 html.dark .p-menu-item-link:hover,
 [data-theme="dark"] .p-menu-item-link:hover,
 .dark .p-menu-item-link:hover {
-    background: var(--p-surface-100, #1e293b);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-100);
+    color: var(--p-text-color);
 }
 
 html.dark .p-menu-item-shortcut,
 [data-theme="dark"] .p-menu-item-shortcut,
 .dark .p-menu-item-shortcut {
-    background: var(--p-surface-100, #1e293b);
-    border-color: var(--p-border-color, #334155);
-    color: var(--p-text-muted, #94a3b8);
+    background: var(--p-surface-100);
+    border-color: var(--p-border-color);
+    color: var(--p-text-muted);
 }
 
 html.dark .p-menu-item-badge,
 [data-theme="dark"] .p-menu-item-badge,
 .dark .p-menu-item-badge {
-    background: var(--p-surface-100, #1e293b);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-100);
+    color: var(--p-text-color);
 }
 
 html.dark .p-menu-submenu-label,
 [data-theme="dark"] .p-menu-submenu-label,
 .dark .p-menu-submenu-label {
-    color: var(--p-text-muted, #94a3b8);
+    color: var(--p-text-muted);
 }
 
 html.dark .p-menu-dot-icon,
 [data-theme="dark"] .p-menu-dot-icon,
 .dark .p-menu-dot-icon {
-    background: var(--p-primary-500, #10b981);
+    background: var(--p-primary-500);
 }
 `;
 
@@ -378,7 +378,7 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
 
     function renderItemContent(item: MenuItemData, path: string, depth: number = 0): string {
         if (item.separator) {
-            return `<li class="p-menu-separator" role="separator"></li>`;
+            return `<li class="p-menu-separator" data-part="root" role="separator"></li>`;
         }
 
         const isGroup = Array.isArray(item.items) && item.items.length > 0;
@@ -559,7 +559,7 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
                 if (isPopup) {
                     closePopup();
                 }
-            });
+            }, { signal: ctx?.signal });
         });
 
         // Keyboard navigation
@@ -588,7 +588,7 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
                 e.preventDefault();
                 closePopup();
             }
-        });
+        }, { signal: ctx?.signal });
     }
 
     function setRadioSelection(list: MenuItemData[], group: string, selectedItem: MenuItemData) {
@@ -657,7 +657,7 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
 
         isOpen = true;
         popupEl = document.createElement('div');
-        popupEl.className = 'p-menu-popup-wrapper';
+        popupEl.className = 'p-menu-popup-wrapper'; container.setAttribute('data-part', 'root');
         popupEl.innerHTML = renderMenuHtml();
         document.body.appendChild(popupEl);
 
@@ -676,7 +676,7 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
                 document.removeEventListener('click', clickOutsideHandler);
             }
         };
-        setTimeout(() => document.addEventListener('click', clickOutsideHandler), 0);
+        setTimeout(() => document.addEventListener('click', clickOutsideHandler, { signal: ctx?.signal }), 0);
     }
 
     function closePopup() {
@@ -697,7 +697,7 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
                     e.preventDefault();
                     e.stopPropagation();
                     openPopup(trigger);
-                });
+                }, { signal: ctx?.signal });
             }
         }
     } else {

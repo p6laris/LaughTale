@@ -427,9 +427,9 @@ const DATAVIEW_CSS = `
 html.dark .p-dataview,
 [data-theme="dark"] .p-dataview,
 .dark .p-dataview {
-    background: var(--p-surface-0, #090d16) !important;
-    color: var(--p-text-color, #f8fafc) !important;
-    border-color: var(--p-border-color, #334155) !important;
+    background: var(--p-surface-0) !important;
+    color: var(--p-text-color) !important;
+    border-color: var(--p-border-color) !important;
 }
 html.dark .p-dataview-header,
 html.dark .p-dataview-paginator,
@@ -437,30 +437,30 @@ html.dark .p-dataview-paginator,
 [data-theme="dark"] .p-dataview-paginator,
 .dark .p-dataview-header,
 .dark .p-dataview-paginator {
-    background: var(--p-surface-50, #0f172a) !important;
-    border-color: var(--p-border-color, #334155) !important;
-    color: var(--p-text-color, #f8fafc) !important;
+    background: var(--p-surface-50) !important;
+    border-color: var(--p-border-color) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-dataview-content,
 [data-theme="dark"] .p-dataview-content,
 .dark .p-dataview-content {
-    background: var(--p-surface-0, #090d16) !important;
+    background: var(--p-surface-0) !important;
 }
 html.dark .p-dataview-list-item,
 [data-theme="dark"] .p-dataview-list-item,
 .dark .p-dataview-list-item {
-    border-color: var(--p-border-color, #334155) !important;
+    border-color: var(--p-border-color) !important;
 }
 html.dark .p-dataview-list-item:hover,
 [data-theme="dark"] .p-dataview-list-item:hover,
 .dark .p-dataview-list-item:hover {
-    background: var(--p-surface-100, #1e293b) !important;
+    background: var(--p-surface-100) !important;
 }
 html.dark .p-dataview-grid-card,
 [data-theme="dark"] .p-dataview-grid-card,
 .dark .p-dataview-grid-card {
-    background: var(--p-surface-0, #090d16) !important;
-    border-color: var(--p-border-color, #334155) !important;
+    background: var(--p-surface-0) !important;
+    border-color: var(--p-border-color) !important;
 }
 html.dark .p-dataview-grid-image-box,
 html.dark .p-dataview-list-image-box,
@@ -468,8 +468,8 @@ html.dark .p-dataview-list-image-box,
 [data-theme="dark"] .p-dataview-list-image-box,
 .dark .p-dataview-grid-image-box,
 .dark .p-dataview-list-image-box {
-    background: var(--p-surface-100, #1e293b) !important;
-    border-color: var(--p-border-color, #334155) !important;
+    background: var(--p-surface-100) !important;
+    border-color: var(--p-border-color) !important;
 }
 html.dark .p-layout-switcher,
 html.dark .p-dataview-sort-select,
@@ -480,9 +480,9 @@ html.dark .p-dataview-btn-wishlist,
 .dark .p-layout-switcher,
 .dark .p-dataview-sort-select,
 .dark .p-dataview-btn-wishlist {
-    background: var(--p-surface-100, #1e293b) !important;
-    border-color: var(--p-border-color, #334155) !important;
-    color: var(--p-text-color, #f8fafc) !important;
+    background: var(--p-surface-100) !important;
+    border-color: var(--p-border-color) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-dataview-item-name,
 html.dark .p-dataview-price,
@@ -493,14 +493,14 @@ html.dark .p-dataview-title,
 .dark .p-dataview-item-name,
 .dark .p-dataview-price,
 .dark .p-dataview-title {
-    color: var(--p-text-color, #f8fafc) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-dataview-rating-pill,
 [data-theme="dark"] .p-dataview-rating-pill,
 .dark .p-dataview-rating-pill {
-    background: var(--p-surface-100, #1e293b) !important;
-    border-color: var(--p-border-color, #334155) !important;
-    color: var(--p-text-color, #f8fafc) !important;
+    background: var(--p-surface-100) !important;
+    border-color: var(--p-border-color) !important;
+    color: var(--p-text-color) !important;
 }
 `;
 
@@ -523,7 +523,7 @@ export default function DataViewIsland(container: HTMLElement, props: DataViewPr
 
     function getSeverityTag(status?: string): string {
         const s = (status || '').toUpperCase();
-        if (s === 'INSTOCK' || s === 'QUALIFIED') return '<span class="p-tag p-tag-success">In Stock</span>';
+        if (s === 'INSTOCK' || s === 'QUALIFIED') return '<span class="p-tag p-tag-success" data-part="root">In Stock</span>';
         if (s === 'LOWSTOCK' || s === 'NEGOTIATION') return '<span class="p-tag p-tag-warn">Low Stock</span>';
         if (s === 'OUTOFSTOCK' || s === 'UNQUALIFIED') return '<span class="p-tag p-tag-danger">Out of Stock</span>';
         return s ? `<span class="p-tag p-tag-success">${s}</span>` : '';
@@ -780,11 +780,11 @@ export default function DataViewIsland(container: HTMLElement, props: DataViewPr
         rootEl.querySelector('.btn-layout-list')?.addEventListener('click', () => {
             currentLayout = 'list';
             render();
-        });
+        }, { signal: ctx?.signal });
         rootEl.querySelector('.btn-layout-grid')?.addEventListener('click', () => {
             currentLayout = 'grid';
             render();
-        });
+        }, { signal: ctx?.signal });
 
         // 2. Sort Dropdown
         const sortSelect = rootEl.querySelector<HTMLSelectElement>('.p-dataview-sort-select');
@@ -801,7 +801,7 @@ export default function DataViewIsland(container: HTMLElement, props: DataViewPr
                     sortField = undefined;
                 }
                 render();
-            });
+            }, { signal: ctx?.signal });
         }
 
         // 3. Wishlist Heart Buttons
@@ -817,7 +817,7 @@ export default function DataViewIsland(container: HTMLElement, props: DataViewPr
                     bubbles: true,
                     detail: { id, isWishlisted: wishlistedIds.has(id) }
                 }));
-            });
+            }, { signal: ctx?.signal });
         });
 
         // 4. Buy Now Buttons
@@ -830,7 +830,7 @@ export default function DataViewIsland(container: HTMLElement, props: DataViewPr
                     bubbles: true,
                     detail: { item: matched }
                 }));
-            });
+            }, { signal: ctx?.signal });
         });
 
         // 5. Pagination Buttons
@@ -841,7 +841,7 @@ export default function DataViewIsland(container: HTMLElement, props: DataViewPr
                     currentPage = targetPage;
                     render();
                 }
-            });
+            }, { signal: ctx?.signal });
         });
 
         const rowsSelect = rootEl.querySelector<HTMLSelectElement>('.p-dataview-rows-select');
@@ -850,7 +850,7 @@ export default function DataViewIsland(container: HTMLElement, props: DataViewPr
                 rowsPerPage = Number(rowsSelect.value);
                 currentPage = 1;
                 render();
-            });
+            }, { signal: ctx?.signal });
         }
     }
 

@@ -126,9 +126,9 @@ const CAROUSEL_CSS = `
 html.dark .p-carousel-card-num,
 [data-theme="dark"] .p-carousel-card-num,
 .dark .p-carousel-card-num {
-    background: var(--p-surface-0, #090d16);
-    color: var(--p-text-color, #f8fafc);
-    border-color: var(--p-border-color, #334155);
+    background: var(--p-surface-0);
+    color: var(--p-text-color);
+    border-color: var(--p-border-color);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
@@ -171,7 +171,7 @@ html.dark .p-carousel-card-num,
 html.dark .p-carousel-indicator-button,
 [data-theme="dark"] .p-carousel-indicator-button,
 .dark .p-carousel-indicator-button {
-    background: var(--p-surface-200, #334155);
+    background: var(--p-surface-200);
 }
 
 .p-carousel-indicator-button:hover {
@@ -217,9 +217,9 @@ html.dark .p-carousel-next,
 [data-theme="dark"] .p-carousel-next,
 .dark .p-carousel-prev,
 .dark .p-carousel-next {
-    background: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
-    color: var(--p-text-muted, #94a3b8);
+    background: var(--p-surface-0);
+    border-color: var(--p-border-color);
+    color: var(--p-text-muted);
 }
 
 .p-carousel-prev:hover:not(:disabled),
@@ -234,8 +234,8 @@ html.dark .p-carousel-next:hover:not(:disabled),
 .dark .p-carousel-next:hover:not(:disabled),
 [data-theme="dark"] .p-carousel-prev:hover:not(:disabled),
 [data-theme="dark"] .p-carousel-next:hover:not(:disabled) {
-    background: var(--p-surface-100, #1e293b);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-100);
+    color: var(--p-text-color);
 }
 
 .p-carousel-prev:active:not(:disabled),
@@ -321,7 +321,7 @@ export default function CarouselIsland(container: HTMLElement, props: CarouselPr
         const itemsHtml = Array.from({ length: itemCount }, (_, i) => {
             const widthOverride = autoSize ? `width: ${customWidths[i]};` : '';
             return `
-                <div class="p-carousel-item" style="${itemDimensionsStyle} ${widthOverride}" role="group" aria-roledescription="slide" aria-label="Slide ${i + 1} of ${itemCount}" data-slide-index="${i}">
+                <div class="p-carousel-item" data-part="root" style="${itemDimensionsStyle} ${widthOverride}" role="group" aria-roledescription="slide" aria-label="Slide ${i + 1} of ${itemCount}" data-slide-index="${i}">
                     <div class="p-carousel-card-num">
                         <span>${i + 1}</span>
                     </div>
@@ -436,7 +436,7 @@ export default function CarouselIsland(container: HTMLElement, props: CarouselPr
             thumb.addEventListener('click', () => {
                 const idx = parseInt(thumb.getAttribute('data-thumb-index') || '0', 10);
                 selectGallerySlide(idx);
-            });
+            }, { signal: ctx?.signal });
         });
 
         if (mainContent) {
@@ -465,7 +465,7 @@ export default function CarouselIsland(container: HTMLElement, props: CarouselPr
                         }
                     }
                 }, 80);
-            });
+            }, { signal: ctx?.signal });
         }
 
         return;
@@ -498,7 +498,7 @@ export default function CarouselIsland(container: HTMLElement, props: CarouselPr
     }
 
     setTimeout(applyCenterPadding, 20);
-    window.addEventListener('resize', applyCenterPadding);
+    window.addEventListener('resize', applyCenterPadding, { signal: ctx?.signal });
 
     let isProgrammaticScroll = false;
     let scrollTimeoutId: any = null;

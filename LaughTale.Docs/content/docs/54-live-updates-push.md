@@ -1,4 +1,4 @@
----
+﻿---
 title: Real-Time Server Push & WebSockets
 description: Connect LaughTale islands to ASP.NET Core SignalR hubs, Server-Sent Events (SSE), and WebSockets for real-time live data updates.
 order: 52
@@ -16,7 +16,7 @@ You can easily pair LaughTale with ASP.NET Core **SignalR** or **Server-Sent Eve
 
 ```typescript
 import * as signalR from '@microsoft/signalr';
-import { IslandContext } from '@softmax/laughtale-client';
+import { IslandContext } from 'laughtale';
 
 export default async function LiveTelemetryIsland(container: HTMLElement, props: any, ctx?: IslandContext) {
     const connection = new signalR.HubConnectionBuilder()

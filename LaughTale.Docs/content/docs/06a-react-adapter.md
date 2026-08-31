@@ -50,7 +50,7 @@ A LaughTale React island is a module exporting a standard React component or an 
 ```tsx
 import React, { useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
-import { IslandContext, emitIslandEvent, onIslandEvent } from '@softmax/laughtale-client';
+import { IslandContext, emitIslandEvent, onIslandEvent } from 'laughtale';
 
 export interface DashboardProps {
     title: string;

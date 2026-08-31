@@ -324,19 +324,19 @@ const CSS = `
 html.dark .p-listbox,
 [data-theme="dark"] .p-listbox,
 .dark .p-listbox {
-    background: var(--p-surface-0, #090d16);
-    color: var(--p-text-color, #f8fafc);
-    border-color: var(--p-border-color, #334155);
+    background: var(--p-surface-0);
+    color: var(--p-text-color);
+    border-color: var(--p-border-color);
 }
 html.dark .p-listbox.variant-filled,
 [data-theme="dark"] .p-listbox.variant-filled,
 .dark .p-listbox.variant-filled {
-    background-color: var(--p-surface-100, #1e293b);
+    background-color: var(--p-surface-100);
 }
 html.dark .p-listbox.variant-filled.is-focused,
 [data-theme="dark"] .p-listbox.variant-filled.is-focused,
 .dark .p-listbox.variant-filled.is-focused {
-    background-color: var(--p-surface-0, #090d16);
+    background-color: var(--p-surface-0);
 }
 html.dark .p-listbox-header,
 html.dark .p-listbox-footer,
@@ -350,66 +350,66 @@ html.dark .p-listbox-option-group-label,
 .dark .p-listbox-footer,
 .dark .p-listbox-filter-container,
 .dark .p-listbox-option-group-label {
-    background: var(--p-surface-50, #0f172a);
-    border-color: var(--p-border-color, #334155);
+    background: var(--p-surface-50);
+    border-color: var(--p-border-color);
 }
 html.dark .p-listbox-filter-input,
 [data-theme="dark"] .p-listbox-filter-input,
 .dark .p-listbox-filter-input {
-    background: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-0);
+    border-color: var(--p-border-color);
+    color: var(--p-text-color);
 }
 html.dark .p-listbox-option,
 [data-theme="dark"] .p-listbox-option,
 .dark .p-listbox-option {
-    color: var(--p-text-color, #f8fafc);
+    color: var(--p-text-color);
 }
 html.dark .p-listbox-option:hover:not(.p-disabled),
 [data-theme="dark"] .p-listbox-option:hover:not(.p-disabled),
 .dark .p-listbox-option:hover:not(.p-disabled) {
-    background: var(--p-surface-100, #1e293b);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-100);
+    color: var(--p-text-color);
 }
 html.dark .p-listbox-option.p-highlight,
 [data-theme="dark"] .p-listbox-option.p-highlight,
 .dark .p-listbox-option.p-highlight {
     background: rgba(16, 185, 129, 0.16);
-    color: var(--p-primary-300, #6ee7b7);
+    color: var(--p-primary-300);
 }
 html.dark .p-listbox-option.p-highlight:hover:not(.p-disabled),
 [data-theme="dark"] .p-listbox-option.p-highlight:hover:not(.p-disabled),
 .dark .p-listbox-option.p-highlight:hover:not(.p-disabled) {
     background: rgba(16, 185, 129, 0.24);
-    color: var(--p-primary-200, #a7f3d0);
+    color: var(--p-primary-200);
 }
 html.dark .p-listbox-option-badge,
 [data-theme="dark"] .p-listbox-option-badge,
 .dark .p-listbox-option-badge {
-    background: var(--p-surface-100, #1e293b);
-    color: var(--p-text-muted, #94a3b8);
+    background: var(--p-surface-100);
+    color: var(--p-text-muted);
 }
 html.dark .p-listbox-option.p-highlight .p-listbox-option-badge,
 [data-theme="dark"] .p-listbox-option.p-highlight .p-listbox-option-badge,
 .dark .p-listbox-option.p-highlight .p-listbox-option-badge {
     background: rgba(16, 185, 129, 0.25);
-    color: var(--p-primary-200, #a7f3d0);
+    color: var(--p-primary-200);
 }
 html.dark .p-listbox-option-checkbox,
 [data-theme="dark"] .p-listbox-option-checkbox,
 .dark .p-listbox-option-checkbox {
-    background: var(--p-surface-50, #0f172a);
-    border-color: var(--p-border-color, #334155);
+    background: var(--p-surface-50);
+    border-color: var(--p-border-color);
 }
 html.dark .p-listbox-option-checkmark,
 [data-theme="dark"] .p-listbox-option-checkmark,
 .dark .p-listbox-option-checkmark {
-    color: var(--p-primary-400, #34d399);
+    color: var(--p-primary-400);
 }
 html.dark .p-listbox-striped .p-listbox-option:nth-child(even):not(.p-highlight),
 [data-theme="dark"] .p-listbox-striped .p-listbox-option:nth-child(even):not(.p-highlight),
 .dark .p-listbox-striped .p-listbox-option:nth-child(even):not(.p-highlight) {
-    background: var(--p-surface-50, #0f172a);
+    background: var(--p-surface-50);
 }
 `;
 
@@ -524,7 +524,7 @@ export default function ListboxIsland(container: HTMLElement, props: ListboxProp
 
         container.innerHTML = `
             ${props.header ? `
-                <div class="p-listbox-header">
+                <div class="p-listbox-header" data-part="root">
                     <span>${props.header}</span>
                     ${props.headerCount ? `<span class="p-listbox-header-count">${props.headerCount}</span>` : ''}
                 </div>
@@ -661,14 +661,14 @@ export default function ListboxIsland(container: HTMLElement, props: ListboxProp
                 if (isDisabled || itemEl.classList.contains('p-disabled')) return;
                 const val = itemEl.getAttribute('data-val')!;
                 handleSelect(val, e);
-            });
+            }, { signal: ctx?.signal });
 
             if (props.focusOnHover) {
                 itemEl.addEventListener('mouseenter', () => {
                     if (!isDisabled && !itemEl.classList.contains('p-disabled')) {
                         updateFocus(idx);
                     }
-                });
+                }, { signal: ctx?.signal });
             }
         });
     }
@@ -711,7 +711,7 @@ export default function ListboxIsland(container: HTMLElement, props: ListboxProp
                 searchQuery = filterInp.value;
                 renderOptions();
             }, 150);
-            filterInp.addEventListener('input', () => debouncedSearch());
+            filterInp.addEventListener('input', () => debouncedSearch(), { signal: ctx?.signal });
         }
 
         container.addEventListener('focus', () => {
@@ -719,7 +719,7 @@ export default function ListboxIsland(container: HTMLElement, props: ListboxProp
             if (props.autoOptionFocus !== false && focusedIndex === -1) {
                 updateFocus(0);
             }
-        });
+        }, { signal: ctx?.signal });
 
         container.addEventListener('blur', (e) => {
             if (!container.contains(e.relatedTarget as Node)) {
@@ -727,7 +727,7 @@ export default function ListboxIsland(container: HTMLElement, props: ListboxProp
                 const visible = container.querySelectorAll<HTMLElement>('.p-listbox-option');
                 visible.forEach(el => el.classList.remove('p-focus'));
             }
-        });
+        }, { signal: ctx?.signal });
 
         container.addEventListener('keydown', (e) => {
             if (isDisabled) return;
@@ -775,7 +775,7 @@ export default function ListboxIsland(container: HTMLElement, props: ListboxProp
                 renderOptions();
                 syncValue();
             }
-        });
+        }, { signal: ctx?.signal });
     }
 
     function syncValue() {

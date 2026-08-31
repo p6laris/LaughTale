@@ -353,25 +353,25 @@ const CSS = `
 html.dark .dp-trigger,
 [data-theme="dark"] .dp-trigger,
 .dark .dp-trigger {
-    background: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-0);
+    border-color: var(--p-border-color);
+    color: var(--p-text-color);
 }
 html.dark .dp-trigger:hover:not(.disabled),
 [data-theme="dark"] .dp-trigger:hover:not(.disabled),
 .dark .dp-trigger:hover:not(.disabled) {
-    border-color: var(--p-surface-400, #64748b);
+    border-color: var(--p-surface-400);
 }
 html.dark .dp-trigger.variant-filled,
 [data-theme="dark"] .dp-trigger.variant-filled,
 .dark .dp-trigger.variant-filled {
-    background: var(--p-surface-100, #1e293b);
+    background: var(--p-surface-100);
 }
 html.dark .dp-panel,
 [data-theme="dark"] .dp-panel,
 .dark .dp-panel {
-    background: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
+    background: var(--p-surface-0);
+    border-color: var(--p-border-color);
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
 }
 html.dark .dp-nav-btn:hover,
@@ -386,14 +386,14 @@ html.dark .dp-view-btn:hover,
 .dark .dp-title-btn:hover,
 .dark .dp-day-cell:hover:not(.disabled):not(.selected),
 .dark .dp-view-btn:hover {
-    background: var(--p-surface-100, #1e293b);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-100);
+    color: var(--p-text-color);
 }
 html.dark .dp-day-cell.in-range,
 [data-theme="dark"] .dp-day-cell.in-range,
 .dark .dp-day-cell.in-range {
     background: rgba(16, 185, 129, 0.15);
-    color: var(--p-primary-300, #6ee7b7);
+    color: var(--p-primary-300);
 }
 html.dark .dp-day-cell.selected,
 html.dark .dp-view-btn.selected,
@@ -401,8 +401,8 @@ html.dark .dp-view-btn.selected,
 [data-theme="dark"] .dp-view-btn.selected,
 .dark .dp-day-cell.selected,
 .dark .dp-view-btn.selected {
-    background: var(--p-primary-500, #10b981) !important;
-    color: #ffffff !important;
+    background: var(--p-primary-500) !important;
+    color: var(--p-surface-0) !important;
 }
 html.dark .dp-timepicker,
 html.dark .dp-buttonbar,
@@ -410,19 +410,19 @@ html.dark .dp-buttonbar,
 [data-theme="dark"] .dp-buttonbar,
 .dark .dp-timepicker,
 .dark .dp-buttonbar {
-    border-color: var(--p-border-color, #334155);
+    border-color: var(--p-border-color);
 }
 html.dark .dp-ampm-btn,
 [data-theme="dark"] .dp-ampm-btn,
 .dark .dp-ampm-btn {
-    background: var(--p-surface-100, #1e293b);
-    border-color: var(--p-border-color, #334155);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-100);
+    border-color: var(--p-border-color);
+    color: var(--p-text-color);
 }
 html.dark .dp-bar-btn,
 [data-theme="dark"] .dp-bar-btn,
 .dark .dp-bar-btn {
-    color: var(--p-primary-300, #6ee7b7);
+    color: var(--p-primary-300);
 }
 html.dark .dp-bar-btn:hover,
 [data-theme="dark"] .dp-bar-btn:hover,
@@ -761,7 +761,7 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
                 viewDate.setFullYear(viewDate.getFullYear() - 10);
             }
             renderComponent();
-        });
+        }, { signal: ctx?.signal });
 
         // Next button
         panel.querySelector('.btn-next')?.addEventListener('click', (e) => {
@@ -774,7 +774,7 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
                 viewDate.setFullYear(viewDate.getFullYear() + 10);
             }
             renderComponent();
-        });
+        }, { signal: ctx?.signal });
 
         // Title button (switch view)
         panel.querySelector('.btn-title')?.addEventListener('click', (e) => {
@@ -783,7 +783,7 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
             else if (currentView === 'month') currentView = 'year';
             else currentView = 'date';
             renderComponent();
-        });
+        }, { signal: ctx?.signal });
 
         // Day click
         panel.querySelectorAll<HTMLButtonElement>('.dp-day-cell:not(.disabled):not(.other-month)').forEach(btn => {
@@ -814,7 +814,7 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
 
                 syncAndDispatch();
                 renderComponent();
-            });
+            }, { signal: ctx?.signal });
         });
 
         // Month click
@@ -825,7 +825,7 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
                 viewDate.setMonth(m);
                 currentView = 'date';
                 renderComponent();
-            });
+            }, { signal: ctx?.signal });
         });
 
         // Year click
@@ -836,7 +836,7 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
                 viewDate.setFullYear(y);
                 currentView = 'month';
                 renderComponent();
-            });
+            }, { signal: ctx?.signal });
         });
 
         // Time controls
@@ -844,28 +844,28 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
             e.stopPropagation();
             selectedHour = (selectedHour + 1) % 24;
             updateSelectedTime();
-        });
+        }, { signal: ctx?.signal });
         panel.querySelector('.btn-hour-down')?.addEventListener('click', (e) => {
             e.stopPropagation();
             selectedHour = (selectedHour - 1 + 24) % 24;
             updateSelectedTime();
-        });
+        }, { signal: ctx?.signal });
         panel.querySelector('.btn-min-up')?.addEventListener('click', (e) => {
             e.stopPropagation();
             selectedMinute = (selectedMinute + 1) % 60;
             updateSelectedTime();
-        });
+        }, { signal: ctx?.signal });
         panel.querySelector('.btn-min-down')?.addEventListener('click', (e) => {
             e.stopPropagation();
             selectedMinute = (selectedMinute - 1 + 60) % 60;
             updateSelectedTime();
-        });
+        }, { signal: ctx?.signal });
         panel.querySelector('.btn-ampm')?.addEventListener('click', (e) => {
             e.stopPropagation();
             isPM = !isPM;
             selectedHour = isPM ? (selectedHour % 12) + 12 : (selectedHour % 12);
             updateSelectedTime();
-        });
+        }, { signal: ctx?.signal });
 
         // Button bar
         panel.querySelector('.btn-today')?.addEventListener('click', (e) => {
@@ -876,13 +876,13 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
             syncAndDispatch();
             if (!isInline && !showTime && disclosure) disclosure.close();
             renderComponent();
-        });
+        }, { signal: ctx?.signal });
         panel.querySelector('.btn-clear')?.addEventListener('click', (e) => {
             e.stopPropagation();
             selectedDates = [];
             syncAndDispatch();
             renderComponent();
-        });
+        }, { signal: ctx?.signal });
     }
 
     function updateSelectedTime() {

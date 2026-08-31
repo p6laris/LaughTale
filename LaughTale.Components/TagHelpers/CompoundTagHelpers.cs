@@ -1,4 +1,4 @@
-﻿using System.Text.Encodings.Web;
+using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
@@ -123,7 +123,6 @@ public class IslandLabelTagHelper : TagHelper
 
         if (Wrapper)
         {
-            // If wrapping a child control like a checkbox or radio
             sb.Append(childContent.GetContent());
             if (!string.IsNullOrEmpty(Text) || !string.IsNullOrEmpty(Description))
             {
@@ -456,655 +455,6 @@ public class IslandCardFooterTagHelper : TagHelper
 
 #endregion
 
-#region 2b. Divider Primitives
-
-/// <summary>
-/// Enterprise Divider TagHelper (Aura Design System compliant)
-/// </summary>
-[HtmlTargetElement("island-divider", TagStructure = TagStructure.NormalOrSelfClosing)]
-[HtmlTargetElement("p-divider", TagStructure = TagStructure.NormalOrSelfClosing)]
-public class IslandDividerTagHelper : TagHelper
-{
-    [HtmlAttributeName("layout")]
-    public string Layout { get; set; } = "horizontal";
-
-    [HtmlAttributeName("type")]
-    public string Type { get; set; } = "solid";
-
-    [HtmlAttributeName("align")]
-    public string? Align { get; set; }
-
-    [HtmlAttributeName("class")]
-    public string? Class { get; set; }
-
-    [HtmlAttributeName("style")]
-    public string? Style { get; set; }
-
-    public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
-    {
-        output.TagName = "div";
-        output.TagMode = TagMode.StartTagAndEndTag;
-        var isVertical = string.Equals(Layout, "vertical", StringComparison.OrdinalIgnoreCase);
-        var layoutClass = isVertical ? "p-divider-vertical" : "p-divider-horizontal";
-        var typeClass = string.IsNullOrWhiteSpace(Type) ? "p-divider-solid" : $"p-divider-{Type.ToLowerInvariant()}";
-        var alignClass = !string.IsNullOrWhiteSpace(Align) ? $"p-divider-{Align.ToLowerInvariant()}" : (isVertical ? "p-divider-center" : "p-divider-left");
-
-        var classes = new List<string> { "p-divider", "p-component", layoutClass, typeClass, alignClass };
-        if (!string.IsNullOrWhiteSpace(Class)) classes.Add(Class);
-
-        output.Attributes.SetAttribute("class", string.Join(" ", classes));
-        output.Attributes.SetAttribute("role", "separator");
-        output.Attributes.SetAttribute("aria-orientation", isVertical ? "vertical" : "horizontal");
-
-        if (!string.IsNullOrWhiteSpace(Style))
-        {
-            output.Attributes.SetAttribute("style", Style);
-        }
-
-        var childContent = await output.GetChildContentAsync();
-        var contentStr = childContent.GetContent();
-        if (!string.IsNullOrWhiteSpace(contentStr))
-        {
-            output.Content.SetHtmlContent($"<div class=\"p-divider-content\">{contentStr}</div>");
-        }
-        else
-        {
-            output.Content.SetHtmlContent(string.Empty);
-        }
-    }
-}
-
-#endregion
-
-#region 2c. Fieldset Primitives
-
-/// <summary>
-/// Enterprise Fieldset TagHelper (Aura Design System compliant)
-/// </summary>
-[HtmlTargetElement("island-fieldset", TagStructure = TagStructure.NormalOrSelfClosing)]
-[HtmlTargetElement("p-fieldset", TagStructure = TagStructure.NormalOrSelfClosing)]
-public class IslandFieldsetTagHelper : TagHelper
-{
-    [HtmlAttributeName("legend")]
-    public string? Legend { get; set; }
-
-    [HtmlAttributeName("toggleable")]
-    public bool Toggleable { get; set; } = false;
-
-    [HtmlAttributeName("collapsed")]
-    public bool Collapsed { get; set; } = false;
-
-    [HtmlAttributeName("controlled")]
-    public bool Controlled { get; set; } = false;
-
-    [HtmlAttributeName("toggle-icon")]
-    public string ToggleIcon { get; set; } = "plusMinus";
-
-    [HtmlAttributeName("class")]
-    public string? Class { get; set; }
-
-    [HtmlAttributeName("style")]
-    public string? Style { get; set; }
-
-    [HtmlAttributeName("hydrate")]
-    public HydrateStrategy Hydrate { get; set; } = HydrateStrategy.Load;
-
-    public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
-    {
-        var childContent = await output.GetChildContentAsync();
-        var contentStr = childContent.GetContent();
-
-        var isCollapsed = Collapsed;
-        var toggleIconType = ToggleIcon ?? "plusMinus";
-        var uid = Guid.NewGuid().ToString("N")[..8];
-        var headerId = $"fieldset_header_{uid}";
-        var contentId = $"fieldset_content_{uid}";
-
-        var initialIconSvg = toggleIconType == "chevron"
-            ? "<svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m6 9 6 6 6-6\"/></svg>"
-            : (isCollapsed 
-                ? "<svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 5v14\"/><path d=\"M5 12h14\"/></svg>" 
-                : "<svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M5 12h14\"/></svg>");
-
-        var indicatorClass = toggleIconType == "chevron" ? "p-fieldset-chevron-indicator" : "";
-        var collapsedClass = isCollapsed ? "p-fieldset-collapsed" : "";
-
-        var legendHtml = "";
-        if (!string.IsNullOrWhiteSpace(Legend))
-        {
-            if (Toggleable)
-            {
-                legendHtml = $@"<legend class=""p-fieldset-legend"">
-                    <a class=""p-fieldset-toggle-button"" id=""{headerId}"" role=""button"" aria-controls=""{contentId}"" aria-expanded=""{(isCollapsed ? "false" : "true")}"" tabindex=""0"">
-                        <span class=""p-fieldset-toggle-icon"">{initialIconSvg}</span>
-                        <span class=""p-fieldset-legend-label"">{Legend}</span>
-                    </a>
-                </legend>";
-            }
-            else
-            {
-                legendHtml = $@"<legend class=""p-fieldset-legend"">
-                    <span class=""p-fieldset-legend-label"">{Legend}</span>
-                </legend>";
-            }
-        }
-
-        var topControlsHtml = "";
-        if (Controlled)
-        {
-            topControlsHtml = $@"<div class=""p-fieldset-top-controls"">
-                <button type=""button"" class=""p-fieldset-ctrl-btn {(!isCollapsed ? "p-highlight" : "")}"" data-action=""open"">Open</button>
-                <button type=""button"" class=""p-fieldset-ctrl-btn {(isCollapsed ? "p-highlight" : "")}"" data-action=""close"">Close</button>
-            </div>";
-        }
-
-        var toggleableAttr = Toggleable ? "data-p-toggleable=\"true\"" : "";
-        var fieldsetHtml = $@"<fieldset class=""p-fieldset p-component {indicatorClass} {collapsedClass}"" {toggleableAttr}>
-            {legendHtml}
-            <div class=""p-fieldset-content-container"" id=""{contentId}"" role=""region"" aria-labelledby=""{headerId}"">
-                <div class=""p-fieldset-content-wrapper"">
-                    <div class=""p-fieldset-content"">
-                        {contentStr}
-                    </div>
-                </div>
-            </div>
-        </fieldset>";
-
-        if (Toggleable || Controlled)
-        {
-            output.TagName = "div";
-            output.TagMode = TagMode.StartTagAndEndTag;
-            output.Attributes.SetAttribute("data-island", "fieldset");
-            output.Attributes.SetAttribute("data-hydrate", Hydrate.ToString().ToLowerInvariant());
-
-            var props = new
-            {
-                legend = Legend,
-                toggleable = Toggleable,
-                collapsed = Collapsed,
-                controlled = Controlled,
-                toggleIcon = ToggleIcon
-            };
-            output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
-            
-            var classes = new List<string>();
-            if (!string.IsNullOrWhiteSpace(Class)) classes.Add(Class);
-            if (classes.Count > 0) output.Attributes.SetAttribute("class", string.Join(" ", classes));
-            if (!string.IsNullOrWhiteSpace(Style)) output.Attributes.SetAttribute("style", Style);
-
-            output.Content.SetHtmlContent(topControlsHtml + fieldsetHtml);
-        }
-        else
-        {
-            output.TagName = "fieldset";
-            output.TagMode = TagMode.StartTagAndEndTag;
-            var classes = new List<string> { "p-fieldset", "p-component" };
-            if (!string.IsNullOrWhiteSpace(Class)) classes.Add(Class);
-            output.Attributes.SetAttribute("class", string.Join(" ", classes));
-            if (!string.IsNullOrWhiteSpace(Style)) output.Attributes.SetAttribute("style", Style);
-
-            output.Content.SetHtmlContent($@"{legendHtml}
-            <div class=""p-fieldset-content-container"" id=""{contentId}"" role=""region"" aria-labelledby=""{headerId}"">
-                <div class=""p-fieldset-content-wrapper"">
-                    <div class=""p-fieldset-content"">
-                        {contentStr}
-                    </div>
-                </div>
-            </div>");
-        }
-    }
-}
-
-#endregion
-
-#region 2d. Panel Primitives
-
-/// <summary>
-/// Enterprise Panel TagHelper (Aura Design System compliant)
-/// </summary>
-[HtmlTargetElement("island-panel", TagStructure = TagStructure.NormalOrSelfClosing)]
-[HtmlTargetElement("p-panel", TagStructure = TagStructure.NormalOrSelfClosing)]
-public class IslandPanelTagHelper : TagHelper
-{
-    [HtmlAttributeName("header")]
-    public string? Header { get; set; }
-
-    [HtmlAttributeName("toggleable")]
-    public bool Toggleable { get; set; } = false;
-
-    [HtmlAttributeName("collapsed")]
-    public bool Collapsed { get; set; } = false;
-
-    [HtmlAttributeName("controlled")]
-    public bool Controlled { get; set; } = false;
-
-    [HtmlAttributeName("toggle-icon")]
-    public string ToggleIcon { get; set; } = "chevron";
-
-    [HtmlAttributeName("class")]
-    public string? Class { get; set; }
-
-    [HtmlAttributeName("style")]
-    public string? Style { get; set; }
-
-    [HtmlAttributeName("hydrate")]
-    public HydrateStrategy Hydrate { get; set; } = HydrateStrategy.Load;
-
-    public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
-    {
-        var childContent = await output.GetChildContentAsync();
-        var contentStr = childContent.GetContent();
-
-        var isCollapsed = Collapsed;
-        var toggleIconType = ToggleIcon ?? "chevron";
-        var uid = Guid.NewGuid().ToString("N")[..8];
-        var headerId = $"panel_header_{uid}";
-        var contentId = $"panel_content_{uid}";
-
-        var initialIconSvg = toggleIconType == "plusMinus"
-            ? (isCollapsed 
-                ? "<svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 5v14\"/><path d=\"M5 12h14\"/></svg>" 
-                : "<svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M5 12h14\"/></svg>")
-            : "<svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m6 9 6 6 6-6\"/></svg>";
-
-        var indicatorClass = toggleIconType == "chevron" ? "p-panel-chevron-indicator" : "";
-        var collapsedClass = isCollapsed ? "p-panel-collapsed" : "";
-
-        var headerHtml = "";
-        if (!string.IsNullOrWhiteSpace(Header))
-        {
-            var toggleBtnHtml = Toggleable ? $@"<div class=""p-panel-icons"">
-                <button type=""button"" class=""p-panel-toggle-button"" aria-label=""{Header}"" aria-controls=""{contentId}"" aria-expanded=""{(isCollapsed ? "false" : "true")}"" tabindex=""0"">
-                    <span class=""p-panel-toggle-icon"">{initialIconSvg}</span>
-                </button>
-            </div>" : "";
-
-            headerHtml = $@"<div class=""p-panel-header"">
-                <span class=""p-panel-title"" id=""{headerId}"">{Header}</span>
-                {toggleBtnHtml}
-            </div>";
-        }
-
-        var topControlsHtml = "";
-        if (Controlled)
-        {
-            topControlsHtml = $@"<div class=""p-panel-top-controls"">
-                <button type=""button"" class=""p-panel-ctrl-btn {(!isCollapsed ? "p-highlight" : "")}"" data-action=""open"">Open</button>
-                <button type=""button"" class=""p-panel-ctrl-btn {(isCollapsed ? "p-highlight" : "")}"" data-action=""close"">Close</button>
-            </div>";
-        }
-
-        var panelHtml = $@"<div class=""p-panel p-component {indicatorClass} {collapsedClass}"">
-            {headerHtml}
-            <div class=""p-panel-content-container"" id=""{contentId}"" role=""region"" aria-labelledby=""{headerId}"">
-                <div class=""p-panel-content-wrapper"">
-                    <div class=""p-panel-content"">
-                        {contentStr}
-                    </div>
-                </div>
-            </div>
-        </div>";
-
-        if (Toggleable || Controlled)
-        {
-            output.TagName = "div";
-            output.TagMode = TagMode.StartTagAndEndTag;
-            output.Attributes.SetAttribute("data-island", "panel");
-            output.Attributes.SetAttribute("data-hydrate", Hydrate.ToString().ToLowerInvariant());
-
-            var props = new
-            {
-                header = Header,
-                toggleable = Toggleable,
-                collapsed = Collapsed,
-                controlled = Controlled,
-                toggleIcon = ToggleIcon
-            };
-            output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
-            
-            var classes = new List<string>();
-            if (!string.IsNullOrWhiteSpace(Class)) classes.Add(Class);
-            if (classes.Count > 0) output.Attributes.SetAttribute("class", string.Join(" ", classes));
-            if (!string.IsNullOrWhiteSpace(Style)) output.Attributes.SetAttribute("style", Style);
-
-            output.Content.SetHtmlContent(topControlsHtml + panelHtml);
-        }
-        else
-        {
-            output.TagName = "div";
-            output.TagMode = TagMode.StartTagAndEndTag;
-            var classes = new List<string> { "p-panel", "p-component" };
-            if (!string.IsNullOrWhiteSpace(Class)) classes.Add(Class);
-            output.Attributes.SetAttribute("class", string.Join(" ", classes));
-            if (!string.IsNullOrWhiteSpace(Style)) output.Attributes.SetAttribute("style", Style);
-
-            output.Content.SetHtmlContent($@"{headerHtml}
-            <div class=""p-panel-content-container"" id=""{contentId}"" role=""region"" aria-labelledby=""{headerId}"">
-                <div class=""p-panel-content-wrapper"">
-                    <div class=""p-panel-content"">
-                        {contentStr}
-                    </div>
-                </div>
-            </div>");
-        }
-    }
-}
-
-#endregion
-
-#region 2e. ScrollArea Primitives
-
-/// <summary>
-/// Enterprise ScrollArea TagHelper (Aura Design System compliant)
-/// </summary>
-[HtmlTargetElement("island-scrollarea", TagStructure = TagStructure.NormalOrSelfClosing)]
-[HtmlTargetElement("p-scrollarea", TagStructure = TagStructure.NormalOrSelfClosing)]
-public class IslandScrollAreaTagHelper : TagHelper
-{
-    [HtmlAttributeName("orientation")]
-    public string Orientation { get; set; } = "vertical"; // "vertical" | "horizontal" | "both"
-
-    [HtmlAttributeName("variant")]
-    public string Variant { get; set; } = "auto"; // "auto" | "hover" | "scroll" | "always" | "hidden"
-
-    [HtmlAttributeName("mask")]
-    public bool Mask { get; set; } = false;
-
-    [HtmlAttributeName("class")]
-    public string? Class { get; set; }
-
-    [HtmlAttributeName("style")]
-    public string? Style { get; set; }
-
-    [HtmlAttributeName("hydrate")]
-    public HydrateStrategy Hydrate { get; set; } = HydrateStrategy.Load;
-
-    public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
-    {
-        output.TagName = "div";
-        output.TagMode = TagMode.StartTagAndEndTag;
-        output.Attributes.SetAttribute("data-island", "scrollarea");
-        output.Attributes.SetAttribute("data-hydrate", Hydrate.ToString().ToLowerInvariant());
-        output.Attributes.SetAttribute("data-p-variant", Variant);
-
-        var props = new
-        {
-            orientation = Orientation,
-            variant = Variant,
-            mask = Mask
-        };
-        output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
-
-        var classes = new List<string> { "p-scrollarea", "p-component" };
-        if (Mask) classes.Add("p-scrollarea-mask");
-        if (!string.IsNullOrWhiteSpace(Class)) classes.Add(Class);
-        output.Attributes.SetAttribute("class", string.Join(" ", classes));
-
-        if (!string.IsNullOrWhiteSpace(Style))
-        {
-            output.Attributes.SetAttribute("style", Style);
-        }
-
-        var childContent = await output.GetChildContentAsync();
-        var contentStr = childContent.GetContent();
-
-        // If sub-tags were not used, wrap children automatically
-        if (!contentStr.Contains("p-scrollarea-viewport"))
-        {
-            var isBoth = string.Equals(Orientation, "both", StringComparison.OrdinalIgnoreCase);
-            var isHoriz = isBoth || string.Equals(Orientation, "horizontal", StringComparison.OrdinalIgnoreCase);
-            var isVert = isBoth || string.Equals(Orientation, "vertical", StringComparison.OrdinalIgnoreCase);
-
-            var vBar = isVert ? @"<div class=""p-scrollarea-scrollbar p-scrollarea-scrollbar-vertical"" role=""scrollbar"" aria-orientation=""vertical""><div class=""p-scrollarea-handle""></div></div>" : "";
-            var hBar = isHoriz ? @"<div class=""p-scrollarea-scrollbar p-scrollarea-scrollbar-horizontal"" role=""scrollbar"" aria-orientation=""horizontal""><div class=""p-scrollarea-handle""></div></div>" : "";
-            var corner = isBoth ? @"<div class=""p-scrollarea-corner""></div>" : "";
-
-            output.Content.SetHtmlContent($@"<div class=""p-scrollarea-viewport"" tabindex=""0"">
-                <div class=""p-scrollarea-content"">
-                    {contentStr}
-                </div>
-            </div>
-            {vBar}
-            {hBar}
-            {corner}");
-        }
-        else
-        {
-            output.Content.SetHtmlContent(contentStr);
-        }
-    }
-}
-
-[HtmlTargetElement("island-scrollarea-viewport", TagStructure = TagStructure.NormalOrSelfClosing)]
-[HtmlTargetElement("p-scrollarea-viewport", TagStructure = TagStructure.NormalOrSelfClosing)]
-public class IslandScrollAreaViewportTagHelper : TagHelper
-{
-    [HtmlAttributeName("class")]
-    public string? Class { get; set; }
-
-    public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
-    {
-        output.TagName = "div";
-        output.TagMode = TagMode.StartTagAndEndTag;
-        var baseClass = "p-scrollarea-viewport";
-        output.Attributes.SetAttribute("class", string.IsNullOrWhiteSpace(Class) ? baseClass : $"{baseClass} {Class}");
-        output.Attributes.SetAttribute("tabindex", "0");
-
-        var childContent = await output.GetChildContentAsync();
-        output.Content.SetHtmlContent(childContent);
-    }
-}
-
-[HtmlTargetElement("island-scrollarea-content", TagStructure = TagStructure.NormalOrSelfClosing)]
-[HtmlTargetElement("p-scrollarea-content", TagStructure = TagStructure.NormalOrSelfClosing)]
-public class IslandScrollAreaContentTagHelper : TagHelper
-{
-    [HtmlAttributeName("class")]
-    public string? Class { get; set; }
-
-    public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
-    {
-        output.TagName = "div";
-        output.TagMode = TagMode.StartTagAndEndTag;
-        var baseClass = "p-scrollarea-content";
-        output.Attributes.SetAttribute("class", string.IsNullOrWhiteSpace(Class) ? baseClass : $"{baseClass} {Class}");
-
-        var childContent = await output.GetChildContentAsync();
-        output.Content.SetHtmlContent(childContent);
-    }
-}
-
-[HtmlTargetElement("island-scrollarea-scrollbar", TagStructure = TagStructure.NormalOrSelfClosing)]
-[HtmlTargetElement("p-scrollarea-scrollbar", TagStructure = TagStructure.NormalOrSelfClosing)]
-public class IslandScrollAreaScrollbarTagHelper : TagHelper
-{
-    [HtmlAttributeName("orientation")]
-    public string Orientation { get; set; } = "vertical";
-
-    [HtmlAttributeName("class")]
-    public string? Class { get; set; }
-
-    public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
-    {
-        output.TagName = "div";
-        output.TagMode = TagMode.StartTagAndEndTag;
-        var isHoriz = string.Equals(Orientation, "horizontal", StringComparison.OrdinalIgnoreCase);
-        var orientClass = isHoriz ? "p-scrollarea-scrollbar-horizontal" : "p-scrollarea-scrollbar-vertical";
-        var baseClass = $"p-scrollarea-scrollbar {orientClass}";
-        output.Attributes.SetAttribute("class", string.IsNullOrWhiteSpace(Class) ? baseClass : $"{baseClass} {Class}");
-        output.Attributes.SetAttribute("role", "scrollbar");
-        output.Attributes.SetAttribute("aria-orientation", isHoriz ? "horizontal" : "vertical");
-
-        var childContent = await output.GetChildContentAsync();
-        var contentStr = childContent.GetContent();
-        if (string.IsNullOrWhiteSpace(contentStr))
-        {
-            output.Content.SetHtmlContent(@"<div class=""p-scrollarea-handle""></div>");
-        }
-        else
-        {
-            output.Content.SetHtmlContent(contentStr);
-        }
-    }
-}
-
-[HtmlTargetElement("island-scrollarea-handle", TagStructure = TagStructure.NormalOrSelfClosing)]
-[HtmlTargetElement("island-scrollarea-thumb", TagStructure = TagStructure.NormalOrSelfClosing)]
-[HtmlTargetElement("p-scrollarea-handle", TagStructure = TagStructure.NormalOrSelfClosing)]
-public class IslandScrollAreaHandleTagHelper : TagHelper
-{
-    [HtmlAttributeName("class")]
-    public string? Class { get; set; }
-
-    public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
-    {
-        output.TagName = "div";
-        output.TagMode = TagMode.StartTagAndEndTag;
-        var baseClass = "p-scrollarea-handle";
-        output.Attributes.SetAttribute("class", string.IsNullOrWhiteSpace(Class) ? baseClass : $"{baseClass} {Class}");
-
-        var childContent = await output.GetChildContentAsync();
-        output.Content.SetHtmlContent(childContent);
-    }
-}
-
-[HtmlTargetElement("island-scrollarea-corner", TagStructure = TagStructure.NormalOrSelfClosing)]
-[HtmlTargetElement("p-scrollarea-corner", TagStructure = TagStructure.NormalOrSelfClosing)]
-public class IslandScrollAreaCornerTagHelper : TagHelper
-{
-    public override void Process(TagHelperContext context, TagHelperOutput output)
-    {
-        output.TagName = "div";
-        output.TagMode = TagMode.StartTagAndEndTag;
-        output.Attributes.SetAttribute("class", "p-scrollarea-corner");
-    }
-}
-
-#endregion
-
-#region 2f. Splitter Primitives
-
-/// <summary>
-/// Enterprise Splitter TagHelper (Aura Design System compliant)
-/// </summary>
-[HtmlTargetElement("island-splitter", TagStructure = TagStructure.NormalOrSelfClosing)]
-[HtmlTargetElement("p-splitter", TagStructure = TagStructure.NormalOrSelfClosing)]
-public class IslandSplitterTagHelper : TagHelper
-{
-    [HtmlAttributeName("layout")]
-    public string Layout { get; set; } = "horizontal";
-
-    [HtmlAttributeName("sizes")]
-    public string? Sizes { get; set; }
-
-    [HtmlAttributeName("disabled")]
-    public bool Disabled { get; set; } = false;
-
-    [HtmlAttributeName("state-key")]
-    public string? StateKey { get; set; }
-
-    [HtmlAttributeName("class")]
-    public string? Class { get; set; }
-
-    [HtmlAttributeName("style")]
-    public string? Style { get; set; }
-
-    [HtmlAttributeName("hydrate")]
-    public HydrateStrategy Hydrate { get; set; } = HydrateStrategy.Load;
-
-    public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
-    {
-        output.TagName = "div";
-        output.TagMode = TagMode.StartTagAndEndTag;
-        output.Attributes.SetAttribute("data-island", "splitter");
-        output.Attributes.SetAttribute("data-hydrate", Hydrate.ToString().ToLowerInvariant());
-
-        var isVertical = string.Equals(Layout, "vertical", StringComparison.OrdinalIgnoreCase);
-        var orientClass = isVertical ? "p-splitter-vertical" : "p-splitter-horizontal";
-
-        var classes = new List<string> { "p-splitter", "p-component", orientClass };
-        if (!string.IsNullOrWhiteSpace(Class)) classes.Add(Class);
-        output.Attributes.SetAttribute("class", string.Join(" ", classes));
-
-        if (Disabled) output.Attributes.SetAttribute("data-disabled", "true");
-        if (!string.IsNullOrWhiteSpace(StateKey)) output.Attributes.SetAttribute("data-state-key", StateKey);
-        if (!string.IsNullOrWhiteSpace(Style)) output.Attributes.SetAttribute("style", Style);
-
-        double[]? parsedSizes = null;
-        if (!string.IsNullOrWhiteSpace(Sizes))
-        {
-            try
-            {
-                var clean = Sizes.Trim().TrimStart('[').TrimEnd(']');
-                parsedSizes = clean.Split(',', StringSplitOptions.RemoveEmptyEntries)
-                    .Select(s => double.Parse(s.Trim()))
-                    .ToArray();
-            }
-            catch {}
-        }
-
-        var props = new
-        {
-            layout = isVertical ? "vertical" : "horizontal",
-            sizes = parsedSizes,
-            disabled = Disabled,
-            stateKey = StateKey
-        };
-        output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
-
-        var childContent = await output.GetChildContentAsync();
-        output.Content.SetHtmlContent(childContent);
-    }
-}
-
-[HtmlTargetElement("island-splitter-panel", TagStructure = TagStructure.NormalOrSelfClosing)]
-[HtmlTargetElement("island-splitterpanel", TagStructure = TagStructure.NormalOrSelfClosing)]
-[HtmlTargetElement("p-splitterpanel", TagStructure = TagStructure.NormalOrSelfClosing)]
-[HtmlTargetElement("p-splitter-panel", TagStructure = TagStructure.NormalOrSelfClosing)]
-public class IslandSplitterPanelTagHelper : TagHelper
-{
-    [HtmlAttributeName("size")]
-    public double? Size { get; set; }
-
-    [HtmlAttributeName("min-size")]
-    public double? MinSize { get; set; }
-
-    [HtmlAttributeName("max-size")]
-    public double? MaxSize { get; set; }
-
-    [HtmlAttributeName("collapsible")]
-    public bool Collapsible { get; set; } = false;
-
-    [HtmlAttributeName("collapsed-size")]
-    public double? CollapsedSize { get; set; }
-
-    [HtmlAttributeName("class")]
-    public string? Class { get; set; }
-
-    [HtmlAttributeName("style")]
-    public string? Style { get; set; }
-
-    public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
-    {
-        output.TagName = "div";
-        output.TagMode = TagMode.StartTagAndEndTag;
-        var baseClass = "p-splitterpanel";
-        output.Attributes.SetAttribute("class", string.IsNullOrWhiteSpace(Class) ? baseClass : $"{baseClass} {Class}");
-
-        if (Size.HasValue) output.Attributes.SetAttribute("data-size", Size.Value.ToString());
-        if (MinSize.HasValue) output.Attributes.SetAttribute("data-min-size", MinSize.Value.ToString());
-        if (MaxSize.HasValue) output.Attributes.SetAttribute("data-max-size", MaxSize.Value.ToString());
-        if (Collapsible) output.Attributes.SetAttribute("data-collapsible", "true");
-        if (CollapsedSize.HasValue) output.Attributes.SetAttribute("data-collapsed-size", CollapsedSize.Value.ToString());
-        if (!string.IsNullOrWhiteSpace(Style)) output.Attributes.SetAttribute("style", Style);
-
-        var childContent = await output.GetChildContentAsync();
-        output.Content.SetHtmlContent(childContent);
-    }
-}
-
-#endregion
-
 #region 3. Button Primitive
 
 /// <summary>
@@ -1274,7 +624,6 @@ public class IslandButtonTagHelper : TagHelper
 
         var classes = new List<string> { "p-button", "p-component" };
 
-        // Severity
         if (sevLower != "primary")
         {
             classes.Add($"p-button-{sevLower}");
@@ -1284,13 +633,11 @@ public class IslandButtonTagHelper : TagHelper
             classes.Add("p-button-primary");
         }
 
-        // Variant
         var vLower = Variant?.ToLowerInvariant();
         if (Outlined || vLower == "outlined" || vLower == "outline") classes.Add("p-button-outlined");
         else if (Text || vLower == "text") classes.Add("p-button-text");
         else if (Link || vLower == "link") classes.Add("p-button-link");
 
-        // Modifiers
         if (Raised) classes.Add("p-button-raised");
         if (Rounded) classes.Add("p-button-rounded");
         if (Fluid) classes.Add("p-button-fluid");
@@ -1298,7 +645,6 @@ public class IslandButtonTagHelper : TagHelper
         if (Loading) classes.Add("p-button-loading");
         if (Disabled) classes.Add("p-disabled");
 
-        // Size
         if (szLower == "small" || szLower == "sm") classes.Add("p-button-sm");
         else if (szLower == "large" || szLower == "lg") classes.Add("p-button-lg");
 
@@ -1324,13 +670,13 @@ public class IslandButtonTagHelper : TagHelper
 
         var iconSize = (szLower == "small" || szLower == "sm") ? 14 : ((szLower == "large" || szLower == "lg") ? 18 : 16);
         var iconHtml = !string.IsNullOrWhiteSpace(Icon) ? LucideIcons.Get(Icon, iconSize) : "";
-        var loadingHtml = Loading ? $@"<span class=""p-button-loading-icon p-button-icon"">{LucideIcons.Get(LoadingIcon ?? "spinner", iconSize)}</span>" : "";
+        var loadingHtml = Loading ? $"<span class=\"p-button-loading-icon p-button-icon\">{LucideIcons.Get(LoadingIcon ?? "spinner", iconSize)}</span>" : "";
 
         var badgeHtml = "";
         if (!string.IsNullOrWhiteSpace(Badge))
         {
             var badgeSev = !string.IsNullOrWhiteSpace(BadgeSeverity) ? $"p-badge-{BadgeSeverity.ToLowerInvariant()}" : "";
-            badgeHtml = $@"<span class=""p-badge p-component {badgeSev}"">{Badge}</span>";
+            badgeHtml = $"<span class=\"p-badge p-component {badgeSev}\">{Badge}</span>";
         }
 
         if (IconOnly)
@@ -1375,8 +721,9 @@ public class IslandButtonGroupTagHelper : TagHelper
 
 #region 4. Dialog / Modal Compound Primitives
 
-[HtmlTargetElement("island-dialog")]
-public class IslandDialogTagHelper : TagHelper
+[HtmlTargetElement("island-compound-dialog")]
+[HtmlTargetElement("island-dialog-root")]
+public class IslandCompoundDialogTagHelper : TagHelper
 {
     public string Id { get; set; } = $"dialog-{Guid.NewGuid():N}";
 
@@ -1400,15 +747,24 @@ public class IslandDialogTagHelper : TagHelper
 [HtmlTargetElement("island-dialog-trigger")]
 public class IslandDialogTriggerTagHelper : TagHelper
 {
-    public string? AsChild { get; set; }
+    [HtmlAttributeName("as-child")]
+    public bool AsChild { get; set; } = false;
+
+    [HtmlAttributeName("class")]
+    public string? Class { get; set; }
 
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "div";
-        var dialogId = context.Items.TryGetValue("CurrentDialogId", out var dId) ? dId as string : "default-dialog";
+        var dialogId = context.Items["CurrentDialogId"]?.ToString();
+        output.Attributes.SetAttribute("data-dialog-trigger", dialogId ?? "");
 
-        output.Attributes.SetAttribute("class", "dialog-trigger inline-block cursor-pointer");
-        output.Attributes.SetAttribute("onclick", $"const c = document.getElementById('{dialogId}-content'); if (c) c.classList.remove('hidden');");
+        if (!AsChild)
+        {
+            output.TagName = "button";
+            output.Attributes.SetAttribute("type", "button");
+            var baseClass = "inline-flex items-center justify-center font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
+            output.Attributes.SetAttribute("class", string.IsNullOrWhiteSpace(Class) ? baseClass : $"{baseClass} {Class}");
+        }
 
         var childContent = await output.GetChildContentAsync();
         output.Content.SetHtmlContent(childContent);
@@ -1423,24 +779,26 @@ public class IslandDialogContentTagHelper : TagHelper
 
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
+        var dialogId = context.Items["CurrentDialogId"]?.ToString();
+
         output.TagName = "div";
-        var dialogId = context.Items.TryGetValue("CurrentDialogId", out var dId) ? dId as string : "default-dialog";
+        output.Attributes.SetAttribute("id", dialogId ?? "");
+        output.Attributes.SetAttribute("role", "dialog");
+        output.Attributes.SetAttribute("aria-modal", "true");
+        output.Attributes.SetAttribute("data-state", "closed");
 
-        var baseClass = "dialog-content-wrapper hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4";
-        output.Attributes.SetAttribute("class", baseClass);
-        output.Attributes.SetAttribute("id", $"{dialogId}-content");
-
-        var innerClass = "dialog-card relative w-full max-w-lg rounded-2xl border border-surface-200 dark:border-surface-800 bg-surface-0 dark:bg-surface-900 shadow-2xl p-6 transition-all duration-200";
-        var userClass = string.IsNullOrWhiteSpace(Class) ? innerClass : $"{innerClass} {Class}";
+        var baseClass = "laughtale-dialog-overlay fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center p-4 transition-all duration-200";
+        output.Attributes.SetAttribute("class", string.IsNullOrWhiteSpace(Class) ? baseClass : $"{baseClass} {Class}");
 
         var childContent = await output.GetChildContentAsync();
-        output.Content.SetHtmlContent($@"
-            <div class=""{userClass}"" onclick=""event.stopPropagation()"">
+
+        var innerContainer = $@"
+            <div class=""laughtale-dialog-panel relative w-full max-w-lg rounded-xl border border-surface-200 dark:border-surface-800 bg-surface-0 dark:bg-surface-900 p-6 shadow-xl transition-all duration-200 text-surface-900 dark:text-surface-100"">
                 {childContent.GetContent()}
             </div>
-        ");
+        ";
 
-        output.Attributes.SetAttribute("onclick", $"document.getElementById('{dialogId}-content').classList.add('hidden')");
+        output.Content.SetHtmlContent(innerContainer);
     }
 }
 
@@ -1470,7 +828,7 @@ public class IslandDialogTitleTagHelper : TagHelper
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
         output.TagName = "h2";
-        var baseClass = "text-lg font-bold leading-none tracking-tight text-surface-900 dark:text-surface-50";
+        var baseClass = "text-lg font-semibold leading-none tracking-tight text-surface-900 dark:text-surface-50";
         output.Attributes.SetAttribute("class", string.IsNullOrWhiteSpace(Class) ? baseClass : $"{baseClass} {Class}");
 
         var childContent = await output.GetChildContentAsync();
@@ -1498,16 +856,27 @@ public class IslandDialogFooterTagHelper : TagHelper
 [HtmlTargetElement("island-dialog-close")]
 public class IslandDialogCloseTagHelper : TagHelper
 {
+    [HtmlAttributeName("class")]
+    public string? Class { get; set; }
+
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = "div";
-        var dialogId = context.Items.TryGetValue("CurrentDialogId", out var dId) ? dId as string : "default-dialog";
+        output.TagName = "button";
+        output.Attributes.SetAttribute("type", "button");
+        output.Attributes.SetAttribute("data-dialog-close", "true");
 
-        output.Attributes.SetAttribute("class", "inline-block cursor-pointer");
-        output.Attributes.SetAttribute("onclick", $"const c = document.getElementById('{dialogId}-content'); if (c) c.classList.add('hidden');");
+        var baseClass = "absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none";
+        output.Attributes.SetAttribute("class", string.IsNullOrWhiteSpace(Class) ? baseClass : $"{baseClass} {Class}");
 
         var childContent = await output.GetChildContentAsync();
-        output.Content.SetHtmlContent(childContent);
+        if (childContent.IsEmptyOrWhiteSpace)
+        {
+            output.Content.SetHtmlContent(LucideIcons.Get("x", 16));
+        }
+        else
+        {
+            output.Content.SetHtmlContent(childContent);
+        }
     }
 }
 
@@ -1518,13 +887,20 @@ public class IslandDialogCloseTagHelper : TagHelper
 [HtmlTargetElement("island-accordion-root")]
 public class IslandAccordionRootTagHelper : TagHelper
 {
+    public string Type { get; set; } = "single";
+    public bool Collapsible { get; set; } = true;
+
     [HtmlAttributeName("class")]
     public string? Class { get; set; }
 
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
         output.TagName = "div";
-        var baseClass = "laughtale-compound-accordion w-full divide-y divide-surface-200 dark:divide-surface-800 border border-surface-200 dark:border-surface-800 rounded-xl overflow-hidden bg-surface-0 dark:bg-surface-900";
+        output.Attributes.SetAttribute("data-accordion-root", "true");
+        output.Attributes.SetAttribute("data-accordion-type", Type);
+        output.Attributes.SetAttribute("data-collapsible", Collapsible.ToString().ToLowerInvariant());
+
+        var baseClass = "w-full divide-y divide-surface-200 dark:divide-surface-800 rounded-xl border border-surface-200 dark:border-surface-800 bg-surface-0 dark:bg-surface-900";
         output.Attributes.SetAttribute("class", string.IsNullOrWhiteSpace(Class) ? baseClass : $"{baseClass} {Class}");
 
         var childContent = await output.GetChildContentAsync();
@@ -1535,7 +911,8 @@ public class IslandAccordionRootTagHelper : TagHelper
 [HtmlTargetElement("island-accordion-item")]
 public class IslandAccordionItemTagHelper : TagHelper
 {
-    public string Id { get; set; } = $"acc-item-{Guid.NewGuid():N}";
+    public string Value { get; set; } = Guid.NewGuid().ToString("N");
+    public bool Disabled { get; set; } = false;
 
     [HtmlAttributeName("class")]
     public string? Class { get; set; }
@@ -1543,11 +920,16 @@ public class IslandAccordionItemTagHelper : TagHelper
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
         output.TagName = "div";
-        context.Items["CurrentAccordionItemId"] = Id;
+        output.Attributes.SetAttribute("data-accordion-item", Value);
+        output.Attributes.SetAttribute("data-state", "closed");
 
-        var baseClass = "accordion-item";
+        if (Disabled)
+        {
+            output.Attributes.SetAttribute("data-disabled", "true");
+        }
+
+        var baseClass = "overflow-hidden";
         output.Attributes.SetAttribute("class", string.IsNullOrWhiteSpace(Class) ? baseClass : $"{baseClass} {Class}");
-        output.Attributes.SetAttribute("data-acc-id", Id);
 
         var childContent = await output.GetChildContentAsync();
         output.Content.SetHtmlContent(childContent);
@@ -1564,17 +946,20 @@ public class IslandAccordionTriggerTagHelper : TagHelper
     {
         output.TagName = "button";
         output.Attributes.SetAttribute("type", "button");
+        output.Attributes.SetAttribute("data-accordion-trigger", "true");
+        output.Attributes.SetAttribute("aria-expanded", "false");
 
-        var itemId = context.Items.TryGetValue("CurrentAccordionItemId", out var aId) ? aId as string : "default-item";
-        output.Attributes.SetAttribute("onclick", $"const c = document.getElementById('{itemId}-content'); const ch = this.querySelector('.acc-chevron'); if (c) c.classList.toggle('hidden'); if (ch) ch.classList.toggle('rotate-180');");
-
-        var baseClass = "flex flex-1 items-center justify-between py-4 px-6 font-semibold text-sm text-surface-900 dark:text-surface-100 hover:bg-surface-50 dark:hover:bg-surface-800/50 transition-all text-left w-full select-none";
+        var baseClass = "flex flex-1 items-center justify-between py-4 px-5 font-medium transition-all hover:bg-surface-50 dark:hover:bg-surface-800/50 [&[data-state=open]>svg]:rotate-180 w-full text-surface-900 dark:text-surface-100";
         output.Attributes.SetAttribute("class", string.IsNullOrWhiteSpace(Class) ? baseClass : $"{baseClass} {Class}");
 
         var childContent = await output.GetChildContentAsync();
-        var chevronSvg = $@"<span class=""acc-chevron flex transition-transform duration-200 text-surface-400"">{LucideIcons.Get("chevron-down", 16)}</span>";
 
-        output.Content.SetHtmlContent($"{childContent.GetContent()} {chevronSvg}");
+        var contentHtml = $@"
+            <span>{childContent.GetContent()}</span>
+            {LucideIcons.Get("chevron-down", 16)}
+        ";
+
+        output.Content.SetHtmlContent(contentHtml);
     }
 }
 
@@ -1587,10 +972,10 @@ public class IslandAccordionContentTagHelper : TagHelper
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
         output.TagName = "div";
-        var itemId = context.Items.TryGetValue("CurrentAccordionItemId", out var aId) ? aId as string : "default-item";
+        output.Attributes.SetAttribute("data-accordion-content", "true");
+        output.Attributes.SetAttribute("data-state", "closed");
 
-        output.Attributes.SetAttribute("id", $"{itemId}-content");
-        var baseClass = "hidden px-6 pb-4 pt-1 text-sm text-surface-600 dark:text-surface-400 bg-surface-50/50 dark:bg-surface-900/50";
+        var baseClass = "hidden px-5 pb-4 pt-0 text-sm text-surface-600 dark:text-surface-400 transition-all";
         output.Attributes.SetAttribute("class", string.IsNullOrWhiteSpace(Class) ? baseClass : $"{baseClass} {Class}");
 
         var childContent = await output.GetChildContentAsync();

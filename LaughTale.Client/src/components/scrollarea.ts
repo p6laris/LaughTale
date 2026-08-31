@@ -127,17 +127,17 @@ const SCROLLAREA_CSS = `
 html.dark .p-scrollarea-handle,
 [data-theme="dark"] .p-scrollarea-handle,
 .dark .p-scrollarea-handle {
-    background: var(--p-surface-600, #475569) !important;
+    background: var(--p-surface-600) !important;
 }
 html.dark .p-scrollarea-handle:hover,
 [data-theme="dark"] .p-scrollarea-handle:hover,
 .dark .p-scrollarea-handle:hover {
-    background: var(--p-surface-500, #64748b) !important;
+    background: var(--p-surface-500) !important;
 }
 html.dark .p-scrollarea-handle:active,
 [data-theme="dark"] .p-scrollarea-handle:active,
 .dark .p-scrollarea-handle:active {
-    background: var(--p-surface-400, #94a3b8) !important;
+    background: var(--p-surface-400) !important;
 }
 `;
 
@@ -151,6 +151,7 @@ export interface ScrollAreaProps {
 
 export default function ScrollAreaIsland(container: HTMLElement, props: ScrollAreaProps, ctx?: IslandContext) {
     injectIslandStyle('scrollarea', SCROLLAREA_CSS);
+    container.setAttribute('data-part', 'root');
 
     const rootEl = container.querySelector<HTMLElement>('.p-scrollarea') || container;
     const viewport = rootEl.querySelector<HTMLElement>('.p-scrollarea-viewport');
@@ -202,7 +203,7 @@ export default function ScrollAreaIsland(container: HTMLElement, props: ScrollAr
         scrollTimeout = setTimeout(() => {
             rootEl.classList.remove('p-scrollarea-scrolling');
         }, 1000);
-    });
+    }, { signal: ctx?.signal });
 
     // Handle dragging vertical scrollbar
     if (vBar && vHandle) {
@@ -216,14 +217,14 @@ export default function ScrollAreaIsland(container: HTMLElement, props: ScrollAr
             startScrollTop = viewport.scrollTop;
             vHandle.setPointerCapture(e.pointerId);
             document.body.style.userSelect = 'none';
-        });
+        }, { signal: ctx?.signal });
 
         vHandle.addEventListener('pointermove', (e) => {
             if (!isDragging) return;
             const deltaY = e.clientY - startY;
             const scrollRatio = (viewport.scrollHeight - viewport.clientHeight) / (viewport.clientHeight - vHandle.offsetHeight);
             viewport.scrollTop = startScrollTop + deltaY * scrollRatio;
-        });
+        }, { signal: ctx?.signal });
 
         const stopDrag = (e: PointerEvent) => {
             if (isDragging) {
@@ -233,8 +234,8 @@ export default function ScrollAreaIsland(container: HTMLElement, props: ScrollAr
             }
         };
 
-        vHandle.addEventListener('pointerup', stopDrag);
-        vHandle.addEventListener('pointercancel', stopDrag);
+        vHandle.addEventListener('pointerup', stopDrag, { signal: ctx?.signal });
+        vHandle.addEventListener('pointercancel', stopDrag, { signal: ctx?.signal });
     }
 
     // Handle dragging horizontal scrollbar
@@ -249,14 +250,14 @@ export default function ScrollAreaIsland(container: HTMLElement, props: ScrollAr
             startScrollLeft = viewport.scrollLeft;
             hHandle.setPointerCapture(e.pointerId);
             document.body.style.userSelect = 'none';
-        });
+        }, { signal: ctx?.signal });
 
         hHandle.addEventListener('pointermove', (e) => {
             if (!isDragging) return;
             const deltaX = e.clientX - startX;
             const scrollRatio = (viewport.scrollWidth - viewport.clientWidth) / (viewport.clientWidth - hHandle.offsetWidth);
             viewport.scrollLeft = startScrollLeft + deltaX * scrollRatio;
-        });
+        }, { signal: ctx?.signal });
 
         const stopDrag = (e: PointerEvent) => {
             if (isDragging) {
@@ -266,8 +267,8 @@ export default function ScrollAreaIsland(container: HTMLElement, props: ScrollAr
             }
         };
 
-        hHandle.addEventListener('pointerup', stopDrag);
-        hHandle.addEventListener('pointercancel', stopDrag);
+        hHandle.addEventListener('pointerup', stopDrag, { signal: ctx?.signal });
+        hHandle.addEventListener('pointercancel', stopDrag, { signal: ctx?.signal });
     }
 
     // Handle interactive variant selector buttons in demo
@@ -291,7 +292,7 @@ export default function ScrollAreaIsland(container: HTMLElement, props: ScrollAr
                 e.preventDefault();
                 const selectedVariant = btn.getAttribute('data-scrollarea-variant') || 'auto';
                 applyVariant(selectedVariant, btn);
-            });
+            }, { signal: ctx?.signal });
         });
     }
 
@@ -304,7 +305,7 @@ export default function ScrollAreaIsland(container: HTMLElement, props: ScrollAr
             const selectedVariant = btn.getAttribute('data-scrollarea-variant') || 'auto';
             applyVariant(selectedVariant, btn);
         }
-    });
+    }, { signal: ctx?.signal });
 
     // Observe size changes
     const resizeObserver = new ResizeObserver(() => {

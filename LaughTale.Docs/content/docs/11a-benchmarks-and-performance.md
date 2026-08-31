@@ -63,7 +63,7 @@ LaughTale enforces a strict **DOM Teardown Contract**:
 You can use the client `measureHydration` and `measureThroughput` APIs directly in your code:
 
 ```typescript
-import { measureHydration, measureThroughput } from '@softmax/laughtale-client';
+import { measureHydration, measureThroughput } from 'laughtale';
 
 // Measure hydration duration
 await measureHydration('my-custom-grid', async () => {

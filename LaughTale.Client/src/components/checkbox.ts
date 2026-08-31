@@ -168,18 +168,18 @@ const CSS = `
 html.dark .laughtale-checkbox-box,
 [data-theme="dark"] .laughtale-checkbox-box,
 .dark .laughtale-checkbox-box {
-    background: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
+    background: var(--p-surface-0);
+    border-color: var(--p-border-color);
 }
 html.dark .laughtale-checkbox-wrap.variant-filled .laughtale-checkbox-box,
 [data-theme="dark"] .laughtale-checkbox-wrap.variant-filled .laughtale-checkbox-box,
 .dark .laughtale-checkbox-wrap.variant-filled .laughtale-checkbox-box {
-    background: var(--p-surface-100, #1e293b);
+    background: var(--p-surface-100);
 }
 html.dark .laughtale-checkbox-wrap:hover:not(.disabled) .laughtale-checkbox-box,
 [data-theme="dark"] .laughtale-checkbox-wrap:hover:not(.disabled) .laughtale-checkbox-box,
 .dark .laughtale-checkbox-wrap:hover:not(.disabled) .laughtale-checkbox-box {
-    border-color: var(--p-primary-400, #34d399);
+    border-color: var(--p-primary-400);
 }
 html.dark .laughtale-checkbox-wrap.checked .laughtale-checkbox-box,
 html.dark .laughtale-checkbox-wrap.indeterminate .laughtale-checkbox-box,
@@ -187,9 +187,9 @@ html.dark .laughtale-checkbox-wrap.indeterminate .laughtale-checkbox-box,
 [data-theme="dark"] .laughtale-checkbox-wrap.indeterminate .laughtale-checkbox-box,
 .dark .laughtale-checkbox-wrap.checked .laughtale-checkbox-box,
 .dark .laughtale-checkbox-wrap.indeterminate .laughtale-checkbox-box {
-    background: var(--p-primary-500, #10b981);
-    border-color: var(--p-primary-500, #10b981);
-    color: #ffffff;
+    background: var(--p-primary-500);
+    border-color: var(--p-primary-500);
+    color: var(--p-surface-0);
 }
 html.dark .laughtale-checkbox-wrap:hover:not(.disabled).checked .laughtale-checkbox-box,
 html.dark .laughtale-checkbox-wrap:hover:not(.disabled).indeterminate .laughtale-checkbox-box,
@@ -197,18 +197,18 @@ html.dark .laughtale-checkbox-wrap:hover:not(.disabled).indeterminate .laughtale
 [data-theme="dark"] .laughtale-checkbox-wrap:hover:not(.disabled).indeterminate .laughtale-checkbox-box,
 .dark .laughtale-checkbox-wrap:hover:not(.disabled).checked .laughtale-checkbox-box,
 .dark .laughtale-checkbox-wrap:hover:not(.disabled).indeterminate .laughtale-checkbox-box {
-    background: var(--p-primary-400, #34d399);
-    border-color: var(--p-primary-400, #34d399);
+    background: var(--p-primary-400);
+    border-color: var(--p-primary-400);
 }
 html.dark .laughtale-checkbox-wrap:focus-within:not(.disabled) .laughtale-checkbox-box,
 [data-theme="dark"] .laughtale-checkbox-wrap:focus-within:not(.disabled) .laughtale-checkbox-box,
 .dark .laughtale-checkbox-wrap:focus-within:not(.disabled) .laughtale-checkbox-box {
-    box-shadow: 0 0 0 1px var(--p-surface-0, #090d16), 0 0 0 3px var(--p-primary-500);
+    box-shadow: 0 0 0 1px var(--p-surface-0), 0 0 0 3px var(--p-primary-500);
 }
 html.dark .laughtale-checkbox-label,
 [data-theme="dark"] .laughtale-checkbox-label,
 .dark .laughtale-checkbox-label {
-    color: var(--p-text-color, #f8fafc);
+    color: var(--p-text-color);
 }
 `;
 
@@ -226,7 +226,7 @@ export default function CheckboxIsland(container: HTMLElement, props: CheckboxPr
         const iconSvg = isIndeterminate ? LucideIcons.minus : LucideIcons.check;
 
         container.innerHTML = `
-            <label class="laughtale-checkbox-wrap size-${size} variant-${variant} ${stateClass} ${props.disabled ? 'disabled' : ''} ${props.invalid ? 'invalid' : ''}" 
+            <label class="laughtale-checkbox-wrap size-${size} variant-${variant} ${stateClass} ${props.disabled ? 'disabled' : ''} ${props.invalid ? 'invalid' : ''}" data-part="root" 
                    for="${inputId}">
                 <input type="checkbox" 
                        id="${inputId}" 
@@ -258,14 +258,14 @@ export default function CheckboxIsland(container: HTMLElement, props: CheckboxPr
             isIndeterminate = false;
             render();
             dispatchChangeEvent();
-        });
+        }, { signal: ctx?.signal });
 
         box?.addEventListener('keydown', (e) => {
             if (e.key === ' ') {
                 e.preventDefault();
                 input.click();
             }
-        });
+        }, { signal: ctx?.signal });
     }
 
     function dispatchChangeEvent() {

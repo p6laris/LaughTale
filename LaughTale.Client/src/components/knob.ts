@@ -25,12 +25,12 @@ const CSS = `
 html.dark .knob-value-display,
 [data-theme="dark"] .knob-value-display,
 .dark .knob-value-display {
-    color: var(--p-text-color, #f8fafc) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .laughtale-knob circle:first-child,
 [data-theme="dark"] .laughtale-knob circle:first-child,
 .dark .laughtale-knob circle:first-child {
-    stroke: var(--p-border-color, #334155) !important;
+    stroke: var(--p-border-color) !important;
 }
 `;
 
@@ -56,7 +56,7 @@ export default function KnobIsland(container: HTMLElement, props: KnobProps, ctx
     const initialText = template.replace('{value}', currentValue.toString());
 
     container.innerHTML = `
-        <div class="laughtale-knob" style="position: relative; display: inline-flex; align-items: center; justify-content: center; width: ${size}px; height: ${size}px; user-select: none; cursor: ${props.disabled ? 'not-allowed' : 'pointer'}; touch-action: none;">
+        <div class="laughtale-knob" data-part="root" style="position: relative; display: inline-flex; align-items: center; justify-content: center; width: ${size}px; height: ${size}px; user-select: none; cursor: ${props.disabled ? 'not-allowed' : 'pointer'}; touch-action: none;">
             <svg width="${size}" height="${size}" style="transform: rotate(-90deg); pointer-events: none;">
                 <!-- Background Circle -->
                 <circle cx="${size / 2}" cy="${size / 2}" r="${radius}" fill="transparent" stroke="var(--lt-surface-200)" stroke-width="${strokeWidth}" />
@@ -137,15 +137,15 @@ export default function KnobIsland(container: HTMLElement, props: KnobProps, ctx
         };
 
         // Pointer Events (Mouse, Touch, Pen)
-        knobEl.addEventListener('pointerdown', onPointerDown as EventListener);
-        knobEl.addEventListener('pointermove', onPointerMove as EventListener);
-        knobEl.addEventListener('pointerup', onPointerUp as EventListener);
-        knobEl.addEventListener('pointercancel', onPointerUp as EventListener);
+        knobEl.addEventListener('pointerdown', onPointerDown as EventListener, { signal: ctx?.signal });
+        knobEl.addEventListener('pointermove', onPointerMove as EventListener, { signal: ctx?.signal });
+        knobEl.addEventListener('pointerup', onPointerUp as EventListener, { signal: ctx?.signal });
+        knobEl.addEventListener('pointercancel', onPointerUp as EventListener, { signal: ctx?.signal });
 
         // Mouse fallback
-        knobEl.addEventListener('mousedown', onPointerDown as EventListener);
-        window.addEventListener('mousemove', onPointerMove as EventListener);
-        window.addEventListener('mouseup', onPointerUp as EventListener);
+        knobEl.addEventListener('mousedown', onPointerDown as EventListener, { signal: ctx?.signal });
+        window.addEventListener('mousemove', onPointerMove as EventListener, { signal: ctx?.signal });
+        window.addEventListener('mouseup', onPointerUp as EventListener, { signal: ctx?.signal });
     }
 
     syncValue();

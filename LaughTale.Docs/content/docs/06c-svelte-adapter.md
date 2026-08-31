@@ -50,7 +50,7 @@ In Svelte 5, components are mounted using the `mount` and `unmount` functions:
 ```typescript
 import { mount, unmount } from 'svelte';
 import ClusterGaugeComponent from './ClusterGauge.svelte';
-import { IslandContext } from '@softmax/laughtale-client';
+import { IslandContext } from 'laughtale';
 
 export interface GaugeProps {
     gaugeTitle: string;
@@ -84,7 +84,7 @@ export default function ClusterGaugeIsland(
 ```svelte
 <script lang="ts">
     import { onMount, onDestroy } from 'svelte';
-    import { emitIslandEvent, onIslandEvent } from '@softmax/laughtale-client';
+    import { emitIslandEvent, onIslandEvent } from 'laughtale';
 
     let { gaugeTitle = 'Cluster Node', initialLoad = 40 } = $props();
 

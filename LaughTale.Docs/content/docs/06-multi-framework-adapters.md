@@ -74,7 +74,7 @@ You can run **React 19**, **Vue 3**, **Svelte 5**, **Preact**, and **Vanilla Typ
 All islands communicate over a lightweight pub/sub bus:
 
 ```typescript
-import { emitIslandEvent, onIslandEvent } from '@softmax/laughtale-client';
+import { emitIslandEvent, onIslandEvent } from 'laughtale';
 
 // In your React Island:
 function handleSale(amount: number) {

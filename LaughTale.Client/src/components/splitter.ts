@@ -105,15 +105,15 @@ const SPLITTER_CSS = `
 html.dark .p-splitter,
 [data-theme="dark"] .p-splitter,
 .dark .p-splitter {
-    background: var(--p-surface-0, #090d16) !important;
-    border-color: var(--p-border-color, #334155) !important;
-    color: var(--p-text-color, #f8fafc) !important;
+    background: var(--p-surface-0) !important;
+    border-color: var(--p-border-color) !important;
+    color: var(--p-text-color) !important;
 }
 
 html.dark .p-splitter-gutter,
 [data-theme="dark"] .p-splitter-gutter,
 .dark .p-splitter-gutter {
-    background: var(--p-surface-100, #1e293b) !important;
+    background: var(--p-surface-100) !important;
 }
 
 html.dark .p-splitter-gutter:hover,
@@ -125,13 +125,13 @@ html.dark .p-splitter-gutter[data-resizing="true"],
 .dark .p-splitter-gutter:hover,
 .dark .p-splitter-gutter:focus-visible,
 .dark .p-splitter-gutter[data-resizing="true"] {
-    background: var(--p-surface-200, #334155) !important;
+    background: var(--p-surface-200) !important;
 }
 
 html.dark .p-splitter-gutter-handle,
 [data-theme="dark"] .p-splitter-gutter-handle,
 .dark .p-splitter-gutter-handle {
-    background: var(--p-surface-400, #64748b) !important;
+    background: var(--p-surface-400) !important;
 }
 
 html.dark .p-splitter-gutter:hover > .p-splitter-gutter-handle,
@@ -140,7 +140,7 @@ html.dark .p-splitter-gutter[data-resizing="true"] > .p-splitter-gutter-handle,
 [data-theme="dark"] .p-splitter-gutter[data-resizing="true"] > .p-splitter-gutter-handle,
 .dark .p-splitter-gutter:hover > .p-splitter-gutter-handle,
 .dark .p-splitter-gutter[data-resizing="true"] > .p-splitter-gutter-handle {
-    background: var(--p-text-muted, #94a3b8) !important;
+    background: var(--p-text-muted) !important;
 }
 `;
 
@@ -219,7 +219,7 @@ export default function SplitterIsland(container: HTMLElement, props: SplitterPr
     const gutters: HTMLElement[] = [];
     for (let i = 0; i < panels.length - 1; i++) {
         const gutter = document.createElement('div');
-        gutter.className = 'p-splitter-gutter';
+        gutter.className = 'p-splitter-gutter'; container.setAttribute('data-part', 'root');
         gutter.setAttribute('role', 'separator');
         gutter.setAttribute('tabindex', isDisabled ? '-1' : '0');
         gutter.setAttribute('aria-orientation', isHorizontal ? 'vertical' : 'horizontal');
@@ -386,10 +386,10 @@ export default function SplitterIsland(container: HTMLElement, props: SplitterPr
             applySizes(currentSizes, true, 'resizeend');
         }
 
-        gutter.addEventListener('pointerdown', onPointerDown);
-        gutter.addEventListener('pointermove', onPointerMove);
-        gutter.addEventListener('pointerup', onPointerUp);
-        gutter.addEventListener('pointercancel', onPointerUp);
+        gutter.addEventListener('pointerdown', onPointerDown, { signal: ctx?.signal });
+        gutter.addEventListener('pointermove', onPointerMove, { signal: ctx?.signal });
+        gutter.addEventListener('pointerup', onPointerUp, { signal: ctx?.signal });
+        gutter.addEventListener('pointercancel', onPointerUp, { signal: ctx?.signal });
 
         // Keyboard accessibility
         gutter.addEventListener('keydown', (e) => {
@@ -416,6 +416,6 @@ export default function SplitterIsland(container: HTMLElement, props: SplitterPr
                 applySizes(currentSizes, true, 'resize');
                 applySizes(currentSizes, true, 'resizeend');
             }
-        });
+        }, { signal: ctx?.signal });
     });
 }

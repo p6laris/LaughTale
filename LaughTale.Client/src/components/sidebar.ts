@@ -127,33 +127,33 @@ html.dark .p-sidebar-layout,
 .dark .p-sidebar,
 .dark .p-sidebar-panel,
 .dark .p-sidebar-layout {
-    background: var(--p-surface-0, #090d16) !important;
-    background-color: var(--p-surface-0, #090d16) !important;
-    color: var(--p-text-color, #f8fafc) !important;
-    border-color: var(--p-border-color, #1e293b) !important;
+    background: var(--p-surface-0) !important;
+    background-color: var(--p-surface-0) !important;
+    color: var(--p-text-color) !important;
+    border-color: var(--p-border-color) !important;
 }
 
 html.dark .p-sidebar-search-input,
 [data-theme="dark"] .p-sidebar-search-input,
 .dark .p-sidebar-search-input {
-    background: var(--p-surface-50, #0f172a) !important;
-    background-color: var(--p-surface-50, #0f172a) !important;
-    color: var(--p-text-color, #f8fafc) !important;
-    border-color: var(--p-border-color, #334155) !important;
+    background: var(--p-surface-50) !important;
+    background-color: var(--p-surface-50) !important;
+    color: var(--p-text-color) !important;
+    border-color: var(--p-border-color) !important;
 }
 
 html.dark .p-sidebar-menu-button:hover,
 [data-theme="dark"] .p-sidebar-menu-button:hover,
 .dark .p-sidebar-menu-button:hover {
-    background: var(--p-surface-100, #1e293b) !important;
-    color: #ffffff !important;
+    background: var(--p-surface-100) !important;
+    color: var(--p-surface-0) !important;
 }
 
 html.dark .p-sidebar-menu-button.p-sidebar-active,
 [data-theme="dark"] .p-sidebar-menu-button.p-sidebar-active,
 .dark .p-sidebar-menu-button.p-sidebar-active {
     background: var(--p-primary-950, rgba(16, 185, 129, 0.15)) !important;
-    color: var(--p-primary-400, #34d399) !important;
+    color: var(--p-primary-400) !important;
 }
 
 /* Overlay Mode */
@@ -355,7 +355,7 @@ html.dark .p-sidebar-menu-button.p-sidebar-active,
 
 .p-sidebar-menu-button.p-active {
     background: var(--p-primary-50, rgba(16, 185, 129, 0.08));
-    color: var(--p-primary-700, #047857);
+    color: var(--p-primary-700);
     font-weight: 600;
     border-color: transparent;
 }
@@ -376,7 +376,7 @@ html.dark .p-sidebar-menu-button.p-sidebar-active,
 }
 
 .p-sidebar-menu-button.p-active .p-sidebar-menu-button-icon {
-    color: var(--p-primary-600, #059669);
+    color: var(--p-primary-600);
 }
 
 .p-sidebar-item-label {
@@ -996,15 +996,15 @@ html.dark .p-sidebar-menu-button.p-sidebar-active,
 html.dark .p-sidebar-layout,
 [data-theme="dark"] .p-sidebar-layout,
 .dark .p-sidebar-layout {
-    background: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
+    background: var(--p-surface-0);
+    border-color: var(--p-border-color);
 }
 
 html.dark .p-sidebar-panel,
 [data-theme="dark"] .p-sidebar-panel,
 .dark .p-sidebar-panel {
-    background: var(--p-surface-0, #090d16);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-0);
+    color: var(--p-text-color);
 }
 
 html.dark .p-sidebar-header,
@@ -1013,81 +1013,81 @@ html.dark .p-sidebar-footer,
 [data-theme="dark"] .p-sidebar-footer,
 .dark .p-sidebar-header,
 .dark .p-sidebar-footer {
-    border-color: var(--p-border-color, #334155);
+    border-color: var(--p-border-color);
 }
 
 html.dark .p-sidebar-search-box,
 [data-theme="dark"] .p-sidebar-search-box,
 .dark .p-sidebar-search-box {
-    background: var(--p-surface-50, #0f172a);
-    border-color: var(--p-border-color, #334155);
+    background: var(--p-surface-50);
+    border-color: var(--p-border-color);
 }
 
 html.dark .p-sidebar-menu-button,
 [data-theme="dark"] .p-sidebar-menu-button,
 .dark .p-sidebar-menu-button {
-    color: var(--p-text-color, #f8fafc);
+    color: var(--p-text-color);
 }
 
 html.dark .p-sidebar-menu-button:hover,
 [data-theme="dark"] .p-sidebar-menu-button:hover,
 .dark .p-sidebar-menu-button:hover {
-    background: var(--p-surface-100, #1e293b);
-    color: #ffffff;
+    background: var(--p-surface-100);
+    color: var(--p-surface-0);
 }
 
 html.dark .p-sidebar-menu-button.p-active,
 [data-theme="dark"] .p-sidebar-menu-button.p-active,
 .dark .p-sidebar-menu-button.p-active {
     background: rgba(16, 185, 129, 0.15) !important;
-    color: var(--p-primary-400, #34d399) !important;
+    color: var(--p-primary-400) !important;
     border-color: transparent !important;
 }
 
 html.dark .p-sidebar-menu-badge,
 [data-theme="dark"] .p-sidebar-menu-badge,
 .dark .p-sidebar-menu-badge {
-    background: var(--p-surface-100, #1e293b);
-    color: var(--p-text-muted, #94a3b8);
+    background: var(--p-surface-100);
+    color: var(--p-text-muted);
 }
 
 html.dark .p-sidebar-menu-sub,
 [data-theme="dark"] .p-sidebar-menu-sub,
 .dark .p-sidebar-menu-sub {
-    border-color: var(--p-border-color, #334155);
+    border-color: var(--p-border-color);
 }
 
 html.dark .p-sidebar-menu-sub-button,
 [data-theme="dark"] .p-sidebar-menu-sub-button,
 .dark .p-sidebar-menu-sub-button {
-    color: var(--p-text-muted, #94a3b8);
+    color: var(--p-text-muted);
 }
 
 html.dark .p-sidebar-menu-sub-button:hover,
 [data-theme="dark"] .p-sidebar-menu-sub-button:hover,
 .dark .p-sidebar-menu-sub-button:hover {
-    background: var(--p-surface-100, #1e293b);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-100);
+    color: var(--p-text-color);
 }
 
 html.dark .p-sidebar-menu-sub-button.p-active,
 [data-theme="dark"] .p-sidebar-menu-sub-button.p-active,
 .dark .p-sidebar-menu-sub-button.p-active {
     background: rgba(16, 185, 129, 0.15);
-    color: var(--p-primary-400, #34d399);
+    color: var(--p-primary-400);
 }
 
 html.dark .p-sidebar-main,
 [data-theme="dark"] .p-sidebar-main,
 .dark .p-sidebar-main {
-    background: var(--p-surface-0, #090d16);
+    background: var(--p-surface-0);
 }
 
 html.dark .p-sidebar-main-header,
 [data-theme="dark"] .p-sidebar-main-header,
 .dark .p-sidebar-main-header {
-    background: var(--p-surface-50, #0f172a);
-    border-color: var(--p-border-color, #334155);
+    background: var(--p-surface-50);
+    border-color: var(--p-border-color);
 }
 `;
 
@@ -1186,16 +1186,16 @@ export default function SidebarIsland(container: HTMLElement, props: SidebarProp
             variant: 'sidebar',
             width: '16.5rem',
             open: !props.collapsed
-        });
+        }, ctx);
     } else {
-        renderCompoundSidebar(container, props);
+        renderCompoundSidebar(container, props, ctx);
     }
 }
 
 /**
  * Render LaughTale Aura Compound Sidebar Component
  */
-function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
+function renderCompoundSidebar(container: HTMLElement, props: SidebarProps, ctx?: IslandContext) {
     const demoType = props.demoType || (props as any).DemoType || 'variants';
     const isAppMode = demoType === 'app';
     const showControls = props.showControls !== false && demoType === 'variants';
@@ -1292,7 +1292,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                 let subTreeHtml = '';
                 if (hasSubs) {
                     const subListHtml = it.subItems!.map(sub => `
-                        <li class="p-sidebar-menu-sub-item">
+                        <li class="p-sidebar-menu-sub-item" data-part="root">
                             <button type="button" class="p-sidebar-menu-sub-button ${sub.isActive ? 'p-active' : ''}">
                                 <span>${sub.label}</span>
                             </button>
@@ -1734,7 +1734,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                 e.stopPropagation();
                 isOpen = !isOpen;
                 updateSidebarClasses();
-            });
+            }, { signal: ctx?.signal });
         });
 
         // Global Event Hook for App Shell Trigger Button
@@ -1745,7 +1745,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
             };
             document.removeEventListener('app-sidebar:toggle', (window as any).__appSidebarUnifiedHandler);
             (window as any).__appSidebarUnifiedHandler = onAppToggle;
-            document.addEventListener('app-sidebar:toggle', onAppToggle);
+            document.addEventListener('app-sidebar:toggle', onAppToggle, { signal: ctx?.signal });
 
             // Filter search input
             const searchInput = container.querySelector<HTMLInputElement>('.p-sidebar-search-input');
@@ -1757,7 +1757,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                         contentEl.innerHTML = renderGroupsHtml(groups);
                         wireSubmenuAndLinks();
                     }
-                });
+                }, { signal: ctx?.signal });
             }
         }
 
@@ -1766,7 +1766,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
             bd.addEventListener('click', () => {
                 isOpen = false;
                 updateSidebarClasses();
-            });
+            }, { signal: ctx?.signal });
         });
 
         // Click outside on main area closes overlay smoothly
@@ -1777,7 +1777,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                     isOpen = false;
                     updateSidebarClasses();
                 }
-            });
+            }, { signal: ctx?.signal });
         }
 
         wireSubmenuAndLinks();
@@ -1790,7 +1790,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                 showCompanyPopup = !showCompanyPopup;
                 showUserPopup = false;
                 render();
-            });
+            }, { signal: ctx?.signal });
         }
 
         container.querySelectorAll('[data-select-company]').forEach(item => {
@@ -1803,7 +1803,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                 }
                 showCompanyPopup = false;
                 render();
-            });
+            }, { signal: ctx?.signal });
         });
 
         // Interactive user profile popup
@@ -1814,7 +1814,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                 showUserPopup = !showUserPopup;
                 showCompanyPopup = false;
                 render();
-            });
+            }, { signal: ctx?.signal });
         }
 
         // Controls: Aura Select dropdown triggers
@@ -1824,7 +1824,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                 const key = trig.getAttribute('data-select-trigger') as any;
                 openSelectDropdown = openSelectDropdown === key ? null : key;
                 render();
-            });
+            }, { signal: ctx?.signal });
         });
 
         // Controls: Aura Select option selections
@@ -1839,7 +1839,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                 }
                 openSelectDropdown = null;
                 render();
-            });
+            }, { signal: ctx?.signal });
         });
 
         // Controls: Side segmented buttons
@@ -1848,7 +1848,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                 e.stopPropagation();
                 side = btn.getAttribute('data-sb-side') as any;
                 render();
-            });
+            }, { signal: ctx?.signal });
         });
 
         // Controls: ToggleSwitches with immediate visual feedback
@@ -1858,7 +1858,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                 e.stopPropagation();
                 overlay = !overlay;
                 render();
-            });
+            }, { signal: ctx?.signal });
         }
 
         const hoverToggle = container.querySelector('[data-sb-toggle="hover"]');
@@ -1867,7 +1867,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                 e.stopPropagation();
                 openOnHover = !openOnHover;
                 render();
-            });
+            }, { signal: ctx?.signal });
         }
 
         const backdropToggle = container.querySelector('[data-sb-toggle="backdrop"]');
@@ -1876,7 +1876,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                 e.stopPropagation();
                 backdrop = !backdrop;
                 render();
-            });
+            }, { signal: ctx?.signal });
         }
 
         // Open on hover logic with smooth delay
@@ -1888,13 +1888,13 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                         isOpen = true;
                         updateSidebarClasses();
                     }
-                });
+                }, { signal: ctx?.signal });
                 aside.addEventListener('mouseleave', () => {
                     if (isOpen) {
                         isOpen = false;
                         updateSidebarClasses();
                     }
-                });
+                }, { signal: ctx?.signal });
             }
         }
 
@@ -1907,7 +1907,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                 render();
             }
         };
-        document.addEventListener('click', onDocClick, { once: true });
+        document.addEventListener('click', onDocClick, { once: true, signal: ctx?.signal });
     }
 
     function wireSubmenuAndLinks() {
@@ -1929,7 +1929,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                         chevron.classList.toggle('p-expanded', expandedSubmenus[subKey]);
                     }
                 }
-            });
+            }, { signal: ctx?.signal });
         });
 
         // Smooth in-page anchor navigation and scroll retention
@@ -1963,7 +1963,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                         targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }
                 }
-            });
+            }, { signal: ctx?.signal });
         });
     }
 
@@ -2004,7 +2004,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
             try {
                 sessionStorage.setItem(storageKey, contentEl.scrollTop.toString());
             } catch {}
-        }, { passive: true });
+        }, { passive: true, signal: ctx?.signal });
     }
 
     function render() {

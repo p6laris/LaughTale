@@ -1,4 +1,4 @@
-﻿using System.Text.Encodings.Web;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
@@ -42,7 +42,8 @@ public static class IslandJson
             WriteIndented = false,
             MaxDepth = 32,
             ReferenceHandler = ReferenceHandler.IgnoreCycles,
-            TypeInfoResolver = resolver
+            TypeInfoResolver = resolver,
+            Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
         };
     }
 

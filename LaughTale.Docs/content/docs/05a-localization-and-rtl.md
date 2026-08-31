@@ -122,7 +122,7 @@ builder.Services.AddLaughTale(opt =>
 For client island developers, LaughTale provides a lightweight composable for formatting dates, numbers, and currencies according to the active locale:
 
 ```typescript
-import { useLocale } from '@softmax/laughtale-client';
+import { useLocale } from 'laughtale';
 
 export default function MyCustomIsland(container: HTMLElement, props: any, ctx: any) {
     const { t, formatDate, formatCurrency, isRtl } = useLocale(ctx);

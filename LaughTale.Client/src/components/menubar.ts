@@ -265,26 +265,26 @@ const MENUBAR_CSS = `
 html.dark .p-menubar,
 [data-theme="dark"] .p-menubar,
 .dark .p-menubar {
-    background: var(--p-surface-0, #090d16);
-    color: var(--p-text-color, #f8fafc);
-    border-color: var(--p-border-color, #334155);
+    background: var(--p-surface-0);
+    color: var(--p-text-color);
+    border-color: var(--p-border-color);
 }
 
 html.dark .p-menubar-button,
 .dark .p-menubar-button {
-    color: var(--p-text-muted, #94a3b8);
+    color: var(--p-text-muted);
 }
 
 html.dark .p-menubar-button:hover,
 .dark .p-menubar-button:hover {
-    background: var(--p-surface-100, #1e293b);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-100);
+    color: var(--p-text-color);
 }
 
 html.dark .p-menubar-item-link,
 [data-theme="dark"] .p-menubar-item-link,
 .dark .p-menubar-item-link {
-    color: var(--p-text-color, #f8fafc);
+    color: var(--p-text-color);
 }
 
 html.dark .p-menubar-item-link:hover,
@@ -293,36 +293,36 @@ html.dark .p-menubar-item.p-active > .p-menubar-item-content > .p-menubar-item-l
 [data-theme="dark"] .p-menubar-item.p-active > .p-menubar-item-content > .p-menubar-item-link,
 .dark .p-menubar-item-link:hover,
 .dark .p-menubar-item.p-active > .p-menubar-item-content > .p-menubar-item-link {
-    background: var(--p-surface-100, #1e293b);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-100);
+    color: var(--p-text-color);
 }
 
 html.dark .p-menubar-submenu,
 [data-theme="dark"] .p-menubar-submenu,
 .dark .p-menubar-submenu {
-    background: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
+    background: var(--p-surface-0);
+    border-color: var(--p-border-color);
 }
 
 html.dark .p-menubar-separator,
 [data-theme="dark"] .p-menubar-separator,
 .dark .p-menubar-separator {
-    background: var(--p-border-color, #334155);
+    background: var(--p-border-color);
 }
 
 html.dark .p-menubar-item-shortcut,
 [data-theme="dark"] .p-menubar-item-shortcut,
 .dark .p-menubar-item-shortcut {
-    background: var(--p-surface-100, #1e293b);
-    border-color: var(--p-border-color, #334155);
-    color: var(--p-text-muted, #94a3b8);
+    background: var(--p-surface-100);
+    border-color: var(--p-border-color);
+    color: var(--p-text-muted);
 }
 
 html.dark .p-menubar-item-badge,
 [data-theme="dark"] .p-menubar-item-badge,
 .dark .p-menubar-item-badge {
-    background: var(--p-surface-100, #1e293b);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-100);
+    color: var(--p-text-color);
 }
 `;
 
@@ -388,7 +388,7 @@ export default function MenubarIsland(container: HTMLElement, props: MenubarProp
 
     function renderItem(item: MenubarItem, path: string, isRoot: boolean): string {
         if (item.separator) {
-            return `<li class="p-menubar-separator" role="separator"></li>`;
+            return `<li class="p-menubar-separator" data-part="root" role="separator"></li>`;
         }
 
         const hasSubmenu = Array.isArray(item.items) && item.items.length > 0;
@@ -477,7 +477,7 @@ export default function MenubarIsland(container: HTMLElement, props: MenubarProp
                 e.stopPropagation();
                 isMobileMenuOpen = !isMobileMenuOpen;
                 rootList.classList.toggle('p-mobile-open', isMobileMenuOpen);
-            });
+            }, { signal: ctx?.signal });
         }
 
         // Hover & click cascade logic
@@ -508,7 +508,7 @@ export default function MenubarIsland(container: HTMLElement, props: MenubarProp
                         }
                     }
                 }
-            });
+            }, { signal: ctx?.signal });
 
             li.addEventListener('mouseleave', () => {
                 if (window.innerWidth > 960) {
@@ -516,7 +516,7 @@ export default function MenubarIsland(container: HTMLElement, props: MenubarProp
                         li.classList.remove('p-active');
                     }
                 }
-            });
+            }, { signal: ctx?.signal });
 
             // Click action & mobile toggle
             link.addEventListener('click', (e) => {
@@ -548,7 +548,7 @@ export default function MenubarIsland(container: HTMLElement, props: MenubarProp
                 }
 
                 closeAllSubmenus();
-            });
+            }, { signal: ctx?.signal });
         });
 
         // Click outside closes submenus
@@ -560,14 +560,14 @@ export default function MenubarIsland(container: HTMLElement, props: MenubarProp
                     rootList.classList.remove('p-mobile-open');
                 }
             }
-        });
+        }, { signal: ctx?.signal });
 
         // Keyboard navigation
         menubarEl.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 closeAllSubmenus();
             }
-        });
+        }, { signal: ctx?.signal });
     }
 
     function closeAllSubmenus() {

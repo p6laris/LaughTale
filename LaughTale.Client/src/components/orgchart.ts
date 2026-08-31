@@ -216,27 +216,27 @@ const ORGCHART_CSS = `
 html.dark .p-organizationchart,
 [data-theme="dark"] .p-organizationchart,
 .dark .p-organizationchart {
-    color: var(--p-text-color, #f8fafc) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-organizationchart-node,
 [data-theme="dark"] .p-organizationchart-node,
 .dark .p-organizationchart-node {
-    background: var(--p-surface-0, #090d16) !important;
-    border-color: var(--p-border-color, #334155) !important;
-    color: var(--p-text-color, #f8fafc) !important;
+    background: var(--p-surface-0) !important;
+    border-color: var(--p-border-color) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-organizationchart-node.p-organizationchart-selectable:hover:not(.p-highlight),
 [data-theme="dark"] .p-organizationchart-node.p-organizationchart-selectable:hover:not(.p-highlight),
 .dark .p-organizationchart-node.p-organizationchart-selectable:hover:not(.p-highlight) {
-    background: var(--p-surface-100, #1e293b) !important;
-    border-color: var(--p-border-color, #334155) !important;
+    background: var(--p-surface-100) !important;
+    border-color: var(--p-border-color) !important;
 }
 html.dark .p-organizationchart-node.p-highlight,
 [data-theme="dark"] .p-organizationchart-node.p-highlight,
 .dark .p-organizationchart-node.p-highlight {
     background: rgba(16, 185, 129, 0.15) !important;
-    border-color: var(--p-primary-500, #10b981) !important;
-    color: var(--p-primary-400, #34d399) !important;
+    border-color: var(--p-primary-500) !important;
+    color: var(--p-primary-400) !important;
 }
 html.dark .p-organizationchart-line-down,
 html.dark .p-organizationchart-line-left,
@@ -247,25 +247,25 @@ html.dark .p-organizationchart-line-top,
 .dark .p-organizationchart-line-down,
 .dark .p-organizationchart-line-left,
 .dark .p-organizationchart-line-top {
-    background-color: var(--p-border-color, #334155) !important;
-    border-color: var(--p-border-color, #334155) !important;
+    background-color: var(--p-border-color) !important;
+    border-color: var(--p-border-color) !important;
 }
 html.dark .p-organizationchart-node-toggle-button,
 [data-theme="dark"] .p-organizationchart-node-toggle-button,
 .dark .p-organizationchart-node-toggle-button {
-    background: var(--p-surface-100, #1e293b) !important;
-    border-color: var(--p-border-color, #334155) !important;
-    color: var(--p-text-muted, #94a3b8) !important;
+    background: var(--p-surface-100) !important;
+    border-color: var(--p-border-color) !important;
+    color: var(--p-text-muted) !important;
 }
 html.dark .p-orgchart-label,
 [data-theme="dark"] .p-orgchart-label,
 .dark .p-orgchart-label {
-    color: var(--p-text-color, #f8fafc) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-orgchart-desc,
 [data-theme="dark"] .p-orgchart-desc,
 .dark .p-orgchart-desc {
-    color: var(--p-text-muted, #94a3b8) !important;
+    color: var(--p-text-muted) !important;
 }
 `;
 
@@ -285,7 +285,7 @@ const ICONS = {
     bolt: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>'
 };
 
-export default function OrgChartIsland<T = any>(container: HTMLElement, props: OrgChartProps<T>) {
+export default function OrgChartIsland<T = any>(container: HTMLElement, props: OrgChartProps<T>, ctx?: IslandContext) {
     injectIslandStyle('orgchart', ORGCHART_CSS);
 
     const rootNode: OrgChartNode<T> = props.value || props.root || {
@@ -361,7 +361,7 @@ export default function OrgChartIsland<T = any>(container: HTMLElement, props: O
 
     function renderNodeCardContent(node: OrgChartNode<T>, isSelected: boolean, isIndet: boolean): string {
         const checkboxHtml = selectionMode === 'checkbox' ? `
-            <div class="p-checkbox-box ${isSelected ? 'p-checked' : (isIndet ? 'p-indeterminate' : '')}" role="checkbox" aria-checked="${isSelected}">
+            <div class="p-checkbox-box ${isSelected ? 'p-checked' : (isIndet ? 'p-indeterminate' : '')}" data-part="root" role="checkbox" aria-checked="${isSelected}">
                 ${isSelected ? ICONS.check : (isIndet ? '<span style="width: 8px; height: 2px; background: white; border-radius: 1px;"></span>' : '')}
             </div>
         ` : '';
@@ -665,7 +665,7 @@ export default function OrgChartIsland<T = any>(container: HTMLElement, props: O
                 e.stopPropagation();
                 const key = btn.getAttribute('data-toggle-key');
                 if (key) toggleNodeCollapse(key);
-            });
+            }, { signal: ctx?.signal });
         });
 
         // 2. Node Selection Clicks
@@ -674,7 +674,7 @@ export default function OrgChartIsland<T = any>(container: HTMLElement, props: O
                 nodeEl.addEventListener('click', () => {
                     const key = nodeEl.getAttribute('data-node-key');
                     if (key) handleNodeClick(key);
-                });
+                }, { signal: ctx?.signal });
             });
         }
 
@@ -688,7 +688,7 @@ export default function OrgChartIsland<T = any>(container: HTMLElement, props: O
                     e.preventDefault();
                     handleNodeClick(key);
                 }
-            });
+            }, { signal: ctx?.signal });
         });
     }
 
@@ -705,7 +705,7 @@ export default function OrgChartIsland<T = any>(container: HTMLElement, props: O
                     collapsedKeys.add(String(rootNode.key));
                     renderTree();
                 }
-            });
+            }, { signal: ctx?.signal });
         });
     }
 

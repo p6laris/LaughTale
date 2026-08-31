@@ -64,17 +64,17 @@ const POPOVER_CSS = `
 html.dark .p-popover,
 [data-theme="dark"] .p-popover,
 .dark .p-popover {
-    background: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-0);
+    border-color: var(--p-border-color);
+    color: var(--p-text-color);
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
 }
 
 html.dark .p-popover-arrow,
 [data-theme="dark"] .p-popover-arrow,
 .dark .p-popover-arrow {
-    background: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
+    background: var(--p-surface-0);
+    border-color: var(--p-border-color);
 }
 `;
 
@@ -140,7 +140,7 @@ function positionPopover(popoverEl: HTMLElement, targetEl: HTMLElement, preferre
     }
 }
 
-function initGlobalPopoverDelegation() {
+function initGlobalPopoverDelegation(signal?: AbortSignal) {
     if (globalPopoverDelegationBound || typeof document === 'undefined') return;
     globalPopoverDelegationBound = true;
 
@@ -195,7 +195,7 @@ function initGlobalPopoverDelegation() {
                 p.classList.remove('p-popover-active');
             });
         }
-    });
+    }, { signal });
 
     // Escape Key Handler
     window.addEventListener('keydown', (e) => {
@@ -204,17 +204,18 @@ function initGlobalPopoverDelegation() {
                 p.classList.remove('p-popover-active');
             });
         }
-    });
+    }, { signal });
 
     // Reposition on window resize or scroll
     window.addEventListener('scroll', () => {
         document.querySelectorAll<HTMLElement>('.p-popover.p-popover-active').forEach(p => {
             // Can reposition or close on scroll
         });
-    }, { passive: true });
+    }, { passive: true, signal });
 }
 
 export default function PopoverIsland(container: HTMLElement, props: PopoverProps, ctx?: IslandContext) {
     injectIslandStyle('popover', POPOVER_CSS);
-    initGlobalPopoverDelegation();
+    container.setAttribute('data-part', 'root');
+    initGlobalPopoverDelegation(ctx?.signal);
 }

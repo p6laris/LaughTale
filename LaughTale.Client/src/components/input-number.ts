@@ -267,28 +267,28 @@ html.dark .p-inputnumber,
 [data-theme="dark"] .p-inputnumber,
 .dark .laughtale-inputnumber,
 .dark .p-inputnumber {
-    background: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
+    background: var(--p-surface-0);
+    border-color: var(--p-border-color);
 }
 html.dark .p-inputnumber:hover:not(.is-disabled),
 [data-theme="dark"] .p-inputnumber:hover:not(.is-disabled),
 .dark .p-inputnumber:hover:not(.is-disabled) {
-    border-color: var(--p-surface-400, #64748b);
+    border-color: var(--p-surface-400);
 }
 html.dark .p-inputnumber.variant-filled,
 [data-theme="dark"] .p-inputnumber.variant-filled,
 .dark .p-inputnumber.variant-filled {
-    background: var(--p-surface-100, #1e293b);
+    background: var(--p-surface-100);
 }
 html.dark .p-inputnumber.variant-filled:focus-within,
 [data-theme="dark"] .p-inputnumber.variant-filled:focus-within,
 .dark .p-inputnumber.variant-filled:focus-within {
-    background: var(--p-surface-0, #090d16);
+    background: var(--p-surface-0);
 }
 html.dark .p-inputnumber-input,
 [data-theme="dark"] .p-inputnumber-input,
 .dark .p-inputnumber-input {
-    color: var(--p-text-color, #f8fafc);
+    color: var(--p-text-color);
 }
 html.dark .p-inputnumber-button-group,
 html.dark .p-inputnumber-button,
@@ -296,9 +296,9 @@ html.dark .p-inputnumber-button,
 [data-theme="dark"] .p-inputnumber-button,
 .dark .p-inputnumber-button-group,
 .dark .p-inputnumber-button {
-    background: var(--p-surface-100, #1e293b);
-    color: var(--p-text-muted, #94a3b8);
-    border-color: var(--p-border-color, #334155);
+    background: var(--p-surface-100);
+    color: var(--p-text-muted);
+    border-color: var(--p-border-color);
 }
 html.dark .p-inputnumber:focus-within .p-inputnumber-button-group,
 html.dark .p-inputnumber:focus-within .p-inputnumber-button-up,
@@ -314,13 +314,13 @@ html.dark .p-inputnumber:focus-within .p-inputnumber-button-down,
 html.dark .p-inputnumber-button:hover:not(:disabled),
 [data-theme="dark"] .p-inputnumber-button:hover:not(:disabled),
 .dark .p-inputnumber-button:hover:not(:disabled) {
-    background: var(--p-surface-200, #334155);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-200);
+    color: var(--p-text-color);
 }
 html.dark .p-inputnumber-button:active:not(:disabled),
 [data-theme="dark"] .p-inputnumber-button:active:not(:disabled),
 .dark .p-inputnumber-button:active:not(:disabled) {
-    background: var(--p-surface-300, #475569);
+    background: var(--p-surface-300);
 }
 `;
 
@@ -429,7 +429,7 @@ export default function InputNumberIsland(container: HTMLElement, props: InputNu
 
     function render() {
         container.innerHTML = '';
-        container.className = 'laughtale-inputnumber p-inputnumber';
+        container.className = 'laughtale-inputnumber p-inputnumber'; container.setAttribute('data-part', 'root');
 
         if (isFluid) container.classList.add('p-inputnumber-fluid');
         if (isFilled) container.classList.add('variant-filled');
@@ -453,7 +453,7 @@ export default function InputNumberIsland(container: HTMLElement, props: InputNu
 
         if (showButtons && buttonLayout === 'horizontal') {
             html += `
-                <button type="button" class="p-inputnumber-button p-inputnumber-button-down" tabindex="-1" ${disabledAttr} aria-label="Decrement">
+                <button type="button" class="p-inputnumber-button p-inputnumber-button-down" data-part="root" tabindex="-1" ${disabledAttr} aria-label="Decrement">
                     ${minusIcon}
                 </button>
             `;
@@ -531,14 +531,14 @@ export default function InputNumberIsland(container: HTMLElement, props: InputNu
             const parsed = parseRaw(inputEl.value);
             setValue(parsed);
             inputEl.value = formatNumber(rawValue);
-        });
+        }, { signal: ctx?.signal });
 
         // Live input change
         inputEl.addEventListener('input', () => {
             const parsed = parseRaw(inputEl.value);
             rawValue = parsed;
             syncTargetInput();
-        });
+        }, { signal: ctx?.signal });
 
         // Keyboard navigation
         inputEl.addEventListener('keydown', (e) => {
@@ -563,35 +563,35 @@ export default function InputNumberIsland(container: HTMLElement, props: InputNu
                 setValue(parsed);
                 inputEl.value = formatNumber(rawValue);
             }
-        });
+        }, { signal: ctx?.signal });
 
         // Step Buttons (Prevent focus event from highlighting text)
         upBtn?.addEventListener('mousedown', (e) => {
             e.preventDefault(); // Prevents loss of focus or unwanted text selection
-        });
+        }, { signal: ctx?.signal });
         upBtn?.addEventListener('click', (e) => {
             e.preventDefault();
             stepUp();
-        });
+        }, { signal: ctx?.signal });
 
         downBtn?.addEventListener('mousedown', (e) => {
             e.preventDefault(); // Prevents loss of focus or unwanted text selection
-        });
+        }, { signal: ctx?.signal });
         downBtn?.addEventListener('click', (e) => {
             e.preventDefault();
             stepDown();
-        });
+        }, { signal: ctx?.signal });
 
         // Clear button
         clearBtn?.addEventListener('mousedown', (e) => {
             e.preventDefault();
-        });
+        }, { signal: ctx?.signal });
         clearBtn?.addEventListener('click', (e) => {
             e.preventDefault();
             setValue(null);
             inputEl.value = '';
             inputEl.focus();
-        });
+        }, { signal: ctx?.signal });
     }
 
     function stepUp() {

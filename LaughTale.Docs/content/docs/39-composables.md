@@ -1,4 +1,4 @@
----
+﻿---
 title: Client-Side Composables & Hooks
 description: Master LaughTale client composables — useVirtualizer, useFocusTrap, useEventListener, useTheme, useLocalStorage, and useDebounce.
 order: 50
@@ -18,7 +18,7 @@ LaughTale includes a modular suite of lightweight TypeScript composables that yo
 Efficiently renders only visible DOM rows within a scrollable viewport:
 
 ```typescript
-import { useVirtualizer } from '@softmax/laughtale-client';
+import { useVirtualizer } from 'laughtale';
 
 const virtualizer = useVirtualizer({
     count: 100000,
@@ -37,7 +37,7 @@ virtualizer.getVirtualItems().forEach(item => {
 Traps keyboard tab navigation inside dialogs and drawers for WCAG 2.1 compliance:
 
 ```typescript
-import { useFocusTrap } from '@softmax/laughtale-client';
+import { useFocusTrap } from 'laughtale';
 
 const trap = useFocusTrap(modalElement);
 trap.activate();
@@ -52,7 +52,7 @@ trap.deactivate();
 Programmatically inspect and toggle Dark/Light mode:
 
 ```typescript
-import { useTheme } from '@softmax/laughtale-client';
+import { useTheme } from 'laughtale';
 
 const { isDark, toggleTheme, setPrimaryColor } = useTheme();
 
@@ -66,7 +66,7 @@ toggleTheme();
 Safe event attachments and value debouncing:
 
 ```typescript
-import { useEventListener, useDebounce } from '@softmax/laughtale-client';
+import { useEventListener, useDebounce } from 'laughtale';
 
 useEventListener(window, 'resize', () => recalculate(), { signal: ctx.signal });
 const debouncedSearch = useDebounce((query) => executeSearch(query), 300);

@@ -338,12 +338,12 @@ html.dark .p-message-info,
 .dark .p-message-info {
     background: rgba(37, 99, 235, 0.15);
     border-color: rgba(59, 130, 246, 0.3);
-    color: #93c5fd;
+    color: var(--p-info-300);
 }
 html.dark .p-message-info .p-message-icon,
 [data-theme="dark"] .p-message-info .p-message-icon,
 .dark .p-message-info .p-message-icon {
-    color: #93c5fd;
+    color: var(--p-info-300);
 }
 
 html.dark .p-message-success,
@@ -351,12 +351,12 @@ html.dark .p-message-success,
 .dark .p-message-success {
     background: rgba(16, 185, 129, 0.15);
     border-color: rgba(16, 185, 129, 0.3);
-    color: #6ee7b7;
+    color: var(--p-primary-300);
 }
 html.dark .p-message-success .p-message-icon,
 [data-theme="dark"] .p-message-success .p-message-icon,
 .dark .p-message-success .p-message-icon {
-    color: #6ee7b7;
+    color: var(--p-primary-300);
 }
 
 html.dark .p-message-warn,
@@ -364,12 +364,12 @@ html.dark .p-message-warn,
 .dark .p-message-warn {
     background: rgba(245, 158, 11, 0.15);
     border-color: rgba(245, 158, 11, 0.3);
-    color: #fcd34d;
+    color: var(--p-warn-300);
 }
 html.dark .p-message-warn .p-message-icon,
 [data-theme="dark"] .p-message-warn .p-message-icon,
 .dark .p-message-warn .p-message-icon {
-    color: #fcd34d;
+    color: var(--p-warn-300);
 }
 
 html.dark .p-message-error,
@@ -377,12 +377,12 @@ html.dark .p-message-error,
 .dark .p-message-error {
     background: rgba(239, 68, 68, 0.15);
     border-color: rgba(239, 68, 68, 0.3);
-    color: #fca5a5;
+    color: var(--p-danger-300);
 }
 html.dark .p-message-error .p-message-icon,
 [data-theme="dark"] .p-message-error .p-message-icon,
 .dark .p-message-error .p-message-icon {
-    color: #fca5a5;
+    color: var(--p-danger-300);
 }
 
 html.dark .p-message-secondary,
@@ -390,38 +390,38 @@ html.dark .p-message-secondary,
 .dark .p-message-secondary {
     background: rgba(100, 116, 139, 0.15);
     border-color: rgba(148, 163, 184, 0.25);
-    color: var(--p-text-muted, #94a3b8);
+    color: var(--p-text-muted);
 }
 html.dark .p-message-secondary .p-message-icon,
 [data-theme="dark"] .p-message-secondary .p-message-icon,
 .dark .p-message-secondary .p-message-icon {
-    color: var(--p-text-muted, #94a3b8);
+    color: var(--p-text-muted);
 }
 
 html.dark .p-message-contrast,
 [data-theme="dark"] .p-message-contrast,
 .dark .p-message-contrast {
-    background: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-0);
+    border-color: var(--p-border-color);
+    color: var(--p-text-color);
 }
 html.dark .p-message-contrast .p-message-icon,
 [data-theme="dark"] .p-message-contrast .p-message-icon,
 .dark .p-message-contrast .p-message-icon {
-    color: var(--p-text-color, #f8fafc);
+    color: var(--p-text-color);
 }
 
 html.dark .p-message-outlined.p-message-contrast,
 [data-theme="dark"] .p-message-outlined.p-message-contrast,
 .dark .p-message-outlined.p-message-contrast {
-    border-color: var(--p-border-color, #334155);
-    color: var(--p-text-color, #f8fafc);
+    border-color: var(--p-border-color);
+    color: var(--p-text-color);
 }
 
 html.dark .p-message-simple.p-message-contrast,
 [data-theme="dark"] .p-message-simple.p-message-contrast,
 .dark .p-message-simple.p-message-contrast {
-    color: var(--p-text-color, #f8fafc);
+    color: var(--p-text-color);
 }
 
 html.dark .p-message-close-button:hover,
@@ -460,7 +460,7 @@ export default function MessageIsland(container: HTMLElement, props: MessageProp
 
     function getDefaultIcon(severity: string, spin?: boolean): string {
         if (spin) {
-            return `<span class="p-message-spin">${LucideIcons.loader2 || '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>'}</span>`;
+            return `<span class="p-message-spin" data-part="root">${LucideIcons.loader2 || '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>'}</span>`;
         }
 
         switch (severity) {
@@ -566,7 +566,7 @@ export default function MessageIsland(container: HTMLElement, props: MessageProp
                         listContainer.innerHTML = dynamicMessages.map(msg => renderSingleMessage(msg as any)).join('');
                         wireMessageClosers(listContainer, false);
                     }
-                });
+                }, { signal: ctx?.signal });
             }
 
             if (clearBtn) {
@@ -584,7 +584,7 @@ export default function MessageIsland(container: HTMLElement, props: MessageProp
                             listContainer.innerHTML = '';
                         }, 280);
                     }
-                });
+                }, { signal: ctx?.signal });
             }
 
             if (listContainer) {
@@ -638,14 +638,14 @@ export default function MessageIsland(container: HTMLElement, props: MessageProp
                 closeBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     dismissMessage();
-                });
+                }, { signal: ctx?.signal });
 
                 closeBtn.addEventListener('keydown', (e: KeyboardEvent) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
                         dismissMessage();
                     }
-                });
+                }, { signal: ctx?.signal });
             }
 
             if (lifeStr) {

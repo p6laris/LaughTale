@@ -171,47 +171,47 @@ const CSS = `
 html.dark .p-selectbutton-item,
 [data-theme="dark"] .p-selectbutton-item,
 .dark .p-selectbutton-item {
-    background: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-0);
+    border-color: var(--p-border-color);
+    color: var(--p-text-color);
 }
 html.dark .p-selectbutton-item:hover:not(.p-disabled):not(.is-selected),
 [data-theme="dark"] .p-selectbutton-item:hover:not(.p-disabled):not(.is-selected),
 .dark .p-selectbutton-item:hover:not(.p-disabled):not(.is-selected) {
-    background: var(--p-surface-100, #1e293b);
-    border-color: var(--p-surface-400, #64748b);
+    background: var(--p-surface-100);
+    border-color: var(--p-surface-400);
 }
 html.dark .p-selectbutton-item.is-selected,
 [data-theme="dark"] .p-selectbutton-item.is-selected,
 .dark .p-selectbutton-item.is-selected {
     background: rgba(16, 185, 129, 0.16);
-    border-color: var(--p-primary-500, #10b981);
-    color: var(--p-primary-300, #6ee7b7);
+    border-color: var(--p-primary-500);
+    color: var(--p-primary-300);
 }
 html.dark .p-selectbutton-item.is-selected:hover:not(.p-disabled),
 [data-theme="dark"] .p-selectbutton-item.is-selected:hover:not(.p-disabled),
 .dark .p-selectbutton-item.is-selected:hover:not(.p-disabled) {
     background: rgba(16, 185, 129, 0.24);
-    color: var(--p-primary-200, #a7f3d0);
+    color: var(--p-primary-200);
 }
 html.dark .p-selectbutton-item.p-disabled,
 [data-theme="dark"] .p-selectbutton-item.p-disabled,
 .dark .p-selectbutton-item.p-disabled {
-    background: var(--p-surface-100, #1e293b);
-    border-color: var(--p-border-color, #334155);
-    color: var(--p-text-muted, #94a3b8);
+    background: var(--p-surface-100);
+    border-color: var(--p-border-color);
+    color: var(--p-text-muted);
 }
 html.dark .p-selectbutton-badge,
 [data-theme="dark"] .p-selectbutton-badge,
 .dark .p-selectbutton-badge {
-    background: var(--p-surface-100, #1e293b);
-    color: var(--p-text-muted, #94a3b8);
+    background: var(--p-surface-100);
+    color: var(--p-text-muted);
 }
 html.dark .p-selectbutton-item.is-selected .p-selectbutton-badge,
 [data-theme="dark"] .p-selectbutton-item.is-selected .p-selectbutton-badge,
 .dark .p-selectbutton-item.is-selected .p-selectbutton-badge {
     background: rgba(16, 185, 129, 0.25);
-    color: var(--p-primary-200, #a7f3d0);
+    color: var(--p-primary-200);
 }
 `;
 
@@ -278,7 +278,7 @@ export default function SelectButtonIsland(container: HTMLElement, props: Select
 
             const flagHtml = opt.flag ? `<span style="font-size: 1.125rem; line-height: 1;">${opt.flag}</span>` : '';
             const iconHtml = opt.icon ? `<span style="display: flex;">${getLucideIcon(opt.icon, 16)}</span>` : '';
-            const badgeHtml = opt.badge !== undefined ? `<span class="p-selectbutton-badge">${opt.badge}</span>` : '';
+            const badgeHtml = opt.badge !== undefined ? `<span class="p-selectbutton-badge" data-part="root">${opt.badge}</span>` : '';
 
             return `
                 <button 

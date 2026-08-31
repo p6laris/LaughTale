@@ -151,28 +151,28 @@ html.dark .p-slider-vertical,
 [data-theme="dark"] .p-slider-vertical,
 .dark .p-slider-horizontal,
 .dark .p-slider-vertical {
-    background: var(--p-surface-200, #334155);
+    background: var(--p-surface-200);
 }
 html.dark .p-slider-range,
 [data-theme="dark"] .p-slider-range,
 .dark .p-slider-range {
-    background: var(--p-primary-500, #10b981);
+    background: var(--p-primary-500);
 }
 html.dark .p-slider-handle,
 [data-theme="dark"] .p-slider-handle,
 .dark .p-slider-handle {
-    background: var(--p-surface-0, #090d16);
-    border-color: var(--p-primary-500, #10b981);
+    background: var(--p-surface-0);
+    border-color: var(--p-primary-500);
 }
 html.dark .p-slider-handle:hover:not(.is-disabled),
 [data-theme="dark"] .p-slider-handle:hover:not(.is-disabled),
 .dark .p-slider-handle:hover:not(.is-disabled) {
-    border-color: var(--p-primary-400, #34d399);
+    border-color: var(--p-primary-400);
 }
 html.dark .p-slider-handle:focus-visible:not(.is-disabled),
 [data-theme="dark"] .p-slider-handle:focus-visible:not(.is-disabled),
 .dark .p-slider-handle:focus-visible:not(.is-disabled) {
-    border-color: var(--p-primary-400, #34d399);
+    border-color: var(--p-primary-400);
     box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.2);
 }
 html.dark .p-slider-handle.is-dragging,
@@ -183,8 +183,8 @@ html.dark .p-slider-handle.is-dragging,
 html.dark .p-slider-handle.is-disabled,
 [data-theme="dark"] .p-slider-handle.is-disabled,
 .dark .p-slider-handle.is-disabled {
-    background: var(--p-surface-100, #1e293b);
-    border-color: var(--p-border-color, #334155);
+    background: var(--p-surface-100);
+    border-color: var(--p-border-color);
 }
 `;
 
@@ -267,7 +267,7 @@ export default function SliderIsland(container: HTMLElement, props: SliderProps,
                 : `left: ${p2}%;`;
 
             container.innerHTML = `
-                <span class="p-slider-range" style="${rangeStyle}"></span>
+                <span class="p-slider-range" data-part="root" style="${rangeStyle}"></span>
                 <span 
                     class="p-slider-handle ${disabledMin || isDisabled ? 'is-disabled' : ''}" 
                     data-handle="0" 

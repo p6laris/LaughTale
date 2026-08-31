@@ -46,7 +46,7 @@ public class WarehouseModel : PageModel
 
 ```typescript
 import { createApp, ref, computed, onMounted, onUnmounted } from 'vue';
-import { IslandContext, emitIslandEvent, onIslandEvent } from '@softmax/laughtale-client';
+import { IslandContext, emitIslandEvent, onIslandEvent } from 'laughtale';
 
 export interface WarehouseProps {
     warehouseName: string;

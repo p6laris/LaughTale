@@ -200,7 +200,7 @@ const CSS = `
 html.dark .p-rating-item,
 [data-theme="dark"] .p-rating-item,
 .dark .p-rating-item {
-    color: var(--p-surface-400, #64748b);
+    color: var(--p-surface-400);
 }
 html.dark .p-rating-item.p-rating-item-active,
 html.dark .p-rating-half-overlay,
@@ -208,27 +208,27 @@ html.dark .p-rating-half-overlay,
 [data-theme="dark"] .p-rating-half-overlay,
 .dark .p-rating-item.p-rating-item-active,
 .dark .p-rating-half-overlay {
-    color: var(--p-primary-400, #34d399);
+    color: var(--p-primary-400);
 }
 html.dark .p-rating-cancel-item,
 [data-theme="dark"] .p-rating-cancel-item,
 .dark .p-rating-cancel-item {
-    color: var(--p-text-muted, #94a3b8);
+    color: var(--p-text-muted);
 }
 html.dark .p-rating-cancel-item:hover,
 [data-theme="dark"] .p-rating-cancel-item:hover,
 .dark .p-rating-cancel-item:hover {
-    color: var(--p-red-400, #f87171);
+    color: var(--p-red-400);
 }
 html.dark .p-rating-text-item,
 [data-theme="dark"] .p-rating-text-item,
 .dark .p-rating-text-item {
-    color: var(--p-surface-400, #64748b);
+    color: var(--p-surface-400);
 }
 html.dark .p-rating-text-item.p-rating-item-active,
 [data-theme="dark"] .p-rating-text-item.p-rating-item-active,
 .dark .p-rating-text-item.p-rating-item-active {
-    color: var(--p-primary-400, #34d399);
+    color: var(--p-primary-400);
 }
 `;
 
@@ -289,7 +289,7 @@ export default function RatingIsland(container: HTMLElement, props: RatingProps,
         let cancelBtnHtml = '';
         if (isCancelAllowed && !isReadonly && !isDisabled) {
             cancelBtnHtml = `
-                <button type="button" class="p-rating-cancel-item" aria-label="Clear rating" tabindex="0">
+                <button type="button" class="p-rating-cancel-item" data-part="root" aria-label="Clear rating" tabindex="0">
                     ${cancelSvg}
                 </button>
             `;
@@ -380,14 +380,14 @@ export default function RatingIsland(container: HTMLElement, props: RatingProps,
                 e.stopPropagation();
                 setRating(0);
                 updateVisuals(0);
-            });
+            }, { signal: ctx?.signal });
             cancelBtn.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
                     setRating(0);
                     updateVisuals(0);
                 }
-            });
+            }, { signal: ctx?.signal });
         }
 
         const items = container.querySelectorAll<HTMLElement>('.p-rating-item');
@@ -404,7 +404,7 @@ export default function RatingIsland(container: HTMLElement, props: RatingProps,
                     hoverValue = starVal;
                 }
                 updateVisuals(hoverValue);
-            });
+            }, { signal: ctx?.signal });
 
             item.addEventListener('click', (e) => {
                 let targetVal = starVal;
@@ -419,7 +419,7 @@ export default function RatingIsland(container: HTMLElement, props: RatingProps,
                 const finalVal = (current === targetVal && isCancelAllowed) ? 0 : targetVal;
                 setRating(finalVal);
                 updateVisuals(finalVal);
-            });
+            }, { signal: ctx?.signal });
 
             // ARIA Keyboard navigation
             item.addEventListener('keydown', (e) => {
@@ -447,14 +447,14 @@ export default function RatingIsland(container: HTMLElement, props: RatingProps,
                     setRating(0);
                     updateVisuals(0);
                 }
-            });
+            }, { signal: ctx?.signal });
         });
 
         // Mouse leave resets to current value
         container.addEventListener('mouseleave', () => {
             hoverValue = null;
             updateVisuals(getRating());
-        });
+        }, { signal: ctx?.signal });
     }
 
     function focusStar(starNum: number) {

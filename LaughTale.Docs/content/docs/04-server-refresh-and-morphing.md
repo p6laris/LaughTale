@@ -1,4 +1,4 @@
----
+﻿---
 title: Server-Driven Refresh & DOM Morphing
 description: Dynamically update and re-render server islands on demand with Idiomorph DOM morphing that preserves focus, cursor positions, and client state.
 order: 5
@@ -49,7 +49,7 @@ app.MapLaughTaleIslandRefresh();
 You can invoke an island refresh using the client JavaScript runtime:
 
 ```typescript
-import { refreshIsland } from '@softmax/laughtale-client';
+import { refreshIsland } from 'laughtale';
 
 // Re-render the 'sales-stats' island with new parameters
 await refreshIsland('sales-stats', {

@@ -25,14 +25,14 @@ const CSS = `
 html.dark .avatar-circle,
 [data-theme="dark"] .avatar-circle,
 .dark .avatar-circle {
-    border-color: var(--p-surface-0, #090d16) !important;
+    border-color: var(--p-surface-0) !important;
 }
 html.dark .avatar-overflow,
 [data-theme="dark"] .avatar-overflow,
 .dark .avatar-overflow {
-    border-color: var(--p-surface-0, #090d16) !important;
-    background: var(--p-surface-100, #1e293b) !important;
-    color: var(--p-text-color, #f8fafc) !important;
+    border-color: var(--p-surface-0) !important;
+    background: var(--p-surface-100) !important;
+    color: var(--p-text-color) !important;
 }
 `;
 
@@ -48,7 +48,7 @@ export default function AvatarGroupIsland(container: HTMLElement, props: AvatarG
     const avatarElements = visible.map((av) => {
         const bg = av.bg || 'var(--lt-surface-800)';
         return `
-            <div class="avatar-circle" title="${av.name || av.label || ''}" style="width: ${sizePx}; height: ${sizePx}; border-radius: 50%; border: 2px solid var(--lt-surface-0, var(--lt-surface-0)); background: ${bg}; color: var(--lt-surface-0, var(--lt-surface-0)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: ${fontSize}; margin-left: -0.5rem; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.1); flex-shrink: 0;">
+            <div class="avatar-circle" data-part="root" title="${av.name || av.label || ''}" style="width: ${sizePx}; height: ${sizePx}; border-radius: 50%; border: 2px solid var(--lt-surface-0, var(--lt-surface-0)); background: ${bg}; color: var(--lt-surface-0, var(--lt-surface-0)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: ${fontSize}; margin-left: -0.5rem; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.1); flex-shrink: 0;">
                 ${av.image ? `<img src="${av.image}" alt="${av.name || ''}" style="width: 100%; height: 100%; object-fit: cover;" />` : (av.label || 'U')}
             </div>
         `;

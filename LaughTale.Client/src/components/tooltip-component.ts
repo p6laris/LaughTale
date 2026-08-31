@@ -1,9 +1,5 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
-﻿/**
- * LaughTale: Enterprise Tooltip Island Component (LaughTale Aura Design System)
- */
-
 import { initGlobalTooltipDelegation } from '../directives/tooltip';
 
 export interface TooltipProps {
@@ -21,6 +17,7 @@ export interface TooltipProps {
 }
 
 export default function TooltipIsland(container: HTMLElement, props: TooltipProps, ctx?: IslandContext) {
+    container.setAttribute('data-part', 'root');
     initGlobalTooltipDelegation();
 
     const targetSelector = props.target;

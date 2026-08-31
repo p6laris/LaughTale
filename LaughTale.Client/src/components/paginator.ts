@@ -197,9 +197,9 @@ const PAGINATOR_CSS = `
 html.dark .p-paginator,
 [data-theme="dark"] .p-paginator,
 .dark .p-paginator {
-    background: var(--p-surface-0, #090d16) !important;
-    border-color: var(--p-border-color, #334155) !important;
-    color: var(--p-text-color, #f8fafc) !important;
+    background: var(--p-surface-0) !important;
+    border-color: var(--p-border-color) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-paginator-page,
 html.dark .p-paginator-first,
@@ -219,7 +219,7 @@ html.dark .p-paginator-action-btn,
 .dark .p-paginator-next,
 .dark .p-paginator-last,
 .dark .p-paginator-action-btn {
-    color: var(--p-text-muted, #94a3b8) !important;
+    color: var(--p-text-muted) !important;
 }
 html.dark .p-paginator-page:hover:not(:disabled):not(.p-highlight),
 html.dark .p-paginator-first:hover:not(:disabled),
@@ -239,14 +239,14 @@ html.dark .p-paginator-action-btn:hover:not(:disabled),
 .dark .p-paginator-next:hover:not(:disabled),
 .dark .p-paginator-last:hover:not(:disabled),
 .dark .p-paginator-action-btn:hover:not(:disabled) {
-    background: var(--p-surface-100, #1e293b) !important;
-    color: var(--p-text-color, #f8fafc) !important;
+    background: var(--p-surface-100) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-paginator-page.p-highlight,
 [data-theme="dark"] .p-paginator-page.p-highlight,
 .dark .p-paginator-page.p-highlight {
     background: rgba(16, 185, 129, 0.16) !important;
-    color: var(--p-primary-300, #6ee7b7) !important;
+    color: var(--p-primary-300) !important;
 }
 html.dark .p-paginator-rpp-select,
 html.dark .p-paginator-jtp-select,
@@ -257,9 +257,9 @@ html.dark .p-paginator-jtp-input,
 .dark .p-paginator-rpp-select,
 .dark .p-paginator-jtp-select,
 .dark .p-paginator-jtp-input {
-    background-color: var(--p-surface-100, #1e293b) !important;
-    border-color: var(--p-border-color, #334155) !important;
-    color: var(--p-text-color, #f8fafc) !important;
+    background-color: var(--p-surface-100) !important;
+    border-color: var(--p-border-color) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-paginator-current,
 html.dark .p-paginator-jtp-container,
@@ -267,13 +267,13 @@ html.dark .p-paginator-jtp-container,
 [data-theme="dark"] .p-paginator-jtp-container,
 .dark .p-paginator-current,
 .dark .p-paginator-jtp-container {
-    color: var(--p-text-muted, #94a3b8) !important;
+    color: var(--p-text-muted) !important;
 }
 html.dark .p-paginator-image-card,
 [data-theme="dark"] .p-paginator-image-card,
 .dark .p-paginator-image-card {
-    background: var(--p-surface-100, #1e293b) !important;
-    border-color: var(--p-border-color, #334155) !important;
+    background: var(--p-surface-100) !important;
+    border-color: var(--p-border-color) !important;
 }
 `;
 
@@ -372,7 +372,7 @@ export default function PaginatorIsland(container: HTMLElement, props: Paginator
             const isSelected = p === currentPage;
             pageButtons.push(`
                 <button type="button" 
-                        class="p-paginator-page ${isSelected ? 'p-highlight' : ''}" 
+                        class="p-paginator-page ${isSelected ? 'p-highlight' : ''}" data-part="root" 
                         data-page="${p}" 
                         aria-label="Page ${p + 1}" 
                         aria-current="${isSelected ? 'page' : undefined}">
@@ -523,17 +523,17 @@ export default function PaginatorIsland(container: HTMLElement, props: Paginator
         if (!rootEl) return;
 
         // 1. First / Prev / Next / Last Nav
-        rootEl.querySelector('[data-action="first"]')?.addEventListener('click', () => setPage(0));
-        rootEl.querySelector('[data-action="prev"]')?.addEventListener('click', () => setPage(getCurrentPage() - 1));
-        rootEl.querySelector('[data-action="next"]')?.addEventListener('click', () => setPage(getCurrentPage() + 1));
-        rootEl.querySelector('[data-action="last"]')?.addEventListener('click', () => setPage(getTotalPages() - 1));
+        rootEl.querySelector('[data-action="first"]')?.addEventListener('click', () => setPage(0), { signal: ctx?.signal });
+        rootEl.querySelector('[data-action="prev"]')?.addEventListener('click', () => setPage(getCurrentPage() - 1), { signal: ctx?.signal });
+        rootEl.querySelector('[data-action="next"]')?.addEventListener('click', () => setPage(getCurrentPage() + 1), { signal: ctx?.signal });
+        rootEl.querySelector('[data-action="last"]')?.addEventListener('click', () => setPage(getTotalPages() - 1), { signal: ctx?.signal });
 
         // 2. Page Link Buttons
         rootEl.querySelectorAll<HTMLButtonElement>('.p-paginator-page').forEach(btn => {
             btn.addEventListener('click', () => {
                 const p = parseInt(btn.getAttribute('data-page') || '0', 10);
                 setPage(p);
-            });
+            }, { signal: ctx?.signal });
         });
 
         // 3. Rows Per Page Select
@@ -542,7 +542,7 @@ export default function PaginatorIsland(container: HTMLElement, props: Paginator
             rppSelect.addEventListener('change', (e) => {
                 const val = parseInt((e.target as HTMLSelectElement).value, 10);
                 if (!isNaN(val)) setRows(val);
-            });
+            }, { signal: ctx?.signal });
         }
 
         // 4. Jump To Page Select
@@ -551,7 +551,7 @@ export default function PaginatorIsland(container: HTMLElement, props: Paginator
             jtpSelect.addEventListener('change', (e) => {
                 const val = parseInt((e.target as HTMLSelectElement).value, 10);
                 if (!isNaN(val)) setPage(val);
-            });
+            }, { signal: ctx?.signal });
         }
 
         // 5. Jump To Page Input
@@ -560,7 +560,7 @@ export default function PaginatorIsland(container: HTMLElement, props: Paginator
             jtpInput.addEventListener('change', (e) => {
                 const val = parseInt((e.target as HTMLInputElement).value, 10);
                 if (!isNaN(val)) setPage(val - 1);
-            });
+            }, { signal: ctx?.signal });
         }
 
         // 6. Slider
@@ -569,7 +569,7 @@ export default function PaginatorIsland(container: HTMLElement, props: Paginator
             slider.addEventListener('input', (e) => {
                 const val = parseInt((e.target as HTMLInputElement).value, 10);
                 if (!isNaN(val)) setPage(val);
-            });
+            }, { signal: ctx?.signal });
         }
     }
 

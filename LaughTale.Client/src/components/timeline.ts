@@ -231,30 +231,30 @@ const TIMELINE_CSS = `
 html.dark .p-timeline,
 [data-theme="dark"] .p-timeline,
 .dark .p-timeline {
-    color: var(--p-text-color, #f8fafc) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-timeline-event-marker.p-marker-default,
 [data-theme="dark"] .p-timeline-event-marker.p-marker-default,
 .dark .p-timeline-event-marker.p-marker-default {
-    background: var(--p-surface-0, #090d16) !important;
-    border-color: var(--p-primary-500, #10b981) !important;
+    background: var(--p-surface-0) !important;
+    border-color: var(--p-primary-500) !important;
 }
 html.dark .p-timeline-event-connector,
 [data-theme="dark"] .p-timeline-event-connector,
 .dark .p-timeline-event-connector {
-    background-color: var(--p-border-color, #334155) !important;
+    background-color: var(--p-border-color) !important;
 }
 html.dark .p-timeline-card,
 [data-theme="dark"] .p-timeline-card,
 .dark .p-timeline-card {
-    background: var(--p-surface-0, #090d16) !important;
-    border-color: var(--p-border-color, #334155) !important;
-    color: var(--p-text-color, #f8fafc) !important;
+    background: var(--p-surface-0) !important;
+    border-color: var(--p-border-color) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-timeline-event-opposite,
 [data-theme="dark"] .p-timeline-event-opposite,
 .dark .p-timeline-event-opposite {
-    color: var(--p-text-muted, #94a3b8) !important;
+    color: var(--p-text-muted) !important;
 }
 
 /* Bi-Directional RTL Support */
@@ -389,7 +389,7 @@ export default function TimelineIsland(container: HTMLElement, props: TimelinePr
             }
 
             return `
-                <div class="p-timeline-event-marker ${status === 'current' ? 'p-timeline-pulse' : ''}">
+                <div class="p-timeline-event-marker ${status === 'current' ? 'p-timeline-pulse' : ''}" data-part="root">
                     <button type="button" class="p-interactive-step-btn" data-step-id="${item.id}" style="${btnStyle}" ${status !== 'current' ? 'disabled' : ''}>
                         ${iconHtml}
                     </button>
@@ -631,12 +631,12 @@ export default function TimelineIsland(container: HTMLElement, props: TimelinePr
                 btn.addEventListener('click', () => {
                     const stepId = parseInt(btn.getAttribute('data-step-id') || '0', 10);
                     if (stepId) handleStepComplete(stepId);
-                });
+                }, { signal: ctx?.signal });
             });
 
             container.querySelector('.p-interactive-reset-btn')?.addEventListener('click', () => {
                 handleReset();
-            });
+            }, { signal: ctx?.signal });
         }
     }
 

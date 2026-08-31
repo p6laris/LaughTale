@@ -4,7 +4,8 @@ import * as path from 'path';
 import * as zlib from 'zlib';
 
 const isProd = process.argv.includes('--prod');
-const RUNTIME_GZIP_BUDGET_BYTES = 8192; // 8 KB
+const RUNTIME_GZIP_BUDGET_BYTES = 45 * 1024; // 45 KB for standalone runtime
+const FULL_BUNDLE_GZIP_BUDGET_BYTES = 250 * 1024; // 250 KB for complete 76-component bundle
 
 // Ensure dist directory exists
 if (!fs.existsSync('dist')) {
@@ -55,19 +56,28 @@ await esbuild.build({
 
 console.log(`[LaughTale] Client bundle built successfully (${isProd ? 'Production' : 'Development'}).`);
 
-// 4. Budget check on core runtime
-if (fs.existsSync('dist/runtime.mjs')) {
-    const rawBuffer = fs.readFileSync('dist/runtime.mjs');
-    const gzipBuffer = zlib.gzipSync(rawBuffer);
-    const rawKb = (rawBuffer.length / 1024).toFixed(2);
-    const gzipKb = (gzipBuffer.length / 1024).toFixed(2);
+// 4. Budget & Size Reports
+console.log('\n📊 [LaughTale Bundle Report]');
+const bundlesToReport = [
+    { file: 'dist/runtime.mjs', label: 'ESM Core Runtime (Split)', budget: 8192 },
+    { file: 'dist/runtime.js', label: 'IIFE Standalone Runtime (Load-Bearing)', budget: RUNTIME_GZIP_BUDGET_BYTES },
+    { file: 'dist/index.js', label: 'Complete All-in-One Bundle (76 Components)', budget: FULL_BUNDLE_GZIP_BUDGET_BYTES }
+];
 
-    console.log(`[LaughTale] Core Runtime Size: ${rawKb} KB (gzipped: ${gzipKb} KB / budget: ${(RUNTIME_GZIP_BUDGET_BYTES / 1024).toFixed(0)} KB)`);
+for (const { file, label, budget } of bundlesToReport) {
+    if (fs.existsSync(file)) {
+        const rawBuffer = fs.readFileSync(file);
+        const gzipBuffer = zlib.gzipSync(rawBuffer);
+        const rawKb = (rawBuffer.length / 1024).toFixed(2);
+        const gzipKb = (gzipBuffer.length / 1024).toFixed(2);
 
-    if (isProd && gzipBuffer.length > RUNTIME_GZIP_BUDGET_BYTES) {
-        console.error(`❌ [LaughTale] Performance Budget Exceeded! Core runtime is ${gzipKb} KB (Budget: ${(RUNTIME_GZIP_BUDGET_BYTES / 1024).toFixed(0)} KB).`);
-        process.exit(1);
-    } else {
-        console.log(`✅ [LaughTale] Performance Budget Passed!`);
+        const budgetStr = budget ? ` (budget: ${(budget / 1024).toFixed(0)} KB)` : '';
+        console.log(`  • ${label}: ${rawKb} KB raw | ${gzipKb} KB gzipped${budgetStr}`);
+
+        if (budget && isProd && gzipBuffer.length > budget) {
+            console.error(`❌ [LaughTale] Performance Budget Exceeded for ${label}! ${gzipKb} KB > ${(budget / 1024).toFixed(0)} KB`);
+            process.exit(1);
+        }
     }
 }
+console.log('✅ [LaughTale] All production bundle size checks complete.\n');

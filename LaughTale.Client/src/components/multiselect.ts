@@ -29,52 +29,52 @@ const CSS = `
 html.dark .multiselect-trigger,
 [data-theme="dark"] .multiselect-trigger,
 .dark .multiselect-trigger {
-    background: var(--p-surface-0, #090d16) !important;
-    color: var(--p-text-color, #f8fafc) !important;
-    border-color: var(--p-border-color, #334155) !important;
+    background: var(--p-surface-0) !important;
+    color: var(--p-text-color) !important;
+    border-color: var(--p-border-color) !important;
 }
 html.dark .multiselect-overlay,
 [data-theme="dark"] .multiselect-overlay,
 .dark .multiselect-overlay {
-    background: var(--p-surface-0, #090d16) !important;
-    color: var(--p-text-color, #f8fafc) !important;
-    border-color: var(--p-border-color, #334155) !important;
+    background: var(--p-surface-0) !important;
+    color: var(--p-text-color) !important;
+    border-color: var(--p-border-color) !important;
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5) !important;
 }
 html.dark .multiselect-select-all,
 [data-theme="dark"] .multiselect-select-all,
 .dark .multiselect-select-all {
-    background: var(--p-surface-50, #0f172a) !important;
-    border-color: var(--p-border-color, #334155) !important;
-    color: var(--p-text-color, #f8fafc) !important;
+    background: var(--p-surface-50) !important;
+    border-color: var(--p-border-color) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .multiselect-filter-input,
 [data-theme="dark"] .multiselect-filter-input,
 .dark .multiselect-filter-input {
-    color: var(--p-text-color, #f8fafc) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .multiselect-item:hover,
 [data-theme="dark"] .multiselect-item:hover,
 .dark .multiselect-item:hover {
-    background: var(--p-surface-100, #1e293b) !important;
-    color: var(--p-text-color, #f8fafc) !important;
+    background: var(--p-surface-100) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .chip-item,
 [data-theme="dark"] .chip-item,
 .dark .chip-item {
-    background: var(--p-surface-100, #1e293b) !important;
-    color: var(--p-text-color, #f8fafc) !important;
+    background: var(--p-surface-100) !important;
+    color: var(--p-text-color) !important;
 }
 `;
 
-export default function MultiSelectIsland<T = string>(container: HTMLElement, props: MultiSelectProps<T>) {
+export default function MultiSelectIsland<T = string>(container: HTMLElement, props: MultiSelectProps<T>, ctx?: IslandContext) {
     injectIslandStyle('multiselect', CSS);
     const options: SelectButtonItem<T>[] = props.options || [];
     let selected: Set<T> = new Set(props.selectedValues || []);
     let filterQuery = '';
 
     container.innerHTML = `
-        <div class="laughtale-multiselect" style="position: relative; width: 100%; max-width: 320px; font-family: var(--p-font-family, inherit);">
+        <div class="laughtale-multiselect" data-part="root" style="position: relative; width: 100%; max-width: 320px; font-family: var(--p-font-family, inherit);">
             <!-- Trigger Button Container -->
             <div class="multiselect-trigger p-input" style="display: flex; align-items: center; justify-content: space-between; min-height: 2.5rem; padding: 0.35rem 0.75rem; cursor: ${props.disabled ? 'not-allowed' : 'pointer'}; background: var(--lt-surface-0); border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); user-select: none;">
                 <div class="multiselect-label-container" style="display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap; flex: 1; min-width: 0;"></div>
@@ -169,7 +169,7 @@ export default function MultiSelectIsland<T = string>(container: HTMLElement, pr
                     renderDisplay();
                     renderList();
                     syncValue();
-                });
+                }, { signal: ctx?.signal });
             });
         }
     }
@@ -202,14 +202,14 @@ export default function MultiSelectIsland<T = string>(container: HTMLElement, pr
                 renderDisplay();
                 renderList();
                 syncValue();
-            });
+            }, { signal: ctx?.signal });
         });
     }
 
     trigger.addEventListener('click', () => {
         if (props.disabled) return;
         disclosure.toggle();
-    });
+    }, { signal: ctx?.signal });
 
     clearBtn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -217,7 +217,7 @@ export default function MultiSelectIsland<T = string>(container: HTMLElement, pr
         renderDisplay();
         renderList();
         syncValue();
-    });
+    }, { signal: ctx?.signal });
 
     selectAllChk.parentElement?.addEventListener('click', () => {
         const filtered = getFilteredOptions();
@@ -230,12 +230,12 @@ export default function MultiSelectIsland<T = string>(container: HTMLElement, pr
         renderDisplay();
         renderList();
         syncValue();
-    });
+    }, { signal: ctx?.signal });
 
     filterInput.addEventListener('input', () => {
         filterQuery = filterInput.value;
         renderList();
-    });
+    }, { signal: ctx?.signal });
 
     function syncValue() {
         if (props.targetInputName) {

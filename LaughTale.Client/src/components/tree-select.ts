@@ -420,42 +420,42 @@ const CSS = `
 html.dark .p-treeselect-label-container,
 [data-theme="dark"] .p-treeselect-label-container,
 .dark .p-treeselect-label-container {
-    background-color: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
-    color: var(--p-text-color, #f8fafc);
+    background-color: var(--p-surface-0);
+    border-color: var(--p-border-color);
+    color: var(--p-text-color);
 }
 html.dark .p-treeselect-label-container:hover:not(.is-disabled),
 [data-theme="dark"] .p-treeselect-label-container:hover:not(.is-disabled),
 .dark .p-treeselect-label-container:hover:not(.is-disabled) {
-    border-color: var(--p-surface-400, #64748b);
+    border-color: var(--p-surface-400);
 }
 html.dark .p-treeselect.variant-filled .p-treeselect-label-container,
 [data-theme="dark"] .p-treeselect.variant-filled .p-treeselect-label-container,
 .dark .p-treeselect.variant-filled .p-treeselect-label-container {
-    background-color: var(--p-surface-100, #1e293b);
+    background-color: var(--p-surface-100);
 }
 html.dark .p-treeselect.variant-filled .p-treeselect-label-container:hover:not(.is-disabled),
 [data-theme="dark"] .p-treeselect.variant-filled .p-treeselect-label-container:hover:not(.is-disabled),
 .dark .p-treeselect.variant-filled .p-treeselect-label-container:hover:not(.is-disabled) {
-    background-color: var(--p-surface-200, #334155);
+    background-color: var(--p-surface-200);
 }
 html.dark .p-treeselect.variant-filled.is-focused .p-treeselect-label-container,
 [data-theme="dark"] .p-treeselect.variant-filled.is-focused .p-treeselect-label-container,
 .dark .p-treeselect.variant-filled.is-focused .p-treeselect-label-container {
-    background-color: var(--p-surface-0, #090d16);
+    background-color: var(--p-surface-0);
 }
 html.dark .p-treeselect-token,
 [data-theme="dark"] .p-treeselect-token,
 .dark .p-treeselect-token {
-    background: var(--p-surface-100, #1e293b);
-    color: var(--p-text-color, #f8fafc);
-    border-color: var(--p-border-color, #334155);
+    background: var(--p-surface-100);
+    color: var(--p-text-color);
+    border-color: var(--p-border-color);
 }
 html.dark .p-treeselect-overlay,
 [data-theme="dark"] .p-treeselect-overlay,
 .dark .p-treeselect-overlay {
-    background: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
+    background: var(--p-surface-0);
+    border-color: var(--p-border-color);
     box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5);
 }
 html.dark .p-treeselect-filter-container,
@@ -467,60 +467,60 @@ html.dark .p-treeselect-footer,
 .dark .p-treeselect-filter-container,
 .dark .p-treeselect-header,
 .dark .p-treeselect-footer {
-    background: var(--p-surface-50, #0f172a);
-    border-color: var(--p-border-color, #334155);
+    background: var(--p-surface-50);
+    border-color: var(--p-border-color);
 }
 html.dark .p-treeselect-filter-input,
 [data-theme="dark"] .p-treeselect-filter-input,
 .dark .p-treeselect-filter-input {
-    background: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-0);
+    border-color: var(--p-border-color);
+    color: var(--p-text-color);
 }
 html.dark .p-treenode-content:hover:not(.p-disabled),
 [data-theme="dark"] .p-treenode-content:hover:not(.p-disabled),
 .dark .p-treenode-content:hover:not(.p-disabled) {
-    background: var(--p-surface-100, #1e293b);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-100);
+    color: var(--p-text-color);
 }
 html.dark .p-treenode-content.p-highlight,
 [data-theme="dark"] .p-treenode-content.p-highlight,
 .dark .p-treenode-content.p-highlight {
     background: rgba(16, 185, 129, 0.16);
-    color: var(--p-primary-300, #6ee7b7);
+    color: var(--p-primary-300);
     font-weight: 600;
 }
 html.dark .p-treenode-content.p-highlight:hover:not(.p-disabled),
 [data-theme="dark"] .p-treenode-content.p-highlight:hover:not(.p-disabled),
 .dark .p-treenode-content.p-highlight:hover:not(.p-disabled) {
     background: rgba(16, 185, 129, 0.24);
-    color: var(--p-primary-200, #a7f3d0);
+    color: var(--p-primary-200);
 }
 html.dark .p-treenode-content.p-highlight .p-tree-toggler,
 [data-theme="dark"] .p-treenode-content.p-highlight .p-tree-toggler,
 .dark .p-treenode-content.p-highlight .p-tree-toggler {
-    color: var(--p-primary-300, #6ee7b7);
+    color: var(--p-primary-300);
 }
 html.dark .p-treenode-content.p-highlight .p-treenode-icon,
 [data-theme="dark"] .p-treenode-content.p-highlight .p-treenode-icon,
 .dark .p-treenode-content.p-highlight .p-treenode-icon {
-    color: var(--p-primary-400, #34d399);
+    color: var(--p-primary-400);
 }
 html.dark .p-tree-toggler,
 [data-theme="dark"] .p-tree-toggler,
 .dark .p-tree-toggler {
-    color: var(--p-text-muted, #94a3b8);
+    color: var(--p-text-muted);
 }
 html.dark .p-tree-toggler:hover,
 [data-theme="dark"] .p-tree-toggler:hover,
 .dark .p-tree-toggler:hover {
-    color: var(--p-text-color, #f8fafc);
+    color: var(--p-text-color);
 }
 html.dark .p-tree-checkbox,
 [data-theme="dark"] .p-tree-checkbox,
 .dark .p-tree-checkbox {
-    background: var(--p-surface-50, #0f172a);
-    border-color: var(--p-border-color, #334155);
+    background: var(--p-surface-50);
+    border-color: var(--p-border-color);
 }
 `;
 
@@ -638,7 +638,7 @@ export default function TreeSelectIsland(container: HTMLElement, props: TreeSele
 
         container.className = rootClasses;
         container.innerHTML = `
-            <div class="p-treeselect-label-container" tabindex="${isDisabled ? '-1' : '0'}" role="combobox" aria-haspopup="tree" aria-expanded="false" aria-controls="${props.inputId || 'treeselect'}_overlay">
+            <div class="p-treeselect-label-container" data-part="root" tabindex="${isDisabled ? '-1' : '0'}" role="combobox" aria-haspopup="tree" aria-expanded="false" aria-controls="${props.inputId || 'treeselect'}_overlay">
                 <div class="p-treeselect-label"></div>
                 <div class="p-treeselect-actions">
                     <button type="button" class="p-treeselect-clear-icon" aria-label="Clear selection" tabindex="-1" style="display: none;">
@@ -687,7 +687,7 @@ export default function TreeSelectIsland(container: HTMLElement, props: TreeSele
         const selected = getSelectedLabels();
 
         if (selected.length === 0) {
-            labelEl.className = 'p-treeselect-label p-placeholder';
+            labelEl.className = 'p-treeselect-label p-placeholder'; container.setAttribute('data-part', 'root');
             labelEl.textContent = placeholder;
             clearBtn.style.display = 'none';
             hiddenInp.value = '';
@@ -709,7 +709,7 @@ export default function TreeSelectIsland(container: HTMLElement, props: TreeSele
                         e.stopPropagation();
                         const key = btn.getAttribute('data-key')!;
                         toggleNodeSelection(key, false);
-                    });
+                    }, { signal: ctx?.signal });
                 });
             } else {
                 labelEl.textContent = selected.map(s => s.label).join(', ');
@@ -829,7 +829,7 @@ export default function TreeSelectIsland(container: HTMLElement, props: TreeSele
                 if (expandedKeys.has(key)) expandedKeys.delete(key);
                 else expandedKeys.add(key);
                 renderTreeList();
-            });
+            }, { signal: ctx?.signal });
         });
 
         // Select Node / Checkbox
@@ -860,7 +860,7 @@ export default function TreeSelectIsland(container: HTMLElement, props: TreeSele
                     const shouldCheck = currentState !== 'checked';
                     toggleNodeSelection(key, shouldCheck);
                 }
-            });
+            }, { signal: ctx?.signal });
         });
     }
 
@@ -891,7 +891,7 @@ export default function TreeSelectIsland(container: HTMLElement, props: TreeSele
             if ((e.target as HTMLElement).closest('.p-treeselect-clear-icon') || (e.target as HTMLElement).closest('.p-treeselect-token-remove')) return;
             if (isDisabled) return;
             disclosure.toggle();
-        });
+        }, { signal: ctx?.signal });
 
         trigger.addEventListener('keydown', (e) => {
             if (isDisabled) return;
@@ -901,7 +901,7 @@ export default function TreeSelectIsland(container: HTMLElement, props: TreeSele
             } else if (e.key === 'Escape') {
                 disclosure.close();
             }
-        });
+        }, { signal: ctx?.signal });
 
         clearBtn.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -909,16 +909,16 @@ export default function TreeSelectIsland(container: HTMLElement, props: TreeSele
             updateTriggerDisplay();
             renderTreeList();
             syncValue();
-        });
+        }, { signal: ctx?.signal });
 
         if (filterInput) {
             filterInput.addEventListener('input', () => {
                 searchQuery = filterInput.value;
                 renderTreeList();
-            });
+            }, { signal: ctx?.signal });
             filterInput.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') disclosure.close();
-            });
+            }, { signal: ctx?.signal });
         }
     }
 

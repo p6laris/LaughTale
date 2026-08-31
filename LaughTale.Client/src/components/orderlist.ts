@@ -264,13 +264,13 @@ const ORDERLIST_CSS = `
 html.dark .p-orderlist,
 [data-theme="dark"] .p-orderlist,
 .dark .p-orderlist {
-    color: var(--p-text-color, #f8fafc) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-orderlist-list-container,
 [data-theme="dark"] .p-orderlist-list-container,
 .dark .p-orderlist-list-container {
-    background: var(--p-surface-0, #090d16) !important;
-    border-color: var(--p-border-color, #334155) !important;
+    background: var(--p-surface-0) !important;
+    border-color: var(--p-border-color) !important;
 }
 html.dark .p-orderlist-header,
 html.dark .p-orderlist-filter-container,
@@ -281,35 +281,35 @@ html.dark .p-orderlist-footer,
 .dark .p-orderlist-header,
 .dark .p-orderlist-filter-container,
 .dark .p-orderlist-footer {
-    background: var(--p-surface-50, #0f172a) !important;
-    border-color: var(--p-border-color, #334155) !important;
-    color: var(--p-text-color, #f8fafc) !important;
+    background: var(--p-surface-50) !important;
+    border-color: var(--p-border-color) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-orderlist-filter-input,
 [data-theme="dark"] .p-orderlist-filter-input,
 .dark .p-orderlist-filter-input {
-    background: var(--p-surface-0, #090d16) !important;
-    border-color: var(--p-border-color, #334155) !important;
-    color: var(--p-text-color, #f8fafc) !important;
+    background: var(--p-surface-0) !important;
+    border-color: var(--p-border-color) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-orderlist-control-btn,
 [data-theme="dark"] .p-orderlist-control-btn,
 .dark .p-orderlist-control-btn {
-    background: var(--p-surface-0, #090d16) !important;
-    border-color: var(--p-border-color, #334155) !important;
-    color: var(--p-text-muted, #94a3b8) !important;
+    background: var(--p-surface-0) !important;
+    border-color: var(--p-border-color) !important;
+    color: var(--p-text-muted) !important;
 }
 html.dark .p-orderlist-control-btn:hover:not(:disabled),
 [data-theme="dark"] .p-orderlist-control-btn:hover:not(:disabled),
 .dark .p-orderlist-control-btn:hover:not(:disabled) {
-    background: var(--p-surface-100, #1e293b) !important;
-    color: var(--p-text-color, #f8fafc) !important;
+    background: var(--p-surface-100) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-orderlist-item:hover:not(.p-highlight),
 [data-theme="dark"] .p-orderlist-item:hover:not(.p-highlight),
 .dark .p-orderlist-item:hover:not(.p-highlight) {
-    background: var(--p-surface-100, #1e293b) !important;
-    color: var(--p-text-color, #f8fafc) !important;
+    background: var(--p-surface-100) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-orderlist-product-name,
 html.dark .p-orderlist-product-price,
@@ -317,17 +317,17 @@ html.dark .p-orderlist-product-price,
 [data-theme="dark"] .p-orderlist-product-price,
 .dark .p-orderlist-product-name,
 .dark .p-orderlist-product-price {
-    color: var(--p-text-color, #f8fafc) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-orderlist-product-img,
 [data-theme="dark"] .p-orderlist-product-img,
 .dark .p-orderlist-product-img {
-    background: var(--p-surface-100, #1e293b) !important;
-    border-color: var(--p-border-color, #334155) !important;
+    background: var(--p-surface-100) !important;
+    border-color: var(--p-border-color) !important;
 }
 `;
 
-export default function OrderListIsland<T = any>(container: HTMLElement, props: OrderListProps<T>) {
+export default function OrderListIsland<T = any>(container: HTMLElement, props: OrderListProps<T>, ctx?: IslandContext) {
     injectIslandStyle('orderlist', ORDERLIST_CSS);
 
     const initialItems: OrderListItem<T>[] = props.value ? [...props.value] : (props.items ? [...props.items] : []);
@@ -355,7 +355,7 @@ export default function OrderListIsland<T = any>(container: HTMLElement, props: 
 
     function renderCellContent(item: OrderListItem<T>, index: number, isSelected: boolean): string {
         const checkboxHtml = isCheckbox ? `
-            <div class="p-checkbox-box ${isSelected ? 'p-checked' : ''}" role="checkbox" aria-checked="${isSelected}">
+            <div class="p-checkbox-box ${isSelected ? 'p-checked' : ''}" data-part="root" role="checkbox" aria-checked="${isSelected}">
                 ${isSelected ? LucideIcons.check : ''}
             </div>
         ` : '';
@@ -527,7 +527,7 @@ export default function OrderListIsland<T = any>(container: HTMLElement, props: 
                             }
                         }
                         updateSelectionUI();
-                    });
+                    }, { signal: ctx?.signal });
                 });
             }
         }
@@ -562,22 +562,22 @@ export default function OrderListIsland<T = any>(container: HTMLElement, props: 
             filterInput.addEventListener('input', (e) => {
                 filterQuery = (e.target as HTMLInputElement).value;
                 updateListStructure();
-            });
+            }, { signal: ctx?.signal });
         }
 
         // 2. Action Controls
         rootEl.querySelector('.btn-order-top')?.addEventListener('click', () => {
             reorder('top');
-        });
+        }, { signal: ctx?.signal });
         rootEl.querySelector('.btn-order-up')?.addEventListener('click', () => {
             reorder('up');
-        });
+        }, { signal: ctx?.signal });
         rootEl.querySelector('.btn-order-down')?.addEventListener('click', () => {
             reorder('down');
-        });
+        }, { signal: ctx?.signal });
         rootEl.querySelector('.btn-order-bottom')?.addEventListener('click', () => {
             reorder('bottom');
-        });
+        }, { signal: ctx?.signal });
 
         // 3. Keyboard Navigation
         const listUl = rootEl.querySelector<HTMLUListElement>('.p-orderlist-list');
@@ -593,7 +593,7 @@ export default function OrderListIsland<T = any>(container: HTMLElement, props: 
                     itemsList.forEach((it, idx) => selectedIds.add(getItemId(it, idx)));
                     updateSelectionUI();
                 }
-            });
+            }, { signal: ctx?.signal });
         }
     }
 

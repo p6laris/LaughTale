@@ -84,12 +84,12 @@ const CSS = `
 html.dark .laughtale-ifta-label > label,
 [data-theme="dark"] .laughtale-ifta-label > label,
 .dark .laughtale-ifta-label > label {
-    color: var(--p-text-muted, #94a3b8);
+    color: var(--p-text-muted);
 }
 html.dark .laughtale-ifta-label:focus-within > label,
 [data-theme="dark"] .laughtale-ifta-label:focus-within > label,
 .dark .laughtale-ifta-label:focus-within > label {
-    color: var(--p-primary-400, #34d399);
+    color: var(--p-primary-400);
 }
 html.dark .laughtale-ifta-label.invalid > label,
 html.dark .laughtale-ifta-label:has(.invalid) > label,
@@ -103,7 +103,7 @@ html.dark .laughtale-ifta-label:has(:invalid) > label,
 .dark .laughtale-ifta-label:has(.invalid) > label,
 .dark .laughtale-ifta-label:has(.is-invalid) > label,
 .dark .laughtale-ifta-label:has(:invalid) > label {
-    color: var(--p-red-400, #f87171) !important;
+    color: var(--p-red-400) !important;
 }
 `;
 
@@ -118,7 +118,7 @@ export default function IftaLabelIsland(container: HTMLElement, props: IftaLabel
     const labelText = props.label || (existingLabel ? existingLabel.textContent : 'Label');
 
     container.innerHTML = `
-        <div class="laughtale-ifta-label ${props.invalid ? 'invalid' : ''}">
+        <div class="laughtale-ifta-label ${props.invalid ? 'invalid' : ''}" data-part="root">
             ${initialHtml}
             ${!existingLabel && labelText ? `<label ${forAttr}>${labelText}</label>` : ''}
         </div>
@@ -136,5 +136,5 @@ export default function IftaLabelIsland(container: HTMLElement, props: IftaLabel
                 (input as any).click();
             }
         }
-    });
+    }, { signal: ctx?.signal });
 }

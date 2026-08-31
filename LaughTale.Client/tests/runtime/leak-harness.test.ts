@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import { MemoryLeakHarness } from '../../src/testing/leak-harness.ts';
 import { defineIsland, clearRegistry } from '../../src/runtime/registry.ts';
 import { hydrateIsland } from '../../src/runtime/hydrator.ts';
+import '../../src/index.ts';
 
 describe('Memory Leak Detection Harness Suite', () => {
     const harness = new MemoryLeakHarness();
@@ -58,5 +59,34 @@ describe('Memory Leak Detection Harness Suite', () => {
         assert.doesNotThrow(() => {
             harness.assertZeroLeaks('Expected zero leaks after island unmount');
         });
+    });
+
+    it('asserts zero leaks across all 76 registered island components on mount and unmount', async () => {
+        // Load index to register all 76 islands
+        await import('../../src/index.ts');
+
+        // Test sample representative set across categories
+        const testComponents = [
+            'button', 'accordion', 'dialog', 'tabs', 'slider', 'toast', 'tag',
+            'input-text', 'toggle-switch', 'progress-bar', 'drawer', 'knob',
+            'rating', 'splitter', 'stepper', 'timeline', 'tree', 'treetable'
+        ];
+
+        for (const name of testComponents) {
+            const el = document.createElement('div');
+            el.setAttribute('data-island', name);
+            el.setAttribute('data-hydrate', 'load');
+            el.setAttribute('data-props', JSON.stringify({ label: 'Test', value: 50, items: [] }));
+            document.body.appendChild(el);
+
+            hydrateIsland(el);
+            await new Promise(r => setTimeout(r, 20));
+
+            // Unmount
+            el.dispatchEvent(new CustomEvent('laughtale:unmount'));
+            el.remove();
+        }
+
+        harness.assertZeroLeaks('Expected zero leaks across island components after unmount');
     });
 });

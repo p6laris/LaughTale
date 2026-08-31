@@ -222,16 +222,16 @@ html.dark .p-contextmenu-sublist-wrapper,
 [data-theme="dark"] .p-contextmenu-sublist-wrapper,
 .dark .p-contextmenu,
 .dark .p-contextmenu-sublist-wrapper {
-    background: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-0);
+    border-color: var(--p-border-color);
+    color: var(--p-text-color);
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
 }
 
 html.dark .p-contextmenu-item-content,
 [data-theme="dark"] .p-contextmenu-item-content,
 .dark .p-contextmenu-item-content {
-    color: var(--p-text-color, #f8fafc);
+    color: var(--p-text-color);
 }
 
 html.dark .p-contextmenu-item-content:hover,
@@ -240,35 +240,35 @@ html.dark .p-contextmenu-item.p-contextmenu-item-active > .p-contextmenu-item-co
 [data-theme="dark"] .p-contextmenu-item.p-contextmenu-item-active > .p-contextmenu-item-content,
 .dark .p-contextmenu-item-content:hover,
 .dark .p-contextmenu-item.p-contextmenu-item-active > .p-contextmenu-item-content {
-    background: var(--p-surface-100, #1e293b);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-100);
+    color: var(--p-text-color);
 }
 
 html.dark .p-contextmenu-separator,
 [data-theme="dark"] .p-contextmenu-separator,
 .dark .p-contextmenu-separator {
-    background: var(--p-border-color, #334155);
+    background: var(--p-border-color);
 }
 
 html.dark .p-contextmenu-shortcut,
 [data-theme="dark"] .p-contextmenu-shortcut,
 .dark .p-contextmenu-shortcut {
-    background: var(--p-surface-100, #1e293b);
-    border-color: var(--p-border-color, #334155);
-    color: var(--p-text-muted, #94a3b8);
+    background: var(--p-surface-100);
+    border-color: var(--p-border-color);
+    color: var(--p-text-muted);
 }
 
 html.dark .p-contextmenu-target-box,
 [data-theme="dark"] .p-contextmenu-target-box,
 .dark .p-contextmenu-target-box {
-    border-color: var(--p-border-color, #334155);
-    color: var(--p-text-muted, #94a3b8);
+    border-color: var(--p-border-color);
+    color: var(--p-text-muted);
 }
 html.dark .p-contextmenu-target-box:hover,
 [data-theme="dark"] .p-contextmenu-target-box:hover,
 .dark .p-contextmenu-target-box:hover {
-    border-color: var(--p-primary-500, #10b981);
-    background: var(--p-surface-50, #0f172a);
+    border-color: var(--p-primary-500);
+    background: var(--p-surface-50);
 }
 `;
 
@@ -398,7 +398,7 @@ export default function ContextMenuIsland(container: HTMLElement, props: Context
             ];
 
             return `
-                <div class="flex justify-center" style="width: 100%;">
+                <div class="flex justify-center" data-part="root" style="width: 100%;">
                     <ul class="p-contextmenu-product-list" style="margin: 0 auto; list-style: none; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); padding: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; width: 100%; max-width: 32rem; background: var(--lt-surface-0);">
                         ${products.map(p => `
                             <li class="p-contextmenu-product-item" data-product-id="${p.id}" style="padding: 0.5rem; border-radius: var(--lt-radius); border: 2px solid transparent; transition: all 180ms ease; cursor: context-menu;">
@@ -612,7 +612,7 @@ export default function ContextMenuIsland(container: HTMLElement, props: Context
             e.preventDefault();
             e.stopPropagation();
             showMenu(e.clientX, e.clientY);
-        });
+        }, { signal: ctx?.signal });
     } else if (demoType === 'template') {
         container.querySelectorAll<HTMLElement>('.p-contextmenu-product-item').forEach(item => {
             item.addEventListener('contextmenu', (e: MouseEvent) => {
@@ -624,7 +624,7 @@ export default function ContextMenuIsland(container: HTMLElement, props: Context
                 selectedTargetEl = item;
 
                 showMenu(e.clientX, e.clientY);
-            });
+            }, { signal: ctx?.signal });
         });
     } else if (demoType === 'command') {
         container.querySelectorAll<HTMLElement>('.p-contextmenu-user-item').forEach(item => {
@@ -637,7 +637,7 @@ export default function ContextMenuIsland(container: HTMLElement, props: Context
                 selectedTargetEl = item;
 
                 showMenu(e.clientX, e.clientY);
-            });
+            }, { signal: ctx?.signal });
         });
     } else {
         const targetBox = container.querySelector<HTMLElement>('[data-context-target]') || container.querySelector<HTMLElement>('.p-contextmenu-router-target');
@@ -646,7 +646,7 @@ export default function ContextMenuIsland(container: HTMLElement, props: Context
                 e.preventDefault();
                 e.stopPropagation();
                 showMenu(e.clientX, e.clientY);
-            });
+            }, { signal: ctx?.signal });
         }
     }
 
@@ -678,7 +678,7 @@ export default function ContextMenuIsland(container: HTMLElement, props: Context
             }));
 
             hideMenu();
-        });
+        }, { signal: ctx?.signal });
     });
 
     // Outside Click & Keyboard Close Handlers
@@ -686,14 +686,14 @@ export default function ContextMenuIsland(container: HTMLElement, props: Context
         if (!menuEl.contains(e.target as Node)) {
             hideMenu();
         }
-    });
+    }, { signal: ctx?.signal });
 
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' || e.key === 'Tab') {
             hideMenu();
         }
-    });
+    }, { signal: ctx?.signal });
 
-    window.addEventListener('scroll', hideMenu, true);
-    window.addEventListener('resize', hideMenu);
+    window.addEventListener('scroll', hideMenu, { capture: true, signal: ctx?.signal });
+    window.addEventListener('resize', hideMenu, { signal: ctx?.signal });
 }

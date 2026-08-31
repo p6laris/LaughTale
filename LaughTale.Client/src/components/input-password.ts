@@ -319,86 +319,86 @@ const CSS = `
 html.dark .p-password-container,
 [data-theme="dark"] .p-password-container,
 .dark .p-password-container {
-    background: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
+    background: var(--p-surface-0);
+    border-color: var(--p-border-color);
 }
 html.dark .p-password-container:hover:not(.is-disabled),
 [data-theme="dark"] .p-password-container:hover:not(.is-disabled),
 .dark .p-password-container:hover:not(.is-disabled) {
-    border-color: var(--p-surface-400, #64748b);
+    border-color: var(--p-surface-400);
 }
 html.dark .p-password.variant-filled .p-password-container,
 [data-theme="dark"] .p-password.variant-filled .p-password-container,
 .dark .p-password.variant-filled .p-password-container {
-    background: var(--p-surface-100, #1e293b);
+    background: var(--p-surface-100);
 }
 html.dark .p-password.variant-filled .p-password-container:focus-within,
 [data-theme="dark"] .p-password.variant-filled .p-password-container:focus-within,
 .dark .p-password.variant-filled .p-password-container:focus-within {
-    background: var(--p-surface-0, #090d16);
+    background: var(--p-surface-0);
 }
 html.dark .p-password-input,
 [data-theme="dark"] .p-password-input,
 .dark .p-password-input {
-    color: var(--p-text-color, #f8fafc);
+    color: var(--p-text-color);
 }
 html.dark .p-password-action-btn,
 [data-theme="dark"] .p-password-action-btn,
 .dark .p-password-action-btn {
-    color: var(--p-text-muted, #94a3b8);
+    color: var(--p-text-muted);
 }
 html.dark .p-password-action-btn:hover:not(:disabled),
 [data-theme="dark"] .p-password-action-btn:hover:not(:disabled),
 .dark .p-password-action-btn:hover:not(:disabled) {
-    color: var(--p-text-color, #f8fafc);
+    color: var(--p-text-color);
 }
 html.dark .p-password-meter-track,
 [data-theme="dark"] .p-password-meter-track,
 .dark .p-password-meter-track {
-    background: var(--p-surface-100, #1e293b);
+    background: var(--p-surface-100);
 }
 html.dark .p-password-chip,
 [data-theme="dark"] .p-password-chip,
 .dark .p-password-chip {
-    background: var(--p-surface-100, #1e293b);
-    border-color: var(--p-border-color, #334155);
-    color: var(--p-text-muted, #94a3b8);
+    background: var(--p-surface-100);
+    border-color: var(--p-border-color);
+    color: var(--p-text-muted);
 }
 html.dark .p-password-chip.is-met,
 [data-theme="dark"] .p-password-chip.is-met,
 .dark .p-password-chip.is-met {
-    background: var(--p-emerald-600, #059669);
-    border-color: var(--p-emerald-600, #059669);
-    color: #ffffff;
+    background: var(--p-emerald-600);
+    border-color: var(--p-emerald-600);
+    color: var(--p-surface-0);
 }
 html.dark .p-password-list-item,
 [data-theme="dark"] .p-password-list-item,
 .dark .p-password-list-item {
-    color: var(--p-text-muted, #94a3b8);
+    color: var(--p-text-muted);
 }
 html.dark .p-password-list-item.is-met,
 [data-theme="dark"] .p-password-list-item.is-met,
 .dark .p-password-list-item.is-met {
-    color: var(--p-emerald-400, #34d399);
+    color: var(--p-emerald-400);
 }
 html.dark .p-password-popover,
 [data-theme="dark"] .p-password-popover,
 .dark .p-password-popover {
-    background: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
+    background: var(--p-surface-0);
+    border-color: var(--p-border-color);
     box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5);
 }
 html.dark .p-password-popover::before,
 [data-theme="dark"] .p-password-popover::before,
 .dark .p-password-popover::before {
-    background: var(--p-surface-0, #090d16);
-    border-left-color: var(--p-border-color, #334155);
-    border-top-color: var(--p-border-color, #334155);
+    background: var(--p-surface-0);
+    border-left-color: var(--p-border-color);
+    border-top-color: var(--p-border-color);
 }
 html.dark .p-password-popover-header-title svg,
 [data-theme="dark"] .p-password-popover-header-title svg,
 .dark .p-password-popover-header-title svg {
-    color: var(--p-text-muted, #94a3b8);
+    color: var(--p-text-muted);
 }
 `;
 
@@ -446,7 +446,7 @@ export default function InputPasswordIsland(container: HTMLElement, props: Input
     }
 
     function render() {
-        container.className = 'laughtale-password p-password';
+        container.className = 'laughtale-password p-password'; container.setAttribute('data-part', 'root');
         if (isFluid) container.classList.add('p-password-fluid');
         if (isFilled) container.classList.add('variant-filled');
         if (props.size) container.classList.add(`size-${props.size}`);
@@ -466,7 +466,7 @@ export default function InputPasswordIsland(container: HTMLElement, props: Input
         let leftIconHtml = '';
         if (props.icon) {
             const iconSvg = getLucideIcon(props.icon) || `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`;
-            leftIconHtml = `<span class="p-password-left-icon">${iconSvg}</span>`;
+            leftIconHtml = `<span class="p-password-left-icon" data-part="root">${iconSvg}</span>`;
         }
 
         let html = `
@@ -671,44 +671,44 @@ export default function InputPasswordIsland(container: HTMLElement, props: Input
             currentVal = inputEl.value;
             updateVisuals();
             syncTargetInput();
-        });
+        }, { signal: ctx?.signal });
 
         // Popover focus & blur handling
         if (popoverEl) {
             inputEl.addEventListener('focus', () => {
                 popoverEl.style.display = 'flex';
                 updateVisuals();
-            });
+            }, { signal: ctx?.signal });
 
             document.addEventListener('click', (e) => {
                 if (!container.contains(e.target as Node)) {
                     popoverEl.style.display = 'none';
                 }
-            });
+            }, { signal: ctx?.signal });
 
             inputEl.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') {
                     popoverEl.style.display = 'none';
                 }
-            });
+            }, { signal: ctx?.signal });
         }
 
         // Toggle mask
         toggleBtn?.addEventListener('mousedown', (e) => {
             e.preventDefault();
-        });
+        }, { signal: ctx?.signal });
         toggleBtn?.addEventListener('click', (e) => {
             e.preventDefault();
             isMasked = !isMasked;
             inputEl.type = isMasked ? 'password' : 'text';
             toggleBtn.innerHTML = isMasked ? eyeIcon : eyeOffIcon;
             inputEl.focus();
-        });
+        }, { signal: ctx?.signal });
 
         // Clear action
         clearBtn?.addEventListener('mousedown', (e) => {
             e.preventDefault();
-        });
+        }, { signal: ctx?.signal });
         clearBtn?.addEventListener('click', (e) => {
             e.preventDefault();
             currentVal = '';
@@ -716,7 +716,7 @@ export default function InputPasswordIsland(container: HTMLElement, props: Input
             updateVisuals();
             syncTargetInput();
             inputEl.focus();
-        });
+        }, { signal: ctx?.signal });
     }
 
     function syncTargetInput() {

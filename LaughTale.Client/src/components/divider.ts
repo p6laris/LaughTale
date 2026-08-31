@@ -101,13 +101,13 @@ const DIVIDER_CSS = `
 html.dark .p-divider:before,
 [data-theme="dark"] .p-divider:before,
 .dark .p-divider:before {
-    border-color: var(--p-border-color, #334155) !important;
+    border-color: var(--p-border-color) !important;
 }
 html.dark .p-divider .p-divider-content,
 [data-theme="dark"] .p-divider .p-divider-content,
 .dark .p-divider .p-divider-content {
-    background: var(--p-surface-0, #090d16) !important;
-    color: var(--p-text-color, #f8fafc) !important;
+    background: var(--p-surface-0) !important;
+    color: var(--p-text-color) !important;
 }
 `;
 
@@ -129,4 +129,5 @@ export default function DividerIsland(container: HTMLElement, props: DividerProp
     container.classList.add(`p-divider-${props.align || (isVertical ? 'center' : 'left')}`);
     container.setAttribute('role', 'separator');
     container.setAttribute('aria-orientation', isVertical ? 'vertical' : 'horizontal');
+    container.setAttribute('data-part', 'root');
 }

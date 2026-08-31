@@ -212,25 +212,25 @@ const TIEREDMENU_CSS = `
 html.dark .p-tieredmenu,
 [data-theme="dark"] .p-tieredmenu,
 .dark .p-tieredmenu {
-    background: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-0);
+    border-color: var(--p-border-color);
+    color: var(--p-text-color);
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
 }
 
 html.dark .p-tieredmenu-submenu,
 [data-theme="dark"] .p-tieredmenu-submenu,
 .dark .p-tieredmenu-submenu {
-    background: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-0);
+    border-color: var(--p-border-color);
+    color: var(--p-text-color);
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
 }
 
 html.dark .p-tieredmenu-item-link,
 [data-theme="dark"] .p-tieredmenu-item-link,
 .dark .p-tieredmenu-item-link {
-    color: var(--p-text-color, #f8fafc);
+    color: var(--p-text-color);
 }
 
 html.dark .p-tieredmenu-item-link:hover,
@@ -242,29 +242,29 @@ html.dark .p-tieredmenu-item.p-active > .p-tieredmenu-item-content > .p-tieredme
 .dark .p-tieredmenu-item-link:hover,
 .dark .p-tieredmenu-item-link:focus-visible,
 .dark .p-tieredmenu-item.p-active > .p-tieredmenu-item-content > .p-tieredmenu-item-link {
-    background: var(--p-surface-100, #1e293b);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-100);
+    color: var(--p-text-color);
 }
 
 html.dark .p-tieredmenu-separator,
 [data-theme="dark"] .p-tieredmenu-separator,
 .dark .p-tieredmenu-separator {
-    background: var(--p-border-color, #334155);
+    background: var(--p-border-color);
 }
 
 html.dark .p-tieredmenu-shortcut,
 [data-theme="dark"] .p-tieredmenu-shortcut,
 .dark .p-tieredmenu-shortcut {
-    background: var(--p-surface-100, #1e293b);
-    border-color: var(--p-border-color, #334155);
-    color: var(--p-text-muted, #94a3b8);
+    background: var(--p-surface-100);
+    border-color: var(--p-border-color);
+    color: var(--p-text-muted);
 }
 
 html.dark .p-tieredmenu-badge,
 [data-theme="dark"] .p-tieredmenu-badge,
 .dark .p-tieredmenu-badge {
-    background: var(--p-surface-100, #1e293b);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-100);
+    color: var(--p-text-color);
 }
 `;
 
@@ -325,7 +325,7 @@ export default function TieredMenuIsland(container: HTMLElement, props: TieredMe
         return '';
     }
 
-    const chevronRightSvg = `<svg class="p-tieredmenu-submenu-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`;
+    const chevronRightSvg = `<svg class="p-tieredmenu-submenu-icon" data-part="root" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`;
 
     function renderMenuItems(itemsList: MenuItem[], level: number = 0): string {
         return itemsList.map((item, idx) => {
@@ -446,7 +446,7 @@ export default function TieredMenuIsland(container: HTMLElement, props: TieredMe
                 triggerEl.addEventListener('click', (e) => {
                     e.stopPropagation();
                     togglePopup(triggerEl);
-                });
+                }, { signal: ctx?.signal });
             }
 
             // Expose .toggle API on DOM element
@@ -463,7 +463,7 @@ export default function TieredMenuIsland(container: HTMLElement, props: TieredMe
                     triggerEl?.setAttribute('aria-expanded', 'false');
                     closeAllSubmenus(rootEl);
                 }
-            });
+            }, { signal: ctx?.signal });
         }
 
         // Flyout Cascading Submenus Behavior
@@ -553,13 +553,13 @@ export default function TieredMenuIsland(container: HTMLElement, props: TieredMe
                         });
                     }
                 }
-            });
+            }, { signal: ctx?.signal });
 
             li.addEventListener('mouseleave', () => {
                 if (hasSub) {
                     scheduleCloseSubmenu(li);
                 }
-            });
+            }, { signal: ctx?.signal });
         });
 
         // Command & Item Click Handling
@@ -597,7 +597,7 @@ export default function TieredMenuIsland(container: HTMLElement, props: TieredMe
                 } else {
                     closeAllSubmenus(rootEl);
                 }
-            });
+            }, { signal: ctx?.signal });
         });
 
         // WAI-ARIA Keyboard Navigation
@@ -670,7 +670,7 @@ export default function TieredMenuIsland(container: HTMLElement, props: TieredMe
                     break;
                 }
             }
-        });
+        }, { signal: ctx?.signal });
     }
 
     function executeCommand(commandStr: string, label: string) {

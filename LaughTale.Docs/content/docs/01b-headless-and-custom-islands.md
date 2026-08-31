@@ -1,4 +1,4 @@
----
+﻿---
 title: Standalone Core & Headless Mode
 description: Using LaughTale as a lightweight headless Islands framework with your own custom design system, Tailwind CSS, or custom React/Vue/Svelte components without the Aura UI library.
 order: 3
@@ -42,7 +42,7 @@ You can use **`LaughTale.Core` independently** as a high-performance Islands Arc
 Install **only** the core package:
 
 ```bash
-dotnet add package SoftMax.LaughTale.Core
+dotnet add package LaughTale.Core
 ```
 
 In `_ViewImports.cshtml`:
@@ -66,7 +66,7 @@ You can mount your own custom components and style them with Tailwind CSS or any
 In your TypeScript island (`src/islands/order-calculator.ts`):
 
 ```typescript
-import { IslandContext } from '@softmax/laughtale-client';
+import { IslandContext } from 'laughtale';
 
 export default function OrderCalculator(container: HTMLElement, props: any, ctx?: IslandContext) {
     let quantity = props.initialQty || 1;

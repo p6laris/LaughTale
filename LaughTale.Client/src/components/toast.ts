@@ -26,6 +26,7 @@ export interface ToastMessageOptions {
     actionLabel?: string;
     onAction?: () => void;
     pt?: PassthroughRecord;
+    signal?: AbortSignal;
 }
 
 export interface ToastContainerProps {
@@ -313,7 +314,7 @@ html.dark .p-toast-message-info,
 .dark .p-toast-message-info {
     background: rgba(37, 99, 235, 0.2);
     border-color: rgba(59, 130, 246, 0.35);
-    color: #93c5fd;
+    color: var(--p-info-300);
 }
 html.dark .p-toast-message-info .p-toast-message-icon,
 html.dark .p-toast-message-info .p-toast-close-button,
@@ -321,7 +322,7 @@ html.dark .p-toast-message-info .p-toast-close-button,
 [data-theme="dark"] .p-toast-message-info .p-toast-close-button,
 .dark .p-toast-message-info .p-toast-message-icon,
 .dark .p-toast-message-info .p-toast-close-button {
-    color: #93c5fd;
+    color: var(--p-info-300);
 }
 
 html.dark .p-toast-message-success,
@@ -329,7 +330,7 @@ html.dark .p-toast-message-success,
 .dark .p-toast-message-success {
     background: rgba(16, 185, 129, 0.2);
     border-color: rgba(16, 185, 129, 0.35);
-    color: #6ee7b7;
+    color: var(--p-primary-300);
 }
 html.dark .p-toast-message-success .p-toast-message-icon,
 html.dark .p-toast-message-success .p-toast-close-button,
@@ -337,7 +338,7 @@ html.dark .p-toast-message-success .p-toast-close-button,
 [data-theme="dark"] .p-toast-message-success .p-toast-close-button,
 .dark .p-toast-message-success .p-toast-message-icon,
 .dark .p-toast-message-success .p-toast-close-button {
-    color: #6ee7b7;
+    color: var(--p-primary-300);
 }
 
 html.dark .p-toast-message-warn,
@@ -345,7 +346,7 @@ html.dark .p-toast-message-warn,
 .dark .p-toast-message-warn {
     background: rgba(245, 158, 11, 0.2);
     border-color: rgba(245, 158, 11, 0.35);
-    color: #fcd34d;
+    color: var(--p-warn-300);
 }
 html.dark .p-toast-message-warn .p-toast-message-icon,
 html.dark .p-toast-message-warn .p-toast-close-button,
@@ -353,7 +354,7 @@ html.dark .p-toast-message-warn .p-toast-close-button,
 [data-theme="dark"] .p-toast-message-warn .p-toast-close-button,
 .dark .p-toast-message-warn .p-toast-message-icon,
 .dark .p-toast-message-warn .p-toast-close-button {
-    color: #fcd34d;
+    color: var(--p-warn-300);
 }
 
 html.dark .p-toast-message-error,
@@ -361,7 +362,7 @@ html.dark .p-toast-message-error,
 .dark .p-toast-message-error {
     background: rgba(239, 68, 68, 0.2);
     border-color: rgba(239, 68, 68, 0.35);
-    color: #fca5a5;
+    color: var(--p-danger-300);
 }
 html.dark .p-toast-message-error .p-toast-message-icon,
 html.dark .p-toast-message-error .p-toast-close-button,
@@ -369,15 +370,15 @@ html.dark .p-toast-message-error .p-toast-close-button,
 [data-theme="dark"] .p-toast-message-error .p-toast-close-button,
 .dark .p-toast-message-error .p-toast-message-icon,
 .dark .p-toast-message-error .p-toast-close-button {
-    color: #fca5a5;
+    color: var(--p-danger-300);
 }
 
 html.dark .p-toast-message-secondary,
 [data-theme="dark"] .p-toast-message-secondary,
 .dark .p-toast-message-secondary {
-    background: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-0);
+    border-color: var(--p-border-color);
+    color: var(--p-text-color);
 }
 html.dark .p-toast-message-secondary .p-toast-message-icon,
 html.dark .p-toast-message-secondary .p-toast-close-button,
@@ -385,15 +386,15 @@ html.dark .p-toast-message-secondary .p-toast-close-button,
 [data-theme="dark"] .p-toast-message-secondary .p-toast-close-button,
 .dark .p-toast-message-secondary .p-toast-message-icon,
 .dark .p-toast-message-secondary .p-toast-close-button {
-    color: var(--p-text-muted, #94a3b8);
+    color: var(--p-text-muted);
 }
 
 html.dark .p-toast-message-contrast,
 [data-theme="dark"] .p-toast-message-contrast,
 .dark .p-toast-message-contrast {
-    background: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-0);
+    border-color: var(--p-border-color);
+    color: var(--p-text-color);
 }
 html.dark .p-toast-message-contrast .p-toast-message-icon,
 html.dark .p-toast-message-contrast .p-toast-close-button,
@@ -401,7 +402,7 @@ html.dark .p-toast-message-contrast .p-toast-close-button,
 [data-theme="dark"] .p-toast-message-contrast .p-toast-close-button,
 .dark .p-toast-message-contrast .p-toast-message-icon,
 .dark .p-toast-message-contrast .p-toast-close-button {
-    color: var(--p-text-color, #f8fafc);
+    color: var(--p-text-color);
 }
 
 html.dark .p-toast-close-button:hover,
@@ -411,32 +412,13 @@ html.dark .p-toast-close-button:hover,
 }
 `;
 
-const CLOSE_SVG = `<svg class="p-toast-close-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
+const CLOSE_SVG = `<svg class="p-toast-close-icon" data-part="root" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
 
 export class ToastService {
     private registeredContainers: Map<string, HTMLElement> = new Map();
     private activeMessages: Map<string, { el: HTMLElement; timeoutId?: any; remainingLife: number; startTime: number }> = new Map();
 
     constructor() {
-        if (typeof window !== 'undefined') {
-            this.initGlobalListeners();
-        }
-    }
-
-    private initGlobalListeners() {
-        document.addEventListener('toast:show', (e: Event) => {
-            const detail = (e as CustomEvent).detail;
-            if (detail) this.add(detail);
-        });
-
-        document.addEventListener('toast:clear', (e: Event) => {
-            const detail = (e as CustomEvent).detail;
-            if (detail?.group) {
-                this.removeGroup(detail.group);
-            } else {
-                this.removeAllGroups();
-            }
-        });
     }
 
     public registerContainer(group: string, containerEl: HTMLElement) {
@@ -548,13 +530,13 @@ export class ToastService {
             closeBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 this.removeById(id);
-            });
+            }, { signal: msg.signal });
             closeBtn.addEventListener('keydown', (e: any) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
                     this.removeById(id);
                 }
-            });
+            }, { signal: msg.signal });
         }
 
         const actionBtn = toastEl.querySelector('[data-toast-action-btn]');
@@ -562,7 +544,7 @@ export class ToastService {
             actionBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 msg.onAction!();
-            });
+            }, { signal: msg.signal });
         }
 
         // Timer Pause on Hover
@@ -597,8 +579,8 @@ export class ToastService {
             }
         };
 
-        toastEl.addEventListener('mouseenter', pauseTimer);
-        toastEl.addEventListener('mouseleave', resumeTimer);
+        toastEl.addEventListener('mouseenter', pauseTimer, { signal: msg.signal });
+        toastEl.addEventListener('mouseleave', resumeTimer, { signal: msg.signal });
 
         if (life > 0) {
             startTimer(life);
@@ -674,6 +656,20 @@ export default function ToastIsland(container: HTMLElement, props: ToastContaine
     }
 
     globalToast.registerContainer(group, container);
+
+    document.addEventListener('toast:show', (e: Event) => {
+        const detail = (e as CustomEvent).detail;
+        if (detail) globalToast.add(detail);
+    }, { signal: ctx?.signal });
+
+    document.addEventListener('toast:clear', (e: Event) => {
+        const detail = (e as CustomEvent).detail;
+        if (detail?.group) {
+            globalToast.removeGroup(detail.group);
+        } else {
+            globalToast.removeAllGroups();
+        }
+    }, { signal: ctx?.signal });
 
     ctx?.onCleanup(() => {
         globalToast.unregisterContainer(group);

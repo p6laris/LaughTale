@@ -118,14 +118,14 @@ const CSS = `
 html.dark .p-textarea,
 [data-theme="dark"] .p-textarea,
 .dark .p-textarea {
-    background: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-0);
+    border-color: var(--p-border-color);
+    color: var(--p-text-color);
 }
 html.dark .p-textarea:hover:not(:disabled):not(.p-disabled):not(.p-invalid),
 [data-theme="dark"] .p-textarea:hover:not(:disabled):not(.p-disabled):not(.p-invalid),
 .dark .p-textarea:hover:not(:disabled):not(.p-disabled):not(.p-invalid) {
-    border-color: var(--p-surface-400, #64748b);
+    border-color: var(--p-surface-400);
 }
 html.dark .p-textarea:focus:not(:disabled):not(.p-disabled):not(.p-invalid),
 html.dark .p-textarea:focus-visible:not(:disabled):not(.p-disabled):not(.p-invalid),
@@ -142,7 +142,7 @@ html.dark .p-textarea.variant-filled,
 [data-theme="dark"] .p-textarea.variant-filled,
 .dark .p-textarea.p-textarea-filled,
 .dark .p-textarea.variant-filled {
-    background: var(--p-surface-100, #1e293b);
+    background: var(--p-surface-100);
 }
 html.dark .p-textarea.p-textarea-filled:focus,
 html.dark .p-textarea.variant-filled:focus,
@@ -150,7 +150,7 @@ html.dark .p-textarea.variant-filled:focus,
 [data-theme="dark"] .p-textarea.variant-filled:focus,
 .dark .p-textarea.p-textarea-filled:focus,
 .dark .p-textarea.variant-filled:focus {
-    background: var(--p-surface-0, #090d16);
+    background: var(--p-surface-0);
 }
 html.dark .p-textarea:disabled,
 html.dark .p-textarea.p-disabled,
@@ -158,9 +158,9 @@ html.dark .p-textarea.p-disabled,
 [data-theme="dark"] .p-textarea.p-disabled,
 .dark .p-textarea:disabled,
 .dark .p-textarea.p-disabled {
-    background: var(--p-surface-100, #1e293b);
-    border-color: var(--p-border-color, #334155);
-    color: var(--p-text-muted, #94a3b8);
+    background: var(--p-surface-100);
+    border-color: var(--p-border-color);
+    color: var(--p-text-muted);
 }
 `;
 
@@ -196,7 +196,7 @@ export default function TextareaIsland(container: HTMLElement, props: TextareaPr
 
             container.innerHTML = `
                 <textarea 
-                    class="${classList}"
+                    class="${classList}" data-part="root"
                     rows="${props.rows || 5}"
                     cols="${props.cols || 30}"
                     placeholder="${props.placeholder || ''}"
@@ -239,17 +239,17 @@ export default function TextareaIsland(container: HTMLElement, props: TextareaPr
             bubbles: true,
             detail: { value: textareaEl.value }
         }));
-    });
+    }, { signal: ctx?.signal });
 
     textareaEl.addEventListener('change', () => {
         container.dispatchEvent(new CustomEvent('textarea:change', {
             bubbles: true,
             detail: { value: textareaEl.value }
         }));
-    });
+    }, { signal: ctx?.signal });
 
     if (isAutoResize) {
-        window.addEventListener('resize', adjustHeight);
+        window.addEventListener('resize', adjustHeight, { signal: ctx?.signal });
         setTimeout(adjustHeight, 0);
     }
 }

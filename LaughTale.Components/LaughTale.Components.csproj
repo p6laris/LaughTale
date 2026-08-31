@@ -17,6 +17,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LaughTale.Core\LaughTale.Core.csproj" />
+    <ProjectReference Include="..\LaughTale.Generators\LaughTale.Generators.csproj" 
+                      OutputItemType="Analyzer" 
+                      ReferenceOutputAssembly="false" />
   </ItemGroup>
 
 </Project>

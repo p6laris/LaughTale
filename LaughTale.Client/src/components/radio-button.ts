@@ -276,73 +276,73 @@ const CSS = `
 html.dark .p-radiobutton-box,
 [data-theme="dark"] .p-radiobutton-box,
 .dark .p-radiobutton-box {
-    background-color: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
+    background-color: var(--p-surface-0);
+    border-color: var(--p-border-color);
 }
 html.dark .p-radiobutton-root:hover:not(.is-disabled) .p-radiobutton-box,
 [data-theme="dark"] .p-radiobutton-root:hover:not(.is-disabled) .p-radiobutton-box,
 .dark .p-radiobutton-root:hover:not(.is-disabled) .p-radiobutton-box {
-    border-color: var(--p-surface-400, #64748b);
+    border-color: var(--p-surface-400);
 }
 html.dark .p-radiobutton-root.is-checked .p-radiobutton-box,
 [data-theme="dark"] .p-radiobutton-root.is-checked .p-radiobutton-box,
 .dark .p-radiobutton-root.is-checked .p-radiobutton-box {
-    border-color: var(--p-primary-500, #10b981);
+    border-color: var(--p-primary-500);
 }
 html.dark .p-radiobutton-icon,
 [data-theme="dark"] .p-radiobutton-icon,
 .dark .p-radiobutton-icon {
-    background: var(--p-primary-500, #10b981);
+    background: var(--p-primary-500);
 }
 html.dark .p-radiobutton-root.variant-filled .p-radiobutton-box,
 [data-theme="dark"] .p-radiobutton-root.variant-filled .p-radiobutton-box,
 .dark .p-radiobutton-root.variant-filled .p-radiobutton-box {
-    background-color: var(--p-surface-100, #1e293b);
+    background-color: var(--p-surface-100);
 }
 html.dark .p-radiobutton-root.variant-filled:hover:not(.is-disabled) .p-radiobutton-box,
 [data-theme="dark"] .p-radiobutton-root.variant-filled:hover:not(.is-disabled) .p-radiobutton-box,
 .dark .p-radiobutton-root.variant-filled:hover:not(.is-disabled) .p-radiobutton-box {
-    background-color: var(--p-surface-200, #334155);
+    background-color: var(--p-surface-200);
 }
 html.dark .p-radiobutton-root.variant-filled.is-checked .p-radiobutton-box,
 [data-theme="dark"] .p-radiobutton-root.variant-filled.is-checked .p-radiobutton-box,
 .dark .p-radiobutton-root.variant-filled.is-checked .p-radiobutton-box {
-    background-color: var(--p-surface-0, #090d16);
-    border-color: var(--p-primary-500, #10b981);
+    background-color: var(--p-surface-0);
+    border-color: var(--p-primary-500);
 }
 html.dark .p-radiobutton-label,
 [data-theme="dark"] .p-radiobutton-label,
 .dark .p-radiobutton-label {
-    color: var(--p-text-color, #f8fafc);
+    color: var(--p-text-color);
 }
 html.dark .p-radiobutton-card,
 [data-theme="dark"] .p-radiobutton-card,
 .dark .p-radiobutton-card {
-    background: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
+    background: var(--p-surface-0);
+    border-color: var(--p-border-color);
 }
 html.dark .p-radiobutton-card:hover:not(.is-disabled),
 [data-theme="dark"] .p-radiobutton-card:hover:not(.is-disabled),
 .dark .p-radiobutton-card:hover:not(.is-disabled) {
-    background: var(--p-surface-50, #0f172a);
-    border-color: var(--p-surface-400, #64748b);
+    background: var(--p-surface-50);
+    border-color: var(--p-surface-400);
 }
 html.dark .p-radiobutton-card.is-checked,
 [data-theme="dark"] .p-radiobutton-card.is-checked,
 .dark .p-radiobutton-card.is-checked {
-    border-color: var(--p-primary-500, #10b981);
-    box-shadow: 0 0 0 1px var(--p-primary-500, #10b981);
+    border-color: var(--p-primary-500);
+    box-shadow: 0 0 0 1px var(--p-primary-500);
 }
 html.dark .p-radiobutton-card-badge,
 [data-theme="dark"] .p-radiobutton-card-badge,
 .dark .p-radiobutton-card-badge {
-    background: var(--p-surface-100, #1e293b);
-    color: var(--p-text-muted, #94a3b8);
+    background: var(--p-surface-100);
+    color: var(--p-text-muted);
 }
 html.dark .p-radiobutton-card-price,
 [data-theme="dark"] .p-radiobutton-card-price,
 .dark .p-radiobutton-card-price {
-    color: var(--p-text-color, #f8fafc);
+    color: var(--p-text-color);
 }
 `;
 
@@ -379,7 +379,7 @@ export default function RadioButtonIsland(container: HTMLElement, props: RadioBu
 
         if (isCard) {
             container.innerHTML = `
-                <label class="${rootClasses}">
+                <label class="${rootClasses}" data-part="root">
                     <div class="p-radiobutton-card-content">
                         ${props.flag ? `<span style="font-size: 1.25rem; line-height: 1;">${props.flag}</span>` : ''}
                         ${props.icon ? `<span style="color: var(--lt-primary-600); display: flex;">${getLucideIcon(props.icon, 18)}</span>` : ''}
@@ -467,14 +467,14 @@ export default function RadioButtonIsland(container: HTMLElement, props: RadioBu
             updateVisuals(input.checked);
             syncOthers();
             syncValue();
-        });
+        }, { signal: ctx?.signal });
 
         input.addEventListener('focus', () => {
             container.querySelector('.p-radiobutton-root')?.classList.add('is-focused');
-        });
+        }, { signal: ctx?.signal });
         input.addEventListener('blur', () => {
             container.querySelector('.p-radiobutton-root')?.classList.remove('is-focused');
-        });
+        }, { signal: ctx?.signal });
     }
 
     function syncOthers() {
@@ -597,7 +597,7 @@ export default function RadioButtonIsland(container: HTMLElement, props: RadioBu
                     bubbles: true,
                     detail: { value: inp.value }
                 }));
-            });
+            }, { signal: ctx?.signal });
         });
     }
 

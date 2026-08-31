@@ -197,60 +197,60 @@ const ACCORDION_CSS = `
 html.dark .p-accordion,
 [data-theme="dark"] .p-accordion,
 .dark .p-accordion {
-    background: var(--p-surface-0, #090d16) !important;
-    border-color: var(--p-border-color, #334155) !important;
-    color: var(--p-text-color, #f8fafc) !important;
+    background: var(--p-surface-0) !important;
+    border-color: var(--p-border-color) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-accordionpanel,
 [data-theme="dark"] .p-accordionpanel,
 .dark .p-accordionpanel {
-    border-color: var(--p-border-color, #334155) !important;
+    border-color: var(--p-border-color) !important;
 }
 html.dark .p-accordionheader-toggle,
 [data-theme="dark"] .p-accordionheader-toggle,
 .dark .p-accordionheader-toggle {
-    background: var(--p-surface-0, #090d16) !important;
-    color: var(--p-text-color, #f8fafc) !important;
+    background: var(--p-surface-0) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-accordionheader-toggle:hover:not(:disabled),
 [data-theme="dark"] .p-accordionheader-toggle:hover:not(:disabled),
 .dark .p-accordionheader-toggle:hover:not(:disabled) {
-    background: var(--p-surface-50, #0f172a) !important;
-    color: var(--p-text-color, #f8fafc) !important;
+    background: var(--p-surface-50) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-accordionpanel.p-accordionpanel-active > .p-accordionheader > .p-accordionheader-toggle,
 [data-theme="dark"] .p-accordionpanel.p-accordionpanel-active > .p-accordionheader > .p-accordionheader-toggle,
 .dark .p-accordionpanel.p-accordionpanel-active > .p-accordionheader > .p-accordionheader-toggle {
-    color: var(--p-primary-400, #34d399) !important;
+    color: var(--p-primary-400) !important;
 }
 html.dark .p-accordioncontent,
 [data-theme="dark"] .p-accordioncontent,
 .dark .p-accordioncontent {
-    background: var(--p-surface-0, #090d16) !important;
+    background: var(--p-surface-0) !important;
 }
 html.dark .p-accordioncontent-content,
 [data-theme="dark"] .p-accordioncontent-content,
 .dark .p-accordioncontent-content {
-    color: var(--p-text-color, #f8fafc) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-accordion-ctrl-btn,
 [data-theme="dark"] .p-accordion-ctrl-btn,
 .dark .p-accordion-ctrl-btn {
-    background: var(--p-surface-100, #1e293b) !important;
-    border-color: var(--p-border-color, #334155) !important;
-    color: var(--p-text-color, #f8fafc) !important;
+    background: var(--p-surface-100) !important;
+    border-color: var(--p-border-color) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-accordion-ctrl-btn.p-highlight,
 [data-theme="dark"] .p-accordion-ctrl-btn.p-highlight,
 .dark .p-accordion-ctrl-btn.p-highlight {
-    background: var(--p-primary-500, #10b981) !important;
-    color: #ffffff !important;
+    background: var(--p-primary-500) !important;
+    color: var(--p-surface-0) !important;
 }
 html.dark .p-accordion-radio-circle,
 [data-theme="dark"] .p-accordion-radio-circle,
 .dark .p-accordion-radio-circle {
-    background: var(--p-surface-50, #0f172a) !important;
-    border-color: var(--p-border-color, #334155) !important;
+    background: var(--p-surface-50) !important;
+    border-color: var(--p-border-color) !important;
 }
 `;
 
@@ -364,7 +364,7 @@ export default function AccordionIsland(container: HTMLElement, props: Accordion
         let topControlsHtml = '';
         if (isControlled) {
             topControlsHtml = `
-                <div class="p-accordion-top-controls">
+                <div class="p-accordion-top-controls" data-part="root">
                     ${tabs.map((_, i) => {
                         const k = String(i);
                         const isActive = activeKeys.has(k);
@@ -472,7 +472,7 @@ export default function AccordionIsland(container: HTMLElement, props: Accordion
             btn.addEventListener('click', () => {
                 const k = btn.getAttribute('data-ctrl-idx');
                 if (k !== null) togglePanel(k);
-            });
+            }, { signal: ctx?.signal });
         });
 
         // Header toggles
@@ -481,7 +481,7 @@ export default function AccordionIsland(container: HTMLElement, props: Accordion
             btn.addEventListener('click', () => {
                 const k = btn.getAttribute('data-toggle-idx');
                 if (k !== null) togglePanel(k);
-            });
+            }, { signal: ctx?.signal });
 
             // Keyboard accessibility (APG W3C standard)
             btn.addEventListener('keydown', (e) => {
@@ -500,7 +500,7 @@ export default function AccordionIsland(container: HTMLElement, props: Accordion
                     e.preventDefault();
                     headerButtons[headerButtons.length - 1]?.focus();
                 }
-            });
+            }, { signal: ctx?.signal });
         });
     }
 

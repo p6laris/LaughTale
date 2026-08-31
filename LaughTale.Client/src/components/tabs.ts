@@ -197,40 +197,40 @@ const TABS_CSS = `
 html.dark .p-tablist,
 [data-theme="dark"] .p-tablist,
 .dark .p-tablist {
-    border-bottom-color: var(--p-border-color, #334155);
+    border-bottom-color: var(--p-border-color);
 }
 html.dark .p-tab,
 [data-theme="dark"] .p-tab,
 .dark .p-tab {
-    color: var(--p-text-muted, #94a3b8);
+    color: var(--p-text-muted);
 }
 html.dark .p-tab:hover:not(.p-tab-active):not(:disabled):not([aria-disabled="true"]),
 [data-theme="dark"] .p-tab:hover:not(.p-tab-active):not(:disabled):not([aria-disabled="true"]),
 .dark .p-tab:hover:not(.p-tab-active):not(:disabled):not([aria-disabled="true"]) {
-    color: var(--p-text-color, #f8fafc);
+    color: var(--p-text-color);
 }
 html.dark .p-tab-active,
 [data-theme="dark"] .p-tab-active,
 .dark .p-tab-active {
-    color: var(--p-primary-500, #10b981);
-    border-bottom-color: var(--p-primary-500, #10b981);
+    color: var(--p-primary-500);
+    border-bottom-color: var(--p-primary-500);
 }
 html.dark .p-tablist-active-bar,
 [data-theme="dark"] .p-tablist-active-bar,
 .dark .p-tablist-active-bar {
-    background: var(--p-primary-500, #10b981);
+    background: var(--p-primary-500);
 }
 html.dark .p-tablist-prev-button,
 [data-theme="dark"] .p-tablist-prev-button,
 .dark .p-tablist-prev-button {
-    background: linear-gradient(to right, var(--p-surface-0, #090d16) 35%, rgba(15, 23, 42, 0.7) 65%, transparent 100%);
-    color: var(--p-text-muted, #94a3b8);
+    background: linear-gradient(to right, var(--p-surface-0) 35%, rgba(15, 23, 42, 0.7) 65%, transparent 100%);
+    color: var(--p-text-muted);
 }
 html.dark .p-tablist-next-button,
 [data-theme="dark"] .p-tablist-next-button,
 .dark .p-tablist-next-button {
-    background: linear-gradient(to left, var(--p-surface-0, #090d16) 35%, rgba(15, 23, 42, 0.7) 65%, transparent 100%);
-    color: var(--p-text-muted, #94a3b8);
+    background: linear-gradient(to left, var(--p-surface-0) 35%, rgba(15, 23, 42, 0.7) 65%, transparent 100%);
+    color: var(--p-text-muted);
 }
 html.dark .p-tablist-prev-button:hover:not(:disabled),
 html.dark .p-tablist-next-button:hover:not(:disabled),
@@ -238,24 +238,24 @@ html.dark .p-tablist-next-button:hover:not(:disabled),
 [data-theme="dark"] .p-tablist-next-button:hover:not(:disabled),
 .dark .p-tablist-prev-button:hover:not(:disabled),
 .dark .p-tablist-next-button:hover:not(:disabled) {
-    color: var(--p-text-color, #f8fafc);
+    color: var(--p-text-color);
 }
 html.dark .p-tablist-capsule,
 [data-theme="dark"] .p-tablist-capsule,
 .dark .p-tablist-capsule {
-    background: var(--p-surface-100, #1e293b);
+    background: var(--p-surface-100);
 }
 html.dark .p-tablist-capsule .p-tab-active,
 [data-theme="dark"] .p-tablist-capsule .p-tab-active,
 .dark .p-tablist-capsule .p-tab-active {
-    background: var(--p-surface-0, #090d16);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-0);
+    color: var(--p-text-color);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 html.dark .p-tabpanel,
 [data-theme="dark"] .p-tabpanel,
 .dark .p-tabpanel {
-    color: var(--p-text-color, #f8fafc);
+    color: var(--p-text-color);
 }
 `;
 
@@ -290,7 +290,7 @@ export default function TabsIsland(container: HTMLElement, props: TabsProps, ctx
     let contentContainer = tabList.querySelector<HTMLElement>('.p-tablist-content');
     if (!contentContainer) {
         contentContainer = document.createElement('div');
-        contentContainer.className = 'p-tablist-content';
+        contentContainer.className = 'p-tablist-content'; container.setAttribute('data-part', 'root');
         
         let tabUl = tabList.querySelector<HTMLElement>('.p-tablist-tab-list, ul');
         if (!tabUl) {
@@ -404,12 +404,12 @@ export default function TabsIsland(container: HTMLElement, props: TabsProps, ctx
             e.preventDefault();
             if (isDisabled) return;
             setActiveTab(val);
-        });
+        }, { signal: ctx?.signal });
 
         if (selectOnFocus) {
             tab.addEventListener('focus', () => {
                 if (!isDisabled) setActiveTab(val);
-            });
+            }, { signal: ctx?.signal });
         }
 
         tab.addEventListener('keydown', (e) => {
@@ -435,7 +435,7 @@ export default function TabsIsland(container: HTMLElement, props: TabsProps, ctx
                 const nextVal = nextTab.getAttribute('data-value') || nextTab.getAttribute('value') || String(nextIdx);
                 setActiveTab(nextVal);
             }
-        });
+        }, { signal: ctx?.signal });
     });
 
     // Scrollable navigation buttons setup
@@ -470,15 +470,15 @@ export default function TabsIsland(container: HTMLElement, props: TabsProps, ctx
 
         prevBtn.addEventListener('click', () => {
             contentContainer?.scrollBy({ left: -220, behavior: 'smooth' });
-        });
+        }, { signal: ctx?.signal });
 
         nextBtn.addEventListener('click', () => {
             contentContainer?.scrollBy({ left: 220, behavior: 'smooth' });
-        });
+        }, { signal: ctx?.signal });
 
-        contentContainer.addEventListener('scroll', checkScrollButtons);
+        contentContainer.addEventListener('scroll', checkScrollButtons, { signal: ctx?.signal });
         setTimeout(checkScrollButtons, 50);
-        window.addEventListener('resize', checkScrollButtons);
+        window.addEventListener('resize', checkScrollButtons, { signal: ctx?.signal });
     }
 
     // Controlled demo: ONLY listen to buttons that are direct siblings or inside the immediate demo wrapper
@@ -489,7 +489,7 @@ export default function TabsIsland(container: HTMLElement, props: TabsProps, ctx
                 e.preventDefault();
                 const targetTab = btn.getAttribute('data-tabs-target');
                 if (targetTab) setActiveTab(targetTab);
-            });
+            }, { signal: ctx?.signal });
         });
     }
 
@@ -499,5 +499,5 @@ export default function TabsIsland(container: HTMLElement, props: TabsProps, ctx
         const tabs = getTabs();
         const activeTabEl = tabs.find(t => (t.getAttribute('data-value') || t.getAttribute('value')) === activeValue);
         updateActiveBar(activeTabEl || null);
-    });
+    }, { signal: ctx?.signal });
 }

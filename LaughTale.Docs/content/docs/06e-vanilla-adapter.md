@@ -23,7 +23,7 @@ LaughTale treats **Pure TypeScript / Vanilla JS as a first-class citizen**. Writ
 Every Pure TypeScript island is simply an exported function matching this signature:
 
 ```typescript
-import { IslandContext } from '@softmax/laughtale-client';
+import { IslandContext } from 'laughtale';
 
 export interface MyComponentProps {
     title: string;
@@ -147,7 +147,7 @@ export default function RealTimeTicker(container: HTMLElement, props: any, ctx?:
 Pure TypeScript islands communicate seamlessly with other islands (including React, Vue, or Svelte) via LaughTale's Pub/Sub Event Bus:
 
 ```typescript
-import { emitIslandEvent, onIslandEvent } from '@softmax/laughtale-client';
+import { emitIslandEvent, onIslandEvent } from 'laughtale';
 
 // 1. Broadcast an event to all islands:
 emitIslandEvent('cart:item-added', {
@@ -174,7 +174,7 @@ Here is a full real-world Pure TypeScript island rendering an animated HTML5 Can
 
 ```typescript
 // src/islands/audio-visualizer.ts
-import { IslandContext } from '@softmax/laughtale-client';
+import { IslandContext } from 'laughtale';
 
 export default function AudioVisualizer(container: HTMLElement, props: any, ctx?: IslandContext) {
     container.innerHTML = `

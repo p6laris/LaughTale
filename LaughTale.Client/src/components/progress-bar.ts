@@ -20,7 +20,7 @@ const CSS = `
 html.dark .laughtale-progress-bar,
 [data-theme="dark"] .laughtale-progress-bar,
 .dark .laughtale-progress-bar {
-    background: var(--p-surface-100, #1e293b) !important;
+    background: var(--p-surface-100) !important;
 }
 `;
 
@@ -33,7 +33,7 @@ export default function ProgressBarIsland(container: HTMLElement, props: Progres
 
     if (isIndeterminate) {
         container.innerHTML = `
-            <div class="laughtale-progress-bar" style="position: relative; height: ${height}; width: 100%; border-radius: 9999px; overflow: hidden; background: var(--lt-surface-100);">
+            <div class="laughtale-progress-bar" data-part="root" style="position: relative; height: ${height}; width: 100%; border-radius: 9999px; overflow: hidden; background: var(--lt-surface-100);">
                 <div style="position: absolute; height: 100%; width: 40%; background: ${color}; border-radius: 9999px; animation: indeterminateProgress 1.5s infinite linear;"></div>
             </div>
             <style>

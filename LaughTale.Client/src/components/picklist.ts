@@ -276,13 +276,13 @@ const PICKLIST_CSS = `
 html.dark .p-picklist,
 [data-theme="dark"] .p-picklist,
 .dark .p-picklist {
-    color: var(--p-text-color, #f8fafc) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-picklist-list-container,
 [data-theme="dark"] .p-picklist-list-container,
 .dark .p-picklist-list-container {
-    background: var(--p-surface-0, #090d16) !important;
-    border-color: var(--p-border-color, #334155) !important;
+    background: var(--p-surface-0) !important;
+    border-color: var(--p-border-color) !important;
 }
 html.dark .p-picklist-header,
 html.dark .p-picklist-filter-container,
@@ -290,35 +290,35 @@ html.dark .p-picklist-filter-container,
 [data-theme="dark"] .p-picklist-filter-container,
 .dark .p-picklist-header,
 .dark .p-picklist-filter-container {
-    background: var(--p-surface-50, #0f172a) !important;
-    border-color: var(--p-border-color, #334155) !important;
-    color: var(--p-text-color, #f8fafc) !important;
+    background: var(--p-surface-50) !important;
+    border-color: var(--p-border-color) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-picklist-filter-input,
 [data-theme="dark"] .p-picklist-filter-input,
 .dark .p-picklist-filter-input {
-    background: var(--p-surface-0, #090d16) !important;
-    border-color: var(--p-border-color, #334155) !important;
-    color: var(--p-text-color, #f8fafc) !important;
+    background: var(--p-surface-0) !important;
+    border-color: var(--p-border-color) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-picklist-control-btn,
 [data-theme="dark"] .p-picklist-control-btn,
 .dark .p-picklist-control-btn {
-    background: var(--p-surface-0, #090d16) !important;
-    border-color: var(--p-border-color, #334155) !important;
-    color: var(--p-text-muted, #94a3b8) !important;
+    background: var(--p-surface-0) !important;
+    border-color: var(--p-border-color) !important;
+    color: var(--p-text-muted) !important;
 }
 html.dark .p-picklist-control-btn:hover:not(:disabled),
 [data-theme="dark"] .p-picklist-control-btn:hover:not(:disabled),
 .dark .p-picklist-control-btn:hover:not(:disabled) {
-    background: var(--p-surface-100, #1e293b) !important;
-    color: var(--p-text-color, #f8fafc) !important;
+    background: var(--p-surface-100) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-picklist-item:hover:not(.p-highlight),
 [data-theme="dark"] .p-picklist-item:hover:not(.p-highlight),
 .dark .p-picklist-item:hover:not(.p-highlight) {
-    background: var(--p-surface-100, #1e293b) !important;
-    color: var(--p-text-color, #f8fafc) !important;
+    background: var(--p-surface-100) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-picklist-product-name,
 html.dark .p-picklist-product-price,
@@ -326,13 +326,13 @@ html.dark .p-picklist-product-price,
 [data-theme="dark"] .p-picklist-product-price,
 .dark .p-picklist-product-name,
 .dark .p-picklist-product-price {
-    color: var(--p-text-color, #f8fafc) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-picklist-product-img,
 [data-theme="dark"] .p-picklist-product-img,
 .dark .p-picklist-product-img {
-    background: var(--p-surface-100, #1e293b) !important;
-    border-color: var(--p-border-color, #334155) !important;
+    background: var(--p-surface-100) !important;
+    border-color: var(--p-border-color) !important;
 }
 
 /* Bi-Directional RTL Support */
@@ -347,7 +347,7 @@ html.dark .p-picklist-product-img,
 }
 `;
 
-export default function PickListIsland<T = any>(container: HTMLElement, props: PickListProps<T>) {
+export default function PickListIsland<T = any>(container: HTMLElement, props: PickListProps<T>, ctx?: IslandContext) {
     injectIslandStyle('picklist', PICKLIST_CSS);
 
     const initialSource = props.value ? props.value[0] : (props.source || []);
@@ -379,7 +379,7 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
 
     function renderCellContent(item: PickListItem<T>, isSelected: boolean): string {
         const checkboxHtml = isCheckbox ? `
-            <div class="p-checkbox-box ${isSelected ? 'p-checked' : ''}" role="checkbox" aria-checked="${isSelected}">
+            <div class="p-checkbox-box ${isSelected ? 'p-checked' : ''}" data-part="root" role="checkbox" aria-checked="${isSelected}">
                 ${isSelected ? LucideIcons.check : ''}
             </div>
         ` : '';
@@ -664,7 +664,7 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
                             }
                         }
                         updateSourceSelectionUI();
-                    });
+                    }, { signal: ctx?.signal });
                 });
             }
         }
@@ -724,7 +724,7 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
                             }
                         }
                         updateTargetSelectionUI();
-                    });
+                    }, { signal: ctx?.signal });
                 });
             }
         }
@@ -759,7 +759,7 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
             srcFilterInput.addEventListener('input', (e) => {
                 sourceFilterQuery = (e.target as HTMLInputElement).value;
                 updateSourceList();
-            });
+            }, { signal: ctx?.signal });
         }
 
         // 2. Target Filter Input
@@ -768,7 +768,7 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
             tgtFilterInput.addEventListener('input', (e) => {
                 targetFilterQuery = (e.target as HTMLInputElement).value;
                 updateTargetList();
-            });
+            }, { signal: ctx?.signal });
         }
 
         // 3. Source Select-All Checkbox
@@ -782,7 +782,7 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
                     sourceList.forEach(it => selectedSource.add(getItemId(it)));
                 }
                 updateSourceSelectionUI();
-            });
+            }, { signal: ctx?.signal });
         }
 
         // 4. Target Select-All Checkbox
@@ -796,7 +796,7 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
                     targetList.forEach(it => selectedTarget.add(getItemId(it)));
                 }
                 updateTargetSelectionUI();
-            });
+            }, { signal: ctx?.signal });
         }
 
         // 5. Move To Target Button
@@ -817,7 +817,7 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
             }
 
             syncValues('move-to-target', moving);
-        });
+        }, { signal: ctx?.signal });
 
         // 6. Move All To Target Button
         rootEl.querySelector('.btn-move-all-to-target')?.addEventListener('click', () => {
@@ -836,7 +836,7 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
             }
 
             syncValues('move-all-to-target', moving);
-        });
+        }, { signal: ctx?.signal });
 
         // 7. Move To Source Button
         rootEl.querySelector('.btn-move-to-source')?.addEventListener('click', () => {
@@ -856,7 +856,7 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
             }
 
             syncValues('move-to-source', moving);
-        });
+        }, { signal: ctx?.signal });
 
         // 8. Move All To Source Button
         rootEl.querySelector('.btn-move-all-to-source')?.addEventListener('click', () => {
@@ -875,35 +875,35 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
             }
 
             syncValues('move-all-to-source', moving);
-        });
+        }, { signal: ctx?.signal });
 
         // 9. Source Reorder Buttons
         rootEl.querySelector('.btn-source-top')?.addEventListener('click', () => {
             reorderList(sourceList, selectedSource, 'top', 'source');
-        });
+        }, { signal: ctx?.signal });
         rootEl.querySelector('.btn-source-up')?.addEventListener('click', () => {
             reorderList(sourceList, selectedSource, 'up', 'source');
-        });
+        }, { signal: ctx?.signal });
         rootEl.querySelector('.btn-source-down')?.addEventListener('click', () => {
             reorderList(sourceList, selectedSource, 'down', 'source');
-        });
+        }, { signal: ctx?.signal });
         rootEl.querySelector('.btn-source-bottom')?.addEventListener('click', () => {
             reorderList(sourceList, selectedSource, 'bottom', 'source');
-        });
+        }, { signal: ctx?.signal });
 
         // 10. Target Reorder Buttons
         rootEl.querySelector('.btn-target-top')?.addEventListener('click', () => {
             reorderList(targetList, selectedTarget, 'top', 'target');
-        });
+        }, { signal: ctx?.signal });
         rootEl.querySelector('.btn-target-up')?.addEventListener('click', () => {
             reorderList(targetList, selectedTarget, 'up', 'target');
-        });
+        }, { signal: ctx?.signal });
         rootEl.querySelector('.btn-target-down')?.addEventListener('click', () => {
             reorderList(targetList, selectedTarget, 'down', 'target');
-        });
+        }, { signal: ctx?.signal });
         rootEl.querySelector('.btn-target-bottom')?.addEventListener('click', () => {
             reorderList(targetList, selectedTarget, 'bottom', 'target');
-        });
+        }, { signal: ctx?.signal });
     }
 
     function reorderList(list: PickListItem<T>[], selectedSet: Set<string>, direction: 'top' | 'up' | 'down' | 'bottom', whichList: 'source' | 'target') {

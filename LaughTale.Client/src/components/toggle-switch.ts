@@ -155,49 +155,49 @@ const CSS = `
 html.dark .p-toggleswitch-slider,
 [data-theme="dark"] .p-toggleswitch-slider,
 .dark .p-toggleswitch-slider {
-    background: var(--p-surface-200, #334155);
+    background: var(--p-surface-200);
 }
 html.dark .p-toggleswitch:hover:not(.p-disabled):not(.p-toggleswitch-checked) .p-toggleswitch-slider,
 [data-theme="dark"] .p-toggleswitch:hover:not(.p-disabled):not(.p-toggleswitch-checked) .p-toggleswitch-slider,
 .dark .p-toggleswitch:hover:not(.p-disabled):not(.p-toggleswitch-checked) .p-toggleswitch-slider {
-    background: var(--p-surface-300, #475569);
+    background: var(--p-surface-300);
 }
 html.dark .p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-slider,
 [data-theme="dark"] .p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-slider,
 .dark .p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-slider {
-    background: var(--p-primary-500, #10b981);
+    background: var(--p-primary-500);
 }
 html.dark .p-toggleswitch.p-toggleswitch-checked:hover:not(.p-disabled) .p-toggleswitch-slider,
 [data-theme="dark"] .p-toggleswitch.p-toggleswitch-checked:hover:not(.p-disabled) .p-toggleswitch-slider,
 .dark .p-toggleswitch.p-toggleswitch-checked:hover:not(.p-disabled) .p-toggleswitch-slider {
-    background: var(--p-primary-400, #34d399);
+    background: var(--p-primary-400);
 }
 html.dark .p-toggleswitch-handle,
 [data-theme="dark"] .p-toggleswitch-handle,
 .dark .p-toggleswitch-handle {
-    background: var(--p-surface-0, #090d16);
-    color: var(--p-text-muted, #94a3b8);
+    background: var(--p-surface-0);
+    color: var(--p-text-muted);
 }
 html.dark .p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-handle,
 [data-theme="dark"] .p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-handle,
 .dark .p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-handle {
-    background: var(--p-surface-0, #090d16);
-    color: var(--p-primary-400, #34d399);
+    background: var(--p-surface-0);
+    color: var(--p-primary-400);
 }
 html.dark .p-toggleswitch.p-disabled .p-toggleswitch-slider,
 [data-theme="dark"] .p-toggleswitch.p-disabled .p-toggleswitch-slider,
 .dark .p-toggleswitch.p-disabled .p-toggleswitch-slider {
-    background: var(--p-surface-100, #1e293b);
+    background: var(--p-surface-100);
 }
 html.dark .p-toggleswitch.p-disabled .p-toggleswitch-handle,
 [data-theme="dark"] .p-toggleswitch.p-disabled .p-toggleswitch-handle,
 .dark .p-toggleswitch.p-disabled .p-toggleswitch-handle {
-    background: var(--p-surface-200, #334155);
+    background: var(--p-surface-200);
 }
 html.dark .p-toggleswitch-label,
 [data-theme="dark"] .p-toggleswitch-label,
 .dark .p-toggleswitch-label {
-    color: var(--p-text-color, #f8fafc);
+    color: var(--p-text-color);
 }
 `;
 
@@ -225,7 +225,7 @@ export default function ToggleSwitchIsland(container: HTMLElement, props: Toggle
         container.className = rootClasses;
 
         const activeIcon = isChecked ? checkedIcon : uncheckedIcon;
-        const iconHtml = activeIcon ? `<span class="p-toggleswitch-handle-icon">${getLucideIcon(activeIcon, 10)}</span>` : '';
+        const iconHtml = activeIcon ? `<span class="p-toggleswitch-handle-icon" data-part="root">${getLucideIcon(activeIcon, 10)}</span>` : '';
 
         container.innerHTML = `
             <input 

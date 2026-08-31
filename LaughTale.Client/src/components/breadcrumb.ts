@@ -131,46 +131,46 @@ html.dark .p-breadcrumb-transparent,
 html.dark .p-breadcrumb,
 [data-theme="dark"] .p-breadcrumb,
 .dark .p-breadcrumb {
-    background: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
+    background: var(--p-surface-0);
+    border-color: var(--p-border-color);
 }
 
 html.dark .p-breadcrumb-item-link,
 [data-theme="dark"] .p-breadcrumb-item-link,
 .dark .p-breadcrumb-item-link {
-    color: var(--p-text-muted, #94a3b8);
+    color: var(--p-text-muted);
 }
 
 html.dark .p-breadcrumb-item-link:hover,
 [data-theme="dark"] .p-breadcrumb-item-link:hover,
 .dark .p-breadcrumb-item-link:hover {
-    color: var(--p-text-color, #f8fafc);
-    background: var(--p-surface-100, #1e293b);
+    color: var(--p-text-color);
+    background: var(--p-surface-100);
 }
 
 html.dark .p-breadcrumb-item-current,
 [data-theme="dark"] .p-breadcrumb-item-current,
 .dark .p-breadcrumb-item-current {
-    color: var(--p-text-color, #f8fafc);
+    color: var(--p-text-color);
 }
 
 html.dark .p-breadcrumb-separator,
 [data-theme="dark"] .p-breadcrumb-separator,
 .dark .p-breadcrumb-separator {
-    color: var(--p-surface-400, #64748b);
+    color: var(--p-surface-400);
 }
 
 html.dark .p-breadcrumb-ellipsis,
 [data-theme="dark"] .p-breadcrumb-ellipsis,
 .dark .p-breadcrumb-ellipsis {
-    color: var(--p-text-muted, #94a3b8);
+    color: var(--p-text-muted);
 }
 
 html.dark .p-breadcrumb-ellipsis:hover,
 [data-theme="dark"] .p-breadcrumb-ellipsis:hover,
 .dark .p-breadcrumb-ellipsis:hover {
-    background: var(--p-surface-100, #1e293b);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-100);
+    color: var(--p-text-color);
 }
 `;
 
@@ -210,7 +210,7 @@ export default function BreadcrumbIsland(container: HTMLElement, props: Breadcru
 
     function getSeparatorHtml(): string {
         if (separatorType === 'slash') {
-            return '<span class="p-breadcrumb-separator" aria-hidden="true">/</span>';
+            return '<span class="p-breadcrumb-separator" data-part="root" aria-hidden="true">/</span>';
         }
         if (separatorType === 'arrow') {
             return '<span class="p-breadcrumb-separator" aria-hidden="true">&gt;</span>';

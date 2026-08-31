@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Text.Json;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using LaughTale.Components.TagHelpers;
@@ -10,7 +10,7 @@ public class TagHelperReflectionSnapshotTests
 {
     public static IEnumerable<object[]> GetAllComponentTagHelperTypes()
     {
-        var assembly = typeof(IslandNumberTagHelper).Assembly;
+        var assembly = typeof(IslandButtonTagHelper).Assembly;
         var tagHelperTypes = assembly.GetTypes()
             .Where(t => typeof(ITagHelper).IsAssignableFrom(t) && !t.IsAbstract && t.GetConstructor(Type.EmptyTypes) != null)
             .OrderBy(t => t.Name);

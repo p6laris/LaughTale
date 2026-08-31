@@ -1,4 +1,4 @@
----
+﻿---
 title: Quickstart & Setup
 description: Get up and running with LaughTale Islands Architecture in ASP.NET Core in under 5 minutes with a zero-configuration setup.
 order: 1
@@ -24,13 +24,13 @@ Choose your installation flavor:
 
 #### Option A: Full Suite (Recommended - Includes 76+ Aura UI Components)
 ```bash
-dotnet add package SoftMax.LaughTale.Core
-dotnet add package SoftMax.LaughTale.Components
+dotnet add package LaughTale.Core
+dotnet add package LaughTale.Components
 ```
 
 #### Option B: Headless Core Only (For Custom Design Systems, Tailwind CSS, or React/Vue)
 ```bash
-dotnet add package SoftMax.LaughTale.Core
+dotnet add package LaughTale.Core
 ```
 
 *(See the dedicated [Headless & Standalone Core](/doc/01b-headless-and-custom-islands) guide for building custom UI islands).*

@@ -380,18 +380,18 @@ const SPEEDDIAL_CSS = `
 html.dark .p-speeddial-action,
 [data-theme="dark"] .p-speeddial-action,
 .dark .p-speeddial-action {
-    background: var(--p-surface-0, #090d16) !important;
-    border-color: var(--p-border-color, #334155) !important;
-    color: var(--p-text-muted, #94a3b8) !important;
+    background: var(--p-surface-0) !important;
+    border-color: var(--p-border-color) !important;
+    color: var(--p-text-muted) !important;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4) !important;
 }
 
 html.dark .p-speeddial-action:hover:not(:disabled),
 [data-theme="dark"] .p-speeddial-action:hover:not(:disabled),
 .dark .p-speeddial-action:hover:not(:disabled) {
-    background: var(--p-surface-100, #1e293b) !important;
-    color: var(--p-text-color, #f8fafc) !important;
-    border-color: var(--p-surface-400, #64748b) !important;
+    background: var(--p-surface-100) !important;
+    color: var(--p-text-color) !important;
+    border-color: var(--p-surface-400) !important;
 }
 
 html.dark .p-speeddial-custom-label,
@@ -400,9 +400,9 @@ html.dark .p-speeddial-custom-icon,
 [data-theme="dark"] .p-speeddial-custom-icon,
 .dark .p-speeddial-custom-label,
 .dark .p-speeddial-custom-icon {
-    background: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
-    color: var(--p-text-muted, #94a3b8);
+    background: var(--p-surface-0);
+    border-color: var(--p-border-color);
+    color: var(--p-text-muted);
 }
 
 html.dark .p-speeddial-custom-item:hover .p-speeddial-custom-label,
@@ -411,37 +411,37 @@ html.dark .p-speeddial-custom-item:hover .p-speeddial-custom-icon,
 [data-theme="dark"] .p-speeddial-custom-item:hover .p-speeddial-custom-icon,
 .dark .p-speeddial-custom-item:hover .p-speeddial-custom-label,
 .dark .p-speeddial-custom-item:hover .p-speeddial-custom-icon {
-    background: var(--p-surface-100, #1e293b);
-    color: var(--p-text-color, #f8fafc);
-    border-color: var(--p-surface-400, #64748b);
+    background: var(--p-surface-100);
+    color: var(--p-text-color);
+    border-color: var(--p-surface-400);
 }
 
 html.dark .p-speeddial-tooltip,
 [data-theme="dark"] .p-speeddial-tooltip,
 .dark .p-speeddial-tooltip {
-    background: var(--p-surface-100, #1e293b);
-    color: var(--p-text-color, #f8fafc);
-    border: 1px solid var(--p-border-color, #334155);
+    background: var(--p-surface-100);
+    color: var(--p-text-color);
+    border: 1px solid var(--p-border-color);
 }
 html.dark .p-speeddial-tooltip.tooltip-left::after,
 [data-theme="dark"] .p-speeddial-tooltip.tooltip-left::after,
 .dark .p-speeddial-tooltip.tooltip-left::after {
-    border-color: transparent transparent transparent var(--p-surface-100, #1e293b);
+    border-color: transparent transparent transparent var(--p-surface-100);
 }
 html.dark .p-speeddial-tooltip.tooltip-right::after,
 [data-theme="dark"] .p-speeddial-tooltip.tooltip-right::after,
 .dark .p-speeddial-tooltip.tooltip-right::after {
-    border-color: transparent var(--p-surface-100, #1e293b) transparent transparent;
+    border-color: transparent var(--p-surface-100) transparent transparent;
 }
 html.dark .p-speeddial-tooltip.tooltip-top::after,
 [data-theme="dark"] .p-speeddial-tooltip.tooltip-top::after,
 .dark .p-speeddial-tooltip.tooltip-top::after {
-    border-color: var(--p-surface-100, #1e293b) transparent transparent transparent;
+    border-color: var(--p-surface-100) transparent transparent transparent;
 }
 html.dark .p-speeddial-tooltip.tooltip-bottom::after,
 [data-theme="dark"] .p-speeddial-tooltip.tooltip-bottom::after,
 .dark .p-speeddial-tooltip.tooltip-bottom::after {
-    border-color: transparent transparent var(--p-surface-100, #1e293b) transparent;
+    border-color: transparent transparent var(--p-surface-100) transparent;
 }
 `;
 
@@ -584,7 +584,7 @@ export default function SpeedDialIsland(container: HTMLElement, props: SpeedDial
     // Initial DOM creation (Only once!)
     let maskHtml = '';
     if (mask) {
-        maskHtml = `<div class="p-speeddial-mask"></div>`;
+        maskHtml = `<div class="p-speeddial-mask" data-part="root"></div>`;
     }
 
     const itemsHtml = items.map((item, index) => {
@@ -713,18 +713,18 @@ export default function SpeedDialIsland(container: HTMLElement, props: SpeedDial
     mainBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         toggle();
-    });
+    }, { signal: ctx?.signal });
 
     maskEl?.addEventListener('click', (e) => {
         e.stopPropagation();
         close();
-    });
+    }, { signal: ctx?.signal });
 
     document.addEventListener('click', (e) => {
         if (isOpen && !container.contains(e.target as Node)) {
             close();
         }
-    });
+    }, { signal: ctx?.signal });
 
     mainBtn.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') {
@@ -745,7 +745,7 @@ export default function SpeedDialIsland(container: HTMLElement, props: SpeedDial
                 if (actions.length) actions[actions.length - 1].focus();
             }
         }
-    });
+    }, { signal: ctx?.signal });
 
     const actionElements = container.querySelectorAll<HTMLElement>('.p-speeddial-action, .p-speeddial-custom-item');
     actionElements.forEach((el) => {
@@ -776,12 +776,12 @@ export default function SpeedDialIsland(container: HTMLElement, props: SpeedDial
             }
 
             close();
-        });
+        }, { signal: ctx?.signal });
 
         const tooltip = el.querySelector<HTMLElement>('.p-speeddial-tooltip');
         if (tooltip) {
-            el.addEventListener('mouseenter', () => tooltip.classList.add('p-tooltip-visible'));
-            el.addEventListener('mouseleave', () => tooltip.classList.remove('p-tooltip-visible'));
+            el.addEventListener('mouseenter', () => tooltip.classList.add('p-tooltip-visible'), { signal: ctx?.signal });
+            el.addEventListener('mouseleave', () => tooltip.classList.remove('p-tooltip-visible'), { signal: ctx?.signal });
         }
 
         el.addEventListener('keydown', (e) => {
@@ -806,6 +806,6 @@ export default function SpeedDialIsland(container: HTMLElement, props: SpeedDial
                 e.preventDefault();
                 allActions[allActions.length - 1]?.focus();
             }
-        });
+        }, { signal: ctx?.signal });
     });
 }

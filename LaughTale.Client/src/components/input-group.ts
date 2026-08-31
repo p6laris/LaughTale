@@ -268,9 +268,9 @@ html.dark .p-inputgroup-addon,
 [data-theme="dark"] .p-inputgroup-addon,
 .dark .laughtale-inputgroup-addon,
 .dark .p-inputgroup-addon {
-    background: var(--p-surface-100, #1e293b) !important;
-    border-color: var(--p-border-color, #334155) !important;
-    color: var(--p-text-muted, #94a3b8) !important;
+    background: var(--p-surface-100) !important;
+    border-color: var(--p-border-color) !important;
+    color: var(--p-text-muted) !important;
 }
 html.dark .laughtale-inputgroup-addon svg,
 html.dark .p-inputgroup-addon svg,
@@ -278,7 +278,7 @@ html.dark .p-inputgroup-addon svg,
 [data-theme="dark"] .p-inputgroup-addon svg,
 .dark .laughtale-inputgroup-addon svg,
 .dark .p-inputgroup-addon svg {
-    color: var(--p-text-muted, #94a3b8);
+    color: var(--p-text-muted);
 }
 html.dark .laughtale-inputgroup .p-button-primary,
 html.dark .p-inputgroup .p-button-primary,
@@ -286,9 +286,9 @@ html.dark .p-inputgroup .p-button-primary,
 [data-theme="dark"] .p-inputgroup .p-button-primary,
 .dark .laughtale-inputgroup .p-button-primary,
 .dark .p-inputgroup .p-button-primary {
-    background: var(--p-primary-500, #10b981) !important;
-    color: #ffffff !important;
-    border-color: var(--p-primary-500, #10b981) !important;
+    background: var(--p-primary-500) !important;
+    color: var(--p-surface-0) !important;
+    border-color: var(--p-primary-500) !important;
 }
 html.dark .laughtale-inputgroup .p-button-secondary,
 html.dark .p-inputgroup .p-button-secondary,
@@ -296,14 +296,16 @@ html.dark .p-inputgroup .p-button-secondary,
 [data-theme="dark"] .p-inputgroup .p-button-secondary,
 .dark .laughtale-inputgroup .p-button-secondary,
 .dark .p-inputgroup .p-button-secondary {
-    background: var(--p-surface-100, #1e293b) !important;
-    border-color: var(--p-border-color, #334155) !important;
-    color: var(--p-text-color, #f8fafc) !important;
+    background: var(--p-surface-100) !important;
+    border-color: var(--p-border-color) !important;
+    color: var(--p-text-color) !important;
 }
 `;
 
 export default function InputGroupIsland(container: HTMLElement, props: InputGroupProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-inputgroup', CSS);
+    container.setAttribute('data-part', 'root');
+    applyPart(container, 'root', '', props.pt, props.studioOverrides);
     
     container.classList.add('laughtale-inputgroup', 'p-inputgroup');
     if (props.size) {
@@ -313,6 +315,7 @@ export default function InputGroupIsland(container: HTMLElement, props: InputGro
 
 export function InputGroupAddonIsland(container: HTMLElement, props: InputGroupAddonProps) {
     injectIslandStyle('laughtale-inputgroup', CSS);
+    container.setAttribute('data-part', 'addon');
     
     container.classList.add('laughtale-inputgroup-addon', 'p-inputgroup-addon');
     

@@ -56,7 +56,7 @@ export default function ButtonIsland(container: HTMLElement, props: ButtonProps,
             let spinner = btnEl.querySelector<HTMLElement>('.p-button-loading-icon');
             if (!spinner) {
                 spinner = document.createElement('span');
-                spinner.className = 'p-button-loading-icon p-button-icon';
+                spinner.className = 'p-button-loading-icon p-button-icon'; container.setAttribute('data-part', 'root');
                 spinner.innerHTML = getLucideIcon(props.loadingIcon || 'spinner', 16);
                 btnEl.prepend(spinner);
             }
@@ -81,7 +81,7 @@ export default function ButtonIsland(container: HTMLElement, props: ButtonProps,
             bubbles: true,
             detail: { label: props.label }
         }));
-    });
+    }, { signal: ctx?.signal });
 
     renderLoading();
 }

@@ -265,34 +265,34 @@ const TREE_CSS = `
 html.dark .p-tree,
 [data-theme="dark"] .p-tree,
 .dark .p-tree {
-    background: var(--p-surface-0, #090d16) !important;
-    color: var(--p-text-color, #f8fafc) !important;
-    border-color: var(--p-border-color, #334155) !important;
+    background: var(--p-surface-0) !important;
+    color: var(--p-text-color) !important;
+    border-color: var(--p-border-color) !important;
 }
 html.dark .p-tree-filter-input,
 [data-theme="dark"] .p-tree-filter-input,
 .dark .p-tree-filter-input {
-    background: var(--p-surface-0, #090d16) !important;
-    color: var(--p-text-color, #f8fafc) !important;
-    border-color: var(--p-border-color, #334155) !important;
+    background: var(--p-surface-0) !important;
+    color: var(--p-text-color) !important;
+    border-color: var(--p-border-color) !important;
 }
 html.dark .p-tree-node-content:hover,
 [data-theme="dark"] .p-tree-node-content:hover,
 .dark .p-tree-node-content:hover {
-    background-color: var(--p-surface-100, #1e293b) !important;
-    color: var(--p-text-color, #f8fafc) !important;
+    background-color: var(--p-surface-100) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-tree-node-content.p-tree-node-selected,
 [data-theme="dark"] .p-tree-node-content.p-tree-node-selected,
 .dark .p-tree-node-content.p-tree-node-selected {
     background-color: rgba(16, 185, 129, 0.16) !important;
-    color: var(--p-primary-300, #6ee7b7) !important;
+    color: var(--p-primary-300) !important;
 }
 html.dark .p-tree-checkbox-box,
 [data-theme="dark"] .p-tree-checkbox-box,
 .dark .p-tree-checkbox-box {
-    background: var(--p-surface-50, #0f172a) !important;
-    border-color: var(--p-border-color, #334155) !important;
+    background: var(--p-surface-50) !important;
+    border-color: var(--p-border-color) !important;
 }
 html.dark .p-tree-loading-overlay,
 [data-theme="dark"] .p-tree-loading-overlay,
@@ -324,7 +324,7 @@ const SVG_ICONS = {
     check: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
     minus: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="5" x2="19" y1="12" y2="12"/></svg>',
     search: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>',
-    spinner: '<svg class="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>',
+    spinner: '<svg class="animate-spin" data-part="root" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>',
     plus: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>',
     refresh: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>'
 };
@@ -774,7 +774,7 @@ export default function TreeIsland(container: HTMLElement, props: TreeProps, ctx
                 if (key && nodeMap.has(key)) {
                     toggleNodeExpand(nodeMap.get(key));
                 }
-            });
+            }, { signal: ctx?.signal });
         });
 
         // Node Selection
@@ -785,7 +785,7 @@ export default function TreeIsland(container: HTMLElement, props: TreeProps, ctx
                     focusedKey = key;
                     selectNode(nodeMap.get(key), e);
                 }
-            });
+            }, { signal: ctx?.signal });
         });
 
         // Keyboard Navigation
@@ -834,15 +834,15 @@ export default function TreeIsland(container: HTMLElement, props: TreeProps, ctx
                     e.preventDefault();
                     selectNode(node, e);
                 }
-            });
+            }, { signal: ctx?.signal });
         });
 
         // Expand All / Collapse All
-        container.querySelector('.p-tree-expand-all')?.addEventListener('click', () => expandAll());
-        container.querySelector('.p-tree-collapse-all')?.addEventListener('click', () => collapseAll());
+        container.querySelector('.p-tree-expand-all')?.addEventListener('click', () => expandAll(), { signal: ctx?.signal });
+        container.querySelector('.p-tree-collapse-all')?.addEventListener('click', () => collapseAll(), { signal: ctx?.signal });
 
         // Select All Header
-        container.querySelector('.p-tree-select-all-header')?.addEventListener('click', () => toggleSelectAll());
+        container.querySelector('.p-tree-select-all-header')?.addEventListener('click', () => toggleSelectAll(), { signal: ctx?.signal });
 
         // Filter Input
         const filterInput = container.querySelector<HTMLInputElement>('.p-tree-filter-input');
@@ -855,7 +855,7 @@ export default function TreeIsland(container: HTMLElement, props: TreeProps, ctx
                     newInput.focus();
                     newInput.setSelectionRange(filterQuery.length, filterQuery.length);
                 }
-            });
+            }, { signal: ctx?.signal });
         }
 
         // Empty State: Add Node
@@ -868,7 +868,7 @@ export default function TreeIsland(container: HTMLElement, props: TreeProps, ctx
             });
             buildMaps(treeData);
             render();
-        });
+        }, { signal: ctx?.signal });
 
         // Drag & Drop
         if (isDraggable || isDroppable) {
@@ -886,12 +886,12 @@ export default function TreeIsland(container: HTMLElement, props: TreeProps, ctx
                             e.dataTransfer.effectAllowed = 'move';
                             e.dataTransfer.setData('text/plain', key);
                         }
-                    });
+                    }, { signal: ctx?.signal });
 
                     nodeLi.addEventListener('dragend', () => {
                         nodeLi.classList.remove('p-tree-node-dragging');
                         globalDraggedNode = null;
-                    });
+                    }, { signal: ctx?.signal });
                 }
 
                 if (isDroppable) {
@@ -902,12 +902,12 @@ export default function TreeIsland(container: HTMLElement, props: TreeProps, ctx
                             nodeLi.classList.add('p-tree-node-dragover');
                             if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
                         }
-                    });
+                    }, { signal: ctx?.signal });
 
                     nodeLi.addEventListener('dragleave', (e) => {
                         e.stopPropagation();
                         nodeLi.classList.remove('p-tree-node-dragover');
-                    });
+                    }, { signal: ctx?.signal });
 
                     nodeLi.addEventListener('drop', (e) => {
                         e.preventDefault();
@@ -941,7 +941,7 @@ export default function TreeIsland(container: HTMLElement, props: TreeProps, ctx
                             notifyToast('info', 'Node Dropped', `${dragged.label} moved into ${node.label}`);
                             render();
                         }
-                    });
+                    }, { signal: ctx?.signal });
                 }
             });
         }

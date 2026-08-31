@@ -388,15 +388,15 @@ html.dark .p-splitbutton-submenu-overlay,
 [data-theme="dark"] .p-splitbutton-submenu-overlay,
 .dark .p-splitbutton-menu,
 .dark .p-splitbutton-submenu-overlay {
-    background: var(--p-surface-0, #090d16) !important;
-    border-color: var(--p-border-color, #334155) !important;
+    background: var(--p-surface-0) !important;
+    border-color: var(--p-border-color) !important;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4) !important;
 }
 
 html.dark .p-splitbutton-menu .p-menu-item-link,
 [data-theme="dark"] .p-splitbutton-menu .p-menu-item-link,
 .dark .p-splitbutton-menu .p-menu-item-link {
-    color: var(--p-text-color, #f8fafc) !important;
+    color: var(--p-text-color) !important;
 }
 
 html.dark .p-splitbutton-menu .p-menu-item-link:hover,
@@ -408,20 +408,20 @@ html.dark .p-splitbutton-menu .p-menu-item.p-focus > .p-menu-item-link,
 .dark .p-splitbutton-menu .p-menu-item-link:hover,
 .dark .p-splitbutton-menu .p-menu-item.p-menu-active > .p-menu-item-link,
 .dark .p-splitbutton-menu .p-menu-item.p-focus > .p-menu-item-link {
-    background: var(--p-surface-100, #1e293b) !important;
-    color: var(--p-text-color, #f8fafc) !important;
+    background: var(--p-surface-100) !important;
+    color: var(--p-text-color) !important;
 }
 
 html.dark .p-splitbutton-menu .p-menu-separator,
 [data-theme="dark"] .p-splitbutton-menu .p-menu-separator,
 .dark .p-splitbutton-menu .p-menu-separator {
-    background: var(--p-border-color, #334155) !important;
+    background: var(--p-border-color) !important;
 }
 
 html.dark .p-splitbutton-text .p-button-contrast,
 [data-theme="dark"] .p-splitbutton-text .p-button-contrast,
 .dark .p-splitbutton-text .p-button-contrast {
-    color: var(--p-text-color, #f8fafc) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-splitbutton-text .p-button-contrast:hover:not(:disabled),
 html.dark .p-splitbutton-text .p-button-contrast[aria-expanded="true"],
@@ -509,7 +509,7 @@ export default function SplitButtonIsland(container: HTMLElement, props: SplitBu
 
     function renderSubmenuTree(subItems: SplitButtonItem[]): string {
         return `
-            <ul class="p-splitbutton-submenu-overlay p-menu-list" role="menu">
+            <ul class=" data-part="root"p-splitbutton-submenu-overlay p-menu-list" role="menu">
                 ${subItems.map((item, idx) => renderMenuItem(item, idx, true)).join('')}
             </ul>
         `;
@@ -660,20 +660,20 @@ export default function SplitButtonIsland(container: HTMLElement, props: SplitBu
             bubbles: true,
             detail: { action: props.action || 'main', label }
         }));
-    });
+    }, { signal: ctx?.signal });
 
     // Dropdown Trigger Click
     dropdownBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         toggleMenu();
-    });
+    }, { signal: ctx?.signal });
 
     // Global Click Outside
     document.addEventListener('click', (e) => {
         if (isOpen && !rootEl.contains(e.target as Node)) {
             closeMenu();
         }
-    });
+    }, { signal: ctx?.signal });
 
     // Item Selection & Execution Handler
     function handleItemClick(itemData: SplitButtonItem, e: MouseEvent | KeyboardEvent) {
@@ -740,7 +740,7 @@ export default function SplitButtonIsland(container: HTMLElement, props: SplitBu
                 } else {
                     li.classList.add('p-menu-active');
                 }
-            });
+            }, { signal: ctx?.signal });
 
             // When click on link
             link?.addEventListener('click', (e) => {
@@ -750,7 +750,7 @@ export default function SplitButtonIsland(container: HTMLElement, props: SplitBu
                     return;
                 }
                 handleItemClick(itemData, e);
-            });
+            }, { signal: ctx?.signal });
 
             // If it has a submenu, recursively set up the child UL
             if (hasSub && subOverlay) {
@@ -770,7 +770,7 @@ export default function SplitButtonIsland(container: HTMLElement, props: SplitBu
             e.preventDefault();
             openMenu();
         }
-    });
+    }, { signal: ctx?.signal });
 
     menuEl.addEventListener('keydown', (e) => {
         const activeEl = document.activeElement as HTMLElement;
@@ -844,5 +844,5 @@ export default function SplitButtonIsland(container: HTMLElement, props: SplitBu
             links[links.length - 1]?.focus();
             return;
         }
-    });
+    }, { signal: ctx?.signal });
 }

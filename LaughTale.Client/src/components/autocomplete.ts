@@ -279,49 +279,49 @@ const CSS = `
 html.dark .ac-input-container,
 [data-theme="dark"] .ac-input-container,
 .dark .ac-input-container {
-    background: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-0);
+    border-color: var(--p-border-color);
+    color: var(--p-text-color);
 }
 html.dark .ac-input-container:hover:not(.disabled),
 [data-theme="dark"] .ac-input-container:hover:not(.disabled),
 .dark .ac-input-container:hover:not(.disabled) {
-    border-color: var(--p-surface-400, #64748b);
+    border-color: var(--p-surface-400);
 }
 html.dark .ac-input-container.variant-filled,
 [data-theme="dark"] .ac-input-container.variant-filled,
 .dark .ac-input-container.variant-filled {
-    background: var(--p-surface-100, #1e293b);
+    background: var(--p-surface-100);
 }
 html.dark .ac-input-container.variant-filled:focus-within,
 [data-theme="dark"] .ac-input-container.variant-filled:focus-within,
 .dark .ac-input-container.variant-filled:focus-within {
-    background: var(--p-surface-0, #090d16);
+    background: var(--p-surface-0);
 }
 html.dark .ac-chip,
 [data-theme="dark"] .ac-chip,
 .dark .ac-chip {
-    background: var(--p-surface-100, #1e293b);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-100);
+    color: var(--p-text-color);
 }
 html.dark .ac-dropdown-btn,
 [data-theme="dark"] .ac-dropdown-btn,
 .dark .ac-dropdown-btn {
-    background: var(--p-surface-100, #1e293b);
-    border-color: var(--p-border-color, #334155);
-    color: var(--p-text-muted, #94a3b8);
+    background: var(--p-surface-100);
+    border-color: var(--p-border-color);
+    color: var(--p-text-muted);
 }
 html.dark .ac-dropdown-btn:hover,
 [data-theme="dark"] .ac-dropdown-btn:hover,
 .dark .ac-dropdown-btn:hover {
-    background: var(--p-surface-200, #334155);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-200);
+    color: var(--p-text-color);
 }
 html.dark .ac-overlay,
 [data-theme="dark"] .ac-overlay,
 .dark .ac-overlay {
-    background: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
+    background: var(--p-surface-0);
+    border-color: var(--p-border-color);
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
 }
 html.dark .ac-item:hover,
@@ -330,14 +330,14 @@ html.dark .ac-item.highlighted,
 [data-theme="dark"] .ac-item.highlighted,
 .dark .ac-item:hover,
 .dark .ac-item.highlighted {
-    background: var(--p-surface-100, #1e293b);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-100);
+    color: var(--p-text-color);
 }
 html.dark .ac-item.selected,
 [data-theme="dark"] .ac-item.selected,
 .dark .ac-item.selected {
     background: rgba(16, 185, 129, 0.15);
-    color: var(--p-primary-300, #6ee7b7);
+    color: var(--p-primary-300);
 }
 `;
 
@@ -373,7 +373,7 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
     }
 
     container.innerHTML = `
-        <div class="laughtale-autocomplete ${props.fluid ? 'fluid' : ''} ${hasDropdown ? 'has-dropdown' : ''}">
+        <div class="laughtale-autocomplete ${props.fluid ? 'fluid' : ''} ${hasDropdown ? 'has-dropdown' : ''}" data-part="root">
             <div class="ac-input-container size-${size} variant-${variant} ${props.invalid ? 'invalid' : ''} ${props.disabled ? 'disabled' : ''}">
                 <div class="ac-chips-wrapper">
                     <input type="text" 
@@ -459,7 +459,7 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
         selectedValues.forEach(val => {
             const item = allItems.find(i => i.value === val) || { label: val, value: val };
             const chip = document.createElement('span');
-            chip.className = 'ac-chip';
+            chip.className = 'ac-chip'; container.setAttribute('data-part', 'root');
             chip.innerHTML = `
                 <span>${item.label}</span>
                 <button type="button" class="ac-chip-remove" data-remove="${item.value}">&times;</button>
@@ -467,7 +467,7 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
             chip.querySelector('.ac-chip-remove')?.addEventListener('click', (e) => {
                 e.stopPropagation();
                 removeValue(item.value);
-            });
+            }, { signal: ctx?.signal });
             chipsWrap.insertBefore(chip, input);
         });
 
@@ -527,11 +527,11 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
                 if (matched && !matched.disabled) {
                     selectItem(matched);
                 }
-            });
+            }, { signal: ctx?.signal });
             itemEl.addEventListener('mouseenter', () => {
                 const idx = Number(itemEl.getAttribute('data-idx'));
                 highlightItem(idx);
-            });
+            }, { signal: ctx?.signal });
         });
     }
 
@@ -632,16 +632,16 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
 
     input.addEventListener('input', () => {
         debouncedFilter();
-    });
+    }, { signal: ctx?.signal });
 
     input.addEventListener('focus', () => {
         inputWrap.classList.add('focused');
         // Do not open dropdown immediately on focus - only when user types or clicks dropdown button
-    });
+    }, { signal: ctx?.signal });
 
     input.addEventListener('blur', () => {
         inputWrap.classList.remove('focused');
-    });
+    }, { signal: ctx?.signal });
 
     input.addEventListener('keydown', (e) => {
         const filtered = getFilteredItems();
@@ -676,7 +676,7 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
             e.preventDefault();
             highlightItem(filtered.length - 1);
         }
-    });
+    }, { signal: ctx?.signal });
 
     clearBtn?.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -687,7 +687,7 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
         syncValue();
         disclosure.close();
         input.focus();
-    });
+    }, { signal: ctx?.signal });
 
     dropdownBtn?.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -698,11 +698,11 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
             disclosure.open();
             input.focus();
         }
-    });
+    }, { signal: ctx?.signal });
 
     inputWrap.addEventListener('click', () => {
         input.focus();
-    });
+    }, { signal: ctx?.signal });
 
     function syncValue() {
         if (props.targetInputName) {

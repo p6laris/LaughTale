@@ -432,9 +432,9 @@ const TREETABLE_CSS = `
 html.dark .p-treetable,
 [data-theme="dark"] .p-treetable,
 .dark .p-treetable {
-    background: var(--p-surface-0, #090d16) !important;
-    color: var(--p-text-color, #f8fafc) !important;
-    border-color: var(--p-border-color, #334155) !important;
+    background: var(--p-surface-0) !important;
+    color: var(--p-text-color) !important;
+    border-color: var(--p-border-color) !important;
 }
 
 /* Bi-Directional RTL Support */
@@ -450,46 +450,46 @@ html.dark .p-treetable,
 html.dark .p-treetable-header,
 [data-theme="dark"] .p-treetable-header,
 .dark .p-treetable-header {
-    background: var(--p-surface-50, #0f172a) !important;
-    color: var(--p-text-color, #f8fafc) !important;
-    border-color: var(--p-border-color, #334155) !important;
+    background: var(--p-surface-50) !important;
+    color: var(--p-text-color) !important;
+    border-color: var(--p-border-color) !important;
 }
 html.dark .p-treetable-footer,
 [data-theme="dark"] .p-treetable-footer,
 .dark .p-treetable-footer {
-    background: var(--p-surface-50, #0f172a) !important;
-    color: var(--p-text-color, #f8fafc) !important;
-    border-color: var(--p-border-color, #334155) !important;
+    background: var(--p-surface-50) !important;
+    color: var(--p-text-color) !important;
+    border-color: var(--p-border-color) !important;
 }
 html.dark .p-treetable-thead > tr > th,
 [data-theme="dark"] .p-treetable-thead > tr > th,
 .dark .p-treetable-thead > tr > th {
-    background: var(--p-surface-50, #0f172a) !important;
-    color: var(--p-text-color, #f8fafc) !important;
-    border-color: var(--p-border-color, #334155) !important;
+    background: var(--p-surface-50) !important;
+    color: var(--p-text-color) !important;
+    border-color: var(--p-border-color) !important;
 }
 html.dark .p-treetable-tbody > tr,
 [data-theme="dark"] .p-treetable-tbody > tr,
 .dark .p-treetable-tbody > tr {
-    background: var(--p-surface-0, #090d16) !important;
-    color: var(--p-text-color, #f8fafc) !important;
+    background: var(--p-surface-0) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-treetable-tbody > tr:not(.p-highlight):hover,
 [data-theme="dark"] .p-treetable-tbody > tr:not(.p-highlight):hover,
 .dark .p-treetable-tbody > tr:not(.p-highlight):hover {
-    background: var(--p-surface-100, #1e293b) !important;
-    color: var(--p-text-color, #f8fafc) !important;
+    background: var(--p-surface-100) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-treetable-tbody > tr.p-highlight,
 [data-theme="dark"] .p-treetable-tbody > tr.p-highlight,
 .dark .p-treetable-tbody > tr.p-highlight {
     background: rgba(16, 185, 129, 0.16) !important;
-    color: var(--p-primary-300, #6ee7b7) !important;
+    color: var(--p-primary-300) !important;
 }
 html.dark .p-treetable-tbody > tr > td,
 [data-theme="dark"] .p-treetable-tbody > tr > td,
 .dark .p-treetable-tbody > tr > td {
-    border-color: var(--p-border-color, #334155) !important;
+    border-color: var(--p-border-color) !important;
 }
 html.dark .p-frozen-left,
 html.dark .p-frozen-right,
@@ -497,25 +497,25 @@ html.dark .p-frozen-right,
 [data-theme="dark"] .p-frozen-right,
 .dark .p-frozen-left,
 .dark .p-frozen-right {
-    background: var(--p-surface-0, #090d16) !important;
+    background: var(--p-surface-0) !important;
 }
 html.dark .p-treetable-paginator,
 [data-theme="dark"] .p-treetable-paginator,
 .dark .p-treetable-paginator {
-    background: var(--p-surface-0, #090d16) !important;
-    border-color: var(--p-border-color, #334155) !important;
+    background: var(--p-surface-0) !important;
+    border-color: var(--p-border-color) !important;
 }
 html.dark .p-treetable-paginator-btn.p-highlight,
 [data-theme="dark"] .p-treetable-paginator-btn.p-highlight,
 .dark .p-treetable-paginator-btn.p-highlight {
     background: rgba(16, 185, 129, 0.16) !important;
-    color: var(--p-primary-300, #6ee7b7) !important;
+    color: var(--p-primary-300) !important;
 }
 html.dark .p-treetable-checkbox,
 [data-theme="dark"] .p-treetable-checkbox,
 .dark .p-treetable-checkbox {
-    background: var(--p-surface-50, #0f172a) !important;
-    border-color: var(--p-border-color, #334155) !important;
+    background: var(--p-surface-50) !important;
+    border-color: var(--p-border-color) !important;
 }
 html.dark .p-treetable-loading-mask,
 [data-theme="dark"] .p-treetable-loading-mask,
@@ -528,8 +528,8 @@ html.dark .p-treetable-popover,
 [data-theme="dark"] .p-treetable-popover,
 .dark .p-treetable-contextmenu,
 .dark .p-treetable-popover {
-    background: var(--p-surface-0, #090d16) !important;
-    border-color: var(--p-border-color, #334155) !important;
+    background: var(--p-surface-0) !important;
+    border-color: var(--p-border-color) !important;
 }
 `;
 
@@ -550,7 +550,7 @@ const SVG_ICONS = {
     minus: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="5" x2="19" y1="12" y2="12"/></svg>',
     search: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>',
     cog: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/></svg>',
-    spinner: '<svg class="animate-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>',
+    spinner: '<svg class="animate-spin" data-part="root" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>',
     refresh: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>',
     download: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>',
     pencil: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>',
@@ -1183,20 +1183,20 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
                     size = s;
                     render();
                 }
-            });
+            }, { signal: ctx?.signal });
         });
 
         // MetaKey switch
         container.querySelector<HTMLInputElement>('.p-treetable-metakey-switch')?.addEventListener('change', (e) => {
             metaKeySelection = (e.target as HTMLInputElement).checked;
-        });
+        }, { signal: ctx?.signal });
 
         // Toggle applications
         container.querySelector('.p-treetable-toggle-apps-btn')?.addEventListener('click', () => {
             if (expandedKeys['0']) delete expandedKeys['0'];
             else expandedKeys['0'] = true;
             render();
-        });
+        }, { signal: ctx?.signal });
 
         // Refresh button
         container.querySelector('.p-treetable-refresh-btn')?.addEventListener('click', () => {
@@ -1206,7 +1206,7 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
                 isLoading = false;
                 render();
             }, 1200);
-        });
+        }, { signal: ctx?.signal });
 
         // Expand/Collapse Toggler
         container.querySelectorAll<HTMLButtonElement>('.p-treetable-toggler').forEach(btn => {
@@ -1216,7 +1216,7 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
                 if (key && nodeMap.has(key)) {
                     toggleExpand(nodeMap.get(key));
                 }
-            });
+            }, { signal: ctx?.signal });
         });
 
         // Checkbox Click
@@ -1232,7 +1232,7 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
                     notifyToast(isChecked ? 'success' : 'warn', isChecked ? 'Node Selected' : 'Node Unselected', node.data.name);
                     render();
                 }
-            });
+            }, { signal: ctx?.signal });
         });
 
         // Row Selection
@@ -1262,7 +1262,7 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
                     notifyToast('success', 'Selection Updated', node.data.name);
                     render();
                 }
-            });
+            }, { signal: ctx?.signal });
 
             // Context Menu
             if (contextMenuEnabled) {
@@ -1273,7 +1273,7 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
                         selectedContextMenuNode = nodeMap.get(key);
                         showContextMenu(e.clientX, e.clientY);
                     }
-                });
+                }, { signal: ctx?.signal });
             }
         });
 
@@ -1282,28 +1282,28 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
             th.addEventListener('click', () => {
                 const field = th.getAttribute('data-col-field');
                 if (field) handleSort(field);
-            });
+            }, { signal: ctx?.signal });
         });
 
         // Pagination controls
-        container.querySelector('.p-treetable-first-btn')?.addEventListener('click', () => { currentPage = 0; render(); });
-        container.querySelector('.p-treetable-prev-btn')?.addEventListener('click', () => { if (currentPage > 0) { currentPage--; render(); } });
-        container.querySelector('.p-treetable-next-btn')?.addEventListener('click', () => { currentPage++; render(); });
-        container.querySelector('.p-treetable-last-btn')?.addEventListener('click', () => { currentPage = 999999; render(); });
+        container.querySelector('.p-treetable-first-btn')?.addEventListener('click', () => { currentPage = 0; render(); }, { signal: ctx?.signal });
+        container.querySelector('.p-treetable-prev-btn')?.addEventListener('click', () => { if (currentPage > 0) { currentPage--; render(); } }, { signal: ctx?.signal });
+        container.querySelector('.p-treetable-next-btn')?.addEventListener('click', () => { currentPage++; render(); }, { signal: ctx?.signal });
+        container.querySelector('.p-treetable-last-btn')?.addEventListener('click', () => { currentPage = 999999; render(); }, { signal: ctx?.signal });
 
         container.querySelectorAll<HTMLButtonElement>('.p-treetable-page-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const page = parseInt(btn.getAttribute('data-page') || '0', 10);
                 currentPage = page;
                 render();
-            });
+            }, { signal: ctx?.signal });
         });
 
         container.querySelector<HTMLSelectElement>('.p-treetable-rpp-select')?.addEventListener('change', (e) => {
             rowsPerPage = parseInt((e.target as HTMLSelectElement).value, 10);
             currentPage = 0;
             render();
-        });
+        }, { signal: ctx?.signal });
 
         // Global search
         const searchInput = container.querySelector<HTMLInputElement>('.p-treetable-global-search');
@@ -1316,7 +1316,7 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
                     reFocus.focus();
                     reFocus.setSelectionRange(globalFilter.length, globalFilter.length);
                 }
-            });
+            }, { signal: ctx?.signal });
         }
 
         // Column toggle button
@@ -1324,7 +1324,7 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
             e.stopPropagation();
             showPopover = !showPopover;
             render();
-        });
+        }, { signal: ctx?.signal });
 
         container.querySelectorAll<HTMLInputElement>('.p-treetable-col-cb').forEach(cb => {
             cb.addEventListener('change', (e) => {
@@ -1337,13 +1337,13 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
                     }
                     render();
                 }
-            });
+            }, { signal: ctx?.signal });
         });
 
         container.querySelector('.p-treetable-reset-cols-btn')?.addEventListener('click', () => {
             visibleFields = columns.map(c => c.field);
             render();
-        });
+        }, { signal: ctx?.signal });
 
         container.querySelector('.p-treetable-empty-add-btn')?.addEventListener('click', () => {
             rawNodes.push({
@@ -1353,17 +1353,17 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
             });
             buildMaps(rawNodes);
             render();
-        });
+        }, { signal: ctx?.signal });
 
         container.querySelector('.p-treetable-footer-reload-btn')?.addEventListener('click', () => {
             notifyToast('info', 'TreeTable Reloaded', 'Refreshed node hierarchy');
-        });
+        }, { signal: ctx?.signal });
     }
 
     function showContextMenu(x: number, y: number) {
         document.querySelectorAll('.p-treetable-contextmenu').forEach(el => el.remove());
         const menu = document.createElement('div');
-        menu.className = 'p-treetable-contextmenu';
+        menu.className = 'p-treetable-contextmenu'; container.setAttribute('data-part', 'root');
         menu.style.left = `${x}px`;
         menu.style.top = `${y}px`;
 
@@ -1383,14 +1383,14 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
                 notifyToast('info', 'Node Selected', selectedContextMenuNode.data.name);
             }
             menu.remove();
-        });
+        }, { signal: ctx?.signal });
 
         menu.querySelector('[data-action="delete"]')?.addEventListener('click', () => {
             if (selectedContextMenuNode) {
                 notifyToast('error', 'Node Deleted', selectedContextMenuNode.data.name);
             }
             menu.remove();
-        });
+        }, { signal: ctx?.signal });
 
         const closeMenu = (e: MouseEvent) => {
             if (!menu.contains(e.target as Node)) {
@@ -1398,7 +1398,7 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
                 document.removeEventListener('click', closeMenu);
             }
         };
-        setTimeout(() => document.addEventListener('click', closeMenu), 50);
+        setTimeout(() => document.addEventListener('click', closeMenu, { signal: ctx?.signal }), 50);
     }
 
     render();

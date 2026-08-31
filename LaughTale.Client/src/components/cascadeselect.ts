@@ -221,24 +221,24 @@ const CSS = `
 html.dark .cs-trigger,
 [data-theme="dark"] .cs-trigger,
 .dark .cs-trigger {
-    background: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-0);
+    border-color: var(--p-border-color);
+    color: var(--p-text-color);
 }
 html.dark .cs-trigger:hover:not(.disabled),
 [data-theme="dark"] .cs-trigger:hover:not(.disabled),
 .dark .cs-trigger:hover:not(.disabled) {
-    border-color: var(--p-surface-400, #64748b);
+    border-color: var(--p-surface-400);
 }
 html.dark .cs-trigger.variant-filled,
 [data-theme="dark"] .cs-trigger.variant-filled,
 .dark .cs-trigger.variant-filled {
-    background: var(--p-surface-100, #1e293b);
+    background: var(--p-surface-100);
 }
 html.dark .cs-trigger.variant-filled:focus-within,
 [data-theme="dark"] .cs-trigger.variant-filled:focus-within,
 .dark .cs-trigger.variant-filled:focus-within {
-    background: var(--p-surface-0, #090d16);
+    background: var(--p-surface-0);
 }
 html.dark .cs-panel,
 html.dark .cs-sub-panel,
@@ -246,8 +246,8 @@ html.dark .cs-sub-panel,
 [data-theme="dark"] .cs-sub-panel,
 .dark .cs-panel,
 .dark .cs-sub-panel {
-    background: var(--p-surface-0, #090d16);
-    border-color: var(--p-border-color, #334155);
+    background: var(--p-surface-0);
+    border-color: var(--p-border-color);
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
 }
 html.dark .cs-item:hover,
@@ -256,18 +256,18 @@ html.dark .cs-item.highlighted,
 [data-theme="dark"] .cs-item.highlighted,
 .dark .cs-item:hover,
 .dark .cs-item.highlighted {
-    background: var(--p-surface-100, #1e293b);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-100);
+    color: var(--p-text-color);
 }
 html.dark .cs-item.selected,
 [data-theme="dark"] .cs-item.selected,
 .dark .cs-item.selected {
     background: rgba(16, 185, 129, 0.15);
-    color: var(--p-primary-300, #6ee7b7);
+    color: var(--p-primary-300);
 }
 `;
 
-export default function CascadeSelectIsland<T = string>(container: HTMLElement, props: CascadeSelectProps<T>) {
+export default function CascadeSelectIsland<T = string>(container: HTMLElement, props: CascadeSelectProps<T>, ctx?: IslandContext) {
     injectIslandStyle('cascadeselect', CSS);
     const options: CascadeSelectNode<T>[] = props.options || [];
     const size = props.size || 'normal';
@@ -308,7 +308,7 @@ export default function CascadeSelectIsland<T = string>(container: HTMLElement, 
     }
 
     container.innerHTML = `
-        <div class="laughtale-cascadeselect ${props.fluid ? 'fluid' : ''}">
+        <div class="laughtale-cascadeselect ${props.fluid ? 'fluid' : ''}" data-part="root">
             <!-- Trigger -->
             <div class="cs-trigger size-${size} variant-${variant} ${props.invalid ? 'invalid' : ''} ${props.disabled ? 'disabled' : ''}" 
                  tabindex="${props.disabled ? -1 : 0}" 
@@ -437,23 +437,23 @@ export default function CascadeSelectIsland<T = string>(container: HTMLElement, 
                         subPanel.style.left = 'calc(100% + 2px)';
                         subPanel.style.right = 'auto';
                     }
-                });
+                }, { signal: ctx?.signal });
 
                 itemEl.addEventListener('mouseleave', () => {
                     hideTimeout = setTimeout(() => {
                         subPanel.style.display = 'none';
                     }, 150);
-                });
+                }, { signal: ctx?.signal });
 
                 subPanel.addEventListener('mouseenter', () => {
                     clearTimeout(hideTimeout);
-                });
+                }, { signal: ctx?.signal });
             } else {
                 itemEl.addEventListener('click', (e) => {
                     e.stopPropagation();
                     if (node.disabled) return;
                     selectLeaf(node, path);
-                });
+                }, { signal: ctx?.signal });
             }
         });
     }
@@ -473,7 +473,7 @@ export default function CascadeSelectIsland<T = string>(container: HTMLElement, 
     trigger.addEventListener('click', () => {
         if (props.disabled) return;
         disclosure.toggle();
-    });
+    }, { signal: ctx?.signal });
 
     trigger.addEventListener('keydown', (e) => {
         if (props.disabled) return;
@@ -483,7 +483,7 @@ export default function CascadeSelectIsland<T = string>(container: HTMLElement, 
         } else if (e.key === 'Escape') {
             disclosure.close();
         }
-    });
+    }, { signal: ctx?.signal });
 
     clearBtn?.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -493,7 +493,7 @@ export default function CascadeSelectIsland<T = string>(container: HTMLElement, 
         label.classList.add('placeholder');
         updateClearButton();
         syncValue([]);
-    });
+    }, { signal: ctx?.signal });
 
     function syncValue(path: string[]) {
         if (props.targetInputName) {

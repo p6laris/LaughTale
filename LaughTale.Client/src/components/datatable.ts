@@ -519,27 +519,27 @@ const DATATABLE_CSS = `
 html.dark .p-datatable,
 [data-theme="dark"] .p-datatable,
 .dark .p-datatable {
-    background: var(--p-surface-0, #090d16) !important;
-    color: var(--p-text-color, #f8fafc) !important;
-    border-color: var(--p-border-color, #334155) !important;
+    background: var(--p-surface-0) !important;
+    color: var(--p-text-color) !important;
+    border-color: var(--p-border-color) !important;
 }
 html.dark .p-datatable-thead > tr > th,
 [data-theme="dark"] .p-datatable-thead > tr > th,
 .dark .p-datatable-thead > tr > th {
-    background: var(--p-surface-50, #0f172a) !important;
-    color: var(--p-text-color, #f8fafc) !important;
-    border-color: var(--p-border-color, #334155) !important;
+    background: var(--p-surface-50) !important;
+    color: var(--p-text-color) !important;
+    border-color: var(--p-border-color) !important;
 }
 html.dark .p-datatable-tbody > tr > td,
 [data-theme="dark"] .p-datatable-tbody > tr > td,
 .dark .p-datatable-tbody > tr > td {
-    border-color: var(--p-border-color, #334155) !important;
-    color: var(--p-text-color, #f8fafc) !important;
+    border-color: var(--p-border-color) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-datatable-tbody > tr:hover,
 [data-theme="dark"] .p-datatable-tbody > tr:hover,
 .dark .p-datatable-tbody > tr:hover {
-    background: var(--p-surface-100, #1e293b) !important;
+    background: var(--p-surface-100) !important;
 }
 html.dark .p-datatable-striped .p-datatable-tbody > tr:nth-child(even):not(.p-highlight),
 [data-theme="dark"] .p-datatable-striped .p-datatable-tbody > tr:nth-child(even):not(.p-highlight),
@@ -555,9 +555,9 @@ html.dark .p-datatable-selection-bar,
 .dark .p-datatable-header-toolbar,
 .dark .p-datatable-paginator,
 .dark .p-datatable-selection-bar {
-    background: var(--p-surface-0, #090d16) !important;
-    border-color: var(--p-border-color, #334155) !important;
-    color: var(--p-text-muted, #94a3b8) !important;
+    background: var(--p-surface-0) !important;
+    border-color: var(--p-border-color) !important;
+    color: var(--p-text-muted) !important;
 }
 html.dark .p-datatable-filter-row > th,
 html.dark .p-row-expansion,
@@ -565,15 +565,15 @@ html.dark .p-row-expansion,
 [data-theme="dark"] .p-row-expansion,
 .dark .p-datatable-filter-row > th,
 .dark .p-row-expansion {
-    background: var(--p-surface-50, #0f172a) !important;
-    border-color: var(--p-border-color, #334155) !important;
+    background: var(--p-surface-50) !important;
+    border-color: var(--p-border-color) !important;
 }
 html.dark .p-datatable-filter-input,
 [data-theme="dark"] .p-datatable-filter-input,
 .dark .p-datatable-filter-input {
-    background: var(--p-surface-0, #090d16) !important;
-    border-color: var(--p-border-color, #334155) !important;
-    color: var(--p-text-color, #f8fafc) !important;
+    background: var(--p-surface-0) !important;
+    border-color: var(--p-border-color) !important;
+    color: var(--p-text-color) !important;
 }
 html.dark .p-datatable-loading-overlay,
 [data-theme="dark"] .p-datatable-loading-overlay,
@@ -583,14 +583,14 @@ html.dark .p-datatable-loading-overlay,
 html.dark .p-tag-secondary,
 [data-theme="dark"] .p-tag-secondary,
 .dark .p-tag-secondary {
-    background: var(--p-surface-100, #1e293b);
-    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-100);
+    color: var(--p-text-color);
 }
 html.dark .p-product-avatar,
 [data-theme="dark"] .p-product-avatar,
 .dark .p-product-avatar {
-    background: var(--p-surface-100, #1e293b);
-    border-color: var(--p-border-color, #334155);
+    background: var(--p-surface-100);
+    border-color: var(--p-border-color);
 }
 `;
 
@@ -1315,7 +1315,7 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                 }));
 
                 triggerDataUpdate();
-            });
+            }, { signal: ctx?.signal });
         });
 
         // 2. Global Filter Input
@@ -1332,7 +1332,7 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                     reacquired.focus();
                     if (pos != null) reacquired.setSelectionRange(pos, pos);
                 }
-            });
+            }, { signal: ctx?.signal });
         }
 
         // 3. Column Row Filters
@@ -1349,13 +1349,13 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                     reacquired.focus();
                     if (pos != null) reacquired.setSelectionRange(pos, pos);
                 }
-            });
+            }, { signal: ctx?.signal });
         });
 
         // 4. Export CSV Button
         const exportBtn = rootEl.querySelector('.p-datatable-export-btn');
         if (exportBtn) {
-            exportBtn.addEventListener('click', () => exportCSV());
+            exportBtn.addEventListener('click', () => exportCSV(), { signal: ctx?.signal });
         }
 
         // 5. Refresh Simulation Button
@@ -1368,7 +1368,7 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                     loading = false;
                     render();
                 }, 1000);
-            });
+            }, { signal: ctx?.signal });
         }
 
         // 6. Interactive Size Switcher
@@ -1379,7 +1379,7 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                     currentSize = s;
                     render();
                 }
-            });
+            }, { signal: ctx?.signal });
         });
 
         // 7. Select All Checkbox
@@ -1395,7 +1395,7 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                 }
                 dispatchSelectionEvent();
                 render();
-            });
+            }, { signal: ctx?.signal });
         }
 
         // 8. Clear Selection Button
@@ -1405,7 +1405,7 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                 selectedKeys.clear();
                 dispatchSelectionEvent();
                 render();
-            });
+            }, { signal: ctx?.signal });
         }
 
         // 9. Row Checkbox Selection
@@ -1422,7 +1422,7 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
 
                 dispatchSelectionEvent();
                 render();
-            });
+            }, { signal: ctx?.signal });
         });
 
         // 10. Row Radio Selection
@@ -1438,7 +1438,7 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                 selectedKeys.add(realKey);
                 dispatchSelectionEvent();
                 render();
-            });
+            }, { signal: ctx?.signal });
         });
 
         // 11. Row Click Selection
@@ -1468,7 +1468,7 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                     }
                     dispatchSelectionEvent();
                     render();
-                });
+                }, { signal: ctx?.signal });
             });
         }
 
@@ -1484,7 +1484,7 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                 if (expandedKeys.has(realKey)) expandedKeys.delete(realKey);
                 else expandedKeys.add(realKey);
                 render();
-            });
+            }, { signal: ctx?.signal });
         });
 
         // 13. In-Place Cell Editing
@@ -1499,7 +1499,7 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                     const realKey = matchedRow ? matchedRow[dataKey] : rowKey;
                     editingCell = { rowKey: realKey, field };
                     render();
-                });
+                }, { signal: ctx?.signal });
             });
 
             const cellInput = rootEl.querySelector<HTMLInputElement>('.p-cell-editor-input');
@@ -1522,7 +1522,7 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                     render();
                 };
 
-                cellInput.addEventListener('blur', saveCell);
+                cellInput.addEventListener('blur', saveCell, { signal: ctx?.signal });
                 cellInput.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter') {
                         saveCell();
@@ -1530,7 +1530,7 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                         editingCell = null;
                         render();
                     }
-                });
+                }, { signal: ctx?.signal });
             }
         }
 
@@ -1542,7 +1542,7 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                     currentPage = targetPage;
                     triggerDataUpdate();
                 }
-            });
+            }, { signal: ctx?.signal });
         });
 
         const rowsSelect = rootEl.querySelector<HTMLSelectElement>('.p-datatable-rows-select');
@@ -1551,7 +1551,7 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                 rowsPerPage = Number(rowsSelect.value);
                 currentPage = 1;
                 triggerDataUpdate();
-            });
+            }, { signal: ctx?.signal });
         }
     }
 
