@@ -1,4 +1,4 @@
-﻿---
+---
 title: Vue 3 Islands
 description: Mount Vue 3 reactive components using the Composition API, refs, and Pinia stores directly inside ASP.NET Core Razor Pages.
 order: 15
@@ -42,107 +42,138 @@ public class WarehouseModel : PageModel
 
 ---
 
-## 💻 2. Writing the Vue Island (`src/islands/warehouse-cart.ts`)
+## 💻 2. Writing the Vue Island
+
+LaughTale supports standard **Single File Components (`.vue`)** using `<script setup>` and `<template>`, mounted seamlessly via `createVueIsland`.
+
+### A. The Single File Component (`src/components/WarehouseCart.vue`)
+
+```vue
+<script setup lang="ts">
+import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { onIslandEvent, emitIslandEvent } from 'laughtale';
+
+interface Props {
+  warehouseName: string;
+  initialStock: number;
+}
+
+const props = defineProps<Props>();
+const stock = ref(props.initialStock);
+const cartQty = ref(0);
+const isLowStock = computed(() => stock.value < 10);
+
+let unsubscribe: (() => void) | null = null;
+
+onMounted(() => {
+  // Listen to sales emitted from React or other islands
+  unsubscribe = onIslandEvent('polyglot:sale', () => {
+    if (stock.value > 0) stock.value--;
+  });
+});
+
+onUnmounted(() => {
+  unsubscribe?.();
+});
+
+function addItem() {
+  if (stock.value > 0) {
+    stock.value--;
+    cartQty.value++;
+    // Emit event to cross-island ledger
+    emitIslandEvent('polyglot:cart', {
+      source: 'Vue 3 Island',
+      action: 'add_item',
+      cartQty: cartQty.value,
+      remainingStock: stock.value
+    });
+  }
+}
+
+function restock() {
+  stock.value += 10;
+  emitIslandEvent('polyglot:restock', {
+    source: 'Vue 3 Island',
+    addedUnits: 10
+  });
+}
+</script>
+
+<template>
+  <div class="p-card p-6 bg-surface-0 border rounded-xl shadow-sm">
+    <div class="flex justify-between items-center mb-4">
+      <h4 class="font-bold text-lg text-surface-900">{{ warehouseName }}</h4>
+      <span class="p-tag p-tag-success">Vue 3</span>
+    </div>
+
+    <div class="mb-4">
+      <div class="text-sm text-surface-500">Available Stock:</div>
+      <div :class="['text-3xl font-black', isLowStock ? 'text-red-500' : 'text-emerald-600']">
+        {{ stock }} units
+      </div>
+    </div>
+
+    <div class="flex gap-2">
+      <button type="button" @click="addItem" :disabled="stock === 0" class="p-button p-button-primary text-sm px-3 py-2">
+        Add to Cart ({{ cartQty }})
+      </button>
+      <button type="button" @click="restock" class="p-button p-button-outlined text-sm px-3 py-2">
+        + Restock (+10)
+      </button>
+    </div>
+  </div>
+</template>
+```
+
+### B. Island Mount Entrypoint (`src/islands/warehouse-cart.ts`)
+
+With LaughTale's built-in `createVueIsland` adapter, mounting the `.vue` component takes only two lines:
 
 ```typescript
-import { createApp, ref, computed, onMounted, onUnmounted } from 'vue';
-import { IslandContext, emitIslandEvent, onIslandEvent } from 'laughtale';
+import { createVueIsland } from 'laughtale';
+import WarehouseCart from '../components/WarehouseCart.vue';
+
+// LaughTale mounts the Vue SFC and automatically manages app.unmount() on cleanup
+export default createVueIsland(WarehouseCart);
+```
+
+---
+
+### C. Zero-Config Pure TypeScript Alternative (`src/islands/warehouse-cart-ts.ts`)
+
+If your bundler pipeline doesn't have a `.vue` compiler plugin configured, you can also author Vue 3 islands in pure TypeScript with `defineComponent` or `h()`:
+
+```typescript
+import { defineComponent, ref, computed, h } from 'vue';
+import { createVueIsland } from 'laughtale';
 
 export interface WarehouseProps {
     warehouseName: string;
     initialStock: number;
 }
 
-// Vue Component Definition (Composition API)
-const WarehouseComponent = {
-    props: ['warehouseName', 'initialStock'],
-    setup(props: WarehouseProps) {
+export const WarehouseComponent = defineComponent({
+    props: {
+        warehouseName: { type: String, required: true },
+        initialStock: { type: Number, required: true }
+    },
+    setup(props) {
         const stock = ref(props.initialStock);
         const cartQty = ref(0);
 
-        const isLowStock = computed(() => stock.value < 10);
+        return () => h('div', { class: 'p-card p-6 bg-surface-0 border rounded-xl' }, [
+            h('h4', { class: 'font-bold text-lg' }, props.warehouseName),
+            h('p', `Available Stock: ${stock.value} units`),
+            h('button', { 
+                type: 'button',
+                class: 'p-button p-button-primary',
+                onClick: () => { if (stock.value > 0) { stock.value--; cartQty.value++; } }
+            }, `Add to Cart (${cartQty.value})`)
+        ]);
+    }
+});
 
-        let unsubscribe: (() => void) | null = null;
-
-        onMounted(() => {
-            // Listen to sales emitted from React or other islands
-            unsubscribe = onIslandEvent('polyglot:sale', (payload: any) => {
-                if (stock.value > 0) {
-                    stock.value--;
-                }
-            });
-        });
-
-        onUnmounted(() => {
-            unsubscribe?.();
-        });
-
-        const addItem = () => {
-            if (stock.value > 0) {
-                stock.value--;
-                cartQty.value++;
-                // Emit event to cross-island ledger
-                emitIslandEvent('polyglot:cart', {
-                    source: 'Vue 3 Island',
-                    action: 'add_item',
-                    cartQty: cartQty.value,
-                    remainingStock: stock.value
-                });
-            }
-        };
-
-        const restock = () => {
-            stock.value += 10;
-            emitIslandEvent('polyglot:restock', {
-                source: 'Vue 3 Island',
-                addedUnits: 10
-            });
-        };
-
-        return { stock, cartQty, isLowStock, addItem, restock, props };
-    },
-    template: `
-        <div class="p-card p-6 bg-surface-0 border rounded-xl shadow-sm">
-            <div class="flex justify-between items-center mb-4">
-                <h4 class="font-bold text-lg text-surface-900">{{ props.warehouseName }}</h4>
-                <span class="p-tag p-tag-success">Vue 3</span>
-            </div>
-
-            <div class="mb-4">
-                <div class="text-sm text-surface-500">Available Stock:</div>
-                <div :class="['text-3xl font-black', isLowStock ? 'text-red-500' : 'text-emerald-600']">
-                    {{ stock }} units
-                </div>
-            </div>
-
-            <div class="flex gap-2">
-                <button type="button" @click="addItem" :disabled="stock === 0" class="p-button p-button-primary text-sm px-3 py-2">
-                    Add to Cart ({{ cartQty }})
-                </button>
-                <button type="button" @click="restock" class="p-button p-button-outlined text-sm px-3 py-2">
-                    + Restock (+10)
-                </button>
-            </div>
-        </div>
-    `
-};
-
-// LaughTale Island Mount Entrypoint
-export default function WarehouseCartIsland(
-    container: HTMLElement, 
-    props: WarehouseProps, 
-    ctx?: IslandContext
-) {
-    const app = createApp(WarehouseComponent, props);
-    app.mount(container);
-
-    // Teardown when navigated away
-    ctx?.onCleanup(() => {
-        app.unmount();
-    });
-
-    return () => app.unmount();
-}
+export default createVueIsland(WarehouseComponent);
 ```
 
 ---
