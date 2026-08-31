@@ -168,36 +168,50 @@ const CSS = `
 }
 
 /* ==================== DARK MODE ==================== */
+html.dark .p-selectbutton-item,
+[data-theme="dark"] .p-selectbutton-item,
 .dark .p-selectbutton-item {
-    background: var(--lt-surface-900);
-    border-color: var(--lt-surface-700);
-    color: var(--lt-surface-100);
+    background: var(--p-surface-0, #090d16);
+    border-color: var(--p-border-color, #334155);
+    color: var(--p-text-color, #f8fafc);
 }
+html.dark .p-selectbutton-item:hover:not(.p-disabled):not(.is-selected),
+[data-theme="dark"] .p-selectbutton-item:hover:not(.p-disabled):not(.is-selected),
 .dark .p-selectbutton-item:hover:not(.p-disabled):not(.is-selected) {
-    background: var(--lt-surface-800);
-    border-color: var(--lt-surface-500);
+    background: var(--p-surface-100, #1e293b);
+    border-color: var(--p-surface-400, #64748b);
 }
+html.dark .p-selectbutton-item.is-selected,
+[data-theme="dark"] .p-selectbutton-item.is-selected,
 .dark .p-selectbutton-item.is-selected {
     background: rgba(16, 185, 129, 0.16);
-    border-color: var(--lt-primary-500);
-    color: var(--lt-primary-300);
+    border-color: var(--p-primary-500, #10b981);
+    color: var(--p-primary-300, #6ee7b7);
 }
+html.dark .p-selectbutton-item.is-selected:hover:not(.p-disabled),
+[data-theme="dark"] .p-selectbutton-item.is-selected:hover:not(.p-disabled),
 .dark .p-selectbutton-item.is-selected:hover:not(.p-disabled) {
     background: rgba(16, 185, 129, 0.24);
-    color: var(--lt-primary-200);
+    color: var(--p-primary-200, #a7f3d0);
 }
+html.dark .p-selectbutton-item.p-disabled,
+[data-theme="dark"] .p-selectbutton-item.p-disabled,
 .dark .p-selectbutton-item.p-disabled {
-    background: var(--lt-surface-850);
-    border-color: var(--lt-surface-700);
-    color: var(--lt-surface-500);
+    background: var(--p-surface-100, #1e293b);
+    border-color: var(--p-border-color, #334155);
+    color: var(--p-text-muted, #94a3b8);
 }
+html.dark .p-selectbutton-badge,
+[data-theme="dark"] .p-selectbutton-badge,
 .dark .p-selectbutton-badge {
-    background: var(--lt-surface-800);
-    color: var(--lt-surface-200);
+    background: var(--p-surface-100, #1e293b);
+    color: var(--p-text-muted, #94a3b8);
 }
+html.dark .p-selectbutton-item.is-selected .p-selectbutton-badge,
+[data-theme="dark"] .p-selectbutton-item.is-selected .p-selectbutton-badge,
 .dark .p-selectbutton-item.is-selected .p-selectbutton-badge {
-    background: var(--lt-primary-900);
-    color: var(--lt-primary-200);
+    background: rgba(16, 185, 129, 0.25);
+    color: var(--p-primary-200, #a7f3d0);
 }
 `;
 

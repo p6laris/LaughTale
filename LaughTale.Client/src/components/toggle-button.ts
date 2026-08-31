@@ -134,31 +134,50 @@ const CSS = `
 }
 
 /* ==================== DARK MODE ==================== */
+html.dark .laughtale-togglebutton,
+html.dark .p-togglebutton,
+[data-theme="dark"] .laughtale-togglebutton,
+[data-theme="dark"] .p-togglebutton,
+.dark .laughtale-togglebutton,
 .dark .p-togglebutton {
-    background: var(--lt-surface-900);
-    border-color: var(--lt-surface-700);
-    color: var(--lt-surface-0);
+    background: var(--p-surface-0, #090d16);
+    border-color: var(--p-border-color, #334155);
+    color: var(--p-text-color, #f8fafc);
 }
+html.dark .p-togglebutton:hover:not(.p-disabled):not(.p-togglebutton-checked),
+[data-theme="dark"] .p-togglebutton:hover:not(.p-disabled):not(.p-togglebutton-checked),
 .dark .p-togglebutton:hover:not(.p-disabled):not(.p-togglebutton-checked) {
-    background: var(--lt-surface-800);
-    border-color: var(--lt-surface-500);
+    background: var(--p-surface-100, #1e293b);
+    border-color: var(--p-surface-400, #64748b);
 }
+html.dark .p-togglebutton.p-togglebutton-checked,
+html.dark .p-togglebutton.is-checked,
+[data-theme="dark"] .p-togglebutton.p-togglebutton-checked,
+[data-theme="dark"] .p-togglebutton.is-checked,
 .dark .p-togglebutton.p-togglebutton-checked,
 .dark .p-togglebutton.is-checked {
     background: rgba(16, 185, 129, 0.16);
-    border-color: var(--lt-primary-500);
-    color: var(--lt-primary-300);
+    border-color: var(--p-primary-500, #10b981);
+    color: var(--p-primary-300, #6ee7b7);
 }
+html.dark .p-togglebutton.p-togglebutton-checked:hover:not(.p-disabled),
+html.dark .p-togglebutton.is-checked:hover:not(.p-disabled),
+[data-theme="dark"] .p-togglebutton.p-togglebutton-checked:hover:not(.p-disabled),
+[data-theme="dark"] .p-togglebutton.is-checked:hover:not(.p-disabled),
 .dark .p-togglebutton.p-togglebutton-checked:hover:not(.p-disabled),
 .dark .p-togglebutton.is-checked:hover:not(.p-disabled) {
     background: rgba(16, 185, 129, 0.24);
-    color: var(--lt-primary-200);
+    color: var(--p-primary-200, #a7f3d0);
 }
+html.dark .p-togglebutton:disabled,
+html.dark .p-togglebutton.p-disabled,
+[data-theme="dark"] .p-togglebutton:disabled,
+[data-theme="dark"] .p-togglebutton.p-disabled,
 .dark .p-togglebutton:disabled,
 .dark .p-togglebutton.p-disabled {
-    background: var(--lt-surface-850);
-    border-color: var(--lt-surface-700);
-    color: var(--lt-surface-500);
+    background: var(--p-surface-100, #1e293b);
+    border-color: var(--p-border-color, #334155);
+    color: var(--p-text-muted, #94a3b8);
 }
 `;
 

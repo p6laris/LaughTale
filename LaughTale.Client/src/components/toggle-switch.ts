@@ -152,31 +152,52 @@ const CSS = `
 }
 
 /* ==================== DARK MODE ==================== */
+html.dark .p-toggleswitch-slider,
+[data-theme="dark"] .p-toggleswitch-slider,
 .dark .p-toggleswitch-slider {
-    background: var(--lt-surface-700);
+    background: var(--p-surface-200, #334155);
 }
+html.dark .p-toggleswitch:hover:not(.p-disabled):not(.p-toggleswitch-checked) .p-toggleswitch-slider,
+[data-theme="dark"] .p-toggleswitch:hover:not(.p-disabled):not(.p-toggleswitch-checked) .p-toggleswitch-slider,
 .dark .p-toggleswitch:hover:not(.p-disabled):not(.p-toggleswitch-checked) .p-toggleswitch-slider {
-    background: var(--lt-surface-600);
+    background: var(--p-surface-300, #475569);
 }
+html.dark .p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-slider,
+[data-theme="dark"] .p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-slider,
 .dark .p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-slider {
-    background: var(--lt-primary-500);
+    background: var(--p-primary-500, #10b981);
 }
+html.dark .p-toggleswitch.p-toggleswitch-checked:hover:not(.p-disabled) .p-toggleswitch-slider,
+[data-theme="dark"] .p-toggleswitch.p-toggleswitch-checked:hover:not(.p-disabled) .p-toggleswitch-slider,
 .dark .p-toggleswitch.p-toggleswitch-checked:hover:not(.p-disabled) .p-toggleswitch-slider {
-    background: var(--lt-primary-400);
+    background: var(--p-primary-400, #34d399);
 }
+html.dark .p-toggleswitch-handle,
+[data-theme="dark"] .p-toggleswitch-handle,
 .dark .p-toggleswitch-handle {
-    background: var(--lt-surface-0);
-    color: var(--lt-surface-600);
+    background: var(--p-surface-0, #090d16);
+    color: var(--p-text-muted, #94a3b8);
 }
+html.dark .p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-handle,
+[data-theme="dark"] .p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-handle,
 .dark .p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-handle {
-    background: var(--lt-surface-0);
-    color: var(--lt-primary-600);
+    background: var(--p-surface-0, #090d16);
+    color: var(--p-primary-400, #34d399);
 }
+html.dark .p-toggleswitch.p-disabled .p-toggleswitch-slider,
+[data-theme="dark"] .p-toggleswitch.p-disabled .p-toggleswitch-slider,
 .dark .p-toggleswitch.p-disabled .p-toggleswitch-slider {
-    background: var(--lt-surface-800);
+    background: var(--p-surface-100, #1e293b);
 }
+html.dark .p-toggleswitch.p-disabled .p-toggleswitch-handle,
+[data-theme="dark"] .p-toggleswitch.p-disabled .p-toggleswitch-handle,
 .dark .p-toggleswitch.p-disabled .p-toggleswitch-handle {
-    background: var(--lt-surface-500);
+    background: var(--p-surface-200, #334155);
+}
+html.dark .p-toggleswitch-label,
+[data-theme="dark"] .p-toggleswitch-label,
+.dark .p-toggleswitch-label {
+    color: var(--p-text-color, #f8fafc);
 }
 `;
 
