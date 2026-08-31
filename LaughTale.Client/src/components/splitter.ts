@@ -102,37 +102,45 @@ const SPLITTER_CSS = `
 }
 
 /* Dark Mode Tokens */
-.dark .p-splitter,
-[data-theme="dark"] .p-splitter {
-    background: var(--lt-surface-900) !important;
-    border-color: var(--lt-surface-700) !important;
-    color: var(--lt-surface-100) !important;
+html.dark .p-splitter,
+[data-theme="dark"] .p-splitter,
+.dark .p-splitter {
+    background: var(--p-surface-0, #090d16) !important;
+    border-color: var(--p-border-color, #334155) !important;
+    color: var(--p-text-color, #f8fafc) !important;
 }
 
-.dark .p-splitter-gutter,
-[data-theme="dark"] .p-splitter-gutter {
-    background: var(--lt-surface-800) !important;
+html.dark .p-splitter-gutter,
+[data-theme="dark"] .p-splitter-gutter,
+.dark .p-splitter-gutter {
+    background: var(--p-surface-100, #1e293b) !important;
 }
 
-.dark .p-splitter-gutter:hover,
-.dark .p-splitter-gutter:focus-visible,
-.dark .p-splitter-gutter[data-resizing="true"],
+html.dark .p-splitter-gutter:hover,
+html.dark .p-splitter-gutter:focus-visible,
+html.dark .p-splitter-gutter[data-resizing="true"],
 [data-theme="dark"] .p-splitter-gutter:hover,
 [data-theme="dark"] .p-splitter-gutter:focus-visible,
-[data-theme="dark"] .p-splitter-gutter[data-resizing="true"] {
-    background: var(--lt-surface-700) !important;
+[data-theme="dark"] .p-splitter-gutter[data-resizing="true"],
+.dark .p-splitter-gutter:hover,
+.dark .p-splitter-gutter:focus-visible,
+.dark .p-splitter-gutter[data-resizing="true"] {
+    background: var(--p-surface-200, #334155) !important;
 }
 
-.dark .p-splitter-gutter-handle,
-[data-theme="dark"] .p-splitter-gutter-handle {
-    background: var(--lt-surface-500) !important;
+html.dark .p-splitter-gutter-handle,
+[data-theme="dark"] .p-splitter-gutter-handle,
+.dark .p-splitter-gutter-handle {
+    background: var(--p-surface-400, #64748b) !important;
 }
 
-.dark .p-splitter-gutter:hover > .p-splitter-gutter-handle,
-.dark .p-splitter-gutter[data-resizing="true"] > .p-splitter-gutter-handle,
+html.dark .p-splitter-gutter:hover > .p-splitter-gutter-handle,
+html.dark .p-splitter-gutter[data-resizing="true"] > .p-splitter-gutter-handle,
 [data-theme="dark"] .p-splitter-gutter:hover > .p-splitter-gutter-handle,
-[data-theme="dark"] .p-splitter-gutter[data-resizing="true"] > .p-splitter-gutter-handle {
-    background: var(--lt-surface-300) !important;
+[data-theme="dark"] .p-splitter-gutter[data-resizing="true"] > .p-splitter-gutter-handle,
+.dark .p-splitter-gutter:hover > .p-splitter-gutter-handle,
+.dark .p-splitter-gutter[data-resizing="true"] > .p-splitter-gutter-handle {
+    background: var(--p-text-muted, #94a3b8) !important;
 }
 `;
 

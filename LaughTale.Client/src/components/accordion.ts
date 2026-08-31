@@ -194,53 +194,63 @@ const ACCORDION_CSS = `
 }
 
 /* Dark Mode Tokens */
-.dark .p-accordion,
-[data-theme="dark"] .p-accordion {
-    background: var(--lt-surface-900) !important;
-    border-color: var(--lt-surface-700) !important;
-    color: var(--lt-surface-100) !important;
+html.dark .p-accordion,
+[data-theme="dark"] .p-accordion,
+.dark .p-accordion {
+    background: var(--p-surface-0, #090d16) !important;
+    border-color: var(--p-border-color, #334155) !important;
+    color: var(--p-text-color, #f8fafc) !important;
 }
-.dark .p-accordionpanel,
-[data-theme="dark"] .p-accordionpanel {
-    border-color: var(--lt-surface-700) !important;
+html.dark .p-accordionpanel,
+[data-theme="dark"] .p-accordionpanel,
+.dark .p-accordionpanel {
+    border-color: var(--p-border-color, #334155) !important;
 }
-.dark .p-accordionheader-toggle,
-[data-theme="dark"] .p-accordionheader-toggle {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-200) !important;
+html.dark .p-accordionheader-toggle,
+[data-theme="dark"] .p-accordionheader-toggle,
+.dark .p-accordionheader-toggle {
+    background: var(--p-surface-0, #090d16) !important;
+    color: var(--p-text-color, #f8fafc) !important;
 }
-.dark .p-accordionheader-toggle:hover:not(:disabled),
-[data-theme="dark"] .p-accordionheader-toggle:hover:not(:disabled) {
-    background: var(--lt-surface-800) !important;
-    color: var(--lt-surface-0) !important;
+html.dark .p-accordionheader-toggle:hover:not(:disabled),
+[data-theme="dark"] .p-accordionheader-toggle:hover:not(:disabled),
+.dark .p-accordionheader-toggle:hover:not(:disabled) {
+    background: var(--p-surface-50, #0f172a) !important;
+    color: var(--p-text-color, #f8fafc) !important;
 }
-.dark .p-accordionpanel.p-accordionpanel-active > .p-accordionheader > .p-accordionheader-toggle,
-[data-theme="dark"] .p-accordionpanel.p-accordionpanel-active > .p-accordionheader > .p-accordionheader-toggle {
-    color: var(--lt-primary-400) !important;
+html.dark .p-accordionpanel.p-accordionpanel-active > .p-accordionheader > .p-accordionheader-toggle,
+[data-theme="dark"] .p-accordionpanel.p-accordionpanel-active > .p-accordionheader > .p-accordionheader-toggle,
+.dark .p-accordionpanel.p-accordionpanel-active > .p-accordionheader > .p-accordionheader-toggle {
+    color: var(--p-primary-400, #34d399) !important;
 }
-.dark .p-accordioncontent,
-[data-theme="dark"] .p-accordioncontent {
-    background: var(--lt-surface-900) !important;
+html.dark .p-accordioncontent,
+[data-theme="dark"] .p-accordioncontent,
+.dark .p-accordioncontent {
+    background: var(--p-surface-0, #090d16) !important;
 }
-.dark .p-accordioncontent-content,
-[data-theme="dark"] .p-accordioncontent-content {
-    color: var(--lt-surface-300) !important;
+html.dark .p-accordioncontent-content,
+[data-theme="dark"] .p-accordioncontent-content,
+.dark .p-accordioncontent-content {
+    color: var(--p-text-color, #f8fafc) !important;
 }
-.dark .p-accordion-ctrl-btn,
-[data-theme="dark"] .p-accordion-ctrl-btn {
-    background: var(--lt-surface-900) !important;
-    border-color: var(--lt-surface-700) !important;
-    color: var(--lt-surface-200) !important;
+html.dark .p-accordion-ctrl-btn,
+[data-theme="dark"] .p-accordion-ctrl-btn,
+.dark .p-accordion-ctrl-btn {
+    background: var(--p-surface-100, #1e293b) !important;
+    border-color: var(--p-border-color, #334155) !important;
+    color: var(--p-text-color, #f8fafc) !important;
 }
-.dark .p-accordion-ctrl-btn.p-highlight,
-[data-theme="dark"] .p-accordion-ctrl-btn.p-highlight {
-    background: var(--lt-primary-500) !important;
-    color: var(--lt-surface-0, var(--lt-surface-0)) !important;
+html.dark .p-accordion-ctrl-btn.p-highlight,
+[data-theme="dark"] .p-accordion-ctrl-btn.p-highlight,
+.dark .p-accordion-ctrl-btn.p-highlight {
+    background: var(--p-primary-500, #10b981) !important;
+    color: #ffffff !important;
 }
-.dark .p-accordion-radio-circle,
-[data-theme="dark"] .p-accordion-radio-circle {
-    background: var(--lt-surface-950) !important;
-    border-color: var(--lt-surface-700) !important;
+html.dark .p-accordion-radio-circle,
+[data-theme="dark"] .p-accordion-radio-circle,
+.dark .p-accordion-radio-circle {
+    background: var(--p-surface-50, #0f172a) !important;
+    border-color: var(--p-border-color, #334155) !important;
 }
 `;
 

@@ -98,14 +98,16 @@ const DIVIDER_CSS = `
 }
 
 /* Dark Mode Tokens */
-.dark .p-divider:before,
-[data-theme="dark"] .p-divider:before {
-    border-color: var(--lt-surface-700) !important;
+html.dark .p-divider:before,
+[data-theme="dark"] .p-divider:before,
+.dark .p-divider:before {
+    border-color: var(--p-border-color, #334155) !important;
 }
-.dark .p-divider .p-divider-content,
-[data-theme="dark"] .p-divider .p-divider-content {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-200) !important;
+html.dark .p-divider .p-divider-content,
+[data-theme="dark"] .p-divider .p-divider-content,
+.dark .p-divider .p-divider-content {
+    background: var(--p-surface-0, #090d16) !important;
+    color: var(--p-text-color, #f8fafc) !important;
 }
 `;
 
