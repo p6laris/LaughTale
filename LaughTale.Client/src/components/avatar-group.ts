@@ -22,10 +22,17 @@ export interface AvatarGroupProps {
 
 
 const CSS = `
-[data-theme="dark"] .laughtale-avatar-group {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-100) !important;
-    border-color: var(--lt-surface-700) !important;
+html.dark .avatar-circle,
+[data-theme="dark"] .avatar-circle,
+.dark .avatar-circle {
+    border-color: var(--p-surface-0, #090d16) !important;
+}
+html.dark .avatar-overflow,
+[data-theme="dark"] .avatar-overflow,
+.dark .avatar-overflow {
+    border-color: var(--p-surface-0, #090d16) !important;
+    background: var(--p-surface-100, #1e293b) !important;
+    color: var(--p-text-color, #f8fafc) !important;
 }
 `;
 

@@ -18,25 +18,31 @@ export interface GalleriaProps {
 
 
 const CSS = `
-[data-theme="dark"] .laughtale-galleria {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-100) !important;
-    border-color: var(--lt-surface-700) !important;
+html.dark .laughtale-galleria,
+[data-theme="dark"] .laughtale-galleria,
+.dark .laughtale-galleria {
+    background: var(--p-surface-0, #090d16) !important;
+    color: var(--p-text-color, #f8fafc) !important;
+    border-color: var(--p-border-color, #334155) !important;
 }
-[data-theme="dark"] .galleria-prev-btn {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-100) !important;
-    border-color: var(--lt-surface-700) !important;
+html.dark .galleria-prev-btn,
+html.dark .galleria-next-btn,
+[data-theme="dark"] .galleria-prev-btn,
+[data-theme="dark"] .galleria-next-btn,
+.dark .galleria-prev-btn,
+.dark .galleria-next-btn {
+    background: rgba(0, 0, 0, 0.6) !important;
+    color: #ffffff !important;
 }
-[data-theme="dark"] .galleria-next-btn {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-100) !important;
-    border-color: var(--lt-surface-700) !important;
+html.dark .galleria-thumb,
+[data-theme="dark"] .galleria-thumb,
+.dark .galleria-thumb {
+    border-color: var(--p-border-color, #334155) !important;
 }
-[data-theme="dark"] .galleria-thumb {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-100) !important;
-    border-color: var(--lt-surface-700) !important;
+html.dark .galleria-thumb.active,
+[data-theme="dark"] .galleria-thumb.active,
+.dark .galleria-thumb.active {
+    border-color: var(--p-primary-500, #10b981) !important;
 }
 `;
 

@@ -123,11 +123,12 @@ const CAROUSEL_CSS = `
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-.dark .p-carousel-card-num,
-[data-theme="dark"] .p-carousel-card-num {
-    background: var(--lt-surface-950);
-    color: var(--lt-surface-0);
-    border-color: var(--lt-surface-800);
+html.dark .p-carousel-card-num,
+[data-theme="dark"] .p-carousel-card-num,
+.dark .p-carousel-card-num {
+    background: var(--p-surface-0, #090d16);
+    color: var(--p-text-color, #f8fafc);
+    border-color: var(--p-border-color, #334155);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
@@ -167,9 +168,10 @@ const CAROUSEL_CSS = `
     outline: none;
 }
 
-.dark .p-carousel-indicator-button,
-[data-theme="dark"] .p-carousel-indicator-button {
-    background: var(--lt-surface-700);
+html.dark .p-carousel-indicator-button,
+[data-theme="dark"] .p-carousel-indicator-button,
+.dark .p-carousel-indicator-button {
+    background: var(--p-surface-200, #334155);
 }
 
 .p-carousel-indicator-button:hover {
@@ -209,13 +211,15 @@ const CAROUSEL_CSS = `
     flex-shrink: 0;
 }
 
-.dark .p-carousel-prev,
-.dark .p-carousel-next,
+html.dark .p-carousel-prev,
+html.dark .p-carousel-next,
 [data-theme="dark"] .p-carousel-prev,
-[data-theme="dark"] .p-carousel-next {
-    background: var(--lt-surface-800);
-    border-color: var(--lt-surface-700);
-    color: var(--lt-surface-400);
+[data-theme="dark"] .p-carousel-next,
+.dark .p-carousel-prev,
+.dark .p-carousel-next {
+    background: var(--p-surface-0, #090d16);
+    border-color: var(--p-border-color, #334155);
+    color: var(--p-text-muted, #94a3b8);
 }
 
 .p-carousel-prev:hover:not(:disabled),
@@ -224,12 +228,14 @@ const CAROUSEL_CSS = `
     color: var(--lt-text-primary);
 }
 
+html.dark .p-carousel-prev:hover:not(:disabled),
+html.dark .p-carousel-next:hover:not(:disabled),
 .dark .p-carousel-prev:hover:not(:disabled),
 .dark .p-carousel-next:hover:not(:disabled),
 [data-theme="dark"] .p-carousel-prev:hover:not(:disabled),
 [data-theme="dark"] .p-carousel-next:hover:not(:disabled) {
-    background: var(--lt-surface-700);
-    color: var(--lt-surface-0);
+    background: var(--p-surface-100, #1e293b);
+    color: var(--p-text-color, #f8fafc);
 }
 
 .p-carousel-prev:active:not(:disabled),

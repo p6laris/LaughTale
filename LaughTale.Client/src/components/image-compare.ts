@@ -182,16 +182,18 @@ const COMPARE_CSS = `
 }
 
 /* Dark Mode Tokens */
-.dark .p-compare,
-[data-theme="dark"] .p-compare {
-    border-color: var(--lt-surface-800);
+html.dark .p-compare,
+[data-theme="dark"] .p-compare,
+.dark .p-compare {
+    border-color: var(--p-border-color, #334155);
 }
 
-.dark .p-compare-indicator,
-[data-theme="dark"] .p-compare-indicator {
-    background: var(--lt-surface-900);
-    color: var(--lt-surface-0);
-    border: 1px solid var(--lt-surface-700);
+html.dark .p-compare-indicator,
+[data-theme="dark"] .p-compare-indicator,
+.dark .p-compare-indicator {
+    background: var(--p-surface-0, #090d16);
+    color: var(--p-text-color, #f8fafc);
+    border: 1px solid var(--p-border-color, #334155);
 }
 `;
 
