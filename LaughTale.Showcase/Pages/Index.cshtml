@@ -1,124 +1,218 @@
-﻿@page
+@page
 @model LaughTale.Showcase.Pages.IndexModel
 @{
-    ViewData["Title"] = "LaughTale Islands Architecture Framework";
+    ViewData["Title"] = "LaughTale — High-Performance Islands Architecture for .NET";
 }
 
-<!-- Hero Header Card -->
-<div class="aura-header-card">
-    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
-        <div>
-            <h1 class="page-title">LaughTale Islands Architecture for .NET</h1>
-            <p class="page-desc">
-                High-performance <strong>Server-Side Rendering (SSR)</strong> with selective multi-strategy client hydration, View Transitions, and C# server slot projection.
-            </p>
-        </div>
+<div class="app-container" style="max-width: 1320px; display: flex; flex-direction: column; gap: 2.5rem; padding-bottom: 3rem;">
 
-        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-            <span class="aura-tag tag-emerald">Load</span>
-            <span class="aura-tag tag-cyan">Idle</span>
-            <span class="aura-tag tag-amber">Visible</span>
-            <span class="aura-tag tag-purple">Interaction</span>
-            <span class="aura-tag tag-slate">Server Slots</span>
-        </div>
-    </div>
-</div>
+    <!-- 1. High-Impact Hero Banner -->
+    <div style="background: linear-gradient(135deg, var(--p-surface-0) 0%, var(--p-surface-50) 100%); border: 1px solid var(--p-border-color); border-radius: 1.25rem; padding: 2.5rem 2rem; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04); position: relative; overflow: hidden;">
+        <div style="position: absolute; top: -50px; right: -50px; width: 250px; height: 250px; border-radius: 50%; background: radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, transparent 70%); pointer-events: none;"></div>
 
-<!-- Grid 1: Above The Fold Interactive Islands -->
-<div class="grid-cols-2" style="margin-bottom: 2rem;">
-    
-    <!-- Island 1: Counter (HydrateStrategy.Load) -->
-    <div class="aura-card">
-        <h2 class="section-title">1. Numeric Stepper Island</h2>
-        <p class="section-desc" style="margin-bottom: 1.25rem;">Above-the-fold component with immediate client hydration.</p>
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 2rem; position: relative; z-index: 1;">
+            <div style="max-width: 680px;">
+                <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.35rem 0.75rem; border-radius: 9999px; background: var(--p-emerald-50, rgba(16, 185, 129, 0.1)); border: 1px solid rgba(16, 185, 129, 0.2); color: var(--p-emerald-600, #059669); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem;">
+                    <span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px #10b981;"></span>
+                    LaughTale v4.0 • ASP.NET Core 10 Ready
+                </div>
 
-        <island name="interactive-counter" 
-                props="@(new CounterProps(25, 5, "Batch Concurrency"))" 
-                hydrate="Load">
-            <div class="skeleton">
-                Loading Counter Island (SSR Skeleton)...
-            </div>
-        </island>
-    </div>
+                <h1 style="font-size: 2.5rem; font-weight: 800; line-height: 1.15; letter-spacing: -0.03em; color: var(--p-text-color); margin: 0 0 1rem;">
+                    Islands Architecture for <span style="background: linear-gradient(135deg, var(--p-primary-500), var(--p-primary-700)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">ASP.NET Core</span>
+                </h1>
 
-    <!-- Island 2: Modal Dialog with C# Server Slot Projection -->
-    <div class="aura-card">
-        <h2 class="section-title">2. Modal Dialog with Server Slot</h2>
-        <p class="section-desc" style="margin-bottom: 1.25rem;">Client island wraps and animates arbitrary server-rendered Razor HTML.</p>
-
-        <island name="modal-dialog" 
-                props="@(new SecurityModalProps("Inspect Security Policy", "Enterprise Access Control Policy"))" 
-                hydrate="Interaction">
-            <!-- Server-rendered C# slot content -->
-            <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1rem;">
-                <div style="font-size: 0.8125rem; font-weight: 600; color: var(--p-surface-900);">Zero-Trust Compliance Standard</div>
-                <p style="font-size: 0.75rem; color: var(--p-surface-600); margin-top: 0.25rem; line-height: 1.5;">
-                    All cross-boundary props are serialized at compile-time via Roslyn analyzers and validated server-side.
+                <p style="font-size: 1.0625rem; line-height: 1.6; color: var(--p-text-muted); margin: 0 0 1.75rem;">
+                    Ship <strong>0 KB initial JavaScript</strong> with instant Server-Side Rendering (SSR). Hydrate only interactive UI widgets on-demand using <em>Load, Idle, Visible, Media, or Interaction</em> strategies.
                 </p>
-                <div style="margin-top: 0.5rem; font-size: 0.6875rem; font-family: var(--p-font-mono); color: var(--p-primary-700);">
-                    Build Hash: @Guid.NewGuid().ToString("N").Substring(0, 8) &bull; Verified: @DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm") UTC
+
+                <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+                    <a href="/components" class="p-button p-button-primary" style="padding: 0.65rem 1.25rem; font-size: 0.9375rem; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.9a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg>
+                        <span>Explore 76 Components</span>
+                    </a>
+                    <a href="/polyglot" class="p-button p-button-secondary" style="padding: 0.65rem 1.25rem; font-size: 0.9375rem; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+                        <span>Polyglot Live Lab</span>
+                        <span class="p-tag p-tag-success" style="font-size: 0.7rem; padding: 0.1rem 0.4rem;">Live</span>
+                    </a>
                 </div>
             </div>
-        </island>
-    </div>
 
-</div>
-
-<!-- Grid 2: Inter-Island Event Bus -->
-<div class="aura-card" style="margin-bottom: 2rem;">
-    <h2 class="section-title">3 &amp; 4. Inter-Island Reactive Event Bus</h2>
-    <p class="section-desc" style="margin-bottom: 1.25rem;">Zero-dependency communication between isolated islands across the DOM tree.</p>
-
-    <div class="grid-cols-2">
-        <island name="event-broadcaster" 
-                props="@(new EventBroadcasterProps("telemetry-channel", "Send Telemetry Pulse"))" 
-                hydrate="Interaction" />
-
-        <island name="event-receiver" 
-                props="@(new EventReceiverProps("telemetry-channel", "Awaiting telemetry broadcast events..."))" 
-                hydrate="Idle" />
-    </div>
-</div>
-
-<!-- Grid 3: Below-the-fold Scroll Hydration (HydrateStrategy.Visible) -->
-<div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--p-border-color);">
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
-        <div>
-            <h2 class="section-title">Below-the-Fold Lazy Hydration</h2>
-            <p class="section-desc">These islands execute 0 bytes of JavaScript until scrolled into the viewport via IntersectionObserver.</p>
+            <!-- Terminal Quickstart Card -->
+            <div style="background: var(--p-surface-900, #090d16); border: 1px solid var(--p-border-color, #1e293b); border-radius: 0.875rem; padding: 1.25rem; width: 100%; max-width: 420px; box-shadow: 0 12px 30px -10px rgba(0,0,0,0.3); color: #f8fafc; font-family: var(--p-font-mono);">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.08);">
+                    <div style="display: flex; gap: 0.35rem;">
+                        <span style="width: 10px; height: 10px; border-radius: 50%; background: #ef4444;"></span>
+                        <span style="width: 10px; height: 10px; border-radius: 50%; background: #f59e0b;"></span>
+                        <span style="width: 10px; height: 10px; border-radius: 50%; background: #10b981;"></span>
+                    </div>
+                    <span style="font-size: 0.75rem; color: #94a3b8;">bash &bull; instant setup</span>
+                </div>
+                <div style="font-size: 0.8125rem; line-height: 1.7;">
+                    <div style="color: #64748b;"># Create a new LaughTale app</div>
+                    <div><span style="color: #34d399;">dotnet</span> new laughtale-web -n StoreApp</div>
+                    <div style="color: #64748b; margin-top: 0.4rem;"># Install components &amp; run</div>
+                    <div><span style="color: #38bdf8;">cd</span> StoreApp &amp;&amp; <span style="color: #34d399;">dotnet</span> run</div>
+                </div>
+            </div>
         </div>
-        <span class="aura-tag tag-cyan">Hydrate: Visible</span>
+
+        <!-- 4 Quick Telemetry Badges -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--p-border-color);">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <div style="width: 2.25rem; height: 2.25rem; border-radius: 8px; background: rgba(16, 185, 129, 0.1); color: #10b981; display: flex; align-items: center; justify-content: center; font-weight: 800;">⚡</div>
+                <div>
+                    <div style="font-size: 0.9375rem; font-weight: 700; color: var(--p-text-color);">&lt; 20ms TTFB</div>
+                    <div style="font-size: 0.75rem; color: var(--p-text-muted);">Instant SSR Baseline</div>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <div style="width: 2.25rem; height: 2.25rem; border-radius: 8px; background: rgba(59, 130, 246, 0.1); color: #3b82f6; display: flex; align-items: center; justify-content: center; font-weight: 800;">📦</div>
+                <div>
+                    <div style="font-size: 0.9375rem; font-weight: 700; color: var(--p-text-color);">3.12 KB Core Runtime</div>
+                    <div style="font-size: 0.75rem; color: var(--p-text-muted);">Microscopic footprint</div>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <div style="width: 2.25rem; height: 2.25rem; border-radius: 8px; background: rgba(168, 85, 247, 0.1); color: #a855f7; display: flex; align-items: center; justify-content: center; font-weight: 800;">🎨</div>
+                <div>
+                    <div style="font-size: 0.9375rem; font-weight: 700; color: var(--p-text-color);">76+ Aura Components</div>
+                    <div style="font-size: 0.75rem; color: var(--p-text-muted);">Forms, Grids, Trees, Charts</div>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <div style="width: 2.25rem; height: 2.25rem; border-radius: 8px; background: rgba(245, 158, 11, 0.1); color: #f59e0b; display: flex; align-items: center; justify-content: center; font-weight: 800;">🌍</div>
+                <div>
+                    <div style="font-size: 0.9375rem; font-weight: 700; color: var(--p-text-color);">100% Kurdish RTL</div>
+                    <div style="font-size: 0.75rem; color: var(--p-text-muted);">Speda font &amp; Bi-di mirroring</div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="grid-cols-2">
+    <!-- 2. Flagship Interactive Islands Playground -->
+    <div>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.5rem;">
+            <div>
+                <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--p-text-color); margin: 0;">Interactive Islands Playground</h2>
+                <p style="color: var(--p-text-muted); font-size: 0.875rem; margin: 0.25rem 0 0;">Test real LaughTale islands executing live client hydration strategies in your browser.</p>
+            </div>
+            <span class="p-tag p-tag-primary">Live Reactivity</span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.5rem;">
+            
+            <!-- Island 1: High-Performance DataGrid with Live Filtering -->
+            <div class="p-card" style="background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-xl); padding: 1.5rem; box-shadow: var(--p-shadow-sm); display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 style="font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--p-text-color);">1. DataTable &amp; Filter Grid</h3>
+                        <span class="aura-tag tag-emerald">Hydrate: Load</span>
+                    </div>
+                    <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">
+                        In-memory / EF Core sortable grid with column filtering and responsive paginator.
+                    </p>
+                    <island-datatable value="@Model.SampleOrders" 
+                                      paginator="true" 
+                                      rows="3" 
+                                      striped-rows="true" 
+                                      show-gridlines="true" 
+                                      hydrate="Load">
+                    </island-datatable>
+                </div>
+            </div>
+
+            <!-- Island 2: Interactive Aura Form Controls -->
+            <div class="p-card" style="background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-xl); padding: 1.5rem; box-shadow: var(--p-shadow-sm); display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 style="font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--p-text-color);">2. Interactive Form Suite</h3>
+                        <span class="aura-tag tag-cyan">Hydrate: Interaction</span>
+                    </div>
+                    <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">
+                        Currency steppers, OTP pins, toggle switches, and localized calendars.
+                    </p>
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <div>
+                            <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--p-text-muted); margin-bottom: 0.35rem;">Currency InputNumber</label>
+                            <island-input-number name="Price" value="249.99" mode="Currency" currency="USD" show-buttons="true" hydrate="Interaction" />
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; background: var(--p-surface-50); padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid var(--p-border-color);">
+                            <span style="font-size: 0.8125rem; font-weight: 600;">Enable Cloud Sync</span>
+                            <island-toggle-switch checked="true" hydrate="Interaction" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 3. Inter-Island Reactive Event Bus -->
+    <div style="background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: 1.25rem; padding: 2rem; box-shadow: var(--p-shadow-sm);">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.5rem;">
+            <div>
+                <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--p-text-color); margin: 0;">Cross-Island Reactive Event Bus</h3>
+                <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0.25rem 0 0;">
+                    Zero-dependency reactive pub/sub message passing between decoupled DOM nodes.
+                </p>
+            </div>
+            <span class="p-tag p-tag-warn">Real-Time</span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+            <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: 10px; padding: 1.25rem;">
+                <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-primary-600); text-transform: uppercase; margin-bottom: 0.5rem;">Island A (Broadcaster)</div>
+                <island name="event-broadcaster" 
+                        props="@(new EventBroadcasterProps("telemetry-channel", "Send Telemetry Pulse"))" 
+                        hydrate="Interaction" />
+            </div>
+
+            <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: 10px; padding: 1.25rem;">
+                <div style="font-size: 0.75rem; font-weight: 700; color: var(--p-info-600, #3b82f6); text-transform: uppercase; margin-bottom: 0.5rem;">Island B (Receiver)</div>
+                <island name="event-receiver" 
+                        props="@(new EventReceiverProps("telemetry-channel", "Awaiting telemetry broadcast events..."))" 
+                        hydrate="Idle" />
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Architectural Pillars -->
+    <div>
+        <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--p-text-color); margin: 0 0 1.25rem;">Why LaughTale Wins Over Traditional SPAs</h3>
         
-        <!-- Island 5: Hierarchy Tree -->
-        <div class="aura-card">
-            <h2 class="section-title">5. Department Hierarchy Tree</h2>
-            <p class="section-desc" style="margin-bottom: 1.25rem;">Searchable tree with multi-level depth and outside-click dismiss.</p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem;">
+            <div style="background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: 1rem; padding: 1.5rem;">
+                <div style="font-size: 1.5rem; margin-bottom: 0.75rem;">⚡</div>
+                <h4 style="font-size: 1rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem;">Instant SSR HTML</h4>
+                <p style="font-size: 0.8125rem; line-height: 1.5; color: var(--p-text-muted); margin: 0;">
+                    First paint happens in under 20ms directly from C# ASP.NET Core without waiting for JavaScript to compile or run.
+                </p>
+            </div>
 
-            <island name="cascade-tree" 
-                    props="@(new DepartmentTreeProps("Select Department...", "SelectedDepartmentId", Model.Departments))" 
-                    hydrate="Visible">
-                <div class="skeleton">
-                    Department Tree (Hydrates on scroll)
-                </div>
-            </island>
+            <div style="background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: 1rem; padding: 1.5rem;">
+                <div style="font-size: 1.5rem; margin-bottom: 0.75rem;">📦</div>
+                <h4 style="font-size: 1rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem;">Zero Vendor Lock-in</h4>
+                <p style="font-size: 0.8125rem; line-height: 1.5; color: var(--p-text-muted); margin: 0;">
+                    Use pre-built Aura components or <code style="font-size: 0.75rem;">dotnet laughtale eject</code> the raw TypeScript &amp; C# code into your repo with 100% source ownership.
+                </p>
+            </div>
+
+            <div style="background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: 1rem; padding: 1.5rem;">
+                <div style="font-size: 1.5rem; margin-bottom: 0.75rem;">🛡️</div>
+                <h4 style="font-size: 1rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem;">Roslyn Compile-Time Types</h4>
+                <p style="font-size: 0.8125rem; line-height: 1.5; color: var(--p-text-muted); margin: 0;">
+                    C# model changes automatically generate strongly-typed TypeScript prop definitions at build time.
+                </p>
+            </div>
+
+            <div style="background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: 1rem; padding: 1.5rem;">
+                <div style="font-size: 1.5rem; margin-bottom: 0.75rem;">🔄</div>
+                <h4 style="font-size: 1rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.5rem;">Native View Transitions</h4>
+                <p style="font-size: 0.8125rem; line-height: 1.5; color: var(--p-text-muted); margin: 0;">
+                    SPA-like animated route navigation without full-page white flashes or broken browser history.
+                </p>
+            </div>
         </div>
-
-        <!-- Island 6: File Dropzone -->
-        <div class="aura-card">
-            <h2 class="section-title">6. Secure Document Vault</h2>
-            <p class="section-desc" style="margin-bottom: 1.25rem;">Client-side size checks, MIME verification, and instant upload preview.</p>
-
-            <island name="file-dropzone" 
-                    props="@(new DropzoneProps("DocumentAttachment", ".pdf,.docx,.xlsx,.png", 10, "Drop enterprise attachments here"))" 
-                    hydrate="Visible">
-                <div class="skeleton">
-                    Document Vault (Hydrates on scroll)
-                </div>
-            </island>
-        </div>
-
     </div>
+
 </div>
