@@ -334,6 +334,17 @@ html.dark .p-picklist-product-img,
     background: var(--p-surface-100, #1e293b) !important;
     border-color: var(--p-border-color, #334155) !important;
 }
+
+/* Bi-Directional RTL Support */
+[dir="rtl"] .p-picklist {
+    flex-direction: row-reverse;
+}
+[dir="rtl"] .p-picklist-transfer-controls .p-picklist-control-btn svg {
+    transform: scaleX(-1);
+}
+[dir="rtl"] .p-picklist-item {
+    text-align: right;
+}
 `;
 
 export default function PickListIsland<T = any>(container: HTMLElement, props: PickListProps<T>) {

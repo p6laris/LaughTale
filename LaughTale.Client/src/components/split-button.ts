@@ -431,6 +431,44 @@ html.dark .p-splitbutton-text .p-button-contrast[aria-expanded="true"],
 .dark .p-splitbutton-text .p-button-contrast[aria-expanded="true"] {
     background: rgba(255, 255, 255, 0.1) !important;
 }
+
+/* Bi-Directional RTL Support */
+[dir="rtl"] .p-splitbutton .p-splitbutton-button {
+    border-top-right-radius: var(--lt-radius) !important;
+    border-bottom-right-radius: var(--lt-radius) !important;
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+}
+[dir="rtl"] .p-splitbutton .p-splitbutton-dropdown {
+    border-top-left-radius: var(--lt-radius) !important;
+    border-bottom-left-radius: var(--lt-radius) !important;
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+}
+[dir="rtl"] .p-splitbutton:not(.p-splitbutton-outlined):not(.p-splitbutton-text) .p-splitbutton-dropdown {
+    border-left: none !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.25) !important;
+}
+[dir="rtl"] .p-splitbutton:not(.p-splitbutton-outlined):not(.p-splitbutton-text) .p-button-secondary.p-splitbutton-dropdown {
+    border-left: none !important;
+    border-right: 1px solid var(--lt-surface-300) !important;
+}
+[dir="rtl"] .p-splitbutton-menu {
+    right: auto !important;
+    left: 0 !important;
+    transform-origin: top left;
+}
+[dir="rtl"] .p-splitbutton-menu.p-menu-flipped {
+    transform-origin: bottom left;
+}
+[dir="rtl"] .p-splitbutton-submenu-overlay {
+    left: auto;
+    right: calc(100% + 2px);
+}
+[dir="rtl"] .p-splitbutton-submenu-overlay.p-submenu-flipped {
+    right: auto;
+    left: calc(100% + 2px);
+}
 `;
 
 export default function SplitButtonIsland(container: HTMLElement, props: SplitButtonProps, ctx?: IslandContext) {

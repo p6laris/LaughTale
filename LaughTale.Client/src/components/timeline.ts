@@ -256,6 +256,32 @@ html.dark .p-timeline-event-opposite,
 .dark .p-timeline-event-opposite {
     color: var(--p-text-muted, #94a3b8) !important;
 }
+
+/* Bi-Directional RTL Support */
+[dir="rtl"] .p-timeline-vertical.p-timeline-left .p-timeline-event {
+    flex-direction: row-reverse;
+}
+[dir="rtl"] .p-timeline-vertical.p-timeline-right .p-timeline-event {
+    flex-direction: row;
+}
+[dir="rtl"] .p-timeline-vertical.p-timeline-left .p-timeline-event-opposite {
+    text-align: left;
+}
+[dir="rtl"] .p-timeline-vertical.p-timeline-right .p-timeline-event-opposite {
+    text-align: right;
+}
+[dir="rtl"] .p-timeline-vertical.p-timeline-alternate .p-timeline-event:nth-child(odd) .p-timeline-event-opposite {
+    text-align: left;
+}
+[dir="rtl"] .p-timeline-vertical.p-timeline-alternate .p-timeline-event:nth-child(even) .p-timeline-event-opposite {
+    text-align: right;
+}
+[dir="rtl"] .p-timeline-event-content {
+    text-align: right;
+}
+[dir="rtl"] .p-timeline-vertical.p-timeline-right .p-timeline-event-content {
+    text-align: left;
+}
 `;
 
 const ICONS = {

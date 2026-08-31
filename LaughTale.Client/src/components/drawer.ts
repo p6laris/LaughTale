@@ -261,6 +261,18 @@ html.dark .p-drawer-nav-section-title,
 .dark .p-drawer-nav-section-title {
     color: var(--p-text-muted, #94a3b8);
 }
+
+/* Bi-Directional RTL Support */
+[dir="rtl"] .p-drawer-header {
+    flex-direction: row-reverse;
+}
+[dir="rtl"] .p-drawer-header-actions {
+    margin-left: 0;
+    margin-right: auto;
+}
+[dir="rtl"] .p-drawer-content {
+    text-align: right;
+}
 `;
 
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';

@@ -502,6 +502,59 @@ export function initDesignTokens(): void {
     --lt-info-fg: #93c5fd;
     --lt-info-border: #1d4ed8;
   }
+
+  /* Bi-Directional RTL System Rules */
+  [dir="rtl"] {
+    text-align: right;
+  }
+
+  [dir="rtl"] .p-paginator-first svg,
+  [dir="rtl"] .p-paginator-prev svg,
+  [dir="rtl"] .p-paginator-next svg,
+  [dir="rtl"] .p-paginator-last svg,
+  [dir="rtl"] .p-breadcrumb-chevron svg,
+  [dir="rtl"] .p-tree-toggler svg,
+  [dir="rtl"] .p-submenu-icon svg,
+  [dir="rtl"] .p-picklist-transfer-controls .p-picklist-control-btn svg {
+    transform: scaleX(-1);
+  }
+
+  [dir="rtl"] .p-timeline-vertical.p-timeline-left .p-timeline-event {
+    flex-direction: row-reverse;
+  }
+  [dir="rtl"] .p-timeline-vertical.p-timeline-right .p-timeline-event {
+    flex-direction: row;
+  }
+  [dir="rtl"] .p-timeline-event-content {
+    text-align: right;
+  }
+  [dir="rtl"] .p-timeline-event-opposite {
+    text-align: left;
+  }
+
+  [dir="rtl"] .p-splitbutton .p-splitbutton-button {
+    border-top-right-radius: var(--lt-radius, 6px) !important;
+    border-bottom-right-radius: var(--lt-radius, 6px) !important;
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+  }
+  [dir="rtl"] .p-splitbutton .p-splitbutton-dropdown {
+    border-top-left-radius: var(--lt-radius, 6px) !important;
+    border-bottom-left-radius: var(--lt-radius, 6px) !important;
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+  }
+
+  [dir="rtl"] .p-dialog-header-actions,
+  [dir="rtl"] .p-drawer-close-button {
+    margin-right: auto;
+    margin-left: 0;
+  }
+
+  [dir="rtl"] .p-tree-sub {
+    padding-right: 1.5rem;
+    padding-left: 0;
+  }
 }
     `;
     document.head.appendChild(styleEl);

@@ -436,6 +436,17 @@ html.dark .p-treetable,
     color: var(--p-text-color, #f8fafc) !important;
     border-color: var(--p-border-color, #334155) !important;
 }
+
+/* Bi-Directional RTL Support */
+[dir="rtl"] .p-treetable {
+    text-align: right;
+}
+[dir="rtl"] .p-treetable th {
+    text-align: right;
+}
+[dir="rtl"] .p-treetable-toggler svg {
+    transform: scaleX(-1);
+}
 html.dark .p-treetable-header,
 [data-theme="dark"] .p-treetable-header,
 .dark .p-treetable-header {

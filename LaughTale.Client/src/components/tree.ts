@@ -299,6 +299,18 @@ html.dark .p-tree-loading-overlay,
 .dark .p-tree-loading-overlay {
     background: rgba(9, 13, 22, 0.7) !important;
 }
+
+/* Bi-Directional RTL Support */
+[dir="rtl"] .p-tree {
+    text-align: right;
+}
+[dir="rtl"] .p-tree-sub {
+    padding-right: 1.5rem;
+    padding-left: 0;
+}
+[dir="rtl"] .p-tree-toggler svg {
+    transform: scaleX(-1);
+}
 `;
 
 const SVG_ICONS = {
