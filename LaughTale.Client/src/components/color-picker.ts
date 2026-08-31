@@ -24,30 +24,25 @@ const DEFAULT_PRESETS = [
 
 
 const CSS = `
-[data-theme="dark"] .color-swatch-btn {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-100) !important;
-    border-color: var(--lt-surface-700) !important;
+html.dark .colorpicker-hex-label,
+[data-theme="dark"] .colorpicker-hex-label,
+.dark .colorpicker-hex-label {
+    color: var(--p-text-color, #f8fafc) !important;
 }
-[data-theme="dark"] .colorpicker-trigger-btn {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-100) !important;
-    border-color: var(--lt-surface-700) !important;
+html.dark .colorpicker-palette-overlay,
+[data-theme="dark"] .colorpicker-palette-overlay,
+.dark .colorpicker-palette-overlay {
+    background: var(--p-surface-0, #090d16) !important;
+    color: var(--p-text-color, #f8fafc) !important;
+    border-color: var(--p-border-color, #334155) !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5) !important;
 }
-[data-theme="dark"] .colorpicker-palette-overlay {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-100) !important;
-    border-color: var(--lt-surface-700) !important;
-}
-[data-theme="dark"] .color-native-input {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-100) !important;
-    border-color: var(--lt-surface-700) !important;
-}
-[data-theme="dark"] .color-hex-input {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-100) !important;
-    border-color: var(--lt-surface-700) !important;
+html.dark .color-hex-input,
+[data-theme="dark"] .color-hex-input,
+.dark .color-hex-input {
+    background: transparent !important;
+    color: var(--p-text-color, #f8fafc) !important;
+    border-color: var(--p-border-color, #334155) !important;
 }
 `;
 

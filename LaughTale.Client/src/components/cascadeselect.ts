@@ -218,26 +218,52 @@ const CSS = `
 }
 
 /* Dark Mode Tokens */
+html.dark .cs-trigger,
+[data-theme="dark"] .cs-trigger,
 .dark .cs-trigger {
-    background: var(--lt-surface-900);
-    border-color: var(--lt-surface-700);
-    color: var(--lt-surface-0);
+    background: var(--p-surface-0, #090d16);
+    border-color: var(--p-border-color, #334155);
+    color: var(--p-text-color, #f8fafc);
 }
+html.dark .cs-trigger:hover:not(.disabled),
+[data-theme="dark"] .cs-trigger:hover:not(.disabled),
+.dark .cs-trigger:hover:not(.disabled) {
+    border-color: var(--p-surface-400, #64748b);
+}
+html.dark .cs-trigger.variant-filled,
+[data-theme="dark"] .cs-trigger.variant-filled,
 .dark .cs-trigger.variant-filled {
-    background: var(--lt-surface-800);
+    background: var(--p-surface-100, #1e293b);
 }
-.dark .cs-panel, .dark .cs-sub-panel {
-    background: var(--lt-surface-900);
-    border-color: var(--lt-surface-700);
+html.dark .cs-trigger.variant-filled:focus-within,
+[data-theme="dark"] .cs-trigger.variant-filled:focus-within,
+.dark .cs-trigger.variant-filled:focus-within {
+    background: var(--p-surface-0, #090d16);
+}
+html.dark .cs-panel,
+html.dark .cs-sub-panel,
+[data-theme="dark"] .cs-panel,
+[data-theme="dark"] .cs-sub-panel,
+.dark .cs-panel,
+.dark .cs-sub-panel {
+    background: var(--p-surface-0, #090d16);
+    border-color: var(--p-border-color, #334155);
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
 }
-.dark .cs-item:hover, .dark .cs-item.highlighted {
-    background: var(--lt-surface-800);
-    color: var(--lt-surface-0);
+html.dark .cs-item:hover,
+html.dark .cs-item.highlighted,
+[data-theme="dark"] .cs-item:hover,
+[data-theme="dark"] .cs-item.highlighted,
+.dark .cs-item:hover,
+.dark .cs-item.highlighted {
+    background: var(--p-surface-100, #1e293b);
+    color: var(--p-text-color, #f8fafc);
 }
+html.dark .cs-item.selected,
+[data-theme="dark"] .cs-item.selected,
 .dark .cs-item.selected {
     background: rgba(16, 185, 129, 0.15);
-    color: var(--lt-primary-300, var(--lt-primary-300));
+    color: var(--p-primary-300, #6ee7b7);
 }
 `;
 
