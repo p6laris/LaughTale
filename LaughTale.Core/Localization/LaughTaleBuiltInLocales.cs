@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace LaughTale.Core.Localization;
@@ -12,6 +12,8 @@ public static class LaughTaleBuiltInLocales
         new Dictionary<string, Func<LaughTaleLocaleDictionary>>(StringComparer.OrdinalIgnoreCase)
         {
             ["en"] = CreateEnglish,
+            ["ku"] = CreateKurdish,
+            ["ckb"] = CreateKurdish,
             ["ar"] = CreateArabic,
             ["es"] = CreateSpanish,
             ["fr"] = CreateFrench,
@@ -91,6 +93,79 @@ public static class LaughTaleBuiltInLocales
         MoveAllToSource = "Move All to Source",
         Available = "Available",
         Selected = "Selected"
+    };
+
+    public static LaughTaleLocaleDictionary CreateKurdish() => new()
+    {
+        Locale = "ku",
+        Dir = "rtl",
+        FirstDayOfWeek = 6, // Saturday / شەممە
+        DayNames = ["یەکشەممە", "دووشەممە", "سێشەممە", "چوارشەممە", "پێنجشەممە", "هەینی", "شەممە"],
+        DayNamesShort = ["یەک", "دوو", "سێ", "چوار", "پێنج", "هەینی", "شەم"],
+        DayNamesMin = ["ی", "د", "س", "چ", "پ", "هـ", "ش"],
+        MonthNames = ["کانوونی دووەم", "شوبات", "ئازار", "نیسان", "ئایار", "حوزەیران", "تەمووز", "ئاب", "ئەیلوول", "تشرینی یەکەم", "تشرینی دووەم", "کانوونی یەکەم"],
+        MonthNamesShort = ["کانوونی دووەم", "شوبات", "ئازار", "نیسان", "ئایار", "حوزەیران", "تەمووز", "ئاب", "ئەیلوول", "تشرینی یەکەم", "تشرینی دووەم", "کانوونی یەکەم"],
+        Today = "ئەمڕۆ",
+        Clear = "سڕینەوە",
+        DateFormat = "dd/mm/yy",
+        WeekHeader = "هـ",
+        Weak = "لاواز",
+        Medium = "ناوەند",
+        Strong = "بەهێز",
+        PasswordPrompt = "وشەی نهێنی بنووسە",
+        EmptyFilterMessage = "هیچ ئەنجامێک نەدۆزرایەوە",
+        SearchMessage = "{0} ئەنجام بەردەستە",
+        SelectionMessage = "تم تحديد {0} عناصر",
+        EmptySelectionMessage = "هیچ بڕگەیەک دیارینەکراوە",
+        EmptySearchMessage = "هیچ ئەنجامێک نەدۆزرایەوە",
+        EmptyMessage = "هیچ بژاردەیەک بەردەست نییە",
+        Choose = "هەڵبژاردن",
+        Upload = "بارکردن",
+        Cancel = "پاشگەزبوونەوە",
+        Completed = "تەواوبوو",
+        Pending = "چاوەڕوانە",
+        FileSizeTypes = ["بایت", "کیلۆبایت", "مێگابایت", "گیگابایت", "تێرابایت", "پێتابایت"],
+        StartsWith = "دەستپێدەکات بە",
+        Contains = "لەخۆدەگرێت",
+        NotContains = "لەخۆناگرێت",
+        EndsWith = "کۆتایی دێت بە",
+        EqualsValue = "یەکسانە بە",
+        NotEquals = "یەکسان نییە بە",
+        NoFilter = "بێ فلتەر",
+        Lt = "کەمترە لە",
+        Lte = "کەمتر یان یەکسانە بە",
+        Gt = "زیاترە لە",
+        Gte = "زیاتر یان یەکسانە بە",
+        DateIs = "بەروار یەکسانە بە",
+        DateIsNot = "بەروار یەکسان نییە بە",
+        DateBefore = "بەروار پێش",
+        DateAfter = "بەروار دوای",
+        Apply = "جێبەجێکردن",
+        MatchAll = "هاوتای هەمووان",
+        MatchAny = "هاوتای هەر یەکێک",
+        AddRule = "زیادکردنی مەرج",
+        RemoveRule = "سڕینەوەی مەرج",
+        Accept = "بەڵێ",
+        Reject = "نەخێر",
+        Close = "داخستن",
+        Save = "پاشەکەوتکردن",
+        RowsPerPage = "دێڕ لە پەڕەیەکدا",
+        Page = "پەڕەی {0}",
+        PrevPage = "پەڕەی پێشوو",
+        NextPage = "پەڕەی داهاتوو",
+        FirstPage = "پەڕەی یەکەم",
+        LastPage = "پەڕەی کۆتایی",
+        ShowingRecordsTemplate = "نیشاندانی {0} تا {1} لە کۆی {2} تۆمار",
+        MoveUp = "بەرەو سەرەوە",
+        MoveTop = "سەرەوەی سەرەوە",
+        MoveDown = "بەرەو خوارەوە",
+        MoveBottom = "خوارەوەی خوارەوە",
+        MoveToTarget = "گواستنەوە بۆ دیاریکراو",
+        MoveAllToTarget = "گواستنەوەی هەمووی بۆ دیاریکراو",
+        MoveToSource = "گواستنەوە بۆ سەرچاوە",
+        MoveAllToSource = "گواستنەوەی هەمووی بۆ سەرچاوە",
+        Available = "بەردەست",
+        Selected = "دیاریکراو"
     };
 
     public static LaughTaleLocaleDictionary CreateArabic() => new()

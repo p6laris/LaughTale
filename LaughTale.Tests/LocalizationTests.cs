@@ -13,6 +13,8 @@ public class LocalizationTests
     public void BuiltInLocales_ContainsStandardLanguages()
     {
         Assert.True(LaughTaleBuiltInLocales.Locales.ContainsKey("en"));
+        Assert.True(LaughTaleBuiltInLocales.Locales.ContainsKey("ku"));
+        Assert.True(LaughTaleBuiltInLocales.Locales.ContainsKey("ckb"));
         Assert.True(LaughTaleBuiltInLocales.Locales.ContainsKey("ar"));
         Assert.True(LaughTaleBuiltInLocales.Locales.ContainsKey("es"));
         Assert.True(LaughTaleBuiltInLocales.Locales.ContainsKey("fr"));
@@ -44,6 +46,18 @@ public class LocalizationTests
         Assert.Equal("مسح", localizer.GetString("clear", arCulture));
         Assert.Equal("لم يتم العثور على نتائج", localizer.GetString("emptyFilterMessage", arCulture));
         Assert.True(localizer.IsRightToLeft(arCulture));
+    }
+
+    [Fact]
+    public void Localizer_ResolvesKurdishAndDetectsRTL()
+    {
+        var localizer = new LaughTaleLocalizer();
+        var kuCulture = CultureInfo.GetCultureInfo("ku");
+
+        Assert.Equal("ئەمڕۆ", localizer.GetString("today", kuCulture));
+        Assert.Equal("سڕینەوە", localizer.GetString("clear", kuCulture));
+        Assert.Equal("هیچ ئەنجامێک نەدۆزرایەوە", localizer.GetString("emptyFilterMessage", kuCulture));
+        Assert.True(localizer.IsRightToLeft(kuCulture));
     }
 
     [Fact]

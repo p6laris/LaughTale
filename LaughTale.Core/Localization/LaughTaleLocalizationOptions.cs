@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace LaughTale.Core.Localization;
@@ -23,7 +23,7 @@ public sealed class LaughTaleLocalizationOptions
     /// </summary>
     public IList<string> SupportedCultures { get; set; } = new List<string>
     {
-        "en-US", "ar-SA", "es-ES", "fr-FR", "de-DE", "tr-TR", "zh-CN", "ja-JP"
+        "en-US", "ku", "ckb", "ckb-IQ", "ar-SA", "es-ES", "fr-FR", "de-DE", "tr-TR", "zh-CN", "ja-JP"
     };
 
     /// <summary>

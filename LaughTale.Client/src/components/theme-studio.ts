@@ -229,12 +229,24 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
                     </div>
                     <div>
                         <div style="font-size: 0.75rem; font-weight: 700; color: var(--lt-surface-500); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Font Family</div>
-                        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.25rem;">
-                            <button type="button" class="font-btn active" data-font="inter" style="padding: 0.4rem 0.15rem; font-size: 0.7rem; border: 2px solid var(--lt-primary-500); border-radius: var(--lt-radius); background: var(--lt-primary-50); color: var(--lt-primary-700); font-weight: 700; cursor: pointer; text-align: center;">Inter</button>
-                            <button type="button" class="font-btn" data-font="geist" style="padding: 0.4rem 0.15rem; font-size: 0.7rem; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer; text-align: center;">Geist</button>
-                            <button type="button" class="font-btn" data-font="jakarta" style="padding: 0.4rem 0.15rem; font-size: 0.7rem; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer; text-align: center;">Jakarta</button>
-                            <button type="button" class="font-btn" data-font="outfit" style="padding: 0.4rem 0.15rem; font-size: 0.7rem; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer; text-align: center;">Outfit</button>
-                            <button type="button" class="font-btn" data-font="mono" style="padding: 0.4rem 0.15rem; font-size: 0.7rem; font-family: monospace; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer; text-align: center;">Mono</button>
+                        <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.25rem;">
+                            <button type="button" class="font-btn active" data-font="inter" style="padding: 0.4rem 0.15rem; font-size: 0.65rem; border: 2px solid var(--lt-primary-500); border-radius: var(--lt-radius); background: var(--lt-primary-50); color: var(--lt-primary-700); font-weight: 700; cursor: pointer; text-align: center;">Inter</button>
+                            <button type="button" class="font-btn" data-font="speda" style="padding: 0.4rem 0.15rem; font-size: 0.65rem; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer; text-align: center; font-family: 'Speda', sans-serif;">سپێدە</button>
+                            <button type="button" class="font-btn" data-font="geist" style="padding: 0.4rem 0.15rem; font-size: 0.65rem; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer; text-align: center;">Geist</button>
+                            <button type="button" class="font-btn" data-font="jakarta" style="padding: 0.4rem 0.15rem; font-size: 0.65rem; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer; text-align: center;">Jakarta</button>
+                            <button type="button" class="font-btn" data-font="outfit" style="padding: 0.4rem 0.15rem; font-size: 0.65rem; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer; text-align: center;">Outfit</button>
+                            <button type="button" class="font-btn" data-font="mono" style="padding: 0.4rem 0.15rem; font-size: 0.65rem; font-family: monospace; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer; text-align: center;">Mono</button>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--lt-surface-500); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Language & Direction (RTL)</div>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem;">
+                            <button type="button" class="lang-btn active" data-lang="en-US" data-dir="ltr" style="padding: 0.45rem 0.5rem; font-size: 0.8125rem; font-weight: 600; border: 2px solid var(--lt-primary-500); border-radius: var(--lt-radius); background: var(--lt-primary-50); color: var(--lt-primary-700); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.35rem;">
+                                🇺🇸 English (LTR)
+                            </button>
+                            <button type="button" class="lang-btn" data-lang="ku" data-dir="rtl" style="padding: 0.45rem 0.5rem; font-size: 0.8125rem; font-weight: 600; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.35rem; font-family: 'Speda', sans-serif;">
+                                ☀️ کوردی (RTL)
+                            </button>
                         </div>
                     </div>
                     <div>
@@ -489,7 +501,9 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
             }
 
             let fontVal = "'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif";
-            if (currentFont === 'geist') {
+            if (currentFont === 'speda') {
+                fontVal = "'Speda', 'Inter', system-ui, -apple-system, sans-serif";
+            } else if (currentFont === 'geist') {
                 fontVal = "'Geist', 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif";
             } else if (currentFont === 'jakarta' || currentFont === 'sans') {
                 fontVal = "'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, sans-serif";
@@ -658,6 +672,48 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
             (btn as HTMLElement).style.background = 'var(--lt-primary-50)';
             (btn as HTMLElement).style.color = 'var(--lt-primary-700)';
             (btn as HTMLElement).style.fontWeight = '700';
+            applyTheme();
+        });
+    });
+
+    container.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const lang = btn.getAttribute('data-lang') || 'en-US';
+            const dir = btn.getAttribute('data-dir') || 'ltr';
+
+            container.querySelectorAll('.lang-btn').forEach(b => {
+                b.classList.remove('active');
+                (b as HTMLElement).style.borderColor = 'var(--lt-surface-200)';
+                (b as HTMLElement).style.background = 'var(--lt-surface-50)';
+                (b as HTMLElement).style.color = 'inherit';
+            });
+            btn.classList.add('active');
+            (btn as HTMLElement).style.borderColor = 'var(--lt-primary-500)';
+            (btn as HTMLElement).style.background = 'var(--lt-primary-50)';
+            (btn as HTMLElement).style.color = 'var(--lt-primary-700)';
+
+            document.documentElement.setAttribute('lang', lang);
+            document.documentElement.setAttribute('dir', dir);
+            document.cookie = `.AspNetCore.Culture=c=${lang}|uic=${lang}; path=/; max-age=31536000; SameSite=Lax`;
+
+            if (dir === 'rtl' || lang.startsWith('ku') || lang.startsWith('ckb')) {
+                currentFont = 'speda';
+                const spedaBtn = container.querySelector('.font-btn[data-font="speda"]');
+                if (spedaBtn) {
+                    container.querySelectorAll('.font-btn').forEach(b => {
+                        b.classList.remove('active');
+                        (b as HTMLElement).style.borderColor = 'var(--lt-surface-200)';
+                        (b as HTMLElement).style.background = 'var(--lt-surface-50)';
+                        (b as HTMLElement).style.color = 'inherit';
+                        (b as HTMLElement).style.fontWeight = 'normal';
+                    });
+                    spedaBtn.classList.add('active');
+                    (spedaBtn as HTMLElement).style.borderColor = 'var(--lt-primary-500)';
+                    (spedaBtn as HTMLElement).style.background = 'var(--lt-primary-50)';
+                    (spedaBtn as HTMLElement).style.color = 'var(--lt-primary-700)';
+                    (spedaBtn as HTMLElement).style.fontWeight = '700';
+                }
+            }
             applyTheme();
         });
     });

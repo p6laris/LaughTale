@@ -195,7 +195,8 @@ export function applySavedTheme(): boolean {
     // Apply font if configured
     if (saved.font) {
         let fontVal = "'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif";
-        if (saved.font === 'geist') fontVal = "'Geist', 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif";
+        if (saved.font === 'speda') fontVal = "'Speda', 'Inter', system-ui, -apple-system, sans-serif";
+        else if (saved.font === 'geist') fontVal = "'Geist', 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif";
         else if (saved.font === 'jakarta' || saved.font === 'sans') fontVal = "'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, sans-serif";
         else if (saved.font === 'outfit') fontVal = "'Outfit', ui-sans-serif, system-ui, -apple-system, sans-serif";
         else if (saved.font === 'mono') fontVal = "'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
