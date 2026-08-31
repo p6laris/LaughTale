@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO.Compression;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -72,7 +72,10 @@ namespace LaughTale.Core.Performance
                 OnPrepareResponse = ctx =>
                 {
                     var path = ctx.Context.Request.Path.Value ?? string.Empty;
-                    if (path.StartsWith("/dist/", StringComparison.OrdinalIgnoreCase) ||
+                    if (path.StartsWith("/_lt/", StringComparison.OrdinalIgnoreCase) ||
+                        path.StartsWith("/js/", StringComparison.OrdinalIgnoreCase) ||
+                        path.StartsWith("/css/", StringComparison.OrdinalIgnoreCase) ||
+                        path.StartsWith("/dist/", StringComparison.OrdinalIgnoreCase) ||
                         path.StartsWith("/_content/", StringComparison.OrdinalIgnoreCase) ||
                         path.StartsWith("/icons/", StringComparison.OrdinalIgnoreCase) ||
                         path.EndsWith(".js", StringComparison.OrdinalIgnoreCase) ||

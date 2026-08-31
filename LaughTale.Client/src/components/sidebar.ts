@@ -1319,7 +1319,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps, ctx?
 
                 const chevronSvg = `<svg class="p-sidebar-submenu-chevron ${isSubExpanded ? 'p-expanded' : ''}" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
                 const ellipsisSvg = `<svg class="p-sidebar-menu-action" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>`;
-                const trashSvg = `<button type="button" class="p-sidebar-menu-action" title="Delete conversation" style="border:none;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>`;
+                const trashSvg = `<button type="button" class="p-sidebar-menu-action" title="Delete conversation" aria-label="Delete conversation" style="border:none;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>`;
 
                 const actionButton = demoType === 'chat' ? trashSvg : (it.badge === undefined ? ellipsisSvg : '');
 
@@ -1538,7 +1538,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps, ctx?
                                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                             </div>
                         </div>
-                        <button type="button" class="p-sidebar-trigger" title="New chat">
+                        <button type="button" class="p-sidebar-trigger" title="New chat" aria-label="New chat">
                             ${newChatPenIcon}
                         </button>
                     </header>
@@ -1564,11 +1564,11 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps, ctx?
 
                         <div class="p-sb-chat-input-container">
                             <div class="p-sb-chat-input-pill">
-                                <button type="button" style="background:transparent; border:none; color:var(--p-text-muted); cursor:pointer; display:flex; align-items:center;" title="Attach file">
+                                <button type="button" style="background:transparent; border:none; color:var(--p-text-muted); cursor:pointer; display:flex; align-items:center;" title="Attach file" aria-label="Attach file">
                                     ${paperclipIcon}
                                 </button>
-                                <input type="text" class="p-sb-chat-input-field" placeholder="Message ChatGPT..." />
-                                <button type="button" class="p-sb-chat-send-btn" title="Send prompt">
+                                <input type="text" class="p-sb-chat-input-field" placeholder="Message ChatGPT..." aria-label="Message ChatGPT" />
+                                <button type="button" class="p-sb-chat-send-btn" title="Send prompt" aria-label="Send prompt">
                                     ${arrowUpSend}
                                 </button>
                             </div>
@@ -1681,7 +1681,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps, ctx?
                             <div class="p-sidebar-search-container">
                                 <div class="p-sidebar-search-box">
                                     <span style="color: var(--lt-surface-400); display: flex; align-items: center;">${searchIconSvg}</span>
-                                    <input type="text" class="p-sidebar-search-input" placeholder="Filter navigation..." value="${searchQuery}" />
+                                    <input type="text" class="p-sidebar-search-input" placeholder="Filter navigation..." aria-label="Filter navigation" value="${searchQuery}" />
                                 </div>
                             </div>
                         ` : ''}

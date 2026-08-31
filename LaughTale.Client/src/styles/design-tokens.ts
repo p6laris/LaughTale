@@ -274,6 +274,7 @@ export function initDesignTokens(): void {
   --lt-text-inverse: var(--lt-surface-0);
   --p-text-color: var(--lt-text-primary);
   --p-text-muted-color: var(--lt-text-muted);
+  --p-text-muted: var(--lt-text-muted);
 
   /* Border tokens */
   --lt-border-subtle: var(--lt-surface-100);
@@ -438,8 +439,11 @@ export function initDesignTokens(): void {
   
   --lt-text-primary: var(--lt-surface-900);
   --lt-text-secondary: var(--lt-surface-600);
-  --lt-text-muted: var(--lt-surface-400);
+  --lt-text-muted: var(--lt-surface-500);
   --lt-text-inverse: var(--lt-surface-0);
+  --p-text-color: var(--lt-text-primary);
+  --p-text-muted-color: var(--lt-text-muted);
+  --p-text-muted: var(--lt-text-muted);
 
   --lt-border-subtle: var(--lt-surface-100);
   --lt-border-default: var(--lt-surface-200);

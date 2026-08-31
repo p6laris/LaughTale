@@ -1,11 +1,13 @@
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 using LaughTale.Core.Extensions;
+using LaughTale.Core.Performance;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add Razor Pages and LaughTale framework with Kurdish & global localization
 builder.Services.AddRazorPages();
+builder.Services.AddLaughTaleCompression();
 builder.Services.AddLaughTale(opt =>
 {
     opt.Localization.DefaultCulture = "en-US";
@@ -40,6 +42,8 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseResponseCompression();
+app.UseLaughTaleStaticAssetsCaching();
 app.UseStaticFiles();
 
 app.UseRequestLocalization(localizationOptions);

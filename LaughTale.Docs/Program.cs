@@ -1,12 +1,14 @@
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 using LaughTale.Core.Extensions;
+using LaughTale.Core.Performance;
 using LaughTale.Markdown.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add Razor Pages, LaughTale Islands engine and Markdown Content Collections with Kurdish & global i18n
 builder.Services.AddRazorPages();
+builder.Services.AddLaughTaleCompression();
 builder.Services.AddLaughTale(opt =>
 {
     opt.Localization.DefaultCulture = "en-US";
@@ -42,6 +44,8 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseResponseCompression();
+app.UseLaughTaleStaticAssetsCaching();
 app.UseStaticFiles();
 
 app.UseRequestLocalization(localizationOptions);

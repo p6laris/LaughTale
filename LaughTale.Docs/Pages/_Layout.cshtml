@@ -8,10 +8,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - LaughTale Docs</title>
-    <!-- Google Fonts: Inter (Tailwind CSS default), Geist, Plus Jakarta Sans, Outfit, JetBrains Mono -->
+    <!-- Google Fonts: Geist & Inter (Async non-blocking) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
     <link rel="stylesheet" href="~/css/docs.css" asp-append-version="true" />
     <script>
         // Synchronous theme initialization (prevents dark mode flash)
@@ -26,7 +27,7 @@
     <header class="docs-navbar">
         <div class="docs-navbar-inner">
             <div style="display: flex; align-items: center; gap: 2rem;">
-                <a href="/" class="brand-group">
+                <a href="/" class="brand-group" aria-label="LaughTale Docs Home">
                     <svg xmlns="http://www.w3.org/2000/svg" width="30" height="28" viewBox="0 0 25 24" style="color: var(--p-primary-600); flex-shrink: 0;"><path fill="currentColor" d="M8.967 4.43a4.3 4.3 0 0 0-.286-.679c-.367-.697-.942-1.33-1.667-1.683a.75.75 0 1 0-.657 1.349c.382.185.746.557.997 1.033q.1.194.17.39a4.3 4.3 0 0 0-1.748-.093a4.31 4.31 0 0 0-3.008 1.97a.75.75 0 0 0 1.269.8A2.81 2.81 0 0 1 6.001 6.23a2.8 2.8 0 0 1 1.723.286a5.55 5.55 0 0 0-2.446 2.516a.75.75 0 1 0 1.35.654A4.04 4.04 0 0 1 8.642 7.74c.39.957.71 1.885.913 2.951c.258 1.355.331 2.964.068 5.15a11.3 11.3 0 0 0-6.166 3.667a.75.75 0 0 0 .568 1.24h16a.75.75 0 0 0 .568-1.24a11.3 11.3 0 0 0-9.435-3.89c.223-2.114.145-3.765-.13-5.208c-.21-1.108-.535-2.076-.907-3.012a4.04 4.04 0 0 1 2.435.7a.75.75 0 1 0 .843-1.242a5.55 5.55 0 0 0-3.687-.932c.29-.49.732-.895 1.293-1.14a2.81 2.81 0 0 1 2.347.04a.75.75 0 0 0 .648-1.35a4.31 4.31 0 0 0-3.596-.063a4.3 4.3 0 0 0-1.437 1.02m9.207 14.82H5.877a9.77 9.77 0 0 1 6.148-2.164a9.78 9.78 0 0 1 6.149 2.163"/><path fill="currentColor" d="M18.025 7.5a2.75 2.75 0 1 0 0 5.5a2.75 2.75 0 0 0 0-5.5m-1.25 2.75a1.25 1.25 0 1 1 2.5 0a1.25 1.25 0 0 1-2.5 0"/></svg>
                     <div>
                         <span class="brand-title">LaughTale</span>
@@ -40,6 +41,7 @@
                 <button type="button" 
                         onclick="document.dispatchEvent(new CustomEvent('command-palette:open'))" 
                         class="p-button p-button-secondary" 
+                        aria-label="Search documentation (Ctrl+K)"
                         style="padding: 0.35rem 0.85rem; font-size: 0.8125rem; display: inline-flex; align-items: center; gap: 0.5rem;"
                         title="Search documentation (Ctrl+K)">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
@@ -51,6 +53,7 @@
                 <button type="button" 
                         onclick="document.dispatchEvent(new CustomEvent('studio:open'))" 
                         class="p-button p-button-primary" 
+                        aria-label="Open Theme Studio"
                         style="direction: ltr; padding: 0.35rem 0.75rem; font-size: 0.8125rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; line-height: 1;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: block; flex-shrink: 0;"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
                     <span style="display: inline-flex; align-items: center; line-height: 1;">Studio</span>
@@ -60,6 +63,7 @@
                 <button type="button" 
                         onclick="const isKu = document.documentElement.lang.startsWith('ku') || document.documentElement.lang.startsWith('ckb'); const targetLang = isKu ? 'en-US' : 'ku'; const targetDir = isKu ? 'ltr' : 'rtl'; document.documentElement.lang = targetLang; document.documentElement.dir = targetDir; document.cookie = `.AspNetCore.Culture=c=${targetLang}|uic=${targetLang}; path=/; max-age=31536000; SameSite=Lax`; window.location.reload();" 
                         class="p-button p-button-secondary" 
+                        aria-label="Toggle Language and Direction"
                         style="direction: ltr; padding: 0.35rem 0.65rem; font-size: 0.8125rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; font-weight: 600; line-height: 1;"
                         title="Toggle Language & RTL (کوردی / English)">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: block; flex-shrink: 0;"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
@@ -70,6 +74,7 @@
                 <button type="button" 
                         onclick="document.documentElement.classList.toggle('dark'); const isDark = document.documentElement.classList.contains('dark'); document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light'); localStorage.setItem('theme', isDark ? 'dark' : 'light');" 
                         class="p-button p-button-secondary" 
+                        aria-label="Toggle Dark Mode"
                         style="padding: 0.35rem 0.65rem; font-size: 0.8125rem; display: inline-flex; align-items: center; justify-content: center; line-height: 1;"
                         title="Toggle Dark Mode">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: block; flex-shrink: 0;"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
