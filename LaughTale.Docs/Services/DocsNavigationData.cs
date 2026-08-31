@@ -122,4 +122,37 @@ public static class DocsNavigationData
             })
         };
     }
+
+    public static List<CommandMenuGroup> GetDocsCommandGroups()
+    {
+        var sidebarItems = GetDocsSidebarItems("");
+        var groups = new List<CommandMenuGroup>();
+
+        foreach (var category in sidebarItems)
+        {
+            if (category.Children == null || category.Children.Count == 0) continue;
+
+            var items = new List<CommandMenuItem>();
+            foreach (var child in category.Children)
+            {
+                if (string.IsNullOrEmpty(child.Url)) continue;
+                items.Add(new CommandMenuItem(
+                    child.Title,
+                    child.Icon,
+                    category.Title,
+                    null,
+                    new List<string> { category.Title, child.Title, child.Badge ?? "" },
+                    null,
+                    child.Url
+                ));
+            }
+
+            if (items.Count > 0)
+            {
+                groups.Add(new CommandMenuGroup(category.Title, items));
+            }
+        }
+
+        return groups;
+    }
 }

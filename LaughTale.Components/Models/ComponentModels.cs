@@ -1023,6 +1023,7 @@ public record ThemeStudioProps(
 [LaughTale.Core.Attributes.Island("command")]
 public record CommandProps(
     string? Placeholder = "Type a command or search...",
-    bool Visible = false
+    bool Visible = false,
+    object? Model = null
 );
 

@@ -177,16 +177,17 @@ function enhanceCodeBlocks() {
     });
 }
 
-function setupDocsEnhancements() {
-    document.addEventListener('keydown', (e) => {
-        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-            e.preventDefault();
-            openCommandPalette();
-        } else if (e.key === 'Escape') {
-            closeCommandPalette();
-        }
-    });
+// Global Shortcut Listener: Ctrl+K / Cmd+K and Escape
+window.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && (e.key?.toLowerCase() === 'k' || e.code === 'KeyK')) {
+        e.preventDefault();
+        openCommandPalette();
+    } else if (e.key === 'Escape') {
+        closeCommandPalette();
+    }
+});
 
+function setupDocsEnhancements() {
     document.getElementById('command-palette-backdrop')?.addEventListener('click', closeCommandPalette);
     document.addEventListener('command-palette:open', openCommandPalette);
 

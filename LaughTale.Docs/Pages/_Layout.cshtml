@@ -60,9 +60,9 @@
                 <button type="button" 
                         onclick="const isKu = document.documentElement.lang.startsWith('ku') || document.documentElement.lang.startsWith('ckb'); const targetLang = isKu ? 'en-US' : 'ku'; const targetDir = isKu ? 'ltr' : 'rtl'; document.documentElement.lang = targetLang; document.documentElement.dir = targetDir; document.cookie = `.AspNetCore.Culture=c=${targetLang}|uic=${targetLang}; path=/; max-age=31536000; SameSite=Lax`; window.location.reload();" 
                         class="p-button p-button-secondary" 
-                        style="direction: ltr; padding: 0.35rem 0.65rem; font-size: 0.8125rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem; font-weight: 600; line-height: 1;"
+                        style="direction: ltr; padding: 0.35rem 0.65rem; font-size: 0.8125rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; font-weight: 600; line-height: 1;"
                         title="Toggle Language & RTL (کوردی / English)">
-                    <span style="display: inline-flex; align-items: center; line-height: 1; font-size: 0.875rem;">@(isRtl ? "☀️" : "🇺🇸")</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: block; flex-shrink: 0;"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
                     <span style="display: inline-flex; align-items: center; line-height: 1; font-family: var(--p-font-family, sans-serif);">@(isRtl ? "کوردی" : "EN")</span>
                 </button>
 
@@ -90,7 +90,7 @@
     <!-- Global Command Palette Spotlight Modal (Hidden by Default) -->
     <div id="command-palette-backdrop" class="command-palette-backdrop" style="display: none;">
         <div class="command-palette-modal" onclick="event.stopPropagation()">
-            <island-command placeholder="Type a command or search documentation..." />
+            <island-command placeholder="Type a command or search documentation..." model="@DocsNavigationData.GetDocsCommandGroups()" />
         </div>
     </div>
 
