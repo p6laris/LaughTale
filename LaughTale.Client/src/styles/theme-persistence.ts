@@ -14,7 +14,7 @@ export interface SavedThemeConfig {
     radius: string;    // e.g. '0.5rem'
     density?: string;  // 'compact' | 'normal' | 'spacious'
     shadow?: string;   // 'none' | 'subtle' | 'layered' | 'bold'
-    font?: string;     // 'sans' | 'inter' | 'mono'
+    font?: string;     // 'inter' | 'geist' | 'jakarta' | 'outfit' | 'mono'
     darkMode?: boolean;
 }
 
@@ -194,9 +194,11 @@ export function applySavedTheme(): boolean {
 
     // Apply font if configured
     if (saved.font) {
-        let fontVal = 'Plus Jakarta Sans, sans-serif';
-        if (saved.font === 'inter') fontVal = 'Inter, -apple-system, sans-serif';
-        else if (saved.font === 'mono') fontVal = 'JetBrains Mono, monospace';
+        let fontVal = "'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif";
+        if (saved.font === 'geist') fontVal = "'Geist', 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif";
+        else if (saved.font === 'jakarta' || saved.font === 'sans') fontVal = "'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, sans-serif";
+        else if (saved.font === 'outfit') fontVal = "'Outfit', ui-sans-serif, system-ui, -apple-system, sans-serif";
+        else if (saved.font === 'mono') fontVal = "'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
         updateToken('--lt-font-family', fontVal);
         updateToken('--p-font-family', fontVal);
     }

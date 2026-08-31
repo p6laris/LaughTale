@@ -130,7 +130,7 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
     let currentRadius = '0.5rem';
     let currentDensity = 'normal';
     let currentShadow = 'layered';
-    let currentFont = 'sans';
+    let currentFont = 'inter';
     let currentThemeMode = 'system';
 
     const disclosure = useDisclosure({ defaultIsOpen: props.defaultOpen });
@@ -229,10 +229,12 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
                     </div>
                     <div>
                         <div style="font-size: 0.75rem; font-weight: 700; color: var(--lt-surface-500); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Font Family</div>
-                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.35rem;">
-                            <button type="button" class="font-btn active" data-font="sans" style="padding: 0.4rem 0.25rem; font-size: 0.75rem; border: 2px solid var(--lt-primary-500); border-radius: var(--lt-radius); background: var(--lt-primary-50); color: var(--lt-primary-700); font-weight: 600; cursor: pointer;">Jakarta</button>
-                            <button type="button" class="font-btn" data-font="inter" style="padding: 0.4rem 0.25rem; font-size: 0.75rem; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer;">Inter</button>
-                            <button type="button" class="font-btn" data-font="mono" style="padding: 0.4rem 0.25rem; font-size: 0.75rem; font-family: monospace; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer;">Mono</button>
+                        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.25rem;">
+                            <button type="button" class="font-btn active" data-font="inter" style="padding: 0.4rem 0.15rem; font-size: 0.7rem; border: 2px solid var(--lt-primary-500); border-radius: var(--lt-radius); background: var(--lt-primary-50); color: var(--lt-primary-700); font-weight: 700; cursor: pointer; text-align: center;">Inter</button>
+                            <button type="button" class="font-btn" data-font="geist" style="padding: 0.4rem 0.15rem; font-size: 0.7rem; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer; text-align: center;">Geist</button>
+                            <button type="button" class="font-btn" data-font="jakarta" style="padding: 0.4rem 0.15rem; font-size: 0.7rem; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer; text-align: center;">Jakarta</button>
+                            <button type="button" class="font-btn" data-font="outfit" style="padding: 0.4rem 0.15rem; font-size: 0.7rem; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer; text-align: center;">Outfit</button>
+                            <button type="button" class="font-btn" data-font="mono" style="padding: 0.4rem 0.15rem; font-size: 0.7rem; font-family: monospace; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer; text-align: center;">Mono</button>
                         </div>
                     </div>
                     <div>
@@ -486,11 +488,15 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
                 root.style.setProperty('--p-shadow-xl', s4);
             }
 
-            let fontVal = 'Plus Jakarta Sans, sans-serif';
-            if (currentFont === 'inter') {
-                fontVal = 'Inter, -apple-system, sans-serif';
+            let fontVal = "'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif";
+            if (currentFont === 'geist') {
+                fontVal = "'Geist', 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif";
+            } else if (currentFont === 'jakarta' || currentFont === 'sans') {
+                fontVal = "'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, sans-serif";
+            } else if (currentFont === 'outfit') {
+                fontVal = "'Outfit', ui-sans-serif, system-ui, -apple-system, sans-serif";
             } else if (currentFont === 'mono') {
-                fontVal = 'JetBrains Mono, monospace';
+                fontVal = "'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
             }
             root.style.setProperty('--lt-font-family', fontVal);
             root.style.setProperty('--p-font-family', fontVal);
@@ -639,15 +645,19 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
 
     container.querySelectorAll('.font-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-            currentFont = btn.getAttribute('data-font') || 'sans';
+            currentFont = btn.getAttribute('data-font') || 'inter';
             container.querySelectorAll('.font-btn').forEach(b => {
                 b.classList.remove('active');
                 (b as HTMLElement).style.borderColor = 'var(--lt-surface-200)';
                 (b as HTMLElement).style.background = 'var(--lt-surface-50)';
+                (b as HTMLElement).style.color = 'inherit';
+                (b as HTMLElement).style.fontWeight = 'normal';
             });
             btn.classList.add('active');
             (btn as HTMLElement).style.borderColor = 'var(--lt-primary-500)';
             (btn as HTMLElement).style.background = 'var(--lt-primary-50)';
+            (btn as HTMLElement).style.color = 'var(--lt-primary-700)';
+            (btn as HTMLElement).style.fontWeight = '700';
             applyTheme();
         });
     });
