@@ -1,3 +1,4 @@
+import { useLocale } from '../composables/useLocale';
 /**
  * LaughTale: Enterprise Select Component (Aura Select / Dropdown)
  * Feature-complete select component supporting single, multiple, checkmark, checkbox modes,
@@ -513,6 +514,7 @@ html.dark .p-select-option-badge,
 
 export default function SelectIsland(container: HTMLElement, props: SelectProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-select', CSS);
+    const locale = useLocale(ctx);
 
     const isMultiple = props.multiple === true || String(props.multiple) === 'true';
     const isCheckmark = props.checkmark === true || String(props.checkmark) === 'true';
@@ -528,7 +530,7 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
     const isReadonly = props.readonly === true || String(props.readonly) === 'true';
     const isFilled = props.variant === 'filled';
     const size = props.size || 'normal';
-    const placeholder = props.placeholder || 'Select an option...';
+    const placeholder = props.placeholder || locale.t('choose') || (locale.isRtl ? 'هەڵبژێرە...' : 'Select an option...');
     const scrollHeight = props.scrollHeight || '220px';
 
     // Normalize options (support flat and grouped)

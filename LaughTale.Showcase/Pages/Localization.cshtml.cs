@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
@@ -23,13 +23,9 @@ public class LocalizationModel : PageModel
     public string CurrentFont => IsRtl ? "Speda" : "Inter";
 
     [BindProperty]
-    [Required(ErrorMessage = "تکایە ناوی تەواو بنووسە / Please enter full name")]
-    [MinLength(3, ErrorMessage = "ناو دەبێت لانی کەم ٣ پیت بێت / Name must be at least 3 characters")]
     public string? FullName { get; set; }
 
     [BindProperty]
-    [Required(ErrorMessage = "تکایە ئیمەیڵ بنووسە / Please enter email")]
-    [EmailAddress(ErrorMessage = "ئیمەیڵەکە دروست نییە / Invalid email address")]
     public string? Email { get; set; }
 
     [BindProperty]
@@ -47,6 +43,24 @@ public class LocalizationModel : PageModel
     public IActionResult OnPost()
     {
         LoadSampleData();
+
+        if (string.IsNullOrWhiteSpace(FullName))
+        {
+            ModelState.AddModelError(nameof(FullName), IsRtl ? "تکایە ناوی تەواو بنووسە." : "Please enter your full name.");
+        }
+        else if (FullName.Trim().Length < 3)
+        {
+            ModelState.AddModelError(nameof(FullName), IsRtl ? "ناو دەبێت لانی کەم ٣ پیت بێت." : "Name must be at least 3 characters.");
+        }
+
+        if (string.IsNullOrWhiteSpace(Email))
+        {
+            ModelState.AddModelError(nameof(Email), IsRtl ? "تکایە ئیمەیڵ بنووسە." : "Please enter your email address.");
+        }
+        else if (!Email.Contains("@") || !Email.Contains("."))
+        {
+            ModelState.AddModelError(nameof(Email), IsRtl ? "ئیمەیڵەکە دروست نییە." : "Invalid email address format.");
+        }
 
         if (!ModelState.IsValid)
         {

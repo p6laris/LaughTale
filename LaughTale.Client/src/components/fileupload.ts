@@ -1,3 +1,4 @@
+import { useLocale } from '../composables/useLocale';
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 ﻿/**

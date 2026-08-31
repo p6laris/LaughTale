@@ -595,8 +595,13 @@ export function registerLocale(locale: string, dict: Partial<LocaleDictionary>):
  * Retrieves the complete LocaleDictionary for the specified locale code.
  */
 export function getLocaleDictionary(locale: string = 'en'): LocaleDictionary {
-    const norm = (locale || 'en').toLowerCase();
-    const lang = norm.split('-')[0];
+    const norm = (locale || 'en').toLowerCase().trim();
+    let lang = norm.split('-')[0];
+    if (norm === 'ckb' || norm.startsWith('ckb-') || norm === 'ku-arab-iq' || norm === 'ku-arab' || norm.startsWith('ku')) {
+        lang = 'ku';
+    } else if (norm === 'ar-iq' || norm.startsWith('ar')) {
+        lang = 'ar';
+    }
 
     const base = BUILTIN_LOCALES[norm] || BUILTIN_LOCALES[lang] || BUILTIN_LOCALES.en;
     const customExact = customLocales[norm];
@@ -635,7 +640,20 @@ export interface UseLocaleResult {
  * Primary localization composable for LaughTale Islands.
  */
 export function useLocale(ctx?: IslandContext): UseLocaleResult {
-    const locale = ctx?.locale || (typeof document !== 'undefined' ? document.documentElement.lang : 'en') || 'en';
+    let locale = ctx?.locale;
+    if (!locale && typeof document !== 'undefined') {
+        const htmlLang = document.documentElement.lang || document.querySelector('html')?.getAttribute('lang');
+        const htmlDir = document.documentElement.getAttribute('dir') || document.body?.getAttribute('dir');
+        if (htmlLang && htmlLang !== 'en') {
+            locale = htmlLang;
+        } else if (htmlDir === 'rtl') {
+            locale = 'ku';
+        } else if (document.cookie && document.cookie.includes('.AspNetCore.Culture=')) {
+            const match = document.cookie.match(/c=([a-zA-Z-]+)/);
+            if (match) locale = match[1];
+        }
+    }
+    locale = locale || 'en';
     const dict = getLocaleDictionary(locale);
     const dir = ctx?.dir || dict.dir || 'ltr';
     const isRtl = dir === 'rtl';

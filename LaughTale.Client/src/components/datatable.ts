@@ -1,3 +1,4 @@
+import { useLocale } from '../composables/useLocale';
 /**
  * LaughTale: Enterprise DataTable Component (Aura Design System compliant)
  * High-performance tabular data grid supporting sorting, filtering, pagination, selection,
@@ -595,6 +596,7 @@ html.dark .p-product-avatar,
 
 export default function DataTableIsland(container: HTMLElement, props: DataTableProps, ctx?: IslandContext) {
     injectIslandStyle('datatable', DATATABLE_CSS);
+    const locale = useLocale(ctx);
 
     const rawData: Record<string, any>[] = [...(props.value || props.data || [])];
     let columns: DataTableColumn[] = [...(props.columns || [])];
@@ -891,7 +893,7 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
         }
 
         const totalPages = Math.max(1, Math.ceil(totalRecords / rowsPerPage));
-        const emptyMessage = props.emptyMessage || 'No records found.';
+        const emptyMessage = props.emptyMessage || locale.t('emptyFilterMessage') || locale.t('emptyMessage') || 'No records found.';
         const showInteractiveSize = !!(props.interactiveSize || (props as any).showInteractiveSize);
 
         // Modifier Classes
@@ -980,7 +982,7 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                         <input type="text" 
                                class="p-datatable-filter-input" 
                                data-filter-field="${col.field}" 
-                               placeholder="${col.filterPlaceholder || 'Filter...'}" 
+                               placeholder="${col.filterPlaceholder || locale.t('searchMessage') || 'Filter...'}" 
                                value="${curVal}" />
                     </th>
                 `;
@@ -1183,7 +1185,7 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                         <button type="button" class="p-paginator-nav p-last" data-page="${totalPages}" ${currentPage === totalPages ? 'disabled' : ''} aria-label="Last Page">»</button>
                     </div>
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <span>Rows per page:</span>
+                        <span>${locale.t('rowsPerPage') || 'Rows per page'}:</span>
                         <select class="p-datatable-rows-select" style="padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px solid var(--lt-surface-300); background: var(--lt-surface-0); color: inherit; font-size: 0.8125rem;">
                             ${rowsPerPageOptions.map(opt => `<option value="${opt}" ${opt === rowsPerPage ? 'selected' : ''}>${opt}</option>`).join('')}
                         </select>
