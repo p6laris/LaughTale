@@ -314,61 +314,90 @@ const CSS = `
     height: 16px;
     color: var(--lt-surface-600);
 }
-
 /* ==================== DARK MODE ==================== */
+html.dark .p-password-container,
+[data-theme="dark"] .p-password-container,
 .dark .p-password-container {
-    background: var(--lt-surface-900);
-    border-color: var(--lt-surface-700);
+    background: var(--p-surface-0, #090d16);
+    border-color: var(--p-border-color, #334155);
 }
+html.dark .p-password-container:hover:not(.is-disabled),
+[data-theme="dark"] .p-password-container:hover:not(.is-disabled),
 .dark .p-password-container:hover:not(.is-disabled) {
-    border-color: var(--lt-surface-600);
+    border-color: var(--p-surface-400, #64748b);
 }
+html.dark .p-password.variant-filled .p-password-container,
+[data-theme="dark"] .p-password.variant-filled .p-password-container,
 .dark .p-password.variant-filled .p-password-container {
-    background: var(--lt-surface-800);
+    background: var(--p-surface-100, #1e293b);
 }
+html.dark .p-password.variant-filled .p-password-container:focus-within,
+[data-theme="dark"] .p-password.variant-filled .p-password-container:focus-within,
 .dark .p-password.variant-filled .p-password-container:focus-within {
-    background: var(--lt-surface-900);
+    background: var(--p-surface-0, #090d16);
 }
+html.dark .p-password-input,
+[data-theme="dark"] .p-password-input,
 .dark .p-password-input {
-    color: var(--lt-surface-0);
+    color: var(--p-text-color, #f8fafc);
 }
+html.dark .p-password-action-btn,
+[data-theme="dark"] .p-password-action-btn,
 .dark .p-password-action-btn {
-    color: var(--lt-surface-400);
+    color: var(--p-text-muted, #94a3b8);
 }
+html.dark .p-password-action-btn:hover:not(:disabled),
+[data-theme="dark"] .p-password-action-btn:hover:not(:disabled),
 .dark .p-password-action-btn:hover:not(:disabled) {
-    color: var(--lt-surface-100);
+    color: var(--p-text-color, #f8fafc);
 }
+html.dark .p-password-meter-track,
+[data-theme="dark"] .p-password-meter-track,
 .dark .p-password-meter-track {
-    background: var(--lt-surface-800);
+    background: var(--p-surface-100, #1e293b);
 }
+html.dark .p-password-chip,
+[data-theme="dark"] .p-password-chip,
 .dark .p-password-chip {
-    background: var(--lt-surface-800);
-    border-color: var(--lt-surface-700);
-    color: var(--lt-surface-300);
+    background: var(--p-surface-100, #1e293b);
+    border-color: var(--p-border-color, #334155);
+    color: var(--p-text-muted, #94a3b8);
 }
+html.dark .p-password-chip.is-met,
+[data-theme="dark"] .p-password-chip.is-met,
 .dark .p-password-chip.is-met {
-    background: var(--p-emerald-600, var(--lt-primary-600));
-    border-color: var(--p-emerald-600, var(--lt-primary-600));
-    color: var(--lt-surface-0, var(--lt-surface-0));
+    background: var(--p-emerald-600, #059669);
+    border-color: var(--p-emerald-600, #059669);
+    color: #ffffff;
 }
+html.dark .p-password-list-item,
+[data-theme="dark"] .p-password-list-item,
 .dark .p-password-list-item {
-    color: var(--lt-surface-400);
+    color: var(--p-text-muted, #94a3b8);
 }
+html.dark .p-password-list-item.is-met,
+[data-theme="dark"] .p-password-list-item.is-met,
 .dark .p-password-list-item.is-met {
-    color: var(--p-emerald-400, var(--lt-primary-400));
+    color: var(--p-emerald-400, #34d399);
 }
+html.dark .p-password-popover,
+[data-theme="dark"] .p-password-popover,
 .dark .p-password-popover {
-    background: var(--lt-surface-900);
-    border-color: var(--lt-surface-700);
+    background: var(--p-surface-0, #090d16);
+    border-color: var(--p-border-color, #334155);
     box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5);
 }
+html.dark .p-password-popover::before,
+[data-theme="dark"] .p-password-popover::before,
 .dark .p-password-popover::before {
-    background: var(--lt-surface-900);
-    border-left-color: var(--lt-surface-700);
-    border-top-color: var(--lt-surface-700);
+    background: var(--p-surface-0, #090d16);
+    border-left-color: var(--p-border-color, #334155);
+    border-top-color: var(--p-border-color, #334155);
 }
+html.dark .p-password-popover-header-title svg,
+[data-theme="dark"] .p-password-popover-header-title svg,
 .dark .p-password-popover-header-title svg {
-    color: var(--lt-surface-300);
+    color: var(--p-text-muted, #94a3b8);
 }
 `;
 

@@ -107,26 +107,45 @@ const CSS = `
 }
 
 /* Dark mode overrides */
+html.dark .laughtale-input-mask,
+html.dark .p-inputmask,
+[data-theme="dark"] .laughtale-input-mask,
+[data-theme="dark"] .p-inputmask,
+.dark .laughtale-input-mask,
 .dark .p-inputmask {
-    background-color: var(--lt-surface-900);
-    border-color: var(--lt-surface-700);
-    color: var(--lt-surface-0);
+    background-color: var(--p-surface-0, #090d16);
+    border-color: var(--p-border-color, #334155);
+    color: var(--p-text-color, #f8fafc);
 }
+html.dark .p-inputmask:hover:not(:disabled):not([readonly]),
+[data-theme="dark"] .p-inputmask:hover:not(:disabled):not([readonly]),
 .dark .p-inputmask:hover:not(:disabled):not([readonly]) {
-    border-color: var(--lt-surface-500);
+    border-color: var(--p-surface-400, #64748b);
 }
+html.dark .p-inputmask.variant-filled,
+[data-theme="dark"] .p-inputmask.variant-filled,
 .dark .p-inputmask.variant-filled {
-    background-color: var(--lt-surface-800);
+    background-color: var(--p-surface-100, #1e293b);
 }
+html.dark .p-inputmask.variant-filled:hover:not(:disabled):not([readonly]),
+[data-theme="dark"] .p-inputmask.variant-filled:hover:not(:disabled):not([readonly]),
 .dark .p-inputmask.variant-filled:hover:not(:disabled):not([readonly]) {
-    background-color: var(--lt-surface-700);
+    background-color: var(--p-surface-200, #334155);
 }
+html.dark .p-inputmask.variant-filled:focus,
+[data-theme="dark"] .p-inputmask.variant-filled:focus,
 .dark .p-inputmask.variant-filled:focus {
-    background-color: var(--lt-surface-900);
+    background-color: var(--p-surface-0, #090d16);
 }
+html.dark .p-inputmask:disabled,
+html.dark .p-inputmask.is-disabled,
+[data-theme="dark"] .p-inputmask:disabled,
+[data-theme="dark"] .p-inputmask.is-disabled,
 .dark .p-inputmask:disabled,
 .dark .p-inputmask.is-disabled {
-    background-color: var(--lt-surface-800);
+    background-color: var(--p-surface-100, #1e293b);
+    border-color: var(--p-border-color, #334155);
+    color: var(--p-text-muted, #94a3b8);
 }
 `;
 

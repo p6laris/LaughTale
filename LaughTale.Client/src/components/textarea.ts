@@ -115,32 +115,52 @@ const CSS = `
 }
 
 /* ==================== DARK MODE ==================== */
+html.dark .p-textarea,
+[data-theme="dark"] .p-textarea,
 .dark .p-textarea {
-    background: var(--lt-surface-950);
-    border-color: var(--lt-surface-700);
-    color: var(--lt-surface-0);
+    background: var(--p-surface-0, #090d16);
+    border-color: var(--p-border-color, #334155);
+    color: var(--p-text-color, #f8fafc);
 }
+html.dark .p-textarea:hover:not(:disabled):not(.p-disabled):not(.p-invalid),
+[data-theme="dark"] .p-textarea:hover:not(:disabled):not(.p-disabled):not(.p-invalid),
 .dark .p-textarea:hover:not(:disabled):not(.p-disabled):not(.p-invalid) {
-    border-color: var(--lt-surface-500);
+    border-color: var(--p-surface-400, #64748b);
 }
+html.dark .p-textarea:focus:not(:disabled):not(.p-disabled):not(.p-invalid),
+html.dark .p-textarea:focus-visible:not(:disabled):not(.p-disabled):not(.p-invalid),
+[data-theme="dark"] .p-textarea:focus:not(:disabled):not(.p-disabled):not(.p-invalid),
+[data-theme="dark"] .p-textarea:focus-visible:not(:disabled):not(.p-disabled):not(.p-invalid),
 .dark .p-textarea:focus:not(:disabled):not(.p-disabled):not(.p-invalid),
 .dark .p-textarea:focus-visible:not(:disabled):not(.p-disabled):not(.p-invalid) {
-    border-color: var(--lt-primary-400) !important;
-    box-shadow: 0 0 0 1px var(--lt-primary-400) !important;
+    border-color: var(--p-primary-500) !important;
+    box-shadow: 0 0 0 1px var(--p-primary-500) !important;
 }
+html.dark .p-textarea.p-textarea-filled,
+html.dark .p-textarea.variant-filled,
+[data-theme="dark"] .p-textarea.p-textarea-filled,
+[data-theme="dark"] .p-textarea.variant-filled,
 .dark .p-textarea.p-textarea-filled,
 .dark .p-textarea.variant-filled {
-    background: var(--lt-surface-850);
+    background: var(--p-surface-100, #1e293b);
 }
+html.dark .p-textarea.p-textarea-filled:focus,
+html.dark .p-textarea.variant-filled:focus,
+[data-theme="dark"] .p-textarea.p-textarea-filled:focus,
+[data-theme="dark"] .p-textarea.variant-filled:focus,
 .dark .p-textarea.p-textarea-filled:focus,
 .dark .p-textarea.variant-filled:focus {
-    background: var(--lt-surface-950);
+    background: var(--p-surface-0, #090d16);
 }
+html.dark .p-textarea:disabled,
+html.dark .p-textarea.p-disabled,
+[data-theme="dark"] .p-textarea:disabled,
+[data-theme="dark"] .p-textarea.p-disabled,
 .dark .p-textarea:disabled,
 .dark .p-textarea.p-disabled {
-    background: var(--lt-surface-800);
-    border-color: var(--lt-surface-700);
-    color: var(--lt-surface-500);
+    background: var(--p-surface-100, #1e293b);
+    border-color: var(--p-border-color, #334155);
+    color: var(--p-text-muted, #94a3b8);
 }
 `;
 
