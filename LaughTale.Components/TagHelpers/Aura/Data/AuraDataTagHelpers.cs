@@ -1,4 +1,4 @@
-﻿// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
 //   Modularized Aura TagHelpers
 // ----------------------------------------------------------------------
 
@@ -50,6 +50,9 @@ public class IslandDataTableTagHelper : TagHelper
     public string? TableStyle { get; set; }
     public string? Title { get; set; }
     public bool InteractiveSize { get; set; } = false;
+    public bool Lazy { get; set; } = false;
+    public string? LazyUrl { get; set; }
+    public int? TotalRecords { get; set; }
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
@@ -91,7 +94,10 @@ public class IslandDataTableTagHelper : TagHelper
             emptyMessage = EmptyMessage,
             tableStyle = TableStyle,
             title = Title,
-            interactiveSize = InteractiveSize
+            interactiveSize = InteractiveSize,
+            lazy = Lazy,
+            lazyUrl = LazyUrl,
+            totalRecords = TotalRecords
         };
 
         output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));

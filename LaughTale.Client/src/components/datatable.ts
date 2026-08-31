@@ -64,6 +64,9 @@ export interface DataTableProps {
     interactiveSize?: boolean;
     showRefresh?: boolean;
     showExport?: boolean;
+    lazy?: boolean;
+    lazyUrl?: string;
+    totalRecords?: number;
 }
 
 const DATATABLE_CSS = `
@@ -614,8 +617,9 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
     let loading = !!props.loading;
     const loadingMode = props.loadingMode || 'overlay';
     const exportFilename = props.exportFilename || 'datatable_export';
-    const emptyMessage = props.emptyMessage || 'No records found.';
-    const showInteractiveSize = !!props.interactiveSize;
+    const isLazy = !!props.lazy;
+    let serverData: Record<string, any>[] = rawData;
+    let serverTotalRecords = props.totalRecords ?? rawData.length;
 
     // State Variables
     let globalFilter = '';
@@ -628,6 +632,59 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
     const selectedKeys = new Set<any>();
     const expandedKeys = new Set<any>();
     let editingCell: { rowKey: any; field: string } | null = null;
+
+    async function fetchLazyData() {
+        if (!isLazy || !props.lazyUrl) return;
+        loading = true;
+        render();
+
+        try {
+            const tokenEl = document.querySelector('input[name="__RequestVerificationToken"]') as HTMLInputElement;
+            const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+            if (tokenEl?.value) {
+                headers['RequestVerificationToken'] = tokenEl.value;
+                headers['X-CSRF-TOKEN'] = tokenEl.value;
+            }
+
+            const response = await fetch(props.lazyUrl, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({
+                    page: currentPage,
+                    pageSize: rowsPerPage,
+                    first: (currentPage - 1) * rowsPerPage,
+                    rows: rowsPerPage,
+                    sortField: sortMeta[0]?.field,
+                    sortOrder: sortMeta[0]?.order,
+                    sort: sortMeta,
+                    globalSearch: globalFilter || undefined,
+                    filters: Object.keys(columnFilters).reduce((acc, f) => {
+                        acc[f] = { value: columnFilters[f], matchMode: 'contains' };
+                        return acc;
+                    }, {} as Record<string, any>)
+                })
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                serverData = result.items || result.data || [];
+                serverTotalRecords = result.totalCount ?? result.totalRecords ?? serverData.length;
+            }
+        } catch (err) {
+            console.error('[LaughTale DataTable] Lazy fetch failed:', err);
+        } finally {
+            loading = false;
+            render();
+        }
+    }
+
+    function triggerDataUpdate() {
+        if (isLazy) {
+            fetchLazyData();
+        } else {
+            render();
+        }
+    }
 
     // Helper: resolve deep nested property path (e.g. 'country.name') with case-insensitive fallback
     function resolveField(obj: any, field: string): any {
@@ -758,60 +815,65 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
     (container as any).exportCSV = exportCSV;
 
     function render() {
-        // 1. Filter Data
-        let filtered = rawData.filter(row => {
-            // Global search
-            if (globalFilter.trim()) {
-                const query = globalFilter.toLowerCase();
-                const fieldsToCheck = props.globalFilterFields && props.globalFilterFields.length > 0
-                    ? props.globalFilterFields
-                    : columns.map(c => c.field).filter(Boolean);
+        let displayRows: Record<string, any>[];
+        let totalRecords: number;
 
-                const matchesGlobal = fieldsToCheck.some(f => {
-                    const val = resolveField(row, f);
-                    return val != null && String(val).toLowerCase().includes(query);
-                });
-                if (!matchesGlobal) return false;
-            }
+        if (isLazy) {
+            displayRows = serverData;
+            totalRecords = serverTotalRecords;
+        } else {
+            // 1. Filter Data
+            let filtered = rawData.filter(row => {
+                // Global search
+                if (globalFilter.trim()) {
+                    const query = globalFilter.toLowerCase();
+                    const fieldsToCheck = props.globalFilterFields && props.globalFilterFields.length > 0
+                        ? props.globalFilterFields
+                        : columns.map(c => c.field).filter(Boolean);
 
-            // Column filters
-            for (const [f, query] of Object.entries(columnFilters)) {
-                if (query.trim()) {
-                    const val = resolveField(row, f);
-                    if (val == null || !String(val).toLowerCase().includes(query.toLowerCase())) {
-                        return false;
+                    const matchesGlobal = fieldsToCheck.some(f => {
+                        const val = resolveField(row, f);
+                        return val != null && String(val).toLowerCase().includes(query);
+                    });
+                    if (!matchesGlobal) return false;
+                }
+
+                // Column filters
+                for (const [f, query] of Object.entries(columnFilters)) {
+                    if (query.trim()) {
+                        const val = resolveField(row, f);
+                        if (val == null || !String(val).toLowerCase().includes(query.toLowerCase())) {
+                            return false;
+                        }
                     }
                 }
+
+                return true;
+            });
+
+            // 2. Sort Data
+            if (sortMeta.length > 0) {
+                filtered.sort((a, b) => {
+                    for (const meta of sortMeta) {
+                        const valA = resolveField(a, meta.field);
+                        const valB = resolveField(b, meta.field);
+                        if (valA === valB) continue;
+                        if (valA == null) return 1;
+                        if (valB == null) return -1;
+                        const res = typeof valA === 'number' && typeof valB === 'number'
+                            ? valA - valB
+                            : String(valA).localeCompare(String(valB), undefined, { numeric: true });
+                        if (res !== 0) return res * meta.order;
+                    }
+                    return 0;
+                });
             }
 
-            return true;
-        });
-
-        // 2. Sort Data
-        if (sortMeta.length > 0) {
-            filtered.sort((a, b) => {
-                for (const meta of sortMeta) {
-                    const valA = resolveField(a, meta.field);
-                    const valB = resolveField(b, meta.field);
-                    if (valA === valB) continue;
-                    if (valA == null) return 1;
-                    if (valB == null) return -1;
-                    const res = typeof valA === 'number' && typeof valB === 'number'
-                        ? valA - valB
-                        : String(valA).localeCompare(String(valB), undefined, { numeric: true });
-                    if (res !== 0) return res * meta.order;
-                }
-                return 0;
-            });
+            // 3. Paginate Data
+            totalRecords = filtered.length;
+            const firstIdx = (currentPage - 1) * rowsPerPage;
+            displayRows = paginator ? filtered.slice(firstIdx, firstIdx + rowsPerPage) : filtered;
         }
-
-        // 3. Paginate Data
-        const totalRecords = filtered.length;
-        const totalPages = Math.ceil(totalRecords / rowsPerPage) || 1;
-        if (currentPage > totalPages) currentPage = totalPages;
-        if (currentPage < 1) currentPage = 1;
-        const firstIdx = (currentPage - 1) * rowsPerPage;
-        const displayRows = paginator ? filtered.slice(firstIdx, firstIdx + rowsPerPage) : filtered;
 
         // Modifier Classes
         const rootClasses = ['p-datatable', 'p-component'];
@@ -1231,7 +1293,7 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                     detail: { sortMeta }
                 }));
 
-                render();
+                triggerDataUpdate();
             });
         });
 
@@ -1243,7 +1305,7 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                 globalFilter = target.value;
                 const pos = target.selectionStart;
                 currentPage = 1;
-                render();
+                triggerDataUpdate();
                 const reacquired = container.querySelector<HTMLInputElement>('.p-datatable-global-filter');
                 if (reacquired) {
                     reacquired.focus();
@@ -1260,7 +1322,7 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                 columnFilters[field] = target.value;
                 const pos = target.selectionStart;
                 currentPage = 1;
-                render();
+                triggerDataUpdate();
                 const reacquired = container.querySelector<HTMLInputElement>(`.p-datatable-filter-input[data-filter-field="${field}"]`);
                 if (reacquired) {
                     reacquired.focus();
@@ -1457,7 +1519,7 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                 const targetPage = Number(btn.getAttribute('data-page'));
                 if (!isNaN(targetPage) && targetPage > 0) {
                     currentPage = targetPage;
-                    render();
+                    triggerDataUpdate();
                 }
             });
         });
@@ -1467,7 +1529,7 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
             rowsSelect.addEventListener('change', () => {
                 rowsPerPage = Number(rowsSelect.value);
                 currentPage = 1;
-                render();
+                triggerDataUpdate();
             });
         }
     }
@@ -1480,6 +1542,10 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
         }));
     }
 
-    // Initial render
-    render();
+    // Initial render / lazy fetch
+    if (isLazy && props.lazyUrl && rawData.length === 0) {
+        fetchLazyData();
+    } else {
+        render();
+    }
 }

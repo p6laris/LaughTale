@@ -1,13 +1,17 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace LaughTale.Core.Data;
 
 /// <summary>
 /// LINQ and EF Core translatable query extensions for LaughTale server-side data components (LT-1508).
+/// Applies safe expression-tree filtering, global multi-column search, multi-sort, and pagination.
 /// </summary>
 public static class QueryableExtensions
 {
@@ -22,21 +26,70 @@ public static class QueryableExtensions
         ArgumentNullException.ThrowIfNull(query);
         ArgumentNullException.ThrowIfNull(request);
 
+        var (filteredQuery, totalCount) = PrepareQuery(query, request, allowedFields);
+
+        // Apply Paging (Skip / Take)
+        int page = Math.Max(1, request.Page);
+        int pageSize = Math.Clamp(request.PageSize, 1, 10000);
+        int skip = (page - 1) * pageSize;
+
+        var items = filteredQuery.Skip(skip).Take(pageSize).ToList();
+
+        return new IslandDataResult<T>(items, totalCount, page, pageSize);
+    }
+
+    /// <summary>
+    /// Asynchronously applies server-side sorting, filtering, and paging.
+    /// </summary>
+    public static Task<IslandDataResult<T>> ToIslandDataResultAsync<T>(
+        this IQueryable<T> query,
+        IslandDataRequest request,
+        IReadOnlySet<string>? allowedFields = null,
+        CancellationToken cancellationToken = default)
+    {
+        // Executes query synchronously or via Task wrapper for standard IQueryable sources
+        return Task.Run(() => query.ToIslandDataResult(request, allowedFields), cancellationToken);
+    }
+
+    /// <summary>
+    /// Applies filtering and sorting without executing pagination or materialization.
+    /// </summary>
+    public static IQueryable<T> ApplyIslandCriteria<T>(
+        this IQueryable<T> query,
+        IslandDataRequest request,
+        IReadOnlySet<string>? allowedFields = null)
+    {
+        ArgumentNullException.ThrowIfNull(query);
+        ArgumentNullException.ThrowIfNull(request);
+
+        var (preparedQuery, _) = PrepareQuery(query, request, allowedFields);
+        return preparedQuery;
+    }
+
+    private static (IQueryable<T> Query, int TotalCount) PrepareQuery<T>(
+        IQueryable<T> query,
+        IslandDataRequest request,
+        IReadOnlySet<string>? allowedFields)
+    {
         var entityType = typeof(T);
         var properties = entityType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                                   .Where(p => p.CanRead)
                                    .ToDictionary(p => p.Name, p => p, StringComparer.OrdinalIgnoreCase);
 
-        // 1. Apply Filters
-        if (request.Filter is { Count: > 0 })
+        // 1. Apply Column Filters
+        var effectiveFilters = request.GetEffectiveFilters();
+        if (effectiveFilters.Count > 0)
         {
-            foreach (var filter in request.Filter)
+            foreach (var filter in effectiveFilters)
             {
                 if (string.IsNullOrWhiteSpace(filter.Field) || string.IsNullOrWhiteSpace(filter.Value))
                     continue;
 
+                // Security: Enforce explicit allowlist if provided
                 if (allowedFields != null && !allowedFields.Contains(filter.Field, StringComparer.OrdinalIgnoreCase))
                     continue;
 
+                // Security: Only allow existing model properties (prevents arbitrary injection)
                 if (!properties.TryGetValue(filter.Field, out var prop))
                     continue;
 
@@ -44,14 +97,21 @@ public static class QueryableExtensions
             }
         }
 
-        // 2. Compute Total Count after filtering
+        // 2. Apply Global Search
+        if (!string.IsNullOrWhiteSpace(request.GlobalSearch))
+        {
+            query = ApplyGlobalSearch(query, properties, request.GlobalSearch, request.GlobalFilterFields, allowedFields);
+        }
+
+        // 3. Compute Total Count after all filters
         int totalCount = query.Count();
 
-        // 3. Apply Sorting
-        if (request.Sort is { Count: > 0 })
+        // 4. Apply Sorting
+        var effectiveSorts = request.GetEffectiveSorts();
+        if (effectiveSorts.Count > 0)
         {
             bool isFirstSort = true;
-            foreach (var sort in request.Sort)
+            foreach (var sort in effectiveSorts)
             {
                 if (string.IsNullOrWhiteSpace(sort.Field))
                     continue;
@@ -67,14 +127,7 @@ public static class QueryableExtensions
             }
         }
 
-        // 4. Apply Paging (Skip / Take)
-        int page = Math.Max(1, request.Page);
-        int pageSize = Math.Clamp(request.PageSize, 1, 1000);
-        int skip = (page - 1) * pageSize;
-
-        var items = query.Skip(skip).Take(pageSize).ToList();
-
-        return new IslandDataResult<T>(items, totalCount, page, pageSize);
+        return (query, totalCount);
     }
 
     private static IQueryable<T> ApplySort<T>(IQueryable<T> source, PropertyInfo prop, bool descending, bool isFirst)
@@ -83,15 +136,9 @@ public static class QueryableExtensions
         var propertyAccess = Expression.Property(parameter, prop);
         var lambda = Expression.Lambda(propertyAccess, parameter);
 
-        string methodName;
-        if (isFirst)
-        {
-            methodName = descending ? "OrderByDescending" : "OrderBy";
-        }
-        else
-        {
-            methodName = descending ? "ThenByDescending" : "ThenBy";
-        }
+        string methodName = isFirst
+            ? (descending ? nameof(Queryable.OrderByDescending) : nameof(Queryable.OrderBy))
+            : (descending ? nameof(Queryable.ThenByDescending) : nameof(Queryable.ThenBy));
 
         var resultExpression = Expression.Call(
             typeof(Queryable),
@@ -107,50 +154,146 @@ public static class QueryableExtensions
     {
         var parameter = Expression.Parameter(typeof(T), "x");
         var propertyAccess = Expression.Property(parameter, prop);
+        var comparison = BuildComparison(propertyAccess, prop.PropertyType, op, rawValue);
 
-        object? convertedValue;
-        try
-        {
-            var targetType = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType;
-            convertedValue = Convert.ChangeType(rawValue, targetType);
-        }
-        catch
-        {
-            return source; // Skip unparseable filter values safely
-        }
-
-        Expression constant = Expression.Constant(convertedValue, prop.PropertyType);
-        Expression comparison;
-
-        switch (op.ToLowerInvariant())
-        {
-            case "contains" when prop.PropertyType == typeof(string):
-                var containsMethod = typeof(string).GetMethod("Contains", new[] { typeof(string) })!;
-                comparison = Expression.Call(propertyAccess, containsMethod, constant);
-                break;
-            case "startswith" when prop.PropertyType == typeof(string):
-                var startsMethod = typeof(string).GetMethod("StartsWith", new[] { typeof(string) })!;
-                comparison = Expression.Call(propertyAccess, startsMethod, constant);
-                break;
-            case "gt":
-                comparison = Expression.GreaterThan(propertyAccess, constant);
-                break;
-            case "gte":
-                comparison = Expression.GreaterThanOrEqual(propertyAccess, constant);
-                break;
-            case "lt":
-                comparison = Expression.LessThan(propertyAccess, constant);
-                break;
-            case "lte":
-                comparison = Expression.LessThanOrEqual(propertyAccess, constant);
-                break;
-            case "equals":
-            default:
-                comparison = Expression.Equal(propertyAccess, constant);
-                break;
-        }
+        if (comparison == null)
+            return source;
 
         var lambda = Expression.Lambda<Func<T, bool>>(comparison, parameter);
         return source.Where(lambda);
+    }
+
+    private static IQueryable<T> ApplyGlobalSearch<T>(
+        IQueryable<T> source,
+        Dictionary<string, PropertyInfo> properties,
+        string searchTerm,
+        List<string>? filterFields,
+        IReadOnlySet<string>? allowedFields)
+    {
+        var stringProps = properties.Values
+            .Where(p => p.PropertyType == typeof(string))
+            .ToList();
+
+        if (filterFields is { Count: > 0 })
+        {
+            stringProps = stringProps
+                .Where(p => filterFields.Contains(p.Name, StringComparer.OrdinalIgnoreCase))
+                .ToList();
+        }
+
+        if (allowedFields != null)
+        {
+            stringProps = stringProps
+                .Where(p => allowedFields.Contains(p.Name, StringComparer.OrdinalIgnoreCase))
+                .ToList();
+        }
+
+        if (stringProps.Count == 0)
+            return source;
+
+        var parameter = Expression.Parameter(typeof(T), "x");
+        var containsMethod = typeof(string).GetMethod(nameof(string.Contains), new[] { typeof(string) })!;
+        var constant = Expression.Constant(searchTerm, typeof(string));
+
+        Expression? combined = null;
+        foreach (var prop in stringProps)
+        {
+            var propertyAccess = Expression.Property(parameter, prop);
+            var notNullCheck = Expression.NotEqual(propertyAccess, Expression.Constant(null, typeof(string)));
+            var containsCall = Expression.Call(propertyAccess, containsMethod, constant);
+            var matchExpr = Expression.AndAlso(notNullCheck, containsCall);
+
+            combined = combined == null ? matchExpr : Expression.OrElse(combined, matchExpr);
+        }
+
+        if (combined == null)
+            return source;
+
+        var lambda = Expression.Lambda<Func<T, bool>>(combined, parameter);
+        return source.Where(lambda);
+    }
+
+    private static Expression? BuildComparison(MemberExpression propertyAccess, Type propertyType, string op, string rawValue)
+    {
+        var targetType = Nullable.GetUnderlyingType(propertyType) ?? propertyType;
+        object? convertedValue;
+
+        try
+        {
+            if (targetType == typeof(Guid))
+            {
+                convertedValue = Guid.Parse(rawValue);
+            }
+            else if (targetType.IsEnum)
+            {
+                convertedValue = Enum.Parse(targetType, rawValue, ignoreCase: true);
+            }
+            else if (targetType == typeof(DateTime))
+            {
+                convertedValue = DateTime.Parse(rawValue, CultureInfo.InvariantCulture);
+            }
+            else if (targetType == typeof(DateTimeOffset))
+            {
+                convertedValue = DateTimeOffset.Parse(rawValue, CultureInfo.InvariantCulture);
+            }
+            else
+            {
+                convertedValue = Convert.ChangeType(rawValue, targetType, CultureInfo.InvariantCulture);
+            }
+        }
+        catch
+        {
+            return null; // Skip unparseable filter values safely
+        }
+
+        Expression constant = Expression.Constant(convertedValue, propertyType);
+
+        switch (op.ToLowerInvariant())
+        {
+            case "contains" when targetType == typeof(string):
+                var containsMethod = typeof(string).GetMethod(nameof(string.Contains), new[] { typeof(string) })!;
+                var notNullContains = Expression.NotEqual(propertyAccess, Expression.Constant(null, typeof(string)));
+                return Expression.AndAlso(notNullContains, Expression.Call(propertyAccess, containsMethod, constant));
+
+            case "notcontains" when targetType == typeof(string):
+                var notContainsMethod = typeof(string).GetMethod(nameof(string.Contains), new[] { typeof(string) })!;
+                var notNullNotContains = Expression.NotEqual(propertyAccess, Expression.Constant(null, typeof(string)));
+                return Expression.OrElse(
+                    Expression.Equal(propertyAccess, Expression.Constant(null, typeof(string))),
+                    Expression.Not(Expression.Call(propertyAccess, notContainsMethod, constant))
+                );
+
+            case "startswith" when targetType == typeof(string):
+                var startsMethod = typeof(string).GetMethod(nameof(string.StartsWith), new[] { typeof(string) })!;
+                var notNullStarts = Expression.NotEqual(propertyAccess, Expression.Constant(null, typeof(string)));
+                return Expression.AndAlso(notNullStarts, Expression.Call(propertyAccess, startsMethod, constant));
+
+            case "endswith" when targetType == typeof(string):
+                var endsMethod = typeof(string).GetMethod(nameof(string.EndsWith), new[] { typeof(string) })!;
+                var notNullEnds = Expression.NotEqual(propertyAccess, Expression.Constant(null, typeof(string)));
+                return Expression.AndAlso(notNullEnds, Expression.Call(propertyAccess, endsMethod, constant));
+
+            case "notequals":
+                return Expression.NotEqual(propertyAccess, constant);
+
+            case "gt":
+            case "dateafter":
+                return Expression.GreaterThan(propertyAccess, constant);
+
+            case "gte":
+                return Expression.GreaterThanOrEqual(propertyAccess, constant);
+
+            case "lt":
+            case "datebefore":
+                return Expression.LessThan(propertyAccess, constant);
+
+            case "lte":
+                return Expression.LessThanOrEqual(propertyAccess, constant);
+
+            case "equals":
+            case "dateis":
+            default:
+                return Expression.Equal(propertyAccess, constant);
+        }
     }
 }
