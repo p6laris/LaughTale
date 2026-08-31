@@ -7,9 +7,15 @@ const ICONS = {
     activity: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.48 12H2"/></svg>`
 };
 
+interface ReactPolyglotProps {
+    title?: string;
+    initialScore?: number;
+    badge?: string;
+}
+
 export default function ReactPolyglotIsland(
     container: HTMLElement,
-    props: any,
+    props: ReactPolyglotProps,
     ctx?: IslandContext
 ) {
     let revenue = props?.initialScore || 84500;
@@ -21,6 +27,7 @@ export default function ReactPolyglotIsland(
 
         container.innerHTML = `
             <div class="p-card" style="background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-xl); padding: 1.5rem; box-shadow: var(--p-shadow-sm); height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
+                <!-- Header -->
                 <div>
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
                         <div style="display: flex; align-items: center; gap: 0.75rem;">
@@ -35,6 +42,7 @@ export default function ReactPolyglotIsland(
                         <span class="p-tag p-tag-info" style="font-size: 0.7rem; font-weight: 600; padding: 0.2rem 0.6rem;">React 19</span>
                     </div>
 
+                    <!-- Revenue KPI Metric -->
                     <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 1.25rem;">
                         <div style="display: flex; justify-content: space-between; align-items: baseline;">
                             <span style="font-size: 0.75rem; color: var(--p-text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Recurring Revenue ARR</span>
@@ -47,6 +55,7 @@ export default function ReactPolyglotIsland(
                         </div>
                     </div>
 
+                    <!-- Interactive Histogram Velocity -->
                     <div style="margin-bottom: 1rem;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                             <span style="font-size: 0.75rem; font-weight: 600; color: var(--p-text-muted);">Sales Velocity</span>
@@ -66,6 +75,7 @@ export default function ReactPolyglotIsland(
                     </div>
                 </div>
 
+                <!-- Action Triggers -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 1rem; border-top: 1px solid var(--p-border-color); padding-top: 1rem;">
                     <button type="button" class="btn-sale-250 p-button p-button-primary" style="font-size: 0.8125rem; padding: 0.5rem 0.75rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; font-weight: 600;">
                         ${ICONS.zap} + $250 Quick Sale

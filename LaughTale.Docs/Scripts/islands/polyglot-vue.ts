@@ -22,13 +22,14 @@ export default function VuePolyglotIsland(
     props: any,
     ctx?: IslandContext
 ) {
-    const warehouse = props?.warehouse || 'Central Distribution Hub';
-    let products: ProductItem[] = [
-        { id: 'SKU-801', name: 'Security FIDO2 Key', stock: 18, price: 45, qty: 0 },
-        { id: 'SKU-802', name: 'Biometric Iris Reader', stock: 6, price: 320, qty: 0 },
-        { id: 'SKU-803', name: 'HSM Cryptocard', stock: 24, price: 110, qty: 0 }
+    const warehouseName = props?.warehouse || 'Erbil Regional Depot';
+    const products = [
+        { name: 'LaughTale Enterprise Pro License', stock: 12, price: 499, qty: 0 },
+        { name: 'Dedicated Support Tier (1-Yr)', stock: 8, price: 299, qty: 0 },
+        { name: 'Custom Theme Studio Pack', stock: 25, price: 99, qty: 0 }
     ];
-    const logMessages: string[] = [];
+
+    const logMessages: string[] = ['Warehouse inventory initialized (Vue 3 Reactive).'];
 
     function render() {
         const totalItemsInCart = products.reduce((acc, p) => acc + p.qty, 0);
@@ -36,40 +37,35 @@ export default function VuePolyglotIsland(
 
         container.innerHTML = `
             <div class="p-card" style="background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-xl); padding: 1.5rem; box-shadow: var(--p-shadow-sm); height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
+                <!-- Header -->
                 <div>
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
                         <div style="display: flex; align-items: center; gap: 0.75rem;">
-                            <div style="width: 2.25rem; height: 2.25rem; border-radius: var(--p-border-radius-md); background: var(--p-green-50, rgba(16, 185, 129, 0.1)); color: var(--p-green-500, #10b981); display: flex; align-items: center; justify-content: center;">
+                            <div style="width: 2.25rem; height: 2.25rem; border-radius: var(--p-border-radius-md); background: var(--p-emerald-50, rgba(16, 185, 129, 0.1)); color: var(--p-emerald-500, #10b981); display: flex; align-items: center; justify-content: center;">
                                 ${ICONS.package}
                             </div>
                             <div>
-                                <h4 style="margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--p-text-color);">Vue 3 Cart & Warehouse</h4>
-                                <span style="font-size: 0.75rem; color: var(--p-text-muted);">Composition API • Reactive State</span>
+                                <h4 style="margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--p-text-color);">${warehouseName}</h4>
+                                <span style="font-size: 0.75rem; color: var(--p-text-muted);">Vue 3 • Reactive Inventory</span>
                             </div>
                         </div>
                         <span class="p-tag p-tag-success" style="font-size: 0.7rem; font-weight: 600; padding: 0.2rem 0.6rem;">Vue 3</span>
                     </div>
 
-                    <div style="display: flex; justify-content: space-between; align-items: center; background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-md); padding: 0.6rem 0.85rem; margin-bottom: 0.85rem; font-size: 0.75rem;">
-                        <span style="color: var(--p-text-muted);">Location: <strong style="color: var(--p-text-color);">${warehouse}</strong></span>
-                        <span class="p-badge p-badge-success" style="font-size: 0.65rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.2rem;">
-                            ${ICONS.shield} Active
-                        </span>
-                    </div>
-
-                    <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 0.75rem;">
-                        ${products.map((p, idx) => `
-                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius-md); font-size: 0.8125rem;">
-                                <div>
-                                    <div style="font-weight: 600; color: var(--p-text-color);">${p.name}</div>
-                                    <div style="font-size: 0.7rem; color: var(--p-text-muted);">$${p.price} • Stock: <strong style="color: ${p.stock <= 5 ? 'var(--p-amber-500, #f59e0b)' : 'var(--p-green-500, #10b981)'}">${p.stock}</strong></div>
+                    <!-- Products List -->
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem;">
+                        ${products.map((prod, idx) => `
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.6rem 0.75rem; border-radius: var(--p-border-radius-md); background: var(--p-surface-50); border: 1px solid var(--p-border-color);">
+                                <div style="display: flex; flex-direction: column;">
+                                    <span style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color);">${prod.name}</span>
+                                    <span style="font-size: 0.7rem; color: var(--p-text-muted);">$${prod.price} • Stock: <strong style="color: ${prod.stock < 5 ? '#ef4444' : 'var(--p-text-color)'};">${prod.stock}</strong></span>
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 0.4rem;">
-                                    <button type="button" class="btn-dec p-button p-button-outlined p-button-sm" data-idx="${idx}" style="padding: 0.2rem 0.4rem; min-width: 1.75rem; height: 1.75rem; display: flex; align-items: center; justify-content: center;" ${p.qty === 0 ? 'disabled' : ''}>
+                                    <button type="button" class="btn-dec p-button p-button-secondary p-button-sm" data-idx="${idx}" style="padding: 0.25rem 0.5rem; font-size: 0.75rem; border-radius: 4px;" ${prod.qty === 0 ? 'disabled' : ''}>
                                         ${ICONS.minus}
                                     </button>
-                                    <span style="font-weight: 700; font-family: var(--p-font-mono); min-width: 1.25rem; text-align: center; font-size: 0.85rem; color: var(--p-text-color);">${p.qty}</span>
-                                    <button type="button" class="btn-inc p-button p-button-primary p-button-sm" data-idx="${idx}" style="padding: 0.2rem 0.4rem; min-width: 1.75rem; height: 1.75rem; display: flex; align-items: center; justify-content: center;" ${p.stock === 0 ? 'disabled' : ''}>
+                                    <span style="font-size: 0.8125rem; font-weight: 700; min-width: 1.5rem; text-align: center;">${prod.qty}</span>
+                                    <button type="button" class="btn-inc p-button p-button-primary p-button-sm" data-idx="${idx}" style="padding: 0.25rem 0.5rem; font-size: 0.75rem; border-radius: 4px;" ${prod.stock === 0 ? 'disabled' : ''}>
                                         ${ICONS.plus}
                                     </button>
                                 </div>
@@ -77,21 +73,20 @@ export default function VuePolyglotIsland(
                         `).join('')}
                     </div>
 
-                    ${logMessages.length > 0 ? `
-                        <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-left: 3px solid var(--p-green-500, #10b981); border-radius: var(--p-border-radius-md); padding: 0.5rem 0.75rem; font-size: 0.725rem; color: var(--p-text-color); display: flex; align-items: flex-start; gap: 0.4rem; margin-bottom: 0.5rem;">
-                            <span style="color: var(--p-green-500, #10b981); flex-shrink: 0; margin-top: 0.1rem;">${ICONS.bell}</span>
-                            <span>${logMessages[0]}</span>
-                        </div>
-                    ` : ''}
+                    <!-- Live Event Dispatches Feed -->
+                    <div style="background: var(--p-surface-100, #f1f5f9); border-radius: var(--p-border-radius-md); padding: 0.5rem 0.75rem; font-size: 0.7rem; font-family: var(--p-font-mono); color: var(--p-text-muted);">
+                        ${logMessages.map(m => `<div>• ${m}</div>`).join('')}
+                    </div>
                 </div>
 
+                <!-- Footer Summary & Actions -->
                 <div style="border-top: 1px solid var(--p-border-color); padding-top: 1rem; display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
                     <div>
                         <span style="font-size: 0.7rem; color: var(--p-text-muted);">Cart (${totalItemsInCart} items):</span>
-                        <div style="font-size: 1.25rem; font-weight: 800; font-family: var(--p-font-mono); color: var(--p-text-color);">$${totalCartPrice}</div>
+                        <div style="font-size: 1.25rem; font-weight: 800; color: var(--p-text-color);">$${totalCartPrice}</div>
                     </div>
                     <button type="button" class="btn-restock p-button p-button-outlined p-button-sm" style="font-size: 0.75rem; padding: 0.4rem 0.75rem; display: inline-flex; align-items: center; gap: 0.35rem; font-weight: 600;">
-                        ${ICONS.refresh} Restock (+5)
+                        ${ICONS.refresh} Restock
                     </button>
                 </div>
             </div>
@@ -108,6 +103,7 @@ export default function VuePolyglotIsland(
                         action: 'add_item',
                         product: products[idx].name,
                         qtyInCart: products[idx].qty,
+                        remainingStock: products[idx].stock,
                         timestamp: new Date().toLocaleTimeString()
                     });
                     render();
@@ -126,6 +122,7 @@ export default function VuePolyglotIsland(
                         action: 'remove_item',
                         product: products[idx].name,
                         qtyInCart: products[idx].qty,
+                        remainingStock: products[idx].stock,
                         timestamp: new Date().toLocaleTimeString()
                     });
                     render();
@@ -137,7 +134,8 @@ export default function VuePolyglotIsland(
             products.forEach(p => p.stock += 5);
             emitIslandEvent('polyglot:restock', {
                 source: 'Vue 3 Island',
-                warehouse: warehouse,
+                warehouse: warehouseName,
+                addedUnits: 15,
                 timestamp: new Date().toLocaleTimeString()
             });
             render();
@@ -147,14 +145,9 @@ export default function VuePolyglotIsland(
     render();
 
     const unsubscribe = onIslandEvent('polyglot:sale', (payload: any) => {
-        const available = products.filter(p => p.stock > 0);
-        if (available.length > 0) {
-            const randomProd = available[Math.floor(Math.random() * available.length)];
-            randomProd.stock--;
-            logMessages.unshift(`Dispatched 1x ${randomProd.name} for $${payload.amount} ${payload.source} sale!`);
-            if (logMessages.length > 3) logMessages.pop();
-            render();
-        }
+        logMessages.unshift(`Sale detected: ${payload.amount} ${payload.source}`);
+        if (logMessages.length > 3) logMessages.pop();
+        render();
     });
 
     ctx?.onCleanup(() => unsubscribe?.());

@@ -17,6 +17,8 @@ defineIsland('persistent-telemetry', () => import('./islands/persistent-player')
 defineIsland('polyglot-react', () => import('./islands/polyglot-react'));
 defineIsland('polyglot-vue', () => import('./islands/polyglot-vue'));
 defineIsland('polyglot-svelte', () => import('./islands/polyglot-svelte'));
+defineIsland('polyglot-preact', () => import('./islands/polyglot-preact'));
+defineIsland('polyglot-vanilla', () => import('./islands/polyglot-vanilla'));
 
 // 3. Command Palette Spotlight Modal Handlers
 export function openCommandPalette() {

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * LaughTale: Enterprise Lucide Vector & Sprite Icon Engine
  * Unified End-to-End SVG icon system leveraging static sprite caching with 0 KB JS bloat.
  * 100% compliant with Aura Design System tokens and Lucide icon specifications.
@@ -59,7 +59,8 @@ const ALIASES: Record<string, string> = {
     'user': 'user',
     'users': 'users',
     'bell': 'bell',
-    'home': 'home',
+    'home': 'house',
+    'house': 'house',
     'lock': 'lock',
     'unlock': 'unlock',
     'calendar': 'calendar',

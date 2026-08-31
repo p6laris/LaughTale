@@ -354,10 +354,10 @@ html.dark .p-sidebar-menu-button.p-sidebar-active,
 }
 
 .p-sidebar-menu-button.p-active {
-    background: var(--lt-primary-50);
-    color: var(--lt-primary-700);
-    font-weight: 700;
-    border-color: var(--lt-primary-200);
+    background: var(--p-primary-50, rgba(16, 185, 129, 0.08));
+    color: var(--p-primary-700, #047857);
+    font-weight: 600;
+    border-color: transparent;
 }
 
 .p-sidebar-menu-button-icon {
@@ -376,7 +376,7 @@ html.dark .p-sidebar-menu-button.p-sidebar-active,
 }
 
 .p-sidebar-menu-button.p-active .p-sidebar-menu-button-icon {
-    color: var(--lt-primary-600);
+    color: var(--p-primary-600, #059669);
 }
 
 .p-sidebar-item-label {
@@ -392,10 +392,10 @@ html.dark .p-sidebar-menu-button.p-sidebar-active,
 }
 
 .p-sidebar-menu-badge {
-    margin-left: auto;
+    margin-inline-start: auto;
     font-size: 0.6875rem;
     font-weight: 700;
-    padding: 0.1rem 0.4rem;
+    padding: 0.1rem 0.45rem;
     border-radius: 9999px;
     background: var(--lt-surface-200);
     color: var(--lt-surface-700);
@@ -406,7 +406,7 @@ html.dark .p-sidebar-menu-button.p-sidebar-active,
 }
 
 .p-sidebar-submenu-chevron {
-    margin-left: auto;
+    margin-inline-start: auto;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -1039,9 +1039,9 @@ html.dark .p-sidebar-menu-button:hover,
 html.dark .p-sidebar-menu-button.p-active,
 [data-theme="dark"] .p-sidebar-menu-button.p-active,
 .dark .p-sidebar-menu-button.p-active {
-    background: rgba(16, 185, 129, 0.15);
-    color: var(--p-primary-400, #34d399);
-    border-color: rgba(16, 185, 129, 0.3);
+    background: rgba(16, 185, 129, 0.15) !important;
+    color: var(--p-primary-400, #34d399) !important;
+    border-color: transparent !important;
 }
 
 html.dark .p-sidebar-menu-badge,

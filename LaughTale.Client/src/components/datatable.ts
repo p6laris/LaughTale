@@ -875,6 +875,10 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
             displayRows = paginator ? filtered.slice(firstIdx, firstIdx + rowsPerPage) : filtered;
         }
 
+        const totalPages = Math.max(1, Math.ceil(totalRecords / rowsPerPage));
+        const emptyMessage = props.emptyMessage || 'No records found.';
+        const showInteractiveSize = !!(props.interactiveSize || (props as any).showInteractiveSize);
+
         // Modifier Classes
         const rootClasses = ['p-datatable', 'p-component'];
         if (currentSize === 'small') rootClasses.push('p-datatable-sm');

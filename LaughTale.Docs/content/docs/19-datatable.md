@@ -8,6 +8,16 @@ category: Data & Trees
 
 # 📊 DataTable Component
 
+
+
+<div class="docs-live-sample" style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+    <div style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--p-primary-600); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.4rem;">
+        <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--p-primary-500); box-shadow: 0 0 8px var(--p-primary-500);"></span>
+        Live Interactive Preview
+    </div>
+    <div data-island="datatable" data-props='{"value": [{"id": 101, "customer": "Alice Morgan", "product": "MacBook Pro M3", "amount": 2499.00, "status": "Completed"}, {"id": 102, "customer": "Braden Vance", "product": "UltraWide Monitor", "amount": 1199.50, "status": "Processing"}, {"id": 103, "customer": "Darya Karimi", "product": "Mechanical Keyboard", "amount": 189.00, "status": "Shipped"}], "paginator": true, "rows": 5, "stripedRows": true, "showGridlines": true}' data-hydrate="load"></div>
+</div>
+
 `<island-datatable />` is LaughTale's flagship data grid component. It is built to effortlessly handle everything from small 5-row tables up to **100,000+ row datasets** with sub-15ms client hydration and EF Core server-side pagination.
 
 ---
