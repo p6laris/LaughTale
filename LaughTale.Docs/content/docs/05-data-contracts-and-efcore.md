@@ -1,4 +1,4 @@
-﻿---
+---
 title: Server-Side Data Contracts & EF Core
 description: Enterprise server-side pagination, multi-column sorting, deep filtering, and global search with EF Core translatable Expression Trees and lazy client hydration.
 order: 5
@@ -14,17 +14,11 @@ When working with large datasets (10,000 to 1,000,000+ rows), client-side in-mem
 
 ## 1. Architecture Overview
 
-```
-Browser Island (Client)                    ASP.NET Core Server (EF Core)
-┌─────────────────────────┐               ┌─────────────────────────────────┐
-│ <island-datatable       │  HTTP POST    │ app.MapIslandData<Order>(...)   │
-│   lazy="true"           │ ────────────> │                                 │
-│   lazy-url="/api/data"  │ IslandData    │ query.ToIslandDataResult(req)   │
-│ />                      │ Request JSON  │   ↓ Expression Trees (SQL)      │
-│                         │ <──────────── │   ↓ Skip / Take / Where / Order │
-│ (Renders Page Slice)    │ IslandData    │ Return IslandDataResult<Order>  │
-└─────────────────────────┘ Result JSON   └─────────────────────────────────┘
-```
+### End-to-End Server Query Flow:
+1. **Browser Island (`<island-datatable lazy="true" />`)**: Emits an `IslandDataRequest` payload containing current page, rows per page, sort columns, and filter predicates.
+2. **Endpoint Router (`app.MapIslandData<Order>("/api/orders/data", ...)`)**: Receives the request and invokes `query.ToIslandDataResultAsync(request)`.
+3. **EF Core LINQ Expression Trees**: Translates sorting and filtering directly into SQL `WHERE`, `ORDER BY`, `OFFSET`, and `FETCH NEXT` queries.
+4. **Hydration Response (`IslandDataResult<T>`)**: Returns the paginated rows slice and total record count to update the client grid instantly.
 
 ---
 

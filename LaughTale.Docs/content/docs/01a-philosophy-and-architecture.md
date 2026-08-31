@@ -1,4 +1,4 @@
-﻿---
+---
 title: Philosophy & Architecture
 description: The architectural principles behind LaughTale — Server-First rendering, progressive partial hydration, zero-FOUC SSR, and multi-framework polyglot interoperability.
 order: 2
@@ -21,19 +21,13 @@ For years, web development has faced a false dilemma:
 ### 1. HTML as the First-Class Citizen
 The fastest code is the code that is never sent to the browser. In LaughTale, 90% of your page is pure, static, highly optimized HTML rendered by ASP.NET Core Razor. JavaScript is only downloaded and executed for specific interactive regions ("islands").
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│ 📄 Page Header (Static Server HTML - 0 KB JS)               │
-├─────────────────────────┬───────────────────────────────────┤
-│ 📂 Sidebar Navigation   │ 📊 Interactive Island 1           │
-│   (Static HTML)         │    <island-datatable />           │
-│                         │    (Hydrates dynamically)         │
-├─────────────────────────┴───────────────────────────────────┤
-│ 💬 Interactive Island 2: <island-comment-box />              │
-├─────────────────────────────────────────────────────────────┤
-│ 📄 Footer (Static Server HTML - 0 KB JS)                    │
-└─────────────────────────────────────────────────────────────┘
-```
+#### Page Structure Breakdown:
+- **Header & Navbar**: Static Server HTML (0 KB JS)
+- **Sidebar Navigation**: Static Server HTML (0 KB JS)
+- **Interactive Islands**:
+  - `<island-datatable />` — Hydrates on viewport entry (`Visible`)
+  - `<island-comment-box />` — Hydrates on click/focus (`Interaction`)
+- **Footer**: Static Server HTML (0 KB JS)
 
 ---
 

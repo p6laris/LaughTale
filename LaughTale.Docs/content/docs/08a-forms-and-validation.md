@@ -1,4 +1,4 @@
-﻿---
+---
 title: Forms & Server-Side Validation
 description: Seamlessly integrate LaughTale rich input controls with ASP.NET Core Model Binding, DataAnnotations, and localized server-side validation.
 order: 9
@@ -14,18 +14,12 @@ Building rock-solid enterprise forms in ASP.NET Core with LaughTale requires **z
 
 ## 🎯 1. How It Works
 
-LaughTale form components automatically emit standard HTML form inputs (`name="..."`, `value="..."`) that bind directly to your C# PageModel or Controller action during HTTP POST submissions.
+LaughTale form components automatically emit standard HTML form inputs (`name="..."`, `value="..."`) that bind directly to your C# PageModel or Controller action during HTTP POST submissions:
 
-```
-Browser (LaughTale Form)                   ASP.NET Core Server
-┌────────────────────────────┐            ┌────────────────────────────────┐
-│ <island-input-number       │            │ [BindProperty]                 │
-│    name="Amount"           │ ──POST───> │ public OrderForm Form {get;set}│
-│ />                         │            │                                │
-│ <island-datepicker         │            │ if (!ModelState.IsValid)       │
-│    name="DeliveryDate" />  │            │     return Page(); // Re-render│
-└────────────────────────────┘            └────────────────────────────────┘
-```
+- **Browser Form**: Renders `<island-input-number name="Amount" />` and `<island-datepicker name="DeliveryDate" />`.
+- **Form Submission**: Submits standard `application/x-www-form-urlencoded` or `multipart/form-data` payload.
+- **Server Binding**: ASP.NET Core binds properties to `[BindProperty] public OrderForm Form { get; set; }`.
+- **Validation**: If `!ModelState.IsValid`, the server re-renders the page with validation error tags (`<span asp-validation-for="..." />`) and preserved user values.
 
 ---
 

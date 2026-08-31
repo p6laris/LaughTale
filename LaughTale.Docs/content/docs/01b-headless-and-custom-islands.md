@@ -1,4 +1,4 @@
-﻿---
+---
 title: Standalone Core & Headless Mode
 description: Using LaughTale as a lightweight headless Islands framework with your own custom design system, Tailwind CSS, or custom React/Vue/Svelte components without the Aura UI library.
 order: 3
@@ -19,30 +19,21 @@ You can use **`LaughTale.Core` independently** as a high-performance Islands Arc
 
 ## 🏗️ Architecture: Two Independent Layers
 
-```
-┌────────────────────────────────────────────────────────────────────────┐
-│                        LaughTale.Components                            │
-│                 (Optional UI Component Library)                        │
-│  76+ Pre-built Aura Controls: <island-datatable>, <island-datepicker>, │
-│  <island-stepper>, <island-fileupload>, <island-theme-studio>, etc.    │
-└───────────────────────────────────┬────────────────────────────────────┘
-                                    │ (Optional layer)
-                                    ▼
-┌────────────────────────────────────────────────────────────────────────┐
-│                          LaughTale.Core                                │
-│                   (The Foundation Framework)                           │
-│  • Generic <island name="..." hydrate="..." /> TagHelper               │
-│  • 5 Progressive Hydration Triggers (Load, Idle, Visible, Media, ...)   │
-│  • Declarative Directives Engine (l-model, l-on, l-show, l-bind, ...)  │
-│  • Native View Transitions & Persistent Island State across Pages      │
-│  • Multi-Framework Polyglot Engine (React, Vue, Svelte, Preact, TS)    │
-│  • Server Data Contracts & EF Core Query Extensions (100k+ Grids)      │
-│  • Server-Driven Refresh & Idiomorph DOM Morphing                      │
-│  • Inter-Island Event Bus (emitIslandEvent / onIslandEvent)            │
-│  • Strict CSP & AST Sandbox with Zero eval()                           │
-│  • Kurdish / English i18n & RTL Engine                                 │
-└────────────────────────────────────────────────────────────────────────┘
-```
+### 1. `LaughTale.Core` (The Foundation Engine)
+- Generic `<island name="..." hydrate="..." />` TagHelper
+- 5 Progressive Hydration Triggers (`Load`, `Idle`, `Visible`, `Media`, `Interaction`)
+- Declarative Directives Engine (`l-model`, `l-on`, `l-show`, `l-bind`, `l-text`, `l-html`)
+- Native View Transitions & Persistent Island State across Pages
+- Multi-Framework Polyglot Engine (React, Vue, Svelte, Preact, TypeScript)
+- Server Data Contracts & EF Core Query Extensions (100k+ Grids)
+- Server-Driven Refresh & Idiomorph DOM Morphing
+- Inter-Island Event Bus (`emitIslandEvent` / `onIslandEvent`)
+- Strict CSP & AST Sandbox with Zero `eval()`
+- Kurdish / English i18n & RTL Engine
+
+### 2. `LaughTale.Components` (Optional UI Library)
+- 76+ Pre-built Aura Controls: `<island-datatable>`, `<island-datepicker>`, `<island-stepper>`, `<island-fileupload>`, `<island-theme-studio>`, etc.
+- Seamless Dark/Light mode tokens and Speda Kurdish font support.
 
 ---
 

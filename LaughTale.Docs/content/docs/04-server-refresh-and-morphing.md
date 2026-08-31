@@ -1,4 +1,4 @@
-﻿---
+---
 title: Server-Driven Refresh & DOM Morphing
 description: Dynamically update and re-render server islands on demand with Idiomorph DOM morphing that preserves focus, cursor positions, and client state.
 order: 5
@@ -16,11 +16,10 @@ LaughTale provides **Server-Driven Island Refresh** powered by **Idiomorph DOM M
 
 ## 💡 How It Works
 
-```
-1. User Action ──> 2. Trigger Refresh ──> 3. Server Renders Island ──> 4. Morph DOM
-   (Click / Event)    (POST /_laughtale/     (Razor generates fresh      (Updates DOM
-                       island/{name})         HTML with updated props)    without losing focus)
-```
+1. **User Action**: Triggered by an event or button click.
+2. **Trigger Refresh**: Client sends a lightweight request to `POST /_laughtale/island/{name}`.
+3. **Server Renders Island**: ASP.NET Core Razor re-executes the island markup with fresh data.
+4. **Idiomorph DOM Morphing**: The client morphs only the changed DOM attributes and child nodes without losing active input focus, scroll offsets, or CSS transitions.
 
 Unlike crude `element.innerHTML = newHtml` replacements that destroy input focus, cancel animations, and reset scroll offsets, LaughTale **morphs the DOM in-place**:
 - Active input fields **retain focus and cursor positions**.
