@@ -1948,16 +1948,19 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps) {
                 const hashIndex = href.indexOf('#');
                 if (hashIndex >= 0 && (href.startsWith('#') || href.startsWith(window.location.pathname))) {
                     const targetId = href.substring(hashIndex + 1);
-                    const targetEl = document.getElementById(targetId);
+                    container.querySelectorAll('.p-sidebar-menu-button').forEach(el => el.classList.remove('p-active'));
+                    link.classList.add('p-active');
 
+                    window.history.pushState(null, '', href);
+                    window.dispatchEvent(new Event('hashchange'));
+
+                    const targetEl = document.getElementById(targetId);
                     if (targetEl) {
                         e.preventDefault();
+                        if (targetEl.style.display === 'none') {
+                            targetEl.style.display = 'block';
+                        }
                         targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-                        container.querySelectorAll('.p-sidebar-menu-button').forEach(el => el.classList.remove('p-active'));
-                        link.classList.add('p-active');
-
-                        window.history.pushState(null, '', href);
                     }
                 }
             });

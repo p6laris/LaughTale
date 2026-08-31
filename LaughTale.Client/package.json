@@ -37,7 +37,8 @@
     "build:dev": "node esbuild.config.mjs",
     "typecheck": "tsc --noEmit",
     "lint:contracts": "node scripts/verify-contracts.mjs",
-    "test": "node scripts/verify-contracts.mjs && node run-tests.mjs"
+    "test": "node scripts/verify-contracts.mjs && node run-tests.mjs",
+    "test:e2e": "npx playwright test"
   },
   "keywords": [
     "islands",
@@ -49,6 +50,7 @@
   "author": "LaughTale",
   "license": "MIT",
   "devDependencies": {
+    "@playwright/test": "^1.62.1",
     "esbuild": "^0.25.0",
     "happy-dom": "^20.11.6",
     "lucide-static": "^1.33.0",

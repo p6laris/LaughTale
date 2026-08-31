@@ -8146,10 +8146,12 @@
 (function() {
     function showTabSection(targetId) {
         if (!targetId || targetId === '#' || targetId === '/components' || targetId === '/enterprise') {
-            targetId = 'sec-dynamic-form';
+            targetId = 'sec-input-text';
         }
-        let id = targetId.replace(/^.*#/, '').trim() || 'sec-dynamic-form';
+        let id = targetId.replace(/^.*#/, '').trim() || 'sec-input-text';
         if (id === 'sec-chips') id = 'sec-inputtags';
+        if (id === 'sec-datatable') id = 'sec-datagrid';
+        if (id === 'sec-radio-button') id = 'sec-radio';
         const allCards = document.querySelectorAll('.components-sections > section, .enterprise-sections > section');
         if (!allCards || !allCards.length) return;
 
@@ -8174,8 +8176,10 @@
         document.querySelectorAll('aside a, [data-sidebar-link]').forEach(link => {
             const href = link.getAttribute('href') || '';
             if (href.endsWith('#' + id)) {
+                link.classList.add('p-active');
                 link.classList.add('active');
             } else {
+                link.classList.remove('p-active');
                 link.classList.remove('active');
             }
         });

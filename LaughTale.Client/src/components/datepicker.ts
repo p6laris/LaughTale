@@ -614,7 +614,7 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
                     ${LucideIcons.chevronLeft}
                 </button>
                 <button type="button" class="dp-title-btn btn-title">
-                    ${currentView === 'date' ? `${monthNames[month]} ${year}` : (currentView === 'month' ? `${year}` : `${Math.floor(year / 10) * 10} - ${Math.floor(year / 10) * 10 + 9}`)}
+                    ${currentView === 'date' ? `${monthNames[month]} ${locale.formatDigits(year)}` : (currentView === 'month' ? `${locale.formatDigits(year)}` : `${locale.formatDigits(Math.floor(year / 10) * 10)} - ${locale.formatDigits(Math.floor(year / 10) * 10 + 9)}`)}
                 </button>
                 <button type="button" class="dp-nav-btn btn-next" aria-label="Next">
                     ${LucideIcons.chevronRight}
@@ -646,7 +646,7 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
         for (let i = firstDayIndex - 1; i >= 0; i--) {
             const day = daysInPrevMonth - i;
             const d = new Date(year, month - 1, day);
-            cellsHtml += `<button type="button" class="dp-day-cell other-month disabled" disabled>${day}</button>`;
+            cellsHtml += `<button type="button" class="dp-day-cell other-month disabled" disabled>${locale.formatDigits(day)}</button>`;
         }
 
         // Current month days
@@ -686,7 +686,7 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
                 isDisabled ? 'disabled' : ''
             ].filter(Boolean).join(' ');
 
-            cellsHtml += `<button type="button" class="${classes}" data-day="${day}">${day}</button>`;
+            cellsHtml += `<button type="button" class="${classes}" data-day="${day}">${locale.formatDigits(day)}</button>`;
         }
 
         return `
@@ -721,7 +721,7 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
             <div class="dp-year-grid">
                 ${years.map(y => {
                     const isSelected = selectedDates.some(d => d.getFullYear() === y);
-                    return `<button type="button" class="dp-view-btn ${isSelected ? 'selected' : ''}" data-year="${y}">${y}</button>`;
+                    return `<button type="button" class="dp-view-btn ${isSelected ? 'selected' : ''}" data-year="${y}">${locale.formatDigits(y)}</button>`;
                 }).join('')}
             </div>
         `;

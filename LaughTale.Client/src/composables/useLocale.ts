@@ -625,12 +625,24 @@ export function formatString(template: string, ...args: any[]): string {
     });
 }
 
+const EASTERN_ARABIC_DIGITS = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+
+export function toLocaleDigits(val: number | string, locale: string = 'en'): string {
+    const s = String(val);
+    const norm = (locale || '').toLowerCase();
+    if (norm === 'ku' || norm.startsWith('ku') || norm === 'ckb' || norm.startsWith('ckb') || norm === 'ar' || norm.startsWith('ar')) {
+        return s.replace(/\d/g, d => EASTERN_ARABIC_DIGITS[parseInt(d, 10)]);
+    }
+    return s;
+}
+
 export interface UseLocaleResult {
     locale: string;
     dir: 'ltr' | 'rtl';
     isRtl: boolean;
     dictionary: LocaleDictionary;
     t: (key: string, ...args: any[]) => string;
+    formatDigits: (val: number | string) => string;
     formatDate: (date: Date | string | number, options?: Intl.DateTimeFormatOptions) => string;
     formatNumber: (value: number, options?: Intl.NumberFormatOptions) => string;
     formatCurrency: (value: number, currency?: string) => string;
@@ -684,6 +696,10 @@ export function useLocale(ctx?: IslandContext): UseLocaleResult {
         }
     }
 
+    function formatDigits(val: number | string): string {
+        return toLocaleDigits(val, locale);
+    }
+
     function formatCurrency(value: number, currency: string = 'USD'): string {
         try {
             return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(value);
@@ -698,6 +714,7 @@ export function useLocale(ctx?: IslandContext): UseLocaleResult {
         isRtl,
         dictionary: dict,
         t,
+        formatDigits,
         formatDate,
         formatNumber,
         formatCurrency
