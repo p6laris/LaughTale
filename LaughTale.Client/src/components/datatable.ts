@@ -817,6 +817,7 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
     function render() {
         let displayRows: Record<string, any>[];
         let totalRecords: number;
+        const firstIdx = (currentPage - 1) * rowsPerPage;
 
         if (isLazy) {
             displayRows = serverData;
@@ -871,7 +872,6 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
 
             // 3. Paginate Data
             totalRecords = filtered.length;
-            const firstIdx = (currentPage - 1) * rowsPerPage;
             displayRows = paginator ? filtered.slice(firstIdx, firstIdx + rowsPerPage) : filtered;
         }
 
