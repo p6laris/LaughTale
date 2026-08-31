@@ -1,4 +1,4 @@
-﻿/**
+/**
  * LaughTale: Enterprise Tooltip Directive & Engine (PrimeVue 4 Aura Design System compliant)
  * High-performance floating advisory tooltip with 4-direction edge arrow notches (top, bottom, left, right),
  * custom show/hide delays, hover & focus trigger events, auto-hide toggle, rich HTML content support,
@@ -73,18 +73,20 @@ const TOOLTIP_CSS = `
 }
 
 /* Dark Mode Tokens */
-.dark .p-tooltip-text,
-[data-theme="dark"] .p-tooltip-text {
-    background: var(--p-surface-900, #0f172a);
-    color: var(--p-surface-0, #f8fafc);
-    border: 1px solid var(--p-surface-700, #334155);
+html.dark .p-tooltip-text,
+[data-theme="dark"] .p-tooltip-text,
+.dark .p-tooltip-text {
+    background: var(--p-surface-0, #090d16);
+    color: var(--p-text-color, #f8fafc);
+    border: 1px solid var(--p-border-color, #334155);
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
 }
 
-.dark .p-tooltip-arrow,
-[data-theme="dark"] .p-tooltip-arrow {
-    background: var(--p-surface-900, #0f172a);
-    border-color: var(--p-surface-700, #334155);
+html.dark .p-tooltip-arrow,
+[data-theme="dark"] .p-tooltip-arrow,
+.dark .p-tooltip-arrow {
+    background: var(--p-surface-0, #090d16);
+    border-color: var(--p-border-color, #334155);
 }
 `;
 

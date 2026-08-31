@@ -16,10 +16,11 @@ export interface SkeletonProps {
 
 
 const CSS = `
-[data-theme="dark"] .laughtale-skeleton {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-100) !important;
-    border-color: var(--lt-surface-700) !important;
+html.dark .laughtale-skeleton,
+[data-theme="dark"] .laughtale-skeleton,
+.dark .laughtale-skeleton {
+    background: linear-gradient(90deg, var(--p-surface-100, #1e293b) 25%, var(--p-surface-200, #334155) 50%, var(--p-surface-100, #1e293b) 75%) !important;
+    background-size: 200% 100% !important;
 }
 `;
 

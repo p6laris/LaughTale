@@ -9,6 +9,7 @@ import { LucideIcons } from '../icons/lucide';
 import { useDisclosure } from '../composables/useDisclosure';
 import { useScrollLock } from '../composables/useScrollLock';
 import { useClipboard } from '../composables/useClipboard';
+import { injectIslandStyle } from '../runtime/styles';
 import { AURA_PALETTES, generatePaletteRamp, updateToken, saveTheme, loadSavedTheme, generateThemeExports, checkWcagCompliance } from '../styles/design-tokens';
 import { applyNeutralSurfaceTokens } from '../styles/theme-persistence';
 
@@ -77,7 +78,52 @@ const NEUTRAL_PRESETS: Record<string, NeutralPreset> = {
     }
 };
 
+const THEME_STUDIO_CSS = `
+html.dark .theme-studio-drawer,
+[data-theme="dark"] .theme-studio-drawer,
+.dark .theme-studio-drawer {
+    background: var(--p-surface-0, #090d16) !important;
+    border-color: var(--p-border-color, #334155) !important;
+    color: var(--p-text-color, #f8fafc) !important;
+}
+html.dark .theme-studio-drawer [style*="border-bottom: 1px solid var(--lt-surface-200)"],
+[data-theme="dark"] .theme-studio-drawer [style*="border-bottom: 1px solid var(--lt-surface-200)"],
+.dark .theme-studio-drawer [style*="border-bottom: 1px solid var(--lt-surface-200)"] {
+    border-color: var(--p-border-color, #334155) !important;
+}
+html.dark .theme-studio-drawer .mode-btn,
+html.dark .theme-studio-drawer .radius-btn,
+html.dark .theme-studio-drawer .density-btn,
+html.dark .theme-studio-drawer .shadow-btn,
+html.dark .theme-studio-drawer .font-btn,
+[data-theme="dark"] .theme-studio-drawer .mode-btn,
+[data-theme="dark"] .theme-studio-drawer .radius-btn,
+[data-theme="dark"] .theme-studio-drawer .density-btn,
+[data-theme="dark"] .theme-studio-drawer .shadow-btn,
+[data-theme="dark"] .theme-studio-drawer .font-btn,
+.dark .theme-studio-drawer .mode-btn,
+.dark .theme-studio-drawer .radius-btn,
+.dark .theme-studio-drawer .density-btn,
+.dark .theme-studio-drawer .shadow-btn,
+.dark .theme-studio-drawer .font-btn {
+    background: var(--p-surface-100, #1e293b) !important;
+    border-color: var(--p-border-color, #334155) !important;
+    color: var(--p-text-color, #f8fafc) !important;
+}
+html.dark .theme-studio-drawer [style*="color: var(--lt-surface-900)"],
+[data-theme="dark"] .theme-studio-drawer [style*="color: var(--lt-surface-900)"],
+.dark .theme-studio-drawer [style*="color: var(--lt-surface-900)"] {
+    color: var(--p-text-color, #f8fafc) !important;
+}
+html.dark .theme-studio-drawer [style*="color: var(--lt-surface-500)"],
+[data-theme="dark"] .theme-studio-drawer [style*="color: var(--lt-surface-500)"],
+.dark .theme-studio-drawer [style*="color: var(--lt-surface-500)"] {
+    color: var(--p-text-muted, #94a3b8) !important;
+}
+`;
+
 export default function ThemeStudioIsland(container: HTMLElement, props: ThemeStudioProps = {}, ctx?: IslandContext) {
+    injectIslandStyle('theme-studio', THEME_STUDIO_CSS);
     let currentPrimary = 'emerald';
     let currentCustomHex = '';
     let currentNeutral = 'slate';
