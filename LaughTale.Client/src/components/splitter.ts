@@ -12,13 +12,14 @@ const SPLITTER_CSS = `
 .p-splitter {
     display: flex;
     flex-wrap: nowrap;
-    border: 1px solid var(--lt-surface-200);
-    background: var(--lt-surface-0);
-    border-radius: var(--p-border-radius-md, 6px);
-    color: var(--lt-text-primary);
+    border: 1px solid var(--p-border-color, var(--lt-surface-200));
+    background: var(--p-content-bg, var(--p-surface-0, #ffffff));
+    border-radius: var(--p-border-radius-md, var(--lt-radius-md, 6px));
+    color: var(--p-text-color, var(--lt-text-primary));
     overflow: hidden;
     box-sizing: border-box;
     position: relative;
+    width: 100%;
 }
 
 .p-splitter-horizontal {
@@ -29,13 +30,27 @@ const SPLITTER_CSS = `
     flex-direction: column;
 }
 
-.p-splitterpanel {
+.p-splitterpanel,
+island-splitter-panel {
+    display: flex;
+    flex-direction: column;
     flex-grow: 1;
     overflow: auto;
     box-sizing: border-box;
     transition: flex-basis 0.15s cubic-bezier(0.2, 0, 0, 1);
+    min-width: 0;
+    min-height: 0;
 }
-.p-splitterpanel.p-splitterpanel-resizing {
+.p-splitter-horizontal > .p-splitterpanel,
+.p-splitter-horizontal > island-splitter-panel {
+    height: 100%;
+}
+.p-splitter-vertical > .p-splitterpanel,
+.p-splitter-vertical > island-splitter-panel {
+    width: 100%;
+}
+.p-splitterpanel.p-splitterpanel-resizing,
+island-splitter-panel.p-splitterpanel-resizing {
     transition: none !important;
 }
 
@@ -46,7 +61,7 @@ const SPLITTER_CSS = `
     align-items: center;
     justify-content: center;
     z-index: 5;
-    background: var(--lt-surface-100);
+    background: var(--p-surface-100, var(--lt-surface-100));
     user-select: none;
     touch-action: none;
     transition: background-color 0.15s ease, opacity 0.15s ease;
@@ -67,15 +82,15 @@ const SPLITTER_CSS = `
 .p-splitter-gutter:hover,
 .p-splitter-gutter:focus-visible,
 .p-splitter-gutter[data-resizing="true"] {
-    background: var(--lt-surface-200);
+    background: var(--p-surface-200, var(--lt-surface-200));
 }
 .p-splitter-gutter:focus-visible {
-    outline: 2px solid var(--lt-primary-500);
+    outline: 2px solid var(--p-primary-color, var(--lt-primary-500, #10b981));
     outline-offset: -1px;
 }
 
 .p-splitter-gutter-handle {
-    background: var(--lt-surface-400);
+    background: var(--p-surface-400, var(--lt-surface-400));
     border-radius: 9999px;
     transition: background-color 0.15s ease;
 }
@@ -92,13 +107,13 @@ const SPLITTER_CSS = `
 
 .p-splitter-gutter:hover > .p-splitter-gutter-handle,
 .p-splitter-gutter[data-resizing="true"] > .p-splitter-gutter-handle {
-    background: var(--lt-surface-600);
+    background: var(--p-primary-color, var(--lt-primary-500, #10b981));
 }
 
 .p-splitter[data-disabled="true"] > .p-splitter-gutter {
     cursor: default !important;
     pointer-events: none !important;
-    opacity: 0.6;
+    opacity: 0.5;
 }
 
 /* Dark Mode Tokens */
@@ -140,13 +155,13 @@ html.dark .p-splitter-gutter[data-resizing="true"] > .p-splitter-gutter-handle,
 [data-theme="dark"] .p-splitter-gutter[data-resizing="true"] > .p-splitter-gutter-handle,
 .dark .p-splitter-gutter:hover > .p-splitter-gutter-handle,
 .dark .p-splitter-gutter[data-resizing="true"] > .p-splitter-gutter-handle {
-    background: var(--p-text-muted) !important;
+    background: var(--p-primary-color, var(--lt-primary-500, #10b981)) !important;
 }
 `;
 
 export interface SplitterProps {
     layout?: 'horizontal' | 'vertical';
-    sizes?: number[];
+    sizes?: number[] | string;
     disabled?: boolean;
     stateKey?: string;
     stateStorage?: 'local' | 'session';
@@ -157,33 +172,55 @@ export interface SplitterProps {
 export default function SplitterIsland(container: HTMLElement, props: SplitterProps, ctx?: IslandContext) {
     injectIslandStyle('splitter', SPLITTER_CSS);
 
-    const rootEl = container.querySelector<HTMLElement>('.p-splitter') || container;
-    const layout = props.layout || (rootEl.classList.contains('p-splitter-vertical') ? 'vertical' : 'horizontal');
-    const isHorizontal = layout === 'horizontal';
-    const isDisabled = !!props.disabled || rootEl.getAttribute('data-disabled') === 'true';
-    const stateKey = props.stateKey || rootEl.getAttribute('data-state-key');
-
-    // Find direct child panels
-    let panels = Array.from(rootEl.children).filter(el => 
-        el.classList.contains('p-splitterpanel') || el.hasAttribute('data-splitterpanel')
-    ) as HTMLElement[];
-
-    // If no panel classes, treat all non-gutter direct children as panels
-    if (panels.length === 0) {
-        panels = Array.from(rootEl.children).filter(el => 
-            !el.classList.contains('p-splitter-gutter')
-        ) as HTMLElement[];
+    // 1. Unpack direct slot container if wrapped by server tag helper
+    const slotEl = container.querySelector(':scope > .island-slot') as HTMLElement;
+    if (slotEl) {
+        while (slotEl.firstChild) {
+            container.appendChild(slotEl.firstChild);
+        }
+        slotEl.remove();
     }
+
+    const layoutAttr = container.getAttribute('layout') || container.getAttribute('data-layout');
+    const layout = props.layout || layoutAttr || (container.classList.contains('p-splitter-vertical') ? 'vertical' : 'horizontal');
+    const isHorizontal = layout === 'horizontal';
+    const disabledAttr = container.getAttribute('disabled') === 'true' || container.hasAttribute('disabled');
+    const isDisabled = !!props.disabled || disabledAttr || container.getAttribute('data-disabled') === 'true';
+    const stateKey = props.stateKey || container.getAttribute('state-key') || container.getAttribute('data-state-key');
+
+    // 2. Find direct child panels
+    let panels = Array.from(container.children).filter(el => 
+        !el.classList.contains('p-splitter-gutter') &&
+        el.tagName !== 'SCRIPT' &&
+        el.tagName !== 'STYLE'
+    ) as HTMLElement[];
 
     if (panels.length === 0) return;
 
-    // Apply classes
-    rootEl.classList.add('p-splitter', 'p-component', isHorizontal ? 'p-splitter-horizontal' : 'p-splitter-vertical');
-    if (isDisabled) rootEl.setAttribute('data-disabled', 'true');
+    // 3. Apply base classes
+    container.classList.add('p-splitter', 'p-component', isHorizontal ? 'p-splitter-horizontal' : 'p-splitter-vertical');
+    if (isDisabled) container.setAttribute('data-disabled', 'true');
 
     panels.forEach(p => p.classList.add('p-splitterpanel'));
 
-    // Initial sizes
+    // 4. Parse sizes
+    let rawSizes: number[] | null = null;
+    if (Array.isArray(props.sizes)) {
+        rawSizes = props.sizes;
+    } else if (typeof props.sizes === 'string') {
+        rawSizes = (props.sizes as string).split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
+    } else if (Array.isArray((props as any).panelSizes)) {
+        rawSizes = (props as any).panelSizes;
+    } else if (typeof (props as any).panelSizes === 'string') {
+        rawSizes = ((props as any).panelSizes as string).split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
+    }
+
+    if (!rawSizes && container.hasAttribute('sizes')) {
+        const attr = container.getAttribute('sizes') || '';
+        rawSizes = attr.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
+    }
+
+    // 5. Initial sizes resolution
     let currentSizes: number[] = [];
     if (stateKey) {
         try {
@@ -193,37 +230,36 @@ export default function SplitterIsland(container: HTMLElement, props: SplitterPr
     }
 
     if (!currentSizes || currentSizes.length !== panels.length) {
-        if (props.sizes && props.sizes.length === panels.length) {
-            currentSizes = [...props.sizes];
+        if (rawSizes && rawSizes.length === panels.length) {
+            const sum = rawSizes.reduce((a, b) => a + b, 0);
+            currentSizes = sum > 0 ? rawSizes.map(s => (s / sum) * 100) : rawSizes;
         } else {
-            // Read from data-size attribute or divide equally
             const definedSizes = panels.map(p => {
-                const s = p.getAttribute('data-size');
+                const s = p.getAttribute('data-size') || p.getAttribute('size');
                 return s ? parseFloat(s) : null;
             });
             const hasDefined = definedSizes.some(s => s !== null);
             if (hasDefined) {
                 const filled = definedSizes.map(s => s ?? (100 / panels.length));
                 const sum = filled.reduce((a, b) => a + b, 0);
-                currentSizes = filled.map(s => (s / sum) * 100);
+                currentSizes = sum > 0 ? filled.map(s => (s / sum) * 100) : panels.map(() => 100 / panels.length);
             } else {
                 currentSizes = panels.map(() => 100 / panels.length);
             }
         }
     }
 
-    // Insert gutters if not already present
-    // Remove existing gutters first
-    Array.from(rootEl.querySelectorAll(':scope > .p-splitter-gutter')).forEach(g => g.remove());
+    // 6. Insert gutters between panels
+    Array.from(container.querySelectorAll(':scope > .p-splitter-gutter')).forEach(g => g.remove());
 
     const gutters: HTMLElement[] = [];
     for (let i = 0; i < panels.length - 1; i++) {
         const gutter = document.createElement('div');
-        gutter.className = 'p-splitter-gutter'; container.setAttribute('data-part', 'root');
+        gutter.className = 'p-splitter-gutter';
         gutter.setAttribute('role', 'separator');
         gutter.setAttribute('tabindex', isDisabled ? '-1' : '0');
         gutter.setAttribute('aria-orientation', isHorizontal ? 'vertical' : 'horizontal');
-        gutter.setAttribute('aria-valuenow', currentSizes[i].toFixed(1));
+        gutter.setAttribute('aria-valuenow', (currentSizes[i] ?? (100 / panels.length)).toFixed(1));
         
         const handle = document.createElement('div');
         handle.className = 'p-splitter-gutter-handle';
@@ -237,19 +273,29 @@ export default function SplitterIsland(container: HTMLElement, props: SplitterPr
         const gutterWidthTotal = (panels.length - 1) * 6; // 6px per gutter
         panels.forEach((p, idx) => {
             const pct = sizes[idx];
-            p.style.flexBasis = `calc(${pct}% - ${(gutterWidthTotal * pct) / 100}px)`;
+            const sizeCalc = `calc(${pct}% - ${(gutterWidthTotal * pct) / 100}px)`;
+            p.style.flexBasis = sizeCalc;
             p.style.flexGrow = '0';
             p.style.flexShrink = '0';
+            if (isHorizontal) {
+                p.style.width = sizeCalc;
+                p.style.height = '100%';
+            } else {
+                p.style.height = sizeCalc;
+                p.style.width = '100%';
+            }
 
             // Check compact mode hook
-            if (p.hasAttribute('data-compact-below')) {
-                const threshold = parseFloat(p.getAttribute('data-compact-below') || '28');
+            if (p.hasAttribute('data-compact-below') || p.hasAttribute('compact-below')) {
+                const threshold = parseFloat(p.getAttribute('data-compact-below') || p.getAttribute('compact-below') || '28');
                 p.classList.toggle('p-compact', pct < threshold);
             }
         });
 
         gutters.forEach((g, idx) => {
-            g.setAttribute('aria-valuenow', sizes[idx].toFixed(1));
+            if (sizes[idx] !== undefined) {
+                g.setAttribute('aria-valuenow', sizes[idx].toFixed(1));
+            }
         });
 
         if (stateKey && eventType === 'resizeend') {
@@ -262,7 +308,7 @@ export default function SplitterIsland(container: HTMLElement, props: SplitterPr
                 detail: { sizes: [...sizes] }
             }));
 
-            // Also dispatch global callback for demo metrics
+            // Sync metrics display in showcase
             const metricBox = container.closest('.component-card')?.querySelector('.p-splitter-metrics');
             if (metricBox) {
                 const format = (s: number[]) => s.map(n => n.toFixed(1) + '%').join(', ');
@@ -278,7 +324,7 @@ export default function SplitterIsland(container: HTMLElement, props: SplitterPr
                 }
             }
 
-            // Sync stateful demo percentage labels
+            // Sync stateful size labels
             container.closest('.component-card')?.querySelectorAll('[data-splitter-size-label]').forEach(lbl => {
                 const panelIdx = parseInt(lbl.getAttribute('data-splitter-size-label') || '0', 10);
                 if (sizes[panelIdx] !== undefined) {
@@ -292,7 +338,7 @@ export default function SplitterIsland(container: HTMLElement, props: SplitterPr
 
     if (isDisabled) return;
 
-    // Attach dragging to each gutter
+    // 7. Attach drag and keyboard interactions to gutters
     gutters.forEach((gutter, gutterIdx) => {
         let isDragging = false;
         let startPos = 0;
@@ -301,15 +347,15 @@ export default function SplitterIsland(container: HTMLElement, props: SplitterPr
         const prevPanel = panels[gutterIdx];
         const nextPanel = panels[gutterIdx + 1];
 
-        const prevMin = parseFloat(prevPanel.getAttribute('data-min-size') || '0');
-        const prevMax = parseFloat(prevPanel.getAttribute('data-max-size') || '100');
-        const prevCollapsible = prevPanel.hasAttribute('data-collapsible');
-        const prevCollapsedSize = parseFloat(prevPanel.getAttribute('data-collapsed-size') || '0');
+        const prevMin = parseFloat(prevPanel.getAttribute('data-min-size') || prevPanel.getAttribute('min-size') || '0');
+        const prevMax = parseFloat(prevPanel.getAttribute('data-max-size') || prevPanel.getAttribute('max-size') || '100');
+        const prevCollapsible = prevPanel.hasAttribute('data-collapsible') || prevPanel.getAttribute('collapsible') === 'true' || prevPanel.hasAttribute('collapsible');
+        const prevCollapsedSize = parseFloat(prevPanel.getAttribute('data-collapsed-size') || prevPanel.getAttribute('collapsed-size') || '0');
 
-        const nextMin = parseFloat(nextPanel.getAttribute('data-min-size') || '0');
-        const nextMax = parseFloat(nextPanel.getAttribute('data-max-size') || '100');
-        const nextCollapsible = nextPanel.hasAttribute('data-collapsible');
-        const nextCollapsedSize = parseFloat(nextPanel.getAttribute('data-collapsed-size') || '0');
+        const nextMin = parseFloat(nextPanel.getAttribute('data-min-size') || nextPanel.getAttribute('min-size') || '0');
+        const nextMax = parseFloat(nextPanel.getAttribute('data-max-size') || nextPanel.getAttribute('max-size') || '100');
+        const nextCollapsible = nextPanel.hasAttribute('data-collapsible') || nextPanel.getAttribute('collapsible') === 'true' || nextPanel.hasAttribute('collapsible');
+        const nextCollapsedSize = parseFloat(nextPanel.getAttribute('data-collapsed-size') || nextPanel.getAttribute('collapsed-size') || '0');
 
         function onPointerDown(e: PointerEvent) {
             isDragging = true;
@@ -328,7 +374,7 @@ export default function SplitterIsland(container: HTMLElement, props: SplitterPr
         function onPointerMove(e: PointerEvent) {
             if (!isDragging) return;
 
-            const totalSize = isHorizontal ? rootEl.offsetWidth : rootEl.offsetHeight;
+            const totalSize = isHorizontal ? container.offsetWidth : container.offsetHeight;
             if (totalSize <= 0) return;
 
             const currentPos = isHorizontal ? e.clientX : e.clientY;
