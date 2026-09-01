@@ -1150,6 +1150,7 @@ export interface SidebarProps {
 
 export default function SidebarIsland(container: HTMLElement, props: SidebarProps, ctx?: IslandContext) {
     injectIslandStyle('sidebar', SIDEBAR_CSS);
+    container.setAttribute('data-part', 'root');
 
     const items = props.items || (props as any).Items;
     const groups = props.groups || (props as any).Groups;
