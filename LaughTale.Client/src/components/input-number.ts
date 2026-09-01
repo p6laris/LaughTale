@@ -1,43 +1,48 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
-
-/**
- * LaughTale: Enterprise InputNumber Component (Aura InputNumber)
- * Seamless unified container design matching LaughTale Aura pixel-for-pixel:
- * Single outer focus ring enclosing buttons and inputs, zero blue selection on click,
- * precision internationalization, and complete dark mode themer tokens.
- */
-
 import { injectIslandStyle } from '../runtime/styles';
 
+/**
+ * LaughTale InputNumber Component
+ * Core island for numeric, currency, prefix/suffix, min/max, step, and formatted numeric inputs.
+ * Adheres to Aura Enterprise Design Tokens and PrimeVue PrimeFlex standards.
+ */
+
 export interface InputNumberProps {
-    targetInputName?: string;
-    inputId?: string;
     value?: number | null;
+    format?: boolean;
+    showButtons?: boolean;
+    buttonLayout?: 'stacked' | 'horizontal' | 'vertical';
+    incrementButtonIcon?: string;
+    decrementButtonIcon?: string;
     mode?: 'decimal' | 'currency';
-    currency?: string; // ISO 4217 e.g. 'USD', 'EUR', 'JPY', 'INR'
+    currency?: string;
     currencyDisplay?: 'symbol' | 'code' | 'name';
     locale?: string;
-    useGrouping?: boolean | string;
-    minFractionDigits?: number;
-    maxFractionDigits?: number;
     prefix?: string;
     suffix?: string;
     min?: number;
     max?: number;
     step?: number;
-    showButtons?: boolean | string;
-    buttonLayout?: 'stacked' | 'horizontal' | 'vertical';
+    minFractionDigits?: number;
+    maxFractionDigits?: number;
+    useGrouping?: boolean;
+    allowEmpty?: boolean;
+    showClear?: boolean;
+    readonly?: boolean;
+    disabled?: boolean;
+    invalid?: boolean;
+    fluid?: boolean;
     variant?: 'outlined' | 'filled';
-    size?: 'small' | 'normal' | 'large';
-    fluid?: boolean | string;
-    invalid?: boolean | string;
-    showClear?: boolean | string;
+    size?: 'small' | 'large';
     placeholder?: string;
-    disabled?: boolean | string;
+    targetInputName?: string;
+    inputId?: string;
     name?: string;
     ariaLabel?: string;
     ariaLabelledBy?: string;
+    buttonSeverity?: 'primary' | 'secondary' | 'success' | 'info' | 'warn' | 'help' | 'danger' | 'contrast';
+    buttonClass?: string;
     inputClass?: string;
     inputStyle?: Record<string, string> | string;
     pt?: PassthroughRecord;
@@ -58,12 +63,6 @@ const CSS = `
     box-sizing: border-box;
     min-height: 2.5rem;
     overflow: hidden;
-    vertical-align: middle;
-}
-
-.p-inputnumber.p-inputnumber-fluid {
-    display: flex;
-    width: 100%;
 }
 
 .p-inputnumber:hover:not(.is-disabled) {
@@ -71,24 +70,30 @@ const CSS = `
 }
 
 .p-inputnumber:focus-within:not(.is-disabled) {
-    border-color: var(--lt-primary-500) !important;
-    box-shadow: 0 0 0 1px var(--lt-primary-500) !important;
+    border-color: var(--p-primary-color, var(--lt-primary-500));
+    box-shadow: 0 0 0 1px var(--p-primary-color, var(--lt-primary-500));
+}
+
+.p-inputnumber.variant-filled {
+    background: var(--lt-surface-100);
+}
+
+.p-inputnumber.variant-filled:focus-within {
+    background: var(--lt-surface-0);
+}
+
+.p-inputnumber-fluid {
+    width: 100%;
 }
 
 .p-inputnumber.is-disabled {
-    background: var(--lt-surface-100);
-    opacity: 0.75;
+    opacity: 0.6;
     cursor: not-allowed;
+    background: var(--lt-surface-100);
 }
 
-/* Variant: Filled */
-.p-inputnumber.variant-filled {
-    background: var(--lt-surface-100);
-    border-color: transparent;
-}
-.p-inputnumber.variant-filled:focus-within {
-    background: var(--lt-surface-0);
-    border-color: var(--lt-primary-500) !important;
+.p-inputnumber.is-disabled * {
+    cursor: not-allowed;
 }
 
 /* Invalid State */
@@ -183,6 +188,72 @@ const CSS = `
     opacity: 0.5;
     cursor: not-allowed;
 }
+
+/* Button Severities */
+.p-inputnumber-button.p-button-primary {
+    background: var(--p-primary-color, var(--lt-primary-500, #10b981));
+    color: var(--p-primary-contrast-color, #ffffff);
+}
+.p-inputnumber-button.p-button-primary:hover:not(:disabled) {
+    background: var(--p-primary-hover-color, var(--lt-primary-600, #059669));
+}
+
+.p-inputnumber-button.p-button-secondary {
+    background: var(--lt-surface-200);
+    color: var(--lt-surface-800);
+}
+.p-inputnumber-button.p-button-secondary:hover:not(:disabled) {
+    background: var(--lt-surface-300);
+}
+
+.p-inputnumber-button.p-button-success {
+    background: var(--lt-success-500, #10b981);
+    color: #ffffff;
+}
+.p-inputnumber-button.p-button-success:hover:not(:disabled) {
+    background: var(--lt-success-600, #059669);
+}
+
+.p-inputnumber-button.p-button-info {
+    background: var(--lt-info-500, #3b82f6);
+    color: #ffffff;
+}
+.p-inputnumber-button.p-button-info:hover:not(:disabled) {
+    background: var(--lt-info-600, #2563eb);
+}
+
+.p-inputnumber-button.p-button-warn {
+    background: var(--lt-warn-500, #f59e0b);
+    color: #ffffff;
+}
+.p-inputnumber-button.p-button-warn:hover:not(:disabled) {
+    background: var(--lt-warn-600, #d97706);
+}
+
+.p-inputnumber-button.p-button-help {
+    background: #a855f7;
+    color: #ffffff;
+}
+.p-inputnumber-button.p-button-help:hover:not(:disabled) {
+    background: #9333ea;
+}
+
+.p-inputnumber-button.p-button-danger {
+    background: var(--lt-danger-500, #ef4444);
+    color: #ffffff;
+}
+.p-inputnumber-button.p-button-danger:hover:not(:disabled) {
+    background: var(--lt-danger-600, #dc2626);
+}
+
+.p-inputnumber-button.p-button-contrast {
+    background: var(--lt-surface-900);
+    color: var(--lt-surface-0);
+}
+.p-inputnumber-button.p-button-contrast:hover:not(:disabled) {
+    background: var(--lt-surface-950);
+}
+
 .p-inputnumber-button svg {
     width: 12px;
     height: 12px;
@@ -301,18 +372,6 @@ html.dark .p-inputnumber-button,
 .dark .p-inputnumber-button {
     background: var(--p-surface-100);
     color: var(--p-text-muted);
-    border-color: var(--p-border-color);
-}
-html.dark .p-inputnumber:focus-within .p-inputnumber-button-group,
-html.dark .p-inputnumber:focus-within .p-inputnumber-button-up,
-html.dark .p-inputnumber:focus-within .p-inputnumber-button-down,
-[data-theme="dark"] .p-inputnumber:focus-within .p-inputnumber-button-group,
-[data-theme="dark"] .p-inputnumber:focus-within .p-inputnumber-button-up,
-[data-theme="dark"] .p-inputnumber:focus-within .p-inputnumber-button-down,
-.dark .p-inputnumber:focus-within .p-inputnumber-button-group,
-.dark .p-inputnumber:focus-within .p-inputnumber-button-up,
-.dark .p-inputnumber:focus-within .p-inputnumber-button-down {
-    border-color: var(--p-primary-500);
 }
 html.dark .p-inputnumber-button:hover:not(:disabled),
 [data-theme="dark"] .p-inputnumber-button:hover:not(:disabled),
@@ -325,29 +384,53 @@ html.dark .p-inputnumber-button:active:not(:disabled),
 .dark .p-inputnumber-button:active:not(:disabled) {
     background: var(--p-surface-300);
 }
+html.dark .p-inputnumber-button-group,
+html.dark .p-inputnumber-stacked .p-inputnumber-button-up,
+html.dark .p-inputnumber-horizontal .p-inputnumber-button-down,
+html.dark .p-inputnumber-horizontal .p-inputnumber-button-up,
+html.dark .p-inputnumber-vertical .p-inputnumber-button-up,
+html.dark .p-inputnumber-vertical .p-inputnumber-button-down,
+[data-theme="dark"] .p-inputnumber-button-group,
+[data-theme="dark"] .p-inputnumber-stacked .p-inputnumber-button-up,
+[data-theme="dark"] .p-inputnumber-horizontal .p-inputnumber-button-down,
+[data-theme="dark"] .p-inputnumber-horizontal .p-inputnumber-button-up,
+[data-theme="dark"] .p-inputnumber-vertical .p-inputnumber-button-up,
+[data-theme="dark"] .p-inputnumber-vertical .p-inputnumber-button-down,
+.dark .p-inputnumber-button-group,
+.dark .p-inputnumber-stacked .p-inputnumber-button-up,
+.dark .p-inputnumber-horizontal .p-inputnumber-button-down,
+.dark .p-inputnumber-horizontal .p-inputnumber-button-up,
+.dark .p-inputnumber-vertical .p-inputnumber-button-up,
+.dark .p-inputnumber-vertical .p-inputnumber-button-down {
+    border-color: var(--p-border-color);
+}
 `;
 
-export default function InputNumberIsland(container: HTMLElement, props: InputNumberProps, ctx?: IslandContext) {
-    injectIslandStyle('laughtale-inputnumber', CSS);
+export function initInputNumber(
+    container: HTMLElement,
+    props: InputNumberProps = {},
+    ctx?: IslandContext
+): void {
+    injectIslandStyle('lt-inputnumber-style', CSS);
 
-    let rawValue: number | null = props.value !== undefined && props.value !== null ? Number(props.value) : null;
-    const step = props.step !== undefined ? Number(props.step) : 1;
-    const min = props.min !== undefined ? Number(props.min) : undefined;
-    const max = props.max !== undefined ? Number(props.max) : undefined;
-    const isCurrency = props.mode === 'currency';
+    let rawValue: number | null = props.value !== undefined ? (props.value === null ? null : Number(props.value)) : null;
+    const mode = props.mode || 'decimal';
+    const isCurrency = mode === 'currency';
     const currency = props.currency || 'USD';
     const currencyDisplay = props.currencyDisplay || 'symbol';
-    const locale = props.locale || undefined;
-    const useGrouping = props.useGrouping !== false && String(props.useGrouping) !== 'false';
-    const buttonLayout = props.buttonLayout || 'stacked';
-    const showButtons = props.showButtons === true || String(props.showButtons) === 'true';
-    const isFluid = props.fluid === true || String(props.fluid) === 'true';
-    const isInvalid = props.invalid === true || String(props.invalid) === 'true';
+    const locale = props.locale || 'en-US';
+    const min = props.min !== undefined ? Number(props.min) : undefined;
+    const max = props.max !== undefined ? Number(props.max) : undefined;
+    const step = props.step !== undefined ? Number(props.step) : 1;
+    const isFluid = props.fluid ?? false;
     const isFilled = props.variant === 'filled';
-    const isDisabled = props.disabled === true || String(props.disabled) === 'true';
-    const showClear = props.showClear === true || String(props.showClear) === 'true';
+    const isDisabled = props.disabled ?? false;
+    const isInvalid = props.invalid ?? false;
+    const showButtons = props.showButtons ?? false;
+    const buttonLayout = props.buttonLayout || 'stacked';
+    const showClear = props.showClear ?? false;
+    const useGrouping = props.useGrouping ?? true;
 
-    // Determine default min/max fraction digits
     let minFractionDigits = props.minFractionDigits !== undefined ? Number(props.minFractionDigits) : undefined;
     let maxFractionDigits = props.maxFractionDigits !== undefined ? Number(props.maxFractionDigits) : undefined;
     if (minFractionDigits === undefined && maxFractionDigits === undefined) {
@@ -452,17 +535,21 @@ export default function InputNumberIsland(container: HTMLElement, props: InputNu
         const minusIcon = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>`;
         const clearIcon = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
 
+        const btnSevClass = props.buttonSeverity ? `p-button-${props.buttonSeverity.toLowerCase()}` : '';
+        const customBtnClass = props.buttonClass || '';
+        const btnCls = `p-inputnumber-button ${btnSevClass} ${customBtnClass}`.trim();
+
         let html = '';
 
         if (showButtons && buttonLayout === 'horizontal') {
             html += `
-                <button type="button" class="p-inputnumber-button p-inputnumber-button-down" data-part="root" tabindex="-1" ${disabledAttr} aria-label="Decrement">
+                <button type="button" class="${btnCls} p-inputnumber-button-down" data-part="root" tabindex="-1" ${disabledAttr} aria-label="Decrement">
                     ${minusIcon}
                 </button>
             `;
         } else if (showButtons && buttonLayout === 'vertical') {
             html += `
-                <button type="button" class="p-inputnumber-button p-inputnumber-button-up" tabindex="-1" ${disabledAttr} aria-label="Increment">
+                <button type="button" class="${btnCls} p-inputnumber-button-up" tabindex="-1" ${disabledAttr} aria-label="Increment">
                     ${plusIcon}
                 </button>
             `;
@@ -497,23 +584,23 @@ export default function InputNumberIsland(container: HTMLElement, props: InputNu
             if (buttonLayout === 'stacked') {
                 html += `
                     <div class="p-inputnumber-button-group">
-                        <button type="button" class="p-inputnumber-button p-inputnumber-button-up" tabindex="-1" ${disabledAttr} aria-label="Increment">
+                        <button type="button" class="${btnCls} p-inputnumber-button-up" tabindex="-1" ${disabledAttr} aria-label="Increment">
                             ${upIcon}
                         </button>
-                        <button type="button" class="p-inputnumber-button p-inputnumber-button-down" tabindex="-1" ${disabledAttr} aria-label="Decrement">
+                        <button type="button" class="${btnCls} p-inputnumber-button-down" tabindex="-1" ${disabledAttr} aria-label="Decrement">
                             ${downIcon}
                         </button>
                     </div>
                 `;
             } else if (buttonLayout === 'horizontal') {
                 html += `
-                    <button type="button" class="p-inputnumber-button p-inputnumber-button-up" tabindex="-1" ${disabledAttr} aria-label="Increment">
+                    <button type="button" class="${btnCls} p-inputnumber-button-up" tabindex="-1" ${disabledAttr} aria-label="Increment">
                         ${plusIcon}
                     </button>
                 `;
             } else if (buttonLayout === 'vertical') {
                 html += `
-                    <button type="button" class="p-inputnumber-button p-inputnumber-button-down" tabindex="-1" ${disabledAttr} aria-label="Decrement">
+                    <button type="button" class="${btnCls} p-inputnumber-button-down" tabindex="-1" ${disabledAttr} aria-label="Decrement">
                         ${minusIcon}
                     </button>
                 `;
@@ -571,7 +658,7 @@ export default function InputNumberIsland(container: HTMLElement, props: InputNu
 
         // Step Buttons (Prevent focus event from highlighting text)
         upBtn?.addEventListener('mousedown', (e) => {
-            e.preventDefault(); // Prevents loss of focus or unwanted text selection
+            e.preventDefault();
         }, { signal: ctx?.signal });
         upBtn?.addEventListener('click', (e) => {
             e.preventDefault();
@@ -579,7 +666,7 @@ export default function InputNumberIsland(container: HTMLElement, props: InputNu
         }, { signal: ctx?.signal });
 
         downBtn?.addEventListener('mousedown', (e) => {
-            e.preventDefault(); // Prevents loss of focus or unwanted text selection
+            e.preventDefault();
         }, { signal: ctx?.signal });
         downBtn?.addEventListener('click', (e) => {
             e.preventDefault();
@@ -644,4 +731,8 @@ export default function InputNumberIsland(container: HTMLElement, props: InputNu
 
     render();
     syncTargetInput();
+}
+
+export default function(container: HTMLElement, props: InputNumberProps = {}, ctx?: IslandContext): void {
+    initInputNumber(container, props, ctx);
 }

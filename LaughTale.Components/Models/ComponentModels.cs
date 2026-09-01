@@ -527,7 +527,7 @@ public record InputNumberProps(
     string? Prefix = null, string? Suffix = null, double? Min = null, double? Max = null, double Step = 1,
     bool ShowButtons = false, ButtonLayout ButtonLayout = ButtonLayout.Stacked, InputVariant Variant = InputVariant.Outlined, ComponentSize Size = ComponentSize.Normal,
     bool Fluid = false, bool Invalid = false, bool ShowClear = false, string? Placeholder = null,
-    string? TargetInput = null, bool Disabled = false
+    string? TargetInput = null, bool Disabled = false, ButtonSeverity? ButtonSeverity = null, string? ButtonClass = null
 );
 
 [LaughTale.Core.Attributes.Island("number")]
@@ -656,6 +656,22 @@ public record RadioButtonProps(
     bool Invalid = false, bool Disabled = false
 );
 
+[LaughTale.Core.Attributes.Island("radio-group")]
+public record RadioGroupProps(
+    string? Name = null, object? Options = null, string? Value = null, string? SelectedValue = null,
+    string? Layout = "vertical", bool Card = false, InputVariant Variant = InputVariant.Outlined,
+    ComponentSize Size = ComponentSize.Normal, bool Invalid = false, bool Disabled = false
+);
+
+[LaughTale.Core.Attributes.Island("split-button")]
+public record SplitButtonProps(
+    string? Label = null, string? Icon = null, string? DropdownIcon = null,
+    object? Model = null, ButtonSeverity Severity = ButtonSeverity.Primary,
+    bool Raised = false, bool Rounded = false, bool Text = false, bool Outlined = false,
+    ComponentSize Size = ComponentSize.Normal, bool Disabled = false, bool Fluid = false,
+    string? Action = null, string? AppendTo = "body"
+);
+
 [LaughTale.Core.Attributes.Island("rating")]
 public record RatingProps(
     double? Value = null, int Stars = 5, bool Cancel = true, bool ReadOnly = false, bool Disabled = false
@@ -695,10 +711,11 @@ public record ToggleSwitchProps(
 
 [LaughTale.Core.Attributes.Island("tree-select")]
 public record TreeSelectProps(
-    object? Value = null, object? Options = null, string? Placeholder = "Select Item",
-    string? SelectionMode = "single", string? Display = "comma", bool Filter = false,
-    string? FilterPlaceholder = "Filter...", bool ShowClear = false, bool Fluid = false,
-    InputVariant Variant = InputVariant.Outlined, ComponentSize Size = ComponentSize.Normal, bool Invalid = false, bool Disabled = false
+    object? Value = null, object? Options = null, object? Nodes = null, object? Departments = null,
+    string? Placeholder = "Select Item", string? SelectionMode = "single", string? Display = "comma",
+    bool Filter = false, string? FilterPlaceholder = "Filter...", bool ShowClear = false, bool Fluid = false,
+    InputVariant Variant = InputVariant.Outlined, ComponentSize Size = ComponentSize.Normal,
+    bool Invalid = false, bool Disabled = false, string? Header = null, string? Footer = null
 );
 
 [LaughTale.Core.Attributes.Island("datatable")]
@@ -907,7 +924,9 @@ public record BlockUIProps(
 [LaughTale.Core.Attributes.Island("speed-dial")]
 public record SpeedDialProps(
     object? Model = null, string? Direction = "up", string? Type = "linear",
-    double Radius = 0, string? Mask = "none", bool Visible = false, bool RotateAnimation = true
+    double Radius = 0, string? Mask = "none", bool Visible = false, bool RotateAnimation = true,
+    string? ButtonSeverity = null, object? ButtonProps = null, int? TransitionDelay = null,
+    string? Template = null, object? TooltipOptions = null
 );
 
 [LaughTale.Core.Attributes.Island("scroll-top")]

@@ -287,7 +287,7 @@ const DATATABLE_CSS = `
 }
 
 /* Aura Tags & Badges */
-.p-tag {
+.p-datatable .p-tag {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -299,12 +299,13 @@ const DATATABLE_CSS = `
     letter-spacing: 0.02em;
     text-transform: capitalize;
     white-space: nowrap;
+    position: static;
 }
-.p-tag-success { background: var(--lt-success-100, var(--lt-success-100)); color: var(--lt-success-700, var(--lt-success-700)); }
-.p-tag-warn { background: var(--lt-warn-100, var(--lt-warn-100)); color: var(--lt-warn-700, var(--lt-warn-700)); }
-.p-tag-danger { background: var(--lt-danger-100, var(--lt-danger-100)); color: var(--lt-danger-700, var(--lt-danger-700)); }
-.p-tag-info { background: var(--lt-info-100); color: var(--lt-info-700); }
-.p-tag-secondary { background: var(--lt-surface-100); color: var(--lt-surface-700); }
+.p-datatable .p-tag-success { background: var(--lt-success-100, var(--lt-success-100)); color: var(--lt-success-700, var(--lt-success-700)); }
+.p-datatable .p-tag-warn { background: var(--lt-warn-100, var(--lt-warn-100)); color: var(--lt-warn-700, var(--lt-warn-700)); }
+.p-datatable .p-tag-danger { background: var(--lt-danger-100, var(--lt-danger-100)); color: var(--lt-danger-700, var(--lt-danger-700)); }
+.p-datatable .p-tag-info { background: var(--lt-info-100); color: var(--lt-info-700); }
+.p-datatable .p-tag-secondary { background: var(--lt-surface-100); color: var(--lt-surface-700); }
 
 /* Product, Rep & Country Flex Formats */
 .p-product-cell {
@@ -474,8 +475,12 @@ const DATATABLE_CSS = `
     color: var(--lt-surface-900);
 }
 .p-paginator-page.p-paginator-page-active {
-    background: var(--lt-primary-500);
-    color: var(--lt-surface-0, var(--lt-surface-0));
+    background: var(--p-primary-color, var(--lt-primary-500, #10b981)) !important;
+    color: var(--p-primary-contrast-color, #ffffff) !important;
+    font-weight: 700;
+}
+.p-paginator-page.p-paginator-page-active:hover {
+    background: var(--p-primary-hover-color, var(--lt-primary-600, #059669)) !important;
 }
 .p-paginator-page:disabled, .p-paginator-nav:disabled {
     opacity: 0.4;
@@ -759,7 +764,9 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
 
         // 3. Product with SKU subtitle
         if ((fieldName === 'name' || headerName === 'product') && row.code) {
-            return `
+            const hasCodeCol = columns.some(c => (c.field || '').toLowerCase() === 'code');
+            if (!hasCodeCol) {
+                return `
                 <div class="p-product-cell">
                     <div class="p-product-avatar">${LucideIcons.package}</div>
                     <div class="p-product-info">
@@ -768,6 +775,8 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                     </div>
                 </div>
             `;
+            }
+            return `<span style="font-weight: 600; color: var(--lt-surface-900);">${row.name ?? rawVal ?? ''}</span>`;
         }
 
         // 4. Country with Flag Icon

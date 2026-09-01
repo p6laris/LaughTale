@@ -79,12 +79,18 @@ defineIsland('orgchart', () => import('./components/orgchart'));
 defineIsland('galleria', () => import('./components/galleria'));
 defineIsland('blockui', () => import('./components/blockui'));
 defineIsland('split-button', () => import('./components/split-button'));
+defineIsland('splitbutton', () => import('./components/split-button'));
+defineIsland('speeddial', () => import('./components/speed-dial'));
 
 // Form & Navigation Phase 2 Components
 defineIsland('select', () => import('./components/select'));
 defineIsland('checkbox', () => import('./components/checkbox'));
 defineIsland('radio-button', () => import('./components/radio-button'));
 defineIsland('radiobutton', () => import('./components/radio-button'));
+defineIsland('radio-group', () => import('./components/radio-button'));
+defineIsland('radiogroup', () => import('./components/radio-button'));
+defineIsland('toggleswitch', () => import('./components/toggle-switch'));
+defineIsland('togglebutton', () => import('./components/toggle-button'));
 defineIsland('textarea', () => import('./components/textarea'));
 defineIsland('input-mask', () => import('./components/input-mask'));
 defineIsland('inputmask', () => import('./components/input-mask'));

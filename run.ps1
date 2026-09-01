@@ -29,7 +29,7 @@ function Stop-RunningInstances {
             }
         } catch { }
     }
-    Get-Process -Name "LaughTale.Showcase", "LaughTale.Docs" -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+    Get-Process -Name "LaughTale.Showcase", "LaughTale.Docs", "VBCSCompiler" -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
 }
 
 Write-Host ""
@@ -46,9 +46,9 @@ Start-Sleep -Milliseconds 300
 # 2. Build Check
 $showcaseBundle = "LaughTale.Showcase/wwwroot/js/islands.js"
 $docsBundle = "LaughTale.Docs/wwwroot/js/islands.js"
-$needsBuild = $Build -or (-not (Test-Path $showcaseBundle)) -or (-not (Test-Path $docsBundle))
+$needsClientBuild = $Build -or (-not (Test-Path $showcaseBundle)) -or (-not (Test-Path $docsBundle))
 
-if ($needsBuild) {
+if ($needsClientBuild) {
     Write-Host "[2/3] Building TypeScript & Client Island bundles..." -ForegroundColor Yellow
     
     if (Test-Path "LaughTale.Showcase/package.json") {
@@ -62,10 +62,20 @@ if ($needsBuild) {
     Write-Host "[2/3] Client bundles up-to-date (use -Build to force recompile)." -ForegroundColor DarkGray
 }
 
+# 2.1 Unified Solution Build to avoid VBCSCompiler lock races
+Write-Host "       Ensuring solution binaries are compiled..." -ForegroundColor Yellow
+dotnet build LaughTale.slnx --nologo --verbosity minimal
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "Solution build failed. Please resolve compilation errors."
+    exit 1
+}
+Write-Host "       Solution built successfully." -ForegroundColor Green
+
 # 3. Launch Target(s)
 Write-Host "[3/3] Launching application services..." -ForegroundColor Yellow
 
 $dotnetCmd = if ($Watch) { "watch" } else { "run" }
+$runArgs = if ($Watch) { "" } else { "--no-build" }
 
 # Optional auto-open helper
 function Open-UrlAsync([string]$url) {
@@ -82,7 +92,7 @@ if ($ShowcaseOnly) {
     Write-Host "`n -> Enterprise Showcase: http://localhost:$ShowcasePort/enterprise" -ForegroundColor Green
     Write-Host "    Press Ctrl+C to stop.`n" -ForegroundColor DarkGray
     Open-UrlAsync "http://localhost:$ShowcasePort/enterprise"
-    dotnet $dotnetCmd --project LaughTale.Showcase/LaughTale.Showcase.csproj --urls "http://localhost:$ShowcasePort"
+    dotnet $dotnetCmd $runArgs --project LaughTale.Showcase/LaughTale.Showcase.csproj --urls "http://localhost:$ShowcasePort"
     exit
 }
 
@@ -90,14 +100,14 @@ if ($DocsOnly) {
     Write-Host "`n -> Documentation Portal: http://localhost:$DocsPort" -ForegroundColor Cyan
     Write-Host "    Press Ctrl+C to stop.`n" -ForegroundColor DarkGray
     Open-UrlAsync "http://localhost:$DocsPort"
-    dotnet $dotnetCmd --project LaughTale.Docs/LaughTale.Docs.csproj --urls "http://localhost:$DocsPort"
+    dotnet $dotnetCmd $runArgs --project LaughTale.Docs/LaughTale.Docs.csproj --urls "http://localhost:$DocsPort"
     exit
 }
 
 # Dual Service Mode (Showcase in foreground, Docs in background)
 $docsLog = [System.IO.Path]::GetTempFileName()
 $docsProcess = Start-Process -FilePath "dotnet" `
-    -ArgumentList "run --project LaughTale.Docs/LaughTale.Docs.csproj --urls http://localhost:$DocsPort" `
+    -ArgumentList "run $runArgs --project LaughTale.Docs/LaughTale.Docs.csproj --urls http://localhost:$DocsPort" `
     -RedirectStandardError $docsLog `
     -WindowStyle Hidden `
     -PassThru
@@ -115,7 +125,7 @@ Write-Host ""
 Open-UrlAsync "http://localhost:$ShowcasePort/enterprise"
 
 try {
-    dotnet $dotnetCmd --project LaughTale.Showcase/LaughTale.Showcase.csproj --urls "http://localhost:$ShowcasePort"
+    dotnet $dotnetCmd $runArgs --project LaughTale.Showcase/LaughTale.Showcase.csproj --urls "http://localhost:$ShowcasePort"
 }
 finally {
     Write-Host "`n[!] Shutting down all LaughTale background services..." -ForegroundColor Yellow

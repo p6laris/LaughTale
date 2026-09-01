@@ -114,8 +114,8 @@ export function generateSubsetSprite(iconNames) {
     const symbols = [];
     const seen = new Set();
 
-    // Always include fallback 'zap'
-    const requested = new Set(['zap', ...(iconNames || [])]);
+    // Always include fallback 'zap' and all canonical aliases
+    const requested = new Set(['zap', ...Object.keys(ALIASES), ...Object.values(ALIASES), ...(iconNames || [])]);
 
     for (const rawName of requested) {
         if (!rawName) continue;

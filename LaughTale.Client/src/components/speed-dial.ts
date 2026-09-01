@@ -1,10 +1,5 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
-﻿/**
- * LaughTale: Enterprise SpeedDial Island Component
- * Strictly compliant with Aura Design System tokens, animations, and trigonometry.
- */
-
 import { getLucideIcon, LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
 import { executeCommand } from '../runtime/commands';
@@ -50,6 +45,7 @@ export interface SpeedDialProps {
     hideIcon?: string;
     rotateAnimation?: boolean;
     buttonProps?: SpeedDialButtonProps;
+    buttonSeverity?: string;
     tooltipOptions?: SpeedDialTooltipOptions;
     ariaLabel?: string;
     template?: 'default' | 'custom';
@@ -73,13 +69,84 @@ const SPEEDDIAL_CSS = `
     width: 3rem;
     height: 3rem;
     border-radius: 50%;
+    background: var(--p-primary-color, var(--lt-primary-500, #10b981));
+    color: var(--p-primary-contrast-color, #ffffff);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.15), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s;
+    transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s, transform 0.2s;
     outline: none;
+    border: none;
+}
+
+.p-speeddial-button:hover {
+    background: var(--p-primary-hover-color, var(--lt-primary-600, #059669));
+}
+
+.p-speeddial-button.p-button-primary {
+    background: var(--p-primary-color, var(--lt-primary-500, #10b981));
+    color: var(--p-primary-contrast-color, #ffffff);
+}
+.p-speeddial-button.p-button-primary:hover {
+    background: var(--p-primary-hover-color, var(--lt-primary-600, #059669));
+}
+
+.p-speeddial-button.p-button-secondary {
+    background: var(--p-surface-200, var(--lt-surface-200));
+    color: var(--p-surface-800, var(--lt-surface-800));
+}
+.p-speeddial-button.p-button-secondary:hover {
+    background: var(--p-surface-300, var(--lt-surface-300));
+}
+
+.p-speeddial-button.p-button-success {
+    background: var(--p-green-500, var(--lt-success-500, #10b981));
+    color: #ffffff;
+}
+.p-speeddial-button.p-button-success:hover {
+    background: var(--p-green-600, var(--lt-success-600, #059669));
+}
+
+.p-speeddial-button.p-button-info {
+    background: var(--p-blue-500, var(--lt-info-500, #3b82f6));
+    color: #ffffff;
+}
+.p-speeddial-button.p-button-info:hover {
+    background: var(--p-blue-600, var(--lt-info-600, #2563eb));
+}
+
+.p-speeddial-button.p-button-warn {
+    background: var(--p-amber-500, var(--lt-warn-500, #f59e0b));
+    color: #ffffff;
+}
+.p-speeddial-button.p-button-warn:hover {
+    background: var(--p-amber-600, var(--lt-warn-600, #d97706));
+}
+
+.p-speeddial-button.p-button-help {
+    background: var(--p-purple-500, #a855f7);
+    color: #ffffff;
+}
+.p-speeddial-button.p-button-help:hover {
+    background: var(--p-purple-600, #9333ea);
+}
+
+.p-speeddial-button.p-button-danger {
+    background: var(--p-red-500, var(--lt-danger-500, #ef4444));
+    color: #ffffff;
+}
+.p-speeddial-button.p-button-danger:hover {
+    background: var(--p-red-600, var(--lt-danger-600, #dc2626));
+}
+
+.p-speeddial-button.p-button-contrast {
+    background: var(--p-surface-900, var(--lt-surface-900));
+    color: var(--p-surface-0, var(--lt-surface-0));
+}
+.p-speeddial-button.p-button-contrast:hover {
+    background: var(--p-surface-950, var(--lt-surface-950));
 }
 
 .p-speeddial-button:focus-visible {
-    outline: 2px solid var(--lt-primary-500);
+    outline: 2px solid var(--p-primary-color, var(--lt-primary-500));
     outline-offset: 2px;
 }
 
@@ -461,12 +528,9 @@ export default function SpeedDialIsland(container: HTMLElement, props: SpeedDial
 
     let isOpen = false;
 
-    // Severity mapping
-    const btnSev = props.buttonProps?.severity || 'contrast';
-    let btnSevClass = 'p-button-contrast';
-    if (btnSev !== 'contrast') {
-        btnSevClass = `p-button-${btnSev.toLowerCase()}`;
-    }
+    // Severity mapping (defaults to primary theme color)
+    const btnSev = props.buttonSeverity || props.buttonProps?.severity || 'primary';
+    const btnSevClass = `p-button-${btnSev.toLowerCase()}`;
     const btnRounded = props.buttonProps?.rounded !== false ? 'p-button-rounded' : '';
     const btnIconOnly = props.buttonProps?.iconOnly !== false ? 'p-button-icon-only' : '';
     const customBtnClass = props.buttonProps?.styleClass || '';

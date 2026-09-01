@@ -344,7 +344,8 @@ const DATAVIEW_CSS = `
 }
 
 /* Status Tags */
-.p-tag {
+.p-dataview .p-dataview-list-image-box .p-tag,
+.p-dataview .p-dataview-grid-image-box .p-tag {
     position: absolute;
     top: 0.5rem;
     left: 0.5rem;
@@ -360,9 +361,9 @@ const DATAVIEW_CSS = `
     text-transform: capitalize;
     z-index: 2;
 }
-.p-tag-success { background: var(--lt-success-100, var(--lt-success-100)); color: var(--lt-success-700, var(--lt-success-700)); }
-.p-tag-warn { background: var(--lt-warn-100, var(--lt-warn-100)); color: var(--lt-warn-700, var(--lt-warn-700)); }
-.p-tag-danger { background: var(--lt-danger-100, var(--lt-danger-100)); color: var(--lt-danger-700, var(--lt-danger-700)); }
+.p-dataview .p-tag-success { background: var(--lt-success-100, var(--lt-success-100)); color: var(--lt-success-700, var(--lt-success-700)); }
+.p-dataview .p-tag-warn { background: var(--lt-warn-100, var(--lt-warn-100)); color: var(--lt-warn-700, var(--lt-warn-700)); }
+.p-dataview .p-tag-danger { background: var(--lt-danger-100, var(--lt-danger-100)); color: var(--lt-danger-700, var(--lt-danger-700)); }
 
 /* Skeleton Shimmer */
 .p-skeleton {
@@ -415,8 +416,12 @@ const DATAVIEW_CSS = `
     color: var(--lt-surface-900);
 }
 .p-paginator-page.p-paginator-page-active {
-    background: var(--lt-primary-500);
-    color: var(--lt-surface-0, var(--lt-surface-0));
+    background: var(--p-primary-color, var(--lt-primary-500, #10b981)) !important;
+    color: var(--p-primary-contrast-color, #ffffff) !important;
+    font-weight: 700;
+}
+.p-paginator-page.p-paginator-page-active:hover {
+    background: var(--p-primary-hover-color, var(--lt-primary-600, #059669)) !important;
 }
 .p-paginator-page:disabled, .p-paginator-nav:disabled {
     opacity: 0.4;

@@ -300,10 +300,10 @@ const TREETABLE_CSS = `
     font-weight: 600;
     letter-spacing: 0.02em;
 }
-.p-tag-warn { background: var(--lt-warn-100, var(--lt-warn-100)); color: var(--lt-warn-700, var(--lt-warn-700)); }
-.p-tag-info { background: var(--lt-info-100); color: var(--lt-info-700); }
-.p-tag-success { background: var(--lt-success-100, var(--lt-success-100)); color: var(--lt-success-700, var(--lt-success-700)); }
-.p-tag-secondary { background: var(--lt-surface-100, var(--lt-surface-100)); color: var(--lt-surface-600, var(--lt-surface-600)); }
+.p-treetable .p-tag-warn { background: var(--lt-warn-100, var(--lt-warn-100)); color: var(--lt-warn-700, var(--lt-warn-700)); }
+.p-treetable .p-tag-info { background: var(--lt-info-100); color: var(--lt-info-700); }
+.p-treetable .p-tag-success { background: var(--lt-success-100, var(--lt-success-100)); color: var(--lt-success-700, var(--lt-success-700)); }
+.p-treetable .p-tag-secondary { background: var(--lt-surface-100, var(--lt-surface-100)); color: var(--lt-surface-600, var(--lt-surface-600)); }
 
 /* Paginator Integration */
 .p-treetable-paginator {
@@ -335,8 +335,12 @@ const TREETABLE_CSS = `
     background: var(--lt-surface-100);
 }
 .p-treetable-paginator-btn.p-highlight {
-    background: var(--lt-surface-900);
-    color: var(--lt-surface-0, var(--lt-surface-0));
+    background: var(--p-primary-color, var(--lt-primary-500, #10b981)) !important;
+    color: var(--p-primary-contrast-color, #ffffff) !important;
+    font-weight: 700;
+}
+.p-treetable-paginator-btn.p-highlight:hover {
+    background: var(--p-primary-hover-color, var(--lt-primary-600, #059669)) !important;
 }
 .p-treetable-paginator-btn:disabled {
     opacity: 0.35;

@@ -36,10 +36,10 @@ const PAGINATOR_CSS = `
     flex-wrap: wrap;
     gap: 0.35rem;
     padding: 0.5rem 1rem;
-    background: var(--lt-surface-0);
-    border-radius: var(--lt-radius-lg);
-    border: 1px solid var(--lt-surface-200);
-    color: var(--lt-surface-700);
+    background: var(--p-content-bg, var(--p-surface-0, #ffffff));
+    border-radius: var(--p-border-radius-lg, var(--lt-radius-lg, 0.75rem));
+    border: 1px solid var(--p-content-border, var(--p-border-color, var(--lt-surface-200)));
+    color: var(--p-text-color, var(--lt-surface-700));
     font-family: var(--p-font-family, inherit);
     user-select: none;
     transition: all 0.15s ease;
@@ -67,31 +67,48 @@ const PAGINATOR_CSS = `
     border-radius: 9999px;
     border: 1px solid transparent;
     background: transparent;
-    color: var(--lt-surface-600);
+    color: var(--p-text-muted, var(--lt-surface-600));
     font-size: 0.875rem;
     font-weight: 500;
     cursor: pointer;
-    transition: background-color 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
     outline: none;
     box-sizing: border-box;
     padding: 0;
 }
 
-.p-paginator-page:hover:not(:disabled):not(.p-highlight),
+.p-paginator-page:hover:not(:disabled):not(.p-highlight):not(.p-paginator-page-selected),
 .p-paginator-first:hover:not(:disabled),
 .p-paginator-prev:hover:not(:disabled),
 .p-paginator-next:hover:not(:disabled),
 .p-paginator-last:hover:not(:disabled),
 .p-paginator-action-btn:hover:not(:disabled) {
-    background: var(--lt-surface-100);
-    color: var(--lt-surface-900);
+    background: var(--p-content-hover-bg, var(--p-surface-100, #f1f5f9));
+    color: var(--p-text-color, var(--lt-surface-900));
+}
+
+.p-paginator-page:focus-visible,
+.p-paginator-first:focus-visible,
+.p-paginator-prev:focus-visible,
+.p-paginator-next:focus-visible,
+.p-paginator-last:focus-visible,
+.p-paginator-action-btn:focus-visible {
+    box-shadow: 0 0 0 1px var(--p-surface-0, #ffffff), 0 0 0 3px var(--p-primary-color, var(--lt-primary-500, #10b981)) !important;
 }
 
 .p-paginator-page.p-highlight,
-.p-paginator-page.p-paginator-page-selected {
-    background: var(--lt-surface-900) !important;
-    color: var(--lt-surface-0, var(--lt-surface-0)) !important;
-    font-weight: 600;
+.p-paginator-page.p-paginator-page-selected,
+.p-paginator-page.p-paginator-page-active {
+    background: var(--p-primary-color, var(--lt-primary-500, #10b981)) !important;
+    color: var(--p-primary-contrast-color, #ffffff) !important;
+    font-weight: 700;
+}
+
+.p-paginator-page.p-highlight:hover,
+.p-paginator-page.p-paginator-page-selected:hover,
+.p-paginator-page.p-paginator-page-active:hover {
+    background: var(--p-primary-hover-color, var(--lt-primary-600, #059669)) !important;
+    color: var(--p-primary-contrast-color, #ffffff) !important;
 }
 
 .p-paginator-first:disabled,
@@ -100,7 +117,7 @@ const PAGINATOR_CSS = `
 .p-paginator-last:disabled,
 .p-paginator-page:disabled,
 .p-paginator-action-btn:disabled {
-    opacity: 0.3;
+    opacity: 0.35;
     cursor: default;
 }
 
@@ -112,7 +129,7 @@ const PAGINATOR_CSS = `
 
 .p-paginator-current {
     font-size: 0.875rem;
-    color: var(--lt-surface-500);
+    color: var(--p-text-muted, var(--lt-surface-500));
     padding: 0 0.75rem;
     white-space: nowrap;
 }
@@ -121,20 +138,21 @@ const PAGINATOR_CSS = `
 .p-paginator-jtp-select {
     appearance: none;
     padding: 0.35rem 2rem 0.35rem 0.75rem;
-    border-radius: var(--lt-radius);
-    border: 1px solid var(--lt-surface-300);
-    background: var(--lt-surface-0) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 0.6rem center;
-    color: var(--lt-surface-800);
+    border-radius: var(--p-border-radius, var(--lt-radius, 0.5rem));
+    border: 1px solid var(--p-border-color, var(--lt-surface-300));
+    background: var(--p-surface-0, #ffffff) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 0.6rem center;
+    color: var(--p-text-color, var(--lt-surface-800));
     font-size: 0.875rem;
     font-weight: 500;
     outline: none;
     cursor: pointer;
-    transition: border-color 0.15s ease;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 .p-paginator-rpp-select:focus,
 .p-paginator-jtp-select:focus,
 .p-paginator-jtp-input:focus {
-    border-color: var(--lt-primary-500);
+    border-color: var(--p-primary-color, var(--lt-primary-500, #10b981)) !important;
+    box-shadow: 0 0 0 1px var(--p-primary-color, var(--lt-primary-500, #10b981)) !important;
 }
 
 .p-paginator-jtp-container {
@@ -142,7 +160,7 @@ const PAGINATOR_CSS = `
     align-items: center;
     gap: 0.5rem;
     font-size: 0.875rem;
-    color: var(--lt-surface-600);
+    color: var(--p-text-muted, var(--lt-surface-600));
     padding: 0 0.5rem;
 }
 
@@ -150,17 +168,18 @@ const PAGINATOR_CSS = `
     width: 3.5rem;
     padding: 0.35rem 0.5rem;
     text-align: center;
-    border-radius: var(--lt-radius);
-    border: 1px solid var(--lt-surface-300);
-    background: var(--lt-surface-0);
-    color: inherit;
+    border-radius: var(--p-border-radius, var(--lt-radius, 0.5rem));
+    border: 1px solid var(--p-border-color, var(--lt-surface-300));
+    background: var(--p-surface-0, #ffffff);
+    color: var(--p-text-color, inherit);
     font-size: 0.875rem;
     outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .p-paginator-slider {
     width: 8rem;
-    accent-color: var(--lt-primary-500);
+    accent-color: var(--p-primary-color, var(--lt-primary-500, #10b981));
     cursor: pointer;
 }
 
@@ -175,11 +194,11 @@ const PAGINATOR_CSS = `
     width: 100%;
     max-width: 36rem;
     height: 20rem;
-    border-radius: var(--lt-radius-lg);
+    border-radius: var(--p-border-radius-lg, var(--lt-radius-lg));
     overflow: hidden;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-    background: var(--lt-surface-100);
-    border: 1px solid var(--lt-surface-200);
+    box-shadow: var(--p-shadow-md, 0 4px 6px -1px rgba(0, 0, 0, 0.08));
+    background: var(--p-surface-100, var(--lt-surface-100));
+    border: 1px solid var(--p-border-color, var(--lt-surface-200));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -193,7 +212,7 @@ const PAGINATOR_CSS = `
     transition: opacity 0.2s ease;
 }
 
-/* Dark Mode Tokens */
+/* Dark Mode Overrides */
 html.dark .p-paginator,
 [data-theme="dark"] .p-paginator,
 .dark .p-paginator {
@@ -221,19 +240,19 @@ html.dark .p-paginator-action-btn,
 .dark .p-paginator-action-btn {
     color: var(--p-text-muted) !important;
 }
-html.dark .p-paginator-page:hover:not(:disabled):not(.p-highlight),
+html.dark .p-paginator-page:hover:not(:disabled):not(.p-highlight):not(.p-paginator-page-selected),
 html.dark .p-paginator-first:hover:not(:disabled),
 html.dark .p-paginator-prev:hover:not(:disabled),
 html.dark .p-paginator-next:hover:not(:disabled),
 html.dark .p-paginator-last:hover:not(:disabled),
 html.dark .p-paginator-action-btn:hover:not(:disabled),
-[data-theme="dark"] .p-paginator-page:hover:not(:disabled):not(.p-highlight),
+[data-theme="dark"] .p-paginator-page:hover:not(:disabled):not(.p-highlight):not(.p-paginator-page-selected),
 [data-theme="dark"] .p-paginator-first:hover:not(:disabled),
 [data-theme="dark"] .p-paginator-prev:hover:not(:disabled),
 [data-theme="dark"] .p-paginator-next:hover:not(:disabled),
 [data-theme="dark"] .p-paginator-last:hover:not(:disabled),
 [data-theme="dark"] .p-paginator-action-btn:hover:not(:disabled),
-.dark .p-paginator-page:hover:not(:disabled):not(.p-highlight),
+.dark .p-paginator-page:hover:not(:disabled):not(.p-highlight):not(.p-paginator-page-selected),
 .dark .p-paginator-first:hover:not(:disabled),
 .dark .p-paginator-prev:hover:not(:disabled),
 .dark .p-paginator-next:hover:not(:disabled),
@@ -243,10 +262,22 @@ html.dark .p-paginator-action-btn:hover:not(:disabled),
     color: var(--p-text-color) !important;
 }
 html.dark .p-paginator-page.p-highlight,
+html.dark .p-paginator-page.p-paginator-page-selected,
 [data-theme="dark"] .p-paginator-page.p-highlight,
-.dark .p-paginator-page.p-highlight {
-    background: rgba(16, 185, 129, 0.16) !important;
-    color: var(--p-primary-300) !important;
+[data-theme="dark"] .p-paginator-page.p-paginator-page-selected,
+.dark .p-paginator-page.p-highlight,
+.dark .p-paginator-page.p-paginator-page-selected {
+    background: var(--p-primary-color, var(--lt-primary-500, #10b981)) !important;
+    color: var(--p-primary-contrast-color, #ffffff) !important;
+}
+html.dark .p-paginator-page.p-highlight:hover,
+html.dark .p-paginator-page.p-paginator-page-selected:hover,
+[data-theme="dark"] .p-paginator-page.p-highlight:hover,
+[data-theme="dark"] .p-paginator-page.p-paginator-page-selected:hover,
+.dark .p-paginator-page.p-highlight:hover,
+.dark .p-paginator-page.p-paginator-page-selected:hover {
+    background: var(--p-primary-hover-color, var(--lt-primary-600, #059669)) !important;
+    color: var(--p-primary-contrast-color, #ffffff) !important;
 }
 html.dark .p-paginator-rpp-select,
 html.dark .p-paginator-jtp-select,
