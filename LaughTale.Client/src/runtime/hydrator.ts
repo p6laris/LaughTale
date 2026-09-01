@@ -92,7 +92,13 @@ export function getIslandState(container: HTMLElement): HydrationState {
 export function hydrateIsland(container: HTMLElement): void {
     if (getIslandState(container) !== 'idle') return;
 
-    const name = container.getAttribute('data-island') || container.getAttribute('name');
+    let name = container.getAttribute('data-island') || container.getAttribute('name');
+    if (!name) {
+        const tag = container.tagName.toLowerCase();
+        if (tag.startsWith('island-') || tag.startsWith('p-') || getIslandDefinition(tag)) {
+            name = tag;
+        }
+    }
     if (!name) return;
 
     const strategy = (container.getAttribute('data-hydrate') || container.getAttribute('hydrate') || 'load').toLowerCase() as HydrateStrategy;
@@ -126,7 +132,13 @@ export function hydrateIsland(container: HTMLElement): void {
  * Explicitly retries hydration on an island in the 'failed' state.
  */
 export async function retryIsland(container: HTMLElement): Promise<void> {
-    const name = container.getAttribute('data-island') || container.getAttribute('name');
+    let name = container.getAttribute('data-island') || container.getAttribute('name');
+    if (!name) {
+        const tag = container.tagName.toLowerCase();
+        if (tag.startsWith('island-') || tag.startsWith('p-') || getIslandDefinition(tag)) {
+            name = tag;
+        }
+    }
     if (!name) return;
 
     // Reset state to allow clean re-execution
@@ -163,7 +175,28 @@ async function executeHydration(container: HTMLElement, name: string): Promise<v
         await awaitStreamingReady(container);
 
         // 2. Parse & revive props (Date, Uint8Array, Map, Set, BigInt, URL)
-        const rawProps = container.getAttribute('data-props') || container.getAttribute('props-json') || container.getAttribute('props');
+        let rawProps = container.getAttribute('data-props') || container.getAttribute('props-json') || container.getAttribute('props');
+        if (!rawProps) {
+            const collectedProps: Record<string, any> = {};
+            for (let i = 0; i < container.attributes.length; i++) {
+                const attr = container.attributes[i];
+                const attrName = attr.name.toLowerCase();
+                if (attrName === 'data-island' || attrName === 'data-hydrate' || attrName === 'hydrate' || attrName === 'class' || attrName === 'style' || attrName === 'id') {
+                    continue;
+                }
+                const camelKey = attr.name.replace(/-([a-z])/g, (_, g) => g.toUpperCase());
+                try {
+                    collectedProps[camelKey] = JSON.parse(attr.value);
+                } catch {
+                    if (attr.value === 'true') collectedProps[camelKey] = true;
+                    else if (attr.value === 'false') collectedProps[camelKey] = false;
+                    else collectedProps[camelKey] = attr.value;
+                }
+            }
+            if (Object.keys(collectedProps).length > 0) {
+                rawProps = JSON.stringify(collectedProps);
+            }
+        }
         const props = parseAndReviveProps(rawProps);
 
         // 3. Load component module with retry resilience
@@ -181,7 +214,7 @@ async function executeHydration(container: HTMLElement, name: string): Promise<v
             refresh: (newProps?: Record<string, any>) => refreshIsland(container, newProps)
         };
 
-        // 5. Construct structural IslandContext (, )
+        // 5. Construct structural IslandContext
         const abortController = new AbortController();
         const cleanups: (() => void)[] = [];
 
@@ -203,49 +236,36 @@ async function executeHydration(container: HTMLElement, name: string): Promise<v
 
         // 6. Mount island with context and register unmount hook
         const unmount = await mount(container, props, ctx);
-        const cleanup = () => {
-            try {
-                abortController.abort();
-            } catch {}
+        if (typeof unmount === 'function') {
+            cleanups.push(unmount);
+        }
 
-            if (typeof unmount === 'function') {
-                try {
-                    unmount();
-                } catch (e) {
-                    console.error(`[LaughTale] Error unmounting island '${name}':`, e);
-                }
-            }
-
+        // 7. Store teardown handle for clean unmounting
+        (container as any).__laughtale_unmount__ = () => {
+            abortController.abort();
             while (cleanups.length > 0) {
-                try {
-                    cleanups.pop()!();
-                } catch (e) {
-                    console.error(`[LaughTale] Error in cleanup callback for island '${name}':`, e);
-                }
+                const cleanup = cleanups.pop();
+                try { cleanup?.(); } catch (err) { console.error(`[LaughTale] Error in teardown of island '${name}':`, err); }
             }
-
             delete (container as any).island;
+            (container as any)[HYDRATION_STATE_KEY] = 'idle';
         };
-
-        container.addEventListener('laughtale:unmount', cleanup, { once: true });
 
         (container as any)[HYDRATION_STATE_KEY] = 'mounted';
 
-        // 6. RUM Performance Mark & Measure
+        // 8. RUM Performance Mark & Measure
         if (typeof performance !== 'undefined' && typeof performance.mark === 'function') {
             try {
                 performance.mark(endMark);
-                if (typeof performance.measure === 'function') {
-                    performance.measure(measureName, startMark, endMark);
-                }
+                performance.measure(measureName, startMark, endMark);
             } catch {}
         }
 
-        // 7. Dispatch success lifecycle event
+        // 9. Dispatch success lifecycle event
         container.dispatchEvent(new CustomEvent('laughtale:hydrated', {
             bubbles: true,
             composed: true,
-            detail: { name, strategy: container.getAttribute('data-hydrate') }
+            detail: { name }
         }));
     } catch (error: any) {
         (container as any)[HYDRATION_STATE_KEY] = 'failed';
@@ -345,7 +365,13 @@ function hydrateMedia(container: HTMLElement, name: string, query: string | null
  * Forces re-hydration of an island with updated props (used by server-driven refresh).
  */
 export async function rehydrateIsland(container: HTMLElement): Promise<void> {
-    const name = container.getAttribute('data-island');
+    let name = container.getAttribute('data-island') || container.getAttribute('name');
+    if (!name) {
+        const tag = container.tagName.toLowerCase();
+        if (tag.startsWith('island-') || tag.startsWith('p-') || getIslandDefinition(tag)) {
+            name = tag;
+        }
+    }
     if (!name) return;
     delete (container as any)[HYDRATION_STATE_KEY];
     await executeHydration(container, name);
@@ -353,6 +379,30 @@ export async function rehydrateIsland(container: HTMLElement): Promise<void> {
 
 export function initIslands(root: ParentNode = document): void {
     initDesignTokens();
-    const islands = root.querySelectorAll<HTMLElement>('[data-island], island, [hydrate], [data-hydrate]');
+    const selectors = [
+        '[data-island]',
+        'island',
+        '[hydrate]',
+        '[data-hydrate]',
+        'p-menu',
+        'island-menu',
+        'p-menubar',
+        'island-menubar',
+        'p-tieredmenu',
+        'island-tieredmenu',
+        'p-contextmenu',
+        'island-contextmenu',
+        'p-breadcrumb',
+        'island-breadcrumb',
+        'p-timeline',
+        'island-timeline',
+        'p-toolbar',
+        'island-toolbar',
+        'p-tabs',
+        'island-tabs',
+        'p-splitbutton',
+        'island-splitbutton'
+    ];
+    const islands = root.querySelectorAll<HTMLElement>(selectors.join(', '));
     islands.forEach(hydrateIsland);
 }

@@ -11,13 +11,15 @@ import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
 
 const MENU_CSS = `
-.p-menu {
+.p-menu,
+p-menu,
+island-menu {
     display: inline-flex;
     flex-direction: column;
-    background: var(--p-menu-background, var(--lt-surface-0));
-    color: var(--p-menu-color, var(--lt-text-primary));
-    border: 1px solid var(--p-menu-border-color, var(--lt-surface-200));
-    border-radius: var(--p-menu-border-radius, var(--lt-radius));
+    background: var(--p-menu-background, var(--p-content-bg, var(--p-surface-0, #ffffff)));
+    color: var(--p-menu-color, var(--p-text-color, #1e293b));
+    border: 1px solid var(--p-menu-border-color, var(--p-border-color, #e2e8f0));
+    border-radius: var(--p-menu-border-radius, var(--p-border-radius-md, 6px));
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
     min-width: 12.5rem;
     box-sizing: border-box;
@@ -45,12 +47,12 @@ const MENU_CSS = `
 }
 
 .p-menu-start {
-    border-bottom: 1px solid var(--p-menu-border-color, var(--lt-surface-200));
+    border-bottom: 1px solid var(--p-menu-border-color, var(--p-border-color, #e2e8f0));
     box-sizing: border-box;
 }
 
 .p-menu-end {
-    border-top: 1px solid var(--p-menu-border-color, var(--lt-surface-200));
+    border-top: 1px solid var(--p-menu-border-color, var(--p-border-color, #e2e8f0));
     box-sizing: border-box;
 }
 
@@ -96,7 +98,7 @@ const MENU_CSS = `
 .p-menu-submenu-label {
     font-size: 0.75rem;
     font-weight: 700;
-    color: var(--lt-surface-400);
+    color: var(--p-text-muted, #94a3b8);
     padding: 0.5rem 0.75rem 0.25rem;
     text-transform: none;
     letter-spacing: normal;
@@ -105,7 +107,7 @@ const MENU_CSS = `
 
 .p-menu-separator {
     height: 1px;
-    background: var(--p-menu-separator-border-color, var(--lt-surface-200));
+    background: var(--p-menu-separator-border-color, var(--p-border-color, #e2e8f0));
     margin: 0.25rem 0;
     list-style: none;
     padding: 0;
@@ -128,8 +130,8 @@ const MENU_CSS = `
     align-items: center;
     gap: 0.5rem;
     padding: 0.45rem 0.65rem;
-    color: var(--p-menu-item-color, var(--lt-text-primary));
-    border-radius: var(--lt-radius);
+    color: var(--p-menu-item-color, var(--p-text-color, #1e293b));
+    border-radius: var(--p-border-radius, 6px);
     text-decoration: none;
     cursor: pointer;
     font-size: 0.875rem;
@@ -141,8 +143,8 @@ const MENU_CSS = `
 
 .p-menu-item-link:hover,
 .p-menu-item-link.p-focus {
-    background: var(--lt-surface-100);
-    color: var(--lt-text-primary);
+    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-text-color, #1e293b);
 }
 
 .p-menu-item.p-disabled > .p-menu-item-content > .p-menu-item-link {
@@ -155,7 +157,7 @@ const MENU_CSS = `
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: var(--lt-surface-500);
+    color: var(--p-text-muted, #64748b);
     width: 1.125rem;
     height: 1.125rem;
     flex-shrink: 0;
@@ -171,9 +173,9 @@ const MENU_CSS = `
 .p-menu-item-shortcut {
     margin-left: auto;
     font-size: 0.75rem;
-    color: var(--lt-surface-500);
-    background: var(--lt-surface-100);
-    border: 1px solid var(--lt-surface-200);
+    color: var(--p-text-muted, #64748b);
+    background: var(--p-surface-100, #f1f5f9);
+    border: 1px solid var(--p-border-color, #e2e8f0);
     border-radius: 4px;
     padding: 0.1rem 0.35rem;
     font-weight: 500;
@@ -181,8 +183,8 @@ const MENU_CSS = `
 
 .p-menu-item-badge {
     margin-left: auto;
-    background: var(--lt-surface-950, var(--lt-surface-950));
-    color: var(--lt-surface-0, var(--lt-surface-0));
+    background: var(--p-primary-500, #10b981);
+    color: #ffffff;
     font-size: 0.75rem;
     font-weight: 700;
     min-width: 1.25rem;
@@ -199,7 +201,7 @@ const MENU_CSS = `
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: var(--lt-surface-400);
+    color: var(--p-text-muted, #94a3b8);
     transition: transform 220ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -211,7 +213,7 @@ const MENU_CSS = `
 .p-menu-check-icon {
     width: 1rem;
     height: 1rem;
-    color: var(--lt-primary-500);
+    color: var(--p-primary-color, #10b981);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -221,7 +223,7 @@ const MENU_CSS = `
     width: 0.375rem;
     height: 0.375rem;
     border-radius: 9999px;
-    background: var(--lt-surface-900);
+    background: var(--p-primary-color, #10b981);
     display: inline-block;
     margin: 0.3125rem;
 }
@@ -236,9 +238,9 @@ const MENU_CSS = `
 html.dark .p-menu,
 [data-theme="dark"] .p-menu,
 .dark .p-menu {
-    background: var(--p-surface-0);
-    color: var(--p-text-color);
-    border-color: var(--p-border-color);
+    background: var(--p-surface-0, #0f172a);
+    color: var(--p-text-color, #f8fafc);
+    border-color: var(--p-border-color, #334155);
 }
 
 html.dark .p-menu-start,
@@ -250,47 +252,47 @@ html.dark .p-menu-separator,
 .dark .p-menu-start,
 .dark .p-menu-end,
 .dark .p-menu-separator {
-    border-color: var(--p-border-color);
+    border-color: var(--p-border-color, #334155);
 }
 
 html.dark .p-menu-item-link,
 [data-theme="dark"] .p-menu-item-link,
 .dark .p-menu-item-link {
-    color: var(--p-text-color);
+    color: var(--p-text-color, #f8fafc);
 }
 
 html.dark .p-menu-item-link:hover,
 [data-theme="dark"] .p-menu-item-link:hover,
 .dark .p-menu-item-link:hover {
-    background: var(--p-surface-100);
-    color: var(--p-text-color);
+    background: var(--p-surface-100, #1e293b);
+    color: var(--p-text-color, #f8fafc);
 }
 
 html.dark .p-menu-item-shortcut,
 [data-theme="dark"] .p-menu-item-shortcut,
 .dark .p-menu-item-shortcut {
-    background: var(--p-surface-100);
-    border-color: var(--p-border-color);
-    color: var(--p-text-muted);
+    background: var(--p-surface-100, #1e293b);
+    border-color: var(--p-border-color, #334155);
+    color: var(--p-text-muted, #94a3b8);
 }
 
 html.dark .p-menu-item-badge,
 [data-theme="dark"] .p-menu-item-badge,
 .dark .p-menu-item-badge {
-    background: var(--p-surface-100);
-    color: var(--p-text-color);
+    background: var(--p-primary-500, #10b981);
+    color: #ffffff;
 }
 
 html.dark .p-menu-submenu-label,
 [data-theme="dark"] .p-menu-submenu-label,
 .dark .p-menu-submenu-label {
-    color: var(--p-text-muted);
+    color: var(--p-text-muted, #94a3b8);
 }
 
 html.dark .p-menu-dot-icon,
 [data-theme="dark"] .p-menu-dot-icon,
 .dark .p-menu-dot-icon {
-    background: var(--p-primary-500);
+    background: var(--p-primary-500, #10b981);
 }
 `;
 
@@ -330,10 +332,11 @@ export interface MenuProps {
 
 export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx?: IslandContext) {
     injectIslandStyle('menu', MENU_CSS);
+    container.setAttribute('data-part', 'root');
 
-    const isPopup = props.popup || (props as any).Popup || false;
+    const isPopup = props.popup === true || String(props.popup) === 'true' || (props as any).Popup === true || String((props as any).Popup) === 'true' || container.getAttribute('popup') === 'true' || container.hasAttribute('popup');
     let expandedKeys: Record<string, boolean> = { ...(props.expandedKeys || (props as any).ExpandedKeys || {}) };
-    const customTemplate = props.customTemplate || (props as any).CustomTemplate || false;
+    const customTemplate = props.customTemplate === true || String(props.customTemplate) === 'true' || (props as any).CustomTemplate === true || String((props as any).CustomTemplate) === 'true' || container.getAttribute('custom-template') === 'true' || container.hasAttribute('custom-template');
 
     // Normalize raw items
     function normalizeItems(rawList: any[]): MenuItemData[] {
@@ -353,12 +356,12 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
                 badge: it.badge || it.Badge,
                 route: it.route || it.Route,
                 target: it.target || it.Target,
-                toggleable: it.toggleable !== undefined ? it.toggleable : (it.Toggleable !== undefined ? it.Toggleable : undefined),
+                toggleable: it.toggleable !== undefined ? (it.toggleable === true || String(it.toggleable) === 'true') : (it.Toggleable !== undefined ? (it.Toggleable === true || String(it.Toggleable) === 'true') : undefined),
                 linkClass: it.linkClass || it.LinkClass,
                 command: it.command || it.Command,
-                checked: it.checked !== undefined ? it.checked : it.Checked,
+                checked: it.checked !== undefined ? (it.checked === true || String(it.checked) === 'true') : (it.Checked !== undefined ? (it.Checked === true || String(it.Checked) === 'true') : undefined),
                 radioGroup: it.radioGroup || it.RadioGroup,
-                radioSelected: it.radioSelected !== undefined ? it.radioSelected : it.RadioSelected
+                radioSelected: it.radioSelected !== undefined ? (it.radioSelected === true || String(it.radioSelected) === 'true') : (it.RadioSelected !== undefined ? (it.RadioSelected === true || String(it.RadioSelected) === 'true') : undefined)
             };
         });
     }
@@ -388,7 +391,7 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
         if (isStaticGroupHeader) {
             const subItemsHtml = item.items!.map((sub, i) => renderItemContent(sub, `${path}.${i}`, depth + 1)).join('');
             const headerLabelClass = customTemplate ? 'text-primary font-bold text-sm' : 'p-menu-submenu-label';
-            const headerLabelStyle = customTemplate ? 'color: var(--lt-primary-500); font-weight: 700; font-size: 0.8125rem; padding: 0.5rem 0.75rem 0.25rem;' : '';
+            const headerLabelStyle = customTemplate ? 'color: var(--p-primary-color, #10b981); font-weight: 700; font-size: 0.8125rem; padding: 0.5rem 0.75rem 0.25rem;' : '';
             return `
                 <li class="p-menu-item" role="none">
                     <div class="${headerLabelClass}" style="${headerLabelStyle}">${item.label}</div>
@@ -431,7 +434,7 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
 
         let customInlineStyle = '';
         if (item.linkClass && item.linkClass.includes('text-red')) {
-            customInlineStyle = 'color: var(--lt-danger-500, var(--lt-danger-500)) !important;';
+            customInlineStyle = 'color: var(--p-danger-500, #ef4444) !important;';
         }
 
         return `
@@ -457,10 +460,10 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
         if (customTemplate) {
             startHtml = `
                 <div class="p-menu-start" style="padding: 0.65rem 0.85rem; display: flex; align-items: center; gap: 0.65rem;">
-                    <span style="display: inline-flex; align-items: center; justify-content: center; width: 1.75rem; height: 1.75rem; background: var(--lt-primary-500); border-radius: 6px; color: var(--lt-surface-0, var(--lt-surface-0));">
+                    <span style="display: inline-flex; align-items: center; justify-content: center; width: 1.75rem; height: 1.75rem; background: var(--p-primary-500, #10b981); border-radius: 6px; color: #ffffff;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg>
                     </span>
-                    <span style="font-weight: 700; font-size: 0.9375rem; letter-spacing: -0.01em;">PRIME<span style="color: var(--lt-primary-500);">APP</span></span>
+                    <span style="font-weight: 700; font-size: 0.9375rem; letter-spacing: -0.01em; color: var(--p-text-color);">PRIME<span style="color: var(--p-primary-color, #10b981);">APP</span></span>
                 </div>
             `;
         }
@@ -470,10 +473,10 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
             endHtml = `
                 <div class="p-menu-end" style="padding: 0.5rem 0.75rem;">
                     <button type="button" class="p-menu-item-link" style="width: 100%; border: none; background: transparent; padding: 0.4rem 0.5rem; display: flex; align-items: center; gap: 0.65rem; border-radius: 6px; cursor: pointer;">
-                        <span style="width: 2rem; height: 2rem; border-radius: 9999px; background: linear-gradient(135deg, var(--lt-warn-500, var(--lt-warn-500)), var(--lt-danger-500, var(--lt-danger-500))); color: var(--lt-surface-0, var(--lt-surface-0)); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700;">AE</span>
+                        <span style="width: 2rem; height: 2rem; border-radius: 9999px; background: linear-gradient(135deg, var(--p-warn-500, #f59e0b), var(--p-danger-500, #ef4444)); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700;">AE</span>
                         <span style="display: flex; flex-direction: column; align-items: flex-start; line-height: 1.2;">
-                            <span style="font-size: 0.8125rem; font-weight: 700; color: var(--lt-text-primary);">Amy Elsner</span>
-                            <span style="font-size: 0.7rem; color: var(--lt-surface-500);">Admin</span>
+                            <span style="font-size: 0.8125rem; font-weight: 700; color: var(--p-text-color);">Amy Elsner</span>
+                            <span style="font-size: 0.7rem; color: var(--p-text-muted);">Admin</span>
                         </span>
                     </button>
                 </div>
@@ -618,8 +621,8 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
             position: fixed;
             bottom: 2rem;
             right: 2rem;
-            background: ${severity === 'success' ? 'var(--lt-primary-500, var(--lt-primary-500))' : 'var(--lt-warn-500, var(--lt-warn-500))'};
-            color: var(--lt-surface-0, var(--lt-surface-0));
+            background: ${severity === 'success' ? 'var(--p-primary-color, #10b981)' : 'var(--p-warn-500, #f59e0b)'};
+            color: #ffffff;
             padding: 0.75rem 1.25rem;
             border-radius: 8px;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
@@ -640,12 +643,14 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
             if (popupEl) {
                 popupEl.innerHTML = renderMenuHtml();
                 const menuEl = popupEl.querySelector<HTMLElement>('.p-menu')!;
-                wireEvents(menuEl);
+                if (menuEl) wireEvents(menuEl);
             }
         } else {
             container.innerHTML = renderMenuHtml();
             const menuEl = container.querySelector<HTMLElement>('.p-menu')!;
-            wireEvents(menuEl);
+            if (menuEl) {
+                wireEvents(menuEl);
+            }
         }
     }
 
@@ -657,7 +662,7 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
 
         isOpen = true;
         popupEl = document.createElement('div');
-        popupEl.className = 'p-menu-popup-wrapper'; container.setAttribute('data-part', 'root');
+        popupEl.className = 'p-menu-popup-wrapper';
         popupEl.innerHTML = renderMenuHtml();
         document.body.appendChild(popupEl);
 
@@ -688,10 +693,10 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
     }
 
     if (isPopup) {
-        container.innerHTML = '';
-        const triggerId = props.triggerId || (props as any).TriggerId;
+        container.style.display = 'none';
+        const triggerId = props.triggerId || (props as any).TriggerId || container.getAttribute('trigger-id') || container.getAttribute('data-trigger-id');
         if (triggerId) {
-            const trigger = document.getElementById(triggerId);
+            const trigger = document.getElementById(triggerId) || container.parentElement?.querySelector(`#${triggerId}`) || container.parentElement?.querySelector(`button`);
             if (trigger) {
                 trigger.addEventListener('click', (e) => {
                     e.preventDefault();
