@@ -9,6 +9,12 @@ import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
 
 const DIALOG_CSS = `
+island-aura-dialog,
+island-dialog,
+p-dialog {
+    display: contents !important;
+}
+
 .p-dialog-mask {
     position: fixed;
     inset: 0;
@@ -85,9 +91,9 @@ const DIALOG_CSS = `
 
 /* Dialog Container */
 .p-dialog {
-    background: var(--lt-surface-0);
-    border: 1px solid var(--lt-surface-200);
-    border-radius: var(--p-border-radius-xl, 12px);
+    background: var(--p-dialog-background, var(--p-content-bg, var(--p-surface-0, #ffffff)));
+    border: 1px solid var(--p-dialog-border-color, var(--p-border-color, #e2e8f0));
+    border-radius: var(--p-dialog-border-radius, var(--p-border-radius-xl, 12px));
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
     min-width: 20rem;
     max-width: 90vw;
@@ -99,6 +105,7 @@ const DIALOG_CSS = `
     will-change: transform, opacity;
     transform: scale(0.95) translateY(6px);
     transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease, width 0.2s ease, height 0.2s ease;
+    color: var(--p-text-color, #1e293b);
 }
 
 .p-dialog-mask.p-dialog-mask-active .p-dialog {
@@ -135,7 +142,7 @@ const DIALOG_CSS = `
 .p-dialog-title {
     font-weight: 700;
     font-size: 1.125rem;
-    color: var(--lt-text-primary);
+    color: var(--p-text-color, #1e293b);
     margin: 0;
 }
 
@@ -155,14 +162,14 @@ const DIALOG_CSS = `
     border-radius: 9999px;
     border: none;
     background: transparent;
-    color: var(--lt-surface-500);
+    color: var(--p-text-muted, #64748b);
     cursor: pointer;
     transition: background-color 0.15s ease, color 0.15s ease;
     padding: 0;
 }
 .p-dialog-header-action:hover {
-    background: var(--lt-surface-100);
-    color: var(--lt-text-primary);
+    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-text-color, #1e293b);
 }
 
 /* Content */
@@ -187,30 +194,30 @@ const DIALOG_CSS = `
 html.dark .p-dialog,
 [data-theme="dark"] .p-dialog,
 .dark .p-dialog {
-    background: var(--p-surface-0);
-    border-color: var(--p-border-color);
-    color: var(--p-text-color);
+    background: var(--p-surface-0, #0f172a);
+    border-color: var(--p-border-color, #334155);
+    color: var(--p-text-color, #f8fafc);
 }
 html.dark .p-dialog-title,
 [data-theme="dark"] .p-dialog-title,
 .dark .p-dialog-title {
-    color: var(--p-text-color);
+    color: var(--p-text-color, #f8fafc);
 }
 html.dark .p-dialog-content,
 [data-theme="dark"] .p-dialog-content,
 .dark .p-dialog-content {
-    color: var(--p-text-color);
+    color: var(--p-text-color, #f8fafc);
 }
 html.dark .p-dialog-header-action,
 [data-theme="dark"] .p-dialog-header-action,
 .dark .p-dialog-header-action {
-    color: var(--p-text-muted);
+    color: var(--p-text-muted, #94a3b8);
 }
 html.dark .p-dialog-header-action:hover,
 [data-theme="dark"] .p-dialog-header-action:hover,
 .dark .p-dialog-header-action:hover {
-    background: var(--p-surface-100);
-    color: var(--p-text-color);
+    background: var(--p-surface-100, #1e293b);
+    color: var(--p-text-color, #f8fafc);
 }
 `;
 
@@ -318,10 +325,42 @@ export default function DialogIsland(container: HTMLElement, props: DialogProps,
     injectIslandStyle('dialog', DIALOG_CSS);
     initGlobalDialogDelegation(ctx?.signal);
 
-    const maskEl = container.querySelector<HTMLElement>('.p-dialog-mask');
-    const dialogEl = container.querySelector<HTMLElement>('.p-dialog');
+    let maskEl = container.querySelector<HTMLElement>('.p-dialog-mask');
+    let dialogEl = container.querySelector<HTMLElement>('.p-dialog');
 
-    if (!maskEl || !dialogEl) return;
+    if (!maskEl || !dialogEl) {
+        maskEl = document.createElement('div');
+        const modal = props.modal !== false && (props as any).Modal !== false;
+        const pos = (props.position || (props as any).Position || 'center').toLowerCase().replace(/[^a-z]/g, '');
+        maskEl.className = `p-dialog-mask ${modal ? 'p-dialog-mask-modal' : ''} p-dialog-pos-${pos}`;
+        maskEl.style.display = 'none';
+
+        dialogEl = document.createElement('div');
+        dialogEl.className = `p-dialog p-component ${props.draggable ? 'p-dialog-draggable' : ''} ${props.class || ''}`;
+        if (props.width) dialogEl.style.width = props.width;
+        if (props.style) dialogEl.style.cssText += props.style;
+
+        const hasHeader = container.querySelector('.p-dialog-header');
+        if (props.header && !hasHeader) {
+            const headerEl = document.createElement('div');
+            headerEl.className = 'p-dialog-header';
+            headerEl.innerHTML = `
+                <span class="p-dialog-title">${props.header}</span>
+                <div class="p-dialog-header-actions">
+                    ${props.maximizable ? `<button type="button" class="p-dialog-header-action p-dialog-maximize-button" aria-label="Maximize">${MAXIMIZE_ICON_SVG}</button>` : ''}
+                    ${props.closable !== false ? `<button type="button" class="p-dialog-header-action p-dialog-close-button" aria-label="Close" data-dialog-close>${CLOSE_ICON_SVG}</button>` : ''}
+                </div>
+            `;
+            dialogEl.appendChild(headerEl);
+        }
+
+        while (container.firstChild) {
+            dialogEl.appendChild(container.firstChild);
+        }
+
+        maskEl.appendChild(dialogEl);
+        container.appendChild(maskEl);
+    }
 
     container.setAttribute('data-part', 'root');
     dialogEl.setAttribute('data-part', 'dialog');
