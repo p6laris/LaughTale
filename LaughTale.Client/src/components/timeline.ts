@@ -360,8 +360,12 @@ export default function TimelineIsland(container: HTMLElement, props: TimelinePr
     const rawEvents: any[] = props.value || props.events || [];
     const align = props.align || 'left';
     const layout = props.layout || 'vertical';
-    const isInteractive = !!props.interactive;
-    const isActivityFeed = !!props.activityFeed;
+    const isInteractive = props.interactive !== undefined
+        ? (props.interactive === true || String(props.interactive) === 'true')
+        : (container.getAttribute('interactive') === 'true' || container.hasAttribute('interactive') || container.hasAttribute('data-interactive') || rawEvents.some((e: any) => e.id && (e.label || e.icon) && !e.user && !e.status));
+    const isActivityFeed = props.activityFeed !== undefined
+        ? (props.activityFeed === true || String(props.activityFeed) === 'true')
+        : (container.getAttribute('activity-feed') === 'true' || container.hasAttribute('activity-feed') || container.hasAttribute('data-activity-feed') || rawEvents.some((e: any) => e.user && (e.action || e.details || e.repo)));
 
     // Interactive State
     let completedSteps = [1];
@@ -440,13 +444,23 @@ export default function TimelineIsland(container: HTMLElement, props: TimelinePr
         }
 
         // 2. Activity Feed Avatar Marker
-        if (isActivityFeed && item.user) {
-            const avatar = typeof item.user === 'object' ? item.user.avatar : (item.id === '1' ? 'SC' : item.id === '2' ? 'AK' : item.id === '3' ? 'MJ' : item.id === '4' ? 'DP' : 'EW');
-            const color = item.id === '1' ? 'var(--p-primary-color, #10b981)' : item.id === '2' ? 'var(--p-info-500, #3b82f6)' : item.id === '3' ? 'var(--p-primary-color, #10b981)' : item.id === '4' ? 'var(--p-warn-500, #f59e0b)' : 'var(--p-danger-500, #ef4444)';
+        if (isActivityFeed || (item.user && item.action)) {
+            const userName = typeof item.user === 'object' ? item.user.name : String(item.user || 'User');
+            const initials = userName.split(' ').map((n: string) => n[0]).join('').toUpperCase().substring(0, 2) || 'U';
+            const colors = [
+                'var(--p-primary-500, #10b981)',
+                'var(--p-info-500, #3b82f6)',
+                'var(--p-warn-500, #f59e0b)',
+                'var(--p-success-500, #22c55e)',
+                'var(--p-danger-500, #ef4444)'
+            ];
+            const colorIdx = (parseInt(item.id || '1', 10) - 1) % colors.length;
+            const color = colors[colorIdx >= 0 ? colorIdx : 0];
+
             return `
                 <div class="p-timeline-event-marker">
-                    <span class="p-timeline-avatar" style="background: ${color};">
-                        ${avatar}
+                    <span class="p-timeline-avatar" style="background: ${color}; width: 2.25rem; height: 2.25rem; border-radius: 9999px; color: #ffffff; font-weight: 700; font-size: 0.8125rem; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        ${initials}
                     </span>
                 </div>
             `;
@@ -475,6 +489,9 @@ export default function TimelineIsland(container: HTMLElement, props: TimelinePr
         if (item.opposite) {
             return `<span>${item.opposite}</span>`;
         }
+        if (item.time && !item.date) {
+            return `<span style="white-space: nowrap; font-size: 0.8125rem; color: var(--p-text-muted);">${item.time}</span>`;
+        }
         if (item.date && item.time) {
             return `
                 <div style="font-weight: 600; color: var(--p-text-color);">${item.date}</div>
@@ -483,9 +500,6 @@ export default function TimelineIsland(container: HTMLElement, props: TimelinePr
         }
         if (item.date) {
             return `<span style="font-size: 0.8125rem; color: var(--p-text-muted);">${item.date}</span>`;
-        }
-        if (item.time) {
-            return `<span style="white-space: nowrap; font-size: 0.8125rem; color: var(--p-text-muted);">${item.time}</span>`;
         }
         return ``;
     }
@@ -512,7 +526,7 @@ export default function TimelineIsland(container: HTMLElement, props: TimelinePr
         }
 
         // 2. Activity Feed Content
-        if (isActivityFeed) {
+        if (isActivityFeed || (item.user && item.action)) {
             const userName = typeof item.user === 'object' ? item.user.name : item.user;
             const detailsHtml = item.details && item.details.length > 0 ? `
                 <div style="margin-top: 0.75rem; padding: 0.75rem; border-radius: 8px; background: var(--p-surface-50); border: 1px solid var(--p-border-color);">
@@ -527,21 +541,22 @@ export default function TimelineIsland(container: HTMLElement, props: TimelinePr
             ` : '';
 
             return `
-                <div style="padding-bottom: 1.5rem;">
+                <div class="p-timeline-card" style="margin-bottom: 1.25rem;">
                     <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-                        <span style="font-weight: 600; color: var(--p-text-color);">${userName}</span>
-                        <span style="color: var(--p-text-muted);">${item.action || ''}</span>
-                        <span style="font-weight: 600; color: var(--p-primary-color, #10b981);">${item.target || ''}</span>
-                        ${item.repo ? `<span style="color: var(--p-text-muted);">to</span> <code style="padding: 0.15rem 0.45rem; border-radius: 4px; background: var(--p-surface-100); font-size: 0.8125rem; font-family: monospace; color: var(--p-text-color);">${item.repo}</code>` : ''}
+                        <span style="font-weight: 700; color: var(--p-text-color); font-size: 0.9375rem;">${userName}</span>
+                        <span style="color: var(--p-text-muted); font-size: 0.875rem;">${item.action || ''}</span>
+                        <span style="font-weight: 600; color: var(--p-primary-color, #10b981); font-size: 0.875rem;">${item.target || ''}</span>
+                        ${item.repo ? `<span style="color: var(--p-text-muted); font-size: 0.875rem;">to</span> <code style="padding: 0.15rem 0.45rem; border-radius: 4px; background: var(--p-surface-100); font-size: 0.8125rem; font-family: monospace; color: var(--p-text-color); border: 1px solid var(--p-border-color);">${item.repo}</code>` : ''}
                     </div>
-                    ${item.description ? `<p style="margin: 0.35rem 0 0 0; font-size: 0.875rem; color: var(--p-text-muted);">${item.description}</p>` : ''}
+                    ${item.description ? `<p style="margin: 0.35rem 0 0 0; font-size: 0.875rem; color: var(--p-text-muted); line-height: 1.5;">${item.description}</p>` : ''}
                     ${detailsHtml}
                 </div>
             `;
         }
 
         // 3. Custom Rich Order Card Content
-        if (item.details || item.tracking || item.user) {
+        if (item.details || item.tracking || item.user || item.status || item.title) {
+            const cardTitle = item.status || item.title || item.label || '';
             const detailsHtml = item.details && item.details.length > 0 ? `
                 <ul style="margin: 0.75rem 0 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 0.35rem;">
                     ${item.details.map((d: string) => `
@@ -565,7 +580,7 @@ export default function TimelineIsland(container: HTMLElement, props: TimelinePr
                 <div class="p-timeline-card">
                     <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
                         ${item.user ? `<span class="p-timeline-avatar" style="background: rgba(16, 185, 129, 0.12); color: var(--p-primary-color, #10b981);">${item.user}</span>` : ''}
-                        <span style="font-weight: 700; font-size: 0.9375rem; color: var(--p-text-color);">${item.status || item.title}</span>
+                        ${cardTitle ? `<span style="font-weight: 700; font-size: 0.9375rem; color: var(--p-text-color);">${cardTitle}</span>` : ''}
                     </div>
                     ${item.description ? `<p style="margin: 0; font-size: 0.875rem; color: var(--p-text-muted); line-height: 1.5;">${item.description}</p>` : ''}
                     ${detailsHtml}
