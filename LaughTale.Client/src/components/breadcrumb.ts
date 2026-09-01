@@ -15,10 +15,12 @@ const BREADCRUMB_CSS = `
     border: none !important;
     padding: 0 !important;
 }
-.p-breadcrumb {
-    background: var(--lt-surface-0);
-    border: 1px solid var(--lt-surface-200);
-    border-radius: var(--lt-radius);
+.p-breadcrumb,
+p-breadcrumb,
+island-breadcrumb {
+    background: var(--p-breadcrumb-background, var(--p-content-bg, var(--p-surface-0, #ffffff)));
+    border: 1px solid var(--p-breadcrumb-border-color, var(--p-border-color, #e2e8f0));
+    border-radius: var(--p-breadcrumb-border-radius, var(--p-border-radius-md, 6px));
     padding: 0.75rem 1.25rem;
     display: inline-flex;
     align-items: center;
@@ -42,7 +44,7 @@ const BREADCRUMB_CSS = `
 }
 
 .p-breadcrumb-item-link {
-    color: var(--p-text-muted, var(--lt-surface-500));
+    color: var(--p-breadcrumb-item-color, var(--p-text-muted, #64748b));
     text-decoration: none;
     font-size: 0.875rem;
     font-weight: 500;
@@ -50,18 +52,18 @@ const BREADCRUMB_CSS = `
     align-items: center;
     gap: 0.4rem;
     padding: 0.25rem 0.4rem;
-    border-radius: 4px;
+    border-radius: var(--p-border-radius, 4px);
     transition: color 0.15s ease, background-color 0.15s ease;
     cursor: pointer;
 }
 
 .p-breadcrumb-item-link:hover {
-    color: var(--lt-text-primary);
-    background: var(--lt-surface-100);
+    color: var(--p-text-color, #1e293b);
+    background: var(--p-surface-100, #f1f5f9);
 }
 
 .p-breadcrumb-item-current {
-    color: var(--lt-text-primary);
+    color: var(--p-text-color, #1e293b);
     font-weight: 600;
     cursor: default;
 }
@@ -71,7 +73,7 @@ const BREADCRUMB_CSS = `
 }
 
 .p-breadcrumb-separator {
-    color: var(--lt-surface-400);
+    color: var(--p-text-muted, #94a3b8);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -81,7 +83,7 @@ const BREADCRUMB_CSS = `
 }
 
 .p-breadcrumb-ellipsis {
-    color: var(--p-text-muted, var(--lt-surface-500));
+    color: var(--p-text-muted, #64748b);
     font-weight: 700;
     letter-spacing: 1px;
     padding: 0.15rem 0.35rem;
@@ -90,8 +92,8 @@ const BREADCRUMB_CSS = `
 }
 
 .p-breadcrumb-ellipsis:hover {
-    background: var(--lt-surface-100);
-    color: var(--lt-text-primary);
+    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-text-color, #1e293b);
 }
 
 .p-breadcrumb-badge {
@@ -105,18 +107,18 @@ const BREADCRUMB_CSS = `
 }
 
 .p-breadcrumb-badge-primary {
-    background: rgba(59, 130, 246, 0.12);
-    color: var(--lt-primary-600);
+    background: rgba(16, 185, 129, 0.12);
+    color: var(--p-primary-color, #10b981);
 }
 
 .p-breadcrumb-badge-info {
     background: rgba(14, 165, 233, 0.12);
-    color: var(--lt-info-600);
+    color: var(--p-info-500, #0ea5e9);
 }
 
 .p-breadcrumb-badge-success {
-    background: rgba(16, 185, 129, 0.12);
-    color: var(--lt-primary-500, var(--lt-primary-500));
+    background: rgba(34, 197, 94, 0.12);
+    color: var(--p-success-500, #22c55e);
 }
 
 /* Dark Mode Tokens */
@@ -131,46 +133,46 @@ html.dark .p-breadcrumb-transparent,
 html.dark .p-breadcrumb,
 [data-theme="dark"] .p-breadcrumb,
 .dark .p-breadcrumb {
-    background: var(--p-surface-0);
-    border-color: var(--p-border-color);
+    background: var(--p-surface-0, #0f172a);
+    border-color: var(--p-border-color, #334155);
 }
 
 html.dark .p-breadcrumb-item-link,
 [data-theme="dark"] .p-breadcrumb-item-link,
 .dark .p-breadcrumb-item-link {
-    color: var(--p-text-muted);
+    color: var(--p-text-muted, #94a3b8);
 }
 
 html.dark .p-breadcrumb-item-link:hover,
 [data-theme="dark"] .p-breadcrumb-item-link:hover,
 .dark .p-breadcrumb-item-link:hover {
-    color: var(--p-text-color);
-    background: var(--p-surface-100);
+    color: var(--p-text-color, #f8fafc);
+    background: var(--p-surface-100, #1e293b);
 }
 
 html.dark .p-breadcrumb-item-current,
 [data-theme="dark"] .p-breadcrumb-item-current,
 .dark .p-breadcrumb-item-current {
-    color: var(--p-text-color);
+    color: var(--p-text-color, #f8fafc);
 }
 
 html.dark .p-breadcrumb-separator,
 [data-theme="dark"] .p-breadcrumb-separator,
 .dark .p-breadcrumb-separator {
-    color: var(--p-surface-400);
+    color: var(--p-text-muted, #64748b);
 }
 
 html.dark .p-breadcrumb-ellipsis,
 [data-theme="dark"] .p-breadcrumb-ellipsis,
 .dark .p-breadcrumb-ellipsis {
-    color: var(--p-text-muted);
+    color: var(--p-text-muted, #94a3b8);
 }
 
 html.dark .p-breadcrumb-ellipsis:hover,
 [data-theme="dark"] .p-breadcrumb-ellipsis:hover,
 .dark .p-breadcrumb-ellipsis:hover {
-    background: var(--p-surface-100);
-    color: var(--p-text-color);
+    background: var(--p-surface-100, #1e293b);
+    color: var(--p-text-color, #f8fafc);
 }
 `;
 
@@ -186,27 +188,34 @@ export interface BreadcrumbItem {
 }
 
 export interface BreadcrumbProps {
-    items: BreadcrumbItem[];
+    items?: BreadcrumbItem[];
+    model?: BreadcrumbItem[];
     home?: {
         icon?: string;
         url?: string;
         label?: string;
-    pt?: PassthroughRecord;
-    studioOverrides?: Record<string, any>;
-};
+        pt?: PassthroughRecord;
+        studioOverrides?: Record<string, any>;
+    };
     homeUrl?: string;
     homeIcon?: string;
+    homeLabel?: string;
     separator?: 'chevron' | 'slash' | 'arrow' | string;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 export default function BreadcrumbIsland(container: HTMLElement, props: BreadcrumbProps, ctx?: IslandContext) {
     injectIslandStyle('breadcrumb', BREADCRUMB_CSS);
+    container.setAttribute('data-part', 'root');
 
-    const items = props.items || [];
-    const homeUrl = props.home?.url || props.homeUrl || '/';
-    const homeIcon = props.home?.icon || props.homeIcon || 'home';
-    const homeLabel = props.home?.label || '';
-    const separatorType = props.separator || 'chevron';
+    const rawList = props.items || props.model || (props as any).Items || (props as any).Model || [];
+    const items = Array.isArray(rawList) ? rawList : [];
+
+    const homeUrl = props.home?.url || props.homeUrl || (props as any).HomeUrl || (props as any).home_url || container.getAttribute('home-url') || '/';
+    const homeIcon = props.home?.icon || props.homeIcon || (props as any).HomeIcon || (props as any).home_icon || container.getAttribute('home-icon') || 'home';
+    const homeLabel = props.home?.label || props.homeLabel || (props as any).HomeLabel || (props as any).home_label || container.getAttribute('home-label') || '';
+    const separatorType = props.separator || (props as any).Separator || container.getAttribute('separator') || 'chevron';
 
     function getSeparatorHtml(): string {
         if (separatorType === 'slash') {
@@ -253,7 +262,7 @@ export default function BreadcrumbIsland(container: HTMLElement, props: Breadcru
 
     const itemsHtml = items.map((item, idx) => {
         const isLast = idx === items.length - 1;
-        const isCurrent = item.isCurrent || isLast;
+        const isCurrent = item.isCurrent || (item as any).IsCurrent || isLast;
         const label = (item as any).label || (item as any).Label || '';
         const url = (item as any).url || (item as any).Url;
         const icon = (item as any).icon || (item as any).Icon;
@@ -292,7 +301,7 @@ export default function BreadcrumbIsland(container: HTMLElement, props: Breadcru
         `;
     }).join('');
 
-    const homeSvg = LucideIcons.home || '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>';
+    const homeSvg = LucideIcons[homeIcon] || LucideIcons.home || '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>';
 
     container.innerHTML = `
         <nav class="p-breadcrumb p-component" aria-label="Breadcrumb">
