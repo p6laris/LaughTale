@@ -1,6 +1,6 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
-﻿/**
+/**
  * LaughTale: Enterprise Timeline Component (Aura Design System compliant)
  * Flexible chronological event sequence visualizer supporting vertical/horizontal orientations,
  * multiple alignment modes (left, right, alternate, top, bottom), custom rich cards,
@@ -22,11 +22,13 @@ export interface TimelineProps {
 }
 
 const TIMELINE_CSS = `
-.p-timeline {
+.p-timeline,
+island-timeline {
     display: flex;
     flex-grow: 1;
     font-family: var(--p-font-family, inherit);
-    color: var(--lt-surface-700);
+    color: var(--p-text-color, var(--lt-surface-700));
+    box-sizing: border-box;
 }
 
 .p-timeline-vertical {
@@ -44,6 +46,7 @@ const TIMELINE_CSS = `
     display: flex;
     position: relative;
     min-height: 4.5rem;
+    box-sizing: border-box;
 }
 
 .p-timeline-vertical.p-timeline-left .p-timeline-event {
@@ -62,7 +65,7 @@ const TIMELINE_CSS = `
     flex: 1;
     padding: 0.125rem 1rem 1rem 1rem;
     font-size: 0.8125rem;
-    color: var(--lt-surface-500);
+    color: var(--p-text-muted, var(--lt-surface-500));
 }
 
 .p-timeline-vertical.p-timeline-left .p-timeline-event-opposite {
@@ -115,39 +118,47 @@ const TIMELINE_CSS = `
 .p-timeline-event-marker.p-marker-default {
     width: 0.875rem;
     height: 0.875rem;
-    border: 2px solid var(--lt-primary-500);
-    background: var(--lt-surface-0);
+    border: 2px solid var(--p-primary-color, var(--lt-primary-500, #10b981));
+    background: var(--p-content-bg, var(--p-surface-0, #ffffff));
     margin-top: 0.25rem;
+    border-radius: 9999px;
+    box-sizing: border-box;
 }
 
 .p-timeline-vertical .p-timeline-event-connector {
     flex-grow: 1;
     width: 2px;
-    background-color: var(--lt-surface-200);
+    background-color: var(--p-border-color, var(--lt-surface-200, #e2e8f0));
     margin: 0.25rem 0;
 }
 
 /* Horizontal layout styling with continuous locked axis */
 .p-timeline-horizontal .p-timeline-event {
+    display: flex;
     flex-direction: column;
-    flex: 1;
+    flex: 1 1 0;
     min-height: auto;
     min-width: 8rem;
-    align-items: stretch;
+    align-items: center;
+    position: relative;
 }
 
 .p-timeline-horizontal .p-timeline-event-separator {
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: center;
     width: 100%;
-    order: 2;
     position: relative;
     min-height: 1.5rem;
 }
 
 .p-timeline-horizontal .p-timeline-event-marker {
-    margin: 0 auto;
+    margin: 0 !important;
+}
+
+.p-timeline-horizontal .p-timeline-event-marker.p-marker-default {
+    margin-top: 0 !important;
 }
 
 .p-timeline-horizontal .p-timeline-event-connector {
@@ -156,7 +167,7 @@ const TIMELINE_CSS = `
     left: 50%;
     width: 100%;
     height: 2px;
-    background-color: var(--lt-surface-300);
+    background-color: var(--p-border-color, var(--lt-surface-300, #cbd5e1));
     transform: translateY(-50%);
     z-index: 1;
 }
@@ -165,31 +176,48 @@ const TIMELINE_CSS = `
 .p-timeline-horizontal .p-timeline-event-content {
     padding: 0.5rem 0.25rem;
     text-align: center !important;
-    min-height: 2rem;
+    min-height: 1.5rem;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-.p-timeline-horizontal.p-timeline-top .p-timeline-event-opposite {
+/* Top Align: separator is on top, content below */
+.p-timeline-horizontal.p-timeline-top .p-timeline-event-separator {
     order: 1;
 }
 .p-timeline-horizontal.p-timeline-top .p-timeline-event-content {
-    order: 3;
+    order: 2;
+}
+.p-timeline-horizontal.p-timeline-top .p-timeline-event-opposite {
+    display: none;
 }
 
+/* Bottom Align: content on top, separator at bottom */
+.p-timeline-horizontal.p-timeline-bottom .p-timeline-event-opposite {
+    display: none;
+}
 .p-timeline-horizontal.p-timeline-bottom .p-timeline-event-content {
     order: 1;
 }
-.p-timeline-horizontal.p-timeline-bottom .p-timeline-event-opposite {
-    order: 3;
+.p-timeline-horizontal.p-timeline-bottom .p-timeline-event-separator {
+    order: 2;
 }
 
+/* Alternate Align */
 .p-timeline-horizontal.p-timeline-alternate .p-timeline-event:nth-child(even) .p-timeline-event-content {
     order: 1;
+}
+.p-timeline-horizontal.p-timeline-alternate .p-timeline-event:nth-child(even) .p-timeline-event-separator {
+    order: 2;
 }
 .p-timeline-horizontal.p-timeline-alternate .p-timeline-event:nth-child(even) .p-timeline-event-opposite {
     order: 3;
 }
 .p-timeline-horizontal.p-timeline-alternate .p-timeline-event:nth-child(odd) .p-timeline-event-opposite {
     order: 1;
+}
+.p-timeline-horizontal.p-timeline-alternate .p-timeline-event:nth-child(odd) .p-timeline-event-separator {
+    order: 2;
 }
 .p-timeline-horizontal.p-timeline-alternate .p-timeline-event:nth-child(odd) .p-timeline-event-content {
     order: 3;
@@ -199,8 +227,8 @@ const TIMELINE_CSS = `
 .p-timeline-card {
     padding: 1.25rem;
     border-radius: var(--p-border-radius-xl, 12px);
-    background: var(--lt-surface-0);
-    border: 1px solid var(--lt-surface-200);
+    background: var(--p-content-bg, var(--p-surface-0, #ffffff));
+    border: 1px solid var(--p-border-color, var(--lt-surface-200));
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
     margin-bottom: 1rem;
     text-align: left;
@@ -216,7 +244,7 @@ const TIMELINE_CSS = `
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    color: var(--lt-surface-0, var(--lt-surface-0));
+    color: #ffffff;
 }
 
 .p-timeline-pulse {
@@ -227,17 +255,21 @@ const TIMELINE_CSS = `
     0%, 100% { opacity: 1; transform: scale(1); }
     50% { opacity: .85; transform: scale(1.08); }
 }
+
 /* Dark Mode Tokens */
 html.dark .p-timeline,
+html.dark island-timeline,
 [data-theme="dark"] .p-timeline,
-.dark .p-timeline {
+[data-theme="dark"] island-timeline,
+.dark .p-timeline,
+.dark island-timeline {
     color: var(--p-text-color) !important;
 }
 html.dark .p-timeline-event-marker.p-marker-default,
 [data-theme="dark"] .p-timeline-event-marker.p-marker-default,
 .dark .p-timeline-event-marker.p-marker-default {
     background: var(--p-surface-0) !important;
-    border-color: var(--p-primary-500) !important;
+    border-color: var(--p-primary-color, #10b981) !important;
 }
 html.dark .p-timeline-event-connector,
 [data-theme="dark"] .p-timeline-event-connector,
@@ -303,17 +335,27 @@ const ICONS = {
 };
 
 const COLOR_MAP: Record<string, string> = {
-    'bg-blue-500': 'var(--lt-info-500, var(--lt-info-500))',
-    'bg-green-500': 'var(--lt-primary-500, var(--lt-primary-500))',
-    'bg-orange-500': 'var(--lt-warn-500)',
-    'bg-lime-500': 'var(--lt-success-500)',
-    'bg-violet-500': 'var(--lt-primary-500, var(--lt-primary-500))',
-    'bg-amber-500': 'var(--lt-warn-500, var(--lt-warn-500))',
-    'bg-rose-500': 'var(--lt-danger-500, var(--lt-danger-500))'
+    'bg-blue-500': 'var(--p-info-500, #3b82f6)',
+    'bg-green-500': 'var(--p-primary-color, var(--p-success-500, #10b981))',
+    'bg-orange-500': 'var(--p-warn-500, #f97316)',
+    'bg-lime-500': 'var(--p-success-500, #84cc16)',
+    'bg-violet-500': 'var(--p-primary-color, #8b5cf6)',
+    'bg-amber-500': 'var(--p-warn-500, #f59e0b)',
+    'bg-rose-500': 'var(--p-danger-500, #f43f5e)'
 };
 
 export default function TimelineIsland(container: HTMLElement, props: TimelineProps, ctx?: IslandContext) {
     injectIslandStyle('timeline', TIMELINE_CSS);
+    container.setAttribute('data-part', 'root');
+
+    // Unpack slot if present
+    const slotEl = container.querySelector<HTMLElement>(':scope > .island-slot');
+    if (slotEl) {
+        while (slotEl.firstChild) {
+            container.appendChild(slotEl.firstChild);
+        }
+        slotEl.remove();
+    }
 
     const rawEvents: any[] = props.value || props.events || [];
     const align = props.align || 'left';
@@ -363,11 +405,11 @@ export default function TimelineIsland(container: HTMLElement, props: TimelinePr
     }
 
     function getColorHex(colorStr?: string): string {
-        if (!colorStr) return 'var(--lt-primary-500, var(--lt-primary-500))';
+        if (!colorStr) return 'var(--p-primary-color, #10b981)';
         const clean = colorStr.replace('!', '').trim();
         if (COLOR_MAP[clean]) return COLOR_MAP[clean];
         if (clean.startsWith('#') || clean.startsWith('rgb')) return clean;
-        return 'var(--lt-primary-500, var(--lt-primary-500))';
+        return 'var(--p-primary-color, #10b981)';
     }
 
     function renderMarker(item: any, isLast: boolean): string {
@@ -378,13 +420,13 @@ export default function TimelineIsland(container: HTMLElement, props: TimelinePr
             let iconHtml = '';
 
             if (status === 'completed') {
-                btnStyle += ' background: var(--lt-success-500, var(--lt-success-500)); color: var(--lt-surface-0, var(--lt-surface-0)); cursor: default;';
+                btnStyle += ' background: var(--p-success-500, #10b981); color: #ffffff; cursor: default;';
                 iconHtml = ICONS.check;
             } else if (status === 'current') {
-                btnStyle += ' background: var(--lt-primary-500); color: var(--lt-surface-0, var(--lt-surface-0)); cursor: pointer; transform: scale(1.05);';
+                btnStyle += ' background: var(--p-primary-color, #10b981); color: #ffffff; cursor: pointer; transform: scale(1.05);';
                 iconHtml = getIconSvg(item.icon) || ICONS.userPlus;
             } else {
-                btnStyle += ' background: var(--lt-surface-200); color: var(--lt-surface-400); cursor: not-allowed;';
+                btnStyle += ' background: var(--p-surface-200); color: var(--p-text-muted); cursor: not-allowed;';
                 iconHtml = getIconSvg(item.icon) || ICONS.userPlus;
             }
 
@@ -400,7 +442,7 @@ export default function TimelineIsland(container: HTMLElement, props: TimelinePr
         // 2. Activity Feed Avatar Marker
         if (isActivityFeed && item.user) {
             const avatar = typeof item.user === 'object' ? item.user.avatar : (item.id === '1' ? 'SC' : item.id === '2' ? 'AK' : item.id === '3' ? 'MJ' : item.id === '4' ? 'DP' : 'EW');
-            const color = item.id === '1' ? 'var(--lt-primary-500, var(--lt-primary-500))' : item.id === '2' ? 'var(--lt-info-500, var(--lt-info-500))' : item.id === '3' ? 'var(--lt-primary-500, var(--lt-primary-500))' : item.id === '4' ? 'var(--lt-warn-500, var(--lt-warn-500))' : 'var(--lt-danger-500, var(--lt-danger-500))';
+            const color = item.id === '1' ? 'var(--p-primary-color, #10b981)' : item.id === '2' ? 'var(--p-info-500, #3b82f6)' : item.id === '3' ? 'var(--p-primary-color, #10b981)' : item.id === '4' ? 'var(--p-warn-500, #f59e0b)' : 'var(--p-danger-500, #ef4444)';
             return `
                 <div class="p-timeline-event-marker">
                     <span class="p-timeline-avatar" style="background: ${color};">
@@ -416,7 +458,7 @@ export default function TimelineIsland(container: HTMLElement, props: TimelinePr
             const colorHex = getColorHex(item.color);
             return `
                 <div class="p-timeline-event-marker">
-                    <span style="display: inline-flex; align-items: center; justify-content: center; width: 2.75rem; height: 2.75rem; border-radius: 9999px; color: var(--lt-surface-0, var(--lt-surface-0)); background: ${colorHex}; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+                    <span style="display: inline-flex; align-items: center; justify-content: center; width: 2.75rem; height: 2.75rem; border-radius: 9999px; color: #ffffff; background: ${colorHex}; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
                         ${iconSvg}
                     </span>
                 </div>
@@ -435,22 +477,22 @@ export default function TimelineIsland(container: HTMLElement, props: TimelinePr
         }
         if (item.date && item.time) {
             return `
-                <div style="font-weight: 600; color: var(--lt-surface-800);">${item.date}</div>
-                <div style="font-size: 0.75rem; color: var(--lt-surface-500);">${item.time}</div>
+                <div style="font-weight: 600; color: var(--p-text-color);">${item.date}</div>
+                <div style="font-size: 0.75rem; color: var(--p-text-muted);">${item.time}</div>
             `;
         }
         if (item.date) {
-            return `<span style="font-size: 0.8125rem; color: var(--lt-surface-500);">${item.date}</span>`;
+            return `<span style="font-size: 0.8125rem; color: var(--p-text-muted);">${item.date}</span>`;
         }
         if (item.time) {
-            return `<span style="white-space: nowrap; font-size: 0.8125rem; color: var(--lt-surface-500);">${item.time}</span>`;
+            return `<span style="white-space: nowrap; font-size: 0.8125rem; color: var(--p-text-muted);">${item.time}</span>`;
         }
-        return `&nbsp;`;
+        return ``;
     }
 
     function renderContent(item: any): string {
         if (typeof item === 'string') {
-            return `<span style="font-size: 0.875rem; font-weight: 600; color: var(--lt-surface-800);">${item}</span>`;
+            return `<span style="font-size: 0.875rem; font-weight: 600; color: var(--p-text-color);">${item}</span>`;
         }
 
         // 1. Interactive Step Workflow Content
@@ -461,10 +503,10 @@ export default function TimelineIsland(container: HTMLElement, props: TimelinePr
 
             return `
                 <div style="padding: 0.75rem 1rem; border-radius: 8px; transition: all 0.2s ease; ${isDone ? 'background: rgba(34, 197, 94, 0.08);' : isCurr ? 'background: rgba(16, 185, 129, 0.08);' : 'opacity: 0.6;'}">
-                    <p style="margin: 0; font-weight: 600; font-size: 0.875rem; ${isDone ? 'color: var(--lt-success-700, var(--lt-success-700)); text-decoration: line-through;' : isCurr ? 'color: var(--lt-primary-600);' : 'color: var(--lt-surface-600);'}">
+                    <p style="margin: 0; font-weight: 600; font-size: 0.875rem; ${isDone ? 'color: var(--p-success-700, #15803d); text-decoration: line-through;' : isCurr ? 'color: var(--p-primary-color, #10b981);' : 'color: var(--p-text-muted);'}">
                         ${item.label || item.status || item.title}
                     </p>
-                    ${isCurr ? `<p style="font-size: 0.75rem; color: var(--lt-surface-500); margin: 0.25rem 0 0 0;">Click the marker to complete</p>` : ''}
+                    ${isCurr ? `<p style="font-size: 0.75rem; color: var(--p-text-muted); margin: 0.25rem 0 0 0;">Click the marker to complete</p>` : ''}
                 </div>
             `;
         }
@@ -473,11 +515,11 @@ export default function TimelineIsland(container: HTMLElement, props: TimelinePr
         if (isActivityFeed) {
             const userName = typeof item.user === 'object' ? item.user.name : item.user;
             const detailsHtml = item.details && item.details.length > 0 ? `
-                <div style="margin-top: 0.75rem; padding: 0.75rem; border-radius: 8px; background: var(--lt-surface-50); border: 1px solid var(--lt-surface-200);">
+                <div style="margin-top: 0.75rem; padding: 0.75rem; border-radius: 8px; background: var(--p-surface-50); border: 1px solid var(--p-border-color);">
                     <ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 0.35rem;">
                         ${item.details.map((d: string) => `
-                            <li style="font-size: 0.8125rem; font-family: var(--p-font-mono, monospace); color: var(--lt-surface-700); display: flex; align-items: center; gap: 0.5rem;">
-                                <span style="color: var(--lt-surface-400);">${ICONS.minus}</span> ${d}
+                            <li style="font-size: 0.8125rem; font-family: var(--p-font-mono, monospace); color: var(--p-text-color); display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="color: var(--p-text-muted);">${ICONS.minus}</span> ${d}
                             </li>
                         `).join('')}
                     </ul>
@@ -487,12 +529,12 @@ export default function TimelineIsland(container: HTMLElement, props: TimelinePr
             return `
                 <div style="padding-bottom: 1.5rem;">
                     <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-                        <span style="font-weight: 600; color: var(--lt-surface-900);">${userName}</span>
-                        <span style="color: var(--lt-surface-500);">${item.action || ''}</span>
-                        <span style="font-weight: 600; color: var(--lt-primary-600);">${item.target || ''}</span>
-                        ${item.repo ? `<span style="color: var(--lt-surface-500);">to</span> <code style="padding: 0.15rem 0.45rem; border-radius: 4px; background: var(--lt-surface-100); font-size: 0.8125rem; font-family: monospace; color: var(--lt-surface-700);">${item.repo}</code>` : ''}
+                        <span style="font-weight: 600; color: var(--p-text-color);">${userName}</span>
+                        <span style="color: var(--p-text-muted);">${item.action || ''}</span>
+                        <span style="font-weight: 600; color: var(--p-primary-color, #10b981);">${item.target || ''}</span>
+                        ${item.repo ? `<span style="color: var(--p-text-muted);">to</span> <code style="padding: 0.15rem 0.45rem; border-radius: 4px; background: var(--p-surface-100); font-size: 0.8125rem; font-family: monospace; color: var(--p-text-color);">${item.repo}</code>` : ''}
                     </div>
-                    ${item.description ? `<p style="margin: 0.35rem 0 0 0; font-size: 0.875rem; color: var(--lt-surface-600);">${item.description}</p>` : ''}
+                    ${item.description ? `<p style="margin: 0.35rem 0 0 0; font-size: 0.875rem; color: var(--p-text-muted);">${item.description}</p>` : ''}
                     ${detailsHtml}
                 </div>
             `;
@@ -503,29 +545,29 @@ export default function TimelineIsland(container: HTMLElement, props: TimelinePr
             const detailsHtml = item.details && item.details.length > 0 ? `
                 <ul style="margin: 0.75rem 0 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 0.35rem;">
                     ${item.details.map((d: string) => `
-                        <li style="font-size: 0.8125rem; color: var(--lt-surface-500); display: flex; align-items: center; gap: 0.5rem;">
-                            <span style="color: var(--lt-primary-500);">${ICONS.box}</span> ${d}
+                        <li style="font-size: 0.8125rem; color: var(--p-text-muted); display: flex; align-items: center; gap: 0.5rem;">
+                            <span style="color: var(--p-primary-color, #10b981);">${ICONS.box}</span> ${d}
                         </li>
                     `).join('')}
                 </ul>
             ` : '';
 
             const trackingHtml = item.tracking ? `
-                <div style="margin-top: 1rem; padding: 0.65rem 0.85rem; border-radius: 8px; background: var(--lt-surface-100); display: flex; align-items: center; justify-content: space-between;">
-                    <span style="font-size: 0.8125rem; color: var(--lt-surface-700); display: flex; align-items: center; gap: 0.5rem;">
+                <div style="margin-top: 1rem; padding: 0.65rem 0.85rem; border-radius: 8px; background: var(--p-surface-100); display: flex; align-items: center; justify-content: space-between;">
+                    <span style="font-size: 0.8125rem; color: var(--p-text-color); display: flex; align-items: center; gap: 0.5rem;">
                         ${ICONS.mapPin} Tracking: <strong>${item.tracking}</strong>
                     </span>
-                    <button type="button" class="p-button p-component p-button-text" style="font-size: 0.75rem; font-weight: 600; color: var(--lt-primary-600); background: transparent; border: none; cursor: pointer; padding: 0.25rem 0.5rem;">Track</button>
+                    <button type="button" class="p-button p-component p-button-text" style="font-size: 0.75rem; font-weight: 600; color: var(--p-primary-color, #10b981); background: transparent; border: none; cursor: pointer; padding: 0.25rem 0.5rem;">Track</button>
                 </div>
             ` : '';
 
             return `
                 <div class="p-timeline-card">
                     <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
-                        ${item.user ? `<span class="p-timeline-avatar" style="background: rgba(16, 185, 129, 0.12); color: var(--lt-primary-600);">${item.user}</span>` : ''}
-                        <span style="font-weight: 700; font-size: 0.9375rem; color: var(--lt-surface-900);">${item.status || item.title}</span>
+                        ${item.user ? `<span class="p-timeline-avatar" style="background: rgba(16, 185, 129, 0.12); color: var(--p-primary-color, #10b981);">${item.user}</span>` : ''}
+                        <span style="font-weight: 700; font-size: 0.9375rem; color: var(--p-text-color);">${item.status || item.title}</span>
                     </div>
-                    ${item.description ? `<p style="margin: 0; font-size: 0.875rem; color: var(--lt-surface-600); line-height: 1.5;">${item.description}</p>` : ''}
+                    ${item.description ? `<p style="margin: 0; font-size: 0.875rem; color: var(--p-text-muted); line-height: 1.5;">${item.description}</p>` : ''}
                     ${detailsHtml}
                     ${trackingHtml}
                 </div>
@@ -534,7 +576,7 @@ export default function TimelineIsland(container: HTMLElement, props: TimelinePr
 
         // 4. Basic Status
         return `
-            <div style="font-size: 0.875rem; font-weight: 500; color: var(--lt-surface-800);">${item.status || item.title || item.label || JSON.stringify(item)}</div>
+            <div style="font-size: 0.875rem; font-weight: 500; color: var(--p-text-color);">${item.status || item.title || item.label || JSON.stringify(item)}</div>
         `;
     }
 
@@ -557,15 +599,15 @@ export default function TimelineIsland(container: HTMLElement, props: TimelinePr
                 <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem;">
                     <div style="display: flex; align-items: center; justify-content: space-between;">
                         <div>
-                            <h3 style="margin: 0; font-size: 1.125rem; font-weight: 700; color: var(--lt-surface-900);">Onboarding Progress</h3>
-                            <p style="margin: 0.25rem 0 0 0; font-size: 0.8125rem; color: var(--lt-surface-500);">${doneCount} of ${allCount} steps completed</p>
+                            <h3 style="margin: 0; font-size: 1.125rem; font-weight: 700; color: var(--p-text-color);">Onboarding Progress</h3>
+                            <p style="margin: 0.25rem 0 0 0; font-size: 0.8125rem; color: var(--p-text-muted);">${doneCount} of ${allCount} steps completed</p>
                         </div>
-                        <button type="button" class="p-interactive-reset-btn p-button p-component p-button-outlined" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: 6px; border: 1px solid var(--lt-surface-300); background: var(--lt-surface-0); cursor: pointer; color: var(--lt-surface-700);">
+                        <button type="button" class="p-interactive-reset-btn p-button p-component p-button-outlined" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: 6px; border: 1px solid var(--p-border-color); background: var(--p-surface-0); cursor: pointer; color: var(--p-text-color);">
                             ${ICONS.refresh} Reset
                         </button>
                     </div>
-                    <div style="width: 100%; height: 0.5rem; border-radius: 9999px; background: var(--lt-surface-200); overflow: hidden;">
-                        <div style="width: ${percent}%; height: 100%; border-radius: 9999px; background: var(--lt-primary-500); transition: width 0.4s ease;"></div>
+                    <div style="width: 100%; height: 0.5rem; border-radius: 9999px; background: var(--p-surface-200); overflow: hidden;">
+                        <div style="width: ${percent}%; height: 100%; border-radius: 9999px; background: var(--p-primary-color, #10b981); transition: width 0.4s ease;"></div>
                     </div>
                 </div>
             `;
@@ -573,9 +615,9 @@ export default function TimelineIsland(container: HTMLElement, props: TimelinePr
             if (isAllDone) {
                 interactiveCelebrationHtml = `
                     <div style="margin-top: 1.5rem; padding: 1rem; border-radius: 8px; background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.3); display: flex; flex-direction: column; align-items: center; gap: 0.25rem; text-align: center;">
-                        <span style="color: var(--lt-success-500, var(--lt-success-500));">${ICONS.checkCircle}</span>
-                        <div style="font-weight: 700; color: var(--lt-success-700, var(--lt-success-700)); font-size: 0.9375rem;">Onboarding Complete!</div>
-                        <span style="font-size: 0.8125rem; color: var(--lt-success-600, var(--lt-success-600));">You've completed all the steps.</span>
+                        <span style="color: var(--p-success-500, #10b981);">${ICONS.checkCircle}</span>
+                        <div style="font-weight: 700; color: var(--p-success-700, #15803d); font-size: 0.9375rem;">Onboarding Complete!</div>
+                        <span style="font-size: 0.8125rem; color: var(--p-success-600, #16a34a);">You've completed all the steps.</span>
                     </div>
                 `;
             }
@@ -586,8 +628,8 @@ export default function TimelineIsland(container: HTMLElement, props: TimelinePr
         if (isActivityFeed) {
             activityHeaderHtml = `
                 <div style="display: flex; align-items: center; gap: 0.625rem; margin-bottom: 1.25rem;">
-                    <span style="color: var(--lt-surface-500);">${ICONS.history}</span>
-                    <span style="font-size: 1.125rem; font-weight: 700; color: var(--lt-surface-900);">Recent Activity</span>
+                    <span style="color: var(--p-text-muted);">${ICONS.history}</span>
+                    <span style="font-size: 1.125rem; font-weight: 700; color: var(--p-text-color);">Recent Activity</span>
                 </div>
             `;
         }
@@ -595,10 +637,11 @@ export default function TimelineIsland(container: HTMLElement, props: TimelinePr
         // Render Events
         const eventsHtml = rawEvents.map((item, idx) => {
             const isLast = idx === rawEvents.length - 1;
+            const oppositeContent = renderOpposite(item);
             return `
                 <div class="p-timeline-event" role="listitem">
                     <div class="p-timeline-event-opposite">
-                        ${renderOpposite(item)}
+                        ${oppositeContent}
                     </div>
                     <div class="p-timeline-event-separator">
                         ${renderMarker(item, isLast)}
