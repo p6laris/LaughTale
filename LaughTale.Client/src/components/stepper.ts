@@ -9,18 +9,23 @@ import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
 
 const STEPPER_CSS = `
-.p-stepper {
+.p-stepper,
+island-stepper,
+p-stepper {
     display: flex;
     flex-direction: column;
     width: 100%;
     box-sizing: border-box;
+    font-family: var(--p-font-family, inherit);
 }
 
 .p-stepper-horizontal {
     flex-direction: column;
 }
 
-.p-steplist {
+.p-steplist,
+island-steplist,
+p-steplist {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -31,7 +36,9 @@ const STEPPER_CSS = `
     width: 100%;
 }
 
-.p-step {
+.p-step,
+island-step,
+p-step {
     display: inline-flex;
     align-items: center;
     flex-shrink: 0;
@@ -52,12 +59,13 @@ const STEPPER_CSS = `
     transition: background-color 0.15s ease, color 0.15s ease;
     outline: none;
     user-select: none;
+    color: inherit;
 }
 .p-step-header:hover:not(:disabled) {
-    background: var(--lt-surface-100);
+    background: var(--p-surface-100, #f1f5f9);
 }
 .p-step-header:focus-visible {
-    outline: 2px solid var(--lt-primary-500);
+    outline: 2px solid var(--p-primary-color, #10b981);
     outline-offset: 2px;
 }
 .p-step-header:disabled {
@@ -72,65 +80,77 @@ const STEPPER_CSS = `
     width: 2.25rem;
     height: 2.25rem;
     border-radius: 9999px;
-    border: 2px solid var(--lt-surface-300);
-    background: var(--lt-surface-0);
-    color: var(--lt-surface-700);
+    border: 2px solid var(--p-border-color, #cbd5e1);
+    background: var(--p-surface-0, #ffffff);
+    color: var(--p-text-muted, #64748b);
     font-weight: 700;
     font-size: 0.875rem;
     transition: all 0.25s cubic-bezier(0.2, 0, 0, 1);
 }
 
-.p-step-active .p-step-number {
-    border-color: var(--lt-primary-500);
-    color: var(--lt-primary-500);
-    background: var(--lt-surface-0);
+.p-step-active .p-step-number,
+.p-step.p-step-active .p-step-number {
+    border-color: var(--p-primary-color, #10b981);
+    color: var(--p-primary-color, #10b981);
+    background: var(--p-surface-0, #ffffff);
     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
 }
 
-.p-step-completed .p-step-number {
-    background: var(--lt-primary-500);
-    border-color: var(--lt-primary-500);
-    color: var(--lt-surface-0, var(--lt-surface-0));
+.p-step-completed .p-step-number,
+.p-step.p-step-completed .p-step-number {
+    background: var(--p-primary-color, #10b981);
+    border-color: var(--p-primary-color, #10b981);
+    color: #ffffff;
 }
 
 .p-step-title {
     font-size: 0.875rem;
     font-weight: 600;
-    color: var(--lt-surface-500);
+    color: var(--p-text-muted, #64748b);
     transition: color 0.2s ease;
     white-space: nowrap;
 }
-.p-step-active .p-step-title {
-    color: var(--lt-text-primary);
+.p-step-active .p-step-title,
+.p-step.p-step-active .p-step-title {
+    color: var(--p-text-color, #1e293b);
     font-weight: 700;
 }
-.p-step-completed .p-step-title {
-    color: var(--lt-text-primary);
+.p-step-completed .p-step-title,
+.p-step.p-step-completed .p-step-title {
+    color: var(--p-text-color, #1e293b);
 }
 
 .p-stepper-separator {
     flex: 1 1 0;
     height: 2px;
-    background: var(--lt-surface-200);
+    background: var(--p-border-color, #e2e8f0);
     margin: 0 0.75rem;
     transition: background-color 0.25s ease;
     z-index: 1;
 }
 .p-stepper-separator.p-stepper-separator-active {
-    background: var(--lt-primary-500);
+    background: var(--p-primary-color, #10b981);
 }
 
 /* Step Panels (Horizontal) */
-.p-steppanels {
+.p-steppanels,
+island-steppanels,
+p-steppanels {
     margin-top: 1.5rem;
     width: 100%;
 }
 
-.p-steppanel {
+.p-steppanel,
+island-steppanel,
+p-steppanel {
     display: none;
     width: 100%;
 }
-.p-steppanel.p-steppanel-active {
+
+.p-stepper:not(.p-stepper-vertical) .p-steppanel.p-steppanel-active,
+.p-stepper-horizontal .p-steppanel.p-steppanel-active,
+island-stepper:not([layout="vertical"]) .p-steppanel.p-steppanel-active,
+p-stepper:not([layout="vertical"]) .p-steppanel.p-steppanel-active {
     display: block;
     animation: p-steppanel-fadein 0.25s cubic-bezier(0.2, 0, 0, 1);
 }
@@ -141,35 +161,44 @@ const STEPPER_CSS = `
 }
 
 /* Vertical Layout & Smooth Slide Animation */
-.p-stepper-vertical {
+.p-stepper-vertical,
+island-stepper[layout="vertical"],
+p-stepper[layout="vertical"] {
     display: flex;
     flex-direction: column;
     gap: 0;
 }
 
-.p-stepitem {
+.p-stepitem,
+island-stepitem,
+p-stepitem {
     display: flex;
     flex-direction: column;
     position: relative;
 }
 
-.p-stepitem:not(:last-child)::before {
+.p-stepitem:not(:last-child)::before,
+island-stepitem:not(:last-child)::before,
+p-stepitem:not(:last-child)::before {
     content: "";
     position: absolute;
     left: calc(1.625rem - 1px);
     top: 2.75rem;
     bottom: 0;
     width: 2px;
-    background: var(--lt-surface-200);
+    background: var(--p-border-color, #e2e8f0);
     transition: background-color 0.25s ease;
     z-index: 1;
 }
 
-.p-stepitem-completed:not(:last-child)::before {
-    background: var(--lt-primary-500);
+.p-stepitem-completed:not(:last-child)::before,
+.p-stepitem.p-stepitem-completed:not(:last-child)::before {
+    background: var(--p-primary-color, #10b981);
 }
 
-.p-stepitem > .p-step {
+.p-stepitem > .p-step,
+.p-stepitem > island-step,
+.p-stepitem > p-step {
     z-index: 2;
 }
 
@@ -183,7 +212,8 @@ const STEPPER_CSS = `
     z-index: 2;
 }
 
-.p-stepitem-active > .p-stepitem-content-wrapper {
+.p-stepitem-active > .p-stepitem-content-wrapper,
+.p-stepitem.p-stepitem-active > .p-stepitem-content-wrapper {
     grid-template-rows: 1fr;
     opacity: 1;
 }
@@ -193,53 +223,69 @@ const STEPPER_CSS = `
     min-height: 0;
 }
 
-.p-stepitem .p-steppanel {
+.p-stepitem .p-steppanel,
+.p-stepitem island-steppanel,
+.p-stepitem p-steppanel {
     display: block;
     padding: 0.5rem 0 1.5rem 0;
+}
+
+/* Fallback before wrapper is injected */
+.p-stepitem:not(.p-stepitem-active) > .p-steppanel:not(.p-stepitem-content-wrapper .p-steppanel) {
+    display: none;
 }
 
 /* Dark Mode Tokens */
 html.dark .p-step-header:hover:not(:disabled),
 [data-theme="dark"] .p-step-header:hover:not(:disabled),
 .dark .p-step-header:hover:not(:disabled) {
-    background: var(--p-surface-100) !important;
+    background: var(--p-surface-100, #1e293b) !important;
 }
 
 html.dark .p-step-number,
 [data-theme="dark"] .p-step-number,
 .dark .p-step-number {
-    background: var(--p-surface-0) !important;
-    border-color: var(--p-border-color) !important;
-    color: var(--p-text-muted) !important;
+    background: var(--p-surface-0, #0f172a) !important;
+    border-color: var(--p-border-color, #334155) !important;
+    color: var(--p-text-muted, #94a3b8) !important;
 }
 
 html.dark .p-step-active .p-step-number,
+html.dark .p-step.p-step-active .p-step-number,
 [data-theme="dark"] .p-step-active .p-step-number,
-.dark .p-step-active .p-step-number {
-    border-color: var(--p-primary-500) !important;
-    color: var(--p-primary-500) !important;
-    background: var(--p-surface-0) !important;
+[data-theme="dark"] .p-step.p-step-active .p-step-number,
+.dark .p-step-active .p-step-number,
+.dark .p-step.p-step-active .p-step-number {
+    border-color: var(--p-primary-color, #10b981) !important;
+    color: var(--p-primary-color, #10b981) !important;
+    background: var(--p-surface-0, #0f172a) !important;
     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
 }
 
 html.dark .p-step-completed .p-step-number,
+html.dark .p-step.p-step-completed .p-step-number,
 [data-theme="dark"] .p-step-completed .p-step-number,
-.dark .p-step-completed .p-step-number {
-    background: var(--p-primary-500) !important;
-    border-color: var(--p-primary-500) !important;
-    color: var(--p-surface-0) !important;
+[data-theme="dark"] .p-step.p-step-completed .p-step-number,
+.dark .p-step-completed .p-step-number,
+.dark .p-step.p-step-completed .p-step-number {
+    background: var(--p-primary-color, #10b981) !important;
+    border-color: var(--p-primary-color, #10b981) !important;
+    color: #ffffff !important;
 }
 
 html.dark .p-step-active .p-step-title,
+html.dark .p-step.p-step-active .p-step-title,
 [data-theme="dark"] .p-step-active .p-step-title,
-.dark .p-step-active .p-step-title {
-    color: var(--p-text-color) !important;
+[data-theme="dark"] .p-step.p-step-active .p-step-title,
+.dark .p-step-active .p-step-title,
+.dark .p-step.p-step-active .p-step-title {
+    color: var(--p-text-color, #f8fafc) !important;
 }
 
 html.dark .p-step-title,
 [data-theme="dark"] .p-step-title,
 .dark .p-step-title {
-    color: var(--p-text-muted);
+    color: var(--p-text-muted, #94a3b8);
 }
 
 html.dark .p-stepper-separator,
@@ -248,7 +294,7 @@ html.dark .p-stepitem:not(:last-child)::before,
 [data-theme="dark"] .p-stepitem:not(:last-child)::before,
 .dark .p-stepper-separator,
 .dark .p-stepitem:not(:last-child)::before {
-    background: var(--p-border-color);
+    background: var(--p-border-color, #334155);
 }
 html.dark .p-stepper-separator.p-stepper-separator-active,
 html.dark .p-stepitem-completed:not(:last-child)::before,
@@ -256,7 +302,7 @@ html.dark .p-stepitem-completed:not(:last-child)::before,
 [data-theme="dark"] .p-stepitem-completed:not(:last-child)::before,
 .dark .p-stepper-separator.p-stepper-separator-active,
 .dark .p-stepitem-completed:not(:last-child)::before {
-    background: var(--p-primary-500) !important;
+    background: var(--p-primary-color, #10b981) !important;
 }
 `;
 
@@ -270,6 +316,7 @@ export interface StepperProps {
 
 export default function StepperIsland(container: HTMLElement, props: StepperProps, ctx?: IslandContext) {
     injectIslandStyle('stepper', STEPPER_CSS);
+    container.setAttribute('data-part', 'root');
 
     const rootEl = container.querySelector<HTMLElement>('.p-stepper') || container;
     const isVertical = props.layout === 'vertical' || rootEl.classList.contains('p-stepper-vertical') || rootEl.querySelector('.p-stepitem') !== null;
@@ -306,7 +353,7 @@ export default function StepperIsland(container: HTMLElement, props: StepperProp
         for (let i = 0; i < renderedSteps.length - 1; i++) {
             if (!renderedSteps[i].nextElementSibling?.classList.contains('p-stepper-separator')) {
                 const sep = document.createElement('li');
-                sep.className = 'p-stepper-separator'; container.setAttribute('data-part', 'root');
+                sep.className = 'p-stepper-separator';
                 sep.setAttribute('aria-hidden', 'true');
                 renderedSteps[i].after(sep);
             }
