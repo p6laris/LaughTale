@@ -9,15 +9,16 @@ import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
 
 const TOOLBAR_CSS = `
-.p-toolbar {
+.p-toolbar,
+island-toolbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     padding: 0.75rem 1rem;
-    background: var(--lt-surface-0);
-    border: 1px solid var(--lt-surface-200);
-    border-radius: var(--lt-radius);
+    background: var(--p-content-bg, var(--p-surface-0, #ffffff));
+    border: 1px solid var(--p-border-color, var(--lt-surface-200));
+    border-radius: var(--p-border-radius-md, var(--lt-radius, 6px));
     gap: 0.75rem;
     box-sizing: border-box;
     width: 100%;
@@ -29,31 +30,54 @@ const TOOLBAR_CSS = `
 .p-toolbar-end,
 .p-toolbar-group-start,
 .p-toolbar-group-center,
-.p-toolbar-group-end {
+.p-toolbar-group-end,
+island-toolbar-start,
+island-toolbar-center,
+island-toolbar-end {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    flex-wrap: wrap;
+    box-sizing: border-box;
+}
+
+.p-toolbar-start,
+island-toolbar-start {
+    justify-content: flex-start;
+    flex-shrink: 0;
 }
 
 .p-toolbar-center,
-.p-toolbar-group-center {
+.p-toolbar-group-center,
+island-toolbar-center {
     justify-content: center;
     flex: 1 1 auto;
 }
 
 .p-toolbar-end,
-.p-toolbar-group-end {
+.p-toolbar-group-end,
+island-toolbar-end {
+    justify-content: flex-end;
     margin-left: auto;
+    flex-shrink: 0;
 }
 
 /* Toggle item active styling */
 .p-toolbar [data-toggle-active="true"],
 .p-toolbar .p-button-active-toggle {
-    background: var(--lt-surface-0) !important;
-    color: var(--lt-primary-600) !important;
+    background: var(--p-surface-0, #ffffff) !important;
+    color: var(--p-primary-color, var(--lt-primary-600, #10b981)) !important;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
     font-weight: 700 !important;
+}
+
+html.dark .p-toolbar,
+html.dark island-toolbar,
+[data-theme="dark"] .p-toolbar,
+[data-theme="dark"] island-toolbar,
+.dark .p-toolbar,
+.dark island-toolbar {
+    background: var(--p-surface-0);
+    border-color: var(--p-border-color);
 }
 
 html.dark .p-toolbar [data-toggle-active="true"],
@@ -63,15 +87,7 @@ html.dark .p-toolbar .p-button-active-toggle,
 .dark .p-toolbar [data-toggle-active="true"],
 .dark .p-toolbar .p-button-active-toggle {
     background: var(--p-surface-100) !important;
-    color: var(--p-primary-500) !important;
-}
-
-/* Dark Mode Tokens */
-html.dark .p-toolbar,
-[data-theme="dark"] .p-toolbar,
-.dark .p-toolbar {
-    background: var(--p-surface-0);
-    border-color: var(--p-border-color);
+    color: var(--p-primary-color, #10b981) !important;
 }
 `;
 
@@ -86,15 +102,29 @@ const PAUSE_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" heigh
 
 export default function ToolbarIsland(container: HTMLElement, props: ToolbarProps, ctx?: IslandContext) {
     injectIslandStyle('toolbar', TOOLBAR_CSS);
+    container.setAttribute('data-part', 'root');
+
+    // Unpack slot if present
+    const slotEl = container.querySelector<HTMLElement>(':scope > .island-slot');
+    if (slotEl) {
+        while (slotEl.firstChild) {
+            container.appendChild(slotEl.firstChild);
+        }
+        slotEl.remove();
+    }
 
     const rootEl = container.querySelector<HTMLElement>('.p-toolbar') || container;
-    container.setAttribute('data-part', 'root');
     rootEl.classList.add('p-toolbar', 'p-component');
     rootEl.setAttribute('role', 'toolbar');
     rootEl.setAttribute('aria-orientation', 'horizontal');
     if (props.ariaLabel) {
         rootEl.setAttribute('aria-label', props.ariaLabel);
     }
+
+    // Set classes on start, center, end sections
+    rootEl.querySelectorAll<HTMLElement>('island-toolbar-start, .p-toolbar-start').forEach(el => el.classList.add('p-toolbar-start'));
+    rootEl.querySelectorAll<HTMLElement>('island-toolbar-center, .p-toolbar-center').forEach(el => el.classList.add('p-toolbar-center'));
+    rootEl.querySelectorAll<HTMLElement>('island-toolbar-end, .p-toolbar-end').forEach(el => el.classList.add('p-toolbar-end'));
 
     // 1. Text Formatting Toggles (Bold, Italic, Underline)
     const formatButtons = rootEl.querySelectorAll<HTMLButtonElement>('[aria-label="Bold"], [aria-label="Italic"], [aria-label="Underline"]');
@@ -104,12 +134,12 @@ export default function ToolbarIsland(container: HTMLElement, props: ToolbarProp
             const isActive = btn.classList.toggle('p-button-active-toggle');
             btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
             if (isActive) {
-                btn.style.background = 'var(--lt-surface-0)';
-                btn.style.color = 'var(--lt-primary-600)';
+                btn.style.background = 'var(--p-surface-0, #ffffff)';
+                btn.style.color = 'var(--p-primary-color, #10b981)';
                 btn.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
             } else {
                 btn.style.background = 'transparent';
-                btn.style.color = 'var(--lt-surface-700)';
+                btn.style.color = 'var(--p-text-color, var(--lt-surface-700))';
                 btn.style.boxShadow = 'none';
             }
         }, { signal: ctx?.signal });
@@ -124,13 +154,13 @@ export default function ToolbarIsland(container: HTMLElement, props: ToolbarProp
                 b.classList.remove('p-button-active-toggle');
                 b.setAttribute('aria-pressed', 'false');
                 b.style.background = 'transparent';
-                b.style.color = 'var(--lt-surface-700)';
+                b.style.color = 'var(--p-text-color, var(--lt-surface-700))';
                 b.style.boxShadow = 'none';
             });
             btn.classList.add('p-button-active-toggle');
             btn.setAttribute('aria-pressed', 'true');
-            btn.style.background = 'var(--lt-surface-0)';
-            btn.style.color = 'var(--lt-primary-600)';
+            btn.style.background = 'var(--p-surface-0, #ffffff)';
+            btn.style.color = 'var(--p-primary-color, #10b981)';
             btn.style.boxShadow = '0 1px 2px rgba(0,0,0,0.06)';
         }, { signal: ctx?.signal });
     });
@@ -142,11 +172,11 @@ export default function ToolbarIsland(container: HTMLElement, props: ToolbarProp
             e.preventDefault();
             viewButtons.forEach(b => {
                 b.style.background = 'transparent';
-                b.style.color = 'var(--lt-surface-600)';
+                b.style.color = 'var(--p-text-muted, var(--lt-surface-600))';
                 b.style.boxShadow = 'none';
             });
-            btn.style.background = 'var(--lt-surface-0)';
-            btn.style.color = 'var(--lt-primary-600)';
+            btn.style.background = 'var(--p-surface-0, #ffffff)';
+            btn.style.color = 'var(--p-primary-color, #10b981)';
             btn.style.boxShadow = '0 1px 2px rgba(0,0,0,0.06)';
         }, { signal: ctx?.signal });
     });
@@ -174,7 +204,7 @@ export default function ToolbarIsland(container: HTMLElement, props: ToolbarProp
             if (countSpan) {
                 countSpan.textContent = isStarred ? '1.4k + 1' : '1.4k';
             }
-            starBtn.style.color = isStarred ? 'var(--lt-warn-500, var(--lt-warn-500))' : 'var(--lt-text-primary)';
+            starBtn.style.color = isStarred ? 'var(--p-warn-500, #f59e0b)' : 'var(--p-text-color)';
         }, { signal: ctx?.signal });
     }
 }
