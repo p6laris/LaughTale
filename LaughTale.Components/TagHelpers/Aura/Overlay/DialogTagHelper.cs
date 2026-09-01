@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace LaughTale.Components.TagHelpers.Aura.Overlay;
@@ -73,6 +73,9 @@ public class DialogTagHelper : IslandTagHelperBase
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
         await base.ProcessAsync(context, output);
+
+        output.Attributes.RemoveAll("style");
+        output.Attributes.SetAttribute("style", "display: contents;");
 
         var childContent = await output.GetChildContentAsync();
         var innerHtml = childContent.GetContent();

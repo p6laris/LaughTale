@@ -1,4 +1,4 @@
-@page "/components"
+﻿@page "/components"
 @model LaughTale.Showcase.Pages.ComponentsModel
 @{
     ViewData["Title"] = "LaughTale Component Suite (76 Components)";
@@ -619,8 +619,8 @@
                         <island-input-number value="10" prefix="Expires in " suffix=" days" fluid="true" />
                     </div>
                     <div>
-                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Temperature (0 to 40℃)</label>
-                        <island-input-number value="20" prefix="↑ " suffix="℃" min="0" max="40" fluid="true" />
+                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Temperature (0 to 40â„ƒ)</label>
+                        <island-input-number value="20" prefix="â†‘ " suffix="â„ƒ" min="0" max="40" fluid="true" />
                     </div>
                 </div>
             </div>
@@ -639,7 +639,7 @@
                         <island-input-number value="10.5" show-buttons="true" button-layout="@ButtonLayout.Stacked" min="0" max="100" step="0.5" fluid="true" />
                     </div>
                     <div style="flex: 1; min-width: 220px;">
-                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Horizontal Layout (Step 0.25 €)</label>
+                        <label style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-color); margin-bottom: 0.35rem; display: block;">Horizontal Layout (Step 0.25 â‚¬)</label>
                         <island-input-number value="25" show-buttons="true" button-layout="@ButtonLayout.Horizontal" step="0.25" mode="@InputNumberMode.Currency" currency="EUR" fluid="true" />
                     </div>
                     <div style="display: flex; flex-direction: column; align-items: center;">
@@ -2278,7 +2278,7 @@
                         <island-rating value="3" stars="5" mode="template" />
                     </div>
                     <div>
-                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--p-text-color);">Emotion Emojis (😡 🙁 😐 😊 🤩)</label>
+                        <label style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--p-text-color);">Emotion Emojis (ðŸ˜¡ ðŸ™ ðŸ˜ ðŸ˜Š ðŸ¤©)</label>
                         <island-rating value="4" stars="5" mode="emoji" />
                     </div>
                 </div>
@@ -3235,7 +3235,7 @@
                                             <label for="card-password" style="font-size: 0.875rem; font-weight: 500; color: var(--p-text-color);">Password</label>
                                             <a href="javascript:void(0)" style="font-size: 0.8125rem; color: var(--p-primary-600); text-decoration: none; font-weight: 500;">Forgot password?</a>
                                         </div>
-                                        <island-input-text id="card-password" type="password" placeholder="••••••••" fluid="true" />
+                                        <island-input-text id="card-password" type="password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" fluid="true" />
                                     </div>
                                 </form>
                             </div>
@@ -3277,12 +3277,12 @@
                             </div>
                             <div class="p-card-content">
                                 <div style="display: flex; flex-direction: column; gap: 0.85rem;">
-                                    <p style="margin: 0;">Sakura Fresh Market is your go-to store for fresh local produce, Japanese snacks, and daily essentials — all in one place!</p>
+                                    <p style="margin: 0;">Sakura Fresh Market is your go-to store for fresh local produce, Japanese snacks, and daily essentials â€” all in one place!</p>
                                     <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.875rem;">
-                                        <span style="color: #eab308; font-size: 1rem;">★</span> <span><strong>4.6</strong> <span style="color: var(--p-text-muted);">(200+ reviews)</span></span>
+                                        <span style="color: #eab308; font-size: 1rem;">â˜…</span> <span><strong>4.6</strong> <span style="color: var(--p-text-muted);">(200+ reviews)</span></span>
                                     </div>
                                     <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.875rem; color: var(--p-surface-600);">
-                                        <span>📍</span> <span>Tokyo, Shibuya-ku</span>
+                                        <span>ðŸ“</span> <span>Tokyo, Shibuya-ku</span>
                                     </div>
                                 </div>
                             </div>
@@ -3865,7 +3865,7 @@
                                         <th style="padding: 0.5rem 1rem; text-align: left; text-transform: uppercase; font-family: var(--font-mono, monospace); font-weight: 600; color: var(--p-text-muted);">City</th>
                                         <th style="padding: 0.5rem 1rem; text-align: left; text-transform: uppercase; font-family: var(--font-mono, monospace); font-weight: 600; color: var(--p-text-muted);">State</th>
                                         <th style="padding: 0.5rem 1rem; text-align: left; text-transform: uppercase; font-family: var(--font-mono, monospace); font-weight: 600; color: var(--p-text-muted);">Population</th>
-                                        <th style="padding: 0.5rem 1rem; text-align: left; text-transform: uppercase; font-family: var(--font-mono, monospace); font-weight: 600; color: var(--p-text-muted);">Area (km²)</th>
+                                        <th style="padding: 0.5rem 1rem; text-align: left; text-transform: uppercase; font-family: var(--font-mono, monospace); font-weight: 600; color: var(--p-text-muted);">Area (kmÂ²)</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -4826,7 +4826,7 @@
                                 </div>
                                 <div style="display: flex; flex-direction: column;">
                                     <span style="font-weight: 700; font-size: 0.875rem; color: var(--p-text-color);">Midnight Reverie</span>
-                                    <span style="font-size: 0.75rem; color: var(--p-text-muted);">Aura Soundscapes • Hi-Fi Audio</span>
+                                    <span style="font-size: 0.75rem; color: var(--p-text-muted);">Aura Soundscapes â€¢ Hi-Fi Audio</span>
                                 </div>
                             </div>
                         </island-toolbar-start>
@@ -5335,7 +5335,7 @@
             <!-- Demo 3: Template with Shortcuts & Badges -->
             <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
                 <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Template (Badges &amp; Keyboard Shortcuts)</h3>
-                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Item customization featuring action shortcuts (⌘+N, ⌘+C, etc.), notification badge pills, and nested flyout chevrons.</p>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Item customization featuring action shortcuts (âŒ˜+N, âŒ˜+C, etc.), notification badge pills, and nested flyout chevrons.</p>
                 <div style="display: flex; justify-content: center; padding: 1.5rem 0;">
                     <island-tieredmenu items="@Model.TieredMenuTemplateItems" custom-template="true" />
                 </div>
@@ -5958,7 +5958,7 @@
             <!-- Demo 3: Controlled -->
             <div data-commandmenu-demo="controlled" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
                 <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Controlled</h3>
-                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">The search query is exposed via v-model:search. Bind it to external state to read, reset, or prefill the query — the filtered list updates in both directions.</p>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">The search query is exposed via v-model:search. Bind it to external state to read, reset, or prefill the query â€” the filtered list updates in both directions.</p>
                 <div style="display: flex; justify-content: center; align-items: center;">
                     <p-commandmenu model="@Model.CommandMenuControlled" placeholder="Search for commands..." />
                 </div>
@@ -5999,7 +5999,7 @@
                 <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic</h3>
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Dialog is used as a container and visibility is controlled with triggers or bindings.</p>
                 <div style="display: flex; align-items: center;">
-                    <button type="button" class="p-button p-button-primary" data-dialog-target="dlg-basic" style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                    <button type="button" class="p-button p-button-primary" data-dialog-target="dlg-basic" style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-primary-color); border: 1px solid var(--p-primary-color); color: var(--p-primary-contrast-color, #ffffff); cursor: pointer;">
                         Edit Profile
                     </button>
                     <island-aura-dialog id="dlg-basic" header="Edit Profile" dialog-width="26rem">
@@ -6028,7 +6028,7 @@
                             <button type="button" class="p-button p-button-outlined p-button-secondary p-button-sm" data-dialog-close style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: transparent; color: var(--p-text-color); cursor: pointer;">
                                 Cancel
                             </button>
-                            <button type="button" class="p-button p-button-primary p-button-sm" data-dialog-close style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                            <button type="button" class="p-button p-button-primary p-button-sm" data-dialog-close style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-primary-color); border: 1px solid var(--p-primary-color); color: var(--p-primary-contrast-color, #ffffff); cursor: pointer;">
                                 Save Changes
                             </button>
                         </div>
@@ -6041,7 +6041,7 @@
                 <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Template</h3>
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Header and Footer sections allow rich custom UI via templating.</p>
                 <div style="display: flex; align-items: center;">
-                    <button type="button" class="p-button p-button-primary" data-dialog-target="dlg-template" style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                    <button type="button" class="p-button p-button-primary" data-dialog-target="dlg-template" style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-primary-color); border: 1px solid var(--p-primary-color); color: var(--p-primary-contrast-color, #ffffff); cursor: pointer;">
                         Show
                     </button>
                     <island-aura-dialog id="dlg-template" dialog-width="25rem">
@@ -6071,7 +6071,7 @@
                             <button type="button" class="p-button p-button-outlined p-button-secondary p-button-sm" data-dialog-close style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: transparent; color: var(--p-text-color); cursor: pointer;">
                                 Cancel
                             </button>
-                            <button type="button" class="p-button p-button-primary p-button-sm" data-dialog-close style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                            <button type="button" class="p-button p-button-primary p-button-sm" data-dialog-close style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-primary-color); border: 1px solid var(--p-primary-color); color: var(--p-primary-contrast-color, #ffffff); cursor: pointer;">
                                 Save
                             </button>
                         </div>
@@ -6084,7 +6084,7 @@
                 <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Draggable</h3>
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Enabling draggable lets the user reposition the Dialog anywhere by dragging from its header.</p>
                 <div style="display: flex; align-items: center;">
-                    <button type="button" class="p-button p-button-primary" data-dialog-target="dlg-draggable" style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                    <button type="button" class="p-button p-button-primary" data-dialog-target="dlg-draggable" style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-primary-color); border: 1px solid var(--p-primary-color); color: var(--p-primary-contrast-color, #ffffff); cursor: pointer;">
                         Open Note
                     </button>
                     <island-aura-dialog id="dlg-draggable" header="Quick Note" draggable="true" dialog-width="25rem">
@@ -6096,7 +6096,7 @@
                             <button type="button" class="p-button p-button-outlined p-button-secondary p-button-sm" data-dialog-close style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: transparent; color: var(--p-text-color); cursor: pointer;">
                                 Discard
                             </button>
-                            <button type="button" class="p-button p-button-primary p-button-sm" data-dialog-close style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                            <button type="button" class="p-button p-button-primary p-button-sm" data-dialog-close style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-primary-color); border: 1px solid var(--p-primary-color); color: var(--p-primary-contrast-color, #ffffff); cursor: pointer;">
                                 Save Note
                             </button>
                         </div>
@@ -6155,7 +6155,7 @@
                             <button type="button" class="p-button p-button-outlined p-button-secondary p-button-sm" data-dialog-close style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: transparent; color: var(--p-text-color); cursor: pointer;">
                                 Cancel
                             </button>
-                            <button type="button" class="p-button p-button-primary p-button-sm" data-dialog-close style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                            <button type="button" class="p-button p-button-primary p-button-sm" data-dialog-close style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-primary-color); border: 1px solid var(--p-primary-color); color: var(--p-primary-contrast-color, #ffffff); cursor: pointer;">
                                 Save
                             </button>
                         </div>
@@ -6168,14 +6168,14 @@
                 <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Maximizable</h3>
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Adding maximizable enables the header full screen expansion mode.</p>
                 <div style="display: flex; align-items: center;">
-                    <button type="button" class="p-button p-button-primary" data-dialog-target="dlg-maximizable" style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                    <button type="button" class="p-button p-button-primary" data-dialog-target="dlg-maximizable" style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-primary-color); border: 1px solid var(--p-primary-color); color: var(--p-primary-contrast-color, #ffffff); cursor: pointer;">
                         Show
                     </button>
                     <island-aura-dialog id="dlg-maximizable" header="Article Preview" maximizable="true" dialog-width="48rem">
                         <div class="p-dialog-content" style="display: flex; flex-direction: column; gap: 1rem;">
                             <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; color: var(--p-text-muted);">
                                 <span>Published on Feb 1, 2026</span>
-                                <span>•</span>
+                                <span>â€¢</span>
                                 <span>5 min read</span>
                             </div>
                             <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--p-text-color); margin: 0;">Getting Started with Component-Driven Development</h2>
@@ -6187,8 +6187,8 @@
                             </p>
                         </div>
                         <div class="p-dialog-footer" style="justify-content: space-between;">
-                            <span style="font-size: 0.8125rem; color: var(--p-text-muted);">Author: Jane Doe • Last updated: Feb 1, 2026</span>
-                            <button type="button" class="p-button p-button-primary p-button-sm" data-dialog-close style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                            <span style="font-size: 0.8125rem; color: var(--p-text-muted);">Author: Jane Doe â€¢ Last updated: Feb 1, 2026</span>
+                            <button type="button" class="p-button p-button-primary p-button-sm" data-dialog-close style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-primary-color); border: 1px solid var(--p-primary-color); color: var(--p-primary-contrast-color, #ffffff); cursor: pointer;">
                                 Close
                             </button>
                         </div>
@@ -6201,7 +6201,7 @@
                 <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Full Screen</h3>
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">A full screen Dialog covering the entire viewport.</p>
                 <div style="display: flex; align-items: center;">
-                    <button type="button" class="p-button p-button-primary" data-dialog-target="dlg-fullscreen" style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                    <button type="button" class="p-button p-button-primary" data-dialog-target="dlg-fullscreen" style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-primary-color); border: 1px solid var(--p-primary-color); color: var(--p-primary-contrast-color, #ffffff); cursor: pointer;">
                         View Gallery
                     </button>
                     <island-aura-dialog id="dlg-fullscreen" header="Photo Gallery" style="width: 100vw; height: 100vh; max-width: 100vw; max-height: 100vh; border-radius: 0;">
@@ -6225,7 +6225,7 @@
                 <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Modal</h3>
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Mask layer behind the Dialog is enabled with modal, and dismissableMask allows closing by clicking outside.</p>
                 <div style="display: flex; align-items: center;">
-                    <button type="button" class="p-button p-button-primary" data-dialog-target="dlg-modal" style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                    <button type="button" class="p-button p-button-primary" data-dialog-target="dlg-modal" style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-primary-color); border: 1px solid var(--p-primary-color); color: var(--p-primary-contrast-color, #ffffff); cursor: pointer;">
                         Edit Profile
                     </button>
                     <island-aura-dialog id="dlg-modal" header="Edit Profile" modal="true" dismissable-mask="true" dialog-width="25rem">
@@ -6244,7 +6244,7 @@
                             <button type="button" class="p-button p-button-outlined p-button-secondary p-button-sm" data-dialog-close style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: transparent; color: var(--p-text-color); cursor: pointer;">
                                 Cancel
                             </button>
-                            <button type="button" class="p-button p-button-primary p-button-sm" data-dialog-close style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                            <button type="button" class="p-button p-button-primary p-button-sm" data-dialog-close style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-primary-color); border: 1px solid var(--p-primary-color); color: var(--p-primary-contrast-color, #ffffff); cursor: pointer;">
                                 Save
                             </button>
                         </div>
@@ -6257,7 +6257,7 @@
                 <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Without Modal</h3>
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Non-modal dialogs allow interacting with the background page simultaneously.</p>
                 <div style="display: flex; align-items: center;">
-                    <button type="button" class="p-button p-button-primary" data-dialog-target="dlg-nomodal" style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                    <button type="button" class="p-button p-button-primary" data-dialog-target="dlg-nomodal" style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-primary-color); border: 1px solid var(--p-primary-color); color: var(--p-primary-contrast-color, #ffffff); cursor: pointer;">
                         Show
                     </button>
                     <island-aura-dialog id="dlg-nomodal" header="Edit Profile" modal="false" dialog-width="25rem">
@@ -6276,7 +6276,7 @@
                             <button type="button" class="p-button p-button-outlined p-button-secondary p-button-sm" data-dialog-close style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: transparent; color: var(--p-text-color); cursor: pointer;">
                                 Cancel
                             </button>
-                            <button type="button" class="p-button p-button-primary p-button-sm" data-dialog-close style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                            <button type="button" class="p-button p-button-primary p-button-sm" data-dialog-close style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-primary-color); border: 1px solid var(--p-primary-color); color: var(--p-primary-contrast-color, #ffffff); cursor: pointer;">
                                 Save
                             </button>
                         </div>
@@ -6313,7 +6313,7 @@
                 <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Long Content</h3>
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">When content exceeds the available space, the content area scrolls while header and footer stay fixed.</p>
                 <div style="display: flex; align-items: center;">
-                    <button type="button" class="p-button p-button-primary" data-dialog-target="dlg-longcontent" style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                    <button type="button" class="p-button p-button-primary" data-dialog-target="dlg-longcontent" style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-primary-color); border: 1px solid var(--p-primary-color); color: var(--p-primary-contrast-color, #ffffff); cursor: pointer;">
                         Inside Scroll
                     </button>
                     <island-aura-dialog id="dlg-longcontent" header="Terms of Service" dialog-width="40rem">
@@ -6343,7 +6343,7 @@
                             <button type="button" class="p-button p-button-outlined p-button-secondary p-button-sm" data-dialog-close style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: transparent; color: var(--p-text-color); cursor: pointer;">
                                 Decline
                             </button>
-                            <button type="button" class="p-button p-button-primary p-button-sm" data-dialog-close style="padding: 0.45rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                            <button type="button" class="p-button p-button-primary p-button-sm" data-dialog-close style="padding: 0.45rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-primary-color); border: 1px solid var(--p-primary-color); color: var(--p-primary-contrast-color, #ffffff); cursor: pointer;">
                                 Accept
                             </button>
                         </div>
@@ -6356,7 +6356,7 @@
                 <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Responsive</h3>
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Dialog dimensions adapt across breakpoints smoothly.</p>
                 <div style="display: flex; align-items: center;">
-                    <button type="button" class="p-button p-button-primary" data-dialog-target="dlg-responsive" style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                    <button type="button" class="p-button p-button-primary" data-dialog-target="dlg-responsive" style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-primary-color); border: 1px solid var(--p-primary-color); color: var(--p-primary-contrast-color, #ffffff); cursor: pointer;">
                         New Event
                     </button>
                     <island-aura-dialog id="dlg-responsive" header="Create Event" style="width: 90vw; max-width: 36rem;">
@@ -6384,7 +6384,7 @@
                             <button type="button" class="p-button p-button-outlined p-button-secondary p-button-sm" data-dialog-close style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: transparent; color: var(--p-text-color); cursor: pointer;">
                                 Cancel
                             </button>
-                            <button type="button" class="p-button p-button-primary p-button-sm" data-dialog-close style="padding: 0.45rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                            <button type="button" class="p-button p-button-primary p-button-sm" data-dialog-close style="padding: 0.45rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-primary-color); border: 1px solid var(--p-primary-color); color: var(--p-primary-contrast-color, #ffffff); cursor: pointer;">
                                 Create Event
                             </button>
                         </div>
@@ -6397,7 +6397,7 @@
                 <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Headless</h3>
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Headless mode lets you implement custom UI containers and radial gradients instead of default elements.</p>
                 <div style="display: flex; align-items: center;">
-                    <button type="button" class="p-button p-button-primary" data-dialog-target="dlg-headless" style="display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                    <button type="button" class="p-button p-button-primary" data-dialog-target="dlg-headless" style="display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-primary-color); border: 1px solid var(--p-primary-color); color: var(--p-primary-contrast-color, #ffffff); cursor: pointer;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                         <span>Login</span>
                     </button>
@@ -6416,7 +6416,7 @@
                             </div>
                             <div style="display: flex; flex-direction: column; gap: 0.35rem;">
                                 <label for="dlg-hd-pass" style="font-size: 0.8125rem; font-weight: 600; color: #cbd5e1;">Password</label>
-                                <input id="dlg-hd-pass" type="password" class="p-inputtext p-component" placeholder="••••••••" style="padding: 0.6rem 0.75rem; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #ffffff; font-size: 0.875rem;" />
+                                <input id="dlg-hd-pass" type="password" class="p-inputtext p-component" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" style="padding: 0.6rem 0.75rem; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #ffffff; font-size: 0.875rem;" />
                             </div>
                             <div style="display: flex; gap: 0.75rem; margin-top: 0.5rem;">
                                 <button type="button" class="p-button p-button-outlined" data-dialog-close style="flex: 1; padding: 0.55rem; border-radius: 8px; border: 1px solid #475569; background: transparent; color: #cbd5e1; font-weight: 600; font-size: 0.875rem; cursor: pointer;">
@@ -6448,7 +6448,7 @@
                 <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic</h3>
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">A slide-in panel from the edge of the screen for contextual content.</p>
                 <div style="display: flex; align-items: center;">
-                    <button type="button" class="p-button p-button-primary" data-drawer-target="drawer-basic" style="display: inline-flex; align-items: center; justify-content: center; width: 3rem; height: 3rem; border-radius: 8px; background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;" title="Open Basic Drawer">
+                    <button type="button" class="p-button p-button-primary" data-drawer-target="drawer-basic" style="display: inline-flex; align-items: center; justify-content: center; width: 3rem; height: 3rem; border-radius: 8px; background: var(--p-primary-color); border: 1px solid var(--p-primary-color); color: var(--p-primary-contrast-color, #ffffff); cursor: pointer;" title="Open Basic Drawer">
                         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
                     </button>
                     <island-drawer id="drawer-basic" header="Basic Drawer" position="left" drawer-width="22rem">
@@ -6464,16 +6464,16 @@
                 <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Position</h3>
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">The position of the drawer can be customized with the position property: left, right, top, and bottom.</p>
                 <div style="display: flex; gap: 0.75rem; align-items: center;">
-                    <button type="button" class="p-button p-button-primary" data-drawer-target="drawer-pos-left" style="display: inline-flex; align-items: center; justify-content: center; width: 3rem; height: 3rem; border-radius: 8px; background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;" title="Left Drawer">
+                    <button type="button" class="p-button p-button-primary" data-drawer-target="drawer-pos-left" style="display: inline-flex; align-items: center; justify-content: center; width: 3rem; height: 3rem; border-radius: 8px; background: var(--p-primary-color); border: 1px solid var(--p-primary-color); color: var(--p-primary-contrast-color, #ffffff); cursor: pointer;" title="Left Drawer">
                         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" x2="19" y1="12" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                     </button>
-                    <button type="button" class="p-button p-button-primary" data-drawer-target="drawer-pos-right" style="display: inline-flex; align-items: center; justify-content: center; width: 3rem; height: 3rem; border-radius: 8px; background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;" title="Right Drawer">
+                    <button type="button" class="p-button p-button-primary" data-drawer-target="drawer-pos-right" style="display: inline-flex; align-items: center; justify-content: center; width: 3rem; height: 3rem; border-radius: 8px; background: var(--p-primary-color); border: 1px solid var(--p-primary-color); color: var(--p-primary-contrast-color, #ffffff); cursor: pointer;" title="Right Drawer">
                         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" x2="5" y1="12" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
                     </button>
-                    <button type="button" class="p-button p-button-primary" data-drawer-target="drawer-pos-top" style="display: inline-flex; align-items: center; justify-content: center; width: 3rem; height: 3rem; border-radius: 8px; background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;" title="Top Drawer">
+                    <button type="button" class="p-button p-button-primary" data-drawer-target="drawer-pos-top" style="display: inline-flex; align-items: center; justify-content: center; width: 3rem; height: 3rem; border-radius: 8px; background: var(--p-primary-color); border: 1px solid var(--p-primary-color); color: var(--p-primary-contrast-color, #ffffff); cursor: pointer;" title="Top Drawer">
                         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="5" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
                     </button>
-                    <button type="button" class="p-button p-button-primary" data-drawer-target="drawer-pos-bottom" style="display: inline-flex; align-items: center; justify-content: center; width: 3rem; height: 3rem; border-radius: 8px; background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;" title="Bottom Drawer">
+                    <button type="button" class="p-button p-button-primary" data-drawer-target="drawer-pos-bottom" style="display: inline-flex; align-items: center; justify-content: center; width: 3rem; height: 3rem; border-radius: 8px; background: var(--p-primary-color); border: 1px solid var(--p-primary-color); color: var(--p-primary-contrast-color, #ffffff); cursor: pointer;" title="Bottom Drawer">
                         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="19" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
                     </button>
 
@@ -6505,7 +6505,7 @@
                 <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Full Screen</h3>
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">The full screen mode is enabled when position property is set as full.</p>
                 <div style="display: flex; align-items: center;">
-                    <button type="button" class="p-button p-button-primary" data-drawer-target="drawer-fullscreen" style="display: inline-flex; align-items: center; justify-content: center; width: 3rem; height: 3rem; border-radius: 8px; background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;" title="Fullscreen Drawer">
+                    <button type="button" class="p-button p-button-primary" data-drawer-target="drawer-fullscreen" style="display: inline-flex; align-items: center; justify-content: center; width: 3rem; height: 3rem; border-radius: 8px; background: var(--p-primary-color); border: 1px solid var(--p-primary-color); color: var(--p-primary-contrast-color, #ffffff); cursor: pointer;" title="Fullscreen Drawer">
                         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M15 3h6v6"/><path d="M10 14 3 21"/><path d="M21 3 14 10"/></svg>
                     </button>
                     <island-drawer id="drawer-fullscreen" header="Full Screen Drawer" position="full">
@@ -6521,7 +6521,7 @@
                 <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Responsive</h3>
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Responsive mode adapts width smoothly across breakpoints.</p>
                 <div style="display: flex; align-items: center;">
-                    <button type="button" class="p-button p-button-primary" data-drawer-target="drawer-responsive" style="padding: 0.55rem 1.35rem; font-size: 0.875rem; font-weight: 600; border-radius: 8px; background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                    <button type="button" class="p-button p-button-primary" data-drawer-target="drawer-responsive" style="padding: 0.55rem 1.35rem; font-size: 0.875rem; font-weight: 600; border-radius: 8px; background: var(--p-primary-color); border: 1px solid var(--p-primary-color); color: var(--p-primary-contrast-color, #ffffff); cursor: pointer;">
                         Log in
                     </button>
                     <island-drawer id="drawer-responsive" header="Responsive Drawer" position="left" style="width: 100%; max-width: 25rem;">
@@ -6538,7 +6538,7 @@
                                 <input id="drw-rsp-rem" type="checkbox" style="width: 1rem; height: 1rem; border-radius: 4px; accent-color: var(--p-primary-500); cursor: pointer;" />
                                 <label for="drw-rsp-rem" style="font-size: 0.8125rem; color: var(--p-text-color); cursor: pointer;">Remember me</label>
                             </div>
-                            <button type="button" class="p-button p-button-primary" data-drawer-close style="width: 100%; padding: 0.6rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer; margin-top: 0.5rem;">
+                            <button type="button" class="p-button p-button-primary" data-drawer-close style="width: 100%; padding: 0.6rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-primary-color); border: 1px solid var(--p-primary-color); color: var(--p-primary-contrast-color, #ffffff); cursor: pointer; margin-top: 0.5rem;">
                                 Sign In
                             </button>
                         </div>
@@ -6551,7 +6551,7 @@
                 <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Template</h3>
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Drawer is customizable by header, content, and footer templates.</p>
                 <div style="display: flex; align-items: center;">
-                    <button type="button" class="p-button p-button-primary" data-drawer-target="drawer-template" style="display: inline-flex; align-items: center; justify-content: center; width: 3rem; height: 3rem; border-radius: 8px; background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;" title="Template Drawer">
+                    <button type="button" class="p-button p-button-primary" data-drawer-target="drawer-template" style="display: inline-flex; align-items: center; justify-content: center; width: 3rem; height: 3rem; border-radius: 8px; background: var(--p-primary-color); border: 1px solid var(--p-primary-color); color: var(--p-primary-contrast-color, #ffffff); cursor: pointer;" title="Template Drawer">
                         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
                     </button>
                     <island-drawer id="drawer-template" position="left" closable="false" drawer-width="22rem">
@@ -6585,7 +6585,7 @@
                 <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Headless</h3>
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Headless mode allows you to customize the entire user interface and navigation tree.</p>
                 <div style="display: flex; align-items: center;">
-                    <button type="button" class="p-button p-button-primary" data-drawer-target="drawer-headless" style="display: inline-flex; align-items: center; justify-content: center; width: 3rem; height: 3rem; border-radius: 8px; background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;" title="Headless Drawer">
+                    <button type="button" class="p-button p-button-primary" data-drawer-target="drawer-headless" style="display: inline-flex; align-items: center; justify-content: center; width: 3rem; height: 3rem; border-radius: 8px; background: var(--p-primary-color); border: 1px solid var(--p-primary-color); color: var(--p-primary-contrast-color, #ffffff); cursor: pointer;" title="Headless Drawer">
                         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
                     </button>
                     <island-drawer id="drawer-headless" position="left" closable="false" drawer-width="22rem">
@@ -6752,7 +6752,7 @@
 
                             <!-- Footer Details -->
                             <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--p-border-color); padding-top: 0.75rem; font-size: 0.75rem; color: var(--p-text-muted);">
-                                <span>Gate B12 · Terminal 5</span>
+                                <span>Gate B12 Â· Terminal 5</span>
                                 <a href="javascript:void(0)" data-popover-close style="color: var(--p-text-color); font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 0.25rem;">
                                     <span>Track flight</span>
                                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" x2="19" y1="12" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
@@ -6784,7 +6784,7 @@
                                     <button type="button" class="p-button p-button-outlined p-button-secondary p-button-sm" data-popover-close style="padding: 0.35rem 0.75rem; font-size: 0.8125rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: transparent; color: var(--p-text-color); cursor: pointer;">
                                         Cancel
                                     </button>
-                                    <button type="button" class="p-button p-button-primary p-button-sm" data-popover-close style="padding: 0.35rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                                    <button type="button" class="p-button p-button-primary p-button-sm" data-popover-close style="padding: 0.35rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-primary-color); border: 1px solid var(--p-primary-color); color: var(--p-primary-contrast-color, #ffffff); cursor: pointer;">
                                         Create
                                     </button>
                                 </div>
@@ -6799,7 +6799,7 @@
                 <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Controlled</h3>
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Popover visibility can be controlled from outside by calling toggle with the anchor element passed explicitly.</p>
                 <div style="display: flex; justify-content: center; align-items: center; gap: 1rem; min-height: 4rem;">
-                    <button type="button" class="p-button p-button-primary" data-popover-target="popover-controlled" data-popover-anchor="popover-controlled-trigger" style="padding: 0.55rem 1.35rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                    <button type="button" class="p-button p-button-primary" data-popover-target="popover-controlled" data-popover-anchor="popover-controlled-trigger" style="padding: 0.55rem 1.35rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-primary-color); border: 1px solid var(--p-primary-color); color: var(--p-primary-contrast-color, #ffffff); cursor: pointer;">
                         Show Popover
                     </button>
                     <button id="popover-controlled-trigger" type="button" class="p-button p-button-outlined p-button-secondary" data-popover-target="popover-controlled" style="padding: 0.55rem 1.35rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); cursor: pointer;">
@@ -6819,7 +6819,7 @@
                                     <button type="button" class="p-button p-button-outlined p-button-secondary p-button-sm" data-popover-close style="padding: 0.35rem 0.75rem; font-size: 0.8125rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: transparent; color: var(--p-text-color); cursor: pointer;">
                                         Cancel
                                     </button>
-                                    <button type="button" class="p-button p-button-primary p-button-sm" data-popover-close style="padding: 0.35rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                                    <button type="button" class="p-button p-button-primary p-button-sm" data-popover-close style="padding: 0.35rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-primary-color); border: 1px solid var(--p-primary-color); color: var(--p-primary-contrast-color, #ffffff); cursor: pointer;">
                                         Create
                                     </button>
                                 </div>
@@ -6900,7 +6900,7 @@
                 <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Custom</h3>
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Tooltip can use either a plain text or rich HTML content by setting escape to false.</p>
                 <div style="display: flex; justify-content: center; align-items: center; min-height: 3.5rem;">
-                    <button type="button" class="p-button p-button-primary" p-tooltip.top="&lt;span style='color:#10b981; font-weight:700;'&gt;&#10004; Verified&lt;/span&gt; &lt;span style='margin-left:4px;'&gt;Security Policy Applied&lt;/span&gt;" p-tooltip-escape="false" style="display: inline-flex; align-items: center; justify-content: center; width: auto; padding: 0.55rem 1.75rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                    <button type="button" class="p-button p-button-primary" p-tooltip.top="&lt;span style='color:#10b981; font-weight:700;'&gt;&#10004; Verified&lt;/span&gt; &lt;span style='margin-left:4px;'&gt;Security Policy Applied&lt;/span&gt;" p-tooltip-escape="false" style="display: inline-flex; align-items: center; justify-content: center; width: auto; padding: 0.55rem 1.75rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-primary-color); border: 1px solid var(--p-primary-color); color: var(--p-primary-contrast-color, #ffffff); cursor: pointer;">
                         Action
                     </button>
                 </div>
@@ -7042,7 +7042,7 @@
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">The message section can be customized using custom template badges, dividers, and icon buttons.</p>
                 <div style="display: flex; align-items: center;">
                     <island-confirm-popup>
-                        <button type="button" class="p-button p-button-primary" data-confirmpopup-trigger="template" data-confirmpopup-message="Please confirm to proceed moving forward." style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                        <button type="button" class="p-button p-button-primary" data-confirmpopup-trigger="template" data-confirmpopup-message="Please confirm to proceed moving forward." style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-primary-color); border: 1px solid var(--p-primary-color); color: var(--p-primary-contrast-color, #ffffff); cursor: pointer;">
                             Save
                         </button>
                     </island-confirm-popup>
@@ -7055,7 +7055,7 @@
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Headless mode lets you implement entire custom confirmation UI instead of the default elements.</p>
                 <div style="display: flex; align-items: center;">
                     <island-confirm-popup>
-                        <button type="button" class="p-button p-button-primary" data-confirmpopup-trigger="headless" data-confirmpopup-message="Save your current process?" style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-surface-900); border: 1px solid var(--p-surface-900); color: #ffffff; cursor: pointer;">
+                        <button type="button" class="p-button p-button-primary" data-confirmpopup-trigger="headless" data-confirmpopup-message="Save your current process?" style="padding: 0.5rem 1.25rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); background: var(--p-primary-color); border: 1px solid var(--p-primary-color); color: var(--p-primary-contrast-color, #ffffff); cursor: pointer;">
                             Save
                         </button>
                     </island-confirm-popup>
@@ -7216,7 +7216,7 @@
                 <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Severity</h3>
                 <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">The severity option specifies the icon and color theme of the toast notification.</p>
                 <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem;">
-                    <button type="button" class="p-button p-button-outlined p-button-info" onclick="window.$toast.add({ severity: 'info', summary: 'Heads up', detail: 'There’s something you might want to check.', life: 3000 })" style="padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid #3b82f6; background: transparent; color: #2563eb; cursor: pointer;">
+                    <button type="button" class="p-button p-button-outlined p-button-info" onclick="window.$toast.add({ severity: 'info', summary: 'Heads up', detail: 'Thereâ€™s something you might want to check.', life: 3000 })" style="padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid #3b82f6; background: transparent; color: #2563eb; cursor: pointer;">
                         Info
                     </button>
                     <button type="button" class="p-button p-button-outlined p-button-success" onclick="window.$toast.add({ severity: 'success', summary: 'Saved successfully', detail: 'Your changes have been saved.', life: 3000 })" style="padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid #10b981; background: transparent; color: #059669; cursor: pointer;">
@@ -7225,7 +7225,7 @@
                     <button type="button" class="p-button p-button-outlined p-button-warn" onclick="window.$toast.add({ severity: 'warn', summary: 'Check this', detail: 'Some fields may need your attention.', life: 3000 })" style="padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid #f59e0b; background: transparent; color: #d97706; cursor: pointer;">
                         Warn
                     </button>
-                    <button type="button" class="p-button p-button-outlined p-button-danger" onclick="window.$toast.add({ severity: 'error', summary: 'Something went wrong', detail: 'We couldn’t complete the action. Please try again.', life: 3000 })" style="padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid #ef4444; background: transparent; color: #dc2626; cursor: pointer;">
+                    <button type="button" class="p-button p-button-outlined p-button-danger" onclick="window.$toast.add({ severity: 'error', summary: 'Something went wrong', detail: 'We couldnâ€™t complete the action. Please try again.', life: 3000 })" style="padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid #ef4444; background: transparent; color: #dc2626; cursor: pointer;">
                         Error
                     </button>
                     <button type="button" class="p-button p-button-outlined p-button-secondary" onclick="window.$toast.add({ severity: 'secondary', summary: 'For your information', detail: 'This is a secondary toast message.', life: 3000 })" style="padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); background: transparent; color: var(--p-text-color); cursor: pointer;">
@@ -7635,7 +7635,7 @@
             <!-- Demo 2: Custom Handle -->
             <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
                 <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Custom Handle</h3>
-                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">The handle can be styled freely — give the indicator a rounded background, custom icon, and shadow for a more prominent look.</p>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">The handle can be styled freely â€” give the indicator a rounded background, custom icon, and shadow for a more prominent look.</p>
                 <island-compare demo-type="custom-handle" custom-handle="true" />
             </div>
 
@@ -7670,7 +7670,7 @@
             <!-- Demo 7: Template -->
             <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
                 <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Template</h3>
-                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Compare is not limited to images — any content can be placed inside the items for creative comparisons.</p>
+                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Compare is not limited to images â€” any content can be placed inside the items for creative comparisons.</p>
                 <island-compare demo-type="template" />
             </div>
         </div>
@@ -8096,7 +8096,7 @@
                 <div style="display: flex; justify-content: center; padding: 1rem 0;">
                     <island-splitbutton severity="Contrast" model="@Model.SplitButtonBasicItems">
                         <span style="display: flex; align-items: center; gap: 0.5rem; font-weight: 700;">
-                            <span style="color: var(--p-primary-500); display: flex;">⚡</span>
+                            <span style="color: var(--p-primary-500); display: flex;">âš¡</span>
                             <span>LaughTale Aura</span>
                         </span>
                     </island-splitbutton>
@@ -8214,3 +8214,4 @@
     }
 })();
 </script>
+
