@@ -13,6 +13,9 @@ const SCROLLAREA_CSS = `
     position: relative;
     overflow: hidden;
     box-sizing: border-box;
+    display: block;
+    width: 100%;
+    border-radius: var(--p-border-radius, 6px);
 }
 
 .p-scrollarea-viewport {
@@ -31,8 +34,13 @@ const SCROLLAREA_CSS = `
 }
 
 .p-scrollarea-content {
-    min-width: 100%;
     box-sizing: border-box;
+    min-width: 100%;
+    min-height: 100%;
+}
+.p-scrollarea-horizontal .p-scrollarea-content,
+.p-scrollarea-both .p-scrollarea-content {
+    width: max-content;
 }
 
 /* Scrollbars */
@@ -72,17 +80,17 @@ const SCROLLAREA_CSS = `
 
 .p-scrollarea-handle {
     flex: 1;
-    background: var(--lt-surface-400);
+    background: var(--p-surface-400, var(--lt-surface-400, #94a3b8));
     border-radius: 9999px;
     position: relative;
     transition: background-color 0.15s ease, transform 0.15s ease;
     cursor: pointer;
 }
 .p-scrollarea-handle:hover {
-    background: var(--lt-surface-500);
+    background: var(--p-primary-color, var(--lt-primary-500, #10b981));
 }
 .p-scrollarea-handle:active {
-    background: var(--lt-surface-600);
+    background: var(--p-primary-hover-color, var(--lt-primary-600, #059669));
 }
 
 /* Mask / Fade */
@@ -127,17 +135,17 @@ const SCROLLAREA_CSS = `
 html.dark .p-scrollarea-handle,
 [data-theme="dark"] .p-scrollarea-handle,
 .dark .p-scrollarea-handle {
-    background: var(--p-surface-600) !important;
+    background: var(--p-surface-600, #475569) !important;
 }
 html.dark .p-scrollarea-handle:hover,
 [data-theme="dark"] .p-scrollarea-handle:hover,
 .dark .p-scrollarea-handle:hover {
-    background: var(--p-surface-500) !important;
+    background: var(--p-primary-color, #10b981) !important;
 }
 html.dark .p-scrollarea-handle:active,
 [data-theme="dark"] .p-scrollarea-handle:active,
 .dark .p-scrollarea-handle:active {
-    background: var(--p-surface-400) !important;
+    background: var(--p-primary-hover-color, #059669) !important;
 }
 `;
 
@@ -153,10 +161,92 @@ export default function ScrollAreaIsland(container: HTMLElement, props: ScrollAr
     injectIslandStyle('scrollarea', SCROLLAREA_CSS);
     container.setAttribute('data-part', 'root');
 
-    const rootEl = container.querySelector<HTMLElement>('.p-scrollarea') || container;
-    const viewport = rootEl.querySelector<HTMLElement>('.p-scrollarea-viewport');
-    if (!viewport) return;
+    const orientation = props.orientation || (container.getAttribute('orientation') as any) || (container.getAttribute('data-orientation') as any) || 'vertical';
+    const variant = props.variant || (container.getAttribute('variant') as any) || (container.getAttribute('data-variant') as any) || (container.getAttribute('data-p-variant') as any) || 'auto';
+    const hasMask = props.mask !== undefined ? !!props.mask : (container.getAttribute('mask') === 'true' || container.hasAttribute('mask'));
 
+    let viewport = container.querySelector<HTMLElement>(':scope > .p-scrollarea-viewport') || container.querySelector<HTMLElement>('.p-scrollarea-viewport');
+
+    if (!viewport) {
+        // Collect existing child content
+        const slotEl = container.querySelector<HTMLElement>(':scope > .island-slot');
+        const fragment = document.createDocumentFragment();
+        const sourceNodes = slotEl ? Array.from(slotEl.childNodes) : Array.from(container.childNodes);
+
+        sourceNodes.forEach(node => fragment.appendChild(node));
+        if (slotEl) slotEl.remove();
+
+        container.innerHTML = '';
+
+        viewport = document.createElement('div');
+        viewport.className = 'p-scrollarea-viewport';
+        viewport.setAttribute('tabindex', '0');
+
+        const content = document.createElement('div');
+        content.className = 'p-scrollarea-content';
+        content.appendChild(fragment);
+        viewport.appendChild(content);
+        container.appendChild(viewport);
+
+        if (orientation === 'vertical' || orientation === 'both') {
+            const vBar = document.createElement('div');
+            vBar.className = 'p-scrollarea-scrollbar p-scrollarea-scrollbar-vertical';
+            vBar.setAttribute('role', 'scrollbar');
+            vBar.setAttribute('aria-orientation', 'vertical');
+
+            const vHandle = document.createElement('div');
+            vHandle.className = 'p-scrollarea-handle';
+            vBar.appendChild(vHandle);
+            container.appendChild(vBar);
+        }
+
+        if (orientation === 'horizontal' || orientation === 'both') {
+            const hBar = document.createElement('div');
+            hBar.className = 'p-scrollarea-scrollbar p-scrollarea-scrollbar-horizontal';
+            hBar.setAttribute('role', 'scrollbar');
+            hBar.setAttribute('aria-orientation', 'horizontal');
+
+            const hHandle = document.createElement('div');
+            hHandle.className = 'p-scrollarea-handle';
+            hBar.appendChild(hHandle);
+            container.appendChild(hBar);
+        }
+
+        if (orientation === 'both') {
+            const corner = document.createElement('div');
+            corner.className = 'p-scrollarea-corner';
+            container.appendChild(corner);
+        }
+    } else if (!viewport.querySelector('.p-scrollarea-content')) {
+        const slotEl = viewport.querySelector<HTMLElement>(':scope > .island-slot');
+        if (slotEl) {
+            const fragment = document.createDocumentFragment();
+            while (slotEl.firstChild) {
+                fragment.appendChild(slotEl.firstChild);
+            }
+            slotEl.remove();
+            const content = document.createElement('div');
+            content.className = 'p-scrollarea-content';
+            content.appendChild(fragment);
+            viewport.appendChild(content);
+        }
+    }
+
+    container.classList.add('p-scrollarea', 'p-component');
+    container.setAttribute('data-p-variant', variant);
+    if (orientation === 'horizontal') {
+        container.classList.add('p-scrollarea-horizontal');
+    } else if (orientation === 'both') {
+        container.classList.add('p-scrollarea-both');
+    } else {
+        container.classList.add('p-scrollarea-vertical');
+    }
+
+    if (hasMask) {
+        container.classList.add('p-scrollarea-mask');
+    }
+
+    const rootEl = container;
     const vBar = rootEl.querySelector<HTMLElement>('.p-scrollarea-scrollbar-vertical');
     const vHandle = vBar?.querySelector<HTMLElement>('.p-scrollarea-handle');
 
@@ -176,7 +266,8 @@ export default function ScrollAreaIsland(container: HTMLElement, props: ScrollAr
             vBar.style.display = hasVerticalScroll ? 'flex' : 'none';
             if (hasVerticalScroll) {
                 const handleHeight = Math.max((clientHeight / scrollHeight) * clientHeight, 20);
-                const handleTop = (scrollTop / (scrollHeight - clientHeight)) * (clientHeight - handleHeight);
+                const maxScrollTop = scrollHeight - clientHeight;
+                const handleTop = maxScrollTop > 0 ? (scrollTop / maxScrollTop) * (clientHeight - handleHeight) : 0;
                 vHandle.style.height = `${handleHeight}px`;
                 vHandle.style.transform = `translateY(${handleTop}px)`;
             }
@@ -188,7 +279,8 @@ export default function ScrollAreaIsland(container: HTMLElement, props: ScrollAr
             hBar.style.display = hasHorizontalScroll ? 'flex' : 'none';
             if (hasHorizontalScroll) {
                 const handleWidth = Math.max((clientWidth / scrollWidth) * clientWidth, 20);
-                const handleLeft = (scrollLeft / (scrollWidth - clientWidth)) * (clientWidth - handleWidth);
+                const maxScrollLeft = scrollWidth - clientWidth;
+                const handleLeft = maxScrollLeft > 0 ? (scrollLeft / maxScrollLeft) * (clientWidth - handleWidth) : 0;
                 hHandle.style.width = `${handleWidth}px`;
                 hHandle.style.transform = `translateX(${handleLeft}px)`;
             }
@@ -214,7 +306,7 @@ export default function ScrollAreaIsland(container: HTMLElement, props: ScrollAr
         vHandle.addEventListener('pointerdown', (e) => {
             isDragging = true;
             startY = e.clientY;
-            startScrollTop = viewport.scrollTop;
+            startScrollTop = viewport!.scrollTop;
             vHandle.setPointerCapture(e.pointerId);
             document.body.style.userSelect = 'none';
         }, { signal: ctx?.signal });
@@ -222,8 +314,8 @@ export default function ScrollAreaIsland(container: HTMLElement, props: ScrollAr
         vHandle.addEventListener('pointermove', (e) => {
             if (!isDragging) return;
             const deltaY = e.clientY - startY;
-            const scrollRatio = (viewport.scrollHeight - viewport.clientHeight) / (viewport.clientHeight - vHandle.offsetHeight);
-            viewport.scrollTop = startScrollTop + deltaY * scrollRatio;
+            const scrollRatio = (viewport!.scrollHeight - viewport!.clientHeight) / (viewport!.clientHeight - vHandle.offsetHeight);
+            viewport!.scrollTop = startScrollTop + deltaY * scrollRatio;
         }, { signal: ctx?.signal });
 
         const stopDrag = (e: PointerEvent) => {
@@ -247,7 +339,7 @@ export default function ScrollAreaIsland(container: HTMLElement, props: ScrollAr
         hHandle.addEventListener('pointerdown', (e) => {
             isDragging = true;
             startX = e.clientX;
-            startScrollLeft = viewport.scrollLeft;
+            startScrollLeft = viewport!.scrollLeft;
             hHandle.setPointerCapture(e.pointerId);
             document.body.style.userSelect = 'none';
         }, { signal: ctx?.signal });
@@ -255,8 +347,8 @@ export default function ScrollAreaIsland(container: HTMLElement, props: ScrollAr
         hHandle.addEventListener('pointermove', (e) => {
             if (!isDragging) return;
             const deltaX = e.clientX - startX;
-            const scrollRatio = (viewport.scrollWidth - viewport.clientWidth) / (viewport.clientWidth - hHandle.offsetWidth);
-            viewport.scrollLeft = startScrollLeft + deltaX * scrollRatio;
+            const scrollRatio = (viewport!.scrollWidth - viewport!.clientWidth) / (viewport!.clientWidth - hHandle.offsetWidth);
+            viewport!.scrollLeft = startScrollLeft + deltaX * scrollRatio;
         }, { signal: ctx?.signal });
 
         const stopDrag = (e: PointerEvent) => {
@@ -272,15 +364,14 @@ export default function ScrollAreaIsland(container: HTMLElement, props: ScrollAr
     }
 
     // Handle interactive variant selector buttons in demo
-    // Search up to the demo card container
     let cardScope = container.closest('.component-card') || container.parentElement?.parentElement?.parentElement || document;
     
-    function applyVariant(variant: string, clickedBtn?: HTMLElement) {
-        rootEl.setAttribute('data-p-variant', variant);
+    function applyVariant(variantName: string) {
+        rootEl.setAttribute('data-p-variant', variantName);
         if (cardScope) {
             cardScope.querySelectorAll<HTMLButtonElement>('[data-scrollarea-variant]').forEach(b => {
                 const bVar = b.getAttribute('data-scrollarea-variant');
-                b.classList.toggle('p-highlight', bVar === variant);
+                b.classList.toggle('p-highlight', bVar === variantName);
             });
         }
         updateScrollbars();
@@ -291,21 +382,10 @@ export default function ScrollAreaIsland(container: HTMLElement, props: ScrollAr
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
                 const selectedVariant = btn.getAttribute('data-scrollarea-variant') || 'auto';
-                applyVariant(selectedVariant, btn);
+                applyVariant(selectedVariant);
             }, { signal: ctx?.signal });
         });
     }
-
-    // Global document click delegator as absolute fallback
-    document.addEventListener('click', (e) => {
-        const btn = (e.target as HTMLElement)?.closest<HTMLButtonElement>('[data-scrollarea-variant]');
-        if (!btn) return;
-        const demoRow = btn.closest('div[style*="padding"]') || btn.closest('.component-card');
-        if (demoRow && demoRow.contains(rootEl)) {
-            const selectedVariant = btn.getAttribute('data-scrollarea-variant') || 'auto';
-            applyVariant(selectedVariant, btn);
-        }
-    }, { signal: ctx?.signal });
 
     // Observe size changes
     const resizeObserver = new ResizeObserver(() => {
