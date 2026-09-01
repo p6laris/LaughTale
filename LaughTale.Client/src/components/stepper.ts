@@ -93,7 +93,7 @@ p-step {
     border-color: var(--p-primary-color, #10b981);
     color: var(--p-primary-color, #10b981);
     background: var(--p-surface-0, #ffffff);
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--p-primary-color, #10b981) 18%, transparent);
 }
 
 .p-step-completed .p-step-number,
@@ -259,7 +259,7 @@ html.dark .p-step.p-step-active .p-step-number,
     border-color: var(--p-primary-color, #10b981) !important;
     color: var(--p-primary-color, #10b981) !important;
     background: var(--p-surface-0, #0f172a) !important;
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--p-primary-color, #10b981) 25%, transparent);
 }
 
 html.dark .p-step-completed .p-step-number,
