@@ -7526,12 +7526,49 @@
         <div class="card-header">
             <div>
                 <h2>AvatarGroup Stack</h2>
-                <p>Overlapping user profile avatars with status badges and excess overflow indicator.</p>
+                <p>Overlapping user profile avatar stacks with initials, photo images, sizing tiers, and overflow counters.</p>
             </div>
             <span class="p-tag p-tag-secondary">Users</span>
         </div>
         <div class="card-body">
-            <island-avatar-group avatars="@Model.TeamAvatars" max="4" />
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; width: 100%;">
+                <!-- Team Stack with Overflow -->
+                <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem;">
+                    <div style="font-size: 0.875rem; font-weight: 600; color: var(--p-text-color);">Team Stack (+Overflow)</div>
+                    <p style="font-size: 0.8rem; color: var(--p-text-muted); margin: 0;">Overlapping circular initials with automatic +N overflow pill.</p>
+                    <island-avatar-group avatars="@Model.TeamAvatars" max="4" />
+                </div>
+
+                <!-- Sizing Tiers -->
+                <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem;">
+                    <div style="font-size: 0.875rem; font-weight: 600; color: var(--p-text-color);">Multiple Sizing Tiers</div>
+                    <p style="font-size: 0.8rem; color: var(--p-text-muted); margin: 0;">Supports small (sm), medium (md), and large (lg) stacks.</p>
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        <island-avatar-group avatars="@Model.TeamAvatars.Take(3).ToList()" size="sm" max="3" />
+                        <island-avatar-group avatars="@Model.TeamAvatars.Take(3).ToList()" size="lg" max="3" />
+                    </div>
+                </div>
+
+                <!-- Square Geometry -->
+                <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem;">
+                    <div style="font-size: 0.875rem; font-weight: 600; color: var(--p-text-color);">Square Rounded Stack</div>
+                    <p style="font-size: 0.8rem; color: var(--p-text-muted); margin: 0;">Square avatars with rounded corners adhering to border tokens.</p>
+                    <island-avatar-group avatars="@Model.TeamAvatars" shape="square" max="4" />
+                </div>
+
+                <!-- Photo Avatars -->
+                <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem;">
+                    <div style="font-size: 0.875rem; font-weight: 600; color: var(--p-text-color);">Project Collaborators</div>
+                    <p style="font-size: 0.8rem; color: var(--p-text-muted); margin: 0;">Interactive avatar stacks with hover elevation and tooltips.</p>
+                    <island-avatar-group avatars="@(new[] {
+                        new { label = "Alex", image = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80", name = "Alex Vance" },
+                        new { label = "Sarah", image = "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80", name = "Sarah Connor" },
+                        new { label = "James", image = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80", name = "James Holden" },
+                        new { label = "Naomi", image = "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&auto=format&fit=crop&q=80", name = "Naomi Nagata" },
+                        new { label = "Amos", image = "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80", name = "Amos Burton" }
+                    })" max="3" />
+                </div>
+            </div>
         </div>
     </section>
 

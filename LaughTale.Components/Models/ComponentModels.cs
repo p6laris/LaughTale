@@ -1016,11 +1016,14 @@ public record BadgeProps(
 [LaughTale.Core.Attributes.Island("avatar")]
 public record AvatarProps(
     string? Label = null, string? Icon = null, string? Image = null,
-    ComponentSize Size = ComponentSize.Normal, string? Shape = "square"
+    string? Size = null, string? Shape = "circle", string? Bg = null, string? Badge = null, string? BadgeSeverity = null
 );
 
 [LaughTale.Core.Attributes.Island("avatar-group")]
-public record AvatarGroupProps();
+public record AvatarGroupProps(
+    object? Avatars = null, object? Items = null,
+    int? Max = 4, string? Size = "md", string? Shape = "circle"
+);
 
 [LaughTale.Core.Attributes.Island("fileupload")]
 public record FileUploadProps(
