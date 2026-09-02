@@ -7690,13 +7690,31 @@
     <section id="sec-galleria" class="component-card">
         <div class="card-header">
             <div>
-                <h2>Galleria</h2>
-                <p>Fullscreen responsive image gallery with thumbnail navigation strip.</p>
+                <h2>Galleria Image Showcase</h2>
+                <p>Responsive media gallery with cross-fading stages, thumbnail navigation strip, indicator pills, and autoplay cycles.</p>
             </div>
             <span class="p-tag p-tag-success">Media</span>
         </div>
         <div class="card-body">
-            <island-galleria images="@Model.GalleriaImages" auto-play="true" />
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 1.5rem; width: 100%;">
+                <!-- Main Thumbnail Gallery -->
+                <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem;">
+                    <div style="font-size: 0.875rem; font-weight: 600; color: var(--p-text-color);">Infrastructure Gallery (Thumbnails)</div>
+                    <p style="font-size: 0.8rem; color: var(--p-text-muted); margin: 0;">Interactive thumbnail strip with active border accent and image captions.</p>
+                    <island-galleria images="@Model.GalleriaImages" auto-play="true" />
+                </div>
+
+                <!-- Indicator Dots Gallery -->
+                <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem;">
+                    <div style="font-size: 0.875rem; font-weight: 600; color: var(--p-text-color);">Telemetry Viewport (Indicators)</div>
+                    <p style="font-size: 0.8rem; color: var(--p-text-muted); margin: 0;">Clean viewport with expanding pill indicators and circular cycling.</p>
+                    <island-galleria images="@(new[] {
+                        new { itemImageSrc = "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop&q=80", title = "Kernel Architecture", subtitle = "Sub-millisecond low-latency pipeline" },
+                        new { itemImageSrc = "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&auto=format&fit=crop&q=80", title = "Cryptographic Core", subtitle = "Quantum-resistant vault storage" },
+                        new { itemImageSrc = "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800&auto=format&fit=crop&q=80", title = "Telemetry Spectrum", subtitle = "Real-time edge event aggregation" }
+                    })" show-thumbnails="false" show-indicators="true" circular="true" />
+                </div>
+            </div>
         </div>
     </section>
 

@@ -805,8 +805,10 @@ public record TieredMenuProps(
 
 [LaughTale.Core.Attributes.Island("galleria")]
 public record GalleriaProps(
-    object? Value = null, int? ActiveIndex = 0, bool FullScreen = false, bool Visible = false,
+    object? Value = null, object? Images = null, object? Items = null,
+    int? ActiveIndex = 0, bool FullScreen = false, bool Visible = false,
     int? NumVisible = 5, bool ShowThumbnails = true, bool ShowIndicators = false,
+    bool ShowItemNavigators = true, bool ShowThumbnailNavigators = true,
     bool AutoPlay = false, int? TransitionInterval = 4000, bool Circular = false
 );
 
