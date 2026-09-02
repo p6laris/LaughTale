@@ -1,13 +1,8 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
-﻿/**
- * LaughTale: Enterprise Button Component (Aura Button)
- * Complete button interactive runtime supporting async loading toggles,
- * icons, badge counters, ripple micro-press interactions, and keyboard triggers.
- */
-
 import { injectIslandStyle } from '../runtime/styles';
 import { getLucideIcon } from '../icons/lucide';
+import { setHtml, unsafe } from '../runtime/html';
 
 export interface ButtonProps {
     label?: string;
@@ -57,7 +52,7 @@ export default function ButtonIsland(container: HTMLElement, props: ButtonProps,
             if (!spinner) {
                 spinner = document.createElement('span');
                 spinner.className = 'p-button-loading-icon p-button-icon'; container.setAttribute('data-part', 'root');
-                spinner.innerHTML = getLucideIcon(props.loadingIcon || 'spinner', 16);
+                setHtml(spinner, unsafe(getLucideIcon(props.loadingIcon || 'spinner', 16)) /* static svg icon */);
                 btnEl.prepend(spinner);
             }
         } else {

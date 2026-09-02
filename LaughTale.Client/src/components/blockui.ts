@@ -1,6 +1,7 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
-﻿import { injectIslandStyle } from '../runtime/styles';
+import { injectIslandStyle } from '../runtime/styles';
+import { html, setHtml } from '../runtime/html';
 /**
  * LaughTale: Enterprise BlockUI Component (Aura BlockUI inspired)
  * Blocks user interaction on a target container with an animated spinner and glassy overlay.
@@ -39,7 +40,7 @@ export default function BlockUIIsland(container: HTMLElement, props: BlockUIProp
     let isBlocked = props.blocked ?? true;
 
     function render() {
-        container.innerHTML = `
+        setHtml(container, html`
             <div class="laughtale-blockui-root" data-part="root" style="position: relative; width: 100%;">
                 <!-- Blocked Glass Overlay -->
                 <div class="blockui-mask" style="display: ${isBlocked ? 'flex' : 'none'}; position: absolute; inset: 0; z-index: 100; background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(3px); align-items: center; justify-content: center; border-radius: inherit;">
@@ -51,7 +52,7 @@ export default function BlockUIIsland(container: HTMLElement, props: BlockUIProp
                     </div>
                 </div>
             </div>
-        `;
+        `);
     }
 
     render();

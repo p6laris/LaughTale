@@ -1,13 +1,8 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
-﻿/**
- * LaughTale: Enterprise Checkbox Component (Aura Checkbox)
- * Accessible, theme-aware tri-state checkbox with LaughTale Core spring micro-interactions.
- * Integrates with Theme Studio tokens and full dark mode support.
- */
-
 import { injectIslandStyle } from '../runtime/styles';
 import { LucideIcons } from '../icons/lucide';
+import { html, setHtml, attr, unsafe } from '../runtime/html';
 
 export interface CheckboxProps {
     checked?: boolean;
@@ -223,26 +218,27 @@ export default function CheckboxIsland(container: HTMLElement, props: CheckboxPr
 
     function render() {
         const stateClass = isIndeterminate ? 'indeterminate' : (isChecked ? 'checked' : '');
-        const iconSvg = isIndeterminate ? LucideIcons.minus : LucideIcons.check;
+        const iconSvgStr = isIndeterminate ? LucideIcons.minus : LucideIcons.check;
+        const iconSvg = unsafe(iconSvgStr) /* static check/minus icon */;
 
-        container.innerHTML = `
+        setHtml(container, html`
             <label class="laughtale-checkbox-wrap size-${size} variant-${variant} ${stateClass} ${props.disabled ? 'disabled' : ''} ${props.invalid ? 'invalid' : ''}" data-part="root" 
                    for="${inputId}">
                 <input type="checkbox" 
                        id="${inputId}" 
                        class="laughtale-checkbox-hidden" 
-                       ${isChecked ? 'checked' : ''} 
-                       ${props.disabled ? 'disabled' : ''} 
+                       ${attr('checked', isChecked)} 
+                       ${attr('disabled', props.disabled)} 
                        aria-checked="${isIndeterminate ? 'mixed' : (isChecked ? 'true' : 'false')}" 
                        role="checkbox" />
-                <div class="laughtale-checkbox-box" tabindex="${props.disabled ? -1 : 0}">
+                <div class="laughtale-checkbox-box" ${attr('tabindex', props.disabled ? -1 : 0)}>
                     <span class="laughtale-checkbox-icon">
                         ${iconSvg}
                     </span>
                 </div>
-                ${props.label ? `<span class="laughtale-checkbox-label">${props.label}</span>` : ''}
+                ${props.label ? html`<span class="laughtale-checkbox-label">${props.label}</span>` : ''}
             </label>
-        `;
+        `);
 
         bindEvents();
         syncValue();

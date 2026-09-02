@@ -1,13 +1,8 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
-﻿/**
- * LaughTale: Enterprise Breadcrumb Component (LaughTale Aura Design System)
- * Semantic breadcrumb navigation with list hierarchy, custom separators, collapsible ellipsis,
- * custom item templates (icons, badges), route integration, and full WCAG / WAI-ARIA compliance.
- */
-
 import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
+import { html, setHtml, url as safeUrl, unsafe, type Raw } from '../runtime/html';
 
 const BREADCRUMB_CSS = `
 .p-breadcrumb-transparent {
@@ -217,43 +212,43 @@ export default function BreadcrumbIsland(container: HTMLElement, props: Breadcru
     const homeLabel = props.home?.label || props.homeLabel || (props as any).HomeLabel || (props as any).home_label || container.getAttribute('home-label') || '';
     const separatorType = props.separator || (props as any).Separator || container.getAttribute('separator') || 'chevron';
 
-    function getSeparatorHtml(): string {
+    function getSeparatorHtml(): Raw {
         if (separatorType === 'slash') {
-            return '<span class="p-breadcrumb-separator" data-part="root" aria-hidden="true">/</span>';
+            return html`<span class="p-breadcrumb-separator" data-part="root" aria-hidden="true">/</span>`;
         }
         if (separatorType === 'arrow') {
-            return '<span class="p-breadcrumb-separator" aria-hidden="true">&gt;</span>';
+            return html`<span class="p-breadcrumb-separator" aria-hidden="true">&gt;</span>`;
         }
-        return `
+        return html`
             <span class="p-breadcrumb-separator" aria-hidden="true">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
             </span>
         `;
     }
 
-    function renderItemContent(item: BreadcrumbItem): string {
-        let iconHtml = '';
+    function renderItemContent(item: BreadcrumbItem): Raw {
+        let iconHtml: Raw | string = '';
         if (item.icon) {
             if (item.icon.startsWith('<svg')) {
-                iconHtml = item.icon;
+                iconHtml = unsafe(item.icon) /* static svg icon */;
             } else if ((LucideIcons as any)[item.icon]) {
-                iconHtml = (LucideIcons as any)[item.icon];
+                iconHtml = unsafe((LucideIcons as any)[item.icon]) /* static Lucide icon */;
             } else {
-                iconHtml = `<span class="${item.icon}"></span>`;
+                iconHtml = html`<span class="${item.icon}"></span>`;
             }
         }
 
         const badgeHtml = item.badge 
-            ? `<span class="p-breadcrumb-badge p-breadcrumb-badge-${item.badgeSeverity || 'primary'}">${item.badge}</span>` 
+            ? html`<span class="p-breadcrumb-badge p-breadcrumb-badge-${item.badgeSeverity || 'primary'}">${item.badge}</span>` 
             : '';
 
         if (item.isEllipsis) {
-            return `<span class="p-breadcrumb-ellipsis" title="Show hidden path">...</span>`;
+            return html`<span class="p-breadcrumb-ellipsis" title="Show hidden path">...</span>`;
         }
 
-        return `
-            ${iconHtml ? `<span style="display:inline-flex; align-items:center;">${iconHtml}</span>` : ''}
-            ${item.label ? `<span>${item.label}</span>` : ''}
+        return html`
+            ${iconHtml ? html`<span style="display:inline-flex; align-items:center;">${iconHtml}</span>` : ''}
+            ${item.label ? html`<span>${item.label}</span>` : ''}
             ${badgeHtml}
         `;
     }
@@ -264,7 +259,7 @@ export default function BreadcrumbIsland(container: HTMLElement, props: Breadcru
         const isLast = idx === items.length - 1;
         const isCurrent = item.isCurrent || (item as any).IsCurrent || isLast;
         const label = (item as any).label || (item as any).Label || '';
-        const url = (item as any).url || (item as any).Url;
+        const itemUrl = (item as any).url || (item as any).Url;
         const icon = (item as any).icon || (item as any).Icon;
         const isEllipsis = (item as any).isEllipsis || (item as any).IsEllipsis;
         const badge = (item as any).badge || (item as any).Badge;
@@ -272,7 +267,7 @@ export default function BreadcrumbIsland(container: HTMLElement, props: Breadcru
 
         const normalizedItem: BreadcrumbItem = {
             label,
-            url,
+            url: itemUrl,
             icon,
             isCurrent,
             isEllipsis,
@@ -282,16 +277,16 @@ export default function BreadcrumbIsland(container: HTMLElement, props: Breadcru
 
         const content = renderItemContent(normalizedItem);
 
-        let inner = '';
+        let inner: Raw;
         if (isCurrent && !isEllipsis) {
-            inner = `<span class="p-breadcrumb-item-link p-breadcrumb-item-current" aria-current="page">${content}</span>`;
-        } else if (url && !isEllipsis) {
-            inner = `<a href="${url}" class="p-breadcrumb-item-link">${content}</a>`;
+            inner = html`<span class="p-breadcrumb-item-link p-breadcrumb-item-current" aria-current="page">${content}</span>`;
+        } else if (itemUrl && !isEllipsis) {
+            inner = html`<a href="${safeUrl(itemUrl)}" class="p-breadcrumb-item-link">${content}</a>`;
         } else {
-            inner = `<span class="p-breadcrumb-item-link">${content}</span>`;
+            inner = html`<span class="p-breadcrumb-item-link">${content}</span>`;
         }
 
-        return `
+        return html`
             <li class="p-breadcrumb-separator-wrapper" style="display: inline-flex; align-items: center;">
                 ${separatorHtml}
             </li>
@@ -299,21 +294,22 @@ export default function BreadcrumbIsland(container: HTMLElement, props: Breadcru
                 ${inner}
             </li>
         `;
-    }).join('');
+    });
 
-    const homeSvg = LucideIcons[homeIcon] || LucideIcons.home || '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>';
+    const homeSvgStr = LucideIcons[homeIcon] || LucideIcons.home || '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>';
+    const homeSvg = unsafe(homeSvgStr) /* static home svg icon */;
 
-    container.innerHTML = `
+    setHtml(container, html`
         <nav class="p-breadcrumb p-component" aria-label="Breadcrumb">
             <ol class="p-breadcrumb-list">
                 <li class="p-breadcrumb-item">
-                    <a href="${homeUrl}" class="p-breadcrumb-item-link" title="Home" aria-label="Home">
+                    <a href="${safeUrl(homeUrl)}" class="p-breadcrumb-item-link" title="Home" aria-label="Home">
                         ${homeSvg}
-                        ${homeLabel ? `<span>${homeLabel}</span>` : ''}
+                        ${homeLabel ? html`<span>${homeLabel}</span>` : ''}
                     </a>
                 </li>
                 ${itemsHtml}
             </ol>
         </nav>
-    `;
+    `);
 }

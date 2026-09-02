@@ -10,6 +10,7 @@ import { useDisclosure } from '../composables/useDisclosure';
 import { useClickOutside } from '../composables/useClickOutside';
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
+import { html, setHtml, url, unsafe, attr, type Raw } from '../runtime/html';
 
 export interface CascadeSelectNode<T = string> {
     name?: string;
@@ -307,7 +308,7 @@ export default function CascadeSelectIsland<T = string>(container: HTMLElement, 
         selectedLabelText = findNodeByValue(options, selectedValue) || String(selectedValue);
     }
 
-    container.innerHTML = `
+    setHtml(container, html`
         <div class="laughtale-cascadeselect ${props.fluid ? 'fluid' : ''}" data-part="root">
             <!-- Trigger -->
             <div class="cs-trigger size-${size} variant-${variant} ${props.invalid ? 'invalid' : ''} ${props.disabled ? 'disabled' : ''}" 
@@ -320,20 +321,20 @@ export default function CascadeSelectIsland<T = string>(container: HTMLElement, 
                 </span>
                 
                 <div class="cs-actions">
-                    ${props.loading ? `
+                    ${props.loading ? html`
                         <span class="cs-btn-icon" style="animation: spin 1s linear infinite;">
-                            ${LucideIcons.loader2 || '⏳'}
+                            ${unsafe(LucideIcons.loader2 || '⏳') /* static spinner icon */}
                         </span>
                     ` : ''}
 
-                    ${showClear ? `
+                    ${showClear ? html`
                         <button type="button" class="cs-btn-icon cs-btn-clear" style="display: ${selectedLabelText ? 'flex' : 'none'};" title="Clear value">
-                            ${LucideIcons.x}
+                            ${unsafe(LucideIcons.x) /* static close icon */}
                         </button>
                     ` : ''}
 
                     <span class="cs-chevron">
-                        ${LucideIcons.chevronDown}
+                        ${unsafe(LucideIcons.chevronDown) /* static dropdown icon */}
                     </span>
                 </div>
             </div>
@@ -343,7 +344,7 @@ export default function CascadeSelectIsland<T = string>(container: HTMLElement, 
                 <div class="cs-panel cs-level-0"></div>
             </div>
         </div>
-    `;
+    `);
 
     const trigger = container.querySelector<HTMLElement>('.cs-trigger')!;
     const label = container.querySelector<HTMLElement>('.cs-label')!;
@@ -374,21 +375,21 @@ export default function CascadeSelectIsland<T = string>(container: HTMLElement, 
     }
 
     function renderLevel(nodes: CascadeSelectNode<T>[], parentContainer: HTMLElement, level: number, currentPath: string[]) {
-        parentContainer.innerHTML = nodes.map((n, idx) => {
+        setHtml(parentContainer, html`${nodes.map((n, idx) => {
             const nodeLabel = getNodeLabel(n);
             const nodeVal = getNodeValue(n);
             const children = getNodeChildren(n);
             const hasChildren = children && children.length > 0;
             const isSelected = selectedValue !== null && nodeVal === String(selectedValue);
 
-            let leadingHtml = '';
+            let leadingHtml: Raw | string = '';
             if (n.icon && LucideIcons[n.icon]) {
-                leadingHtml = `<span style="display: flex; width: 16px; height: 16px; color: var(--lt-primary-600); margin-right: 0.4rem;">${LucideIcons[n.icon]}</span>`;
+                leadingHtml = html`<span style="display: flex; width: 16px; height: 16px; color: var(--lt-primary-600); margin-right: 0.4rem;">${unsafe(LucideIcons[n.icon]) /* static icon */}</span>`;
             } else if (n.image) {
-                leadingHtml = `<img src="${n.image}" alt="" style="width: 18px; height: 18px; border-radius: 2px; margin-right: 0.4rem; object-fit: cover;" />`;
+                leadingHtml = html`<img src="${url(n.image)}" alt="" style="width: 18px; height: 18px; border-radius: 2px; margin-right: 0.4rem; object-fit: cover;" />`;
             }
 
-            return `
+            return html`
                 <div class="cs-item ${isSelected ? 'selected' : ''} ${n.disabled ? 'disabled' : ''}" 
                      data-idx="${idx}" 
                      data-val="${nodeVal}" 
@@ -398,15 +399,15 @@ export default function CascadeSelectIsland<T = string>(container: HTMLElement, 
                         ${leadingHtml}
                         <span>${nodeLabel}</span>
                     </div>
-                    ${hasChildren ? `
+                    ${hasChildren ? html`
                         <span style="color: var(--p-text-muted); display: flex; width: 14px; height: 14px; margin-left: 0.5rem;">
-                            ${LucideIcons.chevronRight}
+                            ${unsafe(LucideIcons.chevronRight) /* static chevron */}
                         </span>
                         <div class="cs-sub-panel cs-level-${level + 1}"></div>
                     ` : ''}
                 </div>
             `;
-        }).join('');
+        })}`);
 
         parentContainer.querySelectorAll<HTMLElement>(':scope > .cs-item').forEach((itemEl, idx) => {
             const node = nodes[idx];

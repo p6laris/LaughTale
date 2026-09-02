@@ -1,12 +1,8 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
-﻿/**
- * LaughTale: Enterprise ColorPicker Component (Aura ColorPicker inspired)
- * Pixel-perfect popover with preset swatches, hex input, and native color spectrum picker.
- */
-
 import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
+import { html, setHtml, attr, type Raw } from '../runtime/html';
 
 export interface ColorPickerProps {
     value?: string; // Hex color e.g. 'var(--lt-primary-500, var(--lt-primary-500))'
@@ -51,22 +47,29 @@ export default function ColorPickerIsland(container: HTMLElement, props: ColorPi
     let currentColor = props.value || 'var(--lt-primary-500, var(--lt-primary-500))';
     let isOpen = false;
 
-    const swatchesHtml = DEFAULT_PRESETS.map(c => `
-        <button type="button" 
-                class="color-swatch-btn" data-part="root" 
-                data-color="${c}" 
-                title="${c}"
-                style="width: 1.75rem; height: 1.75rem; border-radius: 4px; border: ${c.toLowerCase() === currentColor.toLowerCase() ? '2px solid var(--lt-surface-0, var(--lt-surface-0))' : '1px solid rgba(0,0,0,0.15)'}; background: ${c}; cursor: pointer; box-shadow: ${c.toLowerCase() === currentColor.toLowerCase() ? '0 0 0 2px var(--lt-primary-600)' : 'none'}; transition: transform 0.15s ease, box-shadow 0.15s ease;">
-        </button>
-    `).join('');
+    const swatches = DEFAULT_PRESETS.map(c => {
+        const isMatch = c.toLowerCase() === currentColor.toLowerCase();
+        const borderStyle = isMatch ? '2px solid var(--lt-surface-0, var(--lt-surface-0))' : '1px solid rgba(0,0,0,0.15)';
+        const shadowStyle = isMatch ? '0 0 0 2px var(--lt-primary-600)' : 'none';
+        const styleVal = `width: 1.75rem; height: 1.75rem; border-radius: 4px; border: ${borderStyle}; background: ${c}; cursor: pointer; box-shadow: ${shadowStyle}; transition: transform 0.15s ease, box-shadow 0.15s ease;`;
+
+        return html`
+            <button type="button" 
+                    class="color-swatch-btn" data-part="root" 
+                    data-color="${c}" 
+                    title="${c}"
+                    style="${styleVal}">
+            </button>
+        `;
+    });
 
     // Static DOM skeleton built once
-    container.innerHTML = `
+    setHtml(container, html`
         <div class="laughtale-colorpicker" style="position: relative; display: inline-flex; align-items: center; gap: 0.625rem; font-family: var(--p-font-family, inherit);">
             <!-- Color Swatch Trigger Button -->
             <button type="button" 
                     class="colorpicker-trigger-btn" 
-                    ${props.disabled ? 'disabled' : ''} 
+                    ${attr('disabled', props.disabled)} 
                     style="width: 2.25rem; height: 2.25rem; border-radius: var(--lt-radius); border: 2px solid var(--lt-surface-200); background: ${currentColor}; cursor: ${props.disabled ? 'not-allowed' : 'pointer'}; box-shadow: var(--p-shadow-sm); transition: transform 0.15s ease, border-color 0.15s ease; padding: 0; outline: none;">
             </button>
             <span class="colorpicker-hex-label" style="font-family: monospace; font-size: 0.8125rem; font-weight: 600; color: var(--lt-surface-800);">${currentColor.toUpperCase()}</span>
@@ -77,7 +80,7 @@ export default function ColorPickerIsland(container: HTMLElement, props: ColorPi
                 
                 <!-- 5-Column Swatch Grid -->
                 <div class="colorpicker-swatches-grid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 0.875rem; justify-items: center;">
-                    ${swatchesHtml}
+                    ${swatches}
                 </div>
 
                 <!-- Custom Hex & Native Spectrum Picker -->
@@ -91,16 +94,16 @@ export default function ColorPickerIsland(container: HTMLElement, props: ColorPi
                     <div style="flex: 1; min-width: 0; display: flex; align-items: center; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); padding: 0 0.5rem; box-sizing: border-box;">
                         <span style="font-size: 0.75rem; color: var(--lt-surface-400); font-family: monospace; user-select: none;">#</span>
                         <input type="text" 
-                               class="color-hex-input" 
-                               value="${currentColor.replace('#', '')}" 
-                               maxlength="6" 
-                               placeholder="10b981"
-                               style="width: 100%; min-width: 0; padding: 0.35rem 0.25rem; font-family: monospace; font-size: 0.8125rem; color: var(--lt-text-primary); border: none; outline: none; background: transparent; box-sizing: border-box;" />
+                                class="color-hex-input" 
+                                value="${currentColor.replace('#', '')}" 
+                                maxlength="6" 
+                                placeholder="10b981"
+                                style="width: 100%; min-width: 0; padding: 0.35rem 0.25rem; font-family: monospace; font-size: 0.8125rem; color: var(--lt-text-primary); border: none; outline: none; background: transparent; box-sizing: border-box;" />
                     </div>
                 </div>
             </div>
         </div>
-    `;
+    `);
 
     const triggerBtn = container.querySelector<HTMLButtonElement>('.colorpicker-trigger-btn')!;
     const hexLabel = container.querySelector<HTMLElement>('.colorpicker-hex-label')!;

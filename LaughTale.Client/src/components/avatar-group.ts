@@ -1,6 +1,7 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
+import { html, setHtml, url, attr, type Raw } from '../runtime/html';
 
 /**
  * LaughTale: Enterprise Avatar & AvatarGroup Component (Aura Design System compliant)
@@ -152,31 +153,30 @@ export default function AvatarGroupIsland(container: HTMLElement, props: AvatarG
     const visible = rawAvatars.slice(0, max);
     const overflowCount = rawAvatars.length - max;
 
-    const avatarElementsHtml = visible.map((av: AvatarItem) => {
+    const avatarElements = visible.map((av: AvatarItem) => {
         const bg = av.bg ? `background-color: ${av.bg};` : '';
         const color = av.color || (av.bg ? '#ffffff' : '');
         const colorStyle = color ? `color: ${color};` : '';
         const combinedStyle = `${bg} ${colorStyle}`.trim();
-        const styleAttr = combinedStyle ? `style="${combinedStyle}"` : '';
         const title = av.name || av.label || '';
 
-        return `
-            <div class="p-avatar p-component ${shapeClass} ${sizeClass}" title="${title}" ${styleAttr}>
-                ${av.image ? `<img src="${av.image}" alt="${title}" />` : `<span>${av.label || title.charAt(0) || 'U'}</span>`}
+        return html`
+            <div class="p-avatar p-component ${shapeClass} ${sizeClass}" title="${title}" ${attr('style', combinedStyle)}>
+                ${av.image ? html`<img src="${url(av.image)}" alt="${title}" />` : html`<span>${av.label || title.charAt(0) || 'U'}</span>`}
             </div>
         `;
-    }).join('');
+    });
 
     const overflowHtml = overflowCount > 0
-        ? `<div class="p-avatar p-component p-avatargroup-overflow ${shapeClass} ${sizeClass}" title="${overflowCount} more members">+${overflowCount}</div>`
+        ? html`<div class="p-avatar p-component p-avatargroup-overflow ${shapeClass} ${sizeClass}" title="${overflowCount} more members">+${overflowCount}</div>`
         : '';
 
     const rootEl = document.createElement('div');
     rootEl.className = `p-avatargroup p-component ${props.class || ''}`.trim();
     if (props.style) rootEl.style.cssText += props.style;
-    rootEl.innerHTML = `${avatarElementsHtml}${overflowHtml}`;
+    setHtml(rootEl, html`${avatarElements}${overflowHtml}`);
 
-    container.innerHTML = '';
+    setHtml(container, '');
     container.appendChild(rootEl);
 
     container.setAttribute('data-part', 'root');

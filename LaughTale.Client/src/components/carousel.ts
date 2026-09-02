@@ -10,6 +10,7 @@ import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
+import { html, setHtml, url, type Raw } from '../runtime/html';
 
 export interface CarouselProps {
     items?: any[];
@@ -269,10 +270,10 @@ html.dark .p-carousel-next:hover:not(:disabled),
 }
 `;
 
-const CHEVRON_LEFT = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>`;
-const CHEVRON_RIGHT = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`;
-const CHEVRON_UP = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>`;
-const CHEVRON_DOWN = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
+const CHEVRON_LEFT = html`<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>`;
+const CHEVRON_RIGHT = html`<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`;
+const CHEVRON_UP = html`<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>`;
+const CHEVRON_DOWN = html`<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
 
 const GALLERY_DEFAULT_IMAGES = [
     'https://images.unsplash.com/photo-1589656966895-2f33e7653819?q=80&w=1470&auto=format&fit=crop',
@@ -311,7 +312,7 @@ export default function CarouselIsland(container: HTMLElement, props: CarouselPr
         return;
     }
 
-    function renderStandardCarousel(): string {
+    function renderStandardCarousel(): Raw {
         const itemDimensionsStyle = isVertical
             ? `height: calc((240px - ${(spacing * (Math.ceil(slidesPerPage) - 1))}px) / ${slidesPerPage}); width: 100%; flex: 0 0 auto;`
             : (autoSize
@@ -320,23 +321,23 @@ export default function CarouselIsland(container: HTMLElement, props: CarouselPr
 
         const itemsHtml = Array.from({ length: itemCount }, (_, i) => {
             const widthOverride = autoSize ? `width: ${customWidths[i]};` : '';
-            return `
+            return html`
                 <div class="p-carousel-item" data-part="root" style="${itemDimensionsStyle} ${widthOverride}" role="group" aria-roledescription="slide" aria-label="Slide ${i + 1} of ${itemCount}" data-slide-index="${i}">
                     <div class="p-carousel-card-num">
                         <span>${i + 1}</span>
                     </div>
                 </div>
             `;
-        }).join('');
+        });
 
-        const indicatorsHtml = Array.from({ length: itemCount }, (_, i) => `
+        const indicatorsHtml = Array.from({ length: itemCount }, (_, i) => html`
             <li class="p-carousel-indicator">
                 <button type="button" class="p-carousel-indicator-button ${i === currentSlide ? 'p-carousel-indicator-active' : ''}" aria-label="Slide ${i + 1}" data-indicator-index="${i}" ${i === currentSlide ? 'aria-current="true"' : ''}></button>
             </li>
-        `).join('');
+        `);
 
         if (isVertical) {
-            return `
+            return html`
                 <div class="p-carousel p-carousel-vertical p-carousel-align-${align} ${props.class || ''}" role="region" aria-roledescription="carousel" aria-label="Vertical Content Slider" style="max-width: 24rem; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 1.5rem; ${props.style || ''}">
                     <button type="button" class="p-carousel-prev" aria-label="Previous slide" data-carousel-prev>
                         ${CHEVRON_UP}
@@ -351,7 +352,7 @@ export default function CarouselIsland(container: HTMLElement, props: CarouselPr
             `;
         }
 
-        return `
+        return html`
             <div class="p-carousel p-carousel-align-${align} ${props.class || ''}" role="region" aria-roledescription="carousel" aria-label="Content Slider" style="max-width: 36rem; margin: 0 auto; ${props.style || ''}">
                 <div class="p-carousel-content" style="height: ${autoSize ? '140px' : '240px'}; width: 100%; gap: ${spacing}px;" data-carousel-content>
                     ${itemsHtml}
@@ -374,31 +375,31 @@ export default function CarouselIsland(container: HTMLElement, props: CarouselPr
     }
 
     function renderGalleryDemo(images: string[]) {
-        container.innerHTML = `
+        setHtml(container, html`
             <div class="p-carousel-gallery-container" style="max-width: 42rem; margin: 0 auto; width: 100%;">
                 <!-- Main Stage Photo Carousel -->
                 <div class="p-carousel p-carousel-align-center" data-main-carousel style="width: 100%; border-radius: var(--lt-radius); overflow: hidden; border: 1px solid var(--lt-surface-200);">
                     <div class="p-carousel-content" style="height: 396px; width: 100%;" data-main-content>
-                        ${images.map((src, i) => `
+                        ${images.map((src, i) => html`
                             <div class="p-carousel-item" style="width: 100%; height: 100%; flex-shrink: 0;" data-slide-index="${i}">
-                                <img src="${src}" alt="Polar Bear in Nature ${i + 1}" draggable="false" style="width: 100%; height: 100%; object-fit: cover; select-none;" />
+                                <img src="${url(src)}" alt="Polar Bear in Nature ${i + 1}" draggable="false" style="width: 100%; height: 100%; object-fit: cover; select-none;" />
                             </div>
-                        `).join('')}
+                        `)}
                     </div>
                 </div>
 
                 <!-- Synchronized Thumbnail Strip -->
                 <div class="p-carousel p-carousel-align-center" data-thumb-carousel style="margin-top: 0.75rem; width: 100%;">
                     <div class="p-carousel-content" style="height: 90px; width: 100%; gap: 8px;" data-thumb-content>
-                        ${images.map((src, i) => `
+                        ${images.map((src, i) => html`
                             <div class="p-carousel-item p-carousel-gallery-thumb ${i === currentSlide ? 'p-carousel-thumb-active' : ''}" style="width: calc((100% - 24px) / 4); height: 100%; flex-shrink: 0;" data-thumb-index="${i}">
-                                <img src="${src}" alt="Thumbnail ${i + 1}" draggable="false" style="width: 100%; height: 100%; object-fit: cover; border-radius: 6px;" />
+                                <img src="${url(src)}" alt="Thumbnail ${i + 1}" draggable="false" style="width: 100%; height: 100%; object-fit: cover; border-radius: 6px;" />
                             </div>
-                        `).join('')}
+                        `)}
                     </div>
                 </div>
             </div>
-        `;
+        `);
 
         const mainContent = container.querySelector<HTMLElement>('[data-main-content]');
         const thumbContent = container.querySelector<HTMLElement>('[data-thumb-content]');
@@ -471,7 +472,7 @@ export default function CarouselIsland(container: HTMLElement, props: CarouselPr
         return;
     }
 
-    container.innerHTML = renderStandardCarousel();
+    setHtml(container, renderStandardCarousel());
 
     const contentEl = container.querySelector<HTMLElement>('[data-carousel-content]');
     const prevBtn = container.querySelector<HTMLButtonElement>('[data-carousel-prev]');

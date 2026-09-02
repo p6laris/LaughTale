@@ -1,17 +1,11 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
-﻿/**
- * LaughTale: Enterprise AutoComplete & Combobox Component (Aura AutoComplete)
- * Features: Typeahead suggestions on typing, Dropdown button trigger, Clear button, Multi-chip tokens,
- * Group headers, Rich option templating (Avatar, Status, Shortcut, Tag), Keyboard Navigation (W3C ARIA),
- * Size variants (small, normal, large), Filled/Outlined variants, Invalid/Disabled states, Fluid mode.
- */
-
 import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
 import { useDisclosure } from '../composables/useDisclosure';
 import { useClickOutside } from '../composables/useClickOutside';
 import { useDebounce } from '../composables/useDebounce';
+import { html, setHtml, unsafe, attr, type Raw } from '../runtime/html';
 
 export interface AutoCompleteItem {
     label: string;
@@ -372,7 +366,7 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
         );
     }
 
-    container.innerHTML = `
+    setHtml(container, html`
         <div class="laughtale-autocomplete ${props.fluid ? 'fluid' : ''} ${hasDropdown ? 'has-dropdown' : ''}" data-part="root">
             <div class="ac-input-container size-${size} variant-${variant} ${props.invalid ? 'invalid' : ''} ${props.disabled ? 'disabled' : ''}">
                 <div class="ac-chips-wrapper">
@@ -382,32 +376,32 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
                            aria-autocomplete="list"
                            aria-expanded="false"
                            placeholder="${selectedValues.length === 0 ? (props.placeholder || 'Search...') : ''}" 
-                           ${props.disabled ? 'disabled' : ''} />
+                           ${attr('disabled', props.disabled)} />
                 </div>
                 
-                ${props.loading ? `
+                ${props.loading ? html`
                     <span class="ac-btn-icon" style="animation: spin 1s linear infinite;">
-                        ${LucideIcons.loader2 || '⏳'}
+                        ${unsafe(LucideIcons.loader2 || '⏳') /* static spinner icon */}
                     </span>
                 ` : ''}
 
-                ${showClear ? `
+                ${showClear ? html`
                     <button type="button" class="ac-btn-icon ac-btn-clear" style="display: none;" title="Clear value">
-                        ${LucideIcons.x}
+                        ${unsafe(LucideIcons.x) /* static close icon */}
                     </button>
                 ` : ''}
             </div>
 
-            ${hasDropdown ? `
-                <button type="button" class="ac-dropdown-btn size-${size}" ${props.disabled ? 'disabled' : ''} title="Show all suggestions">
-                    <span style="display: flex; width: 16px; height: 16px;">${LucideIcons.chevronDown}</span>
+            ${hasDropdown ? html`
+                <button type="button" class="ac-dropdown-btn size-${size}" ${attr('disabled', props.disabled)} title="Show all suggestions">
+                    <span style="display: flex; width: 16px; height: 16px;">${unsafe(LucideIcons.chevronDown) /* static dropdown icon */}</span>
                 </button>
             ` : ''}
 
             <!-- Suggestions Overlay -->
             <div class="ac-overlay" style="max-height: ${scrollHeight};"></div>
         </div>
-    `;
+    `);
 
     const inputWrap = container.querySelector<HTMLElement>('.ac-input-container')!;
     const chipsWrap = container.querySelector<HTMLElement>('.ac-chips-wrapper')!;
@@ -460,10 +454,10 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
             const item = allItems.find(i => i.value === val) || { label: val, value: val };
             const chip = document.createElement('span');
             chip.className = 'ac-chip'; container.setAttribute('data-part', 'root');
-            chip.innerHTML = `
+            setHtml(chip, html`
                 <span>${item.label}</span>
                 <button type="button" class="ac-chip-remove" data-remove="${item.value}">&times;</button>
-            `;
+            `);
             chip.querySelector('.ac-chip-remove')?.addEventListener('click', (e) => {
                 e.stopPropagation();
                 removeValue(item.value);
@@ -485,7 +479,7 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
         const filtered = getFilteredItems();
 
         if (filtered.length === 0) {
-            overlay.innerHTML = `<div style="padding: 0.75rem; text-align: center; color: var(--p-text-muted); font-size: 0.8125rem;">No results found</div>`;
+            setHtml(overlay, html`<div style="padding: 0.75rem; text-align: center; color: var(--p-text-muted); font-size: 0.8125rem;">No results found</div>`);
             return;
         }
 
@@ -500,25 +494,25 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
             groups[grp].push(item);
         });
 
-        let html = '';
+        const itemsFragments: Raw[] = [];
         let itemIndex = 0;
 
         if (isGrouped) {
             Object.entries(groups).forEach(([grpName, groupItems]) => {
                 if (grpName) {
-                    html += `<div class="ac-group-header">${grpName}</div>`;
+                    itemsFragments.push(html`<div class="ac-group-header">${grpName}</div>`);
                 }
                 groupItems.forEach(item => {
-                    html += renderOptionHtml(item, itemIndex++);
+                    itemsFragments.push(renderOptionHtml(item, itemIndex++));
                 });
             });
         } else {
             filtered.forEach(item => {
-                html += renderOptionHtml(item, itemIndex++);
+                itemsFragments.push(renderOptionHtml(item, itemIndex++));
             });
         }
 
-        overlay.innerHTML = html;
+        setHtml(overlay, html`${itemsFragments}`);
 
         overlay.querySelectorAll<HTMLElement>('.ac-item').forEach(itemEl => {
             itemEl.addEventListener('click', () => {
@@ -535,43 +529,43 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
         });
     }
 
-    function renderOptionHtml(item: AutoCompleteItem, idx: number): string {
+    function renderOptionHtml(item: AutoCompleteItem, idx: number): Raw {
         const isSelected = selectedValues.includes(item.value);
         const isHighlighted = idx === highlightedIndex;
         
-        let leadingHtml = '';
+        let leadingHtml: Raw | string = '';
         if (item.avatar) {
-            leadingHtml = `<span style="width: 26px; height: 26px; border-radius: 50%; background: var(--lt-primary-600); color: var(--lt-surface-0, var(--lt-surface-0)); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; flex-shrink: 0;">${item.avatar}</span>`;
+            leadingHtml = html`<span style="width: 26px; height: 26px; border-radius: 50%; background: var(--lt-primary-600); color: var(--lt-surface-0, var(--lt-surface-0)); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; flex-shrink: 0;">${item.avatar}</span>`;
         } else if (item.icon && LucideIcons[item.icon]) {
-            leadingHtml = `<span style="display: flex; width: 16px; height: 16px; color: var(--lt-primary-600); flex-shrink: 0;">${LucideIcons[item.icon]}</span>`;
+            leadingHtml = html`<span style="display: flex; width: 16px; height: 16px; color: var(--lt-primary-600); flex-shrink: 0;">${unsafe(LucideIcons[item.icon]) /* static icon from LucideIcons */}</span>`;
         }
 
-        let statusHtml = '';
+        let statusHtml: Raw | string = '';
         if (item.status) {
             const statusColor = item.status === 'online' ? 'var(--lt-primary-500, var(--lt-primary-500))' : (item.status === 'away' ? 'var(--lt-warn-500, var(--lt-warn-500))' : 'var(--lt-surface-400, var(--lt-surface-400))');
-            statusHtml = `<span style="width: 8px; height: 8px; border-radius: 50%; background: ${statusColor}; margin-right: 0.35rem; display: inline-block;"></span>`;
+            statusHtml = html`<span style="width: 8px; height: 8px; border-radius: 50%; background: ${statusColor}; margin-right: 0.35rem; display: inline-block;"></span>`;
         }
 
-        let trailingHtml = '';
+        let trailingHtml: Raw | string = '';
         if (item.shortcut) {
-            trailingHtml = `<span style="font-size: 0.725rem; background: var(--lt-surface-200); padding: 0.1rem 0.35rem; border-radius: 4px; color: var(--p-text-muted); font-family: monospace;">${item.shortcut}</span>`;
+            trailingHtml = html`<span style="font-size: 0.725rem; background: var(--lt-surface-200); padding: 0.1rem 0.35rem; border-radius: 4px; color: var(--p-text-muted); font-family: monospace;">${item.shortcut}</span>`;
         } else if (item.count !== undefined) {
-            trailingHtml = `<span class="aura-tag tag-slate" style="font-size: 0.6875rem;">${item.count}</span>`;
+            trailingHtml = html`<span class="aura-tag tag-slate" style="font-size: 0.6875rem;">${item.count}</span>`;
         }
 
-        return `
+        return html`
             <div class="ac-item ${isSelected ? 'selected' : ''} ${isHighlighted ? 'highlighted' : ''} ${item.disabled ? 'disabled' : ''}" 
                  data-value="${item.value}" 
                  data-idx="${idx}" 
                  role="option" 
-                 aria-selected="${isSelected}">
+                 aria-selected="${isSelected ? 'true' : 'false'}">
                 <div style="display: flex; align-items: center; gap: 0.5rem; overflow: hidden;">
                     ${leadingHtml}
                     <div style="display: flex; flex-direction: column; overflow: hidden;">
                         <span style="font-weight: ${isSelected ? '700' : '500'}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                             ${statusHtml}${item.label}
                         </span>
-                        ${item.subtitle ? `<span style="font-size: 0.75rem; color: var(--p-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.subtitle}</span>` : ''}
+                        ${item.subtitle ? html`<span style="font-size: 0.75rem; color: var(--p-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.subtitle}</span>` : ''}
                     </div>
                 </div>
                 ${trailingHtml}

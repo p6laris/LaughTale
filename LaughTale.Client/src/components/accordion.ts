@@ -1,6 +1,7 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
+import { html, setHtml, attr, type Raw } from '../runtime/html';
 import { AccordionTab } from '../types/models';
 
 export interface AccordionProps {
@@ -16,16 +17,16 @@ export interface AccordionProps {
 }
 
 const SVG_ICONS = {
-    chevronDown: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>',
-    chevronRight: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>',
-    folder: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>',
-    folderOpen: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 14 1.5-6h13l-2.5 6H6Z"/><path d="M4 18h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2Z"/></svg>',
-    plus: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>',
-    minus: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>',
-    check: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
-    user: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>',
-    shield: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>',
-    zap: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>'
+    chevronDown: html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`,
+    chevronRight: html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`,
+    folder: html`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>`,
+    folderOpen: html`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 14 1.5-6h13l-2.5 6H6Z"/><path d="M4 18h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2Z"/></svg>`,
+    plus: html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>`,
+    minus: html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>`,
+    check: html`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>`,
+    user: html`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>`,
+    shield: html`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>`,
+    zap: html`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`
 };
 
 const ACCORDION_CSS = `
@@ -309,10 +310,10 @@ export default function AccordionIsland(container: HTMLElement, props: Accordion
                     if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'false');
                     if (customIndicator === 'match') {
                         const iconSpan = panel.querySelector('.p-accordionheader-toggle-icon');
-                        if (iconSpan) iconSpan.innerHTML = SVG_ICONS.folder;
+                        if (iconSpan) setHtml(iconSpan, SVG_ICONS.folder);
                     } else if (tabs[Number(k)]?.toggleIcon === 'plusMinus') {
                         const iconSpan = panel.querySelector('.p-accordionheader-toggle-icon');
-                        if (iconSpan) iconSpan.innerHTML = SVG_ICONS.plus;
+                        if (iconSpan) setHtml(iconSpan, SVG_ICONS.plus);
                     }
                 }
             });
@@ -327,10 +328,10 @@ export default function AccordionIsland(container: HTMLElement, props: Accordion
                 targetPanel.querySelector<HTMLButtonElement>('.p-accordionheader-toggle')?.setAttribute('aria-expanded', 'true');
                 if (customIndicator === 'match') {
                     const iconSpan = targetPanel.querySelector('.p-accordionheader-toggle-icon');
-                    if (iconSpan) iconSpan.innerHTML = SVG_ICONS.folderOpen;
+                    if (iconSpan) setHtml(iconSpan, SVG_ICONS.folderOpen);
                 } else if (tabs[idx]?.toggleIcon === 'plusMinus') {
                     const iconSpan = targetPanel.querySelector('.p-accordionheader-toggle-icon');
-                    if (iconSpan) iconSpan.innerHTML = SVG_ICONS.minus;
+                    if (iconSpan) setHtml(iconSpan, SVG_ICONS.minus);
                 }
             } else {
                 activeKeys.delete(idxStr);
@@ -338,10 +339,10 @@ export default function AccordionIsland(container: HTMLElement, props: Accordion
                 targetPanel.querySelector<HTMLButtonElement>('.p-accordionheader-toggle')?.setAttribute('aria-expanded', 'false');
                 if (customIndicator === 'match') {
                     const iconSpan = targetPanel.querySelector('.p-accordionheader-toggle-icon');
-                    if (iconSpan) iconSpan.innerHTML = SVG_ICONS.folder;
+                    if (iconSpan) setHtml(iconSpan, SVG_ICONS.folder);
                 } else if (tabs[idx]?.toggleIcon === 'plusMinus') {
                     const iconSpan = targetPanel.querySelector('.p-accordionheader-toggle-icon');
-                    if (iconSpan) iconSpan.innerHTML = SVG_ICONS.plus;
+                    if (iconSpan) setHtml(iconSpan, SVG_ICONS.plus);
                 }
             }
         }
@@ -361,22 +362,19 @@ export default function AccordionIsland(container: HTMLElement, props: Accordion
     }
 
     function renderInitial() {
-        let topControlsHtml = '';
-        if (isControlled) {
-            topControlsHtml = `
-                <div class="p-accordion-top-controls" data-part="root">
-                    ${tabs.map((_, i) => {
-                        const k = String(i);
-                        const isActive = activeKeys.has(k);
-                        return `
-                            <button type="button" class="p-accordion-ctrl-btn ${isActive ? 'p-highlight' : ''}" data-ctrl-idx="${k}">
-                                ${i + 1}
-                            </button>
-                        `;
-                    }).join('')}
-                </div>
-            `;
-        }
+        const topControlsHtml = isControlled ? html`
+            <div class="p-accordion-top-controls" data-part="root">
+                ${tabs.map((_, i) => {
+                    const k = String(i);
+                    const isActive = activeKeys.has(k);
+                    return html`
+                        <button type="button" class="p-accordion-ctrl-btn ${isActive ? 'p-highlight' : ''}" data-ctrl-idx="${k}">
+                            ${i + 1}
+                        </button>
+                    `;
+                })}
+            </div>
+        ` : '';
 
         const panelsHtml = tabs.map((tab, idx) => {
             const k = String(idx);
@@ -395,30 +393,25 @@ export default function AccordionIsland(container: HTMLElement, props: Accordion
             }
 
             // Radio Button circle
-            let radioHtml = withRadio ? `
+            const radioHtml = withRadio ? html`
                 <span class="p-accordion-radio-circle">
                     <span class="p-accordion-radio-inner"></span>
                 </span>
             ` : '';
 
             // Custom icon or Avatar in header
-            let customIconHtml = '';
+            let customIconHtml: Raw | string = '';
             if (tab.icon) {
-                if (tab.icon === 'user') customIconHtml = `<span style="display: inline-flex; align-items: center; margin-right: 0.5rem; color: var(--lt-surface-400);">${SVG_ICONS.user}</span>`;
-                else if (tab.icon === 'shield') customIconHtml = `<span style="display: inline-flex; align-items: center; margin-right: 0.5rem; color: var(--lt-primary-500);">${SVG_ICONS.shield}</span>`;
-                else if (tab.icon === 'zap') customIconHtml = `<span style="display: inline-flex; align-items: center; margin-right: 0.5rem; color: var(--lt-warn-500, var(--lt-warn-500));">${SVG_ICONS.zap}</span>`;
+                if (tab.icon === 'user') customIconHtml = html`<span style="display: inline-flex; align-items: center; margin-right: 0.5rem; color: var(--lt-surface-400);">${SVG_ICONS.user}</span>`;
+                else if (tab.icon === 'shield') customIconHtml = html`<span style="display: inline-flex; align-items: center; margin-right: 0.5rem; color: var(--lt-primary-500);">${SVG_ICONS.shield}</span>`;
+                else if (tab.icon === 'zap') customIconHtml = html`<span style="display: inline-flex; align-items: center; margin-right: 0.5rem; color: var(--lt-warn-500, var(--lt-warn-500));">${SVG_ICONS.zap}</span>`;
             }
 
             // Badge / Subtitle / Price
-            let extraHeaderHtml = '';
-            if (tab.badge) {
-                extraHeaderHtml += `<span style="background: var(--lt-primary-100); color: var(--lt-primary-700); font-size: 0.75rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 9999px; margin-left: 0.5rem;">${tab.badge}</span>`;
-            }
-            if (tab.price) {
-                extraHeaderHtml += `<span style="font-weight: 700; font-size: 0.875rem; color: var(--lt-surface-900); margin-left: auto; margin-right: 1rem;">${tab.price}</span>`;
-            }
+            const badgeHtml = tab.badge ? html`<span style="background: var(--lt-primary-100); color: var(--lt-primary-700); font-size: 0.75rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 9999px; margin-left: 0.5rem;">${tab.badge}</span>` : '';
+            const priceHtml = tab.price ? html`<span style="font-weight: 700; font-size: 0.875rem; color: var(--lt-surface-900); margin-left: auto; margin-right: 1rem;">${tab.price}</span>` : '';
 
-            return `
+            return html`
                 <div class="p-accordionpanel ${activeClass} ${disabledClass}" data-panel-idx="${k}">
                     <div class="p-accordionheader" role="heading" aria-level="2">
                         <button type="button" 
@@ -427,13 +420,14 @@ export default function AccordionIsland(container: HTMLElement, props: Accordion
                                 aria-controls="${contentId}"
                                 aria-expanded="${isActive ? 'true' : 'false'}"
                                 aria-disabled="${tab.disabled ? 'true' : 'false'}"
-                                ${tab.disabled ? 'disabled' : ''}
+                                ${attr('disabled', tab.disabled)}
                                 data-toggle-idx="${k}">
                             <div style="display: flex; align-items: center; width: 100%;">
                                 ${radioHtml}
                                 ${customIconHtml}
                                 <span class="p-accordionheader-title">${tab.header}</span>
-                                ${extraHeaderHtml}
+                                ${badgeHtml}
+                                ${priceHtml}
                             </div>
                             <span class="p-accordionheader-toggle-icon">
                                 ${indicatorSvg}
@@ -452,16 +446,16 @@ export default function AccordionIsland(container: HTMLElement, props: Accordion
                     </div>
                 </div>
             `;
-        }).join('');
+        });
 
         const cssIndicatorClass = customIndicator === 'css' ? 'p-accordion-css-indicator' : '';
 
-        container.innerHTML = `
+        setHtml(container, html`
             ${topControlsHtml}
             <div class="p-accordion p-component ${cssIndicatorClass}" role="tablist">
                 ${panelsHtml}
             </div>
-        `;
+        `);
 
         bindEvents();
     }
