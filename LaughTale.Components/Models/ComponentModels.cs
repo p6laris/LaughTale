@@ -1038,6 +1038,16 @@ public record DropzoneProps(
     string? Accept = null, int? MaxFileSize = null, string? Message = "Drag & Drop files here or browse"
 );
 
+[LaughTale.Core.Attributes.Island("inplace")]
+public record InplaceProps(
+    string? Value = null,
+    string? TargetInputName = null,
+    string? Placeholder = "Click to edit...",
+    bool Disabled = false,
+    bool Closable = true,
+    string? Active = "false"
+);
+
 [LaughTale.Core.Attributes.Island("theme-studio")]
 public record ThemeStudioProps(
     bool Visible = false,

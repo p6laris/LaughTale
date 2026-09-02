@@ -7641,12 +7641,48 @@
         <div class="card-header">
             <div>
                 <h2>Inplace Inline Editor</h2>
-                <p>Seamless inline text-to-input morphing for instant on-page editing.</p>
+                <p>Seamless inline text-to-input morphing for instant on-page editing with keyboard shortcuts and save actions.</p>
             </div>
             <span class="p-tag p-tag-success">Inline</span>
         </div>
-        <div class="card-body" style="max-width: 400px;">
-            <island-inplace value="Cluster-US-East-01" />
+        <div class="card-body">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; width: 100%;">
+                <!-- Basic Text Morphing -->
+                <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem;">
+                    <div style="font-size: 0.875rem; font-weight: 600; color: var(--p-text-color);">Server Node Hostname</div>
+                    <p style="font-size: 0.8rem; color: var(--p-text-muted); margin: 0;">Click or press Enter on the badge to edit the hostname in-place.</p>
+                    <div>
+                        <island-inplace value="Cluster-US-East-01" />
+                    </div>
+                </div>
+
+                <!-- Custom Placeholder -->
+                <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem;">
+                    <div style="font-size: 0.875rem; font-weight: 600; color: var(--p-text-color);">Empty Field Prompt</div>
+                    <p style="font-size: 0.8rem; color: var(--p-text-muted); margin: 0;">Displays styled italic placeholder when value is empty.</p>
+                    <div>
+                        <island-inplace placeholder="Add cluster description..." />
+                    </div>
+                </div>
+
+                <!-- Pre-Activated Editor -->
+                <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem;">
+                    <div style="font-size: 0.875rem; font-weight: 600; color: var(--p-text-color);">Active Edit Mode</div>
+                    <p style="font-size: 0.8rem; color: var(--p-text-muted); margin: 0;">Editor opened by default with commit and cancel controls.</p>
+                    <div>
+                        <island-inplace value="production-primary-v2" active="true" />
+                    </div>
+                </div>
+
+                <!-- Disabled State -->
+                <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem;">
+                    <div style="font-size: 0.875rem; font-weight: 600; color: var(--p-text-color);">Read-Only / Disabled</div>
+                    <p style="font-size: 0.8rem; color: var(--p-text-muted); margin: 0;">Locked field that prevents editing for unauthorized roles.</p>
+                    <div>
+                        <island-inplace value="SYS-IMMUTABLE-UUID-8849" disabled="true" />
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
