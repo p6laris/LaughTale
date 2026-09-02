@@ -15,10 +15,15 @@ const MESSAGE_CSS = `
 /* ==========================================================================
    LaughTale Aura Message Component Tokens & Styles
    ========================================================================== */
+island-message,
+p-message {
+    display: contents !important;
+}
+
 .p-message {
     display: flex;
     align-items: stretch;
-    border-radius: var(--p-message-border-radius, var(--lt-radius));
+    border-radius: var(--p-message-border-radius, var(--p-border-radius, 6px));
     border-width: var(--p-message-border-width, 1px);
     border-style: solid;
     margin: 0;
@@ -114,7 +119,7 @@ const MESSAGE_CSS = `
     justify-content: center;
     width: var(--p-message-close-button-width, 1.75rem);
     height: var(--p-message-close-button-height, 1.75rem);
-    border-radius: var(--p-message-close-button-border-radius, var(--lt-radius));
+    border-radius: var(--p-message-close-button-border-radius, var(--p-border-radius, 6px));
     border: none;
     background: transparent;
     color: inherit;
@@ -192,62 +197,62 @@ const MESSAGE_CSS = `
    ========================================================================== */
 /* Info */
 .p-message-info {
-    background: var(--p-message-info-background, var(--lt-info-50));
-    border-color: var(--p-message-info-border-color, var(--lt-info-200));
-    color: var(--p-message-info-color, var(--lt-info-800));
+    background: var(--p-message-info-background, var(--p-info-50, #eff6ff));
+    border-color: var(--p-message-info-border-color, var(--p-info-200, #bfdbfe));
+    color: var(--p-message-info-color, var(--p-info-700, #1d4ed8));
 }
 .p-message-info .p-message-icon {
-    color: var(--p-message-info-color, var(--lt-info-800));
+    color: var(--p-message-info-color, var(--p-info-700, #1d4ed8));
 }
 
 /* Success */
 .p-message-success {
-    background: var(--p-message-success-background, var(--lt-primary-50));
-    border-color: var(--p-message-success-border-color, var(--lt-primary-200));
-    color: var(--p-message-success-color, var(--lt-primary-800));
+    background: var(--p-message-success-background, color-mix(in srgb, var(--p-primary-color, #10b981) 12%, transparent));
+    border-color: var(--p-message-success-border-color, color-mix(in srgb, var(--p-primary-color, #10b981) 30%, transparent));
+    color: var(--p-message-success-color, var(--p-primary-700, #047857));
 }
 .p-message-success .p-message-icon {
-    color: var(--p-message-success-color, var(--lt-primary-800));
+    color: var(--p-message-success-color, var(--p-primary-700, #047857));
 }
 
 /* Warn */
 .p-message-warn {
-    background: var(--p-message-warn-background, var(--lt-warn-50));
-    border-color: var(--p-message-warn-border-color, var(--lt-warn-200));
-    color: var(--p-message-warn-color, var(--lt-warn-800));
+    background: var(--p-message-warn-background, var(--p-warn-50, #fffbeb));
+    border-color: var(--p-message-warn-border-color, var(--p-warn-200, #fde68a));
+    color: var(--p-message-warn-color, var(--p-warn-700, #b45309));
 }
 .p-message-warn .p-message-icon {
-    color: var(--p-message-warn-color, var(--lt-warn-800));
+    color: var(--p-message-warn-color, var(--p-warn-700, #b45309));
 }
 
 /* Error */
 .p-message-error {
-    background: var(--p-message-error-background, var(--lt-danger-50));
-    border-color: var(--p-message-error-border-color, var(--lt-danger-200));
-    color: var(--p-message-error-color, var(--lt-danger-800));
+    background: var(--p-message-error-background, var(--p-danger-50, #fef2f2));
+    border-color: var(--p-message-error-border-color, var(--p-danger-200, #fecaca));
+    color: var(--p-message-error-color, var(--p-danger-700, #b91c1c));
 }
 .p-message-error .p-message-icon {
-    color: var(--p-message-error-color, var(--lt-danger-800));
+    color: var(--p-message-error-color, var(--p-danger-700, #b91c1c));
 }
 
 /* Secondary */
 .p-message-secondary {
-    background: var(--p-message-secondary-background, var(--lt-surface-50));
-    border-color: var(--p-message-secondary-border-color, var(--lt-surface-200));
-    color: var(--p-message-secondary-color, var(--lt-surface-600));
+    background: var(--p-message-secondary-background, var(--p-surface-50, #f8fafc));
+    border-color: var(--p-message-secondary-border-color, var(--p-surface-200, #e2e8f0));
+    color: var(--p-message-secondary-color, var(--p-text-muted, #64748b));
 }
 .p-message-secondary .p-message-icon {
-    color: var(--p-message-secondary-color, var(--lt-surface-600));
+    color: var(--p-message-secondary-color, var(--p-text-muted, #64748b));
 }
 
 /* Contrast */
 .p-message-contrast {
-    background: var(--p-message-contrast-background, var(--lt-surface-900));
-    border-color: var(--p-message-contrast-border-color, var(--lt-surface-800));
-    color: var(--p-message-contrast-color, var(--lt-surface-0));
+    background: var(--p-message-contrast-background, var(--p-surface-900, #0f172a));
+    border-color: var(--p-message-contrast-border-color, var(--p-surface-800, #1e293b));
+    color: var(--p-message-contrast-color, var(--p-surface-0, #ffffff));
 }
 .p-message-contrast .p-message-icon {
-    color: var(--p-message-contrast-color, var(--lt-surface-0));
+    color: var(--p-message-contrast-color, var(--p-surface-0, #ffffff));
 }
 .p-message-contrast .p-message-close-button:hover {
     background: rgba(255, 255, 255, 0.15);
@@ -262,28 +267,28 @@ const MESSAGE_CSS = `
 }
 
 .p-message-outlined.p-message-info {
-    border-color: var(--p-message-info-border-color, var(--lt-info-500));
-    color: var(--p-message-info-outlined-color, var(--lt-info-600));
+    border-color: var(--p-message-info-border-color, var(--p-info-500, #3b82f6));
+    color: var(--p-message-info-outlined-color, var(--p-info-600, #2563eb));
 }
 .p-message-outlined.p-message-success {
-    border-color: var(--p-message-success-border-color, var(--lt-primary-500));
-    color: var(--p-message-success-outlined-color, var(--lt-primary-600));
+    border-color: var(--p-message-success-border-color, var(--p-primary-color, #10b981));
+    color: var(--p-message-success-outlined-color, var(--p-primary-color, #10b981));
 }
 .p-message-outlined.p-message-warn {
-    border-color: var(--p-message-warn-border-color, var(--lt-warn-500));
-    color: var(--p-message-warn-outlined-color, var(--lt-warn-600));
+    border-color: var(--p-message-warn-border-color, var(--p-warn-500, #f59e0b));
+    color: var(--p-message-warn-outlined-color, var(--p-warn-600, #d97706));
 }
 .p-message-outlined.p-message-error {
-    border-color: var(--p-message-error-border-color, var(--lt-danger-500));
-    color: var(--p-message-error-outlined-color, var(--lt-danger-600));
+    border-color: var(--p-message-error-border-color, var(--p-danger-500, #ef4444));
+    color: var(--p-message-error-outlined-color, var(--p-danger-600, #dc2626));
 }
 .p-message-outlined.p-message-secondary {
-    border-color: var(--p-message-secondary-border-color, var(--lt-surface-300));
-    color: var(--p-message-secondary-outlined-color, var(--lt-surface-600));
+    border-color: var(--p-message-secondary-border-color, var(--p-border-color, #cbd5e1));
+    color: var(--p-message-secondary-outlined-color, var(--p-text-muted, #64748b));
 }
 .p-message-outlined.p-message-contrast {
-    border-color: var(--p-message-contrast-border-color, var(--lt-surface-900));
-    color: var(--p-message-contrast-outlined-color, var(--lt-surface-900));
+    border-color: var(--p-message-contrast-border-color, var(--p-surface-900, #0f172a));
+    color: var(--p-message-contrast-outlined-color, var(--p-surface-900, #0f172a));
 }
 
 /* ==========================================================================
@@ -300,22 +305,22 @@ const MESSAGE_CSS = `
 }
 
 .p-message-simple.p-message-info {
-    color: var(--p-message-info-simple-color, var(--lt-info-600));
+    color: var(--p-message-info-simple-color, var(--p-info-600, #2563eb));
 }
 .p-message-simple.p-message-success {
-    color: var(--p-message-success-simple-color, var(--lt-primary-600));
+    color: var(--p-message-success-simple-color, var(--p-primary-color, #10b981));
 }
 .p-message-simple.p-message-warn {
-    color: var(--p-message-warn-simple-color, var(--lt-warn-600));
+    color: var(--p-message-warn-simple-color, var(--p-warn-600, #d97706));
 }
 .p-message-simple.p-message-error {
-    color: var(--p-message-error-simple-color, var(--lt-danger-600));
+    color: var(--p-message-error-simple-color, var(--p-danger-600, #dc2626));
 }
 .p-message-simple.p-message-secondary {
-    color: var(--p-message-secondary-simple-color, var(--lt-surface-500));
+    color: var(--p-message-secondary-simple-color, var(--p-text-muted, #64748b));
 }
 .p-message-simple.p-message-contrast {
-    color: var(--p-message-contrast-simple-color, var(--lt-surface-900));
+    color: var(--p-message-contrast-simple-color, var(--p-surface-900, #0f172a));
 }
 
 /* ==========================================================================

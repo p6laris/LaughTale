@@ -81,10 +81,10 @@ const CONFIRM_DIALOG_CSS = `
 
 /* Dialog Container */
 .p-confirmdialog.p-dialog {
-    background: var(--lt-surface-0);
-    border: 1px solid var(--lt-surface-200);
+    background: var(--p-overlay-bg, var(--p-surface-0, #ffffff));
+    border: 1px solid var(--p-border-color, #e2e8f0);
     border-radius: var(--p-border-radius-xl, 12px);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--p-shadow-xl, 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1));
     min-width: 24rem;
     max-width: 32rem;
     width: 100%;
@@ -94,6 +94,7 @@ const CONFIRM_DIALOG_CSS = `
     overflow: hidden;
     transform: scale(0.94) translateY(6px);
     transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    color: var(--p-text-color, #1e293b);
 }
 
 .p-confirmdialog-mask.p-confirmdialog-mask-active .p-confirmdialog.p-dialog {
@@ -112,7 +113,7 @@ const CONFIRM_DIALOG_CSS = `
 .p-confirmdialog .p-dialog-title {
     font-weight: 700;
     font-size: 1.125rem;
-    color: var(--lt-text-primary);
+    color: var(--p-text-color, #1e293b);
     margin: 0;
 }
 
@@ -125,14 +126,14 @@ const CONFIRM_DIALOG_CSS = `
     border-radius: 9999px;
     border: none;
     background: transparent;
-    color: var(--lt-surface-500);
+    color: var(--p-text-muted, #64748b);
     cursor: pointer;
     transition: background-color 0.15s ease, color 0.15s ease;
     padding: 0;
 }
 .p-confirmdialog .p-dialog-header-close:hover {
-    background: var(--lt-surface-100);
-    color: var(--lt-text-primary);
+    background: var(--p-surface-100, #f1f5f9);
+    color: var(--p-text-color, #1e293b);
 }
 
 /* Content */
@@ -151,22 +152,22 @@ const CONFIRM_DIALOG_CSS = `
     justify-content: center;
     flex-shrink: 0;
     margin-top: 0.125rem;
-    color: var(--lt-primary-500);
+    color: var(--p-primary-color, #10b981);
 }
 
 .p-confirmdialog-icon-danger {
-    color: var(--lt-danger-500, var(--lt-danger-500)) !important;
+    color: var(--p-red-500, #ef4444) !important;
 }
 .p-confirmdialog-icon-warning {
-    color: var(--lt-warn-500, var(--lt-warn-500)) !important;
+    color: var(--p-amber-500, #f59e0b) !important;
 }
 .p-confirmdialog-icon-info {
-    color: var(--lt-info-500, var(--lt-info-500)) !important;
+    color: var(--p-sky-500, #0ea5e9) !important;
 }
 
 .p-confirmdialog .p-confirmdialog-message {
     font-size: 0.9375rem;
-    color: var(--lt-surface-700);
+    color: var(--p-text-color, #334155);
     line-height: 1.5;
     margin: 0;
 }
@@ -195,49 +196,50 @@ const CONFIRM_DIALOG_CSS = `
     width: 4rem;
     height: 4rem;
     border-radius: 9999px;
-    background: var(--lt-primary-50);
-    color: var(--lt-primary-600);
+    background: color-mix(in srgb, var(--p-primary-color, #10b981) 12%, transparent);
+    color: var(--p-primary-color, #10b981);
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid var(--lt-primary-200);
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+    border: 2px solid color-mix(in srgb, var(--p-primary-color, #10b981) 30%, transparent);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--p-primary-color, #10b981) 20%, transparent);
 }
 
 /* Dark Mode Tokens */
 html.dark .p-confirmdialog.p-dialog,
 [data-theme="dark"] .p-confirmdialog.p-dialog,
 .dark .p-confirmdialog.p-dialog {
-    background: var(--p-surface-0);
-    border-color: var(--p-border-color);
+    background: var(--p-surface-0, #0f172a);
+    border-color: var(--p-border-color, #334155);
+    color: var(--p-text-color, #f8fafc);
 }
 html.dark .p-confirmdialog .p-dialog-title,
 [data-theme="dark"] .p-confirmdialog .p-dialog-title,
 .dark .p-confirmdialog .p-dialog-title {
-    color: var(--p-text-color);
+    color: var(--p-text-color, #f8fafc);
 }
 html.dark .p-confirmdialog .p-dialog-header-close,
 [data-theme="dark"] .p-confirmdialog .p-dialog-header-close,
 .dark .p-confirmdialog .p-dialog-header-close {
-    color: var(--p-text-muted);
+    color: var(--p-text-muted, #94a3b8);
 }
 html.dark .p-confirmdialog .p-dialog-header-close:hover,
 [data-theme="dark"] .p-confirmdialog .p-dialog-header-close:hover,
 .dark .p-confirmdialog .p-dialog-header-close:hover {
-    background: var(--p-surface-100);
-    color: var(--p-text-color);
+    background: var(--p-surface-100, #1e293b);
+    color: var(--p-text-color, #f8fafc);
 }
 html.dark .p-confirmdialog .p-confirmdialog-message,
 [data-theme="dark"] .p-confirmdialog .p-confirmdialog-message,
 .dark .p-confirmdialog .p-confirmdialog-message {
-    color: var(--p-text-color);
+    color: var(--p-text-color, #f8fafc);
 }
 html.dark .p-confirmdialog-headless-icon,
 [data-theme="dark"] .p-confirmdialog-headless-icon,
 .dark .p-confirmdialog-headless-icon {
-    background: rgba(16, 185, 129, 0.15);
-    border-color: rgba(16, 185, 129, 0.35);
-    color: var(--p-primary-300);
+    background: color-mix(in srgb, var(--p-primary-color, #10b981) 18%, transparent);
+    border-color: color-mix(in srgb, var(--p-primary-color, #10b981) 40%, transparent);
+    color: var(--p-primary-color, #10b981);
 }
 `;
 
@@ -376,14 +378,14 @@ class ConfirmDialogManager {
                             ${LOCK_SVG}
                         </div>
                         <div>
-                            <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--lt-text-primary); margin: 0 0 0.5rem 0;">${opt.header || 'Save Changes?'}</h3>
-                            <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0; line-height: 1.5;">${opt.message || 'Are you sure you want to proceed with saving your profile changes?'}</p>
+                            <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--p-text-color, #1e293b); margin: 0 0 0.5rem 0;">${opt.header || 'Save Changes?'}</h3>
+                            <p style="font-size: 0.875rem; color: var(--p-text-muted, #64748b); margin: 0; line-height: 1.5;">${opt.message || 'Are you sure you want to proceed with saving your profile changes?'}</p>
                         </div>
                         <div style="display: flex; gap: 0.75rem; width: 100%; margin-top: 0.5rem;">
-                            <button type="button" class="btn-reject p-button p-button-outlined p-button-secondary" style="flex: 1; padding: 0.5rem 1rem; border-radius: var(--lt-radius); font-weight: 600; font-size: 0.875rem;">
+                            <button type="button" class="btn-reject p-button p-button-outlined p-button-secondary" style="flex: 1; padding: 0.5rem 1rem; border-radius: var(--p-border-radius, 6px); border: 1px solid var(--p-border-color, #cbd5e1); background: transparent; color: var(--p-text-color, #1e293b); font-weight: 600; font-size: 0.875rem; cursor: pointer;">
                                 ${opt.rejectLabel || 'Cancel'}
                             </button>
-                            <button type="button" class="btn-accept p-button p-button-primary" style="flex: 1; padding: 0.5rem 1rem; border-radius: var(--lt-radius); font-weight: 600; font-size: 0.875rem;">
+                            <button type="button" class="btn-accept p-button p-button-primary" style="flex: 1; padding: 0.5rem 1rem; border-radius: var(--p-border-radius, 6px); background: var(--p-primary-color); border: 1px solid var(--p-primary-color); color: var(--p-primary-contrast-color, #ffffff); font-weight: 600; font-size: 0.875rem; cursor: pointer;">
                                 ${opt.acceptLabel || 'Save'}
                             </button>
                         </div>
@@ -395,7 +397,7 @@ class ConfirmDialogManager {
         } else {
             const isDanger = opt.acceptSeverity === 'danger' || (opt.icon && (opt.icon.includes('trash') || opt.icon.includes('danger')));
             const acceptBtnClass = isDanger ? 'p-button p-button-danger p-button-sm' : 'p-button p-button-primary p-button-sm';
-            const acceptStyle = isDanger ? 'background: var(--lt-danger-500, var(--lt-danger-500)); border: 1px solid var(--lt-danger-500, var(--lt-danger-500)); color: var(--lt-surface-0, var(--lt-surface-0));' : 'background: var(--lt-primary-500); border: 1px solid var(--lt-primary-500); color: var(--lt-surface-0, var(--lt-surface-0));';
+            const acceptStyle = isDanger ? 'background: var(--p-red-500, #ef4444); border: 1px solid var(--p-red-500, #ef4444); color: #ffffff;' : 'background: var(--p-primary-color); border: 1px solid var(--p-primary-color); color: var(--p-primary-contrast-color, #ffffff);';
 
             this.maskEl.innerHTML = `
                 <div class="p-confirmdialog p-dialog p-component" role="alertdialog">
@@ -410,10 +412,10 @@ class ConfirmDialogManager {
                         <p class="p-confirmdialog-message">${opt.message || 'Are you sure you want to proceed?'}</p>
                     </div>
                     <div class="p-dialog-footer">
-                        <button type="button" class="btn-reject p-button p-button-outlined p-button-secondary p-button-sm" style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--lt-radius); border: 1px solid var(--lt-surface-200); background: transparent; color: var(--lt-text-primary);">
+                        <button type="button" class="btn-reject p-button p-button-outlined p-button-secondary p-button-sm" style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius, 6px); border: 1px solid var(--p-border-color, #cbd5e1); background: transparent; color: var(--p-text-color, #1e293b); cursor: pointer;">
                             ${opt.rejectLabel || 'Cancel'}
                         </button>
-                        <button type="button" class="btn-accept ${acceptBtnClass}" style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--lt-radius); ${acceptStyle}">
+                        <button type="button" class="btn-accept ${acceptBtnClass}" style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius, 6px); ${acceptStyle} cursor: pointer;">
                             ${opt.acceptLabel || (isDanger ? 'Delete' : 'Save')}
                         </button>
                     </div>
