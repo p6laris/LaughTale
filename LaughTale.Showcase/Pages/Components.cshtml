@@ -1,4 +1,4 @@
-﻿@page "/components"
+@page "/components"
 @model LaughTale.Showcase.Pages.ComponentsModel
 @{
     ViewData["Title"] = "LaughTale Component Suite (76 Components)";
@@ -7375,13 +7375,40 @@
         <div class="card-header">
             <div>
                 <h2>ProgressBar</h2>
-                <p>Determinate and indeterminate progress indicator bars.</p>
+                <p>Determinate and indeterminate progress indicator bars with customizable heights, labels, and Aura theme tokens.</p>
             </div>
             <span class="p-tag p-tag-success">Progress</span>
         </div>
-        <div class="card-body" style="max-width: 500px; display: flex; flex-direction: column; gap: 1rem;">
-            <island-progress-bar value="68" show-value="true" />
-            <island-progress-bar mode="indeterminate" />
+        <div class="card-body">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; width: 100%;">
+                <!-- Basic Determinate -->
+                <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem;">
+                    <div style="font-size: 0.875rem; font-weight: 600; color: var(--p-text-color);">Basic Determinate</div>
+                    <p style="font-size: 0.8rem; color: var(--p-text-muted); margin: 0;">Standard determinate progress with percentage indicator label.</p>
+                    <island-progress-bar value="68" show-value="true" />
+                </div>
+
+                <!-- Indeterminate -->
+                <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem;">
+                    <div style="font-size: 0.875rem; font-weight: 600; color: var(--p-text-color);">Indeterminate</div>
+                    <p style="font-size: 0.8rem; color: var(--p-text-muted); margin: 0;">Continuous animated shimmer for unknown or streaming durations.</p>
+                    <island-progress-bar mode="indeterminate" />
+                </div>
+
+                <!-- Custom Unit & Storage -->
+                <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem;">
+                    <div style="font-size: 0.875rem; font-weight: 600; color: var(--p-text-color);">Custom Unit &amp; Quota</div>
+                    <p style="font-size: 0.8rem; color: var(--p-text-muted); margin: 0;">Supports custom unit strings and full value control.</p>
+                    <island-progress-bar value="85" unit="%" />
+                </div>
+
+                <!-- Slim Buffer Bar -->
+                <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem;">
+                    <div style="font-size: 0.875rem; font-weight: 600; color: var(--p-text-color);">Slim Buffer Bar</div>
+                    <p style="font-size: 0.8rem; color: var(--p-text-muted); margin: 0;">Thin 6px track height suitable for compact cards and tables.</p>
+                    <island-progress-bar value="42" height="6px" show-value="false" />
+                </div>
+            </div>
         </div>
     </section>
 
