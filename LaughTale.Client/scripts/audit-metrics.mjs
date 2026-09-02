@@ -41,6 +41,7 @@ const m = {
     // addEventListener calls that do NOT pass an AbortSignal in the same call.
     listenersUnmanaged: 0,
     listenersTotal: 0,
+    timersUncleared: 0,
     // Observers constructed vs disconnected.
     observersCreated: 0,
     observersDisconnected: 0,
@@ -75,6 +76,41 @@ const m = {
     adapterUpdateSupport: 0,
 };
 
+function splitTopLevel(args) {
+    const parts = [];
+    let depth = 0, cur = '', inStr = null;
+    for (let i = 0; i < args.length; i++) {
+        const c = args[i], prev = args[i - 1];
+        if (inStr) { cur += c; if (c === inStr && prev !== '\\') inStr = null; continue; }
+        if (c === "'" || c === '"' || c === '`') { inStr = c; cur += c; continue; }
+        if ('([{'.includes(c)) depth++;
+        else if (')]}'.includes(c)) depth--;
+        if (c === ',' && depth === 0) { parts.push(cur); cur = ''; continue; }
+        cur += c;
+    }
+    if (cur.trim()) parts.push(cur);
+    return parts;
+}
+
+function countUnmanagedListeners(s) {
+    let unmanaged = 0;
+    const re = /addEventListener\s*\(/g;
+    let match;
+    while ((match = re.exec(s))) {
+        let i = re.lastIndex, depth = 1;
+        const start = i;
+        while (i < s.length && depth > 0) {
+            const c = s[i];
+            if (c === '(') depth++; else if (c === ')') depth--;
+            i++;
+        }
+        const parts = splitTopLevel(s.slice(start, i - 1));
+        const opts = parts.length >= 3 ? parts.slice(2).join(',') : '';
+        if (!/\bsignal\b/.test(opts)) unmanaged++;
+    }
+    return unmanaged;
+}
+
 for (const f of files) {
     const s = read(f);
 
@@ -85,10 +121,12 @@ for (const f of files) {
     if (/sanitizeHtml|sanitizeUrl|escapeHtml|isSafeAttribute|\bhtml`/.test(s)) m.escapeAdoption++;
 
     const addCalls = countAll(s, /addEventListener\s*\(/g);
-    // A listener is "managed" if 'signal' appears within 160 chars of the call.
-    const managed = countAll(s, /addEventListener\s*\([^;]{0,160}?signal/g);
     m.listenersTotal += addCalls;
-    m.listenersUnmanaged += Math.max(0, addCalls - managed);
+    m.listenersUnmanaged += countUnmanagedListeners(s);
+
+    const setCalls   = countAll(s, /\bset(Timeout|Interval)\s*\(/g);
+    const clearCalls = countAll(s, /\bclear(Timeout|Interval)\s*\(/g);
+    m.timersUncleared += Math.max(0, setCalls - clearCalls);
 
     m.observersCreated += countAll(s, /new\s+(Resize|Mutation|Intersection)Observer/g);
     m.observersDisconnected += countAll(s, /\.disconnect\s*\(\)/g);
@@ -126,13 +164,14 @@ if (fs.existsSync(ADAPTER_DIR)) {
 
 // Metrics where a LOWER number is better. --check enforces monotonic improvement.
 const LOWER_IS_BETTER = [
-    'innerHtmlRawAssignments', 'listenersUnmanaged', 'ariaZeroComponents',
+    'innerHtmlRawAssignments', 'listenersUnmanaged', 'timersUncleared', 'ariaZeroComponents',
     'inlineStyleAttributes', 'rawSvgLiterals', 'hexHardcoded', 'eventsBare',
 ];
 // Metrics where a HIGHER number is better.
 const HIGHER_IS_BETTER = [
     'escapeAdoption', 'focusTrapAdoption', 'virtualizerAdoption',
     'formAssociationAdoption', 'handleAdoption', 'rtlAdoption', 'adapterUpdateSupport',
+    'observersDisconnected',
 ];
 
 const args = process.argv.slice(2);
