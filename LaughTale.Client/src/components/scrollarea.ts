@@ -396,7 +396,9 @@ export default function ScrollAreaIsland(container: HTMLElement, props: ScrollAr
     if (viewport.firstElementChild) {
         resizeObserver.observe(viewport.firstElementChild);
     }
+    ctx?.onCleanup?.(() => resizeObserver.disconnect());
 
     // Initial calculation
-    setTimeout(updateScrollbars, 50);
+    const t = setTimeout(updateScrollbars, 50);
+    ctx?.onCleanup?.(() => clearTimeout(t));
 }

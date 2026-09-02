@@ -270,9 +270,12 @@ export default function FloatLabelIsland(container: HTMLElement, props: FloatLab
         updateFloatingState();
     });
     observer.observe(container, { childList: true, subtree: true });
+    ctx?.onCleanup?.(() => observer.disconnect());
 
     // Initial passes
     updateFloatingState();
-    setTimeout(updateFloatingState, 50);
-    setTimeout(updateFloatingState, 200);
+    const t1 = setTimeout(updateFloatingState, 50);
+    ctx?.onCleanup?.(() => clearTimeout(t1));
+    const t2 = setTimeout(updateFloatingState, 200);
+    ctx?.onCleanup?.(() => clearTimeout(t2));
 }
