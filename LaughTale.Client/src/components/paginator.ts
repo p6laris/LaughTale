@@ -7,6 +7,7 @@ import type { IslandContext } from '../runtime/registry';
  */
 
 import { injectIslandStyle } from '../runtime/styles';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 export interface PaginatorProps {
     totalRecords: number;
@@ -398,10 +399,10 @@ export default function PaginatorIsland(container: HTMLElement, props: Paginator
             startPage = Math.max(0, endPage - pageLinkSize + 1);
         }
 
-        const pageButtons: string[] = [];
+        const pageButtons: Raw[] = [];
         for (let p = startPage; p <= endPage; p++) {
             const isSelected = p === currentPage;
-            pageButtons.push(`
+            pageButtons.push(html`
                 <button type="button" 
                         class="p-paginator-page ${isSelected ? 'p-highlight' : ''}" data-part="root" 
                         data-page="${p}" 
@@ -413,46 +414,46 @@ export default function PaginatorIsland(container: HTMLElement, props: Paginator
         }
 
         // Nav Links
-        const firstBtnHtml = showFirstLast ? `
-            <button type="button" class="p-paginator-first" data-action="first" title="First Page" aria-label="First Page" ${isFirstPage ? 'disabled' : ''}>
-                ${ICONS.first}
+        const firstBtnHtml = showFirstLast ? html`
+            <button type="button" class="p-paginator-first" data-action="first" title="First Page" aria-label="First Page" ${attr('disabled', isFirstPage)}>
+                ${unsafe(ICONS.first)}
             </button>
         ` : '';
 
-        const prevBtnHtml = `
-            <button type="button" class="p-paginator-prev" data-action="prev" title="Previous Page" aria-label="Previous Page" ${isFirstPage ? 'disabled' : ''}>
-                ${ICONS.prev}
+        const prevBtnHtml = html`
+            <button type="button" class="p-paginator-prev" data-action="prev" title="Previous Page" aria-label="Previous Page" ${attr('disabled', isFirstPage)}>
+                ${unsafe(ICONS.prev)}
             </button>
         `;
 
-        const nextBtnHtml = `
-            <button type="button" class="p-paginator-next" data-action="next" title="Next Page" aria-label="Next Page" ${isLastPage ? 'disabled' : ''}>
-                ${ICONS.next}
+        const nextBtnHtml = html`
+            <button type="button" class="p-paginator-next" data-action="next" title="Next Page" aria-label="Next Page" ${attr('disabled', isLastPage)}>
+                ${unsafe(ICONS.next)}
             </button>
         `;
 
-        const lastBtnHtml = showFirstLast ? `
-            <button type="button" class="p-paginator-last" data-action="last" title="Last Page" aria-label="Last Page" ${isLastPage ? 'disabled' : ''}>
-                ${ICONS.last}
+        const lastBtnHtml = showFirstLast ? html`
+            <button type="button" class="p-paginator-last" data-action="last" title="Last Page" aria-label="Last Page" ${attr('disabled', isLastPage)}>
+                ${unsafe(ICONS.last)}
             </button>
         ` : '';
 
         // Rows Per Page Dropdown
-        let rppHtml = '';
+        let rppHtml: Raw | '' = '';
         if (rowsPerPageOptions && rowsPerPageOptions.length > 0) {
-            const optionsHtml = rowsPerPageOptions.map(opt => `
-                <option value="${opt}" ${opt === rows ? 'selected' : ''}>${opt}</option>
-            `).join('');
-            rppHtml = `<select class="p-paginator-rpp-select" aria-label="Rows per page">${optionsHtml}</select>`;
+            const optionsHtml = rowsPerPageOptions.map(opt => html`
+                <option value="${opt}" ${attr('selected', opt === rows)}>${opt}</option>
+            `);
+            rppHtml = html`<select class="p-paginator-rpp-select" aria-label="Rows per page">${optionsHtml}</select>`;
         }
 
         // Jump to Page Dropdown
-        let jtpDropdownHtml = '';
+        let jtpDropdownHtml: Raw | '' = '';
         if (showJumpToPageDropdown) {
-            const jtpOptions = Array.from({ length: totalPages }, (_, i) => `
-                <option value="${i}" ${i === currentPage ? 'selected' : ''}>${i + 1}</option>
-            `).join('');
-            jtpDropdownHtml = `
+            const jtpOptions = Array.from({ length: totalPages }, (_, i) => html`
+                <option value="${i}" ${attr('selected', i === currentPage)}>${i + 1}</option>
+            `);
+            jtpDropdownHtml = html`
                 <div class="p-paginator-jtp-container">
                     <span>Jump to page:</span>
                     <select class="p-paginator-jtp-select" aria-label="Jump to page">${jtpOptions}</select>
@@ -462,9 +463,9 @@ export default function PaginatorIsland(container: HTMLElement, props: Paginator
         }
 
         // Jump to Page Input
-        let jtpInputHtml = '';
+        let jtpInputHtml: Raw | '' = '';
         if (showJumpToPageInput) {
-            jtpInputHtml = `
+            jtpInputHtml = html`
                 <div class="p-paginator-jtp-container">
                     <span>Go to:</span>
                     <input type="number" class="p-paginator-jtp-input" min="1" max="${totalPages}" value="${currentPage + 1}" />
@@ -474,9 +475,9 @@ export default function PaginatorIsland(container: HTMLElement, props: Paginator
         }
 
         // Slider
-        let sliderHtml = '';
+        let sliderHtml: Raw | '' = '';
         if (showSlider) {
-            sliderHtml = `
+            sliderHtml = html`
                 <div class="p-paginator-jtp-container">
                     <input type="range" class="p-paginator-slider" min="0" max="${totalPages - 1}" value="${currentPage}" />
                 </div>
@@ -484,12 +485,12 @@ export default function PaginatorIsland(container: HTMLElement, props: Paginator
         }
 
         // Current Page Report
-        const reportHtml = props.currentPageReportTemplate ? `
+        const reportHtml = props.currentPageReportTemplate ? html`
             <span class="p-paginator-current">${formatReportText()}</span>
         ` : '';
 
         // Custom template parsing or standard layout
-        let elementsHtml = '';
+        let elementsHtml: Raw | (Raw | '')[];
 
         if (template) {
             const tokens = template.split(/\s+/);
@@ -497,7 +498,7 @@ export default function PaginatorIsland(container: HTMLElement, props: Paginator
                 switch (token) {
                     case 'FirstPageLink': return firstBtnHtml;
                     case 'PrevPageLink': return prevBtnHtml;
-                    case 'PageLinks': return `<div class="p-paginator-pages">${pageButtons.join('')}</div>`;
+                    case 'PageLinks': return html`<div class="p-paginator-pages">${pageButtons}</div>`;
                     case 'NextPageLink': return nextBtnHtml;
                     case 'LastPageLink': return lastBtnHtml;
                     case 'RowsPerPageDropdown': return rppHtml;
@@ -508,12 +509,12 @@ export default function PaginatorIsland(container: HTMLElement, props: Paginator
                     default: return '';
                 }
             });
-            elementsHtml = renderedTokens.join('');
+            elementsHtml = renderedTokens;
         } else {
-            elementsHtml = `
+            elementsHtml = html`
                 ${firstBtnHtml}
                 ${prevBtnHtml}
-                <div class="p-paginator-pages">${pageButtons.join('')}</div>
+                <div class="p-paginator-pages">${pageButtons}</div>
                 ${nextBtnHtml}
                 ${lastBtnHtml}
                 ${rppHtml}
@@ -525,26 +526,26 @@ export default function PaginatorIsland(container: HTMLElement, props: Paginator
         }
 
         // Images preview card (if images are provided)
-        let imageDisplayHtml = '';
+        let imageDisplayHtml: Raw | '' = '';
         if (images.length > 0) {
             const currentImg = images[currentPage % images.length];
-            imageDisplayHtml = `
+            imageDisplayHtml = html`
                 <div class="p-paginator-image-display">
                     <div class="p-paginator-image-card">
-                        <img src="${currentImg}" alt="Nature ${currentPage + 1}" loading="eager" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop&q=80';" />
+                        <img src="${safeUrl(currentImg)}" alt="Nature ${currentPage + 1}" loading="eager" />
                     </div>
                 </div>
             `;
         }
 
-        container.innerHTML = `
+        setHtml(container, html`
             <div class="p-paginator-wrapper" style="width: 100%;">
                 <div class="p-paginator p-component" role="navigation" aria-label="Pagination Navigation">
                     ${elementsHtml}
                 </div>
                 ${imageDisplayHtml}
             </div>
-        `;
+        `);
 
         bindEvents();
     }

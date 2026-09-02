@@ -10,6 +10,7 @@ import { injectIslandStyle } from '../runtime/styles';
 import { getLucideIcon } from '../icons/lucide';
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 export interface SelectOption {
     label: string;
@@ -585,38 +586,38 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
         return flatOptions.filter(o => isSelected(o.value) || isSelected(o.code));
     }
 
-    function renderTriggerLabel(): string {
+    function renderTriggerLabel(): Raw {
         const items = getSelectedItems();
         if (items.length === 0) {
             if (isEditable && selectedValues.length > 0) {
-                return `<span class="p-select-label">${selectedValues[0]}</span>`;
+                return html`<span class="p-select-label">${selectedValues[0]}</span>`;
             }
-            return `<span class="p-select-label p-placeholder">${placeholder}</span>`;
+            return html`<span class="p-select-label p-placeholder">${placeholder}</span>`;
         }
 
         if (isMultiple) {
             if (isChipDisplay) {
-                const chipsHtml = items.map(item => `
+                const chipsHtml = items.map(item => html`
                     <span class="p-select-chip" data-value="${item.value}">
-                        ${item.flag ? `<span>${item.flag}</span>` : ''}
+                        ${item.flag ? html`<span>${item.flag}</span>` : ''}
                         <span>${item.label || item.value}</span>
-                        <span class="p-select-chip-remove" data-remove="${item.value}">${getLucideIcon('x', 12)}</span>
+                        <span class="p-select-chip-remove" data-remove="${item.value}">${unsafe(getLucideIcon('x', 12))}</span>
                     </span>
-                `).join('');
-                return `<div class="p-select-chips-wrap">${chipsHtml}</div>`;
+                `);
+                return html`<div class="p-select-chips-wrap">${chipsHtml}</div>`;
             } else {
                 const first = items[0].label || items[0].value;
                 const count = items.length > 1 ? ` (+${items.length - 1} more)` : '';
-                return `<span class="p-select-label">${first}${count}</span>`;
+                return html`<span class="p-select-label">${first}${count}</span>`;
             }
         }
 
         const item = items[0];
-        const flagHtml = item.flag ? `<span style="font-size: 1.125rem; line-height: 1;">${item.flag}</span>` : '';
-        const iconHtml = item.icon ? `<span style="font-size: 1.125rem; line-height: 1;">${item.icon}</span>` : '';
-        const statusHtml = item.statusClass ? `<span class="w-2 h-2 rounded-full ${item.statusClass}"></span>` : '';
+        const flagHtml = item.flag ? html`<span style="font-size: 1.125rem; line-height: 1;">${item.flag}</span>` : '';
+        const iconHtml = item.icon ? html`<span style="font-size: 1.125rem; line-height: 1;">${item.icon}</span>` : '';
+        const statusHtml = item.statusClass ? html`<span class="w-2 h-2 rounded-full ${item.statusClass}"></span>` : '';
 
-        return `<span class="p-select-label">${flagHtml}${iconHtml}${statusHtml}<span>${item.label || item.value}</span></span>`;
+        return html`<span class="p-select-label">${flagHtml}${iconHtml}${statusHtml}<span>${item.label || item.value}</span></span>`;
     }
 
     function filterOptions(opts: SelectOption[], q: string): SelectOption[] {
@@ -648,53 +649,53 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
         return filtered;
     }
 
-    function renderListItems(): string {
+    function renderListItems(): Raw {
         const visibleOpts = filterOptions(allOptions, filterQuery);
         if (visibleOpts.length === 0) {
-            return `<div class="p-select-empty-message">No results found</div>`;
+            return html`<div class="p-select-empty-message">No results found</div>`;
         }
 
-        let html = '';
+        const items: Raw[] = [];
         visibleOpts.forEach((opt, idx) => {
             if (opt.items && opt.items.length > 0) {
-                html += `
+                items.push(html`
                     <li class="p-select-option-group">
-                        ${opt.flag ? `<span>${opt.flag}</span>` : ''}
+                        ${opt.flag ? html`<span>${opt.flag}</span>` : ''}
                         <span>${opt.label || opt.value}</span>
                     </li>
-                `;
+                `);
                 opt.items.forEach((child, cIdx) => {
-                    html += renderSingleOption(child, `opt_${idx}_${cIdx}`);
+                    items.push(renderSingleOption(child, `opt_${idx}_${cIdx}`));
                 });
             } else {
-                html += renderSingleOption(opt, `opt_${idx}`);
+                items.push(renderSingleOption(opt, `opt_${idx}`));
             }
         });
 
-        return html;
+        return html`${items}`;
     }
 
-    function renderSingleOption(opt: SelectOption, id: string): string {
+    function renderSingleOption(opt: SelectOption, id: string): Raw {
         const checked = isSelected(opt.value) || isSelected(opt.code);
         const dis = opt.disabled ? 'p-disabled' : '';
         const high = checked ? 'p-highlight' : '';
 
-        const flagHtml = opt.flag ? `<span style="font-size: 1.125rem; line-height: 1;">${opt.flag}</span>` : '';
-        const iconHtml = opt.icon ? `<span style="font-size: 1.125rem; line-height: 1;">${opt.icon}</span>` : '';
-        const avatarHtml = opt.avatar ? `<div style="position: relative; width: 1.75rem; height: 1.75rem; border-radius: 50%; background: var(--lt-surface-200); color: var(--lt-surface-700); font-weight: 700; font-size: 0.6875rem; display: flex; align-items: center; justify-content: center;">${opt.avatar}${opt.statusClass ? `<span style="position: absolute; bottom: -1px; right: -1px; width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid var(--lt-surface-0);" class="${opt.statusClass}"></span>` : ''}</div>` : '';
-        const badgeHtml = opt.badge !== undefined ? `<span class="p-select-option-badge">${opt.badge}</span>` : '';
-        const descHtml = opt.description ? `<div style="font-size: 0.75rem; color: var(--p-text-muted);">${opt.description}</div>` : '';
+        const flagHtml = opt.flag ? html`<span style="font-size: 1.125rem; line-height: 1;">${opt.flag}</span>` : '';
+        const iconHtml = opt.icon ? html`<span style="font-size: 1.125rem; line-height: 1;">${opt.icon}</span>` : '';
+        const avatarHtml = opt.avatar ? html`<div style="position: relative; width: 1.75rem; height: 1.75rem; border-radius: 50%; background: var(--lt-surface-200); color: var(--lt-surface-700); font-weight: 700; font-size: 0.6875rem; display: flex; align-items: center; justify-content: center;">${opt.avatar}${opt.statusClass ? html`<span style="position: absolute; bottom: -1px; right: -1px; width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid var(--lt-surface-0);" class="${opt.statusClass}"></span>` : ''}</div>` : '';
+        const badgeHtml = opt.badge !== undefined ? html`<span class="p-select-option-badge">${opt.badge}</span>` : '';
+        const descHtml = opt.description ? html`<div style="font-size: 0.75rem; color: var(--p-text-muted);">${opt.description}</div>` : '';
 
-        const checkmarkHtml = (isCheckmark || isMultiple) && checked ? `<span class="p-select-option-checkmark" data-part="checkmark">${getLucideIcon('check', 16)}</span>` : '';
-        const checkboxHtml = isCheckbox || isMultiple ? `
+        const checkmarkHtml = (isCheckmark || isMultiple) && checked ? html`<span class="p-select-option-checkmark" data-part="checkmark">${unsafe(getLucideIcon('check', 16))}</span>` : '';
+        const checkboxHtml = isCheckbox || isMultiple ? html`
             <div class="p-select-option-checkbox ${checked ? 'is-checked' : ''}" data-part="checkbox">
-                ${checked ? getLucideIcon('check', 12) : ''}
+                ${checked ? unsafe(getLucideIcon('check', 12)) : ''}
             </div>
         ` : '';
 
         const itemPart = resolvePart('item', `p-select-option ${high} ${dis}`, props.pt, props.studioOverrides);
 
-        return `
+        return html`
             <li class="${itemPart.className}" style="${itemPart.style}" data-part="item" data-value="${opt.value}" role="option" aria-selected="${checked ? 'true' : 'false'}" id="${id}">
                 <div class="p-select-option-content" data-part="itemContent">
                     ${checkboxHtml}
@@ -739,25 +740,25 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
         const panelPart = resolvePart('panel', `p-select-overlay ${isOpen ? 'is-visible' : ''}`, props.pt, props.studioOverrides);
         const listPart = resolvePart('list', 'p-select-list', props.pt, props.studioOverrides);
 
-        container.innerHTML = `
+        setHtml(container, html`
             <div class="${triggerPart.className}" style="${triggerPart.style}" data-part="trigger">
                 ${renderTriggerLabel()}
             </div>
             <div class="p-select-actions" data-part="actions">
-                ${showClear && hasSelected && !isDisabled ? `<span class="p-select-clear-icon" data-part="clearButton" title="Clear selection">${getLucideIcon('x', 14)}</span>` : ''}
-                ${isLoading ? `<span class="p-select-dropdown" data-part="indicator">${getLucideIcon('loader-2', 16)}</span>` : `<span class="p-select-dropdown" data-part="indicator">${getLucideIcon('chevron-down', 16)}</span>`}
+                ${showClear && hasSelected && !isDisabled ? html`<span class="p-select-clear-icon" data-part="clearButton" title="Clear selection">${unsafe(getLucideIcon('x', 14))}</span>` : ''}
+                ${isLoading ? html`<span class="p-select-dropdown" data-part="indicator">${unsafe(getLucideIcon('loader-2', 16))}</span>` : html`<span class="p-select-dropdown" data-part="indicator">${unsafe(getLucideIcon('chevron-down', 16))}</span>`}
             </div>
             <div class="${panelPart.className}" style="${panelPart.style}" data-part="panel">
-                ${hasFilter ? `
+                ${hasFilter ? html`
                     <div class="p-select-filter-container" data-part="filterContainer">
-                        <span class="p-select-filter-icon">${getLucideIcon('search', 14)}</span>
+                        <span class="p-select-filter-icon">${unsafe(getLucideIcon('search', 14))}</span>
                         <input type="text" class="p-select-filter-input" data-part="filterInput" placeholder="${props.filterPlaceholder || 'Search...'}" value="${filterQuery}" />
                     </div>
                 ` : ''}
-                ${isMultiple && isCheckbox ? `
+                ${isMultiple && isCheckbox ? html`
                     <div class="p-select-header-all" data-part="headerAll">
                         <div class="p-select-option-checkbox ${allSelected ? 'is-checked' : ''}">
-                            ${allSelected ? getLucideIcon('check', 12) : (isIndeterminate ? getLucideIcon('minus', 12) : '')}
+                            ${allSelected ? unsafe(getLucideIcon('check', 12)) : (isIndeterminate ? unsafe(getLucideIcon('minus', 12)) : '')}
                         </div>
                         <span>Select All (${selectedValues.length}/${flatOptions.length})</span>
                     </div>
@@ -767,7 +768,7 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
                 </ul>
             </div>
             <input type="hidden" name="${props.name || props.targetInputName || 'select_value'}" value="${selectedValues.join(',')}" />
-        `;
+        `);
 
         bindEvents();
     }
@@ -825,7 +826,7 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
             filterInp.oninput = (e) => {
                 filterQuery = filterInp.value;
                 const list = container.querySelector('.p-select-list');
-                if (list) list.innerHTML = renderListItems();
+                if (list) setHtml(list, renderListItems());
                 bindOptionClicks();
             };
             filterInp.onclick = (e) => e.stopPropagation();

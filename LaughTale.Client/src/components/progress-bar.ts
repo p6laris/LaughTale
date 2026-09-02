@@ -1,6 +1,7 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 /**
  * LaughTale: Enterprise ProgressBar Component (Aura Design System compliant)
@@ -156,7 +157,7 @@ export default function ProgressBarIsland(container: HTMLElement, props: Progres
             rootEl.appendChild(valueEl);
         }
 
-        container.innerHTML = '';
+        setHtml(container, html``);
         container.appendChild(rootEl);
     } else {
         // SSR Hydration update

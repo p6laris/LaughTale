@@ -7,6 +7,7 @@ import type { IslandContext } from '../runtime/registry';
  */
 
 import { injectIslandStyle } from '../runtime/styles';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 const SCROLLAREA_CSS = `
 .p-scrollarea {
@@ -176,7 +177,7 @@ export default function ScrollAreaIsland(container: HTMLElement, props: ScrollAr
         sourceNodes.forEach(node => fragment.appendChild(node));
         if (slotEl) slotEl.remove();
 
-        container.innerHTML = '';
+        setHtml(container, html``);
 
         viewport = document.createElement('div');
         viewport.className = 'p-scrollarea-viewport';

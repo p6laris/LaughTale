@@ -9,6 +9,7 @@ import { injectIslandStyle } from '../runtime/styles';
 import { LucideIcons } from '../icons/lucide';
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 export interface PickListProps<T = any> {
     source?: PickListItem<T>[];
@@ -377,26 +378,26 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
         return String((item as any)[dataKey] || item.id || item.name);
     }
 
-    function renderCellContent(item: PickListItem<T>, isSelected: boolean): string {
-        const checkboxHtml = isCheckbox ? `
+    function renderCellContent(item: PickListItem<T>, isSelected: boolean): Raw {
+        const checkboxHtml = isCheckbox ? html`
             <div class="p-checkbox-box ${isSelected ? 'p-checked' : ''}" data-part="root" role="checkbox" aria-checked="${isSelected}">
-                ${isSelected ? LucideIcons.check : ''}
+                ${isSelected ? unsafe(LucideIcons.check) : ''}
             </div>
         ` : '';
 
         // Product template
         if (item.price != null || item.category != null || item.image != null) {
-            return `
+            return html`
                 ${checkboxHtml}
                 <div class="p-picklist-product-item">
                     <div class="p-picklist-product-img">
-                        ${LucideIcons.package}
+                        ${unsafe(LucideIcons.package)}
                     </div>
                     <div class="p-picklist-product-details">
                         <span class="p-picklist-product-name">${item.name}</span>
                         <span class="p-picklist-product-category">${item.category || ''}</span>
                     </div>
-                    ${item.price != null ? `<span class="p-picklist-product-price">$${item.price}</span>` : ''}
+                    ${item.price != null ? html`<span class="p-picklist-product-price">$${item.price}</span>` : ''}
                 </div>
             `;
         }
@@ -404,67 +405,67 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
         // Member template with avatar
         if (item.avatar != null || item.role != null) {
             const initials = item.name.split(' ').map(w => w[0]).join('').substring(0, 2);
-            return `
+            return html`
                 ${checkboxHtml}
                 <div class="p-picklist-member-item">
                     <div class="p-picklist-member-avatar">${initials}</div>
                     <div style="display: flex; flex-direction: column;">
                         <span style="font-weight: 600; color: var(--lt-surface-900);">${item.name}</span>
-                        ${item.role ? `<span style="font-size: 0.75rem; color: var(--lt-surface-500);">${item.role}</span>` : ''}
+                        ${item.role ? html`<span style="font-size: 0.75rem; color: var(--lt-surface-500);">${item.role}</span>` : ''}
                     </div>
                 </div>
             `;
         }
 
         // Default item
-        return `
+        return html`
             ${checkboxHtml}
             <span style="flex: 1; font-weight: ${isSelected ? '600' : 'normal'};">${item.name}</span>
         `;
     }
 
     function buildShell() {
-        const sourceControlsHtml = showSourceControls ? `
+        const sourceControlsHtml = showSourceControls ? html`
             <div class="p-picklist-controls p-picklist-source-controls">
-                <button type="button" class="p-picklist-control-btn btn-source-top" title="Move Top" aria-label="Move Top">${LucideIcons.chevronsUp}</button>
-                <button type="button" class="p-picklist-control-btn btn-source-up" title="Move Up" aria-label="Move Up">${LucideIcons.chevronUp}</button>
-                <button type="button" class="p-picklist-control-btn btn-source-down" title="Move Down" aria-label="Move Down">${LucideIcons.chevronDown}</button>
-                <button type="button" class="p-picklist-control-btn btn-source-bottom" title="Move Bottom" aria-label="Move Bottom">${LucideIcons.chevronsDown}</button>
+                <button type="button" class="p-picklist-control-btn btn-source-top" title="Move Top" aria-label="Move Top">${unsafe(LucideIcons.chevronsUp)}</button>
+                <button type="button" class="p-picklist-control-btn btn-source-up" title="Move Up" aria-label="Move Up">${unsafe(LucideIcons.chevronUp)}</button>
+                <button type="button" class="p-picklist-control-btn btn-source-down" title="Move Down" aria-label="Move Down">${unsafe(LucideIcons.chevronDown)}</button>
+                <button type="button" class="p-picklist-control-btn btn-source-bottom" title="Move Bottom" aria-label="Move Bottom">${unsafe(LucideIcons.chevronsDown)}</button>
             </div>
         ` : '';
 
-        const targetControlsHtml = showTargetControls ? `
+        const targetControlsHtml = showTargetControls ? html`
             <div class="p-picklist-controls p-picklist-target-controls">
-                <button type="button" class="p-picklist-control-btn btn-target-top" title="Move Top" aria-label="Move Top">${LucideIcons.chevronsUp}</button>
-                <button type="button" class="p-picklist-control-btn btn-target-up" title="Move Up" aria-label="Move Up">${LucideIcons.chevronUp}</button>
-                <button type="button" class="p-picklist-control-btn btn-target-down" title="Move Down" aria-label="Move Down">${LucideIcons.chevronDown}</button>
-                <button type="button" class="p-picklist-control-btn btn-target-bottom" title="Move Bottom" aria-label="Move Bottom">${LucideIcons.chevronsDown}</button>
+                <button type="button" class="p-picklist-control-btn btn-target-top" title="Move Top" aria-label="Move Top">${unsafe(LucideIcons.chevronsUp)}</button>
+                <button type="button" class="p-picklist-control-btn btn-target-up" title="Move Up" aria-label="Move Up">${unsafe(LucideIcons.chevronUp)}</button>
+                <button type="button" class="p-picklist-control-btn btn-target-down" title="Move Down" aria-label="Move Down">${unsafe(LucideIcons.chevronDown)}</button>
+                <button type="button" class="p-picklist-control-btn btn-target-bottom" title="Move Bottom" aria-label="Move Bottom">${unsafe(LucideIcons.chevronsDown)}</button>
             </div>
         ` : '';
 
-        const sourceHeaderCheckboxHtml = isCheckbox ? `
+        const sourceHeaderCheckboxHtml = isCheckbox ? html`
             <div class="p-checkbox-box p-source-select-all" role="checkbox" aria-checked="false"></div>
         ` : '';
 
-        const targetHeaderCheckboxHtml = isCheckbox ? `
+        const targetHeaderCheckboxHtml = isCheckbox ? html`
             <div class="p-checkbox-box p-target-select-all" role="checkbox" aria-checked="false"></div>
         ` : '';
 
-        const sourceFilterHtml = isFilter ? `
+        const sourceFilterHtml = isFilter ? html`
             <div class="p-picklist-filter-container">
                 <input type="text" class="p-picklist-filter-input p-source-filter" placeholder="${props.sourceFilterPlaceholder || 'Search by name'}" />
-                <span class="p-picklist-filter-icon">${LucideIcons.search}</span>
+                <span class="p-picklist-filter-icon">${unsafe(LucideIcons.search)}</span>
             </div>
         ` : '';
 
-        const targetFilterHtml = isFilter ? `
+        const targetFilterHtml = isFilter ? html`
             <div class="p-picklist-filter-container">
                 <input type="text" class="p-picklist-filter-input p-target-filter" placeholder="${props.targetFilterPlaceholder || 'Search by name'}" />
-                <span class="p-picklist-filter-icon">${LucideIcons.search}</span>
+                <span class="p-picklist-filter-icon">${unsafe(LucideIcons.search)}</span>
             </div>
         ` : '';
 
-        container.innerHTML = `
+        setHtml(container, html`
             <div class="p-picklist p-component">
                 ${sourceControlsHtml}
 
@@ -485,16 +486,16 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
                 <!-- Transfer Buttons (Center) -->
                 <div class="p-picklist-controls p-picklist-transfer-controls">
                     <button type="button" class="p-picklist-control-btn btn-move-to-target" title="Move to Target" aria-label="Move to Target" disabled>
-                        ${LucideIcons.chevronRight}
+                        ${unsafe(LucideIcons.chevronRight)}
                     </button>
                     <button type="button" class="p-picklist-control-btn btn-move-all-to-target" title="Move All to Target" aria-label="Move All to Target">
-                        ${LucideIcons.chevronsRight}
+                        ${unsafe(LucideIcons.chevronsRight)}
                     </button>
                     <button type="button" class="p-picklist-control-btn btn-move-to-source" title="Move to Source" aria-label="Move to Source" disabled>
-                        ${LucideIcons.chevronLeft}
+                        ${unsafe(LucideIcons.chevronLeft)}
                     </button>
                     <button type="button" class="p-picklist-control-btn btn-move-all-to-source" title="Move All to Source" aria-label="Move All to Source">
-                        ${LucideIcons.chevronsLeft}
+                        ${unsafe(LucideIcons.chevronsLeft)}
                     </button>
                 </div>
 
@@ -514,7 +515,7 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
 
                 ${targetControlsHtml}
             </div>
-        `;
+        `);
 
         bindPermanentEvents();
         updateSourceList();
@@ -539,7 +540,7 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
             const isIndet = filteredSource.some(it => selectedSource.has(getItemId(it))) && !isAll;
             sourceSelectAll.className = `p-checkbox-box p-source-select-all ${isAll ? 'p-checked' : (isIndet ? 'p-indeterminate' : '')}`;
             sourceSelectAll.setAttribute('aria-checked', String(isAll));
-            sourceSelectAll.innerHTML = isAll ? LucideIcons.check : (isIndet ? '<span style="width: 8px; height: 2px; background: white;"></span>' : '');
+            setHtml(sourceSelectAll, isAll ? unsafe(LucideIcons.check) : (isIndet ? html`<span style="width: 8px; height: 2px; background: white;"></span>` : html``));
         }
 
         // Update DOM elements in-place without rebuilding innerHTML
@@ -553,11 +554,11 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
                 el.setAttribute('aria-selected', String(isSelected));
 
                 if (isCheckbox) {
-                    const chk = el.querySelector('.p-checkbox-box');
+                    const chk = el.querySelector<HTMLElement>('.p-checkbox-box');
                     if (chk) {
                         chk.className = `p-checkbox-box ${isSelected ? 'p-checked' : ''}`;
                         chk.setAttribute('aria-checked', String(isSelected));
-                        chk.innerHTML = isSelected ? LucideIcons.check : '';
+                        setHtml(chk, isSelected ? unsafe(LucideIcons.check) : html``);
                     }
                 }
             });
@@ -584,7 +585,7 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
             const isIndet = filteredTarget.some(it => selectedTarget.has(getItemId(it))) && !isAll;
             targetSelectAll.className = `p-checkbox-box p-target-select-all ${isAll ? 'p-checked' : (isIndet ? 'p-indeterminate' : '')}`;
             targetSelectAll.setAttribute('aria-checked', String(isAll));
-            targetSelectAll.innerHTML = isAll ? LucideIcons.check : (isIndet ? '<span style="width: 8px; height: 2px; background: white;"></span>' : '');
+            setHtml(targetSelectAll, isAll ? unsafe(LucideIcons.check) : (isIndet ? html`<span style="width: 8px; height: 2px; background: white;"></span>` : html``));
         }
 
         // Update DOM elements in-place without rebuilding innerHTML
@@ -598,11 +599,11 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
                 el.setAttribute('aria-selected', String(isSelected));
 
                 if (isCheckbox) {
-                    const chk = el.querySelector('.p-checkbox-box');
+                    const chk = el.querySelector<HTMLElement>('.p-checkbox-box');
                     if (chk) {
                         chk.className = `p-checkbox-box ${isSelected ? 'p-checked' : ''}`;
                         chk.setAttribute('aria-checked', String(isSelected));
-                        chk.innerHTML = isSelected ? LucideIcons.check : '';
+                        setHtml(chk, isSelected ? unsafe(LucideIcons.check) : html``);
                     }
                 }
             });
@@ -630,12 +631,12 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
         const srcUl = rootEl.querySelector<HTMLUListElement>('.picklist-source-list');
         if (srcUl) {
             if (filteredSource.length === 0) {
-                srcUl.innerHTML = `<li class="p-picklist-empty">${sourceFilterQuery ? 'No results found' : emptyMessageSource}</li>`;
+                setHtml(srcUl, html`<li class="p-picklist-empty">${sourceFilterQuery ? 'No results found' : emptyMessageSource}</li>`);
             } else {
-                srcUl.innerHTML = filteredSource.map(it => {
+                setHtml(srcUl, html`${filteredSource.map(it => {
                     const id = getItemId(it);
                     const isSelected = selectedSource.has(id);
-                    return `
+                    return html`
                         <li class="p-picklist-item source-item ${isSelected ? 'p-highlight' : ''}" 
                             data-id="${id}" 
                             role="option" 
@@ -643,7 +644,7 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
                             ${renderCellContent(it, isSelected)}
                         </li>
                     `;
-                }).join('');
+                })}`);
 
                 // Bind click events to items
                 srcUl.querySelectorAll<HTMLElement>('.source-item').forEach(el => {
@@ -690,12 +691,12 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
         const tgtUl = rootEl.querySelector<HTMLUListElement>('.picklist-target-list');
         if (tgtUl) {
             if (filteredTarget.length === 0) {
-                tgtUl.innerHTML = `<li class="p-picklist-empty">${targetFilterQuery ? 'No results found' : emptyMessageTarget}</li>`;
+                setHtml(tgtUl, html`<li class="p-picklist-empty">${targetFilterQuery ? 'No results found' : emptyMessageTarget}</li>`);
             } else {
-                tgtUl.innerHTML = filteredTarget.map(it => {
+                setHtml(tgtUl, html`${filteredTarget.map(it => {
                     const id = getItemId(it);
                     const isSelected = selectedTarget.has(id);
-                    return `
+                    return html`
                         <li class="p-picklist-item target-item ${isSelected ? 'p-highlight' : ''}" 
                             data-id="${id}" 
                             role="option" 
@@ -703,7 +704,7 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
                             ${renderCellContent(it, isSelected)}
                         </li>
                     `;
-                }).join('');
+                })}`);
 
                 // Bind click events to items
                 tgtUl.querySelectorAll<HTMLElement>('.target-item').forEach(el => {

@@ -9,6 +9,7 @@ import type { IslandContext } from '../runtime/registry';
 
 import { injectIslandStyle } from '../runtime/styles';
 import { getLucideIcon } from '../icons/lucide';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 export interface SelectButtonOption {
     label?: string;
@@ -276,16 +277,16 @@ export default function SelectButtonIsland(container: HTMLElement, props: Select
                 optDis ? 'p-disabled' : ''
             ].filter(Boolean).join(' ');
 
-            const flagHtml = opt.flag ? `<span style="font-size: 1.125rem; line-height: 1;">${opt.flag}</span>` : '';
-            const iconHtml = opt.icon ? `<span style="display: flex;">${getLucideIcon(opt.icon, 16)}</span>` : '';
-            const badgeHtml = opt.badge !== undefined ? `<span class="p-selectbutton-badge" data-part="root">${opt.badge}</span>` : '';
+            const flagHtml = opt.flag ? html`<span style="font-size: 1.125rem; line-height: 1;">${opt.flag}</span>` : '';
+            const iconHtml = opt.icon ? html`<span style="display: flex;">${unsafe(getLucideIcon(opt.icon, 16))}</span>` : '';
+            const badgeHtml = opt.badge !== undefined ? html`<span class="p-selectbutton-badge" data-part="root">${opt.badge}</span>` : '';
 
-            return `
+            return html`
                 <button 
                     type="button" 
                     class="${btnClasses}" 
                     data-value="${opt.value}"
-                    ${optDis ? 'disabled' : ''}
+                    ${attr('disabled', optDis)}
                     role="${isMultiple ? 'checkbox' : 'radio'}"
                     aria-checked="${active ? 'true' : 'false'}"
                     tabindex="${optDis ? '-1' : '0'}"
@@ -296,12 +297,12 @@ export default function SelectButtonIsland(container: HTMLElement, props: Select
                     ${badgeHtml}
                 </button>
             `;
-        }).join('');
+        });
 
-        container.innerHTML = `
+        setHtml(container, html`
             ${buttonsHtml}
             <input type="hidden" name="${props.name || props.targetInputName || 'selectbutton_value'}" value="${selectedValues.join(',')}" />
-        `;
+        `);
 
         bindEvents();
     }

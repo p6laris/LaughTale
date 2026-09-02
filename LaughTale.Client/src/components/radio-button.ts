@@ -1,13 +1,8 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
-﻿/**
- * LaughTale: Enterprise RadioButton Component (Aura RadioButton)
- * Mutual exclusion radio selector with zero-flicker incremental DOM updates,
- * card mode with badges/descriptions, group coordination, and full ARIA keyboard navigation.
- */
-
 import { injectIslandStyle } from '../runtime/styles';
 import { getLucideIcon } from '../icons/lucide';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 export interface RadioButtonOption {
     label: string;
@@ -378,31 +373,31 @@ export default function RadioButtonIsland(container: HTMLElement, props: RadioBu
         ].filter(Boolean).join(' ');
 
         if (isCard) {
-            container.innerHTML = `
+            setHtml(container, html`
                 <label class="${rootClasses}" data-part="root">
                     <div class="p-radiobutton-card-content">
-                        ${props.flag ? `<span style="font-size: 1.25rem; line-height: 1;">${props.flag}</span>` : ''}
-                        ${props.icon ? `<span style="color: var(--lt-primary-600); display: flex;">${getLucideIcon(props.icon, 18)}</span>` : ''}
+                        ${props.flag ? html`<span style="font-size: 1.25rem; line-height: 1;">${props.flag}</span>` : ''}
+                        ${props.icon ? html`<span style="color: var(--lt-primary-600); display: flex;">${unsafe(getLucideIcon(props.icon, 18))}</span>` : ''}
                         <div>
                             <div class="p-radiobutton-card-title">
                                 <span>${props.label || props.value}</span>
-                                ${props.badge ? `<span class="p-radiobutton-card-badge">${props.badge}</span>` : ''}
+                                ${props.badge ? html`<span class="p-radiobutton-card-badge">${props.badge}</span>` : ''}
                             </div>
-                            ${props.description ? `<div class="p-radiobutton-card-desc">${props.description}</div>` : ''}
+                            ${props.description ? html`<div class="p-radiobutton-card-desc">${props.description}</div>` : ''}
                         </div>
                     </div>
                     <div style="display: flex; align-items: center;">
-                        ${props.price ? `<span class="p-radiobutton-card-price">${props.price}</span>` : ''}
+                        ${props.price ? html`<span class="p-radiobutton-card-price">${props.price}</span>` : ''}
                         <div class="p-radiobutton ${isChecked ? 'p-radiobutton-checked' : ''}">
                             <input 
                                 type="radio" 
                                 class="p-radiobutton-input"
                                 name="${props.name}"
                                 value="${props.value}"
-                                ${isChecked ? 'checked' : ''}
-                                ${isDisabled ? 'disabled' : ''}
-                                ${isReadonly ? 'readonly' : ''}
-                                ${props.inputId ? `id="${props.inputId}"` : ''}
+                                ${attr('checked', isChecked)}
+                                ${attr('disabled', isDisabled)}
+                                ${attr('readonly', isReadonly)}
+                                ${attr('id', props.inputId)}
                             />
                             <div class="p-radiobutton-box">
                                 <div class="p-radiobutton-icon"></div>
@@ -411,9 +406,9 @@ export default function RadioButtonIsland(container: HTMLElement, props: RadioBu
                     </div>
                 </label>
                 <input type="hidden" name="${props.targetInputName || ''}" value="${isChecked ? props.value : ''}" />
-            `;
+            `);
         } else {
-            container.innerHTML = `
+            setHtml(container, html`
                 <label class="${rootClasses}">
                     <div class="p-radiobutton ${isChecked ? 'p-radiobutton-checked' : ''}">
                         <input 
@@ -421,19 +416,19 @@ export default function RadioButtonIsland(container: HTMLElement, props: RadioBu
                             class="p-radiobutton-input"
                             name="${props.name}"
                             value="${props.value}"
-                            ${isChecked ? 'checked' : ''}
-                            ${isDisabled ? 'disabled' : ''}
-                            ${isReadonly ? 'readonly' : ''}
-                            ${props.inputId ? `id="${props.inputId}"` : ''}
+                            ${attr('checked', isChecked)}
+                            ${attr('disabled', isDisabled)}
+                            ${attr('readonly', isReadonly)}
+                            ${attr('id', props.inputId)}
                         />
                         <div class="p-radiobutton-box">
                             <div class="p-radiobutton-icon"></div>
                         </div>
                     </div>
-                    ${props.label ? `<span class="p-radiobutton-label">${props.label}</span>` : ''}
+                    ${props.label ? html`<span class="p-radiobutton-label">${props.label}</span>` : ''}
                 </label>
                 <input type="hidden" name="${props.targetInputName || ''}" value="${isChecked ? props.value : ''}" />
-            `;
+            `);
         }
 
         bindSingleEvents();
@@ -514,27 +509,27 @@ export default function RadioButtonIsland(container: HTMLElement, props: RadioBu
         });
 
         container.className = groupClasses;
-        container.innerHTML = rawOpts.map((opt, idx) => {
+        const itemsHtml = rawOpts.map((opt, idx) => {
             const checked = String(opt.value) === String(currentSelected);
             const itemId = `${props.name}_${idx}`;
             const optDisabled = isDisabled || opt.disabled;
 
             if (isCard) {
-                return `
+                return html`
                     <label class="p-radiobutton-root p-radiobutton-card ${checked ? 'is-checked' : ''} ${optDisabled ? 'is-disabled' : ''}">
                         <div class="p-radiobutton-card-content">
-                            ${opt.flag ? `<span style="font-size: 1.25rem; line-height: 1;">${opt.flag}</span>` : ''}
-                            ${opt.icon ? `<span style="color: var(--lt-primary-600); display: flex;">${getLucideIcon(opt.icon, 18)}</span>` : ''}
+                            ${opt.flag ? html`<span style="font-size: 1.25rem; line-height: 1;">${opt.flag}</span>` : ''}
+                            ${opt.icon ? html`<span style="color: var(--lt-primary-600); display: flex;">${unsafe(getLucideIcon(opt.icon, 18))}</span>` : ''}
                             <div>
                                 <div class="p-radiobutton-card-title">
                                     <span>${opt.label || opt.value}</span>
-                                    ${opt.badge ? `<span class="p-radiobutton-card-badge">${opt.badge}</span>` : ''}
+                                    ${opt.badge ? html`<span class="p-radiobutton-card-badge">${opt.badge}</span>` : ''}
                                 </div>
-                                ${opt.description ? `<div class="p-radiobutton-card-desc">${opt.description}</div>` : ''}
+                                ${opt.description ? html`<div class="p-radiobutton-card-desc">${opt.description}</div>` : ''}
                             </div>
                         </div>
                         <div style="display: flex; align-items: center;">
-                            ${opt.price ? `<span class="p-radiobutton-card-price">${opt.price}</span>` : ''}
+                            ${opt.price ? html`<span class="p-radiobutton-card-price">${opt.price}</span>` : ''}
                             <div class="p-radiobutton ${checked ? 'p-radiobutton-checked' : ''}">
                                 <input 
                                     type="radio" 
@@ -542,8 +537,8 @@ export default function RadioButtonIsland(container: HTMLElement, props: RadioBu
                                     name="${props.name}"
                                     value="${opt.value}"
                                     id="${itemId}"
-                                    ${checked ? 'checked' : ''}
-                                    ${optDisabled ? 'disabled' : ''}
+                                    ${attr('checked', checked)}
+                                    ${attr('disabled', optDisabled)}
                                 />
                                 <div class="p-radiobutton-box">
                                     <div class="p-radiobutton-icon"></div>
@@ -553,7 +548,7 @@ export default function RadioButtonIsland(container: HTMLElement, props: RadioBu
                     </label>
                 `;
             } else {
-                return `
+                return html`
                     <label class="p-radiobutton-root ${checked ? 'is-checked' : ''} ${optDisabled ? 'is-disabled' : ''}">
                         <div class="p-radiobutton ${checked ? 'p-radiobutton-checked' : ''}">
                             <input 
@@ -562,8 +557,8 @@ export default function RadioButtonIsland(container: HTMLElement, props: RadioBu
                                 name="${props.name}"
                                 value="${opt.value}"
                                 id="${itemId}"
-                                ${checked ? 'checked' : ''}
-                                ${optDisabled ? 'disabled' : ''}
+                                ${attr('checked', checked)}
+                                ${attr('disabled', optDisabled)}
                             />
                             <div class="p-radiobutton-box">
                                 <div class="p-radiobutton-icon"></div>
@@ -573,7 +568,12 @@ export default function RadioButtonIsland(container: HTMLElement, props: RadioBu
                     </label>
                 `;
             }
-        }).join('') + `<input type="hidden" name="${props.targetInputName || props.name}" value="${currentSelected}" />`;
+        });
+
+        setHtml(container, html`
+            ${itemsHtml}
+            <input type="hidden" name="${props.targetInputName || props.name}" value="${currentSelected}" />
+        `);
 
         const inputs = container.querySelectorAll<HTMLInputElement>('.p-radiobutton-input');
         const hiddenInp = container.querySelector<HTMLInputElement>('input[type="hidden"]')!;

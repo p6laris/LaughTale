@@ -8,6 +8,7 @@ import type { IslandContext } from '../runtime/registry';
 
 import { injectIslandStyle } from '../runtime/styles';
 import { useControllableState } from '../composables/useControllableState';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 export interface RatingProps {
     value?: number;
@@ -286,51 +287,48 @@ export default function RatingIsland(container: HTMLElement, props: RatingProps,
         container.setAttribute('role', 'radiogroup');
         container.setAttribute('aria-label', `${rating} of ${totalStars} stars`);
 
-        let cancelBtnHtml = '';
-        if (isCancelAllowed && !isReadonly && !isDisabled) {
-            cancelBtnHtml = `
-                <button type="button" class="p-rating-cancel-item" data-part="root" aria-label="Clear rating" tabindex="0">
-                    ${cancelSvg}
-                </button>
-            `;
-        }
+        const cancelBtnHtml = (isCancelAllowed && !isReadonly && !isDisabled) ? html`
+            <button type="button" class="p-rating-cancel-item" data-part="root" aria-label="Clear rating" tabindex="0">
+                ${unsafe(cancelSvg)}
+            </button>
+        ` : '';
 
-        let itemsHtml = '';
+        const itemsHtml: Raw[] = [];
         for (let i = 1; i <= totalStars; i++) {
             if (mode === 'emoji') {
                 const emoji = emojiList[(i - 1) % emojiList.length] || '⭐';
-                itemsHtml += `
+                itemsHtml.push(html`
                     <span class="p-rating-item p-rating-emoji-item" data-value="${i}" role="radio" aria-checked="${rating >= i ? 'true' : 'false'}" aria-label="${i} Star" tabindex="${isReadonly || isDisabled ? '-1' : '0'}">
                         ${emoji}
                     </span>
-                `;
+                `);
             } else if (mode === 'template') {
-                itemsHtml += `
+                itemsHtml.push(html`
                     <span class="p-rating-item p-rating-text-item" data-value="${i}" role="radio" aria-checked="${rating >= i ? 'true' : 'false'}" aria-label="${i} Star" tabindex="${isReadonly || isDisabled ? '-1' : '0'}">
                         A
                     </span>
-                `;
+                `);
             } else {
                 // Standard Star Item with Half-Star support
-                itemsHtml += `
+                itemsHtml.push(html`
                     <span class="p-rating-item p-rating-star-item" data-value="${i}" role="radio" aria-checked="${rating >= i ? 'true' : 'false'}" aria-label="${i} Stars" tabindex="${isReadonly || isDisabled ? '-1' : '0'}">
                         <div class="p-rating-half-wrapper">
-                            <span class="p-rating-icon p-rating-icon-off">${starEmptySvg}</span>
+                            <span class="p-rating-icon p-rating-icon-off">${unsafe(starEmptySvg)}</span>
                             <span class="p-rating-half-overlay" style="display: none;">
-                                <span class="p-rating-icon p-rating-icon-half">${starFilledSvg}</span>
+                                <span class="p-rating-icon p-rating-icon-half">${unsafe(starFilledSvg)}</span>
                             </span>
                         </div>
                     </span>
-                `;
+                `);
             }
         }
 
-        container.innerHTML = `
+        setHtml(container, html`
             ${cancelBtnHtml}
             <div class="p-rating-items" style="display: flex; ${isVertical ? 'flex-direction: column;' : 'align-items: center;'} gap: 0.375rem;">
                 ${itemsHtml}
             </div>
-        `;
+        `);
 
         updateVisuals(rating);
         bindEvents();
@@ -350,15 +348,15 @@ export default function RatingIsland(container: HTMLElement, props: RatingProps,
 
                 if (isFull) {
                     item.classList.add('p-rating-item-active');
-                    if (offIcon) offIcon.innerHTML = starFilledSvg;
+                    if (offIcon) setHtml(offIcon, unsafe(starFilledSvg));
                     if (halfOverlay) halfOverlay.style.display = 'none';
                 } else if (isHalf) {
                     item.classList.remove('p-rating-item-active');
-                    if (offIcon) offIcon.innerHTML = starEmptySvg;
+                    if (offIcon) setHtml(offIcon, unsafe(starEmptySvg));
                     if (halfOverlay) halfOverlay.style.display = 'block';
                 } else {
                     item.classList.remove('p-rating-item-active');
-                    if (offIcon) offIcon.innerHTML = starEmptySvg;
+                    if (offIcon) setHtml(offIcon, unsafe(starEmptySvg));
                     if (halfOverlay) halfOverlay.style.display = 'none';
                 }
             } else {
