@@ -19,12 +19,13 @@ p-dialog {
     position: fixed;
     inset: 0;
     z-index: 1100;
-    display: none;
+    display: flex;
     box-sizing: border-box;
     padding: 1.5rem;
     pointer-events: none;
+    visibility: hidden;
     opacity: 0;
-    transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .p-dialog-mask.p-dialog-mask-modal {
@@ -34,7 +35,7 @@ p-dialog {
 }
 
 .p-dialog-mask.p-dialog-mask-active {
-    display: flex !important;
+    visibility: visible;
     opacity: 1;
     pointer-events: auto;
 }
@@ -103,13 +104,13 @@ p-dialog {
     overflow: hidden;
     pointer-events: auto;
     will-change: transform, opacity;
-    transform: scale(0.95) translateY(6px);
+    transform: translate3d(0, 8px, 0) scale(0.96);
     transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease, width 0.2s ease, height 0.2s ease;
     color: var(--p-text-color, #1e293b);
 }
 
 .p-dialog-mask.p-dialog-mask-active .p-dialog {
-    transform: scale(1) translateY(0);
+    transform: translate3d(0, 0, 0) scale(1);
 }
 
 /* Maximized Mode */

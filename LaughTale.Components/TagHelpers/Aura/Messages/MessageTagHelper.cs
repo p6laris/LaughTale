@@ -1,4 +1,4 @@
-﻿using System.Text.Encodings.Web;
+using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
@@ -127,7 +127,7 @@ public class MessageTagHelper : IslandTagHelperBase
         var lifeAttr = Life.HasValue ? $@"data-life=""{Life.Value}""" : "";
 
         output.Content.SetHtmlContent($@"
-            <div class=""p-message p-message-{Severity} {variantClass} {sizeClass} p-message-enter {Class}"" role=""alert"" aria-live=""assertive"" aria-atomic=""true"" data-message-item {lifeAttr}>
+            <div class=""p-message p-message-{Severity} {variantClass} {sizeClass} {Class}"" role=""alert"" aria-live=""assertive"" aria-atomic=""true"" data-message-item {lifeAttr}>
                 <div class=""p-message-content"">
                     {(string.IsNullOrEmpty(iconHtml) ? "" : $@"<span class=""p-message-icon"">{iconHtml}</span>")}
                     <div class=""p-message-text"">{messageText}</div>

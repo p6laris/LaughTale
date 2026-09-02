@@ -122,25 +122,17 @@ const TOAST_CSS = `
 .p-toast-message.p-toast-message-leave {
     pointer-events: none;
     opacity: 0 !important;
-    max-height: 0 !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-    border-width: 0 !important;
-    transform: translateY(-8px) scale(0.96) !important;
+    transform: translate3d(0, -8px, 0) scale(0.96) !important;
 }
 
 @keyframes p-toast-enter {
     from {
         opacity: 0;
-        transform: translateY(-12px) scale(0.97);
-        max-height: 0;
+        transform: translate3d(0, -12px, 0) scale(0.97);
     }
     to {
         opacity: 1;
-        transform: translateY(0) scale(1);
-        max-height: 300px;
+        transform: translate3d(0, 0, 0) scale(1);
     }
 }
 

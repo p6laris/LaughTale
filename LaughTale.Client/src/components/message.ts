@@ -31,41 +31,32 @@ p-message {
     box-sizing: border-box;
     font-family: var(--p-font-family, inherit);
     overflow: hidden;
-    will-change: opacity, transform, max-height, padding, margin;
-    transition: opacity 240ms cubic-bezier(0.16, 1, 0.3, 1),
-                transform 240ms cubic-bezier(0.16, 1, 0.3, 1),
-                max-height 280ms cubic-bezier(0.16, 1, 0.3, 1),
-                padding 280ms cubic-bezier(0.16, 1, 0.3, 1),
-                margin 280ms cubic-bezier(0.16, 1, 0.3, 1),
-                border-width 280ms ease;
+    will-change: opacity, transform;
+    transition: opacity 200ms cubic-bezier(0.16, 1, 0.3, 1),
+                transform 200ms cubic-bezier(0.16, 1, 0.3, 1),
+                max-height 240ms cubic-bezier(0.16, 1, 0.3, 1),
+                margin 240ms cubic-bezier(0.16, 1, 0.3, 1),
+                padding 240ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .p-message.p-message-enter {
-    animation: p-message-slide-down 260ms cubic-bezier(0.16, 1, 0.3, 1);
+    animation: p-message-slide-down 200ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .p-message.p-message-exit {
     opacity: 0 !important;
-    max-height: 0 !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-    border-width: 0 !important;
-    transform: translateY(-8px) scale(0.98) !important;
+    transform: translate3d(0, -6px, 0) scale(0.98) !important;
     pointer-events: none !important;
 }
 
 @keyframes p-message-slide-down {
     from {
         opacity: 0;
-        transform: translateY(-10px) scale(0.97);
-        max-height: 0;
+        transform: translate3d(0, -6px, 0);
     }
     to {
         opacity: 1;
-        transform: translateY(0) scale(1);
-        max-height: 200px;
+        transform: translate3d(0, 0, 0);
     }
 }
 
@@ -515,7 +506,6 @@ export default function MessageIsland(container: HTMLElement, props: MessageProp
             `p-message-${severity}`,
             variant,
             sizeClass,
-            'p-message-enter',
             p.class || ''
         ].filter(Boolean).join(' ');
 
