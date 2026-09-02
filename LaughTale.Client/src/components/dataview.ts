@@ -1,14 +1,9 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
-﻿/**
- * LaughTale: Enterprise DataView Component (Aura Design System compliant)
- * Displays data in List or Grid layouts with pagination, real-time sorting,
- * layout toggling, skeleton loading, and interactive action controls.
- */
-
 import { injectIslandStyle } from '../runtime/styles';
 import { LucideIcons } from '../icons/lucide';
 import { useAutoAnimate } from '../composables/animation/useAutoAnimate';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 export interface DataViewItem {
     id?: string | number;
@@ -526,12 +521,12 @@ export default function DataViewIsland(container: HTMLElement, props: DataViewPr
 
     const wishlistedIds = new Set<any>();
 
-    function getSeverityTag(status?: string): string {
+    function getSeverityTag(status?: string): Raw | string {
         const s = (status || '').toUpperCase();
-        if (s === 'INSTOCK' || s === 'QUALIFIED') return '<span class="p-tag p-tag-success" data-part="root">In Stock</span>';
-        if (s === 'LOWSTOCK' || s === 'NEGOTIATION') return '<span class="p-tag p-tag-warn">Low Stock</span>';
-        if (s === 'OUTOFSTOCK' || s === 'UNQUALIFIED') return '<span class="p-tag p-tag-danger">Out of Stock</span>';
-        return s ? `<span class="p-tag p-tag-success">${s}</span>` : '';
+        if (s === 'INSTOCK' || s === 'QUALIFIED') return html`<span class="p-tag p-tag-success" data-part="root">In Stock</span>`;
+        if (s === 'LOWSTOCK' || s === 'NEGOTIATION') return html`<span class="p-tag p-tag-warn">Low Stock</span>`;
+        if (s === 'OUTOFSTOCK' || s === 'UNQUALIFIED') return html`<span class="p-tag p-tag-danger">Out of Stock</span>`;
+        return s ? html`<span class="p-tag p-tag-success">${s}</span>` : '';
     }
 
     function render() {
@@ -560,14 +555,14 @@ export default function DataViewIsland(container: HTMLElement, props: DataViewPr
         const displayItems = paginator ? sortedItems.slice(firstIdx, firstIdx + rowsPerPage) : sortedItems;
 
         // Header HTML
-        let headerHtml = '';
+        let headerHtml: Raw | '' = '';
         const hasHeader = props.title || showLayoutSwitcher || showSort;
         if (hasHeader) {
-            headerHtml = `
+            headerHtml = html`
                 <div class="p-dataview-header">
                     <div class="p-dataview-title">${props.title || ''}</div>
                     <div class="p-dataview-controls">
-                        ${showSort ? `
+                        ${showSort ? html`
                             <select class="p-dataview-sort-select" aria-label="Sort by price">
                                 <option value="" ${!sortField ? 'selected' : ''}>Sort by Price...</option>
                                 <option value="lowtohigh" ${sortField === 'price' && sortOrder === 1 ? 'selected' : ''}>Price Low to High</option>
@@ -575,13 +570,13 @@ export default function DataViewIsland(container: HTMLElement, props: DataViewPr
                             </select>
                         ` : ''}
 
-                        ${showLayoutSwitcher ? `
+                        ${showLayoutSwitcher ? html`
                             <div class="p-layout-switcher">
                                 <button type="button" class="p-layout-btn btn-layout-list ${currentLayout === 'list' ? 'p-active' : ''}" title="List View" aria-label="List View">
-                                    ${LucideIcons.list}
+                                    ${unsafe(LucideIcons.list)}
                                 </button>
                                 <button type="button" class="p-layout-btn btn-layout-grid ${currentLayout === 'grid' ? 'p-active' : ''}" title="Grid View" aria-label="Grid View">
-                                    ${LucideIcons.layoutGrid}
+                                    ${unsafe(LucideIcons.layoutGrid)}
                                 </button>
                             </div>
                         ` : ''}
@@ -591,13 +586,13 @@ export default function DataViewIsland(container: HTMLElement, props: DataViewPr
         }
 
         // Content HTML
-        let contentHtml = '';
+        let contentHtml: Raw | '' = '';
         if (loading) {
             // Skeleton Shimmer Loading
             if (currentLayout === 'list') {
-                contentHtml = `
+                contentHtml = html`
                     <div class="p-dataview-list">
-                        ${Array.from({ length: rowsPerPage }).map(() => `
+                        ${Array.from({ length: rowsPerPage }).map(() => html`
                             <div class="p-dataview-list-item">
                                 <div class="p-skeleton p-dataview-list-image-box" style="height: 6.5rem;"></div>
                                 <div class="p-dataview-list-body">
@@ -615,13 +610,13 @@ export default function DataViewIsland(container: HTMLElement, props: DataViewPr
                                     </div>
                                 </div>
                             </div>
-                        `).join('')}
+                        `)}
                     </div>
                 `;
             } else {
-                contentHtml = `
+                contentHtml = html`
                     <div class="p-dataview-grid">
-                        ${Array.from({ length: 6 }).map(() => `
+                        ${Array.from({ length: 6 }).map(() => html`
                             <div class="p-dataview-grid-card">
                                 <div class="p-skeleton p-dataview-grid-image-box" style="height: 10rem;"></div>
                                 <div class="p-dataview-grid-body">
@@ -637,22 +632,22 @@ export default function DataViewIsland(container: HTMLElement, props: DataViewPr
                                     </div>
                                 </div>
                             </div>
-                        `).join('')}
+                        `)}
                     </div>
                 `;
             }
         } else if (currentLayout === 'list') {
             // List Items
-            contentHtml = `
+            contentHtml = html`
                 <div class="p-dataview-list dataview-animated-container">
                     ${displayItems.map(item => {
                         const isWishlisted = wishlistedIds.has(item.id || item.name);
                         const isOutOfStock = (item.inventoryStatus || '').toUpperCase() === 'OUTOFSTOCK';
-                        return `
+                        return html`
                             <div class="p-dataview-list-item" data-id="${item.id || item.name}">
                                 <div class="p-dataview-list-image-box">
                                     ${getSeverityTag(item.inventoryStatus)}
-                                    <div style="font-size: 2.5rem;">${LucideIcons.package}</div>
+                                    <div style="font-size: 2.5rem;">${unsafe(LucideIcons.package)}</div>
                                 </div>
                                 <div class="p-dataview-list-body">
                                     <div class="p-dataview-item-info">
@@ -667,10 +662,10 @@ export default function DataViewIsland(container: HTMLElement, props: DataViewPr
                                         <span class="p-dataview-price">$${item.price ?? 0}</span>
                                         <div class="p-dataview-btn-group">
                                             <button type="button" class="p-dataview-btn-wishlist ${isWishlisted ? 'p-wishlisted' : ''}" data-id="${item.id || item.name}" title="Wishlist" aria-label="Wishlist">
-                                                ${LucideIcons.heart}
+                                                ${unsafe(LucideIcons.heart)}
                                             </button>
                                             <button type="button" class="p-dataview-btn-buy" data-id="${item.id || item.name}" ${isOutOfStock ? 'disabled' : ''}>
-                                                <span>${LucideIcons.shoppingCart}</span>
+                                                <span>${unsafe(LucideIcons.shoppingCart)}</span>
                                                 <span>${isOutOfStock ? 'Out of Stock' : 'Buy Now'}</span>
                                             </button>
                                         </div>
@@ -678,21 +673,21 @@ export default function DataViewIsland(container: HTMLElement, props: DataViewPr
                                 </div>
                             </div>
                         `;
-                    }).join('')}
+                    })}
                 </div>
             `;
         } else {
             // Grid Cards
-            contentHtml = `
+            contentHtml = html`
                 <div class="p-dataview-grid dataview-animated-container">
                     ${displayItems.map(item => {
                         const isWishlisted = wishlistedIds.has(item.id || item.name);
                         const isOutOfStock = (item.inventoryStatus || '').toUpperCase() === 'OUTOFSTOCK';
-                        return `
+                        return html`
                             <div class="p-dataview-grid-card" data-id="${item.id || item.name}">
                                 <div class="p-dataview-grid-image-box">
                                     ${getSeverityTag(item.inventoryStatus)}
-                                    <div style="font-size: 3.5rem;">${LucideIcons.package}</div>
+                                    <div style="font-size: 3.5rem;">${unsafe(LucideIcons.package)}</div>
                                 </div>
                                 <div class="p-dataview-grid-body">
                                     <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -706,62 +701,62 @@ export default function DataViewIsland(container: HTMLElement, props: DataViewPr
                                     <div class="p-dataview-price" style="font-size: 1.5rem;">$${item.price ?? 0}</div>
                                     <div style="display: flex; gap: 0.5rem; align-items: center;">
                                         <button type="button" class="p-dataview-btn-buy" style="flex: 1; justify-content: center;" data-id="${item.id || item.name}" ${isOutOfStock ? 'disabled' : ''}>
-                                            <span>${LucideIcons.shoppingCart}</span>
+                                            <span>${unsafe(LucideIcons.shoppingCart)}</span>
                                             <span>${isOutOfStock ? 'Out of Stock' : 'Buy Now'}</span>
                                         </button>
                                         <button type="button" class="p-dataview-btn-wishlist ${isWishlisted ? 'p-wishlisted' : ''}" data-id="${item.id || item.name}" title="Wishlist" aria-label="Wishlist">
-                                            ${LucideIcons.heart}
+                                            ${unsafe(LucideIcons.heart)}
                                         </button>
                                     </div>
                                 </div>
                             </div>
                         `;
-                    }).join('')}
+                    })}
                 </div>
             `;
         }
 
         // Paginator HTML
-        let paginatorHtml = '';
+        let paginatorHtml: Raw | '' = '';
         if (paginator) {
             const startRecord = totalRecords > 0 ? firstIdx + 1 : 0;
             const endRecord = Math.min(firstIdx + rowsPerPage, totalRecords);
             const reportStr = `Showing ${startRecord} to ${endRecord} of ${totalRecords} entries`;
 
-            const pageButtons = [];
+            const pageButtons: Raw[] = [];
             let startPage = Math.max(1, currentPage - 2);
             let endPage = Math.min(totalPages, startPage + 4);
             if (endPage - startPage < 4) startPage = Math.max(1, endPage - 4);
 
             for (let p = startPage; p <= endPage; p++) {
-                pageButtons.push(`
+                pageButtons.push(html`
                     <button type="button" class="p-paginator-page ${p === currentPage ? 'p-paginator-page-active' : ''}" data-page="${p}">
                         ${p}
                     </button>
                 `);
             }
 
-            paginatorHtml = `
+            paginatorHtml = html`
                 <div class="p-dataview-paginator">
                     <span>${reportStr}</span>
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                         <button type="button" class="p-paginator-nav p-first" data-page="1" ${currentPage === 1 ? 'disabled' : ''} aria-label="First Page">«</button>
                         <button type="button" class="p-paginator-nav p-prev" data-page="${currentPage - 1}" ${currentPage === 1 ? 'disabled' : ''} aria-label="Previous Page">‹</button>
-                        <div class="p-paginator-pages">${pageButtons.join('')}</div>
+                        <div class="p-paginator-pages">${pageButtons}</div>
                         <button type="button" class="p-paginator-nav p-next" data-page="${currentPage + 1}" ${currentPage === totalPages ? 'disabled' : ''} aria-label="Next Page">›</button>
                         <button type="button" class="p-paginator-nav p-last" data-page="${totalPages}" ${currentPage === totalPages ? 'disabled' : ''} aria-label="Last Page">»</button>
                     </div>
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                         <span>Rows per page:</span>
                         <select class="p-dataview-rows-select" aria-label="Rows per page" style="padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px solid var(--lt-surface-300); background: var(--lt-surface-0); color: inherit; font-size: 0.8125rem;">
-                            ${rowsPerPageOptions.map(opt => `<option value="${opt}" ${opt === rowsPerPage ? 'selected' : ''}>${opt}</option>`).join('')}
+                            ${rowsPerPageOptions.map(opt => html`<option value="${opt}" ${opt === rowsPerPage ? 'selected' : ''}>${opt}</option>`)}
                         </select>
                     </div>
                 </div>
             `;
         }
 
-        container.innerHTML = `
+        setHtml(container, html`
             <div class="p-dataview p-component">
                 ${headerHtml}
                 <div class="p-dataview-content">
@@ -769,7 +764,7 @@ export default function DataViewIsland(container: HTMLElement, props: DataViewPr
                 </div>
                 ${paginatorHtml}
             </div>
-        `;
+        `);
 
         const animEl = container.querySelector<HTMLElement>('.dataview-animated-container');
         if (animEl) useAutoAnimate(animEl, { duration: 200 });

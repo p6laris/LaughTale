@@ -2,6 +2,7 @@ import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts
 import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
 import { LucideIcons } from '../icons/lucide';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 export interface DropzoneProps {
     targetInputName: string;
@@ -106,7 +107,7 @@ html.dark .dropzone-subtitle,
 export default function DropzoneIsland(container: HTMLElement, props: DropzoneProps, ctx?: IslandContext) {
     injectIslandStyle('dropzone', CSS);
 
-    container.innerHTML = `
+    setHtml(container, html`
         <div style="display: flex; flex-direction: column; gap: 0.75rem; width: 100%;">
             <div style="display: flex; align-items: center; justify-content: space-between;">
                 <span style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-muted, #64748b);">Secure Document Vault</span>
@@ -128,7 +129,7 @@ export default function DropzoneIsland(container: HTMLElement, props: DropzonePr
                 <div class="preview-area" style="display: none; margin-top: 1rem;"></div>
             </div>
         </div>
-    `;
+    `);
 
     const box = container.querySelector('.dropzone-box') as HTMLElement;
     const input = container.querySelector('.file-input') as HTMLInputElement;
@@ -169,7 +170,7 @@ export default function DropzoneIsland(container: HTMLElement, props: DropzonePr
         }
 
         preview.style.display = 'block';
-        preview.innerHTML = `
+        setHtml(preview, html`
             <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.625rem 0.875rem; background: color-mix(in srgb, var(--p-primary-color, #10b981) 10%, transparent); border: 1px solid var(--p-primary-500, #10b981); border-radius: var(--p-border-radius, 6px); font-size: 0.8125rem; color: var(--p-text-color);">
                 <div style="display: flex; align-items: center; gap: 0.5rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--p-primary-500);"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
@@ -178,7 +179,7 @@ export default function DropzoneIsland(container: HTMLElement, props: DropzonePr
                 </div>
                 <span class="p-tag p-tag-success" style="font-size: 0.6875rem;">Verified</span>
             </div>
-        `;
+        `);
     }
 
     container.setAttribute('data-part', 'root');

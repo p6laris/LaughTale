@@ -1,14 +1,9 @@
 import { useLocale } from '../composables/useLocale';
-/**
- * LaughTale: Enterprise DataTable Component (Aura Design System compliant)
- * High-performance tabular data grid supporting sorting, filtering, pagination, selection,
- * frozen columns, row expansion, in-place cell editing, loading states, and CSV export.
- */
-
 import { injectIslandStyle } from '../runtime/styles';
 import { LucideIcons } from '../icons/lucide';
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
+import { html, setHtml, url as safeUrl, unsafe, attr, cx, type Raw } from '../runtime/html';
 
 export interface DataTableColumn {
     field: string;
@@ -735,7 +730,7 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
     }
 
     // Helper: Rich Cell Renderer
-    function renderCellContent(row: any, col: DataTableColumn, rawVal: any): string {
+    function renderCellContent(row: any, col: DataTableColumn, rawVal: any): Raw | string {
         const fieldName = (col.field || '').toLowerCase();
         const headerName = (col.header || '').toLowerCase();
 
@@ -743,32 +738,32 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
         if (fieldName.includes('status') || headerName.includes('status')) {
             const strVal = String(rawVal || '').toUpperCase();
             if (strVal === 'INSTOCK' || strVal === 'QUALIFIED') {
-                return `<span class="p-tag p-tag-success">${strVal === 'INSTOCK' ? 'In Stock' : 'Qualified'}</span>`;
+                return html`<span class="p-tag p-tag-success">${strVal === 'INSTOCK' ? 'In Stock' : 'Qualified'}</span>`;
             }
             if (strVal === 'LOWSTOCK' || strVal === 'NEGOTIATION') {
-                return `<span class="p-tag p-tag-warn">${strVal === 'LOWSTOCK' ? 'Low Stock' : 'Negotiation'}</span>`;
+                return html`<span class="p-tag p-tag-warn">${strVal === 'LOWSTOCK' ? 'Low Stock' : 'Negotiation'}</span>`;
             }
             if (strVal === 'OUTOFSTOCK' || strVal === 'UNQUALIFIED') {
-                return `<span class="p-tag p-tag-danger">${strVal === 'OUTOFSTOCK' ? 'Out of Stock' : 'Unqualified'}</span>`;
+                return html`<span class="p-tag p-tag-danger">${strVal === 'OUTOFSTOCK' ? 'Out of Stock' : 'Unqualified'}</span>`;
             }
             if (strVal === 'NEW' || strVal === 'PROPOSAL') {
-                return `<span class="p-tag p-tag-info">${strVal}</span>`;
+                return html`<span class="p-tag p-tag-info">${strVal}</span>`;
             }
-            return `<span class="p-tag p-tag-secondary">${rawVal ?? ''}</span>`;
+            return html`<span class="p-tag p-tag-secondary">${rawVal ?? ''}</span>`;
         }
 
         // 2. Category Tag
         if (fieldName === 'category') {
-            return `<span class="p-tag p-tag-secondary">${rawVal ?? ''}</span>`;
+            return html`<span class="p-tag p-tag-secondary">${rawVal ?? ''}</span>`;
         }
 
         // 3. Product with SKU subtitle
         if ((fieldName === 'name' || headerName === 'product') && row.code) {
             const hasCodeCol = columns.some(c => (c.field || '').toLowerCase() === 'code');
             if (!hasCodeCol) {
-                return `
+                return html`
                 <div class="p-product-cell">
-                    <div class="p-product-avatar">${LucideIcons.package}</div>
+                    <div class="p-product-avatar">${unsafe(LucideIcons.package)}</div>
                     <div class="p-product-info">
                         <span class="p-product-name">${row.name ?? ''}</span>
                         <span class="p-product-code">${row.code ?? ''}</span>
@@ -776,12 +771,12 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                 </div>
             `;
             }
-            return `<span style="font-weight: 600; color: var(--lt-surface-900);">${row.name ?? rawVal ?? ''}</span>`;
+            return html`<span style="font-weight: 600; color: var(--lt-surface-900);">${row.name ?? rawVal ?? ''}</span>`;
         }
 
         // 4. Country with Flag Icon
         if (fieldName === 'country') {
-            return `
+            return html`
                 <div class="p-country-cell">
                     <span style="font-size: 1rem; line-height: 1;">🌐</span>
                     <span>${rawVal ?? ''}</span>
@@ -792,7 +787,7 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
         // 5. Representative with Avatar
         if (fieldName.includes('rep') || headerName.includes('representative')) {
             const initials = String(rawVal || 'U').split(' ').map(n => n[0]).join('').substring(0, 2);
-            return `
+            return html`
                 <div class="p-rep-cell">
                     <div class="p-rep-avatar">${initials}</div>
                     <span>${rawVal ?? ''}</span>
@@ -802,12 +797,12 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
 
         // 6. Currency Formatted (Price / Balance)
         if (typeof rawVal === 'number' && (fieldName.includes('price') || fieldName.includes('balance'))) {
-            return `<span style="font-weight: 700; color: var(--lt-surface-900);">$${rawVal.toLocaleString()}</span>`;
+            return html`<span style="font-weight: 700; color: var(--lt-surface-900);">$${rawVal.toLocaleString()}</span>`;
         }
 
         // 7. Verified Boolean Tag
         if (fieldName === 'verified') {
-            return rawVal ? `<span class="p-tag p-tag-success">Verified</span>` : `<span class="p-tag p-tag-secondary">—</span>`;
+            return rawVal ? html`<span class="p-tag p-tag-success">Verified</span>` : html`<span class="p-tag p-tag-secondary">—</span>`;
         }
 
         return rawVal != null ? String(rawVal) : '';
@@ -923,14 +918,14 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
             const isSorted = !!sortItem;
             const sortOrder = sortItem?.order || 0;
             const sortBadge = sortMode === 'multiple' && sortMeta.length > 1 && isSorted
-                ? `<span class="p-datatable-sort-badge">${sortMeta.indexOf(sortItem!) + 1}</span>`
+                ? html`<span class="p-datatable-sort-badge">${sortMeta.indexOf(sortItem!) + 1}</span>`
                 : '';
 
-            let sortIconSvg = '';
+            let sortIconSvg: Raw | '' = '';
             if (isSortable) {
-                if (sortOrder === 1) sortIconSvg = LucideIcons.arrowUp;
-                else if (sortOrder === -1) sortIconSvg = LucideIcons.arrowDown;
-                else sortIconSvg = LucideIcons.arrowUpDown;
+                if (sortOrder === 1) sortIconSvg = unsafe(LucideIcons.arrowUp);
+                else if (sortOrder === -1) sortIconSvg = unsafe(LucideIcons.arrowDown);
+                else sortIconSvg = unsafe(LucideIcons.arrowUpDown);
             }
 
             let frozenClass = '';
@@ -946,10 +941,10 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
 
             // Checkbox Header
             if (col.selectionMode === 'multiple') {
-                return `
+                return html`
                     <th class="${frozenClass}" style="width: 3.5rem; text-align: center;">
                         <div class="p-checkbox-box p-select-all ${allPageSelected ? 'p-checked' : ''}" role="checkbox" aria-checked="${allPageSelected}">
-                            ${allPageSelected ? LucideIcons.check : ''}
+                            ${allPageSelected ? unsafe(LucideIcons.check) : ''}
                         </div>
                     </th>
                 `;
@@ -957,36 +952,36 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
 
             // Radio Header
             if (col.selectionMode === 'single') {
-                return `<th class="${frozenClass}" style="width: 3.5rem; text-align: center;"></th>`;
+                return html`<th class="${frozenClass}" style="width: 3.5rem; text-align: center;"></th>`;
             }
 
             // Row Expander Header
             if (col.expander) {
-                return `<th class="${frozenClass}" style="width: 3.5rem; text-align: center;"></th>`;
+                return html`<th class="${frozenClass}" style="width: 3.5rem; text-align: center;"></th>`;
             }
 
-            return `
+            return html`
                 <th class="${isSortable ? 'p-sortable-column' : ''} ${isSorted ? 'p-sorted' : ''} ${frozenClass} ${col.headerClass || ''}" 
                     data-field="${col.field || ''}" 
                     style="${styleAttr}">
                     <div class="p-datatable-header-content" style="justify-content: ${col.align === 'right' ? 'flex-end' : col.align === 'center' ? 'center' : 'flex-start'};">
                         <span>${col.header || ''}</span>
-                        ${isSortable ? `<span class="p-datatable-sort-icon">${sortIconSvg}</span>${sortBadge}` : ''}
+                        ${isSortable ? html`<span class="p-datatable-sort-icon">${sortIconSvg}</span>${sortBadge}` : ''}
                     </div>
                 </th>
             `;
-        }).join('');
+        });
 
         // Generate Filter Row (if enabled)
-        let filterRowHtml = '';
+        let filterRowHtml: Raw | '' = '';
         if (filterDisplay === 'row') {
             const filterCells = columns.map(col => {
                 let frozenClass = col.frozen ? (col.alignFrozen === 'right' ? 'p-frozen-column-right' : 'p-frozen-column-left') : '';
                 if (!col.field || col.selectionMode || col.expander || col.filterable === false) {
-                    return `<th class="${frozenClass}"></th>`;
+                    return html`<th class="${frozenClass}"></th>`;
                 }
                 const curVal = columnFilters[col.field] || '';
-                return `
+                return html`
                     <th class="${frozenClass}">
                         <input type="text" 
                                class="p-datatable-filter-input" 
@@ -995,28 +990,28 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                                value="${curVal}" />
                     </th>
                 `;
-            }).join('');
-            filterRowHtml = `<tr class="p-datatable-filter-row">${filterCells}</tr>`;
+            });
+            filterRowHtml = html`<tr class="p-datatable-filter-row">${filterCells}</tr>`;
         }
 
         // Generate Body Rows
-        let bodyRowsHtml = '';
+        let bodyRowsHtml: Raw | Raw[] | '' = '';
         if (loading && loadingMode === 'skeleton') {
-            bodyRowsHtml = Array.from({ length: rowsPerPage }).map(() => `
+            bodyRowsHtml = Array.from({ length: rowsPerPage }).map(() => html`
                 <tr>
-                    ${columns.map(col => `
+                    ${columns.map(col => html`
                         <td style="${col.width ? `width: ${col.width};` : ''}">
                             <div class="p-datatable-skeleton-cell"></div>
                         </td>
-                    `).join('')}
+                    `)}
                 </tr>
-            `).join('');
+            `);
         } else if (displayRows.length === 0) {
-            bodyRowsHtml = `
+            bodyRowsHtml = html`
                 <tr>
                     <td colspan="${columns.length}" style="text-align: center; padding: 3rem 1rem; color: var(--lt-surface-400);">
                         <div style="display: flex; flex-direction: column; align-items: center; gap: 0.75rem;">
-                            <span style="font-size: 1.75rem; color: var(--lt-surface-400);">${LucideIcons.inbox}</span>
+                            <span style="font-size: 1.75rem; color: var(--lt-surface-400);">${unsafe(LucideIcons.inbox)}</span>
                             <span style="font-weight: 600; font-size: 0.9375rem; color: var(--lt-surface-700);">${emptyMessage}</span>
                         </div>
                     </td>
@@ -1038,10 +1033,10 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
 
                     // Checkbox Column
                     if (col.selectionMode === 'multiple') {
-                        return `
+                        return html`
                             <td class="${frozenClass}" style="width: 3.5rem; text-align: center;">
                                 <div class="p-checkbox-box p-row-checkbox ${isSelected ? 'p-checked' : ''}" data-row-key="${rowKey}">
-                                    ${isSelected ? LucideIcons.check : ''}
+                                    ${isSelected ? unsafe(LucideIcons.check) : ''}
                                 </div>
                             </td>
                         `;
@@ -1049,10 +1044,10 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
 
                     // Radio Column
                     if (col.selectionMode === 'single') {
-                        return `
+                        return html`
                             <td class="${frozenClass}" style="width: 3.5rem; text-align: center;">
                                 <div class="p-radio-box p-row-radio ${isSelected ? 'p-checked' : ''}" data-row-key="${rowKey}">
-                                    ${isSelected ? '<span style="width: 6px; height: 6px; border-radius: 9999px; background: white;"></span>' : ''}
+                                    ${isSelected ? html`<span style="width: 6px; height: 6px; border-radius: 9999px; background: white;"></span>` : ''}
                                 </div>
                             </td>
                         `;
@@ -1060,10 +1055,10 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
 
                     // Expander Column
                     if (col.expander) {
-                        return `
+                        return html`
                             <td class="${frozenClass}" style="width: 3.5rem; text-align: center;">
                                 <button type="button" class="p-row-toggler" data-row-key="${rowKey}" aria-label="Toggle Row">
-                                    ${isExpanded ? LucideIcons.chevronDown : LucideIcons.chevronRight}
+                                    ${isExpanded ? unsafe(LucideIcons.chevronDown) : unsafe(LucideIcons.chevronRight)}
                                 </button>
                             </td>
                         `;
@@ -1074,7 +1069,7 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                     // In-Place Cell Editing
                     const isEditing = editMode === 'cell' && editingCell?.rowKey === rowKey && editingCell?.field === col.field;
                     if (isEditing) {
-                        return `
+                        return html`
                             <td class="${frozenClass} ${col.bodyClass || ''}" style="${styleAttr}">
                                 <input type="text" 
                                        class="p-cell-editor-input" 
@@ -1089,7 +1084,7 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                     const formattedContent = renderCellContent(row, col, rawVal);
                     const editableClass = editMode === 'cell' && col.field ? 'p-editable-cell' : '';
 
-                    return `
+                    return html`
                         <td class="${frozenClass} ${editableClass} ${col.bodyClass || ''}" 
                             data-row-key="${rowKey}" 
                             data-field="${col.field || ''}" 
@@ -1097,23 +1092,23 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                             ${formattedContent}
                         </td>
                     `;
-                }).join('');
+                });
 
-                const rowHtml = `
+                const rowHtml = html`
                     <tr class="${isSelected ? 'p-highlight' : ''}" data-row-key="${rowKey}">
                         ${cellTds}
                     </tr>
                 `;
 
                 // Row Expansion Detail Card
-                let expansionHtml = '';
+                let expansionHtml: Raw | '' = '';
                 if (isExpanded) {
-                    expansionHtml = `
+                    expansionHtml = html`
                         <tr class="p-row-expansion">
                             <td colspan="${columns.length}" style="padding: 1.25rem;">
                                 <div style="display: flex; gap: 1.25rem; align-items: center; background: var(--lt-surface-0); padding: 1rem; border-radius: 8px; border: 1px solid var(--lt-surface-200);">
                                     <div style="width: 56px; height: 56px; border-radius: 8px; background: var(--lt-primary-50); border: 1px solid var(--lt-primary-200); display: flex; align-items: center; justify-content: center; color: var(--lt-primary-600); font-size: 1.5rem; flex-shrink: 0;">
-                                        ${LucideIcons.package}
+                                        ${unsafe(LucideIcons.package)}
                                     </div>
                                     <div style="display: flex; flex-direction: column; gap: 0.35rem; flex: 1;">
                                         <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -1135,21 +1130,21 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                     `;
                 }
 
-                return rowHtml + expansionHtml;
-            }).join('');
+                return html`${rowHtml}${expansionHtml}`;
+            });
         }
 
         // Selection Summary Bar
-        let selectionBarHtml = '';
+        let selectionBarHtml: Raw | '' = '';
         if (selectedKeys.size > 0) {
             const selectedRows = rawData.filter(r => selectedKeys.has(r[dataKey]));
             const totalVal = selectedRows.reduce((sum, r) => sum + (Number(r.price) || Number(r.balance) || 0), 0);
 
-            selectionBarHtml = `
+            selectionBarHtml = html`
                 <div class="p-datatable-selection-bar">
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                         <span class="p-tag p-tag-info" style="font-weight: 700;">Selected: ${selectedKeys.size}</span>
-                        ${totalVal > 0 ? `<span>Total: <strong>$${totalVal.toLocaleString()}</strong></span>` : ''}
+                        ${totalVal > 0 ? html`<span>Total: <strong>$${totalVal.toLocaleString()}</strong></span>` : ''}
                     </div>
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                         <button type="button" class="p-datatable-clear-selection" style="padding: 0.3rem 0.6rem; font-size: 0.75rem; border-radius: 4px; border: 1px solid var(--lt-surface-300); background: transparent; cursor: pointer; color: var(--lt-surface-600);">
@@ -1161,7 +1156,7 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
         }
 
         // Paginator HTML
-        let paginatorHtml = '';
+        let paginatorHtml: Raw | '' = '';
         if (paginator) {
             const startRecord = totalRecords > 0 ? firstIdx + 1 : 0;
             const endRecord = Math.min(firstIdx + rowsPerPage, totalRecords);
@@ -1170,33 +1165,33 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                 .replace('{last}', String(endRecord))
                 .replace('{totalRecords}', String(totalRecords));
 
-            const pageButtons = [];
+            const pageButtons: Raw[] = [];
             let startPage = Math.max(1, currentPage - 2);
             let endPage = Math.min(totalPages, startPage + 4);
             if (endPage - startPage < 4) startPage = Math.max(1, endPage - 4);
 
             for (let p = startPage; p <= endPage; p++) {
-                pageButtons.push(`
+                pageButtons.push(html`
                     <button type="button" class="p-paginator-page ${p === currentPage ? 'p-paginator-page-active' : ''}" data-page="${p}">
                         ${p}
                     </button>
                 `);
             }
 
-            paginatorHtml = `
+            paginatorHtml = html`
                 <div class="p-datatable-paginator">
                     <span>${reportStr}</span>
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                         <button type="button" class="p-paginator-nav p-first" data-page="1" ${currentPage === 1 ? 'disabled' : ''} aria-label="First Page">«</button>
                         <button type="button" class="p-paginator-nav p-prev" data-page="${currentPage - 1}" ${currentPage === 1 ? 'disabled' : ''} aria-label="Previous Page">‹</button>
-                        <div class="p-paginator-pages">${pageButtons.join('')}</div>
+                        <div class="p-paginator-pages">${pageButtons}</div>
                         <button type="button" class="p-paginator-nav p-next" data-page="${currentPage + 1}" ${currentPage === totalPages ? 'disabled' : ''} aria-label="Next Page">›</button>
                         <button type="button" class="p-paginator-nav p-last" data-page="${totalPages}" ${currentPage === totalPages ? 'disabled' : ''} aria-label="Last Page">»</button>
                     </div>
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                         <span>${locale.t('rowsPerPage') || 'Rows per page'}:</span>
                         <select class="p-datatable-rows-select" aria-label="${locale.t('rowsPerPage') || 'Rows per page'}" style="padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px solid var(--lt-surface-300); background: var(--lt-surface-0); color: inherit; font-size: 0.8125rem;">
-                            ${rowsPerPageOptions.map(opt => `<option value="${opt}" ${opt === rowsPerPage ? 'selected' : ''}>${opt}</option>`).join('')}
+                            ${rowsPerPageOptions.map(opt => html`<option value="${opt}" ${opt === rowsPerPage ? 'selected' : ''}>${opt}</option>`)}
                         </select>
                     </div>
                 </div>
@@ -1204,18 +1199,18 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
         }
 
         // Global Toolbar
-        let toolbarHtml = '';
+        let toolbarHtml: Raw | '' = '';
         const showSearch = Array.isArray(props.globalFilterFields) && props.globalFilterFields.length > 0;
         const showExport = (!!props.exportFilename && props.exportFilename.trim() !== '') || !!props.showExport;
         const showRefresh = !!props.showRefresh;
         const hasToolbar = !!props.title || showSearch || showExport || showInteractiveSize || showRefresh;
 
         if (hasToolbar) {
-            toolbarHtml = `
+            toolbarHtml = html`
                 <div class="p-datatable-header-toolbar">
                     <div class="p-datatable-title">${props.title || ''}</div>
                     <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-                        ${showInteractiveSize ? `
+                        ${showInteractiveSize ? html`
                             <div class="p-size-switcher">
                                 <button type="button" class="p-size-btn ${currentSize === 'small' ? 'p-active' : ''}" data-size="small">Small</button>
                                 <button type="button" class="p-size-btn ${currentSize === 'normal' ? 'p-active' : ''}" data-size="normal">Normal</button>
@@ -1223,22 +1218,22 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                             </div>
                         ` : ''}
 
-                        ${showSearch ? `
+                        ${showSearch ? html`
                             <div style="position: relative; display: flex; align-items: center;">
                                 <input type="text" class="p-datatable-global-filter p-datatable-filter-input" placeholder="Search keyword..." value="${globalFilter}" style="width: 180px;" />
                             </div>
                         ` : ''}
 
-                        ${showRefresh ? `
+                        ${showRefresh ? html`
                             <button type="button" class="p-datatable-refresh-btn" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.4rem 0.75rem; border-radius: 6px; border: 1px solid var(--lt-surface-300); background: var(--lt-surface-0); color: inherit; font-size: 0.8125rem; font-weight: 600; cursor: pointer;">
-                                <span>${LucideIcons.refreshCw}</span>
+                                <span>${unsafe(LucideIcons.refreshCw)}</span>
                                 <span>Refresh</span>
                             </button>
                         ` : ''}
 
-                        ${showExport ? `
+                        ${showExport ? html`
                             <button type="button" class="p-datatable-export-btn" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.4rem 0.75rem; border-radius: 6px; border: 1px solid var(--lt-surface-300); background: var(--lt-surface-0); color: inherit; font-size: 0.8125rem; font-weight: 600; cursor: pointer;">
-                                <span>${LucideIcons.fileSpreadsheet}</span>
+                                <span>${unsafe(LucideIcons.fileSpreadsheet)}</span>
                                 <span>Export CSV</span>
                             </button>
                         ` : ''}
@@ -1248,9 +1243,9 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
         }
 
         // Loading Overlay
-        let loadingOverlayHtml = '';
+        let loadingOverlayHtml: Raw | '' = '';
         if (loading && loadingMode === 'overlay') {
-            loadingOverlayHtml = `
+            loadingOverlayHtml = html`
                 <div class="p-datatable-loading-overlay">
                     <div style="width: 2.25rem; height: 2.25rem; border: 3px solid var(--lt-primary-500); border-top-color: transparent; border-radius: 9999px; animation: p-spin 0.8s linear infinite;"></div>
                     <span style="font-size: 0.875rem; font-weight: 600; color: var(--lt-surface-700);">Loading records...</span>
@@ -1262,7 +1257,7 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
 
         applyPart(container, 'root', rootClasses.join(' '), props.pt, props.studioOverrides);
 
-        container.innerHTML = `
+        setHtml(container, html`
             <div class="${rootClasses.join(' ')}">
                 ${loadingOverlayHtml}
                 ${toolbarHtml}
@@ -1280,7 +1275,7 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                 </div>
                 ${paginatorHtml}
             </div>
-        `;
+        `);
 
         bindEvents();
     }

@@ -284,6 +284,7 @@ html.dark .p-drawer-nav-section-title,
 
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 export interface DrawerProps {
     id?: string;
@@ -406,12 +407,12 @@ export default function DrawerIsland(container: HTMLElement, props: DrawerProps,
         if (props.header && !hasHeader) {
             const headerEl = document.createElement('div');
             headerEl.className = 'p-drawer-header';
-            headerEl.innerHTML = `
+            setHtml(headerEl, html`
                 <span class="p-drawer-title">${props.header}</span>
                 <div class="p-drawer-header-actions">
-                    ${props.closable !== false ? `<button type="button" class="p-drawer-close-button" aria-label="Close" data-drawer-close><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg></button>` : ''}
+                    ${props.closable !== false ? html`<button type="button" class="p-drawer-close-button" aria-label="Close" data-drawer-close><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg></button>` : ''}
                 </div>
-            `;
+            `);
             drawerEl.appendChild(headerEl);
         }
 

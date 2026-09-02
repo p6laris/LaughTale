@@ -10,6 +10,7 @@ import type { IslandContext } from '../runtime/registry';
 import { MenuItem } from '../types/models';
 import { LucideIcons, getLucideIcon } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 export interface ContextMenuItem extends MenuItem {
     shortcut?: string;
@@ -272,7 +273,7 @@ html.dark .p-contextmenu-target-box:hover,
 }
 `;
 
-const CHEVRON_RIGHT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`;
+const CHEVRON_RIGHT_SVG = html`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`;
 
 export default function ContextMenuIsland(container: HTMLElement, props: ContextMenuProps, ctx?: IslandContext) {
     injectIslandStyle('contextmenu', CONTEXTMENU_CSS);
@@ -387,7 +388,7 @@ export default function ContextMenuIsland(container: HTMLElement, props: Context
     }
 
     // Render Host Demo View
-    function renderHostDemo() {
+    function renderHostDemo(): Raw {
         if (demoType === 'template') {
             const products = [
                 { id: '1000', name: 'Bamboo Watch', category: 'Accessories', price: 65, image: 'bamboo-watch.jpg' },
@@ -397,26 +398,26 @@ export default function ContextMenuIsland(container: HTMLElement, props: Context
                 { id: '1004', name: 'Bracelet', category: 'Accessories', price: 15, image: 'bracelet.jpg' }
             ];
 
-            return `
+            return html`
                 <div class="flex justify-center" data-part="root" style="width: 100%;">
                     <ul class="p-contextmenu-product-list" style="margin: 0 auto; list-style: none; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); padding: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; width: 100%; max-width: 32rem; background: var(--lt-surface-0);">
-                        ${products.map(p => `
+                        ${products.map(p => html`
                             <li class="p-contextmenu-product-item" data-product-id="${p.id}" style="padding: 0.5rem; border-radius: var(--lt-radius); border: 2px solid transparent; transition: all 180ms ease; cursor: context-menu;">
                                 <div style="display: flex; align-items: center; gap: 1rem;">
                                     <div style="width: 4rem; height: 3rem; border-radius: 6px; background: var(--lt-surface-100); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.25rem;">
-                                        ${getLucideIcon('package', 24)}
+                                        ${unsafe(getLucideIcon('package', 24))}
                                     </div>
                                     <div style="flex: 1; display: flex; flex-direction: column; gap: 0.25rem;">
                                         <span style="font-weight: 700; font-size: 0.875rem; color: var(--lt-text-primary);">${p.name}</span>
                                         <div style="display: flex; align-items: center; gap: 0.35rem; color: var(--p-text-muted); font-size: 0.75rem;">
-                                            <span>${getLucideIcon('tag', 12)}</span>
+                                            <span>${unsafe(getLucideIcon('tag', 12))}</span>
                                             <span>${p.category}</span>
                                         </div>
                                     </div>
                                     <span style="font-weight: 700; font-size: 0.875rem; color: var(--lt-text-primary); margin-left: 1rem;">$${p.price}</span>
                                 </div>
                             </li>
-                        `).join('')}
+                        `)}
                     </ul>
                 </div>
             `;
@@ -431,10 +432,10 @@ export default function ContextMenuIsland(container: HTMLElement, props: Context
                 { id: 4, name: 'Elwin Sharvill', role: 'Member', badge: 'info' }
             ];
 
-            return `
+            return html`
                 <div class="flex justify-center" style="width: 100%;">
                     <ul class="p-contextmenu-user-list" style="margin: 0 auto; list-style: none; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); padding: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; width: 100%; max-width: 26rem; background: var(--lt-surface-0);">
-                        ${users.map(u => `
+                        ${users.map(u => html`
                             <li class="p-contextmenu-user-item" data-user-id="${u.id}" style="padding: 0.6rem 0.75rem; border-radius: var(--lt-radius); border: 2px solid transparent; transition: all 180ms ease; display: flex; align-items: center; justify-content: space-between; cursor: context-menu;">
                                 <div style="display: flex; align-items: center; gap: 0.75rem;">
                                     <div style="width: 2rem; height: 2rem; border-radius: 9999px; background: var(--lt-primary-100); color: var(--lt-primary-700); font-weight: 700; font-size: 0.75rem; display: flex; align-items: center; justify-content: center;">
@@ -444,31 +445,31 @@ export default function ContextMenuIsland(container: HTMLElement, props: Context
                                 </div>
                                 <span class="aura-tag p-user-role-badge tag-${u.badge}">${u.role}</span>
                             </li>
-                        `).join('')}
+                        `)}
                     </ul>
                 </div>
             `;
         }
 
         if (demoType === 'router') {
-            return `
+            return html`
                 <div style="display: flex; justify-content: center; width: 100%;">
                     <div class="p-contextmenu-target-box p-contextmenu-router-target" style="width: 5rem; height: 5rem; border-radius: var(--lt-radius); border: 2px solid var(--lt-primary-500); display: flex; align-items: center; justify-content: center; cursor: context-menu;">
-                        <span style="color: var(--lt-primary-500);">${getLucideIcon('shield', 36)}</span>
+                        <span style="color: var(--lt-primary-500);">${unsafe(getLucideIcon('shield', 36))}</span>
                     </div>
                 </div>
             `;
         }
 
         if (demoType === 'global') {
-            return `
+            return html`
                 <div style="text-align: center; padding: 2rem 1rem; width: 100%;">
                     <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0;">Right-click anywhere on this card to view the global ContextMenu.</p>
                 </div>
             `;
         }
 
-        return `
+        return html`
             <div class="p-contextmenu-target-box" data-context-target>
                 Right-click here
             </div>
@@ -476,28 +477,28 @@ export default function ContextMenuIsland(container: HTMLElement, props: Context
     }
 
     // Recursive Submenu HTML Builder
-    function renderItemsHtml(items: ContextMenuItem[]): string {
-        return `
+    function renderItemsHtml(items: ContextMenuItem[]): Raw {
+        return html`
             <ul class="p-contextmenu-root-list" role="menubar" aria-orientation="vertical">
                 ${items.map((item, idx) => {
                     if (item.separator) {
-                        return `<li class="p-contextmenu-separator" role="separator"></li>`;
+                        return html`<li class="p-contextmenu-separator" role="separator"></li>`;
                     }
 
                     const hasSub = item.items && item.items.length > 0;
-                    const iconSvg = item.icon ? getLucideIcon(item.icon, 16) : '';
+                    const iconSvg = item.icon ? unsafe(getLucideIcon(item.icon, 16)) : '';
                     const customClass = item.class || '';
 
-                    return `
+                    return html`
                         <li class="p-contextmenu-item ${item.disabled ? 'p-disabled' : ''} ${customClass}" role="none" data-menu-index="${idx}">
-                            <a class="p-contextmenu-item-content" role="menuitem" tabindex="0" ${hasSub ? 'aria-haspopup="true" aria-expanded="false"' : ''} ${item.url ? `href="${item.url}"` : ''} ${item.target ? `target="${item.target}"` : ''} data-item-label="${item.label || ''}">
-                                ${iconSvg ? `<span class="p-contextmenu-item-icon">${iconSvg}</span>` : ''}
+                            <a class="p-contextmenu-item-content" role="menuitem" tabindex="0" ${hasSub ? attr('aria-haspopup', 'true') : ''} ${hasSub ? attr('aria-expanded', 'false') : ''} ${item.url ? attr('href', safeUrl(item.url)) : ''} ${item.target ? attr('target', item.target) : ''} data-item-label="${item.label || ''}">
+                                ${iconSvg ? html`<span class="p-contextmenu-item-icon">${iconSvg}</span>` : ''}
                                 <span class="p-contextmenu-item-label">${item.label || ''}</span>
-                                ${item.shortcut ? `<span class="p-contextmenu-shortcut">${item.shortcut}</span>` : ''}
-                                ${item.badge ? `<span class="p-contextmenu-badge">${item.badge}</span>` : ''}
-                                ${hasSub ? `<span class="p-contextmenu-submenu-icon">${CHEVRON_RIGHT_SVG}</span>` : ''}
+                                ${item.shortcut ? html`<span class="p-contextmenu-shortcut">${item.shortcut}</span>` : ''}
+                                ${item.badge ? html`<span class="p-contextmenu-badge">${item.badge}</span>` : ''}
+                                ${hasSub ? html`<span class="p-contextmenu-submenu-icon">${CHEVRON_RIGHT_SVG}</span>` : ''}
                             </a>
-                            ${hasSub ? `
+                            ${hasSub ? html`
                                 <div class="p-contextmenu-sublist-wrapper" role="menu">
                                     <ul class="p-contextmenu-submenu">
                                         ${renderSubmenuItems(item.items!)}
@@ -506,27 +507,27 @@ export default function ContextMenuIsland(container: HTMLElement, props: Context
                             ` : ''}
                         </li>
                     `;
-                }).join('')}
+                })}
             </ul>
         `;
     }
 
-    function renderSubmenuItems(items: ContextMenuItem[]): string {
+    function renderSubmenuItems(items: ContextMenuItem[]): Raw[] {
         return items.map((item, idx) => {
-            if (item.separator) return `<li class="p-contextmenu-separator" role="separator"></li>`;
+            if (item.separator) return html`<li class="p-contextmenu-separator" role="separator"></li>`;
             const hasSub = item.items && item.items.length > 0;
-            const iconSvg = item.icon ? getLucideIcon(item.icon, 16) : '';
+            const iconSvg = item.icon ? unsafe(getLucideIcon(item.icon, 16)) : '';
 
-            return `
+            return html`
                 <li class="p-contextmenu-item ${item.disabled ? 'p-disabled' : ''} ${item.class || ''}" role="none" data-submenu-index="${idx}">
-                    <a class="p-contextmenu-item-content" role="menuitem" tabindex="0" ${hasSub ? 'aria-haspopup="true" aria-expanded="false"' : ''} data-item-label="${item.label || ''}">
-                        ${iconSvg ? `<span class="p-contextmenu-item-icon">${iconSvg}</span>` : ''}
+                    <a class="p-contextmenu-item-content" role="menuitem" tabindex="0" ${hasSub ? attr('aria-haspopup', 'true') : ''} ${hasSub ? attr('aria-expanded', 'false') : ''} ${item.url ? attr('href', safeUrl(item.url)) : ''} ${item.target ? attr('target', item.target) : ''} data-item-label="${item.label || ''}">
+                        ${iconSvg ? html`<span class="p-contextmenu-item-icon">${iconSvg}</span>` : ''}
                         <span class="p-contextmenu-item-label">${item.label || ''}</span>
-                        ${item.shortcut ? `<span class="p-contextmenu-shortcut">${item.shortcut}</span>` : ''}
-                        ${item.badge ? `<span class="p-contextmenu-badge">${item.badge}</span>` : ''}
-                        ${hasSub ? `<span class="p-contextmenu-submenu-icon">${CHEVRON_RIGHT_SVG}</span>` : ''}
+                        ${item.shortcut ? html`<span class="p-contextmenu-shortcut">${item.shortcut}</span>` : ''}
+                        ${item.badge ? html`<span class="p-contextmenu-badge">${item.badge}</span>` : ''}
+                        ${hasSub ? html`<span class="p-contextmenu-submenu-icon">${CHEVRON_RIGHT_SVG}</span>` : ''}
                     </a>
-                    ${hasSub ? `
+                    ${hasSub ? html`
                         <div class="p-contextmenu-sublist-wrapper" role="menu">
                             <ul class="p-contextmenu-submenu">
                                 ${renderSubmenuItems(item.items!)}
@@ -535,17 +536,17 @@ export default function ContextMenuIsland(container: HTMLElement, props: Context
                     ` : ''}
                 </li>
             `;
-        }).join('');
+        });
     }
 
-    container.innerHTML = `
+    setHtml(container, html`
         <div class="p-contextmenu-container" style="position: relative; width: 100%;">
             ${renderHostDemo()}
             <div class="p-contextmenu ${props.class || ''}" role="region" aria-label="${props.ariaLabel || 'Context Menu'}" data-contextmenu-root>
                 ${renderItemsHtml(menuItems)}
             </div>
         </div>
-    `;
+    `);
 
     const menuEl = container.querySelector<HTMLElement>('[data-contextmenu-root]')!;
     let isMenuOpen = false;

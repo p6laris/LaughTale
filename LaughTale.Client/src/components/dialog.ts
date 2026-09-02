@@ -1,12 +1,7 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
-﻿/**
- * LaughTale: Enterprise Dialog Component (LaughTale Aura Design System)
- * Zero-flash SSR overlay container with global click delegation, draggable header support,
- * maximizable fullscreen toggles, 9-direction positioning, inside scrolling, and headless templates.
- */
-
 import { injectIslandStyle } from '../runtime/styles';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 const DIALOG_CSS = `
 island-aura-dialog,
@@ -223,9 +218,9 @@ html.dark .p-dialog-header-action:hover,
 `;
 
 // Vector SVG Icons
-const CLOSE_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>`;
-const MAXIMIZE_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" x2="14" y1="3" y2="10"/><line x1="3" x2="10" y1="21" y2="14"/></svg>`;
-const RESTORE_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" x2="21" y1="10" y2="3"/><line x1="10" x2="3" y1="14" y2="21"/></svg>`;
+const CLOSE_ICON_SVG = html`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>`;
+const MAXIMIZE_ICON_SVG = html`<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" x2="14" y1="3" y2="10"/><line x1="3" x2="10" y1="21" y2="14"/></svg>`;
+const RESTORE_ICON_SVG = html`<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" x2="21" y1="10" y2="3"/><line x1="10" x2="3" y1="14" y2="21"/></svg>`;
 
 export interface DialogProps {
     header?: string;
@@ -345,13 +340,13 @@ export default function DialogIsland(container: HTMLElement, props: DialogProps,
         if (props.header && !hasHeader) {
             const headerEl = document.createElement('div');
             headerEl.className = 'p-dialog-header';
-            headerEl.innerHTML = `
+            setHtml(headerEl, html`
                 <span class="p-dialog-title">${props.header}</span>
                 <div class="p-dialog-header-actions">
-                    ${props.maximizable ? `<button type="button" class="p-dialog-header-action p-dialog-maximize-button" aria-label="Maximize">${MAXIMIZE_ICON_SVG}</button>` : ''}
-                    ${props.closable !== false ? `<button type="button" class="p-dialog-header-action p-dialog-close-button" aria-label="Close" data-dialog-close>${CLOSE_ICON_SVG}</button>` : ''}
+                    ${props.maximizable ? html`<button type="button" class="p-dialog-header-action p-dialog-maximize-button" aria-label="Maximize">${MAXIMIZE_ICON_SVG}</button>` : ''}
+                    ${props.closable !== false ? html`<button type="button" class="p-dialog-header-action p-dialog-close-button" aria-label="Close" data-dialog-close>${CLOSE_ICON_SVG}</button>` : ''}
                 </div>
-            `;
+            `);
             dialogEl.appendChild(headerEl);
         }
 
@@ -395,7 +390,7 @@ export default function DialogIsland(container: HTMLElement, props: DialogProps,
             e.stopPropagation();
             isMaximized = !isMaximized;
             dialogEl.classList.toggle('p-dialog-maximized', isMaximized);
-            maxBtn.innerHTML = isMaximized ? RESTORE_ICON_SVG : MAXIMIZE_ICON_SVG;
+            setHtml(maxBtn, isMaximized ? RESTORE_ICON_SVG : MAXIMIZE_ICON_SVG);
             maxBtn.setAttribute('aria-label', isMaximized ? 'Minimize' : 'Maximize');
         }, { signal: ctx?.signal });
     }

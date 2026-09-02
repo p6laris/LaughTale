@@ -1,14 +1,9 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
-﻿/**
- * LaughTale: Enterprise CommandMenu Component (LaughTale Aura Design System)
- * Search-driven command palette with unified selection state, root-level keyboard capture,
- * precise viewport scroll tracking, and modal Dialog integration.
- */
-
 import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
 import { useFocusTrap } from '../composables/useFocusTrap';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 const COMMAND_CSS = `
 .p-commandmenu {
@@ -412,19 +407,19 @@ export default function CommandMenuIsland(container: HTMLElement, props: Command
         return result;
     }
 
-    function getIconSvg(iconName?: string): string {
+    function getIconSvg(iconName?: string): Raw | string {
         if (!iconName) return '';
-        if (iconName.startsWith('<svg')) return iconName;
-        if ((LucideIcons as any)[iconName]) return (LucideIcons as any)[iconName];
+        if (iconName.startsWith('<svg')) return unsafe(iconName) /* static svg icon string */;
+        if ((LucideIcons as any)[iconName]) return unsafe((LucideIcons as any)[iconName]) /* static Lucide icon */;
         return '';
     }
 
     function setupCommandMenu(targetEl: HTMLElement) {
-        const arrowUpSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>';
-        const arrowDownSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
+        const arrowUpSvg = html`<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>`;
+        const arrowDownSvg = html`<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
 
-        targetEl.innerHTML = `
-            <div class="p-commandmenu p-component" data-part="root" tabindex="0" ${withDialog ? 'style="border: none; box-shadow: none; width: 100%;"' : ''}>
+        setHtml(targetEl, html`
+            <div class="p-commandmenu p-component" data-part="root" tabindex="0" ${withDialog ? attr('style', 'border: none; box-shadow: none; width: 100%;') : ''}>
                 <div class="p-commandmenu-header">
                     <span class="p-commandmenu-search-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
@@ -446,7 +441,7 @@ export default function CommandMenuIsland(container: HTMLElement, props: Command
                     </div>
                 </div>
             </div>
-        `;
+        `);
 
         const rootEl = targetEl.querySelector<HTMLElement>('.p-commandmenu')!;
         const input = targetEl.querySelector<HTMLInputElement>('.p-commandmenu-input')!;
@@ -495,22 +490,20 @@ export default function CommandMenuIsland(container: HTMLElement, props: Command
 
             if (totalItems === 0) {
                 const emptyMsg = props.emptyMessage || (props as any).EmptyMessage;
-                listEl.innerHTML = `
+                setHtml(listEl, html`
                     <div class="p-commandmenu-empty-message">
-                        ${emptyMsg ? emptyMsg : (search ? `No results found for <strong>"${search}"</strong>` : 'No results found')}
+                        ${emptyMsg ? emptyMsg : (search ? html`No results found for <strong>"${search}"</strong>` : 'No results found')}
                     </div>
-                `;
+                `);
                 return;
             }
 
-            let listHtml = '';
-            filtered.forEach(g => {
-                let itemsHtml = '';
-                g.items.forEach(it => {
+            const groupFragments = filtered.map(g => {
+                const itemFragments = g.items.map(it => {
                     const isFocused = flatIndex === selectedIndex;
                     const iconSvg = getIconSvg(it.icon);
 
-                    let itemLeftHtml = '';
+                    let itemLeftHtml: Raw;
                     if (customTemplate) {
                         const bgStyle = it.color || 'background: var(--lt-primary-500);';
                         const isGradient = bgStyle.startsWith('bg-[') || bgStyle.includes('linear-gradient');
@@ -518,46 +511,46 @@ export default function CommandMenuIsland(container: HTMLElement, props: Command
                             ? (bgStyle.startsWith('bg-[') ? bgStyle.replace('bg-[', 'background: ').replace(']', ';') : `background: ${bgStyle};`)
                             : (bgStyle.startsWith('background') ? bgStyle : `background: ${bgStyle};`);
 
-                        itemLeftHtml = `
+                        itemLeftHtml = html`
                             <div class="p-commandmenu-item-left">
                                 <span class="p-commandmenu-item-icon-badge" style="${inlineBg}">
-                                    ${iconSvg ? `<span style="display:flex; transform:scale(0.8);">${iconSvg}</span>` : '⚡'}
+                                    ${iconSvg ? html`<span style="display:flex; transform:scale(0.8);">${iconSvg}</span>` : '⚡'}
                                 </span>
                                 <span class="p-commandmenu-item-label">${it.label}</span>
-                                ${it.category ? `<span class="p-commandmenu-item-category">${it.category}</span>` : ''}
+                                ${it.category ? html`<span class="p-commandmenu-item-category">${it.category}</span>` : ''}
                             </div>
                         `;
                     } else {
-                        itemLeftHtml = `
+                        itemLeftHtml = html`
                             <div class="p-commandmenu-item-left">
-                                ${iconSvg ? `<span class="p-commandmenu-item-icon">${iconSvg}</span>` : ''}
+                                ${iconSvg ? html`<span class="p-commandmenu-item-icon">${iconSvg}</span>` : ''}
                                 <span class="p-commandmenu-item-label">${it.label}</span>
                             </div>
                         `;
                     }
 
-                    itemsHtml += `
+                    const itemIdx = flatIndex++;
+                    return html`
                         <div class="p-commandmenu-item ${isFocused ? 'p-commandmenu-item-focus' : ''}" 
-                             data-flat-index="${flatIndex}" 
+                             data-flat-index="${itemIdx}" 
                              data-label="${it.label}"
                              data-url="${it.url || ''}" 
                              data-action="${it.action || ''}">
                             ${itemLeftHtml}
-                            ${it.shortcut ? `<kbd class="p-commandmenu-kbd">${it.shortcut}</kbd>` : ''}
+                            ${it.shortcut ? html`<kbd class="p-commandmenu-kbd">${it.shortcut}</kbd>` : ''}
                         </div>
                     `;
-                    flatIndex++;
                 });
 
-                listHtml += `
+                return html`
                     <div class="p-commandmenu-group">
                         <div class="p-commandmenu-group-label">${g.label}</div>
-                        ${itemsHtml}
+                        ${itemFragments}
                     </div>
                 `;
             });
 
-            listEl.innerHTML = listHtml;
+            setHtml(listEl, html`${groupFragments}`);
 
             // Wire hover & click events on items
             listEl.querySelectorAll<HTMLElement>('.p-commandmenu-item').forEach(el => {
@@ -675,9 +668,9 @@ export default function CommandMenuIsland(container: HTMLElement, props: Command
 
         const backdrop = document.createElement('div');
         backdrop.className = 'p-commandmenu-dialog-backdrop'; container.setAttribute('data-part', 'root');
-        backdrop.innerHTML = `
+        setHtml(backdrop, html`
             <div class="p-commandmenu-dialog-card"></div>
-        `;
+        `);
 
         document.body.appendChild(backdrop);
 
@@ -703,13 +696,13 @@ export default function CommandMenuIsland(container: HTMLElement, props: Command
     }
 
     if (withDialog) {
-        container.innerHTML = `
+        setHtml(container, html`
             <div class="p-commandmenu-dialog-trigger-wrapper" style="display: flex; align-items: center; justify-content: center; padding: 2rem 0;">
                 <span class="p-commandmenu-dialog-trigger" style="cursor: pointer; font-size: 0.9375rem; color: var(--lt-text-primary); display: inline-flex; align-items: center;">
                     Press <kbd class="p-commandmenu-kbd" style="margin-left: 0.5rem; padding: 0.25rem 0.6rem; height: auto; font-size: 0.8125rem; font-weight: 600; background: var(--lt-surface-100); border: 1px solid var(--lt-surface-200); border-radius: 6px;">CTRL/⌘ + L</kbd>
                 </span>
             </div>
-        `;
+        `);
 
         container.querySelector('.p-commandmenu-dialog-trigger')?.addEventListener('click', () => {
             openDialog();

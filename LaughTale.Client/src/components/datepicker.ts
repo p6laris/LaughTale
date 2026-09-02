@@ -11,6 +11,7 @@ import { useClickOutside } from '../composables/useClickOutside';
 import { useLocale } from '../composables/useLocale';
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 export interface DatePickerProps {
     targetInputName?: string;
@@ -521,16 +522,16 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
         applyPart(container, 'root', `laughtale-datepicker ${props.fluid ? 'fluid' : ''} ${isInline ? 'inline' : ''}`, props.pt, props.studioOverrides);
 
         if (isInline) {
-            container.innerHTML = `
+            setHtml(container, html`
                 <div class="dp-panel" data-part="panel">
                     ${renderPanelContent()}
                 </div>
-            `;
+            `);
             bindPanelEvents(container.querySelector('.dp-panel')!);
             return;
         }
 
-        container.innerHTML = `
+        setHtml(container, html`
             <div class="dp-trigger size-${size} variant-${variant} ${props.invalid ? 'invalid' : ''} ${props.disabled ? 'disabled' : ''}" 
                  data-part="trigger"
                  tabindex="${props.disabled ? -1 : 0}" 
@@ -539,9 +540,9 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
                 <span class="dp-label ${displayText ? '' : 'placeholder'}" data-part="label">
                     ${displayText || props.placeholder || 'Select Date...'}
                 </span>
-                ${props.showIcon !== false ? `
+                ${props.showIcon !== false ? html`
                     <span class="dp-icon" data-part="icon">
-                        ${LucideIcons.calendar}
+                        ${unsafe(LucideIcons.calendar)}
                     </span>
                 ` : ''}
             </div>
@@ -551,7 +552,7 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
                     ${renderPanelContent()}
                 </div>
             </div>
-        `;
+        `);
 
         const trigger = container.querySelector<HTMLElement>('.dp-trigger')!;
         const overlay = container.querySelector<HTMLElement>('.dp-overlay')!;
@@ -591,7 +592,7 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
         bindPanelEvents(panel, disclosure);
     }
 
-    function renderPanelContent(): string {
+    function renderPanelContent(): Raw {
         if (isTimeOnly) {
             return renderTimePicker();
         }
@@ -599,7 +600,7 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
         const year = viewDate.getFullYear();
         const month = viewDate.getMonth();
 
-        let mainViewHtml = '';
+        let mainViewHtml: Raw;
         if (currentView === 'date') {
             mainViewHtml = renderDateView(year, month);
         } else if (currentView === 'month') {
@@ -608,16 +609,16 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
             mainViewHtml = renderYearView(year);
         }
 
-        return `
+        return html`
             <div class="dp-header">
                 <button type="button" class="dp-nav-btn btn-prev" aria-label="Previous">
-                    ${LucideIcons.chevronLeft}
+                    ${unsafe(LucideIcons.chevronLeft)}
                 </button>
                 <button type="button" class="dp-title-btn btn-title">
                     ${currentView === 'date' ? `${monthNames[month]} ${locale.formatDigits(year)}` : (currentView === 'month' ? `${locale.formatDigits(year)}` : `${locale.formatDigits(Math.floor(year / 10) * 10)} - ${locale.formatDigits(Math.floor(year / 10) * 10 + 9)}`)}
                 </button>
                 <button type="button" class="dp-nav-btn btn-next" aria-label="Next">
-                    ${LucideIcons.chevronRight}
+                    ${unsafe(LucideIcons.chevronRight)}
                 </button>
             </div>
 
@@ -625,7 +626,7 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
 
             ${showTime ? renderTimePicker() : ''}
 
-            ${props.showButtonBar ? `
+            ${props.showButtonBar ? html`
                 <div class="dp-buttonbar">
                     <button type="button" class="dp-bar-btn btn-today">${locale.t('today') || 'Today'}</button>
                     <button type="button" class="dp-bar-btn btn-clear">${locale.t('clear') || 'Clear'}</button>
@@ -634,19 +635,18 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
         `;
     }
 
-    function renderDateView(year: number, month: number): string {
+    function renderDateView(year: number, month: number): Raw {
         const firstDayIndex = (new Date(year, month, 1).getDay() - firstDayOfWeek + 7) % 7;
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const daysInPrevMonth = new Date(year, month, 0).getDate();
         const today = new Date();
 
-        let cellsHtml = '';
+        const cellsHtml: Raw[] = [];
 
         // Previous month filler days
         for (let i = firstDayIndex - 1; i >= 0; i--) {
             const day = daysInPrevMonth - i;
-            const d = new Date(year, month - 1, day);
-            cellsHtml += `<button type="button" class="dp-day-cell other-month disabled" disabled>${locale.formatDigits(day)}</button>`;
+            cellsHtml.push(html`<button type="button" class="dp-day-cell other-month disabled" disabled>${locale.formatDigits(day)}</button>`);
         }
 
         // Current month days
@@ -686,12 +686,12 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
                 isDisabled ? 'disabled' : ''
             ].filter(Boolean).join(' ');
 
-            cellsHtml += `<button type="button" class="${classes}" data-day="${day}">${locale.formatDigits(day)}</button>`;
+            cellsHtml.push(html`<button type="button" class="${classes}" data-day="${day}">${locale.formatDigits(day)}</button>`);
         }
 
-        return `
+        return html`
             <div class="dp-weekdays">
-                ${orderedWeekdays.map(w => `<span>${w}</span>`).join('')}
+                ${orderedWeekdays.map(w => html`<span>${w}</span>`)}
             </div>
             <div class="dp-days-grid">
                 ${cellsHtml}
@@ -699,50 +699,50 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
         `;
     }
 
-    function renderMonthView(year: number): string {
-        return `
+    function renderMonthView(year: number): Raw {
+        return html`
             <div class="dp-month-grid">
                 ${shortMonths.map((m, idx) => {
                     const isSelected = selectedDates.some(d => d.getFullYear() === year && d.getMonth() === idx);
-                    return `<button type="button" class="dp-view-btn ${isSelected ? 'selected' : ''}" data-month="${idx}">${m}</button>`;
-                }).join('')}
+                    return html`<button type="button" class="dp-view-btn ${isSelected ? 'selected' : ''}" data-month="${idx}">${m}</button>`;
+                })}
             </div>
         `;
     }
 
-    function renderYearView(year: number): string {
+    function renderYearView(year: number): Raw {
         const startYear = Math.floor(year / 10) * 10;
         const years: number[] = [];
         for (let y = startYear - 1; y <= startYear + 10; y++) {
             years.push(y);
         }
 
-        return `
+        return html`
             <div class="dp-year-grid">
                 ${years.map(y => {
                     const isSelected = selectedDates.some(d => d.getFullYear() === y);
-                    return `<button type="button" class="dp-view-btn ${isSelected ? 'selected' : ''}" data-year="${y}">${locale.formatDigits(y)}</button>`;
-                }).join('')}
+                    return html`<button type="button" class="dp-view-btn ${isSelected ? 'selected' : ''}" data-year="${y}">${locale.formatDigits(y)}</button>`;
+                })}
             </div>
         `;
     }
 
-    function renderTimePicker(): string {
+    function renderTimePicker(): Raw {
         const displayH = hour12 ? (selectedHour % 12 || 12) : selectedHour;
-        return `
+        return html`
             <div class="dp-timepicker">
                 <div class="dp-time-col">
-                    <button type="button" class="dp-time-btn btn-hour-up">${LucideIcons.chevronUp}</button>
+                    <button type="button" class="dp-time-btn btn-hour-up">${unsafe(LucideIcons.chevronUp)}</button>
                     <span class="dp-time-val">${String(displayH).padStart(2, '0')}</span>
-                    <button type="button" class="dp-time-btn btn-hour-down">${LucideIcons.chevronDown}</button>
+                    <button type="button" class="dp-time-btn btn-hour-down">${unsafe(LucideIcons.chevronDown)}</button>
                 </div>
                 <span style="font-weight: 700; color: var(--p-text-muted);">:</span>
                 <div class="dp-time-col">
-                    <button type="button" class="dp-time-btn btn-min-up">${LucideIcons.chevronUp}</button>
+                    <button type="button" class="dp-time-btn btn-min-up">${unsafe(LucideIcons.chevronUp)}</button>
                     <span class="dp-time-val">${String(selectedMinute).padStart(2, '0')}</span>
-                    <button type="button" class="dp-time-btn btn-min-down">${LucideIcons.chevronDown}</button>
+                    <button type="button" class="dp-time-btn btn-min-down">${unsafe(LucideIcons.chevronDown)}</button>
                 </div>
-                ${hour12 ? `
+                ${hour12 ? html`
                     <button type="button" class="dp-ampm-btn btn-ampm">${isPM ? 'PM' : 'AM'}</button>
                 ` : ''}
             </div>

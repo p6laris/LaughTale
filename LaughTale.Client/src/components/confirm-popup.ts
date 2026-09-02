@@ -1,12 +1,7 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
-﻿/**
- * LaughTale: Enterprise ConfirmPopup Component (LaughTale Aura Design System)
- * Anchored confirmation popup overlay with target alignment, arrow notches, smooth animations,
- * support for Basic, Template, and Headless modes, and seamless Toast notifications.
- */
-
 import { injectIslandStyle } from '../runtime/styles';
+import { html, setHtml, type Raw } from '../runtime/html';
 
 const CONFIRM_POPUP_CSS = `
 .p-confirmpopup {
@@ -218,11 +213,11 @@ export interface ConfirmPopupProps {
 }
 
 // Vector SVGs
-const ALERT_TRIANGLE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9"ツール height="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>`;
-const INFO_CIRCLE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="16" y2="12"/><line x1="12" x2="12.01" y1="8" y2="8"/></svg>`;
-const EXCLAMATION_LARGE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>`;
-const CHECK_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
-const CLOSE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>`;
+const ALERT_TRIANGLE_SVG = html`<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
+const INFO_CIRCLE_SVG = html`<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`;
+const EXCLAMATION_LARGE_SVG = html`<svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
+const CHECK_SVG = html`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+const CLOSE_SVG = html`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
 
 class ConfirmPopupManager {
     private popupEl: HTMLElement | null = null;
@@ -346,7 +341,7 @@ class ConfirmPopupManager {
         if (!this.popupEl) return;
 
         if (opt.headless) {
-            this.popupEl.innerHTML = `
+            setHtml(this.popupEl, html`
                 <div class="p-confirmpopup-headless" data-part="root">
                     <span class="p-confirmpopup-message" style="display: block; font-size: 0.875rem;">${opt.message || 'Save your current process?'}</span>
                     <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.875rem;">
@@ -358,9 +353,9 @@ class ConfirmPopupManager {
                         </button>
                     </div>
                 </div>
-            `;
+            `);
         } else if (opt.template) {
-            this.popupEl.innerHTML = `
+            setHtml(this.popupEl, html`
                 <div class="p-confirmpopup-template-body">
                     <div class="p-confirmpopup-template-icon">
                         ${EXCLAMATION_LARGE_SVG}
@@ -377,7 +372,7 @@ class ConfirmPopupManager {
                         <span>${opt.acceptLabel || 'Confirm'}</span>
                     </button>
                 </div>
-            `;
+            `);
         } else {
             const isDanger = opt.acceptSeverity === 'danger' || (opt.acceptProps && opt.acceptProps.severity === 'danger');
             const iconSvg = isDanger ? INFO_CIRCLE_SVG : ALERT_TRIANGLE_SVG;
@@ -385,7 +380,7 @@ class ConfirmPopupManager {
             const rejectLabel = opt.rejectLabel || (opt.rejectProps?.label) || 'Cancel';
             const acceptStyle = isDanger ? 'background: var(--p-red-500, #ef4444); border: 1px solid var(--p-red-500, #ef4444); color: #ffffff;' : 'background: var(--p-primary-color); border: 1px solid var(--p-primary-color); color: var(--p-primary-contrast-color, #ffffff);';
 
-            this.popupEl.innerHTML = `
+            setHtml(this.popupEl, html`
                 <div class="p-confirmpopup-content">
                     <span class="p-confirmpopup-icon ${isDanger ? 'p-confirmpopup-icon-danger' : ''}">
                         ${iconSvg}
@@ -400,7 +395,7 @@ class ConfirmPopupManager {
                         ${acceptLabel}
                     </button>
                 </div>
-            `;
+            `);
         }
 
         this.popupEl.querySelector('.btn-reject')?.addEventListener('click', () => this.close(false), { signal: opt.signal });

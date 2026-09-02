@@ -1,12 +1,7 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
-﻿/**
- * LaughTale: Enterprise ConfirmDialog Component (Aura Design System compliant)
- * Modal confirmation overlay backed by a global service, declarative trigger bindings,
- * flexible positioning, customizable templates, headless mode, and ARIA alertdialog support.
- */
-
 import { injectIslandStyle } from '../runtime/styles';
+import { html, setHtml, unsafe, type Raw } from '../runtime/html';
 
 const CONFIRM_DIALOG_CSS = `
 .p-confirmdialog-mask {
@@ -276,13 +271,13 @@ export interface ConfirmDialogProps {
 }
 
 // Vector SVG Icons
-const CLOSE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>`;
-const INFO_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="16" y2="12"/><line x1="12" x2="12.01" y1="8" y2="8"/></svg>`;
-const DANGER_ALERT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>`;
-const QUESTION_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>`;
-const CHECK_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
-const CHECK_LARGE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
-const LOCK_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`;
+const CLOSE_SVG = html`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>`;
+const INFO_ICON_SVG = html`<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="16" y2="12"/><line x1="12" x2="12.01" y1="8" y2="8"/></svg>`;
+const DANGER_ALERT_SVG = html`<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>`;
+const QUESTION_SVG = html`<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>`;
+const CHECK_SVG = html`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+const CHECK_LARGE_SVG = html`<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
+const LOCK_SVG = html`<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`;
 
 // Global Confirmation Controller Instance
 class ConfirmDialogManager {
@@ -349,29 +344,29 @@ class ConfirmDialogManager {
         this.currentOptions = null;
     }
 
-    private getIconSVG(iconName?: string): string {
-        if (!iconName) return INFO_ICON_SVG;
+    private getIconSVG(iconName?: string): Raw {
+        if (!iconName) return html`<span class="p-confirmdialog-icon">${INFO_ICON_SVG}</span>`;
         const n = iconName.toLowerCase();
         if (n.includes('danger') || n.includes('trash') || n.includes('alert') || n.includes('triangle')) {
-            return `<span class="p-confirmdialog-icon p-confirmdialog-icon-danger" data-part="root">${DANGER_ALERT_SVG}</span>`;
+            return html`<span class="p-confirmdialog-icon p-confirmdialog-icon-danger" data-part="root">${DANGER_ALERT_SVG}</span>`;
         }
         if (n.includes('warning') || n.includes('exclamation')) {
-            return `<span class="p-confirmdialog-icon p-confirmdialog-icon-warning">${DANGER_ALERT_SVG}</span>`;
+            return html`<span class="p-confirmdialog-icon p-confirmdialog-icon-warning">${DANGER_ALERT_SVG}</span>`;
         }
         if (n.includes('question') || n.includes('help')) {
-            return `<span class="p-confirmdialog-icon p-confirmdialog-icon-info">${QUESTION_SVG}</span>`;
+            return html`<span class="p-confirmdialog-icon p-confirmdialog-icon-info">${QUESTION_SVG}</span>`;
         }
         if (n.includes('check')) {
-            return `<span class="p-confirmdialog-icon">${CHECK_LARGE_SVG}</span>`;
+            return html`<span class="p-confirmdialog-icon">${CHECK_LARGE_SVG}</span>`;
         }
-        return `<span class="p-confirmdialog-icon">${INFO_ICON_SVG}</span>`;
+        return html`<span class="p-confirmdialog-icon">${INFO_ICON_SVG}</span>`;
     }
 
     private renderDialog(opt: ConfirmDialogOptions) {
         if (!this.maskEl) return;
 
         if (opt.headless) {
-            this.maskEl.innerHTML = `
+            setHtml(this.maskEl, html`
                 <div class="p-confirmdialog p-dialog p-component" role="alertdialog">
                     <div class="p-confirmdialog-headless">
                         <div class="p-confirmdialog-headless-icon">
@@ -391,15 +386,15 @@ class ConfirmDialogManager {
                         </div>
                     </div>
                 </div>
-            `;
+            `);
         } else if (opt.template) {
-            this.maskEl.innerHTML = opt.template;
+            setHtml(this.maskEl, unsafe(opt.template) /* custom dialog template */);
         } else {
             const isDanger = opt.acceptSeverity === 'danger' || (opt.icon && (opt.icon.includes('trash') || opt.icon.includes('danger')));
             const acceptBtnClass = isDanger ? 'p-button p-button-danger p-button-sm' : 'p-button p-button-primary p-button-sm';
             const acceptStyle = isDanger ? 'background: var(--p-red-500, #ef4444); border: 1px solid var(--p-red-500, #ef4444); color: #ffffff;' : 'background: var(--p-primary-color); border: 1px solid var(--p-primary-color); color: var(--p-primary-contrast-color, #ffffff);';
 
-            this.maskEl.innerHTML = `
+            setHtml(this.maskEl, html`
                 <div class="p-confirmdialog p-dialog p-component" role="alertdialog">
                     <div class="p-dialog-header">
                         <h3 class="p-dialog-title">${opt.header || 'Confirmation'}</h3>
@@ -420,7 +415,7 @@ class ConfirmDialogManager {
                         </button>
                     </div>
                 </div>
-            `;
+            `);
         }
 
         // Attach events
@@ -457,13 +452,13 @@ export function showToastFeedback(summary: string, detail: string, severity: 'su
     const textColor = isError ? 'var(--lt-danger-500, var(--lt-danger-500))' : 'var(--lt-primary-600)';
 
     toastItem.style.cssText = `background: var(--lt-surface-0); border-left: 4px solid ${borderColor}; border-radius: var(--lt-radius); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); padding: 0.75rem 1rem; width: 18rem; pointer-events: auto; display: flex; align-items: flex-start; gap: 0.5rem; animation: slideInRight 0.2s ease;`;
-    toastItem.innerHTML = `
+    setHtml(toastItem, html`
         <span style="color: ${textColor}; display: flex; align-items: center; margin-top: 2px;">${isError ? DANGER_ALERT_SVG : CHECK_SVG}</span>
         <div>
             <div style="font-weight: 700; font-size: 0.875rem; color: var(--lt-text-primary);">${summary}</div>
             <div style="font-size: 0.8125rem; color: var(--p-text-muted, var(--lt-surface-500));">${detail}</div>
         </div>
-    `;
+    `);
 
     toastContainer.appendChild(toastItem);
     setTimeout(() => {
