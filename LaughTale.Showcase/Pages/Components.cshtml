@@ -7577,15 +7577,62 @@
         <div class="card-header">
             <div>
                 <h2>Tag &amp; Status Badges</h2>
-                <p>Pill and status badge tags in emerald, amber, rose, and slate tones.</p>
+                <p>Status badges, pill indicators, and tagged labels with Aura theme severity tokens and embedded status icons.</p>
             </div>
             <span class="p-tag p-tag-secondary">Badges</span>
         </div>
-        <div class="card-body" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-            <island-tag value="Active" severity="Success" />
-            <island-tag value="Degraded" severity="Warning" />
-            <island-tag value="Offline" severity="Danger" />
-            <island-tag value="Standby" severity="Info" />
+        <div class="card-body">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; width: 100%;">
+                <!-- Severity Levels -->
+                <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem;">
+                    <div style="font-size: 0.875rem; font-weight: 600; color: var(--p-text-color);">Severity Levels</div>
+                    <p style="font-size: 0.8rem; color: var(--p-text-muted); margin: 0;">Standard Aura severity tokens in light and dark modes.</p>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <island-tag value="Primary" severity="primary" />
+                        <island-tag value="Success" severity="success" />
+                        <island-tag value="Info" severity="info" />
+                        <island-tag value="Warning" severity="warning" />
+                        <island-tag value="Danger" severity="danger" />
+                        <island-tag value="Secondary" severity="secondary" />
+                        <island-tag value="Contrast" severity="contrast" />
+                    </div>
+                </div>
+
+                <!-- Rounded Pills -->
+                <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem;">
+                    <div style="font-size: 0.875rem; font-weight: 600; color: var(--p-text-color);">Rounded Pills</div>
+                    <p style="font-size: 0.8rem; color: var(--p-text-muted); margin: 0;">Fully rounded pill tags for filter chips and telemetry states.</p>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <island-tag value="Active" severity="success" rounded="true" />
+                        <island-tag value="Pending" severity="warning" rounded="true" />
+                        <island-tag value="Offline" severity="danger" rounded="true" />
+                        <island-tag value="Archived" severity="secondary" rounded="true" />
+                    </div>
+                </div>
+
+                <!-- Icons with Tags -->
+                <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem;">
+                    <div style="font-size: 0.875rem; font-weight: 600; color: var(--p-text-color);">Embedded Icons</div>
+                    <p style="font-size: 0.8rem; color: var(--p-text-muted); margin: 0;">Lucide status icons prepended to tag content.</p>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <island-tag value="Healthy" severity="success" icon="check" />
+                        <island-tag value="High Load" severity="warning" icon="alertTriangle" />
+                        <island-tag value="Critical" severity="danger" icon="danger" />
+                        <island-tag value="In Queue" severity="info" icon="clock" />
+                    </div>
+                </div>
+
+                <!-- Rounded with Icons -->
+                <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem;">
+                    <div style="font-size: 0.875rem; font-weight: 600; color: var(--p-text-color);">Pill &amp; Icon Composite</div>
+                    <p style="font-size: 0.8rem; color: var(--p-text-muted); margin: 0;">Rounded pill shape combined with status icon indicators.</p>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <island-tag value="Verified" severity="success" icon="check" rounded="true" />
+                        <island-tag value="Standby" severity="info" icon="info" rounded="true" />
+                        <island-tag value="Blocked" severity="contrast" icon="danger" rounded="true" />
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
