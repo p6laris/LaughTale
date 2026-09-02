@@ -12,6 +12,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `laughtale:unmount` event now dispatches on an island container when it is refreshed in-place or retried, in addition to client router navigation.
   - Active mounts are now torn down prior to remounting: their `ctx.signal` is aborted, `ctx.onCleanup` callbacks are executed, and returned unmount functions run, preventing unbounded accumulation of event handlers, observers, and timers across refreshes.
 
+### Fixed
+- **Island Teardown & Lifecycle Leak Prevention (Feature 040 / LT-902):**
+  - **Defect Class:** Resolved unbounded resource accumulation where in-place island replacement (`refreshIsland()`) re-ran mounts without tearing down previous mount scopes, causing handlers to fire once per accumulated refresh and leaking memory on long-lived pages.
+  - **User-Visible Effect:** Prevented duplicate execution of click, keyboard, and global window/document event listeners upon component refreshes; eliminated memory growth caused by orphaned `ResizeObserver`, `MutationObserver`, and background timers.
+  - **Library-Wide Resource Cleanup:**
+    - Brought all element and observer disconnects to 100% (`observersDisconnected: 2 / 2`).
+    - Captured and bound 100% of timers library-wide under `ctx.onCleanup` or signal abort (`timersUncleared: 0`).
+    - Maintained 100% signal binding across all event handlers (`listenersUnmanaged: 0`).
+  - **Repaired Verification Mechanisms:**
+    - Corrected `audit-metrics.mjs` unmanaged-listener scanner using balanced-parenthesis AST argument parsing, eliminating false-positive lint artifacts (corrected baseline from 374 artificial to 3 truthful, then down to 0).
+    - Patched `leak-harness.test.ts` prototype interception and island registry lifecycle, restoring actual leak detection across window, document, and element targets.
+    - Updated `verify-contracts.mjs` (`npm run lint:contracts`) to strictly enforce signal-bound listeners, observer disconnection, and interval clearing at commit and CI gate boundaries.
+
 ### Security
 - **Safe Component Rendering Engine:**
   - Eliminated raw HTML injection defect across client component templates by migrating all 76 components to the safe tagged template primitive (`html`, `setHtml`, `safeUrl`, `attr`).
