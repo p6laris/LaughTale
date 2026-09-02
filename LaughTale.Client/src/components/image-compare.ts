@@ -34,23 +34,34 @@ export interface CompareProps {
     studioOverrides?: Record<string, any>;
 }
 
+const DEFAULT_BEFORE_IMG = 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800&auto=format&fit=crop&q=80';
+const DEFAULT_AFTER_IMG = 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&auto=format&fit=crop&q=80';
+
 const COMPARE_CSS = `
 /* ==========================================================================
    LaughTale Aura Compare Component Tokens & Styles
    ========================================================================== */
+island-compare,
+island-image-compare,
+p-compare {
+    display: block !important;
+    width: 100%;
+}
+
 .p-compare {
     position: relative;
     overflow: hidden;
     user-select: none;
     -webkit-user-select: none;
     touch-action: none;
-    border-radius: var(--p-compare-border-radius, var(--lt-radius));
-    border: 1px solid var(--lt-surface-200);
+    border-radius: var(--p-border-radius, 8px);
+    border: 1px solid var(--p-border-color, #cbd5e1);
     box-sizing: border-box;
     font-family: var(--p-font-family, inherit);
     cursor: ew-resize;
     display: block;
     width: 100%;
+    background: var(--p-surface-950, #020617);
 }
 
 .p-compare-vertical {
@@ -110,7 +121,7 @@ const COMPARE_CSS = `
     z-index: 3;
     pointer-events: none;
     box-sizing: border-box;
-    background: var(--p-compare-handle-background, var(--lt-surface-0));
+    background: #ffffff;
     box-shadow: 0 0 8px rgba(0, 0, 0, 0.45);
     will-change: left, top;
 }
@@ -119,7 +130,7 @@ const COMPARE_CSS = `
 .p-compare:not(.p-compare-vertical) .p-compare-handle {
     top: 0;
     bottom: 0;
-    width: var(--p-compare-handle-size, 2px);
+    width: 2px;
     transform: translateX(-50%);
 }
 
@@ -127,7 +138,7 @@ const COMPARE_CSS = `
 .p-compare-vertical .p-compare-handle {
     left: 0;
     right: 0;
-    height: var(--p-compare-handle-size, 2px);
+    height: 2px;
     transform: translateY(-50%);
 }
 
@@ -136,11 +147,12 @@ const COMPARE_CSS = `
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: var(--p-compare-indicator-size, 2.25rem);
-    height: var(--p-compare-indicator-size, 2.25rem);
-    border-radius: var(--p-compare-indicator-border-radius, 9999px);
-    background: var(--p-compare-indicator-background, var(--lt-surface-0));
-    color: var(--lt-text-primary);
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    background: var(--p-surface-0, #ffffff);
+    color: var(--p-text-color, #1e293b);
+    border: 1px solid var(--p-border-color, #cbd5e1);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
     display: flex;
     align-items: center;
@@ -161,7 +173,7 @@ const COMPARE_CSS = `
 
 .p-compare:focus-within .p-compare-indicator {
     outline: none;
-    box-shadow: 0 0 0 var(--p-compare-indicator-focus-ring-width, 3px) var(--p-compare-indicator-focus-ring-color, rgba(16, 185, 129, 0.4)), 0 4px 12px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.4), 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 
 /* Custom Translucent Bubble Handle */
@@ -170,38 +182,36 @@ const COMPARE_CSS = `
     box-shadow: none !important;
 }
 .p-compare-custom-handle .p-compare-indicator {
-    width: 1.25rem !important;
-    height: 1.25rem !important;
-    background: rgba(255, 255, 255, 0.6) !important;
+    width: 1.5rem !important;
+    height: 1.5rem !important;
+    background: rgba(255, 255, 255, 0.75) !important;
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
 }
 .p-compare-custom-handle .p-compare-indicator:hover {
-    transform: translate(-50%, -50%) scale(1.5) !important;
+    transform: translate(-50%, -50%) scale(1.35) !important;
 }
 
 /* Dark Mode Tokens */
 html.dark .p-compare,
 [data-theme="dark"] .p-compare,
 .dark .p-compare {
-    border-color: var(--p-border-color);
+    border-color: var(--p-surface-700, #334155);
 }
 
 html.dark .p-compare-indicator,
 [data-theme="dark"] .p-compare-indicator,
 .dark .p-compare-indicator {
-    background: var(--p-surface-0);
-    color: var(--p-text-color);
-    border: 1px solid var(--p-border-color);
+    background: var(--p-surface-900, #0f172a);
+    color: var(--p-surface-100, #f8fafc);
+    border: 1px solid var(--p-surface-700, #334155);
 }
 `;
 
 const ARROWS_H_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 8 4 4-4 4"/><path d="M2 12h20"/><path d="m6 8-4 4 4 4"/></svg>`;
 const CODE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>`;
-
-const DEFAULT_BEFORE_IMG = '/images/compare/island2.jpg';
-const DEFAULT_AFTER_IMG = '/images/compare/island1.jpg';
 
 export default function CompareIsland(container: HTMLElement, props: CompareProps, ctx?: IslandContext) {
     injectIslandStyle('compare', COMPARE_CSS);

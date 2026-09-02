@@ -818,10 +818,22 @@ public record CarouselProps(
     bool Circular = false, bool AutoPlay = false, int? AutoPlayInterval = 3000, string? Orientation = "horizontal"
 );
 
+[LaughTale.Core.Attributes.Island("compare")]
+public record CompareProps(
+    string? LeftImage = null, string? RightImage = null, string? BeforeImage = null, string? AfterImage = null,
+    double Position = 50, double? Value = 50, double? ModelValue = 50,
+    string? LeftAlt = null, string? RightAlt = null, string? BeforeLabel = null, string? AfterLabel = null,
+    string? Orientation = "horizontal", bool SlideOnHover = false, bool CustomHandle = false,
+    string? DemoType = null, bool Disabled = false, bool Readonly = false
+);
+
 [LaughTale.Core.Attributes.Island("image-compare")]
 public record ImageCompareProps(
-    string LeftImage = "", string RightImage = "", double Position = 50,
-    string? LeftAlt = null, string? RightAlt = null
+    string? LeftImage = null, string? RightImage = null, string? BeforeImage = null, string? AfterImage = null,
+    double Position = 50, double? Value = 50, double? ModelValue = 50,
+    string? LeftAlt = null, string? RightAlt = null, string? BeforeLabel = null, string? AfterLabel = null,
+    string? Orientation = "horizontal", bool SlideOnHover = false, bool CustomHandle = false,
+    string? DemoType = null, bool Disabled = false, bool Readonly = false
 );
 
 [LaughTale.Core.Attributes.Island("popover")]

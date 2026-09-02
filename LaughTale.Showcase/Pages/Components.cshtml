@@ -7845,58 +7845,47 @@
         <div class="card-header">
             <div>
                 <h2>Compare</h2>
-                <p>Compare two items side by side with a slider. Supports horizontal/vertical orientation, slide on hover, custom handles, SVG chart reveal, rich template comparisons, and two-way value binding.</p>
+                <p>Compare two items side by side with an interactive slider. Supports horizontal/vertical orientation, slide on hover, custom handles, SVG chart reveal, and rich template comparisons.</p>
             </div>
             <span class="p-tag p-tag-success">LaughTale Aura</span>
         </div>
-        <div class="card-body" style="display: flex; flex-direction: column; gap: 2.5rem;">
-            <!-- Demo 1: Basic -->
-            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
-                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic</h3>
-                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Compare is composed with Compare as the root, two CompareItem layers, and a CompareHandle containing the keyboard-accessible CompareIndicator.</p>
-                <island-compare demo-type="basic" />
-            </div>
+        <div class="card-body">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(440px, 1fr)); gap: 1.5rem; width: 100%;">
+                <!-- Demo 1: Basic & Custom Handle -->
+                <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); display: flex; flex-direction: column; gap: 1rem;">
+                    <div>
+                        <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic Comparison</h3>
+                        <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin: 0;">Standard dual-layer comparison slider with draggable indicator and keyboard arrow navigation.</p>
+                    </div>
+                    <island-compare demo-type="basic" />
+                </div>
 
-            <!-- Demo 2: Custom Handle -->
-            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
-                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Custom Handle</h3>
-                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">The handle can be styled freely â€” give the indicator a rounded background, custom icon, and shadow for a more prominent look.</p>
-                <island-compare demo-type="custom-handle" custom-handle="true" />
-            </div>
+                <!-- Demo 2: Custom Translucent Handle -->
+                <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); display: flex; flex-direction: column; gap: 1rem;">
+                    <div>
+                        <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Custom Bubble Handle</h3>
+                        <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin: 0;">Translucent frosted-glass circular indicator bubble with smooth hover expansion.</p>
+                    </div>
+                    <island-compare demo-type="custom-handle" custom-handle="true" />
+                </div>
 
-            <!-- Demo 3: Hover -->
-            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
-                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Hover</h3>
-                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Enable slideOnHover to update the slider position by hovering over the component.</p>
-                <island-compare demo-type="hover" slide-on-hover="true" />
-            </div>
+                <!-- Demo 3: Hover & Vertical -->
+                <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); display: flex; flex-direction: column; gap: 1rem;">
+                    <div>
+                        <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Slide On Hover & Vertical</h3>
+                        <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin: 0;">Instant cursor tracking on hover with vertical top-to-bottom partition layout.</p>
+                    </div>
+                    <island-compare demo-type="vertical" orientation="vertical" slide-on-hover="true" />
+                </div>
 
-            <!-- Demo 4: Vertical -->
-            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
-                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Vertical</h3>
-                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Set orientation to vertical for a vertical comparison layout.</p>
-                <island-compare demo-type="vertical" orientation="vertical" />
-            </div>
-
-            <!-- Demo 5: With Chart -->
-            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
-                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">With Chart</h3>
-                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Combine slideOnHover with controlled value for interactive chart reveals.</p>
-                <island-compare demo-type="with-chart" slide-on-hover="true" />
-            </div>
-
-            <!-- Demo 6: Controlled -->
-            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
-                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Controlled</h3>
-                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Bind the value with v-model when external UI needs to stay in sync with the slider.</p>
-                <island-compare demo-type="controlled" />
-            </div>
-
-            <!-- Demo 7: Template -->
-            <div style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
-                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Template</h3>
-                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.5rem;">Compare is not limited to images â€” any content can be placed inside the items for creative comparisons.</p>
-                <island-compare demo-type="template" />
+                <!-- Demo 4: Chart Reveal & Controlled Precision -->
+                <div style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); display: flex; flex-direction: column; gap: 1rem;">
+                    <div>
+                        <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Controlled Precision Sync</h3>
+                        <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin: 0;">External preset triggers and numeric input synchronized with the slider position.</p>
+                    </div>
+                    <island-compare demo-type="controlled" />
+                </div>
             </div>
         </div>
     </section>
