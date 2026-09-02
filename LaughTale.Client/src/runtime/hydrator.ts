@@ -129,6 +129,7 @@ export async function retryIsland(container: HTMLElement): Promise<void> {
     const name = container.getAttribute('data-island') || container.getAttribute('name');
     if (!name) return;
 
+    teardownIsland(container);
     // Reset state to allow clean re-execution
     (container as any)[HYDRATION_STATE_KEY] = 'idle';
     await executeHydration(container, name);
@@ -342,11 +343,21 @@ function hydrateMedia(container: HTMLElement, name: string, query: string | null
 }
 
 /**
+ * Tears down the active mount on an island container, aborting its signal and running cleanups.
+ */
+export function teardownIsland(container: HTMLElement): void {
+    const CustomEventCtor = (container.ownerDocument?.defaultView as any)?.CustomEvent
+        || (typeof CustomEvent !== 'undefined' ? CustomEvent : Event);
+    container.dispatchEvent(new CustomEventCtor('laughtale:unmount', { bubbles: false }));
+}
+
+/**
  * Forces re-hydration of an island with updated props (used by server-driven refresh).
  */
 export async function rehydrateIsland(container: HTMLElement): Promise<void> {
     const name = container.getAttribute('data-island');
     if (!name) return;
+    teardownIsland(container);
     delete (container as any)[HYDRATION_STATE_KEY];
     await executeHydration(container, name);
 }
