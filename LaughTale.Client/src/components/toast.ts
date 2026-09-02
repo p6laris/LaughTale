@@ -409,7 +409,7 @@ const CLOSE_SVG = `<svg class="p-toast-close-icon" data-part="root" xmlns="http:
 
 export class ToastService {
     private registeredContainers: Map<string, HTMLElement> = new Map();
-    private activeMessages: Map<string, { el: HTMLElement; timeoutId?: any; remainingLife: number; startTime: number }> = new Map();
+    private activeMessages: Map<string, { el: HTMLElement; timeoutId?: any; remainingLife: number; startTime: number; signal?: AbortSignal }> = new Map();
 
     constructor() {
     }
@@ -545,7 +545,8 @@ export class ToastService {
             el: toastEl,
             timeoutId: undefined as any,
             remainingLife: life,
-            startTime: Date.now()
+            startTime: Date.now(),
+            signal: msg.signal
         };
 
         const startTimer = (duration: number) => {
@@ -627,8 +628,9 @@ export class ToastService {
             el.removeEventListener('transitionend', onEnd);
             el.remove();
         };
-        el.addEventListener('transitionend', onEnd);
-        setTimeout(onEnd, 250);
+        el.addEventListener('transitionend', onEnd, { signal: item.signal });
+        const fallback = setTimeout(onEnd, 250);
+        item.signal?.addEventListener?.('abort', () => clearTimeout(fallback), { once: true });
     }
 
     public remove(msg: ToastMessageOptions | string) {

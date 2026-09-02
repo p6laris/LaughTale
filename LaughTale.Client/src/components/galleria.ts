@@ -410,8 +410,9 @@ export default function GalleriaIsland(container: HTMLElement, props: GalleriaPr
     startAutoplay();
 
     if (ctx?.signal) {
-        ctx.signal.addEventListener('abort', () => stopAutoplay());
+        ctx.signal.addEventListener('abort', () => stopAutoplay(), { signal: ctx.signal });
     }
+    ctx?.onCleanup?.(() => stopAutoplay());
 
     container.setAttribute('data-part', 'root');
     applyPart(container, 'root', props.class || '', props.pt, props.studioOverrides);

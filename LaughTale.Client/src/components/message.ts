@@ -597,10 +597,11 @@ export default function MessageIsland(container: HTMLElement, props: MessageProp
                                 });
                             });
                         });
-                        setTimeout(() => {
+                        const tClear = setTimeout(() => {
                             dynamicMessages = [];
                             setHtml(listContainer, html``);
                         }, 240);
+                        ctx?.onCleanup?.(() => clearTimeout(tClear));
                     }
                 }, { signal: ctx?.signal });
             }
@@ -664,8 +665,9 @@ export default function MessageIsland(container: HTMLElement, props: MessageProp
                         msgEl.remove();
                     }
                 };
-                msgEl.addEventListener('transitionend', onEnd);
-                setTimeout(onEnd, 250);
+                msgEl.addEventListener('transitionend', onEnd, { signal: ctx?.signal });
+                const fallback = setTimeout(onEnd, 250);
+                ctx?.onCleanup?.(() => clearTimeout(fallback));
             };
 
             if (closeBtn) {
@@ -685,9 +687,10 @@ export default function MessageIsland(container: HTMLElement, props: MessageProp
             if (lifeStr) {
                 const duration = parseInt(lifeStr, 10);
                 if (!isNaN(duration) && duration > 0) {
-                    setTimeout(() => {
+                    const tLife = setTimeout(() => {
                         dismissMessage();
                     }, duration);
+                    ctx?.onCleanup?.(() => clearTimeout(tLife));
                 }
             }
         });
