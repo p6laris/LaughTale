@@ -8,6 +8,7 @@ import type { IslandContext } from '../runtime/registry';
  */
 
 import { injectIslandStyle } from '../runtime/styles';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 export interface TimelineProps {
     value?: any[];
@@ -669,16 +670,16 @@ export default function TimelineIsland(container: HTMLElement, props: TimelinePr
             `;
         }).join('');
 
-        container.innerHTML = `
+        setHtml(container, html`
             <div class="p-timeline-wrapper" style="width: 100%;">
-                ${interactiveHeaderHtml}
-                ${activityHeaderHtml}
+                ${unsafe(interactiveHeaderHtml)}
+                ${unsafe(activityHeaderHtml)}
                 <div class="p-timeline p-component ${layoutClass} ${alignClass}" role="list">
-                    ${eventsHtml}
+                    ${unsafe(eventsHtml)}
                 </div>
-                ${interactiveCelebrationHtml}
+                ${unsafe(interactiveCelebrationHtml)}
             </div>
-        `;
+        `);
 
         bindEvents();
     }

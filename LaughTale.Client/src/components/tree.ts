@@ -10,6 +10,7 @@ import type { IslandContext } from '../runtime/registry';
 
 import { TreeNode } from '../types/models';
 import { injectIslandStyle } from '../runtime/styles';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 export interface TreeProps {
     value?: TreeNode[];
@@ -562,7 +563,7 @@ export default function TreeIsland(container: HTMLElement, props: TreeProps, ctx
         }, []);
     }
 
-    function renderNode(node: any, level: number = 0): string {
+    function renderNode(node: any, level: number = 0): Raw {
         const key = String(node.key || node.id);
         const hasChildren = (node.children && node.children.length > 0) || (isLazy && !node.leaf);
         const isExpanded = !!expandedKeys[key];
@@ -572,50 +573,50 @@ export default function TreeIsland(container: HTMLElement, props: TreeProps, ctx
         const isPartial = selectionMode === 'checkbox' && !!checkboxSelectionKeys[key]?.partialChecked;
 
         // Toggle icon determination
-        let toggleSvg = '';
+        let toggleSvg: Raw | '' = '';
         if (hasChildren) {
             if (node.loading) {
-                toggleSvg = SVG_ICONS.spinner;
+                toggleSvg = unsafe(SVG_ICONS.spinner);
             } else if (toggleIconType === 'plusMinus') {
-                toggleSvg = isExpanded ? SVG_ICONS.minusCircle : SVG_ICONS.plusCircle;
+                toggleSvg = isExpanded ? unsafe(SVG_ICONS.minusCircle) : unsafe(SVG_ICONS.plusCircle);
             } else {
-                toggleSvg = isExpanded ? SVG_ICONS.chevronDown : SVG_ICONS.chevronRight;
+                toggleSvg = isExpanded ? unsafe(SVG_ICONS.chevronDown) : unsafe(SVG_ICONS.chevronRight);
             }
         }
 
         // Node content icon
-        let iconSvg = '';
+        let iconSvg: Raw | '' = '';
         if (node.icon) {
-            iconSvg = node.icon.startsWith('<svg') ? node.icon : (SVG_ICONS[node.icon as keyof typeof SVG_ICONS] || SVG_ICONS.file);
+            iconSvg = unsafe(node.icon.startsWith('<svg') ? node.icon : (SVG_ICONS[node.icon as keyof typeof SVG_ICONS] || SVG_ICONS.file));
         } else if (hasChildren) {
-            iconSvg = isExpanded ? SVG_ICONS.folderOpen : SVG_ICONS.folder;
+            iconSvg = unsafe(isExpanded ? SVG_ICONS.folderOpen : SVG_ICONS.folder);
         } else {
-            iconSvg = SVG_ICONS.file;
+            iconSvg = unsafe(SVG_ICONS.file);
         }
 
         // Checkbox box
-        let checkboxHtml = '';
+        let checkboxHtml: Raw | '' = '';
         if (selectionMode === 'checkbox') {
-            checkboxHtml = `
+            checkboxHtml = html`
                 <div class="p-tree-node-checkbox" role="checkbox" aria-checked="${isSelected ? 'true' : isPartial ? 'mixed' : 'false'}">
                     <div class="p-tree-checkbox-box ${isSelected ? 'p-highlight' : isPartial ? 'p-indeterminate' : ''}">
-                        ${isSelected ? SVG_ICONS.check : isPartial ? SVG_ICONS.minus : ''}
+                        ${isSelected ? unsafe(SVG_ICONS.check) : isPartial ? unsafe(SVG_ICONS.minus) : ''}
                     </div>
                 </div>
             `;
         }
 
         // Children HTML
-        let childrenHtml = '';
+        let childrenHtml: Raw | '' = '';
         if (hasChildren && isExpanded && node.children) {
-            childrenHtml = `
+            childrenHtml = html`
                 <ul class="p-tree-node-children" role="group">
-                    ${node.children.map((child: any) => renderNode(child, level + 1)).join('')}
+                    ${node.children.map((child: any) => renderNode(child, level + 1))}
                 </ul>
             `;
         }
 
-        return `
+        return html`
             <li class="p-tree-node" role="treeitem" data-key="${key}" aria-expanded="${isExpanded}" aria-selected="${isSelected}" ${isDraggable ? 'draggable="true"' : ''}>
                 <div class="p-tree-node-content ${isSelected ? 'p-tree-node-selected' : ''}" data-key="${key}" tabindex="0">
                     <button type="button" class="p-tree-node-toggle-button ${!hasChildren ? 'p-tree-node-toggle-placeholder' : ''}" data-toggle-key="${key}" tabindex="-1" aria-label="Toggle">
@@ -634,22 +635,22 @@ export default function TreeIsland(container: HTMLElement, props: TreeProps, ctx
         const displayNodes = filterTreeNodes(treeData, filterQuery);
 
         // 1. Optional Controls Header
-        let controlsHtml = '';
+        let controlsHtml: Raw | '' = '';
         if (showControls) {
-            controlsHtml = `
+            controlsHtml = html`
                 <div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;">
                     <button type="button" class="p-tree-expand-all p-button p-component p-button-outlined" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.35rem 0.75rem; font-size: 0.8125rem; font-weight: 600; border-radius: 6px; border: 1px solid var(--lt-surface-300); background: var(--lt-surface-0); cursor: pointer; color: var(--lt-surface-700);">
-                        ${SVG_ICONS.plus} Expand All
+                        ${unsafe(SVG_ICONS.plus)} Expand All
                     </button>
                     <button type="button" class="p-tree-collapse-all p-button p-component p-button-outlined" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.35rem 0.75rem; font-size: 0.8125rem; font-weight: 600; border-radius: 6px; border: 1px solid var(--lt-surface-300); background: var(--lt-surface-0); cursor: pointer; color: var(--lt-surface-700);">
-                        ${SVG_ICONS.minus} Collapse All
+                        ${unsafe(SVG_ICONS.minus)} Collapse All
                     </button>
                 </div>
             `;
         }
 
         // 2. Select All Checkbox Header
-        let selectAllHtml = '';
+        let selectAllHtml: Raw | '' = '';
         if (showSelectAll && selectionMode === 'checkbox') {
             const allKeys = getAllKeys(treeData);
             const selectedCount = Object.values(checkboxSelectionKeys).filter(v => v?.checked).length;
@@ -657,10 +658,10 @@ export default function TreeIsland(container: HTMLElement, props: TreeProps, ctx
             const isAll = allKeys.length > 0 && selectedCount === allKeys.length;
             const isSome = (selectedCount > 0 || partialCount > 0) && !isAll;
 
-            selectAllHtml = `
+            selectAllHtml = html`
                 <div class="p-tree-select-all-header" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0.5rem 0.75rem 0.5rem; border-bottom: 1px solid var(--lt-surface-200); margin-bottom: 0.5rem; cursor: pointer;">
                     <div class="p-tree-checkbox-box ${isAll ? 'p-highlight' : isSome ? 'p-indeterminate' : ''}">
-                        ${isAll ? SVG_ICONS.check : isSome ? SVG_ICONS.minus : ''}
+                        ${isAll ? unsafe(SVG_ICONS.check) : isSome ? unsafe(SVG_ICONS.minus) : ''}
                     </div>
                     <label style="font-weight: 600; font-size: 0.875rem; color: var(--lt-surface-800); cursor: pointer;">Select All</label>
                 </div>
@@ -668,10 +669,10 @@ export default function TreeIsland(container: HTMLElement, props: TreeProps, ctx
         }
 
         // 3. Keyboard Navigation Banner
-        let keyboardBannerHtml = '';
+        let keyboardBannerHtml: Raw | '' = '';
         if (keyboardInfo) {
             const selectedCount = Object.values(multiSelectionKeys).filter(Boolean).length;
-            keyboardBannerHtml = `
+            keyboardBannerHtml = html`
                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.65rem 0.85rem; border-radius: 6px; border: 1px solid var(--lt-surface-200); background: var(--lt-surface-50); margin-bottom: 0.75rem;">
                     <span style="font-size: 0.8125rem; color: var(--lt-surface-600);">
                         <kbd style="padding: 0.15rem 0.4rem; font-size: 0.75rem; border-radius: 4px; background: var(--lt-surface-200); font-family: monospace;">↑</kbd>
@@ -689,78 +690,78 @@ export default function TreeIsland(container: HTMLElement, props: TreeProps, ctx
         }
 
         // 4. Search Filter Input
-        let filterHtml = '';
+        let filterHtml: Raw | '' = '';
         if (props.filter) {
-            filterHtml = `
+            filterHtml = html`
                 <div class="p-tree-filter-container">
-                    <span class="p-tree-filter-icon">${SVG_ICONS.search}</span>
+                    <span class="p-tree-filter-icon">${unsafe(SVG_ICONS.search)}</span>
                     <input type="text" class="p-tree-filter-input" placeholder="${props.filterPlaceholder || 'Search'}" value="${filterQuery}" />
                 </div>
             `;
         }
 
         // 5. Loading Overlay
-        let loadingOverlayHtml = '';
+        let loadingOverlayHtml: Raw | '' = '';
         if (isLoading && props.loadingMode !== 'icon') {
-            loadingOverlayHtml = `
+            loadingOverlayHtml = html`
                 <div class="p-tree-loading-overlay">
-                    <span style="color: var(--lt-primary-500);">${SVG_ICONS.spinner}</span>
+                    <span style="color: var(--lt-primary-500);">${unsafe(SVG_ICONS.spinner)}</span>
                 </div>
             `;
         }
 
         // 6. Tree Body / Skeleton / Empty
-        let treeBodyHtml = '';
+        let treeBodyHtml: Raw = html``;
         if (isSkeleton && isLoading) {
-            treeBodyHtml = `
+            treeBodyHtml = html`
                 <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-                    ${Array.from({ length: 5 }).map((_, i) => `
+                    ${Array.from({ length: 5 }).map((_, i) => html`
                         <div class="p-tree-skeleton-row" style="padding-left: ${i > 1 ? '1.5rem' : '0.5rem'};">
                             <div class="p-tree-skeleton-icon"></div>
                             <div class="p-tree-skeleton-text" style="width: ${70 - (i * 10)}%;"></div>
                         </div>
-                    `).join('')}
+                    `)}
                 </div>
             `;
         } else if (displayNodes.length === 0) {
             if (filterQuery) {
-                treeBodyHtml = `<div style="padding: 1rem; text-align: center; color: var(--lt-surface-500); font-size: 0.875rem;">No options found.</div>`;
+                treeBodyHtml = html`<div style="padding: 1rem; text-align: center; color: var(--lt-surface-500); font-size: 0.875rem;">No options found.</div>`;
             } else {
-                treeBodyHtml = `
+                treeBodyHtml = html`
                     <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.75rem; padding: 2.5rem 1rem; text-align: center;">
                         <div style="width: 3.5rem; height: 3.5rem; border-radius: 9999px; background: var(--lt-surface-100); display: flex; align-items: center; justify-content: center; color: var(--lt-surface-400);">
-                            <span style="transform: scale(1.4);">${SVG_ICONS.folder}</span>
+                            <span style="transform: scale(1.4);">${unsafe(SVG_ICONS.folder)}</span>
                         </div>
                         <div>
                             <p style="margin: 0; font-weight: 700; color: var(--lt-surface-900); font-size: 0.9375rem;">No folders yet</p>
                             <p style="margin: 0.25rem 0 0 0; font-size: 0.8125rem; color: var(--lt-surface-500);">Create your first folder to start building a tree.</p>
                         </div>
                         <button type="button" class="p-tree-add-node-btn p-button p-component p-button-sm" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.4rem 0.85rem; font-size: 0.8125rem; font-weight: 600; border-radius: 6px; background: var(--lt-primary-500); color: var(--lt-surface-0, var(--lt-surface-0)); border: none; cursor: pointer;">
-                            ${SVG_ICONS.plus} New Folder
+                            ${unsafe(SVG_ICONS.plus)} New Folder
                         </button>
                     </div>
                 `;
             }
         } else {
-            treeBodyHtml = `
+            treeBodyHtml = html`
                 <ul class="p-tree-root-children" role="tree">
-                    ${displayNodes.map(node => renderNode(node, 0)).join('')}
+                    ${displayNodes.map(node => renderNode(node, 0))}
                 </ul>
             `;
         }
 
-        container.innerHTML = `
+        setHtml(container, html`
             ${controlsHtml}
             ${keyboardBannerHtml}
             <div class="p-tree p-component" role="tree" tabindex="-1">
-                ${filterHtml ? `<div class="p-tree-header">${filterHtml}</div>` : ''}
+                ${filterHtml ? html`<div class="p-tree-header">${filterHtml}</div>` : ''}
                 ${selectAllHtml}
                 ${loadingOverlayHtml}
                 <div class="p-tree-wrapper">
                     ${treeBodyHtml}
                 </div>
             </div>
-        `;
+        `);
 
         bindEvents();
     }

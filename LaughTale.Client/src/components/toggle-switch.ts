@@ -8,6 +8,7 @@ import type { IslandContext } from '../runtime/registry';
 
 import { injectIslandStyle } from '../runtime/styles';
 import { getLucideIcon } from '../icons/lucide';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 export interface ToggleSwitchProps {
     checked?: boolean;
@@ -225,20 +226,21 @@ export default function ToggleSwitchIsland(container: HTMLElement, props: Toggle
         container.className = rootClasses;
 
         const activeIcon = isChecked ? checkedIcon : uncheckedIcon;
-        const iconHtml = activeIcon ? `<span class="p-toggleswitch-handle-icon" data-part="root">${getLucideIcon(activeIcon, 10)}</span>` : '';
+        const iconHtml = activeIcon ? html`<span class="p-toggleswitch-handle-icon" data-part="root">${unsafe(getLucideIcon(activeIcon, 10))}</span>` : '';
+        const ariaLabelVal = props.ariaLabel || props.label || props.name || 'Toggle switch';
 
-        container.innerHTML = `
+        setHtml(container, html`
             <input 
                 type="checkbox" 
                 role="switch"
                 class="p-toggleswitch-input"
-                ${inputId ? `id="${inputId}"` : ''}
+                ${attr('id', inputId)}
                 name="${inputName}"
-                ${isChecked ? 'checked' : ''}
-                ${isDisabled ? 'disabled' : ''}
+                ${attr('checked', isChecked)}
+                ${attr('disabled', isDisabled)}
                 aria-checked="${isChecked ? 'true' : 'false'}"
-                ${props.ariaLabel ? `aria-label="${props.ariaLabel}"` : (props.label ? `aria-label="${props.label}"` : (props.name ? `aria-label="${props.name}"` : 'aria-label="Toggle switch"'))}
-                ${props.ariaLabelledBy ? `aria-labelledby="${props.ariaLabelledBy}"` : ''}
+                aria-label="${ariaLabelVal}"
+                ${attr('aria-labelledby', props.ariaLabelledBy)}
                 tabindex="${isDisabled ? '-1' : '0'}"
             />
             <div class="p-toggleswitch-slider ${props.sliderClass || ''}">
@@ -246,8 +248,8 @@ export default function ToggleSwitchIsland(container: HTMLElement, props: Toggle
                     ${iconHtml}
                 </div>
             </div>
-            ${props.label ? `<span class="p-toggleswitch-label">${props.label}</span>` : ''}
-        `;
+            ${props.label ? html`<span class="p-toggleswitch-label">${props.label}</span>` : ''}
+        `);
 
         bindEvents();
     }

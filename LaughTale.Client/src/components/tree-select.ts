@@ -11,6 +11,7 @@ import { injectIslandStyle } from '../runtime/styles';
 import { useDisclosure } from '../composables/useDisclosure';
 import { useClickOutside } from '../composables/useClickOutside';
 import { useControllableState } from '../composables/useControllableState';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 export interface TreeNodeItem {
     key: string;
@@ -637,33 +638,33 @@ export default function TreeSelectIsland(container: HTMLElement, props: TreeSele
         ].filter(Boolean).join(' ');
 
         container.className = rootClasses;
-        container.innerHTML = `
+        setHtml(container, html`
             <div class="p-treeselect-label-container" data-part="root" tabindex="${isDisabled ? '-1' : '0'}" role="combobox" aria-haspopup="tree" aria-expanded="false" aria-controls="${props.inputId || 'treeselect'}_overlay">
                 <div class="p-treeselect-label"></div>
                 <div class="p-treeselect-actions">
                     <button type="button" class="p-treeselect-clear-icon" aria-label="Clear selection" tabindex="-1" style="display: none;">
-                        ${xSvg}
+                        ${unsafe(xSvg)}
                     </button>
                     <span class="p-treeselect-dropdown-icon">
-                        ${chevronDownSvg}
+                        ${unsafe(chevronDownSvg)}
                     </span>
                 </div>
             </div>
 
             <div class="p-treeselect-overlay" id="${props.inputId || 'treeselect'}_overlay" role="dialog">
-                ${props.header ? `<div class="p-treeselect-header">${props.header}</div>` : ''}
-                ${isFilter ? `
+                ${props.header ? html`<div class="p-treeselect-header">${props.header}</div>` : ''}
+                ${isFilter ? html`
                     <div class="p-treeselect-filter-container">
-                        <span style="color: var(--lt-surface-400); display: flex;">${searchSvg}</span>
+                        <span style="color: var(--lt-surface-400); display: flex;">${unsafe(searchSvg)}</span>
                         <input type="text" class="p-treeselect-filter-input" placeholder="${props.filterPlaceholder || 'Search tree...'}" />
                     </div>
                 ` : ''}
                 <ul class="p-treeselect-tree" role="tree"></ul>
-                ${props.footer ? `<div class="p-treeselect-footer">${props.footer}</div>` : ''}
+                ${props.footer ? html`<div class="p-treeselect-footer">${props.footer}</div>` : ''}
             </div>
 
             <input type="hidden" name="${props.name || props.targetInputName || 'tree_value'}" value="" />
-        `;
+        `);
 
         updateTriggerDisplay();
         renderTreeList();
@@ -697,12 +698,12 @@ export default function TreeSelectIsland(container: HTMLElement, props: TreeSele
             else clearBtn.style.display = 'none';
 
             if (displayMode === 'chip') {
-                labelEl.innerHTML = selected.map(s => `
+                setHtml(labelEl, html`${selected.map(s => html`
                     <span class="p-treeselect-token">
                         <span>${s.label}</span>
-                        ${!isDisabled ? `<button type="button" class="p-treeselect-token-remove" data-key="${s.key}" aria-label="Remove ${s.label}">${xSvg}</button>` : ''}
+                        ${!isDisabled ? html`<button type="button" class="p-treeselect-token-remove" data-key="${s.key}" aria-label="Remove ${s.label}">${unsafe(xSvg)}</button>` : ''}
                     </span>
-                `).join('');
+                `)}`);
 
                 labelEl.querySelectorAll<HTMLButtonElement>('.p-treeselect-token-remove').forEach(btn => {
                     btn.addEventListener('click', (e) => {
@@ -769,52 +770,52 @@ export default function TreeSelectIsland(container: HTMLElement, props: TreeSele
         const visibleNodes = filterTree(treeData, searchQuery.toLowerCase().trim());
 
         if (visibleNodes.length === 0) {
-            treeList.innerHTML = `<li class="p-treenode" style="padding: 1rem; text-align: center; color: var(--p-text-muted); font-size: 0.8125rem;">No results found</li>`;
+            setHtml(treeList, html`<li class="p-treenode" style="padding: 1rem; text-align: center; color: var(--p-text-muted); font-size: 0.8125rem;">No results found</li>`);
             return;
         }
 
-        function renderNodesHtml(nodes: TreeNodeItem[]): string {
+        function renderNodesHtml(nodes: TreeNodeItem[]): Raw[] {
             return nodes.map(node => {
                 const hasChildren = node.children && node.children.length > 0;
                 const isExpanded = expandedKeys.has(node.key);
                 const isSelected = selectedKeys.has(node.key);
                 const iconSvg = node.icon ? getLucideIcon(node.icon, 16) : (hasChildren ? (isExpanded ? getLucideIcon('folderOpen', 16) : getLucideIcon('folder', 16)) : getLucideIcon('fileText', 16));
 
-                let checkboxHtml = '';
+                let checkboxHtml: Raw | '' = '';
                 if (selectionMode === 'checkbox') {
                     const cbState = getCheckboxState(node);
                     const cbClass = cbState === 'checked' ? 'p-checked' : (cbState === 'indeterminate' ? 'p-indeterminate' : '');
-                    const cbIcon = cbState === 'checked' ? checkSvg : (cbState === 'indeterminate' ? minusSvg : '');
-                    checkboxHtml = `
+                    const cbIcon = cbState === 'checked' ? unsafe(checkSvg) : (cbState === 'indeterminate' ? unsafe(minusSvg) : '');
+                    checkboxHtml = html`
                         <span class="p-tree-checkbox ${cbClass}" data-key="${node.key}" role="checkbox" aria-checked="${cbState === 'checked' ? 'true' : (cbState === 'indeterminate' ? 'mixed' : 'false')}">
                             ${cbIcon}
                         </span>
                     `;
                 }
 
-                return `
-                    <li class="p-treenode" role="treeitem" aria-expanded="${hasChildren ? isExpanded : 'false'}" aria-selected="${isSelected}" data-key="${node.key}">
+                return html`
+                    <li class="p-treenode" role="treeitem" aria-expanded="${hasChildren ? (isExpanded ? 'true' : 'false') : 'false'}" aria-selected="${isSelected ? 'true' : 'false'}" data-key="${node.key}">
                         <div class="p-treenode-content ${isSelected && selectionMode !== 'checkbox' ? 'p-highlight' : ''}" data-key="${node.key}" tabindex="0">
-                            ${hasChildren ? `
+                            ${hasChildren ? html`
                                 <button type="button" class="p-tree-toggler ${isExpanded ? 'p-expanded' : ''}" data-toggle="${node.key}" aria-label="Toggle node" tabindex="-1">
-                                    ${chevronRightSvg}
+                                    ${unsafe(chevronRightSvg)}
                                 </button>
-                            ` : `<span class="p-tree-toggler-empty"></span>`}
+                            ` : html`<span class="p-tree-toggler-empty"></span>`}
                             ${checkboxHtml}
-                            <span class="p-treenode-icon">${iconSvg}</span>
+                            <span class="p-treenode-icon">${unsafe(iconSvg)}</span>
                             <span class="p-treenode-label">${node.label}</span>
                         </div>
-                        ${hasChildren && isExpanded ? `
+                        ${hasChildren && isExpanded ? html`
                             <ul class="p-treenode-children" role="group">
                                 ${renderNodesHtml(node.children!)}
                             </ul>
                         ` : ''}
                     </li>
                 `;
-            }).join('');
+            });
         }
 
-        treeList.innerHTML = renderNodesHtml(visibleNodes);
+        setHtml(treeList, html`${renderNodesHtml(visibleNodes)}`);
         bindNodeEvents();
     }
 

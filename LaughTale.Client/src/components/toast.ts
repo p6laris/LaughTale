@@ -9,6 +9,7 @@ import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 export interface ToastMessageOptions {
     id?: string;
@@ -485,36 +486,36 @@ export class ToastService {
         toastEl.setAttribute('data-toast-group', group);
 
         if (msg.contentHtml) {
-            toastEl.innerHTML = `
+            setHtml(toastEl, html`
                 <div class="p-toast-message-content">
-                    <div style="width: 100%;">${msg.contentHtml}</div>
-                    ${msg.closable !== false ? `
+                    <div style="width: 100%;">${unsafe(msg.contentHtml)}</div>
+                    ${msg.closable !== false ? html`
                         <button type="button" class="p-toast-close-button" aria-label="Close" title="Close" data-toast-close>
-                            ${CLOSE_SVG}
+                            ${unsafe(CLOSE_SVG)}
                         </button>
                     ` : ''}
                 </div>
-            `;
+            `);
         } else {
-            toastEl.innerHTML = `
+            setHtml(toastEl, html`
                 <div class="p-toast-message-content">
-                    <div class="p-toast-message-icon">${iconSvg}</div>
+                    <div class="p-toast-message-icon">${unsafe(iconSvg)}</div>
                     <div class="p-toast-message-text">
-                        ${msg.summary ? `<div class="p-toast-summary">${msg.summary}</div>` : ''}
-                        ${msg.detail ? `<div class="p-toast-detail">${msg.detail}</div>` : ''}
-                        ${msg.actionLabel ? `
+                        ${msg.summary ? html`<div class="p-toast-summary">${msg.summary}</div>` : ''}
+                        ${msg.detail ? html`<div class="p-toast-detail">${msg.detail}</div>` : ''}
+                        ${msg.actionLabel ? html`
                             <button type="button" class="p-button p-button-sm p-button-primary" style="margin-top: 0.5rem; align-self: flex-start; padding: 0.25rem 0.65rem; font-size: 0.775rem;" data-toast-action-btn>
                                 ${msg.actionLabel}
                             </button>
                         ` : ''}
                     </div>
-                    ${msg.closable !== false ? `
+                    ${msg.closable !== false ? html`
                         <button type="button" class="p-toast-close-button" aria-label="Close" title="Close" data-toast-close>
-                            ${CLOSE_SVG}
+                            ${unsafe(CLOSE_SVG)}
                         </button>
                     ` : ''}
                 </div>
-            `;
+            `);
         }
 
         const closeBtn = toastEl.querySelector('[data-toast-close]');

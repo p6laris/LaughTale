@@ -7,6 +7,7 @@ import type { IslandContext } from '../runtime/registry';
  */
 
 import { injectIslandStyle } from '../runtime/styles';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 const TOOLBAR_CSS = `
 .p-toolbar,
@@ -189,7 +190,7 @@ export default function ToolbarIsland(container: HTMLElement, props: ToolbarProp
             e.preventDefault();
             isPlaying = !isPlaying;
             playBtn.setAttribute('aria-label', isPlaying ? 'Pause' : 'Play');
-            playBtn.innerHTML = isPlaying ? PAUSE_ICON_SVG : PLAY_ICON_SVG;
+            setHtml(playBtn, isPlaying ? html`${unsafe(PAUSE_ICON_SVG)}` : html`${unsafe(PLAY_ICON_SVG)}`);
         }, { signal: ctx?.signal });
     }
 

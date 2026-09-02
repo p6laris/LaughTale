@@ -11,6 +11,7 @@ import type { IslandContext } from '../runtime/registry';
 
 import { TreeTableNode, TreeTableColumn } from '../types/models';
 import { injectIslandStyle } from '../runtime/styles';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 export interface TreeTableProps {
     value?: any[];
@@ -1159,21 +1160,21 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
         const sizeClass = size === 'small' ? 'p-treetable-sm' : (size === 'large' ? 'p-treetable-lg' : '');
         const gridlinesClass = showGridlines ? 'p-treetable-gridlines' : '';
 
-        container.innerHTML = `
-            ${topControlsHtml}
+        setHtml(container, html`
+            ${unsafe(topControlsHtml)}
             <div class="p-treetable p-component ${sizeClass} ${gridlinesClass}">
-                ${headerHtml}
-                ${loadingMaskHtml}
+                ${unsafe(headerHtml)}
+                ${unsafe(loadingMaskHtml)}
                 <div class="p-treetable-scrollable-wrapper" style="${scrollStyle}">
                     <table class="p-treetable-table">
-                        ${theadHtml}
-                        ${tbodyHtml}
+                        ${unsafe(theadHtml)}
+                        ${unsafe(tbodyHtml)}
                     </table>
                 </div>
-                ${paginatorHtml}
-                ${footerHtml}
+                ${unsafe(paginatorHtml)}
+                ${unsafe(footerHtml)}
             </div>
-        `;
+        `);
 
         bindEvents();
     }
@@ -1371,14 +1372,14 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
         menu.style.left = `${x}px`;
         menu.style.top = `${y}px`;
 
-        menu.innerHTML = `
+        setHtml(menu, unsafe(`
             <div class="p-treetable-contextmenu-item" data-action="view">
                 ${SVG_ICONS.search} View
             </div>
             <div class="p-treetable-contextmenu-item" data-action="delete" style="color: var(--lt-danger-500, var(--lt-danger-500));">
                 ${SVG_ICONS.trash} Delete
             </div>
-        `;
+        `));
 
         document.body.appendChild(menu);
 

@@ -8,6 +8,7 @@ import type { IslandContext } from '../runtime/registry';
 
 import { injectIslandStyle } from '../runtime/styles';
 import { getLucideIcon } from '../icons/lucide';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 export interface ToggleButtonProps {
     checked?: boolean;
@@ -218,14 +219,14 @@ export default function ToggleButtonIsland(container: HTMLElement, props: Toggle
         const currentLabel = isChecked ? onLabel : offLabel;
         const currentIconName = isChecked ? onIcon : offIcon;
         const iconSize = size === 'small' ? 14 : (size === 'large' ? 18 : 16);
-        const iconHtml = currentIconName ? `<span class="p-togglebutton-icon" data-part="root">${getLucideIcon(currentIconName, iconSize)}</span>` : '';
-        const labelHtml = currentLabel ? `<span class="p-togglebutton-label">${currentLabel}</span>` : '';
+        const iconHtml = currentIconName ? html`<span class="p-togglebutton-icon" data-part="root">${unsafe(getLucideIcon(currentIconName, iconSize))}</span>` : '';
+        const labelHtml = currentLabel ? html`<span class="p-togglebutton-label">${currentLabel}</span>` : '';
 
-        container.innerHTML = `
+        setHtml(container, html`
             ${iconHtml}
             ${labelHtml}
             <input type="hidden" name="${props.name || props.targetInputName || 'togglebutton_value'}" value="${isChecked ? 'true' : 'false'}" />
-        `;
+        `);
 
         bindEvents();
     }
