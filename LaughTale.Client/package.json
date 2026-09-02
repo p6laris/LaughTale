@@ -41,6 +41,8 @@
     "build:dev": "node esbuild.config.mjs",
     "typecheck": "tsc --noEmit",
     "lint:contracts": "node scripts/verify-contracts.mjs",
+    "lint:metrics": "node scripts/audit-metrics.mjs --check",
+    "verify": "npm run lint:contracts && npm run lint:metrics && npm test",
     "test": "node scripts/verify-contracts.mjs && node run-tests.mjs",
     "test:e2e": "npx playwright test"
   },
