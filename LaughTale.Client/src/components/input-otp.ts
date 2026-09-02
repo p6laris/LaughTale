@@ -1,13 +1,7 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
-﻿/**
- * LaughTale: Enterprise InputOtp Component (Aura InputOtp)
- * Multi-cell OTP PIN input with auto-advance, backspace navigation,
- * clipboard paste parsing, integer-only filtering, masked dots,
- * grouped separators, filled/outlined variants, and full dark mode awareness.
- */
-
 import { injectIslandStyle } from '../runtime/styles';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 export interface InputOtpProps {
     targetInputName?: string;
@@ -208,68 +202,42 @@ export default function InputOtpIsland(container: HTMLElement, props: InputOtpPr
         const inputMode = isIntegerOnly ? 'numeric' : 'text';
         const patternAttr = isIntegerOnly ? 'pattern="[0-9]*"' : '';
         const disabledAttr = isDisabled ? 'disabled' : '';
-        const roAttr = isReadonly ? 'readonly' : '';
+        const renderInputCell = (i: number) => html`
+            <input type="${inputType}"
+                   class="p-inputotp-input"
+                   data-index="${i}"
+                   maxlength="1"
+                   inputmode="${inputMode}"
+                   ${attr('pattern', isIntegerOnly ? '[0-9]*' : null)}
+                   ${attr('disabled', isDisabled)}
+                   ${attr('readonly', isReadonly)}
+                   value="${values[i] || ''}"
+                   autocomplete="off"
+                   aria-label="Character ${i + 1}" />
+        `;
 
-        let html = '';
+        let contentHtml: Raw;
 
         if (isGrouped && length % 2 === 0) {
             const mid = length / 2;
-            html += '<div class="p-inputotp-group" data-part="root">';
-            for (let i = 0; i < mid; i++) {
-                html += `
-                    <input type="${inputType}"
-                           class="p-inputotp-input"
-                           data-index="${i}"
-                           maxlength="1"
-                           inputmode="${inputMode}"
-                           ${patternAttr}
-                           ${disabledAttr}
-                           ${roAttr}
-                           value="${values[i] || ''}"
-                           autocomplete="off"
-                           aria-label="Character ${i + 1}" />
-                `;
-            }
-            html += '</div>';
+            const firstGroup = Array.from({ length: mid }, (_, i) => renderInputCell(i));
+            const secondGroup = Array.from({ length: length - mid }, (_, i) => renderInputCell(mid + i));
 
-            html += `<span class="p-inputotp-separator">${separator}</span>`;
-
-            html += '<div class="p-inputotp-group">';
-            for (let i = mid; i < length; i++) {
-                html += `
-                    <input type="${inputType}"
-                           class="p-inputotp-input"
-                           data-index="${i}"
-                           maxlength="1"
-                           inputmode="${inputMode}"
-                           ${patternAttr}
-                           ${disabledAttr}
-                           ${roAttr}
-                           value="${values[i] || ''}"
-                           autocomplete="off"
-                           aria-label="Character ${i + 1}" />
-                `;
-            }
-            html += '</div>';
+            contentHtml = html`
+                <div class="p-inputotp-group" data-part="root">
+                    ${firstGroup}
+                </div>
+                <span class="p-inputotp-separator">${separator}</span>
+                <div class="p-inputotp-group">
+                    ${secondGroup}
+                </div>
+            `;
         } else {
-            for (let i = 0; i < length; i++) {
-                html += `
-                    <input type="${inputType}"
-                           class="p-inputotp-input"
-                           data-index="${i}"
-                           maxlength="1"
-                           inputmode="${inputMode}"
-                           ${patternAttr}
-                           ${disabledAttr}
-                           ${roAttr}
-                           value="${values[i] || ''}"
-                           autocomplete="off"
-                           aria-label="Character ${i + 1}" />
-                `;
-            }
+            const allInputs = Array.from({ length }, (_, i) => renderInputCell(i));
+            contentHtml = html`${allInputs}`;
         }
 
-        container.innerHTML = html;
+        setHtml(container, contentHtml);
         bindEvents();
     }
 

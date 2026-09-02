@@ -2,6 +2,7 @@ import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts
 import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
 import { LucideIcons } from '../icons/lucide';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 /**
  * LaughTale: Enterprise Galleria Component (Aura Design System compliant)
@@ -297,44 +298,44 @@ export default function GalleriaIsland(container: HTMLElement, props: GalleriaPr
     function render() {
         const current = images[activeIndex] || images[0];
 
-        const thumbnailsHtml = showThumbnails ? `
+        const thumbnailsHtml = showThumbnails ? html`
             <div class="p-galleria-thumbnails-content">
-                ${images.map((img, idx) => `
+                ${images.map((img, idx) => html`
                     <div class="p-galleria-thumbnail-item ${idx === activeIndex ? 'active' : ''}" data-index="${idx}">
-                        <img src="${img.thumbnailImageSrc || img.itemImageSrc}" alt="${img.alt || ''}" />
+                        <img src="${safeUrl(img.thumbnailImageSrc || img.itemImageSrc)}" alt="${img.alt || ''}" />
                     </div>
-                `).join('')}
+                `)}
             </div>
         ` : '';
 
-        const indicatorsHtml = showIndicators ? `
+        const indicatorsHtml = showIndicators ? html`
             <div class="p-galleria-indicators">
-                ${images.map((_, idx) => `
+                ${images.map((_, idx) => html`
                     <div class="p-galleria-indicator ${idx === activeIndex ? 'active' : ''}" data-index="${idx}"></div>
-                `).join('')}
+                `)}
             </div>
         ` : '';
 
-        container.innerHTML = `
+        setHtml(container, html`
             <div class="p-galleria p-component ${props.class || ''}" style="${props.style || ''}">
                 <div class="p-galleria-item-wrapper">
                     <div class="p-galleria-item-container">
                         <div class="p-galleria-item">
-                            <img src="${current.itemImageSrc}" alt="${current.alt || ''}" />
+                            <img src="${safeUrl(current.itemImageSrc)}" alt="${current.alt || ''}" />
                         </div>
 
-                        ${showNavigators ? `
+                        ${showNavigators ? html`
                             <button type="button" class="p-galleria-item-nav p-galleria-item-prev" aria-label="Previous image">
-                                <span style="transform: rotate(90deg); display: flex;">${LucideIcons.chevronDown}</span>
+                                <span style="transform: rotate(90deg); display: flex;">${unsafe(LucideIcons.chevronDown)}</span>
                             </button>
                             <button type="button" class="p-galleria-item-nav p-galleria-item-next" aria-label="Next image">
-                                <span style="transform: rotate(-90deg); display: flex;">${LucideIcons.chevronDown}</span>
+                                <span style="transform: rotate(-90deg); display: flex;">${unsafe(LucideIcons.chevronDown)}</span>
                             </button>
                         ` : ''}
 
                         <div class="p-galleria-caption">
                             <div class="p-galleria-caption-title">${current.title || current.alt || ''}</div>
-                            ${current.subtitle ? `<div class="p-galleria-caption-subtitle">${current.subtitle}</div>` : ''}
+                            ${current.subtitle ? html`<div class="p-galleria-caption-subtitle">${current.subtitle}</div>` : ''}
                         </div>
                     </div>
                 </div>
@@ -342,7 +343,7 @@ export default function GalleriaIsland(container: HTMLElement, props: GalleriaPr
                 ${indicatorsHtml}
                 ${thumbnailsHtml}
             </div>
-        `;
+        `);
 
         bindEvents();
     }

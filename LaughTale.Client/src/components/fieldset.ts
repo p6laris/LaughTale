@@ -1,17 +1,12 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
-﻿/**
- * LaughTale: Enterprise Fieldset Component (Aura Design System compliant)
- * Grouping component with collapsible content, smooth 60fps CSS Grid animations,
- * controlled state, custom toggle indicators, and W3C APG keyboard accessibility.
- */
-
 import { injectIslandStyle } from '../runtime/styles';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 const SVG_ICONS = {
-    chevronDown: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>',
-    plus: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>',
-    minus: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>'
+    chevronDown: html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`,
+    plus: html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>`,
+    minus: html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>`
 };
 
 const FIELDSET_CSS = `
@@ -209,16 +204,16 @@ export default function FieldsetIsland(container: HTMLElement, props: FieldsetPr
         sourceNodes.forEach(node => fragment.appendChild(node));
         if (slotEl) slotEl.remove();
 
-        container.innerHTML = '';
+        setHtml(container, html``);
 
         // Add top controls if controlled mode
         if (isControlled && container.parentElement && !container.parentElement.querySelector('.p-fieldset-top-controls')) {
             const topControls = document.createElement('div');
             topControls.className = 'p-fieldset-top-controls';
-            topControls.innerHTML = `
+            setHtml(topControls, html`
                 <button type="button" class="p-fieldset-ctrl-btn ${!isCollapsed ? 'p-highlight' : ''}" data-action="open">Open</button>
                 <button type="button" class="p-fieldset-ctrl-btn ${isCollapsed ? 'p-highlight' : ''}" data-action="close">Close</button>
-            `;
+            `);
             container.parentElement.insertBefore(topControls, container);
         }
 
@@ -235,9 +230,9 @@ export default function FieldsetIsland(container: HTMLElement, props: FieldsetPr
             const iconSpan = document.createElement('span');
             iconSpan.className = 'p-fieldset-toggle-icon';
             if (toggleIconType === 'plusMinus') {
-                iconSpan.innerHTML = isCollapsed ? SVG_ICONS.plus : SVG_ICONS.minus;
+                setHtml(iconSpan, isCollapsed ? SVG_ICONS.plus : SVG_ICONS.minus);
             } else {
-                iconSpan.innerHTML = SVG_ICONS.chevronDown;
+                setHtml(iconSpan, SVG_ICONS.chevronDown);
             }
             toggleBtn.appendChild(iconSpan);
 
@@ -301,7 +296,7 @@ export default function FieldsetIsland(container: HTMLElement, props: FieldsetPr
 
         if (iconSpan) {
             if (toggleIconType === 'plusMinus') {
-                iconSpan.innerHTML = isCollapsed ? SVG_ICONS.plus : SVG_ICONS.minus;
+                setHtml(iconSpan, isCollapsed ? SVG_ICONS.plus : SVG_ICONS.minus);
             }
         }
 

@@ -1,13 +1,8 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
-﻿/**
- * LaughTale: Enterprise InputTags Component (Aura InputTags / Chips)
- * Zero-flicker incremental DOM tokenization, custom delimiters, paste splitting,
- * duplicate handling, max capacity locking, and typeahead suggestions.
- */
-
 import { injectIslandStyle } from '../runtime/styles';
 import { useControllableState } from '../composables/useControllableState';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 export interface InputTagsProps {
     values?: string[] | string;
@@ -303,7 +298,7 @@ html.dark .p-inputtags-item.is-highlighted,
 }
 `;
 
-const xCircleIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>`;
+const xCircleIcon = html`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>`;
 
 export default function InputTagsIsland(container: HTMLElement, props: InputTagsProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-inputtags', CSS);
@@ -358,10 +353,6 @@ export default function InputTagsIsland(container: HTMLElement, props: InputTags
     let activeSuggestionIndex = -1;
     let filteredSuggestions: string[] = [];
 
-    function escapeHtml(str: string): string {
-        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    }
-
     function createTagElement(tag: string, index: number): HTMLElement {
         const el = document.createElement('span');
         el.className = 'p-inputtags-tag'; container.setAttribute('data-part', 'root');
@@ -370,14 +361,14 @@ export default function InputTagsIsland(container: HTMLElement, props: InputTags
         el.setAttribute('role', 'option');
         el.setAttribute('aria-selected', 'true');
 
-        el.innerHTML = `
-            <span class="p-inputtags-tag-label" data-part="root">${escapeHtml(tag)}</span>
-            ${!isDisabled && !isReadonly ? `
-                <button type="button" class="p-inputtags-tag-remove" data-index="${index}" aria-label="Remove ${escapeHtml(tag)}" tabindex="-1">
+        setHtml(el, html`
+            <span class="p-inputtags-tag-label" data-part="root">${tag}</span>
+            ${!isDisabled && !isReadonly ? html`
+                <button type="button" class="p-inputtags-tag-remove" data-index="${index}" aria-label="Remove ${tag}" tabindex="-1">
                     ${xCircleIcon}
                 </button>
             ` : ''}
-        `;
+        `);
 
         bindTagEvents(el);
         return el;
@@ -519,35 +510,35 @@ export default function InputTagsIsland(container: HTMLElement, props: InputTags
         if (isInvalid) container.classList.add('is-invalid');
         if (isDisabled) container.classList.add('is-disabled');
 
-        let tagsHtml = tags.map((tag, idx) => `
+        const tagsHtml = tags.map((tag, idx) => html`
             <span class="p-inputtags-tag" data-index="${idx}" tabindex="0" role="option" aria-selected="true">
-                <span class="p-inputtags-tag-label">${escapeHtml(tag)}</span>
-                ${!isDisabled && !isReadonly ? `
-                    <button type="button" class="p-inputtags-tag-remove" data-index="${idx}" aria-label="Remove ${escapeHtml(tag)}" tabindex="-1">
+                <span class="p-inputtags-tag-label">${tag}</span>
+                ${!isDisabled && !isReadonly ? html`
+                    <button type="button" class="p-inputtags-tag-remove" data-index="${idx}" aria-label="Remove ${tag}" tabindex="-1">
                         ${xCircleIcon}
                     </button>
                 ` : ''}
             </span>
-        `).join('');
+        `);
 
-        let inputHtml = `
+        const inputHtml = html`
             <input type="text"
                    class="p-inputtags-input"
-                   ${inputIdAttr}
-                   placeholder="${tags.length === 0 ? (props.placeholder || '') : ''}"
-                   ${isDisabled ? 'disabled' : ''}
-                   ${isReadonly ? 'readonly' : ''}
+                   ${attr('id', props.inputId)}
+                   ${attr('placeholder', tags.length === 0 ? (props.placeholder || '') : '')}
+                   ${attr('disabled', isDisabled)}
+                   ${attr('readonly', isReadonly)}
                    autocomplete="off"
                    spellcheck="false"
                    ${isMaxReached ? 'style="display: none;"' : ''}
                    ${hasTypeahead ? 'role="combobox" aria-autocomplete="list" aria-expanded="false"' : ''} />
         `;
 
-        container.innerHTML = `
+        setHtml(container, html`
             ${tagsHtml}
             ${inputHtml}
-            ${hasTypeahead ? `<div class="p-inputtags-panel" style="display: none;"></div>` : ''}
-        `;
+            ${hasTypeahead ? html`<div class="p-inputtags-panel" style="display: none;"></div>` : ''}
+        `);
 
         // Bind initial tag events
         container.querySelectorAll<HTMLElement>('.p-inputtags-tag').forEach(bindTagEvents);
@@ -676,11 +667,13 @@ export default function InputTagsIsland(container: HTMLElement, props: InputTags
         panel.style.display = 'flex';
         input?.setAttribute('aria-expanded', 'true');
 
-        panel.innerHTML = filteredSuggestions.map((item, idx) => `
-            <div class="p-inputtags-item ${idx === activeSuggestionIndex ? 'is-highlighted' : ''}" data-index="${idx}">
-                <span>${escapeHtml(item)}</span>
-            </div>
-        `).join('');
+        setHtml(panel, html`
+            ${filteredSuggestions.map((item, idx) => html`
+                <div class="p-inputtags-item ${idx === activeSuggestionIndex ? 'is-highlighted' : ''}" data-index="${idx}">
+                    <span>${item}</span>
+                </div>
+            `)}
+        `);
 
         panel.querySelectorAll<HTMLElement>('.p-inputtags-item').forEach(itemEl => {
             itemEl.addEventListener('click', (e) => {

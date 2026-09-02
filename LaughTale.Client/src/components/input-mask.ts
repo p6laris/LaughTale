@@ -1,12 +1,7 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
-﻿/**
- * LaughTale: Enterprise InputMask Component (Aura Mask / InputMask)
- * High-performance input masking engine with cursor preservation, optional characters (?),
- * custom slot characters, raw value unmasking, auto-clear on blur, and full Aura theming.
- */
-
 import { injectIslandStyle } from '../runtime/styles';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 export interface InputMaskProps {
     mask: string;
@@ -274,18 +269,18 @@ export default function InputMaskIsland(container: HTMLElement, props: InputMask
         isDisabled ? 'is-disabled' : ''
     ].filter(Boolean).join(' ');
 
-    container.innerHTML = `
+    setHtml(container, html`
         <input 
             type="text"
             class="${rootClasses}" data-part="root"
             value="${currentFormatted}"
             placeholder="${props.placeholder || tokens.map(t => t.isSlot ? t.slotChar : t.char).join('')}"
-            ${isDisabled ? 'disabled' : ''}
-            ${isReadonly ? 'readonly' : ''}
-            ${props.inputId ? `id="${props.inputId}"` : ''}
+            ${attr('disabled', isDisabled)}
+            ${attr('readonly', isReadonly)}
+            ${attr('id', props.inputId)}
         />
         <input type="hidden" name="${props.name || props.targetInputName || 'mask_value'}" value="" />
-    `;
+    `);
 
     const input = container.querySelector<HTMLInputElement>('input[type="text"]')!;
     const hiddenInp = container.querySelector<HTMLInputElement>('input[type="hidden"]')!;

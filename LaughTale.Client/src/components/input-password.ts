@@ -10,6 +10,7 @@ import type { IslandContext } from '../runtime/registry';
 
 import { injectIslandStyle } from '../runtime/styles';
 import { getLucideIcon } from '../icons/lucide';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 export interface InputPasswordProps {
     targetInputName?: string;
@@ -453,50 +454,22 @@ export default function InputPasswordIsland(container: HTMLElement, props: Input
         if (isInvalid) container.classList.add('is-invalid');
         if (isDisabled) container.classList.add('is-disabled');
 
-        const inputIdAttr = props.inputId ? `id="${props.inputId}"` : '';
-        const placeholderAttr = props.placeholder ? `placeholder="${props.placeholder}"` : '';
-        const disabledAttr = isDisabled ? 'disabled' : '';
-        const roAttr = isReadonly ? 'readonly' : '';
         const inputType = isMasked ? 'password' : 'text';
 
-        const eyeIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>`;
-        const eyeOffIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>`;
-        const clearIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
+        const eyeIcon = html`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>`;
+        const eyeOffIcon = html`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>`;
+        const clearIcon = html`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
 
-        let leftIconHtml = '';
+        let leftIconHtml: Raw | '' = '';
         if (props.icon) {
-            const iconSvg = getLucideIcon(props.icon) || `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`;
-            leftIconHtml = `<span class="p-password-left-icon" data-part="root">${iconSvg}</span>`;
+            const iconSvg = getLucideIcon(props.icon);
+            leftIconHtml = html`<span class="p-password-left-icon" data-part="root">${iconSvg ? unsafe(iconSvg) : html`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`}</span>`;
         }
 
-        let html = `
-            <div class="p-password-container">
-                ${leftIconHtml}
-                <input type="${inputType}"
-                       class="p-password-input ${props.inputClass || ''}"
-                       ${inputIdAttr}
-                       ${placeholderAttr}
-                       ${disabledAttr}
-                       ${roAttr}
-                       value="${currentVal}"
-                       autocomplete="off" />
-                ${showClear ? `
-                    <button type="button" class="p-password-action-btn p-password-clear-btn" aria-label="Clear password" style="${!currentVal ? 'display: none;' : ''}">
-                        ${clearIcon}
-                    </button>
-                ` : ''}
-                ${hasToggleMask ? `
-                    <button type="button" class="p-password-action-btn p-password-toggle-btn" aria-label="Toggle password visibility" tabindex="-1">
-                        ${isMasked ? eyeIcon : eyeOffIcon}
-                    </button>
-                ` : ''}
-            </div>
-        `;
-
-        // Direct Strength Meter Mode
+        let meterHtml: Raw | '' = '';
         if (showMeter && !isPopover) {
             const str = calculateStrength(currentVal);
-            html += `
+            meterHtml = html`
                 <div class="p-password-meter-wrap" style="${!currentVal ? 'display: none;' : ''}">
                     <div class="p-password-meter-track">
                         <div class="p-password-meter-bar" style="width: ${str.width}; background-color: ${str.color};"></div>
@@ -508,19 +481,9 @@ export default function InputPasswordIsland(container: HTMLElement, props: Input
             `;
         }
 
-        // Requirements Chips Mode
-        if (showRequirements && requirementsMode === 'chips' && !isPopover) {
-            html += renderRequirementsChips(currentVal);
-        }
-
-        // Requirements List Mode
-        if (showRequirements && requirementsMode === 'list' && !isPopover) {
-            html += renderRequirementsList(currentVal);
-        }
-
-        // Popover Mode
+        let popoverHtml: Raw | '' = '';
         if (isPopover) {
-            html += `
+            popoverHtml = html`
                 <div class="p-password-popover" style="display: none;">
                     <div class="p-password-popover-header">
                         <span class="p-password-popover-header-title">
@@ -539,16 +502,42 @@ export default function InputPasswordIsland(container: HTMLElement, props: Input
             `;
         }
 
-        container.innerHTML = html;
+        setHtml(container, html`
+            <div class="p-password-container">
+                ${leftIconHtml}
+                <input type="${inputType}"
+                       class="p-password-input ${props.inputClass || ''}"
+                       ${attr('id', props.inputId)}
+                       ${attr('placeholder', props.placeholder)}
+                       ${attr('disabled', isDisabled)}
+                       ${attr('readonly', isReadonly)}
+                       value="${currentVal}"
+                       autocomplete="off" />
+                ${showClear ? html`
+                    <button type="button" class="p-password-action-btn p-password-clear-btn" aria-label="Clear password" style="${!currentVal ? 'display: none;' : ''}">
+                        ${clearIcon}
+                    </button>
+                ` : ''}
+                ${hasToggleMask ? html`
+                    <button type="button" class="p-password-action-btn p-password-toggle-btn" aria-label="Toggle password visibility" tabindex="-1">
+                        ${isMasked ? eyeIcon : eyeOffIcon}
+                    </button>
+                ` : ''}
+            </div>
+            ${meterHtml}
+            ${showRequirements && requirementsMode === 'chips' && !isPopover ? renderRequirementsChips(currentVal) : ''}
+            ${showRequirements && requirementsMode === 'list' && !isPopover ? renderRequirementsList(currentVal) : ''}
+            ${popoverHtml}
+        `);
         bindEvents();
     }
 
-    function renderRequirementsChips(pwd: string): string {
+    function renderRequirementsChips(pwd: string): Raw {
         const r = checkRules(pwd);
-        const checkIcon = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>`;
-        const xIcon = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
+        const checkIcon = html`<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>`;
+        const xIcon = html`<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
 
-        return `
+        return html`
             <div class="p-password-chips-wrap">
                 <span class="p-password-chip ${r.length ? 'is-met' : ''}" data-rule="length">
                     ${r.length ? checkIcon : xIcon} ${minLength}+ characters
@@ -566,20 +555,20 @@ export default function InputPasswordIsland(container: HTMLElement, props: Input
         `;
     }
 
-    function renderRequirementsList(pwd: string): string {
-        return `
+    function renderRequirementsList(pwd: string): Raw {
+        return html`
             <div class="p-password-list-wrap">
                 ${renderRequirementsListItems(pwd)}
             </div>
         `;
     }
 
-    function renderRequirementsListItems(pwd: string): string {
+    function renderRequirementsListItems(pwd: string): Raw {
         const r = checkRules(pwd);
-        const checkIcon = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>`;
-        const xIcon = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
+        const checkIcon = html`<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>`;
+        const xIcon = html`<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
 
-        return `
+        return html`
             <div class="p-password-list-item ${r.length ? 'is-met' : ''}" data-rule="length">
                 ${r.length ? checkIcon : xIcon} At least ${minLength} characters long
             </div>
@@ -622,27 +611,27 @@ export default function InputPasswordIsland(container: HTMLElement, props: Input
         }
 
         // Update chips
-        const checkIcon = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>`;
-        const xIcon = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
+        const checkIcon = html`<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>`;
+        const xIcon = html`<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
 
         container.querySelectorAll<HTMLElement>('.p-password-chip').forEach(chip => {
             const rule = chip.getAttribute('data-rule') as keyof typeof r;
             const isMet = r[rule];
             chip.classList.toggle('is-met', isMet);
             const text = chip.textContent?.trim().replace(/^[✔✕]\s*/, '') || '';
-            chip.innerHTML = `${isMet ? checkIcon : xIcon} ${text}`;
+            setHtml(chip, html`${isMet ? checkIcon : xIcon} ${text}`);
         });
 
         // Update list items
-        const listCheckIcon = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>`;
-        const listXIcon = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
+        const listCheckIcon = html`<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>`;
+        const listXIcon = html`<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
 
         container.querySelectorAll<HTMLElement>('.p-password-list-item').forEach(item => {
             const rule = item.getAttribute('data-rule') as keyof typeof r;
             const isMet = r[rule];
             item.classList.toggle('is-met', isMet);
             const text = item.textContent?.trim().replace(/^[✔✕]\s*/, '') || '';
-            item.innerHTML = `${isMet ? listCheckIcon : listXIcon} ${text}`;
+            setHtml(item, html`${isMet ? listCheckIcon : listXIcon} ${text}`);
         });
 
         // Update popover header bar & badge
@@ -663,8 +652,8 @@ export default function InputPasswordIsland(container: HTMLElement, props: Input
         const clearBtn = container.querySelector<HTMLButtonElement>('.p-password-clear-btn');
         const popoverEl = container.querySelector<HTMLElement>('.p-password-popover');
 
-        const eyeIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>`;
-        const eyeOffIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>`;
+        const eyeIcon = html`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>`;
+        const eyeOffIcon = html`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>`;
 
         // Input typing
         inputEl.addEventListener('input', () => {
@@ -701,7 +690,7 @@ export default function InputPasswordIsland(container: HTMLElement, props: Input
             e.preventDefault();
             isMasked = !isMasked;
             inputEl.type = isMasked ? 'password' : 'text';
-            toggleBtn.innerHTML = isMasked ? eyeIcon : eyeOffIcon;
+            setHtml(toggleBtn, isMasked ? eyeIcon : eyeOffIcon);
             inputEl.focus();
         }, { signal: ctx?.signal });
 

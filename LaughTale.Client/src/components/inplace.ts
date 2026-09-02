@@ -2,6 +2,7 @@ import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts
 import type { IslandContext } from '../runtime/registry';
 import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 /**
  * LaughTale: Enterprise Inplace / Click-to-Edit Component (Aura Design System compliant)
@@ -180,14 +181,14 @@ export default function InplaceIsland(container: HTMLElement, props: InplaceProp
 
     function render() {
         if (!isEditing) {
-            container.innerHTML = `
+            setHtml(container, html`
                 <div class="p-inplace p-component ${props.class || ''}" style="${props.style || ''}">
                     <div class="p-inplace-display ${isDisabled ? 'p-disabled' : ''}" tabindex="${isDisabled ? '-1' : '0'}" role="button" aria-label="${currentValue || placeholder}">
-                        <span>${currentValue || `<span style="color: var(--p-text-muted); font-style: italic;">${placeholder}</span>`}</span>
-                        ${!isDisabled ? `<span class="p-inplace-display-icon">${LucideIcons.edit}</span>` : ''}
+                        <span>${currentValue || html`<span style="color: var(--p-text-muted); font-style: italic;">${placeholder}</span>`}</span>
+                        ${!isDisabled ? html`<span class="p-inplace-display-icon">${unsafe(LucideIcons.edit)}</span>` : ''}
                     </div>
                 </div>
-            `;
+            `);
 
             if (!isDisabled) {
                 const displayEl = container.querySelector('.p-inplace-display');
@@ -206,7 +207,7 @@ export default function InplaceIsland(container: HTMLElement, props: InplaceProp
                 }, { signal: ctx?.signal });
             }
         } else {
-            container.innerHTML = `
+            setHtml(container, html`
                 <div class="p-inplace p-component ${props.class || ''}" style="${props.style || ''}">
                     <div class="p-inplace-content">
                         <input type="text" 
@@ -214,16 +215,16 @@ export default function InplaceIsland(container: HTMLElement, props: InplaceProp
                                value="${currentValue}" 
                                placeholder="${placeholder}" />
                         <button type="button" class="p-inplace-action-btn p-inplace-save-btn" title="Save">
-                            ${LucideIcons.check}
+                            ${unsafe(LucideIcons.check)}
                         </button>
-                        ${isClosable ? `
+                        ${isClosable ? html`
                             <button type="button" class="p-inplace-action-btn p-inplace-cancel-btn" title="Cancel">
-                                ${LucideIcons.x}
+                                ${unsafe(LucideIcons.x)}
                             </button>
                         ` : ''}
                     </div>
                 </div>
-            `;
+            `);
 
             const input = container.querySelector<HTMLInputElement>('.p-inplace-input')!;
             if (input) {

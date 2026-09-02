@@ -3,6 +3,7 @@ import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts
 import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
 import { LucideIcons } from '../icons/lucide';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 /**
  * LaughTale: Enterprise FileUpload Component (Aura Design System compliant)
@@ -624,7 +625,7 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
             const hasFile = fileQueue.length > 0;
             const currentFile = hasFile ? fileQueue[0] : null;
 
-            container.innerHTML = `
+            setHtml(container, html`
                 <div class="p-fileupload p-fileupload-custom" data-part="root" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
                     <span class="p-fileupload-choose">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
@@ -632,14 +633,14 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
                         <input type="file" accept="${accept}" class="p-fileupload-input" />
                     </span>
 
-                    ${currentFile ? `
+                    ${currentFile ? html`
                         <div class="p-fileupload-custom-preview">
-                            <img src="${currentFile.previewUrl || 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=400&auto=format&fit=crop&q=80'}" alt="${currentFile.name}" />
+                            <img src="${safeUrl(currentFile.previewUrl || 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=400&auto=format&fit=crop&q=80')}" alt="${currentFile.name}" />
                             <div style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-muted); margin-top: 0.5rem;">${currentFile.name}</div>
                         </div>
                     ` : ''}
                 </div>
-            `;
+            `);
 
             const input = container.querySelector<HTMLInputElement>('.p-fileupload-input');
             input?.addEventListener('change', (e) => {
@@ -660,23 +661,23 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
                 : 'No file chosen';
             
             if (auto) {
-                container.innerHTML = `
+                setHtml(container, html`
                     <div class="p-fileupload p-fileupload-basic" style="justify-content: center; width: 100%;">
                         <span class="p-fileupload-choose">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
                             <span>${chooseLabel}</span>
-                            <input type="file" accept="${accept}" ${multiple ? 'multiple' : ''} class="p-fileupload-input" />
+                            <input type="file" accept="${accept}" ${attr('multiple', multiple)} class="p-fileupload-input" />
                         </span>
-                        ${hasFile ? `<span class="p-fileupload-filename">${fileName}</span>` : ''}
+                        ${hasFile ? html`<span class="p-fileupload-filename">${fileName}</span>` : ''}
                     </div>
-                `;
+                `);
             } else {
-                container.innerHTML = `
+                setHtml(container, html`
                     <div class="p-fileupload p-fileupload-basic" style="justify-content: center; width: 100%;">
                         <span class="p-fileupload-choose">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
                             <span>${chooseLabel}</span>
-                            <input type="file" accept="${accept}" ${multiple ? 'multiple' : ''} class="p-fileupload-input" />
+                            <input type="file" accept="${accept}" ${attr('multiple', multiple)} class="p-fileupload-input" />
                         </span>
                         <span class="p-fileupload-filename" style="margin-left: 0.5rem; margin-right: 0.5rem;">${fileName}</span>
                         <button type="button" class="p-button p-button-outlined p-fileupload-upload-btn" ${!hasFile || isUploading ? 'disabled style="opacity:0.5; pointer-events:none; cursor:not-allowed;"' : ''}>
@@ -684,7 +685,7 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
                             <span>${uploadLabel}</span>
                         </button>
                     </div>
-                `;
+                `);
             }
 
             const input = container.querySelector<HTMLInputElement>('.p-fileupload-input');
@@ -706,14 +707,14 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
         const hasFiles = fileQueue.length > 0;
         const progressAverage = hasFiles ? Math.round(fileQueue.reduce((acc, f) => acc + f.progress, 0) / fileQueue.length) : 0;
 
-        container.innerHTML = `
+        setHtml(container, html`
             <div class="p-fileupload p-fileupload-advanced">
                 <!-- Toolbar Header -->
                 <div class="p-fileupload-header">
                     <span class="p-fileupload-choose">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
                         <span>${chooseLabel}</span>
-                        <input type="file" accept="${accept}" ${multiple ? 'multiple' : ''} class="p-fileupload-input" />
+                        <input type="file" accept="${accept}" ${attr('multiple', multiple)} class="p-fileupload-input" />
                     </span>
                     <button type="button" class="p-button p-button-outlined p-fileupload-upload-btn" ${!hasFiles || isUploading ? 'disabled style="opacity:0.5; pointer-events:none; cursor:not-allowed;"' : ''}>
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
@@ -725,7 +726,7 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
                     </button>
                 </div>
 
-                ${isUploading ? `
+                ${isUploading ? html`
                     <div class="p-fileupload-progressbar">
                         <div class="p-fileupload-progressbar-value" style="width: ${progressAverage}%;"></div>
                     </div>
@@ -733,7 +734,7 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
 
                 <!-- Content / Drop Area -->
                 <div class="p-fileupload-content">
-                    ${!hasFiles ? `
+                    ${!hasFiles ? html`
                         <div class="p-fileupload-empty" data-click-trigger>
                             <div class="p-fileupload-empty-icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/><polyline points="12 13 12 9 10 11"/><polyline points="12 9 14 11"/></svg>
@@ -741,25 +742,25 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
                             <div class="p-fileupload-empty-title">${emptyTitle}</div>
                             <div class="p-fileupload-empty-subtitle">${emptySubtitle}</div>
                         </div>
-                    ` : (previewImages ? `
+                    ` : (previewImages ? html`
                         <div class="p-fileupload-image-grid">
-                            ${fileQueue.map(f => `
+                            ${fileQueue.map(f => html`
                                 <div class="p-fileupload-image-card">
-                                    <img src="${f.previewUrl || 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=200&auto=format&fit=crop&q=80'}" alt="${f.name}" />
+                                    <img src="${safeUrl(f.previewUrl || 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=200&auto=format&fit=crop&q=80')}" alt="${f.name}" />
                                     <button type="button" class="p-fileupload-image-remove" data-remove-id="${f.id}" title="Remove image">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                                     </button>
                                 </div>
-                            `).join('')}
+                            `)}
                         </div>
-                    ` : `
+                    ` : html`
                         <div class="p-fileupload-file-list">
-                            ${fileQueue.map(f => `
+                            ${fileQueue.map(f => html`
                                 <div class="p-fileupload-file-item">
                                     <div class="p-fileupload-file-info">
-                                        ${f.previewUrl ? `
-                                            <img src="${f.previewUrl}" alt="${f.name}" class="p-fileupload-thumbnail" />
-                                        ` : `
+                                        ${f.previewUrl ? html`
+                                            <img src="${safeUrl(f.previewUrl)}" alt="${f.name}" class="p-fileupload-thumbnail" />
+                                        ` : html`
                                             <div class="p-fileupload-thumbnail">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--p-text-muted);"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
                                             </div>
@@ -778,12 +779,12 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
                                         </button>
                                     </div>
                                 </div>
-                            `).join('')}
+                            `)}
                         </div>
                     `)}
                 </div>
             </div>
-        `;
+        `);
 
         // Event listeners
         const input = container.querySelector<HTMLInputElement>('.p-fileupload-input');

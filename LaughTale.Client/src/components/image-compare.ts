@@ -1,14 +1,8 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
-﻿/**
- * LaughTale: Enterprise Compare Component (LaughTale Aura Design System)
- * High-performance side-by-side comparison slider supporting horizontal and vertical orientation,
- * slideOnHover, custom handles, SVG chart reveal, rich template comparison, controlled value sync,
- * pointer capture dragging, and hidden accessible range input for full WAI-ARIA compliance.
- */
-
 import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 export interface CompareProps {
     modelValue?: number;
@@ -210,8 +204,8 @@ html.dark .p-compare-indicator,
 }
 `;
 
-const ARROWS_H_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 8 4 4-4 4"/><path d="M2 12h20"/><path d="m6 8-4 4 4 4"/></svg>`;
-const CODE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>`;
+const ARROWS_H_SVG = html`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 8 4 4-4 4"/><path d="M2 12h20"/><path d="m6 8-4 4 4 4"/></svg>`;
+const CODE_SVG = html`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>`;
 
 export default function CompareIsland(container: HTMLElement, props: CompareProps, ctx?: IslandContext) {
     injectIslandStyle('compare', COMPARE_CSS);
@@ -238,11 +232,11 @@ export default function CompareIsland(container: HTMLElement, props: CompareProp
         const verticalClass = isVertical ? 'p-compare-vertical' : '';
         const disabledClass = disabled ? 'p-compare-disabled' : '';
 
-        let beforeContentHtml = '';
-        let afterContentHtml = '';
+        let beforeContentHtml: Raw | string = '';
+        let afterContentHtml: Raw | string = '';
 
         if (isWithChart) {
-            beforeContentHtml = `
+            beforeContentHtml = html`
                 <svg class="absolute h-full w-full" data-part="root" viewBox="0 0 644 189" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;">
                     <g clip-path="url(#compare_chart_clip)">
                         <path d="M0.5 118.499C0.5 118.499 82 102.999 113.5 89.4989C145 75.9989 188.444 87.7869 235 77.4989C272.684 69.1719 293.654 62.4939 329 46.9989C409.332 11.7849 479.5 86.5 510.5 78C541.5 69.5 635.951 0.848863 644 1.49886" stroke="var(--lt-primary-500, var(--lt-primary-500))" stroke-width="2.5" />
@@ -259,19 +253,19 @@ export default function CompareIsland(container: HTMLElement, props: CompareProp
                     </defs>
                 </svg>
             `;
-            afterContentHtml = `
+            afterContentHtml = html`
                 <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: var(--lt-surface-50); color: var(--p-text-muted); font-size: 0.875rem;">
                     <span>Hover to reveal chart trajectory</span>
                 </div>
             `;
         } else if (isTemplate) {
-            beforeContentHtml = `
+            beforeContentHtml = html`
                 <div style="width: 100%; height: 100%; background: var(--lt-primary-50); padding: 1.5rem; display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
                     <div style="width: 100%; max-width: 18rem; border-radius: 12px; border: 1px solid var(--lt-primary-100); background: var(--lt-surface-0, var(--lt-surface-0)); padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; box-shadow: 0 4px 12px rgba(147, 51, 234, 0.1);">
                         <div style="display: flex; align-items: flex-start; justify-content: space-between;">
                             <div style="display: flex; align-items: center; gap: 0.75rem;">
                                 <div style="width: 2.5rem; height: 2.5rem; border-radius: 9999px; overflow: hidden; background: var(--lt-primary-400);">
-                                    <img src="/images/avatar/amyelsner.png" style="width: 100%; height: 100%; object-fit: cover; filter: hue-rotate(260deg) saturate(150%);" />
+                                    <img src="${safeUrl('/images/avatar/amyelsner.png')}" style="width: 100%; height: 100%; object-fit: cover; filter: hue-rotate(260deg) saturate(150%);" />
                                 </div>
                                 <div>
                                     <div style="font-weight: 600; color: var(--lt-primary-900); font-size: 0.9rem;">Amy Elsner</div>
@@ -296,13 +290,13 @@ export default function CompareIsland(container: HTMLElement, props: CompareProp
                     </div>
                 </div>
             `;
-            afterContentHtml = `
+            afterContentHtml = html`
                 <div style="width: 100%; height: 100%; background: var(--lt-primary-50, var(--lt-primary-50)); padding: 1.5rem; display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
                     <div style="width: 100%; max-width: 18rem; border-radius: 12px; border: 1px solid var(--lt-primary-200, var(--lt-primary-200)); background: var(--lt-surface-0, var(--lt-surface-0)); padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);">
                         <div style="display: flex; align-items: flex-start; justify-content: space-between;">
                             <div style="display: flex; align-items: center; gap: 0.75rem;">
                                 <div style="width: 2.5rem; height: 2.5rem; border-radius: 9999px; overflow: hidden; background: var(--lt-primary-400, var(--lt-primary-400));">
-                                    <img src="/images/avatar/amyelsner.png" style="width: 100%; height: 100%; object-fit: cover;" />
+                                    <img src="${safeUrl('/images/avatar/amyelsner.png')}" style="width: 100%; height: 100%; object-fit: cover;" />
                                 </div>
                                 <div>
                                     <div style="font-weight: 600; color: var(--lt-primary-900); font-size: 0.9rem;">Amy Elsner</div>
@@ -328,8 +322,8 @@ export default function CompareIsland(container: HTMLElement, props: CompareProp
                 </div>
             `;
         } else {
-            beforeContentHtml = `<img src="${beforeImg}" alt="Before" draggable="false" />`;
-            afterContentHtml = `<img src="${afterImg}" alt="After" draggable="false" />`;
+            beforeContentHtml = html`<img src="${safeUrl(beforeImg)}" alt="Before" draggable="false" />`;
+            afterContentHtml = html`<img src="${safeUrl(afterImg)}" alt="After" draggable="false" />`;
         }
 
         const iconHtml = (demoType === 'hover' || demoType === 'vertical' || isTemplate) ? CODE_SVG : ARROWS_H_SVG;
@@ -337,32 +331,9 @@ export default function CompareIsland(container: HTMLElement, props: CompareProp
 
         const heightStyle = isWithChart ? 'height: 189px;' : (isTemplate ? 'height: 320px;' : 'aspect-ratio: 16/9;');
 
-        let containerHtml = `
-            <div class="p-compare ${verticalClass} ${customHandleClass} ${disabledClass} ${props.class || ''}" style="max-width: 32rem; margin: 0 auto; ${heightStyle} ${props.style || ''}" data-compare-root>
-                <!-- Hidden Accessible Range Input -->
-                <input type="range" class="p-compare-input" min="${props.min || 0}" max="${props.max || 100}" step="${props.step || 1}" value="${currentValue}" aria-label="${props.ariaLabel || 'Compare images'}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${currentValue}" tabindex="0" ${disabled ? 'disabled' : ''} data-compare-input />
-
-                <!-- Layer After (Base Bottom) -->
-                <div class="p-compare-item p-compare-item-after" data-compare-after>
-                    ${afterContentHtml}
-                </div>
-
-                <!-- Layer Before (Clipped Top) -->
-                <div class="p-compare-item p-compare-item-before" data-compare-before>
-                    ${beforeContentHtml}
-                </div>
-
-                <!-- Divider Handle -->
-                <div class="p-compare-handle" data-compare-handle>
-                    <div class="p-compare-indicator" data-compare-indicator>
-                        ${isCustomHandle ? '' : `<span style="${iconRotateStyle} display: flex; align-items: center; justify-content: center;">${iconHtml}</span>`}
-                    </div>
-                </div>
-            </div>
-        `;
-
+        let controlsHtml: Raw | '' = '';
         if (isControlled) {
-            containerHtml += `
+            controlsHtml = html`
                 <div class="p-compare-controls" style="max-width: 32rem; margin: 1rem auto 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; width: 100%;">
                     <button type="button" class="p-button p-button-outlined p-button-secondary" data-compare-set="25" style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--lt-radius); border: 1px solid var(--lt-surface-200); background: var(--lt-surface-0); color: var(--lt-text-primary); cursor: pointer;">
                         25%
@@ -378,7 +349,30 @@ export default function CompareIsland(container: HTMLElement, props: CompareProp
             `;
         }
 
-        container.innerHTML = containerHtml;
+        setHtml(container, html`
+            <div class="p-compare ${verticalClass} ${customHandleClass} ${disabledClass} ${props.class || ''}" style="max-width: 32rem; margin: 0 auto; ${heightStyle} ${props.style || ''}" data-compare-root>
+                <!-- Hidden Accessible Range Input -->
+                <input type="range" class="p-compare-input" min="${props.min || 0}" max="${props.max || 100}" step="${props.step || 1}" value="${currentValue}" aria-label="${props.ariaLabel || 'Compare images'}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${currentValue}" tabindex="0" ${attr('disabled', disabled)} data-compare-input />
+
+                <!-- Layer After (Base Bottom) -->
+                <div class="p-compare-item p-compare-item-after" data-compare-after>
+                    ${afterContentHtml}
+                </div>
+
+                <!-- Layer Before (Clipped Top) -->
+                <div class="p-compare-item p-compare-item-before" data-compare-before>
+                    ${beforeContentHtml}
+                </div>
+
+                <!-- Divider Handle -->
+                <div class="p-compare-handle" data-compare-handle>
+                    <div class="p-compare-indicator" data-compare-indicator>
+                        ${isCustomHandle ? '' : html`<span style="${iconRotateStyle} display: flex; align-items: center; justify-content: center;">${iconHtml}</span>`}
+                    </div>
+                </div>
+            </div>
+            ${controlsHtml}
+        `);
     }
 
     renderDOM();

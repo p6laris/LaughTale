@@ -1,6 +1,7 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 /**
  * LaughTale InputNumber Component
@@ -514,7 +515,7 @@ export function initInputNumber(
     }
 
     function render() {
-        container.innerHTML = '';
+        setHtml(container, html``);
         container.className = 'laughtale-inputnumber p-inputnumber'; container.setAttribute('data-part', 'root');
 
         if (isFluid) container.classList.add('p-inputnumber-fluid');
@@ -524,90 +525,94 @@ export function initInputNumber(
         if (isDisabled) container.classList.add('is-disabled');
         if (showButtons) container.classList.add(`p-inputnumber-${buttonLayout}`);
 
-        const inputIdAttr = props.inputId ? `id="${props.inputId}"` : '';
-        const placeholderAttr = props.placeholder ? `placeholder="${props.placeholder}"` : '';
-        const disabledAttr = isDisabled ? 'disabled' : '';
         const formattedVal = formatNumber(rawValue);
 
-        const upIcon = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>`;
-        const downIcon = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
-        const plusIcon = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>`;
-        const minusIcon = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>`;
-        const clearIcon = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
+        const upIcon = html`<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>`;
+        const downIcon = html`<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
+        const plusIcon = html`<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>`;
+        const minusIcon = html`<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>`;
+        const clearIcon = html`<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
 
         const btnSevClass = props.buttonSeverity ? `p-button-${props.buttonSeverity.toLowerCase()}` : '';
         const customBtnClass = props.buttonClass || '';
         const btnCls = `p-inputnumber-button ${btnSevClass} ${customBtnClass}`.trim();
 
-        let html = '';
+        let leftButtonHtml: Raw | '' = '';
 
         if (showButtons && buttonLayout === 'horizontal') {
-            html += `
-                <button type="button" class="${btnCls} p-inputnumber-button-down" data-part="root" tabindex="-1" ${disabledAttr} aria-label="Decrement">
+            leftButtonHtml = html`
+                <button type="button" class="${btnCls} p-inputnumber-button-down" data-part="root" tabindex="-1" ${attr('disabled', isDisabled)} aria-label="Decrement">
                     ${minusIcon}
                 </button>
             `;
         } else if (showButtons && buttonLayout === 'vertical') {
-            html += `
-                <button type="button" class="${btnCls} p-inputnumber-button-up" tabindex="-1" ${disabledAttr} aria-label="Increment">
+            leftButtonHtml = html`
+                <button type="button" class="${btnCls} p-inputnumber-button-up" tabindex="-1" ${attr('disabled', isDisabled)} aria-label="Increment">
                     ${plusIcon}
                 </button>
             `;
         }
 
-        html += `
+        const inputHtml = html`
             <input type="text"
                 class="p-inputnumber-input ${props.inputClass || ''}"
-                ${inputIdAttr}
-                ${placeholderAttr}
-                ${disabledAttr}
+                ${attr('id', props.inputId)}
+                ${attr('placeholder', props.placeholder)}
+                ${attr('disabled', isDisabled)}
                 value="${formattedVal}"
                 role="spinbutton"
                 aria-valuenow="${rawValue ?? ''}"
-                ${min !== undefined ? `aria-valuemin="${min}"` : ''}
-                ${max !== undefined ? `aria-valuemax="${max}"` : ''}
-                ${isInvalid ? 'aria-invalid="true"' : ''}
-                ${props.ariaLabel ? `aria-label="${props.ariaLabel}"` : (props.name ? `aria-label="${props.name}"` : 'aria-label="Number input"')}
+                ${attr('aria-valuemin', min)}
+                ${attr('aria-valuemax', max)}
+                ${attr('aria-invalid', isInvalid)}
+                aria-label="${props.ariaLabel || props.name || 'Number input'}"
                 autocomplete="off"
             />
         `;
 
+        let clearButtonHtml: Raw | '' = '';
         if (showClear && rawValue !== null && !isDisabled) {
-            html += `
+            clearButtonHtml = html`
                 <button type="button" class="p-inputnumber-clear-icon" aria-label="Clear value" tabindex="-1">
                     ${clearIcon}
                 </button>
             `;
         }
 
+        let rightButtonHtml: Raw | '' = '';
         if (showButtons) {
             if (buttonLayout === 'stacked') {
-                html += `
+                rightButtonHtml = html`
                     <div class="p-inputnumber-button-group">
-                        <button type="button" class="${btnCls} p-inputnumber-button-up" tabindex="-1" ${disabledAttr} aria-label="Increment">
+                        <button type="button" class="${btnCls} p-inputnumber-button-up" tabindex="-1" ${attr('disabled', isDisabled)} aria-label="Increment">
                             ${upIcon}
                         </button>
-                        <button type="button" class="${btnCls} p-inputnumber-button-down" tabindex="-1" ${disabledAttr} aria-label="Decrement">
+                        <button type="button" class="${btnCls} p-inputnumber-button-down" tabindex="-1" ${attr('disabled', isDisabled)} aria-label="Decrement">
                             ${downIcon}
                         </button>
                     </div>
                 `;
             } else if (buttonLayout === 'horizontal') {
-                html += `
-                    <button type="button" class="${btnCls} p-inputnumber-button-up" tabindex="-1" ${disabledAttr} aria-label="Increment">
+                rightButtonHtml = html`
+                    <button type="button" class="${btnCls} p-inputnumber-button-up" tabindex="-1" ${attr('disabled', isDisabled)} aria-label="Increment">
                         ${plusIcon}
                     </button>
                 `;
             } else if (buttonLayout === 'vertical') {
-                html += `
-                    <button type="button" class="${btnCls} p-inputnumber-button-down" tabindex="-1" ${disabledAttr} aria-label="Decrement">
+                rightButtonHtml = html`
+                    <button type="button" class="${btnCls} p-inputnumber-button-down" tabindex="-1" ${attr('disabled', isDisabled)} aria-label="Decrement">
                         ${minusIcon}
                     </button>
                 `;
             }
         }
 
-        container.innerHTML = html;
+        setHtml(container, html`
+            ${leftButtonHtml}
+            ${inputHtml}
+            ${clearButtonHtml}
+            ${rightButtonHtml}
+        `);
         bindEvents();
     }
 
