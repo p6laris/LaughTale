@@ -323,11 +323,18 @@ export function InputGroupAddonIsland(container: HTMLElement, props: InputGroupA
     if (props.icon && !container.querySelector('svg')) {
         const svg = getLucideIcon(props.icon);
         if (svg) {
-            container.insertAdjacentHTML('afterbegin', svg);
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(svg, 'image/svg+xml');
+            const svgEl = doc.querySelector('svg');
+            if (svgEl) {
+                container.prepend(svgEl);
+            }
         }
     }
     
     if (props.text && !container.querySelector('span') && !container.textContent?.trim()) {
-        container.insertAdjacentHTML('beforeend', `<span>${props.text}</span>`);
+        const span = document.createElement('span');
+        span.textContent = props.text;
+        container.appendChild(span);
     }
 }

@@ -3,7 +3,7 @@
  * Enforces strict lint rules:
  * 1. Reference components must accept `ctx?: IslandContext` and pass `signal` on `addEventListener`.
  * 2. Component props interfaces must include `pt?: PassthroughRecord` and `studioOverrides?: Record<string, any>`.
- * 3. Components must not use deprecated legacy conventions without lifecycle cleanup.
+ * 3. Safe Rendering Purity: Zero unguarded HTML injection sinks (.innerHTML, .outerHTML, insertAdjacentHTML, document.write).
  */
 
 import fs from 'node:fs';
@@ -35,14 +35,27 @@ for (const file of files) {
         errors++;
     }
 
-    // Rule 3: Token Purity - Zero hardcoded hex colors
-    if (file !== 'theme-studio.ts') {
-        const hexMatches = content.match(/#[0-9a-fA-F]{3,8}\b/g);
-        if (hexMatches && hexMatches.length > 0) {
-            console.error(`❌ [${file}] Contains ${hexMatches.length} hardcoded hex literal(s): ${hexMatches.join(', ')}`);
+    // Rule 3: Safe Rendering Purity - Zero unguarded HTML injection sinks (T032, T033)
+    // Rejects .innerHTML =, .outerHTML =, insertAdjacentHTML, and document.write
+    const lines = content.split('\n');
+    lines.forEach((line, idx) => {
+        if (/\.innerHTML\s*=/.test(line)) {
+            console.error(`❌ [${file}:${idx + 1}] Forbidden .innerHTML assignment. Use setHtml() from '../runtime/html' instead.`);
             errors++;
         }
-    }
+        if (/\.outerHTML\s*=/.test(line)) {
+            console.error(`❌ [${file}:${idx + 1}] Forbidden .outerHTML assignment. Use safe DOM manipulation or setHtml() instead.`);
+            errors++;
+        }
+        if (/insertAdjacentHTML\s*\(/.test(line)) {
+            console.error(`❌ [${file}:${idx + 1}] Forbidden insertAdjacentHTML call. Use safe DOM manipulation or setHtml() instead.`);
+            errors++;
+        }
+        if (/document\.write(ln)?\s*\(/.test(line)) {
+            console.error(`❌ [${file}:${idx + 1}] Forbidden document.write call.`);
+            errors++;
+        }
+    });
 }
 
 if (errors > 0) {
