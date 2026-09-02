@@ -2008,9 +2008,10 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps, ctx?
                 chevron?.classList.add('p-expanded');
             }
 
-            setTimeout(() => {
+            const tScroll = setTimeout(() => {
                 activeEl.scrollIntoView({ block: 'nearest', behavior: 'instant' });
             }, 30);
+            ctx?.onCleanup?.(() => clearTimeout(tScroll));
         }
 
         // 3. Save scroll position on user scroll

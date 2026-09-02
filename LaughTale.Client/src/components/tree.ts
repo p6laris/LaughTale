@@ -454,7 +454,7 @@ export default function TreeIsland(container: HTMLElement, props: TreeProps, ctx
             if (isLazy && (!node.children || node.children.length === 0)) {
                 node.loading = true;
                 render();
-                setTimeout(() => {
+                const tLazy = setTimeout(() => {
                     node.loading = false;
                     node.children = [
                         { key: `${key}-0`, label: `Lazy ${node.label}-0`, leaf: true },
@@ -464,6 +464,7 @@ export default function TreeIsland(container: HTMLElement, props: TreeProps, ctx
                     buildMaps(treeData);
                     render();
                 }, 600);
+                ctx?.onCleanup?.(() => clearTimeout(tLazy));
                 return;
             }
             render();

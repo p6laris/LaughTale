@@ -729,7 +729,7 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
             if (isLazy && (!node.children || node.children.length === 0)) {
                 node.loading = true;
                 render();
-                setTimeout(() => {
+                const tLazy = setTimeout(() => {
                     node.loading = false;
                     node.children = [
                         { key: `${key}-0`, data: { name: `${node.data.name} - 0`, size: `${Math.floor(Math.random() * 800) + 50}kb`, type: 'Document' } },
@@ -738,6 +738,7 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
                     buildMaps(rawNodes);
                     render();
                 }, 500);
+                ctx?.onCleanup?.(() => clearTimeout(tLazy));
                 return;
             }
             render();
@@ -1207,10 +1208,11 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
         container.querySelector('.p-treetable-refresh-btn')?.addEventListener('click', () => {
             isLoading = true;
             render();
-            setTimeout(() => {
+            const tRefresh = setTimeout(() => {
                 isLoading = false;
                 render();
             }, 1200);
+            ctx?.onCleanup?.(() => clearTimeout(tRefresh));
         }, { signal: ctx?.signal });
 
         // Expand/Collapse Toggler
@@ -1403,7 +1405,8 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
                 document.removeEventListener('click', closeMenu);
             }
         };
-        setTimeout(() => document.addEventListener('click', closeMenu, { signal: ctx?.signal }), 50);
+        const tMenu = setTimeout(() => document.addEventListener('click', closeMenu, { signal: ctx?.signal }), 50);
+        ctx?.onCleanup?.(() => clearTimeout(tMenu));
     }
 
     render();

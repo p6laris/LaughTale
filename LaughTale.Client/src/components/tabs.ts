@@ -563,7 +563,8 @@ export default function TabsIsland(container: HTMLElement, props: TabsProps, ctx
         }, { signal: ctx?.signal });
 
         contentContainer.addEventListener('scroll', checkScrollButtons, { signal: ctx?.signal });
-        setTimeout(checkScrollButtons, 50);
+        const tScroll = setTimeout(checkScrollButtons, 50);
+        ctx?.onCleanup?.(() => clearTimeout(tScroll));
         window.addEventListener('resize', checkScrollButtons, { signal: ctx?.signal });
     }
 
@@ -600,7 +601,8 @@ export default function TabsIsland(container: HTMLElement, props: TabsProps, ctx
     }, { signal: ctx?.signal });
 
     // Initial render
-    setTimeout(update, 50);
+    const tInit = setTimeout(update, 50);
+    ctx?.onCleanup?.(() => clearTimeout(tInit));
     window.addEventListener('resize', () => {
         const tabs = getTabs();
         const activeTabEl = tabs.find(t => (t.getAttribute('data-value') || t.getAttribute('value')) === activeValue);

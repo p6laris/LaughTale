@@ -614,7 +614,8 @@ export default function TreeSelectIsland(container: HTMLElement, props: TreeSele
             if (overlay) overlay.classList.add('is-open');
             if (isFilter) {
                 const filterInp = container.querySelector<HTMLInputElement>('.p-treeselect-filter-input');
-                setTimeout(() => filterInp?.focus(), 50);
+                const tFocus = setTimeout(() => filterInp?.focus(), 50);
+                ctx?.onCleanup?.(() => clearTimeout(tFocus));
             }
         },
         onClose: () => {

@@ -550,9 +550,10 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
     function close() {
         disclosure.close();
         drawer.style.transform = 'translateX(100%)';
-        setTimeout(() => {
+        const tClose = setTimeout(() => {
             backdrop.style.display = 'none';
         }, 250);
+        ctx?.onCleanup?.(() => clearTimeout(tClose));
         scrollLock.unlock();
     }
 
@@ -797,9 +798,10 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
 
         clipboard.copy(exports.css);
         setHtml(copyCssBtn, html`${unsafe(LucideIcons.check)} Copied to Clipboard!`);
-        setTimeout(() => {
+        const tCss = setTimeout(() => {
             setHtml(copyCssBtn, html`${unsafe(LucideIcons.copy)} Copy CSS Custom Properties`);
         }, 2000);
+        ctx?.onCleanup?.(() => clearTimeout(tCss));
     }, { signal: ctx?.signal });
 
     copyCSharpBtn.addEventListener('click', () => {
@@ -812,9 +814,10 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
 
         clipboard.copy(exports.csharp);
         setHtml(copyCSharpBtn, html`${unsafe(LucideIcons.check)} Copied C# Code!`);
-        setTimeout(() => {
+        const tCSharp = setTimeout(() => {
             setHtml(copyCSharpBtn, html`${unsafe(LucideIcons.code)} Copy C# Theme Tokens`);
         }, 2000);
+        ctx?.onCleanup?.(() => clearTimeout(tCSharp));
     }, { signal: ctx?.signal });
 
     document.addEventListener('studio:open', open, { signal: ctx?.signal });

@@ -601,11 +601,12 @@ export default function SplitButtonIsland(container: HTMLElement, props: SplitBu
         menuEl.style.opacity = '0';
         menuEl.style.transform = 'scaleY(0.8)';
         closeAllSubmenus();
-        setTimeout(() => {
+        const t = setTimeout(() => {
             if (!isOpen) {
                 menuEl.style.display = 'none';
             }
         }, 150);
+        ctx?.onCleanup?.(() => clearTimeout(t));
     }
 
     function openMenu() {
