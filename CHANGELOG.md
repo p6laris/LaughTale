@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Security
+- **Safe Component Rendering Engine:**
+  - Eliminated raw HTML injection defect across client component templates by migrating all 76 components to the safe tagged template primitive (`html`, `setHtml`, `safeUrl`, `attr`).
+  - Automatic HTML entity escaping for dynamic expressions in component rendering templates.
+  - Enforced zero-sink architecture contract (`npm run lint:contracts`) rejecting `.innerHTML`, `.outerHTML`, `insertAdjacentHTML`, and `document.write` across all components.
+  - Integrated contract linting into CI pipeline (`.github/workflows/ci.yml`) and pre-commit adoption ratchet to prevent defect reintroduction.
+
 ## [3.0.0] - 2026-08-30
 
 ### Added
