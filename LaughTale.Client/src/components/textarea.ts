@@ -7,6 +7,7 @@ import type { IslandContext } from '../runtime/registry';
  */
 
 import { injectIslandStyle } from '../runtime/styles';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 export interface TextareaProps {
     value?: string;
@@ -194,23 +195,23 @@ export default function TextareaIsland(container: HTMLElement, props: TextareaPr
                 isDisabled ? 'p-disabled' : ''
             ].filter(Boolean).join(' ');
 
-            container.innerHTML = `
+            setHtml(container, html`
                 <textarea 
                     class="${classList}" data-part="root"
                     rows="${props.rows || 5}"
                     cols="${props.cols || 30}"
                     placeholder="${props.placeholder || ''}"
-                    ${props.maxLength ? `maxlength="${props.maxLength}"` : ''}
-                    ${isDisabled ? 'disabled' : ''}
-                    ${props.name || props.targetInputName ? `name="${props.name || props.targetInputName}"` : ''}
-                    ${props.inputId ? `id="${props.inputId}"` : ''}
+                    ${attr('maxlength', props.maxLength)}
+                    ${attr('disabled', isDisabled)}
+                    ${attr('name', props.name || props.targetInputName)}
+                    ${attr('id', props.inputId)}
                 >${props.value || ''}</textarea>
-                ${props.maxLength ? `
+                ${props.maxLength ? html`
                     <div class="p-textarea-counter">
                         <span class="p-textarea-count">${(props.value || '').length}</span> / ${props.maxLength}
                     </div>
                 ` : ''}
-            `;
+            `);
             textareaEl = container.querySelector<HTMLTextAreaElement>('textarea')!;
         }
     }

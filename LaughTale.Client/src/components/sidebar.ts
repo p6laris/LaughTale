@@ -15,6 +15,7 @@ import type { IslandContext } from '../runtime/registry';
 import { SidebarItem } from '../types/models';
 import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 const SIDEBAR_CSS = `
 /* ==========================================================================
@@ -1767,7 +1768,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps, ctx?
                     searchQuery = (e.target as HTMLInputElement).value;
                     const contentEl = container.querySelector('.p-sidebar-content');
                     if (contentEl) {
-                        contentEl.innerHTML = renderGroupsHtml(groups);
+                        setHtml(contentEl, unsafe(renderGroupsHtml(groups)));
                         wireSubmenuAndLinks();
                     }
                 }, { signal: ctx?.signal });
@@ -2021,7 +2022,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps, ctx?
     }
 
     function render() {
-        container.innerHTML = renderComponent();
+        setHtml(container, unsafe(renderComponent()));
         wireEvents();
         restoreScrollAndActiveItem();
     }

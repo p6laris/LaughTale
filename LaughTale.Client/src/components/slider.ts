@@ -8,6 +8,7 @@ import type { IslandContext } from '../runtime/registry';
  */
 
 import { injectIslandStyle } from '../runtime/styles';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 export interface SliderProps {
     value?: number | number[] | string;
@@ -266,7 +267,7 @@ export default function SliderIsland(container: HTMLElement, props: SliderProps,
                 ? `bottom: ${p2}%;`
                 : `left: ${p2}%;`;
 
-            container.innerHTML = `
+            setHtml(container, html`
                 <span class="p-slider-range" data-part="root" style="${rangeStyle}"></span>
                 <span 
                     class="p-slider-handle ${disabledMin || isDisabled ? 'is-disabled' : ''}" 
@@ -291,7 +292,7 @@ export default function SliderIsland(container: HTMLElement, props: SliderProps,
                     style="${h2Style}"
                 ></span>
                 <input type="hidden" name="${props.name || props.targetInputName || 'slider_value'}" value="${currentValues.join(',')}" />
-            `;
+            `);
         } else {
             const p = getPercent(currentValues[0]);
             const rangeStyle = isVertical
@@ -302,7 +303,7 @@ export default function SliderIsland(container: HTMLElement, props: SliderProps,
                 ? `bottom: ${p}%;`
                 : `left: ${p}%;`;
 
-            container.innerHTML = `
+            setHtml(container, html`
                 <span class="p-slider-range" style="${rangeStyle}"></span>
                 <span 
                     class="p-slider-handle ${isDisabled ? 'is-disabled' : ''}" 
@@ -316,7 +317,7 @@ export default function SliderIsland(container: HTMLElement, props: SliderProps,
                     style="${hStyle}"
                 ></span>
                 <input type="hidden" name="${props.name || props.targetInputName || 'slider_value'}" value="${currentValues[0]}" />
-            `;
+            `);
         }
 
         bindEvents();

@@ -7,6 +7,7 @@ import type { IslandContext } from '../runtime/registry';
  */
 
 import { injectIslandStyle } from '../runtime/styles';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 const TABS_CSS = `
 .p-tabs,
@@ -533,7 +534,7 @@ export default function TabsIsland(container: HTMLElement, props: TabsProps, ctx
             prevBtn.type = 'button';
             prevBtn.className = 'p-tablist-prev-button';
             prevBtn.setAttribute('aria-label', 'Previous Tab');
-            prevBtn.innerHTML = CHEVRON_LEFT_SVG;
+            setHtml(prevBtn, unsafe(CHEVRON_LEFT_SVG));
             tabList.insertBefore(prevBtn, contentContainer);
         }
 
@@ -542,7 +543,7 @@ export default function TabsIsland(container: HTMLElement, props: TabsProps, ctx
             nextBtn.type = 'button';
             nextBtn.className = 'p-tablist-next-button';
             nextBtn.setAttribute('aria-label', 'Next Tab');
-            nextBtn.innerHTML = CHEVRON_RIGHT_SVG;
+            setHtml(nextBtn, unsafe(CHEVRON_RIGHT_SVG));
             tabList.appendChild(nextBtn);
         }
 

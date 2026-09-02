@@ -1,6 +1,7 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 /**
  * LaughTale: Enterprise Skeleton Shimmer Placeholder (Aura Design System compliant)
@@ -96,7 +97,7 @@ export default function SkeletonIsland(container: HTMLElement, props: SkeletonPr
         if (props.borderRadius) rootEl.style.borderRadius = props.borderRadius;
         if (props.style) rootEl.style.cssText += props.style;
 
-        container.innerHTML = '';
+        setHtml(container, html``);
         container.appendChild(rootEl);
     } else {
         rootEl.style.width = width;

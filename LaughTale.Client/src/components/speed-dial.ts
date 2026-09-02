@@ -4,6 +4,7 @@ import { getLucideIcon, LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
 import { executeCommand } from '../runtime/commands';
 import { sanitizeUrl } from '../directives/security';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 export interface SpeedDialActionItem {
     id?: string;
@@ -646,22 +647,19 @@ export default function SpeedDialIsland(container: HTMLElement, props: SpeedDial
     const uniqueId = 'speeddial_' + Math.random().toString(36).substring(2, 9);
 
     // Initial DOM creation (Only once!)
-    let maskHtml = '';
-    if (mask) {
-        maskHtml = `<div class="p-speeddial-mask" data-part="root"></div>`;
-    }
+    const maskHtml = mask ? html`<div class="p-speeddial-mask" data-part="root"></div>` : '';
 
     const itemsHtml = items.map((item, index) => {
-        const iconHtml = item.icon ? getLucideIcon(item.icon, 18) : LucideIcons.zap;
+        const iconHtml = item.icon ? unsafe(getLucideIcon(item.icon, 18)) : unsafe(LucideIcons.zap);
         const tooltipText = (hasTooltips || item.tooltip) ? (item.tooltip || item.label || '') : '';
-        const tooltipHtml = tooltipText ? `
+        const tooltipHtml = tooltipText ? html`
             <span class="p-speeddial-tooltip tooltip-${tooltipPosition}" data-index="${index}">
                 ${tooltipText}
             </span>
         ` : '';
 
         if (isCustomTemplate) {
-            return `
+            return html`
                 <li class="p-speeddial-item" role="none" data-index="${index}">
                     <div class="p-speeddial-custom-item" data-index="${index}">
                         <span class="p-speeddial-custom-label">${item.label || ''}</span>
@@ -673,29 +671,45 @@ export default function SpeedDialIsland(container: HTMLElement, props: SpeedDial
             `;
         }
 
-        const tag = item.url ? 'a' : 'button';
-        const hrefAttr = item.url ? `href="${item.url}" target="${item.target || '_self'}" rel="noopener"` : `type="button"`;
+        if (item.url) {
+            return html`
+                <li class="p-speeddial-item" role="none" data-index="${index}">
+                    <a href="${safeUrl(item.url)}" target="${item.target || '_self'}" rel="noopener"
+                       class="p-speeddial-action ${item.styleClass || ''}" 
+                       role="menuitem"
+                       data-index="${index}"
+                       tabindex="-1"
+                       aria-label="${item.label || tooltipText || 'Action'}"
+                       ${attr('disabled', item.disabled)}
+                       ${attr('aria-disabled', item.disabled ? 'true' : false)}>
+                        ${iconHtml}
+                        ${tooltipHtml}
+                    </a>
+                </li>
+            `;
+        }
 
-        return `
+        return html`
             <li class="p-speeddial-item" role="none" data-index="${index}">
-                <${tag} ${hrefAttr} 
+                <button type="button"
                    class="p-speeddial-action ${item.styleClass || ''}" 
                    role="menuitem"
                    data-index="${index}"
                    tabindex="-1"
                    aria-label="${item.label || tooltipText || 'Action'}"
-                   ${item.disabled ? 'disabled aria-disabled="true"' : ''}>
+                   ${attr('disabled', item.disabled)}
+                   ${attr('aria-disabled', item.disabled ? 'true' : false)}>
                     ${iconHtml}
                     ${tooltipHtml}
-                </${tag}>
+                </button>
             </li>
         `;
-    }).join('');
+    });
 
     const rotateClass = rotateAnimation ? 'p-speeddial-rotate' : '';
     const ariaLabel = props.ariaLabel || 'Speed Dial Options';
 
-    container.innerHTML = `
+    setHtml(container, html`
         ${maskHtml}
         <div class="p-speeddial p-component p-speeddial-direction-${direction} p-speeddial-${type}">
             <button type="button" 
@@ -705,14 +719,14 @@ export default function SpeedDialIsland(container: HTMLElement, props: SpeedDial
                     aria-controls="${uniqueId}_list"
                     aria-label="${ariaLabel}">
                 <span class="p-speeddial-icon ${rotateClass}">
-                    ${LucideIcons.plus}
+                    ${unsafe(LucideIcons.plus)}
                 </span>
             </button>
             <ul id="${uniqueId}_list" class="p-speeddial-list" role="menu" aria-label="${ariaLabel}">
                 ${itemsHtml}
             </ul>
         </div>
-    `;
+    `);
 
     const rootEl = container.querySelector<HTMLElement>('.p-speeddial')!;
     const mainBtn = container.querySelector<HTMLButtonElement>('.p-speeddial-button')!;

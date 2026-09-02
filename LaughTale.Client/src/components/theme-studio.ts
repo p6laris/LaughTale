@@ -12,6 +12,7 @@ import { useClipboard } from '../composables/useClipboard';
 import { injectIslandStyle } from '../runtime/styles';
 import { AURA_PALETTES, generatePaletteRamp, updateToken, saveTheme, loadSavedTheme, generateThemeExports, checkWcagCompliance } from '../styles/design-tokens';
 import { applyNeutralSurfaceTokens } from '../styles/theme-persistence';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 export interface ThemeStudioProps {
     defaultOpen?: boolean;
@@ -137,7 +138,7 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
     const scrollLock = useScrollLock();
     const clipboard = useClipboard();
 
-    container.innerHTML = `
+    setHtml(container, unsafe(`
         <div class="laughtale-theme-studio-root">
             <button type="button" 
                     class="theme-studio-toggle-btn" 
@@ -342,7 +343,7 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
                 </div>
             </div>
         </div>
-    `;
+    `));
 
     const toggleBtn = container.querySelector<HTMLButtonElement>('.theme-studio-toggle-btn')!;
     const backdrop = container.querySelector<HTMLElement>('.theme-studio-backdrop')!;
@@ -357,23 +358,23 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
     const copyCssBtn = container.querySelector<HTMLButtonElement>('.studio-copy-css-btn')!;
     const copyCSharpBtn = container.querySelector<HTMLButtonElement>('.studio-copy-csharp-btn')!;
 
-    colorGrid.innerHTML = Object.entries(PRIMARY_PRESETS).map(([key, p]) => `
+    setHtml(colorGrid, html`${Object.entries(PRIMARY_PRESETS).map(([key, p]) => html`
         <button type="button" 
                 class="studio-color-swatch ${key === currentPrimary ? 'active' : ''}" 
                 data-color="${key}" 
                 title="${p.name}" 
                 style="width: 100%; aspect-ratio: 1; border-radius: var(--lt-radius); background: ${p.hex}; border: ${key === currentPrimary ? '2px solid var(--lt-surface-0, #ffffff)' : '1px solid rgba(0,0,0,0.1)'}; box-shadow: ${key === currentPrimary ? '0 0 0 2px var(--lt-surface-900)' : 'none'}; cursor: pointer; transition: transform 0.15s ease;">
         </button>
-    `).join('');
+    `)}`);
 
-    neutralGrid.innerHTML = Object.entries(NEUTRAL_PRESETS).map(([key, n]) => `
+    setHtml(neutralGrid, html`${Object.entries(NEUTRAL_PRESETS).map(([key, n]) => html`
         <button type="button" 
                 class="studio-neutral-swatch ${key === currentNeutral ? 'active' : ''}" 
                 data-neutral="${key}" 
                 style="padding: 0.35rem 0.25rem; font-size: 0.6875rem; font-weight: 600; border: ${key === currentNeutral ? '2px solid var(--lt-primary-500)' : '1px solid var(--lt-surface-200)'}; border-radius: var(--lt-radius); background: ${n.s100}; color: ${n.s900}; cursor: pointer; text-align: center;">
             ${n.name}
         </button>
-    `).join('');
+    `)}`);
 
     function applyTheme() {
         let currentRamp: Record<string, string>;
@@ -795,9 +796,9 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
         });
 
         clipboard.copy(exports.css);
-        copyCssBtn.innerHTML = `${LucideIcons.check} Copied to Clipboard!`;
+        setHtml(copyCssBtn, html`${unsafe(LucideIcons.check)} Copied to Clipboard!`);
         setTimeout(() => {
-            copyCssBtn.innerHTML = `${LucideIcons.copy} Copy CSS Custom Properties`;
+            setHtml(copyCssBtn, html`${unsafe(LucideIcons.copy)} Copy CSS Custom Properties`);
         }, 2000);
     }, { signal: ctx?.signal });
 
@@ -810,9 +811,9 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
         });
 
         clipboard.copy(exports.csharp);
-        copyCSharpBtn.innerHTML = `${LucideIcons.check} Copied C# Code!`;
+        setHtml(copyCSharpBtn, html`${unsafe(LucideIcons.check)} Copied C# Code!`);
         setTimeout(() => {
-            copyCSharpBtn.innerHTML = `${LucideIcons.code} Copy C# Theme Tokens`;
+            setHtml(copyCSharpBtn, html`${unsafe(LucideIcons.code)} Copy C# Theme Tokens`);
         }, 2000);
     }, { signal: ctx?.signal });
 

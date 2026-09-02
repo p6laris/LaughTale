@@ -10,6 +10,7 @@ import type { IslandContext } from '../runtime/registry';
 import { MenuItem } from '../types/models';
 import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 const TIEREDMENU_CSS = `
 /* ==========================================================================
@@ -327,10 +328,10 @@ export default function TieredMenuIsland(container: HTMLElement, props: TieredMe
 
     const chevronRightSvg = `<svg class="p-tieredmenu-submenu-icon" data-part="root" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`;
 
-    function renderMenuItems(itemsList: MenuItem[], level: number = 0): string {
+    function renderMenuItems(itemsList: MenuItem[], level: number = 0): Raw[] {
         return itemsList.map((item, idx) => {
             if (item.Separator || (item as any).separator) {
-                return `<li class="p-tieredmenu-separator" role="separator"></li>`;
+                return html`<li class="p-tieredmenu-separator" role="separator"></li>`;
             }
 
             const label = item.Label || item.label || '';
@@ -345,29 +346,26 @@ export default function TieredMenuIsland(container: HTMLElement, props: TieredMe
             const command = item.Command || item.command || '';
 
             const subTreeHtml = hasSubmenu 
-                ? `<ul class="p-tieredmenu-submenu" role="menu" style="display: none;">${renderMenuItems(subItems, level + 1)}</ul>` 
+                ? html`<ul class="p-tieredmenu-submenu" role="menu" style="display: none;">${renderMenuItems(subItems, level + 1)}</ul>` 
                 : '';
 
-            const badgeHtml = badge ? `<span class="p-tieredmenu-badge aura-tag tag-emerald">${badge}</span>` : '';
-            const shortcutHtml = shortcut ? `<span class="p-tieredmenu-shortcut">${shortcut}</span>` : '';
-            const submenuArrow = hasSubmenu ? chevronRightSvg : '';
+            const badgeHtml = badge ? html`<span class="p-tieredmenu-badge aura-tag tag-emerald">${badge}</span>` : '';
+            const shortcutHtml = shortcut ? html`<span class="p-tieredmenu-shortcut">${shortcut}</span>` : '';
+            const submenuArrow = hasSubmenu ? unsafe(chevronRightSvg) : '';
+            const href = url ? safeUrl(url) : 'javascript:void(0)';
 
-            const linkAttrs = [
-                `class="p-tieredmenu-item-link"`,
-                `role="menuitem"`,
-                `tabindex="${disabled ? -1 : 0}"`,
-                hasSubmenu ? `aria-haspopup="true" aria-expanded="false"` : '',
-                url ? `href="${url}"` : `href="javascript:void(0)"`,
-                command ? `data-command="${command}"` : '',
-                `data-item-label="${label}"`,
-                item.Target || item.target ? `target="${item.Target || item.target}"` : ''
-            ].filter(Boolean).join(' ');
-
-            return `
+            return html`
                 <li class="p-tieredmenu-item ${disabled ? 'p-disabled' : ''}" role="none" data-level="${level}">
                     <div class="p-tieredmenu-item-content">
-                        <a ${linkAttrs}>
-                            ${iconSvg ? `<span class="p-tieredmenu-item-icon">${iconSvg}</span>` : ''}
+                        <a class="p-tieredmenu-item-link"
+                           role="menuitem"
+                           tabindex="${disabled ? -1 : 0}"
+                           ${hasSubmenu ? 'aria-haspopup="true" aria-expanded="false"' : ''}
+                           href="${href}"
+                           ${attr('data-command', command)}
+                           data-item-label="${label}"
+                           ${attr('target', item.Target || item.target)}>
+                            ${iconSvg ? html`<span class="p-tieredmenu-item-icon">${unsafe(iconSvg)}</span>` : ''}
                             <span class="p-tieredmenu-item-label">${label}</span>
                             ${badgeHtml}
                             ${shortcutHtml}
@@ -377,17 +375,17 @@ export default function TieredMenuIsland(container: HTMLElement, props: TieredMe
                     ${subTreeHtml}
                 </li>
             `;
-        }).join('');
+        });
     }
 
-    function renderComponent(): string {
+    function renderComponent(): Raw {
         const rootClasses = [
             'p-tieredmenu',
             isPopup ? 'p-tieredmenu-overlay' : '',
             props.class || ''
         ].filter(Boolean).join(' ');
 
-        const menuHtml = `
+        const menuHtml = html`
             <div class="${rootClasses}" ${isPopup ? 'style="display: none;"' : ''} data-tieredmenu-root role="menubar" aria-orientation="vertical">
                 <ul class="p-tieredmenu-root-list" role="menubar">
                     ${renderMenuItems(model)}
@@ -400,10 +398,10 @@ export default function TieredMenuIsland(container: HTMLElement, props: TieredMe
             const triggerSeverity = props.triggerSeverity || 'primary';
             const iconSvg = props.triggerIcon ? getIconSvg(props.triggerIcon) : '';
 
-            return `
+            return html`
                 <div class="p-tieredmenu-wrapper" style="position: relative; display: inline-block;">
                     <button type="button" class="p-button p-button-${triggerSeverity} ${triggerVariant === 'outlined' ? 'p-button-outlined' : ''}" data-tieredmenu-trigger aria-haspopup="true" aria-expanded="false">
-                        ${iconSvg ? `<span class="p-button-icon">${iconSvg}</span>` : ''}
+                        ${iconSvg ? html`<span class="p-button-icon">${unsafe(iconSvg)}</span>` : ''}
                         <span class="p-button-label">${props.triggerText}</span>
                     </button>
                     ${menuHtml}
@@ -706,6 +704,6 @@ export default function TieredMenuIsland(container: HTMLElement, props: TieredMe
         }));
     }
 
-    container.innerHTML = renderComponent();
+    setHtml(container, renderComponent());
     wireEvents();
 }

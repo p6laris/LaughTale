@@ -1,6 +1,7 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 /**
  * LaughTale: Enterprise Status Tag & Badge Component (Aura Design System compliant)
@@ -173,14 +174,11 @@ export default function TagIsland(container: HTMLElement, props: TagProps, ctx?:
     rootEl.className = `p-tag p-component p-tag-${severity} ${isRounded ? 'p-tag-rounded' : ''} ${props.class || ''}`.trim();
     if (props.style) rootEl.style.cssText += props.style;
 
-    let iconHtml = '';
-    if (props.icon) {
-        iconHtml = `<span class="p-tag-icon">${getIconSvg(props.icon)}</span>`;
-    }
+    const iconHtml = props.icon ? html`<span class="p-tag-icon">${unsafe(getIconSvg(props.icon))}</span>` : '';
 
-    rootEl.innerHTML = `${iconHtml}<span class="p-tag-label">${value}</span>`;
+    setHtml(rootEl, html`${iconHtml}<span class="p-tag-label">${value}</span>`);
 
-    container.innerHTML = '';
+    setHtml(container, html``);
     container.appendChild(rootEl);
 
     container.setAttribute('data-part', 'root');

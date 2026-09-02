@@ -10,6 +10,7 @@ import { injectIslandStyle } from '../runtime/styles';
 import { LucideIcons } from '../icons/lucide';
 import { executeCommand } from '../runtime/commands';
 import { sanitizeUrl } from '../directives/security';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 export interface SplitButtonProps {
     label?: string;
@@ -507,34 +508,33 @@ export default function SplitButtonIsland(container: HTMLElement, props: SplitBu
     const initialSlotContent = container.innerHTML.trim();
     const hasCustomSlot = initialSlotContent && !initialSlotContent.startsWith('<div class="p-splitbutton');
 
-    function renderSubmenuTree(subItems: SplitButtonItem[]): string {
-        return `
-            <ul class=" data-part="root"p-splitbutton-submenu-overlay p-menu-list" role="menu">
-                ${subItems.map((item, idx) => renderMenuItem(item, idx, true)).join('')}
+    function renderSubmenuTree(subItems: SplitButtonItem[]): Raw {
+        return html`
+            <ul class="data-part=\"root\" p-splitbutton-submenu-overlay p-menu-list" role="menu">
+                ${subItems.map((item, idx) => renderMenuItem(item, idx, true))}
             </ul>
         `;
     }
 
-    function renderMenuItem(item: SplitButtonItem, index: number, isSub: boolean = false): string {
+    function renderMenuItem(item: SplitButtonItem, index: number, isSub: boolean = false): Raw {
         if (item.separator) {
-            return `<li class="p-menu-separator" role="separator"></li>`;
+            return html`<li class="p-menu-separator" role="separator"></li>`;
         }
 
         const hasSub = Array.isArray(item.items) && item.items.length > 0;
-        const iconSvg = item.icon ? `<span class="p-menu-item-icon">${LucideIcons[item.icon]}</span>` : '';
-        const subChevron = hasSub ? `<span class="p-submenu-icon">${LucideIcons.chevronRight}</span>` : '';
+        const iconSvg = item.icon && LucideIcons[item.icon] ? html`<span class="p-menu-item-icon">${unsafe(LucideIcons[item.icon])}</span>` : '';
+        const subChevron = hasSub ? html`<span class="p-submenu-icon">${unsafe(LucideIcons.chevronRight)}</span>` : '';
         const itemLabel = item.label || '';
-        const itemDisabled = item.disabled ? 'aria-disabled="true"' : '';
         const itemUrl = item.url || (item.route ? item.route : '');
 
-        return `
+        return html`
             <li class="p-menu-item ${hasSub ? 'p-menu-item-has-submenu' : ''}" role="none" data-index="${index}">
                 <a class="p-menu-item-link" 
                    role="menuitem" 
                    tabindex="${item.disabled ? '-1' : '0'}" 
-                   ${itemDisabled}
-                   ${itemUrl ? `href="${itemUrl}"` : ''}
-                   ${item.target ? `target="${item.target}"` : ''}>
+                   ${attr('aria-disabled', item.disabled ? 'true' : false)}
+                   ${attr('href', itemUrl ? safeUrl(itemUrl) : undefined)}
+                   ${attr('target', item.target)}>
                     ${iconSvg}
                     <span class="p-menu-item-label">${itemLabel}</span>
                     ${subChevron}
@@ -546,15 +546,15 @@ export default function SplitButtonIsland(container: HTMLElement, props: SplitBu
 
     // Main markup
     const mainButtonContent = hasCustomSlot 
-        ? initialSlotContent 
-        : `${icon ? `<span class="p-button-icon">${LucideIcons[icon]}</span>` : ''}${label ? `<span class="p-button-label">${label}</span>` : ''}`;
+        ? unsafe(initialSlotContent) 
+        : html`${icon && LucideIcons[icon] ? html`<span class="p-button-icon">${unsafe(LucideIcons[icon])}</span>` : ''}${label ? html`<span class="p-button-label">${label}</span>` : ''}`;
 
-    container.innerHTML = `
+    setHtml(container, html`
         <div class="${rootClasses.join(' ')}">
             <!-- Main Default Action Button -->
             <button type="button" 
                     class="p-splitbutton-button p-button ${btnSevClass}" 
-                    ${disabled ? 'disabled' : ''} 
+                    ${attr('disabled', disabled)} 
                     aria-label="${label || 'SplitButton Action'}">
                 ${mainButtonContent}
             </button>
@@ -562,22 +562,22 @@ export default function SplitButtonIsland(container: HTMLElement, props: SplitBu
             <!-- Dropdown Menu Trigger Button -->
             <button type="button" 
                     class="p-splitbutton-dropdown p-button p-button-icon-only ${btnSevClass}" 
-                    ${disabled ? 'disabled' : ''} 
+                    ${attr('disabled', disabled)} 
                     aria-haspopup="menu" 
                     aria-expanded="false" 
                     aria-controls="${menuId}" 
                     aria-label="More Options">
-                <span class="p-button-icon">${LucideIcons[dropdownIcon]}</span>
+                <span class="p-button-icon">${unsafe(LucideIcons[dropdownIcon])}</span>
             </button>
 
             <!-- Dropdown Menu Overlay -->
             <div id="${menuId}" class="p-splitbutton-menu p-menu p-component" role="menu" style="display: none; opacity: 0; transform: scaleY(0.8);">
                 <ul class="p-menu-list" role="menu">
-                    ${items.map((it, idx) => renderMenuItem(it, idx)).join('')}
+                    ${items.map((it, idx) => renderMenuItem(it, idx))}
                 </ul>
             </div>
         </div>
-    `;
+    `);
 
     const rootEl = container.firstElementChild as HTMLElement;
     const mainBtn = rootEl.querySelector<HTMLButtonElement>('.p-splitbutton-button')!;
