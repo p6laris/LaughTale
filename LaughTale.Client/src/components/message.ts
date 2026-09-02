@@ -568,16 +568,36 @@ export default function MessageIsland(container: HTMLElement, props: MessageProp
                 clearBtn.addEventListener('click', () => {
                     if (listContainer) {
                         const items = listContainer.querySelectorAll<HTMLElement>('[data-message-item]');
+                        if (items.length === 0) return;
                         items.forEach(el => {
-                            const currentHeight = el.getBoundingClientRect().height;
-                            el.style.maxHeight = `${currentHeight}px`;
-                            void el.offsetHeight;
-                            el.classList.add('p-message-exit');
+                            const h = el.offsetHeight;
+                            el.style.height = `${h}px`;
+                            el.style.maxHeight = `${h}px`;
+                            el.style.boxSizing = 'border-box';
+                            el.style.overflow = 'hidden';
+                            el.style.pointerEvents = 'none';
+                            el.style.willChange = 'height, max-height, opacity, transform, margin, padding';
+                            el.style.transition = 'height 220ms cubic-bezier(0.16, 1, 0.3, 1), max-height 220ms cubic-bezier(0.16, 1, 0.3, 1), opacity 180ms ease, transform 180ms cubic-bezier(0.16, 1, 0.3, 1), margin 220ms cubic-bezier(0.16, 1, 0.3, 1), padding 220ms cubic-bezier(0.16, 1, 0.3, 1), border-width 220ms ease';
+
+                            requestAnimationFrame(() => {
+                                requestAnimationFrame(() => {
+                                    el.style.height = '0px';
+                                    el.style.maxHeight = '0px';
+                                    el.style.opacity = '0';
+                                    el.style.transform = 'translate3d(0, -6px, 0) scale(0.97)';
+                                    el.style.marginTop = '0px';
+                                    el.style.marginBottom = '0px';
+                                    el.style.paddingTop = '0px';
+                                    el.style.paddingBottom = '0px';
+                                    el.style.borderTopWidth = '0px';
+                                    el.style.borderBottomWidth = '0px';
+                                });
+                            });
                         });
                         setTimeout(() => {
                             dynamicMessages = [];
                             listContainer.innerHTML = '';
-                        }, 280);
+                        }, 240);
                     }
                 }, { signal: ctx?.signal });
             }
@@ -602,31 +622,47 @@ export default function MessageIsland(container: HTMLElement, props: MessageProp
             const lifeStr = msgEl.getAttribute('data-life');
 
             const dismissMessage = () => {
-                // If this is a standalone island container, we must animate and remove the entire container
-                // so no zero-height wrapper or flex gap remains in the parent!
-                const targetToAnimate = isStandaloneIsland && container.parentElement ? container : msgEl;
-                const currentHeight = targetToAnimate.getBoundingClientRect().height;
+                if (msgEl.dataset.dismissing === 'true') return;
+                msgEl.dataset.dismissing = 'true';
 
-                targetToAnimate.style.maxHeight = `${currentHeight}px`;
-                targetToAnimate.style.boxSizing = 'border-box';
-                targetToAnimate.style.overflow = 'hidden';
-                targetToAnimate.style.transition = 'max-height 280ms cubic-bezier(0.16, 1, 0.3, 1), opacity 240ms cubic-bezier(0.16, 1, 0.3, 1), margin 280ms cubic-bezier(0.16, 1, 0.3, 1), padding 280ms cubic-bezier(0.16, 1, 0.3, 1)';
+                // Get exact current height and lock explicitly on the styled element
+                const height = msgEl.offsetHeight;
 
-                msgEl.classList.add('p-message-exit');
+                msgEl.style.height = `${height}px`;
+                msgEl.style.maxHeight = `${height}px`;
+                msgEl.style.boxSizing = 'border-box';
+                msgEl.style.overflow = 'hidden';
+                msgEl.style.pointerEvents = 'none';
+                msgEl.style.willChange = 'height, max-height, opacity, transform, margin, padding';
+                msgEl.style.transition = 'height 220ms cubic-bezier(0.16, 1, 0.3, 1), max-height 220ms cubic-bezier(0.16, 1, 0.3, 1), opacity 180ms ease, transform 180ms cubic-bezier(0.16, 1, 0.3, 1), margin 220ms cubic-bezier(0.16, 1, 0.3, 1), padding 220ms cubic-bezier(0.16, 1, 0.3, 1), border-width 220ms ease';
 
-                // Force reflow for silky smooth CSS interpolation
-                void targetToAnimate.offsetHeight;
+                // Next frame: smoothly collapse height and fade/transform
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        msgEl.style.height = '0px';
+                        msgEl.style.maxHeight = '0px';
+                        msgEl.style.opacity = '0';
+                        msgEl.style.transform = 'translate3d(0, -6px, 0) scale(0.97)';
+                        msgEl.style.marginTop = '0px';
+                        msgEl.style.marginBottom = '0px';
+                        msgEl.style.paddingTop = '0px';
+                        msgEl.style.paddingBottom = '0px';
+                        msgEl.style.borderTopWidth = '0px';
+                        msgEl.style.borderBottomWidth = '0px';
+                    });
+                });
 
-                targetToAnimate.style.maxHeight = '0px';
-                targetToAnimate.style.opacity = '0';
-                targetToAnimate.style.marginTop = '0px';
-                targetToAnimate.style.marginBottom = '0px';
-                targetToAnimate.style.paddingTop = '0px';
-                targetToAnimate.style.paddingBottom = '0px';
-
-                setTimeout(() => {
-                    targetToAnimate.remove();
-                }, 280);
+                // Remove once transition fully completes (already at 0 height, so zero jump!)
+                const onEnd = () => {
+                    msgEl.removeEventListener('transitionend', onEnd);
+                    if (isStandaloneIsland && container.parentElement) {
+                        container.remove();
+                    } else {
+                        msgEl.remove();
+                    }
+                };
+                msgEl.addEventListener('transitionend', onEnd);
+                setTimeout(onEnd, 250);
             };
 
             if (closeBtn) {

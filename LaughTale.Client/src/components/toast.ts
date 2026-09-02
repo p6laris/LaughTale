@@ -593,15 +593,41 @@ export class ToastService {
         }
 
         const el = item.el;
-        const currentHeight = el.getBoundingClientRect().height;
-        el.style.maxHeight = `${currentHeight}px`;
-        void el.offsetHeight;
-        el.classList.add('p-toast-message-leave');
+        if (el.dataset.dismissing === 'true') return;
+        el.dataset.dismissing = 'true';
+
+        const height = el.offsetHeight;
+        el.style.height = `${height}px`;
+        el.style.maxHeight = `${height}px`;
+        el.style.boxSizing = 'border-box';
+        el.style.overflow = 'hidden';
+        el.style.pointerEvents = 'none';
+        el.style.willChange = 'height, max-height, opacity, transform, margin, padding';
+        el.style.transition = 'height 220ms cubic-bezier(0.16, 1, 0.3, 1), max-height 220ms cubic-bezier(0.16, 1, 0.3, 1), opacity 180ms ease, transform 180ms cubic-bezier(0.16, 1, 0.3, 1), margin 220ms cubic-bezier(0.16, 1, 0.3, 1), padding 220ms cubic-bezier(0.16, 1, 0.3, 1), border-width 220ms ease';
+
         this.activeMessages.delete(id);
 
-        setTimeout(() => {
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                el.style.height = '0px';
+                el.style.maxHeight = '0px';
+                el.style.opacity = '0';
+                el.style.transform = 'translate3d(0, -8px, 0) scale(0.96)';
+                el.style.marginTop = '0px';
+                el.style.marginBottom = '0px';
+                el.style.paddingTop = '0px';
+                el.style.paddingBottom = '0px';
+                el.style.borderTopWidth = '0px';
+                el.style.borderBottomWidth = '0px';
+            });
+        });
+
+        const onEnd = () => {
+            el.removeEventListener('transitionend', onEnd);
             el.remove();
-        }, 260);
+        };
+        el.addEventListener('transitionend', onEnd);
+        setTimeout(onEnd, 250);
     }
 
     public remove(msg: ToastMessageOptions | string) {
