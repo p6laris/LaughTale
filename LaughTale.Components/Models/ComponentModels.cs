@@ -907,8 +907,9 @@ public record ProgressBarProps(
 
 [LaughTale.Core.Attributes.Island("meter-group")]
 public record MeterGroupProps(
-    object? Values = null, double Max = 100, string? Orientation = "horizontal",
-    string? LabelPosition = "end", string? LabelOrientation = "horizontal"
+    object? Values = null, object? Value = null, object? Meters = null,
+    double Max = 100, double Min = 0,
+    string? Orientation = "horizontal", string? LabelPosition = "end", string? LabelOrientation = "horizontal"
 );
 
 [LaughTale.Core.Attributes.Island("skeleton")]

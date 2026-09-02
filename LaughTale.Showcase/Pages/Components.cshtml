@@ -7482,12 +7482,42 @@
         <div class="card-header">
             <div>
                 <h2>MeterGroup Capacity Gauge</h2>
-                <p>Multi-segmented capacity distribution meter for RAM, CPU, and disk pools.</p>
+                <p>Multi-segmented capacity and distribution meter for storage, memory, and telemetry datasets.</p>
             </div>
             <span class="p-tag p-tag-success">Telemetry</span>
         </div>
-        <div class="card-body" style="max-width: 600px;">
-            <island-meter-group meters="@Model.StorageMetrics" max="100" />
+        <div class="card-body">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; width: 100%;">
+                <!-- Storage Partition Gauge -->
+                <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem;">
+                    <div style="font-size: 0.875rem; font-weight: 600; color: var(--p-text-color);">Storage Partition Gauge</div>
+                    <p style="font-size: 0.8rem; color: var(--p-text-muted); margin: 0;">Multi-segmented horizontal track showing system disk usage.</p>
+                    <island-meter-group values="@Model.StorageMetrics" max="100" />
+                </div>
+
+                <!-- Network & Bandwidth Distribution -->
+                <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem;">
+                    <div style="font-size: 0.875rem; font-weight: 600; color: var(--p-text-color);">Network Bandwidth Pools</div>
+                    <p style="font-size: 0.8rem; color: var(--p-text-muted); margin: 0;">Labels positioned at start with custom telemetry metrics.</p>
+                    <island-meter-group values="@(new[] { new { label = "Streaming API", value = 45, color = "#10b981" }, new { label = "WebSocket Feed", value = 30, color = "#3b82f6" }, new { label = "CDN Assets", value = 15, color = "#f59e0b" }, new { label = "Idle", value = 10, color = "#94a3b8" } })" label-position="start" max="100" />
+                </div>
+
+                <!-- Vertical Telemetry Stack -->
+                <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem;">
+                    <div style="font-size: 0.875rem; font-weight: 600; color: var(--p-text-color);">Vertical Memory Bar</div>
+                    <p style="font-size: 0.8rem; color: var(--p-text-muted); margin: 0;">Vertical meter column with stacked legend items.</p>
+                    <div style="height: 10rem; display: flex; align-items: center;">
+                        <island-meter-group values="@(new[] { new { label = "Heap Used", value = 55, color = "#8b5cf6" }, new { label = "Buffers", value = 25, color = "#ec4899" }, new { label = "Free RAM", value = 20, color = "#06b6d4" } })" orientation="vertical" max="100" />
+                    </div>
+                </div>
+
+                <!-- Minimal Track without Labels -->
+                <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem;">
+                    <div style="font-size: 0.875rem; font-weight: 600; color: var(--p-text-color);">Compact Status Track</div>
+                    <p style="font-size: 0.8rem; color: var(--p-text-muted); margin: 0;">Minimal track only, suitable for cards and summary tables.</p>
+                    <island-meter-group values="@(new[] { new { label = "Active", value = 60, color = "#10b981" }, new { label = "Pending", value = 25, color = "#f59e0b" }, new { label = "Failed", value = 15, color = "#ef4444" } })" show-labels="false" max="100" />
+                </div>
+            </div>
         </div>
     </section>
 
