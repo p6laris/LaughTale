@@ -1,14 +1,9 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
-﻿/**
- * LaughTale: Enterprise InputText Component (Aura InputText)
- * Standard and enhanced text input with size scales, filled/outlined variants,
- * leading/trailing icons, zero-flicker clear action, and full Theme Studio & dark mode token support.
- */
-
 import { injectIslandStyle } from '../runtime/styles';
 import { LucideIcons } from '../icons/lucide';
 import { useControllableState } from '../composables/useControllableState';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 export interface InputTextProps {
     value?: string;
@@ -256,7 +251,7 @@ html.dark .p-inputtext-icon,
 }
 `;
 
-const xIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
+const xIcon = html`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
 
 export default function InputTextIsland(container: HTMLElement, props: InputTextProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-inputtext', CSS);
@@ -310,40 +305,34 @@ export default function InputTextIsland(container: HTMLElement, props: InputText
 
         container.className = wrapClasses;
 
-        const leftIconHtml = leftIconSvg ? `<span class="p-inputtext-icon p-inputtext-icon-left" data-part="root">${leftIconSvg}</span>` : '';
-        const rightIconHtml = rightIconSvg ? `<span class="p-inputtext-icon p-inputtext-icon-right">${rightIconSvg}</span>` : '';
-        const clearBtnHtml = hasClear ? `
+        const leftIconHtml = leftIconSvg ? html`<span class="p-inputtext-icon p-inputtext-icon-left" data-part="root">${unsafe(leftIconSvg)}</span>` : '';
+        const rightIconHtml = rightIconSvg ? html`<span class="p-inputtext-icon p-inputtext-icon-right">${unsafe(rightIconSvg)}</span>` : '';
+        const clearBtnHtml = hasClear ? html`
             <button type="button" class="p-inputtext-clear" aria-label="Clear text" tabindex="-1" style="display: ${val ? 'flex' : 'none'};">
                 ${xIcon}
             </button>
         ` : '';
 
-        const idAttr = inputId ? `id="${escapeHtml(inputId)}"` : '';
-        const nameAttr = inputName ? `name="${escapeHtml(inputName)}"` : '';
-        const ariaLabelAttr = props.ariaLabel ? `aria-label="${escapeHtml(props.ariaLabel)}"` : '';
-        const ariaLabelledByAttr = props.ariaLabelledBy ? `aria-labelledby="${escapeHtml(props.ariaLabelledBy)}"` : '';
-        const ariaDescribedByAttr = props.ariaDescribedBy ? `aria-describedby="${escapeHtml(props.ariaDescribedBy)}"` : '';
-
-        container.innerHTML = `
+        setHtml(container, html`
             ${leftIconHtml}
             <input
                 type="${props.type || 'text'}"
                 class="${inputClasses}"
-                value="${escapeHtml(val)}"
-                placeholder="${escapeHtml(props.placeholder || '')}"
-                ${idAttr}
-                ${nameAttr}
-                ${ariaLabelAttr}
-                ${ariaLabelledByAttr}
-                ${ariaDescribedByAttr}
-                ${isDisabled ? 'disabled' : ''}
-                ${isReadonly ? 'readonly' : ''}
-                ${isInvalid ? 'aria-invalid="true"' : ''}
+                value="${val}"
+                placeholder="${props.placeholder || ''}"
+                ${attr('id', inputId)}
+                ${attr('name', inputName)}
+                ${attr('aria-label', props.ariaLabel)}
+                ${attr('aria-labelledby', props.ariaLabelledBy)}
+                ${attr('aria-describedby', props.ariaDescribedBy)}
+                ${attr('disabled', isDisabled)}
+                ${attr('readonly', isReadonly)}
+                ${attr('aria-invalid', isInvalid)}
                 autocomplete="off"
             />
             ${clearBtnHtml}
             ${rightIconHtml}
-        `;
+        `);
 
         if (props.helpText) {
             const helpEl = document.createElement('small');
@@ -354,10 +343,6 @@ export default function InputTextIsland(container: HTMLElement, props: InputText
         }
 
         bindEvents();
-    }
-
-    function escapeHtml(str: string): string {
-        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
     function bindEvents() {

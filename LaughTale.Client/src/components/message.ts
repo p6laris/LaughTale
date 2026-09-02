@@ -10,6 +10,7 @@ import type { IslandContext } from '../runtime/registry';
 
 import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 const MESSAGE_CSS = `
 /* ==========================================================================
@@ -483,22 +484,24 @@ export default function MessageIsland(container: HTMLElement, props: MessageProp
         return '';
     }
 
-    const closeIconSvg = `<svg class="p-message-close-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
+    const closeIconSvg = html`<svg class="p-message-close-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
 
-    function renderSingleMessage(p: MessageProps, initialHtmlText?: string): string {
+    function renderSingleMessage(p: MessageProps, initialHtmlText?: string): Raw {
         const severity = p.severity || 'info';
         const variant = p.variant ? `p-message-${p.variant}` : '';
         const sizeClass = p.size === 'small' ? 'p-message-sm' : (p.size === 'large' ? 'p-message-lg' : '');
         const closable = p.closable === true;
-        const text = p.text || p.content || initialHtmlText || '';
+        const text = p.text || p.content || (initialHtmlText ? unsafe(initialHtmlText) : '');
 
-        let iconContent = '';
+        let iconContent: Raw | '' = '';
         if (p.avatar) {
-            iconContent = `<img src="${p.avatar}" alt="Avatar" style="width: 1.75rem; height: 1.75rem; border-radius: 9999px; object-fit: cover;" />`;
+            iconContent = html`<img src="${safeUrl(p.avatar)}" alt="Avatar" style="width: 1.75rem; height: 1.75rem; border-radius: 9999px; object-fit: cover;" />`;
         } else if (p.icon) {
-            iconContent = getCustomIconSvg(p.icon);
+            const customSvg = getCustomIconSvg(p.icon);
+            iconContent = customSvg ? html`${unsafe(customSvg)}` : '';
         } else {
-            iconContent = getDefaultIcon(severity, p.spin);
+            const defSvg = getDefaultIcon(severity, p.spin);
+            iconContent = defSvg ? html`${unsafe(defSvg)}` : '';
         }
 
         const classes = [
@@ -509,12 +512,12 @@ export default function MessageIsland(container: HTMLElement, props: MessageProp
             p.class || ''
         ].filter(Boolean).join(' ');
 
-        return `
-            <div class="${classes}" role="alert" aria-live="assertive" aria-atomic="true" ${p.style ? `style="${p.style}"` : ''} data-message-item ${p.life ? `data-life="${p.life}"` : ''}>
+        return html`
+            <div class="${classes}" role="alert" aria-live="assertive" aria-atomic="true" ${attr('style', p.style)} data-message-item ${attr('data-life', p.life)}>
                 <div class="p-message-content">
-                    ${iconContent ? `<span class="p-message-icon">${iconContent}</span>` : ''}
+                    ${iconContent ? html`<span class="p-message-icon">${iconContent}</span>` : ''}
                     <div class="p-message-text">${text}</div>
-                    ${closable ? `
+                    ${closable ? html`
                         <button type="button" class="p-message-close-button" aria-label="Close" title="Close message" data-message-close>
                             ${closeIconSvg}
                         </button>
@@ -525,14 +528,14 @@ export default function MessageIsland(container: HTMLElement, props: MessageProp
     }
 
     if (isDynamic) {
-        function renderDynamicContainer(): string {
+        function renderDynamicContainer(): Raw {
             const listHtml = dynamicMessages.map(msg => renderSingleMessage({
                 severity: msg.severity as any,
                 content: msg.content,
                 closable: msg.closable !== false
-            })).join('');
+            }));
 
-            return `
+            return html`
                 <div class="p-message-dynamic-wrapper" style="display: flex; flex-direction: column; gap: 0.75rem; width: 100%;">
                     <div style="display: flex; gap: 0.5rem; justify-content: center; margin-bottom: 0.5rem;">
                         <button type="button" class="p-button p-button-primary" data-add-messages>Add Messages</button>
@@ -558,7 +561,7 @@ export default function MessageIsland(container: HTMLElement, props: MessageProp
                         { severity: 'warn', content: 'Dynamic Warn Message', closable: true }
                     ];
                     if (listContainer) {
-                        listContainer.innerHTML = dynamicMessages.map(msg => renderSingleMessage(msg as any)).join('');
+                        setHtml(listContainer, html`${dynamicMessages.map(msg => renderSingleMessage(msg as any))}`);
                         wireMessageClosers(listContainer, false);
                     }
                 }, { signal: ctx?.signal });
@@ -596,7 +599,7 @@ export default function MessageIsland(container: HTMLElement, props: MessageProp
                         });
                         setTimeout(() => {
                             dynamicMessages = [];
-                            listContainer.innerHTML = '';
+                            setHtml(listContainer, html``);
                         }, 240);
                     }
                 }, { signal: ctx?.signal });
@@ -607,13 +610,13 @@ export default function MessageIsland(container: HTMLElement, props: MessageProp
             }
         }
 
-        container.innerHTML = renderDynamicContainer();
+        setHtml(container, renderDynamicContainer());
         wireDynamic();
         return;
     }
 
     const slotContent = container.innerHTML.trim();
-    container.innerHTML = renderSingleMessage(props, slotContent);
+    setHtml(container, renderSingleMessage(props, slotContent));
     wireMessageClosers(container, true);
 
     function wireMessageClosers(root: HTMLElement, isStandaloneIsland: boolean) {

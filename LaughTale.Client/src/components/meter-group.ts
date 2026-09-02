@@ -1,6 +1,7 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 /**
  * LaughTale: Enterprise MeterGroup Component (Aura Design System compliant)
@@ -180,23 +181,23 @@ export default function MeterGroupIsland(container: HTMLElement, props: MeterGro
         const color = v?.color || DEFAULT_COLORS[idx % DEFAULT_COLORS.length];
         const dimensionStyle = isVertical ? `height: ${pct}%;` : `width: ${pct}%;`;
 
-        return `<span class="p-metergroup-meter" style="background: ${color}; ${dimensionStyle}" title="${v?.label || ''}: ${val}%"></span>`;
-    }).join('');
+        return html`<span class="p-metergroup-meter" style="background: ${color}; ${dimensionStyle}" title="${v?.label || ''}: ${val}%"></span>`;
+    });
 
     const legendItemsHtml = rawValues.map((v: MeterValue, idx: number) => {
         const color = v?.color || DEFAULT_COLORS[idx % DEFAULT_COLORS.length];
-        return `
+        return html`
             <li class="p-metergroup-label">
                 <span class="p-metergroup-label-marker" style="background-color: ${color};"></span>
                 <span class="p-metergroup-label-text">${v?.label || ''}</span>
                 <span class="p-metergroup-label-value">${v?.value ?? 0}%</span>
             </li>
         `;
-    }).join('');
+    });
 
-    const metersBlockHtml = `<div class="p-metergroup-meters">${barSegmentsHtml}</div>`;
+    const metersBlockHtml = html`<div class="p-metergroup-meters">${barSegmentsHtml}</div>`;
     const labelsBlockHtml = props.showLabels !== false && rawValues.length > 0
-        ? `<ul class="p-metergroup-labels ${isLabelVertical ? 'p-metergroup-labels-vertical' : 'p-metergroup-labels-horizontal'}">${legendItemsHtml}</ul>`
+        ? html`<ul class="p-metergroup-labels ${isLabelVertical ? 'p-metergroup-labels-vertical' : 'p-metergroup-labels-horizontal'}">${legendItemsHtml}</ul>`
         : '';
 
     const rootEl = document.createElement('div');
@@ -204,12 +205,12 @@ export default function MeterGroupIsland(container: HTMLElement, props: MeterGro
     if (props.style) rootEl.style.cssText += props.style;
 
     if (labelPos === 'start') {
-        rootEl.innerHTML = `${labelsBlockHtml}${metersBlockHtml}`;
+        setHtml(rootEl, html`${labelsBlockHtml}${metersBlockHtml}`);
     } else {
-        rootEl.innerHTML = `${metersBlockHtml}${labelsBlockHtml}`;
+        setHtml(rootEl, html`${metersBlockHtml}${labelsBlockHtml}`);
     }
 
-    container.innerHTML = '';
+    setHtml(container, html``);
     container.appendChild(rootEl);
 
     container.setAttribute('data-part', 'root');

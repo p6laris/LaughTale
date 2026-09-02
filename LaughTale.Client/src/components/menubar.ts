@@ -8,6 +8,7 @@ import type { IslandContext } from '../runtime/registry';
 
 import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 const MENUBAR_CSS = `
 .p-menubar {
@@ -386,34 +387,34 @@ export default function MenubarIsland(container: HTMLElement, props: MenubarProp
         return '';
     }
 
-    function renderItem(item: MenubarItem, path: string, isRoot: boolean): string {
+    function renderItem(item: MenubarItem, path: string, isRoot: boolean): Raw {
         if (item.separator) {
-            return `<li class="p-menubar-separator" data-part="root" role="separator"></li>`;
+            return html`<li class="p-menubar-separator" data-part="root" role="separator"></li>`;
         }
 
         const hasSubmenu = Array.isArray(item.items) && item.items.length > 0;
         const iconSvg = item.icon ? getIconSvg(item.icon) : '';
-        const iconHtml = iconSvg ? `<span class="p-menubar-item-icon">${iconSvg}</span>` : '';
+        const iconHtml = iconSvg ? html`<span class="p-menubar-item-icon">${unsafe(iconSvg)}</span>` : '';
 
-        const angleDownSvg = `<svg class="p-menubar-submenu-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
-        const angleRightSvg = `<svg class="p-menubar-submenu-icon" style="margin-left: auto;" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`;
+        const angleDownSvg = html`<svg class="p-menubar-submenu-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
+        const angleRightSvg = html`<svg class="p-menubar-submenu-icon" style="margin-left: auto;" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`;
 
         const submenuIndicator = hasSubmenu ? (isRoot ? angleDownSvg : angleRightSvg) : '';
 
-        let subHtml = '';
+        let subHtml: Raw | '' = '';
         if (hasSubmenu) {
-            const childrenHtml = item.items!.map((sub, i) => renderItem(sub, `${path}.${i}`, false)).join('');
-            subHtml = `<ul class="p-menubar-submenu" role="menu">${childrenHtml}</ul>`;
+            const childrenHtml = item.items!.map((sub, i) => renderItem(sub, `${path}.${i}`, false));
+            subHtml = html`<ul class="p-menubar-submenu" role="menu">${childrenHtml}</ul>`;
         }
 
-        return `
+        return html`
             <li class="p-menubar-item ${item.disabled ? 'p-disabled' : ''}" role="none" data-path="${path}">
                 <div class="p-menubar-item-content">
-                    <a class="p-menubar-item-link" role="menuitem" tabindex="-1" href="${item.url || item.route || '#'}" ${item.target ? `target="${item.target}"` : ''}>
+                    <a class="p-menubar-item-link" role="menuitem" tabindex="-1" href="${safeUrl(item.url || item.route || '#')}" ${attr('target', item.target)}>
                         ${iconHtml}
                         <span class="p-menubar-item-label">${item.label}</span>
-                        ${item.badge !== undefined ? `<span class="p-menubar-item-badge">${item.badge}</span>` : ''}
-                        ${item.shortcut ? `<span class="p-menubar-item-shortcut">${item.shortcut}</span>` : ''}
+                        ${item.badge !== undefined ? html`<span class="p-menubar-item-badge">${item.badge}</span>` : ''}
+                        ${item.shortcut ? html`<span class="p-menubar-item-shortcut">${item.shortcut}</span>` : ''}
                         ${submenuIndicator}
                     </a>
                 </div>
@@ -422,12 +423,12 @@ export default function MenubarIsland(container: HTMLElement, props: MenubarProp
         `;
     }
 
-    function renderMenubarHtml(): string {
-        const rootItemsHtml = itemsState.map((it, i) => renderItem(it, `${i}`, true)).join('');
+    function renderMenubarHtml(): Raw {
+        const rootItemsHtml = itemsState.map((it, i) => renderItem(it, `${i}`, true));
 
-        let startHtml = '';
+        let startHtml: Raw | '' = '';
         if (customTemplate) {
-            startHtml = `
+            startHtml = html`
                 <div class="p-menubar-start">
                     <span style="display: inline-flex; align-items: center; justify-content: center; width: 2rem; height: 2rem; background: var(--lt-primary-500); border-radius: 6px; color: var(--lt-surface-0, var(--lt-surface-0)); margin-right: 0.5rem;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg>
@@ -437,9 +438,9 @@ export default function MenubarIsland(container: HTMLElement, props: MenubarProp
             `;
         }
 
-        let endHtml = '';
+        let endHtml: Raw | '' = '';
         if (customTemplate) {
-            endHtml = `
+            endHtml = html`
                 <div class="p-menubar-end">
                     <div style="position: relative; display: flex; align-items: center;">
                         <input type="text" placeholder="Search" style="padding: 0.4rem 0.75rem; border-radius: 6px; border: 1px solid var(--lt-surface-200); font-size: 0.8125rem; width: 9rem; outline: none; background: transparent; color: inherit;" />
@@ -449,12 +450,12 @@ export default function MenubarIsland(container: HTMLElement, props: MenubarProp
             `;
         }
 
-        const hamburgerSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>`;
+        const hamburgerSvg = html`<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>`;
 
         const customClass = props.class || (props as any).Class || '';
         const customStyle = props.style || (props as any).Style || '';
 
-        return `
+        return html`
             <div class="p-menubar p-component ${customClass}" style="${customStyle}" role="menubar" tabindex="0">
                 ${startHtml}
                 <button type="button" class="p-menubar-button" aria-label="Toggle navigation">
@@ -615,7 +616,7 @@ export default function MenubarIsland(container: HTMLElement, props: MenubarProp
         setTimeout(() => toast.remove(), 2500);
     }
 
-    container.innerHTML = renderMenubarHtml();
+    setHtml(container, renderMenubarHtml());
     const menubarEl = container.querySelector<HTMLElement>('.p-menubar')!;
     wireEvents(menubarEl);
 }

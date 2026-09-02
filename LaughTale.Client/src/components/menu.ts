@@ -9,6 +9,7 @@ import type { IslandContext } from '../runtime/registry';
 
 import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 const MENU_CSS = `
 .p-menu,
@@ -379,9 +380,9 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
         return '';
     }
 
-    function renderItemContent(item: MenuItemData, path: string, depth: number = 0): string {
+    function renderItemContent(item: MenuItemData, path: string, depth: number = 0): Raw {
         if (item.separator) {
-            return `<li class="p-menu-separator" data-part="root" role="separator"></li>`;
+            return html`<li class="p-menu-separator" data-part="root" role="separator"></li>`;
         }
 
         const isGroup = Array.isArray(item.items) && item.items.length > 0;
@@ -389,10 +390,10 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
         const isStaticGroupHeader = isGroup && !isToggleableSubmenu;
 
         if (isStaticGroupHeader) {
-            const subItemsHtml = item.items!.map((sub, i) => renderItemContent(sub, `${path}.${i}`, depth + 1)).join('');
+            const subItemsHtml = item.items!.map((sub, i) => renderItemContent(sub, `${path}.${i}`, depth + 1));
             const headerLabelClass = customTemplate ? 'text-primary font-bold text-sm' : 'p-menu-submenu-label';
             const headerLabelStyle = customTemplate ? 'color: var(--p-primary-color, #10b981); font-weight: 700; font-size: 0.8125rem; padding: 0.5rem 0.75rem 0.25rem;' : '';
-            return `
+            return html`
                 <li class="p-menu-item" role="none">
                     <div class="${headerLabelClass}" style="${headerLabelStyle}">${item.label}</div>
                     <ul class="p-menu-list" role="group">
@@ -404,26 +405,26 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
 
         const isExpanded = isToggleableSubmenu ? (item.key ? !!expandedKeys[item.key] : !!expandedKeys[path]) : false;
 
-        let iconHtml = '';
+        let iconHtml: Raw | '' = '';
         if (item.checked !== undefined) {
             iconHtml = item.checked 
-                ? `<span class="p-menu-item-icon p-menu-check-icon"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>`
-                : `<span class="p-menu-item-icon p-menu-blank-icon"></span>`;
+                ? html`<span class="p-menu-item-icon p-menu-check-icon"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>`
+                : html`<span class="p-menu-item-icon p-menu-blank-icon"></span>`;
         } else if (item.radioSelected !== undefined) {
             iconHtml = item.radioSelected
-                ? `<span class="p-menu-item-icon"><span class="p-menu-dot-icon"></span></span>`
-                : `<span class="p-menu-item-icon p-menu-blank-icon"></span>`;
+                ? html`<span class="p-menu-item-icon"><span class="p-menu-dot-icon"></span></span>`
+                : html`<span class="p-menu-item-icon p-menu-blank-icon"></span>`;
         } else if (item.icon) {
             const svg = getIconSvg(item.icon);
-            if (svg) iconHtml = `<span class="p-menu-item-icon">${svg}</span>`;
+            if (svg) iconHtml = html`<span class="p-menu-item-icon">${unsafe(svg)}</span>`;
         }
 
-        const chevronSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
+        const chevronSvg = html`<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
 
-        let subHtml = '';
+        let subHtml: Raw | '' = '';
         if (isGroup) {
-            const subItemsHtml = item.items!.map((sub, i) => renderItemContent(sub, `${path}.${i}`, depth + 1)).join('');
-            subHtml = `
+            const subItemsHtml = item.items!.map((sub, i) => renderItemContent(sub, `${path}.${i}`, depth + 1));
+            subHtml = html`
                 <div class="p-menu-submenu-wrapper ${isExpanded ? 'p-expanded' : ''}" role="region">
                     <div class="p-menu-submenu-inner">
                         <ul class="p-menu-submenu-list" role="group">${subItemsHtml}</ul>
@@ -437,15 +438,15 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
             customInlineStyle = 'color: var(--p-danger-500, #ef4444) !important;';
         }
 
-        return `
+        return html`
             <li class="p-menu-item ${item.disabled ? 'p-disabled' : ''}" role="none" data-path="${path}" data-key="${item.key || ''}">
                 <div class="p-menu-item-content">
-                    <a class="p-menu-item-link" style="${customInlineStyle}" role="menuitem" tabindex="-1" href="${item.url || item.route || '#'}" ${item.target ? `target="${item.target}"` : ''}>
+                    <a class="p-menu-item-link" style="${customInlineStyle}" role="menuitem" tabindex="-1" href="${safeUrl(item.url || item.route || '#')}" ${attr('target', item.target)}>
                         ${iconHtml}
                         <span class="p-menu-item-label">${item.label}</span>
-                        ${item.badge !== undefined ? `<span class="p-menu-item-badge">${item.badge}</span>` : ''}
-                        ${item.shortcut ? `<span class="p-menu-item-shortcut">${item.shortcut}</span>` : ''}
-                        ${isToggleableSubmenu ? `<span class="p-menu-item-submenu-icon ${isExpanded ? 'p-expanded' : ''}">${chevronSvg}</span>` : ''}
+                        ${item.badge !== undefined ? html`<span class="p-menu-item-badge">${item.badge}</span>` : ''}
+                        ${item.shortcut ? html`<span class="p-menu-item-shortcut">${item.shortcut}</span>` : ''}
+                        ${isToggleableSubmenu ? html`<span class="p-menu-item-submenu-icon ${isExpanded ? 'p-expanded' : ''}">${chevronSvg}</span>` : ''}
                     </a>
                 </div>
                 ${subHtml}
@@ -453,12 +454,12 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
         `;
     }
 
-    function renderMenuHtml(): string {
-        const itemsHtml = itemsState.map((it, i) => renderItemContent(it, `${i}`, 0)).join('');
+    function renderMenuHtml(): Raw {
+        const itemsHtml = itemsState.map((it, i) => renderItemContent(it, `${i}`, 0));
 
-        let startHtml = '';
+        let startHtml: Raw | '' = '';
         if (customTemplate) {
-            startHtml = `
+            startHtml = html`
                 <div class="p-menu-start" style="padding: 0.65rem 0.85rem; display: flex; align-items: center; gap: 0.65rem;">
                     <span style="display: inline-flex; align-items: center; justify-content: center; width: 1.75rem; height: 1.75rem; background: var(--p-primary-500, #10b981); border-radius: 6px; color: #ffffff;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg>
@@ -468,9 +469,9 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
             `;
         }
 
-        let endHtml = '';
+        let endHtml: Raw | '' = '';
         if (customTemplate) {
-            endHtml = `
+            endHtml = html`
                 <div class="p-menu-end" style="padding: 0.5rem 0.75rem;">
                     <button type="button" class="p-menu-item-link" style="width: 100%; border: none; background: transparent; padding: 0.4rem 0.5rem; display: flex; align-items: center; gap: 0.65rem; border-radius: 6px; cursor: pointer;">
                         <span style="width: 2rem; height: 2rem; border-radius: 9999px; background: linear-gradient(135deg, var(--p-warn-500, #f59e0b), var(--p-danger-500, #ef4444)); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700;">AE</span>
@@ -486,7 +487,7 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
         const customClass = props.class || (props as any).Class || '';
         const customStyle = props.style || (props as any).Style || '';
 
-        return `
+        return html`
             <div class="p-menu p-component ${isPopup ? 'p-menu-popup-overlay' : ''} ${customClass}" style="${customStyle}" role="menu" tabindex="0">
                 ${startHtml}
                 <ul class="p-menu-list" role="menubar">
@@ -641,12 +642,12 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
     function updateContent() {
         if (isPopup) {
             if (popupEl) {
-                popupEl.innerHTML = renderMenuHtml();
+                setHtml(popupEl, renderMenuHtml());
                 const menuEl = popupEl.querySelector<HTMLElement>('.p-menu')!;
                 if (menuEl) wireEvents(menuEl);
             }
         } else {
-            container.innerHTML = renderMenuHtml();
+            setHtml(container, renderMenuHtml());
             const menuEl = container.querySelector<HTMLElement>('.p-menu')!;
             if (menuEl) {
                 wireEvents(menuEl);
@@ -663,7 +664,7 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
         isOpen = true;
         popupEl = document.createElement('div');
         popupEl.className = 'p-menu-popup-wrapper';
-        popupEl.innerHTML = renderMenuHtml();
+        setHtml(popupEl, renderMenuHtml());
         document.body.appendChild(popupEl);
 
         const menuEl = popupEl.querySelector<HTMLElement>('.p-menu')!;

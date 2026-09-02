@@ -9,6 +9,7 @@ import { injectIslandStyle } from '../runtime/styles';
 import { LucideIcons } from '../icons/lucide';
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 export interface OrderListProps<T = any> {
     value?: OrderListItem<T>[];
@@ -353,32 +354,32 @@ export default function OrderListIsland<T = any>(container: HTMLElement, props: 
         return item.title || item.name || '';
     }
 
-    function renderCellContent(item: OrderListItem<T>, index: number, isSelected: boolean): string {
-        const checkboxHtml = isCheckbox ? `
+    function renderCellContent(item: OrderListItem<T>, index: number, isSelected: boolean): Raw {
+        const checkboxHtml = isCheckbox ? html`
             <div class="p-checkbox-box ${isSelected ? 'p-checked' : ''}" data-part="root" role="checkbox" aria-checked="${isSelected}">
-                ${isSelected ? LucideIcons.check : ''}
+                ${isSelected ? unsafe(LucideIcons.check) : ''}
             </div>
         ` : '';
 
         // Product template
         if (item.price != null || item.category != null || item.image != null) {
-            return `
+            return html`
                 ${checkboxHtml}
                 <div class="p-orderlist-product-item">
                     <div class="p-orderlist-product-img">
-                        ${LucideIcons.package}
+                        ${unsafe(LucideIcons.package)}
                     </div>
                     <div class="p-orderlist-product-details">
                         <span class="p-orderlist-product-name">${getItemTitle(item)}</span>
                         <span class="p-orderlist-product-category">${item.category || ''}</span>
                     </div>
-                    ${item.price != null ? `<span class="p-orderlist-product-price">$${item.price}</span>` : ''}
+                    ${item.price != null ? html`<span class="p-orderlist-product-price">$${item.price}</span>` : ''}
                 </div>
             `;
         }
 
         // Default numbered item
-        return `
+        return html`
             ${checkboxHtml}
             <span class="p-orderlist-index">${index + 1}</span>
             <span style="flex: 1; font-weight: ${isSelected ? '600' : 'normal'}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
@@ -388,34 +389,34 @@ export default function OrderListIsland<T = any>(container: HTMLElement, props: 
     }
 
     function buildShell() {
-        const headerHtml = props.header ? `
+        const headerHtml = props.header ? html`
             <div class="p-orderlist-header">
                 <span>${props.header}</span>
             </div>
         ` : '';
 
-        const filterHtml = isFilter ? `
+        const filterHtml = isFilter ? html`
             <div class="p-orderlist-filter-container">
                 <input type="text" class="p-orderlist-filter-input" placeholder="${filterPlaceholder}" />
-                <span class="p-orderlist-filter-icon">${LucideIcons.search}</span>
+                <span class="p-orderlist-filter-icon">${unsafe(LucideIcons.search)}</span>
             </div>
         ` : '';
 
-        container.innerHTML = `
+        setHtml(container, html`
             <div class="p-orderlist p-component">
                 <!-- Reorder Action Buttons (Left) -->
                 <div class="p-orderlist-controls">
                     <button type="button" class="p-orderlist-control-btn btn-order-top" title="Move to Top" aria-label="Move to Top" disabled>
-                        ${LucideIcons.chevronsUp}
+                        ${unsafe(LucideIcons.chevronsUp)}
                     </button>
                     <button type="button" class="p-orderlist-control-btn btn-order-up" title="Move Up" aria-label="Move Up" disabled>
-                        ${LucideIcons.chevronUp}
+                        ${unsafe(LucideIcons.chevronUp)}
                     </button>
                     <button type="button" class="p-orderlist-control-btn btn-order-down" title="Move Down" aria-label="Move Down" disabled>
-                        ${LucideIcons.chevronDown}
+                        ${unsafe(LucideIcons.chevronDown)}
                     </button>
                     <button type="button" class="p-orderlist-control-btn btn-order-bottom" title="Move to Bottom" aria-label="Move to Bottom" disabled>
-                        ${LucideIcons.chevronsDown}
+                        ${unsafe(LucideIcons.chevronsDown)}
                     </button>
                 </div>
 
@@ -427,11 +428,11 @@ export default function OrderListIsland<T = any>(container: HTMLElement, props: 
                     </ul>
                     <div class="p-orderlist-footer">
                         <span class="p-orderlist-selection-status">No selected item</span>
-                        ${isFilter ? `<span class="p-orderlist-results-status" style="font-size: 0.6875rem; color: var(--lt-surface-400);">0 results available</span>` : ''}
+                        ${isFilter ? html`<span class="p-orderlist-results-status" style="font-size: 0.6875rem; color: var(--lt-surface-400);">0 results available</span>` : ''}
                     </div>
                 </div>
             </div>
-        `;
+        `);
 
         bindPermanentEvents();
         updateListStructure();
@@ -458,11 +459,11 @@ export default function OrderListIsland<T = any>(container: HTMLElement, props: 
                 el.setAttribute('aria-selected', String(isSelected));
 
                 if (isCheckbox) {
-                    const chk = el.querySelector('.p-checkbox-box');
+                    const chk = el.querySelector<HTMLElement>('.p-checkbox-box');
                     if (chk) {
                         chk.className = `p-checkbox-box ${isSelected ? 'p-checked' : ''}`;
                         chk.setAttribute('aria-checked', String(isSelected));
-                        chk.innerHTML = isSelected ? LucideIcons.check : '';
+                        setHtml(chk, isSelected ? unsafe(LucideIcons.check) : html``);
                     }
                 }
             });
@@ -492,12 +493,12 @@ export default function OrderListIsland<T = any>(container: HTMLElement, props: 
         const listUl = rootEl.querySelector<HTMLUListElement>('.p-orderlist-list');
         if (listUl) {
             if (filteredItems.length === 0) {
-                listUl.innerHTML = `<li class="p-orderlist-empty">${filterQuery ? 'No results found' : emptyMessage}</li>`;
+                setHtml(listUl, html`<li class="p-orderlist-empty">${filterQuery ? 'No results found' : emptyMessage}</li>`);
             } else {
-                listUl.innerHTML = filteredItems.map((item, idx) => {
+                setHtml(listUl, html`${filteredItems.map((item, idx) => {
                     const id = getItemId(item, idx);
                     const isSelected = selectedIds.has(id);
-                    return `
+                    return html`
                         <li class="p-orderlist-item ${isSelected ? 'p-highlight' : ''}" 
                             data-id="${id}" 
                             data-index="${idx}"
@@ -506,7 +507,7 @@ export default function OrderListIsland<T = any>(container: HTMLElement, props: 
                             ${renderCellContent(item, idx, isSelected)}
                         </li>
                     `;
-                }).join('');
+                })}`);
 
                 // Bind item clicks
                 listUl.querySelectorAll<HTMLElement>('.p-orderlist-item').forEach(el => {

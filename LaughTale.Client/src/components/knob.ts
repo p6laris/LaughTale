@@ -1,6 +1,7 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
-﻿import { injectIslandStyle } from '../runtime/styles';
+import { injectIslandStyle } from '../runtime/styles';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 /**
  * LaughTale: Enterprise Radial Knob / Dial Component (Aura Knob inspired)
  * High-performance pointer capture dragging engine without full DOM rebuilds.
@@ -55,7 +56,7 @@ export default function KnobIsland(container: HTMLElement, props: KnobProps, ctx
     const initialOffset = getOffset(currentValue);
     const initialText = template.replace('{value}', currentValue.toString());
 
-    container.innerHTML = `
+    setHtml(container, html`
         <div class="laughtale-knob" data-part="root" style="position: relative; display: inline-flex; align-items: center; justify-content: center; width: ${size}px; height: ${size}px; user-select: none; cursor: ${props.disabled ? 'not-allowed' : 'pointer'}; touch-action: none;">
             <svg width="${size}" height="${size}" style="transform: rotate(-90deg); pointer-events: none;">
                 <!-- Background Circle -->
@@ -67,7 +68,7 @@ export default function KnobIsland(container: HTMLElement, props: KnobProps, ctx
                 ${initialText}
             </span>
         </div>
-    `;
+    `);
 
     const knobEl = container.querySelector<HTMLElement>('.laughtale-knob')!;
     const progressCircle = container.querySelector<SVGCircleElement>('.knob-progress-circle')!;

@@ -8,6 +8,7 @@ import { OrgChartNode } from '../types/models';
 import { injectIslandStyle } from '../runtime/styles';
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 export interface OrgChartProps<T = any> {
     value?: OrgChartNode<T>;
@@ -359,10 +360,10 @@ export default function OrgChartIsland<T = any>(container: HTMLElement, props: O
         return ICONS[key] || ICONS.bolt;
     }
 
-    function renderNodeCardContent(node: OrgChartNode<T>, isSelected: boolean, isIndet: boolean): string {
-        const checkboxHtml = selectionMode === 'checkbox' ? `
+    function renderNodeCardContent(node: OrgChartNode<T>, isSelected: boolean, isIndet: boolean): Raw {
+        const checkboxHtml = selectionMode === 'checkbox' ? html`
             <div class="p-checkbox-box ${isSelected ? 'p-checked' : (isIndet ? 'p-indeterminate' : '')}" data-part="root" role="checkbox" aria-checked="${isSelected}">
-                ${isSelected ? ICONS.check : (isIndet ? '<span style="width: 8px; height: 2px; background: white; border-radius: 1px;"></span>' : '')}
+                ${isSelected ? unsafe(ICONS.check) : (isIndet ? html`<span style="width: 8px; height: 2px; background: white; border-radius: 1px;"></span>` : '')}
             </div>
         ` : '';
 
@@ -370,13 +371,13 @@ export default function OrgChartIsland<T = any>(container: HTMLElement, props: O
         if (node.icon || node.accent || node.description) {
             const iconSvg = getNodeIconSvg(node.icon);
             const accentClass = node.accent || 'bg-emerald-500/10 text-emerald-500';
-            return `
+            return html`
                 ${checkboxHtml}
                 <div class="p-orgchart-card-content">
-                    ${iconSvg ? `<div class="p-orgchart-icon-box ${accentClass}">${iconSvg}</div>` : ''}
+                    ${iconSvg ? html`<div class="p-orgchart-icon-box ${accentClass}">${unsafe(iconSvg)}</div>` : ''}
                     <div class="p-orgchart-details">
                         <span class="p-orgchart-label">${node.label}</span>
-                        ${node.description ? `<span class="p-orgchart-desc">${node.description}</span>` : ''}
+                        ${node.description ? html`<span class="p-orgchart-desc">${node.description}</span>` : ''}
                     </div>
                 </div>
             `;
@@ -385,20 +386,20 @@ export default function OrgChartIsland<T = any>(container: HTMLElement, props: O
         // 2. Avatar / Leadership Person template
         if (node.avatar || node.title) {
             const initials = node.label.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
-            return `
+            return html`
                 ${checkboxHtml}
                 <div class="p-orgchart-card-content">
                     <div class="p-orgchart-avatar">${initials}</div>
                     <div class="p-orgchart-details">
                         <span class="p-orgchart-label">${node.label}</span>
-                        ${node.title ? `<span class="p-orgchart-desc" style="color: var(--lt-primary-600); font-weight: 600;">${node.title}</span>` : ''}
+                        ${node.title ? html`<span class="p-orgchart-desc" style="color: var(--lt-primary-600); font-weight: 600;">${node.title}</span>` : ''}
                     </div>
                 </div>
             `;
         }
 
         // 3. Standard text node
-        return `
+        return html`
             ${checkboxHtml}
             <span class="p-orgchart-label">${node.label}</span>
         `;
@@ -411,7 +412,7 @@ export default function OrgChartIsland<T = any>(container: HTMLElement, props: O
         return isCollapsed ? ICONS.chevronDown : ICONS.chevronUp;
     }
 
-    function renderBranch(node: OrgChartNode<T>): string {
+    function renderBranch(node: OrgChartNode<T>): Raw {
         const key = String(node.key);
         const hasChildren = node.children && node.children.length > 0;
         const isCollapsed = isCollapsible && collapsedKeys.has(key);
@@ -421,16 +422,17 @@ export default function OrgChartIsland<T = any>(container: HTMLElement, props: O
         const childCount = hasChildren ? node.children!.length : 0;
         const colspan = childCount * 2;
 
-        let toggleBtnHtml = '';
+        let toggleBtnHtml: Raw | '' = '';
         if (isCollapsible && hasChildren) {
-            toggleBtnHtml = `
+            const toggleSvg = getToggleIconSvg(isCollapsed);
+            toggleBtnHtml = html`
                 <button type="button" class="p-organizationchart-node-toggle-button" data-toggle-key="${key}" title="${isCollapsed ? 'Expand' : 'Collapse'}" aria-label="${isCollapsed ? 'Expand' : 'Collapse'}">
-                    ${getToggleIconSvg(isCollapsed)}
+                    ${unsafe(toggleSvg)}
                 </button>
             `;
         }
 
-        const linesDownHtml = hasChildren && !isCollapsed ? `
+        const linesDownHtml = hasChildren && !isCollapsed ? html`
             <tr class="p-organizationchart-lines">
                 <td colspan="${colspan}">
                     <div class="p-organizationchart-line-down"></div>
@@ -438,19 +440,19 @@ export default function OrgChartIsland<T = any>(container: HTMLElement, props: O
             </tr>
         ` : '';
 
-        let connectorRowHtml = '';
-        let childrenCellsHtml = '';
+        let connectorRowHtml: Raw | '' = '';
+        let childrenCellsHtml: Raw | '' = '';
 
         if (hasChildren && !isCollapsed) {
             if (childCount === 1) {
-                connectorRowHtml = `
+                connectorRowHtml = html`
                     <tr class="p-organizationchart-lines">
                         <td colspan="2">
                             <div class="p-organizationchart-line-down"></div>
                         </td>
                     </tr>
                 `;
-                childrenCellsHtml = `
+                childrenCellsHtml = html`
                     <tr class="p-organizationchart-nodes">
                         <td colspan="2" class="p-organizationchart-node-cell" style="width: 100%;">
                             ${renderBranch(node.children![0])}
@@ -462,8 +464,8 @@ export default function OrgChartIsland<T = any>(container: HTMLElement, props: O
                 const colWidth = (100 / colspan).toFixed(4);
                 const childCellWidth = (100 / childCount).toFixed(4);
 
-                const connectorTds: string[] = [];
-                const childTds: string[] = [];
+                const connectorTds: Raw[] = [];
+                const childTds: Raw[] = [];
 
                 node.children!.forEach((child, idx) => {
                     const isFirst = idx === 0;
@@ -472,32 +474,32 @@ export default function OrgChartIsland<T = any>(container: HTMLElement, props: O
                     const leftTop = !isFirst ? 'p-organizationchart-line-top' : '';
                     const rightTop = !isLast ? 'p-organizationchart-line-top' : '';
 
-                    connectorTds.push(`
+                    connectorTds.push(html`
                         <td class="p-organizationchart-line-left ${leftTop}" style="width: ${colWidth}%;">&nbsp;</td>
                         <td class="p-organizationchart-line-right ${rightTop}" style="width: ${colWidth}%;">&nbsp;</td>
                     `);
 
-                    childTds.push(`
+                    childTds.push(html`
                         <td colspan="2" class="p-organizationchart-node-cell" style="width: ${childCellWidth}%;">
                             ${renderBranch(child)}
                         </td>
                     `);
                 });
 
-                connectorRowHtml = `
+                connectorRowHtml = html`
                     <tr class="p-organizationchart-lines">
-                        ${connectorTds.join('')}
+                        ${connectorTds}
                     </tr>
                 `;
-                childrenCellsHtml = `
+                childrenCellsHtml = html`
                     <tr class="p-organizationchart-nodes">
-                        ${childTds.join('')}
+                        ${childTds}
                     </tr>
                 `;
             }
         }
 
-        return `
+        return html`
             <table class="p-organizationchart-table" role="presentation">
                 <tbody>
                     <tr>
@@ -526,11 +528,11 @@ export default function OrgChartIsland<T = any>(container: HTMLElement, props: O
             recalculateCheckboxHierarchy();
         }
 
-        container.innerHTML = `
+        setHtml(container, html`
             <div class="p-organizationchart p-component" role="tree">
                 ${renderBranch(rootNode)}
             </div>
-        `;
+        `);
 
         bindEvents();
     }
@@ -597,7 +599,7 @@ export default function OrgChartIsland<T = any>(container: HTMLElement, props: O
                 if (chk) {
                     chk.className = `p-checkbox-box ${isSelected ? 'p-checked' : (isIndet ? 'p-indeterminate' : '')}`;
                     chk.setAttribute('aria-checked', String(isSelected));
-                    chk.innerHTML = isSelected ? ICONS.check : (isIndet ? '<span style="width: 8px; height: 2px; background: white; border-radius: 1px;"></span>' : '');
+                    setHtml(chk, isSelected ? unsafe(ICONS.check) : (isIndet ? html`<span style="width: 8px; height: 2px; background: white; border-radius: 1px;"></span>` : html``));
                 }
             }
         });

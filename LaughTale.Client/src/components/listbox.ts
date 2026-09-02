@@ -10,6 +10,7 @@ import type { IslandContext } from '../runtime/registry';
 import { LucideIcons, getLucideIcon } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
 import { useDebounce } from '../composables/useDebounce';
+import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 export interface ListboxOptionItem {
     label: string;
@@ -413,8 +414,8 @@ html.dark .p-listbox-striped .p-listbox-option:nth-child(even):not(.p-highlight)
 }
 `;
 
-const checkSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
-const searchSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>`;
+const checkSvg = html`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+const searchSvg = html`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>`;
 
 export default function ListboxIsland(container: HTMLElement, props: ListboxProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-listbox', CSS);
@@ -522,27 +523,27 @@ export default function ListboxIsland(container: HTMLElement, props: ListboxProp
         container.setAttribute('aria-multiselectable', isMultiple ? 'true' : 'false');
         if (props.inputId) container.id = props.inputId;
 
-        container.innerHTML = `
-            ${props.header ? `
+        setHtml(container, html`
+            ${props.header ? html`
                 <div class="p-listbox-header" data-part="root">
                     <span>${props.header}</span>
-                    ${props.headerCount ? `<span class="p-listbox-header-count">${props.headerCount}</span>` : ''}
+                    ${props.headerCount ? html`<span class="p-listbox-header-count">${props.headerCount}</span>` : ''}
                 </div>
             ` : ''}
-            ${isFilter ? `
+            ${isFilter ? html`
                 <div class="p-listbox-filter-container">
                     <span style="color: var(--lt-surface-400); display: flex;">${searchSvg}</span>
-                    <input type="text" class="p-listbox-filter-input" placeholder="${props.filterPlaceholder || 'Filter...'}" ${isDisabled ? 'disabled' : ''} />
+                    <input type="text" class="p-listbox-filter-input" placeholder="${props.filterPlaceholder || 'Filter...'}" ${attr('disabled', isDisabled)} />
                 </div>
             ` : ''}
             <div class="p-listbox-list-wrapper" style="max-height: ${scrollHeight};">
                 <ul class="p-listbox-list" role="presentation"></ul>
             </div>
-            ${props.footer ? `
+            ${props.footer ? html`
                 <div class="p-listbox-footer">${props.footer}</div>
             ` : ''}
             <input type="hidden" name="${props.name || props.targetInputName || 'listbox_value'}" value="" />
-        `;
+        `);
 
         renderOptions();
         bindEvents();
@@ -564,84 +565,84 @@ export default function ListboxIsland(container: HTMLElement, props: ListboxProp
         const isGrouped = rawOptions.some(o => o.items && o.items.length > 0);
 
         if (isGrouped) {
-            let html = '';
+            const groupNodes: Raw[] = [];
             let totalRendered = 0;
 
             for (const group of rawOptions) {
                 const groupItems = group.items ? group.items.filter(matches) : [];
                 if (groupItems.length === 0 && !matches(group)) continue;
 
-                html += `
+                groupNodes.push(html`
                     <li class="p-listbox-option-group" role="group">
                         <div class="p-listbox-option-group-label">
-                            ${group.flag ? `<span style="font-size: 1.1rem; line-height: 1;">${group.flag}</span>` : ''}
-                            ${group.icon ? `<span style="display: flex;">${getLucideIcon(group.icon, 14)}</span>` : ''}
+                            ${group.flag ? html`<span style="font-size: 1.1rem; line-height: 1;">${group.flag}</span>` : ''}
+                            ${group.icon ? html`<span style="display: flex;">${unsafe(getLucideIcon(group.icon, 14))}</span>` : ''}
                             <span>${group.label}</span>
                         </div>
                         <ul style="margin: 0; padding: 0; list-style: none;">
-                            ${groupItems.map(item => renderSingleOptionHtml(item)).join('')}
+                            ${groupItems.map(item => renderSingleOptionHtml(item))}
                         </ul>
                     </li>
-                `;
+                `);
                 totalRendered += groupItems.length;
             }
 
             if (totalRendered === 0) {
-                listEl.innerHTML = `<li style="padding: 1rem; text-align: center; color: var(--p-text-muted); font-size: 0.8125rem;">No results found</li>`;
+                setHtml(listEl, html`<li style="padding: 1rem; text-align: center; color: var(--p-text-muted); font-size: 0.8125rem;">No results found</li>`);
             } else {
-                listEl.innerHTML = html;
+                setHtml(listEl, html`${groupNodes}`);
             }
         } else {
             const visible = rawOptions.filter(matches);
             if (visible.length === 0) {
-                listEl.innerHTML = `<li style="padding: 1rem; text-align: center; color: var(--p-text-muted); font-size: 0.8125rem;">No results found</li>`;
+                setHtml(listEl, html`<li style="padding: 1rem; text-align: center; color: var(--p-text-muted); font-size: 0.8125rem;">No results found</li>`);
             } else {
-                listEl.innerHTML = visible.map(item => renderSingleOptionHtml(item)).join('');
+                setHtml(listEl, html`${visible.map(item => renderSingleOptionHtml(item))}`);
             }
         }
 
         bindItemEvents();
     }
 
-    function renderSingleOptionHtml(item: ListboxOptionItem): string {
+    function renderSingleOptionHtml(item: ListboxOptionItem): Raw {
         const valStr = String(item.value);
         const isSelected = selectedValues.has(valStr);
         const highlightClass = isSelected ? (isHighlightOnSelect ? 'p-highlight' : 'p-highlight-none') : '';
         const disabledClass = item.disabled ? 'p-disabled' : '';
 
-        let checkboxHtml = '';
+        let checkboxHtml: Raw | '' = '';
         if (isCheckbox && isMultiple) {
-            checkboxHtml = `
+            checkboxHtml = html`
                 <span class="p-listbox-option-checkbox" aria-hidden="true">
                     ${isSelected ? checkSvg : ''}
                 </span>
             `;
         }
 
-        let checkmarkHtml = '';
+        let checkmarkHtml: Raw | '' = '';
         if (isCheckmark && isSelected) {
-            checkmarkHtml = `
+            checkmarkHtml = html`
                 <span class="p-listbox-option-checkmark" aria-hidden="true">
                     ${checkSvg}
                 </span>
             `;
         }
 
-        let leadingHtml = '';
+        let leadingHtml: Raw | '' = '';
         if (item.flag) {
-            leadingHtml = `<span style="font-size: 1.1rem; line-height: 1; flex-shrink: 0;">${item.flag}</span>`;
+            leadingHtml = html`<span style="font-size: 1.1rem; line-height: 1; flex-shrink: 0;">${item.flag}</span>`;
         } else if (item.icon) {
-            leadingHtml = `<span style="display: flex; flex-shrink: 0; color: var(--lt-primary-600);">${getLucideIcon(item.icon, 16)}</span>`;
+            leadingHtml = html`<span style="display: flex; flex-shrink: 0; color: var(--lt-primary-600);">${unsafe(getLucideIcon(item.icon, 16))}</span>`;
         }
 
-        let trailingHtml = '';
+        let trailingHtml: Raw | '' = '';
         if (item.code) {
-            trailingHtml = `<span class="p-listbox-option-badge">${item.code}</span>`;
+            trailingHtml = html`<span class="p-listbox-option-badge">${item.code}</span>`;
         } else if (item.badge) {
-            trailingHtml = `<span class="p-listbox-option-badge">${item.badge}</span>`;
+            trailingHtml = html`<span class="p-listbox-option-badge">${item.badge}</span>`;
         }
 
-        return `
+        return html`
             <li class="p-listbox-option ${highlightClass} ${disabledClass}" role="option" aria-selected="${isSelected}" aria-disabled="${item.disabled ? 'true' : 'false'}" data-val="${valStr}" tabindex="-1">
                 <div class="p-listbox-option-content">
                     ${checkboxHtml}
