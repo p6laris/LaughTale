@@ -594,11 +594,12 @@ export default function ContextMenuIsland(container: HTMLElement, props: Context
     function hideMenu() {
         if (!isMenuOpen) return;
         menuEl.classList.remove('p-contextmenu-active');
-        setTimeout(() => {
+        const t = setTimeout(() => {
             if (!menuEl.classList.contains('p-contextmenu-active')) {
                 menuEl.style.display = 'none';
             }
         }, 120);
+        ctx?.onCleanup?.(() => clearTimeout(t));
         isMenuOpen = false;
 
         if (selectedTargetEl) {

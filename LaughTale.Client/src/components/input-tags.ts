@@ -446,7 +446,8 @@ export default function InputTagsIsland(container: HTMLElement, props: InputTags
             const existingEl = container.querySelector<HTMLElement>(`.p-inputtags-tag[data-index="${current.indexOf(val)}"]`);
             if (existingEl) {
                 existingEl.classList.add('is-focused');
-                setTimeout(() => existingEl.classList.remove('is-focused'), 300);
+                const t = setTimeout(() => existingEl.classList.remove('is-focused'), 300);
+                ctx?.onCleanup?.(() => clearTimeout(t));
             }
             return;
         }

@@ -784,9 +784,10 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
             overlay?.classList.add('is-visible');
             container.setAttribute('aria-expanded', 'true');
             if (hasFilter) {
-                setTimeout(() => {
+                const t = setTimeout(() => {
                     container.querySelector<HTMLInputElement>('.p-select-filter-input')?.focus();
                 }, 50);
+                ctx?.onCleanup?.(() => clearTimeout(t));
             }
         } else {
             container.classList.remove('is-open');

@@ -251,6 +251,7 @@ export default function TextareaIsland(container: HTMLElement, props: TextareaPr
 
     if (isAutoResize) {
         window.addEventListener('resize', adjustHeight, { signal: ctx?.signal });
-        setTimeout(adjustHeight, 0);
+        const t = setTimeout(adjustHeight, 0);
+        ctx?.onCleanup?.(() => clearTimeout(t));
     }
 }

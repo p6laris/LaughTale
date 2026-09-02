@@ -266,7 +266,7 @@ class ConfirmPopupManager {
         this.popupEl.classList.add('p-confirmpopup-active');
 
         // Bind outside click
-        setTimeout(() => {
+        const t = setTimeout(() => {
             if (this.outsideClickListener) {
                 document.removeEventListener('click', this.outsideClickListener);
             }
@@ -277,6 +277,7 @@ class ConfirmPopupManager {
             };
             document.addEventListener('click', this.outsideClickListener, { signal: options.signal });
         }, 10);
+        options.signal?.addEventListener('abort', () => clearTimeout(t), { signal: options.signal });
     }
 
     public close(accepted: boolean = false) {

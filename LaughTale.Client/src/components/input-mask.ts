@@ -313,7 +313,8 @@ export default function InputMaskIsland(container: HTMLElement, props: InputMask
         if (!input.value) {
             input.value = tokens.map(t => t.isSlot ? t.slotChar : t.char).join('');
             const pos = getFirstSlotIndex(input.value);
-            setTimeout(() => input.setSelectionRange(pos, pos), 10);
+            const t = setTimeout(() => input.setSelectionRange(pos, pos), 10);
+            ctx?.onCleanup?.(() => clearTimeout(t));
         }
     }, { signal: ctx?.signal });
 

@@ -636,7 +636,8 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
         `;
         toast.textContent = `✓ ${msg}`;
         document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 2500);
+        const tToast = setTimeout(() => toast.remove(), 2500);
+        ctx?.onCleanup?.(() => clearTimeout(tToast));
     }
 
     function updateContent() {
@@ -682,7 +683,8 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
                 document.removeEventListener('click', clickOutsideHandler);
             }
         };
-        setTimeout(() => document.addEventListener('click', clickOutsideHandler, { signal: ctx?.signal }), 0);
+        const tClick = setTimeout(() => document.addEventListener('click', clickOutsideHandler, { signal: ctx?.signal }), 0);
+        ctx?.onCleanup?.(() => clearTimeout(tClick));
     }
 
     function closePopup() {

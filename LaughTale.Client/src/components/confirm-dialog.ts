@@ -324,9 +324,10 @@ class ConfirmDialogManager {
         if (this.maskEl) {
             this.maskEl.className = `p-confirmdialog-mask p-confirmdialog-pos-${pos}`;
             this.renderDialog(options);
-            setTimeout(() => {
+            const tMask = setTimeout(() => {
                 this.maskEl?.classList.add('p-confirmdialog-mask-active');
             }, 10);
+            options.signal?.addEventListener('abort', () => clearTimeout(tMask), { signal: options.signal });
         }
     }
 
@@ -429,7 +430,7 @@ class ConfirmDialogManager {
 const globalConfirm = new ConfirmDialogManager();
 (window as any).$confirm = globalConfirm;
 
-export function showToastFeedback(summary: string, detail: string, severity: 'success' | 'info' | 'warn' | 'error' = 'info') {
+export function showToastFeedback(summary: string, detail: string, severity: 'success' | 'info' | 'warn' | 'error' = 'info', signal?: AbortSignal) {
     // If global toast island exists, trigger it
     if ((window as any).$toast?.add) {
         (window as any).$toast.add({ severity, summary, detail, life: 3000 });
@@ -461,11 +462,16 @@ export function showToastFeedback(summary: string, detail: string, severity: 'su
     `);
 
     toastContainer.appendChild(toastItem);
-    setTimeout(() => {
+    let tInner: any = null;
+    const tOuter = setTimeout(() => {
         toastItem.style.opacity = '0';
         toastItem.style.transition = 'opacity 0.3s ease';
-        setTimeout(() => toastItem.remove(), 300);
+        tInner = setTimeout(() => toastItem.remove(), 300);
     }, 3000);
+    signal?.addEventListener('abort', () => {
+        clearTimeout(tOuter);
+        if (tInner) clearTimeout(tInner);
+    }, { signal });
 }
 
 export default function ConfirmDialogIsland(container: HTMLElement, props: ConfirmDialogProps, ctx?: IslandContext) {

@@ -613,7 +613,8 @@ export default function MenubarIsland(container: HTMLElement, props: MenubarProp
         `;
         toast.textContent = `✓ ${msg}`;
         document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 2500);
+        const tToast = setTimeout(() => toast.remove(), 2500);
+        ctx?.onCleanup?.(() => clearTimeout(tToast));
     }
 
     setHtml(container, renderMenubarHtml());

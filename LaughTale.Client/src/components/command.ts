@@ -583,10 +583,12 @@ export default function CommandMenuIsland(container: HTMLElement, props: Command
             const action = activeEl.getAttribute('data-action');
 
             activeEl.classList.add('p-commandmenu-item-active');
-            setTimeout(() => activeEl.classList.remove('p-commandmenu-item-active'), 150);
+            const tActive = setTimeout(() => activeEl.classList.remove('p-commandmenu-item-active'), 150);
+            ctx?.onCleanup?.(() => clearTimeout(tActive));
 
             if (withDialog) {
-                setTimeout(() => closeDialog(), 150);
+                const tClose = setTimeout(() => closeDialog(), 150);
+                ctx?.onCleanup?.(() => clearTimeout(tClose));
             }
 
             if (url) {

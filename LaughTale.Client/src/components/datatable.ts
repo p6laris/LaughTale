@@ -1368,10 +1368,11 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
             refreshBtn.addEventListener('click', () => {
                 loading = true;
                 render();
-                setTimeout(() => {
+                const t = setTimeout(() => {
                     loading = false;
                     render();
                 }, 1000);
+                ctx?.onCleanup?.(() => clearTimeout(t));
             }, { signal: ctx?.signal });
         }
 

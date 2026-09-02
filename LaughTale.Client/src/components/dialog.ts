@@ -282,11 +282,12 @@ function initGlobalDialogDelegation(signal?: AbortSignal) {
             const maskEl = closeBtn.closest<HTMLElement>('.p-dialog-mask');
             if (maskEl) {
                 maskEl.classList.remove('p-dialog-mask-active');
-                setTimeout(() => {
+                const tClose = setTimeout(() => {
                     if (!maskEl.classList.contains('p-dialog-mask-active')) {
                         maskEl.style.display = 'none';
                     }
                 }, 200);
+                signal?.addEventListener('abort', () => clearTimeout(tClose), { signal });
                 document.body.style.overflow = '';
             }
             return;
@@ -306,11 +307,12 @@ function initGlobalDialogDelegation(signal?: AbortSignal) {
             }
             if (dismissable) {
                 target.classList.remove('p-dialog-mask-active');
-                setTimeout(() => {
+                const tMask = setTimeout(() => {
                     if (!target.classList.contains('p-dialog-mask-active')) {
                         target.style.display = 'none';
                     }
                 }, 200);
+                signal?.addEventListener('abort', () => clearTimeout(tMask), { signal });
                 document.body.style.overflow = '';
             }
         }
@@ -366,11 +368,12 @@ export default function DialogIsland(container: HTMLElement, props: DialogProps,
     window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && maskEl.classList.contains('p-dialog-mask-active')) {
             maskEl.classList.remove('p-dialog-mask-active');
-            setTimeout(() => {
+            const tEsc = setTimeout(() => {
                 if (!maskEl.classList.contains('p-dialog-mask-active')) {
                     maskEl.style.display = 'none';
                 }
             }, 200);
+            ctx?.onCleanup?.(() => clearTimeout(tEsc));
             document.body.style.overflow = '';
         }
     }, { signal: ctx?.signal });
