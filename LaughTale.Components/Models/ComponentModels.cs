@@ -901,7 +901,8 @@ public record TagProps(
 
 [LaughTale.Core.Attributes.Island("progress-bar")]
 public record ProgressBarProps(
-    double? Value = 0, string? Mode = "determinate", bool ShowValue = true, string? Unit = "%"
+    double? Value = 0, string? Mode = "determinate", bool ShowValue = true, string? Unit = "%",
+    string? Height = null, string? Color = null
 );
 
 [LaughTale.Core.Attributes.Island("meter-group")]
@@ -912,8 +913,8 @@ public record MeterGroupProps(
 
 [LaughTale.Core.Attributes.Island("skeleton")]
 public record SkeletonProps(
-    string? Shape = "rectangle", ComponentSize? Size = null, string? Width = "100%",
-    string? Height = "1rem", string? BorderRadius = null, string? Animation = "wave"
+    string? Shape = "rectangle", string? Size = null, string? Width = "100%",
+    string? Height = "1.25rem", string? BorderRadius = null, string? Animation = "wave"
 );
 
 [LaughTale.Core.Attributes.Island("blockui")]

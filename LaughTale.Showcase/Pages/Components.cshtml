@@ -7417,14 +7417,63 @@
         <div class="card-header">
             <div>
                 <h2>Skeleton</h2>
-                <p>Shimmer loading placeholders mimicking cards, text, and circular avatars.</p>
+                <p>Shimmer loading placeholders mimicking text paragraphs, circular avatars, and composite card layouts.</p>
             </div>
             <span class="p-tag p-tag-secondary">Loading</span>
         </div>
-        <div class="card-body" style="max-width: 400px; display: flex; flex-direction: column; gap: 0.75rem;">
-            <island-skeleton width="100%" height="2rem" />
-            <island-skeleton width="75%" height="1.25rem" />
-            <island-skeleton width="50%" height="1.25rem" />
+        <div class="card-body">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; width: 100%;">
+                <!-- Paragraph Placeholders -->
+                <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem;">
+                    <div style="font-size: 0.875rem; font-weight: 600; color: var(--p-text-color);">Typography Lines</div>
+                    <p style="font-size: 0.8rem; color: var(--p-text-muted); margin: 0;">Multi-line paragraph placeholders with variable widths.</p>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem; width: 100%;">
+                        <island-skeleton width="100%" height="1.5rem" />
+                        <island-skeleton width="85%" height="1rem" />
+                        <island-skeleton width="70%" height="1rem" />
+                        <island-skeleton width="45%" height="1rem" />
+                    </div>
+                </div>
+
+                <!-- Circular Avatar & User Profile -->
+                <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem;">
+                    <div style="font-size: 0.875rem; font-weight: 600; color: var(--p-text-color);">Profile &amp; Avatar</div>
+                    <p style="font-size: 0.8rem; color: var(--p-text-muted); margin: 0;">Circular avatar shape paired with title and subtitle tracks.</p>
+                    <div style="display: flex; align-items: center; gap: 1rem; width: 100%;">
+                        <island-skeleton shape="circle" size="3.5rem" />
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem; flex: 1;">
+                            <island-skeleton width="60%" height="1.25rem" />
+                            <island-skeleton width="40%" height="0.875rem" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Complex Card Layout -->
+                <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem;">
+                    <div style="font-size: 0.875rem; font-weight: 600; color: var(--p-text-color);">Card &amp; Feed Item</div>
+                    <p style="font-size: 0.8rem; color: var(--p-text-muted); margin: 0;">Complete media card placeholder with header, body, and actions.</p>
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem; width: 100%;">
+                        <island-skeleton width="100%" height="7rem" border-radius="var(--p-border-radius)" />
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
+                            <island-skeleton width="50%" height="1.25rem" />
+                            <island-skeleton width="4rem" height="1.75rem" border-radius="var(--p-border-radius)" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shapes & Sizes Matrix -->
+                <div style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius); padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem;">
+                    <div style="font-size: 0.875rem; font-weight: 600; color: var(--p-text-color);">Shapes &amp; Sizes</div>
+                    <p style="font-size: 0.8rem; color: var(--p-text-muted); margin: 0;">Circles, squares, pills, and custom rounded blocks.</p>
+                    <div style="display: flex; align-items: flex-end; gap: 0.75rem; flex-wrap: wrap;">
+                        <island-skeleton shape="circle" size="2rem" />
+                        <island-skeleton shape="circle" size="2.5rem" />
+                        <island-skeleton shape="circle" size="3rem" />
+                        <island-skeleton size="2.5rem" border-radius="8px" />
+                        <island-skeleton width="5rem" height="2rem" border-radius="9999px" />
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
