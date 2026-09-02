@@ -1,9 +1,11 @@
-/**
+﻿/**
  * LaughTale: Architecture & Contract Verification Gate
  * Enforces strict lint rules:
- * 1. Reference components must accept `ctx?: IslandContext` and pass `signal` on `addEventListener`.
- * 2. Component props interfaces must include `pt?: PassthroughRecord` and `studioOverrides?: Record<string, any>`.
+ * 1. Signal-bound Event Listeners: All addEventListener registrations must pass options containing signal.
+ * 2. Passthrough Customization: Component props must support pt?: PassthroughRecord.
  * 3. Safe Rendering Purity: Zero unguarded HTML injection sinks (.innerHTML, .outerHTML, insertAdjacentHTML, document.write).
+ * 4. Observer Teardown: Every MutationObserver, ResizeObserver, or IntersectionObserver must have a corresponding disconnect().
+ * 5. Interval Teardown: Every setInterval must have a corresponding clearInterval().
  */
 
 import fs from 'node:fs';
@@ -16,6 +18,74 @@ const componentsDir = path.resolve(__dirname, '../src/components');
 
 console.log('[LaughTale Lint] Running architecture contract verification gate...');
 
+export function splitTopLevel(argsStr) {
+    const parts = [];
+    let depth = 0;
+    let cur = '';
+    let inStr = false;
+    let quote = '';
+    for (let i = 0; i < argsStr.length; i++) {
+        const ch = argsStr[i];
+        if (inStr) {
+            cur += ch;
+            if (ch === quote && argsStr[i - 1] !== '\\') inStr = false;
+        } else if (ch === '"' || ch === "'" || ch === '`') {
+            inStr = true;
+            quote = ch;
+            cur += ch;
+        } else if (ch === '(' || ch === '{' || ch === '[') {
+            depth++;
+            cur += ch;
+        } else if (ch === ')' || ch === '}' || ch === ']') {
+            depth--;
+            cur += ch;
+        } else if (ch === ',' && depth === 0) {
+            parts.push(cur.trim());
+            cur = '';
+        } else {
+            cur += ch;
+        }
+    }
+    if (cur.trim()) parts.push(cur.trim());
+    return parts;
+}
+
+export function findUnmanagedListeners(content) {
+    const violations = [];
+    const re = /addEventListener\s*\(/g;
+    let m;
+    while ((m = re.exec(content)) !== null) {
+        const start = re.lastIndex;
+        let depth = 1;
+        let i = start;
+        let inStr = false;
+        let quote = '';
+        while (i < content.length && depth > 0) {
+            const ch = content[i];
+            if (inStr) {
+                if (ch === quote && content[i - 1] !== '\\') inStr = false;
+            } else if (ch === '"' || ch === "'" || ch === '`') {
+                inStr = true;
+                quote = ch;
+            } else if (ch === '(') {
+                depth++;
+            } else if (ch === ')') {
+                depth--;
+            }
+            i++;
+        }
+        const argsStr = content.slice(start, i - 1);
+        const parts = splitTopLevel(argsStr);
+        const opts = parts.length >= 3 ? parts.slice(2).join(',') : '';
+        if (!/\bsignal\b/.test(opts)) {
+            const lineNumber = content.slice(0, m.index).split('\n').length;
+            const snippet = content.slice(m.index, i).replace(/\s+/g, ' ').slice(0, 80);
+            violations.push({ line: lineNumber, snippet });
+        }
+    }
+    return violations;
+}
+
 const files = fs.readdirSync(componentsDir).filter(f => f.endsWith('.ts'));
 let errors = 0;
 
@@ -23,9 +93,10 @@ for (const file of files) {
     const filePath = path.join(componentsDir, file);
     const content = fs.readFileSync(filePath, 'utf-8');
 
-    // Rule 1: Must support IslandContext
-    if (!content.includes('IslandContext')) {
-        console.error(`❌ [${file}] Missing IslandContext lifecycle support.`);
+    // Rule 1: Signal-bound Event Listeners (balanced-paren parse)
+    const unmanaged = findUnmanagedListeners(content);
+    for (const v of unmanaged) {
+        console.error(`❌ [${file}:${v.line}] Unmanaged event listener without signal: ${v.snippet}`);
         errors++;
     }
 
@@ -35,8 +106,7 @@ for (const file of files) {
         errors++;
     }
 
-    // Rule 3: Safe Rendering Purity - Zero unguarded HTML injection sinks (T032, T033)
-    // Rejects .innerHTML =, .outerHTML =, insertAdjacentHTML, and document.write
+    // Rule 3: Safe Rendering Purity - Zero unguarded HTML injection sinks
     const lines = content.split('\n');
     lines.forEach((line, idx) => {
         if (/\.innerHTML\s*=/.test(line)) {
@@ -56,6 +126,26 @@ for (const file of files) {
             errors++;
         }
     });
+
+    // Rule 4: Observer Teardown (new Observer requires disconnect)
+    const observerMatch = content.match(/new\s+(MutationObserver|ResizeObserver|IntersectionObserver)\s*\(/);
+    if (observerMatch) {
+        if (!/\.disconnect\s*\(\)/.test(content)) {
+            const line = content.slice(0, observerMatch.index).split('\n').length;
+            console.error(`❌ [${file}:${line}] Undisconnected observer: ${observerMatch[1]} instantiated without corresponding disconnect().`);
+            errors++;
+        }
+    }
+
+    // Rule 5: Interval Teardown (setInterval requires clearInterval)
+    const intervalMatch = content.match(/\bsetInterval\s*\(/);
+    if (intervalMatch) {
+        if (!/\bclearInterval\s*\(/.test(content)) {
+            const line = content.slice(0, intervalMatch.index).split('\n').length;
+            console.error(`❌ [${file}:${line}] Uncleared interval: setInterval instantiated without corresponding clearInterval().`);
+            errors++;
+        }
+    }
 }
 
 if (errors > 0) {
