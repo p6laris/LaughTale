@@ -7781,79 +7781,60 @@
             </div>
             <span class="p-tag p-tag-success">Upload</span>
         </div>
-        <div class="card-body" style="display: flex; flex-direction: column; gap: 2rem;">
-            <!-- Hero / Preview Demo -->
-            <div data-fileupload-demo="preview" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
-                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Interactive Drop Area</h3>
-                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Drag and drop files directly onto the container or browse from your device.</p>
-                <div style="width: 100%;">
+        <div class="card-body">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(440px, 1fr)); gap: 1.5rem; width: 100%;">
+                <!-- Demo 1: Advanced Mode -->
+                <div data-fileupload-demo="advanced" style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); display: flex; flex-direction: column; gap: 1rem;">
+                    <div>
+                        <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Advanced Uploader</h3>
+                        <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin: 0;">Drag-and-drop zone with toolbar controls, multi-file queuing, and progress indicators.</p>
+                    </div>
                     <island-fileupload mode="advanced" name="demo[]" url="/api/upload" multiple="true" accept="image/*,.pdf" max-file-size="1000000" choose-label="Choose" upload-label="Upload" cancel-label="Cancel" />
                 </div>
-            </div>
 
-            <!-- Demo 1: Basic -->
-            <div data-fileupload-demo="basic" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
-                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic</h3>
-                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Select and upload files with drag-and-drop support.</p>
-                <div style="display: flex; justify-content: center; align-items: center; min-height: 3.5rem;">
-                    <island-fileupload mode="basic" name="demo[]" url="/api/upload" max-file-size="1000000" choose-label="Choose" upload-label="Upload" />
+                <!-- Demo 2: Image Preview Grid -->
+                <div data-fileupload-demo="imagepreview" style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); display: flex; flex-direction: column; gap: 1rem;">
+                    <div>
+                        <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Image Preview Grid</h3>
+                        <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin: 0;">Multi-image picker rendering responsive thumbnail cards with hover deletion.</p>
+                    </div>
+                    <island-fileupload mode="advanced" preview-images="true" accept="image/*" multiple="true" choose-label="Add Images" upload-label="Upload All" cancel-label="Clear" empty-title="No images selected. Click 'Add Images' to begin." empty-subtitle="PNG, JPG, WEBP accepted (Max 5MB)" />
                 </div>
-            </div>
 
-            <!-- Demo 2: Auto -->
-            <div data-fileupload-demo="auto" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
-                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Auto</h3>
-                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">When auto property is enabled, a file gets uploaded instantly after selection.</p>
-                <div style="display: flex; justify-content: center; align-items: center; min-height: 3.5rem;">
-                    <island-fileupload mode="basic" name="demo[]" url="/api/upload" auto="true" max-file-size="1000000" choose-label="Upload" />
-                </div>
-            </div>
+                <!-- Demo 3: Basic & Instant Auto -->
+                <div data-fileupload-demo="basic-auto" style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); display: flex; flex-direction: column; gap: 1.25rem;">
+                    <div>
+                        <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Basic & Instant Auto</h3>
+                        <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin: 0;">Compact button-driven upload triggers with automatic or manual upload commit.</p>
+                    </div>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem; padding: 1rem; background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius);">
+                        <span style="font-size: 0.75rem; font-weight: 600; color: var(--p-text-muted); text-transform: uppercase;">Standard Manual Upload</span>
+                        <island-fileupload mode="basic" name="demo[]" url="/api/upload" max-file-size="1000000" choose-label="Choose" upload-label="Upload" />
+                    </div>
 
-            <!-- Demo 3: Advanced -->
-            <div data-fileupload-demo="advanced" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
-                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Advanced</h3>
-                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Advanced uploader provides dragdrop support, multi file uploads, auto uploading, progress tracking and validations.</p>
-                <div style="width: 100%;">
-                    <island-fileupload mode="advanced" name="demo[]" url="/api/upload" multiple="true" accept="image/*,.pdf" max-file-size="1000000" choose-label="Choose" upload-label="Upload" cancel-label="Cancel" />
-                </div>
-            </div>
-
-            <!-- Demo 4: InputGroup -->
-            <div data-fileupload-demo="inputgroup" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
-                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">InputGroup</h3>
-                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">FileUpload can be placed inside an InputGroup as an addon to combine it with other form controls.</p>
-                <div style="display: flex; justify-content: center; align-items: center; min-height: 3.5rem;">
-                    <div class="p-inputgroup" style="display: flex; max-width: 24rem; width: 100%;">
-                        <input type="text" placeholder="Keyword" class="p-inputtext p-component" style="flex: 1; padding: 0.55rem 0.85rem; font-size: 0.875rem; border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); border-radius: var(--p-border-radius) 0 0 var(--p-border-radius); border-right: none;" />
-                        <island-fileupload mode="basic" auto="true" choose-label="Upload" style="display: inline-flex;" />
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem; padding: 1rem; background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: var(--p-border-radius);">
+                        <span style="font-size: 0.75rem; font-weight: 600; color: var(--p-text-muted); text-transform: uppercase;">Instant Auto-Upload</span>
+                        <island-fileupload mode="basic" name="demo[]" url="/api/upload" auto="true" max-file-size="1000000" choose-label="Upload Directly" />
                     </div>
                 </div>
-            </div>
 
-            <!-- Demo 5: Custom Upload -->
-            <div data-fileupload-demo="custom" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
-                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Custom Upload</h3>
-                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Uploading implementation can be overridden by enabling customUpload property and defining a custom upload handler.</p>
-                <div style="display: flex; justify-content: center; align-items: center;">
-                    <island-fileupload mode="custom" accept="image/*" choose-label="Custom Upload" />
-                </div>
-            </div>
+                <!-- Demo 4: InputGroup & Secure Dropzone -->
+                <div data-fileupload-demo="inputgroup-dropzone" style="background: var(--p-surface-50); padding: 1.25rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color); display: flex; flex-direction: column; gap: 1.25rem;">
+                    <div>
+                        <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">InputGroup & Document Vault</h3>
+                        <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin: 0;">Form field addon integration and dedicated standalone document vault dropzone.</p>
+                    </div>
 
-            <!-- Demo 6: Dropzone -->
-            <div data-fileupload-demo="dropzone" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
-                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Dropzone</h3>
-                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">A custom dropzone can be built with the content and empty slots. Files are added by dragging them onto the area or by clicking to browse.</p>
-                <div style="width: 100%;">
-                    <island-fileupload mode="advanced" accept="image/*,.pdf" max-file-size="10000000" choose-label="Browse" upload-label="Upload" cancel-label="Clear" empty-title="Drop files here" empty-subtitle="or click to browse" />
-                </div>
-            </div>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <span style="font-size: 0.75rem; font-weight: 600; color: var(--p-text-muted); text-transform: uppercase;">Form Addon Attachment</span>
+                        <div class="p-inputgroup" style="display: flex; width: 100%;">
+                            <input type="text" placeholder="Attach license manifest..." class="p-inputtext p-component" style="flex: 1; padding: 0.5rem 0.85rem; font-size: 0.875rem; border: 1px solid var(--p-border-color); background: var(--p-surface-0); color: var(--p-text-color); border-radius: var(--p-border-radius) 0 0 var(--p-border-radius); border-right: none;" />
+                            <island-fileupload mode="basic" auto="true" choose-label="Attach" style="display: inline-flex;" />
+                        </div>
+                    </div>
 
-            <!-- Demo 7: Image Preview -->
-            <div data-fileupload-demo="imagepreview" style="background: var(--p-surface-50); padding: 1.5rem; border-radius: var(--p-border-radius); border: 1px solid var(--p-border-color);">
-                <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--p-text-color);">Image Preview</h3>
-                <p style="font-size: 0.8125rem; color: var(--p-text-muted); margin-bottom: 1.25rem;">Grid-based image preview with thumbnails. Hover over images to reveal the remove button.</p>
-                <div style="width: 100%;">
-                    <island-fileupload mode="advanced" preview-images="true" accept="image/*" multiple="true" choose-label="Add Images" upload-label="Upload All" cancel-label="Clear All" empty-title="No images selected. Click 'Add Images' to get started." empty-subtitle="PNG, JPG, WEBP accepted" />
+                    <island-dropzone target-input-name="vaultDocument" allowed-extensions=".pdf,.docx,.zip" max-size-mb="25" drop-prompt="Drag and drop audit documents or click to browse" />
                 </div>
             </div>
         </div>

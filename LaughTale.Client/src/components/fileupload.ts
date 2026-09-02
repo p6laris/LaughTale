@@ -1,20 +1,27 @@
 import { useLocale } from '../composables/useLocale';
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
-﻿/**
- * LaughTale: Enterprise FileUpload Component (LaughTale Aura Design System)
- * High-performance, pixel-perfect file uploader matching LaughTale Aura specifications.
+import { injectIslandStyle } from '../runtime/styles';
+import { LucideIcons } from '../icons/lucide';
+
+/**
+ * LaughTale: Enterprise FileUpload Component (Aura Design System compliant)
  * Implements Basic, Auto, Advanced, InputGroup, Custom Upload, Dropzone Template, and Image Preview Grid.
  */
 
-import { injectIslandStyle } from '../runtime/styles';
-
 const FILEUPLOAD_CSS = `
+island-fileupload,
+p-fileupload {
+    display: block !important;
+    width: 100%;
+}
+
 .p-fileupload {
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
     width: 100%;
+    font-family: var(--p-font-family, inherit);
 }
 
 /* Basic Mode */
@@ -36,28 +43,24 @@ const FILEUPLOAD_CSS = `
     padding: 0.5rem 1.15rem;
     font-size: 0.875rem;
     font-weight: 600;
-    border-radius: var(--lt-radius);
-    background: var(--lt-surface-900);
-    border: 1px solid var(--lt-surface-900);
-    color: var(--lt-surface-0, var(--lt-surface-0));
-    transition: background-color 0.15s ease, border-color 0.15s ease;
+    border-radius: var(--p-border-radius, 6px);
+    background: var(--p-primary-color, #10b981);
+    border: 1px solid var(--p-primary-color, #10b981);
+    color: var(--p-primary-contrast-color, #ffffff);
+    transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
     gap: 0.45rem;
     user-select: none;
+    line-height: 1;
 }
 
 .p-fileupload-choose:hover {
-    background: var(--lt-surface-800);
-    border-color: var(--lt-surface-800);
+    background: var(--p-primary-hover-color, #059669);
+    border-color: var(--p-primary-hover-color, #059669);
 }
 
-.p-fileupload-choose.p-button-secondary {
-    background: var(--lt-surface-100);
-    border: 1px solid var(--lt-surface-200);
-    color: var(--lt-surface-800);
-}
-
-.p-fileupload-choose.p-button-secondary:hover {
-    background: var(--lt-surface-200);
+.p-fileupload-choose:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--p-surface-0, #ffffff), 0 0 0 4px var(--p-primary-500, #10b981);
 }
 
 .p-fileupload-choose input[type="file"] {
@@ -76,7 +79,7 @@ const FILEUPLOAD_CSS = `
 
 .p-fileupload-filename {
     font-size: 0.875rem;
-    color: var(--p-text-muted, var(--lt-surface-500));
+    color: var(--p-text-muted, #64748b);
     max-width: 16rem;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -85,9 +88,9 @@ const FILEUPLOAD_CSS = `
 
 /* Advanced Mode Container */
 .p-fileupload-advanced {
-    border: 1px solid var(--lt-surface-200);
-    border-radius: var(--lt-radius);
-    background: var(--lt-surface-0);
+    border: 1px solid var(--p-border-color, #cbd5e1);
+    border-radius: var(--p-border-radius, 8px);
+    background: var(--p-surface-0, #ffffff);
     overflow: hidden;
     width: 100%;
     box-sizing: border-box;
@@ -98,9 +101,38 @@ const FILEUPLOAD_CSS = `
     align-items: center;
     gap: 0.5rem;
     padding: 0.75rem 1rem;
-    background: var(--lt-surface-50);
-    border-bottom: 1px solid var(--lt-surface-200);
+    background: var(--p-surface-50, #f8fafc);
+    border-bottom: 1px solid var(--p-border-color, #cbd5e1);
     flex-wrap: wrap;
+}
+
+.p-fileupload-header .p-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: var(--p-border-radius, 6px);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    line-height: 1;
+}
+
+.p-fileupload-header .p-button-outlined {
+    background: var(--p-surface-0, #ffffff);
+    border: 1px solid var(--p-border-color, #cbd5e1);
+    color: var(--p-text-color, #1e293b);
+}
+
+.p-fileupload-header .p-button-outlined:hover:not(:disabled) {
+    background: var(--p-surface-100, #f1f5f9);
+    border-color: var(--p-border-color, #94a3b8);
+}
+
+.p-fileupload-header .p-button-outlined:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .p-fileupload-content {
@@ -110,12 +142,13 @@ const FILEUPLOAD_CSS = `
     display: flex;
     flex-direction: column;
     justify-content: center;
+    background: var(--p-surface-0, #ffffff);
     transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .p-fileupload-content.p-fileupload-highlight {
-    background: rgba(59, 130, 246, 0.04);
-    outline: 2px dashed var(--lt-primary-500);
+    background: color-mix(in srgb, var(--p-primary-color, #10b981) 6%, transparent);
+    outline: 2px dashed var(--p-primary-500, #10b981);
     outline-offset: -4px;
 }
 
@@ -127,44 +160,44 @@ const FILEUPLOAD_CSS = `
     justify-content: center;
     gap: 0.5rem;
     padding: 2.25rem 1.5rem;
-    color: var(--lt-surface-500);
+    color: var(--p-text-muted, #64748b);
     text-align: center;
-    border: 2px dashed var(--lt-surface-200);
-    border-radius: var(--lt-radius);
-    background: var(--lt-surface-50);
+    border: 2px dashed var(--p-border-color, #cbd5e1);
+    border-radius: var(--p-border-radius, 6px);
+    background: var(--p-surface-50, #f8fafc);
     cursor: pointer;
-    transition: border-color 0.2s ease, background 0.2s ease;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
     width: 100%;
     box-sizing: border-box;
 }
 
 .p-fileupload-empty:hover {
-    border-color: var(--lt-primary-500);
-    background: var(--lt-surface-0);
+    border-color: var(--p-primary-500, #10b981);
+    background: var(--p-surface-100, #f1f5f9);
 }
 
 .p-fileupload-empty-icon {
     width: 3rem;
     height: 3rem;
-    border-radius: 9999px;
-    background: var(--lt-surface-100);
-    border: 1px solid var(--lt-surface-200);
+    border-radius: 50%;
+    background: var(--p-surface-100, #f1f5f9);
+    border: 1px solid var(--p-border-color, #cbd5e1);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--lt-surface-600);
+    color: var(--p-text-muted, #64748b);
     margin-bottom: 0.25rem;
 }
 
 .p-fileupload-empty-title {
     font-weight: 600;
-    font-size: 0.95rem;
-    color: var(--lt-text-primary);
+    font-size: 0.9375rem;
+    color: var(--p-text-color, #1e293b);
 }
 
 .p-fileupload-empty-subtitle {
     font-size: 0.75rem;
-    color: var(--p-text-muted, var(--lt-surface-500));
+    color: var(--p-text-muted, #64748b);
     font-weight: 500;
 }
 
@@ -181,9 +214,9 @@ const FILEUPLOAD_CSS = `
     align-items: center;
     justify-content: space-between;
     padding: 0.75rem 1rem;
-    border: 1px solid var(--lt-surface-200);
-    border-radius: var(--lt-radius);
-    background: var(--lt-surface-0);
+    border: 1px solid var(--p-border-color, #cbd5e1);
+    border-radius: var(--p-border-radius, 6px);
+    background: var(--p-surface-0, #ffffff);
     gap: 1rem;
 }
 
@@ -198,14 +231,14 @@ const FILEUPLOAD_CSS = `
 .p-fileupload-thumbnail {
     width: 3rem;
     height: 3rem;
-    border-radius: 6px;
+    border-radius: var(--p-border-radius, 6px);
     object-fit: cover;
-    background: var(--lt-surface-100);
+    background: var(--p-surface-100, #f1f5f9);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    border: 1px solid var(--lt-surface-200);
+    border: 1px solid var(--p-border-color, #cbd5e1);
 }
 
 .p-fileupload-file-details {
@@ -217,7 +250,7 @@ const FILEUPLOAD_CSS = `
 .p-fileupload-file-name {
     font-size: 0.875rem;
     font-weight: 600;
-    color: var(--lt-text-primary);
+    color: var(--p-text-color, #1e293b);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -225,7 +258,7 @@ const FILEUPLOAD_CSS = `
 
 .p-fileupload-file-size {
     font-size: 0.75rem;
-    color: var(--p-text-muted, var(--lt-surface-500));
+    color: var(--p-text-muted, #64748b);
 }
 
 .p-fileupload-badge {
@@ -237,23 +270,23 @@ const FILEUPLOAD_CSS = `
 }
 
 .p-fileupload-badge-pending {
-    background: rgba(249, 115, 22, 0.12);
-    color: var(--lt-warn-600);
+    background: rgba(245, 158, 11, 0.12);
+    color: var(--p-warn-700, #b45309);
 }
 
 .p-fileupload-badge-completed {
-    background: rgba(16, 185, 129, 0.12);
-    color: var(--lt-primary-500, var(--lt-primary-500));
+    background: color-mix(in srgb, var(--p-primary-color, #10b981) 15%, transparent);
+    color: var(--p-primary-700, #047857);
 }
 
 .p-fileupload-badge-uploading {
     background: rgba(59, 130, 246, 0.12);
-    color: var(--lt-info-600, var(--lt-info-600));
+    color: var(--p-info-700, #1d4ed8);
 }
 
 .p-fileupload-progressbar {
     height: 0.35rem;
-    background: var(--lt-surface-200);
+    background: var(--p-surface-200, #e2e8f0);
     border-radius: 9999px;
     overflow: hidden;
     margin: 0.5rem 1rem;
@@ -262,7 +295,7 @@ const FILEUPLOAD_CSS = `
 
 .p-fileupload-progressbar-value {
     height: 100%;
-    background: var(--lt-primary-500);
+    background: var(--p-primary-color, #10b981);
     border-radius: 9999px;
     transition: width 0.25s ease;
 }
@@ -279,10 +312,10 @@ const FILEUPLOAD_CSS = `
 .p-fileupload-image-card {
     position: relative;
     aspect-ratio: 1;
-    border-radius: var(--lt-radius);
+    border-radius: var(--p-border-radius, 6px);
     overflow: hidden;
-    border: 1px solid var(--lt-surface-200);
-    background: var(--lt-surface-100);
+    border: 1px solid var(--p-border-color, #cbd5e1);
+    background: var(--p-surface-100, #f1f5f9);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
@@ -298,9 +331,9 @@ const FILEUPLOAD_CSS = `
     right: 0.4rem;
     width: 1.6rem;
     height: 1.6rem;
-    border-radius: 9999px;
+    border-radius: 50%;
     background: rgba(15, 23, 42, 0.8);
-    color: var(--lt-surface-0, var(--lt-surface-0));
+    color: #ffffff;
     border: none;
     cursor: pointer;
     display: flex;
@@ -327,71 +360,99 @@ const FILEUPLOAD_CSS = `
     max-height: 22rem;
     border-radius: 8px;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-    border: 1px solid var(--lt-surface-200);
+    border: 1px solid var(--p-border-color, #cbd5e1);
 }
 
 /* Dark Mode Tokens */
 html.dark .p-fileupload-advanced,
 [data-theme="dark"] .p-fileupload-advanced,
 .dark .p-fileupload-advanced {
-    background: var(--p-surface-0);
-    border-color: var(--p-border-color);
+    background: var(--p-surface-900, #0f172a);
+    border-color: var(--p-surface-700, #334155);
 }
 
 html.dark .p-fileupload-header,
 [data-theme="dark"] .p-fileupload-header,
 .dark .p-fileupload-header {
-    background: var(--p-surface-50);
-    border-color: var(--p-border-color);
+    background: var(--p-surface-950, #020617);
+    border-color: var(--p-surface-700, #334155);
+}
+
+html.dark .p-fileupload-content,
+[data-theme="dark"] .p-fileupload-content,
+.dark .p-fileupload-content {
+    background: var(--p-surface-900, #0f172a);
+}
+
+html.dark .p-fileupload-header .p-button-outlined,
+[data-theme="dark"] .p-fileupload-header .p-button-outlined,
+.dark .p-fileupload-header .p-button-outlined {
+    background: var(--p-surface-900, #0f172a);
+    border-color: var(--p-surface-700, #334155);
+    color: var(--p-surface-100, #f1f5f9);
+}
+
+html.dark .p-fileupload-header .p-button-outlined:hover:not(:disabled),
+[data-theme="dark"] .p-fileupload-header .p-button-outlined:hover:not(:disabled),
+.dark .p-fileupload-header .p-button-outlined:hover:not(:disabled) {
+    background: var(--p-surface-800, #1e293b);
+    border-color: var(--p-surface-600, #475569);
 }
 
 html.dark .p-fileupload-empty,
 [data-theme="dark"] .p-fileupload-empty,
 .dark .p-fileupload-empty {
-    background: var(--p-surface-0);
-    border-color: var(--p-border-color);
-    color: var(--p-text-muted);
+    background: var(--p-surface-950, #020617);
+    border-color: var(--p-surface-700, #334155);
+    color: var(--p-text-muted, #94a3b8);
+}
+
+html.dark .p-fileupload-empty:hover,
+[data-theme="dark"] .p-fileupload-empty,
+.dark .p-fileupload-empty {
+    background: var(--p-surface-900, #0f172a);
+    border-color: var(--p-primary-500, #10b981);
 }
 
 html.dark .p-fileupload-empty-icon,
 [data-theme="dark"] .p-fileupload-empty-icon,
 .dark .p-fileupload-empty-icon {
-    background: var(--p-surface-100);
-    color: var(--p-text-color);
-    border-color: var(--p-border-color);
+    background: var(--p-surface-800, #1e293b);
+    color: var(--p-surface-200, #e2e8f0);
+    border-color: var(--p-surface-700, #334155);
 }
 
 html.dark .p-fileupload-empty-title,
 [data-theme="dark"] .p-fileupload-empty-title,
 .dark .p-fileupload-empty-title {
-    color: var(--p-text-color);
+    color: var(--p-text-color, #f8fafc);
 }
 
 html.dark .p-fileupload-file-item,
 [data-theme="dark"] .p-fileupload-file-item,
 .dark .p-fileupload-file-item {
-    background: var(--p-surface-0);
-    border-color: var(--p-border-color);
+    background: var(--p-surface-950, #020617);
+    border-color: var(--p-surface-700, #334155);
 }
 
 html.dark .p-fileupload-file-name,
 [data-theme="dark"] .p-fileupload-file-name,
 .dark .p-fileupload-file-name {
-    color: var(--p-text-color);
+    color: var(--p-text-color, #f8fafc);
 }
 
 html.dark .p-fileupload-thumbnail,
 [data-theme="dark"] .p-fileupload-thumbnail,
 .dark .p-fileupload-thumbnail {
-    background: var(--p-surface-100);
-    border-color: var(--p-border-color);
+    background: var(--p-surface-800, #1e293b);
+    border-color: var(--p-surface-700, #334155);
 }
 
 html.dark .p-fileupload-image-card,
 [data-theme="dark"] .p-fileupload-image-card,
 .dark .p-fileupload-image-card {
-    background: var(--p-surface-0);
-    border-color: var(--p-border-color);
+    background: var(--p-surface-900, #0f172a);
+    border-color: var(--p-surface-700, #334155);
 }
 `;
 
@@ -416,14 +477,16 @@ export interface FileUploadProps {
         size: number;
         previewUrl?: string;
         status?: 'pending' | 'completed' | 'uploading';
-    pt?: PassthroughRecord;
-    studioOverrides?: Record<string, any>;
-};
+    };
     initialImages?: Array<{
         id: string;
         name: string;
         previewUrl: string;
     }>;
+    class?: string;
+    style?: string;
+    pt?: PassthroughRecord;
+    studioOverrides?: Record<string, any>;
 }
 
 interface UploadedFileItem {
@@ -556,7 +619,7 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
     }
 
     function render() {
-        // Custom Mode (Single Photo Showcase matching LaughTale Custom Upload demo)
+        // Custom Mode
         if (mode === 'custom') {
             const hasFile = fileQueue.length > 0;
             const currentFile = hasFile ? fileQueue[0] : null;
@@ -616,8 +679,9 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
                             <input type="file" accept="${accept}" ${multiple ? 'multiple' : ''} class="p-fileupload-input" />
                         </span>
                         <span class="p-fileupload-filename" style="margin-left: 0.5rem; margin-right: 0.5rem;">${fileName}</span>
-                        <button type="button" class="p-button p-button-outlined p-button-secondary p-fileupload-upload-btn" ${!hasFile || isUploading ? 'disabled style="opacity:0.5; pointer-events:none; cursor:not-allowed;"' : ''} style="padding: 0.5rem 1.15rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--lt-radius); border: 1px solid var(--lt-surface-200); background: var(--lt-surface-0); color: var(--lt-text-primary); cursor: pointer;">
-                            ${uploadLabel}
+                        <button type="button" class="p-button p-button-outlined p-fileupload-upload-btn" ${!hasFile || isUploading ? 'disabled style="opacity:0.5; pointer-events:none; cursor:not-allowed;"' : ''}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                            <span>${uploadLabel}</span>
                         </button>
                     </div>
                 `;
@@ -646,16 +710,16 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
             <div class="p-fileupload p-fileupload-advanced">
                 <!-- Toolbar Header -->
                 <div class="p-fileupload-header">
-                    <span class="p-fileupload-choose" style="padding: 0.5rem 1.15rem;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+                    <span class="p-fileupload-choose">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
                         <span>${chooseLabel}</span>
                         <input type="file" accept="${accept}" ${multiple ? 'multiple' : ''} class="p-fileupload-input" />
                     </span>
-                    <button type="button" class="p-button p-button-outlined p-button-secondary p-fileupload-upload-btn" ${!hasFiles || isUploading ? 'disabled style="opacity:0.5; pointer-events:none; cursor:not-allowed;"' : ''} style="padding: 0.5rem 1.15rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--lt-radius); border: 1px solid var(--lt-surface-200); background: var(--lt-surface-0); color: var(--lt-text-primary); cursor: pointer; display: inline-flex; align-items: center; gap: 0.45rem;">
+                    <button type="button" class="p-button p-button-outlined p-fileupload-upload-btn" ${!hasFiles || isUploading ? 'disabled style="opacity:0.5; pointer-events:none; cursor:not-allowed;"' : ''}>
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
                         <span>${uploadLabel}</span>
                     </button>
-                    <button type="button" class="p-button p-button-outlined p-button-secondary p-fileupload-cancel-btn" ${!hasFiles || isUploading ? 'disabled style="opacity:0.5; pointer-events:none; cursor:not-allowed;"' : ''} style="padding: 0.5rem 1.15rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--lt-radius); border: 1px solid var(--lt-surface-200); background: var(--lt-surface-0); color: var(--lt-text-primary); cursor: pointer; display: inline-flex; align-items: center; gap: 0.45rem;">
+                    <button type="button" class="p-button p-button-outlined p-fileupload-cancel-btn" ${!hasFiles || isUploading ? 'disabled style="opacity:0.5; pointer-events:none; cursor:not-allowed;"' : ''}>
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                         <span>${cancelLabel}</span>
                     </button>
@@ -697,7 +761,7 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
                                             <img src="${f.previewUrl}" alt="${f.name}" class="p-fileupload-thumbnail" />
                                         ` : `
                                             <div class="p-fileupload-thumbnail">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--lt-surface-500);"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--p-text-muted);"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
                                             </div>
                                         `}
                                         <div class="p-fileupload-file-details">
@@ -709,7 +773,7 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
                                         <span class="p-fileupload-badge p-fileupload-badge-${f.status === 'completed' ? 'completed' : (f.status === 'uploading' ? 'uploading' : 'pending')}">
                                             ${f.status === 'completed' ? 'Uploaded' : (f.status === 'uploading' ? `${f.progress}%` : 'Pending')}
                                         </span>
-                                        <button type="button" class="p-button p-button-text p-button-danger p-button-sm" data-remove-id="${f.id}" style="border: none; background: transparent; color: var(--lt-danger-500, var(--lt-danger-500)); cursor: pointer; padding: 0.35rem; display: flex; align-items: center; border-radius: 9999px;">
+                                        <button type="button" class="p-button p-button-text p-button-danger p-button-sm" data-remove-id="${f.id}" style="border: none; background: transparent; color: var(--p-red-500, #ef4444); cursor: pointer; padding: 0.35rem; display: flex; align-items: center; border-radius: 9999px;">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                                         </button>
                                     </div>

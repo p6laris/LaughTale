@@ -1,50 +1,128 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
+import { LucideIcons } from '../icons/lucide';
+
 export interface DropzoneProps {
     targetInputName: string;
     allowedExtensions: string;
     maxSizeMb: number;
     dropPrompt: string;
+    class?: string;
+    style?: string;
     pt?: PassthroughRecord;
     studioOverrides?: Record<string, any>;
 }
 
-
 const CSS = `
+island-dropzone,
+p-dropzone {
+    display: block !important;
+    width: 100%;
+}
+
+.dropzone-box {
+    border: 2px dashed var(--p-border-color, #cbd5e1);
+    border-radius: var(--p-border-radius, 8px);
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+    background-color: var(--p-surface-50, #f8fafc);
+    box-sizing: border-box;
+}
+
+.dropzone-box:hover {
+    border-color: var(--p-primary-500, #10b981);
+    background-color: var(--p-surface-100, #f1f5f9);
+}
+
+.dropzone-icon {
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: 50%;
+    background: var(--p-surface-100, #f1f5f9);
+    border: 1px solid var(--p-border-color, #cbd5e1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    color: var(--p-primary-500, #10b981);
+    transition: transform 0.2s ease;
+}
+
+.dropzone-box:hover .dropzone-icon {
+    transform: scale(1.08);
+}
+
+.dropzone-title {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--p-text-color, #1e293b);
+}
+
+.dropzone-subtitle {
+    font-size: 0.75rem;
+    color: var(--p-text-muted, #64748b);
+    margin-top: 0.35rem;
+}
+
+/* Dark Mode Tokens */
 html.dark .dropzone-box,
 [data-theme="dark"] .dropzone-box,
 .dark .dropzone-box {
-    background: var(--p-surface-0) !important;
-    color: var(--p-text-color) !important;
-    border-color: var(--p-border-color) !important;
+    background: var(--p-surface-950, #020617);
+    border-color: var(--p-surface-700, #334155);
 }
+
 html.dark .dropzone-box:hover,
 [data-theme="dark"] .dropzone-box:hover,
 .dark .dropzone-box:hover {
-    border-color: var(--p-primary-500) !important;
+    background: var(--p-surface-900, #0f172a);
+    border-color: var(--p-primary-500, #10b981);
+}
+
+html.dark .dropzone-icon,
+[data-theme="dark"] .dropzone-icon,
+.dark .dropzone-icon {
+    background: var(--p-surface-800, #1e293b);
+    border-color: var(--p-surface-700, #334155);
+    color: var(--p-primary-400, #34d399);
+}
+
+html.dark .dropzone-title,
+[data-theme="dark"] .dropzone-title,
+.dark .dropzone-title {
+    color: var(--p-text-color, #f8fafc);
+}
+
+html.dark .dropzone-subtitle,
+[data-theme="dark"] .dropzone-subtitle,
+.dark .dropzone-subtitle {
+    color: var(--p-text-muted, #94a3b8);
 }
 `;
 
 export default function DropzoneIsland(container: HTMLElement, props: DropzoneProps, ctx?: IslandContext) {
     injectIslandStyle('dropzone', CSS);
+
     container.innerHTML = `
-        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+        <div style="display: flex; flex-direction: column; gap: 0.75rem; width: 100%;">
             <div style="display: flex; align-items: center; justify-content: space-between;">
-                <span style="font-size: 0.8125rem; font-weight: 600; color: var(--lt-surface-600);">Document Vault</span>
-                <span class="aura-tag tag-cyan" data-part="root">Hydrate: Visible</span>
+                <span style="font-size: 0.8125rem; font-weight: 600; color: var(--p-text-muted, #64748b);">Secure Document Vault</span>
+                <span class="p-tag p-tag-info" style="font-size: 0.6875rem;">Client Dropzone</span>
             </div>
 
-            <div class="dropzone-box" style="border: 2px dashed var(--lt-surface-200); border-radius: var(--lt-radius-lg); padding: 2rem 1.5rem; text-align: center; cursor: pointer; transition: all 0.2s ease; background-color: var(--lt-surface-50);">
-                <input type="file" class="file-input" name="${props.targetInputName}" accept="${props.allowedExtensions}" style="display: none;" />
+            <div class="dropzone-box">
+                <input type="file" class="file-input" name="${props.targetInputName || 'file'}" accept="${props.allowedExtensions || '*/*'}" style="display: none;" />
                 
-                <div style="width: 2.75rem; height: 2.75rem; border-radius: 50%; background: var(--lt-surface-100); display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem; font-size: 1.25rem;">
-                    ☁️
+                <div class="dropzone-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/><polyline points="12 13 12 9 10 11"/><polyline points="12 9 14 11"/></svg>
                 </div>
                 
-                <div style="font-size: 0.875rem; font-weight: 600; color: var(--lt-surface-800);">${props.dropPrompt}</div>
-                <div style="font-size: 0.75rem; color: var(--lt-surface-500); margin-top: 0.25rem;">
-                    Supported: ${props.allowedExtensions} &bull; Max Size: ${props.maxSizeMb} MB
+                <div class="dropzone-title">${props.dropPrompt || 'Drag and drop files here to upload'}</div>
+                <div class="dropzone-subtitle">
+                    Supported: ${props.allowedExtensions || 'All files'} &bull; Max Size: ${props.maxSizeMb || 10} MB
                 </div>
 
                 <div class="preview-area" style="display: none; margin-top: 1rem;"></div>
@@ -60,19 +138,16 @@ export default function DropzoneIsland(container: HTMLElement, props: DropzonePr
 
     box.addEventListener('dragover', (e) => {
         e.preventDefault();
-        box.style.borderColor = 'var(--lt-primary-500)';
-        box.style.backgroundColor = 'var(--lt-primary-50)';
+        box.style.borderColor = 'var(--p-primary-500, #10b981)';
     }, { signal: ctx?.signal });
 
     box.addEventListener('dragleave', () => {
-        box.style.borderColor = 'var(--lt-surface-200)';
-        box.style.backgroundColor = 'var(--lt-surface-50)';
+        box.style.borderColor = '';
     }, { signal: ctx?.signal });
 
     box.addEventListener('drop', (e) => {
         e.preventDefault();
-        box.style.borderColor = 'var(--lt-surface-200)';
-        box.style.backgroundColor = 'var(--lt-surface-50)';
+        box.style.borderColor = '';
         if (e.dataTransfer?.files.length) {
             input.files = e.dataTransfer.files;
             handleFiles(input.files[0]);
@@ -87,7 +162,7 @@ export default function DropzoneIsland(container: HTMLElement, props: DropzonePr
 
     function handleFiles(file: File) {
         const sizeMb = file.size / (1024 * 1024);
-        if (sizeMb > props.maxSizeMb) {
+        if (props.maxSizeMb && sizeMb > props.maxSizeMb) {
             alert(`File exceeds size limit of ${props.maxSizeMb} MB.`);
             input.value = '';
             return;
@@ -95,14 +170,18 @@ export default function DropzoneIsland(container: HTMLElement, props: DropzonePr
 
         preview.style.display = 'block';
         preview.innerHTML = `
-            <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; background: var(--lt-primary-50); border: 1px solid var(--lt-primary-200); border-radius: var(--lt-radius); font-size: 0.8125rem; color: var(--lt-primary-700);">
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.625rem 0.875rem; background: color-mix(in srgb, var(--p-primary-color, #10b981) 10%, transparent); border: 1px solid var(--p-primary-500, #10b981); border-radius: var(--p-border-radius, 6px); font-size: 0.8125rem; color: var(--p-text-color);">
                 <div style="display: flex; align-items: center; gap: 0.5rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                    <span>📄</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--p-primary-500);"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
                     <strong style="overflow: hidden; text-overflow: ellipsis;">${file.name}</strong>
-                    <span style="font-size: 0.75rem; opacity: 0.8;">(${sizeMb.toFixed(2)} MB)</span>
+                    <span style="font-size: 0.75rem; color: var(--p-text-muted);">(${sizeMb.toFixed(2)} MB)</span>
                 </div>
-                <span class="aura-tag tag-emerald" style="font-size: 0.6875rem;">Verified</span>
+                <span class="p-tag p-tag-success" style="font-size: 0.6875rem;">Verified</span>
             </div>
         `;
     }
+
+    container.setAttribute('data-part', 'root');
+    applyPart(container, 'root', props.class || '', props.pt, props.studioOverrides);
 }
+
