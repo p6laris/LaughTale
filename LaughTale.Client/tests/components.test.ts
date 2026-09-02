@@ -1,4 +1,4 @@
-﻿import './setup.ts';
+import './setup.ts';
 import { describe, it, beforeEach } from 'node:test';
 import assert from 'node:assert';
 
@@ -245,7 +245,12 @@ describe('LaughTale Aura Enterprise Components Suite', () => {
             targetInputName: 'note'
         });
 
-        const display = container.querySelector('.laughtale-inplace-display') as HTMLElement;
+        const display = container.querySelector('.p-inplace-display') as HTMLElement;
         assert.ok(display);
+
+        display.click();
+        const input = container.querySelector('.p-inplace-input') as HTMLInputElement;
+        assert.ok(input);
+        assert.equal(input.value, 'Initial Note');
     });
 });
