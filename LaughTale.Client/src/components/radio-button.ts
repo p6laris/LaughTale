@@ -3,6 +3,7 @@ import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
 import { getLucideIcon } from '../icons/lucide';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import { setRovingTabindex, handleRovingKeydown } from '../accessibility/aria';
 
 export interface RadioButtonOption {
     label: string;
@@ -578,6 +579,52 @@ export default function RadioButtonIsland(container: HTMLElement, props: RadioBu
         const inputs = container.querySelectorAll<HTMLInputElement>('.p-radiobutton-input');
         const hiddenInp = container.querySelector<HTMLInputElement>('input[type="hidden"]')!;
 
+        const optionEls = Array.from(container.querySelectorAll<HTMLElement>('.p-radiobutton-root'));
+        let activeIndex = rawOpts.findIndex(opt => String(opt.value) === String(currentSelected));
+        if (activeIndex < 0) activeIndex = 0;
+        setRovingTabindex(optionEls, activeIndex);
+
+        function selectIndex(index: number) {
+            if (index < 0 || index >= rawOpts.length) return;
+            activeIndex = index;
+            setRovingTabindex(optionEls, activeIndex);
+            optionEls[activeIndex]?.focus();
+
+            const opt = rawOpts[activeIndex];
+            currentSelected = opt.value;
+            inputs.forEach((other, i) => {
+                other.checked = (i === activeIndex);
+                const cardWrap = other.closest('.p-radiobutton-root');
+                const rb = other.closest('.p-radiobutton');
+                if (other.checked) {
+                    cardWrap?.classList.add('is-checked');
+                    rb?.classList.add('p-radiobutton-checked');
+                } else {
+                    cardWrap?.classList.remove('is-checked');
+                    rb?.classList.remove('p-radiobutton-checked');
+                }
+            });
+
+            if (hiddenInp) hiddenInp.value = String(currentSelected);
+            container.dispatchEvent(new CustomEvent('radiogroup:change', {
+                bubbles: true,
+                detail: { value: currentSelected }
+            }));
+        }
+
+        container.addEventListener('keydown', (e: KeyboardEvent) => {
+            const next = handleRovingKeydown(e, optionEls, activeIndex, isHorizontal ? 'horizontal' : 'both');
+            if (next === activeIndex) return;
+            e.preventDefault();
+            selectIndex(next);
+        }, { signal: ctx?.signal });
+
+        optionEls.forEach((optEl, idx) => {
+            optEl.addEventListener('click', () => {
+                selectIndex(idx);
+            }, { signal: ctx?.signal });
+        });
+
         inputs.forEach(inp => {
             inp.addEventListener('change', () => {
                 inputs.forEach(other => {
@@ -601,5 +648,9 @@ export default function RadioButtonIsland(container: HTMLElement, props: RadioBu
         });
     }
 
-    renderSingle();
+    if (props.options && props.options.length > 0) {
+        renderGroup();
+    } else {
+        renderSingle();
+    }
 }

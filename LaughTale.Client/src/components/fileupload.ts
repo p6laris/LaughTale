@@ -627,7 +627,7 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
 
             setHtml(container, html`
                 <div class="p-fileupload p-fileupload-custom" data-part="root" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
-                    <span class="p-fileupload-choose">
+                    <span class="p-fileupload-choose" tabindex="0">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
                         <span>${chooseLabel}</span>
                         <input type="file" accept="${accept}" class="p-fileupload-input" />
@@ -643,6 +643,14 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
             `);
 
             const input = container.querySelector<HTMLInputElement>('.p-fileupload-input');
+            const chooseBtn = container.querySelector<HTMLElement>('.p-fileupload-choose');
+            chooseBtn?.addEventListener('keydown', (e: KeyboardEvent) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    input?.click();
+                }
+            }, { signal: ctx?.signal });
+
             input?.addEventListener('change', (e) => {
                 const target = e.target as HTMLInputElement;
                 if (target.files && target.files.length > 0) {
@@ -663,7 +671,7 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
             if (auto) {
                 setHtml(container, html`
                     <div class="p-fileupload p-fileupload-basic" style="justify-content: center; width: 100%;">
-                        <span class="p-fileupload-choose">
+                        <span class="p-fileupload-choose" tabindex="0">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
                             <span>${chooseLabel}</span>
                             <input type="file" accept="${accept}" ${attr('multiple', multiple)} class="p-fileupload-input" />
@@ -674,7 +682,7 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
             } else {
                 setHtml(container, html`
                     <div class="p-fileupload p-fileupload-basic" style="justify-content: center; width: 100%;">
-                        <span class="p-fileupload-choose">
+                        <span class="p-fileupload-choose" tabindex="0">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
                             <span>${chooseLabel}</span>
                             <input type="file" accept="${accept}" ${attr('multiple', multiple)} class="p-fileupload-input" />
@@ -689,6 +697,14 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
             }
 
             const input = container.querySelector<HTMLInputElement>('.p-fileupload-input');
+            const chooseBtn = container.querySelector<HTMLElement>('.p-fileupload-choose');
+            chooseBtn?.addEventListener('keydown', (e: KeyboardEvent) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    input?.click();
+                }
+            }, { signal: ctx?.signal });
+
             input?.addEventListener('change', (e) => {
                 const target = e.target as HTMLInputElement;
                 if (target.files && target.files.length > 0) {
@@ -711,7 +727,7 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
             <div class="p-fileupload p-fileupload-advanced">
                 <!-- Toolbar Header -->
                 <div class="p-fileupload-header">
-                    <span class="p-fileupload-choose">
+                    <span class="p-fileupload-choose" tabindex="0">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
                         <span>${chooseLabel}</span>
                         <input type="file" accept="${accept}" ${attr('multiple', multiple)} class="p-fileupload-input" />
@@ -735,7 +751,7 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
                 <!-- Content / Drop Area -->
                 <div class="p-fileupload-content">
                     ${!hasFiles ? html`
-                        <div class="p-fileupload-empty" data-click-trigger>
+                        <div class="p-fileupload-empty" data-click-trigger tabindex="0">
                             <div class="p-fileupload-empty-icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/><polyline points="12 13 12 9 10 11"/><polyline points="12 9 14 11"/></svg>
                             </div>
@@ -805,9 +821,24 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
             cancelAll();
         }, { signal: ctx?.signal });
 
+        const chooseBtn = container.querySelector<HTMLElement>('.p-fileupload-choose');
+        chooseBtn?.addEventListener('keydown', (e: KeyboardEvent) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                input?.click();
+            }
+        }, { signal: ctx?.signal });
+
         const emptyClick = container.querySelector<HTMLElement>('[data-click-trigger]');
         emptyClick?.addEventListener('click', () => {
             input?.click();
+        }, { signal: ctx?.signal });
+
+        emptyClick?.addEventListener('keydown', (e: KeyboardEvent) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                input?.click();
+            }
         }, { signal: ctx?.signal });
 
         // Drop handling

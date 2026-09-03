@@ -57,7 +57,7 @@ export default function KnobIsland(container: HTMLElement, props: KnobProps, ctx
     const initialText = template.replace('{value}', currentValue.toString());
 
     setHtml(container, html`
-        <div class="laughtale-knob" data-part="root" style="position: relative; display: inline-flex; align-items: center; justify-content: center; width: ${size}px; height: ${size}px; user-select: none; cursor: ${props.disabled ? 'not-allowed' : 'pointer'}; touch-action: none;">
+        <div class="laughtale-knob" data-part="root" tabindex="${props.disabled ? '-1' : '0'}" style="position: relative; display: inline-flex; align-items: center; justify-content: center; width: ${size}px; height: ${size}px; user-select: none; cursor: ${props.disabled ? 'not-allowed' : 'pointer'}; touch-action: none;">
             <svg width="${size}" height="${size}" style="transform: rotate(-90deg); pointer-events: none;">
                 <!-- Background Circle -->
                 <circle cx="${size / 2}" cy="${size / 2}" r="${radius}" fill="transparent" stroke="var(--lt-surface-200)" stroke-width="${strokeWidth}" />
@@ -147,6 +147,33 @@ export default function KnobIsland(container: HTMLElement, props: KnobProps, ctx
         knobEl.addEventListener('mousedown', onPointerDown as EventListener, { signal: ctx?.signal });
         window.addEventListener('mousemove', onPointerMove as EventListener, { signal: ctx?.signal });
         window.addEventListener('mouseup', onPointerUp as EventListener, { signal: ctx?.signal });
+
+        // Keyboard navigation
+        knobEl.addEventListener('keydown', (e: KeyboardEvent) => {
+            const largeStep = step * 2;
+            const currentStep = e.shiftKey ? largeStep : step;
+            switch (e.key) {
+                case 'ArrowRight':
+                case 'ArrowUp':
+                    currentValue = Math.min(max, currentValue + currentStep);
+                    break;
+                case 'ArrowLeft':
+                case 'ArrowDown':
+                    currentValue = Math.max(min, currentValue - currentStep);
+                    break;
+                case 'Home':
+                    currentValue = min;
+                    break;
+                case 'End':
+                    currentValue = max;
+                    break;
+                default:
+                    return;
+            }
+            e.preventDefault();
+            updateVisuals();
+            syncValue();
+        }, { signal: ctx?.signal });
     }
 
     syncValue();

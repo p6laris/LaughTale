@@ -11,6 +11,7 @@ import { LucideIcons } from '../icons/lucide';
 import { useDisclosure } from '../composables/useDisclosure';
 import { useClickOutside } from '../composables/useClickOutside';
 import { useTransition } from '../composables/animation/useTransition';
+import { useKeyboardNav } from '../composables/useKeyboardNav';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 
 export interface MultiSelectProps<T = string> {
@@ -77,7 +78,7 @@ export default function MultiSelectIsland<T = string>(container: HTMLElement, pr
     setHtml(container, html`
         <div class="laughtale-multiselect" data-part="root" style="position: relative; width: 100%; max-width: 320px; font-family: var(--p-font-family, inherit);">
             <!-- Trigger Button Container -->
-            <div class="multiselect-trigger p-input" style="display: flex; align-items: center; justify-content: space-between; min-height: 2.5rem; padding: 0.35rem 0.75rem; cursor: ${props.disabled ? 'not-allowed' : 'pointer'}; background: var(--lt-surface-0); border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); user-select: none;">
+            <div class="multiselect-trigger p-input" tabindex="${props.disabled ? '-1' : '0'}" style="display: flex; align-items: center; justify-content: space-between; min-height: 2.5rem; padding: 0.35rem 0.75rem; cursor: ${props.disabled ? 'not-allowed' : 'pointer'}; background: var(--lt-surface-0); border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); user-select: none;">
                 <div class="multiselect-label-container" style="display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap; flex: 1; min-width: 0;"></div>
                 <div style="display: flex; align-items: center; gap: 0.35rem; color: var(--lt-surface-400);">
                     <span class="multiselect-clear-btn" style="display: none; cursor: pointer; padding: 2px;">${unsafe(LucideIcons.x)}</span>
@@ -139,6 +140,38 @@ export default function MultiSelectIsland<T = string>(container: HTMLElement, pr
         const q = filterQuery.toLowerCase();
         return options.filter(o => o.label.toLowerCase().includes(q));
     }
+
+    const nav = useKeyboardNav({
+        itemCount: () => getFilteredOptions().length,
+        initialIndex: 0,
+        orientation: 'vertical',
+        onSelect: (index) => {
+            const filtered = getFilteredOptions();
+            const opt = filtered[index];
+            if (opt) {
+                if (selected.has(opt.value)) selected.delete(opt.value);
+                else selected.add(opt.value);
+                renderDisplay();
+                renderList();
+                syncValue();
+            }
+        },
+        onHighlight: (index) => {
+            const items = itemsList.querySelectorAll<HTMLElement>('.multiselect-item');
+            items.forEach((item, i) => {
+                if (i === index) {
+                    item.style.outline = '2px solid var(--lt-primary-500)';
+                    item.scrollIntoView({ block: 'nearest' });
+                } else {
+                    item.style.outline = 'none';
+                }
+            });
+        },
+        onEscape: () => {
+            disclosure.close();
+            trigger.focus();
+        }
+    });
 
     function renderDisplay() {
         if (selected.size === 0) {
@@ -216,6 +249,27 @@ export default function MultiSelectIsland<T = string>(container: HTMLElement, pr
         disclosure.toggle();
     }, { signal: ctx?.signal });
 
+    trigger.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (props.disabled) return;
+        const isClosed = overlay.style.display === 'none' || overlay.style.display === '';
+        if (isClosed) {
+            if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+                e.preventDefault();
+                disclosure.open();
+                return;
+            }
+        } else {
+            if (!nav.handleKeyDown(e)) {
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    disclosure.close();
+                    trigger.focus();
+                }
+                return;
+            }
+        }
+    }, { signal: ctx?.signal });
+
     clearBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         selected.clear();
@@ -240,6 +294,17 @@ export default function MultiSelectIsland<T = string>(container: HTMLElement, pr
     filterInput.addEventListener('input', () => {
         filterQuery = filterInput.value;
         renderList();
+    }, { signal: ctx?.signal });
+
+    filterInput.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (!nav.handleKeyDown(e)) {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                disclosure.close();
+                trigger.focus();
+            }
+            return;
+        }
     }, { signal: ctx?.signal });
 
     function syncValue() {
