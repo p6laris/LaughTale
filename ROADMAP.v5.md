@@ -2,7 +2,7 @@
 
 **Created**: 2026-09-02
 **Audited against**: commit `a49a996` (branch `comp`)
-**Status**: Strategy of record. Execution steps live in [EXECUTION-RUNBOOK.md](EXECUTION-RUNBOOK.md).
+**Status**: Strategy of record. Execution steps live in the Spec Kit features under `specs/`.
 
 Everything between here and a framework people choose on purpose: the compiler, components,
 adapters, directives, security, performance, auth, plugins — plus the ideas worth taking from
@@ -538,4 +538,5 @@ Every finding in this document is a rule that could have been enforced. Add each
 `verify-contracts.mjs` or `audit-metrics.mjs` as you fix it. **The lint file is the architecture
 document that can't go stale.**
 
-See [EXECUTION-RUNBOOK.md](EXECUTION-RUNBOOK.md) for the gated, step-by-step execution plan.
+See `.specify/memory/constitution.md` for the governing rules and `specs/` for the gated, step-by-step
+feature plans.

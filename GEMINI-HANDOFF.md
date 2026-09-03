@@ -62,8 +62,8 @@ You are the implementation agent for the LaughTale framework.
 
 READ THESE FILES COMPLETELY BEFORE DOING ANYTHING:
   .specify/memory/constitution.md                          <- governing rules, overrides everything
-  EXECUTION-RUNBOOK.md                                     <- §0 rules, §2 ground truth AND its two
-                                                              counter-warnings, §4 barriers
+  ROADMAP.v5.md                                            <- strategy, ground truth and the two
+                                                              counter-warnings
   specs/040-island-teardown-lifecycle/spec.md              <- what "done" means
   specs/040-island-teardown-lifecycle/plan.md              <- approach, measured ground truth, phasing
   specs/040-island-teardown-lifecycle/research.md          <- why each decision was made, with evidence
