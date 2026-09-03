@@ -15,6 +15,7 @@ import type { IslandContext } from '../runtime/registry';
 import { SidebarItem } from '../types/models';
 import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
+import { useFocusTrap } from '../composables/useFocusTrap';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
@@ -2038,4 +2039,17 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps, ctx?
     }
 
     render();
+
+    const trap = useFocusTrap(container, {
+        autoFocus: false,
+        restoreFocus: true,
+        signal: ctx?.signal
+    });
+    trap.activate();
+
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            trap.deactivate();
+        }
+    }, { signal: ctx?.signal });
 }

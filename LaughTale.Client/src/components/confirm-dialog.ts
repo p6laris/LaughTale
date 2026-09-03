@@ -1,6 +1,7 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
+import { useFocusTrap, type UseFocusTrapReturn } from '../composables/useFocusTrap';
 import { html, setHtml, unsafe, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
@@ -290,6 +291,7 @@ class ConfirmDialogManager {
     private maskEl: HTMLElement | null = null;
     private dialogEl: HTMLElement | null = null;
     private currentOptions: ConfirmDialogOptions | null = null;
+    private trap: UseFocusTrapReturn | null = null;
 
     constructor() {
         if (typeof document !== 'undefined') {
@@ -328,17 +330,25 @@ class ConfirmDialogManager {
         const pos = (options.position || 'center').toLowerCase().replace(/[^a-z]/g, '');
         
         if (this.maskEl) {
-            this.maskEl.className = `p-confirmdialog-mask p-confirmdialog-pos-${pos}`;
+            this.maskEl.className = `p-confirmdialog-mask p-confirmdialog-pos-${pos} p-confirmdialog-mask-active`;
             this.renderDialog(options);
-            const tMask = setTimeout(() => {
-                this.maskEl?.classList.add('p-confirmdialog-mask-active');
-            }, 10);
-            options.signal?.addEventListener('abort', () => clearTimeout(tMask), { signal: options.signal });
+            const dialogEl = this.maskEl.querySelector<HTMLElement>('.p-confirmdialog');
+            if (dialogEl) {
+                this.trap?.deactivate();
+                this.trap = useFocusTrap(dialogEl, {
+                    autoFocus: true,
+                    restoreFocus: true,
+                    signal: options.signal
+                });
+                this.trap.activate();
+            }
         }
     }
 
     public close(accepted: boolean = false) {
         if (!this.maskEl) return;
+        this.trap?.deactivate();
+        this.trap = null;
         this.maskEl.classList.remove('p-confirmdialog-mask-active');
 
         if (this.currentOptions) {
@@ -541,4 +551,14 @@ export default function ConfirmDialogIsland(container: HTMLElement, props: Confi
             }
         }, { signal: ctx?.signal });
     });
+
+    const p = props as any;
+    if (triggers.length === 0 && (p.message || p.Message || p.header || p.Header)) {
+        globalConfirm.require({
+            header: p.header || p.Header,
+            message: p.message || p.Message,
+            position: p.position || p.Position,
+            signal: ctx?.signal
+        });
+    }
 }

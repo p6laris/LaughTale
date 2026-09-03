@@ -2,6 +2,7 @@ import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts
 import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
 import { LucideIcons } from '../icons/lucide';
+import { useFocusTrap } from '../composables/useFocusTrap';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
@@ -414,6 +415,21 @@ export default function GalleriaIsland(container: HTMLElement, props: GalleriaPr
 
     render();
     startAutoplay();
+
+    const trap = useFocusTrap(container, {
+        autoFocus: false,
+        restoreFocus: true,
+        signal: ctx?.signal
+    });
+    if (props.fullScreen || (props as any).FullScreen || props.visible || (props as any).Visible) {
+        trap.activate();
+    }
+
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            trap.deactivate();
+        }
+    }, { signal: ctx?.signal });
 
     if (ctx?.signal) {
         ctx.signal.addEventListener('abort', () => stopAutoplay(), { signal: ctx.signal });

@@ -6,6 +6,7 @@
  */
 
 import { injectIslandStyle } from '../runtime/styles';
+import { useFocusTrap } from '../composables/useFocusTrap';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -438,9 +439,28 @@ export default function DrawerIsland(container: HTMLElement, props: DrawerProps,
     maskEl.setAttribute('data-part', 'mask');
     applyPart(container, 'root', props.class || '', props.pt, props.studioOverrides);
 
+    const trap = useFocusTrap(drawerEl, {
+        autoFocus: true,
+        restoreFocus: true,
+        signal: ctx?.signal
+    });
+
+    if (props.visible || (props as any).Visible) {
+        maskEl.classList.add('p-drawer-mask-active');
+        trap.activate();
+    }
+
+    const closeBtn = drawerEl.querySelector('.p-drawer-close-button');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            trap.deactivate();
+        }, { signal: ctx?.signal });
+    }
+
     // Escape Key Handler for this Drawer instance
     window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && maskEl?.classList.contains('p-drawer-mask-active')) {
+            trap.deactivate();
             maskEl.classList.remove('p-drawer-mask-active');
             document.body.style.overflow = '';
         }

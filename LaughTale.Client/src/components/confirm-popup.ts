@@ -1,6 +1,7 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
+import { useFocusTrap, type UseFocusTrapReturn } from '../composables/useFocusTrap';
 import { html, setHtml, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
@@ -229,6 +230,7 @@ class ConfirmPopupManager {
     private popupEl: HTMLElement | null = null;
     private currentOptions: ConfirmPopupOptions | null = null;
     private outsideClickListener: ((e: MouseEvent) => void) | null = null;
+    private trap: UseFocusTrapReturn | null = null;
 
     constructor() {
         if (typeof document !== 'undefined') {
@@ -271,6 +273,14 @@ class ConfirmPopupManager {
         this.renderContent(options);
         this.alignToTarget(options.target);
 
+        this.trap?.deactivate();
+        this.trap = useFocusTrap(this.popupEl, {
+            autoFocus: true,
+            restoreFocus: true,
+            signal: options.signal
+        });
+        this.trap.activate();
+
         this.popupEl.classList.add('p-confirmpopup-active');
 
         // Bind outside click
@@ -290,6 +300,8 @@ class ConfirmPopupManager {
 
     public close(accepted: boolean = false) {
         if (!this.popupEl) return;
+        this.trap?.deactivate();
+        this.trap = null;
         this.popupEl.classList.remove('p-confirmpopup-active');
 
         if (this.outsideClickListener) {
@@ -469,4 +481,12 @@ export default function ConfirmPopupIsland(container: HTMLElement, props: Confir
             }
         }, { signal: ctx?.signal });
     });
+
+    if (triggers.length === 0 && (props.message || (props as any).Message)) {
+        globalConfirmPopup.require({
+            target: container,
+            message: props.message || (props as any).Message,
+            signal: ctx?.signal
+        });
+    }
 }

@@ -1,6 +1,7 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
+import { useFocusTrap } from '../composables/useFocusTrap';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
@@ -373,9 +374,29 @@ export default function DialogIsland(container: HTMLElement, props: DialogProps,
     dialogEl.setAttribute('aria-labelledby', (props as any).ariaLabelledby || 'Dialog');
     maskEl.setAttribute('data-part', 'mask');
 
+    const trap = useFocusTrap(dialogEl, {
+        autoFocus: true,
+        restoreFocus: true,
+        signal: ctx?.signal
+    });
+
+    if (props.visible || (props as any).Visible) {
+        maskEl.style.display = 'flex';
+        maskEl.classList.add('p-dialog-mask-active');
+        trap.activate();
+    }
+
+    const closeBtn = dialogEl.querySelector('.p-dialog-close-button');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            trap.deactivate();
+        }, { signal: ctx?.signal });
+    }
+
     // Per-island Escape Key Handler
     window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && maskEl.classList.contains('p-dialog-mask-active')) {
+            trap.deactivate();
             maskEl.classList.remove('p-dialog-mask-active');
             const tEsc = setTimeout(() => {
                 if (!maskEl.classList.contains('p-dialog-mask-active')) {
