@@ -96,45 +96,53 @@ public abstract class IslandTagHelperBase : TagHelper
 
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
-        // LT-2203: Initial Island Render Authorization Check
+        // LT-2203 / LT-2204: Initial Island Render Authorization Check
         var httpContext = ViewContext?.HttpContext;
         var requestServices = httpContext?.RequestServices;
-        if (httpContext != null && requestServices != null)
+        if (httpContext is null || requestServices is null)
         {
-            var authService = requestServices.GetService<IAuthorizationService>();
-            var authRegistry = requestServices.GetService<LaughTale.Core.Security.IIslandAuthorizationRegistry>();
-            var laughTaleOptions = requestServices.GetService<Microsoft.Extensions.Options.IOptions<LaughTale.Core.Configuration.LaughTaleOptions>>()?.Value;
+            output.SuppressOutput();
+            return;
+        }
 
-            string? requiredPolicy = Policy;
+        var evaluator = requestServices.GetService<LaughTale.Core.Security.IIslandAccessEvaluator>();
+        if (evaluator is null)
+        {
+            output.SuppressOutput();
+            return;
+        }
 
-            if (string.IsNullOrWhiteSpace(requiredPolicy))
+        string? explicitPolicy = Policy;
+        if (string.IsNullOrWhiteSpace(explicitPolicy))
+        {
+            var componentType = this.GetType();
+            var authAttr = componentType.GetCustomAttribute<IslandAuthorizeAttribute>();
+            var anonAttr = componentType.GetCustomAttribute<IslandAllowAnonymousAttribute>();
+            if (authAttr != null && anonAttr != null)
             {
-                var authAttr = this.GetType().GetCustomAttribute<IslandAuthorizeAttribute>();
-                if (authAttr != null)
-                {
-                    requiredPolicy = authAttr.Policy;
-                }
+                throw new InvalidOperationException($"Component type '{componentType.FullName}' cannot have both [IslandAuthorize] and [IslandAllowAnonymous].");
             }
-
-            if (string.IsNullOrWhiteSpace(requiredPolicy) && laughTaleOptions?.Refresh.IslandPolicies.TryGetValue(IslandName, out var optPol) == true)
+            if (anonAttr != null)
             {
-                requiredPolicy = optPol;
+                var reg = requestServices.GetService<LaughTale.Core.Security.IIslandAuthorizationRegistry>();
+                reg?.RegisterPublic(IslandName);
             }
-
-            if (string.IsNullOrWhiteSpace(requiredPolicy) && authRegistry != null)
+            else if (authAttr != null)
             {
-                requiredPolicy = authRegistry.GetPolicy(IslandName);
+                explicitPolicy = authAttr.Policy;
             }
+        }
 
-            if (!string.IsNullOrWhiteSpace(requiredPolicy) && authService != null)
-            {
-                var authResult = await authService.AuthorizeAsync(httpContext.User, requiredPolicy);
-                if (!authResult.Succeeded)
-                {
-                    output.SuppressOutput();
-                    return;
-                }
-            }
+        var decision = await evaluator.EvaluateAsync(
+            IslandName,
+            httpContext.User,
+            requestServices,
+            new LaughTale.Core.Security.IslandAccessContext(ExplicitPolicy: explicitPolicy, LocalOptions: null));
+
+        if (!decision.IsAllowed)
+        {
+            output.SuppressOutput();
+            return;
         }
 
         output.TagName = WrapperTagName;

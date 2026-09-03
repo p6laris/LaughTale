@@ -39,41 +39,43 @@ public static class IslandEndpointExtensions
 
             var laughTaleOptions = context.RequestServices.GetService<Microsoft.Extensions.Options.IOptions<LaughTale.Core.Configuration.LaughTaleOptions>>()?.Value;
 
-            // 1. Antiforgery validation (LT-1503 / LT-2203)
+            // 1. Antiforgery validation (LT-1503 / LT-2203 / LT-2204)
             var requireAntiforgery = localOptions.RequireAntiforgery && (laughTaleOptions?.Refresh.RequireAntiforgery ?? true);
             if (requireAntiforgery)
             {
                 var antiforgery = context.RequestServices.GetService<Microsoft.AspNetCore.Antiforgery.IAntiforgery>();
-                if (antiforgery != null)
+                if (antiforgery is null)
                 {
-                    try
-                    {
-                        await antiforgery.ValidateRequestAsync(context);
-                    }
-                    catch
-                    {
-                        return Results.StatusCode(StatusCodes.Status400BadRequest);
-                    }
+                    return Results.StatusCode(StatusCodes.Status400BadRequest);
+                }
+
+                try
+                {
+                    await antiforgery.ValidateRequestAsync(context);
+                }
+                catch
+                {
+                    return Results.StatusCode(StatusCodes.Status400BadRequest);
                 }
             }
 
-            // 2. Authorization policy check (LT-2203)
-            var authService = context.RequestServices.GetService<Microsoft.AspNetCore.Authorization.IAuthorizationService>();
-            var authRegistry = context.RequestServices.GetService<LaughTale.Core.Security.IIslandAuthorizationRegistry>();
-
-            string? policy = null;
-            if (localOptions.IslandPolicies.TryGetValue(name, out var localPol)) policy = localPol;
-            else if (laughTaleOptions?.Refresh.IslandPolicies.TryGetValue(name, out var globalPol) == true) policy = globalPol;
-            else if (authRegistry != null) policy = authRegistry.GetPolicy(name);
-
-            if (!string.IsNullOrWhiteSpace(policy) && authService != null)
+            // 2. Authorization policy check (LT-2203 / LT-2204)
+            var evaluator = context.RequestServices.GetService<LaughTale.Core.Security.IIslandAccessEvaluator>();
+            if (evaluator is null)
             {
-                var authResult = await authService.AuthorizeAsync(context.User, policy);
-                if (!authResult.Succeeded)
-                {
-                    // 403 Forbidden: Render nothing, zero props leaked in the response body.
-                    return Results.StatusCode(StatusCodes.Status403Forbidden);
-                }
+                return Results.StatusCode(StatusCodes.Status403Forbidden);
+            }
+
+            var decision = await evaluator.EvaluateAsync(
+                name,
+                context.User,
+                context.RequestServices,
+                new LaughTale.Core.Security.IslandAccessContext(ExplicitPolicy: null, LocalOptions: localOptions));
+
+            if (!decision.IsAllowed)
+            {
+                // 403 Forbidden: Render nothing, zero props leaked in the response body (FR-006, invariant I1).
+                return Results.StatusCode(StatusCodes.Status403Forbidden);
             }
 
             // 3. Read props from JSON body if present

@@ -36,18 +36,28 @@ public class IslandRefreshAuthorizationTests
         ClaimsPrincipal user,
         Action<LaughTaleOptions>? configureOptions = null,
         Action<IslandRefreshOptions>? configureEndpoint = null,
-        Action<HttpContext>? configureContext = null)
+        Action<HttpContext>? configureContext = null,
+        Action<IServiceCollection>? configureServices = null)
     {
         var services = new ServiceCollection();
         services.AddLogging();
         services.AddOptions();
         services.AddRouting();
-        services.AddAntiforgery();
-        services.AddAuthorization(options =>
+
+        if (configureServices != null)
         {
-            options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
-            options.AddPolicy("PremiumOnly", policy => policy.RequireClaim("tier", "premium"));
-        });
+            configureServices(services);
+        }
+        else
+        {
+            services.AddAntiforgery();
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+                options.AddPolicy("PremiumOnly", policy => policy.RequireClaim("tier", "premium"));
+            });
+        }
+
         services.AddLaughTale(options =>
         {
             options.Refresh.RequireAntiforgery = false; // Default isolated for auth testing unless enabled
@@ -178,5 +188,73 @@ public class IslandRefreshAuthorizationTests
         // Missing antiforgery token must return 400 Bad Request
         Assert.Equal(StatusCodes.Status400BadRequest, status);
         Assert.Empty(body);
+    }
+
+    [Fact]
+    public async Task Refresh_RegisteredPolicy_MissingAuthorizationService_Refuses()
+    {
+        var user = new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim(ClaimTypes.Role, "Admin") }, "TestAuth"));
+        var (status, body) = await ExecuteRefreshAsync(
+            "admin-panel",
+            "{}",
+            user,
+            configureServices: s =>
+            {
+                // Antiforgery registered, but AddAuthorization omitted
+                s.AddAntiforgery();
+            });
+
+        Assert.Equal(StatusCodes.Status403Forbidden, status);
+        Assert.Empty(body);
+    }
+
+    [Fact]
+    public async Task Refresh_RequireAntiforgery_MissingAntiforgeryService_Rejects()
+    {
+        var user = new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim(ClaimTypes.Role, "Admin") }, "TestAuth"));
+        var (status, body) = await ExecuteRefreshAsync(
+            "admin-panel",
+            "{}",
+            user,
+            configureOptions: opt => opt.Refresh.RequireAntiforgery = true,
+            configureServices: s =>
+            {
+                // AddAuthorization registered, but AddAntiforgery omitted
+                s.AddAuthorization(o => o.AddPolicy("AdminOnly", p => p.RequireRole("Admin")));
+            });
+
+        Assert.Equal(StatusCodes.Status400BadRequest, status);
+    }
+
+    [Fact]
+    public async Task Invariant_I1_I6_RefusalsAreByteIdenticalAndDiagnosticReasonNeverLeaks()
+    {
+        var anonymousUser = new ClaimsPrincipal(new ClaimsIdentity());
+
+        // Denied: policy exists, caller lacks permission
+        var (deniedStatus, deniedBody) = await ExecuteRefreshAsync("admin-panel", "{}", anonymousUser);
+
+        // Undeclared: no policy, not public
+        var (undeclaredStatus, undeclaredBody) = await ExecuteRefreshAsync("undeclared-island", "{}", anonymousUser);
+
+        // Undeterminable: missing authorization service
+        var (undeterminableStatus, undeterminableBody) = await ExecuteRefreshAsync(
+            "admin-panel",
+            "{}",
+            anonymousUser,
+            configureServices: s => s.AddAntiforgery());
+
+        // Invariant I1: Denied, Undeclared, and Undeterminable produce identical status (403) and body (empty)
+        Assert.Equal(StatusCodes.Status403Forbidden, deniedStatus);
+        Assert.Equal(StatusCodes.Status403Forbidden, undeclaredStatus);
+        Assert.Equal(StatusCodes.Status403Forbidden, undeterminableStatus);
+
+        Assert.Equal(deniedBody, undeclaredBody);
+        Assert.Equal(undeclaredBody, undeterminableBody);
+
+        // Invariant I6: DiagnosticReason appears in no response body
+        Assert.Empty(deniedBody);
+        Assert.Empty(undeclaredBody);
+        Assert.Empty(undeterminableBody);
     }
 }

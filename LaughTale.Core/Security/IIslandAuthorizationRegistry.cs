@@ -193,10 +193,15 @@ public class IslandAuthorizationRegistry : IIslandAuthorizationRegistry
 
     public async Task<bool> AuthorizeAsync(string islandName, HttpContext context)
     {
-        var policy = GetPolicy(islandName);
-        if (string.IsNullOrWhiteSpace(policy))
+        var resolution = Resolve(islandName);
+        if (resolution.IsExplicitlyPublic)
         {
             return true;
+        }
+
+        if (resolution.IsUndeclared || string.IsNullOrWhiteSpace(resolution.PolicyName))
+        {
+            return false;
         }
 
         var authService = context.RequestServices.GetService<IAuthorizationService>();
@@ -205,7 +210,7 @@ public class IslandAuthorizationRegistry : IIslandAuthorizationRegistry
             return false;
         }
 
-        var result = await authService.AuthorizeAsync(context.User, policy);
+        var result = await authService.AuthorizeAsync(context.User, resolution.PolicyName);
         return result.Succeeded;
     }
 }
