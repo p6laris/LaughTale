@@ -10,6 +10,8 @@ import type { IslandContext } from '../runtime/registry';
 import { LucideIcons, getLucideIcon } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
 import { useDebounce } from '../composables/useDebounce';
+import { useVirtualizer, type Virtualizer } from '../composables/useVirtualizer';
+import { setRovingTabindex } from '../accessibility/aria';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
@@ -200,6 +202,18 @@ const CSS = `
     margin: 0;
     padding: 0.25rem 0;
     list-style: none;
+}
+.p-virtual-spacer {
+    position: relative;
+    width: 100%;
+}
+.p-virtual-list {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
 }
 
 /* Option Groups */
@@ -557,8 +571,15 @@ export default function ListboxIsland(container: HTMLElement, props: ListboxProp
         syncValue();
     }
 
+    const ITEM_HEIGHT = 38;
+    let virtualizer: Virtualizer | null = null;
+    let currentStart = -1;
+    let currentEnd = -1;
+    let currentVisible: ListboxOptionItem[] = [];
+    let scrollBound = false;
+
     function renderOptions() {
-        const listEl = container.querySelector<HTMLElement>('.p-listbox-list')!;
+        const listWrapperEl = container.querySelector<HTMLElement>('.p-listbox-list-wrapper')!;
         const q = searchQuery.toLowerCase().trim();
 
         function matches(item: ListboxOptionItem): boolean {
@@ -574,6 +595,7 @@ export default function ListboxIsland(container: HTMLElement, props: ListboxProp
         if (isGrouped) {
             const groupNodes: Raw[] = [];
             let totalRendered = 0;
+            let counter = 0;
 
             for (const group of rawOptions) {
                 const groupItems = group.items ? group.items.filter(matches) : [];
@@ -587,7 +609,7 @@ export default function ListboxIsland(container: HTMLElement, props: ListboxProp
                             <span>${group.label}</span>
                         </div>
                         <ul style="margin: 0; padding: 0; list-style: none;">
-                            ${groupItems.map(item => renderSingleOptionHtml(item))}
+                            ${groupItems.map((item) => renderSingleOptionHtml(item, counter++, groupItems.length))}
                         </ul>
                     </li>
                 `);
@@ -595,23 +617,79 @@ export default function ListboxIsland(container: HTMLElement, props: ListboxProp
             }
 
             if (totalRendered === 0) {
-                setHtml(listEl, html`<li style="padding: 1rem; text-align: center; color: var(--p-text-muted); font-size: 0.8125rem;">No results found</li>`);
+                setHtml(listWrapperEl, html`<ul class="p-listbox-list" role="presentation"><li style="padding: 1rem; text-align: center; color: var(--p-text-muted); font-size: 0.8125rem;">No results found</li></ul>`);
             } else {
-                setHtml(listEl, html`${groupNodes}`);
+                setHtml(listWrapperEl, html`<ul class="p-listbox-list" role="presentation">${groupNodes}</ul>`);
             }
+            currentVisible = [];
+            virtualizer = null;
         } else {
             const visible = rawOptions.filter(matches);
+            currentVisible = visible;
             if (visible.length === 0) {
-                setHtml(listEl, html`<li style="padding: 1rem; text-align: center; color: var(--p-text-muted); font-size: 0.8125rem;">No results found</li>`);
+                virtualizer = null;
+                setHtml(listWrapperEl, html`<ul class="p-listbox-list" role="presentation"><li style="padding: 1rem; text-align: center; color: var(--p-text-muted); font-size: 0.8125rem;">No results found</li></ul>`);
+            } else if (visible.length < 100) {
+                virtualizer = null;
+                const nodes: Raw[] = [];
+                for (let i = 0; i < visible.length; i++) {
+                    nodes.push(renderSingleOptionHtml(visible[i], i, visible.length));
+                }
+                setHtml(listWrapperEl, html`<ul class="p-listbox-list" role="presentation">${nodes}</ul>`);
             } else {
-                setHtml(listEl, html`${visible.map(item => renderSingleOptionHtml(item))}`);
+                virtualizer = useVirtualizer({
+                    count: visible.length,
+                    estimateSize: 38,
+                    getScrollElement: () => listWrapperEl,
+                    virtualThreshold: 100
+                });
+                const virtualItems = virtualizer.getVirtualItems();
+                currentStart = virtualItems.length > 0 ? virtualItems[0].index : 0;
+                currentEnd = virtualItems.length > 0 ? virtualItems[virtualItems.length - 1].index : 0;
+                const startOffset = virtualItems.length > 0 ? virtualItems[0].start : 0;
+
+                setHtml(listWrapperEl, html`
+                    <div class="p-virtual-spacer" data-virtual-spacer>
+                        <ul class="p-listbox-list p-virtual-list" role="presentation">
+                            ${virtualItems.map(vi => renderSingleOptionHtml(visible[vi.index], vi.index, visible.length))}
+                        </ul>
+                    </div>
+                `);
+                const spacerEl = listWrapperEl.querySelector<HTMLElement>('.p-virtual-spacer');
+                const listEl = listWrapperEl.querySelector<HTMLElement>('.p-listbox-list');
+                if (spacerEl) spacerEl.style.height = `${virtualizer.getTotalSize()}px`;
+                if (listEl) listEl.style.transform = `translateY(${startOffset}px)`;
+
+                if (!scrollBound) {
+                    scrollBound = true;
+                    listWrapperEl.addEventListener('scroll', () => {
+                        if (!virtualizer || !virtualizer.isVirtual()) return;
+                        const newVirtualItems = virtualizer.getVirtualItems();
+                        if (newVirtualItems.length === 0) return;
+                        const newStart = newVirtualItems[0].index;
+                        const newEnd = newVirtualItems[newVirtualItems.length - 1].index;
+                        if (newStart === currentStart && newEnd === currentEnd) return;
+                        currentStart = newStart;
+                        currentEnd = newEnd;
+                        const newStartOffset = newVirtualItems[0].start;
+                        const listEl = listWrapperEl.querySelector<HTMLElement>('.p-listbox-list');
+                        if (listEl) {
+                            listEl.style.transform = `translateY(${newStartOffset}px)`;
+                            const nodes = newVirtualItems.map(vi => renderSingleOptionHtml(currentVisible[vi.index], vi.index, currentVisible.length));
+                            setHtml(listEl, html`${nodes}`);
+                            bindItemEvents();
+                            restoreFocus();
+                        }
+                    }, { signal: ctx?.signal, passive: true });
+                }
             }
         }
 
         bindItemEvents();
+        restoreFocus();
     }
 
-    function renderSingleOptionHtml(item: ListboxOptionItem): Raw {
+    function renderSingleOptionHtml(item: ListboxOptionItem, index: number, totalCount: number): Raw {
         const valStr = String(item.value);
         const isSelected = selectedValues.has(valStr);
         const highlightClass = isSelected ? (isHighlightOnSelect ? 'p-highlight' : 'p-highlight-none') : '';
@@ -650,7 +728,15 @@ export default function ListboxIsland(container: HTMLElement, props: ListboxProp
         }
 
         return html`
-            <li class="p-listbox-option ${highlightClass} ${disabledClass}" role="option" aria-selected="${isSelected}" aria-disabled="${item.disabled ? 'true' : 'false'}" data-val="${valStr}" tabindex="-1">
+            <li class="p-listbox-option ${highlightClass} ${disabledClass}" 
+                role="option" 
+                aria-selected="${isSelected}" 
+                aria-disabled="${item.disabled ? 'true' : 'false'}" 
+                aria-setsize="${totalCount}" 
+                aria-posinset="${index + 1}" 
+                data-index="${index}" 
+                data-val="${valStr}" 
+                tabindex="-1">
                 <div class="p-listbox-option-content">
                     ${checkboxHtml}
                     ${leadingHtml}
@@ -664,7 +750,7 @@ export default function ListboxIsland(container: HTMLElement, props: ListboxProp
 
     function bindItemEvents() {
         const items = container.querySelectorAll<HTMLElement>('.p-listbox-option');
-        items.forEach((itemEl, idx) => {
+        items.forEach((itemEl) => {
             itemEl.addEventListener('click', (e) => {
                 if (isDisabled || itemEl.classList.contains('p-disabled')) return;
                 const val = itemEl.getAttribute('data-val')!;
@@ -674,6 +760,7 @@ export default function ListboxIsland(container: HTMLElement, props: ListboxProp
             if (props.focusOnHover) {
                 itemEl.addEventListener('mouseenter', () => {
                     if (!isDisabled && !itemEl.classList.contains('p-disabled')) {
+                        const idx = parseInt(itemEl.getAttribute('data-index') || '0', 10);
                         updateFocus(idx);
                     }
                 }, { signal: ctx?.signal });
@@ -686,11 +773,9 @@ export default function ListboxIsland(container: HTMLElement, props: ListboxProp
 
         if (isMultiple) {
             if (isMetaKey && !isCtrlOrCmd && !isCheckbox) {
-                // Single select replacement when metaKey is active and Ctrl is not held
                 selectedValues.clear();
                 selectedValues.add(valStr);
             } else {
-                // Additive toggle
                 if (selectedValues.has(valStr)) selectedValues.delete(valStr);
                 else selectedValues.add(valStr);
             }
@@ -704,12 +789,62 @@ export default function ListboxIsland(container: HTMLElement, props: ListboxProp
     }
 
     function updateFocus(idx: number) {
-        const visible = container.querySelectorAll<HTMLElement>('.p-listbox-option');
-        visible.forEach((el, i) => {
-            if (i === idx) el.classList.add('p-focus');
-            else el.classList.remove('p-focus');
-        });
         focusedIndex = idx;
+        if (virtualizer && virtualizer.isVirtual()) {
+            if (idx < currentStart || idx > currentEnd) {
+                virtualizer.scrollToIndex(idx, 'auto');
+                const newVirtualItems = virtualizer.getVirtualItems();
+                if (newVirtualItems.length > 0) {
+                    currentStart = newVirtualItems[0].index;
+                    currentEnd = newVirtualItems[newVirtualItems.length - 1].index;
+                    const newStartOffset = newVirtualItems[0].start;
+                    const listEl = container.querySelector<HTMLElement>('.p-listbox-list');
+                    if (listEl) {
+                        listEl.style.transform = `translateY(${newStartOffset}px)`;
+                        const nodes = newVirtualItems.map(vi => renderSingleOptionHtml(currentVisible[vi.index], vi.index, currentVisible.length));
+                        setHtml(listEl, html`${nodes}`);
+                        bindItemEvents();
+                    }
+                }
+            }
+            restoreFocus();
+        } else {
+            const visible = Array.from(container.querySelectorAll<HTMLElement>('.p-listbox-option'));
+            setRovingTabindex(visible, idx);
+            visible.forEach((el, i) => {
+                if (i === idx) {
+                    el.classList.add('p-focus');
+                    if (container.classList.contains('is-focused')) el.focus();
+                } else {
+                    el.classList.remove('p-focus');
+                }
+            });
+        }
+    }
+
+    function restoreFocus() {
+        const renderedElements = Array.from(container.querySelectorAll<HTMLElement>('.p-listbox-option'));
+        if (renderedElements.length === 0) return;
+
+        if (focusedIndex >= 0) {
+            const activeEl = renderedElements.find(el => {
+                const idx = parseInt(el.getAttribute('data-index') || '-1', 10);
+                return idx === focusedIndex;
+            });
+            if (activeEl) {
+                const winIdx = renderedElements.indexOf(activeEl);
+                setRovingTabindex(renderedElements, winIdx);
+                renderedElements.forEach(el => el.classList.remove('p-focus'));
+                activeEl.classList.add('p-focus');
+                if (container.classList.contains('is-focused')) {
+                    activeEl.focus();
+                }
+            } else {
+                setRovingTabindex(renderedElements, -1);
+            }
+        } else {
+            setRovingTabindex(renderedElements, 0);
+        }
     }
 
     function bindEvents() {
@@ -717,6 +852,7 @@ export default function ListboxIsland(container: HTMLElement, props: ListboxProp
         if (filterInp) {
             const debouncedSearch = useDebounce(() => {
                 searchQuery = filterInp.value;
+                focusedIndex = -1;
                 renderOptions();
             }, 150);
             filterInp.addEventListener('input', () => debouncedSearch(), { signal: ctx?.signal });
@@ -739,49 +875,43 @@ export default function ListboxIsland(container: HTMLElement, props: ListboxProp
 
         container.addEventListener('keydown', (e) => {
             if (isDisabled) return;
-            const visible = container.querySelectorAll<HTMLElement>('.p-listbox-option');
-            if (visible.length === 0) return;
+            const totalCount = currentVisible.length > 0 ? currentVisible.length : container.querySelectorAll<HTMLElement>('.p-listbox-option').length;
+            if (totalCount === 0) return;
 
             if (e.key === 'ArrowDown') {
                 e.preventDefault();
-                const next = Math.min(focusedIndex + 1, visible.length - 1);
+                const next = Math.min(focusedIndex + 1, totalCount - 1);
                 updateFocus(next);
-                visible[next]?.scrollIntoView({ block: 'nearest' });
-                if (props.selectOnFocus && !isMultiple) {
-                    const val = visible[next]?.getAttribute('data-val')!;
-                    handleSelect(val, e);
+                if (props.selectOnFocus && !isMultiple && currentVisible[next]) {
+                    handleSelect(String(currentVisible[next].value), e);
                 }
             } else if (e.key === 'ArrowUp') {
                 e.preventDefault();
                 const prev = Math.max(focusedIndex - 1, 0);
                 updateFocus(prev);
-                visible[prev]?.scrollIntoView({ block: 'nearest' });
-                if (props.selectOnFocus && !isMultiple) {
-                    const val = visible[prev]?.getAttribute('data-val')!;
-                    handleSelect(val, e);
+                if (props.selectOnFocus && !isMultiple && currentVisible[prev]) {
+                    handleSelect(String(currentVisible[prev].value), e);
                 }
             } else if (e.key === 'Home') {
                 e.preventDefault();
                 updateFocus(0);
-                visible[0]?.scrollIntoView({ block: 'nearest' });
             } else if (e.key === 'End') {
                 e.preventDefault();
-                updateFocus(visible.length - 1);
-                visible[visible.length - 1]?.scrollIntoView({ block: 'nearest' });
+                updateFocus(totalCount - 1);
             } else if (e.key === ' ' || e.key === 'Enter') {
-                if (focusedIndex >= 0 && focusedIndex < visible.length) {
+                if (focusedIndex >= 0 && focusedIndex < totalCount && currentVisible[focusedIndex]) {
                     e.preventDefault();
-                    const val = visible[focusedIndex]?.getAttribute('data-val')!;
-                    handleSelect(val, e);
+                    handleSelect(String(currentVisible[focusedIndex].value), e);
                 }
             } else if (e.key === 'a' && (e.ctrlKey || e.metaKey) && isMultiple) {
                 e.preventDefault();
-                visible.forEach(el => {
-                    const v = el.getAttribute('data-val')!;
-                    selectedValues.add(v);
-                });
-                renderOptions();
-                syncValue();
+                if (currentVisible.length > 0) {
+                    currentVisible.forEach(opt => {
+                        if (!opt.disabled) selectedValues.add(String(opt.value));
+                    });
+                    renderOptions();
+                    syncValue();
+                }
             }
         }, { signal: ctx?.signal });
     }
