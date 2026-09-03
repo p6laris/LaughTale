@@ -88,14 +88,19 @@ public async Task<IslandDataResult<Order>> GetOrders(IslandDataRequest request)
 
 ## 4. Minimal API Endpoint Helper
 
-Map a complete server-side data endpoint with a single line of code:
+Map a complete server-side data endpoint protected by island authorization and a mandatory field policy:
 
 ```csharp
 // Program.cs
+using LaughTale.Core.Data;
 using LaughTale.Core.Endpoints;
 
+var customerFields = IslandFieldPolicy.For("Name", "Email", "City", "Balance", "CreatedAt");
+
 app.MapIslandData<Customer>(
-    "/api/customers/data", 
+    "/api/customers/data",
+    "customers-grid",
+    customerFields,
     async (HttpContext ctx) =>
     {
         var db = ctx.RequestServices.GetRequiredService<AppDbContext>();
@@ -106,18 +111,18 @@ app.MapIslandData<Customer>(
 
 ---
 
-## 5. Security & Injection Protection
+## 5. Security, Mandatory Field Policies & Anti-Oracle Defense
 
-Field names sent from browser clients are never concatenated into SQL or dynamic query strings. LaughTale strictly inspects properties via reflection and can enforce an explicit allowlist:
+Field names sent from browser clients are never concatenated into SQL or dynamic query strings. LaughTale requires an explicit `IslandFieldPolicy`:
 
 ```csharp
-var allowedColumns = new HashSet<string>(StringComparer.OrdinalIgnoreCase) 
-{ 
-    "Name", "Email", "City", "Balance", "CreatedAt" 
-};
+var policy = IslandFieldPolicy.For("Name", "Email", "City", "Balance", "CreatedAt");
 
-var result = query.ToIslandDataResult(request, allowedFields: allowedColumns);
+var result = query.ToIslandDataResult(request, policy);
 ```
+
+### Schema Anti-Oracle Protection
+If a client query requests a field that is either omitted from the allowlist or does not exist on the target entity, LaughTale routes both into `result.RefusedFields` as identical flat entries without differentiator error codes, completely preventing attackers from probing internal schemas.
 
 ---
 

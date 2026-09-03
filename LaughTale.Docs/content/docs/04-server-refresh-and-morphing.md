@@ -88,13 +88,12 @@ builder.Services.AddLaughTale(options =>
 
 ---
 
-## 🔒 5. Authorization & Policy Enforcement (LT-2203)
+## 🔒 5. Deny-by-Default Authorization (LT-2204)
 
-Initial page renders can be conditionally wrapped with `@if (await AuthorizationService.AuthorizeAsync(User, "Policy"))`. However, because `island.refresh()` is a separate server-side request issued after page load, LaughTale **independently re-evaluates the exact same authorization policy against `HttpContext.User`** on every refresh call.
+In LaughTale v4+, **all islands are denied by default** on both initial SSR and subsequent `POST /_laughtale/island/{name}` refreshes. You must explicitly declare either an authorization policy or anonymous access.
 
-### A. Decorator Pattern with `[IslandAuthorize]`
-Decorate your props model or record with `[IslandAuthorize]`. LaughTale automatically registers and enforces the policy for both initial TagHelper rendering and subsequent refresh endpoints:
-
+### A. Protecting Islands with `[IslandAuthorize]`
+Decorate your props model or record with `[IslandAuthorize]`:
 ```csharp
 using LaughTale.Core.Attributes;
 
@@ -103,20 +102,28 @@ using LaughTale.Core.Attributes;
 public record SalesDashboardProps(string Region, decimal Target);
 ```
 
-### B. Global Policy Configuration
-You can also configure authorization policies per island in `Program.cs`:
+### B. Explicit Public Opt-In with `[IslandAllowAnonymous]`
+For islands meant to be public to all users without authentication:
+```csharp
+using LaughTale.Core.Attributes;
 
+[Island("public-counter")]
+[IslandAllowAnonymous]
+public record PublicCounterProps(int InitialCount);
+```
+
+### C. Global Options Configuration
+Configure policies or declare anonymous islands in `Program.cs`:
 ```csharp
 builder.Services.AddLaughTale(options =>
 {
     options.Refresh.RequirePolicy("admin-panel", "AdminOnly");
-    options.Refresh.RequirePolicy("financial-report", "RequireFinanceRole");
+    options.Refresh.AllowAnonymous("public-counter");
 });
 ```
 
-### C. Declarative TagHelper Attribute
-Pass the policy directly on `<island>` or any generated TagHelper:
-
+### D. Declarative TagHelper Attribute
+Pass the policy directly on `<island>` or typed Aura TagHelpers:
 ```html
 <island name="financial-report" policy="RequireFinanceRole" props="Model.ReportData" />
 
@@ -125,6 +132,6 @@ Pass the policy directly on `<island>` or any generated TagHelper:
 ```
 
 ### 🛡️ Leak-Proof Security Contract
-- **Initial Render**: If the user is unauthorized, `IslandTagHelper` calls `output.SuppressOutput()`, rendering **zero HTML elements, zero container tags, and zero props**.
-- **Refresh Endpoint**: If a user's role or policy changes/revokes after page load, calling `island.refresh()` returns **`403 Forbidden` with an empty response body**, preventing any confidential props from leaking over the wire.
+- **Initial Render**: If the user is unauthorized or the island is undeclared, `IslandTagHelper` calls `output.SuppressOutput()`, rendering **zero HTML elements, zero container tags, and zero props**.
+- **Refresh Endpoint**: Calling `refreshIsland()` on an unauthorized or undeclared island returns **`403 Forbidden` with an empty response body**, preventing any server details or confidential props from leaking over the wire.
 

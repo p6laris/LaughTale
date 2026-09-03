@@ -43,28 +43,23 @@ headers['X-CSRF-TOKEN'] = token;
 
 ---
 
-## 🛑 3. Safe Server-Side Reflection & Allowlisting
+## 🛑 3. Mandatory Field Allowlist Policies & Anti-Oracle Defense
 
 When client grids request sorting or filtering by column name (e.g. `sortField: "balance"`), malicious actors might attempt dynamic SQL injection, prototype pollution, or private property exfiltration.
 
-LaughTale protects against this via a multi-layer guard:
+In LaughTale v4+ (Spec 041), **field allowlists are mandatory** via `IslandFieldPolicy`:
 
 ```csharp
-// 1. Model Property Verification:
-// Only public, readable properties declared on T are permitted. Non-existent fields are silently ignored.
-var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+// 1. Mandatory Security Allowlist (Required in v4+):
+var policy = IslandFieldPolicy.For("Id", "Name", "City", "Balance", "CreatedAt");
 
-// 2. Explicit Security Allowlist (Recommended for Public APIs):
-var allowed = new HashSet<string>(StringComparer.OrdinalIgnoreCase) 
-{ 
-    "Id", "Name", "City", "Balance", "CreatedAt" 
-};
-
-var result = query.ToIslandDataResult(request, allowedFields: allowed);
+var result = query.ToIslandDataResult(request, policy);
 ```
 
 ### Protection Summary:
 - **Zero Raw SQL String Concatenation**: Queries are built exclusively via type-safe LINQ Expression Trees.
+- **Mandatory Policy**: Omission of `IslandFieldPolicy` produces a compile-time error. For explicit full opt-in on vetted DTOs, `IslandFieldPolicy.AllMappedProperties` can be specified.
+- **Anti-Oracle Refusal List**: Any requested field that is not allowlisted OR does not exist on the model is silently skipped and collected into `result.RefusedFields` as flat strings without differentiator codes, preventing schema enumeration attacks.
 - **Private Fields Guard**: Fields decorated with `[IslandPrivate]` or non-public properties can never be read or filtered.
 - **Malformed Input Resilience**: Unparseable integers, dates, or Guids are rejected cleanly without throwing unhandled server exceptions.
 
@@ -79,25 +74,50 @@ LaughTale encodes all user-provided strings and JSON properties before rendering
 
 ---
 
-## 🔐 5. Dual-Layer Island Authorization (LT-2203)
+## 🔐 5. Deny-by-Default Island Authorization (LT-2204)
 
-In traditional SPAs or hybrid islands, client-side re-render requests can bypass Razor page gates if endpoints blindly trust incoming parameters. LaughTale introduces **Dual-Layer Island Authorization**:
+Starting in v4 (Spec 041), LaughTale enforces **deny-by-default authorization** across all island execution paths (TagHelpers, TagHelperBase, Generated TagHelpers, Island Refresh Endpoint, and `IIslandAuthorizationRegistry`).
 
-1. **Initial TagHelper Render Guard**:
-   - `IslandTagHelper` and all 76 Aura TagHelpers check `IAuthorizationService.AuthorizeAsync(HttpContext.User, policy)`.
-   - On authorization failure, `output.SuppressOutput()` is invoked, ensuring **zero container markup and zero props JSON are transmitted**.
-2. **Server-Driven Refresh Gating**:
-   - `POST /_laughtale/island/{name}` independently validates the policy against the authenticated `HttpContext.User` on the live connection.
-   - If user permissions change or are revoked mid-session, refresh returns **`403 Forbidden` with an empty payload**.
-3. **`[IslandAuthorize]` Attribute Auto-Binding**:
-   - Mark props models directly with `[IslandAuthorize("PolicyName")]`.
-   - Both initial TagHelper renderers and refresh routers auto-discover and enforce the policy automatically.
+### A. Deny-by-Default Contract
+- **Undeclared Islands**: Any island that has no policy registered and is not explicitly declared public is refused.
+- **Refresh Endpoint**: Returns `403 Forbidden` with an empty response body on any unauthorized request (`Denied`, `Undeclared`, or `Undeterminable`), identical byte-for-byte to prevent oracle side-channel leakage.
+- **TagHelpers**: Suppresses output entirely (`output.SuppressOutput()`), ensuring zero markup and zero props are transmitted to the client.
 
+### B. Declaring Access: The 4 Patterns
+1. **Explicit Policy via `[IslandAuthorize]`**:
+   ```csharp
+   [Island("sales-dashboard")]
+   [IslandAuthorize("RequireSalesManager")]
+   public record SalesDashboardProps(string Region, decimal Target);
+   ```
+2. **Explicit Public Access via `[IslandAllowAnonymous]`**:
+   ```csharp
+   [Island("public-counter")]
+   [IslandAllowAnonymous]
+   public record PublicCounterProps(int InitialCount);
+   ```
+3. **Global or Local Options Configuration**:
+   ```csharp
+   builder.Services.AddLaughTale(options =>
+   {
+       options.Refresh.RequirePolicy("admin-panel", "AdminOnly");
+       options.Refresh.AllowAnonymous("public-counter");
+   });
+   ```
+4. **Declarative TagHelper Attribute**:
+   ```html
+   <island name="sales-dashboard" policy="RequireSalesManager" />
+   ```
+
+### C. Emergency Migration Compatibility Switch
+To facilitate phased migrations in legacy applications, the compatibility switch `AllowUndeclaredIslands` can be temporarily enabled:
 ```csharp
-[Island("executive-analytics")]
-[IslandAuthorize("ExecutiveOnly")]
-public record ExecutiveAnalyticsProps(decimal MonthlyRevenue, decimal NetMargin);
+builder.Services.AddLaughTale(options =>
+{
+    options.Refresh.AllowUndeclaredIslands = true; // Temporary migration switch
+});
 ```
+This logs a deduplicated warning once per undeclared island name and will be removed in a future release. See [Migration Guide](file:///docs/migration/041-deny-by-default.md) for details.
 
 ---
 
@@ -105,7 +125,7 @@ public record ExecutiveAnalyticsProps(decimal MonthlyRevenue, decimal NetMargin)
 
 - [x] Enable HTTPS redirection (`app.UseHttpsRedirection()`).
 - [x] Configure strict CSP headers without `unsafe-eval`.
-- [x] Define explicit property allowlists on public `MapIslandData` endpoints.
+- [x] Declare mandatory `IslandFieldPolicy` on all `ToIslandDataResult` calls and `MapIslandData` endpoints.
 - [x] Ensure anti-forgery token middleware is enabled in ASP.NET Core (`options.Refresh.RequireAntiforgery = true`).
+- [x] Explicitly declare all islands as protected (`[IslandAuthorize]` / `RequirePolicy`) or public (`[IslandAllowAnonymous]` / `AllowAnonymous`).
 - [x] Use `[IslandPrivate]` on sensitive model properties (e.g. PasswordHash, InternalNotes).
-- [x] Enforce `[IslandAuthorize]` or `options.Refresh.RequirePolicy(...)` on sensitive UI islands.
