@@ -1,5 +1,6 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
+import { useFloatingPosition } from '../composables/useFloatingPosition';
 ﻿/**
  * LaughTale: Enterprise SplitButton Component (Aura Design System compliant)
  * Main action button paired with a dropdown trigger menu with nested submenu support.
@@ -597,11 +598,17 @@ export default function SplitButtonIsland(container: HTMLElement, props: SplitBu
         });
     }
 
+    let dropdownFloatingCtrl: { update(): void; computePosition(): any; destroy(): void } | null = null;
+
     function closeMenu() {
         if (!isOpen) return;
         isOpen = false;
         if (activeSplitButtonClose === closeMenu) {
             activeSplitButtonClose = null;
+        }
+        if (dropdownFloatingCtrl) {
+            dropdownFloatingCtrl.destroy();
+            dropdownFloatingCtrl = null;
         }
         dropdownBtn.setAttribute('aria-expanded', 'false');
         menuEl.style.opacity = '0';
@@ -628,22 +635,22 @@ export default function SplitButtonIsland(container: HTMLElement, props: SplitBu
         dropdownBtn.setAttribute('aria-expanded', 'true');
         menuEl.style.display = 'block';
 
-        // Dynamic Collision & Viewport Positioning
-        const rect = rootEl.getBoundingClientRect();
-        const menuHeight = menuEl.offsetHeight || 200;
-        const fitsBelow = (rect.bottom + menuHeight + 10) <= window.innerHeight;
-
-        if (fitsBelow) {
-            menuEl.classList.remove('p-menu-flipped');
-            menuEl.style.top = 'calc(100% + 4px)';
-            menuEl.style.bottom = 'auto';
-            menuEl.style.right = '0';
-        } else {
+        dropdownFloatingCtrl?.destroy();
+        const effectiveSignal = ctx?.signal || new AbortController().signal;
+        dropdownFloatingCtrl = useFloatingPosition(rootEl, menuEl, {
+            placement: 'bottom-end',
+            offset: 4,
+            strategy: 'absolute',
+            reposition: 'follow',
+            signal: effectiveSignal
+        });
+        const coords = dropdownFloatingCtrl.computePosition();
+        if (coords.actualPlacement.startsWith('top')) {
             menuEl.classList.add('p-menu-flipped');
-            menuEl.style.top = 'auto';
-            menuEl.style.bottom = 'calc(100% + 4px)';
-            menuEl.style.right = '0';
+        } else {
+            menuEl.classList.remove('p-menu-flipped');
         }
+        dropdownFloatingCtrl.update();
 
         requestAnimationFrame(() => {
             menuEl.style.opacity = '1';
