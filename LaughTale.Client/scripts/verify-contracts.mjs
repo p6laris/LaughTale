@@ -101,6 +101,53 @@ export function findUnmanagedListeners(content) {
     return violations;
 }
 
+export const POSITIONING_COMPONENTS = [
+    'popover.ts', 'menu.ts', 'context-menu.ts', 'confirm-popup.ts', 'split-button.ts',
+    'tieredmenu.ts', 'menubar.ts', 'cascadeselect.ts',
+    'autocomplete.ts', 'datepicker.ts', 'select.ts', 'tree-select.ts', 'multiselect.ts', 'color-picker.ts'
+];
+
+export const BATCH_C_ANCHORING = {
+    'autocomplete.ts': /\.ac-overlay\s*\{[^}]*position:\s*absolute/,
+    'datepicker.ts': /\.dp-overlay\s*\{[^}]*position:\s*absolute/,
+    'select.ts': /\.p-select-overlay\s*\{[^}]*position:\s*absolute/,
+    'tree-select.ts': /\.p-treeselect-overlay\s*\{[^}]*position:\s*absolute/,
+    'multiselect.ts': /class="multiselect-overlay"[^>]*position:\s*absolute/,
+    'color-picker.ts': /class="colorpicker-palette-overlay"[^>]*position:\s*absolute/
+};
+
+export function findFloatingPositionCalls(content) {
+    const calls = [];
+    const re = /\buseFloatingPosition\s*\(/g;
+    let m;
+    while ((m = re.exec(content)) !== null) {
+        const start = re.lastIndex;
+        let depth = 1;
+        let i = start;
+        let inStr = false;
+        let quote = '';
+        while (i < content.length && depth > 0) {
+            const ch = content[i];
+            if (inStr) {
+                if (ch === quote && content[i - 1] !== '\\') inStr = false;
+            } else if (ch === '"' || ch === "'" || ch === '`') {
+                inStr = true;
+                quote = ch;
+            } else if (ch === '(') {
+                depth++;
+            } else if (ch === ')') {
+                depth--;
+            }
+            i++;
+        }
+        const argsStr = content.slice(start, i - 1);
+        const args = splitTopLevel(argsStr);
+        const line = content.slice(0, m.index).split('\n').length;
+        calls.push({ line, argsStr, args });
+    }
+    return calls;
+}
+
 const files = fs.readdirSync(componentsDir).filter(f => f.endsWith('.ts'));
 let errors = 0;
 
@@ -271,6 +318,63 @@ for (const file of files) {
                 console.error(`❌ [${file}] a11y-presentational-is-inert: Presentational component must not declare interactive state '${stateAttr[1]}'.`);
                 errors++;
             }
+        }
+    }
+
+    // Rule R2: Residual positioning in positioning components
+    let residualErrors = 0;
+    let firstResidualConstruct = null;
+    if (POSITIONING_COMPONENTS.includes(file)) {
+        const fileLines = content.split('\n');
+        fileLines.forEach((line, idx) => {
+            const lineNum = idx + 1;
+            if (/getBoundingClientRect|window\.innerWidth|window\.innerHeight|window\.scrollX|window\.scrollY/.test(line)) {
+                // Allowlist: menubar.ts responsive breakpoint
+                if (file === 'menubar.ts' && /window\.innerWidth\s*>\s*960/.test(line)) {
+                    return;
+                }
+                let construct = 'residual positioning construct';
+                if (line.includes('getBoundingClientRect')) construct = 'getBoundingClientRect';
+                else if (line.includes('window.innerWidth')) construct = 'window.innerWidth';
+                else if (line.includes('window.innerHeight')) construct = 'window.innerHeight';
+                else if (line.includes('window.scrollX')) construct = 'window.scrollX';
+                else if (line.includes('window.scrollY')) construct = 'window.scrollY';
+
+                if (!firstResidualConstruct) {
+                    firstResidualConstruct = { construct, line: lineNum };
+                }
+
+                console.error(`❌ [${file}:${lineNum}] R2 residual positioning: retains ${construct} at line ${lineNum}: ${line.trim()}`);
+                errors++;
+                residualErrors++;
+            }
+        });
+
+        if (BATCH_C_ANCHORING[file]) {
+            const anchorMatch = content.match(BATCH_C_ANCHORING[file]);
+            if (anchorMatch) {
+                const anchorLine = content.slice(0, anchorMatch.index).split('\n').length;
+                if (!firstResidualConstruct) {
+                    firstResidualConstruct = { construct: 'stylesheet/inline panel-anchoring declaration', line: anchorLine };
+                }
+                console.error(`❌ [${file}:${anchorLine}] R2 residual positioning: retains stylesheet/inline panel-anchoring declaration at line ${anchorLine}`);
+                errors++;
+                residualErrors++;
+            }
+        }
+    }
+
+    // Rule R1: Positioning adoption
+    if (POSITIONING_COMPONENTS.includes(file)) {
+        const hasImport = /\bimport\b[^;]*\buseFloatingPosition\b/.test(content);
+        const fpCalls = findFloatingPositionCalls(content);
+        if (hasImport && fpCalls.length === 0) {
+            console.error(`❌ [${file}] R1 positioning adoption: imports useFloatingPosition but never calls it`);
+            errors++;
+        }
+        if (fpCalls.length > 0 && residualErrors > 0) {
+            console.error(`❌ [${file}] R1 positioning adoption: calls useFloatingPosition but retains ${firstResidualConstruct.construct} at line ${firstResidualConstruct.line}`);
+            errors++;
         }
     }
 }
