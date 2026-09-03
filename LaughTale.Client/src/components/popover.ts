@@ -1,5 +1,6 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
+import { useFloatingPosition } from '../composables/useFloatingPosition';
 ﻿/**
  * LaughTale: Enterprise Popover Component (LaughTale Aura Design System)
  * High-performance anchored overlay popup with dynamic viewport edge flipping,
@@ -99,53 +100,50 @@ export interface PopoverProps {
 }
 
 let globalPopoverDelegationBound = false;
+let activePopoverCtrl: { update(): void; computePosition(): any; destroy(): void } | null = null;
 
-function positionPopover(popoverEl: HTMLElement, targetEl: HTMLElement, preferredPlacement: string = 'bottom') {
-    const targetRect = targetEl.getBoundingClientRect();
-    const popoverRect = popoverEl.getBoundingClientRect();
+function positionPopover(popoverEl: HTMLElement, targetEl: HTMLElement, preferredPlacement: string = 'bottom', signal?: AbortSignal) {
+    if (activePopoverCtrl) {
+        activePopoverCtrl.destroy();
+        activePopoverCtrl = null;
+    }
     const arrowEl = popoverEl.querySelector<HTMLElement>('.p-popover-arrow');
-    const margin = 10;
+    const placement = (preferredPlacement as any) || 'bottom';
+    const effectiveSignal = signal || new AbortController().signal;
 
-    let top = 0;
-    let left = 0;
-    let placement = preferredPlacement;
+    activePopoverCtrl = useFloatingPosition(targetEl, popoverEl, {
+        placement,
+        offset: 10,
+        strategy: 'fixed',
+        reposition: 'follow',
+        signal: effectiveSignal,
+        arrow: arrowEl || undefined
+    });
 
-    // Check vertical space
-    const spaceBelow = window.innerHeight - targetRect.bottom;
-    const spaceAbove = targetRect.top;
+    const updatePositionAndArrow = () => {
+        if (!activePopoverCtrl) return;
+        const coords = activePopoverCtrl.computePosition();
+        popoverEl.style.position = 'fixed';
+        popoverEl.style.left = `${Math.round(coords.x)}px`;
+        popoverEl.style.top = `${Math.round(coords.y)}px`;
 
-    if (placement === 'bottom' && spaceBelow < popoverRect.height + margin && spaceAbove > spaceBelow) {
-        placement = 'top';
-    } else if (placement === 'top' && spaceAbove < popoverRect.height + margin && spaceBelow > spaceAbove) {
-        placement = 'bottom';
-    }
-
-    if (placement === 'bottom') {
-        top = targetRect.bottom + margin;
         if (arrowEl) {
-            arrowEl.className = 'p-popover-arrow p-popover-arrow-top';
+            if (coords.actualPlacement.startsWith('bottom')) {
+                arrowEl.className = 'p-popover-arrow p-popover-arrow-top';
+            } else if (coords.actualPlacement.startsWith('top')) {
+                arrowEl.className = 'p-popover-arrow p-popover-arrow-bottom';
+            }
+            if (coords.arrowOffset != null) {
+                arrowEl.style.left = `${Math.round(coords.arrowOffset)}px`;
+            }
         }
-    } else {
-        top = targetRect.top - popoverRect.height - margin;
-        if (arrowEl) {
-            arrowEl.className = 'p-popover-arrow p-popover-arrow-bottom';
-        }
-    }
+    };
 
-    // Align horizontally with target center or bound to viewport
-    left = targetRect.left + (targetRect.width / 2) - (popoverRect.width / 2);
-    if (left < 12) left = 12;
-    if (left + popoverRect.width > window.innerWidth - 12) {
-        left = window.innerWidth - popoverRect.width - 12;
-    }
+    updatePositionAndArrow();
 
-    popoverEl.style.top = `${Math.round(top)}px`;
-    popoverEl.style.left = `${Math.round(left)}px`;
-
-    // Position arrow relative to target center
-    if (arrowEl) {
-        const arrowLeft = targetRect.left + (targetRect.width / 2) - left - 5;
-        arrowEl.style.left = `${Math.max(12, Math.min(popoverRect.width - 22, arrowLeft))}px`;
+    if (typeof window !== 'undefined') {
+        window.addEventListener('scroll', updatePositionAndArrow, { capture: true, passive: true, signal: effectiveSignal });
+        window.addEventListener('resize', updatePositionAndArrow, { passive: true, signal: effectiveSignal });
     }
 }
 
@@ -177,9 +175,13 @@ function initGlobalPopoverDelegation(signal?: AbortSignal) {
                     });
 
                     if (!isActive) {
-                        positionPopover(popoverEl, targetAnchor);
+                        positionPopover(popoverEl, targetAnchor, 'bottom', signal);
                         popoverEl.classList.add('p-popover-active');
                     } else {
+                        if (activePopoverCtrl) {
+                            activePopoverCtrl.destroy();
+                            activePopoverCtrl = null;
+                        }
                         popoverEl.classList.remove('p-popover-active');
                     }
                 }
@@ -193,6 +195,10 @@ function initGlobalPopoverDelegation(signal?: AbortSignal) {
             e.preventDefault();
             const popoverEl = closeBtn.closest<HTMLElement>('.p-popover');
             if (popoverEl) {
+                if (activePopoverCtrl) {
+                    activePopoverCtrl.destroy();
+                    activePopoverCtrl = null;
+                }
                 popoverEl.classList.remove('p-popover-active');
             }
             return;
@@ -203,6 +209,10 @@ function initGlobalPopoverDelegation(signal?: AbortSignal) {
             document.querySelectorAll<HTMLElement>('.p-popover.p-popover-active').forEach(p => {
                 p.classList.remove('p-popover-active');
             });
+            if (activePopoverCtrl) {
+                activePopoverCtrl.destroy();
+                activePopoverCtrl = null;
+            }
         }
     }, { signal });
 
@@ -212,15 +222,12 @@ function initGlobalPopoverDelegation(signal?: AbortSignal) {
             document.querySelectorAll<HTMLElement>('.p-popover.p-popover-active').forEach(p => {
                 p.classList.remove('p-popover-active');
             });
+            if (activePopoverCtrl) {
+                activePopoverCtrl.destroy();
+                activePopoverCtrl = null;
+            }
         }
     }, { signal });
-
-    // Reposition on window resize or scroll
-    window.addEventListener('scroll', () => {
-        document.querySelectorAll<HTMLElement>('.p-popover.p-popover-active').forEach(p => {
-            // Can reposition or close on scroll
-        });
-    }, { passive: true, signal });
 }
 
 export default function PopoverIsland(container: HTMLElement, props: PopoverProps, ctx?: IslandContext) {
@@ -235,6 +242,28 @@ export default function PopoverIsland(container: HTMLElement, props: PopoverProp
         const arrow = document.createElement('div');
         arrow.className = 'p-popover-arrow p-popover-arrow-top';
         container.appendChild(arrow);
+    }
+
+    const targetEl = props.target
+        ? (typeof props.target === 'string' ? document.getElementById(props.target) : props.target)
+        : (props.triggerId ? document.getElementById(props.triggerId) : null);
+
+    if (targetEl) {
+        targetEl.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const isActive = container.classList.contains('p-popover-active');
+            if (!isActive) {
+                positionPopover(container, targetEl, (props.placement as any) || 'bottom', ctx?.signal);
+                container.classList.add('p-popover-active');
+            } else {
+                if (activePopoverCtrl) {
+                    activePopoverCtrl.destroy();
+                    activePopoverCtrl = null;
+                }
+                container.classList.remove('p-popover-active');
+            }
+        }, { signal: ctx?.signal });
     }
 
     initGlobalPopoverDelegation(ctx?.signal);
