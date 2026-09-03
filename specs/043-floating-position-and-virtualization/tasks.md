@@ -222,14 +222,14 @@ A, B, D or E.**
 
 **Files**: 6, one commit.
 
-- [ ] **T045** [US1] Write the Batch C tests **first**, in `LaughTale.Client/tests/components/anchored-panels.test.ts`, and observe them failing: each panel escapes an `overflow: hidden` ancestor; each flips above when it does not fit below; **and each still tracks its anchor across a scroll** — the regression guard, which passes today and must keep passing.
-- [ ] **T046** [P] [US1] `LaughTale.Client/src/components/autocomplete.ts` — replace the stylesheet anchoring at `:229` with `useFloatingPosition`, `reposition: 'follow'`, `signal: ctx.signal`. Remove the superseded `position: absolute` anchoring rule; do not leave it alongside (FR-012).
-- [ ] **T047** [P] [US1] `LaughTale.Client/src/components/datepicker.ts` — same, replacing `:133`.
-- [ ] **T048** [P] [US1] `LaughTale.Client/src/components/tree-select.ts` — same, replacing `:240`.
-- [ ] **T049** [P] [US1] `LaughTale.Client/src/components/multiselect.ts` — same, replacing the **inline** `top: calc(100% + 4px)` at `:97`. Its panel is `left: 0; right: 0`, so its width is coupled to the trigger's — resolved placement must preserve that coupling rather than sizing the panel to its content.
-- [ ] **T050** [P] [US1] `LaughTale.Client/src/components/color-picker.ts` — same, replacing the inline `top: calc(100% + 8px)` at `:85`. Then `LaughTale.Client/src/components/select.ts` — replace `:240` and `:289`. This is `select`'s **second** commit; it changes positioning only, virtualization having landed in T034.
-- [ ] **T051** [US1] Verify stacking across the six files edited in T046–T050 under `LaughTale.Client/src/components/`: a panel promoted out of a clipping ancestor no longer shares a stacking context with its trigger. Confirm each still stacks above sibling content and still closes on outside click.
-- [ ] **T052** [US1] **The regression gate**, over the same six files and `node LaughTale.Client/scripts/audit-metrics.mjs`. SC-005: overlays remaining in a stale position after scroll or resize is **0**, and these six — which are at 0 today — are still **0**. SC-002: anchoring declarations **6 → 0**. SC-004: off-screen or clipped overlays **0**. `inlineStyleAttributes` has **fallen** from 704 and has not risen.
+- [x] **T045** [US1] Write the Batch C tests **first**, in `LaughTale.Client/tests/components/anchored-panels.test.ts`, and observe them failing: each panel escapes an `overflow: hidden` ancestor; each flips above when it does not fit below; **and each still tracks its anchor across a scroll** — the regression guard, which passes today and must keep passing.
+- [x] **T046** [P] [US1] `LaughTale.Client/src/components/autocomplete.ts` — replace the stylesheet anchoring at `:229` with `useFloatingPosition`, `reposition: 'follow'`, `signal: ctx.signal`. Remove the superseded `position: absolute` anchoring rule; do not leave it alongside (FR-012).
+- [x] **T047** [P] [US1] `LaughTale.Client/src/components/datepicker.ts` — same, replacing `:133`.
+- [x] **T048** [P] [US1] `LaughTale.Client/src/components/tree-select.ts` — same, replacing `:240`.
+- [x] **T049** [P] [US1] `LaughTale.Client/src/components/multiselect.ts` — same, replacing the **inline** `top: calc(100% + 4px)` at `:97`. Its panel is `left: 0; right: 0`, so its width is coupled to the trigger's — resolved placement must preserve that coupling rather than sizing the panel to its content.
+- [x] **T050** [P] [US1] `LaughTale.Client/src/components/color-picker.ts` — same, replacing the inline `top: calc(100% + 8px)` at `:85`. Then `LaughTale.Client/src/components/select.ts` — replace `:240` and `:289`. This is `select`'s **second** commit; it changes positioning only, virtualization having landed in T034.
+- [x] **T051** [US1] Verify stacking across the six files edited in T046–T050 under `LaughTale.Client/src/components/`: a panel promoted out of a clipping ancestor no longer shares a stacking context with its trigger. Confirm each still stacks above sibling content and still closes on outside click.
+- [x] **T052** [US1] **The regression gate**, over the same six files and `node LaughTale.Client/scripts/audit-metrics.mjs`. SC-005: overlays remaining in a stale position after scroll or resize is **0**, and these six — which are at 0 today — are still **0**. SC-002: anchoring declarations **6 → 0**. SC-004: off-screen or clipped overlays **0**. `inlineStyleAttributes` has **fallen** from 704 and has not risen.
 
 **Gate**:
 ```bash
