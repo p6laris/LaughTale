@@ -9,6 +9,11 @@ import type { IslandContext } from '../runtime/registry';
 
 import { injectIslandStyle } from '../runtime/styles';
 import { getLucideIcon } from '../icons/lucide';
+import type { PatternDeclaration } from '../accessibility/patterns';
+
+export const a11y: PatternDeclaration = {
+    kind: 'presentational'
+};
 
 export interface InputGroupProps {
     size?: 'small' | 'normal' | 'large';
@@ -327,6 +332,7 @@ export function InputGroupAddonIsland(container: HTMLElement, props: InputGroupA
             const doc = parser.parseFromString(svg, 'image/svg+xml');
             const svgEl = doc.querySelector('svg');
             if (svgEl) {
+                svgEl.setAttribute('aria-hidden', 'true');
                 container.prepend(svgEl);
             }
         }

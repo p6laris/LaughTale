@@ -2,6 +2,11 @@ import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts
 import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
 import { html, setHtml, url, attr, type Raw } from '../runtime/html';
+import type { PatternDeclaration } from '../accessibility/patterns';
+
+export const a11y: PatternDeclaration = {
+    kind: 'presentational'
+};
 
 /**
  * LaughTale: Enterprise Avatar & AvatarGroup Component (Aura Design System compliant)
@@ -173,6 +178,7 @@ export default function AvatarGroupIsland(container: HTMLElement, props: AvatarG
 
     const rootEl = document.createElement('div');
     rootEl.className = `p-avatargroup p-component ${props.class || ''}`.trim();
+    rootEl.setAttribute('aria-label', (props as any).ariaLabel || 'Avatar group');
     if (props.style) rootEl.style.cssText += props.style;
     setHtml(rootEl, html`${avatarElements}${overflowHtml}`);
 

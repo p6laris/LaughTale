@@ -13,6 +13,12 @@ import { injectIslandStyle } from '../runtime/styles';
 import { AURA_PALETTES, generatePaletteRamp, updateToken, saveTheme, loadSavedTheme, generateThemeExports, checkWcagCompliance } from '../styles/design-tokens';
 import { applyNeutralSurfaceTokens } from '../styles/theme-persistence';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import type { PatternDeclaration } from '../accessibility/patterns';
+
+export const a11y: PatternDeclaration = {
+    kind: 'native',
+    element: 'button'
+};
 
 export interface ThemeStudioProps {
     defaultOpen?: boolean;
@@ -143,6 +149,7 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
             <button type="button" 
                     class="theme-studio-toggle-btn" 
                     title="Open Aura Live Theme Studio"
+                    aria-label="Open Aura Live Theme Studio"
                     style="position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 5000; width: 3.25rem; height: 3.25rem; border-radius: 9999px; background: var(--lt-surface-900); color: var(--lt-surface-0); border: 2px solid var(--lt-primary-500); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; outline: none;">
                 ${LucideIcons.palette}
             </button>

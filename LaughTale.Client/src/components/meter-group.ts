@@ -2,6 +2,11 @@ import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts
 import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import type { PatternDeclaration } from '../accessibility/patterns';
+
+export const a11y: PatternDeclaration = {
+    kind: 'presentational'
+};
 
 /**
  * LaughTale: Enterprise MeterGroup Component (Aura Design System compliant)
@@ -202,6 +207,7 @@ export default function MeterGroupIsland(container: HTMLElement, props: MeterGro
 
     const rootEl = document.createElement('div');
     rootEl.className = `p-metergroup p-component ${isVertical ? 'p-metergroup-vertical' : 'p-metergroup-horizontal'} ${props.class || ''}`.trim();
+    rootEl.setAttribute('aria-label', (props as any).ariaLabel || props.title || 'Meter Group');
     if (props.style) rootEl.style.cssText += props.style;
 
     if (labelPos === 'start') {

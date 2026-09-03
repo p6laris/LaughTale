@@ -9,6 +9,12 @@ import type { IslandContext } from '../runtime/registry';
 
 import { injectIslandStyle } from '../runtime/styles';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import type { PatternDeclaration } from '../accessibility/patterns';
+
+export const a11y: PatternDeclaration = {
+    kind: 'native',
+    element: 'ol'
+};
 
 export interface TimelineProps {
     value?: any[];
@@ -27,6 +33,9 @@ const TIMELINE_CSS = `
 island-timeline {
     display: flex;
     flex-grow: 1;
+    list-style: none;
+    margin: 0;
+    padding: 0;
     font-family: var(--p-font-family, inherit);
     color: var(--p-text-color, var(--lt-surface-700));
     box-sizing: border-box;
@@ -655,7 +664,7 @@ export default function TimelineIsland(container: HTMLElement, props: TimelinePr
             const isLast = idx === rawEvents.length - 1;
             const oppositeContent = renderOpposite(item);
             return `
-                <div class="p-timeline-event" role="listitem">
+                <li class="p-timeline-event">
                     <div class="p-timeline-event-opposite">
                         ${oppositeContent}
                     </div>
@@ -666,7 +675,7 @@ export default function TimelineIsland(container: HTMLElement, props: TimelinePr
                     <div class="p-timeline-event-content">
                         ${renderContent(item)}
                     </div>
-                </div>
+                </li>
             `;
         }).join('');
 
@@ -674,9 +683,9 @@ export default function TimelineIsland(container: HTMLElement, props: TimelinePr
             <div class="p-timeline-wrapper" style="width: 100%;">
                 ${unsafe(interactiveHeaderHtml)}
                 ${unsafe(activityHeaderHtml)}
-                <div class="p-timeline p-component ${layoutClass} ${alignClass}" role="list">
+                <ol class="p-timeline p-component ${layoutClass} ${alignClass}" aria-label="${props.title || 'Timeline'}">
                     ${unsafe(eventsHtml)}
-                </div>
+                </ol>
                 ${unsafe(interactiveCelebrationHtml)}
             </div>
         `);

@@ -8,6 +8,11 @@ import type { IslandContext } from '../runtime/registry';
  */
 
 import { injectIslandStyle } from '../runtime/styles';
+import type { PatternDeclaration } from '../accessibility/patterns';
+
+export const a11y: PatternDeclaration = {
+    kind: 'presentational'
+};
 
 export interface FloatLabelProps {
     label?: string;
@@ -202,6 +207,16 @@ export default function FloatLabelIsland(container: HTMLElement, props: FloatLab
     const findTarget = (): HTMLElement | null => {
         return container.querySelector('input, textarea, select, .cs-trigger, .dp-trigger, .ac-input, .p-inputtags-input, .p-password-input');
     };
+
+    const targetEl = findTarget();
+    if (targetEl && labelEl) {
+        if (!labelEl.id) {
+            labelEl.id = props.for || `p-float-label-${Math.random().toString(36).slice(2, 8)}`;
+        }
+        if (!targetEl.hasAttribute('aria-labelledby') && !targetEl.hasAttribute('aria-label')) {
+            targetEl.setAttribute('aria-labelledby', labelEl.id);
+        }
+    }
 
     function updateFloatingState() {
         const input = container.querySelector<HTMLInputElement | HTMLTextAreaElement>('input:not([type="hidden"]), textarea, select');

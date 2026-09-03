@@ -1,6 +1,11 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 import { initGlobalTooltipDelegation } from '../directives/tooltip';
+import type { PatternDeclaration } from '../accessibility/patterns';
+
+export const a11y: PatternDeclaration = {
+    kind: 'presentational'
+};
 
 export interface TooltipProps {
     value?: string;
@@ -27,6 +32,7 @@ export default function TooltipIsland(container: HTMLElement, props: TooltipProp
         const targetEl = document.querySelector<HTMLElement>(targetSelector);
         if (targetEl) {
             targetEl.setAttribute('p-tooltip', tooltipText);
+            targetEl.setAttribute('aria-label', tooltipText);
             if (props.position) targetEl.setAttribute('p-tooltip-position', props.position);
             if (props.showDelay !== undefined) targetEl.setAttribute('p-tooltip-show-delay', props.showDelay.toString());
             if (props.hideDelay !== undefined) targetEl.setAttribute('p-tooltip-hide-delay', props.hideDelay.toString());

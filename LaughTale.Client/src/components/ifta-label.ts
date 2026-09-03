@@ -7,6 +7,11 @@ import type { IslandContext } from '../runtime/registry';
  */
 
 import { injectIslandStyle } from '../runtime/styles';
+import type { PatternDeclaration } from '../accessibility/patterns';
+
+export const a11y: PatternDeclaration = {
+    kind: 'presentational'
+};
 
 export interface IftaLabelProps {
     label?: string;
@@ -163,6 +168,16 @@ export default function IftaLabelIsland(container: HTMLElement, props: IftaLabel
         if (props.for) labelEl.setAttribute('for', props.for);
         labelEl.textContent = props.label;
         container.appendChild(labelEl);
+    }
+
+    const input = container.querySelector<HTMLElement>('input, textarea, select, .cs-trigger, .dp-trigger, .ac-input, .p-inputtags-input, .p-password-input');
+    if (input && labelEl) {
+        if (!labelEl.id) {
+            labelEl.id = props.for || `p-ifta-label-${Math.random().toString(36).slice(2, 8)}`;
+        }
+        if (!input.hasAttribute('aria-labelledby') && !input.hasAttribute('aria-label')) {
+            input.setAttribute('aria-labelledby', labelEl.id);
+        }
     }
 
     // Label click focus delegation
