@@ -1,5 +1,6 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
+import { useFloatingPosition } from '../composables/useFloatingPosition';
 /**
  * LaughTale: Enterprise ContextMenu Component (LaughTale Aura Design System)
  * Native right-click context menu overlay with multi-level recursive submenus,
@@ -559,28 +560,23 @@ export default function ContextMenuIsland(container: HTMLElement, props: Context
     const menuEl = container.querySelector<HTMLElement>('[data-contextmenu-root]')!;
     let isMenuOpen = false;
     let selectedTargetEl: HTMLElement | null = null;
+    let rootFloatingCtrl: { update(): void; destroy(): void } | null = null;
 
     function showMenu(clientX: number, clientY: number) {
         menuEl.style.display = 'block';
         menuEl.style.visibility = 'hidden';
 
-        // Calculate geometry bounds
-        const menuRect = menuEl.getBoundingClientRect();
-        const menuWidth = menuRect.width || 220;
-        const menuHeight = menuRect.height || 200;
-
-        let left = clientX;
-        let top = clientY;
-
-        if (left + menuWidth > window.innerWidth - 10) {
-            left = Math.max(10, window.innerWidth - menuWidth - 10);
-        }
-        if (top + menuHeight > window.innerHeight - 10) {
-            top = Math.max(10, window.innerHeight - menuHeight - 10);
-        }
-
-        menuEl.style.left = `${left}px`;
-        menuEl.style.top = `${top}px`;
+        rootFloatingCtrl?.destroy();
+        const effectiveSignal = ctx?.signal || new AbortController().signal;
+        rootFloatingCtrl = useFloatingPosition({ x: clientX, y: clientY }, menuEl, {
+            placement: 'bottom-start',
+            offset: 0,
+            strategy: 'fixed',
+            reposition: 'dismiss',
+            onDismiss: hideMenu,
+            signal: effectiveSignal
+        });
+        rootFloatingCtrl.update();
         menuEl.style.visibility = 'visible';
 
         requestAnimationFrame(() => {
@@ -606,6 +602,10 @@ export default function ContextMenuIsland(container: HTMLElement, props: Context
 
     function hideMenu() {
         if (!isMenuOpen) return;
+        if (rootFloatingCtrl) {
+            rootFloatingCtrl.destroy();
+            rootFloatingCtrl = null;
+        }
         menuEl.classList.remove('p-contextmenu-active');
         const t = setTimeout(() => {
             if (!menuEl.classList.contains('p-contextmenu-active')) {
