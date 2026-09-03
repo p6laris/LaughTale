@@ -7,6 +7,7 @@ import type { IslandContext } from '../runtime/registry';
 
 import { SelectButtonItem } from '../types/models';
 import { injectIslandStyle } from '../runtime/styles';
+import { emitComponentEvent } from '../runtime/events';
 import { LucideIcons } from '../icons/lucide';
 import { useDisclosure } from '../composables/useDisclosure';
 import { useClickOutside } from '../composables/useClickOutside';
@@ -336,10 +337,9 @@ export default function MultiSelectIsland<T = string>(container: HTMLElement, pr
             hidden.value = JSON.stringify(Array.from(selected));
         }
 
-        container.dispatchEvent(new CustomEvent('multiselect:change', {
-            bubbles: true,
-            detail: { value: Array.from(selected) }
-        }));
+        emitComponentEvent(container, 'multiselect', 'change', {
+            value: Array.from(selected)
+        });
         announce(`${selected.size} items selected`, 'polite');
     }
 

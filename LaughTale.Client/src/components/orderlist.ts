@@ -6,6 +6,7 @@
 
 import { OrderListItem } from '../types/models';
 import { injectIslandStyle } from '../runtime/styles';
+import { emitComponentEvent } from '../runtime/events';
 import { LucideIcons } from '../icons/lucide';
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
@@ -838,12 +839,9 @@ export default function OrderListIsland<T = any>(container: HTMLElement, props: 
     }
 
     function dispatchSelectionEvent() {
-        container.dispatchEvent(new CustomEvent('orderlist:selection-change', {
-            bubbles: true,
-            detail: {
-                selection: Array.from(selectedIds)
-            }
-        }));
+        emitComponentEvent(container, 'orderlist', 'selection-change', {
+            selection: Array.from(selectedIds)
+        });
     }
 
     function syncValues(action = 'change') {
@@ -858,10 +856,10 @@ export default function OrderListIsland<T = any>(container: HTMLElement, props: 
             hidden.value = JSON.stringify(itemsList.map((it, idx) => getItemId(it, idx)));
         }
 
-        container.dispatchEvent(new CustomEvent('orderlist:change', {
-            bubbles: true,
-            detail: { value: itemsList, action }
-        }));
+        emitComponentEvent(container, 'orderlist', 'change', {
+            value: itemsList,
+            action
+        });
     }
 
     buildShell();

@@ -6,6 +6,7 @@
 
 import { OrgChartNode } from '../types/models';
 import { injectIslandStyle } from '../runtime/styles';
+import { emitComponentEvent } from '../runtime/events';
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
@@ -633,10 +634,11 @@ export default function OrgChartIsland<T = any>(container: HTMLElement, props: O
 
         renderTree();
 
-        container.dispatchEvent(new CustomEvent('orgchart:toggle', {
-            bubbles: true,
-            detail: { key, collapsed: collapsedKeys.has(key), collapsedKeys: Array.from(collapsedKeys) }
-        }));
+        emitComponentEvent(container, 'orgchart', 'toggle', {
+            key,
+            collapsed: collapsedKeys.has(key),
+            collapsedKeys: Array.from(collapsedKeys)
+        });
     }
 
     function handleNodeClick(key: string) {
@@ -718,13 +720,10 @@ export default function OrgChartIsland<T = any>(container: HTMLElement, props: O
     }
 
     function dispatchSelectionEvent() {
-        container.dispatchEvent(new CustomEvent('orgchart:selection-change', {
-            bubbles: true,
-            detail: {
-                selectionKeys: Array.from(selectedKeys),
-                indeterminateKeys: Array.from(indeterminateKeys)
-            }
-        }));
+        emitComponentEvent(container, 'orgchart', 'selection-change', {
+            selectionKeys: Array.from(selectedKeys),
+            indeterminateKeys: Array.from(indeterminateKeys)
+        });
     }
 
     function syncValues() {

@@ -11,7 +11,7 @@ import { useFloatingPosition } from '../composables/useFloatingPosition';
 import { MenuItem } from '../types/models';
 import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
-import { emitIslandEvent } from '../runtime/events';
+import { emitIslandEvent, emitComponentEvent } from '../runtime/events';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import { setRovingTabindex, handleRovingKeydown } from '../accessibility/aria';
 import { useKeyboardNav } from '../composables/useKeyboardNav';
@@ -615,10 +615,7 @@ export default function TieredMenuIsland(container: HTMLElement, props: TieredMe
                 }
 
                 // Dispatch global event
-                container.dispatchEvent(new CustomEvent('tieredmenu:select', {
-                    bubbles: true,
-                    detail: { label, command, href }
-                }));
+                emitComponentEvent(container, 'tieredmenu', 'select', { label, command, href });
 
                 // Close all if in popup mode
                 if (isPopup) {

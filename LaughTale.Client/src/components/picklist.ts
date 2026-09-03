@@ -6,6 +6,7 @@
 
 import { PickListItem } from '../types/models';
 import { injectIslandStyle } from '../runtime/styles';
+import { emitComponentEvent } from '../runtime/events';
 import { LucideIcons } from '../icons/lucide';
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
@@ -989,13 +990,10 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
     }
 
     function dispatchSelectionEvent() {
-        container.dispatchEvent(new CustomEvent('picklist:selection-change', {
-            bubbles: true,
-            detail: {
-                sourceSelection: Array.from(selectedSource),
-                targetSelection: Array.from(selectedTarget)
-            }
-        }));
+        emitComponentEvent(container, 'picklist', 'selection-change', {
+            sourceSelection: Array.from(selectedSource),
+            targetSelection: Array.from(selectedTarget)
+        });
     }
 
     function syncValues(action = 'change', affectedItems: any[] = []) {
@@ -1010,10 +1008,12 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
             hidden.value = JSON.stringify(targetList.map(it => getItemId(it)));
         }
 
-        container.dispatchEvent(new CustomEvent('picklist:change', {
-            bubbles: true,
-            detail: { source: sourceList, target: targetList, action, affectedItems }
-        }));
+        emitComponentEvent(container, 'picklist', 'change', {
+            source: sourceList,
+            target: targetList,
+            action,
+            affectedItems
+        });
     }
 
     buildShell();

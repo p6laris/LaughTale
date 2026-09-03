@@ -7,6 +7,7 @@ import type { IslandContext } from '../runtime/registry';
  */
 
 import { injectIslandStyle } from '../runtime/styles';
+import { emitComponentEvent } from '../runtime/events';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
@@ -481,10 +482,7 @@ export default function TabsIsland(container: HTMLElement, props: TabsProps, ctx
 
         activeValue = value;
         update();
-        container.dispatchEvent(new CustomEvent('tabs:change', {
-            bubbles: true,
-            detail: { value: activeValue }
-        }));
+        emitComponentEvent(container, 'tabs', 'change', { value: activeValue });
     }
 
     // Attach click and keyboard events on tabs

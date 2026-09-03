@@ -7,6 +7,7 @@ import type { IslandContext } from '../runtime/registry';
  */
 
 import { injectIslandStyle } from '../runtime/styles';
+import { emitComponentEvent } from '../runtime/events';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
@@ -243,17 +244,11 @@ export default function TextareaIsland(container: HTMLElement, props: TextareaPr
         adjustHeight();
         updateCounter();
 
-        container.dispatchEvent(new CustomEvent('textarea:input', {
-            bubbles: true,
-            detail: { value: textareaEl.value }
-        }));
+        emitComponentEvent(container, 'textarea', 'input', { value: textareaEl.value });
     }, { signal: ctx?.signal });
 
     textareaEl.addEventListener('change', () => {
-        container.dispatchEvent(new CustomEvent('textarea:change', {
-            bubbles: true,
-            detail: { value: textareaEl.value }
-        }));
+        emitComponentEvent(container, 'textarea', 'change', { value: textareaEl.value });
     }, { signal: ctx?.signal });
 
     if (isAutoResize) {

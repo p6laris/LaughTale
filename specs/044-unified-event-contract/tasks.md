@@ -200,10 +200,10 @@ on the safest work.
 **Files**: 19, in two commits of ≤10 per Principle IV.
 
 - [x] **T043** [P] [US2] Migrate the first ten of the T005 conforming set to `emitComponentEvent` in `LaughTale.Client/src/components/`: `accordion.ts`, `autocomplete.ts`, `button.ts`, `cascadeselect.ts`, `checkbox.ts`, `datatable.ts`, `dataview.ts`, `datepicker.ts`, `fieldset.ts`, `inplace.ts`. Namespaces are already correct; only the prefix and the dispatch route change.
-- [ ] **T044** [P] [US2] Migrate the remaining nine: `knob.ts`, `multiselect.ts`, `orderlist.ts`, `orgchart.ts`, `panel.ts`, `picklist.ts`, `stepper.ts`, `tabs.ts`, `textarea.ts`.
-- [ ] **T045** [US2] **SC-003 reaches 72 → 0** across all of `LaughTale.Client/src/components/`. No dispatched name fails R1. Paste `npm run lint:contracts`.
-- [ ] **T046** [US2] **R2 reaches 0.** Confirm no `new CustomEvent(` remains anywhere in `LaughTale.Client/src/components/` by grepping all 76 files directly, rather than trusting the rule written to find them.
-- [ ] **T047** [US2] Over all of `LaughTale.Client/src/components/` — **SC-004**: components emitting a foreign namespace **22 → 0**; distinct namespaces **20 → 41**, one per dispatching component by construction. **SC-002**: dispatch sites **72 → 60**. Record the actual figure against the T003 prediction and justify any deviation in writing.
+- [x] **T044** [P] [US2] Migrate the remaining nine: `knob.ts`, `multiselect.ts`, `orderlist.ts`, `orgchart.ts`, `panel.ts`, `picklist.ts`, `stepper.ts`, `tabs.ts`, `textarea.ts`.
+- [x] **T045** [US2] **SC-003 reaches 72 → 0** across all of `LaughTale.Client/src/components/`. No dispatched name fails R1. Paste `npm run lint:contracts`.
+- [x] **T046** [US2] **R2 reaches 0.** Confirm no `new CustomEvent(` remains anywhere in `LaughTale.Client/src/components/` by grepping all 76 files directly, rather than trusting the rule written to find them.
+- [x] **T047** [US2] Over all of `LaughTale.Client/src/components/` — **SC-004**: components emitting a foreign namespace **22 → 0**; distinct namespaces **20 → 41**, one per dispatching component by construction. **SC-002**: dispatch sites **72 → 60**. Record the actual figure against the T003 prediction and justify any deviation in writing.
 
 **Gate**:
 ```bash

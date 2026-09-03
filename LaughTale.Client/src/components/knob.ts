@@ -1,6 +1,7 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
+import { emitComponentEvent } from '../runtime/events';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
@@ -98,10 +99,7 @@ export default function KnobIsland(container: HTMLElement, props: KnobProps, ctx
             hidden.value = currentValue.toString();
         }
 
-        container.dispatchEvent(new CustomEvent('knob:change', {
-            bubbles: true,
-            detail: { value: currentValue }
-        }));
+        emitComponentEvent(container, 'knob', 'change', { value: currentValue });
     }
 
     if (!props.disabled) {

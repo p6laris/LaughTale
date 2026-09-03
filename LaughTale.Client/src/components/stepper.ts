@@ -7,6 +7,7 @@ import type { IslandContext } from '../runtime/registry';
  */
 
 import { injectIslandStyle } from '../runtime/styles';
+import { emitComponentEvent } from '../runtime/events';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -435,10 +436,7 @@ export default function StepperIsland(container: HTMLElement, props: StepperProp
     function setActiveStep(value: string) {
         activeValue = value;
         update();
-        container.dispatchEvent(new CustomEvent('stepper:change', {
-            bubbles: true,
-            detail: { value: activeValue }
-        }));
+        emitComponentEvent(container, 'stepper', 'change', { value: activeValue });
     }
 
     // Step Header Click Handlers

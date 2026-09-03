@@ -7,6 +7,7 @@ import type { IslandContext } from '../runtime/registry';
  */
 
 import { injectIslandStyle } from '../runtime/styles';
+import { emitComponentEvent } from '../runtime/events';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
@@ -360,10 +361,7 @@ export default function PanelIsland(container: HTMLElement, props: PanelProps, c
             }
         });
 
-        container.dispatchEvent(new CustomEvent('panel:toggle', {
-            bubbles: true,
-            detail: { collapsed: isCollapsed }
-        }));
+        emitComponentEvent(container, 'panel', 'toggle', { collapsed: isCollapsed });
     }
 
     if (isToggleable && toggleBtn) {
