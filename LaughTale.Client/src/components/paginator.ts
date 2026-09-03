@@ -7,6 +7,7 @@ import type { IslandContext } from '../runtime/registry';
  */
 
 import { injectIslandStyle } from '../runtime/styles';
+import { emitComponentEvent } from '../runtime/events';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
@@ -613,20 +614,12 @@ export default function PaginatorIsland(container: HTMLElement, props: Paginator
 
     function dispatchEvents() {
         const page = getCurrentPage();
-        container.dispatchEvent(new CustomEvent('page', {
-            bubbles: true,
-            detail: {
-                first,
-                rows,
-                page,
-                pageCount: getTotalPages()
-            }
-        }));
-
-        container.dispatchEvent(new CustomEvent('page-change', {
-            bubbles: true,
-            detail: { first, rows, page }
-        }));
+        emitComponentEvent(container, 'paginator', 'page-change', {
+            first,
+            rows,
+            page,
+            pageCount: getTotalPages()
+        });
 
         if (props.targetInputName) {
             let hidden = container.querySelector<HTMLInputElement>(`input[name="${props.targetInputName}"]`);

@@ -123,13 +123,13 @@ feature where a mistake is user-visible. It delivers value whether or not any re
 
 ### Batch A
 
-- [ ] **T019** [US1] Write the de-duplication tests **first**, in `LaughTale.Client/tests/events/single-dispatch.test.ts`, one per Batch A occurrence, and observe them failing at counts of 2.
-- [ ] **T020** [P] [US1] `LaughTale.Client/src/components/input-mask.ts` — migrate to `emitComponentEvent` and **delete** the redundant bare dispatch at `:304`. Reconcile payloads per T004.
-- [ ] **T021** [P] [US1] `LaughTale.Client/src/components/listbox.ts` — same, deleting `:932`.
-- [ ] **T022** [P] [US1] `LaughTale.Client/src/components/paginator.ts` — collapse `page` (`:616`) and `page-change` (`:626`) into one. **The survivor is `laughtale:paginator:page-change`** ([research.md](research.md) D7): it is the only pair where both names are bare, so neither has precedence, and `page-change` names the occurrence rather than a noun.
-- [ ] **T023** [P] [US1] `LaughTale.Client/src/components/rating.ts` — same, deleting `:485`.
-- [ ] **T024** [P] [US1] `LaughTale.Client/src/components/select-button.ts` — same, deleting `:381`. Its namespace also changes from `selectbutton:` to `select-button:`.
-- [ ] **T025** [US1] Batch A gate over the five files edited in T020–T024 under `LaughTale.Client/src/components/`: R3 reports **0** duplicated occurrences for these five; R2 reports **0** residual literals; the T019 tests are green at counts of 1; `listenersUnmanaged` and `timersUncleared` still **0**.
+- [x] **T019** [US1] Write the de-duplication tests **first**, in `LaughTale.Client/tests/events/single-dispatch.test.ts`, one per Batch A occurrence, and observe them failing at counts of 2.
+- [x] **T020** [P] [US1] `LaughTale.Client/src/components/input-mask.ts` — migrate to `emitComponentEvent` and **delete** the redundant bare dispatch at `:304`. Reconcile payloads per T004.
+- [x] **T021** [P] [US1] `LaughTale.Client/src/components/listbox.ts` — same, deleting `:932`.
+- [x] **T022** [P] [US1] `LaughTale.Client/src/components/paginator.ts` — collapse `page` (`:616`) and `page-change` (`:626`) into one. **The survivor is `laughtale:paginator:page-change`** ([research.md](research.md) D7): it is the only pair where both names are bare, so neither has precedence, and `page-change` names the occurrence rather than a noun.
+- [x] **T023** [P] [US1] `LaughTale.Client/src/components/rating.ts` — same, deleting `:485`.
+- [x] **T024** [P] [US1] `LaughTale.Client/src/components/select-button.ts` — same, deleting `:381`. Its namespace also changes from `selectbutton:` to `select-button:`.
+- [x] **T025** [US1] Batch A gate over the five files edited in T020–T024 under `LaughTale.Client/src/components/`: R3 reports **0** duplicated occurrences for these five; R2 reports **0** residual literals; the T019 tests are green at counts of 1; `listenersUnmanaged` and `timersUncleared` still **0**.
 
 ### Batch B
 

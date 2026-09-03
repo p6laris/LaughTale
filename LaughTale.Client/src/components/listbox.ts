@@ -9,6 +9,7 @@ import type { IslandContext } from '../runtime/registry';
 
 import { LucideIcons, getLucideIcon } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
+import { emitComponentEvent } from '../runtime/events';
 import { useDebounce } from '../composables/useDebounce';
 import { useVirtualizer, type Virtualizer } from '../composables/useVirtualizer';
 import { setRovingTabindex } from '../accessibility/aria';
@@ -925,14 +926,10 @@ export default function ListboxIsland(container: HTMLElement, props: ListboxProp
             hiddenInp.value = isMultiple ? JSON.stringify(valArray) : (valArray[0] || '');
         }
 
-        container.dispatchEvent(new CustomEvent('listbox:change', {
-            bubbles: true,
-            detail: { value: payload, selectedValues: valArray }
-        }));
-        container.dispatchEvent(new CustomEvent('change', {
-            bubbles: true,
-            detail: { value: payload }
-        }));
+        emitComponentEvent(container, 'listbox', 'change', {
+            value: payload,
+            selectedValues: valArray
+        });
     }
 
     init();

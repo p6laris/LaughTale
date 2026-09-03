@@ -7,6 +7,7 @@ import type { IslandContext } from '../runtime/registry';
  */
 
 import { injectIslandStyle } from '../runtime/styles';
+import { emitComponentEvent } from '../runtime/events';
 import { useControllableState } from '../composables/useControllableState';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
@@ -478,14 +479,7 @@ export default function RatingIsland(container: HTMLElement, props: RatingProps,
             hidden.value = String(val);
         }
 
-        container.dispatchEvent(new CustomEvent('rating:change', {
-            bubbles: true,
-            detail: { value: val }
-        }));
-        container.dispatchEvent(new CustomEvent('change', {
-            bubbles: true,
-            detail: { value: val }
-        }));
+        emitComponentEvent(container, 'rating', 'change', { value: val });
     }
 
     init();

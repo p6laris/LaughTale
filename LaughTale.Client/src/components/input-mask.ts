@@ -1,6 +1,7 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
+import { emitComponentEvent } from '../runtime/events';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
@@ -297,14 +298,11 @@ export default function InputMaskIsland(container: HTMLElement, props: InputMask
         const payload = unmask ? formatted.raw : formatted.masked;
         if (hiddenInp) hiddenInp.value = payload;
 
-        container.dispatchEvent(new CustomEvent('input-mask:change', {
-            bubbles: true,
-            detail: { value: payload, rawValue: formatted.raw, maskedValue: formatted.masked }
-        }));
-        container.dispatchEvent(new CustomEvent('change', {
-            bubbles: true,
-            detail: { value: payload, rawValue: formatted.raw }
-        }));
+        emitComponentEvent(container, 'input-mask', 'change', {
+            value: payload,
+            rawValue: formatted.raw,
+            maskedValue: formatted.masked
+        });
     }
 
     function getFirstSlotIndex(val: string): number {

@@ -8,6 +8,7 @@ import type { IslandContext } from '../runtime/registry';
  */
 
 import { injectIslandStyle } from '../runtime/styles';
+import { emitComponentEvent } from '../runtime/events';
 import { getLucideIcon } from '../icons/lucide';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import { setRovingTabindex, handleRovingKeydown } from '../accessibility/aria';
@@ -374,14 +375,7 @@ export default function SelectButtonIsland(container: HTMLElement, props: Select
         const hiddenInp = container.querySelector<HTMLInputElement>('input[type="hidden"]');
         if (hiddenInp) hiddenInp.value = selectedValues.join(',');
 
-        container.dispatchEvent(new CustomEvent('selectbutton:change', {
-            bubbles: true,
-            detail: { value: payload }
-        }));
-        container.dispatchEvent(new CustomEvent('change', {
-            bubbles: true,
-            detail: { value: payload }
-        }));
+        emitComponentEvent(container, 'select-button', 'change', { value: payload });
     }
 
     render();
