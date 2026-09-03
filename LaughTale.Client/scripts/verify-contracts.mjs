@@ -377,6 +377,35 @@ for (const file of files) {
             errors++;
         }
     }
+
+    // Rule R3: Reposition strategy declared
+    if (POSITIONING_COMPONENTS.includes(file)) {
+        const fpCalls = findFloatingPositionCalls(content);
+        for (const call of fpCalls) {
+            const optsStr = call.args.length >= 3 ? call.args.slice(2).join(',') : '';
+            const repoMatch = optsStr.match(/\breposition\s*:\s*['"](follow|dismiss|none)['"]/);
+            if (!repoMatch) {
+                console.error(`❌ [${file}:${call.line}] R3 reposition strategy declared: useFloatingPosition call omits explicit 'reposition' option.`);
+                errors++;
+            } else {
+                const strategyVal = repoMatch[1];
+                if ((strategyVal === 'follow' || strategyVal === 'dismiss') && !/\bsignal\b/.test(optsStr)) {
+                    console.error(`❌ [${file}:${call.line}] R3 reposition strategy declared: reposition '${strategyVal}' declared without required 'signal'.`);
+                    errors++;
+                }
+                if (strategyVal === 'dismiss' && !/\bonDismiss\b/.test(optsStr)) {
+                    console.error(`❌ [${file}:${call.line}] R3 reposition strategy declared: reposition 'dismiss' declared without required 'onDismiss' callback.`);
+                    errors++;
+                }
+                const firstArg = call.args[0] || '';
+                const isPointAnchorArg = /\{\s*x\s*:\s*[^,]+,\s*y\s*:\s*[^}]+\}/.test(firstArg);
+                if (strategyVal === 'follow' && isPointAnchorArg) {
+                    console.error(`❌ [${file}:${call.line}] R3 reposition strategy declared: point anchor cannot be paired with reposition 'follow'.`);
+                    errors++;
+                }
+            }
+        }
+    }
 }
 
 if (errors > 0) {
