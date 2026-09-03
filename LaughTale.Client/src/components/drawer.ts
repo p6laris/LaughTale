@@ -6,6 +6,12 @@
  */
 
 import { injectIslandStyle } from '../runtime/styles';
+import type { PatternDeclaration } from '../accessibility/patterns';
+
+export const a11y: PatternDeclaration = {
+    kind: 'pattern',
+    pattern: 'dialog'
+};
 
 const DRAWER_CSS = `
 island-drawer,
@@ -426,6 +432,8 @@ export default function DrawerIsland(container: HTMLElement, props: DrawerProps,
 
     container.setAttribute('data-part', 'root');
     drawerEl.setAttribute('data-part', 'drawer');
+    drawerEl.setAttribute('role', 'dialog');
+    drawerEl.setAttribute('aria-modal', 'true');
     maskEl.setAttribute('data-part', 'mask');
     applyPart(container, 'root', props.class || '', props.pt, props.studioOverrides);
 

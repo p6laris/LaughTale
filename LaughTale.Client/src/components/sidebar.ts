@@ -16,6 +16,12 @@ import { SidebarItem } from '../types/models';
 import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import type { PatternDeclaration } from '../accessibility/patterns';
+
+export const a11y: PatternDeclaration = {
+    kind: 'pattern',
+    pattern: 'dialog'
+};
 
 const SIDEBAR_CSS = `
 /* ==========================================================================
@@ -1673,7 +1679,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps, ctx?
         const sidebarWidth = isOpen ? width : (collapsible === 'icon' ? '3.5rem' : '0rem');
 
         const sidebarHtml = `
-            <aside class="${sidebarClasses}" style="width: ${sidebarWidth};" data-sidebar-root>
+            <aside class="${sidebarClasses}" style="width: ${sidebarWidth};" data-sidebar-root role="dialog" aria-modal="true">
                 <div class="p-sidebar-aside">
                     <div class="p-sidebar-panel">
                         <div class="p-sidebar-header">

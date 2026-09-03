@@ -2,6 +2,12 @@ import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts
 import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import type { PatternDeclaration } from '../accessibility/patterns';
+
+export const a11y: PatternDeclaration = {
+    kind: 'pattern',
+    pattern: 'dialog'
+};
 
 const DIALOG_CSS = `
 island-aura-dialog,
@@ -362,6 +368,8 @@ export default function DialogIsland(container: HTMLElement, props: DialogProps,
 
     container.setAttribute('data-part', 'root');
     dialogEl.setAttribute('data-part', 'dialog');
+    dialogEl.setAttribute('role', 'dialog');
+    dialogEl.setAttribute('aria-modal', 'true');
     maskEl.setAttribute('data-part', 'mask');
 
     // Per-island Escape Key Handler

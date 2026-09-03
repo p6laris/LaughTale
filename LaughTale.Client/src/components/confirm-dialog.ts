@@ -2,6 +2,12 @@ import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts
 import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
 import { html, setHtml, unsafe, type Raw } from '../runtime/html';
+import type { PatternDeclaration } from '../accessibility/patterns';
+
+export const a11y: PatternDeclaration = {
+    kind: 'pattern',
+    pattern: 'alertdialog'
+};
 
 const CONFIRM_DIALOG_CSS = `
 .p-confirmdialog-mask {
@@ -368,7 +374,7 @@ class ConfirmDialogManager {
 
         if (opt.headless) {
             setHtml(this.maskEl, html`
-                <div class="p-confirmdialog p-dialog p-component" role="alertdialog">
+                <div class="p-confirmdialog p-dialog p-component" role="alertdialog" aria-modal="true">
                     <div class="p-confirmdialog-headless">
                         <div class="p-confirmdialog-headless-icon">
                             ${LOCK_SVG}
@@ -396,7 +402,7 @@ class ConfirmDialogManager {
             const acceptStyle = isDanger ? 'background: var(--p-red-500, #ef4444); border: 1px solid var(--p-red-500, #ef4444); color: #ffffff;' : 'background: var(--p-primary-color); border: 1px solid var(--p-primary-color); color: var(--p-primary-contrast-color, #ffffff);';
 
             setHtml(this.maskEl, html`
-                <div class="p-confirmdialog p-dialog p-component" role="alertdialog">
+                <div class="p-confirmdialog p-dialog p-component" role="alertdialog" aria-modal="true">
                     <div class="p-dialog-header">
                         <h3 class="p-dialog-title">${opt.header || 'Confirmation'}</h3>
                         <button type="button" class="p-dialog-header-close" aria-label="Close dialog">

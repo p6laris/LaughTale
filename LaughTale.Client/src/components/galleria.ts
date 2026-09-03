@@ -3,6 +3,12 @@ import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
 import { LucideIcons } from '../icons/lucide';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import type { PatternDeclaration } from '../accessibility/patterns';
+
+export const a11y: PatternDeclaration = {
+    kind: 'pattern',
+    pattern: 'dialog'
+};
 
 /**
  * LaughTale: Enterprise Galleria Component (Aura Design System compliant)
@@ -317,7 +323,7 @@ export default function GalleriaIsland(container: HTMLElement, props: GalleriaPr
         ` : '';
 
         setHtml(container, html`
-            <div class="p-galleria p-component ${props.class || ''}" style="${props.style || ''}">
+            <div class="p-galleria p-component ${props.class || ''}" role="dialog" aria-modal="true" style="${props.style || ''}">
                 <div class="p-galleria-item-wrapper">
                     <div class="p-galleria-item-container">
                         <div class="p-galleria-item">
