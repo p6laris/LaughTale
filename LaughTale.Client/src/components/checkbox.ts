@@ -1,6 +1,7 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
+import { emitComponentEvent } from '../runtime/events';
 import { LucideIcons } from '../icons/lucide';
 import { html, setHtml, attr, unsafe } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
@@ -271,14 +272,11 @@ export default function CheckboxIsland(container: HTMLElement, props: CheckboxPr
     }
 
     function dispatchChangeEvent() {
-        container.dispatchEvent(new CustomEvent('checkbox:change', {
-            bubbles: true,
-            detail: {
-                checked: isChecked,
-                indeterminate: isIndeterminate,
-                value: props.value || isChecked
-            }
-        }));
+        emitComponentEvent(container, 'checkbox', 'change', {
+            checked: isChecked,
+            indeterminate: isIndeterminate,
+            value: props.value || isChecked
+        });
     }
 
     function syncValue() {

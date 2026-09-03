@@ -1,6 +1,7 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
+import { emitComponentEvent } from '../runtime/events';
 import { getLucideIcon } from '../icons/lucide';
 import { setHtml, unsafe } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
@@ -79,10 +80,7 @@ export default function ButtonIsland(container: HTMLElement, props: ButtonProps,
             return;
         }
 
-        container.dispatchEvent(new CustomEvent('button:click', {
-            bubbles: true,
-            detail: { label: props.label }
-        }));
+        emitComponentEvent(container, 'button', 'click', { label: props.label });
     }, { signal: ctx?.signal });
 
     renderLoading();

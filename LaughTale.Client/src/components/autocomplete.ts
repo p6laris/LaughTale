@@ -2,6 +2,7 @@ import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts
 import type { IslandContext } from '../runtime/registry';
 import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
+import { emitComponentEvent } from '../runtime/events';
 import { useDisclosure } from '../composables/useDisclosure';
 import { useClickOutside } from '../composables/useClickOutside';
 import { useDebounce } from '../composables/useDebounce';
@@ -726,10 +727,9 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
             hidden.value = multiple ? JSON.stringify(selectedValues) : (selectedValues[0] || '');
         }
 
-        container.dispatchEvent(new CustomEvent('autocomplete:change', {
-            bubbles: true,
-            detail: { value: multiple ? selectedValues : (selectedValues[0] || '') }
-        }));
+        emitComponentEvent(container, 'autocomplete', 'change', {
+            value: multiple ? selectedValues : (selectedValues[0] || '')
+        });
     }
 
     renderChips();

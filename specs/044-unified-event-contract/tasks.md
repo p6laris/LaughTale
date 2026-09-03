@@ -199,7 +199,7 @@ on the safest work.
 
 **Files**: 19, in two commits of ≤10 per Principle IV.
 
-- [ ] **T043** [P] [US2] Migrate the first ten of the T005 conforming set to `emitComponentEvent` in `LaughTale.Client/src/components/`: `accordion.ts`, `autocomplete.ts`, `button.ts`, `cascadeselect.ts`, `checkbox.ts`, `datatable.ts`, `dataview.ts`, `datepicker.ts`, `fieldset.ts`, `inplace.ts`. Namespaces are already correct; only the prefix and the dispatch route change.
+- [x] **T043** [P] [US2] Migrate the first ten of the T005 conforming set to `emitComponentEvent` in `LaughTale.Client/src/components/`: `accordion.ts`, `autocomplete.ts`, `button.ts`, `cascadeselect.ts`, `checkbox.ts`, `datatable.ts`, `dataview.ts`, `datepicker.ts`, `fieldset.ts`, `inplace.ts`. Namespaces are already correct; only the prefix and the dispatch route change.
 - [ ] **T044** [P] [US2] Migrate the remaining nine: `knob.ts`, `multiselect.ts`, `orderlist.ts`, `orgchart.ts`, `panel.ts`, `picklist.ts`, `stepper.ts`, `tabs.ts`, `textarea.ts`.
 - [ ] **T045** [US2] **SC-003 reaches 72 → 0** across all of `LaughTale.Client/src/components/`. No dispatched name fails R1. Paste `npm run lint:contracts`.
 - [ ] **T046** [US2] **R2 reaches 0.** Confirm no `new CustomEvent(` remains anywhere in `LaughTale.Client/src/components/` by grepping all 76 files directly, rather than trusting the rule written to find them.

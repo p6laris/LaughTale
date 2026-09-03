@@ -1,5 +1,6 @@
 import { useLocale } from '../composables/useLocale';
 import { injectIslandStyle } from '../runtime/styles';
+import { emitComponentEvent } from '../runtime/events';
 import { LucideIcons } from '../icons/lucide';
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
@@ -1507,10 +1508,11 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                     const matchedRow = rawData.find(r => String(r[dataKey]) === String(rowKey));
                     if (matchedRow) {
                         matchedRow[field] = newVal;
-                        container.dispatchEvent(new CustomEvent('datatable:cell-edit-complete', {
-                            bubbles: true,
-                            detail: { row: matchedRow, field, newValue: newVal }
-                        }));
+                        emitComponentEvent(container, 'datatable', 'cell-edit-complete', {
+                            row: matchedRow,
+                            field,
+                            newValue: newVal
+                        });
                     }
                     editingCell = null;
                     render();
@@ -1562,10 +1564,7 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                     }
                 }
 
-                container.dispatchEvent(new CustomEvent('datatable:sort', {
-                    bubbles: true,
-                    detail: { sortMeta }
-                }));
+                emitComponentEvent(container, 'datatable', 'sort', { sortMeta });
 
                 triggerDataUpdate();
             }, { signal: ctx?.signal });
@@ -1703,10 +1702,10 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
 
     function dispatchSelectionEvent() {
         const selectedRows = rawData.filter(r => selectedKeys.has(r[dataKey]));
-        container.dispatchEvent(new CustomEvent('datatable:selection-change', {
-            bubbles: true,
-            detail: { selectedKeys: Array.from(selectedKeys), selectedRows }
-        }));
+        emitComponentEvent(container, 'datatable', 'selection-change', {
+            selectedKeys: Array.from(selectedKeys),
+            selectedRows
+        });
     }
 
     // Initial render / lazy fetch

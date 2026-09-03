@@ -1,6 +1,7 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
+import { emitComponentEvent } from '../runtime/events';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
@@ -317,10 +318,7 @@ export default function FieldsetIsland(container: HTMLElement, props: FieldsetPr
             }
         });
 
-        container.dispatchEvent(new CustomEvent('fieldset:toggle', {
-            bubbles: true,
-            detail: { collapsed: isCollapsed }
-        }));
+        emitComponentEvent(container, 'fieldset', 'toggle', { collapsed: isCollapsed });
     }
 
     if (isToggleable && toggleBtn) {

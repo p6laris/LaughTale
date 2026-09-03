@@ -6,6 +6,7 @@
 
 import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
+import { emitComponentEvent } from '../runtime/events';
 import { useDisclosure } from '../composables/useDisclosure';
 import { useClickOutside } from '../composables/useClickOutside';
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
@@ -524,9 +525,10 @@ export default function CascadeSelectIsland<T = string>(container: HTMLElement, 
             hidden.value = selectedValue !== null ? String(selectedValue) : '';
         }
 
-        container.dispatchEvent(new CustomEvent('cascadeselect:change', {
-            bubbles: true,
-            detail: { value: selectedValue, label: selectedLabelText, path: path }
-        }));
+        emitComponentEvent(container, 'cascadeselect', 'change', {
+            value: selectedValue,
+            label: selectedLabelText,
+            path: path
+        });
     }
 }

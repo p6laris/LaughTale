@@ -1,6 +1,7 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
+import { emitComponentEvent } from '../runtime/events';
 import { LucideIcons } from '../icons/lucide';
 import { useAutoAnimate } from '../composables/animation/useAutoAnimate';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
@@ -819,10 +820,10 @@ export default function DataViewIsland(container: HTMLElement, props: DataViewPr
                 if (wishlistedIds.has(id)) wishlistedIds.delete(id);
                 else wishlistedIds.add(id);
                 btn.classList.toggle('p-wishlisted');
-                container.dispatchEvent(new CustomEvent('dataview:wishlist-toggle', {
-                    bubbles: true,
-                    detail: { id, isWishlisted: wishlistedIds.has(id) }
-                }));
+                emitComponentEvent(container, 'dataview', 'wishlist-toggle', {
+                    id,
+                    isWishlisted: wishlistedIds.has(id)
+                });
             }, { signal: ctx?.signal });
         });
 
@@ -832,10 +833,9 @@ export default function DataViewIsland(container: HTMLElement, props: DataViewPr
                 e.stopPropagation();
                 const id = btn.getAttribute('data-id');
                 const matched = rawItems.find(it => String(it.id || it.name) === String(id));
-                container.dispatchEvent(new CustomEvent('dataview:buy-now', {
-                    bubbles: true,
-                    detail: { item: matched }
-                }));
+                emitComponentEvent(container, 'dataview', 'buy-now', {
+                    item: matched
+                });
             }, { signal: ctx?.signal });
         });
 

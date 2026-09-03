@@ -6,6 +6,7 @@
 
 import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
+import { emitComponentEvent } from '../runtime/events';
 import { useDisclosure } from '../composables/useDisclosure';
 import { useClickOutside } from '../composables/useClickOutside';
 import { useLocale } from '../composables/useLocale';
@@ -922,14 +923,11 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
             hidden.value = selectedDates.map(d => formatDate(d)).join(',');
         }
 
-        container.dispatchEvent(new CustomEvent('datepicker:change', {
-            bubbles: true,
-            detail: {
-                dates: selectedDates,
-                value: selectedDates.map(d => formatDate(d)),
-                formatted: getDisplayText()
-            }
-        }));
+        emitComponentEvent(container, 'datepicker', 'change', {
+            dates: selectedDates,
+            value: selectedDates.map(d => formatDate(d)),
+            formatted: getDisplayText()
+        });
     }
 
     renderComponent();

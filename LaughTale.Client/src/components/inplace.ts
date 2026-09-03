@@ -2,6 +2,7 @@ import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts
 import type { IslandContext } from '../runtime/registry';
 import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
+import { emitComponentEvent } from '../runtime/events';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
@@ -276,10 +277,7 @@ export default function InplaceIsland(container: HTMLElement, props: InplaceProp
             hidden.value = currentValue;
         }
 
-        container.dispatchEvent(new CustomEvent('inplace:change', {
-            bubbles: true,
-            detail: { value: currentValue }
-        }));
+        emitComponentEvent(container, 'inplace', 'change', { value: currentValue });
     }
 
     render();

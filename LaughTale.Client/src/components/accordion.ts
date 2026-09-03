@@ -1,6 +1,7 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
+import { emitComponentEvent } from '../runtime/events';
 import { html, setHtml, attr, type Raw } from '../runtime/html';
 import { AccordionTab } from '../types/models';
 import type { PatternDeclaration } from '../accessibility/patterns';
@@ -361,10 +362,9 @@ export default function AccordionIsland(container: HTMLElement, props: Accordion
             });
         }
 
-        container.dispatchEvent(new CustomEvent('accordion:change', {
-            bubbles: true,
-            detail: { value: Array.from(activeKeys) }
-        }));
+        emitComponentEvent(container, 'accordion', 'change', {
+            value: Array.from(activeKeys)
+        });
     }
 
     function renderInitial() {
