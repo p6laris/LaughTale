@@ -11,8 +11,7 @@ import { injectIslandStyle } from '../runtime/styles';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
-    kind: 'pattern',
-    pattern: 'popover'
+    kind: 'presentational'
 };
 
 const POPOVER_CSS = `
