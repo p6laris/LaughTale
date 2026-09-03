@@ -22,6 +22,7 @@ export interface PatternDefinition {
     requiredKeys: string[];          // e.g. ['ArrowUp','ArrowDown','Home','End']
     childRole?: string;              // e.g. 'option' for listbox
     modal: boolean;                  // true => must trap focus; false => must NOT trap focus
+    virtualizedAttributes?: string[]; // required when component adopting pattern uses virtualization
 }
 
 export const PATTERNS: Record<PatternName, PatternDefinition> = {
@@ -45,14 +46,16 @@ export const PATTERNS: Record<PatternName, PatternDefinition> = {
         requiredStates: ['aria-selected'],
         requiredKeys: ['ArrowUp', 'ArrowDown', 'Home', 'End', 'Enter'],
         childRole: 'option',
-        modal: false
+        modal: false,
+        virtualizedAttributes: ['aria-setsize', 'aria-posinset']
     },
     combobox: {
         role: 'combobox',
         requiredAttributes: ['aria-controls', 'aria-haspopup'],
         requiredStates: ['aria-expanded'],
         requiredKeys: ['ArrowDown', 'Escape', 'Enter'],
-        modal: false
+        modal: false,
+        virtualizedAttributes: ['aria-setsize', 'aria-posinset']
     },
     menu: {
         role: 'menu',
@@ -106,7 +109,8 @@ export const PATTERNS: Record<PatternName, PatternDefinition> = {
         requiredStates: ['aria-expanded', 'aria-selected'],
         requiredKeys: ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Home', 'End'],
         childRole: 'treeitem',
-        modal: false
+        modal: false,
+        virtualizedAttributes: ['aria-setsize', 'aria-posinset']
     },
     grid: {
         role: 'grid',
@@ -114,7 +118,8 @@ export const PATTERNS: Record<PatternName, PatternDefinition> = {
         requiredStates: [],
         requiredKeys: ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Home', 'End'],
         childRole: 'row',
-        modal: false
+        modal: false,
+        virtualizedAttributes: ['aria-setsize', 'aria-posinset']
     },
     toolbar: {
         role: 'toolbar',
