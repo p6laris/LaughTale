@@ -12,6 +12,7 @@ import type { IslandContext } from '../runtime/registry';
 import { TreeTableNode, TreeTableColumn } from '../types/models';
 import { injectIslandStyle } from '../runtime/styles';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import { useVirtualizer, type Virtualizer } from '../composables/useVirtualizer';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -137,6 +138,12 @@ const TREETABLE_CSS = `
 .p-treetable-thead > tr > th.p-sortable-column:hover {
     background: var(--lt-surface-100);
     color: var(--lt-surface-900);
+}
+
+.p-treetable-spacer-cell {
+    padding: 0 !important;
+    border: none !important;
+    height: 0;
 }
 
 .p-treetable-thead > tr > th.p-highlight {
@@ -838,17 +845,162 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
         return rows;
     }
 
+    const ITEM_HEIGHT = 40;
+    let virtualizer: Virtualizer | null = null;
+    let currentStart = -1;
+    let currentEnd = -1;
+    let currentFlatRows: { node: any; level: number }[] = [];
+    let scrollBound = false;
+
+    function renderSingleRow(rowItem: { node: any; level: number }, index: number, totalCount: number, visibleCols: TreeTableColumn[]): string {
+        const { node, level } = rowItem;
+        const key = String(node.key);
+        const hasChildren = (node.children && node.children.length > 0) || (isLazy && !node.leaf);
+        const isExpanded = !!expandedKeys[key];
+        const isSelected = selectionMode === 'single' ? singleSelectionKey === key :
+                           selectionMode === 'multiple' ? !!multiSelectionKeys[key] :
+                           selectionMode === 'checkbox' ? !!checkboxSelectionKeys[key]?.checked : false;
+        const isPartial = selectionMode === 'checkbox' && !!checkboxSelectionKeys[key]?.partialChecked;
+
+        return `
+            <tr class="p-treetable-row ${isSelected ? 'p-highlight' : ''}" data-key="${key}" data-index="${index}" role="row" aria-setsize="${totalCount}" aria-posinset="${index + 1}" tabindex="${index === 0 ? '0' : '-1'}">
+                ${visibleCols.map(col => {
+                    const isExp = !!col.expander;
+                    const frozenClass = col.frozen ? (col.alignFrozen === 'right' ? 'p-frozen-right' : 'p-frozen-left') : '';
+                    const widthStyle = col.width ? `width: ${col.width};` : (col.minWidth ? `min-width: ${col.minWidth};` : '');
+
+                    if (isExp) {
+                        const toggleSvg = hasChildren ? (node.loading ? SVG_ICONS.spinner : (isExpanded ? SVG_ICONS.chevronDown : SVG_ICONS.chevronRight)) : '';
+                        const iconSvg = props.useNodeIcons ? `<span style="display: inline-flex; align-items: center; margin-right: 0.5rem; color: var(--lt-surface-400);">${getIcon(node.data.type, isExpanded)}</span>` : '';
+
+                        let checkboxHtml = '';
+                        if (selectionMode === 'checkbox') {
+                            checkboxHtml = `
+                                <div class="p-treetable-checkbox ${isSelected ? 'p-highlight' : isPartial ? 'p-indeterminate' : ''}" data-cb-key="${key}">
+                                    ${isSelected ? SVG_ICONS.check : isPartial ? SVG_ICONS.minus : ''}
+                                </div>
+                            `;
+                        }
+
+                        return `
+                            <td class="${frozenClass}" style="${widthStyle} padding-left: ${level * 1.5 + 0.75}rem;">
+                                <div style="display: flex; align-items: center;">
+                                    <button type="button" class="p-treetable-toggler ${!hasChildren ? 'p-hidden-space' : ''}" data-toggler-key="${key}">
+                                        ${toggleSvg}
+                                    </button>
+                                    ${checkboxHtml}
+                                    ${iconSvg}
+                                    <span style="font-weight: ${hasChildren && props.useNodeIcons ? '600' : '400'}; color: var(--lt-surface-900);">${resolveNodeField(node, col.field) ?? ''}</span>
+                                </div>
+                            </td>
+                        `;
+                    }
+
+                    if (col.field === 'type' && props.useTags) {
+                        const typeVal = node.data.type || 'Folder';
+                        const sev = getSeverity(typeVal);
+                        return `
+                            <td class="${frozenClass}" style="${widthStyle}">
+                                <span class="p-treetable-tag p-tag-${sev}">${typeVal}</span>
+                            </td>
+                        `;
+                    }
+
+                    return `
+                        <td class="${frozenClass}" style="${widthStyle}">
+                            <span style="color: var(--lt-surface-700);">${resolveNodeField(node, col.field) ?? '—'}</span>
+                        </td>
+                    `;
+                }).join('')}
+                ${props.showActions ? `
+                    <td style="text-align: center;">
+                        <div style="display: inline-flex; align-items: center; gap: 0.4rem;">
+                            <button type="button" class="p-treetable-action-view" style="width: 2rem; height: 2rem; border-radius: 9999px; border: none; background: var(--lt-surface-100); color: var(--lt-surface-700); display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                                ${SVG_ICONS.search}
+                            </button>
+                            <button type="button" class="p-treetable-action-edit" style="width: 2rem; height: 2rem; border-radius: 9999px; border: none; background: var(--lt-success-100, var(--lt-success-100)); color: var(--lt-success-700, var(--lt-success-700)); display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                                ${SVG_ICONS.pencil}
+                            </button>
+                        </div>
+                    </td>
+                ` : ''}
+            </tr>
+        `;
+    }
+
+    function updateVirtualPositions() {
+        if (!virtualizer || !virtualizer.isVirtual()) return;
+        const topSpacer = container.querySelector<HTMLElement>('.p-treetable-spacer-top td');
+        const bottomSpacer = container.querySelector<HTMLElement>('.p-treetable-spacer-bottom td');
+        const virtualItems = virtualizer.getVirtualItems();
+        const startOffset = virtualItems.length > 0 ? virtualItems[0].start : 0;
+        const totalSize = virtualizer.getTotalSize();
+        const itemsSize = virtualItems.length * 40;
+        const endOffset = Math.max(0, totalSize - startOffset - itemsSize);
+        if (topSpacer) topSpacer.style.height = `${startOffset}px`;
+        if (bottomSpacer) bottomSpacer.style.height = `${endOffset}px`;
+    }
+
+    function reRenderVirtualRows() {
+        const tbody = container.querySelector<HTMLElement>('.p-treetable-tbody');
+        if (!tbody || !virtualizer || !virtualizer.isVirtual()) return;
+        const visibleCols = columns.filter(c => visibleFields.includes(c.field));
+        const colSpan = visibleCols.length + (props.showActions ? 1 : 0);
+        const virtualItems = virtualizer.getVirtualItems();
+        const rowsHtml = virtualItems.map(vi => renderSingleRow(currentFlatRows[vi.index], vi.index, currentFlatRows.length, visibleCols)).join('');
+        setHtml(tbody, html`
+            <tr class="p-treetable-spacer-top"><td class="p-treetable-spacer-cell" colspan="${colSpan}"></td></tr>
+            ${unsafe(rowsHtml)}
+            <tr class="p-treetable-spacer-bottom"><td class="p-treetable-spacer-cell" colspan="${colSpan}"></td></tr>
+        `);
+        updateVirtualPositions();
+        bindRowEvents();
+    }
+
+    function focusRowByIndex(targetIdx: number) {
+        if (virtualizer && virtualizer.isVirtual()) {
+            if (targetIdx < currentStart || targetIdx > currentEnd) {
+                virtualizer.scrollToIndex(targetIdx, 'auto');
+                const newVirtualItems = virtualizer.getVirtualItems();
+                if (newVirtualItems.length > 0) {
+                    currentStart = newVirtualItems[0].index;
+                    currentEnd = newVirtualItems[newVirtualItems.length - 1].index;
+                    reRenderVirtualRows();
+                }
+            }
+        }
+        const targetRow = container.querySelector<HTMLTableRowElement>(`.p-treetable-row[data-index="${targetIdx}"]`);
+        if (targetRow) {
+            targetRow.focus();
+        }
+    }
+
     function render() {
         const processedNodes = filterAndSort(rawNodes);
-        const allVisibleRows = flattenVisible(processedNodes);
-        const totalRecords = allVisibleRows.length;
+        const allFlattenedRows = flattenVisible(processedNodes);
+        currentFlatRows = allFlattenedRows;
+        const totalRecords = allFlattenedRows.length;
         const totalPages = Math.ceil(totalRecords / rowsPerPage) || 1;
 
         if (currentPage >= totalPages) currentPage = Math.max(0, totalPages - 1);
 
         const displayedRows = isPaginator
-            ? allVisibleRows.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage)
-            : allVisibleRows;
+            ? allFlattenedRows.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage)
+            : allFlattenedRows;
+
+        if (!isPaginator && allFlattenedRows.length >= 100) {
+            virtualizer = useVirtualizer({
+                count: allFlattenedRows.length,
+                estimateSize: 40,
+                getScrollElement: () => container.querySelector<HTMLElement>('.p-treetable-scrollable-wrapper'),
+                virtualThreshold: 100
+            });
+            const virtualItems = virtualizer.getVirtualItems();
+            currentStart = virtualItems.length > 0 ? virtualItems[0].index : 0;
+            currentEnd = virtualItems.length > 0 ? virtualItems[virtualItems.length - 1].index : 0;
+        } else {
+            virtualizer = null;
+        }
 
         const visibleCols = columns.filter(c => visibleFields.includes(c.field));
 
@@ -1017,82 +1169,22 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
                 </tbody>
             `;
         } else {
-            const rowsHtml = displayedRows.map(({ node, level }) => {
-                const key = String(node.key);
-                const hasChildren = (node.children && node.children.length > 0) || (isLazy && !node.leaf);
-                const isExpanded = !!expandedKeys[key];
-                const isSelected = selectionMode === 'single' ? singleSelectionKey === key :
-                                   selectionMode === 'multiple' ? !!multiSelectionKeys[key] :
-                                   selectionMode === 'checkbox' ? !!checkboxSelectionKeys[key]?.checked : false;
-                const isPartial = selectionMode === 'checkbox' && !!checkboxSelectionKeys[key]?.partialChecked;
-
-                return `
-                    <tr class="p-treetable-row ${isSelected ? 'p-highlight' : ''}" data-key="${key}" tabindex="0">
-                        ${visibleCols.map(col => {
-                            const isExp = !!col.expander;
-                            const frozenClass = col.frozen ? (col.alignFrozen === 'right' ? 'p-frozen-right' : 'p-frozen-left') : '';
-                            const widthStyle = col.width ? `width: ${col.width};` : (col.minWidth ? `min-width: ${col.minWidth};` : '');
-
-                            if (isExp) {
-                                const toggleSvg = hasChildren ? (node.loading ? SVG_ICONS.spinner : (isExpanded ? SVG_ICONS.chevronDown : SVG_ICONS.chevronRight)) : '';
-                                const iconSvg = props.useNodeIcons ? `<span style="display: inline-flex; align-items: center; margin-right: 0.5rem; color: var(--lt-surface-400);">${getIcon(node.data.type, isExpanded)}</span>` : '';
-
-                                let checkboxHtml = '';
-                                if (selectionMode === 'checkbox') {
-                                    checkboxHtml = `
-                                        <div class="p-treetable-checkbox ${isSelected ? 'p-highlight' : isPartial ? 'p-indeterminate' : ''}" data-cb-key="${key}">
-                                            ${isSelected ? SVG_ICONS.check : isPartial ? SVG_ICONS.minus : ''}
-                                        </div>
-                                    `;
-                                }
-
-                                return `
-                                    <td class="${frozenClass}" style="${widthStyle} padding-left: ${level * 1.5 + 0.75}rem;">
-                                        <div style="display: flex; align-items: center;">
-                                            <button type="button" class="p-treetable-toggler ${!hasChildren ? 'p-hidden-space' : ''}" data-toggler-key="${key}">
-                                                ${toggleSvg}
-                                            </button>
-                                            ${checkboxHtml}
-                                            ${iconSvg}
-                                            <span style="font-weight: ${hasChildren && props.useNodeIcons ? '600' : '400'}; color: var(--lt-surface-900);">${resolveNodeField(node, col.field) ?? ''}</span>
-                                        </div>
-                                    </td>
-                                `;
-                            }
-
-                            if (col.field === 'type' && props.useTags) {
-                                const typeVal = node.data.type || 'Folder';
-                                const sev = getSeverity(typeVal);
-                                return `
-                                    <td class="${frozenClass}" style="${widthStyle}">
-                                        <span class="p-treetable-tag p-tag-${sev}">${typeVal}</span>
-                                    </td>
-                                `;
-                            }
-
-                            return `
-                                <td class="${frozenClass}" style="${widthStyle}">
-                                    <span style="color: var(--lt-surface-700);">${resolveNodeField(node, col.field) ?? '—'}</span>
-                                </td>
-                            `;
-                        }).join('')}
-                        ${props.showActions ? `
-                            <td style="text-align: center;">
-                                <div style="display: inline-flex; align-items: center; gap: 0.4rem;">
-                                    <button type="button" class="p-treetable-action-view" style="width: 2rem; height: 2rem; border-radius: 9999px; border: none; background: var(--lt-surface-100); color: var(--lt-surface-700); display: flex; align-items: center; justify-content: center; cursor: pointer;">
-                                        ${SVG_ICONS.search}
-                                    </button>
-                                    <button type="button" class="p-treetable-action-edit" style="width: 2rem; height: 2rem; border-radius: 9999px; border: none; background: var(--lt-success-100, var(--lt-success-100)); color: var(--lt-success-700, var(--lt-success-700)); display: flex; align-items: center; justify-content: center; cursor: pointer;">
-                                        ${SVG_ICONS.pencil}
-                                    </button>
-                                </div>
-                            </td>
-                        ` : ''}
-                    </tr>
+            const colSpan = visibleCols.length + (props.showActions ? 1 : 0);
+            if (virtualizer && virtualizer.isVirtual()) {
+                const virtualItems = virtualizer.getVirtualItems();
+                const rowsHtml = virtualItems.map(vi => renderSingleRow(allFlattenedRows[vi.index], vi.index, totalRecords, visibleCols)).join('');
+                tbodyHtml = `
+                    <tbody class="p-treetable-tbody">
+                        <tr class="p-treetable-spacer-top"><td class="p-treetable-spacer-cell" colspan="${colSpan}"></td></tr>
+                        ${rowsHtml}
+                        <tr class="p-treetable-spacer-bottom"><td class="p-treetable-spacer-cell" colspan="${colSpan}"></td></tr>
+                    </tbody>
                 `;
-            }).join('');
-
-            tbodyHtml = `<tbody class="p-treetable-tbody">${rowsHtml}</tbody>`;
+            } else {
+                const startIndex = isPaginator ? currentPage * rowsPerPage : 0;
+                const rowsHtml = displayedRows.map((r, idx) => renderSingleRow(r, startIndex + idx, totalRecords, visibleCols)).join('');
+                tbodyHtml = `<tbody class="p-treetable-tbody">${rowsHtml}</tbody>`;
+            }
         }
 
         // Paginator UI
@@ -1183,44 +1275,11 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
             </div>
         `);
 
+        updateVirtualPositions();
         bindEvents();
     }
 
-    function bindEvents() {
-        // Size buttons
-        container.querySelectorAll<HTMLButtonElement>('.p-treetable-size-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const s = btn.getAttribute('data-size') as any;
-                if (s) {
-                    size = s;
-                    render();
-                }
-            }, { signal: ctx?.signal });
-        });
-
-        // MetaKey switch
-        container.querySelector<HTMLInputElement>('.p-treetable-metakey-switch')?.addEventListener('change', (e) => {
-            metaKeySelection = (e.target as HTMLInputElement).checked;
-        }, { signal: ctx?.signal });
-
-        // Toggle applications
-        container.querySelector('.p-treetable-toggle-apps-btn')?.addEventListener('click', () => {
-            if (expandedKeys['0']) delete expandedKeys['0'];
-            else expandedKeys['0'] = true;
-            render();
-        }, { signal: ctx?.signal });
-
-        // Refresh button
-        container.querySelector('.p-treetable-refresh-btn')?.addEventListener('click', () => {
-            isLoading = true;
-            render();
-            const tRefresh = setTimeout(() => {
-                isLoading = false;
-                render();
-            }, 1200);
-            ctx?.onCleanup?.(() => clearTimeout(tRefresh));
-        }, { signal: ctx?.signal });
-
+    function bindRowEvents() {
         // Expand/Collapse Toggler
         container.querySelectorAll<HTMLButtonElement>('.p-treetable-toggler').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -1277,6 +1336,36 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
                 }
             }, { signal: ctx?.signal });
 
+            row.addEventListener('keydown', (e) => {
+                const key = row.getAttribute('data-key');
+                if (!key || !nodeMap.has(key)) return;
+                const node = nodeMap.get(key);
+
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    const currIdx = parseInt(row.getAttribute('data-index') || '0', 10);
+                    if (currIdx < currentFlatRows.length - 1) {
+                        focusRowByIndex(currIdx + 1);
+                    }
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    const currIdx = parseInt(row.getAttribute('data-index') || '0', 10);
+                    if (currIdx > 0) {
+                        focusRowByIndex(currIdx - 1);
+                    }
+                } else if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    if (!expandedKeys[key] && node.children && node.children.length) {
+                        toggleExpand(node);
+                    }
+                } else if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    if (expandedKeys[key]) {
+                        toggleExpand(node);
+                    }
+                }
+            }, { signal: ctx?.signal });
+
             // Context Menu
             if (contextMenuEnabled) {
                 row.addEventListener('contextmenu', (e) => {
@@ -1289,6 +1378,26 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
                 }, { signal: ctx?.signal });
             }
         });
+    }
+
+    function bindEvents() {
+        bindRowEvents();
+
+        const wrapper = container.querySelector<HTMLElement>('.p-treetable-scrollable-wrapper');
+        if (wrapper && !scrollBound) {
+            scrollBound = true;
+            wrapper.addEventListener('scroll', () => {
+                if (!virtualizer || !virtualizer.isVirtual()) return;
+                const newVirtualItems = virtualizer.getVirtualItems();
+                if (newVirtualItems.length === 0) return;
+                const newStart = newVirtualItems[0].index;
+                const newEnd = newVirtualItems[newVirtualItems.length - 1].index;
+                if (newStart === currentStart && newEnd === currentEnd) return;
+                currentStart = newStart;
+                currentEnd = newEnd;
+                reRenderVirtualRows();
+            }, { signal: ctx?.signal, passive: true });
+        }
 
         // Sorting
         container.querySelectorAll<HTMLTableCellElement>('.p-sortable-column').forEach(th => {
