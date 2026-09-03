@@ -245,6 +245,8 @@ class ConfirmPopupManager {
         this.popupEl.setAttribute('data-part', 'root');
         this.popupEl.setAttribute('role', 'alertdialog');
         this.popupEl.setAttribute('aria-modal', 'true');
+        this.popupEl.setAttribute('aria-labelledby', 'confirmpopup-title');
+        this.popupEl.setAttribute('aria-describedby', 'confirmpopup-message');
 
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && this.popupEl?.classList.contains('p-confirmpopup-active')) {

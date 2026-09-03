@@ -323,7 +323,7 @@ export default function GalleriaIsland(container: HTMLElement, props: GalleriaPr
         ` : '';
 
         setHtml(container, html`
-            <div class="p-galleria p-component ${props.class || ''}" role="dialog" aria-modal="true" style="${props.style || ''}">
+            <div class="p-galleria p-component ${props.class || ''}" role="dialog" aria-modal="true" aria-labelledby="galleria-caption" style="${props.style || ''}">
                 <div class="p-galleria-item-wrapper">
                     <div class="p-galleria-item-container">
                         <div class="p-galleria-item">

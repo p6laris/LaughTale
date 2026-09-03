@@ -374,14 +374,14 @@ class ConfirmDialogManager {
 
         if (opt.headless) {
             setHtml(this.maskEl, html`
-                <div class="p-confirmdialog p-dialog p-component" role="alertdialog" aria-modal="true">
+                <div class="p-confirmdialog p-dialog p-component" role="alertdialog" aria-modal="true" aria-labelledby="confirm-dialog-title" aria-describedby="confirm-dialog-desc">
                     <div class="p-confirmdialog-headless">
                         <div class="p-confirmdialog-headless-icon">
                             ${LOCK_SVG}
                         </div>
                         <div>
-                            <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--p-text-color, #1e293b); margin: 0 0 0.5rem 0;">${opt.header || 'Save Changes?'}</h3>
-                            <p style="font-size: 0.875rem; color: var(--p-text-muted, #64748b); margin: 0; line-height: 1.5;">${opt.message || 'Are you sure you want to proceed with saving your profile changes?'}</p>
+                            <h3 id="confirm-dialog-title" style="font-size: 1.25rem; font-weight: 700; color: var(--p-text-color, #1e293b); margin: 0 0 0.5rem 0;">${opt.header || 'Save Changes?'}</h3>
+                            <p id="confirm-dialog-desc" style="font-size: 0.875rem; color: var(--p-text-muted, #64748b); margin: 0; line-height: 1.5;">${opt.message || 'Are you sure you want to proceed with saving your profile changes?'}</p>
                         </div>
                         <div style="display: flex; gap: 0.75rem; width: 100%; margin-top: 0.5rem;">
                             <button type="button" class="btn-reject p-button p-button-outlined p-button-secondary" style="flex: 1; padding: 0.5rem 1rem; border-radius: var(--p-border-radius, 6px); border: 1px solid var(--p-border-color, #cbd5e1); background: transparent; color: var(--p-text-color, #1e293b); font-weight: 600; font-size: 0.875rem; cursor: pointer;">
@@ -402,16 +402,16 @@ class ConfirmDialogManager {
             const acceptStyle = isDanger ? 'background: var(--p-red-500, #ef4444); border: 1px solid var(--p-red-500, #ef4444); color: #ffffff;' : 'background: var(--p-primary-color); border: 1px solid var(--p-primary-color); color: var(--p-primary-contrast-color, #ffffff);';
 
             setHtml(this.maskEl, html`
-                <div class="p-confirmdialog p-dialog p-component" role="alertdialog" aria-modal="true">
+                <div class="p-confirmdialog p-dialog p-component" role="alertdialog" aria-modal="true" aria-labelledby="confirm-dialog-title" aria-describedby="confirm-dialog-desc">
                     <div class="p-dialog-header">
-                        <h3 class="p-dialog-title">${opt.header || 'Confirmation'}</h3>
+                        <h3 class="p-dialog-title" id="confirm-dialog-title">${opt.header || 'Confirmation'}</h3>
                         <button type="button" class="p-dialog-header-close" aria-label="Close dialog">
                             ${CLOSE_SVG}
                         </button>
                     </div>
                     <div class="p-dialog-content">
                         ${this.getIconSVG(opt.icon)}
-                        <p class="p-confirmdialog-message">${opt.message || 'Are you sure you want to proceed?'}</p>
+                        <p class="p-confirmdialog-message" id="confirm-dialog-desc">${opt.message || 'Are you sure you want to proceed?'}</p>
                     </div>
                     <div class="p-dialog-footer">
                         <button type="button" class="btn-reject p-button p-button-outlined p-button-secondary p-button-sm" style="padding: 0.45rem 1rem; font-size: 0.875rem; font-weight: 600; border-radius: var(--p-border-radius, 6px); border: 1px solid var(--p-border-color, #cbd5e1); background: transparent; color: var(--p-text-color, #1e293b); cursor: pointer;">

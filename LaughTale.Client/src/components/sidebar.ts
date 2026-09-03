@@ -2029,6 +2029,9 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps, ctx?
     }
 
     function render() {
+        container.setAttribute('role', 'dialog');
+        container.setAttribute('aria-modal', 'true');
+        container.setAttribute('aria-labelledby', (props as any).ariaLabelledby || 'Sidebar');
         setHtml(container, unsafe(renderComponent()));
         wireEvents();
         restoreScrollAndActiveItem();

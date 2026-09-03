@@ -370,6 +370,7 @@ export default function DialogIsland(container: HTMLElement, props: DialogProps,
     dialogEl.setAttribute('data-part', 'dialog');
     dialogEl.setAttribute('role', 'dialog');
     dialogEl.setAttribute('aria-modal', 'true');
+    dialogEl.setAttribute('aria-labelledby', (props as any).ariaLabelledby || 'Dialog');
     maskEl.setAttribute('data-part', 'mask');
 
     // Per-island Escape Key Handler

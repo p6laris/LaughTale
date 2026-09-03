@@ -434,6 +434,7 @@ export default function DrawerIsland(container: HTMLElement, props: DrawerProps,
     drawerEl.setAttribute('data-part', 'drawer');
     drawerEl.setAttribute('role', 'dialog');
     drawerEl.setAttribute('aria-modal', 'true');
+    drawerEl.setAttribute('aria-labelledby', (props as any).ariaLabelledby || 'Drawer');
     maskEl.setAttribute('data-part', 'mask');
     applyPart(container, 'root', props.class || '', props.pt, props.studioOverrides);
 
