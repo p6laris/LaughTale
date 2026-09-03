@@ -3,6 +3,12 @@ import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
 import { LucideIcons } from '../icons/lucide';
 import { html, setHtml, attr, unsafe } from '../runtime/html';
+import type { PatternDeclaration } from '../accessibility/patterns';
+
+export const a11y: PatternDeclaration = {
+    kind: 'pattern',
+    pattern: 'checkbox'
+};
 
 export interface CheckboxProps {
     checked?: boolean;

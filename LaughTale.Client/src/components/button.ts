@@ -3,6 +3,13 @@ import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
 import { getLucideIcon } from '../icons/lucide';
 import { setHtml, unsafe } from '../runtime/html';
+import type { PatternDeclaration } from '../accessibility/patterns';
+
+// Native <button> component enhancer
+export const a11y: PatternDeclaration = {
+    kind: 'native',
+    element: 'button'
+};
 
 export interface ButtonProps {
     label?: string;

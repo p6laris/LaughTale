@@ -3,6 +3,12 @@ import type { IslandContext } from '../runtime/registry';
 import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
 import { html, setHtml, url as safeUrl, unsafe, type Raw } from '../runtime/html';
+import type { PatternDeclaration } from '../accessibility/patterns';
+
+export const a11y: PatternDeclaration = {
+    kind: 'native',
+    element: 'nav'
+};
 
 const BREADCRUMB_CSS = `
 .p-breadcrumb-transparent {

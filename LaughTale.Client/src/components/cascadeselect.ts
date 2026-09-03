@@ -11,6 +11,12 @@ import { useClickOutside } from '../composables/useClickOutside';
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 import { html, setHtml, url, unsafe, attr, type Raw } from '../runtime/html';
+import type { PatternDeclaration } from '../accessibility/patterns';
+
+export const a11y: PatternDeclaration = {
+    kind: 'pattern',
+    pattern: 'combobox'
+};
 
 export interface CascadeSelectNode<T = string> {
     name?: string;
@@ -315,7 +321,8 @@ export default function CascadeSelectIsland<T = string>(container: HTMLElement, 
                  tabindex="${props.disabled ? -1 : 0}" 
                  role="combobox" 
                  aria-expanded="false" 
-                 aria-haspopup="tree">
+                 aria-haspopup="tree"
+                 aria-controls="cs-overlay">
                 <span class="cs-label ${selectedLabelText ? '' : 'placeholder'}">
                     ${selectedLabelText || props.placeholder || 'Select a City'}
                 </span>
@@ -340,7 +347,7 @@ export default function CascadeSelectIsland<T = string>(container: HTMLElement, 
             </div>
 
             <!-- Cascade Overlay Container -->
-            <div class="cs-overlay">
+            <div class="cs-overlay" id="cs-overlay">
                 <div class="cs-panel cs-level-0"></div>
             </div>
         </div>

@@ -4,6 +4,12 @@ import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
 import { useFocusTrap } from '../composables/useFocusTrap';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import type { PatternDeclaration } from '../accessibility/patterns';
+
+export const a11y: PatternDeclaration = {
+    kind: 'pattern',
+    pattern: 'dialog'
+};
 
 const COMMAND_CSS = `
 .p-commandmenu {
@@ -671,7 +677,7 @@ export default function CommandMenuIsland(container: HTMLElement, props: Command
         const backdrop = document.createElement('div');
         backdrop.className = 'p-commandmenu-dialog-backdrop'; container.setAttribute('data-part', 'root');
         setHtml(backdrop, html`
-            <div class="p-commandmenu-dialog-card"></div>
+            <div class="p-commandmenu-dialog-card" role="dialog" aria-modal="true" aria-labelledby="command-title"></div>
         `);
 
         document.body.appendChild(backdrop);

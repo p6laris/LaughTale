@@ -3,6 +3,12 @@ import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
 import { html, setHtml, attr, type Raw } from '../runtime/html';
 import { AccordionTab } from '../types/models';
+import type { PatternDeclaration } from '../accessibility/patterns';
+
+export const a11y: PatternDeclaration = {
+    kind: 'native',
+    element: 'button'
+};
 
 export interface AccordionProps {
     tabs?: AccordionTab[];

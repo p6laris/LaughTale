@@ -6,6 +6,12 @@ import { useDisclosure } from '../composables/useDisclosure';
 import { useClickOutside } from '../composables/useClickOutside';
 import { useDebounce } from '../composables/useDebounce';
 import { html, setHtml, unsafe, attr, type Raw } from '../runtime/html';
+import type { PatternDeclaration } from '../accessibility/patterns';
+
+export const a11y: PatternDeclaration = {
+    kind: 'pattern',
+    pattern: 'combobox'
+};
 
 export interface AutoCompleteItem {
     label: string;
@@ -375,6 +381,8 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
                            role="combobox"
                            aria-autocomplete="list"
                            aria-expanded="false"
+                           aria-haspopup="listbox"
+                           aria-controls="ac-overlay"
                            placeholder="${selectedValues.length === 0 ? (props.placeholder || 'Search...') : ''}" 
                            ${attr('disabled', props.disabled)} />
                 </div>
@@ -399,7 +407,7 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
             ` : ''}
 
             <!-- Suggestions Overlay -->
-            <div class="ac-overlay" style="max-height: ${scrollHeight};"></div>
+            <div class="ac-overlay" id="ac-overlay" role="listbox" style="max-height: ${scrollHeight};"></div>
         </div>
     `);
 

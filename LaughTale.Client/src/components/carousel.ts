@@ -11,6 +11,12 @@ import { injectIslandStyle } from '../runtime/styles';
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 import { html, setHtml, url, type Raw } from '../runtime/html';
+import type { PatternDeclaration } from '../accessibility/patterns';
+
+export const a11y: PatternDeclaration = {
+    kind: 'native',
+    element: 'button'
+};
 
 export interface CarouselProps {
     items?: any[];
