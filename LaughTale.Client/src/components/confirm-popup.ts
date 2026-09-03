@@ -2,6 +2,7 @@ import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts
 import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
 import { useFocusTrap, type UseFocusTrapReturn } from '../composables/useFocusTrap';
+import { useFloatingPosition } from '../composables/useFloatingPosition';
 import { html, setHtml, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
@@ -227,10 +228,11 @@ const CHECK_SVG = html`<svg xmlns="http://www.w3.org/2000/svg" width="14" height
 const CLOSE_SVG = html`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
 
 class ConfirmPopupManager {
-    private popupEl: HTMLElement | null = null;
+    public popupEl: HTMLElement | null = null;
     private currentOptions: ConfirmPopupOptions | null = null;
     private outsideClickListener: ((e: MouseEvent) => void) | null = null;
     private trap: UseFocusTrapReturn | null = null;
+    public floatingCtrl: { update(): void; computePosition(): any; destroy(): void } | null = null;
 
     constructor() {
         if (typeof document !== 'undefined') {
@@ -271,7 +273,7 @@ class ConfirmPopupManager {
 
         this.currentOptions = options;
         this.renderContent(options);
-        this.alignToTarget(options.target);
+        this.alignToTarget(options.target, options.signal);
 
         this.trap?.deactivate();
         this.trap = useFocusTrap(this.popupEl, {
@@ -302,6 +304,10 @@ class ConfirmPopupManager {
         if (!this.popupEl) return;
         this.trap?.deactivate();
         this.trap = null;
+        if (this.floatingCtrl) {
+            this.floatingCtrl.destroy();
+            this.floatingCtrl = null;
+        }
         this.popupEl.classList.remove('p-confirmpopup-active');
 
         if (this.outsideClickListener) {
@@ -319,43 +325,48 @@ class ConfirmPopupManager {
         this.currentOptions = null;
     }
 
-    private alignToTarget(target: HTMLElement) {
+    private alignToTarget(target: HTMLElement, signal?: AbortSignal) {
         if (!this.popupEl) return;
 
-        const targetRect = target.getBoundingClientRect();
-        const popupWidth = this.popupEl.offsetWidth || 280;
-        const popupHeight = this.popupEl.offsetHeight || 140;
+        this.floatingCtrl?.destroy();
+        this.popupEl.style.position = 'absolute';
+        const effectiveSignal = signal || new AbortController().signal;
 
-        const viewportHeight = window.innerHeight;
-        const spaceBelow = viewportHeight - targetRect.bottom;
-        const spaceAbove = targetRect.top;
+        this.floatingCtrl = useFloatingPosition(target, this.popupEl, {
+            placement: 'bottom',
+            offset: 10,
+            strategy: 'absolute',
+            reposition: 'follow',
+            signal: effectiveSignal,
+            arrow: this.popupEl
+        });
 
-        const placeAbove = spaceBelow < popupHeight + 16 && spaceAbove > popupHeight + 16;
+        const updatePosition = () => {
+            if (!this.floatingCtrl || !this.popupEl) return;
+            const coords = this.floatingCtrl.computePosition();
+            this.popupEl.style.position = 'absolute';
+            this.popupEl.style.top = `${Math.round(coords.y)}px`;
+            this.popupEl.style.left = `${Math.round(coords.x)}px`;
 
-        let top = 0;
-        if (placeAbove) {
-            top = targetRect.top + window.scrollY - popupHeight - 10;
-            this.popupEl.classList.remove('p-confirmpopup-flipped-top');
-            this.popupEl.classList.add('p-confirmpopup-flipped-bottom');
-        } else {
-            top = targetRect.bottom + window.scrollY + 10;
-            this.popupEl.classList.remove('p-confirmpopup-flipped-bottom');
-            this.popupEl.classList.add('p-confirmpopup-flipped-top');
+            if (coords.actualPlacement.startsWith('top')) {
+                this.popupEl.classList.remove('p-confirmpopup-flipped-top');
+                this.popupEl.classList.add('p-confirmpopup-flipped-bottom');
+            } else {
+                this.popupEl.classList.remove('p-confirmpopup-flipped-bottom');
+                this.popupEl.classList.add('p-confirmpopup-flipped-top');
+            }
+
+            if (coords.arrowOffset != null) {
+                this.popupEl.style.setProperty('--p-popup-arrow-left', `${Math.round(coords.arrowOffset)}px`);
+            }
+        };
+
+        updatePosition();
+
+        if (typeof window !== 'undefined') {
+            window.addEventListener('scroll', updatePosition, { capture: true, passive: true, signal: effectiveSignal });
+            window.addEventListener('resize', updatePosition, { passive: true, signal: effectiveSignal });
         }
-
-        // Horizontal alignment (align popup left with target left, with offset constraint)
-        let left = targetRect.left + window.scrollX;
-        const maxLeft = window.innerWidth - popupWidth - 16;
-        if (left > maxLeft) left = maxLeft;
-        if (left < 16) left = 16;
-
-        // Arrow notch offset pointing at target center
-        const targetCenter = targetRect.left + window.scrollX + (targetRect.width / 2);
-        const arrowLeft = Math.max(16, Math.min(popupWidth - 24, targetCenter - left - 8));
-
-        this.popupEl.style.top = `${top}px`;
-        this.popupEl.style.left = `${left}px`;
-        this.popupEl.style.setProperty('--p-popup-arrow-left', `${arrowLeft}px`);
     }
 
     private renderContent(opt: ConfirmPopupOptions) {
