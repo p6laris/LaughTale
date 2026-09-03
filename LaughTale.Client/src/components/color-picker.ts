@@ -2,6 +2,7 @@ import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts
 import type { IslandContext } from '../runtime/registry';
 import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
+import { useFloatingPosition } from '../composables/useFloatingPosition';
 import { html, setHtml, attr, type Raw } from '../runtime/html';
 import { announce } from '../accessibility/announcer';
 import type { PatternDeclaration } from '../accessibility/patterns';
@@ -82,7 +83,7 @@ export default function ColorPickerIsland(container: HTMLElement, props: ColorPi
             <span class="colorpicker-hex-label" style="font-family: monospace; font-size: 0.8125rem; font-weight: 600; color: var(--lt-surface-800);">${currentColor.toUpperCase()}</span>
 
             <!-- Palette Popover -->
-            <div class="colorpicker-palette-overlay" style="display: none; position: absolute; top: calc(100% + 8px); left: 0; z-index: 600; background: var(--lt-surface-0); border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius-lg); box-shadow: var(--p-shadow-lg); padding: 0.875rem; width: 220px; box-sizing: border-box;">
+            <div class="colorpicker-palette-overlay" style="display: none; z-index: 600; background: var(--lt-surface-0); border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius-lg); box-shadow: var(--p-shadow-lg); padding: 0.875rem; width: 220px; box-sizing: border-box;">
                 <div style="font-size: 0.6875rem; font-weight: 700; color: var(--lt-surface-500); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.625rem;">Palette Swatches</div>
                 
                 <!-- 5-Column Swatch Grid -->
@@ -142,9 +143,21 @@ export default function ColorPickerIsland(container: HTMLElement, props: ColorPi
         syncValue();
     }
 
+    let floatingHandle: { update: () => void } | null = null;
+
     function toggleOverlay(show?: boolean) {
         isOpen = show !== undefined ? show : !isOpen;
         overlay.style.display = isOpen ? 'block' : 'none';
+        if (isOpen) {
+            floatingHandle = useFloatingPosition(triggerBtn, overlay, {
+                placement: 'bottom-start',
+                reposition: 'follow',
+                signal: ctx?.signal,
+                offset: 8
+            });
+        } else {
+            floatingHandle = null;
+        }
     }
 
     if (!props.disabled) {

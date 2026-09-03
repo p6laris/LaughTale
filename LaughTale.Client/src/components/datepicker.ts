@@ -9,6 +9,7 @@ import { injectIslandStyle } from '../runtime/styles';
 import { useDisclosure } from '../composables/useDisclosure';
 import { useClickOutside } from '../composables/useClickOutside';
 import { useLocale } from '../composables/useLocale';
+import { useFloatingPosition } from '../composables/useFloatingPosition';
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
@@ -130,9 +131,6 @@ const CSS = `
 
 /* Overlay & Panel */
 .dp-overlay {
-    position: absolute;
-    top: calc(100% + 4px);
-    left: 0;
     z-index: 1000;
     display: none;
 }
@@ -565,6 +563,7 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
         const trigger = container.querySelector<HTMLElement>('.dp-trigger')!;
         const overlay = container.querySelector<HTMLElement>('.dp-overlay')!;
         const panel = container.querySelector<HTMLElement>('.dp-panel')!;
+        let floatingHandle: { update: () => void } | null = null;
 
         const disclosure = useDisclosure({
             defaultIsOpen: false,
@@ -572,11 +571,18 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
                 overlay.style.display = 'block';
                 trigger.classList.add('focused');
                 trigger.setAttribute('aria-expanded', 'true');
+                floatingHandle = useFloatingPosition(trigger, overlay, {
+                    placement: 'bottom-start',
+                    reposition: 'follow',
+                    signal: ctx?.signal,
+                    offset: 4
+                });
             },
             onClose: () => {
                 overlay.style.display = 'none';
                 trigger.classList.remove('focused');
                 trigger.setAttribute('aria-expanded', 'false');
+                floatingHandle = null;
             }
         });
 

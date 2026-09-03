@@ -12,6 +12,7 @@ import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts
 import type { IslandContext } from '../runtime/registry';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import { useVirtualizer, type Virtualizer } from '../composables/useVirtualizer';
+import { useFloatingPosition } from '../composables/useFloatingPosition';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -238,9 +239,6 @@ const CSS = `
 
 /* ==================== SELECT OVERLAY ==================== */
 .p-select-overlay {
-    position: absolute;
-    top: calc(100% + 4px);
-    left: 0;
     min-width: 100%;
     width: max-content;
     max-width: 24rem;
@@ -870,16 +868,27 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
         if (vListEl) vListEl.style.transform = `translateY(${startOffset}px)`;
     }
 
+    let floatingHandle: { update: () => void } | null = null;
+
     function toggleOverlay(open?: boolean) {
         if (isDisabled || isReadonly) return;
         isOpen = open !== undefined ? open : !isOpen;
-        const overlay = container.querySelector('.p-select-overlay');
+        const overlay = container.querySelector<HTMLElement>('.p-select-overlay');
         const chevron = container.querySelector('.p-select-dropdown');
 
         if (isOpen) {
             container.classList.add('is-open');
             overlay?.classList.add('is-visible');
             container.setAttribute('aria-expanded', 'true');
+            if (overlay) {
+                overlay.style.minWidth = `${container.offsetWidth || 200}px`;
+                floatingHandle = useFloatingPosition(container, overlay, {
+                    placement: 'bottom-start',
+                    reposition: 'follow',
+                    signal: ctx?.signal,
+                    offset: 4
+                });
+            }
             updateVirtualPositions();
             if (hasFilter) {
                 const t = setTimeout(() => {
@@ -892,6 +901,7 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
             overlay?.classList.remove('is-visible');
             container.setAttribute('aria-expanded', 'false');
             filterQuery = '';
+            floatingHandle = null;
         }
     }
 

@@ -44,8 +44,8 @@ describe('Batch C Anchored Panels Suite (US1 / T045)', () => {
         const topPx = parseInt(overlay.style.top || '0', 10);
         assert.ok(topPx < 750, `Autocomplete overlay top (${topPx}px) should flip above trigger (< 750px)`);
 
-        // Scroll tracking
-        anchorY = 600;
+        // Scroll tracking: moves upward with anchor
+        anchorY = 720;
         window.dispatchEvent(new Event('scroll'));
         const updatedTop = parseInt(overlay.style.top || '0', 10);
         assert.ok(updatedTop < topPx, `Autocomplete overlay should follow anchor on scroll (${updatedTop}px < ${topPx}px)`);
@@ -73,7 +73,7 @@ describe('Batch C Anchored Panels Suite (US1 / T045)', () => {
         const topPx = parseInt(overlay.style.top || '0', 10);
         assert.ok(topPx < 750, `DatePicker overlay top (${topPx}px) should flip above trigger (< 750px)`);
 
-        anchorY = 600;
+        anchorY = 720;
         window.dispatchEvent(new Event('scroll'));
         const updatedTop = parseInt(overlay.style.top || '0', 10);
         assert.ok(updatedTop < topPx, `DatePicker overlay should follow anchor on scroll (${updatedTop}px < ${topPx}px)`);
@@ -90,8 +90,7 @@ describe('Batch C Anchored Panels Suite (US1 / T045)', () => {
             ]
         });
 
-        const trigger = container.querySelector<HTMLElement>('.p-treeselect-trigger') || container;
-        trigger.getBoundingClientRect = () => ({
+        container.getBoundingClientRect = () => ({
             top: anchorY, bottom: anchorY + 38, left: 100, right: 300, width: 200, height: 38, x: 100, y: anchorY, toJSON: () => {}
         });
 
@@ -100,12 +99,13 @@ describe('Batch C Anchored Panels Suite (US1 / T045)', () => {
             top: 0, bottom: 200, left: 0, right: 200, width: 200, height: 200, x: 0, y: 0, toJSON: () => {}
         });
 
-        trigger.click();
+        const labelContainer = container.querySelector<HTMLElement>('.p-treeselect-label-container')!;
+        labelContainer.click();
 
         const topPx = parseInt(overlay.style.top || '0', 10);
         assert.ok(topPx < 750, `TreeSelect overlay top (${topPx}px) should flip above trigger (< 750px)`);
 
-        anchorY = 600;
+        anchorY = 720;
         window.dispatchEvent(new Event('scroll'));
         const updatedTop = parseInt(overlay.style.top || '0', 10);
         assert.ok(updatedTop < topPx, `TreeSelect overlay should follow anchor on scroll (${updatedTop}px < ${topPx}px)`);
@@ -135,7 +135,7 @@ describe('Batch C Anchored Panels Suite (US1 / T045)', () => {
         const topPx = parseInt(overlay.style.top || '0', 10);
         assert.ok(topPx < 750, `MultiSelect overlay top (${topPx}px) should flip above trigger (< 750px)`);
 
-        anchorY = 600;
+        anchorY = 720;
         window.dispatchEvent(new Event('scroll'));
         const updatedTop = parseInt(overlay.style.top || '0', 10);
         assert.ok(updatedTop < topPx, `MultiSelect overlay should follow anchor on scroll (${updatedTop}px < ${topPx}px)`);
@@ -165,7 +165,7 @@ describe('Batch C Anchored Panels Suite (US1 / T045)', () => {
         const topPx = parseInt(overlay.style.top || '0', 10);
         assert.ok(topPx < 750, `ColorPicker overlay top (${topPx}px) should flip above trigger (< 750px)`);
 
-        anchorY = 600;
+        anchorY = 720;
         window.dispatchEvent(new Event('scroll'));
         const updatedTop = parseInt(overlay.style.top || '0', 10);
         assert.ok(updatedTop < topPx, `ColorPicker overlay should follow anchor on scroll (${updatedTop}px < ${topPx}px)`);
@@ -180,8 +180,7 @@ describe('Batch C Anchored Panels Suite (US1 / T045)', () => {
             options: ['Alpha', 'Beta', 'Gamma']
         });
 
-        const trigger = container.querySelector<HTMLElement>('.p-select-trigger-wrap') || container;
-        trigger.getBoundingClientRect = () => ({
+        container.getBoundingClientRect = () => ({
             top: anchorY, bottom: anchorY + 38, left: 100, right: 300, width: 200, height: 38, x: 100, y: anchorY, toJSON: () => {}
         });
 
@@ -190,12 +189,12 @@ describe('Batch C Anchored Panels Suite (US1 / T045)', () => {
             top: 0, bottom: 180, left: 0, right: 200, width: 200, height: 180, x: 0, y: 0, toJSON: () => {}
         });
 
-        trigger.click();
+        container.click();
 
         const topPx = parseInt(overlay.style.top || '0', 10);
         assert.ok(topPx < 750, `Select overlay top (${topPx}px) should flip above trigger (< 750px)`);
 
-        anchorY = 600;
+        anchorY = 720;
         window.dispatchEvent(new Event('scroll'));
         const updatedTop = parseInt(overlay.style.top || '0', 10);
         assert.ok(updatedTop < topPx, `Select overlay should follow anchor on scroll (${updatedTop}px < ${topPx}px)`);

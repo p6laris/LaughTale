@@ -5,6 +5,7 @@ import { injectIslandStyle } from '../runtime/styles';
 import { useDisclosure } from '../composables/useDisclosure';
 import { useClickOutside } from '../composables/useClickOutside';
 import { useDebounce } from '../composables/useDebounce';
+import { useFloatingPosition } from '../composables/useFloatingPosition';
 import { html, setHtml, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
@@ -226,10 +227,6 @@ const CSS = `
 
 /* Floating Overlay Panel */
 .ac-overlay {
-    position: absolute;
-    top: calc(100% + 4px);
-    left: 0;
-    right: 0;
     z-index: 1000;
     background: var(--lt-surface-0);
     border: 1px solid var(--lt-surface-200);
@@ -418,17 +415,28 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
     const dropdownBtn = container.querySelector<HTMLButtonElement>('.ac-dropdown-btn');
     const overlay = container.querySelector<HTMLElement>('.ac-overlay')!;
 
+    const rootWrap = container.querySelector<HTMLElement>('.laughtale-autocomplete') || container;
+    let floatingHandle: { update: () => void } | null = null;
+
     const disclosure = useDisclosure({
         defaultIsOpen: false,
         onOpen: () => {
             overlay.style.display = 'block';
             input.setAttribute('aria-expanded', 'true');
             renderDropdown();
+            overlay.style.minWidth = `${rootWrap.offsetWidth || 200}px`;
+            floatingHandle = useFloatingPosition(rootWrap, overlay, {
+                placement: 'bottom-start',
+                reposition: 'follow',
+                signal: ctx?.signal,
+                offset: 4
+            });
         },
         onClose: () => {
             overlay.style.display = 'none';
             input.setAttribute('aria-expanded', 'false');
             highlightedIndex = -1;
+            floatingHandle = null;
             if (forceSelection && !multiple && searchQuery) {
                 const exact = allItems.find(i => i.label.toLowerCase() === searchQuery.toLowerCase());
                 if (!exact) {

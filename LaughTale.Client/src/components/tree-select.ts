@@ -10,6 +10,7 @@ import { LucideIcons, getLucideIcon } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
 import { useDisclosure } from '../composables/useDisclosure';
 import { useClickOutside } from '../composables/useClickOutside';
+import { useFloatingPosition } from '../composables/useFloatingPosition';
 import { useControllableState } from '../composables/useControllableState';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
@@ -237,10 +238,6 @@ const CSS = `
 
 /* Dropdown Overlay */
 .p-treeselect-overlay {
-    position: absolute;
-    top: calc(100% + 4px);
-    left: 0;
-    right: 0;
     min-width: 100%;
     z-index: 1000;
     background: var(--lt-surface-0);
@@ -612,12 +609,23 @@ export default function TreeSelectIsland(container: HTMLElement, props: TreeSele
 
     let searchQuery = '';
 
+    let floatingHandle: { update: () => void } | null = null;
+
     const disclosure = useDisclosure({
         defaultIsOpen: false,
         onOpen: () => {
             container.classList.add('is-open', 'is-focused');
             const overlay = container.querySelector<HTMLElement>('.p-treeselect-overlay');
-            if (overlay) overlay.classList.add('is-open');
+            if (overlay) {
+                overlay.classList.add('is-open');
+                overlay.style.minWidth = `${container.offsetWidth || 200}px`;
+                floatingHandle = useFloatingPosition(container, overlay, {
+                    placement: 'bottom-start',
+                    reposition: 'follow',
+                    signal: ctx?.signal,
+                    offset: 4
+                });
+            }
             if (isFilter) {
                 const filterInp = container.querySelector<HTMLInputElement>('.p-treeselect-filter-input');
                 const tFocus = setTimeout(() => filterInp?.focus(), 50);
@@ -628,10 +636,11 @@ export default function TreeSelectIsland(container: HTMLElement, props: TreeSele
             container.classList.remove('is-open', 'is-focused');
             const overlay = container.querySelector<HTMLElement>('.p-treeselect-overlay');
             if (overlay) overlay.classList.remove('is-open');
+            floatingHandle = null;
         }
     });
 
-    useClickOutside(container, () => disclosure.close());
+    useClickOutside(container, () => disclosure.close(), { signal: ctx?.signal });
 
     function init() {
         const rootClasses = [

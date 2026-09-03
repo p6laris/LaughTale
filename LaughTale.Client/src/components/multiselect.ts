@@ -10,6 +10,7 @@ import { injectIslandStyle } from '../runtime/styles';
 import { LucideIcons } from '../icons/lucide';
 import { useDisclosure } from '../composables/useDisclosure';
 import { useClickOutside } from '../composables/useClickOutside';
+import { useFloatingPosition } from '../composables/useFloatingPosition';
 import { useTransition } from '../composables/animation/useTransition';
 import { useKeyboardNav } from '../composables/useKeyboardNav';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
@@ -94,7 +95,7 @@ export default function MultiSelectIsland<T = string>(container: HTMLElement, pr
             </div>
 
             <!-- Popover Overlay -->
-            <div class="multiselect-overlay" style="display: none; position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 500; background: var(--lt-surface-0); border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius-lg); box-shadow: var(--p-shadow-lg); overflow: hidden;">
+            <div class="multiselect-overlay" style="display: none; z-index: 500; background: var(--lt-surface-0); border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius-lg); box-shadow: var(--p-shadow-lg); overflow: hidden;">
                 <!-- Filter Search Box -->
                 <div style="padding: 0.5rem; border-bottom: 1px solid var(--lt-surface-200); display: flex; align-items: center; gap: 0.5rem;">
                     <span style="color: var(--lt-surface-400); display: flex;">${unsafe(LucideIcons.search)}</span>
@@ -123,6 +124,7 @@ export default function MultiSelectIsland<T = string>(container: HTMLElement, pr
     const chevron = container.querySelector<HTMLElement>('.multiselect-chevron')!;
 
     const overlayTransition = useTransition(overlay, { preset: 'fade' });
+    let floatingHandle: { update: () => void } | null = null;
 
     const disclosure = useDisclosure({
         defaultIsOpen: false,
@@ -131,16 +133,24 @@ export default function MultiSelectIsland<T = string>(container: HTMLElement, pr
             filterInput.value = '';
             filterQuery = '';
             renderList();
+            overlay.style.width = `${trigger.offsetWidth}px`;
+            floatingHandle = useFloatingPosition(trigger, overlay, {
+                placement: 'bottom-start',
+                reposition: 'follow',
+                signal: ctx?.signal,
+                offset: 4
+            });
             overlayTransition.enter();
             filterInput.focus();
         },
         onClose: () => {
             chevron.style.transform = 'none';
             overlayTransition.exit();
+            floatingHandle = null;
         }
     });
 
-    useClickOutside(container, () => disclosure.close());
+    useClickOutside(container, () => disclosure.close(), { signal: ctx?.signal });
 
     function getFilteredOptions() {
         if (!filterQuery.trim()) return options;

@@ -60,9 +60,8 @@ export function useFloatingPosition(
     if (reposition === 'dismiss' && !options.onDismiss) {
         throw new Error('useFloatingPosition: onDismiss callback is required when reposition is "dismiss"');
     }
-    if (reposition !== 'none' && !signal) {
-        throw new Error('useFloatingPosition: signal is required when reposition is not "none"');
-    }
+    const fallbackController = new AbortController();
+    const effectiveSignal = signal || fallbackController.signal;
 
     const cleanupFns: Array<() => void> = [];
     let isDestroyed = false;
@@ -70,6 +69,7 @@ export function useFloatingPosition(
     function destroy() {
         if (isDestroyed) return;
         isDestroyed = true;
+        fallbackController.abort();
         while (cleanupFns.length > 0) {
             try {
                 cleanupFns.pop()!();
@@ -98,7 +98,15 @@ export function useFloatingPosition(
 
     function computePosition(): FloatingCoords {
         const refRect = getReferenceRect();
-        const floatRect = floating.getBoundingClientRect();
+        const rawFloatRect = floating.getBoundingClientRect();
+        const floatRect = {
+            top: rawFloatRect.top,
+            bottom: rawFloatRect.bottom,
+            left: rawFloatRect.left,
+            right: rawFloatRect.right,
+            width: rawFloatRect.width || floating.offsetWidth || 150,
+            height: rawFloatRect.height || floating.offsetHeight || 150
+        };
         const vpWidth = window.innerWidth;
         const vpHeight = window.innerHeight;
 
@@ -237,8 +245,8 @@ export function useFloatingPosition(
     if (reposition === 'follow' && typeof window !== 'undefined') {
         const onScroll = () => { update(); };
         const onResize = () => { update(); };
-        window.addEventListener('scroll', onScroll, { capture: true, passive: true, signal });
-        window.addEventListener('resize', onResize, { passive: true, signal });
+        window.addEventListener('scroll', onScroll, { capture: true, passive: true, signal: effectiveSignal });
+        window.addEventListener('resize', onResize, { passive: true, signal: effectiveSignal });
         cleanupFns.push(() => window.removeEventListener('scroll', onScroll, { capture: true }));
         cleanupFns.push(() => window.removeEventListener('resize', onResize));
 
@@ -251,11 +259,12 @@ export function useFloatingPosition(
         const handleDismiss = () => {
             options.onDismiss?.();
         };
-        window.addEventListener('scroll', handleDismiss, { capture: true, passive: true, signal });
-        window.addEventListener('resize', handleDismiss, { passive: true, signal });
+        window.addEventListener('scroll', handleDismiss, { capture: true, passive: true, signal: effectiveSignal });
+        window.addEventListener('resize', handleDismiss, { passive: true, signal: effectiveSignal });
         cleanupFns.push(() => window.removeEventListener('scroll', handleDismiss, { capture: true }));
         cleanupFns.push(() => window.removeEventListener('resize', handleDismiss));
     }
 
+    update();
     return { update, computePosition, destroy };
 }
