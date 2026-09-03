@@ -25,10 +25,10 @@ standard, and the thing meant to consume it never adopts it.
 |---|---|
 | `useVirtualizer` | **0 / 76** components |
 | `useFloatingPosition` | **0 / 76** |
-| `useKeyboardNav` | **0 / 76** |
+| `useKeyboardNav` | **7 / 76** (Spec 042) |
 | `useDataSource` | **0 / 76** |
 | `useHotkeys` | **0 / 76** |
-| `useFocusTrap` | **1 / 76** |
+| `useFocusTrap` | **7 / 7 modals** (Spec 042, 100% of modals) |
 | `IslandModule.createHandle` | **0** implementations |
 | `sanitizeHtml` / `sanitizeUrl` (333 lines) | **4 / 76** |
 
@@ -194,11 +194,18 @@ The organ that doesn't exist in any form. Everything in Part D and most of Part 
 Theming is genuinely strong (247 tokens, palette generator, contrast checker). The gaps are in
 behaviour, and the fixes are sitting unused in `src/composables/`.
 
-- **Accessibility pass** *(Radix, Ark UI · M · 3–4 wks)* — **21 of 76** components emit no `aria-*` at
-  all, including `multiselect`, `menu`, `popover`, `radio-button`. **Zero focus traps ship.**
-  `multiselect` has no `Escape` handler. Typeahead exists in exactly one component. Wire in
-  `useFocusTrap` (all 9 overlays) and `useKeyboardNav`; document the WAI-ARIA pattern each component
-  implements. *For an "enterprise" framework this is procurement-blocking, not polish.*
+- **Accessibility pass** *(Radix, Ark UI · M · 3–4 wks)* — **[CLOSED — Spec 042]** All **76 of 76**
+  components now declare and strictly conform to machine-verified WAI-ARIA APG contracts (`kind: 'pattern'`,
+  `kind: 'native'`, or `kind: 'presentational'`) with zero architecture lint violations. `ariaZeroComponents`
+  reduced from 21 to **0**. Full keyboard operability restored across all 76 components (Escape unwinding,
+  Arrow navigation via roving tabindex, typeahead buffer). Adopted `useKeyboardNav` across hierarchical/menu
+  components and `useFocusTrap` across 100% of modal overlay containers (7 total: `dialog`, `drawer`,
+  `confirm-dialog`, `sidebar`, `confirm-popup`, `galleria`, `command`).
+  *Note on inherited figures*: The original inherited roadmap target of **9** overlay focus traps was
+  not reproducible from source code upon audit. Only **7** true modal overlay components exist in LaughTale;
+  non-modal overlays (`popover`, `menu`, `context-menu`, `tieredmenu`, `menubar`) explicitly must NOT trap
+  focus per WAI-ARIA and Invariant I3. This represents the third inherited roadmap metric in LaughTale to fail
+  source code reproduction (joining `listenersUnmanaged: 374` and `hexHardcoded: 716`).
 - **Form association** *(web platform · M · 2–3 wks)* — **0** components use `ElementInternals`; only
   10 sync a hidden input. In a server-driven framework, forms are the primary interaction, so every
   input must appear in the native `FormData` POST without JS. Prerequisite for server actions

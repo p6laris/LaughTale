@@ -33,6 +33,10 @@ jobs:
         working-directory: ./LaughTale.Client
         run: npm run lint:contracts
 
+      - name: Audit Metrics Ratchet
+        working-directory: ./LaughTale.Client
+        run: npm run lint:metrics
+
       - name: Audit Server Security
         run: node scripts/audit-server-security.mjs
 
