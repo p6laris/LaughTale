@@ -10,6 +10,7 @@ import { LucideIcons } from '../icons/lucide';
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import { useVirtualizer, type Virtualizer } from '../composables/useVirtualizer';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -146,6 +147,19 @@ const ORDERLIST_CSS = `
     overflow-y: auto;
     display: flex;
     flex-direction: column;
+}
+.p-virtual-spacer {
+    position: relative;
+    width: 100%;
+}
+.p-virtual-list {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
 }
 
 .p-orderlist-item {
@@ -479,6 +493,78 @@ export default function OrderListIsland<T = any>(container: HTMLElement, props: 
         dispatchSelectionEvent();
     }
 
+    const ITEM_HEIGHT = 46;
+    let virtualizer: Virtualizer | null = null;
+    let currentStart = -1;
+    let currentEnd = -1;
+    let currentFilteredItems: any[] = [];
+    let scrollBound = false;
+    let lastFocusedId: string | null = null;
+
+    function renderOrderItemHtml(item: any, idx: number, totalCount: number): Raw {
+        const id = getItemId(item, idx);
+        const isSelected = selectedIds.has(id);
+        return html`
+            <li class="p-orderlist-item ${isSelected ? 'p-highlight' : ''}" 
+                data-id="${id}" 
+                data-index="${idx}"
+                role="option" 
+                aria-selected="${isSelected}"
+                aria-setsize="${totalCount}"
+                aria-posinset="${idx + 1}"
+                tabindex="${idx === 0 ? '0' : '-1'}">
+                ${renderCellContent(item, idx, isSelected)}
+            </li>
+        `;
+    }
+
+    function bindItemClicks() {
+        const rootEl = container.firstElementChild as HTMLElement;
+        if (!rootEl) return;
+        const listUl = rootEl.querySelector<HTMLUListElement>('.p-orderlist-list');
+        if (!listUl) return;
+
+        listUl.querySelectorAll<HTMLElement>('.p-orderlist-item').forEach(el => {
+            el.addEventListener('focus', () => {
+                const id = el.getAttribute('data-id');
+                if (id) lastFocusedId = id;
+            }, { signal: ctx?.signal });
+
+            el.addEventListener('click', (e) => {
+                const id = el.getAttribute('data-id');
+                if (!id) return;
+                lastFocusedId = id;
+                const mouseEvent = e as MouseEvent;
+
+                if (isCheckbox || mouseEvent.ctrlKey || mouseEvent.metaKey) {
+                    if (selectedIds.has(id)) selectedIds.delete(id);
+                    else selectedIds.add(id);
+                } else {
+                    if (selectedIds.has(id) && selectedIds.size === 1) {
+                        selectedIds.clear();
+                    } else {
+                        selectedIds.clear();
+                        selectedIds.add(id);
+                    }
+                }
+                updateSelectionUI();
+            }, { signal: ctx?.signal });
+        });
+    }
+
+    function restoreFocus() {
+        if (!lastFocusedId) return;
+        const rootEl = container.firstElementChild as HTMLElement;
+        if (!rootEl) return;
+        const targetEl = rootEl.querySelector<HTMLElement>(`.p-orderlist-item[data-id="${lastFocusedId}"]`);
+        if (targetEl) {
+            targetEl.setAttribute('tabindex', '0');
+            if (rootEl.contains(document.activeElement)) {
+                targetEl.focus();
+            }
+        }
+    }
+
     function updateListStructure() {
         const rootEl = container.firstElementChild as HTMLElement;
         if (!rootEl) return;
@@ -488,6 +574,7 @@ export default function OrderListIsland<T = any>(container: HTMLElement, props: 
             const targetVal = String((item as any)[filterBy] || item.title || item.name || '').toLowerCase();
             return targetVal.includes(filterQuery.toLowerCase());
         });
+        currentFilteredItems = filteredItems;
 
         // Update Results Count
         const resultsEl = rootEl.querySelector('.p-orderlist-results-status');
@@ -499,47 +586,68 @@ export default function OrderListIsland<T = any>(container: HTMLElement, props: 
         const listUl = rootEl.querySelector<HTMLUListElement>('.p-orderlist-list');
         if (listUl) {
             if (filteredItems.length === 0) {
+                virtualizer = null;
                 setHtml(listUl, html`<li class="p-orderlist-empty">${filterQuery ? 'No results found' : emptyMessage}</li>`);
+            } else if (filteredItems.length < 100) {
+                virtualizer = null;
+                const nodes: Raw[] = [];
+                for (let idx = 0; idx < filteredItems.length; idx++) {
+                    nodes.push(renderOrderItemHtml(filteredItems[idx], idx, filteredItems.length));
+                }
+                setHtml(listUl, html`${nodes}`);
+                bindItemClicks();
             } else {
-                setHtml(listUl, html`${filteredItems.map((item, idx) => {
-                    const id = getItemId(item, idx);
-                    const isSelected = selectedIds.has(id);
-                    return html`
-                        <li class="p-orderlist-item ${isSelected ? 'p-highlight' : ''}" 
-                            data-id="${id}" 
-                            data-index="${idx}"
-                            role="option" 
-                            aria-selected="${isSelected}">
-                            ${renderCellContent(item, idx, isSelected)}
-                        </li>
-                    `;
-                })}`);
-
-                // Bind item clicks
-                listUl.querySelectorAll<HTMLElement>('.p-orderlist-item').forEach(el => {
-                    el.addEventListener('click', (e) => {
-                        const id = el.getAttribute('data-id');
-                        if (!id) return;
-                        const mouseEvent = e as MouseEvent;
-
-                        if (isCheckbox || mouseEvent.ctrlKey || mouseEvent.metaKey) {
-                            if (selectedIds.has(id)) selectedIds.delete(id);
-                            else selectedIds.add(id);
-                        } else {
-                            if (selectedIds.has(id) && selectedIds.size === 1) {
-                                selectedIds.clear();
-                            } else {
-                                selectedIds.clear();
-                                selectedIds.add(id);
-                            }
-                        }
-                        updateSelectionUI();
-                    }, { signal: ctx?.signal });
+                virtualizer = useVirtualizer({
+                    count: filteredItems.length,
+                    estimateSize: 46,
+                    getScrollElement: () => listUl,
+                    virtualThreshold: 100
                 });
+                const virtualItems = virtualizer.getVirtualItems();
+                currentStart = virtualItems.length > 0 ? virtualItems[0].index : 0;
+                currentEnd = virtualItems.length > 0 ? virtualItems[virtualItems.length - 1].index : 0;
+                const startOffset = virtualItems.length > 0 ? virtualItems[0].start : 0;
+
+                setHtml(listUl, html`
+                    <div class="p-virtual-spacer" data-virtual-spacer>
+                        <ul class="p-virtual-list">
+                            ${virtualItems.map(vi => renderOrderItemHtml(filteredItems[vi.index], vi.index, filteredItems.length))}
+                        </ul>
+                    </div>
+                `);
+                const spacerEl = listUl.querySelector<HTMLElement>('.p-virtual-spacer');
+                const vListEl = listUl.querySelector<HTMLElement>('.p-virtual-list');
+                if (spacerEl) spacerEl.style.height = `${virtualizer.getTotalSize()}px`;
+                if (vListEl) vListEl.style.transform = `translateY(${startOffset}px)`;
+                bindItemClicks();
+
+                if (!scrollBound) {
+                    scrollBound = true;
+                    listUl.addEventListener('scroll', () => {
+                        if (!virtualizer || !virtualizer.isVirtual()) return;
+                        const newVirtualItems = virtualizer.getVirtualItems();
+                        if (newVirtualItems.length === 0) return;
+                        const newStart = newVirtualItems[0].index;
+                        const newEnd = newVirtualItems[newVirtualItems.length - 1].index;
+                        if (newStart === currentStart && newEnd === currentEnd) return;
+                        currentStart = newStart;
+                        currentEnd = newEnd;
+                        const newStartOffset = newVirtualItems[0].start;
+                        const vList = listUl.querySelector<HTMLElement>('.p-virtual-list');
+                        if (vList) {
+                            vList.style.transform = `translateY(${newStartOffset}px)`;
+                            const newNodes = newVirtualItems.map(vi => renderOrderItemHtml(currentFilteredItems[vi.index], vi.index, currentFilteredItems.length));
+                            setHtml(vList, html`${newNodes}`);
+                            bindItemClicks();
+                            restoreFocus();
+                        }
+                    }, { signal: ctx?.signal, passive: true });
+                }
             }
         }
 
         updateSelectionUI();
+        restoreFocus();
     }
 
     function updateButtons() {
@@ -605,20 +713,45 @@ export default function OrderListIsland<T = any>(container: HTMLElement, props: 
     }
 
     function navigateItems(delta: number, isShift: boolean) {
-        if (itemsList.length === 0) return;
-        let lastSelectedIdx = itemsList.findIndex((it, idx) => selectedIds.has(getItemId(it, idx)));
-        if (lastSelectedIdx === -1) lastSelectedIdx = delta > 0 ? -1 : itemsList.length;
-        const targetIdx = Math.max(0, Math.min(itemsList.length - 1, lastSelectedIdx + delta));
-        const targetId = getItemId(itemsList[targetIdx], targetIdx);
+        if (currentFilteredItems.length === 0) return;
+        let lastSelectedIdx = currentFilteredItems.findIndex((it, idx) => selectedIds.has(getItemId(it, idx)));
+        if (lastSelectedIdx === -1) lastSelectedIdx = delta > 0 ? -1 : currentFilteredItems.length;
+        const targetIdx = Math.max(0, Math.min(currentFilteredItems.length - 1, lastSelectedIdx + delta));
+        const targetId = getItemId(currentFilteredItems[targetIdx], targetIdx);
+        lastFocusedId = targetId;
 
         if (!isShift) selectedIds.clear();
         selectedIds.add(targetId);
 
+        const rootEl = container.firstElementChild as HTMLElement;
+        const listUl = rootEl?.querySelector<HTMLUListElement>('.p-orderlist-list');
+
+        if (virtualizer && virtualizer.isVirtual() && listUl) {
+            if (targetIdx < currentStart || targetIdx > currentEnd) {
+                virtualizer.scrollToIndex(targetIdx, 'auto');
+                const newVirtualItems = virtualizer.getVirtualItems();
+                if (newVirtualItems.length > 0) {
+                    currentStart = newVirtualItems[0].index;
+                    currentEnd = newVirtualItems[newVirtualItems.length - 1].index;
+                    const newStartOffset = newVirtualItems[0].start;
+                    const vList = listUl.querySelector<HTMLElement>('.p-virtual-list');
+                    if (vList) {
+                        vList.style.transform = `translateY(${newStartOffset}px)`;
+                        const newNodes = newVirtualItems.map(vi => renderOrderItemHtml(currentFilteredItems[vi.index], vi.index, currentFilteredItems.length));
+                        setHtml(vList, html`${newNodes}`);
+                        bindItemClicks();
+                    }
+                }
+            }
+        }
+
         updateSelectionUI();
 
-        const rootEl = container.firstElementChild as HTMLElement;
+        const allRendered = Array.from(rootEl?.querySelectorAll<HTMLElement>('.p-orderlist-item') || []);
         const targetEl = rootEl?.querySelector<HTMLElement>(`.p-orderlist-item[data-id="${targetId}"]`);
         if (targetEl) {
+            allRendered.forEach(el => el.setAttribute('tabindex', el === targetEl ? '0' : '-1'));
+            targetEl.focus();
             targetEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
         }
     }
