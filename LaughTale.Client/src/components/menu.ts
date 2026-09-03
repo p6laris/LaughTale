@@ -1,5 +1,6 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
+import { useFloatingPosition } from '../composables/useFloatingPosition';
 ﻿/**
  * LaughTale: Enterprise Menu Component (LaughTale Aura Design System)
  * Navigation and command menu supporting dynamic popup overlay (fixed body-anchored),
@@ -661,6 +662,8 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
         }
     }
 
+    let floatingCtrl: { update(): void; destroy(): void } | null = null;
+
     function openPopup(trigger: HTMLElement) {
         if (isOpen) {
             closePopup();
@@ -676,11 +679,15 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
         const menuEl = popupEl.querySelector<HTMLElement>('.p-menu')!;
         wireEvents(menuEl);
 
-        const rect = trigger.getBoundingClientRect();
-        menuEl.style.position = 'fixed';
-        menuEl.style.top = `${rect.bottom + 4}px`;
-        menuEl.style.left = `${rect.left}px`;
         menuEl.style.zIndex = '9999';
+        floatingCtrl = useFloatingPosition(trigger, menuEl, {
+            placement: 'bottom-start',
+            offset: 4,
+            strategy: 'fixed',
+            reposition: 'follow',
+            signal: ctx?.signal
+        });
+        floatingCtrl.update();
 
         const clickOutsideHandler = (e: MouseEvent) => {
             if (popupEl && !popupEl.contains(e.target as Node) && !trigger.contains(e.target as Node)) {
@@ -694,6 +701,10 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
 
     function closePopup() {
         isOpen = false;
+        if (floatingCtrl) {
+            floatingCtrl.destroy();
+            floatingCtrl = null;
+        }
         if (popupEl) {
             popupEl.remove();
             popupEl = null;
