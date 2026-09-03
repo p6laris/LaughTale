@@ -3,6 +3,12 @@ import type { IslandContext } from '../runtime/registry';
 import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
 import { html, setHtml, attr, type Raw } from '../runtime/html';
+import type { PatternDeclaration } from '../accessibility/patterns';
+
+export const a11y: PatternDeclaration = {
+    kind: 'native',
+    element: 'input'
+};
 
 export interface ColorPickerProps {
     value?: string; // Hex color e.g. 'var(--lt-primary-500, var(--lt-primary-500))'

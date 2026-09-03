@@ -2,6 +2,12 @@ import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts
 import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import type { PatternDeclaration } from '../accessibility/patterns';
+
+export const a11y: PatternDeclaration = {
+    kind: 'pattern',
+    pattern: 'status'
+};
 
 /**
  * LaughTale: Enterprise Status Tag & Badge Component (Aura Design System compliant)
@@ -172,6 +178,8 @@ export default function TagIsland(container: HTMLElement, props: TagProps, ctx?:
 
     const rootEl = document.createElement('span');
     rootEl.className = `p-tag p-component p-tag-${severity} ${isRounded ? 'p-tag-rounded' : ''} ${props.class || ''}`.trim();
+    rootEl.setAttribute('role', 'status');
+    rootEl.setAttribute('aria-live', 'polite');
     if (props.style) rootEl.style.cssText += props.style;
 
     const iconHtml = props.icon ? html`<span class="p-tag-icon">${unsafe(getIconSvg(props.icon))}</span>` : '';

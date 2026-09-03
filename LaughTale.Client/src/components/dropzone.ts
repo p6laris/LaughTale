@@ -3,6 +3,12 @@ import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
 import { LucideIcons } from '../icons/lucide';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import type { PatternDeclaration } from '../accessibility/patterns';
+
+export const a11y: PatternDeclaration = {
+    kind: 'native',
+    element: 'input'
+};
 
 export interface DropzoneProps {
     targetInputName: string;
@@ -114,7 +120,7 @@ export default function DropzoneIsland(container: HTMLElement, props: DropzonePr
                 <span class="p-tag p-tag-info" style="font-size: 0.6875rem;">Client Dropzone</span>
             </div>
 
-            <div class="dropzone-box">
+            <div class="dropzone-box" tabindex="0">
                 <input type="file" class="file-input" name="${props.targetInputName || 'file'}" accept="${props.allowedExtensions || '*/*'}" style="display: none;" />
                 
                 <div class="dropzone-icon">
@@ -136,6 +142,12 @@ export default function DropzoneIsland(container: HTMLElement, props: DropzonePr
     const preview = container.querySelector('.preview-area') as HTMLElement;
 
     box.addEventListener('click', () => input.click(), { signal: ctx?.signal });
+    box.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            input.click();
+        }
+    }, { signal: ctx?.signal });
 
     box.addEventListener('dragover', (e) => {
         e.preventDefault();
