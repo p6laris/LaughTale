@@ -531,7 +531,7 @@ export default function TieredMenuIsland(container: HTMLElement, props: TieredMe
                 placement: 'right-start',
                 offset: 4,
                 strategy: 'absolute',
-                boundary: (rootEl.offsetParent as HTMLElement) || undefined,
+                boundary: (rootEl?.offsetParent as HTMLElement) || undefined,
                 axis: 'x',
                 reposition: 'none'
             });

@@ -1,5 +1,6 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
+import { useFloatingPosition } from '../composables/useFloatingPosition';
 ﻿/**
  * LaughTale: Enterprise Menubar Component (LaughTale Aura Design System)
  * Horizontal navigation menubar with multi-level cascading dropdowns, responsive mobile drawer/button,
@@ -510,11 +511,21 @@ export default function MenubarIsland(container: HTMLElement, props: MenubarProp
                     }
                     if (submenu) {
                         li.classList.add('p-active');
-                        // Submenu overflow flip check
-                        const rect = submenu.getBoundingClientRect();
-                        if (rect.right > window.innerWidth) {
+                        const subFloatingCtrl = useFloatingPosition(li, submenu, {
+                            placement: 'right-start',
+                            offset: 0,
+                            strategy: 'absolute',
+                            boundary: (container.offsetParent as HTMLElement) || undefined,
+                            axis: 'x',
+                            reposition: 'none'
+                        });
+                        const coords = subFloatingCtrl.computePosition();
+                        if (coords.actualPlacement.startsWith('left')) {
                             submenu.classList.add('p-submenu-flip');
+                        } else {
+                            submenu.classList.remove('p-submenu-flip');
                         }
+                        submenu.style.left = '';
                     }
                 }
             }, { signal: ctx?.signal });
@@ -523,6 +534,7 @@ export default function MenubarIsland(container: HTMLElement, props: MenubarProp
                 if (window.innerWidth > 960) {
                     if (submenu) {
                         li.classList.remove('p-active');
+                        submenu.classList.remove('p-submenu-flip');
                     }
                 }
             }, { signal: ctx?.signal });
