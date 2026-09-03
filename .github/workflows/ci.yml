@@ -33,6 +33,9 @@ jobs:
         working-directory: ./LaughTale.Client
         run: npm run lint:contracts
 
+      - name: Audit Server Security
+        run: node scripts/audit-server-security.mjs
+
       - name: TypeScript Typecheck
         working-directory: ./LaughTale.Client
         run: npm run typecheck

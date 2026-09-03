@@ -66,12 +66,17 @@ SSR becomes something you *install*, not something you rewrite core for.
 
 ---
 
-## 1. URGENT — three shipped bugs that outrank this roadmap
+## 1. URGENT — three shipped bugs that outrank this roadmap [ALL CLOSED]
 
-These are defects in code that ships today. The mitigations exist in the codebase; the components
-don't call them.
+> **Status (2026-09-03)**: All three urgent shipped bugs are now fully **CLOSED**:
+> - **§1.1**: Closed in Spec 039 (`039-zero-sink-architecture`, tagged template migration).
+> - **§1.3**: Closed in Spec 040 (`040-teardown-lifecycle`, teardown and signal bindings).
+> - **§1.2**: Closed in Spec 041 (`041-deny-by-default-authorization`, deny-by-default inversion).
 
-### 1.1 Component rendering bypasses your own HTML sanitizer
+These were defects in code that shipped previously. The mitigations existed in the codebase; the components
+and callers now strictly enforce them.
+
+### 1.1 Component rendering bypasses your own HTML sanitizer [CLOSED — Spec 039]
 
 `directives/security.ts` provides `sanitizeHtml()` with strict allowlists, `sanitizeUrl()` guarding
 `javascript:` and `vbscript:`, and `isSafeAttribute()`. **Of the 68 components that build markup with
@@ -98,16 +103,17 @@ becomes a stored XSS vector on render.
 
 **Fix**: the `html\`\`` primitive (§9). **Priority: above everything else in this document.**
 
-### 1.2 The refresh endpoint is fail-open on authorization
+### 1.2 The refresh endpoint is fail-open on authorization [CLOSED — Spec 041 / LT-2204]
 
-In `IslandEndpointExtensions.cs` the policy lookup falls through three sources and, if none matches,
-`policy` stays null and **the authorization block is skipped entirely** — the request proceeds. An
-island is protected only if someone remembered to register a policy.
-
-Same shape in `QueryableExtensions.cs`: the field allowlist applies only when supplied
-(`allowedFields != null && ...`) — omit it and every mapped property becomes filterable.
-
-**The primitives are good and the defaults are permissive.** Invert both.
+**Resolved (2026-09-03)**: Deny-by-default authorization and mandatory field allowlists are implemented library-wide across all five execution paths:
+- `failOpenAuthorizationSites`: **5 → 0**
+- `serviceAbsenceSkips`: **5 → 0**
+- `allowlistOptionalSites`: **3 → 0**
+- `unguardedDataEndpoints`: **1 → 0**
+- All 5 server authorization paths delegate to `IIslandAccessEvaluator`.
+- `IslandFieldPolicy` is mandatory; missing allowlists trigger compile-time errors.
+- Full test suite passes green (**268 / 268 passed**).
+- Automated CI audit enforcement wired via `scripts/audit-server-security.mjs`.
 
 ### 1.3 Every refresh and navigation leaks event listeners
 
