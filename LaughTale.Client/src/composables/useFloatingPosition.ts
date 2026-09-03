@@ -19,6 +19,9 @@ export interface UseFloatingPositionOptions {
     reposition?: 'follow' | 'dismiss' | 'none';
     onDismiss?: () => void;
     signal?: AbortSignal;
+    strategy?: 'fixed' | 'absolute';
+    boundary?: HTMLElement;
+    axis?: 'both' | 'x' | 'y';
 }
 
 export interface FloatingCoords {
@@ -31,6 +34,7 @@ export interface FloatingCoords {
 export interface FloatingController {
     update(): void;
     computePosition(): FloatingCoords;
+    destroy(): void;
 }
 
 export function useFloatingPosition(
@@ -42,6 +46,9 @@ export function useFloatingPosition(
     const autoFlip = options.autoFlip !== false;
     const viewportPadding = options.viewportPadding ?? 8;
     const reposition = options.reposition ?? 'none';
+    const strategy = options.strategy ?? 'fixed';
+    const boundary = options.boundary;
+    const axis = options.axis ?? 'both';
     const signal = options.signal;
     const initialPlacement: FloatingPlacement = options.placement ?? 'bottom-start';
 
@@ -55,6 +62,23 @@ export function useFloatingPosition(
     }
     if (reposition !== 'none' && !signal) {
         throw new Error('useFloatingPosition: signal is required when reposition is not "none"');
+    }
+
+    const cleanupFns: Array<() => void> = [];
+    let isDestroyed = false;
+
+    function destroy() {
+        if (isDestroyed) return;
+        isDestroyed = true;
+        while (cleanupFns.length > 0) {
+            try {
+                cleanupFns.pop()!();
+            } catch {}
+        }
+    }
+
+    if (signal) {
+        signal.addEventListener('abort', () => { destroy(); }, { once: true });
     }
 
     function getReferenceRect(): { top: number; bottom: number; left: number; right: number; width: number; height: number } {
@@ -78,14 +102,27 @@ export function useFloatingPosition(
         const vpWidth = window.innerWidth;
         const vpHeight = window.innerHeight;
 
+        let bTop = 0;
+        let bBottom = vpHeight;
+        let bLeft = 0;
+        let bRight = vpWidth;
+
+        if (boundary) {
+            const bRect = boundary.getBoundingClientRect();
+            bTop = bRect.top;
+            bBottom = bRect.bottom;
+            bLeft = bRect.left;
+            bRight = bRect.right;
+        }
+
         let placement = initialPlacement;
 
-        // Auto-flip logic if overflowing viewport
+        // Auto-flip logic if overflowing boundary
         if (autoFlip) {
-            const spaceTop = refRect.top;
-            const spaceBottom = vpHeight - refRect.bottom;
-            const spaceLeft = refRect.left;
-            const spaceRight = vpWidth - refRect.right;
+            const spaceTop = refRect.top - bTop;
+            const spaceBottom = bBottom - refRect.bottom;
+            const spaceLeft = refRect.left - bLeft;
+            const spaceRight = bRight - refRect.right;
 
             if (placement.startsWith('bottom') && spaceBottom < floatRect.height + offset && spaceTop > spaceBottom) {
                 placement = placement.replace('bottom', 'top') as FloatingPlacement;
@@ -152,9 +189,9 @@ export function useFloatingPosition(
                 break;
         }
 
-        // Keep inside viewport bounds
-        x = Math.max(viewportPadding, Math.min(vpWidth - floatRect.width - viewportPadding, x));
-        y = Math.max(viewportPadding, Math.min(vpHeight - floatRect.height - viewportPadding, y));
+        // Keep inside boundary bounds (viewport or container)
+        x = Math.max(bLeft + viewportPadding, Math.min(bRight - floatRect.width - viewportPadding, x));
+        y = Math.max(bTop + viewportPadding, Math.min(bBottom - floatRect.height - viewportPadding, y));
 
         let arrowOffset: number | undefined;
         if (options.arrow) {
@@ -176,23 +213,39 @@ export function useFloatingPosition(
             }
         }
 
+        if (strategy === 'absolute') {
+            const scrollX = typeof window !== 'undefined' ? window.scrollX : 0;
+            const scrollY = typeof window !== 'undefined' ? window.scrollY : 0;
+            x += scrollX;
+            y += scrollY;
+        }
+
         return { x, y, actualPlacement: placement, ...(arrowOffset != null ? { arrowOffset } : {}) };
     }
 
     function update() {
         const { x, y } = computePosition();
-        floating.style.position = 'fixed';
-        floating.style.left = `${Math.round(x)}px`;
-        floating.style.top = `${Math.round(y)}px`;
+        floating.style.position = strategy;
+        if (axis === 'both' || axis === 'x') {
+            floating.style.left = `${Math.round(x)}px`;
+        }
+        if (axis === 'both' || axis === 'y') {
+            floating.style.top = `${Math.round(y)}px`;
+        }
     }
 
     if (reposition === 'follow' && typeof window !== 'undefined') {
-        window.addEventListener('scroll', () => { update(); }, { capture: true, passive: true, signal });
-        window.addEventListener('resize', () => { update(); }, { passive: true, signal });
+        const onScroll = () => { update(); };
+        const onResize = () => { update(); };
+        window.addEventListener('scroll', onScroll, { capture: true, passive: true, signal });
+        window.addEventListener('resize', onResize, { passive: true, signal });
+        cleanupFns.push(() => window.removeEventListener('scroll', onScroll, { capture: true }));
+        cleanupFns.push(() => window.removeEventListener('resize', onResize));
+
         if (typeof ResizeObserver !== 'undefined') {
             const ro = new ResizeObserver(() => { update(); });
             ro.observe(floating);
-            signal?.addEventListener('abort', () => { ro.disconnect(); }, { once: true });
+            cleanupFns.push(() => ro.disconnect());
         }
     } else if (reposition === 'dismiss' && typeof window !== 'undefined') {
         const handleDismiss = () => {
@@ -200,7 +253,9 @@ export function useFloatingPosition(
         };
         window.addEventListener('scroll', handleDismiss, { capture: true, passive: true, signal });
         window.addEventListener('resize', handleDismiss, { passive: true, signal });
+        cleanupFns.push(() => window.removeEventListener('scroll', handleDismiss, { capture: true }));
+        cleanupFns.push(() => window.removeEventListener('resize', handleDismiss));
     }
 
-    return { update, computePosition };
+    return { update, computePosition, destroy };
 }
