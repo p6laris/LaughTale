@@ -21,12 +21,13 @@ public static class QueryableExtensions
     public static IslandDataResult<T> ToIslandDataResult<T>(
         this IQueryable<T> query,
         IslandDataRequest request,
-        IReadOnlySet<string>? allowedFields = null)
+        IslandFieldPolicy fieldPolicy)
     {
         ArgumentNullException.ThrowIfNull(query);
         ArgumentNullException.ThrowIfNull(request);
+        ArgumentNullException.ThrowIfNull(fieldPolicy);
 
-        var (filteredQuery, totalCount) = PrepareQuery(query, request, allowedFields);
+        var (filteredQuery, totalCount, refusedFields) = PrepareQuery(query, request, fieldPolicy);
 
         // Apply Paging (Skip / Take)
         int page = Math.Max(1, request.Page);
@@ -35,7 +36,10 @@ public static class QueryableExtensions
 
         var items = filteredQuery.Skip(skip).Take(pageSize).ToList();
 
-        return new IslandDataResult<T>(items, totalCount, page, pageSize);
+        return new IslandDataResult<T>(items, totalCount, page, pageSize)
+        {
+            RefusedFields = refusedFields
+        };
     }
 
     /// <summary>
@@ -44,11 +48,11 @@ public static class QueryableExtensions
     public static Task<IslandDataResult<T>> ToIslandDataResultAsync<T>(
         this IQueryable<T> query,
         IslandDataRequest request,
-        IReadOnlySet<string>? allowedFields = null,
+        IslandFieldPolicy fieldPolicy,
         CancellationToken cancellationToken = default)
     {
         // Executes query synchronously or via Task wrapper for standard IQueryable sources
-        return Task.Run(() => query.ToIslandDataResult(request, allowedFields), cancellationToken);
+        return Task.Run(() => query.ToIslandDataResult(request, fieldPolicy), cancellationToken);
     }
 
     /// <summary>
@@ -57,24 +61,27 @@ public static class QueryableExtensions
     public static IQueryable<T> ApplyIslandCriteria<T>(
         this IQueryable<T> query,
         IslandDataRequest request,
-        IReadOnlySet<string>? allowedFields = null)
+        IslandFieldPolicy fieldPolicy)
     {
         ArgumentNullException.ThrowIfNull(query);
         ArgumentNullException.ThrowIfNull(request);
+        ArgumentNullException.ThrowIfNull(fieldPolicy);
 
-        var (preparedQuery, _) = PrepareQuery(query, request, allowedFields);
+        var (preparedQuery, _, _) = PrepareQuery(query, request, fieldPolicy);
         return preparedQuery;
     }
 
-    private static (IQueryable<T> Query, int TotalCount) PrepareQuery<T>(
+    private static (IQueryable<T> Query, int TotalCount, IReadOnlyList<string> RefusedFields) PrepareQuery<T>(
         IQueryable<T> query,
         IslandDataRequest request,
-        IReadOnlySet<string>? allowedFields)
+        IslandFieldPolicy fieldPolicy)
     {
         var entityType = typeof(T);
         var properties = entityType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
                                    .Where(p => p.CanRead)
                                    .ToDictionary(p => p.Name, p => p, StringComparer.OrdinalIgnoreCase);
+
+        var refused = new List<string>();
 
         // 1. Apply Column Filters
         var effectiveFilters = request.GetEffectiveFilters();
@@ -85,13 +92,19 @@ public static class QueryableExtensions
                 if (string.IsNullOrWhiteSpace(filter.Field) || string.IsNullOrWhiteSpace(filter.Value))
                     continue;
 
-                // Security: Enforce explicit allowlist if provided
-                if (allowedFields != null && !allowedFields.Contains(filter.Field, StringComparer.OrdinalIgnoreCase))
+                // Security: Enforce explicit allowlist
+                if (!fieldPolicy.Allows(filter.Field))
+                {
+                    refused.Add(filter.Field);
                     continue;
+                }
 
                 // Security: Only allow existing model properties (prevents arbitrary injection)
                 if (!properties.TryGetValue(filter.Field, out var prop))
+                {
+                    refused.Add(filter.Field);
                     continue;
+                }
 
                 query = ApplyFilter(query, prop, filter.Operator, filter.Value);
             }
@@ -100,7 +113,7 @@ public static class QueryableExtensions
         // 2. Apply Global Search
         if (!string.IsNullOrWhiteSpace(request.GlobalSearch))
         {
-            query = ApplyGlobalSearch(query, properties, request.GlobalSearch, request.GlobalFilterFields, allowedFields);
+            query = ApplyGlobalSearch(query, properties, request.GlobalSearch, request.GlobalFilterFields, fieldPolicy);
         }
 
         // 3. Compute Total Count after all filters
@@ -116,18 +129,24 @@ public static class QueryableExtensions
                 if (string.IsNullOrWhiteSpace(sort.Field))
                     continue;
 
-                if (allowedFields != null && !allowedFields.Contains(sort.Field, StringComparer.OrdinalIgnoreCase))
+                if (!fieldPolicy.Allows(sort.Field))
+                {
+                    refused.Add(sort.Field);
                     continue;
+                }
 
                 if (!properties.TryGetValue(sort.Field, out var prop))
+                {
+                    refused.Add(sort.Field);
                     continue;
+                }
 
                 query = ApplySort(query, prop, sort.Descending, isFirstSort);
                 isFirstSort = false;
             }
         }
 
-        return (query, totalCount);
+        return (query, totalCount, refused);
     }
 
     private static IQueryable<T> ApplySort<T>(IQueryable<T> source, PropertyInfo prop, bool descending, bool isFirst)
@@ -168,7 +187,7 @@ public static class QueryableExtensions
         Dictionary<string, PropertyInfo> properties,
         string searchTerm,
         List<string>? filterFields,
-        IReadOnlySet<string>? allowedFields)
+        IslandFieldPolicy fieldPolicy)
     {
         var stringProps = properties.Values
             .Where(p => p.PropertyType == typeof(string))
@@ -181,12 +200,9 @@ public static class QueryableExtensions
                 .ToList();
         }
 
-        if (allowedFields != null)
-        {
-            stringProps = stringProps
-                .Where(p => allowedFields.Contains(p.Name, StringComparer.OrdinalIgnoreCase))
-                .ToList();
-        }
+        stringProps = stringProps
+            .Where(p => fieldPolicy.Allows(p.Name))
+            .ToList();
 
         if (stringProps.Count == 0)
             return source;

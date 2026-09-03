@@ -235,6 +235,12 @@ public sealed record IslandDataResult<T>(
 )
 {
     /// <summary>
+    /// List of requested fields that were refused (not allowlisted or non-existent property).
+    /// </summary>
+    [JsonPropertyName("refusedFields")]
+    public IReadOnlyList<string> RefusedFields { get; init; } = Array.Empty<string>();
+
+    /// <summary>
     /// Total number of pages calculated from TotalCount and PageSize.
     /// </summary>
     [JsonPropertyName("totalPages")]

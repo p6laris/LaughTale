@@ -50,7 +50,7 @@ public class ServerSideDataTests
             PageSize = 25
         };
 
-        var result = query.ToIslandDataResult(request);
+        var result = query.ToIslandDataResult(request, IslandFieldPolicy.For("Id", "Name", "City", "Balance"));
 
         Assert.Equal(500, result.TotalCount);
         Assert.Equal(500, result.TotalRecords);
@@ -73,7 +73,7 @@ public class ServerSideDataTests
         };
 
         var sw = Stopwatch.StartNew();
-        var result = query.ToIslandDataResult(request);
+        var result = query.ToIslandDataResult(request, IslandFieldPolicy.For("Id", "Name", "City", "Balance"));
         sw.Stop();
 
         Assert.Equal(100_000, result.TotalCount);
@@ -94,7 +94,7 @@ public class ServerSideDataTests
             }
         };
 
-        var result = query.ToIslandDataResult(request);
+        var result = query.ToIslandDataResult(request, IslandFieldPolicy.For("City"));
 
         Assert.All(result.Items, item => Assert.Contains("Erbil", item.City));
         Assert.True(result.TotalCount > 0);
@@ -112,7 +112,7 @@ public class ServerSideDataTests
             }
         };
 
-        var result = query.ToIslandDataResult(request);
+        var result = query.ToIslandDataResult(request, IslandFieldPolicy.For("Balance"));
 
         Assert.All(result.Items, item => Assert.True(item.Balance >= 5000));
     }
@@ -126,7 +126,7 @@ public class ServerSideDataTests
             GlobalSearch = "Customer 00004"
         };
 
-        var result = query.ToIslandDataResult(request);
+        var result = query.ToIslandDataResult(request, IslandFieldPolicy.For("Name"));
 
         Assert.True(result.TotalCount > 0);
         Assert.All(result.Items, item => Assert.Contains("00004", item.Name));
@@ -144,7 +144,7 @@ public class ServerSideDataTests
             }
         };
 
-        var result = query.ToIslandDataResult(requestDesc);
+        var result = query.ToIslandDataResult(requestDesc, IslandFieldPolicy.For("Id"));
 
         Assert.Equal(100, result.Items[0].Id);
         Assert.Equal(99, result.Items[1].Id);
@@ -154,7 +154,7 @@ public class ServerSideDataTests
     public void Security_AllowlistEnforcement_RejectsMaliciousFieldNames()
     {
         var query = GenerateDataset(50);
-        var allowed = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "Name", "City" };
+        var allowed = IslandFieldPolicy.For("Name", "City");
 
         var request = new IslandDataRequest
         {
@@ -192,7 +192,7 @@ public class ServerSideDataTests
             }
         };
 
-        var result = query.ToIslandDataResult(request);
+        var result = query.ToIslandDataResult(request, IslandFieldPolicy.For("City", "Name"));
 
         Assert.Equal(3, result.Page);
         Assert.Equal(10, result.PageSize);

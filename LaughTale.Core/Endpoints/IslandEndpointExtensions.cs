@@ -109,17 +109,67 @@ public static class IslandEndpointExtensions
         this IEndpointRouteBuilder endpoints,
         string pattern,
         Func<HttpContext, Task<IQueryable<T>>> queryProvider,
-        IReadOnlySet<string>? allowedFields = null)
+        LaughTale.Core.Data.IslandFieldPolicy fieldPolicy,
+        string islandName)
     {
+        ArgumentNullException.ThrowIfNull(endpoints);
+        ArgumentNullException.ThrowIfNull(pattern);
+        ArgumentNullException.ThrowIfNull(queryProvider);
+        ArgumentNullException.ThrowIfNull(fieldPolicy);
+        ArgumentNullException.ThrowIfNull(islandName);
+
         endpoints.MapPost(pattern, async (HttpContext context, IslandDataRequest? request) =>
         {
+            var laughTaleOptions = context.RequestServices.GetService<Microsoft.Extensions.Options.IOptions<LaughTale.Core.Configuration.LaughTaleOptions>>()?.Value;
+
+            // 1. Antiforgery validation (LT-1503 / LT-2204)
+            var requireAntiforgery = laughTaleOptions?.Refresh.RequireAntiforgery ?? true;
+            if (requireAntiforgery)
+            {
+                var antiforgery = context.RequestServices.GetService<Microsoft.AspNetCore.Antiforgery.IAntiforgery>();
+                if (antiforgery is null)
+                {
+                    return Results.StatusCode(StatusCodes.Status400BadRequest);
+                }
+
+                try
+                {
+                    await antiforgery.ValidateRequestAsync(context);
+                }
+                catch
+                {
+                    return Results.StatusCode(StatusCodes.Status400BadRequest);
+                }
+            }
+
+            // 2. Authorization check (Invariant I7: decided BEFORE application queryProvider runs)
+            var evaluator = context.RequestServices.GetService<LaughTale.Core.Security.IIslandAccessEvaluator>();
+            if (evaluator is null)
+            {
+                return Results.StatusCode(StatusCodes.Status403Forbidden);
+            }
+
+            var decision = await evaluator.EvaluateAsync(
+                islandName,
+                context.User,
+                context.RequestServices,
+                new LaughTale.Core.Security.IslandAccessContext(ExplicitPolicy: null, LocalOptions: null));
+
+            if (!decision.IsAllowed)
+            {
+                // 403 Forbidden with empty body (FR-006, Invariant I1)
+                return Results.StatusCode(StatusCodes.Status403Forbidden);
+            }
+
             var req = request ?? new IslandDataRequest();
             var query = await queryProvider(context);
-            var result = query.ToIslandDataResult(req, allowedFields);
+            var result = query.ToIslandDataResult(req, fieldPolicy);
             return Results.Json(result);
         })
         .WithName($"LaughTaleData_{typeof(T).Name}")
-        .Produces<IslandDataResult<T>>(StatusCodes.Status200OK);
+        .Produces<IslandDataResult<T>>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status403Forbidden)
+        .Produces(StatusCodes.Status400BadRequest);
 
         return endpoints;
     }
@@ -131,9 +181,10 @@ public static class IslandEndpointExtensions
         this IEndpointRouteBuilder endpoints,
         string pattern,
         Func<HttpContext, IQueryable<T>> queryProvider,
-        IReadOnlySet<string>? allowedFields = null)
+        LaughTale.Core.Data.IslandFieldPolicy fieldPolicy,
+        string islandName)
     {
-        return endpoints.MapIslandData(pattern, (ctx) => Task.FromResult(queryProvider(ctx)), allowedFields);
+        return endpoints.MapIslandData(pattern, (ctx) => Task.FromResult(queryProvider(ctx)), fieldPolicy, islandName);
     }
 
     /// <summary>

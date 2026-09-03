@@ -30,7 +30,7 @@ public class IslandDataContractTests
             PageSize = 3
         };
 
-        var result = _sampleData.ToIslandDataResult(request);
+        var result = _sampleData.ToIslandDataResult(request, IslandFieldPolicy.For("Id", "Name", "City", "Balance"));
 
         Assert.Equal(8, result.TotalCount);
         Assert.Equal(3, result.Items.Count);
@@ -50,7 +50,7 @@ public class IslandDataContractTests
             Sort = new() { new() { Field = "Balance", Descending = true } }
         };
 
-        var result = _sampleData.ToIslandDataResult(request);
+        var result = _sampleData.ToIslandDataResult(request, IslandFieldPolicy.For("Id", "Name", "City", "Balance"));
 
         Assert.Equal("Diana Prince", result.Items[0].Name);
         Assert.Equal(9800.00m, result.Items[0].Balance);
@@ -67,7 +67,7 @@ public class IslandDataContractTests
             Filter = new() { new() { Field = "City", Operator = "equals", Value = "London" } }
         };
 
-        var result = _sampleData.ToIslandDataResult(request);
+        var result = _sampleData.ToIslandDataResult(request, IslandFieldPolicy.For("City"));
 
         Assert.Equal(3, result.TotalCount);
         Assert.All(result.Items, c => Assert.Equal("London", c.City));
@@ -83,7 +83,7 @@ public class IslandDataContractTests
             Sort = new() { new() { Field = "NonExistentField", Descending = true } }
         };
 
-        var allowed = new HashSet<string> { "Name", "City", "Balance" };
+        var allowed = IslandFieldPolicy.For("Name", "City", "Balance");
         var result = _sampleData.ToIslandDataResult(request, allowed);
 
         Assert.Equal(5, result.Items.Count);
