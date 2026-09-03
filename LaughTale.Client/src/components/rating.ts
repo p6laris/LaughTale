@@ -9,6 +9,12 @@ import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
 import { useControllableState } from '../composables/useControllableState';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import type { PatternDeclaration } from '../accessibility/patterns';
+
+export const a11y: PatternDeclaration = {
+    kind: 'pattern',
+    pattern: 'radiogroup'
+};
 
 export interface RatingProps {
     value?: number;

@@ -11,6 +11,12 @@ import { getLucideIcon } from '../icons/lucide';
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import type { PatternDeclaration } from '../accessibility/patterns';
+
+export const a11y: PatternDeclaration = {
+    kind: 'pattern',
+    pattern: 'combobox'
+};
 
 export interface SelectOption {
     label: string;
@@ -734,6 +740,7 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
         container.setAttribute('role', 'combobox');
         container.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
         container.setAttribute('aria-haspopup', 'listbox');
+        container.setAttribute('aria-controls', 'p-select-overlay');
 
         const labelPart = resolvePart('label', 'p-select-label', props.pt, props.studioOverrides);
         const triggerPart = resolvePart('trigger', 'p-select-trigger-wrap', props.pt, props.studioOverrides);

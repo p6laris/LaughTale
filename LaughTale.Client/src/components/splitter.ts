@@ -7,6 +7,11 @@ import type { IslandContext } from '../runtime/registry';
  */
 
 import { injectIslandStyle } from '../runtime/styles';
+import type { PatternDeclaration } from '../accessibility/patterns';
+
+export const a11y: PatternDeclaration = {
+    kind: 'presentational'
+};
 
 const SPLITTER_CSS = `
 .p-splitter {
