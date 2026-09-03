@@ -11,6 +11,12 @@ import { LucideIcons, getLucideIcon } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
 import { useDebounce } from '../composables/useDebounce';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import type { PatternDeclaration } from '../accessibility/patterns';
+
+export const a11y: PatternDeclaration = {
+    kind: 'pattern',
+    pattern: 'listbox'
+};
 
 export interface ListboxOptionItem {
     label: string;
@@ -521,6 +527,7 @@ export default function ListboxIsland(container: HTMLElement, props: ListboxProp
         container.setAttribute('tabindex', isDisabled ? '-1' : '0');
         container.setAttribute('role', 'listbox');
         container.setAttribute('aria-multiselectable', isMultiple ? 'true' : 'false');
+        container.setAttribute('aria-label', (props as any).ariaLabel || props.header || 'Listbox');
         if (props.inputId) container.id = props.inputId;
 
         setHtml(container, html`
