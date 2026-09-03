@@ -21,13 +21,24 @@ public interface IIslandAuthorizationRegistry
     void RegisterPolicy(string islandName, string policyName);
 
     /// <summary>
-    /// Scans the provided assemblies for types decorated with [Island] and [IslandAuthorize] and registers their policies.
+    /// Registers an island as explicitly public (anonymous access allowed).
+    /// </summary>
+    void RegisterPublic(string islandName);
+
+    /// <summary>
+    /// Scans the provided assemblies for types decorated with [Island], [IslandAuthorize], and [IslandAllowAnonymous] and registers their policies.
     /// </summary>
     void RegisterPoliciesFromAttributes(params Assembly[] assemblies);
 
     /// <summary>
+    /// Resolves the authorization policy resolution state for an island.
+    /// </summary>
+    IslandPolicyResolution Resolve(string islandName);
+
+    /// <summary>
     /// Gets the registered policy name for an island, or null if unrestricted.
     /// </summary>
+    [Obsolete("Use Resolve(islandName) instead.")]
     string? GetPolicy(string islandName);
 
     /// <summary>
@@ -42,12 +53,19 @@ public interface IIslandAuthorizationRegistry
 public class IslandAuthorizationRegistry : IIslandAuthorizationRegistry
 {
     private readonly ConcurrentDictionary<string, string> _policies = new(StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentDictionary<string, byte> _publicIslands = new(StringComparer.OrdinalIgnoreCase);
 
     public void RegisterPolicy(string islandName, string policyName)
     {
         if (string.IsNullOrWhiteSpace(islandName)) throw new ArgumentNullException(nameof(islandName));
         if (string.IsNullOrWhiteSpace(policyName)) throw new ArgumentNullException(nameof(policyName));
         _policies[islandName] = policyName;
+    }
+
+    public void RegisterPublic(string islandName)
+    {
+        if (string.IsNullOrWhiteSpace(islandName)) throw new ArgumentNullException(nameof(islandName));
+        _publicIslands[islandName] = 0;
     }
 
     public void RegisterPoliciesFromAttributes(params Assembly[] assemblies)
@@ -65,12 +83,27 @@ public class IslandAuthorizationRegistry : IIslandAuthorizationRegistry
                     if (islandAttr != null)
                     {
                         var authAttr = type.GetCustomAttribute<IslandAuthorizeAttribute>();
-                        if (authAttr != null && !string.IsNullOrWhiteSpace(authAttr.Policy))
+                        var anonAttr = type.GetCustomAttribute<IslandAllowAnonymousAttribute>();
+
+                        if (authAttr != null && anonAttr != null)
+                        {
+                            throw new InvalidOperationException($"Type '{type.FullName}' cannot have both [IslandAuthorize] and [IslandAllowAnonymous].");
+                        }
+
+                        if (anonAttr != null)
+                        {
+                            RegisterPublic(islandAttr.Name);
+                        }
+                        else if (authAttr != null && !string.IsNullOrWhiteSpace(authAttr.Policy))
                         {
                             RegisterPolicy(islandAttr.Name, authAttr.Policy);
                         }
                     }
                 }
+            }
+            catch (InvalidOperationException)
+            {
+                throw;
             }
             catch
             {
@@ -79,23 +112,39 @@ public class IslandAuthorizationRegistry : IIslandAuthorizationRegistry
         }
     }
 
+    public IslandPolicyResolution Resolve(string islandName)
+    {
+        if (string.IsNullOrWhiteSpace(islandName)) return IslandPolicyResolution.Undeclared();
+        if (_policies.TryGetValue(islandName, out var policy)) return IslandPolicyResolution.RequiringPolicy(policy);
+        if (_publicIslands.ContainsKey(islandName)) return IslandPolicyResolution.Public();
+
+        // Lazy discovery across non-system loaded assemblies
+        var discovered = FindResolutionFromAttributes(islandName);
+        if (discovered.PolicyName != null)
+        {
+            _policies[islandName] = discovered.PolicyName;
+            return discovered;
+        }
+        if (discovered.IsExplicitlyPublic)
+        {
+            _publicIslands[islandName] = 0;
+            return discovered;
+        }
+
+        return IslandPolicyResolution.Undeclared();
+    }
+
+    [Obsolete("Use Resolve(islandName) instead.")]
     public string? GetPolicy(string islandName)
     {
         if (string.IsNullOrWhiteSpace(islandName)) return null;
         if (_policies.TryGetValue(islandName, out var policy)) return policy;
 
-        // Lazy discovery across non-system loaded assemblies
-        var discoveredPolicy = FindPolicyFromAttributes(islandName);
-        if (!string.IsNullOrWhiteSpace(discoveredPolicy))
-        {
-            _policies[islandName] = discoveredPolicy;
-            return discoveredPolicy;
-        }
-
-        return null;
+        var resolution = Resolve(islandName);
+        return resolution.PolicyName;
     }
 
-    private static string? FindPolicyFromAttributes(string islandName)
+    private static IslandPolicyResolution FindResolutionFromAttributes(string islandName)
     {
         foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
         {
@@ -111,19 +160,35 @@ public class IslandAuthorizationRegistry : IIslandAuthorizationRegistry
                     if (islandAttr != null && string.Equals(islandAttr.Name, islandName, StringComparison.OrdinalIgnoreCase))
                     {
                         var authAttr = type.GetCustomAttribute<IslandAuthorizeAttribute>();
+                        var anonAttr = type.GetCustomAttribute<IslandAllowAnonymousAttribute>();
+
+                        if (authAttr != null && anonAttr != null)
+                        {
+                            throw new InvalidOperationException($"Type '{type.FullName}' cannot have both [IslandAuthorize] and [IslandAllowAnonymous].");
+                        }
+
+                        if (anonAttr != null)
+                        {
+                            return IslandPolicyResolution.Public();
+                        }
+
                         if (authAttr != null && !string.IsNullOrWhiteSpace(authAttr.Policy))
                         {
-                            return authAttr.Policy;
+                            return IslandPolicyResolution.RequiringPolicy(authAttr.Policy);
                         }
                     }
                 }
+            }
+            catch (InvalidOperationException)
+            {
+                throw;
             }
             catch
             {
                 // Ignore type load errors on external assemblies
             }
         }
-        return null;
+        return IslandPolicyResolution.Undeclared();
     }
 
     public async Task<bool> AuthorizeAsync(string islandName, HttpContext context)

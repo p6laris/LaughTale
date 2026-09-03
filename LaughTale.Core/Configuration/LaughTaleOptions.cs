@@ -61,9 +61,32 @@ public sealed class IslandRefreshOptions
     public bool RequireAntiforgery { get; set; } = true;
 
     /// <summary>
+    /// Gets or sets whether undeclared islands are allowed to render and refresh without authorization.
+    /// Default: false (deny-by-default). When true, a one-time warning is logged for each undeclared island.
+    /// </summary>
+    public bool AllowUndeclaredIslands { get; set; } = false;
+
+    /// <summary>
+    /// Islands explicitly declared public (anonymous access allowed).
+    /// </summary>
+    public HashSet<string> AnonymousIslands { get; } = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
     /// Per-island policy requirements (islandName -> policyName).
     /// </summary>
     public Dictionary<string, string> IslandPolicies { get; } = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Registers an island as explicitly public (anonymous access allowed).
+    /// </summary>
+    public IslandRefreshOptions AllowAnonymous(string islandName)
+    {
+        if (!string.IsNullOrWhiteSpace(islandName))
+        {
+            AnonymousIslands.Add(islandName);
+        }
+        return this;
+    }
 
     /// <summary>
     /// Registers a required authorization policy for a given island.

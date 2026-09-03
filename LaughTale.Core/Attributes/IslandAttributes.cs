@@ -52,13 +52,45 @@ public sealed class InputMaskAttribute : Attribute
 }
 
 /// <summary>
+/// Declares that an island is explicitly public and allows anonymous access.
+/// </summary>
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false, Inherited = true)]
+public sealed class IslandAllowAnonymousAttribute : Attribute { }
+
+/// <summary>
 /// Specifies the authorization policy or roles required to render or refresh this island.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false, Inherited = true)]
 public sealed class IslandAuthorizeAttribute : Attribute
 {
-    public string? Policy { get; set; }
-    public string? Roles { get; set; }
+    private string? _policy;
+    private string? _roles;
+
+    public string? Policy
+    {
+        get => _policy;
+        set
+        {
+            _policy = value;
+            if (!string.IsNullOrWhiteSpace(_roles) && string.IsNullOrWhiteSpace(_policy))
+            {
+                throw new InvalidOperationException("IslandAuthorizeAttribute does not support Roles without a Policy.");
+            }
+        }
+    }
+
+    public string? Roles
+    {
+        get => _roles;
+        set
+        {
+            if (!string.IsNullOrWhiteSpace(value) && string.IsNullOrWhiteSpace(_policy))
+            {
+                throw new InvalidOperationException("IslandAuthorizeAttribute does not support Roles without a Policy.");
+            }
+            _roles = value;
+        }
+    }
 
     public IslandAuthorizeAttribute(string? policy = null)
     {
