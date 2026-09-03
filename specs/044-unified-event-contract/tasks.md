@@ -133,11 +133,11 @@ feature where a mistake is user-visible. It delivers value whether or not any re
 
 ### Batch B
 
-- [ ] **T026** [P] [US1] `LaughTale.Client/src/components/select.ts` — migrate and delete the redundant bare dispatch at `:1049`.
-- [ ] **T027** [US1] `LaughTale.Client/src/components/slider.ts` — **two** occurrences, four sites (`:386-400`). Delete the bare `change` (`:390`) and the bare `slideend` (`:400`). This is the component the T016 guard was planted in; confirm the guard's planted code is gone.
-- [ ] **T028** [US1] `LaughTale.Client/src/components/toggle-switch.ts` — **three** names for one occurrence (`:271-279`). Delete `switch:change` and the bare `change`; the survivor is `laughtale:toggle-switch:change`. Two of its three namespaces disappear.
-- [ ] **T029** [P] [US1] `LaughTale.Client/src/components/toggle-button.ts` (delete `:255`) and `LaughTale.Client/src/components/tree-select.ts` (delete `:950`). Both namespaces also change.
-- [ ] **T030** [US1] Batch B gate over the five files edited in T026–T029 under `LaughTale.Client/src/components/`: **SC-001 reaches 11 → 0** — the criterion for User Story 1. Re-run T006's reproduction and record counts of **1** where they were 2 and 3. `eventsBare` reaches **0**; note in the commit that this is a **floor, not the criterion**.
+- [x] **T026** [P] [US1] `LaughTale.Client/src/components/select.ts` — migrate and delete the redundant bare dispatch at `:1049`.
+- [x] **T027** [US1] `LaughTale.Client/src/components/slider.ts` — **two** occurrences, four sites (`:386-400`). Delete the bare `change` (`:390`) and the bare `slideend` (`:400`). This is the component the T016 guard was planted in; confirm the guard's planted code is gone.
+- [x] **T028** [US1] `LaughTale.Client/src/components/toggle-switch.ts` — **three** names for one occurrence (`:271-279`). Delete `switch:change` and the bare `change`; the survivor is `laughtale:toggle-switch:change`. Two of its three namespaces disappear.
+- [x] **T029** [P] [US1] `LaughTale.Client/src/components/toggle-button.ts` (delete `:255`) and `LaughTale.Client/src/components/tree-select.ts` (delete `:950`). Both namespaces also change.
+- [x] **T030** [US1] Batch B gate over the five files edited in T026–T029 under `LaughTale.Client/src/components/`: **SC-001 reaches 11 → 0** — the criterion for User Story 1. Re-run T006's reproduction and record counts of **1** where they were 2 and 3. `eventsBare` reaches **0**; note in the commit that this is a **floor, not the criterion**.
 
 **Gate**:
 ```bash

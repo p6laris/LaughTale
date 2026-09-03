@@ -8,6 +8,7 @@ import type { IslandContext } from '../runtime/registry';
  */
 
 import { injectIslandStyle } from '../runtime/styles';
+import { emitComponentEvent } from '../runtime/events';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
@@ -383,24 +384,10 @@ export default function SliderIsland(container: HTMLElement, props: SliderProps,
     function syncValue(isEnd: boolean = false) {
         const valPayload = isRange ? [...currentValues] : currentValues[0];
 
-        container.dispatchEvent(new CustomEvent('slider:change', {
-            bubbles: true,
-            detail: { value: valPayload }
-        }));
-        container.dispatchEvent(new CustomEvent('change', {
-            bubbles: true,
-            detail: { value: valPayload }
-        }));
+        emitComponentEvent(container, 'slider', 'change', { value: valPayload });
 
         if (isEnd) {
-            container.dispatchEvent(new CustomEvent('slider:slideend', {
-                bubbles: true,
-                detail: { value: valPayload }
-            }));
-            container.dispatchEvent(new CustomEvent('slideend', {
-                bubbles: true,
-                detail: { value: valPayload }
-            }));
+            emitComponentEvent(container, 'slider', 'slideend', { value: valPayload });
         }
     }
 

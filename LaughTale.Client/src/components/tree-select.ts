@@ -8,6 +8,7 @@ import type { IslandContext } from '../runtime/registry';
 
 import { LucideIcons, getLucideIcon } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
+import { emitComponentEvent } from '../runtime/events';
 import { useDisclosure } from '../composables/useDisclosure';
 import { useClickOutside } from '../composables/useClickOutside';
 import { useFloatingPosition } from '../composables/useFloatingPosition';
@@ -943,14 +944,10 @@ export default function TreeSelectIsland(container: HTMLElement, props: TreeSele
         const selected = getSelectedLabels();
         const payload = selectionMode === 'single' ? (selected[0]?.key || null) : Array.from(selectedKeys);
 
-        container.dispatchEvent(new CustomEvent('treeselect:change', {
-            bubbles: true,
-            detail: { value: payload, selectedNodes: selected }
-        }));
-        container.dispatchEvent(new CustomEvent('change', {
-            bubbles: true,
-            detail: { value: payload }
-        }));
+        emitComponentEvent(container, 'tree-select', 'change', {
+            value: payload,
+            selectedNodes: selected
+        });
     }
 
     init();

@@ -7,6 +7,7 @@ import type { IslandContext } from '../runtime/registry';
  */
 
 import { injectIslandStyle } from '../runtime/styles';
+import { emitComponentEvent } from '../runtime/events';
 import { getLucideIcon } from '../icons/lucide';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
@@ -268,18 +269,10 @@ export default function ToggleSwitchIsland(container: HTMLElement, props: Toggle
     }
 
     function syncValue() {
-        container.dispatchEvent(new CustomEvent('switch:change', {
-            bubbles: true,
-            detail: { checked: isChecked, value: isChecked }
-        }));
-        container.dispatchEvent(new CustomEvent('toggleswitch:change', {
-            bubbles: true,
-            detail: { checked: isChecked, value: isChecked }
-        }));
-        container.dispatchEvent(new CustomEvent('change', {
-            bubbles: true,
-            detail: { checked: isChecked, value: isChecked }
-        }));
+        emitComponentEvent(container, 'toggle-switch', 'change', {
+            checked: isChecked,
+            value: isChecked
+        });
     }
 
     function bindEvents() {

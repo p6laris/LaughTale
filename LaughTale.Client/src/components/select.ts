@@ -7,6 +7,7 @@ import { useLocale } from '../composables/useLocale';
  */
 
 import { injectIslandStyle } from '../runtime/styles';
+import { emitComponentEvent } from '../runtime/events';
 import { getLucideIcon } from '../icons/lucide';
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
@@ -1042,14 +1043,10 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
         const hiddenInp = container.querySelector<HTMLInputElement>('input[type="hidden"]');
         if (hiddenInp) hiddenInp.value = selectedValues.join(',');
 
-        container.dispatchEvent(new CustomEvent('select:change', {
-            bubbles: true,
-            detail: { value: payload, selectedItems: getSelectedItems() }
-        }));
-        container.dispatchEvent(new CustomEvent('change', {
-            bubbles: true,
-            detail: { value: payload }
-        }));
+        emitComponentEvent(container, 'select', 'change', {
+            value: payload,
+            selectedItems: getSelectedItems()
+        });
     }
 
     if (typeof document !== 'undefined') {
