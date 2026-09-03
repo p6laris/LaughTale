@@ -8,6 +8,7 @@ import type { IslandContext } from '../runtime/registry';
 
 import { injectIslandStyle } from '../runtime/styles';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import { setRovingTabindex, handleRovingKeydown } from '../accessibility/aria';
 
 const TOOLBAR_CSS = `
 .p-toolbar,
@@ -206,6 +207,15 @@ export default function ToolbarIsland(container: HTMLElement, props: ToolbarProp
                 countSpan.textContent = isStarred ? '1.4k + 1' : '1.4k';
             }
             starBtn.style.color = isStarred ? 'var(--p-warn-500, #f59e0b)' : 'var(--p-text-color)';
+        }, { signal: ctx?.signal });
+    }
+
+    const buttons = Array.from(rootEl.querySelectorAll<HTMLButtonElement>('button'));
+    if (buttons.length > 0) {
+        setRovingTabindex(buttons, 0);
+        rootEl.addEventListener('keydown', (e) => {
+            const idx = Math.max(0, buttons.indexOf(document.activeElement as HTMLButtonElement));
+            handleRovingKeydown(e, buttons, idx, 'horizontal');
         }, { signal: ctx?.signal });
     }
 }

@@ -229,7 +229,7 @@ export default function MultiSelectIsland<T = string>(container: HTMLElement, pr
         setHtml(itemsList, html`${filtered.map(o => {
             const isChecked = selected.has(o.value);
             return html`
-                <div class="multiselect-item" role="option" aria-selected="${isChecked}" data-val="${String(o.value)}" style="display: flex; align-items: center; gap: 0.625rem; padding: 0.45rem 0.75rem; cursor: pointer; font-size: 0.8125rem; background: ${isChecked ? 'var(--lt-surface-50)' : 'transparent'}; color: var(--lt-text-primary);">
+                <div class="multiselect-item" role="option" aria-selected="${isChecked ? 'true' : 'false'}" data-val="${String(o.value)}" style="display: flex; align-items: center; gap: 0.625rem; padding: 0.45rem 0.75rem; cursor: pointer; font-size: 0.8125rem; background: ${isChecked ? 'var(--lt-surface-50)' : 'transparent'}; color: var(--lt-text-primary);">
                     <input type="checkbox" ${attr('checked', isChecked)} style="accent-color: var(--lt-primary-600); pointer-events: none;" />
                     <span style="flex: 1;">${o.label}</span>
                 </div>

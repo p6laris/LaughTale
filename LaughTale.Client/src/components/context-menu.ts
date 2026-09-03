@@ -11,6 +11,8 @@ import { MenuItem } from '../types/models';
 import { LucideIcons, getLucideIcon } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import { setRovingTabindex, handleRovingKeydown } from '../accessibility/aria';
+import { useKeyboardNav } from '../composables/useKeyboardNav';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -595,6 +597,11 @@ export default function ContextMenuIsland(container: HTMLElement, props: Context
                 sub.classList.remove('p-sublist-left');
             }
         });
+
+        const items = Array.from(menuEl.querySelectorAll<HTMLElement>('.p-contextmenu-item-link, [data-item-label]'));
+        if (items.length > 0) {
+            setRovingTabindex(items, 0);
+        }
     }
 
     function hideMenu() {
@@ -696,10 +703,28 @@ export default function ContextMenuIsland(container: HTMLElement, props: Context
         }
     }, { signal: ctx?.signal });
 
+    const nav = useKeyboardNav({
+        itemCount: () => menuEl.querySelectorAll<HTMLElement>('.p-contextmenu-item-link, [data-item-label]').length,
+        initialIndex: 0,
+        orientation: 'vertical',
+        onHighlight: (index) => {
+            const items = Array.from(menuEl.querySelectorAll<HTMLElement>('.p-contextmenu-item-link, [data-item-label]'));
+            setRovingTabindex(items, index);
+            items[index]?.focus();
+        },
+        onEscape: hideMenu
+    });
+
     document.addEventListener('keydown', (e) => {
+        if (!isMenuOpen) return;
         if (e.key === 'Escape' || e.key === 'Tab') {
             hideMenu();
+            return;
         }
+        if (nav.handleKeyDown(e)) return;
+        const items = Array.from(menuEl.querySelectorAll<HTMLElement>('.p-contextmenu-item-link, [data-item-label]'));
+        const idx = Math.max(0, items.indexOf(document.activeElement as HTMLElement));
+        handleRovingKeydown(e, items, idx, 'vertical');
     }, { signal: ctx?.signal });
 
     window.addEventListener('scroll', hideMenu, { capture: true, signal: ctx?.signal });

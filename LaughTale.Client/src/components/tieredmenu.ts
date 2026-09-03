@@ -11,6 +11,8 @@ import { MenuItem } from '../types/models';
 import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import { setRovingTabindex, handleRovingKeydown } from '../accessibility/aria';
+import { useKeyboardNav } from '../composables/useKeyboardNav';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -604,8 +606,26 @@ export default function TieredMenuIsland(container: HTMLElement, props: TieredMe
             }, { signal: ctx?.signal });
         });
 
+        const links = Array.from(rootEl.querySelectorAll<HTMLElement>('.p-tieredmenu-item-link'));
+        if (links.length > 0) {
+            setRovingTabindex(links, 0);
+        }
+
+        const nav = useKeyboardNav({
+            itemCount: () => links.length,
+            initialIndex: 0,
+            orientation: 'vertical',
+            onHighlight: (index) => {
+                setRovingTabindex(links, index);
+                links[index]?.focus();
+            }
+        });
+
         // WAI-ARIA Keyboard Navigation
         rootEl.addEventListener('keydown', (e: KeyboardEvent) => {
+            if (nav.handleKeyDown(e)) return;
+            const idx = Math.max(0, links.indexOf(document.activeElement as HTMLElement));
+            handleRovingKeydown(e, links, idx, 'vertical');
             const activeEl = document.activeElement as HTMLElement;
             if (!activeEl || !rootEl.contains(activeEl)) return;
 

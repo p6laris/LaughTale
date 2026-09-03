@@ -10,6 +10,8 @@ import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
 import { getLucideIcon } from '../icons/lucide';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import { setRovingTabindex, handleRovingKeydown } from '../accessibility/aria';
+import { useKeyboardNav } from '../composables/useKeyboardNav';
 
 export interface SelectButtonOption {
     label?: string;
@@ -308,7 +310,31 @@ export default function SelectButtonIsland(container: HTMLElement, props: Select
     }
 
     function bindEvents() {
-        const buttons = container.querySelectorAll<HTMLButtonElement>('.p-selectbutton-item:not(.p-disabled)');
+        const buttons = Array.from(container.querySelectorAll<HTMLButtonElement>('.p-selectbutton-item:not(.p-disabled)'));
+        if (buttons.length > 0) {
+            const activeIdx = Math.max(0, buttons.findIndex(b => b.classList.contains('is-selected')));
+            setRovingTabindex(buttons, activeIdx);
+
+            const nav = useKeyboardNav({
+                itemCount: () => buttons.length,
+                initialIndex: activeIdx,
+                orientation: 'horizontal',
+                onHighlight: (index) => {
+                    setRovingTabindex(buttons, index);
+                    buttons[index]?.focus();
+                },
+                onSelect: (index) => {
+                    buttons[index]?.click();
+                }
+            });
+
+            container.onkeydown = (e) => {
+                if (nav.handleKeyDown(e)) return;
+                const idx = Math.max(0, buttons.indexOf(document.activeElement as HTMLButtonElement));
+                handleRovingKeydown(e, buttons, idx, 'horizontal');
+            };
+        }
+
         buttons.forEach(btn => {
             btn.onclick = (e) => {
                 e.preventDefault();

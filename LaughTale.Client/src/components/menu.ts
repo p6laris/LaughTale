@@ -10,6 +10,8 @@ import type { IslandContext } from '../runtime/registry';
 import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import { setRovingTabindex, handleRovingKeydown } from '../accessibility/aria';
+import { useKeyboardNav } from '../composables/useKeyboardNav';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -573,31 +575,28 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
         });
 
         // Keyboard navigation
-        menuEl.addEventListener('keydown', (e) => {
-            const links = menuEl.querySelectorAll<HTMLElement>('.p-menu-item-link');
-            if (links.length === 0) return;
+        const links = Array.from(menuEl.querySelectorAll<HTMLElement>('.p-menu-item-link'));
+        if (links.length > 0) {
+            setRovingTabindex(links, 0);
+        }
 
-            const active = document.activeElement as HTMLElement;
-            let currentIdx = Array.from(links).indexOf(active);
-
-            if (e.key === 'ArrowDown') {
-                e.preventDefault();
-                currentIdx = (currentIdx + 1) % links.length;
-                links[currentIdx]?.focus();
-            } else if (e.key === 'ArrowUp') {
-                e.preventDefault();
-                currentIdx = (currentIdx - 1 + links.length) % links.length;
-                links[currentIdx]?.focus();
-            } else if (e.key === 'Home') {
-                e.preventDefault();
-                links[0]?.focus();
-            } else if (e.key === 'End') {
-                e.preventDefault();
-                links[links.length - 1]?.focus();
-            } else if (e.key === 'Escape' && isPopup) {
-                e.preventDefault();
-                closePopup();
+        const nav = useKeyboardNav({
+            itemCount: () => links.length,
+            initialIndex: 0,
+            orientation: 'vertical',
+            onHighlight: (index) => {
+                setRovingTabindex(links, index);
+                links[index]?.focus();
+            },
+            onEscape: () => {
+                if (isPopup) closePopup();
             }
+        });
+
+        menuEl.addEventListener('keydown', (e) => {
+            if (nav.handleKeyDown(e)) return;
+            const idx = Math.max(0, links.indexOf(document.activeElement as HTMLElement));
+            handleRovingKeydown(e, links, idx, 'vertical');
         }, { signal: ctx?.signal });
     }
 

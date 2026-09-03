@@ -9,6 +9,8 @@ import type { IslandContext } from '../runtime/registry';
 import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import { setRovingTabindex, handleRovingKeydown } from '../accessibility/aria';
+import { useKeyboardNav } from '../composables/useKeyboardNav';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -569,11 +571,31 @@ export default function MenubarIsland(container: HTMLElement, props: MenubarProp
             }
         }, { signal: ctx?.signal });
 
+        const topLinks = Array.from(rootList?.querySelectorAll<HTMLElement>(':scope > .p-menubar-item > .p-menubar-item-link') || []);
+        if (topLinks.length > 0) {
+            setRovingTabindex(topLinks, 0);
+        }
+
+        const nav = useKeyboardNav({
+            itemCount: () => topLinks.length,
+            initialIndex: 0,
+            orientation: 'horizontal',
+            onHighlight: (index) => {
+                setRovingTabindex(topLinks, index);
+                topLinks[index]?.focus();
+            },
+            onEscape: closeAllSubmenus
+        });
+
         // Keyboard navigation
         menubarEl.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 closeAllSubmenus();
+                return;
             }
+            if (nav.handleKeyDown(e)) return;
+            const idx = Math.max(0, topLinks.indexOf(document.activeElement as HTMLElement));
+            handleRovingKeydown(e, topLinks, idx, 'horizontal');
         }, { signal: ctx?.signal });
     }
 
