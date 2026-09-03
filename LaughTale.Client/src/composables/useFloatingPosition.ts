@@ -1,4 +1,4 @@
-﻿/**
+/**
  * LaughTale: Headless useFloatingPosition Composable
  * Positions floating overlays (tooltips, popovers, autocompletes) with viewport collision flipping and offset calculations.
  */
@@ -8,31 +8,72 @@ export type FloatingPlacement = 'top' | 'top-start' | 'top-end' |
                                 'left' | 'left-start' | 'left-end' |
                                 'right' | 'right-start' | 'right-end';
 
+export type Anchor = HTMLElement | { x: number; y: number };
+
 export interface UseFloatingPositionOptions {
     placement?: FloatingPlacement;
     offset?: number;
     autoFlip?: boolean;
     viewportPadding?: number;
+    arrow?: HTMLElement;
+    reposition?: 'follow' | 'dismiss' | 'none';
+    onDismiss?: () => void;
+    signal?: AbortSignal;
 }
 
 export interface FloatingCoords {
     x: number;
     y: number;
     actualPlacement: FloatingPlacement;
+    arrowOffset?: number;
+}
+
+export interface FloatingController {
+    update(): void;
+    computePosition(): FloatingCoords;
 }
 
 export function useFloatingPosition(
-    reference: HTMLElement,
+    reference: Anchor,
     floating: HTMLElement,
     options: UseFloatingPositionOptions = {}
-) {
+): FloatingController {
     const offset = options.offset ?? 6;
     const autoFlip = options.autoFlip !== false;
     const viewportPadding = options.viewportPadding ?? 8;
-    let initialPlacement: FloatingPlacement = options.placement ?? 'bottom-start';
+    const reposition = options.reposition ?? 'none';
+    const signal = options.signal;
+    const initialPlacement: FloatingPlacement = options.placement ?? 'bottom-start';
+
+    const isPointAnchor = reference != null && !('nodeType' in reference) && typeof (reference as any).x === 'number' && typeof (reference as any).y === 'number';
+
+    if (isPointAnchor && reposition === 'follow') {
+        throw new Error('useFloatingPosition: Point anchor cannot be used with reposition: "follow"');
+    }
+    if (reposition === 'dismiss' && !options.onDismiss) {
+        throw new Error('useFloatingPosition: onDismiss callback is required when reposition is "dismiss"');
+    }
+    if (reposition !== 'none' && !signal) {
+        throw new Error('useFloatingPosition: signal is required when reposition is not "none"');
+    }
+
+    function getReferenceRect(): { top: number; bottom: number; left: number; right: number; width: number; height: number } {
+        if (isPointAnchor) {
+            const pt = reference as { x: number; y: number };
+            return {
+                top: pt.y,
+                bottom: pt.y,
+                left: pt.x,
+                right: pt.x,
+                width: 0,
+                height: 0
+            };
+        }
+        return (reference as HTMLElement).getBoundingClientRect();
+    }
 
     function computePosition(): FloatingCoords {
-        const refRect = reference.getBoundingClientRect();
+        const refRect = getReferenceRect();
         const floatRect = floating.getBoundingClientRect();
         const vpWidth = window.innerWidth;
         const vpHeight = window.innerHeight;
@@ -115,7 +156,27 @@ export function useFloatingPosition(
         x = Math.max(viewportPadding, Math.min(vpWidth - floatRect.width - viewportPadding, x));
         y = Math.max(viewportPadding, Math.min(vpHeight - floatRect.height - viewportPadding, y));
 
-        return { x, y, actualPlacement: placement };
+        let arrowOffset: number | undefined;
+        if (options.arrow) {
+            const arrowEl = options.arrow;
+            if (placement.startsWith('top') || placement.startsWith('bottom')) {
+                const arrowWidth = arrowEl.offsetWidth || (arrowEl.getBoundingClientRect ? arrowEl.getBoundingClientRect().width : 0) || 10;
+                const targetCenter = refRect.left + (refRect.width / 2);
+                const rawOffset = targetCenter - x - (arrowWidth / 2);
+                const minOffset = 12;
+                const maxOffset = Math.max(minOffset, floatRect.width - arrowWidth - minOffset);
+                arrowOffset = Math.max(minOffset, Math.min(maxOffset, rawOffset));
+            } else {
+                const arrowHeight = arrowEl.offsetHeight || (arrowEl.getBoundingClientRect ? arrowEl.getBoundingClientRect().height : 0) || 10;
+                const targetCenter = refRect.top + (refRect.height / 2);
+                const rawOffset = targetCenter - y - (arrowHeight / 2);
+                const minOffset = 12;
+                const maxOffset = Math.max(minOffset, floatRect.height - arrowHeight - minOffset);
+                arrowOffset = Math.max(minOffset, Math.min(maxOffset, rawOffset));
+            }
+        }
+
+        return { x, y, actualPlacement: placement, ...(arrowOffset != null ? { arrowOffset } : {}) };
     }
 
     function update() {
@@ -123,6 +184,22 @@ export function useFloatingPosition(
         floating.style.position = 'fixed';
         floating.style.left = `${Math.round(x)}px`;
         floating.style.top = `${Math.round(y)}px`;
+    }
+
+    if (reposition === 'follow' && typeof window !== 'undefined') {
+        window.addEventListener('scroll', () => { update(); }, { capture: true, passive: true, signal });
+        window.addEventListener('resize', () => { update(); }, { passive: true, signal });
+        if (typeof ResizeObserver !== 'undefined') {
+            const ro = new ResizeObserver(() => { update(); });
+            ro.observe(floating);
+            signal?.addEventListener('abort', () => { ro.disconnect(); }, { once: true });
+        }
+    } else if (reposition === 'dismiss' && typeof window !== 'undefined') {
+        const handleDismiss = () => {
+            options.onDismiss?.();
+        };
+        window.addEventListener('scroll', handleDismiss, { capture: true, passive: true, signal });
+        window.addEventListener('resize', handleDismiss, { passive: true, signal });
     }
 
     return { update, computePosition };
