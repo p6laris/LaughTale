@@ -10,6 +10,7 @@ import { useDisclosure } from '../composables/useDisclosure';
 import { useClickOutside } from '../composables/useClickOutside';
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
+import { useFloatingPosition } from '../composables/useFloatingPosition';
 import { html, setHtml, url, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
@@ -436,9 +437,17 @@ export default function CascadeSelectIsland<T = string>(container: HTMLElement, 
                     renderLevel(children, subPanel, level + 1, path);
                     subPanel.style.display = 'block';
 
-                    // Check bounds against viewport right edge
-                    const rect = subPanel.getBoundingClientRect();
-                    if (rect.right > window.innerWidth) {
+                    // Check bounds against viewport right edge via useFloatingPosition
+                    const subFloatingCtrl = useFloatingPosition(itemEl, subPanel, {
+                        placement: 'right-start',
+                        offset: 2,
+                        strategy: 'absolute',
+                        boundary: (container.offsetParent as HTMLElement) || undefined,
+                        axis: 'x',
+                        reposition: 'none'
+                    });
+                    const coords = subFloatingCtrl.computePosition();
+                    if (coords.actualPlacement.startsWith('left')) {
                         subPanel.style.left = 'auto';
                         subPanel.style.right = 'calc(100% + 2px)';
                     } else {

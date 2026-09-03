@@ -743,14 +743,22 @@ export default function SplitButtonIsland(container: HTMLElement, props: SplitBu
                 if (hasSub && subOverlay) {
                     li.classList.add('p-submenu-open', 'p-menu-active');
 
-                    // Check horizontal viewport collision for flyout
-                    const liRect = li.getBoundingClientRect();
-                    const subWidth = subOverlay.offsetWidth || 180;
-                    if (liRect.right + subWidth > window.innerWidth) {
+                    // Check horizontal viewport collision for flyout via useFloatingPosition
+                    const subFloatingCtrl = useFloatingPosition(li, subOverlay, {
+                        placement: 'right-start',
+                        offset: 0,
+                        strategy: 'absolute',
+                        boundary: (rootEl.offsetParent as HTMLElement) || undefined,
+                        axis: 'x',
+                        reposition: 'none'
+                    });
+                    const coords = subFloatingCtrl.computePosition();
+                    if (coords.actualPlacement.startsWith('left')) {
                         subOverlay.classList.add('p-submenu-flipped');
                     } else {
                         subOverlay.classList.remove('p-submenu-flipped');
                     }
+                    subOverlay.style.left = '';
                 } else {
                     li.classList.add('p-menu-active');
                 }

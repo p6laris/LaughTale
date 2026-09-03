@@ -586,12 +586,22 @@ export default function ContextMenuIsland(container: HTMLElement, props: Context
 
         // Adjust submenus collision
         menuEl.querySelectorAll<HTMLElement>('.p-contextmenu-sublist-wrapper').forEach(sub => {
-            const rect = sub.getBoundingClientRect();
-            if (rect.right > window.innerWidth - 10) {
+            const parentLi = sub.closest<HTMLElement>('.p-contextmenu-item') || menuEl;
+            const subFloatingCtrl = useFloatingPosition(parentLi, sub, {
+                placement: 'right-start',
+                offset: 0,
+                strategy: 'absolute',
+                boundary: (menuEl.offsetParent as HTMLElement) || undefined,
+                axis: 'x',
+                reposition: 'none'
+            });
+            const coords = subFloatingCtrl.computePosition();
+            if (coords.actualPlacement.startsWith('left')) {
                 sub.classList.add('p-sublist-left');
             } else {
                 sub.classList.remove('p-sublist-left');
             }
+            sub.style.left = '';
         });
 
         const items = Array.from(menuEl.querySelectorAll<HTMLElement>('.p-contextmenu-item-link, [data-item-label]'));
