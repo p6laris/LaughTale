@@ -11,6 +11,12 @@ import { MenuItem } from '../types/models';
 import { LucideIcons, getLucideIcon } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import type { PatternDeclaration } from '../accessibility/patterns';
+
+export const a11y: PatternDeclaration = {
+    kind: 'pattern',
+    pattern: 'menu'
+};
 
 export interface ContextMenuItem extends MenuItem {
     shortcut?: string;
@@ -542,7 +548,7 @@ export default function ContextMenuIsland(container: HTMLElement, props: Context
     setHtml(container, html`
         <div class="p-contextmenu-container" style="position: relative; width: 100%;">
             ${renderHostDemo()}
-            <div class="p-contextmenu ${props.class || ''}" role="region" aria-label="${props.ariaLabel || 'Context Menu'}" data-contextmenu-root>
+            <div class="p-contextmenu ${props.class || ''}" role="menu" aria-label="${props.ariaLabel || 'Context Menu'}" data-contextmenu-root>
                 ${renderItemsHtml(menuItems)}
             </div>
         </div>

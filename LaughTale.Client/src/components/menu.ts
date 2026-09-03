@@ -10,6 +10,12 @@ import type { IslandContext } from '../runtime/registry';
 import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import type { PatternDeclaration } from '../accessibility/patterns';
+
+export const a11y: PatternDeclaration = {
+    kind: 'pattern',
+    pattern: 'menu'
+};
 
 const MENU_CSS = `
 .p-menu,
@@ -425,7 +431,7 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
         if (isGroup) {
             const subItemsHtml = item.items!.map((sub, i) => renderItemContent(sub, `${path}.${i}`, depth + 1));
             subHtml = html`
-                <div class="p-menu-submenu-wrapper ${isExpanded ? 'p-expanded' : ''}" role="region">
+                <div class="p-menu-submenu-wrapper ${isExpanded ? 'p-expanded' : ''}">
                     <div class="p-menu-submenu-inner">
                         <ul class="p-menu-submenu-list" role="group">${subItemsHtml}</ul>
                     </div>
@@ -441,7 +447,7 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
         return html`
             <li class="p-menu-item ${item.disabled ? 'p-disabled' : ''}" role="none" data-path="${path}" data-key="${item.key || ''}">
                 <div class="p-menu-item-content">
-                    <a class="p-menu-item-link" style="${customInlineStyle}" role="menuitem" tabindex="-1" href="${safeUrl(item.url || item.route || '#')}" ${attr('target', item.target)}>
+                    <a class="p-menu-item-link" style="${customInlineStyle}" role="menuitem" ${isToggleableSubmenu ? html`aria-haspopup="true" aria-expanded="${isExpanded}"` : ''} tabindex="-1" href="${safeUrl(item.url || item.route || '#')}" ${attr('target', item.target)}>
                         ${iconHtml}
                         <span class="p-menu-item-label">${item.label}</span>
                         ${item.badge !== undefined ? html`<span class="p-menu-item-badge">${item.badge}</span>` : ''}
@@ -490,7 +496,7 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
         return html`
             <div class="p-menu p-component ${isPopup ? 'p-menu-popup-overlay' : ''} ${customClass}" style="${customStyle}" role="menu" tabindex="0">
                 ${startHtml}
-                <ul class="p-menu-list" role="menubar">
+                <ul class="p-menu-list" role="none">
                     ${itemsHtml}
                 </ul>
                 ${endHtml}

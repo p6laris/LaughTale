@@ -8,6 +8,12 @@ import type { IslandContext } from '../runtime/registry';
  */
 
 import { injectIslandStyle } from '../runtime/styles';
+import type { PatternDeclaration } from '../accessibility/patterns';
+
+export const a11y: PatternDeclaration = {
+    kind: 'pattern',
+    pattern: 'popover'
+};
 
 const POPOVER_CSS = `
 island-popover,
@@ -222,6 +228,8 @@ export default function PopoverIsland(container: HTMLElement, props: PopoverProp
     injectIslandStyle('popover', POPOVER_CSS);
     container.classList.add('laughtale-popover', 'p-popover', 'p-component');
     container.setAttribute('data-part', 'root');
+    container.setAttribute('role', 'region');
+    container.setAttribute('aria-label', (props as any).ariaLabel || 'Popover');
 
     // Add arrow notch if not already present
     if (props.showArrow !== false && !container.querySelector('.p-popover-arrow')) {

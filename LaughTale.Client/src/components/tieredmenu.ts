@@ -11,6 +11,12 @@ import { MenuItem } from '../types/models';
 import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import type { PatternDeclaration } from '../accessibility/patterns';
+
+export const a11y: PatternDeclaration = {
+    kind: 'pattern',
+    pattern: 'menu'
+};
 
 const TIEREDMENU_CSS = `
 /* ==========================================================================
@@ -386,8 +392,8 @@ export default function TieredMenuIsland(container: HTMLElement, props: TieredMe
         ].filter(Boolean).join(' ');
 
         const menuHtml = html`
-            <div class="${rootClasses}" ${isPopup ? 'style="display: none;"' : ''} data-tieredmenu-root role="menubar" aria-orientation="vertical">
-                <ul class="p-tieredmenu-root-list" role="menubar">
+            <div class="${rootClasses}" ${isPopup ? 'style="display: none;"' : ''} data-tieredmenu-root role="menu">
+                <ul class="p-tieredmenu-root-list" role="none">
                     ${renderMenuItems(model)}
                 </ul>
             </div>
