@@ -9,6 +9,12 @@ import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import { setRovingTabindex, handleRovingKeydown } from '../accessibility/aria';
+import type { PatternDeclaration } from '../accessibility/patterns';
+
+export const a11y: PatternDeclaration = {
+    kind: 'pattern',
+    pattern: 'toolbar'
+};
 
 const TOOLBAR_CSS = `
 .p-toolbar,
@@ -119,9 +125,7 @@ export default function ToolbarIsland(container: HTMLElement, props: ToolbarProp
     rootEl.classList.add('p-toolbar', 'p-component');
     rootEl.setAttribute('role', 'toolbar');
     rootEl.setAttribute('aria-orientation', 'horizontal');
-    if (props.ariaLabel) {
-        rootEl.setAttribute('aria-label', props.ariaLabel);
-    }
+    rootEl.setAttribute('aria-label', props.ariaLabel || 'Toolbar');
 
     // Set classes on start, center, end sections
     rootEl.querySelectorAll<HTMLElement>('island-toolbar-start, .p-toolbar-start').forEach(el => el.classList.add('p-toolbar-start'));

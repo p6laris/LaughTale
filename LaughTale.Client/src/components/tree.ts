@@ -11,6 +11,12 @@ import type { IslandContext } from '../runtime/registry';
 import { TreeNode } from '../types/models';
 import { injectIslandStyle } from '../runtime/styles';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import type { PatternDeclaration } from '../accessibility/patterns';
+
+export const a11y: PatternDeclaration = {
+    kind: 'pattern',
+    pattern: 'tree'
+};
 
 export interface TreeProps {
     value?: TreeNode[];
