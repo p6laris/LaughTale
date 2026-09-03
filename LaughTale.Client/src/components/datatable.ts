@@ -4,6 +4,7 @@ import { LucideIcons } from '../icons/lucide';
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 import { html, setHtml, url as safeUrl, unsafe, attr, cx, type Raw } from '../runtime/html';
+import { useVirtualizer, type Virtualizer } from '../composables/useVirtualizer';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -140,6 +141,12 @@ const DATATABLE_CSS = `
     color: var(--lt-surface-0, var(--lt-surface-0));
     font-size: 0.6875rem;
     font-weight: 700;
+}
+
+.p-datatable-spacer-cell {
+    padding: 0 !important;
+    border: none !important;
+    height: 0;
 }
 
 /* Filter Row */
@@ -841,6 +848,180 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
 
     (container as any).exportCSV = exportCSV;
 
+    const ITEM_HEIGHT = 48;
+    let virtualizer: Virtualizer | null = null;
+    let currentStart = -1;
+    let currentEnd = -1;
+    let currentFiltered: Record<string, any>[] = [];
+    let scrollBound = false;
+
+    function renderSingleRow(row: Record<string, any>, rowIdx: number, totalCount: number): Raw {
+        const rowKey = row[dataKey];
+        const isSelected = selectedKeys.has(rowKey);
+        const isExpanded = expandedKeys.has(rowKey);
+
+        const cellTds = columns.map(col => {
+            let frozenClass = col.frozen ? (col.alignFrozen === 'right' ? 'p-frozen-column-right' : 'p-frozen-column-left') : '';
+            const styleAttr = [
+                col.width ? `width: ${col.width};` : '',
+                col.minWidth ? `min-width: ${col.minWidth};` : '',
+                col.align ? `text-align: ${col.align};` : ''
+            ].filter(Boolean).join(' ');
+
+            // Checkbox Column
+            if (col.selectionMode === 'multiple') {
+                return html`
+                    <td class="${frozenClass}" style="width: 3.5rem; text-align: center;">
+                        <div class="p-checkbox-box p-row-checkbox ${isSelected ? 'p-checked' : ''}" data-row-key="${rowKey}">
+                            ${isSelected ? unsafe(LucideIcons.check) : ''}
+                        </div>
+                    </td>
+                `;
+            }
+
+            // Radio Column
+            if (col.selectionMode === 'single') {
+                return html`
+                    <td class="${frozenClass}" style="width: 3.5rem; text-align: center;">
+                        <div class="p-radio-box p-row-radio ${isSelected ? 'p-checked' : ''}" data-row-key="${rowKey}">
+                            ${isSelected ? html`<span style="width: 6px; height: 6px; border-radius: 9999px; background: white;"></span>` : ''}
+                        </div>
+                    </td>
+                `;
+            }
+
+            // Expander Column
+            if (col.expander) {
+                return html`
+                    <td class="${frozenClass}" style="width: 3.5rem; text-align: center;">
+                        <button type="button" class="p-row-toggler" data-row-key="${rowKey}" aria-label="Toggle Row">
+                            ${isExpanded ? unsafe(LucideIcons.chevronDown) : unsafe(LucideIcons.chevronRight)}
+                        </button>
+                    </td>
+                `;
+            }
+
+            const rawVal = resolveField(row, col.field);
+
+            // In-Place Cell Editing
+            const isEditing = editMode === 'cell' && editingCell?.rowKey === rowKey && editingCell?.field === col.field;
+            if (isEditing) {
+                return html`
+                    <td class="${frozenClass} ${col.bodyClass || ''}" style="${styleAttr}">
+                        <input type="text" 
+                               class="p-cell-editor-input" 
+                               data-row-key="${rowKey}" 
+                               data-field="${col.field}" 
+                               value="${rawVal ?? ''}" 
+                               autofocus />
+                    </td>
+                `;
+            }
+
+            const formattedContent = renderCellContent(row, col, rawVal);
+            const editableClass = editMode === 'cell' && col.field ? 'p-editable-cell' : '';
+
+            return html`
+                <td class="${frozenClass} ${editableClass} ${col.bodyClass || ''}" 
+                    data-row-key="${rowKey}" 
+                    data-field="${col.field || ''}" 
+                    style="${styleAttr}">
+                    ${formattedContent}
+                </td>
+            `;
+        });
+
+        const rowHtml = html`
+            <tr class="${isSelected ? 'p-highlight' : ''}" 
+                data-row-key="${rowKey}"
+                data-index="${rowIdx}"
+                role="row"
+                aria-setsize="${totalCount}"
+                aria-posinset="${rowIdx + 1}"
+                tabindex="${rowIdx === 0 ? '0' : '-1'}">
+                ${cellTds}
+            </tr>
+        `;
+
+        // Row Expansion Detail Card
+        let expansionHtml: Raw | '' = '';
+        if (isExpanded) {
+            expansionHtml = html`
+                <tr class="p-row-expansion">
+                    <td colspan="${columns.length}" style="padding: 1.25rem;">
+                        <div style="display: flex; gap: 1.25rem; align-items: center; background: var(--lt-surface-0); padding: 1rem; border-radius: 8px; border: 1px solid var(--lt-surface-200);">
+                            <div style="width: 56px; height: 56px; border-radius: 8px; background: var(--lt-primary-50); border: 1px solid var(--lt-primary-200); display: flex; align-items: center; justify-content: center; color: var(--lt-primary-600); font-size: 1.5rem; flex-shrink: 0;">
+                                ${unsafe(LucideIcons.package)}
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 0.35rem; flex: 1;">
+                                <div style="display: flex; align-items: center; justify-content: space-between;">
+                                    <span style="font-weight: 700; color: var(--lt-surface-900); font-size: 1rem;">
+                                        ${row.name || row.title || `Record #${rowKey}`}
+                                    </span>
+                                    <span class="p-tag p-tag-success">${row.inventoryStatus || 'Active'}</span>
+                                </div>
+                                <div style="font-size: 0.8125rem; color: var(--lt-surface-500); display: flex; gap: 1.5rem;">
+                                    <span>SKU: <strong>${row.code || 'N/A'}</strong></span>
+                                    <span>Category: <strong>${row.category || 'General'}</strong></span>
+                                    <span>Stock: <strong>${row.quantity ?? 0} units</strong></span>
+                                    <span>Price: <strong>$${row.price ?? 0}</strong></span>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+
+        return html`${rowHtml}${expansionHtml}`;
+    }
+
+    function updateVirtualPositions() {
+        if (!virtualizer || !virtualizer.isVirtual()) return;
+        const topSpacer = container.querySelector<HTMLElement>('.p-datatable-spacer-top td');
+        const bottomSpacer = container.querySelector<HTMLElement>('.p-datatable-spacer-bottom td');
+        const virtualItems = virtualizer.getVirtualItems();
+        const startOffset = virtualItems.length > 0 ? virtualItems[0].start : 0;
+        const totalSize = virtualizer.getTotalSize();
+        const itemsSize = virtualItems.length * 48;
+        const endOffset = Math.max(0, totalSize - startOffset - itemsSize);
+        if (topSpacer) topSpacer.style.height = `${startOffset}px`;
+        if (bottomSpacer) bottomSpacer.style.height = `${endOffset}px`;
+    }
+
+    function reRenderVirtualRows() {
+        const tbody = container.querySelector<HTMLElement>('.p-datatable-tbody');
+        if (!tbody || !virtualizer || !virtualizer.isVirtual()) return;
+        const virtualItems = virtualizer.getVirtualItems();
+        const rowsHtml = virtualItems.map(vi => renderSingleRow(currentFiltered[vi.index], vi.index, currentFiltered.length));
+        setHtml(tbody, html`
+            <tr class="p-datatable-spacer-top"><td class="p-datatable-spacer-cell" colspan="${columns.length}"></td></tr>
+            ${rowsHtml}
+            <tr class="p-datatable-spacer-bottom"><td class="p-datatable-spacer-cell" colspan="${columns.length}"></td></tr>
+        `);
+        updateVirtualPositions();
+        const rootEl = container.firstElementChild as HTMLElement;
+        if (rootEl) bindBodyRowEvents(rootEl);
+    }
+
+    function focusRowByIndex(targetIdx: number) {
+        if (virtualizer && virtualizer.isVirtual()) {
+            if (targetIdx < currentStart || targetIdx > currentEnd) {
+                virtualizer.scrollToIndex(targetIdx, 'auto');
+                const newVirtualItems = virtualizer.getVirtualItems();
+                if (newVirtualItems.length > 0) {
+                    currentStart = newVirtualItems[0].index;
+                    currentEnd = newVirtualItems[newVirtualItems.length - 1].index;
+                    reRenderVirtualRows();
+                }
+            }
+        }
+        const targetRow = container.querySelector<HTMLTableRowElement>(`.p-datatable-tbody tr[data-index="${targetIdx}"]`);
+        if (targetRow) {
+            targetRow.focus();
+        }
+    }
+
     function render() {
         let displayRows: Record<string, any>[];
         let totalRecords: number;
@@ -897,9 +1078,27 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                 });
             }
 
-            // 3. Paginate Data
+            // 3. Paginate or Virtualize Data
             totalRecords = filtered.length;
-            displayRows = paginator ? filtered.slice(firstIdx, firstIdx + rowsPerPage) : filtered;
+            currentFiltered = filtered;
+            if (paginator) {
+                virtualizer = null;
+                displayRows = filtered.slice(firstIdx, firstIdx + rowsPerPage);
+            } else if (filtered.length < 100) {
+                virtualizer = null;
+                displayRows = filtered;
+            } else {
+                virtualizer = useVirtualizer({
+                    count: filtered.length,
+                    estimateSize: 48,
+                    getScrollElement: () => container.querySelector<HTMLElement>('.p-datatable-scrollable-wrapper'),
+                    virtualThreshold: 100
+                });
+                const virtualItems = virtualizer.getVirtualItems();
+                currentStart = virtualItems.length > 0 ? virtualItems[0].index : 0;
+                currentEnd = virtualItems.length > 0 ? virtualItems[virtualItems.length - 1].index : 0;
+                displayRows = virtualItems.map(vi => filtered[vi.index]);
+            }
         }
 
         const totalPages = Math.max(1, Math.ceil(totalRecords / rowsPerPage));
@@ -1024,120 +1223,18 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                 </tr>
             `;
         } else {
-            bodyRowsHtml = displayRows.map(row => {
-                const rowKey = row[dataKey];
-                const isSelected = selectedKeys.has(rowKey);
-                const isExpanded = expandedKeys.has(rowKey);
-
-                const cellTds = columns.map(col => {
-                    let frozenClass = col.frozen ? (col.alignFrozen === 'right' ? 'p-frozen-column-right' : 'p-frozen-column-left') : '';
-                    const styleAttr = [
-                        col.width ? `width: ${col.width};` : '',
-                        col.minWidth ? `min-width: ${col.minWidth};` : '',
-                        col.align ? `text-align: ${col.align};` : ''
-                    ].filter(Boolean).join(' ');
-
-                    // Checkbox Column
-                    if (col.selectionMode === 'multiple') {
-                        return html`
-                            <td class="${frozenClass}" style="width: 3.5rem; text-align: center;">
-                                <div class="p-checkbox-box p-row-checkbox ${isSelected ? 'p-checked' : ''}" data-row-key="${rowKey}">
-                                    ${isSelected ? unsafe(LucideIcons.check) : ''}
-                                </div>
-                            </td>
-                        `;
-                    }
-
-                    // Radio Column
-                    if (col.selectionMode === 'single') {
-                        return html`
-                            <td class="${frozenClass}" style="width: 3.5rem; text-align: center;">
-                                <div class="p-radio-box p-row-radio ${isSelected ? 'p-checked' : ''}" data-row-key="${rowKey}">
-                                    ${isSelected ? html`<span style="width: 6px; height: 6px; border-radius: 9999px; background: white;"></span>` : ''}
-                                </div>
-                            </td>
-                        `;
-                    }
-
-                    // Expander Column
-                    if (col.expander) {
-                        return html`
-                            <td class="${frozenClass}" style="width: 3.5rem; text-align: center;">
-                                <button type="button" class="p-row-toggler" data-row-key="${rowKey}" aria-label="Toggle Row">
-                                    ${isExpanded ? unsafe(LucideIcons.chevronDown) : unsafe(LucideIcons.chevronRight)}
-                                </button>
-                            </td>
-                        `;
-                    }
-
-                    const rawVal = resolveField(row, col.field);
-
-                    // In-Place Cell Editing
-                    const isEditing = editMode === 'cell' && editingCell?.rowKey === rowKey && editingCell?.field === col.field;
-                    if (isEditing) {
-                        return html`
-                            <td class="${frozenClass} ${col.bodyClass || ''}" style="${styleAttr}">
-                                <input type="text" 
-                                       class="p-cell-editor-input" 
-                                       data-row-key="${rowKey}" 
-                                       data-field="${col.field}" 
-                                       value="${rawVal ?? ''}" 
-                                       autofocus />
-                            </td>
-                        `;
-                    }
-
-                    const formattedContent = renderCellContent(row, col, rawVal);
-                    const editableClass = editMode === 'cell' && col.field ? 'p-editable-cell' : '';
-
-                    return html`
-                        <td class="${frozenClass} ${editableClass} ${col.bodyClass || ''}" 
-                            data-row-key="${rowKey}" 
-                            data-field="${col.field || ''}" 
-                            style="${styleAttr}">
-                            ${formattedContent}
-                        </td>
-                    `;
-                });
-
-                const rowHtml = html`
-                    <tr class="${isSelected ? 'p-highlight' : ''}" data-row-key="${rowKey}">
-                        ${cellTds}
-                    </tr>
+            if (virtualizer && virtualizer.isVirtual()) {
+                const virtualItems = virtualizer.getVirtualItems();
+                const rowsHtml = virtualItems.map(vi => renderSingleRow(currentFiltered[vi.index], vi.index, totalRecords));
+                bodyRowsHtml = html`
+                    <tr class="p-datatable-spacer-top"><td class="p-datatable-spacer-cell" colspan="${columns.length}"></td></tr>
+                    ${rowsHtml}
+                    <tr class="p-datatable-spacer-bottom"><td class="p-datatable-spacer-cell" colspan="${columns.length}"></td></tr>
                 `;
-
-                // Row Expansion Detail Card
-                let expansionHtml: Raw | '' = '';
-                if (isExpanded) {
-                    expansionHtml = html`
-                        <tr class="p-row-expansion">
-                            <td colspan="${columns.length}" style="padding: 1.25rem;">
-                                <div style="display: flex; gap: 1.25rem; align-items: center; background: var(--lt-surface-0); padding: 1rem; border-radius: 8px; border: 1px solid var(--lt-surface-200);">
-                                    <div style="width: 56px; height: 56px; border-radius: 8px; background: var(--lt-primary-50); border: 1px solid var(--lt-primary-200); display: flex; align-items: center; justify-content: center; color: var(--lt-primary-600); font-size: 1.5rem; flex-shrink: 0;">
-                                        ${unsafe(LucideIcons.package)}
-                                    </div>
-                                    <div style="display: flex; flex-direction: column; gap: 0.35rem; flex: 1;">
-                                        <div style="display: flex; align-items: center; justify-content: space-between;">
-                                            <span style="font-weight: 700; color: var(--lt-surface-900); font-size: 1rem;">
-                                                ${row.name || row.title || `Record #${rowKey}`}
-                                            </span>
-                                            <span class="p-tag p-tag-success">${row.inventoryStatus || 'Active'}</span>
-                                        </div>
-                                        <div style="font-size: 0.8125rem; color: var(--lt-surface-500); display: flex; gap: 1.5rem;">
-                                            <span>SKU: <strong>${row.code || 'N/A'}</strong></span>
-                                            <span>Category: <strong>${row.category || 'General'}</strong></span>
-                                            <span>Stock: <strong>${row.quantity ?? 0} units</strong></span>
-                                            <span>Price: <strong>$${row.price ?? 0}</strong></span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                    `;
-                }
-
-                return html`${rowHtml}${expansionHtml}`;
-            });
+            } else {
+                const startIdx = paginator ? firstIdx : 0;
+                bodyRowsHtml = displayRows.map((row, idx) => renderSingleRow(row, startIdx + idx, totalRecords));
+            }
         }
 
         // Selection Summary Bar
@@ -1283,7 +1380,153 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
             </div>
         `);
 
+        updateVirtualPositions();
         bindEvents();
+    }
+
+    function bindBodyRowEvents(rootEl: HTMLElement) {
+        // 9. Row Checkbox Selection
+        rootEl.querySelectorAll<HTMLElement>('.p-row-checkbox').forEach(box => {
+            box.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const key = box.getAttribute('data-row-key');
+                if (!key) return;
+                const matchedRow = rawData.find(r => String(r[dataKey]) === String(key));
+                const realKey = matchedRow ? matchedRow[dataKey] : key;
+
+                if (selectedKeys.has(realKey)) selectedKeys.delete(realKey);
+                else selectedKeys.add(realKey);
+
+                dispatchSelectionEvent();
+                render();
+            }, { signal: ctx?.signal });
+        });
+
+        // 10. Row Radio Selection
+        rootEl.querySelectorAll<HTMLElement>('.p-row-radio').forEach(radio => {
+            radio.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const key = radio.getAttribute('data-row-key');
+                if (!key) return;
+                const matchedRow = rawData.find(r => String(r[dataKey]) === String(key));
+                const realKey = matchedRow ? matchedRow[dataKey] : key;
+
+                selectedKeys.clear();
+                selectedKeys.add(realKey);
+                dispatchSelectionEvent();
+                render();
+            }, { signal: ctx?.signal });
+        });
+
+        // 11. Row Click Selection and Keyboard Navigation
+        rootEl.querySelectorAll<HTMLTableRowElement>('.p-datatable-tbody > tr[data-row-key]').forEach(tr => {
+            if (selectionMode === 'single' || selectionMode === 'multiple') {
+                tr.addEventListener('click', (e) => {
+                    const key = tr.getAttribute('data-row-key');
+                    if (!key) return;
+                    const matchedRow = rawData.find(r => String(r[dataKey]) === String(key));
+                    const realKey = matchedRow ? matchedRow[dataKey] : key;
+
+                    if (selectionMode === 'single') {
+                        if (selectedKeys.has(realKey)) selectedKeys.delete(realKey);
+                        else {
+                            selectedKeys.clear();
+                            selectedKeys.add(realKey);
+                        }
+                    } else if (selectionMode === 'multiple') {
+                        const mouseEvent = e as MouseEvent;
+                        if (metaKeySelection && (mouseEvent.ctrlKey || mouseEvent.metaKey)) {
+                            if (selectedKeys.has(realKey)) selectedKeys.delete(realKey);
+                            else selectedKeys.add(realKey);
+                        } else {
+                            selectedKeys.clear();
+                            selectedKeys.add(realKey);
+                        }
+                    }
+                    dispatchSelectionEvent();
+                    render();
+                }, { signal: ctx?.signal });
+            }
+
+            tr.addEventListener('keydown', (e) => {
+                const idxStr = tr.getAttribute('data-index');
+                if (idxStr == null) return;
+                const currIdx = parseInt(idxStr, 10);
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (currIdx < currentFiltered.length - 1) {
+                        focusRowByIndex(currIdx + 1);
+                    }
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    if (currIdx > 0) {
+                        focusRowByIndex(currIdx - 1);
+                    }
+                }
+            }, { signal: ctx?.signal });
+        });
+
+        // 12. Row Toggler (Expansion)
+        rootEl.querySelectorAll<HTMLElement>('.p-row-toggler').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const key = btn.getAttribute('data-row-key');
+                if (!key) return;
+                const matchedRow = rawData.find(r => String(r[dataKey]) === String(key));
+                const realKey = matchedRow ? matchedRow[dataKey] : key;
+
+                if (expandedKeys.has(realKey)) expandedKeys.delete(realKey);
+                else expandedKeys.add(realKey);
+                render();
+            }, { signal: ctx?.signal });
+        });
+
+        // 13. In-Place Cell Editing
+        if (editMode === 'cell') {
+            rootEl.querySelectorAll<HTMLElement>('.p-editable-cell').forEach(td => {
+                td.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const rowKey = td.getAttribute('data-row-key');
+                    const field = td.getAttribute('data-field');
+                    if (!rowKey || !field) return;
+                    const matchedRow = rawData.find(r => String(r[dataKey]) === String(rowKey));
+                    const realKey = matchedRow ? matchedRow[dataKey] : rowKey;
+                    editingCell = { rowKey: realKey, field };
+                    render();
+                }, { signal: ctx?.signal });
+            });
+
+            const cellInput = rootEl.querySelector<HTMLInputElement>('.p-cell-editor-input');
+            if (cellInput) {
+                cellInput.focus();
+                const saveCell = () => {
+                    if (!editingCell) return;
+                    const rowKey = editingCell.rowKey;
+                    const field = editingCell.field;
+                    const newVal = cellInput.value;
+                    const matchedRow = rawData.find(r => String(r[dataKey]) === String(rowKey));
+                    if (matchedRow) {
+                        matchedRow[field] = newVal;
+                        container.dispatchEvent(new CustomEvent('datatable:cell-edit-complete', {
+                            bubbles: true,
+                            detail: { row: matchedRow, field, newValue: newVal }
+                        }));
+                    }
+                    editingCell = null;
+                    render();
+                };
+
+                cellInput.addEventListener('blur', saveCell, { signal: ctx?.signal });
+                cellInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        saveCell();
+                    } else if (e.key === 'Escape') {
+                        editingCell = null;
+                        render();
+                    }
+                }, { signal: ctx?.signal });
+            }
+        }
     }
 
     function bindEvents() {
@@ -1419,130 +1662,22 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
             }, { signal: ctx?.signal });
         }
 
-        // 9. Row Checkbox Selection
-        rootEl.querySelectorAll<HTMLElement>('.p-row-checkbox').forEach(box => {
-            box.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const key = box.getAttribute('data-row-key');
-                if (!key) return;
-                const matchedRow = rawData.find(r => String(r[dataKey]) === String(key));
-                const realKey = matchedRow ? matchedRow[dataKey] : key;
+        bindBodyRowEvents(rootEl);
 
-                if (selectedKeys.has(realKey)) selectedKeys.delete(realKey);
-                else selectedKeys.add(realKey);
-
-                dispatchSelectionEvent();
-                render();
-            }, { signal: ctx?.signal });
-        });
-
-        // 10. Row Radio Selection
-        rootEl.querySelectorAll<HTMLElement>('.p-row-radio').forEach(radio => {
-            radio.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const key = radio.getAttribute('data-row-key');
-                if (!key) return;
-                const matchedRow = rawData.find(r => String(r[dataKey]) === String(key));
-                const realKey = matchedRow ? matchedRow[dataKey] : key;
-
-                selectedKeys.clear();
-                selectedKeys.add(realKey);
-                dispatchSelectionEvent();
-                render();
-            }, { signal: ctx?.signal });
-        });
-
-        // 11. Row Click Selection
-        if (selectionMode === 'single' || selectionMode === 'multiple') {
-            rootEl.querySelectorAll<HTMLTableRowElement>('.p-datatable-tbody > tr[data-row-key]').forEach(tr => {
-                tr.addEventListener('click', (e) => {
-                    const key = tr.getAttribute('data-row-key');
-                    if (!key) return;
-                    const matchedRow = rawData.find(r => String(r[dataKey]) === String(key));
-                    const realKey = matchedRow ? matchedRow[dataKey] : key;
-
-                    if (selectionMode === 'single') {
-                        if (selectedKeys.has(realKey)) selectedKeys.delete(realKey);
-                        else {
-                            selectedKeys.clear();
-                            selectedKeys.add(realKey);
-                        }
-                    } else if (selectionMode === 'multiple') {
-                        const mouseEvent = e as MouseEvent;
-                        if (metaKeySelection && (mouseEvent.ctrlKey || mouseEvent.metaKey)) {
-                            if (selectedKeys.has(realKey)) selectedKeys.delete(realKey);
-                            else selectedKeys.add(realKey);
-                        } else {
-                            selectedKeys.clear();
-                            selectedKeys.add(realKey);
-                        }
-                    }
-                    dispatchSelectionEvent();
-                    render();
-                }, { signal: ctx?.signal });
-            });
-        }
-
-        // 12. Row Toggler (Expansion)
-        rootEl.querySelectorAll<HTMLElement>('.p-row-toggler').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const key = btn.getAttribute('data-row-key');
-                if (!key) return;
-                const matchedRow = rawData.find(r => String(r[dataKey]) === String(key));
-                const realKey = matchedRow ? matchedRow[dataKey] : key;
-
-                if (expandedKeys.has(realKey)) expandedKeys.delete(realKey);
-                else expandedKeys.add(realKey);
-                render();
-            }, { signal: ctx?.signal });
-        });
-
-        // 13. In-Place Cell Editing
-        if (editMode === 'cell') {
-            rootEl.querySelectorAll<HTMLElement>('.p-editable-cell').forEach(td => {
-                td.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const rowKey = td.getAttribute('data-row-key');
-                    const field = td.getAttribute('data-field');
-                    if (!rowKey || !field) return;
-                    const matchedRow = rawData.find(r => String(r[dataKey]) === String(rowKey));
-                    const realKey = matchedRow ? matchedRow[dataKey] : rowKey;
-                    editingCell = { rowKey: realKey, field };
-                    render();
-                }, { signal: ctx?.signal });
-            });
-
-            const cellInput = rootEl.querySelector<HTMLInputElement>('.p-cell-editor-input');
-            if (cellInput) {
-                cellInput.focus();
-                const saveCell = () => {
-                    if (!editingCell) return;
-                    const rowKey = editingCell.rowKey;
-                    const field = editingCell.field;
-                    const newVal = cellInput.value;
-                    const matchedRow = rawData.find(r => String(r[dataKey]) === String(rowKey));
-                    if (matchedRow) {
-                        matchedRow[field] = newVal;
-                        container.dispatchEvent(new CustomEvent('datatable:cell-edit-complete', {
-                            bubbles: true,
-                            detail: { row: matchedRow, field, newValue: newVal }
-                        }));
-                    }
-                    editingCell = null;
-                    render();
-                };
-
-                cellInput.addEventListener('blur', saveCell, { signal: ctx?.signal });
-                cellInput.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') {
-                        saveCell();
-                    } else if (e.key === 'Escape') {
-                        editingCell = null;
-                        render();
-                    }
-                }, { signal: ctx?.signal });
-            }
+        const wrapper = rootEl.querySelector<HTMLElement>('.p-datatable-scrollable-wrapper');
+        if (wrapper && !scrollBound) {
+            scrollBound = true;
+            wrapper.addEventListener('scroll', () => {
+                if (!virtualizer || !virtualizer.isVirtual()) return;
+                const newVirtualItems = virtualizer.getVirtualItems();
+                if (newVirtualItems.length === 0) return;
+                const newStart = newVirtualItems[0].index;
+                const newEnd = newVirtualItems[newVirtualItems.length - 1].index;
+                if (newStart === currentStart && newEnd === currentEnd) return;
+                currentStart = newStart;
+                currentEnd = newEnd;
+                reRenderVirtualRows();
+            }, { signal: ctx?.signal, passive: true });
         }
 
         // 14. Pagination Controls
