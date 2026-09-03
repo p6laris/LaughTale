@@ -9,6 +9,7 @@ import type { IslandContext } from '../runtime/registry';
  */
 
 import { injectIslandStyle } from '../runtime/styles';
+import { emitComponentEvent } from '../runtime/events';
 import { getLucideIcon } from '../icons/lucide';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
@@ -726,14 +727,11 @@ export default function InputPasswordIsland(container: HTMLElement, props: Input
             hidden.value = currentVal;
         }
 
-        container.dispatchEvent(new CustomEvent('password:change', {
-            bubbles: true,
-            detail: {
-                value: currentVal,
-                strength: calculateStrength(currentVal).label,
-                rules: checkRules(currentVal)
-            }
-        }));
+        emitComponentEvent(container, 'input-password', 'change', {
+            value: currentVal,
+            strength: calculateStrength(currentVal).label,
+            rules: checkRules(currentVal)
+        });
     }
 
     render();

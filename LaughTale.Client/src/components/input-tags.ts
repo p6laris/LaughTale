@@ -1,6 +1,7 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
+import { emitComponentEvent } from '../runtime/events';
 import { useControllableState } from '../composables/useControllableState';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
@@ -473,10 +474,10 @@ export default function InputTagsIsland(container: HTMLElement, props: InputTags
 
         updateTagIndices();
 
-        container.dispatchEvent(new CustomEvent('tags:add', {
-            bubbles: true,
-            detail: { value: val, values: newTags }
-        }));
+        emitComponentEvent(container, 'input-tags', 'add', {
+            value: val,
+            values: newTags
+        });
     }
 
     function removeTag(index: number) {
@@ -497,10 +498,11 @@ export default function InputTagsIsland(container: HTMLElement, props: InputTags
         const input = container.querySelector<HTMLInputElement>('.p-inputtags-input');
         input?.focus();
 
-        container.dispatchEvent(new CustomEvent('tags:remove', {
-            bubbles: true,
-            detail: { value: removedVal, index, values: newTags }
-        }));
+        emitComponentEvent(container, 'input-tags', 'remove', {
+            value: removedVal,
+            index,
+            values: newTags
+        });
     }
 
     function init() {
@@ -726,14 +728,9 @@ export default function InputTagsIsland(container: HTMLElement, props: InputTags
             hidden.value = JSON.stringify(tags);
         }
 
-        container.dispatchEvent(new CustomEvent('inputtags:change', {
-            bubbles: true,
-            detail: { values: tags }
-        }));
-        container.dispatchEvent(new CustomEvent('chips:change', {
-            bubbles: true,
-            detail: { values: tags }
-        }));
+        emitComponentEvent(container, 'input-tags', 'change', {
+            values: tags
+        });
     }
 
     init();

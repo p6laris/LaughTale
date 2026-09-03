@@ -1,6 +1,7 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
+import { emitComponentEvent } from '../runtime/events';
 import { LucideIcons } from '../icons/lucide';
 import { useControllableState } from '../composables/useControllableState';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
@@ -364,17 +365,11 @@ export default function InputTextIsland(container: HTMLElement, props: InputText
                 clearBtn.style.display = val ? 'flex' : 'none';
             }
 
-            container.dispatchEvent(new CustomEvent('inputtext:change', {
-                bubbles: true,
-                detail: { value: val }
-            }));
+            emitComponentEvent(container, 'input-text', 'change', { value: val });
         }, { signal: ctx?.signal });
 
         input.addEventListener('change', () => {
-            container.dispatchEvent(new CustomEvent('inputtext:change', {
-                bubbles: true,
-                detail: { value: input.value }
-            }));
+            emitComponentEvent(container, 'input-text', 'change', { value: input.value });
         }, { signal: ctx?.signal });
 
         if (clearBtn) {
@@ -386,13 +381,8 @@ export default function InputTextIsland(container: HTMLElement, props: InputText
                 clearBtn.style.display = 'none';
                 input.focus();
 
-                container.dispatchEvent(new CustomEvent('inputtext:change', {
-                    bubbles: true,
-                    detail: { value: '' }
-                }));
-                container.dispatchEvent(new CustomEvent('inputtext:clear', {
-                    bubbles: true
-                }));
+                emitComponentEvent(container, 'input-text', 'change', { value: '' });
+                emitComponentEvent(container, 'input-text', 'clear');
                 // Dispatch native input event for FloatLabel/IftaLabel detection
                 input.dispatchEvent(new Event('input', { bubbles: true }));
             }, { signal: ctx?.signal });

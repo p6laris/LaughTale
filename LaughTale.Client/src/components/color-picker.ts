@@ -2,6 +2,7 @@ import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts
 import type { IslandContext } from '../runtime/registry';
 import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
+import { emitComponentEvent } from '../runtime/events';
 import { useFloatingPosition } from '../composables/useFloatingPosition';
 import { html, setHtml, attr, type Raw } from '../runtime/html';
 import { announce } from '../accessibility/announcer';
@@ -205,10 +206,9 @@ export default function ColorPickerIsland(container: HTMLElement, props: ColorPi
             hidden.value = currentColor;
         }
 
-        container.dispatchEvent(new CustomEvent('color:change', {
-            bubbles: true,
-            detail: { value: currentColor }
-        }));
+        emitComponentEvent(container, 'color-picker', 'change', {
+            value: currentColor
+        });
         announce(`Color selected: ${currentColor}`, 'polite');
     }
 

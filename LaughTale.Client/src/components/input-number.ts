@@ -1,6 +1,7 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
+import { emitComponentEvent } from '../runtime/events';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
@@ -721,10 +722,7 @@ export function initInputNumber(
         }
         rawValue = val;
         syncTargetInput();
-        container.dispatchEvent(new CustomEvent('inputnumber:change', {
-            bubbles: true,
-            detail: { value: rawValue }
-        }));
+        emitComponentEvent(container, 'input-number', 'change', { value: rawValue });
     }
 
     function syncTargetInput() {

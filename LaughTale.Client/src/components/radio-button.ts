@@ -1,6 +1,7 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
+import { emitComponentEvent } from '../runtime/events';
 import { getLucideIcon } from '../icons/lucide';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import { setRovingTabindex, handleRovingKeydown } from '../accessibility/aria';
@@ -499,10 +500,10 @@ export default function RadioButtonIsland(container: HTMLElement, props: RadioBu
 
     function syncValue() {
         if (!isChecked) return;
-        container.dispatchEvent(new CustomEvent('radio:change', {
-            bubbles: true,
-            detail: { value: props.value, checked: isChecked }
-        }));
+        emitComponentEvent(container, 'radio-button', 'change', {
+            value: props.value,
+            checked: isChecked
+        });
     }
 
     function renderGroup() {
@@ -614,10 +615,9 @@ export default function RadioButtonIsland(container: HTMLElement, props: RadioBu
             });
 
             if (hiddenInp) hiddenInp.value = String(currentSelected);
-            container.dispatchEvent(new CustomEvent('radiogroup:change', {
-                bubbles: true,
-                detail: { value: currentSelected }
-            }));
+            emitComponentEvent(container, 'radio-button', 'change', {
+                value: currentSelected
+            });
         }
 
         container.addEventListener('keydown', (e: KeyboardEvent) => {
@@ -648,10 +648,9 @@ export default function RadioButtonIsland(container: HTMLElement, props: RadioBu
                 });
 
                 if (hiddenInp) hiddenInp.value = inp.value;
-                container.dispatchEvent(new CustomEvent('radiogroup:change', {
-                    bubbles: true,
-                    detail: { value: inp.value }
-                }));
+                emitComponentEvent(container, 'radio-button', 'change', {
+                    value: inp.value
+                });
             }, { signal: ctx?.signal });
         });
     }

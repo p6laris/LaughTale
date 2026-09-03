@@ -1,6 +1,7 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
+import { emitComponentEvent } from '../runtime/events';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
@@ -364,13 +365,10 @@ export default function InputOtpIsland(container: HTMLElement, props: InputOtpPr
             hidden.value = fullCode;
         }
 
-        container.dispatchEvent(new CustomEvent('otp:change', {
-            bubbles: true,
-            detail: {
-                value: fullCode,
-                isComplete: fullCode.length === length && !values.includes('')
-            }
-        }));
+        emitComponentEvent(container, 'input-otp', 'change', {
+            value: fullCode,
+            isComplete: fullCode.length === length && !values.includes('')
+        });
     }
 
     render();

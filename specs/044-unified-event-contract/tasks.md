@@ -163,11 +163,11 @@ they match. For `tieredmenu`, the test is that a toast **appears**.
 
 ### Batch C — mechanical renames
 
-- [ ] **T031** [P] [US2] `LaughTale.Client/src/components/input-tags.ts` — migrate to `emitComponentEvent`. **Three namespaces collapse to one**: `chips:` (a PrimeVue legacy name the component carries nowhere else), `inputtags:` and `tags:` all become `laughtale:input-tags:`.
-- [ ] **T032** [P] [US2] `LaughTale.Client/src/components/radio-button.ts` — `radio:` and `radiogroup:` collapse to `laughtale:radio-button:`.
-- [ ] **T033** [P] [US2] `LaughTale.Client/src/components/input-text.ts`, `input-number.ts`, `input-otp.ts`, `input-password.ts` — `inputtext:`, `inputnumber:`, `otp:`, `password:` become their canonical kebab-case names.
-- [ ] **T034** [P] [US2] `LaughTale.Client/src/components/color-picker.ts`, `context-menu.ts`, `image-compare.ts`, `speed-dial.ts` — `color:`, `contextmenu:`, `compare:`, `speeddial:` likewise.
-- [ ] **T035** [US2] Batch C gate over the ten files edited in T031–T034 under `LaughTale.Client/src/components/`: R1 and R4 report **0** failures for these ten; R2 reports **0** residual literals; **SC-005 reaches 3 → 0** (no component uses two namespaces).
+- [x] **T031** [P] [US2] `LaughTale.Client/src/components/input-tags.ts` — migrate to `emitComponentEvent`. **Three namespaces collapse to one**: `chips:` (a PrimeVue legacy name the component carries nowhere else), `inputtags:` and `tags:` all become `laughtale:input-tags:`.
+- [x] **T032** [P] [US2] `LaughTale.Client/src/components/radio-button.ts` — `radio:` and `radiogroup:` collapse to `laughtale:radio-button:`.
+- [x] **T033** [P] [US2] `LaughTale.Client/src/components/input-text.ts`, `input-number.ts`, `input-otp.ts`, `input-password.ts` — `inputtext:`, `inputnumber:`, `otp:`, `password:` become their canonical kebab-case names.
+- [x] **T034** [P] [US2] `LaughTale.Client/src/components/color-picker.ts`, `context-menu.ts`, `image-compare.ts`, `speed-dial.ts` — `color:`, `contextmenu:`, `compare:`, `speeddial:` likewise.
+- [x] **T035** [US2] Batch C gate over the ten files edited in T031–T034 under `LaughTale.Client/src/components/`: R1 and R4 report **0** failures for these ten; R2 reports **0** residual literals; **SC-005 reaches 3 → 0** (no component uses two namespaces).
 
 ### Batch D — the two special cases
 

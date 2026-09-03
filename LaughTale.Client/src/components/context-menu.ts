@@ -11,6 +11,7 @@ import { useFloatingPosition } from '../composables/useFloatingPosition';
 import { MenuItem } from '../types/models';
 import { LucideIcons, getLucideIcon } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
+import { emitComponentEvent } from '../runtime/events';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import { setRovingTabindex, handleRovingKeydown } from '../accessibility/aria';
 import { useKeyboardNav } from '../composables/useKeyboardNav';
@@ -697,10 +698,7 @@ export default function ContextMenuIsland(container: HTMLElement, props: Context
                 }
             }
 
-            container.dispatchEvent(new CustomEvent('contextmenu:select', {
-                bubbles: true,
-                detail: { label }
-            }));
+            emitComponentEvent(container, 'context-menu', 'select', { label });
 
             hideMenu();
         }, { signal: ctx?.signal });

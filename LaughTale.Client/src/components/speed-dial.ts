@@ -2,6 +2,7 @@ import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts
 import type { IslandContext } from '../runtime/registry';
 import { getLucideIcon, LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
+import { emitComponentEvent } from '../runtime/events';
 import { executeCommand } from '../runtime/commands';
 import { sanitizeUrl } from '../directives/security';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
@@ -839,10 +840,7 @@ export default function SpeedDialIsland(container: HTMLElement, props: SpeedDial
         el.addEventListener('click', (e) => {
             if (item?.disabled) return;
 
-            container.dispatchEvent(new CustomEvent('speeddial:action', {
-                bubbles: true,
-                detail: { item, index }
-            }));
+            emitComponentEvent(container, 'speed-dial', 'action', { item, index });
 
             if (item?.command) {
                 executeCommand(item.command, item);

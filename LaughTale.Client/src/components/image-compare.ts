@@ -2,6 +2,7 @@ import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts
 import type { IslandContext } from '../runtime/registry';
 import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
+import { emitComponentEvent } from '../runtime/events';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
@@ -408,10 +409,9 @@ export default function CompareIsland(container: HTMLElement, props: CompareProp
             numInput.value = `${Math.round(currentValue)}`;
         }
 
-        container.dispatchEvent(new CustomEvent('compare:change', {
-            bubbles: true,
-            detail: { value: currentValue }
-        }));
+        emitComponentEvent(container, 'image-compare', 'change', {
+            value: currentValue
+        });
     }
 
     updatePosition(currentValue);
