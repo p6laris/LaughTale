@@ -1,5 +1,6 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
+import { useFloatingPosition } from '../composables/useFloatingPosition';
 ﻿/**
  * LaughTale: Enterprise TieredMenu Component (LaughTale Aura Design System)
  * Hierarchical vertical navigation menu with nested flyout overlay submenus,
@@ -425,6 +426,7 @@ export default function TieredMenuIsland(container: HTMLElement, props: TieredMe
         if (!rootEl) return;
 
         // Position & Toggle Popup Mode
+        let popupFloatingCtrl: { update(): void; destroy(): void } | null = null;
         if (isPopup) {
             const triggerEl = container.querySelector<HTMLElement>('[data-tieredmenu-trigger]') 
                 || (props.triggerId ? document.getElementById(props.triggerId) : null);
@@ -435,13 +437,22 @@ export default function TieredMenuIsland(container: HTMLElement, props: TieredMe
                     rootEl.style.display = 'block';
                     triggerEl?.setAttribute('aria-expanded', 'true');
 
-                    // Position relative to target
-                    const rect = targetEl.getBoundingClientRect();
-                    const parentRect = rootEl.offsetParent ? (rootEl.offsetParent as HTMLElement).getBoundingClientRect() : { left: 0, top: 0 };
-                    
-                    rootEl.style.top = `${rect.bottom - parentRect.top + 4}px`;
-                    rootEl.style.left = `${rect.left - parentRect.left}px`;
+                    popupFloatingCtrl?.destroy();
+                    const effectiveSignal = ctx?.signal || new AbortController().signal;
+                    popupFloatingCtrl = useFloatingPosition(targetEl, rootEl, {
+                        placement: 'bottom-start',
+                        offset: 4,
+                        strategy: 'absolute',
+                        boundary: (rootEl.offsetParent as HTMLElement) || undefined,
+                        reposition: 'follow',
+                        signal: effectiveSignal
+                    });
+                    popupFloatingCtrl.update();
                 } else {
+                    if (popupFloatingCtrl) {
+                        popupFloatingCtrl.destroy();
+                        popupFloatingCtrl = null;
+                    }
                     rootEl.style.display = 'none';
                     triggerEl?.setAttribute('aria-expanded', 'false');
                     closeAllSubmenus(rootEl);
@@ -465,6 +476,10 @@ export default function TieredMenuIsland(container: HTMLElement, props: TieredMe
             document.addEventListener('click', (e) => {
                 if (isOpen && !rootEl.contains(e.target as Node) && (!triggerEl || !triggerEl.contains(e.target as Node))) {
                     isOpen = false;
+                    if (popupFloatingCtrl) {
+                        popupFloatingCtrl.destroy();
+                        popupFloatingCtrl = null;
+                    }
                     rootEl.style.display = 'none';
                     triggerEl?.setAttribute('aria-expanded', 'false');
                     closeAllSubmenus(rootEl);
@@ -511,13 +526,22 @@ export default function TieredMenuIsland(container: HTMLElement, props: TieredMe
             sub.style.display = 'block';
             li.querySelector('.p-tieredmenu-item-link')?.setAttribute('aria-expanded', 'true');
 
-            // Collision detection (flip to left if overflows viewport right)
-            const subRect = sub.getBoundingClientRect();
-            if (subRect.right > window.innerWidth - 8) {
+            // Submenu collision detection: flip left when right edge overflows
+            const subFloatingCtrl = useFloatingPosition(li, sub, {
+                placement: 'right-start',
+                offset: 4,
+                strategy: 'absolute',
+                boundary: (rootEl.offsetParent as HTMLElement) || undefined,
+                axis: 'x',
+                reposition: 'none'
+            });
+            const coords = subFloatingCtrl.computePosition();
+            if (coords.actualPlacement.startsWith('left')) {
                 sub.classList.add('p-flipped-left');
             } else {
                 sub.classList.remove('p-flipped-left');
             }
+            sub.style.left = '';
         }
 
         function scheduleCloseSubmenu(li: HTMLElement) {
