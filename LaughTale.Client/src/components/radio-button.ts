@@ -4,6 +4,12 @@ import { injectIslandStyle } from '../runtime/styles';
 import { getLucideIcon } from '../icons/lucide';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import { setRovingTabindex, handleRovingKeydown } from '../accessibility/aria';
+import type { PatternDeclaration } from '../accessibility/patterns';
+
+export const a11y: PatternDeclaration = {
+    kind: 'native',
+    element: 'input'
+};
 
 export interface RadioButtonOption {
     label: string;
@@ -510,6 +516,8 @@ export default function RadioButtonIsland(container: HTMLElement, props: RadioBu
         });
 
         container.className = groupClasses;
+        container.setAttribute('role', 'radiogroup');
+        container.setAttribute('aria-label', (props as any).ariaLabel || props.name || 'Radio Group');
         const itemsHtml = rawOpts.map((opt, idx) => {
             const checked = String(opt.value) === String(currentSelected);
             const itemId = `${props.name}_${idx}`;

@@ -13,6 +13,13 @@ import { useClickOutside } from '../composables/useClickOutside';
 import { useTransition } from '../composables/animation/useTransition';
 import { useKeyboardNav } from '../composables/useKeyboardNav';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import { announce } from '../accessibility/announcer';
+import type { PatternDeclaration } from '../accessibility/patterns';
+
+export const a11y: PatternDeclaration = {
+    kind: 'pattern',
+    pattern: 'listbox'
+};
 
 export interface MultiSelectProps<T = string> {
     options?: SelectButtonItem<T>[];
@@ -101,7 +108,7 @@ export default function MultiSelectIsland<T = string>(container: HTMLElement, pr
                 </div>
 
                 <!-- Items List -->
-                <div class="multiselect-items-list" style="max-height: 200px; overflow-y: auto; padding: 0.25rem 0;"></div>
+                <div class="multiselect-items-list" role="listbox" aria-multiselectable="true" aria-label="Options" style="max-height: 200px; overflow-y: auto; padding: 0.25rem 0;"></div>
             </div>
         </div>
     `);
@@ -222,7 +229,7 @@ export default function MultiSelectIsland<T = string>(container: HTMLElement, pr
         setHtml(itemsList, html`${filtered.map(o => {
             const isChecked = selected.has(o.value);
             return html`
-                <div class="multiselect-item" data-val="${String(o.value)}" style="display: flex; align-items: center; gap: 0.625rem; padding: 0.45rem 0.75rem; cursor: pointer; font-size: 0.8125rem; background: ${isChecked ? 'var(--lt-surface-50)' : 'transparent'}; color: var(--lt-text-primary);">
+                <div class="multiselect-item" role="option" aria-selected="${isChecked}" data-val="${String(o.value)}" style="display: flex; align-items: center; gap: 0.625rem; padding: 0.45rem 0.75rem; cursor: pointer; font-size: 0.8125rem; background: ${isChecked ? 'var(--lt-surface-50)' : 'transparent'}; color: var(--lt-text-primary);">
                     <input type="checkbox" ${attr('checked', isChecked)} style="accent-color: var(--lt-primary-600); pointer-events: none;" />
                     <span style="flex: 1;">${o.label}</span>
                 </div>
@@ -323,6 +330,7 @@ export default function MultiSelectIsland<T = string>(container: HTMLElement, pr
             bubbles: true,
             detail: { value: Array.from(selected) }
         }));
+        announce(`${selected.size} items selected`, 'polite');
     }
 
     renderDisplay();

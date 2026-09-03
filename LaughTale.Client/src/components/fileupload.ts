@@ -4,6 +4,13 @@ import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
 import { LucideIcons } from '../icons/lucide';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import { announce } from '../accessibility/announcer';
+import type { PatternDeclaration } from '../accessibility/patterns';
+
+export const a11y: PatternDeclaration = {
+    kind: 'native',
+    element: 'input'
+};
 
 /**
  * LaughTale: Enterprise FileUpload Component (Aura Design System compliant)
@@ -598,6 +605,7 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
                     f.status = 'completed';
                 });
                 render();
+                announce(`File upload completed: ${fileQueue.length} files`, 'polite');
             } else {
                 fileQueue.forEach(f => {
                     f.progress = currentProgress;
@@ -630,7 +638,7 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
                     <span class="p-fileupload-choose" tabindex="0">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
                         <span>${chooseLabel}</span>
-                        <input type="file" accept="${accept}" class="p-fileupload-input" />
+                        <input type="file" accept="${accept}" class="p-fileupload-input" aria-label="${chooseLabel || 'Upload file'}" />
                     </span>
 
                     ${currentFile ? html`
@@ -674,7 +682,7 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
                         <span class="p-fileupload-choose" tabindex="0">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
                             <span>${chooseLabel}</span>
-                            <input type="file" accept="${accept}" ${attr('multiple', multiple)} class="p-fileupload-input" />
+                            <input type="file" accept="${accept}" ${attr('multiple', multiple)} class="p-fileupload-input" aria-label="${chooseLabel || 'Upload file'}" />
                         </span>
                         ${hasFile ? html`<span class="p-fileupload-filename">${fileName}</span>` : ''}
                     </div>
@@ -685,7 +693,7 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
                         <span class="p-fileupload-choose" tabindex="0">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
                             <span>${chooseLabel}</span>
-                            <input type="file" accept="${accept}" ${attr('multiple', multiple)} class="p-fileupload-input" />
+                            <input type="file" accept="${accept}" ${attr('multiple', multiple)} class="p-fileupload-input" aria-label="${chooseLabel || 'Upload file'}" />
                         </span>
                         <span class="p-fileupload-filename" style="margin-left: 0.5rem; margin-right: 0.5rem;">${fileName}</span>
                         <button type="button" class="p-button p-button-outlined p-fileupload-upload-btn" ${!hasFile || isUploading ? 'disabled style="opacity:0.5; pointer-events:none; cursor:not-allowed;"' : ''}>
@@ -730,7 +738,7 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
                     <span class="p-fileupload-choose" tabindex="0">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
                         <span>${chooseLabel}</span>
-                        <input type="file" accept="${accept}" ${attr('multiple', multiple)} class="p-fileupload-input" />
+                        <input type="file" accept="${accept}" ${attr('multiple', multiple)} class="p-fileupload-input" aria-label="${chooseLabel || 'Upload file'}" />
                     </span>
                     <button type="button" class="p-button p-button-outlined p-fileupload-upload-btn" ${!hasFiles || isUploading ? 'disabled style="opacity:0.5; pointer-events:none; cursor:not-allowed;"' : ''}>
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>

@@ -3,6 +3,7 @@ import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
 import { LucideIcons } from '../icons/lucide';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import { announce } from '../accessibility/announcer';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -120,8 +121,8 @@ export default function DropzoneIsland(container: HTMLElement, props: DropzonePr
                 <span class="p-tag p-tag-info" style="font-size: 0.6875rem;">Client Dropzone</span>
             </div>
 
-            <div class="dropzone-box" tabindex="0">
-                <input type="file" class="file-input" name="${props.targetInputName || 'file'}" accept="${props.allowedExtensions || '*/*'}" style="display: none;" />
+            <div class="dropzone-box" tabindex="0" aria-label="${props.dropPrompt || 'Drag and drop files here to upload'}">
+                <input type="file" class="file-input" name="${props.targetInputName || 'file'}" accept="${props.allowedExtensions || '*/*'}" aria-label="${props.dropPrompt || 'Upload file'}" style="display: none;" />
                 
                 <div class="dropzone-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/><polyline points="12 13 12 9 10 11"/><polyline points="12 9 14 11"/></svg>
@@ -192,6 +193,7 @@ export default function DropzoneIsland(container: HTMLElement, props: DropzonePr
                 <span class="p-tag p-tag-success" style="font-size: 0.6875rem;">Verified</span>
             </div>
         `);
+        announce(`File uploaded: ${file.name}`, 'polite');
     }
 
     container.setAttribute('data-part', 'root');

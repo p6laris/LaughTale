@@ -3,6 +3,7 @@ import type { IslandContext } from '../runtime/registry';
 import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
 import { html, setHtml, attr, type Raw } from '../runtime/html';
+import { announce } from '../accessibility/announcer';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -93,7 +94,7 @@ export default function ColorPickerIsland(container: HTMLElement, props: ColorPi
                 <div style="display: flex; align-items: center; gap: 0.5rem; width: 100%; box-sizing: border-box;">
                     <!-- Stylized Native Color Picker Button -->
                     <div style="position: relative; width: 2rem; height: 2rem; flex-shrink: 0; border-radius: var(--lt-radius); border: 1px solid var(--lt-surface-200); overflow: hidden; background: ${currentColor}; cursor: pointer;">
-                        <input type="color" class="color-native-input" value="${currentColor}" style="position: absolute; inset: -4px; width: 200%; height: 200%; opacity: 0; cursor: pointer; border: none; padding: 0;" />
+                        <input type="color" class="color-native-input" value="${currentColor}" aria-label="Color spectrum" style="position: absolute; inset: -4px; width: 200%; height: 200%; opacity: 0; cursor: pointer; border: none; padding: 0;" />
                     </div>
 
                     <!-- Hex Text Input -->
@@ -104,6 +105,7 @@ export default function ColorPickerIsland(container: HTMLElement, props: ColorPi
                                 value="${currentColor.replace('#', '')}" 
                                 maxlength="6" 
                                 placeholder="10b981"
+                                aria-label="Hex color value"
                                 style="width: 100%; min-width: 0; padding: 0.35rem 0.25rem; font-family: monospace; font-size: 0.8125rem; color: var(--lt-text-primary); border: none; outline: none; background: transparent; box-sizing: border-box;" />
                     </div>
                 </div>
@@ -194,6 +196,7 @@ export default function ColorPickerIsland(container: HTMLElement, props: ColorPi
             bubbles: true,
             detail: { value: currentColor }
         }));
+        announce(`Color selected: ${currentColor}`, 'polite');
     }
 
     syncValue();

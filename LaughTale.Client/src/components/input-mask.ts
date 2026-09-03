@@ -283,6 +283,7 @@ export default function InputMaskIsland(container: HTMLElement, props: InputMask
             placeholder="${props.placeholder || tokens.map(t => t.isSlot ? t.slotChar : t.char).join('')}"
             ${attr('disabled', isDisabled)}
             ${attr('readonly', isReadonly)}
+            ${attr('aria-invalid', isInvalid ? 'true' : null)}
             ${attr('id', props.inputId)}
         />
         <input type="hidden" name="${props.name || props.targetInputName || 'mask_value'}" value="" />

@@ -209,6 +209,7 @@ export default function TextareaIsland(container: HTMLElement, props: TextareaPr
                     placeholder="${props.placeholder || ''}"
                     ${attr('maxlength', props.maxLength)}
                     ${attr('disabled', isDisabled)}
+                    ${attr('aria-invalid', isInvalid ? 'true' : null)}
                     ${attr('name', props.name || props.targetInputName)}
                     ${attr('id', props.inputId)}
                 >${props.value || ''}</textarea>

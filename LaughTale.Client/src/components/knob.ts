@@ -2,6 +2,12 @@ import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts
 import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import type { PatternDeclaration } from '../accessibility/patterns';
+
+export const a11y: PatternDeclaration = {
+    kind: 'pattern',
+    pattern: 'slider'
+};
 /**
  * LaughTale: Enterprise Radial Knob / Dial Component (Aura Knob inspired)
  * High-performance pointer capture dragging engine without full DOM rebuilds.
@@ -57,7 +63,7 @@ export default function KnobIsland(container: HTMLElement, props: KnobProps, ctx
     const initialText = template.replace('{value}', currentValue.toString());
 
     setHtml(container, html`
-        <div class="laughtale-knob" data-part="root" tabindex="${props.disabled ? '-1' : '0'}" style="position: relative; display: inline-flex; align-items: center; justify-content: center; width: ${size}px; height: ${size}px; user-select: none; cursor: ${props.disabled ? 'not-allowed' : 'pointer'}; touch-action: none;">
+        <div class="laughtale-knob" data-part="root" tabindex="${props.disabled ? '-1' : '0'}" role="slider" aria-valuenow="${currentValue}" aria-valuemin="${min}" aria-valuemax="${max}" aria-label="${(props as any).ariaLabel || 'Knob'}" style="position: relative; display: inline-flex; align-items: center; justify-content: center; width: ${size}px; height: ${size}px; user-select: none; cursor: ${props.disabled ? 'not-allowed' : 'pointer'}; touch-action: none;">
             <svg width="${size}" height="${size}" style="transform: rotate(-90deg); pointer-events: none;">
                 <!-- Background Circle -->
                 <circle cx="${size / 2}" cy="${size / 2}" r="${radius}" fill="transparent" stroke="var(--lt-surface-200)" stroke-width="${strokeWidth}" />
@@ -77,6 +83,7 @@ export default function KnobIsland(container: HTMLElement, props: KnobProps, ctx
     function updateVisuals() {
         progressCircle.style.strokeDashoffset = `${getOffset(currentValue)}`;
         valueDisplay.textContent = template.replace('{value}', currentValue.toString());
+        knobEl.setAttribute('aria-valuenow', currentValue.toString());
     }
 
     function syncValue() {
