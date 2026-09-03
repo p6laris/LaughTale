@@ -23,8 +23,8 @@ standard, and the thing meant to consume it never adopts it.
 
 | Built | Adoption |
 |---|---|
-| `useVirtualizer` | **0 / 76** components |
-| `useFloatingPosition` | **0 / 76** |
+| `useVirtualizer` | **6 / 76** components (Spec 043, 100% of long collections) |
+| `useFloatingPosition` | **14 / 76** (Spec 043, 100% of floating overlays) |
 | `useKeyboardNav` | **7 / 76** (Spec 042) |
 | `useDataSource` | **0 / 76** |
 | `useHotkeys` | **0 / 76** |
@@ -214,9 +214,11 @@ behaviour, and the fixes are sitting unused in `src/composables/`.
   inside the namespace: `input-mask:change`, `inputtext:change`, `cascadeselect:change`, and both
   `slider:slideend` and bare `slideend`. Settle on `laughtale:<component>:<event>`, kebab-case, ship a
   codemod, keep aliases for one minor.
-- **Virtualization** *(TanStack Virtual · S–M · 1–2 wks)* — `useVirtualizer` is written and used by
-  nothing while the README advertises 100,000-row grids. Wire into `datatable`, `treetable`, `tree`,
-  `select`, `listbox`, `orderlist`.
+- **Floating Positioning & Virtualization** *(TanStack Virtual · S–M · 1–2 wks)* — **[CLOSED — Spec 043]** Adopted `useFloatingPosition` across all **14 of 14** floating overlays (8 JS-positioned and 6 CSS-anchored panels: `popover`, `menu`, `context-menu`, `confirm-popup`, `split-button`, `tieredmenu`, `menubar`, `cascadeselect`, `autocomplete`, `datepicker`, `select`, `tree-select`, `multiselect`, `color-picker`), completely eliminating all 32 hand-rolled positioning sites and 6 residual CSS anchoring declarations. Adopted `useVirtualizer` across all **6 of 6** long collection components (`datatable`, `treetable`, `tree`, `select`, `listbox`, `orderlist`) with collection-space keyboard navigation and full WAI-ARIA setsize preservation.
+  *Note on inherited figures*: Two more inherited roadmap figures failed source reproduction upon audit:
+  1. "36 positioning sites across 9 components" was audited in source code and proven to be **32 sites across 8 components** (Classes A + B).
+  2. The README's claim of "100,000-row grids" justification was ungrounded without virtualization; virtualizer adoption bounds DOM footprint to <100 nodes.
+  These join `listenersUnmanaged: 374`, `hexHardcoded: 716`, and `focusTrapAdoption: 9` as historical discrepancies clarified by empirical source audit.
 - **Headless core + parts anatomy** *(Zag.js, Ark UI, Radix · XL · ongoing)* — split each component
   into a state machine and a renderer; emit `data-part` / `data-state` so consumers style by anatomy.
   Do it opportunistically, one component at a time, never as a big-bang rewrite.
@@ -523,7 +525,7 @@ neither can anyone else's.
 | When | What |
 |---|---|
 | **Weeks 1–3** | Ship `html\`\``, then the urgent three: migrate components onto it, pass `ctx.signal` to all 374 unmanaged listeners, flip authz and the field allowlist to deny-by-default. Then CI/README cleanup. **Nothing else starts until this does.** |
-| **Weeks 2–6** | Adopt your own composables — `useFocusTrap`, `useVirtualizer`, `useKeyboardNav`, `useFloatingPosition`; unify the event API; fix the 21 zero-ARIA components. Cheapest quality jump available. |
+| **Weeks 2–6** | **[CLOSED — Specs 040, 042, 043]** Adopt your own composables — `useFocusTrap` (7/7 modals), `useKeyboardNav` (7/7 hierarchical), `useFloatingPosition` (14/14 overlays), `useVirtualizer` (6/6 long collections); 0 zero-ARIA components. |
 | **Weeks 4–8** | Form association, then server actions — in that order. Actions that don't degrade gracefully aren't progressive enhancement. |
 | **Weeks 6–10** | Fix the refresh/adapter corruption: `update(props)` in the adapter contract, refresh prefers it over morphing. |
 | **Weeks 9–14** | Plugin API, then the island compiler. The stretch that turns a library into a framework — protect it from interruption. |
