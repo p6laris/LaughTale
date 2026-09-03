@@ -30,6 +30,7 @@ standard, and the thing meant to consume it never adopts it.
 | `useHotkeys` | **0 / 76** |
 | `useFocusTrap` | **7 / 7 modals** (Spec 042, 100% of modals) |
 | `IslandModule.createHandle` | **0** implementations |
+| `runtime/events.ts` | **41 / 41** dispatching components (Spec 044, 100% adoption) |
 | `sanitizeHtml` / `sanitizeUrl` (333 lines) | **4 / 76** |
 
 Mostly this is good news — a large share of this roadmap is **adoption, not invention**. But the
@@ -525,7 +526,7 @@ neither can anyone else's.
 | When | What |
 |---|---|
 | **Weeks 1–3** | Ship `html\`\``, then the urgent three: migrate components onto it, pass `ctx.signal` to all 374 unmanaged listeners, flip authz and the field allowlist to deny-by-default. Then CI/README cleanup. **Nothing else starts until this does.** |
-| **Weeks 2–6** | **[CLOSED — Specs 040, 042, 043]** Adopt your own composables — `useFocusTrap` (7/7 modals), `useKeyboardNav` (7/7 hierarchical), `useFloatingPosition` (14/14 overlays), `useVirtualizer` (6/6 long collections); 0 zero-ARIA components. |
+| **Weeks 2–6** | **[CLOSED — Specs 040, 042, 043, 044]** Adopt your own composables and event runtime — `useFocusTrap` (7/7 modals), `useKeyboardNav` (7/7 hierarchical), `useFloatingPosition` (14/14 overlays), `useVirtualizer` (6/6 long collections); unified component event contract `laughtale:<comp>:<evt>` (41/41 components). Findings recorded: `tieredmenu`'s cross-island toast dispatch never fired due to target mismatch (`window.dispatchEvent` vs `document.addEventListener`), now re-homed to the in-process island bus; `runtime/events.ts` was the seventh built-and-unadopted module, now fully adopted with its first callers. |
 | **Weeks 4–8** | Form association, then server actions — in that order. Actions that don't degrade gracefully aren't progressive enhancement. |
 | **Weeks 6–10** | Fix the refresh/adapter corruption: `update(props)` in the adapter contract, refresh prefers it over morphing. |
 | **Weeks 9–14** | Plugin API, then the island compiler. The stretch that turns a library into a framework — protect it from interruption. |

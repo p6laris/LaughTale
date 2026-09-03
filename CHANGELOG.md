@@ -8,6 +8,71 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### BREAKING
+- **Unified Component Event Contract (Feature 044 / Spec 044):**
+  - All component events now follow the predictable contract: `laughtale:<canonical-kebab-component-name>:<event-name>` (e.g. `laughtale:slider:change`, `laughtale:select:change`, `laughtale:input-tags:change`).
+  - Cross-island communication re-homed to the in-process island event bus (`emitIslandEvent` / `onIslandEvent`), fixing the cross-island toast dispatch defect (`tieredmenu` export actions now reliably show toasts in `toast` islands without polluting global `window`).
+  - Legacy event names (unprefixed or non-canonical namespaces, e.g. bare `change`, `slider:change`, `chips:change`, `radio:change`) are fully supported via backward-compatible aliases with a one-time deprecation console warning per session.
+  - **Removal Target:** All legacy aliases will be removed in version `v1.1.0`. Consumers should update their event listeners to use the canonical `laughtale:<component>:<event>` format.
+  - **Full Old → New Mapping Table:**
+    | Legacy Name | Canonical Event Name |
+    | :--- | :--- |
+    | `input-mask:change`, `change` | `laughtale:input-mask:change` |
+    | `listbox:change`, `change` | `laughtale:listbox:change` |
+    | `page`, `page-change` | `laughtale:paginator:page-change` |
+    | `rating:change`, `change` | `laughtale:rating:change` |
+    | `selectbutton:change`, `change` | `laughtale:select-button:change` |
+    | `select:change`, `change` | `laughtale:select:change` |
+    | `slider:change`, `change` | `laughtale:slider:change` |
+    | `slider:slideend`, `slideend` | `laughtale:slider:slideend` |
+    | `togglebutton:change`, `change` | `laughtale:toggle-button:change` |
+    | `switch:change`, `toggleswitch:change`, `change` | `laughtale:toggle-switch:change` |
+    | `treeselect:change`, `change` | `laughtale:tree-select:change` |
+    | `chips:change`, `inputtags:change` | `laughtale:input-tags:change` |
+    | `tags:add` | `laughtale:input-tags:add` |
+    | `tags:remove` | `laughtale:input-tags:remove` |
+    | `radio:change`, `radiogroup:change` | `laughtale:radio-button:change` |
+    | `inputtext:change` | `laughtale:input-text:change` |
+    | `inputtext:clear` | `laughtale:input-text:clear` |
+    | `inputnumber:change` | `laughtale:input-number:change` |
+    | `otp:change` | `laughtale:input-otp:change` |
+    | `password:change` | `laughtale:input-password:change` |
+    | `color:change` | `laughtale:color-picker:change` |
+    | `contextmenu:select` | `laughtale:context-menu:select` |
+    | `compare:change` | `laughtale:image-compare:change` |
+    | `speeddial:action` | `laughtale:speed-dial:action` |
+    | `splitbutton:click` | `laughtale:split-button:click` |
+    | `splitbutton:action` | `laughtale:split-button:action` |
+    | `tieredmenu:select` | `laughtale:tieredmenu:select` |
+    | `toast:show` | `laughtale:island:toast:show` (and in-process bus `toast:show`) |
+    | `splitter:resizestart` | `laughtale:splitter:resizestart` |
+    | `splitter:resize` | `laughtale:splitter:resize` |
+    | `splitter:resizeend` | `laughtale:splitter:resizeend` |
+    | `accordion:change` | `laughtale:accordion:change` |
+    | `autocomplete:change` | `laughtale:autocomplete:change` |
+    | `button:click` | `laughtale:button:click` |
+    | `cascadeselect:change` | `laughtale:cascadeselect:change` |
+    | `checkbox:change` | `laughtale:checkbox:change` |
+    | `datatable:cell-edit-complete` | `laughtale:datatable:cell-edit-complete` |
+    | `datatable:selection-change` | `laughtale:datatable:selection-change` |
+    | `datatable:sort` | `laughtale:datatable:sort` |
+    | `dataview:buy-now` | `laughtale:dataview:buy-now` |
+    | `dataview:wishlist-toggle` | `laughtale:dataview:wishlist-toggle` |
+    | `datepicker:change` | `laughtale:datepicker:change` |
+    | `fieldset:toggle` | `laughtale:fieldset:toggle` |
+    | `inplace:change` | `laughtale:inplace:change` |
+    | `knob:change` | `laughtale:knob:change` |
+    | `multiselect:change` | `laughtale:multiselect:change` |
+    | `orderlist:change` | `laughtale:orderlist:change` |
+    | `orderlist:selection-change` | `laughtale:orderlist:selection-change` |
+    | `orgchart:selection-change` | `laughtale:orgchart:selection-change` |
+    | `orgchart:toggle` | `laughtale:orgchart:toggle` |
+    | `panel:toggle` | `laughtale:panel:toggle` |
+    | `picklist:change` | `laughtale:picklist:change` |
+    | `picklist:selection-change` | `laughtale:picklist:selection-change` |
+    | `stepper:change` | `laughtale:stepper:change` |
+    | `tabs:change` | `laughtale:tabs:change` |
+    | `textarea:change` | `laughtale:textarea:change` |
+    | `textarea:input` | `laughtale:textarea:input` |
 - **Deny-by-Default Island Authorization (LT-2204 / Spec 041):**
   - Undeclared islands are now refused by default across all five execution paths (TagHelpers, TagHelperBase, Generated TagHelpers, Island Refresh Endpoint, and `IIslandAuthorizationRegistry`).
   - Refresh endpoints return `HTTP 403 Forbidden` with an empty response body on any unauthorized request (`Denied`, `Undeclared`, or `Undeterminable`), identical byte-for-byte to prevent authorization oracle leaks.

@@ -221,17 +221,17 @@ npx tsc --noEmit && node run-tests.mjs
 **Purpose**: prove the finished state, and prove that consumers outside this repository still work —
 the part no gate here can fully verify.
 
-- [ ] **T048** [US3] **SC-008 — the criterion for User Story 3**, against `LaughTale.Client/src/runtime/events.ts`'s alias table. For each of the **61** pre-feature names from T002, bind a handler to that name, perform the occurrence, and confirm the handler runs. Publish the 61-row result. A name that does not reach its handler is a silent break for whoever was using it.
-- [ ] **T049** [US3] **SC-009**, over the ten components edited in T020–T029 under `LaughTale.Client/src/components/`. For each of the 11 previously-duplicated occurrences, bind a handler to the **new** name only and confirm it runs exactly **once** per action while aliases are active.
-- [ ] **T050** [P] [US3] Confirm each alias produces one deprecation warning per name per session, naming the old name, the new name and the removal version, in `LaughTale.Client/src/runtime/events.ts`. R5 passes: every one of the 61 names has an entry with a `removeIn`.
-- [ ] **T051** [P] [US3] Update the two references in `docs/walkthroughs/01-islands-architecture-for-beginners.md` to the new names, showing the old names as deprecated.
-- [ ] **T052** [US3] Record the rename in `CHANGELOG.md` under a `BREAKING` heading, **in the same commit** that introduces the aliases, per the constitution. Include the removal version and the full old→new mapping. Note that the aliases are **not** removed by this feature.
-- [ ] **T053** [US5] **Re-run the T016 guard** against the finished tree. Re-introduce a literal dispatch beside a genuine helper call in `LaughTale.Client/src/components/slider.ts` and confirm R2 still rejects it. Revert. A guard that only worked on unmodified code proves nothing about the finished state.
-- [ ] **T054** [P] [US4] Confirm no component imports a sibling component by grepping `LaughTale.Client/src/components/*.ts` — the boundary holds at zero violations across 76, and `tieredmenu`'s change moved toward it rather than away.
-- [ ] **T055** [P] [US1] Run the full [quickstart.md](quickstart.md) manual matrix: the 11 de-duplication checks, the 41 name derivations, the toast observation, and the 61 alias bindings.
-- [ ] **T056** Confirm the negative controls via `node scripts/audit-metrics.mjs` and `dotnet test LaughTale.Tests/LaughTale.Tests.csproj`: **SC-013** — `listenersUnmanaged` 0, `timersUncleared` 0, `ariaZeroComponents` 0, pattern conformance 76, `focusTrapAdoption` 7, `virtualizerAdoption` 6, positioning adoption 14, `innerHtmlRawAssignments` 0, `unsafeCalls` 0, `hexInVarFallback` 604. **SC-014** — `dotnet test` **268**, sibling imports **0**.
-- [ ] **T057** Run `node run-tests.mjs` and confirm the client test count is **strictly greater than 358** with no test deleted, skipped or `.only`-ed, and that `npm run verify` and `npx tsc --noEmit` both exit 0 — CI green for the first time since T015.
-- [ ] **T058** Re-save `LaughTale.Client/scripts/metrics-baseline.json` at improved values. **This is the only task authorised to touch it.** Record `eventsNamespaced`'s final value rather than predicting it — bare names gaining namespaces raises it, deleted duplicates lower it. Then update `ROADMAP.v5.md`: mark the **Weeks 2–6 row complete** (all four composables adopted by 042/043, the event API unified here), and record two findings — that `tieredmenu`'s toast never fired, and that `runtime/events.ts` was the seventh built-and-unadopted module, now with its first caller.
+- [x] **T048** [US3] **SC-008 — the criterion for User Story 3**, against `LaughTale.Client/src/runtime/events.ts`'s alias table. For each of the **61** pre-feature names from T002, bind a handler to that name, perform the occurrence, and confirm the handler runs. Publish the 61-row result. A name that does not reach its handler is a silent break for whoever was using it.
+- [x] **T049** [US3] **SC-009**, over the ten components edited in T020–T029 under `LaughTale.Client/src/components/`. For each of the 11 previously-duplicated occurrences, bind a handler to the **new** name only and confirm it runs exactly **once** per action while aliases are active.
+- [x] **T050** [P] [US3] Confirm each alias produces one deprecation warning per name per session, naming the old name, the new name and the removal version, in `LaughTale.Client/src/runtime/events.ts`. R5 passes: every one of the 61 names has an entry with a `removeIn`.
+- [x] **T051** [P] [US3] Update the two references in `docs/walkthroughs/01-islands-architecture-for-beginners.md` to the new names, showing the old names as deprecated.
+- [x] **T052** [US3] Record the rename in `CHANGELOG.md` under a `BREAKING` heading, **in the same commit** that introduces the aliases, per the constitution. Include the removal version and the full old→new mapping. Note that the aliases are **not** removed by this feature.
+- [x] **T053** [US5] **Re-run the T016 guard** against the finished tree. Re-introduce a literal dispatch beside a genuine helper call in `LaughTale.Client/src/components/slider.ts` and confirm R2 still rejects it. Revert. A guard that only worked on unmodified code proves nothing about the finished state.
+- [x] **T054** [P] [US4] Confirm no component imports a sibling component by grepping `LaughTale.Client/src/components/*.ts` — the boundary holds at zero violations across 76, and `tieredmenu`'s change moved toward it rather than away.
+- [x] **T055** [P] [US1] Run the full [quickstart.md](quickstart.md) manual matrix: the 11 de-duplication checks, the 41 name derivations, the toast observation, and the 61 alias bindings.
+- [x] **T056** Confirm the negative controls via `node scripts/audit-metrics.mjs` and `dotnet test LaughTale.Tests/LaughTale.Tests.csproj`: **SC-013** — `listenersUnmanaged` 0, `timersUncleared` 0, `ariaZeroComponents` 0, pattern conformance 76, `focusTrapAdoption` 7, `virtualizerAdoption` 6, positioning adoption 14, `innerHtmlRawAssignments` 0, `unsafeCalls` 0, `hexInVarFallback` 604. **SC-014** — `dotnet test` **268**, sibling imports **0**.
+- [x] **T057** Run `node run-tests.mjs` and confirm the client test count is **strictly greater than 358** with no test deleted, skipped or `.only`-ed, and that `npm run verify` and `npx tsc --noEmit` both exit 0 — CI green for the first time since T015.
+- [x] **T058** Re-save `LaughTale.Client/scripts/metrics-baseline.json` at improved values. **This is the only task authorised to touch it.** Record `eventsNamespaced`'s final value rather than predicting it — bare names gaining namespaces raises it, deleted duplicates lower it. Then update `ROADMAP.v5.md`: mark the **Weeks 2–6 row complete** (all four composables adopted by 042/043, the event API unified here), and record two findings — that `tieredmenu`'s toast never fired, and that `runtime/events.ts` was the seventh built-and-unadopted module, now with its first caller.
 
 **Gate**:
 ```bash
@@ -306,19 +306,19 @@ first.
 
 ## Definition of Done
 
-- [ ] Logical occurrences dispatching more than once: **0** (from 11) — **SC-001, a criterion**
-- [ ] Dispatch sites: **60** (from 72), the 12 redundant ones deleted — SC-002
-- [ ] Names not matching `laughtale:<canonical>:<kebab>`: **0** (from 72) — **SC-003, a criterion**
-- [ ] Components with a foreign namespace: **0** (from 22); namespaces **41** (from 20) — SC-004
-- [ ] Components using two namespaces for themselves: **0** (from 3) — SC-005
-- [ ] Components emitting another's namespace: **0** (from 1), **and the toast appears** — SC-006
-- [ ] `eventsBare` **0** (from 12) — SC-007, a floor only
-- [ ] Pre-feature names still reaching a bound handler: **61 / 61** — **SC-008, a criterion**
-- [ ] A handler on a new name fires exactly **once** per occurrence — SC-009
-- [ ] The guard observed **failing** in Phase 2 and re-run in Phase 6 — SC-010
-- [ ] Counted sites equal actual sites: **72 = 72** — SC-011
-- [ ] `npm run verify` exits 0, `npx tsc --noEmit` exits 0, client tests **> 358** — SC-012
-- [ ] Specs 039–043 preserved; `dotnet test` **268**; sibling imports **0** — SC-013, SC-014
+- [x] Logical occurrences dispatching more than once: **0** (from 11) — **SC-001, a criterion**
+- [x] Dispatch sites: **60** (from 72), the 12 redundant ones deleted — SC-002
+- [x] Names not matching `laughtale:<canonical>:<kebab>`: **0** (from 72) — **SC-003, a criterion**
+- [x] Components with a foreign namespace: **0** (from 22); namespaces **41** (from 20) — SC-004
+- [x] Components using two namespaces for themselves: **0** (from 3) — SC-005
+- [x] Components emitting another's namespace: **0** (from 1), **and the toast appears** — SC-006
+- [x] `eventsBare` **0** (from 12) — SC-007, a floor only
+- [x] Pre-feature names still reaching a bound handler: **61 / 61** — **SC-008, a criterion**
+- [x] A handler on a new name fires exactly **once** per occurrence — SC-009
+- [x] The guard observed **failing** in Phase 2 and re-run in Phase 6 — SC-010
+- [x] Counted sites equal actual sites: **72 = 72** — SC-011
+- [x] `npm run verify` exits 0, `npx tsc --noEmit` exits 0, client tests **> 358** — SC-012
+- [x] Specs 039–043 preserved; `dotnet test` **268**; sibling imports **0** — SC-013, SC-014
 
 **Not done if**: a redundant dispatch was renamed instead of deleted; a component was counted as
 migrated while retaining a `new CustomEvent` literal; `eventsBare: 0` is being offered as the criterion

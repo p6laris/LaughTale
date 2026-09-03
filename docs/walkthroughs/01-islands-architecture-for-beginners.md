@@ -1625,6 +1625,19 @@ export function onIslandEvent<T = any>(event: string, handler: Handler<T>): () =
   ```
 - Deliberately minimal: no wildcards, no priorities, no async. Loose coupling by design.
 
+### Component Events (`emitComponentEvent`)
+
+Components dispatch standard DOM events bubbling from their container element using the unified naming contract `laughtale:<component>:<event>` (e.g. `laughtale:slider:change`):
+
+```ts
+import { emitComponentEvent } from '../runtime/events';
+
+// Inside a component island:
+emitComponentEvent(container, 'slider', 'change', { value: 42 });
+```
+
+> **Deprecation Notice**: Legacy pre-unified event names (such as bare `change` or unprefixed `slider:change`) are automatically supported as backward-compatible aliases with a one-time console warning per session, and will be removed in `v1.1.0`. All new code and listeners should subscribe to canonical `laughtale:<component>:<event>`.
+
 ## 4.10 `runtime/state.ts` — the shared store (entire file)
 
 ```ts
