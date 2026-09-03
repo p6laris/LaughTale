@@ -23,7 +23,7 @@ export { enableViewTransitions, navigateTo } from './runtime/router';
 export { resolvePart, applyPart, type PassthroughRecord, type PartOptions, type ResolvedPart } from './runtime/parts';
 export { getSlot, extractSlotContent, hasSlot } from './runtime/slots';
 export { injectIslandStyle, flushPendingStyles, removeIslandStyle, clearAllIslandStyles, isAdoptedStyleSheetsSupported } from './runtime/styles';
-export { emitIslandEvent, onIslandEvent } from './runtime/events';
+export { emitIslandEvent, onIslandEvent, emitComponentEvent, EVENT_PREFIX, EVENT_ALIASES, type EventAlias } from './runtime/events';
 export { IslandStore, useSharedState } from './runtime/state';
 export { parseAndReviveProps, reviveTuple } from './runtime/reviver';
 export { importWithRetry, type RetryOptions } from './runtime/retry';

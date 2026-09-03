@@ -193,8 +193,87 @@ export function findVirtualizerCalls(content) {
     return calls;
 }
 
+export function findEmitComponentEventCalls(content) {
+    const calls = [];
+    const re = /\bemitComponentEvent\s*\(/g;
+    let m;
+    while ((m = re.exec(content)) !== null) {
+        const start = re.lastIndex;
+        let depth = 1;
+        let i = start;
+        let inStr = false;
+        let quote = '';
+        while (i < content.length && depth > 0) {
+            const ch = content[i];
+            if (inStr) {
+                if (ch === quote && content[i - 1] !== '\\') inStr = false;
+            } else if (ch === '"' || ch === "'" || ch === '`') {
+                inStr = true;
+                quote = ch;
+            } else if (ch === '(') {
+                depth++;
+            } else if (ch === ')') {
+                depth--;
+            }
+            i++;
+        }
+        const argsStr = content.slice(start, i - 1);
+        const args = splitTopLevel(argsStr);
+        const line = content.slice(0, m.index).split('\n').length;
+        calls.push({ line, argsStr, args });
+    }
+    return calls;
+}
+
+export function findCustomEventDispatches(content) {
+    const dispatches = [];
+    const re = /\b(?:(\w+)\s*\.\s*)?dispatchEvent\s*\(\s*new\s+CustomEvent\s*\(\s*[`'"]([^`'"]+)[`'"]/g;
+    let m;
+    while ((m = re.exec(content)) !== null) {
+        const line = content.slice(0, m.index).split('\n').length;
+        const target = m[1] || 'container';
+        const eventName = m[2];
+        dispatches.push({ line, target, eventName });
+    }
+    return dispatches;
+}
+
+export const PAIRED_OCCURRENCES = {
+    'input-mask.ts': [['input-mask:change', 'change']],
+    'listbox.ts': [['listbox:change', 'change']],
+    'paginator.ts': [['page', 'page-change']],
+    'rating.ts': [['rating:change', 'change']],
+    'select-button.ts': [['selectbutton:change', 'change']],
+    'select.ts': [['select:change', 'change']],
+    'slider.ts': [['slider:change', 'change'], ['slider:slideend', 'slideend']],
+    'toggle-button.ts': [['togglebutton:change', 'change']],
+    'toggle-switch.ts': [['switch:change', 'toggleswitch:change', 'change']],
+    'tree-select.ts': [['treeselect:change', 'change']]
+};
+
+export const PRE_FEATURE_61 = [
+    'accordion:change', 'autocomplete:change', 'button:click', 'cascadeselect:change',
+    'change', 'checkbox:change', 'chips:change', 'color:change', 'compare:change',
+    'contextmenu:select', 'datatable:cell-edit-complete', 'datatable:selection-change',
+    'datatable:sort', 'dataview:buy-now', 'dataview:wishlist-toggle', 'datepicker:change',
+    'fieldset:toggle', 'inplace:change', 'input-mask:change', 'inputnumber:change',
+    'inputtags:change', 'inputtext:change', 'inputtext:clear', 'knob:change',
+    'listbox:change', 'multiselect:change', 'orderlist:change', 'orderlist:selection-change',
+    'orgchart:selection-change', 'orgchart:toggle', 'otp:change', 'page', 'page-change',
+    'panel:toggle', 'password:change', 'picklist:change', 'picklist:selection-change',
+    'radio:change', 'radiogroup:change', 'rating:change', 'select:change',
+    'selectbutton:change', 'slideend', 'slider:change', 'slider:slideend',
+    'speeddial:action', 'splitbutton:action', 'splitbutton:click', 'splitter:${eventType}',
+    'stepper:change', 'switch:change', 'tabs:change', 'tags:add', 'tags:remove',
+    'textarea:change', 'textarea:input', 'tieredmenu:select', 'toast:show',
+    'togglebutton:change', 'toggleswitch:change', 'treeselect:change'
+];
+
 const files = fs.readdirSync(componentsDir).filter(f => f.endsWith('.ts'));
 let errors = 0;
+let r1NonConformingCount = 0;
+let r1ComponentsSet = new Set();
+let r3DuplicateOccurrencesCount = 0;
 
 for (const file of files) {
     const filePath = path.join(componentsDir, file);
@@ -513,7 +592,124 @@ for (const file of files) {
             }
         }
     }
+
+    // ==========================================
+    // Unified Event Contract Rules (Feature 044)
+    // ==========================================
+    const compBase = file.replace('.ts', '');
+    const emitCalls = findEmitComponentEventCalls(content);
+    const customDispatches = findCustomEventDispatches(content);
+
+    // Rule ER1: Event Name Conformance (contracts/lint-rules.md R1)
+    for (const d of customDispatches) {
+        if (!d.eventName.startsWith(`laughtale:${compBase}:`)) {
+            console.error(`❌ [${file}:${d.line}] ER1 event name conformance: '${d.eventName}' does not conform to 'laughtale:${compBase}:<event>'`);
+            errors++;
+            r1NonConformingCount++;
+            r1ComponentsSet.add(file);
+        }
+    }
+    for (const c of emitCalls) {
+        const compArgRaw = c.args[1] || '';
+        const compArg = compArgRaw.replace(/['"`]/g, '').trim();
+        const evArgRaw = c.args[2] || '';
+        const evArg = evArgRaw.replace(/['"`]/g, '').trim();
+
+        if (!/^['"`][^'"`]+['"`]$/.test(compArgRaw) || compArg !== compBase) {
+            console.error(`❌ [${file}:${c.line}] ER1 event name conformance: component argument must be static string literal '${compBase}', got ${compArgRaw}`);
+            errors++;
+            r1NonConformingCount++;
+            r1ComponentsSet.add(file);
+        }
+        if (/^['"`]/.test(evArgRaw)) {
+            if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(evArg)) {
+                console.error(`❌ [${file}:${c.line}] ER1 event name conformance: event argument '${evArg}' must be kebab-case`);
+                errors++;
+                r1NonConformingCount++;
+                r1ComponentsSet.add(file);
+            }
+        }
+    }
+
+    // Rule ER2: No Residual Literal Dispatch (contracts/lint-rules.md R2)
+    for (const d of customDispatches) {
+        console.error(`❌ [${file}:${d.line}] ER2 residual dispatch: retains literal CustomEvent dispatch for '${d.eventName}' at line ${d.line}`);
+        errors++;
+    }
+
+    // Rule ER3: One Dispatch Per Occurrence (contracts/lint-rules.md R3)
+    if (PAIRED_OCCURRENCES[file]) {
+        for (const pair of PAIRED_OCCURRENCES[file]) {
+            const foundDispatches = pair.filter(evName => customDispatches.some(cd => cd.eventName === evName));
+            if (foundDispatches.length > 1) {
+                console.error(`❌ [${file}] ER3 duplicate dispatch: occurrence emits duplicate events (${foundDispatches.join(', ')})`);
+                errors++;
+                r3DuplicateOccurrencesCount++;
+            }
+        }
+    }
+
+    // Rule ER4: Canonical Component Namespace (contracts/lint-rules.md R4)
+    if (customDispatches.length > 0) {
+        const namespaces = new Set();
+        for (const cd of customDispatches) {
+            if (cd.eventName.includes(':')) {
+                namespaces.add(cd.eventName.split(':')[0]);
+            } else {
+                namespaces.add('(bare)');
+            }
+        }
+        if (namespaces.size > 1) {
+            console.error(`❌ [${file}] ER4 multiple namespaces: dispatches events across multiple namespaces (${[...namespaces].join(', ')})`);
+            errors++;
+        } else if (namespaces.size === 1) {
+            const ns = [...namespaces][0];
+            if (ns !== compBase && ns !== 'laughtale') {
+                console.error(`❌ [${file}] ER4 foreign namespace: dispatches events under foreign namespace '${ns}' instead of '${compBase}'`);
+                errors++;
+            }
+        }
+    }
+
+    // Rule ER6: Valid Dispatch Target (contracts/lint-rules.md R6)
+    for (const cd of customDispatches) {
+        if (/^window\b/.test(cd.target) || /^document\b/.test(cd.target)) {
+            console.error(`❌ [${file}:${cd.line}] ER6 invalid dispatch target: component event must not be dispatched on '${cd.target}'`);
+            errors++;
+        }
+    }
+    for (const c of emitCalls) {
+        const targetArg = (c.args[0] || '').trim();
+        if (/^window\b/.test(targetArg) || /^document\b/.test(targetArg)) {
+            console.error(`❌ [${file}:${c.line}] ER6 invalid dispatch target: emitComponentEvent target must not be '${targetArg}'`);
+            errors++;
+        }
+    }
 }
+
+// Rule ER5: Alias Table Completeness (contracts/lint-rules.md R5)
+const eventsModulePath = path.resolve(__dirname, '../src/runtime/events.ts');
+if (fs.existsSync(eventsModulePath)) {
+    const eventsContent = fs.readFileSync(eventsModulePath, 'utf-8');
+    for (const name of PRE_FEATURE_61) {
+        if (name === 'splitter:${eventType}') {
+            if (!eventsContent.includes("from: 'splitter:resizestart'") ||
+                !eventsContent.includes("from: 'splitter:resize'") ||
+                !eventsContent.includes("from: 'splitter:resizeend'")) {
+                console.error(`❌ [events.ts] ER5 alias table completeness: missing alias for dynamic '${name}'`);
+                errors++;
+            }
+            continue;
+        }
+        const aliasRegex = new RegExp(`from:\\s*['"]${name.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}['"][\\s\\S]*?removeIn:\\s*['"][^'"]+['"]`);
+        if (!aliasRegex.test(eventsContent)) {
+            console.error(`❌ [events.ts] ER5 alias table completeness: missing alias with removeIn for pre-feature event '${name}'`);
+            errors++;
+        }
+    }
+}
+
+console.log(`\n[LaughTale Lint Event Status] R1 non-conforming names: ${r1NonConformingCount} across ${r1ComponentsSet.size} components | R3 duplicate occurrences: ${r3DuplicateOccurrencesCount}`);
 
 if (errors > 0) {
     console.error(`\n❌ [LaughTale Lint] Contract verification failed with ${errors} violation(s).\n`);
