@@ -7,6 +7,7 @@
 
 import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
+import { onIslandEvent } from '../runtime/events';
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
@@ -684,10 +685,9 @@ export default function ToastIsland(container: HTMLElement, props: ToastContaine
 
     globalToast.registerContainer(group, container);
 
-    document.addEventListener('toast:show', (e: Event) => {
-        const detail = (e as CustomEvent).detail;
+    const unsubToast = onIslandEvent('toast:show', (detail: any) => {
         if (detail) globalToast.add(detail);
-    }, { signal: ctx?.signal });
+    });
 
     document.addEventListener('toast:clear', (e: Event) => {
         const detail = (e as CustomEvent).detail;
@@ -699,6 +699,7 @@ export default function ToastIsland(container: HTMLElement, props: ToastContaine
     }, { signal: ctx?.signal });
 
     ctx?.onCleanup(() => {
+        unsubToast();
         globalToast.unregisterContainer(group);
         globalToast.removeGroup(group);
     });

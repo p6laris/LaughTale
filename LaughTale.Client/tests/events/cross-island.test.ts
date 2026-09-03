@@ -4,21 +4,11 @@ import '../setup';
 import TieredMenuIsland from '../../src/components/tieredmenu';
 import ToastIsland from '../../src/components/toast';
 
-describe('Defect 2 Reproduction: TieredMenu to Toast Event Target Mismatch (T007)', () => {
-    it('tieredmenu export dispatches to window, toast listens on document: toast does not receive event', () => {
+describe('Cross-Island Bus Communication Suite (T038)', () => {
+    it('toast appears when tieredmenu triggers export action via island bus', () => {
         const toastContainer = document.createElement('div');
         document.body.appendChild(toastContainer);
         ToastIsland(toastContainer, {});
-
-        let documentReceivedToast = false;
-        let windowReceivedToast = false;
-
-        document.addEventListener('toast:show', () => {
-            documentReceivedToast = true;
-        });
-        window.addEventListener('toast:show', () => {
-            windowReceivedToast = true;
-        });
 
         const menuContainer = document.createElement('div');
         document.body.appendChild(menuContainer);
@@ -33,14 +23,9 @@ describe('Defect 2 Reproduction: TieredMenu to Toast Event Target Mismatch (T007
         assert.ok(exportItem, 'Export item must exist');
         exportItem.click();
 
-        console.log(`[Defect 2] windowReceivedToast: ${windowReceivedToast}, documentReceivedToast: ${documentReceivedToast}`);
-        
-        // Window no longer receives untargeted dispatch; communication is routed via island bus
-        assert.strictEqual(windowReceivedToast, false, 'window should not receive untargeted global event');
-
-        // Toast container DOM now successfully renders the toast message
+        // Check if toast message appeared
         const toastMsg = toastContainer.querySelector('.p-toast-message');
-        assert.ok(toastMsg, 'toast message appears in toast container via island bus');
+        assert.ok(toastMsg, 'toast message must appear in DOM when tieredmenu exports');
 
         document.body.removeChild(toastContainer);
         document.body.removeChild(menuContainer);

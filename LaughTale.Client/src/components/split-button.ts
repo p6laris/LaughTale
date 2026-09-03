@@ -8,6 +8,7 @@ import { useFloatingPosition } from '../composables/useFloatingPosition';
 
 import { SplitButtonItem, ButtonSeverity } from '../types/models';
 import { injectIslandStyle } from '../runtime/styles';
+import { emitComponentEvent } from '../runtime/events';
 import { LucideIcons } from '../icons/lucide';
 import { executeCommand } from '../runtime/commands';
 import { sanitizeUrl } from '../directives/security';
@@ -670,10 +671,10 @@ export default function SplitButtonIsland(container: HTMLElement, props: SplitBu
     // Main Button Click
     mainBtn.addEventListener('click', () => {
         if (disabled) return;
-        container.dispatchEvent(new CustomEvent('splitbutton:click', {
-            bubbles: true,
-            detail: { action: props.action || 'main', label }
-        }));
+        emitComponentEvent(container, 'split-button', 'click', {
+            action: props.action || 'main',
+            label
+        });
     }, { signal: ctx?.signal });
 
     // Dropdown Trigger Click
@@ -710,10 +711,10 @@ export default function SplitButtonIsland(container: HTMLElement, props: SplitBu
             }
         }
 
-        container.dispatchEvent(new CustomEvent('splitbutton:action', {
-            bubbles: true,
-            detail: { item: itemData, action: itemData.action || itemData.label }
-        }));
+        emitComponentEvent(container, 'split-button', 'action', {
+            item: itemData,
+            action: itemData.action || itemData.label
+        });
 
         closeMenu();
         dropdownBtn.focus();

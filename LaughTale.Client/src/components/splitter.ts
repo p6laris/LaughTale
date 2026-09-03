@@ -7,6 +7,7 @@ import type { IslandContext } from '../runtime/registry';
  */
 
 import { injectIslandStyle } from '../runtime/styles';
+import { emitComponentEvent } from '../runtime/events';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -308,10 +309,7 @@ export default function SplitterIsland(container: HTMLElement, props: SplitterPr
         }
 
         if (triggerEvents) {
-            container.dispatchEvent(new CustomEvent(`splitter:${eventType}`, {
-                bubbles: true,
-                detail: { sizes: [...sizes] }
-            }));
+            emitComponentEvent(container, 'splitter', eventType, { sizes: [...sizes] });
 
             // Sync metrics display in showcase
             const metricBox = container.closest('.component-card')?.querySelector('.p-splitter-metrics');
