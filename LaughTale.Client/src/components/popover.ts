@@ -90,6 +90,7 @@ html.dark .p-popover-arrow,
 
 export interface PopoverProps {
     id?: string;
+    target?: string | HTMLElement;
     triggerId?: string;
     placement?: 'bottom' | 'top' | 'left' | 'right';
     showArrow?: boolean;
@@ -249,7 +250,7 @@ export default function PopoverIsland(container: HTMLElement, props: PopoverProp
         : (props.triggerId ? document.getElementById(props.triggerId) : null);
 
     if (targetEl) {
-        targetEl.addEventListener('click', (e) => {
+        targetEl.addEventListener('click', (e: MouseEvent) => {
             e.preventDefault();
             e.stopPropagation();
             const isActive = container.classList.contains('p-popover-active');
