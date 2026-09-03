@@ -148,6 +148,51 @@ export function findFloatingPositionCalls(content) {
     return calls;
 }
 
+export const VIRTUALIZATION_COMPONENTS = [
+    'listbox.ts', 'orderlist.ts', 'select.ts', 'tree.ts', 'treetable.ts', 'datatable.ts'
+];
+
+export const VIRTUALIZATION_TARGETS = {
+    'listbox.ts': { re: /visible\.map\s*\(/, construct: 'visible.map(...) full collection render' },
+    'orderlist.ts': { re: /filteredItems\.map\s*\(/, construct: 'filteredItems.map(...) full collection render' },
+    'select.ts': { re: /visibleOpts\.forEach\s*\(/, construct: 'visibleOpts.forEach(...) full collection render' },
+    'tree.ts': { re: /displayNodes\.map\s*\(/, construct: 'displayNodes.map(...) full collection render' },
+    'treetable.ts': { re: /const\s+allVisibleRows\s*=/, construct: 'allVisibleRows full collection render' },
+    'datatable.ts': { re: /paginator\s*\?\s*filtered\.slice/, construct: 'filtered.slice / full collection render' }
+};
+
+export function findVirtualizerCalls(content) {
+    const calls = [];
+    const re = /\buseVirtualizer\s*\(/g;
+    let m;
+    while ((m = re.exec(content)) !== null) {
+        const start = re.lastIndex;
+        let depth = 1;
+        let i = start;
+        let inStr = false;
+        let quote = '';
+        while (i < content.length && depth > 0) {
+            const ch = content[i];
+            if (inStr) {
+                if (ch === quote && content[i - 1] !== '\\') inStr = false;
+            } else if (ch === '"' || ch === "'" || ch === '`') {
+                inStr = true;
+                quote = ch;
+            } else if (ch === '(') {
+                depth++;
+            } else if (ch === ')') {
+                depth--;
+            }
+            i++;
+        }
+        const argsStr = content.slice(start, i - 1);
+        const args = splitTopLevel(argsStr);
+        const line = content.slice(0, m.index).split('\n').length;
+        calls.push({ line, argsStr, args });
+    }
+    return calls;
+}
+
 const files = fs.readdirSync(componentsDir).filter(f => f.endsWith('.ts'));
 let errors = 0;
 
@@ -401,6 +446,68 @@ for (const file of files) {
                 const isPointAnchorArg = /\{\s*x\s*:\s*[^,]+,\s*y\s*:\s*[^}]+\}/.test(firstArg);
                 if (strategyVal === 'follow' && isPointAnchorArg) {
                     console.error(`❌ [${file}:${call.line}] R3 reposition strategy declared: point anchor cannot be paired with reposition 'follow'.`);
+                    errors++;
+                }
+            }
+        }
+    }
+
+    // Rule R4: Virtualization adoption
+    if (VIRTUALIZATION_COMPONENTS.includes(file)) {
+        const hasImport = /\bimport\b[^;]*\buseVirtualizer\b/.test(content);
+        const virtCalls = findVirtualizerCalls(content);
+        const target = VIRTUALIZATION_TARGETS[file];
+        let unboundedMatch = null;
+        let unboundedLine = 0;
+        if (target) {
+            unboundedMatch = content.match(target.re);
+            if (unboundedMatch) {
+                unboundedLine = content.slice(0, unboundedMatch.index).split('\n').length;
+            }
+        }
+
+        if (hasImport && virtCalls.length === 0) {
+            console.error(`❌ [${file}] R4 virtualization adoption: imports useVirtualizer but never calls it`);
+            errors++;
+        } else if (virtCalls.length === 0) {
+            if (unboundedMatch) {
+                console.error(`❌ [${file}:${unboundedLine}] R4 virtualization adoption: renders unbounded collection without useVirtualizer: ${target.construct} at line ${unboundedLine}`);
+                errors++;
+            }
+        } else {
+            if (unboundedMatch) {
+                console.error(`❌ [${file}:${unboundedLine}] R4 virtualization adoption: calls useVirtualizer but still renders the full collection at line ${unboundedLine}`);
+                errors++;
+            }
+        }
+    }
+
+    // Rules R5 & R6: Keyed on useVirtualizer call
+    const allVirtCalls = findVirtualizerCalls(content);
+    if (allVirtCalls.length > 0) {
+        // Rule R5: Virtualized attributes
+        let virtAttrs = ['aria-setsize', 'aria-posinset'];
+        if (a11yDecl && a11yDecl.kind === 'pattern' && PATTERNS[a11yDecl.pattern] && PATTERNS[a11yDecl.pattern].virtualizedAttributes) {
+            virtAttrs = PATTERNS[a11yDecl.pattern].virtualizedAttributes;
+        }
+        for (const attr of virtAttrs) {
+            if (!content.includes(attr)) {
+                console.error(`❌ [${file}] R5 virtualized attributes: calls useVirtualizer but rendered items missing required '${attr}'.`);
+                errors++;
+            }
+        }
+
+        // Rule R6: Fixed-size only (estimateSize must be numeric)
+        for (const call of allVirtCalls) {
+            const optsStr = call.argsStr;
+            const sizeMatch = optsStr.match(/\bestimateSize\s*:\s*([^,}\n]+)/);
+            if (!sizeMatch) {
+                console.error(`❌ [${file}:${call.line}] R6 fixed-size only: useVirtualizer call missing numeric estimateSize.`);
+                errors++;
+            } else {
+                const sizeVal = sizeMatch[1].trim();
+                if (/=>|function\b/.test(sizeVal) || (!/^\d+(\.\d+)?$/.test(sizeVal) && !/^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(sizeVal))) {
+                    console.error(`❌ [${file}:${call.line}] R6 fixed-size only: estimateSize must be numeric, got '${sizeVal}'.`);
                     errors++;
                 }
             }
