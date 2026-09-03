@@ -78,6 +78,33 @@ app.Run();
 
 ---
 
+## 🔒 Security & Authorization (v4+)
+
+LaughTale enforces **deny-by-default authorization** (LT-2204). Islands must be explicitly declared public or protected with an ASP.NET Core authorization policy:
+
+```csharp
+// Option A: Attribute on props
+[Island("user-profile")]
+[IslandAuthorize("UserPolicy")]
+public record UserProfileProps(string Username);
+
+// Option B: Public island declaration
+[Island("public-counter")]
+[IslandAllowAnonymous]
+public record PublicCounterProps(int Count);
+
+// Option C: Global configuration
+builder.Services.AddLaughTale(options =>
+{
+    options.Refresh.RequirePolicy("admin-panel", "AdminOnly");
+    options.Refresh.AllowAnonymous("public-counter");
+});
+```
+
+See [docs/migration/041-deny-by-default.md](docs/migration/041-deny-by-default.md) for full migration details, field allowlist policies, and emergency compatibility options.
+
+---
+
 ## 📄 License & Attribution
 
 Distributed under the [MIT License](LICENSE). See [NOTICE](NOTICE) for third-party open-source notices.

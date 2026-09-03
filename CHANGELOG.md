@@ -8,6 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### BREAKING
+- **Deny-by-Default Island Authorization (LT-2204 / Spec 041):**
+  - Undeclared islands are now refused by default across all five execution paths (TagHelpers, TagHelperBase, Generated TagHelpers, Island Refresh Endpoint, and `IIslandAuthorizationRegistry`).
+  - Refresh endpoints return `HTTP 403 Forbidden` with an empty response body on any unauthorized request (`Denied`, `Undeclared`, or `Undeterminable`), identical byte-for-byte to prevent authorization oracle leaks.
+  - TagHelpers suppress markup rendering entirely (`output.SuppressOutput()`) when unauthorized or when running outside an authorized request container.
+  - Antiforgery validation fails closed: returns `HTTP 400 Bad Request` if `RequireAntiforgery = true` and `IAntiforgery` service is missing from the container.
+- **Mandatory Field Allowlist Policies (LT-2204 / Spec 041):**
+  - Removed `= null` default from `allowedFields` on `ToIslandDataResult`, `ToIslandDataResultAsync`, and `ApplyIslandCriteria`; parameter is now a required `IslandFieldPolicy` (omission produces a compile-time error).
+  - Added `RefusedFields` init-only property to `IslandDataResult<T>`. All un-allowlisted or non-existent properties requested by clients are recorded into `RefusedFields` as a flat string list with no distinguishing reason codes (anti-oracle guarantee).
+  - `MapIslandData` overloads now require `IslandFieldPolicy` and `islandName`, evaluating authorization and antiforgery strictly before invoking application `queryProvider` delegates.
+- **Emergency Compatibility Switch:**
+  - Added `options.Refresh.AllowUndeclaredIslands` (default `false`) and `options.Refresh.AllowAnonymous(string)` to restore v3 permissive behavior during migration. Emits a deduplicated warning once per island name.
 - **Island Lifecycle Teardown on In-Place Refresh (LT-902):**
   - `laughtale:unmount` event now dispatches on an island container when it is refreshed in-place or retried, in addition to client router navigation.
   - Active mounts are now torn down prior to remounting: their `ctx.signal` is aborted, `ctx.onCleanup` callbacks are executed, and returned unmount functions run, preventing unbounded accumulation of event handlers, observers, and timers across refreshes.

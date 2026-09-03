@@ -8,7 +8,9 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.AspNetCore.Routing;
 using LaughTale.Core.Attributes;
+using LaughTale.Core.Extensions;
 using LaughTale.Core.TagHelpers;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace LaughTale.Tests;
@@ -100,6 +102,11 @@ public class IslandCacheSecurityTests
 
     private static IslandTagHelper CreateTagHelper(HttpContext httpContext)
     {
+        var services = new Microsoft.Extensions.DependencyInjection.ServiceCollection();
+        services.AddLogging();
+        services.AddLaughTale(options => options.Refresh.AllowUndeclaredIslands = true);
+        httpContext.RequestServices = services.BuildServiceProvider();
+
         var actionContext = new Microsoft.AspNetCore.Mvc.ActionContext(httpContext, new RouteData(), new Microsoft.AspNetCore.Mvc.Abstractions.ActionDescriptor());
         var viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary());
         var viewContext = new ViewContext(actionContext, new MockView(), viewData, new TempDataDictionary(httpContext, new MockTempDataProvider()), TextWriter.Null, new HtmlHelperOptions());

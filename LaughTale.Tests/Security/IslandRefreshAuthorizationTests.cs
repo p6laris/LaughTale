@@ -159,11 +159,26 @@ public class IslandRefreshAuthorizationTests
     }
 
     [Fact]
-    public async Task Refresh_UnrestrictedIsland_RendersNormally()
+    public async Task Refresh_UndeclaredIsland_Returns403()
     {
         var anonymousUser = new ClaimsPrincipal(new ClaimsIdentity());
 
         var (status, body) = await ExecuteRefreshAsync("public-counter", "{\"count\":5}", anonymousUser);
+
+        Assert.Equal(StatusCodes.Status403Forbidden, status);
+        Assert.Empty(body);
+    }
+
+    [Fact]
+    public async Task Refresh_ExplicitlyPublicIsland_RendersNormally()
+    {
+        var anonymousUser = new ClaimsPrincipal(new ClaimsIdentity());
+
+        var (status, body) = await ExecuteRefreshAsync(
+            "public-counter",
+            "{\"count\":5}",
+            anonymousUser,
+            configureOptions: opt => opt.Refresh.AllowAnonymous("public-counter"));
 
         Assert.Equal(200, status);
         Assert.Contains("data-island=\"public-counter\"", body);

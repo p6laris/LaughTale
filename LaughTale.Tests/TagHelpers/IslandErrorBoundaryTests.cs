@@ -1,5 +1,14 @@
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.Extensions.DependencyInjection;
 using LaughTale.Core.Enums;
+using LaughTale.Core.Extensions;
 using LaughTale.Core.TagHelpers;
 using Xunit;
 
@@ -10,8 +19,20 @@ public class IslandErrorBoundaryTests
     [Fact]
     public async Task IslandTagHelper_RendersFallbackAttributeAndTemplate()
     {
+        var services = new ServiceCollection();
+        services.AddLogging();
+        services.AddLaughTale(options => options.Refresh.AllowUndeclaredIslands = true);
+        var provider = services.BuildServiceProvider();
+        var httpContext = new DefaultHttpContext { RequestServices = provider };
+        var viewContext = new ViewContext
+        {
+            HttpContext = httpContext,
+            ViewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
+        };
+
         var tagHelper = new IslandTagHelper
         {
+            ViewContext = viewContext,
             Name = "dynamic-chart",
             Hydrate = HydrateStrategy.Visible,
             Fallback = "<p>Static Server Chart Fallback</p>"

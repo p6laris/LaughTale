@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using LaughTale.Core.Enums;
+using LaughTale.Core.Extensions;
 using LaughTale.Core.TagHelpers;
 using Xunit;
 
@@ -29,9 +31,21 @@ public class DiagnosticLoggingTests
     [Fact]
     public async Task IslandTagHelper_EmitsStructuredLog_WithPropsPayloadSize()
     {
+        var services = new Microsoft.Extensions.DependencyInjection.ServiceCollection();
+        services.AddLogging();
+        services.AddLaughTale(options => options.Refresh.AllowUndeclaredIslands = true);
+        var provider = services.BuildServiceProvider();
+        var httpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext { RequestServices = provider };
+        var viewContext = new Microsoft.AspNetCore.Mvc.Rendering.ViewContext
+        {
+            HttpContext = httpContext,
+            ViewData = new Microsoft.AspNetCore.Mvc.ViewFeatures.ViewDataDictionary(new Microsoft.AspNetCore.Mvc.ModelBinding.EmptyModelMetadataProvider(), new Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary())
+        };
+
         var logger = new TestLogger<IslandTagHelper>();
         var tagHelper = new IslandTagHelper(logger)
         {
+            ViewContext = viewContext,
             Name = "analytics-widget",
             Hydrate = HydrateStrategy.Visible,
             Props = new { userId = 42, role = "admin" }

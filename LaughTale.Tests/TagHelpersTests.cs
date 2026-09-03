@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using LaughTale.Components.Enums;
 using LaughTale.Components.Models;
 using LaughTale.Components.TagHelpers;
+using LaughTale.Core.Extensions;
 using System.Text.Json;
 using Xunit;
 
@@ -183,6 +184,7 @@ public class TagHelpersTests
 
             var helper = new LaughTale.Core.TagHelpers.IslandTagHelper
             {
+                ViewContext = CreateViewContext(),
                 Name = "test-island"
             };
 
@@ -198,6 +200,7 @@ public class TagHelpersTests
         }
     }
 
+    [LaughTale.Core.Attributes.IslandAllowAnonymous]
     private class TestIslandBaseTagHelper : IslandTagHelperBase
     {
         public override string IslandName => "test-base-island";
@@ -211,7 +214,7 @@ public class TagHelpersTests
         {
             System.Globalization.CultureInfo.CurrentUICulture = System.Globalization.CultureInfo.GetCultureInfo("ar-SA");
 
-            var helper = new TestIslandBaseTagHelper();
+            var helper = new TestIslandBaseTagHelper { ViewContext = CreateViewContext() };
             var (context, output) = CreateTagHelperContext("island-test-base");
             await helper.ProcessAsync(context, output);
 
@@ -222,6 +225,20 @@ public class TagHelpersTests
         {
             System.Globalization.CultureInfo.CurrentUICulture = prevCulture;
         }
+    }
+
+    private static Microsoft.AspNetCore.Mvc.Rendering.ViewContext CreateViewContext()
+    {
+        var services = new Microsoft.Extensions.DependencyInjection.ServiceCollection();
+        services.AddLogging();
+        services.AddLaughTale(options => options.Refresh.AllowUndeclaredIslands = true);
+        var provider = services.BuildServiceProvider();
+        var httpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext { RequestServices = provider };
+        return new Microsoft.AspNetCore.Mvc.Rendering.ViewContext
+        {
+            HttpContext = httpContext,
+            ViewData = new Microsoft.AspNetCore.Mvc.ViewFeatures.ViewDataDictionary(new Microsoft.AspNetCore.Mvc.ModelBinding.EmptyModelMetadataProvider(), new Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary())
+        };
     }
 
     [Fact]

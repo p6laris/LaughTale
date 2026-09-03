@@ -19,6 +19,7 @@ using Xunit;
 namespace LaughTale.Tests;
 
 [Island("custom-counter", DefaultStrategy = HydrateStrategy.Visible)]
+[IslandAllowAnonymous]
 public record CustomCounterProps(int StartCount, string Label);
 
 /// <summary>
@@ -49,7 +50,7 @@ public class CoreOnlyBoundaryTests
         var provider = services.BuildServiceProvider();
         Assert.NotNull(provider.GetService<LaughTaleOptions>());
 
-        var httpContext = new DefaultHttpContext();
+        var httpContext = new DefaultHttpContext { RequestServices = provider };
         var actionContext = new Microsoft.AspNetCore.Mvc.ActionContext(httpContext, new RouteData(), new Microsoft.AspNetCore.Mvc.Abstractions.ActionDescriptor());
         var viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary());
         var viewContext = new ViewContext(actionContext, new MockView(), viewData, new TempDataDictionary(httpContext, new MockTempDataProvider()), TextWriter.Null, new HtmlHelperOptions());

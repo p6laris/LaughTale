@@ -1,9 +1,15 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.Extensions.DependencyInjection;
 using LaughTale.Core.Diagnostics;
 using LaughTale.Core.Enums;
+using LaughTale.Core.Extensions;
 using LaughTale.Core.TagHelpers;
 using Xunit;
 
@@ -21,11 +27,27 @@ public class IslandRuntimeDiagnosticTests : IDisposable
         LaughTaleEnvironment.SetDevelopment(null);
     }
 
+    private static ViewContext CreateViewContext()
+    {
+        var services = new ServiceCollection();
+        services.AddLogging();
+        services.AddLaughTale(options => options.Refresh.AllowUndeclaredIslands = true);
+        var provider = services.BuildServiceProvider();
+
+        var httpContext = new DefaultHttpContext { RequestServices = provider };
+        return new ViewContext
+        {
+            HttpContext = httpContext,
+            ViewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
+        };
+    }
+
     [Fact]
     public async Task Development_InvalidNameFormat_EmitsWarningAttribute()
     {
         var tagHelper = new IslandTagHelper
         {
+            ViewContext = CreateViewContext(),
             Name = "Invalid_Name-Upper"
         };
 
@@ -41,6 +63,7 @@ public class IslandRuntimeDiagnosticTests : IDisposable
     {
         var tagHelper = new IslandTagHelper
         {
+            ViewContext = CreateViewContext(),
             Name = "valid-island-name"
         };
 
@@ -55,6 +78,7 @@ public class IslandRuntimeDiagnosticTests : IDisposable
     {
         var tagHelper = new IslandTagHelper
         {
+            ViewContext = CreateViewContext(),
             Name = "responsive-card",
             Media = "(min-width: 768px)",
             Hydrate = HydrateStrategy.Load
@@ -72,6 +96,7 @@ public class IslandRuntimeDiagnosticTests : IDisposable
     {
         var tagHelper = new IslandTagHelper
         {
+            ViewContext = CreateViewContext(),
             Name = "responsive-card",
             Media = "(min-width: 768px)",
             Hydrate = HydrateStrategy.Media
@@ -88,6 +113,7 @@ public class IslandRuntimeDiagnosticTests : IDisposable
     {
         var tagHelper = new IslandTagHelper
         {
+            ViewContext = CreateViewContext(),
             Name = "persistent-chat",
             Persist = "true",
             Hydrate = HydrateStrategy.Visible
@@ -105,6 +131,7 @@ public class IslandRuntimeDiagnosticTests : IDisposable
     {
         var tagHelper = new IslandTagHelper
         {
+            ViewContext = CreateViewContext(),
             Name = "persistent-chat",
             Persist = "true",
             Hydrate = HydrateStrategy.Load
@@ -123,6 +150,7 @@ public class IslandRuntimeDiagnosticTests : IDisposable
 
         var tagHelper = new IslandTagHelper
         {
+            ViewContext = CreateViewContext(),
             Name = "Invalid_Name-Upper",
             Media = "(min-width: 768px)",
             Hydrate = HydrateStrategy.Visible,
