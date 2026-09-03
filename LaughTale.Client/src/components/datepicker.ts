@@ -12,6 +12,12 @@ import { useLocale } from '../composables/useLocale';
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import type { PatternDeclaration } from '../accessibility/patterns';
+
+export const a11y: PatternDeclaration = {
+    kind: 'pattern',
+    pattern: 'combobox'
+};
 
 export interface DatePickerProps {
     targetInputName?: string;
@@ -536,7 +542,9 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
                  data-part="trigger"
                  tabindex="${props.disabled ? -1 : 0}" 
                  role="combobox" 
-                 aria-expanded="false">
+                 aria-expanded="false"
+                 aria-haspopup="dialog"
+                 aria-controls="dp-overlay">
                 <span class="dp-label ${displayText ? '' : 'placeholder'}" data-part="label">
                     ${displayText || props.placeholder || 'Select Date...'}
                 </span>
@@ -547,7 +555,7 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
                 ` : ''}
             </div>
 
-            <div class="dp-overlay" data-part="overlay">
+            <div class="dp-overlay" id="dp-overlay" data-part="overlay">
                 <div class="dp-panel" data-part="panel">
                     ${renderPanelContent()}
                 </div>

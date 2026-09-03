@@ -4,6 +4,12 @@ import { injectIslandStyle } from '../runtime/styles';
 import { LucideIcons } from '../icons/lucide';
 import { useAutoAnimate } from '../composables/animation/useAutoAnimate';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import type { PatternDeclaration } from '../accessibility/patterns';
+
+export const a11y: PatternDeclaration = {
+    kind: 'native',
+    element: 'button'
+};
 
 export interface DataViewItem {
     id?: string | number;
