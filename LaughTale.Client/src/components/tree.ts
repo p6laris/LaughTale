@@ -11,6 +11,7 @@ import type { IslandContext } from '../runtime/registry';
 import { TreeNode } from '../types/models';
 import { injectIslandStyle } from '../runtime/styles';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import { useVirtualizer, type Virtualizer } from '../composables/useVirtualizer';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -106,6 +107,32 @@ const TREE_CSS = `
     margin: 0;
     padding: 0;
 }
+
+.p-tree-wrapper {
+    overflow-y: auto;
+    max-height: 400px;
+}
+.p-virtual-spacer {
+    position: relative;
+    width: 100%;
+}
+.p-virtual-list {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.p-tree-node[data-level="1"] { padding-left: 1.5rem; }
+.p-tree-node[data-level="2"] { padding-left: 3rem; }
+.p-tree-node[data-level="3"] { padding-left: 4.5rem; }
+.p-tree-node[data-level="4"] { padding-left: 6rem; }
+.p-tree-node[data-level="5"] { padding-left: 7.5rem; }
+.p-tree-node[data-level="6"] { padding-left: 9rem; }
+.p-tree-node[data-level="7"] { padding-left: 10.5rem; }
+.p-tree-node[data-level="8"] { padding-left: 12rem; }
 
 .p-tree-node-children {
     padding-left: 1.5rem;
@@ -570,7 +597,33 @@ export default function TreeIsland(container: HTMLElement, props: TreeProps, ctx
         }, []);
     }
 
-    function renderNode(node: any, level: number = 0): Raw {
+    interface FlatTreeNode {
+        node: any;
+        level: number;
+        index: number;
+    }
+
+    function flattenVisible(nodesList: any[], level = 0, flatAcc: FlatTreeNode[] = []): FlatTreeNode[] {
+        nodesList.forEach(node => {
+            const index = flatAcc.length;
+            flatAcc.push({ node, level, index });
+            const key = String(node.key || node.id);
+            if (expandedKeys[key] && node.children && node.children.length > 0) {
+                flattenVisible(node.children, level + 1, flatAcc);
+            }
+        });
+        return flatAcc;
+    }
+
+    const ITEM_HEIGHT = 32;
+    let virtualizer: Virtualizer | null = null;
+    let currentStart = -1;
+    let currentEnd = -1;
+    let currentFlatNodes: FlatTreeNode[] = [];
+    let scrollBound = false;
+
+    function renderSingleFlatNode(item: FlatTreeNode, totalCount: number): Raw {
+        const { node, level, index } = item;
         const key = String(node.key || node.id);
         const hasChildren = (node.children && node.children.length > 0) || (isLazy && !node.leaf);
         const isExpanded = !!expandedKeys[key];
@@ -613,19 +666,18 @@ export default function TreeIsland(container: HTMLElement, props: TreeProps, ctx
             `;
         }
 
-        // Children HTML
-        let childrenHtml: Raw | '' = '';
-        if (hasChildren && isExpanded && node.children) {
-            childrenHtml = html`
-                <ul class="p-tree-node-children" role="group">
-                    ${node.children.map((child: any) => renderNode(child, level + 1))}
-                </ul>
-            `;
-        }
-
         return html`
-            <li class="p-tree-node" role="treeitem" data-key="${key}" aria-expanded="${isExpanded}" aria-selected="${isSelected}" ${isDraggable ? 'draggable="true"' : ''}>
-                <div class="p-tree-node-content ${isSelected ? 'p-tree-node-selected' : ''}" data-key="${key}" tabindex="0">
+            <li class="p-tree-node" 
+                role="treeitem" 
+                data-key="${key}" 
+                data-index="${index}"
+                data-level="${level}"
+                aria-expanded="${isExpanded}" 
+                aria-selected="${isSelected}" 
+                aria-setsize="${totalCount}"
+                aria-posinset="${index + 1}"
+                ${isDraggable ? 'draggable="true"' : ''}>
+                <div class="p-tree-node-content ${isSelected ? 'p-tree-node-selected' : ''}" data-key="${key}" tabindex="${index === 0 ? '0' : '-1'}">
                     <button type="button" class="p-tree-node-toggle-button ${!hasChildren ? 'p-tree-node-toggle-placeholder' : ''}" data-toggle-key="${key}" tabindex="-1" aria-label="Toggle">
                         ${toggleSvg}
                     </button>
@@ -633,13 +685,27 @@ export default function TreeIsland(container: HTMLElement, props: TreeProps, ctx
                     <span class="p-tree-node-icon">${iconSvg}</span>
                     <span class="p-tree-node-label">${node.label || node.name}</span>
                 </div>
-                ${childrenHtml}
             </li>
         `;
     }
 
+    function updateVirtualPositions() {
+        if (!virtualizer || !virtualizer.isVirtual()) return;
+        const wrapperEl = container.querySelector<HTMLElement>('.p-tree-wrapper');
+        if (!wrapperEl) return;
+        const spacerEl = wrapperEl.querySelector<HTMLElement>('.p-virtual-spacer');
+        const vListEl = wrapperEl.querySelector<HTMLElement>('.p-virtual-list');
+        const virtualItems = virtualizer.getVirtualItems();
+        const startOffset = virtualItems.length > 0 ? virtualItems[0].start : 0;
+        if (spacerEl) spacerEl.style.height = `${virtualizer.getTotalSize()}px`;
+        if (vListEl) vListEl.style.transform = `translateY(${startOffset}px)`;
+    }
+
     function render() {
         const displayNodes = filterTreeNodes(treeData, filterQuery);
+        const flatNodes = flattenVisible(displayNodes);
+        currentFlatNodes = flatNodes;
+        buildMaps(treeData);
 
         // 1. Optional Controls Header
         let controlsHtml: Raw | '' = '';
@@ -661,42 +727,20 @@ export default function TreeIsland(container: HTMLElement, props: TreeProps, ctx
         if (showSelectAll && selectionMode === 'checkbox') {
             const allKeys = getAllKeys(treeData);
             const selectedCount = Object.values(checkboxSelectionKeys).filter(v => v?.checked).length;
-            const partialCount = Object.values(checkboxSelectionKeys).filter(v => v?.partialChecked).length;
-            const isAll = allKeys.length > 0 && selectedCount === allKeys.length;
-            const isSome = (selectedCount > 0 || partialCount > 0) && !isAll;
+            const isAllSelected = allKeys.length > 0 && selectedCount === allKeys.length;
+            const isSomeSelected = selectedCount > 0 && !isAllSelected;
 
             selectAllHtml = html`
-                <div class="p-tree-select-all-header" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0.5rem 0.75rem 0.5rem; border-bottom: 1px solid var(--lt-surface-200); margin-bottom: 0.5rem; cursor: pointer;">
-                    <div class="p-tree-checkbox-box ${isAll ? 'p-highlight' : isSome ? 'p-indeterminate' : ''}">
-                        ${isAll ? unsafe(SVG_ICONS.check) : isSome ? unsafe(SVG_ICONS.minus) : ''}
+                <div class="p-tree-select-all-header" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.375rem 0.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid var(--lt-surface-200); cursor: pointer; user-select: none;">
+                    <div class="p-tree-checkbox-box ${isAllSelected ? 'p-highlight' : isSomeSelected ? 'p-indeterminate' : ''}">
+                        ${isAllSelected ? unsafe(SVG_ICONS.check) : isSomeSelected ? unsafe(SVG_ICONS.minus) : ''}
                     </div>
-                    <label style="font-weight: 600; font-size: 0.875rem; color: var(--lt-surface-800); cursor: pointer;">Select All</label>
+                    <span style="font-size: 0.875rem; font-weight: 600; color: var(--lt-surface-800);">Select All (${selectedCount}/${allKeys.length})</span>
                 </div>
             `;
         }
 
-        // 3. Keyboard Navigation Banner
-        let keyboardBannerHtml: Raw | '' = '';
-        if (keyboardInfo) {
-            const selectedCount = Object.values(multiSelectionKeys).filter(Boolean).length;
-            keyboardBannerHtml = html`
-                <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.65rem 0.85rem; border-radius: 6px; border: 1px solid var(--lt-surface-200); background: var(--lt-surface-50); margin-bottom: 0.75rem;">
-                    <span style="font-size: 0.8125rem; color: var(--lt-surface-600);">
-                        <kbd style="padding: 0.15rem 0.4rem; font-size: 0.75rem; border-radius: 4px; background: var(--lt-surface-200); font-family: monospace;">↑</kbd>
-                        <kbd style="padding: 0.15rem 0.4rem; font-size: 0.75rem; border-radius: 4px; background: var(--lt-surface-200); font-family: monospace;">↓</kbd> navigate,
-                        <kbd style="padding: 0.15rem 0.4rem; font-size: 0.75rem; border-radius: 4px; background: var(--lt-surface-200); font-family: monospace;">→</kbd> expand,
-                        <kbd style="padding: 0.15rem 0.4rem; font-size: 0.75rem; border-radius: 4px; background: var(--lt-surface-200); font-family: monospace;">←</kbd> collapse,
-                        <kbd style="padding: 0.15rem 0.4rem; font-size: 0.75rem; border-radius: 4px; background: var(--lt-surface-200); font-family: monospace;">Space</kbd> select
-                    </span>
-                    <div style="display: flex; align-items: center; gap: 0.4rem;">
-                        <span style="font-size: 0.8125rem; font-weight: 600; color: var(--lt-surface-700);">Selected</span>
-                        <span style="font-size: 0.75rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 9999px; background: ${selectedCount ? 'var(--lt-primary-500)' : 'var(--lt-surface-300)'}; color: var(--lt-surface-0, var(--lt-surface-0));">${selectedCount}</span>
-                    </div>
-                </div>
-            `;
-        }
-
-        // 4. Search Filter Input
+        // 3. Search Filter Bar
         let filterHtml: Raw | '' = '';
         if (props.filter) {
             filterHtml = html`
@@ -707,30 +751,46 @@ export default function TreeIsland(container: HTMLElement, props: TreeProps, ctx
             `;
         }
 
+        // 4. Keyboard Shortcuts Helper Banner
+        let keyboardBannerHtml: Raw | '' = '';
+        if (keyboardInfo) {
+            keyboardBannerHtml = html`
+                <div class="p-tree-keyboard-banner" style="display: flex; align-items: center; justify-content: space-between; background: var(--lt-surface-100); padding: 0.375rem 0.75rem; border-radius: 6px; font-size: 0.75rem; color: var(--lt-surface-600); margin-bottom: 0.75rem;">
+                    <span>Navigate with <kbd>↑</kbd> <kbd>↓</kbd>, toggle with <kbd>→</kbd> <kbd>←</kbd>, select with <kbd>Space</kbd></span>
+                    <span style="cursor: pointer; font-weight: 700;" onclick="this.parentElement.remove()">✕</span>
+                </div>
+            `;
+        }
+
         // 5. Loading Overlay
         let loadingOverlayHtml: Raw | '' = '';
         if (isLoading && props.loadingMode !== 'icon') {
             loadingOverlayHtml = html`
                 <div class="p-tree-loading-overlay">
-                    <span style="color: var(--lt-primary-500);">${unsafe(SVG_ICONS.spinner)}</span>
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+                        <span style="display: inline-block; animation: p-spin 1s infinite linear;">${unsafe(SVG_ICONS.spinner)}</span>
+                        <span style="font-size: 0.8125rem; font-weight: 600; color: var(--lt-surface-700);">Loading tree...</span>
+                    </div>
                 </div>
             `;
         }
 
-        // 6. Tree Body / Skeleton / Empty
-        let treeBodyHtml: Raw = html``;
+        // 6. Tree Body: Flat Virtualized or Empty or Skeleton
+        let treeBodyHtml: Raw;
         if (isSkeleton && isLoading) {
             treeBodyHtml = html`
-                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-                    ${Array.from({ length: 5 }).map((_, i) => html`
-                        <div class="p-tree-skeleton-row" style="padding-left: ${i > 1 ? '1.5rem' : '0.5rem'};">
-                            <div class="p-tree-skeleton-icon"></div>
-                            <div class="p-tree-skeleton-text" style="width: ${70 - (i * 10)}%;"></div>
+                <div style="display: flex; flex-direction: column; gap: 0.625rem; padding: 0.5rem 0;">
+                    ${[1, 2, 3, 4, 5].map(() => html`
+                        <div class="p-tree-skeleton-row">
+                            <div class="p-tree-skeleton-box" style="width: 1.25rem; height: 1.25rem;"></div>
+                            <div class="p-tree-skeleton-box" style="width: 1.25rem; height: 1.25rem;"></div>
+                            <div class="p-tree-skeleton-box" style="width: 60%; height: 1rem;"></div>
                         </div>
                     `)}
                 </div>
             `;
-        } else if (displayNodes.length === 0) {
+        } else if (flatNodes.length === 0) {
+            virtualizer = null;
             if (filterQuery) {
                 treeBodyHtml = html`<div style="padding: 1rem; text-align: center; color: var(--lt-surface-500); font-size: 0.875rem;">No options found.</div>`;
             } else {
@@ -749,11 +809,34 @@ export default function TreeIsland(container: HTMLElement, props: TreeProps, ctx
                     </div>
                 `;
             }
-        } else {
+        } else if (flatNodes.length < 100) {
+            virtualizer = null;
+            const nodes: Raw[] = [];
+            for (let i = 0; i < flatNodes.length; i++) {
+                nodes.push(renderSingleFlatNode(flatNodes[i], flatNodes.length));
+            }
             treeBodyHtml = html`
                 <ul class="p-tree-root-children" role="tree">
-                    ${displayNodes.map(node => renderNode(node, 0))}
+                    ${nodes}
                 </ul>
+            `;
+        } else {
+            virtualizer = useVirtualizer({
+                count: flatNodes.length,
+                estimateSize: 32,
+                getScrollElement: () => container.querySelector<HTMLElement>('.p-tree-wrapper'),
+                virtualThreshold: 100
+            });
+            const virtualItems = virtualizer.getVirtualItems();
+            currentStart = virtualItems.length > 0 ? virtualItems[0].index : 0;
+            currentEnd = virtualItems.length > 0 ? virtualItems[virtualItems.length - 1].index : 0;
+
+            treeBodyHtml = html`
+                <div class="p-virtual-spacer" data-virtual-spacer>
+                    <ul class="p-virtual-list p-tree-root-children" role="tree">
+                        ${virtualItems.map(vi => renderSingleFlatNode(flatNodes[vi.index], flatNodes.length))}
+                    </ul>
+                </div>
             `;
         }
 
@@ -770,10 +853,43 @@ export default function TreeIsland(container: HTMLElement, props: TreeProps, ctx
             </div>
         `);
 
+        updateVirtualPositions();
         bindEvents();
+        bindNodeEvents();
     }
 
-    function bindEvents() {
+    function focusTreeNodeByIndex(targetIdx: number) {
+        if (virtualizer && virtualizer.isVirtual()) {
+            if (targetIdx < currentStart || targetIdx > currentEnd) {
+                virtualizer.scrollToIndex(targetIdx, 'auto');
+                const newVirtualItems = virtualizer.getVirtualItems();
+                if (newVirtualItems.length > 0) {
+                    currentStart = newVirtualItems[0].index;
+                    currentEnd = newVirtualItems[newVirtualItems.length - 1].index;
+                    const newStartOffset = newVirtualItems[0].start;
+                    const wrapperEl = container.querySelector<HTMLElement>('.p-tree-wrapper');
+                    const vList = wrapperEl?.querySelector<HTMLElement>('.p-virtual-list');
+                    if (vList) {
+                        vList.style.transform = `translateY(${newStartOffset}px)`;
+                        const newNodes = newVirtualItems.map(vi => renderSingleFlatNode(currentFlatNodes[vi.index], currentFlatNodes.length));
+                        setHtml(vList, html`${newNodes}`);
+                        bindNodeEvents();
+                    }
+                }
+            }
+        }
+        const targetNode = currentFlatNodes[targetIdx];
+        if (targetNode) {
+            const key = String(targetNode.node.key || targetNode.node.id);
+            focusedKey = key;
+            const targetEl = container.querySelector<HTMLElement>(`.p-tree-node[data-key="${key}"] .p-tree-node-content`);
+            if (targetEl) {
+                targetEl.focus();
+            }
+        }
+    }
+
+    function bindNodeEvents() {
         // Toggle Expand/Collapse
         container.querySelectorAll<HTMLButtonElement>('.p-tree-node-toggle-button').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -826,17 +942,17 @@ export default function TreeIsland(container: HTMLElement, props: TreeProps, ctx
                     }
                 } else if (e.key === 'ArrowDown') {
                     e.preventDefault();
-                    const allVisible = Array.from(container.querySelectorAll<HTMLElement>('.p-tree-node-content'));
-                    const currIdx = allVisible.indexOf(contentEl);
-                    if (currIdx >= 0 && currIdx < allVisible.length - 1) {
-                        allVisible[currIdx + 1].focus();
+                    const liEl = contentEl.closest('.p-tree-node') as HTMLElement;
+                    const currIdx = liEl ? parseInt(liEl.getAttribute('data-index') || '0', 10) : 0;
+                    if (currIdx < currentFlatNodes.length - 1) {
+                        focusTreeNodeByIndex(currIdx + 1);
                     }
                 } else if (e.key === 'ArrowUp') {
                     e.preventDefault();
-                    const allVisible = Array.from(container.querySelectorAll<HTMLElement>('.p-tree-node-content'));
-                    const currIdx = allVisible.indexOf(contentEl);
+                    const liEl = contentEl.closest('.p-tree-node') as HTMLElement;
+                    const currIdx = liEl ? parseInt(liEl.getAttribute('data-index') || '0', 10) : 0;
                     if (currIdx > 0) {
-                        allVisible[currIdx - 1].focus();
+                        focusTreeNodeByIndex(currIdx - 1);
                     }
                 } else if (e.key === ' ' || e.key === 'Enter') {
                     e.preventDefault();
@@ -844,6 +960,31 @@ export default function TreeIsland(container: HTMLElement, props: TreeProps, ctx
                 }
             }, { signal: ctx?.signal });
         });
+    }
+
+    function bindEvents() {
+        const wrapperEl = container.querySelector<HTMLElement>('.p-tree-wrapper');
+        if (wrapperEl && !scrollBound) {
+            scrollBound = true;
+            wrapperEl.addEventListener('scroll', () => {
+                if (!virtualizer || !virtualizer.isVirtual()) return;
+                const newVirtualItems = virtualizer.getVirtualItems();
+                if (newVirtualItems.length === 0) return;
+                const newStart = newVirtualItems[0].index;
+                const newEnd = newVirtualItems[newVirtualItems.length - 1].index;
+                if (newStart === currentStart && newEnd === currentEnd) return;
+                currentStart = newStart;
+                currentEnd = newEnd;
+                const newStartOffset = newVirtualItems[0].start;
+                const vList = wrapperEl.querySelector<HTMLElement>('.p-virtual-list');
+                if (vList) {
+                    vList.style.transform = `translateY(${newStartOffset}px)`;
+                    const newNodes = newVirtualItems.map(vi => renderSingleFlatNode(currentFlatNodes[vi.index], currentFlatNodes.length));
+                    setHtml(vList, html`${newNodes}`);
+                    bindNodeEvents();
+                }
+            }, { signal: ctx?.signal, passive: true });
+        }
 
         // Expand All / Collapse All
         container.querySelector('.p-tree-expand-all')?.addEventListener('click', () => expandAll(), { signal: ctx?.signal });
