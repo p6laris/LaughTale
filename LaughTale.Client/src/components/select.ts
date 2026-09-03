@@ -11,6 +11,7 @@ import { getLucideIcon } from '../icons/lucide';
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import { useVirtualizer, type Virtualizer } from '../composables/useVirtualizer';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -320,6 +321,19 @@ const CSS = `
     overflow-y: auto;
     max-height: 220px;
     box-sizing: border-box;
+}
+.p-virtual-spacer {
+    position: relative;
+    width: 100%;
+}
+.p-virtual-list {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
 }
 
 .p-select-option-group {
@@ -655,33 +669,88 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
         return filtered;
     }
 
-    function renderListItems(): Raw {
+    type FlatSelectItem = 
+        | { kind: 'group'; opt: SelectOption }
+        | { kind: 'item'; opt: SelectOption; id: string; index: number };
+
+    const ITEM_HEIGHT = 38;
+    let virtualizer: Virtualizer | null = null;
+    let currentStart = -1;
+    let currentEnd = -1;
+    let currentFlatItems: FlatSelectItem[] = [];
+    let currentTotalOptionCount = 0;
+    let scrollBound = false;
+
+    function getFlatOptions(): { flatItems: FlatSelectItem[]; totalCount: number } {
         const visibleOpts = filterOptions(allOptions, filterQuery);
-        if (visibleOpts.length === 0) {
+        const flat: FlatSelectItem[] = [];
+        let totalCount = 0;
+
+        for (let i = 0; i < visibleOpts.length; i++) {
+            const opt = visibleOpts[i];
+            if (opt.items && opt.items.length > 0) {
+                flat.push({ kind: 'group', opt });
+                for (let j = 0; j < opt.items.length; j++) {
+                    flat.push({ kind: 'item', opt: opt.items[j], id: `opt_${i}_${j}`, index: totalCount++ });
+                }
+            } else {
+                flat.push({ kind: 'item', opt, id: `opt_${i}`, index: totalCount++ });
+            }
+        }
+        return { flatItems: flat, totalCount };
+    }
+
+    function renderFlatItem(entry: FlatSelectItem, viIndex: number, totalCount: number): Raw {
+        if (entry.kind === 'group') {
+            return html`
+                <li class="p-select-option-group">
+                    ${entry.opt.flag ? html`<span>${entry.opt.flag}</span>` : ''}
+                    <span>${entry.opt.label || entry.opt.value}</span>
+                </li>
+            `;
+        }
+        return renderSingleOption(entry.opt, entry.id, entry.index, totalCount);
+    }
+
+    function renderListItems(): Raw {
+        const { flatItems, totalCount } = getFlatOptions();
+        currentFlatItems = flatItems;
+        currentTotalOptionCount = totalCount;
+
+        if (flatItems.length === 0) {
+            virtualizer = null;
             return html`<div class="p-select-empty-message">No results found</div>`;
         }
 
-        const items: Raw[] = [];
-        visibleOpts.forEach((opt, idx) => {
-            if (opt.items && opt.items.length > 0) {
-                items.push(html`
-                    <li class="p-select-option-group">
-                        ${opt.flag ? html`<span>${opt.flag}</span>` : ''}
-                        <span>${opt.label || opt.value}</span>
-                    </li>
-                `);
-                opt.items.forEach((child, cIdx) => {
-                    items.push(renderSingleOption(child, `opt_${idx}_${cIdx}`));
-                });
-            } else {
-                items.push(renderSingleOption(opt, `opt_${idx}`));
+        if (flatItems.length < 100) {
+            virtualizer = null;
+            const items: Raw[] = [];
+            for (let i = 0; i < flatItems.length; i++) {
+                items.push(renderFlatItem(flatItems[i], i, totalCount));
             }
-        });
+            return html`${items}`;
+        }
 
-        return html`${items}`;
+        virtualizer = useVirtualizer({
+            count: flatItems.length,
+            estimateSize: 38,
+            getScrollElement: () => container.querySelector<HTMLElement>('.p-select-list'),
+            virtualThreshold: 100
+        });
+        const virtualItems = virtualizer.getVirtualItems();
+        currentStart = virtualItems.length > 0 ? virtualItems[0].index : 0;
+        currentEnd = virtualItems.length > 0 ? virtualItems[virtualItems.length - 1].index : 0;
+
+        return html`
+            <div class="p-virtual-spacer" data-virtual-spacer>
+                <ul class="p-virtual-list">
+                    ${virtualItems.map(vi => renderFlatItem(flatItems[vi.index], vi.index, totalCount))}
+                </ul>
+            </div>
+        `;
     }
 
-    function renderSingleOption(opt: SelectOption, id: string): Raw {
+    function renderSingleOption(opt: SelectOption, id: string, index: number, totalCount: number): Raw {
         const checked = isSelected(opt.value) || isSelected(opt.code);
         const dis = opt.disabled ? 'p-disabled' : '';
         const high = checked ? 'p-highlight' : '';
@@ -702,7 +771,15 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
         const itemPart = resolvePart('item', `p-select-option ${high} ${dis}`, props.pt, props.studioOverrides);
 
         return html`
-            <li class="${itemPart.className}" style="${itemPart.style}" data-part="item" data-value="${opt.value}" role="option" aria-selected="${checked ? 'true' : 'false'}" id="${id}">
+            <li class="${itemPart.className}" 
+                data-part="item" 
+                data-value="${opt.value}" 
+                data-index="${index}"
+                role="option" 
+                aria-selected="${checked ? 'true' : 'false'}" 
+                aria-setsize="${totalCount}" 
+                aria-posinset="${index + 1}"
+                id="${id}">
                 <div class="p-select-option-content" data-part="itemContent">
                     ${checkboxHtml}
                     ${flagHtml}
@@ -777,7 +854,20 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
             <input type="hidden" name="${props.name || props.targetInputName || 'select_value'}" value="${selectedValues.join(',')}" />
         `);
 
+        updateVirtualPositions();
         bindEvents();
+    }
+
+    function updateVirtualPositions() {
+        if (!virtualizer || !virtualizer.isVirtual()) return;
+        const listEl = container.querySelector<HTMLElement>('.p-select-list');
+        if (!listEl) return;
+        const spacerEl = listEl.querySelector<HTMLElement>('.p-virtual-spacer');
+        const vListEl = listEl.querySelector<HTMLElement>('.p-virtual-list');
+        const virtualItems = virtualizer.getVirtualItems();
+        const startOffset = virtualItems.length > 0 ? virtualItems[0].start : 0;
+        if (spacerEl) spacerEl.style.height = `${virtualizer.getTotalSize()}px`;
+        if (vListEl) vListEl.style.transform = `translateY(${startOffset}px)`;
     }
 
     function toggleOverlay(open?: boolean) {
@@ -790,6 +880,7 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
             container.classList.add('is-open');
             overlay?.classList.add('is-visible');
             container.setAttribute('aria-expanded', 'true');
+            updateVirtualPositions();
             if (hasFilter) {
                 const t = setTimeout(() => {
                     container.querySelector<HTMLInputElement>('.p-select-filter-input')?.focus();
@@ -834,7 +925,10 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
             filterInp.oninput = (e) => {
                 filterQuery = filterInp.value;
                 const list = container.querySelector('.p-select-list');
-                if (list) setHtml(list, renderListItems());
+                if (list) {
+                    setHtml(list, renderListItems());
+                    updateVirtualPositions();
+                }
                 bindOptionClicks();
             };
             filterInp.onclick = (e) => e.stopPropagation();
@@ -843,6 +937,29 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
                     toggleOverlay(false);
                 }
             };
+        }
+
+        const listEl = container.querySelector<HTMLElement>('.p-select-list');
+        if (listEl && !scrollBound) {
+            scrollBound = true;
+            listEl.addEventListener('scroll', () => {
+                if (!virtualizer || !virtualizer.isVirtual()) return;
+                const newVirtualItems = virtualizer.getVirtualItems();
+                if (newVirtualItems.length === 0) return;
+                const newStart = newVirtualItems[0].index;
+                const newEnd = newVirtualItems[newVirtualItems.length - 1].index;
+                if (newStart === currentStart && newEnd === currentEnd) return;
+                currentStart = newStart;
+                currentEnd = newEnd;
+                const newStartOffset = newVirtualItems[0].start;
+                const vList = listEl.querySelector<HTMLElement>('.p-virtual-list');
+                if (vList) {
+                    vList.style.transform = `translateY(${newStartOffset}px)`;
+                    const newNodes = newVirtualItems.map(vi => renderFlatItem(currentFlatItems[vi.index], vi.index, currentTotalOptionCount));
+                    setHtml(vList, html`${newNodes}`);
+                    bindOptionClicks();
+                }
+            }, { signal: ctx?.signal, passive: true });
         }
 
         // Select all header click
