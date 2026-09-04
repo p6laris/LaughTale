@@ -139,5 +139,34 @@ test.describe('Native Form Association: hydration & idempotence (US2)', () => {
             }
         }
     });
+
+    test('teardown: after island teardown no field belonging to it remains in the document (FR-011)', async ({ page }) => {
+        await page.goto('/form-conformance');
+
+        const form = page.locator('#conformance-form');
+        await expect(form).toBeVisible();
+
+        await page.waitForFunction(() => (window as any).LaughTale !== undefined);
+
+        const testControls = [
+            { id: 'ctrl-input-text', name: 'InputText' },
+            { id: 'ctrl-inplace', name: 'Inplace' },
+            { id: 'ctrl-checkbox', name: 'Checkbox' }
+        ];
+
+        for (const ctrl of testControls) {
+            await page.evaluate((id) => {
+                const island = document.getElementById(id);
+                if (island) {
+                    (window as any).LaughTale.teardownIsland(island);
+                    island.remove();
+                }
+            }, ctrl.id);
+
+            const remaining = page.locator(`[name="${ctrl.name}"]`);
+            await expect(remaining, `Field for ${ctrl.name} must not outlive torn-down island`).toHaveCount(0);
+        }
+    });
 });
+
 

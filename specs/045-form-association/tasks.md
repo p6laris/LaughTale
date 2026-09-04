@@ -151,7 +151,7 @@ present before hydration is the identical node afterwards, value unchanged, exac
 ### Tests for User Story 2
 
 - [x] T021 [P] [US2] Extend `LaughTale.Client/tests/e2e/form-association.spec.ts` with the idempotence case: 50 in-place island refreshes leave exactly one field per control (plus companion where `Boolean`) — must fail before T022
-- [ ] T022 [P] [US2] Add the teardown case to `LaughTale.Client/tests/e2e/form-association.spec.ts`: after island teardown no field belonging to it remains in the document (FR-011, relies on feature 040)
+- [x] T022 [P] [US2] Add the teardown case to `LaughTale.Client/tests/e2e/form-association.spec.ts`: after island teardown no field belonging to it remains in the document (FR-011, relies on feature 040)
 
 ### Implementation for User Story 2
 
