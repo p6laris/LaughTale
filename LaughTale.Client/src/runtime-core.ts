@@ -19,7 +19,7 @@ export {
     type IslandDefinition,
     type IslandContext
 } from './runtime/registry';
-export { hydrateIsland, initIslands, retryIsland, getIslandState, setHydrationErrorHandler, getHydrationErrorHandler, type HydrateStrategy, type HydrationState, type HydrationErrorHandler } from './runtime/hydrator';
+export { hydrateIsland, initIslands, retryIsland, teardownIsland, rehydrateIsland, getIslandState, setHydrationErrorHandler, getHydrationErrorHandler, type HydrateStrategy, type HydrationState, type HydrationErrorHandler } from './runtime/hydrator';
 export { refreshIsland, type RefreshOptions } from './runtime/refresh';
 export { enableViewTransitions, navigateTo } from './runtime/router';
 export { resolvePart, applyPart, type PassthroughRecord, type PartOptions, type ResolvedPart } from './runtime/parts';

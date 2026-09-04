@@ -2,7 +2,19 @@
  * LaughTale Showcase: Island Registration Entrypoint
  */
 
-import { defineIsland, initIslands, initDirectives, enableViewTransitions } from '../../LaughTale.Client/src/index';
+import { defineIsland, initIslands, initDirectives, enableViewTransitions, hydrateIsland, teardownIsland, rehydrateIsland, refreshIsland } from '../../LaughTale.Client/src/index';
+
+// Expose runtime API on window for showcase demos, diagnostics, and E2E testing
+(window as any).LaughTale = {
+    defineIsland,
+    initIslands,
+    initDirectives,
+    enableViewTransitions,
+    hydrateIsland,
+    teardownIsland,
+    rehydrateIsland,
+    refreshIsland
+};
 
 // 1. Register Core Showcase Islands
 defineIsland('interactive-counter', () => import('./islands/counter'));
