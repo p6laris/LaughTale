@@ -2,6 +2,7 @@ import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts
 import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
 import { emitComponentEvent } from '../runtime/events';
+import { useFormField } from '../composables/useFormField';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
@@ -11,6 +12,7 @@ export const a11y: PatternDeclaration = {
 };
 
 export interface InputOtpProps {
+    name?: string;
     targetInputName?: string;
     inputId?: string;
     value?: string;
@@ -183,6 +185,12 @@ html.dark .p-inputotp-separator,
 export default function InputOtpIsland(container: HTMLElement, props: InputOtpProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-inputotp', CSS);
 
+    const formField = useFormField(container, ctx, {
+        cardinality: 'Single',
+        fieldKind: 'Hidden',
+        name: props.name || props.targetInputName
+    });
+
     const length = Number(props.length) || 4;
     const isMask = props.mask === true || String(props.mask) === 'true';
     const isIntegerOnly = props.integerOnly !== false && String(props.integerOnly) !== 'false';
@@ -244,7 +252,9 @@ export default function InputOtpIsland(container: HTMLElement, props: InputOtpPr
             contentHtml = html`${allInputs}`;
         }
 
+        formField.detach();
         setHtml(container, contentHtml);
+        formField.reattach();
         bindEvents();
     }
 
@@ -354,16 +364,7 @@ export default function InputOtpIsland(container: HTMLElement, props: InputOtpPr
 
     function syncOtp() {
         const fullCode = values.join('');
-        if (props.targetInputName) {
-            let hidden = container.querySelector<HTMLInputElement>(`input[name="${props.targetInputName}"]`);
-            if (!hidden) {
-                hidden = document.createElement('input');
-                hidden.type = 'hidden';
-                hidden.name = props.targetInputName;
-                container.appendChild(hidden);
-            }
-            hidden.value = fullCode;
-        }
+        formField.setValue(fullCode);
 
         emitComponentEvent(container, 'input-otp', 'change', {
             value: fullCode,

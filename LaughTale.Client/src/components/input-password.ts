@@ -1,4 +1,5 @@
 import { useLocale } from '../composables/useLocale';
+import { useFormField } from '../composables/useFormField';
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 ﻿/**
@@ -20,6 +21,7 @@ export const a11y: PatternDeclaration = {
 };
 
 export interface InputPasswordProps {
+    name?: string;
     targetInputName?: string;
     inputId?: string;
     value?: string;
@@ -413,6 +415,12 @@ html.dark .p-password-popover-header-title svg,
 export default function InputPasswordIsland(container: HTMLElement, props: InputPasswordProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-password', CSS);
 
+    const formField = useFormField(container, ctx, {
+        cardinality: 'Single',
+        fieldKind: 'Hidden',
+        name: props.name || props.targetInputName
+    });
+
     let isMasked = true;
     let currentVal = props.value || '';
     const minLength = Number(props.minLength) || 8;
@@ -509,6 +517,7 @@ export default function InputPasswordIsland(container: HTMLElement, props: Input
             `;
         }
 
+        formField.detach();
         setHtml(container, html`
             <div class="p-password-container">
                 ${leftIconHtml}
@@ -536,6 +545,7 @@ export default function InputPasswordIsland(container: HTMLElement, props: Input
             ${showRequirements && requirementsMode === 'list' && !isPopover ? renderRequirementsList(currentVal) : ''}
             ${popoverHtml}
         `);
+        formField.reattach();
         bindEvents();
     }
 
@@ -716,16 +726,7 @@ export default function InputPasswordIsland(container: HTMLElement, props: Input
     }
 
     function syncTargetInput() {
-        if (props.targetInputName) {
-            let hidden = container.querySelector<HTMLInputElement>(`input[name="${props.targetInputName}"]`);
-            if (!hidden) {
-                hidden = document.createElement('input');
-                hidden.type = 'hidden';
-                hidden.name = props.targetInputName;
-                container.appendChild(hidden);
-            }
-            hidden.value = currentVal;
-        }
+        formField.setValue(currentVal);
 
         emitComponentEvent(container, 'input-password', 'change', {
             value: currentVal,

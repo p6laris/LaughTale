@@ -2,6 +2,7 @@ import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts
 import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
 import { emitComponentEvent } from '../runtime/events';
+import { useFormField } from '../composables/useFormField';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
@@ -162,6 +163,12 @@ interface MaskToken {
 export default function InputMaskIsland(container: HTMLElement, props: InputMaskProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-input-mask', CSS);
 
+    const formField = useFormField(container, ctx, {
+        cardinality: 'Single',
+        fieldKind: 'Hidden',
+        name: props.name || props.targetInputName
+    });
+
     const mask = props.mask || '(999) 999-9999';
     const slotChar = props.slotChar || '_';
     const autoClear = props.autoClear !== false && String(props.autoClear) !== 'false';
@@ -276,6 +283,7 @@ export default function InputMaskIsland(container: HTMLElement, props: InputMask
         isDisabled ? 'is-disabled' : ''
     ].filter(Boolean).join(' ');
 
+    formField.detach();
     setHtml(container, html`
         <input 
             type="text"
@@ -287,16 +295,15 @@ export default function InputMaskIsland(container: HTMLElement, props: InputMask
             ${attr('aria-invalid', isInvalid ? 'true' : null)}
             ${attr('id', props.inputId)}
         />
-        <input type="hidden"${attr('name', props.name || props.targetInputName)} value="" />
     `);
+    formField.reattach();
 
     const input = container.querySelector<HTMLInputElement>('input[type="text"]')!;
-    const hiddenInp = container.querySelector<HTMLInputElement>('input[type="hidden"]');
 
     function syncValue() {
         const formatted = formatValue(input.value);
         const payload = unmask ? formatted.raw : formatted.masked;
-        if (hiddenInp) hiddenInp.value = payload;
+        formField.setValue(payload);
 
         emitComponentEvent(container, 'input-mask', 'change', {
             value: payload,

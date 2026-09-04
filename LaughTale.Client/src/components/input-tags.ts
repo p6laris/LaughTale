@@ -3,6 +3,7 @@ import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
 import { emitComponentEvent } from '../runtime/events';
 import { useControllableState } from '../composables/useControllableState';
+import { useFormField } from '../composables/useFormField';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
@@ -12,6 +13,7 @@ export const a11y: PatternDeclaration = {
 };
 
 export interface InputTagsProps {
+    name?: string;
     values?: string[] | string;
     value?: string[] | string;
     placeholder?: string;
@@ -310,6 +312,12 @@ const xCircleIcon = html`<svg xmlns="http://www.w3.org/2000/svg" width="14" heig
 export default function InputTagsIsland(container: HTMLElement, props: InputTagsProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-inputtags', CSS);
 
+    const formField = useFormField(container, ctx, {
+        cardinality: 'Multiple',
+        fieldKind: 'Hidden',
+        name: props.name || props.targetInputName
+    });
+
     // Initial value parsing
     let initialValues: string[] = [];
     const rawVal = props.values ?? props.value;
@@ -543,11 +551,13 @@ export default function InputTagsIsland(container: HTMLElement, props: InputTags
                    ${hasTypeahead ? 'role="combobox" aria-autocomplete="list" aria-expanded="false"' : ''} />
         `;
 
+        formField.detach();
         setHtml(container, html`
             ${tagsHtml}
             ${inputHtml}
             ${hasTypeahead ? html`<div class="p-inputtags-panel" style="display: none;"></div>` : ''}
         `);
+        formField.reattach();
 
         // Bind initial tag events
         container.querySelectorAll<HTMLElement>('.p-inputtags-tag').forEach(bindTagEvents);
@@ -717,16 +727,7 @@ export default function InputTagsIsland(container: HTMLElement, props: InputTags
     }
 
     function syncTargetInput(tags: string[]) {
-        if (props.targetInputName) {
-            let hidden = container.querySelector<HTMLInputElement>(`input[name="${props.targetInputName}"]`);
-            if (!hidden) {
-                hidden = document.createElement('input');
-                hidden.type = 'hidden';
-                hidden.name = props.targetInputName;
-                container.appendChild(hidden);
-            }
-            hidden.value = JSON.stringify(tags);
-        }
+        formField.setValue(tags);
 
         emitComponentEvent(container, 'input-tags', 'change', {
             values: tags
@@ -734,4 +735,5 @@ export default function InputTagsIsland(container: HTMLElement, props: InputTags
     }
 
     init();
+    syncTargetInput(getTags());
 }

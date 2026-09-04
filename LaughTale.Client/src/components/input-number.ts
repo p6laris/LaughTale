@@ -2,6 +2,7 @@ import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts
 import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
 import { emitComponentEvent } from '../runtime/events';
+import { useFormField } from '../composables/useFormField';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
@@ -421,6 +422,12 @@ export function initInputNumber(
 ): void {
     injectIslandStyle('lt-inputnumber-style', CSS);
 
+    const formField = useFormField(container, ctx, {
+        cardinality: 'Single',
+        fieldKind: 'Hidden',
+        name: props.name || props.targetInputName
+    });
+
     let rawValue: number | null = props.value !== undefined ? (props.value === null ? null : Number(props.value)) : null;
     const mode = props.mode || 'decimal';
     const isCurrency = mode === 'currency';
@@ -522,7 +529,7 @@ export function initInputNumber(
     }
 
     function render() {
-        setHtml(container, html``);
+        formField.detach();
         container.className = 'laughtale-inputnumber p-inputnumber'; container.setAttribute('data-part', 'root');
 
         if (isFluid) container.classList.add('p-inputnumber-fluid');
@@ -620,6 +627,7 @@ export function initInputNumber(
             ${clearButtonHtml}
             ${rightButtonHtml}
         `);
+        formField.reattach();
         bindEvents();
     }
 
@@ -726,16 +734,7 @@ export function initInputNumber(
     }
 
     function syncTargetInput() {
-        if (props.targetInputName) {
-            let hidden = container.querySelector<HTMLInputElement>(`input[name="${props.targetInputName}"]`);
-            if (!hidden) {
-                hidden = document.createElement('input');
-                hidden.type = 'hidden';
-                hidden.name = props.targetInputName;
-                container.appendChild(hidden);
-            }
-            hidden.value = rawValue !== null ? rawValue.toString() : '';
-        }
+        formField.setValue(rawValue !== null ? rawValue.toString() : '');
     }
 
     render();

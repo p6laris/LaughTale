@@ -9,6 +9,7 @@ import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
 import { emitComponentEvent } from '../runtime/events';
 import { useControllableState } from '../composables/useControllableState';
+import { useFormField } from '../composables/useFormField';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
@@ -247,6 +248,12 @@ const cancelSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16
 export default function RatingIsland(container: HTMLElement, props: RatingProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-rating', CSS);
 
+    const formField = useFormField(container, ctx, {
+        cardinality: 'Single',
+        fieldKind: 'Hidden',
+        name: props.name || props.targetInputName
+    });
+
     const totalStars = props.stars ? Number(props.stars) : 5;
     const isAllowHalf = props.allowHalf === true || String(props.allowHalf) === 'true';
     const isCancelAllowed = (props.cancel !== false && props.allowCancel !== false && String(props.cancel) !== 'false' && String(props.allowCancel) !== 'false');
@@ -271,7 +278,7 @@ export default function RatingIsland(container: HTMLElement, props: RatingProps,
     }
 
     const [getRating, setRating] = useControllableState<number>({
-        defaultValue: props.value ? Number(props.value) : 0,
+        defaultValue: props.value !== undefined ? Number(props.value) : (formField.field?.value ? Number(formField.field.value) : 0),
         onChange: (val) => {
             syncValue(val);
         }
@@ -330,12 +337,14 @@ export default function RatingIsland(container: HTMLElement, props: RatingProps,
             }
         }
 
+        formField.detach();
         setHtml(container, html`
             ${cancelBtnHtml}
             <div class="p-rating-items" style="display: flex; ${isVertical ? 'flex-direction: column;' : 'align-items: center;'} gap: 0.375rem;">
                 ${itemsHtml}
             </div>
         `);
+        formField.reattach();
 
         updateVisuals(rating);
         bindEvents();
@@ -468,17 +477,7 @@ export default function RatingIsland(container: HTMLElement, props: RatingProps,
     }
 
     function syncValue(val: number) {
-        if (props.targetInputName) {
-            let hidden = container.querySelector<HTMLInputElement>(`input[name="${props.targetInputName}"]`);
-            if (!hidden) {
-                hidden = document.createElement('input');
-                hidden.type = 'hidden';
-                hidden.name = props.targetInputName;
-                container.appendChild(hidden);
-            }
-            hidden.value = String(val);
-        }
-
+        formField.setValue(val);
         emitComponentEvent(container, 'rating', 'change', { value: val });
     }
 

@@ -2,6 +2,7 @@ import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts
 import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
 import { emitComponentEvent } from '../runtime/events';
+import { useFormField } from '../composables/useFormField';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
@@ -15,6 +16,7 @@ export const a11y: PatternDeclaration = {
  */
 
 export interface KnobProps {
+    name?: string;
     value?: number;
     min?: number;
     max?: number;
@@ -44,6 +46,13 @@ html.dark .laughtale-knob circle:first-child,
 
 export default function KnobIsland(container: HTMLElement, props: KnobProps, ctx?: IslandContext) {
     injectIslandStyle('knob', CSS);
+
+    const formField = useFormField(container, ctx, {
+        cardinality: 'Single',
+        fieldKind: 'Hidden',
+        name: props.name || props.targetInputName
+    });
+
     const min = props.min !== undefined ? props.min : 0;
     const max = props.max !== undefined ? props.max : 100;
     const step = props.step || 1;
@@ -53,7 +62,7 @@ export default function KnobIsland(container: HTMLElement, props: KnobProps, ctx
     const circumference = 2 * Math.PI * radius;
     const template = props.valueTemplate || '{value}%';
 
-    let currentValue = props.value !== undefined ? props.value : min;
+    let currentValue = props.value !== undefined ? props.value : (formField.field?.value ? Number(formField.field.value) : min);
 
     function getOffset(val: number): number {
         const pct = Math.max(0, Math.min(1, (val - min) / (max - min)));
@@ -63,6 +72,7 @@ export default function KnobIsland(container: HTMLElement, props: KnobProps, ctx
     const initialOffset = getOffset(currentValue);
     const initialText = template.replace('{value}', currentValue.toString());
 
+    formField.detach();
     setHtml(container, html`
         <div class="laughtale-knob" data-part="root" tabindex="${props.disabled ? '-1' : '0'}" role="slider" aria-valuenow="${currentValue}" aria-valuemin="${min}" aria-valuemax="${max}" aria-label="${(props as any).ariaLabel || 'Knob'}" style="position: relative; display: inline-flex; align-items: center; justify-content: center; width: ${size}px; height: ${size}px; user-select: none; cursor: ${props.disabled ? 'not-allowed' : 'pointer'}; touch-action: none;">
             <svg width="${size}" height="${size}" style="transform: rotate(-90deg); pointer-events: none;">
@@ -76,6 +86,7 @@ export default function KnobIsland(container: HTMLElement, props: KnobProps, ctx
             </span>
         </div>
     `);
+    formField.reattach();
 
     const knobEl = container.querySelector<HTMLElement>('.laughtale-knob')!;
     const progressCircle = container.querySelector<SVGCircleElement>('.knob-progress-circle')!;
@@ -88,17 +99,7 @@ export default function KnobIsland(container: HTMLElement, props: KnobProps, ctx
     }
 
     function syncValue() {
-        if (props.targetInputName) {
-            let hidden = container.querySelector<HTMLInputElement>(`input[name="${props.targetInputName}"]`);
-            if (!hidden) {
-                hidden = document.createElement('input');
-                hidden.type = 'hidden';
-                hidden.name = props.targetInputName;
-                container.appendChild(hidden);
-            }
-            hidden.value = currentValue.toString();
-        }
-
+        formField.setValue(currentValue.toString());
         emitComponentEvent(container, 'knob', 'change', { value: currentValue });
     }
 

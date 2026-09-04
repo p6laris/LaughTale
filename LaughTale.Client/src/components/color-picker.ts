@@ -4,6 +4,7 @@ import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
 import { emitComponentEvent } from '../runtime/events';
 import { useFloatingPosition } from '../composables/useFloatingPosition';
+import { useFormField } from '../composables/useFormField';
 import { html, setHtml, attr, type Raw } from '../runtime/html';
 import { announce } from '../accessibility/announcer';
 import type { PatternDeclaration } from '../accessibility/patterns';
@@ -14,6 +15,7 @@ export const a11y: PatternDeclaration = {
 };
 
 export interface ColorPickerProps {
+    name?: string;
     value?: string; // Hex color e.g. 'var(--lt-primary-500, var(--lt-primary-500))'
     targetInputName?: string;
     disabled?: boolean;
@@ -53,7 +55,14 @@ html.dark .color-hex-input,
 
 export default function ColorPickerIsland(container: HTMLElement, props: ColorPickerProps, ctx?: IslandContext) {
     injectIslandStyle('color-picker', CSS);
-    let currentColor = props.value || 'var(--lt-primary-500, var(--lt-primary-500))';
+
+    const formField = useFormField(container, ctx, {
+        cardinality: 'Single',
+        fieldKind: 'Hidden',
+        name: props.name || props.targetInputName || (props as any).targetInput
+    });
+
+    let currentColor = props.value || formField.field?.value || 'var(--lt-primary-500, var(--lt-primary-500))';
     let isOpen = false;
 
     const swatches = DEFAULT_PRESETS.map(c => {
@@ -73,6 +82,7 @@ export default function ColorPickerIsland(container: HTMLElement, props: ColorPi
     });
 
     // Static DOM skeleton built once
+    formField.detach();
     setHtml(container, html`
         <div class="laughtale-colorpicker" style="position: relative; display: inline-flex; align-items: center; gap: 0.625rem; font-family: var(--p-font-family, inherit);">
             <!-- Color Swatch Trigger Button -->
@@ -114,6 +124,7 @@ export default function ColorPickerIsland(container: HTMLElement, props: ColorPi
             </div>
         </div>
     `);
+    formField.reattach();
 
     const triggerBtn = container.querySelector<HTMLButtonElement>('.colorpicker-trigger-btn')!;
     const hexLabel = container.querySelector<HTMLElement>('.colorpicker-hex-label')!;
@@ -195,16 +206,7 @@ export default function ColorPickerIsland(container: HTMLElement, props: ColorPi
     }
 
     function syncValue() {
-        if (props.targetInputName) {
-            let hidden = container.querySelector<HTMLInputElement>(`input[name="${props.targetInputName}"]`);
-            if (!hidden) {
-                hidden = document.createElement('input');
-                hidden.type = 'hidden';
-                hidden.name = props.targetInputName;
-                container.appendChild(hidden);
-            }
-            hidden.value = currentColor;
-        }
+        formField.setValue(currentColor);
 
         emitComponentEvent(container, 'color-picker', 'change', {
             value: currentColor

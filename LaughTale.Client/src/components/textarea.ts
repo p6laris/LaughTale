@@ -6,6 +6,7 @@ import type { IslandContext } from '../runtime/registry';
  * filled variant, character telemetry, and seamless FloatLabel/IftaLabel integration.
  */
 
+import { useFormField } from '../composables/useFormField';
 import { injectIslandStyle } from '../runtime/styles';
 import { emitComponentEvent } from '../runtime/events';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
@@ -175,6 +176,12 @@ html.dark .p-textarea.p-disabled,
 export default function TextareaIsland(container: HTMLElement, props: TextareaProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-textarea', CSS);
 
+    const formField = useFormField(container, ctx, {
+        cardinality: 'Single',
+        fieldKind: 'Native',
+        name: props.name || props.targetInputName
+    });
+
     const isAutoResize = props.autoResize === true || String(props.autoResize) === 'true';
     const isFluid = props.fluid === true || String(props.fluid) === 'true';
     const isInvalid = props.invalid === true || String(props.invalid) === 'true';
@@ -188,9 +195,26 @@ export default function TextareaIsland(container: HTMLElement, props: TextareaPr
     if (container.tagName.toLowerCase() === 'textarea') {
         textareaEl = container as HTMLTextAreaElement;
     } else {
-        const existing = container.querySelector<HTMLTextAreaElement>('textarea');
+        const existing = (formField.field as HTMLTextAreaElement) || container.querySelector<HTMLTextAreaElement>('textarea');
         if (existing) {
             textareaEl = existing;
+            const classList = [
+                'p-textarea',
+                isFluid ? 'p-textarea-fluid' : '',
+                size !== 'normal' ? `p-textarea-${size === 'small' ? 'sm' : 'lg'}` : '',
+                variant === 'filled' ? 'p-textarea-filled' : '',
+                isInvalid ? 'p-invalid' : '',
+                isDisabled ? 'p-disabled' : ''
+            ].filter(Boolean).join(' ');
+            textareaEl.className = classList;
+            textareaEl.setAttribute('data-part', 'root');
+            if (props.rows) textareaEl.rows = props.rows;
+            if (props.cols) textareaEl.cols = props.cols;
+            if (props.placeholder) textareaEl.placeholder = props.placeholder;
+            if (props.maxLength) textareaEl.maxLength = props.maxLength;
+            if (props.inputId) textareaEl.id = props.inputId;
+            if (isDisabled) textareaEl.disabled = true;
+            if (isInvalid) textareaEl.setAttribute('aria-invalid', 'true');
         } else {
             // Render native textarea
             const classList = [
@@ -243,11 +267,13 @@ export default function TextareaIsland(container: HTMLElement, props: TextareaPr
     textareaEl.addEventListener('input', () => {
         adjustHeight();
         updateCounter();
+        formField.setValue(textareaEl.value);
 
         emitComponentEvent(container, 'textarea', 'input', { value: textareaEl.value });
     }, { signal: ctx?.signal });
 
     textareaEl.addEventListener('change', () => {
+        formField.setValue(textareaEl.value);
         emitComponentEvent(container, 'textarea', 'change', { value: textareaEl.value });
     }, { signal: ctx?.signal });
 

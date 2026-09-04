@@ -4,6 +4,7 @@ import { injectIslandStyle } from '../runtime/styles';
 import { emitComponentEvent } from '../runtime/events';
 import { LucideIcons } from '../icons/lucide';
 import { useControllableState } from '../composables/useControllableState';
+import { useFormField } from '../composables/useFormField';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
@@ -263,10 +264,16 @@ const xIcon = html`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14
 export default function InputTextIsland(container: HTMLElement, props: InputTextProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-inputtext', CSS);
 
+    const formField = useFormField(container, ctx, {
+        cardinality: 'Single',
+        fieldKind: 'Native',
+        name: props.name || props.targetInputName
+    });
+
     const [getValue, setValue] = useControllableState<string>({
-        defaultValue: props.value ?? '',
+        defaultValue: props.value ?? formField.field?.value ?? '',
         onChange: (val) => {
-            syncValue(val);
+            formField.setValue(val);
         }
     });
 
@@ -279,7 +286,6 @@ export default function InputTextIsland(container: HTMLElement, props: InputText
     const leftIconName = props.iconLeft || (!props.iconRight ? props.icon : '');
     const rightIconName = props.iconRight;
     const inputId = props.inputId || props.id || '';
-    const inputName = props.name || props.targetInputName || '';
 
     function getIconSvg(name?: string): string {
         if (!name) return '';
@@ -320,6 +326,7 @@ export default function InputTextIsland(container: HTMLElement, props: InputText
             </button>
         ` : '';
 
+        formField.detach();
         setHtml(container, html`
             ${leftIconHtml}
             <input
@@ -328,7 +335,6 @@ export default function InputTextIsland(container: HTMLElement, props: InputText
                 value="${val}"
                 placeholder="${props.placeholder || ''}"
                 ${attr('id', inputId)}
-                ${attr('name', inputName)}
                 ${attr('aria-label', props.ariaLabel)}
                 ${attr('aria-labelledby', props.ariaLabelledBy)}
                 ${attr('aria-describedby', props.ariaDescribedBy)}
@@ -340,6 +346,10 @@ export default function InputTextIsland(container: HTMLElement, props: InputText
             ${clearBtnHtml}
             ${rightIconHtml}
         `);
+        if (formField.field instanceof HTMLInputElement) {
+            formField.field.type = 'hidden';
+        }
+        formField.reattach();
 
         if (props.helpText) {
             const helpEl = document.createElement('small');
@@ -386,19 +396,6 @@ export default function InputTextIsland(container: HTMLElement, props: InputText
                 // Dispatch native input event for FloatLabel/IftaLabel detection
                 input.dispatchEvent(new Event('input', { bubbles: true }));
             }, { signal: ctx?.signal });
-        }
-    }
-
-    function syncValue(val: string) {
-        if (props.targetInputName) {
-            let hidden = container.querySelector<HTMLInputElement>(`input[name="${props.targetInputName}"]`);
-            if (!hidden) {
-                hidden = document.createElement('input');
-                hidden.type = 'hidden';
-                hidden.name = props.targetInputName;
-                container.appendChild(hidden);
-            }
-            hidden.value = val;
         }
     }
 
