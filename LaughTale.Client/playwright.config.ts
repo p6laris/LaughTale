@@ -8,7 +8,14 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: 'list',
   use: {
+    baseURL: 'http://localhost:5000',
     trace: 'on-first-retry',
+  },
+  webServer: {
+    command: 'dotnet run --project ../LaughTale.Showcase/LaughTale.Showcase.csproj --urls http://localhost:5000',
+    url: 'http://localhost:5000',
+    reuseExistingServer: !process.env.CI,
+    timeout: 120000,
   },
   projects: [
     {

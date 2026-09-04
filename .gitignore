@@ -19,3 +19,8 @@
 ## OS generated
 .DS_Store
 Thumbs.db
+
+## Test Artifacts
+**/test-results/
+**/.tmp/
+

@@ -1,0 +1,70 @@
+﻿@page "/form-conformance"
+@model LaughTale.Showcase.Pages.FormConformanceModel
+@{
+    ViewData["Title"] = "Form Conformance Fixture (29 Controls)";
+}
+
+<h1>Form Conformance Fixture</h1>
+
+@if (Model.WasSubmitted)
+{
+    <div id="submission-result" data-submitted="true" data-field-count="@Model.SubmittedFieldCount">
+        <h2>Submitted Fields (@Model.SubmittedFieldCount)</h2>
+        <ul id="submitted-fields-list">
+            @foreach (var kvp in Model.SubmittedFormFields)
+            {
+                <li data-name="@kvp.Key" data-values="@string.Join(",", kvp.Value)">
+                    <strong>@kvp.Key</strong>: @string.Join(", ", kvp.Value)
+                </li>
+            }
+        </ul>
+    </div>
+}
+
+<form id="conformance-form" method="post" action="/form-conformance">
+    <!-- Batch 1: Text-like controls (10) -->
+    <fieldset>
+        <legend>Batch 1: Text Controls</legend>
+        <island-input-text asp-for="InputText" id="ctrl-input-text" />
+        <island-textarea asp-for="Textarea" id="ctrl-textarea" />
+        <island-input-password asp-for="InputPassword" id="ctrl-input-password" />
+        <island-input-number asp-for="InputNumber" id="ctrl-input-number" />
+        <island-input-mask asp-for="InputMask" mask="99/99/9999" id="ctrl-input-mask" />
+        <island-input-otp asp-for="InputOtp" length="4" id="ctrl-input-otp" />
+        <island-input-tags asp-for="InputTags" id="ctrl-input-tags" />
+        <island-color-picker asp-for="ColorPicker" id="ctrl-color-picker" />
+        <island-knob asp-for="Knob" id="ctrl-knob" />
+        <island-rating asp-for="Rating" id="ctrl-rating" />
+    </fieldset>
+
+    <!-- Batch 2: Choice controls (10) -->
+    <fieldset>
+        <legend>Batch 2: Choice Controls</legend>
+        <island-checkbox asp-for="Checkbox" id="ctrl-checkbox" />
+        <island-radio-button asp-for="RadioButton" value="option-b" id="ctrl-radio-button" />
+        <island-toggle-switch asp-for="ToggleSwitch" id="ctrl-toggle-switch" />
+        <island-toggle-button asp-for="ToggleButton" id="ctrl-toggle-button" />
+        <island-select-button asp-for="SelectButton" multiple="true" id="ctrl-select-button" />
+        <island-select asp-for="Select" id="ctrl-select" />
+        <island-multiselect asp-for="MultiSelect" id="ctrl-multiselect" />
+        <island-listbox asp-for="Listbox" id="ctrl-listbox" />
+        <island-cascade-select asp-for="CascadeSelect" id="ctrl-cascade-select" />
+        <island-tree-select asp-for="TreeSelect" id="ctrl-tree-select" />
+    </fieldset>
+
+    <!-- Batch 3: Composite & Collection controls (9) -->
+    <fieldset>
+        <legend>Batch 3: Composite &amp; Collection Controls</legend>
+        <island-autocomplete asp-for="AutoComplete" id="ctrl-autocomplete" />
+        <island-datepicker asp-for="DatePicker" id="ctrl-datepicker" />
+        <island-slider asp-for="Slider" range="true" id="ctrl-slider" />
+        <island-orderlist asp-for="OrderList" id="ctrl-orderlist" />
+        <island-picklist asp-for="PickList" id="ctrl-picklist" />
+        <island-orgchart asp-for="OrgChart" id="ctrl-orgchart" />
+        <island-paginator asp-for="Paginator" totalRecords="100" rows="10" first="20" id="ctrl-paginator" />
+        <island-dropzone asp-for="Dropzone" id="ctrl-dropzone" />
+        <island-inplace asp-for="Inplace" id="ctrl-inplace" />
+    </fieldset>
+
+    <button type="submit" id="submit-btn">Submit Conformance Form</button>
+</form>

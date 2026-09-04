@@ -122,8 +122,8 @@ current shipped behaviour, and Phase 4 is what makes the field survive. Do not "
 
 ### Tests for User Story 1
 
-- [ ] T013 [P] [US1] Build the conformance fixture: a Razor page hosting all 29 controls bound to a populated page model, plus its handler asserting the received `FormData`, in `LaughTale.Showcase/Pages/FormConformance.cshtml` and its `.cshtml.cs`
-- [ ] T014 [P] [US1] Write the no-JS conformance spec in `LaughTale.Client/tests/e2e/form-association.spec.ts` with a `javaScriptEnabled: false` context, asserting the field set and values — **it must fail at this point**, proving it measures something
+- [x] T013 [P] [US1] Build the conformance fixture: a Razor page hosting all 29 controls bound to a populated page model, plus its handler asserting the received `FormData`, in `LaughTale.Showcase/Pages/FormConformance.cshtml` and its `.cshtml.cs`
+- [x] T014 [P] [US1] Write the no-JS conformance spec in `LaughTale.Client/tests/e2e/form-association.spec.ts` with a `javaScriptEnabled: false` context, asserting the field set and values — **it must fail at this point**, proving it measures something
 
 ### Implementation for User Story 1
 
