@@ -850,7 +850,7 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
                     ${renderListItems()}
                 </ul>
             </div>
-            <input type="hidden" name="${props.name || props.targetInputName || 'select_value'}" value="${selectedValues.join(',')}" />
+            <input type="hidden"${attr('name', props.name || props.targetInputName)} value="${selectedValues.join(',')}" />
         `);
 
         updateVirtualPositions();

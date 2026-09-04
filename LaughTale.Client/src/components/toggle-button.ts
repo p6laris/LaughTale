@@ -232,7 +232,7 @@ export default function ToggleButtonIsland(container: HTMLElement, props: Toggle
         setHtml(container, html`
             ${iconHtml}
             ${labelHtml}
-            <input type="hidden" name="${props.name || props.targetInputName || 'togglebutton_value'}" value="${isChecked ? 'true' : 'false'}" />
+            <input type="hidden"${attr('name', props.name || props.targetInputName)} value="${isChecked ? 'true' : 'false'}" />
         `);
 
         bindEvents();

@@ -298,7 +298,7 @@ export default function SliderIsland(container: HTMLElement, props: SliderProps,
                     aria-valuenow="${currentValues[1]}"
                     style="${h2Style}"
                 ></span>
-                <input type="hidden" name="${props.name || props.targetInputName || 'slider_value'}" value="${currentValues.join(',')}" />
+                <input type="hidden"${attr('name', props.name || props.targetInputName)} value="${currentValues.join(',')}" />
             `);
         } else {
             const p = getPercent(currentValues[0]);
@@ -323,7 +323,7 @@ export default function SliderIsland(container: HTMLElement, props: SliderProps,
                     aria-valuenow="${currentValues[0]}"
                     style="${hStyle}"
                 ></span>
-                <input type="hidden" name="${props.name || props.targetInputName || 'slider_value'}" value="${currentValues[0]}" />
+                <input type="hidden"${attr('name', props.name || props.targetInputName)} value="${currentValues[0]}" />
             `);
         }
 

@@ -564,7 +564,7 @@ export default function ListboxIsland(container: HTMLElement, props: ListboxProp
             ${props.footer ? html`
                 <div class="p-listbox-footer">${props.footer}</div>
             ` : ''}
-            <input type="hidden" name="${props.name || props.targetInputName || 'listbox_value'}" value="" />
+            <input type="hidden"${attr('name', props.name || props.targetInputName)} value="" />
         `);
 
         renderOptions();
@@ -918,7 +918,8 @@ export default function ListboxIsland(container: HTMLElement, props: ListboxProp
     }
 
     function syncValue() {
-        const hiddenInp = container.querySelector<HTMLInputElement>(`input[name="${props.name || props.targetInputName || 'listbox_value'}"]`)!;
+        const inputName = props.name || props.targetInputName;
+        const hiddenInp = inputName ? container.querySelector<HTMLInputElement>(`input[name="${inputName}"]`) : container.querySelector<HTMLInputElement>('input[type="hidden"]');
         const valArray = Array.from(selectedValues);
         const payload = isMultiple ? valArray : (valArray[0] || null);
 

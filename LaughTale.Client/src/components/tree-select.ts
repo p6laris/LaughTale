@@ -680,7 +680,7 @@ export default function TreeSelectIsland(container: HTMLElement, props: TreeSele
                 ${props.footer ? html`<div class="p-treeselect-footer">${props.footer}</div>` : ''}
             </div>
 
-            <input type="hidden" name="${props.name || props.targetInputName || 'tree_value'}" value="" />
+            <input type="hidden"${attr('name', props.name || props.targetInputName)} value="" />
         `);
 
         updateTriggerDisplay();
@@ -700,7 +700,8 @@ export default function TreeSelectIsland(container: HTMLElement, props: TreeSele
     function updateTriggerDisplay() {
         const labelEl = container.querySelector<HTMLElement>('.p-treeselect-label')!;
         const clearBtn = container.querySelector<HTMLElement>('.p-treeselect-clear-icon')!;
-        const hiddenInp = container.querySelector<HTMLInputElement>(`input[name="${props.name || props.targetInputName || 'tree_value'}"]`)!;
+        const inputName = props.name || props.targetInputName;
+        const hiddenInp = inputName ? container.querySelector<HTMLInputElement>(`input[name="${inputName}"]`) : container.querySelector<HTMLInputElement>('input[type="hidden"]');
 
         const selected = getSelectedLabels();
 
@@ -708,7 +709,7 @@ export default function TreeSelectIsland(container: HTMLElement, props: TreeSele
             labelEl.className = 'p-treeselect-label p-placeholder'; container.setAttribute('data-part', 'root');
             labelEl.textContent = placeholder;
             clearBtn.style.display = 'none';
-            hiddenInp.value = '';
+            if (hiddenInp) hiddenInp.value = '';
         } else {
             labelEl.className = 'p-treeselect-label';
             if (isShowClear && !isDisabled) clearBtn.style.display = 'inline-flex';
@@ -733,10 +734,12 @@ export default function TreeSelectIsland(container: HTMLElement, props: TreeSele
                 labelEl.textContent = selected.map(s => s.label).join(', ');
             }
 
-            if (selectionMode === 'single') {
-                hiddenInp.value = selected[0]?.key || '';
-            } else {
-                hiddenInp.value = JSON.stringify(Array.from(selectedKeys));
+            if (hiddenInp) {
+                if (selectionMode === 'single') {
+                    hiddenInp.value = selected[0]?.key || '';
+                } else {
+                    hiddenInp.value = JSON.stringify(Array.from(selectedKeys));
+                }
             }
         }
     }

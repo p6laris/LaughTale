@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### BREAKING
+- **Form Control Generic Fallback Field Names Removed (Feature 045 / Spec 045):**
+  - Removed generic field-name fallbacks (`select_value`, `slider_value`, `mask_value`, `listbox_value`, `togglebutton_value`, `selectbutton_value`, `tree_value`, `switch_value`) from client components per FR-005.
+  - Controls with no explicitly provided `Name`, `TargetInputName`, or `AspFor` binding will no longer submit under shared literal fallback names, preventing silent cross-instance collisions and data overwrites when multiple un-named controls share a form.
 - **Unified Component Event Contract (Feature 044 / Spec 044):**
   - All component events now follow the predictable contract: `laughtale:<canonical-kebab-component-name>:<event-name>` (e.g. `laughtale:slider:change`, `laughtale:select:change`, `laughtale:input-tags:change`).
   - Cross-island communication re-homed to the in-process island event bus (`emitIslandEvent` / `onIslandEvent`), fixing the cross-island toast dispatch defect (`tieredmenu` export actions now reliably show toasts in `toast` islands without polluting global `window`).

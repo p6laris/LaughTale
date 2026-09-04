@@ -218,7 +218,7 @@ export default function ToggleSwitchIsland(container: HTMLElement, props: Toggle
     const checkedIcon = props.checkedIcon || props.icon;
     const uncheckedIcon = props.uncheckedIcon;
     const inputId = props.inputId || '';
-    const inputName = props.name || props.targetInputName || 'switch_value';
+    const inputName = props.name || props.targetInputName || '';
 
     function render() {
         const rootClasses = [
@@ -242,7 +242,7 @@ export default function ToggleSwitchIsland(container: HTMLElement, props: Toggle
                 role="switch"
                 class="p-toggleswitch-input"
                 ${attr('id', inputId)}
-                name="${inputName}"
+                ${attr('name', inputName)}
                 ${attr('checked', isChecked)}
                 ${attr('disabled', isDisabled)}
                 aria-checked="${isChecked ? 'true' : 'false'}"

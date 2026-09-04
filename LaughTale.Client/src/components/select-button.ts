@@ -310,7 +310,7 @@ export default function SelectButtonIsland(container: HTMLElement, props: Select
 
         setHtml(container, html`
             ${buttonsHtml}
-            <input type="hidden" name="${props.name || props.targetInputName || 'selectbutton_value'}" value="${selectedValues.join(',')}" />
+            <input type="hidden"${attr('name', props.name || props.targetInputName)} value="${selectedValues.join(',')}" />
         `);
 
         bindEvents();

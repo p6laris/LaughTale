@@ -287,11 +287,11 @@ export default function InputMaskIsland(container: HTMLElement, props: InputMask
             ${attr('aria-invalid', isInvalid ? 'true' : null)}
             ${attr('id', props.inputId)}
         />
-        <input type="hidden" name="${props.name || props.targetInputName || 'mask_value'}" value="" />
+        <input type="hidden"${attr('name', props.name || props.targetInputName)} value="" />
     `);
 
     const input = container.querySelector<HTMLInputElement>('input[type="text"]')!;
-    const hiddenInp = container.querySelector<HTMLInputElement>('input[type="hidden"]')!;
+    const hiddenInp = container.querySelector<HTMLInputElement>('input[type="hidden"]');
 
     function syncValue() {
         const formatted = formatValue(input.value);
