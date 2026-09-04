@@ -316,4 +316,46 @@ public class TagHelpersTests
         var sizeTypoParsed = Enum.TryParse<ComponentSize>("normalll", ignoreCase: true, out _);
         Assert.False(sizeTypoParsed, "A typo'd size must fail enum parsing.");
     }
+
+    [Fact]
+    public async Task IslandInputTextTagHelper_EmitsNativeInput_WithFormControl()
+    {
+        var helper = new IslandInputTextTagHelper
+        {
+            Name = "CustomerName",
+            Value = "Alice"
+        };
+
+        var services = new ServiceCollection();
+        services.AddLogging();
+        services.AddAuthorization();
+        services.AddLaughTale(opt => opt.Refresh.AllowUndeclaredIslands = true);
+        var sp = services.BuildServiceProvider();
+
+        var httpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext { RequestServices = sp };
+        var actionContext = new Microsoft.AspNetCore.Mvc.ActionContext(httpContext, new Microsoft.AspNetCore.Routing.RouteData(), new Microsoft.AspNetCore.Mvc.Abstractions.ActionDescriptor());
+        var viewData = new Microsoft.AspNetCore.Mvc.ViewFeatures.ViewDataDictionary(new Microsoft.AspNetCore.Mvc.ModelBinding.EmptyModelMetadataProvider(), new Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary());
+        helper.ViewContext = new Microsoft.AspNetCore.Mvc.Rendering.ViewContext(actionContext, new MockTestView(), viewData, new Microsoft.AspNetCore.Mvc.ViewFeatures.TempDataDictionary(httpContext, new MockTestTempDataProvider()), System.IO.TextWriter.Null, new Microsoft.AspNetCore.Mvc.ViewFeatures.HtmlHelperOptions());
+
+        var (context, output) = CreateTagHelperContext("island-input-text");
+        await helper.ProcessAsync(context, output);
+
+        Assert.Equal("true", output.Attributes["data-lt-ssr"]?.Value?.ToString());
+        var content = output.Content.GetContent();
+        Assert.Contains("name=\"CustomerName\"", content);
+        Assert.Contains("value=\"Alice\"", content);
+        Assert.Contains("data-lt-field", content);
+    }
+
+    private class MockTestView : Microsoft.AspNetCore.Mvc.ViewEngines.IView
+    {
+        public string Path => "/test";
+        public Task RenderAsync(Microsoft.AspNetCore.Mvc.Rendering.ViewContext context) => Task.CompletedTask;
+    }
+
+    private class MockTestTempDataProvider : Microsoft.AspNetCore.Mvc.ViewFeatures.ITempDataProvider
+    {
+        public IDictionary<string, object> LoadTempData(Microsoft.AspNetCore.Http.HttpContext context) => new Dictionary<string, object>();
+        public void SaveTempData(Microsoft.AspNetCore.Http.HttpContext context, IDictionary<string, object> values) { }
+    }
 }

@@ -12,6 +12,7 @@ builder.Services.AddLaughTale(opt =>
 {
     opt.Localization.DefaultCulture = "en-US";
     opt.Localization.SupportedCultures = ["en-US", "ku", "ckb", "ar-SA", "es-ES", "fr-FR", "de-DE", "tr-TR"];
+    opt.Refresh.AllowUndeclaredIslands = true;
 });
 
 var supportedCultures = new[]

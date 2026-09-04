@@ -1,4 +1,5 @@
 using LaughTale.Components.Enums;
+using LaughTale.Core.Attributes;
 
 namespace LaughTale.Components.Models;
 
@@ -520,7 +521,8 @@ public record ComponentStateProps(
 //   Aura Island Component Props Records (Emitted by LaughTale.Generators)
 // ============================================================================
 
-[LaughTale.Core.Attributes.Island("input-number")]
+[Island("input-number")]
+[FormControl(Cardinality = FormCardinality.Single, FieldKind = FormFieldKind.Hidden)]
 public record InputNumberProps(
     double? Value = null, string? Name = null, InputNumberMode Mode = InputNumberMode.Decimal, string? Currency = "USD", string? Locale = null,
     bool UseGrouping = true, int? MinFractionDigits = null, int? MaxFractionDigits = null,
@@ -576,37 +578,42 @@ public record CheckboxProps(
     ComponentSize Size = ComponentSize.Normal, bool Disabled = false
 );
 
-[LaughTale.Core.Attributes.Island("color-picker")]
+[Island("color-picker")]
+[FormControl(Cardinality = FormCardinality.Single, FieldKind = FormFieldKind.Hidden)]
 public record ColorPickerProps(
-    string? Value = "#10b981", string? Format = "hex", bool Inline = false,
+    string? Value = "#10b981", string? Name = null, string? Format = "hex", bool Inline = false,
     string? Placeholder = null, string? TargetInput = null, bool Disabled = false
 );
 
-[LaughTale.Core.Attributes.Island("input-mask")]
+[Island("input-mask")]
+[FormControl(Cardinality = FormCardinality.Single, FieldKind = FormFieldKind.Hidden)]
 public record InputMaskProps(
-    string? Value = null, string? Mask = "99/99/9999", string? SlotChar = "_",
+    string? Value = null, string? Name = null, string? Mask = "99/99/9999", string? SlotChar = "_",
     bool AutoClear = true, bool Unmask = false, bool Invalid = false, bool Fluid = false,
     InputVariant Variant = InputVariant.Outlined, ComponentSize Size = ComponentSize.Normal, string? Placeholder = null, bool Disabled = false
 );
 
-[LaughTale.Core.Attributes.Island("input-otp")]
+[Island("input-otp")]
+[FormControl(Cardinality = FormCardinality.Single, FieldKind = FormFieldKind.Hidden)]
 public record InputOtpProps(
-    string? Value = null, int Length = 4, bool IntegerOnly = false, bool Mask = false,
+    string? Value = null, string? Name = null, int Length = 4, bool IntegerOnly = false, bool Mask = false,
     InputVariant Variant = InputVariant.Outlined, ComponentSize Size = ComponentSize.Normal, bool Invalid = false, bool Disabled = false
 );
 
-[LaughTale.Core.Attributes.Island("input-password")]
+[Island("input-password")]
+[FormControl(Cardinality = FormCardinality.Single, FieldKind = FormFieldKind.Hidden)]
 public record InputPasswordProps(
-    string? Value = null, bool ToggleMask = true, bool Feedback = false,
+    string? Value = null, string? Name = null, bool ToggleMask = true, bool Feedback = false,
     string? PromptLabel = "Please enter a password", string? WeakLabel = "Too simple",
     string? MediumLabel = "Average complexity", string? StrongLabel = "Complex password",
     bool Invalid = false, bool Fluid = false, InputVariant Variant = InputVariant.Outlined,
     ComponentSize Size = ComponentSize.Normal, string? Placeholder = null, bool Disabled = false
 );
 
-[LaughTale.Core.Attributes.Island("input-tags")]
+[Island("input-tags")]
+[FormControl(Cardinality = FormCardinality.Multiple, FieldKind = FormFieldKind.Hidden)]
 public record InputTagsProps(
-    object? Value = null, object? Values = null, string? Placeholder = "Add a tag...",
+    object? Value = null, string? Name = null, object? Values = null, string? Placeholder = "Add a tag...",
     int? Max = null, bool AllowDuplicates = false, bool AllowDuplicate = false,
     string? Separator = ",", bool AddOnBlur = true, bool AddOnPaste = true,
     bool Typeahead = false, object? Suggestions = null, string? InputId = null,
@@ -614,17 +621,19 @@ public record InputTagsProps(
     ComponentSize Size = ComponentSize.Normal, bool Disabled = false
 );
 
-[LaughTale.Core.Attributes.Island("input-text")]
+[Island("input-text")]
+[FormControl(Cardinality = FormCardinality.Single, FieldKind = FormFieldKind.Native)]
 public record InputTextProps(
-    string? Value = null, string? Placeholder = null, InputVariant Variant = InputVariant.Outlined,
+    string? Value = null, string? Name = null, string? Placeholder = null, InputVariant Variant = InputVariant.Outlined,
     ComponentSize Size = ComponentSize.Normal, bool Fluid = false, bool Invalid = false,
     bool ShowClear = false, bool Disabled = false, string? InputId = null,
     string? IconLeft = null, string? IconRight = null, string? HelpText = null
 );
 
-[LaughTale.Core.Attributes.Island("knob")]
+[Island("knob")]
+[FormControl(Cardinality = FormCardinality.Single, FieldKind = FormFieldKind.Hidden)]
 public record KnobProps(
-    double Value = 0, double Min = 0, double Max = 100, double Step = 1,
+    double Value = 0, string? Name = null, double Min = 0, double Max = 100, double Step = 1,
     int Size = 100, int StrokeWidth = 14, string? Color = null,
     string? ValueColor = "var(--p-primary-500)", string? RangeColor = "var(--p-surface-200)",
     string? ValueTemplate = "{value}", bool ShowValue = true, bool ReadOnly = false, bool Disabled = false
@@ -672,9 +681,10 @@ public record SplitButtonProps(
     string? Action = null, string? AppendTo = "body"
 );
 
-[LaughTale.Core.Attributes.Island("rating")]
+[Island("rating")]
+[FormControl(Cardinality = FormCardinality.Single, FieldKind = FormFieldKind.Hidden)]
 public record RatingProps(
-    double? Value = null, int Stars = 5, bool Cancel = true, bool ReadOnly = false, bool Disabled = false
+    double? Value = null, string? Name = null, int Stars = 5, bool Cancel = true, bool ReadOnly = false, bool Disabled = false
 );
 
 [LaughTale.Core.Attributes.Island("select-button")]
@@ -690,9 +700,10 @@ public record SliderProps(
     bool Range = false, string? Orientation = "horizontal", bool Disabled = false
 );
 
-[LaughTale.Core.Attributes.Island("textarea")]
+[Island("textarea")]
+[FormControl(Cardinality = FormCardinality.Single, FieldKind = FormFieldKind.Native)]
 public record TextareaProps(
-    string? Value = null, int? Rows = 3, int? Cols = 20, bool AutoResize = false,
+    string? Value = null, string? Name = null, int? Rows = 3, int? Cols = 20, bool AutoResize = false,
     InputVariant Variant = InputVariant.Outlined, ComponentSize Size = ComponentSize.Normal, bool Fluid = false,
     bool Invalid = false, string? Placeholder = null, bool Disabled = false
 );

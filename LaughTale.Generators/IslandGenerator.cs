@@ -427,8 +427,13 @@ public class IslandGenerator : IIncrementalGenerator
         sb.AppendLine("        {");
         if (model.FormControl != null)
         {
-            sb.AppendLine("            Name = Name ?? AspFor?.Name,");
-            sb.AppendLine("            TargetInputName = Name ?? AspFor?.Name,");
+            var nameExpr = model.Properties.Any(p => p.Name == "TargetInput")
+                ? "Name ?? AspFor?.Name ?? TargetInput"
+                : (model.Properties.Any(p => p.Name == "TargetInputName")
+                    ? "Name ?? AspFor?.Name ?? TargetInputName"
+                    : "Name ?? AspFor?.Name");
+            sb.AppendLine($"            Name = {nameExpr},");
+            sb.AppendLine($"            TargetInputName = {nameExpr},");
         }
         foreach (var prop in model.Properties)
         {
@@ -439,6 +444,11 @@ public class IslandGenerator : IIncrementalGenerator
             if (prop.Name == "TargetInput")
             {
                 sb.AppendLine("            TargetInputName = TargetInput,");
+            }
+            else if (model.FormControl != null && prop.Name == model.FormControl.ValueProperty)
+            {
+                var valAttr = ToKebabCase(prop.Name);
+                sb.AppendLine($"            {prop.Name} = (context.AllAttributes.ContainsName(\"{valAttr}\") ? (object?){prop.Name} : null) ?? AspFor?.Model ?? (object?){prop.Name},");
             }
             else
             {
@@ -473,15 +483,21 @@ public class IslandGenerator : IIncrementalGenerator
         {
             sb.AppendLine("        else");
             sb.AppendLine("        {");
-            sb.AppendLine("            var resolvedName = Name ?? AspFor?.Name;");
+            var resolvedNameExpr = model.Properties.Any(p => p.Name == "TargetInput")
+                ? "Name ?? AspFor?.Name ?? TargetInput"
+                : (model.Properties.Any(p => p.Name == "TargetInputName")
+                    ? "Name ?? AspFor?.Name ?? TargetInputName"
+                    : "Name ?? AspFor?.Name");
+            sb.AppendLine($"            var resolvedName = {resolvedNameExpr};");
             sb.AppendLine("            if (!string.IsNullOrWhiteSpace(resolvedName))");
             sb.AppendLine("            {");
             sb.AppendLine("                var encodedName = System.Text.Encodings.Web.HtmlEncoder.Default.Encode(resolvedName);");
             var valProp = model.FormControl.ValueProperty;
+            var valAttr = ToKebabCase(valProp);
             var hasValProp = model.Properties.Any(p => p.Name == valProp);
             if (hasValProp)
             {
-                sb.AppendLine($"                var rawValue = (object?){valProp} ?? AspFor?.Model;");
+                sb.AppendLine($"                var rawValue = (context.AllAttributes.ContainsName(\"{valAttr}\") ? (object?){valProp} : null) ?? AspFor?.Model ?? (object?){valProp};");
             }
             else
             {
