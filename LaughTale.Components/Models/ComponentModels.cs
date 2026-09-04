@@ -547,9 +547,10 @@ public record DatePickerProps(
     string? Placeholder = null, bool Disabled = false
 );
 
-[LaughTale.Core.Attributes.Island("select")]
+[Island("select")]
+[FormControl(Cardinality = FormCardinality.Multiple, FieldKind = FormFieldKind.Hidden)]
 public record SelectProps(
-    object? Value = null, object? Options = null, string? OptionLabel = "label", string? OptionValue = "value",
+    object? Value = null, string? Name = null, object? Options = null, string? OptionLabel = "label", string? OptionValue = "value",
     string? Placeholder = "Select an option", bool Filter = false, string? FilterPlaceholder = "Search...",
     bool ShowClear = false, bool Checkmark = false, bool Invalid = false, bool Fluid = false,
     InputVariant Variant = InputVariant.Outlined, ComponentSize Size = ComponentSize.Normal, bool Disabled = false
@@ -563,17 +564,19 @@ public record AutoCompleteProps(
     InputVariant Variant = InputVariant.Outlined, ComponentSize Size = ComponentSize.Normal, bool Disabled = false
 );
 
-[LaughTale.Core.Attributes.Island("cascade-select")]
+[Island("cascade-select")]
+[FormControl(Cardinality = FormCardinality.Single, FieldKind = FormFieldKind.Hidden)]
 public record CascadeSelectProps(
-    object? Value = null, object? Options = null, string? OptionLabel = "label", string? OptionValue = "value",
+    object? Value = null, string? Name = null, object? Options = null, string? OptionLabel = "label", string? OptionValue = "value",
     string? OptionGroupLabel = "label", string? OptionGroupChildren = "children",
     string? Placeholder = "Select a category", bool ShowClear = false, bool Invalid = false,
     bool Fluid = false, InputVariant Variant = InputVariant.Outlined, ComponentSize Size = ComponentSize.Normal, bool Disabled = false
 );
 
-[LaughTale.Core.Attributes.Island("checkbox")]
+[Island("checkbox")]
+[FormControl(ValueProperty = "Checked", Cardinality = FormCardinality.Boolean, FieldKind = FormFieldKind.Hidden)]
 public record CheckboxProps(
-    bool Checked = false, bool Binary = true, string? Value = null, string? Label = null,
+    bool Checked = false, string? Name = null, bool Binary = true, string? Value = null, string? Label = null,
     bool Indeterminate = false, bool Invalid = false, InputVariant Variant = InputVariant.Outlined,
     ComponentSize Size = ComponentSize.Normal, bool Disabled = false
 );
@@ -639,17 +642,19 @@ public record KnobProps(
     string? ValueTemplate = "{value}", bool ShowValue = true, bool ReadOnly = false, bool Disabled = false
 );
 
-[LaughTale.Core.Attributes.Island("listbox")]
+[Island("listbox")]
+[FormControl(Cardinality = FormCardinality.Multiple, FieldKind = FormFieldKind.Hidden)]
 public record ListboxProps(
-    object? Value = null, object? Options = null, string? OptionLabel = "label",
+    object? Value = null, string? Name = null, object? Options = null, string? OptionLabel = "label",
     string? OptionValue = "value", bool Multiple = false, bool Checkmark = false,
     bool Filter = false, string? FilterPlaceholder = "Filter items...",
     int? ListHeight = 250, bool Striped = false, bool Invalid = false, bool Disabled = false
 );
 
-[LaughTale.Core.Attributes.Island("multiselect")]
+[Island("multiselect")]
+[FormControl(Cardinality = FormCardinality.Multiple, FieldKind = FormFieldKind.Hidden)]
 public record MultiSelectProps(
-    object? Value = null, object? Options = null, string? OptionLabel = "label",
+    object? Value = null, string? Name = null, object? Options = null, string? OptionLabel = "label",
     string? OptionValue = "value", string? Placeholder = "Select items",
     string? Display = "comma", int MaxSelectedLabels = 3,
     string? SelectedItemsLabel = "{0} items selected", bool Filter = false,
@@ -658,7 +663,8 @@ public record MultiSelectProps(
     InputVariant Variant = InputVariant.Outlined, ComponentSize Size = ComponentSize.Normal, bool Disabled = false
 );
 
-[LaughTale.Core.Attributes.Island("radio-button")]
+[Island("radio-button")]
+[FormControl(Cardinality = FormCardinality.Boolean, FieldKind = FormFieldKind.Hidden)]
 public record RadioButtonProps(
     string? Value = null, string? GroupValue = null, string? Name = null,
     string? Label = null, InputVariant Variant = InputVariant.Outlined, ComponentSize Size = ComponentSize.Normal,
@@ -687,9 +693,10 @@ public record RatingProps(
     double? Value = null, string? Name = null, int Stars = 5, bool Cancel = true, bool ReadOnly = false, bool Disabled = false
 );
 
-[LaughTale.Core.Attributes.Island("select-button")]
+[Island("select-button")]
+[FormControl(Cardinality = FormCardinality.Multiple, FieldKind = FormFieldKind.Hidden)]
 public record SelectButtonProps(
-    string? Value = null, object? Options = null, string? OptionLabel = "label",
+    string? Value = null, string? Name = null, object? Options = null, string? OptionLabel = "label",
     string? OptionValue = "value", bool Multiple = false, bool AllowEmpty = true,
     ComponentSize Size = ComponentSize.Normal, bool Fluid = false, bool Invalid = false, bool Disabled = false
 );
@@ -708,21 +715,24 @@ public record TextareaProps(
     bool Invalid = false, string? Placeholder = null, bool Disabled = false
 );
 
-[LaughTale.Core.Attributes.Island("toggle-button")]
+[Island("toggle-button")]
+[FormControl(ValueProperty = "Checked", Cardinality = FormCardinality.Boolean, FieldKind = FormFieldKind.Hidden)]
 public record ToggleButtonProps(
-    bool Checked = false, string? OnLabel = "Yes", string? OffLabel = "No",
+    bool Checked = false, string? Name = null, string? OnLabel = "Yes", string? OffLabel = "No",
     string? OnIcon = null, string? OffIcon = null, ComponentSize Size = ComponentSize.Normal,
     bool Invalid = false, bool Disabled = false
 );
 
-[LaughTale.Core.Attributes.Island("toggle-switch")]
+[Island("toggle-switch")]
+[FormControl(ValueProperty = "Checked", Cardinality = FormCardinality.Boolean, FieldKind = FormFieldKind.Native)]
 public record ToggleSwitchProps(
-    bool Checked = false, ComponentSize Size = ComponentSize.Normal, bool Invalid = false, bool Disabled = false
+    bool Checked = false, string? Name = null, ComponentSize Size = ComponentSize.Normal, bool Invalid = false, bool Disabled = false
 );
 
-[LaughTale.Core.Attributes.Island("tree-select")]
+[Island("tree-select")]
+[FormControl(Cardinality = FormCardinality.Multiple, FieldKind = FormFieldKind.Hidden)]
 public record TreeSelectProps(
-    object? Value = null, object? Options = null, object? Nodes = null, object? Departments = null,
+    object? Value = null, string? Name = null, object? Options = null, object? Nodes = null, object? Departments = null,
     string? Placeholder = "Select Item", string? SelectionMode = "single", string? Display = "comma",
     bool Filter = false, string? FilterPlaceholder = "Filter...", bool ShowClear = false, bool Fluid = false,
     InputVariant Variant = InputVariant.Outlined, ComponentSize Size = ComponentSize.Normal,

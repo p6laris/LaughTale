@@ -547,11 +547,24 @@ public class IslandGenerator : IIncrementalGenerator
             {
                 if (model.FormControl.Cardinality == "Boolean")
                 {
-                    sb.AppendLine("                var isChecked = rawValue is bool b ? b : (bool.TryParse(rawValue?.ToString(), out var parsedB) && parsedB);");
-                    sb.AppendLine("                var fieldDisabledAttr = (isDisabled || !isChecked) ? \" disabled=\\\"disabled\\\"\" : \"\";");
-                    sb.AppendLine("                var companionHtml = $\"<input type=\\\"hidden\\\" name=\\\"{encodedName}\\\" value=\\\"false\\\" data-lt-field-companion{disabledAttr} />\";");
-                    sb.AppendLine("                var fieldHtml = $\"{companionHtml}<input type=\\\"hidden\\\" name=\\\"{encodedName}\\\" value=\\\"true\\\" data-lt-field{fieldDisabledAttr} />\";");
-                    sb.AppendLine("                IslandSsrHelper.StampSsrContent(output, fieldHtml);");
+                    if (model.IslandName == "radio-button")
+                    {
+                        sb.AppendLine("                var isChecked = rawValue is bool b ? b : (bool.TryParse(rawValue?.ToString(), out var parsedB) ? parsedB : (rawValue != null && Value != null && rawValue.ToString() == Value.ToString()));");
+                        sb.AppendLine("                var fieldVal = !string.IsNullOrEmpty(Value) ? Value : \"true\";");
+                        sb.AppendLine("                var encodedFieldVal = System.Text.Encodings.Web.HtmlEncoder.Default.Encode(fieldVal);");
+                        sb.AppendLine("                var fieldDisabledAttr = (isDisabled || !isChecked) ? \" disabled=\\\"disabled\\\"\" : \"\";");
+                        sb.AppendLine("                var companionHtml = $\"<input type=\\\"hidden\\\" name=\\\"{encodedName}\\\" value=\\\"false\\\" data-lt-field-companion{disabledAttr} />\";");
+                        sb.AppendLine("                var fieldHtml = $\"{companionHtml}<input type=\\\"hidden\\\" name=\\\"{encodedName}\\\" value=\\\"{encodedFieldVal}\\\" data-lt-field{fieldDisabledAttr} />\";");
+                        sb.AppendLine("                IslandSsrHelper.StampSsrContent(output, fieldHtml);");
+                    }
+                    else
+                    {
+                        sb.AppendLine("                var isChecked = rawValue is bool b ? b : (bool.TryParse(rawValue?.ToString(), out var parsedB) && parsedB);");
+                        sb.AppendLine("                var fieldDisabledAttr = (isDisabled || !isChecked) ? \" disabled=\\\"disabled\\\"\" : \"\";");
+                        sb.AppendLine("                var companionHtml = $\"<input type=\\\"hidden\\\" name=\\\"{encodedName}\\\" value=\\\"false\\\" data-lt-field-companion{disabledAttr} />\";");
+                        sb.AppendLine("                var fieldHtml = $\"{companionHtml}<input type=\\\"hidden\\\" name=\\\"{encodedName}\\\" value=\\\"true\\\" data-lt-field{fieldDisabledAttr} />\";");
+                        sb.AppendLine("                IslandSsrHelper.StampSsrContent(output, fieldHtml);");
+                    }
                 }
                 else if (model.FormControl.Cardinality == "Multiple")
                 {
