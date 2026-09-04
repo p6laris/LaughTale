@@ -102,6 +102,10 @@ export function useFormField(
 
     const field = initialField;
     const companion = initialCompanion;
+    field.setAttribute('data-lt-ssr-hydrated', 'true');
+    if (companion) {
+        companion.setAttribute('data-lt-ssr-hydrated', 'true');
+    }
     const fieldName = options.name || field.name;
 
     // Track multiple fields for 'Multiple' cardinality
@@ -110,6 +114,9 @@ export function useFormField(
         const existing = Array.from(
             container.querySelectorAll<HTMLInputElement>(':scope input[data-lt-field]')
         );
+        for (const f of existing) {
+            f.setAttribute('data-lt-ssr-hydrated', 'true');
+        }
         multipleFields.push(...existing);
     }
 
@@ -176,6 +183,7 @@ export function useFormField(
                     const cloned = field.cloneNode(true) as HTMLInputElement;
                     cloned.name = fieldName;
                     cloned.setAttribute('data-lt-field', '');
+                    cloned.setAttribute('data-lt-ssr-hydrated', 'true');
                     multipleFields.push(cloned);
                     if (container.contains(field)) {
                         container.appendChild(cloned);

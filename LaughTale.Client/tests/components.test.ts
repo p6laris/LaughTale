@@ -26,6 +26,7 @@ describe('LaughTale Aura Enterprise Components Suite', () => {
     });
 
     it('InputNumber: formats decimals, steps up/down and syncs value', () => {
+        container.innerHTML = '<input type="hidden" name="salary" data-lt-field value="5000" />';
         InputNumberIsland(container, {
             targetInputName: 'salary',
             value: 5000,
@@ -50,6 +51,7 @@ describe('LaughTale Aura Enterprise Components Suite', () => {
     });
 
     it('InputOtp: handles input entry, character jumping and full value sync', () => {
+        container.innerHTML = '<input type="hidden" name="otp_code" data-lt-field />';
         InputOtpIsland(container, {
             length: 4,
             targetInputName: 'otp_code'
@@ -138,6 +140,7 @@ describe('LaughTale Aura Enterprise Components Suite', () => {
     });
 
     it('Rating: highlights stars on selection and allows cancel', () => {
+        container.innerHTML = '<input type="hidden" name="score" data-lt-field value="3" />';
         RatingIsland(container, {
             stars: 5,
             value: 3,
@@ -216,6 +219,7 @@ describe('LaughTale Aura Enterprise Components Suite', () => {
     });
 
     it('ColorPicker: updates color on palette swatch selection', () => {
+        container.innerHTML = '<input type="hidden" name="theme_color" data-lt-field value="#10b981" />';
         ColorPickerIsland(container, {
             value: '#10b981',
             targetInputName: 'theme_color'
@@ -226,6 +230,7 @@ describe('LaughTale Aura Enterprise Components Suite', () => {
     });
 
     it('Knob: calculates value, renders svg circle and responds to pointer events', () => {
+        container.innerHTML = '<input type="hidden" name="percentage" data-lt-field value="75" />';
         KnobIsland(container, {
             value: 75,
             min: 0,
