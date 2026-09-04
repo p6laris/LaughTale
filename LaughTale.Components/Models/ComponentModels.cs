@@ -537,9 +537,10 @@ public record NumberProps(
     double? Value = null, object? Mode = null, string? Currency = "USD", string? TargetInput = null
 );
 
-[LaughTale.Core.Attributes.Island("datepicker")]
+[Island("datepicker")]
+[FormControl(Cardinality = FormCardinality.Multiple, FieldKind = FormFieldKind.Hidden)]
 public record DatePickerProps(
-    string? Value = null, DatePickerSelectionMode SelectionMode = DatePickerSelectionMode.Single, string? DateFormat = "mm/dd/yy",
+    string? Value = null, string? Name = null, DatePickerSelectionMode SelectionMode = DatePickerSelectionMode.Single, string? DateFormat = "mm/dd/yy",
     bool Inline = false, bool ShowIcon = true, bool ShowButtonBar = false, bool ShowTime = false,
     bool TimeOnly = false, bool HourFormat24 = false, int StepMinute = 1, string? MinDate = null,
     string? MaxDate = null, object? DisabledDates = null, object? DisabledDays = null,
@@ -556,9 +557,10 @@ public record SelectProps(
     InputVariant Variant = InputVariant.Outlined, ComponentSize Size = ComponentSize.Normal, bool Disabled = false
 );
 
-[LaughTale.Core.Attributes.Island("autocomplete")]
+[Island("autocomplete")]
+[FormControl(Cardinality = FormCardinality.Single, FieldKind = FormFieldKind.Hidden)]
 public record AutoCompleteProps(
-    string? Value = null, object? Suggestions = null, string? Placeholder = "Search...",
+    string? Value = null, string? Name = null, object? Suggestions = null, string? Placeholder = "Search...",
     bool Multiple = false, bool Dropdown = false, int MinLength = 1, int Delay = 300,
     bool CompleteOnFocus = false, bool Invalid = false, bool Fluid = false,
     InputVariant Variant = InputVariant.Outlined, ComponentSize Size = ComponentSize.Normal, bool Disabled = false
@@ -701,9 +703,10 @@ public record SelectButtonProps(
     ComponentSize Size = ComponentSize.Normal, bool Fluid = false, bool Invalid = false, bool Disabled = false
 );
 
-[LaughTale.Core.Attributes.Island("slider")]
+[Island("slider")]
+[FormControl(Cardinality = FormCardinality.Multiple, FieldKind = FormFieldKind.Hidden)]
 public record SliderProps(
-    object? Value = null, double Min = 0, double Max = 100, double Step = 1,
+    object? Value = null, string? Name = null, double Min = 0, double Max = 100, double Step = 1,
     bool Range = false, string? Orientation = "horizontal", bool Disabled = false
 );
 
@@ -755,15 +758,17 @@ public record DataViewProps(
     string? EmptyMessage = "No records found."
 );
 
-[LaughTale.Core.Attributes.Island("orderlist")]
+[Island("orderlist")]
+[FormControl(Cardinality = FormCardinality.Multiple, FieldKind = FormFieldKind.Hidden)]
 public record OrderListProps(
-    object? Value = null, string? Header = null, string? KeyField = "id",
+    object? Value = null, string? Name = null, string? Header = null, string? KeyField = "id",
     int? ListHeight = 300, bool Filter = false, string? FilterPlaceholder = "Filter items...", bool Striped = false
 );
 
-[LaughTale.Core.Attributes.Island("picklist")]
+[Island("picklist")]
+[FormControl(ValueProperty = "Target", Cardinality = FormCardinality.Multiple, FieldKind = FormFieldKind.Hidden)]
 public record PickListProps(
-    object? Source = null, object? Target = null, string? SourceHeader = "Available",
+    object? Source = null, object? Target = null, string? Name = null, string? SourceHeader = "Available",
     string? TargetHeader = "Selected", string? KeyField = "id", int? ListHeight = 300,
     bool Filter = false, bool Striped = false, bool ShowSourceControls = true, bool ShowTargetControls = true
 );
@@ -781,14 +786,16 @@ public record TreeProps(
     string? FilterPlaceholder = "Filter tree nodes...", bool Checkboxes = false, bool Loading = false
 );
 
-[LaughTale.Core.Attributes.Island("orgchart")]
+[Island("orgchart")]
+[FormControl(Cardinality = FormCardinality.Multiple, FieldKind = FormFieldKind.Hidden)]
 public record OrgChartProps(
-    object? Value = null, string? SelectionMode = "single", bool Collapsible = true
+    object? Value = null, string? Name = null, string? SelectionMode = "single", bool Collapsible = true
 );
 
-[LaughTale.Core.Attributes.Island("paginator")]
+[Island("paginator")]
+[FormControl(ValueProperty = "First", Cardinality = FormCardinality.Single, FieldKind = FormFieldKind.Hidden)]
 public record PaginatorProps(
-    int TotalRecords = 0, int Rows = 10, int First = 0, int PageLinkSize = 5,
+    int TotalRecords = 0, int Rows = 10, int First = 0, string? Name = null, int PageLinkSize = 5,
     object? RowsPerPageOptions = null, bool ShowCurrentPageReport = true,
     string? CurrentPageReportTemplate = "({currentPage} of {totalPages})",
     bool ShowFirstLastIcon = true, bool ShowJumpToPageDropdown = false
@@ -1067,15 +1074,18 @@ public record FileUploadProps(
     string? ChooseLabel = "Choose", string? UploadLabel = "Upload", string? CancelLabel = "Cancel"
 );
 
-[LaughTale.Core.Attributes.Island("dropzone")]
+[Island("dropzone")]
+[FormControl(Cardinality = FormCardinality.Multiple, FieldKind = FormFieldKind.Native)]
 public record DropzoneProps(
-    string? Url = null, string? Name = "file", bool Multiple = true,
+    string? Url = null, string? Name = null, bool Multiple = true,
     string? Accept = null, int? MaxFileSize = null, string? Message = "Drag & Drop files here or browse"
 );
 
-[LaughTale.Core.Attributes.Island("inplace")]
+[Island("inplace")]
+[FormControl(Cardinality = FormCardinality.Single, FieldKind = FormFieldKind.Hidden)]
 public record InplaceProps(
     string? Value = null,
+    string? Name = null,
     string? TargetInputName = null,
     string? Placeholder = "Click to edit...",
     bool Disabled = false,
