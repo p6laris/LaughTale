@@ -18,6 +18,7 @@ export * from './useKeyboardNav';
 export * from './useEventListener';
 export * from './useDataSource';
 export * from './useLocale';
+export * from './useFormField';
 
 // Animation Composables
 export * from './animation/useSpring';

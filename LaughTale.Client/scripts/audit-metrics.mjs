@@ -74,6 +74,8 @@ const m = {
     unsafeCalls: 0,
     // Adapters declaring the update(props) contract (no-remount refresh).
     adapterUpdateSupport: 0,
+    formFieldAdoption: 0,
+    clientCreatedFields: 0,
 };
 
 function splitTopLevel(args) {
@@ -148,9 +150,11 @@ for (const f of files) {
     }
 
     if (/ElementInternals|attachInternals|setFormValue/.test(s)) m.formAssociationAdoption++;
+    if (/useFormField/.test(s)) m.formFieldAdoption++;
+    m.clientCreatedFields += countAll(s, /createElement\((['"])input\1\)/g);
     if (/createHandle/.test(s)) m.handleAdoption++;
-    if (/dir\s*===|rtl|inline-start|inline-end|margin-inline|padding-inline|inset-inline/.test(s)) m.rtlAdoption++;
-    m.unsafeCalls += countAll(s, /unsafe\s*\(/g);
+    if (/ dir\s*===|rtl|inline-start|inline-end|margin-inline|padding-inline|inset-inline/.test(s)) m.rtlAdoption++;
+    m.unsafeCalls += countAll(s, / unsafe\s*\(/g);
 }
 
 // Adapters are a separate directory from components.
@@ -158,20 +162,20 @@ const ADAPTER_DIR = 'src/adapters';
 if (fs.existsSync(ADAPTER_DIR)) {
     for (const f of fs.readdirSync(ADAPTER_DIR).filter(x => x.endsWith('.ts') && x !== 'index.ts')) {
         const s = fs.readFileSync(path.join(ADAPTER_DIR, f), 'utf8');
-        if (/update\s*[(:]/.test(s)) m.adapterUpdateSupport++;
+        if (/ update\s*[(:]/.test(s)) m.adapterUpdateSupport++;
     }
 }
 
 // Metrics where a LOWER number is better. --check enforces monotonic improvement.
 const LOWER_IS_BETTER = [
     'innerHtmlRawAssignments', 'listenersUnmanaged', 'timersUncleared', 'ariaZeroComponents',
-    'inlineStyleAttributes', 'rawSvgLiterals', 'hexHardcoded', 'eventsBare',
+    'inlineStyleAttributes', 'rawSvgLiterals', 'hexHardcoded', 'eventsBare', 'clientCreatedFields',
 ];
 // Metrics where a HIGHER number is better.
 const HIGHER_IS_BETTER = [
     'escapeAdoption', 'focusTrapAdoption', 'virtualizerAdoption',
     'formAssociationAdoption', 'handleAdoption', 'rtlAdoption', 'adapterUpdateSupport',
-    'observersDisconnected',
+    'observersDisconnected', 'formFieldAdoption',
 ];
 
 const args = process.argv.slice(2);

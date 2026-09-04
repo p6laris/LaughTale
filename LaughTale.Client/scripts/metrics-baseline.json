@@ -21,5 +21,7 @@
   "handleAdoption": 0,
   "rtlAdoption": 8,
   "unsafeCalls": 0,
-  "adapterUpdateSupport": 0
+  "adapterUpdateSupport": 0,
+  "formFieldAdoption": 0,
+  "clientCreatedFields": 18
 }

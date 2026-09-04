@@ -25,6 +25,7 @@ public class IslandGenerator : IIncrementalGenerator
     private const string IslandIgnoreAttributeName = "LaughTale.Core.Attributes.IslandIgnoreAttribute";
     private const string JsonIgnoreAttributeName = "System.Text.Json.Serialization.JsonIgnoreAttribute";
     private const string GenerateTypeScriptAttributeName = "LaughTale.Core.Attributes.GenerateTypeScriptAttribute";
+    private const string FormControlAttributeName = "LaughTale.Core.Attributes.FormControlAttribute";
 
     // ── Diagnostics Descriptors ───────────────────────────────────────────────
     private static readonly DiagnosticDescriptor InvalidIslandNameRule = new(
@@ -51,6 +52,15 @@ public class IslandGenerator : IIncrementalGenerator
         messageFormat: "Property '{0}' on island props '{1}' matches sensitive credential pattern '{2}' and will be serialized to public HTML. Decorate with [IslandIgnore] or remove from props.",
         category: "LaughTale.Security",
         defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true
+    );
+
+    private static readonly DiagnosticDescriptor MissingFormControlNameRule = new(
+        id: "LTI005",
+        title: "Missing Name Property on FormControl",
+        messageFormat: "Props record '{0}' is marked with [FormControl] but does not declare a name-bearing property ('Name', 'TargetInputName', or 'TargetInput')",
+        category: "LaughTale.FormAssociation",
+        defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true
     );
 
@@ -212,12 +222,75 @@ public class IslandGenerator : IIncrementalGenerator
             }
         }
 
+        var formControlAttr = symbol.GetAttributes().FirstOrDefault(a =>
+            a.AttributeClass?.ToDisplayString() is FormControlAttributeName or "FormControlAttribute" or "FormControl" or "LaughTale.Core.Attributes.FormControl");
+
+        FormControlModel? formControl = null;
+        if (formControlAttr != null)
+        {
+            var cardinality = "Single";
+            var fieldKind = "Hidden";
+            var valueProperty = "Value";
+
+            if (formControlAttr.ConstructorArguments.Length > 0)
+            {
+                var val = formControlAttr.ConstructorArguments[0].Value;
+                if (val is int cInt)
+                {
+                    cardinality = cInt switch { 1 => "Multiple", 2 => "Boolean", _ => "Single" };
+                }
+                else if (val != null)
+                {
+                    cardinality = val.ToString();
+                }
+            }
+
+            foreach (var named in formControlAttr.NamedArguments)
+            {
+                if (named.Key == "Cardinality")
+                {
+                    if (named.Value.Value is int cInt)
+                        cardinality = cInt switch { 1 => "Multiple", 2 => "Boolean", _ => "Single" };
+                    else if (named.Value.Value != null)
+                        cardinality = named.Value.Value.ToString();
+                }
+                else if (named.Key == "FieldKind")
+                {
+                    if (named.Value.Value is int kInt)
+                        fieldKind = kInt switch { 1 => "Native", _ => "Hidden" };
+                    else if (named.Value.Value != null)
+                        fieldKind = named.Value.Value.ToString();
+                }
+                else if (named.Key == "ValueProperty" && named.Value.Value is string vp && !string.IsNullOrWhiteSpace(vp))
+                {
+                    valueProperty = vp;
+                }
+            }
+
+            var hasNameProperty = symbol.GetMembers().OfType<IPropertySymbol>().Any(m =>
+                m.Name is "Name" or "TargetInputName" or "TargetInput");
+
+            if (!hasNameProperty)
+            {
+                var syntaxRef = symbol.DeclaringSyntaxReferences.FirstOrDefault();
+                var loc = syntaxRef?.GetSyntax().GetLocation() ?? ctx.TargetNode.GetLocation();
+                propertyDiagnostics.Add(Diagnostic.Create(
+                    MissingFormControlNameRule,
+                    loc,
+                    symbol.Name
+                ));
+            }
+
+            formControl = new FormControlModel(valueProperty, cardinality, fieldKind);
+        }
+
         var model = new IslandModel(
             Namespace: symbol.ContainingNamespace.ToDisplayString(),
             TypeName: symbol.Name,
             IslandName: islandName,
             Properties: properties.ToImmutableArray(),
-            Policy: policy
+            Policy: policy,
+            FormControl: formControl
         );
 
         return new IslandModelResult(model, nameDiagnostic, propertyDiagnostics.ToImmutableArray());
@@ -257,6 +330,7 @@ public class IslandGenerator : IIncrementalGenerator
         sb.AppendLine("using Microsoft.Extensions.DependencyInjection;");
         sb.AppendLine("using LaughTale.Core.Enums;");
         sb.AppendLine("using LaughTale.Core.Serialization;");
+        sb.AppendLine("using LaughTale.Components.TagHelpers;");
         sb.AppendLine();
         sb.AppendLine($"namespace {targetNs};");
         sb.AppendLine();
@@ -308,6 +382,19 @@ public class IslandGenerator : IIncrementalGenerator
         sb.AppendLine("    public object? StudioOverrides { get; set; }");
         sb.AppendLine();
 
+        if (model.FormControl != null)
+        {
+            sb.AppendLine("    [HtmlAttributeName(\"asp-for\")]");
+            sb.AppendLine("    public ModelExpression? AspFor { get; set; }");
+            sb.AppendLine();
+            if (!model.Properties.Any(p => p.Name == "Name"))
+            {
+                sb.AppendLine("    [HtmlAttributeName(\"name\")]");
+                sb.AppendLine("    public string? Name { get; set; }");
+                sb.AppendLine();
+            }
+        }
+
         // Generate properties for each props member
         foreach (var prop in model.Properties)
         {
@@ -327,7 +414,6 @@ public class IslandGenerator : IIncrementalGenerator
         var islandDataName = model.IslandName == "number" ? "input-number" : model.IslandName;
         sb.AppendLine($"        output.Attributes.SetAttribute(\"data-island\", \"{islandDataName}\");");
         sb.AppendLine("        output.Attributes.SetAttribute(\"data-hydrate\", Hydrate.ToString().ToLowerInvariant());");
-        sb.AppendLine();
         sb.AppendLine("        if (!string.IsNullOrWhiteSpace(Persist))");
         sb.AppendLine("            output.Attributes.SetAttribute(\"data-persist\", Persist);");
         sb.AppendLine("        if (!string.IsNullOrWhiteSpace(Media))");
@@ -339,8 +425,17 @@ public class IslandGenerator : IIncrementalGenerator
         sb.AppendLine();
         sb.AppendLine("        var propsObj = new");
         sb.AppendLine("        {");
+        if (model.FormControl != null)
+        {
+            sb.AppendLine("            Name = Name ?? AspFor?.Name,");
+            sb.AppendLine("            TargetInputName = Name ?? AspFor?.Name,");
+        }
         foreach (var prop in model.Properties)
         {
+            if (model.FormControl != null && prop.Name is "Name" or "TargetInputName" or "TargetInput")
+            {
+                continue;
+            }
             if (prop.Name == "TargetInput")
             {
                 sb.AppendLine("            TargetInputName = TargetInput,");
@@ -374,6 +469,120 @@ public class IslandGenerator : IIncrementalGenerator
         sb.AppendLine("        {");
         sb.AppendLine("            output.Content.SetHtmlContent($\"<div data-slot=\\\"default\\\" class=\\\"island-slot\\\">{childContent.GetContent()}</div>\");");
         sb.AppendLine("        }");
+        if (model.FormControl != null)
+        {
+            sb.AppendLine("        else");
+            sb.AppendLine("        {");
+            sb.AppendLine("            var resolvedName = Name ?? AspFor?.Name;");
+            sb.AppendLine("            if (!string.IsNullOrWhiteSpace(resolvedName))");
+            sb.AppendLine("            {");
+            sb.AppendLine("                var encodedName = System.Text.Encodings.Web.HtmlEncoder.Default.Encode(resolvedName);");
+            var valProp = model.FormControl.ValueProperty;
+            var hasValProp = model.Properties.Any(p => p.Name == valProp);
+            if (hasValProp)
+            {
+                sb.AppendLine($"                var rawValue = (object?){valProp} ?? AspFor?.Model;");
+            }
+            else
+            {
+                sb.AppendLine("                var rawValue = AspFor?.Model;");
+            }
+
+            var hasDisabledProp = model.Properties.Any(p => p.Name == "Disabled");
+            if (hasDisabledProp)
+            {
+                sb.AppendLine("                var isDisabled = Disabled;");
+            }
+            else
+            {
+                sb.AppendLine("                var isDisabled = false;");
+            }
+            sb.AppendLine("                var disabledAttr = isDisabled ? \" disabled=\\\"disabled\\\"\" : \"\";");
+
+            if (model.FormControl.FieldKind == "Native")
+            {
+                if (model.IslandName == "textarea")
+                {
+                    sb.AppendLine("                var encodedVal = rawValue != null ? System.Text.Encodings.Web.HtmlEncoder.Default.Encode(rawValue.ToString() ?? \"\") : \"\";");
+                    sb.AppendLine("                var fieldHtml = $\"<textarea name=\\\"{encodedName}\\\" data-lt-field{disabledAttr}>{encodedVal}</textarea>\";");
+                    sb.AppendLine("                IslandSsrHelper.StampSsrContent(output, fieldHtml);");
+                }
+                else if (model.IslandName == "dropzone")
+                {
+                    sb.AppendLine("                var fieldHtml = $\"<input type=\\\"file\\\" name=\\\"{encodedName}\\\" data-lt-field{disabledAttr} />\";");
+                    sb.AppendLine("                IslandSsrHelper.StampSsrContent(output, fieldHtml);");
+                }
+                else if (model.IslandName == "toggle-switch")
+                {
+                    sb.AppendLine("                var isChecked = rawValue is bool b ? b : (bool.TryParse(rawValue?.ToString(), out var parsedB) && parsedB);");
+                    sb.AppendLine("                var checkedAttr = isChecked ? \" checked=\\\"checked\\\"\" : \"\";");
+                    sb.AppendLine("                var companionHtml = $\"<input type=\\\"hidden\\\" name=\\\"{encodedName}\\\" value=\\\"false\\\" data-lt-field-companion{disabledAttr} />\";");
+                    sb.AppendLine("                var fieldHtml = $\"{companionHtml}<input type=\\\"checkbox\\\" name=\\\"{encodedName}\\\" value=\\\"true\\\" data-lt-field{checkedAttr}{disabledAttr} />\";");
+                    sb.AppendLine("                IslandSsrHelper.StampSsrContent(output, fieldHtml);");
+                }
+                else
+                {
+                    sb.AppendLine("                var encodedVal = rawValue != null ? System.Text.Encodings.Web.HtmlEncoder.Default.Encode(rawValue.ToString() ?? \"\") : \"\";");
+                    sb.AppendLine("                var fieldHtml = $\"<input name=\\\"{encodedName}\\\" value=\\\"{encodedVal}\\\" data-lt-field{disabledAttr} />\";");
+                    sb.AppendLine("                IslandSsrHelper.StampSsrContent(output, fieldHtml);");
+                }
+            }
+            else // FieldKind == Hidden
+            {
+                if (model.FormControl.Cardinality == "Boolean")
+                {
+                    sb.AppendLine("                var isChecked = rawValue is bool b ? b : (bool.TryParse(rawValue?.ToString(), out var parsedB) && parsedB);");
+                    sb.AppendLine("                var fieldDisabledAttr = (isDisabled || !isChecked) ? \" disabled=\\\"disabled\\\"\" : \"\";");
+                    sb.AppendLine("                var companionHtml = $\"<input type=\\\"hidden\\\" name=\\\"{encodedName}\\\" value=\\\"false\\\" data-lt-field-companion{disabledAttr} />\";");
+                    sb.AppendLine("                var fieldHtml = $\"{companionHtml}<input type=\\\"hidden\\\" name=\\\"{encodedName}\\\" value=\\\"true\\\" data-lt-field{fieldDisabledAttr} />\";");
+                    sb.AppendLine("                IslandSsrHelper.StampSsrContent(output, fieldHtml);");
+                }
+                else if (model.FormControl.Cardinality == "Multiple")
+                {
+                    sb.AppendLine("                var sbFields = new System.Text.StringBuilder();");
+                    sb.AppendLine("                if (rawValue is System.Collections.IEnumerable enumerable && rawValue is not string)");
+                    sb.AppendLine("                {");
+                    sb.AppendLine("                    foreach (var item in enumerable)");
+                    sb.AppendLine("                    {");
+                    sb.AppendLine("                        if (item != null)");
+                    sb.AppendLine("                        {");
+                    sb.AppendLine("                            var encodedVal = System.Text.Encodings.Web.HtmlEncoder.Default.Encode(item.ToString() ?? \"\");");
+                    sb.AppendLine("                            sbFields.Append($\"<input type=\\\"hidden\\\" name=\\\"{encodedName}\\\" value=\\\"{encodedVal}\\\" data-lt-field{disabledAttr} />\");");
+                    sb.AppendLine("                        }");
+                    sb.AppendLine("                    }");
+                    sb.AppendLine("                }");
+                    sb.AppendLine("                else if (rawValue != null)");
+                    sb.AppendLine("                {");
+                    sb.AppendLine("                    var strVal = rawValue.ToString();");
+                    sb.AppendLine("                    if (!string.IsNullOrEmpty(strVal))");
+                    sb.AppendLine("                    {");
+                    sb.AppendLine("                        var encodedVal = System.Text.Encodings.Web.HtmlEncoder.Default.Encode(strVal);");
+                    sb.AppendLine("                        sbFields.Append($\"<input type=\\\"hidden\\\" name=\\\"{encodedName}\\\" value=\\\"{encodedVal}\\\" data-lt-field{disabledAttr} />\");");
+                    sb.AppendLine("                    }");
+                    sb.AppendLine("                }");
+                    sb.AppendLine("                if (sbFields.Length > 0)");
+                    sb.AppendLine("                {");
+                    sb.AppendLine("                    IslandSsrHelper.StampSsrContent(output, sbFields.ToString());");
+                    sb.AppendLine("                }");
+                }
+                else // Single
+                {
+                    if (islandDataName == "input-password")
+                    {
+                        sb.AppendLine("                var fieldHtml = $\"<input type=\\\"hidden\\\" name=\\\"{encodedName}\\\" value=\\\"\\\" data-lt-field{disabledAttr} />\";");
+                    }
+                    else
+                    {
+                        sb.AppendLine("                var strVal = rawValue?.ToString() ?? \"\";");
+                        sb.AppendLine("                var encodedVal = System.Text.Encodings.Web.HtmlEncoder.Default.Encode(strVal);");
+                        sb.AppendLine("                var fieldHtml = $\"<input type=\\\"hidden\\\" name=\\\"{encodedName}\\\" value=\\\"{encodedVal}\\\" data-lt-field{disabledAttr} />\";");
+                    }
+                    sb.AppendLine("                IslandSsrHelper.StampSsrContent(output, fieldHtml);");
+                }
+            }
+            sb.AppendLine("            }");
+            sb.AppendLine("        }");
+        }
         sb.AppendLine("    }");
         sb.AppendLine("}");
 
@@ -507,7 +716,14 @@ internal record IslandModel(
     string TypeName,
     string IslandName,
     ImmutableArray<PropertyModel> Properties,
-    string? Policy = null
+    string? Policy = null,
+    FormControlModel? FormControl = null
+);
+
+internal record FormControlModel(
+    string ValueProperty,
+    string Cardinality,
+    string FieldKind
 );
 
 internal record PropertyModel(

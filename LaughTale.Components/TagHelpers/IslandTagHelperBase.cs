@@ -207,12 +207,7 @@ public abstract class IslandTagHelperBase : TagHelper
         }
         else
         {
-            var ssrHtml = BuildSsrHtml();
-            if (!string.IsNullOrWhiteSpace(ssrHtml))
-            {
-                output.Attributes.SetAttribute("data-lt-ssr", "true");
-                output.Content.SetHtmlContent(ssrHtml);
-            }
+            IslandSsrHelper.StampSsrContent(output, BuildSsrHtml());
         }
 
         IslandDiagnostics.ValidateIsland(
