@@ -32,10 +32,38 @@ standard, and the thing meant to consume it never adopts it.
 | `IslandModule.createHandle` | **0** implementations |
 | `runtime/events.ts` | **41 / 41** dispatching components (Spec 044, 100% adoption) |
 | `sanitizeHtml` / `sanitizeUrl` (333 lines) | **4 / 76** |
+| `ILaughTaleLocalizer` + locale dictionaries (1,256 lines) | **15 / 96 TagHelpers** — see below |
+| `useLocale` | **5 / 76** |
+| `BuildSsrHtml()` / `data-lt-ssr` (feature 026) | **29 / 29** in-scope form controls (Spec 045, eighth built-and-unadopted module now adopted) |
+| `JsonSerializerContext` (source-generated JSON) | **0** — every island serializes by reflection |
 
 Mostly this is good news — a large share of this roadmap is **adoption, not invention**. But the
 pattern has a sharp edge: a 333-line HTML sanitizer that no component calls isn't an unfinished
 feature, it's an open vulnerability.
+
+### The root cause nobody named
+
+The three tables above share one mechanism, and it is not "people forgot to adopt things".
+
+`IslandTagHelperBase` is where the good server-side behaviour lives: the `BuildSsrHtml()` hook, the
+`ILaughTaleLocalizer` lookup, the RTL decision, the `data-lt-ssr` stamp. **Fifteen TagHelpers extend
+it.** The other **81 are generated** by `IslandGenerator`, which emits `public partial class
+<Name>TagHelper : TagHelper` — deriving straight from `TagHelper` and inheriting none of it.
+
+So `<island-dialog>` (hand-written) localizes and can server-render. `<island-input-text>`,
+`<island-select>`, `<island-datatable>` (generated) cannot — not because anyone decided they
+shouldn't, but because they are on the other side of a class hierarchy split nobody wrote down. Every
+capability hung on that base class reaches 15 of 96 call sites and looks "built but unadopted" from
+the outside.
+
+**Fix the split and three roadmap items collapse into one.** Leave it and every future server-side
+capability lands in the same hole.
+
+There is a second boundary problem with the same signature, and the same reason nobody caught it:
+Core's locale dictionary carries 70 component-specific properties (Part N). Both inversions sit in
+code the test suite reports as clean, because `CoreOnlyBoundaryTests` checks assembly references and
+nothing checks class hierarchies at all. **The architecture is guarded in one dimension and unguarded
+in the two that have actually failed.**
 
 ### The strategic fork
 
@@ -171,6 +199,9 @@ delivery is one of the healthier subsystems.
 | Plugin API | **Missing** | No extension point anywhere in Core |
 | DevTools | **Missing** | — |
 | Endpoint rate limiting | **Missing** | Two public `MapPost` routes run user-shaped queries |
+| Localization | **Built, unreachable** | 9 locales, 1,256 lines; reachable from 15 of 96 TagHelpers; 25 English UI strings hardcoded as record defaults |
+| Core/Components boundary | **Half-enforced** | The test checks assembly references only; Core's locale dictionary carries 70 component-specific properties and stays green |
+| Props serialization | **Untuned** | Reflection-based, no source-gen context; 198 of 325 props write their defaults into every instance |
 
 ---
 
@@ -207,14 +238,20 @@ behaviour, and the fixes are sitting unused in `src/composables/`.
   non-modal overlays (`popover`, `menu`, `context-menu`, `tieredmenu`, `menubar`) explicitly must NOT trap
   focus per WAI-ARIA and Invariant I3. This represents the third inherited roadmap metric in LaughTale to fail
   source code reproduction (joining `listenersUnmanaged: 374` and `hexHardcoded: 716`).
-- **Form association** *(web platform · M · 2–3 wks)* — **0** components use `ElementInternals`; only
-  10 sync a hidden input. In a server-driven framework, forms are the primary interaction, so every
-  input must appear in the native `FormData` POST without JS. Prerequisite for server actions
-  degrading honestly.
-- **Unify the event API** *(S · 1 wk)* — 58 namespaced vs 12 bare events, with inconsistent casing
-  inside the namespace: `input-mask:change`, `inputtext:change`, `cascadeselect:change`, and both
-  `slider:slideend` and bare `slideend`. Settle on `laughtale:<component>:<event>`, kebab-case, ship a
-  codemod, keep aliases for one minor.
+- **Form association** *(web platform · M · 2–3 wks)* — **[CLOSED — Spec 045]** Native form association
+  implemented and verified across all **29 of 29** in-scope form controls (`formFieldAdoption: 29`,
+  `clientCreatedFields: 0`). Every form control contributes its form field (`data-lt-field`) to the initial
+  server response before script runs, guaranteeing 100% no-JS form submission with model values (`0 → 29`).
+  Client hydration adopts server fields non-destructively via headless `useFormField`, completely eliminating
+  all 18 client `<input>` creation sites (`18 → 0`). Unambiguous wire cardinality contracts (`Single`, `Multiple`
+  via repeated fields, `Boolean` via companion pattern) provide byte-for-byte submission parity and native
+  `form.reset()` restoration.
+  *Note on inherited figures (Findings 1–3)*: Empirical source audit disproved three inherited roadmap metrics:
+  1. *"Only 10 sync a hidden input" was a regex artefact*: 2 of the 10 were merely DOM query lookups (`float-label`, `checkbox`); only 8 rendered a hidden field, and 3 of those 8 hardcoded `value=""`. 18 components created fields purely in client script.
+  2. *"Implied 10 of 29 post without JS"*: Actually **0 of 29** posted without JavaScript because all 8 hidden fields lived inside client-only templates and no TagHelper overrode `BuildSsrHtml()`.
+  3. *"0 components use ElementInternals"*: True as stated, but `ElementInternals` (`attachInternals()`) is architecturally unreachable on plain elements without converting components to autonomous custom elements. LaughTale solved form association via server-rendered fields and headless composable adoption.
+- **Unify the event API** *(S · 1 wk)* — **[CLOSED — Spec 044]** Unified component event contract across
+  all 41 dispatching components (`laughtale:<comp>:<evt>`).
 - **Floating Positioning & Virtualization** *(TanStack Virtual · S–M · 1–2 wks)* — **[CLOSED — Spec 043]** Adopted `useFloatingPosition` across all **14 of 14** floating overlays (8 JS-positioned and 6 CSS-anchored panels: `popover`, `menu`, `context-menu`, `confirm-popup`, `split-button`, `tieredmenu`, `menubar`, `cascadeselect`, `autocomplete`, `datepicker`, `select`, `tree-select`, `multiselect`, `color-picker`), completely eliminating all 32 hand-rolled positioning sites and 6 residual CSS anchoring declarations. Adopted `useVirtualizer` across all **6 of 6** long collection components (`datatable`, `treetable`, `tree`, `select`, `listbox`, `orderlist`) with collection-space keyboard navigation and full WAI-ARIA setsize preservation.
   *Note on inherited figures*: Two more inherited roadmap figures failed source reproduction upon audit:
   1. "36 positioning sites across 9 components" was audited in source code and proven to be **32 sites across 8 components** (Classes A + B).
@@ -352,8 +389,12 @@ survives internal changes — which is what makes `eject` a good idea rather tha
 
 ### Patterns
 
-- **Keep**: Strategy (hydration), Registry + lazy Factory (loaders), Template Method
-  (`IslandTagHelperBase`), Adapter (frameworks). All used correctly.
+- **Keep**: Strategy (hydration), Registry + lazy Factory (loaders), Adapter (frameworks). Used
+  correctly.
+- **Repair — Template Method (`IslandTagHelperBase`)**: the pattern is right and the base class is
+  well written, but **81 of 96 TagHelpers are generated and never inherit it** (§0). A template method
+  15 of 96 call sites reach is not a pattern in use; it is a pattern that was bypassed. Every
+  capability parked on it — SSR, localization, RTL — inherits that reach.
 - **Adopt — State machine** *(Zag.js, XState)* for overlays. Ends the
   `isOpen && !isDisabled && hasFocus` boolean soup.
 - **Adopt — Observer/signals** so state changes patch rather than rebuild.
@@ -403,6 +444,29 @@ audience.
 - **Publish honest numbers** — a reproducible benchmark against Blazor Server and WASM: TTFB, TTI,
   transferred bytes, memory after 50 navigations. Worth more than every adjective in the README.
 - **Report Core Web Vitals** back through the instrumentation hook (Part H).
+
+**Payload and serialization — the part this roadmap missed.** Every island writes a `data-props` JSON
+blob into the HTML, and nothing about that path is tuned:
+
+- **Defaults are serialized.** `IslandJson` sets `DefaultIgnoreCondition = WhenWritingNull`, which
+  drops nulls but not defaults. Across the props records, **198 of 325 properties have a non-null
+  default**, so they are written into every instance whether the author set them or not. A
+  `<island-sidebar>` with no attributes still emits **270 bytes**; `<island-datatable>` 209;
+  `<island-dialog>` 166. On a page with 116 buttons and 28 inputs — the showcase's actual counts —
+  that is kilobytes of JSON restating the component's own defaults back to itself.
+  *Fix: `DefaultIgnoreCondition.WhenWritingDefault`, or emit only author-set attributes. (S · days)*
+- **Serialization is reflection-based.** There is **no `JsonSerializerContext` anywhere** in the
+  solution. `IslandJson` builds a `DefaultJsonTypeInfoResolver` with a modifier lambda and serializes
+  anonymous types — the slow `System.Text.Json` path, re-resolved per type, and the reason this
+  codebase cannot be trimmed or AOT-published today.
+  *Fix: source-generated serialization contexts for the props records. (S–M · 1 wk)*
+- **The props object is rebuilt per render.** The generator emits a fresh anonymous object per
+  TagHelper invocation, then serializes it. For a table of 500 rows with an island per cell that is
+  500 allocations and 500 serializations of near-identical JSON.
+  *Fix: cache by value, or hoist shared props to the ambient state pool (Part F). (M · 2 wks)*
+- **No compression story for the attribute payload.** `data-props` is inline HTML, so it compresses
+  with the document — but it defeats any future streaming or partial-update path that wants to send
+  markup without re-sending props.
 
 ---
 
@@ -472,7 +536,86 @@ neither can anyone else's.
 
 ---
 
-## 15. Framework capability matrix
+## 15. Part N — Localization, formatting & internationalization
+
+**The most complete subsystem in this repository that reaches almost nothing.** 1,256 lines across
+`LaughTale.Core/Localization/` — `ILaughTaleLocalizer`, a locale dictionary, options, and **9 built-in
+locales** (`ar`, `de`, `en`, `es`, `fr`, `ja`, `ku`, `tr`, `zh`), two of them right-to-left. It is
+well built. It is also, for practical purposes, switched off.
+
+| Built | Adoption |
+|---|---|
+| `ILaughTaleLocalizer` | consumed by `IslandTagHelperBase` — so **15 of 96** TagHelpers |
+| `useLocale` (client) | **5 of 76** components |
+| RTL / logical properties | **7 of 76** components, **2** uses of CSS logical properties |
+| Component UI strings routed through the localizer | **0** |
+
+**The strings are hardcoded, and they are hardcoded in the wrong layer.** Twenty-five English UI
+strings ship as *default values on the C# props records* — `"Add a tag..."`, `"No records found."`,
+`"Drag & Drop files here or browse"`, `"Filter items..."`, `"Click to edit..."`, `"Choose"`,
+`"Cancel"`. A default value in a record is resolved at construction, before any request context
+exists, so no localizer can ever reach it. More English is hardcoded directly in client templates
+(`>No options found<`, `>No results found<`, `>New chat<`). A Japanese user of `<island-datatable>`
+gets a localized *culture* and an English empty-state.
+
+This is the same shape as §1.1's sanitizer and this section's siblings: the capability is real, the
+call sites don't exist, and the counter nobody was keeping is 0.
+
+### The vocabulary is in the wrong project
+
+The *mechanism* is correctly placed. `ILaughTaleLocalizer`, culture resolution, `IsRightToLeft` and the
+`CustomDictionaries` override hook are generic infrastructure and belong in Core.
+
+The *content* does not. `LaughTaleLocaleDictionary` is a sealed class of **70 typed properties**, and
+they are component vocabulary:
+
+| Properties | The component they exist for |
+|---|---|
+| `Weak`, `Medium`, `Strong`, `PasswordPrompt` | `input-password` |
+| `Choose`, `Upload`, `Cancel`, `Completed`, `Pending` | `fileupload` / `dropzone` |
+| `StartsWith`, `Contains`, `EndsWith`, `Lt`, `Lte`, `Gt`, `Gte`, `DateIs`, `DateBefore` | `datatable` filter menu |
+| `DayNames`, `MonthNames`, `WeekHeader`, `DateFormat`, `Today` | `datepicker` |
+| `EmptyFilterMessage`, `SelectionMessage`, `EmptySelectionMessage` | `select` / `multiselect` / `listbox` |
+
+That is PrimeVue's locale shape lifted wholesale into `LaughTale.Core`, plus 674 lines of language
+packs filling it in for ten locales. **Core knows what a password strength meter is.** Two consequences,
+both worse than the tidiness complaint:
+
+1. **You cannot add a component without editing Core.** A new island with new strings means adding
+   properties to a sealed class in the layer that is supposed to know nothing about components. That
+   contradicts the plugin architecture in Part G/L directly: a third-party island gets the `Custom`
+   string bag, never first-class localization. Two tiers, built in.
+2. **`CoreOnlyBoundaryTests` cannot see it.** The test asserts
+   `coreAssembly.GetReferencedAssemblies()` contains no `LaughTale.Components` — a *reference* check.
+   Core can hardcode the entire component vocabulary and stay green forever. The constitution says this
+   boundary is "enforced by `CoreOnlyBoundaryTests.cs`, not by convention". Only the assembly direction
+   is enforced. The semantic direction is pure convention, and it is already broken.
+
+In fairness: the design is not closed — `Custom` is a `Dictionary<string, string>` with an indexer
+fallback, so arbitrary keys work. But the shape that ships, and that every built-in component reads,
+is component vocabulary living one project too low.
+
+
+| Item | From | Effort |
+|---|---|---|
+| **Move the vocabulary down, keep the mechanism up** — `LaughTaleLocaleDictionary`'s 70 typed properties and the 10 language packs move to `LaughTale.Components` and register themselves with the Core localizer; Core keeps culture resolution, RTL and the override hook and learns nothing about components | — | **M · 2–3 wks** |
+| **Make the boundary test see meaning, not just references** — extend `CoreOnlyBoundaryTests` to fail when component nouns appear in Core. Without this the inversion returns the first time someone adds a component with a new string | — | **S · days** |
+| **Route component strings through the localizer** — remove the 25 English defaults from props records and the hardcoded strings from client templates; resolve per request, fall back to the built-in dictionary | — | **M · 2–3 wks** |
+| **Fix the TagHelper split first** (§0, *The root cause nobody named*) — the localizer is only reachable from `IslandTagHelperBase`, so the 81 generated TagHelpers cannot localize until they can see it. Nothing else here is worth doing before this | — | **S–M · 1–2 wks** |
+| **RTL & logical properties** — 7 of 76 today; `dir` already flows through `IslandContext` and two of the nine built-in locales are RTL, so the demand already exists in the shipped product | web platform | S–M · 1–2 wks |
+| **Locale-aware formatting as a contract** — dates, numbers, currency and collation are decided per component today (`datepicker`, `input-number`, `select` each reach for `Intl` on their own). One `useLocale`-backed formatter, adopted by all 76 | Nuxt i18n, Astro i18n | M · 2 wks |
+| **Locale-aware routing** — `/de/produkte`, `Accept-Language` negotiation, `hreflang`, per-locale static output | Nuxt i18n, Astro i18n | M · 2–3 wks |
+| **Pluralization and interpolation** — the dictionary is key→string today; anything with a count needs plural rules | ICU MessageFormat | S–M · 1–2 wks |
+| **Translator workflow** — extract keys at build time, emit a catalogue, diff it in CI so a new untranslated string fails the build rather than shipping English | Nuxt i18n, Lingui | M · 2 wks |
+
+**Why this belongs on the roadmap at all**: LaughTale's pitch is ASP.NET Core, and ASP.NET Core's
+audience is disproportionately enterprise and non-US. `IStringLocalizer` is something .NET developers
+already expect to work. Shipping 9 locales and 25 hardcoded English strings in the same product is
+worse than shipping neither, because it looks finished.
+
+---
+
+## 16. Framework capability matrix
 
 | Capability | Origin | LaughTale today | Part |
 |---|---|---|---|
@@ -486,6 +629,11 @@ neither can anyone else's.
 | Directive layer | Alpine, Stimulus | **Built, undocumented** — 19 directives | I |
 | Composable primitives | Nuxt, Vue | **Built, unused** — 21 written, ~0 adopted | C |
 | Imperative handles | — | **Built, unused** — 0 implementations | C |
+| Localization & i18n | Nuxt i18n, Astro | **Built, unreachable** — 9 locales, 1,256 lines, 15/96 TagHelpers, 25 hardcoded English defaults | **N** |
+| Locale-aware routing | Nuxt i18n | **Missing** | **N** |
+| RTL support | web platform | **Built, unused** — 7/76 components, 2 logical properties | **N** |
+| Props payload efficiency | — | **Untuned** — 198/325 props serialize their defaults | **J** |
+| AOT / trim-safe serialization | .NET | **Missing** — no `JsonSerializerContext`, reflection only | **J** |
 | HTML sanitization at render | — | **CRITICAL** — sanitizer exists, 4/76 call it | §1 |
 | Listener lifecycle | — | **CRITICAL** — 374 unmanaged | §1 |
 | Authorization default | — | **FAIL-OPEN** — unregistered islands unguarded | §1, K |
@@ -521,13 +669,16 @@ neither can anyone else's.
 
 ---
 
-## 16. Build order
+## 17. Build order
 
 | When | What |
 |---|---|
 | **Weeks 1–3** | Ship `html\`\``, then the urgent three: migrate components onto it, pass `ctx.signal` to all 374 unmanaged listeners, flip authz and the field allowlist to deny-by-default. Then CI/README cleanup. **Nothing else starts until this does.** |
 | **Weeks 2–6** | **[CLOSED — Specs 040, 042, 043, 044]** Adopt your own composables and event runtime — `useFocusTrap` (7/7 modals), `useKeyboardNav` (7/7 hierarchical), `useFloatingPosition` (14/14 overlays), `useVirtualizer` (6/6 long collections); unified component event contract `laughtale:<comp>:<evt>` (41/41 components). Findings recorded: `tieredmenu`'s cross-island toast dispatch never fired due to target mismatch (`window.dispatchEvent` vs `document.addEventListener`), now re-homed to the in-process island bus; `runtime/events.ts` was the seventh built-and-unadopted module, now fully adopted with its first callers. |
-| **Weeks 4–8** | Form association, then server actions — in that order. Actions that don't degrade gracefully aren't progressive enhancement. |
+| **Weeks 4–8** | **[CLOSED — Spec 045]** Form association across all 29 form controls (`formFieldAdoption: 29`, `clientCreatedFields: 0`, 100% no-JS parity & reset), then server actions — in that order. Actions that don't degrade gracefully aren't progressive enhancement. |
+| **Weeks 4–9** | **Fix the TagHelper split** (§0). 81 generated TagHelpers derive from `TagHelper`, not `IslandTagHelperBase`, so SSR, localization and RTL are unreachable from the components Razor authors actually use. This one change unblocks Part N and half of Part C. |
+| **Weeks 5–7** | Props payload and serialization (Part J): stop serializing defaults, add source-generated JSON contexts. Small, measurable, and it is the difference between a trimmable product and one that isn't. |
+| **Weeks 8–12** | Localization for real (Part N): move the vocabulary out of Core and teach the boundary test to catch its return, then route the 25 hardcoded English defaults and the client template strings through the localizer, then RTL. Depends on the TagHelper split above. |
 | **Weeks 6–10** | Fix the refresh/adapter corruption: `update(props)` in the adapter contract, refresh prefers it over morphing. |
 | **Weeks 9–14** | Plugin API, then the island compiler. The stretch that turns a library into a framework — protect it from interruption. |
 | **Weeks 14–18** | DevTools + HMR. Once the compiler emits a manifest there's real data to inspect. |
@@ -537,7 +688,7 @@ neither can anyone else's.
 
 ---
 
-## 17. The governing lesson
+## 18. The governing lesson
 
 Thirty-eight specs are marked complete, yet:
 

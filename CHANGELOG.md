@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Native Form Association for Island Controls (Feature 045 / Spec 045):**
+  - All 29 interactive form components (`<island-*>`) now natively participate in HTML form submissions across both server-rendered (no-JS) and hydrated client paths.
+  - Form fields are server-rendered with model values in the initial HTML before any JavaScript executes (`formFieldAdoption: 29`, zero client-created inputs `clientCreatedFields: 0`).
+  - Headless `useFormField` composable provides non-destructive hydration adoption, preserving DOM nodes and native state across renders and 50+ in-place island refreshes.
+  - Native form reset (`form.reset()`) restores all 29 controls to their initial server values in both DOM presentation and submitted payloads.
+  - Cardinality-driven wire formats: `Single` (standard scalar), `Multiple` (repeated form fields for `List<T>`, replacing comma-delimited strings), and `Boolean` (companion hidden input `false` + primary input `true`).
+  - Supports compile-time `asp-for` model expression resolution alongside explicit `name` attributes (see BREAKING entry below regarding removal of literal generic fallback names).
+
 ### BREAKING
 - **Form Control Generic Fallback Field Names Removed (Feature 045 / Spec 045):**
   - Removed generic field-name fallbacks (`select_value`, `slider_value`, `mask_value`, `listbox_value`, `togglebutton_value`, `selectbutton_value`, `tree_value`, `switch_value`) from client components per FR-005.

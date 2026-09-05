@@ -1,4 +1,4 @@
-﻿@page "/form-conformance"
+@page "/form-conformance"
 @model LaughTale.Showcase.Pages.FormConformanceModel
 @{
     ViewData["Title"] = "Form Conformance Fixture (29 Controls)";
@@ -68,3 +68,28 @@
 
     <button type="submit" id="submit-btn">Submit Conformance Form</button>
 </form>
+
+<hr />
+<h2>Edge Cases (T035)</h2>
+
+<div id="edge-case-outside-form">
+    <island-input-text id="ctrl-edge-outside" name="OutsideFormText" value="@("Outside Form Value")" />
+</div>
+
+<form id="edge-cases-form" method="post" action="/form-conformance">
+    <!-- 1. Duplicate resolved names -->
+    <island-input-text id="ctrl-edge-dup-1" name="DuplicateField" value="@("FirstDuplicate")" />
+    <island-input-text id="ctrl-edge-dup-2" name="DuplicateField" value="@("SecondDuplicate")" />
+
+    <!-- 2. Value containing old delimiter (comma) -->
+    <island-input-tags id="ctrl-edge-delimiter" name="DelimiterTags" value='@(new List<string> { "tag,with,comma", "another,tag" })' />
+
+    <!-- 3. Server value the client cannot represent (unparseable date) -->
+    <island-datepicker id="ctrl-edge-unparseable" name="UnparseableDate" value="completely-invalid-date-xyz" />
+
+    <!-- 4. Control for late hydration -->
+    <island-input-text id="ctrl-edge-late-hydrate" name="LateHydrateText" value="@("LateHydrateInitial")" />
+
+    <button type="submit" id="edge-submit-btn">Submit Edge Cases Form</button>
+</form>
+

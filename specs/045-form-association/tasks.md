@@ -191,13 +191,13 @@ scripting disabled, once hydrated — and diff the two `FormData` sets.
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-- [ ] T035 [P] Add the edge cases from `spec.md` to `LaughTale.Client/tests/e2e/form-association.spec.ts`: duplicate resolved names, a value containing the old delimiter, a control outside any form, a control that hydrates late, and a server value the client cannot represent
-- [ ] T036 [P] Document form association in `LaughTale.Client/docs/` — the `asp-for` binding, the name precedence, the cardinality shapes, and the no-JS guarantee
-- [ ] T037 [P] Record in `CHANGELOG.md` that `<island-*>` form controls now participate in native form submission, referencing the BREAKING entry from T020
-- [ ] T038 Update `ROADMAP.v5.md` §5 to close the *Form association* item with the measured outcome, and correct the three figures Findings 1–3 disproved (the "10 sync a hidden input" artefact, the 0-of-29 baseline, and the unreachability of `ElementInternals`)
-- [ ] T039 Update `ROADMAP.v5.md` §0 to record that `026-ssr-first-markup` was the eighth built-and-unadopted module and is now adopted at 29 of 29 in-scope controls
-- [ ] T040 Run the full `quickstart.md` validation end to end and paste the unedited output of all four scenarios into the closing commit
-- [ ] T041 Re-save `LaughTale.Client/scripts/metrics-baseline.json` at the improved values — permitted by the standing authorisation for a completed feature's final verification task, **at improved values only**
+- [x] T035 [P] Add the edge cases from `spec.md` to `LaughTale.Client/tests/e2e/form-association.spec.ts`: duplicate resolved names, a value containing the old delimiter, a control outside any form, a control that hydrates late, and a server value the client cannot represent
+- [x] T036 [P] Document form association in `LaughTale.Client/docs/` — the `asp-for` binding, the name precedence, the cardinality shapes, and the no-JS guarantee
+- [x] T037 [P] Record in `CHANGELOG.md` that `<island-*>` form controls now participate in native form submission, referencing the BREAKING entry from T020
+- [x] T038 Update `ROADMAP.v5.md` §5 to close the *Form association* item with the measured outcome, and correct the three figures Findings 1–3 disproved (the "10 sync a hidden input" artefact, the 0-of-29 baseline, and the unreachability of `ElementInternals`)
+- [x] T039 Update `ROADMAP.v5.md` §0 to record that `026-ssr-first-markup` was the eighth built-and-unadopted module and is now adopted at 29 of 29 in-scope controls
+- [x] T040 Run the full `quickstart.md` validation end to end and paste the unedited output of all four scenarios into the closing commit
+- [x] T041 Re-save `LaughTale.Client/scripts/metrics-baseline.json` at the improved values — permitted by the standing authorisation for a completed feature's final verification task, **at improved values only**
 
 ---
 

@@ -256,4 +256,66 @@ test.describe('Native Form Association: interactive & submitted parity (US3)', (
     });
 });
 
+test.describe('Native Form Association: edge cases (T035)', () => {
+    test.use({ javaScriptEnabled: true });
+
+    test('edge cases: duplicate resolved names, old delimiter preservation, control outside form, late hydration, and unparseable values', async ({ page }) => {
+        await page.goto('/form-conformance');
+        await page.waitForFunction(() => (window as any).LaughTale !== undefined);
+
+        // 1. Duplicate resolved names:
+        // Two controls (#ctrl-edge-dup-1 and #ctrl-edge-dup-2) share name "DuplicateField".
+        // Both fields exist in DOM and neither is overwritten by the other.
+        const dupFields = page.locator('#edge-cases-form [name="DuplicateField"]');
+        await expect(dupFields).toHaveCount(2);
+
+        // 2. Control outside any form (#ctrl-edge-outside):
+        // Hydrates cleanly without parent form; field is present with model value.
+        const outsideField = page.locator('#ctrl-edge-outside [data-lt-field]');
+        await expect(outsideField).toHaveCount(1);
+        await expect(outsideField).toHaveValue('Outside Form Value');
+
+        // 3. Value containing old delimiter (#ctrl-edge-delimiter):
+        // Multi-value tags contain commas ("tag,with,comma", "another,tag").
+        // Emitted as repeated fields, never joined by comma.
+        const delimiterFields = page.locator('#edge-cases-form [name="DelimiterTags"]');
+        await expect(delimiterFields).toHaveCount(2);
+
+        // 4. Server value client cannot represent (#ctrl-edge-unparseable):
+        // Server rendered "completely-invalid-date-xyz". Hydration does not clear or corrupt it.
+        const unparseableField = page.locator('#edge-cases-form [name="UnparseableDate"]');
+        await expect(unparseableField).toHaveValue('completely-invalid-date-xyz');
+
+        // 5. Late hydration / field submittable throughout (#ctrl-edge-late-hydrate):
+        // Field exists with server initial value throughout lifecycle.
+        const lateHydrateField = page.locator('#edge-cases-form [name="LateHydrateText"]');
+        await expect(lateHydrateField).toHaveValue('LateHydrateInitial');
+
+        // Submit edge-cases form and verify submitted payload
+        const [postRequest] = await Promise.all([
+            page.waitForRequest(req => req.method() === 'POST' && req.url().includes('/form-conformance')),
+            page.click('#edge-submit-btn'),
+        ]);
+
+        const postData = new URLSearchParams(postRequest.postData() || '');
+
+        // 1. Both duplicate values present in submitted payload
+        const dupValues = postData.getAll('DuplicateField');
+        expect(dupValues).toEqual(['FirstDuplicate', 'SecondDuplicate']);
+
+        // 2. Outside form field NOT submitted with edge-cases-form
+        expect(postData.has('OutsideFormText')).toBe(false);
+
+        // 3. Values with embedded commas preserved without splitting or loss
+        const delimValues = postData.getAll('DelimiterTags');
+        expect(delimValues).toEqual(['tag,with,comma', 'another,tag']);
+
+        // 4. Unparseable server value submitted intact
+        expect(postData.get('UnparseableDate')).toBe('completely-invalid-date-xyz');
+
+        // 5. Late hydrate value submitted intact
+        expect(postData.get('LateHydrateText')).toBe('LateHydrateInitial');
+    });
+});
+
 
