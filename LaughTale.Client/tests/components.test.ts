@@ -101,6 +101,7 @@ describe('LaughTale Aura Enterprise Components Suite', () => {
     });
 
     it('Slider: respects min, max, step boundaries and handles drag interactions', () => {
+        container.innerHTML = '<input type="hidden" name="volume" data-lt-field value="25" />';
         SliderIsland(container, {
             min: 0,
             max: 100,

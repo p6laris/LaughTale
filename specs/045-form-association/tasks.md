@@ -158,8 +158,8 @@ present before hydration is the identical node afterwards, value unchanged, exac
 - [x] T023 [US2] Adopt `useFormField` in the 10 Batch 1 components in `LaughTale.Client/src/components/`, deleting each `createElement('input')` site and routing every value write through the setter
 - [x] T024 [US2] Adopt `useFormField` in the 10 Batch 2 components in `LaughTale.Client/src/components/`, deleting each `createElement('input')` site and removing the hidden-field literal from any component that renders one in its template
 - [ ] T025 [US2] Adopt `useFormField` in the 9 Batch 3 components in `LaughTale.Client/src/components/` — `dropzone`'s file input MUST be adopted and re-attached, never re-created, or the user's file selection is silently discarded
-- [ ] T026 [US2] Scope `inplace`'s field lookup to its container in `LaughTale.Client/src/components/inplace.ts` — it uses `document.querySelector` today and can bind to another island's field once every control has one
-- [ ] T027 [US2] Verify `float-label`'s `input:not([type="hidden"]), textarea, select` lookup in `LaughTale.Client/src/components/float-label.ts` still resolves to the visible control and not to an adopted field, and constrain it if it does not
+- [x] T026 [US2] Scope `inplace`'s field lookup to its container in `LaughTale.Client/src/components/inplace.ts` — it uses `document.querySelector` today and can bind to another island's field once every control has one
+- [x] T027 [US2] Verify `float-label`'s `input:not([type="hidden"]), textarea, select` lookup in `LaughTale.Client/src/components/float-label.ts` still resolves to the visible control and not to an adopted field, and constrain it if it does not
 - [ ] T028 [US2] Confirm `clientCreatedFields` has reached 0 and `formFieldAdoption` 29 by running `node scripts/audit-metrics.mjs` from `LaughTale.Client/`, and that the T021/T022 e2e cases pass — a counter at target with a failing e2e case is not a pass (FR-017)
 
 **Checkpoint**: US1 and US2 both work. The field is server-rendered, adopted, and survives everything.

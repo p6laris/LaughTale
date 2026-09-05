@@ -205,7 +205,7 @@ export default function FloatLabelIsland(container: HTMLElement, props: FloatLab
 
     // Find interactive child input / textarea / custom island
     const findTarget = (): HTMLElement | null => {
-        return container.querySelector('input, textarea, select, .cs-trigger, .dp-trigger, .ac-input, .p-inputtags-input, .p-password-input');
+        return container.querySelector('input:not([type="hidden"]), textarea, select, .cs-trigger, .dp-trigger, .ac-input, .p-inputtags-input, .p-password-input');
     };
 
     const targetEl = findTarget();
