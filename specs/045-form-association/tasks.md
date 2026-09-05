@@ -156,7 +156,7 @@ present before hydration is the identical node afterwards, value unchanged, exac
 ### Implementation for User Story 2
 
 - [x] T023 [US2] Adopt `useFormField` in the 10 Batch 1 components in `LaughTale.Client/src/components/`, deleting each `createElement('input')` site and routing every value write through the setter
-- [ ] T024 [US2] Adopt `useFormField` in the 10 Batch 2 components in `LaughTale.Client/src/components/`, deleting each `createElement('input')` site and removing the hidden-field literal from any component that renders one in its template
+- [x] T024 [US2] Adopt `useFormField` in the 10 Batch 2 components in `LaughTale.Client/src/components/`, deleting each `createElement('input')` site and removing the hidden-field literal from any component that renders one in its template
 - [ ] T025 [US2] Adopt `useFormField` in the 9 Batch 3 components in `LaughTale.Client/src/components/` — `dropzone`'s file input MUST be adopted and re-attached, never re-created, or the user's file selection is silently discarded
 - [ ] T026 [US2] Scope `inplace`'s field lookup to its container in `LaughTale.Client/src/components/inplace.ts` — it uses `document.querySelector` today and can bind to another island's field once every control has one
 - [ ] T027 [US2] Verify `float-label`'s `input:not([type="hidden"]), textarea, select` lookup in `LaughTale.Client/src/components/float-label.ts` still resolves to the visible control and not to an adopted field, and constrain it if it does not

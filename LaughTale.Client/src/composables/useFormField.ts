@@ -160,7 +160,11 @@ export function useFormField(
                 field.checked = isChecked;
                 field.disabled = false;
             } else {
-                field.value = 'true';
+                if (typeof val === 'string' && val !== 'true' && val !== 'false') {
+                    field.value = val;
+                } else if (!field.value || field.value === 'false') {
+                    field.value = 'true';
+                }
                 // When unchecked, field is disabled so native POST submits only the companion (value="false")
                 field.disabled = !isChecked;
             }
