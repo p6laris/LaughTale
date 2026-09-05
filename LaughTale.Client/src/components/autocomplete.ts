@@ -8,6 +8,7 @@ import { useClickOutside } from '../composables/useClickOutside';
 import { useDebounce } from '../composables/useDebounce';
 import { useFloatingPosition } from '../composables/useFloatingPosition';
 import { html, setHtml, unsafe, attr, type Raw } from '../runtime/html';
+import { useFormField } from '../composables/useFormField';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -30,6 +31,7 @@ export interface AutoCompleteItem {
 }
 
 export interface AutoCompleteProps {
+    name?: string;
     items?: AutoCompleteItem[];
     suggestions?: AutoCompleteItem[];
     placeholder?: string;
@@ -341,6 +343,11 @@ html.dark .ac-item.selected,
 
 export default function AutoCompleteIsland(container: HTMLElement, props: AutoCompleteProps, ctx?: IslandContext) {
     injectIslandStyle('autocomplete', CSS);
+
+    const formField = useFormField(container, ctx, {
+        cardinality: 'Single',
+        name: props.name || props.targetInputName
+    });
     
     const allItems: AutoCompleteItem[] = props.suggestions || props.items || [];
     const multiple = props.multiple === true;
@@ -351,9 +358,10 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
     const variant = props.variant || 'outlined';
     const scrollHeight = props.scrollHeight || '14rem';
     
+    const initialVal = props.value ?? formField.getValue();
     let selectedValues: string[] = multiple 
-        ? (Array.isArray(props.value) ? props.value : (props.value ? [props.value as string] : []))
-        : (props.value ? [props.value as string] : []);
+        ? (Array.isArray(initialVal) ? initialVal : (initialVal ? [initialVal as string] : []))
+        : (initialVal ? [initialVal as string] : []);
     
     let searchQuery = '';
     let highlightedIndex = -1;
@@ -370,6 +378,7 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
         );
     }
 
+    formField.detach();
     setHtml(container, html`
         <div class="laughtale-autocomplete ${props.fluid ? 'fluid' : ''} ${hasDropdown ? 'has-dropdown' : ''}" data-part="root">
             <div class="ac-input-container size-${size} variant-${variant} ${props.invalid ? 'invalid' : ''} ${props.disabled ? 'disabled' : ''}">
@@ -408,6 +417,12 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
             <div class="ac-overlay" id="ac-overlay" role="listbox" style="max-height: ${scrollHeight};"></div>
         </div>
     `);
+    formField.reattach();
+
+    const initialSingleVal = multiple ? JSON.stringify(selectedValues) : (selectedValues[0] || '');
+    if (initialSingleVal) {
+        formField.setValue(initialSingleVal);
+    }
 
     const inputWrap = container.querySelector<HTMLElement>('.ac-input-container')!;
     const chipsWrap = container.querySelector<HTMLElement>('.ac-chips-wrapper')!;
@@ -716,16 +731,8 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
     }, { signal: ctx?.signal });
 
     function syncValue() {
-        if (props.targetInputName) {
-            let hidden = container.querySelector<HTMLInputElement>(`input[name="${props.targetInputName}"]`);
-            if (!hidden) {
-                hidden = document.createElement('input');
-                hidden.type = 'hidden';
-                hidden.name = props.targetInputName;
-                container.appendChild(hidden);
-            }
-            hidden.value = multiple ? JSON.stringify(selectedValues) : (selectedValues[0] || '');
-        }
+        const val = multiple ? JSON.stringify(selectedValues) : (selectedValues[0] || '');
+        formField.setValue(val);
 
         emitComponentEvent(container, 'autocomplete', 'change', {
             value: multiple ? selectedValues : (selectedValues[0] || '')

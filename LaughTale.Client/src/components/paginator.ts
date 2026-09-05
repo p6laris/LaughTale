@@ -10,6 +10,7 @@ import { injectIslandStyle } from '../runtime/styles';
 import { emitComponentEvent } from '../runtime/events';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
+import { useFormField } from '../composables/useFormField';
 
 export const a11y: PatternDeclaration = {
     kind: 'native',
@@ -17,6 +18,7 @@ export const a11y: PatternDeclaration = {
 };
 
 export interface PaginatorProps {
+    name?: string;
     totalRecords: number;
     rows?: number;
     first?: number;
@@ -338,7 +340,15 @@ const DEFAULT_IMAGES = [
 export default function PaginatorIsland(container: HTMLElement, props: PaginatorProps, ctx?: IslandContext) {
     injectIslandStyle('paginator', PAGINATOR_CSS);
 
-    let first = props.first || 0;
+    const formField = useFormField(container, ctx, {
+        cardinality: 'Single',
+        name: props.name || props.targetInputName
+    });
+
+    const initialFieldVal = formField.getValue();
+    let first = props.first !== undefined ? props.first : (initialFieldVal !== undefined && initialFieldVal !== '' ? parseInt(initialFieldVal, 10) : 0);
+    if (isNaN(first)) first = 0;
+
     let rows = props.rows || 10;
     let totalRecords = props.totalRecords || 0;
     const pageLinkSize = props.pageLinkSize || 5;
@@ -545,6 +555,7 @@ export default function PaginatorIsland(container: HTMLElement, props: Paginator
             `;
         }
 
+        formField.detach();
         setHtml(container, html`
             <div class="p-paginator-wrapper" style="width: 100%;">
                 <div class="p-paginator p-component" role="navigation" aria-label="Pagination Navigation">
@@ -553,6 +564,7 @@ export default function PaginatorIsland(container: HTMLElement, props: Paginator
                 ${imageDisplayHtml}
             </div>
         `);
+        formField.reattach();
 
         bindEvents();
     }
@@ -621,16 +633,7 @@ export default function PaginatorIsland(container: HTMLElement, props: Paginator
             pageCount: getTotalPages()
         });
 
-        if (props.targetInputName) {
-            let hidden = container.querySelector<HTMLInputElement>(`input[name="${props.targetInputName}"]`);
-            if (!hidden) {
-                hidden = document.createElement('input');
-                hidden.type = 'hidden';
-                hidden.name = props.targetInputName;
-                container.appendChild(hidden);
-            }
-            hidden.value = JSON.stringify({ first, rows, page });
-        }
+        formField.setValue(String(first));
     }
 
     render();

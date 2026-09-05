@@ -11,6 +11,7 @@ import { LucideIcons } from '../icons/lucide';
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import { useFormField } from '../composables/useFormField';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -19,6 +20,7 @@ export const a11y: PatternDeclaration = {
 };
 
 export interface PickListProps<T = any> {
+    name?: string;
     source?: PickListItem<T>[];
     target?: PickListItem<T>[];
     value?: [PickListItem<T>[], PickListItem<T>[]];
@@ -358,6 +360,11 @@ html.dark .p-picklist-product-img,
 export default function PickListIsland<T = any>(container: HTMLElement, props: PickListProps<T>, ctx?: IslandContext) {
     injectIslandStyle('picklist', PICKLIST_CSS);
 
+    const formField = useFormField(container, ctx, {
+        cardinality: 'Multiple',
+        name: props.name || props.targetInputName
+    });
+
     const initialSource = props.value ? props.value[0] : (props.source || []);
     const initialTarget = props.value ? props.value[1] : (props.target || []);
 
@@ -427,35 +434,53 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
         // Default item
         return html`
             ${checkboxHtml}
-            <span style="flex: 1; font-weight: ${isSelected ? '600' : 'normal'};">${item.name}</span>
+            <span style="flex: 1; font-weight: ${isSelected ? '600' : 'normal'}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                ${item.name}
+            </span>
         `;
     }
 
     function buildShell() {
         const sourceControlsHtml = showSourceControls ? html`
             <div class="p-picklist-controls p-picklist-source-controls">
-                <button type="button" class="p-picklist-control-btn btn-source-top" title="Move Top" aria-label="Move Top">${unsafe(LucideIcons.chevronsUp)}</button>
-                <button type="button" class="p-picklist-control-btn btn-source-up" title="Move Up" aria-label="Move Up">${unsafe(LucideIcons.chevronUp)}</button>
-                <button type="button" class="p-picklist-control-btn btn-source-down" title="Move Down" aria-label="Move Down">${unsafe(LucideIcons.chevronDown)}</button>
-                <button type="button" class="p-picklist-control-btn btn-source-bottom" title="Move Bottom" aria-label="Move Bottom">${unsafe(LucideIcons.chevronsDown)}</button>
+                <button type="button" class="p-picklist-control-btn btn-source-top" title="Move to Top" aria-label="Move to Top" disabled>
+                    ${unsafe(LucideIcons.chevronsUp)}
+                </button>
+                <button type="button" class="p-picklist-control-btn btn-source-up" title="Move Up" aria-label="Move Up" disabled>
+                    ${unsafe(LucideIcons.chevronUp)}
+                </button>
+                <button type="button" class="p-picklist-control-btn btn-source-down" title="Move Down" aria-label="Move Down" disabled>
+                    ${unsafe(LucideIcons.chevronDown)}
+                </button>
+                <button type="button" class="p-picklist-control-btn btn-source-bottom" title="Move to Bottom" aria-label="Move to Bottom" disabled>
+                    ${unsafe(LucideIcons.chevronsDown)}
+                </button>
             </div>
         ` : '';
 
         const targetControlsHtml = showTargetControls ? html`
             <div class="p-picklist-controls p-picklist-target-controls">
-                <button type="button" class="p-picklist-control-btn btn-target-top" title="Move Top" aria-label="Move Top">${unsafe(LucideIcons.chevronsUp)}</button>
-                <button type="button" class="p-picklist-control-btn btn-target-up" title="Move Up" aria-label="Move Up">${unsafe(LucideIcons.chevronUp)}</button>
-                <button type="button" class="p-picklist-control-btn btn-target-down" title="Move Down" aria-label="Move Down">${unsafe(LucideIcons.chevronDown)}</button>
-                <button type="button" class="p-picklist-control-btn btn-target-bottom" title="Move Bottom" aria-label="Move Bottom">${unsafe(LucideIcons.chevronsDown)}</button>
+                <button type="button" class="p-picklist-control-btn btn-target-top" title="Move to Top" aria-label="Move to Top" disabled>
+                    ${unsafe(LucideIcons.chevronsUp)}
+                </button>
+                <button type="button" class="p-picklist-control-btn btn-target-up" title="Move Up" aria-label="Move Up" disabled>
+                    ${unsafe(LucideIcons.chevronUp)}
+                </button>
+                <button type="button" class="p-picklist-control-btn btn-target-down" title="Move Down" aria-label="Move Down" disabled>
+                    ${unsafe(LucideIcons.chevronDown)}
+                </button>
+                <button type="button" class="p-picklist-control-btn btn-target-bottom" title="Move to Bottom" aria-label="Move to Bottom" disabled>
+                    ${unsafe(LucideIcons.chevronsDown)}
+                </button>
             </div>
         ` : '';
 
         const sourceHeaderCheckboxHtml = isCheckbox ? html`
-            <div class="p-checkbox-box p-source-select-all" role="checkbox" aria-checked="false"></div>
+            <div class="p-checkbox-box p-source-select-all" role="checkbox" aria-checked="false" title="Select all visible"></div>
         ` : '';
 
         const targetHeaderCheckboxHtml = isCheckbox ? html`
-            <div class="p-checkbox-box p-target-select-all" role="checkbox" aria-checked="false"></div>
+            <div class="p-checkbox-box p-target-select-all" role="checkbox" aria-checked="false" title="Select all visible"></div>
         ` : '';
 
         const sourceFilterHtml = isFilter ? html`
@@ -472,6 +497,7 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
             </div>
         ` : '';
 
+        formField.detach();
         setHtml(container, html`
             <div class="p-picklist p-component">
                 ${sourceControlsHtml}
@@ -523,6 +549,7 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
                 ${targetControlsHtml}
             </div>
         `);
+        formField.reattach();
 
         bindPermanentEvents();
         updateSourceList();
@@ -997,16 +1024,8 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
     }
 
     function syncValues(action = 'change', affectedItems: any[] = []) {
-        if (props.targetInputName) {
-            let hidden = container.querySelector<HTMLInputElement>(`input[name="${props.targetInputName}"]`);
-            if (!hidden) {
-                hidden = document.createElement('input');
-                hidden.type = 'hidden';
-                hidden.name = props.targetInputName;
-                container.appendChild(hidden);
-            }
-            hidden.value = JSON.stringify(targetList.map(it => getItemId(it)));
-        }
+        const values = targetList.map(it => getItemId(it));
+        formField.setValue(values);
 
         emitComponentEvent(container, 'picklist', 'change', {
             source: sourceList,

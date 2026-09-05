@@ -11,6 +11,7 @@ import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts
 import type { IslandContext } from '../runtime/registry';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
+import { useFormField } from '../composables/useFormField';
 
 export const a11y: PatternDeclaration = {
     kind: 'pattern',
@@ -18,6 +19,7 @@ export const a11y: PatternDeclaration = {
 };
 
 export interface OrgChartProps<T = any> {
+    name?: string;
     value?: OrgChartNode<T>;
     root?: OrgChartNode<T>;
     collapsible?: boolean;
@@ -296,6 +298,11 @@ const ICONS = {
 export default function OrgChartIsland<T = any>(container: HTMLElement, props: OrgChartProps<T>, ctx?: IslandContext) {
     injectIslandStyle('orgchart', ORGCHART_CSS);
 
+    const formField = useFormField(container, ctx, {
+        cardinality: 'Multiple',
+        name: props.name || props.targetInputName
+    });
+
     const rootNode: OrgChartNode<T> = props.value || props.root || {
         key: '0',
         label: 'Founder',
@@ -347,6 +354,13 @@ export default function OrgChartIsland<T = any>(container: HTMLElement, props: O
             Object.entries(props.selectionKeys).forEach(([k, v]) => {
                 if (v) selectedKeys.add(k);
             });
+        }
+    } else {
+        const initialVal = formField.getValue();
+        if (Array.isArray(initialVal)) {
+            initialVal.forEach(k => { if (k) selectedKeys.add(String(k)); });
+        } else if (initialVal) {
+            selectedKeys.add(String(initialVal));
         }
     }
 
@@ -535,11 +549,13 @@ export default function OrgChartIsland<T = any>(container: HTMLElement, props: O
             recalculateCheckboxHierarchy();
         }
 
+        formField.detach();
         setHtml(container, html`
             <div class="p-organizationchart p-component" role="tree">
                 ${renderBranch(rootNode)}
             </div>
         `);
+        formField.reattach();
 
         bindEvents();
     }
@@ -727,16 +743,7 @@ export default function OrgChartIsland<T = any>(container: HTMLElement, props: O
     }
 
     function syncValues() {
-        if (props.targetInputName) {
-            let hidden = container.querySelector<HTMLInputElement>(`input[name="${props.targetInputName}"]`);
-            if (!hidden) {
-                hidden = document.createElement('input');
-                hidden.type = 'hidden';
-                hidden.name = props.targetInputName;
-                container.appendChild(hidden);
-            }
-            hidden.value = JSON.stringify(Array.from(selectedKeys));
-        }
+        formField.setValue(Array.from(selectedKeys));
     }
 
     renderTree();

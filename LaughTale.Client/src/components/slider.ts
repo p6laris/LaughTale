@@ -10,6 +10,7 @@ import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
 import { emitComponentEvent } from '../runtime/events';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import { useFormField } from '../composables/useFormField';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -209,21 +210,29 @@ export default function SliderIsland(container: HTMLElement, props: SliderProps,
     const disabledMax = props.disabledMaxHandle === true || String(props.disabledMaxHandle) === 'true';
     const minDistance = props.minStepsBetweenHandles !== undefined ? Number(props.minStepsBetweenHandles) : 0;
 
+    const formField = useFormField(container, ctx, {
+        cardinality: isRange ? 'Multiple' : 'Single',
+        name: props.name || props.targetInputName
+    });
+
+    const formVal = formField.getValue();
+    const effectiveVal = props.value ?? props.values ?? formVal;
+
     // Parse initial value(s)
     let currentValues: number[] = [];
     if (isRange) {
-        if (Array.isArray(props.values) && props.values.length >= 2) {
-            currentValues = [Number(props.values[0]), Number(props.values[1])];
-        } else if (Array.isArray(props.value) && props.value.length >= 2) {
-            currentValues = [Number(props.value[0]), Number(props.value[1])];
-        } else if (typeof props.value === 'string' && props.value.includes(',')) {
-            const parts = props.value.split(',').map(s => Number(s.trim()));
+        if (Array.isArray(effectiveVal) && effectiveVal.length >= 2) {
+            currentValues = [Number(effectiveVal[0]), Number(effectiveVal[1])];
+        } else if (typeof effectiveVal === 'string' && effectiveVal.includes(',')) {
+            const parts = effectiveVal.split(',').map(s => Number(s.trim()));
             currentValues = [parts[0] ?? min, parts[1] ?? max];
+        } else if (Array.isArray(props.values) && props.values.length >= 2) {
+            currentValues = [Number(props.values[0]), Number(props.values[1])];
         } else {
             currentValues = [min + (max - min) * 0.2, min + (max - min) * 0.8];
         }
     } else {
-        const singleVal = props.value !== undefined ? Number(props.value) : min;
+        const singleVal = effectiveVal !== undefined && effectiveVal !== null ? (Array.isArray(effectiveVal) ? Number(effectiveVal[0]) : Number(effectiveVal)) : min;
         currentValues = [singleVal];
     }
 
@@ -256,6 +265,7 @@ export default function SliderIsland(container: HTMLElement, props: SliderProps,
         container.className = rootClasses;
         if (props.inputId) container.setAttribute('id', props.inputId);
 
+        formField.detach();
         if (isRange) {
             const p1 = getPercent(currentValues[0]);
             const p2 = getPercent(currentValues[1]);
@@ -298,7 +308,6 @@ export default function SliderIsland(container: HTMLElement, props: SliderProps,
                     aria-valuenow="${currentValues[1]}"
                     style="${h2Style}"
                 ></span>
-                <input type="hidden"${attr('name', props.name || props.targetInputName)} value="${currentValues.join(',')}" />
             `);
         } else {
             const p = getPercent(currentValues[0]);
@@ -323,9 +332,10 @@ export default function SliderIsland(container: HTMLElement, props: SliderProps,
                     aria-valuenow="${currentValues[0]}"
                     style="${hStyle}"
                 ></span>
-                <input type="hidden"${attr('name', props.name || props.targetInputName)} value="${currentValues[0]}" />
             `);
         }
+        formField.reattach();
+        formField.setValue(isRange ? currentValues.map(String) : String(currentValues[0]));
 
         bindEvents();
     }
@@ -333,7 +343,6 @@ export default function SliderIsland(container: HTMLElement, props: SliderProps,
     function updateVisuals() {
         const rangeEl = container.querySelector<HTMLElement>('.p-slider-range');
         const handles = container.querySelectorAll<HTMLElement>('.p-slider-handle');
-        const hiddenInp = container.querySelector<HTMLInputElement>('input[type="hidden"]');
 
         if (isRange) {
             const p1 = getPercent(currentValues[0]);
@@ -362,8 +371,6 @@ export default function SliderIsland(container: HTMLElement, props: SliderProps,
                 else handles[1].style.left = `${p2}%`;
                 handles[1].setAttribute('aria-valuenow', currentValues[1].toString());
             }
-
-            if (hiddenInp) hiddenInp.value = currentValues.join(',');
         } else {
             const p = getPercent(currentValues[0]);
             if (rangeEl) {
@@ -376,13 +383,12 @@ export default function SliderIsland(container: HTMLElement, props: SliderProps,
                 else handles[0].style.left = `${p}%`;
                 handles[0].setAttribute('aria-valuenow', currentValues[0].toString());
             }
-
-            if (hiddenInp) hiddenInp.value = currentValues[0].toString();
         }
     }
 
     function syncValue(isEnd: boolean = false) {
         const valPayload = isRange ? [...currentValues] : currentValues[0];
+        formField.setValue(isRange ? currentValues.map(String) : String(currentValues[0]));
 
         emitComponentEvent(container, 'slider', 'change', { value: valPayload });
 

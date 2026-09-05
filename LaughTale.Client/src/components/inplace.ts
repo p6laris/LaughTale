@@ -5,6 +5,7 @@ import { injectIslandStyle } from '../runtime/styles';
 import { emitComponentEvent } from '../runtime/events';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
+import { useFormField } from '../composables/useFormField';
 
 export const a11y: PatternDeclaration = {
     kind: 'native',
@@ -18,6 +19,7 @@ export const a11y: PatternDeclaration = {
  */
 
 export interface InplaceProps {
+    name?: string;
     value?: string;
     targetInputName?: string;
     placeholder?: string;
@@ -179,14 +181,20 @@ html.dark .p-inplace-cancel-btn:hover,
 export default function InplaceIsland(container: HTMLElement, props: InplaceProps, ctx?: IslandContext) {
     injectIslandStyle('inplace', INPLACE_CSS);
 
+    const formField = useFormField(container, ctx, {
+        cardinality: 'Single',
+        name: props.name || props.targetInputName
+    });
+
     const initialActive = props.active === true || props.active === 'true';
     let isEditing = initialActive;
-    let currentValue = props.value ?? container.textContent?.trim() ?? '';
+    let currentValue = props.value ?? formField.getValue() ?? container.textContent?.trim() ?? '';
     const placeholder = props.placeholder || 'Click to edit...';
     const isDisabled = props.disabled || false;
     const isClosable = props.closable !== false;
 
     function render() {
+        formField.detach();
         if (!isEditing) {
             setHtml(container, html`
                 <div class="p-inplace p-component ${props.class || ''}" style="${props.style || ''}">
@@ -263,20 +271,11 @@ export default function InplaceIsland(container: HTMLElement, props: InplaceProp
                 }
             }, { signal: ctx?.signal });
         }
+        formField.reattach();
     }
 
     function syncValue() {
-        if (props.targetInputName) {
-            let hidden = document.querySelector<HTMLInputElement>(`input[name="${props.targetInputName}"]`);
-            if (!hidden) {
-                hidden = document.createElement('input');
-                hidden.type = 'hidden';
-                hidden.name = props.targetInputName;
-                container.appendChild(hidden);
-            }
-            hidden.value = currentValue;
-        }
-
+        formField.setValue(currentValue);
         emitComponentEvent(container, 'inplace', 'change', { value: currentValue });
     }
 

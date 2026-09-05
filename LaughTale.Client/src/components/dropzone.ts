@@ -5,17 +5,20 @@ import { LucideIcons } from '../icons/lucide';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import { announce } from '../accessibility/announcer';
 import type { PatternDeclaration } from '../accessibility/patterns';
+import { useFormField } from '../composables/useFormField';
 
+// Native <input type="file"> is server-rendered and adopted via useFormField({ fieldKind: 'Native' })
 export const a11y: PatternDeclaration = {
     kind: 'native',
     element: 'input'
 };
 
 export interface DropzoneProps {
-    targetInputName: string;
-    allowedExtensions: string;
-    maxSizeMb: number;
-    dropPrompt: string;
+    name?: string;
+    targetInputName?: string;
+    allowedExtensions?: string;
+    maxSizeMb?: number;
+    dropPrompt?: string;
     class?: string;
     style?: string;
     pt?: PassthroughRecord;
@@ -114,6 +117,13 @@ html.dark .dropzone-subtitle,
 export default function DropzoneIsland(container: HTMLElement, props: DropzoneProps, ctx?: IslandContext) {
     injectIslandStyle('dropzone', CSS);
 
+    const formField = useFormField(container, ctx, {
+        cardinality: 'Multiple',
+        fieldKind: 'Native',
+        name: props.name || props.targetInputName
+    });
+
+    formField.detach();
     setHtml(container, html`
         <div style="display: flex; flex-direction: column; gap: 0.75rem; width: 100%;">
             <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -122,8 +132,6 @@ export default function DropzoneIsland(container: HTMLElement, props: DropzonePr
             </div>
 
             <div class="dropzone-box" tabindex="0" aria-label="${props.dropPrompt || 'Drag and drop files here to upload'}">
-                <input type="file" class="file-input" name="${props.targetInputName || 'file'}" accept="${props.allowedExtensions || '*/*'}" aria-label="${props.dropPrompt || 'Upload file'}" style="display: none;" />
-                
                 <div class="dropzone-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/><polyline points="12 13 12 9 10 11"/><polyline points="12 9 14 11"/></svg>
                 </div>
@@ -137,42 +145,59 @@ export default function DropzoneIsland(container: HTMLElement, props: DropzonePr
             </div>
         </div>
     `);
+    formField.reattach();
 
     const box = container.querySelector('.dropzone-box') as HTMLElement;
-    const input = container.querySelector('.file-input') as HTMLInputElement;
+    const input = (formField.field as HTMLInputElement) || (container.querySelector('.file-input') as HTMLInputElement);
     const preview = container.querySelector('.preview-area') as HTMLElement;
 
-    box.addEventListener('click', () => input.click(), { signal: ctx?.signal });
-    box.addEventListener('keydown', (e: KeyboardEvent) => {
-        if (e.key === 'Enter' || e.key === ' ') {
+    if (input) {
+        input.classList.add('file-input');
+        input.style.display = 'none';
+        if (props.allowedExtensions) {
+            input.accept = props.allowedExtensions;
+        }
+        if (props.dropPrompt) {
+            input.setAttribute('aria-label', props.dropPrompt);
+        }
+        if (box && !box.contains(input)) {
+            box.insertBefore(input, box.firstChild);
+        }
+    }
+
+    if (box && input) {
+        box.addEventListener('click', () => input.click(), { signal: ctx?.signal });
+        box.addEventListener('keydown', (e: KeyboardEvent) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                input.click();
+            }
+        }, { signal: ctx?.signal });
+
+        box.addEventListener('dragover', (e) => {
             e.preventDefault();
-            input.click();
-        }
-    }, { signal: ctx?.signal });
+            box.style.borderColor = 'var(--p-primary-500, #10b981)';
+        }, { signal: ctx?.signal });
 
-    box.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        box.style.borderColor = 'var(--p-primary-500, #10b981)';
-    }, { signal: ctx?.signal });
+        box.addEventListener('dragleave', () => {
+            box.style.borderColor = '';
+        }, { signal: ctx?.signal });
 
-    box.addEventListener('dragleave', () => {
-        box.style.borderColor = '';
-    }, { signal: ctx?.signal });
+        box.addEventListener('drop', (e) => {
+            e.preventDefault();
+            box.style.borderColor = '';
+            if (e.dataTransfer?.files.length) {
+                input.files = e.dataTransfer.files;
+                handleFiles(input.files[0]);
+            }
+        }, { signal: ctx?.signal });
 
-    box.addEventListener('drop', (e) => {
-        e.preventDefault();
-        box.style.borderColor = '';
-        if (e.dataTransfer?.files.length) {
-            input.files = e.dataTransfer.files;
-            handleFiles(input.files[0]);
-        }
-    }, { signal: ctx?.signal });
-
-    input.addEventListener('change', () => {
-        if (input.files?.length) {
-            handleFiles(input.files[0]);
-        }
-    }, { signal: ctx?.signal });
+        input.addEventListener('change', () => {
+            if (input.files?.length) {
+                handleFiles(input.files[0]);
+            }
+        }, { signal: ctx?.signal });
+    }
 
     function handleFiles(file: File) {
         const sizeMb = file.size / (1024 * 1024);

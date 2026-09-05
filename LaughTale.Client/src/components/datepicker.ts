@@ -14,6 +14,7 @@ import { useFloatingPosition } from '../composables/useFloatingPosition';
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import { useFormField } from '../composables/useFormField';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -22,6 +23,7 @@ export const a11y: PatternDeclaration = {
 };
 
 export interface DatePickerProps {
+    name?: string;
     targetInputName?: string;
     value?: string | string[]; // 'YYYY-MM-DD' or array
     placeholder?: string;
@@ -444,6 +446,11 @@ const WEEKDAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 export default function DatePickerIsland(container: HTMLElement, props: DatePickerProps, ctx?: IslandContext) {
     injectIslandStyle('datepicker', CSS);
 
+    const formField = useFormField(container, ctx, {
+        cardinality: 'Multiple',
+        name: props.name || props.targetInputName
+    });
+
     const locale = useLocale(ctx);
     const monthNames = locale.dictionary?.monthNames || MONTH_NAMES;
     const shortMonths = locale.dictionary?.monthNamesShort || SHORT_MONTHS;
@@ -463,7 +470,8 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
     const hour12 = props.hourFormat === '12';
 
     // State
-    let selectedDates: Date[] = parseInitialValue(props.value);
+    const initialVal = props.value ?? formField.getValue();
+    let selectedDates: Date[] = parseInitialValue(initialVal);
     let viewDate = selectedDates.length > 0 ? new Date(selectedDates[0]) : new Date();
     let selectedHour = selectedDates.length > 0 ? selectedDates[0].getHours() : new Date().getHours();
     let selectedMinute = selectedDates.length > 0 ? selectedDates[0].getMinutes() : new Date().getMinutes();
@@ -526,12 +534,14 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
 
         applyPart(container, 'root', `laughtale-datepicker ${props.fluid ? 'fluid' : ''} ${isInline ? 'inline' : ''}`, props.pt, props.studioOverrides);
 
+        formField.detach();
         if (isInline) {
             setHtml(container, html`
                 <div class="dp-panel" data-part="panel">
                     ${renderPanelContent()}
                 </div>
             `);
+            formField.reattach();
             bindPanelEvents(container.querySelector('.dp-panel')!);
             return;
         }
@@ -560,6 +570,7 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
                 </div>
             </div>
         `);
+        formField.reattach();
 
         const trigger = container.querySelector<HTMLElement>('.dp-trigger')!;
         const overlay = container.querySelector<HTMLElement>('.dp-overlay')!;
@@ -912,16 +923,7 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
     }
 
     function syncAndDispatch() {
-        if (props.targetInputName) {
-            let hidden = container.querySelector<HTMLInputElement>(`input[name="${props.targetInputName}"]`);
-            if (!hidden) {
-                hidden = document.createElement('input');
-                hidden.type = 'hidden';
-                hidden.name = props.targetInputName;
-                container.appendChild(hidden);
-            }
-            hidden.value = selectedDates.map(d => formatDate(d)).join(',');
-        }
+        formField.setValue(selectedDates.map(d => formatDate(d)));
 
         emitComponentEvent(container, 'datepicker', 'change', {
             dates: selectedDates,
@@ -931,4 +933,7 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
     }
 
     renderComponent();
+    if (selectedDates.length > 0) {
+        formField.setValue(selectedDates.map(d => formatDate(d)));
+    }
 }

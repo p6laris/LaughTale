@@ -11,6 +11,7 @@ import { LucideIcons } from '../icons/lucide';
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import { useFormField } from '../composables/useFormField';
 import { useVirtualizer, type Virtualizer } from '../composables/useVirtualizer';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
@@ -20,6 +21,7 @@ export const a11y: PatternDeclaration = {
 };
 
 export interface OrderListProps<T = any> {
+    name?: string;
     value?: OrderListItem<T>[];
     items?: OrderListItem<T>[];
     header?: string;
@@ -352,6 +354,11 @@ html.dark .p-orderlist-product-img,
 export default function OrderListIsland<T = any>(container: HTMLElement, props: OrderListProps<T>, ctx?: IslandContext) {
     injectIslandStyle('orderlist', ORDERLIST_CSS);
 
+    const formField = useFormField(container, ctx, {
+        cardinality: 'Multiple',
+        name: props.name || props.targetInputName
+    });
+
     const initialItems: OrderListItem<T>[] = props.value ? [...props.value] : (props.items ? [...props.items] : []);
     let itemsList: OrderListItem<T>[] = [...initialItems];
 
@@ -423,6 +430,7 @@ export default function OrderListIsland<T = any>(container: HTMLElement, props: 
             </div>
         ` : '';
 
+        formField.detach();
         setHtml(container, html`
             <div class="p-orderlist p-component">
                 <!-- Reorder Action Buttons (Left) -->
@@ -454,6 +462,7 @@ export default function OrderListIsland<T = any>(container: HTMLElement, props: 
                 </div>
             </div>
         `);
+        formField.reattach();
 
         bindPermanentEvents();
         updateListStructure();
@@ -845,16 +854,8 @@ export default function OrderListIsland<T = any>(container: HTMLElement, props: 
     }
 
     function syncValues(action = 'change') {
-        if (props.targetInputName) {
-            let hidden = container.querySelector<HTMLInputElement>(`input[name="${props.targetInputName}"]`);
-            if (!hidden) {
-                hidden = document.createElement('input');
-                hidden.type = 'hidden';
-                hidden.name = props.targetInputName;
-                container.appendChild(hidden);
-            }
-            hidden.value = JSON.stringify(itemsList.map((it, idx) => getItemId(it, idx)));
-        }
+        const values = itemsList.map((it, idx) => String(getItemId(it, idx)));
+        formField.setValue(values);
 
         emitComponentEvent(container, 'orderlist', 'change', {
             value: itemsList,
