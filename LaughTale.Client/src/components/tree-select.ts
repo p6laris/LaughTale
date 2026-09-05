@@ -14,6 +14,7 @@ import { useClickOutside } from '../composables/useClickOutside';
 import { useFloatingPosition } from '../composables/useFloatingPosition';
 import { useControllableState } from '../composables/useControllableState';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import { useFormField } from '../composables/useFormField';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -539,6 +540,11 @@ const xSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" vie
 export default function TreeSelectIsland(container: HTMLElement, props: TreeSelectProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-treeselect', CSS);
 
+    const formField = useFormField(container, ctx, {
+        cardinality: 'Multiple',
+        name: props.name || props.targetInputName
+    });
+
     const rawNodes: TreeNodeItem[] = props.nodes || props.options || props.departments || [];
     const selectionMode = props.selectionMode || 'single';
     const displayMode = props.display || 'comma';
@@ -580,7 +586,7 @@ export default function TreeSelectIsland(container: HTMLElement, props: TreeSele
 
     // Initial selected keys set
     const selectedKeys = new Set<string>();
-    const initialVal = props.value ?? props.selectedValue;
+    const initialVal = props.value ?? props.selectedValue ?? formField.getValue();
 
     if (initialVal) {
         if (typeof initialVal === 'string') {
@@ -589,9 +595,9 @@ export default function TreeSelectIsland(container: HTMLElement, props: TreeSele
                 if (Array.isArray(parsed)) parsed.forEach(k => selectedKeys.add(String(k)));
                 else if (typeof parsed === 'object' && parsed !== null) {
                     Object.entries(parsed).forEach(([k, v]) => { if (v) selectedKeys.add(k); });
-                } else selectedKeys.add(initialVal);
+                } else if (initialVal !== '') selectedKeys.add(initialVal);
             } catch {
-                selectedKeys.add(initialVal);
+                if (initialVal !== '') selectedKeys.add(initialVal);
             }
         } else if (Array.isArray(initialVal)) {
             initialVal.forEach(k => selectedKeys.add(String(k)));
@@ -655,6 +661,7 @@ export default function TreeSelectIsland(container: HTMLElement, props: TreeSele
         ].filter(Boolean).join(' ');
 
         container.className = rootClasses;
+        formField.detach();
         setHtml(container, html`
             <div class="p-treeselect-label-container" data-part="root" tabindex="${isDisabled ? '-1' : '0'}" role="combobox" aria-haspopup="tree" aria-expanded="false" aria-controls="${props.inputId || 'treeselect'}_overlay">
                 <div class="p-treeselect-label"></div>
@@ -679,13 +686,13 @@ export default function TreeSelectIsland(container: HTMLElement, props: TreeSele
                 <ul class="p-treeselect-tree" role="tree"></ul>
                 ${props.footer ? html`<div class="p-treeselect-footer">${props.footer}</div>` : ''}
             </div>
-
-            <input type="hidden"${attr('name', props.name || props.targetInputName)} value="" />
         `);
+        formField.reattach();
 
         updateTriggerDisplay();
         renderTreeList();
         bindEvents();
+        formField.setValue(Array.from(selectedKeys));
     }
 
     function getSelectedLabels(): { key: string; label: string }[] {
@@ -700,8 +707,6 @@ export default function TreeSelectIsland(container: HTMLElement, props: TreeSele
     function updateTriggerDisplay() {
         const labelEl = container.querySelector<HTMLElement>('.p-treeselect-label')!;
         const clearBtn = container.querySelector<HTMLElement>('.p-treeselect-clear-icon')!;
-        const inputName = props.name || props.targetInputName;
-        const hiddenInp = inputName ? container.querySelector<HTMLInputElement>(`input[name="${inputName}"]`) : container.querySelector<HTMLInputElement>('input[type="hidden"]');
 
         const selected = getSelectedLabels();
 
@@ -709,7 +714,6 @@ export default function TreeSelectIsland(container: HTMLElement, props: TreeSele
             labelEl.className = 'p-treeselect-label p-placeholder'; container.setAttribute('data-part', 'root');
             labelEl.textContent = placeholder;
             clearBtn.style.display = 'none';
-            if (hiddenInp) hiddenInp.value = '';
         } else {
             labelEl.className = 'p-treeselect-label';
             if (isShowClear && !isDisabled) clearBtn.style.display = 'inline-flex';
@@ -732,14 +736,6 @@ export default function TreeSelectIsland(container: HTMLElement, props: TreeSele
                 });
             } else {
                 labelEl.textContent = selected.map(s => s.label).join(', ');
-            }
-
-            if (hiddenInp) {
-                if (selectionMode === 'single') {
-                    hiddenInp.value = selected[0]?.key || '';
-                } else {
-                    hiddenInp.value = JSON.stringify(Array.from(selectedKeys));
-                }
             }
         }
     }
@@ -946,6 +942,8 @@ export default function TreeSelectIsland(container: HTMLElement, props: TreeSele
     function syncValue() {
         const selected = getSelectedLabels();
         const payload = selectionMode === 'single' ? (selected[0]?.key || null) : Array.from(selectedKeys);
+
+        formField.setValue(Array.from(selectedKeys));
 
         emitComponentEvent(container, 'tree-select', 'change', {
             value: payload,

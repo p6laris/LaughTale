@@ -14,6 +14,7 @@ import { useDebounce } from '../composables/useDebounce';
 import { useVirtualizer, type Virtualizer } from '../composables/useVirtualizer';
 import { setRovingTabindex } from '../accessibility/aria';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import { useFormField } from '../composables/useFormField';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -478,9 +479,14 @@ export default function ListboxIsland(container: HTMLElement, props: ListboxProp
 
     const rawOptions = normalizeOptions(props.options || []);
 
+    const formField = useFormField(container, ctx, {
+        cardinality: isMultiple ? 'Multiple' : 'Single',
+        name: props.name || props.targetInputName
+    });
+
     // Selected values set
     const selectedValues = new Set<string>();
-    const initialVal = props.value ?? props.selectedValue;
+    const initialVal = props.value ?? props.selectedValue ?? formField.getValue();
 
     if (initialVal !== undefined && initialVal !== null) {
         if (Array.isArray(initialVal)) {
@@ -489,9 +495,9 @@ export default function ListboxIsland(container: HTMLElement, props: ListboxProp
             try {
                 const parsed = JSON.parse(initialVal);
                 if (Array.isArray(parsed)) parsed.forEach(v => selectedValues.add(String(v)));
-                else selectedValues.add(initialVal);
+                else if (initialVal !== '') selectedValues.add(initialVal);
             } catch {
-                selectedValues.add(initialVal);
+                if (initialVal !== '') selectedValues.add(initialVal);
             }
         } else {
             selectedValues.add(String(initialVal));
@@ -545,6 +551,7 @@ export default function ListboxIsland(container: HTMLElement, props: ListboxProp
         container.setAttribute('aria-label', (props as any).ariaLabel || props.header || 'Listbox');
         if (props.inputId) container.id = props.inputId;
 
+        formField.detach();
         setHtml(container, html`
             ${props.header ? html`
                 <div class="p-listbox-header" data-part="root">
@@ -564,8 +571,8 @@ export default function ListboxIsland(container: HTMLElement, props: ListboxProp
             ${props.footer ? html`
                 <div class="p-listbox-footer">${props.footer}</div>
             ` : ''}
-            <input type="hidden"${attr('name', props.name || props.targetInputName)} value="" />
         `);
+        formField.reattach();
 
         renderOptions();
         bindEvents();
@@ -918,14 +925,10 @@ export default function ListboxIsland(container: HTMLElement, props: ListboxProp
     }
 
     function syncValue() {
-        const inputName = props.name || props.targetInputName;
-        const hiddenInp = inputName ? container.querySelector<HTMLInputElement>(`input[name="${inputName}"]`) : container.querySelector<HTMLInputElement>('input[type="hidden"]');
         const valArray = Array.from(selectedValues);
         const payload = isMultiple ? valArray : (valArray[0] || null);
 
-        if (hiddenInp) {
-            hiddenInp.value = isMultiple ? JSON.stringify(valArray) : (valArray[0] || '');
-        }
+        formField.setValue(valArray);
 
         emitComponentEvent(container, 'listbox', 'change', {
             value: payload,

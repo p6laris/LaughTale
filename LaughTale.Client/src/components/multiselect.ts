@@ -15,6 +15,7 @@ import { useFloatingPosition } from '../composables/useFloatingPosition';
 import { useTransition } from '../composables/animation/useTransition';
 import { useKeyboardNav } from '../composables/useKeyboardNav';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import { useFormField } from '../composables/useFormField';
 import { announce } from '../accessibility/announcer';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
@@ -80,10 +81,17 @@ html.dark .chip-item,
 
 export default function MultiSelectIsland<T = string>(container: HTMLElement, props: MultiSelectProps<T>, ctx?: IslandContext) {
     injectIslandStyle('multiselect', CSS);
+    const formField = useFormField(container, ctx, {
+        cardinality: 'Multiple',
+        name: (props as any).name || props.targetInputName
+    });
+
     const options: SelectButtonItem<T>[] = props.options || [];
-    let selected: Set<T> = new Set(props.selectedValues || []);
+    const initValues = props.selectedValues ?? formField.getValue();
+    let selected: Set<T> = new Set(Array.isArray(initValues) ? initValues : (initValues ? [initValues] : []));
     let filterQuery = '';
 
+    formField.detach();
     setHtml(container, html`
         <div class="laughtale-multiselect" data-part="root" style="position: relative; width: 100%; max-width: 320px; font-family: var(--p-font-family, inherit);">
             <!-- Trigger Button Container -->
@@ -114,6 +122,7 @@ export default function MultiSelectIsland<T = string>(container: HTMLElement, pr
             </div>
         </div>
     `);
+    formField.reattach();
 
     const trigger = container.querySelector<HTMLElement>('.multiselect-trigger')!;
     const labelContainer = container.querySelector<HTMLElement>('.multiselect-label-container')!;
@@ -326,16 +335,7 @@ export default function MultiSelectIsland<T = string>(container: HTMLElement, pr
     }, { signal: ctx?.signal });
 
     function syncValue() {
-        if (props.targetInputName) {
-            let hidden = container.querySelector<HTMLInputElement>(`input[name="${props.targetInputName}"]`);
-            if (!hidden) {
-                hidden = document.createElement('input');
-                hidden.type = 'hidden';
-                hidden.name = props.targetInputName;
-                container.appendChild(hidden);
-            }
-            hidden.value = JSON.stringify(Array.from(selected));
-        }
+        formField.setValue(Array.from(selected));
 
         emitComponentEvent(container, 'multiselect', 'change', {
             value: Array.from(selected)

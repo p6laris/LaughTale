@@ -10,6 +10,7 @@ import { injectIslandStyle } from '../runtime/styles';
 import { emitComponentEvent } from '../runtime/events';
 import { getLucideIcon } from '../icons/lucide';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import { useFormField } from '../composables/useFormField';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -212,13 +213,24 @@ html.dark .p-toggleswitch-label,
 export default function ToggleSwitchIsland(container: HTMLElement, props: ToggleSwitchProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-toggleswitch', CSS);
 
-    let isChecked = props.checked === true || String(props.checked) === 'true' || props.value === true || String(props.value) === 'true';
+    const formField = useFormField(container, ctx, {
+        cardinality: 'Boolean',
+        fieldKind: 'Native',
+        name: props.name || props.targetInputName
+    });
+
+    if (formField.field instanceof HTMLInputElement) {
+        formField.field.type = 'hidden';
+    }
+
+    let isChecked = props.checked !== undefined || props.value !== undefined
+        ? (props.checked === true || String(props.checked) === 'true' || props.value === true || String(props.value) === 'true')
+        : Boolean(formField.getValue());
     const isInvalid = props.invalid === true || String(props.invalid) === 'true';
     const isDisabled = props.disabled === true || String(props.disabled) === 'true';
     const checkedIcon = props.checkedIcon || props.icon;
     const uncheckedIcon = props.uncheckedIcon;
     const inputId = props.inputId || '';
-    const inputName = props.name || props.targetInputName || '';
 
     function render() {
         const rootClasses = [
@@ -236,13 +248,13 @@ export default function ToggleSwitchIsland(container: HTMLElement, props: Toggle
         const iconHtml = activeIcon ? html`<span class="p-toggleswitch-handle-icon" data-part="root">${unsafe(getLucideIcon(activeIcon, 10))}</span>` : '';
         const ariaLabelVal = props.ariaLabel || props.label || props.name || 'Toggle switch';
 
+        formField.detach();
         setHtml(container, html`
             <input 
                 type="checkbox" 
                 role="switch"
                 class="p-toggleswitch-input"
                 ${attr('id', inputId)}
-                ${attr('name', inputName)}
                 ${attr('checked', isChecked)}
                 ${attr('disabled', isDisabled)}
                 aria-checked="${isChecked ? 'true' : 'false'}"
@@ -257,6 +269,10 @@ export default function ToggleSwitchIsland(container: HTMLElement, props: Toggle
             </div>
             ${props.label ? html`<span class="p-toggleswitch-label">${props.label}</span>` : ''}
         `);
+        if (formField.field instanceof HTMLInputElement) {
+            formField.field.type = 'hidden';
+        }
+        formField.reattach();
 
         bindEvents();
     }
@@ -269,6 +285,7 @@ export default function ToggleSwitchIsland(container: HTMLElement, props: Toggle
     }
 
     function syncValue() {
+        formField.setValue(isChecked);
         emitComponentEvent(container, 'toggle-switch', 'change', {
             checked: isChecked,
             value: isChecked
@@ -299,4 +316,5 @@ export default function ToggleSwitchIsland(container: HTMLElement, props: Toggle
     }
 
     render();
+    formField.setValue(isChecked);
 }

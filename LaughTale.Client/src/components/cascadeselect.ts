@@ -13,6 +13,7 @@ import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts
 import type { IslandContext } from '../runtime/registry';
 import { useFloatingPosition } from '../composables/useFloatingPosition';
 import { html, setHtml, url, unsafe, attr, type Raw } from '../runtime/html';
+import { useFormField } from '../composables/useFormField';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -36,6 +37,7 @@ export interface CascadeSelectNode<T = string> {
 }
 
 export interface CascadeSelectProps<T = string> {
+    name?: string;
     options?: CascadeSelectNode<T>[];
     placeholder?: string;
     targetInputName?: string;
@@ -283,7 +285,15 @@ export default function CascadeSelectIsland<T = string>(container: HTMLElement, 
     const variant = props.variant || 'outlined';
     const showClear = props.showClear === true;
 
-    let selectedValue: T | string | null = props.value || null;
+    const formField = useFormField(container, ctx, {
+        cardinality: 'Single',
+        name: props.name || props.targetInputName
+    });
+
+    let selectedValue: T | string | null = props.value ?? formField.getValue() ?? null;
+    if (selectedValue === '') {
+        selectedValue = null;
+    }
     let selectedLabelText = '';
 
     function getNodeLabel(n: CascadeSelectNode<T>): string {
@@ -316,6 +326,7 @@ export default function CascadeSelectIsland<T = string>(container: HTMLElement, 
         selectedLabelText = findNodeByValue(options, selectedValue) || String(selectedValue);
     }
 
+    formField.detach();
     setHtml(container, html`
         <div class="laughtale-cascadeselect ${props.fluid ? 'fluid' : ''}" data-part="root">
             <!-- Trigger -->
@@ -354,6 +365,11 @@ export default function CascadeSelectIsland<T = string>(container: HTMLElement, 
             </div>
         </div>
     `);
+    formField.reattach();
+
+    if (selectedValue !== null && selectedValue !== undefined) {
+        formField.setValue(String(selectedValue));
+    }
 
     const trigger = container.querySelector<HTMLElement>('.cs-trigger')!;
     const label = container.querySelector<HTMLElement>('.cs-label')!;
@@ -514,16 +530,7 @@ export default function CascadeSelectIsland<T = string>(container: HTMLElement, 
     }, { signal: ctx?.signal });
 
     function syncValue(path: string[]) {
-        if (props.targetInputName) {
-            let hidden = container.querySelector<HTMLInputElement>(`input[name="${props.targetInputName}"]`);
-            if (!hidden) {
-                hidden = document.createElement('input');
-                hidden.type = 'hidden';
-                hidden.name = props.targetInputName;
-                container.appendChild(hidden);
-            }
-            hidden.value = selectedValue !== null ? String(selectedValue) : '';
-        }
+        formField.setValue(selectedValue !== null && selectedValue !== undefined ? String(selectedValue) : '');
 
         emitComponentEvent(container, 'cascadeselect', 'change', {
             value: selectedValue,

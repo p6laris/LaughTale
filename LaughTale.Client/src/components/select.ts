@@ -14,6 +14,7 @@ import type { IslandContext } from '../runtime/registry';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import { useVirtualizer, type Virtualizer } from '../composables/useVirtualizer';
 import { useFloatingPosition } from '../composables/useFloatingPosition';
+import { useFormField } from '../composables/useFormField';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -581,15 +582,20 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
 
     const flatOptions = getFlattenedOptions(allOptions);
 
+    const formField = useFormField(container, ctx, {
+        cardinality: isMultiple ? 'Multiple' : 'Single',
+        name: props.name || props.targetInputName
+    });
+
     // Initial selected values
     let selectedValues: any[] = [];
-    const initVal = props.value ?? props.selectedValue;
+    const initVal = props.value ?? props.selectedValue ?? formField.getValue();
     if (initVal !== undefined && initVal !== null) {
         if (Array.isArray(initVal)) {
             selectedValues = [...initVal];
         } else if (typeof initVal === 'string' && initVal.includes(',') && isMultiple) {
             selectedValues = initVal.split(',').map(s => s.trim());
-        } else {
+        } else if (initVal !== '') {
             selectedValues = [initVal];
         }
     }
@@ -823,6 +829,7 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
         const panelPart = resolvePart('panel', `p-select-overlay ${isOpen ? 'is-visible' : ''}`, props.pt, props.studioOverrides);
         const listPart = resolvePart('list', 'p-select-list', props.pt, props.studioOverrides);
 
+        formField.detach();
         setHtml(container, html`
             <div class="${triggerPart.className}" style="${triggerPart.style}" data-part="trigger">
                 ${renderTriggerLabel()}
@@ -850,8 +857,8 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
                     ${renderListItems()}
                 </ul>
             </div>
-            <input type="hidden"${attr('name', props.name || props.targetInputName)} value="${selectedValues.join(',')}" />
         `);
+        formField.reattach();
 
         updateVirtualPositions();
         bindEvents();
@@ -1040,8 +1047,7 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
 
     function syncValue() {
         const payload = isMultiple ? selectedValues : (selectedValues[0] ?? null);
-        const hiddenInp = container.querySelector<HTMLInputElement>('input[type="hidden"]');
-        if (hiddenInp) hiddenInp.value = selectedValues.join(',');
+        formField.setValue(selectedValues);
 
         emitComponentEvent(container, 'select', 'change', {
             value: payload,
@@ -1059,4 +1065,5 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
     }
 
     render();
+    formField.setValue(selectedValues);
 }

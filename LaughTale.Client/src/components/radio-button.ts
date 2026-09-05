@@ -4,6 +4,7 @@ import { injectIslandStyle } from '../runtime/styles';
 import { emitComponentEvent } from '../runtime/events';
 import { getLucideIcon } from '../icons/lucide';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import { useFormField } from '../composables/useFormField';
 import { setRovingTabindex, handleRovingKeydown } from '../accessibility/aria';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
@@ -359,6 +360,11 @@ export default function RadioButtonIsland(container: HTMLElement, props: RadioBu
     const isDisabled = props.disabled === true || String(props.disabled) === 'true';
     const isReadonly = props.readonly === true || String(props.readonly) === 'true';
 
+    const formField = useFormField(container, ctx, {
+        cardinality: 'Boolean',
+        name: props.targetInputName || props.name
+    });
+
     // Group mode
     if (props.options && props.options.length > 0) {
         renderGroup();
@@ -380,6 +386,7 @@ export default function RadioButtonIsland(container: HTMLElement, props: RadioBu
             isDisabled ? 'is-disabled' : ''
         ].filter(Boolean).join(' ');
 
+        formField.detach();
         if (isCard) {
             setHtml(container, html`
                 <label class="${rootClasses}" data-part="root">
@@ -413,7 +420,6 @@ export default function RadioButtonIsland(container: HTMLElement, props: RadioBu
                         </div>
                     </div>
                 </label>
-                <input type="hidden" name="${props.targetInputName || ''}" value="${isChecked ? props.value : ''}" />
             `);
         } else {
             setHtml(container, html`
@@ -435,18 +441,18 @@ export default function RadioButtonIsland(container: HTMLElement, props: RadioBu
                     </div>
                     ${props.label ? html`<span class="p-radiobutton-label">${props.label}</span>` : ''}
                 </label>
-                <input type="hidden" name="${props.targetInputName || ''}" value="${isChecked ? props.value : ''}" />
             `);
         }
+        formField.reattach();
 
         bindSingleEvents();
+        formField.setValue(isChecked ? (props.value || 'true') : false);
     }
 
     function updateVisuals(checked: boolean) {
         isChecked = checked;
         const labelWrap = container.querySelector<HTMLElement>('.p-radiobutton-root');
         const rbBox = container.querySelector<HTMLElement>('.p-radiobutton');
-        const hiddenInp = container.querySelector<HTMLInputElement>('input[type="hidden"]');
 
         if (labelWrap) {
             if (isChecked) labelWrap.classList.add('is-checked');
@@ -456,9 +462,7 @@ export default function RadioButtonIsland(container: HTMLElement, props: RadioBu
             if (isChecked) rbBox.classList.add('p-radiobutton-checked');
             else rbBox.classList.remove('p-radiobutton-checked');
         }
-        if (hiddenInp && props.targetInputName) {
-            hiddenInp.value = isChecked ? props.value : '';
-        }
+        formField.setValue(isChecked ? (props.value || 'true') : false);
     }
 
     function bindSingleEvents() {
@@ -580,13 +584,14 @@ export default function RadioButtonIsland(container: HTMLElement, props: RadioBu
             }
         });
 
+        formField.detach();
         setHtml(container, html`
             ${itemsHtml}
-            <input type="hidden" name="${props.targetInputName || props.name}" value="${currentSelected}" />
         `);
+        formField.reattach();
+        formField.setValue(currentSelected);
 
         const inputs = container.querySelectorAll<HTMLInputElement>('.p-radiobutton-input');
-        const hiddenInp = container.querySelector<HTMLInputElement>('input[type="hidden"]')!;
 
         const optionEls = Array.from(container.querySelectorAll<HTMLElement>('.p-radiobutton-root'));
         let activeIndex = rawOpts.findIndex(opt => String(opt.value) === String(currentSelected));
@@ -614,7 +619,7 @@ export default function RadioButtonIsland(container: HTMLElement, props: RadioBu
                 }
             });
 
-            if (hiddenInp) hiddenInp.value = String(currentSelected);
+            formField.setValue(currentSelected);
             emitComponentEvent(container, 'radio-button', 'change', {
                 value: currentSelected
             });

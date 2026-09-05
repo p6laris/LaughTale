@@ -11,6 +11,7 @@ import { injectIslandStyle } from '../runtime/styles';
 import { emitComponentEvent } from '../runtime/events';
 import { getLucideIcon } from '../icons/lucide';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import { useFormField } from '../composables/useFormField';
 import { setRovingTabindex, handleRovingKeydown } from '../accessibility/aria';
 import { useKeyboardNav } from '../composables/useKeyboardNav';
 import type { PatternDeclaration } from '../accessibility/patterns';
@@ -235,6 +236,11 @@ export default function SelectButtonIsland(container: HTMLElement, props: Select
     const isDisabled = props.disabled === true || String(props.disabled) === 'true';
     const size = props.size || 'normal';
 
+    const formField = useFormField(container, ctx, {
+        cardinality: isMultiple ? 'Multiple' : 'Single',
+        name: props.name || props.targetInputName
+    });
+
     const rawOptions = props.options || props.items || [];
     const normalizedOptions: SelectButtonOption[] = rawOptions.map(opt => {
         if (typeof opt === 'string') {
@@ -248,13 +254,13 @@ export default function SelectButtonIsland(container: HTMLElement, props: Select
     });
 
     let selectedValues: any[] = [];
-    const initVal = props.value ?? props.selectedValue ?? props.values;
+    const initVal = props.value ?? props.selectedValue ?? props.values ?? formField.getValue();
     if (initVal !== undefined && initVal !== null) {
         if (Array.isArray(initVal)) {
             selectedValues = [...initVal];
         } else if (typeof initVal === 'string' && initVal.includes(',') && isMultiple) {
             selectedValues = initVal.split(',').map(s => s.trim());
-        } else {
+        } else if (initVal !== '') {
             selectedValues = [initVal];
         }
     }
@@ -308,10 +314,11 @@ export default function SelectButtonIsland(container: HTMLElement, props: Select
             `;
         });
 
+        formField.detach();
         setHtml(container, html`
             ${buttonsHtml}
-            <input type="hidden"${attr('name', props.name || props.targetInputName)} value="${selectedValues.join(',')}" />
         `);
+        formField.reattach();
 
         bindEvents();
     }
@@ -372,11 +379,11 @@ export default function SelectButtonIsland(container: HTMLElement, props: Select
 
     function syncValue() {
         const payload = isMultiple ? selectedValues : (selectedValues[0] ?? null);
-        const hiddenInp = container.querySelector<HTMLInputElement>('input[type="hidden"]');
-        if (hiddenInp) hiddenInp.value = selectedValues.join(',');
+        formField.setValue(selectedValues);
 
         emitComponentEvent(container, 'select-button', 'change', { value: payload });
     }
 
     render();
+    formField.setValue(selectedValues);
 }

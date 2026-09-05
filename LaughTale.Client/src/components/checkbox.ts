@@ -4,6 +4,7 @@ import { injectIslandStyle } from '../runtime/styles';
 import { emitComponentEvent } from '../runtime/events';
 import { LucideIcons } from '../icons/lucide';
 import { html, setHtml, attr, unsafe } from '../runtime/html';
+import { useFormField } from '../composables/useFormField';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -216,8 +217,13 @@ html.dark .laughtale-checkbox-label,
 
 export default function CheckboxIsland(container: HTMLElement, props: CheckboxProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-checkbox', CSS);
+
+    const formField = useFormField(container, ctx, {
+        cardinality: 'Boolean',
+        name: props.targetInputName || props.name
+    });
     
-    let isChecked = Boolean(props.checked);
+    let isChecked = props.checked !== undefined ? Boolean(props.checked) : Boolean(formField.getValue());
     let isIndeterminate = Boolean(props.indeterminate);
     const size = props.size || 'normal';
     const variant = props.variant || 'outlined';
@@ -228,6 +234,7 @@ export default function CheckboxIsland(container: HTMLElement, props: CheckboxPr
         const iconSvgStr = isIndeterminate ? LucideIcons.minus : LucideIcons.check;
         const iconSvg = unsafe(iconSvgStr) /* static check/minus icon */;
 
+        formField.detach();
         setHtml(container, html`
             <label class="laughtale-checkbox-wrap size-${size} variant-${variant} ${stateClass} ${props.disabled ? 'disabled' : ''} ${props.invalid ? 'invalid' : ''}" data-part="root" 
                    for="${inputId}">
@@ -246,6 +253,7 @@ export default function CheckboxIsland(container: HTMLElement, props: CheckboxPr
                 ${props.label ? html`<span class="laughtale-checkbox-label">${props.label}</span>` : ''}
             </label>
         `);
+        formField.reattach();
 
         bindEvents();
         syncValue();
@@ -280,17 +288,7 @@ export default function CheckboxIsland(container: HTMLElement, props: CheckboxPr
     }
 
     function syncValue() {
-        const targetName = props.targetInputName || props.name;
-        if (targetName) {
-            let hidden = container.querySelector<HTMLInputElement>(`input[type="hidden"][name="${targetName}"]`);
-            if (!hidden) {
-                hidden = document.createElement('input');
-                hidden.type = 'hidden';
-                hidden.name = targetName;
-                container.appendChild(hidden);
-            }
-            hidden.value = isChecked ? (props.value || 'true') : 'false';
-        }
+        formField.setValue(isChecked);
     }
 
     render();

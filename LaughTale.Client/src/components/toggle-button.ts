@@ -10,6 +10,7 @@ import { injectIslandStyle } from '../runtime/styles';
 import { emitComponentEvent } from '../runtime/events';
 import { getLucideIcon } from '../icons/lucide';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import { useFormField } from '../composables/useFormField';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -192,7 +193,14 @@ html.dark .p-togglebutton.p-disabled,
 export default function ToggleButtonIsland(container: HTMLElement, props: ToggleButtonProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-togglebutton', CSS);
 
-    let isChecked = props.checked === true || String(props.checked) === 'true' || props.value === true || String(props.value) === 'true';
+    const formField = useFormField(container, ctx, {
+        cardinality: 'Boolean',
+        name: props.name || props.targetInputName
+    });
+
+    let isChecked = props.checked !== undefined || props.value !== undefined
+        ? (props.checked === true || String(props.checked) === 'true' || props.value === true || String(props.value) === 'true')
+        : Boolean(formField.getValue());
     const isFluid = props.fluid === true || String(props.fluid) === 'true';
     const isInvalid = props.invalid === true || String(props.invalid) === 'true';
     const isDisabled = props.disabled === true || String(props.disabled) === 'true';
@@ -229,11 +237,12 @@ export default function ToggleButtonIsland(container: HTMLElement, props: Toggle
         const iconHtml = currentIconName ? html`<span class="p-togglebutton-icon" data-part="root">${unsafe(getLucideIcon(currentIconName, iconSize))}</span>` : '';
         const labelHtml = currentLabel ? html`<span class="p-togglebutton-label">${currentLabel}</span>` : '';
 
+        formField.detach();
         setHtml(container, html`
             ${iconHtml}
             ${labelHtml}
-            <input type="hidden"${attr('name', props.name || props.targetInputName)} value="${isChecked ? 'true' : 'false'}" />
         `);
+        formField.reattach();
 
         bindEvents();
     }
@@ -246,8 +255,7 @@ export default function ToggleButtonIsland(container: HTMLElement, props: Toggle
     }
 
     function syncValue() {
-        const hiddenInp = container.querySelector<HTMLInputElement>('input[type="hidden"]');
-        if (hiddenInp) hiddenInp.value = isChecked ? 'true' : 'false';
+        formField.setValue(isChecked);
 
         emitComponentEvent(container, 'toggle-button', 'change', {
             checked: isChecked,
@@ -270,4 +278,5 @@ export default function ToggleButtonIsland(container: HTMLElement, props: Toggle
     }
 
     render();
+    formField.setValue(isChecked);
 }
