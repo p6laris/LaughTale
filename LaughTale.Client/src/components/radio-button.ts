@@ -372,7 +372,9 @@ export default function RadioButtonIsland(container: HTMLElement, props: RadioBu
     }
 
     // Single standalone radio button mode
-    let isChecked = Boolean(props.checked) || (props.selectedValue !== undefined && String(props.selectedValue) === String(props.value));
+    let isChecked = Boolean(props.checked) ||
+        (formField.field ? !formField.field.disabled : false) ||
+        (props.selectedValue !== undefined && String(props.selectedValue) === String(props.value));
 
     function renderSingle() {
         const rootClasses = [
@@ -407,7 +409,7 @@ export default function RadioButtonIsland(container: HTMLElement, props: RadioBu
                             <input 
                                 type="radio" 
                                 class="p-radiobutton-input"
-                                name="${props.name}"
+                                data-radio-name="${props.name || ''}"
                                 value="${props.value}"
                                 ${attr('checked', isChecked)}
                                 ${attr('disabled', isDisabled)}
@@ -428,7 +430,7 @@ export default function RadioButtonIsland(container: HTMLElement, props: RadioBu
                         <input 
                             type="radio" 
                             class="p-radiobutton-input"
-                            name="${props.name}"
+                            data-radio-name="${props.name || ''}"
                             value="${props.value}"
                             ${attr('checked', isChecked)}
                             ${attr('disabled', isDisabled)}
@@ -485,18 +487,18 @@ export default function RadioButtonIsland(container: HTMLElement, props: RadioBu
     }
 
     function syncOthers() {
+        if (!props.name) return;
         // Find all other standalone radio buttons with the same name in the document
-        document.querySelectorAll<HTMLInputElement>(`input[type="radio"][name="${props.name}"]`).forEach(other => {
+        document.querySelectorAll<HTMLInputElement>(`input.p-radiobutton-input[data-radio-name="${props.name}"]`).forEach(other => {
             if (other !== container.querySelector('.p-radiobutton-input')) {
+                other.checked = false;
                 const parentRoot = other.closest('.p-radiobutton-root');
                 const parentBox = other.closest('.p-radiobutton');
                 if (parentRoot) {
-                    if (other.checked) parentRoot.classList.add('is-checked');
-                    else parentRoot.classList.remove('is-checked');
+                    parentRoot.classList.remove('is-checked');
                 }
                 if (parentBox) {
-                    if (other.checked) parentBox.classList.add('p-radiobutton-checked');
-                    else parentBox.classList.remove('p-radiobutton-checked');
+                    parentBox.classList.remove('p-radiobutton-checked');
                 }
             }
         });

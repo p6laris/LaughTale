@@ -155,7 +155,7 @@ export function useFormField(
 
     function setValue(val: any) {
         if (cardinality === 'Boolean') {
-            const isChecked = val === true || val === 'true' || val === 1 || val === '1';
+            const isChecked = val === true || val === 'true' || val === 1 || val === '1' || (typeof val === 'string' && val.length > 0 && val !== 'false');
             if (field instanceof HTMLInputElement && field.type === 'checkbox') {
                 field.checked = isChecked;
                 field.disabled = false;

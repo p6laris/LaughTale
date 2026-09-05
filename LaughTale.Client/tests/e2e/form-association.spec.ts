@@ -172,4 +172,88 @@ test.describe('Native Form Association: hydration & idempotence (US2)', () => {
     });
 });
 
+test.describe('Native Form Association: interactive & submitted parity (US3)', () => {
+    test('parity: no-script and hydrated form submission produce identical FormData (FR-014)', async ({ browser }) => {
+        // 1. Submit with no JavaScript
+        const noJsContext = await browser.newContext({ javaScriptEnabled: false });
+        const noJsPage = await noJsContext.newPage();
+        await noJsPage.goto('/form-conformance');
+        const [noJsReq] = await Promise.all([
+            noJsPage.waitForRequest(req => req.method() === 'POST' && req.url().includes('/form-conformance')),
+            noJsPage.click('#submit-btn'),
+        ]);
+        const noJsData = new URLSearchParams(noJsReq.postData() || '');
+        await noJsContext.close();
+
+        // 2. Submit with JavaScript enabled (hydrated)
+        const jsContext = await browser.newContext({ javaScriptEnabled: true });
+        const jsPage = await jsContext.newPage();
+        await jsPage.goto('/form-conformance');
+        await jsPage.waitForFunction(() => (window as any).LaughTale !== undefined);
+        const [jsReq] = await Promise.all([
+            jsPage.waitForRequest(req => req.method() === 'POST' && req.url().includes('/form-conformance')),
+            jsPage.click('#submit-btn'),
+        ]);
+        const jsData = new URLSearchParams(jsReq.postData() || '');
+        await jsContext.close();
+
+        // 3. Diff the two sets of parameters key-for-key and value-for-value
+        const allKeys = Array.from(new Set([...noJsData.keys(), ...jsData.keys()])).filter(k => k !== '__RequestVerificationToken');
+        expect(allKeys.length).toBeGreaterThanOrEqual(29);
+
+        for (const key of allKeys) {
+            const noJsValues = noJsData.getAll(key).sort();
+            const jsValues = jsData.getAll(key).sort();
+            expect(jsValues, `Field '${key}' mismatch between no-JS and hydrated`).toEqual(noJsValues);
+        }
+    });
+
+    test('reset: form reset restores controls to server-rendered values in submitted data and DOM (FR-015)', async ({ page }) => {
+        await page.goto('/form-conformance');
+        await page.waitForFunction(() => (window as any).LaughTale !== undefined);
+
+        const form = page.locator('#conformance-form');
+        await expect(form).toBeVisible();
+
+        // 1. Mutate a text control
+        const textInput = page.locator('#ctrl-input-text input.p-inputtext');
+        await textInput.fill('Mutated Input Text');
+        await expect(textInput).toHaveValue('Mutated Input Text');
+
+        // 2. Mutate an inplace control
+        const inplaceDisplay = page.locator('#ctrl-inplace .p-inplace-display');
+        await inplaceDisplay.click();
+        const inplaceInput = page.locator('#ctrl-inplace .p-inplace-input');
+        await inplaceInput.fill('Mutated Inplace Text');
+        await page.click('#ctrl-inplace .p-inplace-save-btn');
+
+        // 3. Verify mutated values in hidden fields
+        const textHidden = page.locator('#ctrl-input-text input[name="InputText"]');
+        await expect(textHidden).toHaveValue('Mutated Input Text');
+
+        const inplaceHidden = page.locator('#ctrl-inplace input[name="Inplace"]');
+        await expect(inplaceHidden).toHaveValue('Mutated Inplace Text');
+
+        // 4. Trigger native form reset
+        await page.evaluate(() => {
+            const f = document.querySelector<HTMLFormElement>('#conformance-form');
+            f?.reset();
+        });
+
+        // 5. Assert fields in DOM restored to server-rendered initial values
+        await expect(textHidden).toHaveValue('LaughTale Conformance Text');
+        await expect(inplaceHidden).toHaveValue('Inplace Text Value');
+
+        // 6. Submit form and verify submitted payload matches initial values
+        const [postRequest] = await Promise.all([
+            page.waitForRequest(req => req.method() === 'POST' && req.url().includes('/form-conformance')),
+            page.click('#submit-btn'),
+        ]);
+
+        const postData = new URLSearchParams(postRequest.postData() || '');
+        expect(postData.get('InputText')).toBe('LaughTale Conformance Text');
+        expect(postData.get('Inplace')).toBe('Inplace Text Value');
+    });
+});
+
 

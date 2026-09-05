@@ -365,8 +365,9 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
         name: props.name || props.targetInputName
     });
 
+    const fieldTarget = formField.getValue();
     const initialSource = props.value ? props.value[0] : (props.source || []);
-    const initialTarget = props.value ? props.value[1] : (props.target || []);
+    const initialTarget = props.value ? props.value[1] : (props.target || (Array.isArray(fieldTarget) && fieldTarget.length > 0 ? fieldTarget : []));
 
     let sourceList: PickListItem<T>[] = [...initialSource];
     let targetList: PickListItem<T>[] = [...initialTarget];
@@ -389,6 +390,7 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
     let targetFilterQuery = '';
 
     function getItemId(item: PickListItem<T>): string {
+        if (typeof item === 'string' || typeof item === 'number') return String(item);
         return String((item as any)[dataKey] || item.id || item.name);
     }
 

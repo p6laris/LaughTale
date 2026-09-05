@@ -422,7 +422,7 @@ export default function InputPasswordIsland(container: HTMLElement, props: Input
     });
 
     let isMasked = true;
-    let currentVal = props.value || '';
+    let currentVal = formField.field ? formField.getValue() : (props.value || '');
     const minLength = Number(props.minLength) || 8;
     const isFilled = props.variant === 'filled';
     const isFluid = props.fluid === true || String(props.fluid) === 'true';

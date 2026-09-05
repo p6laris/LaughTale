@@ -175,15 +175,15 @@ scripting disabled, once hydrated — and diff the two `FormData` sets.
 
 ### Tests for User Story 3
 
-- [ ] T029 [P] [US3] Add the parity case to `LaughTale.Client/tests/e2e/form-association.spec.ts`: the two `FormData` sets are identical key-for-key and value-for-value — must fail before T030
-- [ ] T030 [P] [US3] Add the form-reset case to `LaughTale.Client/tests/e2e/form-association.spec.ts`: reset restores every control to its server-rendered value in both the submitted data and the visible state (FR-015)
+- [x] T029 [P] [US3] Add the parity case to `LaughTale.Client/tests/e2e/form-association.spec.ts`: the two `FormData` sets are identical key-for-key and value-for-value — must fail before T030
+- [x] T030 [P] [US3] Add the form-reset case to `LaughTale.Client/tests/e2e/form-association.spec.ts`: reset restores every control to its server-rendered value in both the submitted data and the visible state (FR-015)
 
 ### Implementation for User Story 3
 
-- [ ] T031 [US3] Replace comma-joining with repeated fields in the four components that join today — `select`, `select-button`, `slider`, `datepicker` in `LaughTale.Client/src/components/` — per contract C2 `Multiple`; a joined string does not bind to a `List<T>` in ASP.NET Core model binding
-- [ ] T032 [US3] Unify the three incompatible boolean representations onto the checked/unchecked companion pattern from contract C2 `Boolean`, in `checkbox`, `radio-button` and `toggle-button` in `LaughTale.Client/src/components/`
-- [ ] T033 [US3] Route every remaining direct `field.value` assignment in the 29 components through the `useFormField` setter, so serialization has exactly one implementation (FR-012)
-- [ ] T034 [US3] Add the multi-value and boolean serialization cases to `LaughTale.Tests/TagHelpers/FormControlEmissionTests.cs` so the server side is asserted against the same contract as the client
+- [x] T031 [US3] Replace comma-joining with repeated fields in the four components that join today — `select`, `select-button`, `slider`, `datepicker` in `LaughTale.Client/src/components/` — per contract C2 `Multiple`; a joined string does not bind to a `List<T>` in ASP.NET Core model binding
+- [x] T032 [US3] Unify the three incompatible boolean representations onto the checked/unchecked companion pattern from contract C2 `Boolean`, in `checkbox`, `radio-button` and `toggle-button` in `LaughTale.Client/src/components/`
+- [x] T033 [US3] Route every remaining direct `field.value` assignment in the 29 components through the `useFormField` setter, so serialization has exactly one implementation (FR-012)
+- [x] T034 [US3] Add the multi-value and boolean serialization cases to `LaughTale.Tests/TagHelpers/FormControlEmissionTests.cs` so the server side is asserted against the same contract as the client
 
 **Checkpoint**: all three in-scope stories are complete and independently verified.
 

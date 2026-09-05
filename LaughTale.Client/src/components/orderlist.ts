@@ -359,7 +359,8 @@ export default function OrderListIsland<T = any>(container: HTMLElement, props: 
         name: props.name || props.targetInputName
     });
 
-    const initialItems: OrderListItem<T>[] = props.value ? [...props.value] : (props.items ? [...props.items] : []);
+    const fieldVal = formField.getValue();
+    const initialItems: OrderListItem<T>[] = props.value ? [...props.value] : (props.items ? [...props.items] : (Array.isArray(fieldVal) && fieldVal.length > 0 ? [...fieldVal] : []));
     let itemsList: OrderListItem<T>[] = [...initialItems];
 
     const dataKey = props.dataKey || 'id';
@@ -374,11 +375,17 @@ export default function OrderListIsland<T = any>(container: HTMLElement, props: 
     let filterQuery = '';
 
     function getItemId(item: OrderListItem<T>, fallbackIndex: number): string {
+        if (typeof item === 'string' || typeof item === 'number') {
+            return String(item);
+        }
         const keyVal = (item as any)[dataKey] || item.id || item.title || item.name;
         return keyVal != null ? String(keyVal) : String(fallbackIndex);
     }
 
     function getItemTitle(item: OrderListItem<T>): string {
+        if (typeof item === 'string' || typeof item === 'number') {
+            return String(item);
+        }
         return item.title || item.name || '';
     }
 
