@@ -50,6 +50,13 @@ export function createReactIsland<TProps = any>(
                     }
                 };
 
+                // In-place update: re-render the same root instead of unmount+remount on
+                // server-driven refresh. This is React's own designed re-render path, so its
+                // reconciler diffs against the DOM it actually owns (see refresh.ts).
+                const update = (newProps: any) => {
+                    root.render(createElement(Component, newProps));
+                };
+
                 if (ctx?.signal) {
                     ctx.signal.addEventListener('abort', unmount, { once: true });
                 }
@@ -57,7 +64,7 @@ export function createReactIsland<TProps = any>(
                     ctx.onCleanup(unmount);
                 }
 
-                return unmount;
+                return { unmount, update };
             }
         } catch {
             console.warn('[LaughTale] React / ReactDOM package not found in client environment. Falling back to direct execution.');

@@ -28,13 +28,19 @@ export function createVueIsland<TProps = any>(
             const createApp = Vue.createApp || Vue.default?.createApp;
             const createSSRApp = Vue.createSSRApp || Vue.default?.createSSRApp;
             const h = Vue.h || Vue.default?.h;
+            const shallowRef = Vue.shallowRef || Vue.default?.shallowRef;
 
-            if ((createApp || createSSRApp) && h) {
+            if ((createApp || createSSRApp) && h && shallowRef) {
+                // Props live in a shallowRef read inside render() so a later full reassignment
+                // (see `update` below) re-triggers this same app instance's render - no new
+                // app/root is created, and Vue's own patch algorithm updates the mounted
+                // component in place.
+                const propsRef = shallowRef(props);
                 const appFactory = (options.hydrate && createSSRApp && container.hasChildNodes()) ? createSSRApp : createApp;
-                
+
                 const app = appFactory({
                     render() {
-                        return h(Component, props as any);
+                        return h(Component, propsRef.value as any);
                     }
                 });
 
@@ -48,6 +54,12 @@ export function createVueIsland<TProps = any>(
                     }
                 };
 
+                // In-place update: reassign the whole props object (not a per-field mutation)
+                // so removed/added keys are handled correctly, not just changed ones.
+                const update = (newProps: any) => {
+                    propsRef.value = newProps;
+                };
+
                 if (ctx?.signal) {
                     ctx.signal.addEventListener('abort', unmount, { once: true });
                 }
@@ -55,7 +67,7 @@ export function createVueIsland<TProps = any>(
                     ctx.onCleanup(unmount);
                 }
 
-                return unmount;
+                return { unmount, update };
             }
         } catch {
             console.warn('[LaughTale] Vue package not found in client environment. Falling back to direct execution.');

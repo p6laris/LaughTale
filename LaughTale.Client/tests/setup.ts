@@ -10,6 +10,11 @@ const win = new Window({
 
 (globalThis as any).window = win;
 (globalThis as any).document = win.document;
+(globalThis as any).Element = win.Element;
+(globalThis as any).SVGElement = win.SVGElement;
+(globalThis as any).Text = win.Text;
+(globalThis as any).Comment = win.Comment;
+(globalThis as any).DocumentFragment = win.DocumentFragment;
 (globalThis as any).HTMLElement = win.HTMLElement;
 (globalThis as any).HTMLInputElement = win.HTMLInputElement;
 (globalThis as any).HTMLSelectElement = win.HTMLSelectElement;

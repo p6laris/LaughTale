@@ -4,7 +4,8 @@
  * streaming SSR, tri-state lifecycle tracking ('idle' | 'pending' | 'mounted' | 'failed'), and explicit retry recovery.
  */
 
-import { getIslandDefinition, type IslandContext } from './registry';
+import { getIslandDefinition, normalizeMountResult, type IslandContext } from './registry';
+import { setIslandUpdateFn, clearIslandUpdateFn } from './island-instances';
 import { parseAndReviveProps } from './reviver';
 import { importWithRetry } from './retry';
 import { awaitStreamingReady } from './streaming';
@@ -203,7 +204,14 @@ async function executeHydration(container: HTMLElement, name: string): Promise<v
         ctx.dictionary = localeHelpers.dictionary;
 
         // 6. Mount island with context and register unmount hook
-        const unmount = await mount(container, props, ctx);
+        const mountResult = await mount(container, props, ctx);
+        const { unmount, update } = normalizeMountResult(mountResult);
+
+        // Track the adapter's in-place update fn (if any) so refresh.ts can push new props
+        // into this instance without a full unmount/remount. Internal plumbing only — not
+        // part of the public container.island handle below.
+        setIslandUpdateFn(container, update);
+
         const cleanup = () => {
             try {
                 abortController.abort();
@@ -225,6 +233,7 @@ async function executeHydration(container: HTMLElement, name: string): Promise<v
                 }
             }
 
+            clearIslandUpdateFn(container);
             delete (container as any).island;
         };
 

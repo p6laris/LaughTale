@@ -318,22 +318,98 @@ behaviour, and the fixes are sitting unused in `src/composables/`.
 
 ## 6. Part D — Adapters
 
-All five adapters are one-shot mount functions (324 lines total). They handle initial render and
-unmount and nothing in between, which produces a specific and serious bug.
+All five adapters *were* one-shot mount functions (324 lines total, confirmed by `wc -l`: 314
+across the five adapter files — `react.ts` 71, `vue.ts` 69, `preact.ts` 64, `svelte.ts` 94,
+`vanilla.ts` 16 — plus a 10-line barrel). They handled initial render and unmount and nothing in
+between, which produced a specific and serious bug.
 
-> **`island.refresh()` corrupts React islands.** `refresh.ts` morphs the container in place with
-> `morphElement()` — patching attributes and text on live nodes. React's reconciler assumes it alone
-> mutates that subtree. After a morph, the virtual DOM and the real DOM have silently diverged.
-> Your two flagship features are individually good and mutually incompatible, and nothing tests the
-> combination.
+> **`island.refresh()` corrupted React (and Vue, and Preact) islands — [CLOSED (mechanism) for
+> those three adapters, this pass; see below].** `refresh.ts` morphed the container in place with
+> `morphElement()` — patching attributes, then blindly replacing `innerHTML` for the whole
+> subtree — **before** ever telling the mounted framework instance to unmount. React's (or Vue's,
+> or Preact's) reconciler still held references into DOM that had already been ripped out from
+> under it by the time its own `unmount()` ran; that call then threw against already-mutated DOM,
+> silently, into every adapter's own `catch { /* ignore unmount errors on disposed DOM */ }`. This
+> happened on **every single refresh** of a framework-mounted island, not just some hydration
+> strategies — your two flagship features were individually good and mutually incompatible, and
+> nothing tested the combination until this pass.
 
 | Item | From | Effort |
 |---|---|---|
-| **Props updates without remount** — add `update(props)` to the adapter contract; refresh prefers it over morphing. *This is the fix for the corruption above, not a separate feature.* | Astro, Nuxt | M · 2–3 wks |
+| **Props updates without remount** — add `update(props)` to the adapter contract; refresh prefers it over morphing. *This is the fix for the corruption above, not a separate feature.* — **[CLOSED (mechanism), this pass]** for React/Vue/Preact; Svelte and vanilla deliberately excluded — see below | Astro, Nuxt | M · 2–3 wks |
 | **Nested islands** — the hydrator has no concept of an island inside an island | Astro | M · 2 wks |
 | **Context & shared store access** — extend `ctx` with the ambient state pool | Nuxt `useState` | S · 1 wk |
 | **Close adapter gaps** — `preact.ts` doesn't pass slots though React/Vue/Svelte do; `vanilla.ts` is 16 lines with no hydrate path. One contract, conformance test per adapter | parity | S · 1 wk |
 | **New adapters** — Web Components/Lit first (framework-agnostic, no runtime download), then Solid, Alpine, Angular (unglamorous, but what enterprise .NET shops run) | ecosystem | S each |
+
+**Props updates without remount — [CLOSED (mechanism) for 3 of 5 adapters, this pass].** `registry.ts`
+gained an additive `IslandInstance` shape (`{ unmount?, update? }`) alongside the existing
+bare-teardown return type, plus a `normalizeMountResult()` that collapses `void` / a bare function /
+an `IslandInstance` into one shape — every existing `defineIsland(...)` mount function across
+`src/components/` (all of which return `void` or a bare teardown today) keeps working completely
+unchanged; this is additive, not a breaking contract change. A new internal
+`runtime/island-instances.ts` (a `WeakMap<HTMLElement, updateFn>`, cleared on teardown) lets
+`refresh.ts` reach a mounted instance's `update` without putting it on the public `container.island`
+handle a page author can call directly and use to bypass server-authoritative refresh. `refresh.ts`
+now checks for a registered `update` *before* morphing: when present, it parses the *incoming*
+(not-yet-applied) element's `data-props` with the same reviver the hydrator uses for initial mount,
+syncs the container's own attributes (the attribute-sync half of `morphElement` was extracted into a
+shared `syncContainerAttributes`, used by both paths), and calls `update(props)` — `innerHTML` is
+never touched. If `update()` throws, the error is logged (not swallowed) and refresh falls back to
+the original morph+`rehydrateIsland` sequence for that one refresh, so a broken adapter degrades
+gracefully instead of leaving the island half-updated. An adapter that never registers an `update`
+(vanilla, Svelte) sees **zero behavior change** — the exact same morph+remount sequence as before.
+
+- **React** — `root.render(createElement(Component, newProps))` called again on the *same* `root`
+  is React's own designed re-render path. `root` was already captured outside the returned closure,
+  so no restructuring was needed beyond adding the `update` closure itself.
+- **Preact** — `render(h(Component, newProps), container)` into the *same* container lets Preact
+  diff against the vnode tree it already associates with that DOM node. Equally direct.
+- **Vue** required real restructuring: `props` moved from a plain closure variable into a
+  `shallowRef` read inside the wrapper component's `render()`; `update` reassigns the ref's
+  `.value` wholesale (not a per-field mutation), so removed/added keys are handled correctly, not
+  just changed ones.
+- **Svelte — deliberately not implemented this pass (Option B of the two considered).** Svelte 4
+  instances expose `$set()` trivially, but Svelte 5's pure-runes components — mounted via
+  `svelte.mount()`, not `new Component()` — have no public `$set` unless the *consuming app* opts
+  into the compiler flag `compatibility.componentApi: 4`, a real, non-free trade-off that leaks a
+  compiler decision into what this adapter otherwise keeps zero-config. This pass could not verify
+  that trade-off empirically: there is no `.svelte` compiler wired into this repo anywhere (checked:
+  no `esbuild-svelte`, no `svelte/compiler`, no `.svelte` fixture in any `package.json`/build
+  script), so `svelte` was deliberately **not** added as a dependency and `svelte.ts` is
+  **unchanged** — it still returns a bare teardown, and refresh continues through the existing
+  morph+remount path for it, exactly as before the rest of this pass. A smaller, honest scope beats
+  a fragile Svelte 5 `update()` this pass could not actually exercise; recorded here as an explicit
+  open follow-up, not a silent gap.
+- **`vanilla.ts` is correctly excluded — not a gap.** There is no framework instance to hand new
+  props to; `createVanillaIsland` forwards the caller's own mount function verbatim. It keeps going
+  through morph+remount exactly as before — a fake `update` here would just be a slower way to do
+  what remounting already does.
+- **Tests.** `react`, `react-dom`, `vue` and `preact` were added as `devDependencies` only (not
+  runtime deps — matching how a real consuming app installs them, and how the adapters already
+  `import()` them optionally/dynamically); `svelte` was deliberately not added, per above. Before
+  this pass, **zero** adapter test ever exercised a real framework mount: no framework package was
+  installed, so every adapter test's dynamic `import()` always rejected and every "adapter" test
+  only proved the vanilla-fallback catch branch, for all five adapters, unconditionally.
+  `tests/adapters.test.ts` now mounts real React/Vue/Preact components and proves `update()` patches
+  the *same* DOM node — captured by reference before the call, compared by identity after — rather
+  than checking only that new text appeared, which would be equally true of a full remount with new
+  props. A new `tests/runtime/refresh-update.test.ts` drives `refreshIsland()` end-to-end against a
+  real React-adapter-mounted island (asserting the adapter's `unmount` is never called, spied
+  directly; `container.innerHTML` is never assigned, spied directly on the instance; and new props
+  render) and separately against a fake adapter whose `update()` throws (asserting the fallback path
+  still recovers, remounts, and applies the new props instead of leaving the island stuck).
+  `adapterUpdateSupport` — a metrics-baseline counter added for exactly this — went from **0 to 3**
+  of 5 adapters (`LaughTale.Client/scripts/metrics-baseline.json`).
+- **Line count, corrected.** The five adapter files plus their barrel were 324 lines pre-fix
+  (`wc -l`, matching this roadmap's pre-existing figure exactly); post-fix they total 349
+  (`react.ts` 71→78, `vue.ts` 69→81, `preact.ts` 64→70; `svelte.ts` and `vanilla.ts` unchanged at
+  94/16), plus a new, separate 45-line `runtime/island-instances.ts` that is bookkeeping
+  infrastructure, not itself an adapter.
+- **Scope.** This closes the *mechanism* only, for the three adapters listed above. It does not
+  touch nested islands, `ctx`'s ambient state pool, `preact.ts`'s slot-passing gap, `vanilla.ts`'s
+  missing hydrate path, or new adapters — every other row in the table above is exactly as
+  unaddressed as it was before this pass.
 | **Framework SSR sidecar** — Node render host over a local socket. The right *first plugin* to prove the Part L API, not core work. Until then, rename the strategy `client-only` and require a fallback | Astro, Nuxt | XL · 8+ wks |
 
 ---
@@ -755,7 +831,7 @@ worse than shipping neither, because it looks finished.
 | Safe rendering primitive | Lit `html\`\`` | **Missing** — raw `innerHTML` in 68 | M |
 | Island compiler / discovery | Fresh, Nuxt | **Missing** | B |
 | Framework SSR | Astro, Nuxt | **Missing** — client-only mount | D |
-| Post-mount prop updates | Astro, Nuxt | **Missing** — corrupts React on refresh | D |
+| Post-mount prop updates | Astro, Nuxt | **Partial — [CLOSED (mechanism), this pass]** — `update(props)` on the adapter contract, refresh prefers it over morphing, for React/Vue/Preact (`adapterUpdateSupport` 0→3); Svelte and vanilla deliberately excluded, see Part D | D |
 | Nested islands | Astro | **Missing** | D |
 | Plugin / module API | Astro, Nuxt, Fresh | **Missing** | L |
 | Server actions + PE | Next, Remix, Astro | **Missing** | F |
@@ -787,7 +863,7 @@ worse than shipping neither, because it looks finished.
 | **Weeks 4–9** | **[CLOSED] Fix the TagHelper split** (§0). 81 generated TagHelpers derived from `TagHelper`, not `IslandTagHelperBase`, so SSR, localization and RTL were unreachable from the components Razor authors actually use. `IslandGenerator` now emits TagHelpers deriving from `IslandTagHelperBase`; along the way, 14 of those 81 turned out to duplicate a hand-written TagHelper targeting the same tag (two TagHelpers writing into one `TagHelperOutput`) and are now skipped instead of generated. Measured result: 67 generated + 15 hand-written = **82 of 82** TagHelpers reach the base class (was 15 of 96). This unblocks Part N and half of Part C. |
 | **Weeks 5–7** | **[CLOSED (partial)]** Props payload and serialization (Part J): stopped serializing defaults (`WhenWritingDefault`, ~84% payload reduction on a 5-island sample; corrected the stale "198/325" count to the real 401/665) and replaced generator-emitted anonymous props types with named records. Source-generated JSON contexts for those 67 types turned out not achievable — confirmed two Roslyn generators cannot be combined this way — so the product is measurably smaller on the wire but still not trimmable/AOT-safe for generator-emitted islands; trim analysis is now at least turned on (30 IL warnings surfaced, 28 pre-existing/unrelated) so future attempts have a real baseline. |
 | **Weeks 8–12** | **[CLOSED]** Localization for real (Part N): moved the vocabulary out of Core (`LaughTaleLocaleDictionary`/`LaughTaleBuiltInLocales` now in `LaughTale.Components`), taught `CoreOnlyBoundaryTests` to catch its return, and routed all 31 hardcoded English defaults (not 25 — the original count undercounted) and 13 client-template strings through the localizer. RTL adoption itself (8/76 components, corrected from a previously reported 7) remains open — this pass closed vocabulary routing only. |
-| **Weeks 6–10** | Fix the refresh/adapter corruption: `update(props)` in the adapter contract, refresh prefers it over morphing. |
+| **Weeks 6–10** | **[CLOSED (mechanism), this pass]** Fixed the refresh/adapter corruption for React, Vue and Preact: `update(props)` on the adapter contract (additive `IslandInstance` return shape), refresh prefers it over morphing, and falls back to the original morph+remount if `update()` throws. Svelte and vanilla deliberately excluded (see Part D for why); nested islands and the other Part D rows remain untouched. |
 | **Weeks 9–14** | Plugin API, then the island compiler. The stretch that turns a library into a framework — protect it from interruption. |
 | **Weeks 14–18** | DevTools + HMR. Once the compiler emits a manifest there's real data to inspect. |
 | **Weeks 16–24** | Partials, out-of-order streaming, cache tags. The performance story you can benchmark against Blazor Server and win. |

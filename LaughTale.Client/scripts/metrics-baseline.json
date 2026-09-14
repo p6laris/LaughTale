@@ -21,7 +21,7 @@
   "handleAdoption": 0,
   "rtlAdoption": 49,
   "unsafeCalls": 63,
-  "adapterUpdateSupport": 0,
+  "adapterUpdateSupport": 3,
   "formFieldAdoption": 29,
   "clientCreatedFields": 0,
   "propsNullishDefaultAdoption": 24

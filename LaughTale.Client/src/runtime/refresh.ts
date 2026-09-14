@@ -5,6 +5,8 @@
  */
 
 import { rehydrateIsland } from './hydrator';
+import { getIslandUpdateFn } from './island-instances';
+import { parseAndReviveProps } from './reviver';
 import type { IslandContext } from './registry';
 
 export interface RefreshOptions {
@@ -70,17 +72,49 @@ export async function refreshIsland(
         const incomingRoot = doc.querySelector<HTMLElement>(`[data-island="${name}"]`) || doc.body.firstElementChild as HTMLElement;
 
         if (incomingRoot) {
-            // Update props attribute
-            const updatedProps = incomingRoot.getAttribute('data-props');
-            if (updatedProps) {
-                container.setAttribute('data-props', updatedProps);
+            // Prefer the adapter's own in-place update(props), when the mounted framework
+            // instance registered one (see island-instances.ts). This avoids the morph+remount
+            // path entirely: morphElement's innerHTML replacement below rips out DOM nodes a
+            // React/Vue/Preact instance still holds fiber/vnode/component references to, and
+            // the old instance's unmount() then runs against already-mutated DOM (silently, since
+            // every adapter swallows unmount errors on disposed DOM). Calling update() instead
+            // lets the framework's own reconciler diff against the DOM it actually owns.
+            let updatedInPlace = false;
+            const updateFn = getIslandUpdateFn(container);
+
+            if (updateFn) {
+                try {
+                    // Parse props directly off the incoming (not-yet-applied) element - do NOT
+                    // write data-props into the live container first and re-read it back.
+                    const rawIncomingProps = incomingRoot.getAttribute('data-props')
+                        || incomingRoot.getAttribute('props-json')
+                        || incomingRoot.getAttribute('props');
+                    const parsedProps = parseAndReviveProps(rawIncomingProps);
+
+                    // Still keep the container's own attributes (data-props, data-hydrate, etc.)
+                    // consistent with server truth, even though the framework owns its children now.
+                    syncContainerAttributes(container, incomingRoot);
+
+                    await updateFn(parsedProps);
+                    updatedInPlace = true;
+                } catch (err) {
+                    console.error(`[LaughTale] Error calling adapter update() for island '${name}'. Falling back to morph+remount for this refresh:`, err);
+                }
             }
 
-            // Morph inner contents while preserving focusable elements
-            morphElement(container, incomingRoot);
+            if (!updatedInPlace) {
+                // Update props attribute
+                const updatedProps = incomingRoot.getAttribute('data-props');
+                if (updatedProps) {
+                    container.setAttribute('data-props', updatedProps);
+                }
 
-            // Re-hydrate island with new props
-            await rehydrateIsland(container);
+                // Morph inner contents while preserving focusable elements
+                morphElement(container, incomingRoot);
+
+                // Re-hydrate island with new props
+                await rehydrateIsland(container);
+            }
 
             // Restore focus and cursor positions
             if (focusedSelector) {
@@ -104,10 +138,13 @@ export async function refreshIsland(
 }
 
 /**
- * Lightweight DOM morphing utility keeping identical nodes and only updating changed attributes/content.
+ * Synchronizes an element's own attributes (data-props, data-hydrate, etc.) to match another,
+ * removing attributes no longer present (preserving `style`, which may be runtime-managed).
+ * Shared by the adapter-update path above and morphElement's legacy fallback below, so a
+ * container's attributes stay consistent with server truth regardless of which path handled
+ * the refresh.
  */
-function morphElement(existing: HTMLElement, incoming: HTMLElement): void {
-    // 1. Synchronize attributes
+function syncContainerAttributes(existing: HTMLElement, incoming: HTMLElement): void {
     const existingAttrs = Array.from(existing.attributes);
     const incomingAttrs = Array.from(incoming.attributes);
 
@@ -122,6 +159,14 @@ function morphElement(existing: HTMLElement, incoming: HTMLElement): void {
             existing.removeAttribute(attr.name);
         }
     }
+}
+
+/**
+ * Lightweight DOM morphing utility keeping identical nodes and only updating changed attributes/content.
+ */
+function morphElement(existing: HTMLElement, incoming: HTMLElement): void {
+    // 1. Synchronize attributes
+    syncContainerAttributes(existing, incoming);
 
     // 2. Morph children if incoming has structural contents
     if (incoming.children.length > 0) {

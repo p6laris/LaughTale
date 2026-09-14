@@ -15,11 +15,44 @@ export interface IslandContext {
     dictionary?: Record<string, any>;
 }
 
+/**
+ * Richer mount result an adapter may return instead of a bare teardown function.
+ * `update`, when present, lets `refresh.ts` push new props into an already-mounted
+ * framework instance (React `root.render`, Vue prop-ref reassignment, Preact `render`
+ * re-diff) instead of tearing the container down and remounting from scratch on every
+ * server-driven refresh — see ROADMAP.v5.md Part D. Both fields are optional so an
+ * adapter can supply just `unmount` (equivalent to today's bare-function return) or add
+ * `update` incrementally. See `normalizeMountResult`.
+ */
+export interface IslandInstance {
+    unmount?: IslandTeardown;
+    update?: (props: any) => void | Promise<void>;
+}
+
 export type IslandFactory<TProps = any, THandle = any> = (
     container: HTMLElement,
     props: TProps,
     ctx?: IslandContext
-) => void | IslandTeardown | Promise<void | IslandTeardown>;
+) => void | IslandTeardown | IslandInstance | Promise<void | IslandTeardown | IslandInstance>;
+
+/**
+ * Normalizes any shape an `IslandFactory` may return — `undefined`/`void`, a bare teardown
+ * function, or an `IslandInstance` object — into a consistent `{ unmount?, update? }` shape.
+ * Additive by construction: existing mount functions returning `void` or a bare function
+ * (every `defineIsland(...)` mount function in `src/components/` today) keep working
+ * unchanged.
+ */
+export function normalizeMountResult(
+    result: void | IslandTeardown | IslandInstance | undefined
+): IslandInstance {
+    if (!result) {
+        return {};
+    }
+    if (typeof result === 'function') {
+        return { unmount: result };
+    }
+    return result;
+}
 
 export interface IslandModule<TProps = any, THandle = any> {
     default: IslandFactory<TProps, THandle>;

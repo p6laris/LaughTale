@@ -43,6 +43,12 @@ export function createPreactIsland<TProps = any>(
                     }
                 };
 
+                // In-place update: rendering again into the same container lets Preact diff
+                // against the vnode tree it already associates with that DOM node.
+                const update = (newProps: any) => {
+                    render(h(Component, newProps), container);
+                };
+
                 if (ctx?.signal) {
                     ctx.signal.addEventListener('abort', unmount, { once: true });
                 }
@@ -50,7 +56,7 @@ export function createPreactIsland<TProps = any>(
                     ctx.onCleanup(unmount);
                 }
 
-                return unmount;
+                return { unmount, update };
             }
         } catch {
             console.warn('[LaughTale] Preact package not found in client environment. Falling back to direct execution.');
