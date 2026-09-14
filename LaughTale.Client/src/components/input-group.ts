@@ -83,16 +83,16 @@ const CSS = `
 /* First child outer corners */
 .laughtale-inputgroup > *:first-child,
 .p-inputgroup > *:first-child {
-    margin-left: 0 !important;
-    border-top-left-radius: var(--lt-radius) !important;
-    border-bottom-left-radius: var(--lt-radius) !important;
+    margin-inline-start: 0 !important;
+    border-start-start-radius: var(--lt-radius) !important;
+    border-end-start-radius: var(--lt-radius) !important;
 }
 
 /* Last child outer corners */
 .laughtale-inputgroup > *:last-child,
 .p-inputgroup > *:last-child {
-    border-top-right-radius: var(--lt-radius) !important;
-    border-bottom-right-radius: var(--lt-radius) !important;
+    border-start-end-radius: var(--lt-radius) !important;
+    border-end-end-radius: var(--lt-radius) !important;
 }
 
 /* Only child */
@@ -139,8 +139,8 @@ const CSS = `
 .p-inputgroup > *:first-child .dp-trigger,
 .p-inputgroup > *:first-child .laughtale-select-trigger,
 .p-inputgroup > *:first-child.p-button {
-    border-top-left-radius: var(--lt-radius) !important;
-    border-bottom-left-radius: var(--lt-radius) !important;
+    border-start-start-radius: var(--lt-radius) !important;
+    border-end-start-radius: var(--lt-radius) !important;
 }
 
 .laughtale-inputgroup > *:last-child input,
@@ -157,8 +157,8 @@ const CSS = `
 .p-inputgroup > *:last-child .dp-trigger,
 .p-inputgroup > *:last-child .laughtale-select-trigger,
 .p-inputgroup > *:last-child.p-button {
-    border-top-right-radius: var(--lt-radius) !important;
-    border-bottom-right-radius: var(--lt-radius) !important;
+    border-start-end-radius: var(--lt-radius) !important;
+    border-end-end-radius: var(--lt-radius) !important;
 }
 
 /* Addon Styling */

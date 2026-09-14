@@ -101,7 +101,7 @@ const DATATABLE_CSS = `
     font-size: 0.8125rem;
     letter-spacing: 0.01em;
     border-bottom: 1px solid var(--lt-surface-200);
-    text-align: left;
+    text-align: start;
     user-select: none;
     transition: background-color 0.15s ease, color 0.15s ease;
 }
@@ -605,6 +605,11 @@ html.dark .p-product-avatar,
 .dark .p-product-avatar {
     background: var(--p-surface-100);
     border-color: var(--p-border-color);
+}
+
+/* Bi-Directional RTL Support */
+[dir="rtl"] .p-row-toggler svg {
+    transform: scaleX(-1);
 }
 `;
 

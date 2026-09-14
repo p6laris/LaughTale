@@ -38,7 +38,7 @@ island-float-label,
 island-float-label > label,
 .laughtale-float-label > label {
     position: absolute;
-    left: 0.75rem;
+    inset-inline-start: 0.75rem;
     color: var(--p-text-muted);
     font-size: 0.875rem;
     font-weight: 500;
@@ -65,7 +65,7 @@ island-float-label[variant="over"]:focus-within > label,
 .laughtale-float-label-over.has-value > label,
 .laughtale-float-label-over:focus-within > label {
     top: -1.25rem;
-    left: 0.15rem;
+    inset-inline-start: 0.15rem;
     transform: translateY(0);
     font-size: 0.75rem;
     font-weight: 600;

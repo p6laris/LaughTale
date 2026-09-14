@@ -8,11 +8,25 @@ import type { IslandContext } from '../runtime/registry';
 
 import { injectIslandStyle } from '../runtime/styles';
 import { emitComponentEvent } from '../runtime/events';
+import { useLocale } from '../composables/useLocale';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
     kind: 'presentational'
 };
+
+/**
+ * Pure calculation for a horizontal splitter's resize delta, in percent of the container's
+ * total size. `flex-direction: row` reverses the visual order of the (DOM-order) prev/next
+ * panels under `dir="rtl"` - the "prev" panel ends up on the physical right - so a drag that
+ * moves the pointer physically right must shrink "prev" instead of growing it. Exported so
+ * this mirroring can be unit-tested without simulating pointer drags.
+ */
+export function computeSplitterDeltaPct(deltaPx: number, totalSize: number, isRtl: boolean): number {
+    if (totalSize <= 0) return 0;
+    const effectiveDeltaPx = isRtl ? -deltaPx : deltaPx;
+    return (effectiveDeltaPx / totalSize) * 100;
+}
 
 const SPLITTER_CSS = `
 .p-splitter {
@@ -177,6 +191,7 @@ export interface SplitterProps {
 
 export default function SplitterIsland(container: HTMLElement, props: SplitterProps, ctx?: IslandContext) {
     injectIslandStyle('splitter', SPLITTER_CSS);
+    const locale = useLocale(ctx);
 
     // 1. Unpack direct slot container if wrapped by server tag helper
     const slotEl = container.querySelector(':scope > .island-slot') as HTMLElement;
@@ -382,7 +397,9 @@ export default function SplitterIsland(container: HTMLElement, props: SplitterPr
 
             const currentPos = isHorizontal ? e.clientX : e.clientY;
             const deltaPx = currentPos - startPos;
-            const deltaPct = (deltaPx / totalSize) * 100;
+            const deltaPct = isHorizontal
+                ? computeSplitterDeltaPct(deltaPx, totalSize, locale.isRtl)
+                : (deltaPx / totalSize) * 100;
 
             let newPrevSize = startSizes[gutterIdx] + deltaPct;
             let newNextSize = startSizes[gutterIdx + 1] - deltaPct;

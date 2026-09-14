@@ -74,7 +74,7 @@ const ACCORDION_CSS = `
     background: var(--lt-surface-0);
     border: none;
     cursor: pointer;
-    text-align: left;
+    text-align: start;
     transition: background-color 0.2s cubic-bezier(0.2, 0, 0, 1), color 0.2s cubic-bezier(0.2, 0, 0, 1);
     box-sizing: border-box;
 }
@@ -150,7 +150,7 @@ const ACCORDION_CSS = `
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    margin-right: 0.75rem;
+    margin-inline-end: 0.75rem;
     flex-shrink: 0;
     transition: border-color 0.2s ease;
 }
@@ -408,14 +408,14 @@ export default function AccordionIsland(container: HTMLElement, props: Accordion
             // Custom icon or Avatar in header
             let customIconHtml: Raw | string = '';
             if (tab.icon) {
-                if (tab.icon === 'user') customIconHtml = html`<span style="display: inline-flex; align-items: center; margin-right: 0.5rem; color: var(--lt-surface-400);">${SVG_ICONS.user}</span>`;
-                else if (tab.icon === 'shield') customIconHtml = html`<span style="display: inline-flex; align-items: center; margin-right: 0.5rem; color: var(--lt-primary-500);">${SVG_ICONS.shield}</span>`;
-                else if (tab.icon === 'zap') customIconHtml = html`<span style="display: inline-flex; align-items: center; margin-right: 0.5rem; color: var(--lt-warn-500, var(--lt-warn-500));">${SVG_ICONS.zap}</span>`;
+                if (tab.icon === 'user') customIconHtml = html`<span style="display: inline-flex; align-items: center; margin-inline-end: 0.5rem; color: var(--lt-surface-400);">${SVG_ICONS.user}</span>`;
+                else if (tab.icon === 'shield') customIconHtml = html`<span style="display: inline-flex; align-items: center; margin-inline-end: 0.5rem; color: var(--lt-primary-500);">${SVG_ICONS.shield}</span>`;
+                else if (tab.icon === 'zap') customIconHtml = html`<span style="display: inline-flex; align-items: center; margin-inline-end: 0.5rem; color: var(--lt-warn-500, var(--lt-warn-500));">${SVG_ICONS.zap}</span>`;
             }
 
             // Badge / Subtitle / Price
-            const badgeHtml = tab.badge ? html`<span style="background: var(--lt-primary-100); color: var(--lt-primary-700); font-size: 0.75rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 9999px; margin-left: 0.5rem;">${tab.badge}</span>` : '';
-            const priceHtml = tab.price ? html`<span style="font-weight: 700; font-size: 0.875rem; color: var(--lt-surface-900); margin-left: auto; margin-right: 1rem;">${tab.price}</span>` : '';
+            const badgeHtml = tab.badge ? html`<span style="background: var(--lt-primary-100); color: var(--lt-primary-700); font-size: 0.75rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 9999px; margin-inline-start: 0.5rem;">${tab.badge}</span>` : '';
+            const priceHtml = tab.price ? html`<span style="font-weight: 700; font-size: 0.875rem; color: var(--lt-surface-900); margin-inline-start: auto; margin-inline-end: 1rem;">${tab.price}</span>` : '';
 
             return html`
                 <div class="p-accordionpanel ${activeClass} ${disabledClass}" data-panel-idx="${k}">

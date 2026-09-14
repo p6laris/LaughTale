@@ -11,12 +11,28 @@ import { injectIslandStyle } from '../runtime/styles';
 import { emitComponentEvent } from '../runtime/events';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import { useFormField } from '../composables/useFormField';
+import { useLocale } from '../composables/useLocale';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
     kind: 'pattern',
     pattern: 'slider'
 };
+
+/**
+ * Pure calculation for a horizontal slider's drag ratio (0 = inline-start, 1 = inline-end).
+ * Exported so RTL mirroring can be unit-tested without simulating pointer events.
+ * In LTR, inline-start is the physical left edge, so the ratio is measured directly from
+ * `rectLeft`. In RTL, inline-start is the physical right edge, so the raw physical ratio
+ * is flipped (1 - ratio) to keep "closer to the reading-start edge" meaning "lower ratio"
+ * in both directions.
+ */
+export function computeHorizontalRatio(clientX: number, rectLeft: number, rectWidth: number, isRtl: boolean): number {
+    if (rectWidth <= 0) return 0;
+    const raw = (clientX - rectLeft) / rectWidth;
+    const clamped = Math.max(0, Math.min(1, raw));
+    return isRtl ? 1 - clamped : clamped;
+}
 
 export interface SliderProps {
     value?: number | number[] | string;
@@ -199,6 +215,7 @@ html.dark .p-slider-handle.is-disabled,
 
 export default function SliderIsland(container: HTMLElement, props: SliderProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-slider', CSS);
+    const locale = useLocale(ctx);
 
     const min = props.min !== undefined ? Number(props.min) : 0;
     const max = props.max !== undefined ? Number(props.max) : 100;
@@ -313,11 +330,11 @@ export default function SliderIsland(container: HTMLElement, props: SliderProps,
             const p = getPercent(currentValues[0]);
             const rangeStyle = isVertical
                 ? `bottom: 0; height: ${p}%;`
-                : `left: 0; width: ${p}%;`;
+                : `inset-inline-start: 0; width: ${p}%;`;
 
             const hStyle = isVertical
                 ? `bottom: ${p}%;`
-                : `left: ${p}%;`;
+                : `inset-inline-start: ${p}%;`;
 
             setHtml(container, html`
                 <span class="p-slider-range" style="${rangeStyle}"></span>
@@ -355,20 +372,20 @@ export default function SliderIsland(container: HTMLElement, props: SliderProps,
                     rangeEl.style.bottom = `${leftPct}%`;
                     rangeEl.style.height = `${sizePct}%`;
                 } else {
-                    rangeEl.style.left = `${leftPct}%`;
+                    rangeEl.style.insetInlineStart = `${leftPct}%`;
                     rangeEl.style.width = `${sizePct}%`;
                 }
             }
 
             if (handles[0]) {
                 if (isVertical) handles[0].style.bottom = `${p1}%`;
-                else handles[0].style.left = `${p1}%`;
+                else handles[0].style.insetInlineStart = `${p1}%`;
                 handles[0].setAttribute('aria-valuenow', currentValues[0].toString());
             }
 
             if (handles[1]) {
                 if (isVertical) handles[1].style.bottom = `${p2}%`;
-                else handles[1].style.left = `${p2}%`;
+                else handles[1].style.insetInlineStart = `${p2}%`;
                 handles[1].setAttribute('aria-valuenow', currentValues[1].toString());
             }
         } else {
@@ -380,7 +397,7 @@ export default function SliderIsland(container: HTMLElement, props: SliderProps,
 
             if (handles[0]) {
                 if (isVertical) handles[0].style.bottom = `${p}%`;
-                else handles[0].style.left = `${p}%`;
+                else handles[0].style.insetInlineStart = `${p}%`;
                 handles[0].setAttribute('aria-valuenow', currentValues[0].toString());
             }
         }
@@ -410,9 +427,7 @@ export default function SliderIsland(container: HTMLElement, props: SliderProps,
                 const ratio = (rect.bottom - e.clientY) / rect.height;
                 return Math.max(0, Math.min(1, ratio));
             } else {
-                if (rect.width <= 0) return 0;
-                const ratio = (e.clientX - rect.left) / rect.width;
-                return Math.max(0, Math.min(1, ratio));
+                return computeHorizontalRatio(e.clientX, rect.left, rect.width, locale.isRtl);
             }
         };
 

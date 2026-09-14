@@ -260,63 +260,63 @@ export default function ThemeStudioIsland(container: HTMLElement, props: ThemeSt
                     <div>
                         <div style="font-size: 0.75rem; font-weight: 700; color: var(--lt-surface-500); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem;">Preset Curated Themes</div>
                         <div style="display: flex; flex-direction: column; gap: 0.5rem; max-height: 240px; overflow-y: auto;">
-                            <button type="button" class="preset-theme-btn" data-theme="emerald-zero-trust" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer; text-align: left;">
+                            <button type="button" class="preset-theme-btn" data-theme="emerald-zero-trust" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer; text-align: start;">
                                 <div style="display: flex; align-items: center; gap: 0.5rem;">
                                     <span style="width: 1rem; height: 1rem; border-radius: 3px; background: #10b981;"></span>
                                     <span style="font-size: 0.8125rem; font-weight: 600; color: var(--lt-surface-800);">Emerald Zero-Trust</span>
                                 </div>
                                 <span style="font-size: 0.6875rem; color: var(--lt-surface-400);">Default</span>
                             </button>
-                            <button type="button" class="preset-theme-btn" data-theme="krd-golden" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer; text-align: left;">
+                            <button type="button" class="preset-theme-btn" data-theme="krd-golden" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer; text-align: start;">
                                 <div style="display: flex; align-items: center; gap: 0.5rem;">
                                     <span style="width: 1rem; height: 1rem; border-radius: 3px; background: #eab308;"></span>
                                     <span style="font-size: 0.8125rem; font-weight: 600; color: var(--lt-surface-800);">KRD Golden</span>
                                 </div>
                                 <span style="font-size: 0.6875rem; color: var(--lt-surface-400);">Radius 0.5</span>
                             </button>
-                            <button type="button" class="preset-theme-btn" data-theme="supabase-violet" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer; text-align: left;">
+                            <button type="button" class="preset-theme-btn" data-theme="supabase-violet" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer; text-align: start;">
                                 <div style="display: flex; align-items: center; gap: 0.5rem;">
                                     <span style="width: 1rem; height: 1rem; border-radius: 3px; background: #8b5cf6;"></span>
                                     <span style="font-size: 0.8125rem; font-weight: 600; color: var(--lt-surface-800);">Supabase Violet</span>
                                 </div>
                                 <span style="font-size: 0.6875rem; color: var(--lt-surface-400);">Radius 0.375</span>
                             </button>
-                            <button type="button" class="preset-theme-btn" data-theme="sunset-ember" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer; text-align: left;">
+                            <button type="button" class="preset-theme-btn" data-theme="sunset-ember" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer; text-align: start;">
                                 <div style="display: flex; align-items: center; gap: 0.5rem;">
                                     <span style="width: 1rem; height: 1rem; border-radius: 3px; background: #f43f5e;"></span>
                                     <span style="font-size: 0.8125rem; font-weight: 600; color: var(--lt-surface-800);">Sunset Ember</span>
                                 </div>
                                 <span style="font-size: 0.6875rem; color: var(--lt-surface-400);">Radius 0.75</span>
                             </button>
-                            <button type="button" class="preset-theme-btn" data-theme="ocean-blue" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer; text-align: left;">
+                            <button type="button" class="preset-theme-btn" data-theme="ocean-blue" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer; text-align: start;">
                                 <div style="display: flex; align-items: center; gap: 0.5rem;">
                                     <span style="width: 1rem; height: 1rem; border-radius: 3px; background: #3b82f6;"></span>
                                     <span style="font-size: 0.8125rem; font-weight: 600; color: var(--lt-surface-800);">Ocean Blue</span>
                                 </div>
                                 <span style="font-size: 0.6875rem; color: var(--lt-surface-400);">Radius 0.5</span>
                             </button>
-                            <button type="button" class="preset-theme-btn" data-theme="cyber-cyan" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer; text-align: left;">
+                            <button type="button" class="preset-theme-btn" data-theme="cyber-cyan" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer; text-align: start;">
                                 <div style="display: flex; align-items: center; gap: 0.5rem;">
                                     <span style="width: 1rem; height: 1rem; border-radius: 3px; background: #06b6d4;"></span>
                                     <span style="font-size: 0.8125rem; font-weight: 600; color: var(--lt-surface-800);">Cyberpunk Cyan</span>
                                 </div>
                                 <span style="font-size: 0.6875rem; color: var(--lt-surface-400);">Radius 0.0</span>
                             </button>
-                            <button type="button" class="preset-theme-btn" data-theme="lime-minimal" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer; text-align: left;">
+                            <button type="button" class="preset-theme-btn" data-theme="lime-minimal" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer; text-align: start;">
                                 <div style="display: flex; align-items: center; gap: 0.5rem;">
                                     <span style="width: 1rem; height: 1rem; border-radius: 3px; background: #84cc16;"></span>
                                     <span style="font-size: 0.8125rem; font-weight: 600; color: var(--lt-surface-800);">Lime Minimal</span>
                                 </div>
                                 <span style="font-size: 0.6875rem; color: var(--lt-surface-400);">Radius 0.25</span>
                             </button>
-                            <button type="button" class="preset-theme-btn" data-theme="sunset-orange" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer; text-align: left;">
+                            <button type="button" class="preset-theme-btn" data-theme="sunset-orange" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer; text-align: start;">
                                 <div style="display: flex; align-items: center; gap: 0.5rem;">
                                     <span style="width: 1rem; height: 1rem; border-radius: 3px; background: #f97316;"></span>
                                     <span style="font-size: 0.8125rem; font-weight: 600; color: var(--lt-surface-800);">Sunset Orange</span>
                                 </div>
                                 <span style="font-size: 0.6875rem; color: var(--lt-surface-400);">Radius 0.5</span>
                             </button>
-                            <button type="button" class="preset-theme-btn" data-theme="sakura-pink" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer; text-align: left;">
+                            <button type="button" class="preset-theme-btn" data-theme="sakura-pink" style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; border: 1px solid var(--lt-surface-200); border-radius: var(--lt-radius); background: var(--lt-surface-50); cursor: pointer; text-align: start;">
                                 <div style="display: flex; align-items: center; gap: 0.5rem;">
                                     <span style="width: 1rem; height: 1rem; border-radius: 3px; background: #ec4899;"></span>
                                     <span style="font-size: 0.8125rem; font-weight: 600; color: var(--lt-surface-800);">Sakura Pink</span>

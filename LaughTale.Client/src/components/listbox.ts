@@ -325,7 +325,7 @@ const CSS = `
     border: 1px solid var(--lt-surface-200);
     border-radius: 4px;
     background: var(--lt-surface-0);
-    margin-right: 0.5rem;
+    margin-inline-end: 0.5rem;
     transition: all 150ms ease;
     flex-shrink: 0;
 }
@@ -341,7 +341,7 @@ const CSS = `
     align-items: center;
     justify-content: center;
     color: var(--lt-primary-600);
-    margin-left: 0.5rem;
+    margin-inline-start: 0.5rem;
     flex-shrink: 0;
 }
 /* ==================== DARK MODE ==================== */

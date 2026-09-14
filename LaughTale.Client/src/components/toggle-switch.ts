@@ -11,12 +11,26 @@ import { emitComponentEvent } from '../runtime/events';
 import { getLucideIcon } from '../icons/lucide';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import { useFormField } from '../composables/useFormField';
+import { useLocale } from '../composables/useLocale';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
     kind: 'native',
     element: 'input'
 };
+
+/**
+ * Pure calculation for the toggle switch handle's slide transform. The handle's resting
+ * (unchecked) position uses the logical `inset-inline-start` CSS property, which the
+ * browser already mirrors correctly under `dir="rtl"`. But the "checked" slide is a
+ * `translateX`, which is a physical transform that CSS never auto-mirrors - so the sign
+ * must be flipped in JS: in RTL the handle slides toward the physical left instead of
+ * right. Exported so this mirroring can be unit-tested directly.
+ */
+export function getToggleHandleTransform(isChecked: boolean, isRtl: boolean): string {
+    if (!isChecked) return '';
+    return isRtl ? 'translateX(-16px)' : 'translateX(16px)';
+}
 
 export interface ToggleSwitchProps {
     checked?: boolean;
@@ -110,7 +124,7 @@ const CSS = `
 .p-toggleswitch-handle {
     position: absolute;
     top: 3px;
-    left: 3px;
+    inset-inline-start: 3px;
     width: 1.125rem; /* 18px */
     height: 1.125rem; /* 18px */
     background: var(--lt-surface-0);
@@ -125,7 +139,8 @@ const CSS = `
 }
 
 .p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-handle {
-    transform: translateX(16px);
+    /* transform is applied inline per-instance (see getToggleHandleTransform) so the
+       slide direction can be mirrored correctly under dir="rtl". */
     color: var(--lt-primary-600);
 }
 
@@ -212,6 +227,7 @@ html.dark .p-toggleswitch-label,
 
 export default function ToggleSwitchIsland(container: HTMLElement, props: ToggleSwitchProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-toggleswitch', CSS);
+    const locale = useLocale(ctx);
 
     const formField = useFormField(container, ctx, {
         cardinality: 'Boolean',
@@ -247,6 +263,7 @@ export default function ToggleSwitchIsland(container: HTMLElement, props: Toggle
         const activeIcon = isChecked ? checkedIcon : uncheckedIcon;
         const iconHtml = activeIcon ? html`<span class="p-toggleswitch-handle-icon" data-part="root">${unsafe(getLucideIcon(activeIcon, 10))}</span>` : '';
         const ariaLabelVal = props.ariaLabel || props.label || props.name || 'Toggle switch';
+        const handleTransform = getToggleHandleTransform(isChecked, locale.isRtl);
 
         formField.detach();
         setHtml(container, html`
@@ -263,7 +280,7 @@ export default function ToggleSwitchIsland(container: HTMLElement, props: Toggle
                 tabindex="${isDisabled ? '-1' : '0'}"
             />
             <div class="p-toggleswitch-slider ${props.sliderClass || ''}">
-                <div class="p-toggleswitch-handle ${props.handleClass || ''}">
+                <div class="p-toggleswitch-handle ${props.handleClass || ''}" style="${handleTransform ? `transform: ${handleTransform};` : ''}">
                     ${iconHtml}
                 </div>
             </div>

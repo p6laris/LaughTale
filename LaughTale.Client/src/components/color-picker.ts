@@ -5,6 +5,7 @@ import { injectIslandStyle } from '../runtime/styles';
 import { emitComponentEvent } from '../runtime/events';
 import { useFloatingPosition } from '../composables/useFloatingPosition';
 import { useFormField } from '../composables/useFormField';
+import { useLocale } from '../composables/useLocale';
 import { html, setHtml, attr, type Raw } from '../runtime/html';
 import { announce } from '../accessibility/announcer';
 import type { PatternDeclaration } from '../accessibility/patterns';
@@ -55,6 +56,7 @@ html.dark .color-hex-input,
 
 export default function ColorPickerIsland(container: HTMLElement, props: ColorPickerProps, ctx?: IslandContext) {
     injectIslandStyle('color-picker', CSS);
+    const locale = useLocale(ctx);
 
     const formField = useFormField(container, ctx, {
         cardinality: 'Single',
@@ -165,7 +167,8 @@ export default function ColorPickerIsland(container: HTMLElement, props: ColorPi
                 placement: 'bottom-start',
                 reposition: 'follow',
                 signal: ctx?.signal,
-                offset: 8
+                offset: 8,
+                isRtl: locale.isRtl
             });
         } else {
             floatingHandle = null;

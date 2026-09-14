@@ -111,7 +111,7 @@ const ORGCHART_CSS = `
 }
 
 .p-organizationchart-line-left {
-    border-right: 1px solid var(--lt-surface-300);
+    border-inline-end: 1px solid var(--lt-surface-300);
 }
 
 .p-organizationchart-line-right {
@@ -163,7 +163,7 @@ const ORGCHART_CSS = `
     cursor: pointer;
     transition: background-color 0.12s ease, border-color 0.12s ease;
     flex-shrink: 0;
-    margin-right: 0.625rem;
+    margin-inline-end: 0.625rem;
 }
 .p-checkbox-box.p-checked {
     background: var(--lt-primary-500);
@@ -181,7 +181,7 @@ const ORGCHART_CSS = `
     display: flex;
     align-items: center;
     gap: 0.625rem;
-    text-align: left;
+    text-align: start;
 }
 .p-orgchart-avatar {
     width: 2.25rem;

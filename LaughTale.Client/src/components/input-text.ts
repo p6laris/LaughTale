@@ -156,29 +156,29 @@ const CSS = `
     height: 16px;
 }
 .p-inputtext-icon-left {
-    left: 0.75rem;
+    inset-inline-start: 0.75rem;
 }
 .p-inputtext-icon-right {
-    right: 0.75rem;
+    inset-inline-end: 0.75rem;
 }
 
 .has-icon-left .p-inputtext {
-    padding-left: 2.25rem !important;
+    padding-inline-start: 2.25rem !important;
 }
 .has-icon-right .p-inputtext {
-    padding-right: 2.25rem !important;
+    padding-inline-end: 2.25rem !important;
 }
 .has-clear .p-inputtext {
-    padding-right: 2.25rem !important;
+    padding-inline-end: 2.25rem !important;
 }
 .has-icon-right.has-clear .p-inputtext {
-    padding-right: 3.625rem !important;
+    padding-inline-end: 3.625rem !important;
 }
 
 /* Clear Icon Button (Zero-Flicker) */
 .p-inputtext-clear {
     position: absolute;
-    right: 0.625rem;
+    inset-inline-end: 0.625rem;
     top: 50%;
     transform: translateY(-50%);
     background: transparent;
@@ -202,7 +202,7 @@ const CSS = `
     height: 14px;
 }
 .has-icon-right.has-clear .p-inputtext-clear {
-    right: 2.25rem;
+    inset-inline-end: 2.25rem;
 }
 
 /* Help Text */

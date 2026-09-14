@@ -49,7 +49,7 @@ p-avatargroup {
 }
 
 .p-avatargroup .p-avatar {
-    margin-left: -0.625rem;
+    margin-inline-start: -0.625rem;
     border: 2px solid var(--p-content-bg, var(--p-surface-0, #ffffff));
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), z-index 0.2s ease;
@@ -58,7 +58,7 @@ p-avatargroup {
 }
 
 .p-avatargroup .p-avatar:first-child {
-    margin-left: 0;
+    margin-inline-start: 0;
 }
 
 .p-avatargroup .p-avatar:hover {

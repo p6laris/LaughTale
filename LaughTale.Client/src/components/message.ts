@@ -122,7 +122,7 @@ p-message {
     background: transparent;
     color: inherit;
     cursor: pointer;
-    margin-left: auto;
+    margin-inline-start: auto;
     flex-shrink: 0;
     opacity: 0.7;
     transition: background-color 150ms ease, opacity 150ms ease, transform 120ms ease;

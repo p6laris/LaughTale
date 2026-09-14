@@ -120,17 +120,17 @@ const CSS = `
     align-items: center;
 }
 .p-inputotp-group .p-inputotp-input:first-child {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
+    border-start-end-radius: 0;
+    border-end-end-radius: 0;
 }
 .p-inputotp-group .p-inputotp-input:not(:first-child):not(:last-child) {
     border-radius: 0;
-    margin-left: -1px;
+    margin-inline-start: -1px;
 }
 .p-inputotp-group .p-inputotp-input:last-child {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-    margin-left: -1px;
+    border-start-start-radius: 0;
+    border-end-start-radius: 0;
+    margin-inline-start: -1px;
 }
 
 /* Separator between Groups */

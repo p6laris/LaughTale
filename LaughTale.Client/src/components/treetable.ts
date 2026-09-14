@@ -118,7 +118,7 @@ const TREETABLE_CSS = `
     border-left: none;
     border-right: none;
     font-weight: 600;
-    text-align: left;
+    text-align: start;
     transition: background-color 0.15s ease, color 0.15s ease;
     user-select: none;
     position: relative;
@@ -218,7 +218,7 @@ const TREETABLE_CSS = `
     cursor: pointer;
     color: var(--lt-surface-500);
     transition: background-color 0.15s ease, transform 0.2s ease, color 0.15s ease;
-    margin-right: 0.35rem;
+    margin-inline-end: 0.35rem;
     padding: 0;
 }
 .p-treetable-toggler:hover {
@@ -240,7 +240,7 @@ const TREETABLE_CSS = `
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    margin-right: 0.5rem;
+    margin-inline-end: 0.5rem;
     cursor: pointer;
     transition: background-color 0.15s, border-color 0.15s;
     flex-shrink: 0;
@@ -268,14 +268,14 @@ const TREETABLE_CSS = `
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    margin-left: 0.25rem;
+    margin-inline-start: 0.25rem;
 }
 
 /* Column Resizer */
 .p-column-resizer {
     position: absolute;
     top: 0;
-    right: 0;
+    inset-inline-end: 0;
     width: 0.5rem;
     height: 100%;
     cursor: col-resize;
@@ -421,7 +421,7 @@ const TREETABLE_CSS = `
 .p-treetable-popover {
     position: absolute;
     top: 100%;
-    right: 0;
+    inset-inline-end: 0;
     margin-top: 0.5rem;
     background: var(--lt-surface-0);
     border: 1px solid var(--lt-surface-200);
@@ -871,7 +871,7 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
 
                     if (isExp) {
                         const toggleSvg = hasChildren ? (node.loading ? SVG_ICONS.spinner : (isExpanded ? SVG_ICONS.chevronDown : SVG_ICONS.chevronRight)) : '';
-                        const iconSvg = props.useNodeIcons ? `<span style="display: inline-flex; align-items: center; margin-right: 0.5rem; color: var(--lt-surface-400);">${getIcon(node.data.type, isExpanded)}</span>` : '';
+                        const iconSvg = props.useNodeIcons ? `<span style="display: inline-flex; align-items: center; margin-inline-end: 0.5rem; color: var(--lt-surface-400);">${getIcon(node.data.type, isExpanded)}</span>` : '';
 
                         let checkboxHtml = '';
                         if (selectionMode === 'checkbox') {
@@ -883,7 +883,7 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
                         }
 
                         return `
-                            <td class="${frozenClass}" style="${widthStyle} padding-left: ${level * 1.5 + 0.75}rem;">
+                            <td class="${frozenClass}" style="${widthStyle} padding-inline-start: ${level * 1.5 + 0.75}rem;">
                                 <div style="display: flex; align-items: center;">
                                     <button type="button" class="p-treetable-toggler ${!hasChildren ? 'p-hidden-space' : ''}" data-toggler-key="${key}">
                                         ${toggleSvg}
@@ -1011,7 +1011,7 @@ export default function TreeTableIsland(container: HTMLElement, props: TreeTable
                 <div class="p-treetable-top-controls">
                     <div class="p-selectbutton p-button-group" style="display: inline-flex; border: 1px solid var(--lt-surface-300); border-radius: 6px; overflow: hidden;">
                         <button type="button" class="p-treetable-size-btn ${size === 'small' ? 'p-highlight' : ''}" data-size="small" style="padding: 0.45rem 1rem; border: none; background: ${size === 'small' ? 'var(--lt-primary-500)' : 'var(--lt-surface-0)'}; color: ${size === 'small' ? 'var(--lt-surface-0, var(--lt-surface-0))' : 'var(--lt-surface-700)'}; cursor: pointer; font-size: 0.8125rem; font-weight: 600;">Small</button>
-                        <button type="button" class="p-treetable-size-btn ${size === 'normal' ? 'p-highlight' : ''}" data-size="normal" style="padding: 0.45rem 1rem; border: none; border-left: 1px solid var(--lt-surface-200); border-right: 1px solid var(--lt-surface-200); background: ${size === 'normal' ? 'var(--lt-primary-500)' : 'var(--lt-surface-0)'}; color: ${size === 'normal' ? 'var(--lt-surface-0, var(--lt-surface-0))' : 'var(--lt-surface-700)'}; cursor: pointer; font-size: 0.8125rem; font-weight: 600;">Normal</button>
+                        <button type="button" class="p-treetable-size-btn ${size === 'normal' ? 'p-highlight' : ''}" data-size="normal" style="padding: 0.45rem 1rem; border: none; border-inline-start: 1px solid var(--lt-surface-200); border-inline-end: 1px solid var(--lt-surface-200); background: ${size === 'normal' ? 'var(--lt-primary-500)' : 'var(--lt-surface-0)'}; color: ${size === 'normal' ? 'var(--lt-surface-0, var(--lt-surface-0))' : 'var(--lt-surface-700)'}; cursor: pointer; font-size: 0.8125rem; font-weight: 600;">Normal</button>
                         <button type="button" class="p-treetable-size-btn ${size === 'large' ? 'p-highlight' : ''}" data-size="large" style="padding: 0.45rem 1rem; border: none; background: ${size === 'large' ? 'var(--lt-primary-500)' : 'var(--lt-surface-0)'}; color: ${size === 'large' ? 'var(--lt-surface-0, var(--lt-surface-0))' : 'var(--lt-surface-700)'}; cursor: pointer; font-size: 0.8125rem; font-weight: 600;">Large</button>
                     </div>
                 </div>

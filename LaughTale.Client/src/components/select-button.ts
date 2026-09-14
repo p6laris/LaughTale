@@ -93,7 +93,7 @@ const CSS = `
     outline: none;
     box-sizing: border-box;
     transition: background 150ms ease, border-color 150ms ease, color 150ms ease, box-shadow 150ms ease, z-index 150ms ease;
-    margin-left: -1px;
+    margin-inline-start: -1px;
 }
 
 .p-selectbutton-fluid .p-selectbutton-item {
@@ -101,14 +101,14 @@ const CSS = `
 }
 
 .p-selectbutton-item:first-child {
-    margin-left: 0;
-    border-top-left-radius: var(--lt-radius);
-    border-bottom-left-radius: var(--lt-radius);
+    margin-inline-start: 0;
+    border-start-start-radius: var(--lt-radius);
+    border-end-start-radius: var(--lt-radius);
 }
 
 .p-selectbutton-item:last-child {
-    border-top-right-radius: var(--lt-radius);
-    border-bottom-right-radius: var(--lt-radius);
+    border-start-end-radius: var(--lt-radius);
+    border-end-end-radius: var(--lt-radius);
 }
 
 .p-selectbutton-item:hover:not(.p-disabled):not(.is-selected) {

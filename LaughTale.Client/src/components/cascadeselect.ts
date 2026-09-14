@@ -14,6 +14,7 @@ import type { IslandContext } from '../runtime/registry';
 import { useFloatingPosition } from '../composables/useFloatingPosition';
 import { html, setHtml, url, unsafe, attr, type Raw } from '../runtime/html';
 import { useFormField } from '../composables/useFormField';
+import { useLocale } from '../composables/useLocale';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -276,10 +277,16 @@ html.dark .cs-item.selected,
     background: rgba(16, 185, 129, 0.15);
     color: var(--p-primary-300);
 }
+
+/* Bi-Directional RTL Support */
+[dir="rtl"] .cs-submenu-chevron svg {
+    transform: scaleX(-1);
+}
 `;
 
 export default function CascadeSelectIsland<T = string>(container: HTMLElement, props: CascadeSelectProps<T>, ctx?: IslandContext) {
     injectIslandStyle('cascadeselect', CSS);
+    const locale = useLocale(ctx);
     const options: CascadeSelectNode<T>[] = props.options || [];
     const size = props.size || 'normal';
     const variant = props.variant || 'outlined';
@@ -409,9 +416,9 @@ export default function CascadeSelectIsland<T = string>(container: HTMLElement, 
 
             let leadingHtml: Raw | string = '';
             if (n.icon && LucideIcons[n.icon]) {
-                leadingHtml = html`<span style="display: flex; width: 16px; height: 16px; color: var(--lt-primary-600); margin-right: 0.4rem;">${unsafe(LucideIcons[n.icon]) /* static icon */}</span>`;
+                leadingHtml = html`<span style="display: flex; width: 16px; height: 16px; color: var(--lt-primary-600); margin-inline-end: 0.4rem;">${unsafe(LucideIcons[n.icon]) /* static icon */}</span>`;
             } else if (n.image) {
-                leadingHtml = html`<img src="${url(n.image)}" alt="" style="width: 18px; height: 18px; border-radius: 2px; margin-right: 0.4rem; object-fit: cover;" />`;
+                leadingHtml = html`<img src="${url(n.image)}" alt="" style="width: 18px; height: 18px; border-radius: 2px; margin-inline-end: 0.4rem; object-fit: cover;" />`;
             }
 
             return html`
@@ -425,7 +432,7 @@ export default function CascadeSelectIsland<T = string>(container: HTMLElement, 
                         <span>${nodeLabel}</span>
                     </div>
                     ${hasChildren ? html`
-                        <span style="color: var(--p-text-muted); display: flex; width: 14px; height: 14px; margin-left: 0.5rem;">
+                        <span class="cs-submenu-chevron" style="color: var(--p-text-muted); display: flex; width: 14px; height: 14px; margin-inline-start: 0.5rem;">
                             ${unsafe(LucideIcons.chevronRight) /* static chevron */}
                         </span>
                         <div class="cs-sub-panel cs-level-${level + 1}"></div>
@@ -461,7 +468,8 @@ export default function CascadeSelectIsland<T = string>(container: HTMLElement, 
                         strategy: 'absolute',
                         boundary: (container.offsetParent as HTMLElement) || undefined,
                         axis: 'x',
-                        reposition: 'none'
+                        reposition: 'none',
+                        isRtl: locale.isRtl
                     });
                     const coords = subFloatingCtrl.computePosition();
                     if (coords.actualPlacement.startsWith('left')) {

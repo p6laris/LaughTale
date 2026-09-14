@@ -13,6 +13,7 @@ import { LucideIcons } from '../icons/lucide';
 import { executeCommand } from '../runtime/commands';
 import { sanitizeUrl } from '../directives/security';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import { useLocale } from '../composables/useLocale';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -68,8 +69,7 @@ const SPLITBUTTON_CSS = `
     flex: 0 0 auto;
     border-top-left-radius: 0 !important;
     border-bottom-left-radius: 0 !important;
-    padding-left: 0.5rem !important;
-    padding-right: 0.5rem !important;
+    padding-inline: 0.5rem !important;
 }
 
 /* Button Base & Severities */
@@ -217,7 +217,7 @@ const SPLITBUTTON_CSS = `
 .p-splitbutton-outlined .p-button-contrast:hover:not(:disabled) { background: rgba(15, 23, 42, 0.08); }
 
 .p-splitbutton-outlined .p-splitbutton-button {
-    border-right: none !important;
+    border-inline-end: none !important;
 }
 
 /* Text Variant */
@@ -352,7 +352,7 @@ const SPLITBUTTON_CSS = `
 }
 
 .p-splitbutton-menu .p-submenu-icon {
-    margin-left: auto;
+    margin-inline-start: auto;
     display: inline-flex;
     color: var(--lt-surface-400);
 }
@@ -478,10 +478,26 @@ html.dark .p-splitbutton-text .p-button-contrast[aria-expanded="true"],
     right: auto;
     left: calc(100% + 2px);
 }
+[dir="rtl"] .p-submenu-icon svg {
+    transform: scaleX(-1);
+}
+[dir="rtl"] .p-splitbutton-rounded .p-splitbutton-button {
+    border-top-left-radius: 9999px !important;
+    border-bottom-left-radius: 9999px !important;
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+}
+[dir="rtl"] .p-splitbutton-rounded .p-splitbutton-dropdown {
+    border-top-right-radius: 9999px !important;
+    border-bottom-right-radius: 9999px !important;
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+}
 `;
 
 export default function SplitButtonIsland(container: HTMLElement, props: SplitButtonProps, ctx?: IslandContext) {
     injectIslandStyle('split-button', SPLITBUTTON_CSS);
+    const locale = useLocale(ctx);
 
     const label = props.label || '';
     const icon = props.icon || '';
@@ -643,7 +659,8 @@ export default function SplitButtonIsland(container: HTMLElement, props: SplitBu
             offset: 4,
             strategy: 'absolute',
             reposition: 'follow',
-            signal: effectiveSignal
+            signal: effectiveSignal,
+            isRtl: locale.isRtl
         });
         const coords = dropdownFloatingCtrl.computePosition();
         if (coords.actualPlacement.startsWith('top')) {
@@ -751,7 +768,8 @@ export default function SplitButtonIsland(container: HTMLElement, props: SplitBu
                         strategy: 'absolute',
                         boundary: (rootEl.offsetParent as HTMLElement) || undefined,
                         axis: 'x',
-                        reposition: 'none'
+                        reposition: 'none',
+                        isRtl: locale.isRtl
                     });
                     const coords = subFloatingCtrl.computePosition();
                     if (coords.actualPlacement.startsWith('left')) {

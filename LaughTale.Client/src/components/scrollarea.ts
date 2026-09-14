@@ -64,7 +64,7 @@ const SCROLLAREA_CSS = `
 }
 .p-scrollarea-scrollbar-vertical {
     top: 0;
-    right: 0;
+    inset-inline-end: 0;
     bottom: 0;
     width: 9px;
 }
@@ -77,7 +77,7 @@ const SCROLLAREA_CSS = `
 }
 .p-scrollarea-corner {
     position: absolute;
-    right: 0;
+    inset-inline-end: 0;
     bottom: 0;
     width: 9px;
     height: 9px;
@@ -280,6 +280,13 @@ export default function ScrollAreaIsland(container: HTMLElement, props: ScrollAr
         }
 
         // Horizontal
+        // NOTE (RTL): this assumes `scrollLeft` is 0 at the physical-left extreme and grows
+        // toward the physical-right extreme, which holds for LTR content. Under dir="rtl",
+        // browsers disagree on the sign/zero-point of `scrollLeft` (Chrome/Safari report
+        // negative values growing further left of 0; Firefox's legacy behavior differs from
+        // both), so this handle-position and the drag math further below can be wrong under
+        // RTL in some browsers. Left unfixed pending manual cross-browser verification rather
+        // than guessing at a fix that can't be exercised in this test environment.
         if (hBar && hHandle) {
             const hasHorizontalScroll = scrollWidth > clientWidth;
             hBar.style.display = hasHorizontalScroll ? 'flex' : 'none';

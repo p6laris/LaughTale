@@ -16,6 +16,7 @@ import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtim
 import { setRovingTabindex, handleRovingKeydown } from '../accessibility/aria';
 import { useKeyboardNav } from '../composables/useKeyboardNav';
 import type { PatternDeclaration } from '../accessibility/patterns';
+import { useLocale } from '../composables/useLocale';
 
 export const a11y: PatternDeclaration = {
     kind: 'pattern',
@@ -142,7 +143,7 @@ const CONTEXTMENU_CSS = `
 }
 
 .p-contextmenu-shortcut {
-    margin-left: auto;
+    margin-inline-start: auto;
     font-size: 0.75rem;
     color: var(--p-text-muted, var(--lt-surface-400));
     background: var(--lt-surface-100);
@@ -152,7 +153,7 @@ const CONTEXTMENU_CSS = `
 }
 
 .p-contextmenu-badge {
-    margin-left: auto;
+    margin-inline-start: auto;
     font-size: 0.75rem;
     font-weight: 700;
     border-radius: 9999px;
@@ -162,7 +163,7 @@ const CONTEXTMENU_CSS = `
 }
 
 .p-contextmenu-submenu-icon {
-    margin-left: auto;
+    margin-inline-start: auto;
     color: var(--p-contextmenu-submenu-icon-color, var(--lt-surface-400));
     display: inline-flex;
     align-items: center;
@@ -187,7 +188,7 @@ const CONTEXTMENU_CSS = `
     padding: var(--p-contextmenu-list-padding, 0.25rem);
     display: none;
     z-index: 1201;
-    margin-left: 2px;
+    margin-inline-start: 2px;
 }
 
 .p-contextmenu-item:hover > .p-contextmenu-sublist-wrapper,
@@ -198,8 +199,8 @@ const CONTEXTMENU_CSS = `
 .p-contextmenu-sublist-wrapper.p-sublist-left {
     left: auto;
     right: 100%;
-    margin-left: 0;
-    margin-right: 2px;
+    margin-inline-start: 0;
+    margin-inline-end: 2px;
 }
 
 /* Target Area Cards */
@@ -287,6 +288,7 @@ const CHEVRON_RIGHT_SVG = html`<svg xmlns="http://www.w3.org/2000/svg" width="14
 
 export default function ContextMenuIsland(container: HTMLElement, props: ContextMenuProps, ctx?: IslandContext) {
     injectIslandStyle('contextmenu', CONTEXTMENU_CSS);
+    const locale = useLocale(ctx);
 
     const demoType = props.demoType || 'basic';
     const isGlobal = props.global === true || demoType === 'global';
@@ -424,7 +426,7 @@ export default function ContextMenuIsland(container: HTMLElement, props: Context
                                             <span>${p.category}</span>
                                         </div>
                                     </div>
-                                    <span style="font-weight: 700; font-size: 0.875rem; color: var(--lt-text-primary); margin-left: 1rem;">$${p.price}</span>
+                                    <span style="font-weight: 700; font-size: 0.875rem; color: var(--lt-text-primary); margin-inline-start: 1rem;">$${p.price}</span>
                                 </div>
                             </li>
                         `)}
@@ -575,7 +577,8 @@ export default function ContextMenuIsland(container: HTMLElement, props: Context
             strategy: 'fixed',
             reposition: 'dismiss',
             onDismiss: hideMenu,
-            signal: effectiveSignal
+            signal: effectiveSignal,
+            isRtl: locale.isRtl
         });
         rootFloatingCtrl.update();
         menuEl.style.visibility = 'visible';
@@ -594,7 +597,8 @@ export default function ContextMenuIsland(container: HTMLElement, props: Context
                 strategy: 'absolute',
                 boundary: (menuEl.offsetParent as HTMLElement) || undefined,
                 axis: 'x',
-                reposition: 'none'
+                reposition: 'none',
+                isRtl: locale.isRtl
             });
             const coords = subFloatingCtrl.computePosition();
             if (coords.actualPlacement.startsWith('left')) {

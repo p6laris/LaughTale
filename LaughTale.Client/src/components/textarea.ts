@@ -118,7 +118,7 @@ const CSS = `
 .p-textarea-counter {
     font-size: 0.75rem;
     color: var(--p-text-muted, var(--lt-surface-500));
-    text-align: right;
+    text-align: end;
     margin-top: 0.25rem;
     font-family: var(--p-font-mono, monospace);
 }

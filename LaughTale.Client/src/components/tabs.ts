@@ -144,14 +144,14 @@ island-tab:focus-visible {
 .p-tablist-prev-button {
     left: 0;
     justify-content: flex-start;
-    padding-left: 0.5rem;
+    padding-inline-start: 0.5rem;
     background: linear-gradient(to right, var(--p-surface-50, var(--lt-surface-50, #f8fafc)) 35%, rgba(248, 250, 252, 0.7) 65%, transparent 100%);
 }
 
 .p-tablist-next-button {
     right: 0;
     justify-content: flex-end;
-    padding-right: 0.5rem;
+    padding-inline-end: 0.5rem;
     background: linear-gradient(to left, var(--p-surface-50, var(--lt-surface-50, #f8fafc)) 35%, rgba(248, 250, 252, 0.7) 65%, transparent 100%);
 }
 
@@ -314,6 +314,19 @@ html.dark island-tabpanel,
 .dark .p-tabpanel,
 .dark island-tabpanel {
     color: var(--p-text-color);
+}
+
+/* Bi-Directional RTL Support: swap physical side AND gradient direction together
+   since linear-gradient() has no logical-property equivalent. */
+[dir="rtl"] .p-tablist-prev-button {
+    left: auto;
+    right: 0;
+    background: linear-gradient(to left, var(--p-surface-50, var(--lt-surface-50, #f8fafc)) 35%, rgba(248, 250, 252, 0.7) 65%, transparent 100%);
+}
+[dir="rtl"] .p-tablist-next-button {
+    right: auto;
+    left: 0;
+    background: linear-gradient(to right, var(--p-surface-50, var(--lt-surface-50, #f8fafc)) 35%, rgba(248, 250, 252, 0.7) 65%, transparent 100%);
 }
 `;
 

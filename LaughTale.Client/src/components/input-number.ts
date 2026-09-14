@@ -274,12 +274,12 @@ const CSS = `
     display: flex;
     flex-direction: column;
     width: 2.25rem;
-    border-left: 1px solid var(--lt-surface-200);
+    border-inline-start: 1px solid var(--lt-surface-200);
     background: var(--lt-surface-100);
     flex-shrink: 0;
 }
 .p-inputnumber:focus-within .p-inputnumber-button-group {
-    border-left-color: var(--lt-primary-500);
+    border-inline-start-color: var(--lt-primary-500);
 }
 .p-inputnumber-stacked .p-inputnumber-button-up {
     flex: 1;
@@ -295,22 +295,22 @@ const CSS = `
 /* Layout 2: Horizontal */
 .p-inputnumber-horizontal .p-inputnumber-button-down {
     width: 2.5rem;
-    border-right: 1px solid var(--lt-surface-200);
+    border-inline-end: 1px solid var(--lt-surface-200);
     flex-shrink: 0;
 }
 .p-inputnumber-horizontal:focus-within .p-inputnumber-button-down {
-    border-right-color: var(--lt-primary-500);
+    border-inline-end-color: var(--lt-primary-500);
 }
 .p-inputnumber-horizontal .p-inputnumber-input {
     text-align: center;
 }
 .p-inputnumber-horizontal .p-inputnumber-button-up {
     width: 2.5rem;
-    border-left: 1px solid var(--lt-surface-200);
+    border-inline-start: 1px solid var(--lt-surface-200);
     flex-shrink: 0;
 }
 .p-inputnumber-horizontal:focus-within .p-inputnumber-button-up {
-    border-left-color: var(--lt-primary-500);
+    border-inline-start-color: var(--lt-primary-500);
 }
 
 /* Layout 3: Vertical */

@@ -168,7 +168,7 @@ const COMMAND_CSS = `
 .p-commandmenu-item-category {
     font-size: 0.75rem;
     color: var(--p-text-muted, var(--lt-surface-400));
-    margin-left: auto;
+    margin-inline-start: auto;
     opacity: 0.7;
     flex-shrink: 0;
 }
@@ -710,7 +710,7 @@ export default function CommandMenuIsland(container: HTMLElement, props: Command
         setHtml(container, html`
             <div class="p-commandmenu-dialog-trigger-wrapper" style="display: flex; align-items: center; justify-content: center; padding: 2rem 0;">
                 <span class="p-commandmenu-dialog-trigger" style="cursor: pointer; font-size: 0.9375rem; color: var(--lt-text-primary); display: inline-flex; align-items: center;">
-                    Press <kbd class="p-commandmenu-kbd" style="margin-left: 0.5rem; padding: 0.25rem 0.6rem; height: auto; font-size: 0.8125rem; font-weight: 600; background: var(--lt-surface-100); border: 1px solid var(--lt-surface-200); border-radius: 6px;">CTRL/⌘ + L</kbd>
+                    Press <kbd class="p-commandmenu-kbd" style="margin-inline-start: 0.5rem; padding: 0.25rem 0.6rem; height: auto; font-size: 0.8125rem; font-weight: 600; background: var(--lt-surface-100); border: 1px solid var(--lt-surface-200); border-radius: 6px;">CTRL/⌘ + L</kbd>
                 </span>
             </div>
         `);

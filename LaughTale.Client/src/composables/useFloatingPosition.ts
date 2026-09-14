@@ -22,6 +22,32 @@ export interface UseFloatingPositionOptions {
     strategy?: 'fixed' | 'absolute';
     boundary?: HTMLElement;
     axis?: 'both' | 'x' | 'y';
+    /**
+     * Whether the surrounding UI is right-to-left. When true, logical placements are
+     * mirrored: a '*-start' placement aligns to the physical right edge instead of the
+     * left, and pure 'left'/'right' compass placements swap sides. When omitted, this is
+     * auto-detected from the floating element's resolved `direction` CSS property, so
+     * callers that already render inside a `dir="rtl"` subtree get correct behavior for
+     * free; pass it explicitly when the caller already has a resolved locale/dir value
+     * (e.g. from `useLocale(ctx)`) to avoid relying on layout timing.
+     */
+    isRtl?: boolean;
+}
+
+/**
+ * Mirrors a placement's horizontal meaning for RTL contexts: swaps physical
+ * 'left'/'right' compass placements, and swaps the '-start'/'-end' suffix used by
+ * 'top'/'bottom' placements to align to the reference element's logical start/end edge.
+ * Exported so callers/tests can reason about the mirrored placement without duplicating
+ * this logic.
+ */
+export function mirrorPlacementForRtl(placement: FloatingPlacement, isRtl: boolean): FloatingPlacement {
+    if (!isRtl) return placement;
+    if (placement.startsWith('left')) return placement.replace('left', 'right') as FloatingPlacement;
+    if (placement.startsWith('right')) return placement.replace('right', 'left') as FloatingPlacement;
+    if (placement.endsWith('-start')) return placement.replace('-start', '-end') as FloatingPlacement;
+    if (placement.endsWith('-end')) return placement.replace('-end', '-start') as FloatingPlacement;
+    return placement;
 }
 
 export interface FloatingCoords {
@@ -50,7 +76,13 @@ export function useFloatingPosition(
     const boundary = options.boundary;
     const axis = options.axis ?? 'both';
     const signal = options.signal;
-    const initialPlacement: FloatingPlacement = options.placement ?? 'bottom-start';
+    const rawInitialPlacement: FloatingPlacement = options.placement ?? 'bottom-start';
+    const isRtl = options.isRtl ?? (
+        typeof window !== 'undefined' && typeof window.getComputedStyle === 'function'
+            ? window.getComputedStyle(floating).direction === 'rtl'
+            : false
+    );
+    const initialPlacement: FloatingPlacement = mirrorPlacementForRtl(rawInitialPlacement, isRtl);
 
     const isPointAnchor = reference != null && !('nodeType' in reference) && typeof (reference as any).x === 'number' && typeof (reference as any).y === 'number';
 

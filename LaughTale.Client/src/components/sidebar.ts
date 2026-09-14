@@ -357,7 +357,7 @@ html.dark .p-sidebar-menu-button.p-sidebar-active,
     font-weight: 500;
     transition: background-color 0.12s ease, color 0.12s ease, padding 260ms ease, border-color 0.12s ease;
     box-sizing: border-box;
-    text-align: left;
+    text-align: start;
     outline: none;
     position: relative;
     overflow: hidden;
@@ -480,9 +480,10 @@ html.dark .p-sidebar-menu-button.p-sidebar-active,
     overflow: hidden;
     min-height: 0;
     list-style: none;
-    margin: 0.15rem 0 0.25rem 1.15rem;
-    padding: 0 0 0 0.65rem;
-    border-left: 1px solid var(--lt-surface-200);
+    margin-block: 0.15rem 0.25rem;
+    margin-inline-start: 1.15rem;
+    padding-inline-start: 0.65rem;
+    border-inline-start: 1px solid var(--lt-surface-200);
     display: flex;
     flex-direction: column;
     gap: 0.125rem;
@@ -501,7 +502,7 @@ html.dark .p-sidebar-menu-button.p-sidebar-active,
     transition: background-color 0.12s ease, color 0.12s ease;
     border: none;
     background: transparent;
-    text-align: left;
+    text-align: start;
 }
 
 .p-sidebar-menu-sub-button:hover {
@@ -1388,7 +1389,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps, ctx?
                                 ${chatGptSparkleIcon}
                             </div>
                             <span class="p-sidebar-item-label p-sidebar-header-label" style="font-weight: 700; font-size: 0.9rem;">ChatGPT</span>
-                            <svg class="p-sidebar-submenu-chevron" style="margin-left: auto;" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                            <svg class="p-sidebar-submenu-chevron" style="margin-inline-start: auto;" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                         </button>
                     </li>
                 </ul>
@@ -1423,7 +1424,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps, ctx?
                             <button type="button" class="p-sidebar-menu-button" data-company-trigger style="padding: 0.35rem 0.5rem;">
                                 <div style="display:flex; width:1.5rem; height:1.5rem; border-radius:6px; background: ${activeCompany.color}; color:var(--lt-surface-0, var(--lt-surface-0)); align-items:center; justify-content:center; font-weight:700; font-size:0.75rem; flex-shrink:0;">${activeCompany.logo}</div>
                                 <span class="p-sidebar-item-label p-sidebar-header-label" style="font-weight: 700; font-size: 0.875rem;">${activeCompany.name}</span>
-                                <svg class="p-sidebar-submenu-chevron" style="margin-left: auto;" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                                <svg class="p-sidebar-submenu-chevron" style="margin-inline-start: auto;" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                             </button>
                         </li>
                     </ul>
@@ -1433,17 +1434,17 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps, ctx?
                             <div class="p-sb-popup-item" data-select-company="Acme Inc|A|linear-gradient(135deg, var(--lt-primary-500, var(--lt-primary-500)), var(--lt-info-600, var(--lt-info-600)))">
                                 <div style="display:flex; width:1.25rem; height:1.25rem; border-radius:4px; background: linear-gradient(135deg, var(--lt-primary-500, var(--lt-primary-500)), var(--lt-info-600, var(--lt-info-600))); color:var(--lt-surface-0, var(--lt-surface-0)); align-items:center; justify-content:center; font-weight:700; font-size:0.65rem;">A</div>
                                 <span>Acme Inc</span>
-                                ${activeCompany.name === 'Acme Inc' ? '<span style="margin-left:auto; color:var(--lt-primary-600); font-weight:700;">✓</span>' : ''}
+                                ${activeCompany.name === 'Acme Inc' ? '<span style="margin-inline-start:auto; color:var(--lt-primary-600); font-weight:700;">✓</span>' : ''}
                             </div>
                             <div class="p-sb-popup-item" data-select-company="Globex Corp|G|linear-gradient(135deg, var(--lt-primary-500), var(--lt-primary-600))">
                                 <div style="display:flex; width:1.25rem; height:1.25rem; border-radius:4px; background: linear-gradient(135deg, var(--lt-primary-500), var(--lt-primary-600)); color:var(--lt-surface-0); align-items:center; justify-content:center; font-weight:700; font-size:0.65rem;">G</div>
                                 <span>Globex Corp</span>
-                                ${activeCompany.name === 'Globex Corp' ? '<span style="margin-left:auto; color:var(--lt-primary-600); font-weight:700;">✓</span>' : ''}
+                                ${activeCompany.name === 'Globex Corp' ? '<span style="margin-inline-start:auto; color:var(--lt-primary-600); font-weight:700;">✓</span>' : ''}
                             </div>
                             <div class="p-sb-popup-item" data-select-company="Initech|I|linear-gradient(135deg, var(--lt-warn-500), var(--lt-danger-600, var(--lt-danger-600)))">
                                 <div style="display:flex; width:1.25rem; height:1.25rem; border-radius:4px; background: linear-gradient(135deg, var(--lt-warn-500), var(--lt-danger-600, var(--lt-danger-600))); color:var(--lt-surface-0, var(--lt-surface-0)); align-items:center; justify-content:center; font-weight:700; font-size:0.65rem;">I</div>
                                 <span>Initech</span>
-                                ${activeCompany.name === 'Initech' ? '<span style="margin-left:auto; color:var(--lt-primary-600); font-weight:700;">✓</span>' : ''}
+                                ${activeCompany.name === 'Initech' ? '<span style="margin-inline-start:auto; color:var(--lt-primary-600); font-weight:700;">✓</span>' : ''}
                             </div>
                             <div style="border-top: 1px solid var(--lt-surface-200); margin: 0.25rem 0;"></div>
                             <div class="p-sb-popup-item" style="color: var(--p-text-muted);">
@@ -1489,7 +1490,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps, ctx?
                             <button type="button" class="p-sidebar-menu-button" data-user-trigger style="padding: 0.35rem 0.5rem;">
                                 <div style="display:flex; width:1.5rem; height:1.5rem; border-radius:9999px; background: var(--lt-surface-300); color:var(--lt-surface-800); align-items:center; justify-content:center; font-weight:700; font-size:0.65rem; flex-shrink:0;">JD</div>
                                 <span class="p-sidebar-item-label p-sidebar-footer-label" style="font-weight: 600; font-size: 0.8125rem;">John Doe</span>
-                                <svg class="p-sidebar-submenu-chevron" style="margin-left: auto;" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                                <svg class="p-sidebar-submenu-chevron" style="margin-inline-start: auto;" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                             </button>
                         </li>
                     </ul>
@@ -1614,7 +1615,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps, ctx?
                             ${triggerIconSvg}
                         </button>
                         <span style="font-size: 0.875rem; font-weight: 600; color: var(--lt-text-primary);">Dashboard</span>
-                        <button type="button" class="p-sidebar-trigger" data-ai-toggle style="margin-left: auto;" aria-label="Toggle AI chat panel">
+                        <button type="button" class="p-sidebar-trigger" data-ai-toggle style="margin-inline-start: auto;" aria-label="Toggle AI chat panel">
                             ${chatIconSvg}
                         </button>
                     </header>
@@ -1633,7 +1634,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps, ctx?
                         ${triggerIconSvg}
                     </button>
                     <span style="font-size: 0.875rem; font-weight: 600; color: var(--lt-text-primary);">Dashboard</span>
-                    ${demoType === 'responsive' ? `<span style="margin-left: auto; font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.5rem; border-radius: 6px; background: var(--lt-surface-100); color: var(--p-text-muted);">Desktop</span>` : ''}
+                    ${demoType === 'responsive' ? `<span style="margin-inline-start: auto; font-size: 0.75rem; font-weight: 600; padding: 0.2rem 0.5rem; border-radius: 6px; background: var(--lt-surface-100); color: var(--p-text-muted);">Desktop</span>` : ''}
                 </header>
                 <div style="flex: 1; padding: 1rem; display: flex; flex-direction: column; gap: 1rem; overflow-y: auto;">
                     <div style="height: 6rem; border-radius: 8px; background: var(--lt-surface-100); border: 1px solid var(--lt-surface-200); display: flex; align-items: center; justify-content: center; color: var(--p-text-muted); font-size: 0.875rem;">Main Content View</div>

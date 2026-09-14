@@ -93,7 +93,7 @@ const TREE_CSS = `
 
 .p-tree-filter-icon {
     position: absolute;
-    left: 0.75rem;
+    inset-inline-start: 0.75rem;
     top: 50%;
     transform: translateY(-50%);
     color: var(--lt-surface-400);
@@ -126,17 +126,17 @@ const TREE_CSS = `
     padding: 0;
     list-style: none;
 }
-.p-tree-node[data-level="1"] { padding-left: 1.5rem; }
-.p-tree-node[data-level="2"] { padding-left: 3rem; }
-.p-tree-node[data-level="3"] { padding-left: 4.5rem; }
-.p-tree-node[data-level="4"] { padding-left: 6rem; }
-.p-tree-node[data-level="5"] { padding-left: 7.5rem; }
-.p-tree-node[data-level="6"] { padding-left: 9rem; }
-.p-tree-node[data-level="7"] { padding-left: 10.5rem; }
-.p-tree-node[data-level="8"] { padding-left: 12rem; }
+.p-tree-node[data-level="1"] { padding-inline-start: 1.5rem; }
+.p-tree-node[data-level="2"] { padding-inline-start: 3rem; }
+.p-tree-node[data-level="3"] { padding-inline-start: 4.5rem; }
+.p-tree-node[data-level="4"] { padding-inline-start: 6rem; }
+.p-tree-node[data-level="5"] { padding-inline-start: 7.5rem; }
+.p-tree-node[data-level="6"] { padding-inline-start: 9rem; }
+.p-tree-node[data-level="7"] { padding-inline-start: 10.5rem; }
+.p-tree-node[data-level="8"] { padding-inline-start: 12rem; }
 
 .p-tree-node-children {
-    padding-left: 1.5rem;
+    padding-inline-start: 1.5rem;
 }
 
 .p-tree-node {
@@ -198,7 +198,7 @@ const TREE_CSS = `
 }
 
 .p-tree-node-checkbox {
-    margin-right: 0.25rem;
+    margin-inline-end: 0.25rem;
     cursor: pointer;
     display: inline-flex;
     align-items: center;

@@ -49,36 +49,36 @@ const CONFIRM_DIALOG_CSS = `
 .p-confirmdialog-mask.p-confirmdialog-pos-left {
     align-items: center;
     justify-content: flex-start;
-    padding-left: 3rem;
+    padding-inline-start: 3rem;
 }
 .p-confirmdialog-mask.p-confirmdialog-pos-right {
     align-items: center;
     justify-content: flex-end;
-    padding-right: 3rem;
+    padding-inline-end: 3rem;
 }
 .p-confirmdialog-mask.p-confirmdialog-pos-topleft {
     align-items: flex-start;
     justify-content: flex-start;
     padding-top: 3rem;
-    padding-left: 3rem;
+    padding-inline-start: 3rem;
 }
 .p-confirmdialog-mask.p-confirmdialog-pos-topright {
     align-items: flex-start;
     justify-content: flex-end;
     padding-top: 3rem;
-    padding-right: 3rem;
+    padding-inline-end: 3rem;
 }
 .p-confirmdialog-mask.p-confirmdialog-pos-bottomleft {
     align-items: flex-end;
     justify-content: flex-start;
     padding-bottom: 3rem;
-    padding-left: 3rem;
+    padding-inline-start: 3rem;
 }
 .p-confirmdialog-mask.p-confirmdialog-pos-bottomright {
     align-items: flex-end;
     justify-content: flex-end;
     padding-bottom: 3rem;
-    padding-right: 3rem;
+    padding-inline-end: 3rem;
 }
 
 /* Dialog Container */
@@ -468,7 +468,7 @@ export function showToastFeedback(summary: string, detail: string, severity: 'su
     const bgColor = isError ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)';
     const textColor = isError ? 'var(--lt-danger-500, var(--lt-danger-500))' : 'var(--lt-primary-600)';
 
-    toastItem.style.cssText = `background: var(--lt-surface-0); border-left: 4px solid ${borderColor}; border-radius: var(--lt-radius); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); padding: 0.75rem 1rem; width: 18rem; pointer-events: auto; display: flex; align-items: flex-start; gap: 0.5rem; animation: slideInRight 0.2s ease;`;
+    toastItem.style.cssText = `background: var(--lt-surface-0); border-inline-start: 4px solid ${borderColor}; border-radius: var(--lt-radius); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); padding: 0.75rem 1rem; width: 18rem; pointer-events: auto; display: flex; align-items: flex-start; gap: 0.5rem; animation: slideInRight 0.2s ease;`;
     setHtml(toastItem, html`
         <span style="color: ${textColor}; display: flex; align-items: center; margin-top: 2px;">${isError ? DANGER_ALERT_SVG : CHECK_SVG}</span>
         <div>

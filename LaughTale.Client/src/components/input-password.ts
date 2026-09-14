@@ -135,7 +135,7 @@ const CSS = `
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding-left: 0.75rem;
+    padding-inline-start: 0.75rem;
     color: var(--lt-surface-400);
     pointer-events: none;
     flex-shrink: 0;
@@ -281,7 +281,7 @@ const CSS = `
 .p-password-popover {
     position: absolute;
     top: calc(100% + 8px);
-    left: 0;
+    inset-inline-start: 0;
     width: 320px;
     background: var(--lt-surface-0);
     border: 1px solid var(--lt-surface-200);
@@ -298,11 +298,11 @@ const CSS = `
     content: '';
     position: absolute;
     top: -5px;
-    left: 1.5rem;
+    inset-inline-start: 1.5rem;
     width: 8px;
     height: 8px;
     background: var(--lt-surface-0);
-    border-left: 1px solid var(--lt-surface-200);
+    border-inline-start: 1px solid var(--lt-surface-200);
     border-top: 1px solid var(--lt-surface-200);
     transform: rotate(45deg);
 }
@@ -406,7 +406,7 @@ html.dark .p-password-popover::before,
 [data-theme="dark"] .p-password-popover::before,
 .dark .p-password-popover::before {
     background: var(--p-surface-0);
-    border-left-color: var(--p-border-color);
+    border-inline-start-color: var(--p-border-color);
     border-top-color: var(--p-border-color);
 }
 html.dark .p-password-popover-header-title svg,

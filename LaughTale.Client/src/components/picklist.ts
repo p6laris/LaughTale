@@ -140,7 +140,7 @@ const PICKLIST_CSS = `
 }
 .p-picklist-filter-icon {
     position: absolute;
-    right: 1.25rem;
+    inset-inline-end: 1.25rem;
     color: var(--lt-surface-400);
     pointer-events: none;
     display: flex;

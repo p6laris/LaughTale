@@ -36,7 +36,7 @@ island-ifta-label > label,
 .laughtale-ifta-label > label {
     position: absolute;
     top: 0.4rem;
-    left: 0.75rem;
+    inset-inline-start: 0.75rem;
     color: var(--p-text-muted);
     font-size: 0.6875rem;
     font-weight: 600;

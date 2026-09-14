@@ -260,7 +260,7 @@ const CSS = `
     font-size: 0.8125rem;
     font-weight: 600;
     color: var(--lt-text-primary);
-    margin-right: 0.75rem;
+    margin-inline-end: 0.75rem;
 }
 
 /* Radio Group */

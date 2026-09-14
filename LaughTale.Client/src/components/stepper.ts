@@ -214,7 +214,7 @@ p-stepitem:not(:last-child)::before {
     grid-template-rows: 0fr;
     transition: grid-template-rows 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
     opacity: 0;
-    margin-left: 3.25rem;
+    margin-inline-start: 3.25rem;
     position: relative;
     z-index: 2;
 }

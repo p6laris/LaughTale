@@ -124,11 +124,32 @@ p-galleria {
 }
 
 .p-galleria-item-prev {
-    left: 0.875rem;
+    inset-inline-start: 0.875rem;
 }
 
 .p-galleria-item-next {
-    right: 0.875rem;
+    inset-inline-end: 0.875rem;
+}
+
+.p-galleria-item-prev .p-galleria-nav-icon {
+    transform: rotate(90deg);
+    display: flex;
+}
+
+.p-galleria-item-next .p-galleria-nav-icon {
+    transform: rotate(-90deg);
+    display: flex;
+}
+
+/* Bi-Directional RTL Support: prev/next swap physical sides via inset-inline-*
+   above; the chevrons must swap rotation sign to keep pointing "toward reading
+   start" / "toward reading end" respectively. */
+[dir="rtl"] .p-galleria-item-prev .p-galleria-nav-icon {
+    transform: rotate(-90deg);
+}
+
+[dir="rtl"] .p-galleria-item-next .p-galleria-nav-icon {
+    transform: rotate(90deg);
 }
 
 .p-galleria-caption {
@@ -333,10 +354,10 @@ export default function GalleriaIsland(container: HTMLElement, props: GalleriaPr
 
                         ${showNavigators ? html`
                             <button type="button" class="p-galleria-item-nav p-galleria-item-prev" aria-label="Previous image">
-                                <span style="transform: rotate(90deg); display: flex;">${unsafe(LucideIcons.chevronDown)}</span>
+                                <span class="p-galleria-nav-icon">${unsafe(LucideIcons.chevronDown)}</span>
                             </button>
                             <button type="button" class="p-galleria-item-nav p-galleria-item-next" aria-label="Next image">
-                                <span style="transform: rotate(-90deg); display: flex;">${unsafe(LucideIcons.chevronDown)}</span>
+                                <span class="p-galleria-nav-icon">${unsafe(LucideIcons.chevronDown)}</span>
                             </button>
                         ` : ''}
 

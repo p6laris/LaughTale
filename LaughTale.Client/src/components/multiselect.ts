@@ -150,7 +150,8 @@ export default function MultiSelectIsland<T = string>(container: HTMLElement, pr
                 placement: 'bottom-start',
                 reposition: 'follow',
                 signal: ctx?.signal,
-                offset: 4
+                offset: 4,
+                isRtl: locale.isRtl
             });
             overlayTransition.enter();
             filterInput.focus();

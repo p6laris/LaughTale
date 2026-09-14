@@ -60,36 +60,36 @@ p-dialog {
 .p-dialog-mask.p-dialog-pos-left {
     align-items: center;
     justify-content: flex-start;
-    padding-left: 3rem;
+    padding-inline-start: 3rem;
 }
 .p-dialog-mask.p-dialog-pos-right {
     align-items: center;
     justify-content: flex-end;
-    padding-right: 3rem;
+    padding-inline-end: 3rem;
 }
 .p-dialog-mask.p-dialog-pos-topleft {
     align-items: flex-start;
     justify-content: flex-start;
     padding-top: 3rem;
-    padding-left: 3rem;
+    padding-inline-start: 3rem;
 }
 .p-dialog-mask.p-dialog-pos-topright {
     align-items: flex-start;
     justify-content: flex-end;
     padding-top: 3rem;
-    padding-right: 3rem;
+    padding-inline-end: 3rem;
 }
 .p-dialog-mask.p-dialog-pos-bottomleft {
     align-items: flex-end;
     justify-content: flex-start;
     padding-bottom: 3rem;
-    padding-left: 3rem;
+    padding-inline-start: 3rem;
 }
 .p-dialog-mask.p-dialog-pos-bottomright {
     align-items: flex-end;
     justify-content: flex-end;
     padding-bottom: 3rem;
-    padding-right: 3rem;
+    padding-inline-end: 3rem;
 }
 
 /* Dialog Container */
@@ -153,7 +153,7 @@ p-dialog {
     display: flex;
     align-items: center;
     gap: 0.25rem;
-    margin-left: auto;
+    margin-inline-start: auto;
 }
 
 .p-dialog-header-action {

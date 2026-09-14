@@ -199,7 +199,7 @@ const CSS = `
     border: none;
     background: transparent;
     padding: 0;
-    margin-left: 0.125rem;
+    margin-inline-start: 0.125rem;
     border-radius: 9999px;
 }
 .p-treeselect-token-remove:hover {
@@ -211,7 +211,7 @@ const CSS = `
     display: flex;
     align-items: center;
     gap: 0.35rem;
-    margin-left: 0.5rem;
+    margin-inline-start: 0.5rem;
 }
 .p-treeselect-clear-icon {
     display: inline-flex;
@@ -314,7 +314,7 @@ const CSS = `
 }
 
 .p-treenode-children {
-    padding-left: 1.25rem;
+    padding-inline-start: 1.25rem;
     margin: 0;
     list-style: none;
 }
@@ -529,6 +529,11 @@ html.dark .p-tree-checkbox,
     background: var(--p-surface-50);
     border-color: var(--p-border-color);
 }
+
+/* Bi-Directional RTL Support */
+[dir="rtl"] .p-tree-toggler svg {
+    transform: scaleX(-1);
+}
 `;
 
 const checkSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
@@ -632,7 +637,8 @@ export default function TreeSelectIsland(container: HTMLElement, props: TreeSele
                     placement: 'bottom-start',
                     reposition: 'follow',
                     signal: ctx?.signal,
-                    offset: 4
+                    offset: 4,
+                    isRtl: locale.isRtl
                 });
             }
             if (isFilter) {

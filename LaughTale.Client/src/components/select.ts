@@ -894,7 +894,8 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
                     placement: 'bottom-start',
                     reposition: 'follow',
                     signal: ctx?.signal,
-                    offset: 4
+                    offset: 4,
+                    isRtl: locale.isRtl
                 });
             }
             updateVirtualPositions();

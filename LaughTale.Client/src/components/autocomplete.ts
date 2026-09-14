@@ -85,8 +85,8 @@ const CSS = `
     position: relative;
 }
 .laughtale-autocomplete.has-dropdown .ac-input-container {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
+    border-start-end-radius: 0;
+    border-end-end-radius: 0;
 }
 .ac-input-container.variant-filled {
     background: var(--lt-surface-50);
@@ -187,7 +187,7 @@ const CSS = `
     border-radius: 50%;
     transition: color 0.15s ease, background 0.15s ease;
     flex-shrink: 0;
-    margin-left: 0.25rem;
+    margin-inline-start: 0.25rem;
 }
 .ac-btn-icon:hover {
     color: var(--lt-text-primary);
@@ -199,11 +199,11 @@ const CSS = `
     align-items: center;
     justify-content: center;
     border: 1px solid var(--lt-surface-200);
-    border-left: none;
+    border-inline-start: none;
     background: var(--lt-surface-100);
     color: var(--p-text-muted);
-    border-top-right-radius: var(--lt-radius);
-    border-bottom-right-radius: var(--lt-radius);
+    border-start-end-radius: var(--lt-radius);
+    border-end-end-radius: var(--lt-radius);
     cursor: pointer;
     padding: 0 0.85rem;
     transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
@@ -447,7 +447,8 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
                 placement: 'bottom-start',
                 reposition: 'follow',
                 signal: ctx?.signal,
-                offset: 4
+                offset: 4,
+                isRtl: locale.isRtl
             });
         },
         onClose: () => {
@@ -577,7 +578,7 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
         let statusHtml: Raw | string = '';
         if (item.status) {
             const statusColor = item.status === 'online' ? 'var(--lt-primary-500, var(--lt-primary-500))' : (item.status === 'away' ? 'var(--lt-warn-500, var(--lt-warn-500))' : 'var(--lt-surface-400, var(--lt-surface-400))');
-            statusHtml = html`<span style="width: 8px; height: 8px; border-radius: 50%; background: ${statusColor}; margin-right: 0.35rem; display: inline-block;"></span>`;
+            statusHtml = html`<span style="width: 8px; height: 8px; border-radius: 50%; background: ${statusColor}; margin-inline-end: 0.35rem; display: inline-block;"></span>`;
         }
 
         let trailingHtml: Raw | string = '';

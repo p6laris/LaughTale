@@ -141,7 +141,7 @@ const TIEREDMENU_CSS = `
 }
 
 .p-tieredmenu-badge {
-    margin-left: auto;
+    margin-inline-start: auto;
     font-size: 0.6875rem;
     font-weight: 700;
     padding: 0.1rem 0.4rem;
@@ -152,7 +152,7 @@ const TIEREDMENU_CSS = `
 }
 
 .p-tieredmenu-shortcut {
-    margin-left: auto;
+    margin-inline-start: auto;
     font-size: 0.75rem;
     font-weight: 500;
     padding: 0.1rem 0.35rem;
@@ -165,7 +165,7 @@ const TIEREDMENU_CSS = `
 }
 
 .p-tieredmenu-submenu-icon {
-    margin-left: auto;
+    margin-inline-start: auto;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -189,7 +189,7 @@ const TIEREDMENU_CSS = `
     position: absolute;
     top: 0;
     left: 100%;
-    margin-left: 0.25rem;
+    margin-inline-start: 0.25rem;
     min-width: 14rem;
     background: var(--p-tieredmenu-background, var(--lt-surface-0));
     border: 1px solid var(--p-tieredmenu-border-color, var(--lt-surface-200));
@@ -204,8 +204,8 @@ const TIEREDMENU_CSS = `
 .p-tieredmenu-submenu.p-flipped-left {
     left: auto;
     right: 100%;
-    margin-left: 0;
-    margin-right: 0.25rem;
+    margin-inline-start: 0;
+    margin-inline-end: 0.25rem;
     transform-origin: top right;
 }
 
@@ -277,6 +277,11 @@ html.dark .p-tieredmenu-badge,
 .dark .p-tieredmenu-badge {
     background: var(--p-surface-100);
     color: var(--p-text-color);
+}
+
+/* Bi-Directional RTL Support */
+[dir="rtl"] .p-tieredmenu-submenu-icon {
+    transform: scaleX(-1);
 }
 `;
 
@@ -448,7 +453,8 @@ export default function TieredMenuIsland(container: HTMLElement, props: TieredMe
                         strategy: 'absolute',
                         boundary: (rootEl.offsetParent as HTMLElement) || undefined,
                         reposition: 'follow',
-                        signal: effectiveSignal
+                        signal: effectiveSignal,
+                        isRtl: locale.isRtl
                     });
                     popupFloatingCtrl.update();
                 } else {
@@ -536,7 +542,8 @@ export default function TieredMenuIsland(container: HTMLElement, props: TieredMe
                 strategy: 'absolute',
                 boundary: (rootEl?.offsetParent as HTMLElement) || undefined,
                 axis: 'x',
-                reposition: 'none'
+                reposition: 'none',
+                isRtl: locale.isRtl
             });
             const coords = subFloatingCtrl.computePosition();
             if (coords.actualPlacement.startsWith('left')) {

@@ -199,7 +199,7 @@ const TOAST_CSS = `
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    margin-left: auto;
+    margin-inline-start: auto;
     flex-shrink: 0;
     padding: 0;
     opacity: 0.7;

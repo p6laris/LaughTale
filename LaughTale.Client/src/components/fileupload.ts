@@ -74,13 +74,13 @@ p-fileupload {
 .p-fileupload-choose input[type="file"] {
     position: absolute;
     top: 0;
-    right: 0;
+    inset-inline-end: 0;
     margin: 0;
     opacity: 0;
     min-height: 100%;
     min-width: 100%;
     font-size: 100px;
-    text-align: right;
+    text-align: end;
     cursor: pointer;
     z-index: 1;
 }
@@ -336,7 +336,7 @@ p-fileupload {
 .p-fileupload-image-card .p-fileupload-image-remove {
     position: absolute;
     top: 0.4rem;
-    right: 0.4rem;
+    inset-inline-end: 0.4rem;
     width: 1.6rem;
     height: 1.6rem;
     border-radius: 50%;
@@ -696,7 +696,7 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
                             <span>${chooseLabel}</span>
                             <input type="file" accept="${accept}" ${attr('multiple', multiple)} class="p-fileupload-input" aria-label="${chooseLabel || 'Upload file'}" />
                         </span>
-                        <span class="p-fileupload-filename" style="margin-left: 0.5rem; margin-right: 0.5rem;">${fileName}</span>
+                        <span class="p-fileupload-filename" style="margin-inline-start: 0.5rem; margin-inline-end: 0.5rem;">${fileName}</span>
                         <button type="button" class="p-button p-button-outlined p-fileupload-upload-btn" ${!hasFile || isUploading ? 'disabled style="opacity:0.5; pointer-events:none; cursor:not-allowed;"' : ''}>
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
                             <span>${uploadLabel}</span>

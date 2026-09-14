@@ -182,7 +182,7 @@ island-menu {
 }
 
 .p-menu-item-shortcut {
-    margin-left: auto;
+    margin-inline-start: auto;
     font-size: 0.75rem;
     color: var(--p-text-muted, #64748b);
     background: var(--p-surface-100, #f1f5f9);
@@ -193,7 +193,7 @@ island-menu {
 }
 
 .p-menu-item-badge {
-    margin-left: auto;
+    margin-inline-start: auto;
     background: var(--p-primary-500, #10b981);
     color: #ffffff;
     font-size: 0.75rem;
@@ -208,7 +208,7 @@ island-menu {
 }
 
 .p-menu-item-submenu-icon {
-    margin-left: auto;
+    margin-inline-start: auto;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -687,7 +687,8 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
             offset: 4,
             strategy: 'fixed',
             reposition: 'follow',
-            signal: ctx?.signal
+            signal: ctx?.signal,
+            isRtl: locale.isRtl
         });
         floatingCtrl.update();
 

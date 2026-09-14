@@ -242,12 +242,12 @@ const CSS = `
     border-radius: 0;
 }
 .dp-day-cell.range-start {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
+    border-start-end-radius: 0;
+    border-end-end-radius: 0;
 }
 .dp-day-cell.range-end {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
+    border-start-start-radius: 0;
+    border-end-start-radius: 0;
 }
 .dp-day-cell.disabled {
     opacity: 0.3;
@@ -437,6 +437,11 @@ html.dark .dp-bar-btn:hover,
 .dark .dp-bar-btn:hover {
     background: rgba(16, 185, 129, 0.15);
 }
+
+/* Bi-Directional RTL Support */
+[dir="rtl"] .dp-nav-btn svg {
+    transform: scaleX(-1);
+}
 `;
 
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -587,7 +592,8 @@ export default function DatePickerIsland(container: HTMLElement, props: DatePick
                     placement: 'bottom-start',
                     reposition: 'follow',
                     signal: ctx?.signal,
-                    offset: 4
+                    offset: 4,
+                    isRtl: locale.isRtl
                 });
             },
             onClose: () => {

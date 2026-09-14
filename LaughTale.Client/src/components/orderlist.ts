@@ -137,7 +137,7 @@ const ORDERLIST_CSS = `
 }
 .p-orderlist-filter-icon {
     position: absolute;
-    right: 1.25rem;
+    inset-inline-end: 1.25rem;
     color: var(--lt-surface-400);
     pointer-events: none;
     display: flex;
@@ -260,7 +260,7 @@ const ORDERLIST_CSS = `
     font-weight: 600;
     color: var(--lt-surface-400);
     width: 1.5rem;
-    text-align: right;
+    text-align: end;
     flex-shrink: 0;
 }
 

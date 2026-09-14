@@ -8,6 +8,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **RTL Adoption: Logical Properties, Icon Mirroring & Behavioral Fixes (Part C / ROADMAP.v5.md §5):**
+  - `dir` ('ltr'/'rtl') already flowed correctly end-to-end (server-resolved culture → DOM `dir` attribute
+    → `IslandContext.dir` → `useLocale(ctx).isRtl`); this pass is about components actually reading it.
+    `rtlAdoption` (components with at least one direction-aware CSS/JS token) went from **8 of 76** to
+    **49 of 76** (`LaughTale.Client/scripts/metrics-baseline.json`).
+  - Converted physical CSS properties to their logical equivalents (`margin-left/right` →
+    `margin-inline-start/end`, `padding-left/right` → `padding-inline-start/end`, `border-left/right` →
+    `border-inline-start/end`, physical corner radii → `border-start-start-radius`/`-end-start-`/etc.,
+    `text-align: left/right` → `start/end`, and positional `left/right` → `inset-inline-start/end` for
+    icon/affordance placement) across **42** components that previously had zero direction-handling, plus
+    targeted gap-fixes in 5 of the original partially-RTL 8 (`sidebar`, `tree`, `treetable`, `split-button`,
+    `picklist`). Deliberately left as physical/direction-neutral: explicit corner-position variants
+    (`toast`'s position variants, `speed-dial`'s fan-out direction, `drawer`/`sidebar`'s explicit
+    left/right side props, `datatable`'s frozen-column side), centering math (`left: 50%` + equal negative
+    margin), and symmetric full-bleed declarations (`left: 0; right: 0`).
+  - Extended icon mirroring (`[dir="rtl"] … svg { transform: scaleX(-1) }`, or a rotation-sign flip for
+    `galleria`'s `rotate()`-based chevrons, which don't mirror correctly under `scaleX`) to 7 more
+    components: `datepicker` (month nav chevrons), `cascadeselect` (submenu flyout chevron), `tieredmenu`
+    (submenu arrow), `tree-select` (node-expand toggler), `datatable` (row-expand toggle), `galleria`
+    (prev/next nav), and `split-button` (submenu-indicator chevron, filling a gap in its otherwise-complete
+    existing RTL CSS).
+  - **`useFloatingPosition.ts` now mirrors placement under RTL** (new optional `isRtl` option, defaulting
+    to the floating element's own computed `direction` when omitted): a `'*-start'`/`'*-end'` placement
+    now aligns to the reference element's *logical* start/end edge instead of always physically left/right,
+    and pure `'left'`/`'right'` compass placements swap sides. Previously the resolver hardcoded
+    `'start'` → `refRect.left` and `'end'` → `refRect.right - floatRect.width` with no `dir` input at all.
+    **This is the widest-reaching change in this pass** — the composable backs 14 components'
+    floating overlays and submenu flyouts (`autocomplete`, `cascadeselect`, `color-picker`, `confirm-popup`,
+    `context-menu`, `datepicker`, `menu`, `menubar`, `multiselect`, `popover`, `select`, `split-button`,
+    `tieredmenu`, `tree-select`), all now threading `isRtl` from `useLocale(ctx)` at their call sites
+    (`confirm-popup`'s global singleton overlay relies on the new auto-detect default instead, since it has
+    no natural per-call locale context). Fully behavior-preserving for existing LTR callers — mirroring is
+    a no-op when `isRtl` is false, which is the existing default and covers every pre-existing test.
+  - Fixed 4 more RTL geometry bugs that CSS alone can't reach, each backed by a new unit test proving the
+    RTL result mirrors LTR (not just "doesn't throw"): `slider.ts`'s drag-ratio calculation (extracted into
+    an exported pure `computeHorizontalRatio`) now flips under RTL so dragging moves the handle the
+    correct direction; `splitter.ts`'s drag-delta sign (`computeSplitterDeltaPct`) now inverts under RTL to
+    account for `flex-direction: row` mirroring which panel is visually "prev"; `rating.ts`'s half-star
+    hit-test (`isLowerHalfHit`) and its visual half-fill overlay (`.p-rating-half-overlay`, converted to
+    `inset-inline-start`) now agree on which physical half represents the lower half-value under RTL, where
+    previously only the CSS class list handling was RTL-aware and the hit-test/visual crop were not;
+    `toggle-switch.ts`'s handle (previously zero dir-handling at all — a textbook RTL bug for a toggle) now
+    rests on the logical start edge and slides toward the logical end (`getToggleHandleTransform`, applied
+    as an inline `transform` since `translateX` has no logical-property equivalent).
+  - Left unfixed and documented in source rather than guessed at: `scrollarea.ts`'s custom horizontal
+    scrollbar drag math, because browsers disagree on `scrollLeft`'s sign/zero-point under `dir="rtl"`
+    (Chrome/Safari go negative past 0, Firefox's legacy behavior differs from both) and this couldn't be
+    verified cross-browser in this environment; `image-compare.ts`'s divider drag, judged direction-neutral
+    by UI convention (a before/after slider, not a value that reads left-to-right).
+  - New tests: `LaughTale.Client/tests/composables/floating-position.test.ts` (4 new cases covering
+    `mirrorPlacementForRtl`, `'*-start'` mirroring, pure `'left'/'right'` mirroring, and the computed-style
+    auto-detect default) and a new `LaughTale.Client/tests/components/rtl-direction.test.ts` (14 cases
+    covering the `slider`/`splitter`/`rating`/`toggle-switch` pure functions in both directions).
 - **Smaller `data-props` Payloads & Named Island Props Types (Part J / ROADMAP.v5.md §11):**
   - `IslandJson` now omits default-valued properties from `data-props` JSON (`DefaultIgnoreCondition.WhenWritingDefault`, previously `WhenWritingNull`, which only ever dropped `null`s and could never catch a non-nullable value type's default). Corrected the roadmap's stale "198 of 325 props have a non-null default" to the real pre-fix count — **401 of 665** — across the 81 `[Island(...)]` records in `LaughTale.Components/Models/ComponentModels.cs`. Measured on a 5-island sample rendered with no attributes set: `<island-accordion>` 18 → 2 bytes, `<island-datatable>` 208 → 2 bytes, `<island-select>` 209 → 75 bytes, `<island-checkbox>` 123 → 17 bytes, `<island-slider>` 57 → 2 bytes (~84% weighted reduction). This is backward compatible for any client reading props with `??`/`?.`-style fallbacks, which the client component set already does broadly (`propsNullishDefaultAdoption: 24` new metric in `LaughTale.Client/scripts/audit-metrics.mjs`/`metrics-baseline.json`).
   - `IslandGenerator.GenerateTagHelper`'s `BuildProps()` now returns a named `internal sealed record {TagHelperName}WireProps` per generator-emitted island (67 of them) instead of an anonymous `new { ... }` object — same field set, mechanically renamed — removing the literal blocker that made these props types impossible to target with `System.Text.Json`'s `[JsonSerializable]`/`JsonSerializerContext` source generator (which cannot target anonymous types at all).

@@ -218,6 +218,7 @@ delivery is one of the healthier subsystems.
 | DevTools | **Missing** | — |
 | Endpoint rate limiting | **Missing** | Two public `MapPost` routes run user-shaped queries |
 | Localization | **Strong — [CLOSED, Part N]** | 10 locales, 1,509 lines; reachable from **82 of 82** TagHelpers (was 15 of 96); all 31 hardcoded English defaults (roadmap previously undercounted this as 25) and 13 client-template strings now routed through `ILaughTaleLocalizer` |
+| RTL support | **Substantially improved — [CLOSED, this pass]** | `rtlAdoption` **8/76 → 49/76**; logical-property CSS conversion across 42 components + targeted gap-fixes in 5 of the original 8, plus icon mirroring extended to 7 more; 5 behavioral/JS geometry bugs fixed and unit-tested (`useFloatingPosition` — 14 consumers — plus `slider`, `splitter`, `rating`, `toggle-switch`); `scrollarea`'s drag math and `speed-dial`/`toast`'s explicit corner positioning intentionally left as documented exceptions (see §5) |
 | Core/Components boundary | **Fully enforced** | Assembly-reference check passes; class-hierarchy check exists for the TagHelper split (`GeneratedTagHelperHierarchyTests`); the locale-dictionary gap is closed too — `LaughTaleLocaleDictionary`/`LaughTaleBuiltInLocales` moved to `LaughTale.Components`, and `CoreOnlyBoundaryTests` now reflects over Core's assembly and `LaughTaleLocalizationOptions`'s public surface to catch either type quietly coming back |
 | Props serialization | **Improved — [CLOSED, this pass]** | `IslandJson` now omits default-valued props (`DefaultIgnoreCondition.WhenWritingDefault`) — correcting the roadmap's stale "198 of 325" figure to the real pre-fix count, **401 of 665** props across 81 `[Island(...)]` records; generator-emitted anonymous props types replaced with named `WireProps` records (unblocks the anonymous-type limit on `[JsonSerializable]`), but a working `JsonSerializerContext` for them proved unreachable — reflection remains the only path (Part J below has the full account) |
 
@@ -278,9 +279,36 @@ behaviour, and the fixes are sitting unused in `src/composables/`.
 - **Headless core + parts anatomy** *(Zag.js, Ark UI, Radix · XL · ongoing)* — split each component
   into a state machine and a renderer; emit `data-part` / `data-state` so consumers style by anatomy.
   Do it opportunistically, one component at a time, never as a big-bang rewrite.
-- **RTL & logical properties** *(S–M · 1–2 wks)* — only **7 of 76** components consider direction, with
-  **2** uses of CSS logical properties, despite server-side localization being built and `dir` already
-  flowing through `IslandContext`.
+- **RTL & logical properties** *(S–M · 1–2 wks)* — **[CLOSED — this pass, CSS + icons + 5 behavioral fixes]**
+  `dir` already flowed correctly end-to-end (server culture → DOM `dir` attribute → `IslandContext.dir` →
+  `useLocale(ctx).isRtl`) before this pass; what was missing was components actually reading it.
+  `rtlAdoption` (components with at least one direction-aware CSS/JS token) went from **8 of 76** to
+  **49 of 76**, and CSS logical-property conversion (`margin-left/right` → `margin-inline-start/end`,
+  `padding-left/right` → `padding-inline-start/end`, `border-left/right` → `border-inline-start/end`,
+  physical corner radii → `border-start-start-radius` etc., `text-align: left/right` → `start/end`, and
+  positional `left/right` → `inset-inline-start/end` for icon/affordance placement) landed across
+  **42** previously direction-blind components, plus targeted gap-fixes in 5 of the original partially-RTL
+  8 (`sidebar`, `tree`, `treetable`, `split-button`, `picklist`). Icon mirroring (`[dir="rtl"] … { transform:
+  scaleX(-1) }`, or a rotation-sign flip for `galleria`'s rotate-based chevrons) was extended to 7 more
+  components: `datepicker`, `cascadeselect`, `tieredmenu`, `tree-select`, `datatable`, `galleria`,
+  `split-button`.
+  **The part that actually mattered**: 5 behavioral/geometry bugs where CSS mirroring alone would have
+  been silently wrong at runtime, each fixed with a unit test proving the RTL result is a true mirror of
+  LTR, not just "doesn't throw": `useFloatingPosition` (hardcoded `'start'`→left/`'end'`→right and no
+  `dir`-driven mirroring at all; now accepts/auto-detects `isRtl` and mirrors `'*-start'/'*-end'` and pure
+  `'left'/'right'` placements — the highest-leverage fix here since it's consumed by **14** components:
+  `autocomplete`, `cascadeselect`, `color-picker`, `confirm-popup`, `context-menu`, `datepicker`, `menu`,
+  `menubar`, `multiselect`, `popover`, `select`, `split-button`, `tieredmenu`, `tree-select`); `slider`'s
+  drag-ratio math (didn't flip under RTL, so dragging moved the handle the wrong way); `splitter`'s
+  drag-delta sign (didn't account for `flex-direction: row` mirroring panel order under RTL); `rating`'s
+  half-star hit-test *and* its visual half-fill overlay (both used a hardcoded physical-left/right split);
+  `toggle-switch`'s handle position and slide transform (zero dir-handling — a textbook RTL bug for a
+  toggle). Deliberately left unfixed and documented in source: `scrollarea`'s custom-scrollbar drag math
+  (browsers disagree on `scrollLeft`'s sign/zero-point under RTL — flagged with a code comment rather than
+  guessed at); `speed-dial`'s directional fan-out and `toast`'s corner-position variants (both are explicit,
+  developer-chosen physical sides, not text-direction-relative, so intentionally not touched); a handful of
+  centering-math (`left: 50%` + equal negative margin) and full-bleed (`left: 0; right: 0`) declarations
+  that are direction-neutral by construction.
 - **Imperative handles** *(S · 1 wk)* — `createHandle` is defined in the registry and implemented by
   zero components. `dialog.open()`, `toast.show()`, `datatable.reload()`.
 - **Visual regression tests** *(M · 2 wks)* — Playwright is already a dependency; the suite is
@@ -612,7 +640,7 @@ for practical purposes, switched off. It is now wired end to end.
 |---|---|
 | `ILaughTaleLocalizer` | consumed by `IslandTagHelperBase` — **[CLOSED, TagHelper split]** reachable from **82 of 82** TagHelpers (was 15 of 96) |
 | `useLocale` (client) | **17 of 76** components (was 5) — the 3 real pre-existing call sites (`datatable`, `datepicker`, `select`) plus 14 newly wired: `autocomplete`, `command`, `fileupload`, `input-password`, `listbox`, `menu`, `menubar`, `multiselect`, `orderlist`, `picklist`, `sidebar`, `tieredmenu`, `tree`, `tree-select` |
-| RTL / logical properties | **8 of 76** components (corrected count; was reported as 7), **2** uses of CSS logical properties — **not addressed by this pass**, tracked as a follow-up below |
+| RTL / logical properties | **8 of 76** components (corrected count; was reported as 7), **2** uses of CSS logical properties — **not addressed by this pass**, tracked as a follow-up below. **[CLOSED in a later pass, §5]** — `rtlAdoption` is now 49/76; see §5's "RTL & logical properties" entry for the CSS conversion, icon-mirroring, and 5 behavioral-fix breakdown |
 | Component UI strings routed through the localizer | **31 of 31** hardcoded server-side prop defaults, **13 of 13** hardcoded client-template strings — **[CLOSED]** (was 0; the roadmap's original count of "25" hardcoded defaults undercounted — the real number, confirmed by re-reading every props record, was 31) |
 
 **The strings were hardcoded, and they were hardcoded in the wrong layer.** Thirty-one English UI
@@ -682,7 +710,7 @@ BCL-typed member set — a test that fails against the pre-refactor shape and pa
 | **Make the boundary test see meaning, not just references** — extend `CoreOnlyBoundaryTests` to fail when component nouns appear in Core. Without this the inversion returns the first time someone adds a component with a new string | — | S · days | **[CLOSED]** |
 | **Route component strings through the localizer** — remove the 31 English defaults from props records (roadmap previously undercounted this as 25) and the 13 hardcoded strings from client templates; resolve per request, fall back to the built-in dictionary | — | M · 2–3 wks | **[CLOSED]** |
 | **Fix the TagHelper split first** (§0, *The root cause nobody named*) — **[CLOSED]** the localizer is only reachable from `IslandTagHelperBase`; 67 of 81 generated TagHelpers now derive from it (14 skipped as redundant with a hand-written class), so all 82 remaining TagHelpers can see the localizer. The rows below (moving the vocabulary, routing component strings, RTL) were blocked on this and can now proceed | — | — | **[CLOSED]** |
-| **RTL & logical properties** — 8 of 76 today (corrected count; previously reported as 7); `dir` already flows through `IslandContext` and two of the ten built-in locales are RTL, so the demand already exists in the shipped product. **Not addressed by this pass** — this pass closed vocabulary routing only, not RTL adoption | web platform | S–M · 1–2 wks | Open |
+| **RTL & logical properties** — 8 of 76 today (corrected count; previously reported as 7); `dir` already flows through `IslandContext` and two of the ten built-in locales are RTL, so the demand already exists in the shipped product. **Not addressed by this pass** — this pass closed vocabulary routing only, not RTL adoption | web platform | S–M · 1–2 wks | **[CLOSED in a later pass]** — see §5 |
 | **Locale-aware formatting as a contract** — dates, numbers, currency and collation are decided per component today (`datepicker`, `input-number`, `select` each reach for `Intl` on their own). One `useLocale`-backed formatter, adopted by all 76 | Nuxt i18n, Astro i18n | M · 2 wks | Open |
 | **Locale-aware routing** — `/de/produkte`, `Accept-Language` negotiation, `hreflang`, per-locale static output | Nuxt i18n, Astro i18n | M · 2–3 wks | Open |
 | **Pluralization and interpolation** — the dictionary is key→string today; anything with a count needs plural rules | ICU MessageFormat | S–M · 1–2 wks | Open |
@@ -711,7 +739,7 @@ worse than shipping neither, because it looks finished.
 | Imperative handles | — | **Built, unused** — 0 implementations | C |
 | Localization & i18n | Nuxt i18n, Astro | **Strong — [CLOSED, this pass]** — TagHelper split fixed (82/82 reach the localizer); vocabulary moved to `LaughTale.Components`; all 31 hardcoded English defaults and 13 client-template strings routed through it; 10 locales, 1,509 lines. Locale-aware formatting/routing/pluralization/translator workflow remain open follow-ups | **N** |
 | Locale-aware routing | Nuxt i18n | **Missing** | **N** |
-| RTL support | web platform | **Built, unused** — 8/76 components (corrected count; previously reported as 7), 2 logical properties. Not addressed by the localization-vocabulary pass above | **N** |
+| RTL support | web platform | **Substantially improved — [CLOSED, this pass]** — `rtlAdoption` 8/76 → 49/76. CSS logical-property conversion across 42 components + targeted gap-fixes in 5 of the original 8; icon mirroring extended to 7 more components; 5 behavioral/JS geometry bugs fixed with unit tests (`useFloatingPosition` — 14 consumers, `slider`, `splitter`, `rating`, `toggle-switch`). Not a blanket claim: `scrollarea`'s scrollbar-drag math is flagged but unfixed (cross-browser `scrollLeft` disagreement under RTL), and `speed-dial`/`toast`'s explicit corner/fan-out positioning is intentionally left physical, not logical | **N** |
 | Props payload efficiency | — | **Improved — [CLOSED, this pass]** — `WhenWritingDefault` now omits default-valued props (corrected count: 401/665 had non-null defaults, not the roadmap's stale 198/325); ~84% payload reduction on a 5-island sample | **J** |
 | AOT / trim-safe serialization | .NET | **Attempted, not achievable as designed** — generator-emitted anonymous props types replaced with named records (unblocks `[JsonSerializable]` targeting them in principle), but no two-Roslyn-generator combination can actually produce a working `JsonSerializerContext` for them (confirmed empirically, see Part J); reflection remains the only path. Trim analysis enabled for the first time: 30 IL warnings, 2 attributable to this path (irreducible), 28 pre-existing/unrelated | **J** |
 | HTML sanitization at render | — | **CRITICAL** — sanitizer exists, 4/76 call it | §1 |

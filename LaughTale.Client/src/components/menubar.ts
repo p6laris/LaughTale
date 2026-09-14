@@ -39,14 +39,14 @@ const MENUBAR_CSS = `
 .p-menubar-start {
     display: flex;
     align-items: center;
-    margin-right: 0.5rem;
+    margin-inline-end: 0.5rem;
     flex-shrink: 0;
 }
 
 .p-menubar-end {
     display: flex;
     align-items: center;
-    margin-left: auto;
+    margin-inline-start: auto;
     gap: 0.5rem;
     flex-shrink: 0;
 }
@@ -63,7 +63,7 @@ const MENUBAR_CSS = `
     color: var(--lt-surface-600);
     cursor: pointer;
     transition: background-color 0.15s ease, color 0.15s ease;
-    margin-left: auto;
+    margin-inline-start: auto;
 }
 
 .p-menubar-button:hover {
@@ -151,7 +151,7 @@ const MENUBAR_CSS = `
 }
 
 .p-menubar-item-shortcut {
-    margin-left: 1.5rem;
+    margin-inline-start: 1.5rem;
     font-size: 0.75rem;
     color: var(--lt-surface-500);
     background: var(--lt-surface-100);
@@ -173,7 +173,7 @@ const MENUBAR_CSS = `
     align-items: center;
     justify-content: center;
     padding: 0 0.35rem;
-    margin-left: 0.5rem;
+    margin-inline-start: 0.5rem;
 }
 
 /* Cascading Dropdown Submenu */
@@ -181,7 +181,7 @@ const MENUBAR_CSS = `
     display: none;
     position: absolute;
     top: 100%;
-    left: 0;
+    inset-inline-start: 0;
     min-width: 12.5rem;
     background: var(--p-menubar-submenu-background, var(--lt-surface-0));
     border: 1px solid var(--p-menubar-submenu-border-color, var(--lt-surface-200));
@@ -260,14 +260,14 @@ const MENUBAR_CSS = `
         position: static;
         box-shadow: none;
         border: none;
-        padding-left: 1rem;
+        padding-inline-start: 1rem;
         margin: 0;
     }
     .p-menubar-submenu .p-menubar-item > .p-menubar-submenu {
         position: static;
         box-shadow: none;
         border: none;
-        padding-left: 1rem;
+        padding-inline-start: 1rem;
         margin: 0;
     }
 }
@@ -408,7 +408,7 @@ export default function MenubarIsland(container: HTMLElement, props: MenubarProp
         const iconHtml = iconSvg ? html`<span class="p-menubar-item-icon">${unsafe(iconSvg)}</span>` : '';
 
         const angleDownSvg = html`<svg class="p-menubar-submenu-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
-        const angleRightSvg = html`<svg class="p-menubar-submenu-icon" style="margin-left: auto;" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`;
+        const angleRightSvg = html`<svg class="p-menubar-submenu-icon" style="margin-inline-start: auto;" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`;
 
         const submenuIndicator = hasSubmenu ? (isRoot ? angleDownSvg : angleRightSvg) : '';
 
@@ -441,7 +441,7 @@ export default function MenubarIsland(container: HTMLElement, props: MenubarProp
         if (customTemplate) {
             startHtml = html`
                 <div class="p-menubar-start">
-                    <span style="display: inline-flex; align-items: center; justify-content: center; width: 2rem; height: 2rem; background: var(--lt-primary-500); border-radius: 6px; color: var(--lt-surface-0, var(--lt-surface-0)); margin-right: 0.5rem;">
+                    <span style="display: inline-flex; align-items: center; justify-content: center; width: 2rem; height: 2rem; background: var(--lt-primary-500); border-radius: 6px; color: var(--lt-surface-0, var(--lt-surface-0)); margin-inline-end: 0.5rem;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg>
                     </span>
                     <span style="font-weight: 700; font-size: 0.9375rem;">PRIME<span style="color: var(--lt-primary-500);">APP</span></span>
@@ -519,7 +519,8 @@ export default function MenubarIsland(container: HTMLElement, props: MenubarProp
                             strategy: 'absolute',
                             boundary: (container.offsetParent as HTMLElement) || undefined,
                             axis: 'x',
-                            reposition: 'none'
+                            reposition: 'none',
+                            isRtl: locale.isRtl
                         });
                         const coords = subFloatingCtrl.computePosition();
                         if (coords.actualPlacement.startsWith('left')) {

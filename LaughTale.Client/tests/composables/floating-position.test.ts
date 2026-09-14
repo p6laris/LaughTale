@@ -1,7 +1,7 @@
 import '../setup.ts';
 import { describe, it, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
-import { useFloatingPosition } from '../../src/composables/useFloatingPosition.ts';
+import { useFloatingPosition, mirrorPlacementForRtl } from '../../src/composables/useFloatingPosition.ts';
 
 function createMockElement(rect: { left: number; top: number; width: number; height: number }): HTMLElement {
     const el = document.createElement('div');
@@ -178,5 +178,96 @@ describe('useFloatingPosition Headless Composable Suite', () => {
         window.dispatchEvent(new Event('scroll'));
         window.dispatchEvent(new Event('resize'));
         assert.equal(dismissCalls, 1);
+    });
+
+    describe('RTL mirroring', () => {
+        it('mirrorPlacementForRtl swaps left/right and start/end suffixes only when isRtl is true', () => {
+            assert.equal(mirrorPlacementForRtl('bottom-start', false), 'bottom-start');
+            assert.equal(mirrorPlacementForRtl('bottom-start', true), 'bottom-end');
+            assert.equal(mirrorPlacementForRtl('bottom-end', true), 'bottom-start');
+            assert.equal(mirrorPlacementForRtl('top-start', true), 'top-end');
+            assert.equal(mirrorPlacementForRtl('top-end', true), 'top-start');
+            assert.equal(mirrorPlacementForRtl('left', true), 'right');
+            assert.equal(mirrorPlacementForRtl('right', true), 'left');
+            assert.equal(mirrorPlacementForRtl('left-start', true), 'right-start');
+            assert.equal(mirrorPlacementForRtl('right-end', true), 'left-end');
+            // Placements with no horizontal side/suffix (plain 'top'/'bottom') are unaffected.
+            assert.equal(mirrorPlacementForRtl('bottom', true), 'bottom');
+            assert.equal(mirrorPlacementForRtl('top', true), 'top');
+        });
+
+        it('resolves a "*-start" placement to the mirrored physical x position when isRtl is true', () => {
+            const anchor = createMockElement({ left: 200, top: 100, width: 100, height: 40 });
+            const floating = createMockElement({ left: 0, top: 0, width: 150, height: 80 });
+
+            const ltr = useFloatingPosition(anchor, floating, {
+                placement: 'bottom-start',
+                offset: 6,
+                autoFlip: false,
+                isRtl: false
+            }).computePosition();
+            const rtl = useFloatingPosition(anchor, floating, {
+                placement: 'bottom-start',
+                offset: 6,
+                autoFlip: false,
+                isRtl: true
+            }).computePosition();
+
+            // LTR: 'start' aligns to the reference's physical left edge.
+            assert.equal(ltr.x, 200);
+            // RTL: 'start' means the reading-start (physically right) edge, so the
+            // floating element's right edge aligns with the reference's right edge.
+            assert.equal(rtl.x, 200 + 100 - 150);
+            // y is unaffected by direction.
+            assert.equal(ltr.y, rtl.y);
+            // The two must actually differ - this is the regression this test guards against.
+            assert.notEqual(ltr.x, rtl.x);
+        });
+
+        it('mirrors a pure "left"/"right" compass placement to the opposite physical side when isRtl is true', () => {
+            const anchor = createMockElement({ left: 400, top: 300, width: 80, height: 30 });
+            const floating = createMockElement({ left: 0, top: 0, width: 120, height: 60 });
+
+            const ltrLeft = useFloatingPosition(anchor, floating, {
+                placement: 'left',
+                offset: 5,
+                autoFlip: false,
+                isRtl: false
+            }).computePosition();
+            const rtlLeft = useFloatingPosition(anchor, floating, {
+                placement: 'left',
+                offset: 5,
+                autoFlip: false,
+                isRtl: true
+            }).computePosition();
+
+            // LTR 'left': floating sits to the physical left of the anchor.
+            assert.equal(ltrLeft.x, 400 - 120 - 5);
+            assert.equal(ltrLeft.actualPlacement, 'left');
+            // RTL 'left': mirrored to the physical right of the anchor.
+            assert.equal(rtlLeft.x, 400 + 80 + 5);
+            assert.equal(rtlLeft.actualPlacement, 'right');
+            assert.notEqual(ltrLeft.x, rtlLeft.x);
+        });
+
+        it('defaults isRtl from the floating element\'s computed direction when not explicitly provided', () => {
+            const anchor = createMockElement({ left: 200, top: 100, width: 100, height: 40 });
+            const floating = createMockElement({ left: 0, top: 0, width: 150, height: 80 });
+            // getComputedStyle only reflects inline style once the element is attached to the document.
+            document.body.appendChild(floating);
+            floating.style.direction = 'rtl';
+
+            try {
+                const coords = useFloatingPosition(anchor, floating, {
+                    placement: 'bottom-start',
+                    offset: 6,
+                    autoFlip: false
+                }).computePosition();
+
+                assert.equal(coords.x, 200 + 100 - 150);
+            } finally {
+                floating.remove();
+            }
+        });
     });
 });

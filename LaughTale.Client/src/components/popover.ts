@@ -9,6 +9,7 @@ import { useFloatingPosition } from '../composables/useFloatingPosition';
  */
 
 import { injectIslandStyle } from '../runtime/styles';
+import { useLocale } from '../composables/useLocale';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -61,13 +62,13 @@ island-popover.p-popover-active,
 .p-popover-arrow-top {
     top: -6px;
     border-bottom: none;
-    border-right: none;
+    border-inline-end: none;
 }
 
 .p-popover-arrow-bottom {
     bottom: -6px;
     border-top: none;
-    border-left: none;
+    border-inline-start: none;
 }
 
 /* Dark Mode Tokens */
@@ -103,7 +104,7 @@ export interface PopoverProps {
 let globalPopoverDelegationBound = false;
 let activePopoverCtrl: { update(): void; computePosition(): any; destroy(): void } | null = null;
 
-function positionPopover(popoverEl: HTMLElement, targetEl: HTMLElement, preferredPlacement: string = 'bottom', signal?: AbortSignal) {
+function positionPopover(popoverEl: HTMLElement, targetEl: HTMLElement, preferredPlacement: string = 'bottom', signal?: AbortSignal, isRtl?: boolean) {
     if (activePopoverCtrl) {
         activePopoverCtrl.destroy();
         activePopoverCtrl = null;
@@ -118,7 +119,8 @@ function positionPopover(popoverEl: HTMLElement, targetEl: HTMLElement, preferre
         strategy: 'fixed',
         reposition: 'follow',
         signal: effectiveSignal,
-        arrow: arrowEl || undefined
+        arrow: arrowEl || undefined,
+        isRtl
     });
 
     const updatePositionAndArrow = () => {
@@ -233,6 +235,7 @@ function initGlobalPopoverDelegation(signal?: AbortSignal) {
 
 export default function PopoverIsland(container: HTMLElement, props: PopoverProps, ctx?: IslandContext) {
     injectIslandStyle('popover', POPOVER_CSS);
+    const locale = useLocale(ctx);
     container.classList.add('laughtale-popover', 'p-popover', 'p-component');
     container.setAttribute('data-part', 'root');
     container.setAttribute('role', 'region');
@@ -255,7 +258,7 @@ export default function PopoverIsland(container: HTMLElement, props: PopoverProp
             e.stopPropagation();
             const isActive = container.classList.contains('p-popover-active');
             if (!isActive) {
-                positionPopover(container, targetEl, (props.placement as any) || 'bottom', ctx?.signal);
+                positionPopover(container, targetEl, (props.placement as any) || 'bottom', ctx?.signal, locale.isRtl);
                 container.classList.add('p-popover-active');
             } else {
                 if (activePopoverCtrl) {

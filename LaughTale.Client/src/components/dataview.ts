@@ -350,7 +350,7 @@ const DATAVIEW_CSS = `
 .p-dataview .p-dataview-grid-image-box .p-tag {
     position: absolute;
     top: 0.5rem;
-    left: 0.5rem;
+    inset-inline-start: 0.5rem;
     display: inline-flex;
     align-items: center;
     justify-content: center;

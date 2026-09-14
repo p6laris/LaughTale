@@ -10,6 +10,7 @@ import { injectIslandStyle } from '../runtime/styles';
 import { emitComponentEvent } from '../runtime/events';
 import { useControllableState } from '../composables/useControllableState';
 import { useFormField } from '../composables/useFormField';
+import { useLocale } from '../composables/useLocale';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
@@ -17,6 +18,19 @@ export const a11y: PatternDeclaration = {
     kind: 'pattern',
     pattern: 'radiogroup'
 };
+
+/**
+ * Pure hit-test for a rating star's half-star precision: returns true when the pointer is
+ * over the half that represents the *lower* of the two values a star can produce (i.e.
+ * `starVal - 0.5`). In LTR the lower half is the physical left half (values read low-to-high
+ * left-to-right); in RTL the row is mirrored, so the lower half becomes the physical right
+ * half. Exported so this mirroring can be unit-tested without simulating mouse events.
+ */
+export function isLowerHalfHit(clientX: number, rectLeft: number, rectWidth: number, isRtl: boolean): boolean {
+    if (rectWidth <= 0) return false;
+    const isPhysicalLeftHalf = (clientX - rectLeft) < rectWidth / 2;
+    return isRtl ? !isPhysicalLeftHalf : isPhysicalLeftHalf;
+}
 
 export interface RatingProps {
     value?: number;
@@ -113,7 +127,7 @@ const CSS = `
 .p-rating-half-overlay {
     position: absolute;
     top: 0;
-    left: 0;
+    inset-inline-start: 0;
     width: 50%;
     height: 100%;
     overflow: hidden;
@@ -142,14 +156,14 @@ const CSS = `
     border: none;
     cursor: pointer;
     padding: 0.125rem;
-    margin-right: 0.25rem;
+    margin-inline-end: 0.25rem;
     color: var(--lt-surface-400);
     border-radius: 9999px;
     transition: color 150ms ease, background 150ms ease, transform 150ms ease;
     outline: none;
 }
 .p-rating-vertical .p-rating-cancel-item {
-    margin-right: 0;
+    margin-inline-end: 0;
     margin-bottom: 0.25rem;
 }
 .p-rating-cancel-item:hover {
@@ -247,6 +261,7 @@ const cancelSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16
 
 export default function RatingIsland(container: HTMLElement, props: RatingProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-rating', CSS);
+    const locale = useLocale(ctx);
 
     const formField = useFormField(container, ctx, {
         cardinality: 'Single',
@@ -412,8 +427,7 @@ export default function RatingIsland(container: HTMLElement, props: RatingProps,
             item.addEventListener('mousemove', (e) => {
                 if (isAllowHalf && mode === 'stars') {
                     const rect = item.getBoundingClientRect();
-                    const isLeftHalf = (e.clientX - rect.left) < (rect.width / 2);
-                    hoverValue = isLeftHalf ? (starVal - 0.5) : starVal;
+                    hoverValue = isLowerHalfHit(e.clientX, rect.left, rect.width, locale.isRtl) ? (starVal - 0.5) : starVal;
                 } else {
                     hoverValue = starVal;
                 }
@@ -424,8 +438,7 @@ export default function RatingIsland(container: HTMLElement, props: RatingProps,
                 let targetVal = starVal;
                 if (isAllowHalf && mode === 'stars') {
                     const rect = item.getBoundingClientRect();
-                    const isLeftHalf = (e.clientX - rect.left) < (rect.width / 2);
-                    targetVal = isLeftHalf ? (starVal - 0.5) : starVal;
+                    targetVal = isLowerHalfHit(e.clientX, rect.left, rect.width, locale.isRtl) ? (starVal - 0.5) : starVal;
                 }
 
                 // If clicking same value and cancel is enabled, unset to 0

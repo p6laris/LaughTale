@@ -75,16 +75,16 @@ const DIVIDER_CSS = `
     left: 50%;
     height: 100%;
     content: "";
-    border-left: 1px solid var(--lt-surface-200);
+    border-inline-start: 1px solid var(--lt-surface-200);
 }
 .p-divider-vertical.p-divider-solid:before {
-    border-left-style: solid;
+    border-inline-start-style: solid;
 }
 .p-divider-vertical.p-divider-dotted:before {
-    border-left-style: dotted;
+    border-inline-start-style: dotted;
 }
 .p-divider-vertical.p-divider-dashed:before {
-    border-left-style: dashed;
+    border-inline-start-style: dashed;
 }
 .p-divider-vertical .p-divider-content {
     padding: 0.5rem 0;
