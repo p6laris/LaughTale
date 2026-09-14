@@ -123,7 +123,30 @@ export const LEGACY_ALIASES: Readonly<Record<string, string>> = Object.freeze({
     'island-toast': 'toast'
 });
 
-const registry = new Map<string, IslandLoader>();
+/**
+ * The registry's backing Map lives on `globalThis`, not module scope. A page can load more
+ * than one independently-built bundle that each carry their own copy of this module's code —
+ * e.g. the framework's own runtime bundle alongside a separately-built bundle for
+ * user-authored islands discovered under `Islands/**` (see ROADMAP.v5.md Part B) — and ESM
+ * gives each bundle its own module instance, so a plain module-scope `const` would silently
+ * split into two disconnected registries: islands `defineIsland`-registered by one bundle would
+ * never be found by `getIslandLoader` calls from the other. Anchoring on `globalThis` makes any
+ * number of independently-bundled copies of this file share one registry automatically,
+ * regardless of load order. This is a no-op for every app that only ever loads a single bundle
+ * (true of every app in this repo today) — same Map, same behavior, just a different place to
+ * hold the reference.
+ */
+const REGISTRY_KEY = '__laughtaleIslandRegistry__';
+
+function getSharedRegistry(): Map<string, IslandLoader> {
+    const g = globalThis as typeof globalThis & { [REGISTRY_KEY]?: Map<string, IslandLoader> };
+    if (!g[REGISTRY_KEY]) {
+        g[REGISTRY_KEY] = new Map<string, IslandLoader>();
+    }
+    return g[REGISTRY_KEY];
+}
+
+const registry = getSharedRegistry();
 
 /**
  * Resolves an island name to its canonical identifier, issuing a deprecation warning if an alias is used.

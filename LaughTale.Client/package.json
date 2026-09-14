@@ -7,7 +7,7 @@
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "bin": {
-    "laughtale": "./bin/laughtale.mjs"
+    "laughtale": "./cli/laughtale.mjs"
   },
   "exports": {
     ".": {
@@ -55,15 +55,17 @@
   ],
   "author": "LaughTale",
   "license": "MIT",
+  "dependencies": {
+    "esbuild": "^0.25.0",
+    "typescript": "^5.7.3"
+  },
   "devDependencies": {
     "@playwright/test": "^1.62.1",
-    "esbuild": "^0.25.0",
     "happy-dom": "^20.11.6",
     "lucide-static": "^1.33.0",
     "preact": "^10.29.8",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
-    "typescript": "^5.7.3",
     "vue": "^3.5.42"
   }
 }

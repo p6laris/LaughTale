@@ -66,4 +66,22 @@ describe('Island Registry & Canonical Alias Resolution Suite', () => {
         assert.equal(LEGACY_ALIASES['p-toast'], 'toast');
         assert.equal(LEGACY_ALIASES['commandmenu'], 'command');
     });
+
+    it('anchors its backing Map on globalThis, not module scope (ROADMAP.v5.md Part B)', () => {
+        // A page can load more than one independently-built bundle that each carry their own
+        // copy of this module's code (the framework runtime, plus a separately-built bundle for
+        // user-authored islands) — ESM gives each bundle its own module instance, so a plain
+        // module-scope Map would silently split into two disconnected registries. Anchoring on
+        // globalThis is what makes independently-bundled copies share one registry. This test
+        // can't spin up a second real module instance (that's only provable in a real
+        // multi-bundle browser page — see the Showcase end-to-end validation), but it does prove
+        // the actual, observable mechanism: the Map this module mutates really does live at the
+        // well-known globalThis key, not in a closure no other module instance could reach.
+        const dummyLoader = async () => ({ default: () => {} });
+        defineIsland('image-compare', dummyLoader);
+
+        const sharedMap = (globalThis as any).__laughtaleIslandRegistry__;
+        assert.ok(sharedMap instanceof Map, 'registry must be reachable via the well-known globalThis key');
+        assert.equal(sharedMap.get('image-compare'), dummyLoader, 'the globalThis-anchored Map must be the exact same object defineIsland writes to');
+    });
 });

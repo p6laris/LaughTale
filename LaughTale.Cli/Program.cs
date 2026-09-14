@@ -127,7 +127,7 @@ namespace LaughTale.Ejected;
 /// Ejected LaughTale Island: {componentName}
 /// Fully customizable local source component.
 /// </summary>
-[Island(""{componentName}"", Hydrate = HydrateStrategy.Load)]
+[Island(""{componentName}"", DefaultStrategy = HydrateStrategy.Load)]
 public record {pascalName}Props(
     string? Class = null,
     string? Style = null
