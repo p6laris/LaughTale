@@ -87,7 +87,7 @@ public abstract class IslandTagHelperBase : TagHelper
     /// Builds optional server-rendered HTML markup or skeleton placeholder.
     /// When non-null and no child content is provided, output is stamped with data-lt-ssr="true".
     /// </summary>
-    protected virtual string? BuildSsrHtml() => null;
+    protected virtual string? BuildSsrHtml(TagHelperContext context, TagHelperOutput output) => null;
 
     /// <summary>
     /// Override to customize the wrapper HTML element tag. Default is "div".
@@ -207,7 +207,7 @@ public abstract class IslandTagHelperBase : TagHelper
         }
         else
         {
-            IslandSsrHelper.StampSsrContent(output, BuildSsrHtml());
+            IslandSsrHelper.StampSsrContent(output, BuildSsrHtml(context, output));
         }
 
         IslandDiagnostics.ValidateIsland(

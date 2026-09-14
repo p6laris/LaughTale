@@ -19,7 +19,7 @@ public class TestSsrIslandTagHelper : IslandTagHelperBase
 {
     public override string IslandName => "test-ssr-card";
 
-    protected override string? BuildSsrHtml()
+    protected override string? BuildSsrHtml(TagHelperContext context, TagHelperOutput output)
     {
         return "<div class=\"ssr-skeleton\">Loading card...</div>";
     }

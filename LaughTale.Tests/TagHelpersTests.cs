@@ -41,10 +41,11 @@ public class TagHelpersTests
     }
 
     [Fact]
-    public void IslandAccordionTagHelper_RendersIslandTagWithProps()
+    public async Task IslandAccordionTagHelper_RendersIslandTagWithProps()
     {
         var helper = new IslandAccordionTagHelper
         {
+            ViewContext = CreateViewContext(),
             Multiple = true,
             ActiveIndex = 1,
             Tabs = new List<AccordionTab>
@@ -55,7 +56,7 @@ public class TagHelpersTests
         };
 
         var (context, output) = CreateTagHelperContext("island-accordion");
-        helper.Process(context, output);
+        await helper.ProcessAsync(context, output);
 
         Assert.Equal("div", output.TagName);
         Assert.Equal("accordion", output.Attributes["data-island"].Value);
@@ -71,10 +72,11 @@ public class TagHelpersTests
     }
 
     [Fact]
-    public void IslandNumberTagHelper_SerializesModeAndCurrency()
+    public async Task IslandNumberTagHelper_SerializesModeAndCurrency()
     {
         var helper = new IslandNumberTagHelper
         {
+            ViewContext = CreateViewContext(),
             Value = 1250.50,
             Mode = InputNumberMode.Currency,
             Currency = "EUR",
@@ -82,7 +84,7 @@ public class TagHelpersTests
         };
 
         var (context, output) = CreateTagHelperContext("island-number");
-        helper.Process(context, output);
+        await helper.ProcessAsync(context, output);
 
         Assert.Equal("div", output.TagName);
         Assert.Equal("input-number", output.Attributes["data-island"].Value);
@@ -98,10 +100,11 @@ public class TagHelpersTests
     }
 
     [Fact]
-    public void IslandKnobTagHelper_SerializesValueAndSize()
+    public async Task IslandKnobTagHelper_SerializesValueAndSize()
     {
         var helper = new IslandKnobTagHelper
         {
+            ViewContext = CreateViewContext(),
             Value = 75,
             Min = 0,
             Max = 100,
@@ -110,7 +113,7 @@ public class TagHelpersTests
         };
 
         var (context, output) = CreateTagHelperContext("island-knob");
-        helper.Process(context, output);
+        await helper.ProcessAsync(context, output);
 
         Assert.Equal("div", output.TagName);
         Assert.Equal("knob", output.Attributes["data-island"].Value);
@@ -125,16 +128,17 @@ public class TagHelpersTests
     }
 
     [Fact]
-    public void IslandColorPickerTagHelper_SerializesHexColor()
+    public async Task IslandColorPickerTagHelper_SerializesHexColor()
     {
         var helper = new IslandColorPickerTagHelper
         {
+            ViewContext = CreateViewContext(),
             Value = "#8b5cf6",
             TargetInput = "brand_color"
         };
 
         var (context, output) = CreateTagHelperContext("island-color-picker");
-        helper.Process(context, output);
+        await helper.ProcessAsync(context, output);
 
         Assert.Equal("div", output.TagName);
         Assert.Equal("color-picker", output.Attributes["data-island"].Value);
@@ -148,10 +152,14 @@ public class TagHelpersTests
     }
 
     [Fact]
-    public void IslandBreadcrumbTagHelper_SerializesItems()
+    public async Task IslandBreadcrumbTagHelper_SerializesItems()
     {
-        var helper = new IslandBreadcrumbTagHelper
+        // "breadcrumb" is one of the 14 island names with a hand-written TagHelper
+        // (LaughTale.Components.TagHelpers.Aura.Menu.BreadcrumbTagHelper); IslandGenerator skips
+        // generating a duplicate for it, so this test exercises the hand-written class directly.
+        var helper = new LaughTale.Components.TagHelpers.Aura.Menu.BreadcrumbTagHelper
         {
+            ViewContext = CreateViewContext(),
             HomeUrl = "/dashboard",
             Items = new List<BreadcrumbItem>
             {
@@ -161,7 +169,7 @@ public class TagHelpersTests
         };
 
         var (context, output) = CreateTagHelperContext("island-breadcrumb");
-        helper.Process(context, output);
+        await helper.ProcessAsync(context, output);
 
         Assert.Equal("div", output.TagName);
         Assert.Equal("breadcrumb", output.Attributes["data-island"].Value);
@@ -286,17 +294,18 @@ public class TagHelpersTests
     }
 
     [Fact]
-    public void TagHelperEnums_SerializeToCamelCaseJson()
+    public async Task TagHelperEnums_SerializeToCamelCaseJson()
     {
         var helper = new IslandInputTextTagHelper
         {
+            ViewContext = CreateViewContext(),
             Variant = InputVariant.Filled,
             Size = ComponentSize.Large,
             Value = "Hello Enum"
         };
 
         var (context, output) = CreateTagHelperContext("island-input-text");
-        helper.Process(context, output);
+        await helper.ProcessAsync(context, output);
 
         var propsJson = output.Attributes["data-props"].Value.ToString()!;
         Assert.Contains("\"variant\":\"filled\"", propsJson);

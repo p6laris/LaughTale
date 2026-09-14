@@ -32,7 +32,7 @@ standard, and the thing meant to consume it never adopts it.
 | `IslandModule.createHandle` | **0** implementations |
 | `runtime/events.ts` | **41 / 41** dispatching components (Spec 044, 100% adoption) |
 | `sanitizeHtml` / `sanitizeUrl` (333 lines) | **4 / 76** |
-| `ILaughTaleLocalizer` + locale dictionaries (1,256 lines) | **15 / 96 TagHelpers** — see below |
+| `ILaughTaleLocalizer` + locale dictionaries (1,256 lines) | **82 / 82 TagHelpers** — **[CLOSED, TagHelper split]** see below |
 | `useLocale` | **5 / 76** |
 | `BuildSsrHtml()` / `data-lt-ssr` (feature 026) | **29 / 29** in-scope form controls (Spec 045, eighth built-and-unadopted module now adopted) |
 | `JsonSerializerContext` (source-generated JSON) | **0** — every island serializes by reflection |
@@ -41,29 +41,47 @@ Mostly this is good news — a large share of this roadmap is **adoption, not in
 pattern has a sharp edge: a 333-line HTML sanitizer that no component calls isn't an unfinished
 feature, it's an open vulnerability.
 
-### The root cause nobody named
+### The root cause nobody named — **[CLOSED, TagHelper split]**
 
-The three tables above share one mechanism, and it is not "people forgot to adopt things".
+The three tables above shared one mechanism, and it was not "people forgot to adopt things".
 
 `IslandTagHelperBase` is where the good server-side behaviour lives: the `BuildSsrHtml()` hook, the
-`ILaughTaleLocalizer` lookup, the RTL decision, the `data-lt-ssr` stamp. **Fifteen TagHelpers extend
-it.** The other **81 are generated** by `IslandGenerator`, which emits `public partial class
+`ILaughTaleLocalizer` lookup, the RTL decision, the `data-lt-ssr` stamp. **Fifteen TagHelpers extended
+it.** The other **81 were generated** by `IslandGenerator`, which emitted `public partial class
 <Name>TagHelper : TagHelper` — deriving straight from `TagHelper` and inheriting none of it.
 
-So `<island-dialog>` (hand-written) localizes and can server-render. `<island-input-text>`,
-`<island-select>`, `<island-datatable>` (generated) cannot — not because anyone decided they
-shouldn't, but because they are on the other side of a class hierarchy split nobody wrote down. Every
-capability hung on that base class reaches 15 of 96 call sites and looks "built but unadopted" from
-the outside.
+So `<island-dialog>` (hand-written) localized and could server-render. `<island-input-text>`,
+`<island-select>`, `<island-datatable>` (generated) could not — not because anyone decided they
+shouldn't, but because they were on the other side of a class hierarchy split nobody wrote down.
+Every capability hung on that base class reached 15 of 96 call sites and looked "built but unadopted"
+from the outside.
 
-**Fix the split and three roadmap items collapse into one.** Leave it and every future server-side
-capability lands in the same hole.
+**Fixed.** `IslandGenerator.GenerateTagHelper` now emits `public partial class <Name>TagHelper :
+LaughTale.Components.TagHelpers.IslandTagHelperBase`, overrides `IslandName`/`BuildProps()`/
+`BuildSsrHtml()` instead of re-declaring auth, attribute-stamping and field-rendering logic, and
+independently discovered along the way: 14 of the 15 hand-written island names (every one except
+`message`) also had a matching `[Island("...")]` props record, so `IslandGenerator` was *also*
+emitting a second TagHelper targeting the identical `[HtmlTargetElement]` tags — two independent
+TagHelpers writing into the same `TagHelperOutput` for `<island-dialog>`, `<island-breadcrumb>`,
+`<island-menu>` and 11 others. The generator now skips codegen for those 14 names entirely
+(`IslandGenerator.HandWrittenIslandNames`) instead of shadowing the hand-written class.
 
-There is a second boundary problem with the same signature, and the same reason nobody caught it:
-Core's locale dictionary carries 70 component-specific properties (Part N). Both inversions sit in
-code the test suite reports as clean, because `CoreOnlyBoundaryTests` checks assembly references and
-nothing checks class hierarchies at all. **The architecture is guarded in one dimension and unguarded
-in the two that have actually failed.**
+*Measured result*: of the 81 `[Island(...)]` props records in `LaughTale.Components/Models/
+ComponentModels.cs`, 14 are skipped as redundant with a hand-written class, leaving **67 generated
+TagHelpers**, all deriving from `IslandTagHelperBase`. Together with the **15** hand-written
+TagHelpers (unchanged), **82 of 82** TagHelpers now reach the base class — up from 15 of 96 (96 was
+81 generated + 15 hand-written, before the 14 duplicates were known about and removed).
+`LaughTale.Tests/Architecture/GeneratedTagHelperHierarchyTests.cs` now asserts this by reflecting over
+the compiled assembly, not by trusting the count.
+
+There is a second boundary problem with the same signature, and the same reason nobody caught it
+originally: Core's locale dictionary carries 70 component-specific properties (Part N — still open,
+not addressed by this fix). Both inversions sat in code the test suite reported as clean, because
+`CoreOnlyBoundaryTests` checks assembly references and, before this fix, nothing checked class
+hierarchies at all. **The architecture was guarded in one dimension and unguarded in the two that had
+actually failed.** The TagHelper-split dimension is now guarded by
+`GeneratedTagHelperHierarchyTests`; the Core locale-dictionary dimension (Part N) still has no such
+guard.
 
 ### The strategic fork
 
@@ -199,8 +217,8 @@ delivery is one of the healthier subsystems.
 | Plugin API | **Missing** | No extension point anywhere in Core |
 | DevTools | **Missing** | — |
 | Endpoint rate limiting | **Missing** | Two public `MapPost` routes run user-shaped queries |
-| Localization | **Built, unreachable** | 9 locales, 1,256 lines; reachable from 15 of 96 TagHelpers; 25 English UI strings hardcoded as record defaults |
-| Core/Components boundary | **Half-enforced** | The test checks assembly references only; Core's locale dictionary carries 70 component-specific properties and stays green |
+| Localization | **Partial — [CLOSED, TagHelper split]** | 9 locales, 1,256 lines; reachable from **82 of 82** TagHelpers (was 15 of 96); 25 English UI strings still hardcoded as record defaults |
+| Core/Components boundary | **Half-enforced** | Assembly-reference check passes; class-hierarchy check now exists for the TagHelper split (`GeneratedTagHelperHierarchyTests`), but Core's locale dictionary still carries 70 component-specific properties and no test catches that half |
 | Props serialization | **Untuned** | Reflection-based, no source-gen context; 198 of 325 props write their defaults into every instance |
 
 ---
@@ -391,10 +409,11 @@ survives internal changes — which is what makes `eject` a good idea rather tha
 
 - **Keep**: Strategy (hydration), Registry + lazy Factory (loaders), Adapter (frameworks). Used
   correctly.
-- **Repair — Template Method (`IslandTagHelperBase`)**: the pattern is right and the base class is
-  well written, but **81 of 96 TagHelpers are generated and never inherit it** (§0). A template method
-  15 of 96 call sites reach is not a pattern in use; it is a pattern that was bypassed. Every
-  capability parked on it — SSR, localization, RTL — inherits that reach.
+- **Repair — Template Method (`IslandTagHelperBase`)** — **[CLOSED, TagHelper split, §0]**: the base
+  class was well written but unreached — 81 of 96 TagHelpers were generated and never inherited it.
+  `IslandGenerator` now emits generated TagHelpers deriving from `IslandTagHelperBase` (67 of the 81,
+  after skipping 14 that duplicated a hand-written class), so **82 of 82** TagHelpers now reach the
+  template method. Every capability parked on it — SSR, localization, RTL — inherits that reach.
 - **Adopt — State machine** *(Zag.js, XState)* for overlays. Ends the
   `isOpen && !isDisabled && hasFocus` boolean soup.
 - **Adopt — Observer/signals** so state changes patch rather than rebuild.
@@ -545,7 +564,7 @@ well built. It is also, for practical purposes, switched off.
 
 | Built | Adoption |
 |---|---|
-| `ILaughTaleLocalizer` | consumed by `IslandTagHelperBase` — so **15 of 96** TagHelpers |
+| `ILaughTaleLocalizer` | consumed by `IslandTagHelperBase` — **[CLOSED, TagHelper split]** now reachable from **82 of 82** TagHelpers (was 15 of 96); the localizer is reachable everywhere, but see below — component strings still don't call it |
 | `useLocale` (client) | **5 of 76** components |
 | RTL / logical properties | **7 of 76** components, **2** uses of CSS logical properties |
 | Component UI strings routed through the localizer | **0** |
@@ -601,7 +620,7 @@ is component vocabulary living one project too low.
 | **Move the vocabulary down, keep the mechanism up** — `LaughTaleLocaleDictionary`'s 70 typed properties and the 10 language packs move to `LaughTale.Components` and register themselves with the Core localizer; Core keeps culture resolution, RTL and the override hook and learns nothing about components | — | **M · 2–3 wks** |
 | **Make the boundary test see meaning, not just references** — extend `CoreOnlyBoundaryTests` to fail when component nouns appear in Core. Without this the inversion returns the first time someone adds a component with a new string | — | **S · days** |
 | **Route component strings through the localizer** — remove the 25 English defaults from props records and the hardcoded strings from client templates; resolve per request, fall back to the built-in dictionary | — | **M · 2–3 wks** |
-| **Fix the TagHelper split first** (§0, *The root cause nobody named*) — the localizer is only reachable from `IslandTagHelperBase`, so the 81 generated TagHelpers cannot localize until they can see it. Nothing else here is worth doing before this | — | **S–M · 1–2 wks** |
+| **Fix the TagHelper split first** (§0, *The root cause nobody named*) — **[CLOSED]** the localizer is only reachable from `IslandTagHelperBase`; 67 of 81 generated TagHelpers now derive from it (14 skipped as redundant with a hand-written class), so all 82 remaining TagHelpers can see the localizer. The rows below (moving the vocabulary, routing component strings, RTL) were blocked on this and can now proceed | — | **[CLOSED]** |
 | **RTL & logical properties** — 7 of 76 today; `dir` already flows through `IslandContext` and two of the nine built-in locales are RTL, so the demand already exists in the shipped product | web platform | S–M · 1–2 wks |
 | **Locale-aware formatting as a contract** — dates, numbers, currency and collation are decided per component today (`datepicker`, `input-number`, `select` each reach for `Intl` on their own). One `useLocale`-backed formatter, adopted by all 76 | Nuxt i18n, Astro i18n | M · 2 wks |
 | **Locale-aware routing** — `/de/produkte`, `Accept-Language` negotiation, `hreflang`, per-locale static output | Nuxt i18n, Astro i18n | M · 2–3 wks |
@@ -629,7 +648,7 @@ worse than shipping neither, because it looks finished.
 | Directive layer | Alpine, Stimulus | **Built, undocumented** — 19 directives | I |
 | Composable primitives | Nuxt, Vue | **Built, unused** — 21 written, ~0 adopted | C |
 | Imperative handles | — | **Built, unused** — 0 implementations | C |
-| Localization & i18n | Nuxt i18n, Astro | **Built, unreachable** — 9 locales, 1,256 lines, 15/96 TagHelpers, 25 hardcoded English defaults | **N** |
+| Localization & i18n | Nuxt i18n, Astro | **Partial** — TagHelper split fixed (82/82 reach the localizer, was 15/96); 9 locales, 1,256 lines, 25 hardcoded English defaults still not routed through it | **N** |
 | Locale-aware routing | Nuxt i18n | **Missing** | **N** |
 | RTL support | web platform | **Built, unused** — 7/76 components, 2 logical properties | **N** |
 | Props payload efficiency | — | **Untuned** — 198/325 props serialize their defaults | **J** |
@@ -676,7 +695,7 @@ worse than shipping neither, because it looks finished.
 | **Weeks 1–3** | Ship `html\`\``, then the urgent three: migrate components onto it, pass `ctx.signal` to all 374 unmanaged listeners, flip authz and the field allowlist to deny-by-default. Then CI/README cleanup. **Nothing else starts until this does.** |
 | **Weeks 2–6** | **[CLOSED — Specs 040, 042, 043, 044]** Adopt your own composables and event runtime — `useFocusTrap` (7/7 modals), `useKeyboardNav` (7/7 hierarchical), `useFloatingPosition` (14/14 overlays), `useVirtualizer` (6/6 long collections); unified component event contract `laughtale:<comp>:<evt>` (41/41 components). Findings recorded: `tieredmenu`'s cross-island toast dispatch never fired due to target mismatch (`window.dispatchEvent` vs `document.addEventListener`), now re-homed to the in-process island bus; `runtime/events.ts` was the seventh built-and-unadopted module, now fully adopted with its first callers. |
 | **Weeks 4–8** | **[CLOSED — Spec 045]** Form association across all 29 form controls (`formFieldAdoption: 29`, `clientCreatedFields: 0`, 100% no-JS parity & reset), then server actions — in that order. Actions that don't degrade gracefully aren't progressive enhancement. |
-| **Weeks 4–9** | **Fix the TagHelper split** (§0). 81 generated TagHelpers derive from `TagHelper`, not `IslandTagHelperBase`, so SSR, localization and RTL are unreachable from the components Razor authors actually use. This one change unblocks Part N and half of Part C. |
+| **Weeks 4–9** | **[CLOSED] Fix the TagHelper split** (§0). 81 generated TagHelpers derived from `TagHelper`, not `IslandTagHelperBase`, so SSR, localization and RTL were unreachable from the components Razor authors actually use. `IslandGenerator` now emits TagHelpers deriving from `IslandTagHelperBase`; along the way, 14 of those 81 turned out to duplicate a hand-written TagHelper targeting the same tag (two TagHelpers writing into one `TagHelperOutput`) and are now skipped instead of generated. Measured result: 67 generated + 15 hand-written = **82 of 82** TagHelpers reach the base class (was 15 of 96). This unblocks Part N and half of Part C. |
 | **Weeks 5–7** | Props payload and serialization (Part J): stop serializing defaults, add source-generated JSON contexts. Small, measurable, and it is the difference between a trimmable product and one that isn't. |
 | **Weeks 8–12** | Localization for real (Part N): move the vocabulary out of Core and teach the boundary test to catch its return, then route the 25 hardcoded English defaults and the client template strings through the localizer, then RTL. Depends on the TagHelper split above. |
 | **Weeks 6–10** | Fix the refresh/adapter corruption: `update(props)` in the adapter contract, refresh prefers it over morphing. |
