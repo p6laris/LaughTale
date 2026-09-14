@@ -219,7 +219,7 @@ delivery is one of the healthier subsystems.
 | Endpoint rate limiting | **Missing** | Two public `MapPost` routes run user-shaped queries |
 | Localization | **Strong — [CLOSED, Part N]** | 10 locales, 1,509 lines; reachable from **82 of 82** TagHelpers (was 15 of 96); all 31 hardcoded English defaults (roadmap previously undercounted this as 25) and 13 client-template strings now routed through `ILaughTaleLocalizer` |
 | Core/Components boundary | **Fully enforced** | Assembly-reference check passes; class-hierarchy check exists for the TagHelper split (`GeneratedTagHelperHierarchyTests`); the locale-dictionary gap is closed too — `LaughTaleLocaleDictionary`/`LaughTaleBuiltInLocales` moved to `LaughTale.Components`, and `CoreOnlyBoundaryTests` now reflects over Core's assembly and `LaughTaleLocalizationOptions`'s public surface to catch either type quietly coming back |
-| Props serialization | **Untuned** | Reflection-based, no source-gen context; 198 of 325 props write their defaults into every instance |
+| Props serialization | **Improved — [CLOSED, this pass]** | `IslandJson` now omits default-valued props (`DefaultIgnoreCondition.WhenWritingDefault`) — correcting the roadmap's stale "198 of 325" figure to the real pre-fix count, **401 of 665** props across 81 `[Island(...)]` records; generator-emitted anonymous props types replaced with named `WireProps` records (unblocks the anonymous-type limit on `[JsonSerializable]`), but a working `JsonSerializerContext` for them proved unreachable — reflection remains the only path (Part J below has the full account) |
 
 ---
 
@@ -464,28 +464,72 @@ audience.
   transferred bytes, memory after 50 navigations. Worth more than every adjective in the README.
 - **Report Core Web Vitals** back through the instrumentation hook (Part H).
 
-**Payload and serialization — the part this roadmap missed.** Every island writes a `data-props` JSON
-blob into the HTML, and nothing about that path is tuned:
+**Payload and serialization — the part this roadmap missed. — [CLOSED (partial), this pass]** Every
+island writes a `data-props` JSON blob into the HTML, and nothing about that path was tuned:
 
-- **Defaults are serialized.** `IslandJson` sets `DefaultIgnoreCondition = WhenWritingNull`, which
-  drops nulls but not defaults. Across the props records, **198 of 325 properties have a non-null
-  default**, so they are written into every instance whether the author set them or not. A
-  `<island-sidebar>` with no attributes still emits **270 bytes**; `<island-datatable>` 209;
-  `<island-dialog>` 166. On a page with 116 buttons and 28 inputs — the showcase's actual counts —
-  that is kilobytes of JSON restating the component's own defaults back to itself.
-  *Fix: `DefaultIgnoreCondition.WhenWritingDefault`, or emit only author-set attributes. (S · days)*
-- **Serialization is reflection-based.** There is **no `JsonSerializerContext` anywhere** in the
-  solution. `IslandJson` builds a `DefaultJsonTypeInfoResolver` with a modifier lambda and serializes
-  anonymous types — the slow `System.Text.Json` path, re-resolved per type, and the reason this
-  codebase cannot be trimmed or AOT-published today.
-  *Fix: source-generated serialization contexts for the props records. (S–M · 1 wk)*
-- **The props object is rebuilt per render.** The generator emits a fresh anonymous object per
-  TagHelper invocation, then serializes it. For a table of 500 rows with an island per cell that is
-  500 allocations and 500 serializations of near-identical JSON.
+- **Defaults were serialized.** `IslandJson` set `DefaultIgnoreCondition = WhenWritingNull`, which
+  dropped nulls but not defaults. The roadmap's original count here — "198 of 325 properties have a
+  non-null default" — was stale; re-counting against the current `LaughTale.Components/Models/
+  ComponentModels.cs` found **401 of 665** properties across the 81 `[Island(...)]` records with a
+  non-null default. Since C#'s `default` for any non-nullable value type (bool, int, every enum) is
+  never `null`, `WhenWritingNull` could never omit those regardless of whether the author set them —
+  every bool, int and enum prop on every island was written on every render.
+  **Fixed.** `IslandJson.CreateDefaultOptions()` now sets `DefaultIgnoreCondition =
+  JsonIgnoreCondition.WhenWritingDefault`. *Measured, 5-island sample, no attributes set*:
+  `<island-accordion>` 18 → **2 bytes**, `<island-datatable>` 208 → **2 bytes**, `<island-select>`
+  209 → **75 bytes**, `<island-checkbox>` 123 → **17 bytes**, `<island-slider>` 57 → **2 bytes** — a
+  weighted ~84% reduction across the sample. All 313 pre-existing tests plus 8 new regression tests
+  (`LaughTale.Tests/Serialization/IslandPropsPayloadTests.cs`) pass unchanged.
+- **Serialization was reflection-based; no `JsonSerializerContext` existed anywhere in the solution.**
+  `IslandGenerator.GenerateTagHelper`'s `BuildProps()` returned a fresh anonymous type per island model
+  (plus `Pt`/`StudioOverrides` and FormControl-specific fields) — and `[JsonSerializable]`/
+  `JsonSerializerContext` **cannot target anonymous types at all**, a hard Roslyn/`System.Text.Json`
+  constraint with no workaround. This is why trim/AOT-safe serialization had never been attempted.
+  **Partially fixed, and the rest turned out not to be fixable as designed.** `BuildProps()` now
+  returns a named `internal sealed record {TagHelperName}WireProps` per island (67 of them, one per
+  generator-emitted TagHelper — same field set as the old anonymous type, mechanically renamed) instead
+  of `new { ... }`, which does remove the literal anonymous-type blocker. But wiring a working
+  `JsonSerializerContext` for those 67 types — the actual point, reflection-free serialization — does
+  **not** work, confirmed two different ways: (1) emitting `[JsonSerializable(typeof(...WireProps))]`
+  on a partial `JsonSerializerContext` from `IslandGenerator` itself left `System.Text.Json`'s own
+  source generator unable to even find that class (its abstract members went unimplemented — Roslyn
+  generators do not see each other's generated syntax within one compilation pass, confirmed against
+  the documented behavior); (2) moving the identical attributes onto a hand-written, checked-in host
+  class (so the class declaration is original source, not generator output) fixed *that* error, but
+  `System.Text.Json`'s generator then silently failed to generate metadata for every one of the 67
+  types (`SYSLIB1030`, one per type), while an otherwise-identical, fully hand-written probe type in
+  the same file succeeded — so a type merely *existing* as generator output blocks it, independent of
+  which file hosts the context. Reflection remains the only working path for these 67 types today. The
+  seam is still in place for whenever this becomes solvable (e.g. if `WireProps` types are ever moved
+  to their own, separately-built project): `IslandJson.SerializeProps(object?, IJsonTypeInfoResolver?)`
+  accepts an optional additional resolver, combined ahead of the reflection fallback via
+  `JsonTypeInfoResolver.Combine`, with `LaughTale.Core` never referencing `LaughTale.Components` or the
+  generator output — proven correct against a fully hand-written type/context pair
+  (`IslandJsonTests.cs`), just not yet exercised by any real caller.
+  The 15 hand-written TagHelpers' own separate `new { ... }` anonymous-props code path (`Aura/
+  {Menu,Messages,Misc,Overlay}/*.cs`) was **left untouched** — converting it was explicitly a stretch
+  goal for this pass and, unlike the generator-emitted path, would actually be able to use real
+  source-gen (no second generator involved), but 15 working, hand-maintained components were judged
+  not worth touching without dedicated follow-up time.
+  *Trim analysis*: `<IsTrimmable>`/`<EnableTrimAnalyzer>` enabled for the first time on `LaughTale.Core`
+  and `LaughTale.Components` (no trim/AOT attempt existed anywhere before this pass). Result: **30 IL
+  warnings** solution-wide. Two are the irreducible cost of keeping a reflection fallback at all
+  (`IslandJson`'s `DefaultJsonTypeInfoResolver` construction and its generic `JsonSerializer.Serialize`
+  call — inherent while `BuildProps()` returns `object?` and hand-written/arbitrary props types exist).
+  The other 28 are pre-existing, unrelated to props serialization (minimal-API `MapGet`/`MapPost`
+  reflection and `Assembly.GetTypes()`-based authorization discovery in
+  `LaughTale.Core/Endpoints/IslandEndpointExtensions.cs` and
+  `LaughTale.Core/Security/IIslandAuthorizationRegistry.cs`; reflection-based dynamic form/query building
+  in `LaughTale.Components/Forms/DynamicFormSchema.cs` and `LaughTale.Core/Data/QueryableExtensions.cs`;
+  the legacy imperative `IslandTagHelper.Props` reflection path) — out of scope for this pass, reported
+  rather than silenced.
+- **The props object is still rebuilt per render.** Unchanged by this pass — the generator emits a
+  fresh `WireProps` instance per TagHelper invocation, then serializes it. For a table of 500 rows with
+  an island per cell that is still 500 allocations and 500 serializations of near-identical JSON.
   *Fix: cache by value, or hoist shared props to the ambient state pool (Part F). (M · 2 wks)*
-- **No compression story for the attribute payload.** `data-props` is inline HTML, so it compresses
-  with the document — but it defeats any future streaming or partial-update path that wants to send
-  markup without re-sending props.
+- **No compression story for the attribute payload.** Unchanged. `data-props` is inline HTML, so it
+  compresses with the document — but it defeats any future streaming or partial-update path that wants
+  to send markup without re-sending props.
 
 ---
 
@@ -668,8 +712,8 @@ worse than shipping neither, because it looks finished.
 | Localization & i18n | Nuxt i18n, Astro | **Strong — [CLOSED, this pass]** — TagHelper split fixed (82/82 reach the localizer); vocabulary moved to `LaughTale.Components`; all 31 hardcoded English defaults and 13 client-template strings routed through it; 10 locales, 1,509 lines. Locale-aware formatting/routing/pluralization/translator workflow remain open follow-ups | **N** |
 | Locale-aware routing | Nuxt i18n | **Missing** | **N** |
 | RTL support | web platform | **Built, unused** — 8/76 components (corrected count; previously reported as 7), 2 logical properties. Not addressed by the localization-vocabulary pass above | **N** |
-| Props payload efficiency | — | **Untuned** — 198/325 props serialize their defaults | **J** |
-| AOT / trim-safe serialization | .NET | **Missing** — no `JsonSerializerContext`, reflection only | **J** |
+| Props payload efficiency | — | **Improved — [CLOSED, this pass]** — `WhenWritingDefault` now omits default-valued props (corrected count: 401/665 had non-null defaults, not the roadmap's stale 198/325); ~84% payload reduction on a 5-island sample | **J** |
+| AOT / trim-safe serialization | .NET | **Attempted, not achievable as designed** — generator-emitted anonymous props types replaced with named records (unblocks `[JsonSerializable]` targeting them in principle), but no two-Roslyn-generator combination can actually produce a working `JsonSerializerContext` for them (confirmed empirically, see Part J); reflection remains the only path. Trim analysis enabled for the first time: 30 IL warnings, 2 attributable to this path (irreducible), 28 pre-existing/unrelated | **J** |
 | HTML sanitization at render | — | **CRITICAL** — sanitizer exists, 4/76 call it | §1 |
 | Listener lifecycle | — | **CRITICAL** — 374 unmanaged | §1 |
 | Authorization default | — | **FAIL-OPEN** — unregistered islands unguarded | §1, K |
@@ -713,7 +757,7 @@ worse than shipping neither, because it looks finished.
 | **Weeks 2–6** | **[CLOSED — Specs 040, 042, 043, 044]** Adopt your own composables and event runtime — `useFocusTrap` (7/7 modals), `useKeyboardNav` (7/7 hierarchical), `useFloatingPosition` (14/14 overlays), `useVirtualizer` (6/6 long collections); unified component event contract `laughtale:<comp>:<evt>` (41/41 components). Findings recorded: `tieredmenu`'s cross-island toast dispatch never fired due to target mismatch (`window.dispatchEvent` vs `document.addEventListener`), now re-homed to the in-process island bus; `runtime/events.ts` was the seventh built-and-unadopted module, now fully adopted with its first callers. |
 | **Weeks 4–8** | **[CLOSED — Spec 045]** Form association across all 29 form controls (`formFieldAdoption: 29`, `clientCreatedFields: 0`, 100% no-JS parity & reset), then server actions — in that order. Actions that don't degrade gracefully aren't progressive enhancement. |
 | **Weeks 4–9** | **[CLOSED] Fix the TagHelper split** (§0). 81 generated TagHelpers derived from `TagHelper`, not `IslandTagHelperBase`, so SSR, localization and RTL were unreachable from the components Razor authors actually use. `IslandGenerator` now emits TagHelpers deriving from `IslandTagHelperBase`; along the way, 14 of those 81 turned out to duplicate a hand-written TagHelper targeting the same tag (two TagHelpers writing into one `TagHelperOutput`) and are now skipped instead of generated. Measured result: 67 generated + 15 hand-written = **82 of 82** TagHelpers reach the base class (was 15 of 96). This unblocks Part N and half of Part C. |
-| **Weeks 5–7** | Props payload and serialization (Part J): stop serializing defaults, add source-generated JSON contexts. Small, measurable, and it is the difference between a trimmable product and one that isn't. |
+| **Weeks 5–7** | **[CLOSED (partial)]** Props payload and serialization (Part J): stopped serializing defaults (`WhenWritingDefault`, ~84% payload reduction on a 5-island sample; corrected the stale "198/325" count to the real 401/665) and replaced generator-emitted anonymous props types with named records. Source-generated JSON contexts for those 67 types turned out not achievable — confirmed two Roslyn generators cannot be combined this way — so the product is measurably smaller on the wire but still not trimmable/AOT-safe for generator-emitted islands; trim analysis is now at least turned on (30 IL warnings surfaced, 28 pre-existing/unrelated) so future attempts have a real baseline. |
 | **Weeks 8–12** | **[CLOSED]** Localization for real (Part N): moved the vocabulary out of Core (`LaughTaleLocaleDictionary`/`LaughTaleBuiltInLocales` now in `LaughTale.Components`), taught `CoreOnlyBoundaryTests` to catch its return, and routed all 31 hardcoded English defaults (not 25 — the original count undercounted) and 13 client-template strings through the localizer. RTL adoption itself (8/76 components, corrected from a previously reported 7) remains open — this pass closed vocabulary routing only. |
 | **Weeks 6–10** | Fix the refresh/adapter corruption: `update(props)` in the adapter contract, refresh prefers it over morphing. |
 | **Weeks 9–14** | Plugin API, then the island compiler. The stretch that turns a library into a framework — protect it from interruption. |

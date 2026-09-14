@@ -9,6 +9,10 @@
     <AssemblyName>LaughTale.Core</AssemblyName>
     <RootNamespace>LaughTale.Core</RootNamespace>
     <Description>High performance LaughTale Islands Architecture runtime and tag helpers for .NET 10</Description>
+    <!-- ROADMAP.v5.md Part J: first-time trim analysis for this library, surfacing IL2026/IL3050/IL2091-class
+         warnings from reflection-based JSON serialization and other trim-unsafe patterns during normal build. -->
+    <IsTrimmable>true</IsTrimmable>
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
   </PropertyGroup>
 
   <ItemGroup>

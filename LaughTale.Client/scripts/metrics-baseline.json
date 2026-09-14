@@ -23,5 +23,6 @@
   "unsafeCalls": 63,
   "adapterUpdateSupport": 0,
   "formFieldAdoption": 29,
-  "clientCreatedFields": 0
+  "clientCreatedFields": 0,
+  "propsNullishDefaultAdoption": 24
 }

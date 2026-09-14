@@ -76,6 +76,16 @@ const m = {
     adapterUpdateSupport: 0,
     formFieldAdoption: 0,
     clientCreatedFields: 0,
+
+    // --- PROPS PAYLOAD (ROADMAP.v5.md Part J) --------------------------------
+    // Components self-defaulting a prop with `??`/`?.` rather than assuming the server always sent an
+    // explicit value for it. This is the client-side property that makes IslandJson.CreateDefaultOptions()
+    // omitting default-valued props from data-props (DefaultIgnoreCondition.WhenWritingDefault, switched
+    // from WhenWritingNull) safe: a component reading props.foo ?? someDefault behaves identically whether
+    // the server sent foo:<default> explicitly or omitted the key entirely. Approximates the "spot-checked
+    // across dozens of components, no counter-example found" adoption claim in ROADMAP.v5.md Part J with an
+    // actual, re-checkable number instead of a one-time manual audit.
+    propsNullishDefaultAdoption: 0,
 };
 
 function splitTopLevel(args) {
@@ -155,6 +165,8 @@ for (const f of files) {
     if (/createHandle/.test(s)) m.handleAdoption++;
     if (/ dir\s*===|rtl|inline-start|inline-end|margin-inline|padding-inline|inset-inline/.test(s)) m.rtlAdoption++;
     m.unsafeCalls += countAll(s, / unsafe\s*\(/g);
+
+    if (/\bprops\??\.[a-zA-Z_$][\w$]*\s*\?\?/.test(s)) m.propsNullishDefaultAdoption++;
 }
 
 // Adapters are a separate directory from components.
@@ -175,7 +187,7 @@ const LOWER_IS_BETTER = [
 const HIGHER_IS_BETTER = [
     'escapeAdoption', 'focusTrapAdoption', 'virtualizerAdoption',
     'formAssociationAdoption', 'handleAdoption', 'rtlAdoption', 'adapterUpdateSupport',
-    'observersDisconnected', 'formFieldAdoption',
+    'observersDisconnected', 'formFieldAdoption', 'propsNullishDefaultAdoption',
 ];
 
 const args = process.argv.slice(2);

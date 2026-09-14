@@ -9,6 +9,10 @@
     <AssemblyName>LaughTale.Components</AssemblyName>
     <RootNamespace>LaughTale.Components</RootNamespace>
     <Description>Batteries-Included Enterprise UI Components for LaughTale (Stepper, Timeline, Camera, Dropzone, TreeSelect, DataGrid, Modal, Toast)</Description>
+    <!-- ROADMAP.v5.md Part J: first-time trim analysis for this library, surfacing IL2026/IL3050/IL2091-class
+         warnings from reflection-based JSON serialization and other trim-unsafe patterns during normal build. -->
+    <IsTrimmable>true</IsTrimmable>
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,8 +21,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LaughTale.Core\LaughTale.Core.csproj" />
-    <ProjectReference Include="..\LaughTale.Generators\LaughTale.Generators.csproj" 
-                      OutputItemType="Analyzer" 
+    <ProjectReference Include="..\LaughTale.Generators\LaughTale.Generators.csproj"
+                      OutputItemType="Analyzer"
                       ReferenceOutputAssembly="false" />
   </ItemGroup>
 

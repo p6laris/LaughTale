@@ -197,6 +197,18 @@ public abstract class IslandTagHelperBase : TagHelper
         var props = BuildProps();
         if (props != null)
         {
+            // NOTE (ROADMAP.v5.md Part J): a combined-resolver call (IslandJson.SerializeProps(props,
+            // someGeneratedContext)) was attempted here to route generator-emitted "WireProps" record types
+            // (see IslandGenerator.GenerateTagHelper) through source-generated, reflection-free JSON metadata.
+            // It does not work: System.Text.Json's own [JsonSerializable] source generator cannot fully
+            // introspect a type produced by a DIFFERENT Roslyn generator (IslandGenerator) even when the
+            // [JsonSerializable]-decorated context class referencing it is itself hand-written, original
+            // source - confirmed empirically (SYSLIB1030 "did not generate serialization metadata" for
+            // every one of the 67 generator-emitted WireProps types, while an otherwise-identical, fully
+            // hand-written probe type succeeded). Reflection-based serialization remains the only working
+            // path for these types today. IslandJson.SerializeProps(object?, IJsonTypeInfoResolver?) still
+            // exists as the seam a future fix could use (e.g. if hand-written TagHelpers' own wrapper types
+            // are ever converted per Part J's Step 3, since those involve no second generator).
             output.Attributes.SetAttribute("data-props", IslandJson.SerializeProps(props));
         }
 
