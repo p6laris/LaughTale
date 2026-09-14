@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace LaughTale.Core.Localization;
+namespace LaughTale.Components.Localization;
 
 /// <summary>
 /// Built-in language packs and factory for standard UI localizations.
@@ -92,7 +92,20 @@ public static class LaughTaleBuiltInLocales
         MoveToSource = "Move to Source",
         MoveAllToSource = "Move All to Source",
         Available = "Available",
-        Selected = "Selected"
+        Selected = "Selected",
+        SelectPlaceholder = "Select an option",
+        SearchPlaceholder = "Search...",
+        SelectCategoryPlaceholder = "Select a category",
+        AddTagPlaceholder = "Add a tag...",
+        FilterItemsPlaceholder = "Filter items...",
+        SelectItemsPlaceholder = "Select items",
+        SelectItemPlaceholder = "Select Item",
+        FilterPlaceholder = "Filter...",
+        FilterTreeNodesPlaceholder = "Filter tree nodes...",
+        DropzoneMessage = "Drag & Drop files here or browse",
+        InplaceEditPlaceholder = "Click to edit...",
+        CommandPlaceholder = "Type a command or search...",
+        SubmitLabel = "Submit"
     };
 
     public static LaughTaleLocaleDictionary CreateKurdish() => new()
@@ -165,7 +178,20 @@ public static class LaughTaleBuiltInLocales
         MoveToSource = "گواستنەوە بۆ سەرچاوە",
         MoveAllToSource = "گواستنەوەی هەمووی بۆ سەرچاوە",
         Available = "بەردەست",
-        Selected = "دیاریکراو"
+        Selected = "دیاریکراو",
+        SelectPlaceholder = "هەڵبژاردنێک هەڵبژێرە",
+        SearchPlaceholder = "گەڕان...",
+        SelectCategoryPlaceholder = "هاوپۆلێک هەڵبژێرە",
+        AddTagPlaceholder = "تاگێک زیاد بکە...",
+        FilterItemsPlaceholder = "بژاردەکان پاڵاوتن بکە...",
+        SelectItemsPlaceholder = "بژاردەکان هەڵبژێرە",
+        SelectItemPlaceholder = "بژاردەیەک هەڵبژێرە",
+        FilterPlaceholder = "پاڵاوتن...",
+        FilterTreeNodesPlaceholder = "لقەکانی درەخت پاڵاوتن بکە...",
+        DropzoneMessage = "فایلەکان لێرە دابنێ یان وێبگەڕی بکە",
+        InplaceEditPlaceholder = "کلیک بکە بۆ دەستکاریکردن...",
+        CommandPlaceholder = "فەرمانێک بنووسە یان بگەڕێ...",
+        SubmitLabel = "پێشکەشکردن"
     };
 
     public static LaughTaleLocaleDictionary CreateArabic() => new()
@@ -237,7 +263,20 @@ public static class LaughTaleBuiltInLocales
         MoveToSource = "نقل إلى المتاح",
         MoveAllToSource = "نقل الكل إلى المتاح",
         Available = "المتاح",
-        Selected = "المحدد"
+        Selected = "المحدد",
+        SelectPlaceholder = "اختر خيارًا",
+        SearchPlaceholder = "بحث...",
+        SelectCategoryPlaceholder = "اختر فئة",
+        AddTagPlaceholder = "أضف وسمًا...",
+        FilterItemsPlaceholder = "تصفية العناصر...",
+        SelectItemsPlaceholder = "اختر عناصر",
+        SelectItemPlaceholder = "اختر عنصرًا",
+        FilterPlaceholder = "تصفية...",
+        FilterTreeNodesPlaceholder = "تصفية عقد الشجرة...",
+        DropzoneMessage = "اسحب وأفلت الملفات هنا أو تصفح",
+        InplaceEditPlaceholder = "انقر للتعديل...",
+        CommandPlaceholder = "اكتب أمرًا أو ابحث...",
+        SubmitLabel = "إرسال"
     };
 
     public static LaughTaleLocaleDictionary CreateSpanish() => new()
@@ -309,7 +348,20 @@ public static class LaughTaleBuiltInLocales
         MoveToSource = "Mover a origen",
         MoveAllToSource = "Mover todos a origen",
         Available = "Disponibles",
-        Selected = "Seleccionados"
+        Selected = "Seleccionados",
+        SelectPlaceholder = "Seleccionar una opción",
+        SearchPlaceholder = "Buscar...",
+        SelectCategoryPlaceholder = "Seleccionar una categoría",
+        AddTagPlaceholder = "Añadir una etiqueta...",
+        FilterItemsPlaceholder = "Filtrar elementos...",
+        SelectItemsPlaceholder = "Seleccionar elementos",
+        SelectItemPlaceholder = "Seleccionar elemento",
+        FilterPlaceholder = "Filtrar...",
+        FilterTreeNodesPlaceholder = "Filtrar nodos del árbol...",
+        DropzoneMessage = "Arrastra y suelta archivos aquí o explora",
+        InplaceEditPlaceholder = "Haga clic para editar...",
+        CommandPlaceholder = "Escriba un comando o busque...",
+        SubmitLabel = "Enviar"
     };
 
     public static LaughTaleLocaleDictionary CreateFrench() => new()
@@ -381,7 +433,20 @@ public static class LaughTaleBuiltInLocales
         MoveToSource = "Déplacer vers source",
         MoveAllToSource = "Tout déplacer vers source",
         Available = "Disponibles",
-        Selected = "Sélectionnés"
+        Selected = "Sélectionnés",
+        SelectPlaceholder = "Sélectionner une option",
+        SearchPlaceholder = "Rechercher...",
+        SelectCategoryPlaceholder = "Sélectionner une catégorie",
+        AddTagPlaceholder = "Ajouter une étiquette...",
+        FilterItemsPlaceholder = "Filtrer les éléments...",
+        SelectItemsPlaceholder = "Sélectionner des éléments",
+        SelectItemPlaceholder = "Sélectionner un élément",
+        FilterPlaceholder = "Filtrer...",
+        FilterTreeNodesPlaceholder = "Filtrer les nœuds de l'arborescence...",
+        DropzoneMessage = "Glissez-déposez des fichiers ici ou parcourez",
+        InplaceEditPlaceholder = "Cliquez pour modifier...",
+        CommandPlaceholder = "Tapez une commande ou recherchez...",
+        SubmitLabel = "Soumettre"
     };
 
     public static LaughTaleLocaleDictionary CreateGerman() => new()
@@ -453,7 +518,20 @@ public static class LaughTaleBuiltInLocales
         MoveToSource = "Aus Auswahl entfernen",
         MoveAllToSource = "Alle aus Auswahl entfernen",
         Available = "Verfügbar",
-        Selected = "Ausgewählt"
+        Selected = "Ausgewählt",
+        SelectPlaceholder = "Option auswählen",
+        SearchPlaceholder = "Suchen...",
+        SelectCategoryPlaceholder = "Kategorie auswählen",
+        AddTagPlaceholder = "Tag hinzufügen...",
+        FilterItemsPlaceholder = "Einträge filtern...",
+        SelectItemsPlaceholder = "Einträge auswählen",
+        SelectItemPlaceholder = "Eintrag auswählen",
+        FilterPlaceholder = "Filtern...",
+        FilterTreeNodesPlaceholder = "Baumknoten filtern...",
+        DropzoneMessage = "Dateien hierher ziehen oder durchsuchen",
+        InplaceEditPlaceholder = "Zum Bearbeiten klicken...",
+        CommandPlaceholder = "Befehl eingeben oder suchen...",
+        SubmitLabel = "Absenden"
     };
 
     public static LaughTaleLocaleDictionary CreateTurkish() => new()
@@ -525,7 +603,20 @@ public static class LaughTaleBuiltInLocales
         MoveToSource = "Kaynağa Taşı",
         MoveAllToSource = "Tümünü Kaynağa Taşı",
         Available = "Kullanılabilir",
-        Selected = "Seçilen"
+        Selected = "Seçilen",
+        SelectPlaceholder = "Bir seçenek seçin",
+        SearchPlaceholder = "Ara...",
+        SelectCategoryPlaceholder = "Bir kategori seçin",
+        AddTagPlaceholder = "Etiket ekle...",
+        FilterItemsPlaceholder = "Öğeleri filtrele...",
+        SelectItemsPlaceholder = "Öğeleri seçin",
+        SelectItemPlaceholder = "Öğe seçin",
+        FilterPlaceholder = "Filtrele...",
+        FilterTreeNodesPlaceholder = "Ağaç düğümlerini filtrele...",
+        DropzoneMessage = "Dosyaları buraya sürükleyip bırakın veya göz atın",
+        InplaceEditPlaceholder = "Düzenlemek için tıklayın...",
+        CommandPlaceholder = "Bir komut yazın veya arayın...",
+        SubmitLabel = "Gönder"
     };
 
     public static LaughTaleLocaleDictionary CreateChinese() => new()
@@ -597,7 +688,20 @@ public static class LaughTaleBuiltInLocales
         MoveToSource = "移至源",
         MoveAllToSource = "全部移至源",
         Available = "可用项",
-        Selected = "已选项"
+        Selected = "已选项",
+        SelectPlaceholder = "选择一个选项",
+        SearchPlaceholder = "搜索...",
+        SelectCategoryPlaceholder = "选择一个类别",
+        AddTagPlaceholder = "添加标签...",
+        FilterItemsPlaceholder = "筛选项目...",
+        SelectItemsPlaceholder = "选择项目",
+        SelectItemPlaceholder = "选择项目",
+        FilterPlaceholder = "筛选...",
+        FilterTreeNodesPlaceholder = "筛选树节点...",
+        DropzoneMessage = "将文件拖放到此处或浏览",
+        InplaceEditPlaceholder = "点击编辑...",
+        CommandPlaceholder = "输入命令或搜索...",
+        SubmitLabel = "提交"
     };
 
     public static LaughTaleLocaleDictionary CreateJapanese() => new()
@@ -669,6 +773,19 @@ public static class LaughTaleBuiltInLocales
         MoveToSource = "利用可能に移動",
         MoveAllToSource = "すべて利用可能に移動",
         Available = "利用可能",
-        Selected = "選択済み"
+        Selected = "選択済み",
+        SelectPlaceholder = "オプションを選択",
+        SearchPlaceholder = "検索...",
+        SelectCategoryPlaceholder = "カテゴリを選択",
+        AddTagPlaceholder = "タグを追加...",
+        FilterItemsPlaceholder = "項目を絞り込む...",
+        SelectItemsPlaceholder = "項目を選択",
+        SelectItemPlaceholder = "項目を選択",
+        FilterPlaceholder = "絞り込み...",
+        FilterTreeNodesPlaceholder = "ツリーノードを絞り込む...",
+        DropzoneMessage = "ここにファイルをドラッグ&ドロップ、または参照",
+        InplaceEditPlaceholder = "クリックして編集...",
+        CommandPlaceholder = "コマンドを入力または検索...",
+        SubmitLabel = "送信"
     };
 }

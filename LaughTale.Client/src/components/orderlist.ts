@@ -12,6 +12,7 @@ import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts
 import type { IslandContext } from '../runtime/registry';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import { useFormField } from '../composables/useFormField';
+import { useLocale } from '../composables/useLocale';
 import { useVirtualizer, type Virtualizer } from '../composables/useVirtualizer';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
@@ -353,6 +354,7 @@ html.dark .p-orderlist-product-img,
 
 export default function OrderListIsland<T = any>(container: HTMLElement, props: OrderListProps<T>, ctx?: IslandContext) {
     injectIslandStyle('orderlist', ORDERLIST_CSS);
+    const locale = useLocale(ctx);
 
     const formField = useFormField(container, ctx, {
         cardinality: 'Multiple',
@@ -604,7 +606,7 @@ export default function OrderListIsland<T = any>(container: HTMLElement, props: 
         if (listUl) {
             if (filteredItems.length === 0) {
                 virtualizer = null;
-                setHtml(listUl, html`<li class="p-orderlist-empty">${filterQuery ? 'No results found' : emptyMessage}</li>`);
+                setHtml(listUl, html`<li class="p-orderlist-empty">${filterQuery ? (locale.t('emptyFilterMessage') || 'No results found') : emptyMessage}</li>`);
             } else if (filteredItems.length < 100) {
                 virtualizer = null;
                 const nodes: Raw[] = [];

@@ -3,6 +3,7 @@ import type { IslandContext } from '../runtime/registry';
 import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
 import { useFocusTrap } from '../composables/useFocusTrap';
+import { useLocale } from '../composables/useLocale';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
@@ -326,6 +327,7 @@ export interface CommandMenuProps {
 
 export default function CommandMenuIsland(container: HTMLElement, props: CommandMenuProps, ctx?: IslandContext) {
     injectIslandStyle('commandmenu', COMMAND_CSS);
+    const locale = useLocale(ctx);
 
     const placeholder = props.placeholder || (props as any).Placeholder || 'Search for commands...';
     const filterType = props.filter || (props as any).Filter || 'default';
@@ -496,9 +498,10 @@ export default function CommandMenuIsland(container: HTMLElement, props: Command
 
             if (totalItems === 0) {
                 const emptyMsg = props.emptyMessage || (props as any).EmptyMessage;
+                const noResultsText = locale.t('emptyFilterMessage') || 'No results found';
                 setHtml(listEl, html`
                     <div class="p-commandmenu-empty-message">
-                        ${emptyMsg ? emptyMsg : (search ? html`No results found for <strong>"${search}"</strong>` : 'No results found')}
+                        ${emptyMsg ? emptyMsg : (search ? html`${noResultsText} for <strong>"${search}"</strong>` : noResultsText)}
                     </div>
                 `);
                 return;

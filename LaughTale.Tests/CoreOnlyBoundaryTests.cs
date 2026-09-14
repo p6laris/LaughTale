@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -13,6 +15,7 @@ using LaughTale.Core.Attributes;
 using LaughTale.Core.Configuration;
 using LaughTale.Core.Enums;
 using LaughTale.Core.Extensions;
+using LaughTale.Core.Localization;
 using LaughTale.Core.TagHelpers;
 using Xunit;
 
@@ -35,6 +38,67 @@ public class CoreOnlyBoundaryTests
         var referencedAssemblies = coreAssembly.GetReferencedAssemblies();
 
         Assert.DoesNotContain(referencedAssemblies, a => a.Name?.StartsWith("LaughTale.Components", StringComparison.OrdinalIgnoreCase) == true);
+    }
+
+    /// <summary>
+    /// Guards against the concrete, typed locale-pack vocabulary (LaughTaleLocaleDictionary /
+    /// LaughTaleBuiltInLocales) quietly re-appearing in LaughTale.Core.Localization. Those types
+    /// belong to LaughTale.Components now; Core's localization surface must stay expressed purely
+    /// in BCL collection types so Core never needs to know about any concrete locale-pack shape.
+    /// This test would have failed against the pre-refactor code (where both types lived in
+    /// LaughTale.Core.Localization and GetDictionary()/AddLocale() referenced them directly).
+    /// </summary>
+    [Fact]
+    public void CoreAssembly_DoesNotContainConcreteLocalePackTypes()
+    {
+        var coreAssembly = typeof(ILaughTaleLocalizer).Assembly;
+        var typeNames = coreAssembly.GetTypes().Select(t => t.Name).ToArray();
+
+        Assert.DoesNotContain("LaughTaleLocaleDictionary", typeNames);
+        Assert.DoesNotContain("LaughTaleBuiltInLocales", typeNames);
+    }
+
+    /// <summary>
+    /// Guards ILaughTaleLocalizer.GetDictionary() specifically: it must return a generic BCL
+    /// dictionary shape (IReadOnlyDictionary&lt;string, string&gt;), never a named/concrete type.
+    /// </summary>
+    [Fact]
+    public void ILaughTaleLocalizer_GetDictionary_ReturnsGenericReadOnlyDictionaryOfStrings()
+    {
+        var method = typeof(ILaughTaleLocalizer).GetMethod(nameof(ILaughTaleLocalizer.GetDictionary));
+        Assert.NotNull(method);
+        Assert.Equal(typeof(IReadOnlyDictionary<string, string>), method!.ReturnType);
+    }
+
+    /// <summary>
+    /// Guards LaughTaleLocalizationOptions' public surface against quietly growing a
+    /// concrete/typed locale-pack member again: its public instance properties must be exactly
+    /// this fixed, named set, all expressed in BCL types.
+    /// </summary>
+    [Fact]
+    public void LaughTaleLocalizationOptions_PublicSurfaceIsExactlyTheExpectedGenericSet()
+    {
+        var expectedProperties = new HashSet<string>(StringComparer.Ordinal)
+        {
+            nameof(LaughTaleLocalizationOptions.Enabled),
+            nameof(LaughTaleLocalizationOptions.DefaultCulture),
+            nameof(LaughTaleLocalizationOptions.SupportedCultures),
+            nameof(LaughTaleLocalizationOptions.StringLocalizerResourceSource),
+            nameof(LaughTaleLocalizationOptions.CustomDictionaries),
+            nameof(LaughTaleLocalizationOptions.BuiltInDictionaries),
+        };
+
+        var actualProperties = typeof(LaughTaleLocalizationOptions)
+            .GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)
+            .Select(p => p.Name)
+            .ToHashSet(StringComparer.Ordinal);
+
+        Assert.Equal(expectedProperties, actualProperties);
+
+        // Both dictionary-shaped members must be plain culture -> (key -> value) BCL maps.
+        var expectedDictionaryType = typeof(IDictionary<string, IDictionary<string, string>>);
+        Assert.Equal(expectedDictionaryType, typeof(LaughTaleLocalizationOptions).GetProperty(nameof(LaughTaleLocalizationOptions.CustomDictionaries))!.PropertyType);
+        Assert.Equal(expectedDictionaryType, typeof(LaughTaleLocalizationOptions).GetProperty(nameof(LaughTaleLocalizationOptions.BuiltInDictionaries))!.PropertyType);
     }
 
     [Fact]

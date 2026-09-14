@@ -7,6 +7,7 @@ import { useDisclosure } from '../composables/useDisclosure';
 import { useClickOutside } from '../composables/useClickOutside';
 import { useDebounce } from '../composables/useDebounce';
 import { useFloatingPosition } from '../composables/useFloatingPosition';
+import { useLocale } from '../composables/useLocale';
 import { html, setHtml, unsafe, attr, type Raw } from '../runtime/html';
 import { useFormField } from '../composables/useFormField';
 import type { PatternDeclaration } from '../accessibility/patterns';
@@ -343,6 +344,7 @@ html.dark .ac-item.selected,
 
 export default function AutoCompleteIsland(container: HTMLElement, props: AutoCompleteProps, ctx?: IslandContext) {
     injectIslandStyle('autocomplete', CSS);
+    const locale = useLocale(ctx);
 
     const formField = useFormField(container, ctx, {
         cardinality: 'Single',
@@ -511,7 +513,7 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
         const filtered = getFilteredItems();
 
         if (filtered.length === 0) {
-            setHtml(overlay, html`<div style="padding: 0.75rem; text-align: center; color: var(--p-text-muted); font-size: 0.8125rem;">No results found</div>`);
+            setHtml(overlay, html`<div style="padding: 0.75rem; text-align: center; color: var(--p-text-muted); font-size: 0.8125rem;">${locale.t('emptyFilterMessage') || 'No results found'}</div>`);
             return;
         }
 

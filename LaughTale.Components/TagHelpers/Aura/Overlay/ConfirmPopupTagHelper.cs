@@ -1,5 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.Extensions.DependencyInjection;
+using LaughTale.Core.Localization;
 
 namespace LaughTale.Components.TagHelpers.Aura.Overlay;
 
@@ -26,12 +28,13 @@ public class ConfirmPopupTagHelper : IslandTagHelperBase
 
     protected override object? BuildProps()
     {
+        var localizer = ViewContext?.HttpContext?.RequestServices?.GetService<ILaughTaleLocalizer>();
         return new
         {
             group = Group,
             message = Message,
-            acceptText = AcceptText,
-            rejectText = RejectText,
+            acceptText = AcceptText ?? localizer?["accept"],
+            rejectText = RejectText ?? localizer?["reject"],
             @class = Class,
             style = Style,
             id = Id

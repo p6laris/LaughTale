@@ -724,7 +724,7 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
 
         if (flatItems.length === 0) {
             virtualizer = null;
-            return html`<div class="p-select-empty-message">No results found</div>`;
+            return html`<div class="p-select-empty-message">${locale.t('emptyFilterMessage') || 'No results found'}</div>`;
         }
 
         if (flatItems.length < 100) {

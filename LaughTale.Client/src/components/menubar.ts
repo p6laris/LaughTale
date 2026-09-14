@@ -12,6 +12,7 @@ import { injectIslandStyle } from '../runtime/styles';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import { setRovingTabindex, handleRovingKeydown } from '../accessibility/aria';
 import { useKeyboardNav } from '../composables/useKeyboardNav';
+import { useLocale } from '../composables/useLocale';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -363,6 +364,7 @@ export interface MenubarProps {
 
 export default function MenubarIsland(container: HTMLElement, props: MenubarProps, ctx?: IslandContext) {
     injectIslandStyle('menubar', MENUBAR_CSS);
+    const locale = useLocale(ctx);
 
     const customTemplate = props.customTemplate || (props as any).CustomTemplate || false;
 
@@ -560,7 +562,7 @@ export default function MenubarIsland(container: HTMLElement, props: MenubarProp
                     } else if (item.command === 'print') {
                         showFeedback('No printer connected', 'error');
                     } else if (item.command === 'search') {
-                        showFeedback('No results found', 'warn');
+                        showFeedback(locale.t('emptyFilterMessage') || 'No results found', 'warn');
                     } else if (item.command === 'download-cloud') {
                         showFeedback('Downloaded from cloud', 'info');
                     } else if (item.command === 'share-cloud') {

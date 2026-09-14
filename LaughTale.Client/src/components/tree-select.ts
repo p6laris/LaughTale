@@ -15,6 +15,7 @@ import { useFloatingPosition } from '../composables/useFloatingPosition';
 import { useControllableState } from '../composables/useControllableState';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import { useFormField } from '../composables/useFormField';
+import { useLocale } from '../composables/useLocale';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -539,6 +540,7 @@ const xSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" vie
 
 export default function TreeSelectIsland(container: HTMLElement, props: TreeSelectProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-treeselect', CSS);
+    const locale = useLocale(ctx);
 
     const formField = useFormField(container, ctx, {
         cardinality: 'Multiple',
@@ -786,7 +788,7 @@ export default function TreeSelectIsland(container: HTMLElement, props: TreeSele
         const visibleNodes = filterTree(treeData, searchQuery.toLowerCase().trim());
 
         if (visibleNodes.length === 0) {
-            setHtml(treeList, html`<li class="p-treenode" style="padding: 1rem; text-align: center; color: var(--p-text-muted); font-size: 0.8125rem;">No results found</li>`);
+            setHtml(treeList, html`<li class="p-treenode" style="padding: 1rem; text-align: center; color: var(--p-text-muted); font-size: 0.8125rem;">${locale.t('emptyFilterMessage') || 'No results found'}</li>`);
             return;
         }
 

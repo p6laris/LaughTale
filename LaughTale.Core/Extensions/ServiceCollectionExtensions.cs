@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
@@ -10,19 +11,41 @@ namespace LaughTale.Core.Extensions;
 public static class ServiceCollectionExtensions
 {
     /// <summary>
+    /// Finds the LaughTaleOptions instance already registered in this IServiceCollection (from a
+    /// prior AddLaughTale()/AddLaughTaleLocalization() call), or creates and registers a fresh one.
+    /// LaughTaleOptions is registered as a directly-constructed singleton instance rather than
+    /// through the standard IOptions&lt;T&gt; Configure() pipeline, so packages that extend LaughTale
+    /// (e.g. LaughTale.Components' AddLaughTaleComponents(), which seeds built-in locale
+    /// dictionaries) must mutate this same shared instance to take effect - this helper makes that
+    /// safe regardless of whether such a package is registered before or after AddLaughTale().
+    /// </summary>
+    public static LaughTaleOptions EnsureLaughTaleOptions(this IServiceCollection services)
+    {
+        var existing = services
+            .FirstOrDefault(d => d.ServiceType == typeof(LaughTaleOptions))
+            ?.ImplementationInstance as LaughTaleOptions;
+        if (existing != null)
+        {
+            return existing;
+        }
+
+        var options = new LaughTaleOptions();
+        services.AddSingleton(options);
+        services.AddSingleton<IOptions<LaughTaleOptions>>(new OptionsWrapper<LaughTaleOptions>(options));
+        return options;
+    }
+
+    /// <summary>
     /// Registers LaughTale Islands Architecture core runtime and services with optional feature configuration.
     /// </summary>
     /// <param name="services">The IServiceCollection instance.</param>
     /// <param name="configure">Optional delegate to configure LaughTaleOptions.</param>
     public static IServiceCollection AddLaughTale(
-        this IServiceCollection services, 
+        this IServiceCollection services,
         Action<LaughTaleOptions>? configure = null)
     {
-        var options = new LaughTaleOptions();
+        var options = services.EnsureLaughTaleOptions();
         configure?.Invoke(options);
-
-        services.AddSingleton(options);
-        services.AddSingleton<IOptions<LaughTaleOptions>>(new OptionsWrapper<LaughTaleOptions>(options));
 
         // Core island services
         services.TryAddSingleton<ILaughTaleLocalizer, LaughTaleLocalizer>();
@@ -39,13 +62,8 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         Action<LaughTaleLocalizationOptions>? configure = null)
     {
-        var locOptions = new LaughTaleLocalizationOptions();
-        configure?.Invoke(locOptions);
-
-        services.Configure<LaughTaleOptions>(opt =>
-        {
-            opt.Localization = locOptions;
-        });
+        var options = services.EnsureLaughTaleOptions();
+        configure?.Invoke(options.Localization);
 
         services.TryAddSingleton<ILaughTaleLocalizer, LaughTaleLocalizer>();
         return services;

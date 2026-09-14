@@ -15,6 +15,7 @@ import { useVirtualizer, type Virtualizer } from '../composables/useVirtualizer'
 import { setRovingTabindex } from '../accessibility/aria';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import { useFormField } from '../composables/useFormField';
+import { useLocale } from '../composables/useLocale';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -441,6 +442,7 @@ const searchSvg = html`<svg xmlns="http://www.w3.org/2000/svg" width="14" height
 
 export default function ListboxIsland(container: HTMLElement, props: ListboxProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-listbox', CSS);
+    const locale = useLocale(ctx);
 
     const isMultiple = props.multiple === true || String(props.multiple) === 'true';
     const isMetaKey = props.metaKeySelection !== false && String(props.metaKeySelection) !== 'false';
@@ -625,7 +627,7 @@ export default function ListboxIsland(container: HTMLElement, props: ListboxProp
             }
 
             if (totalRendered === 0) {
-                setHtml(listWrapperEl, html`<ul class="p-listbox-list" role="presentation"><li style="padding: 1rem; text-align: center; color: var(--p-text-muted); font-size: 0.8125rem;">No results found</li></ul>`);
+                setHtml(listWrapperEl, html`<ul class="p-listbox-list" role="presentation"><li style="padding: 1rem; text-align: center; color: var(--p-text-muted); font-size: 0.8125rem;">${locale.t('emptyFilterMessage') || 'No results found'}</li></ul>`);
             } else {
                 setHtml(listWrapperEl, html`<ul class="p-listbox-list" role="presentation">${groupNodes}</ul>`);
             }
@@ -636,7 +638,7 @@ export default function ListboxIsland(container: HTMLElement, props: ListboxProp
             currentVisible = visible;
             if (visible.length === 0) {
                 virtualizer = null;
-                setHtml(listWrapperEl, html`<ul class="p-listbox-list" role="presentation"><li style="padding: 1rem; text-align: center; color: var(--p-text-muted); font-size: 0.8125rem;">No results found</li></ul>`);
+                setHtml(listWrapperEl, html`<ul class="p-listbox-list" role="presentation"><li style="padding: 1rem; text-align: center; color: var(--p-text-muted); font-size: 0.8125rem;">${locale.t('emptyFilterMessage') || 'No results found'}</li></ul>`);
             } else if (visible.length < 100) {
                 virtualizer = null;
                 const nodes: Raw[] = [];

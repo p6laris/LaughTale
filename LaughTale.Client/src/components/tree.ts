@@ -12,6 +12,7 @@ import { TreeNode } from '../types/models';
 import { injectIslandStyle } from '../runtime/styles';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import { useVirtualizer, type Virtualizer } from '../composables/useVirtualizer';
+import { useLocale } from '../composables/useLocale';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -368,6 +369,7 @@ let globalDraggedNode: { node: any; sourceScope?: string } | null = null;
 
 export default function TreeIsland(container: HTMLElement, props: TreeProps, ctx?: IslandContext) {
     injectIslandStyle('tree', TREE_CSS);
+    const locale = useLocale(ctx);
 
     let treeData: any[] = JSON.parse(JSON.stringify(props.value || props.nodes || []));
     const selectionMode = props.selectionMode || null;
@@ -792,7 +794,7 @@ export default function TreeIsland(container: HTMLElement, props: TreeProps, ctx
         } else if (flatNodes.length === 0) {
             virtualizer = null;
             if (filterQuery) {
-                treeBodyHtml = html`<div style="padding: 1rem; text-align: center; color: var(--lt-surface-500); font-size: 0.875rem;">No options found.</div>`;
+                treeBodyHtml = html`<div style="padding: 1rem; text-align: center; color: var(--lt-surface-500); font-size: 0.875rem;">${locale.t('emptyMessage') || 'No options found.'}</div>`;
             } else {
                 treeBodyHtml = html`
                     <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.75rem; padding: 2.5rem 1rem; text-align: center;">

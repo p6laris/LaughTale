@@ -1,12 +1,15 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace LaughTale.Core.Localization;
+namespace LaughTale.Components.Localization;
 
 /// <summary>
-/// Comprehensive client/server localization dictionary conforming to LaughTale and Aura specifications.
-/// Serialized directly to client islands and queried on the server for default component labels.
+/// Comprehensive, typed client/server localization dictionary conforming to LaughTale and Aura
+/// specifications. This is a Components-level authoring/reading convenience only — the generic
+/// runtime mechanism lives in LaughTale.Core.Localization.ILaughTaleLocalizer, which knows nothing
+/// about this concrete shape. Use <see cref="ToDictionary"/> to flatten an instance down to the
+/// plain key/value map Core's registration surface expects.
 /// </summary>
 public sealed class LaughTaleLocaleDictionary
 {
@@ -230,8 +233,136 @@ public sealed class LaughTaleLocaleDictionary
     [JsonPropertyName("selected")]
     public string Selected { get; set; } = "Selected";
 
+    // The following keys were added to route previously-hardcoded English UI-copy defaults on
+    // component props records (LaughTale.Components/Models/ComponentModels.cs and
+    // LaughTale.Components/Forms/DynamicFormSchema.cs) through the localizer. Concepts already
+    // covered above (choose/upload/cancel/accept/reject/available/selected/selectionMessage/
+    // emptyMessage/passwordPrompt/weak/medium/strong) are reused directly instead of duplicated.
+    [JsonPropertyName("selectPlaceholder")]
+    public string SelectPlaceholder { get; set; } = "Select an option";
+
+    [JsonPropertyName("searchPlaceholder")]
+    public string SearchPlaceholder { get; set; } = "Search...";
+
+    [JsonPropertyName("selectCategoryPlaceholder")]
+    public string SelectCategoryPlaceholder { get; set; } = "Select a category";
+
+    [JsonPropertyName("addTagPlaceholder")]
+    public string AddTagPlaceholder { get; set; } = "Add a tag...";
+
+    [JsonPropertyName("filterItemsPlaceholder")]
+    public string FilterItemsPlaceholder { get; set; } = "Filter items...";
+
+    [JsonPropertyName("selectItemsPlaceholder")]
+    public string SelectItemsPlaceholder { get; set; } = "Select items";
+
+    [JsonPropertyName("selectItemPlaceholder")]
+    public string SelectItemPlaceholder { get; set; } = "Select Item";
+
+    [JsonPropertyName("filterPlaceholder")]
+    public string FilterPlaceholder { get; set; } = "Filter...";
+
+    [JsonPropertyName("filterTreeNodesPlaceholder")]
+    public string FilterTreeNodesPlaceholder { get; set; } = "Filter tree nodes...";
+
+    [JsonPropertyName("dropzoneMessage")]
+    public string DropzoneMessage { get; set; } = "Drag & Drop files here or browse";
+
+    [JsonPropertyName("inplaceEditPlaceholder")]
+    public string InplaceEditPlaceholder { get; set; } = "Click to edit...";
+
+    [JsonPropertyName("commandPlaceholder")]
+    public string CommandPlaceholder { get; set; } = "Type a command or search...";
+
+    [JsonPropertyName("submitLabel")]
+    public string SubmitLabel { get; set; } = "Submit";
+
     [JsonPropertyName("custom")]
     public Dictionary<string, string> Custom { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// The canonical (lowercase key -> getter) map backing both the dynamic indexer and
+    /// <see cref="ToDictionary"/>, so the two can never drift out of sync with each other.
+    /// </summary>
+    private static readonly IReadOnlyDictionary<string, Func<LaughTaleLocaleDictionary, string>> KeyedAccessors =
+        new Dictionary<string, Func<LaughTaleLocaleDictionary, string>>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["today"] = d => d.Today,
+            ["clear"] = d => d.Clear,
+            ["emptyfiltermessage"] = d => d.EmptyFilterMessage,
+            ["searchmessage"] = d => d.SearchMessage,
+            ["selectionmessage"] = d => d.SelectionMessage,
+            ["emptyselectionmessage"] = d => d.EmptySelectionMessage,
+            ["emptysearchmessage"] = d => d.EmptySearchMessage,
+            ["emptymessage"] = d => d.EmptyMessage,
+            ["choose"] = d => d.Choose,
+            ["upload"] = d => d.Upload,
+            ["cancel"] = d => d.Cancel,
+            ["completed"] = d => d.Completed,
+            ["pending"] = d => d.Pending,
+            ["weak"] = d => d.Weak,
+            ["medium"] = d => d.Medium,
+            ["strong"] = d => d.Strong,
+            ["passwordprompt"] = d => d.PasswordPrompt,
+            ["startswith"] = d => d.StartsWith,
+            ["contains"] = d => d.Contains,
+            ["notcontains"] = d => d.NotContains,
+            ["endswith"] = d => d.EndsWith,
+            ["equals"] = d => d.EqualsValue,
+            ["notequals"] = d => d.NotEquals,
+            ["nofilter"] = d => d.NoFilter,
+            ["lt"] = d => d.Lt,
+            ["lte"] = d => d.Lte,
+            ["gt"] = d => d.Gt,
+            ["gte"] = d => d.Gte,
+            ["dateis"] = d => d.DateIs,
+            ["dateisnot"] = d => d.DateIsNot,
+            ["datebefore"] = d => d.DateBefore,
+            ["dateafter"] = d => d.DateAfter,
+            ["apply"] = d => d.Apply,
+            ["matchall"] = d => d.MatchAll,
+            ["matchany"] = d => d.MatchAny,
+            ["addrule"] = d => d.AddRule,
+            ["removerule"] = d => d.RemoveRule,
+            ["accept"] = d => d.Accept,
+            ["reject"] = d => d.Reject,
+            ["close"] = d => d.Close,
+            ["save"] = d => d.Save,
+            ["rowsperpage"] = d => d.RowsPerPage,
+            ["page"] = d => d.Page,
+            ["prevpage"] = d => d.PrevPage,
+            ["nextpage"] = d => d.NextPage,
+            ["firstpage"] = d => d.FirstPage,
+            ["lastpage"] = d => d.LastPage,
+            ["showingrecordstemplate"] = d => d.ShowingRecordsTemplate,
+            ["moveup"] = d => d.MoveUp,
+            ["movetop"] = d => d.MoveTop,
+            ["movedown"] = d => d.MoveDown,
+            ["movebottom"] = d => d.MoveBottom,
+            ["movetotarget"] = d => d.MoveToTarget,
+            ["movealltotarget"] = d => d.MoveAllToTarget,
+            ["movetosource"] = d => d.MoveToSource,
+            ["movealltosource"] = d => d.MoveAllToSource,
+            ["available"] = d => d.Available,
+            ["selected"] = d => d.Selected,
+            ["selectplaceholder"] = d => d.SelectPlaceholder,
+            ["searchplaceholder"] = d => d.SearchPlaceholder,
+            ["selectcategoryplaceholder"] = d => d.SelectCategoryPlaceholder,
+            ["addtagplaceholder"] = d => d.AddTagPlaceholder,
+            ["filteritemsplaceholder"] = d => d.FilterItemsPlaceholder,
+            ["selectitemsplaceholder"] = d => d.SelectItemsPlaceholder,
+            ["selectitemplaceholder"] = d => d.SelectItemPlaceholder,
+            ["filterplaceholder"] = d => d.FilterPlaceholder,
+            ["filtertreenodesplaceholder"] = d => d.FilterTreeNodesPlaceholder,
+            ["dropzonemessage"] = d => d.DropzoneMessage,
+            ["inplaceeditplaceholder"] = d => d.InplaceEditPlaceholder,
+            ["commandplaceholder"] = d => d.CommandPlaceholder,
+            ["submitlabel"] = d => d.SubmitLabel,
+            // Not part of the switch's typed-property set, but included so ToDictionary() also
+            // seeds the "dir" key that ILaughTaleLocalizer.IsRightToLeft looks up generically.
+            ["dir"] = d => d.Dir,
+            ["locale"] = d => d.Locale,
+        };
 
     /// <summary>
     /// Indexer to lookup or set strings dynamically by key name.
@@ -246,72 +377,33 @@ public sealed class LaughTaleLocaleDictionary
             if (Custom.TryGetValue(normalizedKey, out var customVal))
                 return customVal;
 
-            return normalizedKey.ToLowerInvariant() switch
-            {
-                "today" => Today,
-                "clear" => Clear,
-                "emptyfiltermessage" => EmptyFilterMessage,
-                "searchmessage" => SearchMessage,
-                "selectionmessage" => SelectionMessage,
-                "emptyselectionmessage" => EmptySelectionMessage,
-                "emptysearchmessage" => EmptySearchMessage,
-                "emptymessage" => EmptyMessage,
-                "choose" => Choose,
-                "upload" => Upload,
-                "cancel" => Cancel,
-                "completed" => Completed,
-                "pending" => Pending,
-                "weak" => Weak,
-                "medium" => Medium,
-                "strong" => Strong,
-                "passwordprompt" => PasswordPrompt,
-                "startswith" => StartsWith,
-                "contains" => Contains,
-                "notcontains" => NotContains,
-                "endswith" => EndsWith,
-                "equals" => EqualsValue,
-                "notequals" => NotEquals,
-                "nofilter" => NoFilter,
-                "lt" => Lt,
-                "lte" => Lte,
-                "gt" => Gt,
-                "gte" => Gte,
-                "dateis" => DateIs,
-                "dateisnot" => DateIsNot,
-                "datebefore" => DateBefore,
-                "dateafter" => DateAfter,
-                "apply" => Apply,
-                "matchall" => MatchAll,
-                "matchany" => MatchAny,
-                "addrule" => AddRule,
-                "removerule" => RemoveRule,
-                "accept" => Accept,
-                "reject" => Reject,
-                "close" => Close,
-                "save" => Save,
-                "rowsperpage" => RowsPerPage,
-                "page" => Page,
-                "prevpage" => PrevPage,
-                "nextpage" => NextPage,
-                "firstpage" => FirstPage,
-                "lastpage" => LastPage,
-                "showingrecordstemplate" => ShowingRecordsTemplate,
-                "moveup" => MoveUp,
-                "movetop" => MoveTop,
-                "movedown" => MoveDown,
-                "movebottom" => MoveBottom,
-                "movetotarget" => MoveToTarget,
-                "movealltotarget" => MoveAllToTarget,
-                "movetosource" => MoveToSource,
-                "movealltosource" => MoveAllToSource,
-                "available" => Available,
-                "selected" => Selected,
-                _ => normalizedKey
-            };
+            return KeyedAccessors.TryGetValue(normalizedKey, out var accessor)
+                ? accessor(this)
+                : normalizedKey;
         }
         set
         {
             Custom[key] = value;
         }
+    }
+
+    /// <summary>
+    /// Flattens this typed locale pack down to a plain key/value map suitable for feeding into
+    /// LaughTale.Core.Localization.ILaughTaleLocalizer's generic registration surface
+    /// (LaughTaleLocalizationOptions.AddLocale / AddBuiltInLocale). Derived from the same key
+    /// list the dynamic indexer uses, so the two can never fall out of sync.
+    /// </summary>
+    public IDictionary<string, string> ToDictionary()
+    {
+        var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var (key, accessor) in KeyedAccessors)
+        {
+            result[key] = accessor(this);
+        }
+        foreach (var kv in Custom)
+        {
+            result[kv.Key] = kv.Value;
+        }
+        return result;
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.Globalization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
@@ -12,9 +13,14 @@ namespace LaughTale.Core.Localization;
 /// <summary>
 /// Default implementation of ILaughTaleLocalizer supporting built-in dictionaries,
 /// custom user dictionaries, and ASP.NET Core IStringLocalizer / IHtmlLocalizer integration.
+/// Core has no knowledge of any concrete/typed locale-pack shape: it only ever reads and
+/// writes plain <see cref="IDictionary{TKey, TValue}"/> maps of translation keys to values.
 /// </summary>
 public sealed class LaughTaleLocalizer : ILaughTaleLocalizer
 {
+    private static readonly IReadOnlyDictionary<string, string> EmptyDictionary =
+        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
     private readonly LaughTaleLocalizationOptions _locOptions;
     private readonly IServiceProvider? _serviceProvider;
     private readonly ILogger<LaughTaleLocalizer> _logger;
@@ -49,11 +55,9 @@ public sealed class LaughTaleLocalizer : ILaughTaleLocalizer
             return FormatSafe(stringLocalizerValue, targetCulture, arguments);
         }
 
-        // 2. Lookup in LaughTale dictionary
+        // 2. Lookup in the resolved LaughTale dictionary for this culture
         var dict = GetDictionary(targetCulture);
-        var value = dict[key];
-
-        if (string.IsNullOrEmpty(value))
+        if (!dict.TryGetValue(key, out var value) || string.IsNullOrEmpty(value))
         {
             value = key;
         }
@@ -61,7 +65,7 @@ public sealed class LaughTaleLocalizer : ILaughTaleLocalizer
         return FormatSafe(value, targetCulture, arguments);
     }
 
-    public LaughTaleLocaleDictionary GetDictionary(CultureInfo? culture = null)
+    public IReadOnlyDictionary<string, string> GetDictionary(CultureInfo? culture = null)
     {
         var targetCulture = culture ?? CultureInfo.CurrentUICulture;
         var cultureName = targetCulture.Name; // e.g. "ar-SA"
@@ -70,29 +74,30 @@ public sealed class LaughTaleLocalizer : ILaughTaleLocalizer
         // 1. Check custom dictionary by exact culture code
         if (_locOptions.CustomDictionaries.TryGetValue(cultureName, out var customExact))
         {
-            return customExact;
+            return AsReadOnly(customExact);
         }
 
         // 2. Check custom dictionary by language code
         if (_locOptions.CustomDictionaries.TryGetValue(langCode, out var customLang))
         {
-            return customLang;
+            return AsReadOnly(customLang);
         }
 
-        // 3. Check built-in locales by exact code
-        if (LaughTaleBuiltInLocales.Locales.TryGetValue(cultureName, out var builtInExactFactory))
+        // 3. Check built-in dictionaries by exact culture code
+        if (_locOptions.BuiltInDictionaries.TryGetValue(cultureName, out var builtInExact))
         {
-            return builtInExactFactory();
+            return AsReadOnly(builtInExact);
         }
 
-        // 4. Check built-in locales by language code
-        if (LaughTaleBuiltInLocales.Locales.TryGetValue(langCode, out var builtInLangFactory))
+        // 4. Check built-in dictionaries by language code
+        if (_locOptions.BuiltInDictionaries.TryGetValue(langCode, out var builtInLang))
         {
-            return builtInLangFactory();
+            return AsReadOnly(builtInLang);
         }
 
-        // 5. Default fallback to English
-        return LaughTaleBuiltInLocales.CreateEnglish();
+        // 5. Nothing registered for this culture: fall through to an empty map so callers
+        //    (GetString/the indexer) fall back to the raw key rather than throwing.
+        return EmptyDictionary;
     }
 
     public bool IsRightToLeft(CultureInfo? culture = null)
@@ -104,7 +109,12 @@ public sealed class LaughTaleLocalizer : ILaughTaleLocalizer
         }
 
         var dict = GetDictionary(targetCulture);
-        return string.Equals(dict.Dir, "rtl", StringComparison.OrdinalIgnoreCase);
+        return dict.TryGetValue("dir", out var dir) && string.Equals(dir, "rtl", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static IReadOnlyDictionary<string, string> AsReadOnly(IDictionary<string, string> dict)
+    {
+        return dict is IReadOnlyDictionary<string, string> ro ? ro : new Dictionary<string, string>(dict, StringComparer.OrdinalIgnoreCase);
     }
 
     private string? TryLookupStringLocalizer(string key, CultureInfo culture)

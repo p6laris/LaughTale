@@ -27,6 +27,47 @@ public class IslandGenerator : IIncrementalGenerator
     private const string GenerateTypeScriptAttributeName = "LaughTale.Core.Attributes.GenerateTypeScriptAttribute";
     private const string FormControlAttributeName = "LaughTale.Core.Attributes.FormControlAttribute";
 
+    /// <summary>
+    /// Explicit (props-record type name, property name) -> ILaughTaleLocalizer key map for the
+    /// previously-hardcoded English UI-copy defaults on generator-emitted island props. When a
+    /// prop appears here, BuildProps() falls back to the localizer's resolution of the given key
+    /// (which itself falls back to English via LaughTale.Components' built-in locale seeding)
+    /// instead of leaving the value null/empty when the caller doesn't set it explicitly.
+    /// A small hardcoded map is used deliberately instead of a generic naming convention, since
+    /// the concept each property maps to isn't reliably inferable from its name alone.
+    /// </summary>
+    private static readonly IReadOnlyDictionary<(string TypeName, string PropertyName), string> LocalizedPropDefaults =
+        new Dictionary<(string, string), string>
+        {
+            [("SelectProps", "Placeholder")] = "selectPlaceholder",
+            [("SelectProps", "FilterPlaceholder")] = "searchPlaceholder",
+            [("AutoCompleteProps", "Placeholder")] = "searchPlaceholder",
+            [("CascadeSelectProps", "Placeholder")] = "selectCategoryPlaceholder",
+            [("InputPasswordProps", "PromptLabel")] = "passwordPrompt",
+            [("InputPasswordProps", "WeakLabel")] = "weak",
+            [("InputPasswordProps", "MediumLabel")] = "medium",
+            [("InputPasswordProps", "StrongLabel")] = "strong",
+            [("InputTagsProps", "Placeholder")] = "addTagPlaceholder",
+            [("ListboxProps", "FilterPlaceholder")] = "filterItemsPlaceholder",
+            [("MultiSelectProps", "Placeholder")] = "selectItemsPlaceholder",
+            [("MultiSelectProps", "SelectedItemsLabel")] = "selectionMessage",
+            [("MultiSelectProps", "FilterPlaceholder")] = "searchPlaceholder",
+            [("ToggleButtonProps", "OnLabel")] = "accept",
+            [("ToggleButtonProps", "OffLabel")] = "reject",
+            [("TreeSelectProps", "Placeholder")] = "selectItemPlaceholder",
+            [("TreeSelectProps", "FilterPlaceholder")] = "filterPlaceholder",
+            [("DataViewProps", "EmptyMessage")] = "emptyMessage",
+            [("OrderListProps", "FilterPlaceholder")] = "filterItemsPlaceholder",
+            [("PickListProps", "SourceHeader")] = "available",
+            [("PickListProps", "TargetHeader")] = "selected",
+            [("TreeProps", "FilterPlaceholder")] = "filterTreeNodesPlaceholder",
+            [("FileUploadProps", "ChooseLabel")] = "choose",
+            [("FileUploadProps", "UploadLabel")] = "upload",
+            [("FileUploadProps", "CancelLabel")] = "cancel",
+            [("DropzoneProps", "Message")] = "dropzoneMessage",
+            [("InplaceProps", "Placeholder")] = "inplaceEditPlaceholder",
+        };
+
     // ── Diagnostics Descriptors ───────────────────────────────────────────────
     private static readonly DiagnosticDescriptor InvalidIslandNameRule = new(
         id: "LTI001",
@@ -342,6 +383,7 @@ public class IslandGenerator : IIncrementalGenerator
         sb.AppendLine("using System.Threading.Tasks;");
         sb.AppendLine("using Microsoft.AspNetCore.Mvc.ViewFeatures;");
         sb.AppendLine("using Microsoft.AspNetCore.Razor.TagHelpers;");
+        sb.AppendLine("using Microsoft.Extensions.DependencyInjection;");
         sb.AppendLine("using LaughTale.Components.TagHelpers;");
         sb.AppendLine();
         sb.AppendLine($"namespace {targetNs};");
@@ -462,6 +504,10 @@ public class IslandGenerator : IIncrementalGenerator
             {
                 var valAttr = ToKebabCase(prop.Name);
                 sb.AppendLine($"            {prop.Name} = (context.AllAttributes.ContainsName(\"{valAttr}\") ? (object?){prop.Name} : null) ?? AspFor?.Model ?? (object?){prop.Name},");
+            }
+            else if (LocalizedPropDefaults.TryGetValue((model.TypeName, prop.Name), out var localeKey))
+            {
+                sb.AppendLine($"            {prop.Name} = {prop.Name} ?? ViewContext?.HttpContext?.RequestServices?.GetService<LaughTale.Core.Localization.ILaughTaleLocalizer>()?[\"{localeKey}\"],");
             }
             else
             {

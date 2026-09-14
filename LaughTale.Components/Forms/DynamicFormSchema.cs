@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Reflection;
+using LaughTale.Core.Localization;
 
 namespace LaughTale.Components.Forms;
 
@@ -41,18 +42,18 @@ public record DynamicFormSchema(
     string? Description,
     List<FormFieldMetadata> Fields,
     string? SubmitUrl = null,
-    string SubmitLabel = "Submit",
+    string? SubmitLabel = null,
     string Method = "POST"
 );
 
 public static class DynamicFormSchemaGenerator
 {
-    public static DynamicFormSchema FromModel<T>(T? modelInstance = null, string? title = null, string? submitUrl = null) where T : class
+    public static DynamicFormSchema FromModel<T>(T? modelInstance = null, string? title = null, string? submitUrl = null, string? submitLabel = null, ILaughTaleLocalizer? localizer = null) where T : class
     {
-        return FromType(typeof(T), modelInstance, title, submitUrl);
+        return FromType(typeof(T), modelInstance, title, submitUrl, submitLabel, localizer);
     }
 
-    public static DynamicFormSchema FromType(Type type, object? modelInstance = null, string? title = null, string? submitUrl = null)
+    public static DynamicFormSchema FromType(Type type, object? modelInstance = null, string? title = null, string? submitUrl = null, string? submitLabel = null, ILaughTaleLocalizer? localizer = null)
     {
         var displayAttr = type.GetCustomAttribute<DisplayAttribute>();
         var formTitle = title ?? displayAttr?.GetName() ?? type.Name;
@@ -124,7 +125,8 @@ public static class DynamicFormSchemaGenerator
             Title: formTitle,
             Description: formDescription,
             Fields: fields,
-            SubmitUrl: submitUrl
+            SubmitUrl: submitUrl,
+            SubmitLabel: submitLabel ?? localizer?["submitLabel"] ?? "Submit"
         );
     }
 

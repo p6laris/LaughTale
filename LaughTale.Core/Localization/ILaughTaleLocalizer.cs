@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+using System.Collections.Generic;
+using System.Globalization;
 
 namespace LaughTale.Core.Localization;
 
@@ -34,11 +35,14 @@ public interface ILaughTaleLocalizer
     string GetString(string key, CultureInfo? culture, params object[] arguments);
 
     /// <summary>
-    /// Retrieves the complete client-side locale dictionary for the specified culture.
+    /// Retrieves the complete key/value translation dictionary for the specified culture.
+    /// Core has no knowledge of any concrete/typed locale-pack shape — callers that want a
+    /// typed authoring surface (e.g. LaughTale.Components' LaughTaleLocaleDictionary) can
+    /// flatten it down to this generic shape before registering it.
     /// </summary>
     /// <param name="culture">The target culture, or CultureInfo.CurrentUICulture if null.</param>
-    /// <returns>The locale dictionary containing all component translations and date/number settings.</returns>
-    LaughTaleLocaleDictionary GetDictionary(CultureInfo? culture = null);
+    /// <returns>A read-only key/value map of all translations registered for the culture.</returns>
+    IReadOnlyDictionary<string, string> GetDictionary(CultureInfo? culture = null);
 
     /// <summary>
     /// Determines whether the specified culture (or current UI culture) is right-to-left.

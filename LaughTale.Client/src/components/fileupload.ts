@@ -509,14 +509,15 @@ interface UploadedFileItem {
 
 export default function FileUploadIsland(container: HTMLElement, props: FileUploadProps, ctx?: IslandContext) {
     injectIslandStyle('fileupload', FILEUPLOAD_CSS);
+    const locale = useLocale(ctx);
 
     const mode = props.mode || 'basic';
     const accept = props.accept || '*/*';
     const multiple = props.multiple || false;
     const auto = props.auto || false;
-    const chooseLabel = props.chooseLabel || (mode === 'basic' ? 'Choose' : 'Choose');
-    const uploadLabel = props.uploadLabel || 'Upload';
-    const cancelLabel = props.cancelLabel || 'Cancel';
+    const chooseLabel = props.chooseLabel || locale.t('choose') || 'Choose';
+    const uploadLabel = props.uploadLabel || locale.t('upload') || 'Upload';
+    const cancelLabel = props.cancelLabel || locale.t('cancel') || 'Cancel';
     const previewImages = props.previewImages || false;
     const emptyTitle = props.emptyTitle || 'Drag and drop files to here to upload.';
     const emptySubtitle = props.emptySubtitle || 'MAX. 1MB';

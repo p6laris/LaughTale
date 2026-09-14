@@ -15,6 +15,7 @@ import { emitIslandEvent, emitComponentEvent } from '../runtime/events';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import { setRovingTabindex, handleRovingKeydown } from '../accessibility/aria';
 import { useKeyboardNav } from '../composables/useKeyboardNav';
+import { useLocale } from '../composables/useLocale';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -300,6 +301,7 @@ export interface TieredMenuProps {
 
 export default function TieredMenuIsland(container: HTMLElement, props: TieredMenuProps, ctx?: IslandContext) {
     injectIslandStyle('tieredmenu', TIEREDMENU_CSS);
+    const locale = useLocale(ctx);
 
     const model: MenuItem[] = props.model || props.items || [];
     const isPopup = props.popup === true;
@@ -736,7 +738,7 @@ export default function TieredMenuIsland(container: HTMLElement, props: TieredMe
         } else if (commandStr.includes('search') || commandStr.includes('warn') || label === 'Search') {
             severity = 'warn';
             summary = 'Search Results';
-            detail = 'No results found';
+            detail = locale.t('emptyFilterMessage') || 'No results found';
         } else if (commandStr.includes('download') || label === 'Import') {
             severity = 'info';
             summary = 'Downloads';

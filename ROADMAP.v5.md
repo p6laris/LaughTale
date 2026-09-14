@@ -32,8 +32,8 @@ standard, and the thing meant to consume it never adopts it.
 | `IslandModule.createHandle` | **0** implementations |
 | `runtime/events.ts` | **41 / 41** dispatching components (Spec 044, 100% adoption) |
 | `sanitizeHtml` / `sanitizeUrl` (333 lines) | **4 / 76** |
-| `ILaughTaleLocalizer` + locale dictionaries (1,256 lines) | **82 / 82 TagHelpers** — **[CLOSED, TagHelper split]** see below |
-| `useLocale` | **5 / 76** |
+| `ILaughTaleLocalizer` + locale dictionaries (1,509 lines) | **82 / 82 TagHelpers** — **[CLOSED, Part N]** vocabulary moved to `LaughTale.Components`, all 31 hardcoded English defaults and 13 client-template strings now routed through it; see below |
+| `useLocale` | **17 / 76** (was 5; `datatable`/`datepicker`/`select` plus 14 newly-wired components) |
 | `BuildSsrHtml()` / `data-lt-ssr` (feature 026) | **29 / 29** in-scope form controls (Spec 045, eighth built-and-unadopted module now adopted) |
 | `JsonSerializerContext` (source-generated JSON) | **0** — every island serializes by reflection |
 
@@ -217,8 +217,8 @@ delivery is one of the healthier subsystems.
 | Plugin API | **Missing** | No extension point anywhere in Core |
 | DevTools | **Missing** | — |
 | Endpoint rate limiting | **Missing** | Two public `MapPost` routes run user-shaped queries |
-| Localization | **Partial — [CLOSED, TagHelper split]** | 9 locales, 1,256 lines; reachable from **82 of 82** TagHelpers (was 15 of 96); 25 English UI strings still hardcoded as record defaults |
-| Core/Components boundary | **Half-enforced** | Assembly-reference check passes; class-hierarchy check now exists for the TagHelper split (`GeneratedTagHelperHierarchyTests`), but Core's locale dictionary still carries 70 component-specific properties and no test catches that half |
+| Localization | **Strong — [CLOSED, Part N]** | 10 locales, 1,509 lines; reachable from **82 of 82** TagHelpers (was 15 of 96); all 31 hardcoded English defaults (roadmap previously undercounted this as 25) and 13 client-template strings now routed through `ILaughTaleLocalizer` |
+| Core/Components boundary | **Fully enforced** | Assembly-reference check passes; class-hierarchy check exists for the TagHelper split (`GeneratedTagHelperHierarchyTests`); the locale-dictionary gap is closed too — `LaughTaleLocaleDictionary`/`LaughTaleBuiltInLocales` moved to `LaughTale.Components`, and `CoreOnlyBoundaryTests` now reflects over Core's assembly and `LaughTaleLocalizationOptions`'s public surface to catch either type quietly coming back |
 | Props serialization | **Untuned** | Reflection-based, no source-gen context; 198 of 325 props write their defaults into every instance |
 
 ---
@@ -555,38 +555,47 @@ neither can anyone else's.
 
 ---
 
-## 15. Part N — Localization, formatting & internationalization
+## 15. Part N — Localization, formatting & internationalization — **[CLOSED, this pass]**
 
-**The most complete subsystem in this repository that reaches almost nothing.** 1,256 lines across
-`LaughTale.Core/Localization/` — `ILaughTaleLocalizer`, a locale dictionary, options, and **9 built-in
-locales** (`ar`, `de`, `en`, `es`, `fr`, `ja`, `ku`, `tr`, `zh`), two of them right-to-left. It is
-well built. It is also, for practical purposes, switched off.
+**Was the most complete subsystem in this repository that reached almost nothing.** 1,509 lines —
+`ILaughTaleLocalizer`, a generic key/value resolution mechanism, and options in
+`LaughTale.Core/Localization/`, plus the typed 70-property locale dictionary and **9 built-in
+language packs covering 10 culture codes** (`ar`, `ckb`, `de`, `en`, `es`, `fr`, `ja`, `ku`, `tr`,
+`zh`), two of them right-to-left, now in `LaughTale.Components/Localization/`. It was well built and,
+for practical purposes, switched off. It is now wired end to end.
 
 | Built | Adoption |
 |---|---|
-| `ILaughTaleLocalizer` | consumed by `IslandTagHelperBase` — **[CLOSED, TagHelper split]** now reachable from **82 of 82** TagHelpers (was 15 of 96); the localizer is reachable everywhere, but see below — component strings still don't call it |
-| `useLocale` (client) | **5 of 76** components |
-| RTL / logical properties | **7 of 76** components, **2** uses of CSS logical properties |
-| Component UI strings routed through the localizer | **0** |
+| `ILaughTaleLocalizer` | consumed by `IslandTagHelperBase` — **[CLOSED, TagHelper split]** reachable from **82 of 82** TagHelpers (was 15 of 96) |
+| `useLocale` (client) | **17 of 76** components (was 5) — the 3 real pre-existing call sites (`datatable`, `datepicker`, `select`) plus 14 newly wired: `autocomplete`, `command`, `fileupload`, `input-password`, `listbox`, `menu`, `menubar`, `multiselect`, `orderlist`, `picklist`, `sidebar`, `tieredmenu`, `tree`, `tree-select` |
+| RTL / logical properties | **8 of 76** components (corrected count; was reported as 7), **2** uses of CSS logical properties — **not addressed by this pass**, tracked as a follow-up below |
+| Component UI strings routed through the localizer | **31 of 31** hardcoded server-side prop defaults, **13 of 13** hardcoded client-template strings — **[CLOSED]** (was 0; the roadmap's original count of "25" hardcoded defaults undercounted — the real number, confirmed by re-reading every props record, was 31) |
 
-**The strings are hardcoded, and they are hardcoded in the wrong layer.** Twenty-five English UI
-strings ship as *default values on the C# props records* — `"Add a tag..."`, `"No records found."`,
+**The strings were hardcoded, and they were hardcoded in the wrong layer.** Thirty-one English UI
+strings shipped as *default values on the C# props records* — `"Add a tag..."`, `"No records found."`,
 `"Drag & Drop files here or browse"`, `"Filter items..."`, `"Click to edit..."`, `"Choose"`,
 `"Cancel"`. A default value in a record is resolved at construction, before any request context
-exists, so no localizer can ever reach it. More English is hardcoded directly in client templates
+exists, so no localizer could ever reach it. More English was hardcoded directly in client templates
 (`>No options found<`, `>No results found<`, `>New chat<`). A Japanese user of `<island-datatable>`
-gets a localized *culture* and an English empty-state.
+got a localized *culture* and an English empty-state.
 
-This is the same shape as §1.1's sanitizer and this section's siblings: the capability is real, the
-call sites don't exist, and the counter nobody was keeping is 0.
+**Fixed.** All 31 server-side defaults now resolve `PropValue ?? ILaughTaleLocalizer["key"]` at
+render time (27 via a small hardcoded `(TypeName, PropertyName) -> localeKey` map in
+`IslandGenerator.GenerateTagHelper`, 3 on the hand-written `ConfirmPopupTagHelper` /
+`CommandMenuTagHelper`, 1 — `DynamicFormSchema.SubmitLabel` — via an optional `ILaughTaleLocalizer?`
+parameter on `DynamicFormSchemaGenerator`), falling back to English when no culture-specific
+translation or no `ILaughTaleLocalizer` is registered at all, so plain-Core apps are unaffected. All
+13 client-template strings now call `locale.t('key') || 'original English string'`, matching the
+`datatable.ts` pattern that was already correct. `fileupload.ts` and `input-password.ts`'s previously
+dead `useLocale` imports are now wired and used for the password-strength and file-action labels.
 
-### The vocabulary is in the wrong project
+### The vocabulary was in the wrong project — **[CLOSED, this pass]**
 
 The *mechanism* is correctly placed. `ILaughTaleLocalizer`, culture resolution, `IsRightToLeft` and the
 `CustomDictionaries` override hook are generic infrastructure and belong in Core.
 
-The *content* does not. `LaughTaleLocaleDictionary` is a sealed class of **70 typed properties**, and
-they are component vocabulary:
+The *content* did not. `LaughTaleLocaleDictionary` was a sealed class of **70 typed properties** living
+in `LaughTale.Core.Localization`, and they are component vocabulary:
 
 | Properties | The component they exist for |
 |---|---|
@@ -596,40 +605,48 @@ they are component vocabulary:
 | `DayNames`, `MonthNames`, `WeekHeader`, `DateFormat`, `Today` | `datepicker` |
 | `EmptyFilterMessage`, `SelectionMessage`, `EmptySelectionMessage` | `select` / `multiselect` / `listbox` |
 
-That is PrimeVue's locale shape lifted wholesale into `LaughTale.Core`, plus 674 lines of language
-packs filling it in for ten locales. **Core knows what a password strength meter is.** Two consequences,
-both worse than the tidiness complaint:
+That was PrimeVue's locale shape lifted wholesale into `LaughTale.Core`, plus 674 lines of language
+packs filling it in for ten locales. **Core knew what a password strength meter is.** Two
+consequences, both worse than the tidiness complaint:
 
-1. **You cannot add a component without editing Core.** A new island with new strings means adding
+1. **You could not add a component without editing Core.** A new island with new strings meant adding
    properties to a sealed class in the layer that is supposed to know nothing about components. That
-   contradicts the plugin architecture in Part G/L directly: a third-party island gets the `Custom`
+   contradicted the plugin architecture in Part G/L directly: a third-party island got the `Custom`
    string bag, never first-class localization. Two tiers, built in.
-2. **`CoreOnlyBoundaryTests` cannot see it.** The test asserts
+2. **`CoreOnlyBoundaryTests` could not see it.** The test asserted only
    `coreAssembly.GetReferencedAssemblies()` contains no `LaughTale.Components` — a *reference* check.
-   Core can hardcode the entire component vocabulary and stay green forever. The constitution says this
-   boundary is "enforced by `CoreOnlyBoundaryTests.cs`, not by convention". Only the assembly direction
-   is enforced. The semantic direction is pure convention, and it is already broken.
+   Core could hardcode the entire component vocabulary and stay green forever. The constitution says
+   this boundary is "enforced by `CoreOnlyBoundaryTests.cs`, not by convention". Only the assembly
+   direction was enforced. The semantic direction was pure convention, and it was already broken.
 
-In fairness: the design is not closed — `Custom` is a `Dictionary<string, string>` with an indexer
-fallback, so arbitrary keys work. But the shape that ships, and that every built-in component reads,
-is component vocabulary living one project too low.
+**Fixed.** `LaughTaleLocaleDictionary` and `LaughTaleBuiltInLocales` moved to
+`LaughTale.Components.Localization` unchanged in shape (still 70 typed properties, still 10 language
+packs, now 83 typed properties after the 13 new UI-copy keys this pass added). `ILaughTaleLocalizer`
+in Core became fully generic: `GetDictionary()` now returns `IReadOnlyDictionary<string, string>`
+instead of the concrete `LaughTaleLocaleDictionary` type, and `LaughTaleLocalizationOptions` gained a
+second, lower-priority `BuiltInDictionaries` registration surface (`AddBuiltInLocale`) alongside the
+existing user-facing `CustomDictionaries` (`AddLocale`) — so `LaughTale.Components`'
+`AddLaughTaleComponents()` seeds all 10 built-in locales automatically, and an end user's `AddLocale`
+call always wins regardless of DI registration order. `CoreOnlyBoundaryTests` now asserts, by
+reflection, that no type named `LaughTaleLocaleDictionary` or `LaughTaleBuiltInLocales` exists in the
+Core assembly and that `LaughTaleLocalizationOptions`'s public surface is exactly its expected
+BCL-typed member set — a test that fails against the pre-refactor shape and passes against this one.
 
+| Item | From | Effort | Status |
+|---|---|---|---|
+| **Move the vocabulary down, keep the mechanism up** — `LaughTaleLocaleDictionary`'s 70 typed properties and the 10 language packs move to `LaughTale.Components` and register themselves with the Core localizer; Core keeps culture resolution, RTL and the override hook and learns nothing about components | — | M · 2–3 wks | **[CLOSED]** |
+| **Make the boundary test see meaning, not just references** — extend `CoreOnlyBoundaryTests` to fail when component nouns appear in Core. Without this the inversion returns the first time someone adds a component with a new string | — | S · days | **[CLOSED]** |
+| **Route component strings through the localizer** — remove the 31 English defaults from props records (roadmap previously undercounted this as 25) and the 13 hardcoded strings from client templates; resolve per request, fall back to the built-in dictionary | — | M · 2–3 wks | **[CLOSED]** |
+| **Fix the TagHelper split first** (§0, *The root cause nobody named*) — **[CLOSED]** the localizer is only reachable from `IslandTagHelperBase`; 67 of 81 generated TagHelpers now derive from it (14 skipped as redundant with a hand-written class), so all 82 remaining TagHelpers can see the localizer. The rows below (moving the vocabulary, routing component strings, RTL) were blocked on this and can now proceed | — | — | **[CLOSED]** |
+| **RTL & logical properties** — 8 of 76 today (corrected count; previously reported as 7); `dir` already flows through `IslandContext` and two of the ten built-in locales are RTL, so the demand already exists in the shipped product. **Not addressed by this pass** — this pass closed vocabulary routing only, not RTL adoption | web platform | S–M · 1–2 wks | Open |
+| **Locale-aware formatting as a contract** — dates, numbers, currency and collation are decided per component today (`datepicker`, `input-number`, `select` each reach for `Intl` on their own). One `useLocale`-backed formatter, adopted by all 76 | Nuxt i18n, Astro i18n | M · 2 wks | Open |
+| **Locale-aware routing** — `/de/produkte`, `Accept-Language` negotiation, `hreflang`, per-locale static output | Nuxt i18n, Astro i18n | M · 2–3 wks | Open |
+| **Pluralization and interpolation** — the dictionary is key→string today; anything with a count needs plural rules | ICU MessageFormat | S–M · 1–2 wks | Open |
+| **Translator workflow** — extract keys at build time, emit a catalogue, diff it in CI so a new untranslated string fails the build rather than shipping English | Nuxt i18n, Lingui | M · 2 wks | Open |
 
-| Item | From | Effort |
-|---|---|---|
-| **Move the vocabulary down, keep the mechanism up** — `LaughTaleLocaleDictionary`'s 70 typed properties and the 10 language packs move to `LaughTale.Components` and register themselves with the Core localizer; Core keeps culture resolution, RTL and the override hook and learns nothing about components | — | **M · 2–3 wks** |
-| **Make the boundary test see meaning, not just references** — extend `CoreOnlyBoundaryTests` to fail when component nouns appear in Core. Without this the inversion returns the first time someone adds a component with a new string | — | **S · days** |
-| **Route component strings through the localizer** — remove the 25 English defaults from props records and the hardcoded strings from client templates; resolve per request, fall back to the built-in dictionary | — | **M · 2–3 wks** |
-| **Fix the TagHelper split first** (§0, *The root cause nobody named*) — **[CLOSED]** the localizer is only reachable from `IslandTagHelperBase`; 67 of 81 generated TagHelpers now derive from it (14 skipped as redundant with a hand-written class), so all 82 remaining TagHelpers can see the localizer. The rows below (moving the vocabulary, routing component strings, RTL) were blocked on this and can now proceed | — | **[CLOSED]** |
-| **RTL & logical properties** — 7 of 76 today; `dir` already flows through `IslandContext` and two of the nine built-in locales are RTL, so the demand already exists in the shipped product | web platform | S–M · 1–2 wks |
-| **Locale-aware formatting as a contract** — dates, numbers, currency and collation are decided per component today (`datepicker`, `input-number`, `select` each reach for `Intl` on their own). One `useLocale`-backed formatter, adopted by all 76 | Nuxt i18n, Astro i18n | M · 2 wks |
-| **Locale-aware routing** — `/de/produkte`, `Accept-Language` negotiation, `hreflang`, per-locale static output | Nuxt i18n, Astro i18n | M · 2–3 wks |
-| **Pluralization and interpolation** — the dictionary is key→string today; anything with a count needs plural rules | ICU MessageFormat | S–M · 1–2 wks |
-| **Translator workflow** — extract keys at build time, emit a catalogue, diff it in CI so a new untranslated string fails the build rather than shipping English | Nuxt i18n, Lingui | M · 2 wks |
-
-**Why this belongs on the roadmap at all**: LaughTale's pitch is ASP.NET Core, and ASP.NET Core's
+**Why this belonged on the roadmap at all**: LaughTale's pitch is ASP.NET Core, and ASP.NET Core's
 audience is disproportionately enterprise and non-US. `IStringLocalizer` is something .NET developers
-already expect to work. Shipping 9 locales and 25 hardcoded English strings in the same product is
+already expect to work. Shipping 9 locales and 31 hardcoded English strings in the same product was
 worse than shipping neither, because it looks finished.
 
 ---
@@ -648,9 +665,9 @@ worse than shipping neither, because it looks finished.
 | Directive layer | Alpine, Stimulus | **Built, undocumented** — 19 directives | I |
 | Composable primitives | Nuxt, Vue | **Built, unused** — 21 written, ~0 adopted | C |
 | Imperative handles | — | **Built, unused** — 0 implementations | C |
-| Localization & i18n | Nuxt i18n, Astro | **Partial** — TagHelper split fixed (82/82 reach the localizer, was 15/96); 9 locales, 1,256 lines, 25 hardcoded English defaults still not routed through it | **N** |
+| Localization & i18n | Nuxt i18n, Astro | **Strong — [CLOSED, this pass]** — TagHelper split fixed (82/82 reach the localizer); vocabulary moved to `LaughTale.Components`; all 31 hardcoded English defaults and 13 client-template strings routed through it; 10 locales, 1,509 lines. Locale-aware formatting/routing/pluralization/translator workflow remain open follow-ups | **N** |
 | Locale-aware routing | Nuxt i18n | **Missing** | **N** |
-| RTL support | web platform | **Built, unused** — 7/76 components, 2 logical properties | **N** |
+| RTL support | web platform | **Built, unused** — 8/76 components (corrected count; previously reported as 7), 2 logical properties. Not addressed by the localization-vocabulary pass above | **N** |
 | Props payload efficiency | — | **Untuned** — 198/325 props serialize their defaults | **J** |
 | AOT / trim-safe serialization | .NET | **Missing** — no `JsonSerializerContext`, reflection only | **J** |
 | HTML sanitization at render | — | **CRITICAL** — sanitizer exists, 4/76 call it | §1 |
@@ -697,7 +714,7 @@ worse than shipping neither, because it looks finished.
 | **Weeks 4–8** | **[CLOSED — Spec 045]** Form association across all 29 form controls (`formFieldAdoption: 29`, `clientCreatedFields: 0`, 100% no-JS parity & reset), then server actions — in that order. Actions that don't degrade gracefully aren't progressive enhancement. |
 | **Weeks 4–9** | **[CLOSED] Fix the TagHelper split** (§0). 81 generated TagHelpers derived from `TagHelper`, not `IslandTagHelperBase`, so SSR, localization and RTL were unreachable from the components Razor authors actually use. `IslandGenerator` now emits TagHelpers deriving from `IslandTagHelperBase`; along the way, 14 of those 81 turned out to duplicate a hand-written TagHelper targeting the same tag (two TagHelpers writing into one `TagHelperOutput`) and are now skipped instead of generated. Measured result: 67 generated + 15 hand-written = **82 of 82** TagHelpers reach the base class (was 15 of 96). This unblocks Part N and half of Part C. |
 | **Weeks 5–7** | Props payload and serialization (Part J): stop serializing defaults, add source-generated JSON contexts. Small, measurable, and it is the difference between a trimmable product and one that isn't. |
-| **Weeks 8–12** | Localization for real (Part N): move the vocabulary out of Core and teach the boundary test to catch its return, then route the 25 hardcoded English defaults and the client template strings through the localizer, then RTL. Depends on the TagHelper split above. |
+| **Weeks 8–12** | **[CLOSED]** Localization for real (Part N): moved the vocabulary out of Core (`LaughTaleLocaleDictionary`/`LaughTaleBuiltInLocales` now in `LaughTale.Components`), taught `CoreOnlyBoundaryTests` to catch its return, and routed all 31 hardcoded English defaults (not 25 — the original count undercounted) and 13 client-template strings through the localizer. RTL adoption itself (8/76 components, corrected from a previously reported 7) remains open — this pass closed vocabulary routing only. |
 | **Weeks 6–10** | Fix the refresh/adapter corruption: `update(props)` in the adapter contract, refresh prefers it over morphing. |
 | **Weeks 9–14** | Plugin API, then the island compiler. The stretch that turns a library into a framework — protect it from interruption. |
 | **Weeks 14–18** | DevTools + HMR. Once the compiler emits a manifest there's real data to inspect. |

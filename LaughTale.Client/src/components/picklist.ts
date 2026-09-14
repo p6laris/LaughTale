@@ -12,6 +12,7 @@ import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts
 import type { IslandContext } from '../runtime/registry';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import { useFormField } from '../composables/useFormField';
+import { useLocale } from '../composables/useLocale';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -359,6 +360,7 @@ html.dark .p-picklist-product-img,
 
 export default function PickListIsland<T = any>(container: HTMLElement, props: PickListProps<T>, ctx?: IslandContext) {
     injectIslandStyle('picklist', PICKLIST_CSS);
+    const locale = useLocale(ctx);
 
     const formField = useFormField(container, ctx, {
         cardinality: 'Multiple',
@@ -667,7 +669,7 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
         const srcUl = rootEl.querySelector<HTMLUListElement>('.picklist-source-list');
         if (srcUl) {
             if (filteredSource.length === 0) {
-                setHtml(srcUl, html`<li class="p-picklist-empty">${sourceFilterQuery ? 'No results found' : emptyMessageSource}</li>`);
+                setHtml(srcUl, html`<li class="p-picklist-empty">${sourceFilterQuery ? (locale.t('emptyFilterMessage') || 'No results found') : emptyMessageSource}</li>`);
             } else {
                 setHtml(srcUl, html`${filteredSource.map(it => {
                     const id = getItemId(it);
@@ -727,7 +729,7 @@ export default function PickListIsland<T = any>(container: HTMLElement, props: P
         const tgtUl = rootEl.querySelector<HTMLUListElement>('.picklist-target-list');
         if (tgtUl) {
             if (filteredTarget.length === 0) {
-                setHtml(tgtUl, html`<li class="p-picklist-empty">${targetFilterQuery ? 'No results found' : emptyMessageTarget}</li>`);
+                setHtml(tgtUl, html`<li class="p-picklist-empty">${targetFilterQuery ? (locale.t('emptyFilterMessage') || 'No results found') : emptyMessageTarget}</li>`);
             } else {
                 setHtml(tgtUl, html`${filteredTarget.map(it => {
                     const id = getItemId(it);

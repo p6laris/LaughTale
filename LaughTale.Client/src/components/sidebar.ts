@@ -16,6 +16,7 @@ import { SidebarItem } from '../types/models';
 import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
 import { useFocusTrap } from '../composables/useFocusTrap';
+import { useLocale } from '../composables/useLocale';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
@@ -1217,6 +1218,7 @@ export default function SidebarIsland(container: HTMLElement, props: SidebarProp
  * Render LaughTale Aura Compound Sidebar Component
  */
 function renderCompoundSidebar(container: HTMLElement, props: SidebarProps, ctx?: IslandContext) {
+    const locale = useLocale(ctx);
     const demoType = props.demoType || (props as any).DemoType || 'app';
     const isAppMode = demoType === 'app';
     const showControls = props.showControls === true || (demoType === 'variants' && props.showControls !== false);
@@ -1400,7 +1402,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps, ctx?
                     <li class="p-sidebar-menu-item">
                         <button type="button" class="p-sidebar-menu-button">
                             <span class="p-sidebar-menu-button-icon">${newChatPenIcon}</span>
-                            <span class="p-sidebar-item-label">New chat</span>
+                            <span class="p-sidebar-item-label">${locale.t('newChat') || 'New chat'}</span>
                         </button>
                     </li>
                     <li class="p-sidebar-menu-item">

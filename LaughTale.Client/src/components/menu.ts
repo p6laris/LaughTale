@@ -13,6 +13,7 @@ import { injectIslandStyle } from '../runtime/styles';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import { setRovingTabindex, handleRovingKeydown } from '../accessibility/aria';
 import { useKeyboardNav } from '../composables/useKeyboardNav';
+import { useLocale } from '../composables/useLocale';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -342,6 +343,7 @@ export interface MenuProps {
 
 export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx?: IslandContext) {
     injectIslandStyle('menu', MENU_CSS);
+    const locale = useLocale(ctx);
     container.setAttribute('data-part', 'root');
 
     const isPopup = props.popup === true || String(props.popup) === 'true' || (props as any).Popup === true || String((props as any).Popup) === 'true' || container.getAttribute('popup') === 'true' || container.hasAttribute('popup');
@@ -565,7 +567,7 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
                     if (item.command === 'new-file') {
                         showFeedback('File created', 'success');
                     } else if (item.command === 'search') {
-                        showFeedback('No results found', 'warn');
+                        showFeedback(locale.t('emptyFilterMessage') || 'No results found', 'warn');
                     }
                 }
 

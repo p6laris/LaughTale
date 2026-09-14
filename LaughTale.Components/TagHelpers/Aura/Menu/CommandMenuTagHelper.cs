@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.Extensions.DependencyInjection;
+using LaughTale.Core.Localization;
 
 namespace LaughTale.Components.TagHelpers.Aura.Menu;
 
@@ -36,11 +38,12 @@ public class CommandMenuTagHelper : IslandTagHelperBase
 
     protected override object? BuildProps()
     {
+        var localizer = ViewContext?.HttpContext?.RequestServices?.GetService<ILaughTaleLocalizer>();
         return new
         {
             model = Model ?? Items,
             items = Items ?? Model,
-            placeholder = Placeholder,
+            placeholder = Placeholder ?? localizer?["commandPlaceholder"],
             filter = Filter,
             withDialog = WithDialog,
             hotkey = Hotkey,

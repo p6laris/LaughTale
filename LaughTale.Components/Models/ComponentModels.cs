@@ -552,7 +552,7 @@ public record DatePickerProps(
 [FormControl(Cardinality = FormCardinality.Multiple, FieldKind = FormFieldKind.Hidden)]
 public record SelectProps(
     object? Value = null, string? Name = null, object? Options = null, string? OptionLabel = "label", string? OptionValue = "value",
-    string? Placeholder = "Select an option", bool Filter = false, string? FilterPlaceholder = "Search...",
+    string? Placeholder = null, bool Filter = false, string? FilterPlaceholder = null,
     bool ShowClear = false, bool Checkmark = false, bool Invalid = false, bool Fluid = false,
     InputVariant Variant = InputVariant.Outlined, ComponentSize Size = ComponentSize.Normal, bool Disabled = false
 );
@@ -560,7 +560,7 @@ public record SelectProps(
 [Island("autocomplete")]
 [FormControl(Cardinality = FormCardinality.Single, FieldKind = FormFieldKind.Hidden)]
 public record AutoCompleteProps(
-    string? Value = null, string? Name = null, object? Suggestions = null, string? Placeholder = "Search...",
+    string? Value = null, string? Name = null, object? Suggestions = null, string? Placeholder = null,
     bool Multiple = false, bool Dropdown = false, int MinLength = 1, int Delay = 300,
     bool CompleteOnFocus = false, bool Invalid = false, bool Fluid = false,
     InputVariant Variant = InputVariant.Outlined, ComponentSize Size = ComponentSize.Normal, bool Disabled = false
@@ -571,7 +571,7 @@ public record AutoCompleteProps(
 public record CascadeSelectProps(
     object? Value = null, string? Name = null, object? Options = null, string? OptionLabel = "label", string? OptionValue = "value",
     string? OptionGroupLabel = "label", string? OptionGroupChildren = "children",
-    string? Placeholder = "Select a category", bool ShowClear = false, bool Invalid = false,
+    string? Placeholder = null, bool ShowClear = false, bool Invalid = false,
     bool Fluid = false, InputVariant Variant = InputVariant.Outlined, ComponentSize Size = ComponentSize.Normal, bool Disabled = false
 );
 
@@ -609,8 +609,8 @@ public record InputOtpProps(
 [FormControl(Cardinality = FormCardinality.Single, FieldKind = FormFieldKind.Hidden)]
 public record InputPasswordProps(
     string? Value = null, string? Name = null, bool ToggleMask = true, bool Feedback = false,
-    string? PromptLabel = "Please enter a password", string? WeakLabel = "Too simple",
-    string? MediumLabel = "Average complexity", string? StrongLabel = "Complex password",
+    string? PromptLabel = null, string? WeakLabel = null,
+    string? MediumLabel = null, string? StrongLabel = null,
     bool Invalid = false, bool Fluid = false, InputVariant Variant = InputVariant.Outlined,
     ComponentSize Size = ComponentSize.Normal, string? Placeholder = null, bool Disabled = false
 );
@@ -618,7 +618,7 @@ public record InputPasswordProps(
 [Island("input-tags")]
 [FormControl(Cardinality = FormCardinality.Multiple, FieldKind = FormFieldKind.Hidden)]
 public record InputTagsProps(
-    object? Value = null, string? Name = null, object? Values = null, string? Placeholder = "Add a tag...",
+    object? Value = null, string? Name = null, object? Values = null, string? Placeholder = null,
     int? Max = null, bool AllowDuplicates = false, bool AllowDuplicate = false,
     string? Separator = ",", bool AddOnBlur = true, bool AddOnPaste = true,
     bool Typeahead = false, object? Suggestions = null, string? InputId = null,
@@ -649,7 +649,7 @@ public record KnobProps(
 public record ListboxProps(
     object? Value = null, string? Name = null, object? Options = null, string? OptionLabel = "label",
     string? OptionValue = "value", bool Multiple = false, bool Checkmark = false,
-    bool Filter = false, string? FilterPlaceholder = "Filter items...",
+    bool Filter = false, string? FilterPlaceholder = null,
     int? ListHeight = 250, bool Striped = false, bool Invalid = false, bool Disabled = false
 );
 
@@ -657,10 +657,10 @@ public record ListboxProps(
 [FormControl(Cardinality = FormCardinality.Multiple, FieldKind = FormFieldKind.Hidden)]
 public record MultiSelectProps(
     object? Value = null, string? Name = null, object? Options = null, string? OptionLabel = "label",
-    string? OptionValue = "value", string? Placeholder = "Select items",
+    string? OptionValue = "value", string? Placeholder = null,
     string? Display = "comma", int MaxSelectedLabels = 3,
-    string? SelectedItemsLabel = "{0} items selected", bool Filter = false,
-    string? FilterPlaceholder = "Search...", bool ShowClear = false,
+    string? SelectedItemsLabel = null, bool Filter = false,
+    string? FilterPlaceholder = null, bool ShowClear = false,
     bool ShowSelectAll = true, bool Invalid = false, bool Fluid = false,
     InputVariant Variant = InputVariant.Outlined, ComponentSize Size = ComponentSize.Normal, bool Disabled = false
 );
@@ -721,7 +721,7 @@ public record TextareaProps(
 [Island("toggle-button")]
 [FormControl(ValueProperty = "Checked", Cardinality = FormCardinality.Boolean, FieldKind = FormFieldKind.Hidden)]
 public record ToggleButtonProps(
-    bool Checked = false, string? Name = null, string? OnLabel = "Yes", string? OffLabel = "No",
+    bool Checked = false, string? Name = null, string? OnLabel = null, string? OffLabel = null,
     string? OnIcon = null, string? OffIcon = null, ComponentSize Size = ComponentSize.Normal,
     bool Invalid = false, bool Disabled = false
 );
@@ -736,8 +736,8 @@ public record ToggleSwitchProps(
 [FormControl(Cardinality = FormCardinality.Multiple, FieldKind = FormFieldKind.Hidden)]
 public record TreeSelectProps(
     object? Value = null, string? Name = null, object? Options = null, object? Nodes = null, object? Departments = null,
-    string? Placeholder = "Select Item", string? SelectionMode = "single", string? Display = "comma",
-    bool Filter = false, string? FilterPlaceholder = "Filter...", bool ShowClear = false, bool Fluid = false,
+    string? Placeholder = null, string? SelectionMode = "single", string? Display = "comma",
+    bool Filter = false, string? FilterPlaceholder = null, bool ShowClear = false, bool Fluid = false,
     InputVariant Variant = InputVariant.Outlined, ComponentSize Size = ComponentSize.Normal,
     bool Invalid = false, bool Disabled = false, string? Header = null, string? Footer = null
 );
@@ -755,21 +755,21 @@ public record DataTableProps(
 public record DataViewProps(
     object? Value = null, string? Layout = "list", bool Paginator = false,
     int Rows = 6, object? RowsPerPageOptions = null, bool Sortable = false,
-    string? EmptyMessage = "No records found."
+    string? EmptyMessage = null
 );
 
 [Island("orderlist")]
 [FormControl(Cardinality = FormCardinality.Multiple, FieldKind = FormFieldKind.Hidden)]
 public record OrderListProps(
     object? Value = null, string? Name = null, string? Header = null, string? KeyField = "id",
-    int? ListHeight = 300, bool Filter = false, string? FilterPlaceholder = "Filter items...", bool Striped = false
+    int? ListHeight = 300, bool Filter = false, string? FilterPlaceholder = null, bool Striped = false
 );
 
 [Island("picklist")]
 [FormControl(ValueProperty = "Target", Cardinality = FormCardinality.Multiple, FieldKind = FormFieldKind.Hidden)]
 public record PickListProps(
-    object? Source = null, object? Target = null, string? Name = null, string? SourceHeader = "Available",
-    string? TargetHeader = "Selected", string? KeyField = "id", int? ListHeight = 300,
+    object? Source = null, object? Target = null, string? Name = null, string? SourceHeader = null,
+    string? TargetHeader = null, string? KeyField = "id", int? ListHeight = 300,
     bool Filter = false, bool Striped = false, bool ShowSourceControls = true, bool ShowTargetControls = true
 );
 
@@ -783,7 +783,7 @@ public record TreeTableProps(
 [LaughTale.Core.Attributes.Island("tree")]
 public record TreeProps(
     object? Value = null, string? SelectionMode = "single", bool Filter = false,
-    string? FilterPlaceholder = "Filter tree nodes...", bool Checkboxes = false, bool Loading = false
+    string? FilterPlaceholder = null, bool Checkboxes = false, bool Loading = false
 );
 
 [Island("orgchart")]
@@ -885,7 +885,7 @@ public record ConfirmDialogProps(
 [LaughTale.Core.Attributes.Island("confirm-popup")]
 public record ConfirmPopupProps(
     string? Group = null, string? TargetSelector = null, string? Message = null,
-    string? AcceptText = "Yes", string? RejectText = "No", string? ActionName = null
+    string? AcceptText = null, string? RejectText = null, string? ActionName = null
 );
 
 [LaughTale.Core.Attributes.Island("drawer")]
@@ -1071,14 +1071,14 @@ public record AvatarGroupProps(
 public record FileUploadProps(
     string? Mode = "basic", string? Name = "file", string? Url = null, bool Multiple = false,
     string? Accept = null, int? MaxFileSize = null, bool Auto = false,
-    string? ChooseLabel = "Choose", string? UploadLabel = "Upload", string? CancelLabel = "Cancel"
+    string? ChooseLabel = null, string? UploadLabel = null, string? CancelLabel = null
 );
 
 [Island("dropzone")]
 [FormControl(Cardinality = FormCardinality.Multiple, FieldKind = FormFieldKind.Native)]
 public record DropzoneProps(
     string? Url = null, string? Name = null, bool Multiple = true,
-    string? Accept = null, int? MaxFileSize = null, string? Message = "Drag & Drop files here or browse"
+    string? Accept = null, int? MaxFileSize = null, string? Message = null
 );
 
 [Island("inplace")]
@@ -1087,7 +1087,7 @@ public record InplaceProps(
     string? Value = null,
     string? Name = null,
     string? TargetInputName = null,
-    string? Placeholder = "Click to edit...",
+    string? Placeholder = null,
     bool Disabled = false,
     bool Closable = true,
     string? Active = "false"
@@ -1101,7 +1101,7 @@ public record ThemeStudioProps(
 
 [LaughTale.Core.Attributes.Island("command")]
 public record CommandProps(
-    string? Placeholder = "Type a command or search...",
+    string? Placeholder = null,
     bool Visible = false,
     object? Model = null
 );

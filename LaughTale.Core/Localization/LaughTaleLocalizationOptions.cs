@@ -32,24 +32,54 @@ public sealed class LaughTaleLocalizationOptions
     public Type? StringLocalizerResourceSource { get; set; }
 
     /// <summary>
-    /// Custom dictionary overrides registered per culture key.
+    /// Custom (end-user-authored) dictionary overrides registered per culture key, as plain
+    /// key/value translation maps. Always takes priority over <see cref="BuiltInDictionaries"/>
+    /// regardless of DI registration order.
     /// </summary>
-    public IDictionary<string, LaughTaleLocaleDictionary> CustomDictionaries { get; set; } =
-        new Dictionary<string, LaughTaleLocaleDictionary>(StringComparer.OrdinalIgnoreCase);
+    public IDictionary<string, IDictionary<string, string>> CustomDictionaries { get; set; } =
+        new Dictionary<string, IDictionary<string, string>>(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
-    /// Registers or configures custom locale dictionary for the specified culture.
+    /// Built-in dictionary packs registered per culture key, as plain key/value translation maps.
+    /// Populated by packages such as LaughTale.Components' DI registration (e.g. AddLaughTaleComponents)
+    /// and always ranked below anything registered via <see cref="AddLocale"/>.
     /// </summary>
-    public LaughTaleLocalizationOptions AddLocale(string culture, Action<LaughTaleLocaleDictionary> configure)
+    public IDictionary<string, IDictionary<string, string>> BuiltInDictionaries { get; set; } =
+        new Dictionary<string, IDictionary<string, string>>(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Registers or configures a custom (end-user) locale dictionary for the specified culture.
+    /// Custom dictionaries always take priority over built-in ones.
+    /// </summary>
+    public LaughTaleLocalizationOptions AddLocale(string culture, Action<IDictionary<string, string>> configure)
     {
-        if (string.IsNullOrWhiteSpace(culture)) return this;
-        if (!CustomDictionaries.TryGetValue(culture, out var dict))
+        AddLocaleCore(CustomDictionaries, culture, configure);
+        return this;
+    }
+
+    /// <summary>
+    /// Registers or configures a built-in locale dictionary for the specified culture. Intended for
+    /// use by component/locale-pack libraries seeding their default vocabulary; always ranked below
+    /// anything registered via <see cref="AddLocale"/>.
+    /// </summary>
+    public LaughTaleLocalizationOptions AddBuiltInLocale(string culture, Action<IDictionary<string, string>> configure)
+    {
+        AddLocaleCore(BuiltInDictionaries, culture, configure);
+        return this;
+    }
+
+    private static void AddLocaleCore(
+        IDictionary<string, IDictionary<string, string>> dictionaries,
+        string culture,
+        Action<IDictionary<string, string>> configure)
+    {
+        if (string.IsNullOrWhiteSpace(culture)) return;
+        if (!dictionaries.TryGetValue(culture, out var dict))
         {
-            dict = new LaughTaleLocaleDictionary { Locale = culture };
-            CustomDictionaries[culture] = dict;
+            dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            dictionaries[culture] = dict;
         }
         configure(dict);
-        return this;
     }
 
     /// <summary>

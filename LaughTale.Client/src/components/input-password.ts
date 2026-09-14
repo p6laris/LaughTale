@@ -26,6 +26,10 @@ export interface InputPasswordProps {
     inputId?: string;
     value?: string;
     placeholder?: string;
+    promptLabel?: string;
+    weakLabel?: string;
+    mediumLabel?: string;
+    strongLabel?: string;
     toggleMask?: boolean | string;
     showMeter?: boolean | string;
     showRequirements?: boolean | string;
@@ -414,6 +418,11 @@ html.dark .p-password-popover-header-title svg,
 
 export default function InputPasswordIsland(container: HTMLElement, props: InputPasswordProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-password', CSS);
+    const locale = useLocale(ctx);
+    const promptLabel = props.promptLabel || locale.t('passwordPrompt') || 'Please enter a password';
+    const weakLabel = props.weakLabel || locale.t('weak') || 'Too Weak';
+    const mediumLabel = props.mediumLabel || locale.t('medium') || 'Medium';
+    const strongLabel = props.strongLabel || locale.t('strong') || 'Strong';
 
     const formField = useFormField(container, ctx, {
         cardinality: 'Single',
@@ -448,16 +457,16 @@ export default function InputPasswordIsland(container: HTMLElement, props: Input
     }
 
     function calculateStrength(pwd: string): { score: number; label: string; color: string; bgColor: string; width: string } {
-        if (!pwd) return { score: 0, label: 'Empty', color: 'var(--lt-surface-400, var(--lt-surface-400))', bgColor: 'var(--lt-surface-100, var(--lt-surface-100))', width: '0%' };
+        if (!pwd) return { score: 0, label: promptLabel, color: 'var(--lt-surface-400, var(--lt-surface-400))', bgColor: 'var(--lt-surface-100, var(--lt-surface-100))', width: '0%' };
         const rules = checkRules(pwd);
         const passed = Object.values(rules).filter(Boolean).length;
 
         if (passed <= 1) {
-            return { score: 1, label: 'Too Weak', color: 'var(--lt-danger-500, var(--lt-danger-500))', bgColor: 'rgba(239, 68, 68, 0.15)', width: '25%' };
+            return { score: 1, label: weakLabel, color: 'var(--lt-danger-500, var(--lt-danger-500))', bgColor: 'rgba(239, 68, 68, 0.15)', width: '25%' };
         } else if (passed <= 3) {
-            return { score: 2, label: 'Medium', color: 'var(--lt-warn-500, var(--lt-warn-500))', bgColor: 'rgba(245, 158, 11, 0.15)', width: '60%' };
+            return { score: 2, label: mediumLabel, color: 'var(--lt-warn-500, var(--lt-warn-500))', bgColor: 'rgba(245, 158, 11, 0.15)', width: '60%' };
         } else {
-            return { score: 3, label: 'Strong', color: 'var(--lt-primary-500, var(--lt-primary-500))', bgColor: 'rgba(16, 185, 129, 0.15)', width: '100%' };
+            return { score: 3, label: strongLabel, color: 'var(--lt-primary-500, var(--lt-primary-500))', bgColor: 'rgba(16, 185, 129, 0.15)', width: '100%' };
         }
     }
 

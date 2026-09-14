@@ -16,6 +16,7 @@ import { useTransition } from '../composables/animation/useTransition';
 import { useKeyboardNav } from '../composables/useKeyboardNav';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import { useFormField } from '../composables/useFormField';
+import { useLocale } from '../composables/useLocale';
 import { announce } from '../accessibility/announcer';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
@@ -81,6 +82,7 @@ html.dark .chip-item,
 
 export default function MultiSelectIsland<T = string>(container: HTMLElement, props: MultiSelectProps<T>, ctx?: IslandContext) {
     injectIslandStyle('multiselect', CSS);
+    const locale = useLocale(ctx);
     const formField = useFormField(container, ctx, {
         cardinality: 'Multiple',
         name: (props as any).name || props.targetInputName
@@ -242,7 +244,7 @@ export default function MultiSelectIsland<T = string>(container: HTMLElement, pr
         selectAllChk.checked = filtered.length > 0 && filtered.every(o => selected.has(o.value));
 
         if (filtered.length === 0) {
-            setHtml(itemsList, html`<div style="padding: 1rem; text-align: center; font-size: 0.75rem; color: var(--lt-surface-400);">No options found</div>`);
+            setHtml(itemsList, html`<div style="padding: 1rem; text-align: center; font-size: 0.75rem; color: var(--lt-surface-400);">${locale.t('emptyMessage') || 'No options found'}</div>`);
             return;
         }
 
