@@ -34,16 +34,24 @@
     <LaughTaleIslandsDir Condition="'$(LaughTaleIslandsDir)' == ''">$(MSBuildProjectDirectory)\Islands</LaughTaleIslandsDir>
 
     <!--
-      Intermediate output for the generated manifest + registry - per the manifest schema
-      (ROADMAP.v5.md Part B §1), this is never committed source. Deliberately NO trailing
-      backslash (unlike $(IntermediateOutputPath) itself, which always has one) - verified
-      directly that a quoted MSBuild <Exec> argument ending in a backslash right before the
-      closing quote (e.g. "...LaughTaleIslands\") is misparsed by Windows argv escaping rules:
-      the backslash escapes the quote instead of the string closing, silently gluing the REST of
-      the command line onto this one argument. LaughTale.Generators.targets adds its own "\"
-      wherever it joins this property with a filename.
+      LaughTaleIslandsOutDir (intermediate output for the generated manifest + registry - per the
+      manifest schema, ROADMAP.v5.md Part B §1, this is never committed source) is deliberately
+      NOT defaulted here even though it reads like the same kind of property-default-with-a-guard
+      as its neighbors above/below. Verified directly (a diagnostic <Message> comparing a
+      PropertyGroup assigned here vs. one assigned from inside a <Target>): $(IntermediateOutputPath)
+      is STILL EMPTY at this file's import point (this .props is imported as literally the first
+      line of a consuming .csproj's body, before that file's own <TargetFramework>, and - empirically
+      - before whatever SDK logic gives $(IntermediateOutputPath) its real "obj\Debug\net10.0\"
+      value; that only becomes available at MSBuild EXECUTION time, inside a Target body, not
+      during plain evaluation no matter how late in import order the evaluation happens - moving
+      this same guarded assignment down into LaughTale.Generators.targets, still as a bare
+      (non-Target) PropertyGroup, was tried and confirmed NOT sufficient). A premature default
+      computed here would permanently bake in an empty/wrong value the moment this PropertyGroup
+      evaluates, since MSBuild property assignment captures the referenced property's value
+      immediately rather than re-resolving it later. See LaughTale.Generators.targets'
+      LaughTaleIslandsResolveOutDir target, which sets this default correctly at execution time
+      instead, and ROADMAP.v5.md Part B's task notes for the full empirical trace.
     -->
-    <LaughTaleIslandsOutDir Condition="'$(LaughTaleIslandsOutDir)' == ''">$(IntermediateOutputPath)LaughTaleIslands</LaughTaleIslandsOutDir>
 
     <!-- esbuild mode for the islands bundle: minified/no-sourcemap in Release, dev otherwise. -->
     <LaughTaleIslandsMode Condition="'$(LaughTaleIslandsMode)' == '' AND '$(Configuration)' == 'Release'">production</LaughTaleIslandsMode>

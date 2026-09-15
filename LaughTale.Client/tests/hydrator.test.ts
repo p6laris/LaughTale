@@ -180,4 +180,51 @@ describe('Hydrator Tri-State & Shared Viewport Observer Suite (, )', () => {
         }
     });
 
+    it('late defineIsland() retroactively hydrates an element already stuck in the failed state (ROADMAP.v5.md Part B)', async () => {
+        // Reproduces the real scenario this fix targets: a page's main bundle calls initIslands()
+        // (scanning the DOM and hydrating everything found) BEFORE a separately-loaded islands
+        // bundle - e.g. a generated registry.generated.ts for user-authored islands - has run its
+        // own defineIsland() call. Without the onIslandRegistered retry hook, the element is
+        // permanently stuck: hydrateIsland()'s own idle-only guard means even a later,
+        // unconditional initIslands() re-scan would silently skip it.
+        const container = document.createElement('div');
+        container.setAttribute('data-island', 'late-widget');
+        container.setAttribute('data-hydrate', 'load');
+        document.body.appendChild(container);
+
+        // Hydrate BEFORE the island is registered - matches executeHydration's real "not
+        // registered" path exactly, landing the element in 'failed'.
+        hydrateIsland(container);
+        await new Promise(resolve => setTimeout(resolve, 0));
+        assert.equal(getIslandState(container), 'failed', 'must be failed before the late registration below');
+
+        let mounted = false;
+        defineIsland('late-widget', () => Promise.resolve({
+            default: () => { mounted = true; }
+        }));
+
+        // The retry defineIsland() triggers is itself async (teardownIsland + executeHydration);
+        // give it a turn to complete.
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        assert.equal(mounted, true, 'the island must actually mount once its name is registered late, not stay failed forever');
+        assert.equal(getIslandState(container), 'mounted');
+    });
+
+    it('a late defineIsland() for an unrelated name does not touch an island already stuck in the failed state', async () => {
+        const container = document.createElement('div');
+        container.setAttribute('data-island', 'still-missing-widget');
+        container.setAttribute('data-hydrate', 'load');
+        document.body.appendChild(container);
+
+        hydrateIsland(container);
+        await new Promise(resolve => setTimeout(resolve, 0));
+        assert.equal(getIslandState(container), 'failed');
+
+        defineIsland('some-other-widget', () => Promise.resolve({ default: () => {} }));
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        assert.equal(getIslandState(container), 'failed', 'must not be retried by an unrelated island name being registered');
+    });
+
 });

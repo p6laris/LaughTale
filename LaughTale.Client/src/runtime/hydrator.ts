@@ -4,7 +4,7 @@
  * streaming SSR, tri-state lifecycle tracking ('idle' | 'pending' | 'mounted' | 'failed'), and explicit retry recovery.
  */
 
-import { getIslandDefinition, normalizeMountResult, type IslandContext } from './registry';
+import { getIslandDefinition, normalizeMountResult, onIslandRegistered, type IslandContext } from './registry';
 import { setIslandUpdateFn, clearIslandUpdateFn } from './island-instances';
 import { parseAndReviveProps } from './reviver';
 import { importWithRetry } from './retry';
@@ -135,6 +135,28 @@ export async function retryIsland(container: HTMLElement): Promise<void> {
     (container as any)[HYDRATION_STATE_KEY] = 'idle';
     await executeHydration(container, name);
 }
+
+/**
+ * Picks up islands that failed to hydrate only because their name wasn't registered YET at scan
+ * time - e.g. a separately-built, separately-loaded islands bundle for user-authored islands
+ * (ROADMAP.v5.md Part B) whose <script> tag loads after the app's own main bundle already called
+ * initIslands() and scanned the DOM. Without this, such an island is permanently stuck in the
+ * 'failed' state: hydrateIsland()'s own idle-only guard means a later, unconditional initIslands()
+ * re-scan would skip it too. Scoped to exactly the elements waiting on the name that was just
+ * registered, so this stays cheap on the common path (every one of the ~80 defineIsland() calls
+ * for the built-in components happens before any hydration has even started, so this query
+ * matches nothing for almost all of them).
+ */
+onIslandRegistered((name) => {
+    if (typeof document === 'undefined') return;
+    const escaped = typeof CSS !== 'undefined' && CSS.escape ? CSS.escape(name) : name;
+    const candidates = document.querySelectorAll<HTMLElement>(`[data-island="${escaped}"], [name="${escaped}"]`);
+    candidates.forEach(container => {
+        if (getIslandState(container) === 'failed') {
+            void retryIsland(container);
+        }
+    });
+});
 
 async function executeHydration(container: HTMLElement, name: string): Promise<void> {
     const currentState = getIslandState(container);

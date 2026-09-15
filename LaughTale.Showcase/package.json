@@ -6,6 +6,11 @@
     "build": "node esbuild.config.mjs",
     "watch": "node esbuild.config.mjs --watch"
   },
+  "dependencies": {
+    "laughtale": "file:../LaughTale.Client",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
   "devDependencies": {
     "esbuild": "^0.25.0",
     "typescript": "^5.7.3"

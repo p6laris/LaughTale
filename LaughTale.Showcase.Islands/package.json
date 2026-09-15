@@ -1,0 +1,11 @@
+{
+  "name": "laughtale-showcase-islands",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ROADMAP.v5.md Part B end-to-end example: Islands/UserCard.tsx, discovered and bundled by the laughtale CLI's own 'islands build' command (invoked by LaughTale.Generators/buildTransitive/LaughTale.Generators.targets during dotnet build). No manual build script needed here - MSBuild drives it.",
+  "dependencies": {
+    "laughtale": "file:../LaughTale.Client",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  }
+}

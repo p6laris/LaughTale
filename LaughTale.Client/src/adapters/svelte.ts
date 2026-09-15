@@ -22,9 +22,10 @@ export function createSvelteIsland<TProps = any>(
 ) {
     return async (container: HTMLElement, props: TProps, ctx?: IslandContext) => {
         try {
-            // Check for Svelte 5 runtime first
-            const sveltePkg = 'svelte';
-            const svelte: any = await import(/* @vite-ignore */ sveltePkg).catch(() => null);
+            // Check for Svelte 5 runtime first. Literal specifier, not a variable - see the
+            // identical note in adapters/react.ts for why the variable form is unresolvable by any
+            // bundler and breaks in a real browser.
+            const svelte: any = await import('svelte').catch(() => null);
 
             let unmountFn: (() => void) | null = null;
 

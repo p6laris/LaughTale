@@ -33,6 +33,23 @@
   </ItemGroup>
 
   <!--
+    Resolves LaughTaleIslandsOutDir's default at MSBuild EXECUTION time (inside a Target body),
+    not at plain evaluation time (a bare, non-Target <PropertyGroup>) - see the long comment on
+    this property's old, now-removed home in LaughTale.Generators.props for the empirical trace.
+    Short version: $(IntermediateOutputPath) does not have its real "obj\Debug\net10.0\" value
+    yet at ANY point during plain project evaluation this package's own .props/.targets can reach
+    (confirmed directly with a diagnostic <Message> at both positions) - it is only correct once
+    MSBuild starts executing targets. No Inputs/Outputs here (must run unconditionally, every
+    build, so the property is always set before LaughTaleIslandsCompile's own Outputs attribute
+    below needs it - see its DependsOnTargets) - cost is one string comparison, no process spawn.
+  -->
+  <Target Name="LaughTaleIslandsResolveOutDir" Condition="Exists('$(LaughTaleIslandsDir)')">
+    <PropertyGroup>
+      <LaughTaleIslandsOutDir Condition="'$(LaughTaleIslandsOutDir)' == ''">$(IntermediateOutputPath)LaughTaleIslands</LaughTaleIslandsOutDir>
+    </PropertyGroup>
+  </Target>
+
+  <!--
     Runs the Node discovery+bundling pipeline (LaughTale.Client's "laughtale islands build") and
     writes islands.manifest.g.json + the bundled JS chunks. Real MSBuild-level incremental skip
     via Inputs/Outputs: a build where no island source changed since the manifest was last written
@@ -43,9 +60,16 @@
     on every keystroke. Condition="Exists('$(LaughTaleIslandsDir)')" means a project with no
     Islands/ folder pays zero cost (the target's Condition short-circuits before Inputs/Outputs
     are even evaluated).
+
+    DependsOnTargets="LaughTaleIslandsResolveOutDir" guarantees LaughTaleIslandsOutDir already
+    holds its real value by the time THIS target's own Outputs attribute (immediately below) is
+    evaluated for the up-to-date check - MSBuild evaluates a target's Inputs/Outputs only once
+    that target is actually reached in the execution graph, which DependsOnTargets orders to be
+    after the resolve step above.
   -->
   <Target Name="LaughTaleIslandsCompile"
           BeforeTargets="CoreCompile"
+          DependsOnTargets="LaughTaleIslandsResolveOutDir"
           Condition="'$(DesignTimeBuild)' != 'true' AND Exists('$(LaughTaleIslandsDir)')"
           Inputs="@(LaughTaleIslandsSourceFiles);$(MSBuildThisFileFullPath)"
           Outputs="$(LaughTaleIslandsOutDir)\islands.manifest.g.json">

@@ -21,9 +21,10 @@ export function createVueIsland<TProps = any>(
 ) {
     return async (container: HTMLElement, props: TProps, ctx?: IslandContext) => {
         try {
-            // Dynamic import of Vue to maintain zero-dependency core
-            const vuePkg = 'vue';
-            const Vue: any = await import(/* @vite-ignore */ vuePkg);
+            // Dynamic import of Vue to maintain zero-dependency core. Literal specifier, not a
+            // variable - see the identical note in adapters/react.ts for why the variable form is
+            // unresolvable by any bundler and breaks in a real browser.
+            const Vue: any = await import('vue');
             
             const createApp = Vue.createApp || Vue.default?.createApp;
             const createSSRApp = Vue.createSSRApp || Vue.default?.createSSRApp;

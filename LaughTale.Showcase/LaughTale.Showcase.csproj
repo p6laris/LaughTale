@@ -15,13 +15,26 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>LaughTale.Showcase</AssemblyName>
     <RootNamespace>LaughTale.Showcase</RootNamespace>
+    <!-- ROADMAP.v5.md Part B verification aid: without this, Roslyn generator output (including
+         IslandGenerator.Manifest.cs's manifest-driven TagHelpers) is compiled entirely in-memory
+         and never written to disk anywhere in this repo - confirmed directly (no project sets
+         either property, and the "obj/.../LaughTale.Generators/..." paths that appear in build
+         warnings are virtual/diagnostic-only, backed by no real file). Enabled here so the
+         generated <island-user-card> TagHelper source can actually be inspected on disk. -->
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)generated</CompilerGeneratedFilesOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\LaughTale.Core\LaughTale.Core.csproj" />
     <ProjectReference Include="..\LaughTale.Components\LaughTale.Components.csproj" />
-    <ProjectReference Include="..\LaughTale.Generators\LaughTale.Generators.csproj" 
-                      OutputItemType="Analyzer" 
+    <!-- ROADMAP.v5.md Part B end-to-end example: the actual <island-user-card> TagHelper and its
+         static wwwroot/js/islands/* assets (exposed here via ASP.NET Core static web assets under
+         /_content/LaughTale.Showcase.Islands/...) - see that project's own remarks for why this
+         has to be a separate project rather than living directly in this one. -->
+    <ProjectReference Include="..\LaughTale.Showcase.Islands\LaughTale.Showcase.Islands.csproj" />
+    <ProjectReference Include="..\LaughTale.Generators\LaughTale.Generators.csproj"
+                      OutputItemType="Analyzer"
                       ReferenceOutputAssembly="false" />
   </ItemGroup>
 

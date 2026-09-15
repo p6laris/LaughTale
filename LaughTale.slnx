@@ -4,6 +4,7 @@
   <Project Path="LaughTale.Components/LaughTale.Components.csproj" />
   <Project Path="LaughTale.Markdown/LaughTale.Markdown.csproj" />
   <Project Path="LaughTale.Showcase/LaughTale.Showcase.csproj" />
+  <Project Path="LaughTale.Showcase.Islands/LaughTale.Showcase.Islands.csproj" />
   <Project Path="LaughTale.Docs/LaughTale.Docs.csproj" />
   <Project Path="LaughTale.Templates/LaughTale.Templates.csproj" />
   <Project Path="LaughTale.Cli/LaughTale.Cli.csproj" />

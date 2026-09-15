@@ -164,6 +164,40 @@ export function resolveIslandName(name: string): string {
 }
 
 /**
+ * Fires after `defineIsland` registers a name, so a late registration - e.g. a separately-built,
+ * separately-loaded islands bundle for user-authored islands (ROADMAP.v5.md Part B) whose
+ * `<script>` tag happens to load after the app's own main bundle already called `initIslands()`
+ * and scanned the DOM - can be picked up retroactively instead of the element being permanently
+ * stuck in the 'failed' state. Deliberately generic here (registry.ts has no concept of hydration
+ * state/DOM scanning, and must not import from hydrator.ts, which already imports from this file):
+ * hydrator.ts subscribes once and does the actual retry.
+ *
+ * Anchored on globalThis for the exact same reason `registry` itself is (see the comment above):
+ * the app's main bundle and a separately-built islands bundle are two independent module
+ * instances of this same file. hydrator.ts's subscription runs inside the MAIN bundle's copy;
+ * `defineIsland` for a user-authored island runs inside the ISLANDS bundle's copy. A plain
+ * module-scope array would mean each copy has its own, disconnected listener list, and the
+ * subscription would never see the registration at all - confirmed the hard way: this exact gap
+ * shipped once already, one commit before this one, before the browser-based end-to-end
+ * validation caught it (a Node-based unit test can't catch it, since Node's module cache doesn't
+ * reproduce the two-independent-bundle-instances scenario the way two real <script> tags do).
+ */
+type IslandRegisteredListener = (name: string) => void;
+const LISTENERS_KEY = '__laughtaleIslandRegisteredListeners__';
+
+function getSharedListeners(): IslandRegisteredListener[] {
+    const g = globalThis as typeof globalThis & { [LISTENERS_KEY]?: IslandRegisteredListener[] };
+    if (!g[LISTENERS_KEY]) {
+        g[LISTENERS_KEY] = [];
+    }
+    return g[LISTENERS_KEY];
+}
+
+export function onIslandRegistered(listener: IslandRegisteredListener): void {
+    getSharedListeners().push(listener);
+}
+
+/**
  * Registers an Island component factory with lazy loader support.
  * @param name The canonical name matching C# [Island("name")]
  * @param loader Async import factory e.g. () => import('./my-island')
@@ -173,6 +207,7 @@ export function defineIsland<TProps = any, THandle = any>(
     loader: IslandLoader<TProps, THandle>
 ): void {
     registry.set(name, loader as IslandLoader);
+    for (const listener of getSharedListeners()) listener(name);
 }
 
 /**

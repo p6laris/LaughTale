@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "showcase",
+      "runtimeExecutable": "dotnet",
+      "runtimeArgs": ["run", "--project", "LaughTale.Showcase", "--urls", "http://localhost:5000"],
+      "port": 5000
+    }
+  ]
+}

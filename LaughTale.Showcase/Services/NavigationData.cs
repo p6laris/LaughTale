@@ -13,6 +13,7 @@ public static class NavigationData
                 new("Showcase Home", "home", "/", currentPath == "/"),
                 new("i18n & Kurdish RTL", "globe", "/localization", currentPath.StartsWith("/localization"), null, "New"),
                 new("Polyglot Live Lab", "globe", "/polyglot", currentPath.StartsWith("/polyglot"), null, "Live"),
+                new("Island Compiler", "terminal", "/IslandCompiler", currentPath.StartsWith("/IslandCompiler"), null, "New"),
                 new("Components Catalog", "layers", "/components", currentPath.StartsWith("/components")),
                 new("Dashboard", "activity", "/dashboard", currentPath.StartsWith("/dashboard")),
                 new("Architecture", "fileText", "/About", currentPath.StartsWith("/About"))

@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <!-- ROADMAP.v5.md Part B: this project exists specifically to prove typed island TagHelpers
+       generated from a manifest work end-to-end. They only work when the Islands/ folder (and
+       the IslandGenerator output it produces) lives in a DIFFERENT project than the .cshtml pages
+       that consume the resulting tag - confirmed empirically: Razor's own compiler is ITSELF a
+       Roslyn incremental generator (Microsoft.NET.Sdk.Razor.SourceGenerators.RazorSourceGenerator),
+       and independent incremental generators cannot see each other's AddSource output within one
+       compilation. When Islands/UserCard.tsx's generated TagHelper was emitted directly into
+       LaughTale.Showcase's own compilation, Razor's tag-matching pass silently treated
+       <island-user-card> as plain literal HTML text instead of a TagHelper invocation (verified on
+       a completely clean rebuild, ruling out stale incremental-generator cache). This is the exact
+       same "two Roslyn generators can't compose in one pass" limitation already confirmed for
+       System.Text.Json's source generator in Part J - it just resurfaces here against Razor's own
+       generator instead. Splitting into a separate, already-compiled project sidesteps it, exactly
+       mirroring how LaughTale.Components' 76 built-in components' generated TagHelpers already
+       work when consumed by LaughTale.Showcase/.Docs.
+
+       Microsoft.NET.Sdk.Razor + AddRazorSupportForMvc=true (matching LaughTale.Components) is what
+       makes this project's static wwwroot/js/islands/* output (produced by the "laughtale islands
+       build" MSBuild target below, via buildTransitive/LaughTale.Generators.targets) show up in a
+       referencing app under /_content/LaughTale.Showcase.Islands/js/islands/... via ASP.NET Core's
+       ordinary static web assets mechanism - no bespoke path-rewriting needed, since the generated
+       registry.js's own chunk imports are relative to ITS OWN URL, not the consuming page's. -->
+
+  <Import Project="..\LaughTale.Generators\buildTransitive\LaughTale.Generators.props" Condition="Exists('..\LaughTale.Generators\buildTransitive\LaughTale.Generators.props')" />
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    <AssemblyName>LaughTale.Showcase.Islands</AssemblyName>
+    <RootNamespace>LaughTale.Showcase.Islands</RootNamespace>
+    <Description>ROADMAP.v5.md Part B end-to-end example: a user-authored Islands/UserCard.tsx React
+      component, discovered and compiled into a real typed &lt;island-user-card&gt; TagHelper - no
+      hand-written C# props record, no manual defineIsland() call. Lives in its own project because
+      typed manifest-driven TagHelpers require a separate compilation from their consuming .cshtml
+      pages (see the remarks above).</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LaughTale.Components\LaughTale.Components.csproj" />
+    <ProjectReference Include="..\LaughTale.Generators\LaughTale.Generators.csproj"
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <Import Project="..\LaughTale.Generators\buildTransitive\LaughTale.Generators.targets" Condition="Exists('..\LaughTale.Generators\buildTransitive\LaughTale.Generators.targets')" />
+
+</Project>

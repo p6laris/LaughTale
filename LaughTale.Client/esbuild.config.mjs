@@ -54,6 +54,49 @@ await esbuild.build({
     outfile: 'dist/index.js'
 });
 
+// 4. Build the per-framework mount adapters as standalone ESM modules.
+// package.json's "exports" map advertises "./adapters/react", "./adapters/vue",
+// "./adapters/svelte", "./adapters/preact", and "./adapters/vanilla" pointing at
+// "./dist/adapters/*.js", but nothing built those files (ROADMAP.v5.md Part B -
+// confirmed empirically: `ls dist/adapters` came back missing even after a real
+// build). Each adapter only has type-only imports from '../runtime/registry'
+// (erased at compile time - see src/adapters/*.ts), so bundling each standalone
+// is genuinely zero-cost, matching their own "thin mounting bridge" doc comments.
+// Plain ".js" extension (no outExtension override) is deliberate: package.json's
+// root "type": "module" makes a bare ".js" file ESM by default, matching the
+// single unconditioned string each of these exports entries uses (no separate
+// "import"/"default" split like "." and "./runtime" have).
+await esbuild.build({
+    entryPoints: {
+        'adapters/react': 'src/adapters/react.ts',
+        'adapters/vue': 'src/adapters/vue.ts',
+        'adapters/svelte': 'src/adapters/svelte.ts',
+        'adapters/preact': 'src/adapters/preact.ts',
+        'adapters/vanilla': 'src/adapters/vanilla.ts'
+    },
+    bundle: true,
+    outdir: 'dist',
+    format: 'esm',
+    target: 'es2022',
+    minify: isProd,
+    sourcemap: !isProd
+});
+
+// 5. Build the Tailwind preset for the "./tailwind" subpath export (same gap as
+// the adapters above: "./dist/styles/tailwind.preset.js" was advertised but
+// never produced).
+await esbuild.build({
+    entryPoints: {
+        'styles/tailwind.preset': 'src/styles/tailwind.preset.ts'
+    },
+    bundle: true,
+    outdir: 'dist',
+    format: 'esm',
+    target: 'es2022',
+    minify: isProd,
+    sourcemap: !isProd
+});
+
 console.log(`[LaughTale] Client bundle built successfully (${isProd ? 'Production' : 'Development'}).`);
 
 // 4. Budget & Size Reports

@@ -21,12 +21,16 @@ export function createReactIsland<TProps = any>(
 ) {
     return async (container: HTMLElement, props: TProps, ctx?: IslandContext) => {
         try {
-            // Dynamic import of React & ReactDOM to maintain zero-dependency core
-            const reactPkg = 'react';
-            const reactDomClientPkg = 'react-dom/client';
-            
-            const React: any = await import(/* @vite-ignore */ reactPkg);
-            const ReactDOMClient: any = await import(/* @vite-ignore */ reactDomClientPkg);
+            // Dynamic import of React & ReactDOM to maintain zero-dependency core. The specifier
+            // MUST be a literal string directly in the import() call, not a variable holding one -
+            // every bundler (esbuild, Vite, Rollup, webpack) can only statically analyze/resolve a
+            // literal-specifier dynamic import. A variable-indirected one is invisible to static
+            // analysis in all of them and becomes an unresolvable bare specifier at runtime in a
+            // browser with no import map - confirmed the hard way: this was silently broken for
+            // every real consumer of this adapter until ROADMAP.v5.md Part B's end-to-end example
+            // was the first thing in this repo's history to actually load it in a live browser.
+            const React: any = await import('react');
+            const ReactDOMClient: any = await import('react-dom/client');
             
             const createElement = React.createElement || React.default?.createElement;
             const createRoot = ReactDOMClient.createRoot || ReactDOMClient.default?.createRoot;
