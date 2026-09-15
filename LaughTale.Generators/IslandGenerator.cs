@@ -110,6 +110,24 @@ public partial class IslandGenerator : IIncrementalGenerator
         isEnabledByDefault: true
     );
 
+    /// <summary>
+    /// ROADMAP.v5.md Part H: <c>IslandFieldPolicy.AllMappedProperties</c> is a documented, legitimate
+    /// escape hatch for vetted DTOs (see LT-2204 / Spec 041's mandatory-allowlist contract), but using
+    /// it re-opens every public property on the queried type to client-driven filtering, sorting, and
+    /// search - exactly the "unguarded call" this item asks to flag. A Warning, not an Error: unlike
+    /// SMI004's sensitive-credential check, this can't tell whether the DTO in question actually has a
+    /// field a client shouldn't be able to query by, only that the caller chose the option that doesn't
+    /// check.
+    /// </summary>
+    private static readonly DiagnosticDescriptor UnguardedFieldAllowlistRule = new(
+        id: "LTI006",
+        title: "Unguarded Field Allowlist",
+        messageFormat: "IslandFieldPolicy.AllMappedProperties exposes every public property on the queried type to client-driven filtering, sorting, and search. If any field shouldn't be queryable by a client, use IslandFieldPolicy.For(...) to allowlist specific fields instead.",
+        category: "LaughTale.Security",
+        defaultSeverity: DiagnosticSeverity.Warning,
+        isEnabledByDefault: true
+    );
+
     private static readonly Regex SensitivePropertyPattern = new(
         @"password|secret|token|hash|apikey|connectionstring|passwd|pwd|privatekey",
         RegexOptions.IgnoreCase | RegexOptions.Compiled);
@@ -216,6 +234,47 @@ public partial class IslandGenerator : IIncrementalGenerator
         // before emitting anything, and independent incremental generator pipelines cannot see each
         // other's data.
         InitializeManifestPipeline(context, allIslands);
+
+        // 5. ROADMAP.v5.md Part H: flag any use of IslandFieldPolicy.AllMappedProperties - the escape
+        // hatch that opts an island's data endpoint back out of the mandatory field allowlist (LT-2204
+        // / Spec 041) into "every public property is client-filterable/sortable/searchable". Unlike the
+        // diagnostics above, the thing being flagged is an arbitrary call site anywhere in the
+        // compilation, not an [Island]-attributed type, so it needs its own CreateSyntaxProvider rather
+        // than ForAttributeWithMetadataName.
+        var unguardedAllowlistUsages = context.SyntaxProvider.CreateSyntaxProvider(
+            predicate: static (node, _) => node is MemberAccessExpressionSyntax { Name.Identifier.Text: "AllMappedProperties" },
+            transform: static (ctx, _) => GetUnguardedAllowlistDiagnostic(ctx)
+        );
+
+        context.RegisterSourceOutput(unguardedAllowlistUsages, static (spc, diagnostic) =>
+        {
+            if (diagnostic is not null)
+            {
+                spc.ReportDiagnostic(diagnostic);
+            }
+        });
+    }
+
+    /// <summary>
+    /// Diagnostic LTI006: confirms a matched "AllMappedProperties" member access actually resolves to
+    /// <c>LaughTale.Core.Data.IslandFieldPolicy.AllMappedProperties</c> (not an unrelated member of the
+    /// same name on some other type) before reporting.
+    /// </summary>
+    private static Diagnostic? GetUnguardedAllowlistDiagnostic(GeneratorSyntaxContext ctx)
+    {
+        var memberAccess = (MemberAccessExpressionSyntax)ctx.Node;
+
+        if (ctx.SemanticModel.GetSymbolInfo(memberAccess).Symbol is not IPropertySymbol { IsStatic: true, Name: "AllMappedProperties" } property)
+        {
+            return null;
+        }
+
+        if (property.ContainingType?.ToDisplayString() != "LaughTale.Core.Data.IslandFieldPolicy")
+        {
+            return null;
+        }
+
+        return Diagnostic.Create(UnguardedFieldAllowlistRule, memberAccess.GetLocation());
     }
 
     /// <summary>

@@ -58,7 +58,7 @@ var result = query.ToIslandDataResult(request, policy);
 
 ### Protection Summary:
 - **Zero Raw SQL String Concatenation**: Queries are built exclusively via type-safe LINQ Expression Trees.
-- **Mandatory Policy**: Omission of `IslandFieldPolicy` produces a compile-time error. For explicit full opt-in on vetted DTOs, `IslandFieldPolicy.AllMappedProperties` can be specified.
+- **Mandatory Policy**: Omission of `IslandFieldPolicy` produces a compile-time error. For explicit full opt-in on vetted DTOs, `IslandFieldPolicy.AllMappedProperties` can be specified — doing so raises **`LTI006`**, a build-time warning flagging that every public property on the queried type is now client-filterable, sortable, and searchable. Not an error: the compiler can't know whether your DTO actually has a field that shouldn't be queryable, only that you chose the option that doesn't check. Confirm that's intended, or switch to `IslandFieldPolicy.For(...)`.
 - **Anti-Oracle Refusal List**: Any requested field that is not allowlisted OR does not exist on the model is silently skipped and collected into `result.RefusedFields` as flat strings without differentiator codes, preventing schema enumeration attacks.
 - **Private Fields Guard**: Fields decorated with `[IslandPrivate]` or non-public properties can never be read or filtered.
 - **Malformed Input Resilience**: Unparseable integers, dates, or Guids are rejected cleanly without throwing unhandled server exceptions.

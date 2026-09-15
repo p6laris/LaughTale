@@ -684,7 +684,28 @@ how much of the enterprise story stops at that one policy string.
   synthetic client (`AllowUndeclaredIslandsCompatibilityTests`) — proof the default-on instinct was
   wrong here, not just a theoretical concern. Tests: `LaughTale.Tests/Security/RateLimitingTests.cs`
   (permit-limit enforcement, disabled-by-default, per-IP and per-user partition independence).
-- **Secure-by-default field allowlist** (§1.2) + an `SMI` diagnostic flagging the unguarded call. *(S · days)*
+- **Secure-by-default field allowlist. — [CLOSED, this pass]** The "secure-by-default" half was already
+  done: §1.2 closed in Spec 041 (deny-by-default authorization, `IslandFieldPolicy` a mandatory,
+  non-nullable parameter — omitting it is already a compile error, not just a convention). What was
+  actually still open was the diagnostic half. Also a naming correction: the roadmap calls it an `SMI`
+  diagnostic, but every diagnostic actually implemented in `IslandGenerator.cs` uses an `LTI` prefix
+  (`LTI001`/`LTI002`/`LTI004`/`LTI005`) — `SMI` only ever appeared in code comments as an informal
+  nickname, never as a real `DiagnosticDescriptor.id`, and `SMI003`/`SMI005`–`SMI008` (marked "done" in
+  `ROADMAP.v4.md`) don't exist anywhere in the codebase either — another stale roadmap claim, same
+  pattern as the endpoint-count and page-size-ceiling ones above. Added **`LTI006`** (Warning, not
+  Error — this can't know whether a given DTO actually has a sensitive field, only that the caller chose
+  the escape hatch): fires on any use of `IslandFieldPolicy.AllMappedProperties`, the documented opt-out
+  that re-exposes every public property on the queried type to client-driven filtering/sorting/search.
+  Architecturally new for this generator: the existing diagnostics all scan `[Island]`-attributed type
+  declarations via `ForAttributeWithMetadataName`; this one scans arbitrary call sites anywhere in the
+  compilation via a second `CreateSyntaxProvider`, resolving the member-access symbol through the
+  semantic model to confirm it's really `LaughTale.Core.Data.IslandFieldPolicy.AllMappedProperties`
+  (not an unrelated same-named member elsewhere) before reporting. Verified it doesn't fire anywhere in
+  this repo's own real consumer projects (Showcase, Docs, Components all build clean). Tests:
+  `LaughTale.Tests/Generators/UnguardedFieldAllowlistDiagnosticTests.cs`, driving `IslandGenerator`
+  directly via `CSharpGeneratorDriver` (same harness as `FormControlEmissionTests.cs`) — fires on direct
+  and variable-assigned usage, stays silent for an explicit `IslandFieldPolicy.For(...)` allowlist and
+  for an unrelated type exposing a same-named member.
 - **Lower the page-size ceiling. — [CLOSED, this pass]** The `Math.Clamp` was already there
   (`QueryableExtensions.cs`), just at a fixed `10000` — no smaller than "unbounded" against a slow
   filter/sort, and not configurable at all. Moved the ceiling onto `IslandFieldPolicy` itself
