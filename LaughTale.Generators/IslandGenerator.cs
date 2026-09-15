@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -17,9 +18,13 @@ namespace LaughTale.Generators;
 /// 1. Strongly-typed C# TagHelpers for seamless Razor markup
 /// 2. TypeScript model contracts and island registry
 /// 3. Compile-time Diagnostics (SMI001, SMI002) for type-safety and invalid island names
+///
+/// This class is `partial`: IslandGenerator.Manifest.cs (ROADMAP.v5.md Part B) adds a second island
+/// source - an external JSON manifest produced by a Node build step that scans a user's own
+/// Islands/**/*.tsx files - into this SAME generator/pipeline. See InitializeManifestPipeline below.
 /// </summary>
 [Generator(LanguageNames.CSharp)]
-public class IslandGenerator : IIncrementalGenerator
+public partial class IslandGenerator : IIncrementalGenerator
 {
     private const string IslandAttributeName = "LaughTale.Core.Attributes.IslandAttribute";
     private const string IslandIgnoreAttributeName = "LaughTale.Core.Attributes.IslandIgnoreAttribute";
@@ -201,6 +206,16 @@ public class IslandGenerator : IIncrementalGenerator
             // See ROADMAP.v5.md Part J for the full account and what generator-emitted islands rely on
             // instead (reflection, same as before this fix, via LaughTale.Core.Serialization.IslandJson).
         });
+
+        // 4. ROADMAP.v5.md Part B: discover an optional islands.manifest.g.json AdditionalText -
+        // produced by a separate Node build step that scans a user's own Islands/**/*.tsx files - and
+        // merge its islands into this SAME pipeline (see IslandGenerator.Manifest.cs). This has to live
+        // here, in this generator's own Initialize(), rather than in a second [Generator] class: detecting
+        // a name collision between a manifest-derived island and an [Island(...)]-attributed C# type (or
+        // the HandWrittenIslandNames skip list) requires seeing both sources of island names together
+        // before emitting anything, and independent incremental generator pipelines cannot see each
+        // other's data.
+        InitializeManifestPipeline(context, allIslands);
     }
 
     /// <summary>
@@ -402,7 +417,14 @@ public class IslandGenerator : IIncrementalGenerator
         return false;
     }
 
-    private static string GenerateTagHelper(IslandModel model)
+    /// <summary>
+    /// Emits the TagHelper source for one island. <paramref name="includeAuraAlias"/> defaults to
+    /// <c>true</c> so the existing attribute-driven call site (<c>GenerateTagHelper(result.Model)</c>)
+    /// is byte-for-byte unaffected. Pass <c>false</c> for a manifest-sourced island (ROADMAP.v5.md Part
+    /// B, IslandGenerator.Manifest.cs): the `aura-{name}` alias exists for the 76+ built-in Aura
+    /// design-system components and would be misleading on a user's own custom island.
+    /// </summary>
+    private static string GenerateTagHelper(IslandModel model, bool includeAuraAlias = true)
     {
         var sb = new StringBuilder();
         var (tagHelperName, targetNs) = GetGeneratedNames(model);
@@ -487,13 +509,19 @@ public class IslandGenerator : IIncrementalGenerator
         sb.AppendLine($"[HtmlTargetElement(\"{tagName}\", TagStructure = TagStructure.NormalOrSelfClosing)]");
         sb.AppendLine($"[HtmlTargetElement(\"island-{model.IslandName}\", TagStructure = TagStructure.NormalOrSelfClosing)]");
         sb.AppendLine($"[HtmlTargetElement(\"lt-{model.IslandName}\", TagStructure = TagStructure.NormalOrSelfClosing)]");
-        sb.AppendLine($"[HtmlTargetElement(\"aura-{model.IslandName}\", TagStructure = TagStructure.NormalOrSelfClosing)]");
+        if (includeAuraAlias)
+        {
+            sb.AppendLine($"[HtmlTargetElement(\"aura-{model.IslandName}\", TagStructure = TagStructure.NormalOrSelfClosing)]");
+        }
         if (model.IslandName.Contains("-"))
         {
             var noHyphen = model.IslandName.Replace("-", "");
             sb.AppendLine($"[HtmlTargetElement(\"island-{noHyphen}\", TagStructure = TagStructure.NormalOrSelfClosing)]");
             sb.AppendLine($"[HtmlTargetElement(\"lt-{noHyphen}\", TagStructure = TagStructure.NormalOrSelfClosing)]");
-            sb.AppendLine($"[HtmlTargetElement(\"aura-{noHyphen}\", TagStructure = TagStructure.NormalOrSelfClosing)]");
+            if (includeAuraAlias)
+            {
+                sb.AppendLine($"[HtmlTargetElement(\"aura-{noHyphen}\", TagStructure = TagStructure.NormalOrSelfClosing)]");
+            }
         }
         if (model.IslandName == "input-number")
         {
