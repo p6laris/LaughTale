@@ -685,8 +685,17 @@ how much of the enterprise story stops at that one policy string.
   wrong here, not just a theoretical concern. Tests: `LaughTale.Tests/Security/RateLimitingTests.cs`
   (permit-limit enforcement, disabled-by-default, per-IP and per-user partition independence).
 - **Secure-by-default field allowlist** (§1.2) + an `SMI` diagnostic flagging the unguarded call. *(S · days)*
-- **Lower the page-size ceiling** — `Math.Clamp(request.PageSize, 1, 10000)` → default 200,
-  configurable per island. *(S · hours)*
+- **Lower the page-size ceiling. — [CLOSED, this pass]** The `Math.Clamp` was already there
+  (`QueryableExtensions.cs`), just at a fixed `10000` — no smaller than "unbounded" against a slow
+  filter/sort, and not configurable at all. Moved the ceiling onto `IslandFieldPolicy` itself
+  (`MaxPageSize`, default 200, `DefaultMaxPageSize` constant) rather than a second parameter threaded
+  through every `MapIslandData` call — it's the same per-island security policy object as the field
+  allowlist, and a page-size ceiling is exactly the same kind of "how much can a single request make
+  this endpoint do" concern. Per-island override via `IslandFieldPolicy.For(...).WithMaxPageSize(n)`.
+  3 new tests in `IslandDataContractTests.cs` (default-ceiling clamp, a tighter override, a looser
+  override). Complements Part H's rate limiting: rate limiting bounds *how often* a client can call the
+  endpoint, this bounds *how expensive* any single call can be — together they cover both halves of
+  the same `MapIslandData` DoS surface.
 - **Deployment presets** *(Nitro)* — verified Azure App Service, container and IIS configs covering
   asset hashing, compression, CDN headers. Removes more first-day friction than anything else. *(M · 3 wks)*
 - Then: **image optimization** *(Astro, Next)*, **font optimization**, and an **instrumentation hook**

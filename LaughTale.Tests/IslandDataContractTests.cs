@@ -41,6 +41,41 @@ public class IslandDataContractTests
     }
 
     [Fact]
+    public void Paging_RequestedPageSizeAboveDefaultCeiling_IsClampedTo200()
+    {
+        // ROADMAP.v5.md Part H: an unbounded PageSize against a slow filter/sort is a cheap
+        // denial-of-service surface even with request-rate limiting in place.
+        var request = new IslandDataRequest { Page = 1, PageSize = 999_999 };
+
+        var result = _sampleData.ToIslandDataResult(request, IslandFieldPolicy.For("Id", "Name", "City", "Balance"));
+
+        Assert.Equal(IslandFieldPolicy.DefaultMaxPageSize, result.PageSize);
+    }
+
+    [Fact]
+    public void Paging_PolicyWithLowerMaxPageSize_ClampsBelowTheDefaultCeiling()
+    {
+        var tightPolicy = IslandFieldPolicy.For("Id", "Name", "City", "Balance").WithMaxPageSize(2);
+        var request = new IslandDataRequest { Page = 1, PageSize = 100 };
+
+        var result = _sampleData.ToIslandDataResult(request, tightPolicy);
+
+        Assert.Equal(2, result.PageSize);
+        Assert.Equal(2, result.Items.Count);
+    }
+
+    [Fact]
+    public void Paging_PolicyWithHigherMaxPageSize_AllowsLargerPagesThanTheDefaultCeiling()
+    {
+        var looserPolicy = IslandFieldPolicy.For("Id", "Name", "City", "Balance").WithMaxPageSize(500);
+        var request = new IslandDataRequest { Page = 1, PageSize = 300 };
+
+        var result = _sampleData.ToIslandDataResult(request, looserPolicy);
+
+        Assert.Equal(300, result.PageSize);
+    }
+
+    [Fact]
     public void Sorting_AppliesAscendingAndDescendingOrder()
     {
         var request = new IslandDataRequest

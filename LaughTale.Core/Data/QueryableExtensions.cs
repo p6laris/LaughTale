@@ -29,9 +29,11 @@ public static class QueryableExtensions
 
         var (filteredQuery, totalCount, refusedFields) = PrepareQuery(query, request, fieldPolicy);
 
-        // Apply Paging (Skip / Take)
+        // Apply Paging (Skip / Take). Ceiling comes from the policy (ROADMAP.v5.md Part H) rather than
+        // a fixed constant, so a given island's own policy - not a one-size-fits-all number - decides
+        // how expensive a single page request is allowed to be.
         int page = Math.Max(1, request.Page);
-        int pageSize = Math.Clamp(request.PageSize, 1, 10000);
+        int pageSize = Math.Clamp(request.PageSize, 1, fieldPolicy.MaxPageSize);
         int skip = (page - 1) * pageSize;
 
         var items = filteredQuery.Skip(skip).Take(pageSize).ToList();

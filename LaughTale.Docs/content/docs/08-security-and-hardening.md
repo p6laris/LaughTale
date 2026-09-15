@@ -62,6 +62,10 @@ var result = query.ToIslandDataResult(request, policy);
 - **Anti-Oracle Refusal List**: Any requested field that is not allowlisted OR does not exist on the model is silently skipped and collected into `result.RefusedFields` as flat strings without differentiator codes, preventing schema enumeration attacks.
 - **Private Fields Guard**: Fields decorated with `[IslandPrivate]` or non-public properties can never be read or filtered.
 - **Malformed Input Resilience**: Unparseable integers, dates, or Guids are rejected cleanly without throwing unhandled server exceptions.
+- **Page-Size Ceiling (ROADMAP.v5.md Part H)**: A requested `PageSize` is clamped, never rejected, to `IslandFieldPolicy.MaxPageSize` (default 200) — a single request can't force an unbounded scan even against a slow filter/sort, independent of rate limiting. Override per island for data that's cheaper or more expensive to page through than the default assumes:
+  ```csharp
+  var policy = IslandFieldPolicy.For("Id", "Name", "City", "Balance").WithMaxPageSize(500);
+  ```
 
 ---
 
