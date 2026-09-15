@@ -121,6 +121,38 @@ This logs a deduplicated warning once per undeclared island name and will be rem
 
 ---
 
+## 🚦 6. Per-Client Rate Limiting (ROADMAP.v5.md Part H)
+
+The three island POST endpoints (`MapLaughTaleIslandRefresh`, `MapIslandData`, `MapLaughTaleIslandAction`)
+each accept a request body from the client, run authorization, and then do real work — including, for
+`MapIslandData`, executing an EF Core query built from client-supplied filter/sort fields. A crafted
+filter against an unindexed column, or simply a rapid burst of requests, is a cheap denial-of-service
+surface without a limit in place.
+
+```csharp
+builder.Services.AddLaughTale(options =>
+{
+    options.RateLimit.Enabled = true;      // opt-in — see below
+    options.RateLimit.PermitLimit = 30;    // requests...
+    options.RateLimit.WindowSeconds = 10;  // ...per sliding window
+    options.RateLimit.PartitionByUser = true; // authenticated clients partition by user name, not IP
+});
+```
+
+**Off by default, unlike antiforgery.** `RequireAntiforgery` defaults to `true` because ASP.NET Core's
+own global antiforgery validation is already active for every `AddRazorPages()` app — requiring it in
+LaughTale changes nothing observable. A request limit has no such platform precedent: turning it on by
+default would silently start rejecting real traffic the moment an existing app upgraded, at a threshold
+this library can't know is right for that app's actual usage. Enable it and tune the numbers for your
+own traffic shape.
+
+Enforcement happens inside each endpoint's own handler — the same manual antiforgery → authorization →
+work sequence these endpoints already use — rather than via ASP.NET Core's `UseRateLimiter()` pipeline
+middleware, so protection applies the moment you call `Map...()`, with no separate middleware
+registration to remember. Rejected requests receive `429 Too Many Requests`.
+
+---
+
 ## 📋 Security Checklist for Production
 
 - [x] Enable HTTPS redirection (`app.UseHttpsRedirection()`).
@@ -129,3 +161,4 @@ This logs a deduplicated warning once per undeclared island name and will be rem
 - [x] Ensure anti-forgery token middleware is enabled in ASP.NET Core (`options.Refresh.RequireAntiforgery = true`).
 - [x] Explicitly declare all islands as protected (`[IslandAuthorize]` / `RequirePolicy`) or public (`[IslandAllowAnonymous]` / `AllowAnonymous`).
 - [x] Use `[IslandPrivate]` on sensitive model properties (e.g. PasswordHash, InternalNotes).
+- [ ] Enable and tune `options.RateLimit` on the island endpoints for your own traffic shape (off by default).

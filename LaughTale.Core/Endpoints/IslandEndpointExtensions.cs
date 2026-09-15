@@ -39,6 +39,13 @@ public static class IslandEndpointExtensions
 
             var laughTaleOptions = context.RequestServices.GetService<Microsoft.Extensions.Options.IOptions<LaughTale.Core.Configuration.LaughTaleOptions>>()?.Value;
 
+            // Rate limiting (ROADMAP.v5.md Part H): reject cheaply, before antiforgery/authorization work.
+            var rateLimiter = context.RequestServices.GetService<LaughTale.Core.Security.LaughTaleRateLimiter>();
+            if (rateLimiter != null && !await rateLimiter.TryAcquireAsync(context))
+            {
+                return Results.StatusCode(StatusCodes.Status429TooManyRequests);
+            }
+
             // 1. Antiforgery validation (LT-1503 / LT-2203 / LT-2204)
             var requireAntiforgery = localOptions.RequireAntiforgery && (laughTaleOptions?.Refresh.RequireAntiforgery ?? true);
             if (requireAntiforgery)
@@ -96,7 +103,8 @@ public static class IslandEndpointExtensions
         .WithName("LaughTaleIslandRefresh")
         .Produces(StatusCodes.Status200OK, contentType: "text/html")
         .Produces(StatusCodes.Status403Forbidden)
-        .Produces(StatusCodes.Status400BadRequest);
+        .Produces(StatusCodes.Status400BadRequest)
+        .Produces(StatusCodes.Status429TooManyRequests);
 
         return endpoints;
     }
@@ -121,6 +129,15 @@ public static class IslandEndpointExtensions
         endpoints.MapPost(pattern, async (HttpContext context, IslandDataRequest? request) =>
         {
             var laughTaleOptions = context.RequestServices.GetService<Microsoft.Extensions.Options.IOptions<LaughTale.Core.Configuration.LaughTaleOptions>>()?.Value;
+
+            // Rate limiting (ROADMAP.v5.md Part H): reject cheaply, before EF Core ever runs. This is
+            // the specific endpoint the roadmap names - a crafted filter/sort request against an
+            // unindexed column, run repeatedly, is a cheap denial-of-service surface without this.
+            var rateLimiter = context.RequestServices.GetService<LaughTale.Core.Security.LaughTaleRateLimiter>();
+            if (rateLimiter != null && !await rateLimiter.TryAcquireAsync(context))
+            {
+                return Results.StatusCode(StatusCodes.Status429TooManyRequests);
+            }
 
             // 1. Antiforgery validation (LT-1503 / LT-2204)
             var requireAntiforgery = laughTaleOptions?.Refresh.RequireAntiforgery ?? true;
@@ -169,7 +186,8 @@ public static class IslandEndpointExtensions
         .WithName($"LaughTaleData_{typeof(T).Name}")
         .Produces<IslandDataResult<T>>(StatusCodes.Status200OK)
         .Produces(StatusCodes.Status403Forbidden)
-        .Produces(StatusCodes.Status400BadRequest);
+        .Produces(StatusCodes.Status400BadRequest)
+        .Produces(StatusCodes.Status429TooManyRequests);
 
         return endpoints;
     }

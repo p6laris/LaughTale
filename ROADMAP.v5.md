@@ -659,9 +659,31 @@ how much of the enterprise story stops at that one policy string.
 
 ## 13. Part H — Security & production
 
-- **Rate-limit the island endpoints.** Two public `MapPost` routes accept user-shaped filter/sort
-  requests and run them against EF Core with no limiter. A crafted filter on an unindexed column is a
-  cheap denial of service. *(S · days)*
+- **Rate-limit the island endpoints. — [CLOSED, this pass]** This item's own count was stale: by the
+  time this closed there were **three** public `MapPost` routes accepting user-shaped requests, not
+  two — `MapLaughTaleIslandRefresh`, `MapIslandData<T>` (the one this item specifically named, filter/
+  sort against EF Core with no limiter), and `MapLaughTaleIslandAction<TProps>` (added by the same-day
+  Plugin API work, running a server-side delegate per request). All three are now covered.
+  Implementation is a manual per-request check (`LaughTale.Core/Security/LaughTaleRateLimiter.cs`,
+  a `PartitionedRateLimiter<HttpContext>` wrapping .NET's built-in sliding-window limiter) added as a
+  new first step inside each endpoint's existing antiforgery→authorization→work handler — the same
+  triad idiom these endpoints already use — rather than ASP.NET Core's `RequireRateLimiting()` +
+  `UseRateLimiter()` middleware pair. Neither of this repo's two real `Program.cs` examples calls
+  `UseRateLimiter()` today and this endpoint code can't retroactively add pipeline middleware, so
+  metadata-based enforcement would have shipped silently inert for any consumer who just calls
+  `Map...()` — the same "built but never wired up" trap this session already found and fixed twice
+  elsewhere (directives double-init, the antiforgery/`FormTagHelper` assumption). Partitioned by
+  authenticated user name, falling back to remote IP for anonymous requests (`IslandRateLimitOptions.
+  PartitionByUser`), configured via `options.RateLimit` on `AddLaughTale()` exactly like `Refresh`.
+  **Defaults to disabled** — deliberately *not* mirroring `RequireAntiforgery`'s default-on posture,
+  because antiforgery's default-on is free (ASP.NET Core's own global antiforgery is already active
+  for every consumer via `AddRazorPages()`), while a request limit has no such platform precedent and
+  would silently start rejecting real traffic the moment an existing app upgrades, at a threshold this
+  library can't know is right for that app's actual usage. Caught concretely during implementation: a
+  default `PermitLimit` broke an existing test firing 50 legitimate consecutive requests from one
+  synthetic client (`AllowUndeclaredIslandsCompatibilityTests`) — proof the default-on instinct was
+  wrong here, not just a theoretical concern. Tests: `LaughTale.Tests/Security/RateLimitingTests.cs`
+  (permit-limit enforcement, disabled-by-default, per-IP and per-user partition independence).
 - **Secure-by-default field allowlist** (§1.2) + an `SMI` diagnostic flagging the unguarded call. *(S · days)*
 - **Lower the page-size ceiling** — `Math.Clamp(request.PageSize, 1, 10000)` → default 200,
   configurable per island. *(S · hours)*

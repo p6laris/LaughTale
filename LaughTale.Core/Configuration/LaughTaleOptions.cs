@@ -48,6 +48,18 @@ public sealed class LaughTaleOptions
     /// Server-driven island refresh, antiforgery, and authorization options (LT-2203).
     /// </summary>
     public IslandRefreshOptions Refresh { get; set; } = new();
+
+    /// <summary>
+    /// Per-client request-rate limiting for the island POST endpoints (ROADMAP.v5.md Part H).
+    /// Defaults to disabled, unlike <see cref="IslandRefreshOptions.RequireAntiforgery"/> - antiforgery
+    /// defaults on because ASP.NET Core's own global antiforgery validation (via AddRazorPages()) is
+    /// already active for every consumer, so requiring it changes nothing observable. A request limit
+    /// has no such platform-level precedent: enabling it by default would silently start rejecting
+    /// traffic for every existing app the moment it upgrades, with a threshold this library can't know
+    /// is right for their actual usage pattern. Opt in and tune <see cref="IslandRateLimitOptions.PermitLimit"/>
+    /// / <see cref="IslandRateLimitOptions.WindowSeconds"/> for your own traffic shape.
+    /// </summary>
+    public IslandRateLimitOptions RateLimit { get; set; } = new();
 }
 
 /// <summary>
@@ -99,6 +111,40 @@ public sealed class IslandRefreshOptions
         }
         return this;
     }
+}
+
+/// <summary>
+/// Per-client request-rate limiting for the island POST endpoints (<c>MapLaughTaleIslandRefresh</c>,
+/// <c>MapIslandData</c>, <c>MapLaughTaleIslandAction</c>). A crafted filter/sort request against an
+/// unindexed column, or any rapid burst of requests, is a cheap denial-of-service surface against
+/// these endpoints without a limit in place.
+/// </summary>
+public sealed class IslandRateLimitOptions
+{
+    /// <summary>
+    /// Gets or sets whether rate limiting is enforced on the island endpoints. Default: false - see
+    /// the remarks on <see cref="LaughTaleOptions.RateLimit"/> for why this doesn't default on like
+    /// <see cref="IslandRefreshOptions.RequireAntiforgery"/> does.
+    /// </summary>
+    public bool Enabled { get; set; } = false;
+
+    /// <summary>
+    /// Gets or sets the maximum number of requests a single client (see <see cref="PartitionByUser"/>)
+    /// may make within <see cref="WindowSeconds"/>. Default: 30.
+    /// </summary>
+    public int PermitLimit { get; set; } = 30;
+
+    /// <summary>
+    /// Gets or sets the sliding window length, in seconds, over which <see cref="PermitLimit"/> applies.
+    /// Default: 10.
+    /// </summary>
+    public int WindowSeconds { get; set; } = 10;
+
+    /// <summary>
+    /// Gets or sets whether an authenticated client is partitioned by its user name rather than its
+    /// remote IP address. Default: true. Falls back to the remote IP for anonymous requests either way.
+    /// </summary>
+    public bool PartitionByUser { get; set; } = true;
 }
 
 /// <summary>

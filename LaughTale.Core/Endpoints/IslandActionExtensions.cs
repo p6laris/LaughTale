@@ -44,6 +44,13 @@ public static class IslandActionExtensions
         {
             var laughTaleOptions = context.RequestServices.GetService<Microsoft.Extensions.Options.IOptions<LaughTale.Core.Configuration.LaughTaleOptions>>()?.Value;
 
+            // Rate limiting (ROADMAP.v5.md Part H): reject cheaply, before antiforgery/authorization work.
+            var rateLimiter = context.RequestServices.GetService<LaughTale.Core.Security.LaughTaleRateLimiter>();
+            if (rateLimiter != null && !await rateLimiter.TryAcquireAsync(context))
+            {
+                return Results.StatusCode(StatusCodes.Status429TooManyRequests);
+            }
+
             // 1. Antiforgery validation (same triad step as MapLaughTaleIslandRefresh)
             var requireAntiforgery = localOptions.RequireAntiforgery && (laughTaleOptions?.Refresh.RequireAntiforgery ?? true);
             if (requireAntiforgery)
@@ -99,7 +106,8 @@ public static class IslandActionExtensions
         .WithName($"LaughTaleIslandAction_{islandName}")
         .Produces(StatusCodes.Status200OK, contentType: "text/html")
         .Produces(StatusCodes.Status403Forbidden)
-        .Produces(StatusCodes.Status400BadRequest);
+        .Produces(StatusCodes.Status400BadRequest)
+        .Produces(StatusCodes.Status429TooManyRequests);
 
         return endpoints;
     }

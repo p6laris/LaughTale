@@ -52,6 +52,7 @@ public static class ServiceCollectionExtensions
         services.TryAddSingleton<ILaughTaleLocalizer, LaughTaleLocalizer>();
         services.TryAddSingleton<LaughTale.Core.Security.IIslandAuthorizationRegistry, LaughTale.Core.Security.IslandAuthorizationRegistry>();
         services.TryAddSingleton<LaughTale.Core.Security.IIslandAccessEvaluator, LaughTale.Core.Security.IslandAccessEvaluator>();
+        services.TryAddSingleton<LaughTale.Core.Security.LaughTaleRateLimiter>();
 
         return services;
     }
