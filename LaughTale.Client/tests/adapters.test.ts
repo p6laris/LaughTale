@@ -96,6 +96,25 @@ describe('LaughTale Framework Mount Adapters Suite', () => {
         assert.equal(container.childNodes.length, 0, 'React root must be unmounted, clearing the container');
     });
 
+    it('createReactIsland: the initial render is committed synchronously once mount() resolves (ROADMAP.v5.md Part D, nested islands)', async () => {
+        // Without flushSync, this file's own comment above (lines 27-33) documents that React's
+        // concurrent root only commits on a later macrotask - meaning hydrator.ts's nested-island
+        // survival check (which runs right after mount() resolves, plus one requestAnimationFrame
+        // wait) could not yet observe whether this container's DOM had actually been replaced. This
+        // test asserts the commit is complete with NO waitFor/polling at all - proving flushSync
+        // actually forces synchronous commit, not just that the adapter still compiles/runs.
+        const container = document.createElement('div');
+
+        function Widget(props: any) {
+            return React.createElement('span', { id: 'sync-check' }, `Sync ${props.title}`);
+        }
+
+        const mount = createReactIsland(Widget);
+        await mount(container, { title: 'Widget' }, undefined);
+
+        assert.equal(container.textContent, 'Sync Widget', 'the initial commit must be observable immediately after mount() resolves, with no extra tick');
+    });
+
     it('createReactIsland: update() re-renders the same root in place without unmount/remount', async () => {
         const container = document.createElement('div');
         const ctx = {

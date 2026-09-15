@@ -337,9 +337,9 @@ between, which produced a specific and serious bug.
 | Item | From | Effort |
 |---|---|---|
 | **Props updates without remount** — add `update(props)` to the adapter contract; refresh prefers it over morphing. *This is the fix for the corruption above, not a separate feature.* — **[CLOSED (mechanism), this pass]** for React/Vue/Preact; Svelte and vanilla deliberately excluded — see below | Astro, Nuxt | M · 2–3 wks |
-| **Nested islands** — the hydrator has no concept of an island inside an island | Astro | M · 2 wks |
+| **Nested islands — [CLOSED (order-safety + diagnosability), this pass]** the hydrator now detects and warns about a nested island destroyed by its parent, instead of silently vanishing — see below | Astro | M · 2 wks |
 | **Context & shared store access** — extend `ctx` with the ambient state pool | Nuxt `useState` | S · 1 wk |
-| **Close adapter gaps** — `preact.ts` doesn't pass slots though React/Vue/Svelte do; `vanilla.ts` is 16 lines with no hydrate path. One contract, conformance test per adapter | parity | S · 1 wk |
+| **Close adapter gaps** — the roadmap's own framing here doesn't hold up (found while scoping nested islands): NONE of the four framework adapters implement slot/children forwarding, not just preact — confirmed via git history back to their original commit, "slot projection" has been aspirational doc-comment text since day one for all five. `vanilla.ts`'s missing hydrate-path signal (no `options.hydrate`-equivalent telling a mount function "adopt this existing DOM") is still open and unaffected by this correction. | parity | S · 1 wk (was under-scoped) |
 | **New adapters** — Web Components/Lit first (framework-agnostic, no runtime download), then Solid, Alpine, Angular (unglamorous, but what enterprise .NET shops run) | ecosystem | S each |
 
 **Props updates without remount — [CLOSED (mechanism) for 3 of 5 adapters, this pass].** `registry.ts`
@@ -410,6 +410,53 @@ gracefully instead of leaving the island half-updated. An adapter that never reg
   touch nested islands, `ctx`'s ambient state pool, `preact.ts`'s slot-passing gap, `vanilla.ts`'s
   missing hydrate path, or new adapters — every other row in the table above is exactly as
   unaddressed as it was before this pass.
+
+**Nested islands — [CLOSED (order-safety + diagnosability), this pass].** Not theoretical: a real
+example already ships in `LaughTale.Showcase/Pages/Components.cshtml` (`island-float-label` wrapping
+`island-input-text`, `island-select`, `island-tree-select`, and six other island types), and it only
+ever avoided the underlying hazard by accident (`FloatLabelIsland`'s mount function happens to use
+targeted `querySelector`/`appendChild` rather than an `innerHTML` rewrite — not a designed guarantee).
+Roughly 60 of the ~76 vanilla components do a full `innerHTML`/`setHtml` rewrite on mount and would
+destroy a nested island the same way `float-label` almost does; the framework adapters' replace-mode
+mounts (React/Vue/Preact never set `options.hydrate`, confirmed nowhere in this repo — always the
+destructive branch) carry the identical risk.
+
+**First design attempt was wrong, caught by live-browser verification, not unit tests.** The initial
+fix deferred a nested island's hydration until its parent's own mount settled — logically sound
+against the destruction hazard, but it broke `float-label` live: that component synchronously
+`querySelector`s for the nested island's *already-rendered* `<input>` during its own mount to wire
+ARIA attributes, and deferring starved that read of anything to find (previously "worked" only because
+of module-caching timing luck, not design — this fix would have turned that luck into a deterministic
+failure). All 474 client tests stayed green through this mistake, because the tests exercised the new
+gating logic in isolation rather than the real, more demanding component it was about to ship
+alongside — exactly why this session's live-verification rule exists.
+
+**Revised, shipped design: don't change *when* nested islands hydrate — detect *when they're
+destroyed*.** Nested islands hydrate concurrently with their parent, exactly as before this pass (zero
+timing change, zero risk to `float-label` or anything like it). `hydrator.ts`'s `executeHydration`
+snapshots a container's direct nested islands immediately before calling `mount()`, waits one
+`requestAnimationFrame` after `mount()` resolves (React's `createRoot().render()`, called outside a
+native browser event, schedules its commit via a `MessageChannel` macrotask rather than synchronously —
+a bare microtask isn't a long enough wait; `react.ts`'s initial render is also now wrapped in
+`flushSync` so this doesn't rely on the buffer alone), then checks each snapshotted nested island's
+`isConnected` status — any that were destroyed get a `console.warn` naming both the nested island and
+its parent, instead of silently vanishing. Any nested island newly introduced by the parent's own
+render (not present before mount) is also picked up and hydrated, a genuinely new capability. Verified
+live against the real `float-label` example (all 19 real nested islands across its variants mount
+correctly, ARIA wiring intact) and against a constructed destructive-parent case (the warning fires
+with the exact expected message).
+
+A related, previously-unrelated leak was found and fixed in the same pass: `teardownIsland` dispatches
+a **non-bubbling** `laughtale:unmount`, so tearing down a parent (`retryIsland`, or `rehydrateIsland`
+during refresh) never reached a nested island's own cleanup listener (registered on its own container).
+`router.ts`'s full-page-navigation teardown already solves exactly this (depth-first, dispatched
+individually) — `teardownIsland` now mirrors that precedent rather than adding new bookkeeping.
+
+Explicitly out of scope, same as before: `ctx`'s ambient state pool, `vanilla.ts`'s missing hydrate-path
+signal, new adapters, and true DOM preservation for a nested island inside a framework adapter's
+destructive mount (needs an explicit children/slot-forwarding mechanism — see the corrected
+"close adapter gaps" row above).
+
 | **Framework SSR sidecar** — Node render host over a local socket. The right *first plugin* to prove the Part L API, not core work. Until then, rename the strategy `client-only` and require a fallback | Astro, Nuxt | XL · 8+ wks |
 
 ---

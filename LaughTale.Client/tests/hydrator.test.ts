@@ -7,7 +7,7 @@ import { describe, it, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 
 import { defineIsland } from '../src/runtime/registry.ts';
-import { hydrateIsland, retryIsland, getIslandState } from '../src/runtime/hydrator.ts';
+import { hydrateIsland, retryIsland, getIslandState, initIslands, teardownIsland } from '../src/runtime/hydrator.ts';
 
 describe('Hydrator Tri-State & Shared Viewport Observer Suite (, )', () => {
 
@@ -225,6 +225,198 @@ describe('Hydrator Tri-State & Shared Viewport Observer Suite (, )', () => {
         await new Promise(resolve => setTimeout(resolve, 0));
 
         assert.equal(getIslandState(container), 'failed', 'must not be retried by an unrelated island name being registered');
+    });
+
+});
+
+describe('Nested Islands Suite (ROADMAP.v5.md Part D)', () => {
+
+    beforeEach(() => {
+        document.body.innerHTML = '';
+    });
+
+    it('initIslands hydrates a nested island concurrently with its parent, not gated on the parent settling first', async () => {
+        // Nested islands hydrate at the same time as their parent, exactly like any other island the
+        // top-level scan finds - a deliberate choice, not an oversight: an earlier version of this fix
+        // deferred nested hydration until the parent's own mount settled, but that broke real
+        // components (FloatLabelIsland) that synchronously read a nested island's already-rendered DOM
+        // during their OWN mount. See the "destructive parent" test below for how a nested island that
+        // genuinely gets destroyed is now handled instead (a loud warning, not silent gating).
+        let outerMounted = false;
+        let innerMounted = false;
+
+        defineIsland('nested-outer-safe', () => Promise.resolve({
+            default: () => { outerMounted = true; }
+        }));
+        defineIsland('nested-inner-safe', () => Promise.resolve({
+            default: () => { innerMounted = true; }
+        }));
+
+        const outer = document.createElement('div');
+        outer.setAttribute('data-island', 'nested-outer-safe');
+        outer.setAttribute('data-hydrate', 'load');
+        const inner = document.createElement('div');
+        inner.setAttribute('data-island', 'nested-inner-safe');
+        inner.setAttribute('data-hydrate', 'load');
+        outer.appendChild(inner);
+        document.body.appendChild(outer);
+
+        initIslands(document.body);
+
+        await new Promise(r => setTimeout(r, 50));
+
+        assert.equal(outerMounted, true);
+        assert.equal(innerMounted, true);
+        assert.equal(getIslandState(inner), 'mounted');
+    });
+
+    it('a nested island under a non-destructive vanilla parent hydrates successfully', async () => {
+        defineIsland('nested-outer-nondestructive', () => Promise.resolve({
+            default: (el: HTMLElement) => { el.setAttribute('data-outer-mounted', 'true'); }
+        }));
+        let innerMounted = false;
+        defineIsland('nested-inner-survivor', () => Promise.resolve({
+            default: () => { innerMounted = true; }
+        }));
+
+        const outer = document.createElement('div');
+        outer.setAttribute('data-island', 'nested-outer-nondestructive');
+        outer.setAttribute('data-hydrate', 'load');
+        const inner = document.createElement('div');
+        inner.setAttribute('data-island', 'nested-inner-survivor');
+        inner.setAttribute('data-hydrate', 'load');
+        outer.appendChild(inner);
+        document.body.appendChild(outer);
+
+        hydrateIsland(outer);
+        await new Promise(r => setTimeout(r, 50));
+
+        assert.equal(innerMounted, true);
+        assert.equal(getIslandState(inner), 'mounted');
+    });
+
+    it('a nested island under a destructive (innerHTML-rewriting) vanilla parent does not hydrate and a warning fires', async () => {
+        defineIsland('nested-outer-destructive', () => Promise.resolve({
+            default: (el: HTMLElement) => { el.innerHTML = '<div>replaced</div>'; }
+        }));
+        let innerMounted = false;
+        defineIsland('nested-inner-lost', () => Promise.resolve({
+            default: () => { innerMounted = true; }
+        }));
+
+        const outer = document.createElement('div');
+        outer.setAttribute('data-island', 'nested-outer-destructive');
+        outer.setAttribute('data-hydrate', 'load');
+        const inner = document.createElement('div');
+        inner.setAttribute('data-island', 'nested-inner-lost');
+        inner.setAttribute('data-hydrate', 'load');
+        outer.appendChild(inner);
+        document.body.appendChild(outer);
+
+        const warnings: string[] = [];
+        const originalWarn = console.warn;
+        console.warn = (...args: any[]) => { warnings.push(args.join(' ')); };
+
+        try {
+            hydrateIsland(outer);
+            await new Promise(r => setTimeout(r, 50));
+        } finally {
+            console.warn = originalWarn;
+        }
+
+        assert.equal(innerMounted, false, 'a destroyed nested island must never have its loader invoked');
+        assert.ok(
+            warnings.some(w => w.includes('nested-inner-lost') && w.includes('nested-outer-destructive')),
+            `expected a warning naming both the lost nested island and its parent, got: ${JSON.stringify(warnings)}`
+        );
+    });
+
+    it('a never-strategy parent still lets its nested island hydrate immediately, since its own container is never touched', async () => {
+        let innerMounted = false;
+        defineIsland('nested-inner-under-never', () => Promise.resolve({
+            default: () => { innerMounted = true; }
+        }));
+
+        const outer = document.createElement('div');
+        outer.setAttribute('data-island', 'nested-outer-never');
+        outer.setAttribute('data-hydrate', 'never');
+        const inner = document.createElement('div');
+        inner.setAttribute('data-island', 'nested-inner-under-never');
+        inner.setAttribute('data-hydrate', 'load');
+        outer.appendChild(inner);
+        document.body.appendChild(outer);
+
+        initIslands(document.body);
+        await new Promise(r => setTimeout(r, 50));
+
+        assert.equal(getIslandState(outer), 'idle', 'a never-strategy island itself is never mounted');
+        assert.equal(innerMounted, true, 'its nested island must still hydrate');
+        assert.equal(getIslandState(inner), 'mounted');
+    });
+
+    it('doubly-nested islands (outer > middle > inner) all hydrate correctly when none of them are destructive', async () => {
+        defineIsland('nested-outer-triple', () => Promise.resolve({
+            default: (el: HTMLElement) => { el.setAttribute('data-outer-mounted', 'true'); }
+        }));
+        defineIsland('nested-middle-triple', () => Promise.resolve({
+            default: (el: HTMLElement) => { el.setAttribute('data-middle-mounted', 'true'); }
+        }));
+        defineIsland('nested-inner-triple', () => Promise.resolve({
+            default: () => {}
+        }));
+
+        const outer = document.createElement('div');
+        outer.setAttribute('data-island', 'nested-outer-triple');
+        outer.setAttribute('data-hydrate', 'load');
+        const middle = document.createElement('div');
+        middle.setAttribute('data-island', 'nested-middle-triple');
+        middle.setAttribute('data-hydrate', 'load');
+        const inner = document.createElement('div');
+        inner.setAttribute('data-island', 'nested-inner-triple');
+        inner.setAttribute('data-hydrate', 'load');
+
+        middle.appendChild(inner);
+        outer.appendChild(middle);
+        document.body.appendChild(outer);
+
+        initIslands(document.body);
+        await new Promise(r => setTimeout(r, 100));
+
+        assert.equal(getIslandState(outer), 'mounted');
+        assert.equal(getIslandState(middle), 'mounted');
+        assert.equal(getIslandState(inner), 'mounted');
+    });
+
+    it('teardownIsland cascades laughtale:unmount to nested islands, whose own cleanup would otherwise never fire', async () => {
+        defineIsland('nested-outer-teardown', () => Promise.resolve({
+            default: (el: HTMLElement) => { el.setAttribute('data-outer-mounted', 'true'); }
+        }));
+
+        let innerCleanedUp = false;
+        defineIsland('nested-inner-teardown', () => Promise.resolve({
+            default: (_el: HTMLElement, _props: any, ctx: any) => {
+                ctx.onCleanup(() => { innerCleanedUp = true; });
+            }
+        }));
+
+        const outer = document.createElement('div');
+        outer.setAttribute('data-island', 'nested-outer-teardown');
+        outer.setAttribute('data-hydrate', 'load');
+        const inner = document.createElement('div');
+        inner.setAttribute('data-island', 'nested-inner-teardown');
+        inner.setAttribute('data-hydrate', 'load');
+        outer.appendChild(inner);
+        document.body.appendChild(outer);
+
+        hydrateIsland(outer);
+        await new Promise(r => setTimeout(r, 50));
+
+        assert.equal(getIslandState(inner), 'mounted');
+        assert.equal(innerCleanedUp, false);
+
+        teardownIsland(outer);
+
+        assert.equal(innerCleanedUp, true, 'tearing down the parent must cascade laughtale:unmount to the nested island');
     });
 
 });

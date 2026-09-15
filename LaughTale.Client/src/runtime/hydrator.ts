@@ -17,6 +17,43 @@ import { useLocale } from '../composables/useLocale';
 export type HydrateStrategy = 'load' | 'idle' | 'visible' | 'media' | 'interaction' | 'never';
 export type HydrationState = 'idle' | 'pending' | 'mounted' | 'failed';
 
+/**
+ * Matches every way an island's root container can be marked. Exported so other modules that need to
+ * find island elements (e.g. devtools/state.ts) use the exact same selector rather than an
+ * independently-maintained copy that can drift.
+ */
+export const ISLAND_SELECTOR = '[data-island], island, [hydrate], [data-hydrate]';
+
+/**
+ * True when `el` has an island ancestor strictly between it and `root` (exclusive of both). Bounded at
+ * `root` rather than walking to document.documentElement, since callers pass a specific container they
+ * want the answer scoped to (e.g. "is this a NESTED island relative to the one I'm hydrating", not
+ * "is there an island ancestor anywhere in the whole document").
+ */
+function hasIslandAncestorWithin(el: HTMLElement, root: ParentNode): boolean {
+    let curr: HTMLElement | null = el.parentElement;
+    while (curr && curr !== root) {
+        if (curr.matches(ISLAND_SELECTOR)) return true;
+        curr = curr.parentElement;
+    }
+    return false;
+}
+
+/**
+ * Hydrates every island directly under `root` that does NOT have another island between it and `root`
+ * (ROADMAP.v5.md Part D, nested islands) - used by executeHydration's post-mount step below to pick up
+ * any nested island markup a parent's own render just introduced. Deliberately NOT called from
+ * initIslands() itself: nested islands still hydrate concurrently with their parent there, exactly as
+ * before this pass (see the comment on initIslands for why gating that turned out to be a real
+ * regression, not an improvement).
+ */
+function hydrateTopLevelIslandsWithin(root: ParentNode): void {
+    root.querySelectorAll<HTMLElement>(ISLAND_SELECTOR).forEach((el) => {
+        if (hasIslandAncestorWithin(el, root)) return;
+        hydrateIsland(el);
+    });
+}
+
 export type HydrationErrorHandler = (error: Error, context: { islandName: string; element: HTMLElement }) => void;
 
 let globalErrorHandler: HydrationErrorHandler | null = null;
@@ -225,6 +262,13 @@ async function executeHydration(container: HTMLElement, name: string): Promise<v
         ctx.t = localeHelpers.t;
         ctx.dictionary = localeHelpers.dictionary;
 
+        // Snapshot direct nested islands (ROADMAP.v5.md Part D) BEFORE mount runs, so their survival
+        // can be checked afterward - mount() may destructively replace this container's subtree (a
+        // vanilla innerHTML rewrite, or a framework adapter's replace-mode render/mount) before a
+        // nested island ever gets a chance to hydrate against its original DOM node.
+        const nestedBeforeMount = Array.from(container.querySelectorAll<HTMLElement>(ISLAND_SELECTOR))
+            .filter((el) => !hasIslandAncestorWithin(el, container));
+
         // 6. Mount island with context and register unmount hook
         const mountResult = await mount(container, props, ctx);
         const { unmount, update } = normalizeMountResult(mountResult);
@@ -303,6 +347,41 @@ async function executeHydration(container: HTMLElement, name: string): Promise<v
                 durationMs
             }
         }));
+
+        // 9. Nested islands (ROADMAP.v5.md Part D): a nested island still hydrates concurrently with
+        // its parent, exactly as it always has (an earlier version of this fix deferred nested
+        // hydration until the parent settled, but that broke real, currently-working components like
+        // FloatLabelIsland, which synchronously reads a nested island's already-rendered DOM - e.g. the
+        // <input> a nested input-text island produces - during its OWN mount to wire ARIA attributes;
+        // deferring starved that read of anything to find). What this adds instead is detection: wait
+        // one paint cycle for any adapter whose mount doesn't commit DOM synchronously (React's
+        // createRoot().render(), called here outside a native browser event, schedules its commit at
+        // DefaultLane priority via a MessageChannel macrotask - a bare microtask would not wait long
+        // enough, but requestAnimationFrame reliably runs after at least one full macrotask turn;
+        // react.ts also wraps its own initial render in flushSync so this isn't the only thing this
+        // relies on, but it's cheap, harmless for every already-synchronous adapter, and correct
+        // defense-in-depth for any future adapter with similar scheduling), then check whether each
+        // nested island that existed before mount is still connected to the document. A silently
+        // destroyed nested island (a parent's own innerHTML rewrite, or a framework's replace-mode
+        // mount, wiping it out) now gets a loud, actionable warning instead of just vanishing.
+        await new Promise<void>((resolve) => {
+            if (typeof requestAnimationFrame === 'function') {
+                requestAnimationFrame(() => resolve());
+            } else {
+                resolve();
+            }
+        });
+
+        for (const nestedEl of nestedBeforeMount) {
+            if (!nestedEl.isConnected) {
+                const lostName = nestedEl.getAttribute('data-island') || nestedEl.getAttribute('name') || '(unnamed)';
+                console.warn(`[LaughTale] Nested island '${lostName}' inside '${name}' was destroyed when '${name}' mounted. '${name}' must explicitly preserve or re-render nested island content (e.g. via a content slot) for it to work.`);
+            }
+        }
+        // Also hydrate any nested island NOT present before mount - e.g. markup the parent's own
+        // render just introduced - which the page's original top-level scan could never have reached.
+        // Idempotent (hydrateIsland no-ops on anything not still idle), so this is purely additive.
+        hydrateTopLevelIslandsWithin(container);
     } catch (error: any) {
         (container as any)[HYDRATION_STATE_KEY] = 'failed';
 
@@ -403,6 +482,29 @@ function hydrateMedia(container: HTMLElement, name: string, query: string | null
 export function teardownIsland(container: HTMLElement): void {
     const CustomEventCtor = (container.ownerDocument?.defaultView as any)?.CustomEvent
         || (typeof CustomEvent !== 'undefined' ? CustomEvent : Event);
+
+    // laughtale:unmount is intentionally non-bubbling (see the dispatch below), so a nested island's
+    // own cleanup listener - registered on its own container, not this one - never fires when only its
+    // ancestor is torn down (retryIsland, or rehydrateIsland during refresh) without this cascade.
+    // Mirrors router.ts's full-page-navigation teardown: children before parents, dispatched
+    // individually since nothing bubbles. Re-querying at teardown time rather than tracking hydrated
+    // descendants separately keeps this self-healing across refreshes with no bookkeeping to maintain;
+    // dispatching to an idle/never-hydrated descendant is already a safe no-op since nothing has
+    // registered a listener on it yet (ROADMAP.v5.md Part D).
+    const getDepth = (el: HTMLElement): number => {
+        let depth = 0;
+        let curr: HTMLElement | null = el;
+        while (curr) {
+            depth++;
+            curr = curr.parentElement;
+        }
+        return depth;
+    };
+
+    const nested = Array.from(container.querySelectorAll<HTMLElement>(ISLAND_SELECTOR));
+    nested.sort((a, b) => getDepth(b) - getDepth(a));
+    nested.forEach((el) => el.dispatchEvent(new CustomEventCtor('laughtale:unmount', { bubbles: false })));
+
     container.dispatchEvent(new CustomEventCtor('laughtale:unmount', { bubbles: false }));
 }
 
@@ -419,6 +521,12 @@ export async function rehydrateIsland(container: HTMLElement): Promise<void> {
 
 export function initIslands(root: ParentNode = document): void {
     initDesignTokens();
-    const islands = root.querySelectorAll<HTMLElement>('[data-island], island, [hydrate], [data-hydrate]');
-    islands.forEach(hydrateIsland);
+    // Deliberately NOT filtered to exclude nested islands (an earlier version of this fix did, and a
+    // real regression was found live: components like FloatLabelIsland synchronously read a nested
+    // island's rendered DOM (querySelector for the actual <input> it wraps) during their OWN mount, to
+    // wire ARIA attributes - deferring nested hydration until the parent settles starves that read of
+    // anything to find. Nested islands hydrate concurrently, exactly as before this pass; see
+    // executeHydration below for what this pass actually adds instead: detecting and warning about
+    // nested islands that get destroyed, not gating when they start.
+    root.querySelectorAll<HTMLElement>(ISLAND_SELECTOR).forEach(hydrateIsland);
 }

@@ -6,9 +6,7 @@
  */
 
 import type { HydrationState } from '../runtime/hydrator';
-import { getIslandState } from '../runtime/hydrator';
-
-const ISLAND_SELECTOR = '[data-island], island, [hydrate], [data-hydrate]';
+import { getIslandState, ISLAND_SELECTOR } from '../runtime/hydrator';
 
 export interface TrackedIslandWarnings {
     name?: string;

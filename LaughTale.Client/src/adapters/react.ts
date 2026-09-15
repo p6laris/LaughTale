@@ -31,19 +31,37 @@ export function createReactIsland<TProps = any>(
             // was the first thing in this repo's history to actually load it in a live browser.
             const React: any = await import('react');
             const ReactDOMClient: any = await import('react-dom/client');
-            
+            // flushSync is exported from 'react-dom' proper, not 'react-dom/client' (confirmed
+            // directly against the installed package - react-dom-client.development.js does not
+            // export it, react-dom.development.js does).
+            const ReactDOM: any = await import('react-dom');
+
             const createElement = React.createElement || React.default?.createElement;
             const createRoot = ReactDOMClient.createRoot || ReactDOMClient.default?.createRoot;
             const hydrateRoot = ReactDOMClient.hydrateRoot || ReactDOMClient.default?.hydrateRoot;
+            const flushSync = ReactDOM.flushSync || ReactDOM.default?.flushSync;
 
             if (createRoot && createElement) {
                 let root: any;
-                
+
                 if (options.hydrate && hydrateRoot && container.hasChildNodes()) {
                     root = hydrateRoot(container, createElement(Component, props as any));
                 } else {
                     root = createRoot(container);
-                    root.render(createElement(Component, props as any));
+                    // Wrapped in flushSync (ROADMAP.v5.md Part D, nested islands): outside a native
+                    // browser event, an initial createRoot().render() schedules its commit at
+                    // DefaultLane priority via a MessageChannel macrotask rather than committing
+                    // inline - hydrator.ts's executeHydration relies on this container's DOM mutation
+                    // being observably complete once mount() resolves (so it can tell whether any
+                    // nested island survived), which a deferred commit would silently defeat. Only the
+                    // initial render needs this - the update() re-render below is used by refresh.ts,
+                    // which has no such synchronous-commit requirement.
+                    const doRender = () => root.render(createElement(Component, props as any));
+                    if (typeof flushSync === 'function') {
+                        flushSync(doRender);
+                    } else {
+                        doRender();
+                    }
                 }
 
                 const unmount = () => {
