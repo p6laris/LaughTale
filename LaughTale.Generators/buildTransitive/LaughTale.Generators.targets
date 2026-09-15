@@ -1,0 +1,105 @@
+<Project>
+
+  <!--
+    LaughTale.Generators — buildTransitive targets.
+
+    ROADMAP.v5.md Part B (island discovery & compilation) - see LaughTale.Generators.props
+    (imported earlier) for the property defaults referenced here, and IslandGenerator.Manifest.cs
+    for how the generated manifest is consumed once it's registered as an AdditionalFiles item.
+
+    DEVIATION FROM THE APPROVED PLAN, documented per its own instructions to verify empirically
+    rather than trust blindly: the plan describes a single BeforeTargets="CoreCompile" target that
+    both runs the Node build AND adds the resulting manifest as <AdditionalFiles>, using
+    <Target Inputs="..." Outputs="..."> for incremental skip. Verified directly while building
+    this (two-build test against a real throwaway consumer - see the task's own verification
+    notes): a <Target> with Inputs/Outputs that is up to date skips its ENTIRE body when the
+    engine decides to skip it - not just the "expensive" <Exec/>, but any <ItemGroup> item
+    additions inside it too. A single target would therefore stop re-registering the manifest as
+    an AdditionalFiles item the moment Islands/**/*.tsx stopped changing, even on a later build
+    where CoreCompile legitimately reruns for an unrelated C# edit - silently hiding the generated
+    TagHelpers from that build's compilation. Splitting the cheap, must-always-run item
+    registration into its own target (no Inputs/Outputs, so it never gets skipped) avoids that
+    trap while still giving the Node invocation itself real MSBuild-level incremental skip, which
+    is the plan's actual functional intent.
+  -->
+
+  <!--
+    Evaluated once, at project-evaluation time (needed as a plain, non-batched item list for the
+    Inputs attribute below) - a glob against a non-existent LaughTaleIslandsDir simply yields zero
+    items, so this stays cheap for consumers with no Islands/ folder at all.
+  -->
+  <ItemGroup Condition="Exists('$(LaughTaleIslandsDir)')">
+    <LaughTaleIslandsSourceFiles Include="$(LaughTaleIslandsDir)\**\*.ts;$(LaughTaleIslandsDir)\**\*.tsx" />
+  </ItemGroup>
+
+  <!--
+    Runs the Node discovery+bundling pipeline (LaughTale.Client's "laughtale islands build") and
+    writes islands.manifest.g.json + the bundled JS chunks. Real MSBuild-level incremental skip
+    via Inputs/Outputs: a build where no island source changed since the manifest was last written
+    skips the <Exec/> below entirely.
+
+    Condition="'$(DesignTimeBuild)' != 'true'" matches the existing, proven BuildIslandsJs target
+    in LaughTale.Showcase.csproj - IDE background/design-time compiles must not shell out to Node
+    on every keystroke. Condition="Exists('$(LaughTaleIslandsDir)')" means a project with no
+    Islands/ folder pays zero cost (the target's Condition short-circuits before Inputs/Outputs
+    are even evaluated).
+  -->
+  <Target Name="LaughTaleIslandsCompile"
+          BeforeTargets="CoreCompile"
+          Condition="'$(DesignTimeBuild)' != 'true' AND Exists('$(LaughTaleIslandsDir)')"
+          Inputs="@(LaughTaleIslandsSourceFiles);$(MSBuildThisFileFullPath)"
+          Outputs="$(LaughTaleIslandsOutDir)\islands.manifest.g.json">
+
+    <!--
+      Preflight: turn a missing/broken Node install into one clear, actionable <Error> instead of
+      an opaque "exited with code 9009" (Windows "command not found") from the npx <Exec> below.
+      IgnoreExitCode="true" + reading ExitCode ourselves is what lets this Exec fail silently so
+      the <Error> task below can raise a friendlier message instead.
+    -->
+    <Exec Command="node --version"
+          WorkingDirectory="$(MSBuildProjectDirectory)"
+          IgnoreExitCode="true"
+          StandardOutputImportance="low"
+          StandardErrorImportance="low">
+      <Output TaskParameter="ExitCode" PropertyName="_LaughTaleNodeVersionExitCode" />
+    </Exec>
+
+    <Error Condition="'$(_LaughTaleNodeVersionExitCode)' != '0'"
+           Text="LaughTale: Node.js is required to build islands under '$(LaughTaleIslandsDir)' but 'node --version' failed (exit code $(_LaughTaleNodeVersionExitCode)). Install Node.js (https://nodejs.org/) and ensure 'node' is on PATH, or remove/rename the Islands folder if this project doesn't author custom islands." />
+
+    <!--
+      The npx "no-install" flag below makes this fail clearly if the "laughtale" package isn't
+      actually resolvable in this project's own node_modules, rather than npx silently
+      fetching/installing a copy on the fly.
+
+      TrimEnd('\') on both path properties defends the same trailing-backslash-before-closing-
+      quote hazard explained in LaughTale.Generators.props against a caller overriding either
+      property to a value that itself ends in "\" (the shipped defaults no longer do, but this
+      Exec would silently corrupt its own argument list again if an override did).
+    -->
+    <Exec Command="npx --no-install laughtale islands build --islands-dir &quot;$(LaughTaleIslandsDir.TrimEnd('\'))&quot; --project-root &quot;$(MSBuildProjectDirectory)&quot; --out-dir &quot;$(LaughTaleIslandsOutDir.TrimEnd('\'))&quot; --mode $(LaughTaleIslandsMode)"
+          WorkingDirectory="$(MSBuildProjectDirectory)" />
+  </Target>
+
+  <!--
+    Registers the manifest (produced just now, or already on disk from an earlier build that
+    LaughTaleIslandsCompile above skipped) as an AdditionalFiles item. Deliberately its OWN
+    target with no Inputs/Outputs - see the DEVIATION note above - so it runs, and re-adds the
+    item, on every build that reaches CoreCompile regardless of whether the Node step actually
+    ran this time. DependsOnTargets guarantees LaughTaleIslandsCompile has already had the chance
+    to (re)create the file before this Condition is evaluated.
+
+    Not guarded by DesignTimeBuild on purpose: registering an already-on-disk file as
+    AdditionalFiles is cheap (no process spawn), and doing it during design-time builds too means
+    IDE IntelliSense can see the generated TagHelpers without waiting for the next real build.
+  -->
+  <Target Name="LaughTaleIslandsAddAdditionalFiles"
+          BeforeTargets="CoreCompile"
+          DependsOnTargets="LaughTaleIslandsCompile"
+          Condition="Exists('$(LaughTaleIslandsOutDir)\islands.manifest.g.json')">
+    <ItemGroup>
+      <AdditionalFiles Include="$(LaughTaleIslandsOutDir)\islands.manifest.g.json" />
+    </ItemGroup>
+  </Target>
+
+</Project>

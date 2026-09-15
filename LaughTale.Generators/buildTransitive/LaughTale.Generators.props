@@ -1,0 +1,53 @@
+<Project>
+
+  <!--
+    LaughTale.Generators — buildTransitive props.
+
+    Auto-imported by NuGet for any project that takes a PackageReference on LaughTale.Generators
+    (NuGet's buildTransitive convention: <PackageId>.props/.targets under buildTransitive\ are
+    imported automatically for the referencing project AND anything that references it
+    transitively — no manual <Import> needed). The one exception in this repo is
+    LaughTale.Showcase.csproj: it consumes LaughTale.Generators via ProjectReference, which
+    NuGet's auto-import mechanism does not cover, so it imports these same two files explicitly
+    (see the <Import> pair near the top/bottom of that .csproj). One physical copy of this logic,
+    imported two different ways depending on how the consumer references LaughTale.Generators.
+
+    ROADMAP.v5.md Part B (island discovery & compilation). See LaughTale.Generators.targets
+    (imported late, alongside the rest of a package's *.targets) for the actual build logic, and
+    IslandGenerator.Manifest.cs for the generator-side consumption of the manifest this produces.
+
+    Property defaults only, each guarded so a value the consuming project already set (its own
+    .csproj, Directory.Build.props, etc. - all of which are evaluated before a NuGet package's own
+    .props is auto-imported) always wins; this file only fills gaps.
+  -->
+
+  <PropertyGroup>
+    <!--
+      Where a consuming project authors its own islands. This is intentionally expected to be a
+      direct child directory of the project root named "Islands" - LaughTale.Client's bundle.mjs
+      resolves each manifest island's "sourcePath" via path.resolve(projectRoot, sourcePath), and
+      discover.mjs writes sourcePath as "<basename of LaughTaleIslandsDir>/<relative path>". The
+      two only agree when LaughTaleIslandsDir's parent directory is the same path passed below as
+      the CLI's project-root argument. Overriding this property to a folder that isn't a direct
+      child of the project root (or isn't named to match) will break that convention on the JS side.
+    -->
+    <LaughTaleIslandsDir Condition="'$(LaughTaleIslandsDir)' == ''">$(MSBuildProjectDirectory)\Islands</LaughTaleIslandsDir>
+
+    <!--
+      Intermediate output for the generated manifest + registry - per the manifest schema
+      (ROADMAP.v5.md Part B §1), this is never committed source. Deliberately NO trailing
+      backslash (unlike $(IntermediateOutputPath) itself, which always has one) - verified
+      directly that a quoted MSBuild <Exec> argument ending in a backslash right before the
+      closing quote (e.g. "...LaughTaleIslands\") is misparsed by Windows argv escaping rules:
+      the backslash escapes the quote instead of the string closing, silently gluing the REST of
+      the command line onto this one argument. LaughTale.Generators.targets adds its own "\"
+      wherever it joins this property with a filename.
+    -->
+    <LaughTaleIslandsOutDir Condition="'$(LaughTaleIslandsOutDir)' == ''">$(IntermediateOutputPath)LaughTaleIslands</LaughTaleIslandsOutDir>
+
+    <!-- esbuild mode for the islands bundle: minified/no-sourcemap in Release, dev otherwise. -->
+    <LaughTaleIslandsMode Condition="'$(LaughTaleIslandsMode)' == '' AND '$(Configuration)' == 'Release'">production</LaughTaleIslandsMode>
+    <LaughTaleIslandsMode Condition="'$(LaughTaleIslandsMode)' == ''">development</LaughTaleIslandsMode>
+  </PropertyGroup>
+
+</Project>

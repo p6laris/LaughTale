@@ -10,13 +10,61 @@
     <AssemblyName>LaughTale.Generators</AssemblyName>
     <RootNamespace>LaughTale.Generators</RootNamespace>
     <Description>Roslyn source generators for LaughTale Islands Architecture</Description>
-    <NoWarn>$(NoWarn);RS2008</NoWarn>
+    <!-- NU5128 ("add lib or ref assemblies for netstandard2.0") is expected and harmless for an
+         analyzer-only package that deliberately has no lib/ folder (IncludeBuildOutput=false
+         below) - the same suppression widely used by other real-world Roslyn analyzer packages
+         for this exact, otherwise-unavoidable shape of warning. -->
+    <NoWarn>$(NoWarn);RS2008;NU5128</NoWarn>
+    <!-- Pre-existing packaging gap found while empirically verifying this package's real NuGet
+         PackageReference path for ROADMAP.v5.md Part B (also independently flagged, unfixed, in
+         ROADMAP.v3.md's own backlog: "Ensure the Generators package ships as an analyzer
+         (analyzers/dotnet/cs)"). Without IncludeBuildOutput=false, the SDK's default packing
+         behavior puts this project's own DLL under lib/netstandard2.0/ - an ordinary compile-time
+         reference assembly - and the explicit analyzers/dotnet/cs None item below is ADDITIONAL to
+         that, not a replacement, so both would ship. Verified directly: packed the project as it
+         stood before this fix, unzipped the .nupkg, and found LaughTale.Generators.dll only under
+         lib/netstandard2.0/ with no analyzers/ folder at all - meaning a real PackageReference
+         consumer would never have loaded this assembly as a Roslyn generator, regardless of how
+         correct the buildTransitive MSBuild wiring is. Every existing in-repo consumer
+         (LaughTale.Components/.Showcase/.Docs) is unaffected by this bug because all of them use
+         ProjectReference ... OutputItemType="Analyzer" - a different, NuGet-independent mechanism
+         for marking a referenced assembly as an analyzer - so this never surfaced before now. -->
+    <IncludeBuildOutput>false</IncludeBuildOutput>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.12.0" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" PrivateAssets="all" />
     <PackageReference Include="System.Text.Json" Version="10.0.12" PrivateAssets="all" />
+  </ItemGroup>
+
+  <!-- The actual analyzer DLL, placed where a Roslyn-aware NuGet client (and modern MSBuild/NuGet
+       restore for a PackageReference consumer) looks for a C#-applicable analyzer/generator
+       assembly. Paired with IncludeBuildOutput=false above so this is the ONLY place the DLL is
+       packed - it must not also land in lib/, which would hand consumers a normal compile-time
+       reference to an assembly that depends on Microsoft.CodeAnalysis.CSharp/System.Text.Json
+       (PrivateAssets="all" above, so NOT shipped as consumer-visible package dependencies). -->
+  <ItemGroup>
+    <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <!-- Without also placing the .pdb somewhere in the package, the separate .snupkg symbols
+         package (Directory.Build.props: IncludeSymbols=true, SymbolPackageFormat=snupkg) ends up
+         with zero content once IncludeBuildOutput=false stops the SDK's own default lib/ placement
+         from carrying it - verified directly: omitting this line reproduces NuGet.Build.Tasks.Pack
+         error NU5017 ("Cannot create a package that has no dependencies nor content") on the
+         .snupkg. Mirrors the .dll's own analyzers/dotnet/cs path so the two stay correlated. -->
+    <None Include="$(OutputPath)\$(AssemblyName).pdb" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" Condition="Exists('$(OutputPath)\$(AssemblyName).pdb')" />
+  </ItemGroup>
+
+  <!-- ROADMAP.v5.md Part B — packs the MSBuild wiring that runs "laughtale islands build" and
+       registers its output manifest as an AdditionalFiles item. Packed under buildTransitive\ (not
+       build\) so NuGet auto-imports it for every consumer that references this package, including
+       transitively through another package - not just direct references. See
+       buildTransitive\LaughTale.Generators.targets for the actual target and why it's split into
+       two, and LaughTale.Showcase.csproj for the explicit <Import> workaround needed by
+       ProjectReference-based consumers, which NuGet's auto-import does not cover. -->
+  <ItemGroup>
+    <None Include="buildTransitive\LaughTale.Generators.props" Pack="true" PackagePath="buildTransitive\" />
+    <None Include="buildTransitive\LaughTale.Generators.targets" Pack="true" PackagePath="buildTransitive\" />
   </ItemGroup>
 
 </Project>
