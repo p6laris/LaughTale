@@ -3,6 +3,7 @@
  */
 
 import { defineIsland, initIslands, initDirectives, enableViewTransitions, hydrateIsland, teardownIsland, rehydrateIsland, refreshIsland } from '../../LaughTale.Client/src/index';
+import { isDevMode } from '../../LaughTale.Client/src/runtime/error-boundary';
 
 // Expose runtime API on window for showcase demos, diagnostics, and E2E testing
 (window as any).LaughTale = {
@@ -36,6 +37,11 @@ function initialize() {
     initIslands();
     initDirectives();
     enableViewTransitions();
+
+    // ROADMAP.v5.md DevTools overlay: dynamically imported so production bundles never fetch it.
+    if (isDevMode()) {
+        import('../../LaughTale.Client/src/devtools/overlay').then((m) => m.initDevTools());
+    }
 }
 
 // 3. Initialize hydration engine, directives and View Transitions

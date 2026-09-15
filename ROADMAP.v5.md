@@ -798,9 +798,34 @@ freeze into a package boundary.
 
 **DX items:**
 
-- **DevTools overlay** *(Nuxt DevTools, Astro toolbar · M · 3 wks)* — every island outlined with
-  strategy, hydration state, mount timing, props size, chunk weight. You already track
-  `'idle' | 'pending' | 'mounted' | 'failed'` and have `IslandDiagnostics`. Largely surfacing state you hold.
+- **DevTools overlay — [CLOSED, this pass]** In-page floating panel (Nuxt DevTools / Astro toolbar
+  model — explicitly not a Vue-DevTools-style browser extension) consuming the `laughtale:diagnostic`
+  event this same roadmap section built as its own extension point. One correction along the way: "you
+  already... have `IslandDiagnostics`" doesn't hold up as stated — `IslandDiagnostics` is real, but it's
+  a server-side dev-only TagHelper-output validator (`data-laughtale-warning-*` attributes), not a
+  client state tracker; there was no such tracker until this pass built `LaughTale.Client/src/devtools/state.ts`.
+  Shows every island's strategy, live hydration state, mount duration, and props size (labeled honestly
+  as raw JSON length, not a byte size), a Retry button on failed islands wired directly to the existing
+  `retryIsland()`, and an outline-with-live-label mode for every island on the page. **Chunk weight
+  explicitly deferred** — no runtime-reachable island→chunk mapping exists yet (the manifest that would
+  supply it is a build-time artifact never served to the client), and the framework's default bundle
+  mode is a single IIFE anyway, where "chunk weight" isn't a coherent per-island concept.
+  Dev/Production gating threads through a new `<laughtale-devtools />` TagHelper mirroring
+  `IslandDiagnostics`'s own zero-DI `LaughTaleEnvironment.IsDevelopment` idiom rather than inventing new
+  options plumbing — deliberately not extending `ThemeStudioOptions`, confirmed during this pass to be a
+  fully dead stub referenced nowhere in the codebase. Loaded via dynamic `import()` so production
+  bundles never fetch it. **Two real bugs found via live-browser verification, not caught by unit
+  tests**: (1) the TagHelper initially rendered `<script />` (self-closing, content silently discarded)
+  because `TagHelperOutput` inherits `TagMode.SelfClosing` from the `<laughtale-devtools />` source
+  syntax and setting `.Content` alone doesn't change that — a plain `output.Content` assertion in xUnit
+  never exercises real HTML serialization, so this needed an explicit `TagMode` assertion in the test to
+  actually catch it. (2) The outline labels were positioned via `getBoundingClientRect() + window.scroll`
+  and repositioned on scroll/resize events — visibly laggy, because this app's layout scrolls an inner
+  content pane, not the window, and per-event recompute during a fast scroll gesture is exactly the
+  "layout thrashing" pattern that causes visible jank. Fixed by switching the label to `position: fixed`
+  (already viewport-relative, matching `getBoundingClientRect()` directly with no scroll-offset math
+  needed) tracked by a `requestAnimationFrame` loop instead of scroll/resize listeners — simpler, and
+  correct for any scroll source uniformly, not just window-level scroll.
 - **Dev error overlay** *(S · 1 wk)* — island name, props that failed to revive, stack.
 - **HMR for islands** *(S–M · 2 wks)* — nearly free once the Part B manifest exists.
 - **Layers / theme inheritance** *(Nuxt layers · M · 3 wks)* — how an agency ships one house theme

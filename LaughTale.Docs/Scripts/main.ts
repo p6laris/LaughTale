@@ -3,6 +3,7 @@
  */
 
 import { defineIsland, initIslands, initDirectives, enableViewTransitions } from '../../LaughTale.Client/src/index';
+import { isDevMode } from '../../LaughTale.Client/src/runtime/error-boundary';
 
 // 1. Register Core Docs Islands
 defineIsland('interactive-counter', () => import('./islands/counter'));
@@ -217,6 +218,11 @@ function initialize() {
     initDirectives();
     enableViewTransitions();
     setupDocsEnhancements();
+
+    // ROADMAP.v5.md DevTools overlay: dynamically imported so production bundles never fetch it.
+    if (isDevMode()) {
+        import('../../LaughTale.Client/src/devtools/overlay').then((m) => m.initDevTools());
+    }
 }
 
 if (document.readyState === 'loading') {
