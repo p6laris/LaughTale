@@ -1,0 +1,11 @@
+@model LaughTale.Showcase.Pages.ServerActionsModel
+
+<div id="counter-panel" style="display: flex; align-items: center; gap: 1.25rem; padding: 1.5rem; border: 1px solid var(--p-border-color); border-radius: 1rem; background: var(--p-surface-0);">
+    <div>
+        <div style="font-size: 0.75rem; color: var(--p-text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Server-side count</div>
+        <div style="font-size: 2.5rem; font-weight: 800; color: var(--p-text-color); font-family: var(--p-font-mono, monospace);">@ServerActionsModel.Count</div>
+    </div>
+    <island-form action="Increment" target="#counter-panel">
+        <button type="submit" class="p-button p-button-primary" data-lt-submitting-label="Incrementing…">Increment</button>
+    </island-form>
+</div>

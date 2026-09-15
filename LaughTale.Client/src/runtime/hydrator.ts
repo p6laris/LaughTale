@@ -279,6 +279,30 @@ async function executeHydration(container: HTMLElement, name: string): Promise<v
             composed: true,
             detail: { name, strategy: container.getAttribute('data-hydrate') }
         }));
+
+        // 8. Dispatch structured diagnostics event (ROADMAP.v5.md Part G/L) — the "smallest real
+        // v1" of a diagnostics extension point: no panel registry, just one event a future
+        // DevTools overlay (or any other listener) can consume with zero new API surface. Reuses
+        // the perf mark/measure this function already computes above rather than taking a second
+        // timing measurement.
+        let durationMs: number | undefined;
+        if (typeof performance !== 'undefined' && typeof performance.getEntriesByName === 'function') {
+            try {
+                const entries = performance.getEntriesByName(measureName);
+                durationMs = entries.length > 0 ? entries[entries.length - 1].duration : undefined;
+            } catch {}
+        }
+        container.dispatchEvent(new CustomEvent('laughtale:diagnostic', {
+            bubbles: true,
+            composed: true,
+            detail: {
+                name,
+                strategy: container.getAttribute('data-hydrate'),
+                framework: container.getAttribute('data-framework') ?? undefined,
+                propsSize: rawProps?.length ?? 0,
+                durationMs
+            }
+        }));
     } catch (error: any) {
         (container as any)[HYDRATION_STATE_KEY] = 'failed';
 

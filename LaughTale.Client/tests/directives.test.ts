@@ -151,4 +151,50 @@ describe('LaughTale Declarative Directives Suite', () => {
 
         assert.strictEqual(input.value, '(555) 123-4567');
     });
+
+    it('calling initDirectives() twice binds l-post twice - the underlying property that made this module\'s former auto-run-on-import side effect dangerous (ROADMAP.v5.md Part G/L)', async () => {
+        // This file's own former "Auto-run on DOM ready" block (removed - see the comment left in
+        // its place in src/directives/index.ts) called initDirectives() automatically whenever this
+        // module was imported, IN ADDITION TO every consuming app's own explicit call - found via a
+        // real live-browser test of a real <island-form> Server Action, where a single genuine form
+        // submit fired two independent fetch() calls. A Node/happy-dom test can't faithfully
+        // reproduce THAT exact failure mode (document.readyState/DOMContentLoaded timing here
+        // doesn't match a real browser closely enough - which is exactly why nothing in this test
+        // suite caught the real bug). What IS provable here, and is the actual reason the fix
+        // matters: initDirectives() has no idempotency guard at all, so ANY duplicate call -
+        // whether from a redundant auto-run or a caller invoking it twice by accident - double-binds
+        // every directive it finds. Removing the redundant automatic call was correct specifically
+        // because it eliminates the one duplicate call every real consumer was unknowingly making.
+        // A plain button (not a <form>) deliberately - htmx.ts's FORM-specific branch builds a
+        // FormData from the element, and happy-dom's FormData/HTMLFormElement interop doesn't
+        // support that construction in this test environment (a real, separate environment
+        // limitation, not a product bug - confirmed by the identical construction working fine in
+        // the real live-browser verification of the actual Server Actions feature). A button falls
+        // through to the (identical, unaffected-by-that-limitation) default 'click'-triggered path,
+        // which is all that's needed to prove the double-binding property under test here.
+        document.body.innerHTML = `
+            <button id="action-btn" l-post="/api/test" l-target="#action-btn" l-swap="none">Go</button>
+        `;
+
+        let fetchCallCount = 0;
+        const originalFetch = globalThis.fetch;
+        (globalThis as any).fetch = async () => {
+            fetchCallCount++;
+            return { text: async () => '' } as Response;
+        };
+
+        try {
+            const button = document.getElementById('action-btn') as HTMLButtonElement;
+
+            initDirectives(document.body);
+            initDirectives(document.body); // the exact shape of the bug: a second, redundant call
+
+            button.click();
+            await new Promise(r => setTimeout(r, 10));
+
+            assert.strictEqual(fetchCallCount, 2, 'two initDirectives() calls must produce two bound click listeners - proving why the redundant automatic call had to go, not just the explicit one apps already made correctly');
+        } finally {
+            globalThis.fetch = originalFetch;
+        }
+    });
 });

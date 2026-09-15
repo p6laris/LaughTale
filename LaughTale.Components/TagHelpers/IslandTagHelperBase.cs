@@ -195,6 +195,37 @@ public abstract class IslandTagHelperBase : TagHelper
         }
 
         var props = BuildProps();
+
+        // ROADMAP.v5.md Part G/L: OnIslandRendering plugin hook. Splicing it in here, in the shared
+        // base class, means every IslandTagHelperBase subclass reaches it for free - zero generator
+        // changes. Resolved via RequestServices (matching this class's existing service-location
+        // pattern above) rather than constructor injection. When zero plugins are registered (the
+        // overwhelming common case), GetService<IEnumerable<LaughTalePlugin>>() resolves an empty
+        // sequence and the block below is a no-op - no rendering-context allocation, no behavior change.
+        var plugins = requestServices.GetService<System.Collections.Generic.IEnumerable<LaughTale.Core.Plugins.LaughTalePlugin>>();
+        if (plugins != null)
+        {
+            using var pluginEnumerator = plugins.GetEnumerator();
+            if (pluginEnumerator.MoveNext())
+            {
+                var renderingContext = new LaughTale.Core.Plugins.IslandRenderingContext
+                {
+                    IslandName = IslandName,
+                    HttpContext = httpContext,
+                    Output = output,
+                    Props = props
+                };
+
+                do
+                {
+                    await pluginEnumerator.Current.OnIslandRenderingAsync(renderingContext);
+                }
+                while (pluginEnumerator.MoveNext());
+
+                props = renderingContext.Props;
+            }
+        }
+
         if (props != null)
         {
             // NOTE (ROADMAP.v5.md Part J): a combined-resolver call (IslandJson.SerializeProps(props,

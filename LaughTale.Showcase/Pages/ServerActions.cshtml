@@ -1,0 +1,56 @@
+@page "/ServerActions"
+@model LaughTale.Showcase.Pages.ServerActionsModel
+@{
+    ViewData["Title"] = "Server Actions";
+}
+
+<div class="app-container" style="max-width: 1100px; display: flex; flex-direction: column; gap: 2rem; padding-bottom: 3rem;">
+
+    <!-- Header Banner -->
+    <div style="background: linear-gradient(135deg, var(--p-surface-0) 0%, var(--p-surface-50) 100%); border: 1px solid var(--p-border-color); border-radius: 1.25rem; padding: 2.5rem 2rem; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04);">
+        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+            <div style="width: 2.5rem; height: 2.5rem; border-radius: 10px; background: linear-gradient(135deg, var(--p-primary-500), var(--p-primary-700)); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800;">
+                &#9889;
+            </div>
+            <div>
+                <h1 style="font-size: 1.875rem; font-weight: 800; color: var(--p-text-color); margin: 0;">Server Actions</h1>
+                <p style="color: var(--p-text-muted); font-size: 0.875rem; margin: 0.25rem 0 0;">ROADMAP.v5.md Part G/L: a real <code>&lt;island-form&gt;</code> posting to a plain Razor Pages handler - antiforgery-protected, no client-side state management, no JSON API.</p>
+            </div>
+        </div>
+
+        <div style="margin-top: 1.25rem; padding: 0.75rem 1rem; background: var(--p-emerald-50, rgba(16, 185, 129, 0.1)); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 8px; font-size: 0.8125rem; color: #047857; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+            <span>&#9889; <strong>Pipeline:</strong> <code>&lt;island-form action="Increment"&gt;</code> &rarr; <code>IslandFormTagHelper</code> (antiforgery field + <code>l-post</code>/<code>l-target</code>/<code>l-swap</code>) &rarr; <code>bindServerAction()</code> intercepts submit &rarr; <code>OnPostIncrement</code> &rarr; <code>Partial("_CounterPartial")</code> &rarr; fragment swap, zero page reload.</span>
+            <span class="p-tag p-tag-success" style="font-size: 0.7rem;">New</span>
+        </div>
+    </div>
+
+    <!-- Live Demo -->
+    <div style="background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: 1rem; padding: 1.75rem;">
+        <h2 style="font-size: 1.25rem; font-weight: 800; color: var(--p-text-color); margin: 0 0 0.5rem;">Live Counter</h2>
+        <p style="color: var(--p-text-muted); font-size: 0.8125rem; margin: 0 0 1.5rem;">
+            Clicking Increment submits a real HTML form (via <code>fetch</code>, intercepted client-side) to <code>OnPostIncrement</code>, which increments server-side state and returns just this panel's HTML - the button, page title, and everything else on the page never re-renders.
+        </p>
+
+        <partial name="_CounterPartial" model="Model" />
+    </div>
+
+    <!-- Authoring Contract -->
+    <div style="background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: 1rem; padding: 1.75rem; overflow-x: auto;">
+        <h2 style="font-size: 1.25rem; font-weight: 800; color: var(--p-text-color); margin: 0 0 1rem;">Source: Pages/ServerActions.cshtml.cs</h2>
+        <pre style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: 0.75rem; padding: 1rem 1.25rem; font-size: 0.8125rem; line-height: 1.6; overflow-x: auto; margin: 0;"><code>public class ServerActionsModel : PageModel
+{
+    private static int _count;
+    public static int Count =&gt; _count;
+
+    public IActionResult OnPostIncrement()
+    {
+        Interlocked.Increment(ref _count);
+        return Partial("_CounterPartial", this);
+    }
+}</code></pre>
+        <p style="color: var(--p-text-muted); font-size: 0.75rem; margin: 0.85rem 0 0;">
+            No JSON, no client-side state, no manual fetch/JS wiring: <code>&lt;island-form action="Increment"&gt;</code> renders a real <code>&lt;form method="post"&gt;</code> with a real antiforgery hidden field, and the client-side <code>bindServerAction()</code> engine (already shipped, unrelated to this feature) does the intercept-and-swap.
+        </p>
+    </div>
+
+</div>

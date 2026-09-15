@@ -248,3 +248,37 @@ export function listIslands(): string[] {
 export function clearRegistry(): void {
     registry.clear();
 }
+
+/**
+ * Bridges a framework-authored island component to `defineIsland`, resolving its mount factory
+ * from the named adapter registry (`adapters/registry.ts`'s `getAdapter`) instead of requiring
+ * every call site to import a specific adapter file directly. E.g.:
+ * ```ts
+ * defineFrameworkIsland('user-card', () => import('./UserCard'), 'react');
+ * ```
+ *
+ * Deliberately resolves `getAdapter` via a DYNAMIC import at call time (inside the lazy loader
+ * passed to `defineIsland`, which only ever runs once an island actually hydrates) rather than a
+ * static top-level `import { getAdapter } from '../adapters/registry'`. `adapters/registry.ts`
+ * imports `IslandFactory` — a type — FROM this file, so a static value-level import in the other
+ * direction would make the two modules a real circular pair in the source module graph. A
+ * dynamic import here has no such effect: it is not part of either module's static dependency
+ * list, is only ever evaluated well after both modules have finished initializing, and costs
+ * nothing extra since this loader is already async and already off the critical path (it is the
+ * same lazy-loading boundary `defineIsland` callers already pay for their component chunk).
+ */
+export function defineFrameworkIsland(
+    name: string,
+    loader: () => Promise<{ default: any }>,
+    framework: string
+): void {
+    defineIsland(name, async () => {
+        const mod = await loader();
+        const { getAdapter } = await import('../adapters/registry');
+        const adapter = getAdapter(framework);
+        if (!adapter) {
+            throw new Error(`[LaughTale] No adapter registered for framework "${framework}".`);
+        }
+        return { default: adapter(mod.default) };
+    });
+}

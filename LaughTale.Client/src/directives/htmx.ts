@@ -46,6 +46,11 @@ export function bindServerAction(element: HTMLElement): void {
         if (indicator) indicator.style.display = 'block';
 
         try {
+            // ROADMAP.v5.md Part G/L (Server Actions): marks the closest form as mid-submission so
+            // e.g. CSS/other directives can react (disable inputs, show a spinner). Cleared in the
+            // existing finally block below.
+            element.closest('form')?.setAttribute('data-lt-submitting', 'true');
+
             let requestUrl = url;
             let body: any = null;
             const headers: Record<string, string> = {
@@ -96,14 +101,53 @@ export function bindServerAction(element: HTMLElement): void {
                         break;
                 }
 
-                // Re-initialize directives and islands inside new HTML nodes
-                initDirectives(target);
-                initIslands(target);
+                // Re-initialize directives and islands inside the new HTML nodes.
+                //
+                // BUG THIS FIXES (found via a real live-browser test of a real <island-form> -
+                // Server Actions, ROADMAP.v5.md Part G/L): `target.outerHTML = html` REPLACES
+                // `target` in the DOM with brand-new nodes, but the `target` JS variable keeps
+                // pointing at the OLD, now-detached node - a well-known DOM gotcha; an outerHTML
+                // assignment never repoints the reference that set it. The old code called
+                // `initDirectives(target)` unconditionally, which for 'outerHTML' scanned the
+                // orphaned old subtree - a provably useless no-op - while the actual new
+                // form/button living in the document never got `bindServerAction()`
+                // (re-)attached. Confirmed the hard way: a second submit silently fell through to
+                // an uncaptured native browser form POST (no `?handler=` query string, no
+                // antiforgery interception at all).
+                //
+                // Fix: for 'outerHTML' (target itself was replaced), re-resolve the LIVE
+                // replacement via the same `targetSelector` used to find `target` in the first
+                // place - the swapped-in markup is expected to preserve the same id/selector
+                // (true for every real caller in this codebase today: IslandFormTagHelper always
+                // sets `l-target="#id"` and the server always re-renders that same id). Falls
+                // back to the stale `target` reference (matching the pre-existing, still-broken
+                // behavior) only for the rarer self-targeting case with no explicit `l-target`,
+                // since there is no selector to re-resolve against there - fixing that edge case
+                // is a separate, pre-existing gap, not something this fix attempts.
+                //
+                // For 'beforebegin'/'afterend' (new content inserted as a SIBLING of `target`,
+                // not a descendant), `target` itself is unaffected but does not scope the
+                // newly-inserted content either - re-init from its parent instead so the new
+                // sibling actually gets bound. Same class of bug, fixed the same way for
+                // consistency (no real caller has hit this specific combination yet).
+                //
+                // For 'innerHTML'/'beforeend'/'afterbegin', `target` remains live and now
+                // contains the new content as a descendant - the original `initDirectives(target)`
+                // call was already correct for these modes and is unchanged.
+                let reinitScope: ParentNode = target;
+                if (swapMode === 'outerHTML') {
+                    reinitScope = (targetSelector ? document.querySelector<HTMLElement>(targetSelector) : null) ?? target;
+                } else if (swapMode === 'beforebegin' || swapMode === 'afterend') {
+                    reinitScope = target.parentNode ?? target;
+                }
+                initDirectives(reinitScope);
+                initIslands(reinitScope);
             }
         } catch (err) {
             console.error('[LaughTale] Server fragment request failed:', err);
         } finally {
             if (indicator) indicator.style.display = 'none';
+            element.closest('form')?.removeAttribute('data-lt-submitting');
         }
     };
 

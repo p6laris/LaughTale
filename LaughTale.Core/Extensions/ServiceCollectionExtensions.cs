@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using LaughTale.Core.Configuration;
 using LaughTale.Core.Localization;
+using LaughTale.Core.Plugins;
 
 namespace LaughTale.Core.Extensions;
 
@@ -66,6 +67,25 @@ public static class ServiceCollectionExtensions
         configure?.Invoke(options.Localization);
 
         services.TryAddSingleton<ILaughTaleLocalizer, LaughTaleLocalizer>();
+        return services;
+    }
+
+    /// <summary>
+    /// Registers a LaughTale plugin (ROADMAP.v5.md Part G/L). <see cref="LaughTalePlugin.OnConfigure"/>
+    /// runs eagerly, at this call site, rather than being deferred to service-provider build time -
+    /// that is what makes plugin registration order-independent relative to <see cref="AddLaughTale"/>.
+    /// The plugin is also registered as both its concrete type and <see cref="LaughTalePlugin"/> so
+    /// that <c>IEnumerable&lt;LaughTalePlugin&gt;</c> resolves every registered plugin.
+    /// </summary>
+    public static IServiceCollection AddLaughTalePlugin(this IServiceCollection services, LaughTalePlugin plugin)
+    {
+        ArgumentNullException.ThrowIfNull(plugin);
+
+        var options = services.EnsureLaughTaleOptions();
+        plugin.OnConfigure(options, services); // eager, at the call site - order-independent
+
+        services.AddSingleton(plugin.GetType(), plugin);
+        services.AddSingleton<LaughTalePlugin>(plugin);
         return services;
     }
 

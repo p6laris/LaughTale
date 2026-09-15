@@ -15,10 +15,26 @@ import path from 'node:path';
 import { readManifest, writeManifest, toPosixPath, MANIFEST_FILE_NAME, REGISTRY_FILE_NAME } from './shared.mjs';
 
 /**
- * @param {{ islandsOutDir: string, projectRoot: string, mode: 'development'|'production' }} options
+ * @param {{
+ *   islandsOutDir: string,
+ *   projectRoot: string,
+ *   mode: 'development'|'production',
+ *   plugins?: Array<{
+ *     contributeEntryPoints?: (args: { manifest: object }) => Record<string, string>,
+ *     esbuildPlugin?: import('esbuild').Plugin,
+ *     onBundleComplete?: (args: { manifest: object, metafile: object, outdir: string }) => void | Promise<void>
+ *   }>
+ * }} options
  * @returns {Promise<object>} the final manifest (also written back to disk)
+ *
+ * `plugins` (ROADMAP.v5.md Part G/L build-hook extension point) mirrors esbuild's own plugin
+ * convention: `contributeEntryPoints` adds extra esbuild entry points alongside the registry's
+ * own, `esbuildPlugin` is passed straight through to esbuild's native `plugins` array, and
+ * `onBundleComplete` runs after the final manifest is written. Ships as real but
+ * unvalidated-by-a-real-consumer infrastructure this pass — an empty/omitted `plugins` array is a
+ * complete no-op, matching today's behavior exactly.
  */
-export async function runBundle({ islandsOutDir, projectRoot, mode }) {
+export async function runBundle({ islandsOutDir, projectRoot, mode, plugins = [] }) {
     if (!islandsOutDir || !projectRoot) {
         throw new Error('runBundle requires "islandsOutDir" and "projectRoot".');
     }
@@ -43,21 +59,29 @@ export async function runBundle({ islandsOutDir, projectRoot, mode }) {
 
     const outdir = path.join(resolvedProjectRoot, 'wwwroot/js');
 
+    const extraEntryPoints = Object.assign({}, ...plugins.map((p) => p.contributeEntryPoints?.({ manifest }) ?? {}));
+
     const result = await esbuild.build({
         absWorkingDir: resolvedProjectRoot,
-        entryPoints: { registry: registryPath },
+        entryPoints: { registry: registryPath, ...extraEntryPoints },
         bundle: true,
         splitting: true,
         format: 'esm',
         target: 'es2022',
         jsx: 'automatic',
         jsxImportSource: 'react',
-        entryNames: 'islands/registry', // stable, unhashed — referenced by a hand-written <script src>
+        // "islands/[name]" — stable, unhashed. With only the built-in "registry" entry point
+        // (the common case today) this resolves to the exact same "islands/registry" path a
+        // literal string produced before; written as a template it also now generalizes safely
+        // to any plugin-contributed extra entry points above, which would otherwise collide with
+        // the "registry" entry's own output path under the old hardcoded literal.
+        entryNames: 'islands/[name]',
         chunkNames: 'islands/chunks/[name]-[hash]',
         outdir,
         minify: mode === 'production',
         sourcemap: mode !== 'production',
-        metafile: true
+        metafile: true,
+        plugins: plugins.flatMap((p) => (p.esbuildPlugin ? [p.esbuildPlugin] : []))
     });
 
     const wwwrootDir = path.join(resolvedProjectRoot, 'wwwroot');
@@ -93,6 +117,10 @@ export async function runBundle({ islandsOutDir, projectRoot, mode }) {
     }
 
     writeManifest(manifestPath, manifest);
+
+    for (const plugin of plugins) {
+        await plugin.onBundleComplete?.({ manifest, metafile: result.metafile, outdir });
+    }
 
     return manifest;
 }

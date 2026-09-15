@@ -672,22 +672,77 @@ how much of the enterprise story stops at that one policy string.
 
 ---
 
-## 14. Part G/L — DX & plugin architecture
+## 14. Part G/L — DX & plugin architecture — **[CLOSED (mechanism + 1 of 3 validation plugins), this pass]**
 
 Build the plugin API **before** Parts E and F, so streaming, actions and cache tags are written as
 first-party plugins against your own interface. Nothing proves an extension point like being forced
 to use it.
 
-**Four extension points:**
+**Four extension points — three built, one dropped as not applicable:**
 
-1. **Server lifecycle** — `OnConfigure`, `OnIslandDiscovered`, `OnIslandRendering`, `OnResponseStarting`.
-2. **Client runtime** — register islands, adapters and *directives*; hook mount, unmount, error.
-3. **Build hooks** — transform island source, contribute entry points, emit assets.
-4. **Diagnostics** — contribute panels to the DevTools overlay, the way Astro toolbar apps do.
+1. **Server lifecycle** — `OnConfigure`, `OnIslandRendering`, `OnResponseStarting` shipped as a
+   `LaughTalePlugin` abstract base class (`LaughTale.Core/Plugins/`), mirroring `IslandTagHelperBase`'s
+   own `protected virtual` no-op-default pattern. `OnIslandRendering` splices into
+   `IslandTagHelperBase.ProcessAsync` itself, so all **82 of 82** TagHelpers reach it for free — zero
+   generator changes, the same "fix the base class once" leverage already used for SSR/localization/RTL.
+   `OnConfigure` clones the existing `EnsureLaughTaleOptions()` idempotent-singleton pattern, proven
+   order-independent (registered before *or* after `AddLaughTale()`) by two passing tests.
+   `OnIslandDiscovered` was **dropped** — investigation found no request-time analog exists; discovery
+   only ever happens at C# compile time or Node build time, never per-request, so it was relocated into
+   the build-hook `onIslandDiscovered(island)` callback below instead of kept as a dead server hook.
+2. **Client runtime** — `registerAdapter`/`registerDirective` (new `adapters/registry.ts`,
+   `directives/registry.ts`) clone the `globalThis`-anchored pattern `runtime/registry.ts` already
+   established this session for cross-bundle correctness. Mount/unmount/error hooks needed **no new
+   API** — `hydrator.ts`'s existing `laughtale:hydrated`/`laughtale:hydration-error` CustomEvents already
+   satisfy this with zero code changes.
+3. **Build hooks** — an optional `plugins` array threaded through `discover.mjs`/`bundle.mjs`
+   (`transformSource`, `onIslandDiscovered`, `contributeEntryPoints`, `esbuildPlugin`,
+   `onBundleComplete`), confirmed to need none of Part B's Roslyn-generator-visibility constraints
+   (these scripts never touch a second generator). **Honestly unvalidated by a real consumer this
+   pass** — the one validation plugin built (Server Actions) needs none of it.
+4. **Diagnostics** — no panel registry, no overlay UI (would be exactly the "built, unused" pattern
+   this document spends its first sections complaining about, with zero consumer). Ships as one
+   structured `laughtale:diagnostic` CustomEvent instead, reusing timing data `hydrator.ts` already
+   computes. A future DevTools overlay item stays open below, now with something real to consume.
 
-Ship plugins as **NuGet + npm pairs** with a single install command. **Write the first three yourself**
-— server actions, cache tags, the SSR sidecar. If those can't be built cleanly against the API,
-neither can anyone else's.
+**Validation: Server Actions (Layer 1) — [CLOSED].** A real `<island-form>` TagHelper
+(`LaughTale.Components/TagHelpers/Aura/Forms/IslandFormTagHelper.cs`) posting to a plain Razor Pages
+handler, verified live in a real browser (`LaughTale.Showcase/Pages/ServerActions.cshtml`) — click
+Increment, a real antiforgery-protected POST fires, the server increments state and returns a
+`Partial()` fragment, the DOM swaps with zero page reload. **The most important finding from building
+it: the generic plugin API above is not load-bearing for Server Actions at all.** An already-shipped
+mechanism (`directives/htmx.ts`'s `bindServerAction()`, the `l-get`/`l-post`/`l-put`/`l-delete`
+fragment-action engine) already did the entire intercept-fetch-swap job — exactly the finding "write
+the first three yourself" exists to produce. Cache tags and the SSR sidecar remain open, per the
+original plan's own honest effort estimates (deferred, not attempted this pass).
+
+**Two significant, previously-undiscovered bugs found and fixed while getting Server Actions to a real
+live-browser proof — both pre-existing, unrelated to the plugin API itself, neither ever caught because
+nothing had exercised these paths in a real browser until now:**
+- **A systemic double-initialization bug affecting every directive on every page.**
+  `directives/index.ts` had its own module-load "auto-run" side effect calling `initDirectives()`
+  automatically, *in addition to* every real consuming app (`LaughTale.Showcase`, `LaughTale.Docs`)
+  already calling it explicitly themselves. Confirmed via a real browser: a single genuine form submit
+  fired two independent `fetch()` calls. This means **every directive in this framework** —
+  `l-on:*`, `l-poll`, `l-intersect`, `l-hotkey`, `l-tooltip`, `l-mask`, `l-badge`, `l-teleport`, not
+  just Server Actions — has likely been double-bound on every real page load this entire time. Fixed by
+  removing the redundant auto-run (confirmed safe: both real consuming apps already made their own
+  explicit call). A Node/happy-dom test can't faithfully reproduce the exact browser timing that caused
+  it, but the underlying "no idempotency guard" property is now covered by a real, passing test.
+- **`htmx.ts`'s `outerHTML`/`beforebegin`/`afterend` swap modes never correctly re-bound the swapped-in
+  content.** `target.outerHTML = html` replaces `target` in the DOM, but the `target` JS variable keeps
+  pointing at the old, now-detached node (a well-known DOM gotcha) — the old code re-initialized
+  directives against that orphaned subtree, a proven no-op, while the actual live replacement never got
+  `bindServerAction()` re-attached. Confirmed via a real browser: a second form submission silently fell
+  through to an uncaptured native POST with no antiforgery interception at all. Fixed by re-resolving the
+  live element via the same target selector after these swap modes.
+
+Ship plugins as **NuGet + npm pairs** with a single install command — **deferred**. Everything lands
+directly in `LaughTale.Core`/`LaughTale.Components` this pass (already referenced by every consumer, so
+"single install" is trivially true with nothing new to install); packaging as separately-installable
+pairs is explicitly deferred until a second real plugin (cache tags or the SSR sidecar) is built against
+the same `LaughTalePlugin` shape without needing to change it — proof the interface is stable enough to
+freeze into a package boundary.
 
 **DX items:**
 

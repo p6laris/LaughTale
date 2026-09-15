@@ -289,8 +289,18 @@ function printDiagnostics(sourcePath, diagnostics) {
  * project's root — i.e. `islandsDir === path.join(projectRoot, 'Islands')`.
  * bundle.mjs relies on this same convention when it resolves `sourcePath`
  * back to an absolute path via `path.resolve(projectRoot, sourcePath)`.
+ *
+ * `plugins` (ROADMAP.v5.md Part G/L build-hook extension point) is an optional array of plugin
+ * objects, each of which may implement:
+ *   - `transformSource({ sourceText, filePath, relativePath })` — returns a (possibly unchanged)
+ *     replacement source string, run on each island's source text BEFORE `extractIsland` parses
+ *     it. Called in plugin-array order, threading the output of one plugin into the next.
+ *   - `onIslandDiscovered({ island, sourcePath })` — called once per successfully discovered
+ *     (i.e. non-skipped) island, after it has been pushed into the manifest.
+ * This ships as real but unvalidated-by-a-real-consumer infrastructure this pass (see the plan) —
+ * an empty/omitted `plugins` array is a complete no-op, matching today's behavior exactly.
  */
-export function runDiscover({ islandsDir, outDir }) {
+export function runDiscover({ islandsDir, outDir, plugins = [] }) {
     if (!islandsDir || !outDir) {
         throw new Error('runDiscover requires both "islandsDir" and "outDir".');
     }
@@ -312,7 +322,11 @@ export function runDiscover({ islandsDir, outDir }) {
 
         const buffer = fs.readFileSync(absoluteFilePath);
         const contentHash = `sha256:${crypto.createHash('sha256').update(buffer).digest('hex')}`;
-        const sourceText = buffer.toString('utf8');
+        let sourceText = buffer.toString('utf8');
+
+        for (const plugin of plugins) {
+            sourceText = plugin.transformSource?.({ sourceText, filePath: absoluteFilePath, relativePath }) ?? sourceText;
+        }
 
         const result = extractIsland(sourceText, absoluteFilePath, relativePath);
         printDiagnostics(sourcePath, result.diagnostics);
@@ -324,7 +338,7 @@ export function runDiscover({ islandsDir, outDir }) {
             continue;
         }
 
-        manifestIslands.push({
+        const islandEntry = {
             name: result.name,
             typeName: result.typeName,
             sourcePath,
@@ -333,7 +347,12 @@ export function runDiscover({ islandsDir, outDir }) {
             outputChunk: null,
             props: result.props,
             diagnostics: result.diagnostics
-        });
+        };
+        manifestIslands.push(islandEntry);
+
+        for (const plugin of plugins) {
+            plugin.onIslandDiscovered?.({ island: islandEntry, sourcePath });
+        }
 
         registryLines.push(`defineIsland('${result.name}', () => import('${toPosixPath(absoluteFilePath)}'));`);
     }

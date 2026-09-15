@@ -2,6 +2,7 @@ import { describe, it, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import {
     defineIsland,
+    defineFrameworkIsland,
     hasIsland,
     getIslandLoader,
     getIslandDefinition,
@@ -9,10 +10,12 @@ import {
     LEGACY_ALIASES,
     clearRegistry
 } from '../src/runtime/registry';
+import { registerAdapter, clearAdapterRegistry } from '../src/adapters/registry';
 
 describe('Island Registry & Canonical Alias Resolution Suite', () => {
     beforeEach(() => {
         clearRegistry();
+        clearAdapterRegistry();
     });
 
     it('registers and retrieves an island by canonical name', () => {
@@ -83,5 +86,49 @@ describe('Island Registry & Canonical Alias Resolution Suite', () => {
         const sharedMap = (globalThis as any).__laughtaleIslandRegistry__;
         assert.ok(sharedMap instanceof Map, 'registry must be reachable via the well-known globalThis key');
         assert.equal(sharedMap.get('image-compare'), dummyLoader, 'the globalThis-anchored Map must be the exact same object defineIsland writes to');
+    });
+
+    it('defineFrameworkIsland resolves its adapter via adapters/registry.ts and actually mounts through it (proves the dynamic-import cycle resolution works end-to-end, not just that bundling succeeds)', async () => {
+        const mountCalls: any[] = [];
+        // A fake "framework" adapter — proves defineFrameworkIsland genuinely round-trips
+        // through getAdapter(framework) rather than calling the component directly.
+        registerAdapter('fake-framework', (Component: any) => {
+            return (container: HTMLElement, props: any) => {
+                mountCalls.push({ Component, props });
+                container.textContent = `mounted:${Component.displayName}`;
+            };
+        });
+
+        const FakeComponent = { displayName: 'FakeWidget' };
+        defineFrameworkIsland('fake-widget', () => Promise.resolve({ default: FakeComponent }), 'fake-framework');
+
+        const definition = getIslandDefinition('fake-widget');
+        assert.ok(definition, 'defineFrameworkIsland must register the island under the given name');
+
+        const module: any = await definition!.loader();
+        assert.equal(typeof module.default, 'function', 'the resolved module must expose the ADAPTED mount function as default');
+
+        // This test file (unlike hydrator.test.ts / adapters.test.ts) does not import
+        // tests/setup.ts, so there is no real `document` here — a plain object stand-in is
+        // enough to prove the adapted mount function actually invokes the registered adapter
+        // with the right Component/props, without depending on a DOM environment.
+        const fakeContainer: any = { textContent: '' };
+        module.default(fakeContainer, { foo: 'bar' });
+        assert.equal(mountCalls.length, 1);
+        assert.equal(mountCalls[0].Component, FakeComponent);
+        assert.deepEqual(mountCalls[0].props, { foo: 'bar' });
+        assert.equal(fakeContainer.textContent, 'mounted:FakeWidget');
+    });
+
+    it('defineFrameworkIsland throws a clear error when no adapter is registered for the requested framework', async () => {
+        defineFrameworkIsland('unresolvable-widget', () => Promise.resolve({ default: {} }), 'nonexistent-framework');
+
+        const definition = getIslandDefinition('unresolvable-widget');
+        assert.ok(definition);
+
+        await assert.rejects(
+            () => definition!.loader(),
+            /No adapter registered for framework "nonexistent-framework"/
+        );
     });
 });
