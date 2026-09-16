@@ -152,6 +152,69 @@ describe('LaughTale Framework Mount Adapters Suite', () => {
         assert.equal(spanAfter, spanBefore, 'update() must patch the existing DOM node in place, not remount');
     });
 
+    it('createReactIsland: forwards .island-slot content into props.children, and the live node survives (ROADMAP.v5.md Part D, close adapter gaps)', async () => {
+        const container = document.createElement('div');
+        container.innerHTML = '<div data-slot="default" class="island-slot"><span id="react-slotted">Hi</span></div>';
+
+        function Widget(props: any) {
+            return React.createElement('div', { id: 'wrapper' }, props.children);
+        }
+
+        const mount = createReactIsland(Widget);
+        await mount(container, {}, undefined);
+
+        const slotted = container.querySelector('#react-slotted');
+        assert.ok(slotted, 'the slotted content must be present in the mounted output');
+        assert.ok(container.contains(slotted), 'the slotted node must be reattached inside the mounted container, not left orphaned in a detached fragment');
+        assert.equal(container.querySelector('.island-slot'), null, 'the .island-slot wrapper div itself must be removed');
+    });
+
+    it('createReactIsland: forwarded slot content survives an update() re-render, not just the initial mount', async () => {
+        const container = document.createElement('div');
+        container.innerHTML = '<div data-slot="default" class="island-slot"><span id="react-slotted-2">Hi</span></div>';
+
+        function Widget(props: any) {
+            return React.createElement('div', { id: 'wrapper' }, props.title, props.children);
+        }
+
+        const mount = createReactIsland(Widget);
+        const result: any = await mount(container, { title: 'v1' }, undefined);
+        assert.ok(container.querySelector('#react-slotted-2'), 'sanity check: slot content present after initial mount');
+
+        await result.update({ title: 'v2' });
+
+        assert.ok(
+            container.querySelector('#react-slotted-2'),
+            'slot content must still be present after update() - omitting it from the update call would make React unmount it'
+        );
+    });
+
+    it('createReactIsland: warns when the mounted component never renders forwarded child content', async () => {
+        const container = document.createElement('div');
+        container.innerHTML = '<div data-slot="default" class="island-slot"><span id="react-dropped">Hi</span></div>';
+        container.setAttribute('data-island', 'react-slot-warn-test');
+
+        function Widget() {
+            return React.createElement('div', null, 'children never rendered');
+        }
+
+        const warnings: string[] = [];
+        const originalWarn = console.warn;
+        console.warn = (...args: any[]) => { warnings.push(args.join(' ')); };
+
+        try {
+            const mount = createReactIsland(Widget);
+            await mount(container, {}, undefined);
+        } finally {
+            console.warn = originalWarn;
+        }
+
+        assert.ok(
+            warnings.some(w => w.includes('react-slot-warn-test')),
+            `expected a warning naming the island, got: ${JSON.stringify(warnings)}`
+        );
+    });
+
     it('createVueIsland: mounts a real Vue app and unmounts via IslandContext signal', async () => {
         const container = document.createElement('div');
         const abortController = new AbortController();
@@ -215,6 +278,51 @@ describe('LaughTale Framework Mount Adapters Suite', () => {
         assert.equal(container.textContent, 'Vue Updated');
         const spanAfter = container.querySelector('#stable');
         assert.equal(spanAfter, spanBefore, 'update() must patch the existing DOM node in place, not remount');
+    });
+
+    it('createVueIsland: forwards .island-slot content into the default slot (ROADMAP.v5.md Part D, close adapter gaps)', async () => {
+        const container = document.createElement('div');
+        container.innerHTML = '<div data-slot="default" class="island-slot"><span id="vue-slotted">Hi</span></div>';
+
+        function Widget(_props: any, { slots }: any) {
+            return Vue.h('div', { id: 'wrapper' }, slots.default ? slots.default() : []);
+        }
+
+        const mount = createVueIsland(Widget);
+        await mount(container, {}, undefined);
+        await Vue.nextTick();
+
+        const slotted = container.querySelector('#vue-slotted');
+        assert.ok(slotted, 'the slotted content must be present in the mounted output');
+        assert.ok(container.contains(slotted), 'the slotted node must be reattached inside the mounted container, not left orphaned in a detached fragment');
+        assert.equal(container.querySelector('.island-slot'), null, 'the .island-slot wrapper div itself must be removed');
+    });
+
+    it('createVueIsland: warns when the mounted component never renders forwarded child content', async () => {
+        const container = document.createElement('div');
+        container.innerHTML = '<div data-slot="default" class="island-slot"><span id="vue-dropped">Hi</span></div>';
+        container.setAttribute('data-island', 'vue-slot-warn-test');
+
+        function Widget() {
+            return Vue.h('div', null, 'children never rendered');
+        }
+
+        const warnings: string[] = [];
+        const originalWarn = console.warn;
+        console.warn = (...args: any[]) => { warnings.push(args.join(' ')); };
+
+        try {
+            const mount = createVueIsland(Widget);
+            await mount(container, {}, undefined);
+            await Vue.nextTick();
+        } finally {
+            console.warn = originalWarn;
+        }
+
+        assert.ok(
+            warnings.some(w => w.includes('vue-slot-warn-test')),
+            `expected a warning naming the island, got: ${JSON.stringify(warnings)}`
+        );
     });
 
     it('createSvelteIsland: handles fallback gracefully with IslandContext signal', async () => {
@@ -305,5 +413,48 @@ describe('LaughTale Framework Mount Adapters Suite', () => {
         assert.equal(container.textContent, 'Preact Updated');
         const spanAfter = container.querySelector('#stable');
         assert.equal(spanAfter, spanBefore, 'update() must patch the existing DOM node in place, not remount');
+    });
+
+    it('createPreactIsland: forwards .island-slot content into props.children (ROADMAP.v5.md Part D, close adapter gaps)', async () => {
+        const container = document.createElement('div');
+        container.innerHTML = '<div data-slot="default" class="island-slot"><span id="preact-slotted">Hi</span></div>';
+
+        function Widget(props: any) {
+            return Preact.h('div', { id: 'wrapper' }, props.children);
+        }
+
+        const mount = createPreactIsland(Widget);
+        await mount(container, {}, undefined);
+
+        const slotted = container.querySelector('#preact-slotted');
+        assert.ok(slotted, 'the slotted content must be present in the mounted output');
+        assert.ok(container.contains(slotted), 'the slotted node must be reattached inside the mounted container, not left orphaned in a detached fragment');
+        assert.equal(container.querySelector('.island-slot'), null, 'the .island-slot wrapper div itself must be removed');
+    });
+
+    it('createPreactIsland: warns when the mounted component never renders forwarded child content', async () => {
+        const container = document.createElement('div');
+        container.innerHTML = '<div data-slot="default" class="island-slot"><span id="preact-dropped">Hi</span></div>';
+        container.setAttribute('data-island', 'preact-slot-warn-test');
+
+        function Widget() {
+            return Preact.h('div', null, 'children never rendered');
+        }
+
+        const warnings: string[] = [];
+        const originalWarn = console.warn;
+        console.warn = (...args: any[]) => { warnings.push(args.join(' ')); };
+
+        try {
+            const mount = createPreactIsland(Widget);
+            await mount(container, {}, undefined);
+        } finally {
+            console.warn = originalWarn;
+        }
+
+        assert.ok(
+            warnings.some(w => w.includes('preact-slot-warn-test')),
+            `expected a warning naming the island, got: ${JSON.stringify(warnings)}`
+        );
     });
 });

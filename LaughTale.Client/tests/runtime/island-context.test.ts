@@ -3,10 +3,12 @@ import { describe, it, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { defineIsland, clearRegistry, type IslandContext } from '../../src/runtime/registry.ts';
 import { hydrateIsland } from '../../src/runtime/hydrator.ts';
+import { clearSharedState } from '../../src/runtime/state.ts';
 
 describe('IslandContext & Lifecycle AbortSignal Suite', () => {
     beforeEach(() => {
         clearRegistry();
+        clearSharedState();
         document.body.innerHTML = '';
     });
 
@@ -105,5 +107,79 @@ describe('IslandContext & Lifecycle AbortSignal Suite', () => {
         // Click after unmount
         window.dispatchEvent(new Event('click'));
         assert.equal(clickCount, 1, 'Listener bound to ctx.signal should not fire after unmount');
+    });
+
+    it('ctx.hydrate reflects whether the container already had DOM content when hydration started (ROADMAP.v5.md Part D)', async () => {
+        let emptyCtx: IslandContext | null = null;
+        let seededCtx: IslandContext | null = null;
+
+        defineIsland('hydrate-signal-empty', async () => ({
+            default: (el, props, ctx) => { emptyCtx = ctx!; }
+        }));
+        defineIsland('hydrate-signal-seeded', async () => ({
+            default: (el, props, ctx) => { seededCtx = ctx!; }
+        }));
+
+        const emptyContainer = document.createElement('div');
+        emptyContainer.setAttribute('data-island', 'hydrate-signal-empty');
+        emptyContainer.setAttribute('data-hydrate', 'load');
+        document.body.appendChild(emptyContainer);
+
+        const seededContainer = document.createElement('div');
+        seededContainer.setAttribute('data-island', 'hydrate-signal-seeded');
+        seededContainer.setAttribute('data-hydrate', 'load');
+        seededContainer.innerHTML = '<span>server-rendered</span>';
+        document.body.appendChild(seededContainer);
+
+        hydrateIsland(emptyContainer);
+        hydrateIsland(seededContainer);
+
+        await new Promise(r => setTimeout(r, 40));
+
+        assert.equal(emptyCtx?.hydrate, false, 'an empty container must report ctx.hydrate === false');
+        assert.equal(seededCtx?.hydrate, true, 'a container seeded with markup must report ctx.hydrate === true');
+    });
+
+    it('ctx.sharedState reaches the same store across two islands, and set()/subscribe() sync them (ROADMAP.v5.md Part D)', async () => {
+        let ctxA: IslandContext | null = null;
+        let ctxB: IslandContext | null = null;
+
+        defineIsland('shared-state-island-a', async () => ({
+            default: (el, props, ctx) => { ctxA = ctx!; }
+        }));
+        defineIsland('shared-state-island-b', async () => ({
+            default: (el, props, ctx) => { ctxB = ctx!; }
+        }));
+
+        const containerA = document.createElement('div');
+        containerA.setAttribute('data-island', 'shared-state-island-a');
+        containerA.setAttribute('data-hydrate', 'load');
+        document.body.appendChild(containerA);
+
+        const containerB = document.createElement('div');
+        containerB.setAttribute('data-island', 'shared-state-island-b');
+        containerB.setAttribute('data-hydrate', 'load');
+        document.body.appendChild(containerB);
+
+        hydrateIsland(containerA);
+        hydrateIsland(containerB);
+
+        await new Promise(r => setTimeout(r, 40));
+
+        assert.equal(typeof ctxA?.sharedState, 'function', 'ctx.sharedState must be exposed');
+
+        const storeA = ctxA!.sharedState!<number>('demo-counter', 0);
+        const storeB = ctxB!.sharedState!<number>('demo-counter', 0);
+
+        assert.equal(storeA, storeB, 'two islands requesting the same key must get the identical store instance');
+        assert.equal(storeB.get(), 0, 'store B must see the initial value set by store A\'s first call');
+
+        let observedFromB: number | undefined;
+        storeB.subscribe((value) => { observedFromB = value; });
+
+        storeA.set(5);
+
+        assert.equal(observedFromB, 5, 'island B must observe island A\'s set() via subscribe()');
+        assert.equal(storeB.get(), 5);
     });
 });

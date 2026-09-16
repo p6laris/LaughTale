@@ -13,6 +13,7 @@ import { renderErrorBoundary } from './error-boundary';
 import { refreshIsland } from './refresh';
 import { initDesignTokens } from '../styles/design-tokens';
 import { useLocale } from '../composables/useLocale';
+import { useSharedState } from './state';
 
 export type HydrateStrategy = 'load' | 'idle' | 'visible' | 'media' | 'interaction' | 'never';
 export type HydrationState = 'idle' | 'pending' | 'mounted' | 'failed';
@@ -255,7 +256,14 @@ async function executeHydration(container: HTMLElement, name: string): Promise<v
             container,
             name,
             locale: localeVal,
-            dir: dirVal
+            dir: dirVal,
+            // Computed once, here, so every mount function (vanilla included) shares one normalized
+            // answer to "was there pre-existing DOM here" instead of re-deriving it ad hoc (ROADMAP.v5.md
+            // Part D) - the same check react.ts/vue.ts/preact.ts/svelte.ts already performed independently.
+            hydrate: container.hasChildNodes(),
+            // Reaches the existing (previously unwired) useSharedState composable - see IslandContext's
+            // own doc comment for why this is `sharedState`, not `state` (ROADMAP.v5.md Part D vs Part F).
+            sharedState: useSharedState
         };
 
         const localeHelpers = useLocale(ctx);

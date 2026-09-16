@@ -5,6 +5,7 @@
  */
 
 import type { IslandContext } from '../runtime/registry';
+import { extractIslandSlot, warnIfSlotUnused } from './slot';
 
 export interface ReactAdapterOptions {
     hydrate?: boolean;
@@ -43,8 +44,29 @@ export function createReactIsland<TProps = any>(
 
             if (createRoot && createElement) {
                 let root: any;
+                const hydrateMode = options.hydrate && hydrateRoot && (ctx?.hydrate ?? container.hasChildNodes());
 
-                if (options.hydrate && hydrateRoot && container.hasChildNodes()) {
+                // Extract `.island-slot` (ROADMAP.v5.md Part D, close adapter gaps) BEFORE the
+                // destructive render below wipes it out - forwarded to the component as
+                // `props.children` via a plain host element whose ref callback re-inserts the
+                // real, already-live nodes (not a re-serialized copy, so a nested island inside
+                // survives intact) once React commits it. Skipped entirely in true hydration mode:
+                // the container's existing DOM must exactly match what React renders there, so
+                // there's no destructive mount for slot content to need rescuing from.
+                const extractedSlot = hydrateMode ? null : extractIslandSlot(container);
+                // Rebuilt on every render (initial AND update, see `update` below) rather than
+                // created once - React keeps the underlying DOM node stable across re-renders for a
+                // same-type element at the same position regardless of the ref callback's own
+                // identity changing, so the already-appended live content (which React's own vdom
+                // has no knowledge of - it was inserted imperatively by `attach`) survives. Omitting
+                // this on `update()` would make Component's next render produce no vnode at all in
+                // this position, and React would unmount - and destroy - the slotted content on the
+                // very first server-driven refresh.
+                const makeSlotHost = () => extractedSlot
+                    ? createElement('div', { 'data-lt-slot-host': true, ref: (el: HTMLElement | null) => extractedSlot.attach(el) })
+                    : undefined;
+
+                if (hydrateMode) {
                     root = hydrateRoot(container, createElement(Component, props as any));
                 } else {
                     root = createRoot(container);
@@ -55,13 +77,17 @@ export function createReactIsland<TProps = any>(
                     // being observably complete once mount() resolves (so it can tell whether any
                     // nested island survived), which a deferred commit would silently defeat. Only the
                     // initial render needs this - the update() re-render below is used by refresh.ts,
-                    // which has no such synchronous-commit requirement.
-                    const doRender = () => root.render(createElement(Component, props as any));
+                    // which has no such synchronous-commit requirement. The same synchronous commit
+                    // also guarantees the slot host's ref callback (which fires during commit) has
+                    // already run by the time warnIfSlotUnused checks it below.
+                    const doRender = () => root.render(createElement(Component, props as any, makeSlotHost()));
                     if (typeof flushSync === 'function') {
                         flushSync(doRender);
                     } else {
                         doRender();
                     }
+
+                    warnIfSlotUnused(extractedSlot, container);
                 }
 
                 const unmount = () => {
@@ -76,7 +102,7 @@ export function createReactIsland<TProps = any>(
                 // server-driven refresh. This is React's own designed re-render path, so its
                 // reconciler diffs against the DOM it actually owns (see refresh.ts).
                 const update = (newProps: any) => {
-                    root.render(createElement(Component, newProps));
+                    root.render(createElement(Component, newProps, makeSlotHost()));
                 };
 
                 if (ctx?.signal) {

@@ -5,6 +5,7 @@
  */
 
 import type { IslandContext } from '../runtime/registry';
+import { extractIslandSlot, warnIfSlotUnused } from './slot';
 
 export interface PreactAdapterOptions {
     hydrate?: boolean;
@@ -30,10 +31,26 @@ export function createPreactIsland<TProps = any>(
             const hydrate = preact.hydrate || preact.default?.hydrate;
 
             if (render && h) {
-                if (options.hydrate && hydrate && container.hasChildNodes()) {
+                const hydrateMode = options.hydrate && hydrate && (ctx?.hydrate ?? container.hasChildNodes());
+
+                // Extract `.island-slot` (ROADMAP.v5.md Part D, close adapter gaps) BEFORE the
+                // destructive render below wipes it out - see the identical rationale in
+                // adapters/react.ts. Rebuilt on every render (initial AND `update` below), not
+                // created once: Preact keeps the same underlying DOM node across re-renders for a
+                // same-type element at the same position, so the already-appended live content
+                // (invisible to Preact's own vdom, since `attach` inserted it imperatively) survives
+                // - omitting this on `update()` would make Component's next render produce nothing in
+                // this position and Preact would remove it on the very first server-driven refresh.
+                const extractedSlot = hydrateMode ? null : extractIslandSlot(container);
+                const makeSlotHost = () => extractedSlot
+                    ? h('div', { 'data-lt-slot-host': true, ref: (el: HTMLElement | null) => extractedSlot.attach(el) })
+                    : undefined;
+
+                if (hydrateMode) {
                     hydrate(h(Component, props as any), container);
                 } else {
-                    render(h(Component, props as any), container);
+                    render(h(Component, props as any, makeSlotHost()), container);
+                    warnIfSlotUnused(extractedSlot, container);
                 }
 
                 const unmount = () => {
@@ -47,7 +64,7 @@ export function createPreactIsland<TProps = any>(
                 // In-place update: rendering again into the same container lets Preact diff
                 // against the vnode tree it already associates with that DOM node.
                 const update = (newProps: any) => {
-                    render(h(Component, newProps), container);
+                    render(h(Component, newProps, makeSlotHost()), container);
                 };
 
                 if (ctx?.signal) {

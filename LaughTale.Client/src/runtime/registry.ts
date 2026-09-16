@@ -2,6 +2,8 @@
  * LaughTale: Island Factory & Loader Registry
  */
 
+import type { IslandStore } from './state';
+
 export type IslandTeardown = () => void;
 
 export interface IslandContext {
@@ -13,6 +15,21 @@ export interface IslandContext {
     dir: 'ltr' | 'rtl';
     t?: (key: string, ...args: any[]) => string;
     dictionary?: Record<string, any>;
+    /**
+     * True when this container already had DOM content (server-rendered markup, an `.island-slot`,
+     * etc.) at the moment hydration started - computed once by hydrator.ts via `container.hasChildNodes()`
+     * so every mount function (vanilla included) has a normalized signal for "adopt existing DOM" vs
+     * "render fresh" instead of reinventing ad-hoc detection (ROADMAP.v5.md Part D).
+     */
+    hydrate?: boolean;
+    /**
+     * Reaches `runtime/state.ts`'s existing (previously unwired) `useSharedState` composable, so an
+     * island can read/write cross-island state without a separate import. Deliberately named
+     * `sharedState`, not `state` - ROADMAP.v5.md Part F already earmarks `ctx.state` for a distinct,
+     * not-yet-built server-dehydration mechanism (`IslandStatePool`); this is the narrower, client-only
+     * piece Part D actually asks for.
+     */
+    sharedState?<T = any>(key: string, initialValue?: T): IslandStore<T>;
 }
 
 /**

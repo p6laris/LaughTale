@@ -338,8 +338,8 @@ between, which produced a specific and serious bug.
 |---|---|---|
 | **Props updates without remount** — add `update(props)` to the adapter contract; refresh prefers it over morphing. *This is the fix for the corruption above, not a separate feature.* — **[CLOSED (mechanism), this pass]** for React/Vue/Preact; Svelte and vanilla deliberately excluded — see below | Astro, Nuxt | M · 2–3 wks |
 | **Nested islands — [CLOSED (order-safety + diagnosability), this pass]** the hydrator now detects and warns about a nested island destroyed by its parent, instead of silently vanishing — see below | Astro | M · 2 wks |
-| **Context & shared store access** — extend `ctx` with the ambient state pool | Nuxt `useState` | S · 1 wk |
-| **Close adapter gaps** — the roadmap's own framing here doesn't hold up (found while scoping nested islands): NONE of the four framework adapters implement slot/children forwarding, not just preact — confirmed via git history back to their original commit, "slot projection" has been aspirational doc-comment text since day one for all five. `vanilla.ts`'s missing hydrate-path signal (no `options.hydrate`-equivalent telling a mount function "adopt this existing DOM") is still open and unaffected by this correction. | parity | S · 1 wk (was under-scoped) |
+| **Context & shared store access — [CLOSED, this pass]** `ctx.sharedState(key, initial)` now reaches the existing (previously "built, unused") `useSharedState`/`IslandStore` primitive — see below | Nuxt `useState` | S · 1 wk |
+| **Close adapter gaps — [CLOSED, this pass]** slot/children forwarding shipped for React/Vue/Preact (Svelte deliberately excluded, documented); `vanilla.ts`'s missing hydrate-path signal generalized as `ctx.hydrate` — see below | parity | S · 1 wk |
 | **New adapters** — Web Components/Lit first (framework-agnostic, no runtime download), then Solid, Alpine, Angular (unglamorous, but what enterprise .NET shops run) | ecosystem | S each |
 
 **Props updates without remount — [CLOSED (mechanism) for 3 of 5 adapters, this pass].** `registry.ts`
@@ -452,10 +452,46 @@ during refresh) never reached a nested island's own cleanup listener (registered
 `router.ts`'s full-page-navigation teardown already solves exactly this (depth-first, dispatched
 individually) — `teardownIsland` now mirrors that precedent rather than adding new bookkeeping.
 
-Explicitly out of scope, same as before: `ctx`'s ambient state pool, `vanilla.ts`'s missing hydrate-path
-signal, new adapters, and true DOM preservation for a nested island inside a framework adapter's
-destructive mount (needs an explicit children/slot-forwarding mechanism — see the corrected
-"close adapter gaps" row above).
+**Context & shared store access, and close adapter gaps — [CLOSED, this pass].** `runtime/state.ts`
+already exported a working `useSharedState`/`IslandStore` pub/sub primitive — one of the roadmap's own
+"Composable primitives — built, unused" items — but nothing on `ctx` ever reached it. Wired it up as
+`ctx.sharedState(key, initial)`, populated in `hydrator.ts` right next to `ctx.t`/`ctx.dictionary`.
+Deliberately named `sharedState`, not `state`: Part F (below) already earmarks `ctx.state` for a
+separate, unbuilt server-dehydration mechanism, and this pass doesn't want to squat on that name.
+`state.ts`'s backing store was also `globalThis`-anchored (it was a plain module-scope `Map`) — the
+same multi-bundle gap already fixed twice this session in `runtime/registry.ts` and
+`adapters/registry.ts`, now closed here before `ctx.sharedState` turned it from a latent bug into a
+live one.
+
+Slot/children forwarding turned out to have a much better foundation than expected:
+`IslandTagHelper.cs` (and Blazor's `Island.razor`) already wrap any child content inside
+`<island>...</island>` in `<div class="island-slot">` for every island — 8 vanilla components already
+consume it by hand. The four framework adapters never read it at all; their destructive mount
+silently wiped it out. `adapters/slot.ts` (new) gives React/Vue/Preact the same extraction convention,
+forwarding the *live* DOM nodes (not a re-serialized copy, so a nested island inside survives) as
+`props.children`/the default slot via a small ref-callback host element, warning loudly if a component
+never renders what it was given. Had to fix a real, easy-to-miss bug found during implementation: the
+extracted slot host must be rebuilt on *every* render, not just the initial one — omitting it from
+`update()` would make the component's next render produce nothing in that position and the framework
+would unmount (destroy) the slotted content on the very first server-driven refresh. No real consumer
+of a framework-mounted island with slotted children existed anywhere in the repo, so this carried zero
+regression risk. Svelte is deliberately excluded and documented (Svelte 5 children are snippets, not a
+raw-DOM-node model, and this repo has no Svelte compiler toolchain to verify a fix against — same
+reasoning as `update()`'s existing Svelte exclusion). `vanilla.ts`'s missing hydrate-path signal became
+a structural `ctx.hydrate: boolean` (computed once via `container.hasChildNodes()`), which every
+adapter — vanilla included — now reads instead of separately re-deriving it.
+
+Both verified live on `LaughTale.Showcase/Pages/Polyglot.cshtml`'s new "Part D" section: two vanilla
+islands (writer/reader) sync a counter through `ctx.sharedState` with zero props/events link between
+them, and a real `createReactIsland`-backed island renders server-written `<island>...</island>` child
+markup via `props.children`.
+
+Explicitly out of scope: Part F's server-dehydration `ctx.state`/`IslandStatePool` (no backend exists
+at all — confirmed via repo-wide grep — separate, larger, cross-stack work); `runtime/events.ts`'s
+inter-island event bus has the identical non-`globalThis`-anchored bus this pass fixed for the shared
+store, left unfixed here since it's unrelated to the actual ask; new adapters; and true DOM
+preservation for a nested island inside a framework adapter's destructive mount when the parent
+doesn't forward it as a slot (an author-error case, not a framework gap).
 
 | **Framework SSR sidecar** — Node render host over a local socket. The right *first plugin* to prove the Part L API, not core work. Until then, rename the strategy `client-only` and require a fallback | Astro, Nuxt | XL · 8+ wks |
 

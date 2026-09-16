@@ -33,6 +33,11 @@ defineIsland('polyglot-svelte', () => import('./islands/polyglot-svelte'));
 defineIsland('polyglot-preact', () => import('./islands/polyglot-preact'));
 defineIsland('polyglot-vanilla', () => import('./islands/polyglot-vanilla'));
 
+// 3. Register ROADMAP.v5.md Part D examples (shared state + slot forwarding)
+defineIsland('slot-forward-demo', () => import('./islands/slot-forward-demo'));
+defineIsland('shared-counter-button', () => import('./islands/shared-counter-button'));
+defineIsland('shared-counter-display', () => import('./islands/shared-counter-display'));
+
 function initialize() {
     initIslands();
     initDirectives();

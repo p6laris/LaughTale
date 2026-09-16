@@ -5,6 +5,7 @@
  */
 
 import type { IslandContext } from '../runtime/registry';
+import { extractIslandSlot, warnIfSlotUnused } from './slot';
 
 export interface VueAdapterOptions {
     hydrate?: boolean;
@@ -37,15 +38,36 @@ export function createVueIsland<TProps = any>(
                 // app/root is created, and Vue's own patch algorithm updates the mounted
                 // component in place.
                 const propsRef = shallowRef(props);
-                const appFactory = (options.hydrate && createSSRApp && container.hasChildNodes()) ? createSSRApp : createApp;
+                const hydrateMode = options.hydrate && createSSRApp && (ctx?.hydrate ?? container.hasChildNodes());
+                const appFactory = hydrateMode ? createSSRApp : createApp;
+
+                // Extract `.island-slot` (ROADMAP.v5.md Part D, close adapter gaps) BEFORE the
+                // destructive app.mount() below wipes it out - true hydration mode leaves it
+                // untouched, same rationale as react.ts's identical branch. Forwarded via Vue's
+                // render-function slots object (a function returning vnodes, not a raw children
+                // array, since Component is mounted as a plain function/render-function component
+                // here) - a fresh vnode each render() call is fine, since Vue diffs by type/key, not
+                // object identity, and `attach()` is idempotent once the fragment is consumed.
+                const extractedSlot = hydrateMode ? null : extractIslandSlot(container);
 
                 const app = appFactory({
                     render() {
+                        if (extractedSlot) {
+                            const slotHost = h('div', {
+                                'data-lt-slot-host': true,
+                                ref: (el: HTMLElement | null) => extractedSlot.attach(el)
+                            });
+                            return h(Component, propsRef.value as any, { default: () => [slotHost] });
+                        }
                         return h(Component, propsRef.value as any);
                     }
                 });
 
                 app.mount(container);
+
+                if (extractedSlot) {
+                    warnIfSlotUnused(extractedSlot, container);
+                }
 
                 const unmount = () => {
                     try {

@@ -57,9 +57,29 @@
             hydrate="Visible" />
 
     <!-- 5. VANILLA TS ISLAND -->
-    <island name="polyglot-vanilla" 
-            framework="Vanilla" 
-            props="@(new { LogTitle = "Inter-Island Event Ledger" })" 
+    <island name="polyglot-vanilla"
+            framework="Vanilla"
+            props="@(new { LogTitle = "Inter-Island Event Ledger" })"
             hydrate="Load" />
+
+</div>
+
+<!-- ROADMAP.v5.md Part D: Shared state (ctx.sharedState) + slot forwarding examples -->
+<div style="margin-top: 1.5rem;">
+    <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--p-text-color); margin: 0 0 0.25rem 0;">Part D: Ambient Shared State &amp; Slot Forwarding</h2>
+    <p style="font-size: 0.875rem; color: var(--p-text-muted); margin: 0 0 1rem 0; max-width: 800px;">
+        Two islands sharing state through <code>ctx.sharedState(...)</code> with no props/events link between them, and a real React island rendering server-written child markup via <code>props.children</code>.
+    </p>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.5rem;">
+
+    <island name="shared-counter-button" hydrate="Load" />
+    <island name="shared-counter-display" hydrate="Load" />
+
+    <island name="slot-forward-demo" framework="React" props="@(new { Title = "React Slot Forwarding" })" hydrate="Load">
+        <p style="margin: 0 0 0.5rem 0; color: var(--p-text-color);">This paragraph is real, server-rendered markup written directly inside the <code>&lt;island&gt;</code> tag.</p>
+        <span class="aura-tag tag-emerald">Rendered via props.children</span>
+    </island>
 
 </div>

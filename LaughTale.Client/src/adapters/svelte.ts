@@ -11,6 +11,16 @@ export interface SvelteAdapterOptions {
 }
 
 /**
+ * Slot/children forwarding (ROADMAP.v5.md Part D, close adapter gaps) is deliberately NOT
+ * implemented here, unlike react.ts/vue.ts/preact.ts. Svelte 5's children are snippets (a function
+ * prop rendered via `{@render children()}`, not a raw-DOM-node consumption model like React/Preact
+ * children or Vue's slot-functions-returning-vnodes), and this repo has no Svelte compiler
+ * toolchain to verify a real fix against - the same reason this adapter's test coverage already
+ * only exercises the fallback path (no `svelte` devDependency), and the same reason `update()` was
+ * deliberately excluded here in the prior pass.
+ */
+
+/**
  * Creates an island mount function wrapping a Svelte component.
  * Supports both Svelte 5 (`mount` / `hydrate`) and Svelte 4 (`new Component({ target })`).
  * @param Component The Svelte component class or function.
@@ -31,7 +41,7 @@ export function createSvelteIsland<TProps = any>(
 
             if (svelte && typeof svelte.mount === 'function') {
                 // Svelte 5 API
-                const mount = (options.hydrate && typeof svelte.hydrate === 'function' && container.hasChildNodes())
+                const mount = (options.hydrate && typeof svelte.hydrate === 'function' && (ctx?.hydrate ?? container.hasChildNodes()))
                     ? svelte.hydrate
                     : svelte.mount;
 
