@@ -18,11 +18,16 @@ import { bindIntersectionDirectives } from './intersect';
 import { bindScrollToDirectives } from './scroll';
 import { bindBadgeDirectives } from './badge';
 import { bindTeleportDirectives } from './teleport';
+import { bindConditionalDirectives } from './conditional';
+import { bindListDirectives } from './list';
 import { listDirectiveBinders } from './registry';
 
 export * from './security';
 export * from './reactivity';
 export * from './registry';
+export * from './lifecycle';
+export * from './conditional';
+export * from './list';
 
 export function initDirectives(root: ParentNode = document): void {
     // 1. Initialize Reactive Scopes: [l-state]
@@ -96,6 +101,12 @@ export function initDirectives(root: ParentNode = document): void {
 
         // N. Plugin-registered custom directives (registerDirective)
         for (const binder of listDirectiveBinders()) binder(el);
+
+        // O. Conditional Rendering (l-if)
+        bindConditionalDirectives(el);
+
+        // P. List Rendering (l-for)
+        bindListDirectives(el);
     });
 }
 

@@ -5,6 +5,8 @@
 
 import { isSafeAttribute, isSafeProperty, sanitizeUrl } from './security';
 import { parseExpressionToAst, evaluateAst } from './expression/index';
+import { signal, effect, type Signal } from '../runtime/signals';
+import { registerDirectiveCleanup } from './lifecycle';
 
 export interface ReactiveScope {
     state: Record<string, any>;
@@ -27,13 +29,40 @@ export function getNearestScope(element: HTMLElement): ReactiveScope | undefined
 export function createReactiveScope(container: HTMLElement, initialData: Record<string, any>): ReactiveScope {
     const listeners = new Set<() => void>();
 
+    // Per-key signals, created lazily on first read or write of a given property.
+    // This is what gives l-bind/l-model/etc. fine-grained tracking: an `effect()`
+    // that only reads `state.a` re-runs when `a` changes, not when `b` changes.
+    const signals = new Map<string, Signal<any>>();
+    const getSignal = (key: string): Signal<any> => {
+        let sig = signals.get(key);
+        if (!sig) {
+            sig = signal(Object.prototype.hasOwnProperty.call(initialData, key) ? initialData[key] : undefined);
+            signals.set(key, sig);
+        }
+        return sig;
+    };
+
     const state = new Proxy(initialData, {
         set(target, prop, value) {
             if (!isSafeProperty(prop)) {
                 console.warn(`[LaughTale Security] Blocked assignment to restricted property: "${String(prop)}"`);
                 return true;
             }
-            target[prop as string] = value;
+            if (typeof prop !== 'string') {
+                // Symbols (e.g. well-known symbols probed by JSON.stringify/util
+                // internals) aren't part of the reactive key space - fall back to
+                // the plain target, matching the pre-signals behavior for them.
+                (target as any)[prop] = value;
+                listeners.forEach((fn) => fn());
+                return true;
+            }
+            target[prop] = value;
+            // Fine-grained: only subscribers of THIS key re-run.
+            getSignal(prop).set(value);
+            // Coarse broadcast kept intact: storage.ts's l-persist debounces a full
+            // JSON.stringify(scope.state) snapshot from a setTimeout, asynchronously,
+            // so it legitimately wants "notify on any key changing" rather than
+            // per-key tracking.
             listeners.forEach((fn) => fn());
             return true;
         },
@@ -42,7 +71,11 @@ export function createReactiveScope(container: HTMLElement, initialData: Record<
                 console.warn(`[LaughTale Security] Blocked access to restricted property: "${String(prop)}"`);
                 return undefined;
             }
-            return target[prop as string];
+            if (typeof prop !== 'string') {
+                return (target as any)[prop];
+            }
+            // Tracked read: registers this key as a dependency of the active effect/computed, if any.
+            return getSignal(prop)();
         }
     });
 
@@ -82,8 +115,7 @@ export function bindElementReactivity(element: HTMLElement, scope: ReactiveScope
                 // Safe textContent assignment immune to XSS
                 element.textContent = String(val ?? '');
             };
-            scope.listeners.add(update);
-            update();
+            registerDirectiveCleanup(element, effect(update));
         } else if (attr.name.startsWith('l-bind:')) {
             const targetAttr = attr.name.slice(7);
             if (!isSafeAttribute(targetAttr)) {
@@ -107,8 +139,7 @@ export function bindElementReactivity(element: HTMLElement, scope: ReactiveScope
                     element.setAttribute(targetAttr, String(val));
                 }
             };
-            scope.listeners.add(update);
-            update();
+            registerDirectiveCleanup(element, effect(update));
         } else if (attr.name === 'l-class') {
             const expr = attr.value;
             const update = () => {
@@ -121,8 +152,7 @@ export function bindElementReactivity(element: HTMLElement, scope: ReactiveScope
                     element.className = val;
                 }
             };
-            scope.listeners.add(update);
-            update();
+            registerDirectiveCleanup(element, effect(update));
         } else if (attr.name === 'l-style') {
             const expr = attr.value;
             const update = () => {
@@ -131,8 +161,7 @@ export function bindElementReactivity(element: HTMLElement, scope: ReactiveScope
                     Object.assign(element.style, val);
                 }
             };
-            scope.listeners.add(update);
-            update();
+            registerDirectiveCleanup(element, effect(update));
         }
     }
 
@@ -155,8 +184,7 @@ export function bindElementReactivity(element: HTMLElement, scope: ReactiveScope
                 input.value = val ?? '';
             }
         };
-        scope.listeners.add(update);
-        update();
+        registerDirectiveCleanup(element, effect(update));
 
         // View to Model
         const eventName = input.type === 'checkbox' || input.tagName === 'SELECT' ? 'change' : 'input';

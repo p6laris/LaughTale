@@ -4,6 +4,7 @@
  */
 
 import { executeStatement, getNearestScope } from './reactivity';
+import { registerDirectiveCleanup } from './lifecycle';
 
 export function bindPollingDirectives(element: HTMLElement): void {
     const scope = getNearestScope(element);
@@ -48,6 +49,7 @@ export function bindPollingDirectives(element: HTMLElement): void {
             };
 
             const intervalId = setInterval(runPoll, intervalMs);
+            registerDirectiveCleanup(element, () => clearInterval(intervalId));
         }
     }
 }

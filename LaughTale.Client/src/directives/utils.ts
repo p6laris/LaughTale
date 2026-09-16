@@ -3,6 +3,8 @@
  */
 
 import { evaluateExpression, getNearestScope } from './reactivity';
+import { effect } from '../runtime/signals';
+import { registerDirectiveCleanup } from './lifecycle';
 
 export function bindUtilityDirectives(element: HTMLElement): void {
     const scope = getNearestScope(element);
@@ -16,8 +18,11 @@ export function bindUtilityDirectives(element: HTMLElement): void {
             const isVisible = Boolean(evaluateExpression(expr, state));
             element.style.display = isVisible ? originalDisplay : 'none';
         };
-        if (scope) scope.listeners.add(update);
-        update();
+        if (scope) {
+            registerDirectiveCleanup(element, effect(update));
+        } else {
+            update();
+        }
     }
 
     if (element.hasAttribute('l-hide')) {
@@ -28,8 +33,11 @@ export function bindUtilityDirectives(element: HTMLElement): void {
             const isHidden = Boolean(evaluateExpression(expr, state));
             element.style.display = isHidden ? 'none' : originalDisplay;
         };
-        if (scope) scope.listeners.add(update);
-        update();
+        if (scope) {
+            registerDirectiveCleanup(element, effect(update));
+        } else {
+            update();
+        }
     }
 
     // 2. Clipboard Copy: l-copy="#targetSelector"

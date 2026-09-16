@@ -8,6 +8,8 @@ import type { IslandContext } from '../runtime/registry';
 import { SelectButtonItem } from '../types/models';
 import { injectIslandStyle } from '../runtime/styles';
 import { emitComponentEvent } from '../runtime/events';
+import { signal, effect } from '../runtime/signals';
+import { patchList } from '../runtime/list-patch';
 import { LucideIcons } from '../icons/lucide';
 import { useDisclosure } from '../composables/useDisclosure';
 import { useClickOutside } from '../composables/useClickOutside';
@@ -90,8 +92,8 @@ export default function MultiSelectIsland<T = string>(container: HTMLElement, pr
 
     const options: SelectButtonItem<T>[] = props.options || [];
     const initValues = props.selectedValues ?? formField.getValue();
-    let selected: Set<T> = new Set(Array.isArray(initValues) ? initValues : (initValues ? [initValues] : []));
-    let filterQuery = '';
+    const selected = signal<Set<T>>(new Set(Array.isArray(initValues) ? initValues : (initValues ? [initValues] : [])));
+    const filterQuery = signal('');
 
     formField.detach();
     setHtml(container, html`
@@ -143,8 +145,7 @@ export default function MultiSelectIsland<T = string>(container: HTMLElement, pr
         onOpen: () => {
             chevron.style.transform = 'rotate(180deg)';
             filterInput.value = '';
-            filterQuery = '';
-            renderList();
+            filterQuery.set(''); // renderList's effect re-runs automatically on this write
             overlay.style.width = `${trigger.offsetWidth}px`;
             floatingHandle = useFloatingPosition(trigger, overlay, {
                 placement: 'bottom-start',
@@ -166,9 +167,10 @@ export default function MultiSelectIsland<T = string>(container: HTMLElement, pr
     useClickOutside(container, () => disclosure.close(), { signal: ctx?.signal });
 
     function getFilteredOptions() {
-        if (!filterQuery.trim()) return options;
-        const q = filterQuery.toLowerCase();
-        return options.filter(o => o.label.toLowerCase().includes(q));
+        const q = filterQuery();
+        if (!q.trim()) return options;
+        const lower = q.toLowerCase();
+        return options.filter(o => o.label.toLowerCase().includes(lower));
     }
 
     const nav = useKeyboardNav({
@@ -179,10 +181,10 @@ export default function MultiSelectIsland<T = string>(container: HTMLElement, pr
             const filtered = getFilteredOptions();
             const opt = filtered[index];
             if (opt) {
-                if (selected.has(opt.value)) selected.delete(opt.value);
-                else selected.add(opt.value);
-                renderDisplay();
-                renderList();
+                const next = new Set(selected());
+                if (next.has(opt.value)) next.delete(opt.value);
+                else next.add(opt.value);
+                selected.set(next);
                 syncValue();
             }
         },
@@ -204,7 +206,8 @@ export default function MultiSelectIsland<T = string>(container: HTMLElement, pr
     });
 
     function renderDisplay() {
-        if (selected.size === 0) {
+        const current = selected();
+        if (current.size === 0) {
             setHtml(labelContainer, html`<span style="color: var(--lt-surface-400); font-size: 0.875rem;">${props.placeholder || 'Select items...'}</span>`);
             clearBtn.style.display = 'none';
             return;
@@ -213,11 +216,11 @@ export default function MultiSelectIsland<T = string>(container: HTMLElement, pr
         clearBtn.style.display = 'flex';
 
         if (props.display === 'comma') {
-            const labels = options.filter(o => selected.has(o.value)).map(o => o.label).join(', ');
+            const labels = options.filter(o => current.has(o.value)).map(o => o.label).join(', ');
             setHtml(labelContainer, html`<span style="font-size: 0.875rem; color: var(--lt-text-primary);">${labels}</span>`);
         } else {
             // Chips display
-            const chipsHtml = options.filter(o => selected.has(o.value)).map(o => html`
+            const chipsHtml = options.filter(o => current.has(o.value)).map(o => html`
                 <span class="aura-tag tag-emerald" style="padding: 0.15rem 0.45rem; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 0.25rem;">
                     ${o.label}
                     <span class="chip-remove-btn" data-val="${String(o.value)}" style="cursor: pointer; display: flex; opacity: 0.7;">${unsafe(LucideIcons.x)}</span>
@@ -230,9 +233,11 @@ export default function MultiSelectIsland<T = string>(container: HTMLElement, pr
                     e.stopPropagation();
                     const valStr = btn.getAttribute('data-val');
                     const match = options.find(o => String(o.value) === valStr);
-                    if (match) selected.delete(match.value);
-                    renderDisplay();
-                    renderList();
+                    if (match) {
+                        const next = new Set(selected());
+                        next.delete(match.value);
+                        selected.set(next);
+                    }
                     syncValue();
                 }, { signal: ctx?.signal });
             });
@@ -241,36 +246,28 @@ export default function MultiSelectIsland<T = string>(container: HTMLElement, pr
 
     function renderList() {
         const filtered = getFilteredOptions();
+        const current = selected();
 
-        selectAllChk.checked = filtered.length > 0 && filtered.every(o => selected.has(o.value));
+        selectAllChk.checked = filtered.length > 0 && filtered.every(o => current.has(o.value));
 
         if (filtered.length === 0) {
             setHtml(itemsList, html`<div style="padding: 1rem; text-align: center; font-size: 0.75rem; color: var(--lt-surface-400);">${locale.t('emptyMessage') || 'No options found'}</div>`);
             return;
         }
 
-        setHtml(itemsList, html`${filtered.map(o => {
-            const isChecked = selected.has(o.value);
+        // patchList's own wrapper div (keyed by `data-key`) is what click
+        // delegation below matches on; the `.multiselect-item` div nested inside
+        // is the per-item markup patchList only rewrites when it actually changes,
+        // which keeps onHighlight's `.multiselect-item` query and hover CSS working
+        // unmodified while still getting keyed node reuse across re-renders.
+        patchList(itemsList, filtered, (o) => String(o.value), (o) => {
+            const isChecked = current.has(o.value);
             return html`
-                <div class="multiselect-item" role="option" aria-selected="${isChecked ? 'true' : 'false'}" data-val="${String(o.value)}" style="display: flex; align-items: center; gap: 0.625rem; padding: 0.45rem 0.75rem; cursor: pointer; font-size: 0.8125rem; background: ${isChecked ? 'var(--lt-surface-50)' : 'transparent'}; color: var(--lt-text-primary);">
+                <div class="multiselect-item" role="option" aria-selected="${isChecked ? 'true' : 'false'}" style="display: flex; align-items: center; gap: 0.625rem; padding: 0.45rem 0.75rem; cursor: pointer; font-size: 0.8125rem; background: ${isChecked ? 'var(--lt-surface-50)' : 'transparent'}; color: var(--lt-text-primary);">
                     <input type="checkbox" ${attr('checked', isChecked)} style="accent-color: var(--lt-primary-600); pointer-events: none;" />
                     <span style="flex: 1;">${o.label}</span>
                 </div>
-            `;
-        })}`);
-
-        itemsList.querySelectorAll('.multiselect-item').forEach(el => {
-            el.addEventListener('click', () => {
-                const valStr = el.getAttribute('data-val');
-                const match = options.find(o => String(o.value) === valStr);
-                if (match) {
-                    if (selected.has(match.value)) selected.delete(match.value);
-                    else selected.add(match.value);
-                }
-                renderDisplay();
-                renderList();
-                syncValue();
-            }, { signal: ctx?.signal });
+            `.value;
         });
     }
 
@@ -300,30 +297,44 @@ export default function MultiSelectIsland<T = string>(container: HTMLElement, pr
         }
     }, { signal: ctx?.signal });
 
+    // Delegated item click handling, attached once here (instead of a per-row
+    // listener rebound on every renderList()) - looks up which option was
+    // clicked via patchList's own `data-key` wrapper.
+    itemsList.addEventListener('click', (event) => {
+        const key = (event.target as HTMLElement).closest('[data-key]')?.getAttribute('data-key');
+        if (key === null || key === undefined) return;
+        const match = options.find(o => String(o.value) === key);
+        if (match) {
+            const next = new Set(selected());
+            if (next.has(match.value)) next.delete(match.value);
+            else next.add(match.value);
+            selected.set(next);
+        }
+        syncValue();
+    }, { signal: ctx?.signal });
+
     clearBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        selected.clear();
-        renderDisplay();
-        renderList();
+        selected.set(new Set());
         syncValue();
     }, { signal: ctx?.signal });
 
     selectAllChk.parentElement?.addEventListener('click', () => {
         const filtered = getFilteredOptions();
-        const allChecked = filtered.every(o => selected.has(o.value));
+        const current = selected();
+        const allChecked = filtered.every(o => current.has(o.value));
+        const next = new Set(current);
         if (allChecked) {
-            filtered.forEach(o => selected.delete(o.value));
+            filtered.forEach(o => next.delete(o.value));
         } else {
-            filtered.forEach(o => selected.add(o.value));
+            filtered.forEach(o => next.add(o.value));
         }
-        renderDisplay();
-        renderList();
+        selected.set(next);
         syncValue();
     }, { signal: ctx?.signal });
 
     filterInput.addEventListener('input', () => {
-        filterQuery = filterInput.value;
-        renderList();
+        filterQuery.set(filterInput.value);
     }, { signal: ctx?.signal });
 
     filterInput.addEventListener('keydown', (e: KeyboardEvent) => {
@@ -338,14 +349,22 @@ export default function MultiSelectIsland<T = string>(container: HTMLElement, pr
     }, { signal: ctx?.signal });
 
     function syncValue() {
-        formField.setValue(Array.from(selected));
+        const current = selected();
+        formField.setValue(Array.from(current));
 
         emitComponentEvent(container, 'multiselect', 'change', {
-            value: Array.from(selected)
+            value: Array.from(current)
         });
-        announce(`${selected.size} items selected`, 'polite');
+        announce(`${current.size} items selected`, 'polite');
     }
 
-    renderDisplay();
+    // Reactive rendering: these effects replace every manual renderDisplay()/
+    // renderList() call that used to follow a `selected`/`filterQuery` mutation -
+    // each now re-runs automatically whenever the signal(s) it reads change.
+    // `syncValue()` stays an explicit one-shot call at each mutation site (it
+    // emits a change event / writes the hidden form field - a side effect, not a
+    // render), so it is intentionally NOT wrapped here.
+    effect(renderDisplay);
+    effect(renderList);
     syncValue();
 }

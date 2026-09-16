@@ -646,20 +646,71 @@ For government, finance and healthcare buyers — exactly the accounts an "enter
 chases — **"declarative directives under a strict CSP with nonces"** is a procurement-clearing
 sentence. You built it and you're not saying it.
 
-**Still needed**: document it and put it on the front page; fix the same teardown gap so `l-poll` and
-`l-intersect` don't survive navigation; grow `reactivity.ts` (173 lines) into real signals; add
-`l-model`, `l-for`, `l-if` and transitions; let users register their own directives (Part L); fuzz the
-parser with property tests and a documented grammar; promote `htmx.ts` — the htmx audience *is* your
-audience.
+**Still needed**: document it and put it on the front page; fuzz the parser with property tests and a
+documented grammar; promote `htmx.ts` — the htmx audience *is* your audience.
+
+**Signals, `l-if`/`l-for`, and the teardown leak — [CLOSED (real signals + l-for/l-if + teardown), this
+pass].** Two items in this list were already stale: `l-model` already existed and worked
+(`directives/reactivity.ts:140-172`, confirmed before touching anything), and public directive
+registration already existed and was tested (`directives/registry.ts`'s `registerDirective`, wired
+into `initDirectives()`'s scan loop since an earlier "Part G/L" pass) — the roadmap's own "still
+needed" line for both was wrong. The genuinely open items are now closed:
+- **Real signals**: `runtime/signals.ts` (new) — `signal`/`computed`/`effect`/`batch`, a real
+  dependency-tracked primitive (not a toy: re-runs correctly drop stale dependencies across
+  conditional branches, `batch()` coalesces multiple writes into one re-run per affected subscriber).
+  `directives/reactivity.ts`'s `ReactiveScope` is now signal-backed internally — each property gets
+  its own signal, so an `l-bind`/`l-class`/`l-style`/`l-model` binding only re-evaluates when the
+  specific property it reads changes, not on every write to the scope (previously: any write fired
+  every listener in the whole scope, unconditionally). `ReactiveScope`'s public shape, and every other
+  directive file that reads `scope.state`/`scope.listeners` directly, is unchanged — `storage.ts`'s
+  `l-persist` still gets the coarse "any key changed" broadcast it actually needs, deliberately not
+  converted.
+- **`l-if`/`l-for`** (new, `directives/conditional.ts` and `directives/list.ts`) — the two directives
+  from this list that were genuinely missing. Both toggle/render by moving the *same* DOM node rather
+  than destroying and recreating it, so state and nested directive bindings survive. `l-for` uses a new
+  small keyed list-reconciliation helper (`runtime/list-patch.ts`, `patchList()`) shared with a real
+  component retrofit (below) — one reconciliation algorithm for both. A real bug surfaced and got fixed
+  during this pass, not after: a naive integration would have had `patchList`'s own content-diff
+  spuriously "detect a change" the instant an `l-bind` effect wrote into an already-bound item's DOM
+  (comparing live, mutated markup against the pristine template), destroying and rebuilding the very
+  subtree whose effects it had just bound. Fixed by separating "list structure" (patchList, keyed) from
+  "per-item content" (each item's own reactive scope) so they never fight each other.
+- **Teardown leak, real fix**: `l-poll` previously only self-cancelled on its *next* tick after leaving
+  `document.body` (a delayed leak); `l-intersect` had no disconnect path at all without `.once` (a
+  permanent `IntersectionObserver` leak per SPA navigation). Root cause was structural — directive
+  binders receive only the bare element, never `ctx`/`onCleanup`. Fixed with a small cleanup registry
+  (`directives/lifecycle.ts`, `registerDirectiveCleanup`/`teardownDirectives`) wired into `poll.ts`,
+  `intersect.ts`, and the new signal-backed `l-bind`/`l-show`/`l-hide`/`l-if`/`l-for` effects, and called
+  from `router.ts` before every SPA navigation's DOM swap (excluding `[data-persist]` subtrees, matching
+  the existing island-unmount exclusion rule).
+- **Transitions remain explicitly deferred** — needs `l-if`/`l-for` to exist and be validated first,
+  not designed speculatively alongside them.
+- **One real component retrofit as proof, not a framework-wide rewrite**: `components/multiselect.ts`
+  — the cleanest, smallest match for the innerHTML-rebuild complaint below (full item-list rebuild plus
+  a full per-row listener rebind on every filter keystroke, no debounce). `selected`/`filterQuery` are
+  now signals; `renderDisplay`/`renderList` are each one `effect()` instead of being called manually
+  at every one of 5 mutation sites; item rendering uses `patchList` plus one delegated click listener
+  instead of a full rebuild-and-rebind. `datatable.ts`/`autocomplete.ts` are the same shape and are
+  deliberately left for a follow-on pass, not forgotten — proving the pattern once first, same
+  discipline as the SVG retrofit leaving its own remainder.
+- Gave `runtime/benchmark.ts`'s `measureThroughput` — fully built, unit-tested, zero real callers
+  before this pass — its first real caller (`multiselect-benchmark.test.ts`), producing real
+  `opsPerSec`/percentile numbers instead of an unverified performance claim.
 
 ---
 
 ## 11. Part J — Performance
 
 - **Stop leaking listeners** (§1.3) — the largest runtime problem in the codebase.
-- **Replace `innerHTML` rebuilds with targeted updates.** Components regenerate whole subtrees on any
-  state change, destroying focus, selection and scroll, and forcing layout on every keystroke in a
-  filter box. Signals (Part I) plus the existing `morphElement()` give you patching.
+- **Replace `innerHTML` rebuilds with targeted updates — [CLOSED (one component, proof-of-pattern),
+  this pass].** Real signals plus a new keyed list-patch helper (Part I) fixed this for
+  `multiselect.ts`; `datatable.ts`/`autocomplete.ts` are the same shape and are the deliberate next
+  targets, not done here. Turned out `morphElement()` (`runtime/refresh.ts`) wasn't the right tool for
+  this — it's a root-attribute diff plus a blind full-`innerHTML` replace for children, only used by the
+  server-refresh fallback path, never by a component's own local re-render; the new `patchList()`
+  keyed-reconciliation helper is what actually solves "destroys focus/selection," since for a text
+  filter the triggering state genuinely changes every keystroke — the fix isn't skipping re-runs, it's
+  reusing unchanged DOM nodes within them.
 - **Wire up `useVirtualizer`** so the 100,000-row claim is true on the client too.
 - **Real budgets in CI — [CLOSED (mechanical part), this pass].** There was no CI at all in this repo
   before this pass — confirmed, no `.github/workflows` directory existed — so the existing gzip check
@@ -1088,7 +1139,7 @@ worse than shipping neither, because it looks finished.
 | Typed TagHelper generation | Fresh | Partial — generator exists, no user input | B |
 | Streaming SSR | Next, Nuxt | Partial — in-order only | E |
 | Per-island code splitting | Astro, Qwik | Partial — ESM splits; IIFE ships all 76 | B |
-| Signals / fine-grained reactivity | Qwik, Solid | Partial — `reactivity.ts` 173 lines | I |
+| Signals / fine-grained reactivity | Qwik, Solid | **Strong — [CLOSED, this pass]** — real `signal`/`computed`/`effect`/`batch` (`runtime/signals.ts`), backing `l-bind`/`l-model`/`l-class`/`l-style`/`l-show`/`l-hide`/`l-if`/`l-for`; one component (`multiselect.ts`) retrofitted as proof, `datatable.ts`/`autocomplete.ts` deliberately next | I |
 | Perf budgets in CI | — | **Adopted — [CLOSED (mechanical part), this pass]** — real CI now exists at all; gzip check extended to per-island chunks; hydration-time/Lighthouse still deferred | J |
 | Icon system | — | **Strong — [CLOSED (75%), this pass]** — module already existed; retrofitted 33 of ~37 components, `rawSvgLiterals` 212 → 53, remaining 53 deliberately kept (pre-redesign shapes with no current match, or render properties/CSS hooks the module can't express) | M |
 | Typed content collections | Astro | **Strong — [CLOSED, this pass]** — already fully typed end-to-end; the one real gap (silent schema-mismatch swallowing) is now a loud failure | F |

@@ -4,6 +4,7 @@
  */
 
 import { executeStatement, getNearestScope } from './reactivity';
+import { registerDirectiveCleanup } from './lifecycle';
 
 export function bindIntersectionDirectives(element: HTMLElement): void {
     const scope = getNearestScope(element);
@@ -42,6 +43,7 @@ export function bindIntersectionDirectives(element: HTMLElement): void {
             }, { threshold });
 
             observer.observe(element);
+            registerDirectiveCleanup(element, () => observer.disconnect());
         }
     }
 }

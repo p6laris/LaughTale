@@ -9,6 +9,7 @@
 
 import { initIslands } from './hydrator';
 import { initDirectives } from '../directives/index';
+import { teardownDirectives } from '../directives/lifecycle';
 import { applyNonceToScript } from '../directives/csp';
 import { prefetchManager } from '../router/prefetch';
 import { isReducedMotionPreferred } from '../styles/animations';
@@ -274,6 +275,13 @@ export async function navigateTo(
             const id = el.dataset.persist;
             if (id) persistentElements.set(id, el);
         });
+
+        // Tear down directive cleanups (l-poll intervals, l-intersect observers,
+        // l-if/l-for effects, etc.) on the outgoing subtree before the DOM swap
+        // discards it, so they don't keep running against detached elements.
+        // Persistent islands are excluded via the same [data-persist] rule used
+        // above - their subscriptions must survive the navigation.
+        teardownDirectives(document.body, { skip: el => el.closest('[data-persist]') !== null });
 
         // 5. Extract executable scripts from incoming document body
         const newScripts = Array.from(newDoc.body.querySelectorAll('script'));
