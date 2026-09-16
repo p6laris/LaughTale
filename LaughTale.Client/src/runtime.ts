@@ -32,7 +32,16 @@ export { hasSsrContent, getSsrRoot, markSsrHydrated, SSR_ATTR, SSR_HYDRATED_ATTR
 export { renderSkeleton, renderEmptyState, renderErrorState } from './runtime/states';
 export type { ComponentStateProps, SkeletonOptions, StateMessageOptions } from './types/states';
 export { createVanillaIsland } from './adapters/vanilla';
-export { createPreactIsland, type PreactAdapterOptions } from './adapters/preact';
+// createReactIsland/createVueIsland/createSvelteIsland/createPreactIsland are deliberately NOT
+// re-exported here (they ARE from runtime-core.ts, consumed by the "index" all-in-one bundle) - each
+// framework adapter's `await import('react'|'vue'|'svelte'|'preact')` is only truly optional in a
+// build that can code-split around it. This "runtime" entry point is also built as a single-file
+// IIFE (dist/runtime.js, esbuild.config.mjs) with no splitting support at all, so esbuild has no
+// choice but to inline any reachable dynamic import whole - re-exporting `createPreactIsland` here
+// silently shipped the entire preact package (~11.6 KB raw) in every consumer of the "lean runtime"
+// script tag, whether or not they use Preact, and was the direct cause of this bundle exceeding its
+// own gzip budget (confirmed via `esbuild.analyzeMetafile`). Vanilla has no such dynamic import, so
+// it stays.
 export { initDirectives } from './directives/index';
 export { LucideIcons, getLucideIcon } from './icons/lucide';
 export { registerCommand, unregisterCommand, getCommand, executeCommand, clearCommands, listCommands, type CommandHandler } from './runtime/commands';

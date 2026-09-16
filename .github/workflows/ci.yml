@@ -1,0 +1,55 @@
+name: CI
+
+# ROADMAP.v5.md Part J, "real budgets in CI": before this workflow, there was no CI at all in this
+# repo (confirmed: no .github/workflows directory existed) - `npm run build`'s gzip budget checks and
+# LaughTale.Tests only ever ran if a developer happened to run them by hand. This runs both on every
+# push/PR so a regression is caught before merge, not discovered by chance months later.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  dotnet:
+    name: .NET build & test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore LaughTale.slnx
+
+      - name: Build
+        run: dotnet build LaughTale.slnx --no-restore -c Release
+
+      - name: Test
+        run: dotnet test LaughTale.Tests/LaughTale.Tests.csproj --no-build -c Release
+
+  client:
+    name: Client build, tests & perf budgets
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: LaughTale.Client
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: LaughTale.Client/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify (contract lint, metrics, unit tests)
+        run: npm run verify
+
+      - name: Production build (typecheck + whole-bundle and per-island gzip budgets)
+        run: npm run build

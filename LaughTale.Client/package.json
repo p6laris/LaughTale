@@ -37,11 +37,12 @@
     "prebuild": "npm run gen:icons",
     "pretypecheck": "npm run gen:icons",
     "pretest": "npm run gen:icons",
-    "build": "npm run typecheck && node esbuild.config.mjs --prod",
+    "build": "npm run typecheck && node esbuild.config.mjs --prod && npm run budget:chunks",
     "build:dev": "node esbuild.config.mjs",
     "typecheck": "tsc --noEmit",
     "lint:contracts": "node scripts/verify-contracts.mjs",
     "lint:metrics": "node scripts/audit-metrics.mjs --check",
+    "budget:chunks": "node scripts/check-chunk-budgets.mjs",
     "verify": "npm run lint:contracts && npm run lint:metrics && npm test",
     "test": "node scripts/verify-contracts.mjs && node run-tests.mjs",
     "test:e2e": "npx playwright test"

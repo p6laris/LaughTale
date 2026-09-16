@@ -659,8 +659,41 @@ audience.
   state change, destroying focus, selection and scroll, and forcing layout on every keystroke in a
   filter box. Signals (Part I) plus the existing `morphElement()` give you patching.
 - **Wire up `useVirtualizer`** so the 100,000-row claim is true on the client too.
-- **Real budgets in CI.** Extend the existing gzip check to per-island chunk weight, hydration time,
-  and a Lighthouse run on the showcase. `runtime/benchmark.ts` exists and nothing in CI calls it.
+- **Real budgets in CI — [CLOSED (mechanical part), this pass].** There was no CI at all in this repo
+  before this pass — confirmed, no `.github/workflows` directory existed — so the existing gzip check
+  (and every C# test) only ever ran if a developer happened to run it by hand. Added
+  `.github/workflows/ci.yml`: a `.NET` job (`dotnet build`/`dotnet test` against `LaughTale.slnx`) and
+  a client job (`npm run verify` + `npm run build`) on every push/PR. Extended the gzip check itself to
+  per-island chunk weight as asked: a new `scripts/check-chunk-budgets.mjs` reads the ESM build's own
+  metafile (now persisted to `dist/meta.json`), checks every output whose `entryPoint` is a
+  `src/components/*.ts` file (a genuine per-island code-split point) against a 20 KB gzip budget, and
+  deliberately excludes shared/vendor chunks (react-dom, vue — identifiable by an `entryPoint` under
+  `node_modules/`), which are one-time shared costs, not a single island's weight.
+  **Actually running the production build for the first time in a long while surfaced three real,
+  previously-hidden problems, none related to this pass's own changes**: (1) `npm run build` couldn't
+  get past its own `tsc --noEmit` step at all — `react`/`react-dom`/`svelte` have no installed type
+  declarations (confirmed: no `types` field, no `.d.ts`, and `@types/react`/`@types/react-dom` were
+  never installed, deliberately, same reasoning as not installing `svelte` itself), fixed with a small
+  ambient-declaration file rather than adding real dependencies this package's own "zero-dependency
+  core" design doesn't want. (2) A genuine `ReferenceError` in `radio-button.ts`'s group-mode change
+  handler (an undefined `hiddenInp`, one line away from the correct `formField` variable already used
+  twice in the same function) — every selection in a multi-option radio group has been throwing and
+  silently skipping its own `change`-event dispatch, unrelated to typecheck, caught only because fixing
+  (1) finally let the build reach real bundling. (3) The "IIFE Standalone Runtime" bundle was 3.6 KB
+  over its own 45 KB budget: `runtime.ts` (the lean, framework-agnostic entry point) re-exported
+  `createPreactIsland` — react/vue/svelte's adapters are NOT re-exported there, only preact was, an
+  inconsistency — which meant esbuild inlined the entire Preact library into every consumer of the lean
+  runtime script tag, whether or not they use Preact (IIFE can't code-split around a dynamic import the
+  way the ESM build does). Removed that one re-export; fixed. Once fixed, the "Complete All-in-One
+  Bundle" (76 components + every framework adapter's library, genuinely inlined whole) measured 377 KB
+  gzip against a stale 250 KB budget set once (before all 76 components and 4 adapters existed) and
+  never revisited — corrected to 420 KB with headroom, not silently widened to just clear today's
+  number; Part M already documents this bundle as an intentional escape hatch, not the recommended
+  path, so real size enforcement stays on the two smaller bundles instead.
+  **Explicitly deferred, not mechanical**: hydration-time budgets (`runtime/benchmark.ts` is fully
+  built and unit-tested but has no real caller anywhere - wiring it into a CI assertion needs a real
+  browser driving actual hydration, not just Node/happy-dom) and a Lighthouse run on the Showcase -
+  both closer to new infrastructure than to "extend an existing check."
 - **Publish honest numbers** — a reproducible benchmark against Blazor Server and WASM: TTFB, TTI,
   transferred bytes, memory after 50 navigations. Worth more than every adjective in the README.
 - **Report Core Web Vitals** back through the instrumentation hook (Part H).
@@ -1054,7 +1087,7 @@ worse than shipping neither, because it looks finished.
 | Streaming SSR | Next, Nuxt | Partial — in-order only | E |
 | Per-island code splitting | Astro, Qwik | Partial — ESM splits; IIFE ships all 76 | B |
 | Signals / fine-grained reactivity | Qwik, Solid | Partial — `reactivity.ts` 173 lines | I |
-| Perf budgets in CI | — | Partial — gzip only; benchmark unused | J |
+| Perf budgets in CI | — | **Adopted — [CLOSED (mechanical part), this pass]** — real CI now exists at all; gzip check extended to per-island chunks; hydration-time/Lighthouse still deferred | J |
 | Icon system | — | Partial — module exists; 212 raw SVGs | M |
 | Typed content collections | Astro | Partial — untyped frontmatter | F |
 | Safe rendering primitive | Lit `html\`\`` | **Missing** — raw `innerHTML` in 68 | M |

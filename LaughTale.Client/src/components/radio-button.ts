@@ -654,7 +654,7 @@ export default function RadioButtonIsland(container: HTMLElement, props: RadioBu
                     }
                 });
 
-                if (hiddenInp) hiddenInp.value = inp.value;
+                formField.setValue(inp.value);
                 emitComponentEvent(container, 'radio-button', 'change', {
                     value: inp.value
                 });
