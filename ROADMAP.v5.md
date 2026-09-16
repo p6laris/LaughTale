@@ -531,7 +531,18 @@ doesn't forward it as a slot (an author-error case, not a framework gap).
 | **Server actions** — `<island-form action="OnPostUpdateUser">`: auto antiforgery, submit state, optimistic update, fragment swap, plain POST fallback. **Best effort-to-value ratio here** — Razor Pages handlers are already the right shape | Next, Remix, Astro | S–M · 2–3 wks |
 | **Cache tags & live invalidation** — tag fragments, evict on mutation, SSE push. **This is your Blazor Server answer**: multi-user live updates with no stateful circuit | Next `revalidateTag`, Nitro | M · 2–3 wks |
 | **Ambient state pool** — one `<script id="__LAUGHTALE_STATE__">`, read via `ctx.state`; reuse `IslandJson` and `[IslandPrivate]` | Nuxt `useState` | S · 1 wk |
-| **Typed content collections** — C# record as frontmatter schema, validated at build. `ContentCollection.cs` exists and is untyped | Astro | S–M · 2 wks |
+| **Typed content collections — [CLOSED, this pass; roadmap was stale]** the roadmap's own claim
+  ("`ContentCollection.cs` exists and is untyped") doesn't hold up — `GetCollectionAsync<TMetadata>`/
+  `GetEntryAsync<TMetadata>` were already fully generic, and `IslandMarkdownPipeline.Parse<TMetadata>`
+  already deserialized YAML frontmatter straight into `TMetadata` (already consumed end-to-end by
+  `LaughTale.Docs`). The one real gap was "validated at build": a schema mismatch (wrong type, typo'd
+  key) was silently swallowed into a blank `TMetadata()` instead of failing anything. Fixed: the
+  swallow now rethrows a descriptive `InvalidOperationException` naming the slug and metadata type,
+  so `GetCollectionAsync` (which iterates a whole directory with no try/catch of its own) fails loud
+  for the one bad entry instead of silently shipping half-empty metadata — matching Astro's own
+  content-collections behavior (a schema violation fails the build, not just that one page). Verified
+  the fix doesn't break any of LaughTale.Docs' real `.md` files by checking every real `order:` value
+  parses cleanly. 4 new tests | Astro | S–M · 2 wks |
 | **Typed config & sessions** — validated env schema separating server-only from client-exposed at compile time | Astro env, Nuxt runtimeConfig | S · 1 wk |
 | **Incremental regeneration** | Next ISR | M · 2 wks |
 
@@ -546,58 +557,36 @@ components there is *not one* import of a sibling. Dependencies flow one way int
 
 **Don't refactor the architecture. Refactor the rendering primitive.**
 
-### The keystone
+### The keystone — [CLOSED, already fully adopted before this session — stale roadmap section]
 
-Components build markup as raw template literals assigned to `innerHTML`. That one choice produces,
-independently: the XSS class (interpolation cannot escape), 221 duplicated inline SVGs, 707 inline
-`style="…"` attributes no token can reach, and 2,030-line component files.
-
-```ts
-// src/runtime/html.ts — ~40 lines
-import { sanitizeUrl } from '../directives/security';
-
-const MAP: Record<string,string> = { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' };
-export class Raw { constructor(readonly value: string) {} }
-
-export function escapeHtml(v: unknown): string {
-  if (v == null) return '';
-  return String(v).replace(/[&<>"']/g, c => MAP[c]);
-}
-
-function render(v: unknown): string {
-  if (v instanceof Raw) return v.value;
-  if (Array.isArray(v)) return v.map(render).join('');
-  if (v == null || v === false) return '';
-  return escapeHtml(v);
-}
-
-export function html(s: TemplateStringsArray, ...v: unknown[]): string {
-  let out = s[0];
-  for (let i = 0; i < v.length; i++) out += render(v[i]) + s[i + 1];
-  return out;
-}
-
-export const unsafe = (h: string) => new Raw(h);          // explicit, greppable, reviewable
-export const url    = (u: unknown) => new Raw(escapeHtml(sanitizeUrl(u)));
-export const cx     = (...p: unknown[]) => new Raw(escapeHtml(p.filter(Boolean).join(' ')));
-```
-
-Ship it with a lint rule banning direct `innerHTML` outside `html\`\``, and the vulnerability class
-cannot come back. Pair it with `data-severity`-style attributes replacing the 707 inline styles, so
-those move into the per-island CSS `injectIslandStyle()` already delivers.
-
-**One primitive closes the XSS class, the inline-style bloat and much of the file size at once.**
+This whole section described `src/runtime/html.ts` as a ~40-line proposal to write and a lint rule
+still to add. Both already exist, already more capable than the proposed snippet (also ships
+`setHtml`, `attr`, `cx`, all documented against a real spec: `LT-902`/`specs/040-safe-html-primitive`),
+and are already enforced: `scripts/verify-contracts.mjs` (run by `npm test`) fails the build on any
+`.innerHTML =`/`.outerHTML =`/`insertAdjacentHTML` call outside `setHtml()`. Verified directly against
+`scripts/audit-metrics.mjs`'s live counters, not just a code read: **`innerHtmlRawAssignments: 0`**
+across all 76 components, today. **One primitive did close the XSS class** — it's just already closed,
+not a future item. Two of the "three private copies of `escapeHtml`" claim also don't hold up: exactly
+**two** remain (`directives/tooltip.ts`, `icons/lucide.ts`), not three, and neither is "subsumed" as
+stated — they're real, small, still-open dedup candidates.
 
 ### Debloat — things to delete
 
-- **212 inline SVG literals.** The `icons/` module exists and is imported by 40 components; the rest
-  paste raw `<svg>`. The same folder icon is duplicated verbatim across `accordion`, `tree`, `treetable`.
-- **Three private copies of `escapeHtml`** — subsumed by `html\`\``.
-- **39 `LEGACY_ALIASES`** in the registry, commented "scheduled for removal in LaughTale v4". You are
-  building v4.
-- **The 1.26 MB all-in-one IIFE** as documented default — keep as escape hatch, stop advertising it.
-- **`CompoundTagHelpers.cs`** — 27 classes in 986 lines. Split to match `TagHelpers/Aura/{Data,Form,Misc}`.
-- **`public string? Class { get; set; }` declared 33 times** when `IslandTagHelperBase` exists to hold it.
+Re-verified against `audit-metrics.mjs`'s live counters rather than trusting the roadmap's own
+possibly-stale figures — all of the below are confirmed still real and still open:
+
+- **212 inline SVG literals** (`rawSvgLiterals: 212`, exact match). The `icons/` module exists and is
+  imported by 40 components; ~36 components still paste raw `<svg>`. The same folder icon is
+  duplicated verbatim across `accordion`, `tree`, `treetable`.
+- **Two private copies of `escapeHtml`** (corrected from "three, subsumed" above) —
+  `directives/tooltip.ts`, `icons/lucide.ts`.
+- **39 `LEGACY_ALIASES`** in the registry (confirmed: exactly 39 today), commented "scheduled for
+  removal in LaughTale v4". You are building v4.
+- **The 1.26 MB all-in-one IIFE** as documented default — keep as escape hatch, stop advertising it
+  (its own gzip budget was corrected to a realistic 420 KB this session — see Part J).
+- **`CompoundTagHelpers.cs`** — confirmed still 986 lines. Split to match `TagHelpers/Aura/{Data,Form,Misc}`.
+- **`public string? Class { get; set; }` declared 33 times** (confirmed exact count) when
+  `IslandTagHelperBase` exists to hold it.
 
 ### Decouple
 
@@ -1089,8 +1078,8 @@ worse than shipping neither, because it looks finished.
 | Signals / fine-grained reactivity | Qwik, Solid | Partial — `reactivity.ts` 173 lines | I |
 | Perf budgets in CI | — | **Adopted — [CLOSED (mechanical part), this pass]** — real CI now exists at all; gzip check extended to per-island chunks; hydration-time/Lighthouse still deferred | J |
 | Icon system | — | Partial — module exists; 212 raw SVGs | M |
-| Typed content collections | Astro | Partial — untyped frontmatter | F |
-| Safe rendering primitive | Lit `html\`\`` | **Missing** — raw `innerHTML` in 68 | M |
+| Typed content collections | Astro | **Strong — [CLOSED, this pass]** — already fully typed end-to-end; the one real gap (silent schema-mismatch swallowing) is now a loud failure | F |
+| Safe rendering primitive | Lit `html\`\`` | **Strong — already closed before this session, roadmap was stale** — `runtime/html.ts` + a `verify-contracts.mjs` lint gate ban raw `innerHTML` outright; `innerHtmlRawAssignments: 0` across all 76 components today | M |
 | Island compiler / discovery | Fresh, Nuxt | **Missing** | B |
 | Framework SSR | Astro, Nuxt | **Missing** — client-only mount | D |
 | Post-mount prop updates | Astro, Nuxt | **Partial — [CLOSED (mechanism), this pass]** — `update(props)` on the adapter contract, refresh prefers it over morphing, for React/Vue/Preact (`adapterUpdateSupport` 0→3); Svelte and vanilla deliberately excluded, see Part D | D |

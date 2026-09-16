@@ -55,13 +55,23 @@ public static class IslandMarkdownPipeline
             var yamlContent = yamlBlock.Lines.ToString();
             if (!string.IsNullOrWhiteSpace(yamlContent))
             {
+                // ROADMAP.v5.md Part F: previously swallowed silently here, falling back to a blank
+                // TMetadata() - a typo'd key or a value that doesn't match the schema never failed
+                // anything, it just shipped half-empty metadata that nobody noticed until a page
+                // rendered with a missing title/description. Content collections are meant to be a
+                // validated schema (Astro's own "typed content collections" fail the build the same
+                // way) - GetCollectionAsync/GetEntryAsync call this with no try/catch of their own, so
+                // letting this propagate is what actually makes a schema mismatch fail loud, for the
+                // one entry with bad frontmatter, at parse time rather than silently downstream.
                 try
                 {
                     metadata = YamlDeserializer.Deserialize<TMetadata>(yamlContent) ?? new TMetadata();
                 }
-                catch
+                catch (Exception ex)
                 {
-                    metadata = new TMetadata();
+                    throw new InvalidOperationException(
+                        $"Failed to parse YAML frontmatter for '{slug}' into {typeof(TMetadata).Name}: {ex.Message}",
+                        ex);
                 }
             }
         }
