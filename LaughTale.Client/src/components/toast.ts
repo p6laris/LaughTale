@@ -672,6 +672,21 @@ if (typeof window !== 'undefined') {
     (window as any).ToastService = ToastService;
 }
 
+/**
+ * Imperative handle (ROADMAP.v5.md Part C, "imperative handles" — `toast.show()` was the roadmap's
+ * own named example). Unlike dialog.ts, no mount-time indirection is needed: `globalToast` is already
+ * a persistent singleton keyed by group, registered by `ToastIsland` below, so this can forward
+ * directly - `container.island.show(msg)` targets this specific container's group by default, but a
+ * caller can still override via `msg.group` for cross-container broadcasts.
+ */
+export function createHandle(_container: HTMLElement, props: ToastContainerProps) {
+    const group = props.group || 'default';
+    return {
+        show: (msg: ToastMessageOptions) => globalToast.add({ ...msg, group: msg.group || group }),
+        clear: () => globalToast.removeGroup(group)
+    };
+}
+
 export default function ToastIsland(container: HTMLElement, props: ToastContainerProps, ctx?: IslandContext) {
     injectIslandStyle('toast', TOAST_CSS);
 

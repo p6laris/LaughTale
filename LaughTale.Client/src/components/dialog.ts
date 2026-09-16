@@ -246,6 +246,31 @@ export interface DialogProps {
     studioOverrides?: Record<string, any>;
 }
 
+/**
+ * Imperative handle (ROADMAP.v5.md Part C, "imperative handles" — `createHandle` has existed on the
+ * registry/hydrator contract since day one, implemented by zero components until this pass).
+ * `createHandle(container)` runs BEFORE `mount()` (hydrator.ts calls it to build `container.island`
+ * ahead of the actual mount call), so it can't capture the mask/trap instances directly - it returns
+ * thin forwarders that look up the real instance API (stashed on the container by DialogIsland itself,
+ * once mounted) at CALL time instead, which is always after mount has finished by construction (nothing
+ * external can call `container.island.open()` before the page is interactive).
+ */
+const DIALOG_INSTANCE_KEY = '__ltDialogInstance';
+
+interface DialogInstance {
+    open(): void;
+    close(): void;
+    toggle(): void;
+}
+
+export function createHandle(container: HTMLElement) {
+    return {
+        open: () => (container as any)[DIALOG_INSTANCE_KEY]?.open(),
+        close: () => (container as any)[DIALOG_INSTANCE_KEY]?.close(),
+        toggle: () => (container as any)[DIALOG_INSTANCE_KEY]?.toggle()
+    };
+}
+
 // Global Delegation Initializer
 let globalDelegationBound = false;
 
@@ -380,10 +405,49 @@ export default function DialogIsland(container: HTMLElement, props: DialogProps,
         signal: ctx?.signal
     });
 
-    if (props.visible || (props as any).Visible) {
-        maskEl.style.display = 'flex';
-        maskEl.classList.add('p-dialog-mask-active');
+    // Single source of truth for open/close, reused by the initial `visible` prop, the Escape
+    // handler below, and the createHandle instance API above - previously each duplicated its own
+    // partial copy of this logic (the Escape handler alone had the full show/hide sequence).
+    function doOpen(): void {
+        maskEl!.style.display = 'flex';
+        void maskEl!.offsetWidth; // force reflow so the enter transition actually animates
+        maskEl!.classList.add('p-dialog-mask-active');
+        if (maskEl!.classList.contains('p-dialog-mask-modal')) {
+            document.body.style.overflow = 'hidden';
+        }
         trap.activate();
+    }
+
+    function doClose(): void {
+        trap.deactivate();
+        maskEl!.classList.remove('p-dialog-mask-active');
+        const t = setTimeout(() => {
+            if (!maskEl!.classList.contains('p-dialog-mask-active')) {
+                maskEl!.style.display = 'none';
+            }
+        }, 200);
+        ctx?.onCleanup?.(() => clearTimeout(t));
+        document.body.style.overflow = '';
+    }
+
+    function doToggle(): void {
+        if (maskEl!.classList.contains('p-dialog-mask-active')) {
+            doClose();
+        } else {
+            doOpen();
+        }
+    }
+
+    const instance: DialogInstance = { open: doOpen, close: doClose, toggle: doToggle };
+    (container as any)[DIALOG_INSTANCE_KEY] = instance;
+    ctx?.onCleanup(() => {
+        if ((container as any)[DIALOG_INSTANCE_KEY] === instance) {
+            delete (container as any)[DIALOG_INSTANCE_KEY];
+        }
+    });
+
+    if (props.visible || (props as any).Visible) {
+        doOpen();
     }
 
     const closeBtn = dialogEl.querySelector('.p-dialog-close-button');
@@ -395,16 +459,8 @@ export default function DialogIsland(container: HTMLElement, props: DialogProps,
 
     // Per-island Escape Key Handler
     window.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && maskEl.classList.contains('p-dialog-mask-active')) {
-            trap.deactivate();
-            maskEl.classList.remove('p-dialog-mask-active');
-            const tEsc = setTimeout(() => {
-                if (!maskEl.classList.contains('p-dialog-mask-active')) {
-                    maskEl.style.display = 'none';
-                }
-            }, 200);
-            ctx?.onCleanup?.(() => clearTimeout(tEsc));
-            document.body.style.overflow = '';
+        if (e.key === 'Escape' && maskEl!.classList.contains('p-dialog-mask-active')) {
+            doClose();
         }
     }, { signal: ctx?.signal });
 

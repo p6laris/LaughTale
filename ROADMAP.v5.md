@@ -309,8 +309,22 @@ behaviour, and the fixes are sitting unused in `src/composables/`.
   developer-chosen physical sides, not text-direction-relative, so intentionally not touched); a handful of
   centering-math (`left: 50%` + equal negative margin) and full-bleed (`left: 0; right: 0`) declarations
   that are direction-neutral by construction.
-- **Imperative handles** *(S · 1 wk)* — `createHandle` is defined in the registry and implemented by
-  zero components. `dialog.open()`, `toast.show()`, `datatable.reload()`.
+- **Imperative handles — [CLOSED, this pass]** `createHandle` was defined in the registry (`hydrator.ts`
+  already called `module.createHandle(container, props)` and merged the result onto `container.island`)
+  and implemented by zero components. Implemented the roadmap's own three named examples:
+  `dialog.open()/close()/toggle()`, `toast.show()/clear()`, `datatable.reload()`. Since `createHandle`
+  runs BEFORE `mount()` (hydrator.ts builds `container.island` ahead of the actual mount call), `dialog`
+  and `datatable`'s handles can't capture the real mask/reload closures directly — they return thin
+  forwarders that look up an instance API the mount function stashes on the container once it actually
+  runs, resolved lazily at call time (always after mount, since nothing external can call
+  `container.island.open()` before the page is interactive). `toast` needed no such indirection: its
+  `globalToast` service is already a persistent singleton keyed by group, so `createHandle` forwards to
+  it directly. `dialog.open()`/`close()`/`toggle()` also consolidated three previously-duplicated copies
+  of the show/hide sequence (the Escape handler, the initial `visible`-prop check, and the close button)
+  into one shared implementation. `datatable.reload()` re-fetches from `lazyUrl` when lazy-backed,
+  otherwise re-renders the already-loaded data — verified live to trigger a real second network request
+  and re-render, not just a no-op. All three verified live in Showcase (`/components`) via direct
+  `container.island.<method>()` calls; 5 new tests in `tests/components/imperative-handles.test.ts`.
 - **Visual regression tests** *(M · 2 wks)* — Playwright is already a dependency; the suite is
   unit-level, so a 700-line restyle passes CI unseen.
 
@@ -1027,7 +1041,7 @@ worse than shipping neither, because it looks finished.
 | CSP-safe expressions | *(Alpine can't)* | **Unique** — AST evaluator, no `eval` | I |
 | Directive layer | Alpine, Stimulus | **Built, undocumented** — 19 directives | I |
 | Composable primitives | Nuxt, Vue | **Built, unused** — 21 written, ~0 adopted | C |
-| Imperative handles | — | **Built, unused** — 0 implementations | C |
+| Imperative handles | — | **Adopted — [CLOSED, this pass]** — `dialog`, `toast`, `datatable` implement `createHandle`; the mechanism itself was already sound | C |
 | Localization & i18n | Nuxt i18n, Astro | **Strong — [CLOSED, this pass]** — TagHelper split fixed (82/82 reach the localizer); vocabulary moved to `LaughTale.Components`; all 31 hardcoded English defaults and 13 client-template strings routed through it; 10 locales, 1,509 lines. Locale-aware formatting/routing/pluralization/translator workflow remain open follow-ups | **N** |
 | Locale-aware routing | Nuxt i18n | **Missing** | **N** |
 | RTL support | web platform | **Substantially improved — [CLOSED, this pass]** — `rtlAdoption` 8/76 → 49/76. CSS logical-property conversion across 42 components + targeted gap-fixes in 5 of the original 8; icon mirroring extended to 7 more components; 5 behavioral/JS geometry bugs fixed with unit tests (`useFloatingPosition` — 14 consumers, `slider`, `splitter`, `rating`, `toggle-switch`). Not a blanket claim: `scrollarea`'s scrollbar-drag math is flagged but unfixed (cross-browser `scrollLeft` disagreement under RTL), and `speed-dial`/`toast`'s explicit corner/fan-out positioning is intentionally left physical, not logical | **N** |

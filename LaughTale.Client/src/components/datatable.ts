@@ -613,6 +613,21 @@ html.dark .p-product-avatar,
 }
 `;
 
+/**
+ * Imperative handle (ROADMAP.v5.md Part C, "imperative handles" — `datatable.reload()` was the
+ * roadmap's own named example). Same mount-time indirection as dialog.ts's handle: `createHandle`
+ * runs before `mount()`, before `reload` (a closure inside `DataTableIsland`) exists, so this returns
+ * a thin forwarder that looks up the real function (stashed on the container once mounted) at call
+ * time - always after mount by construction.
+ */
+const DATATABLE_INSTANCE_KEY = '__ltDataTableInstance';
+
+export function createHandle(container: HTMLElement) {
+    return {
+        reload: () => (container as any)[DATATABLE_INSTANCE_KEY]?.reload()
+    };
+}
+
 export default function DataTableIsland(container: HTMLElement, props: DataTableProps, ctx?: IslandContext) {
     injectIslandStyle('datatable', DATATABLE_CSS);
     const locale = useLocale(ctx);
@@ -1712,6 +1727,25 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
             selectedRows
         });
     }
+
+    // Imperative reload: re-fetches from the server when lazy-backed, otherwise just re-renders the
+    // already-loaded data - distinct from the initial-render check below, which only lazy-fetches when
+    // no initial data was provided at all. A later explicit reload() call should always refetch.
+    function doReload(): void {
+        if (isLazy && props.lazyUrl) {
+            fetchLazyData();
+        } else {
+            render();
+        }
+    }
+
+    const instance = { reload: doReload };
+    (container as any)[DATATABLE_INSTANCE_KEY] = instance;
+    ctx?.onCleanup(() => {
+        if ((container as any)[DATATABLE_INSTANCE_KEY] === instance) {
+            delete (container as any)[DATATABLE_INSTANCE_KEY];
+        }
+    });
 
     // Initial render / lazy fetch
     if (isLazy && props.lazyUrl && rawData.length === 0) {
