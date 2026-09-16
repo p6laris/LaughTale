@@ -2,7 +2,7 @@ import { useLocale } from '../composables/useLocale';
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
-import { LucideIcons } from '../icons/lucide';
+import { LucideIcons, getLucideIcon } from '../icons/lucide';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import { announce } from '../accessibility/announcer';
 import type { PatternDeclaration } from '../accessibility/patterns';
@@ -637,7 +637,7 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
             setHtml(container, html`
                 <div class="p-fileupload p-fileupload-custom" data-part="root" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
                     <span class="p-fileupload-choose" tabindex="0">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                        ${unsafe(getLucideIcon('upload', 16, 2))}
                         <span>${chooseLabel}</span>
                         <input type="file" accept="${accept}" class="p-fileupload-input" aria-label="${chooseLabel || 'Upload file'}" />
                     </span>
@@ -681,7 +681,7 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
                 setHtml(container, html`
                     <div class="p-fileupload p-fileupload-basic" style="justify-content: center; width: 100%;">
                         <span class="p-fileupload-choose" tabindex="0">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                            ${unsafe(getLucideIcon('upload', 16, 2))}
                             <span>${chooseLabel}</span>
                             <input type="file" accept="${accept}" ${attr('multiple', multiple)} class="p-fileupload-input" aria-label="${chooseLabel || 'Upload file'}" />
                         </span>
@@ -692,13 +692,13 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
                 setHtml(container, html`
                     <div class="p-fileupload p-fileupload-basic" style="justify-content: center; width: 100%;">
                         <span class="p-fileupload-choose" tabindex="0">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                            ${unsafe(getLucideIcon('upload', 16, 2))}
                             <span>${chooseLabel}</span>
                             <input type="file" accept="${accept}" ${attr('multiple', multiple)} class="p-fileupload-input" aria-label="${chooseLabel || 'Upload file'}" />
                         </span>
                         <span class="p-fileupload-filename" style="margin-inline-start: 0.5rem; margin-inline-end: 0.5rem;">${fileName}</span>
                         <button type="button" class="p-button p-button-outlined p-fileupload-upload-btn" ${!hasFile || isUploading ? 'disabled style="opacity:0.5; pointer-events:none; cursor:not-allowed;"' : ''}>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                            ${unsafe(getLucideIcon('upload', 16, 2))}
                             <span>${uploadLabel}</span>
                         </button>
                     </div>
@@ -737,16 +737,16 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
                 <!-- Toolbar Header -->
                 <div class="p-fileupload-header">
                     <span class="p-fileupload-choose" tabindex="0">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+                        ${unsafe(getLucideIcon('plus', 16, 2))}
                         <span>${chooseLabel}</span>
                         <input type="file" accept="${accept}" ${attr('multiple', multiple)} class="p-fileupload-input" aria-label="${chooseLabel || 'Upload file'}" />
                     </span>
                     <button type="button" class="p-button p-button-outlined p-fileupload-upload-btn" ${!hasFiles || isUploading ? 'disabled style="opacity:0.5; pointer-events:none; cursor:not-allowed;"' : ''}>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                        ${unsafe(getLucideIcon('upload', 16, 2))}
                         <span>${uploadLabel}</span>
                     </button>
                     <button type="button" class="p-button p-button-outlined p-fileupload-cancel-btn" ${!hasFiles || isUploading ? 'disabled style="opacity:0.5; pointer-events:none; cursor:not-allowed;"' : ''}>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        ${unsafe(getLucideIcon('x', 16, 2))}
                         <span>${cancelLabel}</span>
                     </button>
                 </div>
@@ -773,7 +773,7 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
                                 <div class="p-fileupload-image-card">
                                     <img src="${safeUrl(f.previewUrl || 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=200&auto=format&fit=crop&q=80')}" alt="${f.name}" />
                                     <button type="button" class="p-fileupload-image-remove" data-remove-id="${f.id}" title="Remove image">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                        ${unsafe(getLucideIcon('x', 12, 2.5))}
                                     </button>
                                 </div>
                             `)}
@@ -800,7 +800,7 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
                                             ${f.status === 'completed' ? 'Uploaded' : (f.status === 'uploading' ? `${f.progress}%` : 'Pending')}
                                         </span>
                                         <button type="button" class="p-button p-button-text p-button-danger p-button-sm" data-remove-id="${f.id}" style="border: none; background: transparent; color: var(--p-red-500, #ef4444); cursor: pointer; padding: 0.35rem; display: flex; align-items: center; border-radius: 9999px;">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                            ${unsafe(getLucideIcon('x', 16, 2))}
                                         </button>
                                     </div>
                                 </div>

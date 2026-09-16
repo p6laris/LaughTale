@@ -5,7 +5,7 @@
  * promise/async flows, custom templates, action buttons, and full WAI-ARIA alert accessibility.
  */
 
-import { LucideIcons } from '../icons/lucide';
+import { LucideIcons, getLucideIcon } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
 import { onIslandEvent } from '../runtime/events';
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
@@ -412,7 +412,7 @@ html.dark .p-toast-close-button:hover,
 }
 `;
 
-const CLOSE_SVG = `<svg class="p-toast-close-icon" data-part="root" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
+const CLOSE_SVG = getLucideIcon('x', 14, 2).replace('"p-icon p-icon-x"', '"p-icon p-icon-x p-toast-close-icon"').replace('<svg ', '<svg data-part="root" ');
 
 export class ToastService {
     private registeredContainers: Map<string, HTMLElement> = new Map();
@@ -457,29 +457,29 @@ export class ToastService {
 
         let iconSvg = '';
         if (msg.spin) {
-            iconSvg = `<span class="p-toast-spin">${LucideIcons.loader2 || '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>'}</span>`;
+            iconSvg = `<span class="p-toast-spin">${LucideIcons.loader2}</span>`;
         } else if (msg.icon && (LucideIcons as any)[msg.icon]) {
             iconSvg = (LucideIcons as any)[msg.icon];
         } else {
             switch (severity) {
                 case 'success':
-                    iconSvg = LucideIcons.check || '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>';
+                    iconSvg = LucideIcons.check;
                     break;
                 case 'warn':
-                    iconSvg = LucideIcons.receipt || LucideIcons.alertTriangle || '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/></svg>';
+                    iconSvg = LucideIcons.receipt || LucideIcons.alertTriangle;
                     break;
                 case 'error':
-                    iconSvg = LucideIcons.alertTriangle || LucideIcons.xCircle || '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
+                    iconSvg = LucideIcons.alertTriangle || LucideIcons.xCircle;
                     break;
                 case 'secondary':
-                    iconSvg = `<span class="p-toast-spin">${LucideIcons.loader2 || '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>'}</span>`;
+                    iconSvg = `<span class="p-toast-spin">${LucideIcons.loader2}</span>`;
                     break;
                 case 'contrast':
-                    iconSvg = LucideIcons.wifi || LucideIcons.sparkles || '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h.01"/><path d="M2 8.82a15 15 0 0 1 20 0"/></svg>';
+                    iconSvg = LucideIcons.wifi || LucideIcons.sparkles;
                     break;
                 case 'info':
                 default:
-                    iconSvg = LucideIcons.sparkles || LucideIcons.info || '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>';
+                    iconSvg = LucideIcons.sparkles || LucideIcons.info;
                     break;
             }
         }

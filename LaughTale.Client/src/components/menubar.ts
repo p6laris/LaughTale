@@ -7,7 +7,7 @@ import { useFloatingPosition } from '../composables/useFloatingPosition';
  * customizable start and end slots, badge/shortcut rendering, and full WAI-ARIA keyboard navigation.
  */
 
-import { LucideIcons } from '../icons/lucide';
+import { LucideIcons, getLucideIcon } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import { setRovingTabindex, handleRovingKeydown } from '../accessibility/aria';
@@ -407,8 +407,8 @@ export default function MenubarIsland(container: HTMLElement, props: MenubarProp
         const iconSvg = item.icon ? getIconSvg(item.icon) : '';
         const iconHtml = iconSvg ? html`<span class="p-menubar-item-icon">${unsafe(iconSvg)}</span>` : '';
 
-        const angleDownSvg = html`<svg class="p-menubar-submenu-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
-        const angleRightSvg = html`<svg class="p-menubar-submenu-icon" style="margin-inline-start: auto;" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`;
+        const angleDownSvg = unsafe(getLucideIcon('chevron-down', 13, 2.2).replace('"p-icon p-icon-chevron-down"', '"p-icon p-icon-chevron-down p-menubar-submenu-icon"'));
+        const angleRightSvg = unsafe(getLucideIcon('chevron-right', 13, 2.2).replace('"p-icon p-icon-chevron-right"', '"p-icon p-icon-chevron-right p-menubar-submenu-icon" style="margin-inline-start: auto;"'));
 
         const submenuIndicator = hasSubmenu ? (isRoot ? angleDownSvg : angleRightSvg) : '';
 

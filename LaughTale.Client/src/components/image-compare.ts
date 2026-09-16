@@ -1,6 +1,6 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
-import { LucideIcons } from '../icons/lucide';
+import { LucideIcons, getLucideIcon } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
 import { emitComponentEvent } from '../runtime/events';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
@@ -211,8 +211,8 @@ html.dark .p-compare-indicator,
 }
 `;
 
-const ARROWS_H_SVG = html`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 8 4 4-4 4"/><path d="M2 12h20"/><path d="m6 8-4 4 4 4"/></svg>`;
-const CODE_SVG = html`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>`;
+const ARROWS_H_SVG = unsafe(getLucideIcon('move-horizontal', 16, 2.2));
+const CODE_SVG = unsafe(getLucideIcon('code', 16, 2.2));
 
 export default function CompareIsland(container: HTMLElement, props: CompareProps, ctx?: IslandContext) {
     injectIslandStyle('compare', COMPARE_CSS);

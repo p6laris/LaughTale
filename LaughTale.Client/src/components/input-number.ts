@@ -4,6 +4,7 @@ import { injectIslandStyle } from '../runtime/styles';
 import { emitComponentEvent } from '../runtime/events';
 import { useFormField } from '../composables/useFormField';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import { getLucideIcon } from '../icons/lucide';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -541,11 +542,11 @@ export function initInputNumber(
 
         const formattedVal = formatNumber(rawValue);
 
-        const upIcon = html`<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>`;
-        const downIcon = html`<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
-        const plusIcon = html`<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>`;
-        const minusIcon = html`<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>`;
-        const clearIcon = html`<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
+        const upIcon = unsafe(getLucideIcon('chevron-up', 12, 2.5));
+        const downIcon = unsafe(getLucideIcon('chevron-down', 12, 2.5));
+        const plusIcon = unsafe(getLucideIcon('plus', 12, 2.5));
+        const minusIcon = unsafe(getLucideIcon('minus', 12, 2.5));
+        const clearIcon = unsafe(getLucideIcon('x', 14, 2));
 
         const btnSevClass = props.buttonSeverity ? `p-button-${props.buttonSeverity.toLowerCase()}` : '';
         const customBtnClass = props.buttonClass || '';

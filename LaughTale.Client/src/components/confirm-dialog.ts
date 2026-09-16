@@ -4,6 +4,7 @@ import { injectIslandStyle } from '../runtime/styles';
 import { useFocusTrap, type UseFocusTrapReturn } from '../composables/useFocusTrap';
 import { html, setHtml, unsafe, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
+import { getLucideIcon } from '../icons/lucide';
 
 export const a11y: PatternDeclaration = {
     kind: 'pattern',
@@ -278,13 +279,16 @@ export interface ConfirmDialogProps {
 }
 
 // Vector SVG Icons
-const CLOSE_SVG = html`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>`;
-const INFO_ICON_SVG = html`<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="16" y2="12"/><line x1="12" x2="12.01" y1="8" y2="8"/></svg>`;
-const DANGER_ALERT_SVG = html`<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>`;
-const QUESTION_SVG = html`<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>`;
-const CHECK_SVG = html`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+const CLOSE_SVG = unsafe(getLucideIcon('x', 16, 2));
+const INFO_ICON_SVG = unsafe(getLucideIcon('info', 28, 2));
+const DANGER_ALERT_SVG = unsafe(getLucideIcon('triangle-alert', 28, 2));
+const QUESTION_SVG = unsafe(getLucideIcon('circle-help', 28, 2));
+const CHECK_SVG = unsafe(getLucideIcon('check', 16, 2.2));
+// NOTE: left as a raw literal — lucide-static's current circle-check-big.svg uses a differently
+// parameterized arc (`M21.801 10A10 10 0 1 1 17 3.335`) than this literal's
+// (`M22 11.08V12a10 10 0 1 1-5.93-9.14`); not an exact shape-data match.
 const CHECK_LARGE_SVG = html`<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
-const LOCK_SVG = html`<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`;
+const LOCK_SVG = unsafe(getLucideIcon('lock', 32, 2));
 
 // Global Confirmation Controller Instance
 class ConfirmDialogManager {

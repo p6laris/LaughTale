@@ -9,7 +9,7 @@ import { useFloatingPosition } from '../composables/useFloatingPosition';
  */
 
 import { MenuItem } from '../types/models';
-import { LucideIcons } from '../icons/lucide';
+import { LucideIcons, getLucideIcon } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
 import { emitIslandEvent, emitComponentEvent } from '../runtime/events';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
@@ -343,7 +343,7 @@ export default function TieredMenuIsland(container: HTMLElement, props: TieredMe
         return '';
     }
 
-    const chevronRightSvg = `<svg class="p-tieredmenu-submenu-icon" data-part="root" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`;
+    const chevronRightSvg = getLucideIcon('chevron-right', 14, 2).replace('"p-icon p-icon-chevron-right"', '"p-icon p-icon-chevron-right p-tieredmenu-submenu-icon"').replace('<svg ', '<svg data-part="root" ');
 
     function renderMenuItems(itemsList: MenuItem[], level: number = 0): Raw[] {
         return itemsList.map((item, idx) => {

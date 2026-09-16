@@ -3,7 +3,8 @@ import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
 import { useFocusTrap, type UseFocusTrapReturn } from '../composables/useFocusTrap';
 import { useFloatingPosition } from '../composables/useFloatingPosition';
-import { html, setHtml, type Raw } from '../runtime/html';
+import { html, setHtml, unsafe, type Raw } from '../runtime/html';
+import { getLucideIcon } from '../icons/lucide';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -221,11 +222,11 @@ export interface ConfirmPopupProps {
 }
 
 // Vector SVGs
-const ALERT_TRIANGLE_SVG = html`<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
-const INFO_CIRCLE_SVG = html`<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`;
-const EXCLAMATION_LARGE_SVG = html`<svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
-const CHECK_SVG = html`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
-const CLOSE_SVG = html`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+const ALERT_TRIANGLE_SVG = unsafe(getLucideIcon('triangle-alert', 20, 2));
+const INFO_CIRCLE_SVG = unsafe(getLucideIcon('info', 20, 2));
+const EXCLAMATION_LARGE_SVG = unsafe(getLucideIcon('circle-alert', 34, 2.2));
+const CHECK_SVG = unsafe(getLucideIcon('check', 14, 2.2));
+const CLOSE_SVG = unsafe(getLucideIcon('x', 14, 2.2));
 
 class ConfirmPopupManager {
     public popupEl: HTMLElement | null = null;

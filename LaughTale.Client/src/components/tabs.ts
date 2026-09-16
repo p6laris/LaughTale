@@ -10,6 +10,7 @@ import { injectIslandStyle } from '../runtime/styles';
 import { emitComponentEvent } from '../runtime/events';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
+import { getLucideIcon } from '../icons/lucide';
 
 export const a11y: PatternDeclaration = {
     kind: 'pattern',
@@ -339,8 +340,8 @@ export interface TabsProps {
     studioOverrides?: Record<string, any>;
 }
 
-const CHEVRON_LEFT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>`;
-const CHEVRON_RIGHT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`;
+const CHEVRON_LEFT_SVG = getLucideIcon('chevron-left', 18, 2.2);
+const CHEVRON_RIGHT_SVG = getLucideIcon('chevron-right', 18, 2.2);
 
 export default function TabsIsland(container: HTMLElement, props: TabsProps, ctx?: IslandContext) {
     injectIslandStyle('tabs', TABS_CSS);

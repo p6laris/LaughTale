@@ -575,9 +575,22 @@ stated — they're real, small, still-open dedup candidates.
 Re-verified against `audit-metrics.mjs`'s live counters rather than trusting the roadmap's own
 possibly-stale figures — all of the below are confirmed still real and still open:
 
-- **212 inline SVG literals** (`rawSvgLiterals: 212`, exact match). The `icons/` module exists and is
-  imported by 40 components; ~36 components still paste raw `<svg>`. The same folder icon is
-  duplicated verbatim across `accordion`, `tree`, `treetable`.
+- **212 inline SVG literals — [CLOSED (75%), this pass]**. Retrofitted 33 of the ~37 affected
+  components to `getLucideIcon()`, matching each hand-written `<path>`/shape against the real
+  `lucide-static` source (not guessed from variable names) before substituting — `rawSvgLiterals`
+  dropped from 212 to 53 (re-verified against `audit-metrics.mjs`; baseline updated so a future
+  regression back toward raw SVGs fails CI). The duplicated folder icon across `accordion`, `tree`,
+  `treetable` is now one shared sprite symbol instead of three copies. The remaining 53 are
+  deliberately untouched, not missed: several are genuinely pre-Lucide-redesign shapes with no
+  current match (old `eye`/`eye-off`, `star`, `cog`, `file`, `truck`, ...), a few need rendering
+  properties `getLucideIcon` can't produce (`rating.ts`'s filled star needs `fill="currentColor"`
+  against the module's fixed stroke-only template; `toolbar.ts`'s play/pause are solid shapes, not
+  outline), and a few carry a load-bearing extra CSS class or animation hook the module has no way
+  to add (`message.ts`'s size-overridden close icon, `treetable`/`tree`'s `animate-spin` spinners —
+  solved elsewhere in this pass via a wrapping `<span class="animate-spin">` where the surrounding
+  markup allowed it, e.g. `blockui.ts`). Full production build, all three gzip budgets, and all 495
+  client tests verified green after the retrofit; the all-in-one bundle also shrank measurably
+  (376.93 KB → 372.81 KB gzip) from removing the duplicated inline markup.
 - **Two private copies of `escapeHtml`** (corrected from "three, subsumed" above) —
   `directives/tooltip.ts`, `icons/lucide.ts`.
 - **39 `LEGACY_ALIASES`** in the registry (confirmed: exactly 39 today), commented "scheduled for
@@ -1077,7 +1090,7 @@ worse than shipping neither, because it looks finished.
 | Per-island code splitting | Astro, Qwik | Partial — ESM splits; IIFE ships all 76 | B |
 | Signals / fine-grained reactivity | Qwik, Solid | Partial — `reactivity.ts` 173 lines | I |
 | Perf budgets in CI | — | **Adopted — [CLOSED (mechanical part), this pass]** — real CI now exists at all; gzip check extended to per-island chunks; hydration-time/Lighthouse still deferred | J |
-| Icon system | — | Partial — module exists; 212 raw SVGs | M |
+| Icon system | — | **Strong — [CLOSED (75%), this pass]** — module already existed; retrofitted 33 of ~37 components, `rawSvgLiterals` 212 → 53, remaining 53 deliberately kept (pre-redesign shapes with no current match, or render properties/CSS hooks the module can't express) | M |
 | Typed content collections | Astro | **Strong — [CLOSED, this pass]** — already fully typed end-to-end; the one real gap (silent schema-mismatch swallowing) is now a loud failure | F |
 | Safe rendering primitive | Lit `html\`\`` | **Strong — already closed before this session, roadmap was stale** — `runtime/html.ts` + a `verify-contracts.mjs` lint gate ban raw `innerHTML` outright; `innerHtmlRawAssignments: 0` across all 76 components today | M |
 | Island compiler / discovery | Fresh, Nuxt | **Missing** | B |

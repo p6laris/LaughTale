@@ -13,7 +13,7 @@ import type { IslandContext } from '../runtime/registry';
  */
 
 import { SidebarItem } from '../types/models';
-import { LucideIcons } from '../icons/lucide';
+import { LucideIcons, getLucideIcon } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
 import { useFocusTrap } from '../composables/useFocusTrap';
 import { useLocale } from '../composables/useLocale';
@@ -1329,8 +1329,8 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps, ctx?
                     `;
                 }
 
-                const chevronSvg = `<svg class="p-sidebar-submenu-chevron ${isSubExpanded ? 'p-expanded' : ''}" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
-                const ellipsisSvg = `<svg class="p-sidebar-menu-action" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>`;
+                const chevronSvg = getLucideIcon('chevron-down', 13, 2).replace('"p-icon p-icon-chevron-down"', `"p-icon p-icon-chevron-down p-sidebar-submenu-chevron ${isSubExpanded ? 'p-expanded' : ''}"`);
+                const ellipsisSvg = getLucideIcon('ellipsis-vertical', 14, 2).replace('"p-icon p-icon-ellipsis-vertical"', '"p-icon p-icon-ellipsis-vertical p-sidebar-menu-action"');
                 const trashSvg = `<button type="button" class="p-sidebar-menu-action" title="Delete conversation" aria-label="Delete conversation" style="border:none;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>`;
 
                 const actionButton = demoType === 'chat' ? trashSvg : (it.badge === undefined ? ellipsisSvg : '');
@@ -1389,7 +1389,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps, ctx?
                                 ${chatGptSparkleIcon}
                             </div>
                             <span class="p-sidebar-item-label p-sidebar-header-label" style="font-weight: 700; font-size: 0.9rem;">ChatGPT</span>
-                            <svg class="p-sidebar-submenu-chevron" style="margin-inline-start: auto;" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                            ${getLucideIcon('chevron-down', 13, 2).replace('"p-icon p-icon-chevron-down"', '"p-icon p-icon-chevron-down p-sidebar-submenu-chevron"')}
                         </button>
                     </li>
                 </ul>
@@ -1424,7 +1424,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps, ctx?
                             <button type="button" class="p-sidebar-menu-button" data-company-trigger style="padding: 0.35rem 0.5rem;">
                                 <div style="display:flex; width:1.5rem; height:1.5rem; border-radius:6px; background: ${activeCompany.color}; color:var(--lt-surface-0, var(--lt-surface-0)); align-items:center; justify-content:center; font-weight:700; font-size:0.75rem; flex-shrink:0;">${activeCompany.logo}</div>
                                 <span class="p-sidebar-item-label p-sidebar-header-label" style="font-weight: 700; font-size: 0.875rem;">${activeCompany.name}</span>
-                                <svg class="p-sidebar-submenu-chevron" style="margin-inline-start: auto;" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                                ${getLucideIcon('chevron-down', 13, 2).replace('"p-icon p-icon-chevron-down"', '"p-icon p-icon-chevron-down p-sidebar-submenu-chevron"')}
                             </button>
                         </li>
                     </ul>
@@ -1490,7 +1490,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps, ctx?
                             <button type="button" class="p-sidebar-menu-button" data-user-trigger style="padding: 0.35rem 0.5rem;">
                                 <div style="display:flex; width:1.5rem; height:1.5rem; border-radius:9999px; background: var(--lt-surface-300); color:var(--lt-surface-800); align-items:center; justify-content:center; font-weight:700; font-size:0.65rem; flex-shrink:0;">JD</div>
                                 <span class="p-sidebar-item-label p-sidebar-footer-label" style="font-weight: 600; font-size: 0.8125rem;">John Doe</span>
-                                <svg class="p-sidebar-submenu-chevron" style="margin-inline-start: auto;" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                                ${getLucideIcon('chevron-down', 13, 2).replace('"p-icon p-icon-chevron-down"', '"p-icon p-icon-chevron-down p-sidebar-submenu-chevron"')}
                             </button>
                         </li>
                     </ul>
@@ -1529,12 +1529,12 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps, ctx?
     }
 
     function renderMainContent(): string {
-        const triggerIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg>`;
+        const triggerIconSvg = getLucideIcon('panel-left', 16, 2);
         const chatIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>`;
 
         if (demoType === 'chat') {
             const chatGptSparkle = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>`;
-            const arrowUpSend = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>`;
+            const arrowUpSend = getLucideIcon('arrow-up', 14, 2.5);
             const paperclipIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>`;
             const newChatPenIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.375 2.625a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4Z"/></svg>`;
 
@@ -1547,7 +1547,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps, ctx?
                             </button>
                             <div style="display: flex; align-items: center; gap: 0.35rem; padding: 0.3rem 0.6rem; border-radius: 8px; background: var(--lt-surface-100); font-weight: 600; font-size: 0.8125rem; color: var(--lt-text-primary); cursor: pointer;">
                                 <span>ChatGPT 4o</span>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                                ${getLucideIcon('chevron-down', 12, 2)}
                             </div>
                         </div>
                         <button type="button" class="p-sidebar-trigger" title="New chat" aria-label="New chat">
@@ -1668,7 +1668,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps, ctx?
     }
 
     function renderComponent(): string {
-        const searchIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>`;
+        const searchIconSvg = getLucideIcon('search', 13, 2);
 
         const sidebarClasses = [
             'p-sidebar',

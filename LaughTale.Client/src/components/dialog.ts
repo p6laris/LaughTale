@@ -3,6 +3,7 @@ import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
 import { useFocusTrap } from '../composables/useFocusTrap';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import { getLucideIcon } from '../icons/lucide';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -225,9 +226,9 @@ html.dark .p-dialog-header-action:hover,
 `;
 
 // Vector SVG Icons
-const CLOSE_ICON_SVG = html`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>`;
-const MAXIMIZE_ICON_SVG = html`<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" x2="14" y1="3" y2="10"/><line x1="3" x2="10" y1="21" y2="14"/></svg>`;
-const RESTORE_ICON_SVG = html`<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" x2="21" y1="10" y2="3"/><line x1="10" x2="3" y1="14" y2="21"/></svg>`;
+const CLOSE_ICON_SVG = unsafe(getLucideIcon('x', 16, 2));
+const MAXIMIZE_ICON_SVG = unsafe(getLucideIcon('maximize-2', 15, 2));
+const RESTORE_ICON_SVG = unsafe(getLucideIcon('minimize-2', 15, 2));
 
 export interface DialogProps {
     header?: string;

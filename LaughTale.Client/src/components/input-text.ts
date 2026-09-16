@@ -2,7 +2,7 @@ import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts
 import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
 import { emitComponentEvent } from '../runtime/events';
-import { LucideIcons } from '../icons/lucide';
+import { LucideIcons, getLucideIcon } from '../icons/lucide';
 import { useControllableState } from '../composables/useControllableState';
 import { useFormField } from '../composables/useFormField';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
@@ -259,7 +259,7 @@ html.dark .p-inputtext-icon,
 }
 `;
 
-const xIcon = html`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
+const xIcon = unsafe(getLucideIcon('x', 14, 2));
 
 export default function InputTextIsland(container: HTMLElement, props: InputTextProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-inputtext', CSS);

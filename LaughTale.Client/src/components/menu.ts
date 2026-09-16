@@ -8,7 +8,7 @@ import { useFloatingPosition } from '../composables/useFloatingPosition';
  * interactive checkbox/radio groups, custom templates, and WAI-ARIA keyboard navigation.
  */
 
-import { LucideIcons } from '../icons/lucide';
+import { LucideIcons, getLucideIcon } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import { setRovingTabindex, handleRovingKeydown } from '../accessibility/aria';
@@ -418,8 +418,8 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
 
         let iconHtml: Raw | '' = '';
         if (item.checked !== undefined) {
-            iconHtml = item.checked 
-                ? html`<span class="p-menu-item-icon p-menu-check-icon"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>`
+            iconHtml = item.checked
+                ? html`<span class="p-menu-item-icon p-menu-check-icon">${unsafe(getLucideIcon('check', 15, 2.5))}</span>`
                 : html`<span class="p-menu-item-icon p-menu-blank-icon"></span>`;
         } else if (item.radioSelected !== undefined) {
             iconHtml = item.radioSelected
@@ -430,7 +430,7 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
             if (svg) iconHtml = html`<span class="p-menu-item-icon">${unsafe(svg)}</span>`;
         }
 
-        const chevronSvg = html`<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
+        const chevronSvg = unsafe(getLucideIcon('chevron-down', 13, 2.2));
 
         let subHtml: Raw | '' = '';
         if (isGroup) {

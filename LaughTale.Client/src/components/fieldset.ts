@@ -4,6 +4,7 @@ import { injectIslandStyle } from '../runtime/styles';
 import { emitComponentEvent } from '../runtime/events';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
+import { getLucideIcon } from '../icons/lucide';
 
 export const a11y: PatternDeclaration = {
     kind: 'native',
@@ -11,9 +12,9 @@ export const a11y: PatternDeclaration = {
 };
 
 const SVG_ICONS = {
-    chevronDown: html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`,
-    plus: html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>`,
-    minus: html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>`
+    chevronDown: unsafe(getLucideIcon('chevron-down', 14, 2.5)),
+    plus: unsafe(getLucideIcon('plus', 14, 2.5)),
+    minus: unsafe(getLucideIcon('minus', 14, 2.5))
 };
 
 const FIELDSET_CSS = `

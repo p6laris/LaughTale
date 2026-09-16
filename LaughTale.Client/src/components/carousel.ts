@@ -6,11 +6,11 @@
  * synchronized gallery thumbnails, silky smooth 60fps transitions, and WAI-ARIA.
  */
 
-import { LucideIcons } from '../icons/lucide';
+import { LucideIcons, getLucideIcon } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
-import { html, setHtml, url, type Raw } from '../runtime/html';
+import { html, setHtml, url, unsafe, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -276,10 +276,10 @@ html.dark .p-carousel-next:hover:not(:disabled),
 }
 `;
 
-const CHEVRON_LEFT = html`<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>`;
-const CHEVRON_RIGHT = html`<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`;
-const CHEVRON_UP = html`<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>`;
-const CHEVRON_DOWN = html`<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
+const CHEVRON_LEFT = unsafe(getLucideIcon('chevron-left', 18, 2.2));
+const CHEVRON_RIGHT = unsafe(getLucideIcon('chevron-right', 18, 2.2));
+const CHEVRON_UP = unsafe(getLucideIcon('chevron-up', 20, 2.2));
+const CHEVRON_DOWN = unsafe(getLucideIcon('chevron-down', 20, 2.2));
 
 const GALLERY_DEFAULT_IMAGES = [
     'https://images.unsplash.com/photo-1589656966895-2f33e7653819?q=80&w=1470&auto=format&fit=crop',

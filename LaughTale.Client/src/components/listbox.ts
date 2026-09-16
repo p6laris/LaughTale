@@ -437,8 +437,8 @@ html.dark .p-listbox-striped .p-listbox-option:nth-child(even):not(.p-highlight)
 }
 `;
 
-const checkSvg = html`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
-const searchSvg = html`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>`;
+const checkSvg = unsafe(getLucideIcon('check', 14, 3));
+const searchSvg = unsafe(getLucideIcon('search', 14, 2));
 
 export default function ListboxIsland(container: HTMLElement, props: ListboxProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-listbox', CSS);

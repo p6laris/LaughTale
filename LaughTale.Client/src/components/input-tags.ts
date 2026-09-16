@@ -6,6 +6,7 @@ import { useControllableState } from '../composables/useControllableState';
 import { useFormField } from '../composables/useFormField';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
+import { getLucideIcon } from '../icons/lucide';
 
 export const a11y: PatternDeclaration = {
     kind: 'native',
@@ -307,7 +308,7 @@ html.dark .p-inputtags-item.is-highlighted,
 }
 `;
 
-const xCircleIcon = html`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>`;
+const xCircleIcon = unsafe(getLucideIcon('circle-x', 14, 2));
 
 export default function InputTagsIsland(container: HTMLElement, props: InputTagsProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-inputtags', CSS);

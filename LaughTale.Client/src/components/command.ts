@@ -1,6 +1,6 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
-import { LucideIcons } from '../icons/lucide';
+import { LucideIcons, getLucideIcon } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
 import { useFocusTrap } from '../composables/useFocusTrap';
 import { useLocale } from '../composables/useLocale';
@@ -423,14 +423,14 @@ export default function CommandMenuIsland(container: HTMLElement, props: Command
     }
 
     function setupCommandMenu(targetEl: HTMLElement) {
-        const arrowUpSvg = html`<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>`;
-        const arrowDownSvg = html`<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
+        const arrowUpSvg = unsafe(getLucideIcon('chevron-up', 12, 2.5));
+        const arrowDownSvg = unsafe(getLucideIcon('chevron-down', 12, 2.5));
 
         setHtml(targetEl, html`
             <div class="p-commandmenu p-component" data-part="root" tabindex="0" ${withDialog ? attr('style', 'border: none; box-shadow: none; width: 100%;') : ''}>
                 <div class="p-commandmenu-header">
                     <span class="p-commandmenu-search-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                        ${unsafe(getLucideIcon('search', 16, 2))}
                     </span>
                     <input type="text" class="p-commandmenu-input" placeholder="${placeholder}" aria-label="${placeholder}" role="combobox" aria-autocomplete="list" aria-expanded="true" value="${search}" />
                 </div>

@@ -463,23 +463,23 @@ export default function MessageIsland(container: HTMLElement, props: MessageProp
 
     function getDefaultIcon(severity: string, spin?: boolean): string {
         if (spin) {
-            return `<span class="p-message-spin" data-part="root">${LucideIcons.loader2 || '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>'}</span>`;
+            return `<span class="p-message-spin" data-part="root">${LucideIcons.loader2}</span>`;
         }
 
         switch (severity) {
             case 'success':
-                return LucideIcons.check || '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>';
+                return LucideIcons.check;
             case 'warn':
-                return LucideIcons.receipt || LucideIcons.alertTriangle || '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+                return LucideIcons.receipt || LucideIcons.alertTriangle;
             case 'error':
-                return LucideIcons.alertTriangle || LucideIcons.xCircle || '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
+                return LucideIcons.alertTriangle || LucideIcons.xCircle;
             case 'secondary':
-                return `<span class="p-message-spin">${LucideIcons.loader2 || '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>'}</span>`;
+                return `<span class="p-message-spin">${LucideIcons.loader2}</span>`;
             case 'contrast':
-                return LucideIcons.wifi || LucideIcons.sparkles || '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h.01"/><path d="M2 8.82a15 15 0 0 1 20 0"/><path d="M5 12.86a10 10 0 0 1 14 0"/><path d="M8.5 16.43a5 5 0 0 1 7 0"/></svg>';
+                return LucideIcons.wifi || LucideIcons.sparkles;
             case 'info':
             default:
-                return LucideIcons.sparkles || LucideIcons.info || '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>';
+                return LucideIcons.sparkles || LucideIcons.info;
         }
     }
 
