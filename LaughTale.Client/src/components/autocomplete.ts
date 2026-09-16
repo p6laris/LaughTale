@@ -3,6 +3,8 @@ import type { IslandContext } from '../runtime/registry';
 import { LucideIcons } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
 import { emitComponentEvent } from '../runtime/events';
+import { signal, effect } from '../runtime/signals';
+import { patchList } from '../runtime/list-patch';
 import { useDisclosure } from '../composables/useDisclosure';
 import { useClickOutside } from '../composables/useClickOutside';
 import { useDebounce } from '../composables/useDebounce';
@@ -361,16 +363,25 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
     const scrollHeight = props.scrollHeight || '14rem';
     
     const initialVal = props.value ?? formField.getValue();
-    let selectedValues: string[] = multiple 
+    const selectedValues = signal<string[]>(multiple
         ? (Array.isArray(initialVal) ? initialVal : (initialVal ? [initialVal as string] : []))
-        : (initialVal ? [initialVal as string] : []);
-    
-    let searchQuery = '';
+        : (initialVal ? [initialVal as string] : []));
+
+    const searchQuery = signal('');
+    // Whether the dropdown overlay is currently visible. useDisclosure's own
+    // `isOpen` is a plain boolean (not a signal - see useDisclosure.ts), so it
+    // can't be read reactively from inside an effect; this signal mirrors it
+    // (set from onOpen/onClose below) purely so the dropdown-render effect can
+    // depend on "is the overlay open" the same way it depends on searchQuery/
+    // selectedValues. This is what makes reopening the overlay re-render it
+    // even when neither of those signals changed since the last close.
+    const isOverlayOpen = signal(false);
     let highlightedIndex = -1;
 
     function getFilteredItems(): AutoCompleteItem[] {
-        if (!searchQuery) return allItems;
-        const q = searchQuery.toLowerCase();
+        const q0 = searchQuery();
+        if (!q0) return allItems;
+        const q = q0.toLowerCase();
         return allItems.filter(item => 
             item.label.toLowerCase().includes(q) || 
             item.value.toLowerCase().includes(q) ||
@@ -392,7 +403,7 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
                            aria-expanded="false"
                            aria-haspopup="listbox"
                            aria-controls="ac-overlay"
-                           placeholder="${selectedValues.length === 0 ? (props.placeholder || 'Search...') : ''}" 
+                           placeholder="${selectedValues().length === 0 ? (props.placeholder || 'Search...') : ''}"
                            ${attr('disabled', props.disabled)} />
                 </div>
                 
@@ -421,7 +432,7 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
     `);
     formField.reattach();
 
-    const initialSingleVal = multiple ? JSON.stringify(selectedValues) : (selectedValues[0] || '');
+    const initialSingleVal = multiple ? JSON.stringify(selectedValues()) : (selectedValues()[0] || '');
     if (initialSingleVal) {
         formField.setValue(initialSingleVal);
     }
@@ -441,7 +452,12 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
         onOpen: () => {
             overlay.style.display = 'block';
             input.setAttribute('aria-expanded', 'true');
-            renderDropdown();
+            // Flips isOverlayOpen(), which the dropdown-render effect depends
+            // on - this synchronously re-runs it (effects execute immediately
+            // on a dependency change, see signals.ts), so the overlay's
+            // content is always current the moment it becomes visible even if
+            // searchQuery/selectedValues are unchanged since the last close.
+            isOverlayOpen.set(true);
             overlay.style.minWidth = `${rootWrap.offsetWidth || 200}px`;
             floatingHandle = useFloatingPosition(rootWrap, overlay, {
                 placement: 'bottom-start',
@@ -454,13 +470,14 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
         onClose: () => {
             overlay.style.display = 'none';
             input.setAttribute('aria-expanded', 'false');
+            isOverlayOpen.set(false);
             highlightedIndex = -1;
             floatingHandle = null;
-            if (forceSelection && !multiple && searchQuery) {
-                const exact = allItems.find(i => i.label.toLowerCase() === searchQuery.toLowerCase());
+            if (forceSelection && !multiple && searchQuery()) {
+                const exact = allItems.find(i => i.label.toLowerCase() === searchQuery().toLowerCase());
                 if (!exact) {
-                    input.value = selectedValues[0] ? (allItems.find(i => i.value === selectedValues[0])?.label || '') : '';
-                    searchQuery = '';
+                    input.value = selectedValues()[0] ? (allItems.find(i => i.value === selectedValues()[0])?.label || '') : '';
+                    searchQuery.set('');
                 }
             }
         }
@@ -472,10 +489,12 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
     });
 
     function renderChips() {
+        const current = selectedValues();
+
         if (!multiple) {
-            if (selectedValues[0]) {
-                const found = allItems.find(i => i.value === selectedValues[0]);
-                input.value = found ? found.label : selectedValues[0];
+            if (current[0]) {
+                const found = allItems.find(i => i.value === current[0]);
+                input.value = found ? found.label : current[0];
             } else {
                 input.value = '';
             }
@@ -485,7 +504,7 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
 
         chipsWrap.querySelectorAll('.ac-chip').forEach(el => el.remove());
 
-        selectedValues.forEach(val => {
+        current.forEach(val => {
             const item = allItems.find(i => i.value === val) || { label: val, value: val };
             const chip = document.createElement('span');
             chip.className = 'ac-chip'; container.setAttribute('data-part', 'root');
@@ -500,15 +519,39 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
             chipsWrap.insertBefore(chip, input);
         });
 
-        input.placeholder = selectedValues.length === 0 ? (props.placeholder || 'Search...') : '';
+        input.placeholder = current.length === 0 ? (props.placeholder || 'Search...') : '';
         updateClearButton();
     }
 
     function updateClearButton() {
         if (!clearBtn) return;
-        const hasContent = multiple ? selectedValues.length > 0 : (selectedValues.length > 0 || input.value.length > 0);
+        const hasContent = multiple ? selectedValues().length > 0 : (selectedValues().length > 0 || input.value.length > 0);
         clearBtn.style.display = hasContent && !props.disabled ? 'flex' : 'none';
     }
+
+    // Delegated item click/hover handling, attached once here (instead of a
+    // per-item listener rebound on every renderDropdown() call) - this is what
+    // lets the non-grouped path below hand off to patchList without losing
+    // interactivity on reused nodes. NOTE: `mouseenter` does NOT bubble, so a
+    // delegated listener for it on `overlay` would never fire for descendant
+    // `.ac-item` elements at all (hover-to-highlight would silently break,
+    // not throw) - `mouseover` is used instead, which does bubble.
+    overlay.addEventListener('click', (event) => {
+        const itemEl = (event.target as HTMLElement).closest('.ac-item') as HTMLElement | null;
+        if (!itemEl) return;
+        const val = itemEl.getAttribute('data-value');
+        const matched = allItems.find(i => i.value === val);
+        if (matched && !matched.disabled) {
+            selectItem(matched);
+        }
+    }, { signal: ctx?.signal });
+
+    overlay.addEventListener('mouseover', (event) => {
+        const itemEl = (event.target as HTMLElement).closest('.ac-item') as HTMLElement | null;
+        if (!itemEl) return;
+        const idx = Number(itemEl.getAttribute('data-idx'));
+        highlightItem(idx);
+    }, { signal: ctx?.signal });
 
     function renderDropdown() {
         const filtered = getFilteredItems();
@@ -529,10 +572,22 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
             groups[grp].push(item);
         });
 
-        const itemsFragments: Raw[] = [];
-        let itemIndex = 0;
-
         if (isGrouped) {
+            // Grouped case stays a full rebuild: group headers
+            // (`.ac-group-header`) interspersed among items aren't safely
+            // compatible with patchList's assumption that every managed
+            // child carries its own key - the same category of problem
+            // datatable.ts's virtualized spacer-row path has, which is also
+            // deliberately excluded from the keyed-patch optimization there.
+            // Its per-item listener rebind therefore also stays exactly as it
+            // was before this retrofit (not worth touching code that's being
+            // deliberately excluded) - `stopPropagation()` is added only so
+            // these directly-bound listeners don't also double-fire through
+            // the delegated `overlay` listeners registered above, which see
+            // every `.ac-item` click/mouseover regardless of which path
+            // rendered it.
+            const itemsFragments: Raw[] = [];
+            let itemIndex = 0;
             Object.entries(groups).forEach(([grpName, groupItems]) => {
                 if (grpName) {
                     itemsFragments.push(html`<div class="ac-group-header">${grpName}</div>`);
@@ -541,31 +596,57 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
                     itemsFragments.push(renderOptionHtml(item, itemIndex++));
                 });
             });
-        } else {
-            filtered.forEach(item => {
-                itemsFragments.push(renderOptionHtml(item, itemIndex++));
+
+            setHtml(overlay, html`${itemsFragments}`);
+
+            overlay.querySelectorAll<HTMLElement>('.ac-item').forEach(itemEl => {
+                itemEl.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    const val = itemEl.getAttribute('data-value');
+                    const matched = allItems.find(i => i.value === val);
+                    if (matched && !matched.disabled) {
+                        selectItem(matched);
+                    }
+                }, { signal: ctx?.signal });
+                itemEl.addEventListener('mouseenter', () => {
+                    const idx = Number(itemEl.getAttribute('data-idx'));
+                    highlightItem(idx);
+                }, { signal: ctx?.signal });
             });
+            return;
         }
 
-        setHtml(overlay, html`${itemsFragments}`);
+        // Non-grouped (common) case: keyed patch against the overlay's
+        // direct children, reusing a still-visible item's own DOM node
+        // instead of tearing down and rebuilding every `.ac-item` on each
+        // keystroke/selection. Matches multiselect.ts's own shipped
+        // precedent exactly: renderOptionHtml's `<div class="ac-item" ...>`
+        // markup nests inside patchList's own `<div data-key>` wrapper (a
+        // thin double-nesting patchList doesn't let callers customize away),
+        // which keeps `.ac-item` CSS/hover rules and highlightItem()'s
+        // `querySelectorAll('.ac-item')` query working unmodified regardless
+        // of the extra wrapper level. Item interactivity comes from the
+        // delegated `overlay` click/mouseover listeners above, not from
+        // per-item listeners here.
+        //
+        // patchList only ever recycles or removes children carrying its own
+        // `data-key` attribute (see list-patch.ts) - a leftover child from a
+        // different overlay mode (the empty-results message above, or a
+        // grouped full-rebuild's plain `.ac-item`/`.ac-group-header` nodes)
+        // carries no such attribute, so it would otherwise be silently
+        // stranded in the DOM the first time a render switches back into this
+        // path. Clear those out before handing off so patchList always starts
+        // from either an empty container or one it already fully owns.
+        if (Array.from(overlay.children).some(child => !child.hasAttribute('data-key'))) {
+            setHtml(overlay, '');
+        }
 
-        overlay.querySelectorAll<HTMLElement>('.ac-item').forEach(itemEl => {
-            itemEl.addEventListener('click', () => {
-                const val = itemEl.getAttribute('data-value');
-                const matched = allItems.find(i => i.value === val);
-                if (matched && !matched.disabled) {
-                    selectItem(matched);
-                }
-            }, { signal: ctx?.signal });
-            itemEl.addEventListener('mouseenter', () => {
-                const idx = Number(itemEl.getAttribute('data-idx'));
-                highlightItem(idx);
-            }, { signal: ctx?.signal });
-        });
+        const idxByItem = new Map<AutoCompleteItem, number>(filtered.map((item, idx) => [item, idx]));
+        patchList(overlay, filtered, item => item.value, item => renderOptionHtml(item, idxByItem.get(item)!).value);
     }
 
     function renderOptionHtml(item: AutoCompleteItem, idx: number): Raw {
-        const isSelected = selectedValues.includes(item.value);
+        const isSelected = selectedValues().includes(item.value);
         const isHighlighted = idx === highlightedIndex;
         
         let leadingHtml: Raw | string = '';
@@ -588,12 +669,22 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
             trailingHtml = html`<span class="aura-tag tag-slate" style="font-size: 0.6875rem;">${item.count}</span>`;
         }
 
+        // NOTE: this outer tag's attributes are deliberately kept on a single
+        // line (unlike the more readable multi-line form used elsewhere in
+        // this file). When this markup lands inside patchList's wrapper via
+        // `innerHTML =`, the DOM parses it into elements and patchList later
+        // reads that wrapper's `.innerHTML` back out to compare against a
+        // freshly-rendered string; the browser/DOM serializer always
+        // collapses whitespace BETWEEN ATTRIBUTES of the same tag to a single
+        // space (unlike whitespace BETWEEN tags, which round-trips as text
+        // nodes), so a multi-line attribute list here would make the
+        // "existing" and "fresh" strings differ on every single render even
+        // when nothing changed - defeating patchList's unchanged-item skip
+        // and recreating every item's DOM node on every re-render. Matches
+        // multiselect.ts's own single-line outer-tag precedent for the same
+        // reason.
         return html`
-            <div class="ac-item ${isSelected ? 'selected' : ''} ${isHighlighted ? 'highlighted' : ''} ${item.disabled ? 'disabled' : ''}" 
-                 data-value="${item.value}" 
-                 data-idx="${idx}" 
-                 role="option" 
-                 aria-selected="${isSelected ? 'true' : 'false'}">
+            <div class="ac-item ${isSelected ? 'selected' : ''} ${isHighlighted ? 'highlighted' : ''} ${item.disabled ? 'disabled' : ''}" data-value="${item.value}" data-idx="${idx}" role="option" aria-selected="${isSelected ? 'true' : 'false'}">
                 <div style="display: flex; align-items: center; gap: 0.5rem; overflow: hidden;">
                     ${leadingHtml}
                     <div style="display: flex; flex-direction: column; overflow: hidden;">
@@ -623,36 +714,35 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
 
     function selectItem(item: AutoCompleteItem) {
         if (multiple) {
-            if (!selectedValues.includes(item.value)) {
-                selectedValues.push(item.value);
+            if (!selectedValues().includes(item.value)) {
+                selectedValues.set([...selectedValues(), item.value]);
             }
-            searchQuery = '';
+            searchQuery.set('');
             input.value = '';
-            renderChips();
             disclosure.close();
             syncValue();
             input.focus();
         } else {
-            selectedValues = [item.value];
-            searchQuery = '';
-            input.value = item.label;
+            selectedValues.set([item.value]);
+            searchQuery.set('');
             disclosure.close();
-            renderChips();
             syncValue();
         }
     }
 
     function removeValue(val: string) {
-        selectedValues = selectedValues.filter(v => v !== val);
-        renderChips();
+        selectedValues.set(selectedValues().filter(v => v !== val));
         syncValue();
     }
 
     const debouncedFilter = useDebounce(() => {
-        searchQuery = input.value;
-        if (searchQuery.trim().length > 0) {
+        searchQuery.set(input.value);
+        if (input.value.trim().length > 0) {
             if (!disclosure.isOpen) disclosure.open();
-            else renderDropdown();
+            // else: no direct renderDropdown() call needed here - the
+            // dropdown-render effect already re-ran synchronously above,
+            // inside searchQuery.set(), because it depends on searchQuery
+            // while isOverlayOpen is true.
         } else {
             if (disclosure.isOpen) disclosure.close();
         }
@@ -696,8 +786,9 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
             }
         } else if (e.key === 'Escape') {
             disclosure.close();
-        } else if (e.key === 'Backspace' && multiple && input.value === '' && selectedValues.length > 0) {
-            removeValue(selectedValues[selectedValues.length - 1]);
+        } else if (e.key === 'Backspace' && multiple && input.value === '' && selectedValues().length > 0) {
+            const current = selectedValues();
+            removeValue(current[current.length - 1]);
         } else if (e.key === 'Home' && disclosure.isOpen) {
             e.preventDefault();
             highlightItem(0);
@@ -709,10 +800,9 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
 
     clearBtn?.addEventListener('click', (e) => {
         e.stopPropagation();
-        selectedValues = [];
-        searchQuery = '';
+        selectedValues.set([]);
+        searchQuery.set('');
         input.value = '';
-        renderChips();
         syncValue();
         disclosure.close();
         input.focus();
@@ -723,7 +813,7 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
         if (disclosure.isOpen) {
             disclosure.close();
         } else {
-            searchQuery = '';
+            searchQuery.set('');
             disclosure.open();
             input.focus();
         }
@@ -734,13 +824,30 @@ export default function AutoCompleteIsland(container: HTMLElement, props: AutoCo
     }, { signal: ctx?.signal });
 
     function syncValue() {
-        const val = multiple ? JSON.stringify(selectedValues) : (selectedValues[0] || '');
+        const current = selectedValues();
+        const val = multiple ? JSON.stringify(current) : (current[0] || '');
         formField.setValue(val);
 
         emitComponentEvent(container, 'autocomplete', 'change', {
-            value: multiple ? selectedValues : (selectedValues[0] || '')
+            value: multiple ? current : (current[0] || '')
         });
     }
 
-    renderChips();
+    // Reactive rendering: these effects replace every manual renderChips()/
+    // renderDropdown() call that used to follow a selectedValues/searchQuery
+    // mutation (or an open/close transition) - each now re-runs automatically
+    // whenever the signal(s) it reads change. syncValue() stays an explicit
+    // one-shot call at each mutation site (it emits a change event / writes
+    // the hidden form field - a side effect, not a render), so it is
+    // intentionally NOT wrapped here, matching multiselect.ts's precedent.
+    effect(renderChips);
+    effect(() => {
+        // isOverlayOpen is read unconditionally first so this effect is
+        // always subscribed to it; searchQuery/selectedValues are only read
+        // (and therefore only re-run this effect) while the overlay is
+        // actually open, since renderDropdown() has no visible effect while
+        // it's hidden.
+        if (!isOverlayOpen()) return;
+        renderDropdown();
+    });
 }

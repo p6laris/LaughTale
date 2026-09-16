@@ -693,8 +693,8 @@ needed" line for both was wrong. The genuinely open items are now closed:
   instead of a full rebuild-and-rebind. `datatable.ts` — the largest/most feature-rich retrofit yet
   (~1750 lines: sorting, filtering, pagination, single/multi selection, row expansion, in-place cell
   editing, frozen columns, virtualization, lazy server data) — closed separately below, since it needed
-  its own real design work rather than a copy of multiselect's shape. `autocomplete.ts` remains the
-  same shape and is left for a follow-on pass.
+  its own real design work rather than a copy of multiselect's shape. `autocomplete.ts` — closed too,
+  see below — turned out closer to multiselect's shape than datatable's.
 - Gave `runtime/benchmark.ts`'s `measureThroughput` — fully built, unit-tested, zero real callers
   before this pass — its first real caller (`multiselect-benchmark.test.ts`), producing real
   `opsPerSec`/percentile numbers instead of an unverified performance claim.
@@ -733,16 +733,37 @@ reaches a re-render changed. Verified: `tsc --noEmit` clean, 547/547 client test
 with all budgets green, and a live check in the Showcase (sort, row selection, node-identity-preserved
 across an unrelated selection change) with no related console errors.
 
+**`autocomplete.ts` retrofit, closed as a follow-on pass.** Also had zero prior test coverage —
+`tests/components/autocomplete.test.ts` (7 tests) written alongside the retrofit. `selectedValues`/
+`searchQuery` are now signals behind `effect(renderChips)`/`effect(renderDropdown)`, replacing every
+manual call site; the existing 150ms debounce (already correct here, unlike `datatable.ts`'s filters)
+is untouched. `patchList` is used for the common non-grouped item list, keyed by `item.value`, with
+one delegated `click`/`mouseover` pair on the overlay replacing the old per-item listener rebind —
+**`mouseover`, not `mouseenter`, deliberately**: `mouseenter` doesn't bubble, so a delegated listener
+for it on the overlay would never fire for descendant items at all, silently breaking hover-to-
+highlight rather than erroring. Grouped mode (group headers interspersed with items) stays a full
+rebuild, same exclusion reasoning as `datatable.ts`'s virtualized rows — `stopPropagation()` was added
+to its now-coexisting per-item listeners so they don't double-fire through the new delegated overlay
+listener. Independently rediscovered the same whitespace/outerHTML-serialization bug `datatable.ts`
+hit — a multi-line attribute list on the item's outer tag defeats `patchList`'s unchanged-content
+check every time, since attribute-list whitespace doesn't round-trip through the DOM serializer the
+way inter-tag whitespace does — fixed the same way (collapse the tag onto one line), the concrete
+lesson being that this bug class only bites *attribute-list* whitespace, not markup structure
+generally. Verified: `tsc --noEmit` clean, 554/554 tests, production build green, live check in the
+Showcase confirming node identity survives a selection change in the non-grouped path and grouped
+demos correctly stay on the excluded full-rebuild path.
+
 ---
 
 ## 11. Part J — Performance
 
 - **Stop leaking listeners** (§1.3) — the largest runtime problem in the codebase.
-- **Replace `innerHTML` rebuilds with targeted updates — [CLOSED (two components), this pass].** Real
-  signals plus a new keyed list-patch helper (Part I) fixed this for `multiselect.ts` and
-  `datatable.ts` (the latter needed its own local keyed-row helper, `patchTbodyRows` — see Part I for
-  why `patchList` itself doesn't fit a `<tr>`-based container); `autocomplete.ts` is the same shape and
-  is the deliberate next target, not done here. Turned out `morphElement()` (`runtime/refresh.ts`) wasn't the right tool for
+- **Replace `innerHTML` rebuilds with targeted updates — [CLOSED (three components), this pass].** Real
+  signals plus a new keyed list-patch helper (Part I) fixed this for `multiselect.ts`, `datatable.ts`
+  (needed its own local keyed-row helper, `patchTbodyRows` — see Part I for why `patchList` itself
+  doesn't fit a `<tr>`-based container) and `autocomplete.ts` (non-grouped path only — grouped mode
+  stays a full rebuild, same reasoning as `datatable.ts`'s virtualized rows); `select.ts` is the next
+  candidate for the same pattern, not done here. Turned out `morphElement()` (`runtime/refresh.ts`) wasn't the right tool for
   this — it's a root-attribute diff plus a blind full-`innerHTML` replace for children, only used by the
   server-refresh fallback path, never by a component's own local re-render; the new `patchList()`
   keyed-reconciliation helper is what actually solves "destroys focus/selection," since for a text
@@ -1176,7 +1197,7 @@ worse than shipping neither, because it looks finished.
 | Typed TagHelper generation | Fresh | Partial — generator exists, no user input | B |
 | Streaming SSR | Next, Nuxt | Partial — in-order only | E |
 | Per-island code splitting | Astro, Qwik | Partial — ESM splits; IIFE ships all 76 | B |
-| Signals / fine-grained reactivity | Qwik, Solid | **Strong — [CLOSED, this pass]** — real `signal`/`computed`/`effect`/`batch` (`runtime/signals.ts`), backing `l-bind`/`l-model`/`l-class`/`l-style`/`l-show`/`l-hide`/`l-if`/`l-for`; `multiselect.ts` and `datatable.ts` retrofitted as proof, `autocomplete.ts` deliberately next | I |
+| Signals / fine-grained reactivity | Qwik, Solid | **Strong — [CLOSED, this pass]** — real `signal`/`computed`/`effect`/`batch` (`runtime/signals.ts`), backing `l-bind`/`l-model`/`l-class`/`l-style`/`l-show`/`l-hide`/`l-if`/`l-for`; `multiselect.ts`, `datatable.ts` and `autocomplete.ts` retrofitted as proof, `select.ts` deliberately next | I |
 | Perf budgets in CI | — | **Adopted — [CLOSED (mechanical part), this pass]** — real CI now exists at all; gzip check extended to per-island chunks; hydration-time/Lighthouse still deferred | J |
 | Icon system | — | **Strong — [CLOSED (75%), this pass]** — module already existed; retrofitted 33 of ~37 components, `rawSvgLiterals` 212 → 53, remaining 53 deliberately kept (pre-redesign shapes with no current match, or render properties/CSS hooks the module can't express) | M |
 | Typed content collections | Astro | **Strong — [CLOSED, this pass]** — already fully typed end-to-end; the one real gap (silent schema-mismatch swallowing) is now a loud failure | F |
