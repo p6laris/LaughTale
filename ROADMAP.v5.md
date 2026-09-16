@@ -753,17 +753,52 @@ generally. Verified: `tsc --noEmit` clean, 554/554 tests, production build green
 Showcase confirming node identity survives a selection change in the non-grouped path and grouped
 demos correctly stay on the excluded full-rebuild path.
 
+**`select.ts` retrofit, closed — the fourth and last of this pass's component retrofits.** Also had
+zero real behavioral coverage (`select-parts.test.ts` only checked `data-part`/passthrough/lifecycle);
+`tests/components/select.test.ts` (8 tests) written alongside. Unlike the other three, `select.ts`
+already did *some* targeted updating — `toggleOverlay()` never called `render()`, and the filter input
+had a scoped `setHtml(list, ...)` instead of a full-component rebuild — so this wasn't starting from
+the worst case. The real remaining problem was `render()` itself still being called on every
+selection/clear/select-all, and — a genuinely separate, independently-discovered bug — its own
+`bindEvents()` re-registering a `document` outside-click listener on *every* one of those calls (on
+top of a second, separately-registered, functionally-identical one), silently accumulating redundant
+listeners for the life of the component. Fixed as a natural side effect of moving all one-time event
+binding out of the render path into a single setup function, not via any special-cased dedup logic —
+verified with a real test (a spy on the one DOM side-effect unique to closing, asserting it fires
+exactly once per outside click after several prior state changes). `selectedValues`/`filterQuery` are
+now signals, the latter closing a real independent gap (`select.ts` had no debounce at all, unlike
+`autocomplete.ts`). Unlike `autocomplete.ts`'s grouped-case exclusion, `select.ts`'s grouping is
+included in the keyed patch: its flattening step already produces one ordered array of interspersed
+group/item entries by construction (not bolted on afterward), so group headers get a synthetic stable
+key (`` `group:${label}` ``) and patch through `patchList` exactly like items — empirically confirmed
+first that `<li>` (unlike datatable's `<tr>`) parses correctly inside a `patchList`-managed `<div>`.
+Independently rediscovered the exact same attribute-list-whitespace bug the other two retrofits hit
+(third time now) and fixed it the same way — confirming this is a well-understood, generalizable
+gotcha, not a one-off. Virtualized rendering (`>= 100` flat items) stays a full rebuild, same exclusion
+as `datatable.ts`. **One tooling gotcha worth remembering for future retrofits**: `verify-contracts.mjs`'s
+listener-signal check does a naive, comment-unaware paren-balance scan of `addEventListener(...)` call
+expressions — an explanatory comment placed *inside* a listener's callback body containing a stray
+apostrophe or a literal `addEventListener(...)` snippet can make the scanner misparse a real,
+correctly-signal-bound listener as unmanaged; keep such comments outside the call expression. Verified:
+`tsc --noEmit` clean, 562/562 tests, production build green. Live check in the Showcase confirmed node
+identity survives an unrelated selection (matching the unit test) — my first two live attempts looked
+like failures because of a fragile test methodology (re-indexing into a live `NodeList` by position
+after DOM mutations elsewhere on the page can silently point at a different element); holding a stable
+element reference throughout resolved it correctly. `autocomplete.ts`/`multiselect.ts`/`datatable.ts`/
+`select.ts` are now all retrofitted — no further components are queued for this specific pattern.
+
 ---
 
 ## 11. Part J — Performance
 
 - **Stop leaking listeners** (§1.3) — the largest runtime problem in the codebase.
-- **Replace `innerHTML` rebuilds with targeted updates — [CLOSED (three components), this pass].** Real
+- **Replace `innerHTML` rebuilds with targeted updates — [CLOSED (four components), this pass].** Real
   signals plus a new keyed list-patch helper (Part I) fixed this for `multiselect.ts`, `datatable.ts`
   (needed its own local keyed-row helper, `patchTbodyRows` — see Part I for why `patchList` itself
-  doesn't fit a `<tr>`-based container) and `autocomplete.ts` (non-grouped path only — grouped mode
-  stays a full rebuild, same reasoning as `datatable.ts`'s virtualized rows); `select.ts` is the next
-  candidate for the same pattern, not done here. Turned out `morphElement()` (`runtime/refresh.ts`) wasn't the right tool for
+  doesn't fit a `<tr>`-based container), `autocomplete.ts` (non-grouped path only — grouped mode
+  stays a full rebuild, same reasoning as `datatable.ts`'s virtualized rows), and `select.ts` (grouping
+  included this time, unlike `autocomplete.ts` — see Part I). No further components are queued for this
+  pattern. Turned out `morphElement()` (`runtime/refresh.ts`) wasn't the right tool for
   this — it's a root-attribute diff plus a blind full-`innerHTML` replace for children, only used by the
   server-refresh fallback path, never by a component's own local re-render; the new `patchList()`
   keyed-reconciliation helper is what actually solves "destroys focus/selection," since for a text
@@ -1197,7 +1232,7 @@ worse than shipping neither, because it looks finished.
 | Typed TagHelper generation | Fresh | Partial — generator exists, no user input | B |
 | Streaming SSR | Next, Nuxt | Partial — in-order only | E |
 | Per-island code splitting | Astro, Qwik | Partial — ESM splits; IIFE ships all 76 | B |
-| Signals / fine-grained reactivity | Qwik, Solid | **Strong — [CLOSED, this pass]** — real `signal`/`computed`/`effect`/`batch` (`runtime/signals.ts`), backing `l-bind`/`l-model`/`l-class`/`l-style`/`l-show`/`l-hide`/`l-if`/`l-for`; `multiselect.ts`, `datatable.ts` and `autocomplete.ts` retrofitted as proof, `select.ts` deliberately next | I |
+| Signals / fine-grained reactivity | Qwik, Solid | **Strong — [CLOSED, this pass]** — real `signal`/`computed`/`effect`/`batch` (`runtime/signals.ts`), backing `l-bind`/`l-model`/`l-class`/`l-style`/`l-show`/`l-hide`/`l-if`/`l-for`; `multiselect.ts`, `datatable.ts`, `autocomplete.ts` and `select.ts` all retrofitted, no further components queued | I |
 | Perf budgets in CI | — | **Adopted — [CLOSED (mechanical part), this pass]** — real CI now exists at all; gzip check extended to per-island chunks; hydration-time/Lighthouse still deferred | J |
 | Icon system | — | **Strong — [CLOSED (75%), this pass]** — module already existed; retrofitted 33 of ~37 components, `rawSvgLiterals` 212 → 53, remaining 53 deliberately kept (pre-redesign shapes with no current match, or render properties/CSS hooks the module can't express) | M |
 | Typed content collections | Astro | **Strong — [CLOSED, this pass]** — already fully typed end-to-end; the one real gap (silent schema-mismatch swallowing) is now a loud failure | F |

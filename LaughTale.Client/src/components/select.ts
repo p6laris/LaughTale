@@ -12,6 +12,9 @@ import { getLucideIcon } from '../icons/lucide';
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import { signal, effect } from '../runtime/signals';
+import { patchList } from '../runtime/list-patch';
+import { useDebounce } from '../composables/useDebounce';
 import { useVirtualizer, type Virtualizer } from '../composables/useVirtualizer';
 import { useFloatingPosition } from '../composables/useFloatingPosition';
 import { useFormField } from '../composables/useFormField';
@@ -588,23 +591,32 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
     });
 
     // Initial selected values
-    let selectedValues: any[] = [];
+    let initialSelectedValues: any[] = [];
     const initVal = props.value ?? props.selectedValue ?? formField.getValue();
     if (initVal !== undefined && initVal !== null) {
         if (Array.isArray(initVal)) {
-            selectedValues = [...initVal];
+            initialSelectedValues = [...initVal];
         } else if (typeof initVal === 'string' && initVal.includes(',') && isMultiple) {
-            selectedValues = initVal.split(',').map(s => s.trim());
+            initialSelectedValues = initVal.split(',').map(s => s.trim());
         } else if (initVal !== '') {
-            selectedValues = [initVal];
+            initialSelectedValues = [initVal];
         }
     }
 
+    // State (ROADMAP.v5.md Part I/J signals retrofit - see multiselect.ts/datatable.ts/autocomplete.ts
+    // for the established pattern this mirrors). `selectedValues` and `filterQuery` are signals, written
+    // immutably at every former mutation site; the effects registered at the bottom of this file replace
+    // every one of the old manual `render()` calls. `isOpen` stays a plain variable exactly as it was:
+    // `toggleOverlay()` already does its own targeted DOM updates (classList/aria-expanded/floating
+    // position) and never called `render()`, so it isn't part of the problem this retrofit fixes -
+    // matching autocomplete.ts's own decision to leave `highlightedIndex` alone.
+    const selectedValues = signal<any[]>(initialSelectedValues);
+    const filterQuery = signal('');
+
     let isOpen = false;
-    let filterQuery = '';
 
     function isSelected(val: any): boolean {
-        return selectedValues.some(v => String(v) === String(val) || (typeof v === 'object' && v?.value === val));
+        return selectedValues().some(v => String(v) === String(val) || (typeof v === 'object' && v?.value === val));
     }
 
     function getSelectedItems(): SelectOption[] {
@@ -614,8 +626,8 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
     function renderTriggerLabel(): Raw {
         const items = getSelectedItems();
         if (items.length === 0) {
-            if (isEditable && selectedValues.length > 0) {
-                return html`<span class="p-select-label">${selectedValues[0]}</span>`;
+            if (isEditable && selectedValues().length > 0) {
+                return html`<span class="p-select-label">${selectedValues()[0]}</span>`;
             }
             return html`<span class="p-select-label p-placeholder">${placeholder}</span>`;
         }
@@ -645,6 +657,25 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
         return html`<span class="p-select-label">${flagHtml}${iconHtml}${statusHtml}<span>${item.label || item.value}</span></span>`;
     }
 
+    function renderActionsHtml(): Raw {
+        const hasSelected = selectedValues().length > 0;
+        return html`
+            ${showClear && hasSelected && !isDisabled ? html`<span class="p-select-clear-icon" data-part="clearButton" title="Clear selection">${unsafe(getLucideIcon('x', 14))}</span>` : ''}
+            ${isLoading ? html`<span class="p-select-dropdown" data-part="indicator">${unsafe(getLucideIcon('loader-2', 16))}</span>` : html`<span class="p-select-dropdown" data-part="indicator">${unsafe(getLucideIcon('chevron-down', 16))}</span>`}
+        `;
+    }
+
+    function renderHeaderAllHtml(): Raw {
+        const allSelected = flatOptions.length > 0 && selectedValues().length === flatOptions.length;
+        const isIndeterminate = selectedValues().length > 0 && !allSelected;
+        return html`
+            <div class="p-select-option-checkbox ${allSelected ? 'is-checked' : ''}">
+                ${allSelected ? unsafe(getLucideIcon('check', 12)) : (isIndeterminate ? unsafe(getLucideIcon('minus', 12)) : '')}
+            </div>
+            <span>Select All (${selectedValues().length}/${flatOptions.length})</span>
+        `;
+    }
+
     function filterOptions(opts: SelectOption[], q: string): SelectOption[] {
         if (!q) return opts;
         const query = q.toLowerCase();
@@ -652,7 +683,7 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
 
         opts.forEach(opt => {
             if (opt.items && opt.items.length > 0) {
-                const matchingChildren = opt.items.filter(c => 
+                const matchingChildren = opt.items.filter(c =>
                     (c.label && c.label.toLowerCase().includes(query)) ||
                     (c.value && String(c.value).toLowerCase().includes(query)) ||
                     (c.description && c.description.toLowerCase().includes(query))
@@ -674,7 +705,7 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
         return filtered;
     }
 
-    type FlatSelectItem = 
+    type FlatSelectItem =
         | { kind: 'group'; opt: SelectOption }
         | { kind: 'item'; opt: SelectOption; id: string; index: number };
 
@@ -687,7 +718,7 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
     let scrollBound = false;
 
     function getFlatOptions(): { flatItems: FlatSelectItem[]; totalCount: number } {
-        const visibleOpts = filterOptions(allOptions, filterQuery);
+        const visibleOpts = filterOptions(allOptions, filterQuery());
         const flat: FlatSelectItem[] = [];
         let totalCount = 0;
 
@@ -705,6 +736,20 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
         return { flatItems: flat, totalCount };
     }
 
+    // Stable, synthetic key for a flattened group-header entry: patchList only requires that a key be
+    // stable across renders (see list-patch.ts), not that it identify an "item" specifically - since
+    // getFlatOptions() already produces one ordered array by construction (groups and items
+    // interspersed), there's no structural reason to exclude group headers from the keyed patch the way
+    // autocomplete.ts's grouped case excludes itself entirely (that exclusion was about a *different*,
+    // simpler component whose grouping was bolted on after the fact - not a general rule). Keyed by the
+    // group's own label/value rather than its position, since filtering can change a group's index
+    // within the flattened array without changing the group itself.
+    function keyForFlatItem(entry: FlatSelectItem): string {
+        return entry.kind === 'group'
+            ? `group:${String(entry.opt.label ?? entry.opt.value)}`
+            : String(entry.opt.value);
+    }
+
     function renderFlatItem(entry: FlatSelectItem, viIndex: number, totalCount: number): Raw {
         if (entry.kind === 'group') {
             return html`
@@ -715,44 +760,6 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
             `;
         }
         return renderSingleOption(entry.opt, entry.id, entry.index, totalCount);
-    }
-
-    function renderListItems(): Raw {
-        const { flatItems, totalCount } = getFlatOptions();
-        currentFlatItems = flatItems;
-        currentTotalOptionCount = totalCount;
-
-        if (flatItems.length === 0) {
-            virtualizer = null;
-            return html`<div class="p-select-empty-message">${locale.t('emptyFilterMessage') || 'No results found'}</div>`;
-        }
-
-        if (flatItems.length < 100) {
-            virtualizer = null;
-            const items: Raw[] = [];
-            for (let i = 0; i < flatItems.length; i++) {
-                items.push(renderFlatItem(flatItems[i], i, totalCount));
-            }
-            return html`${items}`;
-        }
-
-        virtualizer = useVirtualizer({
-            count: flatItems.length,
-            estimateSize: 38,
-            getScrollElement: () => container.querySelector<HTMLElement>('.p-select-list'),
-            virtualThreshold: 100
-        });
-        const virtualItems = virtualizer.getVirtualItems();
-        currentStart = virtualItems.length > 0 ? virtualItems[0].index : 0;
-        currentEnd = virtualItems.length > 0 ? virtualItems[virtualItems.length - 1].index : 0;
-
-        return html`
-            <div class="p-virtual-spacer" data-virtual-spacer>
-                <ul class="p-virtual-list">
-                    ${virtualItems.map(vi => renderFlatItem(flatItems[vi.index], vi.index, totalCount))}
-                </ul>
-            </div>
-        `;
     }
 
     function renderSingleOption(opt: SelectOption, id: string, index: number, totalCount: number): Raw {
@@ -775,16 +782,20 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
 
         const itemPart = resolvePart('item', `p-select-option ${high} ${dis}`, props.pt, props.studioOverrides);
 
+        // NOTE: this outer `<li>`'s attributes are deliberately kept on a single line (unlike the
+        // more readable multi-line form this file used before this retrofit, and unlike the multi-line
+        // child content below, which is fine). This item's markup lands inside patchList's own wrapper
+        // via `innerHTML =`, and patchList later reads that wrapper's `.innerHTML` back out to compare
+        // against a freshly-rendered string (list-patch.ts's `existing.innerHTML !== html` check) - a
+        // DOM serializer always collapses whitespace BETWEEN ATTRIBUTES of the same tag to a single
+        // space (unlike whitespace BETWEEN tags, which round-trips as text nodes), so a multi-line
+        // attribute list here would make the "existing" and "fresh" strings differ on every render even
+        // when nothing changed, defeating patchList's unchanged-item skip and recreating every option's
+        // DOM node on every re-render. This exact class of bug broke both of this repo's prior
+        // patchList retrofits (datatable.ts, autocomplete.ts) - see autocomplete.ts's own identical
+        // single-line-outer-tag precedent and comment for the full explanation.
         return html`
-            <li class="${itemPart.className}" 
-                data-part="item" 
-                data-value="${opt.value}" 
-                data-index="${index}"
-                role="option" 
-                aria-selected="${checked ? 'true' : 'false'}" 
-                aria-setsize="${totalCount}" 
-                aria-posinset="${index + 1}"
-                id="${id}">
+            <li class="${itemPart.className}" data-part="item" data-value="${opt.value}" data-index="${index}" role="option" aria-selected="${checked ? 'true' : 'false'}" aria-setsize="${totalCount}" aria-posinset="${index + 1}" id="${id}">
                 <div class="p-select-option-content" data-part="itemContent">
                     ${checkboxHtml}
                     ${flagHtml}
@@ -801,73 +812,85 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
         `;
     }
 
-    function render() {
-        const rootClasses = [
-            'laughtale-select',
-            'p-select',
-            isFluid ? 'p-select-fluid' : '',
-            isFilled ? 'variant-filled' : '',
-            size !== 'normal' ? `size-${size}` : '',
-            isInvalid ? 'is-invalid' : '',
-            isDisabled ? 'is-disabled' : '',
-            isOpen ? 'is-open' : ''
-        ].filter(Boolean).join(' ');
+    // Stable references into the shell mountShell() builds exactly once - updateOptionList()/the
+    // trigger+actions/select-all-header effects only ever read/write through these, never through
+    // `container.innerHTML` again after the initial mount. Assigned inside mountShell().
+    let triggerLabelEl: HTMLElement;
+    let actionsEl: HTMLElement;
+    let filterInputEl: HTMLInputElement | null = null;
+    let headerAllEl: HTMLElement | null = null;
+    let listEl: HTMLElement;
 
-        const hasSelected = selectedValues.length > 0;
-        const allSelected = flatOptions.length > 0 && selectedValues.length === flatOptions.length;
-        const isIndeterminate = selectedValues.length > 0 && !allSelected;
+    /**
+     * Targeted update for the option list - replaces the old `renderListItems()` call embedded in the
+     * monolithic `render()`, plus every scoped `setHtml(list, renderListItems())` follow-up call that
+     * used to live in the filter input's `oninput` and the virtualized scroll handler. Registered as
+     * `effect(updateOptionList)` below, so it re-runs automatically whenever `filterQuery`/
+     * `selectedValues` change.
+     *
+     * Non-virtual case (< 100 flat items, including groups): keyed `patchList` reconciliation, reusing
+     * a still-visible option's own DOM node instead of tearing down and rebuilding every `<li>` on each
+     * keystroke/selection.
+     *
+     * Virtualized case (>= 100 flat items): kept as a full `setHtml` rebuild here AND in the scroll
+     * handler's window-shift update (see `bindStaticEvents`) - same exclusion reasoning as
+     * datatable.ts's virtualized rows: a sliding scroll-driven window re-render on every scroll tick
+     * doesn't benefit from keyed reuse the same way non-virtual list mutations do, and mixing it with
+     * patchList's assumptions is a separate, harder problem not worth taking on in this pass.
+     */
+    function updateOptionList() {
+        const { flatItems, totalCount } = getFlatOptions();
+        currentFlatItems = flatItems;
+        currentTotalOptionCount = totalCount;
 
-        applyPart(container, 'root', rootClasses, props.pt, props.studioOverrides);
-        container.setAttribute('tabindex', isDisabled ? '-1' : '0');
-        container.setAttribute('role', 'combobox');
-        container.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-        container.setAttribute('aria-haspopup', 'listbox');
-        container.setAttribute('aria-controls', 'p-select-overlay');
+        if (flatItems.length === 0) {
+            virtualizer = null;
+            setHtml(listEl, html`<div class="p-select-empty-message">${locale.t('emptyFilterMessage') || 'No results found'}</div>`);
+            return;
+        }
 
-        const labelPart = resolvePart('label', 'p-select-label', props.pt, props.studioOverrides);
-        const triggerPart = resolvePart('trigger', 'p-select-trigger-wrap', props.pt, props.studioOverrides);
-        const panelPart = resolvePart('panel', `p-select-overlay ${isOpen ? 'is-visible' : ''}`, props.pt, props.studioOverrides);
-        const listPart = resolvePart('list', 'p-select-list', props.pt, props.studioOverrides);
+        if (flatItems.length < 100) {
+            virtualizer = null;
+            // patchList only ever recycles or removes children carrying its own `data-key` attribute
+            // (see list-patch.ts) - a leftover child from a different render mode (the empty-results
+            // message above, or the virtualized spacer/list wrapper below) carries no such attribute,
+            // so it would otherwise be silently stranded in the DOM the first time an update switches
+            // back into this path. Clear those out before handing off, matching autocomplete.ts's own
+            // identical cleanup for its non-grouped patchList path.
+            if (Array.from(listEl.children).some(child => !child.hasAttribute('data-key'))) {
+                setHtml(listEl, '');
+            }
+            patchList(
+                listEl,
+                flatItems,
+                keyForFlatItem,
+                (entry) => renderFlatItem(entry, 0, totalCount).value
+            );
+            return;
+        }
 
-        formField.detach();
-        setHtml(container, html`
-            <div class="${triggerPart.className}" style="${triggerPart.style}" data-part="trigger">
-                ${renderTriggerLabel()}
-            </div>
-            <div class="p-select-actions" data-part="actions">
-                ${showClear && hasSelected && !isDisabled ? html`<span class="p-select-clear-icon" data-part="clearButton" title="Clear selection">${unsafe(getLucideIcon('x', 14))}</span>` : ''}
-                ${isLoading ? html`<span class="p-select-dropdown" data-part="indicator">${unsafe(getLucideIcon('loader-2', 16))}</span>` : html`<span class="p-select-dropdown" data-part="indicator">${unsafe(getLucideIcon('chevron-down', 16))}</span>`}
-            </div>
-            <div class="${panelPart.className}" style="${panelPart.style}" data-part="panel">
-                ${hasFilter ? html`
-                    <div class="p-select-filter-container" data-part="filterContainer">
-                        <span class="p-select-filter-icon">${unsafe(getLucideIcon('search', 14))}</span>
-                        <input type="text" class="p-select-filter-input" data-part="filterInput" placeholder="${props.filterPlaceholder || 'Search...'}" value="${filterQuery}" />
-                    </div>
-                ` : ''}
-                ${isMultiple && isCheckbox ? html`
-                    <div class="p-select-header-all" data-part="headerAll">
-                        <div class="p-select-option-checkbox ${allSelected ? 'is-checked' : ''}">
-                            ${allSelected ? unsafe(getLucideIcon('check', 12)) : (isIndeterminate ? unsafe(getLucideIcon('minus', 12)) : '')}
-                        </div>
-                        <span>Select All (${selectedValues.length}/${flatOptions.length})</span>
-                    </div>
-                ` : ''}
-                <ul class="${listPart.className}" style="max-height: ${scrollHeight}; ${listPart.style}" data-part="list" role="listbox">
-                    ${renderListItems()}
+        virtualizer = useVirtualizer({
+            count: flatItems.length,
+            estimateSize: ITEM_HEIGHT,
+            getScrollElement: () => listEl,
+            virtualThreshold: 100
+        });
+        const virtualItems = virtualizer.getVirtualItems();
+        currentStart = virtualItems.length > 0 ? virtualItems[0].index : 0;
+        currentEnd = virtualItems.length > 0 ? virtualItems[virtualItems.length - 1].index : 0;
+
+        setHtml(listEl, html`
+            <div class="p-virtual-spacer" data-virtual-spacer>
+                <ul class="p-virtual-list">
+                    ${virtualItems.map(vi => renderFlatItem(flatItems[vi.index], vi.index, totalCount))}
                 </ul>
             </div>
         `);
-        formField.reattach();
-
         updateVirtualPositions();
-        bindEvents();
     }
 
     function updateVirtualPositions() {
         if (!virtualizer || !virtualizer.isVirtual()) return;
-        const listEl = container.querySelector<HTMLElement>('.p-select-list');
-        if (!listEl) return;
         const spacerEl = listEl.querySelector<HTMLElement>('.p-virtual-spacer');
         const vListEl = listEl.querySelector<HTMLElement>('.p-virtual-list');
         const virtualItems = virtualizer.getVirtualItems();
@@ -909,20 +932,88 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
             container.classList.remove('is-open');
             overlay?.classList.remove('is-visible');
             container.setAttribute('aria-expanded', 'false');
-            filterQuery = '';
+            filterQuery.set('');
             floatingHandle = null;
         }
     }
 
-    function bindEvents() {
-        // Trigger click (ignore if clicked on actions or overlay)
-        container.onclick = (e) => {
+    /**
+     * One-time setup (point 2 of the restructuring notes): the full shell - trigger/actions wrappers,
+     * filter bar, select-all header wrapper, and the list `<ul>` - is built exactly once via a single
+     * `setHtml(container, ...)`, with stable element references captured for every effect/handler below
+     * to read and write through from then on. Every "bind everything" listener that used to live in the
+     * old `bindEvents()`/`bindOptionClicks()` (re-run on every single `render()` call) is now attached
+     * exactly once here too - see `bindStaticEvents()`.
+     */
+    function mountShell() {
+        const rootClasses = [
+            'laughtale-select',
+            'p-select',
+            isFluid ? 'p-select-fluid' : '',
+            isFilled ? 'variant-filled' : '',
+            size !== 'normal' ? `size-${size}` : '',
+            isInvalid ? 'is-invalid' : '',
+            isDisabled ? 'is-disabled' : '',
+            isOpen ? 'is-open' : ''
+        ].filter(Boolean).join(' ');
+
+        applyPart(container, 'root', rootClasses, props.pt, props.studioOverrides);
+        container.setAttribute('tabindex', isDisabled ? '-1' : '0');
+        container.setAttribute('role', 'combobox');
+        container.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        container.setAttribute('aria-haspopup', 'listbox');
+        container.setAttribute('aria-controls', 'p-select-overlay');
+
+        const triggerPart = resolvePart('trigger', 'p-select-trigger-wrap', props.pt, props.studioOverrides);
+        const panelPart = resolvePart('panel', `p-select-overlay ${isOpen ? 'is-visible' : ''}`, props.pt, props.studioOverrides);
+        const listPart = resolvePart('list', 'p-select-list', props.pt, props.studioOverrides);
+
+        formField.detach();
+        setHtml(container, html`
+            <div class="${triggerPart.className}" style="${triggerPart.style}" data-part="trigger"></div>
+            <div class="p-select-actions" data-part="actions"></div>
+            <div class="${panelPart.className}" style="${panelPart.style}" data-part="panel">
+                ${hasFilter ? html`
+                    <div class="p-select-filter-container" data-part="filterContainer">
+                        <span class="p-select-filter-icon">${unsafe(getLucideIcon('search', 14))}</span>
+                        <input type="text" class="p-select-filter-input" data-part="filterInput" placeholder="${props.filterPlaceholder || 'Search...'}" />
+                    </div>
+                ` : ''}
+                ${isMultiple && isCheckbox ? html`
+                    <div class="p-select-header-all" data-part="headerAll"></div>
+                ` : ''}
+                <ul class="${listPart.className}" style="max-height: ${scrollHeight}; ${listPart.style}" data-part="list" role="listbox"></ul>
+            </div>
+        `);
+        formField.reattach();
+
+        triggerLabelEl = container.querySelector<HTMLElement>('[data-part="trigger"]')!;
+        actionsEl = container.querySelector<HTMLElement>('[data-part="actions"]')!;
+        filterInputEl = container.querySelector<HTMLInputElement>('.p-select-filter-input');
+        headerAllEl = container.querySelector<HTMLElement>('.p-select-header-all');
+        listEl = container.querySelector<HTMLElement>('.p-select-list')!;
+
+        bindStaticEvents();
+    }
+
+    /**
+     * Every listener that used to be rebound on every `render()`/`bindOptionClicks()` call is attached
+     * exactly once here instead, since `mountShell()` (unlike the old `render()`) never touches
+     * `container.innerHTML` again after this runs. This is also what makes the old outside-click
+     * accumulation bug (a fresh outside-click subscription added on every `render()` call, on top of a
+     * second, functionally-identical one registered separately at module scope) go away as a
+     * natural side effect: there is now exactly one such listener, registered exactly once, for the
+     * lifetime of this component instance.
+     */
+    function bindStaticEvents() {
+        // Trigger click / clear-icon click / chip-remove click, delegated on the (stable, never
+        // replaced) container element.
+        container.addEventListener('click', (e) => {
             const target = e.target as HTMLElement;
             if (target.closest('.p-select-overlay')) return;
             if (target.closest('.p-select-clear-icon')) {
                 e.stopPropagation();
-                selectedValues = [];
-                render();
+                selectedValues.set([]);
                 syncValue();
                 return;
             }
@@ -930,35 +1021,42 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
                 e.stopPropagation();
                 const removeBtn = target.closest('.p-select-chip-remove') as HTMLElement;
                 const remVal = removeBtn.getAttribute('data-remove');
-                selectedValues = selectedValues.filter(v => String(v) !== String(remVal));
-                render();
+                selectedValues.set(selectedValues().filter(v => String(v) !== String(remVal)));
                 syncValue();
                 return;
             }
             toggleOverlay();
-        };
+        }, { signal: ctx?.signal });
 
-        // Filter input
-        const filterInp = container.querySelector<HTMLInputElement>('.p-select-filter-input');
-        if (filterInp) {
-            filterInp.oninput = (e) => {
-                filterQuery = filterInp.value;
-                const list = container.querySelector('.p-select-list');
-                if (list) {
-                    setHtml(list, renderListItems());
-                    updateVirtualPositions();
-                }
-                bindOptionClicks();
-            };
-            filterInp.onclick = (e) => e.stopPropagation();
-            filterInp.onkeydown = (e) => {
+        // Filter input: `oninput` no longer does a scoped re-render itself - it only debounces a write
+        // to the `filterQuery` signal (closing a real, independent gap: unlike autocomplete.ts, this
+        // component had no debounce at all before this retrofit), and the `updateOptionList` effect
+        // below re-runs on its own once that signal changes.
+        if (filterInputEl) {
+            const debouncedSetFilterQuery = useDebounce((value: string) => {
+                filterQuery.set(value);
+            }, 150);
+
+            filterInputEl.addEventListener('input', () => {
+                debouncedSetFilterQuery(filterInputEl!.value);
+            }, { signal: ctx?.signal });
+            filterInputEl.addEventListener('click', (e) => e.stopPropagation(), { signal: ctx?.signal });
+            filterInputEl.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') {
                     toggleOverlay(false);
                 }
-            };
+            }, { signal: ctx?.signal });
         }
 
-        const listEl = container.querySelector<HTMLElement>('.p-select-list');
+        // No bindOptionClicks() call inside the scroll handler below anymore - the delegated `listEl`
+        // click listener (registered further down in this function) is bound to a stable ancestor of
+        // `.p-virtual-list` and its children, so it keeps receiving bubbled clicks regardless of which
+        // code path (patchList or this scroll handler's own setHtml) created a given descendant `<li>`.
+        // NOTE: this comment is deliberately placed BEFORE the call rather than inline inside its
+        // callback body - scripts/verify-contracts.mjs's signal-listener check does a naive
+        // paren-balance scan of the whole call expression without stripping comments first, so a
+        // contraction apostrophe (e.g. "handlers" written with one) inside an inline comment there
+        // gets misread as an unterminated string and throws off the scan.
         if (listEl && !scrollBound) {
             scrollBound = true;
             listEl.addEventListener('scroll', () => {
@@ -976,30 +1074,48 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
                     vList.style.transform = `translateY(${newStartOffset}px)`;
                     const newNodes = newVirtualItems.map(vi => renderFlatItem(currentFlatItems[vi.index], vi.index, currentTotalOptionCount));
                     setHtml(vList, html`${newNodes}`);
-                    bindOptionClicks();
                 }
             }, { signal: ctx?.signal, passive: true });
         }
 
-        // Select all header click
-        const selectAllHeader = container.querySelector<HTMLElement>('.p-select-header-all');
-        if (selectAllHeader) {
-            selectAllHeader.onclick = (e: MouseEvent) => {
+        if (headerAllEl) {
+            headerAllEl.addEventListener('click', (e: MouseEvent) => {
                 e.stopPropagation();
-                if (selectedValues.length === flatOptions.length) {
-                    selectedValues = [];
+                if (selectedValues().length === flatOptions.length) {
+                    selectedValues.set([]);
                 } else {
-                    selectedValues = flatOptions.map(o => o.value);
+                    selectedValues.set(flatOptions.map(o => o.value));
                 }
-                render();
                 syncValue();
-            };
+            }, { signal: ctx?.signal });
         }
 
-        bindOptionClicks();
+        // Delegated option click handling, replacing the old bindOptionClicks()'s per-`<li>` rebind -
+        // attached once to `listEl`, a stable ancestor of every option `<li>` regardless of whether it
+        // was rendered via patchList (non-virtual) or the virtualized `.p-virtual-list` full rebuild.
+        listEl.addEventListener('click', (e) => {
+            const target = e.target as HTMLElement;
+            const optionEl = target.closest('.p-select-option:not(.p-disabled)') as HTMLElement | null;
+            if (!optionEl) return;
+            e.stopPropagation();
+            const val = optionEl.getAttribute('data-value');
+            if (val === null) return;
+
+            if (isMultiple) {
+                if (isSelected(val)) {
+                    selectedValues.set(selectedValues().filter(v => String(v) !== String(val)));
+                } else {
+                    selectedValues.set([...selectedValues(), val]);
+                }
+            } else {
+                selectedValues.set([val]);
+                toggleOverlay(false);
+            }
+            syncValue();
+        }, { signal: ctx?.signal });
 
         // Keyboard navigation on container
-        container.onkeydown = (e) => {
+        container.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') {
                 if (!isOpen) {
                     e.preventDefault();
@@ -1011,44 +1127,22 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
                     toggleOverlay(false);
                 }
             }
-        };
-
-        // Click outside
-        document.addEventListener('click', (e) => {
-            if (!container.contains(e.target as Node)) {
-                if (isOpen) toggleOverlay(false);
-            }
         }, { signal: ctx?.signal });
-    }
 
-    function bindOptionClicks() {
-        const optionEls = container.querySelectorAll<HTMLElement>('.p-select-option:not(.p-disabled)');
-        optionEls.forEach(el => {
-            el.onclick = (e) => {
-                e.stopPropagation();
-                const val = el.getAttribute('data-value');
-                if (val === null) return;
-
-                if (isMultiple) {
-                    if (isSelected(val)) {
-                        selectedValues = selectedValues.filter(v => String(v) !== String(val));
-                    } else {
-                        selectedValues.push(val);
-                    }
-                    render();
-                } else {
-                    selectedValues = [val];
-                    toggleOverlay(false);
-                    render();
+        // Click outside - exactly one listener for the lifetime of this component instance (see this
+        // function's own doc comment above for why that matters).
+        if (typeof document !== 'undefined') {
+            document.addEventListener('click', (e) => {
+                if (!container.contains(e.target as Node)) {
+                    if (isOpen) toggleOverlay(false);
                 }
-                syncValue();
-            };
-        });
+            }, { signal: ctx?.signal });
+        }
     }
 
     function syncValue() {
-        const payload = isMultiple ? selectedValues : (selectedValues[0] ?? null);
-        formField.setValue(selectedValues);
+        const payload = isMultiple ? selectedValues() : (selectedValues()[0] ?? null);
+        formField.setValue(selectedValues());
 
         emitComponentEvent(container, 'select', 'change', {
             value: payload,
@@ -1056,15 +1150,24 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
         });
     }
 
-    if (typeof document !== 'undefined') {
-        const handleOutsideClick = (e: MouseEvent) => {
-            if (!container.contains(e.target as Node)) {
-                toggleOverlay(false);
-            }
-        };
-        document.addEventListener('click', handleOutsideClick, { signal: ctx?.signal });
-    }
+    mountShell();
 
-    render();
-    formField.setValue(selectedValues);
+    // Reactive rendering: these effects replace every manual render() call that used to follow a
+    // selectedValues/filterQuery mutation - each now re-runs automatically whenever the signal(s) it
+    // reads change. syncValue() stays an explicit one-shot call at each mutation site (it emits a
+    // change event / writes the hidden form field - a side effect, not a render), so it is
+    // intentionally NOT wrapped here, matching multiselect.ts's/autocomplete.ts's precedent.
+    effect(() => {
+        setHtml(triggerLabelEl, renderTriggerLabel());
+        setHtml(actionsEl, renderActionsHtml());
+    });
+    if (headerAllEl) {
+        const headerAllElStable = headerAllEl;
+        effect(() => {
+            setHtml(headerAllElStable, renderHeaderAllHtml());
+        });
+    }
+    effect(updateOptionList);
+
+    formField.setValue(selectedValues());
 }
