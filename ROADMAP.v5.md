@@ -685,27 +685,64 @@ needed" line for both was wrong. The genuinely open items are now closed:
   the existing island-unmount exclusion rule).
 - **Transitions remain explicitly deferred** — needs `l-if`/`l-for` to exist and be validated first,
   not designed speculatively alongside them.
-- **One real component retrofit as proof, not a framework-wide rewrite**: `components/multiselect.ts`
+- **Two real component retrofits as proof, not a framework-wide rewrite**: `components/multiselect.ts`
   — the cleanest, smallest match for the innerHTML-rebuild complaint below (full item-list rebuild plus
   a full per-row listener rebind on every filter keystroke, no debounce). `selected`/`filterQuery` are
   now signals; `renderDisplay`/`renderList` are each one `effect()` instead of being called manually
   at every one of 5 mutation sites; item rendering uses `patchList` plus one delegated click listener
-  instead of a full rebuild-and-rebind. `datatable.ts`/`autocomplete.ts` are the same shape and are
-  deliberately left for a follow-on pass, not forgotten — proving the pattern once first, same
-  discipline as the SVG retrofit leaving its own remainder.
+  instead of a full rebuild-and-rebind. `datatable.ts` — the largest/most feature-rich retrofit yet
+  (~1750 lines: sorting, filtering, pagination, single/multi selection, row expansion, in-place cell
+  editing, frozen columns, virtualization, lazy server data) — closed separately below, since it needed
+  its own real design work rather than a copy of multiselect's shape. `autocomplete.ts` remains the
+  same shape and is left for a follow-on pass.
 - Gave `runtime/benchmark.ts`'s `measureThroughput` — fully built, unit-tested, zero real callers
   before this pass — its first real caller (`multiselect-benchmark.test.ts`), producing real
   `opsPerSec`/percentile numbers instead of an unverified performance claim.
+
+**`datatable.ts` retrofit, closed as a follow-on pass.** This component had **zero prior test
+coverage** (confirmed: no test file existed for it at all, unusual for a component this size) — a
+characterization suite (`tests/components/datatable.test.ts`, 12 tests: sorting, global/column
+filtering, pagination, single/multiple/row-click selection, row expansion, cell editing, the
+virtualized path, lazy-mode fetch triggering) was written alongside the retrofit rather than after
+it, since there was no existing regression net to lean on. State (`globalFilter`, `columnFilters`,
+`sortMeta`, `currentPage`, `selectedKeys`, `expandedKeys`, `editingCell`) is now signal-backed behind
+one `effect()`, replacing ~15 scattered manual `render()`/`triggerDataUpdate()` call sites; both
+filter inputs are debounced 150ms (previously none); the table shell (toolbar/thead/tbody/paginator)
+is built once at mount instead of being torn down on every state change, so the global filter's own
+`<input>` never loses focus — the old "reacquire input, restore focus, restore caret position"
+workaround this component needed is gone entirely, not patched around.
+
+**`patchList` (Part I's own new helper) turned out not to be directly usable here — a real,
+non-obvious finding, not a style choice.** Assigning HTML containing bare `<tr>`/`<td>` markup to a
+`<div>` (`patchList`'s hardcoded wrapper) is a parse error under the HTML5 fragment-parsing
+algorithm: real browsers (and happy-dom) silently drop the `<tr>`/`<td>` tags, keeping only their
+text content — a row would render as flattened text, not a table row. Rather than modify the shared
+`list-patch.ts` (used by `l-for` too) for one caller's tag-context needs, `datatable.ts` gets its own
+local `patchTbodyRows` — the identical keyed-reuse algorithm, generalized to a 1-or-2-`<tr>` group per
+row (row + optional expansion row), parsing new markup via a `<template>` element (the spec-correct
+way to build orphan `<tr>` nodes from a string, verified empirically). A second bug surfaced during
+the SAME implementation pass: comparing a reused row's live `.outerHTML` against the freshly-rendered
+string (`patchList`'s own approach) never matches, because a browser's HTML serializer normalizes
+away the whitespace in `renderSingleRow`'s multi-line `<tr ...>` opening tag — every row looked
+"changed" and got needlessly torn down every update, defeating the point. Fixed by caching the raw
+markup string this function itself last wrote per row-key, and comparing against that instead of the
+DOM's own serialization. Virtualized large-dataset rendering is unchanged (still a full `tbody`
+rebuild — its spacer-row layout doesn't fit a keyed-reuse model without deeper surgery, left for
+later); cell-editing/frozen-column/row-expansion logic is untouched, only how their triggering state
+reaches a re-render changed. Verified: `tsc --noEmit` clean, 547/547 client tests, production build
+with all budgets green, and a live check in the Showcase (sort, row selection, node-identity-preserved
+across an unrelated selection change) with no related console errors.
 
 ---
 
 ## 11. Part J — Performance
 
 - **Stop leaking listeners** (§1.3) — the largest runtime problem in the codebase.
-- **Replace `innerHTML` rebuilds with targeted updates — [CLOSED (one component, proof-of-pattern),
-  this pass].** Real signals plus a new keyed list-patch helper (Part I) fixed this for
-  `multiselect.ts`; `datatable.ts`/`autocomplete.ts` are the same shape and are the deliberate next
-  targets, not done here. Turned out `morphElement()` (`runtime/refresh.ts`) wasn't the right tool for
+- **Replace `innerHTML` rebuilds with targeted updates — [CLOSED (two components), this pass].** Real
+  signals plus a new keyed list-patch helper (Part I) fixed this for `multiselect.ts` and
+  `datatable.ts` (the latter needed its own local keyed-row helper, `patchTbodyRows` — see Part I for
+  why `patchList` itself doesn't fit a `<tr>`-based container); `autocomplete.ts` is the same shape and
+  is the deliberate next target, not done here. Turned out `morphElement()` (`runtime/refresh.ts`) wasn't the right tool for
   this — it's a root-attribute diff plus a blind full-`innerHTML` replace for children, only used by the
   server-refresh fallback path, never by a component's own local re-render; the new `patchList()`
   keyed-reconciliation helper is what actually solves "destroys focus/selection," since for a text
@@ -1139,7 +1176,7 @@ worse than shipping neither, because it looks finished.
 | Typed TagHelper generation | Fresh | Partial — generator exists, no user input | B |
 | Streaming SSR | Next, Nuxt | Partial — in-order only | E |
 | Per-island code splitting | Astro, Qwik | Partial — ESM splits; IIFE ships all 76 | B |
-| Signals / fine-grained reactivity | Qwik, Solid | **Strong — [CLOSED, this pass]** — real `signal`/`computed`/`effect`/`batch` (`runtime/signals.ts`), backing `l-bind`/`l-model`/`l-class`/`l-style`/`l-show`/`l-hide`/`l-if`/`l-for`; one component (`multiselect.ts`) retrofitted as proof, `datatable.ts`/`autocomplete.ts` deliberately next | I |
+| Signals / fine-grained reactivity | Qwik, Solid | **Strong — [CLOSED, this pass]** — real `signal`/`computed`/`effect`/`batch` (`runtime/signals.ts`), backing `l-bind`/`l-model`/`l-class`/`l-style`/`l-show`/`l-hide`/`l-if`/`l-for`; `multiselect.ts` and `datatable.ts` retrofitted as proof, `autocomplete.ts` deliberately next | I |
 | Perf budgets in CI | — | **Adopted — [CLOSED (mechanical part), this pass]** — real CI now exists at all; gzip check extended to per-island chunks; hydration-time/Lighthouse still deferred | J |
 | Icon system | — | **Strong — [CLOSED (75%), this pass]** — module already existed; retrofitted 33 of ~37 components, `rawSvgLiterals` 212 → 53, remaining 53 deliberately kept (pre-redesign shapes with no current match, or render properties/CSS hooks the module can't express) | M |
 | Typed content collections | Astro | **Strong — [CLOSED, this pass]** — already fully typed end-to-end; the one real gap (silent schema-mismatch swallowing) is now a loud failure | F |

@@ -7,6 +7,8 @@ import type { IslandContext } from '../runtime/registry';
 import { html, setHtml, url as safeUrl, unsafe, attr, cx, type Raw } from '../runtime/html';
 import { useVirtualizer, type Virtualizer } from '../composables/useVirtualizer';
 import type { PatternDeclaration } from '../accessibility/patterns';
+import { signal, effect } from '../runtime/signals';
+import { useDebounce } from '../composables/useDebounce';
 
 export const a11y: PatternDeclaration = {
     kind: 'native',
@@ -657,7 +659,6 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
     const dataKey = props.dataKey || 'id';
     const paginator = !!props.paginator;
     let rowsPerPage = props.rows || 10;
-    let currentPage = Math.floor((props.first || 0) / rowsPerPage) + 1;
     const rowsPerPageOptions = props.rowsPerPageOptions || [5, 10, 20, 50];
     const sortMode = props.sortMode || 'single';
     const removableSort = !!props.removableSort;
@@ -672,22 +673,37 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
     let serverData: Record<string, any>[] = rawData;
     let serverTotalRecords = props.totalRecords ?? rawData.length;
 
-    // State Variables
-    let globalFilter = '';
-    const columnFilters: Record<string, string> = {};
-    let sortMeta: Array<{ field: string; order: number }> = [];
-    if (props.sortField) {
-        sortMeta.push({ field: props.sortField, order: props.sortOrder ?? 1 });
-    }
-
-    const selectedKeys = new Set<any>();
-    const expandedKeys = new Set<any>();
-    let editingCell: { rowKey: any; field: string } | null = null;
+    // State Variables (ROADMAP.v5.md Part I/J signals retrofit - see multiselect.ts for the
+    // established pattern this mirrors).
+    //
+    // globalFilter, columnFilters, sortMeta, currentPage, selectedKeys, expandedKeys and editingCell
+    // are signals. Every former call site that used to mutate one of these in place and then call
+    // `render()`/`triggerDataUpdate()` now does nothing but a plain (immutable-replace) signal write -
+    // the single `effect(updateView)` registered at the bottom of this file re-runs automatically on
+    // any of their changes and performs every targeted DOM update described in the module doc comment
+    // below `updateView`. Sets and the sortMeta array are always replaced wholesale (never mutated in
+    // place) because `Signal.set()` short-circuits on `Object.is(next, value)` - mutating-then-set on
+    // the same reference would be a silent no-op.
+    //
+    // `loading`, `currentSize` and `rowsPerPage` stay plain variables: this pass only converts the
+    // state listed in the task brief, and toggling any of these three still explicitly calls
+    // `updateView()` at its own mutation site, the same way `fetchLazyData()`'s network call stays an
+    // explicit side effect rather than something wrapped in the reactive effect.
+    const globalFilter = signal('');
+    const columnFilters = signal<Record<string, string>>({});
+    const initialSortMeta: Array<{ field: string; order: number }> = props.sortField
+        ? [{ field: props.sortField, order: props.sortOrder ?? 1 }]
+        : [];
+    const sortMeta = signal(initialSortMeta);
+    const currentPage = signal(Math.floor((props.first || 0) / rowsPerPage) + 1);
+    const selectedKeys = signal<Set<any>>(new Set());
+    const expandedKeys = signal<Set<any>>(new Set());
+    const editingCell = signal<{ rowKey: any; field: string } | null>(null);
 
     async function fetchLazyData() {
         if (!isLazy || !props.lazyUrl) return;
         loading = true;
-        render();
+        updateView();
 
         try {
             const tokenEl = document.querySelector('input[name="__RequestVerificationToken"]') as HTMLInputElement;
@@ -697,20 +713,24 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                 headers['X-CSRF-TOKEN'] = tokenEl.value;
             }
 
+            const page = currentPage();
+            const sort = sortMeta();
+            const filters = columnFilters();
+
             const response = await fetch(props.lazyUrl, {
                 method: 'POST',
                 headers,
                 body: JSON.stringify({
-                    page: currentPage,
+                    page,
                     pageSize: rowsPerPage,
-                    first: (currentPage - 1) * rowsPerPage,
+                    first: (page - 1) * rowsPerPage,
                     rows: rowsPerPage,
-                    sortField: sortMeta[0]?.field,
-                    sortOrder: sortMeta[0]?.order,
-                    sort: sortMeta,
-                    globalSearch: globalFilter || undefined,
-                    filters: Object.keys(columnFilters).reduce((acc, f) => {
-                        acc[f] = { value: columnFilters[f], matchMode: 'contains' };
+                    sortField: sort[0]?.field,
+                    sortOrder: sort[0]?.order,
+                    sort,
+                    globalSearch: globalFilter() || undefined,
+                    filters: Object.keys(filters).reduce((acc, f) => {
+                        acc[f] = { value: filters[f], matchMode: 'contains' };
                         return acc;
                     }, {} as Record<string, any>)
                 })
@@ -725,15 +745,18 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
             console.error('[LaughTale DataTable] Lazy fetch failed:', err);
         } finally {
             loading = false;
-            render();
+            updateView();
         }
     }
 
+    // Former call sites of `triggerDataUpdate()` now write the relevant signal(s) directly and then
+    // call this only to kick off the lazy-mode network fetch - a side effect, so (like
+    // `fetchLazyData()` itself) it stays an explicit call rather than something the reactive effect
+    // does implicitly. In non-lazy mode there is nothing left to do here: `effect(updateView)` already
+    // re-runs on its own the moment the signal write lands.
     function triggerDataUpdate() {
         if (isLazy) {
             fetchLazyData();
-        } else {
-            render();
         }
     }
 
@@ -876,10 +899,34 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
     let currentFiltered: Record<string, any>[] = [];
     let scrollBound = false;
 
+    // Stable references into the shell mountShell() builds exactly once (point 1 of the
+    // restructuring notes below). updateView() only ever reads/writes through these - it never
+    // touches `container.innerHTML` again after the initial mount.
+    let rootEl: HTMLElement;
+    let loadingRegionEl: HTMLElement;
+    let selectionRegionEl: HTMLElement;
+    let theadEl: HTMLElement;
+    let tbodyEl: HTMLElement;
+    let paginatorRegionEl: HTMLElement;
+    let scrollWrapperEl: HTMLElement;
+    // Mirrors the header's last-rendered "select all" checkbox state, read back by the delegated
+    // click handler on theadEl (the checkbox itself is recreated on every header rebuild, so its own
+    // classList can't be inspected at click time the way the old per-render bindEvents() did).
+    let lastAllPageSelected = false;
+    // The single currently-mounted `.p-cell-editor-input`, if any - used to bind its blur/keydown
+    // exactly once per actual DOM node instance (see `syncCellEditorFocus`).
+    let lastEditorInputEl: HTMLInputElement | null = null;
+    // Last raw (never-parsed) markup string `patchTbodyRows` wrote for each row key, keyed the same
+    // way as its own reconciliation - see that function's doc comment for why this cache exists
+    // instead of comparing against the live DOM's own (re-serialized, whitespace-normalized)
+    // `.outerHTML`.
+    const rowMarkupCache = new Map<string, string>();
+
     function renderSingleRow(row: Record<string, any>, rowIdx: number, totalCount: number): Raw {
         const rowKey = row[dataKey];
-        const isSelected = selectedKeys.has(rowKey);
-        const isExpanded = expandedKeys.has(rowKey);
+        const isSelected = selectedKeys().has(rowKey);
+        const isExpanded = expandedKeys().has(rowKey);
+        const editing = editingCell();
 
         const cellTds = columns.map(col => {
             let frozenClass = col.frozen ? (col.alignFrozen === 'right' ? 'p-frozen-column-right' : 'p-frozen-column-left') : '';
@@ -925,7 +972,7 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
             const rawVal = resolveField(row, col.field);
 
             // In-Place Cell Editing
-            const isEditing = editMode === 'cell' && editingCell?.rowKey === rowKey && editingCell?.field === col.field;
+            const isEditing = editMode === 'cell' && editing?.rowKey === rowKey && editing?.field === col.field;
             if (isEditing) {
                 return html`
                     <td class="${frozenClass} ${col.bodyClass || ''}" style="${styleAttr}">
@@ -1021,8 +1068,9 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
             <tr class="p-datatable-spacer-bottom"><td class="p-datatable-spacer-cell" colspan="${columns.length}"></td></tr>
         `);
         updateVirtualPositions();
-        const rootEl = container.firstElementChild as HTMLElement;
-        if (rootEl) bindBodyRowEvents(rootEl);
+        // No per-row rebinding needed here: row interactions are handled by one delegated listener
+        // bound once to the (stable, never-replaced) tbody element itself - see
+        // `bindTbodyDelegatedEvents`. Replacing this tbody's innerHTML does not touch that listener.
     }
 
     function focusRowByIndex(targetIdx: number) {
@@ -1043,10 +1091,24 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
         }
     }
 
-    function render() {
+    /**
+     * Pure computation of everything a render needs: filtered/sorted/paginated-or-virtualized rows,
+     * header/filter-row markup, body markup (for the skeleton/empty/virtualized cases), the selection
+     * bar, the paginator, and the loading overlay. Shared by `mountShell()` (the one-time full build)
+     * and `updateView()` (every subsequent targeted update) so the two can never compute this
+     * differently by accident. Reads every relevant signal exactly once per call, which is also what
+     * lets `effect(updateView)` below correctly track all of them as dependencies.
+     */
+    function computeViewModel() {
+        const page = currentPage();
+        const gFilter = globalFilter();
+        const cFilters = columnFilters();
+        const currentSortMeta = sortMeta();
+        const currentSelectedKeys = selectedKeys();
+
         let displayRows: Record<string, any>[];
         let totalRecords: number;
-        const firstIdx = (currentPage - 1) * rowsPerPage;
+        const firstIdx = (page - 1) * rowsPerPage;
 
         if (isLazy) {
             displayRows = serverData;
@@ -1055,8 +1117,8 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
             // 1. Filter Data
             let filtered = rawData.filter(row => {
                 // Global search
-                if (globalFilter.trim()) {
-                    const query = globalFilter.toLowerCase();
+                if (gFilter.trim()) {
+                    const query = gFilter.toLowerCase();
                     const fieldsToCheck = props.globalFilterFields && props.globalFilterFields.length > 0
                         ? props.globalFilterFields
                         : columns.map(c => c.field).filter(Boolean);
@@ -1069,7 +1131,7 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                 }
 
                 // Column filters
-                for (const [f, query] of Object.entries(columnFilters)) {
+                for (const [f, query] of Object.entries(cFilters)) {
                     if (query.trim()) {
                         const val = resolveField(row, f);
                         if (val == null || !String(val).toLowerCase().includes(query.toLowerCase())) {
@@ -1082,9 +1144,9 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
             });
 
             // 2. Sort Data
-            if (sortMeta.length > 0) {
+            if (currentSortMeta.length > 0) {
                 filtered.sort((a, b) => {
-                    for (const meta of sortMeta) {
+                    for (const meta of currentSortMeta) {
                         const valA = resolveField(a, meta.field);
                         const valB = resolveField(b, meta.field);
                         if (valA === valB) continue;
@@ -1135,16 +1197,16 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
         if (scrollable) rootClasses.push('p-datatable-scrollable');
 
         // Check if all current page rows are selected
-        const allPageSelected = displayRows.length > 0 && displayRows.every(r => selectedKeys.has(r[dataKey]));
+        const allPageSelected = displayRows.length > 0 && displayRows.every(r => currentSelectedKeys.has(r[dataKey]));
 
         // Generate Header Cells
         const headerCells = columns.map((col) => {
             const isSortable = !!col.sortable;
-            const sortItem = sortMeta.find(m => m.field === col.field);
+            const sortItem = currentSortMeta.find(m => m.field === col.field);
             const isSorted = !!sortItem;
             const sortOrder = sortItem?.order || 0;
-            const sortBadge = sortMode === 'multiple' && sortMeta.length > 1 && isSorted
-                ? html`<span class="p-datatable-sort-badge">${sortMeta.indexOf(sortItem!) + 1}</span>`
+            const sortBadge = sortMode === 'multiple' && currentSortMeta.length > 1 && isSorted
+                ? html`<span class="p-datatable-sort-badge">${currentSortMeta.indexOf(sortItem!) + 1}</span>`
                 : '';
 
             let sortIconSvg: Raw | '' = '';
@@ -1206,13 +1268,13 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                 if (!col.field || col.selectionMode || col.expander || col.filterable === false) {
                     return html`<th class="${frozenClass}"></th>`;
                 }
-                const curVal = columnFilters[col.field] || '';
+                const curVal = cFilters[col.field] || '';
                 return html`
                     <th class="${frozenClass}">
-                        <input type="text" 
-                               class="p-datatable-filter-input" 
-                               data-filter-field="${col.field}" 
-                               placeholder="${col.filterPlaceholder || locale.t('searchMessage') || 'Filter...'}" 
+                        <input type="text"
+                               class="p-datatable-filter-input"
+                               data-filter-field="${col.field}"
+                               placeholder="${col.filterPlaceholder || locale.t('searchMessage') || 'Filter...'}"
                                value="${curVal}" />
                     </th>
                 `;
@@ -1220,9 +1282,17 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
             filterRowHtml = html`<tr class="p-datatable-filter-row">${filterCells}</tr>`;
         }
 
-        // Generate Body Rows
+        // Generate Body Rows. `bodyMode` drives how updateView() writes these into the tbody:
+        // 'skeleton'/'empty'/'virtual' are all still a full setHtml(tbodyEl, ...) (see the "Explicitly
+        // out of scope" note above `patchTbodyRows` for why virtualization stays this way); 'rows' is
+        // the actual retrofit target and carries no bodyRowsHtml at all - `rowIndexByKey` plus
+        // `displayRows` are enough for `patchTbodyRows` to render each row itself.
+        let bodyMode: 'skeleton' | 'empty' | 'virtual' | 'rows';
         let bodyRowsHtml: Raw | Raw[] | '' = '';
+        let rowIndexByKey: Map<any, number> | null = null;
+
         if (loading && loadingMode === 'skeleton') {
+            bodyMode = 'skeleton';
             bodyRowsHtml = Array.from({ length: rowsPerPage }).map(() => html`
                 <tr>
                     ${columns.map(col => html`
@@ -1233,6 +1303,7 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                 </tr>
             `);
         } else if (displayRows.length === 0) {
+            bodyMode = 'empty';
             bodyRowsHtml = html`
                 <tr>
                     <td colspan="${columns.length}" style="text-align: center; padding: 3rem 1rem; color: var(--lt-surface-400);">
@@ -1243,31 +1314,32 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                     </td>
                 </tr>
             `;
+        } else if (virtualizer && virtualizer.isVirtual()) {
+            bodyMode = 'virtual';
+            const virtualItems = virtualizer.getVirtualItems();
+            const rowsHtml = virtualItems.map(vi => renderSingleRow(currentFiltered[vi.index], vi.index, totalRecords));
+            bodyRowsHtml = html`
+                <tr class="p-datatable-spacer-top"><td class="p-datatable-spacer-cell" colspan="${columns.length}"></td></tr>
+                ${rowsHtml}
+                <tr class="p-datatable-spacer-bottom"><td class="p-datatable-spacer-cell" colspan="${columns.length}"></td></tr>
+            `;
         } else {
-            if (virtualizer && virtualizer.isVirtual()) {
-                const virtualItems = virtualizer.getVirtualItems();
-                const rowsHtml = virtualItems.map(vi => renderSingleRow(currentFiltered[vi.index], vi.index, totalRecords));
-                bodyRowsHtml = html`
-                    <tr class="p-datatable-spacer-top"><td class="p-datatable-spacer-cell" colspan="${columns.length}"></td></tr>
-                    ${rowsHtml}
-                    <tr class="p-datatable-spacer-bottom"><td class="p-datatable-spacer-cell" colspan="${columns.length}"></td></tr>
-                `;
-            } else {
-                const startIdx = paginator ? firstIdx : 0;
-                bodyRowsHtml = displayRows.map((row, idx) => renderSingleRow(row, startIdx + idx, totalRecords));
-            }
+            bodyMode = 'rows';
+            const startIdx = paginator ? firstIdx : 0;
+            rowIndexByKey = new Map();
+            displayRows.forEach((row, idx) => rowIndexByKey!.set(row[dataKey], startIdx + idx));
         }
 
         // Selection Summary Bar
         let selectionBarHtml: Raw | '' = '';
-        if (selectedKeys.size > 0) {
-            const selectedRows = rawData.filter(r => selectedKeys.has(r[dataKey]));
+        if (currentSelectedKeys.size > 0) {
+            const selectedRows = rawData.filter(r => currentSelectedKeys.has(r[dataKey]));
             const totalVal = selectedRows.reduce((sum, r) => sum + (Number(r.price) || Number(r.balance) || 0), 0);
 
             selectionBarHtml = html`
                 <div class="p-datatable-selection-bar">
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <span class="p-tag p-tag-info" style="font-weight: 700;">Selected: ${selectedKeys.size}</span>
+                        <span class="p-tag p-tag-info" style="font-weight: 700;">Selected: ${currentSelectedKeys.size}</span>
                         ${totalVal > 0 ? html`<span>Total: <strong>$${totalVal.toLocaleString()}</strong></span>` : ''}
                     </div>
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
@@ -1290,13 +1362,13 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                 .replace('{totalRecords}', String(totalRecords));
 
             const pageButtons: Raw[] = [];
-            let startPage = Math.max(1, currentPage - 2);
+            let startPage = Math.max(1, page - 2);
             let endPage = Math.min(totalPages, startPage + 4);
             if (endPage - startPage < 4) startPage = Math.max(1, endPage - 4);
 
             for (let p = startPage; p <= endPage; p++) {
                 pageButtons.push(html`
-                    <button type="button" class="p-paginator-page ${p === currentPage ? 'p-paginator-page-active' : ''}" data-page="${p}">
+                    <button type="button" class="p-paginator-page ${p === page ? 'p-paginator-page-active' : ''}" data-page="${p}">
                         ${p}
                     </button>
                 `);
@@ -1306,61 +1378,17 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                 <div class="p-datatable-paginator">
                     <span>${reportStr}</span>
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <button type="button" class="p-paginator-nav p-first" data-page="1" ${currentPage === 1 ? 'disabled' : ''} aria-label="First Page">«</button>
-                        <button type="button" class="p-paginator-nav p-prev" data-page="${currentPage - 1}" ${currentPage === 1 ? 'disabled' : ''} aria-label="Previous Page">‹</button>
+                        <button type="button" class="p-paginator-nav p-first" data-page="1" ${page === 1 ? 'disabled' : ''} aria-label="First Page">«</button>
+                        <button type="button" class="p-paginator-nav p-prev" data-page="${page - 1}" ${page === 1 ? 'disabled' : ''} aria-label="Previous Page">‹</button>
                         <div class="p-paginator-pages">${pageButtons}</div>
-                        <button type="button" class="p-paginator-nav p-next" data-page="${currentPage + 1}" ${currentPage === totalPages ? 'disabled' : ''} aria-label="Next Page">›</button>
-                        <button type="button" class="p-paginator-nav p-last" data-page="${totalPages}" ${currentPage === totalPages ? 'disabled' : ''} aria-label="Last Page">»</button>
+                        <button type="button" class="p-paginator-nav p-next" data-page="${page + 1}" ${page === totalPages ? 'disabled' : ''} aria-label="Next Page">›</button>
+                        <button type="button" class="p-paginator-nav p-last" data-page="${totalPages}" ${page === totalPages ? 'disabled' : ''} aria-label="Last Page">»</button>
                     </div>
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                         <span>${locale.t('rowsPerPage') || 'Rows per page'}:</span>
                         <select class="p-datatable-rows-select" aria-label="${locale.t('rowsPerPage') || 'Rows per page'}" style="padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px solid var(--lt-surface-300); background: var(--lt-surface-0); color: inherit; font-size: 0.8125rem;">
                             ${rowsPerPageOptions.map(opt => html`<option value="${opt}" ${opt === rowsPerPage ? 'selected' : ''}>${opt}</option>`)}
                         </select>
-                    </div>
-                </div>
-            `;
-        }
-
-        // Global Toolbar
-        let toolbarHtml: Raw | '' = '';
-        const showSearch = Array.isArray(props.globalFilterFields) && props.globalFilterFields.length > 0;
-        const showExport = (!!props.exportFilename && props.exportFilename.trim() !== '') || !!props.showExport;
-        const showRefresh = !!props.showRefresh;
-        const hasToolbar = !!props.title || showSearch || showExport || showInteractiveSize || showRefresh;
-
-        if (hasToolbar) {
-            toolbarHtml = html`
-                <div class="p-datatable-header-toolbar">
-                    <div class="p-datatable-title">${props.title || ''}</div>
-                    <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-                        ${showInteractiveSize ? html`
-                            <div class="p-size-switcher">
-                                <button type="button" class="p-size-btn ${currentSize === 'small' ? 'p-active' : ''}" data-size="small">Small</button>
-                                <button type="button" class="p-size-btn ${currentSize === 'normal' ? 'p-active' : ''}" data-size="normal">Normal</button>
-                                <button type="button" class="p-size-btn ${currentSize === 'large' ? 'p-active' : ''}" data-size="large">Large</button>
-                            </div>
-                        ` : ''}
-
-                        ${showSearch ? html`
-                            <div style="position: relative; display: flex; align-items: center;">
-                                <input type="text" class="p-datatable-global-filter p-datatable-filter-input" placeholder="Search keyword..." value="${globalFilter}" style="width: 180px;" />
-                            </div>
-                        ` : ''}
-
-                        ${showRefresh ? html`
-                            <button type="button" class="p-datatable-refresh-btn" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.4rem 0.75rem; border-radius: 6px; border: 1px solid var(--lt-surface-300); background: var(--lt-surface-0); color: inherit; font-size: 0.8125rem; font-weight: 600; cursor: pointer;">
-                                <span>${unsafe(LucideIcons.refreshCw)}</span>
-                                <span>Refresh</span>
-                            </button>
-                        ` : ''}
-
-                        ${showExport ? html`
-                            <button type="button" class="p-datatable-export-btn" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.4rem 0.75rem; border-radius: 6px; border: 1px solid var(--lt-surface-300); background: var(--lt-surface-0); color: inherit; font-size: 0.8125rem; font-weight: 600; cursor: pointer;">
-                                <span>${unsafe(LucideIcons.fileSpreadsheet)}</span>
-                                <span>Export CSV</span>
-                            </button>
-                        ` : ''}
                     </div>
                 </div>
             `;
@@ -1379,314 +1407,589 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
 
         const scrollWrapperStyle = props.scrollHeight ? `max-height: ${props.scrollHeight}; overflow-y: auto;` : 'overflow-x: auto;';
 
-        applyPart(container, 'root', rootClasses.join(' '), props.pt, props.studioOverrides);
+        return {
+            displayRows, totalRecords, totalPages, firstIdx,
+            rootClasses, headerCells, filterRowHtml,
+            bodyMode, bodyRowsHtml, rowIndexByKey,
+            allPageSelected, selectionBarHtml, paginatorHtml, loadingOverlayHtml,
+            scrollWrapperStyle, showInteractiveSize
+        };
+    }
+    type DataTableViewModel = ReturnType<typeof computeViewModel>;
+
+    /**
+     * Keyed <tr> reconciliation for the tbody - the actual point of this restructuring pass, but
+     * NOT implemented via `patchList` despite the task brief calling for
+     * `patchList(tbodyEl, displayRows, ...)` directly. That was tried first and reverted: patchList's
+     * managed children are hardcoded to plain `<div>` wrappers whose contents get assigned wholesale
+     * (see list-patch.ts's own doc comment), and assigning HTML containing bare `<tr>`/`<td>` markup
+     * to a non-table-context element is a parse error per the HTML5 fragment-parsing algorithm -
+     * real browsers (and happy-dom, verified empirically while building this) silently DROP the
+     * `<tr>`/`<td>` tags entirely, keeping only their text content. A `<div data-key><tr>...</tr></div>`
+     * tbody child would therefore render as flattened text, not a table row, in the Showcase app.
+     * `list-patch.ts` is off-limits to modify for this pass (hard rule), and there is no wrapper-tag
+     * override, so `patchList` cannot be used for this specific container/content combination.
+     *
+     * This reimplements patchList's exact reuse algorithm (existing-by-key map, in-place content
+     * update only when the rendered markup actually differs, position reconciliation via a moving
+     * "insert before here" anchor, remove-what's-no-longer-used) but keyed on each row's own
+     * `data-row-key` attribute (already present on every rendered row - no extra attribute needed)
+     * instead of a synthetic wrapper, and operating on a 1-or-2-`<tr>` group per row (the row itself,
+     * plus its optional `.p-row-expansion` detail row) instead of a single node. New markup is parsed
+     * via a `<template>` element rather than a `<div>`: template *content* fragments always parse
+     * table content correctly regardless of where the `<template>` itself lives in the DOM (the
+     * standard, spec-correct way to build orphan `<tr>` nodes from an HTML string) - verified
+     * empirically to behave the same in happy-dom as the documented real-browser behavior.
+     *
+     * Content-changed detection deliberately does NOT compare against the live DOM's own
+     * `.outerHTML` (patchList's own `existing.innerHTML !== html` check does exactly that, comparing
+     * a fresh template string against the target's post-parse, re-serialized content) - it compares
+     * against `rowMarkupCache`, a plain string this function wrote on the PREVIOUS call. This was not
+     * a style choice: it was a real, empirically-found bug fix. `renderSingleRow`'s own `<tr ...>`
+     * opening tag spans multiple lines with newlines between attributes; a browser's HTML serializer
+     * always normalizes that whitespace away on `.outerHTML` (attribute-separating whitespace has no
+     * DOM representation to round-trip), so `existing.outerHTML` can never equal the freshly rendered
+     * multi-line template string for ANY row, even when nothing about that row changed. That made
+     * every row - not just the one whose state actually changed - look "changed" and get needlessly
+     * torn down and rebuilt on every single update, defeating the entire point of this function
+     * (verified directly: an "unrelated row keeps its node identity" test failed until this cache was
+     * introduced). Comparing two copies of the same never-parsed template string instead sidesteps
+     * serialization fidelity entirely.
+     */
+    function patchTbodyRows(
+        tbody: HTMLElement,
+        items: Record<string, any>[],
+        getKey: (item: Record<string, any>) => string,
+        renderItem: (item: Record<string, any>) => string
+    ): void {
+        const existingByKey = new Map<string, HTMLTableRowElement[]>();
+        // Any direct tbody child that isn't part of a keyed group is leftover markup from the LAST
+        // time this tbody's body was a full setHtml() replacement (loading skeleton, empty state, or
+        // - before virtualization disengages - the virtualized spacer+rows layout): those modes don't
+        // tag their rows with `data-row-key` at all, so a naive key-only scan would silently leave
+        // them behind forever the first time this table switches back into keyed "rows" mode. They
+        // carry no key to reconcile against, so they are simply removed outright below.
+        const foreignNodes: Element[] = [];
+        let scanNode: Element | null = tbody.firstElementChild;
+        while (scanNode) {
+            const rowEl = scanNode as HTMLTableRowElement;
+            const key = rowEl.getAttribute('data-row-key');
+            if (key === null) {
+                foreignNodes.push(rowEl);
+                scanNode = scanNode.nextElementSibling;
+                continue;
+            }
+            const group: HTMLTableRowElement[] = [rowEl];
+            let next = rowEl.nextElementSibling;
+            if (next && next.classList.contains('p-row-expansion')) {
+                group.push(next as HTMLTableRowElement);
+                next = next.nextElementSibling;
+            }
+            existingByKey.set(key, group);
+            scanNode = next;
+        }
+        for (const n of foreignNodes) n.remove();
+
+        const usedKeys = new Set<string>();
+        const template = document.createElement('template');
+        let refNode: Element | null = tbody.firstElementChild;
+
+        for (const item of items) {
+            const key = getKey(item);
+            usedKeys.add(key);
+            // `renderItem` returns already-escaped markup built via the `html` tagged template (same
+            // contract as `patchList`'s own `renderItem` callback) - `unsafe()` here is the same
+            // "markup that is already trusted" escape hatch `setHtml` itself is built on, not a new
+            // injection sink. Routing this through `setHtml` (rather than assigning the template's
+            // content property directly) keeps this file's own zero-unguarded-HTML-sink architecture
+            // rule satisfied by construction - the runtime effect is identical either way.
+            const rowMarkup = renderItem(item);
+            const groupRows = existingByKey.get(key);
+
+            if (groupRows) {
+                // Reposition FIRST, while these are still the original (still-attached) nodes - this
+                // is exactly patchList's own reuse/move check, just generalized from one node to a
+                // 1-2 node group. Doing this before any content swap matters: `refNode` is only ever
+                // compared against / advanced past nodes that are still live members of the tree, so
+                // it can never end up pointing at a node this function is about to remove.
+                if (groupRows[0] === refNode) {
+                    refNode = groupRows[groupRows.length - 1].nextElementSibling;
+                } else {
+                    for (const r of groupRows) tbody.insertBefore(r, refNode);
+                }
+                // THEN swap content in place if it actually changed. `groupRows[0]` is now guaranteed
+                // to be in its correct final position, so inserting the replacement immediately before
+                // it (then removing the old nodes) keeps the new nodes in that same correct spot.
+                if (rowMarkupCache.get(key) !== rowMarkup) {
+                    setHtml(template, unsafe(rowMarkup));
+                    const newRows = Array.from(template.content.children) as HTMLTableRowElement[];
+                    const insertionAnchor = groupRows[0];
+                    for (const r of newRows) tbody.insertBefore(r, insertionAnchor);
+                    for (const r of groupRows) tbody.removeChild(r);
+                    rowMarkupCache.set(key, rowMarkup);
+                }
+            } else {
+                setHtml(template, unsafe(rowMarkup));
+                const newRows = Array.from(template.content.children) as HTMLTableRowElement[];
+                for (const r of newRows) tbody.insertBefore(r, refNode);
+                rowMarkupCache.set(key, rowMarkup);
+            }
+        }
+
+        for (const [key, group] of existingByKey) {
+            if (!usedKeys.has(key)) {
+                for (const r of group) r.remove();
+                rowMarkupCache.delete(key);
+            }
+        }
+    }
+
+    function renderRowsIntoTbody(vm: DataTableViewModel) {
+        patchTbodyRows(
+            tbodyEl,
+            vm.displayRows,
+            row => String(row[dataKey]),
+            row => renderSingleRow(row, vm.rowIndexByKey!.get(row[dataKey])!, vm.totalRecords).value
+        );
+    }
+
+    /**
+     * One-time full build (point 1 of the restructuring notes): the root wrapper, toolbar,
+     * selection/paginator/loading region wrappers, and the table's thead/tbody are all created here,
+     * exactly once, via the same `setHtml(container, ...)` approach the old monolithic `render()`
+     * used for every call. `updateView()` never calls this again - see its own doc comment.
+     */
+    function mountShell() {
+        const vm = computeViewModel();
+
+        const showSearch = Array.isArray(props.globalFilterFields) && props.globalFilterFields.length > 0;
+        const showExportUi = (!!props.exportFilename && props.exportFilename.trim() !== '') || !!props.showExport;
+        const showRefreshUi = !!props.showRefresh;
+        const hasToolbar = !!props.title || showSearch || showExportUi || vm.showInteractiveSize || showRefreshUi;
+
+        // Global Toolbar - built once here and never rebuilt by updateView(). This is what makes the
+        // global filter input immune to losing focus/cursor position on every filter keystroke: unlike
+        // the old code (which rebuilt the entire container, including this input, on every render and
+        // had to manually reacquire-and-refocus it afterward), there is nothing left to reacquire.
+        let toolbarHtml: Raw | '' = '';
+        if (hasToolbar) {
+            toolbarHtml = html`
+                <div class="p-datatable-header-toolbar">
+                    <div class="p-datatable-title">${props.title || ''}</div>
+                    <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                        ${vm.showInteractiveSize ? html`
+                            <div class="p-size-switcher">
+                                <button type="button" class="p-size-btn ${currentSize === 'small' ? 'p-active' : ''}" data-size="small">Small</button>
+                                <button type="button" class="p-size-btn ${currentSize === 'normal' ? 'p-active' : ''}" data-size="normal">Normal</button>
+                                <button type="button" class="p-size-btn ${currentSize === 'large' ? 'p-active' : ''}" data-size="large">Large</button>
+                            </div>
+                        ` : ''}
+
+                        ${showSearch ? html`
+                            <div style="position: relative; display: flex; align-items: center;">
+                                <input type="text" class="p-datatable-global-filter p-datatable-filter-input" placeholder="Search keyword..." value="${globalFilter()}" style="width: 180px;" />
+                            </div>
+                        ` : ''}
+
+                        ${showRefreshUi ? html`
+                            <button type="button" class="p-datatable-refresh-btn" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.4rem 0.75rem; border-radius: 6px; border: 1px solid var(--lt-surface-300); background: var(--lt-surface-0); color: inherit; font-size: 0.8125rem; font-weight: 600; cursor: pointer;">
+                                <span>${unsafe(LucideIcons.refreshCw)}</span>
+                                <span>Refresh</span>
+                            </button>
+                        ` : ''}
+
+                        ${showExportUi ? html`
+                            <button type="button" class="p-datatable-export-btn" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.4rem 0.75rem; border-radius: 6px; border: 1px solid var(--lt-surface-300); background: var(--lt-surface-0); color: inherit; font-size: 0.8125rem; font-weight: 600; cursor: pointer;">
+                                <span>${unsafe(LucideIcons.fileSpreadsheet)}</span>
+                                <span>Export CSV</span>
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        applyPart(container, 'root', vm.rootClasses.join(' '), props.pt, props.studioOverrides);
 
         setHtml(container, html`
-            <div class="${rootClasses.join(' ')}">
-                ${loadingOverlayHtml}
+            <div class="${vm.rootClasses.join(' ')}">
+                <div class="p-datatable-loading-region" data-part="loading-region">${vm.loadingOverlayHtml}</div>
                 ${toolbarHtml}
-                ${selectionBarHtml}
-                <div class="p-datatable-scrollable-wrapper" style="${scrollWrapperStyle}">
+                <div class="p-datatable-selection-region" data-part="selection-region">${vm.selectionBarHtml}</div>
+                <div class="p-datatable-scrollable-wrapper" style="${vm.scrollWrapperStyle}">
                     <table class="p-datatable-table" data-part="table" style="${props.tableStyle || ''}">
                         <thead class="p-datatable-thead" data-part="thead">
-                            <tr>${headerCells}</tr>
-                            ${filterRowHtml}
+                            <tr>${vm.headerCells}</tr>
+                            ${vm.filterRowHtml}
                         </thead>
                         <tbody class="p-datatable-tbody" data-part="tbody">
-                            ${bodyRowsHtml}
+                            ${vm.bodyMode === 'rows' ? '' : vm.bodyRowsHtml}
                         </tbody>
                     </table>
                 </div>
-                ${paginatorHtml}
+                <div class="p-datatable-paginator-region" data-part="paginator-region">${vm.paginatorHtml}</div>
             </div>
         `);
 
+        rootEl = container.firstElementChild as HTMLElement;
+        loadingRegionEl = container.querySelector<HTMLElement>('.p-datatable-loading-region')!;
+        selectionRegionEl = container.querySelector<HTMLElement>('.p-datatable-selection-region')!;
+        theadEl = container.querySelector<HTMLElement>('.p-datatable-thead')!;
+        tbodyEl = container.querySelector<HTMLElement>('.p-datatable-tbody')!;
+        paginatorRegionEl = container.querySelector<HTMLElement>('.p-datatable-paginator-region')!;
+        scrollWrapperEl = container.querySelector<HTMLElement>('.p-datatable-scrollable-wrapper')!;
+        lastAllPageSelected = vm.allPageSelected;
+
+        if (vm.bodyMode === 'rows') {
+            renderRowsIntoTbody(vm);
+        }
+
         updateVirtualPositions();
-        bindEvents();
+        bindStaticEvents();
+        bindTbodyDelegatedEvents();
+        syncCellEditorFocus();
     }
 
-    function bindBodyRowEvents(rootEl: HTMLElement) {
-        // 9. Row Checkbox Selection
-        rootEl.querySelectorAll<HTMLElement>('.p-row-checkbox').forEach(box => {
-            box.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const key = box.getAttribute('data-row-key');
+    /**
+     * Targeted update - replaces every one of the old ~15 manual `render()`/`triggerDataUpdate()`
+     * call sites. Registered as `effect(updateView)` below, so it re-runs automatically whenever
+     * globalFilter/columnFilters/sortMeta/currentPage/selectedKeys/expandedKeys/editingCell change,
+     * and is called explicitly wherever `loading`/`currentSize`/`rowsPerPage` change (the three plain,
+     * non-signal variables - see the State Variables comment far above for why).
+     *
+     * Unlike the old render(), this never touches `container.innerHTML`: the shell mountShell() built
+     * once is reused for the table's entire lifetime. Per column of the restructuring notes:
+     *   - thead (header cells + filter row): full `setHtml` every call - cheap, no patchList needed.
+     *   - selection bar / paginator: full `setHtml` on their own dedicated region element.
+     *   - tbody: `patchTbodyRows` (non-virtualized) keeps unrelated rows' DOM nodes untouched; the
+     *     loading-skeleton/empty/virtualized states still fully replace the tbody's innerHTML (not
+     *     keyed row lists, and - for virtualization - explicitly out of scope for this pass; see
+     *     `patchTbodyRows`'s doc comment and the module-level notes near the top of this file).
+     */
+    function updateView() {
+        const vm = computeViewModel();
+
+        rootEl.className = vm.rootClasses.join(' ');
+        applyPart(container, 'root', vm.rootClasses.join(' '), props.pt, props.studioOverrides);
+
+        setHtml(loadingRegionEl, vm.loadingOverlayHtml);
+        setHtml(selectionRegionEl, vm.selectionBarHtml);
+        setHtml(theadEl, html`<tr>${vm.headerCells}</tr>${vm.filterRowHtml}`);
+        setHtml(paginatorRegionEl, vm.paginatorHtml);
+        lastAllPageSelected = vm.allPageSelected;
+
+        if (vm.bodyMode === 'rows') {
+            renderRowsIntoTbody(vm);
+        } else {
+            setHtml(tbodyEl, html`${vm.bodyRowsHtml}`);
+        }
+
+        if (vm.bodyMode === 'virtual') {
+            updateVirtualPositions();
+        }
+
+        syncCellEditorFocus();
+    }
+
+    function resolveRealKey(key: string): any {
+        const matchedRow = rawData.find(r => String(r[dataKey]) === String(key));
+        return matchedRow ? matchedRow[dataKey] : key;
+    }
+
+    /**
+     * Every former per-row listener (checkbox, radio, row click, row keydown, row-toggler,
+     * editable-cell trigger) becomes ONE delegated listener per event type here, attached exactly
+     * once to `tbodyEl` - which, after this restructuring, is never replaced wholesale again (only
+     * patched via `patchTbodyRows`, or - for the loading/empty/virtualized states - had its innerHTML
+     * replaced, which does not detach a listener bound to the tbody element itself). This mirrors
+     * multiselect.ts's delegated `itemsList` click-listener retrofit. Each former
+     * `e.stopPropagation()` (used so a checkbox/radio/toggler/editable-cell click didn't also trigger
+     * row-click selection) becomes an early `return` instead, since there is now only one listener to
+     * short-circuit rather than a nested pair to stop from both firing.
+     */
+    function bindTbodyDelegatedEvents() {
+        tbodyEl.addEventListener('click', (event) => {
+            const target = event.target as HTMLElement;
+
+            const toggler = target.closest<HTMLElement>('.p-row-toggler');
+            if (toggler) {
+                const key = toggler.getAttribute('data-row-key');
                 if (!key) return;
-                const matchedRow = rawData.find(r => String(r[dataKey]) === String(key));
-                const realKey = matchedRow ? matchedRow[dataKey] : key;
-
-                if (selectedKeys.has(realKey)) selectedKeys.delete(realKey);
-                else selectedKeys.add(realKey);
-
-                dispatchSelectionEvent();
-                render();
-            }, { signal: ctx?.signal });
-        });
-
-        // 10. Row Radio Selection
-        rootEl.querySelectorAll<HTMLElement>('.p-row-radio').forEach(radio => {
-            radio.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const key = radio.getAttribute('data-row-key');
-                if (!key) return;
-                const matchedRow = rawData.find(r => String(r[dataKey]) === String(key));
-                const realKey = matchedRow ? matchedRow[dataKey] : key;
-
-                selectedKeys.clear();
-                selectedKeys.add(realKey);
-                dispatchSelectionEvent();
-                render();
-            }, { signal: ctx?.signal });
-        });
-
-        // 11. Row Click Selection and Keyboard Navigation
-        rootEl.querySelectorAll<HTMLTableRowElement>('.p-datatable-tbody > tr[data-row-key]').forEach(tr => {
-            if (selectionMode === 'single' || selectionMode === 'multiple') {
-                tr.addEventListener('click', (e) => {
-                    const key = tr.getAttribute('data-row-key');
-                    if (!key) return;
-                    const matchedRow = rawData.find(r => String(r[dataKey]) === String(key));
-                    const realKey = matchedRow ? matchedRow[dataKey] : key;
-
-                    if (selectionMode === 'single') {
-                        if (selectedKeys.has(realKey)) selectedKeys.delete(realKey);
-                        else {
-                            selectedKeys.clear();
-                            selectedKeys.add(realKey);
-                        }
-                    } else if (selectionMode === 'multiple') {
-                        const mouseEvent = e as MouseEvent;
-                        if (metaKeySelection && (mouseEvent.ctrlKey || mouseEvent.metaKey)) {
-                            if (selectedKeys.has(realKey)) selectedKeys.delete(realKey);
-                            else selectedKeys.add(realKey);
-                        } else {
-                            selectedKeys.clear();
-                            selectedKeys.add(realKey);
-                        }
-                    }
-                    dispatchSelectionEvent();
-                    render();
-                }, { signal: ctx?.signal });
+                const realKey = resolveRealKey(key);
+                const current = expandedKeys();
+                const next = new Set(current);
+                if (next.has(realKey)) next.delete(realKey); else next.add(realKey);
+                expandedKeys.set(next);
+                return;
             }
 
-            tr.addEventListener('keydown', (e) => {
-                const idxStr = tr.getAttribute('data-index');
-                if (idxStr == null) return;
-                const currIdx = parseInt(idxStr, 10);
-                if (e.key === 'ArrowDown') {
-                    e.preventDefault();
-                    if (currIdx < currentFiltered.length - 1) {
-                        focusRowByIndex(currIdx + 1);
+            const checkbox = target.closest<HTMLElement>('.p-row-checkbox');
+            if (checkbox) {
+                const key = checkbox.getAttribute('data-row-key');
+                if (!key) return;
+                const realKey = resolveRealKey(key);
+                const current = selectedKeys();
+                const next = new Set(current);
+                if (next.has(realKey)) next.delete(realKey); else next.add(realKey);
+                selectedKeys.set(next);
+                dispatchSelectionEvent();
+                return;
+            }
+
+            const radio = target.closest<HTMLElement>('.p-row-radio');
+            if (radio) {
+                const key = radio.getAttribute('data-row-key');
+                if (!key) return;
+                selectedKeys.set(new Set([resolveRealKey(key)]));
+                dispatchSelectionEvent();
+                return;
+            }
+
+            if (editMode === 'cell') {
+                const editableCell = target.closest<HTMLElement>('.p-editable-cell');
+                if (editableCell) {
+                    const rowKey = editableCell.getAttribute('data-row-key');
+                    const field = editableCell.getAttribute('data-field');
+                    if (!rowKey || !field) return;
+                    editingCell.set({ rowKey: resolveRealKey(rowKey), field });
+                    return;
+                }
+            }
+
+            if (selectionMode === 'single' || selectionMode === 'multiple') {
+                const tr = target.closest<HTMLTableRowElement>('tr[data-row-key]');
+                if (!tr) return;
+                const key = tr.getAttribute('data-row-key');
+                if (!key) return;
+                const realKey = resolveRealKey(key);
+                const current = selectedKeys();
+
+                if (selectionMode === 'single') {
+                    if (current.has(realKey)) {
+                        const next = new Set(current);
+                        next.delete(realKey);
+                        selectedKeys.set(next);
+                    } else {
+                        selectedKeys.set(new Set([realKey]));
                     }
-                } else if (e.key === 'ArrowUp') {
-                    e.preventDefault();
-                    if (currIdx > 0) {
-                        focusRowByIndex(currIdx - 1);
+                } else {
+                    const mouseEvent = event as MouseEvent;
+                    if (metaKeySelection && (mouseEvent.ctrlKey || mouseEvent.metaKey)) {
+                        const next = new Set(current);
+                        if (next.has(realKey)) next.delete(realKey); else next.add(realKey);
+                        selectedKeys.set(next);
+                    } else {
+                        selectedKeys.set(new Set([realKey]));
                     }
                 }
-            }, { signal: ctx?.signal });
-        });
+                dispatchSelectionEvent();
+            }
+        }, { signal: ctx?.signal });
 
-        // 12. Row Toggler (Expansion)
-        rootEl.querySelectorAll<HTMLElement>('.p-row-toggler').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const key = btn.getAttribute('data-row-key');
-                if (!key) return;
-                const matchedRow = rawData.find(r => String(r[dataKey]) === String(key));
-                const realKey = matchedRow ? matchedRow[dataKey] : key;
+        tbodyEl.addEventListener('keydown', (event) => {
+            const tr = (event.target as HTMLElement).closest<HTMLTableRowElement>('tr[data-index]');
+            if (!tr) return;
+            const idxStr = tr.getAttribute('data-index');
+            if (idxStr == null) return;
+            const currIdx = parseInt(idxStr, 10);
+            if (event.key === 'ArrowDown') {
+                event.preventDefault();
+                if (currIdx < currentFiltered.length - 1) {
+                    focusRowByIndex(currIdx + 1);
+                }
+            } else if (event.key === 'ArrowUp') {
+                event.preventDefault();
+                if (currIdx > 0) {
+                    focusRowByIndex(currIdx - 1);
+                }
+            }
+        }, { signal: ctx?.signal });
+    }
 
-                if (expandedKeys.has(realKey)) expandedKeys.delete(realKey);
-                else expandedKeys.add(realKey);
-                render();
-            }, { signal: ctx?.signal });
-        });
+    /**
+     * In-place cell editing's single `.p-cell-editor-input` is not a stable element the way tbodyEl
+     * or theadEl are - it only exists for the one row/field currently being edited, and a fresh node
+     * is created for it every time `patchTbodyRows`/`setHtml` touches that row. This binds its
+     * blur/keydown exactly once per actual DOM node instance (tracked via `lastEditorInputEl`) so an
+     * unrelated update that leaves this row's markup unchanged - and therefore reuses the same input
+     * node - does not double-bind or re-focus it. Called at the end of every `mountShell()`/
+     * `updateView()` pass; a no-op whenever `editMode !== 'cell'` or no cell is currently being edited.
+     */
+    function syncCellEditorFocus() {
+        if (editMode !== 'cell') return;
+        const cellInput = tbodyEl.querySelector<HTMLInputElement>('.p-cell-editor-input');
+        if (!cellInput) {
+            lastEditorInputEl = null;
+            return;
+        }
+        if (cellInput === lastEditorInputEl) return;
+        lastEditorInputEl = cellInput;
+        cellInput.focus();
 
-        // 13. In-Place Cell Editing
-        if (editMode === 'cell') {
-            rootEl.querySelectorAll<HTMLElement>('.p-editable-cell').forEach(td => {
-                td.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const rowKey = td.getAttribute('data-row-key');
-                    const field = td.getAttribute('data-field');
-                    if (!rowKey || !field) return;
-                    const matchedRow = rawData.find(r => String(r[dataKey]) === String(rowKey));
-                    const realKey = matchedRow ? matchedRow[dataKey] : rowKey;
-                    editingCell = { rowKey: realKey, field };
-                    render();
+        const saveCell = () => {
+            const editing = editingCell();
+            if (!editing) return;
+            const { rowKey, field } = editing;
+            const newVal = cellInput.value;
+            const matchedRow = rawData.find(r => String(r[dataKey]) === String(rowKey));
+            if (matchedRow) {
+                matchedRow[field] = newVal;
+                emitComponentEvent(container, 'datatable', 'cell-edit-complete', {
+                    row: matchedRow,
+                    field,
+                    newValue: newVal
+                });
+            }
+            editingCell.set(null);
+        };
+
+        cellInput.addEventListener('blur', saveCell, { signal: ctx?.signal });
+        cellInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                saveCell();
+            } else if (e.key === 'Escape') {
+                editingCell.set(null);
+            }
+        }, { signal: ctx?.signal });
+    }
+
+    /**
+     * One-time binding for everything outside the row body: the toolbar's own controls (built once by
+     * mountShell() and never rebuilt, so these can be bound directly rather than via delegation), plus
+     * delegated listeners on thead/paginator-region/selection-region for their sort/filter/pagination/
+     * clear-selection controls specifically BECAUSE those regions' innerHTML IS fully replaced by
+     * `updateView()` on every call (point 2 of the restructuring notes: rebuilding a handful of
+     * <th>/<button> elements is cheap and explicitly fine to keep as a full replace) - so, like the row
+     * body, their inner elements are not stable across updates and need delegation on the
+     * always-stable region element itself rather than a direct listener that would need rebinding.
+     */
+    function bindStaticEvents() {
+        const toolbarEl = rootEl.querySelector<HTMLElement>('.p-datatable-header-toolbar');
+        if (toolbarEl) {
+            toolbarEl.querySelectorAll<HTMLButtonElement>('.p-size-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const s = btn.getAttribute('data-size') as 'small' | 'normal' | 'large';
+                    if (!s) return;
+                    currentSize = s;
+                    toolbarEl.querySelectorAll('.p-size-btn').forEach(b => b.classList.toggle('p-active', b === btn));
+                    updateView();
                 }, { signal: ctx?.signal });
             });
 
-            const cellInput = rootEl.querySelector<HTMLInputElement>('.p-cell-editor-input');
-            if (cellInput) {
-                cellInput.focus();
-                const saveCell = () => {
-                    if (!editingCell) return;
-                    const rowKey = editingCell.rowKey;
-                    const field = editingCell.field;
-                    const newVal = cellInput.value;
-                    const matchedRow = rawData.find(r => String(r[dataKey]) === String(rowKey));
-                    if (matchedRow) {
-                        matchedRow[field] = newVal;
-                        emitComponentEvent(container, 'datatable', 'cell-edit-complete', {
-                            row: matchedRow,
-                            field,
-                            newValue: newVal
-                        });
-                    }
-                    editingCell = null;
-                    render();
-                };
-
-                cellInput.addEventListener('blur', saveCell, { signal: ctx?.signal });
-                cellInput.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') {
-                        saveCell();
-                    } else if (e.key === 'Escape') {
-                        editingCell = null;
-                        render();
-                    }
+            const globalInput = toolbarEl.querySelector<HTMLInputElement>('.p-datatable-global-filter');
+            if (globalInput) {
+                const debouncedGlobalFilter = useDebounce((value: string) => {
+                    globalFilter.set(value);
+                    currentPage.set(1);
+                    triggerDataUpdate();
+                }, 150);
+                globalInput.addEventListener('input', (e) => {
+                    debouncedGlobalFilter((e.target as HTMLInputElement).value);
                 }, { signal: ctx?.signal });
             }
-        }
-    }
 
-    function bindEvents() {
-        const rootEl = container.firstElementChild as HTMLElement;
-        if (!rootEl) return;
+            const exportBtn = toolbarEl.querySelector('.p-datatable-export-btn');
+            exportBtn?.addEventListener('click', () => exportCSV(), { signal: ctx?.signal });
 
-        // 1. Sortable Column Headers
-        rootEl.querySelectorAll<HTMLElement>('.p-sortable-column').forEach(th => {
-            th.addEventListener('click', () => {
-                const field = th.getAttribute('data-field');
-                if (!field) return;
-
-                const existing = sortMeta.find(m => m.field === field);
-                let nextOrder = 1;
-                if (existing) {
-                    if (existing.order === 1) nextOrder = -1;
-                    else if (existing.order === -1) nextOrder = removableSort ? 0 : 1;
-                }
-
-                if (sortMode === 'multiple') {
-                    if (nextOrder === 0) {
-                        sortMeta = sortMeta.filter(m => m.field !== field);
-                    } else if (existing) {
-                        existing.order = nextOrder;
-                    } else {
-                        sortMeta.push({ field, order: nextOrder });
-                    }
-                } else {
-                    if (nextOrder === 0) {
-                        sortMeta = [];
-                    } else {
-                        sortMeta = [{ field, order: nextOrder }];
-                    }
-                }
-
-                emitComponentEvent(container, 'datatable', 'sort', { sortMeta });
-
-                triggerDataUpdate();
-            }, { signal: ctx?.signal });
-        });
-
-        // 2. Global Filter Input
-        const globalInput = rootEl.querySelector<HTMLInputElement>('.p-datatable-global-filter');
-        if (globalInput) {
-            globalInput.addEventListener('input', (e) => {
-                const target = e.target as HTMLInputElement;
-                globalFilter = target.value;
-                const pos = target.selectionStart;
-                currentPage = 1;
-                triggerDataUpdate();
-                const reacquired = container.querySelector<HTMLInputElement>('.p-datatable-global-filter');
-                if (reacquired) {
-                    reacquired.focus();
-                    if (pos != null) reacquired.setSelectionRange(pos, pos);
-                }
-            }, { signal: ctx?.signal });
-        }
-
-        // 3. Column Row Filters
-        rootEl.querySelectorAll<HTMLInputElement>('.p-datatable-filter-input[data-filter-field]').forEach(input => {
-            input.addEventListener('input', (e) => {
-                const target = e.target as HTMLInputElement;
-                const field = input.getAttribute('data-filter-field')!;
-                columnFilters[field] = target.value;
-                const pos = target.selectionStart;
-                currentPage = 1;
-                triggerDataUpdate();
-                const reacquired = container.querySelector<HTMLInputElement>(`.p-datatable-filter-input[data-filter-field="${field}"]`);
-                if (reacquired) {
-                    reacquired.focus();
-                    if (pos != null) reacquired.setSelectionRange(pos, pos);
-                }
-            }, { signal: ctx?.signal });
-        });
-
-        // 4. Export CSV Button
-        const exportBtn = rootEl.querySelector('.p-datatable-export-btn');
-        if (exportBtn) {
-            exportBtn.addEventListener('click', () => exportCSV(), { signal: ctx?.signal });
-        }
-
-        // 5. Refresh Simulation Button
-        const refreshBtn = rootEl.querySelector('.p-datatable-refresh-btn');
-        if (refreshBtn) {
-            refreshBtn.addEventListener('click', () => {
+            const refreshBtn = toolbarEl.querySelector('.p-datatable-refresh-btn');
+            refreshBtn?.addEventListener('click', () => {
                 loading = true;
-                render();
+                updateView();
                 const t = setTimeout(() => {
                     loading = false;
-                    render();
+                    updateView();
                 }, 1000);
                 ctx?.onCleanup?.(() => clearTimeout(t));
             }, { signal: ctx?.signal });
         }
 
-        // 6. Interactive Size Switcher
-        rootEl.querySelectorAll<HTMLButtonElement>('.p-size-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const s = btn.getAttribute('data-size') as 'small' | 'normal' | 'large';
-                if (s) {
-                    currentSize = s;
-                    render();
-                }
-            }, { signal: ctx?.signal });
-        });
+        theadEl.addEventListener('click', (event) => {
+            const target = event.target as HTMLElement;
 
-        // 7. Select All Checkbox
-        const selectAllBox = rootEl.querySelector('.p-select-all');
-        if (selectAllBox) {
-            selectAllBox.addEventListener('click', () => {
-                const allSelected = selectAllBox.classList.contains('p-checked');
-                const displayRows = rawData;
-                if (allSelected) {
-                    displayRows.forEach(r => selectedKeys.delete(r[dataKey]));
+            if (target.closest('.p-select-all')) {
+                const current = selectedKeys();
+                const next = new Set(current);
+                if (lastAllPageSelected) {
+                    rawData.forEach(r => next.delete(r[dataKey]));
                 } else {
-                    displayRows.forEach(r => selectedKeys.add(r[dataKey]));
+                    rawData.forEach(r => next.add(r[dataKey]));
                 }
+                selectedKeys.set(next);
                 dispatchSelectionEvent();
-                render();
-            }, { signal: ctx?.signal });
-        }
+                return;
+            }
 
-        // 8. Clear Selection Button
-        const clearSelBtn = rootEl.querySelector('.p-datatable-clear-selection');
-        if (clearSelBtn) {
-            clearSelBtn.addEventListener('click', () => {
-                selectedKeys.clear();
-                dispatchSelectionEvent();
-                render();
-            }, { signal: ctx?.signal });
-        }
+            const th = target.closest<HTMLElement>('.p-sortable-column');
+            if (!th) return;
+            const field = th.getAttribute('data-field');
+            if (!field) return;
 
-        bindBodyRowEvents(rootEl);
+            const current = sortMeta();
+            const existing = current.find(m => m.field === field);
+            let nextOrder = 1;
+            if (existing) {
+                if (existing.order === 1) nextOrder = -1;
+                else if (existing.order === -1) nextOrder = removableSort ? 0 : 1;
+            }
 
-        const wrapper = rootEl.querySelector<HTMLElement>('.p-datatable-scrollable-wrapper');
-        if (wrapper && !scrollBound) {
+            let next: Array<{ field: string; order: number }>;
+            if (sortMode === 'multiple') {
+                if (nextOrder === 0) {
+                    next = current.filter(m => m.field !== field);
+                } else if (existing) {
+                    next = current.map(m => m.field === field ? { field, order: nextOrder } : m);
+                } else {
+                    next = [...current, { field, order: nextOrder }];
+                }
+            } else {
+                next = nextOrder === 0 ? [] : [{ field, order: nextOrder }];
+            }
+
+            sortMeta.set(next);
+            emitComponentEvent(container, 'datatable', 'sort', { sortMeta: next });
+            triggerDataUpdate();
+        }, { signal: ctx?.signal });
+
+        const debouncedColumnFilter = useDebounce((field: string, value: string) => {
+            columnFilters.set({ ...columnFilters(), [field]: value });
+            currentPage.set(1);
+            triggerDataUpdate();
+        }, 150);
+
+        theadEl.addEventListener('input', (event) => {
+            const input = (event.target as HTMLElement).closest<HTMLInputElement>('.p-datatable-filter-input[data-filter-field]');
+            if (!input) return;
+            const field = input.getAttribute('data-filter-field')!;
+            debouncedColumnFilter(field, input.value);
+        }, { signal: ctx?.signal });
+
+        selectionRegionEl.addEventListener('click', (event) => {
+            if (!(event.target as HTMLElement).closest('.p-datatable-clear-selection')) return;
+            selectedKeys.set(new Set());
+            dispatchSelectionEvent();
+        }, { signal: ctx?.signal });
+
+        paginatorRegionEl.addEventListener('click', (event) => {
+            const btn = (event.target as HTMLElement).closest<HTMLButtonElement>('.p-paginator-page, .p-paginator-nav');
+            if (!btn) return;
+            const targetPage = Number(btn.getAttribute('data-page'));
+            if (!isNaN(targetPage) && targetPage > 0) {
+                currentPage.set(targetPage);
+                triggerDataUpdate();
+            }
+        }, { signal: ctx?.signal });
+
+        paginatorRegionEl.addEventListener('change', (event) => {
+            const select = (event.target as HTMLElement).closest<HTMLSelectElement>('.p-datatable-rows-select');
+            if (!select) return;
+            rowsPerPage = Number(select.value);
+            currentPage.set(1);
+            triggerDataUpdate();
+        }, { signal: ctx?.signal });
+
+        if (!scrollBound) {
             scrollBound = true;
-            wrapper.addEventListener('scroll', () => {
+            scrollWrapperEl.addEventListener('scroll', () => {
                 if (!virtualizer || !virtualizer.isVirtual()) return;
                 const newVirtualItems = virtualizer.getVirtualItems();
                 if (newVirtualItems.length === 0) return;
@@ -1698,44 +2001,28 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
                 reRenderVirtualRows();
             }, { signal: ctx?.signal, passive: true });
         }
-
-        // 14. Pagination Controls
-        rootEl.querySelectorAll<HTMLButtonElement>('.p-paginator-page, .p-paginator-nav').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const targetPage = Number(btn.getAttribute('data-page'));
-                if (!isNaN(targetPage) && targetPage > 0) {
-                    currentPage = targetPage;
-                    triggerDataUpdate();
-                }
-            }, { signal: ctx?.signal });
-        });
-
-        const rowsSelect = rootEl.querySelector<HTMLSelectElement>('.p-datatable-rows-select');
-        if (rowsSelect) {
-            rowsSelect.addEventListener('change', () => {
-                rowsPerPage = Number(rowsSelect.value);
-                currentPage = 1;
-                triggerDataUpdate();
-            }, { signal: ctx?.signal });
-        }
     }
 
     function dispatchSelectionEvent() {
-        const selectedRows = rawData.filter(r => selectedKeys.has(r[dataKey]));
+        const current = selectedKeys();
+        const selectedRows = rawData.filter(r => current.has(r[dataKey]));
         emitComponentEvent(container, 'datatable', 'selection-change', {
-            selectedKeys: Array.from(selectedKeys),
+            selectedKeys: Array.from(current),
             selectedRows
         });
     }
 
     // Imperative reload: re-fetches from the server when lazy-backed, otherwise just re-renders the
     // already-loaded data - distinct from the initial-render check below, which only lazy-fetches when
-    // no initial data was provided at all. A later explicit reload() call should always refetch.
+    // no initial data was provided at all. A later explicit reload() call should always refetch. The
+    // non-lazy branch calls `updateView()` (a targeted update) rather than a full shell rebuild:
+    // rawData itself isn't reactive, but nothing about `reload()` requires rebuilding the shell either
+    // - the same targeted update path every other state change uses is correct here too.
     function doReload(): void {
         if (isLazy && props.lazyUrl) {
             fetchLazyData();
         } else {
-            render();
+            updateView();
         }
     }
 
@@ -1747,10 +2034,18 @@ export default function DataTableIsland(container: HTMLElement, props: DataTable
         }
     });
 
-    // Initial render / lazy fetch
+    // Initial mount: build the shell exactly once (point 1 of the restructuring notes above). This
+    // always runs - even in lazy mode with no initial rows - so fetchLazyData()'s own loading-state
+    // updateView() calls always have a shell to update, instead of needing a separate "am I mounting
+    // or updating" branch. `effect(updateView)` is registered right after: its first execution reads
+    // every signal updateView() depends on (establishing the effect's reactive subscriptions) and
+    // performs one redundant-but-harmless re-update of what mountShell() just built - the same
+    // "build once, then let an effect immediately re-run once" shape multiselect.ts's
+    // `effect(renderDisplay); effect(renderList);` already established.
+    mountShell();
+    effect(updateView);
+
     if (isLazy && props.lazyUrl && rawData.length === 0) {
         fetchLazyData();
-    } else {
-        render();
     }
 }
