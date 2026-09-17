@@ -46,6 +46,17 @@ jobs:
         working-directory: LaughTale.Client
         run: npm ci
 
+      # LaughTale.Client's own `dist/` (gitignored, never committed) is what its package.json
+      # `exports` map ("./islands" -> "./dist/runtime.mjs", "./adapters/react" -> "./dist/adapters/
+      # react.js", etc.) actually resolves to - LaughTale.Showcase.Islands' island-compiler build
+      # imports those subpaths. Confirmed the hard way: a solution build succeeded locally only
+      # because `dist/` already existed there from unrelated prior local work, not because this
+      # dependency was actually satisfied - a genuinely fresh checkout (this CI runner) has no
+      # `dist/` until it's built here first.
+      - name: Build Client (produces dist/ that Showcase.Islands' island-compiler build resolves against)
+        working-directory: LaughTale.Client
+        run: npm run build
+
       - name: Install npm dependencies (Showcase.Islands)
         working-directory: LaughTale.Showcase.Islands
         run: npm ci
@@ -118,6 +129,10 @@ jobs:
       - name: Install npm dependencies (Client)
         working-directory: LaughTale.Client
         run: npm ci
+
+      - name: Build Client (produces dist/ that Showcase.Islands' island-compiler build resolves against)
+        working-directory: LaughTale.Client
+        run: npm run build
 
       - name: Install npm dependencies (Showcase.Islands)
         working-directory: LaughTale.Showcase.Islands

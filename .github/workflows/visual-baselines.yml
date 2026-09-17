@@ -48,6 +48,13 @@ jobs:
         working-directory: LaughTale.Client
         run: npm ci
 
+      # LaughTale.Client's own `dist/` (gitignored) is what its package.json `exports` map resolves
+      # to for Showcase.Islands' island-compiler build - see the identical step in ci.yml for the
+      # full explanation.
+      - name: Build Client (produces dist/ that Showcase.Islands' island-compiler build resolves against)
+        working-directory: LaughTale.Client
+        run: npm run build
+
       - name: Install npm dependencies (Showcase.Islands)
         working-directory: LaughTale.Showcase.Islands
         run: npm ci
