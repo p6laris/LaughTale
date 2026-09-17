@@ -22,5 +22,7 @@ Thumbs.db
 
 ## Test Artifacts
 **/test-results/
+**/playwright-report/
+**/blob-report/
 **/.tmp/
 

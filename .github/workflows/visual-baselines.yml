@@ -1,0 +1,59 @@
+name: Update visual regression baselines
+
+# Manually triggered only - screenshot baselines are the ground truth this whole mechanism diffs
+# against, so regenerating them goes through explicit human review. This job uploads an artifact, it
+# never commits back on its own. Runs on ubuntu-latest specifically because that's the exact same
+# image the `e2e` job in ci.yml runs on - no Docker, no local-machine font/OS drift to debug.
+#
+# One-line local convenience alternative (not required): a Docker image matching the installed
+# @playwright/test version can reproduce the same Linux rendering locally, e.g.
+#   docker run --rm -v ${PWD}:/work -w /work/LaughTale.Client mcr.microsoft.com/playwright:v1.62.1-jammy \
+#     npx playwright test --project=visual --update-snapshots
+# (keep the image tag in sync with package.json's @playwright/test version if you ever use this.)
+
+on:
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Why are baselines being regenerated? (e.g. PR #123 intentional restyle)'
+        required: true
+        type: string
+
+jobs:
+  update-baselines:
+    name: Regenerate visual baselines (ubuntu-latest, chromium)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: LaughTale.Client/package-lock.json
+
+      - name: Build Showcase (same config webServer.command itself uses)
+        run: dotnet build LaughTale.Showcase/LaughTale.Showcase.csproj
+
+      - name: Install client dependencies
+        working-directory: LaughTale.Client
+        run: npm ci
+
+      - name: Install Playwright chromium only
+        working-directory: LaughTale.Client
+        run: npx playwright install --with-deps chromium
+
+      - name: Regenerate baselines
+        working-directory: LaughTale.Client
+        run: npx playwright test --project=visual --update-snapshots
+
+      - name: Upload regenerated baselines
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-baselines-${{ github.run_id }}
+          path: LaughTale.Client/tests/e2e/visual/components.visual.spec.ts-snapshots/**
+          retention-days: 14
