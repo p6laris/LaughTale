@@ -95,8 +95,61 @@ public sealed class LaughTaleLocalizer : ILaughTaleLocalizer
             return AsReadOnly(builtInLang);
         }
 
-        // 5. Nothing registered for this culture: fall through to an empty map so callers
-        //    (GetString/the indexer) fall back to the raw key rather than throwing.
+        // 5. Nothing registered for the ambient/requested culture: fall back to the configured
+        //    DefaultCulture's own built-in dictionary (steps 1-4 skip this when targetCulture already
+        //    IS the default culture, since that would have matched at step 3/4 already) rather than
+        //    giving up to an empty map immediately. This is what actually makes "resolve to sensible
+        //    English text... not null/empty, so existing English-speaking apps see no behavior
+        //    change" (this class's own stated contract) true regardless of the process's ambient
+        //    CultureInfo.CurrentUICulture - which is NOT guaranteed to be "en"/"en-US" just because a
+        //    caller never configured localization: a bare Linux environment with no locale
+        //    configured (e.g. a fresh CI container) resolves the current UI culture to the invariant
+        //    culture, not "en-US", causing every prop default lookup to silently return the raw
+        //    dictionary key instead of English text - confirmed the hard way when this was first
+        //    exercised in a real CI run rather than only ever run on developer machines with an
+        //    en-US OS locale already set. `DefaultCulture` (LaughTaleLocalizationOptions, "en-US" by
+        //    default) already existed for exactly this purpose but was never actually consulted here.
+        if (!string.IsNullOrEmpty(_locOptions.DefaultCulture))
+        {
+            try
+            {
+                // Guarded: under globalization-invariant deployment mode (DOTNET_SYSTEM_GLOBALIZATION_
+                // INVARIANT=1, a legitimate, real .NET deployment option this class must not crash
+                // under just because it was never configured for), only CultureInfo.InvariantCulture
+                // itself can be constructed - "en-US" throws CultureNotFoundException there. That mode
+                // isn't a reason to skip this fallback though: BuiltInDictionaries' own key strings
+                // ("en-US", "en", ...) can still be looked up directly without ever constructing a
+                // CultureInfo for them.
+                var defaultCulture = new CultureInfo(_locOptions.DefaultCulture);
+                if (_locOptions.BuiltInDictionaries.TryGetValue(defaultCulture.Name, out var builtInDefaultExact))
+                {
+                    return AsReadOnly(builtInDefaultExact);
+                }
+                if (_locOptions.BuiltInDictionaries.TryGetValue(defaultCulture.TwoLetterISOLanguageName, out var builtInDefaultLang))
+                {
+                    return AsReadOnly(builtInDefaultLang);
+                }
+            }
+            catch (CultureNotFoundException)
+            {
+                // Can't construct a CultureInfo at all here, so derive the language-code prefix by
+                // plain string splitting instead ("en-US" -> "en") - built-in dictionaries are
+                // registered under the bare 2-letter code (LaughTaleBuiltInLocales), not "en-US".
+                if (_locOptions.BuiltInDictionaries.TryGetValue(_locOptions.DefaultCulture, out var builtInDefaultLiteral))
+                {
+                    return AsReadOnly(builtInDefaultLiteral);
+                }
+                var prefix = _locOptions.DefaultCulture.Split('-')[0];
+                if (_locOptions.BuiltInDictionaries.TryGetValue(prefix, out var builtInDefaultPrefix))
+                {
+                    return AsReadOnly(builtInDefaultPrefix);
+                }
+            }
+        }
+
+        // 6. Truly nothing registered anywhere (not even the default culture): fall through to an
+        //    empty map so callers (GetString/the indexer) fall back to the raw key rather than
+        //    throwing.
         return EmptyDictionary;
     }
 

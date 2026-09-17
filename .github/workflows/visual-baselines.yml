@@ -34,14 +34,37 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: LaughTale.Client/package-lock.json
+          cache-dependency-path: |
+            LaughTale.Client/package-lock.json
+            LaughTale.Showcase.Islands/package-lock.json
+            LaughTale.Showcase/package-lock.json
+
+      # LaughTale.Client must be installed first: LaughTale.Showcase.Islands' own package.json
+      # depends on it via `"laughtale": "file:../LaughTale.Client"`, and the island-compiler CLI's
+      # own scripts (esbuild included) resolve modules from LaughTale.Client's node_modules, not
+      # Islands' own - both must exist before building Showcase below (same ordering as the `e2e`
+      # job in ci.yml).
+      - name: Install npm dependencies (Client)
+        working-directory: LaughTale.Client
+        run: npm ci
+
+      # LaughTale.Client's own `dist/` (gitignored) is what its package.json `exports` map resolves
+      # to for Showcase.Islands' island-compiler build - see the identical step in ci.yml for the
+      # full explanation.
+      - name: Build Client (produces dist/ that Showcase.Islands' island-compiler build resolves against)
+        working-directory: LaughTale.Client
+        run: npm run build
+
+      - name: Install npm dependencies (Showcase.Islands)
+        working-directory: LaughTale.Showcase.Islands
+        run: npm ci
+
+      - name: Install npm dependencies (Showcase)
+        working-directory: LaughTale.Showcase
+        run: npm ci
 
       - name: Build Showcase (same config webServer.command itself uses)
         run: dotnet build LaughTale.Showcase/LaughTale.Showcase.csproj
-
-      - name: Install client dependencies
-        working-directory: LaughTale.Client
-        run: npm ci
 
       - name: Install Playwright chromium only
         working-directory: LaughTale.Client
