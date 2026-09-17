@@ -76,6 +76,14 @@ test.describe('Native Form Association: hydration & idempotence (US2)', () => {
     test.use({ javaScriptEnabled: true });
 
     test('refresh: 50 in-place island refreshes leave exactly one field per control (plus companion where Boolean)', async ({ page }) => {
+        // 50 x 29 = 1,450 sequential awaited rehydrateIsland() calls in one page.evaluate - this is
+        // real, legitimately heavy work, not a hang. The default 30s test timeout was never actually
+        // exercised in CI until this repo's first real Playwright CI run (see ROADMAP.v5.md Part C /
+        // the CI-pipeline fix): WebKit's Linux port is measurably slower than Chromium/Firefox for
+        // this many sequential DOM/event-loop round-trips under a shared CI runner's resource
+        // constraints, and consistently exceeded 30s there while comfortably passing elsewhere.
+        test.setTimeout(90_000);
+
         await page.goto('/form-conformance');
 
         const form = page.locator('#conformance-form');
