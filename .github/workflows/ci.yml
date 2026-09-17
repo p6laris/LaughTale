@@ -21,6 +21,43 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
+      # LaughTale.Showcase, LaughTale.Showcase.Islands, and LaughTale.Docs each run their own npm
+      # build (`BuildIslandsJs`/`LaughTale.Generators.targets` MSBuild targets: esbuild bundling, and
+      # for Islands, the `laughtale islands build` CLI) as a pre-build step - `dotnet build` shells
+      # out to `npm run build`/`npx` in each project's own directory, so their npm dependencies must
+      # already exist before the solution build below, or every one of these three projects fails with
+      # `Cannot find package 'esbuild'` (confirmed: this was the actual, previously-undiscovered reason
+      # every CI run on this repo has failed since the workflow was first created - no job ever ran
+      # `npm ci` anywhere but LaughTale.Client). LaughTale.Client must be installed first:
+      # Showcase.Islands' own package.json depends on it via `"laughtale": "file:../LaughTale.Client"`,
+      # and the island-compiler CLI's own scripts (esbuild included) resolve modules from
+      # LaughTale.Client's node_modules, not Islands' own (confirmed empirically).
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: |
+            LaughTale.Client/package-lock.json
+            LaughTale.Showcase.Islands/package-lock.json
+            LaughTale.Showcase/package-lock.json
+            LaughTale.Docs/package-lock.json
+
+      - name: Install npm dependencies (Client)
+        working-directory: LaughTale.Client
+        run: npm ci
+
+      - name: Install npm dependencies (Showcase.Islands)
+        working-directory: LaughTale.Showcase.Islands
+        run: npm ci
+
+      - name: Install npm dependencies (Showcase)
+        working-directory: LaughTale.Showcase
+        run: npm ci
+
+      - name: Install npm dependencies (Docs)
+        working-directory: LaughTale.Docs
+        run: npm ci
+
       - name: Restore
         run: dotnet restore LaughTale.slnx
 
@@ -68,16 +105,32 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: LaughTale.Client/package-lock.json
+          cache-dependency-path: |
+            LaughTale.Client/package-lock.json
+            LaughTale.Showcase.Islands/package-lock.json
+            LaughTale.Showcase/package-lock.json
+
+      # LaughTale.Client must be installed first: LaughTale.Showcase.Islands' own package.json
+      # depends on it via `"laughtale": "file:../LaughTale.Client"`, and the island-compiler CLI's
+      # own scripts (esbuild included) resolve modules from LaughTale.Client's node_modules, not
+      # Islands' own - both must exist before building Showcase below (see the `dotnet` job above
+      # for the full explanation of why this order matters).
+      - name: Install npm dependencies (Client)
+        working-directory: LaughTale.Client
+        run: npm ci
+
+      - name: Install npm dependencies (Showcase.Islands)
+        working-directory: LaughTale.Showcase.Islands
+        run: npm ci
+
+      - name: Install npm dependencies (Showcase)
+        working-directory: LaughTale.Showcase
+        run: npm ci
 
       # Debug config (no `-c Release`), matching webServer.command's own implicit `dotnet run`
       # default - so this prebuild is actually reused instead of mismatching configs and rebuilding.
       - name: Build Showcase (same config webServer.command itself uses)
         run: dotnet build LaughTale.Showcase/LaughTale.Showcase.csproj
-
-      - name: Install client dependencies
-        working-directory: LaughTale.Client
-        run: npm ci
 
       # All 3 engines, not chromium-only: this job also runs the pre-existing functional specs
       # cross-browser for the first time ever in CI (see ROADMAP.v5.md Part C).
