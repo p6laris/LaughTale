@@ -952,6 +952,31 @@ element reference throughout resolved it correctly. `autocomplete.ts`/`multisele
   built and unit-tested but has no real caller anywhere - wiring it into a CI assertion needs a real
   browser driving actual hydration, not just Node/happy-dom) and a Lighthouse run on the Showcase -
   both closer to new infrastructure than to "extend an existing check."
+  **Correction, several passes later (2026-09-17): this "[CLOSED]" claim did not hold up.** CI had, in
+  fact, never once actually passed since this workflow was created — every single run on `main`, across
+  every "closed"/"verified" commit from this point through the Part I/visual-regression passes,
+  failed on both jobs, confirmed by checking real GitHub Actions run history (`gh run list`), not
+  assumed. Root causes, both entirely unrelated to anything asserted "closed" above: (1)
+  `LaughTale.Showcase`, `LaughTale.Showcase.Islands`, and `LaughTale.Docs` each run their own npm-based
+  build as an MSBuild pre-build step, and no CI job ever installed their npm dependencies (only
+  `LaughTale.Client`'s), so `dotnet build`/`dotnet test` against the full solution failed outright,
+  every time; (2) `tests/setup.ts` never actually set a global `navigator` (it only tried to attach a
+  `.clipboard` property to one it assumed already existed, silently swallowing the failure) - `navigator`
+  is only a built-in Node global since Node 21+, so on Node 20 (what `actions/setup-node@v4` pins here)
+  the bare identifier was completely unbound, throwing inside `react-dom`'s own top-level code and
+  misreported by `adapters/react.ts`'s blanket catch as "package not found," failing 8 real tests that
+  passed silently on every contributor's own Windows/macOS machine. Also found and fixed in the same
+  pass: `LaughTaleLocalizer.GetDictionary()` never consulted its own `DefaultCulture` option as a
+  fallback, so a Linux CI container whose ambient culture doesn't resolve to "en" returned raw
+  dictionary keys instead of English text (Part N's own "resolve to sensible English text... not
+  null/empty" contract, silently unmet outside an already-English-defaulted OS). All three fixed and
+  verified against real Linux containers (`mcr.microsoft.com/dotnet/sdk:10.0`, `node:20`) before
+  merging, not just re-pushed and hoped for — see [p6laris/LaughTale#1](https://github.com/p6laris/LaughTale/pull/1).
+  **The lesson this document itself already states most clearly** (§18, "measure adoption, not
+  delivery"): a CI workflow file existing, and even being referenced as evidence of "closed" status
+  several times since, is not the same as it ever having actually run green. Nothing in this session
+  had checked the real GitHub Actions run history until asked to trigger a downstream workflow
+  surfaced the failure by accident.
 - **Publish honest numbers** — a reproducible benchmark against Blazor Server and WASM: TTFB, TTI,
   transferred bytes, memory after 50 navigations. Worth more than every adjective in the README.
 - **Report Core Web Vitals** back through the instrumentation hook (Part H).
